@@ -47,7 +47,7 @@ export interface UserProfileSecurityPanelViewProps
   onRemovePasskey?: (id: string) => void | Promise<void>;
   onAddMfaMethod?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
-  onRemoveMfaMethod?: (id: string) => void;
+  onRemoveMfaMethod?: (id: string) => void | Promise<void>;
   /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
   onDeleteAccount?: () => Promise<void>;
 }

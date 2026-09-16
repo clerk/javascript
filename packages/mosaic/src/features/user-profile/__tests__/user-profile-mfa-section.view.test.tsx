@@ -1,9 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../../machines/__tests__/test-utils';
 import { MosaicProvider } from '../../../MosaicProvider';
-import type { UserProfileMfaSectionViewProps } from '../user-profile-mfa-section.view';
+import type { UserProfileMfaMethod, UserProfileMfaSectionViewProps } from '../user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from '../user-profile-mfa-section.view';
 
 function renderView(overrides: Partial<UserProfileMfaSectionViewProps> = {}) {
@@ -43,7 +45,7 @@ describe('MFA section', () => {
     expect(screen.queryByText('Default')).not.toBeInTheDocument();
   });
 
-  it('keeps a protected method visible while removing a different SMS method by identity', async () => {
+  it('confirms the selected SMS method and restores focus when removal is cancelled', async () => {
     const user = userEvent.setup();
     const { props } = renderView({
       methods: [
@@ -55,11 +57,26 @@ describe('MFA section', () => {
 
     expect(screen.getByText('Authenticator app')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Manage Authenticator app' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0100' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0100' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    expect(screen.getByRole('alertdialog', { name: 'Remove SMS verification' })).toHaveAccessibleDescription(
+      'You will no longer receive sign-in verification codes at +1 801-555-0100. The phone number will remain on your account.',
+    );
+    expect(props.onRemove).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0100' })).toHaveFocus();
+
     await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0200' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    const dialog = screen.getByRole('alertdialog', { name: 'Remove SMS verification' });
+    expect(dialog).toHaveAccessibleDescription(
+      'You will no longer receive sign-in verification codes at +1 801-555-0200. The phone number will remain on your account.',
+    );
+    await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
 
     expect(props.onRemove).toHaveBeenCalledExactlyOnceWith('work');
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
   it('offers Set as default only for an eligible SMS row and reflects updated props', async () => {
@@ -94,6 +111,118 @@ describe('MFA section', () => {
     expect(screen.getAllByText('Default')).toHaveLength(1);
     await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0200' }));
     expect(screen.queryByRole('menuitem', { name: 'Set as default' })).not.toBeInTheDocument();
+  });
+
+  it('explains authenticator removal without referring to a phone number', async () => {
+    const user = userEvent.setup();
+    const { props } = renderView({ methods: [{ id: 'totp', type: 'authenticator', isDefault: true }] });
+
+    await user.click(screen.getByRole('button', { name: 'Manage Authenticator app' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    const dialog = screen.getByRole('alertdialog', { name: 'Remove authenticator app' });
+    expect(dialog).toHaveAccessibleDescription(
+      'Verification codes from this authenticator will no longer be required when signing in. Your account may not be as secure.',
+    );
+    expect(props.onRemove).not.toHaveBeenCalled();
+    await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
+
+    expect(props.onRemove).toHaveBeenCalledExactlyOnceWith('totp');
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  });
+
+  it('waits for removal of the final method before showing the empty section', async () => {
+    const user = userEvent.setup();
+    const pending = deferred<void>();
+    const onRemove = vi.fn(() => pending.promise);
+    const onAdd = vi.fn();
+
+    function Example() {
+      const [methods, setMethods] = useState<UserProfileMfaMethod[]>([{ id: 'totp', type: 'authenticator' }]);
+      return (
+        <MosaicProvider>
+          <UserProfileMfaSectionView
+            methods={methods}
+            onAdd={onAdd}
+            onRemove={async id => {
+              await onRemove();
+              setMethods(current => current.filter(method => method.id !== id));
+            }}
+          />
+        </MosaicProvider>
+      );
+    }
+
+    render(<Example />);
+    await user.click(screen.getByRole('button', { name: 'Manage Authenticator app' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
+
+    expect(screen.getByRole('button', { name: 'Remove', exact: true })).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByText('Authenticator app')).toBeInTheDocument();
+    expect(screen.queryByText('No verification methods added')).not.toBeInTheDocument();
+    await user.keyboard('{Escape}');
+    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+
+    await act(async () => {
+      pending.resolve();
+      await pending.promise;
+    });
+
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('region', { name: '2-step verification' })).toBeVisible();
+    expect(screen.queryByText('Authenticator app')).not.toBeInTheDocument();
+    expect(screen.getByText('No verification methods added')).toBeVisible();
+    expect(onRemove).toHaveBeenCalledOnce();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Authenticator app' }));
+    expect(onAdd).toHaveBeenCalledExactlyOnceWith('authenticator');
+  });
+
+  it('keeps a failed SMS removal open and retries the same method', async () => {
+    const user = userEvent.setup();
+    const onRemove = vi
+      .fn<(id: string) => Promise<void>>()
+      .mockRejectedValueOnce(new Error('Could not remove this method. Please try again.'))
+      .mockResolvedValueOnce(undefined);
+
+    function Example() {
+      const [methods, setMethods] = useState<UserProfileMfaMethod[]>([
+        { id: 'personal', type: 'sms', description: '+1 801-555-0100' },
+        { id: 'work', type: 'sms', description: '+1 801-555-0200' },
+        { id: 'backup', type: 'backup-codes' },
+      ]);
+      return (
+        <MosaicProvider>
+          <UserProfileMfaSectionView
+            methods={methods}
+            onRemove={async id => {
+              await onRemove(id);
+              setMethods(current => current.filter(method => method.id !== id));
+            }}
+          />
+        </MosaicProvider>
+      );
+    }
+
+    render(<Example />);
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0200' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
+    const dialog = screen.getByRole('alertdialog');
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'Could not remove this method. Please try again.',
+    );
+    expect(dialog).toHaveAccessibleDescription(
+      'You will no longer receive sign-in verification codes at +1 801-555-0200. The phone number will remain on your account.',
+    );
+    expect(screen.getByText('+1 801-555-0200')).toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
+
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(onRemove.mock.calls).toEqual([['work'], ['work']]);
+    expect(screen.queryByText('+1 801-555-0200')).not.toBeInTheDocument();
+    expect(screen.getByText('+1 801-555-0100')).toBeVisible();
+    expect(screen.getByText('Backup codes')).toBeVisible();
   });
 
   it('renders supplied backup codes without other methods and only offers regeneration', async () => {

@@ -13,8 +13,9 @@ export function UserProfileMfaRowView({
   onRemove,
   onSetDefault,
   onRegenerateBackupCodes,
-}: Pick<UserProfileMfaSectionViewProps, 'onRemove' | 'onSetDefault' | 'onRegenerateBackupCodes'> & {
+}: Pick<UserProfileMfaSectionViewProps, 'onSetDefault' | 'onRegenerateBackupCodes'> & {
   method: UserProfileMfaMethod;
+  onRemove?: () => void;
 }) {
   const label = method.label ?? m.methods[method.type];
   const manageLabel =
@@ -32,7 +33,7 @@ export function UserProfileMfaRowView({
       actions.push({ label: m.regenerate, onClick: onRegenerateBackupCodes });
     }
   } else if (onRemove && method.canRemove !== false) {
-    actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(method.id) });
+    actions.push({ label: m.remove, color: 'negative', onClick: onRemove });
   }
 
   return (

@@ -253,6 +253,13 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(screen.getByRole('button', { name: 'Manage SMS verification' }));
     expect(screen.queryByRole('menuitem', { name: 'Manage' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    const dialog = screen.getByRole('alertdialog', { name: 'Remove SMS verification' });
+    expect(dialog).toHaveAccessibleDescription(
+      'This phone number will no longer receive sign-in verification codes. It will remain on your account.',
+    );
+    expect(onRemoveMfaMethod).not.toHaveBeenCalled();
+    await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
     expect(screen.queryByRole('menuitem', { name: 'Remove method' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));

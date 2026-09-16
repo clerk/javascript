@@ -1,6 +1,10 @@
+import { useMemo } from 'react';
+
+import { Confirmation } from '../../blocks/confirmation';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Menu } from '../../components/menu';
+import { fill } from '../../utils/messages';
 import { UserProfileMfaRowView } from './user-profile-mfa-row.view';
 import { userProfileMfaMessages as m } from './user-profile-mfa-section.messages';
 import { UserProfileSecurityList } from './user-profile-security-list';
@@ -22,7 +26,7 @@ export interface UserProfileMfaSectionViewProps {
   sectionTitle?: string;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
-  onRemove?: (id: string) => void;
+  onRemove?: (id: string) => void | Promise<void>;
   onSetDefault?: (id: string) => void;
 }
 
@@ -36,60 +40,81 @@ export function UserProfileMfaSectionView({
   onRemove,
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
+  const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
   const availableMethods = addableMethods.filter(type => !methods.some(method => method.type === type));
 
   return (
-    <UserProfileSecurityList
-      addControl={
-        onAdd && availableMethods.length > 0 ? (
-          <Menu.Root placement='bottom-end'>
-            <Menu.Trigger
-              aria-label={m.addLabel}
-              render={props => (
-                <Button
-                  color='neutral'
+    <>
+      <UserProfileSecurityList
+        addControl={
+          onAdd && availableMethods.length > 0 ? (
+            <Menu.Root placement='bottom-end'>
+              <Menu.Trigger
+                aria-label={m.addLabel}
+                render={props => (
+                  <Button
+                    color='neutral'
+                    size='sm'
+                    variant='outline'
+                    {...props}
+                  />
+                )}
+              >
+                <Icon
+                  name='plus'
+                  placement='inline-start'
                   size='sm'
-                  variant='outline'
-                  {...props}
                 />
-              )}
-            >
-              <Icon
-                name='plus'
-                placement='inline-start'
-                size='sm'
-              />
-              {m.add}
-            </Menu.Trigger>
-            <Menu.Popup>
-              {availableMethods.map(type => (
-                <Menu.Item
-                  key={type}
-                  label={m.methods[type]}
-                  onClick={() => onAdd(type)}
-                >
-                  <Menu.Label>{m.methods[type]}</Menu.Label>
-                </Menu.Item>
-              ))}
-            </Menu.Popup>
-          </Menu.Root>
-        ) : null
-      }
-      addLabel={m.addLabel}
-      emptyLabel={m.empty}
-      hasItems={methods.length > 0}
-      label={m.label}
-      sectionTitle={sectionTitle}
-    >
-      {methods.map(method => (
-        <UserProfileMfaRowView
-          key={method.id}
-          method={method}
-          onRemove={onRemove}
-          onSetDefault={onSetDefault}
-          onRegenerateBackupCodes={onRegenerateBackupCodes}
+                {m.add}
+              </Menu.Trigger>
+              <Menu.Popup>
+                {availableMethods.map(type => (
+                  <Menu.Item
+                    key={type}
+                    label={m.methods[type]}
+                    onClick={() => onAdd(type)}
+                  >
+                    <Menu.Label>{m.methods[type]}</Menu.Label>
+                  </Menu.Item>
+                ))}
+              </Menu.Popup>
+            </Menu.Root>
+          ) : null
+        }
+        addLabel={m.addLabel}
+        emptyLabel={m.empty}
+        hasItems={methods.length > 0}
+        label={m.label}
+        sectionTitle={sectionTitle}
+      >
+        {methods.map(method => (
+          <UserProfileMfaRowView
+            key={method.id}
+            method={method}
+            onRemove={onRemove ? () => removeMethod.open(method) : undefined}
+            onSetDefault={onSetDefault}
+            onRegenerateBackupCodes={onRegenerateBackupCodes}
+          />
+        ))}
+      </UserProfileSecurityList>
+      {onRemove ? (
+        <Confirmation
+          handle={removeMethod}
+          title={method => (method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle)}
+          description={describeMethodRemoval}
+          actionLabel={m.removeDialog.confirm}
+          onConfirm={method => onRemove(method.id)}
         />
-      ))}
-    </UserProfileSecurityList>
+      ) : null}
+    </>
   );
+}
+
+function describeMethodRemoval(method: UserProfileMfaMethod) {
+  if (method.type === 'sms') {
+    return method.description
+      ? fill(m.removeDialog.smsDescription, { phoneNumber: method.description })
+      : m.removeDialog.smsDescriptionWithoutNumber;
+  }
+  return m.removeDialog.authenticatorDescription;
 }
