@@ -32,7 +32,7 @@ Choose Set as default on the second SMS number. Its menu shows progress while me
 | `methods`                 | `UserProfileMfaMethod[]`                      | — (required) | Prepared rows, in display order. All supplied rows render.                                           |
 | `addableMethods`          | `readonly UserProfileMfaAddableMethod[]`      | `[]`         | Available choices, in display order. Add appears when this is nonempty and `onAdd` is supplied.      |
 | `sectionTitle`            | `string`                                      | —            | Optional surrounding heading.                                                                        |
-| `onAdd`                   | `(type: UserProfileMfaAddableMethod) => void` | —            | Receives the selected method when Continue closes the picker.                                        |
+| `onAdd`                   | `(type: UserProfileMfaAddableMethod) => void` | —            | Receives the chosen method immediately when its option is activated.                                 |
 | `onSetDefault`            | `(id: string) => void \| Promise<void>`       | —            | Changes the default SMS method. Shows pending feedback and reports failures beside the selected row. |
 | `onRemove`                | `(id: string) => void \| Promise<void>`       | —            | Called after confirmation. Resolve to close; reject with an Error to show the failure.               |
 | `onRegenerateBackupCodes` | `() => void`                                  | —            | Requests backup-code regeneration.                                                                   |
@@ -55,7 +55,7 @@ Callbacks report user intent; updated props determine the displayed result. Set 
 
 ### Choose a method
 
-Open Add, select a method, then Continue. This example reports the choice below the section; setup and verification screens are still being developed. Closing the picker discards the selection and returns focus to Add. Omitting `onAdd` or supplying no choices hides Add while keeping the section visible.
+Open Add and choose a method. Each option is a button with a chevron, matching the reverification picker. This example reports the choice below the section; setup and verification screens are still being developed. Choosing an option reports it immediately and closes the picker. Closing without choosing a method leaves the selection unchanged; focus returns to Add. Omitting `onAdd` or supplying no choices hides Add while keeping the section visible.
 
 <Story name='AddMethod' storyModule={Stories} />
 

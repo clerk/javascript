@@ -18,7 +18,6 @@ export const userProfileMfaMessages = {
   addDialog: {
     title: 'Add 2-step verification',
     description: 'Choose a verification method',
-    continue: 'Continue',
     methods: {
       sms: 'Get a code by text message',
       authenticator: 'Get codes from an authenticator app',

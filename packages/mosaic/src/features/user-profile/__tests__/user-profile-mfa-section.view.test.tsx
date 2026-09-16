@@ -29,28 +29,27 @@ function renderView(overrides: Partial<UserProfileMfaSectionViewProps> = {}) {
 }
 
 describe('MFA section', () => {
-  it.each(['sms', 'authenticator', 'backup-codes'] as const)('continues with the selected %s method', async type => {
-    const user = userEvent.setup();
-    const { props } = renderView({
-      methods: [{ id: 'existing', type: 'sms', description: '+1 801-555-0100' }],
-      addableMethods: ['sms', 'authenticator', 'backup-codes'],
-    });
-    const labels = { sms: 'SMS verification', authenticator: 'Authenticator app', 'backup-codes': 'Backup codes' };
+  it.each(['sms', 'authenticator', 'backup-codes'] as const)(
+    'continues immediately when the %s option is activated',
+    async type => {
+      const user = userEvent.setup();
+      const { props } = renderView({
+        methods: [{ id: 'existing', type: 'sms', description: '+1 801-555-0100' }],
+        addableMethods: ['sms', 'authenticator', 'backup-codes'],
+      });
+      const labels = { sms: 'SMS verification', authenticator: 'Authenticator app', 'backup-codes': 'Backup codes' };
 
-    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    const dialog = screen.getByRole('dialog', { name: 'Add 2-step verification' });
-    expect(dialog).toHaveAccessibleDescription('Choose a verification method');
-    expect(within(dialog).getAllByRole('radio')).toHaveLength(3);
-    const continueButton = within(dialog).getByRole('button', { name: 'Continue' });
-    expect(continueButton).toBeDisabled();
-    await user.click(within(dialog).getByRole('radio', { name: labels[type] }));
-    expect(props.onAdd).not.toHaveBeenCalled();
-    await user.click(continueButton);
+      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+      const dialog = screen.getByRole('dialog', { name: 'Add 2-step verification' });
+      expect(dialog).toHaveAccessibleDescription('Choose a verification method');
+      expect(within(dialog).queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument();
+      await user.click(within(dialog).getByRole('button', { name: new RegExp(labels[type]) }));
 
-    expect(props.onAdd).toHaveBeenCalledExactlyOnceWith(type);
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(screen.getByText('+1 801-555-0100')).toBeVisible();
-  });
+      expect(props.onAdd).toHaveBeenCalledExactlyOnceWith(type);
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(screen.getByText('+1 801-555-0100')).toBeVisible();
+    },
+  );
 
   it.each(['authenticator', 'sms'] as const)('displays the supplied default state for %s', type => {
     const { props, rerender } = renderView({ methods: [{ id: 'method_1', type, isDefault: true }] });
@@ -69,24 +68,35 @@ describe('MFA section', () => {
     expect(screen.queryByText('Default')).not.toBeInTheDocument();
   });
 
-  it('discards a cancelled keyboard selection and restores focus to Add', async () => {
+  it('cancels without selecting a method and restores focus to Add', async () => {
     const user = userEvent.setup();
     const { props } = renderView();
     const add = screen.getByRole('button', { name: 'Add verification method' });
     await user.click(add);
     await user.tab();
-    expect(screen.getByRole('radio', { name: 'SMS verification' })).toHaveFocus();
-    await user.keyboard('{ArrowDown}');
-    expect(screen.getByRole('radio', { name: 'Authenticator app' })).toBeChecked();
+    expect(screen.getByRole('button', { name: /SMS verification/ })).toHaveFocus();
     await user.keyboard('{Escape}');
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(add).toHaveFocus();
     expect(props.onAdd).not.toHaveBeenCalled();
     await user.click(add);
-    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
-    expect(screen.getByRole('radio', { name: 'Authenticator app' })).not.toBeChecked();
     await user.click(screen.getByRole('button', { name: 'Close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(add).toHaveFocus();
+  });
+
+  it.each(['{Enter}', ' '])('activates a method with %s', async key => {
+    const user = userEvent.setup();
+    const { props } = renderView();
+    const add = screen.getByRole('button', { name: 'Add verification method' });
+    await user.click(add);
+    await user.tab();
+    await user.tab();
+    expect(screen.getByRole('button', { name: /Authenticator app Get codes/ })).toHaveFocus();
+    await user.keyboard(key);
+
+    expect(props.onAdd).toHaveBeenCalledExactlyOnceWith('authenticator');
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(add).toHaveFocus();
   });
@@ -98,9 +108,9 @@ describe('MFA section', () => {
       addableMethods: ['sms'],
     });
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    expect(screen.getAllByRole('radio')).toHaveLength(1);
-    await user.click(screen.getByRole('radio', { name: 'SMS verification' }));
-    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(screen.queryByRole('button', { name: /Authenticator app/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Backup codes/ })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /SMS verification Get a code/ }));
     expect(props.onAdd).toHaveBeenCalledExactlyOnceWith('sms');
   });
 
@@ -331,8 +341,7 @@ describe('MFA section', () => {
     expect(screen.getByText('No verification methods added')).toBeVisible();
     expect(onRemove).toHaveBeenCalledOnce();
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    await user.click(screen.getByRole('radio', { name: 'Authenticator app' }));
-    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await user.click(screen.getByRole('button', { name: /Authenticator app Get codes/ }));
     expect(onAdd).toHaveBeenCalledExactlyOnceWith('authenticator');
   });
 

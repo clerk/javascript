@@ -50,7 +50,7 @@ export function UserProfileMfaSectionView({
           onAdd && addableMethods.length > 0 ? (
             <UserProfileAddMfaDialog
               methods={addableMethods}
-              onContinue={onAdd}
+              onSelect={onAdd}
               disabled={isSettingDefault}
             />
           ) : null
