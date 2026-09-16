@@ -1,8 +1,11 @@
+import { useMemo } from 'react';
+
+import { Confirmation } from '../../blocks/confirmation';
+import { Button } from '../../components/button';
+import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
-import { UserProfileSecurityIcon } from './user-profile-security-icon';
-import { UserProfileSecurityList } from './user-profile-security-list';
+import { UserProfilePasskeyRowView } from './user-profile-passkey-row.view';
+import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 
 export interface UserProfilePasskey {
   id: string;
@@ -15,56 +18,88 @@ export interface UserProfilePasskeysSectionViewProps {
   passkeys: UserProfilePasskey[];
   sectionTitle?: string;
   onAdd?: () => void;
+  addError?: string;
+  onRename?: (id: string, name: string) => void | Promise<void>;
   onManage?: (id: string) => void;
-  onRemove?: (id: string) => void;
+  onRemove?: (id: string) => void | Promise<void>;
 }
 
 export function UserProfilePasskeysSectionView({
   passkeys,
   sectionTitle,
   onAdd,
+  addError,
+  onRename,
   onManage,
   onRemove,
 }: UserProfilePasskeysSectionViewProps) {
+  const removePasskey = useMemo(() => Confirmation.createHandle<UserProfilePasskey>(), []);
+
   return (
-    <UserProfileSecurityList
-      addLabel='Add passkey'
-      emptyLabel='No passkeys added'
-      hasItems={passkeys.length > 0}
-      label='Passkeys'
-      sectionTitle={sectionTitle}
-      onAdd={onAdd}
-    >
-      {passkeys.map(passkey => {
-        const actions: UserProfileMenuAction[] = [];
-
-        if (onManage) {
-          actions.push({ label: 'Rename', onClick: () => onManage(passkey.id) });
-        }
-        if (onRemove) {
-          actions.push({ label: 'Remove passkey', color: 'negative', onClick: () => onRemove(passkey.id) });
-        }
-
-        return (
-          <Section.Item key={passkey.id}>
-            <UserProfileSecurityIcon name='passkey' />
-            <Section.Content>
-              <Section.Label>{passkey.name}</Section.Label>
-              {passkey.createdAtLabel || passkey.lastUsedAtLabel ? (
-                <Section.Description>
-                  {[passkey.createdAtLabel, passkey.lastUsedAtLabel].filter(Boolean).join(' · ')}
-                </Section.Description>
-              ) : null}
-            </Section.Content>
-            <Section.Actions>
-              <UserProfileActionMenu
-                actions={actions}
-                label={`Manage ${passkey.name}`}
-              />
-            </Section.Actions>
-          </Section.Item>
-        );
-      })}
-    </UserProfileSecurityList>
+    <>
+      {passkeys.length > 0 || onAdd ? (
+        <Section.Root aria-label={sectionTitle ? undefined : m.label}>
+          {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
+          <Section.Group>
+            <Section.Row>
+              <Section.Item>
+                <Section.Content>
+                  <Section.Label>{m.label}</Section.Label>
+                </Section.Content>
+                {onAdd ? (
+                  <Section.Actions>
+                    <Button
+                      aria-label={m.add}
+                      color='neutral'
+                      size='sm'
+                      variant='outline'
+                      onClick={onAdd}
+                    >
+                      <Icon
+                        name='plus'
+                        placement='inline-start'
+                        size='sm'
+                      />
+                      {m.add}
+                    </Button>
+                  </Section.Actions>
+                ) : null}
+              </Section.Item>
+              {addError ? <Section.Error>{addError}</Section.Error> : null}
+              {passkeys.length > 0 ? (
+                <Section.Items>
+                  {passkeys.map(passkey => (
+                    <UserProfilePasskeyRowView
+                      key={passkey.id}
+                      passkey={passkey}
+                      onRename={onRename}
+                      onManage={onManage}
+                      onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
+                    />
+                  ))}
+                </Section.Items>
+              ) : (
+                <Section.Items>
+                  <Section.Item>
+                    <Section.Content>
+                      <Section.Description>{m.empty}</Section.Description>
+                    </Section.Content>
+                  </Section.Item>
+                </Section.Items>
+              )}
+            </Section.Row>
+          </Section.Group>
+        </Section.Root>
+      ) : null}
+      {onRemove ? (
+        <Confirmation
+          handle={removePasskey}
+          title={m.removeTitle}
+          description={passkey => m.removeDescription.replace('{name}', () => passkey.name)}
+          actionLabel={m.remove}
+          onConfirm={passkey => onRemove(passkey.id)}
+        />
+      ) : null}
+    </>
   );
 }

@@ -1,0 +1,17 @@
+export const userProfilePasskeysMessages = {
+  label: 'Passkeys',
+  add: 'Add passkey',
+  empty: 'No passkeys added',
+  manage: 'Manage {name}',
+  rename: 'Rename',
+  renameTitle: 'Rename passkey',
+  renameDescription: 'You can change the passkey name to make it easier to find.',
+  nameLabel: 'Passkey name',
+  save: 'Save',
+  cancel: 'Cancel',
+  saveError: 'Something went wrong. Please try again.',
+  removeAction: 'Remove passkey',
+  removeTitle: 'Remove passkey',
+  removeDescription: '{name} will be removed from this account.',
+  remove: 'Remove',
+};

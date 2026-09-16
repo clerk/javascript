@@ -109,6 +109,8 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove', exact: true }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 
     const otherDevices = screen.getByRole('region', { name: 'Other devices' });
     await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
