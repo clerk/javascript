@@ -11,6 +11,7 @@ const m = {
   label: 'Account',
   members: { one: '{count} member', other: '{count} members' },
   seats: { one: '{count} seat in {org}', other: '{count} seats in {org}' },
+  invites: { one: '{count} invite from {sender}', other: '{count} invites' },
   removal: '{#strong}{emailAddress}{/strong} will be removed.',
   countdown: 'Resend ({seconds})',
   divider: 'before {#rule/} after',
@@ -46,6 +47,9 @@ describe('plural', () => {
     plural(m.seats, 2);
     // @ts-expect-error members has nothing beyond count
     plural(m.members, 2, 'en', { org: 'Clerk' });
+    plural(m.invites, 1, 'en', { sender: 'Sam' });
+    // @ts-expect-error a placeholder named by any form is required
+    plural(m.invites, 2);
   });
 });
 

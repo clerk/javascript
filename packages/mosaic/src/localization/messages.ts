@@ -40,11 +40,13 @@ type TypedRichOptions<T extends string> = string extends T
       ? [options: { values: Values<T, ReactNode> }]
       : [options: { values: Values<T, ReactNode>; components: Components<T> }];
 
+type PluralParams<F extends PluralForms> = Exclude<MessageParams<Extract<F[keyof F], string>>, 'count'>;
+
 type PluralValues<F extends PluralForms> = string extends F['other']
   ? [values?: MessageValues]
-  : [Exclude<MessageParams<F['other']>, 'count'>] extends [never]
+  : [PluralParams<F>] extends [never]
     ? []
-    : [values: Record<Exclude<MessageParams<F['other']>, 'count'>, string | number>];
+    : [values: Record<PluralParams<F>, string | number>];
 
 function own<T>(record: Partial<Record<string, T>> | undefined, key: string): T | undefined {
   return record && Object.hasOwn(record, key) ? record[key] : undefined;

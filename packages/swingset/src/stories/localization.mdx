@@ -178,7 +178,7 @@ function Trigger({ name, count }: { name: string; count: number }) {
 | `rich(template, { values, components })` | `{name}` and `{#tag}…{/tag}` markup  | `ReactNode` |
 
 Each helper is typed against the literal it is given: `fill` requires exactly the placeholders
-the string names, `plural` requires whatever the `other` form names besides `count`, and `rich`
+the string names, `plural` requires whatever any of the forms name besides `count`, and `rich`
 requires a component per tag. Passing a string that is not a literal, such as one read from a
 prop, falls back to the untyped signatures.
 
