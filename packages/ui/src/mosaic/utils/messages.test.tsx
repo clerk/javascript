@@ -34,6 +34,11 @@ describe('plural', () => {
     expect(plural({ other: '{count} items' }, 1)).toBe('1 items');
   });
 
+  it('ignores inherited plural forms', () => {
+    const forms = Object.assign(Object.create({ one: 'inherited' }), { other: '{count} items' });
+    expect(plural(forms, 1)).toBe('1 items');
+  });
+
   it('selects by locale', () => {
     const forms = { one: 'one', few: 'few', many: 'many', other: 'other' };
     expect(plural(forms, 3, 'pl')).toBe('few');
@@ -88,6 +93,11 @@ describe('rich', () => {
   it('leaves an unknown placeholder in place', () => {
     const { container } = render(<p>{rich('Hi {name}!')}</p>);
     expect(container.innerHTML).toBe('<p>Hi {name}!</p>');
+  });
+
+  it('leaves an unmatched closing tag in place', () => {
+    const { container } = render(<p>{rich('Use {/strong} literally', { components: {} })}</p>);
+    expect(container.innerHTML).toBe('<p>Use {/strong} literally</p>');
   });
 
   it('ignores inherited object properties', () => {

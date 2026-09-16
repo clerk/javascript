@@ -22,7 +22,7 @@ export function fill(template: string, values: MessageValues): string {
 
 export function plural(forms: PluralForms, count: number, locale = 'en'): string {
   const category = new Intl.PluralRules(locale).select(count);
-  return fill(forms[category] ?? forms.other, { count });
+  return fill(own(forms, category) ?? forms.other, { count });
 }
 
 type Token =
@@ -84,6 +84,7 @@ function fold(
       if (token.name === stopTag) {
         return { nodes, next: i + 1 };
       }
+      nodes.push(`{/${token.name}}`);
       i++;
     } else {
       const inner = fold(tokens, i + 1, token.name, options);
