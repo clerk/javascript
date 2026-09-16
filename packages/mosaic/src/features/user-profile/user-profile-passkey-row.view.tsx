@@ -1,14 +1,13 @@
-import * as stylex from '@stylexjs/stylex';
 import { useMemo } from 'react';
 
 import { Dialog } from '../../components/dialog';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
-import { colorVars } from '../../tokens.stylex';
 import { fill } from '../../utils/messages';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
+import { styles } from './user-profile-passkeys-section.styles';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 import { useUserProfileRenamePasskeyController } from './user-profile-rename-passkey.controller';
 import { UserProfileRenamePasskeyDialog } from './user-profile-rename-passkey.dialog';
@@ -76,9 +75,3 @@ export function UserProfilePasskeyRowView({
     </>
   );
 }
-
-const styles = stylex.create({
-  icon: {
-    color: colorVars['--cl-color-foreground-secondary'],
-  },
-});

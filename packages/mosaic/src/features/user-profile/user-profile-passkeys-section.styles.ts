@@ -1,0 +1,9 @@
+import * as stylex from '@stylexjs/stylex';
+
+import { colorVars } from '../../tokens.stylex';
+
+export const styles = stylex.create({
+  icon: {
+    color: colorVars['--cl-color-foreground-secondary'],
+  },
+});
