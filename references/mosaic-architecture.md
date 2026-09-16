@@ -201,7 +201,10 @@ resolve them with the helpers in `src/mosaic/utils/messages.ts`, never with
   `Intl.PluralRules` and fills `{count}`.
 - `rich(m.description, { values, components })` renders `{#strong}…{/strong}`
   markup through the component authored for that tag, so the sentence stays in the
-  messages file and the view supplies only the element.
+  messages file and the view supplies only the element. Markup is for inline
+  emphasis a translator may keep or move. A wrapper the view needs for its own
+  purposes, such as a countdown span, is passed as an element in `values`, so the
+  string only ever sees `{seconds}`.
 
 ### Composition
 

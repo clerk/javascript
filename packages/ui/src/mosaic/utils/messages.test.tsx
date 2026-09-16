@@ -47,6 +47,11 @@ describe('rich', () => {
     expect(container.innerHTML).toBe('<p>Hi Sam</p>');
   });
 
+  it('renders an element passed as a value', () => {
+    const { container } = render(<p>{rich('Resend ({seconds})', { values: { seconds: <span>9</span> } })}</p>);
+    expect(container.innerHTML).toBe('<p>Resend (<span>9</span>)</p>');
+  });
+
   it('renders markup through the matching component', () => {
     const { container } = render(
       <p>

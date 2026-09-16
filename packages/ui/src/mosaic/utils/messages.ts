@@ -8,7 +8,7 @@ export type PluralForms = Partial<Record<Intl.LDMLPluralRule, string>> & { other
 export type MessageComponents = Record<string, (children?: ReactNode) => ReactNode>;
 
 export interface RichOptions {
-  values?: MessageValues;
+  values?: Record<string, ReactNode>;
   components?: MessageComponents;
 }
 
@@ -74,7 +74,7 @@ function fold(
       nodes.push(token.value);
       i++;
     } else if (token.type === 'value') {
-      nodes.push(String(own(options.values, token.name) ?? `{${token.name}}`));
+      nodes.push(own(options.values, token.name) ?? `{${token.name}}`);
       i++;
     } else if (token.type === 'standalone') {
       const component = own(options.components, token.name);
