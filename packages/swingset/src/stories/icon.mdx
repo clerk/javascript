@@ -59,13 +59,24 @@ Monochrome artwork uses `currentColor`. Set the surrounding text color or use `x
   storyModule={IconStories}
 />
 
-### Names
+### Icons
 
-The gallery includes every registered name. `support` is the rescue ring; `dotted-square` is the separate artwork in Figma's second frame named “support.” Filled device illustrations and dedicated security glyphs are distinct from similarly named outline icons. The building preserves its source paths with corrected placement to prevent clipping.
+Monochrome glyphs include the dedicated security icons. `support` is the rescue ring; `dotted-square` is the separate artwork in Figma's second frame named “support.” The building preserves its source paths with corrected placement to prevent clipping.
 
 <Story
   name='Names'
   storyModule={IconStories}
+  showCode={false}
+/>
+
+### Device illustrations
+
+The filled phone and laptop keep their Figma palettes. They use the same Icon component and per-name overrides as the monochrome glyphs above.
+
+<Story
+  name='DeviceIllustrations'
+  storyModule={IconStories}
+  showCode={false}
 />
 
 ### Overriding a glyph

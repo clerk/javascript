@@ -94,7 +94,9 @@ export function Colors() {
   );
 }
 
-export function Names() {
+const deviceIllustrationNames: IconProps['name'][] = ['device-phone', 'device-laptop'];
+
+function IconGallery({ names }: { names: readonly IconProps['name'][] }) {
   return (
     <div
       style={{
@@ -104,7 +106,7 @@ export function Names() {
         width: '100%',
       }}
     >
-      {(Object.keys(iconRegistry) as Array<keyof typeof iconRegistry>).map(name => (
+      {names.map(name => (
         <div
           key={name}
           style={{
@@ -130,6 +132,17 @@ export function Names() {
       ))}
     </div>
   );
+}
+
+export function Names() {
+  const names = (Object.keys(iconRegistry) as Array<keyof typeof iconRegistry>).filter(
+    name => !deviceIllustrationNames.includes(name),
+  );
+  return <IconGallery names={names} />;
+}
+
+export function DeviceIllustrations() {
+  return <IconGallery names={deviceIllustrationNames} />;
 }
 
 export function Override() {
