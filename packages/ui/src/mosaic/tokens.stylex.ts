@@ -422,14 +422,18 @@ export const focusVars = stylex.defineVars(focusDefaults);
 
 // Elevation. The one card shadow, as a token so every surface at that elevation reads the same:
 // two drop layers that fall away in dark, and a hairline ring that is dark on light and light on
-// dark. Every layer is a wash of `--cl-color-neutral` (black on light, white on dark), matching
-// Figma, where shadows are #000 rather than the foreground. Branched per colour via `light-dark()`
-// since a shadow's geometry cannot branch — see the note on `Dialog`'s popup for why
+// dark. `-drop` is the drop layers alone, for a popup that draws a real border instead of the ring.
+// Every layer is a wash of `--cl-color-neutral` (black on light, white on dark), matching Figma,
+// where shadows are #000 rather than the foreground. Branched per colour via `light-dark()` since
+// a shadow's geometry cannot branch — see the note on `Dialog`'s popup for why
 // `@media (prefers-color-scheme)` is not the escape hatch.
+const shadowDrop = `0 12px 12px -7px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 12%, transparent), transparent),
+    0 24px 24px -10px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), transparent)`;
+const shadowRing = `0 0 0 1px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`;
+
 const shadowDefaults = {
-  '--cl-shadow-card': `0 12px 12px -7px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 12%, transparent), transparent),
-    0 24px 24px -10px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), transparent),
-    0 0 0 1px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`,
+  '--cl-shadow-card': `${shadowDrop}, ${shadowRing}`,
+  '--cl-shadow-card-drop': shadowDrop,
 };
 
 export const shadowVars = stylex.defineVars(shadowDefaults);

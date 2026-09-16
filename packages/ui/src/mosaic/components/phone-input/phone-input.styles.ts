@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   triggerContent: {
@@ -42,9 +42,7 @@ export const styles = stylex.create({
     borderRadius: radiusVars['--cl-radius-lg'],
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-background'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
+    boxShadow: shadowVars['--cl-shadow-card'],
     color: colorVars['--cl-color-foreground'],
   },
   countrySearchContainer: {

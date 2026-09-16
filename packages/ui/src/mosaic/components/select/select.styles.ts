@@ -7,6 +7,7 @@ import {
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
+  shadowVars,
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
@@ -34,14 +35,13 @@ export const positioner = stylex.create({
 export const popup = stylex.create({
   base: {
     // A real border, not a shadow ring, so it occupies the 1px of layout the alignment counts on.
-    borderColor: 'light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))',
+    borderColor: `light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`,
     borderRadius: radiusVars['--cl-radius-lg'],
     borderStyle: 'solid',
     borderWidth: '1px',
     outline: 'none',
     backgroundColor: colorVars['--cl-color-background'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent)`,
+    boxShadow: shadowVars['--cl-shadow-card-drop'],
     color: colorVars['--cl-color-foreground'],
     opacity: {
       default: 1,
