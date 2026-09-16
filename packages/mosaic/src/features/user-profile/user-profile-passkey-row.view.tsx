@@ -1,14 +1,16 @@
+import * as stylex from '@stylexjs/stylex';
 import { useMemo, useState } from 'react';
 
 import { Dialog } from '../../components/dialog';
+import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
+import { colorVars } from '../../tokens.stylex';
 import { fill } from './user-profile-account-section/user-profile-account-section.messages';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 import { UserProfileRenamePasskeyDialog } from './user-profile-rename-passkey.dialog';
-import { UserProfileSecurityIcon } from './user-profile-security-icon';
 
 export function UserProfilePasskeyRowView({
   passkey,
@@ -26,6 +28,10 @@ export function UserProfilePasskeyRowView({
   const [name, setName] = useState(passkey.name);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string>();
+  const description =
+    passkey.createdAtLabel && passkey.lastUsedAtLabel
+      ? fill(m.details, { createdAt: passkey.createdAtLabel, lastUsedAt: passkey.lastUsedAtLabel })
+      : passkey.createdAtLabel || passkey.lastUsedAtLabel;
 
   const onOpenChange = (nextOpen: boolean) => {
     if (isSaving) {
@@ -66,11 +72,22 @@ export function UserProfilePasskeyRowView({
   return (
     <>
       <Section.Item>
-        <UserProfileSecurityIcon name='passkey' />
+        <Section.Media size='lg'>
+          <IconFrame
+            filled
+            bordered={false}
+          >
+            <Icon
+              aria-hidden
+              name='security-passkey'
+              size='md'
+              xstyle={styles.icon}
+            />
+          </IconFrame>
+        </Section.Media>
         <Section.Content>
           <Section.Label>{passkey.name}</Section.Label>
-          {passkey.createdAtLabel ? <Section.Description>{passkey.createdAtLabel}</Section.Description> : null}
-          {passkey.lastUsedAtLabel ? <Section.Description>{passkey.lastUsedAtLabel}</Section.Description> : null}
+          {description ? <Section.Description>{description}</Section.Description> : null}
         </Section.Content>
         {actions.length > 0 ? (
           <Section.Actions>
@@ -97,3 +114,9 @@ export function UserProfilePasskeyRowView({
     </>
   );
 }
+
+const styles = stylex.create({
+  icon: {
+    color: colorVars['--cl-color-neutral-faded'],
+  },
+});

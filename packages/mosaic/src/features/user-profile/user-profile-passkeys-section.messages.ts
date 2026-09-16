@@ -2,6 +2,7 @@ export const userProfilePasskeysMessages = {
   label: 'Passkeys',
   add: 'Add passkey',
   empty: 'No passkeys added',
+  details: '{createdAt} · {lastUsedAt}',
   manage: 'Manage {name}',
   rename: 'Rename',
   renameTitle: 'Rename passkey',
