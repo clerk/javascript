@@ -197,6 +197,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           render={<span />}
           size='sm'
           color='foreground-secondary'
+          {...themeProps('pagination-label')}
         >
           {pageSizeLabel}
         </Text>

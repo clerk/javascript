@@ -261,7 +261,7 @@ describe('Mosaic Pagination', () => {
       />,
     );
     const label = screen.getByText('Results per page');
-    expect(label).toHaveClass('cl-text');
+    expect(label).toHaveClass('cl-text', 'cl-pagination-label');
     expect(label).toHaveAttribute('data-size', 'sm');
     expect(label).toHaveAttribute('data-color', 'foreground-secondary');
   });
