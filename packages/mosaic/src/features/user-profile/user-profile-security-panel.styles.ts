@@ -33,6 +33,9 @@ export const styles = stylex.create({
     flexDirection: 'column',
     width: '100%',
   },
+  emptySectionCards: {
+    display: 'none',
+  },
   sections: {
     gap: space['10'],
     display: 'flex',

@@ -1,4 +1,5 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { createDeferredPromise } from '@clerk/shared/utils';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -163,6 +164,45 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(screen.getByRole('button', { name: 'Manage Safari on macOS' }));
     expect(screen.getByRole('menuitem', { name: 'View details' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Sign out' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the authentication heading on MFA when passkeys are unavailable', () => {
+    renderView({ hasPassword: false, passkeys: [] });
+
+    expect(screen.queryByText('Passkeys')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
+    expect(screen.getByText('2-step verification')).toBeVisible();
+  });
+
+  it('keeps the final passkey confirmation mounted after authentication becomes empty', async () => {
+    const user = userEvent.setup();
+    const removal = createDeferredPromise();
+    const onRemovePasskey = vi.fn(async () => {
+      await removal.promise;
+    });
+    const { rerender } = renderView({ hasPassword: false, mfaMethods: undefined, onRemovePasskey });
+
+    await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileSecurityPanelView
+          passkeys={[]}
+          onRemovePasskey={onRemovePasskey}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('heading', { name: 'Authentication' })).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'Remove passkey' })).toBeVisible();
+
+    await act(async () => {
+      removal.resolve();
+      await removal.promise;
+    });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.queryByText('Passkeys')).not.toBeInTheDocument();
   });
 
   it('only shows backup codes with another verification method and only allows regeneration', async () => {
