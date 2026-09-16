@@ -34,6 +34,17 @@ export function Empty(): ReactElement {
   return <PasskeysExample empty />;
 }
 
+export function CreationUnavailable(): ReactElement {
+  const fixture = usePasskeysFixture();
+  return (
+    <UserProfilePasskeysSectionView
+      {...fixture}
+      sectionTitle='Authentication'
+      onAdd={undefined}
+    />
+  );
+}
+
 export function RecoverableErrors(): ReactElement {
   return <PasskeysExample failOnce />;
 }

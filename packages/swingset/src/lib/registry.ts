@@ -302,6 +302,7 @@ import {
   meta as userProfileMfaSectionMeta,
 } from '../stories/user-profile-mfa-section.stories';
 import {
+  CreationUnavailable as UserProfilePasskeysSectionCreationUnavailable,
   Default as UserProfilePasskeysSectionDefault,
   Empty as UserProfilePasskeysSectionEmpty,
   meta as userProfilePasskeysSectionMeta,
@@ -650,6 +651,7 @@ const userProfilePasswordSectionModule: StoryModule = {
 };
 const userProfilePasskeysSectionModule: StoryModule = {
   meta: userProfilePasskeysSectionMeta,
+  CreationUnavailable: UserProfilePasskeysSectionCreationUnavailable,
   Default: UserProfilePasskeysSectionDefault,
   Empty: UserProfilePasskeysSectionEmpty,
   RecoverableErrors: UserProfilePasskeysSectionRecoverableErrors,
