@@ -30,7 +30,9 @@ describe('profile add email', () => {
       expect(screen.getByRole('dialog', { name: 'Add email' })).toBeInTheDocument();
       await user.type(screen.getByRole('textbox', { name: 'Email' }), 'new@example.com');
       await user.click(screen.getByRole('button', { name: 'Send code' }));
-      await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
+      const codeInput = await screen.findByRole('textbox', { name: 'Verification code' });
+      await waitFor(() => expect(codeInput).toHaveFocus());
+      await user.keyboard('123456');
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
       expect(onSend).toHaveBeenCalledExactlyOnceWith('new@example.com');
       expect(onVerify).toHaveBeenCalledExactlyOnceWith('new@example.com', '123456');
