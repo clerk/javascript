@@ -54,11 +54,11 @@ jobs:
           - expo-sdk: 55
             platform: ios
             runner: blacksmith-6vcpu-macos-26
-          - expo-sdk: 57
+          - expo-sdk: 58
             platform: android
             runner: blacksmith-8vcpu-ubuntu-2204
             run-e2e: true
-          - expo-sdk: 57
+          - expo-sdk: 58
             platform: ios
             runner: blacksmith-6vcpu-macos-26
             run-e2e: true
