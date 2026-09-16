@@ -3,6 +3,7 @@ import { Button, SubmitButton } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Heading } from '../../components/heading';
 import { Text } from '../../components/text';
+import { fill } from '../../utils/messages';
 import { userProfileConnectedAccountsMessages as m } from './user-profile-connected-accounts.messages';
 
 export interface UserProfileRemoveConnectedAccountDialogProps {
@@ -31,7 +32,7 @@ export function UserProfileRemoveConnectedAccountDialog({
       <Dialog.Popup>
         <Dialog.Title render={<Heading size='sm' />}>{m.removeDialog.title}</Dialog.Title>
         <Dialog.Description render={<Text />}>
-          {m.removeDialog.description.replace('{provider}', provider)}
+          {fill(m.removeDialog.description, { provider: provider })}
         </Dialog.Description>
         {errorMessage ? (
           <Banner.Root

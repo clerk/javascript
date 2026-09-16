@@ -5,6 +5,7 @@ import { Button } from '../../../components/button';
 import { Icon, IconFrame } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { Spinner } from '../../../components/spinner';
+import { fill } from '../../../utils/messages';
 import { userProfileEnterpriseAccountsMessages as m } from './user-profile-enterprise-accounts-section.messages';
 import { styles } from './user-profile-enterprise-accounts-section.styles';
 import type { UserProfileEnterpriseAccount } from './user-profile-enterprise-accounts-section.types';
@@ -68,7 +69,7 @@ export function UserProfileEnterpriseAccountRowView({
               color='neutral'
               size='sm'
               variant='outline'
-              aria-label={m.connectProvider.replace('{provider}', account.name)}
+              aria-label={fill(m.connectProvider, { provider: account.name })}
               aria-busy={isPending || undefined}
               disabled={disabled}
               onClick={() => onConnect(account.id)}

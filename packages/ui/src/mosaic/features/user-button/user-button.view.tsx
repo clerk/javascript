@@ -20,10 +20,11 @@ import { Spinner } from '../../components/spinner';
 import type { IconName } from '../../icons/registry';
 import { applyOrder } from '../../utils/apply-order';
 import { focusOutline } from '../../utils/focus-outline.styles';
+import { fill, plural } from '../../utils/messages';
 import { truncationStyles } from '../../utils/typography.styles';
 import type { UserButtonLayout } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
-import { fill, plural, userButtonBase as m } from './user-button.messages';
+import { userButtonMessages as m } from './user-button.messages';
 import { styles } from './user-button.styles';
 import type {
   UserButtonBrandingProps,

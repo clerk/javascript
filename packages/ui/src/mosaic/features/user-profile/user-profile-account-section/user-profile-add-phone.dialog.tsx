@@ -11,8 +11,8 @@ import { Field } from '../../../components/field';
 import { Flow } from '../../../components/flow';
 import { Otp } from '../../../components/otp';
 import { PhoneInput } from '../../../components/phone-input';
+import { fill, rich } from '../../../utils/messages';
 import { styles } from '../user-profile-profile-panel.styles';
-import { fill } from './user-profile-account-section.messages';
 import { userProfileAddPhoneMessages as m } from './user-profile-add-phone.messages';
 
 export interface UserProfileAddPhoneDialogProps {
@@ -37,7 +37,6 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
   const verifyFormId = useId();
   const phoneRef = useRef<HTMLInputElement>(null);
   const verifyRef = useRef<HTMLDivElement>(null);
-  const [beforeSeconds, afterSeconds] = m.verify.resendCountdown.split('{seconds}');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -153,9 +152,11 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
                           m.verify.resending
                         ) : (current.resendSeconds ?? 0) > 0 ? (
                           <span>
-                            {beforeSeconds}
-                            <span {...stylex.props(styles.countdown)}>{current.resendSeconds}</span>
-                            {afterSeconds}
+                            {rich(m.verify.resendCountdown, {
+                              values: {
+                                seconds: <span {...stylex.props(styles.countdown)}>{current.resendSeconds}</span>,
+                              },
+                            })}
                           </span>
                         ) : (
                           m.verify.resend

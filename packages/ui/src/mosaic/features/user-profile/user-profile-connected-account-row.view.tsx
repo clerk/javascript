@@ -5,6 +5,7 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
+import { fill } from '../../utils/messages';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { userProfileConnectedAccountsMessages as m } from './user-profile-connected-accounts.messages';
@@ -74,7 +75,7 @@ export function UserProfileConnectedAccountRowView({
               size='sm'
               variant='outline'
               color='neutral'
-              aria-label={m.connectLabel.replace('{provider}', account.provider)}
+              aria-label={fill(m.connectLabel, { provider: account.provider })}
               onClick={() => onConnect(account.id)}
             >
               {m.connect}
@@ -88,7 +89,7 @@ export function UserProfileConnectedAccountRowView({
         ) : actions.length > 0 ? (
           <Section.Actions>
             <UserProfileActionMenu
-              label={m.manageLabel.replace('{provider}', account.provider)}
+              label={fill(m.manageLabel, { provider: account.provider })}
               actions={actions}
             >
               {onRemove && account.canRemove !== false ? (

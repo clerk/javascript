@@ -4,10 +4,10 @@ import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { Text } from '../../../components/text';
-import { fill } from '../user-profile-account-section/user-profile-account-section.messages';
+import { fill } from '../../../utils/messages';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
-import { userProfilePasswordSectionBase as m } from './user-profile-password-section.messages';
+import { userProfilePasswordSectionMessages as m } from './user-profile-password-section.messages';
 import { styles } from './user-profile-password-section.styles';
 import type {
   UserProfileEditPasswordValue,
