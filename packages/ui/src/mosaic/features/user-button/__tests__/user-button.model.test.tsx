@@ -57,10 +57,10 @@ let environmentHydrated: boolean;
 function environment() {
   return environmentHydrated
     ? {
-      displayConfig: { afterSwitchSessionUrl, branded },
-      authConfig: { singleSessionMode },
-      organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection },
-    }
+        displayConfig: { afterSwitchSessionUrl, branded },
+        authConfig: { singleSessionMode },
+        organizationSettings: { enabled: organizationsEnabled, forceOrganizationSelection },
+      }
     : null;
 }
 
