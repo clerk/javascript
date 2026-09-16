@@ -1,0 +1,245 @@
+import * as LocalizationStories from './localization.stories';
+
+# Localization
+
+Every string Mosaic renders comes from a message file next to the feature that uses it, and
+`MosaicProvider` takes a `localization` prop that replaces any of them. There are three parts:
+a `locale` that picks plural forms, a `messages` catalog for that locale, and sparse `overrides`
+for an app's own wording. Anything not supplied falls back to the built-in English, so a catalog
+can be partial and an override can be a single key. The whole surface is typed from the message
+files themselves, so an unknown key or a missing placeholder is a compile error rather than a
+missing string at runtime.
+
+Without a provider, or with a provider and no `localization`, everything renders in English.
+
+## Example
+
+The `UserButton` under a Spanish catalog for its namespace. Open it: the header, the member
+counts, the footer rows and the accessible names all come from the catalog.
+
+<Story
+  name='Catalog'
+  storyModule={LocalizationStories}
+/>
+
+## Usage
+
+Change a few English strings:
+
+```tsx
+import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
+
+<MosaicProvider localization={{ overrides: { 'userButton.popup.label': 'My account' } }}>
+  <App />
+</MosaicProvider>;
+```
+
+Ship a language:
+
+```tsx
+import esES from './es-ES.json';
+
+<MosaicProvider localization={{ locale: 'es-ES', messages: esES }}>
+  <App />
+</MosaicProvider>;
+```
+
+Ship a language and adjust it for this app:
+
+```tsx
+<MosaicProvider
+  localization={{
+    locale: 'es-ES',
+    messages: esES,
+    overrides: { 'userButton.popup.label': 'Mi cuenta' },
+  }}
+>
+  <App />
+</MosaicProvider>;
+```
+
+The resolved strings are memoized on the `localization` object, so hoist it out of render or
+memoize it rather than writing a fresh literal on every render.
+
+## Catalogs
+
+A catalog is a `MosaicCatalog`: the message tree with every key optional. It is keyed by
+namespace, one per feature (`userButton`, `userProfile`, `reverification`, …), and within a
+namespace the keys mirror the feature's message file. Nested objects and dot paths are
+interchangeable, and can be mixed:
+
+```ts
+const overrides: MosaicCatalog = {
+  userButton: { manage: { invite: 'Invite teammates' } },
+  'userButton.accounts.signOutAll': 'Sign out everywhere',
+};
+```
+
+A leaf is a string, or a set of plural forms keyed by CLDR category. Placeholders are written
+as `{name}`, and inline markup as `{#tag}…{/tag}` or a standalone `{#tag/}`. A translation keeps
+the placeholders of the string it replaces; a value for a placeholder the string does not have
+is left unused, and a placeholder the values do not cover is rendered literally.
+
+```json
+{
+  "userButton": {
+    "trigger": { "open": "Abrir el menú de la cuenta de {name}" },
+    "workspaces": {
+      "members": { "one": "{count} miembro", "other": "{count} miembros" }
+    }
+  },
+  "userProfileVerifyEmailLink": {
+    "resendCountdown": "¿No recibiste el enlace? Reenviar ({seconds})"
+  }
+}
+```
+
+Plural leaves merge per category, so a catalog that supplies only `many` keeps the other forms
+from the layer beneath it.
+
+The type is derived from the message files with `typeof`, so it is never out of date: a key
+that does not exist in Mosaic is rejected, and so is a string where a plural object is expected.
+Message keys are therefore public surface, and renaming one is a breaking change for any
+catalog that names it.
+
+## Overrides
+
+`messages` and `overrides` take the same `MosaicCatalog` shape and differ only in order. English
+is the floor, `messages` is applied over it, and `overrides` over that. Keep the language in
+`messages` and the app's wording in `overrides`, so a catalog can be swapped or updated without
+touching the overrides that sit on top of it.
+
+A few English strings replaced, one by dot path and one nested:
+
+<Story
+  name='Overrides'
+  storyModule={LocalizationStories}
+/>
+
+The Spanish catalog from the example above with one string overridden for this app:
+
+<Story
+  name='CatalogWithOverrides'
+  storyModule={LocalizationStories}
+/>
+
+## Locale
+
+`locale` is a BCP 47 tag and does one thing: it is handed to `Intl.PluralRules`, which picks the
+plural category for a count. It defaults to `en`, so an English-only app never sets it. A catalog
+does not declare its own language, so set `locale` alongside `messages` whenever the catalog is
+not English.
+
+English has two categories, but Russian and Polish have four and Arabic six, and the rules for
+which number takes which form come from CLDR data in the browser rather than from Mosaic. A
+catalog names its cases, and the locale decides which one a given count takes:
+
+<Story
+  name='PluralRules'
+  storyModule={LocalizationStories}
+/>
+
+| Category | Meaning                                           | Required |
+| -------- | ------------------------------------------------- | -------- |
+| `zero`   | Locale-specific zero form                         | no       |
+| `one`    | Singular                                          | no       |
+| `two`    | Dual                                              | no       |
+| `few`    | Paucal                                            | no       |
+| `many`   | Locale-specific large form                        | no       |
+| `other`  | The general form, used when no other case matches | yes      |
+
+## Reading strings in a view
+
+Views never import a message file. Inside the component they read their namespace with
+`useMessages`, which returns the resolved object for that namespace and never changes identity
+while the `localization` prop is stable, and resolve each string with the helper its
+placeholders call for. A module-level helper takes the messages as a parameter.
+
+```tsx
+import { useLocale, useMessages } from '@clerk/mosaic/localization';
+import { fill, plural, rich } from '@clerk/mosaic/localization';
+
+function Trigger({ name, count }: { name: string; count: number }) {
+  const m = useMessages('userButton');
+  const locale = useLocale();
+  return (
+    <button aria-label={fill(m.trigger.open, { name })}>
+      {plural(m.workspaces.members, count, locale)}
+    </button>
+  );
+}
+```
+
+| Helper                                   | Resolves                             | Returns     |
+| ---------------------------------------- | ------------------------------------ | ----------- |
+| `fill(template, values)`                 | `{name}` placeholders                | `string`    |
+| `plural(forms, count, locale, values?)`  | The form for `count`, then `{count}` | `string`    |
+| `rich(template, { values, components })` | `{name}` and `{#tag}…{/tag}` markup  | `ReactNode` |
+
+Each helper is typed against the literal it is given: `fill` requires exactly the placeholders
+the string names, `plural` requires whatever the `other` form names besides `count`, and `rich`
+requires a component per tag. Passing a string that is not a literal, such as one read from a
+prop, falls back to the untyped signatures.
+
+<Story
+  name='Helpers'
+  storyModule={LocalizationStories}
+/>
+
+Fallback is per key. Under the Spanish catalog, which covers only `userButton`, the verify-link
+description stays English:
+
+<Story
+  name='Fallback'
+  storyModule={LocalizationStories}
+/>
+
+### Adding messages to Mosaic
+
+- Strings live in a `<feature>.messages.ts` next to the feature, exported `as const`, grouped
+  by the part of the UI that renders them.
+- Register the namespace in `mosaicMessages` in `packages/mosaic/src/localization/registry.ts`.
+  That is what extends `MosaicCatalog` and `useMessages` to the new namespace.
+- A count goes through `plural` with a `{ one, other }` leaf, never through string
+  concatenation, and always with the locale from `useLocale`.
+- Markup inside a string goes through `rich` with a `{#tag}` rather than through splitting
+  the string around the markup.
+- A controller or machine stores the cause of an error, not its copy. The hook that turns
+  the snapshot into props maps the cause to a message with `useMessages`, so the copy follows
+  the catalog.
+
+## Props
+
+`localization` on `MosaicProvider`:
+
+| Prop        | Type            | Default | Description                                                   |
+| ----------- | --------------- | ------- | ------------------------------------------------------------- |
+| `locale`    | `string`        | `'en'`  | BCP 47 tag handed to `Intl.PluralRules` to pick plural forms. |
+| `messages`  | `MosaicCatalog` | —       | The catalog for `locale`, applied over English.               |
+| `overrides` | `MosaicCatalog` | —       | Sparse changes applied over `messages`.                       |
+
+Exports from `@clerk/mosaic/localization`:
+
+| Export               | Description                                    |
+| -------------------- | ---------------------------------------------- |
+| `MosaicLocalization` | The `localization` prop's type.                |
+| `MosaicCatalog`      | A partial message tree, nested or by dot path. |
+| `MosaicMessages`     | The full message tree, as a view reads it.     |
+| `mosaicMessages`     | The built-in English messages.                 |
+| `useMessages(ns)`    | The resolved messages for one namespace.       |
+| `useLocale()`        | The active locale.                             |
+
+## Design notes
+
+- **Typed from the source.** There is no schema, no codegen and no runtime validation. The
+  catalog type is `typeof` the message files, and the helpers read placeholder names out of the
+  string literals. Mistakes surface in the editor.
+- **No message-format library.** ICU MessageFormat syntax needs a parser shipped to the browser.
+  The part of it that matters, plural selection, is a platform API, and `plural` calls
+  `Intl.PluralRules` directly. Plural cases are declared as an object rather than inline in a
+  string, which is what makes a missing form visible in a catalog.
+- **One locale at a time.** Catalogs are not keyed by locale and there is no parent-locale
+  fallback. An app that switches language swaps `messages` and `locale` together, the same way
+  it swaps the `ClerkProvider` localization resource.
+- **Silent fallback.** A key a catalog leaves out renders in English, with no warning. The
+  types already reject a key that does not exist, and every key exists in English.

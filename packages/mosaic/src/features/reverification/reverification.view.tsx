@@ -1,8 +1,8 @@
 import { Card } from '../../components/card';
 import { Flow } from '../../components/flow';
 import type { IconName } from '../../icons/registry';
-import { fill } from '../../utils/messages';
-import { reverificationMessages as m } from './reverification.messages';
+import type { MosaicMessages } from '../../localization';
+import { fill, useMessages } from '../../localization';
 import type { ReverificationMethod, ReverificationOtpChannel, ReverificationViewProps } from './reverification.types';
 import { ReverificationBackupCode } from './steps/reverification-backup-code';
 import { ReverificationHelp } from './steps/reverification-help';
@@ -11,11 +11,7 @@ import { ReverificationOTP } from './steps/reverification-otp';
 import { ReverificationPasskey } from './steps/reverification-passkey';
 import { ReverificationPassword } from './steps/reverification-password';
 
-const actions = {
-  secondaryActionLabel: m.footerActionLink__useAnotherMethod,
-  primaryActionLabel: m.formButtonPrimary,
-  pendingLabel: m.verifying,
-};
+type Messages = MosaicMessages['reverification'];
 
 const methodIcon = {
   password: 'security-lock-square',
@@ -26,7 +22,7 @@ const methodIcon = {
   backup_code: 'security-phone',
 } as const satisfies Record<ReverificationMethod['strategy'], IconName>;
 
-function methodLabel(method: ReverificationMethod): string {
+function methodLabel(method: ReverificationMethod, m: Messages): string {
   const identifier = 'identifier' in method ? method.identifier : '';
   switch (method.strategy) {
     case 'password':
@@ -44,7 +40,7 @@ function methodLabel(method: ReverificationMethod): string {
   }
 }
 
-function otpCopy(channel: ReverificationOtpChannel | undefined) {
+function otpCopy(channel: ReverificationOtpChannel | undefined, m: Messages) {
   if (channel === 'email') {
     return m.emailCode;
   }
@@ -55,6 +51,7 @@ function otpCopy(channel: ReverificationOtpChannel | undefined) {
 }
 
 export function ReverificationView(props: ReverificationViewProps): JSX.Element {
+  const m = useMessages('reverification');
   const {
     step,
     direction,
@@ -76,7 +73,12 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
     resendRemainingSeconds,
   } = props;
 
-  const otp = otpCopy(otpChannel);
+  const otp = otpCopy(otpChannel, m);
+  const actions = {
+    secondaryActionLabel: m.footerActionLink__useAnotherMethod,
+    primaryActionLabel: m.formButtonPrimary,
+    pendingLabel: m.verifying,
+  };
   const hasAlternatives = methods.length > 0;
   const resendLabel = otpChannel === 'phone' ? m.phoneCode.resendButton : m.emailCode.resendButton;
   const resend =
@@ -179,7 +181,7 @@ export function ReverificationView(props: ReverificationViewProps): JSX.Element 
                 }}
                 methods={methods.map(method => ({
                   id: method.id,
-                  label: methodLabel(method),
+                  label: methodLabel(method, m),
                   icon: methodIcon[method.strategy],
                 }))}
                 pendingMethodId={pendingMethodId}

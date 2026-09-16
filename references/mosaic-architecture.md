@@ -185,7 +185,7 @@ Supporting files carry the parts that would otherwise bloat those four:
 
 ```text
 user-button.types.ts         // the data contract the model and view both agree on
-user-button.messages.ts      // every string the surface renders, in `@clerk/i18n` shape
+user-button.messages.ts      // every string the surface renders, as one `as const` object
 user-button.layout.ts        // pure derivation (which affordance goes in which slot)
 user-button.utils.ts         // pure helpers
 user-button.styles.ts        // `stylex.create` atoms (see the StyleX authoring rules)
@@ -194,19 +194,41 @@ user-button.styles.ts        // `stylex.create` atoms (see the StyleX authoring 
 `*.types.ts` is worth calling out: it holds the data contract so that neither the
 model nor the view owns it, and the two cannot drift.
 
-`*.messages.ts` holds strings only, exported as one `<feature>Messages` object. Views
-resolve them with the helpers in `src/mosaic/utils/messages.ts`, never with
-`.replace` or `.split` on the string:
+`*.messages.ts` holds strings only, exported as one `<feature>Messages` object
+declared `as const` and registered under a namespace in `src/mosaic/localization/registry.ts`.
+Views read their namespace inside the component with `useMessages('userButton')`, so
+the `localization` prop on `MosaicProvider` can replace any string; a module-level
+helper takes the messages as a parameter rather than importing them.
+
+```tsx
+<MosaicProvider localization={{ overrides: { 'userButton.popup.label': 'My account' } }}>
+<MosaicProvider localization={{ locale: 'es-ES', messages: esES, overrides: { 'userButton.popup.label': 'Mi cuenta' } }}>
+```
+
+`messages` is the catalog for `locale`, `overrides` the app's own changes on top, and
+English sits under both. `locale` only feeds `Intl.PluralRules`. Strings are resolved
+with the helpers in `src/mosaic/localization/messages.ts`, never with `.replace` or `.split`
+on the string:
 
 - `fill(m.manage, { value })` substitutes `{name}` placeholders.
-- `plural(m.members, count)` picks a form from `{ one, other, … }` with
-  `Intl.PluralRules` and fills `{count}`.
+- `plural(m.members, count, locale)` picks a form from `{ one, other, … }` with
+  `Intl.PluralRules` for the `locale` from `useLocale()` and fills `{count}`.
 - `rich(m.description, { values, components })` renders `{#strong}…{/strong}`
   markup through the component authored for that tag, so the sentence stays in the
   messages file and the view supplies only the element. Markup is for inline
   emphasis a translator may keep or move. A wrapper the view needs for its own
   purposes, such as a countdown span, is passed as an element in `values`, so the
   string only ever sees `{seconds}`.
+
+The helpers are typed from the string itself: `fill` accepts exactly the `{name}`
+placeholders the template declares, `rich` exactly the tags it marks up, and
+`plural` the placeholders of the `other` form.
+
+Message keys are public surface. `MosaicCatalog` is derived from the registry,
+so a consumer's overrides type-check against the real keys, as a dot path
+(`'userButton.popup.label'`) or a nested object (`{ userButton: { popup: { label } } }`).
+Renaming or moving a key breaks every override that names it; treat it like renaming
+a prop.
 
 ### Composition
 
@@ -481,9 +503,9 @@ The steps above cover the **styling** migration. For **flow** components — whe
 | `src/<feature>/*.controller.tsx`        | Local state and action wrapping; holds the feature's machine                |
 | `src/<feature>/*.view.tsx`              | Clerk-free rendering from plain props                                       |
 | `src/<feature>/*.types.ts`              | The data contract the model and the view both agree on                      |
-| `src/<feature>/*.messages.ts`           | Every string the surface renders, shaped the way `@clerk/i18n` takes them   |
+| `src/<feature>/*.messages.ts`           | Every string the surface renders; its keys are the `localization` paths     |
 | `src/utils/reset.test.tsx`              | Reset specs                                                                 |
-| `src/__tests__/MosaicProvider.test.tsx` | Icon-override context specs                                                 |
+| `src/__tests__/MosaicProvider.test.tsx` | Icon-override and localization context specs                                |
 | `src/components/button/button.test.tsx` | Component-level slot/state/variant specs                                    |
 | `src/features/user-button/__tests__/`   | The canonical per-layer test set to copy from                               |
 

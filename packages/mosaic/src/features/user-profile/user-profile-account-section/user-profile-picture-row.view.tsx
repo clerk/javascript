@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
+import { useMessages } from '../../../localization';
 import type { UserProfileMenuAction } from '../user-profile-action-menu';
 import { UserProfileActionMenu } from '../user-profile-action-menu';
-import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
 
 const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
 /** Matches the limit the row's own description advertises. */
@@ -32,6 +32,7 @@ export function UserProfilePictureRowView({
   onReject,
   onRemove,
 }: UserProfilePictureRowViewProps) {
+  const m = useMessages('userProfileAccountSection');
   const [rejectionError, setRejectionError] = useState<string>();
   const displayedError = errorMessage ?? rejectionError;
   const initials = name
@@ -93,6 +94,7 @@ function ProfilePictureActions({
   canChange: boolean;
   onRemove?: () => void;
 }) {
+  const m = useMessages('userProfileAccountSection');
   const { openFilePicker } = FileUpload.useFileUpload();
   const actions: UserProfileMenuAction[] = [];
 

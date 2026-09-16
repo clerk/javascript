@@ -1,8 +1,3 @@
-/**
- * Every string the surface renders. Shaped the way `@clerk/i18n` takes a base definition, so
- * localizing this component is a matter of registering the namespace and swapping the reads for
- * `useMessages('userProfileDeleteSection', userProfileDeleteSectionMessages)`, not of hunting the literals down first.
- */
 export const userProfileDeleteSectionMessages = {
   sectionTitle: 'Danger zone',
   sectionLabel: 'Delete account',
@@ -13,4 +8,4 @@ export const userProfileDeleteSectionMessages = {
   fieldPlaceholder: 'Delete account',
   actionLabel: 'Delete account',
   cancelLabel: 'Cancel',
-};
+} as const;

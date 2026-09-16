@@ -1,6 +1,6 @@
 import { Section } from '../../../components/section';
+import { useMessages } from '../../../localization';
 import { UserProfilePasswordRowView } from './user-profile-password-row.view';
-import { userProfilePasswordSectionMessages as m } from './user-profile-password-section.messages';
 import type { UserProfilePasswordSectionViewProps } from './user-profile-password-section.types';
 
 export type {
@@ -11,19 +11,21 @@ export type {
 } from './user-profile-password-section.types';
 
 export function UserProfilePasswordSectionView({
-  sectionTitle = m.sectionTitle,
+  sectionTitle,
   hasPassword = false,
   requiresCurrentPassword = false,
   managedBy,
   onSubmitPassword,
 }: UserProfilePasswordSectionViewProps) {
+  const m = useMessages('userProfilePasswordSection');
+  const title = sectionTitle ?? m.sectionTitle;
   if (!hasPassword && !managedBy && !onSubmitPassword) {
     return null;
   }
 
   return (
-    <Section.Root aria-label={sectionTitle ? undefined : m.label}>
-      {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
+    <Section.Root aria-label={title ? undefined : m.label}>
+      {title ? <Section.Title>{title}</Section.Title> : null}
       <Section.Group>
         <UserProfilePasswordRowView
           hasPassword={hasPassword}

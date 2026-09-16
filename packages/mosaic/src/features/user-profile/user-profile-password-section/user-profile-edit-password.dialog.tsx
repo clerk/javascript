@@ -11,8 +11,8 @@ import { Field } from '../../../components/field';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
 import { Text } from '../../../components/text';
+import { useMessages } from '../../../localization';
 import type { UserProfileFormError } from '../user-profile-account-section/user-profile-account-section.types';
-import { userProfilePasswordSectionMessages as m } from './user-profile-password-section.messages';
 import { styles } from './user-profile-password-section.styles';
 import type { UserProfileEditPasswordField } from './user-profile-password-section.types';
 
@@ -55,6 +55,7 @@ export function UserProfileEditPasswordDialog({
   error,
   onSubmit,
 }: UserProfileEditPasswordDialogProps) {
+  const m = useMessages('userProfilePasswordSection');
   const formId = useId();
   const signOutId = useId();
   const signOutDescriptionId = useId();
@@ -202,6 +203,7 @@ function PasswordField({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const m = useMessages('userProfilePasswordSection');
   const [visible, setVisible] = useState(false);
 
   return (

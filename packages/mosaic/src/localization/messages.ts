@@ -12,17 +12,58 @@ export interface RichOptions {
   components?: MessageComponents;
 }
 
-function own<T>(record: Record<string, T> | undefined, key: string): T | undefined {
+export type MessageParams<T extends string> = T extends `${string}{${infer Key}}${infer Rest}`
+  ? Key extends `#${string}` | `/${string}`
+    ? MessageParams<Rest>
+    : Key | MessageParams<Rest>
+  : never;
+
+export type MessageTags<T extends string> = T extends `${string}{#${infer Key}}${infer Rest}`
+  ? (Key extends `${infer Name}/` ? Name : Key) | MessageTags<Rest>
+  : never;
+
+type Exactly<K extends string, V> = [K] extends [never] ? Partial<Record<string, never>> : Record<K, V>;
+
+type Values<T extends string, V> = string extends T ? Record<string, V> : Exactly<MessageParams<T>, V>;
+
+type Components<T extends string> = string extends T
+  ? MessageComponents
+  : Exactly<MessageTags<T>, MessageComponents[string]>;
+
+type TypedRichOptions<T extends string> = string extends T
+  ? [options?: RichOptions]
+  : [MessageParams<T>] extends [never]
+    ? [MessageTags<T>] extends [never]
+      ? []
+      : [options: { components: Components<T> }]
+    : [MessageTags<T>] extends [never]
+      ? [options: { values: Values<T, ReactNode> }]
+      : [options: { values: Values<T, ReactNode>; components: Components<T> }];
+
+type PluralValues<F extends PluralForms> = string extends F['other']
+  ? [values?: MessageValues]
+  : [Exclude<MessageParams<F['other']>, 'count'>] extends [never]
+    ? []
+    : [values: Record<Exclude<MessageParams<F['other']>, 'count'>, string | number>];
+
+function own<T>(record: Partial<Record<string, T>> | undefined, key: string): T | undefined {
   return record && Object.hasOwn(record, key) ? record[key] : undefined;
 }
 
-export function fill(template: string, values: MessageValues): string {
+export function fill<T extends string>(template: T, values: Values<T, string | number>): string;
+export function fill(template: string, values: Partial<MessageValues>): string {
   return template.replace(/\{(\w+)\}/g, (match, key: string) => String(own(values, key) ?? match));
 }
 
-export function plural(forms: PluralForms, count: number, locale = 'en'): string {
+export function plural<F extends PluralForms>(
+  forms: F,
+  count: number,
+  locale = 'en',
+  ...rest: PluralValues<F>
+): string {
   const category = new Intl.PluralRules(locale).select(count);
-  return fill(own(forms, category) ?? forms.other, { count });
+  const template: string = own(forms, category) ?? forms.other;
+  return fill(template, { ...rest[0], count });
 }
 
 type Token =
@@ -100,6 +141,7 @@ function fold(
   return { nodes, next: i, closed: false };
 }
 
+export function rich<T extends string>(template: T, ...rest: TypedRichOptions<T>): ReactNode;
 export function rich(template: string, options: RichOptions = {}): ReactNode {
   return createElement(Fragment, null, ...fold(tokenize(template), 0, undefined, options).nodes);
 }
