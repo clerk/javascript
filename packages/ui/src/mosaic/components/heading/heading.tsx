@@ -22,7 +22,7 @@ export const HeadingContext = React.createContext<Partial<HeadingProps> | null>(
  * `size` and `color` variants. Pass `render` for a different heading level.
  */
 export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(function MosaicHeading(rawProps, ref) {
-  const { size = 'base', color = 'primary', render, xstyle, ...rest } = useContextProps(rawProps, HeadingContext);
+  const { size = 'base', color = 'foreground', render, xstyle, ...rest } = useContextProps(rawProps, HeadingContext);
 
   const props = mergeStyleProps(
     themeProps('heading', { size, color }),
