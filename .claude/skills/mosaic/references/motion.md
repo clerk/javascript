@@ -5,19 +5,40 @@ Token semantics live in `packages/ui/src/mosaic/tokens.stylex.ts`, above
 how-to layer: the rules that decide a transition's shape, and how to check one
 rather than eyeball it.
 
-| Token                   | Value                                   | For                         |
-| ----------------------- | --------------------------------------- | --------------------------- |
-| `--cl-duration-instant` | `0s`                                    | hover and press arrival     |
-| `--cl-duration-fast`    | `0.1s`                                  | exits                       |
-| `--cl-duration-base`    | `0.15s`                                 | entrances, hover exit       |
-| `--cl-duration-slow`    | `0.25s`                                 | larger surfaces             |
-| `--cl-duration-slower`  | `0.35s`                                 | —                           |
-| `--cl-ease-default`     | `cubic-bezier(0.175, 0.885, 0.32, 1.1)` | things ARRIVING (Swift Out) |
-| `--cl-ease-exit`        | `cubic-bezier(0.55, 0.085, 0.68, 0.53)` | things LEAVING (In Quad)    |
+| Token                   | Value                                   | For                              |
+| ----------------------- | --------------------------------------- | -------------------------------- |
+| `--cl-duration-instant` | `0s`                                    | hover and press arrival          |
+| `--cl-duration-fast`    | `0.1s`                                  | exits                            |
+| `--cl-duration-base`    | `0.15s`                                 | entrances, hover exit            |
+| `--cl-duration-slow`    | `0.25s`                                 | larger surfaces                  |
+| `--cl-duration-slower`  | `0.35s`                                 | —                                |
+| `--cl-ease-default`     | `cubic-bezier(0.175, 0.885, 0.32, 1.1)` | things ARRIVING (Swift Out)      |
+| `--cl-ease-enter`       | `cubic-bezier(0, 0, 0.2, 1)`            | arrivals that must not overshoot |
+| `--cl-ease-exit`        | `cubic-bezier(0.55, 0.085, 0.68, 0.53)` | things LEAVING (In Quad)         |
 
 Named curves come from [easing.dev](https://www.easing.dev) (Lochie Axon's Easing
 Graphs). Take one from there rather than inventing a bezier, so the catalog stays
 the shared vocabulary.
+
+## `--cl-ease-default` vs `--cl-ease-enter`: count the overshoot in pixels
+
+`--cl-ease-default` is the default, and should stay that way — its ~2% pass past
+the target is what makes a small surface feel snappy rather than merely fast. But
+that 2% is a fraction of the delta, so the same curve overshoots by a different
+amount depending on what it is applied to, and what the eye judges is the absolute
+distance. A 200px popup scaling from 0.96 passes its target by under a pixel and
+reads as a settle. A full-width dialog does the same thing by tens of pixels and
+reads as playful — the surface arriving past its inset and correcting. That is
+where `--cl-ease-enter` came from: the dialogs, where the default had too much
+play in it.
+
+So the axis is not the element's type but the size of its overshoot. Work out what
+2% of the travel actually is; once it is enough pixels to notice as a bounce, take
+`--cl-ease-enter`, which decelerates the same way without the pass-through.
+
+Opacity is the degenerate case and always takes `--cl-ease-enter`: there is nothing
+past `1` to overshoot into, so the pass is clamped away and only its cost — the
+slower approach to full opacity — is left.
 
 ## A curve has a direction — don't run the entrance curve backwards
 
@@ -63,12 +84,16 @@ transitionDuration: {
   ':where([data-ending-style])': durationVars['--cl-duration-fast'],
 },
 transitionTimingFunction: {
-  default: `linear, ${easingVars['--cl-ease-default']}`,
-  ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}`,
+  default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
+  ':where([data-ending-style])': easingVars['--cl-ease-exit'],
 },
 ```
 
-Both lists are **positional against `transitionProperty`** (`opacity, transform`).
+The entrance list is **positional against `transitionProperty`** (`opacity,
+transform`) — the fade on `--cl-ease-enter`, the geometry on the overshoot. The
+exit collapses to one value because both properties want the same curve; write the
+list out only when a slot genuinely differs, as the dialog's sheet does for its
+slide.
 
 ## Asymmetry, in three places
 
@@ -87,8 +112,12 @@ what stop an exit reading as a lingering ghost.
 
 ## Color and state changes (hover, press)
 
-A state change that only recolors — background, border, text, opacity — takes
-**`linear`, always**. Nothing moves, so there is nothing for an ease to sell:
+A state change on an element that is already there and stays there — background,
+border, text, or an opacity that only dims it — takes **`linear`, always**. This is
+the counterpart to the section above, not an exception to it: a fade that carries a
+surface into or out of existence is an entrance, and takes the entrance and exit
+curves. A hover is not, and neither is a scrim, which dims the page rather than
+arriving on it. Nothing moves, so there is nothing for an ease to sell:
 color interpolation is already perceptually non-uniform, an ease on top just drags
 the midpoint, and `--cl-ease-default`'s overshoot would extrapolate past the target
 color. Reserve the curves for geometry.
