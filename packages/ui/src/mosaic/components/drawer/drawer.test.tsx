@@ -81,7 +81,10 @@ describe('Drawer', () => {
     const inDialog = render(
       <MosaicProvider>
         <Dialog.Root defaultOpen>
-          <Dialog.Popup variant='profile'>
+          <Dialog.Popup
+            variant='profile'
+            aria-label='Profile'
+          >
             <Sheet />
           </Dialog.Popup>
         </Dialog.Root>

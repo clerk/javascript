@@ -9,6 +9,7 @@ import { colorVars, radiusVars, space } from '../../tokens.stylex';
 import { Card } from '../card';
 import type { DialogVariant } from './dialog';
 import { Dialog } from './dialog';
+import { styles as dialogStyles } from './dialog.styles';
 
 afterEach(() => cleanup());
 
@@ -264,10 +265,7 @@ describe('nested Mosaic Dialogs', () => {
 });
 
 describe('stacked backdrops', () => {
-  // The backdrop's two cases differ by a style rather than by an attribute, so the assertion is
-  // that the same tree with only the hosting variant changed produces different classes. Comparing
-  // rather than matching a class: StyleX names are content hashes and would pin the value.
-  async function innerBackdropClass(host: { variant?: DialogVariant }) {
+  async function innerBackdropClasses(host: { variant?: DialogVariant }) {
     const user = userEvent.setup();
     render(
       <Dialog.Root defaultOpen>
@@ -285,16 +283,19 @@ describe('stacked backdrops', () => {
     await user.click(screen.getByRole('button', { name: 'Add email' }));
     // The host paints one too, so the inner dialog's is the last.
     const backdrops = document.querySelectorAll('.cl-dialog-backdrop');
-    const className = backdrops[backdrops.length - 1].className;
+    const classes = Array.from(backdrops[backdrops.length - 1].classList);
     cleanup();
-    return className;
+    return classes;
   }
 
   it('drops the scrim for a card over a card, and keeps it for one over a profile', async () => {
-    const overCard = await innerBackdropClass({ variant: 'card' });
-    const overPanel = await innerBackdropClass({ variant: 'profile' });
+    const overCard = await innerBackdropClasses({ variant: 'card' });
+    const overPanel = await innerBackdropClasses({ variant: 'profile' });
 
-    expect(overCard).not.toBe(overPanel);
+    expect(overCard).toEqual(expect.arrayContaining(atomFor(dialogStyles.backdropStacked)));
+    expect(overCard).not.toEqual(expect.arrayContaining(atomFor(dialogStyles.backdrop)));
+    expect(overPanel).toEqual(expect.arrayContaining(atomFor(dialogStyles.backdrop)));
+    expect(overPanel).not.toEqual(expect.arrayContaining(atomFor(dialogStyles.backdropStacked)));
   });
 
   it('marks the popup beneath as the stack base, so it can recede', async () => {
@@ -474,7 +475,9 @@ const classesOf = (selector: string) => Array.from(document.querySelector(select
 function renderVariant(variant: DialogVariant) {
   return render(
     <Dialog.Root defaultOpen>
-      <Dialog.Popup variant={variant}>Body</Dialog.Popup>
+      <Dialog.Popup variant={variant}>
+        <Surface title='Confirm action' />
+      </Dialog.Popup>
     </Dialog.Root>,
   );
 }
