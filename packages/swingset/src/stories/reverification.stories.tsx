@@ -481,10 +481,10 @@ export function MethodPicker(): JSX.Element {
       <ReverificationMethodPicker
         messages={methodPickerMessages}
         methods={[
-          { id: 'password', label: 'Continue with your password', icon: 'security-lock-square' },
-          { id: 'phone', label: 'Send SMS code to ••• ••• 1234', icon: 'security-phone' },
-          { id: 'totp', label: 'Use your authenticator app', icon: 'security-lock-square' },
-          { id: 'passkey', label: 'Use your passkey', icon: 'security-passkey' },
+          { id: 'password', label: 'Continue with your password', icon: 'lock' },
+          { id: 'phone', label: 'Send SMS code to ••• ••• 1234', icon: 'phone' },
+          { id: 'totp', label: 'Use your authenticator app', icon: 'lock' },
+          { id: 'passkey', label: 'Use your passkey', icon: 'passkey-added' },
         ]}
         pendingMethodId={pendingMethodId}
         onSelect={setPendingMethodId}
@@ -501,10 +501,10 @@ export function MethodPickerPending(): JSX.Element {
       <ReverificationMethodPicker
         messages={methodPickerMessages}
         methods={[
-          { id: 'password', label: 'Continue with your password', icon: 'security-lock-square' },
-          { id: 'phone', label: 'Send SMS code to ••• ••• 1234', icon: 'security-phone' },
-          { id: 'totp', label: 'Use your authenticator app', icon: 'security-lock-square' },
-          { id: 'passkey', label: 'Use your passkey', icon: 'security-passkey' },
+          { id: 'password', label: 'Continue with your password', icon: 'lock' },
+          { id: 'phone', label: 'Send SMS code to ••• ••• 1234', icon: 'phone' },
+          { id: 'totp', label: 'Use your authenticator app', icon: 'lock' },
+          { id: 'passkey', label: 'Use your passkey', icon: 'passkey-added' },
         ]}
         pendingMethodId='phone'
         onSelect={() => undefined}

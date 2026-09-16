@@ -64,17 +64,35 @@ export function Sizes(props: Record<string, unknown>) {
 
 export function Names() {
   return (
-    <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 120px), 1fr))',
+        gap: 8,
+        width: '100%',
+      }}
+    >
       {(Object.keys(iconRegistry) as Array<keyof typeof iconRegistry>).map(name => (
         <div
           key={name}
-          style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', fontSize: 12 }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 12,
+            minWidth: 0,
+            minHeight: 104,
+            padding: '20px 8px 12px',
+            border: '1px solid color-mix(in srgb, currentColor 10%, transparent)',
+            borderRadius: 8,
+            textAlign: 'center',
+          }}
         >
           <Icon
             name={name}
             size='lg'
           />
-          <code>{name}</code>
+          <code style={{ fontSize: 11, lineHeight: 1.5, overflowWrap: 'anywhere' }}>{name}</code>
         </div>
       ))}
     </div>

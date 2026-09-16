@@ -3,6 +3,7 @@ import { render } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { UserProfileSecurityIcon } from '../../features/user-profile/user-profile-security-icon';
 import type { MosaicIconOverrides } from '../../icons/overrides';
 import { MosaicProvider } from '../../MosaicProvider';
 import { space } from '../../tokens.stylex';
@@ -175,26 +176,21 @@ describe('Mosaic Icon', () => {
     expect(svg?.querySelector('path')).not.toBeNull();
   });
 
-  it.each(['security-phone', 'security-lock-square', 'security-passkey'] as const)(
-    'renders the %s glyph on its 18px canvas',
-    name => {
-      const { container } = wrap(<Icon name={name} />);
-      const svg = container.querySelector('svg');
-
-      expect(svg).toHaveAttribute('viewBox', '0 0 18 18');
-      expect(svg?.querySelector('path')).toHaveAttribute('fill', 'currentColor');
-    },
-  );
-
   it.each([
-    ['device-phone', ['#646464', '#646464', '#343434', '#575757', '#171717', 'black']],
-    ['device-laptop', ['black', '#575757', 'black', '#444444', '#171717']],
-  ] as const)('preserves the supplied %s palette', (name, palette) => {
-    const { container } = wrap(<Icon name={name} />);
-    const paths = Array.from(container.querySelectorAll('path'));
+    ['authenticator', 'lock'],
+    ['backup-codes', 'numbers'],
+    ['desktop', 'devices'],
+    ['mobile', 'phone'],
+    ['passkey', 'passkey-added'],
+    ['sms', 'phone'],
+  ] as const)('uses the canonical outline icon and override for %s', (name, iconName) => {
+    const { getByTestId } = wrap(<UserProfileSecurityIcon name={name} />, {
+      [iconName]: <svg data-testid='security-icon' />,
+    });
 
-    expect(container.querySelector('svg')).toHaveAttribute('viewBox', '0 0 18 18');
-    expect(paths.map(path => path.getAttribute('fill'))).toEqual(palette);
+    expect(getByTestId('security-icon')).toHaveClass('cl-icon');
+    expect(getByTestId('security-icon')).toHaveAttribute('data-size', 'lg');
+    expect(getByTestId('security-icon')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('applies the default size when none is passed', () => {

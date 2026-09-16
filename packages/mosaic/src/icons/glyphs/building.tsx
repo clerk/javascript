@@ -1,7 +1,7 @@
 import { glyph } from '../glyph';
 
 export const Building = glyph(
-  <g transform='translate(2 2)'>
+  <>
     <path
       d='M6.83333 5.83333H5.16667'
       stroke='currentColor'
@@ -37,5 +37,5 @@ export const Building = glyph(
       strokeLinecap='round'
       strokeLinejoin='round'
     />
-  </g>,
+  </>,
 );

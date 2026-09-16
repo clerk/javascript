@@ -14,12 +14,12 @@ import { ReverificationPassword } from './steps/reverification-password';
 type Messages = MosaicMessages['reverification'];
 
 const methodIcon = {
-  password: 'security-lock-square',
-  passkey: 'security-passkey',
+  password: 'lock',
+  passkey: 'passkey-added',
   email_code: 'code',
-  phone_code: 'security-phone',
-  totp: 'security-lock-square',
-  backup_code: 'security-phone',
+  phone_code: 'phone',
+  totp: 'lock',
+  backup_code: 'numbers',
 } as const satisfies Record<ReverificationMethod['strategy'], IconName>;
 
 function methodLabel(method: ReverificationMethod, m: Messages): string {
