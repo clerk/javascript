@@ -10,7 +10,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { Branding } from '../branding';
-import { Dialog, DialogContext, isOverlayDialog } from '../dialog';
+import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Drawer } from '../drawer';
 import { Heading } from '../heading';
 import { Icon } from '../icon';
@@ -34,7 +34,7 @@ interface ProfileContextValue {
    */
   registerPageTitle: (value: string, element: HTMLElement | null) => void;
   pageTitleFor: (value: string) => HTMLElement | null;
-  /** Flush: the page's own content — `elevation='flush'`, or an `inline` dialog. */
+  /** Flush: the page's own content, selected by `elevation='flush'`. */
   inline: boolean;
 }
 
@@ -86,7 +86,7 @@ export interface ProfileRootProps extends Omit<MosaicComponentProps<'div'>, 'chi
    * How the surface sits in its host, the way `Card`'s does. `card` is framed: border, radius, a
    * fixed height with the pages scrolling inside. `flush` is the page's own content: no frame or
    * background, the page scrolls, the columns a gap apart. Over the page, in a `profile` dialog,
-   * the popup decides and this is moot; an `inline` dialog implies `flush`.
+   * the popup decides the geometry.
    *
    * @default 'card'
    */
@@ -119,7 +119,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   ref,
 ) {
   const dialog = React.useContext(DialogContext);
-  const inline = elevation === 'flush' || (dialog?.inline ?? false);
+  const inline = elevation === 'flush';
   // Inside a dialog the title takes the id the popup points `aria-labelledby` at, so the surface
   // names the dialog without knowing it is in one — the way `Card.Title` does.
   const generatedTitleId = React.useId();
@@ -167,7 +167,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     props: {
       ...mergeStyleProps(
         themeProps('profile', { elevation: inline ? 'flush' : 'card' }),
-        stylex.props(reset.base, styles.root, isOverlayDialog(dialog) && styles.rootInDialog, xstyle),
+        stylex.props(reset.base, styles.root, isInDialog(dialog) && styles.rootInDialog, xstyle),
         rest,
       ),
       children: (
@@ -178,9 +178,9 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
             {...mergeStyleProps(themeProps('profile-sentinel'), stylex.props(reset.base, styles.sentinel))}
           />
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
-              focus — the same reason `Card.Header` renders its dismiss first. Never inline, which
-              nothing closes. */}
-          {isOverlayDialog(dialog) ? <Dialog.CloseButton /> : null}
+              focus — the same reason `Card.Header` renders its dismiss first. Only rendered
+              inside a standard dialog. */}
+          {isInDialog(dialog) && dialog.role !== 'alertdialog' ? <Dialog.CloseButton /> : null}
           <div
             {...mergeStyleProps(
               themeProps('profile-layout'),

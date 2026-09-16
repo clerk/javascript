@@ -16,7 +16,11 @@ import { useEffect } from 'react';
  * @param node - The element carrying the dialog role, once mounted.
  * @param component - Compound component name, used to name the parts in the message.
  */
-export function useAccessibleDescriptionWarning(node: HTMLElement | null, component: string): void {
+export function useAccessibleDescriptionWarning(
+  node: HTMLElement | null,
+  component: string,
+  descriptionPart?: string,
+): void {
   useEffect(() => {
     if (process.env.NODE_ENV === 'production' || !node) {
       return;
@@ -38,10 +42,10 @@ export function useAccessibleDescriptionWarning(node: HTMLElement | null, compon
         return;
       }
       console.warn(
-        `[clerk] <${component}.Popup> renders an alert dialog with no description. Render a \`<${component}.Description>\` inside it — it is announced with the title, and is what says which decision is being asked for.`,
+        `[clerk] <${component}.Popup> renders an alert dialog with no description. Render a \`<${descriptionPart ?? `${component}.Description`}>\` inside it — it is announced with the title, and is what says which decision is being asked for.`,
       );
     }, 0);
 
     return () => clearTimeout(timer);
-  }, [node, component]);
+  }, [node, component, descriptionPart]);
 }

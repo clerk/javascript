@@ -36,13 +36,12 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
 
   return (
     <Dialog.Root
-      closedBy='closerequest'
       open={props.open}
       onOpenChange={props.onOpenChange}
     >
       {props.trigger ? <Dialog.Trigger render={props.trigger} /> : null}
       <Dialog.Popup
-        size='card'
+        variant='card'
         initialFocus={props.step === 'email' ? emailRef : undefined}
       >
         <Card.Root

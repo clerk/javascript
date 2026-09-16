@@ -54,7 +54,7 @@ export function InsideProfile() {
   return (
     <Dialog.Root>
       <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
-      <Dialog.Popup size='profile'>
+      <Dialog.Popup variant='profile'>
         <UserProfileView
           activePage={activePage}
           pages={pages}
