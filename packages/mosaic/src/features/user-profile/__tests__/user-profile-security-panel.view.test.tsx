@@ -229,6 +229,24 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
   });
 
+  it('forwards default changes and shows their errors in the MFA section', async () => {
+    const user = userEvent.setup();
+    const onSetDefaultMfaMethod = vi.fn(() => {
+      throw new Error('Unable to change the default method.');
+    });
+    renderView({
+      mfaMethods: [{ id: 'sms_1', type: 'sms', canSetDefault: true }],
+      onSetDefaultMfaMethod,
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+
+    expect(onSetDefaultMfaMethod).toHaveBeenCalledExactlyOnceWith('sms_1');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to change the default method.');
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
   it('shows supplied backup codes independently and only allows regeneration', async () => {
     const onRegenerateBackupCodes = vi.fn();
     const onRemoveMfaMethod = vi.fn();

@@ -10,6 +10,7 @@ export const userProfileMfaMessages = {
   },
   default: 'Default',
   setDefault: 'Set as default',
+  setDefaultError: 'Unable to set this method as default. Please try again.',
   remove: 'Remove method',
   regenerate: 'Regenerate',
   manage: 'Manage {label}',

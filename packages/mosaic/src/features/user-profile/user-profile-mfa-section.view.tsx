@@ -6,6 +6,7 @@ import { Icon } from '../../components/icon';
 import { Menu } from '../../components/menu';
 import { fill } from '../../utils/messages';
 import { UserProfileMfaRowView } from './user-profile-mfa-row.view';
+import { useUserProfileMfaSectionController } from './user-profile-mfa-section.controller';
 import { userProfileMfaMessages as m } from './user-profile-mfa-section.messages';
 import { UserProfileSecurityList } from './user-profile-security-list';
 
@@ -27,7 +28,7 @@ export interface UserProfileMfaSectionViewProps {
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
   onRemove?: (id: string) => void | Promise<void>;
-  onSetDefault?: (id: string) => void;
+  onSetDefault?: (id: string) => void | Promise<void>;
 }
 
 const addableMethods: UserProfileMfaAddableMethod[] = ['sms', 'authenticator'];
@@ -41,6 +42,8 @@ export function UserProfileMfaSectionView({
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
+  const controller = useUserProfileMfaSectionController({ methods, onSetDefault });
+  const isSettingDefault = controller.pendingMethodId !== undefined;
   const availableMethods = addableMethods.filter(type => !methods.some(method => method.type === type));
 
   return (
@@ -51,6 +54,7 @@ export function UserProfileMfaSectionView({
             <Menu.Root placement='bottom-end'>
               <Menu.Trigger
                 aria-label={m.addLabel}
+                disabled={isSettingDefault}
                 render={props => (
                   <Button
                     color='neutral'
@@ -92,7 +96,10 @@ export function UserProfileMfaSectionView({
             key={method.id}
             method={method}
             onRemove={onRemove ? () => removeMethod.open(method) : undefined}
-            onSetDefault={onSetDefault}
+            onSetDefault={controller.onSetDefault}
+            isPending={controller.pendingMethodId === method.id}
+            disabled={isSettingDefault}
+            errorMessage={controller.errorMethodId === method.id ? controller.errorMessage : undefined}
             onRegenerateBackupCodes={onRegenerateBackupCodes}
           />
         ))}

@@ -48,6 +48,7 @@ export interface UserProfileSecurityPanelViewProps
   onAddMfaMethod?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
   onRemoveMfaMethod?: (id: string) => void | Promise<void>;
+  onSetDefaultMfaMethod?: (id: string) => void | Promise<void>;
   /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
   onDeleteAccount?: () => Promise<void>;
 }
@@ -68,6 +69,7 @@ export function UserProfileSecurityPanelView({
   onAddMfaMethod,
   onRegenerateBackupCodes,
   onRemoveMfaMethod,
+  onSetDefaultMfaMethod,
   onSignOutDevice,
   onSignOutAllOtherDevices,
   onDeleteAccount,
@@ -106,6 +108,7 @@ export function UserProfileSecurityPanelView({
               onAdd={onAddMfaMethod}
               onRegenerateBackupCodes={onRegenerateBackupCodes}
               onRemove={onRemoveMfaMethod}
+              onSetDefault={onSetDefaultMfaMethod}
             />
           ) : null}
         </div>
