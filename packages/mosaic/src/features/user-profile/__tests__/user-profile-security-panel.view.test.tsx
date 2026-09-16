@@ -166,15 +166,34 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByRole('menuitem', { name: 'Sign out' })).not.toBeInTheDocument();
   });
 
-  it('keeps the authentication heading on MFA when passkeys are unavailable', () => {
-    renderView({ hasPassword: false, passkeys: [] });
+  it('keeps the authentication heading on MFA when existing passkeys are hidden', () => {
+    renderView({
+      hasPassword: false,
+      passkeysVisible: false,
+      onAddPasskey: vi.fn(),
+      onRenamePasskey: vi.fn(),
+      onRemovePasskey: vi.fn(),
+    });
 
     expect(screen.queryByText('Passkeys')).not.toBeInTheDocument();
+    expect(screen.queryByText('Passkey')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
     expect(screen.getByText('2-step verification')).toBeVisible();
   });
 
-  it('keeps the final passkey confirmation mounted after authentication becomes empty', async () => {
+  it('keeps one authentication heading when passkeys are empty and Add is unavailable', () => {
+    renderView({ hasPassword: false, passkeys: [], onAddPasskey: undefined });
+
+    const section = screen.getByRole('region', { name: 'Authentication' });
+    expect(within(section).getByText('Passkeys')).toBeVisible();
+    expect(within(section).getByText('No passkeys added')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
+    expect(screen.getByRole('region', { name: '2-step verification' })).toBeVisible();
+  });
+
+  it('keeps the empty section and final passkey confirmation mounted without Add', async () => {
     const user = userEvent.setup();
     const removal = createDeferredPromise();
     const onRemovePasskey = vi.fn(async () => {
@@ -194,7 +213,7 @@ describe('UserProfileSecurityPanelView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.queryByRole('heading', { name: 'Authentication' })).not.toBeInTheDocument();
+    expect(screen.getByText('Authentication')).toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: 'Remove passkey' })).toBeVisible();
 
     await act(async () => {
@@ -202,7 +221,10 @@ describe('UserProfileSecurityPanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(screen.queryByText('Passkeys')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
+    expect(screen.getByText('Passkeys')).toBeVisible();
+    expect(screen.getByText('No passkeys added')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
   });
 
   it('only shows backup codes with another verification method and only allows regeneration', async () => {

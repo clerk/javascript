@@ -4,14 +4,40 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
+import type { UserProfilePasskey, UserProfilePasskeysSectionViewProps } from '../user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
 
-const passkeys = [
+const passkeys: UserProfilePasskey[] = [
   { id: 'laptop', name: 'MacBook' },
   { id: 'phone', name: 'iPhone' },
 ];
 
+function renderView(overrides: Partial<UserProfilePasskeysSectionViewProps> = {}) {
+  const props: UserProfilePasskeysSectionViewProps = {
+    passkeys,
+    onAdd: vi.fn(),
+    onRename: vi.fn(),
+    onRemove: vi.fn(),
+    ...overrides,
+  };
+  return render(
+    <MosaicProvider>
+      <UserProfilePasskeysSectionView {...props} />
+    </MosaicProvider>,
+  );
+}
+
 describe('passkeys section', () => {
+  it('hides existing passkeys and their actions when the caller hides the section', () => {
+    renderView({ isVisible: false, sectionTitle: 'Authentication' });
+
+    expect(screen.queryByRole('heading', { name: 'Authentication' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Passkeys')).not.toBeInTheDocument();
+    expect(screen.queryByText('MacBook')).not.toBeInTheDocument();
+    expect(screen.queryByText('iPhone')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
   it('confirms the selected passkey and returns focus on cancellation', async () => {
     const user = userEvent.setup();
     const onRemove = vi.fn();
@@ -67,25 +93,20 @@ describe('passkeys section', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
-  it('hides an unavailable section and keeps Add available with an empty list or creation error', async () => {
+  it('keeps an empty section visible when Add is unavailable', () => {
+    renderView({ passkeys: [], onAdd: undefined, sectionTitle: 'Authentication' });
+
+    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
+    expect(screen.getByText('Passkeys')).toBeVisible();
+    expect(screen.getByText('No passkeys added')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
+  });
+
+  it('keeps Add available with an empty list and creation error', async () => {
     const user = userEvent.setup();
     const onAdd = vi.fn();
-    const { rerender } = render(
-      <UserProfilePasskeysSectionView
-        sectionTitle='Authentication'
-        passkeys={[]}
-      />,
-    );
-    expect(screen.queryByRole('heading', { name: 'Authentication' })).not.toBeInTheDocument();
-    expect(screen.queryByText('Passkeys')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
-    rerender(
-      <UserProfilePasskeysSectionView
-        passkeys={[]}
-        onAdd={onAdd}
-        addError='Could not create passkey'
-      />,
-    );
+    renderView({ passkeys: [], onAdd, addError: 'Could not create passkey' });
+
     expect(screen.getByRole('alert')).toHaveTextContent('Could not create passkey');
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     expect(onAdd).toHaveBeenCalledOnce();

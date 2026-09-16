@@ -38,6 +38,7 @@ export interface UserProfileSecurityPanelViewProps
       'hasPassword' | 'requiresCurrentPassword' | 'managedBy' | 'onSubmitPassword'
     > {
   passkeys?: UserProfilePasskey[];
+  passkeysVisible?: boolean;
   mfaMethods?: UserProfileMfaMethod[];
   devices?: UserProfileDevice[];
   onAddPasskey?: () => void;
@@ -57,6 +58,7 @@ export function UserProfileSecurityPanelView({
   requiresCurrentPassword,
   managedBy,
   passkeys,
+  passkeysVisible = true,
   mfaMethods,
   devices,
   onSubmitPassword,
@@ -73,7 +75,7 @@ export function UserProfileSecurityPanelView({
   onDeleteAccount,
 }: UserProfileSecurityPanelViewProps): ReactElement {
   const showPassword = hasPassword || Boolean(onSubmitPassword) || Boolean(managedBy);
-  const showPasskeys = passkeys !== undefined && (passkeys.length > 0 || Boolean(onAddPasskey));
+  const showPasskeys = passkeys !== undefined && passkeysVisible;
   const hasAuthentication = showPassword || showPasskeys || mfaMethods !== undefined;
 
   return (
@@ -92,6 +94,7 @@ export function UserProfileSecurityPanelView({
           {passkeys !== undefined ? (
             <UserProfilePasskeysSectionView
               passkeys={passkeys}
+              isVisible={passkeysVisible}
               sectionTitle={showPassword ? undefined : 'Authentication'}
               onAdd={onAddPasskey}
               addError={addPasskeyError}

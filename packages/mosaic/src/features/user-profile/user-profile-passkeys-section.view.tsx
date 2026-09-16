@@ -17,6 +17,7 @@ export interface UserProfilePasskey {
 
 export interface UserProfilePasskeysSectionViewProps {
   passkeys: UserProfilePasskey[];
+  isVisible?: boolean;
   sectionTitle?: string;
   onAdd?: () => void;
   addError?: string;
@@ -27,6 +28,7 @@ export interface UserProfilePasskeysSectionViewProps {
 
 export function UserProfilePasskeysSectionView({
   passkeys,
+  isVisible = true,
   sectionTitle,
   onAdd,
   addError,
@@ -36,62 +38,64 @@ export function UserProfilePasskeysSectionView({
 }: UserProfilePasskeysSectionViewProps) {
   const removePasskey = useMemo(() => Confirmation.createHandle<UserProfilePasskey>(), []);
 
+  if (!isVisible) {
+    return null;
+  }
+
   return (
     <>
-      {passkeys.length > 0 || onAdd ? (
-        <Section.Root aria-label={sectionTitle ? undefined : m.label}>
-          {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
-          <Section.Group>
-            <Section.Row>
-              <Section.Item>
-                <Section.Content>
-                  <Section.Label>{m.label}</Section.Label>
-                </Section.Content>
-                {onAdd ? (
-                  <Section.Actions>
-                    <Button
-                      aria-label={m.add}
-                      color='neutral'
+      <Section.Root aria-label={sectionTitle ? undefined : m.label}>
+        {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
+        <Section.Group>
+          <Section.Row>
+            <Section.Item>
+              <Section.Content>
+                <Section.Label>{m.label}</Section.Label>
+              </Section.Content>
+              {onAdd ? (
+                <Section.Actions>
+                  <Button
+                    aria-label={m.add}
+                    color='neutral'
+                    size='sm'
+                    variant='outline'
+                    onClick={onAdd}
+                  >
+                    <Icon
+                      name='plus'
+                      placement='inline-start'
                       size='sm'
-                      variant='outline'
-                      onClick={onAdd}
-                    >
-                      <Icon
-                        name='plus'
-                        placement='inline-start'
-                        size='sm'
-                      />
-                      {m.add}
-                    </Button>
-                  </Section.Actions>
-                ) : null}
-              </Section.Item>
-              {addError ? <Section.Error>{addError}</Section.Error> : null}
-              {passkeys.length > 0 ? (
-                <Section.Items>
-                  {passkeys.map(passkey => (
-                    <UserProfilePasskeyRowView
-                      key={passkey.id}
-                      passkey={passkey}
-                      onRename={onRename}
-                      onManage={onManage}
-                      onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
                     />
-                  ))}
-                </Section.Items>
-              ) : (
-                <Section.Items>
-                  <Section.Item>
-                    <Section.Content>
-                      <Section.Description>{m.empty}</Section.Description>
-                    </Section.Content>
-                  </Section.Item>
-                </Section.Items>
-              )}
-            </Section.Row>
-          </Section.Group>
-        </Section.Root>
-      ) : null}
+                    {m.add}
+                  </Button>
+                </Section.Actions>
+              ) : null}
+            </Section.Item>
+            {addError ? <Section.Error>{addError}</Section.Error> : null}
+            {passkeys.length > 0 ? (
+              <Section.Items>
+                {passkeys.map(passkey => (
+                  <UserProfilePasskeyRowView
+                    key={passkey.id}
+                    passkey={passkey}
+                    onRename={onRename}
+                    onManage={onManage}
+                    onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
+                  />
+                ))}
+              </Section.Items>
+            ) : (
+              <Section.Items>
+                <Section.Item>
+                  <Section.Content>
+                    <Section.Description>{m.empty}</Section.Description>
+                  </Section.Content>
+                </Section.Item>
+              </Section.Items>
+            )}
+          </Section.Row>
+        </Section.Group>
+      </Section.Root>
       {onRemove ? (
         <Confirmation
           handle={removePasskey}
