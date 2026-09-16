@@ -1,3 +1,4 @@
+import { Text } from '@clerk/mosaic/components/text';
 import type { UserProfileMfaMethod } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
 import { useRef, useState } from 'react';
@@ -63,6 +64,23 @@ export function ReadOnly() {
       ]}
       sectionTitle='Authentication'
     />
+  );
+}
+
+export function AddMethod() {
+  const [selection, setSelection] = useState('No method selected');
+  const labels = { sms: 'SMS verification', authenticator: 'Authenticator app', 'backup-codes': 'Backup codes' };
+
+  return (
+    <div className='flex w-full flex-col gap-4'>
+      <UserProfileMfaSectionView
+        methods={[{ id: 'sms', type: 'sms', description: '+1 801-555-0100' }]}
+        addableMethods={['sms', 'authenticator', 'backup-codes']}
+        onAdd={type => setSelection(labels[type])}
+        sectionTitle='Authentication'
+      />
+      <Text role='status'>{selection}</Text>
+    </div>
   );
 }
 

@@ -36,6 +36,9 @@ export function Default() {
       passkeys={passkeys.passkeys}
       addPasskeyError={passkeys.addError}
       onRenamePasskey={passkeys.onRename}
+      addableMfaMethods={
+        mfaMethods.some(method => method.type === 'authenticator') ? ['sms'] : ['sms', 'authenticator']
+      }
       onAddMfaMethod={type =>
         setMfaMethods(current => {
           const timestamp = Date.now();

@@ -2,7 +2,7 @@ import * as Stories from './user-profile-mfa-section.stories';
 
 # UserProfileMfaSection
 
-Display two-step verification methods, default badges, and permitted row actions. Removal uses shared Confirmation to await the callback and display errors. This view takes prepared data and callbacks; the examples use local state.
+Display two-step verification methods, default badges, and permitted row actions. Add opens a method picker; removal uses shared Confirmation to await the callback and display errors. This view takes prepared data and callbacks; the examples use local state.
 
 ## Playground
 
@@ -17,6 +17,9 @@ Choose Set as default on the second SMS number. Its menu shows progress while me
     { name: 'Button', href: '/components/button', layer: 'Components' },
     { name: 'Icon', href: '/components/icon', layer: 'Components' },
     { name: 'Menu', href: '/components/menu', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Item', href: '/components/item', layer: 'Components' },
     { name: 'Spinner', href: '/components/spinner', layer: 'Components' },
     { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
   ]}
@@ -27,13 +30,16 @@ Choose Set as default on the second SMS number. Its menu shows progress while me
 | Prop                      | Type                                          | Default      | Description                                                                                          |
 | ------------------------- | --------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------- |
 | `methods`                 | `UserProfileMfaMethod[]`                      | — (required) | Prepared rows, in display order. All supplied rows render.                                           |
+| `addableMethods`          | `readonly UserProfileMfaAddableMethod[]`      | `[]`         | Available choices, in display order. Add appears when this is nonempty and `onAdd` is supplied.      |
 | `sectionTitle`            | `string`                                      | —            | Optional surrounding heading.                                                                        |
-| `onAdd`                   | `(type: UserProfileMfaAddableMethod) => void` | —            | Receives the selected method from the current Add menu.                                              |
+| `onAdd`                   | `(type: UserProfileMfaAddableMethod) => void` | —            | Receives the selected method when Continue closes the picker.                                        |
 | `onSetDefault`            | `(id: string) => void \| Promise<void>`       | —            | Changes the default SMS method. Shows pending feedback and reports failures beside the selected row. |
 | `onRemove`                | `(id: string) => void \| Promise<void>`       | —            | Called after confirmation. Resolve to close; reject with an Error to show the failure.               |
 | `onRegenerateBackupCodes` | `() => void`                                  | —            | Requests backup-code regeneration.                                                                   |
 
 Each method has an `id`, a `type` (`sms`, `authenticator`, or `backup-codes`), and optional `label` and `description`. Supply the formatted phone number as the SMS description so its menu has a distinct accessible name.
+
+`UserProfileMfaAddableMethod` is `sms`, `authenticator`, or `backup-codes`. The caller supplies available choices independently of existing rows, so another SMS number can be added. The Security panel forwards these choices through `addableMfaMethods`.
 
 | Method field    | Type      | Default | Description                                                                   |
 | --------------- | --------- | ------- | ----------------------------------------------------------------------------- |
@@ -46,6 +52,12 @@ Each method has an `id`, a `type` (`sms`, `authenticator`, or `backup-codes`), a
 The caller decides whether to mount the section from the instance's second-factor configuration, even when existing methods are present. When mounted, the section stays visible with no methods or callbacks. The caller also prepares the method order, default indicators, and removal permissions, including restrictions when MFA is required. Backup-code rows only offer regeneration.
 
 Callbacks report user intent; updated props determine the displayed result. Set as default awaits its callback, blocks overlapping method actions, and leaves the current badge in place until `methods` changes. Rejections appear below the selected row and are announced to assistive technology. Retrying clears the error. The section owns one removal confirmation, opened with the selected method. Confirmation owns its pending and error state; update `methods` after a successful removal. Removing SMS verification leaves the phone number on the account. Enrollment dialogs are still being developed.
+
+### Choose a method
+
+Open Add, select a method, then Continue. This example reports the choice below the section; setup and verification screens are still being developed. Closing the picker discards the selection and returns focus to Add. Omitting `onAdd` or supplying no choices hides Add while keeping the section visible.
+
+<Story name='AddMethod' storyModule={Stories} />
 
 ### Confirm removal and retry
 

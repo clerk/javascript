@@ -305,6 +305,7 @@ import {
   RequiresAction as UserProfileEnterpriseAccountsSectionRequiresAction,
 } from '../stories/user-profile-enterprise-accounts-section.stories';
 import {
+  AddMethod as UserProfileMfaSectionAddMethod,
   Default as UserProfileMfaSectionDefault,
   Empty as UserProfileMfaSectionEmpty,
   meta as userProfileMfaSectionMeta,
@@ -676,6 +677,7 @@ const userProfilePasskeysSectionModule: StoryModule = {
   RecoverableErrors: UserProfilePasskeysSectionRecoverableErrors,
 };
 const userProfileMfaSectionModule: StoryModule = {
+  AddMethod: UserProfileMfaSectionAddMethod,
   meta: userProfileMfaSectionMeta,
   Default: UserProfileMfaSectionDefault,
   Empty: UserProfileMfaSectionEmpty,
