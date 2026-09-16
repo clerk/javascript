@@ -291,6 +291,19 @@ describe('Mosaic Pagination', () => {
     expect(screen.getAllByRole('option').map(option => option.textContent)).toEqual(['10', '15', '20']);
   });
 
+  it('drops invalid and duplicate page size options', async () => {
+    render(
+      <Pagination
+        page={1}
+        totalItems={100}
+        pageSize={10}
+        pageSizeOptions={[25, 25, 0, -5, 12.7, Number.NaN, Number.POSITIVE_INFINITY]}
+      />,
+    );
+    await userEvent.click(screen.getByRole('combobox'));
+    expect(screen.getAllByRole('option').map(option => option.textContent)).toEqual(['10', '12', '25']);
+  });
+
   it('treats a page size below one as one', async () => {
     const onChange = vi.fn();
     render(

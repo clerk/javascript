@@ -71,11 +71,10 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
   const current = Math.min(atLeast(page, 1), pageCount);
   const labelId = React.useId();
   const pageSizeItems = React.useMemo(() => {
-    const sizes = pageSizeOptions.includes(itemsPerPage) ? pageSizeOptions : [...pageSizeOptions, itemsPerPage];
-    return sizes
-      .slice()
-      .sort((a, b) => a - b)
-      .map(size => ({ value: String(size), label: String(size) }));
+    const sizes = new Set(
+      [...pageSizeOptions, itemsPerPage].filter(size => Number.isFinite(size) && size >= 1).map(Math.floor),
+    );
+    return [...sizes].sort((a, b) => a - b).map(size => ({ value: String(size), label: String(size) }));
   }, [pageSizeOptions, itemsPerPage]);
   const isFirst = current <= 1;
   const isLast = current >= pageCount;
