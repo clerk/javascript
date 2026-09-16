@@ -47,5 +47,5 @@ export function useAccessibleDescriptionWarning(
     }, 0);
 
     return () => clearTimeout(timer);
-  }, [node, component]);
+  }, [node, component, descriptionPart]);
 }

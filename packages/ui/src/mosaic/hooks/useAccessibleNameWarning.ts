@@ -53,5 +53,5 @@ export function useAccessibleNameWarning(node: HTMLElement | null, component: st
     }, 0);
 
     return () => clearTimeout(timer);
-  }, [node, component]);
+  }, [node, component, titlePart]);
 }
