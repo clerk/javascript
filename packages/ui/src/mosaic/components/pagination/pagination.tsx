@@ -24,6 +24,7 @@ export interface PaginationProps extends Omit<MosaicElementProps<'nav'>, 'onChan
   siblingCount?: number;
   disabled?: boolean;
   label?: string;
+  pageSizeLabel?: string;
 }
 
 function atLeast(value: number, min: number): number {
@@ -57,6 +58,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
     siblingCount = 1,
     disabled = false,
     label = 'Pagination',
+    pageSizeLabel = 'Results per page',
     xstyle,
     ...rest
   },
@@ -194,7 +196,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           id={labelId}
           {...mergeStyleProps(themeProps('pagination-label'), stylex.props(reset.base, sizes.sm, styles.label))}
         >
-          Results per page
+          {pageSizeLabel}
         </span>
         <Select.Root
           items={pageSizeItems}

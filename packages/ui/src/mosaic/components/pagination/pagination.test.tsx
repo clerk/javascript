@@ -239,6 +239,19 @@ describe('Mosaic Pagination', () => {
     expect(onPageSizeChange).toHaveBeenCalledWith(50);
   });
 
+  it('uses the pageSizeLabel prop as the page size label', () => {
+    render(
+      <Pagination
+        page={1}
+        totalItems={100}
+        pageSize={10}
+        pageSizeLabel='Rows per page'
+      />,
+    );
+    expect(screen.getByText('Rows per page')).toHaveClass('cl-pagination-label');
+    expect(screen.getByRole('combobox', { name: 'Rows per page 10' })).toBeInTheDocument();
+  });
+
   it('renders the page size label in its own slot', () => {
     render(
       <Pagination
