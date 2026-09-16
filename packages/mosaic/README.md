@@ -29,7 +29,7 @@
 
 `@clerk/mosaic` is Clerk's experimental next-generation React components.
 
-This package let's us build and iterate on our next component refresh in public, feel free to try them out and provide feedback. If you do, know that we reserve the right to make breaking changes in minors and pin your version.
+This package lets us build and iterate on our next component refresh in public, feel free to try them out and provide feedback. If you do, know that we reserve the right to make breaking changes in minors and pin your version.
 
 When stable, components will move to be exported through the regular packages.
 
