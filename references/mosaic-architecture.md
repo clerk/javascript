@@ -192,6 +192,17 @@ user-button.styles.ts        // `stylex.create` atoms (see the StyleX authoring 
 `*.types.ts` is worth calling out: it holds the data contract so that neither the
 model nor the view owns it, and the two cannot drift.
 
+`*.messages.ts` holds strings only, exported as one `<feature>Messages` object. Views
+resolve them with the helpers in `src/mosaic/utils/messages.ts`, never with
+`.replace` or `.split` on the string:
+
+- `fill(m.manage, { value })` substitutes `{name}` placeholders.
+- `plural(m.members, count)` picks a form from `{ one, other, … }` with
+  `Intl.PluralRules` and fills `{count}`.
+- `rich(m.description, { values, components })` renders `{#strong}…{/strong}`
+  markup through the component authored for that tag, so the sentence stays in the
+  messages file and the view supplies only the element.
+
 ### Composition
 
 Two shapes, chosen by whether the slice fetches its own data.
