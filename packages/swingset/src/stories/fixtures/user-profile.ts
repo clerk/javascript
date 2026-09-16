@@ -10,7 +10,6 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 import type {
   UserProfileMfaMethod,
-  UserProfilePasskey,
 } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 import { useMemo, useState } from 'react';
 
@@ -22,6 +21,7 @@ import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';
 import { useUserProfileEditUsernameFixture } from './user-profile-edit-username';
+import { usePasskeysFixture } from './user-profile-passkeys';
 import { useWeb3WalletsFixture } from './user-profile-web3-wallets';
 
 export interface UserProfileFixtureOptions {
@@ -65,14 +65,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
-  const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([
-    {
-      id: 'passkey',
-      name: 'MacBook Pro',
-      createdAtLabel: 'Created today at 10:12 PM',
-      lastUsedAtLabel: 'Last used 1h ago',
-    },
-  ]);
+  const passkeys = usePasskeysFixture();
   const [mfaMethods, setMfaMethods] = useState<UserProfileMfaMethod[]>([
     { id: 'sms', type: 'sms', description: '+1 801-888-8181' },
     { id: 'backup', type: 'backup-codes' },
@@ -146,7 +139,9 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
     },
     security: {
       ...editPassword,
-      passkeys,
+      passkeys: passkeys.passkeys,
+      addPasskeyError: passkeys.addError,
+      onRenamePasskey: passkeys.onRename,
       mfaMethods,
       devices: activeDevices.devices,
       onAddMfaMethod: type =>
@@ -154,16 +149,11 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
           ...current,
           { id: `${type}-${Date.now()}`, type, description: type === 'sms' ? '+1 801-555-0100' : undefined },
         ]),
-      onAddPasskey: () =>
-        setPasskeys(current => [
-          ...current,
-          { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
-        ]),
+      onAddPasskey: passkeys.onAdd,
       onDeleteAccount: () => Promise.resolve(),
-      onManagePasskey: () => undefined,
       onRegenerateBackupCodes: () => undefined,
       onRemoveMfaMethod: id => setMfaMethods(current => current.filter(method => method.id !== id)),
-      onRemovePasskey: id => setPasskeys(current => current.filter(passkey => passkey.id !== id)),
+      onRemovePasskey: passkeys.onRemove,
       onSignOutAllOtherDevices: activeDevices.onSignOutAllOtherDevices,
       onSignOutDevice: activeDevices.onSignOutDevice,
     },

@@ -41,8 +41,10 @@ export interface UserProfileSecurityPanelViewProps
   mfaMethods?: UserProfileMfaMethod[];
   devices?: UserProfileDevice[];
   onAddPasskey?: () => void;
+  addPasskeyError?: string;
+  onRenamePasskey?: (id: string, name: string) => void | Promise<void>;
   onManagePasskey?: (id: string) => void;
-  onRemovePasskey?: (id: string) => void;
+  onRemovePasskey?: (id: string) => void | Promise<void>;
   onAddMfaMethod?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
   onRemoveMfaMethod?: (id: string) => void;
@@ -59,6 +61,8 @@ export function UserProfileSecurityPanelView({
   devices,
   onSubmitPassword,
   onAddPasskey,
+  addPasskeyError,
+  onRenamePasskey,
   onManagePasskey,
   onRemovePasskey,
   onAddMfaMethod,
@@ -90,6 +94,8 @@ export function UserProfileSecurityPanelView({
                 passkeys={passkeys}
                 sectionTitle={showPassword ? undefined : 'Authentication'}
                 onAdd={onAddPasskey}
+                addError={addPasskeyError}
+                onRename={onRenamePasskey}
                 onManage={onManagePasskey}
                 onRemove={onRemovePasskey}
               />

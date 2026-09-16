@@ -77,7 +77,7 @@ describe('UserProfileSecurityPanelView', () => {
 
   it('forwards security actions', async () => {
     const onAddPasskey = vi.fn();
-    const onManagePasskey = vi.fn();
+    const onRenamePasskey = vi.fn(() => Promise.resolve());
     const onRemovePasskey = vi.fn();
     const onAddMfaMethod = vi.fn();
     const onSignOutDevice = vi.fn();
@@ -91,7 +91,7 @@ describe('UserProfileSecurityPanelView', () => {
         { id: 'backup_1', type: 'backup-codes' },
       ],
       onAddPasskey,
-      onManagePasskey,
+      onRenamePasskey,
       onRemovePasskey,
       onAddMfaMethod,
       onSignOutDevice,
@@ -107,6 +107,11 @@ describe('UserProfileSecurityPanelView', () => {
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
+    const passkeyName = screen.getByRole('textbox', { name: 'Passkey name' });
+    await user.clear(passkeyName);
+    await user.type(passkeyName, 'Work laptop');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove', exact: true }));
@@ -125,7 +130,7 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
 
     expect(onAddPasskey).toHaveBeenCalledOnce();
-    expect(onManagePasskey).toHaveBeenCalledWith('passkey_1');
+    expect(onRenamePasskey).toHaveBeenCalledWith('passkey_1', 'Work laptop');
     expect(onRemovePasskey).toHaveBeenCalledWith('passkey_1');
     expect(onAddMfaMethod).toHaveBeenCalledWith('authenticator');
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
