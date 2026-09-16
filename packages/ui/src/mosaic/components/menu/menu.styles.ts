@@ -24,7 +24,7 @@ export const popup = stylex.create({
     borderRadius: radiusVars['--cl-radius-lg'],
     outline: 'none',
     backgroundColor: colorVars['--cl-color-background'],
-    boxShadow: `${shadowVars['--cl-shadow-raised']}, ${shadowVars['--cl-shadow-ring']}`,
+    boxShadow: shadowVars['--cl-shadow-md'],
     color: colorVars['--cl-color-foreground'],
     opacity: {
       default: 1,

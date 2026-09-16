@@ -420,17 +420,21 @@ const focusDefaults = {
 
 export const focusVars = stylex.defineVars(focusDefaults);
 
-// Elevation, in two composable pieces: `raised` is two drop layers that fall away in dark, and
-// `ring` is a hairline that is dark on light and light on dark. A lifted surface takes both, a
-// popup with a real border takes `raised` alone, and a sheet on the screen edge takes `ring`
-// alone. Every layer is a wash of `--cl-color-neutral` (black on light, white on dark), matching
-// Figma, where shadows are #000 rather than the foreground. Branched per colour via `light-dark()`
+// Elevation, matching the Figma `shadow-sm|md|lg` effect styles: `md` and `lg` are two drop
+// layers and a blurred hairline ring, `sm` is the ring alone. Every layer is a wash of
+// `--cl-color-neutral` (black on light, white on dark). In dark the drop layers fall away and
+// only the ring stays, since a shadow reads as depth against a light page and as nothing against
+// a dark one. Branched per colour via `light-dark()`
 // since a shadow's geometry cannot branch — see the note on `Dialog`'s popup for why
 // `@media (prefers-color-scheme)` is not the escape hatch.
+const drop = (wash: string) => `light-dark(${wash}, transparent)`;
+const neutral4 = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`;
+const neutral8 = colorVars['--cl-color-neutral-alpha-200'];
+
 const shadowDefaults = {
-  '--cl-shadow-raised': `0 12px 12px -7px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 12%, transparent), transparent),
-    0 24px 24px -10px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), transparent)`,
-  '--cl-shadow-ring': `0 0 0 1px light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`,
+  '--cl-shadow-sm': `0 1px 2px 0 ${neutral8}`,
+  '--cl-shadow-md': `0 2px 1px -1px ${drop(neutral4)}, 0 4px 8px 0 ${drop(neutral8)}, 0 0 3px 0 ${neutral8}`,
+  '--cl-shadow-lg': `0 2px 2px -1px ${drop(neutral4)}, 0 8px 16px 0 ${drop(neutral8)}, 0 0 1px 0 ${neutral8}`,
 };
 
 export const shadowVars = stylex.defineVars(shadowDefaults);

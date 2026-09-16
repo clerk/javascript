@@ -83,7 +83,7 @@ export const styles = stylex.create({
     // No drop shadow — the sheet sits on the screen edge, so there is nothing for it to float over.
     // The hairline ring stays: a faint dark edge in light, and the light edge that separates a dark
     // sheet from a dark page.
-    boxShadow: shadowVars['--cl-shadow-ring'],
+    boxShadow: shadowVars['--cl-shadow-sm'],
     color: colorVars['--cl-color-foreground'],
     display: 'flex',
     flexDirection: 'column',

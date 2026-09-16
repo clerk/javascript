@@ -19,7 +19,7 @@ export const root = stylex.create({
     borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-background'],
-    boxShadow: `${shadowVars['--cl-shadow-raised']}, ${shadowVars['--cl-shadow-ring']}`,
+    boxShadow: shadowVars['--cl-shadow-lg'],
   },
   flush: {
     borderRadius: radiusVars['--cl-radius-xl'],
@@ -31,7 +31,7 @@ export const root = stylex.create({
     borderRadius: radiusVars['--cl-radius-xl'],
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-background'],
-    boxShadow: `${shadowVars['--cl-shadow-raised']}, ${shadowVars['--cl-shadow-ring']}`,
+    boxShadow: shadowVars['--cl-shadow-lg'],
   },
 });
 
