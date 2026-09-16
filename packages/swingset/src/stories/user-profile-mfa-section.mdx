@@ -47,6 +47,15 @@ Each method has an `id`, a `type` (`sms`, `authenticator`, or `backup-codes`), a
 | `canRemove`     | `boolean` | `true`  | Allows removal of an SMS or authenticator method when `onRemove` is supplied. |
 | `canSetDefault` | `boolean` | `false` | Allows Set as default on an SMS method when `onSetDefault` is supplied.       |
 
+### Authenticator setup
+
+`UserProfileAuthenticatorSetupView` renders the setup header and content inside a `Card.Root`.
+
+| Prop     | Type     | Default      | Description                                                                        |
+| -------- | -------- | ------------ | ---------------------------------------------------------------------------------- |
+| `secret` | `string` | — (required) | Prepared authenticator setup key.                                                  |
+| `uri`    | `string` | — (required) | Matching authenticator URI, encoded in the QR code and available for manual entry. |
+
 ## Usage
 
 The caller decides whether to mount the section from the instance's second-factor configuration, even when existing methods are present. When mounted, the section stays visible with no methods or callbacks. The caller also prepares the method order, default indicators, and removal permissions, including restrictions when MFA is required. Backup-code rows only offer regeneration.
@@ -55,9 +64,27 @@ Callbacks report user intent; updated props determine the displayed result. Set 
 
 ### Choose a method
 
-Open Add and choose a method. Each option is a button with a chevron, matching the reverification picker. This example reports the choice below the section; setup and verification screens are still being developed. Choosing an option reports it immediately and closes the picker. Closing without choosing a method leaves the selection unchanged; focus returns to Add. Omitting `onAdd` or supplying no choices hides Add while keeping the section visible.
+Open Add and choose a method. Each option is a button with a chevron, matching the reverification picker. This example reports the choice below the section; enrollment and verification are still being developed. Choosing an option reports it immediately and closes the picker. Closing without choosing a method leaves the selection unchanged; focus returns to Add. Omitting `onAdd` or supplying no choices hides Add while keeping the section visible.
 
 <Story name='AddMethod' storyModule={Stories} />
+
+### Authenticator QR code and setup key
+
+Open the dialog to view the QR code, then switch to the read-only setup key and URI for manual entry. Both views use the same supplied credentials. Closing and reopening starts with the QR code again. This example uses fixed demo credentials; it does not enroll an authenticator.
+
+The setup view owns the display toggle. The caller supplies matching `secret` and `uri` values and owns enrollment, loading, and errors. Verification fields are still being developed.
+
+<Story
+  name='AuthenticatorSetup'
+  storyModule={Stories}
+  composition={[
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+  ]}
+/>
 
 ### Confirm removal and retry
 

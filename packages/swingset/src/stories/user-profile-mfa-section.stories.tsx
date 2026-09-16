@@ -1,4 +1,8 @@
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import { Dialog } from '@clerk/mosaic/components/dialog';
 import { Text } from '@clerk/mosaic/components/text';
+import { UserProfileAuthenticatorSetupView } from '@clerk/mosaic/features/user-profile/user-profile-authenticator-setup.view';
 import type { UserProfileMfaMethod } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
 import { useRef, useState } from 'react';
@@ -81,6 +85,47 @@ export function AddMethod() {
       />
       <Text role='status'>{selection}</Text>
     </div>
+  );
+}
+
+export function AuthenticatorSetup() {
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger
+        render={
+          <Button
+            variant='outline'
+            color='neutral'
+          />
+        }
+      >
+        Set up authenticator
+      </Dialog.Trigger>
+      <Dialog.Popup variant='card'>
+        <Card.Root
+          elevation='overlay'
+          renderBranding={false}
+        >
+          <UserProfileAuthenticatorSetupView
+            secret='JBSWY3DPEHPK3PXP'
+            uri='otpauth://totp/Swingset:demo@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Swingset'
+          />
+          <Card.Footer>
+            <Dialog.Close
+              render={
+                <Button
+                  variant='outline'
+                  color='neutral'
+                  fullWidth
+                />
+              }
+            >
+              Cancel
+            </Dialog.Close>
+          </Card.Footer>
+        </Card.Root>
+      </Dialog.Popup>
+    </Dialog.Root>
   );
 }
 

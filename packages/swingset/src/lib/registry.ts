@@ -306,6 +306,7 @@ import {
 } from '../stories/user-profile-enterprise-accounts-section.stories';
 import {
   AddMethod as UserProfileMfaSectionAddMethod,
+  AuthenticatorSetup as UserProfileMfaSectionAuthenticatorSetup,
   Default as UserProfileMfaSectionDefault,
   Empty as UserProfileMfaSectionEmpty,
   meta as userProfileMfaSectionMeta,
@@ -678,6 +679,7 @@ const userProfilePasskeysSectionModule: StoryModule = {
 };
 const userProfileMfaSectionModule: StoryModule = {
   AddMethod: UserProfileMfaSectionAddMethod,
+  AuthenticatorSetup: UserProfileMfaSectionAuthenticatorSetup,
   meta: userProfileMfaSectionMeta,
   Default: UserProfileMfaSectionDefault,
   Empty: UserProfileMfaSectionEmpty,
