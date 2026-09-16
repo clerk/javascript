@@ -19,6 +19,141 @@ const wrap = (ui: React.ReactElement, icons?: MosaicIconOverrides) =>
 const override: MosaicIconOverrides = { 'chevron-right': <span data-testid='override' /> };
 
 describe('Mosaic Icon', () => {
+  it.each([
+    'api',
+    'application-2',
+    'arrow-bottom-top',
+    'arrow-compress',
+    'arrow-dots',
+    'arrow-down',
+    'arrow-down-circle',
+    'arrow-down-left',
+    'arrow-left',
+    'arrow-left-right',
+    'arrow-right',
+    'arrow-up',
+    'arrow-up-circle',
+    'arrow-up-left',
+    'arrow-up-right',
+    'block',
+    'bolt',
+    'building',
+    'calendar',
+    'checkmark',
+    'checkmark-circle',
+    'checkmark-small',
+    'chevron-down',
+    'chevron-left',
+    'chevron-right',
+    'chevron-up',
+    'chevron-up-down',
+    'clipboard',
+    'clock',
+    'cloud',
+    'cog-6-teeth',
+    'columns',
+    'credit-card',
+    'devices',
+    'document',
+    'dollar',
+    'dotted-square',
+    'download',
+    'duplicate',
+    'ellipsis-horizontal',
+    'ellipsis-horizontal-circle',
+    'ellipsis-vertical',
+    'enterprise-connections',
+    'envelope',
+    'exclamation-circle',
+    'export',
+    'eye',
+    'eye-slash',
+    'face-scan',
+    'filter',
+    'fingerprint',
+    'flag',
+    'globe',
+    'grip',
+    'information-circle',
+    'key',
+    'link',
+    'lock',
+    'log-out',
+    'magnifying-glass',
+    'minus',
+    'minus-circle',
+    'numbers',
+    'passkey-added',
+    'pen',
+    'phone',
+    'plus',
+    'question-mark-circle',
+    'receipt-bill',
+    'rotate-anti-clockwise',
+    'rotate-left-right',
+    'route',
+    'shield',
+    'shield-check',
+    'shield-close',
+    'sidebar',
+    'spinner',
+    'support',
+    'trash',
+    'user-circle',
+    'user-circle-plus',
+    'users',
+    'x',
+    'x-circle',
+  ] as const)('renders the Figma %s icon with scalable, inherited-color artwork', name => {
+    const ref = React.createRef<SVGSVGElement>();
+    const { container } = wrap(
+      <Icon
+        name={name}
+        ref={ref}
+        size='sm'
+        aria-label={name}
+      />,
+    );
+    const svg = container.querySelector('svg.cl-icon');
+
+    expect(svg).toHaveAttribute('viewBox', '0 0 16 16');
+    expect(svg).toHaveAttribute('data-size', 'sm');
+    expect(svg).toHaveAttribute('aria-label', name);
+    expect(svg).not.toHaveAttribute('width');
+    expect(svg).not.toHaveAttribute('height');
+    expect(ref.current).toBe(svg);
+    expect(svg?.querySelector('path')).not.toBeNull();
+    expect(svg?.querySelector('[fill="currentColor"], [stroke="currentColor"]')).not.toBeNull();
+    expect(svg?.querySelector('[id]')).toBeNull();
+    for (const element of container.querySelectorAll('[fill], [stroke]')) {
+      for (const attribute of ['fill', 'stroke']) {
+        const paint = element.getAttribute(attribute);
+        if (paint !== null) {
+          expect(['none', 'currentColor']).toContain(paint);
+        }
+      }
+    }
+  });
+
+  it('renders the API glyph with inherited color and a forwarded ref', () => {
+    const ref = React.createRef<SVGSVGElement>();
+    const { container } = wrap(
+      <Icon
+        name='api'
+        size='lg'
+        aria-label='API'
+        ref={ref}
+      />,
+    );
+    const svg = container.querySelector('svg.cl-icon');
+
+    expect(svg).toHaveAttribute('viewBox', '0 0 16 16');
+    expect(svg).toHaveAttribute('data-size', 'lg');
+    expect(svg).toHaveAttribute('aria-label', 'API');
+    expect(svg?.querySelector('[fill="currentColor"], [stroke="currentColor"]')).not.toBeNull();
+    expect(ref.current).toBe(svg);
+  });
+
   it('renders the default glyph for a known name', () => {
     const { container } = wrap(<Icon name='chevron-right' />);
     const svg = container.querySelector('svg.cl-icon');

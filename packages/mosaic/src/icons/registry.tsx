@@ -1,27 +1,89 @@
-import * as React from 'react';
-
-/** A default icon glyph — receives `svg` props (sizing/color flow in via `className`) and forwards a ref. */
-type IconComponent = React.ForwardRefExoticComponent<
-  React.ComponentPropsWithoutRef<'svg'> & React.RefAttributes<SVGSVGElement>
->;
-
-/**
- * Builds a glyph from its inner `<path>` markup. Glyphs omit `width`/`height` so the `Icon` recipe
- * controls size, and use `currentColor` so they inherit text color. Grow the set on demand.
- */
-function glyph(children: React.ReactNode, viewBox = '0 0 16 16'): IconComponent {
-  return React.forwardRef<SVGSVGElement, React.ComponentPropsWithoutRef<'svg'>>((props, ref) => (
-    <svg
-      ref={ref}
-      viewBox={viewBox}
-      fill='none'
-      xmlns='http://www.w3.org/2000/svg'
-      {...props}
-    >
-      {children}
-    </svg>
-  ));
-}
+import type { IconComponent } from './glyph';
+import { glyph } from './glyph';
+import { Api } from './glyphs/api';
+import { Application2 } from './glyphs/application-2';
+import { ArrowBottomTop } from './glyphs/arrow-bottom-top';
+import { ArrowCompress } from './glyphs/arrow-compress';
+import { ArrowDots } from './glyphs/arrow-dots';
+import { ArrowDown } from './glyphs/arrow-down';
+import { ArrowDownCircle } from './glyphs/arrow-down-circle';
+import { ArrowDownLeft } from './glyphs/arrow-down-left';
+import { ArrowLeft } from './glyphs/arrow-left';
+import { ArrowLeftRight } from './glyphs/arrow-left-right';
+import { ArrowRight } from './glyphs/arrow-right';
+import { ArrowUp } from './glyphs/arrow-up';
+import { ArrowUpCircle } from './glyphs/arrow-up-circle';
+import { ArrowUpLeft } from './glyphs/arrow-up-left';
+import { ArrowUpRight } from './glyphs/arrow-up-right';
+import { Block } from './glyphs/block';
+import { Bolt } from './glyphs/bolt';
+import { Building } from './glyphs/building';
+import { Calendar } from './glyphs/calendar';
+import { Checkmark } from './glyphs/checkmark';
+import { CheckmarkCircle } from './glyphs/checkmark-circle';
+import { CheckmarkSmall } from './glyphs/checkmark-small';
+import { ChevronDown } from './glyphs/chevron-down';
+import { ChevronLeft } from './glyphs/chevron-left';
+import { ChevronRight } from './glyphs/chevron-right';
+import { ChevronUp } from './glyphs/chevron-up';
+import { ChevronUpDown } from './glyphs/chevron-up-down';
+import { Clipboard } from './glyphs/clipboard';
+import { Clock } from './glyphs/clock';
+import { Cloud } from './glyphs/cloud';
+import { Cog6Teeth } from './glyphs/cog-6-teeth';
+import { Columns } from './glyphs/columns';
+import { CreditCard } from './glyphs/credit-card';
+import { Devices } from './glyphs/devices';
+import { Document } from './glyphs/document';
+import { Dollar } from './glyphs/dollar';
+import { DottedSquare } from './glyphs/dotted-square';
+import { Download } from './glyphs/download';
+import { Duplicate } from './glyphs/duplicate';
+import { EllipsisHorizontal } from './glyphs/ellipsis-horizontal';
+import { EllipsisHorizontalCircle } from './glyphs/ellipsis-horizontal-circle';
+import { EllipsisVertical } from './glyphs/ellipsis-vertical';
+import { EnterpriseConnections } from './glyphs/enterprise-connections';
+import { Envelope } from './glyphs/envelope';
+import { ExclamationCircle } from './glyphs/exclamation-circle';
+import { Export } from './glyphs/export';
+import { Eye } from './glyphs/eye';
+import { EyeSlash } from './glyphs/eye-slash';
+import { FaceScan } from './glyphs/face-scan';
+import { Filter } from './glyphs/filter';
+import { Fingerprint } from './glyphs/fingerprint';
+import { Flag } from './glyphs/flag';
+import { Globe } from './glyphs/globe';
+import { Grip } from './glyphs/grip';
+import { InformationCircle } from './glyphs/information-circle';
+import { Key } from './glyphs/key';
+import { Link } from './glyphs/link';
+import { Lock } from './glyphs/lock';
+import { LogOut } from './glyphs/log-out';
+import { MagnifyingGlass } from './glyphs/magnifying-glass';
+import { Minus } from './glyphs/minus';
+import { MinusCircle } from './glyphs/minus-circle';
+import { Numbers } from './glyphs/numbers';
+import { PasskeyAdded } from './glyphs/passkey-added';
+import { Pen } from './glyphs/pen';
+import { Phone } from './glyphs/phone';
+import { Plus } from './glyphs/plus';
+import { QuestionMarkCircle } from './glyphs/question-mark-circle';
+import { ReceiptBill } from './glyphs/receipt-bill';
+import { RotateAntiClockwise } from './glyphs/rotate-anti-clockwise';
+import { RotateLeftRight } from './glyphs/rotate-left-right';
+import { Route } from './glyphs/route';
+import { Shield } from './glyphs/shield';
+import { ShieldCheck } from './glyphs/shield-check';
+import { ShieldClose } from './glyphs/shield-close';
+import { Sidebar } from './glyphs/sidebar';
+import { Spinner } from './glyphs/spinner';
+import { Support } from './glyphs/support';
+import { Trash } from './glyphs/trash';
+import { UserCircle } from './glyphs/user-circle';
+import { UserCirclePlus } from './glyphs/user-circle-plus';
+import { Users } from './glyphs/users';
+import { X } from './glyphs/x';
+import { XCircle } from './glyphs/x-circle';
 
 const strokeProps = {
   stroke: 'currentColor',
@@ -29,20 +91,6 @@ const strokeProps = {
   strokeLinecap: 'round',
   strokeLinejoin: 'round',
 } as const;
-
-const ChevronRight = glyph(
-  <path
-    d='M6.75 11.25L10.25 8L6.75 4.75'
-    {...strokeProps}
-  />,
-);
-
-const ChevronLeft = glyph(
-  <path
-    d='M9.25 11.25L5.75 8L9.25 4.75'
-    {...strokeProps}
-  />,
-);
 
 const ChevronDoubleLeft = glyph(
   <>
@@ -68,134 +116,6 @@ const ChevronDoubleRight = glyph(
       {...strokeProps}
     />
   </>,
-);
-
-const ChevronDown = glyph(
-  <path
-    d='M4.75 6.75L8 10.25L11.25 6.75'
-    {...strokeProps}
-  />,
-);
-
-const Check = glyph(
-  <path
-    d='M3.75 8.5L6.5 11.25L12.25 4.75'
-    {...strokeProps}
-  />,
-);
-
-const Close = glyph(
-  <path
-    d='M4.75 4.75L11.25 11.25M11.25 4.75L4.75 11.25'
-    {...strokeProps}
-  />,
-);
-
-const Eye = glyph(
-  <>
-    <path
-      d='M13.75 8C13.75 8.5 12.2 12.75 8 12.75C3.8 12.75 2.25 8.5 2.25 8C2.25 7.5 3.8 3.25 8 3.25C12.2 3.25 13.75 7.5 13.75 8Z'
-      {...strokeProps}
-    />
-    <circle
-      cx='8'
-      cy='8'
-      r='1.25'
-      {...strokeProps}
-    />
-  </>,
-);
-
-const EyeSlash = glyph(
-  <>
-    <path
-      d='M2.949 7C2.80739 7.40946 2.75 7.76622 2.75 8C2.75 9 3.8 12.25 8 12.25C8.35547 12.25 8.68838 12.2267 9 12.1835M11.5 11.1743C12.8384 10.134 13.25 8.62607 13.25 8C13.25 7 12.2 3.75 8 3.75C6.7199 3.75 5.73242 4.05191 4.97809 4.5M7.11612 7.11612C7.60427 6.62797 8.39573 6.62797 8.88388 7.11612C9.37204 7.60428 9.37204 8.39573 8.88388 8.88389'
-      {...strokeProps}
-    />
-    <path
-      d='M3 3L13 13'
-      {...strokeProps}
-    />
-  </>,
-);
-
-const InfoCircle = glyph(
-  <>
-    <circle
-      cx='8'
-      cy='8'
-      r='5.25'
-      {...strokeProps}
-    />
-    <path
-      d='M8 10.75V7.5M8 5.25H8.008'
-      {...strokeProps}
-    />
-  </>,
-);
-
-const Ellipsis = glyph(
-  <path
-    d='M4 8h.008M8 8h.008M12 8h.008'
-    {...strokeProps}
-    strokeWidth={2.5}
-  />,
-);
-
-const ChevronUp = glyph(
-  <path
-    d='M4.75 10.25L8 6.75L11.25 10.25'
-    {...strokeProps}
-  />,
-);
-
-const ChevronUpDown = glyph(
-  <path
-    d='M5.75 6.5L8 4L10.25 6.5M5.75 10L8 12.5L10.25 10'
-    {...strokeProps}
-  />,
-);
-
-const Plus = glyph(
-  <path
-    d='M8 3.75V12.25M3.75 8H12.25'
-    {...strokeProps}
-  />,
-);
-
-const Minus = glyph(
-  <path
-    d='M3.75 8H12.25'
-    {...strokeProps}
-  />,
-);
-
-const Search = glyph(
-  <path
-    d='M10 10.0104C10.7722 9.24089 11.25 8.17625 11.25 7C11.25 4.65279 9.34721 2.75 7 2.75C4.65279 2.75 2.75 4.65279 2.75 7C2.75 9.34721 4.65279 11.25 7 11.25C8.17096 11.25 9.23132 10.7764 10 10.0104ZM10 10.0104L13.25 13.25'
-    {...strokeProps}
-  />,
-);
-
-const CreditCard = glyph(
-  <path
-    d='M2.75 6.75V10.25C2.75 11.3546 3.64543 12.25 4.75 12.25H11.25C12.3546 12.25 13.25 11.3546 13.25 10.25V6.75M2.75 6.75V5.75C2.75 4.64543 3.64543 3.75 4.75 3.75H11.25C12.3546 3.75 13.25 4.64543 13.25 5.75V6.75M2.75 6.75H13.25M5.75 9.25H6.25'
-    {...strokeProps}
-  />,
-);
-
-const UserCircle = glyph(
-  <path
-    d='M11.1786 12.1788C10.4001 11.3023 9.26453 10.75 8 10.75C6.73547 10.75 5.59993 11.3023 4.82141 12.1788M11.1786 12.1788C12.4375 11.2197 13.25 9.70474 13.25 8C13.25 5.10051 10.8995 2.75 8 2.75C5.10051 2.75 2.75 5.10051 2.75 8C2.75 9.70474 3.56251 11.2197 4.82141 12.1788M11.1786 12.1788C10.2963 12.8509 9.19476 13.25 8 13.25C6.80524 13.25 5.7037 12.8509 4.82141 12.1788M9.25 7C9.25 7.69036 8.69036 8.25 8 8.25C7.30964 8.25 6.75 7.69036 6.75 7C6.75 6.30964 7.30964 5.75 8 5.75C8.69036 5.75 9.25 6.30964 9.25 7Z'
-    {...strokeProps}
-  />,
-);
-
-const ShieldCheck = glyph(
-  <path
-    d='M13.25 5.9L8 2.75L2.75 5.9C2.75 5.9 3 12 7.25 13.25M9.75 10.85L11.15 12.25L13.25 8.75'
-    {...strokeProps}
-  />,
 );
 
 const Code = glyph(
@@ -249,13 +169,6 @@ const SecurityLockSquare = glyph(
     clipRule='evenodd'
   />,
   '0 0 18 18',
-);
-
-const SecurityLock = glyph(
-  <path
-    d='M5.25 7.75H3.75V11.25C3.75 12.3546 4.64543 13.25 5.75 13.25H10.25C11.3546 13.25 12.25 12.3546 12.25 11.25V7.75H10.75M5.25 7.75V5.5C5.25 3.98122 6.48122 2.75 8 2.75C9.51878 2.75 10.75 3.98122 10.75 5.5V7.75M5.25 7.75H10.75'
-    {...strokeProps}
-  />,
 );
 
 const DevicePhone = glyph(
@@ -332,105 +245,111 @@ const DeviceLaptop = glyph(
   '0 0 18 18',
 );
 
-const ArrowRightTop = glyph(
-  <path
-    d='M6.35014 5.40727L10.8285 5.17157M10.8285 5.17157L10.5928 9.64991M10.8285 5.17157L5.17163 10.8284'
-    {...strokeProps}
-  />,
-);
-
-const Pen = glyph(
-  <>
-    <path
-      d='M12.2761 2.60927L13.3905 3.72366C13.9112 4.24436 13.9112 5.08858 13.3905 5.60928L12 6.99977L5.19526 13.8046C5.07024 13.9296 4.90067 13.9998 4.72386 13.9998H2V11.276C2 11.0991 2.07024 10.9296 2.19526 10.8046L9 3.9998L10.3905 2.60928C10.9112 2.08858 11.7555 2.08858 12.2761 2.60927Z'
-      {...strokeProps}
-    />
-    <path
-      d='M9 4L12 7'
-      {...strokeProps}
-    />
-  </>,
-);
-
-const LogOut = glyph(
-  <path
-    d='M6.25 13.25H3.75V2.75H6.25M10.25 10.75L13 8L10.25 5.25M13 8H6.25'
-    {...strokeProps}
-  />,
-);
-
-const SwitchHorizontal = glyph(
-  <path
-    d='M2.75 5.75H12.25M10 3.5L12.25 5.75L10 8M13.25 10.25H3.75M6 8L3.75 10.25L6 12.5'
-    {...strokeProps}
-  />,
-);
-
-const Cog = glyph(
-  <path
-    d='M8 7.98999V7.99999M3.46012 4.84271L2.81628 5.88403C2.68081 6.10314 2.76504 6.38383 2.9599 6.55612C3.82824 7.32388 3.82825 8.67611 2.95992 9.44387C2.76507 9.61616 2.68084 9.89685 2.81631 10.116L3.46014 11.1573C3.59 11.3673 3.86848 11.4338 4.11036 11.3616C5.26915 11.0161 6.54871 11.678 6.8223 12.8011C6.88157 13.0444 7.08518 13.25 7.34377 13.25H8.65623C8.91482 13.25 9.11842 13.0444 9.1777 12.8011C9.45129 11.678 10.7308 11.0161 11.8896 11.3616C12.1315 11.4338 12.41 11.3673 12.5399 11.1573L13.1837 10.116C13.3192 9.89685 13.2349 9.61616 13.0401 9.44387C12.1717 8.67611 12.1718 7.32388 13.0401 6.55612C13.235 6.38383 13.3192 6.10314 13.1837 5.88403L12.5399 4.84271C12.41 4.63267 12.1315 4.56622 11.8897 4.63835C10.7309 4.98389 9.45129 4.32196 9.1777 3.19892C9.11842 2.95562 8.91482 2.75 8.65623 2.75H7.34377C7.08518 2.75 6.88157 2.95562 6.8223 3.19892C6.54871 4.32196 5.26913 4.98389 4.11033 4.63835C3.86845 4.56622 3.58997 4.63267 3.46012 4.84271Z'
-    {...strokeProps}
-  />,
-);
-
-const Users = glyph(
-  <path
-    d='M10.4019 6C10.9101 5.69378 11.25 5.13658 11.25 4.5C11.25 3.86342 10.9101 3.30622 10.4019 3M9.5 13.25H12.4489C12.9612 13.25 13.3417 12.7993 13.2306 12.3242L13.0225 11.4345C12.8385 10.648 12.3786 9.97519 11.7524 9.49989M8.25 4.5C8.25 5.4665 7.4665 6.25 6.5 6.25C5.5335 6.25 4.75 5.4665 4.75 4.5C4.75 3.5335 5.5335 2.75 6.5 2.75C7.4665 2.75 8.25 3.5335 8.25 4.5ZM2.76939 12.3242L2.9775 11.4345C3.34439 9.86599 4.80874 8.75 6.5 8.75C8.19126 8.75 9.65561 9.86599 10.0225 11.4345L10.2306 12.3242C10.3417 12.7993 9.96121 13.25 9.44895 13.25H3.55105C3.03879 13.25 2.65827 12.7993 2.76939 12.3242Z'
-    {...strokeProps}
-  />,
-);
-
-const AlertCircle = glyph(
-  <>
-    <circle
-      cx='8'
-      cy='8'
-      r='5.25'
-      {...strokeProps}
-    />
-    <path
-      d='M8 5.25V8.5M8 10.75H8.008'
-      {...strokeProps}
-    />
-  </>,
-);
-
 /** Runtime name → glyph map. `Icon`'s `name` prop is typed from these keys. */
 export const iconRegistry = {
-  'alert-circle': AlertCircle,
-  'arrow-right-top': ArrowRightTop,
-  'chevron-right': ChevronRight,
-  'chevron-left': ChevronLeft,
+  'alert-circle': ExclamationCircle,
+  api: Api,
+  'application-2': Application2,
+  'arrow-bottom-top': ArrowBottomTop,
+  'arrow-compress': ArrowCompress,
+  'arrow-dots': ArrowDots,
+  'arrow-down': ArrowDown,
+  'arrow-down-circle': ArrowDownCircle,
+  'arrow-down-left': ArrowDownLeft,
+  'arrow-left': ArrowLeft,
+  'arrow-left-right': ArrowLeftRight,
+  'arrow-right': ArrowRight,
+  'arrow-right-top': ArrowUpRight,
+  'arrow-up': ArrowUp,
+  'arrow-up-circle': ArrowUpCircle,
+  'arrow-up-left': ArrowUpLeft,
+  'arrow-up-right': ArrowUpRight,
+  block: Block,
+  bolt: Bolt,
+  building: Building,
+  calendar: Calendar,
+  check: Checkmark,
+  checkmark: Checkmark,
+  'checkmark-circle': CheckmarkCircle,
+  'checkmark-small': CheckmarkSmall,
   'chevron-double-left': ChevronDoubleLeft,
   'chevron-double-right': ChevronDoubleRight,
   'chevron-down': ChevronDown,
+  'chevron-left': ChevronLeft,
+  'chevron-right': ChevronRight,
   'chevron-up': ChevronUp,
   'chevron-up-down': ChevronUpDown,
-  check: Check,
-  close: Close,
+  clipboard: Clipboard,
+  clock: Clock,
+  close: X,
+  cloud: Cloud,
   code: Code,
+  cog: Cog6Teeth,
+  'cog-6-teeth': Cog6Teeth,
+  columns: Columns,
   'credit-card': CreditCard,
-  ellipsis: Ellipsis,
-  eye: Eye,
-  'eye-slash': EyeSlash,
-  'info-circle': InfoCircle,
-  minus: Minus,
-  pen: Pen,
-  plus: Plus,
-  search: Search,
-  'shield-check': ShieldCheck,
-  'log-out': LogOut,
-  'switch-horizontal': SwitchHorizontal,
-  cog: Cog,
   'device-laptop': DeviceLaptop,
   'device-phone': DevicePhone,
+  devices: Devices,
+  document: Document,
+  dollar: Dollar,
+  'dotted-square': DottedSquare,
+  download: Download,
+  duplicate: Duplicate,
+  ellipsis: EllipsisHorizontal,
+  'ellipsis-horizontal': EllipsisHorizontal,
+  'ellipsis-horizontal-circle': EllipsisHorizontalCircle,
+  'ellipsis-vertical': EllipsisVertical,
+  'enterprise-connections': EnterpriseConnections,
+  envelope: Envelope,
+  'exclamation-circle': ExclamationCircle,
+  export: Export,
+  eye: Eye,
+  'eye-slash': EyeSlash,
+  'face-scan': FaceScan,
+  filter: Filter,
+  fingerprint: Fingerprint,
+  flag: Flag,
+  globe: Globe,
+  grip: Grip,
+  'info-circle': InformationCircle,
+  'information-circle': InformationCircle,
+  key: Key,
+  link: Link,
+  lock: Lock,
+  'log-out': LogOut,
+  'magnifying-glass': MagnifyingGlass,
+  minus: Minus,
+  'minus-circle': MinusCircle,
+  numbers: Numbers,
+  'passkey-added': PasskeyAdded,
+  pen: Pen,
+  phone: Phone,
+  plus: Plus,
+  'question-mark-circle': QuestionMarkCircle,
+  'receipt-bill': ReceiptBill,
+  'rotate-anti-clockwise': RotateAntiClockwise,
+  'rotate-left-right': RotateLeftRight,
+  route: Route,
+  search: MagnifyingGlass,
   'security-authenticator': SecurityLockSquare,
-  'security-lock': SecurityLock,
+  'security-lock': Lock,
   'security-lock-square': SecurityLockSquare,
   'security-passkey': SecurityPasskey,
   'security-phone': SecurityPhone,
-  users: Users,
+  shield: Shield,
+  'shield-check': ShieldCheck,
+  'shield-close': ShieldClose,
+  sidebar: Sidebar,
+  spinner: Spinner,
+  support: Support,
+  'switch-horizontal': ArrowLeftRight,
+  trash: Trash,
   'user-circle': UserCircle,
+  'user-circle-plus': UserCirclePlus,
+  users: Users,
+  x: X,
+  'x-circle': XCircle,
 } satisfies Record<string, IconComponent>;
 
 export type IconName = keyof typeof iconRegistry;
