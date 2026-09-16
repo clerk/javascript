@@ -80,7 +80,7 @@ export function Ghost() {
             alignItems: 'center',
             gap: 16,
             paddingBlock: 8,
-            borderBlockEnd: '1px solid var(--cl-color-border-faded)',
+            borderBlockEnd: '1px solid var(--cl-color-border-subtle)',
           }}
         >
           <div style={{ display: 'grid' }}>

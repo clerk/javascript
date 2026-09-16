@@ -11,14 +11,14 @@ export const styles = stylex.create({
     flexDirection: 'column',
   },
   label: {
-    color: colorVars['--cl-color-primary'],
+    color: colorVars['--cl-color-brand'],
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
   message: {
     margin: 0,
   },
   description: {
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
   },
   messageRoot: {
     overflow: 'clip',

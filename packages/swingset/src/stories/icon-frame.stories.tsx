@@ -9,8 +9,8 @@ export { default as __source } from './icon-frame.stories?raw';
 
 const styles = stylex.create({
   customSurface: {
-    backgroundColor: colorVars['--cl-color-primary'],
-    color: colorVars['--cl-color-primary-foreground'],
+    backgroundColor: colorVars['--cl-color-brand'],
+    color: colorVars['--cl-color-brand-foreground'],
   },
 });
 
