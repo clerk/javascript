@@ -420,13 +420,10 @@ const focusDefaults = {
 
 export const focusVars = stylex.defineVars(focusDefaults);
 
-// Elevation, matching the Figma `shadow-sm|md|lg` effect styles: `md` and `lg` are two drop
-// layers and a blurred hairline ring, `sm` is the ring alone. Every layer is a wash of
-// `--cl-color-neutral` (black on light, white on dark). In dark the drop layers fall away and
-// only the ring stays, since a shadow reads as depth against a light page and as nothing against
-// a dark one. Branched per colour via `light-dark()`
-// since a shadow's geometry cannot branch — see the note on `Dialog`'s popup for why
-// `@media (prefers-color-scheme)` is not the escape hatch.
+// =============================================================================
+// Shadow Tokens
+// =============================================================================
+
 const drop = (wash: string) => `light-dark(${wash}, transparent)`;
 const neutral4 = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`;
 const neutral8 = colorVars['--cl-color-neutral-alpha-200'];
