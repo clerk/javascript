@@ -65,8 +65,8 @@ export const popup = stylex.create({
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
     transitionTimingFunction: {
-      default: `linear, ${easingVars['--cl-ease-default']}`,
-      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}`,
+      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
     },
     maxHeight: 'var(--cl-available-height)',
     maxWidth: 'min(18rem, calc(100vw - 2rem))',

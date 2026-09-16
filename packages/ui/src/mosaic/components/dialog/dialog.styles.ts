@@ -717,14 +717,14 @@ export const popupMotion = stylex.create({
     // `--cl-ease-default` because a surface this size should land rather than settle — Swift Out's
     // ~2% overshoot reads as the sheet arriving past its inset and correcting.
     transitionTimingFunction: {
-      default: `linear, ${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-enter']}`,
+      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-enter']}`,
       // Positional against `transitionProperty`, so the third slot is `translate` — the sheet's
       // slide, and the only one that departs from `--cl-ease-exit`. Set on the PLAIN
       // `[data-ending-style]` branch rather than behind a media query on purpose: `translate` is
       // unset above the phone band, so the slot is inert there, and a media-scoped branch would
       // have to out-rank a plain sibling on the same property — the fight documented on
       // `translate` below.
-      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}, ${SHEET_EXIT_EASE}`,
+      ':where([data-ending-style])': `${easingVars['--cl-ease-exit']}, ${easingVars['--cl-ease-exit']}, ${SHEET_EXIT_EASE}`,
     },
     /**
      * The sheet's slide rides the independent `translate` property, NOT `transform` — and it
@@ -779,8 +779,8 @@ export const popupMotion = stylex.create({
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
     transitionTimingFunction: {
-      default: `linear, ${easingVars['--cl-ease-enter']}`,
-      ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}`,
+      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-enter']}`,
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
     },
   },
 
@@ -803,6 +803,9 @@ export const popupMotion = stylex.create({
       ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
     transitionProperty: 'opacity',
-    transitionTimingFunction: 'linear',
+    transitionTimingFunction: {
+      default: easingVars['--cl-ease-enter'],
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
+    },
   },
 });
