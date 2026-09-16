@@ -12,7 +12,7 @@ import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
 import { Text } from '../../../components/text';
 import type { UserProfileFormError } from '../user-profile-account-section/user-profile-account-section.types';
-import { userProfilePasswordSectionBase as m } from './user-profile-password-section.messages';
+import { userProfilePasswordSectionMessages as m } from './user-profile-password-section.messages';
 import { styles } from './user-profile-password-section.styles';
 import type { UserProfileEditPasswordField } from './user-profile-password-section.types';
 

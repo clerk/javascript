@@ -4,6 +4,7 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
+import { fill } from '../../utils/messages';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { userProfileWeb3WalletsMessages as m } from './user-profile-web3-wallets.messages';
@@ -79,7 +80,7 @@ export function UserProfileWeb3WalletRowView({
               color='neutral'
               size='sm'
               variant='outline'
-              aria-label={m.connectLabel.replace('{provider}', wallet.provider ?? '')}
+              aria-label={fill(m.connectLabel, { provider: wallet.provider ?? '' })}
               onClick={() => onConnect(wallet.id)}
             >
               {m.connect}
@@ -94,7 +95,7 @@ export function UserProfileWeb3WalletRowView({
           <Section.Actions>
             <UserProfileActionMenu
               actions={actions}
-              label={m.manageLabel.replace('{wallet}', wallet.provider || address || '')}
+              label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
             />
           </Section.Actions>
         ) : null}

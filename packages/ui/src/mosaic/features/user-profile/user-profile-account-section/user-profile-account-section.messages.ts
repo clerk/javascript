@@ -1,11 +1,13 @@
 /**
- * A parameterized message is its template, the way `params()` takes it. `fill` below resolves them
- * until that layer lands.
+ * Every string the surface renders. Shaped the way `@clerk/i18n` takes a base definition, so
+ * localizing this component is a matter of registering the namespace and swapping the reads for
+ * `useMessages('userProfileAccountSection', userProfileAccountSectionMessages)`, not of hunting the
+ * literals down first.
  *
  * Email and phone keep separate keys rather than sharing one templated string: a locale that
  * inflects around the noun cannot build either from the other.
  */
-export const userProfileAccountSectionBase = {
+export const userProfileAccountSectionMessages = {
   sectionLabel: 'Account',
   sectionTitle: 'Profile',
   picture: {
@@ -79,8 +81,3 @@ export const userProfileAccountSectionBase = {
     },
   },
 };
-
-/** Substitutes `{name}`-style placeholders. Replaced by the localization layer's own formatter. */
-export function fill(template: string, values: Record<string, string | number>): string {
-  return template.replace(/\{(\w+)\}/g, (match, key: string) => String(values[key] ?? match));
-}

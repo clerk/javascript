@@ -1,8 +1,9 @@
 import { Destructive } from '../../../blocks/destructive';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
+import { fill } from '../../../utils/messages';
 import { useUserProfileDeleteSectionController } from './user-profile-delete-section.controller';
-import { fill, userProfileDeleteSectionBase as m } from './user-profile-delete-section.messages';
+import { userProfileDeleteSectionMessages as m } from './user-profile-delete-section.messages';
 
 export interface UserProfileDeleteSectionViewProps {
   /**

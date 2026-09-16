@@ -7,8 +7,8 @@ import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
+import { fill, rich } from '../../../utils/messages';
 import { styles as profileStyles } from '../user-profile-profile-panel.styles';
-import { fill } from './user-profile-account-section.messages';
 import { userProfileVerifyEmailLinkMessages as m } from './user-profile-verify-email-link.messages';
 import { styles } from './user-profile-verify-email-link.styles';
 
@@ -33,8 +33,6 @@ export function UserProfileVerifyEmailLinkDialog({
   resendSeconds = 0,
   errorMessage,
 }: UserProfileVerifyEmailLinkDialogProps) {
-  const [beforeSeconds, afterSeconds] = m.resendCountdown.split('{seconds}');
-
   return (
     <Dialog.Root
       closedBy='closerequest'
@@ -80,9 +78,9 @@ export function UserProfileVerifyEmailLinkDialog({
                   m.resending
                 ) : resendSeconds > 0 ? (
                   <span>
-                    {beforeSeconds}
-                    <span {...stylex.props(profileStyles.countdown)}>{resendSeconds}</span>
-                    {afterSeconds}
+                    {rich(m.resendCountdown, {
+                      values: { seconds: <span {...stylex.props(profileStyles.countdown)}>{resendSeconds}</span> },
+                    })}
                   </span>
                 ) : (
                   m.resend

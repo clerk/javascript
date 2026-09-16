@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Section } from '../../components/section';
+import { fill } from '../../utils/messages';
 import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
 import { userProfileConnectedAccountsMessages as m } from './user-profile-connected-accounts.messages';
 
@@ -68,7 +69,7 @@ export function UserProfileConnectedAccountsSectionView({
         <Confirmation
           handle={removeAccount}
           title={m.removeDialog.title}
-          description={account => m.removeDialog.description.replace('{provider}', account.provider)}
+          description={account => fill(m.removeDialog.description, { provider: account.provider })}
           actionLabel={m.removeDialog.confirm}
           cancelLabel={m.removeDialog.cancel}
           onConfirm={account => onRemove(account.id)}

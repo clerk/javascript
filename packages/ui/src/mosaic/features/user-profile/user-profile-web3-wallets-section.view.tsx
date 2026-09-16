@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { truncateWithEndVisible } from '../../../utils/truncateTextWithEndVisible';
 import { Confirmation } from '../../blocks/confirmation';
 import { Section } from '../../components/section';
-import { fill } from './user-profile-account-section/user-profile-account-section.messages';
+import { fill } from '../../utils/messages';
 import { UserProfileWeb3WalletRowView } from './user-profile-web3-wallet-row.view';
 import { userProfileWeb3WalletsMessages as m } from './user-profile-web3-wallets.messages';
 

@@ -10,8 +10,8 @@ import { Field } from '../../../components/field';
 import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import { Input } from '../../../components/input';
 import { Otp } from '../../../components/otp';
+import { fill, rich } from '../../../utils/messages';
 import { styles } from '../user-profile-profile-panel.styles';
-import { fill } from './user-profile-account-section.messages';
 import { userProfileAddEmailMessages as m } from './user-profile-add-email.messages';
 
 export interface UserProfileAddEmailDialogProps {
@@ -163,7 +163,6 @@ interface VerifyEmailStepProps {
 
 function VerifyEmailStep(props: VerifyEmailStepProps) {
   const verifyFormId = useId();
-  const [beforeSeconds, afterSeconds] = m.verify.resendCountdown.split('{seconds}');
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -210,9 +209,9 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
               m.verify.resending
             ) : (props.resendSeconds ?? 0) > 0 ? (
               <span>
-                {beforeSeconds}
-                <span {...stylex.props(styles.countdown)}>{props.resendSeconds}</span>
-                {afterSeconds}
+                {rich(m.verify.resendCountdown, {
+                  values: { seconds: <span {...stylex.props(styles.countdown)}>{props.resendSeconds}</span> },
+                })}
               </span>
             ) : (
               m.verify.resend

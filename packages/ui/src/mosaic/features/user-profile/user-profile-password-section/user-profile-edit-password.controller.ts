@@ -2,7 +2,7 @@ import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
 import type { UserProfileFormError } from '../user-profile-account-section/user-profile-account-section.types';
 import { UserProfileSaveError } from '../user-profile-account-section/user-profile-account-section.types';
-import { userProfilePasswordSectionBase as m } from './user-profile-password-section.messages';
+import { userProfilePasswordSectionMessages as m } from './user-profile-password-section.messages';
 import type { UserProfileEditPasswordField, UserProfileEditPasswordValue } from './user-profile-password-section.types';
 
 export interface UserProfileEditPasswordContext {
