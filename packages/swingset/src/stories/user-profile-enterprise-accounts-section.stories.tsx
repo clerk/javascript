@@ -13,7 +13,7 @@ export const meta: StoryMeta = {
   label: 'Enterprise accounts',
   navigation: { category: 'Sections' },
   source:
-    'packages/ui/src/mosaic/features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view.tsx',
+    'packages/mosaic/src/features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view.tsx',
 };
 
 export function Default() {
