@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { getPageItems } from './page-items';
 import { Pagination } from './pagination';
 
-function controls() {
+function controls(): ReturnType<typeof within> {
   const element = document.querySelector('.cl-pagination-controls');
   if (!(element instanceof HTMLElement)) {
     throw new Error('Pagination controls did not render');

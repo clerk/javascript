@@ -16,10 +16,10 @@ Page navigation for a paged list. Renders a labelled `nav` with previous and nex
 <PropTable
   meta={PaginationStories.meta}
   extra={[
-    { name: 'page', type: 'number', description: 'The current page, 1-based.' },
-    { name: 'totalItems', type: 'number', description: 'Total number of items across every page.' },
-    { name: 'pageSize', type: 'number', description: 'Items per page. The page count is derived from this and `totalItems`.' },
-    { name: 'onChange', type: '(page: number) => void', description: 'Called with the page the user navigated to.' },
+    { name: 'page', type: 'number', default: '—', description: 'The current page, 1-based.' },
+    { name: 'totalItems', type: 'number', default: '—', description: 'Total number of items across every page.' },
+    { name: 'pageSize', type: 'number', default: '—', description: 'Items per page. The page count is derived from this and `totalItems`.' },
+    { name: 'onChange', type: '(page: number) => void', default: '—', description: 'Called with the page the user navigated to.' },
     { name: 'step', type: 'number', default: '1', description: 'How many pages the previous and next controls move.' },
     { name: 'siblingCount', type: 'number', default: '1', description: 'Pages shown on each side of the current one.' },
     { name: 'label', type: 'string', default: "'Pagination'", description: 'Accessible name of the `nav`.' },
