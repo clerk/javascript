@@ -304,8 +304,8 @@ import {
 import {
   Default as UserProfilePasskeysSectionDefault,
   Empty as UserProfilePasskeysSectionEmpty,
-  RecoverableErrors as UserProfilePasskeysSectionRecoverableErrors,
   meta as userProfilePasskeysSectionMeta,
+  RecoverableErrors as UserProfilePasskeysSectionRecoverableErrors,
 } from '../stories/user-profile-passkeys-section.stories';
 import {
   Default as UserProfilePasswordSectionDefault,
