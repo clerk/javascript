@@ -372,7 +372,7 @@ export function SingleSession(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 
   // What an instance in single-session mode hands the view: one account, and neither of the two
-  // actions that only make sense with a second one. The account's own `⋯` still signs out of it.
+  // actions that only make sense with a second one. The foot signs out of just that account.
   return (
     <UserButtonView
       {...prototype}
