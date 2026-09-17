@@ -338,6 +338,7 @@ describe('Tooltip', () => {
       );
 
       await user.hover(screen.getByRole('button', { name: 'Button A' }));
+      await new Promise(resolve => setTimeout(resolve, 350));
       expect(screen.queryByText('Tooltip A')).not.toBeInTheDocument();
       await waitFor(() => expect(screen.getByText('Tooltip A')).toBeInTheDocument(), { timeout: 1000 });
 
