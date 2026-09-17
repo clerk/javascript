@@ -9,7 +9,7 @@ import { constants } from '../constants';
 import type { EnvironmentConfig } from '../models/environment';
 import { environmentConfig } from '../models/environment';
 import { instanceKeys } from './instanceKeys';
-import type { PlatformApplicationConfig } from './platformApplication';
+import type { PlatformApplication, PlatformApplicationConfig } from './platformApplication';
 import { createApplicationFromConfig } from './platformApplication';
 import { getOrCreateCachedPlatformApplication } from './platformApplicationCache';
 
