@@ -100,39 +100,14 @@ describe('userProfileEditPasswordMachine', () => {
   });
 
   it('keeps what was typed when the save fails, so it can be corrected', async () => {
-    const actor = start(() => Promise.reject(new Error('Incorrect password.')));
+    const failure = new Error('Incorrect password.');
+    const actor = start(() => Promise.reject(failure));
     fill(actor);
     actor.send({ type: 'SAVE' });
 
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('editing'));
     expect(actor.getSnapshot().context.newPassword).toBe('new-secret-123');
-    expect(actor.getSnapshot().context.error).toEqual({ message: 'Incorrect password.', fields: undefined });
-  });
-
-  it('carries field copy through when the rejection names the control', async () => {
-    const failure = new UserProfileSaveError('Your password could not be updated.', {
-      newPassword: 'Your password must contain 8 or more characters.',
-    });
-    const actor = start(() => Promise.reject(failure));
-    fill(actor);
-    actor.send({ type: 'SAVE' });
-
-    await vi.waitFor(() =>
-      expect(actor.getSnapshot().context.error?.fields).toEqual({
-        newPassword: 'Your password must contain 8 or more characters.',
-      }),
-    );
-  });
-
-  it('falls back to generic copy when the rejection is not an Error', async () => {
-    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors -- a non-Error rejection is the case under test
-    const actor = start(() => Promise.reject('nope'));
-    fill(actor);
-    actor.send({ type: 'SAVE' });
-
-    await vi.waitFor(() =>
-      expect(actor.getSnapshot().context.error?.message).toBe('Something went wrong. Please try again.'),
-    );
+    expect(actor.getSnapshot().context.error).toBe(failure);
   });
 
   it('refuses to save until both halves match', () => {
@@ -232,6 +207,39 @@ describe('useUserProfileEditPasswordController', () => {
 
     act(() => result.current.onConfirmPasswordChange('new-secret-123'));
     expect(result.current.error).toBeUndefined();
+  });
+
+  it('carries field copy through when the rejection names the control', async () => {
+    const failure = new UserProfileSaveError('Your password could not be updated.', {
+      newPassword: 'Your password must contain 8 or more characters.',
+    });
+    const { result } = renderController(() => Promise.reject(failure));
+
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.onCurrentPasswordChange('old-secret'));
+    act(() => result.current.onNewPasswordChange('new-secret-123'));
+    act(() => result.current.onConfirmPasswordChange('new-secret-123'));
+    act(() => result.current.onSubmit());
+
+    await waitFor(() =>
+      expect(result.current.error).toEqual({
+        message: 'Your password could not be updated.',
+        fields: { newPassword: 'Your password must contain 8 or more characters.' },
+      }),
+    );
+  });
+
+  it('falls back to generic copy when the rejection is not an Error', async () => {
+    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors -- a non-Error rejection is the case under test
+    const { result } = renderController(() => Promise.reject('nope'));
+
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.onCurrentPasswordChange('old-secret'));
+    act(() => result.current.onNewPasswordChange('new-secret-123'));
+    act(() => result.current.onConfirmPasswordChange('new-secret-123'));
+    act(() => result.current.onSubmit());
+
+    await waitFor(() => expect(result.current.error?.message).toBe('Something went wrong. Please try again.'));
   });
 
   it('keeps a failed save visible next to a fresh mismatch', async () => {

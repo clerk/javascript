@@ -4,11 +4,10 @@ import { Badge } from '../../../components/badge';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
-import { fill } from '../../../utils/messages';
+import { fill, useMessages } from '../../../localization';
 import type { UserProfileMenuAction } from '../user-profile-action-menu';
 import { UserProfileActionMenu } from '../user-profile-action-menu';
 import { styles } from '../user-profile-profile-panel.styles';
-import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
 
 export interface UserProfileContactListRowViewProps {
   addAction?: ReactNode;
@@ -31,6 +30,7 @@ export function UserProfileContactListRowView({
   onRemove,
   addAction,
 }: UserProfileContactListRowViewProps) {
+  const m = useMessages('userProfileAccountSection');
   const emptyDescription = m[kind].empty;
 
   return (

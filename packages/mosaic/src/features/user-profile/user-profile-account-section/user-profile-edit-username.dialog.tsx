@@ -8,7 +8,7 @@ import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Input } from '../../../components/input';
-import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
+import { useMessages } from '../../../localization';
 import type { UserProfileFormError } from './user-profile-account-section.types';
 
 export type UserProfileEditUsernameField = 'username';
@@ -36,6 +36,7 @@ export function UserProfileEditUsernameDialog({
   error,
   onSubmit,
 }: UserProfileEditUsernameDialogProps) {
+  const m = useMessages('userProfileAccountSection');
   const formId = useId();
   const usernameRef = useRef<HTMLInputElement>(null);
 

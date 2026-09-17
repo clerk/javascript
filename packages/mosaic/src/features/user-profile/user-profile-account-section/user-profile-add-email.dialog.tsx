@@ -10,9 +10,8 @@ import { Field } from '../../../components/field';
 import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import { Input } from '../../../components/input';
 import { Otp } from '../../../components/otp';
-import { fill, rich } from '../../../utils/messages';
+import { fill, rich, useMessages } from '../../../localization';
 import { styles } from '../user-profile-profile-panel.styles';
-import { userProfileAddEmailMessages as m } from './user-profile-add-email.messages';
 
 export interface UserProfileAddEmailDialogProps {
   open: boolean;
@@ -96,6 +95,7 @@ interface EnterEmailStepProps {
 }
 
 function EnterEmailStep(props: EnterEmailStepProps) {
+  const m = useMessages('userProfileAddEmail');
   const emailFormId = useId();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -161,6 +161,7 @@ interface VerifyEmailStepProps {
 }
 
 function VerifyEmailStep(props: VerifyEmailStepProps) {
+  const m = useMessages('userProfileAddEmail');
   const verifyFormId = useId();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {

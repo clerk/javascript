@@ -3,8 +3,8 @@ import React from 'react';
 import { Icon } from '../../components/icon';
 import type { ProfileRootProps } from '../../components/profile';
 import { Profile } from '../../components/profile';
+import { useMessages } from '../../localization';
 import { getAvailableUserProfilePages, resolveUserProfilePages, USER_PROFILE_PAGE_ICONS } from './user-profile.layout';
-import { userProfileMessages as m } from './user-profile.messages';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
 import { UserProfileApiKeysPanelView } from './user-profile-api-keys-panel.view';
 import { UserProfileBillingPanelView } from './user-profile-billing-panel.view';
@@ -12,7 +12,7 @@ import { UserProfileProfilePanelView } from './user-profile-profile-panel.view';
 import { UserProfileSecurityPanelView } from './user-profile-security-panel.view';
 
 export interface UserProfileViewProps extends Omit<ProfileRootProps, 'children' | 'value' | 'onValueChange'> {
-  /** Names the surface, and the dialog it opens in. Defaults to English; pass a localized string once one is available. */
+  /** Names the surface, and the dialog it opens in. Defaults to the `userProfile.label` message. */
   label?: string;
   /** The open page: a built-in page's id, or a custom page's `path`. */
   activePage: UserProfilePageId | (string & {});
@@ -47,9 +47,10 @@ function BuiltInPage({ id, pages }: { id: UserProfilePageId; pages: UserProfileP
  * surface blank.
  */
 export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewProps>(function UserProfileView(
-  { activePage, pages, customPages, pageOrder, onPageChange, label = m.label, ...rest },
+  { activePage, pages, customPages, pageOrder, onPageChange, label, ...rest },
   ref,
 ) {
+  const m = useMessages('userProfile');
   const entries = resolveUserProfilePages(getAvailableUserProfilePages(pages), customPages, pageOrder);
   const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : entries[0].id;
 
@@ -60,7 +61,7 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
       onValueChange={onPageChange}
       {...rest}
     >
-      <Profile.Title>{label}</Profile.Title>
+      <Profile.Title>{label ?? m.label}</Profile.Title>
       <Profile.Nav>
         {entries.map(entry => (
           <Profile.NavItem

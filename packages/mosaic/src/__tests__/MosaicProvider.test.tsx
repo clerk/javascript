@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { MosaicIconOverrides } from '../icons/overrides';
 import { useMosaicIcons } from '../icons/overrides';
+import { useLocale, useMessages } from '../localization';
 import { MosaicProvider } from '../MosaicProvider';
 
 describe('MosaicProvider icons', () => {
@@ -25,5 +26,26 @@ describe('MosaicProvider icons', () => {
   it('defaults to {} when standalone', () => {
     const { result } = renderHook(() => useMosaicIcons());
     expect(result.current).toEqual({});
+  });
+});
+
+describe('MosaicProvider localization', () => {
+  it('overlays the localization prop onto the built-in messages', () => {
+    const { result } = renderHook(() => useMessages('userButton'), {
+      wrapper: ({ children }) =>
+        React.createElement(
+          MosaicProvider,
+          { localization: { messages: { 'userButton.popup.label': 'Konto' } } },
+          children,
+        ),
+    });
+    expect(result.current.popup.label).toBe('Konto');
+  });
+
+  it('exposes the locale via useLocale', () => {
+    const { result } = renderHook(() => useLocale(), {
+      wrapper: ({ children }) => React.createElement(MosaicProvider, { localization: { locale: 'de' } }, children),
+    });
+    expect(result.current).toBe('de');
   });
 });

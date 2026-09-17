@@ -4,10 +4,9 @@ import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { Text } from '../../../components/text';
-import { fill } from '../../../utils/messages';
+import { fill, useMessages } from '../../../localization';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
-import { userProfilePasswordSectionMessages as m } from './user-profile-password-section.messages';
 import { styles } from './user-profile-password-section.styles';
 import type {
   UserProfileEditPasswordValue,
@@ -21,6 +20,7 @@ export function UserProfilePasswordRowView({
   managedBy,
   onSubmitPassword,
 }: Omit<UserProfilePasswordSectionViewProps, 'sectionTitle'>) {
+  const m = useMessages('userProfilePasswordSection');
   return (
     <Section.Row>
       <Section.Item>
@@ -47,6 +47,7 @@ export function UserProfilePasswordRowView({
 }
 
 function ManagedByLabel({ name, iconUrl }: UserProfilePasswordManagedBy) {
+  const m = useMessages('userProfilePasswordSection');
   return (
     <div {...stylex.props(styles.managedBy)}>
       {iconUrl ? (
@@ -83,6 +84,7 @@ function EditPassword({
   requiresCurrentPassword: boolean;
   onSubmit: (value: UserProfileEditPasswordValue) => Promise<void>;
 }) {
+  const m = useMessages('userProfilePasswordSection');
   const controller = useUserProfileEditPasswordController({
     requiresCurrentPassword: hasPassword && requiresCurrentPassword,
     onSubmit,

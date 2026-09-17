@@ -1,8 +1,8 @@
+import { useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
 import type { UserProfileFormError } from '../user-profile-account-section/user-profile-account-section.types';
 import { UserProfileSaveError } from '../user-profile-account-section/user-profile-account-section.types';
-import { userProfilePasswordSectionMessages as m } from './user-profile-password-section.messages';
 import type { UserProfileEditPasswordField, UserProfileEditPasswordValue } from './user-profile-password-section.types';
 
 export interface UserProfileEditPasswordContext {
@@ -12,7 +12,7 @@ export interface UserProfileEditPasswordContext {
   newPassword: string;
   confirmPassword: string;
   signOutOfOtherSessions: boolean;
-  error: UserProfileFormError<UserProfileEditPasswordField> | undefined;
+  error: unknown;
 }
 
 export type UserProfileEditPasswordEvent =
@@ -48,14 +48,17 @@ export function isSaveable(context: UserProfileEditPasswordContext): boolean {
   );
 }
 
-function toFormError(cause: unknown): UserProfileFormError<UserProfileEditPasswordField> {
+function toFormError(cause: unknown, fallback: string): UserProfileFormError<UserProfileEditPasswordField> | undefined {
+  if (cause === undefined) {
+    return undefined;
+  }
   if (cause instanceof UserProfileSaveError) {
     return { message: cause.message, fields: cause.fields };
   }
   if (cause instanceof Error) {
     return { message: cause.message };
   }
-  return { message: m.errors.generic };
+  return { message: fallback };
 }
 
 export const userProfileEditPasswordMachine = createMachine({
@@ -92,7 +95,7 @@ export const userProfileEditPasswordMachine = createMachine({
           onDone: { target: 'idle', actions: assign(() => emptyFields) },
           onError: {
             target: 'editing',
-            actions: assign((_, event) => ({ error: toFormError(event.error) })),
+            actions: assign((_, event) => ({ error: event.error })),
           },
         },
       ),
@@ -126,13 +129,15 @@ export function useUserProfileEditPasswordController({
   requiresCurrentPassword = false,
   onSubmit,
 }: UserProfileEditPasswordControllerOptions): UserProfileEditPasswordController {
+  const m = useMessages('userProfilePasswordSection');
   const [snapshot, send] = useMachine(userProfileEditPasswordMachine, {
     context: { savePassword: onSubmit, requiresCurrentPassword },
   });
   const { context } = snapshot;
+  const saveError = toFormError(context.error, m.errors.generic);
   const error = passwordsMismatch(context)
-    ? { ...context.error, fields: { ...context.error?.fields, confirmPassword: m.errors.mismatch } }
-    : context.error;
+    ? { ...saveError, fields: { ...saveError?.fields, confirmPassword: m.errors.mismatch } }
+    : saveError;
 
   return {
     isOpen: snapshot.value === 'editing' || snapshot.value === 'saving',

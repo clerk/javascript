@@ -11,9 +11,8 @@ import { Field } from '../../../components/field';
 import { Flow, useFlowAutoFocus } from '../../../components/flow';
 import { Otp } from '../../../components/otp';
 import { PhoneInput } from '../../../components/phone-input';
-import { fill, rich } from '../../../utils/messages';
+import { fill, rich, useMessages } from '../../../localization';
 import { styles } from '../user-profile-profile-panel.styles';
-import { userProfileAddPhoneMessages as m } from './user-profile-add-phone.messages';
 
 export interface UserProfileAddPhoneDialogProps {
   open: boolean;
@@ -97,6 +96,7 @@ interface EnterPhoneStepProps {
 }
 
 function EnterPhoneStep(props: EnterPhoneStepProps) {
+  const m = useMessages('userProfileAddPhone');
   const phoneFormId = useId();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -162,6 +162,7 @@ interface VerifyPhoneStepProps {
 }
 
 function VerifyPhoneStep(props: VerifyPhoneStepProps) {
+  const m = useMessages('userProfileAddPhone');
   const verifyFormId = useId();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
