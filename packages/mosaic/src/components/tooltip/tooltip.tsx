@@ -14,7 +14,6 @@ export type TooltipTriggerProps = MosaicComponentProps<'button'>;
 
 export type TooltipPopupProps = MosaicComponentProps<'div'>;
 
-/** The anchor. Renders a `<button>`; `render` swaps in another element. */
 const Trigger = React.forwardRef<HTMLButtonElement, TooltipTriggerProps>(function TooltipTrigger(
   { xstyle, ...rest },
   ref,
@@ -27,10 +26,6 @@ const Trigger = React.forwardRef<HTMLButtonElement, TooltipTriggerProps>(functio
   );
 });
 
-/**
- * The floating label. Portals itself out of the tree and positions against
- * `Tooltip.Trigger`; the surface, type and enter/exit transition are its own.
- */
 const Popup = React.forwardRef<HTMLDivElement, TooltipPopupProps>(function TooltipPopup({ xstyle, ...rest }, ref) {
   return (
     <Primitive.Portal>
@@ -46,12 +41,6 @@ const Popup = React.forwardRef<HTMLDivElement, TooltipPopupProps>(function Toolt
   );
 });
 
-/**
- * Mosaic `Tooltip` — a short label shown on hover or focus, built on the
- * `@clerk/headless` tooltip primitive. Composed via dot syntax: `Tooltip.Root`,
- * `Tooltip.Trigger`, `Tooltip.Popup`, plus `Tooltip.Group` to share a delay
- * across neighbouring tooltips.
- */
 export const Tooltip = {
   Root: Primitive.Root,
   Group: Primitive.Group,
