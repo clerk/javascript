@@ -65,7 +65,7 @@ export const item = stylex.create({
 
   xs: {
     gap: space['2'],
-    height: space['9'],
+    height: space['8'],
   },
   md: {
     gap: space['3'],
