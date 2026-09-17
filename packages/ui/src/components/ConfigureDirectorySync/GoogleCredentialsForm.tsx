@@ -82,8 +82,6 @@ export const useGoogleCredentialsState = (): GoogleCredentialsState => {
       return;
     }
     await setCredentials({ serviceAccountJson, subjectEmail: trimmedSubjectEmail });
-    // Drop the key as soon as it has been accepted. Nothing in this flow needs
-    // it again, and holding it only widens where it can leak from.
     setServiceAccountJson('');
     setFileName(null);
   }, [hasPendingCredential, setCredentials, serviceAccountJson, trimmedSubjectEmail]);
