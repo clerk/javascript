@@ -147,51 +147,6 @@ Press Cancel to open a discard confirmation above the profile form. Keep editing
   storyModule={DialogStories}
 />
 
-# <<<<<<< HEAD
-
-```tsx
-import { createConfirmHandle, Dialog, useConfirmedClose } from '@clerk/mosaic/components/dialog';
-
-const confirm = React.useMemo(() => createConfirmHandle(), []);
-
-const onOpenChange = useConfirmedClose({
-  handle: confirm,
-  when: () => value !== '',
-  onOpenChange: setOpen,
-  confirm: { title: 'Discard changes?', description: '…', actionLabel: 'Discard', destructive: true },
-});
-
-<Dialog.Root open={open} onOpenChange={onOpenChange} closedBy='closerequest'>
-  <Dialog.Popup>
-    …
-    <Dialog.Confirm handle={confirm} finalFocus={inputRef} />
-  </Dialog.Popup>
-</Dialog.Root>;
-```
-
-- Render `Dialog.Confirm` **inside** the popup it guards, so the two share a floating tree.
-- The guarded dialog must be controlled — a veto is the absence of a commit.
-- `confirm.show(options)` asks the same question directly and resolves `true`/`false`. It needs the
-  `Dialog.Confirm` mounted, and returns the in-flight promise if one is already showing.
-
-### Inline
-
-`inline` on the root renders the dialog in its host instead of over the page: no portal, scrim,
-scroll lock or focus trap, and nothing dismisses it. For the account profile mounted in a page slot.
-
-<Story
-  name='Inline'
-  storyModule={DialogStories}
-/>
-
-- `open`, `modal`, `closedBy` are implied; `onOpenChange` is never called.
-- No initial focus on mount. `Dialog.CloseButton` renders nothing; `Card.Header` carries no dismiss.
-- Fills the host edge to edge. How the surface looks there is the surface's call — the page
-  paints the same frame modal or inline.
-- Dialogs opened from inside it are normal modal dialogs over the page.
-
-> > > > > > > 12e3a52c54 (refactor(swingset): point stories at @clerk/mosaic)
-
 ### Responsive behaviour
 
 The gap to the screen edge is a fixed inset, not a percentage:
