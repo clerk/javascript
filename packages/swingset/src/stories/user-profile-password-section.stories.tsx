@@ -1,4 +1,5 @@
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
+import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 
 import type { StoryMeta } from '@/lib/types';
 
