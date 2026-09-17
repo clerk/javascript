@@ -17,7 +17,7 @@ export async function completeOnboardingIfClaimed(configuredPublishableKey: stri
   if (!configuredPublishableKey) {
     clerkDevelopmentCache?.log({
       cacheKey: `${locallyStoredKeys.publishableKey}_stored`,
-      msg: `[Clerk]: Found existing keyless-mode keys in .clerk/.tmp/keyless.json. Copy the publishableKey and secretKey into .env (CLERK_PUBLISHABLE_KEY / CLERK_SECRET_KEY) to keep using that application, or claim it at ${locallyStoredKeys.claimUrl}`,
+      msg: `[Clerk]: Found existing keyless-mode keys in .clerk/.tmp/keyless.json. To keep using that application, claim it at ${locallyStoredKeys.claimUrl}, then copy the publishableKey and secretKey into .env (CLERK_PUBLISHABLE_KEY / CLERK_SECRET_KEY).`,
     });
     return;
   }

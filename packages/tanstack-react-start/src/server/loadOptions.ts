@@ -30,7 +30,11 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }
 
-  // In development, defer missing-key errors to authenticateRequest so the CLI-pointing message surfaces
+  if (!secretKey && publishableKey) {
+    errorThrower.throwMissingSecretKeyError();
+  }
+
+  // In development with no keys at all, defer to authenticateRequest so its CLI-pointing missing-publishable-key error surfaces
   if (!secretKey && !canUseKeyless) {
     // eslint-disable-next-line @typescript-eslint/only-throw-error
     throw errorThrower.throw('Clerk: no secret key provided');
