@@ -30,7 +30,7 @@ const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable
         tabIndex={0}
         {...mergeStyleProps(
           themeProps('table-viewport'),
-          stylex.props(reset.base, scrollAreaViewport('auto', 'inline')),
+          stylex.props(reset.base, scrollAreaViewport('auto', 'inline'), styles.viewport),
         )}
       >
         <table

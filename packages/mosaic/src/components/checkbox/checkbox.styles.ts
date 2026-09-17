@@ -34,9 +34,18 @@ export const styles = stylex.create({
     display: 'block',
     flexShrink: 0,
     opacity: { default: null, ':disabled': 0.5 },
+    position: 'relative',
     transitionDuration: durationVars['--cl-duration-fast'],
     transitionProperty: 'background-color, border-color',
     transitionTimingFunction: 'linear',
+  },
+  hitTarget: {
+    '::before': {
+      inset: `calc(-1 * ${space['3']})`,
+      content: '""',
+      display: { default: 'none', '@media (pointer: coarse)': 'block' },
+      position: 'absolute',
+    },
   },
   indicator: {
     inset: 0,

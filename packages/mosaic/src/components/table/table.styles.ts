@@ -12,6 +12,9 @@ export const styles = stylex.create({
     backgroundColor: colorVars['--cl-color-background'],
     width: '100%',
   },
+  viewport: {
+    overscrollBehavior: 'none',
+  },
   table: {
     borderCollapse: 'collapse',
     borderSpacing: 0,

@@ -46,7 +46,14 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
         disabled={disabled}
         {...mergeStyleProps(
           themeProps('checkbox-input'),
-          stylex.props(reset.base, focusOutline.visible, styles.input, sizes[size], checkboxInputMarker),
+          stylex.props(
+            reset.base,
+            focusOutline.visible,
+            styles.input,
+            styles.hitTarget,
+            sizes[size],
+            checkboxInputMarker,
+          ),
           rest,
         )}
       />

@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { EmptyState } from '../empty-state';
 import { Table } from './table';
+import { styles } from './table.styles';
 
 const atoms = stylex.create({
   spaced: { marginTop: '8px' },
@@ -42,6 +43,11 @@ describe('Mosaic Table', () => {
   it('lets the keyboard reach the scrolling viewport', () => {
     renderTable();
     expect(screen.getByRole('table').parentElement).toHaveAttribute('tabindex', '0');
+  });
+
+  it('stops the viewport from rubber banding past its edges', () => {
+    renderTable();
+    expect(screen.getByRole('table').parentElement).toHaveClass(stylex.props(styles.viewport).className ?? '');
   });
 
   it('applies slot classes to every part', () => {
