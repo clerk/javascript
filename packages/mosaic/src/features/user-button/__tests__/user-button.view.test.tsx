@@ -952,6 +952,13 @@ describe('UserButtonView, the header', () => {
     expect(screen.queryByRole('button', { name: 'Manage organization' })).toBeNull();
   });
 
+  it('gives each stacked label a box of its own, so a long one truncates', () => {
+    renderHeader();
+
+    const settings = screen.getByRole('button', { name: 'Settings' });
+    expect(within(settings).getByText('Settings').tagName).toBe('SPAN');
+  });
+
   it('stacks the account actions the same way', async () => {
     const onSignOutSession = vi.fn();
     const onManageAccount = vi.fn();
