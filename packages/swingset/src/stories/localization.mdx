@@ -69,6 +69,8 @@ namespace the keys mirror the feature's message file. Nested objects and dot pat
 interchangeable, and can be mixed:
 
 ```ts
+import type { MosaicCatalog } from '@clerk/mosaic/localization';
+
 const overrides: MosaicCatalog = {
   userButton: { manage: { invite: 'Invite teammates' } },
   'userButton.accounts.signOutAll': 'Sign out everywhere',

@@ -201,8 +201,12 @@ the `localization` prop on `MosaicProvider` can replace any string; a module-lev
 helper takes the messages as a parameter rather than importing them.
 
 ```tsx
-<MosaicProvider localization={{ overrides: { 'userButton.popup.label': 'My account' } }}>
-<MosaicProvider localization={{ locale: 'es-ES', messages: esES, overrides: { 'userButton.popup.label': 'Mi cuenta' } }}>
+<MosaicProvider localization={{ overrides: { 'userButton.popup.label': 'My account' } }}>{children}</MosaicProvider>;
+<MosaicProvider
+  localization={{ locale: 'es-ES', messages: esES, overrides: { 'userButton.popup.label': 'Mi cuenta' } }}
+>
+  {children}
+</MosaicProvider>;
 ```
 
 `messages` is the catalog for `locale`, `overrides` the app's own changes on top, and
@@ -210,7 +214,7 @@ English sits under both. `locale` only feeds `Intl.PluralRules`. Strings are res
 with the helpers in `src/localization/messages.ts`, never with `.replace` or `.split`
 on the string:
 
-- `fill(m.manage, { name })` substitutes `{name}` placeholders.
+- `fill(m.trigger.open, { name })` substitutes `{name}` placeholders.
 - `plural(m.members, count, locale)` picks a form from `{ one, other, … }` with
   `Intl.PluralRules` for the `locale` from `useLocale()` and fills `{count}`.
 - `rich(m.description, { values, components })` renders `{#strong}…{/strong}`
@@ -222,7 +226,7 @@ on the string:
 
 The helpers are typed from the string itself: `fill` accepts exactly the `{name}`
 placeholders the template declares, `rich` exactly the tags it marks up, and
-`plural` the placeholders of the `other` form.
+`plural` whatever any of the forms name besides `count`.
 
 Message keys are public surface. `MosaicCatalog` is derived from the registry,
 so a consumer's overrides type-check against the real keys, as a dot path
@@ -485,30 +489,30 @@ The steps above cover the **styling** migration. For **flow** components — whe
 
 ## Files
 
-| File                                           | Purpose                                                                            |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `src/tokens.stylex.ts`                         | `--cl-*` token groups declared with `stylex.defineVars`                            |
-| `src/props.ts`                                 | `themeProps`, `mergeStyleProps`, `MosaicComponentProps`, `MosaicStyleProps`        |
-| `src/MosaicProvider.tsx`                       | Provider for the `icons` and `localization` props                                  |
-| `src/icons/overrides.ts`                       | `MosaicIconOverrides` type + `useMosaicIcons()` context                            |
-| `src/icons/registry.tsx`                       | Built-in glyphs and the `IconName` union                                           |
-| `src/localization/`                            | Message registry, `MosaicCatalog` types, context hooks, and `fill`/`plural`/`rich` |
-| `src/components/`                              | One subdirectory per component, and nothing else                                   |
-| `src/blocks/`                                  | View fragments that own one piece of state of their own (`destructive`)            |
-| `src/utils/*.styles.ts`                        | Atoms shared across components: `reset`, `typography`, `focus-outline`             |
-| `src/hooks/`                                   | Mosaic-only hooks (`useMosaicEnvironment`, `useMosaicRouter`, …)                   |
-| `src/styles/index.ts`                          | StyleX-only barrel — the entry the CSS build walks                                 |
-| `src/machine/`                                 | State-machine runtime (`createMachine`, `createActor`, `useMachine`)               |
-| `src/machines/`                                | Standalone machines and the shared `__tests__/test-utils.ts`                       |
-| `src/<feature>/*.model.tsx`                    | Clerk adapter — the only file in a feature that may import Clerk                   |
-| `src/<feature>/*.controller.tsx`               | Local state and action wrapping; holds the feature's machine                       |
-| `src/<feature>/*.view.tsx`                     | Clerk-free rendering from plain props                                              |
-| `src/<feature>/*.types.ts`                     | The data contract the model and the view both agree on                             |
-| `src/<feature>/*.messages.ts`                  | Every string the surface renders; its keys are the `localization` paths            |
-| `src/utils/reset.test.tsx`                     | Reset specs                                                                        |
-| `src/__tests__/MosaicProvider.test.tsx`        | Icon-override and localization context specs                                       |
-| `src/components/button/button.test.tsx`        | Component-level slot/state/variant specs                                           |
-| `src/features/user-button/__tests__/`          | The canonical per-layer test set to copy from                                      |
+| File                                    | Purpose                                                                            |
+| --------------------------------------- | ---------------------------------------------------------------------------------- |
+| `src/tokens.stylex.ts`                  | `--cl-*` token groups declared with `stylex.defineVars`                            |
+| `src/props.ts`                          | `themeProps`, `mergeStyleProps`, `MosaicComponentProps`, `MosaicStyleProps`        |
+| `src/MosaicProvider.tsx`                | Provider for the `icons` and `localization` props                                  |
+| `src/icons/overrides.ts`                | `MosaicIconOverrides` type + `useMosaicIcons()` context                            |
+| `src/icons/registry.tsx`                | Built-in glyphs and the `IconName` union                                           |
+| `src/localization/`                     | Message registry, `MosaicCatalog` types, context hooks, and `fill`/`plural`/`rich` |
+| `src/components/`                       | One subdirectory per component, and nothing else                                   |
+| `src/blocks/`                           | View fragments that own one piece of state of their own (`destructive`)            |
+| `src/utils/*.styles.ts`                 | Atoms shared across components: `reset`, `typography`, `focus-outline`             |
+| `src/hooks/`                            | Mosaic-only hooks (`useMosaicEnvironment`, `useMosaicRouter`, …)                   |
+| `src/styles/index.ts`                   | StyleX-only barrel — the entry the CSS build walks                                 |
+| `src/machine/`                          | State-machine runtime (`createMachine`, `createActor`, `useMachine`)               |
+| `src/machines/`                         | Standalone machines and the shared `__tests__/test-utils.ts`                       |
+| `src/<feature>/*.model.tsx`             | Clerk adapter — the only file in a feature that may import Clerk                   |
+| `src/<feature>/*.controller.tsx`        | Local state and action wrapping; holds the feature's machine                       |
+| `src/<feature>/*.view.tsx`              | Clerk-free rendering from plain props                                              |
+| `src/<feature>/*.types.ts`              | The data contract the model and the view both agree on                             |
+| `src/<feature>/*.messages.ts`           | Every string the surface renders; its keys are the `localization` paths            |
+| `src/utils/reset.test.tsx`              | Reset specs                                                                        |
+| `src/__tests__/MosaicProvider.test.tsx` | Icon-override and localization context specs                                       |
+| `src/components/button/button.test.tsx` | Component-level slot/state/variant specs                                           |
+| `src/features/user-button/__tests__/`   | The canonical per-layer test set to copy from                                      |
 
 `machine/` is the runtime; `machines/` is machines written with it. The one-letter
 difference is easy to misread — a feature's own machine belongs in its

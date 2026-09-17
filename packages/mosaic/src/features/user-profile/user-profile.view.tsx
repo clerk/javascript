@@ -12,7 +12,7 @@ import { UserProfileProfilePanelView } from './user-profile-profile-panel.view';
 import { UserProfileSecurityPanelView } from './user-profile-security-panel.view';
 
 export interface UserProfileViewProps extends Omit<ProfileRootProps, 'children' | 'value' | 'onValueChange'> {
-  /** Names the surface, and the dialog it opens in. Defaults to English; pass a localized string once one is available. */
+  /** Names the surface, and the dialog it opens in. Defaults to the `userProfile.label` message. */
   label?: string;
   /** The open page: a built-in page's id, or a custom page's `path`. */
   activePage: UserProfilePageId | (string & {});
