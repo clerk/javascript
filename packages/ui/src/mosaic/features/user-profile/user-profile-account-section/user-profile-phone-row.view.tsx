@@ -1,3 +1,4 @@
+import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { useMemo, useRef, useState } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
