@@ -71,6 +71,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     table: dynamic(() => import('../stories/table.mdx')),
     toast: dynamic(() => import('../stories/toast.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
+    tooltip: dynamic(() => import('../stories/tooltip.component.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
     flow: dynamic(() => import('../stories/flow.component.mdx')),
     'visually-hidden': dynamic(() => import('../stories/visually-hidden.mdx')),

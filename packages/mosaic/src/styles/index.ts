@@ -103,6 +103,8 @@ export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
+export { Tooltip } from '../components/tooltip';
+export type { TooltipPopupProps, TooltipRootProps, TooltipTriggerProps } from '../components/tooltip';
 export { VisuallyHidden } from '../components/visually-hidden';
 export type { VisuallyHiddenProps } from '../components/visually-hidden';
 export { Popover } from '../components/popover';
