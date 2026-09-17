@@ -1,9 +1,9 @@
+import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { FormEvent, ReactNode, Ref } from 'react';
 import { useId } from 'react';
 
-import { stringToFormattedPhoneString } from '../../../utils/phoneUtils';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Dialog } from '../../components/dialog';

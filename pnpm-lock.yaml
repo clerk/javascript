@@ -878,6 +878,9 @@ importers:
       bundlewatch:
         specifier: ^0.4.2
         version: 0.4.2
+      qrcode.react:
+        specifier: 4.2.0
+        version: 4.2.0(react@18.3.1)
       react:
         specifier: 18.3.1
         version: 18.3.1

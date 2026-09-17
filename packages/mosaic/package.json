@@ -72,6 +72,7 @@
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "bundlewatch": "^0.4.2",
+    "qrcode.react": "4.2.0",
     "react": "catalog:react",
     "react-dom": "catalog:react",
     "tsdown": "catalog:repo"
