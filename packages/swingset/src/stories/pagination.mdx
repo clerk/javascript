@@ -4,9 +4,9 @@ import * as PaginationStories from './pagination.stories';
 
 Page navigation for a paged list. Renders a labelled `nav` with previous and next controls, the page numbers around the current one, and a results-per-page control. Pages are 1-based and the component is controlled: `onChange` receives the page the user asked for, and `onPageSizeChange` receives the size chosen from the results-per-page `Select`.
 
-## Playground
+## Example
 
-<Preview
+<Story
   name='Primary'
   storyModule={PaginationStories}
 />
@@ -31,6 +31,15 @@ Page navigation for a paged list. Renders a labelled `nav` with previous and nex
       default: "'Results per page'",
       description: 'Text of the label beside the page size select.',
     },
+    { name: 'firstPageLabel', type: 'string', default: "'First page'", description: 'Accessible name of the first page control.' },
+    {
+      name: 'previousPageLabel',
+      type: 'string',
+      default: "'Previous page'",
+      description: 'Accessible name of the previous page control.',
+    },
+    { name: 'nextPageLabel', type: 'string', default: "'Next page'", description: 'Accessible name of the next page control.' },
+    { name: 'lastPageLabel', type: 'string', default: "'Last page'", description: 'Accessible name of the last page control.' },
   ]}
 />
 

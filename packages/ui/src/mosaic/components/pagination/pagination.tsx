@@ -25,6 +25,10 @@ export interface PaginationProps extends Omit<MosaicElementProps<'nav'>, 'onChan
   disabled?: boolean;
   label?: string;
   pageSizeLabel?: string;
+  firstPageLabel?: string;
+  previousPageLabel?: string;
+  nextPageLabel?: string;
+  lastPageLabel?: string;
 }
 
 function atLeast(value: number, min: number): number {
@@ -59,6 +63,10 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
     disabled = false,
     label = 'Pagination',
     pageSizeLabel = 'Results per page',
+    firstPageLabel = 'First page',
+    previousPageLabel = 'Previous page',
+    nextPageLabel = 'Next page',
+    lastPageLabel = 'Last page',
     xstyle,
     ...rest
   },
@@ -102,13 +110,14 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
       <div {...mergeStyleProps(themeProps('pagination-controls'), stylex.props(reset.base, styles.controls))}>
         {hasFirstLast && (
           <Button
-            aria-label='First page'
+            aria-label={firstPageLabel}
             color='neutral'
             variant='outline'
             size='sm'
             shape='square'
             touchTarget={false}
             disabled={disabled || isFirst}
+            xstyle={styles.hitTarget}
             onClick={() => goTo(1)}
           >
             <Icon
@@ -118,13 +127,14 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           </Button>
         )}
         <Button
-          aria-label='Previous page'
+          aria-label={previousPageLabel}
           color='neutral'
           variant='outline'
           size='sm'
           shape='square'
           touchTarget={false}
           disabled={disabled || isFirst}
+          xstyle={styles.hitTarget}
           onClick={() => goTo(current - pageStep)}
         >
           <Icon
@@ -139,6 +149,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
                 key={item}
                 aria-current={item === current ? 'page' : undefined}
                 touchTarget={false}
+                xstyle={styles.hitTarget}
                 onClick={() => goTo(item)}
               >
                 {item}
@@ -158,13 +169,14 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           )}
         </ButtonContext.Provider>
         <Button
-          aria-label='Next page'
+          aria-label={nextPageLabel}
           color='neutral'
           variant='outline'
           size='sm'
           shape='square'
           touchTarget={false}
           disabled={disabled || isLast}
+          xstyle={styles.hitTarget}
           onClick={() => goTo(current + pageStep)}
         >
           <Icon
@@ -174,13 +186,14 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
         </Button>
         {hasFirstLast && (
           <Button
-            aria-label='Last page'
+            aria-label={lastPageLabel}
             color='neutral'
             variant='outline'
             size='sm'
             shape='square'
             touchTarget={false}
             disabled={disabled || isLast}
+            xstyle={styles.hitTarget}
             onClick={() => goTo(pageCount)}
           >
             <Icon

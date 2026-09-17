@@ -252,6 +252,40 @@ describe('Mosaic Pagination', () => {
     expect(screen.getByRole('combobox', { name: 'Rows per page 10' })).toBeInTheDocument();
   });
 
+  it('uses the control label props as the control names', () => {
+    render(
+      <Pagination
+        page={2}
+        totalItems={100}
+        pageSize={10}
+        hasFirstLast
+        firstPageLabel='Start'
+        previousPageLabel='Back'
+        nextPageLabel='Forward'
+        lastPageLabel='End'
+      />,
+    );
+    expect(screen.getByRole('button', { name: 'Start' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Forward' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'End' })).toBeInTheDocument();
+  });
+
+  it('extends every control hit target across the gap', () => {
+    render(
+      <Pagination
+        page={2}
+        totalItems={100}
+        pageSize={10}
+        hasFirstLast
+      />,
+    );
+    const hitTarget = stylex.props(styles.hitTarget).className ?? '';
+    for (const name of ['First page', 'Previous page', '2', 'Next page', 'Last page']) {
+      expect(screen.getByRole('button', { name })).toHaveClass(hitTarget);
+    }
+  });
+
   it('renders the page size label as secondary sm text', () => {
     render(
       <Pagination

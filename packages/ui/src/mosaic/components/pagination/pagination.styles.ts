@@ -15,6 +15,15 @@ export const styles = stylex.create({
     alignItems: 'center',
     display: 'flex',
   },
+  hitTarget: {
+    position: 'relative',
+    '::after': {
+      insetBlock: 0,
+      insetInline: `calc(${space['1']} / -2)`,
+      content: '""',
+      position: 'absolute',
+    },
+  },
   page: {
     color: {
       default: colorVars['--cl-color-foreground-secondary'],
