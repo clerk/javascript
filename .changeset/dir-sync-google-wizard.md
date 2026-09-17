@@ -1,7 +1,8 @@
 ---
-'@clerk/localizations': minor
+'@clerk/clerk-js': minor
 '@clerk/shared': minor
 '@clerk/ui': minor
+'@clerk/localizations': minor
 ---
 
-Support Google Workspace in the Directory Sync setup flow. Those connections previously showed a notice directing the organization admin to the Clerk Dashboard; they can now upload a service account key and delegated admin email, start a sync, and see the result of the last one.
+Support Google Workspace directories in Directory Sync. Organization admins can upload a service account key and delegated admin email from the setup flow, start a sync on demand, and see the result of the last one. `DirectorySync` gains `setCredentials()`, `sync()`, `getSyncStatus()`, and `credentialsConfigured`.
