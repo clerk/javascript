@@ -420,14 +420,8 @@ function HeaderActionButton({
       disabled={busy || disabled}
       onClick={onClick}
     >
-      {compact ? (
-        leading
-      ) : (
-        <>
-          {leading}
-          {label}
-        </>
-      )}
+      {leading}
+      {compact ? null : label}
     </Button>
   );
 }
