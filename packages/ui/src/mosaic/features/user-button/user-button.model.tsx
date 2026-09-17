@@ -123,6 +123,8 @@ function toMembership(organization: OrganizationResource, roleLabel?: string): U
     name: organization.name,
     imageUrl: organization.imageUrl || undefined,
     membersCount: organization.membersCount,
+    // TODO: set `planLabel` once the organization resource carries its billing plan; the view and
+    // types already render it, so today the badge only appears with Swingset's mock data.
     roleLabel,
   };
 }
