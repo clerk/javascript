@@ -1,4 +1,5 @@
-import { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } from './devCache';
+import { completeClaimedOnboarding } from './completeClaimedOnboarding';
+import { clerkDevelopmentCache, createKeylessModeMessage } from './devCache';
 import type { KeylessService } from './service';
 import type { AccountlessApplication } from './types';
 
@@ -45,21 +46,7 @@ export async function resolveKeysWithKeylessFallback(
       Boolean(configuredPublishableKey) && configuredPublishableKey === locallyStoredKeys?.publishableKey;
 
     if (runningWithClaimedKeys && locallyStoredKeys) {
-      // Complete onboarding when running with claimed keys
-      try {
-        await clerkDevelopmentCache?.run(() => keylessService.completeOnboarding(), {
-          cacheKey: `${locallyStoredKeys.publishableKey}_complete`,
-          onSuccessStale: 24 * 60 * 60 * 1000, // 24 hours
-        });
-      } catch {
-        // noop
-      }
-
-      clerkDevelopmentCache?.log({
-        cacheKey: `${locallyStoredKeys.publishableKey}_claimed`,
-        msg: createConfirmationMessage(),
-      });
-
+      await completeClaimedOnboarding(locallyStoredKeys.publishableKey, keylessService);
       return { publishableKey, secretKey, claimUrl, apiKeysUrl };
     }
 
