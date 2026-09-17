@@ -276,6 +276,33 @@ describe('focus after signing a device out', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on macOS' })).toHaveFocus());
   });
 
+  it('skips the signed-out row when the list only catches up later', async () => {
+    const user = userEvent.setup();
+    function LateExample() {
+      const [devices, setDevices] = useState([current, mobile, desktop]);
+      return (
+        <MosaicProvider>
+          <UserProfileActiveDevicesSectionView
+            devices={devices}
+            // Resolves before the row goes, the way a revoke followed by a refetch does.
+            onSignOutDevice={id => {
+              setTimeout(() => setDevices(list => list.filter(device => device.id !== id)), 10);
+              return Promise.resolve();
+            }}
+          />
+        </MosaicProvider>
+      );
+    }
+    render(<LateExample />);
+    await openMenu(user, mobile);
+    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Clerk App on macOS' })).toHaveFocus());
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage Safari on iOS' })).not.toBeInTheDocument());
+    expect(screen.getByRole('button', { name: 'Manage Clerk App on macOS' })).toHaveFocus();
+  });
+
   it('still returns focus to the row itself when the sign out is cancelled', async () => {
     const user = userEvent.setup();
     render(<Example devices={[current, mobile, desktop]} />);
