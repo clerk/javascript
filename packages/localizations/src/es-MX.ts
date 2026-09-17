@@ -1625,6 +1625,8 @@ export const esMX: LocalizationResource = {
       title: 'Revisa tu correo electrónico',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1782,6 +1784,8 @@ export const esMX: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

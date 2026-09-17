@@ -1617,6 +1617,8 @@ export const srRS: LocalizationResource = {
       title: 'Проверите своју е-пошту',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1772,6 +1774,8 @@ export const srRS: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

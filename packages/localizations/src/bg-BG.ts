@@ -1619,6 +1619,8 @@ export const bgBG: LocalizationResource = {
       title: 'Проверете имейла си',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1774,6 +1776,8 @@ export const bgBG: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

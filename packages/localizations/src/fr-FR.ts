@@ -1635,6 +1635,8 @@ export const frFR: LocalizationResource = {
       title: 'Vérifiez votre messagerie',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1791,6 +1793,8 @@ export const frFR: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

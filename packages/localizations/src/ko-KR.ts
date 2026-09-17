@@ -1615,6 +1615,8 @@ export const koKR: LocalizationResource = {
       title: '이메일을 확인하세요',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: '계속할 기업 계정을 선택해 주세요.',
       title: '기업 계정 선택',
     },
@@ -1768,6 +1770,8 @@ export const koKR: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: '계속할 기업 계정을 선택해 주세요.',
       title: '기업 계정 선택',
     },

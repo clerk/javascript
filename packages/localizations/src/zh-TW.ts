@@ -1610,6 +1610,8 @@ export const zhTW: LocalizationResource = {
       title: '查看您的電子郵件',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: '請選擇您想要繼續使用的企業帳戶。',
       title: '選擇一個企業帳戶',
     },
@@ -1763,6 +1765,8 @@ export const zhTW: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: '請選擇您想要繼續使用的企業帳戶。',
       title: '選擇一個企業帳戶',
     },

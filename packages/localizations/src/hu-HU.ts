@@ -1631,6 +1631,8 @@ export const huHU: LocalizationResource = {
       title: 'Ellenőrizze az e-mailjét',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Válaszd ki a vállalati fiókot, amellyel folytatni szeretnéd.',
       title: 'Válaszd ki a vállalati fiókodat',
     },
@@ -1787,6 +1789,8 @@ export const huHU: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Válaszd ki a vállalati fiókot, amellyel folytatni szeretnéd.',
       title: 'Válaszd ki a vállalati fiókodat',
     },

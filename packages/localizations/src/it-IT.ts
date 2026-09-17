@@ -1627,6 +1627,8 @@ export const itIT: LocalizationResource = {
       title: 'Controlla la tua email',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1781,6 +1783,8 @@ export const itIT: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

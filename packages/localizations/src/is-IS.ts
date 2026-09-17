@@ -1630,6 +1630,8 @@ export const isIS: LocalizationResource = {
       title: 'Athugaðu tölvupóstinn þinn',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Veldu fyrirtækjareikninginn sem þú vilt halda áfram með.',
       title: 'Veldu fyrirtækjareikning',
     },
@@ -1786,6 +1788,8 @@ export const isIS: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Veldu fyrirtækjareikninginn sem þú vilt halda áfram með.',
       title: 'Veldu fyrirtækjareikning',
     },

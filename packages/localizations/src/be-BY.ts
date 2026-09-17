@@ -1623,6 +1623,8 @@ export const beBY: LocalizationResource = {
       title: 'Праверце сваю электронную пошту',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1777,6 +1779,8 @@ export const beBY: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

@@ -1632,6 +1632,8 @@ export const msMY: LocalizationResource = {
       title: 'Semak e-mel anda',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Pilih akaun perusahaan yang anda ingin teruskan.',
       title: 'Pilih akaun perusahaan anda',
     },
@@ -1788,6 +1790,8 @@ export const msMY: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Pilih akaun perusahaan yang anda ingin teruskan.',
       title: 'Pilih akaun perusahaan anda',
     },

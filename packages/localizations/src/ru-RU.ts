@@ -1627,6 +1627,8 @@ export const ruRU: LocalizationResource = {
       title: 'Проверьте свою электронную почту',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1783,6 +1785,8 @@ export const ruRU: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

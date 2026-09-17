@@ -1624,6 +1624,8 @@ export const esCR: LocalizationResource = {
       title: 'Revisa tu correo electrónico',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1781,6 +1783,8 @@ export const esCR: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

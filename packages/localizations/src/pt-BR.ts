@@ -1629,6 +1629,8 @@ export const ptBR: LocalizationResource = {
       title: 'Verifique seu e-mail',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Selecione a conta corporativa com a qual deseja continuar.',
       title: 'Escolha sua conta corporativa',
     },
@@ -1785,6 +1787,8 @@ export const ptBR: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Selecione a conta corporativa com a qual deseja continuar.',
       title: 'Escolha sua conta corporativa',
     },

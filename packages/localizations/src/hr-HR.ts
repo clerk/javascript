@@ -1629,6 +1629,8 @@ export const hrHR: LocalizationResource = {
       title: 'Provjerite svoju e-poštu',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Odaberite poslovni račun s kojim želite nastaviti.',
       title: 'Odaberite svoj poslovni račun',
     },
@@ -1785,6 +1787,8 @@ export const hrHR: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Odaberite poslovni račun s kojim želite nastaviti.',
       title: 'Odaberite svoj poslovni račun',
     },

@@ -1630,6 +1630,8 @@ export const teIN: LocalizationResource = {
       title: 'మీ ఇమెయిల్‌ను తనిఖీ చేయండి',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'మీరు కొనసాగించాలనుకుంటున్న ఎంటర్‌ప్రైజ్ ఖాతాను ఎంచుకోండి.',
       title: 'మీ ఎంటర్‌ప్రైజ్ ఖాతాను ఎంచుకోండి',
     },
@@ -1786,6 +1788,8 @@ export const teIN: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'మీరు కొనసాగించాలనుకుంటున్న ఎంటర్‌ప్రైజ్ ఖాతాను ఎంచుకోండి.',
       title: 'మీ ఎంటర్‌ప్రైజ్ ఖాతాను ఎంచుకోండి',
     },

@@ -1620,6 +1620,8 @@ export const mnMN: LocalizationResource = {
       title: 'Имэйлээ шалгана уу',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1775,6 +1777,8 @@ export const mnMN: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

@@ -1607,6 +1607,8 @@ export const zhCN: LocalizationResource = {
       title: '查看您的电子邮件',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1760,6 +1762,8 @@ export const zhCN: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

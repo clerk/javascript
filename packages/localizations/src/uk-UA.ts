@@ -1617,6 +1617,8 @@ export const ukUA: LocalizationResource = {
       title: 'Перевірте свою електронну пошту',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1771,6 +1773,8 @@ export const ukUA: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

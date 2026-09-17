@@ -1627,6 +1627,8 @@ export const caES: LocalizationResource = {
       title: 'Comproveu el vostre correu electrònic',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1782,6 +1784,8 @@ export const caES: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

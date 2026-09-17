@@ -1620,6 +1620,8 @@ export const nlNL: LocalizationResource = {
       title: 'Controleer je e-mail',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1774,6 +1776,8 @@ export const nlNL: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

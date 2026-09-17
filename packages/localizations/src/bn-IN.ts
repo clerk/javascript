@@ -1627,6 +1627,8 @@ export const bnIN: LocalizationResource = {
       title: 'আপনার ইমেইল পরীক্ষা করুন',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'আপনি যে এন্টারপ্রাইজ অ্যাকাউন্ট দিয়ে চালিয়ে যেতে চান তা নির্বাচন করুন।',
       title: 'আপনার এন্টারপ্রাইজ অ্যাকাউন্ট বেছে নিন',
     },
@@ -1783,6 +1785,8 @@ export const bnIN: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'আপনি যে এন্টারপ্রাইজ অ্যাকাউন্ট দিয়ে চালিয়ে যেতে চান তা নির্বাচন করুন।',
       title: 'আপনার এন্টারপ্রাইজ অ্যাকাউন্ট বেছে নিন',
     },

@@ -1628,6 +1628,8 @@ export const faIR: LocalizationResource = {
       title: 'ایمیل خود را بررسی کنید',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1783,6 +1785,8 @@ export const faIR: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

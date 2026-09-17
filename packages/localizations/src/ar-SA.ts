@@ -1615,6 +1615,8 @@ export const arSA: LocalizationResource = {
       title: 'تحقق من بريدك الإلكتروني',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1770,6 +1772,8 @@ export const arSA: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
