@@ -6,11 +6,19 @@ export const styles = stylex.create({
   accountIdentifier: {
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
+  workspaceAvatar: {
+    display: 'inline-grid',
+    gridTemplateColumns: `auto ${space['0.5']}`,
+    gridTemplateRows: `auto ${space['0.5']}`,
+  },
+  workspaceAvatarLead: {
+    gridArea: '1 / 1 / 2 / 2',
+  },
   nestedAvatar: {
     borderRadius: '2px',
-    insetBlockEnd: `calc(${space['0.5']} * -1)`,
-    insetInlineEnd: `calc(${space['0.5']} * -1)`,
-    position: 'absolute',
+    gridArea: '1 / 1 / -1 / -1',
+    alignSelf: 'end',
+    justifySelf: 'end',
   },
   nestedAvatarSm: {
     fontSize: '0.3125rem',

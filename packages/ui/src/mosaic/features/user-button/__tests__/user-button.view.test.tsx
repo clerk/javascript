@@ -999,18 +999,18 @@ describe('UserButtonView, the header', () => {
     renderHeader({ modePriority: 'user' });
 
     const trigger = screen.getByRole('button', { name: 'Open account menu for Alice Smith' });
-    const nestedInTrigger = trigger.querySelector('.cl-avatar .cl-avatar');
+    const nestedInTrigger = trigger.querySelector('.cl-user-button-avatar .cl-avatar[data-shape="square"]');
     expect(nestedInTrigger).toHaveAttribute('data-shape', 'square');
     expect(nestedInTrigger?.textContent).toBe('F');
 
-    const nestedInHeader = header().querySelector('.cl-avatar .cl-avatar');
+    const nestedInHeader = header().querySelector('.cl-user-button-avatar .cl-avatar[data-shape="square"]');
     expect(nestedInHeader).toHaveAttribute('data-shape', 'square');
   });
 
   it('nests no avatar where the organization leads, none is active, or the surface carries none', () => {
     const nested = (props: Partial<UserButtonProps>) => {
       const { unmount } = renderHeader(props);
-      const found = header().querySelector('.cl-avatar .cl-avatar');
+      const found = header().querySelector('.cl-user-button-avatar');
       unmount();
       return found;
     };

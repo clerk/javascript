@@ -18,10 +18,11 @@ import { Popover } from '../../components/popover';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Spinner } from '../../components/spinner';
 import type { IconName } from '../../icons/registry';
-import { themeProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
 import { applyOrder } from '../../utils/apply-order';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { fill, plural } from '../../utils/messages';
+import { reset } from '../../utils/reset.styles';
 import { truncationStyles } from '../../utils/typography.styles';
 import type { UserButtonAction, UserButtonLayout } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
@@ -160,10 +161,9 @@ interface RowAvatarProps {
   shape: 'circle' | 'square';
   size: AvatarProps['size'];
   xstyle?: AvatarProps['xstyle'];
-  children?: ReactNode;
 }
 
-function RowAvatar({ name, imageUrl, shape, size, xstyle, children }: RowAvatarProps) {
+function RowAvatar({ name, imageUrl, shape, size, xstyle }: RowAvatarProps) {
   return (
     // Decorative: the same name is always in text alongside. Held at the root so the whole mark
     // stays out of the accessible name however the image resolves.
@@ -180,32 +180,44 @@ function RowAvatar({ name, imageUrl, shape, size, xstyle, children }: RowAvatarP
         />
       ) : null}
       <Avatar.Fallback>{initials(name)}</Avatar.Fallback>
-      {children}
     </Avatar.Root>
   );
 }
 
-/** The lead workspace's mark. An account working in an organization wears its avatar in the corner. */
+/**
+ * The lead workspace's mark. An account working in an organization wears its avatar in the corner,
+ * on a grid rather than floated, so the overhang takes up room and whatever follows keeps its gap.
+ */
 function WorkspaceAvatar({ workspace, size }: { workspace: ActiveWorkspace; size: AvatarProps['size'] }) {
   const organization = workspace.kind === 'user' ? workspace.organization : null;
+  if (!organization) {
+    return (
+      <RowAvatar
+        name={workspace.name}
+        imageUrl={workspace.imageUrl}
+        shape={workspace.shape}
+        size={size}
+      />
+    );
+  }
 
   return (
-    <RowAvatar
-      name={workspace.name}
-      imageUrl={workspace.imageUrl}
-      shape={workspace.shape}
-      size={size}
-    >
-      {organization ? (
-        <RowAvatar
-          name={organization.name}
-          imageUrl={organization.imageUrl}
-          shape='square'
-          size='fit'
-          xstyle={[styles.nestedAvatar, size === 'md' ? styles.nestedAvatarMd : styles.nestedAvatarSm]}
-        />
-      ) : null}
-    </RowAvatar>
+    <span {...mergeStyleProps(themeProps('user-button-avatar'), stylex.props(reset.base, styles.workspaceAvatar))}>
+      <RowAvatar
+        name={workspace.name}
+        imageUrl={workspace.imageUrl}
+        shape={workspace.shape}
+        size={size}
+        xstyle={styles.workspaceAvatarLead}
+      />
+      <RowAvatar
+        name={organization.name}
+        imageUrl={organization.imageUrl}
+        shape='square'
+        size='fit'
+        xstyle={[styles.nestedAvatar, size === 'md' ? styles.nestedAvatarMd : styles.nestedAvatarSm]}
+      />
+    </span>
   );
 }
 
