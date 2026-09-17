@@ -26,22 +26,30 @@
 
 ## Getting started
 
-`@clerk/mosaic` is Clerk's experimental next-generation React components.
+`@clerk/mosaic` provides Clerk's experimental next-generation React components.
 
-This package lets us build and iterate on our next component refresh in public, feel free to try them out and provide feedback. If you do, know that we reserve the right to make breaking changes in minors and pin your version.
+This package lets you preview and provide feedback on Clerk's next generation of components.
 
 When stable, components will move to be exported through the regular packages.
+
+> We reserve the right to make breaking changes in minors, please pin your version.
 
 ### Prerequisites
 
 - Node.js `>=20.9.0` or later
-- A Clerk SDK that renders a `ClerkProvider` (`@clerk/react`, `@clerk/nextjs`, …)
+- A supported React-based Clerk SDK that renders a `ClerkProvider`
+  - `@clerk/react` version 6 or later
+  - `@clerk/nextjs` version 7 or later
+  - Other React-based Clerk SDKs may also work, but are currently untested
 - React 18 or 19
 
 ### Installation
 
 ```shell
-npm install @clerk/mosaic
+# npm
+npm install --save-exact @clerk/mosaic
+pnpm add --save-exact @clerk/mosaic
+yarn add --exact @clerk/mosaic
 ```
 
 ## Usage
@@ -63,11 +71,35 @@ export function App({ children }) {
 }
 ```
 
-To keep theme CSS ahead of Mosaic's sheet, import the stylesheet into a cascade layer:
+If you want to use custom CSS to theme the components, instead import the stylesheet into a cascade layer:
 
 ```css
 @import '@clerk/mosaic/styles.css' layer(components);
 ```
+
+This ensures your unlayered custom CSS takes priority. Expect more documentation on custom theming soon.
+
+## Troubleshooting
+
+### A Clerk hook says it can only be used within `<ClerkProvider />`
+
+Mosaic and your Clerk framework SDK must resolve the same copy of `@clerk/shared`. If `<ClerkProvider />` is present but you still see this error, deduplicate your dependencies:
+
+```shell
+npm dedupe
+pnpm dedupe
+yarn dedupe @clerk/shared
+```
+
+Check the installed versions:
+
+```shell
+npm ls @clerk/shared
+pnpm why @clerk/shared
+yarn why @clerk/shared
+```
+
+If multiple versions remain, the supported ranges are likely incompatible. Update Mosaic and your Clerk framework SDK to the latest versions, then deduplicate again.
 
 ## License
 
