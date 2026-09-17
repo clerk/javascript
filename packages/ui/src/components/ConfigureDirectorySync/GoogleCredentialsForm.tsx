@@ -12,12 +12,9 @@ import {
   Text,
   useLocalizations,
 } from '@/customizables';
+import { isEmail } from '@/ui/utils/emailUtils';
 
 import { useConfigureDirectorySync } from './ConfigureDirectorySyncContext';
-
-// Same shape as the copies in InviteMembersForm and SignIn/utils: enough to
-// stop an obviously malformed address reaching the provider, no more.
-const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 
 export type GoogleCredentialsState = {
   fileName: string | null;
