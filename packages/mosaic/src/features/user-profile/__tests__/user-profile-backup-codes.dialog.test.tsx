@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -29,6 +29,21 @@ function renderView(overrides: Partial<UserProfileBackupCodesDialogProps> = {}) 
 }
 
 describe('UserProfileBackupCodesDialog', () => {
+  it.each([
+    { codes, action: 'Copy and close' },
+    { codes: [], action: 'Try again' },
+  ])('focuses $action when opened', async ({ codes, action }) => {
+    renderView({ codes });
+    const button = screen.getByRole('button', { name: action });
+    await waitFor(() => expect(document.activeElement === button).toBe(true), { timeout: 1000 });
+  });
+
+  it('keeps the default focus while generating codes', async () => {
+    renderView({ codes: [], pendingAction: 'generate' });
+    const close = screen.getByRole('button', { name: 'Close' });
+    await waitFor(() => expect(document.activeElement === close).toBe(true), { timeout: 1000 });
+  });
+
   it('retries failed generation without offering empty codes to save', async () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView({ codes: [], pendingAction: 'generate' });

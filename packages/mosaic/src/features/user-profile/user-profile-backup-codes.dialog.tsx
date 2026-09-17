@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import { Card } from '../../components/card';
 import type { DialogFocusTarget, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
@@ -18,6 +20,8 @@ export function UserProfileBackupCodesDialog({
   finalFocus,
   ...props
 }: UserProfileBackupCodesDialogProps) {
+  const actionRef = useRef<HTMLButtonElement>(null);
+
   return (
     <Dialog.Root
       open={open}
@@ -26,6 +30,7 @@ export function UserProfileBackupCodesDialog({
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
         variant='card'
+        initialFocus={props.pendingAction ? undefined : actionRef}
         finalFocus={finalFocus}
       >
         <Card.Root
@@ -34,6 +39,7 @@ export function UserProfileBackupCodesDialog({
         >
           <UserProfileBackupCodesView
             {...props}
+            actionRef={actionRef}
             onCancel={() => onOpenChange(false)}
           />
         </Card.Root>
