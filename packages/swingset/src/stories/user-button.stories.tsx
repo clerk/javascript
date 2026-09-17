@@ -77,6 +77,7 @@ const initialAccounts: Account[] = [
         name: 'Clerk app',
         membersCount: 24,
         planLabel: 'Pro plan',
+        roleLabel: 'Admin',
         imageUrl: clerkLogo,
       },
       clerkCloud,
@@ -263,6 +264,31 @@ export function UserPriority(_args: Record<string, unknown>) {
       {...prototype}
       mode='combined'
       modePriority='user'
+    />
+  );
+}
+
+export function StackedHeader(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='combined'
+      headerLayout='stacked'
+    />
+  );
+}
+
+export function UserPriorityStackedHeader(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='combined'
+      modePriority='user'
+      headerLayout='stacked'
     />
   );
 }

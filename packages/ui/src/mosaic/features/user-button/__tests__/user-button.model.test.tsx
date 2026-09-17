@@ -40,6 +40,7 @@ let isOrgLoaded: boolean;
 let user: FakeUser | null;
 let session: { id: string; checkAuthorization: ReturnType<typeof vi.fn> } | null;
 let organization: { id: string; name: string; imageUrl: string; membersCount: number } | null;
+let organizationMembership: { roleName: string } | null;
 let userMemberships: FakeList;
 let userInvitations: FakeList;
 let userSuggestions: FakeList;
@@ -80,7 +81,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useUser: () => ({ isLoaded: isUserLoaded, user }),
     useSession: () => ({ isLoaded: isSessionLoaded, session }),
-    useOrganization: vi.fn(() => ({ isLoaded: isOrgLoaded, organization })),
+    useOrganization: vi.fn(() => ({ isLoaded: isOrgLoaded, organization, membership: organizationMembership })),
     // Stubbed with a sentinel so the assertion is that this exact function reaches Clerk, rather
     // than that some function did.
     usePortalRoot: () => getContainer,
@@ -124,8 +125,8 @@ function acceptable(
   };
 }
 
-function membership(orgId: string, name: string, membersCount: number) {
-  return { organization: { id: orgId, name, imageUrl: '', membersCount } };
+function membership(orgId: string, name: string, membersCount: number, roleName = 'Member') {
+  return { roleName, organization: { id: orgId, name, imageUrl: '', membersCount } };
 }
 
 function list(data: unknown[], count: number, hasNextPage = false, isLoading = false): FakeList {
@@ -148,6 +149,7 @@ beforeEach(() => {
   };
   session = { id: 'sess_1', checkAuthorization: (checkAuthorization = vi.fn().mockReturnValue(true)) };
   organization = { id: 'org_1', name: 'Acme', imageUrl: 'https://img/acme', membersCount: 3 };
+  organizationMembership = { roleName: 'Admin' };
   userMemberships = list([membership('org_1', 'Acme', 3), membership('org_9', 'Other', 1)], 2);
   userInvitations = list([acceptable('inv_1', 'org_3', 'Gamma')], 1);
   userSuggestions = list([acceptable('sug_1', 'org_2', 'Beta')], 1);
@@ -304,6 +306,17 @@ function activeOrganization() {
 }
 
 describe('useUserButtonModel', () => {
+  it('names the role the account holds in the active organization', () => {
+    render(<Harness />);
+    expect(activeOrganization()).toMatchObject({ organizationId: 'org_1', name: 'Acme', roleLabel: 'Admin' });
+  });
+
+  it('leaves the role off where the membership has not resolved', () => {
+    organizationMembership = null;
+    render(<Harness />);
+    expect(activeOrganization()).not.toHaveProperty('roleLabel');
+  });
+
   it('is loading until the user, session, and organization are all loaded', () => {
     isUserLoaded = false;
     const { rerender } = render(<Harness />);
@@ -462,7 +475,13 @@ describe('useUserButtonModel', () => {
     render(<Harness />);
 
     const rows = memberships();
-    expect(rows[0]).toMatchObject({ kind: 'membership', organizationId: 'org_1', name: 'Acme', membersCount: 3 });
+    expect(rows[0]).toMatchObject({
+      kind: 'membership',
+      organizationId: 'org_1',
+      name: 'Acme',
+      membersCount: 3,
+      roleLabel: 'Member',
+    });
 
     const suggestions = JSON.parse(screen.getByTestId('suggestions').textContent ?? '[]');
     expect(suggestions[0]).toMatchObject({

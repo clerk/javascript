@@ -84,6 +84,7 @@ export interface UserButtonLayout {
    * still needs somewhere to manage and sign out of itself.
    */
   showOrganizationsHeading: boolean;
+  describeAccountByOrganization: boolean;
   /** What each slot carries, in the order it renders. */
   actions: Record<UserButtonSlot, UserButtonAction[]>;
 }
@@ -130,6 +131,7 @@ export function resolveUserButtonLayout(
     leadWith: mode === 'combined' ? modePriority : mode,
     showOrganizations: declared.organizations !== false && hasOrganizations,
     showOrganizationsHeading: organizationsHeading !== false,
+    describeAccountByOrganization: declared.organizations !== false,
     actions: {
       header: slot(declared.header),
       organizationsHeading: organizationsHeading === false ? [] : slot(organizationsHeading),

@@ -73,6 +73,13 @@ const popup = () => screen.getByRole('dialog', { name: 'Account' });
 // The `cl-` slot classes are Mosaic's public theming hooks, so they are a stable handle on the
 // popup's sections rather than an implementation detail.
 const groups = () => Array.from(popup().querySelectorAll<HTMLElement>('.cl-item-group'));
+const header = () => {
+  const node = popup().querySelector<HTMLElement>('.cl-user-button-header');
+  if (!node) {
+    throw new Error('The popup has no header');
+  }
+  return node;
+};
 const labels = (group: HTMLElement | undefined) =>
   Array.from(group?.querySelectorAll(".cl-item-label[data-variant='default']") ?? []).map(
     node => node.textContent ?? '',
@@ -109,17 +116,15 @@ describe('UserButtonView, user mode', () => {
   it('names the account in the header, never the organization that is active', () => {
     renderUserMode();
 
-    const header = groups()[0];
-    expect(within(header).getByText('Alice Smith')).toBeInTheDocument();
-    expect(within(header).getByText('alice@example.com')).toBeInTheDocument();
+    expect(within(header()).getByText('Alice Smith')).toBeInTheDocument();
+    expect(within(header()).getByText('alice@example.com')).toBeInTheDocument();
     expect(screen.queryByText('Foundry')).toBeNull();
   });
 
   it('drops the identifier line when it would only repeat the label', () => {
     renderUserMode({ activeSession: { ...alice, name: 'alice@example.com' } });
 
-    const header = groups()[0];
-    expect(within(header).getAllByText('alice@example.com')).toHaveLength(1);
+    expect(within(header()).getAllByText('alice@example.com')).toHaveLength(1);
   });
 
   it('lists no workspaces at all, and offers no way to make one', () => {
@@ -184,9 +189,8 @@ describe('UserButtonView, organization mode', () => {
   it('heads the surface with the active organization and what can be done to it', () => {
     renderOrganizationMode();
 
-    const header = groups()[0];
-    expect(within(header).getByText('Foundry')).toBeInTheDocument();
-    expect(within(header).getByText('24 members · Pro')).toBeInTheDocument();
+    expect(within(header()).getByText('Foundry')).toBeInTheDocument();
+    expect(within(header()).getByText('Pro · 24 members')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Invite' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Manage organization' })).toBeInTheDocument();
   });
@@ -194,7 +198,7 @@ describe('UserButtonView, organization mode', () => {
   it('falls back to the account in the header where no organization is active', () => {
     renderOrganizationMode({ activeOrganization: null });
 
-    expect(within(groups()[0]).getByText('Alice Smith')).toBeInTheDocument();
+    expect(within(header()).getByText('Alice Smith')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
   });
@@ -203,7 +207,7 @@ describe('UserButtonView, organization mode', () => {
   it('names no organization selected where personal is hidden and none is active', () => {
     renderOrganizationMode({ hidePersonal: true, activeOrganization: null });
 
-    expect(within(groups()[0]).getByText('No organization selected')).toBeInTheDocument();
+    expect(within(header()).getByText('No organization selected')).toBeInTheDocument();
     expect(screen.queryByText('Alice Smith')).toBeNull();
     expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
@@ -215,7 +219,7 @@ describe('UserButtonView, organization mode', () => {
   it('offers to invite while the membership list is still in flight', () => {
     renderOrganizationMode({ memberships: [], hasOrganizations: false, organizationsLoading: true });
 
-    expect(within(groups()[0]).getByText('Foundry')).toBeInTheDocument();
+    expect(within(header()).getByText('Foundry')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Manage organization' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Invite' })).toBeInTheDocument();
   });
@@ -260,7 +264,7 @@ describe('UserButtonView, combined mode', () => {
     renderCombined();
 
     // The subtitle is the header's alone; the row below it carries only a label.
-    expect(screen.getByText('24 members · Pro')).toBeInTheDocument();
+    expect(screen.getByText('Pro · 24 members')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Invite' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Manage organization' })).toBeInTheDocument();
   });
@@ -268,7 +272,7 @@ describe('UserButtonView, combined mode', () => {
   it('heads the surface with the account where the user takes priority', () => {
     renderCombined({ modePriority: 'user' });
 
-    expect(screen.queryByText('24 members · Pro')).toBeNull();
+    expect(screen.queryByText('Pro · 24 members')).toBeNull();
     expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
   });
 
@@ -909,5 +913,110 @@ describe('UserButtonTrigger', () => {
 
     expect(screen.getByText('Foundry')).toBeInTheDocument();
     expect(screen.queryByText('Alice Smith')).toBeNull();
+  });
+});
+
+describe('UserButtonView, the header', () => {
+  function renderHeader(props: Partial<UserButtonProps> = {}) {
+    return renderView({
+      hasOrganizations: true,
+      activeOrganization: { ...foundry, roleLabel: 'Admin' },
+      memberships: [foundry, otherCo],
+      ...props,
+    });
+  }
+
+  it('carries the slot classes for the trigger, the popover, and the header', () => {
+    renderHeader();
+
+    expect(screen.getByRole('button', { name: 'Open account menu for Foundry' })).toHaveClass('cl-user-button-trigger');
+    expect(popup().querySelector('.cl-user-button-popover')).not.toBeNull();
+    expect(header()).toHaveAttribute('data-layout', 'inline');
+    expect(header().querySelector('.cl-user-button-header-title')?.textContent).toBe('Foundry');
+    expect(header().querySelector('.cl-user-button-header-description')?.textContent).toBe('Pro · 24 members');
+    expect(header().querySelector('.cl-user-button-header-actions')).not.toBeNull();
+  });
+
+  it('runs the actions beside the workspace by default, the gear as an icon', () => {
+    renderHeader();
+
+    const gear = screen.getByRole('button', { name: 'Manage organization' });
+    expect(gear).toHaveAttribute('data-shape', 'square');
+    expect(screen.getByRole('button', { name: 'Invite' })).not.toHaveAttribute('data-full-width');
+    expect(screen.queryByRole('button', { name: 'Settings' })).toBeNull();
+  });
+
+  it('stacks the actions under the workspace as labelled buttons', () => {
+    renderHeader({ headerLayout: 'stacked' });
+
+    expect(header()).toHaveAttribute('data-layout', 'stacked');
+    const settings = screen.getByRole('button', { name: 'Settings' });
+    expect(settings).toHaveAttribute('data-full-width');
+    expect(settings).not.toHaveAttribute('data-shape', 'square');
+    expect(screen.getByRole('button', { name: 'Invite' })).toHaveAttribute('data-full-width');
+    expect(screen.queryByRole('button', { name: 'Manage organization' })).toBeNull();
+  });
+
+  it('stacks the account actions the same way', async () => {
+    const onSignOutSession = vi.fn();
+    const onManageAccount = vi.fn();
+    renderHeader({ mode: 'user', headerLayout: 'stacked', onSignOutSession, onManageAccount });
+
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Settings' }));
+    expect(onManageAccount).toHaveBeenCalled();
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Sign out' }));
+    expect(onSignOutSession).toHaveBeenCalledWith('sess_1');
+  });
+
+  it('names the organization and the role under an account that leads a combined surface', () => {
+    renderHeader({ modePriority: 'user' });
+
+    expect(within(header()).getByText('Alice Smith')).toBeInTheDocument();
+    expect(within(header()).getByText('Foundry · Admin')).toBeInTheDocument();
+    expect(within(header()).queryByText('alice@example.com')).toBeNull();
+  });
+
+  it('names the organization alone where the role is unknown', () => {
+    renderHeader({ modePriority: 'user', activeOrganization: foundry });
+
+    expect(within(header()).getByText('Foundry')).toBeInTheDocument();
+  });
+
+  it('falls back to the identifier where no organization is active', () => {
+    renderHeader({ modePriority: 'user', activeOrganization: null });
+
+    expect(within(header()).getByText('alice@example.com')).toBeInTheDocument();
+  });
+
+  it('keeps the identifier on a user surface, whatever organization is active', () => {
+    renderHeader({ mode: 'user' });
+
+    expect(within(header()).getByText('alice@example.com')).toBeInTheDocument();
+    expect(screen.queryByText('Foundry · Admin')).toBeNull();
+  });
+
+  it('nests the organization avatar in the account avatar where the account leads', () => {
+    renderHeader({ modePriority: 'user' });
+
+    const trigger = screen.getByRole('button', { name: 'Open account menu for Alice Smith' });
+    const nestedInTrigger = trigger.querySelector('.cl-avatar .cl-avatar');
+    expect(nestedInTrigger).toHaveAttribute('data-shape', 'square');
+    expect(nestedInTrigger?.textContent).toBe('F');
+
+    const nestedInHeader = header().querySelector('.cl-avatar .cl-avatar');
+    expect(nestedInHeader).toHaveAttribute('data-shape', 'square');
+  });
+
+  it('nests no avatar where the organization leads, none is active, or the surface carries none', () => {
+    const nested = (props: Partial<UserButtonProps>) => {
+      const { unmount } = renderHeader(props);
+      const found = header().querySelector('.cl-avatar .cl-avatar');
+      unmount();
+      return found;
+    };
+
+    expect(nested({})).toBeNull();
+    expect(nested({ modePriority: 'user', activeOrganization: null })).toBeNull();
+    expect(nested({ mode: 'user' })).toBeNull();
   });
 });

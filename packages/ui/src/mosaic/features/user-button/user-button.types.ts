@@ -19,6 +19,8 @@ export interface UserButtonMembership {
   imageUrl?: string;
   membersCount?: number;
   planLabel?: string;
+  /** The role the active account holds in the organization, named for display. */
+  roleLabel?: string;
 }
 
 export interface UserButtonSuggestion {
@@ -114,6 +116,12 @@ export type UserButtonMode = 'combined' | 'organization' | 'user';
  * thing to lead with, so they ignore it.
  */
 export type UserButtonModePriority = 'organization' | 'user';
+
+/**
+ * How the header carries its actions: `inline` trails the workspace with them, the gear as an icon;
+ * `stacked` runs them under it as full-width labelled buttons.
+ */
+export type UserButtonHeaderLayout = 'inline' | 'stacked';
 
 /** Which switchers the surface carries, and which one it leads with. */
 export interface UserButtonModeProps {

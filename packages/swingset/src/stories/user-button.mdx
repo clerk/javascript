@@ -97,6 +97,25 @@ A user's avatar on its own rounds the trigger fully to match it.
   storyModule={UserButtonStories}
 />
 
+## Header
+
+The header names the active workspace and carries what you can do about it. An organization is
+described by its plan and member count; an account by the organization it works in and its role
+there, or by its identifier where the surface carries no organizations.
+
+`headerLayout='inline'` (the default) trails the workspace with the actions, the gear as an icon
+alone. `headerLayout='stacked'` runs them under it as full-width labelled buttons.
+
+<Story
+  name='StackedHeader'
+  storyModule={UserButtonStories}
+/>
+
+<Story
+  name='UserPriorityStackedHeader'
+  storyModule={UserButtonStories}
+/>
+
 ## Modes
 
 `mode` picks which switchers the surface carries — the only prop that changes the popup's shape.
@@ -211,3 +230,15 @@ ignored rather than an error, so one order can cover every mode.
 | `UserButtonRoot`    | Owns the data, callbacks, and `mode`; forwards open state to `Popover.Root`. |
 | `UserButtonTrigger` | The trigger: the active workspace's avatar, and what it is called.           |
 | `UserButtonPopup`   | The popover surface: header, workspace list, footer.                         |
+
+## Styling
+
+| Slot                                 | Attributes                        |
+| ------------------------------------ | --------------------------------- |
+| `.cl-user-button-trigger`            |                                   |
+| `.cl-user-button-popover`            |                                   |
+| `.cl-user-button-header`             | `data-layout="inline \| stacked"` |
+| `.cl-user-button-header-content`     |                                   |
+| `.cl-user-button-header-title`       |                                   |
+| `.cl-user-button-header-description` |                                   |
+| `.cl-user-button-header-actions`     |                                   |

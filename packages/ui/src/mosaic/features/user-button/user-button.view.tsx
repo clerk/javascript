@@ -18,11 +18,12 @@ import { Popover } from '../../components/popover';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Spinner } from '../../components/spinner';
 import type { IconName } from '../../icons/registry';
+import { themeProps } from '../../props';
 import { applyOrder } from '../../utils/apply-order';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { fill, plural } from '../../utils/messages';
 import { truncationStyles } from '../../utils/typography.styles';
-import type { UserButtonLayout } from './user-button.layout';
+import type { UserButtonAction, UserButtonLayout } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
 import { userButtonMessages as m } from './user-button.messages';
 import { styles } from './user-button.styles';
@@ -31,12 +32,14 @@ import type {
   UserButtonBusyState,
   UserButtonCallbacks,
   UserButtonData,
+  UserButtonHeaderLayout,
   UserButtonMembership,
   UserButtonMenuItemId,
   UserButtonMenuProps,
   UserButtonModeProps,
   UserButtonSession,
 } from './user-button.types';
+import { UserButtonHeader } from './user-button-header.view';
 
 // The data contract, the mode flags, and the menu item shapes live in `user-button.types`; they are
 // what the model and the view agree on, so neither file owns them.
@@ -94,7 +97,7 @@ type ActiveWorkspace =
       shape: 'square';
       organization: UserButtonMembership;
     }
-  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle' }
+  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle'; organization: UserButtonMembership | null }
   | { kind: 'none'; name: string; imageUrl?: string; shape: 'square' };
 
 /**
@@ -121,18 +124,27 @@ function leadWorkspace({
       return { kind: 'none', name: m.workspaces.notSelected, shape: 'square' };
     }
   }
-  return { kind: 'user', name: activeSession.name, imageUrl: activeSession.imageUrl, shape: 'circle' };
+  return {
+    kind: 'user',
+    name: activeSession.name,
+    imageUrl: activeSession.imageUrl,
+    shape: 'circle',
+    organization: layout.describeAccountByOrganization ? activeOrganization : null,
+  };
+}
+
+function joinDetails(...parts: Array<string | undefined>): string {
+  return parts.filter(Boolean).join(' · ');
 }
 
 function membershipSubtitle(membership: UserButtonMembership): string {
-  const parts: string[] = [];
-  if (membership.membersCount !== undefined) {
-    parts.push(plural(m.workspaces.members, membership.membersCount));
-  }
-  if (membership.planLabel) {
-    parts.push(membership.planLabel);
-  }
-  return parts.join(' · ');
+  const members =
+    membership.membersCount === undefined ? undefined : plural(m.workspaces.members, membership.membersCount);
+  return joinDetails(membership.planLabel, members);
+}
+
+function roleSubtitle(membership: UserButtonMembership): string {
+  return joinDetails(membership.name, membership.roleLabel);
 }
 
 function initials(name: string): string {
@@ -147,9 +159,11 @@ interface RowAvatarProps {
   imageUrl?: string;
   shape: 'circle' | 'square';
   size: AvatarProps['size'];
+  xstyle?: AvatarProps['xstyle'];
+  children?: ReactNode;
 }
 
-function RowAvatar({ name, imageUrl, shape, size }: RowAvatarProps) {
+function RowAvatar({ name, imageUrl, shape, size, xstyle, children }: RowAvatarProps) {
   return (
     // Decorative: the same name is always in text alongside. Held at the root so the whole mark
     // stays out of the accessible name however the image resolves.
@@ -157,6 +171,7 @@ function RowAvatar({ name, imageUrl, shape, size }: RowAvatarProps) {
       aria-hidden
       size={size}
       shape={shape}
+      xstyle={xstyle}
     >
       {imageUrl ? (
         <Avatar.Image
@@ -165,7 +180,32 @@ function RowAvatar({ name, imageUrl, shape, size }: RowAvatarProps) {
         />
       ) : null}
       <Avatar.Fallback>{initials(name)}</Avatar.Fallback>
+      {children}
     </Avatar.Root>
+  );
+}
+
+/** The lead workspace's mark. An account working in an organization wears its avatar in the corner. */
+function WorkspaceAvatar({ workspace, size }: { workspace: ActiveWorkspace; size: AvatarProps['size'] }) {
+  const organization = workspace.kind === 'user' ? workspace.organization : null;
+
+  return (
+    <RowAvatar
+      name={workspace.name}
+      imageUrl={workspace.imageUrl}
+      shape={workspace.shape}
+      size={size}
+    >
+      {organization ? (
+        <RowAvatar
+          name={organization.name}
+          imageUrl={organization.imageUrl}
+          shape='square'
+          size='fit'
+          xstyle={[styles.nestedAvatar, size === 'md' ? styles.nestedAvatarMd : styles.nestedAvatarSm]}
+        />
+      ) : null}
+    </RowAvatar>
   );
 }
 
@@ -323,41 +363,55 @@ function ActionRow({ icon, label, href, onClick, busyKey }: ActionRowProps) {
 // ─── Sections ───────────────────────────────────────────────────────────────
 
 interface HeaderAction {
+  id: UserButtonAction;
   label: string;
-  /** An icon renders a square, icon-only button that labels itself through `aria-label`. */
-  icon?: IconName;
+  icon: IconName;
+  /** Inline, the button is square and shows the icon alone, labelling itself through `aria-label`. */
+  iconOnly?: boolean;
   onClick: () => void;
   /** Key from `userButtonBusyKeys` when the action is one-shot; omitted for navigations. */
   busyKey?: string;
 }
 
 // Hooks cannot run inside a `.map`, so each button is its own component to read its own busy state.
-function HeaderActionButton({ label, icon, onClick, busyKey }: HeaderAction) {
+function HeaderActionButton({
+  layout,
+  label,
+  icon,
+  iconOnly,
+  onClick,
+  busyKey,
+}: HeaderAction & { layout: UserButtonHeaderLayout }) {
   const { busy, disabled } = useBusy(busyKey);
-  // On an icon button the spinner takes the icon's place; on a labelled one it leads the label, so
-  // the button keeps its width while the action runs.
-  const spinner = busy ? <Spinner size='sm' /> : null;
+  const stacked = layout === 'stacked';
+  const compact = !stacked && iconOnly;
+  // The spinner takes the icon's place where there is one, and leads the label otherwise, so the
+  // button keeps its width while the action runs.
+  const leading = busy ? (
+    <Spinner size='sm' />
+  ) : stacked || compact ? (
+    <Icon
+      name={icon}
+      size='sm'
+    />
+  ) : null;
 
   return (
     <Button
       variant='outline'
       color='neutral'
       size='sm'
-      shape={icon ? 'square' : 'default'}
-      aria-label={icon ? label : undefined}
+      shape={compact ? 'square' : 'default'}
+      fullWidth={stacked}
+      aria-label={compact ? label : undefined}
       disabled={busy || disabled}
       onClick={onClick}
     >
-      {icon ? (
-        (spinner ?? (
-          <Icon
-            name={icon}
-            size='sm'
-          />
-        ))
+      {compact ? (
+        leading
       ) : (
         <>
-          {spinner}
+          {leading}
           {label}
         </>
       )}
@@ -366,16 +420,22 @@ function HeaderActionButton({ label, icon, onClick, busyKey }: HeaderAction) {
 }
 
 /** The active workspace: who you are signed in as, and what you can do about it. */
-function Header() {
+function Header({ layout }: { layout: UserButtonHeaderLayout }) {
   const data = useUserButtonContext();
   const signOutSession = data.onSignOutSession;
   const { sessionId, identifier } = data.activeSession;
   const workspace = leadWorkspace(data);
-  const { name, imageUrl, shape } = workspace;
+  const { name } = workspace;
   const organization = workspace.kind === 'organization' ? workspace.organization : undefined;
-  // An account with no name is titled by its identifier, and repeating it underneath says nothing.
-  // No selection is not the account, so it carries no identifier line either.
-  const accountSubtitle = identifier === name ? '' : identifier;
+  // An account is described by the organization it works in where the surface carries one, and by
+  // its identifier otherwise. An account with no name is titled by its identifier, and repeating it
+  // underneath says nothing. No selection is not the account, so it carries no identifier line either.
+  const accountSubtitle =
+    workspace.kind === 'user' && workspace.organization
+      ? roleSubtitle(workspace.organization)
+      : identifier === name
+        ? ''
+        : identifier;
   const subtitle =
     workspace.kind === 'organization'
       ? membershipSubtitle(workspace.organization)
@@ -386,53 +446,65 @@ function Header() {
   const actions: HeaderAction[] = [];
   for (const action of data.layout.actions.header) {
     if (action === 'inviteMembers' && data.onInviteMembers) {
-      actions.push({ label: m.manage.invite, onClick: data.onInviteMembers });
+      actions.push({ id: action, label: m.manage.invite, icon: 'users', onClick: data.onInviteMembers });
     }
     // Every other mode hangs "Sign out" off the organization heading. An account-only one has no
     // such heading, so it takes the labelled slot **Invite** occupies elsewhere, left of the gear.
     if (action === 'signOut' && signOutSession) {
       actions.push({
+        id: action,
         label: m.accounts.signOut,
+        icon: 'log-out',
         onClick: () => signOutSession(sessionId),
         busyKey: userButtonBusyKeys.signOutSession(sessionId),
       });
     }
     // The gear manages whatever the header names, which is settled by the data rather than the mode.
+    // Inline it is the icon alone, named for what it manages; stacked it reads "Settings".
     if (action === 'manageLead') {
       const manage = organization
         ? { label: m.manage.organization, onClick: data.onManageOrganization }
         : { label: m.manage.account, onClick: data.onManageAccount };
       if (manage.onClick) {
-        actions.push({ label: manage.label, icon: 'cog', onClick: manage.onClick });
+        actions.push({
+          id: action,
+          label: layout === 'stacked' ? m.manage.settings : manage.label,
+          icon: 'cog',
+          iconOnly: true,
+          onClick: manage.onClick,
+        });
       }
     }
   }
+  // Inline, the gear trails the labelled actions; stacked, it leads them.
+  const ordered =
+    layout === 'stacked'
+      ? [...actions.filter(a => a.id === 'manageLead'), ...actions.filter(a => a.id !== 'manageLead')]
+      : actions;
 
   return (
-    <Item.Group>
-      <Item.Root>
-        <Item.Media>
-          <RowAvatar
-            name={name}
-            imageUrl={imageUrl}
-            shape={shape}
-            size='fit'
-          />
-        </Item.Media>
-        <Item.Content>
-          <Item.Label>{name}</Item.Label>
-          {subtitle ? <Item.Description>{subtitle}</Item.Description> : null}
-        </Item.Content>
-        <Item.Actions>
-          {actions.map(a => (
-            <HeaderActionButton
-              key={a.label}
-              {...a}
-            />
-          ))}
-        </Item.Actions>
-      </Item.Root>
-    </Item.Group>
+    <UserButtonHeader
+      layout={layout}
+      avatar={
+        <WorkspaceAvatar
+          workspace={workspace}
+          size='md'
+        />
+      }
+      title={name}
+      description={subtitle}
+      actions={
+        ordered.length > 0
+          ? ordered.map(a => (
+              <HeaderActionButton
+                key={a.id}
+                layout={layout}
+                {...a}
+              />
+            ))
+          : undefined
+      }
+    />
   );
 }
 
@@ -1069,12 +1141,18 @@ export function UserButtonTrigger({
 }: UserButtonTriggerProps = {}): ReactElement {
   const data = useUserButtonContext();
   const workspace = leadWorkspace(data);
-  const { name, imageUrl, shape } = workspace;
+  const { name, shape } = workspace;
   const planLabel =
     renderTriggerBadge && workspace.kind === 'organization' ? workspace.organization.planLabel : undefined;
 
   return (
     <Popover.Trigger
+      render={
+        <button
+          type='button'
+          {...themeProps('user-button-trigger')}
+        />
+      }
       aria-label={fill(m.trigger.open, { name })}
       xstyle={[
         focusOutline.visible,
@@ -1083,10 +1161,8 @@ export function UserButtonTrigger({
         !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
       ]}
     >
-      <RowAvatar
-        name={name}
-        imageUrl={imageUrl}
-        shape={shape}
+      <WorkspaceAvatar
+        workspace={workspace}
         size={renderTriggerLabel ? 'xs' : 'sm'}
       />
       {renderTriggerLabel ? (
@@ -1105,14 +1181,27 @@ export function UserButtonTrigger({
   );
 }
 
+export interface UserButtonPopupProps {
+  /**
+   * How the header carries its actions. `inline` trails the workspace with them, the gear as an
+   * icon; `stacked` runs them under it as full-width labelled buttons.
+   *
+   * @default 'inline'
+   */
+  headerLayout?: UserButtonHeaderLayout;
+}
+
 /** The popover surface: header, organizations, and footer. */
-export function UserButtonPopup(): ReactElement {
+export function UserButtonPopup({ headerLayout = 'inline' }: UserButtonPopupProps = {}): ReactElement {
   const { renderBranding } = useUserButtonContext();
 
   return (
-    <Popover.Popup aria-label={m.popup.label}>
+    <Popover.Popup
+      render={<div {...themeProps('user-button-popover')} />}
+      aria-label={m.popup.label}
+    >
       <Card.Root renderBranding={renderBranding}>
-        <Header />
+        <Header layout={headerLayout} />
         <OrganizationSection />
         <Footer />
       </Card.Root>
@@ -1120,20 +1209,25 @@ export function UserButtonPopup(): ReactElement {
   );
 }
 
-export type UserButtonProps = Omit<UserButtonRootProps, 'children'> & UserButtonTriggerProps;
+export type UserButtonProps = Omit<UserButtonRootProps, 'children'> & UserButtonTriggerProps & UserButtonPopupProps;
 
 /**
  * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The
  * connected, Clerk-backed `UserButton` lives in `user-button.tsx` and wraps this view.
  */
-export function UserButtonView({ renderTriggerLabel, renderTriggerBadge, ...root }: UserButtonProps): ReactElement {
+export function UserButtonView({
+  renderTriggerLabel,
+  renderTriggerBadge,
+  headerLayout,
+  ...root
+}: UserButtonProps): ReactElement {
   return (
     <UserButtonRoot {...root}>
       <UserButtonTrigger
         renderTriggerLabel={renderTriggerLabel}
         renderTriggerBadge={renderTriggerBadge}
       />
-      <UserButtonPopup />
+      <UserButtonPopup headerLayout={headerLayout} />
     </UserButtonRoot>
   );
 }

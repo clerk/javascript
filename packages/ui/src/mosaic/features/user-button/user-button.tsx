@@ -10,7 +10,7 @@ import { useUserButtonModel } from './user-button.model';
 import type { OrganizationProfilePageId } from './user-button.pages';
 import { useCustomPages, useOrganizationProfilePages, useUserProfilePages } from './user-button.pages';
 import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
-import type { UserButtonTriggerProps } from './user-button.view';
+import type { UserButtonPopupProps, UserButtonTriggerProps } from './user-button.view';
 import { UserButtonView } from './user-button.view';
 
 /** What a profile opened by `<UserButton />` takes beyond the profile component's own props. */
@@ -42,6 +42,7 @@ export interface UserButtonOrganizationProfileProps
 /** Everything `<UserButton />` takes: profile routing, trigger content, the app's own menu rows, and the profiles it opens. */
 export type UserButtonProps = UserButtonModelOptions &
   UserButtonTriggerProps &
+  UserButtonPopupProps &
   UserButtonMenuProps &
   UserButtonModeProps & {
     /**
@@ -132,6 +133,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
   const {
     renderTriggerLabel,
     renderTriggerBadge,
+    headerLayout,
     mode,
     modePriority,
     userProfileProps,
@@ -194,6 +196,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
         {...viewController}
         renderTriggerLabel={renderTriggerLabel}
         renderTriggerBadge={renderTriggerBadge}
+        headerLayout={headerLayout}
       />
       {portals}
     </>

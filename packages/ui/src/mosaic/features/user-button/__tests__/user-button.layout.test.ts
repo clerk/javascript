@@ -93,6 +93,12 @@ describe('resolveUserButtonLayout, which sections render', () => {
   it('carries no organizations in user mode', () => {
     expect(resolve('user')).toMatchObject({ showOrganizations: false, showOrganizationsHeading: false });
   });
+
+  it('describes the account by its organization only where the surface carries organizations', () => {
+    expect(resolve('combined').describeAccountByOrganization).toBe(true);
+    expect(resolve('organization').describeAccountByOrganization).toBe(true);
+    expect(resolve('user').describeAccountByOrganization).toBe(false);
+  });
 });
 
 describe('resolveUserButtonLayout, what the surface leads with', () => {

@@ -6,6 +6,22 @@ export const styles = stylex.create({
   accountIdentifier: {
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
+  nestedAvatar: {
+    borderRadius: '2px',
+    insetBlockEnd: `calc(${space['0.5']} * -1)`,
+    insetInlineEnd: `calc(${space['0.5']} * -1)`,
+    position: 'absolute',
+  },
+  nestedAvatarSm: {
+    fontSize: '0.3125rem',
+    height: space['2.5'],
+    width: space['2.5'],
+  },
+  nestedAvatarMd: {
+    fontSize: '0.375rem',
+    height: space['3.5'],
+    width: space['3.5'],
+  },
   trigger: {
     padding: 0,
     borderRadius: radiusVars['--cl-radius-md'],
