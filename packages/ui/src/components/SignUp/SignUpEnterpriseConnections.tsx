@@ -3,7 +3,7 @@ import { useClerk } from '@clerk/shared/react/index';
 import { withRedirectToAfterSignUp } from '@/ui/common';
 import { ChooseEnterpriseConnectionCard } from '@/ui/common/ChooseEnterpriseConnectionCard';
 import { useSignUpContext } from '@/ui/contexts';
-import { Flow, localizationKeys } from '@/ui/customizables';
+import { Flow } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { useFetch } from '@/ui/hooks';
@@ -38,8 +38,7 @@ const SignUpEnterpriseConnectionsInternal = () => {
     <Flow.Part part='enterpriseConnections'>
       {enterpriseConnections?.length ? (
         <ChooseEnterpriseConnectionCard
-          title={localizationKeys('signUp.enterpriseConnections.title')}
-          subtitle={localizationKeys('signUp.enterpriseConnections.subtitle')}
+          flow='signUp'
           onClick={handleEnterpriseSSO}
           enterpriseConnections={enterpriseConnections}
         />

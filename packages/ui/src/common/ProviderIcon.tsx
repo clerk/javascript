@@ -76,6 +76,11 @@ export const ProviderIcon = (props: ProviderIconProps) => {
         isLoading={isLoading}
         isDisabled={isDisabled}
         sx={sx}
+        elementDescriptor={
+          elementDescriptor === descriptors.providerIcon
+            ? [descriptors.providerIcon, descriptors.socialButtonsProviderInitialIcon]
+            : elementDescriptor
+        }
         {...initialIconProps}
       />
     );

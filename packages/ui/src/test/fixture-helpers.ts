@@ -118,7 +118,14 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
 
   type SignInWithEnterpriseSSOParams = {
     identifier?: string;
-    enterpriseConnections?: Array<{ id: string; name: string }>;
+    enterpriseConnections?: Array<{
+      id: string;
+      name?: string;
+      provider?: string;
+      logoPublicUrl?: string;
+      organizationName?: string;
+      domain?: string;
+    }>;
     supportSSOFallback?: boolean;
   };
 
@@ -171,10 +178,14 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       identifier,
       supported_identifiers: ['email_address'],
       supported_first_factors: enterpriseConnections?.length
-        ? enterpriseConnections.map(({ id, name }) => ({
+        ? enterpriseConnections.map(({ id, name, provider, logoPublicUrl, organizationName, domain }) => ({
             strategy: 'enterprise_sso',
             enterprise_connection_id: id,
             enterprise_connection_name: name,
+            enterprise_connection_provider: provider,
+            enterprise_connection_logo_url: logoPublicUrl,
+            enterprise_connection_organization_name: organizationName,
+            enterprise_connection_domain: domain,
           }))
         : [{ strategy: 'enterprise_sso' }],
       ...(supportSSOFallback && {

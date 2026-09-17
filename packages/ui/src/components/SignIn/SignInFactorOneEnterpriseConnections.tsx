@@ -4,7 +4,7 @@ import type { ComponentType } from 'react';
 import { withRedirect } from '@/ui/common';
 import { ChooseEnterpriseConnectionCard } from '@/ui/common/ChooseEnterpriseConnectionCard';
 import { useCoreSignIn, useSignInContext } from '@/ui/contexts';
-import { Flow, localizationKeys } from '@/ui/customizables';
+import { Flow } from '@/ui/customizables';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import type { AvailableComponentProps } from '@/ui/types';
 
@@ -26,6 +26,10 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
   const enterpriseConnections = signIn.supportedFirstFactors.map(ff => ({
     id: ff.enterpriseConnectionId,
     name: ff.enterpriseConnectionName,
+    provider: ff.enterpriseConnectionProvider,
+    logoPublicUrl: ff.enterpriseConnectionLogoUrl,
+    organizationName: ff.enterpriseConnectionOrganizationName,
+    domain: ff.enterpriseConnectionDomain,
   }));
 
   const handleEnterpriseSSO = (enterpriseConnectionId: string) => {
@@ -45,8 +49,7 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
   return (
     <Flow.Part part='enterpriseConnections'>
       <ChooseEnterpriseConnectionCard
-        title={localizationKeys('signIn.enterpriseConnections.title')}
-        subtitle={localizationKeys('signIn.enterpriseConnections.subtitle')}
+        flow='signIn'
         onClick={handleEnterpriseSSO}
         enterpriseConnections={enterpriseConnections}
       />

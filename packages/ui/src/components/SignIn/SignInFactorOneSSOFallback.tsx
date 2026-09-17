@@ -99,13 +99,16 @@ export const SignInFactorOneSSOFallback = (props: SignInFactorOneSSOFallbackProp
     const enterpriseConnections = signIn.supportedFirstFactors.map(factor => ({
       id: factor.enterpriseConnectionId,
       name: factor.enterpriseConnectionName,
+      provider: factor.enterpriseConnectionProvider,
+      logoPublicUrl: factor.enterpriseConnectionLogoUrl,
+      organizationName: factor.enterpriseConnectionOrganizationName,
+      domain: factor.enterpriseConnectionDomain,
     }));
 
     return (
       <Flow.Part part='ssoFallback'>
         <ChooseEnterpriseConnectionCard
-          title={localizationKeys('signIn.enterpriseConnections.title')}
-          subtitle={localizationKeys('signIn.enterpriseConnections.subtitle')}
+          flow='signIn'
           onClick={handleSelectEnterpriseConnection}
           enterpriseConnections={enterpriseConnections}
         >

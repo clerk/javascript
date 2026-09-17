@@ -89,25 +89,21 @@ function useHandleAuthenticateWithPasskey(
 
 /**
  * Type guard that checks if all factors in the array are enterprise SSO factors
- * with both `enterpriseConnectionId` and `enterpriseConnectionName` properties.
+ * with an `enterpriseConnectionId` property.
  * This is used to determine if the user should be presented with a choice
  * between multiple enterprise connections.
  * @experimental
  */
 function hasMultipleEnterpriseConnections(
   factors: SignInFirstFactor[] | null,
-): factors is Array<EnterpriseSSOFactor & { enterpriseConnectionId: string; enterpriseConnectionName: string }> {
+): factors is Array<EnterpriseSSOFactor & { enterpriseConnectionId: string }> {
   if (!factors?.length) {
     return false;
   }
 
   return (
-    factors.filter(
-      factor =>
-        factor.strategy === 'enterprise_sso' &&
-        'enterpriseConnectionId' in factor &&
-        'enterpriseConnectionName' in factor,
-    ).length > 1
+    factors.length > 1 &&
+    factors.every(factor => factor.strategy === 'enterprise_sso' && !!factor.enterpriseConnectionId)
   );
 }
 
