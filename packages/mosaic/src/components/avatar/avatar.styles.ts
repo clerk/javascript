@@ -34,6 +34,13 @@ export const styles = stylex.create({
     },
   },
 
+  overlay: {
+    outlineColor: colorVars['--cl-color-neutral-alpha-100'],
+    outlineOffset: '-1px',
+    outlineStyle: 'solid',
+    outlineWidth: '1px',
+  },
+
   // Carries the root's radius rather than leaning on the clip alone, so a part that paints its own
   // fill rounds off cleanly instead of showing a corner.
   image: {
