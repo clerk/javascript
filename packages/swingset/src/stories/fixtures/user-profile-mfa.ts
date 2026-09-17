@@ -9,21 +9,68 @@ import type {
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { useEffect, useState } from 'react';
 
+import { authenticatorSetup } from './user-profile-authenticator';
+
 interface FixtureOptions {
+  initialFlow?: UserProfileMfaAddableMethod;
   enrollmentBackupCodes?: readonly string[];
-  onRegenerateBackupCodes: () => Promise<readonly string[]>;
+  onGenerateBackupCodes?: () => Promise<readonly string[]>;
   onCopy: (codes: readonly string[]) => Promise<void>;
   onDownload: (codes: readonly string[]) => void | Promise<void>;
 }
 
+export const mfaDemoOptions: FixtureOptions = {
+  enrollmentBackupCodes: [
+    'pwkkay19',
+    'cvgunlqs',
+    '4czio578',
+    'a38eewtw',
+    'qqnwzvyr',
+    'znq8j16s',
+    'k4ro51h1',
+    '1gjmkwdb',
+    'pnr8i06f',
+    'ycga0jge',
+  ],
+  onGenerateBackupCodes: () =>
+    Promise.resolve([
+      'demo-new-01',
+      'demo-new-02',
+      'demo-new-03',
+      'demo-new-04',
+      'demo-new-05',
+      'demo-new-06',
+      'demo-new-07',
+      'demo-new-08',
+      'demo-new-09',
+      'demo-new-10',
+    ]),
+  onCopy: codes => navigator.clipboard.writeText(codes.join('\n')),
+  onDownload: codes => {
+    const blob = new Blob(['Swingset demo backup codes\n\n', codes.join('\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'swingset-backup-codes.txt';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  },
+};
+
 const pause = () => new Promise(resolve => setTimeout(resolve, 600));
 
 export function useUserProfileMfaFixture({
+  initialFlow,
   enrollmentBackupCodes,
-  onRegenerateBackupCodes,
+  onGenerateBackupCodes,
   onCopy,
   onDownload,
-}: FixtureOptions): {
+}: FixtureOptions = mfaDemoOptions): {
+  setup: {
+    open: boolean;
+    step: UserProfileMfaAddableMethod | 'select';
+    onOpenChange: (open: boolean) => void;
+  };
   section: UserProfileMfaSectionViewProps;
   authenticator: UserProfileAddAuthenticatorDialogProps;
   sms: UserProfileAddSmsDialogProps;
@@ -37,17 +84,19 @@ export function useUserProfileMfaFixture({
     ],
     authenticator: false,
     defaultPhoneId: 'personal',
-    hasBackupCodes: false,
+    hasBackupCodes: initialFlow === 'backup-codes' && Boolean(enrollmentBackupCodes?.length),
   });
-  const [flow, setFlow] = useState<UserProfileMfaAddableMethod | 'backup-codes'>();
+  const [flow, setFlow] = useState<UserProfileMfaAddableMethod | 'select' | undefined>(initialFlow);
   const [pending, setPending] = useState<'submit' | 'resend' | 'generate' | 'copy' | 'download'>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [code, setCode] = useState('');
-  const [codes, setCodes] = useState<readonly string[]>([]);
+  const [codes, setCodes] = useState<readonly string[]>(
+    initialFlow === 'backup-codes' ? (enrollmentBackupCodes ?? []) : [],
+  );
   const [step, setStep] = useState<UserProfileAddSmsDialogProps['step']>('select');
   const [direction, setDirection] = useState<1 | -1>(1);
   const [verifyFrom, setVerifyFrom] = useState<'select' | 'phone'>('select');
-  const [selectedPhoneId, setSelectedPhoneId] = useState('');
+  const [selectedPhoneId, setSelectedPhoneId] = useState(() => account.phones.find(phone => !phone.enrolled)?.id ?? '');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [resendSeconds, setResendSeconds] = useState(0);
 
@@ -64,23 +113,30 @@ export function useUserProfileMfaFixture({
   const defaultPhoneId = enrolledPhones.some(phone => phone.id === account.defaultPhoneId)
     ? account.defaultPhoneId
     : enrolledPhones[0]?.id;
+  enrolledPhones.sort((left, right) => Number(right.id === defaultPhoneId) - Number(left.id === defaultPhoneId));
   const methods: UserProfileMfaMethod[] = [
     ...(account.authenticator ? [{ id: 'authenticator', type: 'authenticator' as const, isDefault: true }] : []),
-    ...enrolledPhones.map(phone => ({
-      id: phone.id,
-      type: 'sms' as const,
-      description: stringToFormattedPhoneString(phone.phoneNumber),
-      isDefault: !account.authenticator && phone.id === defaultPhoneId,
-      canSetDefault: !account.authenticator && phone.id !== defaultPhoneId,
-    })),
+    ...enrolledPhones.map(phone => {
+      const isDefault = !account.authenticator && phone.id === defaultPhoneId;
+      return {
+        id: phone.id,
+        type: 'sms' as const,
+        description: stringToFormattedPhoneString(phone.phoneNumber),
+        isDefault,
+        canSetDefault: !isDefault,
+      };
+    }),
     ...(account.hasBackupCodes ? [{ id: 'backup', type: 'backup-codes' as const }] : []),
   ];
   const addableMethods: UserProfileMfaAddableMethod[] = ['sms'];
   if (!account.authenticator) {
     addableMethods.push('authenticator');
   }
-  const regenerate = async () => {
-    if (pending || !account.hasBackupCodes) {
+  if (onGenerateBackupCodes && !account.hasBackupCodes && (account.authenticator || enrolledPhones.length > 0)) {
+    addableMethods.push('backup-codes');
+  }
+  const generateBackupCodes = async () => {
+    if (pending || !onGenerateBackupCodes) {
       return;
     }
     setFlow('backup-codes');
@@ -88,20 +144,25 @@ export function useUserProfileMfaFixture({
     setErrorMessage(undefined);
     setCodes([]);
     try {
-      const nextCodes = await onRegenerateBackupCodes();
+      const nextCodes = await onGenerateBackupCodes();
       if (nextCodes.length === 0) {
         throw new Error('No backup codes returned');
       }
       setCodes(nextCodes);
+      setAccount(current => ({ ...current, hasBackupCodes: true }));
     } catch {
-      setErrorMessage('Unable to regenerate backup codes. Please try again.');
+      setErrorMessage('Unable to generate backup codes. Please try again.');
     } finally {
       setPending(undefined);
     }
   };
 
   const open = (type: UserProfileMfaAddableMethod) => {
-    if (pending) {
+    if (pending || !addableMethods.includes(type)) {
+      return;
+    }
+    if (type === 'backup-codes') {
+      void generateBackupCodes();
       return;
     }
     setCode('');
@@ -137,8 +198,14 @@ export function useUserProfileMfaFixture({
     if (pending || !/^\d{6}$/.test(value)) {
       return;
     }
+    setErrorMessage(undefined);
     setPending('submit');
     await pause();
+    if (value === '000000') {
+      setErrorMessage('That code is incorrect. Try again.');
+      setPending(undefined);
+      return;
+    }
     setAccount(current => ({ ...current, authenticator: true }));
     finishEnrollment();
   };
@@ -167,6 +234,11 @@ export function useUserProfileMfaFixture({
     setErrorMessage(undefined);
     setPending('submit');
     await pause();
+    if (step === 'verify' && value === '000000') {
+      setErrorMessage('That code is incorrect. Try again.');
+      setPending(undefined);
+      return;
+    }
     if (step === 'verify' || phone?.verified) {
       const enrolled = { id: phone?.id ?? `phone-${number}`, phoneNumber: number, verified: true, enrolled: true };
       setAccount(current => ({
@@ -227,12 +299,24 @@ export function useUserProfileMfaFixture({
   };
 
   return {
+    setup: {
+      open: flow !== undefined,
+      step: flow ?? 'select',
+      onOpenChange: next => {
+        if (next && !pending) {
+          setFlow('select');
+        } else {
+          close(next);
+        }
+      },
+    },
     section: {
       methods,
       addableMethods,
       sectionTitle: 'Authentication',
       onAdd: open,
-      onRegenerateBackupCodes: account.hasBackupCodes ? () => void regenerate() : undefined,
+      onRegenerateBackupCodes:
+        account.hasBackupCodes && onGenerateBackupCodes ? () => void generateBackupCodes() : undefined,
       onSetDefault: async id => {
         await pause();
         setAccount(current => ({ ...current, defaultPhoneId: id }));
@@ -257,12 +341,13 @@ export function useUserProfileMfaFixture({
     authenticator: {
       open: flow === 'authenticator',
       onOpenChange: close,
-      secret: 'JBSWY3DPEHPK3PXP',
-      uri: 'otpauth://totp/Swingset:demo@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Swingset',
+      setup: authenticatorSetup,
+      onRetry: () => undefined,
       code,
       onCodeChange,
       onSubmit: value => void verifyAuthenticator(value),
       isPending: pending === 'submit',
+      errorMessage,
     },
     sms: {
       open: flow === 'sms',
@@ -314,7 +399,7 @@ export function useUserProfileMfaFixture({
       errorMessage,
       onRetry: () => {
         if (!pending) {
-          void regenerate();
+          void generateBackupCodes();
         }
       },
       onCopy: () => void save('copy'),

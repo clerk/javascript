@@ -5,6 +5,11 @@ export const userProfileAuthenticatorSetupMessages = {
   qrCodeLabel: 'Authenticator setup QR code',
   setupKey: 'Setup key',
   setupUri: 'Setup URI',
+  copyKey: 'Copy setup key',
+  copyUri: 'Copy setup URI',
+  copyFeedback: 'Copy feedback',
+  copying: 'Copying…',
+  copied: 'Copied',
   viewSetupKey: 'Can’t scan? View setup key',
   scanQrCode: 'Scan QR code instead',
 };

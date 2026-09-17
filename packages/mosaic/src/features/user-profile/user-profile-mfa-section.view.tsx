@@ -1,4 +1,4 @@
-import { type Ref, useMemo } from 'react';
+import { type ReactNode, type Ref, useMemo } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { fill } from '../../localization';
@@ -18,12 +18,13 @@ export interface UserProfileMfaMethod {
   canSetDefault?: boolean;
 }
 
-export type UserProfileMfaAddableMethod = 'sms' | 'authenticator';
+export type UserProfileMfaAddableMethod = 'sms' | 'authenticator' | 'backup-codes';
 
 export interface UserProfileMfaSectionViewProps {
   methods: UserProfileMfaMethod[];
   addableMethods?: readonly UserProfileMfaAddableMethod[];
   addButtonRef?: Ref<HTMLButtonElement>;
+  addControl?: ReactNode;
   sectionTitle?: string;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
@@ -35,6 +36,7 @@ export function UserProfileMfaSectionView({
   methods,
   addableMethods,
   addButtonRef,
+  addControl,
   sectionTitle,
   onAdd,
   onRegenerateBackupCodes,
@@ -49,14 +51,15 @@ export function UserProfileMfaSectionView({
     <>
       <UserProfileSecurityList
         addControl={
-          onAdd && addableMethods?.length ? (
+          addControl ??
+          (onAdd && addableMethods?.length ? (
             <UserProfileAddMfaDialog
               triggerRef={addButtonRef}
               methods={addableMethods}
               onSelect={onAdd}
               disabled={isSettingDefault}
             />
-          ) : null
+          ) : null)
         }
         addLabel={m.addLabel}
         emptyLabel={m.empty}

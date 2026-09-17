@@ -29,6 +29,58 @@ function renderView(overrides: Partial<UserProfileMfaSectionViewProps> = {}) {
 }
 
 describe('MFA section', () => {
+  it('uses a supplied setup trigger without opening a separate selection dialog', async () => {
+    const user = userEvent.setup();
+    const onOpen = vi.fn();
+    const { props } = renderView({
+      addControl: (
+        <button
+          type='button'
+          onClick={onOpen}
+        >
+          Set up verification
+        </button>
+      ),
+    });
+    await user.click(screen.getByRole('button', { name: 'Set up verification' }));
+    expect(onOpen).toHaveBeenCalledOnce();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Add verification method' })).not.toBeInTheDocument();
+    expect(props.onAdd).not.toHaveBeenCalled();
+  });
+
+  it('hides removal for protected SMS while keeping backup regeneration available', async () => {
+    const user = userEvent.setup();
+    const { props } = renderView({
+      methods: [
+        { id: 'phone', type: 'sms', description: '+1 801-555-0100', isDefault: true, canRemove: false },
+        { id: 'backup', type: 'backup-codes' },
+      ],
+    });
+    expect(screen.getByText('+1 801-555-0100')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Manage SMS verification +1 801-555-0100' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
+    expect(screen.getAllByRole('menuitem')).toHaveLength(1);
+    await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
+    expect(props.onRegenerateBackupCodes).toHaveBeenCalledOnce();
+    expect(props.onRemove).not.toHaveBeenCalled();
+  });
+
+  it('allows default selection for protected SMS without offering removal', async () => {
+    const user = userEvent.setup();
+    const { props } = renderView({
+      methods: [
+        { id: 'totp', type: 'authenticator', isDefault: true },
+        { id: 'phone', type: 'sms', description: '+1 801-555-0100', canSetDefault: true, canRemove: false },
+      ],
+    });
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0100' }));
+    expect(screen.getAllByRole('menuitem')).toHaveLength(1);
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    expect(props.onSetDefault).toHaveBeenCalledExactlyOnceWith('phone');
+    expect(props.onRemove).not.toHaveBeenCalled();
+  });
+
   it.each(['sms', 'authenticator'] as const)('continues immediately when the %s option is activated', async type => {
     const user = userEvent.setup();
     const { props } = renderView({
@@ -116,6 +168,34 @@ describe('MFA section', () => {
     renderView({ addableMethods });
     expect(screen.getByText('No verification methods added')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Add verification method' })).not.toBeInTheDocument();
+  });
+
+  it('adds caller-enabled backup codes and offers only regeneration after the row is supplied', async () => {
+    const user = userEvent.setup();
+    const methods: UserProfileMfaMethod[] = [{ id: 'personal', type: 'sms', isDefault: true }];
+    const { props, rerender } = renderView({ methods, addableMethods: ['backup-codes'] });
+
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    const picker = screen.getByRole('dialog', { name: 'Add 2-step verification' });
+    await user.click(within(picker).getByRole('button', { name: /Backup codes One-time codes/ }));
+    expect(props.onAdd).toHaveBeenCalledExactlyOnceWith('backup-codes');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileMfaSectionView
+          {...props}
+          methods={[...methods, { id: 'backup', type: 'backup-codes' }]}
+          addableMethods={[]}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('button', { name: 'Add verification method' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
+    expect(screen.getAllByRole('menuitem')).toHaveLength(1);
+    await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
+    expect(props.onRegenerateBackupCodes).toHaveBeenCalledOnce();
+    expect(props.onRemove).not.toHaveBeenCalled();
   });
 
   it('confirms the selected SMS method and restores focus when removal is cancelled', async () => {

@@ -35,7 +35,7 @@ export function Default() {
       'pnr8i06f',
       'ycga0jge',
     ],
-    onRegenerateBackupCodes: () =>
+    onGenerateBackupCodes: () =>
       Promise.resolve([
         'demo-new-01',
         'demo-new-02',

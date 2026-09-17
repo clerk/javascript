@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import { Profile } from '../../components/profile';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -41,6 +41,7 @@ export interface UserProfileSecurityPanelViewProps
   passkeysVisible?: boolean;
   mfaMethods?: UserProfileMfaMethod[];
   addableMfaMethods?: readonly UserProfileMfaAddableMethod[];
+  mfaAddControl?: ReactNode;
   devices?: UserProfileDevice[];
   onAddPasskey?: () => void;
   addPasskeyError?: string;
@@ -62,6 +63,7 @@ export function UserProfileSecurityPanelView({
   passkeysVisible = true,
   mfaMethods,
   addableMfaMethods,
+  mfaAddControl,
   devices,
   onSubmitPassword,
   onAddPasskey,
@@ -107,6 +109,7 @@ export function UserProfileSecurityPanelView({
             <UserProfileMfaSectionView
               methods={mfaMethods}
               addableMethods={addableMfaMethods}
+              addControl={mfaAddControl}
               sectionTitle={!showPassword && !showPasskeys ? 'Authentication' : undefined}
               onAdd={onAddMfaMethod}
               onRegenerateBackupCodes={onRegenerateBackupCodes}

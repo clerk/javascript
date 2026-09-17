@@ -3,4 +3,6 @@ export const userProfileAddAuthenticatorMessages = {
   cancel: 'Cancel',
   verify: 'Verify',
   pending: 'Verifying code',
+  preparing: 'Preparing authenticator…',
+  retry: 'Try again',
 };

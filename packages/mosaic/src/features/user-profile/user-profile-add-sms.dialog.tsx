@@ -1,202 +1,54 @@
-import { stringToFormattedPhoneString } from '@clerk/shared/phone';
-import { useMergeRefs } from '@floating-ui/react';
-import type { Ref } from 'react';
-import { useId, useRef } from 'react';
+import { useRef } from 'react';
 
-import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import type { DialogFocusTarget, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
-import { Field } from '../../components/field';
-import { Flow, type FlowDirection, useFlowAutoFocus } from '../../components/flow';
-import { Select } from '../../components/select';
-import { userProfileAddSmsMessages as m } from './user-profile-add-sms.messages';
-import { EnterPhoneStep, VerifyPhoneStep } from './user-profile-phone.steps';
+import type { UserProfileAddSmsViewProps } from './user-profile-add-sms.view';
+import { UserProfileAddSmsView } from './user-profile-add-sms.view';
 
-export interface UserProfileAddSmsDialogProps {
+export interface UserProfileAddSmsDialogProps extends Omit<
+  UserProfileAddSmsViewProps,
+  'onCancel' | 'selectRef' | 'phoneRef'
+> {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
   finalFocus?: DialogFocusTarget;
-  step: 'select' | 'phone' | 'verify';
-  direction?: FlowDirection;
-  phoneNumbers: readonly { id: string; phoneNumber: string }[];
-  selectedPhoneId: string;
-  onSelectedPhoneIdChange: (id: string) => void;
-  onAddPhone: () => void;
-  onBack: () => void;
-  phoneNumber: string;
-  onPhoneNumberChange: (value: string) => void;
-  code: string;
-  onCodeChange: (value: string) => void;
-  onSubmit: (code?: string) => void;
-  onResend: () => void;
-  isPending?: boolean;
-  errorMessage?: string;
-  isResending?: boolean;
-  resendSeconds?: number;
 }
 
-export function UserProfileAddSmsDialog(props: UserProfileAddSmsDialogProps) {
+export function UserProfileAddSmsDialog({
+  open,
+  onOpenChange,
+  trigger,
+  finalFocus,
+  ...props
+}: UserProfileAddSmsDialogProps) {
   const selectRef = useRef<HTMLButtonElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
 
   return (
     <Dialog.Root
-      open={props.open}
-      onOpenChange={props.onOpenChange}
+      open={open}
+      onOpenChange={onOpenChange}
     >
-      {props.trigger ? <Dialog.Trigger render={props.trigger} /> : null}
+      {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
         variant='card'
         initialFocus={props.step === 'select' ? selectRef : props.step === 'phone' ? phoneRef : undefined}
-        finalFocus={props.finalFocus}
+        finalFocus={finalFocus}
       >
         <Card.Root
           elevation='overlay'
           renderBranding={false}
         >
-          <Flow.Root
-            value={props.step}
-            direction={props.direction}
-            state={props}
-          >
-            {current => {
-              const backAction = (
-                <Button
-                  type='button'
-                  variant='outline'
-                  color='neutral'
-                  fullWidth
-                  disabled={current.isPending || current.isResending}
-                  onClick={current.onBack}
-                >
-                  {m.back}
-                </Button>
-              );
-              return (
-                <>
-                  <Flow.Step ids={['select']}>
-                    <SelectPhoneStep
-                      {...current}
-                      inputRef={selectRef}
-                    />
-                  </Flow.Step>
-                  <Flow.Step ids={['phone']}>
-                    <EnterPhoneStep
-                      inputRef={phoneRef}
-                      phoneNumber={current.phoneNumber}
-                      onPhoneNumberChange={current.onPhoneNumberChange}
-                      onSubmit={current.onSubmit}
-                      isPending={current.isPending}
-                      errorMessage={current.errorMessage}
-                      secondaryAction={backAction}
-                    />
-                  </Flow.Step>
-                  <Flow.Step ids={['verify']}>
-                    <VerifyPhoneStep
-                      phoneNumber={current.phoneNumber}
-                      code={current.code}
-                      onCodeChange={current.onCodeChange}
-                      onSubmit={current.onSubmit}
-                      onResend={current.onResend}
-                      isPending={current.isPending}
-                      errorMessage={current.errorMessage}
-                      isResending={current.isResending}
-                      resendSeconds={current.resendSeconds}
-                      secondaryAction={backAction}
-                    />
-                  </Flow.Step>
-                </>
-              );
-            }}
-          </Flow.Root>
+          <UserProfileAddSmsView
+            {...props}
+            onCancel={() => onOpenChange(false)}
+            selectRef={selectRef}
+            phoneRef={phoneRef}
+          />
         </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
-  );
-}
-
-function SelectPhoneStep(props: UserProfileAddSmsDialogProps & { inputRef: Ref<HTMLButtonElement> }) {
-  const formId = useId();
-  const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLButtonElement>()]);
-  return (
-    <>
-      <Card.Header>
-        <Card.Title>{m.title}</Card.Title>
-        <Card.Description>{m.description}</Card.Description>
-      </Card.Header>
-      <Card.Content
-        render={
-          <form
-            id={formId}
-            onSubmit={event => {
-              event.preventDefault();
-              if (!props.isPending && props.selectedPhoneId) {
-                props.onSubmit();
-              }
-            }}
-          />
-        }
-      >
-        <Field.Root
-          required
-          disabled={props.isPending}
-          invalid={Boolean(props.errorMessage)}
-        >
-          <Field.Label>{m.phoneLabel}</Field.Label>
-          <Select.Root
-            items={props.phoneNumbers.map(phone => ({
-              value: phone.id,
-              label: stringToFormattedPhoneString(phone.phoneNumber),
-            }))}
-            value={props.selectedPhoneId}
-            onValueChange={props.onSelectedPhoneIdChange}
-          >
-            <Select.Trigger
-              ref={inputRef}
-              placeholder={m.phonePlaceholder}
-            />
-            <Select.Popup />
-          </Select.Root>
-          <Field.Message>
-            <Field.Error>{props.errorMessage}</Field.Error>
-          </Field.Message>
-        </Field.Root>
-        <Button
-          type='button'
-          variant='link'
-          color='neutral'
-          size='sm'
-          disabled={props.isPending}
-          onClick={props.onAddPhone}
-        >
-          {m.addPhone}
-        </Button>
-      </Card.Content>
-      <Card.Footer>
-        <Dialog.Close
-          render={
-            <Button
-              variant='outline'
-              color='neutral'
-              fullWidth
-              disabled={props.isPending}
-            />
-          }
-        >
-          {m.cancel}
-        </Dialog.Close>
-        <SubmitButton
-          form={formId}
-          fullWidth
-          isPending={props.isPending}
-          disabled={!props.selectedPhoneId}
-          pendingLabel={m.pending}
-        >
-          {m.continue}
-        </SubmitButton>
-      </Card.Footer>
-    </>
   );
 }

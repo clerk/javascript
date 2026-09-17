@@ -21,6 +21,7 @@ export const userProfileMfaMessages = {
     methods: {
       sms: 'Get a code by text message',
       authenticator: 'Get codes from an authenticator app',
+      'backup-codes': 'One-time codes to use if you lose access',
     },
   },
   removeDialog: {

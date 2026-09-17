@@ -57,6 +57,23 @@ function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) 
 }
 
 describe('UserProfileSecurityPanelView', () => {
+  it('passes a shared MFA setup control into the section', async () => {
+    const onOpen = vi.fn();
+    renderView({
+      mfaAddControl: (
+        <button
+          type='button'
+          onClick={onOpen}
+        >
+          Set up MFA
+        </button>
+      ),
+    });
+    await userEvent.click(screen.getByRole('button', { name: 'Set up MFA' }));
+    expect(onOpen).toHaveBeenCalledOnce();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
   it('composes authentication, active devices, and the danger zone', () => {
     renderView({ onDeleteAccount: vi.fn(() => Promise.resolve()) });
 

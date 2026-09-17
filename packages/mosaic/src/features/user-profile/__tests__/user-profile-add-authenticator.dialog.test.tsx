@@ -14,7 +14,8 @@ const setup = {
 
 function renderView(overrides: Partial<UserProfileAddAuthenticatorDialogProps> = {}) {
   const props: UserProfileAddAuthenticatorDialogProps = {
-    ...setup,
+    setup,
+    onRetry: vi.fn(),
     open: true,
     onOpenChange: vi.fn(),
     code: '',
@@ -37,7 +38,8 @@ function VerificationExample({ onSubmit }: Pick<UserProfileAddAuthenticatorDialo
   return (
     <MosaicProvider>
       <UserProfileAddAuthenticatorDialog
-        {...setup}
+        setup={setup}
+        onRetry={() => undefined}
         open
         onOpenChange={() => undefined}
         code={code}
@@ -49,6 +51,132 @@ function VerificationExample({ onSubmit }: Pick<UserProfileAddAuthenticatorDialo
 }
 
 describe('UserProfileAddAuthenticatorDialog', () => {
+  it.each([undefined, 'Unable to prepare your authenticator.'])(
+    'allows cancellation during preparation: %s',
+    async setupErrorMessage => {
+      const user = userEvent.setup();
+      const { props } = renderView({ setup: undefined, setupErrorMessage });
+      await user.click(screen.getByRole('button', { name: 'Cancel' }));
+      expect(props.onOpenChange).toHaveBeenCalledWith(false);
+      expect(props.onRetry).not.toHaveBeenCalled();
+      expect(props.onSubmit).not.toHaveBeenCalled();
+    },
+  );
+
+  it('copies either manual credential through the caller and displays controlled copy feedback', async () => {
+    const user = userEvent.setup();
+    const onCopy = vi.fn();
+    const { props, rerender } = renderView({ onCopy });
+    await user.click(screen.getByRole('button', { name: 'Can’t scan? View setup key' }));
+    const copyKey = screen.getByRole('button', { name: 'Copy setup key' });
+    const copyUri = screen.getByRole('button', { name: 'Copy setup URI' });
+    await user.click(copyKey);
+    expect(onCopy).toHaveBeenCalledExactlyOnceWith(setup.secret);
+    expect(props.onSubmit).not.toHaveBeenCalled();
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileAddAuthenticatorDialog
+          {...props}
+          copyStatus='pending'
+        />
+      </MosaicProvider>,
+    );
+    expect(copyKey).toHaveFocus();
+    expect(copyKey).toHaveAttribute('aria-disabled', 'true');
+    expect(copyUri).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('status', { name: 'Copy feedback' })).toHaveTextContent('Copying…');
+    await user.click(copyUri);
+    await user.keyboard('{Enter}');
+    expect(onCopy).toHaveBeenCalledOnce();
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileAddAuthenticatorDialog
+          {...props}
+          copyErrorMessage='Could not copy. Please try again.'
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not copy. Please try again.');
+    expect(screen.getByRole('textbox', { name: 'Setup key' })).toHaveValue(setup.secret);
+    await user.click(copyUri);
+    expect(onCopy).toHaveBeenLastCalledWith(setup.uri);
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileAddAuthenticatorDialog
+          {...props}
+          copyStatus='success'
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Copy feedback' })).toHaveTextContent('Copied');
+    expect(screen.getByRole('dialog')).toBeVisible();
+    expect(props.onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it('shows preparation, offers retry on failure, and waits for setup data before verification', async () => {
+    const user = userEvent.setup();
+    const { props, rerender } = renderView({ setup: undefined });
+    const dialog = screen.getByRole('dialog', { name: 'Add an authenticator app' });
+    expect(screen.getByRole('status', { name: 'Preparing authenticator…' })).toBeVisible();
+    expect(screen.queryByRole('img')).not.toBeInTheDocument();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Verify', exact: true })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileAddAuthenticatorDialog
+          {...props}
+          setupErrorMessage='Unable to prepare your authenticator.'
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('Unable to prepare your authenticator.');
+    expect(screen.queryByRole('status', { name: 'Preparing authenticator…' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(props.onRetry).toHaveBeenCalledOnce();
+    expect(props.onSubmit).not.toHaveBeenCalled();
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileAddAuthenticatorDialog {...props} />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Preparing authenticator…' })).toBeVisible();
+    expect(screen.getByRole('button', { name: /Preparing authenticator/ })).toHaveFocus();
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileAddAuthenticatorDialog
+          {...props}
+          setup={setup}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('dialog')).toBe(dialog);
+    expect(screen.queryByRole('status', { name: 'Preparing authenticator…' })).not.toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Authenticator setup QR code' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Verify', exact: true })).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'Verify', exact: true })).toHaveAttribute('aria-disabled', 'true');
+    await user.keyboard('{Enter}');
+    expect(props.onSubmit).not.toHaveBeenCalled();
+    rerender(
+      <MosaicProvider>
+        <UserProfileAddAuthenticatorDialog
+          {...props}
+          setup={setup}
+          code='123456'
+        />
+      </MosaicProvider>,
+    );
+    expect(props.onSubmit).toHaveBeenCalledExactlyOnceWith('123456');
+  });
+
   it.each(['typing', 'pasting'] as const)('submits a complete authenticator code after %s', async method => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
@@ -86,7 +214,7 @@ describe('UserProfileAddAuthenticatorDialog', () => {
     expect(props.onSubmit).toHaveBeenLastCalledWith('654321');
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(props.onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+    expect(props.onOpenChange).toHaveBeenCalledWith(false);
     expect(props.onSubmit).toHaveBeenCalledTimes(2);
   });
 
@@ -94,7 +222,7 @@ describe('UserProfileAddAuthenticatorDialog', () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView({ code: '123' });
     const verify = screen.getByRole('button', { name: 'Verify', exact: true });
-    expect(verify).toBeDisabled();
+    expect(verify).toHaveAttribute('aria-disabled', 'true');
     await user.click(screen.getByRole('textbox', { name: 'Verification code' }));
     await user.keyboard('{Enter}');
     expect(props.onSubmit).not.toHaveBeenCalled();
