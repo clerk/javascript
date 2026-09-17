@@ -64,6 +64,33 @@ Each method has an `id`, a `type` (`sms`, `authenticator`, or `backup-codes`), a
 | `isPending`    | `boolean`                      | `false`      | Disables code entry and Cancel; Verify shows progress and blocks repeat submissions. |
 | `errorMessage` | `string`                       | —            | Feedback associated with the verification field.                                     |
 
+### SMS dialog
+
+`UserProfileAddSmsDialog` combines number selection with the shared phone-entry and verification steps.
+
+| Prop                      | Type                                             | Default      | Description                                                                                             |
+| ------------------------- | ------------------------------------------------ | ------------ | ------------------------------------------------------------------------------------------------------- |
+| `open`                    | `boolean`                                        | — (required) | Whether the dialog is open.                                                                             |
+| `onOpenChange`            | `(open: boolean) => void`                        | — (required) | Receives open and dismiss requests.                                                                     |
+| `trigger`                 | `DialogTriggerProps['render']`                   | —            | Trigger that receives focus after dismissal.                                                            |
+| `step`                    | `'select' \| 'phone' \| 'verify'`                | — (required) | Active screen.                                                                                          |
+| `direction`               | `1 \| -1`                                        | `1`          | Forward or backward transition.                                                                         |
+| `phoneNumbers`            | `readonly { id: string; phoneNumber: string }[]` | — (required) | Eligible existing numbers, in display order.                                                            |
+| `selectedPhoneId`         | `string`                                         | — (required) | Selected number ID; an empty string disables Continue.                                                  |
+| `onSelectedPhoneIdChange` | `(id: string) => void`                           | — (required) | Receives a Select choice.                                                                               |
+| `onAddPhone`              | `() => void`                                     | — (required) | Requests phone entry.                                                                                   |
+| `onBack`                  | `() => void`                                     | — (required) | Requests the previous screen.                                                                           |
+| `phoneNumber`             | `string`                                         | — (required) | Phone-entry value or the number being verified.                                                         |
+| `onPhoneNumberChange`     | `(value: string) => void`                        | — (required) | Receives phone edits.                                                                                   |
+| `code`                    | `string`                                         | — (required) | Current verification code.                                                                              |
+| `onCodeChange`            | `(value: string) => void`                        | — (required) | Receives code edits.                                                                                    |
+| `onSubmit`                | `(code?: string) => void`                        | — (required) | Submits the active step. OTP completion supplies the completed code; form submission uses caller state. |
+| `onResend`                | `() => void`                                     | — (required) | Requests another verification code.                                                                     |
+| `isPending`               | `boolean`                                        | `false`      | Blocks edits and navigation and shows submit progress.                                                  |
+| `errorMessage`            | `string`                                         | —            | Error associated with the active field.                                                                 |
+| `isResending`             | `boolean`                                        | `false`      | Blocks code entry, verification, resend, and Back while sending.                                        |
+| `resendSeconds`           | `number`                                         | `0`          | Seconds remaining before resend becomes available.                                                      |
+
 ## Usage
 
 The caller decides whether to mount the section from the instance's second-factor configuration, even when existing methods are present. When mounted, the section stays visible with no methods or callbacks. The caller also prepares the method order, default indicators, and removal permissions, including restrictions when MFA is required. Backup-code rows only offer regeneration.
@@ -93,6 +120,29 @@ The caller owns the code, pending state, error feedback, and success closure. Cl
     { name: 'Button', href: '/components/button', layer: 'Components' },
     { name: 'Field', href: '/components/field', layer: 'Components' },
     { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Otp', href: '/components/otp', layer: 'Components' },
+  ]}
+/>
+
+### Set up SMS verification
+
+Choose an existing number with Select or add a new number. New numbers use the same phone-entry and code-verification steps as Add phone number. Back returns to the previous screen; returning from verification to phone entry keeps the entered number.
+
+In this example, the first existing number is already verified and enables SMS directly. The second existing number and newly entered numbers require a code. Enter any six digits to see an initial error, then choose Verify to retry successfully. Resend shows a countdown and pending feedback. Closing and reopening resets the example. All requests are simulated; no text messages are sent or account changes made.
+
+The caller supplies eligible numbers and owns selection, navigation, sending codes, enabling SMS, and success closure. It decides whether an existing number needs verification and may open directly on the phone step when there are no existing numbers. The view renders the supplied step and reports actions. Keep dismissal blocked during pending requests, clear errors on edits or retries, and preserve the phone number when going Back.
+
+<Story
+  name='SmsSetup'
+  storyModule={Stories}
+  composition={[
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Select', href: '/components/select', layer: 'Components' },
+    { name: 'PhoneInput', href: '/components/phone-input', layer: 'Components' },
     { name: 'Otp', href: '/components/otp', layer: 'Components' },
   ]}
 />

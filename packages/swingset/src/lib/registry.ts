@@ -312,6 +312,7 @@ import {
   meta as userProfileMfaSectionMeta,
   ReadOnly as UserProfileMfaSectionReadOnly,
   Removal as UserProfileMfaSectionRemoval,
+  SmsSetup as UserProfileMfaSectionSmsSetup,
 } from '../stories/user-profile-mfa-section.stories';
 import {
   CreationUnavailable as UserProfilePasskeysSectionCreationUnavailable,
@@ -680,6 +681,7 @@ const userProfilePasskeysSectionModule: StoryModule = {
 const userProfileMfaSectionModule: StoryModule = {
   AddMethod: UserProfileMfaSectionAddMethod,
   AuthenticatorSetup: UserProfileMfaSectionAuthenticatorSetup,
+  SmsSetup: UserProfileMfaSectionSmsSetup,
   meta: userProfileMfaSectionMeta,
   Default: UserProfileMfaSectionDefault,
   Empty: UserProfileMfaSectionEmpty,
