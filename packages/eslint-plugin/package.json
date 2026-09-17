@@ -51,7 +51,9 @@
     "clerk-next-fix-auth-protection": "./dist/next/fix-auth-protection-cli.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map"
   ],
   "scripts": {
     "build": "tsdown",
