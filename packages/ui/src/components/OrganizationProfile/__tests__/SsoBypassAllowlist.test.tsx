@@ -210,7 +210,7 @@ describe('SSO bypass allowlist', () => {
       expect(await screen.findByText('No members match your search')).toBeInTheDocument();
     });
 
-    it('adds a member picked from the organization members', { timeout: 20000 }, async () => {
+    it('adds a member picked from the organization members', async () => {
       const { wrapper, fixtures } = await createFixtures(
         withSecurityPage({ permissions: ['org:sys_entconns:manage', 'org:sys_entconns_sso_bypass:manage'] }),
       );
