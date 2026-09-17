@@ -72,7 +72,6 @@ const styles = stylex.create({
    * lives in `axes` below.
    */
   viewport: {
-    overscrollBehavior: 'contain',
     flexBasis: 'auto',
     flexGrow: 1,
     flexShrink: 1,
@@ -262,6 +261,7 @@ const axes = stylex.create({
     minHeight: 0,
     overflowX: 'hidden',
     overflowY: 'auto',
+    overscrollBehaviorY: 'contain',
   },
   inline: {
     animationTimeline: 'scroll(self inline), scroll(self inline)',
@@ -281,6 +281,7 @@ const axes = stylex.create({
     minWidth: 0,
     overflowX: 'auto',
     overflowY: 'hidden',
+    overscrollBehaviorX: 'contain',
   },
 });
 
