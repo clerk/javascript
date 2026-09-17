@@ -13,6 +13,7 @@ export const styles = stylex.create({
 
   content: {
     display: 'flex',
+    flexBasis: 0,
     flexDirection: 'column',
     flexGrow: 1,
     minWidth: 0,
