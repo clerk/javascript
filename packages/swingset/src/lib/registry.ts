@@ -105,6 +105,7 @@ import {
   meta as inputGroupMeta,
   Sizes as InputGroupSizes,
 } from '../stories/input-group.stories';
+import { Default as DataListDefault, meta as dataListMeta, Plain as DataListPlain } from '../stories/data-list.stories';
 import {
   Default as ItemDefault,
   Group as ItemGroup,
@@ -253,7 +254,9 @@ import {
 } from '../stories/user-profile-account-section.stories';
 import {
   Default as UserProfileActiveDevicesSectionDefault,
+  Impersonation as UserProfileActiveDevicesSectionImpersonation,
   meta as userProfileActiveDevicesSectionMeta,
+  SignOutError as UserProfileActiveDevicesSectionSignOutError,
 } from '../stories/user-profile-active-devices-section.stories';
 import {
   Default as UserProfileApiKeysPanelDefault,
@@ -447,6 +450,12 @@ const profileComponentModule: StoryModule = {
   Default: ProfileDefault,
   Customized: ProfileCustomized,
   Transitions: ProfileTransitions,
+};
+
+const dataListModule: StoryModule = {
+  meta: dataListMeta,
+  Default: DataListDefault,
+  Plain: DataListPlain,
 };
 
 const itemModule: StoryModule = {
@@ -651,6 +660,8 @@ const userProfileMfaSectionModule: StoryModule = {
 const userProfileActiveDevicesSectionModule: StoryModule = {
   meta: userProfileActiveDevicesSectionMeta,
   Default: UserProfileActiveDevicesSectionDefault,
+  SignOutError: UserProfileActiveDevicesSectionSignOutError,
+  Impersonation: UserProfileActiveDevicesSectionImpersonation,
 };
 const userProfileSubscriptionSectionModule: StoryModule = {
   meta: userProfileSubscriptionSectionMeta,
@@ -770,6 +781,7 @@ export const registry: StoryModule[] = [
   inputModule,
   inputGroupModule,
   phoneInputModule,
+  dataListModule,
   itemModule,
   dialogComponentModule,
   drawerComponentModule,

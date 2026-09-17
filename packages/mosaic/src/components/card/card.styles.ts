@@ -49,7 +49,7 @@ export const header = stylex.create({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: '1',
-    rowGap: space['1'],
+    rowGap: space['0.5'],
   },
   title: {
     color: colorVars['--cl-color-foreground'],

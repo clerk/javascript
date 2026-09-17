@@ -44,6 +44,8 @@ export type {
   ComboboxRootProps,
   ComboboxSize,
 } from '../components/combobox';
+export { DataList } from '../components/data-list';
+export type { DataListProps } from '../components/data-list';
 export { Dialog } from '../components/dialog';
 export type {
   DialogCloseButtonProps,

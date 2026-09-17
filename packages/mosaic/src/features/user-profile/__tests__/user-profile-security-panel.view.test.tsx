@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -113,6 +113,8 @@ describe('UserProfileSecurityPanelView', () => {
     const otherDevices = screen.getByRole('region', { name: 'Other devices' });
     await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
     // The danger zone confirms in a modal, so it goes last: nothing else is clickable while it is open.
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
@@ -147,14 +149,13 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByText('Password')).not.toBeInTheDocument();
   });
 
-  it('does not render actions for the current device', () => {
-    renderView({
-      onManageDevice: vi.fn(),
-      onSignOutDevice: vi.fn(),
-    });
+  it('withholds sign out from the current device', async () => {
+    const user = userEvent.setup();
+    renderView({ onSignOutDevice: vi.fn() });
 
-    expect(screen.queryByRole('button', { name: 'Manage Safari on macOS' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Manage Safari on iOS' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Manage Safari on macOS' }));
+    expect(screen.getByRole('menuitem', { name: 'View details' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Sign out' })).not.toBeInTheDocument();
   });
 
   it('only shows backup codes with another verification method and only allows regeneration', async () => {

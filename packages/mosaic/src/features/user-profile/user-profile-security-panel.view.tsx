@@ -64,7 +64,6 @@ export function UserProfileSecurityPanelView({
   onAddMfaMethod,
   onRegenerateBackupCodes,
   onRemoveMfaMethod,
-  onManageDevice,
   onSignOutDevice,
   onSignOutAllOtherDevices,
   onDeleteAccount,
@@ -109,7 +108,6 @@ export function UserProfileSecurityPanelView({
         {devices ? (
           <UserProfileActiveDevicesSectionView
             devices={devices}
-            onManageDevice={onManageDevice}
             onSignOutAllOtherDevices={onSignOutAllOtherDevices}
             onSignOutDevice={onSignOutDevice}
           />
