@@ -193,7 +193,7 @@ export const ConfigureStep = (): JSX.Element => {
                         as='ol'
                         sx={t => ({
                           gap: t.space.$1x5,
-                          padding: `0 ${t.space.$4} ${t.space.$4}`,
+                          padding: t.space.$4,
                           paddingInlineStart: t.space.$8,
                           listStyle: 'decimal',
                         })}
