@@ -8,8 +8,8 @@ export interface RouteContextValue {
   indexPath: string;
   currentPath: string;
   matches: (path?: string, index?: boolean) => boolean;
-  baseNavigate: (toURL: URL) => Promise<unknown>;
-  navigate: (to: string, options?: { searchParams?: URLSearchParams }) => Promise<unknown>;
+  baseNavigate: (toURL: URL, options?: { replace?: boolean }) => Promise<unknown>;
+  navigate: (to: string, options?: { searchParams?: URLSearchParams; replace?: boolean }) => Promise<unknown>;
   resolve: (to: string) => URL;
   refresh: () => void;
   params: { [key: string]: string };
