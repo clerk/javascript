@@ -18,7 +18,7 @@ export interface UserProfileMfaMethod {
   canSetDefault?: boolean;
 }
 
-export type UserProfileMfaAddableMethod = UserProfileMfaMethod['type'];
+export type UserProfileMfaAddableMethod = 'sms' | 'authenticator';
 
 export interface UserProfileMfaSectionViewProps {
   methods: UserProfileMfaMethod[];

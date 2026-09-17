@@ -23,6 +23,31 @@ export const meta: StoryMeta = {
 export function Default() {
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const fixture = useUserProfileMfaFixture({
+    enrollmentBackupCodes: [
+      'pwkkay19',
+      'cvgunlqs',
+      '4czio578',
+      'a38eewtw',
+      'qqnwzvyr',
+      'znq8j16s',
+      'k4ro51h1',
+      '1gjmkwdb',
+      'pnr8i06f',
+      'ycga0jge',
+    ],
+    onRegenerateBackupCodes: () =>
+      Promise.resolve([
+        'demo-new-01',
+        'demo-new-02',
+        'demo-new-03',
+        'demo-new-04',
+        'demo-new-05',
+        'demo-new-06',
+        'demo-new-07',
+        'demo-new-08',
+        'demo-new-09',
+        'demo-new-10',
+      ]),
     onCopy: codes => navigator.clipboard.writeText(codes.join('\n')),
     onDownload: codes => {
       const blob = new Blob(['Swingset demo backup codes\n\n', codes.join('\n')], { type: 'text/plain' });

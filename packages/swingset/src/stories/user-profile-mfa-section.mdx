@@ -6,9 +6,9 @@ Display and manage two-step verification methods. The playground connects setup,
 
 ## Playground
 
-Choose Add to set up an authenticator, enable SMS for an existing or new phone number, or generate backup codes. Enter any six digits to complete verification. Successful enrollment updates the rows and opens backup codes when none exist. Use each row’s menu to change the default, remove a method, or regenerate backup codes.
+Choose Add, then click SMS verification or Authenticator app to start setup. Enter any six digits to complete verification. Successful enrollment updates the rows. When the instance enables backup codes, enrollment supplies them automatically; both methods open the Save your backup codes screen. Use each row’s menu to change the default, remove a method, or regenerate backup codes.
 
-Account requests are simulated and succeed by default. Copy and Download save the demo codes to your clipboard or a text file. Reload the page to reset the account.
+Account requests are simulated with fixed demo responses and succeed by default. Copy and Download save the demo codes to your clipboard or a text file. Reload the page to reset the account.
 
 <Story
   name='Default'
@@ -50,7 +50,7 @@ Account requests are simulated and succeed by default. Copy and Download save th
 
 Each method has an `id`, a `type` (`sms`, `authenticator`, or `backup-codes`), and optional `label` and `description`. Supply the formatted phone number as the SMS description so its menu has a distinct accessible name.
 
-`UserProfileMfaAddableMethod` is `sms`, `authenticator`, or `backup-codes`. The caller supplies available choices independently of existing rows, so another SMS number can be added. The Security panel forwards these choices through `addableMfaMethods`.
+`UserProfileMfaAddableMethod` is `sms` or `authenticator`. The caller supplies available choices independently of existing rows, so another SMS number can be added. The Security panel forwards these choices through `addableMfaMethods`. Backup codes are supplied automatically during enrollment when enabled for the instance; they are never an Add choice.
 
 | Method field    | Type      | Default | Description                                                                   |
 | --------------- | --------- | ------- | ----------------------------------------------------------------------------- |
@@ -106,7 +106,7 @@ Each method has an `id`, a `type` (`sms`, `authenticator`, or `backup-codes`), a
 
 ### Backup codes dialog
 
-`UserProfileBackupCodesDialog` displays newly generated codes and their save actions.
+`UserProfileBackupCodesDialog` displays supplied codes with Download and Copy and close actions. SMS enrollment, authenticator enrollment, and regeneration use the same Save your backup codes screen.
 
 | Prop            | Type                                 | Default      | Description                                                                      |
 | --------------- | ------------------------------------ | ------------ | -------------------------------------------------------------------------------- |
@@ -129,17 +129,17 @@ Callbacks report user intent; updated props determine the displayed result. Set 
 
 ### Set up a method
 
-The Add picker opens the selected setup dialog. Already enrolled authenticators and backup codes are excluded from the choices. SMS remains available for additional numbers; its select excludes numbers already enrolled. Verified numbers enable SMS directly. Unverified or new numbers require a six-digit code, with Back and Resend available. Cancelling setup leaves the account unchanged.
+The Add picker opens the selected setup dialog. Already enrolled authenticators are excluded from the choices. SMS remains available for additional numbers; its select excludes numbers already enrolled. Verified numbers enable SMS directly. Unverified or new numbers require a six-digit code, with Back and Resend available. Cancelling setup leaves the account unchanged.
 
-Authenticator setup supports both QR codes and a read-only setup key. Completing setup adds the method to the section. When backup codes have not been generated, enrollment continues to Save your backup codes. Subsequent enrollment preserves existing backup codes.
+Authenticator setup supports both QR codes and a read-only setup key. Completing setup adds the method to the section. When enrollment supplies new backup codes, their row is added immediately and the Save your backup codes dialog displays the supplied codes without generating another set. If enrollment supplies no codes, setup finishes without opening the save flow or adding a backup-code row. Subsequent enrollment preserves existing backup codes.
 
 ### Save and regenerate backup codes
 
-Download saves a text file and keeps the dialog open. Copy and close closes after the clipboard write succeeds. A browser failure leaves the codes visible with retry feedback. Regenerate from the backup-code row replaces the displayed set. The caller owns generation, clipboard access, file creation, pending state, and error feedback.
+Download saves a text file and keeps the dialog open. Copy and close closes after the clipboard write succeeds. A browser failure leaves the codes visible with retry feedback. Regenerate from the backup-code row replaces the displayed set only after a successful response containing codes. Failed or empty regeneration responses show retry feedback. The caller owns enrollment results, regeneration, clipboard access, file creation, pending state, and error feedback.
 
 ### Manage methods
 
-Set as default updates the badge after completion. An authenticator takes precedence when enrolled; otherwise the selected SMS method is the default. Remove method opens a confirmation and updates the rows after success. Removing SMS keeps the phone available for re-enrollment. Removing the last authenticator or SMS method clears backup codes and restores the empty section with Add available.
+Set as default updates the badge after completion. An authenticator takes precedence when enrolled; otherwise the selected SMS method is the default. Remove method opens a confirmation and updates the rows after success. Removing SMS keeps the phone available for re-enrollment. Removing the last authenticator or SMS method also removes backup codes, matching legacy behavior. Backup codes remain while another verification method is enrolled. The caller supplies the remaining rows from the updated account state.
 
 ### Read-only methods
 

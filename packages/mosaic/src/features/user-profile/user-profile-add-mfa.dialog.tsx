@@ -18,7 +18,6 @@ interface UserProfileAddMfaDialogProps {
 const icons = {
   sms: 'security-phone',
   authenticator: 'security-lock-square',
-  'backup-codes': 'numbers',
 } as const;
 
 export function UserProfileAddMfaDialog({ methods, onSelect, disabled, triggerRef }: UserProfileAddMfaDialogProps) {

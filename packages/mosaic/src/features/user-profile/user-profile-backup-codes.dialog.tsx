@@ -87,12 +87,24 @@ export function UserProfileBackupCodesDialog({
                 ))}
               </ul>
             ) : pendingAction === 'generate' ? (
-              <Text
+              <div
                 role='status'
-                color='foreground-secondary'
+                aria-label={m.generating}
+                {...stylex.props(reset.base, styles.codes)}
               >
-                {m.generating}
-              </Text>
+                {Array.from({ length: 10 }, (_, index) => (
+                  <div
+                    key={index}
+                    aria-hidden='true'
+                    {...stylex.props(reset.base, styles.cell)}
+                  >
+                    <Text
+                      render={<span />}
+                      xstyle={styles.skeleton}
+                    />
+                  </div>
+                ))}
+              </div>
             ) : null}
           </Card.Content>
           <Card.Footer>

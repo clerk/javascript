@@ -2,7 +2,24 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
+const pulse = stylex.keyframes({
+  '50%': { opacity: 0.5 },
+});
+
 export const styles = stylex.create({
+  skeleton: {
+    borderRadius: radiusVars['--cl-radius-sm'],
+    animationDuration: '2s',
+    animationIterationCount: 'infinite',
+    animationName: {
+      default: pulse,
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    animationTimingFunction: 'cubic-bezier(0.4, 0, 0.6, 1)',
+    backgroundColor: colorVars['--cl-color-neutral-alpha-200'],
+    height: '1lh',
+    width: space['16'],
+  },
   codes: {
     borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-md'],

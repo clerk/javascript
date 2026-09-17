@@ -31,6 +31,17 @@ function renderView(overrides: Partial<UserProfileBackupCodesDialogProps> = {}) 
 }
 
 describe('UserProfileBackupCodesDialog', () => {
+  it('shows the save-backup-codes step', () => {
+    renderView();
+    expect(screen.getByRole('dialog', { name: 'Save your backup codes' })).toHaveAccessibleDescription(
+      'Save these somewhere safe. Each code can be used once if you lose access to your phone.',
+    );
+    expect(screen.getAllByRole('listitem').map(item => item.textContent)).toEqual(codes);
+    expect(screen.getByRole('button', { name: 'Download', exact: true })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Copy and close' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Save backup codes' })).not.toBeInTheDocument();
+  });
+
   it('returns focus to the section’s Add button after completing a flow without a dialog trigger', async () => {
     const user = userEvent.setup();
     function Example() {
@@ -88,6 +99,8 @@ describe('UserProfileBackupCodesDialog', () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView({ codes: [], pendingAction: 'generate' });
     expect(screen.getByRole('progressbar', { name: 'Generating backup codes' })).toBeInTheDocument();
+    const loading = screen.getByRole('status', { name: 'Generating backup codes' });
+    expect(loading.textContent).toBe('');
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Copy and close' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Download', exact: true })).not.toBeInTheDocument();

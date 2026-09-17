@@ -10,13 +10,20 @@ import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { useEffect, useState } from 'react';
 
 interface FixtureOptions {
+  enrollmentBackupCodes?: readonly string[];
+  onRegenerateBackupCodes: () => Promise<readonly string[]>;
   onCopy: (codes: readonly string[]) => Promise<void>;
   onDownload: (codes: readonly string[]) => void | Promise<void>;
 }
 
 const pause = () => new Promise(resolve => setTimeout(resolve, 600));
 
-export function useUserProfileMfaFixture({ onCopy, onDownload }: FixtureOptions): {
+export function useUserProfileMfaFixture({
+  enrollmentBackupCodes,
+  onRegenerateBackupCodes,
+  onCopy,
+  onDownload,
+}: FixtureOptions): {
   section: UserProfileMfaSectionViewProps;
   authenticator: UserProfileAddAuthenticatorDialogProps;
   sms: UserProfileAddSmsDialogProps;
@@ -30,13 +37,13 @@ export function useUserProfileMfaFixture({ onCopy, onDownload }: FixtureOptions)
     ],
     authenticator: false,
     defaultPhoneId: 'personal',
-    backupGeneration: 0,
+    hasBackupCodes: false,
   });
-  const [flow, setFlow] = useState<UserProfileMfaAddableMethod>();
+  const [flow, setFlow] = useState<UserProfileMfaAddableMethod | 'backup-codes'>();
   const [pending, setPending] = useState<'submit' | 'resend' | 'generate' | 'copy' | 'download'>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [code, setCode] = useState('');
-  const [codes, setCodes] = useState<string[]>([]);
+  const [codes, setCodes] = useState<readonly string[]>([]);
   const [step, setStep] = useState<UserProfileAddSmsDialogProps['step']>('select');
   const [direction, setDirection] = useState<1 | -1>(1);
   const [verifyFrom, setVerifyFrom] = useState<'select' | 'phone'>('select');
@@ -66,30 +73,31 @@ export function useUserProfileMfaFixture({ onCopy, onDownload }: FixtureOptions)
       isDefault: !account.authenticator && phone.id === defaultPhoneId,
       canSetDefault: !account.authenticator && phone.id !== defaultPhoneId,
     })),
-    ...(account.backupGeneration > 0 ? [{ id: 'backup', type: 'backup-codes' as const }] : []),
+    ...(account.hasBackupCodes ? [{ id: 'backup', type: 'backup-codes' as const }] : []),
   ];
   const addableMethods: UserProfileMfaAddableMethod[] = ['sms'];
   if (!account.authenticator) {
     addableMethods.push('authenticator');
   }
-  if (account.backupGeneration === 0 && (account.authenticator || enrolledPhones.length > 0)) {
-    addableMethods.push('backup-codes');
-  }
-
-  const generate = async () => {
+  const regenerate = async () => {
+    if (pending || !account.hasBackupCodes) {
+      return;
+    }
     setFlow('backup-codes');
     setPending('generate');
     setErrorMessage(undefined);
     setCodes([]);
-    await pause();
-    const generation = account.backupGeneration + 1;
-    setCodes(
-      ['pwkkay', 'cvgunl', '4czio5', 'a38eew', 'qqnwzv', 'znq8j1', 'k4ro51', '1gjmkw', 'pnr8i0', 'ycga0j'].map(
-        value => `${value}${String(generation).padStart(2, '0')}`,
-      ),
-    );
-    setAccount(current => ({ ...current, backupGeneration: generation }));
-    setPending(undefined);
+    try {
+      const nextCodes = await onRegenerateBackupCodes();
+      if (nextCodes.length === 0) {
+        throw new Error('No backup codes returned');
+      }
+      setCodes(nextCodes);
+    } catch {
+      setErrorMessage('Unable to regenerate backup codes. Please try again.');
+    } finally {
+      setPending(undefined);
+    }
   };
 
   const open = (type: UserProfileMfaAddableMethod) => {
@@ -104,9 +112,6 @@ export function useUserProfileMfaFixture({ onCopy, onDownload }: FixtureOptions)
     setStep(eligiblePhones.length > 0 ? 'select' : 'phone');
     setDirection(1);
     setFlow(type);
-    if (type === 'backup-codes') {
-      void generate();
-    }
   };
 
   const close = (next: boolean) => {
@@ -116,13 +121,15 @@ export function useUserProfileMfaFixture({ onCopy, onDownload }: FixtureOptions)
     }
   };
 
-  const finishEnrollment = async () => {
+  const finishEnrollment = () => {
     setResendSeconds(0);
-    if (account.backupGeneration === 0) {
-      await generate();
+    setPending(undefined);
+    if (!account.hasBackupCodes && enrollmentBackupCodes?.length) {
+      setCodes(enrollmentBackupCodes);
+      setAccount(current => ({ ...current, hasBackupCodes: true }));
+      setFlow('backup-codes');
     } else {
       setFlow(undefined);
-      setPending(undefined);
     }
   };
 
@@ -133,7 +140,7 @@ export function useUserProfileMfaFixture({ onCopy, onDownload }: FixtureOptions)
     setPending('submit');
     await pause();
     setAccount(current => ({ ...current, authenticator: true }));
-    await finishEnrollment();
+    finishEnrollment();
   };
 
   const submitSms = async (value = code) => {
@@ -168,7 +175,7 @@ export function useUserProfileMfaFixture({ onCopy, onDownload }: FixtureOptions)
           ? current.phones.map(item => (item.id === phone.id ? enrolled : item))
           : [...current.phones, enrolled],
       }));
-      await finishEnrollment();
+      finishEnrollment();
       return;
     }
     setPhoneNumber(number);
@@ -225,7 +232,7 @@ export function useUserProfileMfaFixture({ onCopy, onDownload }: FixtureOptions)
       addableMethods,
       sectionTitle: 'Authentication',
       onAdd: open,
-      onRegenerateBackupCodes: () => open('backup-codes'),
+      onRegenerateBackupCodes: account.hasBackupCodes ? () => void regenerate() : undefined,
       onSetDefault: async id => {
         await pause();
         setAccount(current => ({ ...current, defaultPhoneId: id }));
@@ -234,15 +241,16 @@ export function useUserProfileMfaFixture({ onCopy, onDownload }: FixtureOptions)
         await pause();
         const phones = account.phones.map(phone => (phone.id === id ? { ...phone, enrolled: false } : phone));
         const authenticator = id === 'authenticator' ? false : account.authenticator;
-        const hasFactor = authenticator || phones.some(phone => phone.enrolled);
+        const hasSecondFactor = authenticator || phones.some(phone => phone.enrolled);
         setAccount(current => ({
           ...current,
           phones,
           authenticator,
-          backupGeneration: hasFactor ? current.backupGeneration : 0,
+          hasBackupCodes: current.hasBackupCodes && hasSecondFactor,
         }));
-        if (!hasFactor) {
+        if (!hasSecondFactor) {
           setCodes([]);
+          setFlow(undefined);
         }
       },
     },
@@ -306,7 +314,7 @@ export function useUserProfileMfaFixture({ onCopy, onDownload }: FixtureOptions)
       errorMessage,
       onRetry: () => {
         if (!pending) {
-          void generate();
+          void regenerate();
         }
       },
       onCopy: () => void save('copy'),

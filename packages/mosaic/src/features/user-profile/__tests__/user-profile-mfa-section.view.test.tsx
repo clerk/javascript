@@ -29,27 +29,25 @@ function renderView(overrides: Partial<UserProfileMfaSectionViewProps> = {}) {
 }
 
 describe('MFA section', () => {
-  it.each(['sms', 'authenticator', 'backup-codes'] as const)(
-    'continues immediately when the %s option is activated',
-    async type => {
-      const user = userEvent.setup();
-      const { props } = renderView({
-        methods: [{ id: 'existing', type: 'sms', description: '+1 801-555-0100' }],
-        addableMethods: ['sms', 'authenticator', 'backup-codes'],
-      });
-      const labels = { sms: 'SMS verification', authenticator: 'Authenticator app', 'backup-codes': 'Backup codes' };
+  it.each(['sms', 'authenticator'] as const)('continues immediately when the %s option is activated', async type => {
+    const user = userEvent.setup();
+    const { props } = renderView({
+      methods: [{ id: 'existing', type: 'sms', description: '+1 801-555-0100' }],
+      addableMethods: ['sms', 'authenticator'],
+    });
+    const labels = { sms: 'SMS verification', authenticator: 'Authenticator app' };
 
-      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-      const dialog = screen.getByRole('dialog', { name: 'Add 2-step verification' });
-      expect(dialog).toHaveAccessibleDescription('Choose a verification method');
-      expect(within(dialog).queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument();
-      await user.click(within(dialog).getByRole('button', { name: new RegExp(labels[type]) }));
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    const dialog = screen.getByRole('dialog', { name: 'Add 2-step verification' });
+    expect(dialog).toHaveAccessibleDescription('Choose a verification method');
+    expect(within(dialog).queryByRole('button', { name: /Backup codes/ })).not.toBeInTheDocument();
+    expect(within(dialog).queryByRole('button', { name: 'Continue' })).not.toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: new RegExp(labels[type]) }));
 
-      expect(props.onAdd).toHaveBeenCalledExactlyOnceWith(type);
-      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-      expect(screen.getByText('+1 801-555-0100')).toBeVisible();
-    },
-  );
+    expect(props.onAdd).toHaveBeenCalledExactlyOnceWith(type);
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByText('+1 801-555-0100')).toBeVisible();
+  });
 
   it.each(['authenticator', 'sms'] as const)('displays the supplied default state for %s', type => {
     const { props, rerender } = renderView({ methods: [{ id: 'method_1', type, isDefault: true }] });
