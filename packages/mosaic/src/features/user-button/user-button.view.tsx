@@ -21,6 +21,7 @@ import type { IconName } from '../../icons/registry';
 import { applyOrder } from '../../utils/apply-order';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { fill, plural } from '../../utils/messages';
+import { rtl } from '../../utils/rtl.styles';
 import { truncationStyles } from '../../utils/typography.styles';
 import type { UserButtonLayout } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
@@ -794,6 +795,7 @@ function SwitchAccountRow() {
         <Trailing>
           <Icon
             name='chevron-right'
+            xstyle={rtl.mirror}
             size='sm'
           />
         </Trailing>
@@ -957,6 +959,7 @@ function Footer() {
               <Icon
                 name='log-out'
                 size='sm'
+                xstyle={rtl.mirror}
               />
             }
             label={m.accounts.signOutAll}

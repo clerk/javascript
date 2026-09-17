@@ -52,8 +52,17 @@ rule reserves the `.stylex.ts` extension for StyleX define-primitives: **a
   components render the same visual surface — e.g. inputs (`TextInput`,
   `NumberInput`, date fields, `Selector`) sharing one `inputWrapper` /
   `inputStatusBorder` / `inputStatusFocusWithin` set instead of redefining the
-  border/focus treatment five times. Three exist today: `reset.styles.ts`,
-  `typography.styles.ts` and `focus-outline.styles.ts`.
+  border/focus treatment five times. Four exist today: `reset.styles.ts`,
+  `typography.styles.ts`, `focus-outline.styles.ts` and `rtl.styles.ts`.
+- **DO** compose `rtl.mirror` from `utils/rtl.styles.ts` onto a direction-aware
+  icon — a chevron that means "forward"/"back", a pagination arrow, the
+  log-out arrow leaving its frame — via its
+  `xstyle`. It flips the glyph with `scaleX(-1)` only under an ancestor carrying
+  `dir="rtl"`, so the same `chevron-right` reads as "forward" in both directions.
+  Pick it by meaning, not by shape: a chevron that points at a dropdown or an
+  external-link arrow stays unmirrored.
+- **DON'T** register a mirrored twin (`chevron-forward`) in the icon registry or
+  swap the name at the call site by direction. The direction lives in CSS.
 - **DON'T** put a shared style file under `components/`. That directory holds one
   subdirectory per component and nothing else, so a loose file there reads as a
   component that lost its folder.
