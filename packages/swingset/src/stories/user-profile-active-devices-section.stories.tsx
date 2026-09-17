@@ -3,8 +3,8 @@ import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user
 import type { StoryMeta } from '@/lib/types';
 
 import {
-  useUserProfileActiveDevicesFixture,
   userProfileImpersonationDevices,
+  useUserProfileActiveDevicesFixture,
 } from './fixtures/user-profile-active-devices';
 
 export { default as __source } from './user-profile-active-devices-section.stories?raw';

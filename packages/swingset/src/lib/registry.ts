@@ -42,6 +42,7 @@ import {
   meta as confirmationMeta,
   WithError as ConfirmationWithError,
 } from '../stories/confirmation.stories';
+import { Default as DataListDefault, meta as dataListMeta, Plain as DataListPlain } from '../stories/data-list.stories';
 import {
   Default as DestructiveDefault,
   meta as destructiveMeta,
@@ -105,7 +106,6 @@ import {
   meta as inputGroupMeta,
   Sizes as InputGroupSizes,
 } from '../stories/input-group.stories';
-import { Default as DataListDefault, meta as dataListMeta, Plain as DataListPlain } from '../stories/data-list.stories';
 import {
   Default as ItemDefault,
   Group as ItemGroup,
