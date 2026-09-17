@@ -1658,6 +1658,8 @@ export const enUS: LocalizationResource = {
       title: 'Check your email',
     },
     enterpriseConnections: {
+      connectionLabel: 'Enterprise SSO',
+      connectionSubtitle: 'Sign in with {{domain}}',
       subtitle: 'Select the enterprise account with which you wish to continue.',
       title: 'Choose your enterprise account',
     },
@@ -1813,6 +1815,8 @@ export const enUS: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: 'Enterprise SSO',
+      connectionSubtitle: 'Sign in with {{domain}}',
       subtitle: 'Select the enterprise account with which you wish to continue.',
       title: 'Choose your enterprise account',
     },

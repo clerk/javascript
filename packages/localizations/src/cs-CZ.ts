@@ -1626,6 +1626,8 @@ export const csCZ: LocalizationResource = {
       title: 'Zkontrolujte svůj e-mail',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1782,6 +1784,8 @@ export const csCZ: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

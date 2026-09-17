@@ -134,6 +134,11 @@ export type EnterpriseSSOFactor = {
    * @experimental
    */
   enterpriseConnectionName?: string;
+  enterpriseConnectionProvider?: string;
+  enterpriseConnectionLogoUrl?: string;
+  enterpriseConnectionOrganizationId?: string;
+  enterpriseConnectionOrganizationName?: string;
+  enterpriseConnectionDomain?: string;
 };
 
 /** @inline */

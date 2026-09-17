@@ -2219,3 +2219,43 @@ describe('SignUp', () => {
     });
   });
 });
+
+it('maps optional enterprise picker fields and tolerates an older response', async () => {
+  BaseResource._fetch = vi.fn().mockResolvedValue({
+    response: [
+      {
+        id: 'ec_1',
+        name: 'Google',
+        provider: 'oauth_google',
+        logo_public_url: 'https://example.com/google.svg',
+        organization_id: 'org_1',
+        organization_name: 'Acme',
+        domain: 'example.com',
+      },
+      { id: 'ec_2', name: 'Legacy' },
+    ],
+  });
+  const signUp = new SignUp();
+  signUp.id = 'signup_123';
+  const connections = await signUp.__experimental_getEnterpriseConnections();
+  expect(connections).toMatchObject([
+    {
+      id: 'ec_1',
+      name: 'Google',
+      provider: 'oauth_google',
+      logoPublicUrl: 'https://example.com/google.svg',
+      organizationId: 'org_1',
+      organizationName: 'Acme',
+      domain: 'example.com',
+    },
+    {
+      id: 'ec_2',
+      name: 'Legacy',
+      provider: undefined,
+      logoPublicUrl: undefined,
+      organizationId: undefined,
+      organizationName: undefined,
+      domain: undefined,
+    },
+  ]);
+});

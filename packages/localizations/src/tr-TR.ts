@@ -1619,6 +1619,8 @@ export const trTR: LocalizationResource = {
       title: 'E-postanızı kontrol edin',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1774,6 +1776,8 @@ export const trTR: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

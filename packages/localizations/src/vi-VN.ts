@@ -1627,6 +1627,8 @@ export const viVN: LocalizationResource = {
       title: 'Kiểm tra email của bạn',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Chọn tài khoản doanh nghiệp bạn muốn dùng để tiếp tục.',
       title: 'Chọn tài khoản doanh nghiệp của bạn',
     },
@@ -1782,6 +1784,8 @@ export const viVN: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Chọn tài khoản doanh nghiệp bạn muốn dùng để tiếp tục.',
       title: 'Chọn tài khoản doanh nghiệp của bạn',
     },

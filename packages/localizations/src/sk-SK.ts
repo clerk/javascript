@@ -1620,6 +1620,8 @@ export const skSK: LocalizationResource = {
       title: 'Skontrolujte svoj e-mail',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1775,6 +1777,8 @@ export const skSK: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

@@ -1620,6 +1620,8 @@ export const plPL: LocalizationResource = {
       title: 'Sprawdź swoją pocztę',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1776,6 +1778,8 @@ export const plPL: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

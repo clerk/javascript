@@ -1628,6 +1628,8 @@ export const jaJP: LocalizationResource = {
       title: 'メールを確認してください',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: '続行するエンタープライズアカウントを選択してください。',
       title: 'エンタープライズアカウントを選択',
     },
@@ -1783,6 +1785,8 @@ export const jaJP: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: '続行するエンタープライズアカウントを選択してください。',
       title: 'エンタープライズアカウントを選択',
     },

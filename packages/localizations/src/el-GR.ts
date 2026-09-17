@@ -1627,6 +1627,8 @@ export const elGR: LocalizationResource = {
       title: 'Ελέγξτε το email σας',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Συνδεθείτε με SSO επιχείρησης',
       title: 'Σύνδεση επιχείρησης',
     },
@@ -1784,6 +1786,8 @@ export const elGR: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Εγγραφείτε με SSO επιχείρησης',
       title: 'Εγγραφή επιχείρησης',
     },

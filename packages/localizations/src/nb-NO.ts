@@ -1630,6 +1630,8 @@ export const nbNO: LocalizationResource = {
       title: 'Sjekk din e-post',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Velg bedriftskontoen du ønsker å fortsette med.',
       title: 'Velg bedriftskonto',
     },
@@ -1786,6 +1788,8 @@ export const nbNO: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Velg bedriftskontoen du ønsker å fortsette med.',
       title: 'Velg bedriftskonto',
     },

@@ -693,6 +693,8 @@ export type ElementsConfig = {
   enterpriseConnectionsRoot: WithOptions;
   enterpriseConnectionButton: WithOptions;
   enterpriseConnectionButtonText: WithOptions;
+  enterpriseConnectionButtonIcon: WithOptions;
+  enterpriseConnectionButtonSubtitle: WithOptions;
 
   configureSSOConnectionScopeBanner: WithOptions;
   configureSSOHeader: WithOptions;

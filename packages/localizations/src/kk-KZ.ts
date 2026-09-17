@@ -1610,6 +1610,8 @@ export const kkKZ: LocalizationResource = {
       title: 'Электрондық поштаңызды тексеріңіз',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1765,6 +1767,8 @@ export const kkKZ: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

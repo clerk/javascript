@@ -1619,6 +1619,8 @@ export const thTH: LocalizationResource = {
       title: 'ตรวจสอบอีเมลของคุณ',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1773,6 +1775,8 @@ export const thTH: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

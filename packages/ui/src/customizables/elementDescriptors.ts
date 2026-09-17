@@ -557,6 +557,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'enterpriseConnectionsRoot',
   'enterpriseConnectionButton',
   'enterpriseConnectionButtonText',
+  'enterpriseConnectionButtonIcon',
+  'enterpriseConnectionButtonSubtitle',
 
   'configureSSOConnectionScopeBanner',
   'configureSSOHeader',

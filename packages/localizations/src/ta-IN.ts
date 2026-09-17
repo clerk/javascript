@@ -1633,6 +1633,8 @@ export const taIN: LocalizationResource = {
       title: 'உங்கள் மின்னஞ்சலைச் சரிபார்க்கவும்',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'நீங்கள் தொடர விரும்பும் நிறுவன கணக்கைத் தேர்ந்தெடுக்கவும்.',
       title: 'உங்கள் நிறுவன கணக்கைத் தேர்வு செய்யவும்',
     },
@@ -1788,6 +1790,8 @@ export const taIN: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'நீங்கள் தொடர விரும்பும் நிறுவன கணக்கைத் தேர்ந்தெடுக்கவும்.',
       title: 'உங்கள் நிறுவன கணக்கைத் தேர்வு செய்யவும்',
     },

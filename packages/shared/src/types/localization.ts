@@ -421,6 +421,8 @@ export type __internal_LocalizationResource = {
     enterpriseConnections: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      connectionLabel: LocalizationValue;
+      connectionSubtitle: LocalizationValue<'domain'>;
     };
     web3Solana: {
       title: LocalizationValue;
@@ -618,6 +620,8 @@ export type __internal_LocalizationResource = {
     enterpriseConnections: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
+      connectionLabel: LocalizationValue;
+      connectionSubtitle: LocalizationValue<'domain'>;
     };
     enterpriseSSO: {
       formButtonPrimary: LocalizationValue;

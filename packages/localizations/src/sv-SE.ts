@@ -1620,6 +1620,8 @@ export const svSE: LocalizationResource = {
       title: 'Kontrollera din e-post',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1776,6 +1778,8 @@ export const svSE: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

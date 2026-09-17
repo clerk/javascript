@@ -1631,6 +1631,8 @@ export const roRO: LocalizationResource = {
       title: 'Verificați-vă e-mailul',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1787,6 +1789,8 @@ export const roRO: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

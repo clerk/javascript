@@ -1629,6 +1629,8 @@ export const fiFI: LocalizationResource = {
       title: 'Tarkista sähköpostisi',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Valitse yritystili, jolla haluat jatkaa.',
       title: 'Valitse yritystilisi',
     },
@@ -1784,6 +1786,8 @@ export const fiFI: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Valitse yritystili, jolla haluat jatkaa.',
       title: 'Valitse yritystilisi',
     },

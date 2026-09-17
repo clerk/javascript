@@ -1611,6 +1611,8 @@ export const heIL: LocalizationResource = {
       title: 'בדוק את הדוא״ל שלך',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1764,6 +1766,8 @@ export const heIL: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

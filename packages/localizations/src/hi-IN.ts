@@ -1627,6 +1627,8 @@ export const hiIN: LocalizationResource = {
       title: 'अपना ईमेल जांचें',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'वह एंटरप्राइज़ खाता चुनें जिसके साथ आप जारी रखना चाहते हैं।',
       title: 'अपना एंटरप्राइज़ खाता चुनें',
     },
@@ -1783,6 +1785,8 @@ export const hiIN: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'वह एंटरप्राइज़ खाता चुनें जिसके साथ आप जारी रखना चाहते हैं।',
       title: 'अपना एंटरप्राइज़ खाता चुनें',
     },

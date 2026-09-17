@@ -1634,6 +1634,8 @@ export const deDE: LocalizationResource = {
       title: 'Überprüfen Sie Ihren Posteingang',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1791,6 +1793,8 @@ export const deDE: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },

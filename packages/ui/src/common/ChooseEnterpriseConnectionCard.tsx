@@ -1,26 +1,40 @@
+import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { PropsWithChildren } from 'react';
 import { useState } from 'react';
 
-import type { LocalizationKey } from '@/ui/customizables';
-import { descriptors, Flex, Grid, SimpleButton, Spinner, Text } from '@/ui/customizables';
+import {
+  descriptors,
+  Flex,
+  Grid,
+  localizationKeys,
+  SimpleButton,
+  Spinner,
+  Text,
+  useLocalizations,
+} from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { useCardState } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
-import type { InternalTheme, PropsOfComponent } from '@/ui/styledSystem';
 
-type ChooseEnterpriseConnectionCardProps = {
-  title: LocalizationKey;
-  subtitle: LocalizationKey;
-  onClick: (id: string) => Promise<void>;
-  enterpriseConnections: Array<{ id: string; name: string }>;
+import { ProviderIcon } from './ProviderIcon';
+
+type EnterpriseConnectionOption = {
+  id: string;
+  name?: string;
+  provider?: string;
+  logoPublicUrl?: string;
+  organizationName?: string;
+  domain?: string;
 };
 
-/**
- * @experimental
- */
+type ChooseEnterpriseConnectionCardProps = {
+  flow: 'signIn' | 'signUp';
+  onClick: (id: string) => Promise<void>;
+  enterpriseConnections: EnterpriseConnectionOption[];
+};
+
 export const ChooseEnterpriseConnectionCard = ({
-  title,
-  subtitle,
+  flow,
   onClick,
   enterpriseConnections,
   children,
@@ -31,88 +45,86 @@ export const ChooseEnterpriseConnectionCard = ({
     <Card.Root>
       <Card.Content>
         <Header.Root showLogo>
-          <Header.Title localizationKey={title} />
-          <Header.Subtitle localizationKey={subtitle} />
+          <Header.Title localizationKey={localizationKeys(`${flow}.enterpriseConnections.title`)} />
+          <Header.Subtitle localizationKey={localizationKeys(`${flow}.enterpriseConnections.subtitle`)} />
         </Header.Root>
         <Card.Alert>{card.error}</Card.Alert>
-
         <Grid
           elementDescriptor={descriptors.enterpriseConnectionsRoot}
           gap={2}
         >
-          {enterpriseConnections?.map(({ id, name }) => (
+          {enterpriseConnections.map(connection => (
             <ChooseEnterpriseConnectionButton
-              key={id}
-              id={id}
-              label={name}
+              key={connection.id}
+              connection={connection}
+              flow={flow}
               onClick={onClick}
             />
           ))}
         </Grid>
-
         {children}
       </Card.Content>
-
       <Card.Footer />
     </Card.Root>
   );
 };
 
-type ChooseEnterpriseConnectionButtonProps = Omit<PropsOfComponent<typeof SimpleButton>, 'onClick'> & {
-  id: string;
-  label?: string;
-  onClick: (id: string) => Promise<void>;
-};
-
-const ChooseEnterpriseConnectionButton = (props: ChooseEnterpriseConnectionButtonProps): JSX.Element => {
-  const { label, onClick, ...rest } = props;
+const ChooseEnterpriseConnectionButton = ({
+  connection,
+  flow,
+  onClick,
+}: Pick<ChooseEnterpriseConnectionCardProps, 'flow' | 'onClick'> & { connection: EnterpriseConnectionOption }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useLocalizations();
+  const providerKey = connection.provider?.replace(/^(saml|oauth)_/, '');
+  const provider = OAUTH_PROVIDERS.find(p => p.provider === providerKey);
+  const providerLabel =
+    provider?.name ||
+    (providerKey === 'okta' ? 'Okta' : t(localizationKeys(`${flow}.enterpriseConnections.connectionLabel`)));
+  const label = connection.name?.trim() || providerLabel;
+  const domain = connection.domain?.trim();
+  const subtitle =
+    connection.organizationName?.trim() ||
+    (domain ? t(localizationKeys(`${flow}.enterpriseConnections.connectionSubtitle`, { domain })) : providerLabel);
 
   const handleClick = () => {
     setIsLoading(true);
-    void onClick(props.id).catch(() => setIsLoading(false));
+    void onClick(connection.id).catch(() => setIsLoading(false));
   };
 
   return (
     <SimpleButton
       elementDescriptor={descriptors.enterpriseConnectionButton}
+      aria-label={`${label} ${subtitle}`}
       variant='outline'
       block
       isLoading={isLoading}
       hoverAsFocus
       onClick={handleClick}
-      {...rest}
-      sx={(theme: InternalTheme) => [
-        {
-          gap: theme.space.$4,
-          position: 'relative',
-          justifyContent: 'flex-start',
-        },
-        (rest as any).sx,
-      ]}
+      sx={theme => ({ gap: theme.space.$3, justifyContent: 'flex-start', paddingBlock: theme.space.$2 })}
     >
+      {isLoading ? (
+        <Spinner
+          size='sm'
+          elementDescriptor={descriptors.spinner}
+        />
+      ) : (
+        <ProviderIcon
+          id={provider?.provider || 'custom_enterprise_sso'}
+          iconUrl={connection.logoPublicUrl}
+          name={label}
+          size='$5'
+          aria-hidden
+          elementDescriptor={descriptors.enterpriseConnectionButtonIcon}
+          sx={{ flexShrink: 0 }}
+        />
+      )}
       <Flex
-        justify='center'
-        align='center'
         as='span'
-        gap={3}
-        sx={{
-          width: '100%',
-          overflow: 'hidden',
-        }}
+        direction='col'
+        align='start'
+        sx={{ minWidth: 0 }}
       >
-        {isLoading && (
-          <Flex
-            as='span'
-            center
-            sx={(theme: InternalTheme) => ({ flex: `0 0 ${theme.space.$4}` })}
-          >
-            <Spinner
-              size='sm'
-              elementDescriptor={descriptors.spinner}
-            />
-          </Flex>
-        )}
         <Text
           elementDescriptor={descriptors.enterpriseConnectionButtonText}
           as='span'
@@ -120,6 +132,15 @@ const ChooseEnterpriseConnectionButton = (props: ChooseEnterpriseConnectionButto
           variant='buttonLarge'
         >
           {label}
+        </Text>
+        <Text
+          elementDescriptor={descriptors.enterpriseConnectionButtonSubtitle}
+          as='span'
+          truncate
+          variant='caption'
+          colorScheme='secondary'
+        >
+          {subtitle}
         </Text>
       </Flex>
     </SimpleButton>

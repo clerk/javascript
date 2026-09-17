@@ -1630,6 +1630,8 @@ export const ptPT: LocalizationResource = {
       title: 'Verifique o seu e-mail',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Selecione a conta empresarial com a qual pretende continuar.',
       title: 'Escolha a sua conta empresarial',
     },
@@ -1784,6 +1786,8 @@ export const ptPT: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: 'Selecione a conta empresarial com a qual pretende continuar.',
       title: 'Escolha a sua conta empresarial',
     },

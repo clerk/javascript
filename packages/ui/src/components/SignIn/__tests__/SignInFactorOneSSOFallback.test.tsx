@@ -99,3 +99,47 @@ describe('SignInFactorOne SSO fallback', () => {
     await screen.findByText('Continue with SSO');
   });
 });
+
+it('keeps identical connection names distinguishable by organization and selects each ID', async () => {
+  const { wrapper, fixtures } = await createFixtures(f => {
+    f.withEmailAddress();
+    f.startSignInWithEnterpriseSSO({
+      enterpriseConnections: [
+        { id: 'ec_1', name: 'Google', provider: 'oauth_google', organizationName: 'Acme Labs', domain: 'example.com' },
+        { id: 'ec_2', name: 'Google', provider: 'oauth_google', organizationName: 'Acme Corp', domain: 'example.com' },
+      ],
+    });
+  });
+  fixtures.signIn.authenticateWithRedirect.mockResolvedValue(undefined);
+  const { userEvent } = render(<SignInFactorOne />, { wrapper });
+  await userEvent.click(await screen.findByRole('button', { name: 'Google Acme Labs' }));
+  expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenLastCalledWith(
+    expect.objectContaining({ enterpriseConnectionId: 'ec_1' }),
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Google Acme Corp' }));
+  expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenLastCalledWith(
+    expect.objectContaining({ enterpriseConnectionId: 'ec_2' }),
+  );
+});
+
+it('offers connections with absent names and provider icons', async () => {
+  const { wrapper } = await createFixtures(f => {
+    f.withEmailAddress();
+    f.startSignInWithEnterpriseSSO({
+      enterpriseConnections: [
+        { id: 'ec_1', provider: 'saml_okta', domain: 'example.com' },
+        {
+          id: 'ec_2',
+          name: ' ',
+          provider: 'oauth_google',
+          domain: 'other.com',
+          logoPublicUrl: 'https://example.com/google.svg',
+        },
+      ],
+    });
+  });
+  render(<SignInFactorOne />, { wrapper });
+  await screen.findByRole('button', { name: 'Okta Sign in with example.com' });
+  screen.getByRole('button', { name: 'Google Sign in with other.com' });
+  expect(document.querySelectorAll('.cl-enterpriseConnectionButtonIcon')).toHaveLength(2);
+});

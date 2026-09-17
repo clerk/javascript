@@ -1623,6 +1623,8 @@ export const esUY: LocalizationResource = {
       title: 'Revisa tu correo electrónico',
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
@@ -1779,6 +1781,8 @@ export const esUY: LocalizationResource = {
       },
     },
     enterpriseConnections: {
+      connectionLabel: undefined,
+      connectionSubtitle: undefined,
       subtitle: undefined,
       title: undefined,
     },
