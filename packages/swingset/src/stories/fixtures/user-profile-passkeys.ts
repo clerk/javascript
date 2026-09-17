@@ -1,4 +1,4 @@
-import type { UserProfilePasskey } from '@clerk/ui/mosaic/features/user-profile/user-profile-passkeys-section.view';
+import type { UserProfilePasskey } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
 import { useRef, useState } from 'react';
 
 interface PasskeysFixture {
