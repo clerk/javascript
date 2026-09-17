@@ -133,7 +133,7 @@ export const media = stylex.create({
     justifyContent: 'center',
   },
   xs: { width: space['4'] },
-  sm: { width: space['6'] },
+  sm: { width: space['5'] },
 });
 
 // The item lays its children out in one flat row, so the label is what has to take the space
@@ -141,7 +141,6 @@ export const media = stylex.create({
 // `minWidth: 0` is what lets it shrink past its text and truncate instead of pushing the row wide.
 export const label = stylex.create({
   base: {
-    paddingInline: space['1'],
     flexGrow: 1,
     minWidth: 0,
   },
