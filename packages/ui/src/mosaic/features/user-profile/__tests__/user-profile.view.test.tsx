@@ -143,7 +143,7 @@ describe('UserProfileView', () => {
     render(
       <MosaicProvider>
         <Dialog.Root defaultOpen>
-          <Dialog.Popup size='profile'>
+          <Dialog.Popup variant='profile'>
             <UserProfileView
               activePage='account'
               pages={pages}

@@ -24,7 +24,7 @@ jobs:
     name: Release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    timeout-minutes: 25
 
     permissions:
       actions: read
@@ -269,7 +269,7 @@ jobs:
     name: Canary release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    timeout-minutes: 25
     permissions:
       contents: read
       id-token: write
@@ -369,7 +369,7 @@ jobs:
     name: Snapshot release
     if: ${{ github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
     runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    timeout-minutes: 25
 
     permissions:
       contents: read

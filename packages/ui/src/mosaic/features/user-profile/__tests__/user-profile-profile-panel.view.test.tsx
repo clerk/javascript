@@ -50,7 +50,7 @@ describe('UserProfileProfilePanelView', () => {
     });
     await user.click(screen.getByRole('button', { name: 'Manage GitHub' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
 
     rerender(
       <MosaicProvider>
@@ -62,13 +62,13 @@ describe('UserProfileProfilePanelView', () => {
       </MosaicProvider>,
     );
     expect(screen.queryByRole('heading', { name: 'Connected accounts' })).not.toBeInTheDocument();
-    expect(screen.getByRole('dialog', { name: 'Remove connected account' })).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog', { name: 'Remove connected account' })).toBeInTheDocument();
 
     await act(async () => {
       removal.resolve();
       await removal.promise;
     });
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(screen.getByRole('heading', { name: 'Account', level: 3 })).toBeVisible();
   });
 
@@ -84,7 +84,7 @@ describe('UserProfileProfilePanelView', () => {
     });
     await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     rerender(
       <MosaicProvider>
         <UserProfileProfilePanelView
@@ -95,12 +95,12 @@ describe('UserProfileProfilePanelView', () => {
       </MosaicProvider>,
     );
     expect(screen.queryByRole('heading', { name: 'Web3 wallets' })).not.toBeInTheDocument();
-    expect(screen.getByRole('dialog')).toHaveTextContent('0x1234');
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('0x1234');
     await act(async () => {
       removal.resolve();
       await removal.promise;
     });
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
   it('keeps available providers visible without connected accounts', () => {
@@ -377,8 +377,8 @@ describe('UserProfileProfilePanelView', () => {
     expect(onRemoveEmail).not.toHaveBeenCalled();
     await user.click(screen.getByRole('menuitem', { name: 'Remove email' }));
     expect(onRemoveEmail).not.toHaveBeenCalled();
-    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     // Last: the edit-name dialog is modal, so the rest of the panel goes inert once it opens.
     await user.click(screen.getByRole('button', { name: 'Edit name' }));
 
@@ -466,7 +466,7 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(removeEmail);
     expect(onRemoveEmail).not.toHaveBeenCalled();
     await user.click(
-      within(screen.getByRole('dialog', { name: 'Remove email address?' })).getByRole('button', {
+      within(screen.getByRole('alertdialog', { name: 'Remove email address?' })).getByRole('button', {
         name: 'Remove',
       }),
     );
@@ -484,7 +484,7 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
     expect(onRemovePhone).not.toHaveBeenCalled();
     await user.click(
-      within(screen.getByRole('dialog', { name: 'Remove phone number?' })).getByRole('button', {
+      within(screen.getByRole('alertdialog', { name: 'Remove phone number?' })).getByRole('button', {
         name: 'Remove',
       }),
     );
@@ -500,7 +500,7 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(removeConnectedAccount);
     expect(onRemoveConnectedAccount).not.toHaveBeenCalled();
     await user.click(
-      within(screen.getByRole('dialog', { name: 'Remove connected account' })).getByRole('button', {
+      within(screen.getByRole('alertdialog', { name: 'Remove connected account' })).getByRole('button', {
         name: 'Remove',
       }),
     );

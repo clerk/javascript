@@ -9,11 +9,11 @@ import type {
   UserProfileModalProps,
   UserResource,
 } from '@clerk/shared/types';
+import { populateParamFromObject } from '@clerk/shared/url';
 
-import { populateParamFromObject } from '../../../contexts/utils';
-import { useOrganizationListInView } from '../../../hooks/useOrganizationListInView';
 import { useMosaicEnvironment } from '../../hooks/useMosaicEnvironment';
 import { useMosaicRouter } from '../../hooks/useMosaicRouter';
+import { useOrganizationListInView } from '../../hooks/useOrganizationListInView';
 import type {
   UserButtonBrandingProps,
   UserButtonCallbacks,

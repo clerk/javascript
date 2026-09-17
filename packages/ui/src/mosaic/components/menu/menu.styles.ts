@@ -2,6 +2,8 @@ import * as stylex from '@stylexjs/stylex';
 
 import {
   colorVars,
+  durationVars,
+  easingVars,
   fontFamilyVars,
   fontWeightVars,
   radiusVars,
@@ -28,23 +30,32 @@ export const popup = stylex.create({
     color: colorVars['--cl-color-foreground'],
     opacity: {
       default: 1,
-      ':is([data-ending-style])': 0,
-      ':is([data-starting-style])': 0,
+      ':where([data-starting-style], [data-ending-style])': 0,
     },
+    // The reduced-motion scale value goes too, or the exit snaps out of 96%.
     scale: {
       default: 1,
-      ':is([data-ending-style])': 0.96,
-      ':is([data-starting-style])': 0.96,
+      ':where([data-starting-style], [data-ending-style])': 0.96,
+      '@media (prefers-reduced-motion: reduce)': {
+        default: 1,
+        ':where([data-starting-style], [data-ending-style])': 1,
+      },
     },
     // `--cl-transform-origin` is set on the positioner by the headless `cssVars`
     // middleware, so the popup scales out of the edge nearest its trigger.
     transformOrigin: 'var(--cl-transform-origin)',
     transitionDuration: {
-      default: '150ms',
-      '@media (prefers-reduced-motion: reduce)': '0.01ms',
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
-    transitionProperty: 'opacity, scale',
-    transitionTimingFunction: 'ease-out',
+    transitionProperty: {
+      default: 'opacity, scale',
+      '@media (prefers-reduced-motion: reduce)': 'opacity',
+    },
+    transitionTimingFunction: {
+      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
+    },
     maxHeight: 'var(--cl-available-height)',
     // Capped, or the popup grows to whatever its longest item says and `Menu.Label` never
     // reaches the width it has to truncate at.
@@ -97,11 +108,6 @@ export const item = stylex.create({
     outlineOffset: 0,
     position: 'relative',
     textAlign: 'start',
-    transitionDuration: {
-      default: '150ms',
-      '@media (prefers-reduced-motion: reduce)': '0.01ms',
-    },
-    transitionProperty: 'background-color',
     height: space['8'],
     width: '100%',
     '::before': {
