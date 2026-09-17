@@ -73,7 +73,7 @@ export const item = stylex.create({
   base: {
     borderRadius: '0.375rem',
     borderStyle: 'none',
-    gap: space['1.5'],
+    gap: space['0.5'],
     outline: 'none',
     paddingInline: space['1.5'],
     alignItems: 'center',
@@ -141,6 +141,7 @@ export const media = stylex.create({
 // `minWidth: 0` is what lets it shrink past its text and truncate instead of pushing the row wide.
 export const label = stylex.create({
   base: {
+    paddingInline: space['1'],
     flexGrow: 1,
     minWidth: 0,
   },
