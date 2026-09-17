@@ -9,4 +9,4 @@ export const userProfileBackupCodesMessages = {
   generating: 'Generating backup codes',
   copying: 'Copying backup codes',
   downloading: 'Downloading backup codes',
-};
+} as const;

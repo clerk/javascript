@@ -9,7 +9,7 @@ import { Field } from '../../components/field';
 import { Icon } from '../../components/icon';
 import { InputGroup } from '../../components/input-group';
 import { Text } from '../../components/text';
-import { userProfileAuthenticatorSetupMessages as m } from './user-profile-authenticator-setup.messages';
+import { useMessages } from '../../localization';
 import { styles } from './user-profile-authenticator-setup.styles';
 
 export interface UserProfileAuthenticatorSetupViewProps {
@@ -27,6 +27,7 @@ export function UserProfileAuthenticatorSetupView({
   copyStatus,
   copyErrorMessage,
 }: UserProfileAuthenticatorSetupViewProps) {
+  const m = useMessages('userProfileAuthenticatorSetup');
   const [showSetupKey, setShowSetupKey] = useState(false);
 
   return (

@@ -4,8 +4,8 @@ import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { Dialog } from '../../components/dialog';
 import { Icon } from '../../components/icon';
+import { useMessages } from '../../localization';
 import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
-import { userProfileMfaMessages as m } from './user-profile-mfa-section.messages';
 import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.view';
 
 interface UserProfileAddMfaDialogProps {
@@ -16,6 +16,7 @@ interface UserProfileAddMfaDialogProps {
 }
 
 export function UserProfileAddMfaDialog({ methods, onSelect, disabled, triggerRef }: UserProfileAddMfaDialogProps) {
+  const m = useMessages('userProfileMfa');
   const [open, setOpen] = useState(false);
   return (
     <Dialog.Root

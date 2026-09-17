@@ -6,9 +6,9 @@ import { Card } from '../../components/card';
 import { useFlowAutoFocus } from '../../components/flow';
 import { Icon } from '../../components/icon';
 import { Text } from '../../components/text';
+import { useMessages } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
-import { userProfileBackupCodesMessages as m } from './user-profile-backup-codes.messages';
 import { styles } from './user-profile-backup-codes.styles';
 
 export interface UserProfileBackupCodesViewProps {
@@ -30,6 +30,7 @@ export function UserProfileBackupCodesView({
   pendingAction,
   errorMessage,
 }: UserProfileBackupCodesViewProps) {
+  const m = useMessages('userProfileBackupCodes');
   const actionRef = useFlowAutoFocus<HTMLButtonElement>();
   const hasCodes = codes.length > 0 && pendingAction !== 'generate';
 

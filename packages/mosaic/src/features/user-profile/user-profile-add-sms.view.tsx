@@ -8,7 +8,7 @@ import { Card } from '../../components/card';
 import { Field } from '../../components/field';
 import { Flow, type FlowDirection, useFlowAutoFocus } from '../../components/flow';
 import { Select } from '../../components/select';
-import { userProfileAddSmsMessages as m } from './user-profile-add-sms.messages';
+import { useMessages } from '../../localization';
 import { EnterPhoneStep, VerifyPhoneStep } from './user-profile-phone.steps';
 
 export interface UserProfileAddSmsViewProps {
@@ -35,6 +35,7 @@ export interface UserProfileAddSmsViewProps {
 }
 
 export function UserProfileAddSmsView(props: UserProfileAddSmsViewProps) {
+  const m = useMessages('userProfileAddSms');
   const selectRef = useMergeRefs([props.selectRef, useFlowAutoFocus<HTMLButtonElement>()]);
   const phoneRef = useMergeRefs([props.phoneRef, useFlowAutoFocus<HTMLInputElement>()]);
   return (
@@ -97,6 +98,7 @@ export function UserProfileAddSmsView(props: UserProfileAddSmsViewProps) {
 }
 
 function SelectPhoneStep(props: UserProfileAddSmsViewProps & { inputRef?: Ref<HTMLButtonElement> }) {
+  const m = useMessages('userProfileAddSms');
   const formId = useId();
   const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLButtonElement>()]);
   return (

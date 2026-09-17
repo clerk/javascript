@@ -12,4 +12,4 @@ export const userProfileAuthenticatorSetupMessages = {
   copied: 'Copied',
   viewSetupKey: 'Can’t scan? View setup key',
   scanQrCode: 'Scan QR code instead',
-};
+} as const;

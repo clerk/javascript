@@ -1,7 +1,7 @@
 import { Card } from '../../components/card';
 import { Icon, IconFrame } from '../../components/icon';
 import { Item } from '../../components/item';
-import { userProfileMfaMessages as m } from './user-profile-mfa-section.messages';
+import { useMessages } from '../../localization';
 import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.view';
 
 export interface UserProfileAddMfaViewProps {
@@ -16,6 +16,7 @@ const icons = {
 } as const;
 
 export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaViewProps) {
+  const m = useMessages('userProfileMfa');
   return (
     <>
       <Card.Header>

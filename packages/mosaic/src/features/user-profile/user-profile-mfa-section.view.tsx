@@ -2,10 +2,9 @@ import { type ReactNode, type Ref, useMemo, useRef, useState } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Text } from '../../components/text';
-import { fill } from '../../localization';
+import { fill, type MosaicMessages, useMessages } from '../../localization';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileMfaRowView } from './user-profile-mfa-row.view';
-import { userProfileMfaMessages as m } from './user-profile-mfa-section.messages';
 import { UserProfileSecurityList } from './user-profile-security-list';
 
 export interface UserProfileMfaMethod {
@@ -43,6 +42,7 @@ export function UserProfileMfaSectionView({
   onRemove,
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
+  const m = useMessages('userProfileMfa');
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
   const [isSettingDefault, setIsSettingDefault] = useState(false);
   const [defaultError, setDefaultError] = useState<string>();
@@ -113,7 +113,7 @@ export function UserProfileMfaSectionView({
         <Confirmation
           handle={removeMethod}
           title={method => (method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle)}
-          description={describeMethodRemoval}
+          description={method => describeMethodRemoval(method, m)}
           actionLabel={m.removeDialog.confirm}
           onConfirm={method => onRemove(method.id)}
         />
@@ -122,7 +122,7 @@ export function UserProfileMfaSectionView({
   );
 }
 
-function describeMethodRemoval(method: UserProfileMfaMethod) {
+function describeMethodRemoval(method: UserProfileMfaMethod, m: MosaicMessages['userProfileMfa']) {
   if (method.type === 'sms') {
     return method.description
       ? fill(m.removeDialog.smsDescription, { phoneNumber: method.description })

@@ -35,4 +35,4 @@ export const userProfileMfaMessages = {
       'Verification codes from this authenticator will no longer be required when signing in. Your account may not be as secure.',
     confirm: 'Remove',
   },
-};
+} as const;

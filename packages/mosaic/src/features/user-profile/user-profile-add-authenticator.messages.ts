@@ -5,4 +5,4 @@ export const userProfileAddAuthenticatorMessages = {
   pending: 'Verifying code',
   preparing: 'Preparing authenticator…',
   retry: 'Try again',
-};
+} as const;

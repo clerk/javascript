@@ -1,9 +1,8 @@
 import { Badge } from '../../components/badge';
 import { Section } from '../../components/section';
-import { fill } from '../../localization';
+import { fill, useMessages } from '../../localization';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
-import { userProfileMfaMessages as m } from './user-profile-mfa-section.messages';
 import { styles } from './user-profile-mfa-section.styles';
 import type { UserProfileMfaMethod, UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
@@ -18,6 +17,7 @@ export function UserProfileMfaRowView({
   onRemove?: () => void;
   onSetDefault?: (id: string) => void;
 }) {
+  const m = useMessages('userProfileMfa');
   const label = method.label ?? m.methods[method.type];
   const manageLabel =
     method.type === 'sms' && method.description

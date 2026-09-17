@@ -7,9 +7,8 @@ import { Field } from '../../components/field';
 import { useFlowAutoFocus } from '../../components/flow';
 import { Otp } from '../../components/otp';
 import { Text } from '../../components/text';
-import { userProfileAddAuthenticatorMessages as m } from './user-profile-add-authenticator.messages';
+import { useMessages } from '../../localization';
 import { styles } from './user-profile-add-authenticator.styles';
-import { userProfileAuthenticatorSetupMessages as setupMessages } from './user-profile-authenticator-setup.messages';
 import type { UserProfileAuthenticatorSetupViewProps } from './user-profile-authenticator-setup.view';
 import { UserProfileAuthenticatorSetupView } from './user-profile-authenticator-setup.view';
 
@@ -42,6 +41,8 @@ export function UserProfileAddAuthenticatorView({
   isPending = false,
   errorMessage,
 }: UserProfileAddAuthenticatorViewProps) {
+  const m = useMessages('userProfileAddAuthenticator');
+  const setupMessages = useMessages('userProfileAuthenticatorSetup');
   const formId = useId();
   const actionRef = useFlowAutoFocus<HTMLButtonElement>();
   const submitCode = (value: string) => {
