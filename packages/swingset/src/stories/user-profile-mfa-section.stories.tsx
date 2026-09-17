@@ -1,12 +1,16 @@
-import { UserProfileAddAuthenticatorDialog } from '@clerk/mosaic/features/user-profile/user-profile-add-authenticator.dialog';
-import { UserProfileAddSmsDialog } from '@clerk/mosaic/features/user-profile/user-profile-add-sms.dialog';
-import { UserProfileBackupCodesDialog } from '@clerk/mosaic/features/user-profile/user-profile-backup-codes.dialog';
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import { UserProfileAddAuthenticatorView } from '@clerk/mosaic/features/user-profile/user-profile-add-authenticator.view';
+import { UserProfileAddSmsView } from '@clerk/mosaic/features/user-profile/user-profile-add-sms.view';
+import { UserProfileBackupCodesView } from '@clerk/mosaic/features/user-profile/user-profile-backup-codes.view';
 import { UserProfileMfaSectionView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
-import { useRef } from 'react';
+import { type ComponentType, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { useUserProfileMfaFixture } from './fixtures/user-profile-mfa';
+import { useAuthenticatorCopy } from './fixtures/user-profile-authenticator';
+import { mfaDemoOptions, useUserProfileMfaFixture } from './fixtures/user-profile-mfa';
+import { useUserProfileMfaExample } from './fixtures/user-profile-mfa-example';
 
 export { default as __source } from './user-profile-mfa-section.stories?raw';
 
@@ -21,87 +25,98 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  const addButtonRef = useRef<HTMLButtonElement>(null);
+  const mfa = useUserProfileMfaExample();
+  return <UserProfileMfaSectionView {...mfa.section} />;
+}
+
+export function Sms() {
+  return <RestartableExample component={SmsExample} />;
+}
+
+function SmsExample({ onRestart }: { onRestart: () => void }) {
+  const fixture = useUserProfileMfaFixture({ ...mfaDemoOptions, initialFlow: 'sms', enrollmentBackupCodes: [] });
+
+  if (!fixture.sms.open) {
+    return <ExampleComplete onRestart={onRestart} />;
+  }
+
+  return (
+    <Card.Root renderBranding={false}>
+      <UserProfileAddSmsView
+        {...fixture.sms}
+        onCancel={() => fixture.sms.onOpenChange(false)}
+      />
+    </Card.Root>
+  );
+}
+
+export function Authenticator() {
+  return <RestartableExample component={AuthenticatorExample} />;
+}
+
+function AuthenticatorExample({ onRestart }: { onRestart: () => void }) {
+  const copy = useAuthenticatorCopy();
   const fixture = useUserProfileMfaFixture({
-    enrollmentBackupCodes: [
-      'pwkkay19',
-      'cvgunlqs',
-      '4czio578',
-      'a38eewtw',
-      'qqnwzvyr',
-      'znq8j16s',
-      'k4ro51h1',
-      '1gjmkwdb',
-      'pnr8i06f',
-      'ycga0jge',
-    ],
-    onGenerateBackupCodes: () =>
-      Promise.resolve([
-        'demo-new-01',
-        'demo-new-02',
-        'demo-new-03',
-        'demo-new-04',
-        'demo-new-05',
-        'demo-new-06',
-        'demo-new-07',
-        'demo-new-08',
-        'demo-new-09',
-        'demo-new-10',
-      ]),
-    onCopy: codes => navigator.clipboard.writeText(codes.join('\n')),
-    onDownload: codes => {
-      const blob = new Blob(['Swingset demo backup codes\n\n', codes.join('\n')], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'swingset-backup-codes.txt';
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(url), 0);
-    },
+    ...mfaDemoOptions,
+    initialFlow: 'authenticator',
+    enrollmentBackupCodes: [],
   });
 
-  const finalFocus = fixture.authenticator.open || fixture.sms.open || fixture.backupCodes.open ? false : addButtonRef;
+  if (!fixture.authenticator.open) {
+    return <ExampleComplete onRestart={onRestart} />;
+  }
 
   return (
-    <>
-      <UserProfileMfaSectionView
-        {...fixture.section}
-        addButtonRef={addButtonRef}
-      />
-      <UserProfileAddAuthenticatorDialog
+    <Card.Root renderBranding={false}>
+      <UserProfileAddAuthenticatorView
         {...fixture.authenticator}
-        finalFocus={finalFocus}
+        {...copy}
+        onCancel={() => fixture.authenticator.onOpenChange(false)}
       />
-      <UserProfileAddSmsDialog
-        {...fixture.sms}
-        finalFocus={finalFocus}
-      />
-      <UserProfileBackupCodesDialog
+    </Card.Root>
+  );
+}
+
+export function BackupCodes() {
+  return <RestartableExample component={BackupCodesExample} />;
+}
+
+function BackupCodesExample({ onRestart }: { onRestart: () => void }) {
+  const fixture = useUserProfileMfaFixture({ ...mfaDemoOptions, initialFlow: 'backup-codes' });
+
+  if (!fixture.backupCodes.open) {
+    return <ExampleComplete onRestart={onRestart} />;
+  }
+
+  return (
+    <Card.Root renderBranding={false}>
+      <UserProfileBackupCodesView
         {...fixture.backupCodes}
-        finalFocus={finalFocus}
+        onCancel={() => fixture.backupCodes.onOpenChange(false)}
       />
-    </>
+    </Card.Root>
   );
 }
 
-export function ReadOnly() {
+function RestartableExample({ component: Component }: { component: ComponentType<{ onRestart: () => void }> }) {
+  const [run, setRun] = useState(0);
   return (
-    <UserProfileMfaSectionView
-      methods={[
-        { id: 'authenticator', type: 'authenticator', isDefault: true, canRemove: false },
-        { id: 'sms', type: 'sms', description: '+1 801-555-0100' },
-        { id: 'backup', type: 'backup-codes' },
-      ]}
-      sectionTitle='Authentication'
+    <Component
+      key={run}
+      onRestart={() => setRun(current => current + 1)}
     />
   );
 }
 
-export function Empty() {
+function ExampleComplete({ onRestart }: { onRestart: () => void }) {
   return (
-    <UserProfileMfaSectionView
-      methods={[]}
-      sectionTitle='Authentication'
-    />
+    <div>
+      <Button
+        type='button'
+        onClick={onRestart}
+      >
+        Restart
+      </Button>
+    </div>
   );
 }

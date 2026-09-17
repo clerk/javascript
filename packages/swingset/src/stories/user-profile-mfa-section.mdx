@@ -2,13 +2,13 @@ import * as Stories from './user-profile-mfa-section.stories';
 
 # UserProfileMfaSection
 
-Display and manage two-step verification methods. The playground connects setup, backup codes, default selection, and removal using local account state.
+Display and manage two-step verification methods.
 
 ## Playground
 
-Choose Add, then click SMS verification or Authenticator app to start setup. Enter any six digits to complete verification. Successful enrollment updates the rows. When the instance enables backup codes, enrollment supplies them automatically; both methods open the Save your backup codes screen. Use each row’s menu to change the default, remove a method, or regenerate backup codes.
+Choose Add to set up a method. Use `000000` to see an incorrect-code error; other six-digit codes succeed. Row menus let you change the default, remove a method, or regenerate backup codes.
 
-Account requests are simulated with fixed demo responses and succeed by default. Copy and Download save the demo codes to your clipboard or a text file. Reload the page to reset the account.
+Account changes are simulated. Copy and Download use your browser’s clipboard and file downloads.
 
 <Story
   name='Default'
@@ -27,6 +27,7 @@ Account requests are simulated with fixed demo responses and succeed by default.
     { name: 'Flow', href: '/components/flow', layer: 'Components' },
     { name: 'Field', href: '/components/field', layer: 'Components' },
     { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'InputGroup', href: '/components/input-group', layer: 'Components' },
     { name: 'Select', href: '/components/select', layer: 'Components' },
     { name: 'PhoneInput', href: '/components/phone-input', layer: 'Components' },
     { name: 'Otp', href: '/components/otp', layer: 'Components' },
@@ -35,120 +36,24 @@ Account requests are simulated with fixed demo responses and succeed by default.
   ]}
 />
 
-## Props
-
-| Prop                      | Type                                          | Default      | Description                                                                                          |
-| ------------------------- | --------------------------------------------- | ------------ | ---------------------------------------------------------------------------------------------------- |
-| `methods`                 | `UserProfileMfaMethod[]`                      | — (required) | Prepared rows, in display order. All supplied rows render.                                           |
-| `addableMethods`          | `readonly UserProfileMfaAddableMethod[]`      | —            | Available choices, in display order. Add appears when this is nonempty and `onAdd` is supplied.      |
-| `sectionTitle`            | `string`                                      | —            | Optional surrounding heading.                                                                        |
-| `addButtonRef`            | `Ref<HTMLButtonElement>`                      | —            | Ref to the Add button for restoring focus after setup dialogs close.                                 |
-| `onAdd`                   | `(type: UserProfileMfaAddableMethod) => void` | —            | Receives the chosen method immediately when its option is activated.                                 |
-| `onSetDefault`            | `(id: string) => void \| Promise<void>`       | —            | Changes the default SMS method. Shows pending feedback and reports failures beside the selected row. |
-| `onRemove`                | `(id: string) => void \| Promise<void>`       | —            | Called after confirmation. Resolve to close; reject with an Error to show the failure.               |
-| `onRegenerateBackupCodes` | `() => void`                                  | —            | Requests backup-code regeneration.                                                                   |
-
-Each method has an `id`, a `type` (`sms`, `authenticator`, or `backup-codes`), and optional `label` and `description`. Supply the formatted phone number as the SMS description so its menu has a distinct accessible name.
-
-`UserProfileMfaAddableMethod` is `sms` or `authenticator`. The caller supplies available choices independently of existing rows, so another SMS number can be added. The Security panel forwards these choices through `addableMfaMethods`. Backup codes are supplied automatically during enrollment when enabled for the instance; they are never an Add choice.
-
-| Method field    | Type      | Default | Description                                                                   |
-| --------------- | --------- | ------- | ----------------------------------------------------------------------------- |
-| `isDefault`     | `boolean` | `false` | Displays the Default badge.                                                   |
-| `canRemove`     | `boolean` | `true`  | Allows removal of an SMS or authenticator method when `onRemove` is supplied. |
-| `canSetDefault` | `boolean` | `false` | Allows Set as default on an SMS method when `onSetDefault` is supplied.       |
-
-### Authenticator dialog
-
-`UserProfileAddAuthenticatorDialog` combines setup and code verification in one controlled dialog.
-
-| Prop           | Type                           | Default      | Description                                                                          |
-| -------------- | ------------------------------ | ------------ | ------------------------------------------------------------------------------------ |
-| `open`         | `boolean`                      | — (required) | Whether the dialog is open.                                                          |
-| `onOpenChange` | `(open: boolean) => void`      | — (required) | Receives open and dismiss requests.                                                  |
-| `trigger`      | `DialogTriggerProps['render']` | —            | Optional trigger that receives focus when the dialog closes.                         |
-| `finalFocus`   | `DialogFocusTarget`            | —            | Optional focus destination after a flow opened without its own trigger closes.       |
-| `secret`       | `string`                       | — (required) | Prepared authenticator setup key.                                                    |
-| `uri`          | `string`                       | — (required) | Matching authenticator URI, encoded in the QR code and available for manual entry.   |
-| `code`         | `string`                       | — (required) | Current verification code.                                                           |
-| `onCodeChange` | `(value: string) => void`      | — (required) | Receives code edits.                                                                 |
-| `onSubmit`     | `(code: string) => void`       | — (required) | Receives six digits after completion or a Verify submission.                         |
-| `isPending`    | `boolean`                      | `false`      | Disables code entry and Cancel; Verify shows progress and blocks repeat submissions. |
-| `errorMessage` | `string`                       | —            | Feedback associated with the verification field.                                     |
-
-### SMS dialog
-
-`UserProfileAddSmsDialog` combines number selection with the shared phone-entry and verification steps.
-
-| Prop                      | Type                                             | Default      | Description                                                                                             |
-| ------------------------- | ------------------------------------------------ | ------------ | ------------------------------------------------------------------------------------------------------- |
-| `open`                    | `boolean`                                        | — (required) | Whether the dialog is open.                                                                             |
-| `onOpenChange`            | `(open: boolean) => void`                        | — (required) | Receives open and dismiss requests.                                                                     |
-| `trigger`                 | `DialogTriggerProps['render']`                   | —            | Trigger that receives focus after dismissal.                                                            |
-| `finalFocus`              | `DialogFocusTarget`                              | —            | Optional focus destination after a flow opened without its own trigger closes.                          |
-| `step`                    | `'select' \| 'phone' \| 'verify'`                | — (required) | Active screen.                                                                                          |
-| `direction`               | `1 \| -1`                                        | `1`          | Forward or backward transition.                                                                         |
-| `phoneNumbers`            | `readonly { id: string; phoneNumber: string }[]` | — (required) | Eligible existing numbers, in display order.                                                            |
-| `selectedPhoneId`         | `string`                                         | — (required) | Selected number ID; an empty string disables Continue.                                                  |
-| `onSelectedPhoneIdChange` | `(id: string) => void`                           | — (required) | Receives a Select choice.                                                                               |
-| `onAddPhone`              | `() => void`                                     | — (required) | Requests phone entry.                                                                                   |
-| `onBack`                  | `() => void`                                     | — (required) | Requests the previous screen.                                                                           |
-| `phoneNumber`             | `string`                                         | — (required) | Phone-entry value or the number being verified.                                                         |
-| `onPhoneNumberChange`     | `(value: string) => void`                        | — (required) | Receives phone edits.                                                                                   |
-| `code`                    | `string`                                         | — (required) | Current verification code.                                                                              |
-| `onCodeChange`            | `(value: string) => void`                        | — (required) | Receives code edits.                                                                                    |
-| `onSubmit`                | `(code?: string) => void`                        | — (required) | Submits the active step. OTP completion supplies the completed code; form submission uses caller state. |
-| `onResend`                | `() => void`                                     | — (required) | Requests another verification code.                                                                     |
-| `isPending`               | `boolean`                                        | `false`      | Blocks edits and navigation and shows submit progress.                                                  |
-| `errorMessage`            | `string`                                         | —            | Error associated with the active field.                                                                 |
-| `isResending`             | `boolean`                                        | `false`      | Blocks code entry, verification, resend, and Back while sending.                                        |
-| `resendSeconds`           | `number`                                         | `0`          | Seconds remaining before resend becomes available.                                                      |
-
-### Backup codes dialog
-
-`UserProfileBackupCodesDialog` displays supplied codes with Download and Copy and close actions. SMS enrollment, authenticator enrollment, and regeneration use the same Save your backup codes screen.
-
-| Prop            | Type                                 | Default      | Description                                                                      |
-| --------------- | ------------------------------------ | ------------ | -------------------------------------------------------------------------------- |
-| `open`          | `boolean`                            | — (required) | Whether the dialog is open.                                                      |
-| `onOpenChange`  | `(open: boolean) => void`            | — (required) | Receives open and dismiss requests.                                              |
-| `trigger`       | `DialogTriggerProps['render']`       | —            | Optional trigger that receives focus after dismissal.                            |
-| `finalFocus`    | `DialogFocusTarget`                  | —            | Optional focus destination after a flow opened without its own trigger closes.   |
-| `codes`         | `readonly string[]`                  | — (required) | Generated codes in display order; use an empty array before generation succeeds. |
-| `onRetry`       | `() => void`                         | — (required) | Requests another generation attempt.                                             |
-| `onCopy`        | `() => void`                         | — (required) | Requests copying the codes. The caller closes the dialog after success.          |
-| `onDownload`    | `() => void`                         | — (required) | Requests downloading the codes; the dialog remains open.                         |
-| `pendingAction` | `'generate' \| 'copy' \| 'download'` | —            | Displays progress and blocks overlapping actions. Generation hides old codes.    |
-| `errorMessage`  | `string`                             | —            | Announced error feedback; save failures leave the current codes visible.         |
-
 ## Usage
 
-The caller decides whether to mount the section from the instance's second-factor configuration, even when existing methods are present. When mounted, the section stays visible with no methods or callbacks. The caller also prepares the method order, default indicators, and removal permissions, including restrictions when MFA is required. Backup-code rows only offer regeneration.
+The views receive data and callbacks from the caller, which owns enrollment requests, progress, errors, and clipboard/download actions.
 
-Callbacks report user intent; updated props determine the displayed result. Set as default awaits its callback, blocks overlapping method actions, and leaves the current badge in place until `methods` changes. Rejections appear below the selected row and are announced to assistive technology. Retrying clears the error. The section owns one removal confirmation, opened with the selected method. Confirmation owns its pending and error state; update `methods` after a successful removal. Removing SMS verification leaves the phone number on the account.
+## Authenticator
 
-### Set up a method
+Scan the QR code or choose “Can’t scan?” to view and copy the setup key, then enter a verification code.
 
-The Add picker opens the selected setup dialog. Already enrolled authenticators are excluded from the choices. SMS remains available for additional numbers; its select excludes numbers already enrolled. Verified numbers enable SMS directly. Unverified or new numbers require a six-digit code, with Back and Resend available. Cancelling setup leaves the account unchanged.
+<Story name='Authenticator' storyModule={Stories} />
 
-Authenticator setup supports both QR codes and a read-only setup key. Completing setup adds the method to the section. When enrollment supplies new backup codes, their row is added immediately and the Save your backup codes dialog displays the supplied codes without generating another set. If enrollment supplies no codes, setup finishes without opening the save flow or adding a backup-code row. Subsequent enrollment preserves existing backup codes.
+## SMS
 
-### Save and regenerate backup codes
+Select a number or add a new one, then verify it if required.
 
-Download saves a text file and keeps the dialog open. Copy and close closes after the clipboard write succeeds. A browser failure leaves the codes visible with retry feedback. Regenerate from the backup-code row replaces the displayed set only after a successful response containing codes. Failed or empty regeneration responses show retry feedback. The caller owns enrollment results, regeneration, clipboard access, file creation, pending state, and error feedback.
+<Story name='Sms' storyModule={Stories} />
 
-### Manage methods
+## Backup codes
 
-Set as default updates the badge after completion. An authenticator takes precedence when enrolled; otherwise the selected SMS method is the default. Remove method opens a confirmation and updates the rows after success. Removing SMS keeps the phone available for re-enrollment. Removing the last authenticator or SMS method also removes backup codes, matching legacy behavior. Backup codes remain while another verification method is enrolled. The caller supplies the remaining rows from the updated account state.
+Download the demo codes or choose Copy and close to finish.
 
-### Read-only methods
-
-Omitting callbacks hides their actions without hiding the rows.
-
-<Story name='ReadOnly' storyModule={Stories} />
-
-### No methods
-
-An empty section remains visible when Add is unavailable.
-
-<Story name='Empty' storyModule={Stories} />
+<Story name='BackupCodes' storyModule={Stories} />
