@@ -1,4 +1,9 @@
-import type { UserButtonData, UserButtonMode, UserButtonModePriority } from './user-button.types';
+import type {
+  UserButtonData,
+  UserButtonHeaderLayout,
+  UserButtonMode,
+  UserButtonModePriority,
+} from './user-button.types';
 
 /*
  * Which mode puts what where. The surface is three slots deep, in this order, and each mode fills
@@ -85,6 +90,7 @@ export interface UserButtonLayout {
    */
   showOrganizationsHeading: boolean;
   describeAccountByOrganization: boolean;
+  headerLayout: UserButtonHeaderLayout;
   /** What each slot carries, in the order it renders. */
   actions: Record<UserButtonSlot, UserButtonAction[]>;
 }
@@ -104,16 +110,19 @@ export function resolveUserButtonLayout(
   const hasOrganizations = data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0;
 
   /** The action this surface actually carries in place of the one declared, or `null` for none. */
-  const resolve = (action: UserButtonAction): UserButtonAction | null => {
+  const resolve = (slot: UserButtonSlot, action: UserButtonAction): UserButtonAction | null => {
     switch (action) {
       // Inviting belongs to whichever organization is active, even where the account is what heads
       // the surface.
       case 'inviteMembers':
         return data.activeOrganization ? action : null;
-      // "All accounts" is one account. The account's own row already signs out of it, so the foot
-      // would be offering the same thing over again, in the plural.
+      case 'signOut':
+        return slot === 'header' && !hasOtherSessions ? null : action;
+      // "All accounts" is one account. Where the account's own row already signs out of it, the foot
+      // would be offering the same thing over again, in the plural; a user surface has no such row,
+      // so its foot signs the one account out in the singular instead.
       case 'signOutAll':
-        return hasOtherSessions ? action : null;
+        return hasOtherSessions ? action : mode === 'user' ? 'signOut' : null;
       // With no second account there is nothing to switch between, so the flyout collapses to the
       // one row it would have opened onto.
       case 'switchAccount':
@@ -123,8 +132,10 @@ export function resolveUserButtonLayout(
     }
   };
 
-  const slot = (actions: readonly UserButtonAction[]): UserButtonAction[] =>
-    actions.map(resolve).filter((action): action is UserButtonAction => action !== null);
+  const slot = (name: UserButtonSlot, actions: readonly UserButtonAction[]): UserButtonAction[] =>
+    actions.map(action => resolve(name, action)).filter((action): action is UserButtonAction => action !== null);
+
+  const header = slot('header', declared.header);
 
   return {
     // Only a combined surface has two things to choose between; the other two are what they are.
@@ -132,11 +143,12 @@ export function resolveUserButtonLayout(
     showOrganizations: declared.organizations !== false && hasOrganizations,
     showOrganizationsHeading: organizationsHeading !== false,
     describeAccountByOrganization: declared.organizations !== false,
+    headerLayout: header.some(action => action !== 'manageLead') ? 'stacked' : 'inline',
     actions: {
-      header: slot(declared.header),
-      organizationsHeading: organizationsHeading === false ? [] : slot(organizationsHeading),
-      organizationsFooter: slot(organizationsFooter),
-      footer: slot(declared.footer),
+      header,
+      organizationsHeading: organizationsHeading === false ? [] : slot('organizationsHeading', organizationsHeading),
+      organizationsFooter: slot('organizationsFooter', organizationsFooter),
+      footer: slot('footer', declared.footer),
     },
   };
 }

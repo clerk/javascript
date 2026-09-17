@@ -168,9 +168,10 @@ export interface UserButtonBusyState {
  *
  * `switchAccount` and `addAccount` share a slot: the foot carries the flyout of signed-in accounts
  * where there is more than one, and the row it would have opened onto where there is not. Name both
- * to place that slot whichever way it resolves.
+ * to place that slot whichever way it resolves. `signOutAll` and `signOut` share one the same way on
+ * a user surface: it signs out of all accounts where there is more than one, and of the one otherwise.
  */
-export type UserButtonMenuItemId = 'switchAccount' | 'addAccount' | 'signOutAll';
+export type UserButtonMenuItemId = 'switchAccount' | 'addAccount' | 'signOutAll' | 'signOut';
 
 interface UserButtonMenuItemBase {
   /** Identifies the row, for ordering. */

@@ -268,19 +268,18 @@ export function UserPriority(_args: Record<string, unknown>) {
   );
 }
 
-export function StackedHeader(_args: Record<string, unknown>) {
+export function AvatarOnly(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 
   return (
     <UserButtonView
       {...prototype}
-      mode='combined'
-      headerLayout='stacked'
+      renderTriggerLabel={false}
     />
   );
 }
 
-export function UserPriorityStackedHeader(_args: Record<string, unknown>) {
+export function UserPriorityAvatarOnly(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 
   return (
@@ -288,17 +287,6 @@ export function UserPriorityStackedHeader(_args: Record<string, unknown>) {
       {...prototype}
       mode='combined'
       modePriority='user'
-      headerLayout='stacked'
-    />
-  );
-}
-
-export function AvatarOnly(_args: Record<string, unknown>) {
-  const prototype = usePrototype();
-
-  return (
-    <UserButtonView
-      {...prototype}
       renderTriggerLabel={false}
     />
   );
@@ -360,6 +348,22 @@ export function NoOrganizationSelected(_args: Record<string, unknown>) {
     <UserButtonView
       {...prototype}
       mode='combined'
+    />
+  );
+}
+
+export function UserSingleSession(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  // One account signed in, so nothing to switch to or sign out of together. The header keeps its
+  // gear alone and the foot signs the account out beside adding another.
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='user'
+      renderTriggerLabel={false}
+      additionalSessions={[]}
+      onSignOutAll={undefined}
     />
   );
 }

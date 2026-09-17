@@ -90,6 +90,13 @@ A user's avatar on its own rounds the trigger fully to match it.
   storyModule={UserButtonStories}
 />
 
+An account leading a combined surface nests the organization it works in on its avatar.
+
+<Story
+  name='UserPriorityAvatarOnly'
+  storyModule={UserButtonStories}
+/>
+
 `renderTriggerBadge={false}` keeps the name. The badge is part of the label, so it needs both.
 
 <Story
@@ -103,16 +110,18 @@ The header names the active workspace and carries what you can do about it. An o
 described by its plan and member count; an account by the organization it works in and its role
 there, or by its identifier where the surface carries no organizations.
 
-`headerLayout='inline'` (the default) trails the workspace with the actions, the gear as an icon
-alone. `headerLayout='stacked'` runs them under it as full-width labelled buttons.
+The actions stack under the workspace as full-width labelled buttons: **Settings** with **Invite**
+where an organization leads, **Settings** with **Sign out** where an account does. Where the gear is
+the only action, as for an account with no second session, it trails the workspace inline as an
+icon alone, and the foot signs the account out beside **Add account**.
 
 <Story
-  name='StackedHeader'
+  name='UserPriority'
   storyModule={UserButtonStories}
 />
 
 <Story
-  name='UserPriorityStackedHeader'
+  name='UserSingleSession'
   storyModule={UserButtonStories}
 />
 

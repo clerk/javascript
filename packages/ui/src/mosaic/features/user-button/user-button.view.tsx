@@ -433,8 +433,9 @@ function HeaderActionButton({
 }
 
 /** The active workspace: who you are signed in as, and what you can do about it. */
-function Header({ layout }: { layout: UserButtonHeaderLayout }) {
+function Header() {
   const data = useUserButtonContext();
+  const layout = data.layout.headerLayout;
   const signOutSession = data.onSignOutSession;
   const { sessionId, identifier } = data.activeSession;
   const workspace = leadWorkspace(data);
@@ -1009,6 +1010,8 @@ interface FooterRow {
 /** The actions that close out the surface. */
 function Footer() {
   const data = useUserButtonContext();
+  const signOutSession = data.onSignOutSession;
+  const { sessionId } = data.activeSession;
 
   const builtIn: FooterRow[] = [];
   for (const action of data.layout.actions.footer) {
@@ -1030,6 +1033,24 @@ function Footer() {
             }
             label={m.accounts.add}
             onClick={data.onAddAccount}
+          />
+        ),
+      });
+    }
+    if (action === 'signOut' && signOutSession) {
+      builtIn.push({
+        id: 'signOut',
+        node: (
+          <ActionRow
+            icon={
+              <Icon
+                name='log-out'
+                size='sm'
+              />
+            }
+            label={m.accounts.signOut}
+            onClick={() => signOutSession(sessionId)}
+            busyKey={userButtonBusyKeys.signOutSession(sessionId)}
           />
         ),
       });
@@ -1190,18 +1211,8 @@ export function UserButtonTrigger({
   );
 }
 
-export interface UserButtonPopupProps {
-  /**
-   * How the header carries its actions. `inline` trails the workspace with them, the gear as an
-   * icon; `stacked` runs them under it as full-width labelled buttons.
-   *
-   * @default 'inline'
-   */
-  headerLayout?: UserButtonHeaderLayout;
-}
-
 /** The popover surface: header, organizations, and footer. */
-export function UserButtonPopup({ headerLayout = 'inline' }: UserButtonPopupProps = {}): ReactElement {
+export function UserButtonPopup(): ReactElement {
   const { renderBranding } = useUserButtonContext();
 
   return (
@@ -1210,7 +1221,7 @@ export function UserButtonPopup({ headerLayout = 'inline' }: UserButtonPopupProp
       aria-label={m.popup.label}
     >
       <Card.Root renderBranding={renderBranding}>
-        <Header layout={headerLayout} />
+        <Header />
         <OrganizationSection />
         <Footer />
       </Card.Root>
@@ -1218,25 +1229,20 @@ export function UserButtonPopup({ headerLayout = 'inline' }: UserButtonPopupProp
   );
 }
 
-export type UserButtonProps = Omit<UserButtonRootProps, 'children'> & UserButtonTriggerProps & UserButtonPopupProps;
+export type UserButtonProps = Omit<UserButtonRootProps, 'children'> & UserButtonTriggerProps;
 
 /**
  * Presentational all-in-one: renders the trigger + popup from a single prop-driven call. The
  * connected, Clerk-backed `UserButton` lives in `user-button.tsx` and wraps this view.
  */
-export function UserButtonView({
-  renderTriggerLabel,
-  renderTriggerBadge,
-  headerLayout,
-  ...root
-}: UserButtonProps): ReactElement {
+export function UserButtonView({ renderTriggerLabel, renderTriggerBadge, ...root }: UserButtonProps): ReactElement {
   return (
     <UserButtonRoot {...root}>
       <UserButtonTrigger
         renderTriggerLabel={renderTriggerLabel}
         renderTriggerBadge={renderTriggerBadge}
       />
-      <UserButtonPopup headerLayout={headerLayout} />
+      <UserButtonPopup />
     </UserButtonRoot>
   );
 }

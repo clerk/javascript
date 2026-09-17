@@ -140,7 +140,7 @@ describe('UserButtonView, user mode', () => {
     const onSignOutSession = vi.fn();
     renderUserMode({ onSignOutSession });
 
-    expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
     await userEvent.setup().click(screen.getByRole('button', { name: 'Sign out' }));
 
@@ -192,7 +192,7 @@ describe('UserButtonView, organization mode', () => {
     expect(within(header()).getByText('Foundry')).toBeInTheDocument();
     expect(within(header()).getByText('Pro · 24 members')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Invite' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Manage organization' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
   });
 
   it('falls back to the account in the header where no organization is active', () => {
@@ -220,7 +220,7 @@ describe('UserButtonView, organization mode', () => {
     renderOrganizationMode({ memberships: [], hasOrganizations: false, organizationsLoading: true });
 
     expect(within(header()).getByText('Foundry')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Manage organization' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Invite' })).toBeInTheDocument();
   });
 
@@ -266,14 +266,14 @@ describe('UserButtonView, combined mode', () => {
     // The subtitle is the header's alone; the row below it carries only a label.
     expect(screen.getByText('Pro · 24 members')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Invite' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Manage organization' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
   });
 
   it('heads the surface with the account where the user takes priority', () => {
     renderCombined({ modePriority: 'user' });
 
     expect(screen.queryByText('Pro · 24 members')).toBeNull();
-    expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
   });
 
   it('heads the workspace list with the active account and its own actions', async () => {
@@ -935,23 +935,14 @@ describe('UserButtonView, the header', () => {
     expect(popup().querySelector('.cl-user-button-popover')?.className).toMatch(
       /^cl-popover-popup cl-user-button-popover /,
     );
-    expect(header()).toHaveAttribute('data-layout', 'inline');
+    expect(header()).toHaveAttribute('data-layout', 'stacked');
     expect(header().querySelector('.cl-user-button-header-title')?.textContent).toBe('Foundry');
     expect(header().querySelector('.cl-user-button-header-description')?.textContent).toBe('Pro · 24 members');
     expect(header().querySelector('.cl-user-button-header-actions')).not.toBeNull();
   });
 
-  it('runs the actions beside the workspace by default, the gear as an icon', () => {
-    renderHeader();
-
-    const gear = screen.getByRole('button', { name: 'Manage organization' });
-    expect(gear).toHaveAttribute('data-shape', 'square');
-    expect(screen.getByRole('button', { name: 'Invite' })).not.toHaveAttribute('data-full-width');
-    expect(screen.queryByRole('button', { name: 'Settings' })).toBeNull();
-  });
-
   it('stacks the actions under the workspace as labelled buttons', () => {
-    renderHeader({ headerLayout: 'stacked' });
+    renderHeader();
 
     expect(header()).toHaveAttribute('data-layout', 'stacked');
     const settings = screen.getByRole('button', { name: 'Settings' });
@@ -964,10 +955,32 @@ describe('UserButtonView, the header', () => {
   it('stacks the account actions the same way', async () => {
     const onSignOutSession = vi.fn();
     const onManageAccount = vi.fn();
-    renderHeader({ mode: 'user', headerLayout: 'stacked', onSignOutSession, onManageAccount });
+    renderHeader({ mode: 'user', onSignOutSession, onManageAccount });
 
+    expect(header()).toHaveAttribute('data-layout', 'stacked');
     await userEvent.setup().click(screen.getByRole('button', { name: 'Settings' }));
     expect(onManageAccount).toHaveBeenCalled();
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Sign out' }));
+    expect(onSignOutSession).toHaveBeenCalledWith('sess_1');
+  });
+
+  it('runs the gear inline as an icon where it is the only action', () => {
+    renderHeader({ activeOrganization: null });
+
+    expect(header()).toHaveAttribute('data-layout', 'inline');
+    expect(screen.getByRole('button', { name: 'Manage account' })).toHaveAttribute('data-shape', 'square');
+    expect(screen.queryByRole('button', { name: 'Settings' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
+  });
+
+  it('signs a lone account out from the foot, beside "Add account", leaving the header its gear', async () => {
+    const onSignOutSession = vi.fn();
+    renderHeader({ mode: 'user', additionalSessions: [], onSignOutSession });
+
+    expect(header()).toHaveAttribute('data-layout', 'inline');
+    expect(within(header()).getByRole('button', { name: 'Manage account' })).toHaveAttribute('data-shape', 'square');
+    expect(within(header()).queryByRole('button', { name: 'Sign out' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Add account' })).toBeInTheDocument();
     await userEvent.setup().click(screen.getByRole('button', { name: 'Sign out' }));
     expect(onSignOutSession).toHaveBeenCalledWith('sess_1');
   });

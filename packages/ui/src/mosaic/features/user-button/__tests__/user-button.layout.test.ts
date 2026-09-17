@@ -60,12 +60,29 @@ describe('resolveUserButtonLayout, what the data settles', () => {
 
   // With no second account the flyout would open onto one row, so the foot offers that row instead.
   // "All accounts" is that one account too, and the account's own row already signs out of it.
-  it.each<UserButtonMode>(['combined', 'user'])(
-    'leaves the foot "Add account" alone in %s mode where there is one account',
-    mode => {
-      expect(resolve(mode, { additionalSessions: [] }).actions.footer).toEqual(['addAccount']);
-    },
-  );
+  it('leaves the foot "Add account" alone in combined mode where there is one account', () => {
+    expect(resolve('combined', { additionalSessions: [] }).actions.footer).toEqual(['addAccount']);
+  });
+
+  it('signs a lone account out from the foot in user mode, leaving the header its gear', () => {
+    const layout = resolve('user', { additionalSessions: [] });
+
+    expect(layout.actions.header).toEqual(['manageLead']);
+    expect(layout.actions.footer).toEqual(['addAccount', 'signOut']);
+  });
+});
+
+describe('resolveUserButtonLayout, how the header carries its actions', () => {
+  it('stacks them wherever a labelled action joins the gear', () => {
+    expect(resolve('combined').headerLayout).toBe('stacked');
+    expect(resolve('organization').headerLayout).toBe('stacked');
+    expect(resolve('user').headerLayout).toBe('stacked');
+  });
+
+  it('runs the gear inline where it is the only action', () => {
+    expect(resolve('combined', { activeOrganization: null }).headerLayout).toBe('inline');
+    expect(resolve('user', { additionalSessions: [] }).headerLayout).toBe('inline');
+  });
 });
 
 describe('resolveUserButtonLayout, which sections render', () => {
