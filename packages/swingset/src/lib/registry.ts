@@ -217,6 +217,12 @@ import {
   Sizes as TextSizes,
 } from '../stories/text.stories';
 import { meta as toastMeta } from '../stories/toast.stories';
+import {
+  Default as TooltipComponentDefault,
+  Group as TooltipComponentGroup,
+  meta as tooltipComponentMeta,
+  Placement as TooltipComponentPlacement,
+} from '../stories/tooltip.component.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
 import {
@@ -486,6 +492,13 @@ const otpComponentModule: StoryModule = {
 };
 
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
+
+const tooltipComponentModule: StoryModule = {
+  meta: tooltipComponentMeta,
+  Default: TooltipComponentDefault,
+  Placement: TooltipComponentPlacement,
+  Group: TooltipComponentGroup,
+};
 
 const fieldModule: StoryModule = {
   meta: fieldMeta,
@@ -773,6 +786,7 @@ export const registry: StoryModule[] = [
   tableModule,
   textModule,
   toastModule,
+  tooltipComponentModule,
   fieldModule,
   visuallyHiddenModule,
   // Primitives
