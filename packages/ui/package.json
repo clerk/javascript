@@ -100,11 +100,11 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --exclude-entrypoints themes/shadcn.css --profile esm-only",
     "lint:publint": "publint",
-    "showerrors": "tsc",
+    "showerrors": "tsc -p tsconfig.src.json",
     "test": "vitest run",
     "test:ci": "vitest run --maxWorkers=70%",
     "test:coverage": "vitest --collectCoverage && open coverage/lcov-report/index.html",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit -p tsconfig.src.json"
   },
   "dependencies": {
     "@clerk/localizations": "workspace:^",
