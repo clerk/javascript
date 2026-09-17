@@ -186,6 +186,32 @@ describe('ConfigureDirectorySyncWizard configure step', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled());
   });
 
+  it('drops the staged key when a file that is not JSON replaces it', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(googleDirectory());
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    await userEvent.type(screen.getByPlaceholderText('admin@yourcompany.com'), 'admin@clerk.com');
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(fileInput, {
+      target: { files: [new File(['{"type":"service_account"}'], 'key.json', { type: 'application/json' })] },
+    });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled());
+
+    fireEvent.change(fileInput, {
+      target: { files: [new File(['not json'], 'notes.json', { type: 'application/json' })] },
+    });
+
+    // The earlier key must not stay submittable behind the error.
+    expect(
+      await screen.findByText('That file is not valid JSON. Upload the key file downloaded from Google.'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+  });
+
   it('does not accept whitespace or a malformed address as the admin email', async () => {
     const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
     fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
