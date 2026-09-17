@@ -208,7 +208,7 @@ function WorkspaceAvatar({ workspace, size }: { workspace: ActiveWorkspace; size
         imageUrl={workspace.imageUrl}
         shape={workspace.shape}
         size={size}
-        xstyle={styles.workspaceAvatarLead}
+        xstyle={[styles.workspaceAvatarLead, size === 'xs' ? null : styles.workspaceAvatarLeadMd]}
       />
       <RowAvatar
         name={organization.name}

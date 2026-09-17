@@ -21,6 +21,10 @@ export const styles = stylex.create({
     gridColumnStart: '1',
     gridRowStart: '1',
   },
+  workspaceAvatarLeadMd: {
+    height: space['7.5'],
+    width: space['7.5'],
+  },
   nestedAvatar: {
     borderRadius: '2px',
     alignSelf: 'end',
