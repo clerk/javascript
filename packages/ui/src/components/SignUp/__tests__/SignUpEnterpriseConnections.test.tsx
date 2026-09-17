@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
-
 import { clearFetchCache } from '@/ui/hooks/useFetch';
 
 import { SignUpEnterpriseConnections } from '../SignUpEnterpriseConnections';
