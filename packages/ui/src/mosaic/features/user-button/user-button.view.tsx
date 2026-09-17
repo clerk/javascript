@@ -815,6 +815,7 @@ function SessionMenuItem({ session, active }: { session: UserButtonSession; acti
           imageUrl={session.imageUrl}
           shape='circle'
           size='fit'
+          xstyle={styles.rowAvatar}
         />
       </Menu.Media>
       <Menu.Label>{session.identifier}</Menu.Label>
@@ -1160,12 +1161,7 @@ export function UserButtonTrigger({
 
   return (
     <Popover.Trigger
-      render={
-        <button
-          type='button'
-          {...themeProps('user-button-trigger')}
-        />
-      }
+      {...themeProps('user-button-trigger')}
       aria-label={fill(m.trigger.open, { name })}
       xstyle={[
         focusOutline.visible,
@@ -1210,7 +1206,7 @@ export function UserButtonPopup({ headerLayout = 'inline' }: UserButtonPopupProp
 
   return (
     <Popover.Popup
-      render={<div {...themeProps('user-button-popover')} />}
+      {...themeProps('user-button-popover')}
       aria-label={m.popup.label}
     >
       <Card.Root renderBranding={renderBranding}>

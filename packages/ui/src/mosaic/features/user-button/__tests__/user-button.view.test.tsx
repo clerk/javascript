@@ -929,8 +929,12 @@ describe('UserButtonView, the header', () => {
   it('carries the slot classes for the trigger, the popover, and the header', () => {
     renderHeader();
 
-    expect(screen.getByRole('button', { name: 'Open account menu for Foundry' })).toHaveClass('cl-user-button-trigger');
-    expect(popup().querySelector('.cl-user-button-popover')).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Open account menu for Foundry' }).className).toMatch(
+      /^cl-popover-trigger cl-user-button-trigger /,
+    );
+    expect(popup().querySelector('.cl-user-button-popover')?.className).toMatch(
+      /^cl-popover-popup cl-user-button-popover /,
+    );
     expect(header()).toHaveAttribute('data-layout', 'inline');
     expect(header().querySelector('.cl-user-button-header-title')?.textContent).toBe('Foundry');
     expect(header().querySelector('.cl-user-button-header-description')?.textContent).toBe('Pro · 24 members');
