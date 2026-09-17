@@ -126,6 +126,7 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';
+export { UserButton } from '../features/user-button/user-button';
 
 import {
   colorVars,
