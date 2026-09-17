@@ -1,5 +1,6 @@
 import * as path from 'node:path';
 
+import { automatedEnvironmentVariables } from '@clerk/shared/utils';
 import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
@@ -25,8 +26,8 @@ test.describe('Keyless mode @tanstack-react-start', () => {
     app = await commonSetup.commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withKeyless);
-    // Without keys the app 500s on every request (opaque JSON body), so readiness can't wait for a 2xx and the error is asserted from the detached server's stderr file
-    await app.dev({ acceptAnyResponse: true, detached: true });
+    // Without keys the app 500s on every request, so readiness can't wait for a 2xx
+    await app.dev({ acceptAnyResponse: true });
   });
 
   test.afterAll(async () => {
@@ -38,21 +39,12 @@ test.describe('Keyless mode @tanstack-react-start', () => {
   }) => {
     const response = await page.goto(`${app.serverUrl}/`);
     expect(response?.status()).toBe(500);
-
-    const stderrLogs = (await fs.readdir(app.appDir)).filter(f => f.endsWith('.err.log'));
-    const stderr = (await Promise.all(stderrLogs.map(f => fs.readFile(path.join(app.appDir, f), 'utf-8')))).join('\n');
-    expect(stderr).toContain('Publishable key is missing');
-    expect(stderr).toContain('npx clerk@latest init');
+    expect(app.devOutput).toContain('Publishable key is missing');
+    expect(app.devOutput).toContain('npx clerk@latest init');
   });
 
   test('Claimed application with keys inside .env boots and serves the app.', async ({ page, context }) => {
-    /**
-     * Seed claimed keyless state directly: the SDK no longer mints keys, so write the
-     * keys fixture to `.clerk/.tmp/keyless.json` and configure the matching environment
-     * (keys AND api url, so the server-side onboarding-completion call targets the right
-     * instance). The completion request itself is BAPI-bound from the server, invisible
-     * to Playwright — its logic is covered by packages/tanstack-react-start keyless unit tests.
-     */
+    // The SDK no longer mints keys, so seed the claimed keyless state directly
     const publishableKey = appConfigs.envs.withEmailCodes.publicVariables.get('CLERK_PUBLISHABLE_KEY');
     const secretKey = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_SECRET_KEY');
     await fs.ensureDir(path.join(app.appDir, '.clerk', '.tmp'));
@@ -62,7 +54,10 @@ test.describe('Keyless mode @tanstack-react-start', () => {
       claimUrl: 'https://dashboard.clerk.com/apps/claim',
       apiKeysUrl: 'https://dashboard.clerk.com/~/api-keys',
     });
-    await app.withEnv(appConfigs.envs.withEmailCodes);
+    // `base` disables keyless and CI counts as automated, so undo both (as `withKeyless` does) or the claimed-onboarding path never runs
+    const claimedEnv = appConfigs.envs.withEmailCodes.clone().setEnvVariable('public', 'CLERK_KEYLESS_DISABLED', false);
+    automatedEnvironmentVariables.forEach(name => claimedEnv.setEnvVariable('private', name, 'false'));
+    await app.withEnv(claimedEnv);
     // Restart the dev server to pick up new env vars
     await app.restart();
 
@@ -70,5 +65,6 @@ test.describe('Keyless mode @tanstack-react-start', () => {
     await u.page.goToAppHome();
     await u.page.waitForClerkJsLoaded();
     await u.po.expect.toBeSignedOut();
+    expect(app.devOutput).toContain('Your application is running with your claimed keys');
   });
 });
