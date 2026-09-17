@@ -66,6 +66,29 @@ describe('passkeys section', () => {
     expect(onRemove).toHaveBeenCalledExactlyOnceWith('phone');
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
+  it.each([
+    ['MacBook', 'iPhone'],
+    ['iPhone', 'MacBook'],
+  ])('returns focus from removed %s to remaining %s', async (removed, remaining) => {
+    const user = userEvent.setup();
+    function Example() {
+      const [items, setItems] = useState(passkeys);
+      return (
+        <MosaicProvider>
+          <UserProfilePasskeysSectionView
+            passkeys={items}
+            onRemove={id => setItems(current => current.filter(item => item.id !== id))}
+          />
+        </MosaicProvider>
+      );
+    }
+    render(<Example />);
+    await user.click(screen.getByRole('button', { name: `Manage ${removed}` }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
+    await waitFor(() => expect(screen.getByRole('button', { name: `Manage ${remaining}` })).toHaveFocus());
+  });
+
   it('renames through a prefilled form, preserves the draft after failure, and retries', async () => {
     const user = userEvent.setup();
     const onRename = vi.fn().mockRejectedValueOnce(new Error('Try again')).mockResolvedValueOnce(undefined);
@@ -111,13 +134,15 @@ describe('passkeys section', () => {
     renderView({ passkeys: [], onAdd, addError: 'Could not create passkey' });
 
     expect(screen.getByRole('alert')).toHaveTextContent('Could not create passkey');
+    expect(screen.getByRole('alert')).toHaveAttribute('data-open');
+    expect(screen.getByRole('alert')).toHaveAttribute('data-starting-style');
     const addButton = screen.getByRole('button', { name: 'Add passkey' });
     expect(addButton).toHaveTextContent(/^Add$/);
     await user.click(addButton);
     expect(onAdd).toHaveBeenCalledOnce();
   });
 
-  it('finishes removing the final passkey after pending work and keeps Add available', async () => {
+  it.each([true, false])('restores focus after removing the final passkey with Add available: %s', async hasAdd => {
     const user = userEvent.setup();
     let finish = () => {};
     const pending = new Promise<void>(resolve => {
@@ -129,7 +154,7 @@ describe('passkeys section', () => {
         <MosaicProvider>
           <UserProfilePasskeysSectionView
             passkeys={items}
-            onAdd={() => setItems([passkeys[0]])}
+            onAdd={hasAdd ? () => setItems([passkeys[0]]) : undefined}
             onRemove={async () => {
               await pending;
               setItems([]);
@@ -149,8 +174,13 @@ describe('passkeys section', () => {
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(screen.queryByText('MacBook')).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-    expect(screen.getByText('MacBook')).toBeVisible();
+    if (hasAdd) {
+      expect(screen.getByRole('button', { name: 'Add passkey' })).toHaveFocus();
+      await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+      expect(screen.getByText('MacBook')).toBeVisible();
+    } else {
+      expect(screen.getByRole('region', { name: 'Passkeys' })).toHaveFocus();
+    }
   });
 
   it('retries removal for the same passkey after a failure', async () => {

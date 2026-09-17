@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import { useMemo } from 'react';
 
 import { Dialog } from '../../components/dialog';
@@ -14,10 +15,12 @@ import { UserProfileRenamePasskeyDialog } from './user-profile-rename-passkey.di
 
 export function UserProfilePasskeyRowView({
   passkey,
+  triggerRef,
   onRename,
   onRemove,
 }: {
   passkey: UserProfilePasskey;
+  triggerRef?: Ref<HTMLButtonElement>;
   onRename?: (id: string, name: string) => void | Promise<void>;
   onRemove?: () => void;
 }) {
@@ -59,6 +62,7 @@ export function UserProfilePasskeyRowView({
         {actions.length > 0 ? (
           <Section.Actions>
             <UserProfileActionMenu
+              triggerRef={triggerRef}
               actions={actions}
               label={fill(m.manage, { name: passkey.name })}
             />
