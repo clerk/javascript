@@ -1,3 +1,4 @@
+import { readJSONFile } from '@clerk/shared/file';
 import { useCallback, useRef, useState } from 'react';
 
 import {
@@ -13,17 +14,6 @@ import {
 } from '@/customizables';
 
 import { useConfigureDirectorySync } from './ConfigureDirectorySyncContext';
-
-// FileReader rather than Blob.text(), which Safari only gained in 14 and which
-// clerk-js cannot assume. Mirrors fileToBase64 in AvatarUploader.
-const fileToText = (file: File): Promise<string> =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsText(file);
-    reader.onload = () => resolve(reader.result as string);
-    // onerror hands back a ProgressEvent, which is useless to a caller.
-    reader.onerror = () => reject(new Error('Could not read the selected file'));
-  });
 
 // Same shape as the copies in InviteMembersForm and SignIn/utils: enough to
 // stop an obviously malformed address reaching the provider, no more.
@@ -75,23 +65,16 @@ export const useGoogleCredentialsState = (): GoogleCredentialsState => {
       setFileName(null);
       setFileError(null);
 
-      let contents: string;
+      let key: unknown;
       try {
-        contents = await fileToText(file);
-      } catch {
-        setFileError(t(localizationKeys('configureDirectorySync.configureStep.error__invalidKeyFile')));
-        return;
-      }
-
-      try {
-        JSON.parse(contents);
+        key = await readJSONFile(file);
       } catch {
         // Catch the obvious wrong-file case here; anything structurally valid is
         // the identity provider's to judge, and its message is better than ours.
         setFileError(t(localizationKeys('configureDirectorySync.configureStep.error__invalidKeyFile')));
         return;
       }
-      setServiceAccountJson(contents);
+      setServiceAccountJson(JSON.stringify(key));
       setFileName(file.name);
     },
     [t],
