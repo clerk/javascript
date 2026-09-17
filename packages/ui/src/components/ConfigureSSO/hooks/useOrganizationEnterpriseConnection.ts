@@ -21,6 +21,8 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 
 import type { ConnectionScope } from '../domain/connectionScope';
 import {
+  defaultConnectionDomains,
+  domainsClaimedByOtherConnections,
   isEnterpriseConnectionConfigured,
   type OrganizationEnterpriseConnection,
   organizationEnterpriseConnection as buildOrganizationEnterpriseConnection,
@@ -43,9 +45,9 @@ import { type RefreshTestRunsOptions, useEnterpriseConnectionTestRuns } from './
  */
 export interface EnterpriseConnectionMutations {
   /**
-   * Creates a new enterprise connection for the active organization. The
-   * verified organization domains are sourced from the hook itself, so callers
-   * never thread them through.
+   * Creates a new enterprise connection for the active organization with the
+   * domains held in [UseOrganizationEnterpriseConnectionResult.connectionDomains],
+   * so callers never thread them through.
    */
   createConnection: (provider: ProviderType) => Promise<EnterpriseConnectionResource | undefined>;
   /** Replaces the connection `id` with a fresh one for `provider`. */
@@ -89,6 +91,16 @@ export interface UseOrganizationEnterpriseConnectionResult {
   selectConnection: (scope: ConnectionScope) => void;
   /** The scoped connection, `undefined` while the scope is `new`. */
   enterpriseConnection: EnterpriseConnectionResource | undefined;
+  /**
+   * The domains the scoped connection authenticates. An existing connection
+   * reads them off the resource; a `new` scope keeps a draft until the create,
+   * seeded with every verified organization domain no other connection claims.
+   */
+  connectionDomains: string[];
+  /** Replaces [connectionDomains]: an update for an existing connection, a draft edit for a `new` scope. */
+  setConnectionDomains: (domains: string[]) => Promise<void>;
+  /** Domains other connections of the organization already authenticate, keyed to that connection's name. */
+  claimedDomains: Map<string, string>;
   /** The domain entity the wizard makes every flow decision from. */
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   enterpriseConnectionMutations: EnterpriseConnectionMutations;
@@ -142,11 +154,20 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   const enterpriseConnections = useMemo(() => sortEnterpriseConnections(sourceConnections ?? []), [sourceConnections]);
 
   // `null` resolves to the first connection so the standalone host, which has no list UI, still edits a deterministic one.
-  const [scope, setScope] = useState<ConnectionScope | null>(null);
+  const [requestedScope, setRequestedScope] = useState<ConnectionScope | null>(null);
+  // The `new` scope's domains until the create lands; `null` means the admin has not touched the default yet.
+  const [draftDomains, setDraftDomains] = useState<string[] | null>(null);
+
+  const setScope = useCallback((next: ConnectionScope | null) => {
+    setRequestedScope(next);
+    setDraftDomains(null);
+  }, []);
 
   const connectionScope = useMemo<ConnectionScope>(
-    () => scope ?? (enterpriseConnections[0] ? { kind: 'existing', id: enterpriseConnections[0].id } : { kind: 'new' }),
-    [scope, enterpriseConnections],
+    () =>
+      requestedScope ??
+      (enterpriseConnections[0] ? { kind: 'existing', id: enterpriseConnections[0].id } : { kind: 'new' }),
+    [requestedScope, enterpriseConnections],
   );
 
   const enterpriseConnection =
@@ -154,7 +175,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       ? enterpriseConnections.find(connection => connection.id === connectionScope.id)
       : undefined;
 
-  const selectConnection = useCallback((next: ConnectionScope) => setScope(next), []);
+  const selectConnection = useCallback((next: ConnectionScope) => setScope(next), [setScope]);
 
   // Whether the scoped connection already existed the first time the source
   // query settled. Captured during render (not in an effect) the first time the
@@ -203,22 +224,34 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
   const { session } = useSession();
   const { organization } = useOrganization();
 
+  const claimedDomains = useMemo(
+    () => domainsClaimedByOtherConnections(enterpriseConnections, enterpriseConnection?.id),
+    [enterpriseConnections, enterpriseConnection],
+  );
+
+  // A domain verified from this wizard joins the scoped connection on its own;
+  // one another connection claims stays out, since FAPI would reject it.
   const handleDomainOwnershipVerified = useCallback(
     async (verifiedDomains: OrganizationDomainResource[]) => {
-      if (!enterpriseConnection) {
+      const current = enterpriseConnection ? (enterpriseConnection.domains ?? []) : draftDomains;
+      if (current === null) {
         return;
       }
 
-      const verifiedDomainNames = verifiedDomains.map(domain => domain.name);
-      const domains = Array.from(new Set([...(enterpriseConnection.domains ?? []), ...verifiedDomainNames]));
-      const hasNewDomains = domains.length !== (enterpriseConnection.domains?.length ?? 0);
-      if (!hasNewDomains) {
+      const domains = Array.from(
+        new Set([...current, ...verifiedDomains.map(domain => domain.name).filter(name => !claimedDomains.has(name))]),
+      );
+      if (domains.length === current.length) {
         return;
       }
 
-      await updateEnterpriseConnection(enterpriseConnection.id, { domains });
+      if (enterpriseConnection) {
+        await updateEnterpriseConnection(enterpriseConnection.id, { domains });
+      } else {
+        setDraftDomains(domains);
+      }
     },
-    [enterpriseConnection, updateEnterpriseConnection],
+    [enterpriseConnection, draftDomains, claimedDomains, updateEnterpriseConnection],
   );
 
   const {
@@ -233,6 +266,25 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     onOwnershipVerified: handleDomainOwnershipVerified,
   });
 
+  const connectionDomains = useMemo<string[]>(
+    () =>
+      enterpriseConnection
+        ? (enterpriseConnection.domains ?? [])
+        : (draftDomains ?? defaultConnectionDomains(organizationDomains, claimedDomains)),
+    [enterpriseConnection, draftDomains, organizationDomains, claimedDomains],
+  );
+
+  const setConnectionDomains = useCallback(
+    async (domains: string[]) => {
+      if (enterpriseConnection) {
+        await updateEnterpriseConnection(enterpriseConnection.id, { domains });
+      } else {
+        setDraftDomains(domains);
+      }
+    },
+    [enterpriseConnection, updateEnterpriseConnection],
+  );
+
   const organizationDomainMutations = useMemo<OrganizationDomainMutations>(
     () => ({
       createDomain,
@@ -245,10 +297,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
 
   const enterpriseConnectionMutations = useMemo<EnterpriseConnectionMutations>(() => {
     const createConnection: EnterpriseConnectionMutations['createConnection'] = async provider => {
-      const created = await createEnterpriseConnection({
-        provider,
-        domains: organizationDomains?.map(domain => domain.name),
-      });
+      const created = await createEnterpriseConnection({ provider, domains: connectionDomains });
 
       if (created) {
         setScope({ kind: 'existing', id: created.id });
@@ -264,10 +313,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
       const replaced = enterpriseConnections.find(connection => connection.id === id);
       await deleteEnterpriseConnection(id);
 
-      const created = await createEnterpriseConnection({
-        provider,
-        domains: replaced?.domains ?? organizationDomains?.map(domain => domain.name),
-      });
+      const created = await createEnterpriseConnection({ provider, domains: replaced?.domains ?? connectionDomains });
 
       if (created) {
         setScope({ kind: 'existing', id: created.id });
@@ -315,9 +361,10 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     };
   }, [
     organization,
-    organizationDomains,
+    connectionDomains,
     enterpriseConnections,
     connectionScope,
+    setScope,
     createEnterpriseConnection,
     updateEnterpriseConnection,
     deleteEnterpriseConnection,
@@ -373,6 +420,9 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     connectionScope,
     selectConnection,
     enterpriseConnection,
+    connectionDomains,
+    setConnectionDomains,
+    claimedDomains,
     organizationEnterpriseConnection,
     enterpriseConnectionMutations,
     testRuns,

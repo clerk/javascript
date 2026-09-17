@@ -17,7 +17,7 @@ import {
 import { useCardState } from '@/elements/contexts';
 import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
-import { handleError } from '@/utils/errorHandler';
+import { getFieldError, getGlobalError, handleError } from '@/utils/errorHandler';
 
 import { ChangeProviderDialog } from '../ChangeProviderDialog';
 import { useConfigureSSO } from '../ConfigureSSOContext';
@@ -76,8 +76,19 @@ export const SelectProviderStep = (): JSX.Element => {
       await createConnection(selected);
       void goNext();
     } catch (err) {
-      handleError(err as Error, [], card.setError);
+      handleCreateError(err as Error);
       setIsSubmitting(false);
+    }
+  };
+
+  // FAPI reports a domain another connection already authenticates as a field
+  // error on `domains`. This step has no domains field, so it surfaces as the
+  // step's alert instead of vanishing.
+  const handleCreateError = (err: Error) => {
+    handleError(err, [], card.setError);
+    const fieldError = getFieldError(err);
+    if (fieldError && !getGlobalError(err)) {
+      card.setError(fieldError);
     }
   };
 
@@ -97,7 +108,7 @@ export const SelectProviderStep = (): JSX.Element => {
       }
       void goNext();
     } catch (err) {
-      handleError(err as Error, [], card.setError);
+      handleCreateError(err as Error);
       setIsChangeDialogOpen(false);
       setChangeFromProvider(null);
       setIsSubmitting(false);

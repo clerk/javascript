@@ -22,8 +22,8 @@ The block holds one thing: the phrase the user types. Nothing outside the dialog
 Everything that decides what the dialog does next belongs to the caller. `open` closes it, `isDeleting` marks it busy, `errorMessage` explains a failure.
 
 ```tsx
-import { Destructive } from '@clerk/ui/mosaic/blocks/destructive';
-import { Button } from '@clerk/ui/mosaic/components/button';
+import { Destructive } from '@clerk/mosaic/blocks/destructive';
+import { Button } from '@clerk/mosaic/components/button';
 
 const [open, setOpen] = useState(false);
 const [isDeleting, setIsDeleting] = useState(false);

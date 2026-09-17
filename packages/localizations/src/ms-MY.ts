@@ -815,9 +815,11 @@ export const msMY: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__claimed: undefined,
         badge__expired: undefined,
         badge__unverified: 'Belum disahkan',
         badge__verified: 'Disahkan',
+        checkboxLabel: undefined,
         expiredAtLabel: undefined,
         expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
@@ -1298,6 +1300,68 @@ export const msMY: LocalizationResource = {
       title: 'Keluarkan domain',
     },
     securityPage: {
+      connectionPage: {
+        actions: {
+          activate: undefined,
+          continueSetup: undefined,
+        },
+        dangerZone: {
+          deactivateButton: undefined,
+          removeButton: undefined,
+          title: undefined,
+        },
+        domains: {
+          title: undefined,
+        },
+        identityProvider: {
+          certificateExpires: undefined,
+          clientSecret: {
+            placeholder: undefined,
+          },
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        name: {
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        serviceProvider: {
+          acsUrl: undefined,
+          entityId: undefined,
+          metadataUrl: undefined,
+          redirectUri: undefined,
+          title: undefined,
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: undefined,
+            label: undefined,
+          },
+          allowIdpInitiated: {
+            description: undefined,
+            label: undefined,
+          },
+          allowSubdomains: {
+            description: undefined,
+            label: undefined,
+          },
+          forceAuthn: {
+            description: undefined,
+            label: undefined,
+          },
+          syncUserAttributes: {
+            description: undefined,
+            label: undefined,
+          },
+          title: undefined,
+        },
+      },
       directorySyncSection: {
         badge__active: undefined,
         badge__inactive: undefined,

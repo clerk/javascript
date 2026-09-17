@@ -828,9 +828,11 @@ export const enUS: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__claimed: 'Used by another connection',
         badge__expired: 'Expired',
         badge__unverified: 'Unverified',
         badge__verified: 'Verified',
+        checkboxLabel: 'Use {{domain}} for this connection',
         expiredAtLabel:
           "Domain verification expired on {{ date | shortDate('en-US') }}. Verify again to generate a new DNS record.",
         expiredLabel: 'Domain verification expired. Verify again to generate a new DNS record.',
@@ -860,7 +862,8 @@ export const enUS: LocalizationResource = {
         subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",
         title: 'Removing domain',
       },
-      subtitle: 'Add and verify ownership of the domains your organization uses to sign in.',
+      subtitle:
+        'Add and verify ownership of the domains your organization uses to sign in, then pick the ones this connection covers.',
       title: 'Add SSO domains',
     },
     resetConnectionDialog: {
@@ -1320,6 +1323,68 @@ export const enUS: LocalizationResource = {
       title: 'Remove domain',
     },
     securityPage: {
+      connectionPage: {
+        actions: {
+          activate: 'Activate',
+          continueSetup: 'Continue setup',
+        },
+        dangerZone: {
+          deactivateButton: 'Deactivate connection',
+          removeButton: 'Remove connection',
+          title: 'Danger zone',
+        },
+        domains: {
+          title: 'Domains',
+        },
+        identityProvider: {
+          certificateExpires: 'Certificate expires',
+          clientSecret: {
+            placeholder: 'Leave empty to keep the current secret',
+          },
+          editButton: 'Edit',
+          form: {
+            title: 'Edit identity provider',
+          },
+          title: 'Identity provider',
+        },
+        name: {
+          editButton: 'Edit',
+          form: {
+            title: 'Rename connection',
+          },
+          title: 'Name',
+        },
+        serviceProvider: {
+          acsUrl: 'Assertion consumer service (ACS) URL',
+          entityId: 'Entity ID',
+          metadataUrl: 'Metadata URL',
+          redirectUri: 'Redirect URI',
+          title: 'Service provider',
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: 'Members may keep other sign-in methods.',
+            label: 'Allow additional identifiers',
+          },
+          allowIdpInitiated: {
+            description: 'Sign-in may start from the identity provider.',
+            label: 'Allow IdP-initiated flow',
+          },
+          allowSubdomains: {
+            description: "Also match subdomains of the connection's domains.",
+            label: 'Allow subdomains',
+          },
+          forceAuthn: {
+            description: 'Re-authenticate at the identity provider on every sign-in.',
+            label: 'Force re-authentication',
+          },
+          syncUserAttributes: {
+            description: 'Refresh name and email from the identity provider on each sign-in.',
+            label: 'Sync user attributes',
+          },
+          title: 'Settings',
+        },
+      },
       directorySyncSection: {
         badge__active: 'Active',
         badge__inactive: 'Inactive',
