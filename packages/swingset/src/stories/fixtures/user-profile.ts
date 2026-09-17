@@ -8,7 +8,6 @@ import type {
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import type { UserProfileMfaMethod } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 import { useMemo, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';
@@ -19,6 +18,7 @@ import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';
 import { useUserProfileEditUsernameFixture } from './user-profile-edit-username';
+import { useUserProfileMfaExample } from './user-profile-mfa-example';
 import { usePasskeysFixture } from './user-profile-passkeys';
 import { useWeb3WalletsFixture } from './user-profile-web3-wallets';
 
@@ -55,6 +55,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const editName = useUserProfileEditNameFixture();
   const editUsername = useUserProfileEditUsernameFixture();
   const editPassword = useUserProfileEditPasswordFixture();
+  const mfa = useUserProfileMfaExample();
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
@@ -64,10 +65,6 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
   const passkeys = usePasskeysFixture();
-  const [mfaMethods, setMfaMethods] = useState<UserProfileMfaMethod[]>([
-    { id: 'sms', type: 'sms', description: '+1 801-888-8181' },
-    { id: 'backup', type: 'backup-codes' },
-  ]);
   const activeDevices = useUserProfileActiveDevicesFixture();
 
   const [subscription, setSubscription] = useState<UserProfileSubscription>({
@@ -140,17 +137,10 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       passkeys: passkeys.passkeys,
       addPasskeyError: passkeys.addError,
       onRenamePasskey: passkeys.onRename,
-      mfaMethods,
+      ...mfa.security,
       devices: activeDevices.devices,
-      onAddMfaMethod: type =>
-        setMfaMethods(current => [
-          ...current,
-          { id: `${type}-${Date.now()}`, type, description: type === 'sms' ? '+1 801-555-0100' : undefined },
-        ]),
       onAddPasskey: passkeys.onAdd,
       onDeleteAccount: () => Promise.resolve(),
-      onRegenerateBackupCodes: () => undefined,
-      onRemoveMfaMethod: id => setMfaMethods(current => current.filter(method => method.id !== id)),
       onRemovePasskey: passkeys.onRemove,
       onSignOutAllOtherDevices: activeDevices.onSignOutAllOtherDevices,
       onSignOutDevice: activeDevices.onSignOutDevice,
