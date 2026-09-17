@@ -18,12 +18,16 @@ export const styles = stylex.create({
     gridTemplateRows: `auto ${space['0.5']}`,
   },
   workspaceAvatarLead: {
-    gridArea: '1 / 1 / 2 / 2',
+    gridColumnStart: '1',
+    gridRowStart: '1',
   },
   nestedAvatar: {
     borderRadius: '2px',
-    gridArea: '1 / 1 / -1 / -1',
     alignSelf: 'end',
+    gridColumnEnd: '-1',
+    gridColumnStart: '1',
+    gridRowEnd: '-1',
+    gridRowStart: '1',
     justifySelf: 'end',
   },
   nestedAvatarSm: {
