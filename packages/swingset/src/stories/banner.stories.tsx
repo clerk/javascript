@@ -1,5 +1,5 @@
-import type { BannerRootProps } from '@clerk/ui/mosaic/components/banner';
-import { Banner } from '@clerk/ui/mosaic/components/banner';
+import type { BannerRootProps } from '@clerk/mosaic/components/banner';
+import { Banner } from '@clerk/mosaic/components/banner';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -13,7 +13,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'Banner',
-  source: 'packages/ui/src/mosaic/components/banner/banner.tsx',
+  source: 'packages/mosaic/src/components/banner/banner.tsx',
   styles: {
     _variants: {
       color: { neutral: {}, warning: {}, negative: {} },

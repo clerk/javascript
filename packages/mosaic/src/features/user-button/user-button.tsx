@@ -73,7 +73,7 @@ export type UserButtonProps = UserButtonModelOptions &
  *
  * @example
  * ```tsx
- * import { UserButton } from '@clerk/ui/mosaic';
+ * import { UserButton } from '@clerk/mosaic';
  *
  * <UserButton />
  * ```

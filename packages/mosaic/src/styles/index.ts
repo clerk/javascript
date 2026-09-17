@@ -1,8 +1,6 @@
-// StyleX-only barrel: the entry for the isolated `build:mosaic` tsdown config.
-// It re-exports every migrated (Emotion-free) Mosaic component plus the tokens
-// and helpers, so the StyleX rollup plugin can walk this graph and extract one
-// static `styles.css`. Keep it isolated from Emotion/un-migrated code — grow it
-// as components migrate.
+// StyleX-only barrel: the entry for the isolated CSS tsdown config.
+// It re-exports every Mosaic component plus the tokens and helpers, so the
+// StyleX rollup plugin can walk this graph and extract one static `styles.css`.
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
 export { Avatar } from '../components/avatar';
@@ -128,6 +126,7 @@ export type {
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';
+export { UserButton } from '../features/user-button/user-button';
 
 import {
   colorVars,
