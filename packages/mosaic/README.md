@@ -32,7 +32,7 @@ This package lets you preview and provide feedback on Clerk's next generation of
 
 When stable, components will move to be exported through the regular packages.
 
-> We reserve the right to make breaking changes in minors, please pin your version.
+> :construction: We reserve the right to make breaking changes in minors, please pin your version.
 
 ### Prerequisites
 
@@ -46,7 +46,7 @@ When stable, components will move to be exported through the regular packages.
 ### Installation
 
 ```shell
-# npm
+
 npm install --save-exact @clerk/mosaic
 pnpm add --save-exact @clerk/mosaic
 yarn add --exact @clerk/mosaic
