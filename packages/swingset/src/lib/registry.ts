@@ -24,6 +24,12 @@ import {
 } from '../stories/banner.stories';
 import { Disabled, meta as buttonMeta, Primary, Sizes } from '../stories/button.stories';
 import { Default as CardDefault, meta as cardComponentMeta } from '../stories/card.component.stories';
+import {
+  Default as CheckboxDefault,
+  meta as checkboxMeta,
+  Sizes as CheckboxSizes,
+  States as CheckboxStates,
+} from '../stories/checkbox.stories';
 import { meta as collapsibleMeta } from '../stories/collapsible.stories';
 import { meta as comboboxPrimitiveMeta } from '../stories/combobox.primitive.stories';
 import {
@@ -49,6 +55,12 @@ import {
   meta as drawerComponentMeta,
 } from '../stories/drawer.component.stories';
 import { meta as drawerMeta } from '../stories/drawer.stories';
+import {
+  Default as EmptyStateDefault,
+  LabelOnly as EmptyStateLabelOnly,
+  meta as emptyStateMeta,
+  NoResults as EmptyStateNoResults,
+} from '../stories/empty-state.stories';
 import {
   Default as FieldDefault,
   meta as fieldMeta,
@@ -164,6 +176,7 @@ import {
 import {
   Default as ScrollAreaDefault,
   Gutter as ScrollAreaGutter,
+  Horizontal as ScrollAreaHorizontal,
   HoverReveal as ScrollAreaHoverReveal,
   meta as scrollAreaMeta,
   NotScrollable as ScrollAreaNotScrollable,
@@ -188,7 +201,14 @@ import {
   Placeholder as SelectComponentPlaceholder,
 } from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
-import { meta as tableMeta } from '../stories/table.stories';
+import {
+  Default as TableDefault,
+  Empty as TableEmpty,
+  meta as tableMeta,
+  Overflow as TableOverflow,
+  Selection as TableSelection,
+  Sorting as TableSorting,
+} from '../stories/table.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import {
   Colors as TextColors,
@@ -337,6 +357,20 @@ const drawerComponentModule: StoryModule = {
 };
 
 const cardComponentModule: StoryModule = { meta: cardComponentMeta, Default: CardDefault };
+
+const checkboxModule: StoryModule = {
+  meta: checkboxMeta,
+  Default: CheckboxDefault,
+  States: CheckboxStates,
+  Sizes: CheckboxSizes,
+};
+
+const emptyStateModule: StoryModule = {
+  meta: emptyStateMeta,
+  Default: EmptyStateDefault,
+  NoResults: EmptyStateNoResults,
+  LabelOnly: EmptyStateLabelOnly,
+};
 
 const comboboxModule: StoryModule = {
   meta: comboboxMeta,
@@ -510,6 +544,7 @@ const scrollAreaModule: StoryModule = {
   Default: ScrollAreaDefault,
   NotScrollable: ScrollAreaNotScrollable,
   Gutter: ScrollAreaGutter,
+  Horizontal: ScrollAreaHorizontal,
   HoverReveal: ScrollAreaHoverReveal,
   ThemedScrollbar: ScrollAreaThemedScrollbar,
   ShadowIndicators: ScrollAreaShadowIndicators,
@@ -527,8 +562,16 @@ const localizationModule: StoryModule = {
   PluralRules: LocalizationPluralRules,
 };
 
+const tableModule: StoryModule = {
+  meta: tableMeta,
+  Default: TableDefault,
+  Sorting: TableSorting,
+  Selection: TableSelection,
+  Empty: TableEmpty,
+  Overflow: TableOverflow,
+};
+
 // Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
-const tableModule: StoryModule = { meta: tableMeta };
 const toastModule: StoryModule = { meta: toastMeta };
 
 const userProfileApiKeysPanelModule: StoryModule = {
@@ -708,6 +751,7 @@ export const registry: StoryModule[] = [
   bannerModule,
   buttonModule,
   cardComponentModule,
+  checkboxModule,
   comboboxModule,
   flowComponentModule,
   inputModule,
@@ -716,6 +760,7 @@ export const registry: StoryModule[] = [
   itemModule,
   dialogComponentModule,
   drawerComponentModule,
+  emptyStateModule,
   headingModule,
   iconModule,
   iconFrameModule,

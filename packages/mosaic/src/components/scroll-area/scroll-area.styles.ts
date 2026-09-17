@@ -49,7 +49,10 @@ const revealEnd = stylex.keyframes({
 // own, since the two can never legitimately differ. Where we do NOT paint the scrollbar the
 // layer is zero-wide and contributes nothing. Layers composite with `add` by default, so no
 // `mask-composite` declaration is needed.
-const maskImage = `linear-gradient(to bottom, transparent 0, #000 calc(${progressStart} * ${fadeSize}), #000 calc(100% - ${progressEnd} * ${fadeSize}), transparent 100%), linear-gradient(#000, #000)`;
+const fadeStops = `transparent 0, #000 calc(${progressStart} * ${fadeSize}), #000 calc(100% - ${progressEnd} * ${fadeSize}), transparent 100%`;
+const blockMaskImage = `linear-gradient(to bottom, ${fadeStops}), linear-gradient(#000, #000)`;
+const inlineMaskImage = `linear-gradient(to right, ${fadeStops}), linear-gradient(#000, #000)`;
+const inlineMaskImageRtl = `linear-gradient(to left, ${fadeStops}), linear-gradient(#000, #000)`;
 
 // Split by concern rather than one object per slot: the sort-keys rule reorders within an
 // object, so a large one ends up interleaving unrelated properties and stranding the comments
@@ -65,22 +68,14 @@ const styles = stylex.create({
   },
 
   /**
-   * The scroll container itself.
-   *
-   * The scroll padding answers the fade: tabbing to a row below the fold would otherwise land it
-   * flush against the edge the mask fades out, on the one row you just moved to. Block axis only,
-   * like everything else here.
+   * The scroll container itself. Which way it scrolls, and everything that follows from that,
+   * lives in `axes` below.
    */
   viewport: {
     overscrollBehavior: 'contain',
     flexBasis: 'auto',
     flexGrow: 1,
     flexShrink: 1,
-    scrollPaddingBlockEnd: fadeSize,
-    scrollPaddingBlockStart: fadeSize,
-    minHeight: 0,
-    overflowX: 'hidden',
-    overflowY: 'auto',
   },
 
   /**
@@ -153,6 +148,7 @@ const styles = stylex.create({
    */
   scrollbar: {
     '::-webkit-scrollbar': {
+      height: { default: null, '@media (pointer: fine)': scrollbarWidth },
       width: { default: null, '@media (pointer: fine)': scrollbarWidth },
     },
     '::-webkit-scrollbar-thumb': {
@@ -207,30 +203,12 @@ const styles = stylex.create({
     },
   },
 
-  /** Paint-only, so it can never shift the content the way a sticky shadow element does. */
+  /**
+   * Paint-only, so it can never shift the content the way a sticky shadow element does. The
+   * image, its placement and its size all depend on the axis, so they live in `axes` below.
+   */
   mask: {
-    maskImage,
-    maskPosition: 'left top, right top',
     maskRepeat: 'no-repeat',
-    // Held back from the scrollbar only where we actually paint one, which is the same pair of
-    // conditions the rules above run under: a fine pointer, and an engine that implements
-    // `::-webkit-scrollbar`. This is not a fallback branch for the scrollbar styling — there
-    // isn't one — it is the mask asking whether there is a lane to keep clear. Gecko answers no
-    // and gets the fade edge to edge, rather than an unfaded strip beside a bar we never styled
-    // and whose width we don't know.
-    //
-    // `not (-moz-appearance: none)` stands in for the question we actually want to ask,
-    // `selector(::-webkit-scrollbar)`, because StyleX 0.19 rewrites the argument of
-    // `@supports selector(…)` with the same `:not(#\#)` specificity bump it applies to real
-    // selectors. That turns the query into `selector(:not(#\#):not(#\#):not(#\#)::-webkit-scrollbar)`,
-    // which every engine reports as false — verified in Chrome, where the honest form returns
-    // true and the rewritten one returns false. Any property-based condition is left alone.
-    maskSize: {
-      default: '100% 100%, 0px 100%',
-      '@media (pointer: fine)': {
-        '@supports not (-moz-appearance: none)': `calc(100% - ${scrollbarWidth}) 100%, ${scrollbarWidth} 100%`,
-      },
-    },
   },
 
   // Only the name is gated on timeline support. A browser that ignores `animation-timeline`
@@ -247,10 +225,66 @@ const styles = stylex.create({
       default: null,
       '@supports (animation-timeline: scroll())': `${revealStart}, ${revealEnd}`,
     },
-    animationTimeline: 'scroll(self block), scroll(self block)',
     animationTimingFunction: 'linear',
   },
 });
+
+// Everything that knows which way the box scrolls: the overflow pair, the scroll padding that
+// answers the fade (tabbing to a row past the fold would otherwise land it flush against the
+// edge the mask fades out), the mask's geometry, and the timeline the two animations read.
+//
+// The mask's second layer is held back from the scrollbar only where we actually paint one,
+// which is the same pair of conditions the scrollbar rules run under: a fine pointer, and an
+// engine that implements `::-webkit-scrollbar`. This is not a fallback branch for the scrollbar
+// styling — there isn't one — it is the mask asking whether there is a lane to keep clear. Gecko
+// answers no and gets the fade edge to edge, rather than an unfaded strip beside a bar we never
+// styled and whose width we don't know.
+//
+// `not (-moz-appearance: none)` stands in for the question we actually want to ask,
+// `selector(::-webkit-scrollbar)`, because StyleX 0.19 rewrites the argument of
+// `@supports selector(…)` with the same `:not(#\#)` specificity bump it applies to real
+// selectors. That turns the query into `selector(:not(#\#):not(#\#):not(#\#)::-webkit-scrollbar)`,
+// which every engine reports as false — verified in Chrome, where the honest form returns
+// true and the rewritten one returns false. Any property-based condition is left alone.
+const axes = stylex.create({
+  block: {
+    animationTimeline: 'scroll(self block), scroll(self block)',
+    maskImage: blockMaskImage,
+    maskPosition: 'left top, right top',
+    maskSize: {
+      default: '100% 100%, 0px 100%',
+      '@media (pointer: fine)': {
+        '@supports not (-moz-appearance: none)': `calc(100% - ${scrollbarWidth}) 100%, ${scrollbarWidth} 100%`,
+      },
+    },
+    scrollPaddingBlockEnd: fadeSize,
+    scrollPaddingBlockStart: fadeSize,
+    minHeight: 0,
+    overflowX: 'hidden',
+    overflowY: 'auto',
+  },
+  inline: {
+    animationTimeline: 'scroll(self inline), scroll(self inline)',
+    maskImage: {
+      default: inlineMaskImage,
+      ':dir(rtl)': inlineMaskImageRtl,
+    },
+    maskPosition: 'left top, left bottom',
+    maskSize: {
+      default: '100% 100%, 100% 0px',
+      '@media (pointer: fine)': {
+        '@supports not (-moz-appearance: none)': `100% calc(100% - ${scrollbarWidth}), 100% ${scrollbarWidth}`,
+      },
+    },
+    scrollPaddingInlineEnd: fadeSize,
+    scrollPaddingInlineStart: fadeSize,
+    minWidth: 0,
+    overflowX: 'auto',
+    overflowY: 'hidden',
+  },
+});
+
+export type ScrollAreaAxis = keyof typeof axes;
 
 // Gutter only — the scrollbar's own size is a theme token (`--cl-scrollbar-width`), since
 // Mosaic has no reason to size scrollbars differently between components. What varies per
@@ -291,10 +325,14 @@ export type ScrollAreaGutter = keyof typeof gutters;
  * worth it when the content can change height **in place** — a filterable or paginated
  * collection — so crossing the overflow threshold doesn't shift the rows sideways. Neither
  * does anything on platforms that overlay their scrollbars.
+ * @param axis - Which way the box scrolls. `block` (the default) scrolls vertically and fades
+ * the top and bottom edges; `inline` scrolls horizontally — a wide table on a narrow screen —
+ * and fades the left and right edges instead. The other axis is clipped.
  */
-export function scrollAreaViewport(gutter: ScrollAreaGutter = 'auto') {
+export function scrollAreaViewport(gutter: ScrollAreaGutter = 'auto', axis: ScrollAreaAxis = 'block') {
   return [
     styles.viewport,
+    axes[axis],
     styles.thumbColor,
     styles.scrollbar,
     styles.mask,

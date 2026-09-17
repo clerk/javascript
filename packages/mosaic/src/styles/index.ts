@@ -14,6 +14,8 @@ export type { BannerDescriptionProps, BannerLabelProps, BannerRootProps } from '
 export { Button, SubmitButton } from '../components/button';
 export type { ButtonProps, SpinDelayOptions, SubmitButtonProps } from '../components/button';
 export { Card } from '../components/card';
+export { Checkbox } from '../components/checkbox';
+export type { CheckboxProps } from '../components/checkbox';
 export type { CardProps } from '../components/card';
 export { Drawer } from '../components/drawer';
 export type {
@@ -24,6 +26,14 @@ export type {
   DrawerTitleProps,
   DrawerTriggerProps,
 } from '../components/drawer';
+export { EmptyState } from '../components/empty-state';
+export type {
+  EmptyStateActionsProps,
+  EmptyStateDescriptionProps,
+  EmptyStateIconProps,
+  EmptyStateProps,
+  EmptyStateLabelProps,
+} from '../components/empty-state';
 export { Combobox } from '../components/combobox';
 export type {
   ComboboxEmptyProps,
@@ -74,7 +84,7 @@ export type {
   MenuTriggerProps,
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
-export type { ScrollAreaGutter } from '../components/scroll-area';
+export type { ScrollAreaAxis, ScrollAreaGutter } from '../components/scroll-area';
 export { Select } from '../components/select';
 export type {
   SelectItem,
@@ -84,6 +94,20 @@ export type {
   SelectTriggerProps,
   SelectTriggerVariant,
 } from '../components/select';
+export { Table } from '../components/table';
+export type {
+  TableAlign,
+  TableBodyProps,
+  TableCellProps,
+  TableEmptyProps,
+  TableHeaderCellProps,
+  TableHeaderProps,
+  TableProps,
+  TableRowProps,
+  TableSelectAllCellProps,
+  TableSelectCellProps,
+  TableSort,
+} from '../components/table';
 export { Section } from '../components/section';
 export type {
   SectionActionsProps,

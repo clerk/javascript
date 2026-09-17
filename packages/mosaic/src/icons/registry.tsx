@@ -137,6 +137,13 @@ const Plus = glyph(
   />,
 );
 
+const Minus = glyph(
+  <path
+    d='M3.75 8H12.25'
+    {...strokeProps}
+  />,
+);
+
 const Search = glyph(
   <path
     d='M10 10.0104C10.7722 9.24089 11.25 8.17625 11.25 7C11.25 4.65279 9.34721 2.75 7 2.75C4.65279 2.75 2.75 4.65279 2.75 7C2.75 9.34721 4.65279 11.25 7 11.25C8.17096 11.25 9.23132 10.7764 10 10.0104ZM10 10.0104L13.25 13.25'
@@ -379,6 +386,7 @@ export const iconRegistry = {
   eye: Eye,
   'eye-slash': EyeSlash,
   'info-circle': InfoCircle,
+  minus: Minus,
   pen: Pen,
   plus: Plus,
   search: Search,
