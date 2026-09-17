@@ -129,6 +129,15 @@ opacity-at-overshoot-peak from 0.78 to 1.00.
 **Exits land together.** Do _not_ split them going out. Matching durations are
 what stop an exit reading as a lingering ghost.
 
+## An exit must not show new content
+
+An element that animates out is still mounted, and by then the thing that closed
+it has usually changed the data underneath — so the subtree re-renders and the
+exit plays over the _next_ screen's content. It reads as a flash. Whatever you
+animate out, hold its last frame for the length of the exit: `Freeze` around the
+children, or a snapshot of the outgoing content. See "Exiting content must be
+frozen" in `headless.md` for which to use and the two ways to get it wrong.
+
 ## Color and state changes (hover, press)
 
 A state change on an element that is already there and stays there — background,
