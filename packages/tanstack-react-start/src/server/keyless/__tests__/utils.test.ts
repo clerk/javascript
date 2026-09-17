@@ -22,7 +22,7 @@ const storedKeys = {
   publishableKey: 'pk_test_stored',
   secretKey: 'sk_test_stored',
   claimUrl: 'https://dashboard.clerk.com/apps/claim',
-  apiKeysUrl: 'https://dashboard.clerk.com/last-active?path=api-keys',
+  apiKeysUrl: 'https://dashboard.clerk.com/~/api-keys',
 };
 
 describe('completeOnboardingIfClaimed', () => {

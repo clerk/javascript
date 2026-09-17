@@ -60,7 +60,7 @@ test.describe('Keyless mode @tanstack-react-start', () => {
       publishableKey,
       secretKey,
       claimUrl: 'https://dashboard.clerk.com/apps/claim',
-      apiKeysUrl: 'https://dashboard.clerk.com/last-active?path=api-keys',
+      apiKeysUrl: 'https://dashboard.clerk.com/~/api-keys',
     });
     await app.withEnv(appConfigs.envs.withEmailCodes);
     // Restart the dev server to pick up new env vars
