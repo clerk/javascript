@@ -16,9 +16,9 @@ anchor, and `Popover.Popup` is the floating box. Put the surface inside the popu
 see comes from the `Card`.
 
 ```tsx
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Card } from '@clerk/ui/mosaic/components/card';
-import { Popover } from '@clerk/ui/mosaic/components/popover';
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import { Popover } from '@clerk/mosaic/components/popover';
 
 <Popover.Root>
   <Popover.Trigger render={props => <Button {...props}>Open popover</Button>} />
@@ -183,10 +183,10 @@ them through your own typography (`Heading`, `Text`) inside the surface.
 The Mosaic popover is themed with **StyleX**. Each styled part
 carries a stable `.cl-<slot>` class (the slots in the table above) alongside the StyleX atoms.
 Consumers never target the hashed atomic classes — override by targeting the `.cl-*` slot from a
-CSS layer that wins over `@clerk/ui/styles.css`:
+CSS layer that wins over `@clerk/mosaic/styles.css`:
 
 ```css
-@import '@clerk/ui/styles.css' layer(components);
+@import '@clerk/mosaic/styles.css' layer(components);
 
 @layer overrides {
   .cl-popover-popup[data-size='lg'] {

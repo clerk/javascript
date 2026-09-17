@@ -15,7 +15,7 @@ opens directly over the trigger, the way a native `<select>` does.
 ## Usage
 
 ```tsx
-import { Select } from '@clerk/ui/mosaic/components/select';
+import { Select } from '@clerk/mosaic/components/select';
 
 const roles = [
   { value: 'all', label: 'All roles' },
@@ -196,7 +196,7 @@ The Mosaic select is themed with **StyleX**. Each styled part carries a stable `
 override by targeting the `.cl-*` slot from a CSS layer that wins over `@clerk/ui/styles.css`:
 
 ```css
-@import '@clerk/ui/styles.css' layer(components);
+@import '@clerk/mosaic/styles.css' layer(components);
 
 @layer overrides {
   .cl-select-popup {

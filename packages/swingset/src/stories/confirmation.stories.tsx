@@ -1,5 +1,5 @@
-import { Confirmation } from '@clerk/ui/mosaic/blocks/confirmation';
-import { Button } from '@clerk/ui/mosaic/components/button';
+import { Confirmation } from '@clerk/mosaic/blocks/confirmation';
+import { Button } from '@clerk/mosaic/components/button';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -12,7 +12,7 @@ export const meta: StoryMeta = {
   group: 'Blocks',
   status: 'wip',
   title: 'Confirmation',
-  source: 'packages/ui/src/mosaic/blocks/confirmation/confirmation.tsx',
+  source: 'packages/mosaic/src/blocks/confirmation/confirmation.tsx',
 };
 
 // A real removal is a network round trip. Without one the action never renders its pending

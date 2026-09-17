@@ -2,7 +2,7 @@
 
 Headless UI primitives for Clerk's component library. These are unstyled, accessible React components built on [Floating UI](https://floating-ui.com/) that handle positioning, keyboard navigation, focus management, and ARIA attributes.
 
-This package is **internal** (`private: true`) and consumed by `@clerk/ui`. It exists as a separate package because `@clerk/ui` uses `@emotion/react` as its JSX source, which conflicts with the standard `react-jsx` transform these primitives require.
+This package is **internal** (`private: true`) and consumed by `@clerk/mosaic`. It is planned to later move into the Mosaic package. Mosaic currently bundles Headless into its published artifact.
 
 ## Primitives
 

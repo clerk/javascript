@@ -1,6 +1,6 @@
 # Package map
 
-The 24 active, git-tracked packages, the dependency shape, and the full "change X, touch Y" routing.
+The 25 active, git-tracked packages, the dependency shape, and the full "change X, touch Y" routing.
 `SKILL.md` has the short version (the ~10 packages people touch most).
 
 > The authoritative package list is the set of `packages/*/package.json` files tracked in git. The
@@ -22,7 +22,8 @@ backwards-compatibility contract (see `breaking-changes.md`).
 | `@clerk/backend`              | foundational    |     | Backend API REST client, JWT verification, webhook helpers. Used by every server adapter.                                                                                      |
 | `@clerk/clerk-js`             | browser-runtime | ⚠️  | The browser runtime (script tag). Backwards-compat sensitive.                                                                                                                  |
 | `@clerk/ui`                   | ui              | ⚠️  | React components for the hosted sign-in / sign-up flows (`packages/ui/src/components`). Consumed by the react/astro/vue/chrome-extension adapters. Backwards-compat sensitive. |
-| `@clerk/headless`             | ui              |     | Unstyled, accessible UI primitives (dialog, menu, popover, ...) consumed by `@clerk/ui`. Private (not published).                                                              |
+| `@clerk/mosaic`               | ui              |     | Experimental next-generation React components. Public ESM package (`UserButton` + `styles.css`). Reads Clerk context from the host SDK via `@clerk/shared`.                          |
+| `@clerk/headless`             | ui              |     | Unstyled, accessible UI primitives (dialog, menu, popover, ...) consumed by `@clerk/mosaic`. Private (not published); bundled into Mosaic's published artifact.                |
 | `@clerk/react`                | adapter (core)  |     | React hooks and context (`useAuth`, `useUser`, `useOrganization`, ...). Shared by the React-based adapters.                                                                    |
 | `@clerk/nextjs`               | adapter         |     | Next.js SDK: middleware, route handlers, server components.                                                                                                                    |
 | `@clerk/express`              | adapter         |     | Express middleware and server helpers.                                                                                                                                         |
@@ -39,7 +40,7 @@ backwards-compatibility contract (see `breaking-changes.md`).
 | `@clerk/localizations`        | ui/i18n         |     | Translation strings for the UI components. Consumed by `ui`.                                                                                                                   |
 | `@clerk/testing`              | tooling         |     | E2E test helpers for consumers (Playwright + Cypress).                                                                                                                         |
 | `@clerk/msw`                  | tooling         |     | MSW request handlers for mocking the Clerk API in tests. Private (not published).                                                                                              |
-| `@clerk/swingset`             | tooling         |     | Component explorer for `@clerk/ui`'s Mosaic design system. Private (not published).                                                                                            |
+| `@clerk/swingset`             | tooling         |     | Component explorer for `@clerk/mosaic`. Private (not published).                                                                                                               |
 | `@clerk/upgrade`              | tooling         |     | CLI codemod tool for upgrading consumers between SDK versions.                                                                                                                 |
 | `@clerk/eslint-plugin`        | tooling         |     | ESLint plugin enforcing Clerk patterns across JavaScript frameworks (lint rules shipped to apps). Published.                                                                   |
 
@@ -57,7 +58,8 @@ script.
            /   |   \
    nextjs  react-router  expo ...        (framework adapters: consume react + backend + shared)
 
-   @clerk/ui  ──uses──▶  @clerk/localizations, @clerk/headless   (UI components; consumed by react / astro / vue / chrome-extension)
+   @clerk/mosaic  ──uses──▶  @clerk/shared; bundles @clerk/headless
+   @clerk/ui  ──uses──▶  @clerk/localizations   (hosted UI; consumed by react / astro / vue / chrome-extension)
    @clerk/clerk-js                               (standalone browser runtime, script tag; delivered alongside @clerk/ui)
 ```
 
@@ -77,6 +79,7 @@ error traces back to it, rebuild shared: `pnpm turbo build --filter=@clerk/share
   `@clerk/react`. Changes propagate to `nextjs`, `react-router`, `tanstack-react-start`, `expo`,
   `chrome-extension` (all consume `@clerk/react`; note `expo` wraps `useAuth` rather than just
   re-exporting it).
+- **Mosaic components (`UserButton`, StyleX parts, flow views)**: `packages/mosaic/src` (`@clerk/mosaic`). Preview in Swingset (`pnpm dev:swingset`). Headless primitives stay in `packages/headless` and are bundled into Mosaic. Mosaic-only changesets should not list `@clerk/react` or `@clerk/nextjs`.
 - **The hosted sign-in / sign-up UI (components, layout)**: `packages/ui/src/components` (`@clerk/ui`).
   Strings live in `packages/localizations/src`. `@clerk/ui` is consumed by the
   `react`/`astro`/`vue`/`chrome-extension` adapters; its compiled runtime is delivered alongside

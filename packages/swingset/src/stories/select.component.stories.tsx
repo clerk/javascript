@@ -1,6 +1,6 @@
-import { Field } from '@clerk/ui/mosaic/components/field';
-import { Select } from '@clerk/ui/mosaic/components/select';
-import { Text } from '@clerk/ui/mosaic/components/text';
+import { Field } from '@clerk/mosaic/components/field';
+import { Select } from '@clerk/mosaic/components/select';
+import { Text } from '@clerk/mosaic/components/text';
 import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
 
@@ -16,7 +16,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'wip',
   title: 'Select',
-  source: 'packages/ui/src/mosaic/components/select/select.tsx',
+  source: 'packages/mosaic/src/components/select/select.tsx',
 };
 
 const roleFilters = [
