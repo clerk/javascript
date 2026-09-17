@@ -4,7 +4,7 @@ import { Confirmation } from '../../blocks/confirmation';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
-import { fill } from '../../utils/messages';
+import { fill } from '../../localization/messages';
 import { UserProfilePasskeyRowView } from './user-profile-passkey-row.view';
 import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 
