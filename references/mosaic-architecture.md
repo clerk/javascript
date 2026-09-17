@@ -457,7 +457,7 @@ To migrate a component from the old system to Mosaic:
    ```
 
 4. Update token references — e.g. `theme.colors.$primary500` → `colorVars['--cl-color-brand']`.
-5. Export the component from `styles/index.ts` and run `pnpm build:mosaic`.
+5. Export the component from `styles/index.ts` and run `pnpm build --filter @clerk/mosaic`.
 
 The steps above cover the **styling** migration. For **flow** components — where the legacy component also fuses data-fetching and interaction state into the same file — splitting that into the model/controller/view layers and verifying no implicit behavior is dropped is its own end-to-end workflow. See the `mosaic` Claude Code skill (`.claude/skills/mosaic/`), in particular its `references/migration.md`.
 

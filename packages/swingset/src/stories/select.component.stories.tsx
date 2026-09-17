@@ -16,7 +16,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'wip',
   title: 'Select',
-  source: 'packages/ui/src/mosaic/components/select/select.tsx',
+  source: 'packages/mosaic/src/components/select/select.tsx',
 };
 
 const roleFilters = [
