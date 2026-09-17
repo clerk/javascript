@@ -299,6 +299,7 @@ function SwitcherRow({
           imageUrl={imageUrl}
           shape={shape}
           size='fit'
+          xstyle={styles.rowAvatar}
         />
       </Item.Media>
       <Item.Content>

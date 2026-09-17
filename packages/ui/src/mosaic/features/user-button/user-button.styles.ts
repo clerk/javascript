@@ -6,6 +6,11 @@ export const styles = stylex.create({
   accountIdentifier: {
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
+  rowAvatar: {
+    fontSize: '0.5rem',
+    height: space['5'],
+    width: space['5'],
+  },
   workspaceAvatar: {
     display: 'inline-grid',
     gridTemplateColumns: `auto ${space['0.5']}`,
