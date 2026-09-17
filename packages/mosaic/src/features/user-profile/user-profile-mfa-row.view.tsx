@@ -1,5 +1,3 @@
-import { useId } from 'react';
-
 import { Badge } from '../../components/badge';
 import { Section } from '../../components/section';
 import { fill } from '../../localization';
@@ -15,18 +13,11 @@ export function UserProfileMfaRowView({
   onRemove,
   onSetDefault,
   onRegenerateBackupCodes,
-  isPending,
-  disabled,
-  errorMessage,
 }: Pick<UserProfileMfaSectionViewProps, 'onRegenerateBackupCodes'> & {
   method: UserProfileMfaMethod;
   onRemove?: () => void;
   onSetDefault?: (id: string) => void;
-  isPending?: boolean;
-  disabled?: boolean;
-  errorMessage?: string;
 }) {
-  const errorId = useId();
   const label = method.label ?? m.methods[method.type];
   const manageLabel =
     method.type === 'sms' && method.description
@@ -47,36 +38,23 @@ export function UserProfileMfaRowView({
   }
 
   return (
-    <>
-      <Section.Item>
-        <UserProfileSecurityIcon name={method.type} />
-        <Section.Content>
-          <Section.Label xstyle={styles.label}>
-            {label}
-            {method.isDefault ? <Badge color='neutral'>{m.default}</Badge> : null}
-          </Section.Label>
-          {method.description ? <Section.Description>{method.description}</Section.Description> : null}
-        </Section.Content>
-        {actions.length > 0 ? (
-          <Section.Actions>
-            <UserProfileActionMenu
-              actions={actions}
-              label={manageLabel}
-              isPending={isPending}
-              disabled={disabled}
-              aria-describedby={errorMessage ? errorId : undefined}
-            />
-          </Section.Actions>
-        ) : null}
-      </Section.Item>
-      {errorMessage ? (
-        <Section.Error
-          id={errorId}
-          xstyle={styles.error}
-        >
-          {errorMessage}
-        </Section.Error>
+    <Section.Item>
+      <UserProfileSecurityIcon name={method.type} />
+      <Section.Content>
+        <Section.Label xstyle={styles.label}>
+          {label}
+          {method.isDefault ? <Badge color='neutral'>{m.default}</Badge> : null}
+        </Section.Label>
+        {method.description ? <Section.Description>{method.description}</Section.Description> : null}
+      </Section.Content>
+      {actions.length > 0 ? (
+        <Section.Actions>
+          <UserProfileActionMenu
+            actions={actions}
+            label={manageLabel}
+          />
+        </Section.Actions>
       ) : null}
-    </>
+    </Section.Item>
   );
 }

@@ -100,16 +100,48 @@ describe('MFA section', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
-  it('marks the selected default change pending and blocks overlapping method actions', async () => {
+  it('hides Set as default during an update while keeping the menu available', async () => {
     const user = userEvent.setup();
     const pending = deferred<void>();
     const onSetDefault = vi.fn(() => pending.promise);
-    const { props } = renderView({
+    renderView({
+      methods: [
+        { id: 'work', type: 'sms', description: '+1 801-555-0200', canSetDefault: true },
+        { id: 'other', type: 'sms', description: '+1 801-555-0300', canSetDefault: true },
+      ],
+      onSetDefault,
+    });
+
+    const selected = screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0200' });
+    await user.click(selected);
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await user.click(selected);
+    expect(screen.queryByRole('menuitem', { name: 'Set as default' })).not.toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Remove method' })).toBeVisible();
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0300' }));
+    expect(screen.queryByRole('menuitem', { name: 'Set as default' })).not.toBeInTheDocument();
+    expect(onSetDefault).toHaveBeenCalledExactlyOnceWith('work');
+
+    await act(async () => {
+      pending.resolve();
+      await pending.promise;
+    });
+
+    expect(await screen.findByRole('menuitem', { name: 'Set as default' })).toBeVisible();
+  });
+
+  it.each([
+    { cause: new Error('Unable to update the default method.'), message: 'Unable to update the default method.' },
+    { cause: 'network failure', message: 'Unable to set this method as default. Please try again.' },
+  ])('shows a default-change error and clears it on retry: $message', async ({ cause, message }) => {
+    const user = userEvent.setup();
+    const retry = deferred<void>();
+    const onSetDefault = vi.fn().mockRejectedValueOnce(cause).mockReturnValueOnce(retry.promise);
+    renderView({
       methods: [
         { id: 'personal', type: 'sms', description: '+1 801-555-0100', isDefault: true },
         { id: 'work', type: 'sms', description: '+1 801-555-0200', canSetDefault: true },
-        { id: 'other', type: 'sms', description: '+1 801-555-0300', canSetDefault: true },
-        { id: 'backup', type: 'backup-codes' },
       ],
       onSetDefault,
     });
@@ -118,78 +150,21 @@ describe('MFA section', () => {
     await user.click(selected);
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
 
-    expect(selected).toHaveAttribute('aria-busy', 'true');
-    expect(selected).toHaveAttribute('aria-disabled', 'true');
-    expect(selected).toHaveFocus();
-    await user.click(selected);
-    await user.keyboard('{Enter}');
-    const other = screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0300' });
-    expect(other).toHaveAttribute('aria-disabled', 'true');
-    await user.click(other);
-    expect(screen.getByRole('button', { name: 'Manage Backup codes' })).toHaveAttribute('aria-disabled', 'true');
-    expect(screen.getByRole('button', { name: 'Add verification method' })).toBeDisabled();
-    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    expect(await screen.findByRole('alert')).toHaveTextContent(message);
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     expect(screen.getAllByText('Default')).toHaveLength(1);
-    expect(onSetDefault).toHaveBeenCalledExactlyOnceWith('work');
-    expect(props.onRemove).not.toHaveBeenCalled();
+    await user.click(selected);
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
 
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     await act(async () => {
-      pending.resolve();
-      await pending.promise;
+      retry.resolve();
+      await retry.promise;
     });
 
-    await waitFor(() => expect(selected).not.toHaveAttribute('aria-busy', 'true'));
-    expect(other).not.toHaveAttribute('aria-disabled', 'true');
-    expect(screen.getByRole('button', { name: 'Add verification method' })).toBeEnabled();
-    await user.click(other);
-    expect(screen.getByRole('menuitem', { name: 'Set as default' })).toBeVisible();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(onSetDefault.mock.calls).toEqual([['work'], ['work']]);
   });
-
-  it.each([
-    { cause: new Error('Unable to update the default method.'), message: 'Unable to update the default method.' },
-    { cause: 'network failure', message: 'Unable to set this method as default. Please try again.' },
-  ])(
-    'shows a default-change error beside the selected row and clears it on retry: $message',
-    async ({ cause, message }) => {
-      const user = userEvent.setup();
-      const retry = deferred<void>();
-      const onSetDefault = vi.fn().mockRejectedValueOnce(cause).mockReturnValueOnce(retry.promise);
-      renderView({
-        methods: [
-          { id: 'personal', type: 'sms', description: '+1 801-555-0100', isDefault: true },
-          { id: 'work', type: 'sms', description: '+1 801-555-0200', canSetDefault: true },
-        ],
-        onSetDefault,
-      });
-
-      const selected = screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0200' });
-      await user.click(selected);
-      await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
-
-      expect(await screen.findByRole('alert')).toHaveTextContent(message);
-      expect(selected).toHaveAccessibleDescription(message);
-      expect(
-        screen.getByRole('button', { name: 'Manage SMS verification +1 801-555-0100' }),
-      ).not.toHaveAccessibleDescription();
-      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
-      expect(screen.getAllByText('Default')).toHaveLength(1);
-      await user.click(selected);
-      await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
-
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-      expect(selected).not.toHaveAccessibleDescription();
-      expect(selected).toHaveAttribute('aria-busy', 'true');
-      await act(async () => {
-        retry.resolve();
-        await retry.promise;
-      });
-
-      await waitFor(() => expect(selected).not.toHaveAttribute('aria-busy', 'true'));
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-      expect(onSetDefault.mock.calls).toEqual([['work'], ['work']]);
-    },
-  );
 
   it('renders supplied backup codes without other methods and only offers regeneration', async () => {
     const user = userEvent.setup();

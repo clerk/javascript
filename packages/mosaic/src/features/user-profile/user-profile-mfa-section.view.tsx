@@ -1,10 +1,10 @@
-import { type ReactNode, type Ref, useMemo } from 'react';
+import { type ReactNode, type Ref, useMemo, useRef, useState } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
+import { Text } from '../../components/text';
 import { fill } from '../../localization';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileMfaRowView } from './user-profile-mfa-row.view';
-import { useUserProfileMfaSectionController } from './user-profile-mfa-section.controller';
 import { userProfileMfaMessages as m } from './user-profile-mfa-section.messages';
 import { UserProfileSecurityList } from './user-profile-security-list';
 
@@ -44,8 +44,33 @@ export function UserProfileMfaSectionView({
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
-  const controller = useUserProfileMfaSectionController({ methods, onSetDefault });
-  const isSettingDefault = controller.pendingMethodId !== undefined;
+  const [isSettingDefault, setIsSettingDefault] = useState(false);
+  const [defaultError, setDefaultError] = useState<string>();
+  const settingDefault = useRef(false);
+
+  const setDefault = async (id: string) => {
+    const method = methods.find(method => method.id === id);
+    if (
+      !onSetDefault ||
+      method?.type !== 'sms' ||
+      !method.canSetDefault ||
+      method.isDefault ||
+      settingDefault.current
+    ) {
+      return;
+    }
+    settingDefault.current = true;
+    setIsSettingDefault(true);
+    setDefaultError(undefined);
+    try {
+      await onSetDefault(id);
+    } catch (error) {
+      setDefaultError(error instanceof Error ? error.message : m.setDefaultError);
+    } finally {
+      settingDefault.current = false;
+      setIsSettingDefault(false);
+    }
+  };
 
   return (
     <>
@@ -57,7 +82,6 @@ export function UserProfileMfaSectionView({
               triggerRef={addButtonRef}
               methods={addableMethods}
               onSelect={onAdd}
-              disabled={isSettingDefault}
             />
           ) : null)
         }
@@ -72,14 +96,19 @@ export function UserProfileMfaSectionView({
             key={method.id}
             method={method}
             onRemove={onRemove ? () => removeMethod.open(method) : undefined}
-            onSetDefault={controller.onSetDefault}
-            isPending={controller.pendingMethodId === method.id}
-            disabled={isSettingDefault}
-            errorMessage={controller.errorMethodId === method.id ? controller.errorMessage : undefined}
+            onSetDefault={onSetDefault && !isSettingDefault ? id => void setDefault(id) : undefined}
             onRegenerateBackupCodes={onRegenerateBackupCodes}
           />
         ))}
       </UserProfileSecurityList>
+      {defaultError ? (
+        <Text
+          role='alert'
+          color='negative'
+        >
+          {defaultError}
+        </Text>
+      ) : null}
       {onRemove ? (
         <Confirmation
           handle={removeMethod}
