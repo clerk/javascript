@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileBackupCodesDialogProps } from '../user-profile-backup-codes.dialog';
 import { UserProfileBackupCodesDialog } from '../user-profile-backup-codes.dialog';
+import { UserProfileMfaSectionView } from '../user-profile-mfa-section.view';
 
 const codes = ['pwkkay19', 'cvgunlqs', '4czio578', 'a38eewtw', 'qqnwzvyr', 'znq8j16s'];
 
@@ -30,19 +31,19 @@ function renderView(overrides: Partial<UserProfileBackupCodesDialogProps> = {}) 
 }
 
 describe('UserProfileBackupCodesDialog', () => {
-  it('returns focus to the caller’s target after completing a flow without a dialog trigger', async () => {
+  it('returns focus to the section’s Add button after completing a flow without a dialog trigger', async () => {
     const user = userEvent.setup();
     function Example() {
       const [open, setOpen] = useState(true);
       const target = useRef<HTMLButtonElement>(null);
       return (
         <MosaicProvider>
-          <button
-            type='button'
-            ref={target}
-          >
-            Manage verification methods
-          </button>
+          <UserProfileMfaSectionView
+            methods={[]}
+            addableMethods={['sms', 'authenticator']}
+            onAdd={vi.fn()}
+            addButtonRef={target}
+          />
           <UserProfileBackupCodesDialog
             open={open}
             onOpenChange={setOpen}
@@ -57,7 +58,7 @@ describe('UserProfileBackupCodesDialog', () => {
     }
     render(<Example />);
     await user.click(screen.getByRole('button', { name: 'Copy and close' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage verification methods' })).toHaveFocus());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Add verification method' })).toHaveFocus());
   });
 
   it('displays all supplied codes and delegates saving without closing before success', async () => {

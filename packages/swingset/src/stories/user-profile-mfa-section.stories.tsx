@@ -21,7 +21,7 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
   const fixture = useUserProfileMfaFixture({
     onCopy: codes => navigator.clipboard.writeText(codes.join('\n')),
     onDownload: codes => {
@@ -35,18 +35,14 @@ export function Default() {
     },
   });
 
-  const finalFocus = fixture.authenticator.open || fixture.sms.open || fixture.backupCodes.open ? false : sectionRef;
+  const finalFocus = fixture.authenticator.open || fixture.sms.open || fixture.backupCodes.open ? false : addButtonRef;
 
   return (
     <>
-      <div
-        ref={sectionRef}
-        tabIndex={-1}
-        role='group'
-        aria-label='Authentication'
-      >
-        <UserProfileMfaSectionView {...fixture.section} />
-      </div>
+      <UserProfileMfaSectionView
+        {...fixture.section}
+        addButtonRef={addButtonRef}
+      />
       <UserProfileAddAuthenticatorDialog
         {...fixture.authenticator}
         finalFocus={finalFocus}

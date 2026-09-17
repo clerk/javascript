@@ -42,6 +42,7 @@ Account requests are simulated and succeed by default. Copy and Download save th
 | `methods`                 | `UserProfileMfaMethod[]`                      | — (required) | Prepared rows, in display order. All supplied rows render.                                           |
 | `addableMethods`          | `readonly UserProfileMfaAddableMethod[]`      | —            | Available choices, in display order. Add appears when this is nonempty and `onAdd` is supplied.      |
 | `sectionTitle`            | `string`                                      | —            | Optional surrounding heading.                                                                        |
+| `addButtonRef`            | `Ref<HTMLButtonElement>`                      | —            | Ref to the Add button for restoring focus after setup dialogs close.                                 |
 | `onAdd`                   | `(type: UserProfileMfaAddableMethod) => void` | —            | Receives the chosen method immediately when its option is activated.                                 |
 | `onSetDefault`            | `(id: string) => void \| Promise<void>`       | —            | Changes the default SMS method. Shows pending feedback and reports failures beside the selected row. |
 | `onRemove`                | `(id: string) => void \| Promise<void>`       | —            | Called after confirmation. Resolve to close; reject with an Error to show the failure.               |

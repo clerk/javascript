@@ -1,3 +1,5 @@
+import type { Ref } from 'react';
+
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { Dialog } from '../../components/dialog';
@@ -10,6 +12,7 @@ interface UserProfileAddMfaDialogProps {
   methods: readonly UserProfileMfaAddableMethod[];
   onSelect: (type: UserProfileMfaAddableMethod) => void;
   disabled?: boolean;
+  triggerRef?: Ref<HTMLButtonElement>;
 }
 
 const icons = {
@@ -18,10 +21,11 @@ const icons = {
   'backup-codes': 'numbers',
 } as const;
 
-export function UserProfileAddMfaDialog({ methods, onSelect, disabled }: UserProfileAddMfaDialogProps) {
+export function UserProfileAddMfaDialog({ methods, onSelect, disabled, triggerRef }: UserProfileAddMfaDialogProps) {
   return (
     <Dialog.Root>
       <Dialog.Trigger
+        ref={triggerRef}
         aria-label={m.addLabel}
         disabled={disabled}
         render={
