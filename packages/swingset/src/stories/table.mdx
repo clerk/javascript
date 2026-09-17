@@ -1,3 +1,108 @@
+import * as TableStories from './table.stories';
+
 # Table
 
-Styled Mosaic component for tabular data, pairing with the [useDataTable](/hooks/use-data-table) hook for pagination, sorting, filtering, and row selection. Not yet implemented.
+Table renders tabular data in a bordered Mosaic shell. It's composed from parts via dot syntax: `Table.Root` renders the `<table>` inside a shell that scrolls horizontally when the columns outgrow the container, and `Table.Header`, `Table.Body`, `Table.Row`, `Table.HeaderCell`, and `Table.Cell` map onto their native elements.
+
+Sorting, selection, and the empty state are opt-in parts rather than state the table owns. Pair it with the [useDataTable](/hooks/use-data-table) hook, which holds sorting and row selection, and apply the sort to your rows before rendering them. Pagination is rendered by the consumer below the table with the Pagination component.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={TableStories}
+/>
+
+## Usage
+
+```tsx
+import { Table } from '@clerk/mosaic/components/table';
+
+<Table.Root>
+  <Table.Header>
+    <Table.Row>
+      <Table.HeaderCell>Name</Table.HeaderCell>
+      <Table.HeaderCell>Created</Table.HeaderCell>
+    </Table.Row>
+  </Table.Header>
+  <Table.Body>
+    {rows.map(row => (
+      <Table.Row key={row.id}>
+        <Table.Cell>{row.name}</Table.Cell>
+        <Table.Cell>{row.created}</Table.Cell>
+      </Table.Row>
+    ))}
+  </Table.Body>
+</Table.Root>;
+```
+
+## Parts
+
+- `Table.Root` renders the `<table>`. `xstyle`, `ref`, and any table props land on it; the scrolling shell around it is internal.
+- `Table.Header` and `Table.Body` render `<thead>` and `<tbody>`. Rows inside the body get a top border.
+- `Table.Row` renders a `<tr>`. Pass `selected` to mark it `aria-selected` and tint it.
+- `Table.HeaderCell` renders a `<th scope="col">`. Pass `onSort` to make it sortable: the label becomes a button with a direction icon, and `sort` (`'ascending'`, `'descending'`, or `'none'`) reflects the current direction as `aria-sort`. `align` moves the content to `'center'` or `'end'`.
+- `Table.Cell` renders a `<td>` with the same `align` prop.
+- `Table.SelectAllCell` and `Table.SelectCell` render a narrow header or body cell holding a [Checkbox](/components/checkbox). They take Checkbox props, so pass `checked`, `indeterminate`, and an `aria-label`. `Table.SelectCell` also takes `onToggleSelected`, called with `{ range: true }` when the checkbox was shift-clicked, which fits the row's `toggleSelected` from `useDataTable` directly.
+- `Table.Empty` renders a full-width row with a single cell that spans every column. Put an [EmptyState](/components/empty-state) inside it. The cell uses the largest `colSpan` browsers allow, which stretches across the columns the table actually has; pass `colSpan` yourself if you need the exact count.
+
+## Styling
+
+Each part carries a stable `.cl-*` class, and the parts with state reflect it as `data-*` attributes:
+
+| Class                   | Part                                      | Attributes                                                                                                                |
+| ----------------------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `.cl-table-shell`       | The bordered wrapper around the table     |                                                                                                                           |
+| `.cl-table-viewport`    | The horizontally scrolling viewport       |                                                                                                                           |
+| `.cl-table`             | `Table.Root`                              |                                                                                                                           |
+| `.cl-table-header`      | `Table.Header`                            |                                                                                                                           |
+| `.cl-table-body`        | `Table.Body`                              |                                                                                                                           |
+| `.cl-table-row`         | `Table.Row`                               | `data-selected` when `selected`                                                                                           |
+| `.cl-table-header-cell` | `Table.HeaderCell`                        | `data-align` (`start` / `center` / `end`), `data-sortable` when `onSort` is set, `data-sort` (`ascending` / `descending`) |
+| `.cl-table-cell`        | `Table.Cell`                              | `data-align` (`start` / `center` / `end`)                                                                                 |
+| `.cl-table-select-cell` | `Table.SelectAllCell`, `Table.SelectCell` |                                                                                                                           |
+| `.cl-table-empty`       | `Table.Empty`                             |                                                                                                                           |
+
+```css
+.cl-table-row[data-selected] {
+  background: rgba(0, 0, 0, 0.06);
+}
+```
+
+---
+
+## Examples
+
+### Sorting
+
+Each sortable header cycles through ascending, descending, and unsorted. The story keeps sorting in `useDataTable` and sorts the rows itself before rendering.
+
+<Story
+  name='Sorting'
+  storyModule={TableStories}
+/>
+
+### Selection
+
+`Table.SelectAllCell` reads `getIsAllRowsSelected` and `getIsSomeRowsSelected` from `useDataTable`; each `Table.SelectCell` reads its row. Select a row, then shift-click another to select every row in between.
+
+<Story
+  name='Selection'
+  storyModule={TableStories}
+/>
+
+### Empty
+
+<Story
+  name='Empty'
+  storyModule={TableStories}
+/>
+
+### Overflow
+
+Wide tables scroll horizontally inside the shell instead of breaking the page layout. The viewport is the shared [Scroll Area](/styles/scroll-area) on its `inline` axis, so the left and right edges fade while there is more to reveal and the scrollbar matches the rest of Mosaic.
+
+<Story
+  name='Overflow'
+  storyModule={TableStories}
+/>
