@@ -316,7 +316,8 @@ export const enUS: LocalizationResource = {
     changeProviderDialog: {
       cancelButton: 'Cancel',
       confirmButton: 'Change provider',
-      subtitle: 'Switching to {{provider}} will remove your {{currentProvider}} connection and require a new setup.',
+      subtitle:
+        'Switching to {{provider}} will remove the {{currentProvider}} connection "{{name}}" and require a new setup.',
       title: 'Change provider to {{provider}}',
     },
     configureStep: {
@@ -812,6 +813,12 @@ export const enUS: LocalizationResource = {
         title: 'Unsupported provider',
       },
     },
+    connectionScopeBanner: {
+      subtitle__adding: 'This organization already has {{count}} SSO connections.',
+      subtitle__editing: 'This organization has {{count}} SSO connections. Changes here apply only to this connection.',
+      title__adding: 'Adding a new SSO connection',
+      title__editing: 'Editing "{{name}}"',
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: "Contact your organization's administrator to upgrade your permissions.",
       title: 'You do not have permission to manage Single Sign-on (SSO)',
@@ -821,9 +828,11 @@ export const enUS: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__claimed: 'Used by another connection',
         badge__expired: 'Expired',
         badge__unverified: 'Unverified',
         badge__verified: 'Verified',
+        checkboxLabel: 'Use {{domain}} for this connection',
         expiredAtLabel:
           "Domain verification expired on {{ date | shortDate('en-US') }}. Verify again to generate a new DNS record.",
         expiredLabel: 'Domain verification expired. Verify again to generate a new DNS record.',
@@ -853,7 +862,8 @@ export const enUS: LocalizationResource = {
         subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",
         title: 'Removing domain',
       },
-      subtitle: 'Add and verify ownership of the domains your organization uses to sign in.',
+      subtitle:
+        'Add and verify ownership of the domains your organization uses to sign in, then pick the ones this connection covers.',
       title: 'Add SSO domains',
     },
     resetConnectionDialog: {
@@ -862,7 +872,7 @@ export const enUS: LocalizationResource = {
       confirmationFieldPlaceholder: '{{name}}',
       resetButton: 'Reset connection',
       subtitle:
-        'Are you sure you want to reset the connection? This action is irreversible and you will have to configure all steps again',
+        'Are you sure you want to reset the connection "{{name}}"? This action is irreversible and you will have to configure all steps again',
       title: 'Reset connection',
     },
     selectProviderStep: {
@@ -1313,6 +1323,68 @@ export const enUS: LocalizationResource = {
       title: 'Remove domain',
     },
     securityPage: {
+      connectionPage: {
+        actions: {
+          activate: 'Activate',
+          continueSetup: 'Continue setup',
+        },
+        dangerZone: {
+          deactivateButton: 'Deactivate connection',
+          removeButton: 'Remove connection',
+          title: 'Danger zone',
+        },
+        domains: {
+          title: 'Domains',
+        },
+        identityProvider: {
+          certificateExpires: 'Certificate expires',
+          clientSecret: {
+            placeholder: 'Leave empty to keep the current secret',
+          },
+          editButton: 'Edit',
+          form: {
+            title: 'Edit identity provider',
+          },
+          title: 'Identity provider',
+        },
+        name: {
+          editButton: 'Edit',
+          form: {
+            title: 'Rename connection',
+          },
+          title: 'Name',
+        },
+        serviceProvider: {
+          acsUrl: 'Assertion consumer service (ACS) URL',
+          entityId: 'Entity ID',
+          metadataUrl: 'Metadata URL',
+          redirectUri: 'Redirect URI',
+          title: 'Service provider',
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: 'Members may keep other sign-in methods.',
+            label: 'Allow additional identifiers',
+          },
+          allowIdpInitiated: {
+            description: 'Sign-in may start from the identity provider.',
+            label: 'Allow IdP-initiated flow',
+          },
+          allowSubdomains: {
+            description: "Also match subdomains of the connection's domains.",
+            label: 'Allow subdomains',
+          },
+          forceAuthn: {
+            description: 'Re-authenticate at the identity provider on every sign-in.',
+            label: 'Force re-authentication',
+          },
+          syncUserAttributes: {
+            description: 'Refresh name and email from the identity provider on each sign-in.',
+            label: 'Sync user attributes',
+          },
+          title: 'Settings',
+        },
+      },
       directorySyncSection: {
         badge__active: 'Active',
         badge__inactive: 'Inactive',
@@ -1337,7 +1409,7 @@ export const enUS: LocalizationResource = {
       removeDialog: {
         confirmButton: 'Remove connection',
         subtitle:
-          'Are you sure you want to remove the connection? This action is irreversible and deletes the connection and all of its configuration.',
+          'Are you sure you want to remove the connection "{{name}}"? This action is irreversible and deletes the connection and all of its configuration.',
         title: 'Remove SSO connection',
       },
       ssoSection: {
@@ -1348,9 +1420,11 @@ export const enUS: LocalizationResource = {
         descriptionLine1: 'Require members with a matching email domain to sign in through your identity provider.',
         domainLabel: 'Domains:',
         menuAction__activate: 'Activate',
+        menuAction__continue: 'Continue configuration',
         menuAction__deactivate: 'Deactivate',
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
+        primaryButton__addConnection: 'Add connection',
         primaryButton__continueConfiguration: 'Continue configuration',
         primaryButton__startConfiguration: 'Start configuration',
         title: 'SSO',

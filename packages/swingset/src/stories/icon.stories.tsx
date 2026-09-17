@@ -1,7 +1,7 @@
-import type { IconProps } from '@clerk/ui/mosaic/components/icon';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import { iconRegistry } from '@clerk/ui/mosaic/icons/registry';
-import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
+import type { IconProps } from '@clerk/mosaic/components/icon';
+import { Icon } from '@clerk/mosaic/components/icon';
+import { iconRegistry } from '@clerk/mosaic/icons/registry';
+import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -13,7 +13,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'Icon',
-  source: 'packages/ui/src/mosaic/components/icon/icon.tsx',
+  source: 'packages/mosaic/src/components/icon/icon.tsx',
   styles: {
     _variants: {
       size: { sm: {}, md: {}, lg: {} },

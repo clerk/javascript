@@ -1,0 +1,136 @@
+import * as Stories from './confirmation.stories';
+
+# Confirmation
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Banner', href: '/components/banner', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+A confirmation for a destructive action that is worth a second look but not worth making the user type for. Removing a connected account, revoking a session, signing out everywhere. For the actions that do warrant typing, use [Destructive](/components/destructive).
+
+It is an `alertdialog`: it announces as an interruption, an outside press cannot dismiss it, and the card carries no corner dismiss. Escape and the footer's Cancel action dismiss it. Under the phone band it arrives as a bottom sheet.
+
+The block holds nothing of its own. Everything that decides what the dialog does next belongs to the caller. `open` closes it, `isConfirming` marks it busy, `errorMessage` explains a failure.
+
+```tsx
+import { Confirmation } from '@clerk/mosaic/blocks/confirmation';
+import { Button } from '@clerk/mosaic/components/button';
+import { useState } from 'react';
+
+const [open, setOpen] = useState(false);
+const [isConfirming, setIsConfirming] = useState(false);
+const [errorMessage, setErrorMessage] = useState<string>();
+
+const handleConfirm = async () => {
+  setIsConfirming(true);
+  setErrorMessage(undefined);
+  try {
+    await removeConnectedAccount();
+    setOpen(false);
+  } catch {
+    setErrorMessage('Google could not be removed. Please try again.');
+  } finally {
+    setIsConfirming(false);
+  }
+};
+
+<Confirmation
+  open={open}
+  onOpenChange={setOpen}
+  trigger={<Button color='negative' variant='outline'>Remove</Button>}
+  title='Remove connected account'
+  description='Google will be removed from this account. You will no longer be able to use this connected account and any dependent features will no longer work.'
+  actionLabel='Remove'
+  onConfirm={() => void handleConfirm()}
+  isConfirming={isConfirming}
+  errorMessage={errorMessage}
+/>;
+```
+
+## Failure
+
+A failed attempt leaves the dialog up. Pass the sentence the user should read as `errorMessage`, and clear it when the next attempt starts. The message renders as a banner between the description and the actions.
+
+<Story
+  name='WithError'
+  storyModule={Stories}
+/>
+
+## One block, many rows
+
+A table of members has a Remove in every row, but it needs one confirmation, not one per row. Create a handle, mount the block once after the table, and open it from any row with the member it is about. The copy props take a function of that payload, and `onConfirm` receives it. The block owns `open`, the pending state, and the error: a resolved promise closes it, a rejected one keeps it open showing why.
+
+```tsx
+const removeMember = Confirmation.createHandle<Member>();
+
+<Menu.Item color='negative' onClick={() => removeMember.open(member)}>Remove</Menu.Item>
+
+<Confirmation
+  handle={removeMember}
+  title='Remove member'
+  description={member => <><strong>{member.name}</strong> will be removed from the organization.</>}
+  actionLabel='Remove'
+  onConfirm={member => api.removeMember(member.id)}
+/>
+```
+
+Opened from a menu item, focus returns to that menu's trigger when the dialog closes.
+
+<Story
+  name='WithHandle'
+  storyModule={Stories}
+/>
+
+## Props
+
+Controlled:
+
+| Prop           | Type                      | Default      | Description                                                                                |
+| -------------- | ------------------------- | ------------ | ------------------------------------------------------------------------------------------ |
+| `open`         | `boolean`                 | — (required) | Whether the confirmation is showing. Controlled, the way any dialog is.                    |
+| `onOpenChange` | `(open: boolean) => void` | — (required) | Asks to open or close. Fired by the trigger, Escape, and the `Dialog.Close` Cancel action. |
+| `trigger`      | `ReactNode`               | —            | The button that asks to open the dialog.                                                   |
+| `title`        | `string`                  | — (required) | Names what is about to happen.                                                             |
+| `description`  | `ReactNode`               | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                           |
+| `actionLabel`  | `string`                  | — (required) | The destructive button's label.                                                            |
+| `cancelLabel`  | `string`                  | `'Cancel'`   | The cancel button's label.                                                                 |
+| `onConfirm`    | `() => void`              | — (required) | Asks the caller to run the action.                                                         |
+| `isConfirming` | `boolean`                 | `false`      | Renders the action pending and ignores further presses.                                    |
+| `errorMessage` | `string`                  | —            | Renders as a negative banner above the actions.                                            |
+
+With a handle:
+
+| Prop          | Type                                           | Default      | Description                                                                            |
+| ------------- | ---------------------------------------------- | ------------ | -------------------------------------------------------------------------------------- |
+| `handle`      | `ConfirmationHandle<Payload>`                  | — (required) | From `Confirmation.createHandle<Payload>()`. `handle.open(payload)` opens the block.   |
+| `title`       | `string \| (payload: Payload) => string`       | — (required) | Names what is about to happen.                                                         |
+| `description` | `ReactNode \| (payload: Payload) => ReactNode` | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                       |
+| `actionLabel` | `string \| (payload: Payload) => string`       | — (required) | The destructive button's label.                                                        |
+| `cancelLabel` | `string`                                       | `'Cancel'`   | The cancel button's label.                                                             |
+| `onConfirm`   | `(payload: Payload) => Promise<void> \| void`  | — (required) | Runs the action. Resolve to close; reject with an `Error` to keep it open showing why. |
+
+## Driving it from a machine
+
+A section that wires the block to a state machine maps the machine's state onto the same props:
+
+```tsx
+<Confirmation
+  open={snapshot.value === 'confirming' || snapshot.value === 'removing'}
+  onOpenChange={open => send({ type: open ? 'OPEN' : 'CANCEL' })}
+  onConfirm={() => send({ type: 'CONFIRM' })}
+  isConfirming={snapshot.value === 'removing'}
+  errorMessage={snapshot.context.errorMessage}
+  {...copy}
+/>
+```

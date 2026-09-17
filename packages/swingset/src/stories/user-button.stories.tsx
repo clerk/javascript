@@ -1,4 +1,4 @@
-import { Icon } from '@clerk/ui/mosaic/components/icon';
+import { Icon } from '@clerk/mosaic/components/icon';
 import {
   userButtonBusyKeys,
   type UserButtonInvitation,
@@ -7,7 +7,7 @@ import {
   type UserButtonSession,
   type UserButtonSuggestion,
   UserButtonView,
-} from '@clerk/ui/mosaic/user-button/user-button.view';
+} from '@clerk/mosaic/features/user-button/user-button.view';
 import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -22,7 +22,7 @@ export const meta: StoryMeta = {
   label: 'User button',
   status: 'wip',
   substatus: 'needs wire-up',
-  source: 'packages/ui/src/mosaic/user-button/user-button.view.tsx',
+  source: 'packages/mosaic/src/features/user-button/user-button.view.tsx',
 };
 
 // Accounts wear their own photo. Only the flagship workspace carries the Clerk mark; the rest wear

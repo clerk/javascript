@@ -1,6 +1,6 @@
-import type { IconFrameProps } from '@clerk/ui/mosaic/components/icon';
-import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
-import { colorVars, space } from '@clerk/ui/mosaic/tokens.stylex';
+import type { IconFrameProps } from '@clerk/mosaic/components/icon';
+import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
+import { colorVars, space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -9,8 +9,8 @@ export { default as __source } from './icon-frame.stories?raw';
 
 const styles = stylex.create({
   customSurface: {
-    backgroundColor: colorVars['--cl-color-primary'],
-    color: colorVars['--cl-color-primary-foreground'],
+    backgroundColor: colorVars['--cl-color-brand'],
+    color: colorVars['--cl-color-brand-foreground'],
   },
 });
 
@@ -30,7 +30,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'IconFrame',
-  source: 'packages/ui/src/mosaic/components/icon/icon-frame.tsx',
+  source: 'packages/mosaic/src/components/icon/icon-frame.tsx',
   styles: {
     _variants: {
       bordered: { true: {}, false: {} },

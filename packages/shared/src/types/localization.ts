@@ -1197,7 +1197,7 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       removeDialog: {
         title: LocalizationValue;
-        subtitle: LocalizationValue;
+        subtitle: LocalizationValue<'name'>;
         confirmButton: LocalizationValue;
       };
       ssoSection: {
@@ -1209,14 +1209,78 @@ export type __internal_LocalizationResource = {
         descriptionLine1: LocalizationValue;
         primaryButton__startConfiguration: LocalizationValue;
         primaryButton__continueConfiguration: LocalizationValue;
+        primaryButton__addConnection: LocalizationValue;
         domainLabel: LocalizationValue;
         menuAction__edit: LocalizationValue;
+        menuAction__continue: LocalizationValue;
         menuAction__activate: LocalizationValue;
         menuAction__deactivate: LocalizationValue;
         menuAction__remove: LocalizationValue;
         tooltip: LocalizationValue<'role'>;
         tooltip__noRole: LocalizationValue;
         tooltipLabel: LocalizationValue;
+      };
+      connectionPage: {
+        actions: {
+          activate: LocalizationValue;
+          continueSetup: LocalizationValue;
+        };
+        dangerZone: {
+          title: LocalizationValue;
+          deactivateButton: LocalizationValue;
+          removeButton: LocalizationValue;
+        };
+        name: {
+          title: LocalizationValue;
+          editButton: LocalizationValue;
+          form: {
+            title: LocalizationValue;
+          };
+        };
+        domains: {
+          title: LocalizationValue;
+        };
+        serviceProvider: {
+          title: LocalizationValue;
+          acsUrl: LocalizationValue;
+          entityId: LocalizationValue;
+          metadataUrl: LocalizationValue;
+          redirectUri: LocalizationValue;
+        };
+        identityProvider: {
+          title: LocalizationValue;
+          certificateExpires: LocalizationValue;
+          editButton: LocalizationValue;
+          form: {
+            title: LocalizationValue;
+          };
+          clientSecret: {
+            placeholder: LocalizationValue;
+          };
+        };
+        settings: {
+          title: LocalizationValue;
+          syncUserAttributes: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowAdditionalIdentifiers: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowSubdomains: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowIdpInitiated: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          forceAuthn: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+        };
       };
       directorySyncSection: {
         title: LocalizationValue;
@@ -1547,6 +1611,12 @@ export type __internal_LocalizationResource = {
     };
   };
   configureSSO: {
+    connectionScopeBanner: {
+      title__editing: LocalizationValue<'name'>;
+      subtitle__editing: LocalizationValue<'count'>;
+      title__adding: LocalizationValue;
+      subtitle__adding: LocalizationValue<'count'>;
+    };
     missingManageEnterpriseConnectionsPermission: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -1559,7 +1629,7 @@ export type __internal_LocalizationResource = {
       confirmationFieldLabel: LocalizationValue<'name'>;
       confirmationFieldPlaceholder: LocalizationValue<'name'>;
       resetButton: LocalizationValue;
-      subtitle: LocalizationValue;
+      subtitle: LocalizationValue<'name'>;
       title: LocalizationValue;
     };
     selectProviderStep: {
@@ -1580,7 +1650,7 @@ export type __internal_LocalizationResource = {
     };
     changeProviderDialog: {
       title: LocalizationValue<'provider'>;
-      subtitle: LocalizationValue<'provider' | 'currentProvider'>;
+      subtitle: LocalizationValue<'provider' | 'currentProvider' | 'name'>;
       cancelButton: LocalizationValue;
       confirmButton: LocalizationValue;
     };
@@ -1598,6 +1668,8 @@ export type __internal_LocalizationResource = {
         badge__verified: LocalizationValue;
         badge__unverified: LocalizationValue;
         badge__expired: LocalizationValue;
+        badge__claimed: LocalizationValue;
+        checkboxLabel: LocalizationValue<'domain'>;
         verifiedAtLabel: LocalizationValue<'date'>;
         expiredAtLabel: LocalizationValue<'date'>;
         expiredLabel: LocalizationValue;

@@ -792,6 +792,12 @@ export const zhCN: LocalizationResource = {
         title: undefined,
       },
     },
+    connectionScopeBanner: {
+      subtitle__adding: undefined,
+      subtitle__editing: undefined,
+      title__adding: undefined,
+      title__editing: undefined,
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: '请联系您的组织管理员以升级您的权限。',
       title: '您无权管理单点登录 (SSO)',
@@ -801,9 +807,11 @@ export const zhCN: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__claimed: undefined,
         badge__expired: undefined,
         badge__unverified: '未验证',
         badge__verified: '已验证',
+        checkboxLabel: undefined,
         expiredAtLabel: undefined,
         expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
@@ -1274,6 +1282,68 @@ export const zhCN: LocalizationResource = {
       title: '删除域名',
     },
     securityPage: {
+      connectionPage: {
+        actions: {
+          activate: undefined,
+          continueSetup: undefined,
+        },
+        dangerZone: {
+          deactivateButton: undefined,
+          removeButton: undefined,
+          title: undefined,
+        },
+        domains: {
+          title: undefined,
+        },
+        identityProvider: {
+          certificateExpires: undefined,
+          clientSecret: {
+            placeholder: undefined,
+          },
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        name: {
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        serviceProvider: {
+          acsUrl: undefined,
+          entityId: undefined,
+          metadataUrl: undefined,
+          redirectUri: undefined,
+          title: undefined,
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: undefined,
+            label: undefined,
+          },
+          allowIdpInitiated: {
+            description: undefined,
+            label: undefined,
+          },
+          allowSubdomains: {
+            description: undefined,
+            label: undefined,
+          },
+          forceAuthn: {
+            description: undefined,
+            label: undefined,
+          },
+          syncUserAttributes: {
+            description: undefined,
+            label: undefined,
+          },
+          title: undefined,
+        },
+      },
       directorySyncSection: {
         badge__active: undefined,
         badge__inactive: undefined,
@@ -1306,9 +1376,11 @@ export const zhCN: LocalizationResource = {
         descriptionLine1: undefined,
         domainLabel: undefined,
         menuAction__activate: undefined,
+        menuAction__continue: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
+        primaryButton__addConnection: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,

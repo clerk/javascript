@@ -380,6 +380,8 @@ export type ElementsConfig = {
   organizationProfileSecuritySsoDetailRowChip: WithOptions<string>;
   organizationProfileSecuritySsoDetailRowLink: WithOptions<string>;
   organizationProfileSecuritySsoProviderIcon: WithOptions;
+  organizationProfileSecuritySsoConnectionRow: WithOptions;
+  organizationProfileSecuritySsoConnectionPage: WithOptions;
 
   organizationListPreviewItems: WithOptions;
   organizationListPreviewItem: WithOptions;
@@ -692,6 +694,7 @@ export type ElementsConfig = {
   enterpriseConnectionButton: WithOptions;
   enterpriseConnectionButtonText: WithOptions;
 
+  configureSSOConnectionScopeBanner: WithOptions;
   configureSSOHeader: WithOptions;
   configureSSOHeaderBackButton: WithOptions;
   configureSSOMobileNavbar: WithOptions;
@@ -727,7 +730,8 @@ export type ElementsConfig = {
   configureSSOVerifyDomainList: WithOptions;
   configureSSOVerifyDomainSuggestion: WithOptions;
   configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified' | 'expired'>;
-  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified' | 'expired'>;
+  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified' | 'expired' | 'claimed'>;
+  configureSSOVerifyDomainCardCheckbox: WithOptions;
   configureSSOVerifyDomainCardRemoveButton: WithOptions;
   configureSSOVerifyDomainCardTxtRecord: WithOptions;
   configureSSOVerifyDomainCardTxtRecordValue: WithOptions;

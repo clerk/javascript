@@ -1,5 +1,5 @@
-import type { UserProfileMfaMethod } from '@clerk/ui/mosaic/user-profile/user-profile-mfa-section.view';
-import { UserProfileMfaSectionView } from '@clerk/ui/mosaic/user-profile/user-profile-mfa-section.view';
+import type { UserProfileMfaMethod } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
+import { UserProfileMfaSectionView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -12,7 +12,7 @@ export const meta: StoryMeta = {
   title: 'UserProfileMfaSection',
   label: '2-step verification',
   navigation: { category: 'Sections' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-mfa-section.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-mfa-section.view.tsx',
 };
 
 export function Default() {

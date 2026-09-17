@@ -1,8 +1,8 @@
-import { Avatar } from '@clerk/ui/mosaic/components/avatar';
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Item } from '@clerk/ui/mosaic/components/item';
-import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
-import { radiusVars, space } from '@clerk/ui/mosaic/tokens.stylex';
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Button } from '@clerk/mosaic/components/button';
+import { Item } from '@clerk/mosaic/components/item';
+import { scrollAreaRoot, scrollAreaViewport } from '@clerk/mosaic/components/scroll-area';
+import { radiusVars, space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
@@ -25,7 +25,7 @@ export const meta: StoryMeta = {
   group: 'Styles',
   title: 'Scroll Area',
   status: 'stable',
-  source: 'packages/ui/src/mosaic/components/scroll-area/scroll-area.styles.ts',
+  source: 'packages/mosaic/src/components/scroll-area/scroll-area.styles.ts',
 };
 
 const accounts = [
@@ -283,7 +283,7 @@ export function ThemedScrollbar() {
 
 /**
  * The mask retired for overlay scrims, each reading the progress var for its edge. The scrim mixes
- * from `--cl-color-card-foreground`, so it reads as a shadow on light and a glow on dark;
+ * from `--cl-color-foreground`, so it reads as a shadow on light and a glow on dark;
  * hardcoded black would vanish on a dark surface. `overflow: hidden` on the root keeps the scrims
  * inside its rounded corners.
  *
@@ -311,13 +311,13 @@ export function ShadowIndicators() {
         }
         .demo-scroll-shadows .cl-item-group::before {
           top: 0;
-          background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+          background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
           opacity: var(--cl-scroll-area-progress-start);
           transform: translateY(calc((var(--cl-scroll-area-progress-start) - 1) * var(--cl-scroll-fade-size)));
         }
         .demo-scroll-shadows .cl-item-group::after {
           bottom: 0;
-          background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+          background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
           opacity: var(--cl-scroll-area-progress-end);
           transform: translateY(calc((1 - var(--cl-scroll-area-progress-end)) * var(--cl-scroll-fade-size)));
         }
