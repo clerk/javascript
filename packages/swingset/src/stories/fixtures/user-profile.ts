@@ -8,9 +8,7 @@ import type {
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import type {
-  UserProfileMfaMethod,
-} from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
+import type { UserProfileMfaMethod } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 import { useMemo, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';

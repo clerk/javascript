@@ -1,6 +1,4 @@
-import type {
-  UserProfileMfaMethod,
-} from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
+import type { UserProfileMfaMethod } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 import { useState } from 'react';
 
