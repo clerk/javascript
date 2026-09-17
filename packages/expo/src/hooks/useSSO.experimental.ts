@@ -164,6 +164,7 @@ export function useSSO(): UseSSOReturn {
         strategy: 'enterprise_sso',
         enterpriseConnectionId,
         redirectUrl,
+        actionCompleteRedirectUrl: redirectUrl,
         oidcPrompt,
       });
     }

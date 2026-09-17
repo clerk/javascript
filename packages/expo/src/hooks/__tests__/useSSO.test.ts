@@ -157,6 +157,7 @@ describe('useSSO', () => {
       strategy: 'enterprise_sso',
       enterpriseConnectionId,
       redirectUrl: 'myapp://sso-callback',
+      actionCompleteRedirectUrl: 'myapp://sso-callback',
       oidcPrompt: 'consent',
     });
     expect(mocks.openAuthSessionAsync).toHaveBeenCalledOnce();

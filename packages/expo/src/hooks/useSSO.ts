@@ -113,6 +113,7 @@ export function useSSO() {
         strategy: 'enterprise_sso',
         enterpriseConnectionId,
         redirectUrl,
+        actionCompleteRedirectUrl: redirectUrl,
         oidcPrompt,
       });
     }
