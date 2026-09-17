@@ -126,12 +126,10 @@ export type EnterpriseSSOFactor = {
   strategy: EnterpriseSSOStrategy;
   /**
    * The ID of the enterprise connection.
-   * @experimental
    */
   enterpriseConnectionId?: string;
   /**
    * The name of the enterprise connection.
-   * @experimental
    */
   enterpriseConnectionName?: string;
 };
@@ -248,7 +246,6 @@ export type EnterpriseSSOConfig = EnterpriseSSOFactor & {
   emailAddressId?: string;
   /**
    * The ID of the enterprise connection used for the enterprise SSO factor.
-   * @experimental
    */
   enterpriseConnectionId?: string;
 };

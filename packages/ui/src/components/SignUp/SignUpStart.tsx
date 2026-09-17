@@ -340,12 +340,9 @@ function SignUpStartInternal(): JSX.Element {
         }),
       )
       .catch(err => {
-        /**
-         * @experimental
-         */
         if (
           isClerkAPIResponseError(err) &&
-          err.errors?.[0]?.code === 'enterprise_connection_id_is_required_with_multiple_connections'
+          err.errors?.[0]?.code === ERROR_CODES.ENTERPRISE_CONNECTION_ID_REQUIRED_WITH_MULTIPLE_CONNECTIONS
         ) {
           return navigate('./enterprise-connections');
         }

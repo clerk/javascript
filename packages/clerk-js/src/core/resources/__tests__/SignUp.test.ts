@@ -38,6 +38,22 @@ describe('SignUp', () => {
     expect(snapshot).toBeDefined();
   });
 
+  it.each(['getEnterpriseConnections', '__experimental_getEnterpriseConnections'] as const)(
+    '%s returns connection resources from the current sign-up',
+    async method => {
+      const mockFetch = vi.fn().mockResolvedValue({ response: [{ id: 'ec_1', name: 'Example SSO' }] });
+      BaseResource._fetch = mockFetch;
+      const signUp = new SignUp();
+      signUp.id = 'signup_123';
+      const connections = await signUp[method]();
+      expect(mockFetch).toHaveBeenCalledWith({
+        path: '/client/sign_ups/signup_123/enterprise_connections',
+        method: 'GET',
+      });
+      expect(connections).toMatchObject([{ id: 'ec_1', name: 'Example SSO' }]);
+    },
+  );
+
   describe('prepareVerification', () => {
     afterEach(() => {
       vi.clearAllMocks();

@@ -636,6 +636,10 @@ export class SignUp extends BaseResource implements SignUpResource {
   }
 
   __experimental_getEnterpriseConnections = (): Promise<SignUpEnterpriseConnectionResource[]> => {
+    return this.getEnterpriseConnections();
+  };
+
+  getEnterpriseConnections = (): Promise<SignUpEnterpriseConnectionResource[]> => {
     return BaseResource._fetch({
       path: `/client/sign_ups/${this.id}/enterprise_connections`,
       method: 'GET',

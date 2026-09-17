@@ -24,6 +24,7 @@ export type StartSSOFlowParams = {
   | {
       strategy: EnterpriseSSOStrategy;
       identifier: string;
+      enterpriseConnectionId?: string;
     }
 );
 
@@ -85,13 +86,36 @@ export function useSSO() {
         path: 'sso-callback',
       });
 
-    await signIn.create({
-      strategy,
-      redirectUrl,
-      oidcPrompt,
-      oidcLoginHint,
-      ...(startSSOFlowParams.strategy === 'enterprise_sso' ? { identifier: startSSOFlowParams.identifier } : {}),
-    });
+    const createParams =
+      startSSOFlowParams.strategy === 'enterprise_sso'
+        ? { identifier: startSSOFlowParams.identifier }
+        : {
+            strategy,
+            redirectUrl,
+            oidcPrompt,
+            oidcLoginHint,
+          };
+    await signIn.create(createParams);
+
+    if (startSSOFlowParams.strategy === 'enterprise_sso') {
+      const { enterpriseConnectionId } = startSSOFlowParams;
+      const connections = signIn.supportedFirstFactors?.filter(factor => factor.strategy === 'enterprise_sso') ?? [];
+      if (!enterpriseConnectionId && connections.length > 1) {
+        return {
+          createdSessionId: null,
+          authSessionResult: null,
+          signIn,
+          signUp,
+          setActive,
+        };
+      }
+      await signIn.prepareFirstFactor({
+        strategy: 'enterprise_sso',
+        enterpriseConnectionId,
+        redirectUrl,
+        oidcPrompt,
+      });
+    }
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
     if (!externalVerificationRedirectURL) {
