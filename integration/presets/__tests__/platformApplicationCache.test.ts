@@ -56,12 +56,7 @@ describe('getOrCreateCachedPlatformApplication', () => {
     releaseCreation!();
 
     const resolved = await Promise.all(results);
-    expect(resolved.map(result => result.application)).toEqual([
-      application,
-      application,
-      application,
-      application,
-    ]);
+    expect(resolved.map(result => result.application)).toEqual([application, application, application, application]);
     expect(resolved.filter(result => result.created)).toHaveLength(1);
     expect(create).toHaveBeenCalledTimes(1);
   });
