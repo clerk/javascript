@@ -2054,6 +2054,7 @@ export const hrHR: LocalizationResource = {
     session_exists: 'Već ste prijavljeni.',
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Nije pronađeno proširenje za Web3 novčanik. Molimo instalirajte jedno za nastavak.',
     web3_signature_request_rejected: 'Odbili ste zahtjev za potpis. Pokušajte ponovno za nastavak.',
     web3_solana_signature_generation_failed:

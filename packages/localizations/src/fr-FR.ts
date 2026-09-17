@@ -2045,6 +2045,7 @@ export const frFR: LocalizationResource = {
     session_exists: 'Vous êtes déjà connecté.',
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Aucune extension de portefeuille Web3 trouvée. Veuillez en installer une pour continuer.',
     web3_signature_request_rejected: 'Vous avez refusé la demande de signature. Veuillez réessayer pour continuer.',
     web3_solana_signature_generation_failed:

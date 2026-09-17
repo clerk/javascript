@@ -16,6 +16,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 import { Col, Flex, localizationKeys, Text, useLocalizations } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';
+import { useLoadingStatus } from '../../hooks';
 import type { PropsOfComponent } from '../../styledSystem';
 import { mqu } from '../../styledSystem';
 import { RemovePasskeyForm } from './RemoveResourceForm';
@@ -202,16 +203,21 @@ const AddPasskeyButton = ({ onClick }: { onClick?: () => void }) => {
   const { isSatellite } = useClerk();
   const { user } = useUser();
   const createPasskey = useReverification(() => user?.createPasskey());
+  const status = useLoadingStatus();
 
   const handleCreatePasskey = async () => {
     onClick?.();
     if (!user) {
       return;
     }
+    card.setError(undefined);
+    status.setLoading();
     try {
       await createPasskey();
     } catch (e: any) {
       handleError(e, [], card.setError);
+    } finally {
+      status.setIdle();
     }
   };
 
@@ -224,6 +230,7 @@ const AddPasskeyButton = ({ onClick }: { onClick?: () => void }) => {
       id='passkeys'
       localizationKey={localizationKeys('userProfile.start.passkeysSection.primaryButton')}
       onClick={handleCreatePasskey}
+      isLoading={status.isLoading}
     />
   );
 };

@@ -2053,6 +2053,7 @@ export const deDE: LocalizationResource = {
     session_exists: 'Sie sind bereits angemeldet.',
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier:
       'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',
     web3_signature_request_rejected:

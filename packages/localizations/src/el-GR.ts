@@ -2044,6 +2044,7 @@ export const elGR: LocalizationResource = {
     session_exists: 'Έχετε ήδη συνδεθεί.',
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Δεν εντοπίστηκε αναγνωριστικό Web3. Παρακαλώ δοκιμάστε ξανά.',
     web3_signature_request_rejected: 'Απορρίψατε το αίτημα υπογραφής. Δοκιμάστε ξανά για να συνεχίσετε.',
     web3_solana_signature_generation_failed:
