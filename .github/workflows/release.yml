@@ -468,7 +468,6 @@ jobs:
         if: steps.version-packages.outputs.success == '1'
         run: pnpm release:snapshot
         env:
-          NPM_CONFIG_LOGLEVEL: verbose
           NPM_CONFIG_PROVENANCE: true
 
       - name: Package info
