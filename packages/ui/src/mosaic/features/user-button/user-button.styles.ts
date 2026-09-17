@@ -7,6 +7,7 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
   rowAvatar: {
+    '--_cl-avatar-radius': radiusVars['--cl-radius-sm'],
     fontSize: '0.5rem',
     height: space['5'],
     width: space['5'],
