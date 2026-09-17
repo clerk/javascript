@@ -32,7 +32,7 @@ export interface UserProfileMfaSectionViewProps {
 
 export function UserProfileMfaSectionView({
   methods,
-  addableMethods = [],
+  addableMethods,
   sectionTitle,
   onAdd,
   onRegenerateBackupCodes,
@@ -47,7 +47,7 @@ export function UserProfileMfaSectionView({
     <>
       <UserProfileSecurityList
         addControl={
-          onAdd && addableMethods.length > 0 ? (
+          onAdd && addableMethods?.length ? (
             <UserProfileAddMfaDialog
               methods={addableMethods}
               onSelect={onAdd}
