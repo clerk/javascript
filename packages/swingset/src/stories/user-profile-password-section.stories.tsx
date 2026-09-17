@@ -13,7 +13,8 @@ export const meta: StoryMeta = {
   title: 'UserProfilePasswordSection',
   label: 'Password',
   navigation: { category: 'Sections' },
-  source: 'packages/mosaic/src/features/user-profile/user-profile-password-section/user-profile-password-section.view.tsx',
+  source:
+    'packages/mosaic/src/features/user-profile/user-profile-password-section/user-profile-password-section.view.tsx',
 };
 
 function PasswordSection({

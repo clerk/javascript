@@ -1,4 +1,7 @@
-import type { UserProfileEmail, UserProfilePhone } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
+import type {
+  UserProfileEmail,
+  UserProfilePhone,
+} from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 import { useState } from 'react';
 

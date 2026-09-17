@@ -59,12 +59,12 @@ export function UserProfileWeb3WalletsSectionView({
             ))}
             {onConnect
               ? availableProviders.map(provider => (
-                <UserProfileWeb3WalletRowView
-                  key={provider.id}
-                  wallet={provider}
-                  onConnect={onConnect}
-                />
-              ))
+                  <UserProfileWeb3WalletRowView
+                    key={provider.id}
+                    wallet={provider}
+                    onConnect={onConnect}
+                  />
+                ))
               : null}
           </Section.Group>
         </Section.Root>

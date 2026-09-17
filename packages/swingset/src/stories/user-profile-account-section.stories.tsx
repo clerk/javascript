@@ -28,7 +28,8 @@ export const meta: StoryMeta = {
   title: 'UserProfileAccountSection',
   label: 'Account',
   navigation: { category: 'Sections' },
-  source: 'packages/mosaic/src/features/user-profile/user-profile-account-section/user-profile-account-section.view.tsx',
+  source:
+    'packages/mosaic/src/features/user-profile/user-profile-account-section/user-profile-account-section.view.tsx',
 };
 
 function AccountSection({

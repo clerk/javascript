@@ -376,10 +376,10 @@ function OTPPanel({
         resend={
           renderResend
             ? {
-              label: isResending ? 'Sending a new code…' : 'Didn’t receive a code? Resend',
-              disabled: isResending,
-              onClick: () => setValue(''),
-            }
+                label: isResending ? 'Sending a new code…' : 'Didn’t receive a code? Resend',
+                disabled: isResending,
+                onClick: () => setValue(''),
+              }
             : undefined
         }
         onValueChange={setValue}
