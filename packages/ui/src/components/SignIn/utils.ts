@@ -8,6 +8,7 @@ import type {
 import { titleize } from '@clerk/shared/underscore';
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 
+import { isEmail } from '@/ui/utils/emailUtils';
 import { getPreferredPhoneCodeChannelByCountry } from '@/ui/utils/phoneUtils';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 
@@ -118,7 +119,6 @@ const resetPasswordStrategies: SignInStrategy[] = ['reset_password_phone_code', 
 export const isResetPasswordStrategy = (strategy: SignInStrategy | string | null | undefined) =>
   !!strategy && resetPasswordStrategies.includes(strategy as SignInStrategy);
 
-const isEmail = (str: string) => /^\S+@\S+\.\S+$/.test(str);
 export function getSignUpAttributeFromIdentifier(identifier: FormControlState<'identifier'>) {
   if (identifier.type === 'tel') {
     return 'phoneNumber';
