@@ -73,9 +73,9 @@ export const item = stylex.create({
   base: {
     borderRadius: '0.375rem',
     borderStyle: 'none',
-    gap: space['1'],
+    gap: space['1.5'],
     outline: 'none',
-    paddingInline: space['1'],
+    paddingInline: space['1.5'],
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
