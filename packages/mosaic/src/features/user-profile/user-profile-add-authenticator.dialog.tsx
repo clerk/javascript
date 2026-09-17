@@ -2,7 +2,7 @@ import { useId } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
-import type { DialogTriggerProps } from '../../components/dialog';
+import type { DialogFocusTarget, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Otp } from '../../components/otp';
@@ -15,6 +15,7 @@ export interface UserProfileAddAuthenticatorDialogProps extends UserProfileAuthe
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
+  finalFocus?: DialogFocusTarget;
   code: string;
   onCodeChange: (value: string) => void;
   onSubmit: (code: string) => void;
@@ -26,6 +27,7 @@ export function UserProfileAddAuthenticatorDialog({
   open,
   onOpenChange,
   trigger,
+  finalFocus,
   secret,
   uri,
   code,
@@ -47,7 +49,10 @@ export function UserProfileAddAuthenticatorDialog({
       onOpenChange={onOpenChange}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
-      <Dialog.Popup variant='card'>
+      <Dialog.Popup
+        variant='card'
+        finalFocus={finalFocus}
+      >
         <Card.Root
           elevation='overlay'
           renderBranding={false}

@@ -5,7 +5,7 @@ import { useId, useRef } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
-import type { DialogTriggerProps } from '../../components/dialog';
+import type { DialogFocusTarget, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Flow, type FlowDirection, useFlowAutoFocus } from '../../components/flow';
@@ -17,6 +17,7 @@ export interface UserProfileAddSmsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
+  finalFocus?: DialogFocusTarget;
   step: 'select' | 'phone' | 'verify';
   direction?: FlowDirection;
   phoneNumbers: readonly { id: string; phoneNumber: string }[];
@@ -49,6 +50,7 @@ export function UserProfileAddSmsDialog(props: UserProfileAddSmsDialogProps) {
       <Dialog.Popup
         variant='card'
         initialFocus={props.step === 'select' ? selectRef : props.step === 'phone' ? phoneRef : undefined}
+        finalFocus={props.finalFocus}
       >
         <Card.Root
           elevation='overlay'

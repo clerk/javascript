@@ -305,14 +305,10 @@ import {
   RequiresAction as UserProfileEnterpriseAccountsSectionRequiresAction,
 } from '../stories/user-profile-enterprise-accounts-section.stories';
 import {
-  AddMethod as UserProfileMfaSectionAddMethod,
-  AuthenticatorSetup as UserProfileMfaSectionAuthenticatorSetup,
   Default as UserProfileMfaSectionDefault,
   Empty as UserProfileMfaSectionEmpty,
   meta as userProfileMfaSectionMeta,
   ReadOnly as UserProfileMfaSectionReadOnly,
-  Removal as UserProfileMfaSectionRemoval,
-  SmsSetup as UserProfileMfaSectionSmsSetup,
 } from '../stories/user-profile-mfa-section.stories';
 import {
   CreationUnavailable as UserProfilePasskeysSectionCreationUnavailable,
@@ -679,14 +675,10 @@ const userProfilePasskeysSectionModule: StoryModule = {
   RecoverableErrors: UserProfilePasskeysSectionRecoverableErrors,
 };
 const userProfileMfaSectionModule: StoryModule = {
-  AddMethod: UserProfileMfaSectionAddMethod,
-  AuthenticatorSetup: UserProfileMfaSectionAuthenticatorSetup,
-  SmsSetup: UserProfileMfaSectionSmsSetup,
   meta: userProfileMfaSectionMeta,
   Default: UserProfileMfaSectionDefault,
   Empty: UserProfileMfaSectionEmpty,
   ReadOnly: UserProfileMfaSectionReadOnly,
-  Removal: UserProfileMfaSectionRemoval,
 };
 const userProfileActiveDevicesSectionModule: StoryModule = {
   meta: userProfileActiveDevicesSectionMeta,

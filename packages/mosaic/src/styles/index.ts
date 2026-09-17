@@ -212,3 +212,4 @@ export { mergeStyleProps, themeProps } from '../props';
 export { UserProfileMfaSectionView } from '../features/user-profile/user-profile-mfa-section.view';
 export { UserProfileAddSmsDialog } from '../features/user-profile/user-profile-add-sms.dialog';
 export { UserProfileAddAuthenticatorDialog } from '../features/user-profile/user-profile-add-authenticator.dialog';
+export { UserProfileBackupCodesDialog } from '../features/user-profile/user-profile-backup-codes.dialog';
