@@ -1,5 +1,4 @@
 import type {
-  UserProfileDevice,
   UserProfileMfaMethod,
   UserProfilePasskey,
 } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
@@ -8,6 +7,7 @@ import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { useUserProfileActiveDevicesFixture } from './fixtures/user-profile-active-devices';
 import { useUserProfileEditPasswordFixture } from './fixtures/user-profile-edit-password';
 
 export { default as __source } from './user-profile-security-panel.stories?raw';
@@ -35,32 +35,12 @@ export function Default() {
     { id: 'sms', type: 'sms', description: '+1 801-888-8181' },
     { id: 'backup', type: 'backup-codes' },
   ]);
-  const [devices, setDevices] = useState<UserProfileDevice[]>([
-    {
-      id: 'current',
-      name: 'Safari on macOS',
-      description: 'Salt Lake City, UT, United States',
-      type: 'desktop',
-      isCurrent: true,
-    },
-    {
-      id: 'mobile',
-      name: 'Safari on iOS',
-      description: 'Last seen 2 weeks ago · Orem, UT, United States',
-      type: 'mobile',
-    },
-    {
-      id: 'desktop',
-      name: 'Clerk App on macOS',
-      description: 'Last seen May 14th, 2026 · San Francisco, CA, United States',
-      type: 'desktop',
-    },
-  ]);
+  const devices = useUserProfileActiveDevicesFixture();
 
   return (
     <UserProfileSecurityPanelView
       {...editPassword}
-      devices={devices}
+      devices={devices.devices}
       mfaMethods={mfaMethods}
       passkeys={passkeys}
       onAddMfaMethod={type =>
@@ -86,7 +66,6 @@ export function Default() {
         ])
       }
       onDeleteAccount={() => Promise.resolve()}
-      onManageDevice={() => undefined}
       onManagePasskey={() => undefined}
       onRegenerateBackupCodes={() =>
         setMfaMethods(current =>
@@ -95,8 +74,8 @@ export function Default() {
       }
       onRemoveMfaMethod={id => setMfaMethods(current => current.filter(method => method.id !== id))}
       onRemovePasskey={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
-      onSignOutAllOtherDevices={() => setDevices(current => current.filter(device => device.isCurrent))}
-      onSignOutDevice={id => setDevices(current => current.filter(device => device.id !== id))}
+      onSignOutAllOtherDevices={devices.onSignOutAllOtherDevices}
+      onSignOutDevice={devices.onSignOutDevice}
     />
   );
 }
