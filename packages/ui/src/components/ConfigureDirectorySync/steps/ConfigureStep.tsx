@@ -67,6 +67,11 @@ export const ConfigureStep = (): JSX.Element => {
     }
   };
 
+  const submitCredentialsAndContinue = async (): Promise<void> => {
+    await credentials.submit();
+    goNext();
+  };
+
   // The credentials only exist once the directory does, so create it on entry.
   const hasAttemptedCreate = useRef(false);
   useEffect(() => {
@@ -341,7 +346,7 @@ export const ConfigureStep = (): JSX.Element => {
 
       <Step.Footer>
         <Step.Footer.Continue
-          onClick={isPull ? () => run(async () => (await credentials.submit(), goNext())) : () => goNext()}
+          onClick={isPull ? () => void run(submitCredentialsAndContinue) : () => goNext()}
           // For a pull directory this button is the submit, so it waits on the
           // form being complete rather than just on the directory existing.
           isDisabled={!directory || (isPull && !credentials.canContinue)}
