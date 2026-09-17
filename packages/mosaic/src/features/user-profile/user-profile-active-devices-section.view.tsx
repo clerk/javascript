@@ -1,4 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
+import type { Ref } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
@@ -6,6 +7,7 @@ import { Badge } from '../../components/badge';
 import { SubmitButton } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Section } from '../../components/section';
+import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import type { MosaicMessages } from '../../localization';
 import { fill, useMessages } from '../../localization';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
@@ -36,42 +38,13 @@ export function UserProfileActiveDevicesSectionView({
 
   const openSignOut = onSignOutDevice ? (device: UserProfileDevice) => signOutDevice.open(device) : undefined;
 
-  const triggers = useRef(new Map<string, HTMLButtonElement>());
-  const signedOut = useRef<{ id: string; index: number } | undefined>(undefined);
-
-  const registerTrigger = (id: string) => (element: HTMLButtonElement | null) => {
-    if (element) {
-      triggers.current.set(id, element);
-    } else {
-      triggers.current.delete(id);
-    }
-  };
-
-  const signOutDeviceAt = onSignOutDevice
-    ? async (device: UserProfileDevice) => {
-        const index = otherDevices.findIndex(other => other.id === device.id);
-        await onSignOutDevice(device.id);
-        // Recorded only once the device is really gone, so a cancelled or failed attempt still
-        // returns focus to the row's own menu.
-        signedOut.current = { id: device.id, index };
-      }
-    : undefined;
-
-  // The row the dialog was opened from has just unmounted, so focus goes to whichever row took
-  // its place — the last one if it was the last, the current device once none are left.
-  const focusAfterSignOut = () => {
-    const removed = signedOut.current;
-    signedOut.current = undefined;
-    if (!removed) {
-      return null;
-    }
-    // Filtered by id as well as index: a caller whose list only catches up on a later refetch
-    // still has the signed-out row here, and handing focus back to it loses focus all over again
-    // when it goes.
-    const remaining = devices.filter(device => !device.isCurrent && device.id !== removed.id);
-    const next = remaining[Math.min(removed.index, remaining.length - 1)] ?? currentDevices[0];
-    return (next && triggers.current.get(next.id)) ?? null;
-  };
+  const currentDeviceTrigger = useRef<HTMLButtonElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: otherDevices.map(device => device.id),
+    onRemove: onSignOutDevice,
+    fallback: () => currentDeviceTrigger.current,
+  });
+  const signOutDeviceAt = onSignOutDevice ? (device: UserProfileDevice) => removalFocus.remove(device.id) : undefined;
 
   const [isSigningOutAll, setIsSigningOutAll] = useState(false);
   const [signOutAllError, setSignOutAllError] = useState<string>();
@@ -104,7 +77,7 @@ export function UserProfileActiveDevicesSectionView({
               <Section.Row key={device.id}>
                 <DeviceItem
                   device={device}
-                  triggerRef={registerTrigger(device.id)}
+                  triggerRef={device.id === currentDevices[0]?.id ? currentDeviceTrigger : undefined}
                   onViewDetails={device => deviceDetails.open(device)}
                 />
               </Section.Row>
@@ -153,7 +126,7 @@ export function UserProfileActiveDevicesSectionView({
                   <DeviceItem
                     key={device.id}
                     device={device}
-                    triggerRef={registerTrigger(device.id)}
+                    triggerRef={removalFocus.registerTrigger(device.id)}
                     onSignOut={openSignOut}
                     onViewDetails={device => deviceDetails.open(device)}
                   />
@@ -165,7 +138,7 @@ export function UserProfileActiveDevicesSectionView({
       ) : null}
       <UserProfileDeviceDetailsDialog
         handle={deviceDetails}
-        finalFocus={focusAfterSignOut}
+        finalFocus={removalFocus.finalFocus}
         onSignOut={signOutDeviceAt}
       />
       {onSignOutDevice ? (
@@ -176,7 +149,7 @@ export function UserProfileActiveDevicesSectionView({
           description={device => fill(m.signOutDialog.description, { name: device.name })}
           actionLabel={m.signOutDialog.confirm}
           cancelLabel={m.signOutDialog.cancel}
-          finalFocus={focusAfterSignOut}
+          finalFocus={removalFocus.finalFocus}
           onConfirm={device => signOutDeviceAt?.(device)}
         />
       ) : null}
@@ -200,7 +173,7 @@ function DeviceItem({
   onSignOut,
 }: {
   device: UserProfileDevice;
-  triggerRef: (element: HTMLButtonElement | null) => void;
+  triggerRef?: Ref<HTMLButtonElement>;
   onViewDetails: (device: UserProfileDevice) => void;
   onSignOut?: (device: UserProfileDevice) => void;
 }) {

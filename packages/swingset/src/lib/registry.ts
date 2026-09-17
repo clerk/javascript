@@ -302,9 +302,11 @@ import {
   meta as userProfileMfaSectionMeta,
 } from '../stories/user-profile-mfa-section.stories';
 import {
+  CreationUnavailable as UserProfilePasskeysSectionCreationUnavailable,
   Default as UserProfilePasskeysSectionDefault,
   Empty as UserProfilePasskeysSectionEmpty,
   meta as userProfilePasskeysSectionMeta,
+  RecoverableErrors as UserProfilePasskeysSectionRecoverableErrors,
 } from '../stories/user-profile-passkeys-section.stories';
 import {
   Default as UserProfilePasswordSectionDefault,
@@ -649,8 +651,10 @@ const userProfilePasswordSectionModule: StoryModule = {
 };
 const userProfilePasskeysSectionModule: StoryModule = {
   meta: userProfilePasskeysSectionMeta,
+  CreationUnavailable: UserProfilePasskeysSectionCreationUnavailable,
   Default: UserProfilePasskeysSectionDefault,
   Empty: UserProfilePasskeysSectionEmpty,
+  RecoverableErrors: UserProfilePasskeysSectionRecoverableErrors,
 };
 const userProfileMfaSectionModule: StoryModule = {
   meta: userProfileMfaSectionMeta,
