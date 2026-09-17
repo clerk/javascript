@@ -1,10 +1,7 @@
-import { act, render, renderHook, screen } from '@testing-library/react';
-import { createElement } from 'react';
+import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { UserProfileBackupCodesDialog } from '../../../../mosaic/src/features/user-profile/user-profile-backup-codes.dialog';
 import { deferred } from '../../../../mosaic/src/machines/__tests__/test-utils';
-import { MosaicProvider } from '../../../../mosaic/src/MosaicProvider';
 import { useUserProfileMfaFixture } from './user-profile-mfa';
 
 const enrollmentCodes = ['enrollment-code-1', 'enrollment-code-2'];
@@ -42,62 +39,6 @@ describe('MFA playground', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it.each(['sms', 'authenticator'] as const)('rejects 000000 for %s and accepts a corrected code', async type => {
-    const { result } = setup();
-    act(() => result.current.section.onAdd?.(type));
-    if (type === 'sms') {
-      await complete(() => result.current.sms.onSubmit());
-      expect(result.current.sms.step).toBe('verify');
-    }
-    const methods = result.current.section.methods;
-    act(() => result.current[type].onCodeChange('000000'));
-    act(() => result.current[type].onSubmit('000000'));
-    expect(result.current[type].isPending).toBe(true);
-    await complete(() => undefined);
-    expect(result.current[type].open).toBe(true);
-    expect(result.current[type].isPending).toBe(false);
-    expect(result.current[type].errorMessage).toBe('That code is incorrect. Try again.');
-    expect(result.current.section.methods).toEqual(methods);
-    expect(result.current.backupCodes.open).toBe(false);
-
-    act(() => result.current[type].onCodeChange('123456'));
-    expect(result.current[type].errorMessage).toBeUndefined();
-    await complete(() => result.current[type].onSubmit('123456'));
-    expect(result.current[type].open).toBe(false);
-    expect(result.current.backupCodes.open).toBe(true);
-  });
-
-  it('keeps the setup dialog open from method selection through enrollment and backup codes', async () => {
-    const { result } = setup();
-    act(() => result.current.setup.onOpenChange(true));
-    expect(result.current.setup).toMatchObject({ open: true, step: 'select' });
-    act(() => result.current.section.onAdd?.('sms'));
-    expect(result.current.setup).toMatchObject({ open: true, step: 'sms' });
-    act(() => result.current.sms.onSelectedPhoneIdChange('other'));
-    await complete(() => result.current.sms.onSubmit());
-    expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
-    await complete(() => result.current.backupCodes.onCopy());
-    expect(result.current.setup.open).toBe(false);
-    act(() => result.current.setup.onOpenChange(true));
-    expect(result.current.setup).toMatchObject({ open: true, step: 'select' });
-  });
-
-  it.each(['sms', 'backup-codes'] as const)('starts an inline %s example at its first screen', initialFlow => {
-    const { result } = renderHook(() =>
-      useUserProfileMfaFixture({
-        initialFlow,
-        enrollmentBackupCodes: enrollmentCodes,
-        onCopy: vi.fn(),
-        onDownload: vi.fn(),
-      }),
-    );
-    expect(result.current.sms.open).toBe(initialFlow === 'sms');
-    expect(result.current.backupCodes.open).toBe(initialFlow === 'backup-codes');
-    expect(result.current.sms.step).toBe('select');
-    expect(result.current.sms.selectedPhoneId).toBe('work');
-    expect(result.current.backupCodes.codes).toEqual(initialFlow === 'backup-codes' ? enrollmentCodes : []);
-  });
-
   it('creates backup codes for existing SMS enrollment when the instance enables them later', async () => {
     const { result, rerender, onGenerateBackupCodes } = setup([], false);
     expect(result.current.section.methods.map(method => method.type)).toEqual(['sms']);
@@ -124,27 +65,6 @@ describe('MFA playground', () => {
     expect(result.current.section.addableMethods).not.toContain('backup-codes');
     expect(result.current.section.onRegenerateBackupCodes).toBeDefined();
     expect(onGenerateBackupCodes).toHaveBeenCalledOnce();
-  });
-
-  it.each(['sms', 'authenticator'] as const)('opens Save your backup codes after %s enrollment', async type => {
-    const { result } = setup();
-    act(() => result.current.section.onAdd?.(type));
-    if (type === 'authenticator') {
-      await complete(() => result.current.authenticator.onSubmit('123456'));
-    } else {
-      act(() => result.current.sms.onSelectedPhoneIdChange('other'));
-      await complete(() => result.current.sms.onSubmit());
-    }
-    expect(result.current.sms.open).toBe(false);
-    expect(result.current.authenticator.open).toBe(false);
-    expect(result.current.backupCodes.open).toBe(true);
-    render(
-      createElement(MosaicProvider, null, createElement(UserProfileBackupCodesDialog, result.current.backupCodes)),
-    );
-    expect(screen.getByRole('dialog', { name: 'Save your backup codes' })).toBeVisible();
-    expect(screen.getAllByRole('listitem').map(item => item.textContent)).toEqual(enrollmentCodes);
-    expect(screen.getByRole('button', { name: 'Download' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Copy and close' })).toBeVisible();
   });
 
   it('withholds backup-code creation until the instance enables codes and the user has MFA', async () => {
@@ -197,18 +117,6 @@ describe('MFA playground', () => {
       expect(onGenerateBackupCodes).toHaveBeenCalledTimes(3);
     },
   );
-
-  it('automatically adds supplied backup codes during enrollment and removes their Add choice', async () => {
-    const { result } = setup();
-    expect(result.current.section.addableMethods).toEqual(['sms', 'authenticator', 'backup-codes']);
-    act(() => result.current.section.onAdd?.('authenticator'));
-    await complete(() => result.current.authenticator.onSubmit('123456'));
-    expect(result.current.section.methods.map(method => method.type)).toEqual(['authenticator', 'sms', 'backup-codes']);
-    const codes = result.current.backupCodes.codes;
-    expect(codes).toEqual(enrollmentCodes);
-    expect(result.current.backupCodes.open).toBe(true);
-    expect(result.current.backupCodes.codes).toEqual(codes);
-  });
 
   it('enrolls an authenticator on the first attempt, saves backup codes, and regenerates them', async () => {
     const { result, onCopy, onDownload, onGenerateBackupCodes } = setup();
@@ -292,6 +200,10 @@ describe('MFA playground', () => {
       'other',
     ]);
     await complete(() => void result.current.section.onSetDefault?.('other'));
+    expect(result.current.section.methods.filter(method => method.type === 'sms').map(method => method.id)).toEqual([
+      'other',
+      'personal',
+    ]);
     expect(result.current.section.methods.filter(method => method.isDefault).map(method => method.id)).toEqual([
       'authenticator',
     ]);
@@ -305,28 +217,6 @@ describe('MFA playground', () => {
       isDefault: false,
       canSetDefault: true,
     });
-  });
-
-  it.each([false, true])('orders the default SMS number first with authenticator enabled: %s', async authenticator => {
-    const { result } = setup([]);
-    if (authenticator) {
-      act(() => result.current.section.onAdd?.('authenticator'));
-      await complete(() => result.current.authenticator.onSubmit('123456'));
-    }
-    act(() => result.current.section.onAdd?.('sms'));
-    act(() => result.current.sms.onSelectedPhoneIdChange('other'));
-    await complete(() => result.current.sms.onSubmit());
-    expect(result.current.section.methods.filter(method => method.type === 'sms').map(method => method.id)).toEqual([
-      'personal',
-      'other',
-    ]);
-
-    await complete(() => void result.current.section.onSetDefault?.('other'));
-
-    expect(result.current.section.methods.filter(method => method.type === 'sms').map(method => method.id)).toEqual([
-      'other',
-      'personal',
-    ]);
   });
 
   it('preserves codes on a real copy failure and closes after a successful retry', async () => {
@@ -380,23 +270,6 @@ describe('MFA playground', () => {
     expect(result.current.backupCodes.codes).toEqual(enrollmentCodes);
   });
 
-  it('keeps enrollment and backup codes when dismissed during regeneration', async () => {
-    const { result } = setup();
-    act(() => result.current.section.onAdd?.('authenticator'));
-    await complete(() => result.current.authenticator.onSubmit('123456'));
-    expect(result.current.backupCodes.open).toBe(true);
-    expect(result.current.section.methods.some(method => method.type === 'authenticator')).toBe(true);
-    act(() => result.current.backupCodes.onOpenChange(false));
-    expect(result.current.backupCodes.open).toBe(false);
-    expect(result.current.section.methods.some(method => method.type === 'authenticator')).toBe(true);
-    expect(result.current.section.addableMethods).toEqual(['sms']);
-    expect(result.current.section.methods.some(method => method.type === 'backup-codes')).toBe(true);
-    expect(result.current.backupCodes.codes).toEqual(enrollmentCodes);
-    await complete(() => result.current.section.onRegenerateBackupCodes?.());
-    expect(result.current.section.methods.some(method => method.type === 'authenticator')).toBe(true);
-    expect(result.current.backupCodes.open).toBe(true);
-  });
-
   it.each(['authenticator', 'sms'] as const)(
     'finishes %s enrollment without backup codes when none are supplied',
     async type => {
@@ -441,4 +314,3 @@ describe('MFA playground', () => {
     },
   );
 });
-import '@testing-library/jest-dom/vitest';

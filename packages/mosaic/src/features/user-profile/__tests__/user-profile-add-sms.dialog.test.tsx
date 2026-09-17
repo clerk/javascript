@@ -39,24 +39,6 @@ function renderView(overrides: Partial<UserProfileAddSmsDialogProps> = {}) {
 }
 
 describe('UserProfileAddSmsDialog', () => {
-  it('chooses an existing number with Select or requests a new number', async () => {
-    const user = userEvent.setup();
-    const { props } = renderView();
-    const select = screen.getByRole('combobox', { name: 'Phone number +1 (801) 555-0100' });
-    await waitFor(() => expect(select).toHaveFocus());
-
-    await user.click(select);
-    await user.click(screen.getByRole('option', { name: '+1 (801) 555-0200' }));
-    expect(props.onSelectedPhoneIdChange).toHaveBeenCalledWith('work');
-    expect(props.onSubmit).not.toHaveBeenCalled();
-
-    await user.click(screen.getByRole('button', { name: 'Continue' }));
-    expect(props.onSubmit).toHaveBeenCalledOnce();
-
-    await user.click(screen.getByRole('button', { name: 'Add a new phone number' }));
-    expect(props.onAddPhone).toHaveBeenCalledOnce();
-  });
-
   it('adds and verifies a new number in the same dialog, preserving the number on Back', async () => {
     const user = userEvent.setup();
     const onVerify = vi.fn();

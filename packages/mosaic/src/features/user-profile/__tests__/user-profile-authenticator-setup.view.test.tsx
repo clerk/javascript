@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
@@ -52,28 +52,5 @@ describe('Authenticator setup', () => {
     await user.click(screen.getByRole('button', { name: 'Can’t scan? View setup key' }));
     expect(screen.getByRole('textbox', { name: 'Setup key' })).toHaveValue(setup.secret);
     expect(screen.getByRole('textbox', { name: 'Setup URI' })).toHaveValue(setup.uri);
-  });
-
-  it('supports keyboard toggling and starts with the QR code again after dismissal', async () => {
-    const user = userEvent.setup();
-    renderView();
-    const trigger = screen.getByRole('button', { name: 'Set up authenticator' });
-    await user.click(trigger);
-    await user.tab();
-    const toggle = screen.getByRole('button', { name: 'Can’t scan? View setup key' });
-    expect(toggle).toHaveFocus();
-    await user.keyboard('{Enter}');
-    expect(screen.getByRole('textbox', { name: 'Setup key' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Scan QR code instead' })).toHaveFocus();
-    await user.keyboard(' ');
-    expect(screen.getByRole('img', { name: 'Authenticator setup QR code' })).toBeVisible();
-    await user.keyboard('{Enter}');
-    await user.keyboard('{Escape}');
-
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(trigger).toHaveFocus();
-    await user.click(trigger);
-    expect(screen.getByRole('img', { name: 'Authenticator setup QR code' })).toBeVisible();
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 });

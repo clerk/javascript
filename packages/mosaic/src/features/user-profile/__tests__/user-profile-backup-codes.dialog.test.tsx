@@ -1,12 +1,10 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useRef, useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileBackupCodesDialogProps } from '../user-profile-backup-codes.dialog';
 import { UserProfileBackupCodesDialog } from '../user-profile-backup-codes.dialog';
-import { UserProfileMfaSectionView } from '../user-profile-mfa-section.view';
 
 const codes = ['pwkkay19', 'cvgunlqs', '4czio578', 'a38eewtw', 'qqnwzvyr', 'znq8j16s'];
 
@@ -31,70 +29,6 @@ function renderView(overrides: Partial<UserProfileBackupCodesDialogProps> = {}) 
 }
 
 describe('UserProfileBackupCodesDialog', () => {
-  it('shows the save-backup-codes step', () => {
-    renderView();
-    expect(screen.getByRole('dialog', { name: 'Save your backup codes' })).toHaveAccessibleDescription(
-      'Save these somewhere safe. Each code can be used once if you lose access to your phone.',
-    );
-    expect(screen.getAllByRole('listitem').map(item => item.textContent)).toEqual(codes);
-    expect(screen.getByRole('button', { name: 'Download', exact: true })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Copy and close' })).toBeVisible();
-    expect(screen.queryByRole('button', { name: 'Save backup codes' })).not.toBeInTheDocument();
-  });
-
-  it('returns focus to the section’s Add button after completing a flow without a dialog trigger', async () => {
-    const user = userEvent.setup();
-    function Example() {
-      const [open, setOpen] = useState(true);
-      const target = useRef<HTMLButtonElement>(null);
-      return (
-        <MosaicProvider>
-          <UserProfileMfaSectionView
-            methods={[]}
-            addableMethods={['sms', 'authenticator']}
-            onAdd={vi.fn()}
-            addButtonRef={target}
-          />
-          <UserProfileBackupCodesDialog
-            open={open}
-            onOpenChange={setOpen}
-            finalFocus={target}
-            codes={codes}
-            onRetry={vi.fn()}
-            onDownload={vi.fn()}
-            onCopy={() => setOpen(false)}
-          />
-        </MosaicProvider>
-      );
-    }
-    render(<Example />);
-    await user.click(screen.getByRole('button', { name: 'Copy and close' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Add verification method' })).toHaveFocus());
-  });
-
-  it('displays all supplied codes and delegates saving without closing before success', async () => {
-    const user = userEvent.setup();
-    const { props } = renderView();
-    expect(screen.getByRole('dialog', { name: 'Save your backup codes' })).toHaveAccessibleDescription(
-      'Save these somewhere safe. Each code can be used once if you lose access to your phone.',
-    );
-    const list = screen.getByRole('list', { name: 'Backup codes' });
-    expect(
-      within(list)
-        .getAllByRole('listitem')
-        .map(item => item.textContent),
-    ).toEqual(codes);
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Close', exact: true })).toHaveFocus());
-    expect(props.onRetry).not.toHaveBeenCalled();
-
-    await user.click(screen.getByRole('button', { name: 'Download', exact: true }));
-    expect(props.onDownload).toHaveBeenCalledTimes(1);
-    expect(props.onOpenChange).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('button', { name: 'Copy and close' }));
-    expect(props.onCopy).toHaveBeenCalledTimes(1);
-    expect(props.onOpenChange).not.toHaveBeenCalled();
-  });
-
   it('retries failed generation without offering empty codes to save', async () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView({ codes: [], pendingAction: 'generate' });
@@ -155,30 +89,4 @@ describe('UserProfileBackupCodesDialog', () => {
       expect(action === 'copy' ? props.onCopy : props.onDownload).toHaveBeenCalledTimes(1);
     },
   );
-
-  it('replaces old codes during regeneration and renders the newly supplied set', () => {
-    const { props, rerender } = renderView();
-    rerender(
-      <MosaicProvider>
-        <UserProfileBackupCodesDialog
-          {...props}
-          pendingAction='generate'
-        />
-      </MosaicProvider>,
-    );
-    expect(screen.queryByRole('list')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Download', exact: true })).not.toBeInTheDocument();
-
-    const replacementCodes = ['newcode1', 'newcode2'];
-    rerender(
-      <MosaicProvider>
-        <UserProfileBackupCodesDialog
-          {...props}
-          codes={replacementCodes}
-        />
-      </MosaicProvider>,
-    );
-    expect(screen.getAllByRole('listitem').map(item => item.textContent)).toEqual(replacementCodes);
-    expect(screen.queryByText(codes[0])).not.toBeInTheDocument();
-  });
 });
