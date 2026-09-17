@@ -1,5 +1,6 @@
 import type {
   AddMemberParams,
+  AddSsoBypassAllowlistUserParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
   CreateDirectorySyncParams,
@@ -40,6 +41,8 @@ import type {
   OrganizationResource,
   RoleJSON,
   SetOrganizationLogoParams,
+  SsoBypassAllowlistUserJSON,
+  SsoBypassAllowlistUserResource,
   UpdateMembershipParams,
   UpdateOrganizationEnterpriseConnectionParams,
   UpdateOrganizationParams,
@@ -57,6 +60,7 @@ import {
   EnterpriseConnectionTestRun,
   OrganizationInvitation,
   OrganizationMembership,
+  SsoBypassAllowlistUser,
 } from './internal';
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
@@ -302,6 +306,42 @@ export class Organization extends BaseResource implements OrganizationResource {
     )?.response as unknown as DirectorySyncJSON;
 
     return new DirectorySync(json, this.id);
+  };
+
+  getSsoBypassAllowlistUsers = async (): Promise<SsoBypassAllowlistUserResource[]> => {
+    const json = (
+      await BaseResource._fetch({
+        path: `/organizations/${this.id}/sso_bypass_allowlist_users`,
+        method: 'GET',
+      })
+    )?.response as unknown as SsoBypassAllowlistUserJSON[];
+
+    return (json || []).map(entry => new SsoBypassAllowlistUser(entry));
+  };
+
+  addSsoBypassAllowlistUser = async (
+    params: AddSsoBypassAllowlistUserParams,
+  ): Promise<SsoBypassAllowlistUserResource> => {
+    const json = (
+      await BaseResource._fetch({
+        path: `/organizations/${this.id}/sso_bypass_allowlist_users`,
+        method: 'POST',
+        body: { user_id: params.userId } as any,
+      })
+    )?.response as unknown as SsoBypassAllowlistUserJSON;
+
+    return new SsoBypassAllowlistUser(json);
+  };
+
+  removeSsoBypassAllowlistUser = async (userId: string): Promise<DeletedObjectResource> => {
+    const json = (
+      await BaseResource._fetch<DeletedObjectJSON>({
+        path: `/organizations/${this.id}/sso_bypass_allowlist_users/${userId}`,
+        method: 'DELETE',
+      })
+    )?.response as unknown as DeletedObjectJSON;
+
+    return new DeletedObject(json);
   };
 
   getMembershipRequests = async (

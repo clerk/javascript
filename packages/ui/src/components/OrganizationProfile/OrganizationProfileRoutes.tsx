@@ -63,6 +63,7 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
     isSecurityPageRoot,
     shouldShowBilling,
     shouldShowSelfServeSSO,
+    shouldShowSecurityPage,
     apiKeysProps,
   } = useOrganizationProfileContext();
 
@@ -165,8 +166,13 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
             </Route>
           </Protect>
         )}
-        {shouldShowSelfServeSSO ? (
-          <Protect condition={has => has({ permission: 'org:sys_entconns:manage' })}>
+        {shouldShowSecurityPage ? (
+          <Protect
+            condition={has =>
+              (shouldShowSelfServeSSO && has({ permission: 'org:sys_entconns:manage' })) ||
+              has({ permission: 'org:sys_entconns_sso_bypass:manage' })
+            }
+          >
             <Route path={isSecurityPageRoot ? undefined : 'organization-security'}>
               <Switch>
                 <Route index>

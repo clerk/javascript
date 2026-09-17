@@ -83,6 +83,7 @@ export type ProfileSectionId =
   | 'ssoConnectionIdentityProvider'
   | 'ssoConnectionSettings'
   | 'ssoConnectionDangerZone'
+  | 'ssoBypass'
   | 'accountCredits';
 export type ProfilePageId =
   | 'account'

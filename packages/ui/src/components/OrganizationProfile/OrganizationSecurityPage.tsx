@@ -1,19 +1,23 @@
-import { useOrganization } from '@clerk/shared/react';
-import React, { useState } from 'react';
+import { __internal_useOrganizationEnterpriseConnections, useOrganization } from '@clerk/shared/react';
+import React, { useMemo, useState } from 'react';
 
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 
+import { useProtect } from '../../common';
 import { useEnvironment } from '../../contexts';
 import { Col, descriptors, Flex, localizationKeys, Spinner } from '../../customizables';
 import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySync/ConfigureDirectorySyncWizard';
 import { SecurityDirectorySyncSection } from '../ConfigureDirectorySync/SecurityDirectorySyncSection';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
 import type { ConnectionScope } from '../ConfigureSSO/domain/connectionScope';
+import { sortEnterpriseConnections } from '../ConfigureSSO/domain/organizationEnterpriseConnection';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { EnterpriseConnectionPage } from './EnterpriseConnectionPage';
 import { SecurityBackControl } from './SecurityBackControl';
+import { SecuritySsoBypassSection } from './SecuritySsoBypassSection';
 import { SecuritySsoSection } from './SecuritySsoSection';
+import { SsoBypassAllowlistPage } from './SsoBypassAllowlistPage';
 
 type OrganizationSecurityPageProps = {
   contentRef: React.RefObject<HTMLDivElement>;
@@ -25,20 +29,35 @@ type SecurityPageView =
   | { kind: 'overview' }
   | { kind: 'wizard'; forceInitialStep: boolean; returnTo: WizardReturnTo }
   | { kind: 'connection'; id: string }
-  | { kind: 'directorySync' };
+  | { kind: 'directorySync' }
+  | { kind: 'ssoBypass' };
 
 export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPageProps) => {
   const { organization } = useOrganization();
+  const canManageConnections = useProtect({ permission: 'org:sys_entconns:manage' });
+  const canManageSsoBypass = useProtect({ permission: 'org:sys_entconns_sso_bypass:manage' });
 
   if (!organization) {
     // We should never reach this point, but we'll return null to make TS happy
     return null;
   }
 
-  return <OrganizationSecurityPageContent contentRef={contentRef} />;
+  if (!canManageConnections) {
+    return <SsoBypassOnlySecurityPage canManageSsoBypass={canManageSsoBypass} />;
+  }
+
+  return (
+    <OrganizationSecurityPageContent
+      contentRef={contentRef}
+      canManageSsoBypass={canManageSsoBypass}
+    />
+  );
 };
 
-const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPageProps) => {
+const OrganizationSecurityPageContent = ({
+  contentRef,
+  canManageSsoBypass,
+}: OrganizationSecurityPageProps & { canManageSsoBypass: boolean }) => {
   const {
     organization,
     isLoading,
@@ -90,21 +109,7 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
   // configure write) must not tear the open wizard down and reseat it — each
   // wizard step owns its own loading UI.
   if (isLoading && view.kind === 'overview') {
-    return (
-      <SecurityPageOverview fillHeight>
-        <Flex
-          align='center'
-          justify='center'
-          sx={t => ({ flex: 1, paddingBlock: t.space.$5 })}
-        >
-          <Spinner
-            size='xs'
-            colorScheme='neutral'
-            elementDescriptor={descriptors.spinner}
-          />
-        </Flex>
-      </SecurityPageOverview>
-    );
+    return <SecurityPageLoading />;
   }
 
   if (view.kind === 'directorySync') {
@@ -114,6 +119,10 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
         onExit={exitToOverview}
       />
     );
+  }
+
+  if (view.kind === 'ssoBypass') {
+    return <SsoBypassAllowlistPage onBack={exitToOverview} />;
   }
 
   if (view.kind === 'connection' && openedConnection) {
@@ -169,6 +178,9 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
         onConfigure={openWizard}
         onOpenConnection={openConnection}
       />
+      {canManageSsoBypass && enterpriseConnections.length > 0 && (
+        <SecuritySsoBypassSection onManage={() => setRequestedView({ kind: 'ssoBypass' })} />
+      )}
       {showDirectorySync && (
         <SecurityDirectorySyncSection
           organizationName={organization?.name ?? ''}
@@ -179,6 +191,45 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     </SecurityPageOverview>
   );
 };
+
+const SsoBypassOnlySecurityPage = ({ canManageSsoBypass }: { canManageSsoBypass: boolean }) => {
+  const { data, isLoading } = __internal_useOrganizationEnterpriseConnections();
+  const enterpriseConnections = useMemo(() => sortEnterpriseConnections(data ?? []), [data]);
+  const [view, setView] = useState<'overview' | 'ssoBypass'>('overview');
+
+  if (isLoading) {
+    return <SecurityPageLoading />;
+  }
+
+  if (view === 'ssoBypass') {
+    return <SsoBypassAllowlistPage onBack={() => setView('overview')} />;
+  }
+
+  return (
+    <SecurityPageOverview>
+      <SecuritySsoSection enterpriseConnections={enterpriseConnections} />
+      {canManageSsoBypass && enterpriseConnections.length > 0 && (
+        <SecuritySsoBypassSection onManage={() => setView('ssoBypass')} />
+      )}
+    </SecurityPageOverview>
+  );
+};
+
+const SecurityPageLoading = (): JSX.Element => (
+  <SecurityPageOverview fillHeight>
+    <Flex
+      align='center'
+      justify='center'
+      sx={t => ({ flex: 1, paddingBlock: t.space.$5 })}
+    >
+      <Spinner
+        size='xs'
+        colorScheme='neutral'
+        elementDescriptor={descriptors.spinner}
+      />
+    </Flex>
+  </SecurityPageOverview>
+);
 
 /**
  * The overview's stable page chrome — the security `ProfileCard.Page` and its

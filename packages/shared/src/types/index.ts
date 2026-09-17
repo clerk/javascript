@@ -19,6 +19,7 @@ export type * from './enterpriseAccount';
 export type * from './directorySync';
 export type * from './enterpriseConnection';
 export type * from './enterpriseConnectionTestRun';
+export type * from './ssoBypassAllowlistUser';
 export type * from './environment';
 export type * from './errors';
 export type * from './externalAccount';

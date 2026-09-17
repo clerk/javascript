@@ -7,6 +7,7 @@ import { ProviderIcon } from '../../common';
 import { useEnvironment } from '../../contexts';
 import {
   Badge,
+  Box,
   Button,
   Col,
   descriptors,
@@ -26,8 +27,8 @@ import { STATUS_BADGES } from './enterpriseConnectionStatusBadges';
 
 type SecuritySsoSectionProps = {
   enterpriseConnections: EnterpriseConnectionResource[];
-  onConfigure: (scope: ConnectionScope, forceInitialStep?: boolean) => void;
-  onOpenConnection: (id: string) => void;
+  onConfigure?: (scope: ConnectionScope, forceInitialStep?: boolean) => void;
+  onOpenConnection?: (id: string) => void;
 };
 
 export const SecuritySsoSection = ({
@@ -64,17 +65,19 @@ export const SecuritySsoSection = ({
         >
           <SsoDescription />
 
-          <Button
-            elementDescriptor={descriptors.organizationProfileSecuritySsoConfigureButton}
-            elementId={descriptors.organizationProfileSecuritySsoConfigureButton.setId('start')}
-            variant='bordered'
-            colorScheme='secondary'
-            size='sm'
-            onClick={() => onConfigure({ kind: 'new' }, true)}
-            localizationKey={localizationKeys(
-              'organizationProfile.securityPage.ssoSection.primaryButton__startConfiguration',
-            )}
-          />
+          {onConfigure && (
+            <Button
+              elementDescriptor={descriptors.organizationProfileSecuritySsoConfigureButton}
+              elementId={descriptors.organizationProfileSecuritySsoConfigureButton.setId('start')}
+              variant='bordered'
+              colorScheme='secondary'
+              size='sm'
+              onClick={() => onConfigure({ kind: 'new' }, true)}
+              localizationKey={localizationKeys(
+                'organizationProfile.securityPage.ssoSection.primaryButton__startConfiguration',
+              )}
+            />
+          )}
         </Col>
       ) : (
         <Col gap={4}>
@@ -90,13 +93,15 @@ export const SecuritySsoSection = ({
             ))}
           </ProfileSection.ItemList>
 
-          <ProfileSection.ArrowButton
-            id='sso'
-            localizationKey={localizationKeys(
-              'organizationProfile.securityPage.ssoSection.primaryButton__addConnection',
-            )}
-            onClick={() => onConfigure({ kind: 'new' }, true)}
-          />
+          {onConfigure && (
+            <ProfileSection.ArrowButton
+              id='sso'
+              localizationKey={localizationKeys(
+                'organizationProfile.securityPage.ssoSection.primaryButton__addConnection',
+              )}
+              onClick={() => onConfigure({ kind: 'new' }, true)}
+            />
+          )}
         </Col>
       )}
     </ProfileSection.Root>
@@ -105,7 +110,7 @@ export const SecuritySsoSection = ({
 
 type ConnectionRowProps = {
   connection: EnterpriseConnectionResource;
-  onOpenConnection: (id: string) => void;
+  onOpenConnection?: (id: string) => void;
 };
 
 const ConnectionRow = ({ connection, onOpenConnection }: ConnectionRowProps): JSX.Element => {
@@ -114,6 +119,94 @@ const ConnectionRow = ({ connection, onOpenConnection }: ConnectionRowProps): JS
   const badge = STATUS_BADGES[status];
   const label = providerLabel(toProviderCard(connection.provider as EnterpriseConnectionProviderType));
 
+  const item = (
+    <ProfileSection.Item
+      as='span'
+      id='sso'
+      hoverable={Boolean(onOpenConnection)}
+    >
+      <Flex
+        as='span'
+        align='center'
+        wrap='wrap'
+        sx={t => ({ minWidth: 0, flex: 1, gap: t.space.$2 })}
+      >
+        <ProviderIcon
+          id={connection.provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider}
+          iconUrl={connection.logoPublicUrl?.trim() || undefined}
+          name={connection.name}
+          elementDescriptor={descriptors.organizationProfileSecuritySsoProviderIcon}
+        />
+
+        <Col
+          as='span'
+          sx={{ minWidth: 0 }}
+        >
+          <Text as='span'>{connection.name}</Text>
+          {label && (
+            <Text
+              as='span'
+              colorScheme='secondary'
+              variant='caption'
+              localizationKey={label}
+            />
+          )}
+        </Col>
+
+        {connection.domains.length > 0 && (
+          <Flex
+            as='span'
+            align='center'
+            wrap='wrap'
+            sx={t => ({ minWidth: 0, gap: t.space.$1x5 })}
+          >
+            {connection.domains.map(domain => (
+              <Badge
+                key={domain}
+                elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRowChip}
+              >
+                {domain}
+              </Badge>
+            ))}
+          </Flex>
+        )}
+      </Flex>
+
+      <Flex
+        as='span'
+        align='center'
+        sx={t => ({ gap: t.space.$2 })}
+      >
+        <Badge
+          elementDescriptor={descriptors.organizationProfileSecuritySsoBadge}
+          elementId={descriptors.organizationProfileSecuritySsoBadge.setId(badge.id)}
+          colorScheme={badge.colorScheme}
+          localizationKey={badge.label}
+        />
+
+        {onOpenConnection && (
+          <Icon
+            icon={ChevronRight}
+            aria-hidden
+            sx={t => ({ width: t.sizes.$4, height: t.sizes.$4, color: t.colors.$colorMutedForeground })}
+          />
+        )}
+      </Flex>
+    </ProfileSection.Item>
+  );
+
+  if (!onOpenConnection) {
+    return (
+      <Box
+        as='span'
+        elementDescriptor={descriptors.organizationProfileSecuritySsoConnectionRow}
+        sx={{ display: 'block', width: '100%' }}
+      >
+        {item}
+      </Box>
+    );
+  }
+
   return (
     <Button
       elementDescriptor={descriptors.organizationProfileSecuritySsoConnectionRow}
@@ -121,77 +214,7 @@ const ConnectionRow = ({ connection, onOpenConnection }: ConnectionRowProps): JS
       onClick={() => onOpenConnection(connection.id)}
       sx={{ display: 'block', width: '100%', height: 'auto', padding: 0, textAlign: 'start' }}
     >
-      <ProfileSection.Item
-        as='span'
-        id='sso'
-        hoverable
-      >
-        <Flex
-          as='span'
-          align='center'
-          wrap='wrap'
-          sx={t => ({ minWidth: 0, flex: 1, gap: t.space.$2 })}
-        >
-          <ProviderIcon
-            id={connection.provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider}
-            iconUrl={connection.logoPublicUrl?.trim() || undefined}
-            name={connection.name}
-            elementDescriptor={descriptors.organizationProfileSecuritySsoProviderIcon}
-          />
-
-          <Col
-            as='span'
-            sx={{ minWidth: 0 }}
-          >
-            <Text as='span'>{connection.name}</Text>
-            {label && (
-              <Text
-                as='span'
-                colorScheme='secondary'
-                variant='caption'
-                localizationKey={label}
-              />
-            )}
-          </Col>
-
-          {connection.domains.length > 0 && (
-            <Flex
-              as='span'
-              align='center'
-              wrap='wrap'
-              sx={t => ({ minWidth: 0, gap: t.space.$1x5 })}
-            >
-              {connection.domains.map(domain => (
-                <Badge
-                  key={domain}
-                  elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRowChip}
-                >
-                  {domain}
-                </Badge>
-              ))}
-            </Flex>
-          )}
-        </Flex>
-
-        <Flex
-          as='span'
-          align='center'
-          sx={t => ({ gap: t.space.$2 })}
-        >
-          <Badge
-            elementDescriptor={descriptors.organizationProfileSecuritySsoBadge}
-            elementId={descriptors.organizationProfileSecuritySsoBadge.setId(badge.id)}
-            colorScheme={badge.colorScheme}
-            localizationKey={badge.label}
-          />
-
-          <Icon
-            icon={ChevronRight}
-            aria-hidden
-            sx={t => ({ width: t.sizes.$4, height: t.sizes.$4, color: t.colors.$colorMutedForeground })}
-          />
-        </Flex>
-      </ProfileSection.Item>
+      {item}
     </Button>
   );
 };

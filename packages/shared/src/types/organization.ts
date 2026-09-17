@@ -24,6 +24,7 @@ import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination
 import type { ClerkResource } from './resource';
 import type { RoleResource } from './role';
 import type { OrganizationJSONSnapshot } from './snapshots';
+import type { AddSsoBypassAllowlistUserParams, SsoBypassAllowlistUserResource } from './ssoBypassAllowlistUser';
 import type { GetEnterpriseConnectionsParams } from './user';
 
 declare global {
@@ -234,6 +235,20 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
     enterpriseConnectionId: string,
     params?: CreateDirectorySyncParams,
   ) => Promise<DirectorySyncResource>;
+  /**
+   * Lists the members who may sign in with an email code when the organization's enterprise SSO is unavailable.
+   * Requires the `org:sys_entconns_sso_bypass:manage` permission.
+   */
+  getSsoBypassAllowlistUsers: () => Promise<SsoBypassAllowlistUserResource[]>;
+  /**
+   * Adds a member to the SSO bypass allowlist. The member must hold a verified email address served by one of the
+   * organization's enterprise connections.
+   */
+  addSsoBypassAllowlistUser: (params: AddSsoBypassAllowlistUserParams) => Promise<SsoBypassAllowlistUserResource>;
+  /**
+   * Removes a member from the SSO bypass allowlist.
+   */
+  removeSsoBypassAllowlistUser: (userId: string) => Promise<DeletedObjectResource>;
   /**
    * Deletes the Organization. Only administrators can delete an Organization.
    *

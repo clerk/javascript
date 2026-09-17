@@ -1,4 +1,4 @@
-import { useOrganization } from '@clerk/shared/react';
+import { __internal_useOrganizationEnterpriseConnections, useOrganization } from '@clerk/shared/react';
 import React from 'react';
 
 import { NavBar, NavbarContextProvider } from '@/ui/elements/Navbar';
@@ -13,7 +13,7 @@ export const OrganizationProfileNavbar = (
   props: React.PropsWithChildren<Pick<PropsOfComponent<typeof NavBar>, 'contentRef'>>,
 ) => {
   const { organization } = useOrganization();
-  const { apiKeysProps, pages } = useOrganizationProfileContext();
+  const { apiKeysProps, pages, shouldShowSelfServeSSO } = useOrganizationProfileContext();
 
   const allowMembersRoute = useProtect(
     has =>
@@ -29,7 +29,14 @@ export const OrganizationProfileNavbar = (
       }) || has({ permission: 'org:sys_billing:manage' }),
   );
 
-  const allowSecurityRoute = useProtect(has => has({ permission: 'org:sys_entconns:manage' }));
+  const canManageConnections = useProtect(has => has({ permission: 'org:sys_entconns:manage' }));
+  const canManageSsoBypass = useProtect(has => has({ permission: 'org:sys_entconns_sso_bypass:manage' }));
+  const canConfigureSso = shouldShowSelfServeSSO && canManageConnections;
+
+  const { data: enterpriseConnections } = __internal_useOrganizationEnterpriseConnections({
+    enabled: canManageSsoBypass && !canConfigureSso,
+  });
+  const allowSecurityRoute = canConfigureSso || (canManageSsoBypass && (enterpriseConnections?.length ?? 0) > 0);
 
   const routes = pages.routes
     .filter(

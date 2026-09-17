@@ -21,6 +21,7 @@ export * from './EnterpriseAccount';
 export * from './DirectorySync';
 export * from './EnterpriseConnection';
 export * from './EnterpriseConnectionTestRun';
+export * from './SsoBypassAllowlistUser';
 export * from './Environment';
 export * from './ExternalAccount';
 export * from './Feature';
