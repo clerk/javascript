@@ -188,15 +188,7 @@ function RowAvatar({ name, imageUrl, shape, size, xstyle }: RowAvatarProps) {
  * The lead workspace's mark. An account working in an organization wears its avatar in the corner,
  * on a grid rather than floated, so the overhang takes up room and whatever follows keeps its gap.
  */
-function WorkspaceAvatar({
-  workspace,
-  size,
-  nestedSize,
-}: {
-  workspace: ActiveWorkspace;
-  size: AvatarProps['size'];
-  nestedSize: 'sm' | 'md';
-}) {
+function WorkspaceAvatar({ workspace, size }: { workspace: ActiveWorkspace; size: AvatarProps['size'] }) {
   const organization = workspace.kind === 'user' ? workspace.organization : null;
   if (!organization) {
     return (
@@ -223,7 +215,7 @@ function WorkspaceAvatar({
         imageUrl={organization.imageUrl}
         shape='square'
         size='fit'
-        xstyle={[styles.nestedAvatar, nestedSize === 'md' ? styles.nestedAvatarMd : styles.nestedAvatarSm]}
+        xstyle={[styles.nestedAvatar, size === 'xs' ? styles.nestedAvatarSm : styles.nestedAvatarMd]}
       />
     </span>
   );
@@ -511,7 +503,6 @@ function Header() {
         <WorkspaceAvatar
           workspace={workspace}
           size='sm'
-          nestedSize='md'
         />
       }
       title={name}
@@ -1203,7 +1194,6 @@ export function UserButtonTrigger({
       <WorkspaceAvatar
         workspace={workspace}
         size={renderTriggerLabel ? 'xs' : 'sm'}
-        nestedSize='sm'
       />
       {renderTriggerLabel ? (
         <>
