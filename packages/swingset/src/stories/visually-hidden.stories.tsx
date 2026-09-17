@@ -42,7 +42,7 @@ export function LiveRegion() {
       >
         Copy backup code
       </Button>
-      <Text color='neutral'>Copied {copies} times</Text>
+      <Text>Copied {copies} times</Text>
       <VisuallyHidden
         render={
           <div

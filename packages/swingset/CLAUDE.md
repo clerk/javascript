@@ -273,6 +273,7 @@ import * as UserButtonStories from './user-button.stories';
 
 - Keep the intro to one short, present-tense paragraph: what the thing is and what it's for. For primitives, say explicitly that it's headless and ships no styles.
 - Prose should add what a demo can't — behavior, accessibility, when to reach for it — not restate prop names already in the table.
+- Describe the API as it is; leave the reasoning that produced it out. No "not a `size`, because…", no rejected alternatives, no history of what a prop used to be — that belongs in a code comment or the PR. The docs get the conclusion, stated plainly and briefly.
 - Lead every page with the heading hierarchy its archetype prescribes; don't invent new top-level sections or reorder them. Consistency across pages is the goal.
 
 ### Before you finish

@@ -8,7 +8,7 @@ import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Input } from '../../../components/input';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
 import type { UserProfileFormError, UserProfileNameAttribute } from './user-profile-account-section.types';
 
 export type UserProfileEditNameField = 'firstName' | 'lastName';
@@ -69,13 +69,12 @@ export function UserProfileEditNameDialog({
 
   return (
     <Dialog.Root
-      closedBy='closerequest'
       open={open}
       onOpenChange={onOpenChange}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
-        size='card'
+        variant='card'
         initialFocus={initialFocusRef}
       >
         <Card.Root

@@ -1,4 +1,5 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { createDeferredPromise } from '@clerk/shared/utils';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -35,6 +36,71 @@ describe('UserProfileProfilePanelView', () => {
       availableConnectionProviders: [{ id: 'google', provider: 'Google' }],
     });
     expect(screen.queryByRole('region', { name: 'Connected accounts' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the final account confirmation mounted until removal settles', async () => {
+    const user = userEvent.setup();
+    const removal = createDeferredPromise();
+    const onRemoveConnectedAccount = vi.fn(async () => {
+      await removal.promise;
+    });
+    const { rerender } = renderView({
+      connectedAccounts: [{ id: 'github', provider: 'GitHub' }],
+      onRemoveConnectedAccount,
+    });
+    await user.click(screen.getByRole('button', { name: 'Manage GitHub' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileProfilePanelView
+          {...props}
+          connectedAccounts={[]}
+          onRemoveConnectedAccount={onRemoveConnectedAccount}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('heading', { name: 'Connected accounts' })).not.toBeInTheDocument();
+    expect(screen.getByRole('alertdialog', { name: 'Remove connected account' })).toBeInTheDocument();
+
+    await act(async () => {
+      removal.resolve();
+      await removal.promise;
+    });
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('heading', { name: 'Account', level: 3 })).toBeVisible();
+  });
+
+  it('keeps the final wallet confirmation mounted until removal settles', async () => {
+    const user = userEvent.setup();
+    const removal = createDeferredPromise();
+    const onRemoveWeb3Wallet = vi.fn(async () => {
+      await removal.promise;
+    });
+    const { rerender } = renderView({
+      web3Wallets: [{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }],
+      onRemoveWeb3Wallet,
+    });
+    await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    rerender(
+      <MosaicProvider>
+        <UserProfileProfilePanelView
+          {...props}
+          web3Wallets={[]}
+          onRemoveWeb3Wallet={onRemoveWeb3Wallet}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('heading', { name: 'Web3 wallets' })).not.toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('0x1234');
+    await act(async () => {
+      removal.resolve();
+      await removal.promise;
+    });
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
   it('keeps available providers visible without connected accounts', () => {

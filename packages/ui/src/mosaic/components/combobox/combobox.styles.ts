@@ -1,6 +1,16 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  durationVars,
+  easingVars,
+  fontFamilyVars,
+  fontWeightVars,
+  radiusVars,
+  shadowVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 export const styles = stylex.create({
   positioner: {
@@ -10,26 +20,35 @@ export const styles = stylex.create({
     borderRadius: radiusVars['--cl-radius-lg'],
     outline: 'none',
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
-    color: colorVars['--cl-color-card-foreground'],
+    backgroundColor: colorVars['--cl-color-background'],
+    boxShadow: shadowVars['--cl-shadow-md'],
+    color: colorVars['--cl-color-foreground'],
     opacity: {
       default: 1,
       ':where([data-ending-style], [data-starting-style])': 0,
     },
+    // The reduced-motion scale value goes too, or the exit snaps out of 96%.
     scale: {
       default: 1,
       ':where([data-ending-style], [data-starting-style])': 0.96,
+      '@media (prefers-reduced-motion: reduce)': {
+        default: 1,
+        ':where([data-ending-style], [data-starting-style])': 1,
+      },
     },
     transformOrigin: 'var(--cl-transform-origin)',
     transitionDuration: {
-      default: '150ms',
-      '@media (prefers-reduced-motion: reduce)': '0.01ms',
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
-    transitionProperty: 'opacity, scale',
-    transitionTimingFunction: 'ease-out',
+    transitionProperty: {
+      default: 'opacity, scale',
+      '@media (prefers-reduced-motion: reduce)': 'opacity',
+    },
+    transitionTimingFunction: {
+      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
+    },
     maxHeight: 'var(--cl-available-height)',
     minWidth: '12.5rem',
   },
@@ -84,7 +103,7 @@ export const styles = stylex.create({
   empty: {
     paddingBlock: space['6'],
     paddingInline: space['3'],
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     textAlign: 'center',
