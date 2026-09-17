@@ -1,7 +1,7 @@
 import type {
   UserProfileWeb3Provider,
   UserProfileWeb3Wallet,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
 import { useState } from 'react';
 
 interface DemoWallet extends UserProfileWeb3Wallet {
@@ -45,6 +45,7 @@ export function useWeb3WalletsFixture({
 } = {}) {
   const [wallets, setWallets] = useState(initialWallets);
   const [connectionProviders, setConnectionProviders] = useState(availableProviders);
+  const [removalFailed, setRemovalFailed] = useState(false);
   const [primaryFailed, setPrimaryFailed] = useState(false);
 
   return {
@@ -94,22 +95,15 @@ export function useWeb3WalletsFixture({
         current.map(wallet => ({ ...wallet, isPrimary: wallet.id === id, primaryError: undefined })),
       );
     },
-    onRemove: (id: string) => {
+    onRemove: async (id: string) => {
       if (removalState === 'pending') {
-        setWallets(current => current.map(wallet => (wallet.id === id ? { ...wallet, isRemoving: true } : wallet)));
-        setTimeout(() => {
-          setWallets(current => current.filter(wallet => wallet.id !== id));
-        }, 1500);
-        return;
+        await new Promise(resolve => setTimeout(resolve, 1500));
       }
-      setWallets(current => {
-        if (removalState === 'error' && !current.find(wallet => wallet.id === id)?.removalError) {
-          return current.map(wallet =>
-            wallet.id === id ? { ...wallet, removalError: 'Unable to remove wallet. Please try again.' } : wallet,
-          );
-        }
-        return current.filter(wallet => wallet.id !== id);
-      });
+      if (removalState === 'error' && !removalFailed) {
+        setRemovalFailed(true);
+        throw new Error('Unable to remove wallet. Please try again.');
+      }
+      setWallets(current => current.filter(wallet => wallet.id !== id));
     },
   };
 }

@@ -14,12 +14,12 @@ pnpm dev --filter @clerk/swingset
 
 ```tsx
 import type { StoryMeta } from '@/lib/types';
-import { MyComponent, type MyComponentProps } from '@clerk/ui/mosaic/components/my-component';
+import { MyComponent, type MyComponentProps } from '@clerk/mosaic/components/my-component';
 
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'My Component',
-  source: 'packages/ui/src/mosaic/components/my-component/my-component.tsx', // repo-root path → "View source" link
+  source: 'packages/mosaic/src/components/my-component/my-component.tsx', // repo-root path → "View source" link
   // Variant surface, declared by hand — knobs are generated from `_variants`
   styles: {
     _variants: { variant: { primary: {}, outline: {} }, size: { sm: {}, md: {} } },

@@ -1,13 +1,13 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import type { UserProfileFormError } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
+import { Button } from '@clerk/mosaic/components/button';
+import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type {
   UserProfileEmail,
   UserProfilePhone,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
-import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileAddPhoneDialogProps } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
-import { UserProfileVerifyEmailLinkDialog } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-link.dialog';
-import { UserProfileVerifyEmailSsoDialog } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-sso.dialog';
+} from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
+import { UserProfileAccountSectionView } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
+import type { UserProfileAddPhoneDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
+import { UserProfileVerifyEmailLinkDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-link.dialog';
+import { UserProfileVerifyEmailSsoDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-sso.dialog';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -29,7 +29,7 @@ export const meta: StoryMeta = {
   label: 'Account',
   navigation: { category: 'Sections' },
   source:
-    'packages/ui/src/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view.tsx',
+    'packages/mosaic/src/features/user-profile/user-profile-account-section/user-profile-account-section.view.tsx',
 };
 
 function AccountSection({
@@ -38,13 +38,19 @@ function AccountSection({
   failWith,
   usernameFailWith,
   failEmailVerification = false,
+  emailRemovalState,
+  phoneRemovalState,
 }: {
   allowMultipleAccounts: boolean;
   failAt?: UserProfileAddPhoneDialogProps['step'];
   failWith?: UserProfileFormError;
   usernameFailWith?: UserProfileFormError;
   failEmailVerification?: boolean;
+  emailRemovalState?: 'pending' | 'error';
+  phoneRemovalState?: 'pending' | 'error';
 }) {
+  const [phoneRemovalFailed, setPhoneRemovalFailed] = useState(false);
+  const [emailRemovalFailed, setEmailRemovalFailed] = useState(false);
   const editName = useUserProfileEditNameFixture({ failWith });
   const editUsername = useUserProfileEditUsernameFixture({ failWith: usernameFailWith });
   const [emails, setEmails] = useState<UserProfileEmail[]>(
@@ -84,9 +90,27 @@ function AccountSection({
       onRemoveProfilePicture={clearImage}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
-      onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
+      onRemoveEmail={async id => {
+        if (emailRemovalState === 'pending') {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+        if (emailRemovalState === 'error' && !emailRemovalFailed) {
+          setEmailRemovalFailed(true);
+          throw new Error('Unable to remove this email address. Try again.');
+        }
+        setEmails(current => current.filter(email => email.id !== id));
+      }}
       onSetPrimaryEmail={id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })))}
-      onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
+      onRemovePhone={async id => {
+        if (phoneRemovalState === 'pending') {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+        }
+        if (phoneRemovalState === 'error' && !phoneRemovalFailed) {
+          setPhoneRemovalFailed(true);
+          throw new Error('Unable to remove this phone number. Try again.');
+        }
+        setPhones(current => current.filter(phone => phone.id !== id));
+      }}
       onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
     />
   );
@@ -207,6 +231,42 @@ export function AddPhoneFails() {
     <AccountSection
       allowMultipleAccounts
       failAt='phone'
+    />
+  );
+}
+
+export function EmailRemovalPending() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      emailRemovalState='pending'
+    />
+  );
+}
+
+export function EmailRemovalError() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      emailRemovalState='error'
+    />
+  );
+}
+
+export function PhoneRemovalPending() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      phoneRemovalState='pending'
+    />
+  );
+}
+
+export function PhoneRemovalError() {
+  return (
+    <AccountSection
+      allowMultipleAccounts
+      phoneRemovalState='error'
     />
   );
 }

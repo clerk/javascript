@@ -1,8 +1,8 @@
-import { Avatar } from '@clerk/ui/mosaic/components/avatar';
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Item } from '@clerk/ui/mosaic/components/item';
-import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
-import { radiusVars, space } from '@clerk/ui/mosaic/tokens.stylex';
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Button } from '@clerk/mosaic/components/button';
+import { Item } from '@clerk/mosaic/components/item';
+import { scrollAreaRoot, scrollAreaViewport } from '@clerk/mosaic/components/scroll-area';
+import { radiusVars, space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
@@ -25,7 +25,7 @@ export const meta: StoryMeta = {
   group: 'Styles',
   title: 'Scroll Area',
   status: 'stable',
-  source: 'packages/ui/src/mosaic/components/scroll-area/scroll-area.styles.ts',
+  source: 'packages/mosaic/src/components/scroll-area/scroll-area.styles.ts',
 };
 
 const accounts = [

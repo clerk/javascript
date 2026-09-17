@@ -1,18 +1,18 @@
-import type { UserProfileViewProps } from '@clerk/ui/mosaic/features/user-profile/user-profile.view';
-import type { UserProfileAPIKey } from '@clerk/ui/mosaic/features/user-profile/user-profile-api-keys-panel.view';
+import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import type { UserProfileAPIKey } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-billing-panel.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
 import type {
   UserProfileEmail,
   UserProfilePhone,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-profile-panel.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 import type {
   UserProfileDevice,
   UserProfileMfaMethod,
   UserProfilePasskey,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-security-panel.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 import { useMemo, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';
@@ -22,6 +22,7 @@ import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';
 import { useUserProfileEditUsernameFixture } from './user-profile-edit-username';
+import { useWeb3WalletsFixture } from './user-profile-web3-wallets';
 
 export interface UserProfileFixtureOptions {
   /** Replaces the default OTP flow, e.g. for a custom dialog example. */
@@ -52,6 +53,7 @@ const initialAPIKeys: UserProfileAPIKey[] = [
  */
 export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions = {}) {
   const connections = useConnectedAccountsFixture();
+  const wallets = useWeb3WalletsFixture();
   const editName = useUserProfileEditNameFixture();
   const editUsername = useUserProfileEditUsernameFixture();
   const editPassword = useUserProfileEditPasswordFixture();
@@ -132,6 +134,11 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onConnectAccount: connections.onConnect,
       onReconnectAccount: connections.onReconnect,
       onRemoveConnectedAccount: connections.onRemove,
+      web3Wallets: wallets.wallets,
+      availableWeb3Providers: wallets.availableProviders,
+      onConnectWeb3Wallet: wallets.onConnect,
+      onSetPrimaryWeb3Wallet: wallets.onSetPrimary,
+      onRemoveWeb3Wallet: wallets.onRemove,
       allowMultipleAccounts: true,
       hasImage: Boolean(imageUrl),
       imageUrl,

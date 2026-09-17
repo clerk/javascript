@@ -1,10 +1,10 @@
 'use client';
 
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Combobox } from '@clerk/ui/mosaic/components/combobox';
-import { Field } from '@clerk/ui/mosaic/components/field';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import { InputGroup } from '@clerk/ui/mosaic/components/input-group';
+import { Button } from '@clerk/mosaic/components/button';
+import { Combobox } from '@clerk/mosaic/components/combobox';
+import { Field } from '@clerk/mosaic/components/field';
+import { Icon } from '@clerk/mosaic/components/icon';
+import { InputGroup } from '@clerk/mosaic/components/input-group';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -19,7 +19,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'wip',
   title: 'Combobox',
-  source: 'packages/ui/src/mosaic/components/combobox/combobox.tsx',
+  source: 'packages/mosaic/src/components/combobox/combobox.tsx',
 };
 
 export function Default() {

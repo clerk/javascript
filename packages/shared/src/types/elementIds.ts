@@ -41,6 +41,11 @@ export type FieldId =
   | 'redirectUri'
   | 'acsUrl'
   | 'spEntityId'
+  | 'syncUserAttributes'
+  | 'allowAdditionalIdentifiers'
+  | 'allowSubdomains'
+  | 'allowIdpInitiated'
+  | 'forceAuthn'
   | 'web3WalletName'
   | 'domain';
 export type ProfileSectionId =
@@ -72,6 +77,12 @@ export type ProfileSectionId =
   | 'resetSso'
   | 'testSsoUrl'
   | 'testResults'
+  | 'ssoConnectionName'
+  | 'ssoConnectionDomains'
+  | 'ssoConnectionServiceProvider'
+  | 'ssoConnectionIdentityProvider'
+  | 'ssoConnectionSettings'
+  | 'ssoConnectionDangerZone'
   | 'accountCredits';
 export type ProfilePageId =
   | 'account'

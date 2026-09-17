@@ -1,6 +1,6 @@
-import type { ButtonProps } from '@clerk/ui/mosaic/components/button';
-import { Button, SubmitButton } from '@clerk/ui/mosaic/components/button';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
+import type { ButtonProps } from '@clerk/mosaic/components/button';
+import { Button, SubmitButton } from '@clerk/mosaic/components/button';
+import { Icon } from '@clerk/mosaic/components/icon';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -13,7 +13,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'Button',
-  source: 'packages/ui/src/mosaic/components/button/button.tsx',
+  source: 'packages/mosaic/src/components/button/button.tsx',
   styles: {
     _variants: {
       color: { primary: {}, neutral: {}, negative: {} },
