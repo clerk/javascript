@@ -7,9 +7,8 @@ import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
-import { fill, rich } from '../../../utils/messages';
+import { fill, rich, useMessages } from '../../../localization';
 import { styles as profileStyles } from '../user-profile-profile-panel.styles';
-import { userProfileVerifyEmailLinkMessages as m } from './user-profile-verify-email-link.messages';
 import { styles } from './user-profile-verify-email-link.styles';
 
 export interface UserProfileVerifyEmailLinkDialogProps {
@@ -33,6 +32,7 @@ export function UserProfileVerifyEmailLinkDialog({
   resendSeconds = 0,
   errorMessage,
 }: UserProfileVerifyEmailLinkDialogProps) {
+  const m = useMessages('userProfileVerifyEmailLink');
   return (
     <Dialog.Root
       open={open}

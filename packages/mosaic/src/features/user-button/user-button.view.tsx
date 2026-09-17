@@ -18,16 +18,16 @@ import { Popover } from '../../components/popover';
 import { scrollAreaViewport } from '../../components/scroll-area';
 import { Spinner } from '../../components/spinner';
 import type { IconName } from '../../icons/registry';
+import type { MosaicMessages } from '../../localization';
+import { fill, plural, useLocale, useMessages } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { applyOrder } from '../../utils/apply-order';
 import { focusOutline } from '../../utils/focus-outline.styles';
-import { fill, plural } from '../../utils/messages';
 import { reset } from '../../utils/reset.styles';
 import { rtl } from '../../utils/rtl.styles';
 import { truncationStyles } from '../../utils/typography.styles';
 import type { UserButtonAction, UserButtonLayout } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
-import { userButtonMessages as m } from './user-button.messages';
 import { styles } from './user-button.styles';
 import type {
   UserButtonBrandingProps,
@@ -106,12 +106,12 @@ type ActiveWorkspace =
  * What the surface leads with: named in the trigger and headed in the popup, so the two always
  * agree. An organization-led surface with no org and no personal workspace is no selection.
  */
-function leadWorkspace({
-  layout,
-  activeOrganization,
-  activeSession,
-  hidePersonal,
-}: UserButtonContextValue): ActiveWorkspace {
+type Messages = MosaicMessages['userButton'];
+
+function leadWorkspace(
+  { layout, activeOrganization, activeSession, hidePersonal }: UserButtonContextValue,
+  m: Messages,
+): ActiveWorkspace {
   if (layout.leadWith === 'organization') {
     if (activeOrganization) {
       return {
@@ -139,9 +139,9 @@ function joinDetails(...parts: Array<string | undefined>): string {
   return parts.filter(Boolean).join(' · ');
 }
 
-function membershipSubtitle(membership: UserButtonMembership): string {
+function membershipSubtitle(membership: UserButtonMembership, m: Messages, locale: string): string {
   const members =
-    membership.membersCount === undefined ? undefined : plural(m.workspaces.members, membership.membersCount);
+    membership.membersCount === undefined ? undefined : plural(m.workspaces.members, membership.membersCount, locale);
   return joinDetails(membership.planLabel, members);
 }
 
@@ -278,6 +278,7 @@ function SwitcherRow({
   busy,
   disabled,
 }: SwitcherRowProps) {
+  const m = useMessages('userButton');
   // Selecting what is already selected does nothing, so the active row is not a button at all. A
   // row that is merely waiting stays one, disabled.
   const select = active ? undefined : onSelect;
@@ -429,11 +430,13 @@ function HeaderActionButton({
 
 /** The active workspace: who you are signed in as, and what you can do about it. */
 function Header() {
+  const m = useMessages('userButton');
+  const locale = useLocale();
   const data = useUserButtonContext();
   const layout = data.layout.headerLayout;
   const signOutSession = data.onSignOutSession;
   const { sessionId, identifier } = data.activeSession;
-  const workspace = leadWorkspace(data);
+  const workspace = leadWorkspace(data, m);
   const { name } = workspace;
   const organization = workspace.kind === 'organization' ? workspace.organization : undefined;
   // An account is described by the organization it works in where the surface carries one, and by
@@ -447,7 +450,7 @@ function Header() {
         : identifier;
   const subtitle =
     workspace.kind === 'organization'
-      ? membershipSubtitle(workspace.organization)
+      ? membershipSubtitle(workspace.organization, m, locale)
       : workspace.kind === 'user'
         ? accountSubtitle
         : '';
@@ -559,6 +562,7 @@ function ActionMenu({ label, actions, disabled }: { label: string; actions: RowA
  * below carries the ones that act on every account.
  */
 function OrganizationsHeading() {
+  const m = useMessages('userButton');
   const data = useUserButtonContext();
   const signOutSession = data.onSignOutSession;
   const { identifier, sessionId } = data.activeSession;
@@ -634,6 +638,7 @@ function MembershipRow({ membership, active, onSelect }: MembershipRowProps) {
  * what they are about.
  */
 function PersonalRow() {
+  const m = useMessages('userButton');
   const data = useUserButtonContext();
   const selectOrganization = data.onSelectOrganization;
   const { busy, disabled } = useBusy(userButtonBusyKeys.selectOrganization(null));
@@ -686,6 +691,7 @@ interface PendingRowProps {
 
 /** A workspace on offer: joined from its own trailing button rather than by clicking the row. */
 function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: PendingRowProps) {
+  const m = useMessages('userButton');
   const { busy, disabled } = useBusy(busyKey);
   // The button reads the same on every offer and the workspace it acts on is the label beside it,
   // so pressing tab through the list gives no way to tell them apart without this.
@@ -727,6 +733,7 @@ function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: Pe
 
 /** What the active account has been asked to join but has not joined yet. */
 function PendingRows() {
+  const m = useMessages('userButton');
   const data = useUserButtonContext();
   const acceptSuggestion = data.onAcceptSuggestion;
   const acceptInvitation = data.onAcceptInvitation;
@@ -835,6 +842,7 @@ function SessionMenuItem({ session, active }: { session: UserButtonSession; acti
  * organizations heading carries the spinner for what its own `⋯` opens.
  */
 function SwitchAccountRow() {
+  const m = useMessages('userButton');
   const data = useUserButtonContext();
   const addAccount = data.onAddAccount;
   const { pendingKey } = data;
@@ -916,6 +924,7 @@ function SwitchAccountRow() {
 
 /** Holds the organization list's place until its first page lands. */
 function OrganizationListLoadingRow() {
+  const m = useMessages('userButton');
   return (
     // Plain text rather than a live region: it mounts with its copy already in it, so there is no
     // change for one to report, and the popup it lands in is read on open either way.
@@ -938,6 +947,7 @@ function OrganizationListLoadingRow() {
  * to manage and sign out of itself.
  */
 function OrganizationSection() {
+  const m = useMessages('userButton');
   const data = useUserButtonContext();
   const { showOrganizations, showOrganizationsHeading } = data.layout;
 
@@ -1005,6 +1015,7 @@ interface FooterRow {
 
 /** The actions that close out the surface. */
 function Footer() {
+  const m = useMessages('userButton');
   const data = useUserButtonContext();
   const signOutSession = data.onSignOutSession;
   const { sessionId } = data.activeSession;
@@ -1171,8 +1182,9 @@ export function UserButtonTrigger({
   renderTriggerLabel = true,
   renderTriggerBadge = true,
 }: UserButtonTriggerProps = {}): ReactElement {
+  const m = useMessages('userButton');
   const data = useUserButtonContext();
-  const workspace = leadWorkspace(data);
+  const workspace = leadWorkspace(data, m);
   const { name, shape } = workspace;
   const planLabel =
     renderTriggerBadge && workspace.kind === 'organization' ? workspace.organization.planLabel : undefined;
@@ -1210,6 +1222,7 @@ export function UserButtonTrigger({
 
 /** The popover surface: header, organizations, and footer. */
 export function UserButtonPopup(): ReactElement {
+  const m = useMessages('userButton');
   const { renderBranding } = useUserButtonContext();
 
   return (

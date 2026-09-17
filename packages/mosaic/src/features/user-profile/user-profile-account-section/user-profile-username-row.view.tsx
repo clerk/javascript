@@ -1,6 +1,6 @@
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
-import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
+import { useMessages } from '../../../localization';
 import { useUserProfileEditUsernameController } from './user-profile-edit-username.controller';
 import { UserProfileEditUsernameDialog } from './user-profile-edit-username.dialog';
 
@@ -10,6 +10,7 @@ export interface UserProfileUsernameRowViewProps {
 }
 
 export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUsernameRowViewProps) {
+  const m = useMessages('userProfileAccountSection');
   return (
     <Section.Row>
       <Section.Item>
@@ -31,6 +32,7 @@ export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUs
 }
 
 function EditUsername({ username, onSubmit }: { username: string; onSubmit: (username: string) => Promise<void> }) {
+  const m = useMessages('userProfileAccountSection');
   const controller = useUserProfileEditUsernameController({ username, onSubmit });
 
   return (

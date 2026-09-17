@@ -2,7 +2,7 @@ import type { FileRejection } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
 
 import { Section } from '../../../components/section';
-import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
+import { useMessages } from '../../../localization';
 import { styles } from './user-profile-account-section.styles';
 import type {
   UserProfileEmail,
@@ -87,6 +87,7 @@ export function UserProfileAccountSectionView({
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
+  const m = useMessages('userProfileAccountSection');
   const phoneRow = (
     <UserProfilePhoneRowView
       phones={phones}

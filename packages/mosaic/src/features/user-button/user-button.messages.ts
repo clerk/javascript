@@ -1,8 +1,3 @@
-/**
- * Every string the surface renders. Shaped the way `@clerk/i18n` takes a base definition, so
- * localizing this component is a matter of registering the namespace and swapping the reads for
- * `useMessages('userButton', userButtonMessages)`, not of hunting the literals down first.
- */
 export const userButtonMessages = {
   trigger: {
     open: 'Open account menu for {name}',
@@ -35,4 +30,4 @@ export const userButtonMessages = {
     organization: 'Manage organization',
     createOrganization: 'Create organization',
   },
-};
+} as const;

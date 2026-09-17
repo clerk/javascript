@@ -100,6 +100,15 @@ import {
   meta as itemMeta,
   Scrolling as ItemScrolling,
 } from '../stories/item.stories';
+import {
+  Catalog as LocalizationCatalog,
+  CatalogWithOverrides as LocalizationCatalogWithOverrides,
+  Fallback as LocalizationFallback,
+  Helpers as LocalizationHelpers,
+  meta as localizationMeta,
+  Overrides as LocalizationOverrides,
+  PluralRules as LocalizationPluralRules,
+} from '../stories/localization.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
@@ -508,6 +517,16 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+const localizationModule: StoryModule = {
+  meta: localizationMeta,
+  Overrides: LocalizationOverrides,
+  Catalog: LocalizationCatalog,
+  CatalogWithOverrides: LocalizationCatalogWithOverrides,
+  Helpers: LocalizationHelpers,
+  Fallback: LocalizationFallback,
+  PluralRules: LocalizationPluralRules,
+};
+
 // Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
 const tableModule: StoryModule = { meta: tableMeta };
 const toastModule: StoryModule = { meta: toastMeta };
@@ -730,6 +749,8 @@ export const registry: StoryModule[] = [
   scrollAreaModule,
   // Hooks
   useDataTableModule,
+  // Localization
+  localizationModule,
 ];
 
 /**

@@ -100,6 +100,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     // Headless hooks — alphabetical.
     'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
   },
+  localization: {
+    localization: dynamic(() => import('../stories/localization.mdx')),
+  },
 };
 
 interface DocsViewerProps {

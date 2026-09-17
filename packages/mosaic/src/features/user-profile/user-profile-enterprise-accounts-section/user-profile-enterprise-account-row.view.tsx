@@ -5,8 +5,7 @@ import { Button } from '../../../components/button';
 import { Icon, IconFrame } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { Spinner } from '../../../components/spinner';
-import { fill } from '../../../utils/messages';
-import { userProfileEnterpriseAccountsMessages as m } from './user-profile-enterprise-accounts-section.messages';
+import { fill, useMessages } from '../../../localization';
 import { styles } from './user-profile-enterprise-accounts-section.styles';
 import type { UserProfileEnterpriseAccount } from './user-profile-enterprise-accounts-section.types';
 
@@ -21,6 +20,7 @@ export function UserProfileEnterpriseAccountRowView({
   isPending?: boolean;
   disabled?: boolean;
 }) {
+  const m = useMessages('userProfileEnterpriseAccountsSection');
   const iconUrl = account.iconUrl?.trim();
   return (
     <Section.Row xstyle={onConnect && styles.connectRow}>

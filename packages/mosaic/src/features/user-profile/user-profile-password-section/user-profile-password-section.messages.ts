@@ -26,4 +26,4 @@ export const userProfilePasswordSectionMessages = {
     mismatch: "Passwords don't match.",
     generic: 'Something went wrong. Please try again.',
   },
-};
+} as const;

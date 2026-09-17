@@ -4,8 +4,7 @@ import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
-import { fill } from '../../../utils/messages';
-import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
+import { fill, useMessages } from '../../../localization';
 import type { UserProfileEmail } from './user-profile-account-section.types';
 import type { UserProfileAddEmailControllerOptions } from './user-profile-add-email.controller';
 import { useUserProfileAddEmailController } from './user-profile-add-email.controller';
@@ -36,6 +35,7 @@ export function UserProfileEmailRowView({
   onSetPrimaryEmail,
   onRemoveEmail,
 }: UserProfileEmailRowViewProps) {
+  const m = useMessages('userProfileAccountSection');
   const addEmailAction =
     onSendEmailCode && onVerifyEmailCode ? (
       <AddEmail
@@ -136,6 +136,7 @@ export function UserProfileEmailRowView({
 }
 
 function AddEmail({ options, compact }: { options: UserProfileAddEmailControllerOptions; compact: boolean }) {
+  const m = useMessages('userProfileAccountSection');
   const controller = useUserProfileAddEmailController(options);
   return (
     <UserProfileAddEmailDialog

@@ -2,9 +2,8 @@ import { useMemo } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Section } from '../../components/section';
-import { fill } from '../../utils/messages';
+import { fill, useMessages } from '../../localization';
 import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
-import { userProfileConnectedAccountsMessages as m } from './user-profile-connected-accounts.messages';
 
 export interface UserProfileConnectionProvider {
   id: string;
@@ -36,6 +35,7 @@ export function UserProfileConnectedAccountsSectionView({
   onReconnect,
   onRemove,
 }: UserProfileConnectedAccountsSectionViewProps) {
+  const m = useMessages('userProfileConnectedAccounts');
   const removeAccount = useMemo(() => Confirmation.createHandle<UserProfileConnectedAccount>(), []);
   const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
 
