@@ -1,16 +1,16 @@
-import { test } from '@playwright/test';
+import * as path from 'node:path';
+
+import { automatedEnvironmentVariables } from '@clerk/shared/utils';
+import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
-import {
-  testClaimedAppWithMissingKeys,
-  testKeylessRemovedAfterEnvAndRestart,
-  testToggleCollapsePopoverAndClaim,
-} from '../../testUtils/keylessHelpers';
+import { fs } from '../../scripts';
+import { createTestUtils } from '../../testUtils';
 
-const commonSetup = appConfigs.reactRouter.reactRouterNode.clone();
+const commonSetup = appConfigs.tanstack.reactStart.clone();
 
-test.describe('Keyless mode @react-router', () => {
+test.describe('Keyless mode @tanstack-react-start', () => {
   test.describe.configure({ mode: 'serial' });
   test.setTimeout(90_000);
 
@@ -21,35 +21,50 @@ test.describe('Keyless mode @react-router', () => {
   });
 
   let app: Application;
-  let dashboardUrl = 'https://dashboard.clerk.com/';
 
   test.beforeAll(async () => {
     app = await commonSetup.commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withKeyless);
-    if (appConfigs.envs.withKeyless.privateVariables.get('CLERK_API_URL')?.includes('clerkstage')) {
-      dashboardUrl = 'https://dashboard.clerkstage.dev/';
-    }
-    await app.dev();
+    // Without keys the app 500s on every request, so readiness can't wait for a 2xx
+    await app.dev({ acceptAnyResponse: true });
   });
 
   test.afterAll(async () => {
-    // Keep files for debugging
     await app?.teardown();
   });
 
-  test('Toggle collapse popover and claim.', async ({ page, context }) => {
-    await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl, framework: 'react-router' });
-  });
-
-  test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
+  test('Without keys, requests fail with the missing env vars error instead of keyless bootstrap.', async ({
     page,
-    context,
   }) => {
-    await testClaimedAppWithMissingKeys({ page, context, app, dashboardUrl });
+    const response = await page.goto(`${app.serverUrl}/`);
+    expect(response?.status()).toBe(500);
+    expect(app.devOutput).toContain('Publishable key is missing');
+    expect(app.devOutput).toContain('npx clerk@latest init');
   });
 
-  test('Keyless popover is removed after adding keys to .env and restarting.', async ({ page, context }) => {
-    await testKeylessRemovedAfterEnvAndRestart({ page, context, app });
+  test('Claimed application with keys inside .env boots and serves the app.', async ({ page, context }) => {
+    // The SDK no longer mints keys, so seed the claimed keyless state directly
+    const publishableKey = appConfigs.envs.withEmailCodes.publicVariables.get('CLERK_PUBLISHABLE_KEY');
+    const secretKey = appConfigs.envs.withEmailCodes.privateVariables.get('CLERK_SECRET_KEY');
+    await fs.ensureDir(path.join(app.appDir, '.clerk', '.tmp'));
+    await fs.writeJSON(path.join(app.appDir, '.clerk', '.tmp', 'keyless.json'), {
+      publishableKey,
+      secretKey,
+      claimUrl: 'https://dashboard.clerk.com/apps/claim',
+      apiKeysUrl: 'https://dashboard.clerk.com/~/api-keys',
+    });
+    // `base` disables keyless and CI counts as automated, so undo both (as `withKeyless` does) or the claimed-onboarding path never runs
+    const claimedEnv = appConfigs.envs.withEmailCodes.clone().setEnvVariable('public', 'CLERK_KEYLESS_DISABLED', false);
+    automatedEnvironmentVariables.forEach(name => claimedEnv.setEnvVariable('private', name, 'false'));
+    await app.withEnv(claimedEnv);
+    // Restart the dev server to pick up new env vars
+    await app.restart();
+
+    const u = createTestUtils({ app, page, context });
+    await u.page.goToAppHome();
+    await u.page.waitForClerkJsLoaded();
+    await u.po.expect.toBeSignedOut();
+    expect(app.devOutput).toContain('Your application is running with your claimed keys');
   });
 });
