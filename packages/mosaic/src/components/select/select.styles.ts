@@ -26,6 +26,15 @@ export const value = stylex.create({
   },
 });
 
+export const adornment = stylex.create({
+  base: {
+    alignItems: 'center',
+    display: 'flex',
+    flexShrink: 0,
+    lineHeight: 1,
+  },
+});
+
 export const positioner = stylex.create({
   base: {
     outline: 'none',

@@ -94,6 +94,15 @@ const roles = [
   storyModule={SelectStories}
 />
 
+### Decorative content
+
+Supply `startAdornment` to place a flag or icon before the text. Adornments are hidden from assistive technology; `label` remains the text used for naming and typeahead. Pass the selected item's adornment to the trigger.
+
+| Prop                                                         | Type        | Default | Description                                   |
+| ------------------------------------------------------------ | ----------- | ------- | --------------------------------------------- |
+| `SelectItem.startAdornment` / `Select.Option.startAdornment` | `ReactNode` | —       | Decorative content before an option's label.  |
+| `Select.Trigger.startAdornment`                              | `ReactNode` | —       | Decorative content before the selected value. |
+
 ### Options
 
 Every row reserves space for the check, so the labels stay put when the selection moves. A
@@ -101,7 +110,7 @@ Every row reserves space for the check, so the labels stay put when the selectio
 read to assistive technology as the option's description, not as part of its name.
 
 To compose the rows yourself, give `Select.Popup` children: one `Select.Option` per item, taking the
-same `value`, `label`, `description`, and `disabled`.
+same `value`, `label`, `description`, `startAdornment`, and `disabled`.
 
 ```tsx
 <Select.Popup>
@@ -179,11 +188,13 @@ with the shared ScrollArea treatment. Nothing to opt into — `Select.Popup` com
 | ---------------- | ------------------------------------ | ----------------------------------------------------------------------------------- |
 | `Select.Root`    | —                                    | State provider; owns the value, the items, open/close, and keyboard nav.            |
 | `Select.Trigger` | `select-trigger`                     | Opens the listbox. Defaults to a neutral `md` `Button`; `variant` picks the chrome. |
+| ↳ adornment      | `select-trigger-adornment`           | Decorative content before the value.                                                |
 | ↳ value          | `select-value`                       | The selected label, or the placeholder.                                             |
 | ↳ icon           | `select-trigger-icon`                | The trailing chevron.                                                               |
 | `Select.Popup`   | `select-positioner` / `select-popup` | Portals, positions, and renders the listbox surface.                                |
 | ↳ viewport       | `select-viewport`                    | The scrolling box inside the popup. Carries the ScrollArea fade and scrollbar.      |
 | `Select.Option`  | `select-option`                      | A single choice. `data-selected`, `data-active`, `data-disabled`, `data-described`. |
+| ↳ adornment      | `select-option-adornment`            | Decorative content before the option label.                                         |
 | ↳ content        | `select-option-content`              | Stacks the label over the description.                                              |
 | ↳ label          | `select-option-label`                | The option's text. Truncates to one line.                                           |
 | ↳ description    | `select-option-description`          | The optional second line.                                                           |

@@ -29,6 +29,7 @@ export interface SelectItem {
    * description hangs below the trigger unless `alignItemWithTrigger` says otherwise.
    */
   description?: string;
+  startAdornment?: React.ReactNode;
   disabled?: boolean;
 }
 
@@ -72,6 +73,7 @@ export type SelectTriggerProps = MosaicComponentProps<'button'> & {
   variant?: SelectTriggerVariant;
   /** Shown in place of the selected label while nothing is selected. */
   placeholder?: React.ReactNode;
+  startAdornment?: React.ReactNode;
 };
 
 /**
@@ -83,6 +85,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
   {
     variant = 'outline',
     placeholder,
+    startAdornment,
     render,
     xstyle,
     children,
@@ -135,6 +138,14 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
       aria-required={ariaRequired ?? (fieldProps?.required ? true : undefined)}
       {...mergeStyleProps(themeProps('select-trigger', { variant }), stylex.props(xstyle), rest)}
     >
+      {startAdornment != null && (
+        <span
+          aria-hidden='true'
+          {...mergeStyleProps(themeProps('select-trigger-adornment'), stylex.props(reset.base, slots.adornment.base))}
+        >
+          {startAdornment}
+        </span>
+      )}
       {children ?? (
         <Primitive.Value
           id={valueId}
@@ -212,7 +223,7 @@ export interface SelectOptionProps
 
 /** A single choice: its label, an optional description, and a check when it is the selection. */
 export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProps>(function MosaicSelectOption(
-  { label, description, xstyle, ...rest },
+  { label, description, startAdornment, xstyle, ...rest },
   ref,
 ) {
   const id = React.useId();
@@ -239,6 +250,14 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
         rest,
       )}
     >
+      {startAdornment != null && (
+        <span
+          aria-hidden='true'
+          {...mergeStyleProps(themeProps('select-option-adornment'), stylex.props(reset.base, slots.adornment.base))}
+        >
+          {startAdornment}
+        </span>
+      )}
       <span {...mergeStyleProps(themeProps('select-option-content'), stylex.props(reset.base, slots.content.base))}>
         <span
           id={labelId}
