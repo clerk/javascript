@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { act, render, screen, waitFor } from '@/test/utils';
 import { VirtualRouter } from '@/ui/router';
 
 import { OrganizationProfile } from '..';
@@ -71,6 +71,8 @@ const membership = (userId: string, firstName: string, identifier: string) =>
       hasImage: false,
     },
   }) as any;
+
+const settleRoutes = () => act(() => new Promise<void>(resolve => setTimeout(resolve, 50)));
 
 const renderPage = (wrapper: React.ComponentType<{ children?: React.ReactNode }>) =>
   render(<OrganizationSecurityPage contentRef={{ current: null }} />, { wrapper });
@@ -358,6 +360,27 @@ describe('SSO bypass allowlist', () => {
       expect(await screen.findByText('SSO bypass')).toBeInTheDocument();
     });
 
+    it('keeps the route closed to a member with the permission while the organization has no connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(
+        withSecurityPage({ selfServeSSO: false, permissions: ['org:sys_entconns_sso_bypass:manage'] }),
+      );
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+
+      render(
+        <VirtualRouter startPath='/organization-security'>
+          <OrganizationProfileRoutes contentRef={{ current: null }} />
+        </VirtualRouter>,
+        { wrapper },
+      );
+
+      await waitFor(() => expect(fixtures.clerk.organization?.getEnterpriseConnections).toHaveBeenCalled());
+      await settleRoutes();
+
+      expect(screen.queryByRole('heading', { name: 'Security' })).not.toBeInTheDocument();
+      expect(screen.queryByText(SSO_DESCRIPTION)).not.toBeInTheDocument();
+      expect(screen.queryByText('SSO bypass')).not.toBeInTheDocument();
+    });
+
     it('keeps the route closed to members with neither permission', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPage({ selfServeSSO: false, permissions: [] }));
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([activeConnection]);
@@ -369,7 +392,11 @@ describe('SSO bypass allowlist', () => {
         { wrapper },
       );
 
-      await waitFor(() => expect(screen.queryByText(SSO_DESCRIPTION)).not.toBeInTheDocument());
+      await settleRoutes();
+
+      expect(fixtures.clerk.organization?.getEnterpriseConnections).not.toHaveBeenCalled();
+      expect(screen.queryByRole('heading', { name: 'Security' })).not.toBeInTheDocument();
+      expect(screen.queryByText(SSO_DESCRIPTION)).not.toBeInTheDocument();
       expect(screen.queryByText('SSO bypass')).not.toBeInTheDocument();
     });
   });
