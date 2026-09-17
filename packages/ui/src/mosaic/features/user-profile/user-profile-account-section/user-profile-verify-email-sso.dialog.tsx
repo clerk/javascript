@@ -6,8 +6,8 @@ import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Spinner } from '../../../components/spinner';
+import { fill } from '../../../utils/messages';
 import { UserProfileProviderIcon } from '../user-profile-provider-icon';
-import { fill } from './user-profile-account-section.messages';
 import { userProfileVerifyEmailSsoMessages as m } from './user-profile-verify-email-sso.messages';
 import { styles } from './user-profile-verify-email-sso.styles';
 
@@ -38,12 +38,11 @@ export function UserProfileVerifyEmailSsoDialog({
 }: UserProfileVerifyEmailSsoDialogProps) {
   return (
     <Dialog.Root
-      closedBy='closerequest'
       open={open}
       onOpenChange={onOpenChange}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
-      <Dialog.Popup size='card'>
+      <Dialog.Popup variant='card'>
         <Card.Root
           elevation='overlay'
           renderBranding={false}

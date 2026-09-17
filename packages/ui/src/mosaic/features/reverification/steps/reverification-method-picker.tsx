@@ -99,7 +99,6 @@ export function ReverificationMethodPicker({
         ) : null}
         <Text
           size='xs'
-          color='neutral'
           xstyle={styles.helpText}
         >
           {messages.helpText}{' '}

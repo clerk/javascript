@@ -1,4 +1,4 @@
-export const reverificationBase = {
+export const reverificationMessages = {
   alternativeMethods: {
     actionLink: 'Get help',
     actionText: 'Don’t have any of these?',
@@ -69,16 +69,3 @@ export const reverificationBase = {
   /** Announced while an attempt is in flight; the button's own label stays visible. */
   verifying: 'Verifying',
 };
-
-/** Substitutes `{name}`-style placeholders. Replaced by the localization layer's own formatter. */
-export function fill(template: string, values: Record<string, string | number>): string {
-  return template.replace(/\{(\w+)\}/g, (match, key: string) => String(values[key] ?? match));
-}
-
-/**
- * Picks a plural form and fills `{count}`. English has the two forms below; the localization layer
- * selects across all six categories with `Intl.PluralRules`.
- */
-export function plural(forms: { one: string; other: string }, count: number): string {
-  return fill(count === 1 ? forms.one : forms.other, { count });
-}

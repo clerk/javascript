@@ -1,6 +1,16 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontFamilyVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  durationVars,
+  easingVars,
+  fontFamilyVars,
+  fontWeightVars,
+  radiusVars,
+  shadowVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 // Positioning is applied inline by the headless positioner; this only clears the
 // focus outline it receives. No z-index: the portalled, fixed positioner already
@@ -15,30 +25,37 @@ export const popup = stylex.create({
   base: {
     borderRadius: radiusVars['--cl-radius-lg'],
     outline: 'none',
-    backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
-    color: colorVars['--cl-color-card-foreground'],
+    backgroundColor: colorVars['--cl-color-background'],
+    boxShadow: shadowVars['--cl-shadow-md'],
+    color: colorVars['--cl-color-foreground'],
     opacity: {
       default: 1,
-      ':is([data-ending-style])': 0,
-      ':is([data-starting-style])': 0,
+      ':where([data-starting-style], [data-ending-style])': 0,
     },
+    // The reduced-motion scale value goes too, or the exit snaps out of 96%.
     scale: {
       default: 1,
-      ':is([data-ending-style])': 0.96,
-      ':is([data-starting-style])': 0.96,
+      ':where([data-starting-style], [data-ending-style])': 0.96,
+      '@media (prefers-reduced-motion: reduce)': {
+        default: 1,
+        ':where([data-starting-style], [data-ending-style])': 1,
+      },
     },
     // `--cl-transform-origin` is set on the positioner by the headless `cssVars`
     // middleware, so the popup scales out of the edge nearest its trigger.
     transformOrigin: 'var(--cl-transform-origin)',
     transitionDuration: {
-      default: '150ms',
-      '@media (prefers-reduced-motion: reduce)': '0.01ms',
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
-    transitionProperty: 'opacity, scale',
-    transitionTimingFunction: 'ease-out',
+    transitionProperty: {
+      default: 'opacity, scale',
+      '@media (prefers-reduced-motion: reduce)': 'opacity',
+    },
+    transitionTimingFunction: {
+      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
+    },
     maxHeight: 'var(--cl-available-height)',
     // Capped, or the popup grows to whatever its longest item says and `Menu.Label` never
     // reaches the width it has to truncate at.
@@ -73,9 +90,9 @@ export const item = stylex.create({
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
-      ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+      ':is([data-active])': colorVars['--cl-color-neutral-alpha-100'],
       '@media (hover: hover)': {
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`,
+        ':hover': colorVars['--cl-color-neutral-alpha-100'],
       },
     },
     cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
@@ -91,11 +108,6 @@ export const item = stylex.create({
     outlineOffset: 0,
     position: 'relative',
     textAlign: 'start',
-    transitionDuration: {
-      default: '150ms',
-      '@media (prefers-reduced-motion: reduce)': '0.01ms',
-    },
-    transitionProperty: 'background-color',
     height: space['8'],
     width: '100%',
     '::before': {
@@ -109,9 +121,9 @@ export const item = stylex.create({
   negative: {
     backgroundColor: {
       default: 'transparent',
-      ':is([data-active])': `color-mix(in oklab, ${colorVars['--cl-color-negative']} 8%, transparent)`,
+      ':is([data-active])': colorVars['--cl-color-negative-alpha-200'],
       '@media (hover: hover)': {
-        ':hover': `color-mix(in oklab, ${colorVars['--cl-color-negative']} 8%, transparent)`,
+        ':hover': colorVars['--cl-color-negative-alpha-200'],
       },
     },
     color: colorVars['--cl-color-negative'],

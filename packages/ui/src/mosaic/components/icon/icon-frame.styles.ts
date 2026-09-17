@@ -2,9 +2,6 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
-// Figma uses the 'page faded' token
-const filledBackground = 'light-dark(oklch(0.9702 0 0), oklch(0.2393 0 0))';
-
 export const styles = stylex.create({
   base: {
     borderColor: 'transparent',
@@ -23,7 +20,7 @@ export const styles = stylex.create({
     borderColor: colorVars['--cl-color-border'],
   },
   filled: {
-    backgroundColor: filledBackground,
+    backgroundColor: colorVars['--cl-color-background-subtle'],
   },
 });
 

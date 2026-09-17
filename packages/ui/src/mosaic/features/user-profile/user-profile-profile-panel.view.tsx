@@ -33,10 +33,10 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
   web3Wallets?: UserProfileWeb3Wallet[];
   availableWeb3Providers?: UserProfileWeb3Provider[];
   onConnectAccount?: (id: string) => void;
-  onRemoveConnectedAccount?: (id: string) => void;
+  onRemoveConnectedAccount?: (id: string) => void | Promise<void>;
   onConnectWeb3Wallet?: (id: string) => void;
   onSetPrimaryWeb3Wallet?: (id: string) => void;
-  onRemoveWeb3Wallet?: (id: string) => void;
+  onRemoveWeb3Wallet?: (id: string) => void | Promise<void>;
   /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
   onDeleteAccount?: () => Promise<void>;
 }
@@ -118,24 +118,20 @@ export function UserProfileProfilePanelView({
           onSubmitName={onSubmitName}
           onSubmitUsername={onSubmitUsername}
         />
-        {connectedAccounts.length > 0 || (availableConnectionProviders.length > 0 && onConnectAccount) ? (
-          <UserProfileConnectedAccountsSectionView
-            accounts={connectedAccounts}
-            availableProviders={availableConnectionProviders}
-            onReconnect={onReconnectAccount}
-            onConnect={onConnectAccount}
-            onRemove={onRemoveConnectedAccount}
-          />
-        ) : null}
-        {web3Wallets.length > 0 || (availableWeb3Providers.length > 0 && onConnectWeb3Wallet) ? (
-          <UserProfileWeb3WalletsSectionView
-            wallets={web3Wallets}
-            availableProviders={availableWeb3Providers}
-            onConnect={onConnectWeb3Wallet}
-            onRemove={onRemoveWeb3Wallet}
-            onSetPrimary={onSetPrimaryWeb3Wallet}
-          />
-        ) : null}
+        <UserProfileConnectedAccountsSectionView
+          accounts={connectedAccounts}
+          availableProviders={availableConnectionProviders}
+          onReconnect={onReconnectAccount}
+          onConnect={onConnectAccount}
+          onRemove={onRemoveConnectedAccount}
+        />
+        <UserProfileWeb3WalletsSectionView
+          wallets={web3Wallets}
+          availableProviders={availableWeb3Providers}
+          onConnect={onConnectWeb3Wallet}
+          onRemove={onRemoveWeb3Wallet}
+          onSetPrimary={onSetPrimaryWeb3Wallet}
+        />
         {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
       </div>
     </div>

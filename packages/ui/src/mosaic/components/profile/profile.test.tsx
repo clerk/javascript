@@ -5,6 +5,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
+import { Card } from '../card';
 import { Dialog } from '../dialog';
 import { Icon } from '../icon';
 import type { ProfileRootProps } from './profile';
@@ -318,14 +319,11 @@ describe('Profile', () => {
   });
 
   describe('inside a dialog', () => {
-    function renderInDialog(inline = false) {
+    function renderInDialog() {
       return render(
         <MosaicProvider>
-          <Dialog.Root
-            defaultOpen
-            inline={inline}
-          >
-            <Dialog.Popup size='profile'>
+          <Dialog.Root defaultOpen>
+            <Dialog.Popup variant='profile'>
               <Surface />
             </Dialog.Popup>
           </Dialog.Root>
@@ -344,18 +342,36 @@ describe('Profile', () => {
       expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
     });
 
-    it('carries no dismiss standalone, or inline', () => {
-      const standalone = renderSurface();
-      expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
-      standalone.unmount();
+    it('withholds the corner dismiss inside an alert dialog', () => {
+      render(
+        <MosaicProvider>
+          <Dialog.Root
+            defaultOpen
+            role='alertdialog'
+          >
+            <Dialog.Popup variant='profile'>
+              <Surface />
+              <Card.Description>Review your profile before continuing.</Card.Description>
+              <Dialog.Close>Cancel</Dialog.Close>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
 
-      renderInDialog(true);
-      expect(screen.getByRole('dialog', { name: 'User profile' })).toBeInTheDocument();
+      expect(screen.getByRole('alertdialog', { name: 'User profile' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Close', exact: true })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    });
+
+    // The dismiss belongs to the dialog, so a profile that is the page's own content has none.
+    it('carries no dismiss standalone', () => {
+      renderSurface();
+
       expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
     });
 
-    // Switching pages must never resize the surface: standalone and inline it holds a fixed height
-    // and scrolls inside; over the page the popup's height is the one that counts.
+    // Switching pages must never resize the surface: standalone it holds a fixed height and
+    // scrolls inside; over the page the popup's height is the one that counts.
     it('holds a fixed height standalone, and hands it to the popup over the page', () => {
       const probe = stylex.create({ fixed: { blockSize: '45rem' }, handed: { blockSize: 'auto' } });
       const fixed = atomsOf(probe.fixed);
@@ -371,14 +387,14 @@ describe('Profile', () => {
       expect(frame()).toEqual(expect.arrayContaining(handed));
     });
 
-    // Inline the profile is the page's content: no frame, no scroll region of its own, and the
+    // Flush, the profile is the page's content: no frame, no scroll region of its own, and the
     // branding closes the pages' column out rather than the navigation's.
-    it('is flush and unframed inline, and scrolls with the page', () => {
+    it('is flush and unframed at that elevation, and scrolls with the page', () => {
       const probe = stylex.create({
         frameless: { borderWidth: '0px', overflow: 'visible', backgroundColor: 'transparent', blockSize: 'auto' },
         scroller: { overflowY: 'auto' },
       });
-      renderInDialog(true);
+      renderSurface({ elevation: 'flush' });
 
       const frame = document.querySelector('.cl-profile-layout')!;
       expect(Array.from(frame.classList)).toEqual(expect.arrayContaining(atomsOf(probe.frameless)));

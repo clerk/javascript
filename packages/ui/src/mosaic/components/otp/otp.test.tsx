@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -7,6 +8,10 @@ import { Field } from '../field';
 import { Otp } from './otp';
 
 const slots = () => screen.getAllByRole('textbox');
+
+const atoms = stylex.create({
+  spaced: { marginTop: '8px' },
+});
 
 describe('Mosaic Otp', () => {
   it('renders one slot per character and applies the default status', () => {
@@ -213,5 +218,17 @@ describe('Mosaic Otp', () => {
     );
 
     expect(ref.current).toBe(slots()[0]);
+  });
+
+  it('merges xstyle atoms after the root atoms', () => {
+    render(
+      <Otp
+        xstyle={atoms.spaced}
+        aria-label='Verification code'
+      />,
+    );
+
+    const group = screen.getByRole('group', { name: 'Verification code' });
+    expect(group).toHaveClass('cl-otp', stylex.props(atoms.spaced).className ?? '');
   });
 });

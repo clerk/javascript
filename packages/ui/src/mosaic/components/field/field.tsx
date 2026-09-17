@@ -20,7 +20,7 @@ import {
 } from './field.context';
 import { dynamic, styles } from './field.styles';
 
-function useNativeLabelWarning(label: HTMLLabelElement | null) {
+function useNativeLabelWarning(label: HTMLElement | null) {
   React.useEffect(() => {
     if (process.env.NODE_ENV !== 'production' && label && label.tagName !== 'LABEL') {
       console.warn('[clerk] <Field.Label> must render a native `<label>` element.');
@@ -65,20 +65,30 @@ export interface FieldLabelProps extends MosaicComponentProps<'label'> {
   visuallyHidden?: boolean;
 }
 
-const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function MosaicFieldLabel(
-  { render, xstyle, id: idProp, htmlFor: htmlForProp, visuallyHidden: isVisuallyHidden = false, ...rest },
+const Label = React.forwardRef<HTMLElement, FieldLabelProps>(function MosaicFieldLabel(
+  { render, xstyle, id: idProp, htmlFor: htmlForProp, visuallyHidden: isVisuallyHidden = false, onClick, ...rest },
   ref,
 ) {
   const context = useOptionalFieldContext();
   const generatedId = React.useId();
   const id = idProp ?? (context ? `cl-field-${generatedId}-label` : undefined);
-  const htmlFor = htmlForProp ?? context?.controlId;
-  const [label, setLabel] = React.useState<HTMLLabelElement | null>(null);
+  // A `<label>` activates the control it names, which would open a select; those get a span
+  // that only focuses it, and are named through `aria-labelledby` instead.
+  const nativeLabel = htmlForProp !== undefined || context?.labelElementType !== 'span';
+  const controlId = context?.controlId;
+  const htmlFor = htmlForProp ?? (nativeLabel ? controlId : undefined);
+  const [label, setLabel] = React.useState<HTMLElement | null>(null);
   useRegisterFieldPartId(htmlForProp === undefined ? id : undefined, context?.setLabelIds);
-  useNativeLabelWarning(label);
+  useNativeLabelWarning(nativeLabel ? label : null);
+  const handleClick = (event: React.MouseEvent<HTMLLabelElement>) => {
+    onClick?.(event);
+    if (!nativeLabel && controlId && !event.defaultPrevented) {
+      document.getElementById(controlId)?.focus();
+    }
+  };
   return useRender({
     defaultTagName: 'label',
-    render,
+    render: render ?? (nativeLabel ? undefined : <span />),
     ref: [ref, setLabel],
     props: {
       ...mergeStyleProps(
@@ -95,6 +105,7 @@ const Label = React.forwardRef<HTMLLabelElement, FieldLabelProps>(function Mosai
       ),
       id,
       htmlFor,
+      onClick: handleClick,
     },
   });
 });

@@ -36,21 +36,15 @@ export type {
   ComboboxRootProps,
   ComboboxSize,
 } from '../components/combobox';
-export { Dialog, createConfirmHandle, useConfirmedClose } from '../components/dialog';
+export { Dialog } from '../components/dialog';
 export type {
-  ConfirmHandle,
-  ConfirmOptions,
-  DialogActionsProps,
   DialogCloseButtonProps,
   DialogCloseProps,
-  DialogConfirmProps,
-  DialogDescriptionProps,
+  DialogCompactPlacement,
   DialogPopupProps,
   DialogRootProps,
-  DialogSize,
-  DialogTitleProps,
+  DialogVariant,
   DialogTriggerProps,
-  UseConfirmedCloseOptions,
 } from '../components/dialog';
 export { Field } from '../components/field';
 export type { FieldDescriptionProps, FieldErrorProps, FieldLabelProps, FieldRootProps } from '../components/field';
@@ -83,6 +77,15 @@ export type {
 } from '../components/menu';
 export { scrollAreaRoot, scrollAreaVars, scrollAreaViewport } from '../components/scroll-area';
 export type { ScrollAreaGutter } from '../components/scroll-area';
+export { Select } from '../components/select';
+export type {
+  SelectItem,
+  SelectOptionProps,
+  SelectPopupProps,
+  SelectProps,
+  SelectTriggerProps,
+  SelectTriggerVariant,
+} from '../components/select';
 export { Section } from '../components/section';
 export type {
   SectionActionsProps,

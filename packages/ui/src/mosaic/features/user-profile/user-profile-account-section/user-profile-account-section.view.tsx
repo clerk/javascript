@@ -2,7 +2,7 @@ import type { FileRejection } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
 
 import { Section } from '../../../components/section';
-import { userProfileAccountSectionBase as m } from './user-profile-account-section.messages';
+import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
 import { styles } from './user-profile-account-section.styles';
 import type {
   UserProfileEmail,

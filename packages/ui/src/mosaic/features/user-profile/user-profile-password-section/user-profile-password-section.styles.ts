@@ -9,7 +9,7 @@ export const styles = stylex.create({
     display: 'flex',
   },
   checkbox: {
-    accentColor: colorVars['--cl-color-primary'],
+    accentColor: colorVars['--cl-color-brand'],
     cursor: 'pointer',
     flexShrink: 0,
     marginBlockStart: '2px',
@@ -26,7 +26,7 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
   checkboxDescription: {
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
   },
   managedBy: {
     gap: space['1.5'],
@@ -39,6 +39,6 @@ export const styles = stylex.create({
     width: space['4'],
   },
   managedByText: {
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
   },
 });

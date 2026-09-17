@@ -24,6 +24,7 @@ export function useConnectedAccountsFixture({
   providers?: UserProfileConnectionProvider[];
   removalState?: 'pending' | 'error';
 } = {}) {
+  const [hasRemovalFailed, setHasRemovalFailed] = useState(false);
   const [accounts, setAccounts] = useState(initialAccounts);
   const availableProviders = providers.filter(provider => !accounts.some(account => account.id === provider.id));
 
@@ -47,18 +48,15 @@ export function useConnectedAccountsFixture({
             : account,
         ),
       ),
-    onRemove: (id: string) =>
-      setAccounts(current => {
-        const account = current.find(item => item.id === id);
-        if (removalState === 'pending') {
-          return current.map(item => (item.id === id ? { ...item, isRemoving: true } : item));
-        }
-        if (removalState === 'error' && account && !account.removalError) {
-          return current.map(item =>
-            item.id === id ? { ...item, removalError: 'Unable to remove this account. Please try again.' } : item,
-          );
-        }
-        return current.filter(item => item.id !== id);
-      }),
+    onRemove: async (id: string) => {
+      if (removalState === 'pending') {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+      }
+      if (removalState === 'error' && !hasRemovalFailed) {
+        setHasRemovalFailed(true);
+        throw new Error('Unable to remove this account. Please try again.');
+      }
+      setAccounts(current => current.filter(item => item.id !== id));
+    },
   };
 }

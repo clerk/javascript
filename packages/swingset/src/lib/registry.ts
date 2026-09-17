@@ -169,6 +169,15 @@ import {
   meta as sectionMeta,
   MultipleEmailAndPhoneNumbers as SectionMultipleEmailAndPhoneNumbers,
 } from '../stories/section.stories';
+import {
+  Controlled as SelectComponentControlled,
+  Default as SelectComponentDefault,
+  Descriptions as SelectComponentDescriptions,
+  Ghost as SelectComponentGhost,
+  meta as selectComponentMeta,
+  Overflowing as SelectComponentOverflowing,
+  Placeholder as SelectComponentPlaceholder,
+} from '../stories/select.component.stories';
 import { meta as selectMeta } from '../stories/select.stories';
 import { meta as tableMeta } from '../stories/table.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
@@ -198,10 +207,14 @@ import {
   Default as UserProfileAccountSectionDefault,
   EmailLinkResendFails as UserProfileAccountSectionEmailLinkResendFails,
   EmailLinkVerification as UserProfileAccountSectionEmailLinkVerification,
+  EmailRemovalError as UserProfileAccountSectionEmailRemovalError,
+  EmailRemovalPending as UserProfileAccountSectionEmailRemovalPending,
   EmailSsoConnectFails as UserProfileAccountSectionEmailSsoConnectFails,
   EmailSsoVerification as UserProfileAccountSectionEmailSsoVerification,
   meta as userProfileAccountSectionMeta,
   MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
+  PhoneRemovalError as UserProfileAccountSectionPhoneRemovalError,
+  PhoneRemovalPending as UserProfileAccountSectionPhoneRemovalPending,
 } from '../stories/user-profile-account-section.stories';
 import {
   Default as UserProfileActiveDevicesSectionDefault,
@@ -411,6 +424,16 @@ const headingModule: StoryModule = {
 
 const menuComponentModule: StoryModule = { meta: menuComponentMeta, Default: MenuComponentDefault };
 
+const selectComponentModule: StoryModule = {
+  meta: selectComponentMeta,
+  Default: SelectComponentDefault,
+  Descriptions: SelectComponentDescriptions,
+  Ghost: SelectComponentGhost,
+  Placeholder: SelectComponentPlaceholder,
+  Controlled: SelectComponentControlled,
+  Overflowing: SelectComponentOverflowing,
+};
+
 const otpComponentModule: StoryModule = {
   meta: otpComponentMeta,
   Default: OtpComponentDefault,
@@ -510,6 +533,10 @@ const userProfileAccountSectionModule: StoryModule = {
   EmailLinkResendFails: UserProfileAccountSectionEmailLinkResendFails,
   EmailSsoVerification: UserProfileAccountSectionEmailSsoVerification,
   EmailSsoConnectFails: UserProfileAccountSectionEmailSsoConnectFails,
+  EmailRemovalPending: UserProfileAccountSectionEmailRemovalPending,
+  EmailRemovalError: UserProfileAccountSectionEmailRemovalError,
+  PhoneRemovalPending: UserProfileAccountSectionPhoneRemovalPending,
+  PhoneRemovalError: UserProfileAccountSectionPhoneRemovalError,
 };
 const userProfileProfilePanelModule: StoryModule = {
   meta: userProfileProfilePanelMeta,
@@ -678,6 +705,7 @@ export const registry: StoryModule[] = [
   popoverComponentModule,
   profileComponentModule,
   sectionModule,
+  selectComponentModule,
   tableModule,
   textModule,
   toastModule,

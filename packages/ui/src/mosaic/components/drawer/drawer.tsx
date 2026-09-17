@@ -6,7 +6,7 @@ import React from 'react';
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
-import { DialogContext, isOverlayDialog } from '../dialog';
+import { DialogContext, isInDialog } from '../dialog';
 import { styles } from './drawer.styles';
 
 export type DrawerRootProps = HeadlessDrawerProps;
@@ -46,7 +46,7 @@ const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function Drawer
   ref,
 ) {
   const host = React.useContext(DialogContext);
-  const nested = isOverlayDialog(host);
+  const nested = isInDialog(host);
   return (
     <Primitive.Portal>
       <Primitive.Backdrop

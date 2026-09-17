@@ -3,6 +3,7 @@ import { Otp as Primitive } from '@clerk/headless/otp';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { inputStyles } from '../../utils/input.styles';
 import { reset } from '../../utils/reset.styles';
@@ -12,7 +13,8 @@ import { styles } from './otp.styles';
 /** How the entered code currently reads back to the user. */
 export type OtpStatus = 'neutral' | 'success' | 'error';
 
-export interface OtpProps extends Omit<PrimitiveOtpProps, 'children' | 'length' | 'className' | 'style' | 'ref'> {
+export interface OtpProps
+  extends Omit<PrimitiveOtpProps, 'children' | 'length' | 'className' | 'style' | 'ref'>, MosaicStyleProps {
   /** The number of boxes in the code. @default 6 */
   length?: number;
   /** Colours every slot for the verification outcome. Defaults to the enclosing `Field`'s validity. */
@@ -58,6 +60,7 @@ export const Otp = React.forwardRef<HTMLInputElement, OtpProps>(function MosaicO
     'aria-invalid': ariaInvalidProp,
     'aria-labelledby': ariaLabelledBy,
     'aria-describedby': ariaDescribedBy,
+    xstyle,
     ...rest
   },
   ref,
@@ -82,7 +85,7 @@ export const Otp = React.forwardRef<HTMLInputElement, OtpProps>(function MosaicO
       disabled={disabled}
       required={required}
       id={fieldProps?.id ?? id}
-      {...mergeStyleProps(themeProps('otp', { status, disabled }), stylex.props(reset.base, styles.root))}
+      {...mergeStyleProps(themeProps('otp', { status, disabled }), stylex.props(reset.base, styles.root, xstyle))}
       aria-labelledby={fieldProps?.['aria-labelledby'] ?? ariaLabelledBy}
       aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}
     >

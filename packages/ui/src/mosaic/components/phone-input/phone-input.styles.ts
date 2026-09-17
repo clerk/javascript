@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   triggerContent: {
@@ -29,7 +29,7 @@ export const styles = stylex.create({
   },
   prefix: {
     gap: space['2'],
-    color: colorVars['--cl-color-primary'],
+    color: colorVars['--cl-color-brand'],
     fontVariantNumeric: 'tabular-nums',
     paddingInlineEnd: 0,
     paddingInlineStart: space['2'],
@@ -41,11 +41,9 @@ export const styles = stylex.create({
   popup: {
     borderRadius: radiusVars['--cl-radius-lg'],
     overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-card'],
-    boxShadow: `0 12px 12px -7px light-dark(oklch(0.2046 0 0 / 12%), transparent),
-                0 24px 24px -10px light-dark(oklch(0.2046 0 0 / 4%), transparent),
-                0 0 0 1px light-dark(oklch(0.2046 0 0 / 4%), oklch(1 0 0 / 10%))`,
-    color: colorVars['--cl-color-card-foreground'],
+    backgroundColor: colorVars['--cl-color-background'],
+    boxShadow: shadowVars['--cl-shadow-md'],
+    color: colorVars['--cl-color-foreground'],
   },
   countrySearchContainer: {
     paddingInline: space['2'],
@@ -61,7 +59,7 @@ export const styles = stylex.create({
     minWidth: 0,
   },
   optionCode: {
-    color: colorVars['--cl-color-neutral-faded'],
+    color: colorVars['--cl-color-foreground-secondary'],
     flexShrink: 0,
     fontVariantNumeric: 'tabular-nums',
     whiteSpace: 'nowrap',

@@ -1,6 +1,6 @@
 import { Section } from '../../../components/section';
 import { UserProfilePasswordRowView } from './user-profile-password-row.view';
-import { userProfilePasswordSectionBase as m } from './user-profile-password-section.messages';
+import { userProfilePasswordSectionMessages as m } from './user-profile-password-section.messages';
 import type { UserProfilePasswordSectionViewProps } from './user-profile-password-section.types';
 
 export type {
