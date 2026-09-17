@@ -6,10 +6,10 @@ import { Badge } from '../../components/badge';
 import { SubmitButton } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Section } from '../../components/section';
-import { fill } from '../../utils/messages';
+import type { MosaicMessages } from '../../localization';
+import { fill, useMessages } from '../../localization';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
-import { userProfileActiveDevicesMessages as m } from './user-profile-active-devices.messages';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 import { UserProfileDeviceDetailsDialog } from './user-profile-device-details.dialog';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
@@ -28,6 +28,7 @@ export function UserProfileActiveDevicesSectionView({
   onSignOutDevice,
   onSignOutAllOtherDevices,
 }: UserProfileActiveDevicesSectionViewProps) {
+  const m = useMessages('userProfileActiveDevices');
   const deviceDetails = useMemo(() => Dialog.createHandle<UserProfileDevice>(), []);
   const signOutDevice = useMemo(() => Confirmation.createHandle<UserProfileDevice>(), []);
   const currentDevices = devices.filter(device => device.isCurrent);
@@ -183,12 +184,13 @@ export function UserProfileActiveDevicesSectionView({
   );
 }
 
-function deviceBadges(device: UserProfileDevice): string[] {
-  return [
+function deviceBadges(device: UserProfileDevice, m: MosaicMessages['userProfileActiveDevices']): string[] {
+  const labels: (string | null)[] = [
     device.isCurrent ? m.thisDevice : null,
     device.isUserDevice ? m.userDevice : null,
     device.isImpersonationDevice ? m.impersonationDevice : null,
-  ].filter((label): label is string => label !== null);
+  ];
+  return labels.filter((label): label is string => label !== null);
 }
 
 function DeviceItem({
@@ -202,6 +204,7 @@ function DeviceItem({
   onViewDetails: (device: UserProfileDevice) => void;
   onSignOut?: (device: UserProfileDevice) => void;
 }) {
+  const m = useMessages('userProfileActiveDevices');
   const actions: UserProfileMenuAction[] = [{ label: m.viewDetails, onClick: () => onViewDetails(device) }];
 
   if (onSignOut) {
@@ -214,7 +217,7 @@ function DeviceItem({
       <Section.Content>
         <Section.Label xstyle={styles.deviceLabel}>
           <span>{device.name}</span>
-          {deviceBadges(device).map(label => (
+          {deviceBadges(device, m).map(label => (
             <Badge
               key={label}
               color='neutral'

@@ -29,4 +29,4 @@ export const userProfileActiveDevicesMessages = {
     confirm: 'Sign out',
     cancel: 'Cancel',
   },
-};
+} as const;

@@ -6,8 +6,7 @@ import { Card } from '../../components/card';
 import { DataList } from '../../components/data-list';
 import type { DialogFocusTarget, DialogHandle } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
-import { fill } from '../../utils/messages';
-import { userProfileActiveDevicesMessages as m } from './user-profile-active-devices.messages';
+import { fill, useMessages } from '../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
 export interface UserProfileDeviceDetailsDialogProps {
@@ -46,6 +45,7 @@ function DeviceDetailsCard({
   handle: DialogHandle<UserProfileDevice>;
   onSignOut: UserProfileDeviceDetailsDialogProps['onSignOut'];
 }) {
+  const m = useMessages('userProfileActiveDevices');
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>();
   const signingOut = useRef(false);
@@ -68,13 +68,14 @@ function DeviceDetailsCard({
     }
   };
 
-  const details = [
+  const fields: { label: string; value: string | undefined }[] = [
     { label: m.detailsDialog.model, value: device.model },
     { label: m.detailsDialog.browser, value: device.browser },
     { label: m.detailsDialog.ipAddress, value: device.ipAddress },
     { label: m.detailsDialog.location, value: device.location },
     { label: m.detailsDialog.signedInAt, value: device.signedInAt },
-  ].filter((detail): detail is { label: string; value: string } => Boolean(detail.value));
+  ];
+  const details = fields.filter((field): field is { label: string; value: string } => Boolean(field.value));
 
   return (
     <Card.Root
