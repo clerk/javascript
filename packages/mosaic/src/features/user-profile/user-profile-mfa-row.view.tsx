@@ -2,7 +2,7 @@ import { useId } from 'react';
 
 import { Badge } from '../../components/badge';
 import { Section } from '../../components/section';
-import { fill } from '../../utils/messages';
+import { fill } from '../../localization';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import { userProfileMfaMessages as m } from './user-profile-mfa-section.messages';

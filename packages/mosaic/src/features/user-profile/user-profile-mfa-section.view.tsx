@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
-import { fill } from '../../utils/messages';
+import { fill } from '../../localization';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileMfaRowView } from './user-profile-mfa-row.view';
 import { useUserProfileMfaSectionController } from './user-profile-mfa-section.controller';
