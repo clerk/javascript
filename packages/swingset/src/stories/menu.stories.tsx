@@ -11,6 +11,7 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Menu',
   source: 'packages/headless/src/primitives/menu/index.ts',
 };

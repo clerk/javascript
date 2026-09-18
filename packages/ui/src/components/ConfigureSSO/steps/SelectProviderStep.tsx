@@ -17,65 +17,21 @@ import {
 import { useCardState } from '@/elements/contexts';
 import { common, mqu } from '@/styledSystem';
 import { Alert } from '@/ui/elements/Alert';
-import { handleError } from '@/utils/errorHandler';
+import { getFieldError, getGlobalError, handleError } from '@/utils/errorHandler';
 
 import { ChangeProviderDialog } from '../ChangeProviderDialog';
 import { useConfigureSSO } from '../ConfigureSSOContext';
-import { isOidcProvider } from '../domain/organizationEnterpriseConnection';
+import { PROVIDER_GROUPS, providerLabel, toProviderCard } from '../domain/providers';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
-import type { EnterpriseConnectionProviderType, ProviderType } from '../types';
+import type { ProviderType } from '../types';
 
 const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
-const PROVIDER_GROUPS: ReadonlyArray<{
-  id: 'saml' | 'oidc';
-  label: LocalizationKey;
-  options: ReadonlyArray<{ id: ProviderType; label: LocalizationKey; iconId: string }>;
-}> = [
-  {
-    id: 'saml',
-    label: localizationKeys('configureSSO.selectProviderStep.saml.groupLabel'),
-    options: [
-      { id: 'saml_okta', label: localizationKeys('configureSSO.selectProviderStep.saml.okta'), iconId: 'okta' },
-      {
-        id: 'saml_microsoft',
-        label: localizationKeys('configureSSO.selectProviderStep.saml.microsoft'),
-        iconId: 'microsoft',
-      },
-      {
-        id: 'saml_google',
-        label: localizationKeys('configureSSO.selectProviderStep.saml.google'),
-        iconId: 'google',
-      },
-      {
-        id: 'saml_custom',
-        label: localizationKeys('configureSSO.selectProviderStep.saml.customSaml'),
-        iconId: 'saml',
-      },
-    ],
-  },
-  {
-    id: 'oidc',
-    label: localizationKeys('configureSSO.selectProviderStep.oidc.groupLabel'),
-    options: [
-      {
-        id: 'oidc_custom',
-        label: localizationKeys('configureSSO.selectProviderStep.oidc.oidcProvider'),
-        iconId: 'oidc',
-      },
-    ],
-  },
-];
-
-const providerLabel = (provider: ProviderType): LocalizationKey | undefined =>
-  PROVIDER_GROUPS.flatMap(group => group.options).find(option => option.id === provider)?.label;
-
-const toProviderCard = (provider: EnterpriseConnectionProviderType): ProviderType =>
-  isOidcProvider(provider) ? 'oidc_custom' : provider;
 
 export const SelectProviderStep = (): JSX.Element => {
   const {
     organizationEnterpriseConnection: c,
+    enterpriseConnection,
     enterpriseConnectionMutations: { createConnection, changeProvider },
     contentRef,
   } = useConfigureSSO();
@@ -120,8 +76,19 @@ export const SelectProviderStep = (): JSX.Element => {
       await createConnection(selected);
       void goNext();
     } catch (err) {
-      handleError(err as Error, [], card.setError);
+      handleCreateError(err as Error);
       setIsSubmitting(false);
+    }
+  };
+
+  // FAPI reports a domain another connection already authenticates as a field
+  // error on `domains`. This step has no domains field, so it surfaces as the
+  // step's alert instead of vanishing.
+  const handleCreateError = (err: Error) => {
+    handleError(err, [], card.setError);
+    const fieldError = getFieldError(err);
+    if (fieldError && !getGlobalError(err)) {
+      card.setError(fieldError);
     }
   };
 
@@ -134,10 +101,14 @@ export const SelectProviderStep = (): JSX.Element => {
     setIsSubmitting(true);
 
     try {
-      await changeProvider(selected);
+      if (enterpriseConnection) {
+        await changeProvider(enterpriseConnection.id, selected);
+      } else {
+        await createConnection(selected);
+      }
       void goNext();
     } catch (err) {
-      handleError(err as Error, [], card.setError);
+      handleCreateError(err as Error);
       setIsChangeDialogOpen(false);
       setChangeFromProvider(null);
       setIsSubmitting(false);
@@ -238,6 +209,7 @@ export const SelectProviderStep = (): JSX.Element => {
             isSubmitting={isSubmitting}
             nextProviderLabel={nextProviderLabel}
             currentProviderLabel={currentProviderLabel}
+            connectionName={enterpriseConnection?.name ?? ''}
             contentRef={contentRef}
           />
         ) : null}

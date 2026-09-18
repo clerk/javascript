@@ -67,7 +67,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
     prevCurrentFactor: undefined,
   }));
 
-  const { hasAnyStrategy, hasFirstParty } = useReverificationAlternativeStrategies({
+  const { hasAlternativeStrategies } = useReverificationAlternativeStrategies({
     filterOutFactor: currentFactor,
     supportedFirstFactors: availableFactors,
   });
@@ -76,7 +76,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
     () => !currentFactor || !factorHasLocalStrategy(currentFactor),
   );
 
-  const toggleAllStrategies = hasAnyStrategy
+  const toggleAllStrategies = hasAlternativeStrategies
     ? () => {
         card.setError(undefined);
         setShowAllStrategies(s => !s);
@@ -142,7 +142,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
           onFactorPrepare={handleFactorPrepare}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           factor={currentFactor}
-          showAlternativeMethods={hasFirstParty}
+          showAlternativeMethods={hasAlternativeStrategies}
         />
       );
     case 'email_link':
@@ -160,7 +160,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
           onFactorPrepare={handleFactorPrepare}
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           factor={currentFactor}
-          showAlternativeMethods={hasFirstParty}
+          showAlternativeMethods={hasAlternativeStrategies}
         />
       );
     case 'passkey':

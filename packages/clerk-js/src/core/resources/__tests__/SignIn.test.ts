@@ -3291,4 +3291,48 @@ describe('SignIn', () => {
       expect(result.protectCheck).toBeNull();
     });
   });
+
+  describe('ssoBypassFirstFactors', () => {
+    const baseJSON = {
+      id: 'signin_123',
+      object: 'sign_in',
+      status: 'needs_first_factor',
+      supported_identifiers: [],
+      identifier: 'user@corp.com',
+      user_data: {} as any,
+      supported_first_factors: [{ strategy: 'enterprise_sso' }],
+      supported_second_factors: [],
+      first_factor_verification: null,
+      second_factor_verification: null,
+      created_session_id: null,
+    } as any;
+
+    it('defaults to null when the field is absent', () => {
+      const signIn = new SignIn(baseJSON);
+
+      expect(signIn.ssoBypassFirstFactors).toBeNull();
+      expect(signIn.__internal_future.ssoBypassFirstFactors).toEqual([]);
+      expect(signIn.__internal_toSnapshot().sso_bypass_first_factors).toBeUndefined();
+    });
+
+    it('round-trips the field through the snapshot', () => {
+      const signIn = new SignIn({
+        ...baseJSON,
+        sso_bypass_first_factors: [
+          { strategy: 'email_code', safe_identifier: 'user@corp.com', email_address_id: 'idn_hmac' },
+        ],
+      });
+
+      expect(signIn.ssoBypassFirstFactors).toEqual([
+        { strategy: 'email_code', safeIdentifier: 'user@corp.com', emailAddressId: 'idn_hmac' },
+      ]);
+      expect(signIn.__internal_future.ssoBypassFirstFactors).toEqual(signIn.ssoBypassFirstFactors);
+
+      const snapshot = signIn.__internal_toSnapshot();
+      expect(snapshot.sso_bypass_first_factors).toEqual([
+        { strategy: 'email_code', safe_identifier: 'user@corp.com', email_address_id: 'idn_hmac' },
+      ]);
+      expect(new SignIn(snapshot).ssoBypassFirstFactors).toEqual(signIn.ssoBypassFirstFactors);
+    });
+  });
 });

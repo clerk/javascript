@@ -30,6 +30,7 @@ describe('useEnabledThirdPartyProviders', () => {
     const { authenticatableOauthStrategies } = result.current;
 
     expect(authenticatableOauthStrategies).toStrictEqual([
+      'oauth_agentid',
       'oauth_apple',
       'oauth_atlassian',
       'oauth_bitbucket',

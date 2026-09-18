@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
 
+import { StatusDot } from '@/components/StatusDot';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Sidebar,
@@ -21,10 +22,11 @@ import {
 } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getSidebarGroups } from '@/lib/registry';
+import type { StoryStatus, WipSubstatus } from '@/lib/types';
 
 const groups = getSidebarGroups();
 
-const COLLAPSED_BY_DEFAULT = new Set(['Blocks', 'Primitives', 'Components', 'Styles', 'Hooks']);
+const COLLAPSED_BY_DEFAULT = new Set(['Blocks', 'Primitives', 'Components', 'Styles', 'Hooks', 'Localization']);
 
 type SidebarEntry = ReturnType<typeof getSidebarGroups>[number]['components'][number];
 
@@ -44,7 +46,19 @@ function byCategory(components: SidebarEntry[]) {
   return categories;
 }
 
-function SidebarUsageItem({ usage, href, isActive }: { usage: string; href: string; isActive: boolean }) {
+function SidebarUsageItem({
+  usage,
+  href,
+  isActive,
+  status,
+  substatus,
+}: {
+  usage: string;
+  href: string;
+  isActive: boolean;
+  status?: StoryStatus;
+  substatus?: WipSubstatus;
+}) {
   const labelRef = React.useRef<HTMLSpanElement>(null);
   const [isTruncated, setIsTruncated] = React.useState(false);
 
@@ -71,6 +85,12 @@ function SidebarUsageItem({ usage, href, isActive }: { usage: string; href: stri
               isActive={isActive}
               render={<Link href={href} />}
             >
+              {status ? (
+                <StatusDot
+                  status={status}
+                  substatus={substatus}
+                />
+              ) : null}
               <span
                 ref={labelRef}
                 className='truncate font-mono text-[10px] leading-relaxed'
@@ -106,12 +126,12 @@ function SidebarEntryMenu({
         const href = `/${groupSlug}/${componentSlug}`;
         // How an entry is USED differs by layer, so the label follows the layer rather
         // than a guess at the title: hooks are called, atomic styles are a set of
-        // exports with no single call form worth privileging, and everything else is a
-        // component rendered as JSX.
+        // exports with no single call form worth privileging, localization is a prop rather
+        // than a component, and everything else is a component rendered as JSX.
         const usage =
           mod.meta.group === 'Hooks'
             ? `${mod.meta.title}()`
-            : mod.meta.group === 'Styles'
+            : mod.meta.group === 'Styles' || mod.meta.group === 'Localization'
               ? mod.meta.title
               : `<${mod.meta.title} />`;
         return (
@@ -120,6 +140,8 @@ function SidebarEntryMenu({
             usage={usage}
             href={href}
             isActive={pathname === href}
+            status={mod.meta.status}
+            substatus={mod.meta.substatus}
           />
         );
       })}

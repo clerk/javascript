@@ -344,4 +344,152 @@ describe('Organization', () => {
       expect(result.data[0].connectionType).toBe('saml');
     });
   });
+
+  describe('directory sync', () => {
+    const DIRECTORY_PATH = `/organizations/${ORG_ID}/enterprise_connections/ec_123/directory`;
+
+    const directoryJSON = {
+      object: 'directory' as const,
+      id: 'scimdir_1',
+      name: 'Acme Okta',
+      enterprise_connection_id: 'ec_123',
+      endpoint_url: 'https://api.example.com/scim/v2',
+      provider: 'okta' as const,
+      enabled: false,
+      group_role_mapping_enabled: false,
+      attribute_mapping: { 'name.givenName': 'first_name' },
+      created_at: 1700000000000,
+      updated_at: 1700000000000,
+    };
+
+    it('fetches the directory from the connection-scoped path', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: directoryJSON }));
+
+      const organization = createOrganization();
+      const result = await organization.getDirectorySync('ec_123');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'GET', path: DIRECTORY_PATH });
+      expect(result.id).toBe('scimdir_1');
+      expect(result.endpointUrl).toBe('https://api.example.com/scim/v2');
+      expect(result.provider).toBe('okta');
+      expect(result.attributeMapping).toEqual({ 'name.givenName': 'first_name' });
+      expect(result.apiKey).toBeNull();
+    });
+
+    it('creates the directory and exposes the show-once token', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi
+        .fn()
+        .mockReturnValue(Promise.resolve({ response: { ...directoryJSON, api_key: 'ak_secret' } }));
+
+      const organization = createOrganization();
+      const result = await organization.createDirectorySync('ec_123', { name: 'Acme Okta' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: DIRECTORY_PATH,
+        body: { name: 'Acme Okta' },
+      });
+      expect(result.apiKey).toBe('ak_secret');
+      expect(result.__internal_toSnapshot()).not.toHaveProperty('api_key');
+    });
+
+    it('creates the directory without a name, leaving it to the FAPI client to drop the undefined field', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: directoryJSON }));
+
+      const organization = createOrganization();
+      await organization.createDirectorySync('ec_123');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: DIRECTORY_PATH,
+        body: { name: undefined },
+      });
+    });
+  });
+
+  describe('SSO bypass allowlist', () => {
+    const ALLOWLIST_PATH = `/organizations/${ORG_ID}/sso_bypass_allowlist_users`;
+
+    const entryJSON = {
+      object: 'sso_bypass_allowlist_user' as const,
+      user_id: 'user_1',
+      public_user_data: {
+        first_name: 'Cameron',
+        last_name: 'Walker',
+        image_url: 'https://img.clerk.com/cameron',
+        has_image: true,
+        identifier: 'cameron@example.com',
+        username: null,
+      },
+      created_at: 1700000000000,
+      updated_at: 1700000000000,
+    };
+
+    it('lists the allowlisted users', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: [entryJSON] }));
+
+      const organization = createOrganization();
+      const entries = await organization.ssoBypassAllowlist.getUsers();
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'GET', path: ALLOWLIST_PATH });
+      expect(entries).toHaveLength(1);
+      expect(entries[0].id).toBe('user_1');
+      expect(entries[0].userId).toBe('user_1');
+      expect(entries[0].publicUserData.firstName).toBe('Cameron');
+      expect(entries[0].publicUserData.identifier).toBe('cameron@example.com');
+      expect(entries[0].createdAt).toEqual(new Date(1700000000000));
+      expect(entries[0].__internal_toSnapshot()).toMatchObject({
+        object: 'sso_bypass_allowlist_user',
+        user_id: 'user_1',
+      });
+    });
+
+    it('adds a user by id as a form field', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: entryJSON }));
+
+      const organization = createOrganization();
+      const entry = await organization.ssoBypassAllowlist.addUser({ userId: 'user_1' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: ALLOWLIST_PATH,
+        body: { user_id: 'user_1' },
+      });
+      expect(entry.userId).toBe('user_1');
+    });
+
+    it('removes a user by id', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi
+        .fn()
+        .mockReturnValue(
+          Promise.resolve({ response: { object: 'sso_bypass_allowlist_user', id: 'user_1', deleted: true } }),
+        );
+
+      const organization = createOrganization();
+      const result = await organization.ssoBypassAllowlist.removeUser('user_1');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'DELETE', path: `${ALLOWLIST_PATH}/user_1` });
+      expect(result.id).toBe('user_1');
+      expect(result.deleted).toBe(true);
+    });
+
+    it('does not create a cycle when the organization is serialized', () => {
+      const organization = createOrganization();
+
+      expect(() => JSON.stringify(organization)).not.toThrow();
+      expect(JSON.parse(JSON.stringify(organization)).ssoBypassAllowlist).toEqual({});
+    });
+  });
 });

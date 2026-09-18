@@ -20,6 +20,7 @@ export default defineConfig({
         'primitives/select/index': 'src/primitives/select/index.ts',
         'primitives/menu/index': 'src/primitives/menu/index.ts',
         'primitives/autocomplete/index': 'src/primitives/autocomplete/index.ts',
+        'primitives/combobox/index': 'src/primitives/combobox/index.ts',
         'primitives/collapsible/index': 'src/primitives/collapsible/index.ts',
         'primitives/dialog/index': 'src/primitives/dialog/index.ts',
         'primitives/drawer/index': 'src/primitives/drawer/index.ts',

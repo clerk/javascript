@@ -3,7 +3,7 @@
 Mosaic is styled with **StyleX** (`@stylexjs/stylex` 0.19). StyleX is
 compile-time atomic CSS: the style objects become hashed atom classes plus one
 static stylesheet, with zero runtime. This file is the authoring model; read it
-against the reference component, `packages/ui/src/mosaic/components/button/`.
+against the reference component, `packages/mosaic/src/components/button/`.
 
 Consumers target `--cl-*` vars, the `.cl-<slot>` class, and `data-<axis>` attrs,
 never StyleX's hashed `x…` atoms. That public contract is fixed; everything
@@ -25,7 +25,7 @@ conventions to follow by hand, not guarantees the toolchain makes for you.
 | `utils/`                          | everything shared across components — styles and non-style helpers alike                   |
 | `<comp>/<comp>.markers.stylex.ts` | `stylex.defineMarker()` results for scoped ancestor states                                 |
 | `<comp>/<comp>.tsx`               | component; spreads `stylex.props(...)` via `mergeStyleProps`                               |
-| `props.ts`                        | `themeProps` (`.cl-<slot>` + `data-<axis>`) + `mergeStyleProps`                            |
+| `props.ts`                        | `themeProps` (`.cl-<slot>` + `data-<axis>`), `mergeStyleProps`, the `Mosaic*Props` types   |
 | `styles/index.ts`                 | isolated-build barrel; derives `*VarName` types                                            |
 
 The `@stylexjs` eslint rules run on `src/mosaic/**`. The `enforce-extension`
@@ -52,8 +52,17 @@ rule reserves the `.stylex.ts` extension for StyleX define-primitives: **a
   components render the same visual surface — e.g. inputs (`TextInput`,
   `NumberInput`, date fields, `Selector`) sharing one `inputWrapper` /
   `inputStatusBorder` / `inputStatusFocusWithin` set instead of redefining the
-  border/focus treatment five times. Three exist today: `reset.styles.ts`,
-  `typography.styles.ts` and `focus-outline.styles.ts`.
+  border/focus treatment five times. Four exist today: `reset.styles.ts`,
+  `typography.styles.ts`, `focus-outline.styles.ts` and `rtl.styles.ts`.
+- **DO** compose `rtl.mirror` from `utils/rtl.styles.ts` onto a direction-aware
+  icon — a chevron that means "forward"/"back", a pagination arrow, the
+  log-out arrow leaving its frame — via its
+  `xstyle`. It flips the glyph with `scaleX(-1)` only under an ancestor carrying
+  `dir="rtl"`, so the same `chevron-right` reads as "forward" in both directions.
+  Pick it by meaning, not by shape: a chevron that points at a dropdown or an
+  external-link arrow stays unmirrored.
+- **DON'T** register a mirrored twin (`chevron-forward`) in the icon registry or
+  swap the name at the call site by direction. The direction lives in CSS.
 - **DON'T** put a shared style file under `components/`. That directory holds one
   subdirectory per component and nothing else, so a loose file there reads as a
   component that lost its folder.
@@ -70,7 +79,7 @@ it gives consumers stable `--cl-*` vars to override in plain CSS:
 const colorDefaults = {
   // one value carries light + dark; resolves against the in-scope `color-scheme`,
   // so dark mode lives in the token, no `@media (prefers-color-scheme)` copy.
-  '--cl-color-primary': 'light-dark(oklch(0.205 0 0), oklch(0.922 0 0))',
+  '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
 } as const;
 export const colorVars = stylex.defineVars(colorDefaults);
 ```
@@ -78,6 +87,9 @@ export const colorVars = stylex.defineVars(colorDefaults);
 - **DO** put light + dark in one token value via `light-dark()`. Never ship a
   second `@media (prefers-color-scheme: dark)` copy of a color.
 - **DO** reserve `--cl-*`-prefixed keys for the public, overridable contract.
+- **DO** derive a gray-backed colour token from `--cl-color-neutral` mixed into
+  `--cl-color-background` (`neutralMix(80, 98)` in `tokens.stylex.ts`) rather than
+  restating an oklch value. There is no gray scale: retinting neutral retints the ramp.
 - **DO** name internal, non-contract vars with a `--_cl-*` prefix (e.g. a value a
   parent writes for a child to read). They still emit verbatim but the `_` marks
   them "not a contract, don't override."
@@ -87,7 +99,7 @@ export const colorVars = stylex.defineVars(colorDefaults);
   wrapping controls. A role name survives a value change; `--cl-radius-md` doesn't.
 - **DO** compute tints at the call site with `color-mix()`, not as their own
   tokens. `color-mix(in oklab, ${primary}, ${fg} 12%)` beats minting
-  `--cl-color-primary-hover-12`.
+  `--cl-color-brand-hover-12`.
 - **DON'T** mint a per-step derivative token for something a `calc()`/`color-mix()`
   can express from an existing token.
 - **DON'T** give one value two public names. The focus ring's colour is
@@ -95,14 +107,16 @@ export const colorVars = stylex.defineVars(colorDefaults);
   would let a consumer override one and not the other, and the ring's appearance
   would then depend on which they picked.
 - **DO** build a fill that sits _on top of_ an unknown backdrop — a hover or pressed
-  wash on a transparent `outline`/`ghost` control — as a **scrim**: an opacity of
-  black-on-light / white-on-dark over `transparent`, not a percentage of a gray token.
+  wash on a transparent `outline`/`ghost` control — from the `--cl-color-neutral-alpha-*`
+  tokens: `--cl-color-neutral` (black on light, white on dark) at a fixed opacity over
+  `transparent`, not a percentage of a gray token. Status colors have the same three
+  steps (`--cl-color-negative-alpha-100` …).
 
   ```ts
-  const step = `color-mix(in oklab, light-dark(oklch(0 0 0), oklch(1 0 0)) 12%, transparent)`;
+  backgroundColor: colorVars['--cl-color-neutral-alpha-300'],
   ```
 
-  A gray token like `--cl-color-neutral` is a 900, not black, so the same percentage of
+  A gray token like `--cl-color-foreground` is a 900, not black, so the same percentage of
   it lands lighter than the percentage of black — and by an amount that shifts with
   whatever the control sits on, so the step numbers stop describing what they render.
   The scrim composites, so one ramp reads consistently on every surface. This applies
@@ -128,7 +142,7 @@ imported file"). `defineConsts` is StyleX's shareable inlined-value primitive, s
 it's the only way to get a scale that is both shared across components and free
 of per-step vars.
 
-**Reference tokens by bracket string key**, always: `colorVars['--cl-color-primary']`,
+**Reference tokens by bracket string key**, always: `colorVars['--cl-color-brand']`,
 `space['2']`. A computed key (`colorVars[name]`) defeats StyleX static analysis
 and won't compile.
 
@@ -157,7 +171,7 @@ objects and compose them at the call site.
   });
   // variant map: keyed by the prop value, indexed at the call site
   const variants = stylex.create({
-    primary: { backgroundColor: colorVars['--cl-color-primary'] },
+    primary: { backgroundColor: colorVars['--cl-color-brand'] },
     secondary: { backgroundColor: colorVars['--cl-color-secondary'] },
   });
   const sizes = stylex.create({
@@ -232,7 +246,7 @@ instead of 12, with each axis staying independent. **Don't.**
   inlines it at build, so the duplication leaves the source without emitting a var:
 
   ```ts
-  const primaryHover = `color-mix(in oklab, ${colorVars['--cl-color-primary']}, ${colorVars['--cl-color-primary-foreground']} 12%)`;
+  const primaryHover = `color-mix(in oklab, ${colorVars['--cl-color-brand']}, ${colorVars['--cl-color-brand-foreground']} 12%)`;
   ```
 
   Same-file is required — an imported one fails static evaluation ("Atoms" above).
@@ -255,7 +269,7 @@ Use StyleX's conditional-value objects (a `default` plus pseudo / at-rule keys).
 
 ```ts
 backgroundColor: {
-  default: colorVars['--cl-color-primary'],
+  default: colorVars['--cl-color-brand'],
   ':active': primaryActive,
   '@media (hover: hover)': {
     // the media block contributes only the pseudo; the top-level `default` still
@@ -298,8 +312,8 @@ device, while touch devices look correct.
   but it depends on StyleX's emission order for the tiebreak and duplicates the
   value in every cell.
 - Applies to any state pair where one side is inside an at-rule and the other is
-  not. Confirm the output rather than trusting it: `pnpm build:mosaic --filter @clerk/ui`,
-  then grep `dist-mosaic/styles.css` for the two selectors and compare their
+  not. Confirm the output rather than trusting it: `pnpm build --filter @clerk/mosaic`,
+  then grep `dist/styles.css` for the two selectors and compare their
   specificity.
 
 - **A button that opens something takes the pressed fill while open**, so a
@@ -312,11 +326,11 @@ device, while touch devices look correct.
   ```ts
   backgroundColor: {
     default: 'transparent',
-    ':enabled:active': neutralStep1,
-    ':enabled[data-open]': neutralStep1,
+    ':enabled:active': colorVars['--cl-color-neutral-alpha-200'],
+    ':enabled[data-open]': colorVars['--cl-color-neutral-alpha-200'],
     '@media (hover: hover)': {
       default: null,
-      ':enabled:hover:not(:active):not([data-open])': neutralStep0,
+      ':enabled:hover:not(:active):not([data-open])': colorVars['--cl-color-neutral-alpha-100'],
     },
   },
   ```
@@ -324,7 +338,7 @@ device, while touch devices look correct.
   Worked example: `button.styles.ts`, applied across every filled/outline/ghost cell
   (`link` opts out — it reads as text, not a control).
 
-Worked example: `packages/ui/src/mosaic/components/button/button.styles.ts`.
+Worked example: `packages/mosaic/src/components/button/button.styles.ts`.
 
 - **DON'T** write a focus ring by hand. Compose `focusOutline` from
   `utils/focus-outline.styles.ts` into the element's `stylex.props(...)`:
@@ -577,28 +591,70 @@ The element carries three things, and nothing else is a contract:
 plus a kebab-cased `data-<axis>` reflection of the visual props, so consumers
 target stable data-attribute selectors, not collision-prone class names.
 
-`mergeStyleProps` fuses everything in precedence order — **theme props → StyleX atoms →
-consumer `className`/`style`** — so the consumer always wins. It concatenates
-className left-to-right and merges `style` with the consumer object spread last:
+`mergeStyleProps` fuses its bags left to right — **theme props → StyleX atoms →
+the props the part was called with** — concatenating `className`, shallow-merging
+`style` with the later bag winning, and letting the later bag overwrite anything else:
 
 ```tsx
-<button
-  {...mergeStyleProps(
-    themeProps('button', { intent, variant }),
-    stylex.props(styles.base, variants[variant], xstyle),
-    className,
-    style,
-  )}
-/>
+function Button({ intent, variant, xstyle, ...rest }: ButtonProps) {
+  return (
+    <button
+      {...mergeStyleProps(
+        themeProps('button', { intent, variant }),
+        stylex.props(styles.base, variants[variant], xstyle),
+        rest,
+      )}
+    />
+  );
+}
 ```
 
-- **DO** put consumer `xstyle` **last** inside `stylex.props(...)` (so their atoms
-  win the cascade) and consumer `className`/`style` last inside `mergeStyleProps` (so
-  their raw CSS wins).
+- **DO** put the caller's `xstyle` **last** inside `stylex.props(...)` so its atoms
+  win the cascade, and pass `rest` as the **last** bag to `mergeStyleProps` so the
+  caller's other props (`id`, handlers, `aria-*`) land as usual.
 - **DON'T** forward `xstyle` down to internal slot elements — it targets the slot
-  the consumer named, not your private structure.
-- **DON'T** call `stylex.props` twice on one element or spread `{...props}` after
-  the merge result — fuse everything through the one `mergeStyleProps` call.
+  the caller named, not your private structure.
+- **DON'T** call `stylex.props` twice on one element or spread `{...rest}` after
+  the merge result — fuse everything through the one `mergeStyleProps` call. A
+  trailing `{...rest}` would clobber the part's own `className` when the part is
+  the target of another part's `render`.
+
+### `xstyle`, not `className`/`style`
+
+A Mosaic part has no `className` or `style` prop. `MosaicComponentProps` and
+`MosaicElementProps` (`props.ts`) omit the pair and add `xstyle?: XStyle`, so
+every part inherits the contract by typing its props off one of them. A lint
+rule in the `packages/ui/mosaic` eslint block names the replacement when either
+attribute shows up on a capitalized element.
+
+- **Inside `packages/ui`** a flow author who needs to nudge a part declares the
+  atoms in the view's own `stylex.create` and passes them as `xstyle`:
+
+  ```tsx
+  const styles = stylex.create({ helpText: { textAlign: 'center', marginBlockStart: space['1'] } });
+
+  <Text
+    size='xs'
+    xstyle={styles.helpText}
+  >
+    {messages.helpText}
+  </Text>;
+  ```
+
+- **Outside `packages/ui`** a theme targets the `.cl-<slot>` class, `data-<axis>`
+  attrs, and `--cl-*` vars in CSS. No prop is involved.
+- **`render` composition still delivers the pair at runtime.** `Dialog.Title
+render={<Heading />}` clones the title's merged `className`/`style` onto the
+  `Heading`, which is why a part passes its `rest` bag through `mergeStyleProps`:
+  the helper merges the incoming pair instead of letting it overwrite the part's
+  own class. The public prop types stay closed; only the merge is tolerant.
+- `xstyle` is typed as `XStyle`: whatever `stylex.props(...)` accepts, since that
+  is where the part passes it on. StyleX's narrower `StyleXStyles` only admits
+  property names it knows and rejects real atoms (the scroll area's
+  `::-webkit-scrollbar` rules), so parts do not use it.
+- `{...stylex.props(atoms)}` on a part is the same pair by another route and the
+  lint rule flags it too. Pass the atoms as `xstyle`; only native elements spread
+  `stylex.props`.
 
 ### Type every part with `MosaicComponentProps`
 
@@ -635,10 +691,10 @@ export interface PopoverPopupProps extends MosaicComponentProps<'div'> { … }
 
 ## Build & CSS delivery (two contexts, same babel)
 
-- **Published** (`build:mosaic` → `@stylexjs/rollup-plugin`): compiles the
-  `styles/index.ts` barrel into `dist-mosaic/styles.css`, exported as
-  `@clerk/ui/styles.css`. Consumers choose the cascade layer at import:
-  `@import '@clerk/ui/styles.css' layer(components)`.
+- **Published** (`pnpm build` in `@clerk/mosaic` → `@stylexjs/rollup-plugin`): compiles the
+  `styles/index.ts` barrel into `dist/styles.css`, exported as
+  `@clerk/mosaic/styles.css`. Consumers choose the cascade layer at import:
+  `@import '@clerk/mosaic/styles.css' layer(components)`.
 - **Swingset** (source-consumed): `@stylexjs/unplugin/webpack` in `next.config`
   transforms StyleX **JS only** (calls → static atoms; SWC/Emotion untouched);
   `@stylexjs/postcss-plugin` extracts the **CSS** by replacing `@stylex;` in
@@ -664,8 +720,8 @@ token colors aren't down-leveled into an invalid polyfill.
 - Avoid manual `@layer` / `@property` inside `create` (StyleX owns layering;
   `@property` compiles but emits invalid output).
 - No need for `stylex.firstThatWorks` or `stylex.attrs` — a proven full library
-  ships without either; reach for conditional-value objects and `mergeStyleProps`
-  instead.
+  ships without either; reach for conditional-value objects, `xstyle`, and
+  `mergeStyleProps` instead.
 - Dynamic functions-in-`create` are allowed but exceptional — see "Dynamic styles"
   above. Default to static atoms, variant maps, and conditional-value objects; use
   a dynamic function only for a continuous runtime value, and prefer writing a

@@ -14,12 +14,12 @@ pnpm dev --filter @clerk/swingset
 
 ```tsx
 import type { StoryMeta } from '@/lib/types';
-import { MyComponent, type MyComponentProps } from '@clerk/ui/mosaic/components/my-component';
+import { MyComponent, type MyComponentProps } from '@clerk/mosaic/components/my-component';
 
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'My Component',
-  source: 'packages/ui/src/mosaic/components/my-component/my-component.tsx', // repo-root path → "View source" link
+  source: 'packages/mosaic/src/components/my-component/my-component.tsx', // repo-root path → "View source" link
   // Variant surface, declared by hand — knobs are generated from `_variants`
   styles: {
     _variants: { variant: { primary: {}, outline: {} }, size: { sm: {}, md: {} } },
@@ -45,7 +45,7 @@ const myModule: StoryModule = { meta: myMeta, Default };
 export const registry: StoryModule[] = [..., myModule];
 ```
 
-Import stories explicitly (not `import *`) to control sidebar order.
+Import stories explicitly (not `import *`) and add the module under its group's comment in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `User Profile`, and `Reverification` render in array order.
 
 **3. Add docs** — `src/stories/my-component.mdx`
 

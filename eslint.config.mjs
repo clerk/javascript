@@ -537,9 +537,9 @@ export default tseslint.config([
     },
   },
   {
-    name: 'packages/ui/mosaic',
-    files: ['packages/ui/src/mosaic/**/*'],
-    ignores: ['packages/ui/src/mosaic/utils.ts', 'packages/ui/src/mosaic/__tests__/**'],
+    name: 'packages/mosaic',
+    files: ['packages/mosaic/src/**/*'],
+    ignores: ['packages/mosaic/src/__tests__/**'],
     plugins: {
       '@stylexjs': pluginStylex,
     },
@@ -572,6 +572,30 @@ export default tseslint.config([
           message:
             "Use motionSafe() from mosaic/utils instead of raw '@media (prefers-reduced-motion: no-preference)'.",
         },
+        // A Mosaic part takes `xstyle`, not `className`/`style`; its prop types already reject the pair,
+        // this names the replacement. Native elements (lowercase) are unaffected.
+        {
+          selector:
+            "JSXOpeningElement[name.type='JSXIdentifier'][name.name=/^[A-Z]/] > JSXAttribute[name.name=/^(className|style)$/]",
+          message: 'Mosaic parts take `xstyle` (StyleX atoms) instead of `className`/`style`.',
+        },
+        {
+          selector:
+            "JSXOpeningElement[name.type='JSXMemberExpression'] > JSXAttribute[name.name=/^(className|style)$/]",
+          message: 'Mosaic parts take `xstyle` (StyleX atoms) instead of `className`/`style`.',
+        },
+        // `{...stylex.props(x)}` is the same pair by another route; the types miss it because a
+        // spread's optional keys skip excess-property checks.
+        {
+          selector:
+            "JSXOpeningElement[name.type='JSXIdentifier'][name.name=/^[A-Z]/] > JSXSpreadAttribute > CallExpression[callee.object.name='stylex'][callee.property.name='props']",
+          message: 'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread.',
+        },
+        {
+          selector:
+            "JSXOpeningElement[name.type='JSXMemberExpression'] > JSXSpreadAttribute > CallExpression[callee.object.name='stylex'][callee.property.name='props']",
+          message: 'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread.',
+        },
       ],
     },
   },
@@ -580,8 +604,8 @@ export default tseslint.config([
     // is compile-time and cannot inline a `hover()`/`motionSafe()` helper imported into `create`,
     // so the media-query restrictions above (an Emotion-runtime convention) can't apply here. The
     // `@stylexjs/*` rules from the mosaic block still cover these files.
-    name: 'packages/ui/mosaic - stylex styles',
-    files: ['packages/ui/src/mosaic/**/*.styles.ts'],
+    name: 'packages/mosaic - stylex styles',
+    files: ['packages/mosaic/src/**/*.styles.ts'],
     rules: {
       'no-restricted-syntax': 'off',
     },

@@ -1,0 +1,53 @@
+import * as CheckboxStories from './checkbox.stories';
+
+# Checkbox
+
+Checkbox is a styled native `<input type="checkbox">`. It forwards its ref and every input prop to the input, so it works controlled (`checked` + `onChange`) or uncontrolled (`defaultChecked`) exactly like the native element. `indeterminate` sets the DOM property of the same name, which is how a "select all" control shows a partial selection.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={CheckboxStories}
+/>
+
+## Props
+
+<PropTable
+  meta={CheckboxStories.meta}
+  extra={[
+    { name: 'checked', type: 'boolean' },
+    { name: 'defaultChecked', type: 'boolean' },
+    { name: 'onChange', type: '(event) => void' },
+  ]}
+/>
+
+## Usage
+
+```tsx
+import { Checkbox } from '@clerk/mosaic/components/checkbox';
+
+<Checkbox
+  aria-label='Select row'
+  checked={selected}
+  onChange={() => toggle()}
+/>;
+```
+
+---
+
+## Examples
+
+### States
+
+<Story
+  name='States'
+  storyModule={CheckboxStories}
+/>
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={CheckboxStories}
+/>

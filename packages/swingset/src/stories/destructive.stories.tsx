@@ -1,5 +1,5 @@
-import { Destructive } from '@clerk/ui/mosaic/blocks/destructive';
-import { Button } from '@clerk/ui/mosaic/components/button';
+import { Destructive } from '@clerk/mosaic/blocks/destructive';
+import { Button } from '@clerk/mosaic/components/button';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -10,8 +10,9 @@ export { default as __source } from './destructive.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Blocks',
+  status: 'stable',
   title: 'Destructive',
-  source: 'packages/ui/src/mosaic/blocks/destructive/destructive.tsx',
+  source: 'packages/mosaic/src/blocks/destructive/destructive.tsx',
 };
 
 // A real delete is a network round trip. Without one the action never renders its pending

@@ -1,0 +1,135 @@
+import * as ComboboxStories from './combobox.primitive.stories';
+
+# Combobox
+
+A headless primitive for choosing an option from a searchable list. It ships no styles.
+Selection is remembered separately from the search text. Use Autocomplete for free text with suggestions.
+
+## Example
+
+This example renders the unstyled parts. Focus the input and press Arrow Down to open the list,
+then Enter to select. Clearing the input clears the selection; dismissing a search restores
+the selected label. Reopening shows all options until you type again.
+
+<Story name='Default' storyModule={ComboboxStories} />
+
+## Usage
+
+```tsx
+import { Combobox } from '@clerk/headless/combobox';
+
+<Combobox.Root>
+  <Combobox.Input aria-label='Fruit' />
+  <Combobox.Trigger aria-label='Toggle fruit options'>⌄</Combobox.Trigger>
+  <Combobox.Portal>
+    <Combobox.Positioner>
+      <Combobox.Popup>
+        <Combobox.Collection items={['Apple', 'Banana']} itemToStringLabel={fruit => fruit}>
+          {fruit => (
+            <Combobox.Option key={fruit} value={fruit}>
+              {fruit}
+              <Combobox.OptionIndicator>✓</Combobox.OptionIndicator>
+            </Combobox.Option>
+          )}
+        </Combobox.Collection>
+      </Combobox.Popup>
+    </Combobox.Positioner>
+  </Combobox.Portal>
+</Combobox.Root>;
+```
+
+Control selection with `value` and `onValueChange`. Search text has its own `inputValue`
+and `onInputValueChange` props.
+
+```tsx
+const [value, setValue] = useState<string | null>(null);
+
+<Combobox.Root value={value} onValueChange={setValue}>
+  {/* Compose the same parts here. */}
+</Combobox.Root>;
+```
+
+## Parts
+
+| Part                       | Default element | Description                                                    |
+| -------------------------- | --------------- | -------------------------------------------------------------- |
+| `Combobox.Root`            | none (context)  | Owns selection, search, navigation, and open state             |
+| `Combobox.Input`           | `input`         | Search input and keyboard focus target                         |
+| `Combobox.Trigger`         | `button`        | Toggles the popup and focuses the input                        |
+| `Combobox.Portal`          | none (portal)   | Portals the floating content                                   |
+| `Combobox.Positioner`      | `div`           | Positions the listbox relative to the input or supplied anchor |
+| `Combobox.Popup`           | `div`           | Wraps popup content and preserves it during exit transitions   |
+| `Combobox.Collection`      | none            | Filters items by their labels                                  |
+| `Combobox.Option`          | `div`           | Selectable option                                              |
+| `Combobox.OptionIndicator` | `span`          | Renders its children only for the selected option              |
+| `Combobox.List`            | `div`           | Inline listbox inside another floating surface                 |
+| `Combobox.Arrow`           | `svg`           | Optional arrow pointing toward the anchor                      |
+
+Parts belong inside `Combobox.Root`; `OptionIndicator` belongs inside `Option`.
+DOM parts using `useRender` accept `render` and standard HTML attributes.
+`Arrow` accepts Floating UI's `FloatingArrow` props.
+
+## Props
+
+### `Combobox.Root`
+
+| Prop                 | Type                              | Default          | Description                                                         |
+| -------------------- | --------------------------------- | ---------------- | ------------------------------------------------------------------- |
+| `value`              | `string \| null`                  | —                | Controlled selection                                                |
+| `defaultValue`       | `string \| null`                  | `null`           | Initial selection                                                   |
+| `onValueChange`      | `(value: string \| null) => void` | —                | Selection or clearing callback                                      |
+| `inputValue`         | `string`                          | —                | Controlled search text                                              |
+| `defaultInputValue`  | `string`                          | `''`             | Initial text; use the selected label with `defaultValue`            |
+| `onInputValueChange` | `(value: string) => void`         | —                | Input text callback                                                 |
+| `open`               | `boolean`                         | —                | Controlled open state                                               |
+| `defaultOpen`        | `boolean`                         | `false`          | Initial open state                                                  |
+| `onOpenChange`       | `(open: boolean) => void`         | —                | Open state callback                                                 |
+| `placement`          | `Placement`                       | `'bottom-start'` | Popup placement                                                     |
+| `sideOffset`         | `number`                          | `4`              | Gap from the anchor in pixels                                       |
+| `inline`             | `boolean`                         | `false`          | Separate search inside another surface; bind `open` to that surface |
+
+### `Combobox.Collection`
+
+| Prop                | Type                        | Default      | Description                              |
+| ------------------- | --------------------------- | ------------ | ---------------------------------------- |
+| `items`             | `readonly Item[]`           | — (required) | Available options                        |
+| `itemToStringLabel` | `(item: Item) => string`    | — (required) | Label used for case-insensitive matching |
+| `children`          | `(item: Item) => ReactNode` | — (required) | Renders each matching option             |
+| `empty`             | `ReactNode`                 | —            | Content when no items match              |
+
+### `Combobox.Option`
+
+| Prop       | Type      | Default               | Description                 |
+| ---------- | --------- | --------------------- | --------------------------- |
+| `value`    | `string`  | — (required)          | Option value                |
+| `label`    | `string`  | falls back to `value` | Text displayed on selection |
+| `disabled` | `boolean` | —                     | Prevents selection          |
+
+### `Combobox.Positioner`
+
+| Prop     | Type                  | Default       | Description                            |
+| -------- | --------------------- | ------------- | -------------------------------------- |
+| `anchor` | `HTMLElement \| null` | input element | Element used for positioning and width |
+
+### `Combobox.Portal`
+
+| Prop   | Type                                                    | Default       | Description      |
+| ------ | ------------------------------------------------------- | ------------- | ---------------- |
+| `root` | `HTMLElement \| null \| RefObject<HTMLElement \| null>` | document body | Portal container |
+
+`Trigger` defaults to `type='button'` and `tabIndex={-1}`; keyboard navigation uses the input.
+For an inline list, use `List` in place of `Portal` and `Positioner` so the outer surface owns dismissal.
+
+## Styling
+
+| Attribute                  | Parts             | Description                           |
+| -------------------------- | ----------------- | ------------------------------------- |
+| `data-open`, `data-closed` | Input, Trigger    | Popup state                           |
+| `data-selected`            | Option            | Matches the selected value            |
+| `data-active`              | Option            | Current keyboard or pointer highlight |
+| `data-disabled`            | Option            | Disabled option                       |
+| `data-side`                | Positioner, Arrow | Resolved popup side                   |
+
+The positioner matches the anchor width and exposes `--cl-anchor-width`, `--cl-anchor-height`,
+`--cl-available-width`, `--cl-available-height`, and `--cl-transform-origin` for custom styling.
+Selection and highlight are separate, so the checkmark stays on the selected option while you browse others.

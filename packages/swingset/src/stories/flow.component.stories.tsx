@@ -1,6 +1,6 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Card } from '@clerk/ui/mosaic/components/card';
-import { Flow, type FlowDirection } from '@clerk/ui/mosaic/components/flow';
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import { Flow, type FlowDirection } from '@clerk/mosaic/components/flow';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -9,8 +9,9 @@ export { default as __source } from './flow.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'wip',
   title: 'Flow',
-  source: 'packages/ui/src/mosaic/components/flow/flow.tsx',
+  source: 'packages/mosaic/src/components/flow/flow.tsx',
 };
 
 export function Default(): JSX.Element {

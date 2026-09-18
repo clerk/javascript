@@ -5,7 +5,7 @@ import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 import { fileURLToPath } from 'url';
 
-import { mosaicLightningCssTargets } from '../ui/stylex-lightningcss.config.mjs';
+import { mosaicLightningCssTargets } from '../mosaic/stylex-lightningcss.config.mjs';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -77,7 +77,9 @@ const nextConfig = {
       stylexPlugin({
         dev: isDev,
         runtimeInjection: isDev,
-        unstable_moduleResolution: { type: 'commonJS', rootDir: resolve(__dirname, '../ui') },
+        unstable_moduleResolution: { type: 'commonJS', rootDir: resolve(__dirname, '../mosaic') },
+        // Stories reach `tokens.stylex.ts` through the same alias; StyleX resolves it itself.
+        aliases: { '@clerk/mosaic/*': [resolve(__dirname, '../mosaic/src/*')] },
         useCSSLayers: true,
         lightningcssOptions: { targets: mosaicLightningCssTargets },
       }),
@@ -92,7 +94,7 @@ const nextConfig = {
       });
     }
 
-    config.resolve.alias['@clerk/ui/mosaic'] = resolve(__dirname, '../ui/src/mosaic');
+    config.resolve.alias['@clerk/mosaic'] = resolve(__dirname, '../mosaic/src');
     // Consume @clerk/headless primitives from source (no dist build needed), mirroring Mosaic.
     // `/hooks` and `/utils` live outside `primitives/`, so alias them first (more specific wins).
     config.resolve.alias['@clerk/headless/hooks'] = resolve(__dirname, '../headless/src/hooks');
