@@ -1,11 +1,11 @@
 'use client';
 
-import type { ComboboxProps } from '@clerk/headless/combobox';
-import { Combobox as HeadlessCombobox } from '@clerk/headless/combobox';
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { ComboboxProps } from '../../primitives/combobox';
+import { Combobox as HeadlessCombobox } from '../../primitives/combobox';
+import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';

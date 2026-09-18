@@ -2,7 +2,7 @@ import * as CollapsibleStories from './collapsible.stories';
 
 # Collapsible
 
-A single show/hide panel toggled by a button, from `@clerk/headless`. It is a
+A single show/hide panel toggled by a button. It is a
 **headless** primitive: it supplies behavior, state, ARIA wiring, and the
 expand/collapse animation lifecycle, but ships **no styles** — you bring your own
 CSS by targeting the `data-*` attributes each part emits.
@@ -20,7 +20,7 @@ its behavior and ARIA wiring. Click the trigger to expand and collapse.
 ## Usage
 
 ```tsx
-import { Collapsible } from '@clerk/headless/collapsible';
+import { Collapsible } from '@clerk/mosaic/primitives/collapsible';
 
 <Collapsible.Root>
   <Collapsible.Trigger>Toggle</Collapsible.Trigger>

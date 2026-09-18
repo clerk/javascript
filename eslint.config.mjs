@@ -539,7 +539,8 @@ export default tseslint.config([
   {
     name: 'packages/mosaic',
     files: ['packages/mosaic/src/**/*'],
-    ignores: ['packages/mosaic/src/__tests__/**'],
+    // Tests assert on style values they receive; they are not authoring styles.
+    ignores: ['packages/mosaic/src/__tests__/**', 'packages/mosaic/src/**/*.test.{ts,tsx}'],
     plugins: {
       '@stylexjs': pluginStylex,
     },
@@ -553,10 +554,6 @@ export default tseslint.config([
       '@stylexjs/sort-keys': 'error',
       '@stylexjs/valid-shorthands': 'error',
       '@stylexjs/valid-styles': 'error',
-      // Mosaic renders elements through `render={p => <el {...p} />}`, so children and controls sit on
-      // the outer component. Both rules only see the empty inner element and always report.
-      'jsx-a11y/heading-has-content': 'off',
-      'jsx-a11y/label-has-associated-control': 'off',
       'no-restricted-syntax': [
         'error',
         {
@@ -600,12 +597,32 @@ export default tseslint.config([
     },
   },
   {
+    name: 'packages/mosaic/jsx-a11y',
+    files: ['packages/mosaic/src/**/*'],
+    rules: {
+      // Mosaic renders elements through `render={p => <el {...p} />}`, so children and controls sit on
+      // the outer component. Both rules only see the empty inner element and always report.
+      'jsx-a11y/heading-has-content': 'off',
+      'jsx-a11y/label-has-associated-control': 'off',
+    },
+  },
+  {
     // StyleX `create()` files author conditions raw (`@media (hover: hover)`, `:hover`) — StyleX
     // is compile-time and cannot inline a `hover()`/`motionSafe()` helper imported into `create`,
     // so the media-query restrictions above (an Emotion-runtime convention) can't apply here. The
     // `@stylexjs/*` rules from the mosaic block still cover these files.
     name: 'packages/mosaic - stylex styles',
     files: ['packages/mosaic/src/**/*.styles.ts'],
+    rules: {
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
+    // Primitives are unstyled and take `className`/`style` like any other headless component; the
+    // `xstyle`-only rule targets styled Mosaic parts and otherwise false-positives on things like
+    // `<FloatingOverlay style={...}>`, a third-party component, not a Mosaic part.
+    name: 'packages/mosaic - primitives',
+    files: ['packages/mosaic/src/primitives/**/*'],
     rules: {
       'no-restricted-syntax': 'off',
     },

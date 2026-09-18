@@ -1,10 +1,10 @@
-import { useTransition } from '@clerk/headless/hooks';
-import { useRender } from '@clerk/headless/utils';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type { IconName } from '../../icons/registry';
+import { useTransition } from '../../primitives/hooks';
+import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';

@@ -1,9 +1,9 @@
-import { FileUpload } from '@clerk/headless/file-upload';
+import { FileUpload } from '@clerk/mosaic/primitives/file-upload';
 
 import type { StoryMeta } from '@/lib/types';
 
 // Headless primitives ship no styles. This single demo renders the primitive raw —
-// unstyled — so it faithfully reflects what `@clerk/headless` provides: file selection via
+// unstyled — so it faithfully reflects what the primitive provides: file selection via
 // a trigger or drag-and-drop, live image previews, and the `data-*` attributes each part
 // emits, with zero appearance. The only inline styles below constrain the preview thumbnail
 // so a full-resolution image can't blow out the demo; they are not part of the primitive.
@@ -16,7 +16,7 @@ export const meta: StoryMeta = {
   status: 'stable',
   title: 'FileUpload',
   label: 'File Upload',
-  source: 'packages/headless/src/primitives/file-upload/index.ts',
+  source: 'packages/mosaic/src/primitives/file-upload/index.ts',
 };
 
 function SelectedFiles() {

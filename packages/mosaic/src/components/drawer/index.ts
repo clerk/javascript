@@ -7,4 +7,4 @@ export type {
   DrawerTitleProps,
   DrawerTriggerProps,
 } from './drawer';
-export type { DrawerFocusTarget } from '@clerk/headless/drawer';
+export type { DrawerFocusTarget } from '../../primitives/drawer';
