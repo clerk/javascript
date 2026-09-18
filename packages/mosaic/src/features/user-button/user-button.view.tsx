@@ -28,6 +28,8 @@ import { rtl } from '../../utils/rtl.styles';
 import { truncationStyles } from '../../utils/typography.styles';
 import type { UserButtonAction, UserButtonLayout } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
+import { triggerAvatarOnlyMarker } from './user-button.markers.stylex';
+import { notchMask } from './user-button.notch';
 import { styles } from './user-button.styles';
 import type {
   UserButtonBrandingProps,
@@ -198,6 +200,7 @@ function WorkspaceAvatar({ workspace, size }: { workspace: ActiveWorkspace; size
         imageUrl={workspace.imageUrl}
         shape={workspace.shape}
         size={size}
+        xstyle={styles.workspaceAvatarLeadFocus}
       />
     );
   }
@@ -209,7 +212,16 @@ function WorkspaceAvatar({ workspace, size }: { workspace: ActiveWorkspace; size
         imageUrl={workspace.imageUrl}
         shape={workspace.shape}
         size={size}
-        xstyle={[styles.workspaceAvatarLead, size === 'xs' ? null : styles.workspaceAvatarLeadMd]}
+        xstyle={[
+          styles.workspaceAvatarLead,
+          styles.workspaceAvatarLeadFocus,
+          size === 'xs'
+            ? styles.workspaceAvatarLeadNotched(notchMask(6, 2.5, 'right'), notchMask(6, 2.5, 'left'))
+            : [
+                styles.workspaceAvatarLeadMd,
+                styles.workspaceAvatarLeadNotched(notchMask(7.5, 3.5, 'right'), notchMask(7.5, 3.5, 'left')),
+              ],
+        ]}
       />
       <RowAvatar
         name={organization.name}
@@ -1185,7 +1197,7 @@ export function UserButtonTrigger({
   const m = useMessages('userButton');
   const data = useUserButtonContext();
   const workspace = leadWorkspace(data, m);
-  const { name, shape } = workspace;
+  const { name } = workspace;
   const planLabel =
     renderTriggerBadge && workspace.kind === 'organization' ? workspace.organization.planLabel : undefined;
 
@@ -1194,10 +1206,10 @@ export function UserButtonTrigger({
       {...themeProps('user-button-trigger')}
       aria-label={fill(m.trigger.open, { name })}
       xstyle={[
-        focusOutline.visible,
         styles.trigger,
-        renderTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
-        !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
+        renderTriggerLabel
+          ? [focusOutline.visible, styles.triggerLabelled]
+          : [styles.triggerAvatarOnly, triggerAvatarOnlyMarker],
       ]}
     >
       <WorkspaceAvatar

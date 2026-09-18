@@ -899,17 +899,19 @@ describe('UserButtonTrigger', () => {
     expect(avatarSize({ mode: 'organization', renderTriggerLabel: false })).toBe('sm');
   });
 
-  it('rounds fully only around a user avatar on its own', () => {
-    const corner = (props: Partial<UserButtonProps>) => {
+  // The ring follows the lead mark, which is round or square on its own, so the button's box is
+  // the same whichever shape leads it.
+  it('shapes the trigger the same way whatever leads it', () => {
+    const shape = (props: Partial<UserButtonProps>) => {
       const { unmount } = renderTrigger(props);
       const className = screen.getByRole('button', { name: /Open account menu/ }).className;
       unmount();
       return className;
     };
 
-    expect(corner({ mode: 'organization' })).toEqual(corner({ mode: 'user' }));
-    expect(corner({ mode: 'organization', renderTriggerLabel: false })).not.toEqual(
-      corner({ mode: 'user', renderTriggerLabel: false }),
+    expect(shape({ mode: 'organization' })).toEqual(shape({ mode: 'user' }));
+    expect(shape({ mode: 'organization', renderTriggerLabel: false })).toEqual(
+      shape({ mode: 'user', renderTriggerLabel: false }),
     );
   });
 
