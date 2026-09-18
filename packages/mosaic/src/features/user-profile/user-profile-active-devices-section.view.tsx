@@ -4,12 +4,12 @@ import { useMemo, useRef, useState } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Badge } from '../../components/badge';
-import { SubmitButton } from '../../components/button';
+import { Button } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Section } from '../../components/section';
 import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import type { MosaicMessages } from '../../localization';
-import { fill, useMessages } from '../../localization';
+import { fill, plural, useLocale, useMessages } from '../../localization';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
@@ -31,6 +31,7 @@ export function UserProfileActiveDevicesSectionView({
   onSignOutAllOtherDevices,
 }: UserProfileActiveDevicesSectionViewProps) {
   const m = useMessages('userProfileActiveDevices');
+  const locale = useLocale();
   const deviceDetails = useMemo(() => Dialog.createHandle<UserProfileDevice>(), []);
   const signOutDevice = useMemo(() => Confirmation.createHandle<UserProfileDevice>(), []);
   const currentDevices = devices.filter(device => device.isCurrent);
@@ -46,9 +47,12 @@ export function UserProfileActiveDevicesSectionView({
   });
   const signOutDeviceAt = onSignOutDevice ? (device: UserProfileDevice) => removalFocus.remove(device.id) : undefined;
 
+  const [isSignOutAllOpen, setIsSignOutAllOpen] = useState(false);
   const [isSigningOutAll, setIsSigningOutAll] = useState(false);
   const [signOutAllError, setSignOutAllError] = useState<string>();
   const signingOutAll = useRef(false);
+  const signedOutAll = useRef(false);
+  const signOutAllTrigger = useRef<HTMLButtonElement>(null);
 
   const signOutAllOtherDevices = async () => {
     if (!onSignOutAllOtherDevices || signingOutAll.current) {
@@ -59,12 +63,23 @@ export function UserProfileActiveDevicesSectionView({
     setSignOutAllError(undefined);
     try {
       await onSignOutAllOtherDevices();
+      signedOutAll.current = true;
+      setIsSignOutAllOpen(false);
     } catch (error) {
       setSignOutAllError(error instanceof Error ? error.message : m.signOutAllError);
     } finally {
       signingOutAll.current = false;
       setIsSigningOutAll(false);
     }
+  };
+
+  // Confirming takes the whole card with it, trigger included — hence the dialog mounted outside
+  // it, and the current device as the place focus lands. Cancelling keeps the trigger, so focus
+  // goes back to it.
+  const focusAfterSignOutAll = () => {
+    const signedOut = signedOutAll.current;
+    signedOutAll.current = false;
+    return signedOut ? currentDeviceTrigger.current : signOutAllTrigger.current;
   };
 
   return (
@@ -107,20 +122,18 @@ export function UserProfileActiveDevicesSectionView({
                 </Section.Content>
                 {onSignOutAllOtherDevices ? (
                   <Section.Actions>
-                    <SubmitButton
-                      type='button'
+                    <Button
+                      ref={signOutAllTrigger}
                       color='neutral'
                       size='sm'
                       variant='outline'
-                      isPending={isSigningOutAll}
-                      onClick={() => void signOutAllOtherDevices()}
+                      onClick={() => setIsSignOutAllOpen(true)}
                     >
                       {m.signOutAll}
-                    </SubmitButton>
+                    </Button>
                   </Section.Actions>
                 ) : null}
               </Section.Item>
-              {signOutAllError ? <Section.Error>{signOutAllError}</Section.Error> : null}
               <Section.Items>
                 {otherDevices.map(device => (
                   <DeviceItem
@@ -135,6 +148,26 @@ export function UserProfileActiveDevicesSectionView({
             </Section.Row>
           </Section.Group>
         </Section.Root>
+      ) : null}
+      {onSignOutAllOtherDevices ? (
+        <Confirmation
+          open={isSignOutAllOpen}
+          onOpenChange={open => {
+            setIsSignOutAllOpen(open);
+            if (!open) {
+              setSignOutAllError(undefined);
+            }
+          }}
+          color='primary'
+          finalFocus={focusAfterSignOutAll}
+          title={m.signOutAllDialog.title}
+          description={plural(m.signOutAllDialog.description, otherDevices.length, locale)}
+          actionLabel={m.signOutAllDialog.confirm}
+          cancelLabel={m.signOutAllDialog.cancel}
+          onConfirm={() => void signOutAllOtherDevices()}
+          isConfirming={isSigningOutAll}
+          errorMessage={signOutAllError}
+        />
       ) : null}
       <UserProfileDeviceDetailsDialog
         handle={deviceDetails}

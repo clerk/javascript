@@ -173,29 +173,60 @@ describe('active device sign out', () => {
 });
 
 describe('signing out of all other devices', () => {
-  it('holds the button pending, then explains a failure under the row', async () => {
+  function renderAll(onSignOutAllOtherDevices: () => void | Promise<void>, devices = [current, mobile]) {
+    return render(
+      <MosaicProvider>
+        <UserProfileActiveDevicesSectionView
+          devices={devices}
+          onSignOutAllOtherDevices={onSignOutAllOtherDevices}
+        />
+      </MosaicProvider>,
+    );
+  }
+
+  const confirmation = () => screen.getByRole('alertdialog');
+
+  it('confirms first, naming how many devices it covers', async () => {
+    const user = userEvent.setup();
+    const onSignOutAllOtherDevices = vi.fn();
+    renderAll(onSignOutAllOtherDevices, [current, mobile, { id: 'desktop', name: 'Clerk App', type: 'desktop' }]);
+    await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+
+    expect(within(confirmation()).getByText(/2 other devices will be signed out/)).toBeInTheDocument();
+    expect(onSignOutAllOtherDevices).not.toHaveBeenCalled();
+
+    await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
+    expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  });
+
+  it('leaves the devices alone when the confirmation is cancelled', async () => {
+    const user = userEvent.setup();
+    const onSignOutAllOtherDevices = vi.fn();
+    renderAll(onSignOutAllOtherDevices);
+    await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+    await user.click(within(confirmation()).getByRole('button', { name: 'Cancel' }));
+
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(onSignOutAllOtherDevices).not.toHaveBeenCalled();
+    expect(screen.getByRole('button', { name: 'Sign out of all devices' })).toHaveFocus();
+  });
+
+  it('holds the confirmation open and explains a failure', async () => {
     const user = userEvent.setup();
     const onSignOutAllOtherDevices = vi
       .fn()
       .mockRejectedValueOnce(new Error('Unable to sign out of all devices'))
       .mockResolvedValue(undefined);
-    render(
-      <MosaicProvider>
-        <UserProfileActiveDevicesSectionView
-          devices={[current, mobile]}
-          onSignOutAllOtherDevices={onSignOutAllOtherDevices}
-        />
-      </MosaicProvider>,
-    );
-
-    const signOutAll = screen.getByRole('button', { name: 'Sign out of all devices' });
-    await user.click(signOutAll);
+    renderAll(onSignOutAllOtherDevices);
+    await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+    await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
 
     expect(await screen.findByText('Unable to sign out of all devices')).toBeInTheDocument();
-    expect(signOutAll).not.toHaveAttribute('aria-busy');
+    expect(confirmation()).toBeInTheDocument();
 
-    await user.click(signOutAll);
-    await waitFor(() => expect(screen.queryByText('Unable to sign out of all devices')).not.toBeInTheDocument());
+    await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(onSignOutAllOtherDevices).toHaveBeenCalledTimes(2);
   });
 
@@ -203,19 +234,12 @@ describe('signing out of all other devices', () => {
     const user = userEvent.setup();
     const signOutAll = createDeferredPromise();
     const onSignOutAllOtherDevices = vi.fn(() => signOutAll.promise);
-    render(
-      <MosaicProvider>
-        <UserProfileActiveDevicesSectionView
-          devices={[current, mobile]}
-          onSignOutAllOtherDevices={onSignOutAllOtherDevices}
-        />
-      </MosaicProvider>,
-    );
-
-    const button = screen.getByRole('button', { name: 'Sign out of all devices' });
-    await user.click(button);
-    await waitFor(() => expect(button).toHaveAttribute('aria-busy'));
-    await user.click(button);
+    renderAll(onSignOutAllOtherDevices);
+    await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+    const confirm = within(confirmation()).getByRole('button', { name: 'Sign out' });
+    await user.click(confirm);
+    await waitFor(() => expect(confirm).toHaveAttribute('aria-busy'));
+    await user.click(confirm);
 
     expect(onSignOutAllOtherDevices).toHaveBeenCalledTimes(1);
 
@@ -223,7 +247,30 @@ describe('signing out of all other devices', () => {
       signOutAll.resolve();
       await signOutAll.promise;
     });
-    await waitFor(() => expect(button).not.toHaveAttribute('aria-busy'));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  });
+
+  it('hands focus to the current device once the others are gone', async () => {
+    const user = userEvent.setup();
+    function Example() {
+      const [devices, setDevices] = useState([current, mobile]);
+      return (
+        <MosaicProvider>
+          <UserProfileActiveDevicesSectionView
+            devices={devices}
+            onSignOutAllOtherDevices={() => setDevices(list => list.filter(device => device.isCurrent))}
+          />
+        </MosaicProvider>
+      );
+    }
+    render(<Example />);
+    await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+    await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
+
+    await waitFor(() =>
+      expect(screen.queryByRole('button', { name: 'Sign out of all devices' })).not.toBeInTheDocument(),
+    );
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on macOS' })).toHaveFocus());
   });
 });
 

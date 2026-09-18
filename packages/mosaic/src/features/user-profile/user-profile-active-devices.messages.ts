@@ -6,6 +6,15 @@ export const userProfileActiveDevicesMessages = {
   otherDevices: '{count} other devices',
   signOutAll: 'Sign out of all devices',
   signOutAllError: 'Something went wrong signing these devices out. Please try again.',
+  signOutAllDialog: {
+    title: 'Sign out of all devices',
+    description: {
+      one: '{count} other device will be signed out. Signing back in on it will need your credentials again.',
+      other: '{count} other devices will be signed out. Signing back in on them will need your credentials again.',
+    },
+    confirm: 'Sign out',
+    cancel: 'Cancel',
+  },
   manageLabel: 'Manage {name}',
   thisDevice: 'This device',
   userDevice: "User's device",
