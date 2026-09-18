@@ -17,6 +17,7 @@ export const useSecurityRouteAccess = (): SecurityRouteAccess => {
 
   const { data: enterpriseConnections, isLoading } = __internal_useOrganizationEnterpriseConnections({
     enabled: needsConnections,
+    keepPreviousData: false,
   });
 
   return {
