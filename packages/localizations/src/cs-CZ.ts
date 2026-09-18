@@ -1698,7 +1698,7 @@ export const csCZ: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Před resetováním hesla musíme ověřit vaši identitu.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

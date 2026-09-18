@@ -1697,7 +1697,7 @@ export const esCR: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Es necesario verificar su identidad para restablecer su contraseña.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

@@ -1690,7 +1690,7 @@ export const enGB: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'We need to verify your identity before resetting your password.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

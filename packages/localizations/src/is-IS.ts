@@ -1702,7 +1702,7 @@ export const isIS: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Við þurfum að staðfesta auðkenni þitt áður en við endurstillum lykilorðið þitt.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

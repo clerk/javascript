@@ -1703,7 +1703,7 @@ export const nbNO: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Vi må bekrefte identiteten din før vi tilbakestiller passordet ditt.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

@@ -1700,7 +1700,7 @@ export const faIR: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'قبل از تنظیم مجدد رمز عبور، باید هویت شما را تأیید کنیم.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

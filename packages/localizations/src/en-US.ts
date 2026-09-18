@@ -1729,7 +1729,7 @@ export const enUS: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'We need to verify your identity before resetting your password.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: "Can't use SSO?",
       code: {
         resendButton: "Didn't receive a code? Resend",

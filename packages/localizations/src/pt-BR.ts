@@ -1701,7 +1701,7 @@ export const ptBR: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Precisamos verificar sua identidade antes de redefinir sua senha.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

@@ -1690,7 +1690,7 @@ export const thTH: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'เราต้องยืนยันตัวตนของคุณก่อนรีเซ็ตรหัสผ่าน',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

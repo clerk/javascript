@@ -1681,7 +1681,7 @@ export const heIL: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'אנחנו צריכים לאמת את זהותך לפני שנאפס את הסיסמה שלך.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

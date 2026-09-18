@@ -1689,7 +1689,7 @@ export const srRS: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Potrebno je da potvrdimo tvoj identitet pre resetovanja lozinke.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

@@ -1677,7 +1677,7 @@ export const zhCN: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: '我们需要验证您的身份才能重置您的密码。',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

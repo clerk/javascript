@@ -1688,7 +1688,7 @@ export const daDK: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Vi skal bekræfte din identitet, før du nulstiller din adgangskode.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

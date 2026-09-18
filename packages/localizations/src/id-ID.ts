@@ -1694,7 +1694,7 @@ export const idID: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Kami perlu memverifikasi identitas Anda sebelum mereset kata sandi.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

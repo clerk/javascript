@@ -1699,7 +1699,7 @@ export const viVN: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Chúng tôi cần xác minh danh tính của bạn trước khi đặt lại mật khẩu.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

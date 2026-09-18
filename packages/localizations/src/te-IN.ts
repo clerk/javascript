@@ -1703,7 +1703,7 @@ export const teIN: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'మీ పాస్‌వర్డ్‌ను రీసెట్ చేయడానికి ముందు మీ గుర్తింపును మేము ధృవీకరించాలి.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

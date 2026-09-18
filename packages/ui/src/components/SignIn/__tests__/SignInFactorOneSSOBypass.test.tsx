@@ -8,11 +8,11 @@ import { SignInFactorOne } from '../SignInFactorOne';
 
 const { createFixtures } = bindCreateFixtures('SignIn');
 
-describe('SignInFactorOne SSO fallback', () => {
-  it('offers the fallback next to the SSO action for a single connection', async () => {
+describe('SignInFactorOne SSO bypass', () => {
+  it('offers the bypass next to the SSO action for a single connection', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
-      f.startSignInWithEnterpriseSSO({ supportSSOFallback: true });
+      f.startSignInWithEnterpriseSSO({ supportSSOBypass: true });
     });
 
     render(<SignInFactorOne />, { wrapper });
@@ -21,7 +21,7 @@ describe('SignInFactorOne SSO fallback', () => {
     screen.getByText("Can't use SSO?");
   });
 
-  it('does not render the fallback when the user is not allowlisted for one', async () => {
+  it('does not render the bypass when the user is not allowlisted for one', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
       f.startSignInWithEnterpriseSSO();
@@ -32,11 +32,11 @@ describe('SignInFactorOne SSO fallback', () => {
     expect(screen.queryByText("Can't use SSO?")).not.toBeInTheDocument();
   });
 
-  it('offers a single fallback action alongside multiple connections', async () => {
+  it('offers a single bypass action alongside multiple connections', async () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
       f.startSignInWithEnterpriseSSO({
-        supportSSOFallback: true,
+        supportSSOBypass: true,
         enterpriseConnections: [
           { id: 'conn_okta', name: 'Okta' },
           { id: 'conn_msft', name: 'Microsoft' },
@@ -54,7 +54,7 @@ describe('SignInFactorOne SSO fallback', () => {
   it('redirects to the identity provider when the SSO action is used', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress();
-      f.startSignInWithEnterpriseSSO({ supportSSOFallback: true });
+      f.startSignInWithEnterpriseSSO({ supportSSOBypass: true });
     });
 
     const { userEvent } = render(<SignInFactorOne />, { wrapper });
@@ -69,7 +69,7 @@ describe('SignInFactorOne SSO fallback', () => {
   it('prepares the email code with the handle and warns on the code screen', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress();
-      f.startSignInWithEnterpriseSSO({ supportSSOFallback: true });
+      f.startSignInWithEnterpriseSSO({ supportSSOBypass: true });
     });
     fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
 
@@ -87,7 +87,7 @@ describe('SignInFactorOne SSO fallback', () => {
   it('returns to the SSO screen from the code screen', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress();
-      f.startSignInWithEnterpriseSSO({ supportSSOFallback: true });
+      f.startSignInWithEnterpriseSSO({ supportSSOBypass: true });
     });
     fixtures.signIn.prepareFirstFactor.mockReturnValueOnce(Promise.resolve({} as SignInResource));
 

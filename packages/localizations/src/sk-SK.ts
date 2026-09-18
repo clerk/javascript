@@ -1692,7 +1692,7 @@ export const skSK: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Pred obnovením hesla je potrebné overiť vašu totožnosť.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

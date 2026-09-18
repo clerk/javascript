@@ -1690,7 +1690,7 @@ export const bgBG: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Трябва да потвърдим вашата самоличност, преди да нулираме паролата ви.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

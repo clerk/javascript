@@ -1680,7 +1680,7 @@ export const zhTW: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: '我們需要驗證您的身份才能重設您的密碼。',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

@@ -1700,7 +1700,7 @@ export const jaJP: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'パスワードをリセットする前に、身元を確認する必要があります。',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

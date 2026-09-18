@@ -115,12 +115,12 @@ function hasMultipleEnterpriseConnections(
  * Returns the email code factor a sign-in may fall back to, or `null`.
  * @experimental
  */
-function getSSOFallbackFactor(signIn: SignInResource): EmailCodeFactor | null {
+function getSSOBypassFactor(signIn: SignInResource): EmailCodeFactor | null {
   if (!signIn.supportedFirstFactors?.some(factor => factor.strategy === 'enterprise_sso')) {
     return null;
   }
 
-  return (signIn.ssoFallbackFirstFactors?.find(factor => factor.strategy === 'email_code') as EmailCodeFactor) ?? null;
+  return (signIn.ssoBypassFirstFactors?.find(factor => factor.strategy === 'email_code') as EmailCodeFactor) ?? null;
 }
 
-export { getSSOFallbackFactor, hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey };
+export { getSSOBypassFactor, hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey };

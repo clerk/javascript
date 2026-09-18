@@ -1703,7 +1703,7 @@ export const huHU: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Vissza kell igazolnod az identitásod, mielőtt visszaállítod a jelszavad',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

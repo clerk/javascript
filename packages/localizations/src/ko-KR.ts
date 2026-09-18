@@ -1685,7 +1685,7 @@ export const koKR: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: '비밀번호를 재설정하기 전에 신원을 확인해야 해요.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

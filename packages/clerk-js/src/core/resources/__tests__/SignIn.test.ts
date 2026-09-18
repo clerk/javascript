@@ -3292,7 +3292,7 @@ describe('SignIn', () => {
     });
   });
 
-  describe('ssoFallbackFirstFactors', () => {
+  describe('ssoBypassFirstFactors', () => {
     const baseJSON = {
       id: 'signin_123',
       object: 'sign_in',
@@ -3310,29 +3310,29 @@ describe('SignIn', () => {
     it('defaults to null when the field is absent', () => {
       const signIn = new SignIn(baseJSON);
 
-      expect(signIn.ssoFallbackFirstFactors).toBeNull();
-      expect(signIn.__internal_future.ssoFallbackFirstFactors).toEqual([]);
-      expect(signIn.__internal_toSnapshot().sso_fallback_first_factors).toBeUndefined();
+      expect(signIn.ssoBypassFirstFactors).toBeNull();
+      expect(signIn.__internal_future.ssoBypassFirstFactors).toEqual([]);
+      expect(signIn.__internal_toSnapshot().sso_bypass_first_factors).toBeUndefined();
     });
 
     it('round-trips the field through the snapshot', () => {
       const signIn = new SignIn({
         ...baseJSON,
-        sso_fallback_first_factors: [
+        sso_bypass_first_factors: [
           { strategy: 'email_code', safe_identifier: 'user@corp.com', email_address_id: 'idn_hmac' },
         ],
       });
 
-      expect(signIn.ssoFallbackFirstFactors).toEqual([
+      expect(signIn.ssoBypassFirstFactors).toEqual([
         { strategy: 'email_code', safeIdentifier: 'user@corp.com', emailAddressId: 'idn_hmac' },
       ]);
-      expect(signIn.__internal_future.ssoFallbackFirstFactors).toEqual(signIn.ssoFallbackFirstFactors);
+      expect(signIn.__internal_future.ssoBypassFirstFactors).toEqual(signIn.ssoBypassFirstFactors);
 
       const snapshot = signIn.__internal_toSnapshot();
-      expect(snapshot.sso_fallback_first_factors).toEqual([
+      expect(snapshot.sso_bypass_first_factors).toEqual([
         { strategy: 'email_code', safe_identifier: 'user@corp.com', email_address_id: 'idn_hmac' },
       ]);
-      expect(new SignIn(snapshot).ssoFallbackFirstFactors).toEqual(signIn.ssoFallbackFirstFactors);
+      expect(new SignIn(snapshot).ssoBypassFirstFactors).toEqual(signIn.ssoBypassFirstFactors);
     });
   });
 });
