@@ -1699,7 +1699,7 @@ export const esES: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Necesitamos verificar tu identidad antes de restablecer tu contraseña.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

@@ -1701,7 +1701,7 @@ export const hrHR: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Moramo potvrditi vaš identitet prije resetiranja lozinke.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

@@ -1700,7 +1700,7 @@ export const bnIN: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'আপনার পাসওয়ার্ড রিসেট করার আগে আমাদের আপনার পরিচয় যাচাই করতে হবে।',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

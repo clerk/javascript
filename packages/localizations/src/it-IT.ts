@@ -1698,7 +1698,7 @@ export const itIT: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Dobbiamo verificare la tua identità prima di resettare la tua password.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

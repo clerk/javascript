@@ -1700,7 +1700,7 @@ export const hiIN: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'आपका पासवर्ड रीसेट करने से पहले हमें आपकी पहचान सत्यापित करनी होगी।',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

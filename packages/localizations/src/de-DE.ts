@@ -1707,7 +1707,7 @@ export const deDE: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Bevor wir Ihr Passwort zurücksetzen können, müssen wir Ihre Identität überprüfen.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

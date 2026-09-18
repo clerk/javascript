@@ -1682,7 +1682,7 @@ export const kkKZ: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Құпия сөзді өзгерту үшін тұлғаңызды растау қажет.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

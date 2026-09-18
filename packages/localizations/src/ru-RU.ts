@@ -1699,7 +1699,7 @@ export const ruRU: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Необходимо верифицировать вашу личность перед восстановлением пароля',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

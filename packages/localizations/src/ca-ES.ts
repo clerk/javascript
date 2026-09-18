@@ -1699,7 +1699,7 @@ export const caES: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Necessitem verificar la teva identitat abans de restablir la teva contrasenya.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

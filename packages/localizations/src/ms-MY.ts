@@ -1704,7 +1704,7 @@ export const msMY: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Kami perlu mengesahkan identiti anda sebelum menetapkan semula kata laluan anda.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

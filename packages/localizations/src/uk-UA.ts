@@ -1688,7 +1688,7 @@ export const ukUA: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Необхідно верифікувати вашу особу перед відновленням пароля',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

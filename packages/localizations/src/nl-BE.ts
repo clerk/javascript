@@ -1691,7 +1691,7 @@ export const nlBE: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Voor veiligheidsredenen is het vereist om je wachtwoord te resetten.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

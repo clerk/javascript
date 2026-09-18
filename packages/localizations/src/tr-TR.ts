@@ -1691,7 +1691,7 @@ export const trTR: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Şifrenizi sıfırlamadan önce kimliğinizi doğrulamamız gerekiyor.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

@@ -1687,7 +1687,7 @@ export const arSA: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'نريد التحقق من هويتك قبل أعادة تعيين كلمة المرور',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

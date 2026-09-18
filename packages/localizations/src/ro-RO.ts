@@ -1703,7 +1703,7 @@ export const roRO: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Trebuie să îți verificăm identitatea înainte de a reseta parola.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

@@ -1692,7 +1692,7 @@ export const plPL: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Przed zresetowaniem hasła musimy zweryfikować tożsamość użytkownika.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

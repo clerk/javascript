@@ -1692,7 +1692,7 @@ export const svSE: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Vi behöver verifiera din identitet innan vi återställer ditt lösenord.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

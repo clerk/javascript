@@ -1692,7 +1692,7 @@ export const mnMN: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Нууц үгээ шинэчлэхээс өмнө бид таны хувийн мэдээллийг баталгаажуулах шаардлагатай.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

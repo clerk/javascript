@@ -1694,7 +1694,7 @@ export const beBY: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Неабходна верыфікаваць вашу асобу перад аднаўленнем пароля',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
