@@ -570,6 +570,21 @@ describe('Toast', () => {
       });
       return waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
+
+    it('shows toasts added before the provider mounted', () => {
+      const manager = Toast.createToastManager();
+      manager.add({ title: 'Early' });
+
+      render(
+        <Toast.Provider toastManager={manager}>
+          <Toast.Viewport>
+            <ToastList />
+          </Toast.Viewport>
+        </Toast.Provider>,
+      );
+
+      expect(screen.getByRole('heading', { name: 'Early' })).toBeInTheDocument();
+    });
   });
 
   describe('announcing', () => {

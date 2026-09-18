@@ -49,20 +49,18 @@ export interface ToastManager {
   promise: <Value>(promise: Promise<Value>, options: ToastPromiseOptions<Value>) => Promise<Value>;
 }
 
-export type ToastManagerEvent =
-  | { action: 'add'; options: ToastAddOptions & { id: string } }
-  | { action: 'close'; id: string | undefined }
-  | { action: 'update'; id: string; options: ToastUpdater };
-
 export interface ExternalToastManager extends ToastManager {
-  subscribe: (listener: (event: ToastManagerEvent) => void) => () => void;
+  /** Drops the toast from the store. Called by `Toast.Root` once its exit animations finish. */
+  remove: (id: string) => void;
+  setHeight: (id: string, height: number) => void;
+  subscribe: (listener: () => void) => () => void;
+  getSnapshot: () => ToastObject[];
 }
 
 let toastCounter = 0;
 
-export function generateToastId() {
-  toastCounter += 1;
-  return `toast-${toastCounter}`;
+export function isActive(toast: ToastObject) {
+  return toast.transitionStatus !== 'ending';
 }
 
 function resolvePromiseResult<Value>(result: ToastPromiseResult<Value>, value: Value): ToastUpdateOptions {
@@ -71,57 +69,73 @@ function resolvePromiseResult<Value>(result: ToastPromiseResult<Value>, value: V
 }
 
 /**
- * The `promise` flow expressed over `add` and `update`, so the provider and the
- * external manager behave identically.
- */
-export function runToastPromise<Value>(
-  api: Pick<ToastManager, 'add' | 'update'>,
-  promise: Promise<Value>,
-  options: ToastPromiseOptions<Value>,
-): Promise<Value> {
-  const loading = resolvePromiseResult(options.loading, undefined);
-  const id = api.add({ timeout: 0, type: 'loading', ...loading });
-
-  return promise.then(
-    value => {
-      api.update(id, { timeout: undefined, type: 'success', ...resolvePromiseResult(options.success, value) });
-      return value;
-    },
-    (error: unknown) => {
-      api.update(id, { timeout: undefined, type: 'error', ...resolvePromiseResult(options.error, error) });
-      throw error;
-    },
-  );
-}
-
-/**
- * Creates a manager usable outside React. Pass it to `<Toast.Provider toastManager>`;
- * calls made before the provider mounts are dropped.
+ * Creates the store that holds the toasts. `Toast.Provider` creates one on its own;
+ * create one yourself and pass it as `toastManager` to add toasts outside React.
  */
 export function createToastManager(): ExternalToastManager {
-  const listeners = new Set<(event: ToastManagerEvent) => void>();
+  let toasts: ToastObject[] = [];
+  const listeners = new Set<() => void>();
 
-  const emit = (event: ToastManagerEvent) => {
+  const set = (next: ToastObject[]) => {
+    toasts = next;
     for (const listener of listeners) {
-      listener(event);
+      listener();
     }
   };
 
   const manager: ExternalToastManager = {
     add: options => {
-      const id = options.id ?? generateToastId();
-      emit({ action: 'add', options: { ...options, id } });
+      toastCounter += 1;
+      const id = options.id ?? `toast-${toastCounter}`;
+      set([{ ...options, id, transitionStatus: 'starting' }, ...toasts.filter(t => t.id !== id)]);
       return id;
     },
-    close: id => emit({ action: 'close', id }),
-    update: (id, options) => emit({ action: 'update', id, options }),
-    promise: (promise, options) => runToastPromise(manager, promise, options),
+    close: id => {
+      const closing = toasts.filter(t => isActive(t) && (id === undefined || t.id === id));
+      if (closing.length === 0) {
+        return;
+      }
+      set(toasts.map(t => (closing.includes(t) ? { ...t, transitionStatus: 'ending' } : t)));
+      for (const toast of closing) {
+        toast.onClose?.();
+      }
+    },
+    remove: id => {
+      const toast = toasts.find(t => t.id === id);
+      if (!toast) {
+        return;
+      }
+      set(toasts.filter(t => t !== toast));
+      toast.onRemove?.();
+    },
+    update: (id, options) => {
+      set(toasts.map(t => (t.id === id ? { ...t, ...(typeof options === 'function' ? options(t) : options), id } : t)));
+    },
+    promise: (promise, options) => {
+      const id = manager.add({ timeout: 0, type: 'loading', ...resolvePromiseResult(options.loading, undefined) });
+      return promise.then(
+        value => {
+          manager.update(id, { timeout: undefined, type: 'success', ...resolvePromiseResult(options.success, value) });
+          return value;
+        },
+        (error: unknown) => {
+          manager.update(id, { timeout: undefined, type: 'error', ...resolvePromiseResult(options.error, error) });
+          throw error;
+        },
+      );
+    },
+    setHeight: (id, height) => {
+      if (toasts.some(t => t.id === id && t.height !== height)) {
+        set(toasts.map(t => (t.id === id ? { ...t, height } : t)));
+      }
+    },
     subscribe: listener => {
       listeners.add(listener);
       return () => {
         listeners.delete(listener);
       };
     },
+    getSnapshot: () => toasts,
   };
 
   return manager;
