@@ -579,25 +579,6 @@ export const popupMotion = stylex.create({
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,
     },
-    /**
-     * Structurally identical to `card` below, and that is load-bearing rather than tidiness.
-     *
-     * This was once written as a single media-scoped rule with no unconditioned `default`, on the
-     * theory that leaving `transform` unset at rest removed any cascade contest. It emitted
-     * correctly — the rule is there, at HIGHER specificity than `card`'s — and yet no scale ever
-     * ran, while `card`'s did. The only difference between the two was the resting declaration, so
-     * the resting value is what a transition needs: an endpoint of `none` is not one the scale
-     * interpolates from here, whereas `scale(1)` is.
-     *
-     * Do NOT re-collapse this into the no-`default` shape. `translate` below keeps that shape and
-     * genuinely works, which makes the asymmetry easy to talk yourself back into.
-     *
-     * The phone band then pins the scale flat, because a sheet slides rather than scales — stacking
-     * a shrink on top of a full-height travel makes the surface arrive slightly small and settle,
-     * which reads as a correction rather than as one movement. Both media branches resolve to
-     * `scale(1)`, so their order relative to each other cannot matter and `@stylexjs/sort-keys` is
-     * free to reorder them.
-     */
     transform: {
       [PHONE]: {
         default: 'scale(1)',
@@ -683,28 +664,9 @@ export const popupMotion = stylex.create({
       // slide, and the only one that departs from `--cl-ease-exit`. Set on the PLAIN
       // `[data-ending-style]` branch rather than behind a media query on purpose: `translate` is
       // unset above the phone band, so the slot is inert there, and a media-scoped branch would
-      // have to out-rank a plain sibling on the same property — the fight documented on
-      // `translate` below.
+      // have to out-rank a plain sibling on the same property.
       ':where([data-ending-style])': `${easingVars['--cl-ease-exit']}, ${easingVars['--cl-ease-exit']}, ${SHEET_EXIT_EASE}`,
     },
-    /**
-     * The sheet's slide rides the independent `translate` property, NOT `transform` — and it
-     * declares exactly one rule, with no unconditioned `default`.
-     *
-     * Both halves of that are load-bearing. A `:where()` state branch nested inside an `@media`
-     * branch loses to the same property's unconditioned `default`, even at (0,3,0) against
-     * (0,1,0): verified in the browser, where `default + desktop-enter` correctly yields
-     * `scale(0.98)` while `default + mobile-enter` yields `scale(1)`. It is not specificity and
-     * not source order — both rules sit in `priority4` and the mobile one is emitted last. So a
-     * media-scoped state branch must never have to out-rank a plain sibling on the same property.
-     *
-     * Giving the slide its own property removes the contest entirely, and omitting the `default`
-     * leaves nothing for it to lose to: at rest `translate` is simply unset. The
-     * `no-preference` guard then makes reduced motion a no-op for free — no branch matches, so
-     * the sheet holds flat and only the scrim fades. It nests inside the band rather than being
-     * written as one combined query, because a container query and a media query cannot share
-     * an `and`.
-     */
     translate: {
       [PHONE]: {
         default: null,

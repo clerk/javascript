@@ -296,8 +296,6 @@ describe('Mosaic Card', () => {
     expect(screen.getByRole('dialog')).toHaveAccessibleName('Review terms');
   });
 
-  // The id is load-bearing inside a dialog: the popup points `aria-labelledby` at it, so a caller
-  // id that displaced it would silently leave the dialog unnamed.
   it('keeps the dialog id over an explicit one, and stays named', () => {
     render(
       <Dialog.Root defaultOpen>

@@ -273,7 +273,7 @@ backgroundColor: {
   ':active': primaryActive,
   '@media (hover: hover)': {
     // the media block contributes only the pseudo; the top-level `default` still
-    // paints the rest state. `:not(:active)` is load-bearing — see below.
+    // paints the rest state. `:not(:active)` is required — see below.
     default: null,
     ':hover:not(:active)': primaryHover,
   },
