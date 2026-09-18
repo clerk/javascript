@@ -13,8 +13,6 @@ import { EnterPhoneStep, VerifyPhoneStep } from './user-profile-phone.steps';
 
 export interface UserProfileAddSmsViewProps {
   onCancel: () => void;
-  selectRef?: Ref<HTMLButtonElement>;
-  phoneRef?: Ref<HTMLInputElement>;
   step: 'select' | 'phone' | 'verify';
   direction?: FlowDirection;
   phoneNumbers: readonly { id: string; phoneNumber: string }[];
@@ -36,8 +34,8 @@ export interface UserProfileAddSmsViewProps {
 
 export function UserProfileAddSmsView(props: UserProfileAddSmsViewProps) {
   const m = useMessages('userProfileAddSms');
-  const selectRef = useMergeRefs([props.selectRef, useFlowAutoFocus<HTMLButtonElement>()]);
-  const phoneRef = useMergeRefs([props.phoneRef, useFlowAutoFocus<HTMLInputElement>()]);
+  const selectRef = useFlowAutoFocus<HTMLButtonElement>();
+  const phoneRef = useFlowAutoFocus<HTMLInputElement>();
   return (
     <Flow.Root
       value={props.step}

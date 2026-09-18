@@ -3,21 +3,20 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../../MosaicProvider';
-import type { UserProfileAddAuthenticatorDialogProps } from '../user-profile-add-authenticator.dialog';
-import { UserProfileAddAuthenticatorDialog } from '../user-profile-add-authenticator.dialog';
+import type { UserProfileMfaSetupViewProps } from '../user-profile-mfa-setup.view';
+import { MfaSetupDialog } from './mfa-test-utils';
+
+type ViewProps = UserProfileMfaSetupViewProps['authenticator'];
 
 const setup = {
   secret: 'JBSWY3DPEHPK3PXP',
   uri: 'otpauth://totp/Swingset:demo@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Swingset',
 };
 
-function renderView(overrides: Partial<UserProfileAddAuthenticatorDialogProps> = {}) {
-  const props: UserProfileAddAuthenticatorDialogProps = {
+function renderView(overrides: Partial<ViewProps> = {}) {
+  const props: ViewProps = {
     setup,
     onRetry: vi.fn(),
-    open: true,
-    onOpenChange: vi.fn(),
     code: '',
     onCodeChange: vi.fn(),
     onSubmit: vi.fn(),
@@ -26,31 +25,25 @@ function renderView(overrides: Partial<UserProfileAddAuthenticatorDialogProps> =
   return {
     props,
     ...render(
-      <MosaicProvider>
-        <UserProfileAddAuthenticatorDialog {...props} />
-      </MosaicProvider>,
+      <MfaSetupDialog
+        step='authenticator'
+        authenticator={props}
+      />,
     ),
   };
 }
 
-function VerificationExample({ onSubmit }: Pick<UserProfileAddAuthenticatorDialogProps, 'onSubmit'>) {
+function VerificationExample({ onSubmit }: Pick<ViewProps, 'onSubmit'>) {
   const [code, setCode] = useState('');
   return (
-    <MosaicProvider>
-      <UserProfileAddAuthenticatorDialog
-        setup={setup}
-        onRetry={() => undefined}
-        open
-        onOpenChange={() => undefined}
-        code={code}
-        onCodeChange={setCode}
-        onSubmit={onSubmit}
-      />
-    </MosaicProvider>
+    <MfaSetupDialog
+      step='authenticator'
+      authenticator={{ setup, onRetry: () => undefined, code, onCodeChange: setCode, onSubmit }}
+    />
   );
 }
 
-describe('UserProfileAddAuthenticatorDialog', () => {
+describe('UserProfileAddAuthenticatorView', () => {
   it('shows preparation, offers retry on failure, and waits for setup data before verification', async () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView({ setup: undefined });
@@ -62,12 +55,10 @@ describe('UserProfileAddAuthenticatorDialog', () => {
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
 
     rerender(
-      <MosaicProvider>
-        <UserProfileAddAuthenticatorDialog
-          {...props}
-          setupErrorMessage='Unable to prepare your authenticator.'
-        />
-      </MosaicProvider>,
+      <MfaSetupDialog
+        step='authenticator'
+        authenticator={{ ...props, setupErrorMessage: 'Unable to prepare your authenticator.' }}
+      />,
     );
     expect(screen.getByRole('alert')).toHaveTextContent('Unable to prepare your authenticator.');
     expect(screen.queryByRole('status', { name: 'Preparing authenticator…' })).not.toBeInTheDocument();
@@ -76,21 +67,20 @@ describe('UserProfileAddAuthenticatorDialog', () => {
     expect(props.onSubmit).not.toHaveBeenCalled();
 
     rerender(
-      <MosaicProvider>
-        <UserProfileAddAuthenticatorDialog {...props} />
-      </MosaicProvider>,
+      <MfaSetupDialog
+        step='authenticator'
+        authenticator={props}
+      />,
     );
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(screen.getByRole('status', { name: 'Preparing authenticator…' })).toBeVisible();
     expect(screen.getByRole('button', { name: /Preparing authenticator/ })).toHaveFocus();
 
     rerender(
-      <MosaicProvider>
-        <UserProfileAddAuthenticatorDialog
-          {...props}
-          setup={setup}
-        />
-      </MosaicProvider>,
+      <MfaSetupDialog
+        step='authenticator'
+        authenticator={{ ...props, setup }}
+      />,
     );
     expect(screen.getByRole('dialog')).toBe(dialog);
     expect(screen.queryByRole('status', { name: 'Preparing authenticator…' })).not.toBeInTheDocument();
@@ -100,13 +90,10 @@ describe('UserProfileAddAuthenticatorDialog', () => {
     await user.keyboard('{Enter}');
     expect(props.onSubmit).not.toHaveBeenCalled();
     rerender(
-      <MosaicProvider>
-        <UserProfileAddAuthenticatorDialog
-          {...props}
-          setup={setup}
-          code='123456'
-        />
-      </MosaicProvider>,
+      <MfaSetupDialog
+        step='authenticator'
+        authenticator={{ ...props, setup, code: '123456' }}
+      />,
     );
     expect(props.onSubmit).toHaveBeenCalledExactlyOnceWith('123456');
   });
@@ -121,13 +108,10 @@ describe('UserProfileAddAuthenticatorDialog', () => {
     expect(props.onSubmit).not.toHaveBeenCalled();
 
     rerender(
-      <MosaicProvider>
-        <UserProfileAddAuthenticatorDialog
-          {...props}
-          code='123456'
-          isPending
-        />
-      </MosaicProvider>,
+      <MfaSetupDialog
+        step='authenticator'
+        authenticator={{ ...props, code: '123456', isPending: true }}
+      />,
     );
     expect(verify).toHaveAttribute('aria-busy', 'true');
     expect(screen.getByRole('progressbar', { name: 'Verifying code' })).toBeInTheDocument();

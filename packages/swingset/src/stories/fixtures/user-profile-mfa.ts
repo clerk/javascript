@@ -1,11 +1,9 @@
-import type { UserProfileAddAuthenticatorDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-add-authenticator.dialog';
-import type { UserProfileAddSmsDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-add-sms.dialog';
-import type { UserProfileBackupCodesDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-backup-codes.dialog';
 import type {
   UserProfileMfaAddableMethod,
   UserProfileMfaMethod,
   UserProfileMfaSectionViewProps,
 } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
+import type { UserProfileMfaSetupViewProps } from '@clerk/mosaic/features/user-profile/user-profile-mfa-setup.view';
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { useEffect, useState } from 'react';
 
@@ -72,9 +70,9 @@ export function useUserProfileMfaFixture({
     onOpenChange: (open: boolean) => void;
   };
   section: UserProfileMfaSectionViewProps;
-  authenticator: UserProfileAddAuthenticatorDialogProps;
-  sms: UserProfileAddSmsDialogProps;
-  backupCodes: UserProfileBackupCodesDialogProps;
+  authenticator: UserProfileMfaSetupViewProps['authenticator'];
+  sms: UserProfileMfaSetupViewProps['sms'];
+  backupCodes: UserProfileMfaSetupViewProps['backupCodes'];
 } {
   const [account, setAccount] = useState({
     phones: [
@@ -93,7 +91,7 @@ export function useUserProfileMfaFixture({
   const [codes, setCodes] = useState<readonly string[]>(
     initialFlow === 'backup-codes' ? (enrollmentBackupCodes ?? []) : [],
   );
-  const [step, setStep] = useState<UserProfileAddSmsDialogProps['step']>('select');
+  const [step, setStep] = useState<UserProfileMfaSetupViewProps['sms']['step']>('select');
   const [direction, setDirection] = useState<1 | -1>(1);
   const [verifyFrom, setVerifyFrom] = useState<'select' | 'phone'>('select');
   const [selectedPhoneId, setSelectedPhoneId] = useState(() => account.phones.find(phone => !phone.enrolled)?.id ?? '');
@@ -339,8 +337,6 @@ export function useUserProfileMfaFixture({
       },
     },
     authenticator: {
-      open: flow === 'authenticator',
-      onOpenChange: close,
       setup: authenticatorSetup,
       onRetry: () => undefined,
       code,
@@ -350,8 +346,6 @@ export function useUserProfileMfaFixture({
       errorMessage,
     },
     sms: {
-      open: flow === 'sms',
-      onOpenChange: close,
       step,
       direction,
       phoneNumbers: eligiblePhones,
@@ -392,8 +386,6 @@ export function useUserProfileMfaFixture({
       errorMessage,
     },
     backupCodes: {
-      open: flow === 'backup-codes',
-      onOpenChange: close,
       codes,
       pendingAction: pending === 'generate' || pending === 'copy' || pending === 'download' ? pending : undefined,
       errorMessage,

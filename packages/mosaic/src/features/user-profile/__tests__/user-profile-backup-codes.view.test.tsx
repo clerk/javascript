@@ -2,16 +2,15 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../../MosaicProvider';
-import type { UserProfileBackupCodesDialogProps } from '../user-profile-backup-codes.dialog';
-import { UserProfileBackupCodesDialog } from '../user-profile-backup-codes.dialog';
+import type { UserProfileMfaSetupViewProps } from '../user-profile-mfa-setup.view';
+import { MfaSetupDialog } from './mfa-test-utils';
+
+type ViewProps = UserProfileMfaSetupViewProps['backupCodes'];
 
 const codes = ['pwkkay19', 'cvgunlqs', '4czio578', 'a38eewtw', 'qqnwzvyr', 'znq8j16s'];
 
-function renderView(overrides: Partial<UserProfileBackupCodesDialogProps> = {}) {
-  const props: UserProfileBackupCodesDialogProps = {
-    open: true,
-    onOpenChange: vi.fn(),
+function renderView(overrides: Partial<ViewProps> = {}, step: UserProfileMfaSetupViewProps['step'] = 'backup-codes') {
+  const props: ViewProps = {
     codes,
     onRetry: vi.fn(),
     onCopy: vi.fn(),
@@ -21,19 +20,26 @@ function renderView(overrides: Partial<UserProfileBackupCodesDialogProps> = {}) 
   return {
     props,
     ...render(
-      <MosaicProvider>
-        <UserProfileBackupCodesDialog {...props} />
-      </MosaicProvider>,
+      <MfaSetupDialog
+        step={step}
+        backupCodes={props}
+      />,
     ),
   };
 }
 
-describe('UserProfileBackupCodesDialog', () => {
+describe('UserProfileBackupCodesView', () => {
   it.each([
     { codes, action: 'Copy and close' },
     { codes: [], action: 'Try again' },
-  ])('focuses $action when opened', async ({ codes, action }) => {
-    renderView({ codes });
+  ])('focuses $action when entering backup codes', async ({ codes, action }) => {
+    const { props, rerender } = renderView({ codes }, 'select');
+    rerender(
+      <MfaSetupDialog
+        step='backup-codes'
+        backupCodes={props}
+      />,
+    );
     const button = screen.getByRole('button', { name: action });
     await waitFor(() => expect(document.activeElement === button).toBe(true), { timeout: 1000 });
   });
@@ -58,13 +64,14 @@ describe('UserProfileBackupCodesDialog', () => {
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
 
     rerender(
-      <MosaicProvider>
-        <UserProfileBackupCodesDialog
-          {...props}
-          pendingAction={undefined}
-          errorMessage='Unable to generate backup codes. Please try again.'
-        />
-      </MosaicProvider>,
+      <MfaSetupDialog
+        step='backup-codes'
+        backupCodes={{
+          ...props,
+          pendingAction: undefined,
+          errorMessage: 'Unable to generate backup codes. Please try again.',
+        }}
+      />,
     );
     expect(screen.getByRole('alert')).toHaveTextContent('Unable to generate backup codes. Please try again.');
     await user.click(screen.getByRole('button', { name: 'Try again' }));
@@ -89,13 +96,14 @@ describe('UserProfileBackupCodesDialog', () => {
       expect(props.onDownload).not.toHaveBeenCalled();
 
       rerender(
-        <MosaicProvider>
-          <UserProfileBackupCodesDialog
-            {...props}
-            pendingAction={undefined}
-            errorMessage='Unable to save your backup codes. Please try again.'
-          />
-        </MosaicProvider>,
+        <MfaSetupDialog
+          step='backup-codes'
+          backupCodes={{
+            ...props,
+            pendingAction: undefined,
+            errorMessage: 'Unable to save your backup codes. Please try again.',
+          }}
+        />,
       );
       expect(screen.getByRole('dialog')).toBe(dialog);
       expect(screen.getByRole('alert')).toHaveTextContent('Unable to save your backup codes. Please try again.');

@@ -49,7 +49,7 @@ describe('MFA playground', () => {
     const request = deferred<readonly string[]>();
     onGenerateBackupCodes.mockReturnValueOnce(request.promise);
     act(() => result.current.section.onAdd?.('backup-codes'));
-    expect(result.current.backupCodes.open).toBe(true);
+    expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
     expect(result.current.backupCodes.pendingAction).toBe('generate');
     expect(result.current.section.methods.map(method => method.type)).toEqual(['sms']);
     expect(result.current.section.onRegenerateBackupCodes).toBeUndefined();
@@ -70,14 +70,14 @@ describe('MFA playground', () => {
   it('withholds backup-code creation until the instance enables codes and the user has MFA', async () => {
     const { result, rerender, onGenerateBackupCodes } = setup([], false);
     act(() => result.current.section.onAdd?.('backup-codes'));
-    expect(result.current.backupCodes.open).toBe(false);
+    expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
     expect(onGenerateBackupCodes).not.toHaveBeenCalled();
 
     await complete(() => void result.current.section.onRemove?.('personal'));
     rerender({ backupCodesEnabled: true });
     expect(result.current.section.addableMethods).not.toContain('backup-codes');
     act(() => result.current.section.onAdd?.('backup-codes'));
-    expect(result.current.backupCodes.open).toBe(false);
+    expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
     expect(onGenerateBackupCodes).not.toHaveBeenCalled();
 
     act(() => result.current.section.onAdd?.('authenticator'));
@@ -96,7 +96,7 @@ describe('MFA playground', () => {
       }
 
       await complete(() => result.current.section.onAdd?.('backup-codes'));
-      expect(result.current.backupCodes.open).toBe(true);
+      expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
       expect(result.current.backupCodes.errorMessage).toContain('Unable to generate');
       expect(result.current.backupCodes.codes).toEqual([]);
       expect(result.current.section.methods.map(method => method.type)).toEqual(['sms']);
@@ -109,10 +109,10 @@ describe('MFA playground', () => {
       expect(result.current.section.methods.map(method => method.type)).toEqual(['sms', 'backup-codes']);
       expect(result.current.section.addableMethods).not.toContain('backup-codes');
       await complete(() => result.current.backupCodes.onCopy());
-      expect(result.current.backupCodes.open).toBe(false);
+      expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
 
       await complete(() => result.current.section.onRegenerateBackupCodes?.());
-      expect(result.current.backupCodes.open).toBe(true);
+      expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
       expect(result.current.section.methods.filter(method => method.type === 'backup-codes')).toHaveLength(1);
       expect(onGenerateBackupCodes).toHaveBeenCalledTimes(3);
     },
@@ -121,10 +121,10 @@ describe('MFA playground', () => {
   it('enrolls an authenticator on the first attempt, saves backup codes, and regenerates them', async () => {
     const { result, onCopy, onDownload, onGenerateBackupCodes } = setup();
     act(() => result.current.section.onAdd?.('authenticator'));
-    expect(result.current.authenticator.open).toBe(true);
+    expect(result.current.setup).toMatchObject({ open: true, step: 'authenticator' });
     await complete(() => result.current.authenticator.onSubmit('123456'));
-    expect(result.current.authenticator.open).toBe(false);
-    expect(result.current.backupCodes.open).toBe(true);
+    expect(result.current.setup).not.toMatchObject({ open: true, step: 'authenticator' });
+    expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
     expect(result.current.backupCodes.codes).toEqual(enrollmentCodes);
     expect(result.current.section.methods.map(method => method.type)).toEqual(['authenticator', 'sms', 'backup-codes']);
     expect(result.current.section.addableMethods).toEqual(['sms']);
@@ -133,12 +133,12 @@ describe('MFA playground', () => {
     expect(onGenerateBackupCodes).not.toHaveBeenCalled();
     await complete(() => result.current.backupCodes.onDownload());
     expect(onDownload).toHaveBeenCalledExactlyOnceWith(codes);
-    expect(result.current.backupCodes.open).toBe(true);
+    expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
     await complete(() => result.current.backupCodes.onCopy());
     expect(onCopy).toHaveBeenCalledExactlyOnceWith(codes);
-    expect(result.current.backupCodes.open).toBe(false);
+    expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
     await complete(() => result.current.section.onRegenerateBackupCodes?.());
-    expect(result.current.backupCodes.open).toBe(true);
+    expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
     expect(result.current.backupCodes.codes).toEqual(regeneratedCodes);
     expect(onGenerateBackupCodes).toHaveBeenCalledOnce();
     expect(result.current.section.methods.filter(method => method.type === 'backup-codes')).toHaveLength(1);
@@ -152,13 +152,13 @@ describe('MFA playground', () => {
     await complete(() => result.current.sms.onSubmit());
     expect(result.current.sms.step).toBe('verify');
     await complete(() => result.current.sms.onSubmit('123456'));
-    expect(result.current.backupCodes.open).toBe(true);
+    expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
     const method = result.current.section.methods.find(method => method.id === 'phone-+18015550300');
     expect(method).toBeDefined();
     if (!method) {
       throw new Error('New SMS method missing');
     }
-    act(() => result.current.backupCodes.onOpenChange(false));
+    act(() => result.current.setup.onOpenChange(false));
     await complete(() => void result.current.section.onSetDefault?.(method.id));
     expect(result.current.section.methods.find(item => item.isDefault)?.id).toBe(method.id);
     await complete(() => void result.current.section.onRemove?.(method.id));
@@ -174,16 +174,16 @@ describe('MFA playground', () => {
     expect(result.current.sms.phoneNumbers.some(phone => phone.id === 'personal')).toBe(false);
     act(() => result.current.sms.onSelectedPhoneIdChange('other'));
     await complete(() => result.current.sms.onSubmit());
-    expect(result.current.sms.open).toBe(false);
+    expect(result.current.setup).not.toMatchObject({ open: true, step: 'sms' });
     expect(result.current.section.methods.some(method => method.id === 'other')).toBe(true);
-    act(() => result.current.backupCodes.onOpenChange(false));
+    act(() => result.current.setup.onOpenChange(false));
     act(() => result.current.section.onAdd?.('sms'));
     act(() => result.current.sms.onSelectedPhoneIdChange('work'));
     await complete(() => result.current.sms.onSubmit());
     expect(result.current.sms.step).toBe('verify');
     await complete(() => result.current.sms.onSubmit('654321'));
-    expect(result.current.sms.open).toBe(false);
-    expect(result.current.backupCodes.open).toBe(false);
+    expect(result.current.setup).not.toMatchObject({ open: true, step: 'sms' });
+    expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
     expect(result.current.section.methods.some(method => method.id === 'work')).toBe(true);
   });
 
@@ -226,11 +226,11 @@ describe('MFA playground', () => {
     const codes = result.current.backupCodes.codes;
     onCopy.mockRejectedValueOnce(new Error('Clipboard unavailable'));
     await complete(() => result.current.backupCodes.onCopy());
-    expect(result.current.backupCodes.open).toBe(true);
+    expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
     expect(result.current.backupCodes.codes).toEqual(codes);
     expect(result.current.backupCodes.errorMessage).toContain('Unable to copy');
     await complete(() => result.current.backupCodes.onCopy());
-    expect(result.current.backupCodes.open).toBe(false);
+    expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
     expect(result.current.backupCodes.errorMessage).toBeUndefined();
   });
 
@@ -239,7 +239,7 @@ describe('MFA playground', () => {
     const initialMethods = result.current.section.methods;
     act(() => result.current.section.onAdd?.('authenticator'));
     act(() => result.current.authenticator.onCodeChange('123'));
-    act(() => result.current.authenticator.onOpenChange(false));
+    act(() => result.current.setup.onOpenChange(false));
     expect(result.current.section.methods).toEqual(initialMethods);
     act(() => result.current.section.onAdd?.('authenticator'));
     expect(result.current.authenticator.code).toBe('');
@@ -249,7 +249,7 @@ describe('MFA playground', () => {
     const { result } = setup();
     act(() => result.current.section.onAdd?.('authenticator'));
     await complete(() => result.current.authenticator.onSubmit('123456'));
-    act(() => result.current.backupCodes.onOpenChange(false));
+    act(() => result.current.setup.onOpenChange(false));
     const firstId = type === 'authenticator' ? 'personal' : 'authenticator';
     const lastId = type === 'authenticator' ? 'authenticator' : 'personal';
     await complete(() => void result.current.section.onRemove?.(firstId));
@@ -259,14 +259,14 @@ describe('MFA playground', () => {
     await complete(() => void result.current.section.onRemove?.(lastId));
     expect(result.current.section.methods).toEqual([]);
     expect(result.current.backupCodes.codes).toEqual([]);
-    expect(result.current.backupCodes.open).toBe(false);
+    expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
     expect(result.current.section.onRegenerateBackupCodes).toBeUndefined();
     expect(result.current.section.addableMethods).toEqual(['sms', 'authenticator']);
 
     act(() => result.current.section.onAdd?.('authenticator'));
     await complete(() => result.current.authenticator.onSubmit('123456'));
     expect(result.current.section.methods.map(method => method.type)).toEqual(['authenticator', 'backup-codes']);
-    expect(result.current.backupCodes.open).toBe(true);
+    expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
     expect(result.current.backupCodes.codes).toEqual(enrollmentCodes);
   });
 
@@ -284,7 +284,7 @@ describe('MFA playground', () => {
       expect(result.current.section.methods.some(method => method.type === type)).toBe(true);
       expect(result.current.section.methods.some(method => method.type === 'backup-codes')).toBe(false);
       expect(result.current.section.addableMethods).toContain('backup-codes');
-      expect(result.current.backupCodes.open).toBe(false);
+      expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
       expect(result.current.backupCodes.codes).toEqual([]);
       expect(result.current.section.onRegenerateBackupCodes).toBeUndefined();
     },
@@ -296,14 +296,14 @@ describe('MFA playground', () => {
       const { result, onGenerateBackupCodes } = setup();
       act(() => result.current.section.onAdd?.('authenticator'));
       await complete(() => result.current.authenticator.onSubmit('123456'));
-      act(() => result.current.backupCodes.onOpenChange(false));
+      act(() => result.current.setup.onOpenChange(false));
       if (failure === 'rejection') {
         onGenerateBackupCodes.mockRejectedValueOnce(new Error('Try again'));
       } else {
         onGenerateBackupCodes.mockResolvedValueOnce([]);
       }
       await complete(() => result.current.section.onRegenerateBackupCodes?.());
-      expect(result.current.backupCodes.open).toBe(true);
+      expect(result.current.setup).toMatchObject({ open: true, step: 'backup-codes' });
       expect(result.current.backupCodes.codes).toEqual([]);
       expect(result.current.backupCodes.errorMessage).toContain('Unable to generate');
       expect(result.current.section.methods.some(method => method.type === 'backup-codes')).toBe(true);

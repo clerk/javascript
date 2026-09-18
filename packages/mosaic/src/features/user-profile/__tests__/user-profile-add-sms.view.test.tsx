@@ -3,14 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../../MosaicProvider';
-import type { UserProfileAddSmsDialogProps } from '../user-profile-add-sms.dialog';
-import { UserProfileAddSmsDialog } from '../user-profile-add-sms.dialog';
+import type { UserProfileMfaSetupViewProps } from '../user-profile-mfa-setup.view';
+import { MfaSetupDialog } from './mfa-test-utils';
 
-function renderView(overrides: Partial<UserProfileAddSmsDialogProps> = {}) {
-  const props: UserProfileAddSmsDialogProps = {
-    open: true,
-    onOpenChange: vi.fn(),
+type ViewProps = UserProfileMfaSetupViewProps['sms'];
+
+function renderView(overrides: Partial<ViewProps> = {}) {
+  const props: ViewProps = {
     step: 'select',
     phoneNumbers: [
       { id: 'personal', phoneNumber: '+18015550100' },
@@ -31,40 +30,40 @@ function renderView(overrides: Partial<UserProfileAddSmsDialogProps> = {}) {
   return {
     props,
     ...render(
-      <MosaicProvider>
-        <UserProfileAddSmsDialog {...props} />
-      </MosaicProvider>,
+      <MfaSetupDialog
+        step='sms'
+        sms={props}
+      />,
     ),
   };
 }
 
-describe('UserProfileAddSmsDialog', () => {
+describe('UserProfileAddSmsView', () => {
   it('adds and verifies a new number in the same dialog, preserving the number on Back', async () => {
     const user = userEvent.setup();
     const onVerify = vi.fn();
     function Example() {
-      const [step, setStep] = useState<UserProfileAddSmsDialogProps['step']>('select');
+      const [step, setStep] = useState<ViewProps['step']>('select');
       const [phoneNumber, setPhoneNumber] = useState('+18015550300');
       const [code, setCode] = useState('');
       return (
-        <MosaicProvider>
-          <UserProfileAddSmsDialog
-            open
-            onOpenChange={vi.fn()}
-            step={step}
-            phoneNumbers={[]}
-            selectedPhoneId=''
-            onSelectedPhoneIdChange={vi.fn()}
-            onAddPhone={() => setStep('phone')}
-            onBack={() => setStep(step === 'verify' ? 'phone' : 'select')}
-            phoneNumber={phoneNumber}
-            onPhoneNumberChange={setPhoneNumber}
-            code={code}
-            onCodeChange={setCode}
-            onSubmit={value => (step === 'phone' ? setStep('verify') : onVerify(value))}
-            onResend={vi.fn()}
-          />
-        </MosaicProvider>
+        <MfaSetupDialog
+          step='sms'
+          sms={{
+            step,
+            phoneNumbers: [],
+            selectedPhoneId: '',
+            onSelectedPhoneIdChange: vi.fn(),
+            onAddPhone: () => setStep('phone'),
+            onBack: () => setStep(step === 'verify' ? 'phone' : 'select'),
+            phoneNumber,
+            onPhoneNumberChange: setPhoneNumber,
+            code,
+            onCodeChange: setCode,
+            onSubmit: value => (step === 'phone' ? setStep('verify') : onVerify(value)),
+            onResend: vi.fn(),
+          }}
+        />
       );
     }
     render(<Example />);
@@ -108,13 +107,10 @@ describe('UserProfileAddSmsDialog', () => {
       expect(screen.getByRole('button', { name: step === 'select' ? 'Cancel' : 'Back' })).toBeDisabled();
 
       rerender(
-        <MosaicProvider>
-          <UserProfileAddSmsDialog
-            {...props}
-            isPending={false}
-            errorMessage='Please try again.'
-          />
-        </MosaicProvider>,
+        <MfaSetupDialog
+          step='sms'
+          sms={{ ...props, isPending: false, errorMessage: 'Please try again.' }}
+        />,
       );
       expect(screen.getByRole(role, { name })).toHaveAttribute('aria-invalid', 'true');
       const describedControl =
@@ -135,24 +131,18 @@ describe('UserProfileAddSmsDialog', () => {
     expect(screen.getByRole('button', { name: 'Sending a new code…' })).toBeDisabled();
 
     rerender(
-      <MosaicProvider>
-        <UserProfileAddSmsDialog
-          {...props}
-          isResending={false}
-          resendSeconds={12}
-        />
-      </MosaicProvider>,
+      <MfaSetupDialog
+        step='sms'
+        sms={{ ...props, isResending: false, resendSeconds: 12 }}
+      />,
     );
     expect(code).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Didn’t receive a code? Resend (12)' })).toBeDisabled();
     rerender(
-      <MosaicProvider>
-        <UserProfileAddSmsDialog
-          {...props}
-          isResending={false}
-          resendSeconds={0}
-        />
-      </MosaicProvider>,
+      <MfaSetupDialog
+        step='sms'
+        sms={{ ...props, isResending: false, resendSeconds: 0 }}
+      />,
     );
     await user.click(screen.getByRole('button', { name: 'Didn’t receive a code? Resend' }));
     expect(props.onResend).toHaveBeenCalledOnce();

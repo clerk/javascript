@@ -1,6 +1,4 @@
-import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
-import type { Ref } from 'react';
 
 import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
@@ -14,7 +12,6 @@ import { reset } from '../../utils/reset.styles';
 import { styles } from './user-profile-backup-codes.styles';
 
 export interface UserProfileBackupCodesViewProps {
-  actionRef?: Ref<HTMLButtonElement>;
   onCancel: () => void;
   codes: readonly string[];
   onRetry: () => void;
@@ -25,7 +22,6 @@ export interface UserProfileBackupCodesViewProps {
 }
 
 export function UserProfileBackupCodesView({
-  actionRef: actionRefProp,
   onCancel,
   codes,
   onRetry,
@@ -35,7 +31,7 @@ export function UserProfileBackupCodesView({
   errorMessage,
 }: UserProfileBackupCodesViewProps) {
   const m = useMessages('userProfileBackupCodes');
-  const actionRef = useMergeRefs([actionRefProp, useFlowAutoFocus<HTMLButtonElement>()]);
+  const actionRef = useFlowAutoFocus<HTMLButtonElement>();
   const hasCodes = codes.length > 0 && pendingAction !== 'generate';
 
   return (

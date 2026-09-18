@@ -1,4 +1,4 @@
-import type { UserProfileAddAuthenticatorDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-add-authenticator.dialog';
+import type { UserProfileAuthenticatorSetupViewProps } from '@clerk/mosaic/features/user-profile/user-profile-authenticator-setup.view';
 import { useState } from 'react';
 
 export const authenticatorSetup = {
@@ -7,7 +7,7 @@ export const authenticatorSetup = {
 };
 
 export function useAuthenticatorCopy() {
-  const [copyStatus, setCopyStatus] = useState<UserProfileAddAuthenticatorDialogProps['copyStatus']>();
+  const [copyStatus, setCopyStatus] = useState<UserProfileAuthenticatorSetupViewProps['copyStatus']>();
   const [copyErrorMessage, setCopyErrorMessage] = useState<string>();
 
   return {
