@@ -45,6 +45,7 @@ describe('useForm', () => {
     expectTypeOf(result.current.values).toEqualTypeOf<{ username: string; age: number }>();
     expectTypeOf(result.current.setValue).parameter(0).toEqualTypeOf<'username' | 'age'>();
     expectTypeOf(result.current.touch).parameter(0).toEqualTypeOf<'username' | 'age'>();
+    expectTypeOf(result.current.register).parameter(0).toEqualTypeOf<'username'>();
     expectTypeOf(result.current.fields.age.feedback).toEqualTypeOf<FieldFeedback | undefined>();
     expectTypeOf(result.current.error).toEqualTypeOf<string | undefined>();
     expectTypeOf(result.current.reset).parameter(0).toEqualTypeOf<{ username: string; age: number } | undefined>();
@@ -337,5 +338,68 @@ describe('useForm', () => {
       await flush();
     });
     expect(result.current.isSubmitting).toBe(false);
+  });
+
+  it('registers a text control with its name, value, change and blur handlers', () => {
+    const { result } = renderHook(() => useForm({ initialValues: { username: 'alex' }, onSubmit: resolved }));
+    expect(result.current.register('username')).toMatchObject({ name: 'username', value: 'alex' });
+    act(() => result.current.register('username').onChange({ target: { value: 'alexc' } }));
+    expect(result.current.values.username).toBe('alexc');
+    expect(result.current.register('username').value).toBe('alexc');
+    expect(result.current.fields.username.touched).toBe(false);
+    act(() => result.current.register('username').onBlur());
+    expect(result.current.fields.username.touched).toBe(true);
+  });
+
+  it('focuses the first registered control with an error instead of submitting', () => {
+    const onSubmit = vi.fn(resolved);
+    const { result } = renderHook(() =>
+      useForm({
+        initialValues: { a: '', b: '' },
+        fields: { b: { validate: value => (value === '' ? { type: 'error', message: 'Required' } : undefined) } },
+        onSubmit,
+      }),
+    );
+    const a = document.body.appendChild(document.createElement('input'));
+    const b = document.body.appendChild(document.createElement('input'));
+    result.current.register('a').ref(a);
+    result.current.register('b').ref(b);
+    act(() => result.current.submit());
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(document.activeElement).toBe(b);
+    act(() => result.current.setValue('b', 'ok'));
+    a.focus();
+    act(() => result.current.submit());
+    expect(onSubmit).toHaveBeenCalledWith({ a: '', b: 'ok' });
+    expect(document.activeElement).toBe(a);
+    a.remove();
+    b.remove();
+  });
+
+  it('marks fields and the form dirty against initialValues, or the values given to reset', () => {
+    const { result } = renderHook(() => useForm({ initialValues: { username: 'alex', bio: '' }, onSubmit: resolved }));
+    expect(result.current.isDirty).toBe(false);
+    act(() => result.current.setValue('bio', 'hi'));
+    expect(result.current.fields.bio.isDirty).toBe(true);
+    expect(result.current.fields.username.isDirty).toBe(false);
+    expect(result.current.isDirty).toBe(true);
+    act(() => result.current.setValue('bio', ''));
+    expect(result.current.isDirty).toBe(false);
+    act(() => result.current.reset({ username: 'sam', bio: 'x' }));
+    expect(result.current.isDirty).toBe(false);
+    act(() => result.current.setValue('bio', ''));
+    expect(result.current.fields.bio.isDirty).toBe(true);
+    act(() => result.current.reset());
+    expect(result.current.values).toEqual({ username: 'alex', bio: '' });
+    expect(result.current.isDirty).toBe(false);
+  });
+
+  it('handles a form submit event by preventing navigation and submitting', () => {
+    const onSubmit = vi.fn(resolved);
+    const { result } = renderHook(() => useForm({ initialValues: { username: 'alex' }, onSubmit }));
+    const preventDefault = vi.fn();
+    act(() => result.current.handleSubmit({ preventDefault }));
+    expect(preventDefault).toHaveBeenCalledOnce();
+    expect(onSubmit).toHaveBeenCalledWith({ username: 'alex' });
   });
 });
