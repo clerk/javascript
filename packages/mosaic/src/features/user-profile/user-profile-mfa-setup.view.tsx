@@ -18,9 +18,11 @@ export interface UserProfileMfaSetupViewProps extends UserProfileAddMfaViewProps
 }
 
 export function UserProfileMfaSetupView(props: UserProfileMfaSetupViewProps) {
+  const step = props.step === 'authenticator' && props.authenticator.setup ? 'authenticator-verify' : props.step;
+
   return (
     <Flow.Root
-      value={props.step}
+      value={step}
       state={props}
     >
       {current => (
@@ -38,6 +40,12 @@ export function UserProfileMfaSetupView(props: UserProfileMfaSetupViewProps) {
             />
           </Flow.Step>
           <Flow.Step ids={['authenticator']}>
+            <UserProfileAddAuthenticatorView
+              {...current.authenticator}
+              onCancel={current.onCancel}
+            />
+          </Flow.Step>
+          <Flow.Step ids={['authenticator-verify']}>
             <UserProfileAddAuthenticatorView
               {...current.authenticator}
               onCancel={current.onCancel}

@@ -45,6 +45,7 @@ export function UserProfileAddAuthenticatorView({
   const setupMessages = useMessages('userProfileAuthenticatorSetup');
   const formId = useId();
   const actionRef = useFlowAutoFocus<HTMLButtonElement>();
+  const inputRef = useFlowAutoFocus<HTMLInputElement>();
   const submitCode = (value: string) => {
     if (setup && !isPending && value.length === 6) {
       onSubmit(value);
@@ -105,6 +106,7 @@ export function UserProfileAddAuthenticatorView({
           >
             <Field.Label xstyle={styles.label}>{m.codeLabel}</Field.Label>
             <Otp
+              ref={inputRef}
               name='code'
               value={code}
               onValueChange={onCodeChange}

@@ -13,7 +13,7 @@ const setup = {
   uri: 'otpauth://totp/Swingset:demo@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Swingset',
 };
 
-function renderView(overrides: Partial<ViewProps> = {}) {
+function renderView(overrides: Partial<ViewProps> = {}, step: UserProfileMfaSetupViewProps['step'] = 'authenticator') {
   const props: ViewProps = {
     setup,
     onRetry: vi.fn(),
@@ -26,7 +26,7 @@ function renderView(overrides: Partial<ViewProps> = {}) {
     props,
     ...render(
       <MfaSetupDialog
-        step='authenticator'
+        step={step}
         authenticator={props}
       />,
     ),
@@ -46,13 +46,20 @@ function VerificationExample({ onSubmit }: Pick<ViewProps, 'onSubmit'>) {
 describe('UserProfileAddAuthenticatorView', () => {
   it('shows preparation, offers retry on failure, and waits for setup data before verification', async () => {
     const user = userEvent.setup();
-    const { props, rerender } = renderView({ setup: undefined });
+    const { props, rerender } = renderView({ setup: undefined }, 'select');
+    rerender(
+      <MfaSetupDialog
+        step='authenticator'
+        authenticator={props}
+      />,
+    );
     const dialog = screen.getByRole('dialog', { name: 'Add an authenticator app' });
     expect(screen.getByRole('status', { name: 'Preparing authenticator…' })).toBeVisible();
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Verify', exact: true })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Preparing authenticator/ })).toHaveFocus();
 
     rerender(
       <MfaSetupDialog
@@ -62,6 +69,7 @@ describe('UserProfileAddAuthenticatorView', () => {
     );
     expect(screen.getByRole('alert')).toHaveTextContent('Unable to prepare your authenticator.');
     expect(screen.queryByRole('status', { name: 'Preparing authenticator…' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Try again' })).toHaveFocus();
     await user.click(screen.getByRole('button', { name: 'Try again' }));
     expect(props.onRetry).toHaveBeenCalledOnce();
     expect(props.onSubmit).not.toHaveBeenCalled();
@@ -85,7 +93,7 @@ describe('UserProfileAddAuthenticatorView', () => {
     expect(screen.getByRole('dialog')).toBe(dialog);
     expect(screen.queryByRole('status', { name: 'Preparing authenticator…' })).not.toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Authenticator setup QR code' })).toBeVisible();
-    expect(screen.getByRole('button', { name: 'Verify', exact: true })).toHaveFocus();
+    expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveFocus();
     expect(screen.getByRole('button', { name: 'Verify', exact: true })).toHaveAttribute('aria-disabled', 'true');
     await user.keyboard('{Enter}');
     expect(props.onSubmit).not.toHaveBeenCalled();
