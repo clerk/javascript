@@ -1200,6 +1200,36 @@ export type __internal_LocalizationResource = {
         subtitle: LocalizationValue<'name'>;
         confirmButton: LocalizationValue;
       };
+      ssoBypassSection: {
+        title: LocalizationValue;
+        description: LocalizationValue;
+        allowlistLabel: LocalizationValue;
+        allowlistCount: LocalizationValue<'count'>;
+        allowlistCount__one: LocalizationValue;
+        menuAction__manage: LocalizationValue;
+        error__load: LocalizationValue;
+      };
+      ssoBypassPage: {
+        title: LocalizationValue;
+        action__search: LocalizationValue;
+        action__add: LocalizationValue;
+        addForm: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          memberLabel: LocalizationValue;
+          changeButton: LocalizationValue;
+          memberPlaceholder: LocalizationValue;
+          noResults: LocalizationValue;
+          submitButton: LocalizationValue;
+        };
+        table: {
+          header__user: LocalizationValue;
+          header__actions: LocalizationValue;
+          emptyState: LocalizationValue;
+          emptyState__search: LocalizationValue;
+          menuAction__remove: LocalizationValue;
+        };
+      };
       ssoSection: {
         title: LocalizationValue;
         badge__unconfigured: LocalizationValue;
