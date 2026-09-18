@@ -306,7 +306,6 @@ import {
 } from '../stories/user-profile-enterprise-accounts-section.stories';
 import {
   Default as UserProfileMfaSectionDefault,
-  Empty as UserProfileMfaSectionEmpty,
   meta as userProfileMfaSectionMeta,
 } from '../stories/user-profile-mfa-section.stories';
 import {
@@ -676,7 +675,6 @@ const userProfilePasskeysSectionModule: StoryModule = {
 const userProfileMfaSectionModule: StoryModule = {
   meta: userProfileMfaSectionMeta,
   Default: UserProfileMfaSectionDefault,
-  Empty: UserProfileMfaSectionEmpty,
 };
 const userProfileActiveDevicesSectionModule: StoryModule = {
   meta: userProfileActiveDevicesSectionMeta,

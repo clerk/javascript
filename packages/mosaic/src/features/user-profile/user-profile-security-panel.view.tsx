@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import { Profile } from '../../components/profile';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -40,6 +40,8 @@ export interface UserProfileSecurityPanelViewProps
   passkeys?: UserProfilePasskey[];
   passkeysVisible?: boolean;
   mfaMethods?: UserProfileMfaMethod[];
+  addableMfaMethods?: readonly UserProfileMfaAddableMethod[];
+  mfaAddControl?: ReactNode;
   devices?: UserProfileDevice[];
   onAddPasskey?: () => void;
   addPasskeyError?: string;
@@ -47,7 +49,8 @@ export interface UserProfileSecurityPanelViewProps
   onRemovePasskey?: (id: string) => void | Promise<void>;
   onAddMfaMethod?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
-  onRemoveMfaMethod?: (id: string) => void;
+  onRemoveMfaMethod?: (id: string) => void | Promise<void>;
+  onSetDefaultMfaMethod?: (id: string) => void | Promise<void>;
   /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
   onDeleteAccount?: () => Promise<void>;
 }
@@ -59,6 +62,8 @@ export function UserProfileSecurityPanelView({
   passkeys,
   passkeysVisible = true,
   mfaMethods,
+  addableMfaMethods,
+  mfaAddControl,
   devices,
   onSubmitPassword,
   onAddPasskey,
@@ -68,6 +73,7 @@ export function UserProfileSecurityPanelView({
   onAddMfaMethod,
   onRegenerateBackupCodes,
   onRemoveMfaMethod,
+  onSetDefaultMfaMethod,
   onSignOutDevice,
   onSignOutAllOtherDevices,
   onDeleteAccount,
@@ -102,10 +108,13 @@ export function UserProfileSecurityPanelView({
           {mfaMethods !== undefined ? (
             <UserProfileMfaSectionView
               methods={mfaMethods}
+              addableMethods={addableMfaMethods}
+              addControl={mfaAddControl}
               sectionTitle={!showPassword && !showPasskeys ? 'Authentication' : undefined}
               onAdd={onAddMfaMethod}
               onRegenerateBackupCodes={onRegenerateBackupCodes}
               onRemove={onRemoveMfaMethod}
+              onSetDefault={onSetDefaultMfaMethod}
             />
           ) : null}
         </div>

@@ -1,10 +1,11 @@
-import { Button } from '../../components/button';
-import { Icon } from '../../components/icon';
-import { Menu } from '../../components/menu';
-import { Section } from '../../components/section';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
-import { UserProfileSecurityIcon } from './user-profile-security-icon';
+import { type ReactNode, type Ref, useMemo, useRef, useState } from 'react';
+
+import { Confirmation } from '../../blocks/confirmation';
+import { Text } from '../../components/text';
+import { fill, type MosaicMessages, useMessages } from '../../localization';
+import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
+import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
+import { UserProfileMfaRowView } from './user-profile-mfa-row.view';
 import { UserProfileSecurityList } from './user-profile-security-list';
 
 export interface UserProfileMfaMethod {
@@ -12,111 +13,130 @@ export interface UserProfileMfaMethod {
   type: 'sms' | 'authenticator' | 'backup-codes';
   label?: string;
   description?: string;
+  isDefault?: boolean;
+  canRemove?: boolean;
+  canSetDefault?: boolean;
 }
 
-export type UserProfileMfaAddableMethod = Extract<UserProfileMfaMethod['type'], 'sms' | 'authenticator'>;
+export type UserProfileMfaAddableMethod = 'sms' | 'authenticator' | 'backup-codes';
 
 export interface UserProfileMfaSectionViewProps {
   methods: UserProfileMfaMethod[];
+  addableMethods?: readonly UserProfileMfaAddableMethod[];
+  addButtonRef?: Ref<HTMLButtonElement>;
+  addControl?: ReactNode;
   sectionTitle?: string;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
-  onRemove?: (id: string) => void;
+  onRemove?: (id: string) => void | Promise<void>;
+  onSetDefault?: (id: string) => void | Promise<void>;
 }
-
-const labels: Record<UserProfileMfaMethod['type'], string> = {
-  sms: 'SMS verification',
-  authenticator: 'Authenticator app',
-  'backup-codes': 'Backup codes',
-};
-
-const addableMethods: UserProfileMfaAddableMethod[] = ['sms', 'authenticator'];
 
 export function UserProfileMfaSectionView({
   methods,
+  addableMethods,
+  addButtonRef,
+  addControl,
   sectionTitle,
   onAdd,
   onRegenerateBackupCodes,
   onRemove,
+  onSetDefault,
 }: UserProfileMfaSectionViewProps) {
-  const availableMethods = addableMethods.filter(type => !methods.some(method => method.type === type));
-  const hasConfiguredMethod = methods.some(method => method.type === 'sms' || method.type === 'authenticator');
-  const visibleMethods = methods.filter(method => method.type !== 'backup-codes' || hasConfiguredMethod);
+  const m = useMessages('userProfileMfa');
+  const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [isSettingDefault, setIsSettingDefault] = useState(false);
+  const [defaultError, setDefaultError] = useState<string>();
+  const settingDefault = useRef(false);
+
+  const setDefault = async (id: string) => {
+    const method = methods.find(method => method.id === id);
+    if (
+      !onSetDefault ||
+      method?.type !== 'sms' ||
+      !method.canSetDefault ||
+      method.isDefault ||
+      settingDefault.current
+    ) {
+      return;
+    }
+    settingDefault.current = true;
+    setIsSettingDefault(true);
+    setDefaultError(undefined);
+    try {
+      await onSetDefault(id);
+    } catch (error) {
+      setDefaultError(error instanceof Error ? error.message : m.setDefaultError);
+    } finally {
+      settingDefault.current = false;
+      setIsSettingDefault(false);
+    }
+  };
 
   return (
-    <UserProfileSecurityList
-      addControl={
-        onAdd && availableMethods.length > 0 ? (
-          <Menu.Root placement='bottom-end'>
-            <Menu.Trigger
-              aria-label='Add verification method'
-              render={props => (
-                <Button
-                  color='neutral'
-                  size='sm'
-                  variant='outline'
-                  {...props}
-                />
-              )}
+    <>
+      <UserProfileSecurityList
+        addControl={
+          addControl ??
+          (onAdd && addableMethods?.length ? (
+            <UserProfileAddMfaDialog
+              triggerRef={addButtonRef}
+              open={pickerOpen}
+              onOpenChange={setPickerOpen}
             >
-              <Icon
-                name='plus'
-                placement='inline-start'
-                size='sm'
+              <UserProfileAddMfaView
+                methods={addableMethods}
+                onSelect={type => {
+                  onAdd(type);
+                  setPickerOpen(false);
+                }}
               />
-              Add
-            </Menu.Trigger>
-            <Menu.Popup>
-              {availableMethods.map(type => (
-                <Menu.Item
-                  key={type}
-                  label={labels[type]}
-                  onClick={() => onAdd(type)}
-                >
-                  <Menu.Label>{labels[type]}</Menu.Label>
-                </Menu.Item>
-              ))}
-            </Menu.Popup>
-          </Menu.Root>
-        ) : null
-      }
-      addLabel='Add verification method'
-      emptyLabel='No verification methods added'
-      hasItems={visibleMethods.length > 0}
-      label='2-step verification'
-      sectionTitle={sectionTitle}
-    >
-      {visibleMethods.map(method => {
-        const label = method.label ?? labels[method.type];
-        const actions: UserProfileMenuAction[] = [];
-
-        if (method.type === 'backup-codes') {
-          if (onRegenerateBackupCodes) {
-            actions.push({
-              label: 'Regenerate',
-              onClick: onRegenerateBackupCodes,
-            });
-          }
-        } else if (onRemove) {
-          actions.push({ label: 'Remove method', color: 'negative', onClick: () => onRemove(method.id) });
+            </UserProfileAddMfaDialog>
+          ) : null)
         }
-
-        return (
-          <Section.Item key={method.id}>
-            <UserProfileSecurityIcon name={method.type} />
-            <Section.Content>
-              <Section.Label>{label}</Section.Label>
-              {method.description ? <Section.Description>{method.description}</Section.Description> : null}
-            </Section.Content>
-            <Section.Actions>
-              <UserProfileActionMenu
-                actions={actions}
-                label={`Manage ${label}`}
-              />
-            </Section.Actions>
-          </Section.Item>
-        );
-      })}
-    </UserProfileSecurityList>
+        addLabel={m.addLabel}
+        emptyLabel={m.empty}
+        hasItems={methods.length > 0}
+        label={m.label}
+        sectionTitle={sectionTitle}
+      >
+        {methods.map(method => (
+          <UserProfileMfaRowView
+            key={method.id}
+            method={method}
+            onRemove={onRemove ? () => removeMethod.open(method) : undefined}
+            onSetDefault={onSetDefault && !isSettingDefault ? id => void setDefault(id) : undefined}
+            onRegenerateBackupCodes={onRegenerateBackupCodes}
+          />
+        ))}
+      </UserProfileSecurityList>
+      {defaultError ? (
+        <Text
+          role='alert'
+          color='negative'
+        >
+          {defaultError}
+        </Text>
+      ) : null}
+      {onRemove ? (
+        <Confirmation
+          handle={removeMethod}
+          title={method => (method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle)}
+          description={method => describeMethodRemoval(method, m)}
+          actionLabel={m.removeDialog.confirm}
+          onConfirm={method => onRemove(method.id)}
+        />
+      ) : null}
+    </>
   );
+}
+
+function describeMethodRemoval(method: UserProfileMfaMethod, m: MosaicMessages['userProfileMfa']) {
+  if (method.type === 'sms') {
+    return method.description
+      ? fill(m.removeDialog.smsDescription, { phoneNumber: method.description })
+      : m.removeDialog.smsDescriptionWithoutNumber;
+  }
+  return m.removeDialog.authenticatorDescription;
 }
