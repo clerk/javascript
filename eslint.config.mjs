@@ -554,10 +554,6 @@ export default tseslint.config([
       '@stylexjs/sort-keys': 'error',
       '@stylexjs/valid-shorthands': 'error',
       '@stylexjs/valid-styles': 'error',
-      // Mosaic renders elements through `render={p => <el {...p} />}`, so children and controls sit on
-      // the outer component. Both rules only see the empty inner element and always report.
-      'jsx-a11y/heading-has-content': 'off',
-      'jsx-a11y/label-has-associated-control': 'off',
       'no-restricted-syntax': [
         'error',
         {
@@ -598,6 +594,16 @@ export default tseslint.config([
           message: 'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread.',
         },
       ],
+    },
+  },
+  {
+    name: 'packages/mosaic/jsx-a11y',
+    files: ['packages/mosaic/src/**/*'],
+    rules: {
+      // Mosaic renders elements through `render={p => <el {...p} />}`, so children and controls sit on
+      // the outer component. Both rules only see the empty inner element and always report.
+      'jsx-a11y/heading-has-content': 'off',
+      'jsx-a11y/label-has-associated-control': 'off',
     },
   },
   {
