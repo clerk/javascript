@@ -14,19 +14,19 @@ import { SignInFactorOneCodeForm } from './SignInFactorOneCodeForm';
 
 type Step = 'sso' | 'code';
 
-type SignInFactorOneSSOFallbackProps = {
-  fallbackFactor: EmailCodeFactor;
+type SignInFactorOneSSOBypassProps = {
+  bypassFactor: EmailCodeFactor;
 };
 
 /**
- * Enterprise-routed sign-in for a user the instance has allowlisted for a fallback.
+ * Enterprise-routed sign-in for a user the instance has allowlisted for a bypass.
  *
  * Replaces the automatic redirect to the identity provider with a screen the user can act on,
- * since the fallback is only reachable from one.
+ * since the bypass is only reachable from one.
  * @experimental
  */
-export const SignInFactorOneSSOFallback = (props: SignInFactorOneSSOFallbackProps) => {
-  const { fallbackFactor } = props;
+export const SignInFactorOneSSOBypass = (props: SignInFactorOneSSOBypassProps) => {
+  const { bypassFactor } = props;
   const card = useCardState();
   const ctx = useSignInContext();
   const signIn = useCoreSignIn();
@@ -69,16 +69,16 @@ export const SignInFactorOneSSOFallback = (props: SignInFactorOneSSOFallbackProp
 
   if (step === 'code') {
     return (
-      <Flow.Part part='ssoFallback'>
+      <Flow.Part part='ssoBypass'>
         <SignInFactorOneCodeForm
-          factor={fallbackFactor}
+          factor={bypassFactor}
           factorAlreadyPrepared={false}
           onFactorPrepare={() => {}}
-          cardTitle={localizationKeys('signIn.ssoFallback.code.title')}
-          cardSubtitle={localizationKeys('signIn.ssoFallback.code.subtitle')}
-          cardNotice={localizationKeys('signIn.ssoFallback.notice')}
+          cardTitle={localizationKeys('signIn.ssoBypass.code.title')}
+          cardSubtitle={localizationKeys('signIn.ssoBypass.code.subtitle')}
+          cardNotice={localizationKeys('signIn.ssoBypass.notice')}
           inputLabel={localizationKeys('signIn.emailCode.formTitle')}
-          resendButton={localizationKeys('signIn.ssoFallback.code.resendButton')}
+          resendButton={localizationKeys('signIn.ssoBypass.code.resendButton')}
           identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__emailAddress')}
           onShowAlternativeMethodsClicked={() => goToStep('sso')}
         />
@@ -86,10 +86,10 @@ export const SignInFactorOneSSOFallback = (props: SignInFactorOneSSOFallbackProp
     );
   }
 
-  const fallbackAction = (
-    <Card.Action elementId='ssoFallback'>
+  const bypassAction = (
+    <Card.Action elementId='ssoBypass'>
       <Card.ActionLink
-        localizationKey={localizationKeys('signIn.ssoFallback.actionLink')}
+        localizationKey={localizationKeys('signIn.ssoBypass.actionLink')}
         onClick={() => goToStep('code')}
       />
     </Card.Action>
@@ -102,21 +102,21 @@ export const SignInFactorOneSSOFallback = (props: SignInFactorOneSSOFallbackProp
     }));
 
     return (
-      <Flow.Part part='ssoFallback'>
+      <Flow.Part part='ssoBypass'>
         <ChooseEnterpriseConnectionCard
           title={localizationKeys('signIn.enterpriseConnections.title')}
           subtitle={localizationKeys('signIn.enterpriseConnections.subtitle')}
           onClick={handleSelectEnterpriseConnection}
           enterpriseConnections={enterpriseConnections}
         >
-          {fallbackAction}
+          {bypassAction}
         </ChooseEnterpriseConnectionCard>
       </Flow.Part>
     );
   }
 
   return (
-    <Flow.Part part='ssoFallback'>
+    <Flow.Part part='ssoBypass'>
       <Card.Root>
         <Card.Content>
           <Header.Root showLogo>
@@ -136,7 +136,7 @@ export const SignInFactorOneSSOFallback = (props: SignInFactorOneSSOFallbackProp
               localizationKey={localizationKeys('signIn.enterpriseSSO.formButtonPrimary')}
               onClick={handleContinueWithSSO}
             />
-            {fallbackAction}
+            {bypassAction}
           </Col>
         </Card.Content>
         <Card.Footer />

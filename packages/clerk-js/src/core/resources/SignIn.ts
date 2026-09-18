@@ -118,7 +118,7 @@ export class SignIn extends BaseResource implements SignInResource {
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedFirstFactors: SignInFirstFactor[] | null = [];
   supportedSecondFactors: SignInSecondFactor[] | null = null;
-  ssoFallbackFirstFactors: SignInFirstFactor[] | null = null;
+  ssoBypassFirstFactors: SignInFirstFactor[] | null = null;
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
   identifier: string | null = null;
@@ -640,7 +640,7 @@ export class SignIn extends BaseResource implements SignInResource {
       this.identifier = data.identifier;
       this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
       this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
-      this.ssoFallbackFirstFactors = deepSnakeToCamel(data.sso_fallback_first_factors ?? null) as
+      this.ssoBypassFirstFactors = deepSnakeToCamel(data.sso_bypass_first_factors ?? null) as
         | SignInFirstFactor[]
         | null;
       this.firstFactorVerification = new Verification(data.first_factor_verification);
@@ -712,7 +712,7 @@ export class SignIn extends BaseResource implements SignInResource {
       supported_identifiers: this.supportedIdentifiers,
       supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
       supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
-      sso_fallback_first_factors: deepCamelToSnake(this.ssoFallbackFirstFactors) ?? undefined,
+      sso_bypass_first_factors: deepCamelToSnake(this.ssoBypassFirstFactors) ?? undefined,
       first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
       second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),
       identifier: this.identifier,
@@ -832,8 +832,8 @@ class SignInFuture implements SignInFutureResource {
     return this.#resource.supportedSecondFactors ?? [];
   }
 
-  get ssoFallbackFirstFactors() {
-    return this.#resource.ssoFallbackFirstFactors ?? [];
+  get ssoBypassFirstFactors() {
+    return this.#resource.ssoBypassFirstFactors ?? [];
   }
 
   get isTransferable() {

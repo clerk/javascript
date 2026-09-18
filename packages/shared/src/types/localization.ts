@@ -622,7 +622,7 @@ export type __internal_LocalizationResource = {
     enterpriseSSO: {
       formButtonPrimary: LocalizationValue;
     };
-    ssoFallback: {
+    ssoBypass: {
       actionLink: LocalizationValue;
       notice: LocalizationValue;
       code: {

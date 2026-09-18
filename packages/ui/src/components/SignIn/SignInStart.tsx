@@ -41,7 +41,7 @@ import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import {
-  getSSOFallbackFactor,
+  getSSOBypassFactor,
   hasMultipleEnterpriseConnections,
   SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
   useHandleAuthenticateWithPasskey,
@@ -731,13 +731,13 @@ const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
 /**
  * Whether the sign-in can go straight to the identity provider without showing a card first.
  *
- * A connection choice and an SSO fallback are both only reachable from one, so either sends the
+ * A connection choice and an SSO bypass are both only reachable from one, so either sends the
  * user to `factor-one` instead.
  */
 const canRedirectToEnterpriseSSO = (signIn: SignInResource): boolean =>
   hasOnlyEnterpriseSSOFirstFactors(signIn) &&
   !hasMultipleEnterpriseConnections(signIn.supportedFirstFactors) &&
-  !getSSOFallbackFactor(signIn);
+  !getSSOBypassFactor(signIn);
 
 const InstantPasswordRow = ({
   field,

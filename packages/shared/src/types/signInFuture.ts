@@ -349,7 +349,7 @@ export interface SignInFutureResource {
   /**
    * Factors an enterprise SSO user can fall back to when they cannot reach their identity provider. Empty unless the instance has allowlisted this user for a fallback.
    */
-  readonly ssoFallbackFirstFactors: SignInFirstFactor[];
+  readonly ssoBypassFirstFactors: SignInFirstFactor[];
 
   /**
    * The current status of the sign-in.
