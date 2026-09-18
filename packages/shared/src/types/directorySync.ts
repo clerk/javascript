@@ -19,6 +19,11 @@ export interface DirectorySyncJSON extends ClerkResourceJSON {
   group_role_mapping_enabled: boolean;
   attribute_mapping: Record<string, string>;
   /**
+   * Whether a validated identity-provider credential is stored for this directory. Only present for
+   * pull-based providers; push-based directories authenticate with a bearer token and omit it.
+   */
+  credentials_configured?: boolean | null;
+  /**
    * The SCIM bearer token. Only present on create and rotate responses; it
    * cannot be retrieved again afterwards.
    */
@@ -51,6 +56,11 @@ export interface DirectorySyncResource extends ClerkResource {
   /** The SCIM attribute paths mapped onto Clerk user attributes. */
   attributeMapping: Record<string, string>;
   /**
+   * Whether a validated identity-provider credential is stored for this directory. `null` for
+   * push-based providers, which authenticate with a bearer token and have no credential.
+   */
+  credentialsConfigured: boolean | null;
+  /**
    * The SCIM bearer token. Only populated on the resource returned by
    * `Organization.createDirectorySync` and `rotateToken`; `null` everywhere
    * else — generate a new token if it was lost.
@@ -77,6 +87,26 @@ export interface DirectorySyncResource extends ClerkResource {
    * Gets the users the identity provider has provisioned into the directory.
    */
   getUsers: (params?: GetDirectorySyncUsersParams) => Promise<ClerkPaginatedResponse<DirectorySyncUserResource>>;
+  /**
+   * Stores the credential a pull-based directory reads the identity provider with, and activates the
+   * directory once the provider accepts it. Calling it again replaces the stored credential, which is
+   * how a rotated key is applied.
+   *
+   * The credential is validated against the identity provider before it is stored, so a rejected key or
+   * a misconfigured delegation rejects with a message describing what to fix. Surface that message: it
+   * is the only thing telling the administrator what is wrong with their setup.
+   */
+  setCredentials: (params: SetDirectorySyncCredentialsParams) => Promise<DirectorySyncResource>;
+  /**
+   * Starts a sync for a pull-based directory instead of waiting for the next scheduled one. Rejects
+   * while a sync is already running.
+   */
+  sync: () => Promise<void>;
+  /**
+   * Gets the result of the directory's most recent sync. Every field is `null` before the first sync
+   * completes.
+   */
+  getSyncStatus: () => Promise<DirectorySyncStatusResource>;
   __internal_toSnapshot: () => DirectorySyncJSONSnapshot;
 }
 
@@ -128,4 +158,31 @@ export type CreateDirectorySyncParams = {
 export type GetDirectorySyncUsersParams = {
   initialPage?: number;
   pageSize?: number;
+};
+
+/**
+ * The outcome of a directory's last sync run.
+ */
+export type DirectorySyncRunStatus = 'running' | 'succeeded' | 'failed' | 'cancelled';
+
+export interface DirectorySyncStatusJSON {
+  last_synced_at: number | null;
+  last_sync_status: DirectorySyncRunStatus | null;
+  last_sync_error: string | null;
+}
+
+export interface DirectorySyncStatusResource {
+  /** When the last sync finished, or `null` if none has completed. */
+  lastSyncedAt: Date | null;
+  /** The outcome of the last sync, or `null` if none has completed. */
+  lastSyncStatus: DirectorySyncRunStatus | null;
+  /** Why the last sync failed, when it did. */
+  lastSyncError: string | null;
+}
+
+export type SetDirectorySyncCredentialsParams = {
+  /** The service account key, as the JSON document downloaded from the identity provider. */
+  serviceAccountJson: string;
+  /** The directory administrator the service account impersonates when reading the directory. */
+  subjectEmail: string;
 };
