@@ -249,11 +249,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationProfileSecuritySsoBypassSearchInput',
   'organizationProfileSecuritySsoBypassSearchInputIcon',
   'organizationProfileSecuritySsoBypassAddButton',
-  'organizationProfileSecuritySsoBypassMemberSearchInput',
-  'organizationProfileSecuritySsoBypassMemberSearchInputIcon',
-  'organizationProfileSecuritySsoBypassMemberOptions',
-  'organizationProfileSecuritySsoBypassMemberOption',
-  'organizationProfileSecuritySsoBypassAddAllButton',
+  'organizationProfileSecuritySsoBypassEmailInput',
+  'organizationProfileSecuritySsoBypassRoleWarning',
   'organizationProfileSecuritySsoBypassBulkResult',
 
   'organizationListPreviewItems',

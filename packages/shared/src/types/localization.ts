@@ -1216,13 +1216,15 @@ export type __internal_LocalizationResource = {
         addForm: {
           title: LocalizationValue;
           subtitle: LocalizationValue;
-          memberLabel: LocalizationValue;
-          changeButton: LocalizationValue;
-          roleLabel: LocalizationValue;
-          addAllButton: LocalizationValue;
-          memberPlaceholder: LocalizationValue;
-          noResults: LocalizationValue;
+          modeLabel: LocalizationValue;
+          mode__email: LocalizationValue;
+          mode__role: LocalizationValue;
+          emailPlaceholder: LocalizationValue;
+          roleOption: LocalizationValue<'role' | 'count'>;
+          roleWarning: LocalizationValue;
           submitButton: LocalizationValue;
+          error__memberNotFound: LocalizationValue;
+          error__alreadyAdded: LocalizationValue;
         };
         table: {
           header__user: LocalizationValue;
