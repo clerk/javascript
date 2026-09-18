@@ -11,6 +11,7 @@ import { environmentConfig } from '../models/environment';
 import { instanceKeys } from './instanceKeys';
 import type { PlatformApplication, PlatformApplicationConfig } from './platformApplication';
 import { createApplicationFromConfig } from './platformApplication';
+import { getOrCreateCachedPlatformApplication } from './platformApplicationCache';
 
 export { instanceKeys };
 
@@ -20,15 +21,6 @@ const platformApplicationCachePaths = new Set<string>();
 
 export const removePlatformApplicationCache = async () => {
   await Promise.all([...platformApplicationCachePaths].map(cachePath => fs.remove(cachePath)));
-};
-
-const isPlatformApplication = (value: unknown): value is PlatformApplication => {
-  if (!value || typeof value !== 'object') {
-    return false;
-  }
-
-  const application = value as Partial<PlatformApplication>;
-  return Boolean(application.applicationId && application.instanceId && application.pk && application.sk);
 };
 
 const getPlatformApplication = async (
@@ -57,21 +49,11 @@ const getPlatformApplication = async (
     .digest('hex');
   const cachePath = resolve(constants.TMP_DIR, 'platform-applications', `${cacheKey}.json`);
   platformApplicationCachePaths.add(cachePath);
-  const cached = (await fs.pathExists(cachePath)) ? await fs.readJSON(cachePath, { throws: false }) : null;
-
-  if (isPlatformApplication(cached)) {
-    console.log(`Using Platform API application ${cached.applicationId} for ${keyName}.`);
-    return cached;
-  }
-
-  const application = await createApplicationFromConfig(
-    platformApiKey,
-    keyName,
-    definition,
-    constants.INTEGRATION_TEST_RUN_KEY,
-  );
-  await fs.outputJSON(cachePath, application, { mode: 0o600 });
-  console.log(`Created Platform API application ${application.applicationId} for ${keyName}.`);
+  const { application, created } = await getOrCreateCachedPlatformApplication({
+    cachePath,
+    create: () => createApplicationFromConfig(platformApiKey, keyName, definition, constants.INTEGRATION_TEST_RUN_KEY),
+  });
+  console.log(`${created ? 'Created' : 'Using'} Platform API application ${application.applicationId} for ${keyName}.`);
   return application;
 };
 
