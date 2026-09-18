@@ -3,11 +3,9 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  currentDevice: {
-    color: colorVars['--cl-color-positive'],
-  },
-  descriptionLine: {
-    columnGap: space['1'],
+  deviceLabel: {
+    alignItems: 'center',
+    columnGap: space['2'],
     display: 'flex',
     flexWrap: 'wrap',
   },
@@ -34,6 +32,9 @@ export const styles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
+  },
+  emptySectionCards: {
+    display: 'none',
   },
   sections: {
     gap: space['10'],

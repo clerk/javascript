@@ -59,12 +59,12 @@ const {
 
 Each `DataTableRow` has:
 
-| Field              | Type            | Description                   |
-| ------------------ | --------------- | ----------------------------- |
-| `id`               | `string`        | Stable row identifier         |
-| `original`         | `TData`         | Original data item            |
-| `getIsSelected()`  | `() => boolean` | Whether this row is selected  |
-| `toggleSelected()` | `() => void`    | Toggle selection for this row |
+| Field                      | Type                                      | Description                                                                                                          |
+| -------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `id`                       | `string`                                  | Stable row identifier                                                                                                |
+| `original`                 | `TData`                                   | Original data item                                                                                                   |
+| `getIsSelected()`          | `() => boolean`                           | Whether this row is selected                                                                                         |
+| `toggleSelected(options?)` | `(options?: { range?: boolean }) => void` | Toggle selection for this row; with `range`, apply the toggle to every row between the last toggled row and this one |
 
 ### Pagination
 

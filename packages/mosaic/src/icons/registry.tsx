@@ -44,6 +44,32 @@ const ChevronLeft = glyph(
   />,
 );
 
+const ChevronDoubleLeft = glyph(
+  <>
+    <path
+      d='M7.25 11.25L3.75 8L7.25 4.75'
+      {...strokeProps}
+    />
+    <path
+      d='M11.75 11.25L8.25 8L11.75 4.75'
+      {...strokeProps}
+    />
+  </>,
+);
+
+const ChevronDoubleRight = glyph(
+  <>
+    <path
+      d='M8.75 11.25L12.25 8L8.75 4.75'
+      {...strokeProps}
+    />
+    <path
+      d='M4.25 11.25L7.75 8L4.25 4.75'
+      {...strokeProps}
+    />
+  </>,
+);
+
 const ChevronDown = glyph(
   <path
     d='M4.75 6.75L8 10.25L11.25 6.75'
@@ -133,6 +159,13 @@ const ChevronUpDown = glyph(
 const Plus = glyph(
   <path
     d='M8 3.75V12.25M3.75 8H12.25'
+    {...strokeProps}
+  />,
+);
+
+const Minus = glyph(
+  <path
+    d='M3.75 8H12.25'
     {...strokeProps}
   />,
 );
@@ -368,6 +401,8 @@ export const iconRegistry = {
   'arrow-right-top': ArrowRightTop,
   'chevron-right': ChevronRight,
   'chevron-left': ChevronLeft,
+  'chevron-double-left': ChevronDoubleLeft,
+  'chevron-double-right': ChevronDoubleRight,
   'chevron-down': ChevronDown,
   'chevron-up': ChevronUp,
   'chevron-up-down': ChevronUpDown,
@@ -379,6 +414,7 @@ export const iconRegistry = {
   eye: Eye,
   'eye-slash': EyeSlash,
   'info-circle': InfoCircle,
+  minus: Minus,
   pen: Pen,
   plus: Plus,
   search: Search,

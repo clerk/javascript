@@ -66,15 +66,15 @@ const [open, setOpen] = useState(false);
 
 ### `Tooltip.Root`
 
-| Prop           | Type                      | Default | Description                          |
-| -------------- | ------------------------- | ------- | ------------------------------------ |
-| `open`         | `boolean`                 | —       | Controlled open state                |
-| `defaultOpen`  | `boolean`                 | `false` | Initial open state (uncontrolled)    |
-| `onOpenChange` | `(open: boolean) => void` | —       | Called when open state changes       |
-| `placement`    | `Placement`               | `"top"` | Floating UI placement                |
-| `sideOffset`   | `number`                  | `4`     | Gap between trigger and tooltip (px) |
-| `delay`        | `number`                  | `200`   | Hover open delay (ms)                |
-| `closeDelay`   | `number`                  | `0`     | Hover close delay (ms)               |
+| Prop           | Type                      | Default | Description                                              |
+| -------------- | ------------------------- | ------- | -------------------------------------------------------- |
+| `open`         | `boolean`                 | —       | Controlled open state                                    |
+| `defaultOpen`  | `boolean`                 | `false` | Initial open state (uncontrolled)                        |
+| `onOpenChange` | `(open: boolean) => void` | —       | Called when open state changes                           |
+| `placement`    | `Placement`               | `"top"` | Floating UI placement                                    |
+| `sideOffset`   | `number`                  | `4`     | Gap between trigger and tooltip (px)                     |
+| `delay`        | `number`                  | `200`   | Hover open delay (ms); ignored inside a `Tooltip.Group`  |
+| `closeDelay`   | `number`                  | `0`     | Hover close delay (ms); ignored inside a `Tooltip.Group` |
 
 ### `Tooltip.Trigger`, `Tooltip.Positioner`, `Tooltip.Popup`
 
@@ -108,7 +108,7 @@ Middleware stack: `offset` -> `flip` -> `shift` -> `arrow` -> CSS vars. Repositi
 - **No `FloatingFocusManager`** — tooltips do not receive or trap focus. This is correct per ARIA guidelines.
 - **Nested tooltips are supported** via `FloatingTree`.
 - **`Tooltip.Trigger` wraps its child** — if your trigger is already a button, the `render` prop can forward props to it instead of wrapping.
-- **For tooltip clusters** (e.g. toolbar buttons), wrap them in `Tooltip.Group` to share an open/close delay so moving between triggers switches tooltips instantly. Accepts `delay` (`number | { open?, close? }`) and `timeoutMs` props.
+- **For tooltip clusters** (e.g. toolbar buttons), wrap them in `Tooltip.Group` to share an open/close delay so moving between triggers switches tooltips instantly. Accepts `delay` (`number | { open?, close? }`) and `timeoutMs` props. The group's delay replaces each member's own `delay` / `closeDelay`.
 
 ## ARIA
 
