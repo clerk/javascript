@@ -5,12 +5,6 @@ import { useEffect } from 'react';
  *
  * An overlay's name comes from a title part — its own, or the surface's, for a `Dialog` — which
  * reports itself to its root through an effect — so `aria-labelledby` is legitimately absent on the commit that mounts the surface.
- * Two consequences, both load-bearing:
- *
- * - it has to read the DOM after mount rather than the root's state at render, since the
- *   `hasTitle` flag starts `false` and a render-time check would warn on every correct overlay;
- * - it has to be deferred by a task even then, for the same reason one commit later.
- *
  * `role` is checked rather than assumed because the part may be rendered as something else
  * through `render`, and only a dialog needs a name badly enough to warn about. Both dialog roles
  * count: `alertdialog` is the same surface asking more urgently, and an unnamed one is worse, not
