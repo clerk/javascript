@@ -24,6 +24,7 @@ import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { SearchInput } from '@/ui/elements/SearchInput';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
+import { SuccessPage } from '@/ui/elements/SuccessPage';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { UserPreview } from '@/ui/elements/UserPreview';
 import { handleError } from '@/ui/utils/errorHandler';
@@ -42,6 +43,7 @@ import {
   Text,
   useLocalizations,
 } from '../../customizables';
+import { useWizard, Wizard } from '../../common';
 import { useFetchRoles } from '../../hooks/useFetchRoles';
 import { mqu } from '../../styledSystem';
 import { RoleSelect } from './MemberListTable';
@@ -118,34 +120,26 @@ const collectUserIdsByRole = async (organization: OrganizationResource, role: Or
   }
 };
 
-const bulkResultMessages = (
-  result: BulkResult,
-): { variant: 'info' | 'warning'; title: LocalizationKey; subtitle?: LocalizationKey } => {
+const bulkResultText = (result: BulkResult): LocalizationKey[] => {
   if (result.added === 0 && result.skipped === 0) {
-    return {
-      variant: 'info',
-      title: localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.none'),
-    };
+    return [localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.none')];
   }
-  const title =
+  const added =
     result.added === 1
       ? localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.added__one')
       : localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.added', {
           count: String(result.added),
         });
   if (result.skipped === 0) {
-    return { variant: 'info', title };
+    return [added];
   }
-  return {
-    variant: 'warning',
-    title,
-    subtitle:
-      result.skipped === 1
-        ? localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.skipped__one')
-        : localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.skipped', {
-            count: String(result.skipped),
-          }),
-  };
+  const skipped =
+    result.skipped === 1
+      ? localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.skipped__one')
+      : localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.skipped', {
+          count: String(result.skipped),
+        });
+  return result.added === 0 ? [skipped] : [added, skipped];
 };
 
 const matchesSearch = (entry: SSOBypassAllowlistUserResource, term: string): boolean => {
@@ -161,7 +155,6 @@ export const SSOBypassAllowlistPage = withCardStateProvider(({ onBack }: SSOBypa
   const { data, isLoading, error, addUser, addUsers, removeUser } = __internal_useOrganizationSSOBypassAllowlist();
 
   const [search, setSearch] = useState('');
-  const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
   const term = search.trim().toLowerCase();
 
   const entries = useMemo(
@@ -222,7 +215,6 @@ export const SSOBypassAllowlistPage = withCardStateProvider(({ onBack }: SSOBypa
                   <Button
                     elementDescriptor={descriptors.organizationProfileSecuritySsoBypassAddButton}
                     localizationKey={localizationKeys('organizationProfile.securityPage.ssoBypassPage.action__add')}
-                    onClick={() => setBulkResult(null)}
                   />
                 </Action.Trigger>
               </Flex>
@@ -235,7 +227,6 @@ export const SSOBypassAllowlistPage = withCardStateProvider(({ onBack }: SSOBypa
                     allowlistedUserIds={allowlistedUserIds}
                     addUser={addUser}
                     addUsers={addUsers}
-                    onBulkResult={setBulkResult}
                   />
                 </Action.Card>
               </Flex>
@@ -243,13 +234,6 @@ export const SSOBypassAllowlistPage = withCardStateProvider(({ onBack }: SSOBypa
           </Action.Root>
 
           <Card.Alert>{card.error}</Card.Alert>
-
-          {bulkResult && (
-            <Alert
-              {...bulkResultMessages(bulkResult)}
-              elementDescriptor={descriptors.organizationProfileSecuritySsoBypassBulkResult}
-            />
-          )}
 
           {error ? (
             <Alert
@@ -336,18 +320,31 @@ type AddMemberProps = {
   allowlistedUserIds: Set<string>;
   addUser: (params: AddSSOBypassAllowlistUserParams) => Promise<unknown>;
   addUsers: (params: AddSSOBypassAllowlistUsersParams) => Promise<SSOBypassAllowlistBulkCreateResult | undefined>;
-  onBulkResult: (result: BulkResult) => void;
 };
 
 const AddMemberScreen = (props: AddMemberProps): JSX.Element => {
   const { close } = useActionContext();
+  const wizard = useWizard();
+  const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
 
   return (
-    <AddMemberForm
-      {...props}
-      onSuccess={close}
-      onReset={close}
-    />
+    <Wizard {...wizard.props}>
+      <AddMemberForm
+        {...props}
+        onSuccess={close}
+        onReset={close}
+        onBulkResult={result => {
+          setBulkResult(result);
+          wizard.nextStep();
+        }}
+      />
+      <SuccessPage
+        elementDescriptor={descriptors.organizationProfileSecuritySsoBypassBulkResult}
+        title={localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.title')}
+        text={bulkResult ? bulkResultText(bulkResult) : undefined}
+        onFinish={close}
+      />
+    </Wizard>
   );
 };
 
@@ -359,7 +356,11 @@ const AddMemberForm = withCardStateProvider(
     onBulkResult,
     onSuccess,
     onReset,
-  }: AddMemberProps & { onSuccess: () => void; onReset: () => void }): JSX.Element => {
+  }: AddMemberProps & {
+    onSuccess: () => void;
+    onReset: () => void;
+    onBulkResult: (result: BulkResult) => void;
+  }): JSX.Element => {
     const card = useCardState();
     const { t } = useLocalizations();
     const [mode, setMode] = useState<AddMode>('email');
@@ -424,7 +425,7 @@ const AddMemberForm = withCardStateProvider(
       return true;
     };
 
-    const addByRole = async () => {
+    const addByRole = async (): Promise<BulkResult | undefined> => {
       if (!organization) {
         return;
       }
@@ -432,12 +433,10 @@ const AddMemberForm = withCardStateProvider(
         userId => !allowlistedUserIds.has(userId),
       );
       if (userIds.length === 0) {
-        onBulkResult({ added: 0, skipped: 0 });
-        return true;
+        return { added: 0, skipped: 0 };
       }
       const added = await addUsers({ userIds });
-      onBulkResult({ added: added?.data.length ?? 0, skipped: added?.errors.length ?? 0 });
-      return true;
+      return { added: added?.data.length ?? 0, skipped: added?.errors.length ?? 0 };
     };
 
     const onSubmit = async (e: React.FormEvent) => {
@@ -448,9 +447,15 @@ const AddMemberForm = withCardStateProvider(
       }
 
       try {
-        const done = await card.runAsync(mode === 'email' ? addByEmail : addByRole);
-        if (done) {
-          onSuccess();
+        if (mode === 'email') {
+          if (await card.runAsync(addByEmail)) {
+            onSuccess();
+          }
+          return;
+        }
+        const result = await card.runAsync(addByRole);
+        if (result) {
+          onBulkResult(result);
         }
       } catch (err) {
         handleError(err as Error, [emailField], card.setError);

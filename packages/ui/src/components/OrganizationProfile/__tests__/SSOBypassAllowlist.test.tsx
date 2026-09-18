@@ -322,7 +322,10 @@ describe('SSO bypass allowlist', () => {
       expect(
         screen.getByText('1 member could not be added because their email address is not served by a connection.'),
       ).toBeInTheDocument();
-      expect(screen.queryByRole('heading', { name: 'Add members' })).not.toBeInTheDocument();
+      expect(screen.getAllByRole('heading', { name: 'Add members' }).length).toBeGreaterThan(0);
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Finish' }));
+      await waitFor(() => expect(screen.queryByRole('heading', { name: 'Add members' })).not.toBeInTheDocument());
     });
 
     it('removes a member from the row menu', async () => {
