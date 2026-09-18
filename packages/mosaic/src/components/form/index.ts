@@ -7,6 +7,8 @@ export type {
   FieldsConfig,
   FieldValidator,
   FormField,
+  RegisteredField,
+  TextFieldName,
   UseFormOptions,
   UseFormResult,
 } from './use-form';

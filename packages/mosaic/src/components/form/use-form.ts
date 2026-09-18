@@ -35,6 +35,20 @@ export interface FormField {
   feedback: FieldFeedback | undefined;
   isValidating: boolean;
   touched: boolean;
+  isDirty: boolean;
+}
+
+export type TextFieldName<TValues extends object> = {
+  [K in keyof TValues]: string extends TValues[K] ? K : never;
+}[keyof TValues] &
+  string;
+
+export interface RegisteredField<TValues extends object, K extends keyof TValues> {
+  name: K;
+  value: TValues[K];
+  onChange: (event: { target: { value: TValues[K] } }) => void;
+  onBlur: () => void;
+  ref: (element: HTMLElement | null) => void;
 }
 
 export interface UseFormResult<TValues extends object> {
@@ -43,10 +57,13 @@ export interface UseFormResult<TValues extends object> {
   fields: Record<keyof TValues, FormField>;
   error: string | undefined;
   isSubmitting: boolean;
+  isDirty: boolean;
   canSubmit: boolean;
+  register: <K extends TextFieldName<TValues>>(name: K) => RegisteredField<TValues, K>;
   setValue: <K extends keyof TValues>(name: K, value: TValues[K]) => void;
   touch: (name: keyof TValues) => void;
   submit: () => void;
+  handleSubmit: (event: { preventDefault: () => void }) => void;
   reset: (values?: TValues) => void;
 }
 
@@ -58,6 +75,7 @@ interface AsyncFieldState {
 
 type AsyncState<TValues extends object> = Partial<Record<keyof TValues, AsyncFieldState>>;
 type Touched<TValues extends object> = Partial<Record<keyof TValues, true>>;
+type ElementRef = (element: HTMLElement | null) => void;
 
 const always = () => true;
 
@@ -93,15 +111,22 @@ function rawFeedback<TValues extends object>(
   return runSyncValidator(fields, name, values) ?? async[name]?.feedback;
 }
 
+function firstInvalid<TValues extends object>(
+  fields: FieldsConfig<TValues> | undefined,
+  values: TValues,
+  async: AsyncState<TValues>,
+): keyof TValues | undefined {
+  return keysOf(values).find(name => rawFeedback(fields, name, values, undefined, async)?.type === 'error');
+}
+
 function isBlocked<TValues extends object>(
   fields: FieldsConfig<TValues> | undefined,
   values: TValues,
   async: AsyncState<TValues>,
 ): boolean {
-  return keysOf(values).some(name => {
-    const state = async[name];
-    return state?.pending === true || rawFeedback(fields, name, values, undefined, async)?.type === 'error';
-  });
+  return (
+    keysOf(values).some(name => async[name]?.pending === true) || firstInvalid(fields, values, async) !== undefined
+  );
 }
 
 export function useForm<TValues extends object>(options: UseFormOptions<TValues>): UseFormResult<TValues> {
@@ -109,10 +134,16 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
   const m = useMessages('form');
   const [touched, setTouched] = useState<Touched<TValues>>({});
   const [async, setAsync] = useState<AsyncState<TValues>>({});
+  const [baseline, setBaseline] = useState<TValues | undefined>(undefined);
+  const initial = baseline ?? options.initialValues;
   const asyncRef = useRef(async);
   asyncRef.current = async;
   const optionsRef = useRef(options);
   optionsRef.current = options;
+  const initialRef = useRef(initial);
+  initialRef.current = initial;
+  const elements = useRef(new Map<keyof TValues, HTMLElement>());
+  const refs = useRef(new Map<keyof TValues, ElementRef>());
 
   const canSubmitValues = useCallback((values: TValues) => {
     const { fields, canSubmit = always } = optionsRef.current;
@@ -129,18 +160,18 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
   if (machineRef.current === null) {
     machineRef.current = createFormMachine({ ...deps, values: options.initialValues, error: undefined });
   }
-  const [snapshot, send] = useMachine(machineRef.current, { context: deps });
+  const [snapshot, send, actor] = useMachine(machineRef.current, { context: deps });
   const { values } = snapshot.context;
 
   useEffect(() => {
-    const { fields, initialValues } = optionsRef.current;
+    const { fields } = optionsRef.current;
     for (const name of keysOf(values)) {
       const validateAsync = fields?.[name]?.validateAsync;
       const value = values[name];
       if (validateAsync === undefined || asyncRef.current[name]?.value === value) {
         continue;
       }
-      if (value === initialValues[name]) {
+      if (value === initialRef.current[name]) {
         setAsync(current => ({ ...current, [name]: undefined }));
         continue;
       }
@@ -158,18 +189,55 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     [send],
   );
   const touch = useCallback((name: keyof TValues) => setTouched(current => ({ ...current, [name]: true })), []);
+  const refFor = useCallback((name: keyof TValues): ElementRef => {
+    const existing = refs.current.get(name);
+    if (existing !== undefined) {
+      return existing;
+    }
+    const ref: ElementRef = element => {
+      if (element === null) {
+        elements.current.delete(name);
+      } else {
+        elements.current.set(name, element);
+      }
+    };
+    refs.current.set(name, ref);
+    return ref;
+  }, []);
   const submit = useCallback(() => {
-    setTouched(mapKeys(optionsRef.current.initialValues, () => true));
+    const { fields, initialValues } = optionsRef.current;
+    setTouched(mapKeys(initialValues, () => true));
+    const invalid = firstInvalid(fields, actor.getSnapshot().context.values, asyncRef.current);
+    if (invalid !== undefined) {
+      elements.current.get(invalid)?.focus();
+      return;
+    }
     send({ type: 'SUBMIT' });
-  }, [send]);
+  }, [actor, send]);
+  const handleSubmit = useCallback(
+    (event: { preventDefault: () => void }) => {
+      event.preventDefault();
+      submit();
+    },
+    [submit],
+  );
   const reset = useCallback(
     (nextValues?: TValues) => {
       setTouched({});
       setAsync({});
+      setBaseline(nextValues);
       send({ type: 'RESET', values: nextValues });
     },
     [send],
   );
+
+  const register = <K extends TextFieldName<TValues>>(name: K): RegisteredField<TValues, K> => ({
+    name,
+    value: values[name],
+    onChange: event => setValue(name, event.target.value),
+    onBlur: () => touch(name),
+    ref: refFor(name),
+  });
 
   const isSubmitting = snapshot.value === 'submitting';
   const fields = mapKeys(values, (name): FormField => {
@@ -179,6 +247,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
       feedback: feedback?.type === 'error' && !isTouched ? undefined : feedback,
       isValidating: async[name]?.pending === true,
       touched: isTouched,
+      isDirty: !Object.is(values[name], initial[name]),
     };
   });
 
@@ -188,10 +257,13 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     fields,
     error: snapshot.context.error?.message,
     isSubmitting,
+    isDirty: keysOf(values).some(name => fields[name].isDirty),
     canSubmit: !isSubmitting && canSubmitValues(values),
+    register,
     setValue,
     touch,
     submit,
+    handleSubmit,
     reset,
   };
 }
