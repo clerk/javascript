@@ -1,6 +1,6 @@
 export const userProfileBackupCodesMessages = {
   title: 'Save your backup codes',
-  description: 'Save these somewhere safe. Each code can be used once if you lose access to your phone.',
+  description: 'Save these somewhere safe. Each code can be used once if you lose access to your verification method.',
   codesLabel: 'Backup codes',
   download: 'Download',
   copyAndClose: 'Copy and close',
