@@ -1,22 +1,22 @@
 import { glyph } from '../glyph';
 
 export const UserCirclePlus = glyph(
-  <g transform='translate(2.5 2)'>
+  <g transform='translate(1.5 1)'>
     <path
-      d='M5.5 10H3.375C2.82271 10 2.3635 9.54755 2.47463 9.00655C2.81432 7.35305 4.01716 6 6 6'
+      d='M6.41666 11.6667H3.93749C3.29316 11.6667 2.75741 11.1388 2.88707 10.5076C3.28337 8.57856 4.68668 7 6.99999 7'
       stroke='currentColor'
       strokeWidth='1.5'
       strokeLinecap='round'
       strokeLinejoin='round'
     />
     <path
-      d='M6 6C7.1736 6 8.125 5.0486 8.125 3.875C8.125 2.70139 7.1736 1.75 6 1.75C4.82639 1.75 3.875 2.70139 3.875 3.875C3.875 5.0486 4.82639 6 6 6Z'
+      d='M7 7C8.36921 7 9.47917 5.89004 9.47917 4.52083C9.47917 3.15163 8.36921 2.04167 7 2.04167C5.63079 2.04167 4.52083 3.15163 4.52083 4.52083C4.52083 5.89004 5.63079 7 7 7Z'
       stroke='currentColor'
       strokeWidth='1.5'
       strokeLinejoin='round'
     />
     <path
-      d='M9 7V10M10.5 8.5H7.5'
+      d='M10.5 8.16667V11.6667M12.25 9.91667H8.75'
       stroke='currentColor'
       strokeWidth='1.5'
       strokeLinecap='round'
