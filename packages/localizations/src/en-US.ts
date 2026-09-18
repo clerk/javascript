@@ -1416,13 +1416,22 @@ export const enUS: LocalizationResource = {
         action__add: 'Add',
         action__search: 'Search users',
         addForm: {
+          addAllButton: 'Add all',
           changeButton: 'Change',
           memberLabel: 'Member',
           memberPlaceholder: 'Search members',
           noResults: 'No members found',
+          roleLabel: 'Or add everyone with a role',
           submitButton: 'Add',
           subtitle: 'Members on this list can sign in with an email code when SSO is unavailable.',
           title: 'Add member',
+        },
+        bulkResult: {
+          added: 'Added {{count}} members to the allow list.',
+          added__one: 'Added 1 member to the allow list.',
+          none: 'Everyone with that role is already on the allow list.',
+          skipped: '{{count}} members could not be added because their email address is not served by a connection.',
+          skipped__one: '1 member could not be added because their email address is not served by a connection.',
         },
         table: {
           emptyState: 'No members on the allow list',

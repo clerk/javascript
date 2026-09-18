@@ -1,7 +1,11 @@
 import { __internal_useOrganizationSSOBypassAllowlist, useOrganization, useUser } from '@clerk/shared/react';
 import type {
   AddSSOBypassAllowlistUserParams,
+  AddSSOBypassAllowlistUsersParams,
+  OrganizationCustomRoleKey,
   OrganizationMembershipResource,
+  OrganizationResource,
+  SSOBypassAllowlistBulkCreateResult,
   SSOBypassAllowlistUserResource,
 } from '@clerk/shared/types';
 import React, { useMemo, useRef, useState } from 'react';
@@ -23,6 +27,7 @@ import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { UserPreview } from '@/ui/elements/UserPreview';
 import { handleError } from '@/ui/utils/errorHandler';
 
+import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
   Button,
@@ -34,7 +39,9 @@ import {
   Text,
   useLocalizations,
 } from '../../customizables';
+import { useFetchRoles } from '../../hooks/useFetchRoles';
 import { mqu } from '../../styledSystem';
+import { RoleSelect } from './MemberListTable';
 import { SecurityBackControl } from './SecurityBackControl';
 
 type SSOBypassAllowlistPageProps = {
@@ -43,6 +50,61 @@ type SSOBypassAllowlistPageProps = {
 
 const MEMBER_SEARCH_DEBOUNCE_MS = 500;
 const MEMBER_SEARCH_PAGE_SIZE = 10;
+const ROLE_MEMBERS_PAGE_SIZE = 100;
+
+type BulkResult = { added: number; skipped: number };
+
+const collectUserIdsByRole = async (organization: OrganizationResource, role: OrganizationCustomRoleKey) => {
+  const userIds: string[] = [];
+  let fetched = 0;
+  for (let page = 1; ; page++) {
+    const { data, total_count } = await organization.getMemberships({
+      role: [role],
+      pageSize: ROLE_MEMBERS_PAGE_SIZE,
+      initialPage: page,
+    });
+    fetched += data.length;
+    data.forEach(membership => {
+      const userId = membership.publicUserData?.userId;
+      if (userId) {
+        userIds.push(userId);
+      }
+    });
+    if (data.length === 0 || fetched >= total_count) {
+      return userIds;
+    }
+  }
+};
+
+const bulkResultMessages = (
+  result: BulkResult,
+): { variant: 'info' | 'warning'; title: LocalizationKey; subtitle?: LocalizationKey } => {
+  if (result.added === 0 && result.skipped === 0) {
+    return {
+      variant: 'info',
+      title: localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.none'),
+    };
+  }
+  const title =
+    result.added === 1
+      ? localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.added__one')
+      : localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.added', {
+          count: String(result.added),
+        });
+  if (result.skipped === 0) {
+    return { variant: 'info', title };
+  }
+  return {
+    variant: 'warning',
+    title,
+    subtitle:
+      result.skipped === 1
+        ? localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.skipped__one')
+        : localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.skipped', {
+            count: String(result.skipped),
+          }),
+  };
+};
 
 const matchesSearch = (entry: SSOBypassAllowlistUserResource, term: string): boolean => {
   const { firstName, lastName, identifier, username } = entry.publicUserData;
@@ -54,9 +116,10 @@ export const SSOBypassAllowlistPage = withCardStateProvider(({ onBack }: SSOBypa
   const card = useCardState();
   const { t } = useLocalizations();
   const { user } = useUser();
-  const { data, isLoading, error, addUser, removeUser } = __internal_useOrganizationSSOBypassAllowlist();
+  const { data, isLoading, error, addUser, addUsers, removeUser } = __internal_useOrganizationSSOBypassAllowlist();
 
   const [search, setSearch] = useState('');
+  const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
   const term = search.trim().toLowerCase();
 
   const entries = useMemo(
@@ -117,6 +180,7 @@ export const SSOBypassAllowlistPage = withCardStateProvider(({ onBack }: SSOBypa
                   <Button
                     elementDescriptor={descriptors.organizationProfileSecuritySsoBypassAddButton}
                     localizationKey={localizationKeys('organizationProfile.securityPage.ssoBypassPage.action__add')}
+                    onClick={() => setBulkResult(null)}
                   />
                 </Action.Trigger>
               </Flex>
@@ -128,6 +192,8 @@ export const SSOBypassAllowlistPage = withCardStateProvider(({ onBack }: SSOBypa
                   <AddMemberScreen
                     allowlistedUserIds={allowlistedUserIds}
                     addUser={addUser}
+                    addUsers={addUsers}
+                    onBulkResult={setBulkResult}
                   />
                 </Action.Card>
               </Flex>
@@ -135,6 +201,13 @@ export const SSOBypassAllowlistPage = withCardStateProvider(({ onBack }: SSOBypa
           </Action.Root>
 
           <Card.Alert>{card.error}</Card.Alert>
+
+          {bulkResult && (
+            <Alert
+              {...bulkResultMessages(bulkResult)}
+              elementDescriptor={descriptors.organizationProfileSecuritySsoBypassBulkResult}
+            />
+          )}
 
           {error ? (
             <Alert
@@ -220,6 +293,8 @@ const AllowlistRow = ({ entry, isCurrentUser, onRemove }: AllowlistRowProps): JS
 type AddMemberProps = {
   allowlistedUserIds: Set<string>;
   addUser: (params: AddSSOBypassAllowlistUserParams) => Promise<unknown>;
+  addUsers: (params: AddSSOBypassAllowlistUsersParams) => Promise<SSOBypassAllowlistBulkCreateResult | undefined>;
+  onBulkResult: (result: BulkResult) => void;
 };
 
 const AddMemberScreen = (props: AddMemberProps): JSX.Element => {
@@ -238,6 +313,8 @@ const AddMemberForm = withCardStateProvider(
   ({
     allowlistedUserIds,
     addUser,
+    addUsers,
+    onBulkResult,
     onSuccess,
     onReset,
   }: AddMemberProps & { onSuccess: () => void; onReset: () => void }): JSX.Element => {
@@ -246,9 +323,11 @@ const AddMemberForm = withCardStateProvider(
     const [search, setSearch] = useState('');
     const [query, setQuery] = useState('');
     const [selected, setSelected] = useState<OrganizationMembershipResource | null>(null);
+    const [role, setRole] = useState('');
     const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const { options: roles } = useFetchRoles();
 
-    const { memberships } = useOrganization({
+    const { organization, memberships } = useOrganization({
       memberships: {
         keepPreviousData: true,
         pageSize: MEMBER_SEARCH_PAGE_SIZE,
@@ -293,6 +372,29 @@ const AddMemberForm = withCardStateProvider(
 
       try {
         await card.runAsync(() => addUser({ userId: selectedUserId }));
+        onSuccess();
+      } catch (err) {
+        handleError(err as Error, [], card.setError);
+      }
+    };
+
+    const onAddAll = async () => {
+      if (!role || !organization || card.isLoading) {
+        return;
+      }
+
+      try {
+        const result = await card.runAsync(async () => {
+          const userIds = (await collectUserIdsByRole(organization, role)).filter(
+            userId => !allowlistedUserIds.has(userId),
+          );
+          if (userIds.length === 0) {
+            return { added: 0, skipped: 0 };
+          }
+          const added = await addUsers({ userIds });
+          return { added: added?.data.length ?? 0, skipped: added?.errors.length ?? 0 };
+        });
+        onBulkResult(result);
         onSuccess();
       } catch (err) {
         handleError(err as Error, [], card.setError);
@@ -410,6 +512,40 @@ const AddMemberForm = withCardStateProvider(
               </>
             )}
           </Col>
+
+          {roles && roles.length > 0 && (
+            <Col gap={2}>
+              <Text
+                as='span'
+                variant='subtitle'
+                localizationKey={localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.roleLabel')}
+              />
+              <Flex
+                align='center'
+                gap={2}
+              >
+                <RoleSelect
+                  roles={roles}
+                  value={role}
+                  onChange={setRole}
+                  isDisabled={card.isLoading}
+                  triggerSx={t => ({ width: 'auto', color: t.colors.$colorForeground })}
+                />
+                <Button
+                  type='button'
+                  variant='bordered'
+                  colorScheme='secondary'
+                  size='sm'
+                  elementDescriptor={descriptors.organizationProfileSecuritySsoBypassAddAllButton}
+                  isDisabled={!role || card.isLoading}
+                  onClick={() => void onAddAll()}
+                  localizationKey={localizationKeys(
+                    'organizationProfile.securityPage.ssoBypassPage.addForm.addAllButton',
+                  )}
+                />
+              </Flex>
+            </Col>
+          )}
 
           <FormButtons
             isDisabled={!canSubmit}

@@ -1390,13 +1390,22 @@ export const msMY: LocalizationResource = {
         action__add: undefined,
         action__search: undefined,
         addForm: {
+          addAllButton: undefined,
           changeButton: undefined,
           memberLabel: undefined,
           memberPlaceholder: undefined,
           noResults: undefined,
+          roleLabel: undefined,
           submitButton: undefined,
           subtitle: undefined,
           title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          added__one: undefined,
+          none: undefined,
+          skipped: undefined,
+          skipped__one: undefined,
         },
         table: {
           emptyState: undefined,

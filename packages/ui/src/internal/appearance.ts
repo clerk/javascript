@@ -393,6 +393,8 @@ export type ElementsConfig = {
   organizationProfileSecuritySsoBypassMemberSearchInputIcon: WithOptions;
   organizationProfileSecuritySsoBypassMemberOptions: WithOptions;
   organizationProfileSecuritySsoBypassMemberOption: WithOptions;
+  organizationProfileSecuritySsoBypassAddAllButton: WithOptions;
+  organizationProfileSecuritySsoBypassBulkResult: WithOptions;
 
   organizationListPreviewItems: WithOptions;
   organizationListPreviewItem: WithOptions;

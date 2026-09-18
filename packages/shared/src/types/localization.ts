@@ -1218,6 +1218,8 @@ export type __internal_LocalizationResource = {
           subtitle: LocalizationValue;
           memberLabel: LocalizationValue;
           changeButton: LocalizationValue;
+          roleLabel: LocalizationValue;
+          addAllButton: LocalizationValue;
           memberPlaceholder: LocalizationValue;
           noResults: LocalizationValue;
           submitButton: LocalizationValue;
@@ -1228,6 +1230,13 @@ export type __internal_LocalizationResource = {
           emptyState: LocalizationValue;
           emptyState__search: LocalizationValue;
           menuAction__remove: LocalizationValue;
+        };
+        bulkResult: {
+          added: LocalizationValue<'count'>;
+          added__one: LocalizationValue;
+          skipped: LocalizationValue<'count'>;
+          skipped__one: LocalizationValue;
+          none: LocalizationValue;
         };
       };
       ssoSection: {

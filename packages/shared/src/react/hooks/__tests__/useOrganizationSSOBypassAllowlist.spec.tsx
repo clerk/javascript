@@ -9,6 +9,7 @@ const entry = (userId: string) => ({ id: userId, userId, publicUserData: { ident
 
 const getSpy = vi.fn(() => Promise.resolve([entry('user_1')]));
 const addSpy = vi.fn(() => Promise.resolve(entry('user_2')));
+const addManySpy = vi.fn(() => Promise.resolve({ data: [entry('user_2'), entry('user_3')], errors: [] }));
 const removeSpy = vi.fn(() => Promise.resolve({ id: 'user_1', deleted: true }));
 
 const defaultQueryClient = createMockQueryClient();
@@ -20,7 +21,7 @@ const mockClerk = createMockClerk({
     session: null,
     organization: {
       id: 'org_1',
-      ssoBypassAllowlist: { getUsers: getSpy, addUser: addSpy, removeUser: removeSpy },
+      ssoBypassAllowlist: { getUsers: getSpy, addUser: addSpy, addUsers: addManySpy, removeUser: removeSpy },
     },
     client: null,
   },
@@ -67,6 +68,17 @@ describe('useOrganizationSSOBypassAllowlist', () => {
 
     expect(addSpy).toHaveBeenCalledWith({ userId: 'user_2' });
     expect(added).toEqual(entry('user_2'));
+    await waitFor(() => expect(getSpy).toHaveBeenCalledTimes(2));
+  });
+
+  it('adds several users and refetches the list before resolving', async () => {
+    const { result } = renderAllowlist();
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    const added = await result.current.addUsers({ userIds: ['user_2', 'user_3'] });
+
+    expect(addManySpy).toHaveBeenCalledWith({ userIds: ['user_2', 'user_3'] });
+    expect(added).toEqual({ data: [entry('user_2'), entry('user_3')], errors: [] });
     await waitFor(() => expect(getSpy).toHaveBeenCalledTimes(2));
   });
 
