@@ -14,9 +14,9 @@ type BannerColor = 'neutral' | 'warning' | 'negative';
 const DEFAULT_COLOR: BannerColor = 'neutral';
 
 const ICONS: Record<BannerColor, IconName> = {
-  neutral: 'info-circle',
-  warning: 'alert-circle',
-  negative: 'alert-circle',
+  neutral: 'information-circle',
+  warning: 'exclamation-circle',
+  negative: 'exclamation-circle',
 };
 
 const BannerColorContext = React.createContext<BannerColor>(DEFAULT_COLOR);

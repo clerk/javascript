@@ -372,7 +372,7 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
           label: 'App settings',
           icon: (
             <Icon
-              name='cog'
+              name='cog-6-teeth'
               size='sm'
             />
           ),

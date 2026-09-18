@@ -77,7 +77,7 @@ export function UserProfileConnectedAccountRowView({
             >
               {m.connect}
               <Icon
-                name='arrow-right-top'
+                name='arrow-up-right'
                 placement='inline-end'
                 size='sm'
               />

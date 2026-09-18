@@ -103,7 +103,7 @@ function ProfilePictureActions({
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, icon: 'close', onClick: onRemove });
+    actions.push({ label: m.picture.remove, icon: 'x', onClick: onRemove });
   }
 
   if (actions.length > 0) {

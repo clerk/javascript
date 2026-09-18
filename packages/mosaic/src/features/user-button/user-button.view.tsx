@@ -272,7 +272,7 @@ function SwitcherRow({
       ) : active ? (
         <Trailing>
           <Icon
-            name='check'
+            name='checkmark'
             size='sm'
           />
         </Trailing>
@@ -407,7 +407,7 @@ function Header() {
         ? { label: m.manage.organization, onClick: data.onManageOrganization }
         : { label: m.manage.account, onClick: data.onManageAccount };
       if (manage.onClick) {
-        actions.push({ label: manage.label, icon: 'cog', onClick: manage.onClick });
+        actions.push({ label: manage.label, icon: 'cog-6-teeth', onClick: manage.onClick });
       }
     }
   }
@@ -744,7 +744,7 @@ function SessionMenuItem({ session, active }: { session: UserButtonSession; acti
       {active ? (
         <Menu.Media>
           <Icon
-            name='check'
+            name='checkmark'
             size='sm'
           />
         </Menu.Media>
@@ -792,7 +792,7 @@ function SwitchAccountRow() {
             <Spinner size='sm' />
           ) : (
             <Icon
-              name='switch-horizontal'
+              name='arrow-left-right'
               size='sm'
             />
           )}

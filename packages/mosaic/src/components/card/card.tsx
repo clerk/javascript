@@ -82,7 +82,7 @@ function HeaderCloseButton() {
         />
       )}
     >
-      <Icon name='close' />
+      <Icon name='x' />
     </Dialog.Close>
   );
 }

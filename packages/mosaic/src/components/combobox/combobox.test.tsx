@@ -321,7 +321,7 @@ describe('Mosaic Combobox', () => {
         <InputGroup.Root size='lg'>
           <InputGroup.Start>
             <Icon
-              name='search'
+              name='magnifying-glass'
               aria-hidden='true'
             />
           </InputGroup.Start>

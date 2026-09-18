@@ -238,7 +238,7 @@ describe('Mosaic Table', () => {
           <Table.Body>
             <Table.Empty colSpan={2}>
               <EmptyState.Root>
-                <EmptyState.Icon name='search' />
+                <EmptyState.Icon name='magnifying-glass' />
                 <EmptyState.Label>No results</EmptyState.Label>
                 <EmptyState.Description>Try a different search.</EmptyState.Description>
               </EmptyState.Root>

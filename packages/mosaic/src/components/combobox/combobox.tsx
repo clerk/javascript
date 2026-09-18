@@ -176,7 +176,7 @@ export const ComboboxOptionIndicator = React.forwardRef<HTMLSpanElement, Combobo
       >
         {children ?? (
           <Icon
-            name='check'
+            name='checkmark'
             size='sm'
           />
         )}

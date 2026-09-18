@@ -40,7 +40,7 @@ describe('Mosaic IconFrame', () => {
   it('composes with an Icon', () => {
     const { container } = render(
       <IconFrame>
-        <Icon name='check' />
+        <Icon name='checkmark' />
       </IconFrame>,
     );
     const frame = container.querySelector('.cl-icon-frame');
