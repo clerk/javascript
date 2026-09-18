@@ -1,4 +1,7 @@
-import { __internal_useOrganizationDirectorySyncUsers } from '@clerk/shared/react';
+import {
+  __internal_useOrganizationDirectorySyncStatus,
+  __internal_useOrganizationDirectorySyncUsers,
+} from '@clerk/shared/react';
 import type { DirectorySyncUserResource } from '@clerk/shared/types';
 
 import {
@@ -18,6 +21,7 @@ import { Step } from '../../ConfigureSSO/elements/Step';
 import { useWizard } from '../../ConfigureSSO/elements/Wizard';
 import { useConfigureDirectorySync } from '../ConfigureDirectorySyncContext';
 import { DIRECTORY_SYNC_PROVIDERS } from '../providerMeta';
+import { SyncNowRow } from '../SyncNowRow';
 
 const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.Element => {
   const displayName = [user.firstName, user.lastName].filter(Boolean).join(' ');
@@ -85,11 +89,15 @@ const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.
 
 export const TestSyncStep = (): JSX.Element => {
   const { goPrev } = useWizard();
-  const { providerMeta, directory, onExit } = useConfigureDirectorySync();
+  const { providerMeta, directory, onExit, syncDirectory } = useConfigureDirectorySync();
   const { t } = useLocalizations();
+  const isPull = providerMeta?.mode === 'pull';
   // The list doubles as a live feed while the admin pushes test users from the
   // IdP, so poll for as long as this step is mounted.
   const users = __internal_useOrganizationDirectorySyncUsers({ directory, poll: true });
+  // A pull directory has nothing to report until a run happens, and a run can
+  // be minutes away, so the status is only worth watching for those.
+  const syncStatus = __internal_useOrganizationDirectorySyncStatus({ directory, poll: isPull, enabled: isPull });
 
   const rows = users.data ?? [];
   const providerName = t((providerMeta ?? DIRECTORY_SYNC_PROVIDERS.custom).name);
@@ -106,8 +114,20 @@ export const TestSyncStep = (): JSX.Element => {
           <Text
             as='p'
             colorScheme='secondary'
-            localizationKey={localizationKeys('configureDirectorySync.testStep.description')}
+            localizationKey={localizationKeys(
+              isPull
+                ? 'configureDirectorySync.testStep.description__pull'
+                : 'configureDirectorySync.testStep.description',
+            )}
           />
+
+          {isPull && (
+            <SyncNowRow
+              status={syncStatus.data}
+              onSync={syncDirectory}
+              onSynced={() => void syncStatus.revalidate()}
+            />
+          )}
 
           <Text
             as='p'
@@ -154,7 +174,11 @@ export const TestSyncStep = (): JSX.Element => {
               <Text
                 as='span'
                 colorScheme='secondary'
-                localizationKey={localizationKeys('configureDirectorySync.testStep.empty__waitingForFirstUser')}
+                localizationKey={localizationKeys(
+                  isPull
+                    ? 'configureDirectorySync.testStep.empty__waitingForFirstSync'
+                    : 'configureDirectorySync.testStep.empty__waitingForFirstUser',
+                )}
               />
             </Flex>
           ) : (
