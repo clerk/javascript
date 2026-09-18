@@ -105,6 +105,8 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByRole('menuitem', { name: 'SMS verification' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Authenticator app' }));
     await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
