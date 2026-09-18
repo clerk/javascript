@@ -1,4 +1,5 @@
 import XCTest
+import ClerkKit
 @testable import ClerkExpo
 
 final class ClerkNativeBridgeTests: XCTestCase {
@@ -15,6 +16,11 @@ final class ClerkNativeBridgeTests: XCTestCase {
 
   @MainActor
   func testBiometricCredentialOperationsRejectBeforeConfiguration() async {
+    await assertEnvironmentUnavailable {
+      try await ClerkNativeBridge.shared.reverifyWithBiometrics(
+        sessionId: "sess_test", level: "multi_factor", reason: nil
+      )
+    }
     await assertEnvironmentUnavailable {
       try await ClerkNativeBridge.shared.listBiometricCredentials()
     }
@@ -36,6 +42,22 @@ final class ClerkNativeBridgeTests: XCTestCase {
         reason: nil
       )
     }
+  }
+
+  func testBiometricReverificationLevels() throws {
+    XCTAssertEqual(try ClerkNativeBridge.biometricReverificationLevel("first_factor"), .firstFactor)
+    XCTAssertEqual(try ClerkNativeBridge.biometricReverificationLevel("second_factor"), .secondFactor)
+    XCTAssertEqual(try ClerkNativeBridge.biometricReverificationLevel("multi_factor"), .multiFactor)
+    XCTAssertThrowsError(try ClerkNativeBridge.biometricReverificationLevel("unknown"))
+  }
+
+  func testBiometricReverificationPayloadWithoutEmbeddedSession() {
+    let verification = SessionVerification(id: "stepup_test", status: .complete, level: .multiFactor)
+    let payload = ClerkNativeBridge.biometricReverificationPayload(verification, sessionId: "sess_test")
+    XCTAssertEqual(payload["id"] as? String, "stepup_test")
+    XCTAssertEqual(payload["status"] as? String, "complete")
+    XCTAssertEqual(payload["level"] as? String, "multi_factor")
+    XCTAssertEqual(payload["sessionId"] as? String, "sess_test")
   }
 
   @MainActor
