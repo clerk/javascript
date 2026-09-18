@@ -22,13 +22,48 @@ if (!idToken) {
 }
 
 const payload = JSON.parse(Buffer.from(idToken.split('.')[1], 'base64url').toString());
-const keys = ['iss', 'aud', 'sub', 'repository', 'repository_id', 'repository_owner', 'repository_owner_id', 'repository_visibility', 'ref', 'ref_type', 'sha', 'event_name', 'workflow', 'workflow_ref', 'workflow_sha', 'job_workflow_ref', 'job_workflow_sha', 'runner_environment', 'actor', 'run_id', 'run_attempt', 'environment', 'enterprise'];
-console.log('[oidc-debug] id_token claims =', JSON.stringify(Object.fromEntries(keys.map(k => [k, payload[k]])), null, 2));
+const keys = [
+  'iss',
+  'aud',
+  'sub',
+  'repository',
+  'repository_id',
+  'repository_owner',
+  'repository_owner_id',
+  'repository_visibility',
+  'ref',
+  'ref_type',
+  'sha',
+  'event_name',
+  'workflow',
+  'workflow_ref',
+  'workflow_sha',
+  'job_workflow_ref',
+  'job_workflow_sha',
+  'runner_environment',
+  'actor',
+  'run_id',
+  'run_attempt',
+  'environment',
+  'enterprise',
+];
+console.log(
+  '[oidc-debug] id_token claims =',
+  JSON.stringify(Object.fromEntries(keys.map(k => [k, payload[k]])), null, 2),
+);
 
 const exRes = await fetch(`${registry}/-/npm/v1/oidc/token/exchange/package/${encodeURIComponent(pkg)}`, {
   method: 'POST',
   headers: { Accept: 'application/json', Authorization: `Bearer ${idToken}`, 'npm-command': 'publish' },
 });
-const exBody = await exRes.text();
+const exText = await exRes.text();
 console.log('[oidc-debug] exchange status =', exRes.status);
-console.log('[oidc-debug] exchange body =', exBody.replace(/"token":"[^"]+"/, '"token":"<redacted>"').slice(0, 1000));
+if (exRes.ok) {
+  let keys = [];
+  try {
+    keys = Object.keys(JSON.parse(exText));
+  } catch {}
+  console.log('[oidc-debug] exchange succeeded; response keys =', keys.join(','));
+} else {
+  console.log('[oidc-debug] exchange body =', exText.slice(0, 1000));
+}
