@@ -243,6 +243,9 @@ describe('SSO bypass allowlist', () => {
       await waitFor(() =>
         expect(fixtures.clerk.organization?.ssoBypassAllowlist.addUser).toHaveBeenCalledWith({ userId: 'user_9' }),
       );
+      expect(await screen.findByText('Added 1 member to the allow list.')).toBeInTheDocument();
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Finish' }));
       await waitFor(() => expect(screen.queryByRole('heading', { name: 'Add members' })).not.toBeInTheDocument());
     });
 

@@ -331,9 +331,8 @@ const AddMemberScreen = (props: AddMemberProps): JSX.Element => {
     <Wizard {...wizard.props}>
       <AddMemberForm
         {...props}
-        onSuccess={close}
         onReset={close}
-        onBulkResult={result => {
+        onResult={result => {
           setBulkResult(result);
           wizard.nextStep();
         }}
@@ -353,13 +352,11 @@ const AddMemberForm = withCardStateProvider(
     allowlistedUserIds,
     addUser,
     addUsers,
-    onBulkResult,
-    onSuccess,
+    onResult,
     onReset,
   }: AddMemberProps & {
-    onSuccess: () => void;
     onReset: () => void;
-    onBulkResult: (result: BulkResult) => void;
+    onResult: (result: BulkResult) => void;
   }): JSX.Element => {
     const card = useCardState();
     const { t } = useLocalizations();
@@ -403,7 +400,7 @@ const AddMemberForm = withCardStateProvider(
       setMode(next);
     };
 
-    const addByEmail = async () => {
+    const addByEmail = async (): Promise<BulkResult | undefined> => {
       if (!organization) {
         return;
       }
@@ -413,16 +410,16 @@ const AddMemberForm = withCardStateProvider(
         card.setError(
           t(localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.error__memberNotFound')),
         );
-        return false;
+        return;
       }
       if (allowlistedUserIds.has(userId)) {
         card.setError(
           t(localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.error__alreadyAdded')),
         );
-        return false;
+        return;
       }
       await addUser({ userId });
-      return true;
+      return { added: 1, skipped: 0 };
     };
 
     const addByRole = async (): Promise<BulkResult | undefined> => {
@@ -447,15 +444,9 @@ const AddMemberForm = withCardStateProvider(
       }
 
       try {
-        if (mode === 'email') {
-          if (await card.runAsync(addByEmail)) {
-            onSuccess();
-          }
-          return;
-        }
-        const result = await card.runAsync(addByRole);
+        const result = await card.runAsync(mode === 'email' ? addByEmail : addByRole);
         if (result) {
-          onBulkResult(result);
+          onResult(result);
         }
       } catch (err) {
         handleError(err as Error, [emailField], card.setError);
