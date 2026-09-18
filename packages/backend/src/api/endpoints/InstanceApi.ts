@@ -20,7 +20,7 @@ export type UpdateParams = {
   clerkJsVersion?: string | null | undefined;
   /** The development origin for the instance. */
   developmentOrigin?: string | null | undefined;
-  /** For browser-like stacks such as browser extensions, Electron, or Capacitor.js, the instance allowed origins need to be updated with the request origin value. For Chrome extensions popup, background, or service worker pages the origin is `chrome-extension://extension_uiid`. For Electron apps the default origin is `http://localhost:3000`. For Capacitor.js, the origin is `capacitor://localhost`. */
+  /** For browser-like stacks such as browser extensions, Electron, or Capacitor.js, the instance allowed origins need to be updated with the request origin value. For Chrome extensions popup, background, or service worker pages the origin is `chrome-extension://extension_uiid`. For Electron apps using `@clerk/electron`, the origin is the custom renderer scheme registered with `createClerkBridge()`, for example `my-app://renderer`. For Capacitor.js, the origin is `capacitor://localhost`. */
   allowedOrigins?: Array<string> | undefined;
   /** Whether the instance should use URL-based session syncing in development mode (i.e., without third-party cookies). */
   urlBasedSessionSyncing?: boolean | null | undefined;
