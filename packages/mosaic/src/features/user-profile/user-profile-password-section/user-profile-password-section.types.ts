@@ -1,5 +1,12 @@
 export type UserProfileEditPasswordField = 'currentPassword' | 'newPassword' | 'confirmPassword';
 
+export interface UserProfileEditPasswordValues {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+  signOutOfOtherSessions: boolean;
+}
+
 export interface UserProfileEditPasswordValue {
   currentPassword?: string;
   newPassword: string;
