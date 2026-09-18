@@ -6,6 +6,44 @@ export const styles = stylex.create({
   accountIdentifier: {
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
+  rowAvatar: {
+    '--_cl-avatar-radius': radiusVars['--cl-radius-sm'],
+    fontSize: '0.5rem',
+    height: space['5'],
+    width: space['5'],
+  },
+  workspaceAvatar: {
+    display: 'inline-grid',
+    gridTemplateColumns: `auto ${space['0.5']}`,
+    gridTemplateRows: `auto ${space['0.5']}`,
+  },
+  workspaceAvatarLead: {
+    gridColumnStart: '1',
+    gridRowStart: '1',
+  },
+  workspaceAvatarLeadMd: {
+    height: space['7.5'],
+    width: space['7.5'],
+  },
+  nestedAvatar: {
+    borderRadius: '2px',
+    alignSelf: 'end',
+    gridColumnEnd: '-1',
+    gridColumnStart: '1',
+    gridRowEnd: '-1',
+    gridRowStart: '1',
+    justifySelf: 'end',
+  },
+  nestedAvatarSm: {
+    fontSize: '0.3125rem',
+    height: space['2.5'],
+    width: space['2.5'],
+  },
+  nestedAvatarMd: {
+    fontSize: '0.375rem',
+    height: space['3.5'],
+    width: space['3.5'],
+  },
   trigger: {
     padding: 0,
     borderRadius: radiusVars['--cl-radius-md'],

@@ -48,7 +48,7 @@ The ~10 packages people touch most. Full 25-package table, the dependency pyrami
 | `@clerk/backend`       | Server-side: JWT verification, the Backend API REST client, webhooks. Used by every framework adapter.                                                      |
 | `@clerk/clerk-js`      | ⚠️ The browser runtime loaded via script tag. **Backwards-compat sensitive** (see rules).                                                                   |
 | `@clerk/ui`            | ⚠️ The React components powering the hosted sign-in / sign-up UI. **Backwards-compat sensitive**.                                                           |
-| `@clerk/mosaic`        | Experimental next-generation components (`UserButton` today). Independently releasable; reads Clerk context from the host SDK.                             |
+| `@clerk/mosaic`        | Experimental next-generation components (`UserButton` today). Independently releasable; reads Clerk context from the host SDK.                              |
 | `@clerk/react`         | Shared React hooks/context (`useAuth`, `useUser`, ...) consumed by the React-based adapters.                                                                |
 | `@clerk/nextjs`        | Next.js SDK: middleware, route handlers, server components.                                                                                                 |
 | `@clerk/express`       | Express middleware and server helpers.                                                                                                                      |

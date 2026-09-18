@@ -19,6 +19,8 @@ export interface UserButtonMembership {
   imageUrl?: string;
   membersCount?: number;
   planLabel?: string;
+  /** The role the active account holds in the organization, named for display. */
+  roleLabel?: string;
 }
 
 export interface UserButtonSuggestion {
@@ -115,6 +117,12 @@ export type UserButtonMode = 'combined' | 'organization' | 'user';
  */
 export type UserButtonModePriority = 'organization' | 'user';
 
+/**
+ * How the header carries its actions: `inline` trails the workspace with them, the gear as an icon;
+ * `stacked` runs them under it as full-width labelled buttons.
+ */
+export type UserButtonHeaderLayout = 'inline' | 'stacked';
+
 /** Which switchers the surface carries, and which one it leads with. */
 export interface UserButtonModeProps {
   /**
@@ -160,9 +168,10 @@ export interface UserButtonBusyState {
  *
  * `switchAccount` and `addAccount` share a slot: the foot carries the flyout of signed-in accounts
  * where there is more than one, and the row it would have opened onto where there is not. Name both
- * to place that slot whichever way it resolves.
+ * to place that slot whichever way it resolves. So do `signOutAll` and `signOut`: the foot signs out
+ * of every account where there is more than one, and of the one account where there is not.
  */
-export type UserButtonMenuItemId = 'switchAccount' | 'addAccount' | 'signOutAll';
+export type UserButtonMenuItemId = 'switchAccount' | 'addAccount' | 'signOutAll' | 'signOut';
 
 interface UserButtonMenuItemBase {
   /** Identifies the row, for ordering. */

@@ -84,9 +84,9 @@ export const item = stylex.create({
   base: {
     borderRadius: '0.375rem',
     borderStyle: 'none',
-    gap: space['1'],
+    gap: space['0.5'],
     outline: 'none',
-    paddingInline: space['1'],
+    paddingInline: space['1.5'],
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
@@ -139,7 +139,7 @@ export const media = stylex.create({
     justifyContent: 'center',
   },
   xs: { width: space['4'] },
-  sm: { width: space['6'] },
+  sm: { width: space['5'] },
 });
 
 // The item lays its children out in one flat row, so the label is what has to take the space

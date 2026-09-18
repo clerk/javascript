@@ -77,6 +77,7 @@ const initialAccounts: Account[] = [
         name: 'Clerk app',
         membersCount: 24,
         planLabel: 'Pro plan',
+        roleLabel: 'Admin',
         imageUrl: clerkLogo,
       },
       clerkCloud,
@@ -278,6 +279,19 @@ export function AvatarOnly(_args: Record<string, unknown>) {
   );
 }
 
+export function UserPriorityAvatarOnly(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='combined'
+      modePriority='user'
+      renderTriggerLabel={false}
+    />
+  );
+}
+
 export function UserAvatarOnly(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 
@@ -338,11 +352,27 @@ export function NoOrganizationSelected(_args: Record<string, unknown>) {
   );
 }
 
+export function UserSingleSession(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  // One account signed in, so nothing to switch to or sign out of together. The header keeps its
+  // gear alone and the foot signs the account out beside adding another.
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='user'
+      renderTriggerLabel={false}
+      additionalSessions={[]}
+      onSignOutAll={undefined}
+    />
+  );
+}
+
 export function SingleSession(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 
   // What an instance in single-session mode hands the view: one account, and neither of the two
-  // actions that only make sense with a second one. The account's own `⋯` still signs out of it.
+  // actions that only make sense with a second one. The foot signs out of just that account.
   return (
     <UserButtonView
       {...prototype}
