@@ -149,15 +149,23 @@ const LATENCY_MS = 800;
 function usePrototype({
   hidePersonal = false,
   startWithoutOrganization = false,
+  colinInNoOrganizations = false,
 }: {
   hidePersonal?: boolean;
   startWithoutOrganization?: boolean;
+  colinInNoOrganizations?: boolean;
 } = {}): Omit<UserButtonProps, 'mode'> {
   const [open, setOpen] = useState(false);
   const [accounts, setAccounts] = useState(() =>
-    startWithoutOrganization
-      ? initialAccounts.map(a => (a.session.sessionId === colin.sessionId ? { ...a, activeOrganizationId: null } : a))
-      : initialAccounts,
+    initialAccounts.map(a => {
+      if (a.session.sessionId !== colin.sessionId) {
+        return a;
+      }
+      if (colinInNoOrganizations) {
+        return { ...a, activeOrganizationId: null, memberships: [], suggestions: [], invitations: [] };
+      }
+      return startWithoutOrganization ? { ...a, activeOrganizationId: null } : a;
+    }),
   );
   const [activeSessionId, setActiveSessionId] = useState(colin.sessionId);
   const [pendingKey, setPendingKey] = useState<string | null>(null);
@@ -348,6 +356,18 @@ export function NoOrganizationSelected(_args: Record<string, unknown>) {
     <UserButtonView
       {...prototype}
       mode='combined'
+    />
+  );
+}
+
+export function NoOrganizations(_args: Record<string, unknown>) {
+  const prototype = usePrototype({ colinInNoOrganizations: true });
+
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='combined'
+      modePriority='user'
     />
   );
 }

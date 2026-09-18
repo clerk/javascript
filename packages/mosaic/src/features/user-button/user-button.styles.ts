@@ -1,6 +1,15 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  durationVars,
+  focusVars,
+  fontWeightVars,
+  radiusVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
+import { triggerAvatarOnlyMarker } from './user-button.markers.stylex';
 
 export const styles = stylex.create({
   accountIdentifier: {
@@ -21,12 +30,39 @@ export const styles = stylex.create({
     gridColumnStart: '1',
     gridRowStart: '1',
   },
+  // An avatar-only trigger rings its lead mark, not its box: the nested mark overhangs the lead,
+  // so the box is neither round nor square and a ring around it follows neither.
+  workspaceAvatarLeadFocus: {
+    outlineColor: {
+      default: null,
+      [stylex.when.ancestor(':focus-visible', triggerAvatarOnlyMarker)]: colorVars['--cl-color-ring'],
+    },
+    outlineOffset: {
+      default: null,
+      [stylex.when.ancestor(':focus-visible', triggerAvatarOnlyMarker)]: focusVars['--cl-focus-outline-offset'],
+    },
+    outlineStyle: {
+      default: null,
+      [stylex.when.ancestor(':focus-visible', triggerAvatarOnlyMarker)]: focusVars['--cl-focus-outline-style'],
+    },
+    outlineWidth: {
+      default: null,
+      [stylex.when.ancestor(':focus-visible', triggerAvatarOnlyMarker)]: focusVars['--cl-focus-outline-width'],
+    },
+  },
   workspaceAvatarLeadMd: {
     height: space['7.5'],
     width: space['7.5'],
   },
+  workspaceAvatarLeadNotched: (ltr: string, rtl: string) => ({
+    maskClip: 'no-clip',
+    maskImage: { default: ltr, ':is([dir="rtl"] *)': rtl },
+    maskPosition: `calc(${space['1']} * -1) calc(${space['1']} * -1)`,
+    maskRepeat: 'no-repeat',
+    maskSize: `calc(100% + ${space['2']}) calc(100% + ${space['2']})`,
+  }),
   nestedAvatar: {
-    borderRadius: '2px',
+    borderRadius: radiusVars['--cl-radius-sm'],
     alignSelf: 'end',
     gridColumnEnd: '-1',
     gridColumnStart: '1',
@@ -77,10 +113,6 @@ export const styles = stylex.create({
       },
     },
     transitionProperty: 'opacity',
-  },
-
-  triggerRound: {
-    borderRadius: radiusVars['--cl-radius-full'],
   },
 
   // Matches `Item.Label`, so the trigger names a workspace the same way its row does. Capped,

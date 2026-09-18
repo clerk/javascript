@@ -211,6 +211,22 @@ account**.
   storyModule={UserButtonStories}
 />
 
+## No organizations
+
+An instance with organizations on still has accounts that belong to none — a fresh signup, or one
+that left its last. The account leads, described by its identifier since there is no org to name.
+The header keeps only the gear (**Manage account**), inline, since there is nothing to invite to. The
+account's row still heads the workspace list — it is where **Manage account** and **Sign out** live
+behind `⋯` — but no workspaces follow it, and **Create organization** is all the list offers. The
+same props under `modePriority="organization"` render the same way: with no org to lead, the surface
+falls back to the account. Switch to Braden to compare: he is in organizations, so the same surface
+names one under his name and lists his workspaces.
+
+<Story
+  name='NoOrganizations'
+  storyModule={UserButtonStories}
+/>
+
 ## Menu items
 
 `customMenuItems` adds the app's own rows to the foot of the popup, ahead of Clerk's own. A row with
