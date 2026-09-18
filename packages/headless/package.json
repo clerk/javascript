@@ -65,6 +65,10 @@
       "types": "./dist/primitives/otp/index.d.ts",
       "import": "./dist/primitives/otp/index.js"
     },
+    "./toast": {
+      "types": "./dist/primitives/toast/index.d.ts",
+      "import": "./dist/primitives/toast/index.js"
+    },
     "./hooks": {
       "types": "./dist/hooks/index.d.ts",
       "import": "./dist/hooks/index.js"

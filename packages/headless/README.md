@@ -17,6 +17,7 @@ This package is **internal** (`private: true`) and consumed by `@clerk/mosaic`. 
 | Popover      | `@clerk/headless/popover`      | Non-modal floating content triggered by click                 |
 | Select       | `@clerk/headless/select`       | Dropdown select with typeahead and keyboard navigation        |
 | Tabs         | `@clerk/headless/tabs`         | Tab navigation with animated indicator                        |
+| Toast        | `@clerk/headless/toast`        | Stacked notifications with timers, a queue, and announcements |
 | Tooltip      | `@clerk/headless/tooltip`      | Hover/focus tooltip with configurable delay and group support |
 
 Shared utilities are available at `@clerk/headless/utils` (includes `useRender` and `mergeProps`).

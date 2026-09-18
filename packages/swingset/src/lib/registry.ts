@@ -225,6 +225,7 @@ import {
   meta as textMeta,
   Sizes as TextSizes,
 } from '../stories/text.stories';
+import { meta as toastPrimitiveMeta } from '../stories/toast.primitive.stories';
 import { meta as toastMeta } from '../stories/toast.stories';
 import {
   Default as TooltipComponentDefault,
@@ -578,6 +579,7 @@ const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
 const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
+const toastPrimitiveModule: StoryModule = { meta: toastPrimitiveMeta };
 const tooltipModule: StoryModule = { meta: tooltipMeta };
 
 const scrollAreaModule: StoryModule = {
@@ -837,6 +839,7 @@ export const registry: StoryModule[] = [
   popoverModule,
   selectModule,
   tabsModule,
+  toastPrimitiveModule,
   tooltipModule,
   // Styles — atomic styles that ship as StyleX atoms rather than components.
   scrollAreaModule,

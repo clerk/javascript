@@ -27,6 +27,7 @@ export default defineConfig({
         'primitives/file-upload/index': 'src/primitives/file-upload/index.ts',
         'primitives/flow/index': 'src/primitives/flow/index.ts',
         'primitives/otp/index': 'src/primitives/otp/index.ts',
+        'primitives/toast/index': 'src/primitives/toast/index.ts',
         'utils/index': 'src/utils/index.ts',
         'hooks/index': 'src/hooks/index.ts',
         'hooks/use-controllable-state': 'src/hooks/use-controllable-state.ts',

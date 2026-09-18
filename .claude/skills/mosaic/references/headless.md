@@ -2,7 +2,7 @@
 
 `@clerk/headless` (`packages/headless/`) is the unstyled, accessible primitive
 layer under Mosaic: Accordion, Autocomplete, Collapsible, Dialog, Drawer,
-FileUpload, Menu, OTP, Popover, Select, Tabs, Tooltip. Every part emits **zero
+FileUpload, Menu, OTP, Popover, Select, Tabs, Toast, Tooltip. Every part emits **zero
 styles** — positioning, keyboard nav, focus management, dismiss, and ARIA are
 delegated to `@floating-ui/react`; all appearance is applied externally via
 `data-*` selectors and consumer classNames.
