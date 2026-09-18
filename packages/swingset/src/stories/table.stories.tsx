@@ -1,5 +1,3 @@
-import type { OnChangeFn, SortingState } from '@clerk/headless/hooks';
-import { useDataTable } from '@clerk/headless/hooks';
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
 import { EmptyState } from '@clerk/mosaic/components/empty-state';
@@ -8,6 +6,8 @@ import { Menu } from '@clerk/mosaic/components/menu';
 import type { TableSort } from '@clerk/mosaic/components/table';
 import { Table } from '@clerk/mosaic/components/table';
 import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
+import type { OnChangeFn, SortingState } from '@clerk/mosaic/primitives/hooks';
+import { useDataTable } from '@clerk/mosaic/primitives/hooks';
 import * as React from 'react';
 
 import type { StoryMeta } from '@/lib/types';

@@ -1,13 +1,13 @@
+import * as stylex from '@stylexjs/stylex';
+import React from 'react';
+
 import type {
   SelectOptionProps as PrimitiveSelectOptionProps,
   SelectPopupProps as PrimitiveSelectPopupProps,
   SelectPortalProps,
   SelectProps as PrimitiveSelectProps,
-} from '@clerk/headless/select';
-import { Select as Primitive } from '@clerk/headless/select';
-import * as stylex from '@stylexjs/stylex';
-import React from 'react';
-
+} from '../../primitives/select';
+import { Select as Primitive } from '../../primitives/select';
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';

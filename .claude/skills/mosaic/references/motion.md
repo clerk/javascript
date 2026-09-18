@@ -309,7 +309,7 @@ delta — don't stretch it.
 
 For anything anchored to a trigger, scale about the **trigger**, not the element's
 own center, so it reads as emerging from what opened it. `cssVars` in
-`packages/headless/src/utils/css-vars.ts` emits two origins on the floating
+`packages/mosaic/src/primitives/utils/css-vars.ts` emits two origins on the floating
 element; custom properties inherit, so a popup one level down reads them directly.
 
 | var                     | meaning                                                        |
