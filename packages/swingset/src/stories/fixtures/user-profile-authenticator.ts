@@ -1,5 +1,5 @@
-import type { UserProfileAuthenticatorSetupViewProps } from '@clerk/mosaic/features/user-profile/user-profile-authenticator-setup.view';
-import { useState } from 'react';
+import type { UserProfileAuthenticatorCopyProps } from '@clerk/mosaic/features/user-profile/user-profile-authenticator-setup.view';
+import { useEffect, useState } from 'react';
 
 export const authenticatorSetup = {
   secret: 'JBSWY3DPEHPK3PXP',
@@ -7,21 +7,28 @@ export const authenticatorSetup = {
 };
 
 export function useAuthenticatorCopy() {
-  const [copyStatus, setCopyStatus] = useState<UserProfileAuthenticatorSetupViewProps['copyStatus']>();
-  const [copyErrorMessage, setCopyErrorMessage] = useState<string>();
+  const [copyState, setCopyState] = useState<UserProfileAuthenticatorCopyProps['state']>();
+
+  useEffect(() => {
+    if (copyState?.status !== 'success') {
+      return;
+    }
+    const timeout = setTimeout(() => setCopyState(undefined), 2000);
+    return () => clearTimeout(timeout);
+  }, [copyState]);
 
   return {
-    copyStatus,
-    copyErrorMessage,
+    state: copyState,
     onCopy: async (value: string) => {
-      setCopyStatus('pending');
-      setCopyErrorMessage(undefined);
+      if (copyState?.status === 'pending') {
+        return;
+      }
+      setCopyState({ status: 'pending' });
       try {
         await navigator.clipboard.writeText(value);
-        setCopyStatus('success');
+        setCopyState({ status: 'success' });
       } catch {
-        setCopyStatus(undefined);
-        setCopyErrorMessage('Could not copy. Please try again.');
+        setCopyState({ status: 'error', message: 'Could not copy. Please try again.' });
       }
     },
   };

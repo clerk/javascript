@@ -7,7 +7,8 @@ import { useUserProfileMfaFixture } from './user-profile-mfa';
 
 export function useUserProfileMfaExample() {
   const fixture = useUserProfileMfaFixture();
-  const authenticatorCopy = useAuthenticatorCopy();
+  const secretCopy = useAuthenticatorCopy();
+  const uriCopy = useAuthenticatorCopy();
   const addControl = (
     <UserProfileAddMfaDialog
       open={fixture.setup.open}
@@ -18,7 +19,7 @@ export function useUserProfileMfaExample() {
         methods={fixture.section.addableMethods ?? []}
         onSelect={type => fixture.section.onAdd?.(type)}
         sms={fixture.sms}
-        authenticator={{ ...fixture.authenticator, ...authenticatorCopy }}
+        authenticator={{ ...fixture.authenticator, secretCopy, uriCopy }}
         backupCodes={fixture.backupCodes}
         onBack={fixture.setup.onBack}
         onCancel={() => fixture.setup.onOpenChange(false)}

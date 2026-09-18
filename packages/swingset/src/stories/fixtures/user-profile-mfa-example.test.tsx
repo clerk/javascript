@@ -9,6 +9,7 @@ import type { ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { useUserProfileFixture } from './user-profile';
+import { authenticatorSetup } from './user-profile-authenticator';
 
 function ProfileExample({
   overlay = false,
@@ -61,7 +62,8 @@ describe('Profile MFA flows', () => {
 
   it('retries copying and verification, then finishes authenticator setup without closing the Profile overlay', async () => {
     const user = userEvent.setup();
-    vi.spyOn(navigator.clipboard, 'writeText')
+    const copy = vi
+      .spyOn(navigator.clipboard, 'writeText')
       .mockRejectedValueOnce(new Error('Clipboard unavailable'))
       .mockResolvedValue();
     render(<ProfileExample overlay />);
@@ -72,9 +74,18 @@ describe('Profile MFA flows', () => {
     await user.click(within(setup).getByRole('button', { name: /Authenticator app/ }));
     await user.click(within(setup).getByRole('button', { name: 'Can’t scan? View setup key' }));
     await user.click(within(setup).getByRole('button', { name: 'Copy setup key' }));
-    expect(await within(setup).findByRole('alert')).toHaveTextContent('Could not copy. Please try again.');
+    expect(await within(setup).findByText('Could not copy. Please try again.')).toBeVisible();
+    expect(within(setup).getByRole('textbox', { name: 'Setup key' })).toHaveAccessibleDescription(
+      'Could not copy. Please try again.',
+    );
+    expect(within(setup).getByRole('textbox', { name: 'Setup key' })).not.toHaveAttribute('aria-invalid', 'true');
+    expect(within(setup).getByRole('textbox', { name: 'Setup URI' })).not.toHaveAccessibleDescription();
+    expect(within(setup).queryByRole('alert')).not.toBeInTheDocument();
     await user.click(within(setup).getByRole('button', { name: 'Copy setup key' }));
-    expect(within(setup).getByRole('status', { name: 'Copy feedback' })).toHaveTextContent('Copied');
+    expect(copy).toHaveBeenLastCalledWith(authenticatorSetup.secret);
+    expect(within(setup).getByRole('textbox', { name: 'Setup key' })).not.toHaveAccessibleDescription();
+    await user.click(within(setup).getByRole('button', { name: 'Copy setup URI' }));
+    expect(copy).toHaveBeenLastCalledWith(authenticatorSetup.uri);
     const code = within(setup).getByRole('textbox', { name: 'Verification code' });
     await user.type(code, '000000');
     expect(await within(setup).findByText('That code is incorrect. Try again.')).toBeVisible();

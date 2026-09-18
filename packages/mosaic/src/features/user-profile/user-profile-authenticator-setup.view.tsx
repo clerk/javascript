@@ -2,30 +2,32 @@ import * as stylex from '@stylexjs/stylex';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState } from 'react';
 
-import { Banner } from '../../components/banner';
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
 import { Icon } from '../../components/icon';
 import { InputGroup } from '../../components/input-group';
-import { Text } from '../../components/text';
+import { VisuallyHidden } from '../../components/visually-hidden';
 import { useMessages } from '../../localization';
 import { styles } from './user-profile-authenticator-setup.styles';
+
+export interface UserProfileAuthenticatorCopyProps {
+  onCopy: (value: string) => void;
+  state?: { status: 'pending' | 'success' } | { status: 'error'; message: string };
+}
 
 export interface UserProfileAuthenticatorSetupViewProps {
   secret: string;
   uri: string;
-  onCopy?: (value: string) => void;
-  copyStatus?: 'pending' | 'success';
-  copyErrorMessage?: string;
+  secretCopy?: UserProfileAuthenticatorCopyProps;
+  uriCopy?: UserProfileAuthenticatorCopyProps;
 }
 
 export function UserProfileAuthenticatorSetupView({
   secret,
   uri,
-  onCopy,
-  copyStatus,
-  copyErrorMessage,
+  secretCopy,
+  uriCopy,
 }: UserProfileAuthenticatorSetupViewProps) {
   const m = useMessages('userProfileAuthenticatorSetup');
   const [showSetupKey, setShowSetupKey] = useState(false);
@@ -40,46 +42,44 @@ export function UserProfileAuthenticatorSetupView({
         {showSetupKey ? (
           <>
             {[
-              { label: m.setupKey, value: secret, copyLabel: m.copyKey },
-              { label: m.setupUri, value: uri, copyLabel: m.copyUri },
-            ].map(({ label, value, copyLabel }) => (
-              <Field.Root key={label}>
-                <Field.Label>{label}</Field.Label>
-                <InputGroup.Root>
-                  <InputGroup.Input
-                    value={value}
-                    readOnly
-                  />
-                  {onCopy ? (
-                    <InputGroup.End>
-                      <Button
-                        type='button'
-                        aria-label={copyLabel}
-                        disabled={copyStatus === 'pending'}
-                        focusableWhenDisabled
-                        onClick={() => onCopy(value)}
-                      >
-                        <Icon name='clipboard' />
-                      </Button>
-                    </InputGroup.End>
-                  ) : null}
-                </InputGroup.Root>
-              </Field.Root>
-            ))}
-            {copyErrorMessage ? (
-              <Banner.Root
-                color='negative'
-                role='alert'
-              >
-                <Banner.Label>{copyErrorMessage}</Banner.Label>
-              </Banner.Root>
-            ) : null}
-            <Text
-              role='status'
-              aria-label={m.copyFeedback}
-            >
-              {copyStatus === 'pending' ? m.copying : copyStatus === 'success' ? m.copied : null}
-            </Text>
+              { label: m.setupKey, value: secret, copyLabel: m.copyKey, copy: secretCopy },
+              { label: m.setupUri, value: uri, copyLabel: m.copyUri, copy: uriCopy },
+            ].map(({ label, value, copyLabel, copy }) => {
+              const feedback = copy?.state;
+              return (
+                <Field.Root key={label}>
+                  <Field.Label>{label}</Field.Label>
+                  <InputGroup.Root>
+                    <InputGroup.Input
+                      value={value}
+                      readOnly
+                    />
+                    {copy ? (
+                      <InputGroup.End>
+                        <Button
+                          type='button'
+                          aria-label={copyLabel}
+                          disabled={feedback?.status === 'pending'}
+                          focusableWhenDisabled
+                          onClick={() => copy.onCopy(value)}
+                        >
+                          <Icon name={feedback?.status === 'success' ? 'checkmark' : 'clipboard'} />
+                        </Button>
+                      </InputGroup.End>
+                    ) : null}
+                  </InputGroup.Root>
+                  <Field.Message>
+                    <Field.Error>{feedback?.status === 'error' ? feedback.message : null}</Field.Error>
+                  </Field.Message>
+                  <VisuallyHidden
+                    role='status'
+                    aria-label={copyLabel}
+                  >
+                    {feedback?.status === 'pending' ? m.copying : feedback?.status === 'success' ? m.copied : null}
+                  </VisuallyHidden>
+                </Field.Root>
+              );
+            })}
           </>
         ) : (
           <div {...stylex.props(styles.qrCode)}>

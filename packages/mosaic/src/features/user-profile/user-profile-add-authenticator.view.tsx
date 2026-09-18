@@ -32,9 +32,8 @@ export function UserProfileAddAuthenticatorView({
   setup,
   setupErrorMessage,
   onRetry,
-  onCopy,
-  copyStatus,
-  copyErrorMessage,
+  secretCopy,
+  uriCopy,
   code,
   onCodeChange,
   onSubmit,
@@ -57,9 +56,8 @@ export function UserProfileAddAuthenticatorView({
       {setup ? (
         <UserProfileAuthenticatorSetupView
           {...setup}
-          onCopy={onCopy}
-          copyStatus={copyStatus}
-          copyErrorMessage={copyErrorMessage}
+          secretCopy={secretCopy}
+          uriCopy={uriCopy}
         />
       ) : (
         <>
