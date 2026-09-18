@@ -23,7 +23,7 @@ make each layer account for a specific row.
 ## Phase 1 — Inventory the legacy behavior (the spec)
 
 Locate the legacy files (usually under `packages/ui/src/components/<Feature>/`).
-Then grep them for the primitives that carry hidden, load-bearing logic. Every
+Then grep them for the primitives that carry hidden logic. Every
 hit is a row you must consciously place or drop later:
 
 | Primitive                         | The behavior it usually hides                      |
