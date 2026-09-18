@@ -65,7 +65,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
         )}
       >
         <Icon
-          name='check'
+          name='checkmark'
           size='inherit'
         />
       </span>

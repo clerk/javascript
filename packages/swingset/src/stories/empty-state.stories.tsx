@@ -18,7 +18,7 @@ export const meta: StoryMeta = {
 export function Default() {
   return (
     <EmptyState.Root>
-      <EmptyState.Icon name='search' />
+      <EmptyState.Icon name='magnifying-glass' />
       <EmptyState.Label>No API keys</EmptyState.Label>
       <EmptyState.Description>Create a key to start making requests from your application.</EmptyState.Description>
       <EmptyState.Actions>
@@ -37,7 +37,7 @@ export function Default() {
 export function NoResults() {
   return (
     <EmptyState.Root>
-      <EmptyState.Icon name='search' />
+      <EmptyState.Icon name='magnifying-glass' />
       <EmptyState.Label>No results</EmptyState.Label>
       <EmptyState.Description>No keys match your search. Try a different name.</EmptyState.Description>
     </EmptyState.Root>

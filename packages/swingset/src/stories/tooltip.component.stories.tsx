@@ -21,7 +21,7 @@ export function Default() {
         <Tooltip.Popup>
           Tooltip
           <Icon
-            name='check'
+            name='checkmark'
             size='sm'
           />
         </Tooltip.Popup>
@@ -104,7 +104,7 @@ export function Group() {
                 aria-label='Search'
                 {...props}
               >
-                <Icon name='search' />
+                <Icon name='magnifying-glass' />
               </Button>
             )}
           />
@@ -119,7 +119,7 @@ export function Group() {
                 aria-label='Settings'
                 {...props}
               >
-                <Icon name='cog' />
+                <Icon name='cog-6-teeth' />
               </Button>
             )}
           />

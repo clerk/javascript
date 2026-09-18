@@ -286,7 +286,7 @@ export function Empty() {
       <Table.Body>
         <Table.Empty>
           <EmptyState.Root>
-            <EmptyState.Icon name='search' />
+            <EmptyState.Icon name='magnifying-glass' />
             <EmptyState.Label>No API keys</EmptyState.Label>
             <EmptyState.Description>
               Create a key to start making requests from your application.
