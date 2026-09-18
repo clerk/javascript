@@ -47,6 +47,23 @@ export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
   }
 };
 
+export const assertOAuthAudienceClaim = (aud?: unknown, audience?: string | string[]) => {
+  if (![audience].flat().some(a => !!a)) {
+    return;
+  }
+
+  const hasAudience =
+    (typeof aud === 'string' && aud.length > 0) || (isArrayString(aud) && aud.every(a => a.length > 0));
+  if (!hasAudience) {
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenVerificationFailed,
+      message: `Invalid OAuth audience claim (aud) ${JSON.stringify(aud)}. Expected a non-empty string or a non-empty array of non-empty strings.`,
+    });
+  }
+
+  assertAudienceClaim(aud, audience);
+};
+
 export const assertHeaderType = (typ?: unknown, allowedTypes?: string | string[]) => {
   if (typeof typ === 'undefined' && typeof allowedTypes === 'undefined') {
     return;
