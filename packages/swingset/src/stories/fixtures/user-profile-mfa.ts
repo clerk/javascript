@@ -30,8 +30,9 @@ export const mfaDemoOptions: FixtureOptions = {
     'pnr8i06f',
     'ycga0jge',
   ],
-  onGenerateBackupCodes: () =>
-    Promise.resolve([
+  onGenerateBackupCodes: async () => {
+    await pause();
+    return [
       'demo-new-01',
       'demo-new-02',
       'demo-new-03',
@@ -42,7 +43,8 @@ export const mfaDemoOptions: FixtureOptions = {
       'demo-new-08',
       'demo-new-09',
       'demo-new-10',
-    ]),
+    ];
+  },
   onCopy: codes => navigator.clipboard.writeText(codes.join('\n')),
   onDownload: codes => {
     const blob = new Blob(['Swingset demo backup codes\n\n', codes.join('\n')], { type: 'text/plain' });

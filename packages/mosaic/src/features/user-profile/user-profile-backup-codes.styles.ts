@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, easingVars, radiusVars, space } from '../../tokens.stylex';
 
 const pulse = stylex.keyframes({
   '50%': { opacity: 0.5 },
@@ -15,7 +15,7 @@ export const styles = stylex.create({
       default: pulse,
       '@media (prefers-reduced-motion: reduce)': 'none',
     },
-    animationTimingFunction: 'cubic-bezier(0.4, 0, 0.6, 1)',
+    animationTimingFunction: easingVars['--cl-ease-pulse'],
     backgroundColor: colorVars['--cl-color-neutral-alpha-200'],
     height: '1lh',
     width: space['16'],

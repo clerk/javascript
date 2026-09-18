@@ -113,6 +113,8 @@ describe('Profile MFA flows', () => {
     await user.click(screen.getByRole('button', { name: 'Manage Backup codes' }));
     expect(screen.getAllByRole('menuitem')).toHaveLength(1);
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
+    expect(screen.getByRole('status', { name: 'Generating backup codes' })).toBeVisible();
+    expect(screen.queryByRole('list', { name: 'Backup codes' })).not.toBeInTheDocument();
     expect(await screen.findByText('demo-new-01')).toBeVisible();
   });
 });
