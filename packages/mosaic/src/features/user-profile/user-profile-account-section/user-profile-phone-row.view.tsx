@@ -5,8 +5,7 @@ import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
-import { fill } from '../../../utils/messages';
-import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
+import { fill, useMessages } from '../../../localization';
 import type { UserProfilePhone } from './user-profile-account-section.types';
 import type { UserProfileAddPhoneControllerOptions } from './user-profile-add-phone.controller';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
@@ -35,6 +34,7 @@ export function UserProfilePhoneRowView({
   onSetPrimaryPhone,
   onRemovePhone,
 }: UserProfilePhoneRowViewProps) {
+  const m = useMessages('userProfileAccountSection');
   const addPhoneAction =
     onSendPhoneCode && onVerifyPhoneCode ? (
       <AddPhone
@@ -124,6 +124,7 @@ export function UserProfilePhoneRowView({
 }
 
 function AddPhone({ options, compact }: { options: UserProfileAddPhoneControllerOptions; compact: boolean }) {
+  const m = useMessages('userProfileAccountSection');
   const controller = useUserProfileAddPhoneController(options);
   return (
     <UserProfileAddPhoneDialog

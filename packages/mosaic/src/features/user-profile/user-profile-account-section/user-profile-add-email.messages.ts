@@ -18,4 +18,4 @@ export const userProfileAddEmailMessages = {
     resending: 'Sending a new code…',
     resendCountdown: 'Didn’t receive a code? Resend ({seconds})',
   },
-};
+} as const;

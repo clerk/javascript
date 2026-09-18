@@ -1,4 +1,5 @@
-import { render, screen, within } from '@testing-library/react';
+import { createDeferredPromise } from '@clerk/shared/utils';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -77,7 +78,7 @@ describe('UserProfileSecurityPanelView', () => {
 
   it('forwards security actions', async () => {
     const onAddPasskey = vi.fn();
-    const onManagePasskey = vi.fn();
+    const onRenamePasskey = vi.fn(() => Promise.resolve());
     const onRemovePasskey = vi.fn();
     const onAddMfaMethod = vi.fn();
     const onSignOutDevice = vi.fn();
@@ -91,7 +92,7 @@ describe('UserProfileSecurityPanelView', () => {
         { id: 'backup_1', type: 'backup-codes' },
       ],
       onAddPasskey,
-      onManagePasskey,
+      onRenamePasskey,
       onRemovePasskey,
       onAddMfaMethod,
       onSignOutDevice,
@@ -104,15 +105,26 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByRole('menuitem', { name: 'SMS verification' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Authenticator app' }));
     await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
+    const passkeyName = screen.getByRole('textbox', { name: 'Passkey name' });
+    await user.clear(passkeyName);
+    await user.type(passkeyName, 'Work laptop');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove', exact: true }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
     const otherDevices = screen.getByRole('region', { name: 'Other devices' });
     await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
     // The danger zone confirms in a modal, so it goes last: nothing else is clickable while it is open.
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
@@ -121,7 +133,7 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
 
     expect(onAddPasskey).toHaveBeenCalledOnce();
-    expect(onManagePasskey).toHaveBeenCalledWith('passkey_1');
+    expect(onRenamePasskey).toHaveBeenCalledWith('passkey_1', 'Work laptop');
     expect(onRemovePasskey).toHaveBeenCalledWith('passkey_1');
     expect(onAddMfaMethod).toHaveBeenCalledWith('authenticator');
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
@@ -147,14 +159,74 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByText('Password')).not.toBeInTheDocument();
   });
 
-  it('does not render actions for the current device', () => {
+  it('withholds sign out from the current device', async () => {
+    const user = userEvent.setup();
+    renderView({ onSignOutDevice: vi.fn() });
+
+    await user.click(screen.getByRole('button', { name: 'Manage Safari on macOS' }));
+    expect(screen.getByRole('menuitem', { name: 'View details' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Sign out' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the authentication heading on MFA when existing passkeys are hidden', () => {
     renderView({
-      onManageDevice: vi.fn(),
-      onSignOutDevice: vi.fn(),
+      hasPassword: false,
+      passkeysVisible: false,
+      onAddPasskey: vi.fn(),
+      onRenamePasskey: vi.fn(),
+      onRemovePasskey: vi.fn(),
     });
 
-    expect(screen.queryByRole('button', { name: 'Manage Safari on macOS' })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Manage Safari on iOS' })).toBeInTheDocument();
+    expect(screen.queryByText('Passkeys')).not.toBeInTheDocument();
+    expect(screen.queryByText('Passkey')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
+    expect(screen.getByText('2-step verification')).toBeVisible();
+  });
+
+  it('keeps one authentication heading when passkeys are empty and Add is unavailable', () => {
+    renderView({ hasPassword: false, passkeys: [], onAddPasskey: undefined });
+
+    const section = screen.getByRole('region', { name: 'Authentication' });
+    expect(within(section).getByText('Passkeys')).toBeVisible();
+    expect(within(section).getByText('No passkeys added')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
+    expect(screen.getByRole('region', { name: '2-step verification' })).toBeVisible();
+  });
+
+  it('keeps the empty section and final passkey confirmation mounted without Add', async () => {
+    const user = userEvent.setup();
+    const removal = createDeferredPromise();
+    const onRemovePasskey = vi.fn(async () => {
+      await removal.promise;
+    });
+    const { rerender } = renderView({ hasPassword: false, mfaMethods: undefined, onRemovePasskey });
+
+    await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileSecurityPanelView
+          passkeys={[]}
+          onRemovePasskey={onRemovePasskey}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByText('Authentication')).toBeInTheDocument();
+    expect(screen.getByRole('alertdialog', { name: 'Remove passkey' })).toBeVisible();
+
+    await act(async () => {
+      removal.resolve();
+      await removal.promise;
+    });
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
+    expect(screen.getByText('Passkeys')).toBeVisible();
+    expect(screen.getByText('No passkeys added')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
   });
 
   it('only shows backup codes with another verification method and only allows regeneration', async () => {

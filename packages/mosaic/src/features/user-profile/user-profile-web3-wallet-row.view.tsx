@@ -4,10 +4,9 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
-import { fill } from '../../utils/messages';
+import { fill, useMessages } from '../../localization';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
-import { userProfileWeb3WalletsMessages as m } from './user-profile-web3-wallets.messages';
 import { styles } from './user-profile-web3-wallets.styles';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
 
@@ -22,6 +21,7 @@ export function UserProfileWeb3WalletRowView({
   onSetPrimary?: (id: string) => void;
   onRemove?: (wallet: UserProfileWeb3Wallet) => void;
 }) {
+  const m = useMessages('userProfileWeb3Wallets');
   const iconUrl = wallet.iconUrl?.trim();
   const linkedWallet = 'address' in wallet ? wallet : undefined;
   const address = linkedWallet?.address;
@@ -85,7 +85,7 @@ export function UserProfileWeb3WalletRowView({
             >
               {m.connect}
               <Icon
-                name='arrow-right-top'
+                name='arrow-up-right'
                 placement='inline-end'
                 size='sm'
               />

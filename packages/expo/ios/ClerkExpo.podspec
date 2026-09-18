@@ -17,8 +17,8 @@ else
   }
 end
 
-clerk_ios_repo = ENV['CLERK_IOS_LOCAL_PATH'] || 'https://github.com/clerk/clerk-ios.git'
-clerk_ios_version = '1.5.4'
+clerk_ios_repo = 'https://github.com/clerk/clerk-ios.git'
+clerk_ios_version = '1.5.5'
 
 Pod::Spec.new do |s|
   s.name           = 'ClerkExpo'

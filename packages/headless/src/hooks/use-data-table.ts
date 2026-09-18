@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 import { useControllableState } from './use-controllable-state';
 
@@ -46,7 +46,7 @@ export interface DataTableRow<TData> {
   id: string;
   original: TData;
   getIsSelected: () => boolean;
-  toggleSelected: () => void;
+  toggleSelected: (options?: { range?: boolean }) => void;
 }
 
 export interface UseDataTableReturn<TData> {
@@ -136,19 +136,31 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
   // ── Rows ────────────────────────────────────────────────────────────────────
 
   const { getRowId } = opts;
-  const rows = useMemo<DataTableRow<TData>[]>(
-    () =>
-      opts.data.map((original, i) => {
-        const id = getRowId ? getRowId(original, i) : String(i);
-        return {
-          id,
-          original,
-          getIsSelected: () => !!rowSelection[id],
-          toggleSelected: () => setRowSelection(old => ({ ...old, [id]: !old[id] })),
-        };
-      }),
-    [opts.data, getRowId, rowSelection, setRowSelection],
-  );
+  const selectionAnchor = useRef<string | null>(null);
+  const rows = useMemo<DataTableRow<TData>[]>(() => {
+    const ids = opts.data.map((original, i) => (getRowId ? getRowId(original, i) : String(i)));
+    return opts.data.map((original, i) => {
+      const id = ids[i];
+      return {
+        id,
+        original,
+        getIsSelected: () => !!rowSelection[id],
+        toggleSelected: options => {
+          const anchor = selectionAnchor.current;
+          const anchorIndex = options?.range && anchor !== null ? ids.indexOf(anchor) : -1;
+          selectionAnchor.current = id;
+          setRowSelection(old => {
+            const selected = !old[id];
+            if (anchorIndex === -1) {
+              return { ...old, [id]: selected };
+            }
+            const rangeIds = ids.slice(Math.min(anchorIndex, i), Math.max(anchorIndex, i) + 1);
+            return { ...old, ...Object.fromEntries(rangeIds.map(rangeId => [rangeId, selected])) };
+          });
+        },
+      };
+    });
+  }, [opts.data, getRowId, rowSelection, setRowSelection]);
 
   // ── Pagination helpers ──────────────────────────────────────────────────────
 

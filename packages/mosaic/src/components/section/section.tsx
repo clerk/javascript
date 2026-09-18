@@ -247,7 +247,7 @@ const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(f
       children: (
         <>
           <Icon
-            name='alert-circle'
+            name='exclamation-circle'
             size='sm'
             aria-hidden='true'
             xstyle={styles.errorIcon}

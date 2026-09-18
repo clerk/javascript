@@ -3,8 +3,8 @@ import type { ReactNode } from 'react';
 import { Badge } from '../../../components/badge';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
+import { useMessages } from '../../../localization';
 import { styles } from '../user-profile-profile-panel.styles';
-import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
 
 export interface UserProfileContactRowViewProps {
   kind: 'email' | 'phone';
@@ -23,6 +23,7 @@ export function UserProfileContactRowView({
   onManage,
   addAction,
 }: UserProfileContactRowViewProps) {
+  const m = useMessages('userProfileAccountSection');
   const item = items[0];
   const onClick = item ? (onManage ? () => onManage(item.id) : undefined) : onAdd;
   const emptyDescription = m[kind].empty;

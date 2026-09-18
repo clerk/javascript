@@ -17,10 +17,12 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/avatar/avatar.tsx',
   styles: {
     _variants: {
+      bordered: { true: {}, false: {} },
       shape: { circle: {}, square: {} },
       size: { xs: {}, sm: {}, md: {}, lg: {} },
     },
     _defaultVariants: {
+      bordered: true,
       shape: 'circle',
       size: 'md',
     },

@@ -5,6 +5,7 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
+import { rtl } from '../../utils/rtl.styles';
 import { styles } from './user-profile-billing-history-section.styles';
 
 export interface UserProfileBillingHistoryItem {
@@ -128,7 +129,10 @@ export function UserProfileBillingHistorySectionView({
                 variant='ghost'
                 onClick={() => onPageChange?.(pagination.page - 1)}
               >
-                <Icon name='chevron-left' />
+                <Icon
+                  name='chevron-left'
+                  xstyle={rtl.mirror}
+                />
               </Button>
               <Button
                 aria-current='page'
@@ -151,7 +155,10 @@ export function UserProfileBillingHistorySectionView({
                 variant='ghost'
                 onClick={() => onPageChange?.(pagination.page + 1)}
               >
-                <Icon name='chevron-right' />
+                <Icon
+                  name='chevron-right'
+                  xstyle={rtl.mirror}
+                />
               </Button>
             </div>
             <label {...stylex.props(styles.pageSizeLabel)}>

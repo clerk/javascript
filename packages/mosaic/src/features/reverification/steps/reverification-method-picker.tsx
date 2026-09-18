@@ -8,6 +8,7 @@ import { Icon, IconFrame } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
+import { rtl } from '../../../utils/rtl.styles';
 
 const styles = stylex.create({
   helpText: {
@@ -81,7 +82,16 @@ export function ReverificationMethodPicker({
                   <Item.Label>{method.label}</Item.Label>
                   {method.description ? <Item.Description>{method.description}</Item.Description> : null}
                 </Item.Content>
-                <Item.Actions>{isPending ? <Spinner size='sm' /> : <Icon name='chevron-right' />}</Item.Actions>
+                <Item.Actions>
+                  {isPending ? (
+                    <Spinner size='sm' />
+                  ) : (
+                    <Icon
+                      name='chevron-right'
+                      xstyle={rtl.mirror}
+                    />
+                  )}
+                </Item.Actions>
               </Item.Root>
             );
           })}

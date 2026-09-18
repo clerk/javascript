@@ -134,7 +134,7 @@ export type FlowMetadata = {
     | 'chooseOrganization'
     | 'chooseWallet'
     | 'enterpriseConnections'
-    | 'ssoFallback'
+    | 'ssoBypass'
     | 'organizationCreationDisabled'
     | 'methodSelectionMFA'
     | 'provideEmail'

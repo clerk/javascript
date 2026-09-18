@@ -2,10 +2,9 @@ import { useMemo } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Section } from '../../components/section';
-import { fill } from '../../utils/messages';
+import { fill, useMessages } from '../../localization';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 import { UserProfileWeb3WalletRowView } from './user-profile-web3-wallet-row.view';
-import { userProfileWeb3WalletsMessages as m } from './user-profile-web3-wallets.messages';
 
 export interface UserProfileWeb3Provider {
   id: string;
@@ -40,6 +39,7 @@ export function UserProfileWeb3WalletsSectionView({
   onSetPrimary,
   onRemove,
 }: UserProfileWeb3WalletsSectionViewProps) {
+  const m = useMessages('userProfileWeb3Wallets');
   const removeWallet = useMemo(() => Confirmation.createHandle<UserProfileWeb3Wallet>(), []);
   const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
 
@@ -73,7 +73,11 @@ export function UserProfileWeb3WalletsSectionView({
         <Confirmation
           handle={removeWallet}
           title={m.removeDialog.title}
-          description={describeWalletRemoval}
+          description={wallet =>
+            fill(wallet.isVerified ? m.removeDialog.verifiedDescription : m.removeDialog.description, {
+              wallet: truncateWithEndVisible(wallet.address, 13, 4),
+            })
+          }
           actionLabel={m.removeDialog.confirm}
           cancelLabel={m.removeDialog.cancel}
           onConfirm={wallet => onRemove(wallet.id)}
@@ -81,10 +85,4 @@ export function UserProfileWeb3WalletsSectionView({
       ) : null}
     </>
   );
-}
-
-function describeWalletRemoval(wallet: UserProfileWeb3Wallet) {
-  return fill(wallet.isVerified ? m.removeDialog.verifiedDescription : m.removeDialog.description, {
-    wallet: truncateWithEndVisible(wallet.address, 13, 4),
-  });
 }

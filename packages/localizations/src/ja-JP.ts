@@ -1383,6 +1383,36 @@ export const jaJP: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          changeButton: undefined,
+          memberLabel: undefined,
+          memberPlaceholder: undefined,
+          noResults: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
       ssoSection: {
         badge__active: undefined,
         badge__inProgress: undefined,
@@ -1700,7 +1730,7 @@ export const jaJP: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'パスワードをリセットする前に、身元を確認する必要があります。',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,

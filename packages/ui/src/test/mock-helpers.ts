@@ -70,6 +70,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
           mockMethodsOf(m);
           if (m.organization) {
             mockMethodsOf(m.organization);
+            mockMethodsOf(m.organization.ssoBypassAllowlist);
           }
         });
         sessionAny.user.passkeys?.forEach((m: any) => mockMethodsOf(m));

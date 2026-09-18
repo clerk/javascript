@@ -200,8 +200,8 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
 type FieldFeedbackKind = 'error' | 'success';
 
 const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon: IconName; color: stylex.StyleXStyles }> = {
-  error: { slot: 'field-error', icon: 'alert-circle', color: styles.error },
-  success: { slot: 'field-success', icon: 'check', color: styles.success },
+  error: { slot: 'field-error', icon: 'exclamation-circle', color: styles.error },
+  success: { slot: 'field-success', icon: 'checkmark', color: styles.success },
 };
 
 interface FieldFeedbackProps extends MosaicComponentProps<'p'> {

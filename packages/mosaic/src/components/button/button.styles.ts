@@ -378,7 +378,8 @@ export const variants = stylex.create({
     paddingInlineStart: 0,
     textDecorationColor: { default: 'transparent', ':not([data-disabled]):hover': 'currentColor' },
     textDecorationLine: 'underline',
-    textUnderlineOffset: '2px',
+    textDecorationSkipInk: 'auto',
+    textUnderlinePosition: 'from-font',
     height: 'auto',
   },
   'link-neutral': {
@@ -395,7 +396,8 @@ export const variants = stylex.create({
     paddingInlineStart: 0,
     textDecorationColor: { default: 'transparent', ':not([data-disabled]):hover': 'currentColor' },
     textDecorationLine: 'underline',
-    textUnderlineOffset: '2px',
+    textDecorationSkipInk: 'auto',
+    textUnderlinePosition: 'from-font',
     height: 'auto',
   },
   'link-negative': {
@@ -412,7 +414,8 @@ export const variants = stylex.create({
     paddingInlineStart: 0,
     textDecorationColor: { default: 'transparent', ':not([data-disabled]):hover': 'currentColor' },
     textDecorationLine: 'underline',
-    textUnderlineOffset: '2px',
+    textDecorationSkipInk: 'auto',
+    textUnderlinePosition: 'from-font',
     height: 'auto',
   },
 });

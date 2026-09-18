@@ -259,7 +259,7 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
         )}
       </span>
       <Icon
-        name='check'
+        name='checkmark'
         size='sm'
         xstyle={slots.indicator.base}
         {...themeProps('select-option-indicator')}

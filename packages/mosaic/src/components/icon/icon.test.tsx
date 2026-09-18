@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import type { MosaicIconOverrides } from '../../icons/overrides';
 import { MosaicProvider } from '../../MosaicProvider';
 import { space } from '../../tokens.stylex';
+import { Banner } from '../banner';
 import { Icon } from './icon';
 
 const containerStyles = stylex.create({
@@ -19,6 +20,167 @@ const wrap = (ui: React.ReactElement, icons?: MosaicIconOverrides) =>
 const override: MosaicIconOverrides = { 'chevron-right': <span data-testid='override' /> };
 
 describe('Mosaic Icon', () => {
+  it.each([
+    ['neutral', 'information-circle'],
+    ['warning', 'exclamation-circle'],
+    ['negative', 'exclamation-circle'],
+  ] as const)('applies the canonical %s icon override in a banner', (color, name) => {
+    const { getByTestId } = wrap(<Banner.Root color={color}>Notice</Banner.Root>, {
+      [name]: <svg data-testid='canonical-icon' />,
+    });
+
+    expect(getByTestId('canonical-icon')).toHaveClass('cl-icon', 'cl-banner-icon');
+    expect(getByTestId('canonical-icon')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it.each([
+    'api',
+    'application-2',
+    'arrow-bottom-top',
+    'arrow-compress',
+    'arrow-dots',
+    'arrow-down',
+    'arrow-down-circle',
+    'arrow-down-left',
+    'arrow-left',
+    'arrow-left-right',
+    'arrow-right',
+    'arrow-up',
+    'arrow-up-circle',
+    'arrow-up-left',
+    'arrow-up-right',
+    'block',
+    'bolt',
+    'building',
+    'calendar',
+    'checkmark',
+    'checkmark-circle',
+    'checkmark-small',
+    'chevron-double-left',
+    'chevron-double-right',
+    'chevron-down',
+    'chevron-left',
+    'chevron-right',
+    'chevron-up',
+    'chevron-up-down',
+    'clipboard',
+    'clock',
+    'cloud',
+    'cog-6-teeth',
+    'columns',
+    'credit-card',
+    'devices',
+    'document',
+    'dollar',
+    'dotted-square',
+    'download',
+    'duplicate',
+    'ellipsis-horizontal',
+    'ellipsis-horizontal-circle',
+    'ellipsis-vertical',
+    'enterprise-connections',
+    'envelope',
+    'exclamation-circle',
+    'export',
+    'eye',
+    'eye-slash',
+    'face-scan',
+    'filter',
+    'fingerprint',
+    'flag',
+    'globe',
+    'grip',
+    'information-circle',
+    'key',
+    'link',
+    'lock',
+    'log-out',
+    'magnifying-glass',
+    'minus',
+    'minus-circle',
+    'numbers',
+    'passkey-added',
+    'pen',
+    'phone',
+    'plus',
+    'question-mark-circle',
+    'receipt-bill',
+    'rotate-anti-clockwise',
+    'rotate-left-right',
+    'route',
+    'shield',
+    'shield-check',
+    'shield-close',
+    'sidebar',
+    'spinner',
+    'support',
+    'trash',
+    'user-circle',
+    'user-circle-plus',
+    'users',
+    'x',
+    'x-circle',
+  ] as const)('renders the %s icon with scalable, inherited-color artwork', name => {
+    const ref = React.createRef<SVGSVGElement>();
+    const { container } = wrap(
+      <Icon
+        name={name}
+        ref={ref}
+        size='sm'
+        aria-label={name}
+      />,
+    );
+    const svg = container.querySelector('svg.cl-icon');
+
+    expect(svg).toHaveAttribute('viewBox', '0 0 16 16');
+    expect(svg).toHaveAttribute('data-size', 'sm');
+    expect(svg).toHaveAttribute('aria-label', name);
+    expect(svg).not.toHaveAttribute('width');
+    expect(svg).not.toHaveAttribute('height');
+    expect(ref.current).toBe(svg);
+    expect(svg?.querySelector('path')).not.toBeNull();
+    expect(svg?.querySelector('[fill="currentColor"], [stroke="currentColor"]')).not.toBeNull();
+    expect(svg?.querySelector('[id]')).toBeNull();
+    for (const element of container.querySelectorAll('[fill], [stroke]')) {
+      for (const attribute of ['fill', 'stroke']) {
+        const paint = element.getAttribute(attribute);
+        if (paint !== null) {
+          expect(['none', 'currentColor']).toContain(paint);
+        }
+      }
+    }
+  });
+
+  it.each(['chevron-double-left', 'chevron-double-right'] as const)(
+    'preserves the thinner Figma stroke for %s',
+    name => {
+      const { container } = wrap(<Icon name={name} />);
+
+      for (const path of container.querySelectorAll('path')) {
+        expect(path).toHaveAttribute('stroke-width', '1.33333');
+      }
+    },
+  );
+
+  it('renders the API glyph with inherited color and a forwarded ref', () => {
+    const ref = React.createRef<SVGSVGElement>();
+    const { container } = wrap(
+      <Icon
+        name='api'
+        size='lg'
+        aria-label='API'
+        ref={ref}
+      />,
+    );
+    const svg = container.querySelector('svg.cl-icon');
+
+    expect(svg).toHaveAttribute('viewBox', '0 0 16 16');
+    expect(svg).toHaveAttribute('data-size', 'lg');
+    expect(svg).toHaveAttribute('aria-label', 'API');
+    expect(svg?.querySelector('[fill="currentColor"], [stroke="currentColor"]')).not.toBeNull();
+    expect(ref.current).toBe(svg);
+  });
+
   it('renders the default glyph for a known name', () => {
     const { container } = wrap(<Icon name='chevron-right' />);
     const svg = container.querySelector('svg.cl-icon');
@@ -38,8 +200,8 @@ describe('Mosaic Icon', () => {
   );
 
   it.each([
-    ['device-phone', ['#646464', '#646464', '#343434', '#575757', '#171717', 'black']],
-    ['device-laptop', ['black', '#575757', 'black', '#444444', '#171717']],
+    ['device-phone', ['#646464', '#646464', '#343434', '#575757', 'black', 'black']],
+    ['device-laptop', ['black', '#575757', 'black', '#444444', 'black']],
   ] as const)('preserves the supplied %s palette', (name, palette) => {
     const { container } = wrap(<Icon name={name} />);
     const paths = Array.from(container.querySelectorAll('path'));

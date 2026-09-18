@@ -4,10 +4,9 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
-import { fill } from '../../utils/messages';
+import { fill, useMessages } from '../../localization';
 import type { UserProfileMenuAction } from './user-profile-action-menu';
 import { UserProfileActionMenu } from './user-profile-action-menu';
-import { userProfileConnectedAccountsMessages as m } from './user-profile-connected-accounts.messages';
 import { styles } from './user-profile-connected-accounts.styles';
 import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
 
@@ -22,6 +21,7 @@ export function UserProfileConnectedAccountRowView({
   onReconnect?: (id: string) => void;
   onRemove?: (account: UserProfileConnectedAccount) => void;
 }) {
+  const m = useMessages('userProfileConnectedAccounts');
   const iconUrl = account.iconUrl?.trim();
   const actions: UserProfileMenuAction[] = [];
   if (account.status === 'reconnect' && onReconnect) {
@@ -77,7 +77,7 @@ export function UserProfileConnectedAccountRowView({
             >
               {m.connect}
               <Icon
-                name='arrow-right-top'
+                name='arrow-up-right'
                 placement='inline-end'
                 size='sm'
               />

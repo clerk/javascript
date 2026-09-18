@@ -8,6 +8,7 @@ import { Input } from '../../components/input';
 import { Menu } from '../../components/menu';
 import { Profile } from '../../components/profile';
 import { mergeStyleProps, themeProps } from '../../props';
+import { rtl } from '../../utils/rtl.styles';
 import { styles } from './user-profile-api-keys-panel.styles';
 
 export interface UserProfileAPIKey {
@@ -70,7 +71,7 @@ export function UserProfileApiKeysPanelView({
         <div {...stylex.props(styles.searchWrapper)}>
           <Icon
             aria-hidden
-            name='search'
+            name='magnifying-glass'
             size='sm'
             xstyle={styles.searchIcon}
           />
@@ -202,7 +203,10 @@ export function UserProfileApiKeysPanelView({
               variant='ghost'
               onClick={() => onPageChange?.(pagination.page - 1)}
             >
-              <Icon name='chevron-left' />
+              <Icon
+                name='chevron-left'
+                xstyle={rtl.mirror}
+              />
             </Button>
             <Button
               aria-current='page'
@@ -225,7 +229,10 @@ export function UserProfileApiKeysPanelView({
               variant='ghost'
               onClick={() => onPageChange?.(pagination.page + 1)}
             >
-              <Icon name='chevron-right' />
+              <Icon
+                name='chevron-right'
+                xstyle={rtl.mirror}
+              />
             </Button>
           </div>
           <label {...stylex.props(styles.pageSizeLabel)}>

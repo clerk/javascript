@@ -382,6 +382,17 @@ export type ElementsConfig = {
   organizationProfileSecuritySsoProviderIcon: WithOptions;
   organizationProfileSecuritySsoConnectionRow: WithOptions;
   organizationProfileSecuritySsoConnectionPage: WithOptions;
+  organizationProfileSecuritySsoBypassDescription: WithOptions;
+  organizationProfileSecuritySsoBypassCountLabel: WithOptions;
+  organizationProfileSecuritySsoBypassCountBadge: WithOptions;
+  organizationProfileSecuritySsoBypassPage: WithOptions;
+  organizationProfileSecuritySsoBypassSearchInput: WithOptions;
+  organizationProfileSecuritySsoBypassSearchInputIcon: WithOptions;
+  organizationProfileSecuritySsoBypassAddButton: WithOptions;
+  organizationProfileSecuritySsoBypassMemberSearchInput: WithOptions;
+  organizationProfileSecuritySsoBypassMemberSearchInputIcon: WithOptions;
+  organizationProfileSecuritySsoBypassMemberOptions: WithOptions;
+  organizationProfileSecuritySsoBypassMemberOption: WithOptions;
 
   organizationListPreviewItems: WithOptions;
   organizationListPreviewItem: WithOptions;

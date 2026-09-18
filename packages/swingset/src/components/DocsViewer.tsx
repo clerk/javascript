@@ -52,13 +52,17 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     banner: dynamic(() => import('../stories/banner.mdx')),
     button: dynamic(() => import('../stories/button.mdx')),
     card: dynamic(() => import('../stories/card.component.mdx')),
+    checkbox: dynamic(() => import('../stories/checkbox.mdx')),
     combobox: dynamic(() => import('../stories/combobox.mdx')),
+    'data-list': dynamic(() => import('../stories/data-list.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     'input-group': dynamic(() => import('../stories/input-group.mdx')),
+    pagination: dynamic(() => import('../stories/pagination.mdx')),
     'phone-input': dynamic(() => import('../stories/phone-input.mdx')),
     item: dynamic(() => import('../stories/item.mdx')),
     dialog: dynamic(() => import('../stories/dialog.component.mdx')),
     drawer: dynamic(() => import('../stories/drawer.component.mdx')),
+    'empty-state': dynamic(() => import('../stories/empty-state.mdx')),
     heading: dynamic(() => import('../stories/heading.mdx')),
     icon: dynamic(() => import('../stories/icon.mdx')),
     'icon-frame': dynamic(() => import('../stories/icon-frame.mdx')),
@@ -71,6 +75,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     table: dynamic(() => import('../stories/table.mdx')),
     toast: dynamic(() => import('../stories/toast.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
+    tooltip: dynamic(() => import('../stories/tooltip.component.mdx')),
     field: dynamic(() => import('../stories/field.component.mdx')),
     flow: dynamic(() => import('../stories/flow.component.mdx')),
     'visually-hidden': dynamic(() => import('../stories/visually-hidden.mdx')),
@@ -99,6 +104,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   hooks: {
     // Headless hooks — alphabetical.
     'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
+  },
+  localization: {
+    localization: dynamic(() => import('../stories/localization.mdx')),
   },
 };
 
