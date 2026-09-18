@@ -151,6 +151,17 @@ describe('Mosaic Icon', () => {
     }
   });
 
+  it.each(['chevron-double-left', 'chevron-double-right'] as const)(
+    'preserves the thinner Figma stroke for %s',
+    name => {
+      const { container } = wrap(<Icon name={name} />);
+
+      for (const path of container.querySelectorAll('path')) {
+        expect(path).toHaveAttribute('stroke-width', '1.33333');
+      }
+    },
+  );
+
   it('renders the API glyph with inherited color and a forwarded ref', () => {
     const ref = React.createRef<SVGSVGElement>();
     const { container } = wrap(
