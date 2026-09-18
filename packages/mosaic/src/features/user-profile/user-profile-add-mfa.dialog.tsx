@@ -1,27 +1,34 @@
-import { type Ref, useState } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import { type ReactNode, type Ref, useRef } from 'react';
 
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
 import { Dialog } from '../../components/dialog';
 import { Icon } from '../../components/icon';
 import { useMessages } from '../../localization';
-import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
-import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.view';
 
-interface UserProfileAddMfaDialogProps {
-  methods: readonly UserProfileMfaAddableMethod[];
-  onSelect: (type: UserProfileMfaAddableMethod) => void;
+export interface UserProfileAddMfaDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: ReactNode;
   disabled?: boolean;
   triggerRef?: Ref<HTMLButtonElement>;
 }
 
-export function UserProfileAddMfaDialog({ methods, onSelect, disabled, triggerRef }: UserProfileAddMfaDialogProps) {
+export function UserProfileAddMfaDialog({
+  open,
+  onOpenChange,
+  children,
+  disabled,
+  triggerRef: triggerRefProp,
+}: UserProfileAddMfaDialogProps) {
   const m = useMessages('userProfileMfa');
-  const [open, setOpen] = useState(false);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useMergeRefs([triggerRefProp, addButtonRef]);
   return (
     <Dialog.Root
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={onOpenChange}
     >
       <Dialog.Trigger
         ref={triggerRef}
@@ -42,18 +49,15 @@ export function UserProfileAddMfaDialog({ methods, onSelect, disabled, triggerRe
         />
         {m.add}
       </Dialog.Trigger>
-      <Dialog.Popup variant='card'>
+      <Dialog.Popup
+        variant='card'
+        finalFocus={addButtonRef}
+      >
         <Card.Root
           elevation='overlay'
           renderBranding={false}
         >
-          <UserProfileAddMfaView
-            methods={methods}
-            onSelect={type => {
-              onSelect(type);
-              setOpen(false);
-            }}
-          />
+          {children}
         </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>

@@ -305,11 +305,8 @@ import {
   RequiresAction as UserProfileEnterpriseAccountsSectionRequiresAction,
 } from '../stories/user-profile-enterprise-accounts-section.stories';
 import {
-  Authenticator as UserProfileMfaSectionAuthenticator,
-  BackupCodes as UserProfileMfaSectionBackupCodes,
   Default as UserProfileMfaSectionDefault,
   meta as userProfileMfaSectionMeta,
-  Sms as UserProfileMfaSectionSms,
 } from '../stories/user-profile-mfa-section.stories';
 import {
   CreationUnavailable as UserProfilePasskeysSectionCreationUnavailable,
@@ -678,9 +675,6 @@ const userProfilePasskeysSectionModule: StoryModule = {
 const userProfileMfaSectionModule: StoryModule = {
   meta: userProfileMfaSectionMeta,
   Default: UserProfileMfaSectionDefault,
-  Authenticator: UserProfileMfaSectionAuthenticator,
-  BackupCodes: UserProfileMfaSectionBackupCodes,
-  Sms: UserProfileMfaSectionSms,
 };
 const userProfileActiveDevicesSectionModule: StoryModule = {
   meta: userProfileActiveDevicesSectionMeta,

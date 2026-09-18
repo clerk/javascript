@@ -5,11 +5,18 @@ import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profil
 import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { useUserProfileFixture } from './user-profile';
 
-function ProfileExample({ overlay = false }: { overlay?: boolean }) {
+function ProfileExample({
+  overlay = false,
+  localization,
+}: {
+  overlay?: boolean;
+  localization?: ComponentProps<typeof MosaicProvider>['localization'];
+}) {
   const { pages } = useUserProfileFixture();
   const profile = (
     <UserProfileView
@@ -19,7 +26,7 @@ function ProfileExample({ overlay = false }: { overlay?: boolean }) {
     />
   );
   return (
-    <MosaicProvider>
+    <MosaicProvider localization={localization}>
       {overlay ? (
         <Dialog.Root defaultOpen>
           <Dialog.Popup variant='profile'>{profile}</Dialog.Popup>
@@ -32,6 +39,20 @@ function ProfileExample({ overlay = false }: { overlay?: boolean }) {
 }
 
 describe('Profile MFA flows', () => {
+  it('uses the localized Add action and returns to method selection after cancelling setup', async () => {
+    const user = userEvent.setup();
+    render(<ProfileExample localization={{ messages: { userProfileMfa: { addLabel: 'Add a second factor' } } }} />);
+    const add = screen.getByRole('button', { name: 'Add a second factor' });
+    await user.click(add);
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(add).toHaveFocus();
+    await user.click(add);
+    expect(screen.getByRole('dialog', { name: 'Add 2-step verification' })).toBeVisible();
+    expect(screen.getByRole('button', { name: /Authenticator app/ })).toBeVisible();
+  });
+
   it('retries copying and verification, then finishes authenticator setup without closing the Profile overlay', async () => {
     const user = userEvent.setup();
     vi.spyOn(navigator.clipboard, 'writeText')

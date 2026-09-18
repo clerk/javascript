@@ -4,6 +4,7 @@ import { Confirmation } from '../../blocks/confirmation';
 import { Text } from '../../components/text';
 import { fill, type MosaicMessages, useMessages } from '../../localization';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
+import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
 import { UserProfileMfaRowView } from './user-profile-mfa-row.view';
 import { UserProfileSecurityList } from './user-profile-security-list';
 
@@ -44,6 +45,7 @@ export function UserProfileMfaSectionView({
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [isSettingDefault, setIsSettingDefault] = useState(false);
   const [defaultError, setDefaultError] = useState<string>();
   const settingDefault = useRef(false);
@@ -80,9 +82,17 @@ export function UserProfileMfaSectionView({
           (onAdd && addableMethods?.length ? (
             <UserProfileAddMfaDialog
               triggerRef={addButtonRef}
-              methods={addableMethods}
-              onSelect={onAdd}
-            />
+              open={pickerOpen}
+              onOpenChange={setPickerOpen}
+            >
+              <UserProfileAddMfaView
+                methods={addableMethods}
+                onSelect={type => {
+                  onAdd(type);
+                  setPickerOpen(false);
+                }}
+              />
+            </UserProfileAddMfaDialog>
           ) : null)
         }
         addLabel={m.addLabel}
