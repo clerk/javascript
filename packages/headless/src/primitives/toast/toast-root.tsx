@@ -64,7 +64,17 @@ function ToastAnnouncer(props: { toast: ToastObject }) {
 
 export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(function ToastRoot(props, ref) {
   const { render, toast, children, ...otherProps } = props;
-  const { toasts, close, remove, expanded, frontmost, setHeight, registerRoot } = useToastContext();
+  const {
+    toasts,
+    close,
+    remove,
+    timeout: defaultTimeout,
+    paused,
+    expanded,
+    frontmost,
+    setHeight,
+    registerRoot,
+  } = useToastContext();
 
   const rootRef = useRef<HTMLDivElement | null>(null);
   const rootId = useId();
@@ -79,6 +89,26 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
       remove(toast.id);
     }
   }, [mounted, remove, toast.id]);
+
+  const timeout = toast.timeout ?? defaultTimeout;
+  const timerStopped = paused || !open || toast.limited === true || timeout <= 0;
+  const remainingRef = useRef(timeout);
+
+  useEffect(() => {
+    remainingRef.current = timeout;
+  }, [timeout]);
+
+  useEffect(() => {
+    if (timerStopped) {
+      return;
+    }
+    const start = Date.now();
+    const timeoutId = setTimeout(() => close(toast.id), remainingRef.current);
+    return () => {
+      clearTimeout(timeoutId);
+      remainingRef.current -= Date.now() - start;
+    };
+  }, [timerStopped, timeout, close, toast.id]);
 
   useLayoutEffect(() => {
     const element = rootRef.current;

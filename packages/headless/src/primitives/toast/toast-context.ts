@@ -1,18 +1,19 @@
 import { createContext, type MutableRefObject, type RefObject, useContext } from 'react';
 
-import type { ToastManager, ToastObject } from './toast-manager';
+import type { ExternalToastManager, ToastObject } from './toast-manager';
 
-export interface ToastContextValue extends ToastManager {
+export interface ToastContextValue extends ExternalToastManager {
   toasts: ToastObject[];
-  /** Drops the toast from state. Called by `Toast.Root` once its exit animations finish. */
-  remove: (id: string) => void;
-  /** True while the viewport is hovered or holds focus. Timers are paused and roots carry `data-expanded`. */
+  /** The provider's default auto-dismiss delay in ms. */
+  timeout: number;
+  /** True while auto-dismiss timers must not run. */
+  paused: boolean;
+  /** True while the viewport is hovered or holds focus. Roots carry `data-expanded`. */
   expanded: boolean;
   /** The newest toast that is not closing. Its height sizes the collapsed stack. */
   frontmost: ToastObject | undefined;
   setHovering: (hovering: boolean) => void;
   setFocused: (focused: boolean) => void;
-  setHeight: (id: string, height: number) => void;
   registerRoot: (id: string, element: HTMLElement) => () => void;
   focusToast: (id: string) => boolean;
   viewportRef: RefObject<HTMLElement | null>;

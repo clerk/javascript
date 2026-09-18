@@ -77,7 +77,7 @@ const toastManager = Toast.createToastManager();
 toastManager.add({ title: 'Signed out' });
 ```
 
-Calls made before the provider mounts are dropped.
+Toasts added before the provider mounts show once it does.
 
 ## Parts
 
