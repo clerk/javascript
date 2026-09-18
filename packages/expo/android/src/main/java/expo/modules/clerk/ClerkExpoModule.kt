@@ -18,6 +18,9 @@ import com.clerk.api.biometriccredential.BiometricCredential
 import com.clerk.api.biometriccredential.BiometricCredentialAvailability
 import com.clerk.api.biometriccredential.BiometricCredentialKeyManagerException
 import com.clerk.api.biometriccredential.BiometricCredentialPolicy
+import com.clerk.api.session.SessionVerification
+import com.clerk.api.session.startVerification
+import com.clerk.api.session.verifyWithBiometrics
 import com.clerk.api.ui.ClerkColors
 import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
@@ -102,6 +105,23 @@ internal fun biometricCredentialPolicy(policy: String): BiometricCredentialPolic
         else -> null
     }
 }
+
+internal fun biometricReverificationLevel(level: String): SessionVerification.Level? = when (level) {
+    "first_factor" -> SessionVerification.Level.FIRST_FACTOR
+    "second_factor" -> SessionVerification.Level.SECOND_FACTOR
+    "multi_factor" -> SessionVerification.Level.MULTI_FACTOR
+    else -> null
+}
+
+internal fun biometricReverificationPayload(
+    verification: SessionVerification,
+    sessionId: String
+): Map<String, Any?> = mapOf(
+    "id" to verification.id,
+    "status" to verification.status.name.lowercase(),
+    "level" to verification.level.value,
+    "sessionId" to (verification.session?.id ?: sessionId)
+)
 
 internal data class BiometricCredentialBridgeError(
     val code: String,
@@ -270,6 +290,14 @@ class ClerkExpoModule : Module() {
                 reason: String?,
                 promise: Promise ->
             signInWithBiometrics(id, identifierHint, reason, promise)
+        }
+
+        AsyncFunction("reverifyWithBiometrics") {
+                sessionId: String,
+                level: String,
+                reason: String?,
+                promise: Promise ->
+            reverifyWithBiometrics(sessionId, level, reason, promise)
         }
     }
 
@@ -752,6 +780,64 @@ class ClerkExpoModule : Module() {
                     fallbackMessage = "Unable to sign in with biometric credential",
                     exception = e
                 )
+            }
+        }
+    }
+
+    private fun reverifyWithBiometrics(
+        sessionId: String,
+        level: String,
+        reason: String?,
+        promise: Promise
+    ) {
+        if (!requireBiometricCredentialEnvironment(promise)) return
+        val requestedLevel = biometricReverificationLevel(level)
+        if (requestedLevel == null) {
+            promise.reject("invalid_reverification_level", "Invalid biometric reverification level: $level", null)
+            return
+        }
+        coroutineScope.launch {
+            try {
+                val session = Clerk.clientFlow.value?.sessions?.firstOrNull { it.id == sessionId }
+                if (session == null) {
+                    promise.reject(
+                        "biometric_reverification_session_unavailable",
+                        "The session to reverify is unavailable in the native Clerk client.",
+                        null
+                    )
+                    return@launch
+                }
+                if (!attachCurrentActivityForBiometricCredential(promise)) return@launch
+                val started = when (val result = session.startVerification(requestedLevel)) {
+                    is ClerkResult.Success -> result.value
+                    is ClerkResult.Failure -> {
+                        rejectBiometricCredentialFailure(promise, "E_BIOMETRIC_REVERIFICATION_FAILED",
+                            "Unable to start biometric reverification", result)
+                        return@launch
+                    }
+                }
+                val factor = when (started.status) {
+                    SessionVerification.Status.NEEDS_FIRST_FACTOR -> SessionVerification.Level.FIRST_FACTOR
+                    SessionVerification.Status.NEEDS_SECOND_FACTOR -> SessionVerification.Level.SECOND_FACTOR
+                    SessionVerification.Status.COMPLETE -> {
+                        promise.resolve(biometricReverificationPayload(started, sessionId))
+                        return@launch
+                    }
+                    SessionVerification.Status.UNKNOWN -> {
+                        promise.reject("E_BIOMETRIC_REVERIFICATION_FAILED",
+                            "The server returned an unsupported reverification status.", null)
+                        return@launch
+                    }
+                }
+                when (val result = session.verifyWithBiometrics(promptSubtitle = reason, level = factor)) {
+                    is ClerkResult.Success -> promise.resolve(biometricReverificationPayload(result.value, sessionId))
+                    is ClerkResult.Failure -> rejectBiometricCredentialFailure(
+                        promise, "E_BIOMETRIC_REVERIFICATION_FAILED", "Unable to reverify with biometrics", result
+                    )
+                }
+            } catch (e: Exception) {
+                rejectBiometricCredentialException(promise, "E_BIOMETRIC_REVERIFICATION_FAILED",
+                    "Unable to reverify with biometrics", e)
             }
         }
     }

@@ -56,9 +56,36 @@ Biometric credential operations preserve Clerk API and native biometric error co
 
 `useTrustedDevices()` and the trusted-device types remain available as deprecated compatibility aliases. New code should use `useBiometricCredentials()` and the biometric credential types; the previous `deviceName` enrollment option is forwarded to `name`.
 
+New enrollments default to `biometry_current_set`: biometric authentication is required, with no device-passcode fallback, and adding a biometric invalidates the app's key. Explicit alternative policies remain available for sign-in. Existing credentials retain their original protection.
+
+#### Biometric reverification
+
+Use `reverify()` to verify the active session before a sensitive action without signing the user out or creating another session:
+
+```tsx
+const { reverify } = useBiometricCredentials();
+
+const result = await reverify({
+  level: 'multi_factor',
+  reason: 'Verify your identity to update your account.',
+});
+
+if (result.status === 'complete') {
+  await updateAccount();
+}
+```
+
+`level` defaults to `first_factor`; `second_factor` and `multi_factor` are also supported. The native SDK starts verification and follows the factor requested by the server. The result includes the server's actual `level`, `status`, and synchronized JavaScript `session`. Check `status` before continuing; an incomplete result can be continued using that session's verification methods.
+
+On completion, Expo clears cached JavaScript session tokens and fetches a fresh token before resolving. The server remains responsible for enforcing the sensitive action's reverification requirement.
+
+Android requires a credential originally enrolled with `biometry_current_set` for reverification. Older or explicitly weaker credentials return `biometric_credential_policy_incompatible`; offer another verification method. They remain available for sign-in and are not automatically replaced. iOS uses the protection selected when the credential was enrolled.
+
+Reverification requires a development build containing the updated native bridge. An over-the-air JavaScript update alone cannot add it to an older native build. Biometric cancellation, invalidated-key errors, and Clerk API error codes are preserved.
+
 #### Face ID on iOS
 
-Apps that use Face ID for biometric credential enrollment or sign-in must provide `NSFaceIDUsageDescription`. You can have the Clerk config plugin add it during prebuild:
+Apps that use Face ID for biometric credential enrollment, sign-in, or reverification must provide `NSFaceIDUsageDescription`. You can have the Clerk config plugin add it during prebuild:
 
 ```json
 {

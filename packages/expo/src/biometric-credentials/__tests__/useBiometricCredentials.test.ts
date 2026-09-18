@@ -217,7 +217,7 @@ describe('useBiometricCredentials on iOS', () => {
       "Sean's iPhone",
       'sean@example.com',
       'Use Face ID to trust this device.',
-      'biometry_or_device_passcode',
+      'biometry_current_set',
     );
     expect(biometricCredential.createdAt).toEqual(new Date(nativeBiometricCredential.createdAt));
   });

@@ -8,11 +8,35 @@ import com.clerk.api.biometriccredential.BiometricCredential
 import com.clerk.api.biometriccredential.BiometricCredentialAvailability
 import com.clerk.api.biometriccredential.BiometricCredentialKeyManagerException
 import com.clerk.api.biometriccredential.BiometricCredentialPolicy
+import com.clerk.api.session.SessionVerification
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
 
 class BiometricCredentialBridgeTest {
+    @Test
+    fun `maps biometric reverification requirements`() {
+        assertEquals(SessionVerification.Level.FIRST_FACTOR, biometricReverificationLevel("first_factor"))
+        assertEquals(SessionVerification.Level.SECOND_FACTOR, biometricReverificationLevel("second_factor"))
+        assertEquals(SessionVerification.Level.MULTI_FACTOR, biometricReverificationLevel("multi_factor"))
+        assertNull(biometricReverificationLevel("unknown"))
+    }
+
+    @Test
+    fun `maps reverification results without creating a session`() {
+        val result = SessionVerification(
+            id = "stepup_test",
+            status = SessionVerification.Status.COMPLETE,
+            level = SessionVerification.Level.MULTI_FACTOR
+        )
+        assertEquals(mapOf(
+            "id" to "stepup_test",
+            "status" to "complete",
+            "level" to "multi_factor",
+            "sessionId" to "sess_test"
+        ), biometricReverificationPayload(result, "sess_test"))
+    }
+
     private fun keyManagerException(
         code: BiometricCredentialKeyManagerException.Code,
         message: String
