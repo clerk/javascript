@@ -42,6 +42,7 @@ import {
   meta as confirmationMeta,
   WithError as ConfirmationWithError,
 } from '../stories/confirmation.stories';
+import { Default as DataListDefault, meta as dataListMeta, Plain as DataListPlain } from '../stories/data-list.stories';
 import {
   Default as DestructiveDefault,
   meta as destructiveMeta,
@@ -131,6 +132,14 @@ import {
   Success as OtpComponentSuccess,
 } from '../stories/otp.component.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
+import {
+  Disabled as PaginationDisabled,
+  FirstLast as PaginationFirstLast,
+  meta as paginationMeta,
+  Primary as PaginationPrimary,
+  Siblings as PaginationSiblings,
+  SinglePage as PaginationSinglePage,
+} from '../stories/pagination.stories';
 import {
   Default as PhoneInputDefault,
   Disabled as PhoneInputDisabled,
@@ -253,7 +262,9 @@ import {
 } from '../stories/user-profile-account-section.stories';
 import {
   Default as UserProfileActiveDevicesSectionDefault,
+  Impersonation as UserProfileActiveDevicesSectionImpersonation,
   meta as userProfileActiveDevicesSectionMeta,
+  SignOutError as UserProfileActiveDevicesSectionSignOutError,
 } from '../stories/user-profile-active-devices-section.stories';
 import {
   Default as UserProfileApiKeysPanelDefault,
@@ -299,9 +310,11 @@ import {
   meta as userProfileMfaSectionMeta,
 } from '../stories/user-profile-mfa-section.stories';
 import {
+  CreationUnavailable as UserProfilePasskeysSectionCreationUnavailable,
   Default as UserProfilePasskeysSectionDefault,
   Empty as UserProfilePasskeysSectionEmpty,
   meta as userProfilePasskeysSectionMeta,
+  RecoverableErrors as UserProfilePasskeysSectionRecoverableErrors,
 } from '../stories/user-profile-passkeys-section.stories';
 import {
   Default as UserProfilePasswordSectionDefault,
@@ -427,6 +440,15 @@ const inputGroupModule: StoryModule = {
   Invalid: InputGroupInvalid,
 };
 
+const paginationModule: StoryModule = {
+  meta: paginationMeta,
+  Primary: PaginationPrimary,
+  FirstLast: PaginationFirstLast,
+  Siblings: PaginationSiblings,
+  SinglePage: PaginationSinglePage,
+  Disabled: PaginationDisabled,
+};
+
 const phoneInputModule: StoryModule = {
   meta: phoneInputMeta,
   Default: PhoneInputDefault,
@@ -447,6 +469,12 @@ const profileComponentModule: StoryModule = {
   Default: ProfileDefault,
   Customized: ProfileCustomized,
   Transitions: ProfileTransitions,
+};
+
+const dataListModule: StoryModule = {
+  meta: dataListMeta,
+  Default: DataListDefault,
+  Plain: DataListPlain,
 };
 
 const itemModule: StoryModule = {
@@ -640,8 +668,10 @@ const userProfilePasswordSectionModule: StoryModule = {
 };
 const userProfilePasskeysSectionModule: StoryModule = {
   meta: userProfilePasskeysSectionMeta,
+  CreationUnavailable: UserProfilePasskeysSectionCreationUnavailable,
   Default: UserProfilePasskeysSectionDefault,
   Empty: UserProfilePasskeysSectionEmpty,
+  RecoverableErrors: UserProfilePasskeysSectionRecoverableErrors,
 };
 const userProfileMfaSectionModule: StoryModule = {
   meta: userProfileMfaSectionMeta,
@@ -651,6 +681,8 @@ const userProfileMfaSectionModule: StoryModule = {
 const userProfileActiveDevicesSectionModule: StoryModule = {
   meta: userProfileActiveDevicesSectionMeta,
   Default: UserProfileActiveDevicesSectionDefault,
+  SignOutError: UserProfileActiveDevicesSectionSignOutError,
+  Impersonation: UserProfileActiveDevicesSectionImpersonation,
 };
 const userProfileSubscriptionSectionModule: StoryModule = {
   meta: userProfileSubscriptionSectionMeta,
@@ -770,6 +802,7 @@ export const registry: StoryModule[] = [
   inputModule,
   inputGroupModule,
   phoneInputModule,
+  dataListModule,
   itemModule,
   dialogComponentModule,
   drawerComponentModule,
@@ -779,6 +812,7 @@ export const registry: StoryModule[] = [
   iconFrameModule,
   menuComponentModule,
   otpComponentModule,
+  paginationModule,
   popoverComponentModule,
   profileComponentModule,
   sectionModule,

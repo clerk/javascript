@@ -3,11 +3,16 @@ import type { ReactNode } from 'react';
 import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
-import type { DialogHandle, DialogTriggerProps } from '../../components/dialog';
+import type { DialogFocusTarget, DialogHandle, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { useConfirmationController } from './confirmation.controller';
 
+/** The weight the confirming button carries: an undoable action takes `primary`. */
+export type ConfirmationColor = 'negative' | 'primary';
+
 interface ConfirmationCardProps {
+  color: ConfirmationColor;
+  finalFocus: DialogFocusTarget | undefined;
   title: string;
   description: ReactNode;
   actionLabel: string;
@@ -18,6 +23,8 @@ interface ConfirmationCardProps {
 }
 
 function ConfirmationCard({
+  color,
+  finalFocus,
   title,
   description,
   actionLabel,
@@ -27,7 +34,10 @@ function ConfirmationCard({
   errorMessage,
 }: ConfirmationCardProps) {
   return (
-    <Dialog.Popup compactPlacement='sheet'>
+    <Dialog.Popup
+      compactPlacement='sheet'
+      finalFocus={finalFocus}
+    >
       <Card.Root
         elevation='overlay'
         renderBranding={false}
@@ -60,7 +70,7 @@ function ConfirmationCard({
           <SubmitButton
             type='button'
             fullWidth
-            color='negative'
+            color={color}
             isPending={isConfirming}
             onClick={onConfirm}
           >
@@ -75,6 +85,13 @@ function ConfirmationCard({
 export interface ConfirmationControlledProps {
   /** Whether the dialog is open */
   open: boolean;
+  /** The weight the confirming button carries. An action that can be undone takes `primary` (default: `negative`) */
+  color?: ConfirmationColor;
+  /**
+   * Where focus returns when the dialog closes. Default: the trigger — which a confirmed removal
+   * may have taken off the page, so a list hands back the row that replaced it instead.
+   */
+  finalFocus?: DialogFocusTarget;
   /** Callback when open state changes */
   onOpenChange: (open: boolean) => void;
   /** Element that opens the dialog */
@@ -97,6 +114,8 @@ export interface ConfirmationControlledProps {
 
 function ControlledConfirmation({
   open,
+  color = 'negative',
+  finalFocus,
   onOpenChange,
   trigger,
   title,
@@ -115,6 +134,8 @@ function ControlledConfirmation({
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <ConfirmationCard
+        color={color}
+        finalFocus={finalFocus}
         title={title}
         description={description}
         actionLabel={actionLabel}
@@ -152,6 +173,13 @@ function resolve<Payload, Value>(value: FromPayload<Payload, Value>, payload: Pa
 export interface ConfirmationHandleProps<Payload> {
   /** Opens the dialog with a payload from anywhere: `handle.open(payload)` */
   handle: ConfirmationHandle<Payload>;
+  /** The weight the confirming button carries. An action that can be undone takes `primary` (default: `negative`) */
+  color?: ConfirmationColor;
+  /**
+   * Where focus returns when the dialog closes. Default: the trigger — which a confirmed removal
+   * may have taken off the page, so a list hands back the row that replaced it instead.
+   */
+  finalFocus?: DialogFocusTarget;
   /** Dialog heading, or a function of the payload */
   title: FromPayload<Payload, string>;
   /** What the action does and why it warrants a second look, or a function of the payload. Takes markup, for a name to emphasise */
@@ -166,6 +194,8 @@ export interface ConfirmationHandleProps<Payload> {
 
 function HandleConfirmation<Payload>({
   handle,
+  color = 'negative',
+  finalFocus,
   title,
   description,
   actionLabel,
@@ -184,6 +214,8 @@ function HandleConfirmation<Payload>({
       {({ payload }) =>
         payload === undefined ? null : (
           <ConfirmationCard
+            color={color}
+            finalFocus={finalFocus}
             title={resolve(title, payload)}
             description={resolve(description, payload)}
             actionLabel={resolve(actionLabel, payload)}
@@ -205,8 +237,9 @@ function HandleConfirmation<Payload>({
 export type ConfirmationProps<Payload = unknown> = ConfirmationControlledProps | ConfirmationHandleProps<Payload>;
 
 /**
- * Confirmation dialog for a destructive action that is worth a second look but not worth
- * making the user type for. Use `Destructive` for the actions that are.
+ * Confirmation dialog for an action worth a second look but not worth making the user type for.
+ * Use `Destructive` for the destructive actions that are. `color` sets the weight the confirming
+ * button carries: `negative` for what cannot be undone, `primary` for what can.
  *
  * An `alertdialog`: it announces as an interruption, an outside press cannot answer it, and the
  * card withholds its corner dismiss. Escape still closes it, the way the cancel action does. Under

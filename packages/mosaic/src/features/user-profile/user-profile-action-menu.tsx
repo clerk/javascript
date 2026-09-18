@@ -1,3 +1,5 @@
+import type { Ref } from 'react';
+
 import { Icon } from '../../components/icon';
 import { Menu } from '../../components/menu';
 import type { IconName } from '../../icons/registry';
@@ -9,14 +11,26 @@ export interface UserProfileMenuAction {
   onClick: () => void;
 }
 
-export function UserProfileActionMenu({ label, actions }: { label: string; actions: UserProfileMenuAction[] }) {
+export function UserProfileActionMenu({
+  label,
+  actions,
+  triggerRef,
+}: {
+  label: string;
+  actions: UserProfileMenuAction[];
+  /** The trigger element, for a caller that has to hand focus back to this row. */
+  triggerRef?: Ref<HTMLButtonElement>;
+}) {
   if (actions.length === 0) {
     return null;
   }
 
   return (
     <Menu.Root placement='bottom-end'>
-      <Menu.Trigger aria-label={label} />
+      <Menu.Trigger
+        ref={triggerRef}
+        aria-label={label}
+      />
       <Menu.Popup>
         {actions.map(action => (
           <Menu.Item
