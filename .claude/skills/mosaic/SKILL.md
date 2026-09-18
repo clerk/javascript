@@ -81,7 +81,7 @@ controller, and view layers, then verifies parity with `parity-audit.md`.
 
 ## Documenting a component in swingset
 
-`packages/swingset/CLAUDE.md` is the house style — archetypes, required section
+`packages/swingset/AGENTS.md` is the house style — archetypes, required section
 order, `meta` conventions. One rule on top of it, because it is the one agents
 get wrong:
 
