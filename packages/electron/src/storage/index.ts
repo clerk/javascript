@@ -3,7 +3,7 @@ import Store from 'electron-store';
 
 import type { TokenStorage } from '../shared/types';
 
-type StorageOptions = {
+export type StorageOptions = {
   /**
    * The name of the file (without extension) used to persist tokens.
    *
