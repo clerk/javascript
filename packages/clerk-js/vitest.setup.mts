@@ -262,13 +262,19 @@ if (typeof window !== 'undefined') {
   window.getComputedStyle = patchedGetComputedStyle;
 }
 
-// Mock browser-tabs-lock to prevent window access errors in tests
+// Mock browser-tabs-lock to prevent window access errors in tests.
+// A plain class rather than vi.fn(): a suite calling vi.restoreAllMocks() would otherwise strip
+// the implementation and leave every later acquireLock in the file resolving undefined.
 vi.mock('browser-tabs-lock', () => {
   return {
-    default: vi.fn().mockImplementation(() => ({
-      acquireLock: vi.fn().mockResolvedValue(true),
-      releaseLock: vi.fn().mockResolvedValue(true),
-    })),
+    default: class {
+      acquireLock() {
+        return Promise.resolve(true);
+      }
+      releaseLock() {
+        return Promise.resolve(true);
+      }
+    },
   };
 });
 
