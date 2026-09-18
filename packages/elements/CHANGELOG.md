@@ -1,5 +1,14 @@
 # @clerk/elements
 
+## 0.24.20
+
+### Patch Changes
+
+- Updated dependencies [[`2bb1c2d`](https://github.com/clerk/javascript/commit/2bb1c2dd95a0d85a8029b8d912dbd1c8fd40f628)]:
+  - @clerk/shared@3.48.0
+  - @clerk/clerk-react@5.61.10
+  - @clerk/types@4.101.27
+
 ## 0.24.19
 
 ### Patch Changes

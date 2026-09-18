@@ -1,5 +1,14 @@
 # @clerk/astro
 
+## 2.17.15
+
+### Patch Changes
+
+- Updated dependencies [[`2bb1c2d`](https://github.com/clerk/javascript/commit/2bb1c2dd95a0d85a8029b8d912dbd1c8fd40f628)]:
+  - @clerk/shared@3.48.0
+  - @clerk/backend@2.33.7
+  - @clerk/types@4.101.27
+
 ## 2.17.14
 
 ### Patch Changes
