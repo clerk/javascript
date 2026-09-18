@@ -61,7 +61,6 @@ const styles = stylex.create({
   root: {
     display: 'flex',
     flexDirection: 'column',
-    // Only load-bearing for a future scrollbar part; the viewport needs no positioning.
     position: 'relative',
     // A scroll container nested in a column flex parent overflows its track without this.
     minHeight: 0,
