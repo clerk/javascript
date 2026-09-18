@@ -67,7 +67,8 @@ export const OrganizationProfileRoutes = ({ contentRef }: OrganizationProfileRou
     apiKeysProps,
   } = useOrganizationProfileContext();
 
-  const allowSecurityRoute = useSecurityRouteAccess();
+  const securityRouteAccess = useSecurityRouteAccess();
+  const allowSecurityRoute = securityRouteAccess.allowed || securityRouteAccess.pending;
 
   const { apiKeysSettings, commerceSettings } = useEnvironment();
 

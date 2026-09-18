@@ -30,7 +30,7 @@ export const OrganizationProfileNavbar = (
       }) || has({ permission: 'org:sys_billing:manage' }),
   );
 
-  const allowSecurityRoute = useSecurityRouteAccess();
+  const { allowed: allowSecurityRoute } = useSecurityRouteAccess();
 
   const routes = pages.routes
     .filter(

@@ -33,7 +33,7 @@ export type UseOrganizationSSOBypassAllowlistReturn = {
 function useOrganizationSSOBypassAllowlist(
   params: UseOrganizationSSOBypassAllowlistParams = {},
 ): UseOrganizationSSOBypassAllowlistReturn {
-  const { keepPreviousData = true, enabled = true } = params;
+  const { keepPreviousData = false, enabled = true } = params;
   const clerk = useClerkInstanceContext();
   const organization = useOrganizationBase();
   const [queryClient] = useClerkQueryClient();
