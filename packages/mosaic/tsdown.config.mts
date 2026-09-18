@@ -13,10 +13,10 @@ export default defineConfig({
   platform: 'browser',
   minify: false,
   sourcemap: false,
-  tsconfig: './tsconfig.build.json',
+  tsconfig: './tsconfig.json',
   deps: {
     neverBundle: ['react', 'react-dom', /^@clerk\/shared(\/.*)?$/],
-    alwaysBundle: [/^@clerk\/headless(\/.*)?$/, /^@stylexjs\//, /^@floating-ui\//],
+    alwaysBundle: [/^@stylexjs\//, /^@floating-ui\//],
     onlyBundle: false,
   },
   plugins: [

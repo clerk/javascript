@@ -576,7 +576,8 @@ export default tseslint.config([
   {
     name: 'packages/mosaic',
     files: ['packages/mosaic/src/**/*'],
-    ignores: ['packages/mosaic/src/__tests__/**'],
+    // Tests assert on style values they receive; they are not authoring styles.
+    ignores: ['packages/mosaic/src/__tests__/**', 'packages/mosaic/src/**/*.test.{ts,tsx}'],
     plugins: {
       '@stylexjs': pluginStylex,
     },
@@ -643,6 +644,16 @@ export default tseslint.config([
     // `@stylexjs/*` rules from the mosaic block still cover these files.
     name: 'packages/mosaic - stylex styles',
     files: ['packages/mosaic/src/**/*.styles.ts'],
+    rules: {
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
+    // Primitives are unstyled and take `className`/`style` like any other headless component; the
+    // `xstyle`-only rule targets styled Mosaic parts and otherwise false-positives on things like
+    // `<FloatingOverlay style={...}>`, a third-party component, not a Mosaic part.
+    name: 'packages/mosaic - primitives',
+    files: ['packages/mosaic/src/primitives/**/*'],
     rules: {
       'no-restricted-syntax': 'off',
     },
