@@ -371,6 +371,14 @@ describe('authenticatedMachineObject', () => {
       expect(authObject.scopes).toEqual(['read:foo', 'write:bar']);
       expect(authObject.userId).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(authObject.clientId).toBe('client_2VTWUzvGC5UhdJCNx6xG1D98edc');
+      expect(authObject.aud).toEqual(['https://mcp.example.test/mcp']);
+      expect(authObject.act).toBeNull();
+    });
+
+    it('exposes the actor claim', () => {
+      const act = { sub: 'client_2agentTESTtestTESTtestTESTtest' };
+      const authObject = authenticatedMachineObject('oauth_token', token, { ...verificationResult, act }, debugData);
+      expect(authObject.act).toEqual(act);
     });
   });
 
@@ -408,6 +416,14 @@ describe('unauthenticatedMachineObject', () => {
     expect(authObject.id).toBeNull();
     expect(authObject.subject).toBeNull();
     expect(authObject.scopes).toBeNull();
+  });
+
+  it('nulls the OAuth token properties', () => {
+    const authObject = unauthenticatedMachineObject('oauth_token');
+    expect(authObject.userId).toBeNull();
+    expect(authObject.clientId).toBeNull();
+    expect(authObject.aud).toBeNull();
+    expect(authObject.act).toBeNull();
   });
 
   it('has() always returns false', () => {

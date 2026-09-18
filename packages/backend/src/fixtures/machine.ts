@@ -29,6 +29,8 @@ export const mockVerificationResults = {
     name: 'GitHub OAuth',
     subject: 'user_2vYVtestTESTtestTESTtestTESTtest',
     scopes: ['read:foo', 'write:bar'],
+    aud: ['https://mcp.example.test/mcp'],
+    act: null,
     revoked: false,
     revocationReason: null,
     expired: false,

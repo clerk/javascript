@@ -1,6 +1,7 @@
 import { createCheckAuthorization } from '@clerk/shared/authorization';
 import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
+  ActClaim,
   CheckAuthorizationFromSessionClaims,
   Jwt,
   JwtPayload,
@@ -102,6 +103,8 @@ type MachineObjectExtendedProperties<TAuthenticated extends boolean> = {
   oauth_token: {
     userId: TAuthenticated extends true ? string : null;
     clientId: TAuthenticated extends true ? string : null;
+    aud: TAuthenticated extends true ? string[] : null;
+    act: TAuthenticated extends true ? ActClaim | null : null;
   };
 };
 
@@ -310,6 +313,8 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         scopes: result.scopes,
         userId: result.subject,
         clientId: result.clientId,
+        aud: result.aud,
+        act: result.act,
       } as unknown as AuthenticatedMachineObject<T>;
     }
     default:
@@ -362,6 +367,8 @@ export function unauthenticatedMachineObject<T extends MachineTokenType>(
         scopes: null,
         userId: null,
         clientId: null,
+        aud: null,
+        act: null,
       } as unknown as UnauthenticatedMachineObject<T>;
     }
     default:
