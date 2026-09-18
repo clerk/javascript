@@ -164,7 +164,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
                 {...mergeStyleProps(themeProps('pagination-ellipsis'), stylex.props(reset.base, styles.ellipsis))}
               >
                 <Icon
-                  name='ellipsis'
+                  name='ellipsis-horizontal'
                   size='sm'
                 />
               </span>
