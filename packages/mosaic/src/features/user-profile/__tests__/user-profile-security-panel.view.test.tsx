@@ -76,14 +76,8 @@ describe('UserProfileSecurityPanelView', () => {
     ).toBeInTheDocument();
   });
 
-  it('forwards security actions', async () => {
-    const onAddPasskey = vi.fn();
-    const onRenamePasskey = vi.fn(() => Promise.resolve());
-    const onRemovePasskey = vi.fn();
+  it('adds an available MFA method through the picker', async () => {
     const onAddMfaMethod = vi.fn();
-    const onSignOutDevice = vi.fn();
-    const onSignOutAllOtherDevices = vi.fn();
-    const onDeleteAccount = vi.fn(() => Promise.resolve());
     const user = userEvent.setup();
 
     renderView({
@@ -91,21 +85,36 @@ describe('UserProfileSecurityPanelView', () => {
         { id: 'sms_1', type: 'sms', description: '+1 801-888-8181' },
         { id: 'backup_1', type: 'backup-codes' },
       ],
+      onAddMfaMethod,
+      addableMfaMethods: ['authenticator'],
+    });
+
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    expect(screen.queryByRole('button', { name: /SMS verification Get a code/ })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /Authenticator app Get codes/ }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(onAddMfaMethod).toHaveBeenCalledWith('authenticator');
+  });
+
+  it('forwards security actions', async () => {
+    const onAddPasskey = vi.fn();
+    const onRenamePasskey = vi.fn(() => Promise.resolve());
+    const onRemovePasskey = vi.fn();
+    const onSignOutDevice = vi.fn();
+    const onSignOutAllOtherDevices = vi.fn();
+    const onDeleteAccount = vi.fn(() => Promise.resolve());
+    const user = userEvent.setup();
+
+    renderView({
       onAddPasskey,
       onRenamePasskey,
       onRemovePasskey,
-      onAddMfaMethod,
-      addableMfaMethods: ['authenticator'],
       onSignOutDevice,
       onSignOutAllOtherDevices,
       onDeleteAccount,
     });
 
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
-    expect(screen.queryByRole('button', { name: /SMS verification Get a code/ })).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /Authenticator app Get codes/ }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
@@ -137,7 +146,6 @@ describe('UserProfileSecurityPanelView', () => {
     expect(onAddPasskey).toHaveBeenCalledOnce();
     expect(onRenamePasskey).toHaveBeenCalledWith('passkey_1', 'Work laptop');
     expect(onRemovePasskey).toHaveBeenCalledWith('passkey_1');
-    expect(onAddMfaMethod).toHaveBeenCalledWith('authenticator');
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
     expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
     expect(onDeleteAccount).toHaveBeenCalledOnce();
