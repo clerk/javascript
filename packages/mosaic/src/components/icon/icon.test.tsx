@@ -56,6 +56,8 @@ describe('Mosaic Icon', () => {
     'checkmark',
     'checkmark-circle',
     'checkmark-small',
+    'chevron-double-left',
+    'chevron-double-right',
     'chevron-down',
     'chevron-left',
     'chevron-right',
@@ -118,7 +120,7 @@ describe('Mosaic Icon', () => {
     'users',
     'x',
     'x-circle',
-  ] as const)('renders the Figma %s icon with scalable, inherited-color artwork', name => {
+  ] as const)('renders the %s icon with scalable, inherited-color artwork', name => {
     const ref = React.createRef<SVGSVGElement>();
     const { container } = wrap(
       <Icon

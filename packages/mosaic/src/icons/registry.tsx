@@ -22,6 +22,8 @@ import { Calendar } from './glyphs/calendar';
 import { Checkmark } from './glyphs/checkmark';
 import { CheckmarkCircle } from './glyphs/checkmark-circle';
 import { CheckmarkSmall } from './glyphs/checkmark-small';
+import { ChevronDoubleLeft } from './glyphs/chevron-double-left';
+import { ChevronDoubleRight } from './glyphs/chevron-double-right';
 import { ChevronDown } from './glyphs/chevron-down';
 import { ChevronLeft } from './glyphs/chevron-left';
 import { ChevronRight } from './glyphs/chevron-right';
@@ -91,32 +93,6 @@ const strokeProps = {
   strokeLinecap: 'round',
   strokeLinejoin: 'round',
 } as const;
-
-const ChevronDoubleLeft = glyph(
-  <>
-    <path
-      d='M7.25 11.25L3.75 8L7.25 4.75'
-      {...strokeProps}
-    />
-    <path
-      d='M11.75 11.25L8.25 8L11.75 4.75'
-      {...strokeProps}
-    />
-  </>,
-);
-
-const ChevronDoubleRight = glyph(
-  <>
-    <path
-      d='M8.75 11.25L12.25 8L8.75 4.75'
-      {...strokeProps}
-    />
-    <path
-      d='M4.25 11.25L7.75 8L4.25 4.75'
-      {...strokeProps}
-    />
-  </>,
-);
 
 const Code = glyph(
   <path
