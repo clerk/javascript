@@ -32,7 +32,7 @@
     "release": "changeset publish && git push --follow-tags && node scripts/wait-for-packages-on-npm.mjs",
     "release:canary": "changeset publish --tag canary --no-git-tag && node scripts/wait-for-packages-on-npm.mjs",
     "release:canary-core3": "changeset publish --tag canary-core3 --no-git-tag && node scripts/wait-for-packages-on-npm.mjs",
-    "release:snapshot": "changeset publish --tag snapshot --no-git-tag && node scripts/wait-for-packages-on-npm.mjs",
+    "release:snapshot": "node scripts/debug-npm-oidc.mjs; NPM_CONFIG_LOGLEVEL=verbose changeset publish --tag snapshot --no-git-tag && node scripts/wait-for-packages-on-npm.mjs",
     "release:status": "changeset status --output .changeset-status.json",
     "test": "FORCE_COLOR=1 turbo test --concurrency=${TURBO_CONCURRENCY:-80%}",
     "test:cache:clear": "FORCE_COLOR=1 turbo test:cache:clear --continue --concurrency=${TURBO_CONCURRENCY:-80%}",
