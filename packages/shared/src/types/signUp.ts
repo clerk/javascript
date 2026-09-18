@@ -128,13 +128,18 @@ export interface SignUpResource extends ClerkResource {
   __internal_future: SignUpFutureResource;
 
   /**
-   * @experimental
+   * Lists the enterprise connections that match the sign-up email domain.
+   */
+  getEnterpriseConnections: () => Promise<SignUpEnterpriseConnectionResource[]>;
+
+  /**
+   * @deprecated Use `getEnterpriseConnections()` instead.
    */
   __experimental_getEnterpriseConnections: () => Promise<SignUpEnterpriseConnectionResource[]>;
 }
 
 /**
- * @experimental
+ * An enterprise connection that matches the sign-up email domain.
  */
 export interface SignUpEnterpriseConnectionResource extends ClerkResource {
   id: string;

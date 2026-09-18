@@ -21,6 +21,7 @@ export {
   is4xxError,
   isCaptchaError,
   isEmailLinkError,
+  isEnterpriseConnectionAmbiguousError,
   isKnownError,
   isMetamaskError,
   isNetworkError,

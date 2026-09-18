@@ -37,6 +37,8 @@ export const ERROR_CODES = {
   SESSION_EXISTS: 'session_exists',
   SIGN_UP_MODE_RESTRICTED: 'sign_up_mode_restricted',
   SIGN_UP_MODE_RESTRICTED_WAITLIST: 'sign_up_restricted_waitlist',
+  ENTERPRISE_CONNECTION_ID_REQUIRED_WITH_MULTIPLE_CONNECTIONS:
+    'enterprise_connection_id_is_required_with_multiple_connections',
   ENTERPRISE_SSO_USER_ATTRIBUTE_MISSING: 'enterprise_sso_user_attribute_missing',
   ENTERPRISE_SSO_EMAIL_ADDRESS_DOMAIN_MISMATCH: 'enterprise_sso_email_address_domain_mismatch',
   ENTERPRISE_SSO_HOSTED_DOMAIN_MISMATCH: 'enterprise_sso_hosted_domain_mismatch',

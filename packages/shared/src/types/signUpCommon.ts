@@ -115,6 +115,7 @@ export type SignUpIdentificationField = SignUpVerifiableField | OAuthStrategy | 
 // TODO: Replace with discriminated union type
 export type SignUpCreateParams = Partial<
   {
+    enterpriseConnectionId: string;
     externalAccountStrategy: string;
     externalAccountRedirectUrl: string;
     externalAccountActionCompleteRedirectUrl: string;
