@@ -150,7 +150,7 @@ export function UserVerificationFactorOneInternal(): JSX.Element | null {
         <UVFactorOneEmailLinkCard
           onShowAlternativeMethodsClicked={toggleAllStrategies}
           factor={currentFactor}
-          showAlternativeMethods={hasFirstParty}
+          showAlternativeMethods={hasAlternativeStrategies}
         />
       );
     case 'phone_code':

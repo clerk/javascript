@@ -122,6 +122,28 @@ describe('UserVerificationFactorOne', () => {
     await waitFor(() => expect(fixtures.clerk.setActive).toHaveBeenCalledWith({ session: 'session_1' }));
   });
 
+  it('offers email links to another address as an alternative', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({ username: 'clerkuser' });
+    });
+    fixtures.session?.startVerification.mockResolvedValue({
+      status: 'needs_first_factor',
+      supportedFirstFactors: [
+        { strategy: 'email_link', emailAddressId: 'idn_primary', safeIdentifier: 'primary@example.com', primary: true },
+        { strategy: 'email_link', emailAddressId: 'idn_other', safeIdentifier: 'other@example.com', primary: false },
+      ],
+    });
+    fixtures.session?.createEmailLinkFlow.mockReturnValue({
+      startEmailLinkFlow: vi.fn(() => new Promise(() => {})),
+      cancelEmailLinkFlow: vi.fn(),
+    });
+
+    const { userEvent, getByText } = render(<UserVerificationFactorOne />, { wrapper });
+    await waitFor(() => getByText('Check your email'));
+    await userEvent.click(getByText('Use another method'));
+    await waitFor(() => getByText('Email link to other@example.com'));
+  });
+
   describe('Submitting', () => {
     it('navigates to UserVerificationFactorTwo page when user submits first factor and second factor is enabled', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
