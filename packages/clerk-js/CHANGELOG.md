@@ -1,5 +1,17 @@
 # Change Log
 
+## 5.128.0
+
+### Minor Changes
+
+- Internal improvements to Clerk Protect. No action is required. ([#9630](https://github.com/clerk/javascript/pull/9630)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+### Patch Changes
+
+- Updated dependencies [[`2bb1c2d`](https://github.com/clerk/javascript/commit/2bb1c2dd95a0d85a8029b8d912dbd1c8fd40f628)]:
+  - @clerk/shared@3.48.0
+  - @clerk/localizations@3.37.9
+
 ## 5.127.2
 
 ### Patch Changes

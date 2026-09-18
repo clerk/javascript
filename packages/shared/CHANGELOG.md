@@ -1,5 +1,11 @@
 # Change Log
 
+## 3.48.0
+
+### Minor Changes
+
+- Internal improvements to Clerk Protect. No action is required. ([#9630](https://github.com/clerk/javascript/pull/9630)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
 ## 3.47.8
 
 ### Patch Changes
