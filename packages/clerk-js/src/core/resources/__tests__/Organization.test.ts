@@ -484,5 +484,12 @@ describe('Organization', () => {
       expect(result.id).toBe('user_1');
       expect(result.deleted).toBe(true);
     });
+
+    it('does not create a cycle when the organization is serialized', () => {
+      const organization = createOrganization();
+
+      expect(() => JSON.stringify(organization)).not.toThrow();
+      expect(JSON.parse(JSON.stringify(organization)).ssoBypassAllowlist).toEqual({});
+    });
   });
 });

@@ -12,7 +12,11 @@ import { DeletedObject } from './DeletedObject';
 import { SSOBypassAllowlistUser } from './SSOBypassAllowlistUser';
 
 export class SSOBypassAllowlist implements SSOBypassAllowlistResource {
-  constructor(private readonly organization: { id: string }) {}
+  declare private readonly organization: { id: string };
+
+  constructor(organization: { id: string }) {
+    Object.defineProperty(this, 'organization', { value: organization, enumerable: false });
+  }
 
   private get path(): string {
     return `/organizations/${this.organization.id}/sso_bypass_allowlist_users`;
