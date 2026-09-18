@@ -2044,6 +2044,7 @@ export const viVN: LocalizationResource = {
     session_exists: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Không tìm thấy phần mở rộng Web3 Wallet. Vui lòng cài đặt một phần mở rộng để tiếp tục.',
     web3_signature_request_rejected: 'Bạn đã từ chối yêu cầu ký. Vui lòng thử lại để tiếp tục.',
     web3_solana_signature_generation_failed: 'Đã xảy ra lỗi khi tạo chữ ký. Vui lòng thử lại để tiếp tục.',

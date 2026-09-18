@@ -2025,6 +2025,7 @@ export const mnMN: LocalizationResource = {
     session_exists: 'Та аль хэдийн нэвтэрсэн байна.',
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected:
       'Та гарын үсгийн хүсэлтийг цуцалсан байна. Үргэлжлүүлэхийн тулд дахин оролдоно уу.',

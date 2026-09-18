@@ -2051,6 +2051,7 @@ export const nbNO: LocalizationResource = {
     session_exists: 'Du er allerede logget inn.',
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'En Web3-lommebokutvidelse ble ikke funnet. Installer en for å fortsette.',
     web3_signature_request_rejected: 'Du avviste signaturforespørselen. Prøv igjen for å fortsette.',
     web3_solana_signature_generation_failed:

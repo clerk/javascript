@@ -2027,6 +2027,7 @@ export const enGB: LocalizationResource = {
     session_exists: "You're already signed in.",
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
     web3_solana_signature_generation_failed:

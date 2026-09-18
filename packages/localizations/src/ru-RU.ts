@@ -2040,6 +2040,7 @@ export const ruRU: LocalizationResource = {
     session_exists: 'Вы уже вошли в систему.',
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected:
       'Вы отклонили запрос на подпись. Пожалуйста, попробуйте ещё раз, чтобы продолжить.',

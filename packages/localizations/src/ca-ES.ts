@@ -2036,6 +2036,7 @@ export const caES: LocalizationResource = {
     session_exists: 'Ja estàs connectat.',
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Has rebutjat la sol·licitud de signatura. Torna-ho a provar per continuar.',
     web3_solana_signature_generation_failed:

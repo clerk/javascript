@@ -2049,6 +2049,7 @@ export const hiIN: LocalizationResource = {
     session_exists: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Web3 वॉलेट एक्सटेंशन नहीं मिल सका। जारी रखने के लिए कृपया एक इंस्टॉल करें।',
     web3_signature_request_rejected:
       'आपने सिग्नेचर अनुरोध अस्वीकार कर दिया है। जारी रखने के लिए कृपया फिर से प्रयास करें।',

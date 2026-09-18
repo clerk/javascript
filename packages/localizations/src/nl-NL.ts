@@ -2024,6 +2024,7 @@ export const nlNL: LocalizationResource = {
     session_exists: 'Je bent al ingelogd.',
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected:
       'Je hebt het handtekeningverzoek afgewezen. Probeer het opnieuw om verder te gaan.',

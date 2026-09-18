@@ -2043,6 +2043,7 @@ export const roRO: LocalizationResource = {
     session_exists: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Nu am găsit o extensie pentru portofel Web3. Te rugăm instalează una pentru a continua.',
     web3_signature_request_rejected: 'Ați respins solicitarea de semnătură. Încercați din nou pentru a continua.',
     web3_solana_signature_generation_failed:

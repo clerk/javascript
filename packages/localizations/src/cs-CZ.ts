@@ -2035,6 +2035,7 @@ export const csCZ: LocalizationResource = {
     session_exists: 'Jste již přihlášen.',
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Rozšíření peněženky Web3 nebylo nalezeno. Pro pokračování prosím nainstalujte jednu.',
     web3_signature_request_rejected: 'Odmítli jste žádost o podpis. Chcete-li pokračovat, zkuste to prosím znovu.',
     web3_solana_signature_generation_failed:
