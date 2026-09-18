@@ -150,7 +150,7 @@ describe('SSO bypass allowlist', () => {
       await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Manage' }));
 
-      expect(await screen.findByRole('heading', { name: 'SSO allow list' })).toBeInTheDocument();
+      expect(await screen.findByRole('heading', { name: 'SSO bypass' })).toBeInTheDocument();
       expect(screen.getByText('Cameron Walker')).toBeInTheDocument();
       expect(screen.getByText('cameron@clerk.com')).toBeInTheDocument();
       expect(screen.getByText('You')).toBeInTheDocument();
@@ -184,7 +184,7 @@ describe('SSO bypass allowlist', () => {
       await screen.findByText('SSO bypass');
       await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Manage' }));
-      await screen.findByRole('heading', { name: 'SSO allow list' });
+      await screen.findByRole('heading', { name: 'SSO bypass' });
     };
 
     it('filters the list by name or email', async () => {

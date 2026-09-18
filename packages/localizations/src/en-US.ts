@@ -1442,7 +1442,7 @@ export const enUS: LocalizationResource = {
           header__user: 'User',
           menuAction__remove: 'Remove',
         },
-        title: 'SSO allow list',
+        title: 'SSO bypass',
       },
       ssoBypassSection: {
         allowlistCount: '{{count}} users',
