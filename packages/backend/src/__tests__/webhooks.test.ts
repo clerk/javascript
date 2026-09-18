@@ -1,6 +1,7 @@
 import { Webhook } from 'standardwebhooks';
 import { beforeEach, describe, expect, it } from 'vitest';
 
+import type { EmailDeliveryWebhookEvent } from '../api/resources/Webhooks';
 import { verifyWebhook } from '../webhooks';
 
 describe('verifyWebhook', () => {
@@ -17,6 +18,34 @@ describe('verifyWebhook', () => {
     // Create a signature using the Standard Webhooks library
     return webhook.sign(id, new Date(parseInt(timestamp) * 1000), body);
   };
+
+  it('preserves a signed email outcome and its original event time', async () => {
+    const event: EmailDeliveryWebhookEvent = {
+      object: 'event',
+      type: 'email.bounced',
+      timestamp: 1789387200123,
+      instance_id: 'ins_example',
+      event_attributes: { http_request: { client_ip: '', user_agent: '' } },
+      data: {
+        id: 'ema_example',
+        to: ['recipient@example.com'],
+        bounce: { type: 'Permanent', message: 'Unknown mailbox' },
+      },
+    };
+    const body = JSON.stringify(event);
+    const id = 'msg_outcome';
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const request = new Request('https://example.com/webhooks', {
+      method: 'POST',
+      body,
+      headers: {
+        'svix-id': id,
+        'svix-timestamp': timestamp,
+        'svix-signature': createValidSignature(id, timestamp, body),
+      },
+    });
+    expect(await verifyWebhook(request)).toEqual(event);
+  });
 
   it('throws when required headers are missing', async () => {
     const mockRequest = new Request('https://clerk.com/webhooks', {
