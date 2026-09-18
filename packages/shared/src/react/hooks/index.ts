@@ -65,11 +65,11 @@ export type {
   UseOrganizationEnterpriseConnectionTestRunsRevalidateResult,
   UseOrganizationEnterpriseConnectionTestRunsReturn,
 } from './useOrganizationEnterpriseConnectionTestRuns';
-export { __internal_useOrganizationSsoBypassAllowlist } from './useOrganizationSsoBypassAllowlist';
+export { __internal_useOrganizationSSOBypassAllowlist } from './useOrganizationSSOBypassAllowlist';
 export type {
-  UseOrganizationSsoBypassAllowlistParams,
-  UseOrganizationSsoBypassAllowlistReturn,
-} from './useOrganizationSsoBypassAllowlist';
+  UseOrganizationSSOBypassAllowlistParams,
+  UseOrganizationSSOBypassAllowlistReturn,
+} from './useOrganizationSSOBypassAllowlist';
 
 export { useUserBase as __internal_useUserBase } from './base/useUserBase';
 export { useClientBase as __internal_useClientBase } from './base/useClientBase';

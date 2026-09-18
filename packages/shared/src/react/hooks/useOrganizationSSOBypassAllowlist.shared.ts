@@ -6,7 +6,7 @@ import { createCacheKeys } from './createCacheKeys';
 /**
  * @internal
  */
-export function useOrganizationSsoBypassAllowlistCacheKeys(params: { organizationId: string | null }) {
+export function useOrganizationSSOBypassAllowlistCacheKeys(params: { organizationId: string | null }) {
   const { organizationId } = params;
   return useMemo(() => {
     return createCacheKeys({

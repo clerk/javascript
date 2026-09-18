@@ -1,5 +1,5 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { __internal_useOrganizationSsoBypassAllowlist } from '@clerk/shared/react';
+import { __internal_useOrganizationSSOBypassAllowlist } from '@clerk/shared/react';
 
 import { Alert } from '@/ui/elements/Alert';
 import { ProfileSection } from '@/ui/elements/Section';
@@ -7,17 +7,17 @@ import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 
 import { Badge, Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 
-type SecuritySsoBypassSectionProps = {
+type SecuritySSOBypassSectionProps = {
   onManage: () => void;
 };
 
-const isFeatureNotEnabled = (error: Error | null): boolean =>
+const isFeatureNotEnabledError = (error: Error | null): boolean =>
   error !== null && isClerkAPIResponseError(error) && error.errors.some(e => e.code === 'feature_not_enabled');
 
-export const SecuritySsoBypassSection = ({ onManage }: SecuritySsoBypassSectionProps): JSX.Element | null => {
-  const { data, isLoading, error } = __internal_useOrganizationSsoBypassAllowlist();
+export const SecuritySSOBypassSection = ({ onManage }: SecuritySSOBypassSectionProps): JSX.Element | null => {
+  const { data, isLoading, error } = __internal_useOrganizationSSOBypassAllowlist();
 
-  if (isFeatureNotEnabled(error)) {
+  if (isFeatureNotEnabledError(error)) {
     return null;
   }
 

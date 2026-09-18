@@ -436,7 +436,7 @@ describe('Organization', () => {
       BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: [entryJSON] }));
 
       const organization = createOrganization();
-      const entries = await organization.getSsoBypassAllowlistUsers();
+      const entries = await organization.ssoBypassAllowlist.getUsers();
 
       // @ts-ignore
       expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'GET', path: ALLOWLIST_PATH });
@@ -457,7 +457,7 @@ describe('Organization', () => {
       BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: entryJSON }));
 
       const organization = createOrganization();
-      const entry = await organization.addSsoBypassAllowlistUser({ userId: 'user_1' });
+      const entry = await organization.ssoBypassAllowlist.addUser({ userId: 'user_1' });
 
       // @ts-ignore
       expect(BaseResource._fetch).toHaveBeenCalledWith({
@@ -477,7 +477,7 @@ describe('Organization', () => {
         );
 
       const organization = createOrganization();
-      const result = await organization.removeSsoBypassAllowlistUser('user_1');
+      const result = await organization.ssoBypassAllowlist.removeUser('user_1');
 
       // @ts-ignore
       expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'DELETE', path: `${ALLOWLIST_PATH}/user_1` });

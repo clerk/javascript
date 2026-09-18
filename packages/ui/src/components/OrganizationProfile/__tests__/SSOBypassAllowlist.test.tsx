@@ -93,7 +93,7 @@ describe('SSO bypass allowlist', () => {
 
       expect(await screen.findByText(SSO_DESCRIPTION)).toBeInTheDocument();
       expect(screen.queryByText('SSO bypass')).not.toBeInTheDocument();
-      expect(fixtures.clerk.organization?.getSsoBypassAllowlistUsers).not.toHaveBeenCalled();
+      expect(fixtures.clerk.organization?.ssoBypassAllowlist.getUsers).not.toHaveBeenCalled();
     });
 
     it('is hidden while the organization has no enterprise connection', async () => {
@@ -117,7 +117,7 @@ describe('SSO bypass allowlist', () => {
         data: [],
         total_count: 0,
       } as any);
-      fixtures.clerk.organization?.getSsoBypassAllowlistUsers.mockResolvedValue([
+      fixtures.clerk.organization?.ssoBypassAllowlist.getUsers.mockResolvedValue([
         allowlistEntry('user_1', 'Cameron', 'cameron@clerk.com'),
         allowlistEntry('user_2', 'Dana', 'dana@clerk.com'),
       ]);
@@ -139,7 +139,7 @@ describe('SSO bypass allowlist', () => {
         data: [],
         total_count: 0,
       } as any);
-      fixtures.clerk.organization?.getSsoBypassAllowlistUsers.mockResolvedValue([
+      fixtures.clerk.organization?.ssoBypassAllowlist.getUsers.mockResolvedValue([
         allowlistEntry('user_123', 'Cameron', 'cameron@clerk.com'),
       ]);
 
@@ -172,7 +172,7 @@ describe('SSO bypass allowlist', () => {
         data: [],
         total_count: 0,
       } as any);
-      fixtures.clerk.organization?.getSsoBypassAllowlistUsers.mockResolvedValue(entries as any);
+      fixtures.clerk.organization?.ssoBypassAllowlist.getUsers.mockResolvedValue(entries as any);
 
       const utils = renderPage(wrapper);
 
@@ -218,7 +218,7 @@ describe('SSO bypass allowlist', () => {
         data: [membership('user_1', 'Cameron', 'cameron@clerk.com'), membership('user_9', 'Yukio', 'yukio@clerk.com')],
         total_count: 2,
       } as any);
-      fixtures.clerk.organization?.addSsoBypassAllowlistUser.mockResolvedValue(
+      fixtures.clerk.organization?.ssoBypassAllowlist.addUser.mockResolvedValue(
         allowlistEntry('user_9', 'Yukio', 'yukio@clerk.com'),
       );
 
@@ -243,7 +243,7 @@ describe('SSO bypass allowlist', () => {
       await userEvent.click(submitButton());
 
       await waitFor(() =>
-        expect(fixtures.clerk.organization?.addSsoBypassAllowlistUser).toHaveBeenCalledWith({ userId: 'user_9' }),
+        expect(fixtures.clerk.organization?.ssoBypassAllowlist.addUser).toHaveBeenCalledWith({ userId: 'user_9' }),
       );
       await waitFor(() => expect(screen.queryByRole('heading', { name: 'Add member' })).not.toBeInTheDocument());
     });
@@ -280,7 +280,7 @@ describe('SSO bypass allowlist', () => {
       const { wrapper, fixtures } = await createFixtures(
         withSecurityPage({ permissions: ['org:sys_entconns:manage', 'org:sys_entconns_sso_bypass:manage'] }),
       );
-      fixtures.clerk.organization?.removeSsoBypassAllowlistUser.mockResolvedValue({
+      fixtures.clerk.organization?.ssoBypassAllowlist.removeUser.mockResolvedValue({
         id: 'user_1',
         deleted: true,
       } as any);
@@ -293,7 +293,7 @@ describe('SSO bypass allowlist', () => {
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Remove' }));
 
       await waitFor(() =>
-        expect(fixtures.clerk.organization?.removeSsoBypassAllowlistUser).toHaveBeenCalledWith('user_1'),
+        expect(fixtures.clerk.organization?.ssoBypassAllowlist.removeUser).toHaveBeenCalledWith('user_1'),
       );
     });
   });
@@ -304,7 +304,7 @@ describe('SSO bypass allowlist', () => {
         withSecurityPage({ selfServeSSO: false, permissions: ['org:sys_entconns_sso_bypass:manage'] }),
       );
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([activeConnection]);
-      fixtures.clerk.organization?.getSsoBypassAllowlistUsers.mockResolvedValue([]);
+      fixtures.clerk.organization?.ssoBypassAllowlist.getUsers.mockResolvedValue([]);
 
       renderPage(wrapper);
 
@@ -324,7 +324,7 @@ describe('SSO bypass allowlist', () => {
         withSecurityPage({ selfServeSSO: false, permissions: ['org:sys_entconns_sso_bypass:manage'] }),
       );
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([activeConnection]);
-      fixtures.clerk.organization?.getSsoBypassAllowlistUsers.mockResolvedValue([]);
+      fixtures.clerk.organization?.ssoBypassAllowlist.getUsers.mockResolvedValue([]);
 
       render(<OrganizationProfile />, { wrapper });
 
@@ -348,7 +348,7 @@ describe('SSO bypass allowlist', () => {
         withSecurityPage({ selfServeSSO: false, permissions: ['org:sys_entconns_sso_bypass:manage'] }),
       );
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([activeConnection]);
-      fixtures.clerk.organization?.getSsoBypassAllowlistUsers.mockResolvedValue([]);
+      fixtures.clerk.organization?.ssoBypassAllowlist.getUsers.mockResolvedValue([]);
 
       render(
         <VirtualRouter startPath='/organization-security'>

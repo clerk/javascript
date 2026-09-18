@@ -1,5 +1,5 @@
-import { __internal_useOrganizationEnterpriseConnections, useOrganization } from '@clerk/shared/react';
-import React, { useMemo, useState } from 'react';
+import { useOrganization } from '@clerk/shared/react';
+import React, { useState } from 'react';
 
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
@@ -11,13 +11,12 @@ import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySync/Configur
 import { SecurityDirectorySyncSection } from '../ConfigureDirectorySync/SecurityDirectorySyncSection';
 import { ConfigureSSOWizard } from '../ConfigureSSO/ConfigureSSOWizard';
 import type { ConnectionScope } from '../ConfigureSSO/domain/connectionScope';
-import { sortEnterpriseConnections } from '../ConfigureSSO/domain/organizationEnterpriseConnection';
 import { useOrganizationEnterpriseConnection } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
 import { EnterpriseConnectionPage } from './EnterpriseConnectionPage';
 import { SecurityBackControl } from './SecurityBackControl';
-import { SecuritySsoBypassSection } from './SecuritySsoBypassSection';
+import { SecuritySSOBypassSection } from './SecuritySSOBypassSection';
 import { SecuritySsoSection } from './SecuritySsoSection';
-import { SsoBypassAllowlistPage } from './SsoBypassAllowlistPage';
+import { SSOBypassAllowlistPage } from './SSOBypassAllowlistPage';
 
 type OrganizationSecurityPageProps = {
   contentRef: React.RefObject<HTMLDivElement>;
@@ -34,30 +33,19 @@ type SecurityPageView =
 
 export const OrganizationSecurityPage = ({ contentRef }: OrganizationSecurityPageProps) => {
   const { organization } = useOrganization();
-  const canManageConnections = useProtect({ permission: 'org:sys_entconns:manage' });
-  const canManageSsoBypass = useProtect({ permission: 'org:sys_entconns_sso_bypass:manage' });
 
   if (!organization) {
     // We should never reach this point, but we'll return null to make TS happy
     return null;
   }
 
-  if (!canManageConnections) {
-    return <SsoBypassOnlySecurityPage canManageSsoBypass={canManageSsoBypass} />;
-  }
-
-  return (
-    <OrganizationSecurityPageContent
-      contentRef={contentRef}
-      canManageSsoBypass={canManageSsoBypass}
-    />
-  );
+  return <OrganizationSecurityPageContent contentRef={contentRef} />;
 };
 
-const OrganizationSecurityPageContent = ({
-  contentRef,
-  canManageSsoBypass,
-}: OrganizationSecurityPageProps & { canManageSsoBypass: boolean }) => {
+const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPageProps) => {
+  const canManageConnections = useProtect({ permission: 'org:sys_entconns:manage' });
+  const canManageSSOBypass = useProtect({ permission: 'org:sys_entconns_sso_bypass:manage' });
+
   const {
     organization,
     isLoading,
@@ -72,10 +60,11 @@ const OrganizationSecurityPageContent = ({
     enterpriseConnectionMutations,
     organizationDomains,
     organizationDomainMutations,
-  } = useOrganizationEnterpriseConnection();
+  } = useOrganizationEnterpriseConnection({ manage: canManageConnections });
 
   const { userSettings } = useEnvironment();
-  const showDirectorySync = userSettings.enterpriseSSO.self_serve_directory_sync;
+  const showDirectorySync = canManageConnections && userSettings.enterpriseSSO.self_serve_directory_sync;
+  const showSSOBypass = canManageSSOBypass && enterpriseConnections.length > 0;
 
   const [requestedView, setRequestedView] = useState<SecurityPageView>({ kind: 'overview' });
 
@@ -109,7 +98,21 @@ const OrganizationSecurityPageContent = ({
   // configure write) must not tear the open wizard down and reseat it — each
   // wizard step owns its own loading UI.
   if (isLoading && view.kind === 'overview') {
-    return <SecurityPageLoading />;
+    return (
+      <SecurityPageOverview fillHeight>
+        <Flex
+          align='center'
+          justify='center'
+          sx={t => ({ flex: 1, paddingBlock: t.space.$5 })}
+        >
+          <Spinner
+            size='xs'
+            colorScheme='neutral'
+            elementDescriptor={descriptors.spinner}
+          />
+        </Flex>
+      </SecurityPageOverview>
+    );
   }
 
   if (view.kind === 'directorySync') {
@@ -122,7 +125,7 @@ const OrganizationSecurityPageContent = ({
   }
 
   if (view.kind === 'ssoBypass') {
-    return <SsoBypassAllowlistPage onBack={exitToOverview} />;
+    return <SSOBypassAllowlistPage onBack={exitToOverview} />;
   }
 
   if (view.kind === 'connection' && openedConnection) {
@@ -175,12 +178,10 @@ const OrganizationSecurityPageContent = ({
     <SecurityPageOverview>
       <SecuritySsoSection
         enterpriseConnections={enterpriseConnections}
-        onConfigure={openWizard}
-        onOpenConnection={openConnection}
+        onConfigure={canManageConnections ? openWizard : undefined}
+        onOpenConnection={canManageConnections ? openConnection : undefined}
       />
-      {canManageSsoBypass && enterpriseConnections.length > 0 && (
-        <SecuritySsoBypassSection onManage={() => setRequestedView({ kind: 'ssoBypass' })} />
-      )}
+      {showSSOBypass && <SecuritySSOBypassSection onManage={() => setRequestedView({ kind: 'ssoBypass' })} />}
       {showDirectorySync && (
         <SecurityDirectorySyncSection
           organizationName={organization?.name ?? ''}
@@ -191,45 +192,6 @@ const OrganizationSecurityPageContent = ({
     </SecurityPageOverview>
   );
 };
-
-const SsoBypassOnlySecurityPage = ({ canManageSsoBypass }: { canManageSsoBypass: boolean }) => {
-  const { data, isLoading } = __internal_useOrganizationEnterpriseConnections();
-  const enterpriseConnections = useMemo(() => sortEnterpriseConnections(data ?? []), [data]);
-  const [view, setView] = useState<'overview' | 'ssoBypass'>('overview');
-
-  if (isLoading) {
-    return <SecurityPageLoading />;
-  }
-
-  if (view === 'ssoBypass') {
-    return <SsoBypassAllowlistPage onBack={() => setView('overview')} />;
-  }
-
-  return (
-    <SecurityPageOverview>
-      <SecuritySsoSection enterpriseConnections={enterpriseConnections} />
-      {canManageSsoBypass && enterpriseConnections.length > 0 && (
-        <SecuritySsoBypassSection onManage={() => setView('ssoBypass')} />
-      )}
-    </SecurityPageOverview>
-  );
-};
-
-const SecurityPageLoading = (): JSX.Element => (
-  <SecurityPageOverview fillHeight>
-    <Flex
-      align='center'
-      justify='center'
-      sx={t => ({ flex: 1, paddingBlock: t.space.$5 })}
-    >
-      <Spinner
-        size='xs'
-        colorScheme='neutral'
-        elementDescriptor={descriptors.spinner}
-      />
-    </Flex>
-  </SecurityPageOverview>
-);
 
 /**
  * The overview's stable page chrome — the security `ProfileCard.Page` and its

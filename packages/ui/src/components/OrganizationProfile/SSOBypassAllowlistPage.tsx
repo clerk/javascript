@@ -1,8 +1,8 @@
-import { __internal_useOrganizationSsoBypassAllowlist, useOrganization, useUser } from '@clerk/shared/react';
+import { __internal_useOrganizationSSOBypassAllowlist, useOrganization, useUser } from '@clerk/shared/react';
 import type {
-  AddSsoBypassAllowlistUserParams,
+  AddSSOBypassAllowlistUserParams,
   OrganizationMembershipResource,
-  SsoBypassAllowlistUserResource,
+  SSOBypassAllowlistUserResource,
 } from '@clerk/shared/types';
 import React, { useMemo, useRef, useState } from 'react';
 
@@ -37,24 +37,24 @@ import {
 import { mqu } from '../../styledSystem';
 import { SecurityBackControl } from './SecurityBackControl';
 
-type SsoBypassAllowlistPageProps = {
+type SSOBypassAllowlistPageProps = {
   onBack: () => void;
 };
 
 const MEMBER_SEARCH_DEBOUNCE_MS = 500;
 const MEMBER_SEARCH_PAGE_SIZE = 10;
 
-const matchesSearch = (entry: SsoBypassAllowlistUserResource, term: string): boolean => {
+const matchesSearch = (entry: SSOBypassAllowlistUserResource, term: string): boolean => {
   const { firstName, lastName, identifier, username } = entry.publicUserData;
   const haystack = [firstName, lastName, identifier, username].filter(Boolean).join(' ').toLowerCase();
   return haystack.includes(term);
 };
 
-export const SsoBypassAllowlistPage = withCardStateProvider(({ onBack }: SsoBypassAllowlistPageProps): JSX.Element => {
+export const SSOBypassAllowlistPage = withCardStateProvider(({ onBack }: SSOBypassAllowlistPageProps): JSX.Element => {
   const card = useCardState();
   const { t } = useLocalizations();
   const { user } = useUser();
-  const { data, isLoading, error, addUser, removeUser } = __internal_useOrganizationSsoBypassAllowlist();
+  const { data, isLoading, error, addUser, removeUser } = __internal_useOrganizationSSOBypassAllowlist();
 
   const [search, setSearch] = useState('');
   const term = search.trim().toLowerCase();
@@ -179,7 +179,7 @@ export const SsoBypassAllowlistPage = withCardStateProvider(({ onBack }: SsoBypa
 });
 
 type AllowlistRowProps = {
-  entry: SsoBypassAllowlistUserResource;
+  entry: SSOBypassAllowlistUserResource;
   isCurrentUser: boolean;
   onRemove: () => void;
 };
@@ -219,7 +219,7 @@ const AllowlistRow = ({ entry, isCurrentUser, onRemove }: AllowlistRowProps): JS
 
 type AddMemberProps = {
   allowlistedUserIds: Set<string>;
-  addUser: (params: AddSsoBypassAllowlistUserParams) => Promise<unknown>;
+  addUser: (params: AddSSOBypassAllowlistUserParams) => Promise<unknown>;
 };
 
 const AddMemberScreen = (props: AddMemberProps): JSX.Element => {

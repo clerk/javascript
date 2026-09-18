@@ -64,8 +64,8 @@ export const useOrganizationProfileContext = (): OrganizationProfileContextType 
   const shouldShowSelfServeSSO =
     environment.userSettings.enterpriseSSO.self_serve_sso && !!organization?.selfServeSSOEnabled;
 
-  const canManageSsoBypass = Boolean(session?.checkAuthorization({ permission: 'org:sys_entconns_sso_bypass:manage' }));
-  const shouldShowSecurityPage = shouldShowSelfServeSSO || canManageSsoBypass;
+  const canManageSSOBypass = Boolean(session?.checkAuthorization({ permission: 'org:sys_entconns_sso_bypass:manage' }));
+  const shouldShowSecurityPage = shouldShowSelfServeSSO || canManageSSOBypass;
 
   const pages = useMemo(
     () =>

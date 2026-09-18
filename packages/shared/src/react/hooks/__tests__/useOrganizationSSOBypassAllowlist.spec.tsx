@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { __internal_useOrganizationSsoBypassAllowlist } from '../useOrganizationSsoBypassAllowlist';
+import { __internal_useOrganizationSSOBypassAllowlist } from '../useOrganizationSSOBypassAllowlist';
 import { createMockClerk, createMockQueryClient } from './mocks/clerk';
 import { wrapper } from './wrapper';
 
@@ -20,9 +20,7 @@ const mockClerk = createMockClerk({
     session: null,
     organization: {
       id: 'org_1',
-      getSsoBypassAllowlistUsers: getSpy,
-      addSsoBypassAllowlistUser: addSpy,
-      removeSsoBypassAllowlistUser: removeSpy,
+      ssoBypassAllowlist: { getUsers: getSpy, addUser: addSpy, removeUser: removeSpy },
     },
     client: null,
   },
@@ -34,10 +32,10 @@ vi.mock('../../contexts', () => ({
   useInitialStateContext: () => undefined,
 }));
 
-const renderAllowlist = (params?: Parameters<typeof __internal_useOrganizationSsoBypassAllowlist>[0]) =>
-  renderHook(() => __internal_useOrganizationSsoBypassAllowlist(params), { wrapper });
+const renderAllowlist = (params?: Parameters<typeof __internal_useOrganizationSSOBypassAllowlist>[0]) =>
+  renderHook(() => __internal_useOrganizationSSOBypassAllowlist(params), { wrapper });
 
-describe('useOrganizationSsoBypassAllowlist', () => {
+describe('useOrganizationSSOBypassAllowlist', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     defaultQueryClient.client.clear();

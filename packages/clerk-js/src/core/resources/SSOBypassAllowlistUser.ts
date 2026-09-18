@@ -1,32 +1,24 @@
 import type {
-  ClerkResourceReloadParams,
-  SsoBypassAllowlistUserJSON,
-  SsoBypassAllowlistUserJSONSnapshot,
-  SsoBypassAllowlistUserResource,
+  SSOBypassAllowlistUserJSON,
+  SSOBypassAllowlistUserJSONSnapshot,
+  SSOBypassAllowlistUserResource,
 } from '@clerk/shared/types';
 
 import { unixEpochToDate } from '../../utils/date';
-import { clerkUnsupportedReloadMethod } from '../errors';
-import { PublicUserData } from './internal';
+import { PublicUserData } from './PublicUserData';
 
-export class SsoBypassAllowlistUser implements SsoBypassAllowlistUserResource {
-  pathRoot = '/organizations';
-
+export class SSOBypassAllowlistUser implements SSOBypassAllowlistUserResource {
   id!: string;
   userId!: string;
   publicUserData!: PublicUserData;
   createdAt!: Date;
   updatedAt!: Date;
 
-  constructor(data: SsoBypassAllowlistUserJSON | SsoBypassAllowlistUserJSONSnapshot) {
+  constructor(data: SSOBypassAllowlistUserJSON | SSOBypassAllowlistUserJSONSnapshot) {
     this.fromJSON(data);
   }
 
-  reload(_?: ClerkResourceReloadParams): Promise<this> {
-    clerkUnsupportedReloadMethod('SsoBypassAllowlistUser');
-  }
-
-  private fromJSON(data: SsoBypassAllowlistUserJSON | SsoBypassAllowlistUserJSONSnapshot | null): this {
+  private fromJSON(data: SSOBypassAllowlistUserJSON | SSOBypassAllowlistUserJSONSnapshot | null): this {
     if (!data) {
       return this;
     }
@@ -40,7 +32,7 @@ export class SsoBypassAllowlistUser implements SsoBypassAllowlistUserResource {
     return this;
   }
 
-  public __internal_toSnapshot(): SsoBypassAllowlistUserJSONSnapshot {
+  public __internal_toSnapshot(): SSOBypassAllowlistUserJSONSnapshot {
     return {
       object: 'sso_bypass_allowlist_user',
       user_id: this.userId,

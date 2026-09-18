@@ -1,29 +1,26 @@
 import { useCallback } from 'react';
 
 import type { DeletedObjectResource } from '../../types/deletedObject';
-import type {
-  AddSsoBypassAllowlistUserParams,
-  SsoBypassAllowlistUserResource,
-} from '../../types/ssoBypassAllowlistUser';
+import type { AddSSOBypassAllowlistUserParams, SSOBypassAllowlistUserResource } from '../../types/ssoBypassAllowlist';
 import { useClerkInstanceContext } from '../contexts';
 import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
 import { useClerkQueryClient } from '../query/use-clerk-query-client';
 import { useClerkQuery } from '../query/useQuery';
 import { useOrganizationBase } from './base/useOrganizationBase';
 import { useClearQueriesOnSignOut } from './useClearQueriesOnSignOut';
-import { useOrganizationSsoBypassAllowlistCacheKeys } from './useOrganizationSsoBypassAllowlist.shared';
+import { useOrganizationSSOBypassAllowlistCacheKeys } from './useOrganizationSSOBypassAllowlist.shared';
 
-export type UseOrganizationSsoBypassAllowlistParams = {
+export type UseOrganizationSSOBypassAllowlistParams = {
   enabled?: boolean;
   keepPreviousData?: boolean;
 };
 
-export type UseOrganizationSsoBypassAllowlistReturn = {
-  data: SsoBypassAllowlistUserResource[] | undefined;
+export type UseOrganizationSSOBypassAllowlistReturn = {
+  data: SSOBypassAllowlistUserResource[] | undefined;
   error: Error | null;
   isLoading: boolean;
   isFetching: boolean;
-  addUser: (params: AddSsoBypassAllowlistUserParams) => Promise<SsoBypassAllowlistUserResource | undefined>;
+  addUser: (params: AddSSOBypassAllowlistUserParams) => Promise<SSOBypassAllowlistUserResource | undefined>;
   removeUser: (userId: string) => Promise<DeletedObjectResource | undefined>;
   revalidate: () => Promise<void>;
 };
@@ -33,15 +30,15 @@ export type UseOrganizationSsoBypassAllowlistReturn = {
  *
  * @internal
  */
-function useOrganizationSsoBypassAllowlist(
-  params: UseOrganizationSsoBypassAllowlistParams = {},
-): UseOrganizationSsoBypassAllowlistReturn {
+function useOrganizationSSOBypassAllowlist(
+  params: UseOrganizationSSOBypassAllowlistParams = {},
+): UseOrganizationSSOBypassAllowlistReturn {
   const { keepPreviousData = true, enabled = true } = params;
   const clerk = useClerkInstanceContext();
   const organization = useOrganizationBase();
   const [queryClient] = useClerkQueryClient();
 
-  const { queryKey, stableKey, authenticated } = useOrganizationSsoBypassAllowlistCacheKeys({
+  const { queryKey, stableKey, authenticated } = useOrganizationSSOBypassAllowlistCacheKeys({
     organizationId: organization?.id ?? null,
   });
 
@@ -55,7 +52,7 @@ function useOrganizationSsoBypassAllowlist(
 
   const query = useClerkQuery({
     queryKey,
-    queryFn: () => organization?.getSsoBypassAllowlistUsers(),
+    queryFn: () => organization?.ssoBypassAllowlist.getUsers(),
     enabled: queryEnabled,
     placeholderData: defineKeepPreviousDataFn(keepPreviousData),
   });
@@ -66,8 +63,8 @@ function useOrganizationSsoBypassAllowlist(
   );
 
   const addUser = useCallback(
-    async (addParams: AddSsoBypassAllowlistUserParams) => {
-      const added = await organization?.addSsoBypassAllowlistUser(addParams);
+    async (addParams: AddSSOBypassAllowlistUserParams) => {
+      const added = await organization?.ssoBypassAllowlist.addUser(addParams);
       await revalidate();
       return added;
     },
@@ -76,7 +73,7 @@ function useOrganizationSsoBypassAllowlist(
 
   const removeUser = useCallback(
     async (userId: string) => {
-      const removed = await organization?.removeSsoBypassAllowlistUser(userId);
+      const removed = await organization?.ssoBypassAllowlist.removeUser(userId);
       await revalidate();
       return removed;
     },
@@ -94,4 +91,4 @@ function useOrganizationSsoBypassAllowlist(
   };
 }
 
-export { useOrganizationSsoBypassAllowlist as __internal_useOrganizationSsoBypassAllowlist };
+export { useOrganizationSSOBypassAllowlist as __internal_useOrganizationSSOBypassAllowlist };
