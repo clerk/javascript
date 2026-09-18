@@ -40,6 +40,7 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist",
+    "THIRD_PARTY_NOTICES",
     "styles.css.d.ts"
   ],
   "scripts": {
