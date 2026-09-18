@@ -99,8 +99,6 @@ export class DirectorySync extends BaseResource implements DirectorySyncResource
       })
     )?.response as unknown as DirectorySyncJSON;
 
-    // The credential is deliberately not kept on the resource. It is an input
-    // only; the server stores it and reports `credentials_configured` back.
     return new DirectorySync(json, this.organizationId);
   };
 
@@ -112,8 +110,6 @@ export class DirectorySync extends BaseResource implements DirectorySyncResource
   };
 
   getSyncStatus = async (): Promise<DirectorySyncStatusResource> => {
-    // Not a Clerk resource — it has no id or object — so it is fetched
-    // untyped and cast, the same way getUsers handles its paginated payload.
     const res = await BaseResource._fetch({
       path: `${this.directoryPath}/sync_status`,
       method: 'GET',
