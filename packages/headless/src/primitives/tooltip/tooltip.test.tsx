@@ -317,6 +317,36 @@ describe('Tooltip', () => {
       // First tooltip should no longer be visible
       expect(screen.queryByText('Tooltip A')).not.toBeInTheDocument();
     });
+
+    it('applies the group delay to its members and switches between them instantly', async () => {
+      const user = userEvent.setup();
+      render(
+        <Tooltip.Group delay={{ open: 500, close: 0 }}>
+          <Tooltip.Root>
+            <Tooltip.Trigger>Button A</Tooltip.Trigger>
+            <Tooltip.Positioner>
+              <Tooltip.Popup>Tooltip A</Tooltip.Popup>
+            </Tooltip.Positioner>
+          </Tooltip.Root>
+          <Tooltip.Root>
+            <Tooltip.Trigger>Button B</Tooltip.Trigger>
+            <Tooltip.Positioner>
+              <Tooltip.Popup>Tooltip B</Tooltip.Popup>
+            </Tooltip.Positioner>
+          </Tooltip.Root>
+        </Tooltip.Group>,
+      );
+
+      await user.hover(screen.getByRole('button', { name: 'Button A' }));
+      await new Promise(resolve => setTimeout(resolve, 350));
+      expect(screen.queryByText('Tooltip A')).not.toBeInTheDocument();
+      await waitFor(() => expect(screen.getByText('Tooltip A')).toBeInTheDocument(), { timeout: 1000 });
+
+      await user.hover(screen.getByRole('button', { name: 'Button B' }));
+      await new Promise(resolve => setTimeout(resolve, 100));
+      expect(screen.getByText('Tooltip B')).toBeInTheDocument();
+      expect(screen.queryByText('Tooltip A')).not.toBeInTheDocument();
+    });
   });
 
   describe('Arrow ref', () => {

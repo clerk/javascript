@@ -3,7 +3,7 @@
 Mosaic is styled with **StyleX** (`@stylexjs/stylex` 0.19). StyleX is
 compile-time atomic CSS: the style objects become hashed atom classes plus one
 static stylesheet, with zero runtime. This file is the authoring model; read it
-against the reference component, `packages/ui/src/mosaic/components/button/`.
+against the reference component, `packages/mosaic/src/components/button/`.
 
 Consumers target `--cl-*` vars, the `.cl-<slot>` class, and `data-<axis>` attrs,
 never StyleX's hashed `x…` atoms. That public contract is fixed; everything
@@ -52,8 +52,17 @@ rule reserves the `.stylex.ts` extension for StyleX define-primitives: **a
   components render the same visual surface — e.g. inputs (`TextInput`,
   `NumberInput`, date fields, `Selector`) sharing one `inputWrapper` /
   `inputStatusBorder` / `inputStatusFocusWithin` set instead of redefining the
-  border/focus treatment five times. Three exist today: `reset.styles.ts`,
-  `typography.styles.ts` and `focus-outline.styles.ts`.
+  border/focus treatment five times. Four exist today: `reset.styles.ts`,
+  `typography.styles.ts`, `focus-outline.styles.ts` and `rtl.styles.ts`.
+- **DO** compose `rtl.mirror` from `utils/rtl.styles.ts` onto a direction-aware
+  icon — a chevron that means "forward"/"back", a pagination arrow, the
+  log-out arrow leaving its frame — via its
+  `xstyle`. It flips the glyph with `scaleX(-1)` only under an ancestor carrying
+  `dir="rtl"`, so the same `chevron-right` reads as "forward" in both directions.
+  Pick it by meaning, not by shape: a chevron that points at a dropdown or an
+  external-link arrow stays unmirrored.
+- **DON'T** register a mirrored twin (`chevron-forward`) in the icon registry or
+  swap the name at the call site by direction. The direction lives in CSS.
 - **DON'T** put a shared style file under `components/`. That directory holds one
   subdirectory per component and nothing else, so a loose file there reads as a
   component that lost its folder.
@@ -303,8 +312,8 @@ device, while touch devices look correct.
   but it depends on StyleX's emission order for the tiebreak and duplicates the
   value in every cell.
 - Applies to any state pair where one side is inside an at-rule and the other is
-  not. Confirm the output rather than trusting it: `pnpm build:mosaic --filter @clerk/ui`,
-  then grep `dist-mosaic/styles.css` for the two selectors and compare their
+  not. Confirm the output rather than trusting it: `pnpm build --filter @clerk/mosaic`,
+  then grep `dist/styles.css` for the two selectors and compare their
   specificity.
 
 - **A button that opens something takes the pressed fill while open**, so a
@@ -329,7 +338,7 @@ device, while touch devices look correct.
   Worked example: `button.styles.ts`, applied across every filled/outline/ghost cell
   (`link` opts out — it reads as text, not a control).
 
-Worked example: `packages/ui/src/mosaic/components/button/button.styles.ts`.
+Worked example: `packages/mosaic/src/components/button/button.styles.ts`.
 
 - **DON'T** write a focus ring by hand. Compose `focusOutline` from
   `utils/focus-outline.styles.ts` into the element's `stylex.props(...)`:
@@ -682,10 +691,10 @@ export interface PopoverPopupProps extends MosaicComponentProps<'div'> { … }
 
 ## Build & CSS delivery (two contexts, same babel)
 
-- **Published** (`build:mosaic` → `@stylexjs/rollup-plugin`): compiles the
-  `styles/index.ts` barrel into `dist-mosaic/styles.css`, exported as
-  `@clerk/ui/styles.css`. Consumers choose the cascade layer at import:
-  `@import '@clerk/ui/styles.css' layer(components)`.
+- **Published** (`pnpm build` in `@clerk/mosaic` → `@stylexjs/rollup-plugin`): compiles the
+  `styles/index.ts` barrel into `dist/styles.css`, exported as
+  `@clerk/mosaic/styles.css`. Consumers choose the cascade layer at import:
+  `@import '@clerk/mosaic/styles.css' layer(components)`.
 - **Swingset** (source-consumed): `@stylexjs/unplugin/webpack` in `next.config`
   transforms StyleX **JS only** (calls → static atoms; SWC/Emotion untouched);
   `@stylexjs/postcss-plugin` extracts the **CSS** by replacing `@stylex;` in

@@ -1,27 +1,25 @@
-import type { UserProfileViewProps } from '@clerk/ui/mosaic/features/user-profile/user-profile.view';
-import type { UserProfileAPIKey } from '@clerk/ui/mosaic/features/user-profile/user-profile-api-keys-panel.view';
+import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import type { UserProfileAPIKey } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-billing-panel.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
 import type {
   UserProfileEmail,
   UserProfilePhone,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-profile-panel.view';
-import type {
-  UserProfileDevice,
-  UserProfileMfaMethod,
-  UserProfilePasskey,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-security-panel.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
+import type { UserProfileMfaMethod } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 import { useMemo, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';
+import { useUserProfileActiveDevicesFixture } from './user-profile-active-devices';
 import { createUserProfileAddEmailFixture } from './user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
 import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';
 import { useUserProfileEditUsernameFixture } from './user-profile-edit-username';
+import { usePasskeysFixture } from './user-profile-passkeys';
 import { useWeb3WalletsFixture } from './user-profile-web3-wallets';
 
 export interface UserProfileFixtureOptions {
@@ -65,39 +63,12 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
   ]);
-  const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([
-    {
-      id: 'passkey',
-      name: 'MacBook Pro',
-      createdAtLabel: 'Created today at 10:12 PM',
-      lastUsedAtLabel: 'Last used 1h ago',
-    },
-  ]);
+  const passkeys = usePasskeysFixture();
   const [mfaMethods, setMfaMethods] = useState<UserProfileMfaMethod[]>([
     { id: 'sms', type: 'sms', description: '+1 801-888-8181' },
     { id: 'backup', type: 'backup-codes' },
   ]);
-  const [devices, setDevices] = useState<UserProfileDevice[]>([
-    {
-      id: 'current',
-      name: 'Safari on macOS',
-      description: 'Salt Lake City, UT, United States',
-      type: 'desktop',
-      isCurrent: true,
-    },
-    {
-      id: 'mobile',
-      name: 'Safari on iOS',
-      description: 'Last seen 2 weeks ago · Orem, UT, United States',
-      type: 'mobile',
-    },
-    {
-      id: 'desktop',
-      name: 'Clerk App on macOS',
-      description: 'Last seen May 14th, 2026 · San Francisco, CA, United States',
-      type: 'desktop',
-    },
-  ]);
+  const activeDevices = useUserProfileActiveDevicesFixture();
 
   const [subscription, setSubscription] = useState<UserProfileSubscription>({
     planName: 'Basic Plan',
@@ -166,27 +137,23 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
     },
     security: {
       ...editPassword,
-      passkeys,
+      passkeys: passkeys.passkeys,
+      addPasskeyError: passkeys.addError,
+      onRenamePasskey: passkeys.onRename,
       mfaMethods,
-      devices,
+      devices: activeDevices.devices,
       onAddMfaMethod: type =>
         setMfaMethods(current => [
           ...current,
           { id: `${type}-${Date.now()}`, type, description: type === 'sms' ? '+1 801-555-0100' : undefined },
         ]),
-      onAddPasskey: () =>
-        setPasskeys(current => [
-          ...current,
-          { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
-        ]),
+      onAddPasskey: passkeys.onAdd,
       onDeleteAccount: () => Promise.resolve(),
-      onManageDevice: () => undefined,
-      onManagePasskey: () => undefined,
       onRegenerateBackupCodes: () => undefined,
       onRemoveMfaMethod: id => setMfaMethods(current => current.filter(method => method.id !== id)),
-      onRemovePasskey: id => setPasskeys(current => current.filter(passkey => passkey.id !== id)),
-      onSignOutAllOtherDevices: () => setDevices(current => current.filter(device => device.isCurrent)),
-      onSignOutDevice: id => setDevices(current => current.filter(device => device.id !== id)),
+      onRemovePasskey: passkeys.onRemove,
+      onSignOutAllOtherDevices: activeDevices.onSignOutAllOtherDevices,
+      onSignOutDevice: activeDevices.onSignOutDevice,
     },
     billing: {
       subscription,
@@ -255,5 +222,5 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
     },
   };
 
-  return { activePage, setActivePage, pages, addEmail, devices };
+  return { activePage, setActivePage, pages, addEmail, devices: activeDevices.devices };
 }

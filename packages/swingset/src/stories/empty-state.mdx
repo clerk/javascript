@@ -1,0 +1,72 @@
+import * as EmptyStateStories from './empty-state.stories';
+
+# EmptyState
+
+EmptyState explains why a surface has nothing in it and, optionally, what to do about it. It's composed from parts via dot syntax: `EmptyState.Root` centers its children in whatever container holds it, `EmptyState.Icon` renders a named icon in a filled frame, and `EmptyState.Label`, `EmptyState.Description`, and `EmptyState.Actions` stack below it. Drop it inside [Table](/components/table)'s `Table.Empty` row, a card, or a section.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={EmptyStateStories}
+/>
+
+## Usage
+
+```tsx
+import { EmptyState } from '@clerk/mosaic/components/empty-state';
+
+<EmptyState.Root>
+  <EmptyState.Icon name='search' />
+  <EmptyState.Label>No results</EmptyState.Label>
+  <EmptyState.Description>Try a different search.</EmptyState.Description>
+</EmptyState.Root>;
+```
+
+## Parts
+
+| Part                     | Element  | Notes                                                      |
+| ------------------------ | -------- | ---------------------------------------------------------- |
+| `EmptyState.Root`        | `<div>`  | Centers the stack and takes `xstyle`, `ref`, and `render`. |
+| `EmptyState.Icon`        | `<span>` | Renders the icon named by `name` inside a filled frame.    |
+| `EmptyState.Label`       | `<p>`    | The heading line.                                          |
+| `EmptyState.Description` | `<p>`    | Secondary copy, capped at a readable measure.              |
+| `EmptyState.Actions`     | `<div>`  | A wrapping row for buttons.                                |
+
+Every part takes `xstyle` and `ref` along with its element's props; all but `EmptyState.Icon` take `render` too.
+
+## Styling
+
+Each part carries a stable class and reflects no state, so target the classes directly:
+
+| Class                         | Part                     |
+| ----------------------------- | ------------------------ |
+| `.cl-empty-state`             | `EmptyState.Root`        |
+| `.cl-empty-state-icon`        | `EmptyState.Icon`        |
+| `.cl-empty-state-label`       | `EmptyState.Label`       |
+| `.cl-empty-state-description` | `EmptyState.Description` |
+| `.cl-empty-state-actions`     | `EmptyState.Actions`     |
+
+```css
+.cl-empty-state-description {
+  max-width: 40ch;
+}
+```
+
+---
+
+## Examples
+
+### Without actions
+
+<Story
+  name='NoResults'
+  storyModule={EmptyStateStories}
+/>
+
+### Label only
+
+<Story
+  name='LabelOnly'
+  storyModule={EmptyStateStories}
+/>

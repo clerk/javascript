@@ -2,12 +2,6 @@ import * as DialogStories from './dialog.component.stories';
 
 # Dialog
 
-The Mosaic `Dialog` — a modal surface built on the `@clerk/headless` dialog primitive. Three parts:
-`Dialog.Root` owns the state, `Dialog.Trigger` opens it, `Dialog.Popup` is the surface. Focus
-trapping, scroll lock and ARIA wiring come from the primitive.
-
-## Playground
-
 <Preview
   name='Default'
   storyModule={DialogStories}
@@ -19,30 +13,35 @@ trapping, scroll lock and ARIA wiring come from the primitive.
   meta={DialogStories.meta}
   extra={[
     { name: 'role', type: "'dialog' | 'alertdialog'", default: "'dialog'" },
-    { name: 'inline', type: 'boolean', default: 'false' },
     { name: 'open', type: 'boolean' },
     { name: 'defaultOpen', type: 'boolean', default: 'false' },
     { name: 'onOpenChange', type: '(open: boolean, details: DialogOpenChangeDetails) => void' },
     { name: 'modal', type: 'boolean', default: 'true' },
-    { name: 'closedBy', type: "'any' | 'closerequest' | 'none'", default: "'any'" },
   ]}
 />
 
-`size` belongs to `Dialog.Popup`; the rest belong to `Dialog.Root`.
+`variant` and `compactPlacement` belong to `Dialog.Popup`; the rest belong to `Dialog.Root`.
 
 ## Usage
 
 ```tsx
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import { Dialog } from '@clerk/mosaic/components/dialog';
 
 <Dialog.Root>
   <Dialog.Trigger render={<Button />}>Open dialog</Dialog.Trigger>
   <Dialog.Popup>
-    <Dialog.CloseButton />
-    <Dialog.Title>Confirm action</Dialog.Title>
-    <Dialog.Description>Are you sure you want to proceed?</Dialog.Description>
-    <Dialog.Close render={<Button />}>Cancel</Dialog.Close>
+    <Card.Root elevation='overlay'>
+      <Card.Header>
+        <Card.Title>Confirm action</Card.Title>
+        <Card.Description>Are you sure you want to proceed?</Card.Description>
+      </Card.Header>
+      <Card.Footer>
+        <Dialog.Close render={<Button variant='outline' fullWidth />}>Cancel</Dialog.Close>
+        <Button fullWidth>Proceed</Button>
+      </Card.Footer>
+    </Card.Root>
   </Dialog.Popup>
 </Dialog.Root>;
 ```
@@ -64,41 +63,37 @@ const [open, setOpen] = useState(false);
 
 Every close the dialog owns — Escape, outside press, `Dialog.Close`, `Dialog.CloseButton`,
 `handle.close()` — goes through `onOpenChange`, so a controlled consumer can veto one by not
-committing. Your own `setOpen(false)` skips that; use `Dialog.Close` when a close might need vetoing.
+committing.
 
-### Size
+### Variant
 
-| Value     | Width                                    | For                                                   |
-| --------- | ---------------------------------------- | ----------------------------------------------------- |
-| `prompt`  | `23.75rem`, height from content          | One question or one field (default)                   |
-| `card`    | `25rem`, height from content             | Sign-in / sign-up                                     |
-| `profile` | Width from its surface, fills the height | Account profile and settings — a surface you navigate |
+| Value     | Width                                    | For                                                                  |
+| --------- | ---------------------------------------- | -------------------------------------------------------------------- |
+| `card`    | `25rem`, height from content             | Everything a `Card` holds — a flow, a confirmation, a form (default) |
+| `profile` | Width from its surface, fills the height | Account profile and settings — a surface you navigate                |
 
-### `card` and `profile` bring their own surface
+### Every dialog brings its own surface
 
-Only `prompt` paints itself. A `card` holds a `Card`, and a `profile` holds a `Profile` (or
+The dialog **paints nothing**. A `card` holds a `Card`, and a `profile` holds a `Profile` (or
 `UserProfileView`): the dialog positions and animates the popup, and the surface inside paints it.
-Both surfaces read `DialogContext` and are self-contained — `Card.Title` and the profile's label name
-the dialog, and `Card.Header` and `Profile.Root` carry the dismiss — so `Dialog.CloseButton`
-and `Dialog.Title` are only for a `prompt`.
+
+A popup with no surface inside renders an unpainted box.
 
 <Story
   name='CardSurface'
   storyModule={DialogStories}
 />
 
-A `profile` composes the same way, with the user page in place of the card. The page names the
-dialog, carries the dismiss, scrolls its own content column, and collapses its own sidebar — the
-full example is under [A profile](#a-profile):
+A `profile` composes the same way, with the user page in place of the card.
 
 ```tsx
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
-import { UserProfileView } from '@clerk/ui/mosaic/features/user-profile/user-profile.view';
+import { Button } from '@clerk/mosaic/components/button';
+import { Dialog } from '@clerk/mosaic/components/dialog';
+import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
 
 <Dialog.Root>
   <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
-  <Dialog.Popup size='profile'>
+  <Dialog.Popup variant='profile'>
     <UserProfileView
       activePage={activePage}
       pages={pages}
@@ -107,6 +102,23 @@ import { UserProfileView } from '@clerk/ui/mosaic/features/user-profile/user-pro
   </Dialog.Popup>
 </Dialog.Root>;
 ```
+
+### Compact placement
+
+`compactPlacement='sheet'` bottom-anchors the surface in the compact container query and slides it up from the
+edge instead of centring it.
+
+<Story
+  name='Sheet'
+  storyModule={DialogStories}
+/>
+
+| Value    | Compact band (`< 48rem`)                                      | Above it |
+| -------- | ------------------------------------------------------------- | -------- |
+| `center` | Centred (default)                                             | Centred  |
+| `sheet`  | Bottom-anchored, slides up; full width until the surface caps | Centred  |
+
+A `profile` takes no placement and warns in dev if given one.
 
 ### Alert dialogs
 
@@ -121,66 +133,19 @@ destructive confirmation, a "discard changes?".
 What follows from the role:
 
 - Announced as an interruption.
-- No outside-press dismissal. `closedBy` narrows to `closerequest` (default) or `none`; Escape still
-  cancels.
-- Always a `prompt`. `size` is ignored (warns in dev).
-- A `Title` **and** a `Description` are required; both warn in dev when missing.
-- `Dialog.CloseButton` warns: the cancel in `Dialog.Actions` is the way out.
-
-`Dialog.Actions` is the button row for any prompt, not only alerts — it splits the width evenly.
-Render the cancel first so it takes focus on open. The action usually starts
-work, so close from your own state when it resolves rather than with `Dialog.Close`. Pass
-`finalFocus` when there is no trigger to return focus to.
+- No outside-press dismissal; Escape still cancels.
+- A name **and** a description are required — `Card.Title` and `Card.Description`; both warn in dev
+  when missing.
+- `Card.Header` withholds its corner dismiss, and `Dialog.CloseButton` warns.
 
 ### Confirming a discard
 
-Guard a dialog's close behind a confirmation with a handle, a hook, and `Dialog.Confirm`:
+Press Cancel to open a discard confirmation above the profile form. Keep editing returns to the form with the draft intact; Discard clears the draft and closes both dialogs. The dialogs share one scrim, and the form beneath dims and recedes.
 
 <Story
-  name='DiscardChanges'
+  name='Stacked'
   storyModule={DialogStories}
 />
-
-```tsx
-import { createConfirmHandle, Dialog, useConfirmedClose } from '@clerk/ui/mosaic/components/dialog';
-
-const confirm = React.useMemo(() => createConfirmHandle(), []);
-
-const onOpenChange = useConfirmedClose({
-  handle: confirm,
-  when: () => value !== '',
-  onOpenChange: setOpen,
-  confirm: { title: 'Discard changes?', description: '…', actionLabel: 'Discard', destructive: true },
-});
-
-<Dialog.Root open={open} onOpenChange={onOpenChange} closedBy='closerequest'>
-  <Dialog.Popup>
-    …
-    <Dialog.Confirm handle={confirm} finalFocus={inputRef} />
-  </Dialog.Popup>
-</Dialog.Root>;
-```
-
-- Render `Dialog.Confirm` **inside** the popup it guards, so the two share a floating tree.
-- The guarded dialog must be controlled — a veto is the absence of a commit.
-- `confirm.show(options)` asks the same question directly and resolves `true`/`false`. It needs the
-  `Dialog.Confirm` mounted, and returns the in-flight promise if one is already showing.
-
-### Inline
-
-`inline` on the root renders the dialog in its host instead of over the page: no portal, scrim,
-scroll lock or focus trap, and nothing dismisses it. For the account profile mounted in a page slot.
-
-<Story
-  name='Inline'
-  storyModule={DialogStories}
-/>
-
-- `open`, `modal`, `closedBy` are implied; `onOpenChange` is never called.
-- No initial focus on mount. `Dialog.CloseButton` renders nothing; `Card.Header` carries no dismiss.
-- Fills the host edge to edge. How the surface looks there is the surface's call — the page
-  paints the same frame modal or inline.
-- Dialogs opened from inside it are normal modal dialogs over the page.
 
 ### Responsive behaviour
 
@@ -193,89 +158,75 @@ The gap to the screen edge is a fixed inset, not a percentage:
 | `>= 90rem`    | `3rem`       | `3rem` |
 
 The bands are **container queries** against the dialog's viewport element (named `cl-dialog`), not
-media queries. For a modal dialog that is the window, so nothing differs; for an `inline` dialog the
-bands follow the host's width. `Profile` does the same against its own width (`cl-profile`), which is
-what collapses its navigation inside a narrow host.
+media queries.
 
-Below `48rem` a `prompt` becomes a bottom sheet: it pins to the bottom, slides up, and lifts its
-width cap. `card` and `profile` are unchanged. Under `prefers-reduced-motion: reduce` only the fade
-runs.
+Below `48rem` a `compactPlacement='sheet'` dialog pins to the bottom and slides up.
 
 ### Close button
 
-`Dialog.CloseButton` is the styled corner X for a `prompt`, absolutely positioned so it can sit
-anywhere in the children. Pass `aria-label` to localise it. A `card` or `profile` surface carries its
-own. `Dialog.Close` is the unstyled alternative for a footer "Cancel".
+The surface carries the dismiss: `Card.Header` renders one in flow, and `Profile` anchors its own
+through `Dialog.CloseButton`.
 
-Focus opens on the first tabbable element, so a `CloseButton` rendered first takes it. Point
-`initialFocus` on `Dialog.Popup` at the field that should have it instead.
+Focus opens on the first tabbable element, which is why `Card.Header` renders its dismiss first in
+the DOM. Point `initialFocus` on `Dialog.Popup` at the field that should have it instead.
 
 ### Dismissal
 
-`closedBy` mirrors the native `<dialog closedby>` attribute:
+`role` decides what closes the dialog. There is no prop for it.
 
-| Value          | Escape | Outside press | Programmatic | Use for                                     |
-| -------------- | ------ | ------------- | ------------ | ------------------------------------------- |
-| `any`          | ✅     | ✅            | ✅           | Read-and-dismiss content (default)          |
-| `closerequest` | ✅     | ❌            | ✅           | Anything holding input; alert dialogs       |
-| `none`         | ❌     | ❌            | ✅           | Flows the user must complete or acknowledge |
+| Role          | Escape | Outside press | Programmatic |
+| ------------- | ------ | ------------- | ------------ |
+| `dialog`      | ✅     | ✅            | ✅           |
+| `alertdialog` | ✅     | ❌            | ✅           |
 
-```tsx
-<Dialog.Root closedBy='closerequest'>…</Dialog.Root>
-```
+The two map to the native [`<dialog closedby>`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLDialogElement/closedBy) values `any` and `closerequest`.
 
 ### Keyboard
 
 | Key                | Does                                                              |
 | ------------------ | ----------------------------------------------------------------- |
-| Enter (in a field) | Submits the prompt's form — the primary action                    |
-| Escape             | Cancels, per `closedBy`                                           |
+| Enter (in a field) | Submits the dialog's form — the primary action                    |
+| Escape             | Cancels                                                           |
 | Tab                | Moves through the popup in visual order: field → Cancel → confirm |
 
-Tab follows the layout (WCAG 2.4.3), so a prompt with a field should be a form with the primary
-action as its submit — that is how Enter reaches it:
+Tab follows the layout (WCAG 2.4.3), so a dialog with a field should be a form with the primary
+action as its submit.
 
 ```tsx
-<form style={{ display: 'contents' }} onSubmit={save}>
+<Card.Content render={<form id='update-profile' onSubmit={save} />}>
   <Input value={name} onChange={…} />
-  <Dialog.Actions>
-    <Dialog.Close render={<Button variant='outline' />}>Cancel</Dialog.Close>
-    <Button type='submit'>Save</Button>
-  </Dialog.Actions>
-</form>
+</Card.Content>
+<Card.Footer>
+  <Dialog.Close render={<Button variant='outline' fullWidth />}>Cancel</Dialog.Close>
+  <Button type='submit' form='update-profile' fullWidth>Save</Button>
+</Card.Footer>
 ```
-
-### Exit animations
-
-The popup's contents hold their last frame while it fades out, so state that resets on close (a
-machine returning to idle) does not flash through the exit.
 
 ## Parts
 
-| Part                 | Slot                  | Description                                                         |
-| -------------------- | --------------------- | ------------------------------------------------------------------- |
-| `Dialog.Root`        | —                     | State: open/close, `role`, `inline`, `modal`, `closedBy`, `handle`. |
-| `Dialog.Trigger`     | —                     | Opens the dialog; `render`, and `handle` + `payload` when detached. |
-| `Dialog.Popup`       | `dialog-popup`        | The surface; `size`, `initialFocus`, `finalFocus`.                  |
-| `Dialog.Title`       | —                     | Wired to `aria-labelledby`. Unstyled — render through `Heading`.    |
-| `Dialog.Description` | —                     | Wired to `aria-describedby`. Unstyled — render through `Text`.      |
-| `Dialog.Close`       | —                     | Unstyled dismiss; accepts `render`.                                 |
-| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X.                                                |
-| `Dialog.Actions`     | `dialog-actions`      | An alert dialog's response row. Cancel first.                       |
-| `Dialog.Confirm`     | `dialog-popup`        | A confirmation rendered from `confirm.show()`.                      |
+| Part                 | Slot                  | Description                                                                               |
+| -------------------- | --------------------- | ----------------------------------------------------------------------------------------- |
+| `Dialog.Root`        | —                     | State: open/close, `role`, `modal`, `handle`.                                             |
+| `Dialog.Trigger`     | —                     | Opens the dialog; `render`, and `handle` + `payload` when detached.                       |
+| `Dialog.Popup`       | `dialog-popup`        | The box the surface sits in; `variant`, `compactPlacement`, `initialFocus`, `finalFocus`. |
+| `Dialog.Close`       | —                     | Unstyled dismiss; accepts `render`.                                                       |
+| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X, for a surface that anchors its own dismiss.                          |
+
+The name, the description and the button row come from the surface — `Card.Title`,
+`Card.Description` and `Card.Footer` — not from the dialog.
 
 `Dialog.Popup` also renders the scrim (`dialog-backdrop`), the viewport (`dialog-viewport`, the
 `cl-dialog` container) and the centering track inside it (`dialog-track`, which carries the inset).
 
 ## Styling
 
-Override by targeting the `.cl-*` slot from a layer that wins over `@clerk/ui/styles.css`:
+Override by targeting the `.cl-*` slot from a layer that wins over `@clerk/mosaic/styles.css`:
 
 ```css
-@import '@clerk/ui/styles.css' layer(components);
+@import '@clerk/mosaic/styles.css' layer(components);
 
 @layer overrides {
-  .cl-dialog-popup[data-size='profile'] {
+  .cl-dialog-popup[data-variant='profile'] {
     max-width: 60rem;
   }
 }
@@ -287,23 +238,22 @@ State attributes:
 | ------------------------------------------- | ---------------------------------- | ------------------------------------- |
 | `data-open` / `data-closed`                 | Trigger, Backdrop, Viewport, Popup | Open state (`closed` during the exit) |
 | `data-starting-style` / `data-ending-style` | Backdrop, Viewport, Popup          | Entering frame / exit animation       |
-| `data-size`                                 | Viewport, Track, Popup             | Resolved size                         |
-| `data-inline`                               | Viewport, Track, Popup             | Root is `inline`                      |
+| `data-variant`                              | Viewport, Track, Popup             | Resolved variant                      |
 | `data-nested`                               | Backdrop, Viewport, Popup          | Opened inside another overlay         |
 | `data-stacked` / `data-stack-base`          | Popup                              | On top of / beneath another dialog    |
 
 ### Nested dialogs and stacks
 
-A dialog opened inside another is one of two relationships, decided by the size beneath it:
+A dialog opened inside another is one of two relationships, decided by the variant beneath it:
 
 |                     | Nested                     | Stack                              |
 | ------------------- | -------------------------- | ---------------------------------- |
-| Opens over          | a `profile` or `card`      | a `prompt`                         |
+| Opens over          | a `profile`                | a `card`                           |
 | Its own scrim       | Yes, lighter than the base | None — one scrim serves the stack  |
 | The surface beneath | Unchanged                  | Dims and recedes                   |
 | Attributes          | `data-nested`              | `data-stacked` / `data-stack-base` |
 
-A `profile` never opens inside another dialog — it warns in dev. A `prompt` or a `card` (a confirmation holding a `Card`) is what opens over one.
+A `profile` never opens inside another dialog — it warns in dev. A `card` is what opens over one.
 
 ---
 
@@ -311,31 +261,12 @@ A `profile` never opens inside another dialog — it warns in dev. A `prompt` or
 
 ### A profile
 
-The account profile as a `profile`: the page inside paints the frame, names the dialog, scrolls its
-own content column, collapses its own sidebar, and carries the dismiss. The dialog only positions it.
-
 <Story
   name='Nested'
   storyModule={DialogStories}
 />
 
-Add an email address, type into the field and try to close it: the prompt opens over the profile
-(nested, with its own lighter scrim), and a confirmation stacks on the prompt (no second scrim; the
-prompt recedes). The same stack on its own:
-
-<Story
-  name='StackedPrompts'
-  storyModule={DialogStories}
-/>
-
-Nest by rendering a `Dialog.Root` inside another popup's children. Dismissal reaches only the top
-dialog, scroll stays locked until the last one closes, and focus returns down the stack.
-
 ### Scrolling a tall card
-
-A `prompt` or `card` taller than the screen scrolls the whole dialog inside the viewport, inset and
-all. Nothing to opt into. (A phone-band `prompt` sheet is clipped instead — use `card` for a tall
-surface on a phone.)
 
 <Story
   name='OutsideScroll'

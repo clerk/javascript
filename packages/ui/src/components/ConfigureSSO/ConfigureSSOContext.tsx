@@ -1,7 +1,6 @@
 import type { EnterpriseConnectionResource, OrganizationDomainResource } from '@clerk/shared/types';
 import React, { type PropsWithChildren } from 'react';
 
-import type { ConnectionScope } from './domain/connectionScope';
 import type { OrganizationEnterpriseConnection } from './domain/organizationEnterpriseConnection';
 import type {
   EnterpriseConnectionMutations,
@@ -19,8 +18,11 @@ export type { OrganizationDomainMutations };
  */
 export interface ConfigureSSOData {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
-  enterpriseConnections: EnterpriseConnectionResource[];
-  connectionScope: ConnectionScope;
+  /** The scoped connection's domains, a draft while the scope is `new`. */
+  connectionDomains: string[];
+  setConnectionDomains: (domains: string[]) => Promise<void>;
+  /** Domains other connections of the organization authenticate, keyed to that connection's name. */
+  claimedDomains: Map<string, string>;
   /** Ref to the wizard's scrollable content container. */
   contentRef: React.RefObject<HTMLDivElement>;
   enterpriseConnectionMutations: EnterpriseConnectionMutations;
@@ -33,8 +35,9 @@ export interface ConfigureSSOData {
 
 interface ConfigureSSOProviderProps {
   enterpriseConnection: EnterpriseConnectionResource | undefined;
-  enterpriseConnections: EnterpriseConnectionResource[];
-  connectionScope: ConnectionScope;
+  connectionDomains: string[];
+  setConnectionDomains: (domains: string[]) => Promise<void>;
+  claimedDomains: Map<string, string>;
   organizationEnterpriseConnection: OrganizationEnterpriseConnection;
   testRuns: TestRunsView;
   organizationDomains: OrganizationDomainResource[] | undefined;
@@ -49,8 +52,9 @@ ConfigureSSOContext.displayName = 'ConfigureSSOContext';
 
 export const ConfigureSSOProvider = ({
   enterpriseConnection,
-  enterpriseConnections,
-  connectionScope,
+  connectionDomains,
+  setConnectionDomains,
+  claimedDomains,
   organizationEnterpriseConnection,
   testRuns,
   organizationDomains,
@@ -64,8 +68,9 @@ export const ConfigureSSOProvider = ({
     () => ({
       contentRef,
       enterpriseConnection,
-      enterpriseConnections,
-      connectionScope,
+      connectionDomains,
+      setConnectionDomains,
+      claimedDomains,
       organizationEnterpriseConnection,
       testRuns,
       organizationDomains,
@@ -81,8 +86,9 @@ export const ConfigureSSOProvider = ({
       testRuns,
       organizationDomains,
       enterpriseConnection,
-      enterpriseConnections,
-      connectionScope,
+      connectionDomains,
+      setConnectionDomains,
+      claimedDomains,
       onExit,
     ],
   );

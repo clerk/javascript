@@ -19,12 +19,13 @@ import {
   useInteractions,
   useRole,
 } from '@floating-ui/react';
-import { type ReactNode, useMemo, useRef } from 'react';
+import { type ReactNode, useContext, useMemo, useRef } from 'react';
 
 import { useControllableState } from '../../hooks/use-controllable-state';
 import { useTransition } from '../../hooks/use-transition';
 import { cssVars } from '../../utils/css-vars';
 import { TooltipContext, type TooltipContextValue } from './tooltip-context';
+import { TooltipGroupContext } from './tooltip-group';
 
 export interface TooltipProps {
   open?: boolean;
@@ -32,9 +33,9 @@ export interface TooltipProps {
   onOpenChange?: (open: boolean) => void;
   placement?: Placement;
   sideOffset?: number;
-  /** Delay in ms before the tooltip opens on hover. Default: 200 */
+  /** Delay in ms before the tooltip opens on hover. Ignored inside a `Tooltip.Group`. Default: 200 */
   delay?: number;
-  /** Delay in ms before the tooltip closes on hover out. Default: 0 */
+  /** Delay in ms before the tooltip closes on hover out. Ignored inside a `Tooltip.Group`. Default: 0 */
   closeDelay?: number;
   children: ReactNode;
 }
@@ -78,11 +79,12 @@ function TooltipInner(props: TooltipProps) {
     ref: popupRef,
   });
 
-  useDelayGroup(floatingContext, { id: nodeId });
+  const inGroup = useContext(TooltipGroupContext);
+  const { delay: groupDelay } = useDelayGroup(floatingContext, { id: nodeId });
 
   const hover = useHover(floatingContext, {
     move: false,
-    delay: { open: delay, close: closeDelay },
+    delay: inGroup ? groupDelay : { open: delay, close: closeDelay },
   });
   const focus = useFocus(floatingContext);
   const dismiss = useDismiss(floatingContext);

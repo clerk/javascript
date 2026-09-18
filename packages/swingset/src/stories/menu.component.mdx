@@ -14,8 +14,8 @@ Click the trigger, then use the arrow keys or type to move between items.
 ## Usage
 
 ```tsx
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import { Menu } from '@clerk/ui/mosaic/components/menu';
+import { Icon } from '@clerk/mosaic/components/icon';
+import { Menu } from '@clerk/mosaic/components/menu';
 
 <Menu.Root>
   <Menu.Trigger />
@@ -216,10 +216,10 @@ const [open, setOpen] = useState(false);
 The Mosaic menu is themed with **StyleX**. Each styled part
 carries a stable `.cl-<slot>` class (the slots above) alongside the StyleX atoms. Consumers never
 target the hashed atomic classes — override by targeting the `.cl-*` slot from a CSS layer that wins
-over `@clerk/ui/styles.css`:
+over `@clerk/mosaic/styles.css`:
 
 ```css
-@import '@clerk/ui/styles.css' layer(components);
+@import '@clerk/mosaic/styles.css' layer(components);
 
 @layer overrides {
   .cl-menu-popup {

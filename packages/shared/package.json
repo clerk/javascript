@@ -71,6 +71,16 @@
         "default": "./dist/utils/index.js"
       }
     },
+    "./phone": {
+      "import": {
+        "types": "./dist/phone/index.d.mts",
+        "default": "./dist/phone/index.mjs"
+      },
+      "require": {
+        "types": "./dist/phone/index.d.ts",
+        "default": "./dist/phone/index.js"
+      }
+    },
     "./workerTimers": {
       "import": {
         "types": "./dist/workerTimers/index.d.mts",

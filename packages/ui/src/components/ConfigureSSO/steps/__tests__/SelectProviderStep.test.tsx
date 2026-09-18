@@ -1,4 +1,4 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import type { ReactElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -350,5 +350,30 @@ describe('SelectProviderStep', () => {
       expect(changeProvider).not.toHaveBeenCalled();
       expect(goNext).not.toHaveBeenCalled();
     });
+  });
+
+  it('surfaces a domains field error from the create on the step, since the step has no domains field', async () => {
+    resetMocks();
+    createEnterpriseConnection.mockRejectedValue(
+      new ClerkAPIResponseError('Unprocessable', {
+        status: 422,
+        data: [
+          {
+            code: 'form_identifier_exists',
+            message: 'already exists',
+            long_message: 'That domain is already used by another connection.',
+            meta: { param_name: 'domains' },
+          },
+        ],
+      }),
+    );
+    const { wrapper } = await createFixtures();
+    const { userEvent } = renderStep(wrapper);
+
+    await userEvent.click(screen.getByRole('radio', { name: 'Okta Workforce' }));
+    await userEvent.click(screen.getByRole('button', { name: /Continue/i }));
+
+    expect(await screen.findByText(/already used by another connection/i)).toBeInTheDocument();
+    expect(goNext).not.toHaveBeenCalled();
   });
 });

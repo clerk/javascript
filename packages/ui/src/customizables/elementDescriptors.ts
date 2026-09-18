@@ -240,6 +240,8 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'organizationProfileSecuritySsoDetailRowChip',
   'organizationProfileSecuritySsoDetailRowLink',
   'organizationProfileSecuritySsoProviderIcon',
+  'organizationProfileSecuritySsoConnectionRow',
+  'organizationProfileSecuritySsoConnectionPage',
 
   'organizationListPreviewItems',
   'organizationListPreviewItem',
@@ -593,6 +595,7 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOVerifyDomainSuggestion',
   'configureSSOVerifyDomainCard',
   'configureSSOVerifyDomainCardBadge',
+  'configureSSOVerifyDomainCardCheckbox',
   'configureSSOVerifyDomainCardRemoveButton',
   'configureSSOVerifyDomainCardTxtRecord',
   'configureSSOVerifyDomainCardTxtRecordValue',

@@ -68,6 +68,9 @@ vi.mock('../../ConfigureSSO/hooks/useOrganizationEnterpriseConnection', () => ({
       enterpriseConnections: [activeConnection],
       connectionScope: { kind: 'existing', id: activeConnection.id },
       selectConnection: () => {},
+      connectionDomains: activeConnection.domains,
+      setConnectionDomains: noop,
+      claimedDomains: new Map(),
       organizationEnterpriseConnection: buildOrganizationEnterpriseConnection({
         connection: activeConnection,
         hasSuccessfulTestRun: true,
@@ -122,9 +125,10 @@ describe('OrganizationSecurityPage — wizard survives a mid-flow loading toggle
 
     const { userEvent } = render(<OrganizationSecurityPage contentRef={{ current: null }} />, { wrapper });
 
-    // Enter the wizard from the overview via Edit, which forces the first step.
-    await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
-    await userEvent.click(await screen.findByRole('menuitem', { name: 'Edit' }));
+    // Enter the wizard from the overview via Add connection, which forces the
+    // first step. The mocked hook pins the scope to `activeConnection`, so the
+    // wizard opens on it regardless of the requested scope.
+    await userEvent.click(await screen.findByRole('button', { name: /Add connection/i }));
     expect(await screen.findByRole('heading', { name: /add SSO domains/i })).toBeInTheDocument();
 
     // Navigate forward to the Activate step via the breadcrumb (reachable because
