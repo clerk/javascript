@@ -11,9 +11,10 @@ import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.vie
 
 export interface UserProfileMfaSetupViewProps extends UserProfileAddMfaViewProps {
   step: UserProfileMfaAddableMethod | 'select';
-  sms: Omit<UserProfileAddSmsViewProps, 'onCancel'>;
-  authenticator: Omit<UserProfileAddAuthenticatorViewProps, 'onCancel'>;
+  sms: UserProfileAddSmsViewProps;
+  authenticator: Omit<UserProfileAddAuthenticatorViewProps, 'onBack'>;
   backupCodes: Omit<UserProfileBackupCodesViewProps, 'onCancel'>;
+  onBack: () => void;
   onCancel: () => void;
 }
 
@@ -23,6 +24,7 @@ export function UserProfileMfaSetupView(props: UserProfileMfaSetupViewProps) {
   return (
     <Flow.Root
       value={step}
+      direction={props.step === 'select' ? -1 : 1}
       state={props}
     >
       {current => (
@@ -34,21 +36,18 @@ export function UserProfileMfaSetupView(props: UserProfileMfaSetupViewProps) {
             />
           </Flow.Step>
           <Flow.Step ids={['sms']}>
-            <UserProfileAddSmsView
-              {...current.sms}
-              onCancel={current.onCancel}
-            />
+            <UserProfileAddSmsView {...current.sms} />
           </Flow.Step>
           <Flow.Step ids={['authenticator']}>
             <UserProfileAddAuthenticatorView
               {...current.authenticator}
-              onCancel={current.onCancel}
+              onBack={current.onBack}
             />
           </Flow.Step>
           <Flow.Step ids={['authenticator-verify']}>
             <UserProfileAddAuthenticatorView
               {...current.authenticator}
-              onCancel={current.onCancel}
+              onBack={current.onBack}
             />
           </Flow.Step>
           <Flow.Step ids={['backup-codes']}>

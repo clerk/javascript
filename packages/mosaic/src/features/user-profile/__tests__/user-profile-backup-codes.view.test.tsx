@@ -78,6 +78,15 @@ describe('UserProfileBackupCodesView', () => {
     expect(props.onRetry).toHaveBeenCalledTimes(1);
   });
 
+  it('returns to method selection when generation fails after choosing backup codes', async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    renderView({ codes: [], errorMessage: 'Unable to generate backup codes.', onBack });
+    expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Back' }));
+    expect(onBack).toHaveBeenCalledOnce();
+  });
+
   it.each([
     ['copy', 'Copy and close', 'Download', 'Copying backup codes'],
     ['download', 'Download', 'Copy and close', 'Downloading backup codes'],

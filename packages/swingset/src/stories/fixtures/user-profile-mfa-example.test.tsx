@@ -39,19 +39,25 @@ function ProfileExample({
 }
 
 describe('Profile MFA flows', () => {
-  it('uses the localized Add action and returns to method selection after cancelling setup', async () => {
-    const user = userEvent.setup();
-    render(<ProfileExample localization={{ messages: { userProfileMfa: { addLabel: 'Add a second factor' } } }} />);
-    const add = screen.getByRole('button', { name: 'Add a second factor' });
-    await user.click(add);
-    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
-    await user.click(screen.getByRole('button', { name: 'Cancel' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(add).toHaveFocus();
-    await user.click(add);
-    expect(screen.getByRole('dialog', { name: 'Add 2-step verification' })).toBeVisible();
-    expect(screen.getByRole('button', { name: /Authenticator app/ })).toBeVisible();
-  });
+  it.each(['SMS verification', 'Authenticator app'])(
+    'returns from %s to the method picker without closing the dialog',
+    async method => {
+      const user = userEvent.setup();
+      render(<ProfileExample localization={{ messages: { userProfileMfa: { addLabel: 'Add a second factor' } } }} />);
+      const add = screen.getByRole('button', { name: 'Add a second factor' });
+      await user.click(add);
+      const dialog = screen.getByRole('dialog', { name: 'Add 2-step verification' });
+      await user.click(within(dialog).getByRole('button', { name: new RegExp(method) }));
+      await user.click(within(dialog).getByRole('button', { name: 'Back' }));
+      expect(screen.getByRole('dialog', { name: 'Add 2-step verification' })).toBe(dialog);
+      expect(within(dialog).getByRole('button', { name: /SMS verification/ })).toHaveFocus();
+      await user.click(within(dialog).getByRole('button', { name: new RegExp(method) }));
+      expect(within(dialog).getByRole('button', { name: 'Back' })).toBeVisible();
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(add).toHaveFocus();
+    },
+  );
 
   it('retries copying and verification, then finishes authenticator setup without closing the Profile overlay', async () => {
     const user = userEvent.setup();

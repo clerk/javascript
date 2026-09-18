@@ -20,6 +20,7 @@ export function useUserProfileMfaExample() {
         sms={fixture.sms}
         authenticator={{ ...fixture.authenticator, ...authenticatorCopy }}
         backupCodes={fixture.backupCodes}
+        onBack={fixture.setup.onBack}
         onCancel={() => fixture.setup.onOpenChange(false)}
       />
     </UserProfileAddMfaDialog>

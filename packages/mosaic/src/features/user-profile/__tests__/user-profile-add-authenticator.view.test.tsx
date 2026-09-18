@@ -58,7 +58,7 @@ describe('UserProfileAddAuthenticatorView', () => {
     expect(screen.queryByRole('img')).not.toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Verify', exact: true })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Back' })).toBeEnabled();
     expect(screen.getByRole('button', { name: /Preparing authenticator/ })).toHaveFocus();
 
     rerender(
@@ -126,7 +126,7 @@ describe('UserProfileAddAuthenticatorView', () => {
     for (const slot of screen.getAllByRole('textbox')) {
       expect(slot).toBeDisabled();
     }
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled();
     await user.click(verify);
     const form = screen.getByRole('textbox', { name: 'Verification code' }).closest('form');
     if (!form) {

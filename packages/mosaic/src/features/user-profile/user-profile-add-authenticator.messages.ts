@@ -1,6 +1,6 @@
 export const userProfileAddAuthenticatorMessages = {
   codeLabel: 'Verification code',
-  cancel: 'Cancel',
+  back: 'Back',
   verify: 'Verify',
   pending: 'Verifying code',
   preparing: 'Preparing authenticator…',

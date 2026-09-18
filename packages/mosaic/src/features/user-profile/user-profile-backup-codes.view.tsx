@@ -13,6 +13,7 @@ import { styles } from './user-profile-backup-codes.styles';
 
 export interface UserProfileBackupCodesViewProps {
   onCancel: () => void;
+  onBack?: () => void;
   codes: readonly string[];
   onRetry: () => void;
   onCopy: () => void;
@@ -23,6 +24,7 @@ export interface UserProfileBackupCodesViewProps {
 
 export function UserProfileBackupCodesView({
   onCancel,
+  onBack,
   codes,
   onRetry,
   onCopy,
@@ -133,9 +135,9 @@ export function UserProfileBackupCodesView({
               color='neutral'
               fullWidth
               disabled={Boolean(pendingAction)}
-              onClick={onCancel}
+              onClick={onBack ?? onCancel}
             >
-              {m.cancel}
+              {onBack ? m.back : m.cancel}
             </Button>
             <SubmitButton
               type='button'

@@ -5,6 +5,7 @@ export const userProfileBackupCodesMessages = {
   download: 'Download',
   copyAndClose: 'Copy and close',
   cancel: 'Cancel',
+  back: 'Back',
   retry: 'Try again',
   generating: 'Generating backup codes',
   copying: 'Copying backup codes',

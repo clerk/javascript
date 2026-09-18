@@ -19,7 +19,7 @@ export interface UserProfileAddAuthenticatorViewProps extends Omit<
   setup?: { secret: string; uri: string };
   setupErrorMessage?: string;
   onRetry: () => void;
-  onCancel: () => void;
+  onBack: () => void;
   code: string;
   onCodeChange: (value: string) => void;
   onSubmit: (code: string) => void;
@@ -28,7 +28,7 @@ export interface UserProfileAddAuthenticatorViewProps extends Omit<
 }
 
 export function UserProfileAddAuthenticatorView({
-  onCancel,
+  onBack,
   setup,
   setupErrorMessage,
   onRetry,
@@ -125,9 +125,9 @@ export function UserProfileAddAuthenticatorView({
           color='neutral'
           fullWidth
           disabled={Boolean(setup) && isPending}
-          onClick={onCancel}
+          onClick={onBack}
         >
-          {m.cancel}
+          {m.back}
         </Button>
         <SubmitButton
           ref={actionRef}

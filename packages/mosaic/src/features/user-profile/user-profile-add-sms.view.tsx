@@ -12,7 +12,6 @@ import { useMessages } from '../../localization';
 import { EnterPhoneStep, VerifyPhoneStep } from './user-profile-phone.steps';
 
 export interface UserProfileAddSmsViewProps {
-  onCancel: () => void;
   step: 'select' | 'phone' | 'verify';
   direction?: FlowDirection;
   phoneNumbers: readonly { id: string; phoneNumber: string }[];
@@ -160,9 +159,9 @@ function SelectPhoneStep(props: UserProfileAddSmsViewProps & { inputRef?: Ref<HT
           color='neutral'
           fullWidth
           disabled={props.isPending}
-          onClick={props.onCancel}
+          onClick={props.onBack}
         >
-          {m.cancel}
+          {m.back}
         </Button>
         <SubmitButton
           form={formId}

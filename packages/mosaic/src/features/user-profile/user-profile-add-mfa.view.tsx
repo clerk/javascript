@@ -1,4 +1,5 @@
 import { Card } from '../../components/card';
+import { useFlowAutoFocus } from '../../components/flow';
 import { Icon, IconFrame } from '../../components/icon';
 import { Item } from '../../components/item';
 import { useMessages } from '../../localization';
@@ -17,6 +18,7 @@ const icons = {
 
 export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaViewProps) {
   const m = useMessages('userProfileMfa');
+  const firstMethodRef = useFlowAutoFocus<HTMLDivElement>();
   return (
     <>
       <Card.Header>
@@ -25,9 +27,10 @@ export function UserProfileAddMfaView({ methods, onSelect }: UserProfileAddMfaVi
       </Card.Header>
       <Card.Content>
         <Item.Group variant='outline'>
-          {methods.map(type => (
+          {methods.map((type, index) => (
             <Item.Root
               key={type}
+              ref={index === 0 ? firstMethodRef : undefined}
               size='lg'
               render={
                 <button

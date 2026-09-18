@@ -16,6 +16,7 @@ export function MfaSetupDialog(props: Partial<UserProfileMfaSetupViewProps>) {
           step='select'
           methods={['sms', 'authenticator', 'backup-codes']}
           onSelect={vi.fn()}
+          onBack={vi.fn()}
           onCancel={vi.fn()}
           authenticator={{
             onRetry: vi.fn(),

@@ -104,7 +104,7 @@ describe('UserProfileAddSmsView', () => {
       }
       form.requestSubmit();
       expect(props.onSubmit).not.toHaveBeenCalled();
-      expect(screen.getByRole('button', { name: step === 'select' ? 'Cancel' : 'Back' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled();
 
       rerender(
         <MfaSetupDialog

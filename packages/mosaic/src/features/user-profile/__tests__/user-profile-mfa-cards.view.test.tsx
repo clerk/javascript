@@ -43,7 +43,6 @@ describe('MFA cards', () => {
                       onCodeChange={vi.fn()}
                       onSubmit={vi.fn()}
                       onResend={vi.fn()}
-                      onCancel={vi.fn()}
                     />
                   </Flow.Step>
                 </>

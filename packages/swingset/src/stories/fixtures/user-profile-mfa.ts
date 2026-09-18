@@ -68,6 +68,7 @@ export function useUserProfileMfaFixture({
     open: boolean;
     step: UserProfileMfaAddableMethod | 'select';
     onOpenChange: (open: boolean) => void;
+    onBack: () => void;
   };
   section: UserProfileMfaSectionViewProps;
   authenticator: UserProfileMfaSetupViewProps['authenticator'];
@@ -85,6 +86,7 @@ export function useUserProfileMfaFixture({
     hasBackupCodes: initialFlow === 'backup-codes' && Boolean(enrollmentBackupCodes?.length),
   });
   const [flow, setFlow] = useState<UserProfileMfaAddableMethod | 'select' | undefined>(initialFlow);
+  const [backupCodesSource, setBackupCodesSource] = useState<'select' | 'regenerate'>('regenerate');
   const [pending, setPending] = useState<'submit' | 'resend' | 'generate' | 'copy' | 'download'>();
   const [errorMessage, setErrorMessage] = useState<string>();
   const [code, setCode] = useState('');
@@ -133,10 +135,11 @@ export function useUserProfileMfaFixture({
   if (onGenerateBackupCodes && !account.hasBackupCodes && (account.authenticator || enrolledPhones.length > 0)) {
     addableMethods.push('backup-codes');
   }
-  const generateBackupCodes = async () => {
+  const generateBackupCodes = async (source: 'select' | 'regenerate') => {
     if (pending || !onGenerateBackupCodes) {
       return;
     }
+    setBackupCodesSource(source);
     setFlow('backup-codes');
     setPending('generate');
     setErrorMessage(undefined);
@@ -160,7 +163,7 @@ export function useUserProfileMfaFixture({
       return;
     }
     if (type === 'backup-codes') {
-      void generateBackupCodes();
+      void generateBackupCodes('select');
       return;
     }
     setCode('');
@@ -178,6 +181,16 @@ export function useUserProfileMfaFixture({
       setFlow(undefined);
       setResendSeconds(0);
     }
+  };
+
+  const backToMethods = () => {
+    if (pending) {
+      return;
+    }
+    setFlow('select');
+    setCode('');
+    setErrorMessage(undefined);
+    setResendSeconds(0);
   };
 
   const finishEnrollment = () => {
@@ -300,6 +313,7 @@ export function useUserProfileMfaFixture({
     setup: {
       open: flow !== undefined,
       step: flow ?? 'select',
+      onBack: backToMethods,
       onOpenChange: next => {
         if (next && !pending) {
           setFlow('select');
@@ -314,7 +328,7 @@ export function useUserProfileMfaFixture({
       sectionTitle: 'Authentication',
       onAdd: open,
       onRegenerateBackupCodes:
-        account.hasBackupCodes && onGenerateBackupCodes ? () => void generateBackupCodes() : undefined,
+        account.hasBackupCodes && onGenerateBackupCodes ? () => void generateBackupCodes('regenerate') : undefined,
       onSetDefault: async id => {
         await pause();
         setAccount(current => ({ ...current, defaultPhoneId: id }));
@@ -361,8 +375,8 @@ export function useUserProfileMfaFixture({
         setStep('phone');
       },
       onBack: () => {
-        if (step === 'phone' && eligiblePhones.length === 0) {
-          close(false);
+        if (step === 'select' || (step === 'phone' && eligiblePhones.length === 0)) {
+          backToMethods();
           return;
         }
         setStep(step === 'verify' ? verifyFrom : 'select');
@@ -386,12 +400,13 @@ export function useUserProfileMfaFixture({
       errorMessage,
     },
     backupCodes: {
+      onBack: backupCodesSource === 'select' ? backToMethods : undefined,
       codes,
       pendingAction: pending === 'generate' || pending === 'copy' || pending === 'download' ? pending : undefined,
       errorMessage,
       onRetry: () => {
         if (!pending) {
-          void generateBackupCodes();
+          void generateBackupCodes(backupCodesSource);
         }
       },
       onCopy: () => void save('copy'),

@@ -118,6 +118,24 @@ describe('MFA playground', () => {
     },
   );
 
+  it('returns from failed backup-code setup to the picker but cancels direct regeneration', async () => {
+    const { result, onGenerateBackupCodes } = setup([]);
+    onGenerateBackupCodes.mockRejectedValueOnce(new Error('Generation failed'));
+    act(() => result.current.setup.onOpenChange(true));
+    await complete(() => result.current.section.onAdd?.('backup-codes'));
+    act(() => result.current.backupCodes.onBack?.());
+    expect(result.current.setup).toMatchObject({ open: true, step: 'select' });
+    expect(result.current.backupCodes.errorMessage).toBeUndefined();
+
+    await complete(() => result.current.section.onAdd?.('backup-codes'));
+    act(() => result.current.setup.onOpenChange(false));
+    onGenerateBackupCodes.mockRejectedValueOnce(new Error('Regeneration failed'));
+    await complete(() => result.current.section.onRegenerateBackupCodes?.());
+    expect(result.current.backupCodes.onBack).toBeUndefined();
+    act(() => result.current.setup.onOpenChange(false));
+    expect(result.current.setup.open).toBe(false);
+  });
+
   it('enrolls an authenticator on the first attempt, saves backup codes, and regenerates them', async () => {
     const { result, onCopy, onDownload, onGenerateBackupCodes } = setup();
     act(() => result.current.section.onAdd?.('authenticator'));
@@ -185,6 +203,12 @@ describe('MFA playground', () => {
     expect(result.current.setup).not.toMatchObject({ open: true, step: 'sms' });
     expect(result.current.setup).not.toMatchObject({ open: true, step: 'backup-codes' });
     expect(result.current.section.methods.some(method => method.id === 'work')).toBe(true);
+
+    act(() => result.current.section.onAdd?.('sms'));
+    expect(result.current.sms.phoneNumbers).toEqual([]);
+    expect(result.current.sms.step).toBe('phone');
+    act(() => result.current.sms.onBack());
+    expect(result.current.setup).toMatchObject({ open: true, step: 'select' });
   });
 
   it('allows changing the default SMS number while an authenticator keeps the Default badge', async () => {

@@ -6,6 +6,5 @@ export const userProfileAddSmsMessages = {
   addPhone: 'Add a new phone number',
   continue: 'Continue',
   pending: 'Continuing',
-  cancel: 'Cancel',
   back: 'Back',
 } as const;
