@@ -133,6 +133,14 @@ import {
 } from '../stories/otp.component.stories';
 import { meta as otpMeta } from '../stories/otp.stories';
 import {
+  Disabled as PaginationDisabled,
+  FirstLast as PaginationFirstLast,
+  meta as paginationMeta,
+  Primary as PaginationPrimary,
+  Siblings as PaginationSiblings,
+  SinglePage as PaginationSinglePage,
+} from '../stories/pagination.stories';
+import {
   Default as PhoneInputDefault,
   Disabled as PhoneInputDisabled,
   Invalid as PhoneInputInvalid,
@@ -430,6 +438,15 @@ const inputGroupModule: StoryModule = {
   Sizes: InputGroupSizes,
   Disabled: InputGroupDisabled,
   Invalid: InputGroupInvalid,
+};
+
+const paginationModule: StoryModule = {
+  meta: paginationMeta,
+  Primary: PaginationPrimary,
+  FirstLast: PaginationFirstLast,
+  Siblings: PaginationSiblings,
+  SinglePage: PaginationSinglePage,
+  Disabled: PaginationDisabled,
 };
 
 const phoneInputModule: StoryModule = {
@@ -795,6 +812,7 @@ export const registry: StoryModule[] = [
   iconFrameModule,
   menuComponentModule,
   otpComponentModule,
+  paginationModule,
   popoverComponentModule,
   profileComponentModule,
   sectionModule,
