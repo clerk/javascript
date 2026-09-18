@@ -4,6 +4,7 @@ import React from 'react';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
+import { rtl } from '../../utils/rtl.styles';
 import { Button } from '../button';
 import { ButtonContext } from '../button/button.context';
 import { Icon } from '../icon';
@@ -122,6 +123,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           >
             <Icon
               name='chevron-double-left'
+              xstyle={rtl.mirror}
               size='sm'
             />
           </Button>
@@ -139,6 +141,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
         >
           <Icon
             name='chevron-left'
+            xstyle={rtl.mirror}
             size='sm'
           />
         </Button>
@@ -181,6 +184,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
         >
           <Icon
             name='chevron-right'
+            xstyle={rtl.mirror}
             size='sm'
           />
         </Button>
@@ -198,6 +202,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           >
             <Icon
               name='chevron-double-right'
+              xstyle={rtl.mirror}
               size='sm'
             />
           </Button>

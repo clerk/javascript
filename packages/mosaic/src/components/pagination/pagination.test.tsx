@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { rtl } from '../../utils/rtl.styles';
 import { getPageItems } from './page-items';
 import { Pagination } from './pagination';
 import { styles } from './pagination.styles';
@@ -269,6 +270,21 @@ describe('Mosaic Pagination', () => {
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Forward' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'End' })).toBeInTheDocument();
+  });
+
+  it('mirrors the direction-aware control icons under rtl', () => {
+    render(
+      <Pagination
+        page={2}
+        totalItems={100}
+        pageSize={10}
+        hasFirstLast
+      />,
+    );
+    const mirror = stylex.props(rtl.mirror).className ?? '';
+    for (const name of ['First page', 'Previous page', 'Next page', 'Last page']) {
+      expect(screen.getByRole('button', { name }).querySelector('svg')).toHaveClass(mirror);
+    }
   });
 
   it('extends every control hit target across the gap', () => {

@@ -1,5 +1,5 @@
-import type { PaginationProps } from '@clerk/ui/mosaic/components/pagination';
-import { Pagination } from '@clerk/ui/mosaic/components/pagination';
+import type { PaginationProps } from '@clerk/mosaic/components/pagination';
+import { Pagination } from '@clerk/mosaic/components/pagination';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -15,7 +15,7 @@ export const meta: StoryMeta = {
   status: 'wip',
   substatus: 'needs design',
   title: 'Pagination',
-  source: 'packages/ui/src/mosaic/components/pagination/pagination.tsx',
+  source: 'packages/mosaic/src/components/pagination/pagination.tsx',
   styles: {
     _variants: {
       hasFirstLast: { true: {}, false: {} },
