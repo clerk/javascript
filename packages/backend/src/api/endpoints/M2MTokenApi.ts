@@ -64,6 +64,8 @@ export type RevokeM2MTokenParams = {
 export type VerifyM2MTokenParams = {
   /** The custom machine secret key for authentication. If not provided, the SDK will use the value from the environment variables. */
   machineSecretKey?: string;
+  /** The ID of the machine (`mch_...`) receiving the M2M token. When provided, verification additionally requires the token to be scoped for this machine. */
+  machineId?: string;
   /** The M2M token to verify. */
   token: string;
 };
@@ -172,7 +174,7 @@ export class M2MTokenApi extends AbstractAPI {
     return this.request<M2MToken>(requestOptions);
   }
 
-  async #verifyJwtFormat(token: string): Promise<M2MToken> {
+  async #verifyJwtFormat(token: string, machineId?: string): Promise<M2MToken> {
     let decoded;
     try {
       const { data, errors } = decodeJwt(token);
@@ -187,7 +189,7 @@ export class M2MTokenApi extends AbstractAPI {
       });
     }
 
-    const result = await verifyM2MJwt(token, decoded, this.#verifyOptions);
+    const result = await verifyM2MJwt(token, decoded, { ...this.#verifyOptions, machineId });
     if (result.errors) {
       throw result.errors[0];
     }
@@ -199,10 +201,10 @@ export class M2MTokenApi extends AbstractAPI {
    * @returns The verified [`M2MToken`](https://clerk.com/docs/reference/backend/types/backend-m2m-token) object.
    */
   async verify(params: VerifyM2MTokenParams) {
-    const { token, machineSecretKey } = params;
+    const { token, machineSecretKey, machineId } = params;
 
     if (isM2MJwt(token)) {
-      return this.#verifyJwtFormat(token);
+      return this.#verifyJwtFormat(token, machineId);
     }
 
     const requestOptions = this.#createRequestOptions(
@@ -214,6 +216,14 @@ export class M2MTokenApi extends AbstractAPI {
       machineSecretKey,
     );
 
-    return this.request<M2MToken>(requestOptions);
+    const m2mToken = await this.request<M2MToken>(requestOptions);
+    // BAPI skips the receiver check unless machine-authenticated, so enforce it here.
+    if (machineId && !m2mToken.scopes.includes(machineId)) {
+      throw new MachineTokenVerificationError({
+        code: MachineTokenVerificationErrorCode.TokenInvalid,
+        message: `M2M token is not scoped for machine "${machineId}".`,
+      });
+    }
+    return m2mToken;
   }
 }

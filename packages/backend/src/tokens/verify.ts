@@ -210,11 +210,11 @@ function handleClerkAPIError(
 
 async function verifyM2MToken(
   token: string,
-  options: VerifyTokenOptions,
+  options: VerifyMachineAuthTokenOptions,
 ): Promise<MachineTokenReturnType<M2MToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.m2m.verify({ token });
+    const verifiedToken = await client.m2m.verify({ token, machineId: options.machineId });
     return { data: verifiedToken, tokenType: TokenType.M2MToken, errors: undefined };
   } catch (err: any) {
     return handleClerkAPIError(TokenType.M2MToken, err, 'Machine token not found');
@@ -248,13 +248,23 @@ async function verifyAPIKey(
 }
 
 /**
+ * @interface
+ */
+export type VerifyMachineAuthTokenOptions = VerifyTokenOptions & {
+  /**
+   * The ID of the machine (`mch_...`) receiving machine-to-machine tokens. When provided, M2M token verification additionally requires the token to be scoped for this machine.
+   */
+  machineId?: string;
+};
+
+/**
  * Verifies any type of machine token by detecting its type from the prefix or JWT claims.
  * For JWTs, decodes once and routes based on claims to avoid redundant decoding.
  *
  * @param token - The token to verify (e.g., starts with "mt_", "oat_", "ak_", or a JWT)
  * @param options - Options including secretKey for BAPI authorization
  */
-export async function verifyMachineAuthToken(token: string, options: VerifyTokenOptions) {
+export async function verifyMachineAuthToken(token: string, options: VerifyMachineAuthTokenOptions) {
   if (isJwtFormat(token)) {
     let decodedResult: Jwt;
     try {

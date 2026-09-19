@@ -393,6 +393,52 @@ describe('M2MToken', () => {
       expect(response.claims).toEqual({ foo: 'bar' });
     });
 
+    it('verifies an opaque m2m token scoped for the provided machineId', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens/verify',
+          validateHeaders(() => {
+            return HttpResponse.json(mockM2MToken);
+          }),
+        ),
+      );
+
+      const response = await apiClient.m2m.verify({
+        token: m2mSecret,
+        machineId: 'mch_1xxxxxxxxxxxxx',
+      });
+
+      expect(response.id).toBe(m2mId);
+    });
+
+    it('throws when an opaque m2m token is not scoped for the provided machineId', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      server.use(
+        http.post(
+          'https://api.clerk.test/m2m_tokens/verify',
+          validateHeaders(() => {
+            return HttpResponse.json(mockM2MToken);
+          }),
+        ),
+      );
+
+      await expect(
+        apiClient.m2m.verify({
+          token: m2mSecret,
+          machineId: 'mch_not_in_scopes',
+        }),
+      ).rejects.toThrow('mch_not_in_scopes');
+    });
+
     it('requires a machine secret or instance secret to verify a m2m token', async () => {
       const apiClient = createBackendApiClient({
         apiUrl: 'https://api.clerk.test',
@@ -475,7 +521,7 @@ describe('M2MToken', () => {
       });
       const result = await m2mApi.verify({ token: jwtToken });
 
-      // `aud` and `scopes` from the token are user-supplied custom claims and are
+      // `aud` and `scopes` are auto-added by the backend at mint time and are
       // preserved in `claims`; `scopes` additionally seeds the dedicated field.
       expect(result.claims).toEqual({
         aud: ['mch_1xxxxx', 'mch_2xxxxx'],
@@ -511,6 +557,45 @@ describe('M2MToken', () => {
 
       const jwtToken = await createSignedM2MJwt();
       await expect(m2mApi.verify({ token: jwtToken })).rejects.toThrow('Failed to resolve JWK during verification');
+    });
+
+    it('verifies a JWT M2M token scoped for the provided machineId', async () => {
+      const m2mApi = new M2MTokenApi(
+        buildRequest({ apiUrl: 'https://api.clerk.test', skipApiVersionInUrl: true, requireSecretKey: false }),
+        { secretKey: 'sk_test_xxxxx', apiUrl: 'https://api.clerk.test', skipJwksCache: true },
+      );
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => HttpResponse.json(mockJwks)),
+        ),
+      );
+
+      const jwtToken = await createSignedM2MJwt();
+      const result = await m2mApi.verify({ token: jwtToken, machineId: 'mch_1xxxxx' });
+
+      expect(result.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
+      expect(result.scopes).toContain('mch_1xxxxx');
+    });
+
+    it('throws when a JWT M2M token is not scoped for the provided machineId', async () => {
+      const m2mApi = new M2MTokenApi(
+        buildRequest({ apiUrl: 'https://api.clerk.test', skipApiVersionInUrl: true, requireSecretKey: false }),
+        { secretKey: 'sk_test_xxxxx', apiUrl: 'https://api.clerk.test', skipJwksCache: true },
+      );
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => HttpResponse.json(mockJwks)),
+        ),
+      );
+
+      const jwtToken = await createSignedM2MJwt();
+      await expect(m2mApi.verify({ token: jwtToken, machineId: 'mch_not_in_scopes' })).rejects.toThrow(
+        'mch_not_in_scopes',
+      );
     });
   });
 

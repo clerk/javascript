@@ -29,8 +29,8 @@ describe('M2MToken', () => {
       expect(token.id).toBe('mt_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE');
       expect(token.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
       expect(token.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
-      // `aud` is a user-supplied custom claim (the backend does not auto-add it),
-      // so it is surfaced through `claims` while also seeding the `scopes` field.
+      // `aud` (auto-added by the backend as the scoped machine IDs) seeds the
+      // `scopes` field and is also surfaced through `claims`.
       expect(token.claims).toEqual({ aud: ['mch_1xxxxx', 'mch_2xxxxx'] });
       expect(token.revoked).toBe(false);
       expect(token.revocationReason).toBeNull();
@@ -56,9 +56,8 @@ describe('M2MToken', () => {
 
       const token = M2MToken.fromJwtPayload(payload);
 
-      // `aud` and `scopes` are user-supplied custom claims in Clerk-issued M2M
-      // tokens (the backend neither reserves nor auto-adds them), so they are
-      // preserved in `claims` alongside any other custom claims.
+      // `aud` and `scopes` are auto-added by the backend at mint time; they are
+      // preserved in `claims` alongside the user-supplied custom claims.
       expect(token.claims).toEqual({
         aud: ['mch_1xxxxx'],
         scopes: 'scope1 scope2',

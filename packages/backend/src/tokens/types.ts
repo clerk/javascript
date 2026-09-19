@@ -73,6 +73,12 @@ export type AuthenticateRequestOptions = {
    */
   machineSecretKey?: string;
   /**
+   * The ID of the machine (`mch_...`) receiving machine-to-machine tokens.
+   * When provided, M2M token verification additionally requires the token to be
+   * scoped for this machine.
+   */
+  machineId?: string;
+  /**
    * Controls whether satellite apps automatically sync with the primary domain on initial page load.
    *
    * When `false` (default), satellite apps will skip the automatic handshake if no session cookies exist,

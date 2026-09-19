@@ -14,9 +14,9 @@ type M2MJwtPayload = {
 
 // Structural claims that Clerk's machine-token service always adds when it mints
 // an M2M JWT. These are mapped onto dedicated `M2MToken` fields, so they are
-// stripped from `claims`. Everything else is a user-supplied custom claim and is
-// surfaced through `claims`, including `aud` and `scopes`, which the backend
-// treats as custom claims (they are neither reserved nor auto-added).
+// stripped from `claims`. The service also auto-adds `aud` (the scoped machine
+// IDs) and `scopes` (space-joined) as reserved claims; those seed the dedicated
+// `scopes` field but are additionally surfaced through `claims`.
 const M2M_RESERVED_JWT_CLAIMS = new Set(['iss', 'sub', 'exp', 'nbf', 'iat', 'jti']);
 
 /**
