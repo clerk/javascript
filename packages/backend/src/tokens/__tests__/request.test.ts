@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
+import type { ApiClient } from '../../api';
 import { MachineTokenVerificationErrorCode, TokenVerificationErrorReason } from '../../errors';
 import {
   mockExpiredJwt,
@@ -21,6 +22,7 @@ import { signJwt } from '../../jwt/signJwt';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
+import { HandshakeService } from '../handshake';
 import { JWT_CATEGORY_JWT_TEMPLATE } from '../jwtCategories';
 import { OrganizationMatcher } from '../organizationMatcher';
 import { authenticateRequest, RefreshTokenErrorReason } from '../request';
@@ -2465,6 +2467,193 @@ describe('tokens.authenticateRequest(options)', () => {
       );
 
       expect(requestState).toBeSignedOut({ reason: AuthErrorReason.SessionTokenIATBeforeClientUAT });
+    });
+  });
+
+  describe('__internal_resolveHandshakeOnlyForNavigation', () => {
+    const fetchHeaders = { 'sec-fetch-dest': 'empty', accept: '*/*' };
+
+    const mockOptionsWithHandshakePayload = (overrides: Partial<AuthenticateRequestOptions> = {}) => {
+      const getHandshakePayload = vi.fn().mockResolvedValue({ directives: [`__session=${mockJwt}; Path=/`] });
+      const options = mockOptions({
+        publishableKey: PK_LIVE,
+        apiClient: { clients: { getHandshakePayload } } as unknown as ApiClient,
+        ...overrides,
+      });
+      return { options, getHandshakePayload };
+    };
+
+    beforeEach(() => {
+      server.use(
+        http.get('https://api.clerk.test/v1/jwks', () => {
+          return HttpResponse.json(mockJwks);
+        }),
+      );
+    });
+
+    test('skips the payload exchange on a fetch request with a stale nonce and authenticates from the session cookie', async () => {
+      const { options, getHandshakePayload } = mockOptionsWithHandshakePayload({
+        __internal_resolveHandshakeOnlyForNavigation: true,
+      });
+
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(fetchHeaders, {
+          __clerk_handshake_nonce: 'stale',
+          __client_uat: '12345',
+          __session: mockJwt,
+        }),
+        options,
+      );
+
+      expect(getHandshakePayload).not.toHaveBeenCalled();
+      expect(requestState).toBeSignedIn();
+      expect(requestState.headers.get('location')).toBeNull();
+    });
+
+    test('skips the payload exchange on a POST request with a stale nonce', async () => {
+      const { options, getHandshakePayload } = mockOptionsWithHandshakePayload({
+        __internal_resolveHandshakeOnlyForNavigation: true,
+      });
+
+      const requestState = await authenticateRequest(
+        new Request('http://clerk.com/path', {
+          method: 'POST',
+          headers: {
+            ...defaultHeaders,
+            cookie: `__clerk_handshake_nonce=stale;__client_uat=12345;__session=${mockJwt}`,
+          },
+        }),
+        options,
+      );
+
+      expect(getHandshakePayload).not.toHaveBeenCalled();
+      expect(requestState).toBeSignedIn();
+    });
+
+    test('returns signed out without a payload exchange on a fetch request with a stale nonce and no session', async () => {
+      const { options, getHandshakePayload } = mockOptionsWithHandshakePayload({
+        __internal_resolveHandshakeOnlyForNavigation: true,
+      });
+
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(fetchHeaders, { __clerk_handshake_nonce: 'stale', __client_uat: '12345' }),
+        options,
+      );
+
+      expect(getHandshakePayload).not.toHaveBeenCalled();
+      expect(requestState).toBeSignedOut({ reason: AuthErrorReason.ClientUATWithoutSessionToken });
+      expect(requestState.headers.get('location')).toBeNull();
+    });
+
+    test('still exchanges the payload on a navigation request with a nonce', async () => {
+      const { options, getHandshakePayload } = mockOptionsWithHandshakePayload({
+        __internal_resolveHandshakeOnlyForNavigation: true,
+      });
+
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies({}, { __clerk_handshake_nonce: 'fresh', __client_uat: '12345' }),
+        options,
+      );
+
+      expect(getHandshakePayload).toHaveBeenCalledWith({ nonce: 'fresh' });
+      expect(requestState).toBeSignedIn();
+    });
+
+    test('still redirects a development navigation request to the dev browser handshake', async () => {
+      const { options, getHandshakePayload } = mockOptionsWithHandshakePayload({
+        __internal_resolveHandshakeOnlyForNavigation: true,
+        publishableKey: PK_TEST,
+        secretKey: 'test_deadbeef',
+      });
+
+      const requestState = await authenticateRequest(mockRequestWithCookies(), options);
+
+      expect(getHandshakePayload).not.toHaveBeenCalled();
+      expect(requestState).toMatchHandshake({ reason: AuthErrorReason.DevBrowserMissing });
+    });
+
+    test('still resolves the nonce on a development navigation request returning from the handshake', async () => {
+      const { options, getHandshakePayload } = mockOptionsWithHandshakePayload({
+        __internal_resolveHandshakeOnlyForNavigation: true,
+        publishableKey: PK_TEST,
+        secretKey: 'test_deadbeef',
+      });
+
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies({}, { __clerk_handshake_nonce: 'fresh' }),
+        options,
+      );
+
+      expect(getHandshakePayload).toHaveBeenCalledTimes(1);
+      expect(requestState).toBeSignedIn();
+    });
+
+    test('ignores a stale cookie-transport handshake token on a fetch request without logging', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const { options } = mockOptionsWithHandshakePayload({ __internal_resolveHandshakeOnlyForNavigation: true });
+
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(fetchHeaders, {
+          __clerk_handshake: 'not-a-jwt',
+          __client_uat: '12345',
+          __session: mockJwt,
+        }),
+        options,
+      );
+
+      expect(errorSpy).not.toHaveBeenCalled();
+      expect(requestState).toBeSignedIn();
+    });
+
+    test('by default logs a resolution error for a stale cookie-transport handshake token on a fetch request', async () => {
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const { options } = mockOptionsWithHandshakePayload();
+
+      const requestState = await authenticateRequest(
+        mockRequestWithCookies(fetchHeaders, {
+          __clerk_handshake: 'not-a-jwt',
+          __client_uat: '12345',
+          __session: mockJwt,
+        }),
+        options,
+      );
+
+      expect(errorSpy).toHaveBeenCalledWith('Clerk: unable to resolve handshake:', expect.anything());
+      expect(requestState).toBeSignedIn();
+    });
+
+    test.each([
+      ['omitted', {}],
+      ['false', { __internal_resolveHandshakeOnlyForNavigation: false }],
+    ])(
+      'when the option is %s the eligibility check is never consulted and the payload is exchanged',
+      async (_, flag) => {
+        const eligibilitySpy = vi.spyOn(HandshakeService.prototype, 'isRequestEligibleForHandshake');
+        const { options, getHandshakePayload } = mockOptionsWithHandshakePayload(flag);
+
+        await authenticateRequest(
+          mockRequestWithCookies(fetchHeaders, { __clerk_handshake_nonce: 'fresh', __client_uat: '12345' }),
+          options,
+        );
+
+        expect(eligibilitySpy).not.toHaveBeenCalled();
+        expect(getHandshakePayload).toHaveBeenCalledTimes(1);
+      },
+    );
+
+    test('only an explicit true consults the eligibility check', async () => {
+      const eligibilitySpy = vi.spyOn(HandshakeService.prototype, 'isRequestEligibleForHandshake');
+      const { options, getHandshakePayload } = mockOptionsWithHandshakePayload({
+        __internal_resolveHandshakeOnlyForNavigation: true,
+      });
+
+      await authenticateRequest(
+        mockRequestWithCookies(fetchHeaders, { __clerk_handshake_nonce: 'fresh', __client_uat: '12345' }),
+        options,
+      );
+
+      expect(eligibilitySpy).toHaveBeenCalled();
+      expect(getHandshakePayload).not.toHaveBeenCalled();
     });
   });
 });
