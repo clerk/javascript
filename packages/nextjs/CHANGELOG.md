@@ -1,5 +1,18 @@
 # Change Log
 
+## 7.9.5
+
+### Patch Changes
+
+- Fix a development-only React key warning when using `ClerkProvider` in the App Router. ([#9816](https://github.com/clerk/javascript/pull/9816)) by [@joshrowley](https://github.com/joshrowley)
+
+- Fix a cross-request credential leak in `clerkMiddleware()`. When using dynamic keys (an options callback that resolves a different `secretKey` per request), a `clerkClient()` call made inside the middleware handler could be built with another concurrent request's secret key. Each request now gets its own isolated store, so the keys resolved for a request are only ever visible to that request. ([#9723](https://github.com/clerk/javascript/pull/9723)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`804d3db`](https://github.com/clerk/javascript/commit/804d3db182746d3b403411025b5dccc5aeafc719), [`64c8e3e`](https://github.com/clerk/javascript/commit/64c8e3ec55e79a2ccc79ae27cbadaeef9481f3d9), [`07b4c2b`](https://github.com/clerk/javascript/commit/07b4c2b3c8bfa394f4331efcc363ee4064336f9d), [`4e36687`](https://github.com/clerk/javascript/commit/4e366874c5c4348750d43073cd8ec7aa4564e476), [`3d6ed25`](https://github.com/clerk/javascript/commit/3d6ed25dd62603647e39447454cd8b964fe3558d), [`9e7485c`](https://github.com/clerk/javascript/commit/9e7485c8efc33e9458643372ce133b229347c03d)]:
+  - @clerk/shared@4.34.0
+  - @clerk/react@6.17.0
+  - @clerk/backend@3.18.2
+
 ## 7.9.4
 
 ### Patch Changes
