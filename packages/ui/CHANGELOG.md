@@ -1,5 +1,37 @@
 # @clerk/ui
 
+## 1.34.0
+
+### Minor Changes
+
+- Rename the SSO fallback sign-in flow to SSO bypass, matching the name the feature ships under. The sign-in resource's `ssoFallbackFirstFactors` is now `ssoBypassFirstFactors` and reads the `sso_bypass_first_factors` field from the API, the `signIn.ssoFallback` localization keys are now `signIn.ssoBypass`, and the `ssoFallback` card action element id is now `ssoBypass`. The flow has not been enabled on any instance, so no application is affected by the old names going away. ([#9822](https://github.com/clerk/javascript/pull/9822)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Add the ability for Organization admins to manage the SSO bypass allowlist from the Security page of `<OrganizationProfile />`. ([#9809](https://github.com/clerk/javascript/pull/9809)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+  For custom flows, `organization.ssoBypassAllowlist` exposes `getUsers()`, `addUser({ userId })` and `removeUser(userId)`.
+
+### Patch Changes
+
+- Add `@clerk/shared/phone` with Clerk's country metadata and phone-number parsing, formatting, and detection helpers. ([#9763](https://github.com/clerk/javascript/pull/9763)) by [@Ephem](https://github.com/Ephem)
+
+- Fix reconnecting disconnected Google One Tap accounts in UserProfile to use Google OAuth while preserving session reverification. ([#9767](https://github.com/clerk/javascript/pull/9767)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Each enterprise connection listed on the organization Security page now opens its own page. It lists the connection name and domains, the service provider values to copy into the identity provider, the identity provider configuration behind an Edit form, and the connection settings as a form you save. The header carries one action, either Activate or Continue setup, and deactivating or removing the connection lives in a Danger zone section at the bottom of the page. The row menu is gone; click the row instead. ([#9748](https://github.com/clerk/javascript/pull/9748)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+  The setup wizard's domains step now shows a checkbox per verified domain, so an admin picks which domains a connection covers. A domain another connection of the organization already authenticates is disabled and labelled with that connection's name, and an error from creating the connection is shown on the provider step instead of being dropped.
+
+  New customization handles ship with it: the `organizationProfileSecuritySsoConnectionRow` and `organizationProfileSecuritySsoConnectionPage` appearance elements, the `configureSSOVerifyDomainCardCheckbox` element, the `claimed` badge id, the new `FieldId` values for the connection settings, and the `ssoConnectionName`, `ssoConnectionDomains`, `ssoConnectionServiceProvider`, `ssoConnectionIdentityProvider`, `ssoConnectionSettings` and `ssoConnectionDangerZone` `ProfileSectionId` values.
+
+- Add `@clerk/mosaic`, an experimental standalone package for next generation Clerk components. ([#9765](https://github.com/clerk/javascript/pull/9765)) by [@Ephem](https://github.com/Ephem)
+
+  If you try this out, make sure to pin your version as breaking changes can happen in minors.
+
+- Add `createDynamicParamParser` and `populateParamFromObject` to `@clerk/shared/url` for resolving `:property` placeholders in URL templates. ([#9761](https://github.com/clerk/javascript/pull/9761)) by [@Ephem](https://github.com/Ephem)
+
+- Updated dependencies [[`804d3db`](https://github.com/clerk/javascript/commit/804d3db182746d3b403411025b5dccc5aeafc719), [`64c8e3e`](https://github.com/clerk/javascript/commit/64c8e3ec55e79a2ccc79ae27cbadaeef9481f3d9), [`07b4c2b`](https://github.com/clerk/javascript/commit/07b4c2b3c8bfa394f4331efcc363ee4064336f9d), [`4e36687`](https://github.com/clerk/javascript/commit/4e366874c5c4348750d43073cd8ec7aa4564e476), [`9e7485c`](https://github.com/clerk/javascript/commit/9e7485c8efc33e9458643372ce133b229347c03d)]:
+  - @clerk/shared@4.34.0
+  - @clerk/localizations@4.18.0
+
 ## 1.33.1
 
 ### Patch Changes
