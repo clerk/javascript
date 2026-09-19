@@ -463,6 +463,7 @@ const AddMemberForm = withCardStateProvider(
             aria-label={t(localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.modeLabel'))}
             value={mode}
             onChange={next => changeMode(next as AddMode)}
+            size='lg'
             sx={{ alignSelf: 'flex-start' }}
           >
             <SegmentedControl.Button
