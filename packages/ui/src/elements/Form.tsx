@@ -1,7 +1,7 @@
 import { createContextAndHook } from '@clerk/shared/react';
 import type { FieldId } from '@clerk/shared/types';
 import type { PropsWithChildren } from 'react';
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useRef, useState } from 'react';
 
 import type { LocalizationKey } from '../customizables';
 import { Button, Col, descriptors, Flex, Form as FormPrim, localizationKeys } from '../customizables';
@@ -13,31 +13,36 @@ import type { OTPInputProps } from './CodeControl';
 import { useCardState } from './contexts';
 import { Field } from './FieldControl';
 
-const [FormState, useFormState] = createContextAndHook<{
+const [FormState, useFormState, useOptionalFormState] = createContextAndHook<{
   isLoading: boolean;
   isDisabled: boolean;
   submittedWithEnter: boolean;
+  preserveFocusOnSubmit?: FieldId;
 }>('FormState');
 
-type FormProps = PropsOfComponent<typeof FormPrim>;
+type FormProps = PropsOfComponent<typeof FormPrim> & { preserveFocusOnSubmit?: FieldId };
 
 const FormRoot = (props: FormProps): JSX.Element => {
+  const { preserveFocusOnSubmit, ...formProps } = props;
   const card = useCardState();
   const status = useLoadingStatus();
   const [submittedWithEnter, setSubmittedWithEnter] = useState(false);
+  const isSubmitting = useRef(false);
 
   const onSubmit: React.FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault();
     e.stopPropagation();
-    if (!props.onSubmit) {
+    if (!props.onSubmit || isSubmitting.current || card.isLoading) {
       return;
     }
     try {
+      isSubmitting.current = true;
       card.setLoading();
       status.setLoading();
       setSubmittedWithEnter(true);
       await props.onSubmit(e);
     } finally {
+      isSubmitting.current = false;
       card.setIdle();
       status.setIdle();
     }
@@ -45,16 +50,21 @@ const FormRoot = (props: FormProps): JSX.Element => {
 
   const value = React.useMemo(() => {
     return {
-      value: { isLoading: status.isLoading, isDisabled: card.isLoading || status.isLoading, submittedWithEnter },
+      value: {
+        isLoading: status.isLoading,
+        isDisabled: card.isLoading || status.isLoading,
+        submittedWithEnter,
+        preserveFocusOnSubmit,
+      },
     };
-  }, [card.isLoading, status.isLoading, submittedWithEnter]);
+  }, [card.isLoading, status.isLoading, submittedWithEnter, preserveFocusOnSubmit]);
 
   return (
     <FormState.Provider value={value}>
       <FormPrim
         elementDescriptor={descriptors.form}
         gap={6}
-        {...props}
+        {...formProps}
         onSubmit={onSubmit}
       >
         {/*
@@ -76,7 +86,7 @@ const FormRoot = (props: FormProps): JSX.Element => {
 };
 
 const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
-  const { isLoading, isDisabled } = useFormState();
+  const { isLoading, isDisabled, preserveFocusOnSubmit } = useFormState();
   return (
     <Button
       elementDescriptor={descriptors.formButtonPrimary}
@@ -86,6 +96,20 @@ const FormSubmit = (props: PropsOfComponent<typeof Button>) => {
       isDisabled={isDisabled}
       type='submit'
       {...props}
+      onMouseDown={e => {
+        props.onMouseDown?.(e);
+        if (
+          !e.defaultPrevented &&
+          e.button === 0 &&
+          preserveFocusOnSubmit &&
+          document.activeElement instanceof HTMLInputElement &&
+          document.activeElement.name === preserveFocusOnSubmit &&
+          e.currentTarget.form &&
+          document.activeElement.form === e.currentTarget.form
+        ) {
+          e.preventDefault();
+        }
+      }}
       localizationKey={props.localizationKey || localizationKeys('formButtonPrimary')}
     />
   );
@@ -129,10 +153,14 @@ type CommonInputProps = CommonFieldRootProps & {
 };
 
 const CommonInputWrapper = (props: PropsWithChildren<CommonInputProps>) => {
+  const form = useOptionalFormState();
   const { isOptional, isLastAuthenticationStrategy, icon, actionLabel, children, onActionClicked, ...fieldProps } =
     props;
   return (
-    <Field.Root {...fieldProps}>
+    <Field.Root
+      preserveFocus={form?.preserveFocusOnSubmit === fieldProps.id}
+      {...fieldProps}
+    >
       <Col
         elementDescriptor={descriptors.formField}
         elementId={descriptors.formField.setId(fieldProps.id)}

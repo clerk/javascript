@@ -30,18 +30,19 @@ import { PhoneInput } from './PhoneInput';
 import { RadioItem, RadioLabel } from './RadioGroup';
 
 type FormControlProps = Omit<PropsOfComponent<typeof Input>, 'label' | 'placeholder' | 'disabled' | 'required'> &
-  ReturnType<typeof useFormControlUtil<FieldId>>['props'];
+  ReturnType<typeof useFormControlUtil<FieldId>>['props'] & { preserveFocus?: boolean };
 
 const Root = (props: PropsWithChildren<FormControlProps>) => {
   const card = useCardState();
   const { autoFocus: optionAutoFocus } = useAppearance().parsedOptions;
-  const { children, isDisabled: isDisabledProp, ...restProps } = props;
+  const { children, isDisabled: isDisabledProp, preserveFocus, ...restProps } = props;
 
   const isDisabled = isDisabledProp || card.isLoading;
 
   const ctxProps = {
     ...restProps,
     isDisabled,
+    preserveFocus: preserveFocus && !isDisabledProp && card.isLoading && restProps.isFocused,
     autoFocus: optionAutoFocus && restProps.autoFocus,
   };
 
