@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { act, render, screen, waitFor } from '@/test/utils';
@@ -150,7 +150,7 @@ describe('SSO bypass allowlist', () => {
       await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Manage' }));
 
-      expect(await screen.findByRole('heading', { name: 'SSO allow list' })).toBeInTheDocument();
+      expect(await screen.findByRole('heading', { name: 'SSO bypass' })).toBeInTheDocument();
       expect(screen.getByText('Cameron Walker')).toBeInTheDocument();
       expect(screen.getByText('cameron@clerk.com')).toBeInTheDocument();
       expect(screen.getByText('You')).toBeInTheDocument();
@@ -184,7 +184,7 @@ describe('SSO bypass allowlist', () => {
       await screen.findByText('SSO bypass');
       await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Manage' }));
-      await screen.findByRole('heading', { name: 'SSO allow list' });
+      await screen.findByRole('heading', { name: 'SSO bypass' });
     };
 
     it('filters the list by name or email', async () => {
@@ -210,13 +210,13 @@ describe('SSO bypass allowlist', () => {
       expect(await screen.findByText('No members match your search')).toBeInTheDocument();
     });
 
-    it('adds a member picked from the organization members', async () => {
+    it('adds a member by email address', async () => {
       const { wrapper, fixtures } = await createFixtures(
         withSecurityPage({ permissions: ['org:sys_entconns:manage', 'org:sys_entconns_sso_bypass:manage'] }),
       );
       fixtures.clerk.organization?.getMemberships.mockResolvedValue({
-        data: [membership('user_1', 'Cameron', 'cameron@clerk.com'), membership('user_9', 'Yukio', 'yukio@clerk.com')],
-        total_count: 2,
+        data: [membership('user_9', 'Yukio', 'yukio@clerk.com')],
+        total_count: 1,
       } as any);
       fixtures.clerk.organization?.ssoBypassAllowlist.addUser.mockResolvedValue(
         allowlistEntry('user_9', 'Yukio', 'yukio@clerk.com'),
@@ -228,27 +228,28 @@ describe('SSO bypass allowlist', () => {
 
       await userEvent.click(screen.getByRole('button', { name: 'Add' }));
 
-      expect(await screen.findByRole('heading', { name: 'Add member' })).toBeInTheDocument();
-      const submitButton = () => screen.getAllByRole('button', { name: 'Add' })[1];
-      expect(submitButton()).toBeDisabled();
+      expect(await screen.findByRole('heading', { name: 'Add members' })).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: 'Email' })).toBeChecked();
+      expect(screen.getByRole('button', { name: 'Add members' })).toBeDisabled();
 
-      const options = await screen.findAllByRole('option');
-      expect(options).toHaveLength(1);
-      expect(options[0]).toHaveTextContent('Yukio Yamamoto');
+      await userEvent.type(screen.getByLabelText('Email address'), 'Yukio@clerk.com');
+      await userEvent.click(screen.getByRole('button', { name: 'Add members' }));
 
-      await userEvent.click(options[0]);
-      expect(screen.queryByRole('option')).not.toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Change' })).toBeInTheDocument();
-
-      await userEvent.click(submitButton());
-
+      await waitFor(() =>
+        expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalledWith(
+          expect.objectContaining({ query: 'Yukio@clerk.com' }),
+        ),
+      );
       await waitFor(() =>
         expect(fixtures.clerk.organization?.ssoBypassAllowlist.addUser).toHaveBeenCalledWith({ userId: 'user_9' }),
       );
-      await waitFor(() => expect(screen.queryByRole('heading', { name: 'Add member' })).not.toBeInTheDocument());
+      expect(await screen.findByText('Added 1 member to the allow list.')).toBeInTheDocument();
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Finish' }));
+      await waitFor(() => expect(screen.queryByRole('heading', { name: 'Add members' })).not.toBeInTheDocument());
     });
 
-    it('searches members through the organization membership query', async () => {
+    it('explains when no member has the email address', async () => {
       const { wrapper, fixtures } = await createFixtures(
         withSecurityPage({ permissions: ['org:sys_entconns:manage', 'org:sys_entconns_sso_bypass:manage'] }),
       );
@@ -257,23 +258,77 @@ describe('SSO bypass allowlist', () => {
         total_count: 1,
       } as any);
 
-      vi.useFakeTimers({ shouldAdvanceTime: true });
-      try {
-        const { userEvent } = await openAllowlistPage(wrapper, fixtures, []);
+      const { userEvent } = await openAllowlistPage(wrapper, fixtures, []);
 
-        await userEvent.click(screen.getByRole('button', { name: 'Add' }));
-        await userEvent.type(await screen.findByRole('searchbox', { name: 'Search members' }), 'yukio');
+      await userEvent.click(screen.getByRole('button', { name: 'Add' }));
+      await userEvent.type(await screen.findByLabelText('Email address'), 'nobody@clerk.com');
+      await userEvent.click(screen.getByRole('button', { name: 'Add members' }));
 
-        await vi.advanceTimersByTimeAsync(600);
+      expect(await screen.findByText('No member of this organization has that email address.')).toBeInTheDocument();
+      expect(fixtures.clerk.organization?.ssoBypassAllowlist.addUser).not.toHaveBeenCalled();
+      expect(screen.getByRole('heading', { name: 'Add members' })).toBeInTheDocument();
+    });
 
-        await waitFor(() =>
-          expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalledWith(
-            expect.objectContaining({ query: 'yukio' }),
-          ),
-        );
-      } finally {
-        vi.useRealTimers();
-      }
+    it('adds every member with the selected role and reports the skipped ones', async () => {
+      const { wrapper, fixtures } = await createFixtures(
+        withSecurityPage({
+          permissions: ['org:sys_entconns:manage', 'org:sys_entconns_sso_bypass:manage', 'org:sys_memberships:read'],
+        }),
+      );
+      fixtures.clerk.organization?.getRoles.mockResolvedValue({
+        data: [
+          { id: 'role_admin', key: 'org:admin', name: 'Admin' },
+          { id: 'role_member', key: 'org:member', name: 'Member' },
+        ],
+        total_count: 2,
+      } as any);
+      fixtures.clerk.organization?.getMemberships.mockResolvedValue({
+        data: [
+          membership('user_1', 'Cameron', 'cameron@clerk.com'),
+          membership('user_9', 'Yukio', 'yukio@clerk.com'),
+          membership('user_10', 'Dana', 'dana@personal.com'),
+        ],
+        total_count: 3,
+      } as any);
+      fixtures.clerk.organization?.ssoBypassAllowlist.addUsers.mockResolvedValue({
+        data: [allowlistEntry('user_9', 'Yukio', 'yukio@clerk.com')],
+        errors: [{ userId: 'user_10', code: 'sso_bypass_domain_not_served' }],
+      });
+
+      const { userEvent } = await openAllowlistPage(wrapper, fixtures, [
+        allowlistEntry('user_1', 'Cameron', 'cameron@clerk.com'),
+      ]);
+
+      await userEvent.click(screen.getByRole('button', { name: 'Add' }));
+      expect(await screen.findByRole('heading', { name: 'Add members' })).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole('radio', { name: 'Role' }));
+      expect(screen.getByText('This list does not sync. Members are added and removed manually.')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Add members' })).toBeDisabled();
+
+      await userEvent.click(screen.getByRole('button', { name: /select role/i }));
+      await userEvent.click(await screen.findByText('Admin (3)'));
+      await userEvent.click(screen.getByRole('button', { name: 'Add members' }));
+
+      await waitFor(() =>
+        expect(fixtures.clerk.organization?.getMemberships).toHaveBeenCalledWith(
+          expect.objectContaining({ role: ['org:admin'], initialPage: 1 }),
+        ),
+      );
+      await waitFor(() =>
+        expect(fixtures.clerk.organization?.ssoBypassAllowlist.addUsers).toHaveBeenCalledWith({
+          userIds: ['user_9', 'user_10'],
+        }),
+      );
+
+      expect(await screen.findByText('Added 1 member to the allow list.')).toBeInTheDocument();
+      expect(
+        screen.getByText('1 member could not be added because their email address is not served by a connection.'),
+      ).toBeInTheDocument();
+      expect(screen.getAllByRole('heading', { name: 'Add members' }).length).toBeGreaterThan(0);
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Finish' }));
+      await waitFor(() => expect(screen.queryByRole('heading', { name: 'Add members' })).not.toBeInTheDocument());
     });
 
     it('removes a member from the row menu', async () => {

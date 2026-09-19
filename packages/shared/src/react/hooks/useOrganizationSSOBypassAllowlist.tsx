@@ -1,7 +1,12 @@
 import { useCallback } from 'react';
 
 import type { DeletedObjectResource } from '../../types/deletedObject';
-import type { AddSSOBypassAllowlistUserParams, SSOBypassAllowlistUserResource } from '../../types/ssoBypassAllowlist';
+import type {
+  AddSSOBypassAllowlistUserParams,
+  AddSSOBypassAllowlistUsersParams,
+  SSOBypassAllowlistBulkCreateResult,
+  SSOBypassAllowlistUserResource,
+} from '../../types/ssoBypassAllowlist';
 import { useClerkInstanceContext } from '../contexts';
 import { defineKeepPreviousDataFn } from '../query/keep-previous-data';
 import { useClerkQueryClient } from '../query/use-clerk-query-client';
@@ -21,6 +26,7 @@ export type UseOrganizationSSOBypassAllowlistReturn = {
   isLoading: boolean;
   isFetching: boolean;
   addUser: (params: AddSSOBypassAllowlistUserParams) => Promise<SSOBypassAllowlistUserResource | undefined>;
+  addUsers: (params: AddSSOBypassAllowlistUsersParams) => Promise<SSOBypassAllowlistBulkCreateResult | undefined>;
   removeUser: (userId: string) => Promise<DeletedObjectResource | undefined>;
   revalidate: () => Promise<void>;
 };
@@ -71,6 +77,15 @@ function useOrganizationSSOBypassAllowlist(
     [organization, revalidate],
   );
 
+  const addUsers = useCallback(
+    async (addParams: AddSSOBypassAllowlistUsersParams) => {
+      const result = await organization?.ssoBypassAllowlist.addUsers(addParams);
+      await revalidate();
+      return result;
+    },
+    [organization, revalidate],
+  );
+
   const removeUser = useCallback(
     async (userId: string) => {
       const removed = await organization?.ssoBypassAllowlist.removeUser(userId);
@@ -86,6 +101,7 @@ function useOrganizationSSOBypassAllowlist(
     isLoading: query.isLoading,
     isFetching: query.isFetching,
     addUser,
+    addUsers,
     removeUser,
     revalidate,
   };

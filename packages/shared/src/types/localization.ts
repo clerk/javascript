@@ -1216,11 +1216,15 @@ export type __internal_LocalizationResource = {
         addForm: {
           title: LocalizationValue;
           subtitle: LocalizationValue;
-          memberLabel: LocalizationValue;
-          changeButton: LocalizationValue;
-          memberPlaceholder: LocalizationValue;
-          noResults: LocalizationValue;
+          modeLabel: LocalizationValue;
+          mode__email: LocalizationValue;
+          mode__role: LocalizationValue;
+          emailPlaceholder: LocalizationValue;
+          roleOption: LocalizationValue<'role' | 'count'>;
+          roleWarning: LocalizationValue;
           submitButton: LocalizationValue;
+          error__memberNotFound: LocalizationValue;
+          error__alreadyAdded: LocalizationValue;
         };
         table: {
           header__user: LocalizationValue;
@@ -1228,6 +1232,13 @@ export type __internal_LocalizationResource = {
           emptyState: LocalizationValue;
           emptyState__search: LocalizationValue;
           menuAction__remove: LocalizationValue;
+        };
+        bulkResult: {
+          added: LocalizationValue<'count'>;
+          added__one: LocalizationValue;
+          skipped: LocalizationValue<'count'>;
+          skipped__one: LocalizationValue;
+          none: LocalizationValue;
         };
       };
       ssoSection: {
