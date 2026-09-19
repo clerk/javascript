@@ -32,7 +32,7 @@ catalogs:
       version: 3.0.4
   peer-expo:
     expo:
-      specifier: '>=54 <58'
+      specifier: '>=54'
       version: 54.0.36
   react:
     '@types/react':
@@ -9091,6 +9091,7 @@ packages:
   eslint@9.31.0:
     resolution: {integrity: sha512-QldCVh/ztyKJJZLr4jXNUByx3gR+TDYZCRXEktiZoUR3PGy4qCmSbkxcIle8GEwGpb5JBZazlaJ/CxLidXdEbQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
