@@ -1,4 +1,5 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { inertProps } from '@clerk/shared/inert';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
@@ -415,8 +416,7 @@ function SignUpStartInternal(): JSX.Element {
               direction='col'
               elementDescriptor={descriptors.main}
               gap={6}
-              // @ts-ignore - `inert` is not yet in the installed React types
-              inert={captchaIsInteractive ? '' : undefined}
+              {...inertProps(captchaIsInteractive)}
               // `display:none` (not `visibility:hidden`) so the collapsed column leaves flex flow and
               // contributes no `gap` gutter to `Card.Content` — otherwise it injects empty space above
               // the spotlighted captcha. Subtree stays mounted (form state preserved); `inert` is then

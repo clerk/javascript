@@ -1097,6 +1097,7 @@ describe('SignInStart', () => {
       simulateCaptchaInteractive(getCaptcha());
 
       await waitFor(() => expect(google.closest('[inert]')).not.toBeNull());
+      expect(google.closest('[inert]')?.hasAttribute('inert')).toBe(true);
       // The captcha widget and the header stay outside the inert subtree.
       expect(getCaptcha().closest('[inert]')).toBeNull();
       expect(screen.getByRole('heading').closest('[inert]')).toBeNull();
