@@ -1,6 +1,6 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
-import { inertProps } from '@clerk/shared/inert';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { inertProps } from '@clerk/shared/inert';
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
