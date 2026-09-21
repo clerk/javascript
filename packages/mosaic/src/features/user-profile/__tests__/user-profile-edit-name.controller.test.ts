@@ -55,36 +55,40 @@ describe('userProfileEditNameMachine', () => {
   });
 
   it('keeps what was typed when the save fails, so it can be corrected', async () => {
-    const actor = start(() => failed({ message: 'Your name could not be updated.' }));
+    const actor = start(() => failed({ global: { message: 'Your name could not be updated.' } }));
     actor.send({ type: 'TYPE', field: 'lastName', value: 'Barton' });
     actor.send({ type: 'SAVE' });
 
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('editing'));
     expect(actor.getSnapshot().context.lastName).toBe('Barton');
     expect(actor.getSnapshot().context.error).toEqual({
-      message: 'Your name could not be updated.',
+      global: { message: 'Your name could not be updated.' },
     });
   });
 
   it('carries field copy through when the error names a control', async () => {
     const actor = start(() =>
-      failed({ message: 'Your name could not be updated.', fields: { firstName: 'First name is required.' } }),
+      failed({
+        global: { message: 'Your name could not be updated.' },
+        fields: { firstName: { message: 'First name is required.' } },
+      }),
     );
     actor.send({ type: 'SAVE' });
 
     await vi.waitFor(() =>
-      expect(actor.getSnapshot().context.error?.fields).toEqual({ firstName: 'First name is required.' }),
+      expect(actor.getSnapshot().context.error?.fields).toEqual({ firstName: { message: 'First name is required.' } }),
     );
   });
 
-  it('falls back to generic copy when the save throws something that is not an Error', async () => {
-    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors -- a non-Error rejection is the case under test
-    const actor = start(() => Promise.reject('nope'));
+  it('shows the generic banner and logs when the save throws unexpectedly', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const failure = new TypeError('boom');
+    const actor = start(() => Promise.reject(failure));
     actor.send({ type: 'SAVE' });
 
-    await vi.waitFor(() =>
-      expect(actor.getSnapshot().context.error?.message).toBe('Something went wrong. Please try again.'),
-    );
+    await vi.waitFor(() => expect(actor.getSnapshot().context.error).toEqual({ global: {} }));
+    expect(log).toHaveBeenCalledWith(failure);
+    log.mockRestore();
   });
 
   it('stays open without a banner when the save is cancelled', async () => {
@@ -96,9 +100,9 @@ describe('userProfileEditNameMachine', () => {
   });
 
   it('drops the error when the dialog is cancelled', async () => {
-    const actor = start(() => failed({ message: 'nope' }));
+    const actor = start(() => failed({ global: { message: 'nope' } }));
     actor.send({ type: 'SAVE' });
-    await vi.waitFor(() => expect(actor.getSnapshot().context.error?.message).toBe('nope'));
+    await vi.waitFor(() => expect(actor.getSnapshot().context.error?.global?.message).toBe('nope'));
 
     actor.send({ type: 'CANCEL' });
 

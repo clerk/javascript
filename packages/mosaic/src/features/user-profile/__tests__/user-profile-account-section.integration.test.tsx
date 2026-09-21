@@ -120,7 +120,12 @@ describe('UserProfileAccountSection', () => {
   });
 
   it('uploads a picked picture and shows why it failed', async () => {
-    user.setProfileImage.mockRejectedValue(new Error('Upload failed.'));
+    user.setProfileImage.mockRejectedValue(
+      new ClerkAPIResponseError('failed', {
+        data: [{ code: 'avatar_file_size_exceeded', message: 'Too large', long_message: 'Too large.' }],
+        status: 413,
+      }),
+    );
     const actor = userEvent.setup();
     const { container } = renderSection();
     const file = new File(['x'], 'me.png', { type: 'image/png' });
@@ -131,7 +136,9 @@ describe('UserProfileAccountSection', () => {
     }
     await actor.upload(input, file);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Upload failed.');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+    );
     expect(user.setProfileImage).toHaveBeenCalledExactlyOnceWith({ file });
   });
 

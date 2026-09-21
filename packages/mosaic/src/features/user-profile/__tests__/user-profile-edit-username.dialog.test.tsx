@@ -3,11 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../../components/button';
+import type { MosaicLocalization } from '../../../localization';
 import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileEditUsernameDialogProps } from '../user-profile-account-section/user-profile-edit-username.dialog';
 import { UserProfileEditUsernameDialog } from '../user-profile-account-section/user-profile-edit-username.dialog';
 
-function renderView(overrides: Partial<UserProfileEditUsernameDialogProps> = {}) {
+function renderView(overrides: Partial<UserProfileEditUsernameDialogProps> = {}, localization?: MosaicLocalization) {
   const props: UserProfileEditUsernameDialogProps = {
     open: true,
     onOpenChange: vi.fn(),
@@ -19,7 +20,7 @@ function renderView(overrides: Partial<UserProfileEditUsernameDialogProps> = {})
   return {
     props,
     ...render(
-      <MosaicProvider>
+      <MosaicProvider localization={localization}>
         <UserProfileEditUsernameDialog {...props} />
       </MosaicProvider>,
     ),
@@ -95,7 +96,7 @@ describe('UserProfileEditUsernameDialog', () => {
   });
 
   it('announces the failure in a negative banner', () => {
-    renderView({ error: { message: 'Your username could not be updated.' } });
+    renderView({ error: { global: { message: 'Your username could not be updated.' } } });
 
     const banner = screen.getByRole('alert');
     expect(banner).toHaveAttribute('data-color', 'negative');
@@ -104,11 +105,20 @@ describe('UserProfileEditUsernameDialog', () => {
   });
 
   it('renders a field-scoped failure with no banner', () => {
-    renderView({ error: { fields: { username: 'That username is taken.' } } });
+    renderView({ error: { fields: { username: { message: 'That username is taken.' } } } });
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(screen.getByText('That username is taken.')).toBeInTheDocument();
     expect(usernameField()).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('shows the translation for the error code over the message Clerk sent', () => {
+    renderView(
+      { error: { fields: { username: { code: 'form_identifier_exists', paramName: 'username', message: 'Taken.' } } } },
+      { overrides: { 'errors.form_identifier_exists__username': 'Ese nombre de usuario ya existe.' } },
+    );
+
+    expect(usernameField()).toHaveAccessibleDescription('Ese nombre de usuario ya existe.');
   });
 
   it('withholds the save while the caller says the value is unacceptable', async () => {

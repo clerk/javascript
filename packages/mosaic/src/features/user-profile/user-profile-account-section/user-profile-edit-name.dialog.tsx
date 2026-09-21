@@ -8,7 +8,7 @@ import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Input } from '../../../components/input';
-import { useMessages } from '../../../localization';
+import { useErrorText, useMessages } from '../../../localization';
 import type { FormError } from '../../../utils/save-result';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
 
@@ -56,6 +56,7 @@ export function UserProfileEditNameDialog({
   onSubmit,
 }: UserProfileEditNameDialogProps) {
   const m = useMessages('userProfileAccountSection');
+  const errorText = useErrorText();
   const formId = useId();
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const { enabled: showFirstName = true, required: firstNameRequired = false } = firstNameAttribute;
@@ -94,12 +95,12 @@ export function UserProfileEditNameDialog({
               />
             }
           >
-            {error?.message ? (
+            {error?.global ? (
               <Banner.Root
                 role='alert'
                 color='negative'
               >
-                <Banner.Label>{error.message}</Banner.Label>
+                <Banner.Label>{errorText(error.global)}</Banner.Label>
               </Banner.Root>
             ) : null}
             {showFirstName ? (
@@ -116,7 +117,7 @@ export function UserProfileEditNameDialog({
                   onChange={event => onFirstNameChange(event.target.value)}
                 />
                 <Field.Message>
-                  <Field.Error>{error?.fields?.firstName}</Field.Error>
+                  <Field.Error>{error?.fields?.firstName ? errorText(error.fields.firstName) : null}</Field.Error>
                 </Field.Message>
               </Field.Root>
             ) : null}
@@ -134,7 +135,7 @@ export function UserProfileEditNameDialog({
                   onChange={event => onLastNameChange(event.target.value)}
                 />
                 <Field.Message>
-                  <Field.Error>{error?.fields?.lastName}</Field.Error>
+                  <Field.Error>{error?.fields?.lastName ? errorText(error.fields.lastName) : null}</Field.Error>
                 </Field.Message>
               </Field.Root>
             ) : null}

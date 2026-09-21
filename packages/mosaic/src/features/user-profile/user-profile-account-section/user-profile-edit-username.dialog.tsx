@@ -8,7 +8,7 @@ import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Input } from '../../../components/input';
-import { useMessages } from '../../../localization';
+import { useErrorText, useMessages } from '../../../localization';
 import type { FormError } from '../../../utils/save-result';
 
 export type UserProfileEditUsernameField = 'username';
@@ -37,6 +37,7 @@ export function UserProfileEditUsernameDialog({
   onSubmit,
 }: UserProfileEditUsernameDialogProps) {
   const m = useMessages('userProfileAccountSection');
+  const errorText = useErrorText();
   const formId = useId();
   const usernameRef = useRef<HTMLInputElement>(null);
 
@@ -73,12 +74,12 @@ export function UserProfileEditUsernameDialog({
               />
             }
           >
-            {error?.message ? (
+            {error?.global ? (
               <Banner.Root
                 role='alert'
                 color='negative'
               >
-                <Banner.Label>{error.message}</Banner.Label>
+                <Banner.Label>{errorText(error.global)}</Banner.Label>
               </Banner.Root>
             ) : null}
             <Field.Root invalid={Boolean(error?.fields?.username)}>
@@ -91,7 +92,7 @@ export function UserProfileEditUsernameDialog({
                 onChange={event => onUsernameChange(event.target.value)}
               />
               <Field.Message>
-                <Field.Error>{error?.fields?.username}</Field.Error>
+                <Field.Error>{error?.fields?.username ? errorText(error.fields.username) : null}</Field.Error>
               </Field.Message>
             </Field.Root>
           </Card.Content>

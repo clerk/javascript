@@ -1,7 +1,7 @@
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
 import type { FormError, SaveResult } from '../../../utils/save-result';
-import { formErrorOf } from '../../../utils/save-result';
+import { formErrorOf, unexpectedFormError } from '../../../utils/save-result';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
 
 export interface UserProfileEditUsernameContext {
@@ -25,13 +25,6 @@ function notSeated(): Promise<never> {
 
 function isSaveable(context: UserProfileEditUsernameContext): boolean {
   return context.username !== context.savedUsername && context.username !== '';
-}
-
-function toFormError(cause: unknown): FormError<UserProfileEditUsernameField> {
-  if (cause instanceof Error) {
-    return { message: cause.message };
-  }
-  return { message: 'Something went wrong. Please try again.' };
 }
 
 export const userProfileEditUsernameMachine = createMachine({
@@ -64,17 +57,14 @@ export const userProfileEditUsernameMachine = createMachine({
         onDone: [
           {
             guard: (_, event) => event.output.error !== null,
-
             target: 'editing',
-
             actions: assign((_, event) => ({ error: formErrorOf(event.output.error) })),
           },
-
           { target: 'idle', actions: assign(() => ({ error: undefined })) },
         ],
         onError: {
           target: 'editing',
-          actions: assign((_, event) => ({ error: toFormError(event.error) })),
+          actions: assign((_, event) => ({ error: unexpectedFormError(event.error) })),
         },
       }),
     },

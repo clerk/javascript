@@ -5,7 +5,7 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
-import { useMessages } from '../../../localization';
+import { useErrorText, useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
 import { FileUpload } from '../../../primitives/file-upload';
 import type { SaveResult } from '../../../utils/save-result';
@@ -35,9 +35,10 @@ export function UserProfilePictureRowView({
   onRemove,
 }: UserProfilePictureRowViewProps) {
   const m = useMessages('userProfileAccountSection');
+  const errorText = useErrorText();
   const controller = useUserProfilePictureController({ onChange, onRemove });
   const [rejectionError, setRejectionError] = useState<string>();
-  const displayedError = errorMessage ?? rejectionError ?? controller.errorMessage;
+  const displayedError = errorMessage ?? rejectionError ?? (controller.error ? errorText(controller.error) : undefined);
   const initials = name
     .split(/\s+/)
     .map(part => part[0])

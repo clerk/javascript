@@ -207,8 +207,8 @@ export function EditNameFails() {
     <AccountSection
       allowMultipleAccounts={false}
       failWith={{
-        message: 'Your name could not be updated.',
-        fields: { lastName: 'Last name must be 64 characters or fewer.' },
+        global: { message: 'Your name could not be updated.' },
+        fields: { lastName: { message: 'Last name must be 64 characters or fewer.' } },
       }}
     />
   );
@@ -219,8 +219,8 @@ export function EditUsernameFails() {
     <AccountSection
       allowMultipleAccounts={false}
       usernameFailWith={{
-        message: 'Your username could not be updated.',
-        fields: { username: 'That username is already taken.' },
+        global: { message: 'Your username could not be updated.' },
+        fields: { username: { message: 'That username is already taken.' } },
       }}
     />
   );

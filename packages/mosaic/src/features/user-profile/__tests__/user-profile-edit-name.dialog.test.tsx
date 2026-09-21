@@ -133,8 +133,8 @@ describe('UserProfileEditNameDialog', () => {
   it('announces the failure in a negative banner and marks the blamed field invalid', () => {
     renderView({
       error: {
-        message: 'Your name could not be updated.',
-        fields: { lastName: 'Last name must be 64 characters or fewer.' },
+        global: { message: 'Your name could not be updated.' },
+        fields: { lastName: { message: 'Last name must be 64 characters or fewer.' } },
       },
     });
 
@@ -147,7 +147,7 @@ describe('UserProfileEditNameDialog', () => {
   });
 
   it('renders a field-scoped failure with no banner', () => {
-    renderView({ error: { fields: { firstName: 'First name is required.' } } });
+    renderView({ error: { fields: { firstName: { message: 'First name is required.' } } } });
 
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(firstNameField()).toHaveAttribute('aria-invalid', 'true');
