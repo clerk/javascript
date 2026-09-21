@@ -1,14 +1,11 @@
 import { isClerkAPIResponseError, isReverificationCancelledError } from '@clerk/shared/error';
 import type { AttributeData } from '@clerk/shared/types';
+import { snakeToCamel } from '@clerk/shared/underscore';
 
 import type { UserProfileFormError, UserProfileSaveResult } from './user-profile-account-section.types';
 
 export function isAttributeAvailable(attribute: AttributeData | undefined): boolean {
   return Boolean(attribute?.enabled || attribute?.used_for_first_factor || attribute?.used_for_second_factor);
-}
-
-function snakeToCamel(value: string): string {
-  return value.replace(/_([a-z])/g, (_, letter: string) => letter.toUpperCase());
 }
 
 export function toUserProfileFormError<TField extends string>(
