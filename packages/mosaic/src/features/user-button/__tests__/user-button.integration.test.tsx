@@ -277,6 +277,19 @@ describe('UserButton (connected)', () => {
     });
   });
 
+  it('renders the fallback while Clerk is still loading', () => {
+    isUserLoaded = false;
+    renderUserButton({ fallback: <output data-testid='fallback' /> });
+    expect(screen.getByTestId('fallback')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Open account menu/ })).toBeNull();
+  });
+
+  it('drops the fallback once nobody is signed in', () => {
+    user = null;
+    renderUserButton({ fallback: <output data-testid='fallback' /> });
+    expect(host()).toBeEmptyDOMElement();
+  });
+
   it('renders the trigger and keeps the popover closed until clicked', () => {
     renderUserButton();
     expect(trigger()).toBeInTheDocument();
