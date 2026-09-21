@@ -215,3 +215,6 @@ export { UserProfileMfaSectionView } from '../features/user-profile/user-profile
 export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-mfa-setup.view';
 
 export { UserProfileApiKeysPanelView } from '../features/user-profile/user-profile-api-keys-panel.view';
+
+export { OrganizationProfileApiKeysPanelView } from '../features/organization-profile/organization-profile-api-keys-panel.view';
+export { OrganizationProfileCreateAPIKeyDialog } from '../features/organization-profile/organization-profile-create-api-key.dialog';
