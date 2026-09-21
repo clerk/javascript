@@ -17,6 +17,7 @@ This is an internal folder (`src/primitives/`) inside `@clerk/mosaic`, not a sep
 | Popover      | `src/primitives/popover`      | Non-modal floating content triggered by click                 |
 | Select       | `src/primitives/select`       | Dropdown select with typeahead and keyboard navigation        |
 | Tabs         | `src/primitives/tabs`         | Tab navigation with animated indicator                        |
+| Toast        | `src/primitives/toast`        | Stacked notifications with timers, a queue, and announcements |
 | Tooltip      | `src/primitives/tooltip`      | Hover/focus tooltip with configurable delay and group support |
 
 Shared utilities live at `src/primitives/utils` (includes `useRender` and `mergeProps`).
