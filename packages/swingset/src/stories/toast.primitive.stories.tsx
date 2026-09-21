@@ -1,4 +1,5 @@
 import { Toast } from '@clerk/mosaic/primitives/toast';
+import { useRef } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -95,7 +96,6 @@ function AnchoredToasts() {
         <Toast.Positioner
           key={toast.id}
           toast={toast}
-          sideOffset={8}
         >
           <Toast.Root toast={toast}>
             <Toast.Arrow />
@@ -107,21 +107,32 @@ function AnchoredToasts() {
   );
 }
 
+function CopyButton() {
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+  function handleCopy() {
+    anchoredToastManager.add({
+      description: 'Copied',
+      timeout: 1500,
+      positionerProps: { anchor: buttonRef.current, sideOffset: 8 },
+    });
+  }
+
+  return (
+    <button
+      ref={buttonRef}
+      type='button'
+      onClick={handleCopy}
+    >
+      Copy
+    </button>
+  );
+}
+
 export function Anchored() {
   return (
     <Toast.Provider toastManager={anchoredToastManager}>
-      <button
-        type='button'
-        onClick={event =>
-          anchoredToastManager.add({
-            description: 'Copied',
-            timeout: 1500,
-            positionerProps: { anchor: event.currentTarget },
-          })
-        }
-      >
-        Copy
-      </button>
+      <CopyButton />
       <Toast.Portal>
         <Toast.Viewport>
           <AnchoredToasts />

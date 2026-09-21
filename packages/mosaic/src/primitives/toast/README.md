@@ -100,7 +100,6 @@ function AnchoredToasts() {
     <Toast.Positioner
       key={toast.id}
       toast={toast}
-      sideOffset={8}
     >
       <Toast.Root toast={toast}>
         <Toast.Arrow />
@@ -110,18 +109,27 @@ function AnchoredToasts() {
   ));
 }
 
-<button
-  type='button'
-  onClick={event =>
+function CopyButton() {
+  const buttonRef = React.useRef<HTMLButtonElement | null>(null);
+
+  function handleCopy() {
     anchoredToastManager.add({
       description: 'Copied',
       timeout: 1500,
-      positionerProps: { anchor: event.currentTarget },
-    })
+      positionerProps: { anchor: buttonRef.current, sideOffset: 8 },
+    });
   }
->
-  Copy
-</button>;
+
+  return (
+    <button
+      ref={buttonRef}
+      type='button'
+      onClick={handleCopy}
+    >
+      Copy
+    </button>
+  );
+}
 ```
 
 ## Parts
