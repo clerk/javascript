@@ -125,6 +125,13 @@ import {
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
+  Default as OrganizationProfileApiKeysPanelDefault,
+  Empty as OrganizationProfileApiKeysPanelEmpty,
+  meta as organizationProfileApiKeysPanelMeta,
+  ReadOnly as OrganizationProfileApiKeysPanelReadOnly,
+  Retry as OrganizationProfileApiKeysPanelRetry,
+} from '../stories/organization-profile-api-keys-panel.stories';
+import {
   Default as OtpComponentDefault,
   Disabled as OtpComponentDisabled,
   Error as OtpComponentError,
@@ -762,6 +769,14 @@ const reverificationModule: StoryModule = {
   MethodPickerPending: ReverificationMethodPickerPending,
   Help: ReverificationHelp,
 };
+const organizationProfileApiKeysPanelModule: StoryModule = {
+  meta: organizationProfileApiKeysPanelMeta,
+  Default: OrganizationProfileApiKeysPanelDefault,
+  Empty: OrganizationProfileApiKeysPanelEmpty,
+  ReadOnly: OrganizationProfileApiKeysPanelReadOnly,
+  Retry: OrganizationProfileApiKeysPanelRetry,
+};
+
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -785,6 +800,7 @@ export const registry: StoryModule[] = [
   userProfileEnterpriseAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
+  organizationProfileApiKeysPanelModule,
   // Reverification
   reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.

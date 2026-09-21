@@ -1,0 +1,94 @@
+import * as Stories from './organization-profile-api-keys-panel.stories';
+
+# OrganizationProfileApiKeysPanel
+
+A controlled organization API keys table with search, pagination, a create-and-copy dialog, and confirmation before revocation. The caller supplies the current page and updates the data when an action succeeds.
+
+## Playground
+
+### Management
+
+Create a key, choose its expiration, and copy its secret. Use a row menu to revoke a key. Creating and revoking update the results after a short pending state.
+
+<Preview name='Default' storyModule={Stories} />
+
+### Read-only
+
+Omitting the create and revoke callbacks leaves the table and search available.
+
+<Story name='ReadOnly' storyModule={Stories} />
+
+### Empty
+
+An empty panel remains visible. Searching an empty list shows the no-results message; clearing the search restores the organization empty state and focuses the search input.
+
+<Story name='Empty' storyModule={Stories} />
+
+### Retry
+
+The first creation, copy, and revocation attempt each fail. Retry the action to complete it. A failed copy keeps the secret visible; **Copy API key** keeps the dialog open, while **Copy and close** closes it after copying succeeds.
+
+<Story name='Retry' storyModule={Stories} />
+
+## Props
+
+| Prop               | Type                                         | Default      | Description                                                                                                     |
+| ------------------ | -------------------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------- |
+| `apiKeys`          | `OrganizationProfileAPIKey[]`                | — (required) | The supplied page, rendered in its supplied order.                                                              |
+| `totalCount`       | `number`                                     | — (required) | Matching results across all pages.                                                                              |
+| `page`             | `number`                                     | — (required) | Current page, starting at 1.                                                                                    |
+| `pageSize`         | `number`                                     | `10`         | Results per page.                                                                                               |
+| `onPageChange`     | `(page: number) => void`                     | — (required) | Updates the controlled page.                                                                                    |
+| `onPageSizeChange` | `(size: number) => void`                     | —            | Enables changing the page size; a change also requests page 1.                                                  |
+| `searchValue`      | `string`                                     | — (required) | Controlled search input.                                                                                        |
+| `onSearchChange`   | `(value: string) => void`                    | — (required) | Receives input changes and an empty string when cleared.                                                        |
+| `isLoading`        | `boolean`                                    | — (required) | Shows the initial loading state instead of rows.                                                                |
+| `isFetching`       | `boolean`                                    | `false`      | Marks the table busy while retaining supplied rows.                                                             |
+| `onCreate`         | `MouseEventHandler<HTMLButtonElement>`       | —            | Shows the Create action and lets the caller open a fresh form.                                                  |
+| `createDialog`     | `OrganizationProfileCreateAPIKeyDialogProps` | —            | Controlled dialog rendered alongside the table.                                                                 |
+| `onRevoke`         | `(id: string) => Promise<void>`              | —            | Shows row actions. Resolve after updating the rows; reject with an `Error` to show its message and allow retry. |
+
+Each key supplies `id`, `name`, `createdAtLabel`, `expiresAtLabel`, and `lastUsedAtLabel`. Dates are formatted by the caller. A null expiration means the key never expires; a null last-used label displays a dash.
+
+### Create dialog
+
+| Prop                                | Type                                                                                         | Default        | Description                                                           |
+| ----------------------------------- | -------------------------------------------------------------------------------------------- | -------------- | --------------------------------------------------------------------- |
+| `open` / `onOpenChange`             | `boolean` / `(open: boolean) => void`                                                        | — (required)   | Controlled visibility. Dismissal is blocked while pending.            |
+| `name` / `onNameChange`             | `string` / `(name: string) => void`                                                          | — (required)   | Controlled name; submission requires nonblank trimmed text.           |
+| `expiration` / `onExpirationChange` | `'never'`, `'1d'`, `'7d'`, `'30d'`, `'60d'`, `'90d'`, `'180d'`, `'1y'`, or `null` / callback | — (required)   | An explicit choice is required; null leaves the placeholder selected. |
+| `expirationDateLabel`               | `string` or `null`                                                                           | — (required)   | Formatted expiration date, or null for no expiration.                 |
+| `secret`                            | `string` or `null`                                                                           | — (required)   | A returned secret switches the dialog to the copy step.               |
+| `isPending`                         | `boolean`                                                                                    | — (required)   | Prevents repeated submission, copying, and dismissal.                 |
+| `error`                             | `string` or `null`                                                                           | — (required)   | Visible error supplied by the caller.                                 |
+| `onSubmit`                          | `() => void` or promise                                                                      | — (required)   | Requests creation using the controlled form values.                   |
+| `onCopy`                            | `(close: boolean) => void` or promise                                                        | — (required)   | Requests copying; true also requests closing after success.           |
+| `finalFocus`                        | `DialogFocusTarget`                                                                          | Dialog default | Usually the ref captured from the Create button.                      |
+
+## Usage
+
+```tsx
+import { OrganizationProfileApiKeysPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-api-keys-panel.view';
+
+<OrganizationProfileApiKeysPanelView
+  apiKeys={pageItems}
+  totalCount={matchingCount}
+  page={page}
+  pageSize={pageSize}
+  searchValue={search}
+  isLoading={isLoading}
+  isFetching={isFetching}
+  onSearchChange={setSearch}
+  onPageChange={setPage}
+  onPageSizeChange={setPageSize}
+  onCreate={openFreshForm}
+  createDialog={createDialog}
+  onRevoke={revokeKey}
+/>;
+```
+
+The caller decides when to mount the panel and which actions to supply. It owns search debouncing and normalization, filtering, date formatting, pagination, and correcting the page after removal. The panel renders the supplied page without filtering it again. Page-size controls remain available when there are results, including on a single page.
+
+The caller also owns creation, clipboard access, dialog values, pending state, and errors. Clear the form, secret, and error when opening creation. Keep the secret after a failed copy and only close a copy-and-close request after copying succeeds. Confirmation owns revocation pending and error state, and restores focus to a surviving row or the Create/Search control after removal.
+
+Override complete messages through `MosaicProvider` using the `organizationProfileApiKeysPanel` namespace. Target `.cl-organization-profile-api-keys-panel` for the root styling identity and the shared components’ stable classes for their parts.

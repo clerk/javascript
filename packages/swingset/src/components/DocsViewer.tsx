@@ -39,6 +39,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-web3wallets-section': dynamic(() => import('../stories/user-profile-web3-wallets-section.mdx')),
     'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
   },
+  'organization-profile': {
+    'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
+  },
   reverification: {
     reverification: dynamic(() => import('../stories/reverification.mdx')),
   },
