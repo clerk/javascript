@@ -13,7 +13,8 @@ export const styles = stylex.create({
     minWidth: 0,
     width: '100%',
   },
-  // Room to scroll the last rows clear of the pinned bulk bar — only while it is showing.
+  // Room to scroll the last rows clear of a bulk bar pinned to the frame — only while it is
+  // showing, and not when the bar is fixed to the window instead.
   rootWithBulkBar: {
     paddingBlockEnd: space['8'],
   },

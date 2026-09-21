@@ -290,6 +290,30 @@ describe('OrganizationProfileMembersPanelView', () => {
     expect(props.onChangeRole).toHaveBeenCalledWith(['m2'], 'admin');
   });
 
+  it.each([
+    { mode: 'frame', position: 'relative', inset: true },
+    { mode: 'viewport', position: 'static', inset: false },
+  ])('$mode: insets the rows for the bulk bar = $inset', async ({ position, inset }) => {
+    const user = userEvent.setup();
+    const content = document.createElement('div');
+    content.className = 'cl-profile-content';
+    content.style.position = position;
+    document.body.appendChild(content);
+    const props: OrganizationProfileMembersPanelViewProps = { members, roles, onChangeRole: vi.fn() };
+    render(
+      <MosaicProvider>
+        <OrganizationProfileMembersPanelView {...props} />
+      </MosaicProvider>,
+      { container: content },
+    );
+
+    const panel = document.querySelector('.cl-organization-profile-members-panel') as HTMLElement;
+    const insetClass = stylex.props(styles.rootWithBulkBar).className as string;
+    expect(panel).not.toHaveClass(insetClass);
+    await user.click(screen.getByRole('checkbox', { name: 'Select Kyle Mac' }));
+    expect(panel.className.includes(insetClass)).toBe(inset);
+  });
+
   it('changes roles and removes selected invitations in bulk', async () => {
     const user = userEvent.setup();
     const props = renderPanel();

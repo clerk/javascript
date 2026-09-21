@@ -289,7 +289,7 @@ export function OrganizationProfileRequestsTabView({
         />
       ) : null}
 
-      {selectedCount > 0 ? <div {...stylex.props(styles.bulkSpacer)} /> : null}
+      {selectedCount > 0 && overlay?.mode !== 'viewport' ? <div {...stylex.props(styles.bulkSpacer)} /> : null}
 
       <OrganizationProfileBulkActions
         count={selectedCount}

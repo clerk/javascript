@@ -237,12 +237,20 @@ export function OrganizationProfileMembersPanelView({
 
   const requestCount = requests.length;
 
+  // A bar pinned to the frame overlaps the foot of the scrolling column, so the rows need room to
+  // clear it. The embedded profile's bar is fixed to the window instead, over the page rather than
+  // the column, so the same inset would only add dead space under the table.
+  const needsBulkBarInset = overlay?.mode !== 'viewport';
+
   return (
     <div
       ref={rootRef}
       {...mergeStyleProps(
         themeProps('organization-profile-members-panel'),
-        stylex.props(styles.root, activeTab === 'members' && selectedCount > 0 && styles.rootWithBulkBar),
+        stylex.props(
+          styles.root,
+          activeTab === 'members' && selectedCount > 0 && needsBulkBarInset && styles.rootWithBulkBar,
+        ),
       )}
     >
       <Profile.PageTitle>Members</Profile.PageTitle>
