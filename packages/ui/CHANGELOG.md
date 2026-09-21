@@ -1,5 +1,95 @@
 # @clerk/ui
 
+## 1.33.1
+
+### Patch Changes
+
+- Add `agentid` to `OAuthProvider` and `OAUTH_PROVIDERS` to support the "Continue with AgentID" OAuth flow. Instances with the connection enabled now render a "Continue with AgentID" button, with the AgentID mark tinted to match the theme's foreground color so it stays legible in dark mode. ([#9735](https://github.com/clerk/javascript/pull/9735)) by [@wyattjoh](https://github.com/wyattjoh)
+
+- The organization Security page now lists every enterprise SSO connection of the organization, each with its own status, domains, and actions. The SSO wizard edits one explicit connection, and a banner names it when the organization has more than one. Changing a provider or removing a connection now targets that connection instead of the first one returned by the API. ([#9729](https://github.com/clerk/javascript/pull/9729)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Validate `appearance.cssLayerName` before wrapping component styles in `@layer`. Values that are not a valid CSS layer name (for example ones containing braces, semicolons, or markup) are now ignored with a one-time console warning instead of being interpolated into the generated stylesheet. ([#9747](https://github.com/clerk/javascript/pull/9747)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`855c24f`](https://github.com/clerk/javascript/commit/855c24f451314c6b8a586daf422b8463638f1f37), [`cb6a376`](https://github.com/clerk/javascript/commit/cb6a376c5e34fa7869821f554c73f2968019776f)]:
+  - @clerk/shared@4.33.0
+  - @clerk/localizations@4.17.1
+
+## 1.33.0
+
+### Minor Changes
+
+- Introduce self-serve Directory Sync (SCIM) capabilities and related functionality. ([#9590](https://github.com/clerk/javascript/pull/9590)) by [@kalafut](https://github.com/kalafut)
+
+- Add the SSO fallback sign-in flow to `<SignIn />`, for enterprise users the instance has allowlisted to sign in with an email code when they cannot reach their identity provider. ([#9685](https://github.com/clerk/javascript/pull/9685)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+  For such a user the sign-in no longer redirects straight to the identity provider. It shows the SSO action — or the connection picker, when several connections serve the address — alongside a "Can't use SSO?" link leading to the standard email code step, which carries a notice that the organization requires single sign-on and that the attempt is recorded. Users without a fallback, and instances without the feature, are unaffected.
+
+  Custom flows can read the same factor from the new `ssoFallbackFirstFactors` property on the sign-in resource. The flow adds the `signIn.enterpriseSSO` and `signIn.ssoFallback` localization keys and the `ssoFallback` card action element id.
+
+### Patch Changes
+
+- Fixed OAuth sign-ups from `openSignIn({ withSignUp: true })` landing on the sign-in page with an "External Account was not found" error instead of creating the account. ([#9758](https://github.com/clerk/javascript/pull/9758)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`b5a3abe`](https://github.com/clerk/javascript/commit/b5a3abe19629dc00839fecf03b364dff1b4e2e2e), [`ddf9afc`](https://github.com/clerk/javascript/commit/ddf9afc6dc82528d28223ba9b775f8aa6647bbd7), [`f21352f`](https://github.com/clerk/javascript/commit/f21352f93707211199d2cf267bd07ec80e4f8b53), [`2502266`](https://github.com/clerk/javascript/commit/25022663a36073c4d3014178c730894785cf0dc1), [`607d561`](https://github.com/clerk/javascript/commit/607d56196c7b7205c06edcdcbf521827762baaeb), [`39782e3`](https://github.com/clerk/javascript/commit/39782e3abf25363053866dae1996eaaaf5e91b42)]:
+  - @clerk/localizations@4.17.0
+  - @clerk/shared@4.32.0
+
+## 1.32.3
+
+### Patch Changes
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Hide "Use another method" during reverification when the current factor is the only available method. ([#9681](https://github.com/clerk/javascript/pull/9681)) by [@Ephem](https://github.com/Ephem)
+
+- Prevent passkey autofill from displaying an RP ID or domain error when a browser rejects a background credential request. ([#9687](https://github.com/clerk/javascript/pull/9687)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+- Update the `@floating-ui/react` dependency to 0.27.20. ([#9027](https://github.com/clerk/javascript/pull/9027)) by [@renovate](https://github.com/apps/renovate)
+
+- Updated dependencies [[`452107a`](https://github.com/clerk/javascript/commit/452107a4cfe06ce5d72b008ddaf670ea604e857d), [`7ea009f`](https://github.com/clerk/javascript/commit/7ea009fda71c052ac6e4d712830baa856f347954), [`06be25f`](https://github.com/clerk/javascript/commit/06be25fadde3d068f7686b565848a02d832f6211), [`c47e9cb`](https://github.com/clerk/javascript/commit/c47e9cb5e74de91bdec17111ba7b01d3e2ea459a), [`1601100`](https://github.com/clerk/javascript/commit/16011007218787509fd8457081ed5640e61bec48)]:
+  - @clerk/shared@4.31.1
+  - @clerk/localizations@4.16.1
+
+## 1.32.2
+
+### Patch Changes
+
+- Add a "Back" action to the authenticator-app verification step in `<UserProfile />`, so a user who needs to re-scan can return to the QR code instead of cancelling the whole setup. Going back now reuses the TOTP secret already issued rather than generating a new one, keeping any code the user has already scanned valid. ([#9626](https://github.com/clerk/javascript/pull/9626)) by [@paulogdm](https://github.com/paulogdm)
+
+## 1.32.1
+
+### Patch Changes
+
+- Fix the `<OAuthDeviceVerification />` code input overflowing the card when the card is not flush. ([#9643](https://github.com/clerk/javascript/pull/9643)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+## 1.32.0
+
+### Minor Changes
+
+- Add an authenticated OAuth device verification component and workflow hook for approving or denying OAuth Device Authorization Grant requests. ([#9518](https://github.com/clerk/javascript/pull/9518)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+### Patch Changes
+
+- Fix configured OIDC prompts being ignored by sign-up continuations, including enterprise SSO after email-link verification or direct combined-flow transfer and OAuth sign-ups embedded in `<SignIn withSignUp>`. ([#9541](https://github.com/clerk/javascript/pull/9541)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/localizations@4.16.0
+  - @clerk/shared@4.31.0
+
+## 1.31.0
+
+### Minor Changes
+
+- Add the Mosaic `Banner` component: a tinted surface that annotates the content around it with a status message. Compose it from `Banner.Root`, `Banner.Label`, and `Banner.Description`. `Banner.Root` takes a `color` of `neutral`, `warning`, or `negative`, and renders the icon for that color itself. It sets no ARIA role, so pass `role='status'` (or `role='alert'`) when the banner appears in response to something the user did. ([#9581](https://github.com/clerk/javascript/pull/9581)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+  Also adds an `info-circle` glyph to the Mosaic icon set.
+
+### Patch Changes
+
+- Updated dependencies [[`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/localizations@4.15.8
+  - @clerk/shared@4.30.2
+
 ## 1.30.8
 
 ### Patch Changes

@@ -1,6 +1,7 @@
-import { Field } from '@clerk/ui/mosaic/components/field';
-import type { OtpProps } from '@clerk/ui/mosaic/components/otp';
-import { Otp } from '@clerk/ui/mosaic/components/otp';
+import { Field } from '@clerk/mosaic/components/field';
+import type { OtpProps } from '@clerk/mosaic/components/otp';
+import { Otp } from '@clerk/mosaic/components/otp';
+import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -10,25 +11,26 @@ export { default as __source } from './otp.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'OTP',
-  source: 'packages/ui/src/mosaic/components/otp/otp.tsx',
+  source: 'packages/mosaic/src/components/otp/otp.tsx',
   styles: {
     _variants: {
-      size: { sm: {}, md: {}, lg: {} },
       status: { neutral: {}, success: {}, error: {} },
     },
     _defaultVariants: {
-      size: 'md',
       status: 'neutral',
     },
   },
 };
 
-const stackStyles = {
-  display: 'grid',
-  gap: 8,
-  justifyItems: 'start',
-} as const;
+const styles = stylex.create({
+  stack: {
+    display: 'grid',
+    gap: 8,
+    justifyItems: 'start',
+  },
+});
 
 function knobsAsProps(props: Record<string, unknown>) {
   return props as unknown as OtpProps;
@@ -43,31 +45,22 @@ export function Default(props: Record<string, unknown>) {
   );
 }
 
-export function Sizes() {
+export function WithField() {
   return (
-    <div style={{ display: 'grid', gap: 16, justifyItems: 'start' }}>
-      <Otp
-        size='sm'
-        defaultValue='123'
-        aria-label='Small code'
-      />
-      <Otp
-        size='md'
-        defaultValue='123'
-        aria-label='Medium code'
-      />
-      <Otp
-        size='lg'
-        defaultValue='123'
-        aria-label='Large code'
-      />
-    </div>
+    <Field.Root
+      required
+      xstyle={styles.stack}
+    >
+      <Field.Label>Verification code</Field.Label>
+      <Otp name='code' />
+      <Field.Description>Enter the code we sent to your device.</Field.Description>
+    </Field.Root>
   );
 }
 
 export function Success() {
   return (
-    <Field.Root style={stackStyles}>
+    <Field.Root xstyle={styles.stack}>
       <Otp
         status='success'
         defaultValue='123456'
@@ -82,7 +75,7 @@ export function Error() {
   return (
     <Field.Root
       invalid
-      style={stackStyles}
+      xstyle={styles.stack}
     >
       <Otp
         defaultValue='123456'

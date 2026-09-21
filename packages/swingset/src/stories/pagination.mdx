@@ -1,0 +1,84 @@
+import * as PaginationStories from './pagination.stories';
+
+# Pagination
+
+Page navigation for a paged list. Renders a labelled `nav` with previous and next controls, the page numbers around the current one, and a results-per-page control. Pages are 1-based and the component is controlled: `onChange` receives the page the user asked for, and `onPageSizeChange` receives the size chosen from the results-per-page `Select`.
+
+## Example
+
+<Story
+  name='Primary'
+  storyModule={PaginationStories}
+/>
+
+## Props
+
+<PropTable
+  meta={PaginationStories.meta}
+  extra={[
+    { name: 'page', type: 'number', default: '—', description: 'The current page, 1-based.' },
+    { name: 'totalItems', type: 'number', default: '—', description: 'Total number of items across every page.' },
+    { name: 'pageSize', type: 'number', default: '—', description: 'Items per page. The page count is derived from this and `totalItems`.' },
+    { name: 'onChange', type: '(page: number) => void', default: '—', description: 'Called with the page the user navigated to.' },
+    { name: 'pageSizeOptions', type: 'number[]', default: '[10, 25, 50, 100]', description: 'Sizes offered by the results-per-page select. The current `pageSize` is always included.' },
+    { name: 'onPageSizeChange', type: '(pageSize: number) => void', default: '—', description: 'Called with the page size the user chose.' },
+    { name: 'step', type: 'number', default: '1', description: 'How many pages the previous and next controls move.' },
+    { name: 'siblingCount', type: 'number', default: '1', description: 'Pages shown on each side of the current one.' },
+    { name: 'label', type: 'string', default: "'Pagination'", description: 'Accessible name of the `nav`.' },
+    {
+      name: 'pageSizeLabel',
+      type: 'string',
+      default: "'Results per page'",
+      description: 'Text of the label beside the page size select.',
+    },
+    { name: 'firstPageLabel', type: 'string', default: "'First page'", description: 'Accessible name of the first page control.' },
+    {
+      name: 'previousPageLabel',
+      type: 'string',
+      default: "'Previous page'",
+      description: 'Accessible name of the previous page control.',
+    },
+    { name: 'nextPageLabel', type: 'string', default: "'Next page'", description: 'Accessible name of the next page control.' },
+    { name: 'lastPageLabel', type: 'string', default: "'Last page'", description: 'Accessible name of the last page control.' },
+  ]}
+/>
+
+## Usage
+
+<Usage
+  component='Pagination'
+  module='@clerk/mosaic/components/pagination'
+  props={{ page: 1, totalItems: 100, pageSize: 10 }}
+/>
+
+---
+
+## Examples
+
+### First and last
+
+<Story
+  name='FirstLast'
+  storyModule={PaginationStories}
+/>
+
+### Sibling count
+
+<Story
+  name='Siblings'
+  storyModule={PaginationStories}
+/>
+
+### Single page
+
+<Story
+  name='SinglePage'
+  storyModule={PaginationStories}
+/>
+
+### Disabled
+
+<Story
+  name='Disabled'
+  storyModule={PaginationStories}
+/>

@@ -436,5 +436,53 @@ describe('useDataTable', () => {
 
       expect(result.current.rowSelection).toEqual(controlled);
     });
+
+    it('row.toggleSelected({ range: true }) selects every row between the last toggled row and this one', () => {
+      const { result } = renderHook(() => useDataTable({ data: DATA }));
+
+      act(() => result.current.rows[0].toggleSelected());
+      act(() => result.current.rows[2].toggleSelected({ range: true }));
+
+      expect(result.current.rowSelection).toEqual({ '0': true, '1': true, '2': true });
+    });
+
+    it('row.toggleSelected({ range: true }) selects a range above the last toggled row', () => {
+      const { result } = renderHook(() => useDataTable({ data: DATA }));
+
+      act(() => result.current.rows[2].toggleSelected());
+      act(() => result.current.rows[0].toggleSelected({ range: true }));
+
+      expect(result.current.rowSelection).toEqual({ '0': true, '1': true, '2': true });
+    });
+
+    it('row.toggleSelected({ range: true }) deselects the range when this row is selected', () => {
+      const { result } = renderHook(() =>
+        useDataTable({ data: DATA, defaultRowSelection: { '0': true, '1': true, '2': true } }),
+      );
+
+      act(() => result.current.rows[0].toggleSelected());
+      act(() => result.current.rows[2].toggleSelected({ range: true }));
+
+      expect(result.current.rowSelection).toEqual({ '0': false, '1': false, '2': false });
+    });
+
+    it('row.toggleSelected({ range: true }) toggles only this row when no row was toggled before', () => {
+      const { result } = renderHook(() => useDataTable({ data: DATA }));
+
+      act(() => result.current.rows[2].toggleSelected({ range: true }));
+
+      expect(result.current.rowSelection).toEqual({ '2': true });
+    });
+
+    it('row.toggleSelected({ range: true }) anchors on the row that ended the last range', () => {
+      const { result } = renderHook(() => useDataTable({ data: DATA }));
+
+      act(() => result.current.rows[0].toggleSelected());
+      act(() => result.current.rows[1].toggleSelected({ range: true }));
+      act(() => result.current.rows[2].toggleSelected({ range: true }));
+      act(() => result.current.rows[1].toggleSelected({ range: true }));
+
+      expect(result.current.rowSelection).toEqual({ '0': true, '1': false, '2': false });
+    });
   });
 });

@@ -230,6 +230,83 @@ export const csCZ: LocalizationResource = {
     yearPerUnit: undefined,
     years: undefined,
   },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
+  },
   configureSSO: {
     activate: {
       activateButton: undefined,
@@ -719,6 +796,12 @@ export const csCZ: LocalizationResource = {
         title: undefined,
       },
     },
+    connectionScopeBanner: {
+      subtitle__adding: undefined,
+      subtitle__editing: undefined,
+      title__adding: undefined,
+      title__editing: undefined,
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Kontaktujte správce vaší organizace pro rozšíření vašich oprávnění.',
       title: 'Nemáte oprávnění ke správě jednotného přihlášení (SSO)',
@@ -728,9 +811,11 @@ export const csCZ: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__claimed: undefined,
         badge__expired: undefined,
         badge__unverified: 'Neověřeno',
         badge__verified: 'Ověřeno',
+        checkboxLabel: undefined,
         expiredAtLabel: undefined,
         expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
@@ -957,6 +1042,47 @@ export const csCZ: LocalizationResource = {
     viewFullUrl: undefined,
     warning: undefined,
   },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
+  },
   organizationList: {
     action__createOrganization: 'Vytvořit organizaci',
     action__invitationAccept: 'Připojit se',
@@ -1169,9 +1295,120 @@ export const csCZ: LocalizationResource = {
       title: 'Odebrat doménu',
     },
     securityPage: {
+      connectionPage: {
+        actions: {
+          activate: undefined,
+          continueSetup: undefined,
+        },
+        dangerZone: {
+          deactivateButton: undefined,
+          removeButton: undefined,
+          title: undefined,
+        },
+        domains: {
+          title: undefined,
+        },
+        identityProvider: {
+          certificateExpires: undefined,
+          clientSecret: {
+            placeholder: undefined,
+          },
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        name: {
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        serviceProvider: {
+          acsUrl: undefined,
+          entityId: undefined,
+          metadataUrl: undefined,
+          redirectUri: undefined,
+          title: undefined,
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: undefined,
+            label: undefined,
+          },
+          allowIdpInitiated: {
+            description: undefined,
+            label: undefined,
+          },
+          allowSubdomains: {
+            description: undefined,
+            label: undefined,
+          },
+          forceAuthn: {
+            description: undefined,
+            label: undefined,
+          },
+          syncUserAttributes: {
+            description: undefined,
+            label: undefined,
+          },
+          title: undefined,
+        },
+      },
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
+        title: undefined,
+      },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          changeButton: undefined,
+          memberLabel: undefined,
+          memberPlaceholder: undefined,
+          noResults: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
         title: undefined,
       },
       ssoSection: {
@@ -1182,9 +1419,11 @@ export const csCZ: LocalizationResource = {
         descriptionLine1: undefined,
         domainLabel: undefined,
         menuAction__activate: undefined,
+        menuAction__continue: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
+        primaryButton__addConnection: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
@@ -1425,6 +1664,9 @@ export const csCZ: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Kód pro resetování hesla',
       resendButton: 'Neobdrželi jste kód? Znovu poslat',
@@ -1494,6 +1736,15 @@ export const csCZ: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Před resetováním hesla musíme ověřit vaši identitu.',
+    },
+    ssoBypass: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registrovat se',
@@ -1821,6 +2072,8 @@ export const csCZ: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Jste již přihlášen.',
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Rozšíření peněženky Web3 nebylo nalezeno. Pro pokračování prosím nainstalujte jednu.',
     web3_signature_request_rejected: 'Odmítli jste žádost o podpis. Chcete-li pokračovat, zkuste to prosím znovu.',
     web3_solana_signature_generation_failed:

@@ -2,16 +2,36 @@ import * as Stories from './user-profile-mfa-section.stories';
 
 # UserProfileMfaSection
 
-Two-step verification methods composed with the shared Security list treatment.
+Display and manage two-step verification methods.
+
+## Playground
+
+Choose Add to set up a method. Use `000000` to see an incorrect-code error; other six-digit codes succeed. Row menus let you change the default, remove a method, or regenerate backup codes.
+
+Account changes are simulated. Copy and Download use your browser’s clipboard and file downloads.
 
 <Story
   name='Default'
   storyModule={Stories}
-  composition={[{ name: 'Section', href: '/components/section', layer: 'Components' }]}
-/>
-
-<Story
-  name='Empty'
-  storyModule={Stories}
-  composition={[{ name: 'Section', href: '/components/section', layer: 'Components' }]}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Icon', href: '/components/icon', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Item', href: '/components/item', layer: 'Components' },
+    { name: 'Spinner', href: '/components/spinner', layer: 'Components' },
+    { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'InputGroup', href: '/components/input-group', layer: 'Components' },
+    { name: 'Select', href: '/components/select', layer: 'Components' },
+    { name: 'PhoneInput', href: '/components/phone-input', layer: 'Components' },
+    { name: 'Otp', href: '/components/otp', layer: 'Components' },
+    { name: 'Banner', href: '/components/banner', layer: 'Components' },
+    { name: 'Text', href: '/components/text', layer: 'Components' },
+  ]}
 />

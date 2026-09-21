@@ -1,11 +1,14 @@
-import stylexPlugin from '@stylexjs/unplugin/webpack';
 import createMDX from '@next/mdx';
-import remarkGfm from 'remark-gfm';
+import stylexPlugin from '@stylexjs/unplugin/webpack';
+import { createRequire } from 'module';
+import { dirname, resolve } from 'path';
 import rehypeRaw from 'rehype-raw';
-import { resolve } from 'path';
+import remarkGfm from 'remark-gfm';
 import { fileURLToPath } from 'url';
-import { mosaicLightningCssTargets } from '../ui/stylex-lightningcss.config.mjs';
 
+import { mosaicLightningCssTargets } from '../mosaic/stylex-lightningcss.config.mjs';
+
+const require = createRequire(import.meta.url);
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
 const withMDX = createMDX({
@@ -76,18 +79,32 @@ const nextConfig = {
       stylexPlugin({
         dev: isDev,
         runtimeInjection: isDev,
-        unstable_moduleResolution: { type: 'commonJS', rootDir: resolve(__dirname, '../ui') },
+        unstable_moduleResolution: { type: 'commonJS', rootDir: resolve(__dirname, '../mosaic') },
+        // Stories reach `tokens.stylex.ts` through the same alias; StyleX resolves it itself.
+        aliases: { '@clerk/mosaic/*': [resolve(__dirname, '../mosaic/src/*')] },
         useCSSLayers: true,
         lightningcssOptions: { targets: mosaicLightningCssTargets },
       }),
     );
 
-    config.resolve.alias['@clerk/ui/mosaic'] = resolve(__dirname, '../ui/src/mosaic');
+    // Dev-only: StyleX's runtime injector drops named `@container` rules after the first per
+    // query — see the loader for the bug. Scoped to that one module.
+    if (isDev) {
+      config.module.rules.push({
+        test: /[\\/]@stylexjs[\\/]stylex[\\/]lib[\\/](es|cjs)[\\/]inject\.(mjs|js)$/,
+        use: [{ loader: resolve(__dirname, 'src/lib/loaders/stylex-inject-named-container.cjs') }],
+      });
+    }
+
+    config.resolve.alias['@clerk/mosaic'] = resolve(__dirname, '../mosaic/src');
     // Consume @clerk/headless primitives from source (no dist build needed), mirroring Mosaic.
     // `/hooks` and `/utils` live outside `primitives/`, so alias them first (more specific wins).
     config.resolve.alias['@clerk/headless/hooks'] = resolve(__dirname, '../headless/src/hooks');
     config.resolve.alias['@clerk/headless/utils'] = resolve(__dirname, '../headless/src/utils');
     config.resolve.alias['@clerk/headless'] = resolve(__dirname, '../headless/src/primitives');
+    // Mosaic/headless source imports this. Webpack resolves from the aliased file's
+    // directory, which is outside swingset, so the package has to be named here.
+    config.resolve.alias['@floating-ui/react'] = dirname(require.resolve('@floating-ui/react/package.json'));
     return config;
   },
 };

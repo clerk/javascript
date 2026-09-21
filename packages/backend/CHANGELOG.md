@@ -1,5 +1,64 @@
 # Change Log
 
+## 3.18.1
+
+### Patch Changes
+
+- Updated dependencies [[`855c24f`](https://github.com/clerk/javascript/commit/855c24f451314c6b8a586daf422b8463638f1f37), [`cb6a376`](https://github.com/clerk/javascript/commit/cb6a376c5e34fa7869821f554c73f2968019776f)]:
+  - @clerk/shared@4.33.0
+
+## 3.18.0
+
+### Minor Changes
+
+- Add experimental `emails.createBatch()` for submitting up to 100 transactional emails. Each message supports its own idempotency key and returns an independent success or error result. ([#9711](https://github.com/clerk/javascript/pull/9711)) by [@jescalan](https://github.com/jescalan)
+
+  Transactional messages now support sender and reply-to display names, cross-domain Reply-To addresses, CC/BCC recipients, attachments, and custom headers. These options require a backend deployment that supports them.
+
+### Patch Changes
+
+- Update docs deep links in JSDoc comments to match clerk.com's new heading anchors (`#get-token` is now `#gettoken`, `#o-auth-strategy` is now `#oauthstrategy`, and so on). ([#9520](https://github.com/clerk/javascript/pull/9520)) by [@manovotny](https://github.com/manovotny)
+
+- Update the `lockUser()` JSDoc to point at the **System** page under **Protect** > **Rules** (`/~/protect/rules/system`), matching the Clerk Dashboard's Protect navigation. ([#9691](https://github.com/clerk/javascript/pull/9691)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`b5a3abe`](https://github.com/clerk/javascript/commit/b5a3abe19629dc00839fecf03b364dff1b4e2e2e), [`ddf9afc`](https://github.com/clerk/javascript/commit/ddf9afc6dc82528d28223ba9b775f8aa6647bbd7), [`39782e3`](https://github.com/clerk/javascript/commit/39782e3abf25363053866dae1996eaaaf5e91b42)]:
+  - @clerk/shared@4.32.0
+
+## 3.17.2
+
+### Patch Changes
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`452107a`](https://github.com/clerk/javascript/commit/452107a4cfe06ce5d72b008ddaf670ea604e857d), [`7ea009f`](https://github.com/clerk/javascript/commit/7ea009fda71c052ac6e4d712830baa856f347954), [`06be25f`](https://github.com/clerk/javascript/commit/06be25fadde3d068f7686b565848a02d832f6211), [`c47e9cb`](https://github.com/clerk/javascript/commit/c47e9cb5e74de91bdec17111ba7b01d3e2ea459a), [`1601100`](https://github.com/clerk/javascript/commit/16011007218787509fd8457081ed5640e61bec48)]:
+  - @clerk/shared@4.31.1
+
+## 3.17.1
+
+### Patch Changes
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/shared@4.31.0
+
+## 3.17.0
+
+### Minor Changes
+
+- Add experimental methods for sending and retrieving internal transactional emails, including Clerk suppression state and reasons. ([#9553](https://github.com/clerk/javascript/pull/9553)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Reject JWT-template tokens presented as session tokens in the `Authorization` header when `acceptsToken` is `'any'` or an array that includes `'session_token'`. `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for such a token, matching the existing `acceptsToken: 'session_token'` behavior. ([#9511](https://github.com/clerk/javascript/pull/9511)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+## 3.16.13
+
+### Patch Changes
+
+- Align JSDoc link targets with the docs link rules: internal docs links don't open in a new tab (removed `{{ target: '_blank' }}` from the `Invitation` Metadata link), while API reference links do (added it to the `ExternalAccount` Backend API link and the `currentUser()` endpoint link). ([#9556](https://github.com/clerk/javascript/pull/9556)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/shared@4.30.2
+
 ## 3.16.12
 
 ### Patch Changes

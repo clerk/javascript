@@ -1,4 +1,4 @@
-import { Icon } from '@clerk/ui/mosaic/components/icon';
+import { Icon } from '@clerk/mosaic/components/icon';
 import {
   userButtonBusyKeys,
   type UserButtonInvitation,
@@ -7,7 +7,7 @@ import {
   type UserButtonSession,
   type UserButtonSuggestion,
   UserButtonView,
-} from '@clerk/ui/mosaic/user-button/user-button.view';
+} from '@clerk/mosaic/features/user-button/user-button.view';
 import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -20,7 +20,9 @@ export const meta: StoryMeta = {
   group: 'User Button',
   title: 'UserButton',
   label: 'User button',
-  source: 'packages/ui/src/mosaic/user-button/user-button.view.tsx',
+  status: 'wip',
+  substatus: 'needs wire-up',
+  source: 'packages/mosaic/src/features/user-button/user-button.view.tsx',
 };
 
 // Accounts wear their own photo. Only the flagship workspace carries the Clerk mark; the rest wear
@@ -276,6 +278,18 @@ export function AvatarOnly(_args: Record<string, unknown>) {
   );
 }
 
+export function UserAvatarOnly(_args: Record<string, unknown>) {
+  const prototype = usePrototype();
+
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='user'
+      renderTriggerLabel={false}
+    />
+  );
+}
+
 export function WithoutTriggerBadge(_args: Record<string, unknown>) {
   const prototype = usePrototype();
 
@@ -358,7 +372,7 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
           label: 'App settings',
           icon: (
             <Icon
-              name='cog'
+              name='cog-6-teeth'
               size='sm'
             />
           ),

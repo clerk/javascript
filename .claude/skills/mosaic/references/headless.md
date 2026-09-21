@@ -7,9 +7,9 @@ styles** — positioning, keyboard nav, focus management, dismiss, and ARIA are
 delegated to `@floating-ui/react`; all appearance is applied externally via
 `data-*` selectors and consumer classNames.
 
-The package is `private: true` and consumed by `@clerk/ui`. It's a separate
-package because `@clerk/ui` sets `jsxImportSource: '@emotion/react'`, which
-conflicts with the standard `react-jsx` transform these primitives need.
+The package is `private: true` and consumed by `@clerk/mosaic`. It is planned
+to later move into the Mosaic package. Mosaic currently bundles Headless into
+its published artifact.
 
 ## Read this for the _what_
 
@@ -244,4 +244,4 @@ if (!element) return null;
 Tests run in **real Chromium** (vitest browser mode), not jsdom, and include
 `axe` accessibility assertions. `pnpm test` in `packages/headless`. See
 `testing.md` for the Mosaic flow-layer testing model (a different concern — that
-covers machines/controllers/views, not these primitives).
+covers models/controllers/views, not these primitives).

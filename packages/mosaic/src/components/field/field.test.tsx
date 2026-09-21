@@ -1,0 +1,644 @@
+import * as stylex from '@stylexjs/stylex';
+import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+
+import { Input } from '../input';
+import { Select } from '../select';
+import { Field } from './field';
+
+const overrides = stylex.create({
+  root: { display: 'grid' },
+  label: { fontWeight: 700 },
+  description: { opacity: 0.8 },
+  error: { fontWeight: 600 },
+});
+
+const atoms = (style: stylex.StyleXStyles) =>
+  (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
+
+const restores: Array<() => void> = [];
+
+function stubPrototype(target: object, name: string, descriptor: PropertyDescriptor) {
+  const original = Object.getOwnPropertyDescriptor(target, name);
+  Object.defineProperty(target, name, { configurable: true, ...descriptor });
+  restores.push(() => {
+    if (original) {
+      Object.defineProperty(target, name, original);
+    } else {
+      Reflect.deleteProperty(target, name);
+    }
+  });
+}
+
+describe('Mosaic Field', () => {
+  afterEach(() => {
+    restores.splice(0).forEach(restore => restore());
+  });
+
+  it('generates native label and message relationships', () => {
+    render(
+      <Field.Root>
+        <Field.Label>Email</Field.Label>
+        <Input aria-invalid='true' />
+        <Field.Description>Used for account notifications.</Field.Description>
+        <Field.Error>Enter a valid email.</Field.Error>
+      </Field.Root>,
+    );
+
+    const control = screen.getByRole('textbox', { name: 'Email' });
+    const label = screen.getByText('Email');
+    const description = screen.getByText('Used for account notifications.');
+    const error = screen.getByText('Enter a valid email.').closest('p');
+    expect(control.id).not.toBe('');
+    expect(label.id).not.toBe('');
+    expect(label).toHaveAttribute('for', control.id);
+    expect(control).toHaveAttribute('aria-labelledby', label.id);
+    expect(description.id).not.toBe('');
+    expect(error?.id).not.toBe('');
+    expect(control).toHaveAttribute('aria-describedby', `${description.id} ${error?.id}`);
+    expect(control).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('preserves caller-provided IDs and merges ARIA relationships', () => {
+    render(
+      <Field.Root aria-label='Account details'>
+        <Field.Label
+          id='custom-label'
+          aria-hidden='false'
+        >
+          Account
+        </Field.Label>
+        <Input
+          id='custom-control'
+          aria-labelledby='external-label custom-label'
+          aria-describedby='external-description custom-description'
+        />
+        <Field.Description
+          id='custom-description'
+          aria-live='polite'
+        >
+          Description
+        </Field.Description>
+        <Field.Error
+          id='custom-error'
+          role='alert'
+        >
+          Error
+        </Field.Error>
+      </Field.Root>,
+    );
+
+    expect(screen.getByLabelText('Account details')).toHaveClass('cl-field-root');
+    expect(screen.getByText('Account')).toHaveAttribute('id', 'custom-label');
+    expect(screen.getByText('Account')).toHaveAttribute('for', 'custom-control');
+    expect(screen.getByText('Account')).toHaveAttribute('aria-hidden', 'false');
+    expect(screen.getByRole('textbox')).toHaveAttribute('id', 'custom-control');
+    expect(screen.getByRole('textbox')).toHaveAttribute('aria-labelledby', 'external-label custom-label');
+    expect(screen.getByRole('textbox')).toHaveAttribute(
+      'aria-describedby',
+      'external-description custom-description custom-error',
+    );
+    expect(screen.getByText('Description')).toHaveAttribute('id', 'custom-description');
+    expect(screen.getByText('Description')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByRole('alert')).toHaveAttribute('id', 'custom-error');
+  });
+
+  it('allows every part to render independently of Root', () => {
+    render(
+      <>
+        <Field.Label htmlFor='standalone'>Standalone label</Field.Label>
+        <Field.Description id='standalone-description'>Standalone description</Field.Description>
+        <Field.Error id='standalone-error'>Standalone error</Field.Error>
+      </>,
+    );
+
+    expect(screen.getByText('Standalone label')).toHaveClass('cl-field-label');
+    expect(screen.getByText('Standalone description')).toHaveClass('cl-field-description');
+    expect(screen.getByText('Standalone error').closest('p')).toHaveClass('cl-field-error');
+  });
+
+  it('keeps Input native and ARIA behavior identical inside and outside Field', () => {
+    const props = {
+      id: 'account-email',
+      name: 'email',
+      type: 'email',
+      required: true,
+      readOnly: true,
+      'aria-label': 'Account email',
+      'aria-labelledby': 'external-label',
+      'aria-describedby': 'external-description external-error',
+      'aria-invalid': 'grammar' as const,
+      'aria-disabled': 'false' as const,
+      'aria-required': 'true' as const,
+    };
+
+    render(
+      <>
+        <Input
+          {...props}
+          data-testid='outside'
+        />
+        <Field.Root>
+          <Input
+            {...props}
+            data-testid='inside'
+          />
+        </Field.Root>
+      </>,
+    );
+
+    const outside = screen.getByTestId('outside');
+    const inside = screen.getByTestId('inside');
+    const attributes = [
+      'id',
+      'name',
+      'type',
+      'required',
+      'readonly',
+      'aria-label',
+      'aria-labelledby',
+      'aria-describedby',
+      'aria-invalid',
+      'aria-disabled',
+      'aria-required',
+      'class',
+      'data-size',
+    ];
+    for (const attribute of attributes) {
+      expect(inside.getAttribute(attribute)).toBe(outside.getAttribute(attribute));
+    }
+    expect(inside).toHaveClass('cl-input');
+    expect(inside).not.toHaveClass('cl-field-control');
+  });
+
+  it('propagates semantic state while preserving explicit control props', () => {
+    render(
+      <>
+        <Field.Root
+          disabled
+          required
+          invalid
+        >
+          <Input data-testid='inherited' />
+        </Field.Root>
+        <Field.Root
+          disabled
+          required
+          invalid
+        >
+          <Input
+            data-testid='explicit'
+            disabled={false}
+            required={false}
+            aria-invalid='grammar'
+          />
+        </Field.Root>
+      </>,
+    );
+
+    expect(screen.getByTestId('inherited')).toBeDisabled();
+    expect(screen.getByTestId('inherited')).toBeRequired();
+    expect(screen.getByTestId('inherited')).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByTestId('explicit')).not.toBeDisabled();
+    expect(screen.getByTestId('explicit')).not.toBeRequired();
+    expect(screen.getByTestId('explicit')).toHaveAttribute('aria-invalid', 'grammar');
+  });
+
+  it('finalizes explicit IDs and generated relationships during hydration', async () => {
+    const field = (
+      <Field.Root>
+        <Field.Label>Email</Field.Label>
+        <Input id='custom-control' />
+        <Field.Description>Description</Field.Description>
+      </Field.Root>
+    );
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(field);
+    expect(container.querySelector('input')).not.toHaveAttribute('id', 'custom-control');
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    let root: ReturnType<typeof hydrateRoot> | undefined;
+    await act(() => {
+      root = hydrateRoot(container, field);
+    });
+
+    const control = container.querySelector('input');
+    const label = container.querySelector('label');
+    const description = container.querySelector('.cl-field-description');
+    expect(consoleError).not.toHaveBeenCalled();
+    expect(control).toHaveAttribute('id', 'custom-control');
+    expect(label).toHaveAttribute('for', control?.id);
+    expect(control).toHaveAttribute('aria-labelledby', label?.id);
+    expect(control).toHaveAttribute('aria-describedby', description?.id);
+
+    await act(() => root?.unmount());
+    consoleError.mockRestore();
+  });
+
+  it('warns when Root contains more than one form control', () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    render(
+      <Field.Root>
+        <Input />
+        <Input />
+      </Field.Root>,
+    );
+
+    expect(consoleWarn).toHaveBeenCalledTimes(1);
+    expect(consoleWarn).toHaveBeenCalledWith(
+      '[clerk] <Field.Root> supports a single form control. Use a separate <Field.Root> for each control or native <fieldset> semantics for grouped controls.',
+    );
+    consoleWarn.mockRestore();
+  });
+
+  it('updates registered control and message IDs as parts change', () => {
+    const { rerender } = render(
+      <Field.Root>
+        <Field.Label>Email</Field.Label>
+        <Input id='account-email' />
+        <Field.Description>Description</Field.Description>
+      </Field.Root>,
+    );
+    const descriptionId = screen.getByText('Description').id;
+
+    expect(screen.getByRole('textbox', { name: 'Email' })).toHaveAttribute('aria-describedby', descriptionId);
+
+    rerender(
+      <Field.Root>
+        <Field.Label>Email</Field.Label>
+        <Input id='billing-email' />
+      </Field.Root>,
+    );
+
+    const control = screen.getByRole('textbox', { name: 'Email' });
+    expect(control).toHaveAttribute('id', 'billing-email');
+    expect(control).not.toHaveAttribute('aria-describedby');
+    expect(screen.getByText('Email')).toHaveAttribute('for', 'billing-email');
+  });
+
+  it('forwards refs and native props from every part', () => {
+    const rootRef = React.createRef<HTMLDivElement>();
+    const labelRef = React.createRef<HTMLLabelElement>();
+    const descriptionRef = React.createRef<HTMLParagraphElement>();
+    const errorRef = React.createRef<HTMLParagraphElement>();
+
+    render(
+      <Field.Root
+        ref={rootRef}
+        data-root='field'
+      >
+        <Field.Label
+          ref={labelRef}
+          htmlFor='name'
+        >
+          Name
+        </Field.Label>
+        <Field.Description
+          ref={descriptionRef}
+          title='Help'
+        >
+          Description
+        </Field.Description>
+        <Field.Error
+          ref={errorRef}
+          role='status'
+        >
+          Error
+        </Field.Error>
+      </Field.Root>,
+    );
+
+    expect(rootRef.current).toHaveAttribute('data-root', 'field');
+    expect(labelRef.current).toHaveAttribute('for', 'name');
+    expect(descriptionRef.current).toHaveAttribute('title', 'Help');
+    expect(errorRef.current).toHaveAttribute('role', 'status');
+  });
+
+  it('applies xstyle on every part without prescribing layout', () => {
+    render(
+      <Field.Root
+        xstyle={overrides.root}
+        data-testid='root'
+      >
+        <Field.Label xstyle={overrides.label}>Email</Field.Label>
+        <Field.Description xstyle={overrides.description}>Description</Field.Description>
+        <Field.Error xstyle={overrides.error}>Error</Field.Error>
+      </Field.Root>,
+    );
+
+    expect(screen.getByTestId('root')).toHaveClass('cl-field-root', ...atoms(overrides.root));
+    expect(screen.getByText('Email')).toHaveClass('cl-field-label', ...atoms(overrides.label));
+    expect(screen.getByText('Description')).toHaveClass('cl-field-description', ...atoms(overrides.description));
+    expect(screen.getByText('Error').closest('p')).toHaveClass('cl-field-error', ...atoms(overrides.error));
+  });
+
+  it('merges a render-sourced className instead of clobbering its own', () => {
+    render(
+      <Field.Root>
+        <Field.Description render={<Field.Error />}>Description</Field.Description>
+      </Field.Root>,
+    );
+
+    expect(screen.getByText('Description').closest('p')).toHaveClass('cl-field-description', 'cl-field-error');
+  });
+
+  it('hides the label visually while keeping it associated with the control', () => {
+    render(
+      <Field.Root>
+        <Field.Label visuallyHidden>Email</Field.Label>
+        <Input />
+      </Field.Root>,
+    );
+
+    const label = screen.getByText('Email');
+    expect(label).toHaveAttribute('data-visually-hidden', '');
+    expect(screen.getByRole('textbox', { name: 'Email' })).toHaveAttribute('id', label.getAttribute('for'));
+  });
+
+  it('supports render escape hatches on every part', () => {
+    render(
+      <Field.Root render={props => <section {...props} />}>
+        <Field.Label render={props => <label {...props} />}>Biography</Field.Label>
+        <Field.Description render={props => <div {...props} />}>Description</Field.Description>
+        <Field.Error render={props => <div {...props} />}>Error</Field.Error>
+      </Field.Root>,
+    );
+
+    expect(screen.getByText('Biography').closest('section')).not.toBeNull();
+    expect(screen.getByText('Description').tagName).toBe('DIV');
+    expect(screen.getByText('Error').closest('div')).toHaveClass('cl-field-error');
+  });
+
+  it('preserves the opt-in error presentation and icon', () => {
+    render(<Field.Error>Email is invalid.</Field.Error>);
+
+    const error = screen.getByText('Email is invalid.').closest('p');
+    expect(error).not.toHaveAttribute('role');
+    expect(error).not.toHaveAttribute('aria-live');
+    expect(error?.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('mounts through the headless enter transition and animates the message height', () => {
+    const probe = stylex.create({
+      message: {
+        transitionProperty: {
+          default: 'height, margin-top',
+          '@media (prefers-reduced-motion: reduce)': 'none',
+        },
+        height: {
+          default: 'var(--_cl-field-message-height)',
+          ':where(:not([data-open]), [data-starting-style])': 0,
+        },
+      },
+      feedback: {
+        opacity: { default: 1, ':where([data-starting-style], [data-ending-style])': 0 },
+        position: { default: null, ':where([data-ending-style])': 'absolute' },
+      },
+    });
+
+    const { container } = render(
+      <Field.Root>
+        <Field.Message>
+          <Field.Error>Enter a valid email.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    const message = container.querySelector('.cl-field-message');
+    const error = screen.getByText('Enter a valid email.').closest('p');
+    expect(atoms(probe.message)).toHaveLength(4);
+    expect(message).toHaveClass(...atoms(probe.message));
+    expect(message).toHaveAttribute('data-open');
+    expect(message).toHaveAttribute('data-starting-style');
+    expect(atoms(probe.feedback)).toHaveLength(3);
+    expect(error).toHaveClass(...atoms(probe.feedback));
+    expect(error).toHaveAttribute('data-open');
+    expect(error).toHaveAttribute('data-starting-style');
+  });
+
+  it('renders nothing without a message', () => {
+    const { container } = render(
+      <Field.Root>
+        <Field.Error>{null}</Field.Error>
+        <Field.Error>{''}</Field.Error>
+        <Field.Error>{false}</Field.Error>
+      </Field.Root>,
+    );
+
+    expect(container.querySelector('.cl-field-error')).toBeNull();
+  });
+
+  it('crossfades an error into a success message inside one Field.Message', async () => {
+    stubPrototype(Element.prototype, 'getAnimations', {
+      value: () => [{ finished: new Promise<void>(() => undefined) }],
+    });
+
+    const { container, rerender } = render(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>Password is incorrect.</Field.Error>
+          <Field.Success>{null}</Field.Success>
+        </Field.Message>
+      </Field.Root>,
+    );
+    await act(async () => {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    });
+    expect(container.querySelector('.cl-field-success')).toBeNull();
+
+    rerender(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>{null}</Field.Error>
+          <Field.Success>Password verified.</Field.Success>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    const error = container.querySelector('.cl-field-error');
+    const success = container.querySelector('.cl-field-success');
+    expect(container.querySelector('.cl-field-message')).toHaveAttribute('data-open');
+    expect(container.querySelector('.cl-field-message')).not.toHaveAttribute('data-ending-style');
+    expect(error).toHaveTextContent('Password is incorrect.');
+    expect(error).toHaveAttribute('data-ending-style');
+    expect(error).toHaveAttribute('aria-hidden', 'true');
+    expect(success).toHaveTextContent('Password verified.');
+    expect(success).toHaveAttribute('data-starting-style');
+    expect(success).not.toHaveAttribute('aria-hidden');
+    expect(screen.getByRole('textbox')).toHaveAttribute('aria-describedby', success?.id);
+  });
+
+  it('re-measures when an open message swaps its rendered element', () => {
+    stubPrototype(HTMLElement.prototype, 'offsetHeight', {
+      get(this: HTMLElement) {
+        return this.tagName === 'DIV' ? 40 : 24;
+      },
+    });
+
+    const { container, rerender } = render(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>Enter a valid email.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+    const message = container.querySelector('.cl-field-message');
+    expect(message).toHaveAttribute('data-open');
+    expect(message?.getAttribute('style')).toContain('24px');
+
+    rerender(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error render={<div />}>Enter a valid email.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    expect(screen.getByText('Enter a valid email.').closest('div')).toHaveClass('cl-field-error');
+    expect(message).toHaveAttribute('data-open');
+    expect(message).not.toHaveAttribute('data-ending-style');
+    expect(message?.getAttribute('style')).toContain('40px');
+  });
+
+  it('announces messages from a persistent polite live region that callers can escalate', () => {
+    const { container, rerender } = render(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>{null}</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    const message = container.querySelector('.cl-field-message');
+    expect(message).toHaveAttribute('role', 'status');
+    expect(message).toBeEmptyDOMElement();
+
+    rerender(
+      <Field.Root>
+        <Input />
+        <Field.Message role='alert'>
+          <Field.Error>Required.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    expect(container.querySelector('.cl-field-message')).toBe(message);
+    expect(message).toHaveAttribute('role', 'alert');
+    expect(message).toHaveTextContent('Required.');
+  });
+
+  it('holds the last message through the exit transition, then unmounts', async () => {
+    let finish = () => undefined as void;
+    const finished = new Promise<void>(resolve => {
+      finish = resolve;
+    });
+    const getAnimations = vi.fn(() => [{ finished }]);
+    stubPrototype(Element.prototype, 'getAnimations', { value: getAnimations });
+
+    const { container, rerender } = render(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>Enter a valid email.</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+    const error = screen.getByText('Enter a valid email.').closest('p');
+    await act(async () => {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    });
+    expect(error).not.toHaveAttribute('data-starting-style');
+    expect(screen.getByRole('textbox')).toHaveAttribute('aria-describedby', error?.id);
+
+    rerender(
+      <Field.Root>
+        <Input />
+        <Field.Message>
+          <Field.Error>{null}</Field.Error>
+        </Field.Message>
+      </Field.Root>,
+    );
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    expect(screen.getByText('Enter a valid email.').closest('p')).toHaveAttribute('data-ending-style');
+    expect(container.querySelector('.cl-field-message')).toHaveAttribute('data-ending-style');
+    expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-describedby');
+
+    getAnimations.mockReturnValue([]);
+    await act(async () => {
+      finish();
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+
+    expect(screen.queryByText('Enter a valid email.')).toBeNull();
+  });
+
+  it('renders a span label that focuses a control which cannot be natively labelled', async () => {
+    const user = userEvent.setup();
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    render(
+      <Field.Root>
+        <Field.Label>Role</Field.Label>
+        <Select.Root
+          items={[{ value: 'admin', label: 'Admin' }]}
+          defaultValue='admin'
+        >
+          <Select.Trigger />
+          <Select.Popup />
+        </Select.Root>
+      </Field.Root>,
+    );
+
+    const label = screen.getByText('Role');
+    const trigger = screen.getByRole('combobox');
+    expect(label.tagName).toBe('SPAN');
+    expect(label).toHaveClass('cl-field-label');
+    expect(label).not.toHaveAttribute('for');
+    expect(label.id).not.toBe('');
+    expect(trigger.id).not.toBe('');
+    expect(trigger.getAttribute('aria-labelledby')).toContain(label.id);
+
+    await user.click(label);
+    expect(trigger).toHaveFocus();
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    expect(consoleWarn).not.toHaveBeenCalled();
+    consoleWarn.mockRestore();
+  });
+
+  it('keeps a native label for a select when htmlFor is explicit', () => {
+    render(
+      <Field.Root>
+        <Field.Label htmlFor='elsewhere'>Role</Field.Label>
+        <Select.Root items={[{ value: 'admin', label: 'Admin' }]}>
+          <Select.Trigger />
+          <Select.Popup />
+        </Select.Root>
+      </Field.Root>,
+    );
+
+    const label = screen.getByText('Role');
+    expect(label.tagName).toBe('LABEL');
+    expect(label).toHaveAttribute('for', 'elsewhere');
+  });
+
+  it('warns when Field.Label does not render a native label', () => {
+    const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    render(<Field.Label render={<div />}>Email</Field.Label>);
+
+    expect(consoleWarn).toHaveBeenCalledWith('[clerk] <Field.Label> must render a native `<label>` element.');
+    consoleWarn.mockRestore();
+  });
+});

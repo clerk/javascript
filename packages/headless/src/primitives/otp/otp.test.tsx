@@ -517,6 +517,107 @@ describe('Otp', () => {
     });
   });
 
+  describe('form integration', () => {
+    it('marks every slot required so a partial code fails validation', () => {
+      render(
+        <Harness
+          required
+          name='code'
+          defaultValue='12'
+        />,
+      );
+      expect(inputs().every(input => input.required)).toBe(true);
+      expect(inputs()[2].checkValidity()).toBe(false);
+      expect(inputs()[0].checkValidity()).toBe(true);
+    });
+
+    it('does not require slots by default', () => {
+      render(<Harness />);
+      expect(inputs().some(input => input.required)).toBe(false);
+    });
+
+    it('disables the hidden input so a disabled field submits nothing', () => {
+      render(
+        <Harness
+          disabled
+          name='code'
+          defaultValue='1234'
+        />,
+      );
+      const hidden = document.querySelector<HTMLInputElement>('input[name="code"]');
+      expect(hidden).toBeDisabled();
+
+      const form = document.createElement('form');
+      form.append(hidden as Node);
+      expect(Array.from(new FormData(form).keys())).toEqual([]);
+    });
+
+    it('submits the hidden input when enabled', () => {
+      render(
+        <Harness
+          name='code'
+          defaultValue='1234'
+        />,
+      );
+      const hidden = document.querySelector<HTMLInputElement>('input[name="code"]');
+      expect(hidden).not.toBeDisabled();
+
+      const form = document.createElement('form');
+      form.append(hidden as Node);
+      expect(new FormData(form).get('code')).toBe('1234');
+    });
+  });
+
+  describe('labelling', () => {
+    it('puts the root id on the first slot and derives the rest from it', () => {
+      render(<Harness id='code' />);
+      expect(inputs().map(input => input.id)).toEqual(['code', 'code-2', 'code-3', 'code-4']);
+      expect(document.querySelector('[data-testid="otp-root"]')).not.toHaveAttribute('id');
+    });
+
+    it('generates slot ids when no id is given', () => {
+      render(<Harness />);
+      expect(inputs().every(input => input.id !== '')).toBe(true);
+      expect(new Set(inputs().map(input => input.id)).size).toBe(4);
+    });
+
+    it('names the first slot after a native label targeting it', () => {
+      render(
+        <>
+          <label htmlFor='code'>Verification code</label>
+          <Harness id='code' />
+        </>,
+      );
+      expect(inputs()[0]).not.toHaveAttribute('aria-label');
+      expect(screen.getByLabelText('Verification code')).toBe(inputs()[0]);
+    });
+
+    it('passes the root aria-labelledby down to the first slot', () => {
+      render(
+        <>
+          <span id='code-label'>Verification code</span>
+          <Harness aria-labelledby='code-label' />
+        </>,
+      );
+      expect(inputs()[0]).toHaveAttribute('aria-labelledby', 'code-label');
+      expect(inputs()[0]).not.toHaveAttribute('aria-label');
+    });
+
+    it('passes the root aria-label down to the first slot', () => {
+      render(<Harness aria-label='Verification code' />);
+      expect(inputs()[0]).toHaveAttribute('aria-label', 'Verification code');
+    });
+
+    it('labels the remaining slots positionally', () => {
+      render(<Harness aria-label='Verification code' />);
+      expect(
+        inputs()
+          .slice(1)
+          .map(input => input.getAttribute('aria-label')),
+      ).toEqual(['Character 2 of 4', 'Character 3 of 4', 'Character 4 of 4']);
+    });
+  });
+
   describe('accessibility', () => {
     it('has no axe violations', async () => {
       const { container } = render(

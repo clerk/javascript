@@ -134,13 +134,15 @@ export class StateProxy implements State {
 
   private buildSignInProxy() {
     const gateProperty = this.gateProperty.bind(this);
-    const target = () => this.client.signIn.__internal_future;
+    const target = () => this.state.signInSignal().signIn ?? this.client.signIn.__internal_future;
 
     return {
       errors: defaultSignInErrors(),
       fetchStatus: 'idle' as const,
       signIn: {
-        status: 'needs_identifier' as const,
+        get status() {
+          return gateProperty(target, 'status', 'needs_identifier');
+        },
         availableStrategies: [],
         get isTransferable() {
           return gateProperty(target, 'isTransferable', false);
@@ -150,6 +152,9 @@ export class StateProxy implements State {
         },
         get supportedFirstFactors() {
           return gateProperty(target, 'supportedFirstFactors', []);
+        },
+        get ssoBypassFirstFactors() {
+          return gateProperty(target, 'ssoBypassFirstFactors', []);
         },
         get supportedSecondFactors() {
           return gateProperty(target, 'supportedSecondFactors', []);
@@ -256,7 +261,7 @@ export class StateProxy implements State {
   private buildSignUpProxy() {
     const gateProperty = this.gateProperty.bind(this);
     const gateMethod = this.gateMethod.bind(this);
-    const target = () => this.client.signUp.__internal_future;
+    const target = () => this.state.signUpSignal().signUp ?? this.client.signUp.__internal_future;
 
     return {
       errors: defaultSignUpErrors(),

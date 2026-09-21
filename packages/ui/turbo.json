@@ -11,9 +11,10 @@
         "*.d.ts",
         "src/**",
         "tsconfig.json",
-        "tsconfig.mosaic.json",
+        "tsconfig.base.json",
+        "tsconfig.src.json",
         "rspack.config.js",
-        "tsdown.mosaic.config.mts",
+        "tsdown.config.mts",
 
         "!**/*.test.*",
         "!**/test/**",
@@ -25,7 +26,7 @@
         "!examples/**",
         "!node_modules/**"
       ],
-      "outputs": ["*/package.json", "dist/**", "dist-mosaic/**", "scripts/**"]
+      "outputs": ["*/package.json", "dist/**"]
     },
     "test": {
       "inputs": [

@@ -2,7 +2,7 @@ import type { CustomPage } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { render, screen, waitFor } from '@/test/utils';
+import { act, render, screen, waitFor } from '@/test/utils';
 import { VirtualRouter } from '@/ui/router';
 
 import { OrganizationProfile } from '..';
@@ -603,7 +603,11 @@ describe('OrganizationProfile', () => {
 
       renderSecurityRoute(wrapper);
 
-      await waitFor(() => expect(screen.queryByText(SECURITY_DESCRIPTION)).not.toBeInTheDocument());
+      await act(() => new Promise<void>(resolve => setTimeout(resolve, 50)));
+
+      expect(fixtures.clerk.organization?.getEnterpriseConnections).not.toHaveBeenCalled();
+      expect(screen.queryByRole('heading', { name: 'Security' })).not.toBeInTheDocument();
+      expect(screen.queryByText(SECURITY_DESCRIPTION)).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
     });
   });

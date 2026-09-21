@@ -1,3 +1,4 @@
+import { SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ClientJSON,
   DisplayConfigJSON,
@@ -16,7 +17,6 @@ import type {
   VerificationJSON,
 } from '@clerk/shared/types';
 
-import { SIGN_UP_MODES } from '@/core/constants';
 import type { OrgParams } from '@/test/core-fixtures';
 import { createUser, getOrganizationId } from '@/test/core-fixtures';
 
@@ -116,6 +116,12 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     supportResetPassword?: boolean;
   };
 
+  type SignInWithEnterpriseSSOParams = {
+    identifier?: string;
+    enterpriseConnections?: Array<{ id: string; name: string }>;
+    supportSSOBypass?: boolean;
+  };
+
   type SignInFactorTwoParams = {
     identifier?: string;
     supportPhoneCode?: boolean;
@@ -155,6 +161,28 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
             ]
           : []),
       ],
+      user_data: { ...(createUserFixture() as any) },
+    } as SignInJSON;
+  };
+
+  const startSignInWithEnterpriseSSO = (params?: SignInWithEnterpriseSSOParams) => {
+    const { identifier = 'hello@clerk.com', enterpriseConnections, supportSSOBypass } = params || {};
+    baseClient.sign_in = {
+      status: 'needs_first_factor',
+      identifier,
+      supported_identifiers: ['email_address'],
+      supported_first_factors: enterpriseConnections?.length
+        ? enterpriseConnections.map(({ id, name }) => ({
+            strategy: 'enterprise_sso',
+            enterprise_connection_id: id,
+            enterprise_connection_name: name,
+          }))
+        : [{ strategy: 'enterprise_sso' }],
+      ...(supportSSOBypass && {
+        sso_bypass_first_factors: [
+          { strategy: 'email_code', safe_identifier: identifier, email_address_id: 'idn_hmac' },
+        ],
+      }),
       user_data: { ...(createUserFixture() as any) },
     } as SignInJSON;
   };
@@ -290,6 +318,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
 
   return {
     startSignInWithEmailAddress,
+    startSignInWithEnterpriseSSO,
     startSignInWithPhoneNumber,
     startSignInFactorTwo,
     startSignInClientTrust,
@@ -630,9 +659,13 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
-  const withEnterpriseSso = (opts?: { selfServeSSO?: boolean }) => {
+  const withEnterpriseSso = (opts?: { selfServeSSO?: boolean; selfServeDirectorySync?: boolean }) => {
     us.saml = { enabled: true };
-    us.enterprise_sso = { enabled: true, self_serve_sso: opts?.selfServeSSO ?? false };
+    us.enterprise_sso = {
+      enabled: true,
+      self_serve_sso: opts?.selfServeSSO ?? false,
+      self_serve_directory_sync: opts?.selfServeDirectorySync ?? false,
+    };
   };
 
   const withBackupCode = (opts?: Partial<UserSettingsJSON['attributes']['backup_code']>) => {

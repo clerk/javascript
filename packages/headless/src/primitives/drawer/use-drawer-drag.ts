@@ -46,6 +46,11 @@ export interface UseDrawerDragReturn {
   isDragging: boolean;
 }
 
+function scrolls(el: HTMLElement): boolean {
+  const { overflowY } = getComputedStyle(el);
+  return overflowY === 'auto' || overflowY === 'scroll';
+}
+
 /**
  * Pointer/transform drag engine for a bottom sheet (Y axis only). Down-to-dismiss
  * with velocity and distance thresholds, an inner-scroll-aware gate, and snap-point
@@ -54,6 +59,7 @@ export interface UseDrawerDragReturn {
  * Movement is written via the `swipeY` CSS var (no direct `transform`), so the
  * `curSwipe` ref — not `getComputedStyle` — is the source of truth for decisions.
  */
+
 export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
   const { open, now } = opts;
   const [isDragging, setIsDragging] = useState(false);
@@ -72,6 +78,8 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
   // Removes the current iOS `touchend` fallback listener (see `onPointerDown`),
   // so it never outlives its gesture or piles up across gestures.
   const removeTouchEnd = useRef<(() => void) | null>(null);
+  // Removes the window-level release listeners armed for the current gesture (see `onPointerDown`).
+  const removeWindowRelease = useRef<(() => void) | null>(null);
 
   // Latest options, read at event time so the handlers can stay referentially stable.
   const cfg = useRef(opts);
@@ -86,7 +94,32 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
   }, [open, now]);
 
   // Drop any pending iOS touchend fallback if the drawer unmounts mid-gesture.
-  useEffect(() => () => removeTouchEnd.current?.(), []);
+  useEffect(
+    () => () => {
+      removeTouchEnd.current?.();
+      removeWindowRelease.current?.();
+    },
+    [],
+  );
+
+  // A gesture never outlives the open state. Should a release be lost anyway, closing (or the
+  // sheet unmounting under the finger) must not leave the engine armed for the next open.
+  useEffect(() => {
+    if (open) {
+      return;
+    }
+    draggingRef.current = false;
+    allowed.current = false;
+    pid.current = null;
+    removeWindowRelease.current?.();
+    removeWindowRelease.current = null;
+    // A dismiss leaves the swipe where the finger let go, on purpose — the exit slides from there.
+    // The next open starts at rest, and `shouldDrag` reads this ref before it looks at inner
+    // scroll, so a stale value would drag the sheet where a list should have scrolled.
+    cfg.current.setSwipe(0);
+    cfg.current.setVar(DrawerCssVars.swipeProgress, '0');
+    setIsDragging(false);
+  }, [open]);
 
   const shouldDrag = useCallback((target: HTMLElement, down: boolean): boolean => {
     const { now: clock, curSwipe, snap } = cfg.current;
@@ -104,8 +137,18 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     if (target.closest(`[${DrawerAttrs.noDrag}]`)) {
       return false;
     }
-    // A text selection is in progress (contenteditable / regular DOM text).
-    if (window.getSelection()?.toString().length) {
+    // A text selection is in progress INSIDE the sheet (contenteditable / regular DOM text). One
+    // elsewhere on the page is none of the sheet's business, and would otherwise veto every drag
+    // for as long as it stood.
+    const selection = window.getSelection();
+    const sheet = cfg.current.popupRef.current;
+    if (
+      selection &&
+      !selection.isCollapsed &&
+      selection.toString().length &&
+      selection.anchorNode &&
+      sheet?.contains(selection.anchorNode)
+    ) {
       return false;
     }
     // A focused input/textarea with a non-collapsed selection: dragging is
@@ -130,19 +173,25 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
       lastScrollAt.current = clock();
       return false;
     }
-    // Upward at rest: let inner content scroll instead.
-    if (!down) {
-      return false;
-    }
+    // Inner content with room to scroll the way the content would move takes the gesture: down,
+    // it has scrolled (the finger pulls it back); up, there is more below. Otherwise the sheet
+    // moves — rubber-banding upward at rest, so the drag is never simply swallowed. The walk ends
+    // at the sheet: nothing above it is inner content, and its box may well be taller than the
+    // screen, while the page behind must never veto a drag.
     for (let el: HTMLElement | null = target; el; el = el.parentElement) {
-      if (el.scrollHeight > el.clientHeight) {
-        if (el.scrollTop !== 0) {
-          lastScrollAt.current = clock();
-          return false; // scrolling within inner content
+      // Only a box that can scroll is inner content: a clipped or overflowing one has the same
+      // geometry and none of the behaviour, and would swallow every upward drag at rest.
+      if (el.scrollHeight > el.clientHeight && scrolls(el)) {
+        const room = down ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight - 1;
+        if (room) {
+          if (down) {
+            lastScrollAt.current = clock();
+          }
+          return false;
         }
-        if (el.getAttribute('role') === 'dialog') {
-          return true; // reached the sheet boundary
-        }
+      }
+      if (el === sheet) {
+        break;
       }
     }
     return true;
@@ -154,93 +203,15 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     lastSample.current = { y, t };
   }, []);
 
-  const onPointerDown = useCallback((e: ReactPointerEvent<HTMLElement>): void => {
-    const { popupRef, dismissible, handleOnly, snapPoints, now: clock } = cfg.current;
-    if (e.pointerType === 'mouse' && e.button !== 0) {
-      return;
-    }
-    if (!dismissible && !snapPoints) {
-      return; // nothing a drag could accomplish
-    }
-    const popup = popupRef.current;
-    if (!popup || !popup.contains(e.target as Node)) {
-      return;
-    }
-    if (handleOnly && !(e.target as HTMLElement).closest(`[${DrawerAttrs.handle}]`)) {
-      return;
-    }
-
-    sheetH.current = popup.getBoundingClientRect().height;
-    pid.current = e.pointerId;
-    startY.current = e.clientY;
-    const t = clock();
-    lastSample.current = { y: e.clientY, t };
-    vel.current = 0;
-    allowed.current = false;
-    draggingRef.current = true;
-    setIsDragging(true);
-
-    // Capture the actual target (not the popup) so a click on an inner control
-    // still lands on it; the popup handler keeps receiving bubbled moves. (vaul)
-    const target = e.target as Element;
-    captured.current = target;
-    safeCapture(target, e.pointerId, 'setPointerCapture');
-
-    // iOS doesn't dispatch pointerup after a scroll-cancelled gesture, so reset
-    // `allowed` on touchend. Track the listener (and drop any stale one from a
-    // prior gesture that never fired) so it's removed on release/unmount instead
-    // of leaking on `window`.
-    if (isIOS()) {
-      removeTouchEnd.current?.();
-      const onTouchEnd = (): void => {
-        allowed.current = false;
-        removeTouchEnd.current = null;
-      };
-      window.addEventListener('touchend', onTouchEnd, { once: true });
-      removeTouchEnd.current = () => window.removeEventListener('touchend', onTouchEnd);
-    }
-  }, []);
-
-  const onPointerMove = useCallback(
-    (e: ReactPointerEvent<HTMLElement>): void => {
-      if (!draggingRef.current || e.pointerId !== pid.current) {
-        return;
-      }
-      const { snapPoints, snap, setSwipe, setVar, now: clock, onNestedDrag } = cfg.current;
-      const dist = e.clientY - startY.current; // positive is downward
-      const down = dist > 0;
-
-      if (!allowed.current && !shouldDrag(e.target as HTMLElement, down)) {
-        return;
-      }
-      allowed.current = true;
-      sample(e.clientY, clock());
-
-      // Nested: hand the parent our normalized downward progress so it can scale in.
-      onNestedDrag?.(clamp(dist / sheetH.current, 0, 1));
-
-      if (snapPoints && snap) {
-        snap.onDrag(dist);
-        return;
-      }
-      if (!down) {
-        // Rubber-band over-drag past the open position; never moves below rest.
-        setSwipe(Math.min(-dampen(-dist), 0));
-        return;
-      }
-      setSwipe(dist);
-      setVar(DrawerCssVars.swipeProgress, String(Math.min(dist / sheetH.current, 1)));
-    },
-    [shouldDrag, sample],
-  );
-
-  const onRelease = useCallback((e: ReactPointerEvent<HTMLElement>): void => {
+  const onRelease = useCallback((e: { clientY: number }): void => {
     if (!draggingRef.current) {
       return;
     }
-    // Normal release: the iOS touchend fallback is no longer needed.
+    // Normal release: neither fallback is needed any more.
     removeTouchEnd.current?.();
     removeTouchEnd.current = null;
+    removeWindowRelease.current?.();
+    removeWindowRelease.current = null;
     const {
       snapPoints,
       snap,
@@ -299,6 +270,110 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     }
     onNestedRelease?.(!dismiss);
   }, []);
+
+  const onPointerDown = useCallback(
+    (e: ReactPointerEvent<HTMLElement>): void => {
+      const { popupRef, dismissible, handleOnly, snapPoints, now: clock } = cfg.current;
+      if (e.pointerType === 'mouse' && e.button !== 0) {
+        return;
+      }
+      if (!dismissible && !snapPoints) {
+        return; // nothing a drag could accomplish
+      }
+      const popup = popupRef.current;
+      if (!popup || !popup.contains(e.target as Node)) {
+        return;
+      }
+      if (handleOnly && !(e.target as HTMLElement).closest(`[${DrawerAttrs.handle}]`)) {
+        return;
+      }
+
+      sheetH.current = popup.getBoundingClientRect().height;
+      pid.current = e.pointerId;
+      startY.current = e.clientY;
+      const t = clock();
+      lastSample.current = { y: e.clientY, t };
+      vel.current = 0;
+      allowed.current = false;
+      draggingRef.current = true;
+      // Not `setIsDragging` yet: a press is not a drag. `data-swiping` — and everything the styled
+      // layer hangs off it — lands on the first move that commits to dragging the sheet.
+
+      // Capture the actual target (not the popup) so a click on an inner control
+      // still lands on it; the popup handler keeps receiving bubbled moves. (vaul)
+      const target = e.target as Element;
+      captured.current = target;
+      safeCapture(target, e.pointerId, 'setPointerCapture');
+
+      // The release is expected on the captured target, but capture is not a guarantee — a release
+      // the popup never sees would leave the sheet held mid-drag, across opens. Whatever lands on
+      // `window` for this pointer ends the gesture; the popup's own handler then finds nothing to do.
+      removeWindowRelease.current?.();
+      const pointerId = e.pointerId;
+      const onWindowRelease = (ev: PointerEvent): void => {
+        if (ev.pointerId === pointerId) {
+          onRelease(ev);
+        }
+      };
+      window.addEventListener('pointerup', onWindowRelease, true);
+      window.addEventListener('pointercancel', onWindowRelease, true);
+      removeWindowRelease.current = () => {
+        window.removeEventListener('pointerup', onWindowRelease, true);
+        window.removeEventListener('pointercancel', onWindowRelease, true);
+      };
+
+      // iOS doesn't dispatch pointerup after a scroll-cancelled gesture, so reset
+      // `allowed` on touchend. Track the listener (and drop any stale one from a
+      // prior gesture that never fired) so it's removed on release/unmount instead
+      // of leaking on `window`.
+      if (isIOS()) {
+        removeTouchEnd.current?.();
+        const onTouchEnd = (): void => {
+          allowed.current = false;
+          removeTouchEnd.current = null;
+        };
+        window.addEventListener('touchend', onTouchEnd, { once: true });
+        removeTouchEnd.current = () => window.removeEventListener('touchend', onTouchEnd);
+      }
+    },
+    [onRelease],
+  );
+
+  const onPointerMove = useCallback(
+    (e: ReactPointerEvent<HTMLElement>): void => {
+      if (!draggingRef.current || e.pointerId !== pid.current) {
+        return;
+      }
+      const { snapPoints, snap, setSwipe, setVar, now: clock, onNestedDrag } = cfg.current;
+      const dist = e.clientY - startY.current; // positive is downward
+      const down = dist > 0;
+
+      if (!allowed.current && !shouldDrag(e.target as HTMLElement, down)) {
+        return;
+      }
+      if (!allowed.current) {
+        setIsDragging(true);
+      }
+      allowed.current = true;
+      sample(e.clientY, clock());
+
+      // Nested: hand the parent our normalized downward progress so it can scale in.
+      onNestedDrag?.(clamp(dist / sheetH.current, 0, 1));
+
+      if (snapPoints && snap) {
+        snap.onDrag(dist);
+        return;
+      }
+      if (!down) {
+        // Rubber-band over-drag past the open position; never moves below rest.
+        setSwipe(Math.min(-dampen(-dist), 0));
+        return;
+      }
+      setSwipe(dist);
+      setVar(DrawerCssVars.swipeProgress, String(Math.min(dist / sheetH.current, 1)));
+    },
+    [shouldDrag, sample],
+  );
 
   return {
     onPointerDown,

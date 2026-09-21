@@ -11,8 +11,8 @@
     "lib": ["ES2023", "DOM"],
     "paths": {
       "@/*": ["./src/*"],
-      "@clerk/ui/mosaic": ["../ui/src/mosaic"],
-      "@clerk/ui/mosaic/*": ["../ui/src/mosaic/*"],
+      "@clerk/mosaic": ["../mosaic/src"],
+      "@clerk/mosaic/*": ["../mosaic/src/*"],
       "@clerk/headless/hooks": ["../headless/src/hooks"],
       "@clerk/headless/*": ["../headless/src/primitives/*"]
     },
@@ -22,9 +22,10 @@
       }
     ],
     "allowJs": true,
+    "allowImportingTsExtensions": true,
     "noEmit": true,
     "incremental": true
   },
-  "include": ["mdx-components.tsx", "next.config.mjs", "src", ".next/types/**/*.ts"],
+  "include": ["mdx-components.tsx", "next.config.mjs", "vitest.config.mts", "src", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

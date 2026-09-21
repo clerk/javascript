@@ -1,0 +1,110 @@
+import * as FlowStories from './flow.stories';
+
+# Flow
+
+A controlled step viewport from `@clerk/headless`. It maps controller states to presentational steps, keeps an outgoing step mounted until its CSS animation finishes, and publishes the measurements needed to animate the viewport height. It ships no styles.
+
+## Example
+
+The controls in this demo stand in for a controller. The animation CSS belongs to the example rather than the primitive.
+
+<Story
+  name='Default'
+  storyModule={FlowStories}
+/>
+
+## Usage
+
+```tsx
+import { Flow } from '@clerk/headless/flow';
+
+<Flow.Root
+  value={controller.status}
+  direction={controller.direction}
+>
+  <Flow.Step ids={['enter-password', 'enter-password-pending', 'enter-password-error']}>
+    <PasswordView {...passwordViewProps} />
+  </Flow.Step>
+
+  <Flow.Step ids={['enter-code', 'enter-code-pending', 'enter-code-error']}>
+    <OtpView {...otpViewProps} />
+  </Flow.Step>
+</Flow.Root>;
+```
+
+Flow is controlled and has no trigger. The controller owns the active state and supplies `direction` as `1` or `-1`. Grouping related state ids in one step keeps that view mounted when, for example, `enter-code` becomes `enter-code-pending`.
+
+## Parts
+
+| Part        | Default Element | Description                                                       |
+| ----------- | --------------- | ----------------------------------------------------------------- |
+| `Flow.Root` | `<div>`         | Provides state and publishes the active step's measured height    |
+| `Flow.Step` | `<div>`         | Renders while active or while its exit animation is still running |
+
+Both parts accept a `render` prop for polymorphic rendering and standard HTML attributes for their default element.
+
+## Props
+
+### `Flow.Root`
+
+| Prop                   | Type                 | Default        | Description                                  |
+| ---------------------- | -------------------- | -------------- | -------------------------------------------- |
+| <code>value</code>     | <code>string</code>  | — (required)   | Active controller state                      |
+| <code>direction</code> | <code>-1 \| 1</code> | <code>1</code> | Direction used by the step transition styles |
+
+### `Flow.Step`
+
+| Prop             | Type                           | Default      | Description                                |
+| ---------------- | ------------------------------ | ------------ | ------------------------------------------ |
+| <code>ids</code> | <code>readonly string[]</code> | — (required) | Controller states represented by this step |
+
+## Animation lifecycle
+
+`Flow.Step` emits the same transition lifecycle attributes used by the other headless primitives:
+
+| Attribute             | Description                                            |
+| --------------------- | ------------------------------------------------------ |
+| `data-open`           | The step is active                                     |
+| `data-closed`         | The step is exiting                                    |
+| `data-starting-style` | Present on the incoming step's initial animation frame |
+| `data-ending-style`   | Present while the outgoing animation is finishing      |
+
+The initially active step never receives `data-starting-style`. Exiting steps are inert, hidden from the accessibility tree, and retain their last active children until their exit animation completes.
+
+Direction is available to each step as `--cl-flow-transition-direction`, whose value is exactly `1` or `-1`:
+
+```css
+.flow-step[data-starting-style] {
+  opacity: 0;
+  transform: translateX(calc(var(--cl-flow-transition-direction) * 1.5rem));
+}
+
+.flow-step[data-ending-style] {
+  opacity: 0;
+  transform: translateX(calc(var(--cl-flow-transition-direction) * -1.5rem));
+}
+```
+
+## Viewport height
+
+`Flow.Root` measures the active or entering step and publishes its height as `--cl-flow-step-height`. It carries `data-initial` through the first measured frame so the first step and initial viewport height can render without motion.
+
+```css
+.flow-root {
+  height: var(--cl-flow-step-height, auto);
+  overflow: hidden;
+  position: relative;
+  transition: height 240ms ease;
+}
+
+.flow-root[data-initial] {
+  transition: none;
+}
+
+.flow-step[data-closed] {
+  inset: 0;
+  position: absolute;
+}
+```
+
+The outgoing step becomes absolute so the entering step determines layout and therefore the root's target height. Keep reduced-motion handling in the styled layer by disabling these transitions under `prefers-reduced-motion`.

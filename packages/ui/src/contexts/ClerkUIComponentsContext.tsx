@@ -2,6 +2,7 @@ import type {
   APIKeysProps,
   ConfigureSSOProps,
   OAuthConsentProps,
+  OAuthDeviceVerificationProps,
   PricingTableProps,
   TaskChooseOrganizationProps,
   TaskResetPasswordProps,
@@ -14,10 +15,12 @@ import type { ReactNode } from 'react';
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
   APIKeysContext,
+  ConfigureDirectorySyncContext,
   ConfigureSSOContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
   OAuthConsentContext,
+  OAuthDeviceVerificationContext,
   OrganizationListContext,
   OrganizationProfileContext,
   OrganizationSwitcherContext,
@@ -122,6 +125,12 @@ export function ComponentContextProvider({
           {children}
         </ConfigureSSOContext.Provider>
       );
+    case 'ConfigureDirectorySync':
+      return (
+        <ConfigureDirectorySyncContext.Provider value={{ componentName, ...(props as ConfigureSSOProps) }}>
+          {children}
+        </ConfigureDirectorySyncContext.Provider>
+      );
     case 'OAuthConsent': {
       // Translate capital-A `oAuth*` props from the accounts portal into
       // the lowercase `oauth*` context shape the component reads.
@@ -148,6 +157,12 @@ export function ComponentContextProvider({
         </OAuthConsentContext.Provider>
       );
     }
+    case 'OAuthDeviceVerification':
+      return (
+        <OAuthDeviceVerificationContext.Provider value={{ componentName, ...(props as OAuthDeviceVerificationProps) }}>
+          {children}
+        </OAuthDeviceVerificationContext.Provider>
+      );
     case 'TaskChooseOrganization':
       return (
         <TaskChooseOrganizationContext.Provider

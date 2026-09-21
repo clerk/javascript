@@ -11,7 +11,7 @@ description: >-
 
 # Working in the clerk/javascript monorepo
 
-This is Clerk's JavaScript SDK monorepo: 24 packages (21 published `@clerk/*` plus the private
+This is Clerk's JavaScript SDK monorepo: 25 packages (22 published `@clerk/*` plus the private
 `@clerk/msw`, `@clerk/headless`, and `@clerk/swingset`) managed with pnpm
 workspaces and Turborepo. Read this before building, testing, committing, or touching anything
 under `packages/`.
@@ -39,7 +39,7 @@ Full sequence, the 11 footguns, and the internal integration-test / 1Password se
 
 ## Package map: where does X live?
 
-The ~10 packages people touch most. Full 24-package table, the dependency pyramid, and the complete
+The ~10 packages people touch most. Full 25-package table, the dependency pyramid, and the complete
 "change X, touch Y" routing are in [`references/package-map.md`](references/package-map.md).
 
 | Package                | You change it when...                                                                                                                                       |
@@ -48,6 +48,7 @@ The ~10 packages people touch most. Full 24-package table, the dependency pyrami
 | `@clerk/backend`       | Server-side: JWT verification, the Backend API REST client, webhooks. Used by every framework adapter.                                                      |
 | `@clerk/clerk-js`      | ⚠️ The browser runtime loaded via script tag. **Backwards-compat sensitive** (see rules).                                                                   |
 | `@clerk/ui`            | ⚠️ The React components powering the hosted sign-in / sign-up UI. **Backwards-compat sensitive**.                                                           |
+| `@clerk/mosaic`        | Experimental next-generation components (`UserButton` today). Independently releasable; reads Clerk context from the host SDK.                              |
 | `@clerk/react`         | Shared React hooks/context (`useAuth`, `useUser`, ...) consumed by the React-based adapters.                                                                |
 | `@clerk/nextjs`        | Next.js SDK: middleware, route handlers, server components.                                                                                                 |
 | `@clerk/express`       | Express middleware and server helpers.                                                                                                                      |

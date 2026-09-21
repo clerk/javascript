@@ -1,17 +1,13 @@
-import type { EnterpriseConnectionResource } from '@clerk/shared/types';
-import { useState } from 'react';
+import type { EnterpriseConnectionResource, OAuthProvider } from '@clerk/shared/types';
 
-import { Card } from '@/ui/elements/Card';
-import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
-import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { Tooltip } from '@/ui/elements/Tooltip';
-import { handleError } from '@/utils/errorHandler';
 
+import { ProviderIcon } from '../../common';
 import { useEnvironment } from '../../contexts';
-import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
+  Box,
   Button,
   Col,
   descriptors,
@@ -22,226 +18,149 @@ import {
   useLocalizations,
 } from '../../customizables';
 import { useFetchRoles, useLocalizeCustomRoles } from '../../hooks/useFetchRoles';
-import { InformationCircle } from '../../icons';
-import type {
-  OrganizationEnterpriseConnection,
-  OrganizationEnterpriseConnectionStatus,
-} from '../ConfigureSSO/domain/organizationEnterpriseConnection';
-import type { EnterpriseConnectionMutations } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnection';
-import { ResetConnectionDialog } from '../ConfigureSSO/ResetConnectionDialog';
+import { ChevronRight, InformationCircle } from '../../icons';
+import type { ConnectionScope } from '../ConfigureSSO/domain/connectionScope';
+import { providerLabel, toProviderCard } from '../ConfigureSSO/domain/providers';
+import { useOrganizationEnterpriseConnectionStatus } from '../ConfigureSSO/hooks/useOrganizationEnterpriseConnectionStatus';
+import type { EnterpriseConnectionProviderType } from '../ConfigureSSO/types';
+import { STATUS_BADGES } from './enterpriseConnectionStatusBadges';
 
 type SecuritySsoSectionProps = {
-  connection: OrganizationEnterpriseConnection;
-  enterpriseConnection: EnterpriseConnectionResource | undefined;
-  setConnectionActive: EnterpriseConnectionMutations['setConnectionActive'];
-  deleteConnection: EnterpriseConnectionMutations['deleteConnection'];
-  organizationName: string;
-  contentRef: React.RefObject<HTMLDivElement>;
-  onConfigure: (forceInitialStep?: boolean) => void;
+  enterpriseConnections: EnterpriseConnectionResource[];
+  onConfigure?: (scope: ConnectionScope, forceInitialStep?: boolean) => void;
+  onOpenConnection?: (id: string) => void;
 };
 
-const STATUS_BADGES: Record<
-  OrganizationEnterpriseConnectionStatus,
-  { id: string; colorScheme?: 'primary' | 'danger' | 'warning' | 'success'; label: LocalizationKey }
-> = {
-  unconfigured: {
-    id: 'unconfigured',
-    colorScheme: 'primary',
-    label: localizationKeys('organizationProfile.securityPage.ssoSection.badge__unconfigured'),
-  },
-  in_progress: {
-    id: 'inProgress',
-    colorScheme: 'warning',
-    label: localizationKeys('organizationProfile.securityPage.ssoSection.badge__inProgress'),
-  },
-  active: {
-    id: 'active',
-    colorScheme: 'success',
-    label: localizationKeys('organizationProfile.securityPage.ssoSection.badge__active'),
-  },
-  inactive: {
-    id: 'inactive',
-    colorScheme: 'danger',
-    label: localizationKeys('organizationProfile.securityPage.ssoSection.badge__inactive'),
-  },
-};
-
-export const SecuritySsoSection = (props: SecuritySsoSectionProps): JSX.Element => {
-  const { connection, onConfigure } = props;
-
-  const isConfigured = connection.status === 'active' || connection.status === 'inactive';
-
-  // The badge and menu read straight from the entity; revalidation drives the settled state.
-  const status: OrganizationEnterpriseConnectionStatus = connection.status;
-  const badge = STATUS_BADGES[status];
-
+export const SecuritySsoSection = ({
+  enterpriseConnections,
+  onConfigure,
+  onOpenConnection,
+}: SecuritySsoSectionProps): JSX.Element => {
   return (
     <ProfileSection.Root
       title={localizationKeys('organizationProfile.securityPage.ssoSection.title')}
       id='sso'
       centered={false}
       badge={
-        <Badge
-          elementDescriptor={descriptors.organizationProfileSecuritySsoBadge}
-          elementId={descriptors.organizationProfileSecuritySsoBadge.setId(badge.id)}
-          colorScheme={badge.colorScheme}
-          localizationKey={badge.label}
-        />
+        <Flex
+          align='center'
+          gap={2}
+        >
+          <SsoInfoTooltip />
+          {enterpriseConnections.length === 0 ? (
+            <Badge
+              elementDescriptor={descriptors.organizationProfileSecuritySsoBadge}
+              elementId={descriptors.organizationProfileSecuritySsoBadge.setId(STATUS_BADGES.unconfigured.id)}
+              colorScheme={STATUS_BADGES.unconfigured.colorScheme}
+              localizationKey={STATUS_BADGES.unconfigured.label}
+            />
+          ) : undefined}
+        </Flex>
       }
     >
-      {status === 'unconfigured' && (
-        <NotConfiguredContent
-          primaryButtonKey={localizationKeys(
-            'organizationProfile.securityPage.ssoSection.primaryButton__startConfiguration',
-          )}
-          primaryButtonId='start'
-          onConfigure={() => onConfigure(true)}
-        />
-      )}
+      {enterpriseConnections.length === 0 ? (
+        <Col
+          align='start'
+          gap={4}
+        >
+          <SsoDescription />
 
-      {status === 'in_progress' && (
-        <NotConfiguredContent
-          primaryButtonKey={localizationKeys(
-            'organizationProfile.securityPage.ssoSection.primaryButton__continueConfiguration',
+          {onConfigure && (
+            <Button
+              elementDescriptor={descriptors.organizationProfileSecuritySsoConfigureButton}
+              elementId={descriptors.organizationProfileSecuritySsoConfigureButton.setId('start')}
+              variant='bordered'
+              colorScheme='secondary'
+              size='sm'
+              onClick={() => onConfigure({ kind: 'new' }, true)}
+              localizationKey={localizationKeys(
+                'organizationProfile.securityPage.ssoSection.primaryButton__startConfiguration',
+              )}
+            />
           )}
-          primaryButtonId='continue'
-          onConfigure={() => onConfigure()}
-        />
-      )}
+        </Col>
+      ) : (
+        <Col gap={4}>
+          <SsoDescription />
 
-      {isConfigured && (
-        <CardStateProvider>
-          <ConfiguredContent
-            {...props}
-            isActive={status === 'active'}
-          />
-        </CardStateProvider>
+          <ProfileSection.ItemList id='sso'>
+            {enterpriseConnections.map(connection => (
+              <ConnectionRow
+                key={connection.id}
+                connection={connection}
+                onOpenConnection={onOpenConnection}
+              />
+            ))}
+          </ProfileSection.ItemList>
+
+          {onConfigure && (
+            <ProfileSection.ArrowButton
+              id='sso'
+              localizationKey={localizationKeys(
+                'organizationProfile.securityPage.ssoSection.primaryButton__addConnection',
+              )}
+              onClick={() => onConfigure({ kind: 'new' }, true)}
+            />
+          )}
+        </Col>
       )}
     </ProfileSection.Root>
   );
 };
 
-type NotConfiguredContentProps = {
-  primaryButtonKey: LocalizationKey;
-  primaryButtonId: string;
-  onConfigure: () => void;
+type ConnectionRowProps = {
+  connection: EnterpriseConnectionResource;
+  onOpenConnection?: (id: string) => void;
 };
 
-const NotConfiguredContent = ({
-  primaryButtonKey,
-  primaryButtonId,
-  onConfigure,
-}: NotConfiguredContentProps): JSX.Element => (
-  <Col
-    align='start'
-    gap={4}
-  >
-    <SsoDescription />
+const ConnectionRow = ({ connection, onOpenConnection }: ConnectionRowProps): JSX.Element => {
+  const { status } = useOrganizationEnterpriseConnectionStatus(connection, { probe: false });
 
-    <Button
-      elementDescriptor={descriptors.organizationProfileSecuritySsoConfigureButton}
-      elementId={descriptors.organizationProfileSecuritySsoConfigureButton.setId(primaryButtonId)}
-      variant='bordered'
-      colorScheme='secondary'
-      size='sm'
-      onClick={onConfigure}
-      localizationKey={primaryButtonKey}
-    />
-  </Col>
-);
+  const badge = STATUS_BADGES[status];
+  const label = providerLabel(toProviderCard(connection.provider as EnterpriseConnectionProviderType));
 
-type ConfiguredContentProps = SecuritySsoSectionProps & {
-  isActive: boolean;
-};
-
-const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
-  const {
-    enterpriseConnection,
-    setConnectionActive,
-    deleteConnection,
-    organizationName,
-    contentRef,
-    onConfigure,
-    isActive,
-  } = props;
-  const card = useCardState();
-  const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
-
-  const domains = enterpriseConnection?.domains ?? [];
-
-  const onSetActive = async (active: boolean) => {
-    if (card.isLoading) {
-      return;
-    }
-
-    card.setError(undefined);
-    card.setLoading();
-
-    try {
-      // A configured (active / inactive) connection guarantees the resource is set.
-      // The mutation revalidates before resolving, so the refreshed entity drives the settled UI.
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await setConnectionActive(enterpriseConnection!.id, active);
-    } catch (err) {
-      handleError(err as Error, [], card.setError);
-    } finally {
-      card.setIdle();
-    }
-  };
-
-  return (
-    <Col gap={4}>
+  const item = (
+    <ProfileSection.Item
+      as='span'
+      id='sso'
+      hoverable={Boolean(onOpenConnection)}
+    >
       <Flex
-        align='start'
-        justify='between'
-        gap={3}
+        as='span'
+        align='center'
+        wrap='wrap'
+        sx={t => ({ minWidth: 0, flex: 1, gap: t.space.$2 })}
       >
-        <SsoDescription />
-
-        <ThreeDotsMenu
-          elementId='sso'
-          actions={[
-            {
-              label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__edit'),
-              onClick: () => onConfigure(true),
-            },
-            isActive
-              ? {
-                  label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__deactivate'),
-                  isDisabled: card.isLoading,
-                  onClick: () => void onSetActive(false),
-                }
-              : {
-                  label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__activate'),
-                  isDisabled: card.isLoading,
-                  onClick: () => void onSetActive(true),
-                },
-            {
-              label: localizationKeys('organizationProfile.securityPage.ssoSection.menuAction__remove'),
-              isDestructive: true,
-              onClick: () => setIsResetDialogOpen(true),
-            },
-          ]}
+        <ProviderIcon
+          id={connection.provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider}
+          iconUrl={connection.logoPublicUrl?.trim() || undefined}
+          name={connection.name}
+          elementDescriptor={descriptors.organizationProfileSecuritySsoProviderIcon}
         />
-      </Flex>
 
-      <Card.Alert>{card.error}</Card.Alert>
+        <Col
+          as='span'
+          sx={{ minWidth: 0 }}
+        >
+          <Text as='span'>{connection.name}</Text>
+          {label && (
+            <Text
+              as='span'
+              colorScheme='secondary'
+              variant='caption'
+              localizationKey={label}
+            />
+          )}
+        </Col>
 
-      {domains.length > 0 && (
-        <Flex sx={t => ({ gap: t.space.$1x5 })}>
-          <Text
-            elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRowLabel}
-            elementId={descriptors.organizationProfileSecuritySsoDetailRowLabel.setId('domain')}
-            colorScheme='secondary'
-            localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.domainLabel')}
-          />
-
+        {connection.domains.length > 0 && (
           <Flex
+            as='span'
             align='center'
             wrap='wrap'
             sx={t => ({ minWidth: 0, gap: t.space.$1x5 })}
           >
-            {domains.map(domain => (
+            {connection.domains.map(domain => (
               <Badge
                 key={domain}
                 elementDescriptor={descriptors.organizationProfileSecuritySsoDetailRowChip}
@@ -250,70 +169,99 @@ const ConfiguredContent = (props: ConfiguredContentProps): JSX.Element => {
               </Badge>
             ))}
           </Flex>
-        </Flex>
-      )}
+        )}
+      </Flex>
 
-      <ResetConnectionDialog
-        isOpen={isResetDialogOpen}
-        onClose={() => setIsResetDialogOpen(false)}
-        confirmationValue={organizationName}
-        title={localizationKeys('organizationProfile.securityPage.removeDialog.title')}
-        subtitle={localizationKeys('organizationProfile.securityPage.removeDialog.subtitle')}
-        confirmButtonLabel={localizationKeys('organizationProfile.securityPage.removeDialog.confirmButton')}
-        // A configured (active / inactive) connection guarantees the resource is set.
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        onDelete={() => deleteConnection(enterpriseConnection!.id)}
-        contentRef={contentRef}
-      />
-    </Col>
+      <Flex
+        as='span'
+        align='center'
+        sx={t => ({ gap: t.space.$2 })}
+      >
+        <Badge
+          elementDescriptor={descriptors.organizationProfileSecuritySsoBadge}
+          elementId={descriptors.organizationProfileSecuritySsoBadge.setId(badge.id)}
+          colorScheme={badge.colorScheme}
+          localizationKey={badge.label}
+        />
+
+        {onOpenConnection && (
+          <Icon
+            icon={ChevronRight}
+            aria-hidden
+            sx={t => ({ width: t.sizes.$4, height: t.sizes.$4, color: t.colors.$colorMutedForeground })}
+          />
+        )}
+      </Flex>
+    </ProfileSection.Item>
+  );
+
+  if (!onOpenConnection) {
+    return (
+      <Box
+        as='span'
+        elementDescriptor={descriptors.organizationProfileSecuritySsoConnectionRow}
+        sx={{ display: 'block', width: '100%' }}
+      >
+        {item}
+      </Box>
+    );
+  }
+
+  return (
+    <Button
+      elementDescriptor={descriptors.organizationProfileSecuritySsoConnectionRow}
+      variant='unstyled'
+      onClick={() => onOpenConnection(connection.id)}
+      sx={{ display: 'block', width: '100%', height: 'auto', padding: 0, textAlign: 'start' }}
+    >
+      {item}
+    </Button>
   );
 };
 
-const SsoDescription = (): JSX.Element => {
+const SsoDescription = (): JSX.Element => (
+  <Text
+    as='p'
+    elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
+    colorScheme='secondary'
+    localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine1')}
+  />
+);
+
+const SsoInfoTooltip = (): JSX.Element => {
   const roleName = useEnrollmentRoleName();
   const { t } = useLocalizations();
 
   return (
-    <Text as='p'>
-      <Text
-        as='span'
-        elementDescriptor={descriptors.organizationProfileSecuritySsoDescription}
-        colorScheme='secondary'
-        localizationKey={localizationKeys('organizationProfile.securityPage.ssoSection.descriptionLine1')}
+    <Tooltip.Root>
+      <Tooltip.Trigger>
+        <Button
+          variant='unstyled'
+          aria-label={t(localizationKeys('organizationProfile.securityPage.ssoSection.tooltipLabel'))}
+          sx={t => ({
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: 0,
+            height: 'fit-content',
+            borderRadius: t.radii.$sm,
+            color: t.colors.$colorMutedForeground,
+          })}
+        >
+          <Icon
+            icon={InformationCircle}
+            aria-hidden
+            sx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
+          />
+        </Button>
+      </Tooltip.Trigger>
+      <Tooltip.Content
+        text={
+          roleName
+            ? localizationKeys('organizationProfile.securityPage.ssoSection.tooltip', { role: roleName })
+            : localizationKeys('organizationProfile.securityPage.ssoSection.tooltip__noRole')
+        }
       />
-
-      <Tooltip.Root>
-        <Tooltip.Trigger>
-          <Button
-            variant='unstyled'
-            aria-label={t(localizationKeys('organizationProfile.securityPage.ssoSection.tooltipLabel'))}
-            sx={t => ({
-              display: 'inline-flex',
-              alignItems: 'center',
-              verticalAlign: 'middle',
-              padding: 0,
-              height: 'fit-content',
-              borderRadius: t.radii.$sm,
-              color: t.colors.$colorMutedForeground,
-              marginInlineStart: t.space.$1,
-            })}
-          >
-            <Icon
-              icon={InformationCircle}
-              aria-hidden
-              sx={t => ({ width: t.sizes.$4, height: t.sizes.$4 })}
-            />
-          </Button>
-        </Tooltip.Trigger>
-        <Tooltip.Content
-          text={
-            roleName
-              ? localizationKeys('organizationProfile.securityPage.ssoSection.tooltip', { role: roleName })
-              : localizationKeys('organizationProfile.securityPage.ssoSection.tooltip__noRole')
-          }
-        />
-      </Tooltip.Root>
-    </Text>
+    </Tooltip.Root>
   );
 };
 

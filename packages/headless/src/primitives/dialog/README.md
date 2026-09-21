@@ -192,9 +192,14 @@ When `root` is provided, the dialog is portaled into that container instead of `
 
 ### `Dialog.Viewport`
 
-| Prop         | Type      | Default | Description                     |
-| ------------ | --------- | ------- | ------------------------------- |
-| `lockScroll` | `boolean` | `true`  | Prevents body scroll while open |
+| Prop         | Type      | Default | Description                                                                  |
+| ------------ | --------- | ------- | ---------------------------------------------------------------------------- |
+| `lockScroll` | `boolean` | `true`  | Prevents body scroll while open                                              |
+| `overlay`    | `boolean` | `true`  | Wraps the viewport in a fixed overlay. `false` renders it in flow, unlocked. |
+
+`overlay={false}` is for a dialog presented inline in its host rather than over the page — an
+account panel mounted in a page slot. Pair it with `modal={false}` and `closedBy='none'` on the
+root, and `initialFocus={false}` on the popup so mounting does not steal focus.
 
 ### `Dialog.Trigger`
 
@@ -212,6 +217,10 @@ When `root` is provided, the dialog is portaled into that container instead of `
 | `finalFocus`   | `DialogFocusTarget` | `true`  | Where focus returns when it closes      |
 
 `DialogFocusTarget` is `boolean | RefObject | (interactionType) => boolean | void | HTMLElement | null`.
+
+The popup's children are held at their last committed frame while it exits (`Freeze`), so state
+that resets on close — a machine returning to its initial state — does not flash through the
+fade. The popup element itself stays live for `data-closed` / `data-ending-style`.
 
 ### `Dialog.Backdrop`, `Dialog.Title`, `Dialog.Description`, `Dialog.Close`
 

@@ -1,0 +1,439 @@
+import * as stylex from '@stylexjs/stylex';
+
+// Mosaic design tokens.
+//
+// `stylex.defineVars` normally hashes variable names (e.g. `--x1a2b3c`), which
+// consumers cannot target. Keys that start with `--` are emitted verbatim, so
+// these become real, stable custom properties a consumer can override in plain
+// CSS without touching StyleX:
+//
+//   :root { --cl-color-brand: rebeccapurple; }
+//
+// StyleX still emits `:root { --cl-color-brand: … }` as the default. Following
+// astryx's structure: each group is a plain `*Defaults` object wrapped by
+// `defineVars`. The `*VarName` unions are derived from the exported `*Vars` in
+// `styles/index.ts` — the `@stylexjs/enforce-extension` rule requires a
+// `.stylex.ts` file to export nothing but its `defineVars` results. Color tokens
+// carry light and dark in one `light-dark(...)` value, so dark mode lives in the token
+// layer and resolves against the `color-scheme` in scope, with no
+// `@media (prefers-color-scheme)` duplication. The `--cl-` prefix namespaces
+// the vars so they never collide with a host app's own custom properties.
+
+// =============================================================================
+// Color Tokens
+// =============================================================================
+
+// Every achromatic token is `--cl-color-neutral` mixed into `--cl-color-background`, so
+// retinting neutral (a warm gray, say) retints the whole ramp. The percentages reproduce
+// the Figma gray scale: grays have zero chroma, so an oklab mix is linear in lightness.
+// Dark mode needs its own percentage because its background is a 900, not black.
+const neutralMix = (light: number, dark: number) =>
+  `light-dark(color-mix(in oklab, var(--cl-color-neutral) ${light}%, var(--cl-color-background)), color-mix(in oklab, var(--cl-color-neutral) ${dark}%, var(--cl-color-background)))`;
+
+const colorDefaults = {
+  '--cl-color-neutral': 'light-dark(oklch(0 0 0), oklch(1 0 0))',
+  '--cl-color-neutral-alpha-100': 'color-mix(in oklab, var(--cl-color-neutral) 6%, transparent)',
+  '--cl-color-neutral-alpha-200': 'color-mix(in oklab, var(--cl-color-neutral) 8%, transparent)',
+  '--cl-color-neutral-alpha-300': 'color-mix(in oklab, var(--cl-color-neutral) 12%, transparent)',
+
+  '--cl-color-background': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
+  '--cl-color-background-subtle': neutralMix(3, 4),
+
+  '--cl-color-foreground': neutralMix(79.5, 98),
+  '--cl-color-foreground-secondary': neutralMix(56, 64.25),
+  '--cl-color-foreground-disabled': neutralMix(28.5, 44),
+
+  '--cl-color-border': neutralMix(5.5, 8),
+  '--cl-color-border-subtle': neutralMix(3, 4.25),
+
+  '--cl-color-brand': 'light-dark(oklch(0.2046 0 0), oklch(0.9851 0 0))',
+  '--cl-color-brand-secondary': 'light-dark(oklch(0.5555 0 0), oklch(0.7155 0 0))',
+  '--cl-color-brand-border': 'light-dark(oklch(0.9219 0 0), oklch(0.3715 0 0))',
+  '--cl-color-brand-foreground': 'light-dark(oklch(1 0 0), oklch(0.2046 0 0))',
+
+  '--cl-color-negative': 'light-dark(oklch(0.5903 0.213 26.78), oklch(0.7106 0.1661 22.22))',
+  '--cl-color-negative-foreground': 'oklch(1 0 0)',
+  '--cl-color-negative-subtle': 'light-dark(oklch(0.9757 0.0118 17.36), oklch(0.255 0.0604 22.31))',
+  '--cl-color-negative-border': 'light-dark(oklch(0.8155 0.0983 19.41), oklch(0.3958 0.1331 25.72))',
+  '--cl-color-negative-alpha-100': 'color-mix(in oklab, var(--cl-color-negative) 6%, transparent)',
+  '--cl-color-negative-alpha-200': 'color-mix(in oklab, var(--cl-color-negative) 8%, transparent)',
+  '--cl-color-negative-alpha-300': 'color-mix(in oklab, var(--cl-color-negative) 12%, transparent)',
+
+  '--cl-color-positive': 'light-dark(oklch(0.6082 0.1799 145.47), oklch(0.7227 0.192 149.58))',
+  '--cl-color-positive-foreground': 'oklch(1 0 0)',
+  '--cl-color-positive-subtle': 'light-dark(oklch(0.9859 0.0164 156.92), oklch(0.3297 0.052 152.31))',
+  '--cl-color-positive-border': 'light-dark(oklch(0.7922 0.1959 148.18), oklch(0.4479 0.1083 151.33))',
+  '--cl-color-positive-alpha-100': 'color-mix(in oklab, var(--cl-color-positive) 6%, transparent)',
+  '--cl-color-positive-alpha-200': 'color-mix(in oklab, var(--cl-color-positive) 8%, transparent)',
+  '--cl-color-positive-alpha-300': 'color-mix(in oklab, var(--cl-color-positive) 12%, transparent)',
+
+  '--cl-color-warning': 'light-dark(oklch(0.7099 0.1888 44.94), oklch(0.7576 0.159 55.93))',
+  '--cl-color-warning-foreground': 'oklch(1 0 0)',
+  '--cl-color-warning-subtle': 'light-dark(oklch(0.9799 0.0147 70.89), oklch(0.2725 0.0547 55.7))',
+  '--cl-color-warning-border': 'light-dark(oklch(0.8672 0.0902 63.47), oklch(0.4084 0.1165 38.17))',
+  '--cl-color-warning-alpha-100': 'color-mix(in oklab, var(--cl-color-warning) 6%, transparent)',
+  '--cl-color-warning-alpha-200': 'color-mix(in oklab, var(--cl-color-warning) 8%, transparent)',
+  '--cl-color-warning-alpha-300': 'color-mix(in oklab, var(--cl-color-warning) 12%, transparent)',
+
+  '--cl-color-input':
+    'light-dark(var(--cl-color-background), color-mix(in oklab, var(--cl-color-neutral) 4%, var(--cl-color-background)))',
+  '--cl-color-input-placeholder': neutralMix(28, 64),
+
+  '--cl-color-ring': neutralMix(80, 90),
+} as const;
+
+export const colorVars = stylex.defineVars(colorDefaults);
+
+// =============================================================================
+// Radius Tokens
+// =============================================================================
+// `md` is 6px rather than a 4/8/12 step: it is the control radius (button), and
+// neither neighbour sits right on a control.
+
+const radiusDefaults = {
+  '--cl-radius-none': '0rem',
+  '--cl-radius-sm': '0.25rem',
+  '--cl-radius-md': '0.375rem',
+  '--cl-radius-lg': '0.5rem',
+  '--cl-radius-xl': '0.75rem',
+  '--cl-radius-2xl': '1.5rem',
+  '--cl-radius-full': 'calc(infinity * 1px)',
+} as const;
+
+export const radiusVars = stylex.defineVars(radiusDefaults);
+
+// =============================================================================
+// Target Size Tokens
+// =============================================================================
+// The floor a control's hit area drops to under a coarse pointer — a fingertip is
+// roughly 44px across regardless of how dense the rest of the UI is. Deliberately
+// off the `--cl-spacing` scale for that reason: a consumer rescaling density must
+// not shrink a touch target with it.
+
+const targetDefaults = {
+  '--cl-target-coarse': '2.75rem',
+} as const;
+
+export const targetVars = stylex.defineVars(targetDefaults);
+
+// =============================================================================
+// Scrollbar Tokens
+// =============================================================================
+// One opinion for every scrolling surface in Mosaic, set in one place. Mosaic has no
+// reason to render differently-sized scrollbars in different components, so these are
+// tokens rather than per-component props — a consumer restyles all of them at once.
+//
+// The width is a real LENGTH, not the `auto | thin | none` keyword `scrollbar-width` takes.
+// Mosaic paints the scrollbar through `::-webkit-scrollbar`, which takes a length; the two
+// paths are mutually exclusive (a non-`auto` `scrollbar-width` or `scrollbar-color` makes a
+// UA ignore the pseudo-elements outright), so specifying a length is the honest option and
+// the keyword one is gone. Firefox implements neither pseudo-element and keeps its platform
+// scrollbar. Set the width to `0px` to hide it outright, which is what the old `none` did.
+//
+// Deliberately in PIXELS rather than on the `rem` scale the rest of the tokens use. A scrollbar
+// is chrome, not content: it should stay the same hairline whether or not the surrounding text
+// scales, and 8px of lane carrying a 2px inset — a 4px pill with a 2px track either side — is
+// a specific hairline rather than a ratio of anything. Rounding also matters more here than
+// elsewhere, since the thumb is only a few pixels wide to begin with.
+//
+// There is deliberately no knob for nudging the thumb sideways within its lane. The lane itself
+// cannot move — the browser places it at the inline end of the padding box, and it takes no margin,
+// offset, or transform — so the only lever is making the thumb's insets asymmetric, and that
+// visibly deforms the pill: `background-clip: content-box` clips to the inner radius, which is the
+// outer radius minus each side's own border width, so unequal insets draw the two halves of every
+// cap with different curvature. Tried and measured; not worth a hairline of position.
+//
+// The colours are FOUR states, not three, and they run from quietest to loudest: `idle` while the
+// pointer is elsewhere, the base once it reaches the region, then `hover` and `active` for the
+// thumb's own two. Each derives from `--cl-scrollbar-thumb` rather than baking its value in, so
+// they resolve at use time — overriding the base re-derives all three, while any one stays
+// individually overridable. The base is itself mixed most of the way toward `--cl-color-background`,
+// which keeps a 4px bar reading as a hairline rather than a hard rule; `idle` carries on in that
+// direction, and the other two step back toward `--cl-color-foreground`, deepening in light
+// mode and lightening in dark, since that token already carries both.
+//
+// Only the idle → base step can animate. It is set on the scroller, which owns the transition;
+// the thumb's own two are set on the pseudo-element, and Blink runs no transition there.
+//
+// `--cl-scrollbar-thumb-idle: oklch(from var(--cl-scrollbar-thumb) l c h / 0)` is the whole recipe
+// for a scrollbar that fades in on approach: the pill paints nothing until the pointer reaches the
+// region, and the lane is reserved either way, so nothing moves.
+//
+// Only applied under `@media (pointer: fine)`. A touch platform draws an overlay bar there is
+// no width to apply to, and thinning a target that is already hard to hit would be actively
+// worse — Polaris's `s-scroll-box` gates its scrollbar styling the same way.
+
+// Self-reference by literal name: the group being defined can't read its own exported object,
+// and `--`-prefixed keys are emitted verbatim, so the name is stable enough to write by hand.
+const scrollbarThumb = 'var(--cl-scrollbar-thumb)';
+
+const scrollbarDefaults = {
+  '--cl-scrollbar-width': '8px',
+  '--cl-scrollbar-thumb-inset': '2px',
+  '--cl-scrollbar-thumb': `color-mix(in oklab, ${colorVars['--cl-color-foreground-secondary']}, ${colorVars['--cl-color-background']} 55%)`,
+  '--cl-scrollbar-thumb-idle': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-background']} 45%)`,
+  '--cl-scrollbar-thumb-hover': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-foreground']} 15%)`,
+  '--cl-scrollbar-thumb-active': `color-mix(in oklab, ${scrollbarThumb}, ${colorVars['--cl-color-foreground']} 30%)`,
+} as const;
+
+export const scrollbarVars = stylex.defineVars(scrollbarDefaults);
+
+// The edge-fade indicator on a scrolling region. Global rather than owned by `ScrollArea`
+// because "how soft is the edge of a scrolling region" is a design-language decision, on a
+// par with a radius step — any component that grows an edge fade should read these rather
+// than mint its own family. A component that genuinely needs a different value sets the var
+// on itself; the global default still applies everywhere else.
+//
+// `size` and `range` default to the same value on purpose: the fade reaches full strength
+// after you've scrolled its own height, so it grows in at the rate the content moves.
+//
+// There is deliberately no `inset` knob for holding the fade back from the scrollbar. It
+// existed only to compensate for a width CSS could not measure; now that `--cl-scrollbar-width`
+// specifies that width, the two can never legitimately differ — a smaller inset lets the fade
+// cover part of the scrollbar, a larger one leaves an unfaded strip beside it — so the mask
+// derives its inset from the scrollbar token instead of exposing a second name for the same
+// number.
+const scrollFadeDefaults = {
+  '--cl-scroll-fade-size': '1.5rem',
+  '--cl-scroll-fade-range': '1.5rem',
+} as const;
+
+export const scrollFadeVars = stylex.defineVars(scrollFadeDefaults);
+
+// =============================================================================
+// Spacing Tokens
+// =============================================================================
+
+const spacingDefaults = {
+  '--cl-spacing': '0.25rem',
+} as const;
+
+export const spacingVars = stylex.defineVars(spacingDefaults);
+
+const step = (multiple: number): string => `calc(var(--cl-spacing) * ${multiple})`;
+
+export const space = stylex.defineVars({
+  '0': '0px',
+  '0.5': step(0.5),
+  '1': step(1),
+  '1.5': step(1.5),
+  '2': step(2),
+  '2.5': step(2.5),
+  '3': step(3),
+  '3.5': step(3.5),
+  '4': step(4),
+  '4.5': step(4.5),
+  '5': step(5),
+  '5.5': step(5.5),
+  '6': step(6),
+  '6.5': step(6.5),
+  '7': step(7),
+  '7.5': step(7.5),
+  '8': step(8),
+  '8.5': step(8.5),
+  '9': step(9),
+  '9.5': step(9.5),
+  '10': step(10),
+  '10.5': step(10.5),
+  '11': step(11),
+  '11.5': step(11.5),
+  '12': step(12),
+  '12.5': step(12.5),
+  '13': step(13),
+  '13.5': step(13.5),
+  '14': step(14),
+  '14.5': step(14.5),
+  '15': step(15),
+  '15.5': step(15.5),
+  '16': step(16),
+  '16.5': step(16.5),
+  '17': step(17),
+  '17.5': step(17.5),
+  '18': step(18),
+  '18.5': step(18.5),
+  '19': step(19),
+  '19.5': step(19.5),
+  '20': step(20),
+  '20.5': step(20.5),
+  '21': step(21),
+  '21.5': step(21.5),
+  '22': step(22),
+  '22.5': step(22.5),
+  '23': step(23),
+  '23.5': step(23.5),
+  '24': step(24),
+  '24.5': step(24.5),
+  '25': step(25),
+  '25.5': step(25.5),
+  '26': step(26),
+  '26.5': step(26.5),
+  '27': step(27),
+  '27.5': step(27.5),
+  '28': step(28),
+  '28.5': step(28.5),
+  '29': step(29),
+  '29.5': step(29.5),
+  '30': step(30),
+  '30.5': step(30.5),
+  '31': step(31),
+  '31.5': step(31.5),
+  '32': step(32),
+  '32.5': step(32.5),
+  '33': step(33),
+  '33.5': step(33.5),
+  '34': step(34),
+  '34.5': step(34.5),
+  '35': step(35),
+  '35.5': step(35.5),
+  '36': step(36),
+  '36.5': step(36.5),
+  '37': step(37),
+  '37.5': step(37.5),
+  '38': step(38),
+  '38.5': step(38.5),
+  '39': step(39),
+  '39.5': step(39.5),
+  '40': step(40),
+});
+
+// =============================================================================
+// Typography Tokens — type scale
+// =============================================================================
+
+const typeScaleDefaults = {
+  '--cl-text-xs-size': '0.75rem',
+  '--cl-text-xs-leading': 'calc(1 / 0.75)',
+  '--cl-text-sm-size': '0.875rem',
+  '--cl-text-sm-leading': 'calc(1.25 / 0.875)',
+  '--cl-text-base-size': '1rem',
+  '--cl-text-base-leading': 'calc(1.5 / 1)',
+  '--cl-text-lg-size': '1.125rem',
+  '--cl-text-lg-leading': 'calc(1.75 / 1.125)',
+  '--cl-text-xl-size': '1.25rem',
+  '--cl-text-xl-leading': 'calc(1.75 / 1.25)',
+  '--cl-text-2xl-size': '1.5rem',
+  '--cl-text-2xl-leading': 'calc(2 / 1.5)',
+} as const;
+
+export const typeScaleVars = stylex.defineVars(typeScaleDefaults);
+
+// =============================================================================
+// Typography Tokens — font family
+// =============================================================================
+
+const fontFamilyDefaults = {
+  '--cl-font-family-sans': 'inherit',
+} as const;
+
+export const fontFamilyVars = stylex.defineVars(fontFamilyDefaults);
+
+// =============================================================================
+// Typography Tokens — font weight
+// =============================================================================
+
+const fontWeightDefaults = {
+  '--cl-font-normal': '400',
+  '--cl-font-medium': '500',
+  '--cl-font-semibold': '600',
+  '--cl-font-bold': '700',
+} as const;
+
+export const fontWeightVars = stylex.defineVars(fontWeightDefaults);
+
+// =============================================================================
+// Motion Tokens — duration
+// =============================================================================
+// Read as "how direct is this feedback": the more a change is the answer to
+// something the pointer just did, the shorter it runs. `instant` is for the state
+// that has to feel like contact rather than a fade — a press landing, a highlight
+// appearing under the cursor, hover included; `fast` for exits and other short
+// pointer-driven change; `base` for that state decaying once the pointer leaves,
+// which reads better a little slower than it arrived; `slow`/`slower` for changes
+// the pointer didn't
+// cause directly, like a panel or overlay resolving.
+//
+// Durations are not gated on `prefers-reduced-motion`. That signal is about
+// vestibular safety — transforms, positional change, parallax — so the gate
+// belongs on the moving property at its use site, not on every duration here.
+
+const durationDefaults = {
+  '--cl-duration-instant': '0s',
+  '--cl-duration-fast': '0.1s',
+  '--cl-duration-base': '0.15s',
+  '--cl-duration-slow': '0.25s',
+  '--cl-duration-slower': '0.35s',
+} as const;
+
+export const durationVars = stylex.defineVars(durationDefaults);
+
+// =============================================================================
+// Motion Tokens — easing
+// =============================================================================
+// Curves are named for their role rather than their shape so a consumer can
+// retarget one without the name going stale. The default is Swift Out
+// (https://www.easing.dev/swift-out, from Lochie Axon's Easing Graphs):
+// front-loaded, so a change departs fast, and carrying its endpoint ~2% past
+// target around 85% through before settling.
+//
+// It belongs on properties that MOVE — transform, translate, scale, insets — where
+// the overshoot is what makes motion read as physical rather than mechanical, which
+// in practice means the `slow`/`slower` end of the duration scale. Color and opacity
+// take plain `linear` instead: their interpolation is already perceptually
+// non-uniform, so an ease on top only makes the midpoint drag, and an overshoot
+// extrapolates past the target color for no gain. That is a rule about the property,
+// not the duration — a transform at `fast` still wants this curve.
+//
+// `--cl-ease-exit` is its counterpart for things LEAVING, In Quad
+// (https://www.easing.dev/in-quad). Swift Out run backwards spends 90% of its travel
+// in the first three frames and then crawls, and its overshoot inverts into a wobble
+// past the target — a departure has nothing to settle into, so it wants to accelerate
+// away instead. Deliberately the gentlest of the in-family: an exit moves a small
+// distance over few frames, so a sharper curve (In Quart, In Circ) leaves half of them
+// below the threshold of visible change and reads as a stall followed by a lurch.
+// Pair it with a shorter duration than the matching entrance.
+//
+// `--cl-ease-enter` is the entrance curve for surfaces that should NOT settle: the same
+// front-loaded deceleration, but landing exactly on target instead of carrying ~2% past it.
+// Use it where the overshoot is read as a correction rather than as physicality — a large
+// surface, or one whose arrival is already carried by a companion signal such as a scrim.
+// `Dialog` takes it for that reason; a small element moving a short distance still wants
+// `--cl-ease-default`, where the settle is the whole point. Same property rule applies: it
+// belongs on things that MOVE, and opacity still takes `linear`.
+
+const easingDefaults = {
+  '--cl-ease-default': 'cubic-bezier(0.175, 0.885, 0.32, 1.1)',
+  '--cl-ease-enter': 'cubic-bezier(0, 0, 0.2, 1)',
+  '--cl-ease-exit': 'cubic-bezier(0.55, 0.085, 0.68, 0.53)',
+  '--cl-ease-pulse': 'cubic-bezier(0.4, 0, 0.6, 1)',
+} as const;
+
+export const easingVars = stylex.defineVars(easingDefaults);
+
+// =============================================================================
+// Focus Tokens
+// =============================================================================
+
+const focusDefaults = {
+  '--cl-focus-outline-width': '2px',
+  '--cl-focus-outline-style': 'solid',
+  '--cl-focus-outline-offset': '2px',
+} as const;
+
+export const focusVars = stylex.defineVars(focusDefaults);
+
+// =============================================================================
+// Shadow Tokens
+// =============================================================================
+
+const light = (wash: string) => `light-dark(${wash}, transparent)`;
+const neutral4 = `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent)`;
+const neutral8 = colorVars['--cl-color-neutral-alpha-200'];
+const darkRing = `0 0 0 1px light-dark(transparent, color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`;
+
+const shadowDefaults = {
+  '--cl-shadow-sm': `0 1px 2px 0 ${light(neutral8)}, ${darkRing}`,
+  '--cl-shadow-md': `0 2px 1px -1px ${light(neutral4)}, 0 4px 8px 0 ${light(neutral8)}, 0 0 3px 0 ${light(neutral8)}, ${darkRing}`,
+  '--cl-shadow-lg': `0 2px 2px -1px ${light(neutral4)}, 0 8px 16px 0 ${light(neutral8)}, 0 0 1px 0 ${light(neutral8)}, ${darkRing}`,
+};
+
+export const shadowVars = stylex.defineVars(shadowDefaults);

@@ -1,8 +1,8 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import type { CardProps } from '@clerk/ui/mosaic/components/card';
-import { Card } from '@clerk/ui/mosaic/components/card';
-import { Field } from '@clerk/ui/mosaic/components/field';
-import { Input } from '@clerk/ui/mosaic/components/input';
+import { Button } from '@clerk/mosaic/components/button';
+import type { CardProps } from '@clerk/mosaic/components/card';
+import { Card } from '@clerk/mosaic/components/card';
+import { Field } from '@clerk/mosaic/components/field';
+import { Input } from '@clerk/mosaic/components/input';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -12,8 +12,9 @@ export { default as __source } from './card.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Card',
-  source: 'packages/ui/src/mosaic/components/card/card.tsx',
+  source: 'packages/mosaic/src/components/card/card.tsx',
   styles: {
     _variants: {
       elevation: { card: {}, flush: {}, overlay: {} },
@@ -32,10 +33,7 @@ function knobsAsProps(props: Record<string, unknown>) {
 
 export function Default(props: Record<string, unknown>) {
   return (
-    <Card.Root
-      {...knobsAsProps(props)}
-      style={{ maxWidth: 400 }}
-    >
+    <Card.Root {...knobsAsProps(props)}>
       <Card.Header>
         <Card.Title>Login to your account</Card.Title>
         <Card.Description>Enter your email below to login to your account</Card.Description>

@@ -111,17 +111,19 @@ inside `Otp.Root`.
 
 ### `Otp.Root`
 
-| Prop            | Type                                     | Default      | Description                                         |
-| --------------- | ---------------------------------------- | ------------ | --------------------------------------------------- |
-| `length`        | `number`                                 | — (required) | Number of slots (characters) in the code            |
-| `value`         | `string`                                 | —            | Controlled value                                    |
-| `defaultValue`  | `string`                                 | `''`         | Initial value (uncontrolled)                        |
-| `onValueChange` | `(value: string) => void`                | —            | Called with the full value on every change          |
-| `onComplete`    | `(value: string) => void`                | —            | Called once every slot is filled                    |
-| `pattern`       | `'numeric' \| 'alpha' \| 'alphanumeric'` | `'numeric'`  | Allowed characters; others are stripped             |
-| `mask`          | `boolean`                                | `false`      | Render slots as password inputs                     |
-| `name`          | `string`                                 | —            | Submit the value via a hidden input under this name |
-| `disabled`      | `boolean`                                | `false`      | Disable every slot                                  |
+| Prop            | Type                                     | Default      | Description                                            |
+| --------------- | ---------------------------------------- | ------------ | ------------------------------------------------------ |
+| `length`        | `number`                                 | — (required) | Number of slots (characters) in the code               |
+| `value`         | `string`                                 | —            | Controlled value                                       |
+| `defaultValue`  | `string`                                 | `''`         | Initial value (uncontrolled)                           |
+| `onValueChange` | `(value: string) => void`                | —            | Called with the full value on every change             |
+| `onComplete`    | `(value: string) => void`                | —            | Called once every slot is filled                       |
+| `pattern`       | `'numeric' \| 'alpha' \| 'alphanumeric'` | `'numeric'`  | Allowed characters; others are stripped                |
+| `mask`          | `boolean`                                | `false`      | Render slots as password inputs                        |
+| `name`          | `string`                                 | —            | Submit the value via a hidden input under this name    |
+| `disabled`      | `boolean`                                | `false`      | Disable every slot and the hidden input                |
+| `required`      | `boolean`                                | `false`      | Require every slot to be filled before submitting      |
+| `id`            | `string`                                 | generated    | Applied to the first slot so a `<label>` can target it |
 
 ### `Otp.Input`
 
@@ -159,7 +161,12 @@ Each part emits `data-*` attributes you can target with any CSS solution:
 ```
 
 `Otp.Root` is a `role="group"`; give it an `aria-label` (or `aria-labelledby`) describing the code.
-Each `Otp.Input` gets a default `aria-label` of `"Character N of M"` (overridable), and the slots use
-a roving tab index so `Tab` enters the group once and leaves in one step. When `name` is set, the
-hidden form input is `aria-hidden` and out of the tab order. Arrow keys follow reading order — under
-`dir="rtl"`, `ArrowLeft`/`ArrowRight` are swapped.
+Because a group is not labelable, `Otp.Root`'s `id` lands on the _first_ slot (the rest take
+`${id}-2`, `${id}-3`, …), so a `<label htmlFor>` targets a real control and clicking it focuses the
+code. That first slot inherits the group's name rather than a positional one — a `"Character 1 of N"`
+there would contradict the visible label — while the remaining slots get a default `aria-label` of
+`"Character N of M"` (overridable). The slots use a roving tab index so `Tab` enters the group once
+and leaves in one step. `required` is applied to each slot, not the hidden input, which is `readOnly`
+and therefore barred from constraint validation. When `name` is set, the hidden form input is
+`aria-hidden`, out of the tab order, and disabled alongside the field. Arrow keys follow reading
+order — under `dir="rtl"`, `ArrowLeft`/`ArrowRight` are swapped.
