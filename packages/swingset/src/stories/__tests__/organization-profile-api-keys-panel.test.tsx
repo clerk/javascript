@@ -1,9 +1,59 @@
+import { OrganizationProfileApiKeysPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-api-keys-panel.view';
+import { useMessages } from '@clerk/mosaic/localization';
 import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Default, Empty, ReadOnly, Retry } from '../organization-profile-api-keys-panel.stories';
+import {
+  createExampleAPIKey,
+  revokeExampleAPIKey,
+  useOrganizationProfileAPIKeysFixture,
+} from '../fixtures/organization-profile-api-keys';
+import { Default, Empty } from '../organization-profile-api-keys-panel.stories';
+
+function Retry() {
+  const m = useMessages('organizationProfileApiKeysPanel');
+  const attempts = useRef({ create: false, copy: false, revoke: false });
+  const props = useOrganizationProfileAPIKeysFixture({
+    createKey: async () => {
+      const result = await createExampleAPIKey();
+      if (!attempts.current.create) {
+        attempts.current.create = true;
+        throw new Error(m.createError);
+      }
+      return result;
+    },
+    copyKey: async secret => {
+      if (!attempts.current.copy) {
+        attempts.current.copy = true;
+        throw new Error(m.copyError);
+      }
+      await navigator.clipboard.writeText(secret);
+    },
+    revokeKey: async () => {
+      await revokeExampleAPIKey();
+      if (!attempts.current.revoke) {
+        attempts.current.revoke = true;
+        throw new Error(m.revokeError);
+      }
+    },
+  });
+  return <OrganizationProfileApiKeysPanelView {...props} />;
+}
+
+function ReadOnly() {
+  const props = useOrganizationProfileAPIKeysFixture();
+  return (
+    <OrganizationProfileApiKeysPanelView
+      {...props}
+      onCreate={undefined}
+      createDialog={undefined}
+      onRevoke={undefined}
+    />
+  );
+}
 
 describe('organization API keys playground', () => {
   it('creates and copies a key, then resets the form for the next key', async () => {

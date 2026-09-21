@@ -155,8 +155,6 @@ import {
   Default as OrganizationProfileApiKeysPanelDefault,
   Empty as OrganizationProfileApiKeysPanelEmpty,
   meta as organizationProfileApiKeysPanelMeta,
-  ReadOnly as OrganizationProfileApiKeysPanelReadOnly,
-  Retry as OrganizationProfileApiKeysPanelRetry,
 } from '../stories/organization-profile-api-keys-panel.stories';
 import {
   Default as OtpComponentDefault,
@@ -836,8 +834,6 @@ const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,
   Default: OrganizationProfileApiKeysPanelDefault,
   Empty: OrganizationProfileApiKeysPanelEmpty,
-  ReadOnly: OrganizationProfileApiKeysPanelReadOnly,
-  Retry: OrganizationProfileApiKeysPanelRetry,
 };
 
 export const registry: StoryModule[] = [
