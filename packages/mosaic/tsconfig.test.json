@@ -14,7 +14,9 @@
     "src/**/*.spec.tsx",
     "src/**/__tests__/**/*.ts",
     "src/**/__tests__/**/*.tsx",
-    "src/global.d.ts"
+    "src/global.d.ts",
+    "src/primitives/test-utils/jest-dom.d.ts",
+    "src/primitives/test-utils/vitest-axe.d.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }
