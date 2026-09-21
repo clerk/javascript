@@ -3,7 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import { fontWeightVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  root: { gap: space['6'], display: 'flex', flexDirection: 'column', width: '100%' },
+  root: { gap: space['6'], display: 'flex', flexDirection: 'column' },
   toolbar: {
     gap: space['4'],
     alignItems: 'center',
