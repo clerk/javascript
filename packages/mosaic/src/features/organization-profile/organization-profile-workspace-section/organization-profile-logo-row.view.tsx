@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
+import type { ActionMenuAction } from '../../../components/action-menu';
+import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
 import { FileUpload } from '../../../primitives/file-upload';
-import type { OrganizationProfileMenuAction } from '../organization-profile-action-menu';
-import { OrganizationProfileActionMenu } from '../organization-profile-action-menu';
 
 const LOGO_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
 const LOGO_MAX_BYTES = 10 * 1000 * 1000;
@@ -98,7 +98,7 @@ function LogoActions({
 }) {
   const m = useMessages('organizationProfileWorkspaceSection');
   const { openFilePicker } = FileUpload.useFileUpload();
-  const actions: OrganizationProfileMenuAction[] = [];
+  const actions: ActionMenuAction[] = [];
 
   if (hasImage && canChange) {
     actions.push({ label: m.logo.change, icon: 'pen', onClick: openFilePicker });
@@ -111,7 +111,7 @@ function LogoActions({
   if (actions.length > 0) {
     return (
       <Section.Actions>
-        <OrganizationProfileActionMenu
+        <ActionMenu
           actions={actions}
           label={m.logo.manage}
         />

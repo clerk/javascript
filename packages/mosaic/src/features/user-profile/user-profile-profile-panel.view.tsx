@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
-import { Profile } from '../../components/profile';
+import { panelStyles, Profile } from '../../components/profile';
 import { mergeStyleProps, themeProps } from '../../props';
 import type {
   UserProfileAccountSectionViewProps,
@@ -15,7 +15,6 @@ import type {
 } from './user-profile-connected-accounts-section.view';
 import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
-import { styles } from './user-profile-profile-panel.styles';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
@@ -84,9 +83,9 @@ export function UserProfileProfilePanelView({
   onDeleteAccount,
 }: UserProfileProfilePanelViewProps): ReactElement {
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-profile-panel'), stylex.props(styles.root))}>
+    <div {...mergeStyleProps(themeProps('user-profile-profile-panel'), stylex.props(panelStyles.root))}>
       <Profile.PageTitle>Account</Profile.PageTitle>
-      <div {...stylex.props(styles.sections)}>
+      <div {...stylex.props(panelStyles.sections)}>
         <UserProfileAccountSectionView
           allowMultipleAccounts={allowMultipleAccounts}
           emails={emails}

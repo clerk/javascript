@@ -96,12 +96,6 @@ export const styles = stylex.create({
     alignItems: 'center',
     display: 'flex',
   },
-  root: {
-    gap: space['6'],
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-  },
   row: {
     borderBlockStartColor: colorVars['--cl-color-border'],
     borderBlockStartStyle: 'solid',

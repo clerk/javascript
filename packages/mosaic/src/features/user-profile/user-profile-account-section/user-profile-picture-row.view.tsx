@@ -1,13 +1,13 @@
 import { useState } from 'react';
 
+import type { ActionMenuAction } from '../../../components/action-menu';
+import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
 import { FileUpload } from '../../../primitives/file-upload';
-import type { UserProfileMenuAction } from '../user-profile-action-menu';
-import { UserProfileActionMenu } from '../user-profile-action-menu';
 
 const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
 /** Matches the limit the row's own description advertises. */
@@ -96,7 +96,7 @@ function ProfilePictureActions({
 }) {
   const m = useMessages('userProfileAccountSection');
   const { openFilePicker } = FileUpload.useFileUpload();
-  const actions: UserProfileMenuAction[] = [];
+  const actions: ActionMenuAction[] = [];
 
   if (hasImage && canChange) {
     actions.push({ label: m.picture.change, icon: 'pen', onClick: openFilePicker });
@@ -109,7 +109,7 @@ function ProfilePictureActions({
   if (actions.length > 0) {
     return (
       <Section.Actions>
-        <UserProfileActionMenu
+        <ActionMenu
           actions={actions}
           label={m.picture.manage}
         />

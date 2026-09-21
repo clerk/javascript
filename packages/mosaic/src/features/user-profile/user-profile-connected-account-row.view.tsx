@@ -1,12 +1,12 @@
 import * as stylex from '@stylexjs/stylex';
 
+import type { ActionMenuAction } from '../../components/action-menu';
+import { ActionMenu } from '../../components/action-menu';
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
 import { fill, useMessages } from '../../localization';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
 import { styles } from './user-profile-connected-accounts.styles';
 import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
 
@@ -23,7 +23,7 @@ export function UserProfileConnectedAccountRowView({
 }) {
   const m = useMessages('userProfileConnectedAccounts');
   const iconUrl = account.iconUrl?.trim();
-  const actions: UserProfileMenuAction[] = [];
+  const actions: ActionMenuAction[] = [];
   if (account.status === 'reconnect' && onReconnect) {
     actions.push({ label: m.reconnect, onClick: () => onReconnect(account.id) });
   }
@@ -85,7 +85,7 @@ export function UserProfileConnectedAccountRowView({
           </Section.Actions>
         ) : actions.length > 0 ? (
           <Section.Actions>
-            <UserProfileActionMenu
+            <ActionMenu
               label={fill(m.manageLabel, { provider: account.provider })}
               actions={actions}
             />
