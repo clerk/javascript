@@ -44,11 +44,12 @@ describe('organization API keys playground', () => {
     expect(within(dialog).getByRole('button', { name: 'Add API Key' })).toBeEnabled();
     await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
     const copyDialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
-    await waitFor(() => expect(within(copyDialog).getByRole('textbox', { name: 'API key' })).toHaveFocus());
+    await waitFor(() => expect(within(copyDialog).getByRole('button', { name: 'Copy API key' })).toHaveFocus());
+    const secret = within(copyDialog).getByText(/^ak_demo_/).textContent;
     expect(within(copyDialog).queryByLabelText('Secret key name')).not.toBeInTheDocument();
     await user.click(within(copyDialog).getByRole('button', { name: 'Copy and close' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(copy).toHaveBeenCalledWith(expect.stringContaining('ak_demo_'));
+    expect(copy).toHaveBeenCalledWith(secret);
     expect(trigger).toHaveFocus();
     await user.type(screen.getByRole('searchbox'), 'New integration');
     expect(await screen.findByText('New integration')).toBeVisible();
@@ -56,7 +57,7 @@ describe('organization API keys playground', () => {
     expect(screen.getByLabelText('Secret key name')).toHaveValue('');
     expect(screen.queryByText('This key will never expire')).not.toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /^Expiration/ })).toHaveTextContent('Select expiration');
-    expect(screen.queryByRole('textbox', { name: 'API key' })).not.toBeInTheDocument();
+    expect(screen.queryByText(/^ak_demo_/)).not.toBeInTheDocument();
   });
 
   it('retries creation, copying, and revocation while updating rows and counts', async () => {
@@ -79,10 +80,10 @@ describe('organization API keys playground', () => {
     expect(screen.getByRole('textbox', { name: 'Secret key name' })).toHaveValue('Retry integration');
     await user.click(screen.getByRole('button', { name: 'Add API Key' }));
     const dialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
-    const secret = within(dialog).getByRole('textbox', { name: 'API key' });
+    const secret = within(dialog).getByText(/^ak_demo_/);
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('Could not copy the API key. Try again.');
-    expect(secret).toHaveAttribute('value', expect.stringContaining('ak_demo_'));
+    expect(secret).toBeVisible();
     await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
     await waitFor(() => expect(copy).toHaveBeenCalledOnce());
     expect(dialog).toBeVisible();
@@ -151,6 +152,23 @@ describe('organization API keys playground', () => {
     expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeEnabled();
   });
 
+  it('updates the expiration label after each selection', async () => {
+    const user = userEvent.setup();
+    render(
+      <MosaicProvider>
+        <Default />
+      </MosaicProvider>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Create API key' }));
+    const trigger = screen.getByRole('combobox', { name: /^Expiration/ });
+
+    for (const label of ['7 Days', '30 Days', 'Never']) {
+      await user.click(trigger);
+      await user.click(screen.getByRole('option', { name: label }));
+      expect(trigger).toHaveTextContent(label);
+    }
+  });
+
   it('keeps the key visible after a copy failure and saves the selected expiration', async () => {
     const user = userEvent.setup();
     const copy = vi
@@ -181,10 +199,7 @@ describe('organization API keys playground', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('Impossible de copier cette clé.');
-    expect(within(dialog).getByRole('textbox', { name: 'API key' })).toHaveAttribute(
-      'value',
-      expect.stringContaining('ak_demo_'),
-    );
+    expect(within(dialog).getByText(/^ak_demo_/)).toBeVisible();
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(copy).toHaveBeenCalledTimes(2);

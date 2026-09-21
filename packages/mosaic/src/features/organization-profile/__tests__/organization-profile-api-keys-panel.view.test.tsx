@@ -431,7 +431,7 @@ describe('organization API key creation', () => {
     expect(props.onSubmit).toHaveBeenCalledTimes(2);
   });
 
-  it('focuses the returned secret and keeps copy and copy-and-close as separate retryable intents', async () => {
+  it('focuses Copy beside the secret text and keeps both copy intents retryable', async () => {
     const user = userEvent.setup();
     const props = dialogPropsFor({ name: 'Deploy', expiration: 'never' });
     const view = render(dialogView(props));
@@ -439,10 +439,10 @@ describe('organization API key creation', () => {
     const returned = { ...props, secret: 'ak_org_secret' };
     view.rerender(dialogView(returned));
     const dialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
-    const secret = within(dialog).getByRole('textbox', { name: 'API key' });
-    await waitFor(() => expect(secret).toHaveFocus());
-    expect(secret).toHaveValue('ak_org_secret');
-    expect(secret).toHaveAttribute('readonly');
+    const secret = within(dialog).getByText('ak_org_secret');
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Copy API key' })).toHaveFocus());
+    expect(secret).toBeVisible();
+    expect(within(dialog).queryByRole('textbox')).not.toBeInTheDocument();
     await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
     expect(props.onCopy).toHaveBeenLastCalledWith(false);
     view.rerender(dialogView({ ...returned, isPending: true }));
@@ -454,7 +454,7 @@ describe('organization API key creation', () => {
     expect(props.onOpenChange).not.toHaveBeenCalled();
     view.rerender(dialogView({ ...returned, error: 'Copy failed. Try again.' }));
     expect(within(dialog).getByRole('alert')).toHaveTextContent('Copy failed. Try again.');
-    expect(secret).toHaveValue('ak_org_secret');
+    expect(secret).toHaveTextContent('ak_org_secret');
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     expect(props.onCopy).toHaveBeenNthCalledWith(1, false);
     expect(props.onCopy).toHaveBeenNthCalledWith(2, true);

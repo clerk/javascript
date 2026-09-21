@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 import { useId, useRef } from 'react';
 
@@ -6,6 +7,7 @@ import { Card } from '../../components/card';
 import type { DialogFocusTarget } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
+import { styles as fieldStyles } from '../../components/field/field.styles';
 import { Flow, useFlowAutoFocus } from '../../components/flow';
 import { Icon } from '../../components/icon';
 import { Input } from '../../components/input';
@@ -13,6 +15,8 @@ import { InputGroup } from '../../components/input-group';
 import { Select } from '../../components/select';
 import { Text } from '../../components/text';
 import { fill, useMessages } from '../../localization';
+import { truncationStyles } from '../../utils/typography.styles';
+import { styles } from './organization-profile-create-api-key.styles';
 
 const expirationValues = ['never', '1d', '7d', '30d', '60d', '90d', '180d', '1y'] as const;
 
@@ -180,16 +184,13 @@ function CopyKeyStep(props: OrganizationProfileCreateAPIKeyDialogProps) {
           />
         }
       >
-        <Field.Root>
-          <Field.Label>{m.secretLabel}</Field.Label>
+        <div {...stylex.props(fieldStyles.root)}>
+          <Text xstyle={fieldStyles.label}>{m.secretLabel}</Text>
           <InputGroup.Root>
-            <InputGroup.Input
-              ref={useFlowAutoFocus<HTMLInputElement>()}
-              value={props.secret ?? ''}
-              readOnly
-            />
+            <Text xstyle={[truncationStyles.singleLine, styles.secret]}>{props.secret}</Text>
             <InputGroup.End>
               <Button
+                ref={useFlowAutoFocus<HTMLButtonElement>()}
                 type='button'
                 aria-label={m.copy}
                 disabled={props.isPending}
@@ -199,7 +200,7 @@ function CopyKeyStep(props: OrganizationProfileCreateAPIKeyDialogProps) {
               </Button>
             </InputGroup.End>
           </InputGroup.Root>
-        </Field.Root>
+        </div>
 
         {props.error ? (
           <Text
