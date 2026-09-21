@@ -5,7 +5,6 @@ import { isDevelopmentFromSecretKey } from '@clerk/shared/keys';
 import { isHttpOrHttps, isProxyUrlRelative } from '@clerk/shared/proxy';
 
 import { errorThrower } from '../utils';
-import { canUseKeyless } from '../utils/feature-flags';
 import { commonEnvs } from './constants';
 import type { LoaderOptions } from './types';
 
@@ -30,14 +29,8 @@ export const loadOptions = (request: ClerkRequest, overrides: LoaderOptions = {}
     proxyUrl = relativeOrAbsoluteProxyUrl;
   }
 
-  if (!secretKey && publishableKey) {
+  if (!secretKey) {
     errorThrower.throwMissingSecretKeyError();
-  }
-
-  // In development with no keys at all, defer to authenticateRequest so its CLI-pointing missing-publishable-key error surfaces
-  if (!secretKey && !canUseKeyless) {
-    // eslint-disable-next-line @typescript-eslint/only-throw-error
-    throw errorThrower.throw('Clerk: no secret key provided');
   }
 
   if (isSatellite && !proxyUrl && !domain) {

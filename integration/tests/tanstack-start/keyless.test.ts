@@ -34,7 +34,7 @@ test.describe('Keyless mode @tanstack-react-start', () => {
   }) => {
     const response = await page.goto(`${app.serverUrl}/`);
     expect(response?.status()).toBe(500);
-    expect(app.devOutput).toContain('Publishable key is missing');
+    expect(app.devOutput).toContain('Missing secretKey');
     expect(app.devOutput).toContain('npx clerk@latest init');
   });
 });
