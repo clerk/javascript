@@ -317,6 +317,7 @@ export const enUS: LocalizationResource = {
       description: 'Users appear here as your identity provider provisions them, most recent activity first.',
       description__pull:
         'Your directory is read on a schedule. Start a sync to pull users now, most recent activity first.',
+      empty__noUsersSynced: 'The last sync finished without provisioning any users.',
       empty__waitingForFirstSync: 'Waiting for the first sync to finish…',
       empty__waitingForFirstUser: 'Waiting for the first provisioned user…',
       error__lastSyncFailed: 'The last sync failed',

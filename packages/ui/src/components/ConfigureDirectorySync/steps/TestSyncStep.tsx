@@ -101,6 +101,11 @@ export const TestSyncStep = (): JSX.Element => {
 
   const rows = users.data ?? [];
   const providerName = t((providerMeta ?? DIRECTORY_SYNC_PROVIDERS.custom).name);
+  const lastSyncStatus = syncStatus.data?.lastSyncStatus ?? null;
+  // A push directory is always waiting: the IdP provisions whenever it likes.
+  // A pull directory that has finished a run is not — an empty list is that
+  // run's result, and spinning implies work that will never happen.
+  const isWaitingForUsers = !isPull || lastSyncStatus === null || lastSyncStatus === 'running';
 
   return (
     <>
@@ -166,18 +171,22 @@ export const TestSyncStep = (): JSX.Element => {
                 borderColor: t.colors.$borderAlpha150,
               })}
             >
-              <Spinner
-                elementDescriptor={descriptors.spinner}
-                size='xs'
-                colorScheme='neutral'
-              />
+              {isWaitingForUsers && (
+                <Spinner
+                  elementDescriptor={descriptors.spinner}
+                  size='xs'
+                  colorScheme='neutral'
+                />
+              )}
               <Text
                 as='span'
                 colorScheme='secondary'
                 localizationKey={localizationKeys(
-                  isPull
-                    ? 'configureDirectorySync.testStep.empty__waitingForFirstSync'
-                    : 'configureDirectorySync.testStep.empty__waitingForFirstUser',
+                  !isWaitingForUsers
+                    ? 'configureDirectorySync.testStep.empty__noUsersSynced'
+                    : isPull
+                      ? 'configureDirectorySync.testStep.empty__waitingForFirstSync'
+                      : 'configureDirectorySync.testStep.empty__waitingForFirstUser',
                 )}
               />
             </Flex>

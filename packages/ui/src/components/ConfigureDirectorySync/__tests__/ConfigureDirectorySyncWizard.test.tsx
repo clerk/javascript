@@ -35,6 +35,9 @@ const oktaConnection = {
 const directory = (overrides: Record<string, unknown> = {}) =>
   ({
     id: 'scimdir_1',
+    // The sync status hook refuses a directory from another organization, and
+    // the fixture organization's id comes from the membership name.
+    organizationId: 'Org1',
     enterpriseConnectionId: 'ent_1',
     endpointUrl: 'https://api.example.com/scim/v2',
     provider: 'okta',
@@ -272,5 +275,45 @@ describe('ConfigureDirectorySyncWizard test step', () => {
     expect(await screen.findByText('Could not load provisioned users')).toBeInTheDocument();
     expect(screen.getByText('users unavailable')).toBeInTheDocument();
     expect(screen.queryByText('Waiting for the first provisioned user…')).not.toBeInTheDocument();
+  });
+
+  it('stops waiting once a sync has finished without provisioning anyone', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    const existing = googleDirectory({ credentialsConfigured: true, enabled: true });
+    existing.getSyncStatus.mockResolvedValue({
+      lastSyncedAt: new Date(),
+      lastSyncStatus: 'succeeded',
+      lastSyncError: null,
+    });
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Attribute review')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    // An empty directory is the sync's result, not a stage on the way to one,
+    // so the step must not keep implying users are still on their way.
+    expect(await screen.findByText('The last sync finished without provisioning any users.')).toBeInTheDocument();
+    expect(screen.queryByText('Waiting for the first sync to finish…')).not.toBeInTheDocument();
+  });
+
+  it('keeps waiting while a pull directory has not finished a sync', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    const existing = googleDirectory({ credentialsConfigured: true, enabled: true });
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Attribute review')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByText('Waiting for the first sync to finish…')).toBeInTheDocument();
   });
 });
