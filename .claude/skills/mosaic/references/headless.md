@@ -211,6 +211,57 @@ attributes and drive unmount off the Web Animations API. Root spreads
 Consumer CSS keys off these: `[data-starting-style] { opacity: 0 }`,
 `[data-open] { animation: … }`, `[data-ending-style] { opacity: 0 }`.
 
+### Exiting content must be frozen
+
+Anything that animates out outlives `open` by the length of its exit, and
+whatever closed it has usually already changed the data behind it — picking a
+menu item, selecting an option, switching account, a machine returning to `idle`,
+a form clearing. The subtree re-renders with the new data and swaps visibly under
+the exit, which reads as a flash of the next screen. This applies to **every part
+with an exit transition**, not only popups: a sheet, a panel, a step, an inline
+region that fades out all have the same window.
+
+Two ways to hold the old frame, depending on whether the part re-renders for
+reasons of its own while closed:
+
+**`Freeze`** — wrap the children, keep the animating element live:
+
+```tsx
+const { render, children, ...otherProps } = props;
+const { open, popupRef, transitionProps } = useMenuContext();
+
+const defaultProps = {
+  ...transitionProps,
+  children: <Freeze frozen={!open}>{children}</Freeze>,
+};
+```
+
+**A held snapshot** — keep the last open `children` in a ref and render those
+while closed. `FlowStep` does this: its `children` prop genuinely changes when the
+step value moves on, so there is a correct old value to render rather than a frame
+to hold.
+
+```tsx
+if (open) activeChildrenRef.current = children;
+// ...
+children: open ? children : activeChildrenRef.current,
+```
+
+Reach for `Freeze` by default; reach for the snapshot when the outgoing content is
+a distinct element you still have.
+
+Two things to get right either way:
+
+- Gate on **`!open`**, never `!mounted`. `mounted` stays true through the whole
+  exit — that is precisely the window this covers, so `!mounted` freezes nothing.
+- Freeze the **children**, not the animating element. It has to stay live for
+  `data-closed` / `data-ending-style` to land on it and for the animation to run.
+
+In place today: Popover, Select, Combobox, Menu, Dialog (`Freeze`), Flow
+(snapshot). Not yet: Drawer, Autocomplete, Tooltip, and the Accordion /
+Collapsible / Tabs panels. Any new part with an exit transition needs one of the
+two.
+
 **Positioners** gate the floating layer on `mounted` via `useRender`'s
 `enabled`, so the positioned DOM doesn't exist until the first frame:
 
@@ -232,6 +283,10 @@ if (!element) return null;
 ## Shared utils (`@clerk/headless/utils`)
 
 - **`useRender`, `mergeProps`, `ComponentProps<Tag>`, `DefaultProps<Tag>`, `RenderProp`** — the part-authoring primitives (above).
+- **`Freeze({ frozen, children })`** — holds its subtree's DOM at the last
+  committed frame while `frozen` (a suspended boundary whose `display: none` is
+  undone in an insertion effect). Wrap a transitioning popup's children in it so
+  they don't swap under the exit animation; see above.
 - **`cssVars({ sideOffset? }): Middleware`** — floating-ui middleware setting
   `--cl-anchor-width/height`, `--cl-available-width/height`, `--cl-transform-origin`
   on the floating element. Place it **after** `arrow()`.
