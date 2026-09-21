@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 
 import type { LocalizableError } from '../../../localization';
 import type { SaveResult } from '../../../utils/save-result';
-import { formErrorOf, unexpectedFormError } from '../../../utils/save-result';
+import { formErrorOf, UNEXPECTED_ERROR } from '../../../utils/save-result';
 
 export interface UserProfilePictureControllerOptions {
   onChange?: (file: File) => Promise<SaveResult>;
@@ -35,7 +35,8 @@ export function useUserProfilePictureController({
       const result = await action();
       setError(formErrorOf(result.error)?.global);
     } catch (cause) {
-      setError(unexpectedFormError(cause).global);
+      console.error(cause);
+      setError(UNEXPECTED_ERROR);
     } finally {
       inFlight.current = false;
       setIsPending(false);

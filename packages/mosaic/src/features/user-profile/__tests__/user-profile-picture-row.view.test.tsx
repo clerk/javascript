@@ -18,18 +18,17 @@ function renderView(overrides: Partial<UserProfilePictureRowViewProps> = {}) {
 }
 
 describe('UserProfilePictureRowView', () => {
-  it('renders and clears the error supplied by the section', () => {
-    const { rerender } = renderView({ errorMessage: 'File size exceeds the maximum limit of 10MB.' });
+  it('shows why removing the picture failed', async () => {
+    const user = userEvent.setup();
+    renderView({
+      hasImage: true,
+      onRemove: vi.fn().mockResolvedValue({ error: { kind: 'form', global: { code: 'action_blocked' } } }),
+    });
 
-    expect(screen.getByRole('alert')).toHaveTextContent('File size exceeds the maximum limit of 10MB.');
+    await user.click(screen.getByRole('button', { name: 'Manage profile picture' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove avatar' }));
 
-    rerender(
-      <MosaicProvider>
-        <UserProfilePictureRowView name='Preston Booth' />
-      </MosaicProvider>,
-    );
-
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(await screen.findByRole('alert')).toHaveTextContent("This action couldn't be completed.");
   });
 
   it('offers Upload while the avatar is only a generated default', () => {

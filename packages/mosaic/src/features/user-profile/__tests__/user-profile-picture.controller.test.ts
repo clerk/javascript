@@ -83,7 +83,7 @@ describe('useUserProfilePictureController', () => {
     const { result } = renderController({ onChange });
 
     await act(async () => result.current.onChange?.(file));
-    expect(result.current.error).toEqual({});
+    expect(result.current.error).toEqual({ code: 'generic' });
     expect(log).toHaveBeenCalledWith(failure);
     log.mockRestore();
   });
