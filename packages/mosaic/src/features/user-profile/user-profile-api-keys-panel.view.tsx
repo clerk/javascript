@@ -253,6 +253,7 @@ export function UserProfileApiKeysPanelView({
               onPageSizeChange ? next => table.setPagination({ pageIndex: 0, pageSize: next }) : undefined
             }
             label={m.pagination}
+            pageSizeLabel={m.pageSize}
             previousPageLabel={m.previousPage}
             nextPageLabel={m.nextPage}
             onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
@@ -267,7 +268,13 @@ export function UserProfileApiKeysPanelView({
           description={m.revokeDescription}
           actionLabel={m.revoke}
           cancelLabel={m.cancel}
-          onConfirm={apiKey => removalFocus.remove(apiKey.id)}
+          onConfirm={async apiKey => {
+            try {
+              await removalFocus.remove(apiKey.id);
+            } catch (error) {
+              throw error instanceof Error ? error : new Error(m.revokeError);
+            }
+          }}
           finalFocus={removalFocus.finalFocus}
         />
       ) : null}

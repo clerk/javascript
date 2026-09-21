@@ -49,29 +49,34 @@ function renderView(overrides: Partial<UserProfileApiKeysPanelViewProps> = {}) {
 describe('UserProfileApiKeysPanelView', () => {
   it('localizes the shared confirmation for each selected key', async () => {
     const user = userEvent.setup();
-    const onRevoke = vi.fn<(id: string) => Promise<void>>();
+    const onRevoke = vi.fn<(id: string) => Promise<void>>().mockRejectedValueOnce(null);
     render(
       <MosaicProvider
         localization={{
           overrides: {
             'userProfileApiKeysPanel.revokeTitle': 'Retirer {name} ?',
             'userProfileApiKeysPanel.cancel': 'Annuler',
+            'userProfileApiKeysPanel.pageSize': 'Résultats par page',
+            'userProfileApiKeysPanel.revokeError': 'Impossible de révoquer cette clé.',
           },
         }}
       >
-        <UserProfileApiKeysPanelView {...propsFor({ onRevoke })} />
+        <UserProfileApiKeysPanelView {...propsFor({ onRevoke, onPageSizeChange: vi.fn() })} />
       </MosaicProvider>,
     );
+    expect(screen.getByRole('combobox', { name: 'Résultats par page 10' })).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Manage Primary API Key' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
     expect(screen.getByRole('alertdialog')).toHaveAccessibleName('Retirer Primary API Key ?');
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Revoke key' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Impossible de révoquer cette clé.');
     await user.click(screen.getByRole('button', { name: 'Annuler' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Manage Legacy API Key' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
     expect(screen.getByRole('alertdialog')).toHaveAccessibleName('Retirer Legacy API Key ?');
-    expect(onRevoke).not.toHaveBeenCalled();
+    expect(onRevoke).toHaveBeenCalledExactlyOnceWith('primary');
   });
   it('localizes complete sentences and renders supplied rows even when their names do not match search', () => {
     render(

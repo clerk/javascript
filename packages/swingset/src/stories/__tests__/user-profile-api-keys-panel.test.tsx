@@ -7,6 +7,25 @@ import { Default as FullProfile, Overlay } from '../user-profile.stories';
 import { Default, ProposedTable } from '../user-profile-api-keys-panel.stories';
 
 describe('API keys playground', () => {
+  it('formats existing key dates and relative times with the active locale', () => {
+    const view = render(
+      <MosaicProvider localization={{ locale: 'fr-FR' }}>
+        <Default />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('cell', { name: '5 janv. 2026' })).toBeVisible();
+    expect(screen.getAllByText('Expires 31 déc. 2027')[0]).toBeVisible();
+    expect(screen.getByRole('cell', { name: 'il y a 2 minutes' })).toBeVisible();
+    view.rerender(
+      <MosaicProvider localization={{ locale: 'en-US' }}>
+        <Default />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('cell', { name: 'Jan 5, 2026' })).toBeVisible();
+    expect(screen.getAllByText('Expires Dec 31, 2027')[0]).toBeVisible();
+    expect(screen.getByRole('cell', { name: '2 minutes ago' })).toBeVisible();
+  });
+
   it('creates and copies a key, then resets the form for the next key', async () => {
     const user = userEvent.setup();
     const copy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
@@ -115,7 +134,9 @@ describe('API keys playground', () => {
       .mockRejectedValueOnce(new Error('Denied'))
       .mockResolvedValue();
     render(
-      <MosaicProvider>
+      <MosaicProvider
+        localization={{ overrides: { 'userProfileApiKeysPanel.copyError': 'Impossible de copier cette clé.' } }}
+      >
         <Default />
       </MosaicProvider>,
     );
@@ -135,7 +156,7 @@ describe('API keys playground', () => {
     await user.click(screen.getByRole('button', { name: 'Add API Key' }));
     const dialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
-    expect(await within(dialog).findByRole('alert')).toHaveTextContent('Could not copy the API key');
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('Impossible de copier cette clé.');
     expect(within(dialog).getByRole('textbox', { name: 'API key' })).toHaveAttribute(
       'value',
       expect.stringContaining('ak_demo_'),
