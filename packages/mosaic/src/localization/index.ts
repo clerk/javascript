@@ -1,4 +1,6 @@
 export type { MosaicCatalog, MosaicLocalization } from './catalog';
+export type { LocalizableError } from './errors';
+export { useErrorText } from './errors';
 export { MosaicLocalizationProvider, resolveLocalization, useLocale, useMessages } from './context';
 export type { MosaicMessages } from './registry';
 export { mosaicMessages } from './registry';

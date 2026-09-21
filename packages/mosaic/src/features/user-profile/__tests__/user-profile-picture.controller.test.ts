@@ -35,7 +35,7 @@ describe('useUserProfilePictureController', () => {
       await upload.promise;
     });
     expect(result.current.isPending).toBe(false);
-    expect(result.current.errorMessage).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
   });
 
   it('ignores a second pick while one is in flight', () => {
@@ -54,16 +54,18 @@ describe('useUserProfilePictureController', () => {
   it('shows why the upload failed, and clears it on the next attempt', async () => {
     const onChange = vi
       .fn()
-      .mockResolvedValueOnce({ error: { kind: 'form', message: 'Too big.' } })
+      .mockResolvedValueOnce({
+        error: { kind: 'form', global: { code: 'avatar_file_size_exceeded', message: 'Too big.' } },
+      })
       .mockResolvedValueOnce({ error: null });
     const { result } = renderController({ onChange });
 
     await act(async () => result.current.onChange?.(file));
-    expect(result.current.errorMessage).toBe('Too big.');
+    expect(result.current.error).toEqual({ code: 'avatar_file_size_exceeded', message: 'Too big.' });
     expect(result.current.isPending).toBe(false);
 
     await act(async () => result.current.onChange?.(file));
-    expect(result.current.errorMessage).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
   });
 
   it('shows nothing when the action is cancelled', async () => {
@@ -71,22 +73,26 @@ describe('useUserProfilePictureController', () => {
     const { result } = renderController({ onChange });
 
     await act(async () => result.current.onChange?.(file));
-    expect(result.current.errorMessage).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
   });
 
-  it('shows the message of an unexpected throw', async () => {
-    const onChange = vi.fn().mockRejectedValue(new Error('Network down.'));
+  it('shows the generic error and logs an unexpected throw', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const failure = new TypeError('boom');
+    const onChange = vi.fn().mockRejectedValue(failure);
     const { result } = renderController({ onChange });
 
     await act(async () => result.current.onChange?.(file));
-    expect(result.current.errorMessage).toBe('Network down.');
+    expect(result.current.error).toEqual({});
+    expect(log).toHaveBeenCalledWith(failure);
+    log.mockRestore();
   });
 
   it('reports a failed removal the same way', async () => {
-    const onRemove = vi.fn().mockResolvedValue({ error: { kind: 'form', message: 'Nope.' } });
+    const onRemove = vi.fn().mockResolvedValue({ error: { kind: 'form', global: { message: 'Nope.' } } });
     const { result } = renderController({ onRemove });
 
     await act(async () => result.current.onRemove?.());
-    expect(result.current.errorMessage).toBe('Nope.');
+    expect(result.current.error).toEqual({ message: 'Nope.' });
   });
 });

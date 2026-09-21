@@ -1,7 +1,7 @@
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
 import type { FormError, SaveResult } from '../../../utils/save-result';
-import { formErrorOf } from '../../../utils/save-result';
+import { formErrorOf, unexpectedFormError } from '../../../utils/save-result';
 import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 
 export interface UserProfileEditNameContext {
@@ -24,13 +24,6 @@ const { createMachine, assign, fromPromise } = setup<UserProfileEditNameContext,
 
 function notSeated(): Promise<never> {
   return Promise.reject(new Error('edit-name deps are not seated'));
-}
-
-function toFormError(cause: unknown): FormError<UserProfileEditNameField> {
-  if (cause instanceof Error) {
-    return { message: cause.message };
-  }
-  return { message: 'Something went wrong. Please try again.' };
 }
 
 export const userProfileEditNameMachine = createMachine({
@@ -69,17 +62,14 @@ export const userProfileEditNameMachine = createMachine({
         onDone: [
           {
             guard: (_, event) => event.output.error !== null,
-
             target: 'editing',
-
             actions: assign((_, event) => ({ error: formErrorOf(event.output.error) })),
           },
-
           { target: 'idle', actions: assign(() => ({ error: undefined })) },
         ],
         onError: {
           target: 'editing',
-          actions: assign((_, event) => ({ error: toFormError(event.error) })),
+          actions: assign((_, event) => ({ error: unexpectedFormError(event.error) })),
         },
       }),
     },

@@ -163,7 +163,7 @@ describe('useUserProfileAccountSectionModel', () => {
       user?.setProfileImage.mockRejectedValue(apiError());
       const file = new File(['x'], 'me.png', { type: 'image/png' });
       await expect(ready().onProfilePictureChange?.(file)).resolves.toEqual({
-        error: { kind: 'form', message: 'That value is invalid.' },
+        error: { kind: 'form', global: { code: 'form_param_invalid', message: 'That value is invalid.' } },
       });
     });
   });
@@ -177,7 +177,12 @@ describe('useUserProfileAccountSectionModel', () => {
     it('maps a field error onto the control that caused it', async () => {
       user?.update.mockRejectedValue(apiError('first_name'));
       await expect(ready().onSubmitName?.({ firstName: '', lastName: 'B' })).resolves.toEqual({
-        error: { kind: 'form', fields: { firstName: 'That value is invalid.' } },
+        error: {
+          kind: 'form',
+          fields: {
+            firstName: { code: 'form_param_invalid', paramName: 'first_name', message: 'That value is invalid.' },
+          },
+        },
       });
     });
 
@@ -196,11 +201,16 @@ describe('useUserProfileAccountSectionModel', () => {
     });
   });
 
-  it('returns the message of a non-API failure', async () => {
-    user?.update.mockRejectedValue(new Error('Network down.'));
+  it('returns a Clerk runtime failure by its code, without the developer message', async () => {
+    user?.update.mockRejectedValue(new ClerkRuntimeError('Network down.', { code: 'network_error' }));
     await expect(ready().onSubmitName?.({ firstName: 'Pres', lastName: 'B' })).resolves.toEqual({
-      error: { kind: 'form', message: 'Network down.' },
+      error: { kind: 'form', global: { code: 'network_error' } },
     });
+  });
+
+  it('rethrows a failure that is not from Clerk', async () => {
+    user?.update.mockRejectedValue(new TypeError('boom'));
+    await expect(ready().onSubmitName?.({ firstName: 'Pres', lastName: 'B' })).rejects.toThrow('boom');
   });
 
   describe('username', () => {
@@ -213,7 +223,12 @@ describe('useUserProfileAccountSectionModel', () => {
     it('maps a username error onto the field', async () => {
       user?.update.mockRejectedValue(apiError('username'));
       await expect(ready().onSubmitUsername?.('x')).resolves.toEqual({
-        error: { kind: 'form', fields: { username: 'That value is invalid.' } },
+        error: {
+          kind: 'form',
+          fields: {
+            username: { code: 'form_param_invalid', paramName: 'username', message: 'That value is invalid.' },
+          },
+        },
       });
     });
 

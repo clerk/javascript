@@ -1,12 +1,11 @@
-import { isClerkAPIResponseError, isReverificationCancelledError } from '@clerk/shared/error';
+import { isClerkAPIResponseError, isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
-/** Plain data, so nothing downstream of the model imports a Clerk error. */
+import type { LocalizableError } from '../localization';
+
 export interface FormError<TField extends string = string> {
-  /** Rendered in the dialog's negative banner. */
-  message?: string;
-  /** Rendered under the named control, which is also marked invalid. */
-  fields?: Partial<Record<TField, string>>;
+  global?: LocalizableError;
+  fields?: Partial<Record<TField, LocalizableError>>;
 }
 
 export type SaveFailure<TField extends string = never> = { kind: 'cancelled' } | ({ kind: 'form' } & FormError<TField>);
@@ -23,18 +22,31 @@ export function formErrorOf<TField extends string>(failure: SaveFailure<TField> 
   return error;
 }
 
-export function toFormError<TField extends string>(cause: unknown, fields: readonly TField[]): FormError<TField> {
+export function unexpectedFormError(cause: unknown): FormError<never> {
+  console.error(cause);
+  return { global: {} };
+}
+
+function toFormError<TField extends string>(cause: unknown, fields: readonly TField[]): FormError<TField> | undefined {
+  if (isClerkRuntimeError(cause)) {
+    return { global: { code: cause.code, ...(cause.longMessage ? { message: cause.longMessage } : {}) } };
+  }
   if (!isClerkAPIResponseError(cause)) {
-    return { message: cause instanceof Error ? cause.message : 'Something went wrong. Please try again.' };
+    return undefined;
   }
   const error: FormError<TField> = {};
   for (const apiError of cause.errors) {
-    const text = apiError.longMessage || apiError.message;
-    const field = fields.find(f => apiError.meta?.paramName && snakeToCamel(apiError.meta.paramName) === f);
+    const paramName = apiError.meta?.paramName;
+    const localizable: LocalizableError = {
+      code: apiError.code,
+      ...(paramName ? { paramName } : {}),
+      message: apiError.longMessage || apiError.message,
+    };
+    const field = fields.find(f => paramName && snakeToCamel(paramName) === f);
     if (field) {
-      error.fields = { ...error.fields, [field]: error.fields?.[field] ?? text };
+      error.fields = { ...error.fields, [field]: error.fields?.[field] ?? localizable };
     } else {
-      error.message ??= text;
+      error.global ??= localizable;
     }
   }
   return error;
@@ -51,6 +63,10 @@ export async function toSaveResult<TField extends string = never>(
     if (isReverificationCancelledError(cause)) {
       return { error: { kind: 'cancelled' } };
     }
-    return { error: { kind: 'form', ...toFormError(cause, fields) } };
+    const error = toFormError(cause, fields);
+    if (!error) {
+      throw cause;
+    }
+    return { error: { kind: 'form', ...error } };
   }
 }

@@ -54,36 +54,40 @@ describe('userProfileEditUsernameMachine', () => {
   });
 
   it('keeps what was typed when the save fails, so it can be corrected', async () => {
-    const actor = start(() => failed({ message: 'That username is taken.' }));
+    const actor = start(() => failed({ global: { message: 'That username is taken.' } }));
     actor.send({ type: 'TYPE', value: 'preston' });
     actor.send({ type: 'SAVE' });
 
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('editing'));
     expect(actor.getSnapshot().context.username).toBe('preston');
-    expect(actor.getSnapshot().context.error).toEqual({ message: 'That username is taken.' });
+    expect(actor.getSnapshot().context.error).toEqual({ global: { message: 'That username is taken.' } });
   });
 
   it('carries field copy through when the error names the control', async () => {
     const actor = start(() =>
-      failed({ message: 'Your username could not be updated.', fields: { username: 'That username is taken.' } }),
+      failed({
+        global: { message: 'Your username could not be updated.' },
+        fields: { username: { message: 'That username is taken.' } },
+      }),
     );
     actor.send({ type: 'TYPE', value: 'preston' });
     actor.send({ type: 'SAVE' });
 
     await vi.waitFor(() =>
-      expect(actor.getSnapshot().context.error?.fields).toEqual({ username: 'That username is taken.' }),
+      expect(actor.getSnapshot().context.error?.fields).toEqual({ username: { message: 'That username is taken.' } }),
     );
   });
 
-  it('falls back to generic copy when the save throws something that is not an Error', async () => {
-    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors -- a non-Error rejection is the case under test
-    const actor = start(() => Promise.reject('nope'));
+  it('shows the generic banner and logs when the save throws unexpectedly', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const failure = new TypeError('boom');
+    const actor = start(() => Promise.reject(failure));
     actor.send({ type: 'TYPE', value: 'preston' });
     actor.send({ type: 'SAVE' });
 
-    await vi.waitFor(() =>
-      expect(actor.getSnapshot().context.error?.message).toBe('Something went wrong. Please try again.'),
-    );
+    await vi.waitFor(() => expect(actor.getSnapshot().context.error).toEqual({ global: {} }));
+    expect(log).toHaveBeenCalledWith(failure);
+    log.mockRestore();
   });
 
   it('refuses to save a value that has not moved', () => {
@@ -118,10 +122,10 @@ describe('userProfileEditUsernameMachine', () => {
   });
 
   it('drops the error when the dialog is cancelled', async () => {
-    const actor = start(() => failed({ message: 'nope' }));
+    const actor = start(() => failed({ global: { message: 'nope' } }));
     actor.send({ type: 'TYPE', value: 'preston' });
     actor.send({ type: 'SAVE' });
-    await vi.waitFor(() => expect(actor.getSnapshot().context.error?.message).toBe('nope'));
+    await vi.waitFor(() => expect(actor.getSnapshot().context.error?.global?.message).toBe('nope'));
 
     actor.send({ type: 'CANCEL' });
 
