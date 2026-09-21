@@ -1,17 +1,17 @@
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
-import type { UserProfileFormError, UserProfileSaveResult } from './user-profile-account-section.types';
-import { formErrorOf } from './user-profile-account-section.types';
+import type { FormError, SaveResult } from '../../../utils/save-result';
+import { formErrorOf } from '../../../utils/save-result';
 import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 
 export interface UserProfileEditNameContext {
-  saveName: (value: UserProfileEditNameValue) => Promise<UserProfileSaveResult<UserProfileEditNameField>>;
+  saveName: (value: UserProfileEditNameValue) => Promise<SaveResult<UserProfileEditNameField>>;
   /** Injected every render. What `OPEN` seeds the fields from. */
   savedFirstName: string;
   savedLastName: string;
   firstName: string;
   lastName: string;
-  error: UserProfileFormError<UserProfileEditNameField> | undefined;
+  error: FormError<UserProfileEditNameField> | undefined;
 }
 
 export type UserProfileEditNameEvent =
@@ -26,7 +26,7 @@ function notSeated(): Promise<never> {
   return Promise.reject(new Error('edit-name deps are not seated'));
 }
 
-function toFormError(cause: unknown): UserProfileFormError<UserProfileEditNameField> {
+function toFormError(cause: unknown): FormError<UserProfileEditNameField> {
   if (cause instanceof Error) {
     return { message: cause.message };
   }
@@ -90,7 +90,7 @@ export interface UserProfileEditNameControllerOptions {
   firstName?: string;
   lastName?: string;
   /** Resolve with `{ error: null }` to close the dialog, or with an error to keep it open showing why. */
-  onSubmit: (value: UserProfileEditNameValue) => Promise<UserProfileSaveResult<UserProfileEditNameField>>;
+  onSubmit: (value: UserProfileEditNameValue) => Promise<SaveResult<UserProfileEditNameField>>;
 }
 
 export interface UserProfileEditNameController {
@@ -102,7 +102,7 @@ export interface UserProfileEditNameController {
   onLastNameChange: (value: string) => void;
   onSubmit: () => void;
   isSaving: boolean;
-  error: UserProfileFormError<UserProfileEditNameField> | undefined;
+  error: FormError<UserProfileEditNameField> | undefined;
 }
 
 export function useUserProfileEditNameController({

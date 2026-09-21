@@ -2,7 +2,7 @@ import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { UserProfileSaveResult } from '../user-profile-account-section/user-profile-account-section.types';
+import type { SaveResult } from '../../../utils/save-result';
 import type { UserProfilePictureControllerOptions } from '../user-profile-account-section/user-profile-picture.controller';
 import { useUserProfilePictureController } from '../user-profile-account-section/user-profile-picture.controller';
 
@@ -39,7 +39,7 @@ describe('useUserProfilePictureController', () => {
   });
 
   it('ignores a second pick while one is in flight', () => {
-    const onChange = vi.fn(() => new Promise<UserProfileSaveResult>(() => {}));
+    const onChange = vi.fn(() => new Promise<SaveResult>(() => {}));
     const { result } = renderController({ onChange });
 
     act(() => {

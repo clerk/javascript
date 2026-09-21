@@ -3,12 +3,12 @@ import * as stylex from '@stylexjs/stylex';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
+import type { SaveResult } from '../../../utils/save-result';
 import { styles } from './user-profile-account-section.styles';
 import type {
   UserProfileEmail,
   UserProfileNameAttribute,
   UserProfilePhone,
-  UserProfileSaveResult,
 } from './user-profile-account-section.types';
 import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
@@ -38,11 +38,11 @@ export interface UserProfileAccountSectionViewProps {
   lastNameAttribute?: UserProfileNameAttribute;
   emails: UserProfileEmail[];
   phones: UserProfilePhone[];
-  onProfilePictureChange?: (file: File) => Promise<UserProfileSaveResult>;
+  onProfilePictureChange?: (file: File) => Promise<SaveResult>;
   onProfilePictureReject?: (rejections: FileRejection[]) => void;
-  onRemoveProfilePicture?: () => Promise<UserProfileSaveResult>;
-  onSubmitName?: (value: UserProfileEditNameValue) => Promise<UserProfileSaveResult<UserProfileEditNameField>>;
-  onSubmitUsername?: (username: string) => Promise<UserProfileSaveResult<UserProfileEditUsernameField>>;
+  onRemoveProfilePicture?: () => Promise<SaveResult>;
+  onSubmitName?: (value: UserProfileEditNameValue) => Promise<SaveResult<UserProfileEditNameField>>;
+  onSubmitUsername?: (username: string) => Promise<SaveResult<UserProfileEditUsernameField>>;
   onAddEmail?: () => void;
   onSendEmailCode?: (emailAddress: string) => Promise<void>;
   onVerifyEmailCode?: (emailAddress: string, code: string) => Promise<void>;

@@ -1,5 +1,5 @@
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
-import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
+import type { FormError } from '@clerk/mosaic/utils/save-result';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -24,7 +24,7 @@ function PasswordSection({
 }: {
   hasPassword?: boolean;
   requiresCurrentPassword?: boolean;
-  failWith?: UserProfileFormError;
+  failWith?: FormError;
 }) {
   const editPassword = useUserProfileEditPasswordFixture({ hasPassword, requiresCurrentPassword, failWith });
 

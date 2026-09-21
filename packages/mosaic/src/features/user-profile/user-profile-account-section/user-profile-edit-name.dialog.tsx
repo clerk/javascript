@@ -9,7 +9,8 @@ import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Input } from '../../../components/input';
 import { useMessages } from '../../../localization';
-import type { UserProfileFormError, UserProfileNameAttribute } from './user-profile-account-section.types';
+import type { FormError } from '../../../utils/save-result';
+import type { UserProfileNameAttribute } from './user-profile-account-section.types';
 
 export type UserProfileEditNameField = 'firstName' | 'lastName';
 
@@ -31,7 +32,7 @@ export interface UserProfileEditNameDialogProps {
   onFirstNameChange: (value: string) => void;
   onLastNameChange: (value: string) => void;
   isSaving?: boolean;
-  error?: UserProfileFormError<UserProfileEditNameField>;
+  error?: FormError<UserProfileEditNameField>;
   onSubmit: () => void;
 }
 

@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react';
 
-import type { UserProfileSaveResult } from './user-profile-account-section.types';
-import { formErrorOf } from './user-profile-account-section.types';
+import type { SaveResult } from '../../../utils/save-result';
+import { formErrorOf } from '../../../utils/save-result';
 
 export interface UserProfilePictureControllerOptions {
-  onChange?: (file: File) => Promise<UserProfileSaveResult>;
-  onRemove?: () => Promise<UserProfileSaveResult>;
+  onChange?: (file: File) => Promise<SaveResult>;
+  onRemove?: () => Promise<SaveResult>;
 }
 
 export interface UserProfilePictureController {
@@ -23,7 +23,7 @@ export function useUserProfilePictureController({
   const [errorMessage, setErrorMessage] = useState<string>();
   const inFlight = useRef(false);
 
-  const run = async (action: () => Promise<UserProfileSaveResult>) => {
+  const run = async (action: () => Promise<SaveResult>) => {
     if (inFlight.current) {
       return;
     }

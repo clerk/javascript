@@ -1,14 +1,14 @@
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
-import type { UserProfileFormError, UserProfileSaveResult } from './user-profile-account-section.types';
-import { formErrorOf } from './user-profile-account-section.types';
+import type { FormError, SaveResult } from '../../../utils/save-result';
+import { formErrorOf } from '../../../utils/save-result';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
 
 export interface UserProfileEditUsernameContext {
-  saveUsername: (username: string) => Promise<UserProfileSaveResult<UserProfileEditUsernameField>>;
+  saveUsername: (username: string) => Promise<SaveResult<UserProfileEditUsernameField>>;
   savedUsername: string;
   username: string;
-  error: UserProfileFormError<UserProfileEditUsernameField> | undefined;
+  error: FormError<UserProfileEditUsernameField> | undefined;
 }
 
 export type UserProfileEditUsernameEvent =
@@ -27,7 +27,7 @@ function isSaveable(context: UserProfileEditUsernameContext): boolean {
   return context.username !== context.savedUsername && context.username !== '';
 }
 
-function toFormError(cause: unknown): UserProfileFormError<UserProfileEditUsernameField> {
+function toFormError(cause: unknown): FormError<UserProfileEditUsernameField> {
   if (cause instanceof Error) {
     return { message: cause.message };
   }
@@ -83,7 +83,7 @@ export const userProfileEditUsernameMachine = createMachine({
 
 export interface UserProfileEditUsernameControllerOptions {
   username?: string;
-  onSubmit: (username: string) => Promise<UserProfileSaveResult<UserProfileEditUsernameField>>;
+  onSubmit: (username: string) => Promise<SaveResult<UserProfileEditUsernameField>>;
 }
 
 export interface UserProfileEditUsernameController {
@@ -94,7 +94,7 @@ export interface UserProfileEditUsernameController {
   onSubmit: () => void;
   canSave: boolean;
   isSaving: boolean;
-  error: UserProfileFormError<UserProfileEditUsernameField> | undefined;
+  error: FormError<UserProfileEditUsernameField> | undefined;
 }
 
 export function useUserProfileEditUsernameController({

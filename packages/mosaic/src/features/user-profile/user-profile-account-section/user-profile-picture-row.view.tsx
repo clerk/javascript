@@ -8,7 +8,7 @@ import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
 import { FileUpload } from '../../../primitives/file-upload';
-import type { UserProfileSaveResult } from './user-profile-account-section.types';
+import type { SaveResult } from '../../../utils/save-result';
 import { useUserProfilePictureController } from './user-profile-picture.controller';
 
 const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
@@ -20,9 +20,9 @@ export interface UserProfilePictureRowViewProps {
   imageUrl?: string;
   hasImage?: boolean;
   errorMessage?: string;
-  onChange?: (file: File) => Promise<UserProfileSaveResult>;
+  onChange?: (file: File) => Promise<SaveResult>;
   onReject?: (rejections: FileRejection[]) => void;
-  onRemove?: () => Promise<UserProfileSaveResult>;
+  onRemove?: () => Promise<SaveResult>;
 }
 
 export function UserProfilePictureRowView({
