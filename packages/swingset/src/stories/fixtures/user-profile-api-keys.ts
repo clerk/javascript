@@ -79,7 +79,7 @@ export function useUserProfileAPIKeysFixture({
 }: {
   initialKeys?: FixtureAPIKey[];
   enableSorting?: boolean;
-} = {}): UserProfileApiKeysPanelViewProps & { createDialog: UserProfileCreateAPIKeyDialogProps } {
+} = {}): UserProfileApiKeysPanelViewProps {
   const [items, setItems] = useState(initialKeys);
   const [searchValue, setSearchValue] = useState('');
   const [query, setQuery] = useState('');

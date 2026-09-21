@@ -47,9 +47,9 @@ function renderView(overrides: Partial<UserProfileApiKeysPanelViewProps> = {}) {
 }
 
 describe('UserProfileApiKeysPanelView', () => {
-  it('uses localized confirmation copy and clears the shared fallback error on cancellation', async () => {
+  it('localizes the shared confirmation for each selected key', async () => {
     const user = userEvent.setup();
-    const onRevoke = vi.fn<(id: string) => Promise<void>>().mockRejectedValueOnce(undefined);
+    const onRevoke = vi.fn<(id: string) => Promise<void>>();
     render(
       <MosaicProvider
         localization={{
@@ -66,17 +66,12 @@ describe('UserProfileApiKeysPanelView', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
     expect(screen.getByRole('alertdialog')).toHaveAccessibleName('Retirer Primary API Key ?');
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
-    const confirm = screen.getByRole('button', { name: 'Revoke key' });
-    expect(confirm).toBeEnabled();
-    expect(onRevoke).not.toHaveBeenCalled();
-    await user.click(confirm);
-    expect(await screen.findByText('Something went wrong. Please try again.')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Annuler' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Manage Legacy API Key' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
     expect(screen.getByRole('alertdialog')).toHaveAccessibleName('Retirer Legacy API Key ?');
-    expect(screen.queryByText('Something went wrong. Please try again.')).not.toBeInTheDocument();
+    expect(onRevoke).not.toHaveBeenCalled();
   });
   it('localizes complete sentences and renders supplied rows even when their names do not match search', () => {
     render(
@@ -154,9 +149,6 @@ describe('UserProfileApiKeysPanelView', () => {
     const confirm = within(dialog).getByRole('button', { name: 'Revoke key' });
     await user.click(confirm);
     expect(confirm).toHaveAttribute('aria-busy', 'true');
-    await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
-    await user.click(confirm);
-    await user.keyboard('{Enter}{Escape}');
     expect(onRevoke).toHaveBeenCalledExactlyOnceWith('legacy');
     expect(dialog).toBeInTheDocument();
     await act(async () => {

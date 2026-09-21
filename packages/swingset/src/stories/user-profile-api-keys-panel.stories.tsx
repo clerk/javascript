@@ -1,5 +1,4 @@
 import { UserProfileApiKeysPanelView } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
-import { UserProfileCreateAPIKeyDialog } from '@clerk/mosaic/features/user-profile/user-profile-create-api-key.dialog';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -17,13 +16,8 @@ export const meta: StoryMeta = {
 };
 
 export function Default() {
-  const { createDialog, ...props } = useUserProfileAPIKeysFixture();
-  return (
-    <>
-      <UserProfileApiKeysPanelView {...props} />
-      <UserProfileCreateAPIKeyDialog {...createDialog} />
-    </>
-  );
+  const props = useUserProfileAPIKeysFixture();
+  return <UserProfileApiKeysPanelView {...props} />;
 }
 
 export function Empty() {
@@ -38,14 +32,11 @@ export function Empty() {
 }
 
 export function ProposedTable() {
-  const { createDialog, ...props } = useUserProfileAPIKeysFixture({ enableSorting: true });
+  const props = useUserProfileAPIKeysFixture({ enableSorting: true });
   return (
-    <>
-      <UserProfileApiKeysPanelView
-        {...props}
-        onBulkAction={() => undefined}
-      />
-      <UserProfileCreateAPIKeyDialog {...createDialog} />
-    </>
+    <UserProfileApiKeysPanelView
+      {...props}
+      onBulkAction={() => undefined}
+    />
   );
 }
