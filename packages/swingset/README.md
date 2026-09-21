@@ -8,18 +8,24 @@ Component explorer for the Mosaic design system. Runs at http://localhost:6006.
 pnpm dev --filter @clerk/swingset
 ```
 
+## Live Sandbox
+
+`/live` runs Mosaic flows against a real Clerk application. Copy `packages/swingset/.env.example` to `packages/swingset/.env.local`, set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, and restart Swingset. `CLERK_SECRET_KEY` is optional (needed for SSO / OAuth). `SWINGSET_DASHBOARD_URL` is optional (deep-links the application name on the overview).
+
+The component explorer works without these keys.
+
 ## Adding a component
 
 **1. Create a story file** — `src/stories/my-component.stories.tsx`
 
 ```tsx
 import type { StoryMeta } from '@/lib/types';
-import { MyComponent, type MyComponentProps } from '@clerk/ui/mosaic/components/my-component';
+import { MyComponent, type MyComponentProps } from '@clerk/mosaic/components/my-component';
 
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'My Component',
-  source: 'packages/ui/src/mosaic/components/my-component/my-component.tsx', // repo-root path → "View source" link
+  source: 'packages/mosaic/src/components/my-component/my-component.tsx', // repo-root path → "View source" link
   // Variant surface, declared by hand — knobs are generated from `_variants`
   styles: {
     _variants: { variant: { primary: {}, outline: {} }, size: { sm: {}, md: {} } },
@@ -79,7 +85,7 @@ const docModules = {
 };
 ```
 
-Also update the root redirect in `src/app/page.tsx` if this is now the first component.
+Also update the root redirect in `src/app/(explorer)/page.tsx` if this is now the first component.
 
 ## PropTable
 
@@ -97,7 +103,9 @@ Variant props (type and default) are derived from `meta.styles._variants` and `m
 
 ```
 src/
-  app/                 Next.js App Router
+  app/
+    (explorer)/        Component explorer (`/`, `/[group]/[component]`)
+    (clerk)/           Live Sandbox (`/live`, `/sign-in`, `/sign-up`)
   components/
     app-sidebar.tsx    Left nav (reads from registry)
     ClientRoot.tsx     SidebarProvider + breadcrumb header

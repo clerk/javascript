@@ -1,7 +1,7 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Field } from '@clerk/ui/mosaic/components/field';
-import { Input } from '@clerk/ui/mosaic/components/input';
-import { Select } from '@clerk/ui/mosaic/components/select';
+import { Button } from '@clerk/mosaic/components/button';
+import { Field } from '@clerk/mosaic/components/field';
+import { Input } from '@clerk/mosaic/components/input';
+import { Select } from '@clerk/mosaic/components/select';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -15,7 +15,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'Field',
-  source: 'packages/ui/src/mosaic/components/field/field.tsx',
+  source: 'packages/mosaic/src/components/field/field.tsx',
 };
 
 const styles = stylex.create({

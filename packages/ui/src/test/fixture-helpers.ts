@@ -1,3 +1,4 @@
+import { SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ClientJSON,
   DisplayConfigJSON,
@@ -16,7 +17,6 @@ import type {
   VerificationJSON,
 } from '@clerk/shared/types';
 
-import { SIGN_UP_MODES } from '@/core/constants';
 import type { OrgParams } from '@/test/core-fixtures';
 import { createUser, getOrganizationId } from '@/test/core-fixtures';
 
@@ -119,7 +119,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
   type SignInWithEnterpriseSSOParams = {
     identifier?: string;
     enterpriseConnections?: Array<{ id: string; name: string }>;
-    supportSSOFallback?: boolean;
+    supportSSOBypass?: boolean;
   };
 
   type SignInFactorTwoParams = {
@@ -165,7 +165,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
   };
 
   const startSignInWithEnterpriseSSO = (params?: SignInWithEnterpriseSSOParams) => {
-    const { identifier = 'hello@clerk.com', enterpriseConnections, supportSSOFallback } = params || {};
+    const { identifier = 'hello@clerk.com', enterpriseConnections, supportSSOBypass } = params || {};
     baseClient.sign_in = {
       status: 'needs_first_factor',
       identifier,
@@ -177,8 +177,8 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
             enterprise_connection_name: name,
           }))
         : [{ strategy: 'enterprise_sso' }],
-      ...(supportSSOFallback && {
-        sso_fallback_first_factors: [
+      ...(supportSSOBypass && {
+        sso_bypass_first_factors: [
           { strategy: 'email_code', safe_identifier: identifier, email_address_id: 'idn_hmac' },
         ],
       }),

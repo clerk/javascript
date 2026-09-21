@@ -11,7 +11,6 @@
   "author": "Clerk",
   "sideEffects": [
     "./src/utils/setWebpackChunkPublicPath.ts",
-    "./dist-mosaic/styles.css",
     "./register/*"
   ],
   "type": "module",
@@ -57,10 +56,6 @@
       "default": "./dist/experimental/index.js"
     },
     "./themes/shadcn.css": "./dist/themes/shadcn.css",
-    "./styles.css": {
-      "types": "./styles.css.d.ts",
-      "default": "./dist-mosaic/styles.css"
-    },
     "./register": {
       "import": {
         "types": "./register/index.d.ts",
@@ -76,15 +71,14 @@
   "types": "dist/index.d.ts",
   "files": [
     "dist",
-    "dist-mosaic",
-    "styles.css.d.ts",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map",
     "register"
   ],
   "scripts": {
-    "build": "pnpm build:umd && pnpm build:esm && pnpm build:mosaic && pnpm check:no-rhc && pnpm type-check",
+    "build": "pnpm build:umd && pnpm build:esm && pnpm check:no-rhc && pnpm type-check",
     "build:analyze": "rspack build --config rspack.config.js --env production --env analyze",
     "build:esm": "tsdown",
-    "build:mosaic": "tsdown --config tsdown.mosaic.config.mts",
     "build:rsdoctor": "RSDOCTOR=true rspack build --config rspack.config.js --env production",
     "build:umd": "rspack build --config rspack.config.js --env production",
     "bundlewatch": "FORCE_COLOR=1 bundlewatch --config bundlewatch.config.json",
@@ -100,11 +94,11 @@
     "lint": "eslint src",
     "lint:attw": "attw --pack . --exclude-entrypoints themes/shadcn.css --profile esm-only",
     "lint:publint": "publint",
-    "showerrors": "tsc",
+    "showerrors": "tsc -p tsconfig.src.json",
     "test": "vitest run",
     "test:ci": "vitest run --maxWorkers=70%",
     "test:coverage": "vitest --collectCoverage && open coverage/lcov-report/index.html",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit -p tsconfig.src.json"
   },
   "dependencies": {
     "@clerk/localizations": "workspace:^",
@@ -116,7 +110,6 @@
     "@solana/wallet-adapter-base": "catalog:module-manager",
     "@solana/wallet-adapter-react": "catalog:module-manager",
     "@solana/wallet-standard": "catalog:module-manager",
-    "@stylexjs/stylex": "0.19.0",
     "@swc/helpers": "catalog:repo",
     "copy-to-clipboard": "3.3.3",
     "core-js": "catalog:repo",
@@ -126,16 +119,12 @@
     "qrcode.react": "4.2.0"
   },
   "devDependencies": {
-    "@clerk/headless": "workspace:^",
     "@floating-ui/react-dom": "^2.1.8",
     "@rsdoctor/rspack-plugin": "^1.5.9",
     "@rspack/cli": "catalog:rspack",
     "@rspack/core": "catalog:rspack",
     "@rspack/dev-server": "catalog:rspack",
     "@rspack/plugin-react-refresh": "catalog:rspack",
-    "@stylexjs/eslint-plugin": "0.19.0",
-    "@stylexjs/rollup-plugin": "0.19.0",
-    "@stylexjs/unplugin": "0.19.0",
     "@svgr/rollup": "^8.1.0",
     "@svgr/webpack": "^6.5.1",
     "@types/webpack-env": "^1.18.8",

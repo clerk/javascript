@@ -2,7 +2,7 @@
 
 This file provides guidance to Coding Agents when working with code in this repository.
 
-`@clerk/swingset` is a private (unpublished) component explorer — a Storybook-like app — for the **Mosaic** design system that lives in `@clerk/ui`. It is a Next.js App Router app that renders Mosaic components interactively with live knobs and design-token overrides.
+`@clerk/swingset` is a private (unpublished) component explorer — a Storybook-like app — for the **Mosaic** design system that lives in `@clerk/mosaic`. It is a Next.js App Router app that renders Mosaic components interactively with live knobs and design-token overrides.
 
 ## Commands
 
@@ -20,18 +20,19 @@ There are no tests or lint scripts in this package, yet.
 
 These require reading several files together; the `README.md` covers the step-by-step "add a component" workflow.
 
-- **Consumes Mosaic from source, not build.** `@clerk/ui/mosaic` is aliased to `../ui/src/mosaic` in *two* places that must stay in sync: `next.config.mjs` (webpack `resolve.alias`) and `tsconfig.json` (`paths`). Editing Mosaic source in `packages/ui` reflects live in swingset's dev server — no rebuild of `@clerk/ui` needed.
+- **Consumes Mosaic from source, not build.** `@clerk/mosaic` is aliased to `../mosaic/src` in *two* places that must stay in sync: `next.config.mjs` (webpack `resolve.alias`) and `tsconfig.json` (`paths`). Editing Mosaic source in `packages/mosaic` reflects live in swingset's dev server — no rebuild of `@clerk/mosaic` needed.
 
 - **Knobs are generated from a story's declared variant surface.** A story's `meta.styles` is a hand-written `{ _variants, _defaultVariants }` object describing the component's variant props — StyleX compiles its styles away, so there is no runtime recipe to derive this from. `lib/generateKnobs.ts` turns each variant into a control: variants whose keys are only `true`/`false` become boolean toggles, everything else becomes a select. Knob values are passed as props straight into the story component. This is why story functions take `Record<string, unknown>` and cast to the real prop type.
 
-- **`lib/registry.ts` is the single source of truth for which components exist**, and they are imported *explicitly* (never `import *`) so sidebar order is deterministic. `getSidebarGroups`, `getModuleBySlug`, and slugging (`lib/slug.ts`, from `meta.title`) read from it. Adding a component touches up to three wiring points: `registry.ts` (sidebar entry + per-page playground lookup), `DocsViewer.tsx`'s `docModules` map (MDX docs), and the hardcoded redirect in `app/page.tsx`.
+- **`lib/registry.ts` is the single source of truth for which components exist**, and they are imported *explicitly* (never `import *`) so sidebar order is deterministic. `getSidebarGroups`, `getModuleBySlug`, and slugging (`lib/slug.ts`, from `meta.title`) read from it. Adding a component touches up to three wiring points: `registry.ts` (sidebar entry + per-page playground lookup), `DocsViewer.tsx`'s `docModules` map (MDX docs), and the hardcoded redirect in `app/(explorer)/page.tsx`.
   - ⚠️ **Add each new import and its first usage in the same edit.** The on-save lint-fix (`unused-imports/no-unused-imports` is an `error`) deletes any import that isn't referenced yet, so importing a story export in `registry.ts` (or a component in a `*.stories.tsx`) *before* the code that uses it silently drops the import and you get `X is not defined` at runtime. After wiring, `grep` the new symbol to confirm both the import and its use survived. (Repo-wide footgun; see `clerk-monorepo` skill `references/setup-and-footguns.md`.)
 
-- **Routing.** Each component is a single page: `/components/[component]` renders its MDX overview via `DocsViewer`. There are no per-story sub-pages — the interactive playground lives *inside* the overview. `app/page.tsx` is a static redirect (currently to `/components/button`) because `registry.ts` eagerly imports story modules (client components / `createContext`), so registry-derived data can't be computed in a Server Component. `DocsViewer` also renders a "View source" link (`ViewSource.tsx`) from `meta.source` — a repo-root-relative path turned into a GitHub URL by `lib/source.ts`.
+- **Routing.** Route groups split the app: `(explorer)` is the component playground, `(clerk)` is the Live Sandbox (`/live`, `/sign-in`, `/sign-up`) and needs keys from `packages/swingset/.env.local`. Each component is a single page: `/components/[component]` renders its MDX overview via `DocsViewer`. There are no per-story sub-pages — the interactive playground lives *inside* the overview. `app/(explorer)/page.tsx` is a static redirect (currently to `/components/button`) because `registry.ts` eagerly imports story modules (client components / `createContext`), so registry-derived data can't be computed in a Server Component. `DocsViewer` also renders a "View source" link (`ViewSource.tsx`) from `meta.source` — a repo-root-relative path turned into a GitHub URL by `lib/source.ts`.
 
 - **Shared playground state.** `DocsViewer` wraps each overview in a `PlaygroundProvider` (`PlaygroundContext.tsx`), keyed by slug and seeded from the component's `meta` via `getModuleBySlug`. It owns the knob values (props). The `<Preview>` and the interactive `<PropTable>` both read/write this single context, so editing a prop in the table updates the preview above it.
 
 - **Every story renders inside `MosaicProvider`.** `StoryPreview` (the MDX `<Preview>`) renders a named story with the playground's knob values as props and exposes a Reset button. `StoryEmbed` (the MDX `<Story>`) renders a single static variation with default knob values and no controls.
+  - The header's **RTL** switch (`DirectionToggle`, state in `DirectionProvider`) sets `dir` on `<html>`. It has to sit that high because popover and menu popups portal to `<body>`, so a `dir` on the preview container would never reach them; swingset's own chrome flips along with the story.
 
 - **The prop table is the knob surface.** `PropTable` (MDX `<PropTable>`) derives rows from `meta.styles._variants`/`_defaultVariants`, then appends the `className` + `style` escape-hatch rows every Mosaic component accepts. Each variant row renders a `KnobControl` in its **Value** column, seeded with the prop's default and bound to the playground context. The escape-hatch rows and `extra` stay static.
 
@@ -40,7 +41,7 @@ These require reading several files together; the `README.md` covers the step-by
 - **`<Story>` examples can show their source in a collapsible code footer.** When a story module exposes its own source as `__source` — via a `?raw` self-import (`export { default as __source } from './x.stories?raw'`) — `StoryEmbed` runs `extractStorySource` (`lib/extractStorySource.ts`) to pull the *previewed story function's* source out of that raw text, then `toUsageSnippet` (`lib/exampleSnippet.ts`) to reduce that knob harness to a clean usage snippet (unwraps `export function …() { return (…) }` down to the returned JSX and strips the `{...knobsAsProps(props)}` / `{...props}` knob plumbing), and renders a `CodeFooter` (`CodeFooter.tsx`): a "View code" toggle that's collapsed by default and reveals the snippet with a height animation (Base UI's `--collapsible-panel-height` + `data-starting/ending-style`). It's **opt-in per module** — only modules that export `__source` get a footer, and it's keyed to whichever story `name` the `<Story>` renders, so each example shows its own code. Shiki highlighting is shared with the `<pre>`/`CodeBlock` path through the `useShikiHtml` hook. A `<Story>` can carry both a code footer and a `composition` footer; they stack under the preview.
   - The `?raw` query is wired in `next.config.mjs`: an `asset/source` rule handles `?raw` imports, and — crucially — a recursive `excludeRawQuery` pass adds `resourceQuery: { not: [/raw/] }` to every *other* loader so Next's SWC loader doesn't compile the file first (otherwise `__source` would contain `_jsxDEV(…)` output instead of the authored source).
 
-- **Two component layers.** `src/components/ui/*` are shadcn/ui primitives (`components.json`, `base-nova` style, neutral base) used for swingset's *own* chrome (sidebar, tabs, inputs). The components being *documented* come from `@clerk/ui/mosaic`. Don't confuse the two.
+- **Two component layers.** `src/components/ui/*` are shadcn/ui primitives (`components.json`, `base-nova` style, neutral base) used for swingset's *own* chrome (sidebar, tabs, inputs). The components being *documented* come from `@clerk/mosaic`. Don't confuse the two.
 
 ## Documenting Mosaic components
 
@@ -55,7 +56,7 @@ Pick the archetype below by the component's **layer** (its `meta.group`), then f
 
 ### Layers
 
-`meta.group` places an entry in one of these layers. Group order follows first appearance in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `User Profile`, and `Reverification` render in registry order. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
+`meta.group` places an entry in one of these layers. Group order follows first appearance in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `User Profile`, `Reverification`, and `Localization` render in registry order. Within a group, an optional `meta.navigation.category` sub-groups entries under a small collapsible subheading (e.g. `User Profile` splits into `Panels` and `Sections`), collapsed by default unless it contains the active page; category order also follows first appearance in the registry, and uncategorized entries render with no subheading (list them before the categorized ones). Use these exact group strings:
 
 | Group        | What lives here                                                | Archetype |
 | ------------ | -------------------------------------------------------------- | --------- |
@@ -65,6 +66,7 @@ Pick the archetype below by the component's **layer** (its `meta.group`), then f
 | `Primitives` | Headless `@clerk/headless` primitives (`Accordion`)            | B         |
 | `Styles`     | Atomic styles that ship as StyleX atoms, not components (`Scroll Area`) | B (adapted) |
 | `Hooks`      | Headless hooks (`useDataTable`)                                | B (adapted) |
+| `Localization` | The `localization` prop on `MosaicProvider`: catalogs, overrides, locale, and the message helpers | B (adapted) |
 
 `User Button` / `User Profile` → `Components` → `Primitives` runs high-level-composition → low-level-primitive. Composed layers are documented as compositions of lower layers (archetype C); leaf layers (Components, Primitives) get full prop/knob docs (archetypes A and B).
 
@@ -85,7 +87,7 @@ export const meta: StoryMeta = {
   title: 'Button', // drives slug + the page <h1>
   label: 'Delete Org', // optional friendlier sidebar text
   status: 'stable', // maturity dot in sidebar + page badge; omit to show no status
-  source: 'packages/ui/src/mosaic/components/button/button.tsx', // repo-root path → "View source"
+  source: 'packages/mosaic/src/components/button/button.tsx', // repo-root path → "View source"
   styles: {
     // Hand-written variant surface — archetype A · simple only
     _variants: { variant: { primary: {}, outline: {} }, size: { sm: {}, md: {} } },
@@ -142,7 +144,7 @@ import * as ButtonStories from './button.stories';
 
 <Usage
   component='Button'
-  module='@clerk/ui/mosaic/components/button'
+  module='@clerk/mosaic/components/button'
 >
   Click me
 </Usage>
@@ -283,5 +285,5 @@ import * as UserButtonStories from './user-button.stories';
 - [ ] `Components`-layer story files export `__source` (the `?raw` self-import) so every `<Story>` example gets a "View code" footer.
 - [ ] MDX sections match the archetype's required order exactly.
 - [ ] Every props-table row states its default in the **Default** column (auto `<PropTable>` fills it from `meta.styles._defaultVariants`; `—` / `(required)` when none).
-- [ ] Wiring done per `README.md`: `registry.ts`, `DocsViewer.tsx`'s `docModules`, and the `app/page.tsx` redirect if this is now the first component.
+- [ ] Wiring done per `README.md`: `registry.ts`, `DocsViewer.tsx`'s `docModules`, and the `app/(explorer)/page.tsx` redirect if this is now the first component.
 - [ ] `pnpm format --filter @clerk/swingset` is clean.

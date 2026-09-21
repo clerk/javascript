@@ -25,9 +25,9 @@ import * as DialogStories from './dialog.component.stories';
 ## Usage
 
 ```tsx
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Card } from '@clerk/ui/mosaic/components/card';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import { Dialog } from '@clerk/mosaic/components/dialog';
 
 <Dialog.Root>
   <Dialog.Trigger render={<Button />}>Open dialog</Dialog.Trigger>
@@ -87,9 +87,9 @@ A popup with no surface inside renders an unpainted box.
 A `profile` composes the same way, with the user page in place of the card.
 
 ```tsx
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
-import { UserProfileView } from '@clerk/ui/mosaic/features/user-profile/user-profile.view';
+import { Button } from '@clerk/mosaic/components/button';
+import { Dialog } from '@clerk/mosaic/components/dialog';
+import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
 
 <Dialog.Root>
   <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
@@ -220,10 +220,10 @@ The name, the description and the button row come from the surface — `Card.Tit
 
 ## Styling
 
-Override by targeting the `.cl-*` slot from a layer that wins over `@clerk/ui/styles.css`:
+Override by targeting the `.cl-*` slot from a layer that wins over `@clerk/mosaic/styles.css`:
 
 ```css
-@import '@clerk/ui/styles.css' layer(components);
+@import '@clerk/mosaic/styles.css' layer(components);
 
 @layer overrides {
   .cl-dialog-popup[data-variant='profile'] {

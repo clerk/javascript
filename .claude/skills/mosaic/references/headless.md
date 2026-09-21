@@ -7,9 +7,9 @@ styles** — positioning, keyboard nav, focus management, dismiss, and ARIA are
 delegated to `@floating-ui/react`; all appearance is applied externally via
 `data-*` selectors and consumer classNames.
 
-The package is `private: true` and consumed by `@clerk/ui`. It's a separate
-package because `@clerk/ui` sets `jsxImportSource: '@emotion/react'`, which
-conflicts with the standard `react-jsx` transform these primitives need.
+The package is `private: true` and consumed by `@clerk/mosaic`. It is planned
+to later move into the Mosaic package. Mosaic currently bundles Headless into
+its published artifact.
 
 ## Read this for the _what_
 

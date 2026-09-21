@@ -1,0 +1,251 @@
+import { act, render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
+import { describe, expect, it, vi } from 'vitest';
+
+import { MosaicProvider } from '../../../MosaicProvider';
+import type { UserProfilePasskey, UserProfilePasskeysSectionViewProps } from '../user-profile-passkeys-section.view';
+import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
+
+const passkeys: UserProfilePasskey[] = [
+  { id: 'laptop', name: 'MacBook' },
+  { id: 'phone', name: 'iPhone' },
+];
+
+function renderView(overrides: Partial<UserProfilePasskeysSectionViewProps> = {}) {
+  const props: UserProfilePasskeysSectionViewProps = {
+    passkeys,
+    onAdd: vi.fn(),
+    onRename: vi.fn(),
+    onRemove: vi.fn(),
+    ...overrides,
+  };
+  return render(
+    <MosaicProvider>
+      <UserProfilePasskeysSectionView {...props} />
+    </MosaicProvider>,
+  );
+}
+
+describe('passkeys section', () => {
+  it('shows existing passkeys without actions when their callbacks are unavailable', () => {
+    renderView({ onAdd: undefined, onRename: undefined, onRemove: undefined, sectionTitle: 'Authentication' });
+
+    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
+    expect(screen.getByText('Passkeys')).toBeVisible();
+    expect(screen.getByText('MacBook')).toBeVisible();
+    expect(screen.getByText('iPhone')).toBeVisible();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('confirms the selected passkey and returns focus on cancellation', async () => {
+    const user = userEvent.setup();
+    const onRemove = vi.fn();
+    render(
+      <MosaicProvider>
+        <UserProfilePasskeysSectionView
+          passkeys={passkeys}
+          onRemove={onRemove}
+        />
+      </MosaicProvider>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Manage MacBook' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription('MacBook will be removed from this account.');
+    expect(onRemove).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(screen.getByRole('button', { name: 'Manage MacBook' })).toHaveFocus();
+
+    await user.click(screen.getByRole('button', { name: 'Manage iPhone' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    const dialog = screen.getByRole('alertdialog');
+    expect(dialog).toHaveAccessibleDescription('iPhone will be removed from this account.');
+    await user.click(within(dialog).getByRole('button', { name: 'Remove', exact: true }));
+    expect(onRemove).toHaveBeenCalledExactlyOnceWith('phone');
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  });
+  it.each([
+    ['MacBook', 'iPhone'],
+    ['iPhone', 'MacBook'],
+  ])('returns focus from removed %s to remaining %s', async (removed, remaining) => {
+    const user = userEvent.setup();
+    function Example() {
+      const [items, setItems] = useState(passkeys);
+      return (
+        <MosaicProvider>
+          <UserProfilePasskeysSectionView
+            passkeys={items}
+            onRemove={id => setItems(current => current.filter(item => item.id !== id))}
+          />
+        </MosaicProvider>
+      );
+    }
+    render(<Example />);
+    await user.click(screen.getByRole('button', { name: `Manage ${removed}` }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
+    await waitFor(() => expect(screen.getByRole('button', { name: `Manage ${remaining}` })).toHaveFocus());
+  });
+
+  it('renames through a prefilled form, preserves the draft after failure, and retries', async () => {
+    const user = userEvent.setup();
+    const onRename = vi.fn().mockRejectedValueOnce(new Error('Try again')).mockResolvedValueOnce(undefined);
+    render(
+      <MosaicProvider>
+        <UserProfilePasskeysSectionView
+          passkeys={passkeys}
+          onRename={onRename}
+        />
+      </MosaicProvider>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Manage MacBook' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
+    const input = screen.getByRole('textbox', { name: 'Passkey name' });
+    expect(input).toHaveValue('MacBook');
+    await waitFor(() => expect(input).toHaveFocus());
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('aria-disabled', 'true');
+    await user.clear(input);
+    await user.type(input, 'Work laptop');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Try again');
+    expect(input).toHaveValue('Work laptop');
+    await user.type(input, ' updated');
+    expect(screen.getByRole('alert')).toHaveTextContent('Try again');
+    expect(input).toHaveValue('Work laptop updated');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    expect(onRename).toHaveBeenLastCalledWith('laptop', 'Work laptop updated');
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('keeps an empty section visible when Add is unavailable', () => {
+    renderView({ passkeys: [], onAdd: undefined, sectionTitle: 'Authentication' });
+
+    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
+    expect(screen.getByText('Passkeys')).toBeVisible();
+    expect(screen.getByText('No passkeys added')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
+  });
+
+  it('keeps Add available with an empty list and creation error', async () => {
+    const user = userEvent.setup();
+    const onAdd = vi.fn();
+    renderView({ passkeys: [], onAdd, addError: 'Could not create passkey' });
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Could not create passkey');
+    expect(screen.getByRole('alert')).toHaveAttribute('data-open');
+    expect(screen.getByRole('alert')).toHaveAttribute('data-starting-style');
+    const addButton = screen.getByRole('button', { name: 'Add passkey' });
+    expect(addButton).toHaveTextContent(/^Add$/);
+    await user.click(addButton);
+    expect(onAdd).toHaveBeenCalledOnce();
+  });
+
+  it.each([true, false])('restores focus after removing the final passkey with Add available: %s', async hasAdd => {
+    const user = userEvent.setup();
+    let finish = () => {};
+    const pending = new Promise<void>(resolve => {
+      finish = resolve;
+    });
+    function Example() {
+      const [items, setItems] = useState([passkeys[0]]);
+      return (
+        <MosaicProvider>
+          <UserProfilePasskeysSectionView
+            passkeys={items}
+            onAdd={hasAdd ? () => setItems([passkeys[0]]) : undefined}
+            onRemove={async () => {
+              await pending;
+              setItems([]);
+            }}
+          />
+        </MosaicProvider>
+      );
+    }
+    render(<Example />);
+    await user.click(screen.getByRole('button', { name: 'Manage MacBook' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
+    expect(screen.getByRole('button', { name: 'Remove', exact: true })).toHaveAttribute('aria-busy', 'true');
+    await act(async () => {
+      finish();
+      await pending;
+    });
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(screen.queryByText('MacBook')).not.toBeInTheDocument();
+    if (hasAdd) {
+      expect(screen.getByRole('button', { name: 'Add passkey' })).toHaveFocus();
+      await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+      expect(screen.getByText('MacBook')).toBeVisible();
+    } else {
+      expect(screen.getByRole('region', { name: 'Passkeys' })).toHaveFocus();
+    }
+  });
+
+  it('retries removal for the same passkey after a failure', async () => {
+    const user = userEvent.setup();
+    const onRemove = vi.fn().mockRejectedValueOnce(new Error('Removal failed')).mockResolvedValueOnce(undefined);
+    render(
+      <MosaicProvider>
+        <UserProfilePasskeysSectionView
+          passkeys={passkeys}
+          onRemove={onRemove}
+        />
+      </MosaicProvider>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Manage iPhone' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Removal failed');
+    await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
+    expect(onRemove.mock.calls).toEqual([['phone'], ['phone']]);
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  });
+  it('preserves literal passkey names in menu labels and removal copy', async () => {
+    const user = userEvent.setup();
+    render(
+      <MosaicProvider>
+        <UserProfilePasskeysSectionView
+          passkeys={[{ id: 'special', name: '$& laptop' }]}
+          onRemove={vi.fn()}
+        />
+      </MosaicProvider>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Manage $& laptop' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleDescription('$& laptop will be removed from this account.');
+  });
+
+  it('keeps rename pending until saving finishes', async () => {
+    const user = userEvent.setup();
+    let finish = () => {};
+    const onRename = vi.fn(
+      () =>
+        new Promise<void>(resolve => {
+          finish = resolve;
+        }),
+    );
+    render(
+      <MosaicProvider>
+        <UserProfilePasskeysSectionView
+          passkeys={passkeys}
+          onRename={onRename}
+        />
+      </MosaicProvider>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Manage MacBook' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
+    const input = screen.getByRole('textbox', { name: 'Passkey name' });
+    await user.clear(input);
+    await user.type(input, 'Work laptop');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    expect(input).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Save' })).toHaveAttribute('aria-busy', 'true');
+    await user.keyboard('{Escape}');
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    await act(() => finish());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(onRename).toHaveBeenCalledExactlyOnceWith('laptop', 'Work laptop');
+  });
+});

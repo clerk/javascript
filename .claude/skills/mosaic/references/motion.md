@@ -1,6 +1,6 @@
-# Motion: entrances and exits
+# Motion: entrances, exits, and pulses
 
-Token semantics live in `packages/ui/src/mosaic/tokens.stylex.ts`, above
+Token semantics live in `packages/mosaic/src/tokens.stylex.ts`, above
 `durationDefaults` / `easingDefaults` — read those comments first. This file is the
 how-to layer: the rules that decide a transition's shape, and how to check one
 rather than eyeball it.
@@ -15,6 +15,7 @@ rather than eyeball it.
 | `--cl-ease-default`     | `cubic-bezier(0.175, 0.885, 0.32, 1.1)` | things ARRIVING (Swift Out)      |
 | `--cl-ease-enter`       | `cubic-bezier(0, 0, 0.2, 1)`            | arrivals that must not overshoot |
 | `--cl-ease-exit`        | `cubic-bezier(0.55, 0.085, 0.68, 0.53)` | things LEAVING (In Quad)         |
+| `--cl-ease-pulse`       | `cubic-bezier(0.4, 0, 0.6, 1)`          | repeating opacity pulses         |
 
 Named curves come from [easing.dev](https://www.easing.dev) (Lochie Axon's Easing
 Graphs). Take one from there rather than inventing a bezier, so the catalog stays
@@ -47,9 +48,16 @@ So the axis is not the element's type but the size of its overshoot. Work out wh
 2% of the travel actually is; once it is enough pixels to notice as a bounce, take
 `--cl-ease-enter`, which decelerates the same way without the pass-through.
 
-Opacity is the degenerate case and always takes `--cl-ease-enter`: there is nothing
+For entrances, opacity takes `--cl-ease-enter`: there is nothing
 past `1` to overshoot into, so the pass is clamped away and only its cost — the
 slower approach to full opacity — is left.
+
+## Repeating pulses
+
+Use `--cl-ease-pulse` for repeating opacity fades such as loading skeletons. Its
+symmetric curve slows at both ends of each fade, keeping the reversal smooth.
+Keep the pulse duration on the component and disable the animation under
+`prefers-reduced-motion: reduce`.
 
 ## A curve has a direction — don't run the entrance curve backwards
 
