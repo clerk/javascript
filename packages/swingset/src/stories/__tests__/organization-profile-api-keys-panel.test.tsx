@@ -11,7 +11,7 @@ import {
   revokeExampleAPIKey,
   useOrganizationProfileAPIKeysFixture,
 } from '../fixtures/organization-profile-api-keys';
-import { Default, Empty } from '../organization-profile-api-keys-panel.stories';
+import { Default, Empty, ProposedTable } from '../organization-profile-api-keys-panel.stories';
 
 function Retry() {
   const m = useMessages('organizationProfileApiKeysPanel');
@@ -254,6 +254,54 @@ describe('organization API keys playground', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(copy).toHaveBeenCalledTimes(2);
     expect(screen.getByText(`Expires ${expirationLabel}`)).toBeVisible();
+  });
+
+  it('sorts the proposed table across pages and clears selection when sorting changes', async () => {
+    const user = userEvent.setup();
+    render(
+      <MosaicProvider>
+        <ProposedTable />
+      </MosaicProvider>,
+    );
+    const names = () =>
+      screen
+        .getAllByRole('checkbox')
+        .slice(1)
+        .map(row => row.getAttribute('aria-label'));
+    await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Select Staging' }));
+    expect(screen.getByRole('checkbox', { name: 'Select Staging' })).toBeChecked();
+    expect(screen.getByRole('checkbox', { name: 'Select all API keys' })).toBePartiallyChecked();
+    await user.click(screen.getByRole('checkbox', { name: 'Select all API keys' }));
+    expect(screen.getByRole('checkbox', { name: 'Select all API keys' })).toBeChecked();
+    expect(screen.getByRole('checkbox', { name: 'Select Local development' })).toBeChecked();
+    await user.click(screen.getByRole('button', { name: 'Name' }));
+    expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveAttribute('aria-sort', 'ascending');
+    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
+    expect(names()[0]).toBe('Select Analytics');
+    expect(screen.getByRole('checkbox', { name: 'Select all API keys' })).not.toBeChecked();
+    await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
+    expect(names()).toEqual(['Select Support tools', 'Select Web app']);
+    await user.click(screen.getByRole('button', { name: 'Name' }));
+    expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveAttribute('aria-sort', 'descending');
+    expect(names()[0]).toBe('Select Web app');
+    await user.click(screen.getByRole('button', { name: 'Name' }));
+    expect(screen.getByRole('columnheader', { name: 'Name' })).not.toHaveAttribute('aria-sort');
+    expect(names().slice(0, 2)).toEqual(['Select Web app', 'Select Mobile app']);
+    await user.click(screen.getByRole('button', { name: 'Last used' }));
+    expect(names().slice(0, 4)).toEqual(['Select Backups', 'Select Reports', 'Select Analytics', 'Select Web app']);
+    expect(screen.getByRole('cell', { name: '11 minutes ago' })).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Last used' }));
+    expect(names().slice(0, 4)).toEqual(['Select Web app', 'Select Analytics', 'Select Reports', 'Select Backups']);
+    expect(screen.getByRole('columnheader', { name: 'Last used' })).toHaveAttribute('aria-sort', 'descending');
+    expect(screen.getByRole('columnheader', { name: 'Name' })).not.toHaveAttribute('aria-sort');
+    await user.click(screen.getByRole('button', { name: 'Date created' }));
+    expect(screen.getByRole('columnheader', { name: 'Date created' })).toHaveAttribute('aria-sort', 'ascending');
+    expect(names().slice(0, 2)).toEqual(['Select Web app', 'Select Mobile app']);
+    await user.click(screen.getByRole('button', { name: 'Date created' }));
+    expect(screen.getByRole('columnheader', { name: 'Date created' })).toHaveAttribute('aria-sort', 'descending');
+    expect(names().slice(0, 2)).toEqual(['Select Local development', 'Select Staging']);
+    expect(screen.getByRole('cell', { name: 'Jan 16, 2026' })).toBeVisible();
   });
 
   it('corrects the page after its last result is removed', async () => {

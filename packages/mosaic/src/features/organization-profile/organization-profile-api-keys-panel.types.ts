@@ -10,6 +10,11 @@ export interface OrganizationProfileAPIKey {
   lastUsedAtLabel: string | null;
 }
 
+export interface OrganizationProfileAPIKeySort {
+  column: 'name' | 'createdAt' | 'lastUsed';
+  direction: 'ascending' | 'descending';
+}
+
 export interface OrganizationProfileApiKeysPanelViewProps {
   apiKeys: OrganizationProfileAPIKey[];
   totalCount: number;
@@ -24,4 +29,7 @@ export interface OrganizationProfileApiKeysPanelViewProps {
   onCreate?: MouseEventHandler<HTMLButtonElement>;
   createDialog?: OrganizationProfileCreateAPIKeyDialogProps;
   onRevoke?: (id: string) => Promise<void>;
+  onBulkAction?: (ids: string[]) => void;
+  sort?: OrganizationProfileAPIKeySort | null;
+  onSortChange?: (sort: OrganizationProfileAPIKeySort | null) => void;
 }

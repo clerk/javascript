@@ -10,6 +10,7 @@ import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
 import { Profile } from '../../components/profile';
 import { Spinner } from '../../components/spinner';
+import type { TableHeaderCellProps } from '../../components/table';
 import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
@@ -21,6 +22,7 @@ import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 import { styles } from './organization-profile-api-keys-panel.styles';
 import type {
   OrganizationProfileAPIKey,
+  OrganizationProfileAPIKeySort,
   OrganizationProfileApiKeysPanelViewProps,
 } from './organization-profile-api-keys-panel.types';
 import { OrganizationProfileCreateAPIKeyDialog } from './organization-profile-create-api-key.dialog';
@@ -39,6 +41,9 @@ export function OrganizationProfileApiKeysPanelView({
   onCreate,
   createDialog,
   onRevoke,
+  onBulkAction,
+  sort,
+  onSortChange,
   isLoading,
   isFetching = false,
 }: OrganizationProfileApiKeysPanelViewProps) {
@@ -56,9 +61,23 @@ export function OrganizationProfileApiKeysPanelView({
     data: apiKeys,
     totalCount,
     getRowId,
+    sorting: sort ? [{ id: sort.column, desc: sort.direction === 'descending' }] : [],
+    onSortingChange: onSortChange
+      ? update => {
+          const next = typeof update === 'function' ? update(table.sorting) : update;
+          const active = next[0];
+          table.setRowSelection({});
+          onSortChange(
+            active && (active.id === 'name' || active.id === 'createdAt' || active.id === 'lastUsed')
+              ? { column: active.id, direction: active.desc ? 'descending' : 'ascending' }
+              : null,
+          );
+        }
+      : undefined,
     pagination,
     onPaginationChange: update => {
       const next = typeof update === 'function' ? update(pagination) : update;
+      table.setRowSelection({});
       if (next.pageSize !== pageSize) {
         onPageSizeChange?.(next.pageSize);
       }
@@ -66,10 +85,29 @@ export function OrganizationProfileApiKeysPanelView({
     },
     globalFilter: searchValue,
     onGlobalFilterChange: update => {
+      table.setRowSelection({});
       onSearchChange(typeof update === 'function' ? update(searchValue) : update);
     },
   });
-  const columnCount = 3 + Number(Boolean(onRevoke));
+  const sortHeader = (
+    column: OrganizationProfileAPIKeySort['column'],
+  ): Pick<TableHeaderCellProps, 'sort' | 'onSort'> => {
+    const active = table.sorting[0];
+    return {
+      sort: active?.id === column ? (active.desc ? 'descending' : 'ascending') : 'none',
+      onSort: onSortChange
+        ? () =>
+            table.setSorting(current => {
+              const active = current[0];
+              if (active?.id !== column) {
+                return [{ id: column, desc: false }];
+              }
+              return active.desc ? [] : [{ id: column, desc: true }];
+            })
+        : undefined,
+    };
+  };
+  const columnCount = 3 + Number(Boolean(onRevoke)) + Number(Boolean(onBulkAction));
   const query = searchValue.trim();
   const emptyState = query
     ? { label: m.empty, description: fill(m.emptyDescription, { query }) }
@@ -124,9 +162,17 @@ export function OrganizationProfileApiKeysPanelView({
         >
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>{m.name}</Table.HeaderCell>
-              <Table.HeaderCell>{m.createdAt}</Table.HeaderCell>
-              <Table.HeaderCell>{m.lastUsed}</Table.HeaderCell>
+              {onBulkAction ? (
+                <Table.SelectAllCell
+                  aria-label={m.selectAll}
+                  checked={table.getIsAllRowsSelected()}
+                  indeterminate={table.getIsSomeRowsSelected()}
+                  onChange={table.toggleAllRowsSelected}
+                />
+              ) : null}
+              <Table.HeaderCell {...sortHeader('name')}>{m.name}</Table.HeaderCell>
+              <Table.HeaderCell {...sortHeader('createdAt')}>{m.createdAt}</Table.HeaderCell>
+              <Table.HeaderCell {...sortHeader('lastUsed')}>{m.lastUsed}</Table.HeaderCell>
               {onRevoke ? (
                 <Table.HeaderCell align='end'>
                   <VisuallyHidden>{m.actions}</VisuallyHidden>
@@ -152,7 +198,17 @@ export function OrganizationProfileApiKeysPanelView({
               </Table.Empty>
             ) : (
               table.rows.map(row => (
-                <Table.Row key={row.id}>
+                <Table.Row
+                  key={row.id}
+                  selected={Boolean(onBulkAction) && row.getIsSelected()}
+                >
+                  {onBulkAction ? (
+                    <Table.SelectCell
+                      aria-label={fill(m.select, { name: row.original.name })}
+                      checked={row.getIsSelected()}
+                      onToggleSelected={row.toggleSelected}
+                    />
+                  ) : null}
                   <Table.Cell>
                     <div {...stylex.props(styles.metadata)}>
                       <Text xstyle={styles.name}>{row.original.name}</Text>

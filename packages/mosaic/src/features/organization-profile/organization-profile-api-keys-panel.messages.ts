@@ -9,6 +9,8 @@ export const organizationProfileApiKeysPanelMessages = {
   pageSize: 'Results per page',
   previousPage: 'Previous API keys page',
   nextPage: 'Next API keys page',
+  selectAll: 'Select all API keys',
+  select: 'Select {name}',
   revokeTitle: 'Revoke {name}?',
   revokeDescription: 'This API key will stop working immediately. This action cannot be undone.',
   revokeError: 'Something went wrong. Please try again.',

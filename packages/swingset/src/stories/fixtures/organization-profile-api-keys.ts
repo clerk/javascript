@@ -1,4 +1,7 @@
-import type { OrganizationProfileApiKeysPanelViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile-api-keys-panel.types';
+import type {
+  OrganizationProfileAPIKeySort,
+  OrganizationProfileApiKeysPanelViewProps,
+} from '@clerk/mosaic/features/organization-profile/organization-profile-api-keys-panel.types';
 import type { OrganizationProfileCreateAPIKeyDialogProps } from '@clerk/mosaic/features/organization-profile/organization-profile-create-api-key.dialog';
 import { useLocale, useMessages } from '@clerk/mosaic/localization';
 import { useEffect, useRef, useState } from 'react';
@@ -48,6 +51,28 @@ function getExpirationDate(expiration: OrganizationProfileCreateAPIKeyDialogProp
   return date;
 }
 
+function sortAPIKeys(items: FixtureAPIKey[], sort: OrganizationProfileAPIKeySort | null) {
+  if (!sort) {
+    return items;
+  }
+  const direction = sort.direction === 'ascending' ? 1 : -1;
+  return [...items].sort((a, b) => {
+    if (sort.column === 'name') {
+      return direction * a.name.localeCompare(b.name);
+    }
+    if (sort.column === 'createdAt') {
+      return direction * (a.createdAt - b.createdAt);
+    }
+    if (a.lastUsedAt === null) {
+      return b.lastUsedAt === null ? 0 : 1;
+    }
+    if (b.lastUsedAt === null) {
+      return -1;
+    }
+    return direction * (a.lastUsedAt - b.lastUsedAt);
+  });
+}
+
 export async function createExampleAPIKey() {
   await new Promise<void>(resolve => setTimeout(resolve, 600));
   return { id: `ak_demo_${crypto.randomUUID()}`, secret: `ak_demo_${crypto.randomUUID()}` };
@@ -59,11 +84,13 @@ export async function revokeExampleAPIKey() {
 
 export function useOrganizationProfileAPIKeysFixture({
   initialKeys = exampleAPIKeys,
+  enableSorting = false,
   createKey = createExampleAPIKey,
   copyKey = (secret: string) => navigator.clipboard.writeText(secret),
   revokeKey = revokeExampleAPIKey,
 }: {
   initialKeys?: FixtureAPIKey[];
+  enableSorting?: boolean;
   createKey?: (input: {
     name: string;
     expiration: OrganizationProfileCreateAPIKeyDialogProps['expiration'];
@@ -77,6 +104,7 @@ export function useOrganizationProfileAPIKeysFixture({
   const [searchValue, setSearchValue] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [sort, setSort] = useState<OrganizationProfileAPIKeySort | null>(null);
   const createTrigger = useRef<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
@@ -109,6 +137,7 @@ export function useOrganizationProfileAPIKeysFixture({
   }, [searchValue, query]);
 
   const filtered = items.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
+  const sorted = sortAPIKeys(filtered, sort);
   const pageCount = Math.ceil(filtered.length / pageSize);
   useEffect(() => {
     if (page > Math.max(1, pageCount)) {
@@ -117,7 +146,7 @@ export function useOrganizationProfileAPIKeysFixture({
   }, [page, pageCount]);
 
   return {
-    apiKeys: filtered.slice((page - 1) * pageSize, page * pageSize).map(item => ({
+    apiKeys: sorted.slice((page - 1) * pageSize, page * pageSize).map(item => ({
       id: item.id,
       name: item.name,
       createdAtLabel: dateLabel(item.createdAt),
@@ -200,6 +229,13 @@ export function useOrganizationProfileAPIKeysFixture({
     onSearchChange: setSearchValue,
     onPageChange: setPage,
     onPageSizeChange: setPageSize,
+    sort: enableSorting ? sort : undefined,
+    onSortChange: enableSorting
+      ? next => {
+          setSort(next);
+          setPage(1);
+        }
+      : undefined,
     onRevoke: async id => {
       await revokeKey(id);
       setItems(current => current.filter(item => item.id !== id));

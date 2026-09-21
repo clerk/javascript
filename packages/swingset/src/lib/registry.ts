@@ -155,6 +155,7 @@ import {
   Default as OrganizationProfileApiKeysPanelDefault,
   Empty as OrganizationProfileApiKeysPanelEmpty,
   meta as organizationProfileApiKeysPanelMeta,
+  ProposedTable as OrganizationProfileApiKeysPanelProposedTable,
 } from '../stories/organization-profile-api-keys-panel.stories';
 import {
   Default as OtpComponentDefault,
@@ -833,6 +834,7 @@ const reverificationModule: StoryModule = {
 const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,
   Default: OrganizationProfileApiKeysPanelDefault,
+  ProposedTable: OrganizationProfileApiKeysPanelProposedTable,
   Empty: OrganizationProfileApiKeysPanelEmpty,
 };
 

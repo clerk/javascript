@@ -36,3 +36,11 @@ A controlled organization API keys table with search, page navigation, and confi
 ### Empty
 
 <Story name='Empty' storyModule={Stories} />
+
+### Proposed table
+
+This example enables sorting and row selection through `onSortChange` and `onBulkAction`. Click Name, Date created, or Last used to cycle through ascending, descending, and unsorted order. The caller sorts all results before pagination and resets to page 1. Keys that have never been used sort last.
+
+The bulk callback is a placeholder that enables selection checkboxes. Sorting clears the current selection.
+
+<Story name='ProposedTable' storyModule={Stories} />

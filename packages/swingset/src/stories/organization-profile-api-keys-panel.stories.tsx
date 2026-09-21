@@ -30,3 +30,13 @@ export function Empty() {
     />
   );
 }
+
+export function ProposedTable() {
+  const props = useOrganizationProfileAPIKeysFixture({ enableSorting: true });
+  return (
+    <OrganizationProfileApiKeysPanelView
+      {...props}
+      onBulkAction={() => undefined}
+    />
+  );
+}
