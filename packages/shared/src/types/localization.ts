@@ -1666,7 +1666,7 @@ export type __internal_LocalizationResource = {
       note: LocalizationValue;
       empty__waitingForFirstUser: LocalizationValue;
       empty__waitingForFirstSync: LocalizationValue;
-      empty__noUsersSynced: LocalizationValue;
+      empty__noUsersProvisioned: LocalizationValue;
       actionLabel__syncNow: LocalizationValue;
       error__lastSyncFailed: LocalizationValue;
       error__syncFailed: LocalizationValue;

@@ -3,6 +3,7 @@ import {
   __internal_useOrganizationDirectorySyncUsers,
 } from '@clerk/shared/react';
 import type { DirectorySyncUserResource } from '@clerk/shared/types';
+import { useEffect, useState } from 'react';
 
 import {
   Badge,
@@ -102,10 +103,26 @@ export const TestSyncStep = (): JSX.Element => {
   const rows = users.data ?? [];
   const providerName = t((providerMeta ?? DIRECTORY_SYNC_PROVIDERS.custom).name);
   const lastSyncStatus = syncStatus.data?.lastSyncStatus ?? null;
+  const lastSyncedAt = syncStatus.data?.lastSyncedAt ?? null;
+
+  // The two queries poll independently, so a finished run is reported while the
+  // list on screen still predates it. Refresh the list for every run, whoever
+  // started it, and keep waiting until that lands: otherwise the stale empty
+  // list reads as the run's result.
+  const [isRefreshingAfterSync, setIsRefreshingAfterSync] = useState(false);
+  const { revalidate: revalidateUsers } = users;
+  useEffect(() => {
+    if (!isPull || !lastSyncedAt) {
+      return;
+    }
+    setIsRefreshingAfterSync(true);
+    void revalidateUsers().finally(() => setIsRefreshingAfterSync(false));
+  }, [isPull, lastSyncedAt?.getTime(), revalidateUsers]);
+
   // A push directory is always waiting: the IdP provisions whenever it likes.
   // A pull directory that has finished a run is not — an empty list is that
   // run's result, and spinning implies work that will never happen.
-  const isWaitingForUsers = !isPull || lastSyncStatus === null || lastSyncStatus === 'running';
+  const isWaitingForUsers = !isPull || lastSyncStatus === null || lastSyncStatus === 'running' || isRefreshingAfterSync;
 
   return (
     <>
@@ -183,7 +200,7 @@ export const TestSyncStep = (): JSX.Element => {
                 colorScheme='secondary'
                 localizationKey={localizationKeys(
                   !isWaitingForUsers
-                    ? 'configureDirectorySync.testStep.empty__noUsersSynced'
+                    ? 'configureDirectorySync.testStep.empty__noUsersProvisioned'
                     : isPull
                       ? 'configureDirectorySync.testStep.empty__waitingForFirstSync'
                       : 'configureDirectorySync.testStep.empty__waitingForFirstUser',

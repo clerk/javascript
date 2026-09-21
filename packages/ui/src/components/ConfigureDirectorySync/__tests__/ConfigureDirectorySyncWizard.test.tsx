@@ -297,8 +297,47 @@ describe('ConfigureDirectorySyncWizard test step', () => {
 
     // An empty directory is the sync's result, not a stage on the way to one,
     // so the step must not keep implying users are still on their way.
-    expect(await screen.findByText('The last sync finished without provisioning any users.')).toBeInTheDocument();
+    expect(await screen.findByText('No users have been provisioned yet.')).toBeInTheDocument();
     expect(screen.queryByText('Waiting for the first sync to finish…')).not.toBeInTheDocument();
+  });
+
+  it('keeps waiting while the list refreshed by a sync is still loading', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    const existing = googleDirectory({ credentialsConfigured: true, enabled: true });
+    let releaseUsers: ((value: unknown) => void) | null = null;
+    existing.sync.mockImplementation(async () => {
+      existing.getSyncStatus.mockResolvedValue({
+        lastSyncedAt: new Date(),
+        lastSyncStatus: 'succeeded',
+        lastSyncError: null,
+      });
+      // The refreshed list is slow to arrive. Until it does, the list on screen
+      // is the one from before the sync.
+      existing.getUsers.mockImplementation(() => new Promise(resolve => (releaseUsers = resolve)));
+    });
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Attribute review')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Sync now' }));
+
+    // The sync has reported success, but the users it provisioned have not been
+    // read yet, so calling the directory empty here would be wrong.
+    expect(await screen.findByText('Succeeded')).toBeInTheDocument();
+    expect(screen.queryByText('No users have been provisioned yet.')).not.toBeInTheDocument();
+
+    releaseUsers?.({
+      data: [{ id: 'dsu_1', identifier: 'someone@clerk.com', active: true, provisionedAt: new Date() }],
+      total_count: 1,
+    });
+
+    expect(await screen.findByText('someone@clerk.com')).toBeInTheDocument();
   });
 
   it('keeps waiting while a pull directory has not finished a sync', async () => {

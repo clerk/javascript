@@ -322,7 +322,7 @@ export const taIN: LocalizationResource = {
       badge__deprovisioned: undefined,
       description: undefined,
       description__pull: undefined,
-      empty__noUsersSynced: undefined,
+      empty__noUsersProvisioned: undefined,
       empty__waitingForFirstSync: undefined,
       empty__waitingForFirstUser: undefined,
       error__lastSyncFailed: undefined,
