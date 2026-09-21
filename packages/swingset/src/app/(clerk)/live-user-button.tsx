@@ -1,7 +1,7 @@
 'use client';
 
-import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
-import { UserButton } from '@clerk/ui/mosaic/user-button/user-button';
+import { UserButton } from '@clerk/mosaic/features/user-button/user-button';
+import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 
 export function LiveUserButton() {
   return (

@@ -1,10 +1,10 @@
 'use client';
 
+import { Button } from '@clerk/mosaic/components/button';
+import { Reverification, useReverificationWithState } from '@clerk/mosaic/features/reverification';
+import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 import { SignOutButton, useUser } from '@clerk/nextjs';
 import { isReverificationCancelledError } from '@clerk/shared/error';
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Reverification, useReverificationWithState } from '@clerk/ui/mosaic/features/reverification';
-import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
 import Link from 'next/link';
 import { useState } from 'react';
 

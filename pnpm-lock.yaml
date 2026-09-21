@@ -1111,9 +1111,6 @@ importers:
       '@clerk/shared':
         specifier: workspace:*
         version: link:../shared
-      '@clerk/ui':
-        specifier: workspace:*
-        version: link:../ui
       '@floating-ui/react':
         specifier: catalog:repo
         version: 0.27.20(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
