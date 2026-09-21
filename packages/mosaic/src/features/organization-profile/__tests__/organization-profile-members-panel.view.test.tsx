@@ -276,6 +276,20 @@ describe('OrganizationProfileMembersPanelView', () => {
     expect(props.onRemoveMembers).toHaveBeenCalledWith(['m1', 'm2']);
   });
 
+  it('drops rows the search hides from the bulk selection', async () => {
+    const user = userEvent.setup();
+    const props = renderPanel();
+    await user.click(screen.getByRole('checkbox', { name: 'Select Kyle Mac' }));
+    await user.click(screen.getByRole('checkbox', { name: 'Select Colin Sidoti' }));
+    // Narrowing the list to Colin leaves Kyle selected but hidden; the bulk bar must forget him.
+    await user.type(screen.getByRole('textbox', { name: 'Search members' }), 'colin');
+    const toolbar = screen.getByRole('toolbar', { name: 'Member bulk actions' });
+    expect(within(toolbar).getByText('1 selected')).toBeInTheDocument();
+    await user.click(within(toolbar).getByRole('button', { name: /Change role/ }));
+    await user.click(screen.getByRole('menuitem', { name: 'Admin' }));
+    expect(props.onChangeRole).toHaveBeenCalledWith(['m2'], 'admin');
+  });
+
   it('changes roles and removes selected invitations in bulk', async () => {
     const user = userEvent.setup();
     const props = renderPanel();

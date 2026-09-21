@@ -45,7 +45,10 @@ export const styles = stylex.create({
       default: 1,
       ':is([data-open="false"])': 0,
     },
-    pointerEvents: 'auto',
+    pointerEvents: {
+      default: 'auto',
+      ':is([data-open="false"])': 'none',
+    },
     transform: {
       default: 'translateY(0)',
       ':is([data-open="false"])': 'translateY(0.25rem)',

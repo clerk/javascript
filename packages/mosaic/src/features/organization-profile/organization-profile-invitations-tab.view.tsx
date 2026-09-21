@@ -132,8 +132,11 @@ export function OrganizationProfileInvitationsTabView({
     }
     table.setRowSelection(next);
   };
+  // Selection survives paging, but not filtering: a row the current filters hide is not something
+  // a bulk action should reach.
+  const visibleIds = React.useMemo(() => new Set(filtered.map(invitation => invitation.id)), [filtered]);
   const selectedIds = Object.entries(table.rowSelection)
-    .filter(([, selected]) => selected)
+    .filter(([id, selected]) => selected && visibleIds.has(id))
     .map(([id]) => id);
   const selectedCount = selectedIds.length;
   const clearSelection = () => table.setRowSelection({});

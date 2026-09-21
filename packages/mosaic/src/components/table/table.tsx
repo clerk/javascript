@@ -4,6 +4,7 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import type { CheckboxProps } from '../checkbox';
@@ -42,7 +43,11 @@ const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable
         tabIndex={0}
         {...mergeStyleProps(
           themeProps('table-viewport'),
-          stylex.props(reset.base, fade ? scrollAreaViewport('auto', 'inline') : styles.plainViewport, styles.viewport),
+          stylex.props(
+            reset.base,
+            ...(fade ? scrollAreaViewport('auto', 'inline') : [styles.plainViewport, focusOutline.visible]),
+            styles.viewport,
+          ),
         )}
       >
         <table
