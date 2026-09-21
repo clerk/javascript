@@ -106,6 +106,10 @@ export function UserProfileApiKeysPanelView({
     };
   };
   const columnCount = 3 + Number(Boolean(onRevoke)) + Number(Boolean(onBulkAction));
+  const query = searchValue.trim();
+  const emptyState = query
+    ? { label: m.empty, description: fill(m.emptyDescription, { query }) }
+    : { label: m.noKeys, description: m.noKeysDescription };
   return (
     <>
       <div {...mergeStyleProps(themeProps('user-profile-api-keys-panel'), stylex.props(styles.root))}>
@@ -185,8 +189,9 @@ export function UserProfileApiKeysPanelView({
             ) : table.rows.length === 0 ? (
               <Table.Empty colSpan={columnCount}>
                 <EmptyState.Root>
-                  <EmptyState.Icon name='magnifying-glass' />
-                  <EmptyState.Label>{m.empty}</EmptyState.Label>
+                  <EmptyState.Icon name='key' />
+                  <EmptyState.Label>{emptyState.label}</EmptyState.Label>
+                  <EmptyState.Description>{emptyState.description}</EmptyState.Description>
                 </EmptyState.Root>
               </Table.Empty>
             ) : (
@@ -224,10 +229,10 @@ export function UserProfileApiKeysPanelView({
                       </Text>
                     </div>
                   </Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell xstyle={styles.dateCell}>
                     <Text>{row.original.createdAtLabel}</Text>
                   </Table.Cell>
-                  <Table.Cell>
+                  <Table.Cell xstyle={styles.dateCell}>
                     <Text>{row.original.lastUsedAtLabel ?? m.neverUsed}</Text>
                   </Table.Cell>
                   {onRevoke ? (

@@ -1,6 +1,9 @@
 export const userProfileApiKeysPanelMessages = {
   loading: 'Loading API keys',
   empty: 'No API keys found',
+  emptyDescription: 'Your search for "{query}" did not return any results.',
+  noKeys: 'No API Keys created',
+  noKeysDescription: 'API keys allow apps and scripts access your account without signing in',
   clearSearch: 'Clear search',
   pagination: 'API keys pages',
   pageSize: 'Results per page',
@@ -44,7 +47,7 @@ export const userProfileApiKeysPanelMessages = {
   lastUsed: 'Last used',
   actions: 'Actions',
   expires: 'Expires {expiresDate}',
-  neverExpires: 'Never expires.',
+  neverExpires: 'Never expires',
   neverUsed: '-',
   manage: 'Manage {name}',
   revoke: 'Revoke key',
