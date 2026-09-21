@@ -2,6 +2,4 @@
 '@clerk/backend': major
 ---
 
-OAuth access token verification now requires a matching `aud` when a non-empty `audience` option is configured, for both opaque tokens and JWTs. Tokens with a missing, empty, malformed, or mismatched audience are rejected.
-
-Applications that configure `audience` must issue OAuth tokens with a matching audience before upgrading. Session JWT and M2M token verification behavior is unchanged.
+When a non-empty `audience` is set, OAuth access tokens must have a valid `aud` with at least one matching value. This check is new for opaque tokens. OAuth JWTs already rejected valid but mismatched audiences; they now also reject missing or malformed `aud` claims. `idPOAuthAccessToken.verify()` now accepts an optional `{ audience }`. Without it, the SDK skips the audience check. Session and M2M verification are unchanged.
