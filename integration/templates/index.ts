@@ -5,6 +5,7 @@ export const templates = {
   'next-cache-components': resolve(import.meta.dirname, './next-cache-components'),
   'next-app-router-quickstart': resolve(import.meta.dirname, './next-app-router-quickstart'),
   'next-app-router-bundled-ui': resolve(import.meta.dirname, './next-app-router-bundled-ui'),
+  'next-app-router-mosaic': resolve(import.meta.dirname, './next-app-router-mosaic'),
   'next-app-router-quickstart-v6': resolve(import.meta.dirname, './next-app-router-quickstart-v6'),
   'react-vite': resolve(import.meta.dirname, './react-vite'),
   'express-vite': resolve(import.meta.dirname, './express-vite'),

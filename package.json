@@ -57,6 +57,7 @@
     "test:integration:hono": "E2E_APP_ID=hono.* pnpm test:integration:base --grep @hono",
     "test:integration:localhost": "pnpm test:integration:base --grep @localhost",
     "test:integration:machine": "pnpm test:integration:base --grep @machine",
+    "test:integration:mosaic": "E2E_APP_ID=next.appRouterMosaic.* pnpm test:integration:base --grep @mosaic",
     "test:integration:nextjs": "E2E_APP_ID=next.appRouter.* pnpm test:integration:base --grep @nextjs",
     "test:integration:nuxt": "E2E_APP_ID=nuxt.node npm run test:integration:base -- --grep @nuxt",
     "test:integration:quickstart": "E2E_APP_ID=quickstart.* pnpm test:integration:base --grep @quickstart",
