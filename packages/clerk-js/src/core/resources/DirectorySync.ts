@@ -121,6 +121,7 @@ export class DirectorySync extends BaseResource implements DirectorySyncResource
       lastSyncedAt: json?.last_synced_at ? unixEpochToDate(json.last_synced_at) : null,
       lastSyncStatus: json?.last_sync_status ?? null,
       lastSyncError: json?.last_sync_error ?? null,
+      lastSyncChangedUserCount: json?.last_sync_changed_user_count ?? null,
     };
   };
 

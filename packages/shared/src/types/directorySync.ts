@@ -169,6 +169,7 @@ export interface DirectorySyncStatusJSON {
   last_synced_at: number | null;
   last_sync_status: DirectorySyncRunStatus | null;
   last_sync_error: string | null;
+  last_sync_changed_user_count?: number | null;
 }
 
 export interface DirectorySyncStatusResource {
@@ -178,6 +179,12 @@ export interface DirectorySyncStatusResource {
   lastSyncStatus: DirectorySyncRunStatus | null;
   /** Why the last sync failed, when it did. */
   lastSyncError: string | null;
+  /**
+   * How many users the last sync created or updated, or `null` when none has
+   * completed. Those users are provisioned after the sync itself finishes, so
+   * a count above zero means more are still on their way.
+   */
+  lastSyncChangedUserCount: number | null;
 }
 
 export type SetDirectorySyncCredentialsParams = {

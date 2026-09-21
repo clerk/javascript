@@ -157,7 +157,12 @@ describe('DirectorySync', () => {
     // @ts-ignore
     BaseResource._fetch = vi.fn().mockReturnValue(
       Promise.resolve({
-        response: { last_synced_at: 1700000000000, last_sync_status: 'failed', last_sync_error: 'delegation denied' },
+        response: {
+          last_synced_at: 1700000000000,
+          last_sync_status: 'failed',
+          last_sync_error: 'delegation denied',
+          last_sync_changed_user_count: 0,
+        },
       }),
     );
 
@@ -168,6 +173,22 @@ describe('DirectorySync', () => {
     expect(result.lastSyncedAt).toEqual(new Date(1700000000000));
     expect(result.lastSyncStatus).toBe('failed');
     expect(result.lastSyncError).toBe('delegation denied');
+    expect(result.lastSyncChangedUserCount).toBe(0);
+  });
+
+  it('reads a missing changed-user count as null, not zero', async () => {
+    // A backend that predates the field omits it, and zero would read as
+    // "the sync changed nobody" — a settled answer the caller would act on.
+    // @ts-ignore
+    BaseResource._fetch = vi.fn().mockReturnValue(
+      Promise.resolve({
+        response: { last_synced_at: 1700000000000, last_sync_status: 'succeeded', last_sync_error: null },
+      }),
+    );
+
+    const result = await createDirectorySync().getSyncStatus();
+
+    expect(result.lastSyncChangedUserCount).toBeNull();
   });
 
   it('reads an unsynced directory as null rather than an epoch date', async () => {
@@ -183,6 +204,7 @@ describe('DirectorySync', () => {
     expect(result.lastSyncedAt).toBeNull();
     expect(result.lastSyncStatus).toBeNull();
     expect(result.lastSyncError).toBeNull();
+    expect(result.lastSyncChangedUserCount).toBeNull();
   });
 
   it('deletes the directory', async () => {
