@@ -1,4 +1,3 @@
-import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 import { useId, useRef } from 'react';
 
@@ -14,7 +13,6 @@ import { InputGroup } from '../../components/input-group';
 import { Select } from '../../components/select';
 import { Text } from '../../components/text';
 import { fill, useMessages } from '../../localization';
-import { styles } from './user-profile-api-keys-panel.styles';
 
 const expirationValues = ['never', '1d', '7d', '30d', '60d', '90d', '180d', '1y'] as const;
 
@@ -94,7 +92,7 @@ function CreateKeyStep(props: UserProfileCreateAPIKeyDialogProps & { inputRef: R
             id={formId}
             onSubmit={event => {
               event.preventDefault();
-              if (!props.isPending) {
+              if (!props.isPending && props.name.trim() && props.expiration !== null) {
                 void props.onSubmit();
               }
             }}
@@ -114,11 +112,11 @@ function CreateKeyStep(props: UserProfileCreateAPIKeyDialogProps & { inputRef: R
             onChange={event => props.onNameChange(event.target.value)}
           />
         </Field.Root>
-        <Field.Root disabled={props.isPending}>
-          <div {...stylex.props(styles.expirationLabel)}>
-            <Field.Label>{m.expirationLabel}</Field.Label>
-            <Text color='foreground-secondary'>{m.optional}</Text>
-          </div>
+        <Field.Root
+          required
+          disabled={props.isPending}
+        >
+          <Field.Label>{m.expirationLabel}</Field.Label>
           <Select.Root
             items={expirationValues.map(value => ({ value, label: m.expirationOptions[value] }))}
             value={props.expiration ?? undefined}
@@ -150,7 +148,7 @@ function CreateKeyStep(props: UserProfileCreateAPIKeyDialogProps & { inputRef: R
           form={formId}
           fullWidth
           isPending={props.isPending}
-          disabled={!props.name.trim()}
+          disabled={!props.name.trim() || props.expiration === null}
         >
           {m.add}
         </SubmitButton>

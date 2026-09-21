@@ -25,6 +25,12 @@ describe('API keys playground', () => {
     expect(within(dialog).getByRole('combobox', { name: 'Expiration Select expiration' })).toHaveTextContent(
       'Select expiration',
     );
+    expect(within(dialog).queryByText('Optional')).not.toBeInTheDocument();
+    expect(within(dialog).getByRole('combobox', { name: /^Expiration/ })).toHaveAttribute('aria-required', 'true');
+    await user.type(within(dialog).getByLabelText('Secret key name'), 'New integration');
+    expect(within(dialog).getByRole('button', { name: 'Add API Key' })).toBeDisabled();
+    await user.keyboard('{Enter}');
+    expect(within(dialog).getByRole('button', { name: 'Add API Key' })).toBeDisabled();
     await user.click(within(dialog).getByRole('combobox', { name: /^Expiration/ }));
     expect(screen.getAllByRole('option').map(option => option.textContent)).toEqual([
       'Never',
@@ -38,7 +44,7 @@ describe('API keys playground', () => {
     ]);
     await user.click(screen.getByRole('option', { name: 'Never' }));
     expect(within(dialog).getByText('This key will never expire')).toBeVisible();
-    await user.type(within(dialog).getByLabelText('Secret key name'), 'New integration');
+    expect(within(dialog).getByRole('button', { name: 'Add API Key' })).toBeEnabled();
     await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
     const copyDialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
     expect(
@@ -57,6 +63,25 @@ describe('API keys playground', () => {
     expect(screen.queryByText('This key will never expire')).not.toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /^Expiration/ })).toHaveTextContent('Select expiration');
     expect(screen.queryByRole('textbox', { name: 'API key' })).not.toBeInTheDocument();
+  });
+
+  it.each([Default, ProposedTable])('changes page size and keeps the controls available (%#)', async Story => {
+    const user = userEvent.setup();
+    render(
+      <MosaicProvider>
+        <Story />
+      </MosaicProvider>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
+    await user.click(screen.getByRole('combobox', { name: /Results per page/ }));
+    await user.click(screen.getByRole('option', { name: '25' }));
+    expect(screen.getByRole('combobox', { name: /Results per page/ })).toHaveTextContent('25');
+    expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeDisabled();
+    expect(screen.getAllByRole('row')).toHaveLength(13);
+    await user.click(screen.getByRole('combobox', { name: /Results per page/ }));
+    await user.click(screen.getByRole('option', { name: '10' }));
+    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeEnabled();
   });
 
   it('keeps the key visible after a copy failure and saves the selected expiration', async () => {
@@ -113,7 +138,7 @@ describe('API keys playground', () => {
     await user.click(screen.getByRole('checkbox', { name: 'Select Staging' }));
     await user.click(screen.getByRole('button', { name: 'Name' }));
     expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveAttribute('aria-sort', 'ascending');
-    expect(screen.getByText('Displaying 1 – 10 of 12')).toBeVisible();
+    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
     expect(names()[0]).toBe('Select Analytics');
     expect(screen.getByRole('checkbox', { name: 'Select all API keys' })).not.toBeChecked();
     await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
@@ -188,7 +213,7 @@ describe('API keys playground', () => {
     }
     expect(screen.getByText('Web app')).toBeVisible();
     expect(screen.getAllByRole('row')).toHaveLength(11);
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeDisabled();
   });
 
   it('keeps the empty table visible without action capabilities', () => {
@@ -210,7 +235,7 @@ describe('API keys playground', () => {
       </MosaicProvider>,
     );
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-    expect(screen.getByText('Displaying 1 – 10 of 12')).toBeVisible();
+    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('columnheader', { name: 'Date created' })).toBeVisible();
     expect(screen.getByRole('cell', { name: 'Jan 5, 2026' })).toBeVisible();
     expect(screen.getByRole('cell', { name: 'Jan 31, 2026' })).toBeVisible();
@@ -218,14 +243,14 @@ describe('API keys playground', () => {
     expect(screen.queryByRole('button', { name: 'Name' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Last used' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
-    expect(screen.getByText('Displaying 11 – 12 of 12')).toBeVisible();
+    expect(screen.getByRole('button', { name: '2' })).toHaveAttribute('aria-current', 'page');
     const input = screen.getByRole('searchbox');
     await user.type(input, '  Web app  ');
     expect(input).toHaveValue('  Web app  ');
     await waitFor(() => expect(screen.getByRole('table')).toHaveTextContent('Web app'));
     expect(screen.getAllByRole('row')).toHaveLength(2);
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeDisabled();
     await user.click(screen.getByRole('button', { name: 'Clear search' }));
-    await screen.findByText('Displaying 1 – 10 of 12');
+    await waitFor(() => expect(screen.getAllByRole('row')).toHaveLength(11));
   });
 });

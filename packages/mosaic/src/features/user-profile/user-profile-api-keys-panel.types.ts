@@ -22,6 +22,7 @@ export interface UserProfileApiKeysPanelViewProps {
   isLoading: boolean;
   isFetching?: boolean;
   onPageChange: (page: number) => void;
+  onPageSizeChange?: (pageSize: number) => void;
   onSearchChange: (value: string) => void;
   onCreate?: MouseEventHandler<HTMLButtonElement>;
   onRevoke?: (id: string) => Promise<void>;

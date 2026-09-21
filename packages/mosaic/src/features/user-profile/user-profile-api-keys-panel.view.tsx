@@ -34,6 +34,7 @@ export function UserProfileApiKeysPanelView({
   page,
   pageSize = 10,
   onPageChange,
+  onPageSizeChange,
   searchValue,
   onSearchChange,
   onCreate,
@@ -75,6 +76,9 @@ export function UserProfileApiKeysPanelView({
     onPaginationChange: update => {
       const next = typeof update === 'function' ? update(pagination) : update;
       table.setRowSelection({});
+      if (next.pageSize !== pageSize) {
+        onPageSizeChange?.(next.pageSize);
+      }
       onPageChange(next.pageIndex + 1);
     },
     globalFilter: searchValue,
@@ -238,28 +242,19 @@ export function UserProfileApiKeysPanelView({
             )}
           </Table.Body>
         </Table.Root>
-        {table.getPageCount() > 1 ? (
-          <div {...stylex.props(styles.footer)}>
-            <Text
-              size='sm'
-              color='foreground-secondary'
-            >
-              {fill(m.range, {
-                start: totalCount > 0 ? Math.min((page - 1) * pageSize + 1, totalCount) : 0,
-                end: Math.min(page * pageSize, totalCount),
-                total: totalCount,
-              })}
-            </Text>
-            <Pagination
-              page={table.pagination.pageIndex + 1}
-              pageSize={table.pagination.pageSize}
-              totalItems={totalCount}
-              label={m.pagination}
-              previousPageLabel={m.previousPage}
-              nextPageLabel={m.nextPage}
-              onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
-            />
-          </div>
+        {table.getPageCount() > 1 || (totalCount > 0 && onPageSizeChange) ? (
+          <Pagination
+            page={table.pagination.pageIndex + 1}
+            pageSize={table.pagination.pageSize}
+            totalItems={totalCount}
+            onPageSizeChange={
+              onPageSizeChange ? next => table.setPagination({ pageIndex: 0, pageSize: next }) : undefined
+            }
+            label={m.pagination}
+            previousPageLabel={m.previousPage}
+            nextPageLabel={m.nextPage}
+            onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
+          />
         ) : null}
       </div>
       {onRevoke ? (
