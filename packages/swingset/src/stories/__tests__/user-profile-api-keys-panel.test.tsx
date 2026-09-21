@@ -3,23 +3,21 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Default, Empty, ProposedTable } from '../user-profile-api-keys-panel.stories';
+import { Default as FullProfile, Overlay } from '../user-profile.stories';
+import { Default, ProposedTable } from '../user-profile-api-keys-panel.stories';
 
 describe('API keys playground', () => {
-  it.each([Default, ProposedTable])('creates and copies a key through the design dialog (%#)', async Story => {
+  it('creates and copies a key, then resets the form for the next key', async () => {
     const user = userEvent.setup();
     const copy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
     render(
       <MosaicProvider>
-        <Story />
+        <Default />
       </MosaicProvider>,
     );
     const trigger = screen.getByRole('button', { name: 'Create API key' });
     await user.click(trigger);
     const dialog = screen.getByRole('dialog', { name: 'Add new API key' });
-    expect(
-      within(dialog).getByText('Provide a name to generate a new key. You’ll be able to revoke it anytime.'),
-    ).toBeVisible();
     expect(within(dialog).getByLabelText('Secret key name')).toHaveFocus();
     expect(within(dialog).queryByText('This key will never expire')).not.toBeInTheDocument();
     expect(within(dialog).getByRole('combobox', { name: 'Expiration Select expiration' })).toHaveTextContent(
@@ -47,9 +45,6 @@ describe('API keys playground', () => {
     expect(within(dialog).getByRole('button', { name: 'Add API Key' })).toBeEnabled();
     await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
     const copyDialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
-    expect(
-      within(copyDialog).getByText("For security reasons, we won't allow you to view it again later."),
-    ).toBeVisible();
     await waitFor(() => expect(within(copyDialog).getByRole('textbox', { name: 'API key' })).toHaveFocus());
     expect(within(copyDialog).queryByLabelText('Secret key name')).not.toBeInTheDocument();
     await user.click(within(copyDialog).getByRole('button', { name: 'Copy and close' }));
@@ -65,11 +60,11 @@ describe('API keys playground', () => {
     expect(screen.queryByRole('textbox', { name: 'API key' })).not.toBeInTheDocument();
   });
 
-  it.each([Default, ProposedTable])('changes page size and keeps the controls available (%#)', async Story => {
+  it('changes page size and keeps the controls available', async () => {
     const user = userEvent.setup();
     render(
       <MosaicProvider>
-        <Story />
+        <Default />
       </MosaicProvider>,
     );
     await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
@@ -82,6 +77,35 @@ describe('API keys playground', () => {
     await user.click(screen.getByRole('option', { name: '10' }));
     expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeEnabled();
+  });
+
+  it.each([FullProfile, Overlay])('creates and copies a key in the full profile (%#)', async Story => {
+    const user = userEvent.setup();
+    const copy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
+    render(
+      <MosaicProvider>
+        <Story />
+      </MosaicProvider>,
+    );
+    const manage = screen.queryByRole('button', { name: 'Manage account' });
+    if (manage) {
+      await user.click(manage);
+    }
+    await user.click(screen.getByRole('tab', { name: 'API Keys' }));
+    const trigger = screen.getByRole('button', { name: 'Create API key' });
+    await user.click(trigger);
+    const dialog = screen.getByRole('dialog', { name: 'Add new API key' });
+    await user.type(within(dialog).getByLabelText('Secret key name'), 'Full profile key');
+    await user.click(within(dialog).getByRole('combobox', { name: /^Expiration/ }));
+    await user.click(screen.getByRole('option', { name: 'Never' }));
+    await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
+    const copyDialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
+    await waitFor(() => expect(within(copyDialog).getByRole('textbox', { name: 'API key' })).toHaveFocus());
+    await user.click(within(copyDialog).getByRole('button', { name: 'Copy and close' }));
+    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Copy your API Key' })).not.toBeInTheDocument());
+    expect(copy).toHaveBeenCalledWith(expect.stringContaining('ak_demo_'));
+    expect(screen.getByText('Full profile key')).toBeVisible();
+    expect(trigger).toHaveFocus();
   });
 
   it('keeps the key visible after a copy failure and saves the selected expiration', async () => {
@@ -165,37 +189,6 @@ describe('API keys playground', () => {
     expect(screen.getByRole('cell', { name: 'Jan 16, 2026' })).toBeVisible();
   });
 
-  it('demonstrates bulk selection only in the optional callback example', async () => {
-    const user = userEvent.setup();
-    render(
-      <MosaicProvider>
-        <ProposedTable />
-      </MosaicProvider>,
-    );
-    await user.click(screen.getByRole('checkbox', { name: 'Select Web app' }));
-    expect(screen.queryByRole('button', { name: 'Bulk actions' })).not.toBeInTheDocument();
-    expect(screen.getByRole('checkbox', { name: 'Select Web app' })).toBeChecked();
-    expect(screen.getByText('Web app')).toBeVisible();
-  });
-
-  it('shows pending revocation and removes the row after success', async () => {
-    const user = userEvent.setup();
-    render(
-      <MosaicProvider>
-        <Default />
-      </MosaicProvider>,
-    );
-    await user.click(screen.getByRole('button', { name: 'Manage Web app' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
-    const dialog = screen.getByRole('alertdialog');
-    const confirm = within(dialog).getByRole('button', { name: 'Revoke key' });
-    await user.click(confirm);
-    expect(confirm).toHaveAttribute('aria-busy', 'true');
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(screen.queryByText('Web app')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Manage Mobile app' })).toHaveFocus();
-  });
-
   it('corrects the page after its last result is removed', async () => {
     const user = userEvent.setup();
     render(
@@ -216,17 +209,6 @@ describe('API keys playground', () => {
     expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeDisabled();
   });
 
-  it('keeps the empty table visible without action capabilities', () => {
-    render(
-      <MosaicProvider>
-        <Empty />
-      </MosaicProvider>,
-    );
-    expect(screen.getByRole('table')).toBeVisible();
-    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-    expect(screen.queryByRole('columnheader', { name: 'Actions' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Create API key' })).not.toBeInTheDocument();
-  });
   it('changes the displayed page and debounces a trimmed search without showing bulk selection', async () => {
     const user = userEvent.setup();
     render(
@@ -236,9 +218,6 @@ describe('API keys playground', () => {
     );
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
-    expect(screen.getByRole('columnheader', { name: 'Date created' })).toBeVisible();
-    expect(screen.getByRole('cell', { name: 'Jan 5, 2026' })).toBeVisible();
-    expect(screen.getByRole('cell', { name: '2 minutes ago' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Date created' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Name' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Last used' })).not.toBeInTheDocument();

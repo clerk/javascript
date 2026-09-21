@@ -25,6 +25,7 @@ import type {
   UserProfileAPIKeySort,
   UserProfileApiKeysPanelViewProps,
 } from './user-profile-api-keys-panel.types';
+import { UserProfileCreateAPIKeyDialog } from './user-profile-create-api-key.dialog';
 
 const getRowId = (row: UserProfileAPIKey) => row.id;
 
@@ -38,6 +39,7 @@ export function UserProfileApiKeysPanelView({
   searchValue,
   onSearchChange,
   onCreate,
+  createDialog,
   onRevoke,
   onBulkAction,
   sort,
@@ -257,6 +259,7 @@ export function UserProfileApiKeysPanelView({
           />
         ) : null}
       </div>
+      {createDialog ? <UserProfileCreateAPIKeyDialog {...createDialog} /> : null}
       {onRevoke ? (
         <Confirmation
           handle={revokeKey}
