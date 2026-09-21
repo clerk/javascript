@@ -64,7 +64,7 @@ function DeleteAccountHarness() {
         >
           Delete account
         </Button>
-        <SignOutButton redirectUrl='/live/reverification'>
+        <SignOutButton redirectUrl='/live/reverification/reverification'>
           <Button variant='outline'>Sign out</Button>
         </SignOutButton>
       </div>

@@ -5,20 +5,41 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ComponentProps } from 'react';
 
+import type { SidebarEntry } from '@/components/sidebar-nav-group';
+import { SidebarNavGroup } from '@/components/sidebar-nav-group';
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar';
+import { getModule } from '@/lib/registry';
 
-const flows = [{ title: 'Reverification', href: '/live/reverification' }];
+const livePages = [{ groupSlug: 'reverification', componentSlug: 'reverification' }];
+
+function liveGroups() {
+  const groups: { group: string; groupSlug: string; components: SidebarEntry[] }[] = [];
+  for (const { groupSlug, componentSlug } of livePages) {
+    const mod = getModule(groupSlug, componentSlug);
+    if (!mod) {
+      continue;
+    }
+    const existing = groups.find(g => g.groupSlug === groupSlug);
+    if (existing) {
+      existing.components.push({ mod, componentSlug });
+    } else {
+      groups.push({ group: mod.meta.group, groupSlug, components: [{ mod, componentSlug }] });
+    }
+  }
+  return groups;
+}
+
+const groups = liveGroups();
 
 export function LiveSidebar(props: ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
@@ -54,26 +75,15 @@ export function LiveSidebar(props: ComponentProps<typeof Sidebar>) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup className='py-1'>
-          <SidebarGroupLabel className='text-sidebar-foreground/50 h-auto px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'>
-            Flows
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {flows.map(flow => (
-                <SidebarMenuItem key={flow.href}>
-                  <SidebarMenuButton
-                    className='h-auto py-1 text-xs'
-                    isActive={pathname.startsWith(flow.href)}
-                    render={<Link href={flow.href} />}
-                  >
-                    {flow.title}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {groups.map(({ group, groupSlug, components }) => (
+          <SidebarNavGroup
+            key={group}
+            group={group}
+            components={components}
+            defaultOpen
+            hrefFor={componentSlug => `/live/${groupSlug}/${componentSlug}`}
+          />
+        ))}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
