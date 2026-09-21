@@ -42,6 +42,9 @@ export const TagInputInput = React.forwardRef<HTMLInputElement, TagInputInputPro
       onBlur: commit,
       onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
+          if (event.nativeEvent.isComposing || event.keyCode === 229) {
+            return;
+          }
           if (text.trim()) {
             event.preventDefault();
             commit();

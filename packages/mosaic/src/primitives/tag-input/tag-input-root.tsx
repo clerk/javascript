@@ -1,6 +1,6 @@
 'use client';
 
-import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
+import React, { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
@@ -26,7 +26,7 @@ export interface TagInputProps extends Omit<ComponentProps<'div'>, 'defaultValue
   children: ReactNode;
 }
 
-export function TagInputRoot(props: TagInputProps) {
+export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(function TagInputRoot(props, forwardedRef) {
   const {
     render,
     value: valueProp,
@@ -87,7 +87,6 @@ export function TagInputRoot(props: TagInputProps) {
         }
       }
       if (next.length !== current.length) {
-        valueRef.current = next;
         setValue(next);
       }
     },
@@ -109,9 +108,7 @@ export function TagInputRoot(props: TagInputProps) {
       } else {
         focusTag(target);
       }
-      const nextValue = current.filter(item => item !== tagValue);
-      valueRef.current = nextValue;
-      setValue(nextValue);
+      setValue(current.filter(item => item !== tagValue));
     },
     [setValue, focusInput, focusTag],
   );
@@ -182,6 +179,7 @@ export function TagInputRoot(props: TagInputProps) {
       {useRender({
         defaultTagName: 'div',
         render,
+        ref: forwardedRef,
         state,
         stateAttributesMapping: {
           disabled: (v: boolean) => (v ? { 'data-disabled': '' } : null),
@@ -191,4 +189,4 @@ export function TagInputRoot(props: TagInputProps) {
       })}
     </TagInputContext.Provider>
   );
-}
+});

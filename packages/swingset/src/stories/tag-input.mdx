@@ -42,7 +42,9 @@ browser animates its snapshot out. Each tag sets `view-transition-name: match-el
 `view-transition-class: tag`, and the enter and exit keyframes target `::view-transition-new(*.tag)`
 and `::view-transition-old(*.tag)`. The input gets its own `view-transition-class: tag-input` so it
 slides with the tags, and its snapshot uses `object-fit: none` so the width change doesn't stretch
-it. Browsers without view transitions apply the update without animating.
+it. Browsers without view transitions apply the update without animating. Each change is computed
+from the current `value`, so an edit made before a pending transition applies its update starts from
+the previous value.
 
 ```tsx
 const [value, setValue] = useState<string[]>([]);

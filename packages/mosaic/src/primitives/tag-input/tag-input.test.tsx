@@ -1,6 +1,6 @@
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { createRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -133,6 +133,18 @@ describe('TagInput', () => {
       expect(tagValues()).toEqual(['a@clerk.dev']);
     });
 
+    it('does not commit on Enter while an IME composition is active', async () => {
+      const user = userEvent.setup();
+      render(<Harness />);
+
+      await user.type(input(), 'にほん');
+      fireEvent.keyDown(input(), { key: 'Enter', isComposing: true });
+      fireEvent.keyDown(input(), { key: 'Enter', keyCode: 229 });
+
+      expect(tagValues()).toEqual([]);
+      expect(input()).toHaveValue('にほん');
+    });
+
     it('marks tags that fail validation as invalid', async () => {
       const user = userEvent.setup();
       render(<Harness validate={value => value.includes('@')} />);
@@ -261,17 +273,6 @@ describe('TagInput', () => {
 
       expect(tagValues()).toEqual(['b']);
       expect(screen.getByRole('status')).toHaveTextContent(/^b$/);
-    });
-
-    it('applies consecutive removals made before a deferred update lands', async () => {
-      const user = userEvent.setup();
-      render(<DeferredHarness defaultValue={['a', 'b', 'c']} />);
-
-      await user.click(input());
-      await user.keyboard('{Backspace}{Backspace}{Backspace}');
-      flushPending();
-
-      expect(tagValues()).toEqual(['a']);
     });
   });
 
@@ -403,6 +404,23 @@ describe('TagInput', () => {
       expect(input()).toHaveFocus();
     });
 
+    it('forwards refs on Root and List', () => {
+      const rootRef = createRef<HTMLDivElement>();
+      const listRef = createRef<HTMLDivElement>();
+      render(
+        <TagInput.Root ref={rootRef}>
+          <TagInput.List
+            ref={listRef}
+            aria-label='Emails'
+          />
+          <TagInput.Input aria-label='Email' />
+        </TagInput.Root>,
+      );
+
+      expect(rootRef.current).toBeInstanceOf(HTMLDivElement);
+      expect(listRef.current).toHaveAttribute('role', 'list');
+    });
+
     it('supports a controlled value', async () => {
       const user = userEvent.setup();
       function Controlled() {
@@ -422,6 +440,29 @@ describe('TagInput', () => {
       await user.type(input(), 'b{Enter}');
 
       expect(screen.getByRole('status')).toHaveTextContent('a|b');
+    });
+
+    it('does not restore an add that a controlled parent rejected', async () => {
+      const user = userEvent.setup();
+      function Capped() {
+        const [value, setValue] = useState(['a', 'b']);
+        return (
+          <Harness
+            value={value}
+            onValueChange={next => {
+              if (next.length <= 2) {
+                setValue(next);
+              }
+            }}
+          />
+        );
+      }
+      render(<Capped />);
+
+      await user.type(input(), 'c{Enter}');
+      await user.click(screen.getByRole('button', { name: 'Remove a' }));
+
+      expect(tagValues()).toEqual(['b']);
     });
 
     it('submits one hidden input per tag under name', () => {
