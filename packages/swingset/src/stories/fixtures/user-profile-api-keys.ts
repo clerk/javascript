@@ -89,7 +89,7 @@ export function useUserProfileAPIKeysFixture({
   const [secret, setSecret] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
   const dateLabel = (date: Date) =>
     new Intl.DateTimeFormat('en-US', {
       month: 'short',
@@ -149,7 +149,7 @@ export function useUserProfileAPIKeysFixture({
       isPending,
       error,
       onSubmit: async () => {
-        if (!name.trim() || isPending) {
+        if (!name.trim() || expiration === null || isPending) {
           return;
         }
         setIsPending(true);
@@ -193,6 +193,7 @@ export function useUserProfileAPIKeysFixture({
     },
     onSearchChange: setSearchValue,
     onPageChange: setPage,
+    onPageSizeChange: setPageSize,
     sort: enableSorting ? sort : undefined,
     onSortChange: enableSorting
       ? next => {

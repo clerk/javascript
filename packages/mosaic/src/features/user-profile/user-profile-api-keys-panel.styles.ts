@@ -11,8 +11,6 @@ export const styles = stylex.create({
     justifyContent: 'space-between',
   },
   search: { maxWidth: '100%', width: '17rem' },
-  footer: { gap: space['4'], alignItems: 'center', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' },
-  expirationLabel: { alignItems: 'center', display: 'flex', justifyContent: 'space-between' },
   name: { fontWeight: fontWeightVars['--cl-font-medium'] },
   metadata: { gap: space['0.5'], display: 'flex', flexDirection: 'column', minWidth: '25ch' },
 });
