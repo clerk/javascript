@@ -13,7 +13,7 @@ import {
 import type { VerifyJwtOptions } from '../jwt';
 import type { JwtReturnType, MachineTokenReturnType } from '../jwt/types';
 import { decodeJwt, verifyJwt } from '../jwt/verifyJwt';
-import { getOAuthAudienceVerificationError, verifyM2MJwt, verifyOAuthJwt } from '../jwt/verifyMachineJwt';
+import { verifyM2MJwt, verifyOAuthJwt } from '../jwt/verifyMachineJwt';
 import { JWT_CATEGORY_M2M_TOKEN } from './jwtCategories';
 import type { LoadClerkJWKFromRemoteOptions } from './keys';
 import { loadClerkJwkFromPem, loadClerkJWKFromRemote } from './keys';
@@ -225,20 +225,25 @@ async function verifyOAuthToken(
   accessToken: string,
   options: VerifyTokenOptions,
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
-  let verifiedToken: IdPOAuthAccessToken;
   try {
     const client = createBackendApiClient(options);
-    verifiedToken = await client.idPOAuthAccessToken.verify(accessToken);
+    const verifiedToken = await client.idPOAuthAccessToken.verify(accessToken, { audience: options.audience });
+    return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
   } catch (err: any) {
+    if (err instanceof TokenVerificationError) {
+      return {
+        data: undefined,
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            message: err.message,
+          }),
+        ],
+      };
+    }
     return handleClerkAPIError(TokenType.OAuthToken, err, 'OAuth token not found');
   }
-
-  const audienceError = getOAuthAudienceVerificationError(verifiedToken.aud, options.audience);
-  if (audienceError) {
-    return { data: undefined, tokenType: TokenType.OAuthToken, errors: [audienceError] };
-  }
-
-  return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
 }
 
 async function verifyAPIKey(
