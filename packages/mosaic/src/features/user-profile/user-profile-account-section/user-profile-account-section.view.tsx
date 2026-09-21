@@ -8,8 +8,10 @@ import type {
   UserProfileEmail,
   UserProfileNameAttribute,
   UserProfilePhone,
+  UserProfileSaveResult,
 } from './user-profile-account-section.types';
-import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
+import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.dialog';
+import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
 import { UserProfileEmailRowView } from './user-profile-email-row.view';
 import { UserProfileNameRowView } from './user-profile-name-row.view';
 import { UserProfilePhoneRowView } from './user-profile-phone-row.view';
@@ -28,7 +30,7 @@ export interface UserProfileAccountSectionViewProps {
    */
   hasImage?: boolean;
   name: string;
-  username: string;
+  username?: string;
   /** Passed alongside `name`, which cannot be split back into its two halves. */
   firstName?: string;
   lastName?: string;
@@ -36,11 +38,11 @@ export interface UserProfileAccountSectionViewProps {
   lastNameAttribute?: UserProfileNameAttribute;
   emails: UserProfileEmail[];
   phones: UserProfilePhone[];
-  onProfilePictureChange?: (file: File) => void;
+  onProfilePictureChange?: (file: File) => Promise<UserProfileSaveResult>;
   onProfilePictureReject?: (rejections: FileRejection[]) => void;
-  onRemoveProfilePicture?: () => void;
-  onSubmitName?: (value: UserProfileEditNameValue) => Promise<void>;
-  onSubmitUsername?: (username: string) => Promise<void>;
+  onRemoveProfilePicture?: () => Promise<UserProfileSaveResult>;
+  onSubmitName?: (value: UserProfileEditNameValue) => Promise<UserProfileSaveResult<UserProfileEditNameField>>;
+  onSubmitUsername?: (username: string) => Promise<UserProfileSaveResult<UserProfileEditUsernameField>>;
   onAddEmail?: () => void;
   onSendEmailCode?: (emailAddress: string) => Promise<void>;
   onVerifyEmailCode?: (emailAddress: string, code: string) => Promise<void>;
@@ -88,6 +90,7 @@ export function UserProfileAccountSectionView({
   onRemovePhone,
 }: UserProfileAccountSectionViewProps) {
   const m = useMessages('userProfileAccountSection');
+  const showName = firstNameAttribute?.enabled !== false || lastNameAttribute?.enabled !== false;
   const phoneRow = (
     <UserProfilePhoneRowView
       phones={phones}
@@ -127,18 +130,22 @@ export function UserProfileAccountSectionView({
             onReject={onProfilePictureReject}
             onRemove={onRemoveProfilePicture}
           />
-          <UserProfileNameRowView
-            name={name}
-            firstName={firstName}
-            lastName={lastName}
-            firstNameAttribute={firstNameAttribute}
-            lastNameAttribute={lastNameAttribute}
-            onSubmit={onSubmitName}
-          />
-          <UserProfileUsernameRowView
-            username={username}
-            onSubmit={onSubmitUsername}
-          />
+          {showName ? (
+            <UserProfileNameRowView
+              name={name}
+              firstName={firstName}
+              lastName={lastName}
+              firstNameAttribute={firstNameAttribute}
+              lastNameAttribute={lastNameAttribute}
+              onSubmit={onSubmitName}
+            />
+          ) : null}
+          {username !== undefined ? (
+            <UserProfileUsernameRowView
+              username={username}
+              onSubmit={onSubmitUsername}
+            />
+          ) : null}
           {!allowMultipleAccounts ? emailRow : null}
           {!allowMultipleAccounts ? phoneRow : null}
         </Section.Group>

@@ -1,9 +1,9 @@
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
-import type { UserProfileNameAttribute } from './user-profile-account-section.types';
+import type { UserProfileNameAttribute, UserProfileSaveResult } from './user-profile-account-section.types';
 import { useUserProfileEditNameController } from './user-profile-edit-name.controller';
-import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
+import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 import { UserProfileEditNameDialog } from './user-profile-edit-name.dialog';
 
 export interface UserProfileNameRowViewProps {
@@ -12,7 +12,7 @@ export interface UserProfileNameRowViewProps {
   lastName?: string;
   firstNameAttribute?: UserProfileNameAttribute;
   lastNameAttribute?: UserProfileNameAttribute;
-  onSubmit?: (value: UserProfileEditNameValue) => Promise<void>;
+  onSubmit?: (value: UserProfileEditNameValue) => Promise<UserProfileSaveResult<UserProfileEditNameField>>;
 }
 
 export function UserProfileNameRowView({
@@ -58,7 +58,7 @@ function EditName({
   lastName?: string;
   firstNameAttribute?: UserProfileNameAttribute;
   lastNameAttribute?: UserProfileNameAttribute;
-  onSubmit: (value: UserProfileEditNameValue) => Promise<void>;
+  onSubmit: (value: UserProfileEditNameValue) => Promise<UserProfileSaveResult<UserProfileEditNameField>>;
 }) {
   const m = useMessages('userProfileAccountSection');
   const controller = useUserProfileEditNameController({ firstName, lastName, onSubmit });

@@ -1,12 +1,14 @@
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
+import type { UserProfileSaveResult } from './user-profile-account-section.types';
 import { useUserProfileEditUsernameController } from './user-profile-edit-username.controller';
+import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
 import { UserProfileEditUsernameDialog } from './user-profile-edit-username.dialog';
 
 export interface UserProfileUsernameRowViewProps {
   username: string;
-  onSubmit?: (username: string) => Promise<void>;
+  onSubmit?: (username: string) => Promise<UserProfileSaveResult<UserProfileEditUsernameField>>;
 }
 
 export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUsernameRowViewProps) {
@@ -31,7 +33,13 @@ export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUs
   );
 }
 
-function EditUsername({ username, onSubmit }: { username: string; onSubmit: (username: string) => Promise<void> }) {
+function EditUsername({
+  username,
+  onSubmit,
+}: {
+  username: string;
+  onSubmit: (username: string) => Promise<UserProfileSaveResult<UserProfileEditUsernameField>>;
+}) {
   const m = useMessages('userProfileAccountSection');
   const controller = useUserProfileEditUsernameController({ username, onSubmit });
 

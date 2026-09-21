@@ -1,11 +1,11 @@
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
-import type { UserProfileFormError } from './user-profile-account-section.types';
-import { UserProfileSaveError } from './user-profile-account-section.types';
+import type { UserProfileFormError, UserProfileSaveResult } from './user-profile-account-section.types';
+import { formErrorOf } from './user-profile-account-section.types';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
 
 export interface UserProfileEditUsernameContext {
-  saveUsername: (username: string) => Promise<void>;
+  saveUsername: (username: string) => Promise<UserProfileSaveResult<UserProfileEditUsernameField>>;
   savedUsername: string;
   username: string;
   error: UserProfileFormError<UserProfileEditUsernameField> | undefined;
@@ -28,9 +28,6 @@ function isSaveable(context: UserProfileEditUsernameContext): boolean {
 }
 
 function toFormError(cause: unknown): UserProfileFormError<UserProfileEditUsernameField> {
-  if (cause instanceof UserProfileSaveError) {
-    return { message: cause.message, fields: cause.fields };
-  }
   if (cause instanceof Error) {
     return { message: cause.message };
   }
@@ -64,7 +61,17 @@ export const userProfileEditUsernameMachine = createMachine({
     },
     saving: {
       invoke: fromPromise(context => context.saveUsername(context.username), {
-        onDone: { target: 'idle', actions: assign(() => ({ error: undefined })) },
+        onDone: [
+          {
+            guard: (_, event) => event.output.error !== null,
+
+            target: 'editing',
+
+            actions: assign((_, event) => ({ error: formErrorOf(event.output.error) })),
+          },
+
+          { target: 'idle', actions: assign(() => ({ error: undefined })) },
+        ],
         onError: {
           target: 'editing',
           actions: assign((_, event) => ({ error: toFormError(event.error) })),
@@ -76,7 +83,7 @@ export const userProfileEditUsernameMachine = createMachine({
 
 export interface UserProfileEditUsernameControllerOptions {
   username?: string;
-  onSubmit: (username: string) => Promise<void>;
+  onSubmit: (username: string) => Promise<UserProfileSaveResult<UserProfileEditUsernameField>>;
 }
 
 export interface UserProfileEditUsernameController {

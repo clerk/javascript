@@ -18,7 +18,10 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 
-const flows = [{ title: 'Reverification', href: '/live/reverification' }];
+const flows = [
+  { title: 'Account section', href: '/live/account-section' },
+  { title: 'Reverification', href: '/live/reverification' },
+];
 
 export function LiveSidebar(props: ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();

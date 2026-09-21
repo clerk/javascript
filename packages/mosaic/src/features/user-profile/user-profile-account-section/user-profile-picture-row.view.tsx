@@ -8,6 +8,8 @@ import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
 import { FileUpload } from '../../../primitives/file-upload';
+import type { UserProfileSaveResult } from './user-profile-account-section.types';
+import { useUserProfilePictureController } from './user-profile-picture.controller';
 
 const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
 /** Matches the limit the row's own description advertises. */
@@ -18,9 +20,9 @@ export interface UserProfilePictureRowViewProps {
   imageUrl?: string;
   hasImage?: boolean;
   errorMessage?: string;
-  onChange?: (file: File) => void;
+  onChange?: (file: File) => Promise<UserProfileSaveResult>;
   onReject?: (rejections: FileRejection[]) => void;
-  onRemove?: () => void;
+  onRemove?: () => Promise<UserProfileSaveResult>;
 }
 
 export function UserProfilePictureRowView({
@@ -33,8 +35,9 @@ export function UserProfilePictureRowView({
   onRemove,
 }: UserProfilePictureRowViewProps) {
   const m = useMessages('userProfileAccountSection');
+  const controller = useUserProfilePictureController({ onChange, onRemove });
   const [rejectionError, setRejectionError] = useState<string>();
-  const displayedError = errorMessage ?? rejectionError;
+  const displayedError = errorMessage ?? rejectionError ?? controller.errorMessage;
   const initials = name
     .split(/\s+/)
     .map(part => part[0])
@@ -46,6 +49,8 @@ export function UserProfilePictureRowView({
     <FileUpload.Root
       accept={PROFILE_PICTURE_MIME_TYPES}
       maxSize={PROFILE_PICTURE_MAX_BYTES}
+      disabled={controller.isPending}
+      aria-busy={controller.isPending || undefined}
       render={<Section.Row />}
       onReject={rejections => {
         const rejection = rejections[0];
@@ -56,7 +61,7 @@ export function UserProfilePictureRowView({
         const file = files[0];
         if (file) {
           setRejectionError(undefined);
-          onChange?.(file);
+          void controller.onChange?.(file);
         }
       }}
     >
@@ -75,9 +80,9 @@ export function UserProfilePictureRowView({
           <Section.Description>{m.picture.description}</Section.Description>
         </Section.Content>
         <ProfilePictureActions
-          canChange={Boolean(onChange)}
+          canChange={Boolean(controller.onChange)}
           hasImage={hasImage}
-          onRemove={onRemove}
+          onRemove={controller.onRemove}
         />
       </Section.Item>
       <Section.Error>{displayedError}</Section.Error>
@@ -92,7 +97,7 @@ function ProfilePictureActions({
 }: {
   hasImage: boolean;
   canChange: boolean;
-  onRemove?: () => void;
+  onRemove?: () => Promise<void>;
 }) {
   const m = useMessages('userProfileAccountSection');
   const { openFilePicker } = FileUpload.useFileUpload();
@@ -103,7 +108,7 @@ function ProfilePictureActions({
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, icon: 'x', onClick: onRemove });
+    actions.push({ label: m.picture.remove, icon: 'x', onClick: () => void onRemove() });
   }
 
   if (actions.length > 0) {
