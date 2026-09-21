@@ -11,7 +11,9 @@ import {
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
-import { selectOptionScope } from './select.markers.stylex';
+import { selectOptionScope, selectPopupScope } from './select.markers.stylex';
+
+const POPUP_ENTER_SCALE = 0.96;
 
 // With `alignItemWithTrigger` the selected option's box lands over the trigger's, so the two
 // boxes must inset their text identically: the trigger is a `md` Button (32px, 1px border, 12px
@@ -72,11 +74,10 @@ export const popup = stylex.create({
     // Never narrower than the trigger, or the trigger's chevron shows from under the overlay.
     minWidth: 'max(10rem, var(--cl-anchor-width, 0px))',
   },
-  // Scaling a popup that already sits over the trigger reads as the selected row sliding out of place.
   scaled: {
     scale: {
       default: 1,
-      ':where([data-starting-style], [data-ending-style])': 0.96,
+      ':where([data-starting-style], [data-ending-style])': POPUP_ENTER_SCALE,
       '@media (prefers-reduced-motion: reduce)': {
         default: 1,
         ':where([data-starting-style], [data-ending-style])': 1,
@@ -165,6 +166,37 @@ export const description = stylex.create({
   base: {
     color: colorVars['--cl-color-foreground-secondary'],
     fontWeight: fontWeightVars['--cl-font-normal'],
+  },
+});
+
+// The popup scales about the trigger's centre, which is the selected row's own centre: undoing the
+// scale there holds that one row still while the surface grows around it.
+export const selectedOption = stylex.create({
+  counterScale: {
+    scale: {
+      default: 1,
+      [stylex.when.ancestor('[data-ending-style]', selectPopupScope)]: 1 / POPUP_ENTER_SCALE,
+      [stylex.when.ancestor('[data-starting-style]', selectPopupScope)]: 1 / POPUP_ENTER_SCALE,
+      '@media (prefers-reduced-motion: reduce)': {
+        default: 1,
+        [stylex.when.ancestor('[data-ending-style]', selectPopupScope)]: 1,
+        [stylex.when.ancestor('[data-starting-style]', selectPopupScope)]: 1,
+      },
+    },
+    // The popup's pivot, in the row's own box: half the trigger, less the popup border and viewport padding.
+    transformOrigin: `calc(var(--cl-anchor-width, 0px) / 2 - 1px - ${space['0.5']}) 50%`,
+    transitionDuration: {
+      default: durationVars['--cl-duration-base'],
+      [stylex.when.ancestor('[data-ending-style]', selectPopupScope)]: durationVars['--cl-duration-fast'],
+    },
+    transitionProperty: {
+      default: 'scale',
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    transitionTimingFunction: {
+      default: easingVars['--cl-ease-default'],
+      [stylex.when.ancestor('[data-ending-style]', selectPopupScope)]: easingVars['--cl-ease-exit'],
+    },
   },
 });
 

@@ -17,7 +17,7 @@ import { Button } from '../button';
 import { mergeIds, useOptionalFieldControlProps } from '../field/field.context';
 import { Icon } from '../icon';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
-import { selectOptionScope } from './select.markers.stylex';
+import { selectOptionScope, selectPopupScope } from './select.markers.stylex';
 import * as slots from './select.styles';
 
 export interface SelectItem {
@@ -172,7 +172,6 @@ export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(fu
   ref,
 ) {
   const items = React.useContext(ItemsContext);
-  const { overlaysTrigger } = useSelectContext();
 
   return (
     <Primitive.Portal root={portalRoot}>
@@ -183,7 +182,7 @@ export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(fu
           ref={ref}
           {...mergeStyleProps(
             themeProps('select-popup'),
-            stylex.props(reset.base, scrollAreaRoot, slots.popup.base, !overlaysTrigger && slots.popup.scaled, xstyle),
+            stylex.props(reset.base, scrollAreaRoot, selectPopupScope, slots.popup.base, slots.popup.scaled, xstyle),
             rest,
           )}
         >
@@ -218,6 +217,7 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
   { label, description, xstyle, ...rest },
   ref,
 ) {
+  const { overlaysTrigger, selectedValue } = useSelectContext();
   const id = React.useId();
   const labelId = `${id}-label`;
   const descriptionId = `${id}-description`;
@@ -237,6 +237,7 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
           selectOptionScope,
           slots.option.base,
           described && slots.option.described,
+          overlaysTrigger && selectedValue === rest.value && slots.selectedOption.counterScale,
           xstyle,
         ),
         rest,
