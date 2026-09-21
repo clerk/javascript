@@ -127,6 +127,23 @@ describe('API keys playground', () => {
     expect(trigger).toHaveFocus();
   });
 
+  it('updates the expiration label after each selection', async () => {
+    const user = userEvent.setup();
+    render(
+      <MosaicProvider>
+        <Default />
+      </MosaicProvider>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Create API key' }));
+    const trigger = screen.getByRole('combobox', { name: /^Expiration/ });
+
+    for (const label of ['7 Days', '30 Days', 'Never']) {
+      await user.click(trigger);
+      await user.click(screen.getByRole('option', { name: label }));
+      expect(trigger).toHaveTextContent(label);
+    }
+  });
+
   it('keeps the key visible after a copy failure and saves the selected expiration', async () => {
     const user = userEvent.setup();
     const copy = vi
