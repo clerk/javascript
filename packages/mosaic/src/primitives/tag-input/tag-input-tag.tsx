@@ -29,6 +29,8 @@ export const TagInputTag = React.forwardRef<HTMLDivElement, TagInputTagProps>(
       }
     }, [mounted, onTagExited, tagValue]);
 
+    useEffect(() => () => onTagExited(tagValue), [onTagExited, tagValue]);
+
     const registerRef = useCallback(
       (element: HTMLDivElement | null) => {
         elementRef.current = element;

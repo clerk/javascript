@@ -32,6 +32,40 @@ wrap together, and the input grows to fill the rest of its row. Tags fade and sc
   storyModule={TagInputStories}
 />
 
+### View transitions
+
+The same field animated with view transitions instead, so the remaining tags slide into place when
+one is added or removed. The primitive stays unaware of it: the field is controlled, and
+`onValueChange` applies each update inside `document.startViewTransition` with `flushSync`. Render
+only tags where `present` is `true`, so a removed tag leaves the DOM in the same update and the
+browser animates its snapshot out. Each tag sets `view-transition-name: match-element` and
+`view-transition-class: tag`, and the enter and exit keyframes target `::view-transition-new(*.tag)`
+and `::view-transition-old(*.tag)`. The input gets its own `view-transition-class: tag-input` so it
+slides with the tags, and its snapshot uses `object-fit: none` so the width change doesn't stretch
+it. Browsers without view transitions apply the update without animating.
+
+```tsx
+const [value, setValue] = useState<string[]>([]);
+
+<TagInput.Root
+  value={value}
+  onValueChange={next => {
+    if (typeof document.startViewTransition !== 'function') {
+      setValue(next);
+      return;
+    }
+    document.startViewTransition(() => {
+      flushSync(() => setValue(next));
+    });
+  }}
+>
+```
+
+<Story
+  name='ViewTransition'
+  storyModule={TagInputStories}
+/>
+
 ## Usage
 
 The value lives in `TagInput.Root`. Read the tags with the `useTagInput` hook and render one

@@ -1,6 +1,7 @@
 import { act, cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
+import { flushSync } from 'react-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../test-utils/axe';
@@ -200,6 +201,77 @@ describe('TagInput', () => {
 
       const rendered = Array.from(document.querySelectorAll('[data-value]')).map(el => el.getAttribute('data-value'));
       expect(rendered).toEqual(['a', 'b', 'c', 'd']);
+    });
+  });
+
+  describe('deferred updates', () => {
+    function DeferredHarness({ defaultValue }: { defaultValue: string[] }) {
+      const [value, setValue] = useState(defaultValue);
+      return (
+        <TagInput.Root
+          value={value}
+          onValueChange={next => {
+            pending.push(() => flushSync(() => setValue(next)));
+          }}
+        >
+          <TagInput.List aria-label='Emails'>
+            <PresentTags />
+          </TagInput.List>
+          <TagInput.Input aria-label='Email' />
+        </TagInput.Root>
+      );
+    }
+
+    function PresentTags() {
+      const { tags } = TagInput.useTagInput();
+      return (
+        <>
+          {tags
+            .filter(tag => tag.present)
+            .map(tag => (
+              <TagInput.Tag
+                key={tag.value}
+                value={tag.value}
+              >
+                {tag.value}
+                <TagInput.TagRemove />
+              </TagInput.Tag>
+            ))}
+          <output>{tags.map(tag => tag.value).join('|')}</output>
+        </>
+      );
+    }
+
+    const pending: Array<() => void> = [];
+
+    function flushPending() {
+      act(() => {
+        pending.splice(0).forEach(update => update());
+      });
+    }
+
+    it('drops a removed tag once the consumer stops rendering it', async () => {
+      const user = userEvent.setup();
+      render(<DeferredHarness defaultValue={['a', 'b']} />);
+
+      await user.click(screen.getByRole('button', { name: 'Remove a' }));
+      expect(tagValues()).toEqual(['a', 'b']);
+
+      flushPending();
+
+      expect(tagValues()).toEqual(['b']);
+      expect(screen.getByRole('status')).toHaveTextContent(/^b$/);
+    });
+
+    it('applies consecutive removals made before a deferred update lands', async () => {
+      const user = userEvent.setup();
+      render(<DeferredHarness defaultValue={['a', 'b', 'c']} />);
+
+      await user.click(input());
+      await user.keyboard('{Backspace}{Backspace}{Backspace}');
+      flushPending();
+
+      expect(tagValues()).toEqual(['a']);
     });
   });
 

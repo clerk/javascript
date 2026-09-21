@@ -87,6 +87,7 @@ export function TagInputRoot(props: TagInputProps) {
         }
       }
       if (next.length !== current.length) {
+        valueRef.current = next;
         setValue(next);
       }
     },
@@ -108,7 +109,9 @@ export function TagInputRoot(props: TagInputProps) {
       } else {
         focusTag(target);
       }
-      setValue(current.filter(item => item !== tagValue));
+      const nextValue = current.filter(item => item !== tagValue);
+      valueRef.current = nextValue;
+      setValue(nextValue);
     },
     [setValue, focusInput, focusTag],
   );
