@@ -48,15 +48,13 @@ export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
 };
 
 export const assertOAuthAudienceClaim = (aud: unknown, audience?: string | string[]) => {
-  // if no expected audiences, nothing to check
   const audienceList = [audience].flat().filter(a => !!a);
   if (audienceList.length === 0) {
     return;
   }
 
-  // we are now expecting audiences;
-  const audFromToken = aud ? [aud as string[] | undefined].flat() : undefined;
-  if (!audFromToken) {
+  const audFromToken = aud ? [aud].flat() : undefined;
+  if (!isArrayString(audFromToken) || audFromToken.some(a => a.length === 0)) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
       message: `Invalid OAuth audience claim (aud) ${JSON.stringify(aud)}. Expected a non-empty string or a non-empty array of non-empty strings.`,
