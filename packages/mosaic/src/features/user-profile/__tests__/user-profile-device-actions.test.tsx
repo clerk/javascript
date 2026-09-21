@@ -325,6 +325,7 @@ describe('focus after signing a device out', () => {
 
   it('skips the signed-out row when the list only catches up later', async () => {
     const user = userEvent.setup();
+    const catchUp = createDeferredPromise();
     function LateExample() {
       const [devices, setDevices] = useState([current, mobile, desktop]);
       return (
@@ -333,7 +334,7 @@ describe('focus after signing a device out', () => {
             devices={devices}
             // Resolves before the row goes, the way a revoke followed by a refetch does.
             onSignOutDevice={id => {
-              setTimeout(() => setDevices(list => list.filter(device => device.id !== id)), 10);
+              void catchUp.promise.then(() => setDevices(list => list.filter(device => device.id !== id)));
               return Promise.resolve();
             }}
           />
@@ -346,7 +347,12 @@ describe('focus after signing a device out', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
 
     await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Clerk App on macOS' })).toHaveFocus());
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage Safari on iOS' })).not.toBeInTheDocument());
+
+    await act(async () => {
+      catchUp.resolve();
+      await catchUp.promise;
+    });
+    expect(screen.queryByRole('button', { name: 'Manage Safari on iOS' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Manage Clerk App on macOS' })).toHaveFocus();
   });
 

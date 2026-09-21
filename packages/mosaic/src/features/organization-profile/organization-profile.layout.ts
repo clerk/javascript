@@ -16,7 +16,7 @@ export const ORGANIZATION_PROFILE_PAGE_IDS: readonly OrganizationProfilePageId[]
 ];
 
 export const ORGANIZATION_PROFILE_PAGE_ICONS: Record<OrganizationProfilePageId, IconName> = {
-  general: 'cog-6-teeth',
+  general: 'building',
   members: 'users',
   security: 'shield-check',
   billing: 'credit-card',

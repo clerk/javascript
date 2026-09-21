@@ -1,3 +1,4 @@
+import { SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ClientJSON,
   DisplayConfigJSON,
@@ -16,7 +17,6 @@ import type {
   VerificationJSON,
 } from '@clerk/shared/types';
 
-import { SIGN_UP_MODES } from '@/core/constants';
 import type { OrgParams } from '@/test/core-fixtures';
 import { createUser, getOrganizationId } from '@/test/core-fixtures';
 

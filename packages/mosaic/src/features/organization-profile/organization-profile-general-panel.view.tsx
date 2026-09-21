@@ -1,5 +1,3 @@
-import type { FileRejection } from '@clerk/headless/file-upload';
-import { FileUpload } from '@clerk/headless/file-upload';
 import * as stylex from '@stylexjs/stylex';
 import type { FormEvent, ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
@@ -18,6 +16,8 @@ import { Section } from '../../components/section';
 import { Tooltip } from '../../components/tooltip';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { fill, plural, useLocale, useMessages } from '../../localization';
+import type { FileRejection } from '../../primitives/file-upload';
+import { FileUpload } from '../../primitives/file-upload';
 import { mergeStyleProps, themeProps } from '../../props';
 import { styles } from './organization-profile-general-panel.styles';
 

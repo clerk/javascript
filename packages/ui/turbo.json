@@ -11,7 +11,10 @@
         "*.d.ts",
         "src/**",
         "tsconfig.json",
+        "tsconfig.base.json",
+        "tsconfig.src.json",
         "rspack.config.js",
+        "tsdown.config.mts",
 
         "!**/*.test.*",
         "!**/test/**",

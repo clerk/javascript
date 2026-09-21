@@ -34,7 +34,7 @@ export const organizationProfileMessages = {
       dialogTitle: 'Edit workspace name',
     },
     slug: {
-      label: 'Workspace slug',
+      label: 'Slug',
       empty: 'Not set',
       copy: 'Copy',
       copied: 'Copied',

@@ -1,3 +1,6 @@
+import * as stylex from '@stylexjs/stylex';
+import React from 'react';
+
 import type {
   TabsIndicatorProps as HeadlessTabsIndicatorProps,
   TabsListProps as HeadlessTabsListProps,
@@ -5,11 +8,8 @@ import type {
   TabsProps as HeadlessTabsRootProps,
   TabsTabProps as HeadlessTabsTabProps,
   TabsTriggerProps as HeadlessTabsTriggerProps,
-} from '@clerk/headless/tabs';
-import { Tabs as Primitive } from '@clerk/headless/tabs';
-import * as stylex from '@stylexjs/stylex';
-import React from 'react';
-
+} from '../../primitives/tabs';
+import { Tabs as Primitive } from '../../primitives/tabs';
 import type { MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';

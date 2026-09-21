@@ -66,7 +66,7 @@ describe('OrganizationProfileGeneralPanelView', () => {
       onDelete: undefined,
     });
 
-    expect(screen.queryByText('Workspace slug')).not.toBeInTheDocument();
+    expect(screen.queryByText('Slug')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Upload' })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Danger zone' })).not.toBeInTheDocument();
@@ -133,7 +133,7 @@ describe('OrganizationProfileGeneralPanelView', () => {
 
     await user.click(screen.getAllByRole('button', { name: 'Edit' })[1]);
     const dialog = screen.getByRole('dialog', { name: 'Edit workspace slug' });
-    const input = within(dialog).getByRole('textbox', { name: 'Workspace slug' });
+    const input = within(dialog).getByRole('textbox', { name: 'Slug' });
 
     expect(within(dialog).getByText(/Changing it may break existing links/)).toBeInTheDocument();
     await user.clear(input);

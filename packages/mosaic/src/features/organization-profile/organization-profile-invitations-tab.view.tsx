@@ -1,5 +1,3 @@
-import type { OnChangeFn, SortingState } from '@clerk/headless/hooks';
-import { useDataTable } from '@clerk/headless/hooks';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 import React from 'react';
@@ -12,6 +10,8 @@ import { Menu } from '../../components/menu';
 import type { TableSort } from '../../components/table';
 import { Table } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
+import type { OnChangeFn, SortingState } from '../../primitives/hooks';
+import { useDataTable } from '../../primitives/hooks';
 import { colorVars } from '../../tokens.stylex';
 import type { OrganizationProfileBulkOverlay } from './organization-profile-bulk-actions.view';
 import { OrganizationProfileBulkActions } from './organization-profile-bulk-actions.view';
