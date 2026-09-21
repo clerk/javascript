@@ -169,6 +169,9 @@ export type SignInCreateParams = (
 ) & {
   transfer?: boolean;
   signUpIfMissing?: boolean;
+  /**
+   * An IANA timezone for this sign-in. Defaults to the browser's timezone when omitted, if available.
+   */
   timezone?: string;
 };
 
