@@ -8,7 +8,7 @@ import type {
   UserProfileDevice,
 } from './user-profile-active-devices-section.view';
 import { UserProfileActiveDevicesSectionView } from './user-profile-active-devices-section.view';
-import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
+import { UserProfileDeleteSection } from './user-profile-delete-section/user-profile-delete-section';
 import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
@@ -125,7 +125,8 @@ export function UserProfileSecurityPanelView({
             onSignOutDevice={onSignOutDevice}
           />
         ) : null}
-        {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
+        {/* TODO: This is temporary, a view should not render a connected component */}
+        {onDeleteAccount ? <UserProfileDeleteSection onDelete={onDeleteAccount} /> : null}
       </div>
     </div>
   );
