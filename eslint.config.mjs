@@ -173,6 +173,30 @@ const noUnstableMethods = {
   },
 };
 
+const noRawInert = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow the raw `inert` JSX attribute',
+      recommended: false,
+    },
+    messages: {
+      useInertProps:
+        "Use `{...inertProps(active)}` from '@clerk/shared/inert' instead of a raw `inert` attribute. React 18 and 19 need different `inert` values.",
+    },
+    schema: [],
+  },
+  create(context) {
+    return {
+      JSXAttribute(node) {
+        if (node.name.type === 'JSXIdentifier' && node.name.name === 'inert') {
+          context.report({ node, messageId: 'useInertProps' });
+        }
+      },
+    };
+  },
+};
+
 const noPhysicalCssProperties = {
   meta: {
     type: 'problem',
@@ -327,6 +351,7 @@ export default tseslint.config([
           'no-navigate-useClerk': noNavigateUseClerk,
           'no-unstable-methods': noUnstableMethods,
           'no-physical-css-properties': noPhysicalCssProperties,
+          'no-raw-inert': noRawInert,
         },
       },
       'simple-import-sort': pluginSimpleImportSort,
@@ -345,6 +370,7 @@ export default tseslint.config([
     },
     rules: {
       'custom-rules/no-unstable-methods': 'error',
+      'custom-rules/no-raw-inert': 'error',
       'no-label-var': 'error',
       'no-undef-init': 'warn',
       'no-restricted-imports': [
