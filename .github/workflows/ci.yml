@@ -413,7 +413,11 @@ jobs:
           jq --version
 
       - name: Validate turbo task
+        id: validate-turbo
         env:
+          CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
+          CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
+          E2E_DEBUG: '1'
           E2E_APP_CLERK_JS_DIR: ${{runner.temp}}
           E2E_APP_CLERK_UI_DIR: ${{runner.temp}}
           E2E_CLERK_JS_VERSION: 'latest'
@@ -421,11 +425,14 @@ jobs:
           E2E_NEXTJS_VERSION: ${{ matrix.next-version }}
           E2E_PROJECT: ${{ matrix.test-project }}
           INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          TURBO_UI: '0'
         run: |
-          # Validate the turbo task exists. Turbo's --affected flag is a no-op for
-          # root-level tasks (//#) — they are always returned as affected. The previous
-          # --affected check only served to silently skip tests when the task was missing
-          # from turbo.json, hiding real configuration errors.
+          # Validate the turbo task exists and expose whether every task in the
+          # graph is a cache hit. Turbo's --affected flag is a no-op for
+          # root-level tasks (//#) — they are always returned as affected. The
+          # previous --affected check only served to silently skip tests when
+          # the task was missing from turbo.json, hiding real configuration
+          # errors.
           TASK_NAME="test:integration:${{ matrix.test-name }}"
           TURBO_STDERR=$(mktemp)
           if ! TURBO_RAW=$(pnpm turbo run "$TASK_NAME" --dry=json 2>"$TURBO_STDERR"); then
@@ -450,17 +457,31 @@ jobs:
           fi
 
           echo "Task '$TASK_NAME' validated ($TASK_COUNT tasks in graph)"
+          jq -r '.tasks[] | "\(.taskId) cache.status=\(.cache.status // "unknown")"' <<< "$TURBO_JSON"
+
+          CACHE_HIT=$(jq -r 'all(.tasks[]; .cache.status == "HIT")' <<< "$TURBO_JSON")
+          echo "cache-hit=${CACHE_HIT}" >> "$GITHUB_OUTPUT"
+
+          if [ "$CACHE_HIT" = "true" ]; then
+            echo "Task '$TASK_NAME' is a Turbo cache hit; skipping resource setup, tests, and cleanup"
+          else
+            echo "Task '$TASK_NAME' is a Turbo cache miss; running tests"
+          fi
 
       - name: Build packages
+        if: ${{ steps.validate-turbo.outputs.cache-hit != 'true' }}
         run: pnpm turbo build $TURBO_ARGS --only
 
       - name: Publish to local registry
+        if: ${{ steps.validate-turbo.outputs.cache-hit != 'true' }}
         run: pkglab pub --force
 
       - name: Edit .npmrc [link-workspace-packages=false]
+        if: ${{ steps.validate-turbo.outputs.cache-hit != 'true' }}
         run: sed -i -E 's/link-workspace-packages=(deep|true)/link-workspace-packages=false/' .npmrc
 
       - name: Install @clerk/clerk-js in os temp
+        if: ${{ steps.validate-turbo.outputs.cache-hit != 'true' }}
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-js && cd clerk-js
@@ -468,6 +489,7 @@ jobs:
           pkglab add @clerk/clerk-js
 
       - name: Install @clerk/ui in os temp
+        if: ${{ steps.validate-turbo.outputs.cache-hit != 'true' }}
         working-directory: ${{runner.temp}}
         run: |
           mkdir clerk-ui && cd clerk-ui
@@ -475,10 +497,11 @@ jobs:
           pkglab add @clerk/ui
 
       - name: Copy components @clerk/astro
-        if: ${{ matrix.test-name == 'astro' }}
+        if: ${{ steps.validate-turbo.outputs.cache-hit != 'true' && matrix.test-name == 'astro' }}
         run: cd packages/astro && pnpm copy:components
 
       - name: Write all ENV certificates to files in integration/certs
+        if: ${{ steps.validate-turbo.outputs.cache-hit != 'true' }}
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         env:
           INTEGRATION_CERTS: '${{secrets.INTEGRATION_CERTS}}'
@@ -496,11 +519,12 @@ jobs:
             }
 
       - name: LS certs
+        if: ${{ steps.validate-turbo.outputs.cache-hit != 'true' }}
         working-directory: ./integration/certs
         run: ls -la && pwd
 
       - name: Ensure Xvfb is installed
-        if: ${{ matrix.test-name == 'electron' }}
+        if: ${{ steps.validate-turbo.outputs.cache-hit != 'true' && matrix.test-name == 'electron' }}
         run: |
           if ! command -v xvfb-run &> /dev/null; then
             sudo apt-get update
@@ -508,6 +532,7 @@ jobs:
           fi
 
       - name: Configure test user cleanup
+        if: ${{ steps.validate-turbo.outputs.cache-hit != 'true' }}
         run: echo "INTEGRATION_TEST_RUN_KEY=${RUN_ID}-${RUN_ATTEMPT}-${TEST_NAME}-${TEST_PROJECT}-${NEXT_VERSION:-default}" >> "$GITHUB_ENV"
         env:
           RUN_ID: ${{ github.run_id }}
@@ -517,6 +542,7 @@ jobs:
           NEXT_VERSION: ${{ matrix.next-version }}
 
       - name: Run Integration Tests
+        if: ${{ steps.validate-turbo.outputs.cache-hit != 'true' }}
         id: integration-tests
         timeout-minutes: 25
         run: |
@@ -557,7 +583,7 @@ jobs:
           retention-days: 1
 
       - name: Delete integration-test users
-        if: ${{ always() && steps.integration-tests.outcome != 'skipped' }}
+        if: ${{ always() && steps.validate-turbo.outputs.cache-hit != 'true' && steps.integration-tests.outcome != 'skipped' }}
         timeout-minutes: 4
         run: pnpm test:integration:cleanup
         env:
