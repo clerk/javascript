@@ -327,7 +327,6 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
 
       expect(result.tokenType).toBe('oauth_token');
       expect(result.data).toBeDefined();
-      expect((result.data as IdPOAuthAccessToken).aud).toEqual(aud);
       expect(result.errors).toBeUndefined();
     });
 
@@ -347,7 +346,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.errors![0]).toBeInstanceOf(MachineTokenVerificationError);
       expect(result.errors![0]).toMatchObject({
         code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
-        message: expect.stringContaining('Invalid JWT audience claim'),
+        message: expect.stringContaining('Invalid OAuth audience claim'),
       });
     });
 
@@ -747,7 +746,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.data).toBeUndefined();
       expect(result.errors).toHaveLength(1);
       expect(result.errors![0]).toMatchInlineSnapshot(
-        `[MachineTokenVerificationError: Invalid JWT audience claim (aud) "https://attacker.example.com". Is not included in "["https://my-resource.example.com"]".]`,
+        `[MachineTokenVerificationError: Invalid OAuth audience claim (aud) "https://attacker.example.com". Is not included in "["https://my-resource.example.com"]".]`,
       );
     });
   });

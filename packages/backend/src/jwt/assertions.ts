@@ -7,6 +7,10 @@ const isArrayString = (s: unknown): s is string[] => {
   return Array.isArray(s) && s.length > 0 && s.every(a => typeof a === 'string');
 };
 
+const isNonEmptyArrayString = (s: unknown): s is string[] => {
+  return isArrayString(s) && s.every(a => a.length > 0);
+};
+
 export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
   const audienceList = [audience].flat().filter(a => !!a);
   const audList = [aud].flat().filter(a => !!a);
@@ -48,20 +52,27 @@ export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
 };
 
 export const assertOAuthAudienceClaim = (aud?: unknown, audience?: string | string[]) => {
-  if (![audience].flat().some(a => !!a)) {
+  const audienceList = [audience].flat().filter((a): a is string => typeof a === 'string' && a.length > 0);
+  if (audienceList.length === 0) {
     return;
   }
 
-  const hasAudience =
-    (typeof aud === 'string' && aud.length > 0) || (isArrayString(aud) && aud.every(a => a.length > 0));
-  if (!hasAudience) {
+  const audList = typeof aud === 'string' && aud.length > 0 ? [aud] : isNonEmptyArrayString(aud) ? aud : undefined;
+  if (!audList) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
       message: `Invalid OAuth audience claim (aud) ${JSON.stringify(aud)}. Expected a non-empty string or a non-empty array of non-empty strings.`,
     });
   }
 
-  assertAudienceClaim(aud, audience);
+  if (!audList.some(a => audienceList.includes(a))) {
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenVerificationFailed,
+      message: `Invalid OAuth audience claim (aud) ${JSON.stringify(aud)}. Is not included in "${JSON.stringify(
+        audienceList,
+      )}".`,
+    });
+  }
 };
 
 export const assertHeaderType = (typ?: unknown, allowedTypes?: string | string[]) => {
