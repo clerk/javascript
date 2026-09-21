@@ -47,7 +47,7 @@ export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
   }
 };
 
-export const assertOAuthAudienceClaim = (aud?: string[] | undefined, audience?: string | string[]) => {
+export const assertOAuthAudienceClaim = (aud: unknown, audience?: string | string[]) => {
   // if no expected audiences, nothing to check
   const audienceList = [audience].flat().filter(a => !!a);
   if (audienceList.length === 0) {
@@ -55,7 +55,7 @@ export const assertOAuthAudienceClaim = (aud?: string[] | undefined, audience?: 
   }
 
   // we are now expecting audiences;
-  const audFromToken = aud ? [aud].flat() : undefined;
+  const audFromToken = aud ? [aud as string[] | undefined].flat() : undefined;
   if (!audFromToken) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
