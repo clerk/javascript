@@ -32,7 +32,7 @@ test.describe('Keyless mode | middleware authorization @nextjs', () => {
     const response = await page.goto(`${app.serverUrl}/protected`);
     expect(response?.status()).toBe(500);
     const content = await page.content();
-    expect(content).toContain('Missing publishableKey');
+    expect(content).toContain('ready to set up your Clerk .env keys');
     expect(content).toContain('npx clerk@latest init');
   });
 });
