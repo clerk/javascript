@@ -48,6 +48,15 @@ describe('useMosaicRoutes without a provider', () => {
     expect(result.current.route).toBe('index');
   });
 
+  it('returns the same result between renders when the route did not change', () => {
+    const { result, rerender } = renderRoutes();
+    const before = result.current;
+
+    rerender();
+
+    expect(result.current).toBe(before);
+  });
+
   it('moves between routes without touching the URL', async () => {
     const { result } = renderRoutes();
 

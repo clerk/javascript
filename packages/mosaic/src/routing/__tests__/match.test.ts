@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildPath, matchRoute } from '../match';
+import { buildPath, compilePattern, compileRoutes, matchRoute } from '../match';
 
-const routes = {
+const routes = compileRoutes({
   index: '',
   security: 'security',
   statement: 'billing/statement/:statementId',
-} as const;
+});
 
 describe('matchRoute', () => {
   it('matches the empty path to the index route', () => {
@@ -32,12 +32,19 @@ describe('matchRoute', () => {
     expect(matchRoute(routes, 'security/extra')).toBeUndefined();
   });
 
+  it('keeps a malformed escape as is instead of throwing', () => {
+    expect(matchRoute(routes, 'billing/statement/%E0%A4')).toEqual({
+      name: 'statement',
+      params: { statementId: '%E0%A4' },
+    });
+  });
+
   it('does not match an empty param segment', () => {
     expect(matchRoute(routes, 'billing/statement/')).toBeUndefined();
   });
 
   it('returns the first route that matches', () => {
-    expect(matchRoute({ plans: 'billing/plans', statement: 'billing/:id' }, 'billing/plans')).toEqual({
+    expect(matchRoute(compileRoutes({ plans: 'billing/plans', statement: 'billing/:id' }), 'billing/plans')).toEqual({
       name: 'plans',
       params: {},
     });
@@ -45,7 +52,7 @@ describe('matchRoute', () => {
 });
 
 describe('matchRoute with optional params', () => {
-  const optional = { plan: 'billing/plans/:planId?' } as const;
+  const optional = compileRoutes({ plan: 'billing/plans/:planId?' });
 
   it('captures a present optional param', () => {
     expect(matchRoute(optional, 'billing/plans/pro')).toEqual({ name: 'plan', params: { planId: 'pro' } });
@@ -62,18 +69,20 @@ describe('matchRoute with optional params', () => {
 
 describe('buildPath', () => {
   it('returns a static pattern unchanged', () => {
-    expect(buildPath('security', {})).toBe('security');
+    expect(buildPath(compilePattern('security'), {})).toBe('security');
   });
 
   it('fills and encodes params', () => {
-    expect(buildPath('billing/statement/:statementId', { statementId: 'st 1' })).toBe('billing/statement/st%201');
+    expect(buildPath(compilePattern('billing/statement/:statementId'), { statementId: 'st 1' })).toBe(
+      'billing/statement/st%201',
+    );
   });
 
   it('fills a present optional param', () => {
-    expect(buildPath('billing/plans/:planId?', { planId: 'pro' })).toBe('billing/plans/pro');
+    expect(buildPath(compilePattern('billing/plans/:planId?'), { planId: 'pro' })).toBe('billing/plans/pro');
   });
 
   it('drops an absent optional param', () => {
-    expect(buildPath('billing/plans/:planId?', {})).toBe('billing/plans');
+    expect(buildPath(compilePattern('billing/plans/:planId?'), {})).toBe('billing/plans');
   });
 });

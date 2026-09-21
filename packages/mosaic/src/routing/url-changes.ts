@@ -2,13 +2,21 @@ type Listener = () => void;
 
 const listeners = new Set<Listener>();
 let installed = false;
+let scheduled = false;
+
+function flush() {
+  scheduled = false;
+  for (const listener of listeners) {
+    listener();
+  }
+}
 
 function notify() {
-  queueMicrotask(() => {
-    for (const listener of listeners) {
-      listener();
-    }
-  });
+  if (scheduled || listeners.size === 0) {
+    return;
+  }
+  scheduled = true;
+  queueMicrotask(flush);
 }
 
 function patchHistory(method: 'pushState' | 'replaceState') {

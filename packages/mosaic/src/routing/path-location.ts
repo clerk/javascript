@@ -1,4 +1,4 @@
-import { hasUrlInFragment, mergeFragmentIntoUrl } from '@clerk/shared/internal/clerk-js/url';
+import { mergeFragmentIntoUrl } from '@clerk/shared/internal/clerk-js/url';
 
 import type { MosaicLocation, WriteOptions } from './location';
 import { splitQuery } from './match';
@@ -18,9 +18,13 @@ interface PathLocationOptions {
 export function createPathLocation({ basePath, navigate }: PathLocationOptions): PathLocation {
   const base = `/${basePath.split('/').filter(Boolean).join('/')}`.replace(/^\/$/, '');
 
-  const isInBase = (pathname: string) => base === '' || pathname === base || pathname.startsWith(`${base}/`);
+  const basePrefix = `${base}/`;
 
-  const currentUrl = () => mergeFragmentIntoUrl(window.location.href);
+  const isInBase = (pathname: string) => base === '' || pathname === base || pathname.startsWith(basePrefix);
+
+  const hasFragmentPath = () => window.location.hash.startsWith('#/');
+
+  const currentUrl = () => (hasFragmentPath() ? mergeFragmentIntoUrl(window.location.href) : window.location);
 
   const toHostPath = (to: string) => {
     const { path, search } = splitQuery(to);
@@ -34,14 +38,14 @@ export function createPathLocation({ basePath, navigate }: PathLocationOptions):
         return '';
       }
       const { pathname, search } = currentUrl();
-      const path = isInBase(pathname) ? pathname.slice(base.length).replace(/^\/+/, '') : '';
+      const path = isInBase(pathname) ? pathname.slice(base.length + 1) : '';
       return `${path}${search}`;
     },
     write: async (to, options) => {
       await navigate(toHostPath(to), options);
     },
     start: async () => {
-      if (typeof window === 'undefined' || !hasUrlInFragment(window.location.hash)) {
+      if (typeof window === 'undefined' || !hasFragmentPath()) {
         return;
       }
       const { pathname, search } = currentUrl();

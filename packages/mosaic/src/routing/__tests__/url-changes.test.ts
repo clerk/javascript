@@ -48,6 +48,19 @@ describe('subscribeToUrlChanges without the Navigation API', () => {
     expect(second).toHaveBeenCalledTimes(1);
   });
 
+  it('coalesces changes in the same tick into one notification', async () => {
+    const subscribe = await loadSubscribe();
+    const listener = vi.fn();
+    subscribe(listener);
+
+    history.pushState(null, '', '/e');
+    history.replaceState(null, '', '/f');
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    await flushMicrotasks();
+
+    expect(listener).toHaveBeenCalledTimes(1);
+  });
+
   it('stops notifying after unsubscribe', async () => {
     const subscribe = await loadSubscribe();
     const listener = vi.fn();

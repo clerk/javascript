@@ -7,6 +7,8 @@ import { createMemoryLocation } from './memory-location';
 import { useMosaicLocation } from './MosaicRoutingProvider';
 import { createRouter, type Router, type SearchParams } from './router';
 
+const EMPTY_PARAMS: Record<string, string> = Object.freeze({});
+
 export interface MosaicRoutes<Routes extends RouteTable> {
   route: Extract<keyof Routes, string> | undefined;
   params: Record<string, string>;
@@ -24,10 +26,13 @@ export function useMosaicRoutes<const Routes extends RouteTable>(routes: Routes)
   );
   const page = React.useSyncExternalStore(router.subscribe, router.get, router.get);
 
-  return {
-    route: page?.route,
-    params: page?.params ?? {},
-    search: page?.search ?? {},
-    go: router.go,
-  };
+  return React.useMemo(
+    () => ({
+      route: page?.route,
+      params: page?.params ?? EMPTY_PARAMS,
+      search: page?.search ?? EMPTY_PARAMS,
+      go: router.go,
+    }),
+    [page, router],
+  );
 }
