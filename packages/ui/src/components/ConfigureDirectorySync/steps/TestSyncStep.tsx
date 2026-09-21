@@ -119,10 +119,19 @@ export const TestSyncStep = (): JSX.Element => {
     void revalidateUsers().finally(() => setIsRefreshingAfterSync(false));
   }, [isPull, lastSyncedAt?.getTime(), revalidateUsers]);
 
+  // The run reports how many users it changed, and those users are provisioned
+  // after it finishes. A count above zero with nothing listed yet means they
+  // are still landing; zero is the settled answer that the run changed nobody.
+  // The count is absent on a backend that predates it, and then the refresh
+  // above is all there is to go on.
+  const changedUserCount = syncStatus.data?.lastSyncChangedUserCount ?? null;
+  const hasUsersStillLanding = changedUserCount !== null && changedUserCount > 0;
+
   // A push directory is always waiting: the IdP provisions whenever it likes.
   // A pull directory that has finished a run is not — an empty list is that
   // run's result, and spinning implies work that will never happen.
-  const isWaitingForUsers = !isPull || lastSyncStatus === null || lastSyncStatus === 'running' || isRefreshingAfterSync;
+  const isWaitingForUsers =
+    !isPull || lastSyncStatus === null || lastSyncStatus === 'running' || hasUsersStillLanding || isRefreshingAfterSync;
 
   return (
     <>

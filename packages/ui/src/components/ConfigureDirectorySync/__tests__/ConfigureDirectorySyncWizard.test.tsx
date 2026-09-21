@@ -59,7 +59,12 @@ const googleDirectory = (overrides: Record<string, unknown> = {}) =>
     credentialsConfigured: false,
     setCredentials: vi.fn(),
     sync: vi.fn(),
-    getSyncStatus: vi.fn().mockResolvedValue({ lastSyncedAt: null, lastSyncStatus: null, lastSyncError: null }),
+    getSyncStatus: vi.fn().mockResolvedValue({
+      lastSyncedAt: null,
+      lastSyncStatus: null,
+      lastSyncError: null,
+      lastSyncChangedUserCount: null,
+    }),
     ...overrides,
   });
 
@@ -285,6 +290,7 @@ describe('ConfigureDirectorySyncWizard test step', () => {
       lastSyncedAt: new Date(),
       lastSyncStatus: 'succeeded',
       lastSyncError: null,
+      lastSyncChangedUserCount: 0,
     });
     fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
 
@@ -311,6 +317,7 @@ describe('ConfigureDirectorySyncWizard test step', () => {
         lastSyncedAt: new Date(),
         lastSyncStatus: 'succeeded',
         lastSyncError: null,
+        lastSyncChangedUserCount: 3,
       });
       // The refreshed list is slow to arrive. Until it does, the list on screen
       // is the one from before the sync.
@@ -338,6 +345,31 @@ describe('ConfigureDirectorySyncWizard test step', () => {
     });
 
     expect(await screen.findByText('someone@clerk.com')).toBeInTheDocument();
+  });
+
+  it('keeps waiting while the users a finished sync changed are still landing', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    const existing = googleDirectory({ credentialsConfigured: true, enabled: true });
+    // The sync changed users, but they are provisioned after it finishes, so
+    // the list is legitimately empty for a moment.
+    existing.getSyncStatus.mockResolvedValue({
+      lastSyncedAt: new Date(),
+      lastSyncStatus: 'succeeded',
+      lastSyncError: null,
+      lastSyncChangedUserCount: 4,
+    });
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Attribute review')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByText('Waiting for the first sync to finish…')).toBeInTheDocument();
+    expect(screen.queryByText('No users have been provisioned yet.')).not.toBeInTheDocument();
   });
 
   it('keeps waiting while a pull directory has not finished a sync', async () => {
