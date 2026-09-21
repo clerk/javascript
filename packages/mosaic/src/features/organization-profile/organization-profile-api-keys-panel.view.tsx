@@ -80,7 +80,7 @@ export function OrganizationProfileApiKeysPanelView({
         <Profile.PageTitle>{m.title}</Profile.PageTitle>
         <div {...stylex.props(styles.toolbar)}>
           <InputGroup.Root
-            size='sm'
+            size='md'
             xstyle={styles.search}
           >
             <InputGroup.Start>
