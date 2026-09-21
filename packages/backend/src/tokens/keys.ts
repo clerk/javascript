@@ -13,7 +13,7 @@ import {
 } from '../errors';
 import { runtime } from '../runtime';
 import { joinPaths } from '../util/path';
-import { retry } from '../util/shared';
+import { parsePublishableKey, retry } from '../util/shared';
 
 type JsonWebKeyWithKid = JsonWebKey & { kid: string };
 
@@ -113,6 +113,10 @@ export type LoadClerkJWKFromRemoteOptions = {
    */
   secretKey?: string;
   /**
+   * The Clerk Publishable Key from the [**API keys**](https://dashboard.clerk.com/~/api-keys) page in the Clerk Dashboard. Used to load the JWKS from the Frontend API when no `secretKey` is provided.
+   */
+  publishableKey?: string;
+  /**
    * The [Clerk Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }} endpoint.
    * @default 'https://api.clerk.com'
    */
@@ -126,7 +130,8 @@ export type LoadClerkJWKFromRemoteOptions = {
 
 /**
  *
- * Loads a key from JWKS retrieved from the well-known Frontend API endpoint of the issuer.
+ * Loads a key from the JWKS of the Clerk instance: from the Backend API when a `secretKey` is provided,
+ * otherwise from the well-known Frontend API endpoint derived from the `publishableKey`.
  * The result is also cached on the module level to avoid network requests in subsequent invocations.
  * The cache lasts up to 5 minutes.
  *
@@ -136,19 +141,20 @@ export type LoadClerkJWKFromRemoteOptions = {
  * @returns {JsonWebKey} key
  */
 export async function loadClerkJWKFromRemote(params: LoadClerkJWKFromRemoteOptions): Promise<JsonWebKey> {
-  const { secretKey, apiUrl = API_URL, apiVersion = API_VERSION, kid, skipJwksCache } = params;
+  const { secretKey, publishableKey, apiUrl = API_URL, apiVersion = API_VERSION, kid, skipJwksCache } = params;
 
-  const cache = getRemoteCache(`${apiUrl}|${apiVersion}|${secretKey ?? ''}`);
+  const cache = getRemoteCache(secretKey ? `${apiUrl}|${apiVersion}|${secretKey}` : (publishableKey ?? ''));
 
   if (skipJwksCache || cacheHasExpired(cache) || !cache.keys[kid]) {
-    if (!secretKey) {
+    if (!secretKey && !publishableKey) {
       throw new TokenVerificationError({
         action: TokenVerificationErrorAction.ContactSupport,
         message: 'Failed to load JWKS from Clerk Backend or Frontend API.',
         reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
       });
     }
-    const fetcher = () => fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion) as Promise<{ keys: JsonWebKeyWithKid[] }>;
+    const fetcher = () =>
+      secretKey ? fetchJWKSFromBAPI(apiUrl, secretKey, apiVersion) : fetchJWKSFromFAPI(publishableKey);
     const { keys } = await retry(fetcher);
 
     if (!keys || !keys.length) {
@@ -180,7 +186,11 @@ export async function loadClerkJWKFromRemote(params: LoadClerkJWKFromRemoteOptio
   return jwk;
 }
 
-async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string) {
+async function fetchJWKSFromBAPI(
+  apiUrl: string,
+  key: string,
+  apiVersion: string,
+): Promise<{ keys: JsonWebKeyWithKid[] }> {
   if (!key) {
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.SetClerkSecretKey,
@@ -219,6 +229,23 @@ async function fetchJWKSFromBAPI(apiUrl: string, key: string, apiVersion: string
     throw new TokenVerificationError({
       action: TokenVerificationErrorAction.ContactSupport,
       message: `Error loading Clerk JWKS from ${url.href} with code=${response.status}`,
+      reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
+    });
+  }
+
+  return response.json();
+}
+
+async function fetchJWKSFromFAPI(publishableKey: string | undefined): Promise<{ keys: JsonWebKeyWithKid[] }> {
+  const { frontendApi } = parsePublishableKey(publishableKey, { fatal: true });
+  const url = `https://${frontendApi}/.well-known/jwks.json`;
+
+  const response = await runtime.fetch(url, { headers: { 'User-Agent': USER_AGENT } });
+
+  if (!response.ok) {
+    throw new TokenVerificationError({
+      action: TokenVerificationErrorAction.ContactSupport,
+      message: `Error loading Clerk JWKS from ${url} with code=${response.status}`,
       reason: TokenVerificationErrorReason.RemoteJWKFailedToLoad,
     });
   }

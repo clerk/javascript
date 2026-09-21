@@ -155,8 +155,9 @@ export const authenticateRequest: AuthenticateRequest = (async (
   // Default tokenType is session_token for backwards compatibility.
   const acceptsToken = options.acceptsToken ?? TokenType.SessionToken;
 
-  // machine-to-machine tokens can accept a machine secret or a secret key
-  if (acceptsToken !== TokenType.M2MToken) {
+  // M2M tokens can accept a machine secret or a secret key, and OAuth JWTs can be verified
+  // with the publishable key alone, so neither requires a secret key up front.
+  if (acceptsToken !== TokenType.M2MToken && acceptsToken !== TokenType.OAuthToken) {
     assertValidSecretKey(authenticateContext.secretKey);
 
     if (authenticateContext.isSatellite) {
