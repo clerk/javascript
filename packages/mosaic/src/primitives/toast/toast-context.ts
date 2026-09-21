@@ -23,7 +23,7 @@ export interface ToastContextValue extends ExternalToastManager {
 
 export const ToastContext = createContext<ToastContextValue | null>(null);
 
-export function useToastContext() {
+export function useToastContext(): ToastContextValue {
   const ctx = useContext(ToastContext);
   if (!ctx) {
     throw new Error('Toast compound components must be used within <Toast.Provider>');
@@ -44,7 +44,7 @@ export interface ToastRootContextValue {
 
 export const ToastRootContext = createContext<ToastRootContextValue | null>(null);
 
-export function useToastRootContext() {
+export function useToastRootContext(): ToastRootContextValue {
   const ctx = useContext(ToastRootContext);
   if (!ctx) {
     throw new Error('Toast parts must be used within <Toast.Root>');

@@ -49,6 +49,8 @@ export function ToastProvider(props: ToastProviderProps) {
     const onBlur = () => setWindowFocused(false);
     const onFocus = () => setWindowFocused(true);
     const onVisibilityChange = () => setDocumentVisible(document.visibilityState !== 'hidden');
+    setWindowFocused(document.hasFocus());
+    onVisibilityChange();
     window.addEventListener('blur', onBlur);
     window.addEventListener('focus', onFocus);
     document.addEventListener('visibilitychange', onVisibilityChange);

@@ -8,6 +8,7 @@ import { Toast, type ToastManager, type ToastObject } from './index';
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 function ToastList() {
@@ -194,6 +195,38 @@ describe('Toast', () => {
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
 
+    it('renders Action when only a render prop is given', async () => {
+      function List() {
+        const { toasts } = Toast.useToastManager();
+        return (
+          <>
+            {toasts.map(toast => (
+              <Toast.Root
+                key={toast.id}
+                toast={toast}
+              >
+                <Toast.Title />
+                <Toast.Action render={<button type='button'>Retry</button>} />
+              </Toast.Root>
+            ))}
+          </>
+        );
+      }
+      const user = userEvent.setup();
+      render(
+        <Toast.Provider>
+          <Trigger />
+          <Toast.Viewport>
+            <List />
+          </Toast.Viewport>
+        </Toast.Provider>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Add toast' }));
+
+      expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+    });
+
     it('does not render Action without actionProps or children', async () => {
       function List() {
         const { toasts } = Toast.useToastManager();
@@ -367,6 +400,31 @@ describe('Toast', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
       visibility.mockRestore();
+    });
+
+    it('stays paused when mounted in a hidden document', () => {
+      vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
+      const { add, advance } = renderWithTimers({ timeout: 1000 });
+
+      add();
+      advance(5000);
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    });
+
+    it('stays paused when mounted in an unfocused window', () => {
+      vi.spyOn(document, 'hasFocus').mockReturnValue(false);
+      const { add, advance } = renderWithTimers({ timeout: 1000 });
+
+      add();
+      advance(5000);
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      act(() => {
+        fireEvent.focus(window);
+      });
+      advance(1000);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     it('does not run the timer of a limited toast until it is promoted', () => {

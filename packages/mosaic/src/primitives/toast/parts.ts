@@ -17,4 +17,5 @@ export {
   type ToastPriority,
   type ToastPromiseOptions,
   type ToastUpdateOptions,
+  type ToastUpdater,
 } from './toast-manager';

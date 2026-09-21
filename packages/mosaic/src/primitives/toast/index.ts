@@ -16,6 +16,7 @@ export type {
   ToastRootProps,
   ToastTitleProps,
   ToastUpdateOptions,
+  ToastUpdater,
   ToastViewportProps,
   UseToastManagerReturn,
 } from './parts';

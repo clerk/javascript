@@ -13,7 +13,7 @@ export const ToastAction = React.forwardRef<HTMLButtonElement, ToastActionProps>
   const { toast } = useToastRootContext();
 
   const { ref: actionRef, ...actionProps } = toast.actionProps ?? {};
-  const enabled = toast.actionProps !== undefined || otherProps.children != null;
+  const enabled = toast.actionProps !== undefined || otherProps.children != null || render !== undefined;
 
   const defaultProps = { type: 'button' } satisfies DefaultProps<'button'>;
   const closeProps = { onClick: () => close(toast.id) } satisfies DefaultProps<'button'>;
