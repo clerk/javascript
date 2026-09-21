@@ -14,7 +14,7 @@ import type {
   UserProfileConnectionProvider,
 } from './user-profile-connected-accounts-section.view';
 import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
-import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
+import { UserProfileDeleteSection } from './user-profile-delete-section/user-profile-delete-section';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
@@ -131,7 +131,8 @@ export function UserProfileProfilePanelView({
           onRemove={onRemoveWeb3Wallet}
           onSetPrimary={onSetPrimaryWeb3Wallet}
         />
-        {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
+        {/* TODO: This is temporary, a view should not render a connected component */}
+        {onDeleteAccount ? <UserProfileDeleteSection onDelete={onDeleteAccount} /> : null}
       </div>
     </div>
   );
