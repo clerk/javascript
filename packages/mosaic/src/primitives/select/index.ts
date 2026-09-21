@@ -11,3 +11,4 @@ export type {
   SelectTriggerProps,
   SelectValueProps,
 } from './parts';
+export { useSelectContext } from './select-context';

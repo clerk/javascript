@@ -26,6 +26,20 @@ export const value = stylex.create({
   },
 });
 
+// Overlaid, the trigger's open fill is only ever seen crossfading out under the closing popup.
+export const trigger = stylex.create({
+  aligned: {
+    backgroundColor: {
+      default: 'transparent',
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
+      '@media (hover: hover)': {
+        default: null,
+        ':not([data-disabled]):hover:not(:active)': colorVars['--cl-color-neutral-alpha-100'],
+      },
+    },
+  },
+});
+
 export const positioner = stylex.create({
   base: {
     outline: 'none',
@@ -47,6 +61,19 @@ export const popup = stylex.create({
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,
     },
+    transitionDuration: durationVars['--cl-duration-fast'],
+    transitionProperty: 'opacity',
+    transitionTimingFunction: {
+      default: easingVars['--cl-ease-enter'],
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
+    },
+    maxHeight: 'var(--cl-available-height)',
+    maxWidth: 'min(18rem, calc(100vw - 2rem))',
+    // Never narrower than the trigger, or the trigger's chevron shows from under the overlay.
+    minWidth: 'max(10rem, var(--cl-anchor-width, 0px))',
+  },
+  // Scaling a popup that already sits over the trigger reads as the selected row sliding out of place.
+  scaled: {
     scale: {
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0.96,
@@ -68,10 +95,6 @@ export const popup = stylex.create({
       default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
       ':where([data-ending-style])': easingVars['--cl-ease-exit'],
     },
-    maxHeight: 'var(--cl-available-height)',
-    maxWidth: 'min(18rem, calc(100vw - 2rem))',
-    // Never narrower than the trigger, or the trigger's chevron shows from under the overlay.
-    minWidth: 'max(10rem, var(--cl-anchor-width, 0px))',
   },
 });
 

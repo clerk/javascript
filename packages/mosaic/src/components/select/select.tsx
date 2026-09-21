@@ -7,7 +7,7 @@ import type {
   SelectPortalProps,
   SelectProps as PrimitiveSelectProps,
 } from '../../primitives/select';
-import { Select as Primitive } from '../../primitives/select';
+import { Select as Primitive, useSelectContext } from '../../primitives/select';
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
@@ -99,6 +99,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
 ) {
   const generatedId = React.useId();
   const valueId = `${generatedId}-value`;
+  const { overlaysTrigger } = useSelectContext();
   const fieldProps = useOptionalFieldControlProps({
     id: idProp,
     disabled: disabledProp,
@@ -118,6 +119,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
         variant={variant}
         color='neutral'
         size='md'
+        xstyle={overlaysTrigger ? slots.trigger.aligned : undefined}
         {...props}
       />
     ));
@@ -170,6 +172,7 @@ export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(fu
   ref,
 ) {
   const items = React.useContext(ItemsContext);
+  const { overlaysTrigger } = useSelectContext();
 
   return (
     <Primitive.Portal root={portalRoot}>
@@ -180,7 +183,7 @@ export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(fu
           ref={ref}
           {...mergeStyleProps(
             themeProps('select-popup'),
-            stylex.props(reset.base, scrollAreaRoot, slots.popup.base, xstyle),
+            stylex.props(reset.base, scrollAreaRoot, slots.popup.base, !overlaysTrigger && slots.popup.scaled, xstyle),
             rest,
           )}
         >

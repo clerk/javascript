@@ -42,6 +42,8 @@ export interface SelectContextValue {
   openMethodRef: React.MutableRefObject<string | null>;
   /** Whether the popup is currently overlaying the selected option on the trigger. */
   alignItemWithTrigger: boolean;
+  /** Whether the popup covers the trigger: aligned, and with a value selected when it opened. */
+  overlaysTrigger: boolean;
   handleSelect: (value: string, index: number) => void;
   mounted: boolean;
   transitionProps: TransitionProps;

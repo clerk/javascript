@@ -83,11 +83,16 @@ function SelectInner(props: SelectProps) {
   const selectedItemRef = useRef<HTMLElement | null>(null);
   const openRef = useRef(open);
   openRef.current = open;
+  const selectedValueRef = useRef(selectedValue);
+  selectedValueRef.current = selectedValue;
   const openMethodRef = useRef<string | null>(null);
   const updateRef = useRef<() => void>(() => {});
   const [touchOpen, setTouchOpen] = useState(false);
   const [fallback, setFallback] = useState(false);
+  const [selectionOnOpen, setSelectionOnOpen] = useState(false);
   const alignActive = alignProp && !touchOpen && !fallback;
+  // Held from the open, or picking the first value would restyle the popup mid-exit.
+  const overlaysTrigger = alignActive && selectionOnOpen;
   // Memoized so its held position survives re-renders during the exit transition.
   const align = useMemo(
     () =>
@@ -104,6 +109,7 @@ function SelectInner(props: SelectProps) {
     (next: boolean) => {
       if (next) {
         setTouchOpen(openMethodRef.current === 'touch');
+        setSelectionOnOpen(selectedValueRef.current !== undefined);
       }
       setOpen(next);
     },
@@ -236,6 +242,7 @@ function SelectInner(props: SelectProps) {
       selectedItemRef,
       openMethodRef,
       alignItemWithTrigger: alignActive,
+      overlaysTrigger,
       handleSelect,
       mounted,
       transitionProps,
@@ -258,6 +265,7 @@ function SelectInner(props: SelectProps) {
       selectedLabel,
       returnFocusRef,
       alignActive,
+      overlaysTrigger,
       handleSelect,
       mounted,
       transitionProps,
