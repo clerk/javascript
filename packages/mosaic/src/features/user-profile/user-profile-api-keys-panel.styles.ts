@@ -1,144 +1,18 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { fontWeightVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  actionCell: {
-    textAlign: 'end',
-    width: space['12'],
-  },
-  cell: {
-    paddingBlock: space['3'],
-    paddingInline: space['4'],
-    color: colorVars['--cl-color-foreground'],
-    fontSize: typeScaleVars['--cl-text-sm-size'],
-    lineHeight: typeScaleVars['--cl-text-sm-leading'],
-    verticalAlign: 'middle',
-  },
-  checkbox: {
-    accentColor: colorVars['--cl-color-brand'],
-    cursor: 'pointer',
-    height: space['4'],
-    width: space['4'],
-  },
-  checkboxCell: {
-    paddingInlineEnd: space['1'],
-    paddingInlineStart: space['4'],
-    textAlign: 'center',
-    width: space['8'],
-  },
-  emptyCell: {
-    paddingBlock: space['8'],
-    color: colorVars['--cl-color-foreground-secondary'],
-    fontSize: typeScaleVars['--cl-text-sm-size'],
-    lineHeight: typeScaleVars['--cl-text-sm-leading'],
-    textAlign: 'center',
-  },
-  header: {
-    backgroundColor: colorVars['--cl-color-border-subtle'],
-  },
-  headerCell: {
-    paddingBlock: space['2.5'],
-    paddingInline: space['4'],
-    color: colorVars['--cl-color-foreground-secondary'],
-    fontSize: typeScaleVars['--cl-text-xs-size'],
-    fontWeight: fontWeightVars['--cl-font-medium'],
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
-    textAlign: 'start',
-  },
-  keyDescription: {
-    color: colorVars['--cl-color-foreground-secondary'],
-    fontSize: typeScaleVars['--cl-text-xs-size'],
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
-    marginBlockStart: space['0.5'],
-  },
-  keyName: {
-    gap: space['2'],
-    alignItems: 'center',
-    color: colorVars['--cl-color-foreground'],
-    display: 'flex',
-    fontSize: typeScaleVars['--cl-text-sm-size'],
-    fontWeight: fontWeightVars['--cl-font-medium'],
-    lineHeight: typeScaleVars['--cl-text-sm-leading'],
-  },
-  nameColumn: {
-    width: '38%',
-  },
-  pageSizeLabel: {
-    gap: space['2'],
-    alignItems: 'center',
-    color: colorVars['--cl-color-foreground-secondary'],
-    display: 'flex',
-    fontSize: typeScaleVars['--cl-text-xs-size'],
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
-  },
-  pageSizeSelect: {
-    borderColor: colorVars['--cl-color-border'],
-    borderRadius: radiusVars['--cl-radius-md'],
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    paddingBlock: space['1'],
-    paddingInline: space['2'],
-    backgroundColor: colorVars['--cl-color-background'],
-    color: colorVars['--cl-color-foreground'],
-    fontSize: typeScaleVars['--cl-text-xs-size'],
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
-  },
-  pagination: {
-    gap: space['4'],
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  paginationControls: {
-    gap: space['1'],
-    alignItems: 'center',
-    display: 'flex',
-  },
-  row: {
-    borderBlockStartColor: colorVars['--cl-color-border'],
-    borderBlockStartStyle: 'solid',
-    borderBlockStartWidth: '1px',
-  },
-  search: {
-    paddingInlineStart: space['8'],
-  },
-  searchIcon: {
-    color: colorVars['--cl-color-foreground-secondary'],
-    insetInlineStart: space['3'],
-    pointerEvents: 'none',
-    position: 'absolute',
-    transform: 'translateY(-50%)',
-    top: '50%',
-  },
-  searchWrapper: {
-    position: 'relative',
-    width: '17rem',
-  },
-  table: {
-    borderCollapse: 'collapse',
-    tableLayout: 'fixed',
-    width: '100%',
-  },
-  tableScroller: {
-    overflowX: 'auto',
-    width: '100%',
-  },
-  tableShell: {
-    borderColor: colorVars['--cl-color-border'],
-    borderRadius: radiusVars['--cl-radius-xl'],
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-background'],
-    width: '100%',
-  },
   toolbar: {
     gap: space['4'],
     alignItems: 'center',
     display: 'flex',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    width: '100%',
   },
+  search: { maxWidth: '100%', width: '17rem' },
+  footer: { gap: space['4'], alignItems: 'center', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between' },
+  expirationLabel: { alignItems: 'center', display: 'flex', justifyContent: 'space-between' },
+  name: { fontWeight: fontWeightVars['--cl-font-medium'] },
+  metadata: { gap: space['0.5'], display: 'flex', flexDirection: 'column', minWidth: '25ch' },
 });
