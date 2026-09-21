@@ -6,9 +6,7 @@ import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { AnyRequestMiddleware } from '@tanstack/react-start';
 import { createMiddleware } from '@tanstack/react-start';
 
-import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
-import { completeOnboardingIfClaimed } from './keyless/utils';
 import { loadOptions } from './loadOptions';
 import type { ClerkMiddlewareOptions, ClerkMiddlewareOptionsCallback } from './types';
 import { getResponseClerkState } from './utils';
@@ -28,14 +26,6 @@ export const clerkMiddleware = (
       publishableKey: resolvedOptions?.publishableKey,
       secretKey: resolvedOptions?.secretKey,
     });
-
-    if (canUseKeyless) {
-      try {
-        await completeOnboardingIfClaimed(loadedOptions.publishableKey);
-      } catch {
-        // Silently fail - claimed-keys onboarding must not break requests
-      }
-    }
 
     const requestState = await clerkClient().authenticateRequest(clerkRequest, {
       ...loadedOptions,

@@ -9,9 +9,8 @@ const KEYLESS_DISABLED =
   false;
 
 /**
- * Whether the development-only keyless leftovers run: claimed-onboarding completion,
- * the stored-keys hint, and deferring the no-keys error to `authenticateRequest`.
- * The SDK no longer activates keyless mode.
+ * Whether a missing key pair defers to `authenticateRequest`, so its CLI-pointing
+ * missing-publishable-key error surfaces. The SDK no longer activates keyless mode.
  *
  * True only in development, outside automated/CI environments, and unless either is set:
  * - `VITE_CLERK_KEYLESS_DISABLED=1` (for Vite-based projects)
