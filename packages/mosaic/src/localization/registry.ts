@@ -1,3 +1,4 @@
+import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
 import { userProfileMessages } from '../features/user-profile/user-profile.messages';
@@ -19,6 +20,7 @@ import { userProfilePasswordSectionMessages } from '../features/user-profile/use
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets.messages';
 
 export const mosaicMessages = {
+  organizationProfile: organizationProfileMessages,
   reverification: reverificationMessages,
   userButton: userButtonMessages,
   userProfile: userProfileMessages,

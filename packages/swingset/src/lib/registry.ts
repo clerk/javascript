@@ -1,5 +1,6 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
+import { Default as ActionBarDefault, meta as actionBarMeta } from '../stories/action-bar.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
@@ -125,6 +126,42 @@ import {
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
+  Default as OrganizationProfileDefault,
+  meta as organizationProfileMeta,
+  Overlay as OrganizationProfileOverlay,
+} from '../stories/organization-profile.stories';
+import {
+  Default as OrganizationProfileApiKeysPanelDefault,
+  meta as organizationProfileApiKeysPanelMeta,
+} from '../stories/organization-profile-api-keys-panel.stories';
+import {
+  Default as OrganizationProfileBillingPanelDefault,
+  meta as organizationProfileBillingPanelMeta,
+} from '../stories/organization-profile-billing-panel.stories';
+import {
+  Default as OrganizationProfileGeneralPanelDefault,
+  meta as organizationProfileGeneralPanelMeta,
+} from '../stories/organization-profile-general-panel.stories';
+import {
+  Default as OrganizationProfileInvitationsTabDefault,
+  meta as organizationProfileInvitationsTabMeta,
+} from '../stories/organization-profile-invitations-tab.stories';
+import {
+  Default as OrganizationProfileMembersPanelDefault,
+  EmptyInvitations as OrganizationProfileMembersPanelEmptyInvitations,
+  EmptyMembers as OrganizationProfileMembersPanelEmptyMembers,
+  EmptyRequests as OrganizationProfileMembersPanelEmptyRequests,
+  meta as organizationProfileMembersPanelMeta,
+} from '../stories/organization-profile-members-panel.stories';
+import {
+  Default as OrganizationProfileRequestsTabDefault,
+  meta as organizationProfileRequestsTabMeta,
+} from '../stories/organization-profile-requests-tab.stories';
+import {
+  Default as OrganizationProfileSecurityPanelDefault,
+  meta as organizationProfileSecurityPanelMeta,
+} from '../stories/organization-profile-security-panel.stories';
+import {
   Default as OtpComponentDefault,
   Disabled as OtpComponentDisabled,
   Error as OtpComponentError,
@@ -136,8 +173,8 @@ import {
   Disabled as PaginationDisabled,
   FirstLast as PaginationFirstLast,
   meta as paginationMeta,
+  MiddlePage as PaginationMiddlePage,
   Primary as PaginationPrimary,
-  Siblings as PaginationSiblings,
   SinglePage as PaginationSinglePage,
 } from '../stories/pagination.stories';
 import {
@@ -396,6 +433,11 @@ const comboboxModule: StoryModule = {
   Scrolling: ComboboxScrolling,
 };
 
+const actionBarModule: StoryModule = {
+  meta: actionBarMeta,
+  Default: ActionBarDefault,
+};
+
 const avatarModule: StoryModule = {
   meta: avatarMeta,
   Primary: AvatarPrimary,
@@ -443,7 +485,7 @@ const paginationModule: StoryModule = {
   meta: paginationMeta,
   Primary: PaginationPrimary,
   FirstLast: PaginationFirstLast,
-  Siblings: PaginationSiblings,
+  MiddlePage: PaginationMiddlePage,
   SinglePage: PaginationSinglePage,
   Disabled: PaginationDisabled,
 };
@@ -619,6 +661,42 @@ const userProfileApiKeysPanelModule: StoryModule = {
   Default: UserProfileApiKeysPanelDefault,
   Empty: UserProfileApiKeysPanelEmpty,
 };
+const organizationProfileModule: StoryModule = {
+  meta: organizationProfileMeta,
+  Default: OrganizationProfileDefault,
+  Overlay: OrganizationProfileOverlay,
+};
+const organizationProfileGeneralPanelModule: StoryModule = {
+  meta: organizationProfileGeneralPanelMeta,
+  Default: OrganizationProfileGeneralPanelDefault,
+};
+const organizationProfileMembersPanelModule: StoryModule = {
+  meta: organizationProfileMembersPanelMeta,
+  Default: OrganizationProfileMembersPanelDefault,
+  EmptyMembers: OrganizationProfileMembersPanelEmptyMembers,
+  EmptyInvitations: OrganizationProfileMembersPanelEmptyInvitations,
+  EmptyRequests: OrganizationProfileMembersPanelEmptyRequests,
+};
+const organizationProfileSecurityPanelModule: StoryModule = {
+  meta: organizationProfileSecurityPanelMeta,
+  Default: OrganizationProfileSecurityPanelDefault,
+};
+const organizationProfileBillingPanelModule: StoryModule = {
+  meta: organizationProfileBillingPanelMeta,
+  Default: OrganizationProfileBillingPanelDefault,
+};
+const organizationProfileApiKeysPanelModule: StoryModule = {
+  meta: organizationProfileApiKeysPanelMeta,
+  Default: OrganizationProfileApiKeysPanelDefault,
+};
+const organizationProfileInvitationsTabModule: StoryModule = {
+  meta: organizationProfileInvitationsTabMeta,
+  Default: OrganizationProfileInvitationsTabDefault,
+};
+const organizationProfileRequestsTabModule: StoryModule = {
+  meta: organizationProfileRequestsTabMeta,
+  Default: OrganizationProfileRequestsTabDefault,
+};
 const userProfileModule: StoryModule = {
   meta: userProfileMeta,
   Default: UserProfileDefault,
@@ -783,12 +861,24 @@ export const registry: StoryModule[] = [
   userProfileEnterpriseAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
+  // Organization Profile
+  organizationProfileModule,
+  // Organization Profile · Panels
+  organizationProfileGeneralPanelModule,
+  organizationProfileMembersPanelModule,
+  organizationProfileSecurityPanelModule,
+  organizationProfileBillingPanelModule,
+  organizationProfileApiKeysPanelModule,
+  // Organization Profile · Sections
+  organizationProfileInvitationsTabModule,
+  organizationProfileRequestsTabModule,
   // Reverification
   reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
   confirmationModule,
   destructiveModule,
   // Components
+  actionBarModule,
   avatarModule,
   badgeModule,
   bannerModule,

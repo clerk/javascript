@@ -4,7 +4,7 @@ import { colorVars, fontWeightVars, space, typeScaleVars } from '../../tokens.st
 
 export const styles = stylex.create({
   root: {
-    gap: space['1'],
+    gap: 0,
     paddingBlock: space['10'],
     paddingInline: space['6'],
     alignItems: 'center',
@@ -16,7 +16,7 @@ export const styles = stylex.create({
   },
   icon: {
     display: 'inline-flex',
-    marginBlockEnd: space['1'],
+    marginBlockEnd: space['2'],
   },
   label: {
     color: colorVars['--cl-color-foreground'],
@@ -28,6 +28,7 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-foreground-secondary'],
     fontSize: typeScaleVars['--cl-text-xs-size'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    marginBlockStart: space['1'],
     maxWidth: '32ch',
   },
   actions: {
@@ -36,6 +37,6 @@ export const styles = stylex.create({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    marginBlockStart: space['2'],
+    marginBlockStart: space['3'],
   },
 });

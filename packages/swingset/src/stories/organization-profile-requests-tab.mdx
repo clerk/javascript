@@ -1,0 +1,18 @@
+import * as OrganizationProfileRequestsTabStories from './organization-profile-requests-tab.stories';
+
+# OrganizationProfileRequestsTab
+
+Membership requests as a sortable `Table`: the requester, the role they asked for, when they
+requested, and per-row accept and decline actions. Shown on the Members page's Requests tab; it
+takes the shared search and role filter as props.
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileRequestsTabStories}
+  composition={[
+    { name: 'Table', href: '/components/table', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'EmptyState', href: '/components/empty-state', layer: 'Components' },
+  ]}
+/>

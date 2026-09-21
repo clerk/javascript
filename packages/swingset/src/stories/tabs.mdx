@@ -2,17 +2,12 @@ import * as TabsStories from './tabs.stories';
 
 # Tabs
 
-A set of layered sections where one panel is shown at a time, selected from a row of tabs,
-from `@clerk/headless`. It is a **headless** primitive: it supplies behavior, active-tab
-state, roving-tabindex keyboard navigation, an optional position-tracking indicator, and
-ARIA wiring, but ships **no styles** — you bring your own CSS by targeting the `data-*`
-attributes each part emits.
+A set of layered sections where one panel is shown at a time. Tabs include keyboard navigation,
+ARIA wiring, and an indicator that slides between selections.
 
 ## Example
 
-The demo below is intentionally unstyled — it renders the raw primitive so you can see its
-behavior and ARIA wiring. Click a tab (or focus one and use the arrow keys) to swap the
-visible panel.
+Click a tab, or focus one and use the arrow keys, to swap the visible panel.
 
 <Story
   name='Default'
@@ -22,7 +17,7 @@ visible panel.
 ## Usage
 
 ```tsx
-import { Tabs } from '@clerk/headless/tabs';
+import { Tabs } from '@clerk/mosaic/components/tabs';
 
 <Tabs.Root defaultValue='tab1'>
   <Tabs.List>
@@ -59,8 +54,8 @@ const [value, setValue] = useState('tab1');
 | `Tabs.Panel`     | `<div>`         | `role="tabpanel"`; hidden via the `hidden` attribute when inactive |
 | `Tabs.Indicator` | `<span>`        | Decorative element that tracks the active tab's position and size  |
 
-All rendered parts accept a `render` prop for polymorphic rendering and standard HTML
-attributes for their default element. `Tabs.Root` renders no element of its own.
+All rendered parts accept a `render` prop for polymorphic rendering, standard HTML attributes,
+and `xstyle`. `Tabs.Root` renders no element of its own.
 
 ## Props
 
@@ -91,7 +86,7 @@ attributes for their default element. `Tabs.Root` renders no element of its own.
 `Tabs.List` and `Tabs.Indicator` take no additional props beyond standard HTML
 attributes for their default element.
 
-## Styling
+## State
 
 Each part emits `data-*` attributes you can target with any CSS solution:
 
@@ -105,8 +100,8 @@ Each part emits `data-*` attributes you can target with any CSS solution:
 | `data-starting-style` | Panel        | Enter-animation first frame (force-mounted panels only)          |
 | `data-ending-style`   | Panel        | Exit-animation frame (force-mounted panels only)                 |
 
-`Tabs.Indicator` is absolutely positioned and exposes the active tab's geometry as CSS
-variables (give `Tabs.List` `position: relative`):
+`Tabs.Indicator` is positioned against `Tabs.List` and exposes the active tab's geometry as CSS
+variables:
 
 | Variable          | Description                             |
 | ----------------- | --------------------------------------- |
@@ -116,13 +111,4 @@ variables (give `Tabs.List` `position: relative`):
 | `--cl-tab-height` | Active tab height                       |
 
 A force-mounted `Tabs.Panel` also exposes `--cl-tab-transition-direction` (`1` when moving
-to a later tab, `-1` to an earlier one) for directional slide animations.
-
-```css
-.cl-tabs-indicator {
-  position: absolute;
-  left: var(--cl-tab-left);
-  width: var(--cl-tab-width);
-  transition: left 200ms ease, width 200ms ease;
-}
-```
+to a later tab, `-1` to an earlier one) for directional panel transitions.

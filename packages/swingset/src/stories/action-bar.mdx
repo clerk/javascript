@@ -1,0 +1,49 @@
+import * as ActionBarStories from './action-bar.stories';
+
+# ActionBar
+
+A floating bar of actions for a current selection. It sits at the foot of its nearest positioned
+ancestor — give that ancestor `position: relative` and the bar centers over its bottom — and
+animates in when opened. While closed it is inert and click-through, so the surface
+underneath stays usable.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={ActionBarStories}
+  composition={[
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+```tsx
+<ActionBar.Root open={selectedCount > 0}>
+  <ActionBar.Count>{selectedCount} selected</ActionBar.Count>
+  <ActionBar.Separator />
+  <Menu.Root>{/* Change role */}</Menu.Root>
+  <Button color='negative' variant='ghost' shape='square' aria-label='Remove'>
+    <Icon name='trash' />
+  </Button>
+  <ActionBar.Separator />
+  <ActionBar.Dismiss onClick={clearSelection} />
+</ActionBar.Root>
+```
+
+## Parts
+
+| Part                  | Element  | Description                                                                |
+| --------------------- | -------- | -------------------------------------------------------------------------- |
+| `ActionBar.Root`      | `div`    | The positioner + floating surface. Takes `open`; renders `role='toolbar'`. |
+| `ActionBar.Count`     | `div`    | The leading count of what is selected.                                     |
+| `ActionBar.Separator` | `div`    | A vertical divider between groups.                                         |
+| `ActionBar.Dismiss`   | `button` | Clears the selection. A ghost icon button; labelled `Clear selection`.     |
+
+## Styling
+
+`ActionBar.Root` reflects `data-open` (`true` / `false`) on its surface, so the entrance
+transition and the closed (click-through) state are both selectable. The actions themselves are
+whatever children you place between the parts.

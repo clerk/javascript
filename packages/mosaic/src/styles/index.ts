@@ -3,6 +3,13 @@
 // StyleX rollup plugin can walk this graph and extract one static `styles.css`.
 
 export type { MosaicComponentProps, MosaicElementProps } from '../props';
+export { ActionBar } from '../components/action-bar';
+export type {
+  ActionBarCountProps,
+  ActionBarDismissProps,
+  ActionBarRootProps,
+  ActionBarSeparatorProps,
+} from '../components/action-bar';
 export { Avatar } from '../components/avatar';
 export type { AvatarProps, AvatarImageProps, AvatarFallbackProps, AvatarIconProps } from '../components/avatar';
 export { Badge } from '../components/badge';
@@ -112,6 +119,15 @@ export type {
   TableSelectCellProps,
   TableSort,
 } from '../components/table';
+export { Tabs } from '../components/tabs';
+export type {
+  TabsIndicatorProps,
+  TabsListProps,
+  TabsPanelProps,
+  TabsRootProps,
+  TabsTabProps,
+  TabsTriggerProps,
+} from '../components/tabs';
 export { Section } from '../components/section';
 export type {
   SectionActionsProps,
@@ -211,3 +227,4 @@ export type TypeScaleVarName = keyof typeof typeScaleVars;
 export { mergeStyleProps, themeProps } from '../props';
 export { UserProfileMfaSectionView } from '../features/user-profile/user-profile-mfa-section.view';
 export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-mfa-setup.view';
+export { OrganizationProfileView } from '../features/organization-profile/organization-profile.view';

@@ -318,12 +318,14 @@ export interface ProfileNavItemProps extends MosaicComponentProps<'button'> {
   value: string;
   /** Leads the label. Any node, so a page of the consumer's own can bring its own mark. */
   icon?: React.ReactNode;
+  /** Trailing content aligned to the end of the row, e.g. a count `Badge`. */
+  badge?: React.ReactNode;
   disabled?: boolean;
 }
 
 /** A destination. Selecting it shows the `Profile.ContentPanel` sharing its `value`. */
 const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(function ProfileNavItem(
-  { value, icon, disabled, children, render, xstyle, onClick, ...rest },
+  { value, icon, badge, disabled, children, render, xstyle, onClick, ...rest },
   ref,
 ) {
   const { compact, closeNav } = useProfileContext('Profile.NavItem');
@@ -355,6 +357,11 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
         </span>
       ) : null}
       <span {...themeProps('profile-nav-item-label')}>{children}</span>
+      {badge != null ? (
+        <span {...mergeStyleProps(themeProps('profile-nav-item-badge'), stylex.props(reset.base, styles.navItemBadge))}>
+          {badge}
+        </span>
+      ) : null}
     </Tabs.Tab>
   );
 });

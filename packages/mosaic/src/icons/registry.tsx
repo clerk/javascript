@@ -81,6 +81,8 @@ import { Sidebar } from './glyphs/sidebar';
 import { Spinner } from './glyphs/spinner';
 import { Support } from './glyphs/support';
 import { Trash } from './glyphs/trash';
+import { User } from './glyphs/user';
+import { User2 } from './glyphs/user-2';
 import { UserCircle } from './glyphs/user-circle';
 import { UserCirclePlus } from './glyphs/user-circle-plus';
 import { Users } from './glyphs/users';
@@ -310,6 +312,8 @@ export const iconRegistry = {
   spinner: Spinner,
   support: Support,
   trash: Trash,
+  user: User,
+  'user-2': User2,
   'user-circle': UserCircle,
   'user-circle-plus': UserCirclePlus,
   users: Users,

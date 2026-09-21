@@ -2,7 +2,9 @@ import * as PaginationStories from './pagination.stories';
 
 # Pagination
 
-Page navigation for a paged list. Renders a labelled `nav` with previous and next controls, the page numbers around the current one, and a results-per-page control. Pages are 1-based and the component is controlled: `onChange` receives the page the user asked for, and `onPageSizeChange` receives the size chosen from the results-per-page `Select`.
+Page navigation for a paged list. It shows the visible item range, a results-per-page control,
+first and previous controls, the current page count, and next and last controls. Pages are 1-based
+and controlled.
 
 ## Example
 
@@ -20,16 +22,27 @@ Page navigation for a paged list. Renders a labelled `nav` with previous and nex
     { name: 'totalItems', type: 'number', default: '—', description: 'Total number of items across every page.' },
     { name: 'pageSize', type: 'number', default: '—', description: 'Items per page. The page count is derived from this and `totalItems`.' },
     { name: 'onChange', type: '(page: number) => void', default: '—', description: 'Called with the page the user navigated to.' },
-    { name: 'pageSizeOptions', type: 'number[]', default: '[10, 25, 50, 100]', description: 'Sizes offered by the results-per-page select. The current `pageSize` is always included.' },
+    { name: 'pageSizeOptions', type: 'number[]', default: '[10, 15, 20, 100]', description: 'Sizes offered by the results-per-page select. The current `pageSize` is always included.' },
     { name: 'onPageSizeChange', type: '(pageSize: number) => void', default: '—', description: 'Called with the page size the user chose.' },
     { name: 'step', type: 'number', default: '1', description: 'How many pages the previous and next controls move.' },
-    { name: 'siblingCount', type: 'number', default: '1', description: 'Pages shown on each side of the current one.' },
     { name: 'label', type: 'string', default: "'Pagination'", description: 'Accessible name of the `nav`.' },
+    {
+      name: 'rangeLabel',
+      type: 'string',
+      default: "'{start}–{end} of {total}'",
+      description: 'The item range, with `{start}`, `{end}` and `{total}` filled in.',
+    },
     {
       name: 'pageSizeLabel',
       type: 'string',
       default: "'Results per page'",
       description: 'Text of the label beside the page size select.',
+    },
+    {
+      name: 'pageSizeLabelCompact',
+      type: 'string',
+      default: "'Show'",
+      description: 'Stands in for `pageSizeLabel` when the pagination is too narrow to carry it.',
     },
     { name: 'firstPageLabel', type: 'string', default: "'First page'", description: 'Accessible name of the first page control.' },
     {
@@ -62,10 +75,10 @@ Page navigation for a paged list. Renders a labelled `nav` with previous and nex
   storyModule={PaginationStories}
 />
 
-### Sibling count
+### Middle page
 
 <Story
-  name='Siblings'
+  name='MiddlePage'
   storyModule={PaginationStories}
 />
 

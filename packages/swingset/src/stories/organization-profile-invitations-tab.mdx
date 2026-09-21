@@ -1,0 +1,18 @@
+import * as OrganizationProfileInvitationsTabStories from './organization-profile-invitations-tab.stories';
+
+# OrganizationProfileInvitationsTab
+
+Pending invitations as a sortable `Table`: the invitee, their role, when they were invited, and a
+per-row revoke. Shown on the Members page's Invitations tab; it takes the shared search and role
+filter as props.
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileInvitationsTabStories}
+  composition={[
+    { name: 'Table', href: '/components/table', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'EmptyState', href: '/components/empty-state', layer: 'Components' },
+  ]}
+/>
