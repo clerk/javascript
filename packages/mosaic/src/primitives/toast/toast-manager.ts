@@ -2,6 +2,23 @@ import type { ComponentPropsWithRef, ReactNode } from 'react';
 
 export type ToastPriority = 'low' | 'high';
 
+export type ToastSide = 'top' | 'bottom' | 'left' | 'right';
+
+export type ToastAlign = 'start' | 'center' | 'end';
+
+export interface ToastPositionerOptions {
+  /** The element the toast is positioned against. */
+  anchor?: Element | null;
+  /** @default 'top' */
+  side?: ToastSide;
+  /** @default 'center' */
+  align?: ToastAlign;
+  /** Gap between the anchor and the toast, in px. @default 0 */
+  sideOffset?: number;
+  /** Shift along the alignment axis, in px. @default 0 */
+  alignOffset?: number;
+}
+
 export interface ToastObject {
   id: string;
   title?: ReactNode;
@@ -21,6 +38,8 @@ export interface ToastObject {
   onRemove?: () => void;
   /** Props merged onto `Toast.Action`. Its `onClick` runs before the toast closes. */
   actionProps?: ComponentPropsWithRef<'button'>;
+  /** Positioning for `Toast.Positioner`. Overrides the props given to the positioner. */
+  positionerProps?: ToastPositionerOptions;
   data?: Record<string, unknown>;
 }
 

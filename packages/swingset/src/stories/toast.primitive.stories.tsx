@@ -84,3 +84,49 @@ export function Default() {
     </Toast.Provider>
   );
 }
+
+const anchoredToastManager = Toast.createToastManager();
+
+function AnchoredToasts() {
+  const { toasts } = Toast.useToastManager();
+  return (
+    <>
+      {toasts.map(toast => (
+        <Toast.Positioner
+          key={toast.id}
+          toast={toast}
+          sideOffset={8}
+        >
+          <Toast.Root toast={toast}>
+            <Toast.Arrow />
+            <Toast.Description />
+          </Toast.Root>
+        </Toast.Positioner>
+      ))}
+    </>
+  );
+}
+
+export function Anchored() {
+  return (
+    <Toast.Provider toastManager={anchoredToastManager}>
+      <button
+        type='button'
+        onClick={event =>
+          anchoredToastManager.add({
+            description: 'Copied',
+            timeout: 1500,
+            positionerProps: { anchor: event.currentTarget },
+          })
+        }
+      >
+        Copy
+      </button>
+      <Toast.Portal>
+        <Toast.Viewport>
+          <AnchoredToasts />
+        </Toast.Viewport>
+      </Toast.Portal>
+    </Toast.Provider>
+  );
+}
