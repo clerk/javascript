@@ -441,6 +441,24 @@ describe('Toast', () => {
       advance(1000);
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
+
+    it('announces a limited toast only once it is promoted', () => {
+      const { add, advance } = renderWithTimers({ limit: 1, timeout: 1000 });
+
+      add({ title: 'First' });
+      add({ title: 'Second' });
+
+      advance(50);
+      const [second, first] = screen.getAllByRole('status', { hidden: true });
+      expect(second).toHaveTextContent('Second');
+      expect(first).toBeEmptyDOMElement();
+
+      advance(1000);
+      expect(screen.getByRole('dialog')).not.toHaveAttribute('data-limited');
+
+      advance(50);
+      expect(screen.getByRole('status')).toHaveTextContent('First');
+    });
   });
 
   describe('limit', () => {
@@ -890,11 +908,12 @@ describe('Toast', () => {
   describe('accessibility (axe)', () => {
     it('has no violations', async () => {
       const user = userEvent.setup();
-      const { container } = renderToast();
+      renderToast();
 
       await user.click(screen.getByRole('button', { name: 'Add toast' }));
+      await screen.findByRole('dialog');
 
-      expect(await axe(container)).toHaveNoViolations();
+      expect(await axe(document.body, { rules: { region: { enabled: false } } })).toHaveNoViolations();
     });
   });
 

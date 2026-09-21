@@ -35,12 +35,16 @@ const visuallyHidden: CSSProperties = {
 
 function ToastAnnouncer(props: { toast: ToastObject }) {
   const { toast } = props;
+  const limited = toast.limited === true;
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    if (limited) {
+      return;
+    }
     const id = setTimeout(() => setReady(true), 50);
     return () => clearTimeout(id);
-  }, []);
+  }, [limited]);
 
   const assertive = toast.priority === 'high';
 
