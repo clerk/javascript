@@ -2,8 +2,8 @@ import * as DialogStories from './dialog.stories';
 
 # Dialog
 
-A modal window that overlays the page and traps focus until dismissed, from
-`@clerk/headless`. It is a **headless** primitive: it supplies open state, portalling, an
+A modal window that overlays the page and traps focus until dismissed. It is a
+**headless** primitive: it supplies open state, portalling, an
 overlay surface, a centering viewport with optional body scroll lock, focus management,
 dismissal (outside press / Escape), and ARIA wiring, but ships **no styles** — you bring
 your own CSS by targeting the `data-*` state attributes each part emits.
@@ -21,7 +21,7 @@ behavior and ARIA wiring. Open it, then press Escape or click outside the popup 
 ## Usage
 
 ```tsx
-import { Dialog } from '@clerk/headless/dialog';
+import { Dialog } from '@clerk/mosaic/primitives/dialog';
 
 <Dialog.Root>
   <Dialog.Trigger>Open</Dialog.Trigger>
