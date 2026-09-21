@@ -11,6 +11,9 @@ interface FixtureAPIKey extends UserProfileAPIKey {
   lastUsedAt: number | null;
 }
 
+const relativeTime = new Intl.RelativeTimeFormat('en-US');
+const exampleTime = Date.now();
+
 export const exampleAPIKeys: FixtureAPIKey[] = [
   'Web app',
   'Mobile app',
@@ -30,8 +33,8 @@ export const exampleAPIKeys: FixtureAPIKey[] = [
   createdAtLabel: `Jan ${index + 5}, 2026`,
   createdAt: Date.UTC(2026, 0, index + 5),
   expiresAtLabel: index % 2 === 0 ? 'Dec 31, 2027' : null,
-  lastUsedAtLabel: index % 3 === 0 ? `Jan ${31 - index}, 2026` : null,
-  lastUsedAt: index % 3 === 0 ? Date.UTC(2026, 0, 31 - index) : null,
+  lastUsedAtLabel: index % 3 === 0 ? relativeTime.format(-(index + 2), 'minute') : null,
+  lastUsedAt: index % 3 === 0 ? exampleTime - (index + 2) * 60_000 : null,
 }));
 
 function getExpirationDate(expiration: UserProfileCreateAPIKeyDialogProps['expiration'], now = new Date()) {

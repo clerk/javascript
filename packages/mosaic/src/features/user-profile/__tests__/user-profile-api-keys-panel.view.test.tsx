@@ -14,7 +14,7 @@ const apiKeys: UserProfileAPIKey[] = [
     name: 'Primary API Key',
     createdAtLabel: 'Jan 5, 2026',
     expiresAtLabel: 'Dec 31, 2027',
-    lastUsedAtLabel: 'Jan 31, 2026',
+    lastUsedAtLabel: '2 minutes ago',
   },
   { id: 'legacy', name: 'Legacy API Key', createdAtLabel: 'Jul 1, 2024', expiresAtLabel: null, lastUsedAtLabel: null },
 ];
@@ -341,7 +341,7 @@ describe('UserProfileApiKeysPanelView', () => {
     expect(screen.getByText('Expires Dec 31, 2027')).toBeVisible();
     expect(screen.getByRole('cell', { name: 'Jul 1, 2024' })).toBeVisible();
     expect(screen.getByText('Never expires.')).toBeVisible();
-    expect(screen.getByText('Jan 31, 2026')).toBeVisible();
+    expect(screen.getByText('2 minutes ago')).toBeVisible();
     expect(screen.getByText('-')).toBeVisible();
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();

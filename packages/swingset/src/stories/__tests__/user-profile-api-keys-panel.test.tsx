@@ -151,7 +151,7 @@ describe('API keys playground', () => {
     expect(names().slice(0, 2)).toEqual(['Select Web app', 'Select Mobile app']);
     await user.click(screen.getByRole('button', { name: 'Last used' }));
     expect(names().slice(0, 4)).toEqual(['Select Backups', 'Select Reports', 'Select Analytics', 'Select Web app']);
-    expect(screen.getByRole('cell', { name: 'Jan 22, 2026' })).toBeVisible();
+    expect(screen.getByRole('cell', { name: '11 minutes ago' })).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Last used' }));
     expect(names().slice(0, 4)).toEqual(['Select Web app', 'Select Analytics', 'Select Reports', 'Select Backups']);
     expect(screen.getByRole('columnheader', { name: 'Last used' })).toHaveAttribute('aria-sort', 'descending');
@@ -238,7 +238,7 @@ describe('API keys playground', () => {
     expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('columnheader', { name: 'Date created' })).toBeVisible();
     expect(screen.getByRole('cell', { name: 'Jan 5, 2026' })).toBeVisible();
-    expect(screen.getByRole('cell', { name: 'Jan 31, 2026' })).toBeVisible();
+    expect(screen.getByRole('cell', { name: '2 minutes ago' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Date created' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Name' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Last used' })).not.toBeInTheDocument();
