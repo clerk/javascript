@@ -65,7 +65,12 @@ describe('API keys playground', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
     const copyDialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
     await waitFor(() => expect(within(copyDialog).getByRole('button', { name: 'Copy API key' })).toHaveFocus());
-    const secret = within(copyDialog).getByText(/^ak_demo_/).textContent;
+    const secretInput = within(copyDialog).getByRole('textbox', { name: 'API key' });
+    expect(secretInput).toHaveAttribute('readonly');
+    const secret = secretInput.getAttribute('value');
+    expect(secret).toMatch(/^ak_demo_/);
+    await user.click(secretInput);
+    expect(secretInput).toHaveFocus();
     expect(within(copyDialog).queryByLabelText('Secret key name')).not.toBeInTheDocument();
     await user.click(within(copyDialog).getByRole('button', { name: 'Copy and close' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
@@ -175,7 +180,7 @@ describe('API keys playground', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('Impossible de copier cette clé.');
-    expect(within(dialog).getByText(/^ak_demo_/)).toBeVisible();
+    expect(within(dialog).getByDisplayValue(/^ak_demo_/)).toBeVisible();
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(copy).toHaveBeenCalledTimes(2);
