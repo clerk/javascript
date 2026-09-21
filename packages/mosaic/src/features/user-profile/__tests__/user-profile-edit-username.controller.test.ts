@@ -85,7 +85,7 @@ describe('userProfileEditUsernameMachine', () => {
     actor.send({ type: 'TYPE', value: 'preston' });
     actor.send({ type: 'SAVE' });
 
-    await vi.waitFor(() => expect(actor.getSnapshot().context.error).toEqual({ global: {} }));
+    await vi.waitFor(() => expect(actor.getSnapshot().context.error).toEqual({ global: { code: 'generic' } }));
     expect(log).toHaveBeenCalledWith(failure);
     log.mockRestore();
   });

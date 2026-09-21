@@ -22,10 +22,7 @@ export function formErrorOf<TField extends string>(failure: SaveFailure<TField> 
   return error;
 }
 
-export function unexpectedFormError(cause: unknown): FormError<never> {
-  console.error(cause);
-  return { global: {} };
-}
+export const UNEXPECTED_ERROR: LocalizableError = { code: 'generic' };
 
 function toFormError<TField extends string>(cause: unknown, fields: readonly TField[]): FormError<TField> | undefined {
   if (isClerkRuntimeError(cause)) {

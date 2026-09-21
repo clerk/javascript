@@ -19,7 +19,6 @@ export interface UserProfilePictureRowViewProps {
   name: string;
   imageUrl?: string;
   hasImage?: boolean;
-  errorMessage?: string;
   onChange?: (file: File) => Promise<SaveResult>;
   onReject?: (rejections: FileRejection[]) => void;
   onRemove?: () => Promise<SaveResult>;
@@ -29,7 +28,6 @@ export function UserProfilePictureRowView({
   name,
   imageUrl,
   hasImage = false,
-  errorMessage,
   onChange,
   onReject,
   onRemove,
@@ -38,7 +36,7 @@ export function UserProfilePictureRowView({
   const errorText = useErrorText();
   const controller = useUserProfilePictureController({ onChange, onRemove });
   const [rejectionError, setRejectionError] = useState<string>();
-  const displayedError = errorMessage ?? rejectionError ?? (controller.error ? errorText(controller.error) : undefined);
+  const displayedError = rejectionError ?? (controller.error ? errorText(controller.error) : undefined);
   const initials = name
     .split(/\s+/)
     .map(part => part[0])
