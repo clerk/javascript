@@ -15,7 +15,7 @@ export default defineConfig({
   sourcemap: false,
   tsconfig: './tsconfig.json',
   deps: {
-    neverBundle: ['react', 'react-dom', /^@clerk\/shared(\/.*)?$/, /^@floating-ui\//],
+    neverBundle: ['react', 'react-dom', /^@clerk\/shared(\/.*)?$/],
     alwaysBundle: [/^@stylexjs\//],
     onlyBundle: false,
   },
