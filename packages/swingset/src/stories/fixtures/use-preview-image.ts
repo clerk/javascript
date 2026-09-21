@@ -24,6 +24,7 @@ export function usePreviewImage(initialUrl?: string) {
       const next = URL.createObjectURL(file);
       objectUrlRef.current = next;
       setImageUrl(next);
+      return Promise.resolve({ error: null });
     },
     [release],
   );
@@ -31,6 +32,7 @@ export function usePreviewImage(initialUrl?: string) {
   const clearImage = useCallback(() => {
     release();
     setImageUrl(undefined);
+    return Promise.resolve({ error: null });
   }, [release]);
 
   return { imageUrl, showFile, clearImage };

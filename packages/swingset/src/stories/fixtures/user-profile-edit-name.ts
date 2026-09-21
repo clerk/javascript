@@ -1,5 +1,4 @@
 import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
-import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type { UserProfileEditNameValue } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-edit-name.dialog';
 import { useState } from 'react';
 
@@ -7,7 +6,7 @@ export interface UserProfileEditNameFixtureOptions {
   firstName?: string;
   lastName?: string;
   latency?: number;
-  /** Rejects every save instead of committing it. */
+  /** Fails every save instead of committing it. */
   failWith?: UserProfileFormError;
 }
 
@@ -29,9 +28,10 @@ export function useUserProfileEditNameFixture({
     onSubmitName: async (value: UserProfileEditNameValue) => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith) {
-        throw new UserProfileSaveError(failWith.message ?? 'Something went wrong.', failWith.fields);
+        return { error: { kind: 'form' as const, ...failWith } };
       }
       setName(value);
+      return { error: null };
     },
   };
 }

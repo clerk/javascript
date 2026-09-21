@@ -2,13 +2,24 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../../machine/createActor';
-import { UserProfileSaveError } from '../user-profile-account-section/user-profile-account-section.types';
+import type {
+  UserProfileFormError,
+  UserProfileSaveResult,
+} from '../user-profile-account-section/user-profile-account-section.types';
 import {
   userProfileEditUsernameMachine,
   useUserProfileEditUsernameController,
 } from '../user-profile-account-section/user-profile-edit-username.controller';
+import type { UserProfileEditUsernameField } from '../user-profile-account-section/user-profile-edit-username.dialog';
 
-function start(saveUsername: () => Promise<void>, savedUsername = 'prestonxyz') {
+type Result = UserProfileSaveResult<UserProfileEditUsernameField>;
+
+const saved = (): Promise<Result> => Promise.resolve({ error: null });
+const failed = (error: UserProfileFormError<UserProfileEditUsernameField>): Promise<Result> =>
+  Promise.resolve({ error: { kind: 'form', ...error } });
+const cancelled = (): Promise<Result> => Promise.resolve({ error: { kind: 'cancelled' } });
+
+function start(saveUsername: () => Promise<Result>, savedUsername = 'prestonxyz') {
   const actor = createActor(userProfileEditUsernameMachine, { context: { saveUsername, savedUsername } }).start();
   actor.send({ type: 'OPEN' });
   return actor;
@@ -16,14 +27,14 @@ function start(saveUsername: () => Promise<void>, savedUsername = 'prestonxyz') 
 
 describe('userProfileEditUsernameMachine', () => {
   it('seeds the field from the saved username on open', () => {
-    const actor = start(() => Promise.resolve());
+    const actor = start(saved);
 
     expect(actor.getSnapshot().value).toBe('editing');
     expect(actor.getSnapshot().context.username).toBe('prestonxyz');
   });
 
   it('returns to idle when the save lands, and can be opened again', async () => {
-    const actor = start(() => Promise.resolve());
+    const actor = start(saved);
     actor.send({ type: 'TYPE', value: 'preston' });
     actor.send({ type: 'SAVE' });
     expect(actor.getSnapshot().value).toBe('saving');
@@ -36,7 +47,7 @@ describe('userProfileEditUsernameMachine', () => {
   });
 
   it('re-seeds from the saved username on the next open, dropping what was typed', () => {
-    const actor = start(() => Promise.resolve());
+    const actor = start(saved);
     actor.send({ type: 'TYPE', value: 'ada' });
     actor.send({ type: 'CANCEL' });
 
@@ -46,20 +57,19 @@ describe('userProfileEditUsernameMachine', () => {
   });
 
   it('keeps what was typed when the save fails, so it can be corrected', async () => {
-    const actor = start(() => Promise.reject(new Error('That username is taken.')));
+    const actor = start(() => failed({ message: 'That username is taken.' }));
     actor.send({ type: 'TYPE', value: 'preston' });
     actor.send({ type: 'SAVE' });
 
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('editing'));
     expect(actor.getSnapshot().context.username).toBe('preston');
-    expect(actor.getSnapshot().context.error).toEqual({ message: 'That username is taken.', fields: undefined });
+    expect(actor.getSnapshot().context.error).toEqual({ message: 'That username is taken.' });
   });
 
-  it('carries field copy through when the rejection names the control', async () => {
-    const failure = new UserProfileSaveError('Your username could not be updated.', {
-      username: 'That username is taken.',
-    });
-    const actor = start(() => Promise.reject(failure));
+  it('carries field copy through when the error names the control', async () => {
+    const actor = start(() =>
+      failed({ message: 'Your username could not be updated.', fields: { username: 'That username is taken.' } }),
+    );
     actor.send({ type: 'TYPE', value: 'preston' });
     actor.send({ type: 'SAVE' });
 
@@ -68,7 +78,7 @@ describe('userProfileEditUsernameMachine', () => {
     );
   });
 
-  it('falls back to generic copy when the rejection is not an Error', async () => {
+  it('falls back to generic copy when the save throws something that is not an Error', async () => {
     // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors -- a non-Error rejection is the case under test
     const actor = start(() => Promise.reject('nope'));
     actor.send({ type: 'TYPE', value: 'preston' });
@@ -80,7 +90,7 @@ describe('userProfileEditUsernameMachine', () => {
   });
 
   it('refuses to save a value that has not moved', () => {
-    const saveUsername = vi.fn(() => Promise.resolve());
+    const saveUsername = vi.fn(saved);
     const actor = start(saveUsername);
 
     actor.send({ type: 'SAVE' });
@@ -91,7 +101,7 @@ describe('userProfileEditUsernameMachine', () => {
   });
 
   it('refuses to save an empty value, since clearing a username is not on offer', () => {
-    const saveUsername = vi.fn(() => Promise.resolve());
+    const saveUsername = vi.fn(saved);
     const actor = start(saveUsername);
     actor.send({ type: 'TYPE', value: '' });
 
@@ -101,8 +111,17 @@ describe('userProfileEditUsernameMachine', () => {
     expect(saveUsername).not.toHaveBeenCalled();
   });
 
+  it('stays open without a banner when the save is cancelled', async () => {
+    const actor = start(cancelled);
+    actor.send({ type: 'TYPE', value: 'preston' });
+    actor.send({ type: 'SAVE' });
+
+    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('editing'));
+    expect(actor.getSnapshot().context.error).toBeUndefined();
+  });
+
   it('drops the error when the dialog is cancelled', async () => {
-    const actor = start(() => Promise.reject(new Error('nope')));
+    const actor = start(() => failed({ message: 'nope' }));
     actor.send({ type: 'TYPE', value: 'preston' });
     actor.send({ type: 'SAVE' });
     await vi.waitFor(() => expect(actor.getSnapshot().context.error?.message).toBe('nope'));
@@ -117,7 +136,7 @@ describe('userProfileEditUsernameMachine', () => {
 describe('useUserProfileEditUsernameController', () => {
   it('holds the dialog open across editing and saving, then closes on success', async () => {
     const { result } = renderHook(() =>
-      useUserProfileEditUsernameController({ username: 'prestonxyz', onSubmit: () => Promise.resolve() }),
+      useUserProfileEditUsernameController({ username: 'prestonxyz', onSubmit: saved }),
     );
     expect(result.current.isOpen).toBe(false);
 
@@ -137,7 +156,7 @@ describe('useUserProfileEditUsernameController', () => {
   });
 
   it('saves the value it is currently holding', async () => {
-    const onSubmit = vi.fn(() => Promise.resolve());
+    const onSubmit = vi.fn(saved);
     const { result } = renderHook(() => useUserProfileEditUsernameController({ username: 'prestonxyz', onSubmit }));
 
     act(() => result.current.onOpenChange(true));
@@ -149,7 +168,7 @@ describe('useUserProfileEditUsernameController', () => {
 
   it('withholds the save until the value moves', () => {
     const { result } = renderHook(() =>
-      useUserProfileEditUsernameController({ username: 'prestonxyz', onSubmit: () => Promise.resolve() }),
+      useUserProfileEditUsernameController({ username: 'prestonxyz', onSubmit: saved }),
     );
 
     act(() => result.current.onOpenChange(true));
@@ -161,7 +180,7 @@ describe('useUserProfileEditUsernameController', () => {
 
   it('withholds the save on an empty value', () => {
     const { result } = renderHook(() =>
-      useUserProfileEditUsernameController({ username: 'prestonxyz', onSubmit: () => Promise.resolve() }),
+      useUserProfileEditUsernameController({ username: 'prestonxyz', onSubmit: saved }),
     );
 
     act(() => result.current.onOpenChange(true));

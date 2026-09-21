@@ -1,11 +1,11 @@
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
-import type { UserProfileFormError } from './user-profile-account-section.types';
-import { UserProfileSaveError } from './user-profile-account-section.types';
+import type { UserProfileFormError, UserProfileSaveResult } from './user-profile-account-section.types';
+import { formErrorOf } from './user-profile-account-section.types';
 import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 
 export interface UserProfileEditNameContext {
-  saveName: (value: UserProfileEditNameValue) => Promise<void>;
+  saveName: (value: UserProfileEditNameValue) => Promise<UserProfileSaveResult<UserProfileEditNameField>>;
   /** Injected every render. What `OPEN` seeds the fields from. */
   savedFirstName: string;
   savedLastName: string;
@@ -27,9 +27,6 @@ function notSeated(): Promise<never> {
 }
 
 function toFormError(cause: unknown): UserProfileFormError<UserProfileEditNameField> {
-  if (cause instanceof UserProfileSaveError) {
-    return { message: cause.message, fields: cause.fields };
-  }
   if (cause instanceof Error) {
     return { message: cause.message };
   }
@@ -69,7 +66,17 @@ export const userProfileEditNameMachine = createMachine({
     },
     saving: {
       invoke: fromPromise(context => context.saveName({ firstName: context.firstName, lastName: context.lastName }), {
-        onDone: { target: 'idle', actions: assign(() => ({ error: undefined })) },
+        onDone: [
+          {
+            guard: (_, event) => event.output.error !== null,
+
+            target: 'editing',
+
+            actions: assign((_, event) => ({ error: formErrorOf(event.output.error) })),
+          },
+
+          { target: 'idle', actions: assign(() => ({ error: undefined })) },
+        ],
         onError: {
           target: 'editing',
           actions: assign((_, event) => ({ error: toFormError(event.error) })),
@@ -82,8 +89,8 @@ export const userProfileEditNameMachine = createMachine({
 export interface UserProfileEditNameControllerOptions {
   firstName?: string;
   lastName?: string;
-  /** Resolve to close the dialog; reject with an `Error` to keep it open showing why. */
-  onSubmit: (value: UserProfileEditNameValue) => Promise<void>;
+  /** Resolve with `{ error: null }` to close the dialog, or with an error to keep it open showing why. */
+  onSubmit: (value: UserProfileEditNameValue) => Promise<UserProfileSaveResult<UserProfileEditNameField>>;
 }
 
 export interface UserProfileEditNameController {
