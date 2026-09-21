@@ -78,7 +78,7 @@ import {
 
 import { debugLogger } from '@/utils/debug';
 
-import { getBrowserLocale, getBrowserTimezone, web3 } from '../../utils';
+import { getBrowserLocale, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
@@ -87,6 +87,7 @@ import {
 import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { getBrowserTimezone } from '../../utils/timezone';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,

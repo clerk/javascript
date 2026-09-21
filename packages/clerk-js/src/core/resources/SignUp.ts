@@ -50,7 +50,7 @@ import type {
 
 import { debugLogger } from '@/utils/debug';
 
-import { getBrowserLocale, getBrowserTimezone, getClerkQueryParam, web3 } from '../../utils';
+import { getBrowserLocale, getClerkQueryParam, web3 } from '../../utils';
 import {
   _authenticateWithPopup,
   _futureAuthenticateWithPopup,
@@ -60,6 +60,7 @@ import { _authenticateWithTransport } from '../../utils/authenticateWithTranspor
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { normalizeUnsafeMetadata } from '../../utils/resourceParams';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { getBrowserTimezone } from '../../utils/timezone';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
