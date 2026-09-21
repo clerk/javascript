@@ -1,17 +1,19 @@
 import type {
-  UserProfileAPIKey,
   UserProfileAPIKeySort,
   UserProfileApiKeysPanelViewProps,
 } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.types';
 import type { UserProfileCreateAPIKeyDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-create-api-key.dialog';
+import { useLocale, useMessages } from '@clerk/mosaic/localization';
 import { useEffect, useRef, useState } from 'react';
 
-interface FixtureAPIKey extends UserProfileAPIKey {
+interface FixtureAPIKey {
+  id: string;
+  name: string;
   createdAt: number;
+  expiresAt: number | null;
   lastUsedAt: number | null;
 }
 
-const relativeTime = new Intl.RelativeTimeFormat('en-US');
 const exampleTime = Date.now();
 
 export const exampleAPIKeys: FixtureAPIKey[] = [
@@ -30,10 +32,8 @@ export const exampleAPIKeys: FixtureAPIKey[] = [
 ].map((name, index) => ({
   id: `ak_example${String(index + 1).padStart(16, '0')}`,
   name,
-  createdAtLabel: `Jan ${index + 5}, 2026`,
   createdAt: Date.UTC(2026, 0, index + 5),
-  expiresAtLabel: index % 2 === 0 ? 'Dec 31, 2027' : null,
-  lastUsedAtLabel: index % 3 === 0 ? relativeTime.format(-(index + 2), 'minute') : null,
+  expiresAt: index % 2 === 0 ? Date.UTC(2027, 11, 31) : null,
   lastUsedAt: index % 3 === 0 ? exampleTime - (index + 2) * 60_000 : null,
 }));
 
@@ -80,6 +80,8 @@ export function useUserProfileAPIKeysFixture({
   initialKeys?: FixtureAPIKey[];
   enableSorting?: boolean;
 } = {}): UserProfileApiKeysPanelViewProps {
+  const m = useMessages('userProfileApiKeysPanel');
+  const locale = useLocale();
   const [items, setItems] = useState(initialKeys);
   const [searchValue, setSearchValue] = useState('');
   const [query, setQuery] = useState('');
@@ -93,13 +95,14 @@ export function useUserProfileAPIKeysFixture({
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pageSize, setPageSize] = useState(10);
-  const dateLabel = (date: Date) =>
-    new Intl.DateTimeFormat('en-US', {
+  const dateLabel = (date: Date | number) =>
+    new Intl.DateTimeFormat(locale, {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
       timeZone: 'UTC',
     }).format(date);
+  const relativeTime = new Intl.RelativeTimeFormat(locale);
 
   const expirationDate = getExpirationDate(expiration);
 
@@ -125,7 +128,16 @@ export function useUserProfileAPIKeysFixture({
   }, [page, pageCount]);
 
   return {
-    apiKeys: sorted.slice((page - 1) * pageSize, page * pageSize),
+    apiKeys: sorted.slice((page - 1) * pageSize, page * pageSize).map(item => ({
+      id: item.id,
+      name: item.name,
+      createdAtLabel: dateLabel(item.createdAt),
+      expiresAtLabel: item.expiresAt === null ? null : dateLabel(item.expiresAt),
+      lastUsedAtLabel:
+        item.lastUsedAt === null
+          ? null
+          : relativeTime.format(Math.round((item.lastUsedAt - exampleTime) / 60_000), 'minute'),
+    })),
     totalCount: filtered.length,
     page,
     pageSize,
@@ -166,10 +178,8 @@ export function useUserProfileAPIKeysFixture({
             id,
             name: name.trim(),
             createdAt: createdAt.getTime(),
-            createdAtLabel: dateLabel(createdAt),
-            expiresAtLabel: expiresAt ? dateLabel(expiresAt) : null,
+            expiresAt: expiresAt?.getTime() ?? null,
             lastUsedAt: null,
-            lastUsedAtLabel: null,
           },
           ...current,
         ]);
@@ -188,7 +198,7 @@ export function useUserProfileAPIKeysFixture({
             setOpen(false);
           }
         } catch {
-          setError('Could not copy the API key. Try again.');
+          setError(m.copyError);
         } finally {
           setIsPending(false);
         }
