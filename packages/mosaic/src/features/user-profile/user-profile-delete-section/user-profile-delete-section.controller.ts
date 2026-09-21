@@ -2,7 +2,7 @@ import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
 
 export interface UserProfileDeleteSectionContext {
-  /** Deletes the account. Injected by the view from its `onDelete` prop. */
+  /** Deletes the account. Injected by the wrapper from its `onDelete` prop. */
   deleteAccount: () => Promise<void>;
   /** Why the last attempt failed. */
   errorMessage: string | undefined;

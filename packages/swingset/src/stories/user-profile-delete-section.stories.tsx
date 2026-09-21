@@ -1,3 +1,4 @@
+import { useUserProfileDeleteSectionController } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.controller';
 import { UserProfileDeleteSectionView } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.view';
 import { useState } from 'react';
 
@@ -11,12 +12,17 @@ export const meta: StoryMeta = {
   title: 'UserProfileDeleteSection',
   label: 'Danger zone',
   navigation: { category: 'Sections' },
-  source: 'packages/mosaic/src/features/user-profile/user-profile-delete-section/user-profile-delete-section.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-delete-section/user-profile-delete-section.tsx',
 };
 
 // A real delete is a network round trip. Without one the button never renders its pending
 // state, so both stories wait before they settle.
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+
+function DeleteSectionHarness({ onDelete }: { onDelete: () => Promise<void> }) {
+  const controller = useUserProfileDeleteSectionController({ onDelete });
+  return <UserProfileDeleteSectionView {...controller} />;
+}
 
 export function Default() {
   const [runId, setRunId] = useState(0);
@@ -29,7 +35,7 @@ export function Default() {
   };
 
   return (
-    <UserProfileDeleteSectionView
+    <DeleteSectionHarness
       key={runId}
       onDelete={handleDelete}
     />
@@ -38,7 +44,7 @@ export function Default() {
 
 export function WithError() {
   return (
-    <UserProfileDeleteSectionView
+    <DeleteSectionHarness
       onDelete={async () => {
         await settleAfter(2000);
         throw new Error('Your subscription is still active. Cancel it before you delete your account.');
