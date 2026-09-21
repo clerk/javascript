@@ -12,5 +12,6 @@ export const styles = stylex.create({
   },
   search: { maxWidth: '100%', width: '17rem' },
   name: { fontWeight: fontWeightVars['--cl-font-medium'] },
+  dateCell: { whiteSpace: 'nowrap' },
   metadata: { gap: space['0.5'], display: 'flex', flexDirection: 'column', minWidth: '25ch' },
 });

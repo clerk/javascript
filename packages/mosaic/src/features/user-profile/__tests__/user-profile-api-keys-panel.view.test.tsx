@@ -47,6 +47,17 @@ function renderView(overrides: Partial<UserProfileApiKeysPanelViewProps> = {}) {
 }
 
 describe('UserProfileApiKeysPanelView', () => {
+  it.each([
+    ['', 'No API Keys created', 'API keys allow apps and scripts access your account without signing in'],
+    ['   ', 'No API Keys created', 'API keys allow apps and scripts access your account without signing in'],
+    ['Special Key', 'No API keys found', 'Your search for "Special Key" did not return any results.'],
+  ])('shows the empty state for search "%s"', (searchValue, label, description) => {
+    renderView({ apiKeys: [], totalCount: 0, searchValue });
+
+    expect(screen.getByText(label)).toBeVisible();
+    expect(screen.getByText(description)).toBeVisible();
+  });
+
   it('localizes the shared confirmation for each selected key', async () => {
     const user = userEvent.setup();
     const onRevoke = vi.fn<(id: string) => Promise<void>>().mockRejectedValueOnce(null);
@@ -133,7 +144,7 @@ describe('UserProfileApiKeysPanelView', () => {
         await pending.promise;
       });
       await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-      expect(screen.getByText('No API keys found')).toBeVisible();
+      expect(screen.getByText('No API Keys created')).toBeVisible();
       expect(
         hasCreate ? screen.getByRole('button', { name: 'Create API key' }) : screen.getByRole('searchbox'),
       ).toHaveFocus();
@@ -207,7 +218,7 @@ describe('UserProfileApiKeysPanelView', () => {
       }
     }
     expect(onRevoke.mock.calls).toEqual([['primary'], ['legacy']]);
-    expect(screen.getByText('No API keys found')).toBeVisible();
+    expect(screen.getByText('No API Keys created')).toBeVisible();
     expect(screen.getByRole('searchbox', { name: 'Search API keys' })).toHaveFocus();
   });
   it('only offers selection with an injected bulk action and has no bulk action button', async () => {
@@ -296,7 +307,7 @@ describe('UserProfileApiKeysPanelView', () => {
       </MosaicProvider>,
     );
     expect(screen.getByRole('status')).toHaveTextContent('Loading API keys');
-    expect(screen.queryByText('No API keys found')).not.toBeInTheDocument();
+    expect(screen.queryByText('No API Keys created')).not.toBeInTheDocument();
     view.rerender(
       <MosaicProvider>
         <UserProfileApiKeysPanelView
@@ -321,7 +332,7 @@ describe('UserProfileApiKeysPanelView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.getByText('No API keys found')).toBeVisible();
+    expect(screen.getByText('No API Keys created')).toBeVisible();
     expect(screen.getAllByRole('columnheader')).toHaveLength(3);
   });
   it('renders complete metadata with only the shipped columns and calls creation', async () => {
@@ -337,7 +348,7 @@ describe('UserProfileApiKeysPanelView', () => {
     expect(screen.getByRole('cell', { name: 'Jan 5, 2026' })).toBeVisible();
     expect(screen.getByText('Expires Dec 31, 2027')).toBeVisible();
     expect(screen.getByRole('cell', { name: 'Jul 1, 2024' })).toBeVisible();
-    expect(screen.getByText('Never expires.')).toBeVisible();
+    expect(screen.getByText('Never expires')).toBeVisible();
     expect(screen.getByText('2 minutes ago')).toBeVisible();
     expect(screen.getByText('-')).toBeVisible();
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
