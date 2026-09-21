@@ -1,3 +1,4 @@
+import type { FloatingContext, Placement } from '@floating-ui/react';
 import { createContext, type MutableRefObject, type RefObject, useContext } from 'react';
 
 import type { ExternalToastManager, ToastObject } from './toast-manager';
@@ -48,6 +49,22 @@ export function useToastRootContext(): ToastRootContextValue {
   const ctx = useContext(ToastRootContext);
   if (!ctx) {
     throw new Error('Toast parts must be used within <Toast.Root>');
+  }
+  return ctx;
+}
+
+export interface ToastPositionerContextValue {
+  floatingContext: FloatingContext;
+  placement: Placement;
+  arrowRef: MutableRefObject<SVGSVGElement | null>;
+}
+
+export const ToastPositionerContext = createContext<ToastPositionerContextValue | null>(null);
+
+export function useToastPositionerContext(): ToastPositionerContextValue {
+  const ctx = useContext(ToastPositionerContext);
+  if (!ctx) {
+    throw new Error('Toast.Arrow must be used within <Toast.Positioner>');
   }
   return ctx;
 }

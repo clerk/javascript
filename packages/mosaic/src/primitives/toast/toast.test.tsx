@@ -905,6 +905,111 @@ describe('Toast', () => {
     });
   });
 
+  describe('anchored', () => {
+    function AnchoredList(props: Partial<React.ComponentProps<typeof Toast.Positioner>>) {
+      const { toasts } = Toast.useToastManager();
+      return (
+        <>
+          {toasts.map(toast => (
+            <Toast.Positioner
+              key={toast.id}
+              toast={toast}
+              data-testid='positioner'
+              {...props}
+            >
+              <Toast.Root toast={toast}>
+                <Toast.Arrow data-testid='arrow' />
+                <Toast.Title />
+              </Toast.Root>
+            </Toast.Positioner>
+          ))}
+        </>
+      );
+    }
+
+    function AnchoredTrigger(props: { positionerProps?: ToastObject['positionerProps'] }) {
+      const manager = Toast.useToastManager();
+      return (
+        <button
+          type='button'
+          onClick={event =>
+            manager.add({ title: 'Copied', positionerProps: { anchor: event.currentTarget, ...props.positionerProps } })
+          }
+        >
+          Copy
+        </button>
+      );
+    }
+
+    function renderAnchored(
+      listProps: Partial<React.ComponentProps<typeof Toast.Positioner>> = {},
+      positionerProps?: ToastObject['positionerProps'],
+    ) {
+      return render(
+        <Toast.Provider>
+          <AnchoredTrigger positionerProps={positionerProps} />
+          <Toast.Portal>
+            <Toast.Viewport>
+              <AnchoredList {...listProps} />
+            </Toast.Viewport>
+          </Toast.Portal>
+        </Toast.Provider>,
+      );
+    }
+
+    it('wraps the toast in a positioned element that defaults to top center', async () => {
+      const user = userEvent.setup();
+      renderAnchored();
+
+      await user.click(screen.getByRole('button', { name: 'Copy' }));
+
+      const positioner = screen.getByTestId('positioner');
+      expect(positioner).toContainElement(screen.getByRole('dialog', { name: 'Copied' }));
+      expect(positioner).toHaveAttribute('data-side', 'top');
+      expect(positioner).toHaveAttribute('data-align', 'center');
+      expect(positioner.style.position).toBe('absolute');
+    });
+
+    it('takes side and align from its props', async () => {
+      const user = userEvent.setup();
+      renderAnchored({ side: 'bottom', align: 'end' });
+
+      await user.click(screen.getByRole('button', { name: 'Copy' }));
+
+      expect(screen.getByTestId('positioner')).toHaveAttribute('data-side', 'bottom');
+      expect(screen.getByTestId('positioner')).toHaveAttribute('data-align', 'end');
+    });
+
+    it('lets the toast positionerProps override its props', async () => {
+      const user = userEvent.setup();
+      renderAnchored({ side: 'bottom', align: 'end' }, { side: 'right', align: 'start' });
+
+      await user.click(screen.getByRole('button', { name: 'Copy' }));
+
+      expect(screen.getByTestId('positioner')).toHaveAttribute('data-side', 'right');
+      expect(screen.getByTestId('positioner')).toHaveAttribute('data-align', 'start');
+    });
+
+    it('renders an arrow carrying the side', async () => {
+      const user = userEvent.setup();
+      renderAnchored({ side: 'bottom' });
+
+      await user.click(screen.getByRole('button', { name: 'Copy' }));
+
+      expect(screen.getByTestId('arrow')).toHaveAttribute('data-side', 'bottom');
+    });
+
+    it('unmounts the positioner once the toast is removed', async () => {
+      const user = userEvent.setup();
+      renderAnchored();
+
+      await user.click(screen.getByRole('button', { name: 'Copy' }));
+      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+
+      await waitFor(() => expect(screen.queryByTestId('positioner')).not.toBeInTheDocument());
+    });
+  });
+
   describe('accessibility (axe)', () => {
     it('has no violations', async () => {
       const user = userEvent.setup();
@@ -925,6 +1030,31 @@ describe('Toast', () => {
       }
       const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
       expect(() => render(<Bad />)).toThrow('<Toast.Provider>');
+      spy.mockRestore();
+    });
+
+    it('throws when Arrow is used outside Positioner', () => {
+      function List() {
+        const { toasts } = Toast.useToastManager();
+        return toasts.map(toast => (
+          <Toast.Root
+            key={toast.id}
+            toast={toast}
+          >
+            <Toast.Arrow />
+          </Toast.Root>
+        ));
+      }
+      const manager = Toast.createToastManager();
+      manager.add({ title: 'Hi' });
+      const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      expect(() =>
+        render(
+          <Toast.Provider toastManager={manager}>
+            <List />
+          </Toast.Provider>,
+        ),
+      ).toThrow('<Toast.Positioner>');
       spy.mockRestore();
     });
   });

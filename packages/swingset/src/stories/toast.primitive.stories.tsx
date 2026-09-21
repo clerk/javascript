@@ -1,4 +1,5 @@
 import { Toast } from '@clerk/mosaic/primitives/toast';
+import { useRef } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -81,6 +82,62 @@ export function Default() {
       <Toast.Viewport>
         <ToastList />
       </Toast.Viewport>
+    </Toast.Provider>
+  );
+}
+
+const anchoredToastManager = Toast.createToastManager();
+
+function AnchoredToasts() {
+  const { toasts } = Toast.useToastManager();
+  return (
+    <>
+      {toasts.map(toast => (
+        <Toast.Positioner
+          key={toast.id}
+          toast={toast}
+        >
+          <Toast.Root toast={toast}>
+            <Toast.Arrow />
+            <Toast.Description />
+          </Toast.Root>
+        </Toast.Positioner>
+      ))}
+    </>
+  );
+}
+
+function CopyButton() {
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+  function handleCopy() {
+    anchoredToastManager.add({
+      description: 'Copied',
+      timeout: 1500,
+      positionerProps: { anchor: buttonRef.current, sideOffset: 8 },
+    });
+  }
+
+  return (
+    <button
+      ref={buttonRef}
+      type='button'
+      onClick={handleCopy}
+    >
+      Copy
+    </button>
+  );
+}
+
+export function Anchored() {
+  return (
+    <Toast.Provider toastManager={anchoredToastManager}>
+      <CopyButton />
+      <Toast.Portal>
+        <Toast.Viewport>
+          <AnchoredToasts />
+        </Toast.Viewport>
+      </Toast.Portal>
     </Toast.Provider>
   );
 }
