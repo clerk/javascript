@@ -1,8 +1,8 @@
-import type { TooltipProps as HeadlessTooltipProps } from '@clerk/headless/tooltip';
-import { Tooltip as Primitive } from '@clerk/headless/tooltip';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { TooltipProps as HeadlessTooltipProps } from '../../primitives/tooltip';
+import { Tooltip as Primitive } from '../../primitives/tooltip';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
