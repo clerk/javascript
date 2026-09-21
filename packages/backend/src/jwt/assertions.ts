@@ -7,10 +7,6 @@ const isArrayString = (s: unknown): s is string[] => {
   return Array.isArray(s) && s.length > 0 && s.every(a => typeof a === 'string');
 };
 
-const isNonEmptyArrayString = (s: unknown): s is string[] => {
-  return isArrayString(s) && s.every(a => a.length > 0);
-};
-
 export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
   const audienceList = [audience].flat().filter(a => !!a);
   const audList = [aud].flat().filter(a => !!a);
@@ -51,21 +47,23 @@ export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
   }
 };
 
-export const assertOAuthAudienceClaim = (aud?: unknown, audience?: string | string[]) => {
-  const audienceList = [audience].flat().filter((a): a is string => typeof a === 'string' && a.length > 0);
+export const assertOAuthAudienceClaim = (aud?: string[] | undefined, audience?: string | string[]) => {
+  // if no expected audiences, nothing to check
+  const audienceList = [audience].flat().filter(a => !!a);
   if (audienceList.length === 0) {
     return;
   }
 
-  const audList = typeof aud === 'string' && aud.length > 0 ? [aud] : isNonEmptyArrayString(aud) ? aud : undefined;
-  if (!audList) {
+  // we are now expecting audiences;
+  const audFromToken = aud ? [aud].flat() : undefined;
+  if (!audFromToken) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
       message: `Invalid OAuth audience claim (aud) ${JSON.stringify(aud)}. Expected a non-empty string or a non-empty array of non-empty strings.`,
     });
   }
 
-  if (!audList.some(a => audienceList.includes(a))) {
+  if (!audFromToken.some(a => audienceList.includes(a))) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
       message: `OAuth audience mismatch. Verification expected audience ${JSON.stringify(
