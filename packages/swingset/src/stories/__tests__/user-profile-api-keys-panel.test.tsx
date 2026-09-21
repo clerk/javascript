@@ -64,11 +64,12 @@ describe('API keys playground', () => {
     expect(within(dialog).getByRole('button', { name: 'Add API Key' })).toBeEnabled();
     await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
     const copyDialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
-    await waitFor(() => expect(within(copyDialog).getByRole('textbox', { name: 'API key' })).toHaveFocus());
+    await waitFor(() => expect(within(copyDialog).getByRole('button', { name: 'Copy API key' })).toHaveFocus());
+    const secret = within(copyDialog).getByText(/^ak_demo_/).textContent;
     expect(within(copyDialog).queryByLabelText('Secret key name')).not.toBeInTheDocument();
     await user.click(within(copyDialog).getByRole('button', { name: 'Copy and close' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(copy).toHaveBeenCalledWith(expect.stringContaining('ak_demo_'));
+    expect(copy).toHaveBeenCalledWith(secret);
     expect(trigger).toHaveFocus();
     await user.type(screen.getByRole('searchbox'), 'New integration');
     expect(await screen.findByText('New integration')).toBeVisible();
@@ -76,7 +77,7 @@ describe('API keys playground', () => {
     expect(screen.getByLabelText('Secret key name')).toHaveValue('');
     expect(screen.queryByText('This key will never expire')).not.toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /^Expiration/ })).toHaveTextContent('Select expiration');
-    expect(screen.queryByRole('textbox', { name: 'API key' })).not.toBeInTheDocument();
+    expect(screen.queryByText(/^ak_demo_/)).not.toBeInTheDocument();
   });
 
   it('changes page size and keeps the controls available', async () => {
@@ -119,7 +120,7 @@ describe('API keys playground', () => {
     await user.click(screen.getByRole('option', { name: 'Never' }));
     await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
     const copyDialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
-    await waitFor(() => expect(within(copyDialog).getByRole('textbox', { name: 'API key' })).toHaveFocus());
+    await waitFor(() => expect(within(copyDialog).getByRole('button', { name: 'Copy API key' })).toHaveFocus());
     await user.click(within(copyDialog).getByRole('button', { name: 'Copy and close' }));
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Copy your API Key' })).not.toBeInTheDocument());
     expect(copy).toHaveBeenCalledWith(expect.stringContaining('ak_demo_'));
@@ -174,10 +175,7 @@ describe('API keys playground', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('Impossible de copier cette clé.');
-    expect(within(dialog).getByRole('textbox', { name: 'API key' })).toHaveAttribute(
-      'value',
-      expect.stringContaining('ak_demo_'),
-    );
+    expect(within(dialog).getByText(/^ak_demo_/)).toBeVisible();
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(copy).toHaveBeenCalledTimes(2);
