@@ -270,6 +270,7 @@ import {
   Default as UserProfileApiKeysPanelDefault,
   Empty as UserProfileApiKeysPanelEmpty,
   meta as userProfileApiKeysPanelMeta,
+  ProposedTable as UserProfileApiKeysPanelProposedTable,
 } from '../stories/user-profile-api-keys-panel.stories';
 import {
   Default as UserProfileBillingHistorySectionDefault,
@@ -617,6 +618,7 @@ const toastModule: StoryModule = { meta: toastMeta };
 const userProfileApiKeysPanelModule: StoryModule = {
   meta: userProfileApiKeysPanelMeta,
   Default: UserProfileApiKeysPanelDefault,
+  ProposedTable: UserProfileApiKeysPanelProposedTable,
   Empty: UserProfileApiKeysPanelEmpty,
 };
 const userProfileModule: StoryModule = {
