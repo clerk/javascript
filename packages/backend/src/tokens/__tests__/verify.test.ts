@@ -346,7 +346,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.errors![0]).toBeInstanceOf(MachineTokenVerificationError);
       expect(result.errors![0]).toMatchObject({
         code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
-        message: expect.stringContaining('Invalid OAuth audience claim'),
+        message: expect.stringContaining('OAuth audience mismatch'),
       });
     });
 
@@ -746,7 +746,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(result.data).toBeUndefined();
       expect(result.errors).toHaveLength(1);
       expect(result.errors![0]).toMatchInlineSnapshot(
-        `[MachineTokenVerificationError: Invalid OAuth audience claim (aud) "https://attacker.example.com". Is not included in "["https://my-resource.example.com"]".]`,
+        `[MachineTokenVerificationError: OAuth audience mismatch. Verification expected audience ["https://my-resource.example.com"], but incoming token has aud "https://attacker.example.com".]`,
       );
     });
   });

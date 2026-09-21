@@ -1620,7 +1620,7 @@ describe('tokens.authenticateRequest(options)', () => {
           tokenType: 'oauth_token',
           reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
           message:
-            'Invalid OAuth audience claim (aud) "https://other.example.com". Is not included in "["https://resource.example.com"]". (code=token-verification-failed, status=n/a)',
+            'OAuth audience mismatch. Verification expected audience ["https://resource.example.com"], but incoming token has aud "https://other.example.com". (code=token-verification-failed, status=n/a)',
         });
         expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
           tokenType: 'oauth_token',

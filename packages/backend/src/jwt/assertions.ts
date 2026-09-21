@@ -68,9 +68,9 @@ export const assertOAuthAudienceClaim = (aud?: unknown, audience?: string | stri
   if (!audList.some(a => audienceList.includes(a))) {
     throw new TokenVerificationError({
       reason: TokenVerificationErrorReason.TokenVerificationFailed,
-      message: `Invalid OAuth audience claim (aud) ${JSON.stringify(aud)}. Is not included in "${JSON.stringify(
+      message: `OAuth audience mismatch. Verification expected audience ${JSON.stringify(
         audienceList,
-      )}".`,
+      )}, but incoming token has aud ${JSON.stringify(aud)}.`,
     });
   }
 };

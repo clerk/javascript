@@ -59,7 +59,7 @@ describe('IdPOAuthAccessToken', () => {
     );
 
     await expect(apiClient.idPOAuthAccessToken.verify(accessToken, { audience })).rejects.toThrow(
-      'Invalid OAuth audience claim',
+      'OAuth audience mismatch. Verification expected audience ["https://resource.example.com"], but incoming token has aud ["https://other.example.com"].',
     );
   });
 });
