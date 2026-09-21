@@ -1,6 +1,6 @@
 import { TagInput } from '@clerk/mosaic/primitives/tag-input';
 import { X } from 'lucide-react';
-import { type ComponentProps, type ReactNode, useId, useState } from 'react';
+import { type ComponentProps, type ReactNode, useId, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 
 import type { StoryMeta } from '@/lib/types';
@@ -164,30 +164,58 @@ export function Styled() {
   );
 }
 
-export function ViewTransition() {
+function usesViewTransition(root: HTMLElement | null) {
+  if (typeof document.startViewTransition !== 'function' || !root) {
+    return false;
+  }
+  const target = root.querySelector('[data-value]') ?? root.querySelector('input:not([type="hidden"])');
+  return target !== null && getComputedStyle(target).getPropertyValue('view-transition-name') !== 'none';
+}
+
+function ViewTransitionField({ tagClassName, inputClassName }: { tagClassName: string; inputClassName?: string }) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const [value, setValue] = useState(['preston@clerk.dev', 'nate@clerk.dev']);
+  const [viewTransition, setViewTransition] = useState(true);
   return (
     <>
       <style>{viewTransitionCss}</style>
       <StyledField
+        ref={rootRef}
         value={value}
         onValueChange={next => {
-          if (typeof document.startViewTransition !== 'function') {
+          if (!usesViewTransition(rootRef.current)) {
+            setViewTransition(false);
             setValue(next);
             return;
           }
           document.startViewTransition(() => {
-            flushSync(() => setValue(next));
+            flushSync(() => {
+              setViewTransition(true);
+              setValue(next);
+            });
           });
         }}
         tags={
           <StyledTags
-            className={viewTransitionTagClassName}
-            presentOnly
+            className={tagClassName}
+            presentOnly={viewTransition}
           />
         }
-        inputClassName={viewTransitionInputClassName}
+        inputClassName={inputClassName}
       />
     </>
   );
+}
+
+export function ViewTransition() {
+  return (
+    <ViewTransitionField
+      tagClassName={viewTransitionTagClassName}
+      inputClassName={viewTransitionInputClassName}
+    />
+  );
+}
+
+export function ViewTransitionOptOut() {
+  return <ViewTransitionField tagClassName={`${presenceTagClassName} [view-transition-name:none]`} />;
 }

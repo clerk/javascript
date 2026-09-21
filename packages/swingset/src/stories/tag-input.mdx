@@ -68,6 +68,16 @@ const [value, setValue] = useState<string[]>([]);
   storyModule={TagInputStories}
 />
 
+To opt out in CSS, set `view-transition-name: none` on the tags. At each change the field reads that
+name from a tag (or the input when there are no tags). When it is `none`, the field skips the view
+transition and keeps removed tags mounted, so `data-starting-style` / `data-ending-style` drive both
+enter and exit.
+
+<Story
+  name='ViewTransitionOptOut'
+  storyModule={TagInputStories}
+/>
+
 ## Usage
 
 The value lives in `TagInput.Root`. Read the tags with the `useTagInput` hook and render one
