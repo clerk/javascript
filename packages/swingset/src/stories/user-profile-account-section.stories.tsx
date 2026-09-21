@@ -1,5 +1,4 @@
 import { Button } from '@clerk/mosaic/components/button';
-import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type {
   UserProfileEmail,
   UserProfilePhone,
@@ -8,6 +7,7 @@ import { UserProfileAccountSectionView } from '@clerk/mosaic/features/user-profi
 import type { UserProfileAddPhoneDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
 import { UserProfileVerifyEmailLinkDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-link.dialog';
 import { UserProfileVerifyEmailSsoDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-sso.dialog';
+import type { FormError } from '@clerk/mosaic/utils/save-result';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -43,8 +43,8 @@ function AccountSection({
 }: {
   allowMultipleAccounts: boolean;
   failAt?: UserProfileAddPhoneDialogProps['step'];
-  failWith?: UserProfileFormError;
-  usernameFailWith?: UserProfileFormError;
+  failWith?: FormError;
+  usernameFailWith?: FormError;
   failEmailVerification?: boolean;
   emailRemovalState?: 'pending' | 'error';
   phoneRemovalState?: 'pending' | 'error';

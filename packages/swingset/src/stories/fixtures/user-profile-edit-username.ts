@@ -1,10 +1,10 @@
-import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
+import type { FormError } from '@clerk/mosaic/utils/save-result';
 import { useState } from 'react';
 
 export interface UserProfileEditUsernameFixtureOptions {
   username?: string;
   latency?: number;
-  failWith?: UserProfileFormError;
+  failWith?: FormError;
 }
 
 export function useUserProfileEditUsernameFixture({

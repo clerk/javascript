@@ -1,5 +1,5 @@
-import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type { UserProfileEditNameValue } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-edit-name.dialog';
+import type { FormError } from '@clerk/mosaic/utils/save-result';
 import { useState } from 'react';
 
 export interface UserProfileEditNameFixtureOptions {
@@ -7,7 +7,7 @@ export interface UserProfileEditNameFixtureOptions {
   lastName?: string;
   latency?: number;
   /** Fails every save instead of committing it. */
-  failWith?: UserProfileFormError;
+  failWith?: FormError;
 }
 
 /** Stands in for the model. Everything else the dialog needs belongs to the controller. */

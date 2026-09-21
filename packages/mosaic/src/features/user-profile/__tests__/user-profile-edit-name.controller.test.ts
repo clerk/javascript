@@ -2,20 +2,17 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../../machine/createActor';
-import type {
-  UserProfileFormError,
-  UserProfileSaveResult,
-} from '../user-profile-account-section/user-profile-account-section.types';
+import type { FormError, SaveResult } from '../../../utils/save-result';
 import {
   userProfileEditNameMachine,
   useUserProfileEditNameController,
 } from '../user-profile-account-section/user-profile-edit-name.controller';
 import type { UserProfileEditNameField } from '../user-profile-account-section/user-profile-edit-name.dialog';
 
-type Result = UserProfileSaveResult<UserProfileEditNameField>;
+type Result = SaveResult<UserProfileEditNameField>;
 
 const saved = (): Promise<Result> => Promise.resolve({ error: null });
-const failed = (error: UserProfileFormError<UserProfileEditNameField>): Promise<Result> =>
+const failed = (error: FormError<UserProfileEditNameField>): Promise<Result> =>
   Promise.resolve({ error: { kind: 'form', ...error } });
 const cancelled = (): Promise<Result> => Promise.resolve({ error: { kind: 'cancelled' } });
 

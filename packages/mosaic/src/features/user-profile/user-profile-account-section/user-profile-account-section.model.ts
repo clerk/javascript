@@ -3,6 +3,7 @@ import { useUser } from '@clerk/shared/react';
 import type { AttributeData, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
+import { toSaveResult } from '../../../utils/save-result';
 import type { ReverificationProps } from '../../reverification';
 import { useReverificationWithState } from '../../reverification';
 import type {
@@ -10,7 +11,7 @@ import type {
   UserProfileNameAttribute,
   UserProfilePhone,
 } from './user-profile-account-section.types';
-import { isAttributeAvailable, toSaveResult } from './user-profile-account-section.utils';
+import { isAttributeAvailable } from './user-profile-account-section.utils';
 import type { UserProfileAccountSectionViewProps } from './user-profile-account-section.view';
 import type { UserProfileEditNameField } from './user-profile-edit-name.dialog';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';

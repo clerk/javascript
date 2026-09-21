@@ -20,10 +20,7 @@ import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-prof
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
 export type { UserProfileConnectedAccount, UserProfileEmail, UserProfilePhone, UserProfileWeb3Wallet };
-export type {
-  UserProfileFormError,
-  UserProfileNameAttribute,
-} from './user-profile-account-section/user-profile-account-section.types';
+export type { UserProfileNameAttribute } from './user-profile-account-section/user-profile-account-section.types';
 export type { UserProfileEditNameValue } from './user-profile-account-section/user-profile-edit-name.dialog';
 
 export interface UserProfileProfilePanelViewProps extends UserProfileAccountSectionViewProps {

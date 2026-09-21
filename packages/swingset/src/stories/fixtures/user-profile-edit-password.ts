@@ -1,6 +1,6 @@
-import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type { UserProfileEditPasswordValue } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.types';
+import type { FormError } from '@clerk/mosaic/utils/save-result';
 import { useState } from 'react';
 
 export interface UserProfileEditPasswordFixtureOptions {
@@ -8,7 +8,7 @@ export interface UserProfileEditPasswordFixtureOptions {
   requiresCurrentPassword?: boolean;
   latency?: number;
   /** Rejects the first save so the next attempt can succeed. */
-  failWith?: UserProfileFormError;
+  failWith?: FormError;
 }
 
 export function useUserProfileEditPasswordFixture({
