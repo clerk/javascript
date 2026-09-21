@@ -603,7 +603,10 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       });
 
       expect(result.tokenType).toBe('oauth_token');
-      expect(result.data).toMatchObject({ aud, scopes: ['read:foo', 'write:bar'] });
+      expect(result.data).toMatchObject({
+        aud: [aud].flat(),
+        scopes: ['read:foo', 'write:bar'],
+      });
       expect(result.errors).toBeUndefined();
     });
 
