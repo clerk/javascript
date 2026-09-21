@@ -92,11 +92,9 @@ export function UserProfileConnectedAccountRowView({
           </Section.Actions>
         ) : null}
       </Section.Item>
-      {account.connectError ? <Section.Error>{account.connectError}</Section.Error> : null}
-      {account.reconnectError ? <Section.Error>{account.reconnectError}</Section.Error> : null}
-      {account.status === 'error' && account.verificationError ? (
-        <Section.Error>{account.verificationError}</Section.Error>
-      ) : null}
+      <Section.Error>{account.connectError}</Section.Error>
+      <Section.Error>{account.reconnectError}</Section.Error>
+      <Section.Error>{account.status === 'error' ? account.verificationError : undefined}</Section.Error>
     </Section.Row>
   );
 }

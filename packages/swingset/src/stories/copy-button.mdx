@@ -1,0 +1,43 @@
+import * as Stories from './copy-button.stories';
+
+# CopyButton
+
+Puts a value on the clipboard. A tooltip confirms the copy and settles after `resetAfter`. It
+opens only on the copy, so the button carries no hover tooltip of its own.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[{ name: 'Button', href: '/components/button', layer: 'Components' }]}
+/>
+
+## Props
+
+<PropTable
+  meta={Stories.meta}
+  extra={[
+    { name: 'value', type: 'string' },
+    { name: 'label', type: 'string', default: 'Copy' },
+    { name: 'copiedLabel', type: 'string', default: 'Copied' },
+    { name: 'placement', type: "'top' | 'bottom' | 'left' | 'right'", default: 'top' },
+    { name: 'resetAfter', type: 'number', default: '2000' },
+    { name: 'onCopy', type: '(value: string) => void | Promise<void>' },
+  ]}
+/>
+
+## Inline with the value
+
+<Story
+  name='Inline'
+  storyModule={Stories}
+/>
+
+## Naming what it copies
+
+The button keeps its name while the copy is fresh. A tooltip opened without the pointer is not
+announced, so the outcome comes from a live region instead.
+
+<Story
+  name='Labelled'
+  storyModule={Stories}
+/>

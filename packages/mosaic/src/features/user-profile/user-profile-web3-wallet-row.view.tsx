@@ -100,8 +100,8 @@ export function UserProfileWeb3WalletRowView({
           </Section.Actions>
         ) : null}
       </Section.Item>
-      {'connectError' in wallet && wallet.connectError ? <Section.Error>{wallet.connectError}</Section.Error> : null}
-      {linkedWallet?.primaryError ? <Section.Error>{linkedWallet.primaryError}</Section.Error> : null}
+      <Section.Error>{'connectError' in wallet ? wallet.connectError : undefined}</Section.Error>
+      <Section.Error>{linkedWallet?.primaryError}</Section.Error>
     </Section.Row>
   );
 }

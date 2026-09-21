@@ -6,14 +6,13 @@ import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
 import { FileUpload } from '../../../primitives/file-upload';
-import type { UserProfileMenuAction } from '../user-profile-action-menu';
-import { UserProfileActionMenu } from '../user-profile-action-menu';
+import type { OrganizationProfileMenuAction } from '../organization-profile-action-menu';
+import { OrganizationProfileActionMenu } from '../organization-profile-action-menu';
 
-const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
-/** Matches the limit the row's own description advertises. */
-const PROFILE_PICTURE_MAX_BYTES = 10 * 1000 * 1000;
+const LOGO_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
+const LOGO_MAX_BYTES = 10 * 1000 * 1000;
 
-export interface UserProfilePictureRowViewProps {
+export interface OrganizationProfileLogoRowViewProps {
   name: string;
   imageUrl?: string;
   hasImage?: boolean;
@@ -23,7 +22,7 @@ export interface UserProfilePictureRowViewProps {
   onRemove?: () => void;
 }
 
-export function UserProfilePictureRowView({
+export function OrganizationProfileLogoRowView({
   name,
   imageUrl,
   hasImage = false,
@@ -31,8 +30,8 @@ export function UserProfilePictureRowView({
   onChange,
   onReject,
   onRemove,
-}: UserProfilePictureRowViewProps) {
-  const m = useMessages('userProfileAccountSection');
+}: OrganizationProfileLogoRowViewProps) {
+  const m = useMessages('organizationProfileWorkspaceSection');
   const [rejectionError, setRejectionError] = useState<string>();
   const displayedError = errorMessage ?? rejectionError;
   const initials = name
@@ -44,12 +43,12 @@ export function UserProfilePictureRowView({
 
   return (
     <FileUpload.Root
-      accept={PROFILE_PICTURE_MIME_TYPES}
-      maxSize={PROFILE_PICTURE_MAX_BYTES}
+      accept={LOGO_MIME_TYPES}
+      maxSize={LOGO_MAX_BYTES}
       render={<Section.Row />}
       onReject={rejections => {
         const rejection = rejections[0];
-        setRejectionError(rejection ? m.picture.errors[rejection.reason] : undefined);
+        setRejectionError(rejection ? m.logo.errors[rejection.reason] : undefined);
         onReject?.(rejections);
       }}
       onValueChange={files => {
@@ -62,7 +61,10 @@ export function UserProfilePictureRowView({
     >
       <Section.Item>
         <Section.Media size='lg'>
-          <Avatar.Root size='fit'>
+          <Avatar.Root
+            shape='square'
+            size='fit'
+          >
             <Avatar.Image
               alt={name}
               src={imageUrl}
@@ -71,10 +73,10 @@ export function UserProfilePictureRowView({
           </Avatar.Root>
         </Section.Media>
         <Section.Content>
-          <Section.Label>{m.picture.label}</Section.Label>
-          <Section.Description>{m.picture.description}</Section.Description>
+          <Section.Label>{m.logo.label}</Section.Label>
+          <Section.Description>{m.logo.description}</Section.Description>
         </Section.Content>
-        <ProfilePictureActions
+        <LogoActions
           canChange={Boolean(onChange)}
           hasImage={hasImage}
           onRemove={onRemove}
@@ -85,7 +87,7 @@ export function UserProfilePictureRowView({
   );
 }
 
-function ProfilePictureActions({
+function LogoActions({
   hasImage,
   canChange,
   onRemove,
@@ -94,24 +96,24 @@ function ProfilePictureActions({
   canChange: boolean;
   onRemove?: () => void;
 }) {
-  const m = useMessages('userProfileAccountSection');
+  const m = useMessages('organizationProfileWorkspaceSection');
   const { openFilePicker } = FileUpload.useFileUpload();
-  const actions: UserProfileMenuAction[] = [];
+  const actions: OrganizationProfileMenuAction[] = [];
 
   if (hasImage && canChange) {
-    actions.push({ label: m.picture.change, icon: 'pen', onClick: openFilePicker });
+    actions.push({ label: m.logo.change, icon: 'pen', onClick: openFilePicker });
   }
 
   if (hasImage && onRemove) {
-    actions.push({ label: m.picture.remove, icon: 'x', onClick: onRemove });
+    actions.push({ label: m.logo.remove, icon: 'x', onClick: onRemove });
   }
 
   if (actions.length > 0) {
     return (
       <Section.Actions>
-        <UserProfileActionMenu
+        <OrganizationProfileActionMenu
           actions={actions}
-          label={m.picture.manage}
+          label={m.logo.manage}
         />
       </Section.Actions>
     );
@@ -129,7 +131,7 @@ function ProfilePictureActions({
             />
           }
         >
-          {m.picture.upload}
+          {m.logo.upload}
         </FileUpload.Trigger>
       </Section.Actions>
     );
