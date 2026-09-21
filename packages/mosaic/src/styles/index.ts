@@ -211,3 +211,5 @@ export type TypeScaleVarName = keyof typeof typeScaleVars;
 export { mergeStyleProps, themeProps } from '../props';
 export { UserProfileMfaSectionView } from '../features/user-profile/user-profile-mfa-section.view';
 export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-mfa-setup.view';
+
+export { UserProfileApiKeysPanelView } from '../features/user-profile/user-profile-api-keys-panel.view';

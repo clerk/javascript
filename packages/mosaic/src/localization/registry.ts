@@ -9,6 +9,7 @@ import { userProfileVerifyEmailSsoMessages } from '../features/user-profile/user
 import { userProfileActiveDevicesMessages } from '../features/user-profile/user-profile-active-devices.messages';
 import { userProfileAddAuthenticatorMessages } from '../features/user-profile/user-profile-add-authenticator.messages';
 import { userProfileAddSmsMessages } from '../features/user-profile/user-profile-add-sms.messages';
+import { userProfileApiKeysPanelMessages } from '../features/user-profile/user-profile-api-keys-panel.messages';
 import { userProfileAuthenticatorSetupMessages } from '../features/user-profile/user-profile-authenticator-setup.messages';
 import { userProfileBackupCodesMessages } from '../features/user-profile/user-profile-backup-codes.messages';
 import { userProfileConnectedAccountsMessages } from '../features/user-profile/user-profile-connected-accounts.messages';
@@ -19,6 +20,7 @@ import { userProfilePasswordSectionMessages } from '../features/user-profile/use
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets.messages';
 
 export const mosaicMessages = {
+  userProfileApiKeysPanel: userProfileApiKeysPanelMessages,
   reverification: reverificationMessages,
   userButton: userButtonMessages,
   userProfile: userProfileMessages,
