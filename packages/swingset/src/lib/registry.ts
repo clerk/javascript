@@ -219,6 +219,7 @@ import {
   Sorting as TableSorting,
 } from '../stories/table.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
+import { meta as tagInputMeta } from '../stories/tag-input.stories';
 import {
   Colors as TextColors,
   Default as TextDefault,
@@ -578,6 +579,7 @@ const otpModule: StoryModule = { meta: otpMeta };
 const popoverModule: StoryModule = { meta: popoverMeta };
 const selectModule: StoryModule = { meta: selectMeta };
 const tabsModule: StoryModule = { meta: tabsMeta };
+const tagInputModule: StoryModule = { meta: tagInputMeta };
 const toastPrimitiveModule: StoryModule = { meta: toastPrimitiveMeta };
 const tooltipModule: StoryModule = { meta: tooltipMeta };
 
@@ -837,6 +839,7 @@ export const registry: StoryModule[] = [
   popoverModule,
   selectModule,
   tabsModule,
+  tagInputModule,
   toastPrimitiveModule,
   tooltipModule,
   // Styles — atomic styles that ship as StyleX atoms rather than components.
