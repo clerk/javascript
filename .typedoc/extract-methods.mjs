@@ -36,6 +36,7 @@ import {
 import { isCallableInterfaceProperty } from './custom-theme.mjs';
 import { removeLineBreaks } from './markdown-helpers.mjs';
 import { BACKEND_API_CONFIG, REFERENCE_OBJECT_CONFIG } from './reference-objects.mjs';
+import { compareRequiredFirstThenAlphabetical } from './sort-reflections.mjs';
 
 /**
  * `'reference'` (default): each `methods/<name>.mdx` opens with `### foo()` and uses an H4 `#### Parameters` heading — matches the reference-object pages that aggregate many methods.
@@ -522,8 +523,8 @@ function buildPropertyTableDocMdx(parentName, nestedDecl, ctx) {
   if (!propsUnsorted?.length) {
     return '';
   }
-  /** Match nominal param tables and merged intersection holders: stable A–Z by property name (TypeDoc inline literal `children` order is declaration order). */
-  const props = [...propsUnsorted].sort((a, b) => a.name.localeCompare(b.name));
+  /** Match TypeDoc tables: required properties first, then stable A–Z by property name. */
+  const props = [...propsUnsorted].sort(compareRequiredFirstThenAlphabetical);
   const tableMd = renderMemberTableOmittingExampleBlocks(props, ctx, () =>
     ctx.partials.propertiesTable(
       props,
@@ -554,7 +555,7 @@ function buildExtractMethodsNamespacePropertyTableMdx(parentDecl, nonCallableMem
   }
   const title = `### \`${parentDecl.name}\``;
   const description = commentSummaryAndBody(parentDecl.comment);
-  const props = [...nonCallableMembers].sort((a, b) => a.name.localeCompare(b.name));
+  const props = [...nonCallableMembers].sort(compareRequiredFirstThenAlphabetical);
   const tableMd = renderMemberTableOmittingExampleBlocks(props, ctx, () =>
     ctx.partials.propertiesTable(
       props,
@@ -865,7 +866,7 @@ function mergePropertyArms(arms, options) {
   if (byName.size === 0) {
     return undefined;
   }
-  const merged = [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
+  const merged = [...byName.values()].sort(compareRequiredFirstThenAlphabetical);
   return substituteTypeParameterDefaultsInChildren(merged);
 }
 
@@ -1029,7 +1030,7 @@ function nestedParameterRowsFromDocumentedProperties(param, ctx) {
     return [];
   }
   const props = children.filter(c => c.kindOf(ReflectionKind.Property));
-  props.sort((a, b) => a.name.localeCompare(b.name));
+  props.sort(compareRequiredFirstThenAlphabetical);
   /** @type {string[]} */
   const rows = [];
   for (const child of props) {

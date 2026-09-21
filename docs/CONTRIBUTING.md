@@ -188,6 +188,8 @@ If your change can't only be tested by unit tests, you should add/edit an integr
 
 As explained in [documenting your changes](#documenting-your-changes), we use JSDoc to annotate our public API surface. We then use [Typedoc](https://typedoc.org/) to autogenerate MDX docs from these comments.
 
+Generated property and options tables list required properties first, followed by optional properties. Properties are sorted alphabetically within each group.
+
 For a comprehensive guide on **authoring** JSDoc/Typedoc comments, see [this guide](https://www.notion.so/clerkdev/Typedoc-JSDoc-1df2b9ab44fe808a8cf2c9cca324ea89?source=copy_link).
 
 To review your changes locally, you can run `pnpm run typedoc:generate` to generate the docs. Afterwards, you can inspect the MDX files inside `.typedoc/docs`. But if you want to preview how the Typedoc output will look in Clerk Docs, there's a few things you need to do first:

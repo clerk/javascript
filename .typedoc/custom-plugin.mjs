@@ -2,6 +2,8 @@
 import { Converter, DeclarationReflection, ReflectionKind, ReflectionType, RendererEvent } from 'typedoc';
 import { MarkdownPageEvent } from 'typedoc-plugin-markdown';
 
+import { compareRequiredFirstThenAlphabetical } from './sort-reflections.mjs';
+
 /**
  * A list of files where we want to remove any headings
  * TODO: Move this logic to the custom-theme logic and don't change it after the fact
@@ -700,10 +702,9 @@ export function load(app) {
         if (!target || !expandable.has(target)) continue;
         const merged = collectPropertiesFromType(reflection.type, reflectionsByName);
         if (merged.length > 0) {
-          // typedoc's package-level `sort: 'alphabetical'` is applied during conversion, before
-          // our synthetic merge runs. Sort here to match the alphabetical ordering used by
-          // every other table in the docs.
-          merged.sort((a, b) => a.name.localeCompare(b.name));
+          // TypeDoc's package-level sort is applied during conversion, before our synthetic merge runs.
+          // Reapply the same required-first, then alphabetical ordering here.
+          merged.sort(compareRequiredFirstThenAlphabetical);
           const decl = new DeclarationReflection('__type', ReflectionKind.TypeLiteral, reflection);
           decl.children = merged;
           reflection.type = new ReflectionType(decl);

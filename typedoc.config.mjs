@@ -94,7 +94,7 @@ const config = {
     includeVersion: false,
     excludePrivate: true,
     sortEntryPoints: true,
-    sort: 'alphabetical',
+    sort: ['required-first', 'alphabetical'],
     excludeExternals: true,
     excludeInternal: true,
     excludeNotDocumented: true,

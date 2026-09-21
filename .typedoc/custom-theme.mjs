@@ -5,6 +5,7 @@ import { MarkdownTheme, MarkdownThemeContext } from 'typedoc-plugin-markdown';
 import { applyTodoStrippingToComment } from './comment-utils.mjs';
 import { backTicks, heading, htmlTable, removeLineBreaks, table } from './markdown-helpers.mjs';
 import { REFERENCE_OBJECTS_LIST } from './reference-objects.mjs';
+import { compareRequiredFirstThenAlphabetical } from './sort-reflections.mjs';
 import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 import { unwrapOptional } from './type-utils.mjs';
 
@@ -373,7 +374,7 @@ function mergeIntersectionPropertyReflections(intersection, project) {
       byName.set(p.name, p);
     }
   }
-  return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
+  return [...byName.values()].sort(compareRequiredFirstThenAlphabetical);
 }
 
 /**
@@ -398,7 +399,7 @@ function collectPropertyReflectionsFromUnionObjectArms(t, visitedReflectionIds, 
       byName.set(p.name, p);
     }
   }
-  return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
+  return [...byName.values()].sort(compareRequiredFirstThenAlphabetical);
 }
 
 /**
