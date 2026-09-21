@@ -152,6 +152,13 @@ import {
   SaveFails as OrganizationProfileWorkspaceSectionSaveFails,
 } from '../stories/organization-profile-workspace-section.stories';
 import {
+  Default as OrganizationProfileApiKeysPanelDefault,
+  Empty as OrganizationProfileApiKeysPanelEmpty,
+  meta as organizationProfileApiKeysPanelMeta,
+  ReadOnly as OrganizationProfileApiKeysPanelReadOnly,
+  Retry as OrganizationProfileApiKeysPanelRetry,
+} from '../stories/organization-profile-api-keys-panel.stories';
+import {
   Default as OtpComponentDefault,
   Disabled as OtpComponentDisabled,
   Error as OtpComponentError,
@@ -825,6 +832,14 @@ const reverificationModule: StoryModule = {
   MethodPickerPending: ReverificationMethodPickerPending,
   Help: ReverificationHelp,
 };
+const organizationProfileApiKeysPanelModule: StoryModule = {
+  meta: organizationProfileApiKeysPanelMeta,
+  Default: OrganizationProfileApiKeysPanelDefault,
+  Empty: OrganizationProfileApiKeysPanelEmpty,
+  ReadOnly: OrganizationProfileApiKeysPanelReadOnly,
+  Retry: OrganizationProfileApiKeysPanelRetry,
+};
+
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -852,6 +867,7 @@ export const registry: StoryModule[] = [
   organizationProfileModule,
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
+  organizationProfileApiKeysPanelModule,
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
   organizationProfileDangerSectionModule,

@@ -46,6 +46,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
       () => import('../stories/organization-profile-workspace-section.mdx'),
     ),
     'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
+    'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
   },
   reverification: {
     reverification: dynamic(() => import('../stories/reverification.mdx')),
