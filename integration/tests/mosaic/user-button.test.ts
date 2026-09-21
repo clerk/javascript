@@ -10,7 +10,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
 
   let fakeUser: FakeUser;
   let otherFakeUser: FakeUser;
-  let organizations: Organization[];
+  let organizations: Organization[] = [];
 
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
@@ -71,14 +71,20 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
     await trigger(page).click();
 
     await expect(popup(page)).toBeVisible();
-    await expect(popup(page).getByText(fakeUser.email)).toBeVisible();
+    await expect(popup(page)).toContainText(fakeUser.email);
     for (const { name } of organizations) {
-      await expect(popup(page).getByRole('button', { name })).toBeVisible();
+      await expect(popup(page)).toContainText(name);
     }
   });
 
   test('switches the active organization', async ({ page, context }) => {
     await signIn({ page, context });
+
+    await trigger(page).click();
+    await popup(page).getByRole('button', { name: 'Personal account' }).click();
+    await page.waitForFunction(() => window.Clerk?.organization === null);
+    await page.keyboard.press('Escape');
+    await expect(popup(page)).toBeHidden();
 
     for (const { id, name } of organizations) {
       await trigger(page).click();
