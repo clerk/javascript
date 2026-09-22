@@ -99,17 +99,21 @@ describe('Mosaic CopyButton', () => {
     expect(writeText).not.toHaveBeenCalled();
   });
 
-  it('stays quiet when the copy fails', async () => {
+  it('confirms nothing when the copy fails, and hands the caller the reason', async () => {
+    const onCopyError = vi.fn();
+    const denied = new Error('denied');
     const user = userEvent.setup();
     render(
       <CopyButton
         value='acme-inc'
-        onCopy={() => Promise.reject(new Error('denied'))}
+        onCopy={() => Promise.reject(denied)}
+        onCopyError={onCopyError}
       />,
     );
 
     await user.click(screen.getByRole('button', { name: 'Copy' }));
 
+    await waitFor(() => expect(onCopyError).toHaveBeenCalledWith(denied));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

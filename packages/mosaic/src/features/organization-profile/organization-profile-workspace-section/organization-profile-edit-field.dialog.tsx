@@ -80,7 +80,7 @@ export function OrganizationProfileEditFieldDialog({
               />
             }
           >
-            {error?.message ? (
+            {error?.message && !error.field ? (
               <Banner.Root
                 role='alert'
                 color='negative'
@@ -97,7 +97,7 @@ export function OrganizationProfileEditFieldDialog({
                 onChange={event => onValueChange(event.target.value)}
               />
               <Field.Message>
-                <Field.Error>{error?.field}</Field.Error>
+                <Field.Error>{error?.field ? error.message : undefined}</Field.Error>
               </Field.Message>
             </Field.Root>
           </Card.Content>

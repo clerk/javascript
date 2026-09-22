@@ -1,3 +1,4 @@
+import { OrganizationProfileSaveError } from '@clerk/mosaic/features/organization-profile/organization-profile.types';
 import type { OrganizationProfileViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 import { useState } from 'react';
 
@@ -10,7 +11,8 @@ const MEMBER_COUNT = 20;
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 export interface OrganizationProfileFixtureOptions {
-  failWith?: string;
+  /** Rejects that field's save with this message, scoped to the field so it renders under it. */
+  failWith?: Partial<Record<'name' | 'slug', string>>;
 }
 
 export function useOrganizationProfileFixture({ failWith }: OrganizationProfileFixtureOptions = {}) {
@@ -19,10 +21,11 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
   const [slug, setSlug] = useState(INITIAL_SLUG);
   const { imageUrl, showFile, clearImage } = usePreviewImage();
 
-  const save = async (apply: () => void) => {
+  const save = async (field: 'name' | 'slug', apply: () => void) => {
     await settleAfter(800);
-    if (failWith) {
-      throw new Error(failWith);
+    const message = failWith?.[field];
+    if (message) {
+      throw new OrganizationProfileSaveError(message, field);
     }
     apply();
   };
@@ -35,8 +38,8 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     hasImage: Boolean(imageUrl),
     onLogoChange: showFile,
     onRemoveLogo: clearImage,
-    onSubmitName: async next => save(() => setName(next)),
-    onSubmitSlug: async next => save(() => setSlug(next)),
+    onSubmitName: async next => save('name', () => setName(next)),
+    onSubmitSlug: async next => save('slug', () => setSlug(next)),
     onLeave: () => settleAfter(1200),
     onDelete: () => settleAfter(1200),
   };

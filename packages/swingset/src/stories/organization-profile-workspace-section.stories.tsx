@@ -34,7 +34,7 @@ export function Default() {
 }
 
 export function SaveFails() {
-  const { general } = useOrganizationProfileFixture({ failWith: 'That slug is already taken.' });
+  const { general } = useOrganizationProfileFixture({ failWith: { slug: 'That slug is already taken.' } });
   return (
     <OrganizationProfileWorkspaceSectionView
       name={general.name}

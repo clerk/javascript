@@ -23,6 +23,7 @@ of the control: it announces itself, `F6` reaches it and `Escape` dismisses it.
     { name: 'side', type: "'top' | 'bottom' | 'left' | 'right'", default: 'top' },
     { name: 'resetAfter', type: 'number', default: '2000' },
     { name: 'onCopy', type: '(value: string) => void | Promise<void>' },
+    { name: 'onCopyError', type: '(error: unknown) => void' },
   ]}
 />
 

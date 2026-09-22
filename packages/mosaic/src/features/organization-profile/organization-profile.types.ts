@@ -22,6 +22,7 @@ export interface CustomOrganizationProfilePage {
 
 export interface OrganizationProfileFormError {
   message?: string;
+  /** Names the control the failure belongs to. Set, and `message` renders under it instead of in the banner. */
   field?: string;
 }
 
