@@ -25,7 +25,7 @@ import { useToastManager } from '@clerk/mosaic/components/toast';
 
 function InviteButton() {
   const manager = useToastManager();
-  return <Button onClick={() => manager.add({ title: '2 invites sent', type: 'success' })}>Invite</Button>;
+  return <Button onClick={() => manager.add({ label: '2 invites sent', type: 'success' })}>Invite</Button>;
 }
 ```
 
@@ -65,11 +65,11 @@ The viewports render these slots for each toast:
 | Slot                            | Attributes                                                                                |
 | ------------------------------- | ----------------------------------------------------------------------------------------- |
 | `.cl-toast-root`                | `data-type`, `data-expanded`, `data-repeated`, `data-starting-style`, `data-ending-style` |
-| `.cl-toast-content`             | `data-behind`, `data-expanded`                                                            |
-| `.cl-toast-text`                | —                                                                                         |
+| `.cl-toast-item`                | `data-behind`, `data-expanded`                                                            |
+| `.cl-toast-content`             | —                                                                                         |
 | `.cl-toast-anchored-positioner` | `data-side`, `data-align`, `data-anchor-hidden`                                           |
 | `.cl-toast-anchored-root`       | `data-type`, `data-repeated`, `data-starting-style`, `data-ending-style`                  |
-| `.cl-toast-title`               | —                                                                                         |
+| `.cl-toast-label`               | —                                                                                         |
 | `.cl-toast-description`         | —                                                                                         |
 | `.cl-toast-icon`                | `data-type`: `success` \| `error` \| `loading`                                            |
 

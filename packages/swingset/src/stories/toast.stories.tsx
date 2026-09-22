@@ -19,13 +19,13 @@ export function Default() {
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center', paddingBlock: '3rem' }}>
       <Button
         variant='outline'
-        onClick={() => manager.add({ title: '2 invites sent', type: 'success' })}
+        onClick={() => manager.add({ label: '2 invites sent', type: 'success' })}
       >
         Success
       </Button>
       <Button
         variant='outline'
-        onClick={() => manager.add({ id: 'send-invites-error', title: 'Could not send invites', type: 'error' })}
+        onClick={() => manager.add({ id: 'send-invites-error', label: 'Could not send invites', type: 'error' })}
       >
         Error
       </Button>
@@ -47,7 +47,7 @@ export function Default() {
         variant='outline'
         onClick={() =>
           manager.add({
-            title: 'Invitation revoked',
+            label: 'Invitation revoked',
             description: 'jane@example.com can no longer join.',
             type: 'success',
           })

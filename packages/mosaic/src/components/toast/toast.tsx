@@ -58,7 +58,7 @@ function StackedToast(props: { toast: ToastObject; zIndex: number }) {
       toast={toast}
       {...mergeStyleProps(themeProps('toast-root'), stylex.props(reset.base, styles.root, styles.stackOrder(zIndex)))}
     >
-      <Primitive.Content {...mergeStyleProps(themeProps('toast-content'), stylex.props(reset.base, styles.content))}>
+      <Primitive.Content {...mergeStyleProps(themeProps('toast-item'), stylex.props(reset.base, styles.item))}>
         {type && (
           <span
             aria-hidden='true'
@@ -70,8 +70,8 @@ function StackedToast(props: { toast: ToastObject; zIndex: number }) {
             />
           </span>
         )}
-        <div {...mergeStyleProps(themeProps('toast-text'), stylex.props(reset.base, styles.text))}>
-          <Primitive.Title {...mergeStyleProps(themeProps('toast-title'), stylex.props(reset.base, styles.title))} />
+        <div {...mergeStyleProps(themeProps('toast-content'), stylex.props(reset.base, styles.content))}>
+          <Primitive.Title {...mergeStyleProps(themeProps('toast-label'), stylex.props(reset.base, styles.label))} />
           <Primitive.Description
             {...mergeStyleProps(themeProps('toast-description'), stylex.props(reset.base, styles.description))}
           />
@@ -98,7 +98,7 @@ function AnchoredToast(props: { toast: ToastObject }) {
           stylex.props(reset.base, tooltipSurface.base, styles.anchoredRoot),
         )}
       >
-        <Primitive.Title {...mergeStyleProps(themeProps('toast-title'), stylex.props(reset.base))} />
+        <Primitive.Title {...mergeStyleProps(themeProps('toast-label'), stylex.props(reset.base))} />
         <Primitive.Description {...mergeStyleProps(themeProps('toast-description'), stylex.props(reset.base))} />
         {type && (
           <span
@@ -150,5 +150,3 @@ export function ToastProvider(props: { children: React.ReactNode }): React.React
     </Primitive.Provider>
   );
 }
-
-export const useToastManager = Primitive.useToastManager;

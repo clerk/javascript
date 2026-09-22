@@ -98,7 +98,7 @@ export const styles = stylex.create({
     zIndex,
   }),
 
-  content: {
+  item: {
     gap: space['2'],
     alignItems: 'center',
     display: 'flex',
@@ -112,14 +112,14 @@ export const styles = stylex.create({
     minWidth: 0,
   },
 
-  text: {
+  content: {
     gap: space['0.5'],
     display: 'flex',
     flexDirection: 'column',
     minWidth: 0,
   },
 
-  title: {
+  label: {
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
 
