@@ -136,6 +136,12 @@ import {
   Overlay as OrganizationProfileOverlay,
 } from '../stories/organization-profile.stories';
 import {
+  Default as OrganizationProfileApiKeysPanelDefault,
+  Empty as OrganizationProfileApiKeysPanelEmpty,
+  meta as organizationProfileApiKeysPanelMeta,
+  ProposedTable as OrganizationProfileApiKeysPanelProposedTable,
+} from '../stories/organization-profile-api-keys-panel.stories';
+import {
   Default as OrganizationProfileDangerSectionDefault,
   LeaveOnly as OrganizationProfileDangerSectionLeaveOnly,
   meta as organizationProfileDangerSectionMeta,
@@ -151,12 +157,6 @@ import {
   meta as organizationProfileWorkspaceSectionMeta,
   SaveFails as OrganizationProfileWorkspaceSectionSaveFails,
 } from '../stories/organization-profile-workspace-section.stories';
-import {
-  Default as OrganizationProfileApiKeysPanelDefault,
-  Empty as OrganizationProfileApiKeysPanelEmpty,
-  meta as organizationProfileApiKeysPanelMeta,
-  ProposedTable as OrganizationProfileApiKeysPanelProposedTable,
-} from '../stories/organization-profile-api-keys-panel.stories';
 import {
   Default as OtpComponentDefault,
   Disabled as OtpComponentDisabled,

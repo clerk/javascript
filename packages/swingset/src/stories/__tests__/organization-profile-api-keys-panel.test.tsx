@@ -124,7 +124,7 @@ describe('organization API keys playground', () => {
       </MosaicProvider>,
     );
     await user.click(screen.getByRole('combobox', { name: /Results per page/ }));
-    await user.click(screen.getByRole('option', { name: '25' }));
+    await user.click(screen.getByRole('option', { name: '20' }));
     await user.click(screen.getByRole('button', { name: 'Create API key' }));
     await user.type(screen.getByRole('textbox', { name: 'Secret key name' }), 'Retry integration');
     await user.click(screen.getByRole('combobox', { name: /^Expiration/ }));
@@ -197,13 +197,13 @@ describe('organization API keys playground', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
     await user.click(screen.getByRole('combobox', { name: /Results per page/ }));
-    await user.click(screen.getByRole('option', { name: '25' }));
-    expect(screen.getByRole('combobox', { name: /Results per page/ })).toHaveTextContent('25');
+    await user.click(screen.getByRole('option', { name: '20' }));
+    expect(screen.getByRole('combobox', { name: /Results per page/ })).toHaveTextContent('20');
     expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeDisabled();
     expect(screen.getAllByRole('row')).toHaveLength(13);
     await user.click(screen.getByRole('combobox', { name: /Results per page/ }));
     await user.click(screen.getByRole('option', { name: '10' }));
-    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('1/2')).toBeVisible();
     expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeEnabled();
   });
 
@@ -282,7 +282,7 @@ describe('organization API keys playground', () => {
     expect(screen.getByRole('checkbox', { name: 'Select Local development' })).toBeChecked();
     await user.click(screen.getByRole('button', { name: 'Name' }));
     expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveAttribute('aria-sort', 'ascending');
-    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('1/2')).toBeVisible();
     expect(names()[0]).toBe('Select Analytics');
     expect(screen.getByRole('checkbox', { name: 'Select all API keys' })).not.toBeChecked();
     await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
@@ -337,12 +337,12 @@ describe('organization API keys playground', () => {
       </MosaicProvider>,
     );
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('1/2')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Date created' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Name' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Last used' })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
-    expect(screen.getByRole('button', { name: '2' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('2/2')).toBeVisible();
     const input = screen.getByRole('searchbox');
     await user.type(input, '  Web app  ');
     expect(input).toHaveValue('  Web app  ');

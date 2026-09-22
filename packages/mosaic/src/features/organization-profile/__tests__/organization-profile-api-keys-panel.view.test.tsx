@@ -291,11 +291,11 @@ describe('OrganizationProfileApiKeysPanelView', () => {
       );
     }
     render(<Example />);
-    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('1/2')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
     expect(screen.getByText('Key 11')).toBeVisible();
     expect(screen.queryByText('Key 1')).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '2' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('2/2')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Previous API keys page' }));
     expect(screen.getByText('Key 1')).toBeVisible();
     const input = screen.getByRole('searchbox', { name: 'Search API keys' });
@@ -306,7 +306,7 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     await user.click(screen.getByRole('button', { name: 'Clear search' }));
     expect(input).toHaveValue('');
     expect(input).toHaveFocus();
-    expect(screen.getByRole('button', { name: '1' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByText('1/2')).toBeVisible();
   });
   it('distinguishes initial loading from retained rows and empty read-only results', () => {
     const props = propsFor({ apiKeys: [], totalCount: 0, isLoading: true, onCreate: undefined, onRevoke: undefined });
