@@ -14,30 +14,35 @@ describe('Mosaic CopyButton', () => {
     await expect(navigator.clipboard.readText()).resolves.toBe('acme-inc');
   });
 
-  it('announces the copy and keeps the button named', async () => {
+  it('confirms the copy in a toast and keeps the button named', async () => {
     const user = userEvent.setup();
     render(<CopyButton value='acme-inc' />);
 
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
     await user.click(screen.getByRole('button', { name: 'Copy' }));
 
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Copied'));
+    const toast = await screen.findByRole('dialog', { name: 'Copied' });
+    expect(toast.querySelector('.cl-icon')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Copy' })).toBeInTheDocument();
   });
 
-  it('confirms the copy in a tooltip', async () => {
+  it('announces the copy from the region the button names', async () => {
     const user = userEvent.setup();
-    render(<CopyButton value='acme-inc' />);
+    render(
+      <CopyButton
+        value='acme-inc'
+        label='Copy slug'
+      />,
+    );
 
-    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Copy slug' }));
 
-    await user.click(screen.getByRole('button', { name: 'Copy' }));
-
-    const tooltip = await screen.findByRole('tooltip');
-    expect(tooltip).toHaveTextContent('Copied');
-    expect(tooltip.querySelector('.cl-icon')).toBeInTheDocument();
+    expect(await screen.findByRole('region', { name: 'Copy slug' })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Copied'));
   });
 
-  it('takes the tooltip label from copiedLabel', async () => {
+  it('takes the confirmation text from copiedLabel', async () => {
     const user = userEvent.setup();
     render(
       <CopyButton
@@ -48,10 +53,10 @@ describe('Mosaic CopyButton', () => {
 
     await user.click(screen.getByRole('button', { name: 'Copy' }));
 
-    await waitFor(() => expect(screen.getByRole('tooltip')).toHaveTextContent('Slug copied'));
+    expect(await screen.findByRole('dialog', { name: 'Slug copied' })).toBeInTheDocument();
   });
 
-  it('settles back after the copied state expires', async () => {
+  it('settles back after the confirmation expires', async () => {
     const user = userEvent.setup();
     render(
       <CopyButton
@@ -61,9 +66,20 @@ describe('Mosaic CopyButton', () => {
     );
 
     await user.click(screen.getByRole('button', { name: 'Copy' }));
-    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Copied'));
+    await screen.findByRole('dialog');
 
-    await waitFor(() => expect(screen.getByRole('status')).toBeEmptyDOMElement());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('shows one confirmation when the value is copied twice', async () => {
+    const user = userEvent.setup();
+    render(<CopyButton value='acme-inc' />);
+
+    await user.click(screen.getByRole('button', { name: 'Copy' }));
+    await screen.findByRole('dialog');
+    await user.click(screen.getByRole('button', { name: 'Copy' }));
+
+    await waitFor(() => expect(screen.getAllByRole('dialog')).toHaveLength(1));
   });
 
   it('copies through onCopy when one is given', async () => {
@@ -94,6 +110,6 @@ describe('Mosaic CopyButton', () => {
 
     await user.click(screen.getByRole('button', { name: 'Copy' }));
 
-    expect(screen.getByRole('status')).toBeEmptyDOMElement();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

@@ -2,8 +2,9 @@ import * as Stories from './copy-button.stories';
 
 # CopyButton
 
-Puts a value on the clipboard. A tooltip confirms the copy and settles after `resetAfter`. It
-opens only on the copy, so the button carries no hover tooltip of its own.
+Puts a value on the clipboard and confirms it in a toast anchored to the button, which settles after
+`resetAfter`. A toast rather than a tooltip because the confirmation is an event, not a description
+of the control: it announces itself, `F6` reaches it and `Escape` dismisses it.
 
 <Story
   name='Default'
@@ -19,7 +20,7 @@ opens only on the copy, so the button carries no hover tooltip of its own.
     { name: 'value', type: 'string' },
     { name: 'label', type: 'string', default: 'Copy' },
     { name: 'copiedLabel', type: 'string', default: 'Copied' },
-    { name: 'placement', type: "'top' | 'bottom' | 'left' | 'right'", default: 'top' },
+    { name: 'side', type: "'top' | 'bottom' | 'left' | 'right'", default: 'top' },
     { name: 'resetAfter', type: 'number', default: '2000' },
     { name: 'onCopy', type: '(value: string) => void | Promise<void>' },
   ]}
@@ -34,8 +35,8 @@ opens only on the copy, so the button carries no hover tooltip of its own.
 
 ## Naming what it copies
 
-The button keeps its name while the copy is fresh. A tooltip opened without the pointer is not
-announced, so the outcome comes from a live region instead.
+The button keeps its name while the copy is fresh; the confirmation is announced by the toast's own
+live region, from a landmark the `label` names.
 
 <Story
   name='Labelled'
