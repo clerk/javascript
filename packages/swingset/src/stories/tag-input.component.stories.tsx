@@ -51,7 +51,10 @@ function CopyPasteList() {
       variant='outline'
       size='sm'
       onClick={() => {
-        void navigator.clipboard.writeText(pasteList).then(() => setCopied(true));
+        navigator.clipboard.writeText(pasteList).then(
+          () => setCopied(true),
+          () => setCopied(false),
+        );
       }}
     >
       {copied ? 'Copied, now paste into the field' : 'Copy a comma-separated list'}

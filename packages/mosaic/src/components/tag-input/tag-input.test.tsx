@@ -155,6 +155,29 @@ describe('Mosaic TagInput', () => {
     expect(screen.getByRole('textbox', { name: 'Email' })).not.toHaveAttribute('name');
   });
 
+  it('submits to the form named by form', () => {
+    render(
+      <>
+        <form
+          id='invite'
+          data-testid='form'
+        />
+        <TagInput
+          aria-label='Email'
+          name='emails'
+          form='invite'
+          defaultValue={['preston@clerk.dev']}
+        />
+      </>,
+    );
+
+    const form = screen.getByTestId('form');
+    if (!(form instanceof HTMLFormElement)) {
+      throw new Error('expected a form');
+    }
+    expect(new FormData(form).getAll('emails')).toEqual(['preston@clerk.dev']);
+  });
+
   it('forwards the ref and native input props to the text input', () => {
     const ref = React.createRef<HTMLInputElement>();
     render(

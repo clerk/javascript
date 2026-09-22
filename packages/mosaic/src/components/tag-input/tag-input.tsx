@@ -19,7 +19,7 @@ import { styles } from './tag-input.styles';
 
 type TagInputRootProps = Pick<
   PrimitiveTagInputProps,
-  'value' | 'defaultValue' | 'onValueChange' | 'validate' | 'delimiters' | 'name' | 'disabled'
+  'value' | 'defaultValue' | 'onValueChange' | 'validate' | 'delimiters' | 'name' | 'form' | 'disabled'
 >;
 
 export interface TagInputProps
@@ -89,6 +89,7 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
     validate,
     delimiters,
     name,
+    form,
     removeLabel = defaultRemoveLabel,
     disabled: disabledProp,
     required: requiredProp,
@@ -122,6 +123,7 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
       validate={validate}
       delimiters={delimiters}
       name={name}
+      form={form}
       disabled={disabled}
       {...mergeStyleProps(
         themeProps('tag-input', { disabled, invalid }),
