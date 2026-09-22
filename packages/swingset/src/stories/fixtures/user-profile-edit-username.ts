@@ -19,7 +19,7 @@ export function useUserProfileEditUsernameFixture({
     onSubmitUsername: async (value: string) => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith) {
-        return { error: { kind: 'form' as const, ...failWith } };
+        return { error: failWith };
       }
       setUsername(value);
       return { error: null };

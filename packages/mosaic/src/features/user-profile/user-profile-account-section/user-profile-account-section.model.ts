@@ -4,8 +4,6 @@ import type { AttributeData, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
 import { toSaveResult } from '../../../utils/save-result';
-import type { ReverificationProps } from '../../reverification';
-import { useReverificationWithState } from '../../reverification';
 import type {
   UserProfileEmail,
   UserProfileNameAttribute,
@@ -37,7 +35,7 @@ type UserProfileAccountSectionData = Pick<
 export type UserProfileAccountSectionModel =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | (UserProfileAccountSectionData & { status: 'ready'; reverification: ReverificationProps });
+  | (UserProfileAccountSectionData & { status: 'ready' });
 
 const NAME_FIELDS: readonly UserProfileEditNameField[] = ['firstName', 'lastName'];
 const USERNAME_FIELDS: readonly UserProfileEditUsernameField[] = ['username'];
@@ -71,7 +69,6 @@ function toPhones(user: UserResource): UserProfilePhone[] {
 export function useUserProfileAccountSectionModel(): UserProfileAccountSectionModel {
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
-  const [updateUsername, reverification] = useReverificationWithState((username: string) => user?.update({ username }));
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -89,7 +86,6 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
 
   return {
     status: 'ready',
-    reverification,
     name: getFullName(user),
     firstName: user.firstName ?? '',
     lastName: user.lastName ?? '',
@@ -107,7 +103,7 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
       : value => toSaveResult(() => user.update({ firstName: value.firstName, lastName: value.lastName }), NAME_FIELDS),
     onSubmitUsername:
       showUsername && !usernameImmutable
-        ? username => toSaveResult(() => updateUsername(username), USERNAME_FIELDS)
+        ? username => toSaveResult(() => user.update({ username }), USERNAME_FIELDS)
         : undefined,
   };
 }

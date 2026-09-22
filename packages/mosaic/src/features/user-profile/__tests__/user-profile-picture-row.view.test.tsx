@@ -22,7 +22,7 @@ describe('UserProfilePictureRowView', () => {
     const user = userEvent.setup();
     renderView({
       hasImage: true,
-      onRemove: vi.fn().mockResolvedValue({ error: { kind: 'form', global: { code: 'action_blocked' } } }),
+      onRemove: vi.fn().mockResolvedValue({ error: { global: { code: 'action_blocked' } } }),
     });
 
     await user.click(screen.getByRole('button', { name: 'Manage profile picture' }));

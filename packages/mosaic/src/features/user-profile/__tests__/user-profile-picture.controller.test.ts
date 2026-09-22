@@ -55,7 +55,7 @@ describe('useUserProfilePictureController', () => {
     const onChange = vi
       .fn()
       .mockResolvedValueOnce({
-        error: { kind: 'form', global: { code: 'avatar_file_size_exceeded', message: 'Too big.' } },
+        error: { global: { code: 'avatar_file_size_exceeded', message: 'Too big.' } },
       })
       .mockResolvedValueOnce({ error: null });
     const { result } = renderController({ onChange });
@@ -63,14 +63,6 @@ describe('useUserProfilePictureController', () => {
     await act(async () => result.current.onChange?.(file));
     expect(result.current.error).toEqual({ code: 'avatar_file_size_exceeded', message: 'Too big.' });
     expect(result.current.isPending).toBe(false);
-
-    await act(async () => result.current.onChange?.(file));
-    expect(result.current.error).toBeUndefined();
-  });
-
-  it('shows nothing when the action is cancelled', async () => {
-    const onChange = vi.fn().mockResolvedValue({ error: { kind: 'cancelled' } });
-    const { result } = renderController({ onChange });
 
     await act(async () => result.current.onChange?.(file));
     expect(result.current.error).toBeUndefined();
@@ -89,7 +81,7 @@ describe('useUserProfilePictureController', () => {
   });
 
   it('reports a failed removal the same way', async () => {
-    const onRemove = vi.fn().mockResolvedValue({ error: { kind: 'form', global: { message: 'Nope.' } } });
+    const onRemove = vi.fn().mockResolvedValue({ error: { global: { message: 'Nope.' } } });
     const { result } = renderController({ onRemove });
 
     await act(async () => result.current.onRemove?.());

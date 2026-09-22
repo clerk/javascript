@@ -12,9 +12,7 @@ import type { UserProfileEditNameField } from '../user-profile-account-section/u
 type Result = SaveResult<UserProfileEditNameField>;
 
 const saved = (): Promise<Result> => Promise.resolve({ error: null });
-const failed = (error: FormError<UserProfileEditNameField>): Promise<Result> =>
-  Promise.resolve({ error: { kind: 'form', ...error } });
-const cancelled = (): Promise<Result> => Promise.resolve({ error: { kind: 'cancelled' } });
+const failed = (error: FormError<UserProfileEditNameField>): Promise<Result> => Promise.resolve({ error });
 
 function start(saveName: () => Promise<Result>, saved = { savedFirstName: 'Preston', savedLastName: 'Booth' }) {
   const actor = createActor(userProfileEditNameMachine, { context: { saveName, ...saved } }).start();
@@ -89,14 +87,6 @@ describe('userProfileEditNameMachine', () => {
     await vi.waitFor(() => expect(actor.getSnapshot().context.error).toEqual({ global: { code: 'generic' } }));
     expect(log).toHaveBeenCalledWith(failure);
     log.mockRestore();
-  });
-
-  it('stays open without a banner when the save is cancelled', async () => {
-    const actor = start(cancelled);
-    actor.send({ type: 'SAVE' });
-
-    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('editing'));
-    expect(actor.getSnapshot().context.error).toBeUndefined();
   });
 
   it('drops the error when the dialog is cancelled', async () => {

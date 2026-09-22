@@ -30,7 +30,6 @@ let user: {
 } | null;
 let attributes: Record<'first_name' | 'last_name' | 'username', FakeAttribute>;
 let environmentHydrated: boolean;
-let reverified: ReturnType<typeof vi.fn>;
 
 function attribute(overrides: Partial<FakeAttribute> = {}): FakeAttribute {
   return { enabled: true, required: false, used_for_first_factor: false, used_for_second_factor: false, ...overrides };
@@ -41,13 +40,6 @@ vi.mock('@clerk/shared/react', async importOriginal => {
   return {
     ...actual,
     useUser: () => ({ isLoaded: isUserLoaded, user }),
-    useSession: () => ({ session: { id: 'sess_1' } }),
-    useReverification: (fetcher: (...args: unknown[]) => Promise<unknown>) => {
-      return (...args: unknown[]) => {
-        reverified(...args);
-        return fetcher(...args);
-      };
-    },
     useClerk: () => ({
       __internal_environment: environmentHydrated ? { userSettings: { attributes } } : null,
     }),
@@ -83,7 +75,6 @@ function apiError(paramName?: string) {
 beforeEach(() => {
   isUserLoaded = true;
   environmentHydrated = true;
-  reverified = vi.fn();
   attributes = { first_name: attribute(), last_name: attribute(), username: attribute() };
   user = {
     firstName: 'Preston',
@@ -137,7 +128,6 @@ describe('useUserProfileAccountSectionModel', () => {
       ],
       phones: [{ id: 'phone_1', value: '+18018888181', isDefault: false, isVerified: true }],
     });
-    expect(model.reverification).toEqual({ isActive: false });
   });
 
   describe('profile picture', () => {
@@ -163,7 +153,7 @@ describe('useUserProfileAccountSectionModel', () => {
       user?.setProfileImage.mockRejectedValue(apiError());
       const file = new File(['x'], 'me.png', { type: 'image/png' });
       await expect(ready().onProfilePictureChange?.(file)).resolves.toEqual({
-        error: { kind: 'form', global: { code: 'form_param_invalid', message: 'That value is invalid.' } },
+        error: { global: { code: 'form_param_invalid', message: 'That value is invalid.' } },
       });
     });
   });
@@ -178,7 +168,6 @@ describe('useUserProfileAccountSectionModel', () => {
       user?.update.mockRejectedValue(apiError('first_name'));
       await expect(ready().onSubmitName?.({ firstName: '', lastName: 'B' })).resolves.toEqual({
         error: {
-          kind: 'form',
           fields: {
             firstName: { code: 'form_param_invalid', paramName: 'first_name', message: 'That value is invalid.' },
           },
@@ -204,7 +193,7 @@ describe('useUserProfileAccountSectionModel', () => {
   it('returns a Clerk runtime failure by its code, without the developer message', async () => {
     user?.update.mockRejectedValue(new ClerkRuntimeError('Network down.', { code: 'network_error' }));
     await expect(ready().onSubmitName?.({ firstName: 'Pres', lastName: 'B' })).resolves.toEqual({
-      error: { kind: 'form', global: { code: 'network_error' } },
+      error: { global: { code: 'network_error' } },
     });
   });
 
@@ -214,9 +203,8 @@ describe('useUserProfileAccountSectionModel', () => {
   });
 
   describe('username', () => {
-    it('saves the username behind reverification', async () => {
-      await ready().onSubmitUsername?.('preston');
-      expect(reverified).toHaveBeenCalledWith('preston');
+    it('saves the username', async () => {
+      await expect(ready().onSubmitUsername?.('preston')).resolves.toEqual({ error: null });
       expect(user?.update).toHaveBeenCalledWith({ username: 'preston' });
     });
 
@@ -224,17 +212,11 @@ describe('useUserProfileAccountSectionModel', () => {
       user?.update.mockRejectedValue(apiError('username'));
       await expect(ready().onSubmitUsername?.('x')).resolves.toEqual({
         error: {
-          kind: 'form',
           fields: {
             username: { code: 'form_param_invalid', paramName: 'username', message: 'That value is invalid.' },
           },
         },
       });
-    });
-
-    it('reports a cancelled reverification as cancelled, not as a failure', async () => {
-      user?.update.mockRejectedValue(new ClerkRuntimeError('cancelled', { code: 'reverification_cancelled' }));
-      await expect(ready().onSubmitUsername?.('x')).resolves.toEqual({ error: { kind: 'cancelled' } });
     });
 
     it('is hidden when the instance does not use usernames', () => {
