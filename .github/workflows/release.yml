@@ -110,6 +110,12 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_CHANGELOG_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
+      - name: Deprecate superseded packages
+        if: steps.changesets.outputs.published == 'true'
+        run: node scripts/deprecate-superseded.mjs '${{ steps.changesets.outputs.publishedPackages }}'
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
   # We're running the CI workflow (where node v20 modules are cached) in
   # merge_group and not on main, we need to explicitly cache node_modules here so
   # that follow-on branches can use the cached version of node_modules rather
