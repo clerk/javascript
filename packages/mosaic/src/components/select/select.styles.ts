@@ -34,8 +34,8 @@ export const positioner = stylex.create({
 
 export const popup = stylex.create({
   base: {
-    // A real border, not a shadow ring, so it occupies the 1px of layout the alignment counts on.
-    borderColor: `light-dark(color-mix(in oklab, ${colorVars['--cl-color-neutral']} 4%, transparent), color-mix(in oklab, ${colorVars['--cl-color-neutral']} 10%, transparent))`,
+    // Transparent, not removed: it holds the 1px of layout the alignment counts on, and forced colors paints it.
+    borderColor: 'transparent',
     borderRadius: radiusVars['--cl-radius-lg'],
     borderStyle: 'solid',
     borderWidth: '1px',
