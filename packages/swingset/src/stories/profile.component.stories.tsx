@@ -170,7 +170,7 @@ function Surface({
                 size='sm'
               />
             }
-            badge={item.id === 'security' ? <Badge color='neutral'>2</Badge> : undefined}
+            badge={item.id === 'security' ? <Badge>2</Badge> : undefined}
           >
             {item.label}
           </Profile.NavItem>
