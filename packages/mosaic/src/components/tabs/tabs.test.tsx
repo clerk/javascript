@@ -58,4 +58,32 @@ describe('Mosaic Tabs', () => {
     expect(ref.current).toHaveClass('cl-tabs-panels', panelsAtom, atom);
     expect(screen.getByText('Member list')).toHaveClass('cl-tabs-panel', panelAtom);
   });
+
+  it('renders a custom panel wrapper and merges its refs and classes', () => {
+    const ref = React.createRef<HTMLDivElement>();
+    const renderRef = React.createRef<HTMLDivElement>();
+    render(
+      <Tabs.Root defaultValue='members'>
+        <Tabs.Panels
+          ref={ref}
+          render={
+            <div
+              ref={renderRef}
+              data-testid='custom-panels'
+              className='from-source'
+            />
+          }
+        >
+          <Tabs.Panel value='members'>Member list</Tabs.Panel>
+        </Tabs.Panels>
+      </Tabs.Root>,
+    );
+
+    const panels = screen.getByTestId('custom-panels');
+    const panelsAtom = stylex.props(styles.panels).className ?? '';
+    expect(ref.current).toBe(panels);
+    expect(renderRef.current).toBe(panels);
+    expect(panels).toHaveClass('cl-tabs-panels', panelsAtom, 'from-source');
+    expect(panels).toContainElement(screen.getByRole('tabpanel'));
+  });
 });
