@@ -1,10 +1,9 @@
-import { Card } from '../../components/card';
 import { useReverificationController } from './reverification.controller';
 import { useReverificationModel } from './reverification.model';
 import type { ReverificationProps } from './reverification.types';
 import { ReverificationPending, ReverificationUnavailable, ReverificationView } from './reverification.view';
 
-export function Reverification({ embedded = false, ...props }: ReverificationProps & { embedded?: boolean }) {
+export function Reverification(props: ReverificationProps) {
   const model = useReverificationModel(props);
   const controller = useReverificationController(model);
 
@@ -12,27 +11,12 @@ export function Reverification({ embedded = false, ...props }: ReverificationPro
     return null;
   }
 
-  let content: JSX.Element;
   if (controller.status === 'loading') {
-    content = <ReverificationPending />;
+    return <ReverificationPending />;
   } else if (controller.status === 'unavailable') {
-    content = <ReverificationUnavailable />;
-  } else {
-    const { status: _status, ...viewProps } = controller;
-    content = (
-      <ReverificationView
-        {...viewProps}
-        // When rendering the view standalone for swingset or otherwise, you might want
-        // to render it as embedded or not, but when rendering it through this wrapper,
-        // the wrapper owns the <Card.Root> and the view is always acts as embedded
-        embedded
-      />
-    );
+    return <ReverificationUnavailable />;
   }
 
-  if (embedded) {
-    return content;
-  }
-
-  return <Card.Root renderBranding={false}>{content}</Card.Root>;
+  const { status: _status, ...viewProps } = controller;
+  return <ReverificationView {...viewProps} />;
 }

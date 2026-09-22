@@ -33,15 +33,13 @@ function renderView(overrides: Partial<ReverificationViewProps> = {}) {
 }
 
 describe('ReverificationView', () => {
-  it('keeps one Card and Flow surface while view props and panels change', () => {
+  it('keeps one Flow surface while view props and panels change', () => {
     const { container, rerender } = renderView();
 
-    const card = container.querySelector('.cl-card-root');
     const flow = container.querySelector('.cl-flow-root');
     const passwordStep = screen.getByLabelText('Password').closest('.cl-flow-step');
 
-    expect(card).not.toBeNull();
-    expect(card).toContainElement(flow);
+    expect(container.querySelector('.cl-card-root')).toBeNull();
     expect(flow).toHaveAttribute('data-value', 'password');
 
     rerender(
@@ -50,7 +48,6 @@ describe('ReverificationView', () => {
       </MosaicProvider>,
     );
 
-    expect(container.querySelector('.cl-card-root')).toBe(card);
     expect(container.querySelector('.cl-flow-root')).toBe(flow);
     expect(screen.getByLabelText('Password').closest('.cl-flow-step')).toBe(passwordStep);
 
@@ -60,7 +57,6 @@ describe('ReverificationView', () => {
       </MosaicProvider>,
     );
 
-    expect(container.querySelector('.cl-card-root')).toBe(card);
     expect(container.querySelector('.cl-flow-root')).toBe(flow);
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument();
     const otpStep = screen.getByRole('group', { name: 'Verification code' }).closest('.cl-flow-step');
@@ -107,20 +103,6 @@ describe('ReverificationView', () => {
     });
 
     expect(screen.getByRole('button', { name: 'Didn’t receive a code? Resend (23)' })).toBeDisabled();
-  });
-
-  it('omits the card root when embedded', () => {
-    const { container } = renderView({ embedded: true });
-
-    expect(container.querySelector('.cl-card-root')).toBeNull();
-    expect(container.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'password');
-    expect(screen.getByLabelText('Password')).toBeInTheDocument();
-  });
-
-  it('does not render Card branding', () => {
-    renderView();
-
-    expect(screen.queryByText('Secured by')).not.toBeInTheDocument();
   });
 
   it('renders a passkey attempt error in a negative Banner', () => {

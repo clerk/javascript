@@ -19,7 +19,6 @@ export type ReverificationMethod =
 export type ReverificationPreparableMethod = Extract<ReverificationMethod, { strategy: 'email_code' | 'phone_code' }>;
 
 type ReverificationViewFields = {
-  embedded?: boolean;
   direction?: FlowDirection;
   value: string;
   onValueChange: (value: string) => void;
