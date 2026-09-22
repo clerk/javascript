@@ -14,6 +14,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'wip',
   title: 'Pagination',
+  layout: 'wide',
   source: 'packages/mosaic/src/components/pagination/pagination.tsx',
   styles: {
     _variants: {
