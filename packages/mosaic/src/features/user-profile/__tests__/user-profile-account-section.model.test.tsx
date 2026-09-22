@@ -28,7 +28,7 @@ let user: {
   setProfileImage: ReturnType<typeof vi.fn>;
   update: ReturnType<typeof vi.fn>;
 } | null;
-let attributes: Record<'first_name' | 'last_name' | 'username', FakeAttribute>;
+let attributes: Record<'first_name' | 'last_name' | 'username' | 'email_address' | 'phone_number', FakeAttribute>;
 let environmentHydrated: boolean;
 
 function attribute(overrides: Partial<FakeAttribute> = {}): FakeAttribute {
@@ -75,7 +75,13 @@ function apiError(paramName?: string) {
 beforeEach(() => {
   isUserLoaded = true;
   environmentHydrated = true;
-  attributes = { first_name: attribute(), last_name: attribute(), username: attribute() };
+  attributes = {
+    first_name: attribute(),
+    last_name: attribute(),
+    username: attribute(),
+    email_address: attribute(),
+    phone_number: attribute(),
+  };
   user = {
     firstName: 'Preston',
     lastName: 'Booth',
@@ -128,6 +134,15 @@ describe('useUserProfileAccountSectionModel', () => {
       ],
       phones: [{ id: 'phone_1', value: '+18018888181', isDefault: false, isVerified: true }],
     });
+  });
+
+  it('leaves out the contacts the instance does not collect', () => {
+    attributes.email_address = attribute({ enabled: false });
+    attributes.phone_number = attribute({ enabled: false });
+    const model = ready();
+
+    expect(model.emails).toBeUndefined();
+    expect(model.phones).toBeUndefined();
   });
 
   describe('profile picture', () => {

@@ -36,8 +36,9 @@ export interface UserProfileAccountSectionViewProps {
   lastName?: string;
   firstNameAttribute?: UserProfileNameAttribute;
   lastNameAttribute?: UserProfileNameAttribute;
-  emails: UserProfileEmail[];
-  phones: UserProfilePhone[];
+  /** Left out when the instance does not collect the attribute, which drops the row. */
+  emails?: UserProfileEmail[];
+  phones?: UserProfilePhone[];
   onProfilePictureChange?: (file: File) => Promise<SaveResult>;
   onProfilePictureReject?: (rejections: FileRejection[]) => void;
   onRemoveProfilePicture?: () => Promise<SaveResult>;
@@ -91,7 +92,7 @@ export function UserProfileAccountSectionView({
 }: UserProfileAccountSectionViewProps) {
   const m = useMessages('userProfileAccountSection');
   const showName = firstNameAttribute?.enabled !== false || lastNameAttribute?.enabled !== false;
-  const phoneRow = (
+  const phoneRow = phones ? (
     <UserProfilePhoneRowView
       phones={phones}
       allowMultipleAccounts={allowMultipleAccounts}
@@ -102,8 +103,8 @@ export function UserProfileAccountSectionView({
       onSetPrimaryPhone={onSetPrimaryPhone}
       onRemovePhone={onRemovePhone}
     />
-  );
-  const emailRow = (
+  ) : null;
+  const emailRow = emails ? (
     <UserProfileEmailRowView
       emails={emails}
       allowMultipleAccounts={allowMultipleAccounts}
@@ -115,7 +116,7 @@ export function UserProfileAccountSectionView({
       onSetPrimaryEmail={onSetPrimaryEmail}
       onRemoveEmail={onRemoveEmail}
     />
-  );
+  ) : null;
 
   return (
     <div {...stylex.props(styles.sections)}>
@@ -150,12 +151,12 @@ export function UserProfileAccountSectionView({
           {!allowMultipleAccounts ? phoneRow : null}
         </Section.Group>
       </Section.Root>
-      {allowMultipleAccounts ? (
+      {allowMultipleAccounts && emailRow ? (
         <Section.Root aria-label={m.email.label}>
           <Section.Group>{emailRow}</Section.Group>
         </Section.Root>
       ) : null}
-      {allowMultipleAccounts ? (
+      {allowMultipleAccounts && phoneRow ? (
         <Section.Root aria-label={m.phone.label}>
           <Section.Group>{phoneRow}</Section.Group>
         </Section.Root>
