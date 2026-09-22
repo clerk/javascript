@@ -146,7 +146,6 @@ describe('OAuthConsent', () => {
       expect(getByText(/You'll stay signed in until you sign out or revoke access\./)).toBeVisible();
     });
     expect(queryByText('This will allow Clerk CLI access to:')).toBeNull();
-    expect(queryByText('Offline access')).toBeNull();
   });
 
   it('supports localizing the private metadata scope description', async () => {

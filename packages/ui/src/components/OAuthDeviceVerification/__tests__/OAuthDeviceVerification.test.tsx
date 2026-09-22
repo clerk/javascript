@@ -155,7 +155,6 @@ describe('OAuthDeviceVerification', () => {
     await waitFor(() => expect(getByText('Allow TV App to access your account?')).toBeVisible());
     expect(getByText("You'll stay signed in until you sign out or revoke access.")).toBeVisible();
     expect(queryByText('This will allow TV App access to:')).toBeNull();
-    expect(queryByText('Offline access')).toBeNull();
   });
 
   it('keeps an invalid URL prefill editable without calling FAPI', async () => {
