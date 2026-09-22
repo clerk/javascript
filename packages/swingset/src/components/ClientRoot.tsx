@@ -54,11 +54,11 @@ export function ClientRoot({ children }: { children: React.ReactNode }) {
 
   return (
     <DirectionProvider>
-      <CommandPalette
-        open={searchOpen}
-        onOpenChange={setSearchOpen}
-      />
       <SidebarProvider>
+        <CommandPalette
+          open={searchOpen}
+          onOpenChange={setSearchOpen}
+        />
         <AppSidebar onSearchOpen={() => setSearchOpen(true)} />
         <SidebarInset>
           <header className='bg-background sticky top-0 z-10 flex h-12 shrink-0 items-center gap-2 border-b px-4'>

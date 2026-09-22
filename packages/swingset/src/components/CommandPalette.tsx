@@ -1,23 +1,22 @@
 'use client';
 
 import { Dialog } from '@base-ui/react/dialog';
-import { FlaskConicalIcon, SearchIcon } from 'lucide-react';
+import { SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from 'next-themes';
 import * as React from 'react';
 
-import { StatusDot } from '@/components/StatusDot';
+import { useSidebar } from '@/components/ui/sidebar';
 import { getSidebarGroups } from '@/lib/registry';
-import type { StoryStatus, WipSubstatus } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 type PaletteEntry = {
-  href: string;
+  href?: string;
   title: string;
-  label: string;
+  hint?: string;
   group: string;
-  status?: StoryStatus;
-  substatus?: WipSubstatus;
   search: string;
+  run?: () => void;
 };
 
 function usage(group: string, title: string) {
@@ -30,30 +29,45 @@ function usage(group: string, title: string) {
   return `<${title} />`;
 }
 
-const entries: PaletteEntry[] = [
+const navigationEntries: PaletteEntry[] = [
   ...getSidebarGroups().flatMap(({ group, groupSlug, components }) =>
     components.map(({ mod, componentSlug }) => {
-      const { title, label, status, substatus } = mod.meta;
+      const { title, label } = mod.meta;
       return {
         href: `/${groupSlug}/${componentSlug}`,
         title,
-        label: label ?? usage(group, title),
+        hint: label ?? usage(group, title),
         group,
-        status,
-        substatus,
-        search: `${title} ${label ?? ''}`.toLowerCase(),
+        search: `${title} ${label ?? ''} ${group} ${groupSlug} ${componentSlug}`.toLowerCase(),
       };
     }),
   ),
-  { href: '/live', title: 'Live Sandbox', label: 'Live Sandbox', group: 'Sandbox', search: 'live sandbox' },
+  { href: '/live', title: 'Live Sandbox', group: 'Sandbox', search: 'live sandbox /live' },
 ];
 
 export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   const router = useRouter();
+  const { resolvedTheme, setTheme } = useTheme();
+  const { toggleSidebar } = useSidebar();
   const [query, setQuery] = React.useState('');
   const [activeIndex, setActiveIndex] = React.useState(0);
   const listRef = React.useRef<HTMLDivElement>(null);
 
+  const entries = [
+    ...navigationEntries,
+    {
+      title: 'Toggle dark mode',
+      group: 'Appearance',
+      search: 'toggle dark mode theme appearance',
+      run: () => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark'),
+    },
+    {
+      title: 'Toggle sidebar',
+      group: 'Appearance',
+      search: 'toggle sidebar collapse expand',
+      run: toggleSidebar,
+    },
+  ];
   const q = query.trim().toLowerCase();
   const results = q ? entries.filter(entry => entry.search.includes(q)) : entries;
 
@@ -69,24 +83,33 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
   }, [open]);
 
   React.useEffect(() => {
-    listRef.current?.querySelector('[data-active="true"]')?.scrollIntoView({ block: 'nearest' });
-  }, [activeIndex]);
+    listRef.current?.querySelector('[aria-selected="true"]')?.scrollIntoView({ block: 'nearest' });
+  }, [activeIndex, q]);
 
   const select = (entry: PaletteEntry | undefined) => {
     if (!entry) {
       return;
     }
-    router.push(entry.href);
     onOpenChange(false);
+    if (entry.run) {
+      entry.run();
+      return;
+    }
+    if (entry.href) {
+      router.push(entry.href);
+    }
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
+    if (!results.length) {
+      return;
+    }
     if (event.key === 'ArrowDown') {
       event.preventDefault();
-      setActiveIndex(index => Math.min(results.length - 1, index + 1));
+      setActiveIndex(index => (index + 1) % results.length);
     } else if (event.key === 'ArrowUp') {
       event.preventDefault();
-      setActiveIndex(index => Math.max(0, index - 1));
+      setActiveIndex(index => (index - 1 + results.length) % results.length);
     } else if (event.key === 'Enter') {
       event.preventDefault();
       select(results[activeIndex]);
@@ -99,9 +122,9 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
       onOpenChange={onOpenChange}
     >
       <Dialog.Portal>
-        <Dialog.Backdrop className='data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-xs fixed inset-0 z-50 bg-black/20 transition-opacity duration-150' />
-        <Dialog.Popup className='bg-popover text-popover-foreground data-ending-style:opacity-0 data-ending-style:scale-98 data-starting-style:opacity-0 data-starting-style:scale-98 fixed left-1/2 top-[15vh] z-50 flex max-h-[70vh] w-[92vw] max-w-lg -translate-x-1/2 flex-col overflow-hidden rounded-xl border shadow-lg transition duration-150'>
-          <Dialog.Title className='sr-only'>Search components</Dialog.Title>
+        <Dialog.Backdrop className='data-ending-style:opacity-0 data-starting-style:opacity-0 supports-backdrop-filter:backdrop-blur-sm fixed inset-0 z-50 bg-black/40 transition-opacity duration-150 dark:bg-black/60' />
+        <Dialog.Popup className='bg-popover text-popover-foreground data-ending-style:opacity-0 data-ending-style:scale-98 data-starting-style:opacity-0 data-starting-style:scale-98 fixed left-1/2 top-[18vh] z-50 flex max-h-[min(50vh,600px)] w-[92vw] max-w-lg -translate-x-1/2 flex-col overflow-hidden rounded-lg border shadow-2xl transition duration-150'>
+          <Dialog.Title className='sr-only'>Command palette</Dialog.Title>
           <div className='flex items-center gap-2 border-b px-3'>
             <SearchIcon className='text-muted-foreground size-4 shrink-0' />
             <input
@@ -110,50 +133,67 @@ export function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenCh
               value={query}
               onChange={event => setQuery(event.target.value)}
               onKeyDown={onKeyDown}
-              placeholder='Search components, pages…'
-              aria-label='Search components'
-              className='placeholder:text-muted-foreground h-11 w-full bg-transparent text-sm outline-none'
+              placeholder='Type a command or search…'
+              aria-label='Search commands'
+              className='placeholder:text-muted-foreground w-full bg-transparent py-3 text-sm outline-none'
             />
-            <kbd className='text-muted-foreground bg-muted hidden shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] sm:inline-block'>
-              esc
+            <kbd className='text-muted-foreground hidden shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px] sm:inline-block'>
+              ESC
             </kbd>
           </div>
           <div
             ref={listRef}
-            className='overflow-y-auto p-1.5'
+            role='listbox'
+            className='min-h-0 flex-1 overflow-y-auto p-1'
           >
             {results.length === 0 ? (
-              <p className='text-muted-foreground px-3 py-6 text-center text-xs'>No matches for “{query.trim()}”.</p>
+              <p className='text-muted-foreground px-3 py-6 text-center text-xs'>No results</p>
             ) : (
-              results.map((entry, index) => (
-                <button
-                  key={entry.href}
-                  type='button'
-                  data-active={index === activeIndex}
-                  onClick={() => select(entry)}
-                  onMouseMove={() => setActiveIndex(index)}
-                  className={cn(
-                    'flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm',
-                    index === activeIndex ? 'bg-accent text-accent-foreground' : 'text-foreground',
-                  )}
-                >
-                  {entry.status ? (
-                    <StatusDot
-                      status={entry.status}
-                      substatus={entry.substatus}
-                    />
-                  ) : entry.group === 'Sandbox' ? (
-                    <FlaskConicalIcon className='text-muted-foreground size-3.5 shrink-0' />
-                  ) : (
-                    <span className='size-2 shrink-0' />
-                  )}
-                  <span className='truncate'>{entry.label}</span>
-                  <span className='text-muted-foreground ml-auto shrink-0 text-[10px] uppercase tracking-wider'>
-                    {entry.group}
-                  </span>
-                </button>
-              ))
+              results.map((entry, index) => {
+                const previous = results[index - 1];
+                const startsGroup = !previous || previous.group !== entry.group;
+                return (
+                  <React.Fragment key={entry.href ?? entry.title}>
+                    {startsGroup && (
+                      <p className='text-muted-foreground px-2 pb-1 pt-2 text-[10px] font-medium uppercase tracking-wide'>
+                        {entry.group}
+                      </p>
+                    )}
+                    <button
+                      type='button'
+                      role='option'
+                      aria-selected={index === activeIndex}
+                      onClick={() => select(entry)}
+                      onMouseMove={() => setActiveIndex(index)}
+                      className={cn(
+                        'text-foreground hover:bg-accent hover:text-accent-foreground group flex w-full items-center justify-between gap-2 rounded-md px-2 py-1.5 text-left text-xs',
+                        index === activeIndex && 'bg-accent text-accent-foreground',
+                      )}
+                    >
+                      <span className='min-w-0 truncate'>{entry.title}</span>
+                      {entry.hint && (
+                        <span className='text-muted-foreground group-aria-selected:text-accent-foreground/70 max-w-[11rem] shrink truncate font-mono text-[9px]'>
+                          {entry.hint}
+                        </span>
+                      )}
+                    </button>
+                  </React.Fragment>
+                );
+              })
             )}
+          </div>
+          <div className='text-muted-foreground flex items-center gap-3 border-t px-3 py-2 text-[10px]'>
+            <span className='flex items-center gap-1'>
+              <kbd className='rounded border px-1 py-0.5'>↑</kbd>
+              <kbd className='rounded border px-1 py-0.5'>↓</kbd> Navigate
+            </span>
+            <span className='flex items-center gap-1'>
+              <kbd className='rounded border px-1 py-0.5'>↵</kbd> Select
+            </span>
+            <span className='flex items-center gap-1'>
+              <kbd className='rounded border px-1 py-0.5'>⌘</kbd>
+              <kbd className='rounded border px-1 py-0.5'>K</kbd> Toggle
+            </span>
           </div>
         </Dialog.Popup>
       </Dialog.Portal>
