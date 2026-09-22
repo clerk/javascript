@@ -2,46 +2,74 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, space, typeScaleVars } from '../../tokens.stylex';
 
+const compact = '@container (width < 48rem)' as const;
+
 export const styles = stylex.create({
   root: {
     gap: space['4'],
-    alignItems: 'center',
+    alignItems: { [compact]: 'stretch', default: 'center' },
     display: 'flex',
+    flexDirection: { [compact]: 'column', default: 'row' },
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+  },
+  summary: {
+    gap: space['3'],
+    alignItems: 'center',
+    display: 'flex',
+    flexWrap: { [compact]: 'nowrap', default: 'wrap' },
+    justifyContent: { [compact]: 'space-between', default: 'flex-start' },
+    width: { [compact]: '100%', default: 'auto' },
+  },
+  pageSize: {
+    gap: space['3'],
+    alignItems: 'center',
+    display: 'flex',
   },
   controls: {
     gap: space['1'],
     alignItems: 'center',
+    borderBlockStartColor: { [compact]: colorVars['--cl-color-border'], default: 'transparent' },
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: { [compact]: '1px', default: 0 },
+    display: { [compact]: 'grid', default: 'flex' },
+    gridTemplateColumns: { [compact]: '1fr auto 1fr', default: 'none' },
+    paddingBlockStart: { [compact]: space['4'], default: 0 },
+    width: { [compact]: '100%', default: 'auto' },
+  },
+  controlGroup: {
+    gap: space['1'],
+    alignItems: 'center',
     display: 'flex',
   },
-  hitTarget: {
-    position: 'relative',
-    '::after': {
-      insetBlock: 0,
-      insetInline: `calc(${space['1']} / -2)`,
-      content: '""',
-      position: 'absolute',
-    },
+  controlGroupEnd: {
+    justifySelf: 'end',
   },
-  page: {
-    color: {
-      default: colorVars['--cl-color-foreground-secondary'],
-      ':where([aria-current="page"])': colorVars['--cl-color-foreground'],
-    },
-  },
-  ellipsis: {
-    alignItems: 'center',
+  text: {
     color: colorVars['--cl-color-foreground-secondary'],
-    display: 'inline-flex',
-    justifyContent: 'center',
-    height: space['7'],
-    width: space['7'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    whiteSpace: 'nowrap',
   },
-  pageSize: {
-    gap: space['2'],
-    alignItems: 'center',
-    display: 'flex',
+  divider: {
+    alignSelf: 'center',
+    backgroundColor: colorVars['--cl-color-border'],
+    display: { [compact]: 'none', default: 'block' },
+    height: '1.25rem',
+    width: '1px',
+  },
+  pageSizeLabel: {
+    display: { [compact]: 'none', default: 'inline' },
+  },
+  pageSizeLabelCompact: {
+    display: { [compact]: 'inline', default: 'none' },
+  },
+  pageLabel: {
+    paddingInline: space['1'],
+    color: colorVars['--cl-color-foreground-secondary'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    whiteSpace: 'nowrap',
   },
   pageSizeOption: {
     paddingBlock: 0,
