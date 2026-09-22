@@ -154,6 +154,7 @@ export const styles = stylex.create({
   },
 
   layoutInDialog: {
+    borderWidth: '0px',
     blockSize: 'auto',
     // Lifted off the page like a card in a dialog: the card's elevation, none compact, where the
     // popup is the screen and there is nothing to lift off.
