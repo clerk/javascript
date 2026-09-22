@@ -30,7 +30,7 @@ export function UserProfileNameRowView({
       <Section.Item>
         <Section.Content>
           <Section.Label>{m.name.label}</Section.Label>
-          <Section.Description>{name}</Section.Description>
+          {name ? <Section.Description>{name}</Section.Description> : null}
         </Section.Content>
         {onSubmit ? (
           <Section.Actions>
