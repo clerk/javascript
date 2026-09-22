@@ -240,11 +240,11 @@ describe('Profile', () => {
           this.callback = callback;
         }
         observe(target: Element) {
-          observe = width =>
-            this.callback(
-              [{ target, contentRect: { width, height: 600 } } as unknown as ResizeObserverEntry],
-              this as unknown as ResizeObserver,
-            );
+          observe = width => {
+            Object.defineProperty(target, 'offsetWidth', { configurable: true, value: width });
+            Object.defineProperty(target, 'offsetHeight', { configurable: true, value: 600 });
+            this.callback([], this as unknown as ResizeObserver);
+          };
         }
         disconnect() {}
         unobserve() {}
