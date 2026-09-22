@@ -22,8 +22,10 @@ export const userProfileAccountSectionMessages = {
   name: {
     label: 'Name',
     edit: 'Edit name',
+    set: 'Set name',
 
     dialogTitle: 'Edit name',
+    setDialogTitle: 'Set name',
     firstNameLabel: 'First name',
     lastNameLabel: 'Last name',
     cancel: 'Cancel',

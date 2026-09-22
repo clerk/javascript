@@ -35,6 +35,7 @@ export function UserProfileNameRowView({
         {onSubmit ? (
           <Section.Actions>
             <EditName
+              isSet={Boolean(name)}
               firstName={firstName}
               lastName={lastName}
               firstNameAttribute={firstNameAttribute}
@@ -49,12 +50,14 @@ export function UserProfileNameRowView({
 }
 
 function EditName({
+  isSet,
   firstName,
   lastName,
   firstNameAttribute,
   lastNameAttribute,
   onSubmit,
 }: {
+  isSet: boolean;
   firstName?: string;
   lastName?: string;
   firstNameAttribute?: UserProfileNameAttribute;
@@ -70,13 +73,14 @@ function EditName({
       firstNameAttribute={firstNameAttribute}
       lastNameAttribute={lastNameAttribute}
       open={controller.isOpen}
+      title={isSet ? m.name.dialogTitle : m.name.setDialogTitle}
       trigger={
         <Button
           color='neutral'
           size='sm'
           variant='outline'
         >
-          {m.name.edit}
+          {isSet ? m.name.edit : m.name.set}
         </Button>
       }
     />

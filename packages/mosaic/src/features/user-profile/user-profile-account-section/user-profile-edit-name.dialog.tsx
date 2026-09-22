@@ -31,6 +31,7 @@ export interface UserProfileEditNameDialogProps {
   lastNameAttribute?: UserProfileNameAttribute;
   onFirstNameChange: (value: string) => void;
   onLastNameChange: (value: string) => void;
+  title?: string;
   isSaving?: boolean;
   error?: FormError<UserProfileEditNameField>;
   onSubmit: () => void;
@@ -51,6 +52,7 @@ export function UserProfileEditNameDialog({
   lastNameAttribute = {},
   onFirstNameChange,
   onLastNameChange,
+  title,
   isSaving = false,
   error,
   onSubmit,
@@ -85,7 +87,7 @@ export function UserProfileEditNameDialog({
           renderBranding={false}
         >
           <Card.Header>
-            <Card.Title>{m.name.dialogTitle}</Card.Title>
+            <Card.Title>{title ?? m.name.dialogTitle}</Card.Title>
           </Card.Header>
           <Card.Content
             render={
