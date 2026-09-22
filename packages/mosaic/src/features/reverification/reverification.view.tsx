@@ -112,7 +112,6 @@ export function ReverificationView({
   onResend,
   canResend,
   resendRemainingSeconds,
-  embedded = false,
 }: ReverificationViewProps): JSX.Element {
   const m = useMessages('reverification');
 
@@ -127,13 +126,13 @@ export function ReverificationView({
   const resend =
     otpChannel === 'email' || otpChannel === 'phone'
       ? {
-        label: resendRemainingSeconds ? `${resendLabel} (${resendRemainingSeconds})` : resendLabel,
-        disabled: !canResend || isPending,
-        onClick: onResend,
-      }
+          label: resendRemainingSeconds ? `${resendLabel} (${resendRemainingSeconds})` : resendLabel,
+          disabled: !canResend || isPending,
+          onClick: onResend,
+        }
       : undefined;
 
-  const flow = (
+  return (
     <Flow.Root
       value={step}
       direction={direction}
@@ -249,12 +248,4 @@ export function ReverificationView({
       )}
     </Flow.Root>
   );
-
-  if (embedded) {
-    return flow;
-  }
-
-  // The wrapper always renders the view as embedded, so this case should only
-  // happen when rendering the view standalone (e.g. for swingset)
-  return <Card.Root renderBranding={false}>{flow}</Card.Root>;
 }

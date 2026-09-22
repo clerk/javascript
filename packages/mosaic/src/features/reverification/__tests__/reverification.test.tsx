@@ -30,14 +30,7 @@ vi.mock('../reverification.controller', () => ({
 vi.mock('../reverification.view', () => ({
   ReverificationPending: () => <output data-testid='pending' />,
   ReverificationUnavailable: () => <output data-testid='unavailable' />,
-  ReverificationView: ({ step, embedded }: { step: string; embedded?: boolean }) => (
-    <output
-      data-testid='view'
-      data-embedded={embedded ? '' : undefined}
-    >
-      {step}
-    </output>
-  ),
+  ReverificationView: ({ step }: { step: string }) => <output data-testid='view'>{step}</output>,
 }));
 
 const active = {
@@ -79,31 +72,21 @@ describe('Reverification', () => {
     const { rerender } = render(<Reverification {...active} />);
     expect(screen.getByTestId('pending')).toBeInTheDocument();
     expect(screen.queryByTestId('view')).not.toBeInTheDocument();
-    expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
 
     controller = { status: 'unavailable' };
     rerender(<Reverification {...active} />);
     expect(screen.getByTestId('unavailable')).toBeInTheDocument();
     expect(screen.queryByTestId('view')).not.toBeInTheDocument();
-    expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
 
     controller = ready({ step: 'otp', otpChannel: 'email' });
     rerender(<Reverification {...active} />);
     expect(screen.getByTestId('view')).toHaveTextContent('otp');
-    expect(screen.getByTestId('view')).toHaveAttribute('data-embedded', '');
-    expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
   });
 
-  it('keeps the card flow mounted through retrying and can omit the card', () => {
+  it('keeps the factor flow mounted through retrying', () => {
     controller = ready({ isPending: true });
-    const { rerender } = render(
-      <Reverification
-        embedded
-        phase='retrying'
-      />,
-    );
+    const { rerender } = render(<Reverification phase='retrying' />);
     expect(screen.getByTestId('view')).toHaveTextContent('password');
-    expect(screen.getByTestId('view')).toHaveAttribute('data-embedded', '');
 
     controller = { status: 'idle' };
     rerender(<Reverification phase='inactive' />);
