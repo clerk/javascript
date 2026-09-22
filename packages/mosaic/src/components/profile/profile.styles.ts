@@ -352,3 +352,21 @@ export const styles = stylex.create({
 export const contentScroll = scrollAreaRoot;
 // A held gutter: switching to a page that does not scroll must not reflow the one that did.
 export const contentViewportScroll = scrollAreaViewport('stable');
+
+/**
+ * The layout every page inside `Profile.Content` is built on: a column under the headline, and a
+ * column of sections under that. Composed by the panel views rather than applied by
+ * `Profile.ContentPanel`, so each page keeps a slot of its own to theme against.
+ */
+export const panelStyles = stylex.create({
+  root: {
+    gap: space['4'],
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  sections: {
+    gap: space['10'],
+    display: 'flex',
+    flexDirection: 'column',
+  },
+});

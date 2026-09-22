@@ -20,15 +20,4 @@ export const styles = stylex.create({
     height: space['5'],
     width: space['5'],
   },
-  root: {
-    gap: space['4'],
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  sections: {
-    gap: space['8'],
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
-  },
 });

@@ -6,7 +6,7 @@ import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Input } from '../../components/input';
 import { Menu } from '../../components/menu';
-import { Profile } from '../../components/profile';
+import { panelStyles, Profile } from '../../components/profile';
 import { mergeStyleProps, themeProps } from '../../props';
 import { rtl } from '../../utils/rtl.styles';
 import { styles } from './user-profile-api-keys-panel.styles';
@@ -65,7 +65,7 @@ export function UserProfileApiKeysPanelView({
   };
 
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-api-keys-panel'), stylex.props(styles.root))}>
+    <div {...mergeStyleProps(themeProps('user-profile-api-keys-panel'), stylex.props(panelStyles.root))}>
       <Profile.PageTitle>API Keys</Profile.PageTitle>
       <div {...stylex.props(styles.toolbar)}>
         <div {...stylex.props(styles.searchWrapper)}>

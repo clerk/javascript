@@ -131,17 +131,7 @@ export const styles = stylex.create({
   // Sits under the row's item rather than inside its content, so a message never shifts the
   // media and actions off the centre line they share.
   error: {
-    margin: 0,
-    gap: space['1'],
-    alignItems: 'flex-start',
-    color: colorVars['--cl-color-negative'],
-    display: 'flex',
-    textWrap: 'pretty',
     width: '100%',
-  },
-  errorIcon: {
-    flexShrink: 0,
-    height: '1lh',
   },
 });
 /* eslint-enable @stylexjs/no-lookahead-selectors */
