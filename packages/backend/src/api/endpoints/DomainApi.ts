@@ -82,7 +82,7 @@ export class DomainAPI extends AbstractAPI {
    * Deletes a domain for the instance. The active domain cannot be deleted.
    * @param domainId - The ID of the domain to delete.
    * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object).
-   * @deprecated Use `delete()` instead.
+   * @deprecated
    */
   public async deleteDomain(domainId: string) {
     this.requireId(domainId);
