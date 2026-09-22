@@ -5,11 +5,15 @@ import { colorVars, durationVars, easingVars, space, typeScaleVars } from '../..
 const reduceMotion = '@media (prefers-reduced-motion: reduce)' as const;
 
 export const styles = stylex.create({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
   list: {
     gap: space['5'],
     alignItems: 'center',
     display: 'flex',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
     position: 'relative',
     borderBottomColor: colorVars['--cl-color-border-subtle'],
     borderBottomStyle: 'solid',
@@ -33,6 +37,15 @@ export const styles = stylex.create({
     display: 'inline-flex',
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
+  },
+  panels: {
+    display: 'grid',
+  },
+  panel: {
+    gridColumnEnd: '2',
+    gridColumnStart: '1',
+    gridRowEnd: '2',
+    gridRowStart: '1',
   },
   indicator: {
     backgroundColor: colorVars['--cl-color-foreground'],

@@ -20,9 +20,11 @@ export function Default() {
         <Tabs.Tab value='notifications'>Notifications</Tabs.Tab>
         <Tabs.Indicator />
       </Tabs.List>
-      <Tabs.Panel value='account'>Manage your account details.</Tabs.Panel>
-      <Tabs.Panel value='security'>Update your password and sessions.</Tabs.Panel>
-      <Tabs.Panel value='notifications'>Choose what you get notified about.</Tabs.Panel>
+      <Tabs.Panels>
+        <Tabs.Panel value='account'>Manage your account details.</Tabs.Panel>
+        <Tabs.Panel value='security'>Update your password and sessions.</Tabs.Panel>
+        <Tabs.Panel value='notifications'>Choose what you get notified about.</Tabs.Panel>
+      </Tabs.Panels>
     </Tabs.Root>
   );
 }

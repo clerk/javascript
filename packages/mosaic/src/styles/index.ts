@@ -112,6 +112,16 @@ export type {
   TableSelectCellProps,
   TableSort,
 } from '../components/table';
+export { Tabs } from '../components/tabs';
+export type {
+  TabsIndicatorProps,
+  TabsListProps,
+  TabsPanelProps,
+  TabsPanelsProps,
+  TabsRootProps,
+  TabsTabProps,
+  TabsTriggerProps,
+} from '../components/tabs';
 export { Section } from '../components/section';
 export type {
   SectionActionsProps,

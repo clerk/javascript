@@ -25,8 +25,10 @@ import { Tabs } from '@clerk/mosaic/components/tabs';
     <Tabs.Tab value='tab2'>Security</Tabs.Tab>
     <Tabs.Indicator />
   </Tabs.List>
-  <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
-  <Tabs.Panel value='tab2'>Security content</Tabs.Panel>
+  <Tabs.Panels>
+    <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+    <Tabs.Panel value='tab2'>Security content</Tabs.Panel>
+  </Tabs.Panels>
 </Tabs.Root>;
 ```
 
@@ -38,11 +40,16 @@ import { Tabs } from '@clerk/mosaic/components/tabs';
 | `Tabs.List`      | `<div>`    | `role="tablist"` container with roving-tabindex navigation        |
 | `Tabs.Tab`       | `<button>` | A keyboard-navigable tab trigger inside `Tabs.List`               |
 | `Tabs.Trigger`   | `<button>` | Standalone tab trigger for use outside `Tabs.List`                |
+| `Tabs.Panels`    | `<div>`    | Grid container that stacks direct `Tabs.Panel` children           |
 | `Tabs.Panel`     | `<div>`    | `role="tabpanel"`; hidden when inactive                           |
 | `Tabs.Indicator` | `<span>`   | Decorative element that tracks the active tab's position and size |
 
 All rendered parts accept a `render` prop for polymorphic rendering, standard HTML attributes,
-and `xstyle`. `Tabs.Root` renders no element of its own.
+and `xstyle`. `Tabs.Root` renders a column container so the list and panels stack regardless of the
+surrounding layout.
 
 The selection indicator uses a short CSS transition and disables its motion when the user prefers
 reduced motion.
+
+`Tabs.Panels` places its direct panels in one grid cell. Pair it with force-mounted panels and the
+tabs primitive's transition attributes when a theme needs to animate outgoing and incoming panels.

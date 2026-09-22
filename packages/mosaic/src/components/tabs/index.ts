@@ -3,6 +3,7 @@ export type {
   TabsIndicatorProps,
   TabsListProps,
   TabsPanelProps,
+  TabsPanelsProps,
   TabsRootProps,
   TabsTabProps,
   TabsTriggerProps,
