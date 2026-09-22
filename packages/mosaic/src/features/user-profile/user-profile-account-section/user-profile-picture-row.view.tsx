@@ -37,6 +37,13 @@ export function UserProfilePictureRowView({
   const controller = useUserProfilePictureController({ onChange, onRemove });
   const [rejectionError, setRejectionError] = useState<string>();
   const displayedError = rejectionError ?? (controller.error ? errorText(controller.error) : undefined);
+  const remove = controller.onRemove;
+  const handleRemove = remove
+    ? () => {
+        setRejectionError(undefined);
+        return remove();
+      }
+    : undefined;
   const initials = name
     .split(/\s+/)
     .map(part => part[0])
@@ -81,7 +88,7 @@ export function UserProfilePictureRowView({
         <ProfilePictureActions
           canChange={Boolean(controller.onChange)}
           hasImage={hasImage}
-          onRemove={controller.onRemove}
+          onRemove={handleRemove}
         />
       </Section.Item>
       <Section.Error>{displayedError}</Section.Error>
