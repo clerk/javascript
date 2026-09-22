@@ -9,6 +9,7 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
+import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Drawer } from '../drawer';
@@ -322,6 +323,8 @@ export interface ProfileNavItemProps extends MosaicComponentProps<'button'> {
   disabled?: boolean;
 }
 
+const navItemBadgeDefaults = { color: 'neutral' } as const;
+
 /** A destination. Selecting it shows the `Profile.ContentPanel` sharing its `value`. */
 const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(function ProfileNavItem(
   { value, icon, badge, disabled, children, render, xstyle, onClick, ...rest },
@@ -358,7 +361,7 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
       <span {...themeProps('profile-nav-item-label')}>{children}</span>
       {badge != null ? (
         <span {...mergeStyleProps(themeProps('profile-nav-item-badge'), stylex.props(reset.base, styles.navItemBadge))}>
-          {badge}
+          <BadgeContext.Provider value={navItemBadgeDefaults}>{badge}</BadgeContext.Provider>
         </span>
       ) : null}
     </Tabs.Tab>
