@@ -185,7 +185,12 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
               />
             </Button>
           </div>
-          <span {...mergeStyleProps(themeProps('pagination-page-label'), stylex.props(reset.base, styles.pageLabel))}>
+          <span
+            {...mergeStyleProps(
+              themeProps('pagination-page-label'),
+              stylex.props(reset.base, styles.text, styles.pageLabel),
+            )}
+          >
             {current}/{pageCount}
           </span>
           <div {...stylex.props(reset.base, styles.controlGroup, styles.controlGroupEnd)}>

@@ -24,7 +24,6 @@ export const styles = stylex.create({
     display: 'flex',
     flexWrap: { [compact]: 'nowrap', default: 'wrap' },
     justifyContent: { [compact]: 'space-between', default: 'flex-start' },
-    width: { [compact]: '100%', default: 'auto' },
   },
   pageSize: {
     gap: space['3'],
@@ -34,13 +33,12 @@ export const styles = stylex.create({
   controls: {
     gap: space['1'],
     alignItems: 'center',
-    borderBlockStartColor: { [compact]: colorVars['--cl-color-border'], default: 'transparent' },
+    borderBlockStartColor: colorVars['--cl-color-border'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: { [compact]: '1px', default: 0 },
     display: { [compact]: 'grid', default: 'flex' },
     gridTemplateColumns: { [compact]: '1fr auto 1fr', default: 'none' },
     paddingBlockStart: { [compact]: space['4'], default: 0 },
-    width: { [compact]: '100%', default: 'auto' },
   },
   controlGroup: {
     gap: space['1'],
@@ -57,7 +55,6 @@ export const styles = stylex.create({
     whiteSpace: 'nowrap',
   },
   divider: {
-    alignSelf: 'center',
     backgroundColor: colorVars['--cl-color-border'],
     display: { [compact]: 'none', default: 'block' },
     height: '1.25rem',
@@ -71,10 +68,6 @@ export const styles = stylex.create({
   },
   pageLabel: {
     paddingInline: space['1'],
-    color: colorVars['--cl-color-foreground-secondary'],
-    fontSize: typeScaleVars['--cl-text-sm-size'],
-    lineHeight: typeScaleVars['--cl-text-sm-leading'],
-    whiteSpace: 'nowrap',
   },
   pageSizeOption: {
     paddingBlock: 0,
