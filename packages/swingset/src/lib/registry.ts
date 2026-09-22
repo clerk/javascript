@@ -136,8 +136,8 @@ import {
   Disabled as PaginationDisabled,
   FirstLast as PaginationFirstLast,
   meta as paginationMeta,
+  MiddlePage as PaginationMiddlePage,
   Primary as PaginationPrimary,
-  Siblings as PaginationSiblings,
   SinglePage as PaginationSinglePage,
 } from '../stories/pagination.stories';
 import {
@@ -445,7 +445,7 @@ const paginationModule: StoryModule = {
   meta: paginationMeta,
   Primary: PaginationPrimary,
   FirstLast: PaginationFirstLast,
-  Siblings: PaginationSiblings,
+  MiddlePage: PaginationMiddlePage,
   SinglePage: PaginationSinglePage,
   Disabled: PaginationDisabled,
 };
