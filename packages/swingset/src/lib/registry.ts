@@ -1,5 +1,6 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
+import { Default as ActionBarDefault, meta as actionBarMeta } from '../stories/action-bar.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
@@ -397,6 +398,11 @@ const comboboxModule: StoryModule = {
   Scrolling: ComboboxScrolling,
 };
 
+const actionBarModule: StoryModule = {
+  meta: actionBarMeta,
+  Default: ActionBarDefault,
+};
+
 const avatarModule: StoryModule = {
   meta: avatarMeta,
   Primary: AvatarPrimary,
@@ -791,6 +797,7 @@ export const registry: StoryModule[] = [
   confirmationModule,
   destructiveModule,
   // Components
+  actionBarModule,
   avatarModule,
   badgeModule,
   bannerModule,
