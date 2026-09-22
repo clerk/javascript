@@ -84,7 +84,7 @@ export interface ClerkAPIError {
     traceId?: string;
     /**
      * A tag naming why the request was blocked, configured by the application's
-     * owner — for example `vpn_detected`.
+     * owner.
      *
      * Opaque, and never rendered by the built-in screen. It exists so an
      * application can switch on it and render its own UI instead.
