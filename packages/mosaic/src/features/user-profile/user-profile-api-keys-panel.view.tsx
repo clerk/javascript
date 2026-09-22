@@ -1,261 +1,318 @@
 import * as stylex from '@stylexjs/stylex';
-import type { ReactElement } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
-import { Badge } from '../../components/badge';
+import { Confirmation } from '../../blocks/confirmation';
 import { Button } from '../../components/button';
+import { EmptyState } from '../../components/empty-state';
 import { Icon } from '../../components/icon';
-import { Input } from '../../components/input';
+import { InputGroup } from '../../components/input-group';
 import { Menu } from '../../components/menu';
-import { Profile } from '../../components/profile';
+import { Pagination } from '../../components/pagination';
+import { panelStyles, Profile } from '../../components/profile';
+import { Spinner } from '../../components/spinner';
+import type { TableHeaderCellProps } from '../../components/table';
+import { Table } from '../../components/table';
+import { Text } from '../../components/text';
+import { VisuallyHidden } from '../../components/visually-hidden';
+import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
+import { fill, useMessages } from '../../localization';
+import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
-import { rtl } from '../../utils/rtl.styles';
+import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 import { styles } from './user-profile-api-keys-panel.styles';
+import type {
+  UserProfileAPIKey,
+  UserProfileAPIKeySort,
+  UserProfileApiKeysPanelViewProps,
+} from './user-profile-api-keys-panel.types';
+import { UserProfileCreateAPIKeyDialog } from './user-profile-create-api-key.dialog';
 
-export interface UserProfileAPIKey {
-  id: string;
-  name: string;
-  expirationLabel: string;
-  createdAtLabel: string;
-  lastUsedAtLabel: string;
-  isExpired?: boolean;
-}
-
-export interface UserProfileAPIKeysPagination {
-  page: number;
-  pageCount: number;
-  pageSize: number;
-  pageSizeOptions?: readonly number[];
-}
-
-export interface UserProfileApiKeysPanelViewProps {
-  apiKeys: UserProfileAPIKey[];
-  pagination?: UserProfileAPIKeysPagination;
-  searchValue: string;
-  selectedIds: readonly string[];
-  onCreate?: () => void;
-  onPageChange?: (page: number) => void;
-  onPageSizeChange?: (pageSize: number) => void;
-  onRevoke?: (id: string) => void;
-  onSearchChange: (value: string) => void;
-  onSelectionChange: (ids: string[]) => void;
-}
+const getRowId = (row: UserProfileAPIKey) => row.id;
 
 export function UserProfileApiKeysPanelView({
   apiKeys,
-  pagination,
-  searchValue,
-  selectedIds,
-  onCreate,
+  totalCount,
+  page,
+  pageSize = 10,
   onPageChange,
   onPageSizeChange,
-  onRevoke,
+  searchValue,
   onSearchChange,
-  onSelectionChange,
-}: UserProfileApiKeysPanelViewProps): ReactElement {
-  const allSelected = apiKeys.length > 0 && apiKeys.every(apiKey => selectedIds.includes(apiKey.id));
-
-  const toggleAll = () => {
-    onSelectionChange(allSelected ? [] : apiKeys.map(apiKey => apiKey.id));
+  onCreate,
+  createDialog,
+  onRevoke,
+  onBulkAction,
+  sort,
+  onSortChange,
+  isLoading,
+  isFetching = false,
+}: UserProfileApiKeysPanelViewProps) {
+  const m = useMessages('userProfileApiKeysPanel');
+  const searchInput = useRef<HTMLInputElement>(null);
+  const createButton = useRef<HTMLButtonElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: apiKeys.map(getRowId),
+    onRemove: onRevoke,
+    fallback: () => createButton.current ?? searchInput.current,
+  });
+  const revokeKey = useMemo(() => Confirmation.createHandle<UserProfileAPIKey>(), []);
+  const pagination = { pageIndex: page - 1, pageSize };
+  const table = useDataTable({
+    data: apiKeys,
+    totalCount,
+    getRowId,
+    sorting: sort ? [{ id: sort.column, desc: sort.direction === 'descending' }] : [],
+    onSortingChange: onSortChange
+      ? update => {
+          const next = typeof update === 'function' ? update(table.sorting) : update;
+          const active = next[0];
+          table.setRowSelection({});
+          onSortChange(
+            active && (active.id === 'name' || active.id === 'createdAt' || active.id === 'lastUsed')
+              ? { column: active.id, direction: active.desc ? 'descending' : 'ascending' }
+              : null,
+          );
+        }
+      : undefined,
+    pagination,
+    onPaginationChange: update => {
+      const next = typeof update === 'function' ? update(pagination) : update;
+      table.setRowSelection({});
+      if (next.pageSize !== pageSize) {
+        onPageSizeChange?.(next.pageSize);
+      }
+      onPageChange(next.pageIndex + 1);
+    },
+    globalFilter: searchValue,
+    onGlobalFilterChange: update => {
+      table.setRowSelection({});
+      onSearchChange(typeof update === 'function' ? update(searchValue) : update);
+    },
+  });
+  const sortHeader = (column: UserProfileAPIKeySort['column']): Pick<TableHeaderCellProps, 'sort' | 'onSort'> => {
+    const active = table.sorting[0];
+    return {
+      sort: active?.id === column ? (active.desc ? 'descending' : 'ascending') : 'none',
+      onSort: onSortChange
+        ? () =>
+            table.setSorting(current => {
+              const active = current[0];
+              if (active?.id !== column) {
+                return [{ id: column, desc: false }];
+              }
+              return active.desc ? [] : [{ id: column, desc: true }];
+            })
+        : undefined,
+    };
   };
-
-  const toggleOne = (id: string) => {
-    onSelectionChange(
-      selectedIds.includes(id) ? selectedIds.filter(selectedId => selectedId !== id) : [...selectedIds, id],
-    );
-  };
-
+  const columnCount = 3 + Number(Boolean(onRevoke)) + Number(Boolean(onBulkAction));
+  const query = searchValue.trim();
+  const emptyState = query
+    ? { label: m.empty, description: fill(m.emptyDescription, { query }) }
+    : { label: m.noKeys, description: m.noKeysDescription };
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-api-keys-panel'), stylex.props(styles.root))}>
-      <Profile.PageTitle>API Keys</Profile.PageTitle>
-      <div {...stylex.props(styles.toolbar)}>
-        <div {...stylex.props(styles.searchWrapper)}>
-          <Icon
-            aria-hidden
-            name='magnifying-glass'
-            size='sm'
-            xstyle={styles.searchIcon}
-          />
-          <Input
-            aria-label='Search API keys'
-            autoComplete='off'
-            placeholder='Search'
-            size='sm'
-            type='search'
-            value={searchValue}
+    <>
+      <div {...mergeStyleProps(themeProps('user-profile-api-keys-panel'), stylex.props(panelStyles.root))}>
+        <Profile.PageTitle>{m.title}</Profile.PageTitle>
+        <div {...stylex.props(styles.toolbar)}>
+          <InputGroup.Root
+            size='md'
             xstyle={styles.search}
-            onChange={event => onSearchChange(event.currentTarget.value)}
-          />
+          >
+            <InputGroup.Start>
+              <Icon name='magnifying-glass' />
+            </InputGroup.Start>
+            <InputGroup.Input
+              ref={searchInput}
+              autoComplete='off'
+              type='search'
+              aria-label={m.search}
+              placeholder={m.search}
+              value={table.globalFilter}
+              onChange={event => table.setGlobalFilter(event.currentTarget.value)}
+            />
+            {table.globalFilter ? (
+              <InputGroup.End>
+                <Button
+                  aria-label={m.clearSearch}
+                  onClick={() => {
+                    table.setGlobalFilter('');
+                    searchInput.current?.focus();
+                  }}
+                >
+                  <Icon name='x' />
+                </Button>
+              </InputGroup.End>
+            ) : null}
+          </InputGroup.Root>
+          {onCreate ? (
+            <Button
+              ref={createButton}
+              onClick={onCreate}
+            >
+              {m.create}
+            </Button>
+          ) : null}
         </div>
-        {onCreate ? <Button onClick={onCreate}>Create API key</Button> : null}
-      </div>
-      {/* TODO: Replace this inline implementation with the Mosaic Table component. */}
-      <div {...stylex.props(styles.tableShell)}>
-        <div {...stylex.props(styles.tableScroller)}>
-          <table {...stylex.props(styles.table)}>
-            <thead {...stylex.props(styles.header)}>
-              <tr>
-                <th
-                  scope='col'
-                  {...stylex.props(styles.headerCell, styles.checkboxCell)}
-                >
-                  {/* TODO: Replace these inline selection controls with the Mosaic Checkbox component. */}
-                  <input
-                    aria-label='Select all API keys'
-                    checked={allSelected}
-                    type='checkbox'
-                    {...stylex.props(styles.checkbox)}
-                    onChange={toggleAll}
-                  />
-                </th>
-                <th
-                  scope='col'
-                  {...stylex.props(styles.headerCell, styles.nameColumn)}
-                >
-                  Name
-                </th>
-                <th
-                  scope='col'
-                  {...stylex.props(styles.headerCell)}
-                >
-                  Created
-                </th>
-                <th
-                  scope='col'
-                  {...stylex.props(styles.headerCell)}
-                >
-                  Last used
-                </th>
-                <th
-                  aria-label='Actions'
-                  scope='col'
-                  {...stylex.props(styles.headerCell, styles.actionCell)}
+        <Table.Root
+          aria-label={m.title}
+          aria-busy={isLoading || isFetching}
+        >
+          <Table.Header>
+            <Table.Row>
+              {onBulkAction ? (
+                <Table.SelectAllCell
+                  aria-label={m.selectAll}
+                  checked={table.getIsAllRowsSelected()}
+                  indeterminate={table.getIsSomeRowsSelected()}
+                  onChange={table.toggleAllRowsSelected}
                 />
-              </tr>
-            </thead>
-            <tbody>
-              {apiKeys.length > 0 ? (
-                apiKeys.map(apiKey => (
-                  <tr
-                    key={apiKey.id}
-                    {...stylex.props(styles.row)}
-                  >
-                    <td {...stylex.props(styles.cell, styles.checkboxCell)}>
-                      <input
-                        aria-label={`Select ${apiKey.name}`}
-                        checked={selectedIds.includes(apiKey.id)}
-                        type='checkbox'
-                        {...stylex.props(styles.checkbox)}
-                        onChange={() => toggleOne(apiKey.id)}
-                      />
-                    </td>
-                    <td {...stylex.props(styles.cell)}>
-                      <div {...stylex.props(styles.keyName)}>
-                        <span>{apiKey.name}</span>
-                        {apiKey.isExpired ? <Badge color='warning'>Expired</Badge> : null}
-                      </div>
-                      <div {...stylex.props(styles.keyDescription)}>{apiKey.expirationLabel}</div>
-                    </td>
-                    <td {...stylex.props(styles.cell)}>{apiKey.createdAtLabel}</td>
-                    <td {...stylex.props(styles.cell)}>{apiKey.lastUsedAtLabel}</td>
-                    <td {...stylex.props(styles.cell, styles.actionCell)}>
-                      {onRevoke ? (
-                        <Menu.Root placement='bottom-end'>
-                          <Menu.Trigger aria-label={`Manage ${apiKey.name}`} />
-                          <Menu.Popup>
-                            <Menu.Item
-                              color='negative'
-                              label='Revoke'
-                              onClick={() => onRevoke(apiKey.id)}
-                            >
-                              <Menu.Label>Revoke</Menu.Label>
-                            </Menu.Item>
-                          </Menu.Popup>
-                        </Menu.Root>
-                      ) : null}
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr {...stylex.props(styles.row)}>
-                  <td
-                    colSpan={5}
-                    {...stylex.props(styles.emptyCell)}
-                  >
-                    No API keys found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {pagination ? (
-        // TODO: Replace this inline implementation with the Mosaic Pagination component.
-        <div {...stylex.props(styles.pagination)}>
-          <div {...stylex.props(styles.paginationControls)}>
-            <Button
-              aria-label='Previous API keys page'
-              color='neutral'
-              disabled={pagination.page <= 1}
-              shape='square'
-              size='sm'
-              touchTarget={false}
-              variant='ghost'
-              onClick={() => onPageChange?.(pagination.page - 1)}
-            >
-              <Icon
-                name='chevron-left'
-                xstyle={rtl.mirror}
-              />
-            </Button>
-            <Button
-              aria-current='page'
-              aria-label={`API keys page ${pagination.page}`}
-              color='neutral'
-              shape='square'
-              size='sm'
-              touchTarget={false}
-              variant='ghost'
-            >
-              {pagination.page}
-            </Button>
-            <Button
-              aria-label='Next API keys page'
-              color='neutral'
-              disabled={pagination.page >= pagination.pageCount}
-              shape='square'
-              size='sm'
-              touchTarget={false}
-              variant='ghost'
-              onClick={() => onPageChange?.(pagination.page + 1)}
-            >
-              <Icon
-                name='chevron-right'
-                xstyle={rtl.mirror}
-              />
-            </Button>
-          </div>
-          <label {...stylex.props(styles.pageSizeLabel)}>
-            <span>Results per page</span>
-            {/* TODO: Replace this inline implementation with the Mosaic Select component. */}
-            <select
-              aria-label='Results per page'
-              value={pagination.pageSize}
-              {...stylex.props(styles.pageSizeSelect)}
-              onChange={event => onPageSizeChange?.(Number(event.currentTarget.value))}
-            >
-              {(pagination.pageSizeOptions ?? [10, 25, 50]).map(pageSize => (
-                <option
-                  key={pageSize}
-                  value={pageSize}
+              ) : null}
+              <Table.HeaderCell {...sortHeader('name')}>{m.name}</Table.HeaderCell>
+              <Table.HeaderCell {...sortHeader('createdAt')}>{m.createdAt}</Table.HeaderCell>
+              <Table.HeaderCell {...sortHeader('lastUsed')}>{m.lastUsed}</Table.HeaderCell>
+              {onRevoke ? (
+                <Table.HeaderCell align='end'>
+                  <VisuallyHidden>{m.actions}</VisuallyHidden>
+                </Table.HeaderCell>
+              ) : null}
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            {isLoading ? (
+              <Table.Empty colSpan={columnCount}>
+                <span role='status'>
+                  <Spinner />
+                  <VisuallyHidden>{m.loading}</VisuallyHidden>
+                </span>
+              </Table.Empty>
+            ) : table.rows.length === 0 ? (
+              <Table.Empty colSpan={columnCount}>
+                <EmptyState.Root>
+                  <EmptyState.Icon name='key' />
+                  <EmptyState.Label>{emptyState.label}</EmptyState.Label>
+                  <EmptyState.Description>{emptyState.description}</EmptyState.Description>
+                </EmptyState.Root>
+              </Table.Empty>
+            ) : (
+              table.rows.map(row => (
+                <Table.Row
+                  key={row.id}
+                  selected={Boolean(onBulkAction) && row.getIsSelected()}
                 >
-                  {pageSize}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
+                  {onBulkAction ? (
+                    <Table.SelectCell
+                      aria-label={fill(m.select, { name: row.original.name })}
+                      checked={row.getIsSelected()}
+                      onToggleSelected={row.toggleSelected}
+                    />
+                  ) : null}
+                  <Table.Cell>
+                    <div {...stylex.props(styles.metadata)}>
+                      <Text xstyle={styles.name}>{row.original.name}</Text>
+                      <Text
+                        size='xs'
+                        color='foreground-secondary'
+                      >
+                        {truncateWithEndVisible(row.original.id, 10, 4)} ·{' '}
+                        <Text
+                          render={<span />}
+                          size='xs'
+                          color={row.original.expiresAtLabel === null ? 'foreground-secondary' : 'warning'}
+                        >
+                          {row.original.expiresAtLabel === null
+                            ? m.neverExpires
+                            : fill(m.expires, {
+                                expiresDate: row.original.expiresAtLabel,
+                              })}
+                        </Text>
+                      </Text>
+                    </div>
+                  </Table.Cell>
+                  <Table.Cell xstyle={styles.dateCell}>
+                    <Text>{row.original.createdAtLabel}</Text>
+                  </Table.Cell>
+                  <Table.Cell xstyle={styles.dateCell}>
+                    <Text>{row.original.lastUsedAtLabel ?? m.neverUsed}</Text>
+                  </Table.Cell>
+                  {onRevoke ? (
+                    <Table.Cell align='end'>
+                      <APIKeyActions
+                        apiKey={row.original}
+                        registerTrigger={removalFocus.registerTrigger}
+                        onSelect={apiKey => revokeKey.open(apiKey)}
+                      />
+                    </Table.Cell>
+                  ) : null}
+                </Table.Row>
+              ))
+            )}
+          </Table.Body>
+        </Table.Root>
+        {table.getPageCount() > 1 || (totalCount > 0 && onPageSizeChange) ? (
+          <Pagination
+            page={table.pagination.pageIndex + 1}
+            pageSize={table.pagination.pageSize}
+            totalItems={totalCount}
+            onPageSizeChange={
+              onPageSizeChange ? next => table.setPagination({ pageIndex: 0, pageSize: next }) : undefined
+            }
+            label={m.pagination}
+            pageSizeLabel={m.pageSize}
+            previousPageLabel={m.previousPage}
+            nextPageLabel={m.nextPage}
+            onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
+          />
+        ) : null}
+      </div>
+      {createDialog ? <UserProfileCreateAPIKeyDialog {...createDialog} /> : null}
+      {onRevoke ? (
+        <Confirmation
+          handle={revokeKey}
+          title={apiKey => fill(m.revokeTitle, { name: apiKey.name })}
+          description={m.revokeDescription}
+          actionLabel={m.revoke}
+          cancelLabel={m.cancel}
+          onConfirm={async apiKey => {
+            try {
+              await removalFocus.remove(apiKey.id);
+            } catch (error) {
+              throw error instanceof Error ? error : new Error(m.revokeError);
+            }
+          }}
+          finalFocus={removalFocus.finalFocus}
+        />
       ) : null}
-    </div>
+    </>
+  );
+}
+
+function APIKeyActions({
+  apiKey,
+  registerTrigger,
+  onSelect,
+}: {
+  apiKey: UserProfileAPIKey;
+  registerTrigger: (id: string) => (element: HTMLButtonElement | null) => void;
+  onSelect: (key: UserProfileAPIKey) => void;
+}) {
+  const m = useMessages('userProfileApiKeysPanel');
+  const [triggerRef] = useState(() => registerTrigger(apiKey.id));
+  return (
+    <Menu.Root placement='bottom-end'>
+      <Menu.Trigger
+        ref={triggerRef}
+        aria-label={fill(m.manage, { name: apiKey.name })}
+      />
+      <Menu.Popup>
+        <Menu.Item
+          color='negative'
+          label={m.revoke}
+          onClick={() => onSelect(apiKey)}
+        >
+          <Menu.Label>{m.revoke}</Menu.Label>
+        </Menu.Item>
+      </Menu.Popup>
+    </Menu.Root>
   );
 }

@@ -117,6 +117,22 @@ selection, which packages to list, body-writing rules, and the major-version gat
 Test runner differs by package (`shared`, `clerk-js`, most adapters use vitest; `backend` runs a
 multi-runtime suite), but the `pnpm --filter <name> test` invocation is uniform.
 
+If the `bundlewatch` CI job fails, a built file in `@clerk/clerk-js` or `@clerk/ui` exceeds its
+`maxSize` in that package's `bundlewatch.config.json` (often after a rebase on `main`). If the growth
+is expected, raise the limits; if it is larger than the change explains, investigate instead:
+
+```bash
+pnpm turbo build --filter=@clerk/clerk-js       # measures dist/, so build first
+pnpm --filter @clerk/clerk-js bundlewatch:fix   # failing maxSize -> current size + 1KB, rounded up
+```
+
+Same commands with `@clerk/ui` for the UI package. Commit the updated `bundlewatch.config.json` and
+call out the bump in the PR description; never raise limits silently.
+
+Check the printed diff: if any file's `maxSize` goes up by more than 10KB, stop before committing and
+flag it to the user, listing each file with its old and new limit. Only commit the bump once they
+confirm the growth is expected.
+
 If the editor or a build reports stale types from `@clerk/shared`, rebuild the foundations:
 `pnpm turbo build --filter=@clerk/shared`.
 

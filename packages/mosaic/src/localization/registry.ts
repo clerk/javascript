@@ -1,3 +1,6 @@
+import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
+import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
+import { organizationProfileWorkspaceSectionMessages } from '../features/organization-profile/organization-profile-workspace-section/organization-profile-workspace-section.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
 import { userProfileMessages } from '../features/user-profile/user-profile.messages';
@@ -9,6 +12,7 @@ import { userProfileVerifyEmailSsoMessages } from '../features/user-profile/user
 import { userProfileActiveDevicesMessages } from '../features/user-profile/user-profile-active-devices.messages';
 import { userProfileAddAuthenticatorMessages } from '../features/user-profile/user-profile-add-authenticator.messages';
 import { userProfileAddSmsMessages } from '../features/user-profile/user-profile-add-sms.messages';
+import { userProfileApiKeysPanelMessages } from '../features/user-profile/user-profile-api-keys-panel.messages';
 import { userProfileAuthenticatorSetupMessages } from '../features/user-profile/user-profile-authenticator-setup.messages';
 import { userProfileBackupCodesMessages } from '../features/user-profile/user-profile-backup-codes.messages';
 import { userProfileConnectedAccountsMessages } from '../features/user-profile/user-profile-connected-accounts.messages';
@@ -19,6 +23,10 @@ import { userProfilePasswordSectionMessages } from '../features/user-profile/use
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets.messages';
 
 export const mosaicMessages = {
+  organizationProfile: organizationProfileMessages,
+  organizationProfileDangerSection: organizationProfileDangerSectionMessages,
+  organizationProfileWorkspaceSection: organizationProfileWorkspaceSectionMessages,
+  userProfileApiKeysPanel: userProfileApiKeysPanelMessages,
   reverification: reverificationMessages,
   userButton: userButtonMessages,
   userProfile: userProfileMessages,

@@ -131,6 +131,8 @@ export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
+export { useToastManager } from '../components/toast';
+export type { ToastType } from '../components/toast';
 export { Tooltip } from '../components/tooltip';
 export type { TooltipPopupProps, TooltipRootProps, TooltipTriggerProps } from '../components/tooltip';
 export { VisuallyHidden } from '../components/visually-hidden';
@@ -211,3 +213,5 @@ export type TypeScaleVarName = keyof typeof typeScaleVars;
 export { mergeStyleProps, themeProps } from '../props';
 export { UserProfileMfaSectionView } from '../features/user-profile/user-profile-mfa-section.view';
 export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-mfa-setup.view';
+
+export { UserProfileApiKeysPanelView } from '../features/user-profile/user-profile-api-keys-panel.view';
