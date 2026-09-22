@@ -5,7 +5,6 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
-import type * as ReverificationModule from '../../reverification';
 import { UserProfileAccountSection } from '../user-profile-account-section/user-profile-account-section';
 
 let usernameEnabled: boolean;
@@ -30,8 +29,6 @@ vi.mock('@clerk/shared/react', async importOriginal => {
   return {
     ...actual,
     useUser: () => ({ isLoaded: true, user }),
-    useSession: () => ({ session: { id: 'sess_1' } }),
-    useReverification: (fetcher: unknown) => fetcher,
     useClerk: () => ({
       __internal_environment: {
         userSettings: {
@@ -45,11 +42,6 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     }),
   };
 });
-
-vi.mock('../../reverification', async importOriginal => ({
-  ...(await importOriginal<typeof ReverificationModule>()),
-  Reverification: () => null,
-}));
 
 function renderSection() {
   return render(

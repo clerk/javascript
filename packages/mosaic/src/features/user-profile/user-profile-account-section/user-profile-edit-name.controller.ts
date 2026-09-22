@@ -1,7 +1,7 @@
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
 import type { FormError, SaveResult } from '../../../utils/save-result';
-import { formErrorOf, UNEXPECTED_ERROR } from '../../../utils/save-result';
+import { UNEXPECTED_ERROR } from '../../../utils/save-result';
 import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 
 export interface UserProfileEditNameContext {
@@ -63,7 +63,7 @@ export const userProfileEditNameMachine = createMachine({
           {
             guard: (_, event) => event.output.error !== null,
             target: 'editing',
-            actions: assign((_, event) => ({ error: formErrorOf(event.output.error) })),
+            actions: assign((_, event) => ({ error: event.output.error ?? undefined })),
           },
           { target: 'idle', actions: assign(() => ({ error: undefined })) },
         ],

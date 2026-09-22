@@ -1,4 +1,4 @@
-import { isClerkAPIResponseError, isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
+import { isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
 import type { LocalizableError } from '../localization';
@@ -8,18 +8,8 @@ export interface FormError<TField extends string = string> {
   fields?: Partial<Record<TField, LocalizableError>>;
 }
 
-export type SaveFailure<TField extends string = never> = { kind: 'cancelled' } | ({ kind: 'form' } & FormError<TField>);
-
 export interface SaveResult<TField extends string = never> {
-  error: SaveFailure<TField> | null;
-}
-
-export function formErrorOf<TField extends string>(failure: SaveFailure<TField> | null): FormError<TField> | undefined {
-  if (failure?.kind !== 'form') {
-    return undefined;
-  }
-  const { kind: _kind, ...error } = failure;
-  return error;
+  error: FormError<TField> | null;
 }
 
 export const UNEXPECTED_ERROR: LocalizableError = { code: 'generic' };
@@ -57,13 +47,10 @@ export async function toSaveResult<TField extends string = never>(
     await run();
     return { error: null };
   } catch (cause) {
-    if (isReverificationCancelledError(cause)) {
-      return { error: { kind: 'cancelled' } };
-    }
     const error = toFormError(cause, fields);
     if (!error) {
       throw cause;
     }
-    return { error: { kind: 'form', ...error } };
+    return { error };
   }
 }

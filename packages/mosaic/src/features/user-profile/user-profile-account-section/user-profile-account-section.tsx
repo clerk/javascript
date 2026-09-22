@@ -1,4 +1,3 @@
-import { Reverification } from '../../reverification';
 import { useUserProfileAccountSectionModel } from './user-profile-account-section.model';
 import { UserProfileAccountSectionView } from './user-profile-account-section.view';
 
@@ -9,12 +8,7 @@ export function UserProfileAccountSection() {
     return null;
   }
 
-  const { status: _status, reverification, ...viewProps } = model;
+  const { status: _status, ...viewProps } = model;
 
-  return (
-    <>
-      <UserProfileAccountSectionView {...viewProps} />
-      <Reverification {...reverification} />
-    </>
-  );
+  return <UserProfileAccountSectionView {...viewProps} />;
 }
