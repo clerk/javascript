@@ -6,8 +6,10 @@ const reduceMotion = '@media (prefers-reduced-motion: reduce)' as const;
 
 export const styles = stylex.create({
   root: {
+    gap: space['6'],
     display: 'flex',
     flexDirection: 'column',
+    width: '100%',
   },
   list: {
     gap: space['5'],
@@ -22,7 +24,6 @@ export const styles = stylex.create({
   tab: {
     borderStyle: 'none',
     gap: space['2'],
-    paddingBlock: space['2.5'],
     alignItems: 'center',
     backgroundColor: 'transparent',
     color: {
@@ -37,6 +38,8 @@ export const styles = stylex.create({
     display: 'inline-flex',
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    paddingBottom: space['3'],
+    paddingTop: space['2.5'],
   },
   panels: {
     display: 'grid',
