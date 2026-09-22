@@ -84,7 +84,7 @@ export const styles = stylex.create({
       ':where([data-expanded])': 'var(--toast-height)',
     },
     maxWidth: '100%',
-    width: '356px',
+    width: '22.25rem',
     '::after': {
       insetInline: 0,
       content: '""',
