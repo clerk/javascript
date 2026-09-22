@@ -4,13 +4,15 @@ import * as Stories from './organization-profile.stories';
 
 The organization profile: a `Profile` whose navigation lists the General, Members, Security,
 Billing, and API Keys pages it was given content for, then any pages of the consumer's own, in the
-order asked for. Only General is built — the rest hold their place with a placeholder.
+order asked for. General and API Keys are built; Members, Security, and Billing hold their place
+with a placeholder.
 
 <Story
   name='Default'
   storyModule={Stories}
   composition={[
     { name: 'General panel', href: '/organization-profile/organization-profile-general-panel', layer: 'Organization Profile' },
+    { name: 'API keys panel', href: '/organization-profile/organization-profile-api-keys-panel', layer: 'Organization Profile' },
   ]}
 />
 
