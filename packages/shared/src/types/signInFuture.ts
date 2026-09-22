@@ -241,7 +241,6 @@ export interface SignInFutureSSOParams {
   oidcPrompt?: string;
   /**
    * The identifier of the enterprise connection to target when using the `enterprise_sso` strategy.
-   * @experimental
    */
   enterpriseConnectionId?: string;
   /**

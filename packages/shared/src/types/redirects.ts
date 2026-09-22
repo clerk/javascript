@@ -87,7 +87,7 @@ export type AuthenticateWithRedirectParams = {
   __internal_callbackParams?: HandleOAuthCallbackParams;
 
   /**
-   * @experimental
+   * The ID of the enterprise connection to use when multiple connections match the email domain.
    */
   enterpriseConnectionId?: string;
 };

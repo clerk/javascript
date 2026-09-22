@@ -122,6 +122,7 @@ export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupC
 export type SignInCreateParams = (
   | {
       strategy: OAuthStrategy | EnterpriseSSOStrategy;
+      enterpriseConnectionId?: string;
       redirectUrl: string;
       actionCompleteRedirectUrl?: string;
       identifier?: string;

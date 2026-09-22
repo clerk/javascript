@@ -136,3 +136,17 @@ export function isPasswordCompromisedError(err: any) {
 export function isEmailLinkError(err: Error): err is EmailLinkError {
   return err.name === 'EmailLinkError';
 }
+
+/**
+ * Checks whether an enterprise SSO flow needs a connection selection.
+ *
+ * @param error - The error returned by Clerk.
+ * @returns Whether multiple enterprise connections match the email domain.
+ */
+export function isEnterpriseConnectionAmbiguousError(error: unknown): boolean {
+  return (
+    error != null &&
+    isClerkAPIResponseError(error) &&
+    error.errors.some(({ code }) => code === 'enterprise_connection_id_is_required_with_multiple_connections')
+  );
+}
