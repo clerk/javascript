@@ -1,17 +1,12 @@
 'use client';
 
 import type { CountryEntry, CountryIso } from '@clerk/shared/phone';
-import {
-  extractDigits,
-  formatPhoneNumber,
-  getFlagEmojiFromCountryIso,
-  IsoToCountryMap,
-  parsePhoneString,
-} from '@clerk/shared/phone';
+import { extractDigits, formatPhoneNumber, IsoToCountryMap, parsePhoneString } from '@clerk/shared/phone';
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { CountryFlag } from '../../icons/country-flags';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
@@ -210,15 +205,11 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
               aria-label={`Country, ${country.name}`}
             >
               <span {...stylex.props(reset.base, styles.triggerContent)}>
-                <span
+                <CountryFlag
+                  iso={country.iso}
                   aria-hidden='true'
-                  {...mergeStyleProps(
-                    themeProps('phone-input-flag'),
-                    stylex.props(reset.base, styles.flag, styles.triggerFlag),
-                  )}
-                >
-                  {getFlagEmojiFromCountryIso(country.iso)}
-                </span>
+                  {...mergeStyleProps(themeProps('phone-input-flag'), stylex.props(reset.base, styles.flag))}
+                />
                 <Icon
                   name='chevron-down'
                   size='md'
@@ -267,26 +258,27 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
               </Field.Root>
               <Combobox.List {...themeProps('phone-input-country-list')}>
                 {filteredCountries.length > 0 ? (
-                  filteredCountries.map(option => (
-                    <Combobox.Option
-                      key={option.iso}
-                      value={option.iso}
-                      label={option.name}
-                      {...themeProps('phone-input-country-option')}
-                    >
-                      <span
-                        aria-hidden='true'
-                        {...stylex.props(reset.base, styles.flag)}
+                  filteredCountries.map(option => {
+                    return (
+                      <Combobox.Option
+                        key={option.iso}
+                        value={option.iso}
+                        label={option.name}
+                        {...themeProps('phone-input-country-option')}
                       >
-                        {getFlagEmojiFromCountryIso(option.iso)}
-                      </span>
-                      <span {...stylex.props(reset.base, styles.optionName)}>{option.name}</span>
-                      <span {...stylex.props(reset.base, styles.optionCode)}>+{option.code}</span>
-                      <span {...stylex.props(styles.indicatorSlot)}>
-                        <Combobox.OptionIndicator />
-                      </span>
-                    </Combobox.Option>
-                  ))
+                        <CountryFlag
+                          iso={option.iso}
+                          aria-hidden='true'
+                          {...mergeStyleProps(themeProps('phone-input-flag'), stylex.props(reset.base, styles.flag))}
+                        />
+                        <span {...stylex.props(reset.base, styles.optionName)}>{option.name}</span>
+                        <span {...stylex.props(reset.base, styles.optionCode)}>+{option.code}</span>
+                        <span {...stylex.props(styles.indicatorSlot)}>
+                          <Combobox.OptionIndicator />
+                        </span>
+                      </Combobox.Option>
+                    );
+                  })
                 ) : (
                   <Combobox.Empty>{noResultsMessage}</Combobox.Empty>
                 )}

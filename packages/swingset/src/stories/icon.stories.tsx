@@ -1,7 +1,9 @@
 import type { IconProps } from '@clerk/mosaic/components/icon';
 import { Icon } from '@clerk/mosaic/components/icon';
+import { getCountryFlag } from '@clerk/mosaic/icons/country-flags';
 import { iconRegistry } from '@clerk/mosaic/icons/registry';
 import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
+import { IsoToCountryMap } from '@clerk/shared/phone';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -111,6 +113,49 @@ export function Names() {
 
 export function DeviceIllustrations() {
   return <IconGallery names={deviceIllustrationNames} />;
+}
+
+export function Flags() {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 120px), 1fr))',
+        gap: 8,
+        width: '100%',
+      }}
+    >
+      {[...IsoToCountryMap.values()].map(({ iso, name }) => {
+        const Flag = getCountryFlag(iso);
+        return (
+          <div
+            key={iso}
+            title={name}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+              minWidth: 0,
+              minHeight: 104,
+              padding: '20px 8px 12px',
+              border: '1px solid color-mix(in srgb, currentColor 10%, transparent)',
+              borderRadius: 8,
+              textAlign: 'center',
+            }}
+          >
+            <Flag
+              width={24}
+              height={24}
+              role='img'
+              aria-label={name}
+            />
+            <code style={{ fontSize: 11, lineHeight: 1.5 }}>{iso.toUpperCase()}</code>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export function Override() {

@@ -27,7 +27,10 @@ export default defineConfig({
     }),
   ],
   onSuccess: async () => {
-    const { rm } = await import('node:fs/promises');
-    await rm('./dist/index.js.map', { force: true });
+    const { readdir, rm } = await import('node:fs/promises');
+    const files = await readdir('./dist');
+    await Promise.all(
+      files.filter(file => file.endsWith('.js.map')).map(file => rm(`./dist/${file}`, { force: true })),
+    );
   },
 });
