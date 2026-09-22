@@ -20,7 +20,7 @@ import * as DialogStories from './dialog.component.stories';
   ]}
 />
 
-`variant` and `compactPlacement` belong to `Dialog.Popup`; the rest belong to `Dialog.Root`.
+`variant`, `size` and `compactPlacement` belong to `Dialog.Popup`; the rest belong to `Dialog.Root`.
 
 ## Usage
 
@@ -204,13 +204,13 @@ action as its submit.
 
 ## Parts
 
-| Part                 | Slot                  | Description                                                                               |
-| -------------------- | --------------------- | ----------------------------------------------------------------------------------------- |
-| `Dialog.Root`        | —                     | State: open/close, `role`, `modal`, `handle`.                                             |
-| `Dialog.Trigger`     | —                     | Opens the dialog; `render`, and `handle` + `payload` when detached.                       |
-| `Dialog.Popup`       | `dialog-popup`        | The box the surface sits in; `variant`, `compactPlacement`, `initialFocus`, `finalFocus`. |
-| `Dialog.Close`       | —                     | Unstyled dismiss; accepts `render`.                                                       |
-| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X, for a surface that anchors its own dismiss.                          |
+| Part                 | Slot                  | Description                                                                                       |
+| -------------------- | --------------------- | ------------------------------------------------------------------------------------------------- |
+| `Dialog.Root`        | —                     | State: open/close, `role`, `modal`, `handle`.                                                     |
+| `Dialog.Trigger`     | —                     | Opens the dialog; `render`, and `handle` + `payload` when detached.                               |
+| `Dialog.Popup`       | `dialog-popup`        | The box the surface sits in; `variant`, `size`, `compactPlacement`, `initialFocus`, `finalFocus`. |
+| `Dialog.Close`       | —                     | Unstyled dismiss; accepts `render`.                                                               |
+| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X, for a surface that anchors its own dismiss.                                  |
 
 The name, the description and the button row come from the surface — `Card.Title`,
 `Card.Description` and `Card.Footer` — not from the dialog.

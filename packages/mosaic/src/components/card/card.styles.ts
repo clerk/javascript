@@ -12,7 +12,7 @@ export const root = stylex.create({
     containerType: 'inline-size',
     display: 'flex',
     flexDirection: 'column',
-    maxWidth: '26.25rem',
+    maxWidth: 'var(--_cl-card-max-width, 26.25rem)',
     width: '100%',
   },
   card: {

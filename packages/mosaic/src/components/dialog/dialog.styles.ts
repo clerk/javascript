@@ -12,6 +12,9 @@ const STACK_VEIL_OPACITY = 0.4;
 // value.
 const CARD_MAX_WIDTH = '25rem';
 
+// Set by a card `size` and read by both the popup and `Card.Root`, so the surface widens with the box.
+const CARD_MAX_WIDTH_VAR = `var(--_cl-card-max-width, ${CARD_MAX_WIDTH})`;
+
 // The scrim over the bare page. A black wash over `transparent` rather than a percentage of a
 // neutral token: it composites over whatever the host app renders, so the same value reads
 // consistently on any page.
@@ -362,7 +365,7 @@ export const variants = stylex.create({
     // alone: a `profile` hosting a dialog gets a scrim between the two instead, and would
     // otherwise dim as well as darken.
     '--_cl-stack-veil': { default: 0, ':where([data-stack-base])': STACK_VEIL_OPACITY },
-    maxWidth: CARD_MAX_WIDTH,
+    maxWidth: CARD_MAX_WIDTH_VAR,
   },
   /**
    * Like `card`, a profile brings its own surface. It is the account-profile and settings surface,
@@ -406,6 +409,12 @@ export const variants = stylex.create({
   },
 });
 
+/** The width of a `card`. Applied for `card` alone, like `compactPlacements`. */
+export const sizes = stylex.create({
+  default: {},
+  wide: { '--_cl-card-max-width': '36.25rem' },
+});
+
 /**
  * Where the surface sits in the COMPACT band, which is an axis of its own rather than a property
  * of the size: the same `card` is a centred dialog in one place and a bottom sheet in another, and
@@ -434,7 +443,7 @@ export const compactPlacements = stylex.create({
     // `stylex.props` call, so StyleX dedupes `max-width` to whatever is written here. Both read
     // the same constant, so there is one value to retune.
     alignSelf: { [PHONE]: 'end', default: null },
-    maxWidth: { [PHONE]: 'none', default: CARD_MAX_WIDTH },
+    maxWidth: { [PHONE]: 'none', default: CARD_MAX_WIDTH_VAR },
   },
 });
 

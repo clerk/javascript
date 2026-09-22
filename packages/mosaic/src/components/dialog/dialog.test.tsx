@@ -600,6 +600,48 @@ describe('compactPlacement', () => {
   });
 });
 
+describe('size', () => {
+  const probe = stylex.create({
+    wide: { '--_cl-card-max-width': '36.25rem' },
+  });
+
+  const renderSize = (size: 'default' | 'wide', variant: DialogVariant = 'card') =>
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup
+          variant={variant}
+          size={size}
+        >
+          <Surface title='Invite members' />
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+  it('leaves the card width alone by default', () => {
+    renderSize('default');
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.wide)));
+    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'default');
+  });
+
+  it('widens the card', () => {
+    renderSize('wide');
+
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.wide)));
+    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'wide');
+  });
+
+  it('ignores a size on a profile, and warns', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderSize('wide', 'profile');
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.wide)));
+    expect(document.querySelector('.cl-dialog-popup')).not.toHaveAttribute('data-size');
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('takes no size'));
+    warn.mockRestore();
+  });
+});
+
 describe('viewport scroll behaviour', () => {
   // The inside/outside scroll split. A pinned `height: 100%` cannot grow, so an over-tall popup
   // spills past the viewport's padding box and loses the bottom inset; `min-height: 100%` lets the
