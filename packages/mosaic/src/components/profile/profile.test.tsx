@@ -5,6 +5,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
+import { Badge } from '../badge';
 import { Card } from '../card';
 import { Dialog } from '../dialog';
 import { Icon } from '../icon';
@@ -54,6 +55,27 @@ function atomsOf(style: stylex.StyleXStyles): string[] {
 }
 
 describe('Profile', () => {
+  it('renders trailing badge content in a navigation item', () => {
+    render(
+      <Profile.Root value='account'>
+        <Profile.Title>Settings</Profile.Title>
+        <Profile.Nav>
+          <Profile.NavItem
+            value='account'
+            badge={<Badge color='neutral'>3</Badge>}
+          >
+            Account
+          </Profile.NavItem>
+        </Profile.Nav>
+        <Profile.Content>
+          <Profile.ContentPanel value='account'>Account content</Profile.ContentPanel>
+        </Profile.Content>
+      </Profile.Root>,
+    );
+
+    expect(screen.getByText('3').closest('.cl-profile-nav-item-badge')).toBeInTheDocument();
+  });
+
   it('is a labelled navigation of tabs beside the selected page', () => {
     renderSurface();
 
