@@ -229,6 +229,7 @@ describe('organization API keys playground', () => {
     const copy = vi
       .spyOn(navigator.clipboard, 'writeText')
       .mockRejectedValueOnce(new Error('Denied'))
+      .mockRejectedValueOnce(new Error('Denied'))
       .mockResolvedValue();
     render(
       <MosaicProvider
@@ -252,12 +253,15 @@ describe('organization API keys playground', () => {
     expect(screen.getByText(`This key will expire on ${expirationLabel}`)).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Add API Key' }));
     const dialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
+    await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('Impossible de copier cette clé.');
+    expect(screen.queryByRole('dialog', { name: 'Copied' })).not.toBeInTheDocument();
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('Impossible de copier cette clé.');
     expect(within(dialog).getByDisplayValue(/^ak_demo_/)).toBeVisible();
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(copy).toHaveBeenCalledTimes(2);
+    expect(copy).toHaveBeenCalledTimes(3);
     expect(screen.getByText(`Expires ${expirationLabel}`)).toBeVisible();
   });
 

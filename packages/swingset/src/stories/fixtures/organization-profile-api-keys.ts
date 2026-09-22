@@ -219,8 +219,11 @@ export function useOrganizationProfileAPIKeysFixture({
           if (close) {
             setOpen(false);
           }
-        } catch {
+        } catch (error) {
           setError(m.copyError);
+          if (!close) {
+            throw error;
+          }
         } finally {
           setIsPending(false);
         }

@@ -41,6 +41,7 @@ export const organizationProfileApiKeysPanelMessages = {
   copyDescription: "For security reasons, we won't allow you to view it again later.",
   secretLabel: 'API key',
   copy: 'Copy API key',
+  copied: 'Copied',
   copyError: 'Could not copy the API key. Try again.',
   copyAndClose: 'Copy and close',
   name: 'Name',
