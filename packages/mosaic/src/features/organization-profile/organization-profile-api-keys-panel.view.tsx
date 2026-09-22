@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { Destructive } from '../../blocks/destructive';
 import { Button } from '../../components/button';
@@ -8,7 +8,7 @@ import { Icon } from '../../components/icon';
 import { InputGroup } from '../../components/input-group';
 import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
-import { Profile } from '../../components/profile';
+import { panelStyles, Profile } from '../../components/profile';
 import { Spinner } from '../../components/spinner';
 import type { TableHeaderCellProps } from '../../components/table';
 import { Table } from '../../components/table';
@@ -114,7 +114,7 @@ export function OrganizationProfileApiKeysPanelView({
     : { label: m.noKeys, description: m.noKeysDescription };
   return (
     <>
-      <div {...mergeStyleProps(themeProps('organization-profile-api-keys-panel'), stylex.props(styles.root))}>
+      <div {...mergeStyleProps(themeProps('organization-profile-api-keys-panel'), stylex.props(panelStyles.root))}>
         <Profile.PageTitle>{m.title}</Profile.PageTitle>
         <div {...stylex.props(styles.toolbar)}>
           <InputGroup.Root
@@ -301,11 +301,11 @@ function APIKeyActions({
   onSelect: (key: OrganizationProfileAPIKey) => void;
 }) {
   const m = useMessages('organizationProfileApiKeysPanel');
-  const triggerRef = useRef(registerTrigger(apiKey.id));
+  const [triggerRef] = useState(() => registerTrigger(apiKey.id));
   return (
     <Menu.Root placement='bottom-end'>
       <Menu.Trigger
-        ref={triggerRef.current}
+        ref={triggerRef}
         aria-label={fill(m.manage, { name: apiKey.name })}
       />
       <Menu.Popup>
