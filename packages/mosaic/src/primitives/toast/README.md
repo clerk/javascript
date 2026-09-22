@@ -215,7 +215,7 @@ Returns `{ toasts, add, close, update, promise }`.
 | `onClose`         | `() => void`                      | Called when the toast starts closing.                                          |
 | `onRemove`        | `() => void`                      | Called once the toast is removed from the list.                                |
 | `data`            | `Record<string, unknown>`         | Anything the rendering code needs.                                             |
-| `limited`         | `boolean`                         | True while queued beyond the provider `limit`.                                 |
+| `limited`         | `boolean`                         | True while beyond the provider `limit`. Its timer keeps running.               |
 | `height`          | `number`                          | Measured root height, used for `--toast-offset-y`.                             |
 | `repeatCount`     | `number`                          | How many times `add` was called again with this toast's id while it was open.  |
 

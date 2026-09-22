@@ -30,7 +30,7 @@ export interface ToastObject {
   /** `'high'` announces with `role="alert"` and `aria-live="assertive"`. @default 'low' */
   priority?: ToastPriority;
   transitionStatus?: 'starting' | 'ending';
-  /** True while the toast is queued beyond the provider `limit`. */
+  /** True while the toast is beyond the provider `limit`. Its timer keeps running. */
   limited?: boolean;
   /** Measured height of the root element, used to compute `--toast-offset-y` for the toasts stacked below it. */
   height?: number;

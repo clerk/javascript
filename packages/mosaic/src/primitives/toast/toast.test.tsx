@@ -427,25 +427,26 @@ describe('Toast', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
-    it('does not run the timer of a limited toast until it is promoted', () => {
+    it('keeps the timer of a limited toast running so toasts close oldest first', () => {
       const { add, advance } = renderWithTimers({ limit: 1, timeout: 1000 });
 
-      add();
-      add();
+      add({ title: 'First' });
+      advance(500);
+      add({ title: 'Second' });
       expect(screen.getAllByRole('dialog')).toHaveLength(2);
 
-      advance(1000);
+      advance(500);
       expect(screen.getAllByRole('dialog')).toHaveLength(1);
-      expect(screen.getByRole('dialog')).not.toHaveAttribute('data-limited');
+      expect(screen.getByRole('dialog', { name: 'Second' })).not.toHaveAttribute('data-limited');
 
-      advance(1000);
+      advance(500);
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     it('announces a limited toast only once it is promoted', () => {
       const { add, advance } = renderWithTimers({ limit: 1, timeout: 1000 });
 
-      add({ title: 'First' });
+      add({ title: 'First', timeout: 2000 });
       add({ title: 'Second' });
 
       advance(50);

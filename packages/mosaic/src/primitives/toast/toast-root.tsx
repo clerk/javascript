@@ -96,7 +96,7 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
   }, [mounted, remove, toast.id]);
 
   const timeout = toast.timeout ?? defaultTimeout;
-  const timerStopped = paused || !open || toast.limited === true || timeout <= 0;
+  const timerStopped = paused || !open || timeout <= 0;
   const remainingRef = useRef(timeout);
   const repeatCount = toast.repeatCount ?? 0;
   const [repeated, setRepeated] = useState(false);
