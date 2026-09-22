@@ -19,6 +19,7 @@ export interface UserProfileEditUsernameDialogProps {
   trigger?: DialogTriggerProps['render'];
   username: string;
   onUsernameChange: (value: string) => void;
+  title?: string;
   canSave?: boolean;
   isSaving?: boolean;
   error?: FormError<UserProfileEditUsernameField>;
@@ -31,6 +32,7 @@ export function UserProfileEditUsernameDialog({
   trigger,
   username,
   onUsernameChange,
+  title,
   canSave = true,
   isSaving = false,
   error,
@@ -63,7 +65,7 @@ export function UserProfileEditUsernameDialog({
           renderBranding={false}
         >
           <Card.Header>
-            <Card.Title>{m.username.dialogTitle}</Card.Title>
+            <Card.Title>{title ?? m.username.dialogTitle}</Card.Title>
           </Card.Header>
 
           <Card.Content
