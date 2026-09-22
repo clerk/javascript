@@ -1,0 +1,217 @@
+import * as TagInputStories from './tag-input.stories';
+
+# Tag Input
+
+A text field that turns entries into removable tags. It is a **headless**
+primitive: it owns the list of values, parses typed and pasted text into tags, manages focus between
+the tags and the input, and keeps removed tags mounted while they animate out, but ships **no
+styles**. You bring your own CSS by targeting the `data-*` attributes each part emits.
+
+## Example
+
+The demo below is intentionally unstyled, so it renders the raw primitive to show its behavior. Type an
+entry and press `Enter` or `,` to add it; paste a comma- or newline-separated list to add several at
+once. `Backspace` or `←` at the start of the input moves to the last tag, `←`/`→` move between tags,
+`Home`/`End` jump to the ends, and `Backspace`/`Delete` remove the focused tag. Entries without an `@`
+fail the demo's `validate` and get `data-invalid`.
+
+<Story
+  name='Default'
+  storyModule={TagInputStories}
+/>
+
+### Styled
+
+The same primitive styled like a textarea. `TagInput.Root` draws the box, and pressing anywhere in
+it that isn't a tag focuses the input. `TagInput.List` is `display: contents`, so the tags and the input
+wrap together, and the input grows to fill the rest of its row. Tags fade and scale in and out through
+`data-starting-style` / `data-ending-style`.
+
+<Story
+  name='Styled'
+  storyModule={TagInputStories}
+/>
+
+### View transitions
+
+The same field animated with view transitions instead, so the remaining tags slide into place when
+one is added or removed. The primitive stays unaware of it: the field is controlled, and
+`onValueChange` applies each update inside `document.startViewTransition` with `flushSync`. Render
+only tags where `present` is `true`, so a removed tag leaves the DOM in the same update and the
+browser animates its snapshot out. Each tag sets `view-transition-name: match-element` and
+`view-transition-class: tag`, and the enter and exit keyframes target `::view-transition-new(*.tag)`
+and `::view-transition-old(*.tag)`. The input gets its own `view-transition-class: tag-input` so it
+slides with the tags, and its snapshot uses `object-fit: none` so the width change doesn't stretch
+it. Browsers without view transitions apply the update without animating. Each change is computed
+from the current `value`, so an edit made before a pending transition applies its update starts from
+the previous value.
+
+```tsx
+const [value, setValue] = useState<string[]>([]);
+
+<TagInput.Root
+  value={value}
+  onValueChange={next => {
+    if (typeof document.startViewTransition !== 'function') {
+      setValue(next);
+      return;
+    }
+    document.startViewTransition(() => {
+      flushSync(() => setValue(next));
+    });
+  }}
+>
+```
+
+<Story
+  name='ViewTransition'
+  storyModule={TagInputStories}
+/>
+
+To opt out in CSS, set `view-transition-name: none` on the tags. At each change the field reads that
+name from a tag (or the input when there are no tags). When it is `none`, the field skips the view
+transition and keeps removed tags mounted, so `data-starting-style` / `data-ending-style` drive both
+enter and exit.
+
+<Story
+  name='ViewTransitionOptOut'
+  storyModule={TagInputStories}
+/>
+
+## Usage
+
+The value lives in `TagInput.Root`. Read the tags with the `useTagInput` hook and render one
+`TagInput.Tag` per entry, passing each its `value`:
+
+```tsx
+import { TagInput } from '@clerk/mosaic/primitives/tag-input';
+
+function InviteEmails() {
+  return (
+    <TagInput.Root validate={isEmail}>
+      <TagInput.List aria-label='Email addresses'>
+        <Tags />
+      </TagInput.List>
+      <TagInput.Input aria-label='Email' />
+    </TagInput.Root>
+  );
+}
+
+function Tags() {
+  const { tags } = TagInput.useTagInput();
+  return tags.map(tag => (
+    <TagInput.Tag
+      key={tag.value}
+      value={tag.value}
+    >
+      {tag.value}
+      <TagInput.TagRemove>×</TagInput.TagRemove>
+    </TagInput.Tag>
+  ));
+}
+```
+
+`useTagInput().tags` includes tags that are animating out, so render every entry it returns. Each entry
+is `{ value, present, invalid }`; `present` is `false` while a removed tag exits.
+
+### Controlled
+
+```tsx
+const [emails, setEmails] = useState<string[]>([]);
+
+<TagInput.Root
+  value={emails}
+  onValueChange={setEmails}
+>
+  …
+</TagInput.Root>;
+```
+
+### Inside a form
+
+Pass `name` to submit one hidden input per tag:
+
+```tsx
+<form action={invite}>
+  <TagInput.Root name='emails'>…</TagInput.Root>
+  <button type='submit'>Send invites</button>
+</form>
+```
+
+## Parts
+
+| Part                 | Default Element | Description                                                     |
+| -------------------- | --------------- | --------------------------------------------------------------- |
+| `TagInput.Root`      | `<div>`         | Owns the values and focus, provides context, submits the values |
+| `TagInput.List`      | `<div>`         | The `role="list"` wrapping the tags                             |
+| `TagInput.Tag`       | `<div>`         | A single tag; render one per `useTagInput().tags` entry         |
+| `TagInput.TagRemove` | `<button>`      | Removes its tag and returns focus to the input                  |
+| `TagInput.Input`     | `<input>`       | The text entry; commits on `Enter`, a delimiter, paste, or blur |
+
+Every part accepts a `render` prop for polymorphic rendering and standard HTML attributes for its default
+element. The parts (and the `useTagInput` hook) throw if used outside `TagInput.Root`;
+`TagInput.TagRemove` also throws outside `TagInput.Tag`.
+
+`TagInput.useTagInput()` returns `{ value, tags, disabled, add, remove }`.
+
+## Props
+
+### `TagInput.Root`
+
+| Prop            | Type                         | Default | Description                                                                   |
+| --------------- | ---------------------------- | ------- | ----------------------------------------------------------------------------- |
+| `value`         | `string[]`                   | —       | Controlled values                                                             |
+| `defaultValue`  | `string[]`                   | `[]`    | Initial values (uncontrolled)                                                 |
+| `onValueChange` | `(value: string[]) => void`  | —       | Called with the full list on every change                                     |
+| `validate`      | `(value: string) => boolean` | —       | Tags returning `false` stay in the list with `data-invalid`                   |
+| `delimiters`    | `string[]`                   | `[',']` | Characters that commit the typed text; paste also splits on newlines and tabs |
+| `name`          | `string`                     | —       | Submit each value via a hidden input under this name                          |
+| `disabled`      | `boolean`                    | `false` | Disable the input, removal, and the hidden inputs                             |
+
+### `TagInput.Tag`
+
+| Prop    | Type     | Default      | Description                                 |
+| ------- | -------- | ------------ | ------------------------------------------- |
+| `value` | `string` | — (required) | The tag's value (from `useTagInput().tags`) |
+
+## Styling
+
+| Attribute             | Applies To | Description                                   |
+| --------------------- | ---------- | --------------------------------------------- |
+| `data-empty`          | Root       | Present when there are no tags                |
+| `data-disabled`       | Root, Tag  | Present when disabled                         |
+| `data-value`          | Tag        | The tag's value                               |
+| `data-invalid`        | Tag        | Present when the tag fails `validate`         |
+| `data-starting-style` | Tag        | Present on the first frame after a tag mounts |
+| `data-ending-style`   | Tag        | Present while a removed tag animates out      |
+
+Tags stay mounted until every CSS transition or animation on them finishes, so exits are driven
+entirely by CSS:
+
+```css
+.tag {
+  transition:
+    opacity 150ms,
+    scale 150ms;
+}
+.tag[data-starting-style],
+.tag[data-ending-style] {
+  opacity: 0;
+  scale: 0.9;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tag {
+    transition: none;
+  }
+}
+```
+
+## Accessibility
+
+The field is a single tab stop: tags are `tabIndex={-1}` and reached from the input with
+`Backspace` or `←` when the caret is at the start. Arrow keys follow reading order, so under
+`dir="rtl"` `ArrowLeft`/`ArrowRight` are swapped. Removing a tag moves focus immediately to its neighbor
+(or the input), without waiting for the exit animation, and a tag that is animating out is `inert`
+and `aria-hidden` so it is skipped by focus and assistive tech. `TagInput.TagRemove` defaults its
+`aria-label` to `Remove {value}`; pass your own to localize it. Label the input with `aria-label` or a
+`<label>`, and link any hint text with `aria-describedby`.
