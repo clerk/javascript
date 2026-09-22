@@ -2,7 +2,7 @@ import * as Stories from './organization-profile-api-keys-panel.stories';
 
 # OrganizationProfileApiKeysPanel
 
-A controlled organization API keys table with search, page navigation, and confirmation before revocation. The caller supplies the current page and owns data updates; the panel owns the revoke interaction.
+A controlled organization API keys table with search, page navigation, and confirmation before revocation. The caller supplies the current page and owns data updates; the panel requires typing the key's exact name before revoking it.
 
 ## Example
 
@@ -27,7 +27,7 @@ A controlled organization API keys table with search, page navigation, and confi
     { name: 'Field', href: '/components/field', layer: 'Components' },
     { name: 'Input', href: '/components/input', layer: 'Components' },
     { name: 'Select', href: '/components/select', layer: 'Components' },
-    { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
+    { name: 'Destructive', href: '/blocks/destructive', layer: 'Blocks' },
   ]}
 />
 

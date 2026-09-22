@@ -148,11 +148,15 @@ describe('organization API keys playground', () => {
     expect(screen.getAllByRole('row')).toHaveLength(14);
     await user.click(screen.getByRole('button', { name: 'Manage Retry integration' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
+    await user.type(
+      screen.getByRole('textbox', { name: 'Type “Retry integration” below to continue' }),
+      'Retry integration',
+    );
     await user.click(screen.getByRole('button', { name: 'Revoke key' }));
     expect(screen.getByRole('button', { name: 'Revoke key' })).toHaveAttribute('aria-busy', 'true');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+    expect(await screen.findByText('Something went wrong. Please try again.')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Revoke key' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(screen.queryByText('Retry integration')).not.toBeInTheDocument();
     expect(screen.getAllByRole('row')).toHaveLength(13);
     expect(screen.getByRole('button', { name: 'Manage Web app' })).toHaveFocus();
@@ -324,9 +328,10 @@ describe('organization API keys playground', () => {
     for (const name of ['Staging', 'Local development']) {
       await user.click(screen.getByRole('button', { name: `Manage ${name}` }));
       await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
-      const dialog = screen.getByRole('alertdialog');
+      const dialog = screen.getByRole('dialog');
+      await user.type(within(dialog).getByRole('textbox', { name: `Type “${name}” below to continue` }), name);
       await user.click(within(dialog).getByRole('button', { name: 'Revoke key' }));
-      await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     }
     expect(screen.getByText('Web app')).toBeVisible();
     expect(screen.getAllByRole('row')).toHaveLength(11);

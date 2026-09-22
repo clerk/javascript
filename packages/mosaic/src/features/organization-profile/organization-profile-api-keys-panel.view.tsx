@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import { useMemo, useRef } from 'react';
 
-import { Confirmation } from '../../blocks/confirmation';
+import { Destructive } from '../../blocks/destructive';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Icon } from '../../components/icon';
@@ -55,7 +55,7 @@ export function OrganizationProfileApiKeysPanelView({
     onRemove: onRevoke,
     fallback: () => createButton.current ?? searchInput.current,
   });
-  const revokeKey = useMemo(() => Confirmation.createHandle<OrganizationProfileAPIKey>(), []);
+  const revokeKey = useMemo(() => Destructive.createHandle<OrganizationProfileAPIKey>(), []);
   const pagination = { pageIndex: page - 1, pageSize };
   const table = useDataTable({
     data: apiKeys,
@@ -269,13 +269,15 @@ export function OrganizationProfileApiKeysPanelView({
       </div>
       {createDialog ? <OrganizationProfileCreateAPIKeyDialog {...createDialog} /> : null}
       {onRevoke ? (
-        <Confirmation
+        <Destructive
           handle={revokeKey}
           title={apiKey => fill(m.revokeTitle, { name: apiKey.name })}
           description={m.revokeDescription}
+          fieldLabel={apiKey => fill(m.revokeFieldLabel, { name: apiKey.name })}
+          confirmationValue={apiKey => apiKey.name}
           actionLabel={m.revoke}
           cancelLabel={m.cancel}
-          onConfirm={async apiKey => {
+          onDelete={async apiKey => {
             try {
               await removalFocus.remove(apiKey.id);
             } catch (error) {

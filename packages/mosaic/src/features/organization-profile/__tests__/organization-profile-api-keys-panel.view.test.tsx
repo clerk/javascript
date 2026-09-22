@@ -107,6 +107,7 @@ describe('OrganizationProfileApiKeysPanelView', () => {
         localization={{
           overrides: {
             'organizationProfileApiKeysPanel.revokeTitle': 'Retirer {name} ?',
+            'organizationProfileApiKeysPanel.revokeFieldLabel': 'Saisissez « {name} » pour continuer',
             'organizationProfileApiKeysPanel.cancel': 'Annuler',
             'organizationProfileApiKeysPanel.pageSize': 'Résultats par page',
             'organizationProfileApiKeysPanel.revokeError': 'Impossible de révoquer cette clé.',
@@ -119,15 +120,20 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     expect(screen.getByRole('combobox', { name: 'Résultats par page 10' })).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Manage Primary API Key' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
-    expect(screen.getByRole('alertdialog')).toHaveAccessibleName('Retirer Primary API Key ?');
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Retirer Primary API Key ?');
+    await user.type(
+      screen.getByRole('textbox', { name: 'Saisissez « Primary API Key » pour continuer' }),
+      'Primary API Key',
+    );
     await user.click(screen.getByRole('button', { name: 'Revoke key' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Impossible de révoquer cette clé.');
+    expect(await screen.findByText('Impossible de révoquer cette clé.')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Annuler' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     await user.click(screen.getByRole('button', { name: 'Manage Legacy API Key' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
-    expect(screen.getByRole('alertdialog')).toHaveAccessibleName('Retirer Legacy API Key ?');
+    expect(screen.getByRole('dialog')).toHaveAccessibleName('Retirer Legacy API Key ?');
+    expect(screen.getByRole('textbox', { name: 'Saisissez « Legacy API Key » pour continuer' })).toHaveValue('');
+    expect(screen.queryByText('Impossible de révoquer cette clé.')).not.toBeInTheDocument();
     expect(onRevoke).toHaveBeenCalledExactlyOnceWith('primary');
   });
   it('localizes complete sentences and renders supplied rows even when their names do not match search', () => {
@@ -179,12 +185,13 @@ describe('OrganizationProfileApiKeysPanelView', () => {
       render(<Example />);
       await user.click(screen.getByRole('button', { name: 'Manage Primary API Key' }));
       await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
+      await user.type(screen.getByRole('textbox'), 'Primary API Key');
       await user.click(screen.getByRole('button', { name: 'Revoke key' }));
       await act(async () => {
         pending.resolve();
         await pending.promise;
       });
-      await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
       expect(screen.getByText('No API Keys created')).toBeVisible();
       expect(
         hasCreate ? screen.getByRole('button', { name: 'Create API key' }) : screen.getByRole('searchbox'),
@@ -202,9 +209,12 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     renderView({ onRevoke });
     await user.click(screen.getByRole('button', { name: 'Manage Legacy API Key' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
-    const dialog = screen.getByRole('alertdialog', { name: 'Revoke Legacy API Key?' });
+    const dialog = screen.getByRole('dialog', { name: 'Revoke Legacy API Key?' });
     const confirm = within(dialog).getByRole('button', { name: 'Revoke key' });
+    const input = within(dialog).getByRole('textbox');
+    await user.type(input, 'Legacy API Key');
     await user.click(confirm);
+    expect(input).toBeDisabled();
     expect(confirm).toHaveAttribute('aria-busy', 'true');
     expect(onRevoke).toHaveBeenCalledExactlyOnceWith('legacy');
     expect(dialog).toBeInTheDocument();
@@ -214,11 +224,14 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     });
     expect(await screen.findByText('Could not revoke this key. Try again.')).toBeVisible();
     expect(dialog).toHaveAccessibleName('Revoke Legacy API Key?');
+    expect(input).toHaveValue('Legacy API Key');
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input).toHaveAccessibleDescription('Could not revoke this key. Try again.');
     await user.click(confirm);
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(onRevoke.mock.calls).toEqual([['legacy'], ['legacy']]);
   });
-  it('confirms without typing, cancels safely, and revokes multiple keys with removal focus', async () => {
+  it('requires each key name, cancels safely, and revokes multiple keys through one dialog with removal focus', async () => {
     const user = userEvent.setup();
     const onRevoke = vi.fn<(id: string) => Promise<void>>(async () => {});
     function Example() {
@@ -240,19 +253,27 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     render(<Example />);
     await user.click(screen.getByRole('button', { name: 'Manage Primary API Key' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
-    let dialog = screen.getByRole('alertdialog', { name: 'Revoke Primary API Key?' });
+    let dialog = screen.getByRole('dialog', { name: 'Revoke Primary API Key?' });
     expect(onRevoke).not.toHaveBeenCalled();
-    expect(within(dialog).queryByRole('textbox')).not.toBeInTheDocument();
-    expect(within(dialog).getByRole('button', { name: 'Revoke key' })).toBeEnabled();
+    expect(within(dialog).getByRole('button', { name: 'Revoke key' })).toHaveAttribute('aria-disabled', 'true');
+    await user.type(within(dialog).getByRole('textbox'), 'Primary API Key');
     await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    expect(onRevoke).not.toHaveBeenCalled();
     await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Primary API Key' })).toHaveFocus());
     for (const name of ['Primary API Key', 'Legacy API Key']) {
       await user.click(screen.getByRole('button', { name: `Manage ${name}` }));
       await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
-      dialog = screen.getByRole('alertdialog', { name: `Revoke ${name}?` });
-      expect(within(dialog).queryByRole('textbox')).not.toBeInTheDocument();
+      dialog = screen.getByRole('dialog', { name: `Revoke ${name}?` });
+      expect(screen.getAllByRole('dialog')).toHaveLength(1);
+      const input = within(dialog).getByRole('textbox', { name: `Type “${name}” below to continue` });
+      const previousCalls = onRevoke.mock.calls.length;
+      expect(input).toHaveValue('');
+      await user.type(input, `${name.toLowerCase()}{Enter}`);
+      expect(onRevoke).toHaveBeenCalledTimes(previousCalls);
+      await user.clear(input);
+      await user.type(input, name);
       await user.click(within(dialog).getByRole('button', { name: 'Revoke key' }));
-      await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
       expect(screen.queryByText(name)).not.toBeInTheDocument();
       if (name === 'Primary API Key') {
         expect(screen.getByRole('button', { name: 'Manage Legacy API Key' })).toHaveFocus();
