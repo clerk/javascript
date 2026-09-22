@@ -14,7 +14,7 @@ function createResourceCache<T>(key: string): ResourceCache<T> {
     if (!opts.storage || !opts.publishableKey) {
       throw new Error(`Clerk: ResourceCache for ${key} requires storage and publishableKey!`);
     }
-    itemKey = `${key}_${opts.publishableKey.replace(/=+$/, '')}`;
+    itemKey = `${key}_${opts.publishableKey.split('=').join('')}`;
     storage = opts.storage();
   };
 
