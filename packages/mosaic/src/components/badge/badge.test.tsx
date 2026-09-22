@@ -4,6 +4,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { Badge } from './badge';
+import { BadgeContext } from './badge.context';
 
 const atoms = stylex.create({
   spaced: { marginTop: '8px' },
@@ -25,6 +26,24 @@ describe('Mosaic Badge', () => {
   it.each(['primary', 'neutral', 'warning', 'negative', 'positive'] as const)('reflects the %s color', color => {
     render(<Badge color={color}>Active</Badge>);
     expect(screen.getByText('Active')).toHaveAttribute('data-color', color);
+  });
+
+  it('takes its color from BadgeContext when none is passed', () => {
+    render(
+      <BadgeContext.Provider value={{ color: 'neutral' }}>
+        <Badge>Active</Badge>
+      </BadgeContext.Provider>,
+    );
+    expect(screen.getByText('Active')).toHaveAttribute('data-color', 'neutral');
+  });
+
+  it('lets an explicit color override the BadgeContext default', () => {
+    render(
+      <BadgeContext.Provider value={{ color: 'neutral' }}>
+        <Badge color='positive'>Active</Badge>
+      </BadgeContext.Provider>,
+    );
+    expect(screen.getByText('Active')).toHaveAttribute('data-color', 'positive');
   });
 
   it('merges xstyle atoms after the slot atoms', () => {
