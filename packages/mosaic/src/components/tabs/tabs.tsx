@@ -19,19 +19,18 @@ import { styles } from './tabs.styles';
 
 type StyledProps<Props> = Omit<Props, 'className' | 'style'> & MosaicStyleProps;
 
-/** Props for the root container. Set the active tab with `value`/`defaultValue` and observe changes via `onValueChange`. */
+/**
+ * Orientation is omitted because the styled layout and indicator currently support only horizontal tabs.
+ * The headless primitive still supports vertical orientation.
+ */
 export type TabsRootProps = StyledProps<Omit<HeadlessTabsRootProps, 'orientation'>>;
-/** Props for the `role="tablist"` container that wraps the `Tab`s and `Indicator`. */
 export type TabsListProps = StyledProps<HeadlessTabsListProps>;
-/** Props for a tab rendered inside `List`. Its `value` pairs it with the `Panel` sharing the same value. */
 export type TabsTabProps = StyledProps<HeadlessTabsTabProps>;
 /** Props for a standalone tab trigger used outside `List`, keyed to a `Panel` by `value`. */
 export type TabsTriggerProps = StyledProps<HeadlessTabsTriggerProps>;
-/** Props for a content panel, shown when its `value` matches the active tab. */
 export type TabsPanelProps = StyledProps<HeadlessTabsPanelProps>;
 /** Props for the optional wrapper that stacks the panels in one grid cell so they can animate in and out. */
 export type TabsPanelsProps = MosaicComponentProps<'div'>;
-/** Props for the animated indicator that tracks the active tab within `List`. */
 export type TabsIndicatorProps = StyledProps<HeadlessTabsIndicatorProps>;
 
 function Root({ xstyle, children, ...rest }: TabsRootProps) {
@@ -108,17 +107,6 @@ function Indicator({ xstyle, ...rest }: TabsIndicatorProps) {
   );
 }
 
-/**
- * A styled tabbed interface composed through `Tabs.Root`, `Tabs.List`, `Tabs.Tab`,
- * `Tabs.Trigger`, `Tabs.Panels`, `Tabs.Panel`, and `Tabs.Indicator`. Each part accepts the Mosaic
- * `xstyle` prop. `Tabs.Root` renders a column container so the list and panels stack regardless of
- * the surrounding layout.
- *
- * Selection is keyed by `value`: a `Tabs.Tab` (rendered inside `Tabs.List`) or a standalone
- * `Tabs.Trigger` activates the `Tabs.Panel` that shares the same `value`, and `Tabs.Indicator`
- * animates to the active tab. Control the active tab on `Tabs.Root` through `value`/`defaultValue`
- * and `onValueChange`.
- */
 export const Tabs = {
   Root,
   List,
