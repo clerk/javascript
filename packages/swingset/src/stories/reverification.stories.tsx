@@ -201,32 +201,34 @@ function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element
 
   return (
     <>
-      <ReverificationView
-        step={step}
-        direction={direction}
-        value={value}
-        onValueChange={onValueChange}
-        errorMessage={errorMessage}
-        isPending={isPending}
-        onSubmit={onSubmit}
-        onShowMethods={() => navigate('method-picker', 1)}
-        onResend={onResend}
-        canResend={canResend}
-        onShowHelp={() => navigate('help', 1)}
-        onBack={() => {
-          if (step === 'help') {
-            navigate('method-picker', -1);
-            return;
-          }
-          if (step === 'method-picker') {
-            navigate(stepFor(methodId), -1);
-          }
-        }}
-        onEmailSupport={() => setSupportRequested(true)}
-        methods={allMethods.filter(method => method.id !== methodId)}
-        onSelectMethod={id => void selectMethod(id)}
-        otpChannel={activeMethod ? otpChannelFor(activeMethod.strategy) : undefined}
-      />
+      <Card.Root renderBranding={false}>
+        <ReverificationView
+          step={step}
+          direction={direction}
+          value={value}
+          onValueChange={onValueChange}
+          errorMessage={errorMessage}
+          isPending={isPending}
+          onSubmit={onSubmit}
+          onShowMethods={() => navigate('method-picker', 1)}
+          onResend={onResend}
+          canResend={canResend}
+          onShowHelp={() => navigate('help', 1)}
+          onBack={() => {
+            if (step === 'help') {
+              navigate('method-picker', -1);
+              return;
+            }
+            if (step === 'method-picker') {
+              navigate(stepFor(methodId), -1);
+            }
+          }}
+          onEmailSupport={() => setSupportRequested(true)}
+          methods={allMethods.filter(method => method.id !== methodId)}
+          onSelectMethod={id => void selectMethod(id)}
+          otpChannel={activeMethod ? otpChannelFor(activeMethod.strategy) : undefined}
+        />
+      </Card.Root>
       {supportRequested ? <p>Email support requested.</p> : null}
     </>
   );

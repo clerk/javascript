@@ -72,7 +72,6 @@ function Nested({ step }: { step: 'confirm' | 'verify' | 'finalizing' }) {
                   </Flow.Step>
                   <Flow.Step ids={['verify']}>
                     <Reverification
-                      embedded
                       phase='active'
                       complete={vi.fn()}
                       cancel={vi.fn()}
@@ -95,7 +94,7 @@ function Nested({ step }: { step: 'confirm' | 'verify' | 'finalizing' }) {
   );
 }
 
-describe('embedded reverification inside an outer flow', () => {
+describe('reverification inside an outer flow', () => {
   it('keeps one dialog and one card, and nests a flow only while verifying', () => {
     controller = { status: 'idle' };
     const { rerender } = render(<Nested step='confirm' />);
@@ -183,7 +182,9 @@ describe('reverification card states', () => {
     controller = { status: 'loading' };
     const { container, rerender } = render(
       <MosaicProvider>
-        <Reverification {...active} />
+        <Card.Root renderBranding={false}>
+          <Reverification {...active} />
+        </Card.Root>
       </MosaicProvider>,
     );
     const card = container.querySelector('.cl-card-root');
@@ -199,7 +200,9 @@ describe('reverification card states', () => {
     controller = surface();
     rerender(
       <MosaicProvider>
-        <Reverification {...active} />
+        <Card.Root renderBranding={false}>
+          <Reverification {...active} />
+        </Card.Root>
       </MosaicProvider>,
     );
 
@@ -215,10 +218,9 @@ describe('reverification card states', () => {
       <MosaicProvider>
         <Dialog.Root open>
           <Dialog.Popup>
-            <Reverification
-              embedded
-              {...active}
-            />
+            <Card.Root renderBranding={false}>
+              <Reverification {...active} />
+            </Card.Root>
           </Dialog.Popup>
         </Dialog.Root>
       </MosaicProvider>,
@@ -226,14 +228,16 @@ describe('reverification card states', () => {
 
     expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
     expect(screen.getByRole('dialog')).toHaveAccessibleName('Verification required');
-    expect(document.querySelector('.cl-card-root')).toBeNull();
+    expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
   });
 
   it('renders unavailable outside the factor flow, then mounts that flow in the same card', () => {
     controller = { status: 'unavailable' };
     const { container, rerender } = render(
       <MosaicProvider>
-        <Reverification {...active} />
+        <Card.Root renderBranding={false}>
+          <Reverification {...active} />
+        </Card.Root>
       </MosaicProvider>,
     );
     const card = container.querySelector('.cl-card-root');
@@ -248,7 +252,9 @@ describe('reverification card states', () => {
     controller = surface();
     rerender(
       <MosaicProvider>
-        <Reverification {...active} />
+        <Card.Root renderBranding={false}>
+          <Reverification {...active} />
+        </Card.Root>
       </MosaicProvider>,
     );
 
