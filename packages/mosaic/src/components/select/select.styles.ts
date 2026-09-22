@@ -12,11 +12,13 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 import { selectOptionScope } from './select.markers.stylex';
+import { selectVars } from './select.vars.stylex';
 
-// With `alignItemWithTrigger` the selected option's box lands over the trigger's, so the two
-// boxes must inset their text identically: the trigger is a `md` Button (32px, 1px border, 12px
-// inline padding, sm text), and the option gets the same 13px from the popup's 1px border, the
-// viewport's 2px padding, and its own 10px padding at the same 32px height.
+const POPUP_ENTER_SCALE = 0.96;
+const popupScale = selectVars['--_cl-select-popup-scale'];
+
+// Overlaid, the row's box is the trigger's: the popup widens by its border and the viewport's
+// padding and shifts back by the same, and the row repeats the trigger's own insets.
 
 export const value = stylex.create({
   base: {
@@ -36,6 +38,16 @@ export const trigger = stylex.create({
         default: null,
         ':not([data-disabled]):hover:not(:active)': colorVars['--cl-color-neutral-alpha-100'],
       },
+    },
+  },
+});
+
+// So the trigger is already in hover when the popup closes out from over it.
+export const triggerRowHovered = stylex.create({
+  base: {
+    backgroundColor: {
+      default: colorVars['--cl-color-neutral-alpha-100'],
+      ':not([data-disabled]):not([data-pending]):active': colorVars['--cl-color-neutral-alpha-200'],
     },
   },
 });
@@ -72,23 +84,27 @@ export const popup = stylex.create({
     // Never narrower than the trigger, or the trigger's chevron shows from under the overlay.
     minWidth: 'max(10rem, var(--cl-anchor-width, 0px))',
   },
-  // Scaling a popup that already sits over the trigger reads as the selected row sliding out of place.
+  overlaid: {
+    translate: `calc(-1px - ${space['0.5']})`,
+    minWidth: `max(10rem, calc(var(--cl-anchor-width, 0px) + 2px + 2 * ${space['0.5']}))`,
+  },
   scaled: {
-    scale: {
+    '--_cl-select-popup-scale': {
       default: 1,
-      ':where([data-starting-style], [data-ending-style])': 0.96,
+      ':where([data-starting-style], [data-ending-style])': POPUP_ENTER_SCALE,
       '@media (prefers-reduced-motion: reduce)': {
         default: 1,
         ':where([data-starting-style], [data-ending-style])': 1,
       },
     },
+    scale: popupScale,
     transformOrigin: 'var(--cl-anchor-origin, center)',
     transitionDuration: {
       default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
       ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
     transitionProperty: {
-      default: 'opacity, scale',
+      default: 'opacity, --_cl-select-popup-scale',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
     transitionTimingFunction: {
@@ -150,6 +166,11 @@ export const option = stylex.create({
   described: {
     paddingBlock: space['2'],
   },
+  overlaid: {
+    paddingInlineEnd: `calc(1px + ${space['2']})`,
+    // A `md` Button's 13px to its text, and the tighter 9px it gives a trailing icon.
+    paddingInlineStart: `calc(1px + ${space['3']})`,
+  },
 });
 
 export const content = stylex.create({
@@ -165,6 +186,17 @@ export const description = stylex.create({
   base: {
     color: colorVars['--cl-color-foreground-secondary'],
     fontWeight: fontWeightVars['--cl-font-normal'],
+  },
+});
+
+// The popup scales about the trigger's center, which is this row's center: undoing it there holds
+// the row still.
+export const selectedOption = stylex.create({
+  counterScale: {
+    scale: `calc(1 / ${popupScale})`,
+    // About its center, the last row reaches 0.67px past the end of the list — enough to tip the
+    // viewport into scrollable. The start edge never is, so the first row needs nothing.
+    transformOrigin: { default: null, ':where(:last-child)': '50% 100%' },
   },
 });
 
