@@ -385,7 +385,7 @@ export type CreateExternalAccountParams = {
    */
   enterpriseConnectionId?: string;
   /**
-   * The full URL or path that the OAuth provider should redirect to, on successful authorization on their part. Typically, this will be a simple `/sso-callback` route that calls [`Clerk.handleRedirectCallback`](https://clerk.com/docs/reference/objects/clerk#handle-redirect-callback) or mounts the [`<AuthenticateWithRedirectCallback />`](https://clerk.com/docs/reference/components/control/authenticate-with-redirect-callback) component. See the [custom flow](https://clerk.com/docs/guides/development/custom-flows/authentication/oauth-connections) for implementation details.
+   * The full URL or path that the OAuth provider should redirect to, on successful authorization on their part. Typically, this will be a simple `/sso-callback` route that calls [`Clerk.handleRedirectCallback`](https://clerk.com/docs/reference/objects/clerk#handleredirectcallback) or mounts the [`<AuthenticateWithRedirectCallback />`](https://clerk.com/docs/reference/components/control/authenticate-with-redirect-callback) component. See the [custom flow](https://clerk.com/docs/guides/development/custom-flows/authentication/oauth-connections) for implementation details.
 
    */
   redirectUrl?: string;

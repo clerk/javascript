@@ -13,6 +13,7 @@ export { getClerkInstance } from './provider/singleton';
 export * from './provider/ClerkProvider';
 export * from './hooks';
 export * from './components';
+export * from './biometric-credentials';
 export * from './trusted-devices';
 
 // Override Clerk React error thrower to show that errors come from @clerk/expo

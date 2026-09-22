@@ -16,6 +16,7 @@ import {
   disabledEmailAddressAttribute,
   disabledOrganizationAPIKeysFeature,
   disabledOrganizationsFeature,
+  disabledSelfServeDirectorySyncFeature,
   disabledSelfServeSSOFeature,
   disabledUserAPIKeysFeature,
   isSignedInAndSingleSessionModeEnabled,
@@ -99,6 +100,7 @@ import type {
   LoadedClerk,
   NavigateOptions,
   OAuthApplicationNamespace,
+  OAuthDeviceVerificationProps,
   OAuthTransport,
   OrganizationListProps,
   OrganizationProfileProps,
@@ -788,10 +790,16 @@ export class Clerk implements ClerkInterface {
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       this.#setTransitiveState();
 
-      if (this.#options.experimental?.persistClient ?? true) {
-        await this.client.removeSessions();
-      } else {
-        await this.client.destroy();
+      try {
+        if (this.#options.experimental?.persistClient ?? true) {
+          await this.client.removeSessions();
+        } else {
+          await this.client.destroy();
+        }
+      } catch (err) {
+        if (!isClerkRuntimeError(err) || err.code !== 'network_error') {
+          throw err;
+        }
       }
 
       await executeSignOut();
@@ -1545,6 +1553,36 @@ export class Clerk implements ClerkInterface {
     return this.unmountOAuthConsent(node);
   };
 
+  public __internal_mountOAuthDeviceVerification = (node: HTMLDivElement, props?: OAuthDeviceVerificationProps) => {
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderOAuthDeviceVerificationComponentWhenUserDoesNotExist, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'OAuthDeviceVerification';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'oauthDeviceVerification',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  public __internal_unmountOAuthDeviceVerification = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
   /**
    * Mount an API keys component at the target element.
    * @param targetNode Target to mount the APIKeys component.
@@ -1678,6 +1716,77 @@ export class Clerk implements ClerkInterface {
    * @hidden
    */
   public __internal_unmountConfigureSSO = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
+   * Mount the Directory Sync onboarding component at the target element.
+   * Directory Sync provisions members through the organization's SSO connection,
+   * so it requires organizations to be enabled and the self-serve Directory Sync
+   * feature to be turned on for the instance.
+   *
+   * @param targetNode Target to mount the ConfigureDirectorySync component.
+   * @param props Configuration parameters.
+   * @hidden
+   */
+  public __internal_mountConfigureDirectorySync = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'ConfigureDirectorySync',
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('ConfigureDirectorySync'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
+      return;
+    }
+
+    const userExists = !noUserExists(this);
+    if (noOrganizationExists(this) && userExists) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.createCannotRenderComponentWhenOrgDoesNotExist('ConfigureDirectorySync'), {
+          code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (disabledSelfServeDirectorySyncFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderConfigureDirectorySyncComponentWhenDisabled, {
+          code: CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'ConfigureDirectorySync';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'configureDirectorySync',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  /**
+   * Unmount the Directory Sync onboarding component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ConfigureDirectorySync component from.
+   * @hidden
+   */
+  public __internal_unmountConfigureDirectorySync = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
@@ -3360,7 +3469,11 @@ export class Clerk implements ClerkInterface {
         const initEnvironmentPromise = Environment.getInstance()
           .fetch({ touch: shouldTouchEnv })
           .then(res => this.updateEnvironment(res))
-          .catch(() => {
+          .catch(err => {
+            if (isError(err, 'dev_browser_unauthenticated')) {
+              throw err;
+            }
+
             ++initializationDegradedCounter;
             const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
               CLERK_ENVIRONMENT_STORAGE_ENTRY,
@@ -3422,7 +3535,11 @@ export class Clerk implements ClerkInterface {
             });
         };
 
-        const [, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+        const [environmentResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+        if (environmentResult.status === 'rejected') {
+          throw environmentResult.reason;
+        }
+
         if (clientResult.status === 'rejected') {
           const e = clientResult.reason;
 

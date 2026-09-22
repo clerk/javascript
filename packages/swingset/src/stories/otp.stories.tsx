@@ -1,9 +1,9 @@
-import { Otp } from '@clerk/headless/otp';
+import { Otp } from '@clerk/mosaic/primitives/otp';
 
 import type { StoryMeta } from '@/lib/types';
 
 // Headless primitives ship no styles. This single demo renders the primitive raw —
-// unstyled — so it faithfully reflects what `@clerk/headless` provides: per-character
+// unstyled — so it faithfully reflects what the primitive provides: per-character
 // slots, focus advancing as you type, paste distribution, and the `data-*` attributes
 // each part emits, with zero appearance. It is embedded once into the overview via
 // `<Story>` in the MDX (the one thing prose can't convey: that typing, deleting, and
@@ -12,8 +12,9 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'OTP',
-  source: 'packages/headless/src/primitives/otp/index.ts',
+  source: 'packages/mosaic/src/primitives/otp/index.ts',
 };
 
 function Slots() {

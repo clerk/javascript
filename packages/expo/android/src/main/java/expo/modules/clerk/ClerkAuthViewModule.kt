@@ -10,12 +10,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.clerk.api.Clerk
 import com.clerk.api.FrameworkIntegrationApi
 import com.clerk.api.ui.ClerkDesign
@@ -100,6 +103,16 @@ class ClerkAuthNativeView(context: Context, appContext: AppContext) : ClerkCompo
 
   @Composable
   private fun AuthContent() {
+    // An AuthView composed before Clerk has loaded the environment renders no
+    // form and never recovers, so recreate it once loaded.
+    val isInitialized by Clerk.isInitialized.collectAsStateWithLifecycle()
+    key(isInitialized) {
+      AuthContentBody()
+    }
+  }
+
+  @Composable
+  private fun AuthContentBody() {
     AuthView(
       modifier = Modifier.fillMaxSize(),
       clerkTheme = authTheme(),

@@ -1,0 +1,165 @@
+import * as stylex from '@stylexjs/stylex';
+
+import {
+  colorVars,
+  durationVars,
+  easingVars,
+  fontFamilyVars,
+  fontWeightVars,
+  radiusVars,
+  shadowVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
+
+// Positioning is applied inline by the headless positioner; this only clears the
+// focus outline it receives. No z-index: the portalled, fixed positioner already
+// paints above page content, and consumers own their own stacking order.
+export const positioner = stylex.create({
+  base: {
+    outline: 'none',
+  },
+});
+
+export const popup = stylex.create({
+  base: {
+    borderRadius: radiusVars['--cl-radius-lg'],
+    outline: 'none',
+    backgroundColor: colorVars['--cl-color-background'],
+    boxShadow: shadowVars['--cl-shadow-md'],
+    color: colorVars['--cl-color-foreground'],
+    opacity: {
+      default: 1,
+      ':where([data-starting-style], [data-ending-style])': 0,
+    },
+    // The reduced-motion scale value goes too, or the exit snaps out of 96%.
+    scale: {
+      default: 1,
+      ':where([data-starting-style], [data-ending-style])': 0.96,
+      '@media (prefers-reduced-motion: reduce)': {
+        default: 1,
+        ':where([data-starting-style], [data-ending-style])': 1,
+      },
+    },
+    // `--cl-transform-origin` is set on the positioner by the headless `cssVars`
+    // middleware, so the popup scales out of the edge nearest its trigger.
+    transformOrigin: 'var(--cl-transform-origin)',
+    transitionDuration: {
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
+    },
+    transitionProperty: {
+      default: 'opacity, scale',
+      '@media (prefers-reduced-motion: reduce)': 'opacity',
+    },
+    transitionTimingFunction: {
+      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
+    },
+    maxHeight: 'var(--cl-available-height)',
+    // Capped, or the popup grows to whatever its longest item says and `Menu.Label` never
+    // reaches the width it has to truncate at.
+    maxWidth: 'min(18rem, calc(100vw - 2rem))',
+    minWidth: '12.5rem',
+  },
+});
+
+// The popup supplies the chrome and the height cap; this scrolls inside it. They cannot be
+// one element: `scrollAreaViewport()` carries a `mask-image` for the fade, and a mask clips
+// the element's whole rendering — so on the popup it would eat the background and the drop
+// shadow along with the overflowing rows. Same split the Dialog panel makes.
+export const viewport = stylex.create({
+  base: {
+    // The inset belongs to the scrolling box, not the popup: `Menu.Separator` bleeds through it
+    // with a negative margin, and from inside a viewport that clips its inline axis a bleed past
+    // the popup's own padding would be cut off instead.
+    padding: space['0.5'],
+    gap: space['0.5'],
+    display: 'flex',
+    flexDirection: 'column',
+  },
+});
+
+export const item = stylex.create({
+  base: {
+    borderRadius: '0.375rem',
+    borderStyle: 'none',
+    gap: space['1'],
+    outline: 'none',
+    paddingInline: space['1'],
+    alignItems: 'center',
+    backgroundColor: {
+      default: 'transparent',
+      ':is([data-active])': colorVars['--cl-color-neutral-alpha-100'],
+      '@media (hover: hover)': {
+        ':hover': colorVars['--cl-color-neutral-alpha-100'],
+      },
+    },
+    cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
+    display: 'flex',
+    // The viewport is a height-capped flex column: without this the rows squash to fit the cap
+    // instead of overflowing it, and the menu silently loses both its row height and its scroll.
+    flexShrink: 0,
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    opacity: { default: 1, ':is([data-disabled])': 0.5 },
+    outlineOffset: 0,
+    position: 'relative',
+    textAlign: 'start',
+    height: space['8'],
+    width: '100%',
+    '::before': {
+      insetBlock: `calc(-1 * ${space['0.5']})`,
+      insetInline: `calc(-1 * ${space['0.5']})`,
+      content: '""',
+      position: 'absolute',
+    },
+  },
+
+  negative: {
+    backgroundColor: {
+      default: 'transparent',
+      ':is([data-active])': colorVars['--cl-color-negative-alpha-200'],
+      '@media (hover: hover)': {
+        ':hover': colorVars['--cl-color-negative-alpha-200'],
+      },
+    },
+    color: colorVars['--cl-color-negative'],
+  },
+});
+
+export const media = stylex.create({
+  base: {
+    alignItems: 'center',
+    aspectRatio: '1/1',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+  },
+  xs: { width: space['4'] },
+  sm: { width: space['6'] },
+});
+
+// The item lays its children out in one flat row, so the label is what has to take the space
+// between the media and whatever trails it, rather than the row spacing the three evenly.
+// `minWidth: 0` is what lets it shrink past its text and truncate instead of pushing the row wide.
+export const label = stylex.create({
+  base: {
+    paddingInline: space['1'],
+    flexGrow: 1,
+    minWidth: 0,
+  },
+});
+
+export const separator = stylex.create({
+  base: {
+    // Full-bleed across the popup: cancel the viewport's inline padding.
+    marginBlock: space['0.5'],
+    marginInline: `calc(-1 * ${space['0.5']})`,
+    backgroundColor: colorVars['--cl-color-border'],
+    blockSize: '1px',
+    flexShrink: 0,
+  },
+});

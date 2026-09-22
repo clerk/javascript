@@ -1,32 +1,15 @@
-import { errorThrower } from '../utils/errors';
+import { deprecated } from '@clerk/shared/deprecated';
+import { useMemo } from 'react';
+
+import { useBiometricCredentials } from '../biometric-credentials/useBiometricCredentials';
+import { toTrustedDevices } from './compatibility';
 import type { UseTrustedDevicesReturn } from './types';
 
-const unsupportedAvailability = {
-  isAvailable: false,
-  unavailableReason: 'unsupported_platform',
-} as const;
-
-function unsupported(): never {
-  return errorThrower.throw('Biometric trusted devices are currently only available on iOS and Android.');
-}
-
-function rejectUnsupported(): Promise<never> {
-  return Promise.resolve().then(unsupported);
-}
-
-const trustedDevices: UseTrustedDevicesReturn = Object.freeze({
-  getAvailability: () => Promise.resolve(unsupportedAvailability),
-  list: rejectUnsupported,
-  enroll: rejectUnsupported,
-  revoke: rejectUnsupported,
-  signIn: rejectUnsupported,
-});
-
 /**
- * Accesses biometric trusted-device enrollment and sign-in.
- *
- * Trusted devices are currently supported on iOS and Android.
+ * @deprecated Use `useBiometricCredentials()` instead. This hook will be removed in the next major version.
  */
 export function useTrustedDevices(): UseTrustedDevicesReturn {
-  return trustedDevices;
+  deprecated('useTrustedDevices', 'Use `useBiometricCredentials()` instead.');
+  const biometricCredentials = useBiometricCredentials();
+  return useMemo(() => toTrustedDevices(biometricCredentials), [biometricCredentials]);
 }

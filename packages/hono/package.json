@@ -1,6 +1,6 @@
 {
   "name": "@clerk/hono",
-  "version": "0.1.73",
+  "version": "0.1.79",
   "description": "Clerk SDK for Hono",
   "keywords": [
     "auth",
@@ -56,7 +56,9 @@
   },
   "main": "./dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map"
   ],
   "scripts": {
     "build": "tsdown",
@@ -76,7 +78,7 @@
     "@clerk/shared": "workspace:^"
   },
   "devDependencies": {
-    "hono": "^4.12.27"
+    "hono": "^4.12.34"
   },
   "peerDependencies": {
     "hono": ">=4"

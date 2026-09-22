@@ -1,5 +1,54 @@
 # Change Log
 
+## 2.1.69
+
+### Patch Changes
+
+- Updated dependencies [[`855c24f`](https://github.com/clerk/javascript/commit/855c24f451314c6b8a586daf422b8463638f1f37), [`cb6a376`](https://github.com/clerk/javascript/commit/cb6a376c5e34fa7869821f554c73f2968019776f)]:
+  - @clerk/shared@4.33.0
+  - @clerk/backend@3.18.1
+
+## 2.1.68
+
+### Patch Changes
+
+- Updated dependencies [[`b5a3abe`](https://github.com/clerk/javascript/commit/b5a3abe19629dc00839fecf03b364dff1b4e2e2e), [`ddf9afc`](https://github.com/clerk/javascript/commit/ddf9afc6dc82528d28223ba9b775f8aa6647bbd7), [`4e1e432`](https://github.com/clerk/javascript/commit/4e1e43201fbb6cf041b4d4a95851b058a1aef807), [`39782e3`](https://github.com/clerk/javascript/commit/39782e3abf25363053866dae1996eaaaf5e91b42), [`9801ed5`](https://github.com/clerk/javascript/commit/9801ed5645dc62d58f36cef064feb314448b2502)]:
+  - @clerk/shared@4.32.0
+  - @clerk/backend@3.18.0
+
+## 2.1.67
+
+### Patch Changes
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`452107a`](https://github.com/clerk/javascript/commit/452107a4cfe06ce5d72b008ddaf670ea604e857d), [`7ea009f`](https://github.com/clerk/javascript/commit/7ea009fda71c052ac6e4d712830baa856f347954), [`06be25f`](https://github.com/clerk/javascript/commit/06be25fadde3d068f7686b565848a02d832f6211), [`c47e9cb`](https://github.com/clerk/javascript/commit/c47e9cb5e74de91bdec17111ba7b01d3e2ea459a), [`1601100`](https://github.com/clerk/javascript/commit/16011007218787509fd8457081ed5640e61bec48)]:
+  - @clerk/shared@4.31.1
+  - @clerk/backend@3.17.2
+
+## 2.1.66
+
+### Patch Changes
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/shared@4.31.0
+  - @clerk/backend@3.17.1
+
+## 2.1.65
+
+### Patch Changes
+
+- Updated dependencies [[`c4f9883`](https://github.com/clerk/javascript/commit/c4f98834434edd7821f5c6f344583c07e30013cd), [`eef0ceb`](https://github.com/clerk/javascript/commit/eef0ceb97926688384ec480afe44199b16f13993)]:
+  - @clerk/backend@3.17.0
+
+## 2.1.64
+
+### Patch Changes
+
+- Updated dependencies [[`9c5e93c`](https://github.com/clerk/javascript/commit/9c5e93c9ea93561242ab26ff0e2b100940ac6308), [`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/backend@3.16.13
+  - @clerk/shared@4.30.2
+
 ## 2.1.63
 
 ### Patch Changes

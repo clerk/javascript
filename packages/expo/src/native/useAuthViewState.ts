@@ -34,9 +34,9 @@ function isNativeAuthFlowState(state: NativeAuthFlowState | undefined): state is
 }
 
 /**
- * Reports when authentication and an optional trusted-device enrollment prompt are complete.
+ * Reports when authentication and an optional biometric-credential enrollment prompt are complete.
  *
- * Use this hook when trusted-device enrollment prompts are enabled and a
+ * Use this hook when biometric-credential enrollment prompts are enabled and a
  * non-dismissible root `AuthView` must remain mounted until the prompt finishes.
  * On platforms without native auth-flow completion state, it falls back to the
  * JS session state.

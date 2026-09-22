@@ -127,6 +127,16 @@ export function storage(options: StorageOptions = {}): TokenStorage {
     name: options.name ?? 'clerk-tokens',
     ...(options.path ? { cwd: options.path } : {}),
   });
+  const memoryFallback = new Map<string, string>();
+  // IPC requests can resolve out of order, so only the latest mutation may update storage.
+  const mutationVersions = new Map<string, number>();
+
+  const beginMutation = (key: string) => {
+    const version = (mutationVersions.get(key) ?? 0) + 1;
+    mutationVersions.set(key, version);
+    return version;
+  };
+  const isCurrentMutation = (key: string, version: number) => (mutationVersions.get(key) ?? 0) === version;
 
   let cachedCipher: Cipher | null = null;
   let resolving: Promise<Cipher | null> | null = null;
@@ -155,6 +165,11 @@ export function storage(options: StorageOptions = {}): TokenStorage {
 
   return {
     async getItem(key) {
+      const fallback = memoryFallback.get(key);
+      if (fallback !== undefined) {
+        return fallback;
+      }
+
       const stored = store.get(key);
 
       if (!stored) {
@@ -166,6 +181,7 @@ export function storage(options: StorageOptions = {}): TokenStorage {
       }
 
       if (stored.startsWith(ENCRYPTED_PREFIX)) {
+        const mutationVersion = mutationVersions.get(key) ?? 0;
         const cipher = await getCipher();
 
         // No usable OS encryption, preserve entry.
@@ -181,7 +197,10 @@ export function storage(options: StorageOptions = {}): TokenStorage {
           if (shouldReEncrypt) {
             // OS key has rotated, persist with new value
             try {
-              store.set(key, ENCRYPTED_PREFIX + (await cipher.encrypt(value)));
+              const encrypted = await cipher.encrypt(value);
+              if (isCurrentMutation(key, mutationVersion)) {
+                store.set(key, ENCRYPTED_PREFIX + encrypted);
+              }
             } catch {
               // keep the existing payload; it still decrypts for now
             }
@@ -199,15 +218,27 @@ export function storage(options: StorageOptions = {}): TokenStorage {
       return null;
     },
     async setItem(key, value) {
+      const mutationVersion = beginMutation(key);
       const cipher = await getCipher();
+
+      if (!isCurrentMutation(key, mutationVersion)) {
+        return;
+      }
 
       if (!cipher) {
         if (options.unencryptedFallback) {
-          warnOnce(
-            'Clerk: OS encryption is unavailable; falling back to unencrypted storage. Session tokens are being stored unencrypted on local disk.',
-          );
-          store.set(key, RAW_PREFIX + value);
+          try {
+            store.set(key, RAW_PREFIX + value);
+            memoryFallback.delete(key);
+            warnOnce(
+              'Clerk: OS encryption is unavailable; falling back to unencrypted storage. Tokens are being stored unencrypted on local disk.',
+            );
+          } catch {
+            memoryFallback.set(key, value);
+            warnOnce('Clerk: failed to persist a token; it will only be available until the app exits.');
+          }
         } else {
+          memoryFallback.set(key, value);
           warnOnce(
             'Clerk: OS encryption is unavailable and unencryptedFallback is not enabled, so tokens are not being persisted. The user will be signed out on the next launch. Pass `storage({ unencryptedFallback: true })` to persist unencrypted (less secure).',
           );
@@ -216,13 +247,23 @@ export function storage(options: StorageOptions = {}): TokenStorage {
       }
 
       try {
-        store.set(key, ENCRYPTED_PREFIX + (await cipher.encrypt(value)));
+        const encrypted = await cipher.encrypt(value);
+        if (!isCurrentMutation(key, mutationVersion)) {
+          return;
+        }
+        store.set(key, ENCRYPTED_PREFIX + encrypted);
+        memoryFallback.delete(key);
       } catch {
-        // Encryption is available but encryption failed
-        warnOnce('Clerk: failed to encrypt the session token; it was not persisted.');
+        if (!isCurrentMutation(key, mutationVersion)) {
+          return;
+        }
+        memoryFallback.set(key, value);
+        warnOnce('Clerk: failed to securely persist a token; it will only be available until the app exits.');
       }
     },
     removeItem(key) {
+      beginMutation(key);
+      memoryFallback.delete(key);
       store.delete(key);
     },
   };

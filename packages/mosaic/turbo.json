@@ -1,0 +1,28 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "inputs": [
+        "package.json",
+        "*.d.ts",
+        "src/**",
+        "tsconfig.json",
+        "tsconfig.base.json",
+        "tsdown.config.mts",
+        "tsdown.css.config.mts",
+        "stylex-lightningcss.config.mjs",
+        "scripts/**",
+        "!**/*.test.*",
+        "!**/test/**",
+        "!**/tests/**",
+        "!**/__tests__/**",
+        "!**/__mocks__/**",
+        "!**/__snapshots__/**",
+        "!coverage/**",
+        "!examples/**",
+        "!node_modules/**"
+      ],
+      "outputs": ["dist/**"]
+    }
+  }
+}

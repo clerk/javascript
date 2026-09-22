@@ -1,9 +1,9 @@
-import { Tabs } from '@clerk/headless/tabs';
+import { Tabs } from '@clerk/mosaic/primitives/tabs';
 
 import type { StoryMeta } from '@/lib/types';
 
 // Headless primitives ship no styles. This single demo renders the primitive raw —
-// unstyled — so it faithfully reflects what `@clerk/headless` provides: behavior, state,
+// unstyled — so it faithfully reflects what the primitive provides: behavior, state,
 // and ARIA wiring via the `data-*` attributes each part emits, with zero appearance.
 // It is embedded once into the overview via `<Story>` in the MDX (the one thing prose
 // can't convey: that selecting a tab swaps the panel). There is no interactive knob canvas
@@ -11,8 +11,9 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Tabs',
-  source: 'packages/headless/src/primitives/tabs/index.ts',
+  source: 'packages/mosaic/src/primitives/tabs/index.ts',
 };
 
 export function Default() {

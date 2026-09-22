@@ -197,6 +197,7 @@ export interface EmailJSON extends ClerkResourceJSON {
   status?: string;
   data?: Record<string, any> | null;
   delivered_by_clerk: boolean;
+  suppression_reason?: string | null;
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {
@@ -962,6 +963,7 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   expiration: number | null;
   created_at: number;
   updated_at: number;
+  aud?: string[];
 }
 
 export interface BillingPayerJSON extends ClerkResourceJSON {

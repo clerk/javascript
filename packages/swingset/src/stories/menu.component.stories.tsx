@@ -1,5 +1,6 @@
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import { Menu } from '@clerk/ui/mosaic/components/menu';
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Icon } from '@clerk/mosaic/components/icon';
+import { Menu } from '@clerk/mosaic/components/menu';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -9,31 +10,169 @@ export { default as __source } from './menu.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Menu',
-  source: 'packages/ui/src/mosaic/components/menu/menu.tsx',
+  source: 'packages/mosaic/src/components/menu/menu.tsx',
 };
 
 export function Default() {
   return (
     <Menu.Root>
       <Menu.Trigger />
-      <Menu.Content>
+      <Menu.Popup>
         <Menu.Item label='Add workspace'>
-          <Icon name='plus' />
-          Add workspace
+          <Menu.Media>
+            <Icon name='plus' />
+          </Menu.Media>
+          <Menu.Label>Add workspace</Menu.Label>
         </Menu.Item>
         <Menu.Item label='Sign out'>
-          <Icon name='log-out' />
-          Sign out
+          <Menu.Media>
+            <Icon name='log-out' />
+          </Menu.Media>
+          <Menu.Label>Sign out</Menu.Label>
         </Menu.Item>
         <Menu.Item
           label='Delete user'
           color='negative'
         >
-          <Icon name='close' />
-          Delete user
+          <Menu.Media>
+            <Icon name='x' />
+          </Menu.Media>
+          <Menu.Label>Delete user</Menu.Label>
         </Menu.Item>
-      </Menu.Content>
+      </Menu.Popup>
+    </Menu.Root>
+  );
+}
+
+const accounts = [
+  { active: true, identifier: 'colin@clerk.dev', initial: 'C' },
+  { active: false, identifier: 'braden.wiggins@a-very-long-domain.example', initial: 'B' },
+];
+
+export function Accounts() {
+  return (
+    <Menu.Root>
+      <Menu.Trigger>Switch account</Menu.Trigger>
+      <Menu.Popup>
+        {accounts.map(account => (
+          <Menu.Item
+            key={account.identifier}
+            label={account.identifier}
+          >
+            <Menu.Media>
+              <Avatar.Root
+                shape='circle'
+                size='fit'
+              >
+                <Avatar.Fallback>{account.initial}</Avatar.Fallback>
+              </Avatar.Root>
+            </Menu.Media>
+            <Menu.Label>{account.identifier}</Menu.Label>
+            {account.active ? (
+              <Icon
+                name='checkmark'
+                size='sm'
+              />
+            ) : null}
+          </Menu.Item>
+        ))}
+      </Menu.Popup>
+    </Menu.Root>
+  );
+}
+
+const workspaces = [
+  'Ashgrove',
+  'Bramblewood',
+  'Cedar Hollow',
+  'Dunmore Flats',
+  'Elderbrook',
+  'Fernwick',
+  'Glasswater',
+  'Hallowfield',
+  'Ironvale',
+  'Juniper Reach',
+  'Kestrel Point',
+  'Larkspur Mill',
+  'Marrowden',
+  'Northgate',
+  'Oakenshire',
+  'Pinecrest',
+  'Quarryfield',
+  'Redhollow',
+  'Stonebridge',
+  'Thornbury',
+  'Underhill',
+  'Vellamere',
+  'Westmarch',
+  'Yarrowdale',
+  'Alderwick',
+  'Blackthorn',
+  'Coldspring',
+  'Dovecote',
+  'Eastfen',
+  'Foxglove',
+  'Greyholt',
+  'Harrowgate',
+  'Inglewood',
+  'Jessamine',
+  'Kirkstall',
+  'Lindenfell',
+  'Mossbank',
+  'Nettlefold',
+  'Oxbow Landing',
+  'Peartree Row',
+  'Quillhaven',
+  'Ravensmoor',
+  'Saltmarsh',
+  'Tanglewood',
+  'Ullswater',
+  'Vinequarter',
+  'Wrenfield',
+  'Yewbarrow',
+  'Amberlyn',
+  'Brookhaven',
+  'Chalkhill',
+  'Dryden Cross',
+  'Ellerby',
+  'Fallowmere',
+  'Gorsecliff',
+  'Hazelmoor',
+  'Ivybridge',
+  'Jackdaw Lane',
+  'Kilnwood',
+  'Longmeadow',
+];
+
+/**
+ * More rows than the popup can show. The popup caps at the available height and the rows scroll
+ * inside it, so this is the story where the ScrollArea treatment is visible: the fade at whichever
+ * edge still has content past it, and the thumb that lifts as the pointer enters.
+ */
+export function Overflowing() {
+  return (
+    <Menu.Root>
+      <Menu.Trigger>Switch workspace</Menu.Trigger>
+      <Menu.Popup>
+        {workspaces.map(workspace => (
+          <Menu.Item
+            key={workspace}
+            label={workspace}
+          >
+            <Menu.Media>
+              <Avatar.Root
+                shape='square'
+                size='fit'
+              >
+                <Avatar.Fallback>{workspace[0]}</Avatar.Fallback>
+              </Avatar.Root>
+            </Menu.Media>
+            <Menu.Label>{workspace}</Menu.Label>
+          </Menu.Item>
+        ))}
+      </Menu.Popup>
     </Menu.Root>
   );
 }
