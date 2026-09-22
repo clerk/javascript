@@ -16,6 +16,7 @@ import type { UserProfileEditUsernameField } from './user-profile-edit-username.
 
 type UserProfileAccountSectionData = Pick<
   UserProfileAccountSectionViewProps,
+  | 'allowMultipleAccounts'
   | 'name'
   | 'imageUrl'
   | 'hasImage'
@@ -88,6 +89,7 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
 
   return {
     status: 'ready',
+    allowMultipleAccounts: true,
     name: getFullName(user),
     firstName: user.firstName ?? '',
     lastName: user.lastName ?? '',
