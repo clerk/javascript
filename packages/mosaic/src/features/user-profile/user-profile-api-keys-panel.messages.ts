@@ -13,6 +13,7 @@ export const userProfileApiKeysPanelMessages = {
   select: 'Select {name}',
   revokeTitle: 'Revoke {name}?',
   revokeDescription: 'This API key will stop working immediately. This action cannot be undone.',
+  revokeFieldLabel: 'Type “{name}” below to continue',
   revokeError: 'Something went wrong. Please try again.',
   cancel: 'Cancel',
   title: 'API Keys',
