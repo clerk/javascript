@@ -376,7 +376,7 @@ export type ProfilePageTitleProps = MosaicComponentProps<'div'>;
  * sheet. Anywhere else — the wide layout, or a page rendered on its own — it is the heading alone.
  *
  * The caret sits `vertical-align: middle`, which CSS defines as the box's midpoint on the parent's
- * baseline plus half its x-height: optically centred on the lowercase letters rather than on the
+ * baseline plus half its x-height: optically centered on the lowercase letters rather than on the
  * line box. That needs an inline formatting context, so the button is `display: inline`.
  */
 const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(function ProfilePageTitle(

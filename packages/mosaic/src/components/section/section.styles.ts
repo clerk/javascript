@@ -129,7 +129,7 @@ export const styles = stylex.create({
     justifyContent: 'flex-end',
   },
   // Sits under the row's item rather than inside its content, so a message never shifts the
-  // media and actions off the centre line they share.
+  // media and actions off the center line they share.
   error: {
     width: '100%',
   },
