@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, easingVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, durationVars, easingVars, fontFamilyVars, space, typeScaleVars } from '../../tokens.stylex';
 
 const reduceMotion = '@media (prefers-reduced-motion: reduce)' as const;
 
@@ -31,13 +31,15 @@ export const styles = stylex.create({
       ':where([data-selected])': colorVars['--cl-color-foreground'],
       '@media (hover: hover)': {
         default: null,
-        ':hover:not([data-selected])': colorVars['--cl-color-foreground'],
+        ':hover:not([data-selected]):not([data-disabled])': colorVars['--cl-color-foreground'],
       },
     },
-    cursor: 'pointer',
+    cursor: { default: 'pointer', ':is([data-disabled])': 'not-allowed' },
     display: 'inline-flex',
+    fontFamily: fontFamilyVars['--cl-font-family-sans'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    opacity: { default: 1, ':is([data-disabled])': 0.5 },
     paddingBottom: space['3'],
     paddingTop: space['2.5'],
   },
