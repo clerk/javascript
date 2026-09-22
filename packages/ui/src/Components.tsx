@@ -292,6 +292,7 @@ const componentNodes = Object.freeze({
   SignUp: 'signUpModal',
   SignIn: 'signInModal',
   UserProfile: 'userProfileModal',
+  UserVerification: 'userVerificationModal',
   OrganizationProfile: 'organizationProfileModal',
   CreateOrganization: 'createOrganizationModal',
   Waitlist: 'waitlistModal',
