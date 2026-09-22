@@ -3,7 +3,7 @@
 import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 
 import { ToastContext, type ToastContextValue } from './toast-context';
-import { createToastManager, type ExternalToastManager, isActive, type ToastObject } from './toast-manager';
+import { createToastManager, type ExternalToastManager, isActive, isAnchored, type ToastObject } from './toast-manager';
 
 export interface ToastProviderProps {
   children: ReactNode;
@@ -18,7 +18,7 @@ export interface ToastProviderProps {
 function applyLimit(toasts: ToastObject[], limit: number): ToastObject[] {
   let active = 0;
   return toasts.map(toast => {
-    if (!isActive(toast)) {
+    if (!isActive(toast) || isAnchored(toast)) {
       return toast;
     }
     active += 1;
@@ -99,7 +99,8 @@ export function ToastProvider(props: ToastProviderProps) {
 
   const expanded = hovering || focused;
   const paused = expanded || !windowFocused || !documentVisible;
-  const frontmost = toasts.find(isActive) ?? toasts[0];
+  const stacked = toasts.filter(t => !isAnchored(t));
+  const frontmost = stacked.find(isActive) ?? stacked[0];
 
   const contextValue = useMemo<ToastContextValue>(
     () => ({

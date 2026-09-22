@@ -4,7 +4,6 @@ import React from 'react';
 import type { IconName } from '../../icons/registry';
 import type { ToastObject } from '../../primitives/toast';
 import { Toast as Primitive } from '../../primitives/toast';
-import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { tooltipSurface } from '../../utils/tooltip-surface.styles';
@@ -50,31 +49,33 @@ function ToastIndicator(props: { type: ToastType; indicator: Indicator }) {
   );
 }
 
-function DefaultToast(props: { toast: ToastObject }) {
-  const { toast } = props;
+function StackedToast(props: { toast: ToastObject; zIndex: number }) {
+  const { toast, zIndex } = props;
   const type = toToastType(toast.type);
 
   return (
     <Primitive.Root
       toast={toast}
-      {...mergeStyleProps(themeProps('toast-root'), stylex.props(reset.base, styles.root))}
+      {...mergeStyleProps(themeProps('toast-root'), stylex.props(reset.base, styles.root, styles.stackOrder(zIndex)))}
     >
-      {type && (
-        <span
-          aria-hidden='true'
-          {...mergeStyleProps(themeProps('toast-icon', { type }), stylex.props(styles.icon, iconColors[type]))}
-        >
-          <ToastIndicator
-            type={type}
-            indicator={DEFAULT_INDICATOR}
-          />
-        </span>
-      )}
       <Primitive.Content {...mergeStyleProps(themeProps('toast-content'), stylex.props(reset.base, styles.content))}>
-        <Primitive.Title {...mergeStyleProps(themeProps('toast-title'), stylex.props(reset.base, styles.title))} />
-        <Primitive.Description
-          {...mergeStyleProps(themeProps('toast-description'), stylex.props(reset.base, styles.description))}
-        />
+        {type && (
+          <span
+            aria-hidden='true'
+            {...mergeStyleProps(themeProps('toast-icon', { type }), stylex.props(styles.icon, iconColors[type]))}
+          >
+            <ToastIndicator
+              type={type}
+              indicator={DEFAULT_INDICATOR}
+            />
+          </span>
+        )}
+        <div {...mergeStyleProps(themeProps('toast-text'), stylex.props(reset.base, styles.text))}>
+          <Primitive.Title {...mergeStyleProps(themeProps('toast-title'), stylex.props(reset.base, styles.title))} />
+          <Primitive.Description
+            {...mergeStyleProps(themeProps('toast-description'), stylex.props(reset.base, styles.description))}
+          />
+        </div>
       </Primitive.Content>
     </Primitive.Root>
   );
@@ -92,7 +93,10 @@ function AnchoredToast(props: { toast: ToastObject }) {
     >
       <Primitive.Root
         toast={toast}
-        {...mergeStyleProps(themeProps('toast-anchored-root'), stylex.props(reset.base, tooltipSurface.base))}
+        {...mergeStyleProps(
+          themeProps('toast-anchored-root'),
+          stylex.props(reset.base, tooltipSurface.base, styles.anchoredRoot),
+        )}
       >
         <Primitive.Title {...mergeStyleProps(themeProps('toast-title'), stylex.props(reset.base))} />
         <Primitive.Description {...mergeStyleProps(themeProps('toast-description'), stylex.props(reset.base))} />
@@ -112,53 +116,39 @@ function AnchoredToast(props: { toast: ToastObject }) {
   );
 }
 
-export type ToastViewportProps = MosaicComponentProps<'div'>;
-
-const Viewport = React.forwardRef<HTMLDivElement, ToastViewportProps>(function ToastViewport({ xstyle, ...rest }, ref) {
+function ToastViewport() {
   const { toasts } = Primitive.useToastManager();
+  const stacked = toasts.filter(toast => !Primitive.isAnchored(toast));
+  const anchored = toasts.filter(Primitive.isAnchored);
+
   return (
     <Primitive.Portal>
-      <Primitive.Viewport
-        ref={ref}
-        {...mergeStyleProps(themeProps('toast-viewport'), stylex.props(reset.base, styles.viewport, xstyle), rest)}
-      >
-        {toasts.map(toast => (
-          <DefaultToast
+      <Primitive.Viewport {...mergeStyleProps(themeProps('toast-viewport'), stylex.props(reset.base, styles.viewport))}>
+        {stacked.map((toast, index) => (
+          <StackedToast
             key={toast.id}
             toast={toast}
+            zIndex={stacked.length - index}
           />
         ))}
       </Primitive.Viewport>
+      {anchored.map(toast => (
+        <AnchoredToast
+          key={toast.id}
+          toast={toast}
+        />
+      ))}
     </Primitive.Portal>
   );
-});
+}
 
-const AnchoredViewport = React.forwardRef<HTMLDivElement, ToastViewportProps>(function ToastAnchoredViewport(
-  { xstyle, ...rest },
-  ref,
-) {
-  const { toasts } = Primitive.useToastManager();
+export function ToastProvider(props: { children: React.ReactNode }): React.ReactElement {
   return (
-    <Primitive.Portal>
-      <Primitive.Viewport
-        ref={ref}
-        {...mergeStyleProps(themeProps('toast-anchored-viewport'), stylex.props(reset.base, xstyle), rest)}
-      >
-        {toasts.map(toast => (
-          <AnchoredToast
-            key={toast.id}
-            toast={toast}
-          />
-        ))}
-      </Primitive.Viewport>
-    </Primitive.Portal>
+    <Primitive.Provider>
+      {props.children}
+      <ToastViewport />
+    </Primitive.Provider>
   );
-});
+}
 
-export const Toast = {
-  Provider: Primitive.Provider,
-  Viewport,
-  AnchoredViewport,
-  useToastManager: Primitive.useToastManager,
-  createToastManager: Primitive.createToastManager,
-};
+export const useToastManager = Primitive.useToastManager;

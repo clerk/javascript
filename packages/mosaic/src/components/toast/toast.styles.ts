@@ -13,6 +13,16 @@ import {
 } from '../../tokens.stylex';
 
 const stackGap = space['2'];
+const stackDuration = '400ms';
+const stackEasing = 'ease';
+
+const shake = stylex.keyframes({
+  '0%, 100%': { translate: '0 0' },
+  '20%': { translate: '-4px 0' },
+  '40%': { translate: '4px 0' },
+  '60%': { translate: '-3px 0' },
+  '80%': { translate: '2px 0' },
+});
 
 export const styles = stylex.create({
   viewport: {
@@ -24,11 +34,17 @@ export const styles = stylex.create({
 
   root: {
     borderRadius: radiusVars['--cl-radius-lg'],
-    gap: space['2'],
     insetInline: 0,
     marginInline: 'auto',
     paddingBlock: space['3'],
     alignItems: 'center',
+    animationDuration: durationVars['--cl-duration-slower'],
+    animationName: {
+      default: null,
+      ':where([data-repeated])': shake,
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    animationTimingFunction: easingVars['--cl-ease-default'],
     backgroundColor: colorVars['--cl-color-background'],
     boxShadow: shadowVars['--cl-shadow-lg'],
     color: colorVars['--cl-color-foreground'],
@@ -47,29 +63,30 @@ export const styles = stylex.create({
     paddingInlineEnd: space['5'],
     paddingInlineStart: space['4'],
     position: 'absolute',
-    transform: `translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * ${stackGap}))`,
-    transitionDuration: {
-      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-base']}`,
-      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
+    transform: {
+      default: `translateY(calc(var(--toast-index) * -1 * ${stackGap})) scale(calc(1 - var(--toast-index) * 0.05))`,
+      ':where([data-expanded])': `translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * ${stackGap}))`,
     },
+    transitionDuration: stackDuration,
     transitionProperty: {
-      default: 'opacity, transform, translate',
+      default: 'opacity, transform, translate, height',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
-    transitionTimingFunction: {
-      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}, ${easingVars['--cl-ease-default']}`,
-      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
-    },
+    transitionTimingFunction: stackEasing,
     translate: {
       default: '0 0',
-      ':where([data-starting-style], [data-ending-style])': `0 ${space['4']}`,
+      ':where([data-starting-style], [data-ending-style])': '0 100%',
       '@media (prefers-reduced-motion: reduce)': {
         default: '0 0',
         ':where([data-starting-style], [data-ending-style])': '0 0',
       },
     },
-    maxWidth: 'min(100%, 28rem)',
-    width: 'max-content',
+    height: {
+      default: 'var(--toast-frontmost-height)',
+      ':where([data-expanded])': 'var(--toast-height)',
+    },
+    maxWidth: '100%',
+    width: '356px',
     '::after': {
       insetInline: 0,
       content: '""',
@@ -79,7 +96,25 @@ export const styles = stylex.create({
     },
   },
 
+  stackOrder: (zIndex: number) => ({
+    zIndex,
+  }),
+
   content: {
+    gap: space['2'],
+    alignItems: 'center',
+    display: 'flex',
+    opacity: {
+      default: 1,
+      ':where([data-behind]:not([data-expanded]))': 0,
+    },
+    transitionDuration: stackDuration,
+    transitionProperty: 'opacity',
+    transitionTimingFunction: stackEasing,
+    minWidth: 0,
+  },
+
+  text: {
     gap: space['0.5'],
     display: 'flex',
     flexDirection: 'column',
@@ -109,6 +144,16 @@ export const styles = stylex.create({
 
   anchoredPositioner: {
     outline: 'none',
+  },
+
+  anchoredRoot: {
+    animationDuration: durationVars['--cl-duration-slower'],
+    animationName: {
+      default: null,
+      ':where([data-repeated])': shake,
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    animationTimingFunction: easingVars['--cl-ease-default'],
   },
 
   anchoredIcon: {

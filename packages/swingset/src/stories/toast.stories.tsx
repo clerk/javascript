@@ -1,7 +1,6 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
-import { Toast } from '@clerk/mosaic/components/toast';
-import { useRef } from 'react';
+import { useToastManager } from '@clerk/mosaic/components/toast';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -14,8 +13,8 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/toast/toast.tsx',
 };
 
-function Triggers() {
-  const manager = Toast.useToastManager();
+export function Default() {
+  const manager = useToastManager();
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center', paddingBlock: '3rem' }}>
       <Button
@@ -26,7 +25,7 @@ function Triggers() {
       </Button>
       <Button
         variant='outline'
-        onClick={() => manager.add({ title: 'Could not send invites', type: 'error' })}
+        onClick={() => manager.add({ id: 'send-invites-error', title: 'Could not send invites', type: 'error' })}
       >
         Error
       </Button>
@@ -60,49 +59,26 @@ function Triggers() {
   );
 }
 
-export function Default() {
-  return (
-    <Toast.Provider>
-      <Triggers />
-      <Toast.Viewport />
-    </Toast.Provider>
-  );
-}
-
-const anchoredToastManager = Toast.createToastManager();
-
-function CopyButton() {
-  const buttonRef = useRef<HTMLButtonElement | null>(null);
-
-  function handleCopy() {
-    anchoredToastManager.add({
-      description: 'Copied',
-      type: 'success',
-      timeout: 1500,
-      positionerProps: { anchor: buttonRef.current },
-    });
-  }
-
-  return (
-    <Button
-      ref={buttonRef}
-      variant='ghost'
-      shape='square'
-      aria-label='Copy'
-      onClick={handleCopy}
-    >
-      <Icon name='clipboard' />
-    </Button>
-  );
-}
-
 export function Anchored() {
+  const manager = useToastManager();
   return (
-    <Toast.Provider toastManager={anchoredToastManager}>
-      <div style={{ display: 'flex', justifyContent: 'center', paddingBlock: '3rem' }}>
-        <CopyButton />
-      </div>
-      <Toast.AnchoredViewport />
-    </Toast.Provider>
+    <div style={{ display: 'flex', justifyContent: 'center', paddingBlock: '3rem' }}>
+      <Button
+        variant='ghost'
+        shape='square'
+        aria-label='Copy'
+        onClick={event =>
+          manager.add({
+            id: 'copy',
+            description: 'Copied',
+            type: 'success',
+            timeout: 1500,
+            positionerProps: { anchor: event.currentTarget },
+          })
+        }
+      >
+        <Icon name='clipboard' />
+      </Button>
+    </div>
   );
 }

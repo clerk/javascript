@@ -1,2 +1,2 @@
-export { Toast } from './toast';
-export type { ToastType, ToastViewportProps } from './toast';
+export { useToastManager } from './toast';
+export type { ToastType } from './toast';
