@@ -16,6 +16,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { getModule } from '@/lib/registry';
 
 import { AppSidebar } from './app-sidebar';
+import { CommandPalette } from './CommandPalette';
 import { DirectionProvider } from './DirectionProvider';
 import { DirectionToggle } from './DirectionToggle';
 import { ThemeToggle } from './ThemeToggle';
@@ -38,11 +39,27 @@ function useBreadcrumb() {
 
 export function ClientRoot({ children }: { children: React.ReactNode }) {
   const crumbs = useBreadcrumb();
+  const [searchOpen, setSearchOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() === 'k' && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        setSearchOpen(open => !open);
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   return (
     <DirectionProvider>
+      <CommandPalette
+        open={searchOpen}
+        onOpenChange={setSearchOpen}
+      />
       <SidebarProvider>
-        <AppSidebar />
+        <AppSidebar onSearchOpen={() => setSearchOpen(true)} />
         <SidebarInset>
           <header className='bg-background sticky top-0 z-10 flex h-12 shrink-0 items-center gap-2 border-b px-4'>
             <SidebarTrigger className='-ml-1' />
