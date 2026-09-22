@@ -2,6 +2,7 @@
 
 import { inertProps } from '@clerk/shared/inert';
 import React, {
+  type AnimationEvent,
   type CSSProperties,
   type KeyboardEvent,
   useEffect,
@@ -15,7 +16,7 @@ import React, {
 import { useTransition } from '../hooks/use-transition';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { ToastRootContext, type ToastRootContextValue, useToastContext } from './toast-context';
-import type { ToastObject } from './toast-manager';
+import { isAnchored, type ToastObject } from './toast-manager';
 
 export interface ToastRootProps extends ComponentProps<'div'> {
   toast: ToastObject;
@@ -95,12 +96,23 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
   }, [mounted, remove, toast.id]);
 
   const timeout = toast.timeout ?? defaultTimeout;
-  const timerStopped = paused || !open || toast.limited === true || timeout <= 0;
+  const timerStopped = paused || !open || timeout <= 0;
   const remainingRef = useRef(timeout);
+  const repeatCount = toast.repeatCount ?? 0;
+  const [repeated, setRepeated] = useState(false);
 
   useEffect(() => {
     remainingRef.current = timeout;
-  }, [timeout]);
+  }, [timeout, repeatCount]);
+
+  useEffect(() => {
+    if (repeatCount === 0) {
+      return;
+    }
+    setRepeated(false);
+    const frame = requestAnimationFrame(() => setRepeated(true));
+    return () => cancelAnimationFrame(frame);
+  }, [repeatCount]);
 
   useEffect(() => {
     if (timerStopped) {
@@ -112,7 +124,7 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
       clearTimeout(timeoutId);
       remainingRef.current -= Date.now() - start;
     };
-  }, [timerStopped, timeout, close, toast.id]);
+  }, [timerStopped, timeout, repeatCount, close, toast.id]);
 
   useLayoutEffect(() => {
     const element = rootRef.current;
@@ -120,7 +132,13 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
       return;
     }
     const unregister = registerRoot(toast.id, element);
-    const measure = () => setHeight(toast.id, element.offsetHeight);
+    const measure = () => {
+      const previousHeight = element.style.height;
+      element.style.height = 'auto';
+      const height = element.offsetHeight;
+      element.style.height = previousHeight;
+      setHeight(toast.id, height);
+    };
     measure();
     if (typeof ResizeObserver === 'undefined') {
       return unregister;
@@ -133,10 +151,11 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
     };
   }, [toast.id, registerRoot, setHeight]);
 
-  const index = toasts.indexOf(toast);
-  const offsetY = toasts.slice(0, Math.max(index, 0)).reduce((sum, t) => sum + (t.limited ? 0 : (t.height ?? 0)), 0);
+  const peers = toasts.filter(t => isAnchored(t) === isAnchored(toast));
+  const index = peers.indexOf(toast);
+  const offsetY = peers.slice(0, Math.max(index, 0)).reduce((sum, t) => sum + (t.limited ? 0 : (t.height ?? 0)), 0);
 
-  const behind = frontmost !== undefined && index > toasts.indexOf(frontmost);
+  const behind = frontmost !== undefined && peers.includes(frontmost) && index > peers.indexOf(frontmost);
 
   const contextValue = useMemo<ToastRootContextValue>(
     () => ({ toast, behind, rootId, titleId, descriptionId, setTitleId, setDescriptionId }),
@@ -167,6 +186,11 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
     tabIndex: 0,
     ...inertProps(toast.limited === true),
     ...transitionAttrs,
+    onAnimationEnd: (event: AnimationEvent<HTMLDivElement>) => {
+      if (event.target === event.currentTarget) {
+        setRepeated(false);
+      }
+    },
     onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
       if (event.key === 'Escape' && !event.defaultPrevented) {
         event.preventDefault();
@@ -189,11 +213,12 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
         render,
         enabled: mounted,
         ref: [rootRef, ref],
-        state: { type: toast.type, expanded, limited: toast.limited === true },
+        state: { type: toast.type, expanded, limited: toast.limited === true, repeated },
         stateAttributesMapping: {
           type: v => (v ? { 'data-type': v } : null),
           expanded: v => (v ? { 'data-expanded': '' } : null),
           limited: v => (v ? { 'data-limited': '' } : null),
+          repeated: v => (v ? { 'data-repeated': '' } : null),
         },
         props: mergeProps<'div'>(defaultProps, otherProps),
       })}

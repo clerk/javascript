@@ -131,6 +131,8 @@ export { Spinner } from '../components/spinner';
 export type { SpinnerProps } from '../components/spinner';
 export { Text, TextContext } from '../components/text';
 export type { TextProps } from '../components/text';
+export { useToastManager } from '../components/toast';
+export type { ToastType } from '../components/toast';
 export { Tooltip } from '../components/tooltip';
 export type { TooltipPopupProps, TooltipRootProps, TooltipTriggerProps } from '../components/tooltip';
 export { VisuallyHidden } from '../components/visually-hidden';
