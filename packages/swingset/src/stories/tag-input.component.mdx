@@ -1,0 +1,90 @@
+import * as TagInputStories from './tag-input.component.stories';
+
+# Tag Input
+
+A field that turns typed and pasted entries into removable tags, built on the headless [TagInput primitive](/primitives/tag-input). Press `Enter` or `,` to add an entry, or paste a comma- or newline-separated list to add several at once.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={TagInputStories}
+/>
+
+## Props
+
+<PropTable
+  meta={TagInputStories.meta}
+  extra={[
+    { name: 'value', type: 'string[]', default: '—' },
+    { name: 'defaultValue', type: 'string[]', default: '[]' },
+    { name: 'onValueChange', type: '(value: string[]) => void', default: '—' },
+    { name: 'validate', type: '(value: string) => boolean', default: '—' },
+    { name: 'delimiters', type: 'string[]', default: "[',']" },
+    { name: 'name', type: 'string', default: '—' },
+  ]}
+/>
+
+Every other native `input` prop, including `placeholder`, `required`, and the ref, goes to the text input.
+
+## Usage
+
+<Usage
+  component='TagInput'
+  module='@clerk/mosaic/components/tag-input'
+  props={{ 'aria-label': 'Email', name: 'emails' }}
+/>
+
+Give the field an accessible name with `aria-label`, or place it in a `Field.Root` with a `Field.Label`.
+
+Inside a `Field.Root`, the field's `disabled`, `required`, and `invalid` flow into the tag input, `Field.Label` focuses the text input, and `Field.Description` and `Field.Error` describe it. With `name`, each tag submits as its own form value. `required` stops blocking submission once a tag exists.
+
+```tsx
+<Field.Root invalid={Boolean(error)}>
+  <Field.Label>Email</Field.Label>
+  <TagInput name='emails' />
+  <Field.Message>
+    <Field.Error>{error}</Field.Error>
+  </Field.Message>
+</Field.Root>
+```
+
+---
+
+## Examples
+
+### Validation
+
+Tags that fail `validate` are marked invalid.
+
+<Story
+  name='Validation'
+  storyModule={TagInputStories}
+/>
+
+### Invalid
+
+<Story
+  name='Invalid'
+  storyModule={TagInputStories}
+/>
+
+### Disabled
+
+<Story
+  name='Disabled'
+  storyModule={TagInputStories}
+/>
+
+## Parts
+
+| Part       | Stable slot class          | Description                                  |
+| ---------- | -------------------------- | -------------------------------------------- |
+| Root       | `.cl-tag-input`            | The box holding the tags and the text input. |
+| List       | `.cl-tag-input-list`       | The `role="list"` of tags.                   |
+| Tag        | `.cl-tag-input-tag`        | One tag.                                     |
+| Tag label  | `.cl-tag-input-tag-label`  | The tag's text, truncated when it overflows. |
+| Tag remove | `.cl-tag-input-tag-remove` | The button that removes the tag.             |
+| Input      | `.cl-tag-input-input`      | The text input new entries are typed into.   |
+
+The root carries `data-disabled` and `data-invalid`, plus the primitive's `data-empty` when there are no tags. Each tag carries `data-disabled`, `data-invalid` when it fails `validate`, and `data-starting-style` / `data-ending-style` while it animates in and out.

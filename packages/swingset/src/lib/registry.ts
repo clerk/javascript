@@ -253,6 +253,13 @@ import {
 } from '../stories/table.stories';
 import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
+import {
+  Default as TagInputComponentDefault,
+  Disabled as TagInputComponentDisabled,
+  Invalid as TagInputComponentInvalid,
+  meta as tagInputComponentMeta,
+  Validation as TagInputComponentValidation,
+} from '../stories/tag-input.component.stories';
 import { meta as tagInputMeta } from '../stories/tag-input.stories';
 import {
   Colors as TextColors,
@@ -587,6 +594,14 @@ const otpComponentModule: StoryModule = {
   Disabled: OtpComponentDisabled,
 };
 
+const tagInputComponentModule: StoryModule = {
+  meta: tagInputComponentMeta,
+  Default: TagInputComponentDefault,
+  Validation: TagInputComponentValidation,
+  Invalid: TagInputComponentInvalid,
+  Disabled: TagInputComponentDisabled,
+};
+
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
 const tooltipComponentModule: StoryModule = {
@@ -910,6 +925,7 @@ export const registry: StoryModule[] = [
   selectComponentModule,
   tableModule,
   tabsComponentModule,
+  tagInputComponentModule,
   textModule,
   toastModule,
   tooltipComponentModule,
