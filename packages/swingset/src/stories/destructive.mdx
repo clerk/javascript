@@ -58,6 +58,48 @@ A failed attempt leaves the dialog up. Pass the sentence the user should read as
   storyModule={Stories}
 />
 
+## Reverification
+
+Wrap the action with `useReverificationWithState` and pass the returned state to keep confirmation and verification in the same dialog and card.
+
+```tsx
+import { useReverificationWithState } from '@clerk/mosaic/features/reverification';
+import { isReverificationCancelledError } from '@clerk/shared/error';
+import { useState } from 'react';
+
+const [open, setOpen] = useState(false);
+const [isDeleting, setIsDeleting] = useState(false);
+const [errorMessage, setErrorMessage] = useState<string>();
+const [runDelete, reverification] = useReverificationWithState(deleteAccount);
+
+const handleDelete = async () => {
+  setIsDeleting(true);
+  setErrorMessage(undefined);
+  try {
+    await runDelete();
+    setOpen(false);
+  } catch (error) {
+    if (isReverificationCancelledError(error)) {
+      setOpen(false);
+      return;
+    }
+    setErrorMessage(error instanceof Error ? error.message : 'Delete failed.');
+  } finally {
+    setIsDeleting(false);
+  }
+};
+
+<Destructive
+  {...copy}
+  open={open}
+  onOpenChange={setOpen}
+  onDelete={() => void handleDelete()}
+  isDeleting={isDeleting}
+  errorMessage={errorMessage}
+  reverification={reverification}
+/>;
+```
+
 ## One block, many rows
 
 A table of projects has a Delete in every row. Create a handle, mount the block once after the table, and open it from any row with the project it is about. The copy props take a function of that payload, and `onDelete` receives it. The block owns `open`, the pending state, and the error: a resolved promise closes it, a rejected one keeps it open showing why.
@@ -108,6 +150,7 @@ Controlled:
 | `onDelete`          | `() => void`              | — (required) | Asks the caller to run the action, once the typed phrase matches.                |
 | `isDeleting`        | `boolean`                 | `false`      | Disables the field, renders the action pending, and ignores further submissions. |
 | `errorMessage`      | `string`                  | —            | Marks the field invalid and renders under it.                                    |
+| `reverification`    | `ReverificationProps`     | —            | Renders reverification in the same dialog after the action requests it.          |
 
 With a handle:
 
