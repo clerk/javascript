@@ -1,4 +1,5 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -47,12 +48,37 @@ const configuredConnection = (overrides: Record<string, unknown> = {}) =>
     ...overrides,
   }) as any;
 
+const section = (id: 'sso' | 'directorySync') =>
+  within(document.querySelector(`.cl-profileSection__${id}`) as HTMLElement);
+
+const findMenuButtons = (id: 'sso' | 'directorySync') =>
+  waitFor(() => {
+    const buttons = section(id).getAllByRole('button', { name: /open menu/i });
+    expect(buttons.length).toBeGreaterThan(0);
+    return buttons;
+  });
+
+const openConnectionMenu = async (userEvent: ReturnType<typeof render>['userEvent'], index = 0) => {
+  const buttons = await findMenuButtons('sso');
+  await userEvent.click(buttons[index]);
+};
+
+const openConnectionPage = async (userEvent: ReturnType<typeof render>['userEvent'], index = 0) => {
+  await openConnectionMenu(userEvent, index);
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'Edit' }));
+};
+
+const openDirectorySyncMenu = async (userEvent: ReturnType<typeof render>['userEvent']) => {
+  const [button] = await findMenuButtons('directorySync');
+  await userEvent.click(button);
+};
+
 const renderPage = (wrapper: React.ComponentType<{ children?: React.ReactNode }>) =>
   render(<OrganizationSecurityPage contentRef={{ current: null }} />, { wrapper });
 
 describe('OrganizationSecurityPage', () => {
   describe('overview states', () => {
-    it('renders the unconfigured state with a Start configuration action', async () => {
+    it('renders the unconfigured state with a Configure action', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
@@ -60,19 +86,19 @@ describe('OrganizationSecurityPage', () => {
       renderPage(wrapper);
 
       // The "Security" header now also renders during the loading placeholder, so
-      // wait on the settled badge before asserting the page chrome and content.
-      expect(await screen.findByText('Unconfigured')).toBeInTheDocument();
+      // wait on the settled action before asserting the page chrome and content.
+      expect(await screen.findByRole('button', { name: 'Configure' })).toBeInTheDocument();
       expect(screen.getByRole('heading', { name: 'Security' })).toBeInTheDocument();
       expect(screen.getByText('SSO')).toBeInTheDocument();
       expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
+      expect(screen.queryByText('Unconfigured')).not.toBeInTheDocument();
 
       expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
       expect(screen.queryByText(/select your identity provider/i)).not.toBeInTheDocument();
     });
 
-    it('renders the in-progress state as a clickable row', async () => {
+    it('renders the in-progress state as a row with a menu', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       // A connection without SAML configuration is mid-setup.
@@ -91,8 +117,8 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.queryByText(/you have started a configuration/i)).not.toBeInTheDocument();
       expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
 
-      expect(screen.getByRole('button', { name: /clerk\.com/ })).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /clerk\.com/ })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /open menu/i })).toBeInTheDocument();
     });
 
     it('renders the active state as a condensed overview with the domains', async () => {
@@ -108,19 +134,21 @@ describe('OrganizationSecurityPage', () => {
 
       expect(await screen.findByText('Active')).toBeInTheDocument();
       expect(screen.getByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
+      expect(screen.getByLabelText('clerk.com icon')).toBeInTheDocument();
+      expect(screen.queryByText('C')).not.toBeInTheDocument();
 
       expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
 
       expect(screen.queryByText(/^Domains:?$/)).not.toBeInTheDocument();
       expect(screen.getAllByText('clerk.com').length).toBeGreaterThan(0);
 
-      expect(screen.getByRole('button', { name: /clerk\.com/ })).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /clerk\.com/ })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /open menu/i })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Configure' })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Continue configuration' })).not.toBeInTheDocument();
     });
 
-    it('renders the inactive state with a chip per domain', async () => {
+    it('renders the inactive state with every domain in the caption', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
@@ -136,11 +164,9 @@ describe('OrganizationSecurityPage', () => {
       expect(await screen.findByText('Inactive')).toBeInTheDocument();
 
       expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /open menu/i })).toBeInTheDocument();
 
-      for (const domain of ['github.com', 'gmail.com', 'maps.com', 'another.com']) {
-        expect(screen.getByText(domain)).toBeInTheDocument();
-      }
+      expect(screen.getByText('github.com, gmail.com, maps.com, another.com')).toBeInTheDocument();
     });
 
     it('renders the full value for long domains', async () => {
@@ -205,7 +231,7 @@ describe('OrganizationSecurityPage', () => {
   });
 
   describe('view switching', () => {
-    it('opens the wizard at the first step when Start configuration is clicked', async () => {
+    it('opens the wizard at the first step when Configure is clicked', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
@@ -213,43 +239,14 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: 'Start configuration' }));
+      await userEvent.click(await screen.findByRole('button', { name: 'Configure' }));
 
       // Start forces the first step. The fixture domain is already verified, so
       // without the forced entry the wizard would skip to select-provider —
       // proving Start threads `forceInitialStep`.
       expect(await screen.findByRole('heading', { name: /add SSO domains/i })).toBeInTheDocument();
       expect(screen.queryByText(/select your identity provider/i)).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
-    });
-
-    it("resumes the wizard at the reachable step from the connection page's Continue setup", async () => {
-      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
-
-      // A connection without SAML configuration is mid-setup (in_progress).
-      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
-        configuredConnection({ samlConnection: null }),
-      ]);
-      fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
-        data: [],
-        total_count: 0,
-      } as any);
-      fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
-
-      const { userEvent } = renderPage(wrapper);
-
-      await userEvent.click(await screen.findByRole('button', { name: /clerk\.com/ }));
-      await userEvent.click(await screen.findByRole('button', { name: 'Continue setup' }));
-
-      // The connection page forces no step, so the wizard resumes at the furthest-
-      // reachable step for this connection (configure, since a provider connection
-      // exists and the domain is verified) rather than the forced first step.
-      // Resuming into `configure` (direction 0) falls through to its furthest-
-      // reachable sub-step: a provider already exists, so it lands on
-      // `configure-provider` rather than re-showing `select-provider`.
-      expect(await screen.findByRole('heading', { name: /configure okta workforce/i })).toBeInTheDocument();
-      expect(screen.queryByRole('heading', { name: /select your identity provider/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole('heading', { name: /add SSO domains/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Configure' })).not.toBeInTheDocument();
     });
   });
 
@@ -263,44 +260,104 @@ describe('OrganizationSecurityPage', () => {
       const { userEvent } = renderPage(wrapper);
 
       // Enter the wizard from the overview.
-      await userEvent.click(await screen.findByRole('button', { name: 'Start configuration' }));
+      await userEvent.click(await screen.findByRole('button', { name: 'Configure' }));
       const backControl = await screen.findByRole('button', { name: 'Security' });
       expect(backControl).toBeInTheDocument();
 
       // The back control exits to the overview (the Start action returns).
       await userEvent.click(backControl);
 
-      expect(await screen.findByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
+      expect(await screen.findByRole('button', { name: 'Configure' })).toBeInTheDocument();
       expect(screen.queryByRole('heading', { name: /add SSO domains/i })).not.toBeInTheDocument();
     });
+  });
 
-    it('returns to the connection page when the wizard was opened from it', async () => {
-      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
-
-      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([
-        configuredConnection({ samlConnection: null }),
-      ]);
+  describe('connection row menu', () => {
+    const withConnection = (
+      fixtures: any,
+      connection: any,
+      testRuns: unknown[] = [{ id: 'run_1', status: 'success' }],
+    ) => {
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([connection]);
       fixtures.clerk.organization?.getEnterpriseConnectionTestRuns.mockResolvedValue({
-        data: [],
-        total_count: 0,
+        data: testRuns,
+        total_count: testRuns.length,
       } as any);
       fixtures.clerk.organization?.getDomains.mockResolvedValue({ data: [verifiedDomain], total_count: 1 } as any);
+    };
+
+    it('lists Edit, Deactivate, and Remove for an active connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+      withConnection(fixtures, configuredConnection({ active: true }));
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: /clerk\.com/ }));
-      await userEvent.click(await screen.findByRole('button', { name: 'Continue setup' }));
+      await openConnectionMenu(userEvent);
+
+      expect(await screen.findByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'Deactivate' })).toBeInTheDocument();
+      expect(screen.getByRole('menuitem', { name: 'Remove' })).toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Activate' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Continue configuration' })).not.toBeInTheDocument();
+    });
+
+    it('activates an inactive connection from the menu', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+      withConnection(fixtures, configuredConnection({ active: false }));
+      fixtures.clerk.organization?.updateEnterpriseConnection.mockResolvedValue({} as any);
+
+      const { userEvent } = renderPage(wrapper);
+
+      await openConnectionMenu(userEvent);
+      expect(screen.queryByRole('menuitem', { name: 'Deactivate' })).not.toBeInTheDocument();
+      await userEvent.click(await screen.findByRole('menuitem', { name: 'Activate' }));
+
+      await waitFor(() =>
+        expect(fixtures.clerk.organization?.updateEnterpriseConnection).toHaveBeenCalledWith(
+          'ent_1',
+          expect.objectContaining({ active: true }),
+        ),
+      );
+    });
+
+    it('resumes the wizard from Continue configuration on an in-progress connection', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+      withConnection(fixtures, configuredConnection({ samlConnection: null }), []);
+
+      const { userEvent } = renderPage(wrapper);
+
+      await openConnectionMenu(userEvent);
+      expect(screen.queryByRole('menuitem', { name: 'Activate' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Deactivate' })).not.toBeInTheDocument();
+      await userEvent.click(await screen.findByRole('menuitem', { name: 'Continue configuration' }));
+
       expect(await screen.findByRole('heading', { name: /configure okta workforce/i })).toBeInTheDocument();
+    });
 
-      await userEvent.click(await screen.findByRole('button', { name: 'Security' }));
+    it('removes a connection through the type-to-confirm dialog', async () => {
+      const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
+      withConnection(fixtures, configuredConnection({ active: true }));
+      fixtures.clerk.organization?.deleteEnterpriseConnection.mockResolvedValue({} as any);
 
-      expect(await screen.findByText('Danger zone')).toBeInTheDocument();
-      expect(screen.queryByText(DESCRIPTION_LINE_1)).not.toBeInTheDocument();
+      const { userEvent } = renderPage(wrapper);
+
+      await openConnectionMenu(userEvent);
+      await userEvent.click(await screen.findByRole('menuitem', { name: 'Remove' }));
+
+      const dialog = within(await screen.findByRole('dialog'));
+      await userEvent.type(dialog.getByRole('textbox'), 'Org1');
+      fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+      await userEvent.click(dialog.getByRole('button', { name: /remove/i }));
+
+      await waitFor(() =>
+        expect(fixtures.clerk.organization?.deleteEnterpriseConnection).toHaveBeenCalledWith('ent_1'),
+      );
+      expect(await screen.findByRole('button', { name: 'Configure' })).toBeInTheDocument();
     });
   });
 
   describe('connection page', () => {
-    it('opens the connection page for the clicked row', async () => {
+    it('opens the connection page from the row menu Edit action', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
 
       fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([configuredConnection({ active: true })]);
@@ -311,7 +368,7 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: /clerk\.com/ }));
+      await openConnectionPage(userEvent);
 
       expect(await screen.findByRole('heading', { name: 'clerk.com' })).toBeInTheDocument();
       expect(screen.getAllByText('Okta Workforce').length).toBeGreaterThan(0);
@@ -330,7 +387,7 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: /clerk\.com/ }));
+      await openConnectionPage(userEvent);
       await userEvent.click(await screen.findByRole('button', { name: 'Security' }));
 
       expect(await screen.findByText(DESCRIPTION_LINE_1)).toBeInTheDocument();
@@ -353,11 +410,11 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: /clerk\.com/ }));
+      await openConnectionPage(userEvent);
       await userEvent.click(await screen.findByRole('checkbox', { name: /Sync user attributes/ }));
       await userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
-      expect(await screen.findByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
+      expect(await screen.findByRole('button', { name: 'Configure' })).toBeInTheDocument();
       expect(screen.queryByText('Identity provider')).not.toBeInTheDocument();
     });
   });
@@ -406,13 +463,13 @@ describe('OrganizationSecurityPage', () => {
       expect(screen.queryByText('Unconfigured')).not.toBeInTheDocument();
     });
 
-    it('opens the connection page of the clicked row', async () => {
+    it('opens the connection page of the row whose menu was used', async () => {
       const { wrapper, fixtures } = await createFixtures(withSecurityPageFixtures);
       withTwoConnections(fixtures);
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: /second\.com/ }));
+      await openConnectionPage(userEvent, 1);
 
       expect(await screen.findByRole('heading', { name: 'second.com' })).toBeInTheDocument();
       expect(screen.queryByRole('heading', { name: 'first.com' })).not.toBeInTheDocument();
@@ -471,8 +528,7 @@ describe('OrganizationSecurityPage', () => {
 
       renderPage(wrapper);
 
-      expect(await screen.findByRole('button', { name: /clerk\.com/ })).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
+      expect(await screen.findByText('Active')).toBeInTheDocument();
       expect(screen.queryByText('Directory Sync')).not.toBeInTheDocument();
       expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
     });
@@ -486,10 +542,14 @@ describe('OrganizationSecurityPage', () => {
 
       renderPage(wrapper);
 
-      const startButton = await screen.findByRole('button', { name: 'Start configuration' });
-      expect(startButton).toBeEnabled();
-      expect(screen.queryByText('SSO Required')).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
+      const configureButton = await screen.findByRole('button', { name: 'Configure' });
+      expect(configureButton).toBeEnabled();
+      expect(
+        screen.getByText('Keep organization members synced with your identity provider. Requires an SSO connection.'),
+      ).toBeInTheDocument();
+      expect(screen.queryByText('Unconfigured')).not.toBeInTheDocument();
+      expect(screen.queryByText('SSO required')).not.toBeInTheDocument();
+      expect(section('directorySync').queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
     });
 
     it('surfaces a load error when the directory request fails for any other reason', async () => {
@@ -505,8 +565,8 @@ describe('OrganizationSecurityPage', () => {
       renderPage(wrapper);
 
       expect(await screen.findByText('Could not load Directory Sync')).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Configure' })).not.toBeInTheDocument();
+      expect(section('directorySync').queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument();
     });
 
     it('disables setup and flags SSO as required when no connection exists', async () => {
@@ -516,11 +576,10 @@ describe('OrganizationSecurityPage', () => {
 
       renderPage(wrapper);
 
-      expect(await screen.findByText('SSO Required')).toBeInTheDocument();
-      const startButtons = screen.getAllByRole('button', { name: 'Start configuration' });
-      expect(startButtons).toHaveLength(2);
-      expect(startButtons[0]).toBeEnabled();
-      expect(startButtons[1]).toBeDisabled();
+      expect(await screen.findByText('SSO required')).toBeInTheDocument();
+      const [ssoConfigureButton, directorySyncConfigureButton] = screen.getAllByRole('button', { name: 'Configure' });
+      expect(ssoConfigureButton).toBeEnabled();
+      expect(directorySyncConfigureButton).toBeDisabled();
       expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
     });
 
@@ -538,7 +597,7 @@ describe('OrganizationSecurityPage', () => {
 
       // Google used to be sent to the Clerk Dashboard here, which is the Clerk
       // customer's account rather than the admin's, so setup dead-ended.
-      expect(await screen.findByRole('button', { name: 'Start configuration' })).toBeEnabled();
+      expect(await screen.findByRole('button', { name: 'Configure' })).toBeEnabled();
       expect(
         screen.queryByText('Google Workspace connections are not configurable via self-serve'),
       ).not.toBeInTheDocument();
@@ -551,7 +610,7 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
+      await openDirectorySyncMenu(userEvent);
 
       expect(screen.getByRole('menuitem', { name: 'Edit' })).toBeInTheDocument();
       expect(screen.getByRole('menuitem', { name: 'Deactivate' })).toBeInTheDocument();
@@ -571,12 +630,12 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
+      await openDirectorySyncMenu(userEvent);
       await userEvent.click(screen.getByRole('menuitem', { name: 'Deactivate' }));
 
       expect(activeDirectory.update).toHaveBeenCalledWith({ enabled: false });
 
-      await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
+      await openDirectorySyncMenu(userEvent);
       await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Activate' })).toBeInTheDocument());
     });
 
@@ -589,7 +648,7 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
+      await openDirectorySyncMenu(userEvent);
       await userEvent.click(screen.getByRole('menuitem', { name: 'Remove' }));
 
       expect(await screen.findByRole('heading', { name: 'Remove Directory Sync' })).toBeInTheDocument();
@@ -600,7 +659,7 @@ describe('OrganizationSecurityPage', () => {
       await userEvent.click(confirmButton);
 
       expect(activeDirectory.delete).toHaveBeenCalledWith();
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument());
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Configure' })).toBeInTheDocument());
       // Typing the confirmation and swapping the section back has hit the 5s default on CI.
     }, 15_000);
 
@@ -611,7 +670,7 @@ describe('OrganizationSecurityPage', () => {
 
       const { userEvent } = renderPage(wrapper);
 
-      await userEvent.click(await screen.findByRole('button', { name: /open menu/i }));
+      await openDirectorySyncMenu(userEvent);
       await userEvent.click(screen.getByRole('menuitem', { name: 'Edit' }));
 
       await waitFor(() => expect(screen.queryByRole('button', { name: /open menu/i })).not.toBeInTheDocument());

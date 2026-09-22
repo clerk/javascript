@@ -21,12 +21,10 @@ import { getFieldError, getGlobalError, handleError } from '@/utils/errorHandler
 
 import { ChangeProviderDialog } from '../ChangeProviderDialog';
 import { useConfigureSSO } from '../ConfigureSSOContext';
-import { PROVIDER_GROUPS, providerLabel, toProviderCard } from '../domain/providers';
+import { MONOCHROMATIC_PROVIDER_ICONS, PROVIDER_GROUPS, providerLabel, toProviderCard } from '../domain/providers';
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 import type { ProviderType } from '../types';
-
-const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
 
 export const SelectProviderStep = (): JSX.Element => {
   const {
