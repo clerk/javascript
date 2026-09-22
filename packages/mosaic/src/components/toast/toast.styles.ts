@@ -13,8 +13,6 @@ import {
 } from '../../tokens.stylex';
 
 const stackGap = space['2'];
-const stackDuration = '400ms';
-const stackEasing = 'ease';
 
 const shake = stylex.keyframes({
   '0%, 100%': { translate: '0 0' },
@@ -67,12 +65,12 @@ export const styles = stylex.create({
       default: `translateY(calc(var(--toast-index) * -1 * ${stackGap})) scale(calc(1 - var(--toast-index) * 0.05))`,
       ':where([data-expanded])': `translateY(calc(var(--toast-offset-y) * -1 - var(--toast-index) * ${stackGap}))`,
     },
-    transitionDuration: stackDuration,
+    transitionDuration: durationVars['--cl-duration-slow'],
     transitionProperty: {
       default: 'opacity, transform, translate, height',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
-    transitionTimingFunction: stackEasing,
+    transitionTimingFunction: easingVars['--cl-ease-enter'],
     translate: {
       default: '0 0',
       ':where([data-starting-style], [data-ending-style])': '0 100%',
@@ -108,9 +106,9 @@ export const styles = stylex.create({
       default: 1,
       ':where([data-behind]:not([data-expanded]))': 0,
     },
-    transitionDuration: stackDuration,
+    transitionDuration: durationVars['--cl-duration-slow'],
     transitionProperty: 'opacity',
-    transitionTimingFunction: stackEasing,
+    transitionTimingFunction: easingVars['--cl-ease-enter'],
     minWidth: 0,
   },
 
