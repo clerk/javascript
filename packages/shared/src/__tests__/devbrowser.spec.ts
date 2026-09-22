@@ -61,6 +61,21 @@ describe('extractDevBrowserFromURL(url)', () => {
     expect(replaceStateMock).not.toHaveBeenCalled();
   });
 
+  it('does not throw when the url hash is not valid percent-encoding', () => {
+    expect(extractDevBrowserFromURL(new URL('/foo?__clerk_db_jwt=token#%E0%A4%A', DUMMY_URL_BASE))).toEqual('token');
+    expect(replaceStateMock.mock.calls[0][2].href).toEqual(new URL('/foo#%E0%A4%A', DUMMY_URL_BASE).href);
+  });
+
+  it('does not call replaceState for a malformed hash with nothing to remove', () => {
+    expect(extractDevBrowserFromURL(new URL('/foo#%E0%A4%A', DUMMY_URL_BASE))).toEqual('');
+    expect(replaceStateMock).not.toHaveBeenCalled();
+  });
+
+  it('removes the legacy dev browser from a hash that is not valid percent-encoding', () => {
+    expect(extractDevBrowserFromURL(new URL('/foo#%E0%A4%A__clerk_db_jwt[token2]', DUMMY_URL_BASE))).toEqual('');
+    expect(replaceStateMock.mock.calls[0][2].href).toEqual(new URL('/foo#%E0%A4%A', DUMMY_URL_BASE).href);
+  });
+
   const testCases: Array<[string, string]> = [
     ['', ''],
     ['foo', ''],
@@ -69,6 +84,7 @@ describe('extractDevBrowserFromURL(url)', () => {
     ['/foo?__clerk_db_jwt=token', 'token'],
     ['?__clerk_db_jwt=token#foo', 'token'],
     ['/foo?bar=42&__clerk_db_jwt=token#qux__clerk_db_jwt[token2]', 'token'],
+    ['/foo?__clerk_db_jwt=token#%E0%A4%A', 'token'],
   ];
 
   test.each(testCases)(
