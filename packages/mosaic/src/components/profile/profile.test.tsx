@@ -5,6 +5,7 @@ import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
+import { Badge } from '../badge';
 import { Card } from '../card';
 import { Dialog } from '../dialog';
 import { Icon } from '../icon';
@@ -54,6 +55,56 @@ function atomsOf(style: stylex.StyleXStyles): string[] {
 }
 
 describe('Profile', () => {
+  it('renders trailing badge content in a navigation item', () => {
+    render(
+      <Profile.Root value='account'>
+        <Profile.Title>Settings</Profile.Title>
+        <Profile.Nav>
+          <Profile.NavItem
+            value='account'
+            badge={<Badge>3</Badge>}
+          >
+            Account
+          </Profile.NavItem>
+        </Profile.Nav>
+        <Profile.Content>
+          <Profile.ContentPanel value='account'>Account content</Profile.ContentPanel>
+        </Profile.Content>
+      </Profile.Root>,
+    );
+
+    expect(screen.getByText('3').closest('.cl-profile-nav-item-badge')).toBeInTheDocument();
+  });
+
+  it('defaults a navigation item badge to the neutral color', () => {
+    render(
+      <Profile.Root value='account'>
+        <Profile.Title>Settings</Profile.Title>
+        <Profile.Nav>
+          <Profile.NavItem
+            value='account'
+            badge={<Badge>3</Badge>}
+          >
+            Account
+          </Profile.NavItem>
+          <Profile.NavItem
+            value='security'
+            badge={<Badge color='warning'>1</Badge>}
+          >
+            Security
+          </Profile.NavItem>
+        </Profile.Nav>
+        <Profile.Content>
+          <Profile.ContentPanel value='account'>Account content</Profile.ContentPanel>
+          <Profile.ContentPanel value='security'>Security content</Profile.ContentPanel>
+        </Profile.Content>
+      </Profile.Root>,
+    );
+
+    expect(screen.getByText('3')).toHaveAttribute('data-color', 'neutral');
+    expect(screen.getByText('1')).toHaveAttribute('data-color', 'warning');
+  });
+
   it('is a labelled navigation of tabs beside the selected page', () => {
     renderSurface();
 

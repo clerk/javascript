@@ -263,6 +263,13 @@ export const styles = stylex.create({
     flexShrink: 0,
   },
 
+  navItemBadge: {
+    alignItems: 'center',
+    display: 'inline-flex',
+    flexShrink: 0,
+    marginInlineStart: 'auto',
+  },
+
   branding: {
     display: 'block',
     marginBlockStart: 'auto',
