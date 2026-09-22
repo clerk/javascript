@@ -726,6 +726,16 @@ describe('Toast', () => {
       expect(toast.repeatCount).toBeUndefined();
     });
 
+    it('calls onRemove for a closing toast replaced by a new one', () => {
+      const manager = Toast.createToastManager();
+      const onRemove = vi.fn();
+      manager.add({ id: 'copy', title: 'Copied', onRemove });
+      manager.close('copy');
+      manager.add({ id: 'copy', title: 'Copied' });
+
+      expect(onRemove).toHaveBeenCalledTimes(1);
+    });
+
     it('marks the root with data-repeated until its animation ends', async () => {
       const manager = renderManaged();
 

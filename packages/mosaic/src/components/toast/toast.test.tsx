@@ -61,7 +61,7 @@ describe('Mosaic Toast', () => {
   it('renders no icon for a toast without a known type', () => {
     const manager = renderProvider();
 
-    manager.add({ title: 'Signed out' });
+    manager.add({ title: 'Signed out', type: 'info' });
 
     expect(screen.getByRole('dialog', { name: 'Signed out' }).querySelector('.cl-toast-icon')).toBeNull();
   });
@@ -91,8 +91,9 @@ describe('Mosaic Toast', () => {
     const manager = renderProvider();
 
     manager.add({ id: 'copy', title: 'Copied' });
-    manager.add({ id: 'copy', title: 'Copied' });
+    manager.add({ id: 'copy', title: 'Copied again' });
 
-    expect(screen.getAllByRole('dialog', { name: 'Copied' })).toHaveLength(1);
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(screen.getByRole('dialog', { name: 'Copied again' })).toBeInTheDocument();
   });
 });

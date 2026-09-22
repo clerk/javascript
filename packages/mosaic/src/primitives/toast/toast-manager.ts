@@ -119,7 +119,9 @@ export function createToastManager(): ExternalToastManager {
         set(toasts.map(t => (t === open ? { ...t, ...options, id, repeatCount: (t.repeatCount ?? 0) + 1 } : t)));
         return id;
       }
-      set([{ ...options, id, transitionStatus: 'starting' }, ...toasts.filter(t => t.id !== id)]);
+      const replaced = toasts.find(t => t.id === id);
+      set([{ ...options, id, transitionStatus: 'starting' }, ...toasts.filter(t => t !== replaced)]);
+      replaced?.onRemove?.();
       return id;
     },
     close: id => {

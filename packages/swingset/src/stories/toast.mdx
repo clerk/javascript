@@ -34,13 +34,19 @@ function InviteButton() {
 Pass `positionerProps.anchor` to show the toast next to an element. Anchored toasts stay out of the stack and the limit:
 
 ```tsx
-manager.add({
-  id: 'copy',
-  description: 'Copied',
-  type: 'success',
-  timeout: 1500,
-  positionerProps: { anchor: event.currentTarget },
-});
+<Button
+  onClick={event =>
+    manager.add({
+      id: 'copy',
+      description: 'Copied',
+      type: 'success',
+      timeout: 1500,
+      positionerProps: { anchor: event.currentTarget },
+    })
+  }
+>
+  Copy
+</Button>
 ```
 
 Adding a toast with the id of one that is still open updates that toast, restarts its timer, and shakes it instead of adding another.
