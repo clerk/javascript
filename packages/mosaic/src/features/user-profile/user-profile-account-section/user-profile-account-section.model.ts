@@ -83,6 +83,8 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
   const usernameImmutable = Boolean(usernameAttribute?.immutable);
   const showUsername = isAttributeAvailable(usernameAttribute) && !(usernameImmutable && !user.username);
   const nameReadOnly = user.enterpriseAccounts.some(account => account.active);
+  const showEmails = isAttributeAvailable(attributes.email_address);
+  const showPhones = isAttributeAvailable(attributes.phone_number);
 
   return {
     status: 'ready',
@@ -94,8 +96,8 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     imageUrl: user.imageUrl,
     hasImage: user.hasImage,
     username: showUsername ? (user.username ?? '') : undefined,
-    emails: toEmails(user),
-    phones: toPhones(user),
+    emails: showEmails ? toEmails(user) : undefined,
+    phones: showPhones ? toPhones(user) : undefined,
     onProfilePictureChange: file => toSaveResult(() => user.setProfileImage({ file })),
     onRemoveProfilePicture: user.hasImage ? () => toSaveResult(() => user.setProfileImage({ file: null })) : undefined,
     onSubmitName: nameReadOnly
