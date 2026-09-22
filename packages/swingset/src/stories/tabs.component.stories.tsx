@@ -1,19 +1,14 @@
-import { Tabs } from '@clerk/mosaic/primitives/tabs';
+import { Tabs } from '@clerk/mosaic/components/tabs';
 
 import type { StoryMeta } from '@/lib/types';
 
-// Headless primitives ship no styles. This single demo renders the primitive raw —
-// unstyled — so it faithfully reflects what the primitive provides: behavior, state,
-// and ARIA wiring via the `data-*` attributes each part emits, with zero appearance.
-// It is embedded once into the overview via `<Story>` in the MDX (the one thing prose
-// can't convey: that selecting a tab swaps the panel). There is no interactive knob canvas
-// for headless primitives.
+export { default as __source } from './tabs.component.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'Primitives',
+  group: 'Components',
   status: 'stable',
   title: 'Tabs',
-  source: 'packages/mosaic/src/primitives/tabs/index.ts',
+  source: 'packages/mosaic/src/components/tabs/tabs.tsx',
 };
 
 export function Default() {
@@ -23,6 +18,7 @@ export function Default() {
         <Tabs.Tab value='account'>Account</Tabs.Tab>
         <Tabs.Tab value='security'>Security</Tabs.Tab>
         <Tabs.Tab value='notifications'>Notifications</Tabs.Tab>
+        <Tabs.Indicator />
       </Tabs.List>
       <Tabs.Panel value='account'>Manage your account details.</Tabs.Panel>
       <Tabs.Panel value='security'>Update your password and sessions.</Tabs.Panel>

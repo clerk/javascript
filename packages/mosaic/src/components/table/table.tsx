@@ -4,7 +4,6 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import type { CheckboxProps } from '../checkbox';
@@ -21,21 +20,9 @@ export type TableAlign = keyof typeof aligns;
 
 export type TableSort = 'ascending' | 'descending' | 'none';
 
-export type TableProps = MosaicElementProps<'table'> & {
-  /**
-   * Whether a left/right gradient fades the edges while the table scrolls horizontally. On by
-   * default; the table still scrolls when off, it just shows no fade. Turn it off for a table
-   * whose columns are meant to fit, so an edge gradient never shows when there is nothing to scroll.
-   *
-   * @default true
-   */
-  fade?: boolean;
-};
+export type TableProps = MosaicElementProps<'table'>;
 
-const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable(
-  { xstyle, fade = true, ...rest },
-  ref,
-) {
+const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable({ xstyle, ...rest }, ref) {
   return (
     <div {...mergeStyleProps(themeProps('table-shell'), stylex.props(reset.base, scrollAreaRoot, styles.shell))}>
       <div
@@ -43,11 +30,7 @@ const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable
         tabIndex={0}
         {...mergeStyleProps(
           themeProps('table-viewport'),
-          stylex.props(
-            reset.base,
-            ...(fade ? scrollAreaViewport('auto', 'inline') : [styles.plainViewport, focusOutline.visible]),
-            styles.viewport,
-          ),
+          stylex.props(reset.base, scrollAreaViewport('auto', 'inline'), styles.viewport),
         )}
       >
         <table

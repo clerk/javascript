@@ -86,7 +86,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     section: dynamic(() => import('../stories/section.mdx')),
     select: dynamic(() => import('../stories/select.component.mdx')),
     table: dynamic(() => import('../stories/table.mdx')),
-    tabs: dynamic(() => import('../stories/tabs.mdx')),
+    tabs: dynamic(() => import('../stories/tabs.component.mdx')),
     toast: dynamic(() => import('../stories/toast.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.component.mdx')),
@@ -108,6 +108,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     otp: dynamic(() => import('../stories/otp.mdx')),
     popover: dynamic(() => import('../stories/popover.mdx')),
     select: dynamic(() => import('../stories/select.mdx')),
+    tabs: dynamic(() => import('../stories/tabs.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.mdx')),
   },
   styles: {

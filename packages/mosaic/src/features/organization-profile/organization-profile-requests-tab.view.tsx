@@ -151,7 +151,7 @@ export function OrganizationProfileRequestsTabView({
 
   return (
     <>
-      <Table.Root fade={false}>
+      <Table.Root>
         <Table.Header>
           <Table.Row>
             <Table.SelectAllCell

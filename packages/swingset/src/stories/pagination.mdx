@@ -25,6 +25,7 @@ and controlled.
     { name: 'pageSizeOptions', type: 'number[]', default: '[10, 15, 20, 100]', description: 'Sizes offered by the results-per-page select. The current `pageSize` is always included.' },
     { name: 'onPageSizeChange', type: '(pageSize: number) => void', default: '—', description: 'Called with the page size the user chose.' },
     { name: 'step', type: 'number', default: '1', description: 'How many pages the previous and next controls move.' },
+    { name: 'siblingCount', type: 'number', default: '1', description: 'Retained for compatibility and reflected as `data-sibling-count`.' },
     { name: 'label', type: 'string', default: "'Pagination'", description: 'Accessible name of the `nav`.' },
     {
       name: 'rangeLabel',

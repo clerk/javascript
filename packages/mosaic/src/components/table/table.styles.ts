@@ -18,14 +18,6 @@ export const styles = stylex.create({
   viewport: {
     overscrollBehaviorX: 'none',
   },
-  // The viewport without the scroll-area's edge fade: it still scrolls horizontally when the
-  // columns overflow, but shows no left/right gradient. For a table whose columns are meant to fit.
-  plainViewport: {
-    minWidth: 0,
-    overflowX: 'auto',
-    overflowY: 'hidden',
-    overscrollBehaviorX: 'contain',
-  },
   table: {
     borderCollapse: 'collapse',
     borderSpacing: 0,

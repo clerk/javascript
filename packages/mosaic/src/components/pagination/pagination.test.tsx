@@ -47,6 +47,18 @@ describe('Mosaic Pagination', () => {
     expect(screen.getByRole('navigation', { name: 'Invoices' })).toBeInTheDocument();
   });
 
+  it('retains the sibling count styling contract', () => {
+    render(
+      <Pagination
+        page={1}
+        totalItems={100}
+        pageSize={10}
+        siblingCount={2}
+      />,
+    );
+    expect(screen.getByRole('navigation')).toHaveAttribute('data-sibling-count', '2');
+  });
+
   it('moves with the first, previous, next, and last controls', async () => {
     const onChange = vi.fn();
     render(

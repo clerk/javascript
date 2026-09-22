@@ -20,6 +20,7 @@ export interface PaginationProps extends Omit<MosaicElementProps<'nav'>, 'onChan
   onPageSizeChange?: (pageSize: number) => void;
   hasFirstLast?: boolean;
   step?: number;
+  siblingCount?: number;
   disabled?: boolean;
   label?: string;
   /** The item range, with `{start}`, `{end}` and `{total}` filled in. */
@@ -57,6 +58,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
     onPageSizeChange,
     hasFirstLast = true,
     step = 1,
+    siblingCount = 1,
     disabled = false,
     label = 'Pagination',
     rangeLabel = '{start}–{end} of {total}',
@@ -73,6 +75,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
 ) {
   const itemsPerPage = atLeast(pageSize, 1);
   const pageStep = atLeast(step, 1);
+  const siblings = atLeast(siblingCount, 0);
   const itemCount = atLeast(totalItems, 0);
   const pageCount = Math.max(1, Math.ceil(itemCount / itemsPerPage));
   const current = Math.min(atLeast(page, 1), pageCount);
@@ -93,7 +96,7 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
       ref={ref}
       aria-label={label}
       {...mergeStyleProps(
-        themeProps('pagination', { disabled, hasFirstLast }),
+        themeProps('pagination', { disabled, hasFirstLast, siblingCount: siblings }),
         stylex.props(reset.base, styles.root, xstyle),
         rest,
       )}

@@ -338,7 +338,7 @@ export function OrganizationProfileMembersPanelView({
 
       {activeTab === 'members' ? (
         <>
-          <Table.Root fade={false}>
+          <Table.Root>
             <Table.Header>
               <Table.Row>
                 <Table.SelectAllCell
