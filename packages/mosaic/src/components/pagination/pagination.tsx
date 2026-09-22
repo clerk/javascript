@@ -101,127 +101,129 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
         rest,
       )}
     >
-      <div {...mergeStyleProps(themeProps('pagination-summary'), stylex.props(reset.base, styles.summary))}>
-        <span {...mergeStyleProps(themeProps('pagination-range'), stylex.props(reset.base, styles.text))}>
-          {fill(rangeLabel, { start, end, total: itemCount })}
-        </span>
-        <span
-          aria-hidden
-          {...mergeStyleProps(themeProps('pagination-divider'), stylex.props(reset.base, styles.divider))}
-        />
-        <div {...mergeStyleProps(themeProps('pagination-page-size'), stylex.props(reset.base, styles.pageSize))}>
-          <span {...stylex.props(reset.base, styles.text, styles.pageSizeLabel)}>{pageSizeLabel}</span>
+      <div {...stylex.props(reset.base, styles.layout)}>
+        <div {...mergeStyleProps(themeProps('pagination-summary'), stylex.props(reset.base, styles.summary))}>
+          <span {...mergeStyleProps(themeProps('pagination-range'), stylex.props(reset.base, styles.text))}>
+            {fill(rangeLabel, { start, end, total: itemCount })}
+          </span>
           <span
             aria-hidden
-            {...stylex.props(reset.base, styles.text, styles.pageSizeLabelCompact)}
-          >
-            {pageSizeLabelCompact}
-          </span>
-          <Select.Root
-            items={pageSizeItems}
-            value={String(itemsPerPage)}
-            onValueChange={value => onPageSizeChange?.(Number(value))}
-          >
-            <Select.Trigger
-              aria-label={pageSizeLabel}
-              disabled={disabled}
-              render={props => (
-                <Button
-                  color='neutral'
-                  variant='outline'
-                  size='sm'
-                  {...props}
-                />
-              )}
-            />
-            <Select.Popup>
-              {pageSizeItems.map(item => (
-                <Select.Option
-                  key={item.value}
-                  xstyle={styles.pageSizeOption}
-                  {...item}
-                />
-              ))}
-            </Select.Popup>
-          </Select.Root>
+            {...mergeStyleProps(themeProps('pagination-divider'), stylex.props(reset.base, styles.divider))}
+          />
+          <div {...mergeStyleProps(themeProps('pagination-page-size'), stylex.props(reset.base, styles.pageSize))}>
+            <span {...stylex.props(reset.base, styles.text, styles.pageSizeLabel)}>{pageSizeLabel}</span>
+            <span
+              aria-hidden
+              {...stylex.props(reset.base, styles.text, styles.pageSizeLabelCompact)}
+            >
+              {pageSizeLabelCompact}
+            </span>
+            <Select.Root
+              items={pageSizeItems}
+              value={String(itemsPerPage)}
+              onValueChange={value => onPageSizeChange?.(Number(value))}
+            >
+              <Select.Trigger
+                aria-label={pageSizeLabel}
+                disabled={disabled}
+                render={props => (
+                  <Button
+                    color='neutral'
+                    variant='outline'
+                    size='sm'
+                    {...props}
+                  />
+                )}
+              />
+              <Select.Popup>
+                {pageSizeItems.map(item => (
+                  <Select.Option
+                    key={item.value}
+                    xstyle={styles.pageSizeOption}
+                    {...item}
+                  />
+                ))}
+              </Select.Popup>
+            </Select.Root>
+          </div>
         </div>
-      </div>
 
-      <div {...mergeStyleProps(themeProps('pagination-controls'), stylex.props(reset.base, styles.controls))}>
-        <div {...stylex.props(reset.base, styles.controlGroup)}>
-          {hasFirstLast ? (
+        <div {...mergeStyleProps(themeProps('pagination-controls'), stylex.props(reset.base, styles.controls))}>
+          <div {...stylex.props(reset.base, styles.controlGroup)}>
+            {hasFirstLast ? (
+              <Button
+                aria-label={firstPageLabel}
+                color='neutral'
+                variant='outline'
+                size='sm'
+                shape='square'
+                touchTarget={false}
+                disabled={disabled || isFirst}
+                onClick={() => goTo(1)}
+              >
+                <Icon
+                  name='chevron-double-left'
+                  size='sm'
+                  xstyle={rtl.mirror}
+                />
+              </Button>
+            ) : null}
             <Button
-              aria-label={firstPageLabel}
+              aria-label={previousPageLabel}
               color='neutral'
               variant='outline'
               size='sm'
               shape='square'
               touchTarget={false}
               disabled={disabled || isFirst}
-              onClick={() => goTo(1)}
+              onClick={() => goTo(current - pageStep)}
             >
               <Icon
-                name='chevron-double-left'
+                name='chevron-left'
                 size='sm'
                 xstyle={rtl.mirror}
               />
             </Button>
-          ) : null}
-          <Button
-            aria-label={previousPageLabel}
-            color='neutral'
-            variant='outline'
-            size='sm'
-            shape='square'
-            touchTarget={false}
-            disabled={disabled || isFirst}
-            onClick={() => goTo(current - pageStep)}
-          >
-            <Icon
-              name='chevron-left'
-              size='sm'
-              xstyle={rtl.mirror}
-            />
-          </Button>
-        </div>
-        <span {...mergeStyleProps(themeProps('pagination-page-label'), stylex.props(reset.base, styles.pageLabel))}>
-          {current}/{pageCount}
-        </span>
-        <div {...stylex.props(reset.base, styles.controlGroup, styles.controlGroupEnd)}>
-          <Button
-            aria-label={nextPageLabel}
-            color='neutral'
-            variant='outline'
-            size='sm'
-            shape='square'
-            touchTarget={false}
-            disabled={disabled || isLast}
-            onClick={() => goTo(current + pageStep)}
-          >
-            <Icon
-              name='chevron-right'
-              size='sm'
-              xstyle={rtl.mirror}
-            />
-          </Button>
-          {hasFirstLast ? (
+          </div>
+          <span {...mergeStyleProps(themeProps('pagination-page-label'), stylex.props(reset.base, styles.pageLabel))}>
+            {current}/{pageCount}
+          </span>
+          <div {...stylex.props(reset.base, styles.controlGroup, styles.controlGroupEnd)}>
             <Button
-              aria-label={lastPageLabel}
+              aria-label={nextPageLabel}
               color='neutral'
               variant='outline'
               size='sm'
               shape='square'
               touchTarget={false}
               disabled={disabled || isLast}
-              onClick={() => goTo(pageCount)}
+              onClick={() => goTo(current + pageStep)}
             >
               <Icon
-                name='chevron-double-right'
+                name='chevron-right'
                 size='sm'
                 xstyle={rtl.mirror}
               />
             </Button>
-          ) : null}
+            {hasFirstLast ? (
+              <Button
+                aria-label={lastPageLabel}
+                color='neutral'
+                variant='outline'
+                size='sm'
+                shape='square'
+                touchTarget={false}
+                disabled={disabled || isLast}
+                onClick={() => goTo(pageCount)}
+              >
+                <Icon
+                  name='chevron-double-right'
+                  size='sm'
+                  xstyle={rtl.mirror}
+                />
+              </Button>
+            ) : null}
+          </div>
         </div>
       </div>
     </nav>

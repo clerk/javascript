@@ -2,10 +2,15 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, space, typeScaleVars } from '../../tokens.stylex';
 
-const compact = '@container (width < 48rem)' as const;
+const compact = '@container cl-pagination (width < 48rem)' as const;
 
 export const styles = stylex.create({
   root: {
+    containerName: 'cl-pagination',
+    containerType: 'inline-size',
+    width: '100%',
+  },
+  layout: {
     gap: space['4'],
     alignItems: { [compact]: 'stretch', default: 'center' },
     display: 'flex',
