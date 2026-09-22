@@ -42,20 +42,28 @@ export interface SelectProps extends Omit<PrimitiveSelectProps, 'items'> {
 }
 
 const ItemsContext = React.createContext<SelectItem[]>([]);
+// Split so a row reporting its hover re-renders the trigger and nothing else.
+const RowHoveredContext = React.createContext(false);
+const SetRowHoveredContext = React.createContext<React.Dispatch<React.SetStateAction<boolean>>>(() => {});
 
 /** Holds the selection and the items; renders no element of its own. */
 export function SelectRoot({ items, alignItemWithTrigger, children, ...rest }: SelectProps): React.ReactElement {
   const described = items.some(item => item.description !== undefined);
+  const [rowHovered, setRowHovered] = React.useState(false);
 
   return (
     <ItemsContext.Provider value={items}>
-      <Primitive.Root
-        items={items}
-        alignItemWithTrigger={alignItemWithTrigger ?? !described}
-        {...rest}
-      >
-        {children}
-      </Primitive.Root>
+      <SetRowHoveredContext.Provider value={setRowHovered}>
+        <RowHoveredContext.Provider value={rowHovered}>
+          <Primitive.Root
+            items={items}
+            alignItemWithTrigger={alignItemWithTrigger ?? !described}
+            {...rest}
+          >
+            {children}
+          </Primitive.Root>
+        </RowHoveredContext.Provider>
+      </SetRowHoveredContext.Provider>
     </ItemsContext.Provider>
   );
 }
@@ -100,6 +108,7 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
   const generatedId = React.useId();
   const valueId = `${generatedId}-value`;
   const { overlaysTrigger } = useSelectContext();
+  const rowHovered = React.useContext(RowHoveredContext);
   const fieldProps = useOptionalFieldControlProps({
     id: idProp,
     disabled: disabledProp,
@@ -119,7 +128,10 @@ export const SelectTrigger = React.forwardRef<HTMLButtonElement, SelectTriggerPr
         variant={variant}
         color='neutral'
         size='md'
-        xstyle={overlaysTrigger ? slots.trigger.aligned : undefined}
+        xstyle={[
+          overlaysTrigger && slots.trigger.aligned,
+          overlaysTrigger && rowHovered && slots.triggerRowHovered.base,
+        ]}
         {...props}
       />
     ));
@@ -172,6 +184,7 @@ export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(fu
   ref,
 ) {
   const items = React.useContext(ItemsContext);
+  const { overlaysTrigger } = useSelectContext();
 
   return (
     <Primitive.Portal root={portalRoot}>
@@ -182,7 +195,14 @@ export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(fu
           ref={ref}
           {...mergeStyleProps(
             themeProps('select-popup'),
-            stylex.props(reset.base, scrollAreaRoot, slots.popup.base, slots.popup.scaled, xstyle),
+            stylex.props(
+              reset.base,
+              scrollAreaRoot,
+              slots.popup.base,
+              slots.popup.scaled,
+              overlaysTrigger && slots.popup.overlaid,
+              xstyle,
+            ),
             rest,
           )}
         >
@@ -218,10 +238,33 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
   ref,
 ) {
   const { overlaysTrigger, selectedValue } = useSelectContext();
+  const setRowHovered = React.useContext(SetRowHoveredContext);
   const id = React.useId();
   const labelId = `${id}-label`;
   const descriptionId = `${id}-description`;
   const described = description !== undefined;
+  const overlaysIt = overlaysTrigger && selectedValue === rest.value;
+
+  // A close under the pointer never sends the leave, so the row hands the state back as it goes.
+  React.useEffect(() => {
+    if (!overlaysIt) {
+      return;
+    }
+    return () => setRowHovered(false);
+  }, [overlaysIt, setRowHovered]);
+
+  const hoverProps = overlaysIt
+    ? {
+        onPointerEnter: (event: React.PointerEvent<HTMLButtonElement>) => {
+          rest.onPointerEnter?.(event);
+          setRowHovered(true);
+        },
+        onPointerLeave: (event: React.PointerEvent<HTMLButtonElement>) => {
+          rest.onPointerLeave?.(event);
+          setRowHovered(false);
+        },
+      }
+    : null;
 
   return (
     <Primitive.Option
@@ -237,10 +280,11 @@ export const SelectOption = React.forwardRef<HTMLButtonElement, SelectOptionProp
           selectOptionScope,
           slots.option.base,
           described && slots.option.described,
-          overlaysTrigger && selectedValue === rest.value && slots.selectedOption.counterScale,
+          overlaysTrigger && slots.option.overlaid,
+          overlaysIt && slots.selectedOption.counterScale,
           xstyle,
         ),
-        rest,
+        { ...rest, ...hoverProps },
       )}
     >
       <span {...mergeStyleProps(themeProps('select-option-content'), stylex.props(reset.base, slots.content.base))}>
