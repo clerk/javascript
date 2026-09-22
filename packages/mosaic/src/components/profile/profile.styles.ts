@@ -263,6 +263,13 @@ export const styles = stylex.create({
     flexShrink: 0,
   },
 
+  navItemBadge: {
+    alignItems: 'center',
+    display: 'inline-flex',
+    flexShrink: 0,
+    marginInlineStart: 'auto',
+  },
+
   branding: {
     display: 'block',
     marginBlockStart: 'auto',
@@ -299,13 +306,17 @@ export const styles = stylex.create({
   },
 
   contentViewport: {
-    paddingBlock: {
-      [compact]: space['6'],
-      default: `calc(${space['16']} - ${SCROLL_INSET})`,
-    },
     paddingInline: {
       [compact]: space['6'],
       default: space['16'],
+    },
+    paddingBlockEnd: {
+      [compact]: space['6'],
+      default: `calc(${space['8']} - ${SCROLL_INSET})`,
+    },
+    paddingBlockStart: {
+      [compact]: space['6'],
+      default: `calc(${space['16']} - ${SCROLL_INSET})`,
     },
   },
 

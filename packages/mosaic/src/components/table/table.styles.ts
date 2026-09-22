@@ -10,6 +10,9 @@ export const styles = stylex.create({
     borderWidth: '1px',
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-background'],
+    containerType: 'inline-size',
+    maxWidth: '100%',
+    minWidth: 0,
     width: '100%',
   },
   viewport: {

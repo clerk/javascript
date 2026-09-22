@@ -1,16 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { fill } from '../../localization/messages';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { rtl } from '../../utils/rtl.styles';
 import { Button } from '../button';
-import { ButtonContext } from '../button/button.context';
 import { Icon } from '../icon';
 import { Select } from '../select';
-import { Text } from '../text';
-import { getPageItems } from './page-items';
 import { styles } from './pagination.styles';
 
 export interface PaginationProps extends Omit<MosaicElementProps<'nav'>, 'onChange'> {
@@ -25,7 +23,11 @@ export interface PaginationProps extends Omit<MosaicElementProps<'nav'>, 'onChan
   siblingCount?: number;
   disabled?: boolean;
   label?: string;
+  /** The item range, with `{start}`, `{end}` and `{total}` filled in. */
+  rangeLabel?: string;
   pageSizeLabel?: string;
+  /** Stands in for `pageSizeLabel` when the pagination is too narrow to carry it. */
+  pageSizeLabelCompact?: string;
   firstPageLabel?: string;
   previousPageLabel?: string;
   nextPageLabel?: string;
@@ -36,19 +38,15 @@ function atLeast(value: number, min: number): number {
   return Number.isFinite(value) && value > min ? Math.floor(value) : min;
 }
 
-const defaultPageSizeOptions = [10, 25, 50, 100];
+const defaultPageSizeOptions = [10, 15, 20, 100];
 
 /**
- * Page navigation for a paged list. Renders a labelled `nav` with previous/next controls, the
- * page numbers around the current one, and a results-per-page control. Pages are 1-based;
+ * Page navigation for a paged list. Renders the current item range, a results-per-page control,
+ * first/previous/next/last controls, and the current page over the total. Pages are 1-based;
  * `onChange` receives the page the user asked for.
  *
  * @example
  * <Pagination page={page} totalItems={120} pageSize={10} onChange={setPage} />
- *
- * @example
- * // With jump-to-ends controls and a wider window of pages
- * <Pagination page={page} totalItems={120} pageSize={10} onChange={setPage} hasFirstLast siblingCount={2} />
  */
 export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(function MosaicPagination(
   {
@@ -58,12 +56,14 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
     onChange,
     pageSizeOptions = defaultPageSizeOptions,
     onPageSizeChange,
-    hasFirstLast = false,
+    hasFirstLast = true,
     step = 1,
     siblingCount = 1,
     disabled = false,
     label = 'Pagination',
+    rangeLabel = '{start}–{end} of {total}',
     pageSizeLabel = 'Results per page',
+    pageSizeLabelCompact = 'Show',
     firstPageLabel = 'First page',
     previousPageLabel = 'Previous page',
     nextPageLabel = 'Next page',
@@ -76,9 +76,11 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
   const itemsPerPage = atLeast(pageSize, 1);
   const pageStep = atLeast(step, 1);
   const siblings = atLeast(siblingCount, 0);
-  const pageCount = Math.max(1, Math.ceil(atLeast(totalItems, 0) / itemsPerPage));
+  const itemCount = atLeast(totalItems, 0);
+  const pageCount = Math.max(1, Math.ceil(itemCount / itemsPerPage));
   const current = Math.min(atLeast(page, 1), pageCount);
-  const labelId = React.useId();
+  const start = itemCount === 0 ? 0 : (current - 1) * itemsPerPage + 1;
+  const end = Math.min(current * itemsPerPage, itemCount);
   const pageSizeItems = React.useMemo(() => {
     const sizes = new Set(
       [...pageSizeOptions, itemsPerPage].filter(size => Number.isFinite(size) && size >= 1).map(Math.floor),
@@ -87,164 +89,140 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
   }, [pageSizeOptions, itemsPerPage]);
   const isFirst = current <= 1;
   const isLast = current >= pageCount;
-
-  const pageDefaults = React.useMemo(
-    () =>
-      ({
-        color: 'neutral',
-        variant: 'ghost',
-        size: 'sm',
-        disabled,
-        styles: styles.page,
-      }) as const,
-    [disabled],
-  );
-
   const goTo = (next: number) => onChange?.(Math.min(Math.max(next, 1), pageCount));
 
   return (
     <nav
       ref={ref}
       aria-label={label}
-      {...mergeStyleProps(themeProps('pagination', { disabled }), stylex.props(reset.base, styles.root, xstyle), rest)}
+      {...mergeStyleProps(
+        themeProps('pagination', { disabled, hasFirstLast, siblingCount: siblings }),
+        stylex.props(reset.base, styles.root, xstyle),
+        rest,
+      )}
     >
+      <div {...mergeStyleProps(themeProps('pagination-summary'), stylex.props(reset.base, styles.summary))}>
+        <span {...mergeStyleProps(themeProps('pagination-range'), stylex.props(reset.base, styles.text))}>
+          {fill(rangeLabel, { start, end, total: itemCount })}
+        </span>
+        <span
+          aria-hidden
+          {...mergeStyleProps(themeProps('pagination-divider'), stylex.props(reset.base, styles.divider))}
+        />
+        <div {...mergeStyleProps(themeProps('pagination-page-size'), stylex.props(reset.base, styles.pageSize))}>
+          <span {...stylex.props(reset.base, styles.text, styles.pageSizeLabel)}>{pageSizeLabel}</span>
+          <span
+            aria-hidden
+            {...stylex.props(reset.base, styles.text, styles.pageSizeLabelCompact)}
+          >
+            {pageSizeLabelCompact}
+          </span>
+          <Select.Root
+            items={pageSizeItems}
+            value={String(itemsPerPage)}
+            onValueChange={value => onPageSizeChange?.(Number(value))}
+          >
+            <Select.Trigger
+              aria-label={pageSizeLabel}
+              disabled={disabled}
+              render={props => (
+                <Button
+                  color='neutral'
+                  variant='outline'
+                  size='sm'
+                  {...props}
+                />
+              )}
+            />
+            <Select.Popup>
+              {pageSizeItems.map(item => (
+                <Select.Option
+                  key={item.value}
+                  xstyle={styles.pageSizeOption}
+                  {...item}
+                />
+              ))}
+            </Select.Popup>
+          </Select.Root>
+        </div>
+      </div>
+
       <div {...mergeStyleProps(themeProps('pagination-controls'), stylex.props(reset.base, styles.controls))}>
-        {hasFirstLast && (
+        <div {...stylex.props(reset.base, styles.controlGroup)}>
+          {hasFirstLast ? (
+            <Button
+              aria-label={firstPageLabel}
+              color='neutral'
+              variant='outline'
+              size='sm'
+              shape='square'
+              touchTarget={false}
+              disabled={disabled || isFirst}
+              onClick={() => goTo(1)}
+            >
+              <Icon
+                name='chevron-double-left'
+                size='sm'
+                xstyle={rtl.mirror}
+              />
+            </Button>
+          ) : null}
           <Button
-            aria-label={firstPageLabel}
+            aria-label={previousPageLabel}
             color='neutral'
             variant='outline'
             size='sm'
             shape='square'
             touchTarget={false}
             disabled={disabled || isFirst}
-            xstyle={styles.hitTarget}
-            onClick={() => goTo(1)}
+            onClick={() => goTo(current - pageStep)}
           >
             <Icon
-              name='chevron-double-left'
-              xstyle={rtl.mirror}
+              name='chevron-left'
               size='sm'
+              xstyle={rtl.mirror}
             />
           </Button>
-        )}
-        <Button
-          aria-label={previousPageLabel}
-          color='neutral'
-          variant='outline'
-          size='sm'
-          shape='square'
-          touchTarget={false}
-          disabled={disabled || isFirst}
-          xstyle={styles.hitTarget}
-          onClick={() => goTo(current - pageStep)}
-        >
-          <Icon
-            name='chevron-left'
-            xstyle={rtl.mirror}
-            size='sm'
-          />
-        </Button>
-        <ButtonContext.Provider value={pageDefaults}>
-          {getPageItems(current, pageCount, siblings).map(item =>
-            typeof item === 'number' ? (
-              <Button
-                key={item}
-                aria-current={item === current ? 'page' : undefined}
-                touchTarget={false}
-                xstyle={styles.hitTarget}
-                onClick={() => goTo(item)}
-              >
-                {item}
-              </Button>
-            ) : (
-              <span
-                key={item}
-                aria-hidden
-                {...mergeStyleProps(themeProps('pagination-ellipsis'), stylex.props(reset.base, styles.ellipsis))}
-              >
-                <Icon
-                  name='ellipsis-horizontal'
-                  size='sm'
-                />
-              </span>
-            ),
-          )}
-        </ButtonContext.Provider>
-        <Button
-          aria-label={nextPageLabel}
-          color='neutral'
-          variant='outline'
-          size='sm'
-          shape='square'
-          touchTarget={false}
-          disabled={disabled || isLast}
-          xstyle={styles.hitTarget}
-          onClick={() => goTo(current + pageStep)}
-        >
-          <Icon
-            name='chevron-right'
-            xstyle={rtl.mirror}
-            size='sm'
-          />
-        </Button>
-        {hasFirstLast && (
+        </div>
+        <span {...mergeStyleProps(themeProps('pagination-page-label'), stylex.props(reset.base, styles.pageLabel))}>
+          {current}/{pageCount}
+        </span>
+        <div {...stylex.props(reset.base, styles.controlGroup, styles.controlGroupEnd)}>
           <Button
-            aria-label={lastPageLabel}
+            aria-label={nextPageLabel}
             color='neutral'
             variant='outline'
             size='sm'
             shape='square'
             touchTarget={false}
             disabled={disabled || isLast}
-            xstyle={styles.hitTarget}
-            onClick={() => goTo(pageCount)}
+            onClick={() => goTo(current + pageStep)}
           >
             <Icon
-              name='chevron-double-right'
-              xstyle={rtl.mirror}
+              name='chevron-right'
               size='sm'
+              xstyle={rtl.mirror}
             />
           </Button>
-        )}
-      </div>
-      <div {...mergeStyleProps(themeProps('pagination-page-size'), stylex.props(reset.base, styles.pageSize))}>
-        <Text
-          id={labelId}
-          render={<span />}
-          size='sm'
-          color='foreground-secondary'
-          {...themeProps('pagination-label')}
-        >
-          {pageSizeLabel}
-        </Text>
-        <Select.Root
-          items={pageSizeItems}
-          value={String(itemsPerPage)}
-          onValueChange={value => onPageSizeChange?.(Number(value))}
-        >
-          <Select.Trigger
-            aria-labelledby={labelId}
-            disabled={disabled}
-            render={props => (
-              <Button
-                color='neutral'
-                variant='outline'
+          {hasFirstLast ? (
+            <Button
+              aria-label={lastPageLabel}
+              color='neutral'
+              variant='outline'
+              size='sm'
+              shape='square'
+              touchTarget={false}
+              disabled={disabled || isLast}
+              onClick={() => goTo(pageCount)}
+            >
+              <Icon
+                name='chevron-double-right'
                 size='sm'
-                {...props}
+                xstyle={rtl.mirror}
               />
-            )}
-          />
-          <Select.Popup>
-            {pageSizeItems.map(item => (
-              <Select.Option
-                key={item.value}
-                xstyle={styles.pageSizeOption}
-                {...item}
-              />
-            ))}
-          </Select.Popup>
-        </Select.Root>
+            </Button>
+          ) : null}
+        </div>
       </div>
     </nav>
   );

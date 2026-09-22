@@ -1,0 +1,48 @@
+import * as TabsStories from './tabs.component.stories';
+
+# Tabs
+
+A set of layered sections where one panel is shown at a time. Tabs include keyboard navigation,
+ARIA wiring, and an indicator that slides between selections.
+
+## Example
+
+Click a tab, or focus one and use the arrow keys, to swap the visible panel.
+
+<Story
+  name='Default'
+  storyModule={TabsStories}
+/>
+
+## Usage
+
+```tsx
+import { Tabs } from '@clerk/mosaic/components/tabs';
+
+<Tabs.Root defaultValue='tab1'>
+  <Tabs.List>
+    <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+    <Tabs.Tab value='tab2'>Security</Tabs.Tab>
+    <Tabs.Indicator />
+  </Tabs.List>
+  <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+  <Tabs.Panel value='tab2'>Security content</Tabs.Panel>
+</Tabs.Root>;
+```
+
+## Parts
+
+| Part             | Element    | Description                                                       |
+| ---------------- | ---------- | ----------------------------------------------------------------- |
+| `Tabs.Root`      | none       | Provides active-value state, orientation, and activation mode     |
+| `Tabs.List`      | `<div>`    | `role="tablist"` container with roving-tabindex navigation        |
+| `Tabs.Tab`       | `<button>` | A keyboard-navigable tab trigger inside `Tabs.List`               |
+| `Tabs.Trigger`   | `<button>` | Standalone tab trigger for use outside `Tabs.List`                |
+| `Tabs.Panel`     | `<div>`    | `role="tabpanel"`; hidden when inactive                           |
+| `Tabs.Indicator` | `<span>`   | Decorative element that tracks the active tab's position and size |
+
+All rendered parts accept a `render` prop for polymorphic rendering, standard HTML attributes,
+and `xstyle`. `Tabs.Root` renders no element of its own.
+
+The selection indicator uses a short CSS transition and disables its motion when the user prefers
+reduced motion.

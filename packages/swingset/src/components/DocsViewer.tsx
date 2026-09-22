@@ -12,6 +12,18 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   'user-button': {
     'user-button': dynamic(() => import('../stories/user-button.mdx')),
   },
+  'organization-profile': {
+    'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
+    'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
+    'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
+    'organization-profile-security-panel': dynamic(() => import('../stories/organization-profile-security-panel.mdx')),
+    'organization-profile-billing-panel': dynamic(() => import('../stories/organization-profile-billing-panel.mdx')),
+    'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
+    'organization-profile-invitations-tab': dynamic(
+      () => import('../stories/organization-profile-invitations-tab.mdx'),
+    ),
+    'organization-profile-requests-tab': dynamic(() => import('../stories/organization-profile-requests-tab.mdx')),
+  },
   'user-profile': {
     'user-profile': dynamic(() => import('../stories/user-profile.mdx')),
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
@@ -47,6 +59,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
   },
   components: {
+    'action-bar': dynamic(() => import('../stories/action-bar.mdx')),
     avatar: dynamic(() => import('../stories/avatar.mdx')),
     badge: dynamic(() => import('../stories/badge.mdx')),
     banner: dynamic(() => import('../stories/banner.mdx')),
@@ -73,6 +86,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     section: dynamic(() => import('../stories/section.mdx')),
     select: dynamic(() => import('../stories/select.component.mdx')),
     table: dynamic(() => import('../stories/table.mdx')),
+    tabs: dynamic(() => import('../stories/tabs.component.mdx')),
     toast: dynamic(() => import('../stories/toast.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.component.mdx')),

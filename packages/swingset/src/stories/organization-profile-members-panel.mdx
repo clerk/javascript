@@ -1,0 +1,45 @@
+import * as OrganizationProfileMembersPanelStories from './organization-profile-members-panel.stories';
+
+# OrganizationProfileMembersPanel
+
+The Members page: three tabs — Members, Invitations, and Requests — over a shared toolbar (search, a
+role filter, and an invite button). Members are a sortable, paginated `Table` with inline role
+changes, a per-row remove that confirms first, and a bulk `ActionBar` for changing roles or removing
+a selection. The viewer's own row cannot be selected and their role cannot be changed. The
+Invitations and Requests tabs are documented as their own sections.
+
+<Story
+  name='Default'
+  storyModule={OrganizationProfileMembersPanelStories}
+  composition={[
+    { name: 'Table', href: '/components/table', layer: 'Components' },
+    { name: 'ActionBar', href: '/components/action-bar', layer: 'Components' },
+    { name: 'Pagination', href: '/components/pagination', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+    { name: 'Select', href: '/components/select', layer: 'Components' },
+    { name: 'InputGroup', href: '/components/input-group', layer: 'Components' },
+    { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'EmptyState', href: '/components/empty-state', layer: 'Components' },
+  ]}
+/>
+
+## Empty states
+
+Each page state opens the relevant tab directly. The Members and Invitations states retain their
+invite actions, while Requests explains where future requests will appear.
+
+<Story
+  name='EmptyMembers'
+  storyModule={OrganizationProfileMembersPanelStories}
+/>
+
+<Story
+  name='EmptyInvitations'
+  storyModule={OrganizationProfileMembersPanelStories}
+/>
+
+<Story
+  name='EmptyRequests'
+  storyModule={OrganizationProfileMembersPanelStories}
+/>
