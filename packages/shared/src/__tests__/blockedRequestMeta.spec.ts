@@ -4,10 +4,6 @@ import { ClerkAPIError } from '../errors/clerkApiError';
 import { errorToJSON } from '../errors/parseError';
 import type { ClerkAPIErrorJSON } from '../types/errors';
 
-// The details shown on the blocked-request screen ride on the error's meta.
-// Both directions of the mapping have an exhaustive field list, so a field
-// added to one and not the other is dropped silently — which reads as "the
-// application configured no message" rather than as a bug.
 describe('blocked request error meta', () => {
   const json: ClerkAPIErrorJSON = {
     code: 'action_blocked',
@@ -37,9 +33,6 @@ describe('blocked request error meta', () => {
     });
   });
 
-  // errorToJSON backs __internal_toSnapshot, so this is the SSR/hydration path:
-  // without it the screen loses its message and reference after rehydration and
-  // silently degrades to the generic wording.
   it('survives a snapshot round trip', () => {
     const roundTripped = new ClerkAPIError(errorToJSON(new ClerkAPIError(json)));
     expect(roundTripped.meta).toMatchObject({

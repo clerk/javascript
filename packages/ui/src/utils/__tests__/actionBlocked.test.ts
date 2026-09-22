@@ -74,7 +74,6 @@ describe('getActionBlockedDetails', () => {
     expect(getActionBlockedDetails(blocked({}))).toBeNull();
   });
 
-  // The screen never renders these, so on their own they are not a reason to replace the form.
   it('does not count fields the screen does not render', () => {
     expect(getActionBlockedDetails(blocked({ linkText: 'Contact support' }))).toBeNull();
     expect(getActionBlockedDetails(blocked({ kind: 'custom_kind' }))).toBeNull();

@@ -14,7 +14,6 @@ type State = {
   status: Status;
   metadata: Metadata;
   error: string | undefined;
-  /** The error `error` was translated from, for a card that renders more than the message. */
   rawError?: CardError;
 };
 type CardStateCtxValue = {
@@ -29,7 +28,6 @@ export const CardStateProvider = (props: React.PropsWithChildren<any>) => {
   const router = useRouter();
 
   const [state, setState] = React.useState<State>(() => {
-    // Read once: the getter hands the error over and clears it.
     const lastError = window?.Clerk?.__internal_last_error || undefined;
     return { status: 'idle', metadata: undefined, error: translateError(lastError), rawError: lastError };
   });

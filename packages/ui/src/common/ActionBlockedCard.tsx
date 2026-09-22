@@ -11,10 +11,6 @@ type ActionBlockedCardProps = {
   details: ActionBlockedDetails;
 };
 
-/**
- * Replaces a card's body when its request was blocked: there is no field to correct and no retry
- * that helps, so it is shown instead of the form rather than as an inline error beside it.
- */
 export const ActionBlockedCard = (props: ActionBlockedCardProps) => {
   const { traceId, title, description, linkUrl, linkText } = props.details;
   const href = safeHref(linkUrl);
@@ -66,7 +62,6 @@ export const ActionBlockedCard = (props: ActionBlockedCardProps) => {
                 variant='buttonLarge'
                 colorScheme='inherit'
                 sx={{ textAlign: 'center', textDecoration: 'underline' }}
-                // The destination is the application's choice, not necessarily under its control.
                 {...{ href, target: '_blank', rel: 'noopener noreferrer' }}
               >
                 {linkText || href}

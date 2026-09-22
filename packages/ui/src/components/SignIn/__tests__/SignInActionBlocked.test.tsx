@@ -57,7 +57,6 @@ describe('a blocked sign-in', () => {
     const { wrapper } = await createFixtures(f => {
       f.withEmailAddress();
     });
-    // Like the real getter, this hands the error over once and then clears it.
     let lastError: unknown = blockedError({ trace_id: '7Q8ikxgt' }).errors[0];
     window.Clerk = {
       get __internal_last_error() {
@@ -72,9 +71,6 @@ describe('a blocked sign-in', () => {
     await screen.findByText('7Q8ikxgt');
   });
 
-  // Only the cards that render the blocked screen read the details. Any other card must keep
-  // showing its inline error, or a block there would leave the user looking at a form with nothing
-  // on it.
   it('leaves the inline error alone on a card that does not render the blocked screen', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.withEmailAddress();

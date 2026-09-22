@@ -36,8 +36,6 @@ describe('card state keeps the raw error beside the translated one', () => {
     expect(result.current.error).toBe('action_blocked');
   });
 
-  // Callers clear the error by passing undefined or '' before every attempt, so the raw error
-  // must clear with it or a card that renders from it would stay stuck on an old one.
   it('clears both', () => {
     const { result } = renderCard();
     act(() => result.current.setError(blocked));
