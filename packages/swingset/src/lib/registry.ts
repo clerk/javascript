@@ -226,7 +226,7 @@ import {
   Sizes as TextSizes,
 } from '../stories/text.stories';
 import { meta as toastPrimitiveMeta } from '../stories/toast.primitive.stories';
-import { meta as toastMeta } from '../stories/toast.stories';
+import { Anchored as ToastAnchored, Default as ToastDefault, meta as toastMeta } from '../stories/toast.stories';
 import {
   Default as TooltipComponentDefault,
   Group as TooltipComponentGroup,
@@ -614,7 +614,7 @@ const tableModule: StoryModule = {
 };
 
 // Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
-const toastModule: StoryModule = { meta: toastMeta };
+const toastModule: StoryModule = { meta: toastMeta, Default: ToastDefault, Anchored: ToastAnchored };
 
 const userProfileApiKeysPanelModule: StoryModule = {
   meta: userProfileApiKeysPanelMeta,

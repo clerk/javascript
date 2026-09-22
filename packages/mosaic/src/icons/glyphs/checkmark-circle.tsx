@@ -1,20 +1,18 @@
 import { glyph } from '../glyph';
 
 export const CheckmarkCircle = glyph(
-  <g transform='translate(2.5 2)'>
+  <>
     <path
-      d='M6 10.625C8.55432 10.625 10.625 8.55432 10.625 6C10.625 3.44568 8.55432 1.375 6 1.375C3.44568 1.375 1.375 3.44568 1.375 6C1.375 8.55432 3.44568 10.625 6 10.625Z'
+      d='M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z'
+      stroke='currentColor'
+      strokeWidth='1.5'
+    />
+    <path
+      d='M5.25 8.6L7.075 10.435L10.1 5.9'
       stroke='currentColor'
       strokeWidth='1.5'
       strokeLinecap='round'
       strokeLinejoin='round'
     />
-    <path
-      d='M3.875 6.46155L5.28125 7.875L7.625 4.375'
-      stroke='currentColor'
-      strokeWidth='1.5'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    />
-  </g>,
+  </>,
 );
