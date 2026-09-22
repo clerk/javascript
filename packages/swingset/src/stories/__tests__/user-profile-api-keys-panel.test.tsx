@@ -241,9 +241,10 @@ describe('API keys playground', () => {
     for (const name of ['Staging', 'Local development']) {
       await user.click(screen.getByRole('button', { name: `Manage ${name}` }));
       await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
-      const dialog = screen.getByRole('alertdialog');
+      const dialog = screen.getByRole('dialog');
+      await user.type(within(dialog).getByRole('textbox'), name);
       await user.click(within(dialog).getByRole('button', { name: 'Revoke key' }));
-      await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     }
     expect(screen.getByText('Web app')).toBeVisible();
     expect(screen.getAllByRole('row')).toHaveLength(11);
