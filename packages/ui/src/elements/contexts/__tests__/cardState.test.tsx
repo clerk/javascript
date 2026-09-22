@@ -1,79 +1,61 @@
+import type { ClerkAPIError } from '@clerk/shared/types';
 import { act, renderHook } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { useCardState, withCardStateProvider } from '../index';
 
-// The localization layer is not what these assertions are about; translateError
-// just needs to hand back something.
 vi.mock('../../../customizables', () => ({
-  useLocalizations: () => ({ translateError: (e: any) => (typeof e === 'string' ? e : (e?.code ?? '')) }),
+  useLocalizations: () => ({
+    translateError: (e: ClerkAPIError | string | undefined) => (typeof e === 'string' ? e : (e?.code ?? '')),
+  }),
 }));
 
-// The provider reads the router only to re-surface Clerk's last error on
-// navigation, which is not what these assertions are about.
 vi.mock('@/ui/router', () => ({
   useRouter: () => ({ currentPath: '/' }),
 }));
 
-const blocked = {
+const blocked: ClerkAPIError = {
   code: 'action_blocked',
   message: 'Action blocked',
   meta: { traceId: '7Q8ikxgt' },
 };
 
-const wrapper = withCardStateProvider(({ children }: { children?: React.ReactNode }) => <>{children}</>);
+const Provider = withCardStateProvider(({ children }: { children?: React.ReactNode }) => <>{children}</>);
 
 const renderCard = () =>
   renderHook(() => useCardState(), {
-    wrapper: ({ children }) => React.createElement(wrapper as any, null, children),
+    wrapper: ({ children }) => <Provider>{children}</Provider>,
   });
 
-describe('card state, blocked requests', () => {
-  it('sets blockedDetails and clears the inline error', () => {
+describe('card state keeps the raw error beside the translated one', () => {
+  it('sets both', () => {
     const { result } = renderCard();
-    act(() => result.current.setError(blocked as any));
-    expect(result.current.blockedDetails).toEqual({ traceId: '7Q8ikxgt' });
-    expect(result.current.error).toBeUndefined();
-  });
-
-  // The blocked screen must not LATCH. Every caller that clears an error passes
-  // undefined or '' first — handleClerkApiError does, and so does the
-  // protect-check runner — so a card that had once been blocked would otherwise
-  // never show anything again, including the next real error.
-  it('clears blockedDetails when the error is cleared', () => {
-    const { result } = renderCard();
-    act(() => result.current.setError(blocked as any));
-    expect(result.current.blockedDetails).toBeTruthy();
-
-    act(() => result.current.setError(undefined as any));
-    expect(result.current.blockedDetails).toBeUndefined();
-  });
-
-  it('clears blockedDetails when a different error replaces it', () => {
-    const { result } = renderCard();
-    act(() => result.current.setError(blocked as any));
-    expect(result.current.blockedDetails).toBeTruthy();
-
-    act(() => result.current.setError({ code: 'form_password_incorrect', message: 'nope' } as any));
-    expect(result.current.blockedDetails).toBeUndefined();
-    expect(result.current.error).toBe('form_password_incorrect');
-  });
-
-  it('leaves a normal error alone', () => {
-    const { result } = renderCard();
-    act(() => result.current.setError('something went wrong'));
-    expect(result.current.blockedDetails).toBeUndefined();
-    expect(result.current.error).toBe('something went wrong');
-  });
-
-  // A blocked request from an older backend carries no meta, so it must fall
-  // through to the inline error rather than taking over the screen with nothing
-  // on it.
-  it('ignores a blocked error with no details', () => {
-    const { result } = renderCard();
-    act(() => result.current.setError({ code: 'action_blocked', message: 'Action blocked' } as any));
-    expect(result.current.blockedDetails).toBeUndefined();
+    act(() => result.current.setError(blocked));
+    expect(result.current.rawError).toBe(blocked);
     expect(result.current.error).toBe('action_blocked');
+  });
+
+  // Callers clear the error by passing undefined or '' before every attempt, so the raw error
+  // must clear with it or a card that renders from it would stay stuck on an old one.
+  it('clears both', () => {
+    const { result } = renderCard();
+    act(() => result.current.setError(blocked));
+    act(() => result.current.setError(undefined));
+    expect(result.current.rawError).toBeUndefined();
+    expect(result.current.error).toBeUndefined();
+
+    act(() => result.current.setError(blocked));
+    act(() => result.current.setError(''));
+    expect(result.current.rawError).toBeUndefined();
+  });
+
+  it('replaces both', () => {
+    const { result } = renderCard();
+    const incorrect: ClerkAPIError = { code: 'form_password_incorrect', message: 'nope' };
+    act(() => result.current.setError(blocked));
+    act(() => result.current.setError(incorrect));
+    expect(result.current.rawError).toBe(incorrect);
+    expect(result.current.error).toBe('form_password_incorrect');
   });
 });
