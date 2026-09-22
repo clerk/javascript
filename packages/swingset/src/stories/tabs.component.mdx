@@ -34,19 +34,19 @@ import { Tabs } from '@clerk/mosaic/components/tabs';
 
 ## Parts
 
-| Part             | Element    | Description                                                       |
-| ---------------- | ---------- | ----------------------------------------------------------------- |
-| `Tabs.Root`      | none       | Provides active-value state, orientation, and activation mode     |
-| `Tabs.List`      | `<div>`    | `role="tablist"` container with roving-tabindex navigation        |
-| `Tabs.Tab`       | `<button>` | A keyboard-navigable tab trigger inside `Tabs.List`               |
-| `Tabs.Trigger`   | `<button>` | Standalone tab trigger for use outside `Tabs.List`                |
-| `Tabs.Panels`    | `<div>`    | Grid container that stacks direct `Tabs.Panel` children           |
-| `Tabs.Panel`     | `<div>`    | `role="tabpanel"`; hidden when inactive                           |
-| `Tabs.Indicator` | `<span>`   | Decorative element that tracks the active tab's position and size |
+| Part             | Element    | Description                                                                           |
+| ---------------- | ---------- | ------------------------------------------------------------------------------------- |
+| `Tabs.Root`      | `<div>`    | Column container providing active-value state and activation mode for horizontal tabs |
+| `Tabs.List`      | `<div>`    | `role="tablist"` container with roving-tabindex navigation                            |
+| `Tabs.Tab`       | `<button>` | A keyboard-navigable tab trigger inside `Tabs.List`                                   |
+| `Tabs.Trigger`   | `<button>` | Standalone tab trigger for use outside `Tabs.List`                                    |
+| `Tabs.Panels`    | `<div>`    | Grid container that stacks direct `Tabs.Panel` children                               |
+| `Tabs.Panel`     | `<div>`    | `role="tabpanel"`; hidden when inactive                                               |
+| `Tabs.Indicator` | `<span>`   | Decorative element that tracks the active tab's position and size                     |
 
-All rendered parts accept a `render` prop for polymorphic rendering, standard HTML attributes,
-and `xstyle`. `Tabs.Root` renders a column container so the list and panels stack regardless of the
-surrounding layout.
+All parts accept `xstyle`. Parts other than `Tabs.Root` also accept a `render` prop for polymorphic
+rendering and standard HTML attributes. `Tabs.Root` renders a column container inside the primitive's
+context provider so the list and panels stack regardless of the surrounding layout.
 
 The selection indicator uses a short CSS transition and disables its motion when the user prefers
 reduced motion.

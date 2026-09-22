@@ -20,7 +20,7 @@ import { styles } from './tabs.styles';
 type StyledProps<Props> = Omit<Props, 'className' | 'style'> & MosaicStyleProps;
 
 /** Props for the root container. Set the active tab with `value`/`defaultValue` and observe changes via `onValueChange`. */
-export type TabsRootProps = StyledProps<HeadlessTabsRootProps>;
+export type TabsRootProps = StyledProps<Omit<HeadlessTabsRootProps, 'orientation'>>;
 /** Props for the `role="tablist"` container that wraps the `Tab`s and `Indicator`. */
 export type TabsListProps = StyledProps<HeadlessTabsListProps>;
 /** Props for a tab rendered inside `List`. Its `value` pairs it with the `Panel` sharing the same value. */
