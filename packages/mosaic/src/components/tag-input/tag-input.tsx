@@ -25,9 +25,13 @@ type TagInputRootProps = Pick<
 export interface TagInputProps
   extends
     Omit<MosaicComponentProps<'input'>, keyof TagInputRootProps | 'render' | 'children' | 'type'>,
-    TagInputRootProps {}
+    TagInputRootProps {
+  removeLabel?: (value: string) => string;
+}
 
-function Tags() {
+const defaultRemoveLabel = (value: string) => `Remove ${value}`;
+
+function Tags({ removeLabel }: { removeLabel: (value: string) => string }) {
   const { tags, disabled } = Primitive.useTagInput();
 
   return tags.map(tag => (
@@ -43,6 +47,7 @@ function Tags() {
         {tag.value}
       </span>
       <Primitive.TagRemove
+        aria-label={removeLabel(tag.value)}
         {...mergeStyleProps(themeProps('tag-input-tag-remove'), stylex.props(reset.base, styles.tagRemove))}
       >
         <Icon
@@ -84,6 +89,7 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
     validate,
     delimiters,
     name,
+    removeLabel = defaultRemoveLabel,
     disabled: disabledProp,
     required: requiredProp,
     id,
@@ -123,7 +129,7 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
       )}
     >
       <Primitive.List {...mergeStyleProps(themeProps('tag-input-list'), stylex.props(reset.base, styles.list))}>
-        <Tags />
+        <Tags removeLabel={removeLabel} />
       </Primitive.List>
       <TextInput
         {...inputProps}

@@ -69,6 +69,18 @@ describe('Mosaic TagInput', () => {
     expect(onValueChange).toHaveBeenLastCalledWith(['nate@clerk.dev']);
   });
 
+  it('labels each remove button with removeLabel', () => {
+    render(
+      <TagInput
+        aria-label='Email'
+        defaultValue={['preston@clerk.dev']}
+        removeLabel={value => `Quitar ${value}`}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Quitar preston@clerk.dev' })).toBeInTheDocument();
+  });
+
   it('marks tags that fail validation', () => {
     render(
       <TagInput

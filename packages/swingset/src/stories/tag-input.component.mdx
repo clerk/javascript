@@ -22,6 +22,7 @@ A field that turns typed and pasted entries into removable tags, built on the he
     { name: 'validate', type: '(value: string) => boolean', default: '—' },
     { name: 'delimiters', type: 'string[]', default: "[',']" },
     { name: 'name', type: 'string', default: '—' },
+    { name: 'removeLabel', type: '(value: string) => string', default: '`Remove ${value}`' },
   ]}
 />
 
