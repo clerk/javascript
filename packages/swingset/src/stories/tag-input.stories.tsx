@@ -1,3 +1,4 @@
+import { useLayoutAnimation } from '@clerk/mosaic/primitives/hooks';
 import { TagInput } from '@clerk/mosaic/primitives/tag-input';
 import { X } from 'lucide-react';
 import { type ComponentProps, type ReactNode, useId, useRef, useState } from 'react';
@@ -92,7 +93,17 @@ html[dir='rtl']::view-transition-new(*.tag-input) {
 }
 `;
 
-function StyledTags({ className, presentOnly = false }: { className: string; presentOnly?: boolean }) {
+type LayoutItemProps = ReturnType<typeof useLayoutAnimation>['itemProps'];
+
+function StyledTags({
+  className,
+  presentOnly = false,
+  itemProps,
+}: {
+  className: string;
+  presentOnly?: boolean;
+  itemProps?: LayoutItemProps;
+}) {
   const { tags } = TagInput.useTagInput();
   const visible = presentOnly ? tags.filter(tag => tag.present) : tags;
   return visible.map(tag => (
@@ -100,6 +111,7 @@ function StyledTags({ className, presentOnly = false }: { className: string; pre
       key={tag.value}
       value={tag.value}
       className={className}
+      {...itemProps}
     >
       {tag.value}
       <TagInput.TagRemove className='hover:bg-foreground/10 rounded-sm p-0.5'>
@@ -111,10 +123,18 @@ function StyledTags({ className, presentOnly = false }: { className: string; pre
 
 type StyledFieldProps = Omit<ComponentProps<typeof TagInput.Root>, 'children'> & {
   tags: ReactNode;
+  rootClassName?: string;
   inputClassName?: string;
+  inputItemProps?: LayoutItemProps;
 };
 
-function StyledField({ tags, inputClassName = '', ...rootProps }: StyledFieldProps) {
+function StyledField({
+  tags,
+  rootClassName = '',
+  inputClassName = '',
+  inputItemProps,
+  ...rootProps
+}: StyledFieldProps) {
   const id = useId();
   const inputId = `${id}-input`;
   const hintId = `${id}-hint`;
@@ -137,7 +157,7 @@ function StyledField({ tags, inputClassName = '', ...rootProps }: StyledFieldPro
       <TagInput.Root
         validate={value => value.includes('@')}
         {...rootProps}
-        className='border-input focus-within:ring-ring/50 flex min-h-24 cursor-text flex-wrap content-start gap-1.5 rounded-lg border p-2 focus-within:ring-2'
+        className={`border-input focus-within:ring-ring/50 flex min-h-24 cursor-text flex-wrap content-start gap-1.5 rounded-lg border p-2 focus-within:ring-2 ${rootClassName}`}
       >
         <TagInput.List
           aria-label='Email addresses'
@@ -149,6 +169,7 @@ function StyledField({ tags, inputClassName = '', ...rootProps }: StyledFieldPro
           id={inputId}
           aria-describedby={hintId}
           className={`min-w-[8ch] flex-1 bg-transparent text-sm outline-none ${inputClassName}`}
+          {...inputItemProps}
         />
       </TagInput.Root>
     </div>
@@ -218,4 +239,23 @@ export function ViewTransition() {
 
 export function ViewTransitionOptOut() {
   return <ViewTransitionField tagClassName={`${presenceTagClassName} [view-transition-name:none]`} />;
+}
+
+export function LayoutAnimation() {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const { itemProps } = useLayoutAnimation(rootRef);
+  return (
+    <StyledField
+      ref={rootRef}
+      defaultValue={['preston@clerk.dev', 'nate@clerk.dev']}
+      rootClassName='relative [--cl-layout-duration:200ms] [--cl-layout-easing:ease-out]'
+      inputItemProps={itemProps}
+      tags={
+        <StyledTags
+          className={presenceTagClassName}
+          itemProps={itemProps}
+        />
+      }
+    />
+  );
 }

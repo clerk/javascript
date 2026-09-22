@@ -78,6 +78,46 @@ enter and exit.
   storyModule={TagInputStories}
 />
 
+### Layout animation
+
+The same field animated with `useLayoutAnimation`, so the remaining tags and the input slide into place
+while tags fade in and out through `data-starting-style` / `data-ending-style`. Pass the hook a ref to
+the root, and spread the `itemProps` it returns onto each tag and the input. The root must be
+`position: relative`, and it sets the timing with `--cl-layout-duration` and `--cl-layout-easing`.
+A removed tag is pinned where it was with `position: absolute` and `data-layout-popped` while it
+exits. Moving items carry `data-layout-animating` and animate `translate`, so tag styles must not
+set it. With no duration, or under `prefers-reduced-motion: reduce`, items snap.
+
+```tsx
+import { useLayoutAnimation } from '@clerk/mosaic/primitives/hooks';
+
+const rootRef = useRef<HTMLDivElement>(null);
+const { itemProps } = useLayoutAnimation(rootRef);
+
+<TagInput.Root
+  ref={rootRef}
+  className='relative [--cl-layout-duration:200ms] [--cl-layout-easing:ease-out]'
+>
+  <TagInput.List className='contents'>
+    {tags.map(tag => (
+      <TagInput.Tag
+        key={tag.value}
+        value={tag.value}
+        {...itemProps}
+      >
+        …
+      </TagInput.Tag>
+    ))}
+  </TagInput.List>
+  <TagInput.Input {...itemProps} />
+</TagInput.Root>;
+```
+
+<Story
+  name='LayoutAnimation'
+  storyModule={TagInputStories}
+/>
+
 ## Usage
 
 The value lives in `TagInput.Root`. Read the tags with the `useTagInput` hook and render one
