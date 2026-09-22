@@ -94,6 +94,10 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
       await page.keyboard.press('Escape');
       await expect(popup(page)).toBeHidden();
     }
+
+    await trigger(page).click();
+    await popup(page).getByRole('button', { name: 'Personal account' }).click();
+    await page.waitForFunction(() => window.Clerk?.organization === null);
   });
 
   test('manage account opens the UserProfile modal', async ({ page, context }) => {

@@ -285,8 +285,14 @@ describe('UserButton (connected)', () => {
   });
 
   it('drops the fallback once nobody is signed in', () => {
+    const props = { fallback: <output data-testid='fallback' /> };
+    isUserLoaded = false;
+    const { rerender } = renderUserButton(props);
+    expect(screen.getByTestId('fallback')).toBeInTheDocument();
+
+    isUserLoaded = true;
     user = null;
-    renderUserButton({ fallback: <output data-testid='fallback' /> });
+    rerender(tree(props));
     expect(host()).toBeEmptyDOMElement();
   });
 
