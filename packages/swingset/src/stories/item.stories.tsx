@@ -1,9 +1,9 @@
-import { Avatar } from '@clerk/ui/mosaic/components/avatar';
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import { Item } from '@clerk/ui/mosaic/components/item';
-import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
-import { radiusVars, space } from '@clerk/ui/mosaic/styles';
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Button } from '@clerk/mosaic/components/button';
+import { Icon } from '@clerk/mosaic/components/icon';
+import { Item } from '@clerk/mosaic/components/item';
+import { scrollAreaRoot, scrollAreaViewport } from '@clerk/mosaic/components/scroll-area';
+import { radiusVars, space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -12,11 +12,17 @@ import type { StoryMeta } from '@/lib/types';
 // renders a code footer with its function's source. See `StoryModule.__source`.
 export { default as __source } from './item.stories?raw';
 
+const styles = stylex.create({
+  iconWidth: {
+    width: space['7'],
+  },
+});
+
 export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'Item',
-  source: 'packages/ui/src/mosaic/components/item/item.tsx',
+  source: 'packages/mosaic/src/components/item/item.tsx',
 };
 
 export function Default() {
@@ -139,7 +145,7 @@ export function Group() {
               size='sm'
               shape='square'
             >
-              <Icon name='ellipsis' />
+              <Icon name='ellipsis-horizontal' />
             </Button>
           </Item.Actions>
         </Item.Root>
@@ -160,11 +166,9 @@ export function Group() {
             <Item.Label>Clerk</Item.Label>
           </Item.Content>
           <Icon
-            name='check'
+            name='checkmark'
             size='md'
-            style={{
-              width: space['7'],
-            }}
+            xstyle={styles.iconWidth}
           />
         </Item.Root>
         <Item.Root
@@ -356,9 +360,7 @@ export function OutlineGroup() {
           <Icon
             name='chevron-right'
             size='md'
-            style={{
-              width: space['7'],
-            }}
+            xstyle={styles.iconWidth}
           />
         </Item.Root>
       </Item.Group>
@@ -395,7 +397,7 @@ export function Scrolling() {
       className={`${root.className} border-border w-full border`}
       style={{ height: 200, borderRadius: radiusVars['--cl-radius-sm'] }}
     >
-      <Item.Group {...stylex.props(...scrollAreaViewport())}>
+      <Item.Group xstyle={scrollAreaViewport()}>
         {organizations.map(name => (
           <Item.Root
             key={name}

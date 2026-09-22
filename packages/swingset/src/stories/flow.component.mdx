@@ -16,8 +16,8 @@ import * as FlowStories from './flow.component.stories';
 Keep `Card.Root` outside `Flow.Root` so the card remains stable while Flow clips and animates its step viewport.
 
 ```tsx
-import { Card } from '@clerk/ui/mosaic/components/card';
-import { Flow } from '@clerk/ui/mosaic/components/flow';
+import { Card } from '@clerk/mosaic/components/card';
+import { Flow } from '@clerk/mosaic/components/flow';
 
 <Card.Root renderBranding={false}>
   <Flow.Root

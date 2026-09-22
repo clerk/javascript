@@ -1,0 +1,87 @@
+import * as stylex from '@stylexjs/stylex';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
+import { describe, expect, it } from 'vitest';
+
+import { Heading, HeadingContext } from './heading';
+
+const atoms = stylex.create({
+  spaced: { marginTop: '8px' },
+});
+
+describe('Mosaic Heading', () => {
+  it('renders an h2 with its children', () => {
+    render(<Heading>Title</Heading>);
+    expect(screen.getByRole('heading', { level: 2, name: 'Title' })).toBeInTheDocument();
+  });
+
+  it('applies default variants when none are passed', () => {
+    render(<Heading>Title</Heading>);
+    const heading = screen.getByRole('heading');
+    expect(heading).toHaveClass('cl-heading');
+    expect(heading).toHaveAttribute('data-size', 'base');
+    expect(heading).toHaveAttribute('data-color', 'foreground');
+  });
+
+  it('wires variant props and xstyle atoms through to the element', () => {
+    render(
+      <Heading
+        size='2xl'
+        color='negative'
+        xstyle={atoms.spaced}
+      >
+        Title
+      </Heading>,
+    );
+    const heading = screen.getByRole('heading');
+    expect(heading).toHaveAttribute('data-size', '2xl');
+    expect(heading).toHaveAttribute('data-color', 'negative');
+    expect(heading).toHaveClass('cl-heading', stylex.props(atoms.spaced).className ?? '');
+  });
+
+  it('merges a className carried by the render element instead of clobbering the slot class', () => {
+    render(<Heading render={<h3 className='from-source' />}>Title</Heading>);
+    expect(screen.getByRole('heading')).toHaveClass('cl-heading', 'from-source');
+  });
+
+  it('renders a different element through the render prop, keeping the slot props', () => {
+    render(<Heading render={p => <h3 {...p} />}>Title</Heading>);
+    const heading = screen.getByRole('heading', { level: 3 });
+    expect(heading).toHaveClass('cl-heading');
+    expect(heading).toHaveAttribute('data-size', 'base');
+  });
+
+  it('clones an element passed to the render prop, keeping the slot props', () => {
+    render(<Heading render={<h3 lang='en' />}>Title</Heading>);
+    const heading = screen.getByRole('heading', { level: 3, name: 'Title' });
+    expect(heading).toHaveClass('cl-heading');
+    expect(heading).toHaveAttribute('data-size', 'base');
+    expect(heading).toHaveAttribute('lang', 'en');
+  });
+
+  it('reads defaults from HeadingContext, with own props winning', () => {
+    render(
+      <HeadingContext.Provider value={{ size: 'xl', color: 'foreground' }}>
+        <Heading color='negative'>Title</Heading>
+      </HeadingContext.Provider>,
+    );
+    const heading = screen.getByRole('heading');
+    expect(heading).toHaveAttribute('data-size', 'xl');
+    expect(heading).toHaveAttribute('data-color', 'negative');
+  });
+
+  it('forwards arbitrary props and the ref', () => {
+    const ref = React.createRef<HTMLHeadingElement>();
+    render(
+      <Heading
+        ref={ref}
+        id='section-title'
+      >
+        Title
+      </Heading>,
+    );
+    const heading = screen.getByRole('heading');
+    expect(ref.current).toBe(heading);
+    expect(heading).toHaveAttribute('id', 'section-title');
+  });
+});

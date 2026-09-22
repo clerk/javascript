@@ -1,6 +1,6 @@
 {
   "name": "@clerk/react-router",
-  "version": "3.6.22",
+  "version": "3.6.24",
   "description": "Clerk SDK for React Router",
   "keywords": [
     "clerk",
@@ -82,7 +82,9 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map"
   ],
   "scripts": {
     "build": "tsdown",

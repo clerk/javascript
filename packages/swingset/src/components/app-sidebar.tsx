@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRightIcon } from 'lucide-react';
+import { ChevronRightIcon, FlaskConicalIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
@@ -10,6 +10,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -26,7 +27,7 @@ import type { StoryStatus, WipSubstatus } from '@/lib/types';
 
 const groups = getSidebarGroups();
 
-const COLLAPSED_BY_DEFAULT = new Set(['Blocks', 'Primitives', 'Components', 'Styles', 'Hooks']);
+const COLLAPSED_BY_DEFAULT = new Set(['Blocks', 'Primitives', 'Components', 'Styles', 'Hooks', 'Localization']);
 
 type SidebarEntry = ReturnType<typeof getSidebarGroups>[number]['components'][number];
 
@@ -126,12 +127,12 @@ function SidebarEntryMenu({
         const href = `/${groupSlug}/${componentSlug}`;
         // How an entry is USED differs by layer, so the label follows the layer rather
         // than a guess at the title: hooks are called, atomic styles are a set of
-        // exports with no single call form worth privileging, and everything else is a
-        // component rendered as JSX.
+        // exports with no single call form worth privileging, localization is a prop rather
+        // than a component, and everything else is a component rendered as JSX.
         const usage =
           mod.meta.group === 'Hooks'
             ? `${mod.meta.title}()`
-            : mod.meta.group === 'Styles'
+            : mod.meta.group === 'Styles' || mod.meta.group === 'Localization'
               ? mod.meta.title
               : `<${mod.meta.title} />`;
         return (
@@ -253,6 +254,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </React.Fragment>
         ))}
       </SidebarContent>
+      <SidebarFooter className='gap-0 p-0'>
+        <SidebarSeparator className='data-horizontal:w-auto my-1' />
+        <SidebarGroup className='py-1'>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className='h-auto py-1 text-xs'
+                  isActive={pathname.startsWith('/live')}
+                  render={<Link href='/live' />}
+                >
+                  <FlaskConicalIcon className='size-3.5!' />
+                  Live Sandbox
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   );
