@@ -59,9 +59,9 @@ describe('SignInProtectCheck', () => {
       });
       mockExecute.mockResolvedValue('proof-abc');
       fixtures.signIn.submitProtectCheck.mockResolvedValue(enterpriseSSOSignIn([{ strategy: 'enterprise_sso' }]));
-      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(() => {
+      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(async () => {
         (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-2' };
-        return Promise.resolve();
+        throw new ClerkRuntimeError('challenge required', { code: 'protect_check_required' });
       });
 
       render(<SignInProtectCheck />, { wrapper });

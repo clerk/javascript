@@ -25,6 +25,7 @@ import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
 import { buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
 import {
+  isProtectCheckRequiredError,
   isSignInPendingOAuthTransfer,
   isSignInProtectGated,
   resumeSignInAfterProtectCheck,
@@ -87,18 +88,22 @@ function SignInProtectCheckInternal(): JSX.Element | null {
         // has exactly one to prepare. If that guard is ever loosened to resume a connection the
         // user chose, the id has to be carried across the challenge and passed here.
         resumeEnterpriseSSO: async () => {
-          await signIn.authenticateWithRedirect({
-            strategy: 'enterprise_sso',
-            redirectUrl: ctx.ssoCallbackUrl,
-            redirectUrlComplete: afterSignInUrl || '/',
-            oidcPrompt: ctx.oidcPrompt,
-            continueSignIn: true,
-          });
-
-          // Preparing the hand-off can raise a further challenge, in which case no redirect was
-          // issued: stay here and run it on the next render.
-          if (isSignInProtectGated(signIn)) {
-            await navigate('.');
+          try {
+            await signIn.authenticateWithRedirect({
+              strategy: 'enterprise_sso',
+              redirectUrl: ctx.ssoCallbackUrl,
+              redirectUrlComplete: afterSignInUrl || '/',
+              oidcPrompt: ctx.oidcPrompt,
+              continueSignIn: true,
+            });
+          } catch (err) {
+            // Preparing the hand-off can raise a further challenge, in which case no redirect was
+            // issued: stay here and run it on the next render.
+            if (isProtectCheckRequiredError(err) && isSignInProtectGated(signIn)) {
+              await navigate('.');
+              return;
+            }
+            throw err;
           }
         },
         startedAsOAuthTransfer: startedAsOAuthTransfer.current,

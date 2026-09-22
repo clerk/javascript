@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/shared/types';
 import { waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
@@ -76,10 +77,10 @@ describe('SignInFactorOneEnterpriseConnections with a challenge', () => {
       f.startSignInWithEmailAddress();
     });
     (fixtures.signIn as unknown as SignInResource).supportedFirstFactors = TWO_CONNECTIONS as never;
-    // WHEN preparing the hand-off comes back gated: no redirect is issued, the call just resolves.
-    fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(() => {
+    // WHEN preparing the hand-off comes back gated: no redirect is issued and the call throws.
+    fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(async () => {
       (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-abc' };
-      return Promise.resolve();
+      throw new ClerkRuntimeError('challenge required', { code: 'protect_check_required' });
     });
 
     const { userEvent } = render(<SignInFactorOneEnterpriseConnections />, { wrapper });

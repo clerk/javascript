@@ -9,7 +9,7 @@ import { withCardStateProvider } from '@/ui/elements/contexts';
 import type { AvailableComponentProps } from '@/ui/types';
 
 import { useRouter } from '../../router';
-import { navigateOnSignInProtectGate } from './handleProtectCheck';
+import { isProtectCheckRequiredError, navigateOnSignInProtectGate } from './handleProtectCheck';
 import { hasMultipleEnterpriseConnections } from './shared';
 
 /**
@@ -37,19 +37,24 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
-    await signIn.authenticateWithRedirect({
-      strategy: 'enterprise_sso',
-      redirectUrl,
-      redirectUrlComplete,
-      oidcPrompt: ctx.oidcPrompt,
-      continueSignIn: true,
-      enterpriseConnectionId,
-    });
-
-    // Preparing the hand-off can itself raise a challenge, in which case no redirect was issued
-    // and the sign-in is sitting on the gate instead. Without this the picker looks inert: the
-    // user clicks their connection and nothing happens.
-    navigateOnSignInProtectGate(signIn, navigate, '../protect-check');
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl,
+        redirectUrlComplete,
+        oidcPrompt: ctx.oidcPrompt,
+        continueSignIn: true,
+        enterpriseConnectionId,
+      });
+    } catch (err) {
+      // Preparing the hand-off can itself raise a challenge. No redirect was issued and the sign-in
+      // is sitting on the gate instead. Handled here because the card's click handler drops errors,
+      // so without this the user clicks their connection and nothing happens.
+      if (isProtectCheckRequiredError(err) && navigateOnSignInProtectGate(signIn, navigate, '../protect-check')) {
+        return;
+      }
+      throw err;
+    }
   };
 
   return (
