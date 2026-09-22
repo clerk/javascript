@@ -134,23 +134,24 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
       );
     }
 
-    if (creds.identifier) {
-      await setItemAsync(key, creds.identifier);
-    }
+    const identifier = creds.identifier ?? (await getItemAsync(key).catch(() => null));
 
-    const storedIdentifier = await getItemAsync(key).catch(() => null);
-
-    if (!storedIdentifier) {
+    if (!identifier) {
       return errorThrower.throw(
         `useLocalCredentials: setCredentials() an identifier should already be set in order to update its password.`,
       );
     }
 
-    setHasLocalAuthCredentials(true);
     await setItemAsync(pkey, creds.password, {
       keychainAccessible: WHEN_PASSCODE_SET_THIS_DEVICE_ONLY,
       requireAuthentication: true,
     });
+
+    if (creds.identifier) {
+      await setItemAsync(key, creds.identifier);
+    }
+
+    setHasLocalAuthCredentials(true);
   };
 
   const clearCredentials = async () => {
