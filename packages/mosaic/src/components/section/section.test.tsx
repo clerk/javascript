@@ -196,7 +196,7 @@ describe('Section', () => {
     // A row-level message announces itself; there is no field to describe it.
     expect(error).toHaveAttribute('role', 'alert');
     expect(error).toHaveTextContent('File type not supported.');
-    // Outside the item, so the item's media and actions keep their centre line.
+    // Outside the item, so the item's media and actions keep their center line.
     expect(screen.getByTestId('item')).not.toContainElement(error);
     expect(screen.getByTestId('row')).toContainElement(error);
 
