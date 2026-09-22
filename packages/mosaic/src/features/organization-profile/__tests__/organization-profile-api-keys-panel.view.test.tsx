@@ -57,6 +57,11 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView();
     const table = screen.getByRole('table', { name: 'API Keys' });
+    expect(screen.getByRole('heading', { name: 'API Keys' })).toBeVisible();
+    expect(within(table).getByRole('cell', { name: 'Jan 5, 2026' })).toBeVisible();
+    expect(within(table).getByRole('cell', { name: 'Jul 1, 2024' })).toBeVisible();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.getByRole('searchbox', { name: 'Search API keys' })).toBeVisible();
     expect(
       within(table)
         .getAllByRole('columnheader')
@@ -70,6 +75,13 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     expect(within(table).queryByRole('button', { name: /sort/i })).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Create API key' }));
     expect(props.onCreate).toHaveBeenCalledOnce();
+    await user.click(screen.getByRole('button', { name: 'Manage Primary API Key' }));
+    expect(
+      within(screen.getByRole('menu'))
+        .getAllByRole('menuitem')
+        .map(item => item.textContent),
+    ).toEqual(['Revoke key']);
+    await user.keyboard('{Escape}');
     rerender(
       <MosaicProvider>
         <OrganizationProfileApiKeysPanelView
@@ -282,6 +294,38 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     expect(onRevoke.mock.calls).toEqual([['primary'], ['legacy']]);
     expect(screen.getByText('No API Keys created')).toBeVisible();
     expect(screen.getByRole('searchbox', { name: 'Search API keys' })).toHaveFocus();
+  });
+  it('only offers selection with an injected bulk action and has no bulk action button', async () => {
+    const user = userEvent.setup();
+    const onBulkAction = vi.fn();
+    const { props, rerender } = renderView({ onBulkAction });
+    expect(screen.queryByRole('button', { name: 'Bulk actions' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('checkbox', { name: 'Select Primary API Key' }));
+    expect(screen.getByRole('checkbox', { name: 'Select all API keys' })).toBePartiallyChecked();
+    expect(screen.getByRole('checkbox', { name: 'Select Primary API Key' })).toBeChecked();
+    await user.click(screen.getByRole('checkbox', { name: 'Select all API keys' }));
+    expect(screen.getByRole('checkbox', { name: 'Select all API keys' })).toBeChecked();
+    rerender(
+      <MosaicProvider>
+        <OrganizationProfileApiKeysPanelView
+          {...props}
+          apiKeys={[apiKeys[1]]}
+          totalCount={1}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('checkbox', { name: 'Select Legacy API Key' })).toBeChecked();
+    expect(onBulkAction).not.toHaveBeenCalled();
+    rerender(
+      <MosaicProvider>
+        <OrganizationProfileApiKeysPanelView
+          {...props}
+          onBulkAction={undefined}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Bulk actions' })).not.toBeInTheDocument();
   });
   it('navigates actual pages and clears controlled search without changing page size', async () => {
     const user = userEvent.setup();

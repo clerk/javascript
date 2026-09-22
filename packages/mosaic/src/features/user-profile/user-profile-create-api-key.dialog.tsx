@@ -196,6 +196,7 @@ function CopyKeyStep(props: UserProfileCreateAPIKeyDialogProps) {
                 label={m.copy}
                 copiedLabel={m.copied}
                 disabled={props.isPending}
+                onCopy={() => props.onCopy(false)}
               />
             </InputGroup.End>
           </InputGroup.Root>

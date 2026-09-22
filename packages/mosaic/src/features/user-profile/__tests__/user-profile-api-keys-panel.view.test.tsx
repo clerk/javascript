@@ -7,6 +7,7 @@ import { deferred } from '../../../machines/__tests__/test-utils';
 import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileAPIKey, UserProfileApiKeysPanelViewProps } from '../user-profile-api-keys-panel.types';
 import { UserProfileApiKeysPanelView } from '../user-profile-api-keys-panel.view';
+import type { UserProfileCreateAPIKeyDialogProps } from '../user-profile-create-api-key.dialog';
 
 const apiKeys: UserProfileAPIKey[] = [
   {
@@ -47,9 +48,56 @@ function renderView(overrides: Partial<UserProfileApiKeysPanelViewProps> = {}) {
 }
 
 describe('UserProfileApiKeysPanelView', () => {
+  it('renders supplied metadata and only offers actions when callbacks are provided', async () => {
+    const user = userEvent.setup();
+    const { props, rerender } = renderView();
+    const table = screen.getByRole('table', { name: 'API Keys' });
+    expect(screen.getByRole('heading', { name: 'API Keys' })).toBeVisible();
+    expect(within(table).getByRole('cell', { name: 'Jan 5, 2026' })).toBeVisible();
+    expect(within(table).getByRole('cell', { name: 'Jul 1, 2024' })).toBeVisible();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+    expect(screen.getByRole('searchbox', { name: 'Search API keys' })).toBeVisible();
+    expect(
+      within(table)
+        .getAllByRole('columnheader')
+        .map(header => header.textContent),
+    ).toEqual(['Name', 'Date created', 'Last used', 'Actions']);
+    expect(within(table).getByText('Expires Dec 31, 2027')).toBeVisible();
+    expect(within(table).getByText('Never expires')).toBeVisible();
+    expect(within(table).getByRole('cell', { name: '2 minutes ago' })).toBeVisible();
+    expect(within(table).getByRole('cell', { name: '-' })).toBeVisible();
+    expect(within(table).queryByRole('checkbox')).not.toBeInTheDocument();
+    expect(within(table).queryByRole('button', { name: /sort/i })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Create API key' }));
+    expect(props.onCreate).toHaveBeenCalledOnce();
+    await user.click(screen.getByRole('button', { name: 'Manage Primary API Key' }));
+    expect(
+      within(screen.getByRole('menu'))
+        .getAllByRole('menuitem')
+        .map(item => item.textContent),
+    ).toEqual(['Revoke key']);
+    await user.keyboard('{Escape}');
+    rerender(
+      <MosaicProvider>
+        <UserProfileApiKeysPanelView
+          {...props}
+          onCreate={undefined}
+          onRevoke={undefined}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByText('Primary API Key')).toBeVisible();
+    expect(screen.getAllByRole('columnheader').map(header => header.textContent)).toEqual([
+      'Name',
+      'Date created',
+      'Last used',
+    ]);
+    expect(screen.queryByRole('button', { name: 'Create API key' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Manage/ })).not.toBeInTheDocument();
+  });
   it.each([
-    ['', 'No API Keys created', 'API keys allow apps and scripts access your account without signing in'],
-    ['   ', 'No API Keys created', 'API keys allow apps and scripts access your account without signing in'],
+    ['', 'No API Keys created', 'API keys allow apps and scripts to access your account without signing in.'],
+    ['   ', 'No API Keys created', 'API keys allow apps and scripts to access your account without signing in.'],
     ['Special Key', 'No API keys found', 'Your search for "Special Key" did not return any results.'],
   ])('shows the empty state for search "%s"', (searchValue, label, description) => {
     renderView({ apiKeys: [], totalCount: 0, searchValue });
@@ -356,32 +404,125 @@ describe('UserProfileApiKeysPanelView', () => {
     expect(screen.getByText('No API Keys created')).toBeVisible();
     expect(screen.getAllByRole('columnheader')).toHaveLength(3);
   });
-  it('renders complete metadata with only the shipped columns and calls creation', async () => {
+});
+
+function dialogPropsFor(
+  overrides: Partial<UserProfileCreateAPIKeyDialogProps> = {},
+): UserProfileCreateAPIKeyDialogProps {
+  return {
+    open: true,
+    onOpenChange: vi.fn(),
+    name: '',
+    onNameChange: vi.fn(),
+    expiration: null,
+    expirationDateLabel: null,
+    onExpirationChange: vi.fn(),
+    secret: null,
+    isPending: false,
+    error: null,
+    onSubmit: vi.fn(),
+    onCopy: vi.fn(),
+    ...overrides,
+  };
+}
+
+function dialogView(createDialog: UserProfileCreateAPIKeyDialogProps) {
+  return (
+    <MosaicProvider>
+      <UserProfileApiKeysPanelView {...propsFor({ createDialog })} />
+    </MosaicProvider>
+  );
+}
+
+describe('user API key creation', () => {
+  it('focuses the name and requires a trimmed name and explicit expiration before submitting', async () => {
     const user = userEvent.setup();
-    const { props } = renderView();
-    expect(screen.getByRole('heading', { name: 'API Keys' })).toBeVisible();
-    expect(screen.getAllByRole('columnheader').map(header => header.textContent)).toEqual([
-      'Name',
-      'Date created',
-      'Last used',
-      'Actions',
+    const props = dialogPropsFor();
+    const view = render(dialogView(props));
+    const dialog = screen.getByRole('dialog', { name: 'Add new API key' });
+    const submit = within(dialog).getByRole('button', { name: 'Add API Key' });
+    await waitFor(() => expect(within(dialog).getByRole('textbox', { name: 'Secret key name' })).toHaveFocus());
+    expect(submit).toBeDisabled();
+    expect(within(dialog).queryByText('This key will never expire')).not.toBeInTheDocument();
+    await user.type(within(dialog).getByRole('textbox', { name: 'Secret key name' }), 'A');
+    expect(props.onNameChange).toHaveBeenCalledWith('A');
+    view.rerender(dialogView({ ...props, name: 'A' }));
+    await user.keyboard('{Enter}');
+    expect(props.onSubmit).not.toHaveBeenCalled();
+    await user.click(within(dialog).getByRole('combobox', { name: /^Expiration/ }));
+    expect(screen.getAllByRole('option').map(option => option.textContent)).toEqual([
+      'Never',
+      '1 Day',
+      '7 Days',
+      '30 Days',
+      '60 Days',
+      '90 Days',
+      '180 Days',
+      '1 Year',
     ]);
-    expect(screen.getByRole('cell', { name: 'Jan 5, 2026' })).toBeVisible();
-    expect(screen.getByText('Expires Dec 31, 2027')).toBeVisible();
-    expect(screen.getByRole('cell', { name: 'Jul 1, 2024' })).toBeVisible();
-    expect(screen.getByText('Never expires')).toBeVisible();
-    expect(screen.getByText('2 minutes ago')).toBeVisible();
-    expect(screen.getByText('-')).toBeVisible();
-    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
-    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
-    expect(screen.getByRole('searchbox', { name: 'Search API keys' })).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Create API key' }));
-    expect(props.onCreate).toHaveBeenCalledOnce();
-    await user.click(screen.getByRole('button', { name: 'Manage Primary API Key' }));
-    expect(
-      within(screen.getByRole('menu'))
-        .getAllByRole('menuitem')
-        .map(item => item.textContent),
-    ).toEqual(['Revoke key']);
+    await user.click(screen.getByRole('option', { name: 'Never' }));
+    expect(props.onExpirationChange).toHaveBeenCalledWith('never');
+    view.rerender(dialogView({ ...props, name: '   ', expiration: 'never' }));
+    expect(submit).toBeDisabled();
+    view.rerender(dialogView({ ...props, name: 'A', expiration: 'never' }));
+    expect(within(dialog).getByText('This key will never expire')).toBeVisible();
+    await user.click(submit);
+    expect(props.onSubmit).toHaveBeenCalledOnce();
+  });
+
+  it('holds the form while pending and displays errors without losing input before retry', async () => {
+    const user = userEvent.setup();
+    const props = dialogPropsFor({ name: 'Deploy', expiration: '7d', expirationDateLabel: 'Sep 28, 2026' });
+    const view = render(dialogView(props));
+    expect(screen.getByText('This key will expire on Sep 28, 2026')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Add API Key' }));
+    view.rerender(dialogView({ ...props, isPending: true }));
+    expect(screen.getByRole('textbox', { name: 'Secret key name' })).toBeDisabled();
+    expect(screen.getByRole('combobox', { name: /^Expiration/ })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Add API Key' })).toHaveAttribute('aria-disabled', 'true');
+    await user.click(screen.getByRole('button', { name: 'Add API Key' }));
+    expect(props.onSubmit).toHaveBeenCalledOnce();
+    await user.keyboard('{Escape}');
+    expect(props.onOpenChange).not.toHaveBeenCalled();
+    view.rerender(dialogView({ ...props, error: 'Creation failed. Try again.' }));
+    expect(screen.getByRole('alert')).toHaveTextContent('Creation failed. Try again.');
+    expect(screen.getByRole('textbox', { name: 'Secret key name' })).toHaveValue('Deploy');
+    await user.click(screen.getByRole('button', { name: 'Add API Key' }));
+    expect(props.onSubmit).toHaveBeenCalledTimes(2);
+  });
+
+  it('focuses Copy beside the read-only input and keeps both copy intents retryable', async () => {
+    const user = userEvent.setup();
+    const props = dialogPropsFor({ name: 'Deploy', expiration: 'never' });
+    const view = render(dialogView(props));
+    await user.click(screen.getByRole('button', { name: 'Add API Key' }));
+    const returned = { ...props, secret: 'ak_user_secret' };
+    view.rerender(dialogView(returned));
+    const dialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
+    const secret = within(dialog).getByRole('textbox', { name: 'API key' });
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Copy API key' })).toHaveFocus());
+    expect(secret).toBeVisible();
+    expect(secret).toHaveAttribute('readonly');
+    expect(secret).toHaveValue('ak_user_secret');
+    await user.click(secret);
+    expect(secret).toHaveFocus();
+    await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
+    expect(props.onCopy).toHaveBeenLastCalledWith(false);
+    expect(await screen.findByRole('dialog', { name: 'Copied' })).toBeVisible();
+    view.rerender(dialogView({ ...returned, isPending: true }));
+    expect(within(dialog).getByRole('button', { name: 'Copy API key' })).toBeDisabled();
+    expect(within(dialog).getByRole('button', { name: 'Copy and close' })).toHaveAttribute('aria-disabled', 'true');
+    await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
+    expect(props.onCopy).toHaveBeenCalledOnce();
+    await user.keyboard('{Escape}');
+    expect(props.onOpenChange).not.toHaveBeenCalled();
+    view.rerender(dialogView({ ...returned, error: 'Copy failed. Try again.' }));
+    expect(within(dialog).getByRole('alert')).toHaveTextContent('Copy failed. Try again.');
+    expect(secret).toHaveValue('ak_user_secret');
+    await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
+    expect(props.onCopy).toHaveBeenNthCalledWith(1, false);
+    expect(props.onCopy).toHaveBeenNthCalledWith(2, true);
+    await user.keyboard('{Escape}');
+    expect(props.onOpenChange).toHaveBeenCalledWith(false);
   });
 });
