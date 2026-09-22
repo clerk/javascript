@@ -74,7 +74,7 @@ function resource(overrides: Partial<SessionVerificationResource> = {}): Session
 
 function activeProps() {
   return {
-    isActive: true as const,
+    phase: 'active' as const,
     complete: vi.fn(),
     cancel: vi.fn(),
     level: 'first_factor' as const,
@@ -103,25 +103,25 @@ describe('useReverificationModel', () => {
     session = null;
     const { result } = renderHook(() => useReverificationModel(activeProps()));
     expect(result.current.status).toBe('loading');
-    expect(result.current.isActive).toBe(true);
+    expect(result.current.phase).toBe('active');
   });
 
   it('is loading until supportEmail is resolved', () => {
     supportEmail = undefined;
     const { result } = renderHook(() => useReverificationModel(activeProps()));
     expect(result.current.status).toBe('loading');
-    expect(result.current.isActive).toBe(true);
+    expect(result.current.phase).toBe('active');
   });
 
   it('is active when props are active', () => {
     const { result } = renderHook(() => useReverificationModel(activeProps()));
-    expect(result.current.isActive).toBe(true);
+    expect(result.current.phase).toBe('active');
     expect(ready(result.current).supportEmail).toBe('support@example.com');
   });
 
   it('is inactive when props are idle', () => {
-    const { result } = renderHook(() => useReverificationModel({ isActive: false }));
-    expect(result.current.isActive).toBe(false);
+    const { result } = renderHook(() => useReverificationModel({ phase: 'inactive' }));
+    expect(result.current.phase).toBe('inactive');
   });
 
   it('defaults to second-factor verification when no level is provided', async () => {
@@ -299,15 +299,22 @@ describe('useReverificationModel', () => {
     ).rejects.toThrow('That password is incorrect.');
   });
 
-  it('activates the verified session and calls complete', async () => {
+  it('activates the verified session before complete', async () => {
     session?.startVerification.mockResolvedValue(resource({ status: 'complete' }));
+    const order: string[] = [];
+    setActive.mockImplementation(() => {
+      order.push('setActive');
+    });
     const props = activeProps();
+    props.complete.mockImplementation(() => {
+      order.push('complete');
+    });
     const { result } = renderHook(() => useReverificationModel(props));
     const started = await ready(result.current).start();
     expect(started).toEqual({ status: 'complete', methods: [], startingMethod: null });
     await ready(result.current).finish();
     expect(setActive).toHaveBeenCalledWith({ session: 'sess_1' });
-    expect(props.complete).toHaveBeenCalledOnce();
+    expect(order).toEqual(['setActive', 'complete']);
   });
 
   it('does not call complete when setActive fails', async () => {

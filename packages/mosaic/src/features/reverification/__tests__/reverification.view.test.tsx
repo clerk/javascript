@@ -109,6 +109,14 @@ describe('ReverificationView', () => {
     expect(screen.getByRole('button', { name: 'Didn’t receive a code? Resend (23)' })).toBeDisabled();
   });
 
+  it('omits the card root when embedded', () => {
+    const { container } = renderView({ embedded: true });
+
+    expect(container.querySelector('.cl-card-root')).toBeNull();
+    expect(container.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'password');
+    expect(screen.getByLabelText('Password')).toBeInTheDocument();
+  });
+
   it('does not render Card branding', () => {
     renderView();
 

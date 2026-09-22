@@ -21,7 +21,7 @@ import { pickStartingMethod } from './reverification.utils';
 
 export type ReverificationReadyModel = {
   status: 'ready';
-  isActive: boolean;
+  phase: ReverificationProps['phase'];
   supportEmail: string;
   start: () => Promise<ReverificationResult>;
   prepare: (method: ReverificationPreparableMethod) => Promise<void>;
@@ -30,7 +30,7 @@ export type ReverificationReadyModel = {
   cancel: () => void;
 };
 
-export type ReverificationModel = { status: 'loading'; isActive: boolean } | ReverificationReadyModel;
+export type ReverificationModel = { status: 'loading'; phase: ReverificationProps['phase'] } | ReverificationReadyModel;
 
 function toError(error: unknown): Error {
   if (isClerkAPIResponseError(error)) {
@@ -119,10 +119,13 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
   const supportEmail = useMosaicSupportEmail();
-  const { isActive, cancel, complete, level } = props;
+  const phase = props.phase;
+  const level = props.phase === 'active' ? props.level : undefined;
+  const cancel = props.phase === 'active' ? props.cancel : undefined;
+  const complete = props.phase === 'active' ? props.complete : undefined;
 
   if (!session || !environment || supportEmail === undefined) {
-    return { status: 'loading', isActive };
+    return { status: 'loading', phase };
   }
 
   const webAuthnSupported = isWebAuthnSupported();
@@ -133,7 +136,7 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
 
   return {
     status: 'ready',
-    isActive,
+    phase,
     supportEmail,
     start: async () => {
       try {

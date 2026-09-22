@@ -17,13 +17,13 @@ The example pauses briefly in each pending state. Enter `error` in password or b
 
 ## Usage
 
-The feature wrapper reads Clerk state and drives `ReverificationView`. Isolated panel stories below are for visual development only.
+The feature wrapper reads Clerk state and drives the reverification flow. It renders nothing while `phase` is `inactive`. While a challenge is still preparing, the card stays in place with a verification header, a centered spinner, and a disabled continue button, then shows the factor without a step transition. A card appears for a ready factor, a pending retry, or the unavailable state. Pass `embedded` to render that flow without the card. Isolated panel stories below are for visual development only.
 
 ```tsx
 import { Reverification } from '@clerk/mosaic/features/reverification';
 
 <Reverification
-  isActive
+  phase='active'
   complete={() => {}}
   cancel={() => {}}
   level='first_factor'
