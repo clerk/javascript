@@ -17,7 +17,7 @@ import { Button } from '../button';
 import { mergeIds, useOptionalFieldControlProps } from '../field/field.context';
 import { Icon } from '../icon';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
-import { selectOptionScope, selectPopupScope } from './select.markers.stylex';
+import { selectOptionScope } from './select.markers.stylex';
 import * as slots from './select.styles';
 
 export interface SelectItem {
@@ -182,7 +182,7 @@ export const SelectPopup = React.forwardRef<HTMLDivElement, SelectPopupProps>(fu
           ref={ref}
           {...mergeStyleProps(
             themeProps('select-popup'),
-            stylex.props(reset.base, scrollAreaRoot, selectPopupScope, slots.popup.base, slots.popup.scaled, xstyle),
+            stylex.props(reset.base, scrollAreaRoot, slots.popup.base, slots.popup.scaled, xstyle),
             rest,
           )}
         >

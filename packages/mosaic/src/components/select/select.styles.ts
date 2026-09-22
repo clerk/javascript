@@ -11,9 +11,11 @@ import {
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
-import { selectOptionScope, selectPopupScope } from './select.markers.stylex';
+import { selectOptionScope } from './select.markers.stylex';
+import { selectVars } from './select.vars.stylex';
 
 const POPUP_ENTER_SCALE = 0.96;
+const popupScale = selectVars['--_cl-select-popup-scale'];
 
 // With `alignItemWithTrigger` the selected option's box lands over the trigger's, so the two
 // boxes must inset their text identically: the trigger is a `md` Button (32px, 1px border, 12px
@@ -75,7 +77,7 @@ export const popup = stylex.create({
     minWidth: 'max(10rem, var(--cl-anchor-width, 0px))',
   },
   scaled: {
-    scale: {
+    '--_cl-select-popup-scale': {
       default: 1,
       ':where([data-starting-style], [data-ending-style])': POPUP_ENTER_SCALE,
       '@media (prefers-reduced-motion: reduce)': {
@@ -83,13 +85,14 @@ export const popup = stylex.create({
         ':where([data-starting-style], [data-ending-style])': 1,
       },
     },
+    scale: popupScale,
     transformOrigin: 'var(--cl-anchor-origin, center)',
     transitionDuration: {
       default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
       ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
     transitionProperty: {
-      default: 'opacity, scale',
+      default: 'opacity, --_cl-select-popup-scale',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
     },
     transitionTimingFunction: {
@@ -173,30 +176,9 @@ export const description = stylex.create({
 // scale there holds that one row still while the surface grows around it.
 export const selectedOption = stylex.create({
   counterScale: {
-    scale: {
-      default: 1,
-      [stylex.when.ancestor('[data-ending-style]', selectPopupScope)]: 1 / POPUP_ENTER_SCALE,
-      [stylex.when.ancestor('[data-starting-style]', selectPopupScope)]: 1 / POPUP_ENTER_SCALE,
-      '@media (prefers-reduced-motion: reduce)': {
-        default: 1,
-        [stylex.when.ancestor('[data-ending-style]', selectPopupScope)]: 1,
-        [stylex.when.ancestor('[data-starting-style]', selectPopupScope)]: 1,
-      },
-    },
+    scale: `calc(1 / ${popupScale})`,
     // The popup's pivot, in the row's own box: half the trigger, less the popup border and viewport padding.
     transformOrigin: `calc(var(--cl-anchor-width, 0px) / 2 - 1px - ${space['0.5']}) 50%`,
-    transitionDuration: {
-      default: durationVars['--cl-duration-base'],
-      [stylex.when.ancestor('[data-ending-style]', selectPopupScope)]: durationVars['--cl-duration-fast'],
-    },
-    transitionProperty: {
-      default: 'scale',
-      '@media (prefers-reduced-motion: reduce)': 'none',
-    },
-    transitionTimingFunction: {
-      default: easingVars['--cl-ease-default'],
-      [stylex.when.ancestor('[data-ending-style]', selectPopupScope)]: easingVars['--cl-ease-exit'],
-    },
   },
 });
 
