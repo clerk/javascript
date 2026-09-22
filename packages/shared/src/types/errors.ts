@@ -112,7 +112,7 @@ export interface ClerkAPIError {
      */
     linkText?: string;
     /**
-     * Arbitrary values the application's owner attached to this rule.
+     * Arbitrary values the application's owner configured for this block.
      *
      * Passed through untouched and **never rendered** by the built-in screen —
      * it is here for an application rendering its own UI (usually keyed off

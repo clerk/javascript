@@ -11,6 +11,7 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 import { handleError } from '@/ui/utils/errorHandler';
 import { createPasswordError } from '@/ui/utils/passwordUtils';
 import type { FormControlState } from '@/ui/utils/useFormControl';
@@ -385,16 +386,13 @@ function SignUpStartInternal(): JSX.Element {
     setAlternativePhoneCodeProvider(phoneCodeProvider);
   };
 
-  if (mode !== SIGN_UP_MODES.PUBLIC && !(hasTicket || hasExistingSignUpWithTicket)) {
-    return <SignUpRestrictedAccess />;
+  const blockedDetails = actionBlockedDetailsFrom(card.rawError);
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
   }
 
-  // A blocked request is terminal — no field to correct, no retry that helps —
-  // so it replaces the card rather than showing an inline error beside a form
-  // the user cannot resubmit. Detection lives in card state, so every path
-  // that reports an error here is covered.
-  if (card.blockedDetails) {
-    return <ActionBlockedCard details={card.blockedDetails} />;
+  if (mode !== SIGN_UP_MODES.PUBLIC && !(hasTicket || hasExistingSignUpWithTicket)) {
+    return <SignUpRestrictedAccess />;
   }
 
   return (

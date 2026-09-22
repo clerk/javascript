@@ -19,6 +19,7 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 import { handleError } from '@/ui/utils/errorHandler';
 import { isMobileDevice } from '@/ui/utils/isMobileDevice';
 import type { FormControlState } from '@/ui/utils/useFormControl';
@@ -596,12 +597,9 @@ function SignInStartInternal(): JSX.Element {
       ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
       : false;
 
-  // A blocked request is terminal — no field to correct, no retry that helps —
-  // so it replaces the card rather than showing an inline error beside a form
-  // the user cannot resubmit. Detection lives in card state, so every path
-  // that reports an error here is covered.
-  if (card.blockedDetails) {
-    return <ActionBlockedCard details={card.blockedDetails} />;
+  const blockedDetails = actionBlockedDetailsFrom(card.rawError);
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
   }
 
   return (

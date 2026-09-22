@@ -12,13 +12,8 @@ type ActionBlockedCardProps = {
 };
 
 /**
- * The screen shown when a request was blocked and there is nothing the end user
- * can do to retry it.
- *
- * A block is terminal — there is no field to correct and no second attempt that
- * helps — so it replaces the form rather than appearing as an inline error
- * beside it. The one thing the user can act on is the reference, which is why it
- * is always rendered and is selectable.
+ * Replaces a card's body when its request was blocked: there is no field to correct and no retry
+ * that helps, so it is shown instead of the form rather than as an inline error beside it.
  */
 export const ActionBlockedCard = (props: ActionBlockedCardProps) => {
   const { traceId, title, description, linkUrl, linkText } = props.details;
@@ -29,9 +24,6 @@ export const ActionBlockedCard = (props: ActionBlockedCardProps) => {
       <Card.Root>
         <Card.Content>
           <Header.Root>
-            {/* An application-supplied title is plain text, so it is passed as a
-                child rather than through localizationKey. Without one we fall
-                back to our own wording. */}
             {title ? (
               <Header.Title>{title}</Header.Title>
             ) : (
@@ -74,9 +66,7 @@ export const ActionBlockedCard = (props: ActionBlockedCardProps) => {
                 variant='buttonLarge'
                 colorScheme='inherit'
                 sx={{ textAlign: 'center', textDecoration: 'underline' }}
-                // rel is set because the destination is chosen by the
-                // application's owner and is not necessarily under their
-                // control once followed.
+                // The destination is the application's choice, not necessarily under its control.
                 {...{ href, target: '_blank', rel: 'noopener noreferrer' }}
               >
                 {linkText || href}
@@ -95,8 +85,6 @@ export const ActionBlockedCard = (props: ActionBlockedCardProps) => {
                   colorScheme='secondary'
                   localizationKey={localizationKeys('actionBlocked.traceIdLabel')}
                 />
-                {/* Selectable and monospaced: this is the one thing on the
-                    screen the user is expected to copy or retype. */}
                 <Text
                   elementDescriptor={descriptors.actionBlockedTraceId}
                   variant='body'
