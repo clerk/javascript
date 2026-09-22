@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRightIcon, FlaskConicalIcon } from 'lucide-react';
+import { ChevronRightIcon, FlaskConicalIcon, SearchIcon, XIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
@@ -15,6 +15,7 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
+  SidebarInput,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -45,6 +46,14 @@ function byCategory(components: SidebarEntry[]) {
     }
   }
   return categories;
+}
+
+function matchesQuery(entry: SidebarEntry, query: string) {
+  if (!query) {
+    return true;
+  }
+  const { title, label } = entry.mod.meta;
+  return title.toLowerCase().includes(query) || (label?.toLowerCase().includes(query) ?? false);
 }
 
 function SidebarUsageItem({
@@ -152,6 +161,16 @@ function SidebarEntryMenu({
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const [query, setQuery] = React.useState('');
+
+  const q = query.trim().toLowerCase();
+  const isSearching = q.length > 0;
+
+  const filteredGroups = groups
+    .map(group => ({ ...group, components: group.components.filter(entry => matchesQuery(entry, q)) }))
+    .filter(group => group.components.length > 0);
+
+  const showLiveSandbox = !isSearching || 'live sandbox'.includes(q);
 
   return (
     <Sidebar {...props}>
@@ -187,12 +206,44 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </svg>
         <span className='text-sidebar-foreground/70 text-[10px] font-medium'>Mosaic - Swingset</span>
       </SidebarHeader>
+      <div className='border-b px-2 py-2'>
+        <div className='relative'>
+          <SearchIcon className='text-sidebar-foreground/50 pointer-events-none absolute left-2 top-1/2 size-3.5 -translate-y-1/2' />
+          <SidebarInput
+            type='search'
+            placeholder='Search…'
+            aria-label='Search components'
+            value={query}
+            onChange={event => setQuery(event.target.value)}
+            onKeyDown={event => {
+              if (event.key === 'Escape') {
+                setQuery('');
+              }
+            }}
+            className='px-7 [&::-webkit-search-cancel-button]:appearance-none'
+          />
+          {query ? (
+            <button
+              type='button'
+              aria-label='Clear search'
+              onClick={() => setQuery('')}
+              className='text-sidebar-foreground/50 hover:text-sidebar-foreground absolute right-1.5 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-sm'
+            >
+              <XIcon className='size-3.5' />
+            </button>
+          ) : null}
+        </div>
+      </div>
       <SidebarContent className='gap-0'>
-        {groups.map(({ group, groupSlug, components }) => (
+        {isSearching && filteredGroups.length === 0 ? (
+          <p className='text-sidebar-foreground/50 px-4 py-6 text-xs'>No matches for “{query.trim()}”.</p>
+        ) : null}
+        {filteredGroups.map(({ group, groupSlug, components }) => (
           <React.Fragment key={group}>
             {group === 'Blocks' && <SidebarSeparator className='data-horizontal:w-auto my-1' />}
             <Collapsible
-              defaultOpen={!COLLAPSED_BY_DEFAULT.has(group)}
+              key={`${group}-${isSearching}`}
+              {...(isSearching ? { open: true } : { defaultOpen: !COLLAPSED_BY_DEFAULT.has(group) })}
               className='group/collapsible'
             >
               <SidebarGroup
@@ -211,11 +262,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     {byCategory(components).map(({ category, components }) =>
                       category ? (
                         <Collapsible
-                          key={category}
-                          // Collapsed by default, unless it holds the page being viewed.
-                          defaultOpen={components.some(
-                            ({ componentSlug }) => pathname === `/${groupSlug}/${componentSlug}`,
-                          )}
+                          key={`${category}-${isSearching}`}
+                          // While searching, force every surviving category open. Otherwise it's
+                          // collapsed by default, unless it holds the page being viewed.
+                          {...(isSearching
+                            ? { open: true }
+                            : {
+                                defaultOpen: components.some(
+                                  ({ componentSlug }) => pathname === `/${groupSlug}/${componentSlug}`,
+                                ),
+                              })}
                           className='group/category'
                         >
                           <CollapsibleTrigger className='text-sidebar-foreground/40 hover:text-sidebar-foreground/70 flex w-full items-center gap-1 px-2 pb-0.5 pt-2 text-[9px] font-semibold uppercase tracking-wider'>
@@ -254,25 +310,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </React.Fragment>
         ))}
       </SidebarContent>
-      <SidebarFooter className='gap-0 p-0'>
-        <SidebarSeparator className='data-horizontal:w-auto my-1' />
-        <SidebarGroup className='py-1'>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  className='h-auto py-1 text-xs'
-                  isActive={pathname.startsWith('/live')}
-                  render={<Link href='/live' />}
-                >
-                  <FlaskConicalIcon className='size-3.5!' />
-                  Live Sandbox
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarFooter>
+      {showLiveSandbox ? (
+        <SidebarFooter className='gap-0 p-0'>
+          <SidebarSeparator className='data-horizontal:w-auto my-1' />
+          <SidebarGroup className='py-1'>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    className='h-auto py-1 text-xs'
+                    isActive={pathname.startsWith('/live')}
+                    render={<Link href='/live' />}
+                  >
+                    <FlaskConicalIcon className='size-3.5!' />
+                    Live Sandbox
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarFooter>
+      ) : null}
       <SidebarRail />
     </Sidebar>
   );
