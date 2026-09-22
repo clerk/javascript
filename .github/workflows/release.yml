@@ -111,7 +111,7 @@ jobs:
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
       - name: Deprecate superseded packages
-        if: steps.changesets.outputs.published == 'true'
+        if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' }}
         run: node scripts/deprecate-superseded.mjs '${{ steps.changesets.outputs.publishedPackages }}'
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
