@@ -9,6 +9,10 @@ import { MosaicProvider } from '../../MosaicProvider';
 import type { DestructiveControlledProps, DestructiveHandleProps } from './destructive';
 import { Destructive } from './destructive';
 
+vi.mock('../../features/reverification', () => ({
+  Reverification: ({ phase }: { phase: string }) => <output data-testid='reverification'>{phase}</output>,
+}));
+
 function renderBlock(overrides: Partial<DestructiveControlledProps> = {}) {
   return render(
     <MosaicProvider>
@@ -28,6 +32,12 @@ function renderBlock(overrides: Partial<DestructiveControlledProps> = {}) {
 }
 
 const confirmButton = () => screen.getByRole('button', { name: 'Delete account' });
+const activeReverification = {
+  phase: 'active' as const,
+  complete: vi.fn(),
+  cancel: vi.fn(),
+  level: 'first_factor' as const,
+};
 
 describe('Destructive', () => {
   it('renders nothing until the caller opens it', () => {
@@ -142,6 +152,67 @@ describe('Destructive', () => {
     expect(confirmButton()).toHaveAttribute('aria-busy', 'true');
     await user.click(confirmButton());
     expect(onDelete).not.toHaveBeenCalled();
+  });
+
+  it('shows reverification in the same dialog and card', () => {
+    renderBlock({ isDeleting: true, reverification: activeReverification });
+
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
+    expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
+    expect(screen.getByTestId('reverification')).toHaveTextContent('active');
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('cancels active reverification when the dialog closes', async () => {
+    const cancel = vi.fn();
+    const onOpenChange = vi.fn();
+    const user = userEvent.setup();
+    renderBlock({
+      isDeleting: true,
+      onOpenChange,
+      reverification: { ...activeReverification, cancel },
+    });
+
+    await user.keyboard('{Escape}');
+
+    expect(cancel).toHaveBeenCalledOnce();
+    expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+  });
+
+  it('keeps the retrying factor visible until the hook becomes inactive', () => {
+    const props = {
+      open: true,
+      onOpenChange: vi.fn(),
+      title: 'Delete account?',
+      description: 'All of your data will be permanently deleted.',
+      fieldLabel: 'Type “Delete account” below to continue',
+      confirmationValue: 'Delete account',
+      actionLabel: 'Delete account',
+      onDelete: vi.fn(),
+    };
+    const { rerender } = render(
+      <MosaicProvider>
+        <Destructive
+          {...props}
+          isDeleting
+          reverification={{ phase: 'retrying' }}
+        />
+      </MosaicProvider>,
+    );
+
+    rerender(
+      <MosaicProvider>
+        <Destructive
+          {...props}
+          errorMessage='Delete failed.'
+          reverification={{ phase: 'inactive' }}
+        />
+      </MosaicProvider>,
+    );
+    expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'confirm');
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(screen.getByText('Delete failed.')).toBeInTheDocument();
   });
 });
 

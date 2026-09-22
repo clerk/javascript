@@ -1,5 +1,6 @@
 'use client';
 
+import { Destructive } from '@clerk/mosaic/blocks/destructive';
 import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import { Dialog } from '@clerk/mosaic/components/dialog';
@@ -263,6 +264,89 @@ function DialogHarness() {
   );
 }
 
+function DestructiveHarness() {
+  const [deleteAccount, reverification] = useReverificationWithState(() => mockDelete(true));
+  const [open, setOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [requestPending, setRequestPending] = useState(false);
+  const runRef = useRef(false);
+
+  const continueDelete = () => {
+    if (runRef.current || reverification.phase !== 'inactive') {
+      return;
+    }
+    runRef.current = true;
+    setRequestPending(true);
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    void (async () => {
+      try {
+        await resetMockDelete();
+        await deleteAccount();
+        setSuccessMessage('Mock delete completed. The account was not deleted.');
+        setOpen(false);
+      } catch (error) {
+        if (isClerkRuntimeError(error) && error.code === 'request_already_in_progress') {
+          return;
+        }
+        await resetMockDelete();
+        if (isReverificationCancelledError(error)) {
+          setErrorMessage(null);
+          setOpen(false);
+          return;
+        }
+        setErrorMessage(error instanceof Error ? error.message : 'Mock delete failed.');
+        setOpen(true);
+      } finally {
+        runRef.current = false;
+        setRequestPending(false);
+      }
+    })();
+  };
+
+  return (
+    <div className='flex flex-col gap-4'>
+      <div className='flex flex-wrap items-center gap-2'>
+        <Button
+          color='negative'
+          onClick={() => {
+            setErrorMessage(null);
+            setSuccessMessage(null);
+            setOpen(true);
+          }}
+          disabled={open || requestPending}
+        >
+          Delete account
+        </Button>
+      </div>
+      {successMessage ? <p className='text-sm'>{successMessage}</p> : null}
+      <Destructive
+        open={open}
+        onOpenChange={next => {
+          if (!next && requestPending && reverification.phase === 'inactive') {
+            return;
+          }
+          setOpen(next);
+          if (!next && reverification.phase !== 'retrying') {
+            setErrorMessage(null);
+            void resetMockDelete();
+          }
+        }}
+        title='Delete account?'
+        description='This mock asks for verification, then waits before a fake success. The account is not deleted.'
+        fieldLabel='Type “Delete account” below to continue'
+        confirmationValue='Delete account'
+        actionLabel='Delete account'
+        onDelete={continueDelete}
+        isDeleting={requestPending}
+        errorMessage={errorMessage ?? undefined}
+        reverification={reverification}
+      />
+    </div>
+  );
+}
+
 export default function ReverificationLivePage() {
   const { isLoaded, isSignedIn } = useUser();
   const [demoKey, setDemoKey] = useState(0);
@@ -313,12 +397,20 @@ export default function ReverificationLivePage() {
           <div className='flex flex-col gap-1'>
             <h2 className='text-base font-semibold'>Dialog / Flow</h2>
             <p className='text-muted-foreground text-sm'>
-              Reverification renders inside the dialog&apos;s card. This dialog showcases two different pending states:
-              the action retry can either be merged with the reverification pending state, or be its own flow step
-              after.
+              Reverification renders inside the dialog&apos;s card. The action retry can stay on the verification step,
+              or move to its own finalizing step.
             </p>
           </div>
           {isLoaded && isSignedIn ? <DialogHarness key={demoKey} /> : null}
+        </section>
+        <section className='flex flex-col gap-4'>
+          <div className='flex flex-col gap-1'>
+            <h2 className='text-base font-semibold'>Destructive</h2>
+            <p className='text-muted-foreground text-sm'>
+              Destructive keeps its dialog and card while Reverification replaces the confirmation step.
+            </p>
+          </div>
+          {isLoaded && isSignedIn ? <DestructiveHarness key={demoKey} /> : null}
         </section>
       </div>
     </MosaicProvider>
