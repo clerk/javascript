@@ -25,9 +25,22 @@ Kent C. Dodds' advice: _write tests, not too many, mostly integration._
 | Unit             | Pure functions and state machines that have a real input space                              | Only where the branching justifies it    |
 | **Integration**  | A feature, block, or component rendered for real, driven with `userEvent` and role queries  | **The bulk of the suite**                |
 | Visual / browser | Layout, motion, gestures, and computed styles. jsdom cannot check any of these (see below). | A few, in a real browser                 |
+| **End-to-end**   | The published package in a real app against a real Clerk instance (Playwright)              | A few critical journeys per component    |
 
 Coverage is not a goal. Past ~70% the returns fall off, and chasing a number
 leads to tests of trivial code.
+
+## Which level owns what
+
+- **End-to-end** proves the published component works in a real app against
+  real Clerk: it mounts from public exports, its stylesheet loads, and the
+  critical journeys complete (open, switch, manage, sign out). These are slow,
+  so keep to the paths a customer would notice first.
+- **jsdom integration** owns the branches: loading and hidden states,
+  capability gates, errors, pending states, one-action-at-a-time, focus return,
+  and instance settings that are awkward to set up on a real instance.
+- Do not assert a journey in jsdom only because the E2E suite exists, and do
+  not add an E2E test for a branch jsdom already covers.
 
 ## Rules
 
@@ -228,6 +241,19 @@ If the answer to 1 or 2 is no, or 3 is yes, do not write it.
 When you edit an existing file that uses a pattern this doc rules out, do not
 add more tests in that pattern. Write new tests the way this doc describes.
 
+### End-to-end (`integration/tests/mosaic/`)
+
+Playwright tests tagged `@mosaic`, run against the `next.appRouterMosaic.*`
+long-running app, which is built from the `next-app-router-mosaic` template.
+That template installs `@clerk/mosaic` from pkglab and renders components
+through public exports only. `integration/tests/mosaic/user-button.test.ts` is
+the model to copy. It creates its users and organizations through the Backend
+API in `beforeAll`, removes them in `afterAll`, and queries by role. Add a
+component to the template and a suite here once it is exported publicly.
+
 ## Running
 
-`pnpm --filter @clerk/mosaic test <substring>` runs matching files.
+- `pnpm --filter @clerk/mosaic test <substring>` runs matching unit and jsdom
+  integration files.
+- `pnpm test:integration:mosaic` runs the E2E suite. It needs the integration
+  setup in the `clerk-monorepo` skill's `references/setup-and-footguns.md`.
