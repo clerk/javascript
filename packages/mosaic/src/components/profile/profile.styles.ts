@@ -46,7 +46,7 @@ export const styles = stylex.create({
    * inside a dialog. `maxWidth` here so the frame inside is what the width clamps.
    */
   root: {
-    // Centred where the host is wider — a `profile` dialog's popup spans the viewport. The frame
+    // Centered where the host is wider — a `profile` dialog's popup spans the viewport. The frame
     // runs wide; the content inside is held to a reading width of its own, see `contentBody`.
     marginInline: 'auto',
     containerName: 'cl-profile',
@@ -147,7 +147,7 @@ export const styles = stylex.create({
     // No frame to inset from, so neither column carries padding; a gap holds them apart.
     columnGap: space['10'],
     gridTemplateRows: 'auto',
-    // As wide as the navigation, the gap and the pages' reading column, centred in the host. The
+    // As wide as the navigation, the gap and the pages' reading column, centered in the host. The
     // explicit width matters: auto margins on a column-flex item otherwise shrink it to its content.
     inlineSize: '100%',
     maxWidth: `calc(${NAV_WIDTH} + ${space['10']} + ${CONTENT_MAX_WIDTH})`,
@@ -317,7 +317,7 @@ export const styles = stylex.create({
     },
   },
 
-  /** The pages' column: held to a reading width and centred, however wide the frame runs. */
+  /** The pages' column: held to a reading width and centered, however wide the frame runs. */
   contentBody: {
     marginInline: 'auto',
     maxInlineSize: CONTENT_MAX_WIDTH,
@@ -345,7 +345,7 @@ export const styles = stylex.create({
   },
   /**
    * Beside the title, `vertical-align: middle`: the caret's midpoint on the baseline plus half the
-   * x-height, which centres it on the lowercase letters rather than the line box. Sized in `em`
+   * x-height, which centers it on the lowercase letters rather than the line box. Sized in `em`
    * through the icon's `inherit` size, so it scales with the heading; coloured through the icon's
    * own variable rather than `color`, which the icon sets itself.
    */
