@@ -40,6 +40,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
   },
   'organization-profile': {
+    'members-table-tab': dynamic(() => import('../stories/members-table-tab.mdx')),
     'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
     'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
     'organization-profile-workspace-section': dynamic(

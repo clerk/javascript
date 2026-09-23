@@ -128,6 +128,12 @@ import {
   Overrides as LocalizationOverrides,
   PluralRules as LocalizationPluralRules,
 } from '../stories/localization.stories';
+import {
+  Empty as MembersTableTabEmpty,
+  Legacy as MembersTableTabLegacy,
+  meta as membersTableTabMeta,
+  Proposed as MembersTableTabProposed,
+} from '../stories/members-table-tab.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
@@ -862,6 +868,13 @@ const organizationProfileApiKeysPanelModule: StoryModule = {
   Empty: OrganizationProfileApiKeysPanelEmpty,
 };
 
+const membersTableTabModule: StoryModule = {
+  meta: membersTableTabMeta,
+  Legacy: MembersTableTabLegacy,
+  Proposed: MembersTableTabProposed,
+  Empty: MembersTableTabEmpty,
+};
+
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -890,6 +903,7 @@ export const registry: StoryModule[] = [
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
+  membersTableTabModule,
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
   organizationProfileDangerSectionModule,

@@ -1,0 +1,32 @@
+import * as Stories from './members-table-tab.stories';
+
+# MembersTableTab
+
+A controlled members table for the organization profile’s Members tab. The caller supplies the current page, role labels, loading state, and action callbacks.
+
+## Example
+
+### Legacy
+
+The baseline table shows the user, joined date, role, and optional row actions.
+
+<Story name='Legacy' storyModule={Stories} composition={[
+  { name: 'Tabs', href: '/components/tabs', layer: 'Components' },
+  { name: 'Table', href: '/components/table', layer: 'Components' },
+  { name: 'InputGroup', href: '/components/input-group', layer: 'Components' },
+  { name: 'Pagination', href: '/components/pagination', layer: 'Components' },
+  { name: 'Select', href: '/components/select', layer: 'Components' },
+  { name: 'Menu', href: '/components/menu', layer: 'Components' },
+]} />
+
+## Examples
+
+### Proposed
+
+Sorting and selection are enabled through optional callbacks, following the API keys table. The caller sorts before pagination. The current user and deprovisioned members cannot be selected, removed, or have their role changed. Selection clears when search, sorting, or pagination changes. The bulk callback enables selection; no bulk action toolbar is rendered.
+
+<Story name='Proposed' storyModule={Stories} />
+
+### Empty
+
+<Story name='Empty' storyModule={Stories} />
