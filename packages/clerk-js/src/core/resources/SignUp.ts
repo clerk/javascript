@@ -77,14 +77,6 @@ declare global {
   }
 }
 
-// `timezone` is create-only and FAPI ignores it on PATCH. Strip it from update bodies built from
-// reused create params (e.g. `upsert`) so it's clear an update can't change it.
-const withoutTimezone = <T extends object>(params: T): Omit<T, 'timezone'> => {
-  const body = { ...params } as T & { timezone?: unknown };
-  delete body.timezone;
-  return body;
-};
-
 export class SignUp extends BaseResource implements SignUpResource {
   pathRoot = '/client/sign_ups';
 
@@ -519,7 +511,7 @@ export class SignUp extends BaseResource implements SignUpResource {
 
   update = (params: SignUpUpdateParams): Promise<SignUpResource> => {
     return this._basePatch({
-      body: normalizeUnsafeMetadata(withoutTimezone(params)),
+      body: normalizeUnsafeMetadata(params),
     });
   };
 
@@ -962,7 +954,7 @@ class SignUpFuture implements SignUpFutureResource {
   async update(params: SignUpFutureUpdateParams): Promise<{ error: ClerkError | null }> {
     return runAsyncResourceTask(this.#resource, async () => {
       const body: Record<string, unknown> = {
-        ...withoutTimezone(params),
+        ...params,
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
@@ -979,7 +971,7 @@ class SignUpFuture implements SignUpFutureResource {
         captchaToken,
         captchaWidgetType,
         captchaError,
-        ...withoutTimezone(params),
+        ...params,
         unsafeMetadata: params.unsafeMetadata ? normalizeUnsafeMetadata(params.unsafeMetadata) : undefined,
       };
 
