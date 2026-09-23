@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { Menu } from '../menu';
 import { ActionBar } from './action-bar';
 
 const testStyles = stylex.create({
@@ -12,33 +13,52 @@ const testStyles = stylex.create({
   },
 });
 
-describe('Mosaic ActionBar', () => {
-  it('renders a toolbar with its count and reflects data-open', () => {
-    render(
+function BulkActions({ open = true, onDismiss }: { open?: boolean; onDismiss?: () => void }) {
+  return (
+    <ActionBar.Anchor>
+      <table id='members'>
+        <tbody>
+          <tr>
+            <td>
+              <input
+                type='checkbox'
+                aria-label='Select Kyle'
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
       <ActionBar.Root
-        open
+        open={open}
         aria-label='Bulk actions'
+        aria-controls='members'
       >
         <ActionBar.Count>3 selected</ActionBar.Count>
-      </ActionBar.Root>,
-    );
+        <ActionBar.Separator />
+        <button type='button'>Change role</button>
+        <button type='button'>Remove</button>
+        <ActionBar.Separator />
+        <ActionBar.Dismiss onClick={onDismiss} />
+      </ActionBar.Root>
+    </ActionBar.Anchor>
+  );
+}
+
+describe('Mosaic ActionBar', () => {
+  it('renders a labelled toolbar tied to its table and described by its count', () => {
+    render(<BulkActions />);
     const bar = screen.getByRole('toolbar', { name: 'Bulk actions' });
     expect(bar).toHaveClass('cl-action-bar');
     expect(bar).toHaveAttribute('data-open', 'true');
-    const count = screen.getByText('3 selected');
-    expect(count).toHaveClass('cl-action-bar-count');
-    expect(count.querySelector('.cl-icon')).not.toBeInTheDocument();
+    expect(bar).toHaveAttribute('aria-controls', 'members');
+    expect(bar).toHaveAttribute('aria-orientation', 'horizontal');
+    expect(bar).toHaveAccessibleDescription('3 selected');
+    expect(screen.getByText('3 selected')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getAllByRole('separator')).toHaveLength(2);
   });
 
   it('marks the bar inert while closed', () => {
-    render(
-      <ActionBar.Root
-        open={false}
-        aria-label='Bulk actions'
-      >
-        <ActionBar.Count>0 selected</ActionBar.Count>
-      </ActionBar.Root>,
-    );
+    render(<BulkActions open={false} />);
     const bar = screen.getByRole('toolbar', { name: 'Bulk actions', hidden: true });
     expect(bar).toHaveAttribute('data-open', 'false');
     expect(bar.inert).toBe(true);
@@ -57,16 +77,91 @@ describe('Mosaic ActionBar', () => {
     );
   });
 
-  it('dismisses with a labelled button', async () => {
-    const onDismiss = vi.fn();
+  it('is a single tab stop', async () => {
+    const user = userEvent.setup();
+    render(<BulkActions />);
+    await user.click(screen.getByRole('checkbox', { name: 'Select Kyle' }));
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Change role' })).toHaveFocus();
+    await user.tab();
+    expect(document.body).toHaveFocus();
+  });
+
+  it('moves between controls with the arrow keys, Home, and End', async () => {
+    const user = userEvent.setup();
+    render(<BulkActions />);
+    await user.click(screen.getByRole('checkbox', { name: 'Select Kyle' }));
+    await user.tab();
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByRole('button', { name: 'Remove' })).toHaveFocus();
+    await user.keyboard('{End}');
+    expect(screen.getByRole('button', { name: 'Clear selection' })).toHaveFocus();
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByRole('button', { name: 'Change role' })).toHaveFocus();
+    await user.keyboard('{ArrowLeft}');
+    expect(screen.getByRole('button', { name: 'Clear selection' })).toHaveFocus();
+    await user.keyboard('{Home}');
+    expect(screen.getByRole('button', { name: 'Change role' })).toHaveFocus();
+  });
+
+  it('returns to the last focused control when tabbed back into', async () => {
+    const user = userEvent.setup();
+    render(<BulkActions />);
+    await user.click(screen.getByRole('checkbox', { name: 'Select Kyle' }));
+    await user.tab();
+    await user.keyboard('{ArrowRight}');
+    await user.tab({ shift: true });
+    await user.tab();
+    expect(screen.getByRole('button', { name: 'Remove' })).toHaveFocus();
+  });
+
+  it('leaves arrow keys inside a portalled menu to the menu', async () => {
+    const user = userEvent.setup();
     render(
       <ActionBar.Root
         open
         aria-label='Bulk actions'
       >
-        <ActionBar.Dismiss onClick={onDismiss} />
+        <Menu.Root>
+          <Menu.Trigger>Change role</Menu.Trigger>
+          <Menu.Popup>
+            <Menu.Item label='Admin'>
+              <Menu.Label>Admin</Menu.Label>
+            </Menu.Item>
+          </Menu.Popup>
+        </Menu.Root>
+        <button type='button'>Remove</button>
       </ActionBar.Root>,
     );
+    await user.click(screen.getByRole('button', { name: 'Change role' }));
+    const item = await screen.findByRole('menuitem', { name: 'Admin' });
+    item.focus();
+    await user.keyboard('{ArrowRight}');
+    expect(screen.getByRole('button', { name: 'Remove' })).not.toHaveFocus();
+  });
+
+  it('returns focus to where it came from when the bar closes around it', async () => {
+    const user = userEvent.setup();
+    function Harness() {
+      const [open, setOpen] = React.useState(true);
+      return (
+        <BulkActions
+          open={open}
+          onDismiss={() => setOpen(false)}
+        />
+      );
+    }
+    render(<Harness />);
+    const checkbox = screen.getByRole('checkbox', { name: 'Select Kyle' });
+    await user.click(checkbox);
+    await user.tab();
+    await user.keyboard('{End}{Enter}');
+    expect(checkbox).toHaveFocus();
+  });
+
+  it('dismisses with a labelled button', async () => {
+    const onDismiss = vi.fn();
+    render(<BulkActions onDismiss={onDismiss} />);
     await userEvent.click(screen.getByRole('button', { name: 'Clear selection' }));
     expect(onDismiss).toHaveBeenCalledOnce();
   });

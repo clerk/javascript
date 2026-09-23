@@ -2,10 +2,10 @@ import * as ActionBarStories from './action-bar.stories';
 
 # ActionBar
 
-A floating bar of actions for a current selection. It sits at the foot of its nearest positioned
-ancestor — give that ancestor `position: relative` and the bar centers over its bottom — and
-animates in when opened. While closed it is inert and click-through, so the surface
-underneath stays usable.
+A floating toolbar of actions for a current selection. It rests on the bottom edge of the table it
+acts on and, while that edge is scrolled out of view, stays pinned to the foot of the nearest scroll
+container — the content column of a profile in a dialog, or the page when the profile is inline. It
+animates in when opened. While closed it is inert and click-through.
 
 ## Example
 
@@ -21,26 +21,42 @@ underneath stays usable.
 ## Usage
 
 ```tsx
-<ActionBar.Root open={selectedCount > 0}>
-  <ActionBar.Count>{selectedCount} selected</ActionBar.Count>
-  <ActionBar.Separator />
-  <Menu.Root>{/* Change role */}</Menu.Root>
-  <Button color='negative' variant='ghost' shape='square' aria-label='Remove'>
-    <Icon name='trash' />
-  </Button>
-  <ActionBar.Separator />
-  <ActionBar.Dismiss onClick={clearSelection} />
-</ActionBar.Root>
+<ActionBar.Anchor>
+  <Table.Root id={tableId}>{/* rows */}</Table.Root>
+  <ActionBar.Root
+    open={selectedCount > 0}
+    aria-label='Bulk actions'
+    aria-controls={tableId}
+  >
+    <ActionBar.Count>{selectedCount} selected</ActionBar.Count>
+    <ActionBar.Separator />
+    <Menu.Root>{/* Change role */}</Menu.Root>
+    <Button color='negative' variant='ghost' shape='square' aria-label='Remove'>
+      <Icon name='trash' />
+    </Button>
+    <ActionBar.Separator />
+    <ActionBar.Dismiss onClick={clearSelection} />
+  </ActionBar.Root>
+</ActionBar.Anchor>
 ```
 
 ## Parts
 
-| Part                  | Element  | Description                                                                |
-| --------------------- | -------- | -------------------------------------------------------------------------- |
-| `ActionBar.Root`      | `div`    | The positioner + floating surface. Takes `open`; renders `role='toolbar'`. |
-| `ActionBar.Count`     | `div`    | The leading count of what is selected.                                     |
-| `ActionBar.Separator` | `div`    | A vertical divider between groups.                                         |
-| `ActionBar.Dismiss`   | `button` | Clears the selection. A ghost icon button; labelled `Clear selection`.     |
+| Part                  | Element  | Description                                                                          |
+| --------------------- | -------- | ------------------------------------------------------------------------------------ |
+| `ActionBar.Anchor`    | `div`    | Wraps the table and the bar. The bar never leaves the anchor's bounds.               |
+| `ActionBar.Root`      | `div`    | The positioner + floating surface, last in the anchor. Takes `open`; `role=toolbar`. |
+| `ActionBar.Count`     | `div`    | The leading count of what is selected. Describes the toolbar; announced politely.    |
+| `ActionBar.Separator` | `div`    | A vertical divider between groups.                                                   |
+| `ActionBar.Dismiss`   | `button` | Clears the selection. A ghost icon button; labelled `Clear selection`.               |
+
+## Accessibility
+
+- The bar is a single tab stop. `←` / `→` move between its controls and wrap; `Home` / `End` jump to
+  the first and last.
+- Give it an `aria-label`, and point `aria-controls` at the table's `id`.
+- When the bar closes while it holds focus, focus returns to the element it came from. Pass
+  `returnFocus` to send it somewhere else.
 
 ## Styling
 

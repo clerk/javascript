@@ -14,23 +14,18 @@ import {
 const reduceMotion = '@media (prefers-reduced-motion: reduce)';
 
 export const styles = stylex.create({
+  anchor: {
+    display: 'flow-root',
+  },
   positioner: {
+    alignItems: 'center',
     display: 'flex',
     justifyContent: 'center',
     pointerEvents: 'none',
-    zIndex: 1,
-    bottom: space['2'],
-  },
-  // Anchored to the nearest positioned ancestor — for a bounded container.
-  positionerAbsolute: {
-    insetInline: 0,
-    position: 'absolute',
-  },
-  // Pinned to the foot of the nearest scroll container, so it stays in view while its surface
-  // scrolls. `margin-block-start: auto` drops it to the bottom when the column has room to spare.
-  positionerSticky: {
-    marginBlockStart: 'auto',
     position: 'sticky',
+    zIndex: 1,
+    bottom: `calc(${space['5']} + ${space['4']})`,
+    height: 0,
   },
   bar: {
     borderRadius: radiusVars['--cl-radius-lg'],
@@ -39,8 +34,10 @@ export const styles = stylex.create({
     paddingInline: space['1'],
     alignItems: 'center',
     backgroundColor: colorVars['--cl-color-background'],
+    blockSize: space['10'],
     boxShadow: shadowVars['--cl-shadow-lg'],
     display: 'flex',
+    flexShrink: 0,
     opacity: {
       default: 1,
       ':is([data-open="false"])': 0,
