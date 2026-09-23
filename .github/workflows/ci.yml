@@ -294,6 +294,9 @@ jobs:
           turbo-team: ${{ vars.TURBO_TEAM }}
           turbo-token: ${{ secrets.TURBO_TOKEN }}
 
+      - name: Run integration infrastructure unit tests
+        run: pnpm test:integration:unit
+
       - name: Run tests in packages
         run: |
           if [ "${{ matrix.test-filter }}" = "**" ]; then

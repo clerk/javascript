@@ -34,7 +34,7 @@ describe('OAuth application cleanup', () => {
     vi.restoreAllMocks();
   });
 
-  it.each([false, true])('filters every page and preserves other runs (rate limited: %s)', async rateLimited => {
+  it.each([false, true])('filters every page and rejects suffix nonmatches (rate limited: %s)', async rateLimited => {
     const marker = getE2EApplicationRunMarker('cleanup-regression');
     const listQueries: Record<string, string>[] = [];
     const deletedIds: string[] = [];
