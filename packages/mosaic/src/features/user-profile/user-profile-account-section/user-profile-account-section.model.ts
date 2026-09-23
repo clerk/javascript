@@ -1,9 +1,10 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import { useUser } from '@clerk/shared/react';
-import type { AttributeData, UserResource } from '@clerk/shared/types';
+import type { AttributeData, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
 import { save } from '../../../utils/form-error';
+import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import type {
   UserProfileEmail,
   UserProfileNameAttribute,
@@ -24,6 +25,7 @@ type UserProfileAccountSectionData = Pick<
   | 'lastName'
   | 'firstNameAttribute'
   | 'lastNameAttribute'
+  | 'nameManagedBy'
   | 'username'
   | 'emails'
   | 'phones'
@@ -40,6 +42,17 @@ export type UserProfileAccountSectionModel =
 
 const NAME_FIELDS: readonly UserProfileEditNameField[] = ['firstName', 'lastName'];
 const USERNAME_FIELDS: readonly UserProfileEditUsernameField[] = ['username'];
+
+function toManagedBy(account: EnterpriseAccountResource | undefined): UserProfileManagedBy | undefined {
+  if (!account) {
+    return undefined;
+  }
+  const connection = account.enterpriseConnection;
+  return {
+    name: connection?.name || account.provider.replace(/^(oauth_|saml_)/, ''),
+    iconUrl: connection?.logoPublicUrl ?? undefined,
+  };
+}
 
 function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameAttribute {
   return { enabled: attribute?.enabled ?? false, required: attribute?.required ?? false };
@@ -79,11 +92,11 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     return { status: 'hidden' };
   }
 
-  const { attributes } = environment.userSettings;
+  const { attributes, usernameSettings } = environment.userSettings;
   const usernameAttribute = attributes.username;
   const usernameImmutable = Boolean(usernameAttribute?.immutable);
   const showUsername = isAttributeAvailable(usernameAttribute) && !(usernameImmutable && !user.username);
-  const nameReadOnly = user.enterpriseAccounts.some(account => account.active);
+  const nameManagedBy = toManagedBy(user.enterpriseAccounts.find(account => account.active));
   const showEmails = isAttributeAvailable(attributes.email_address);
   const showPhones = isAttributeAvailable(attributes.phone_number);
 
@@ -95,6 +108,7 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     lastName: user.lastName ?? '',
     firstNameAttribute: toNameAttribute(attributes.first_name),
     lastNameAttribute: toNameAttribute(attributes.last_name),
+    nameManagedBy,
     imageUrl: user.imageUrl,
     hasImage: user.hasImage,
     username: showUsername ? (user.username ?? '') : undefined,
@@ -102,12 +116,16 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     phones: showPhones ? toPhones(user) : undefined,
     onProfilePictureChange: file => save(() => user.setProfileImage({ file })),
     onRemoveProfilePicture: user.hasImage ? () => save(() => user.setProfileImage({ file: null })) : undefined,
-    onSubmitName: nameReadOnly
+    onSubmitName: nameManagedBy
       ? undefined
       : value => save(() => user.update({ firstName: value.firstName, lastName: value.lastName }), NAME_FIELDS),
     onSubmitUsername:
       showUsername && !usernameImmutable
-        ? username => save(() => user.update({ username }), USERNAME_FIELDS)
+        ? username =>
+            save(() => user.update({ username }), USERNAME_FIELDS, {
+              min_length: usernameSettings.min_length,
+              max_length: usernameSettings.max_length,
+            })
         : undefined,
   };
 }
