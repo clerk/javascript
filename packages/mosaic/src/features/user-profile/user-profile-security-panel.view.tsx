@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 
-import { Profile } from '../../components/profile';
+import { panelStyles, Profile } from '../../components/profile';
 import { mergeStyleProps, themeProps } from '../../props';
 import type {
   UserProfileActiveDevicesSectionViewProps,
@@ -83,9 +83,9 @@ export function UserProfileSecurityPanelView({
   const hasAuthentication = showPassword || showPasskeys || mfaMethods !== undefined;
 
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-security-panel'), stylex.props(styles.root))}>
+    <div {...mergeStyleProps(themeProps('user-profile-security-panel'), stylex.props(panelStyles.root))}>
       <Profile.PageTitle>Security</Profile.PageTitle>
-      <div {...stylex.props(styles.sections)}>
+      <div {...stylex.props(panelStyles.sections)}>
         <div {...stylex.props(styles.sectionCards, !hasAuthentication && styles.emptySectionCards)}>
           {showPassword ? (
             <UserProfilePasswordSectionView

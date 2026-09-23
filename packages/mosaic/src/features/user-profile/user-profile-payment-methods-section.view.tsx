@@ -1,9 +1,9 @@
+import type { ActionMenuAction } from '../../components/action-menu';
+import { ActionMenu } from '../../components/action-menu';
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
 import { UserProfileProviderIcon } from './user-profile-provider-icon';
 
 export interface UserProfilePaymentMethod {
@@ -87,7 +87,7 @@ function PaymentMethodItem({
   onMakeDefault?: (id: string) => void;
   onRemove?: (id: string) => void;
 }) {
-  const actions: UserProfileMenuAction[] = [];
+  const actions: ActionMenuAction[] = [];
 
   if (!paymentMethod.isDefault && onMakeDefault) {
     actions.push({ label: 'Make default', onClick: () => onMakeDefault(paymentMethod.id) });
@@ -106,7 +106,7 @@ function PaymentMethodItem({
         {paymentMethod.expiryLabel ? <Section.Description>{paymentMethod.expiryLabel}</Section.Description> : null}
       </Section.Content>
       <Section.Actions>
-        <UserProfileActionMenu
+        <ActionMenu
           actions={actions}
           label={`Manage ${paymentMethod.label}`}
         />

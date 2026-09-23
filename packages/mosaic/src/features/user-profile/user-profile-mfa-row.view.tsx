@@ -1,8 +1,8 @@
+import type { ActionMenuAction } from '../../components/action-menu';
+import { ActionMenu } from '../../components/action-menu';
 import { Badge } from '../../components/badge';
 import { Section } from '../../components/section';
 import { fill, useMessages } from '../../localization';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
 import { styles } from './user-profile-mfa-section.styles';
 import type { UserProfileMfaMethod, UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
@@ -23,7 +23,7 @@ export function UserProfileMfaRowView({
     method.type === 'sms' && method.description
       ? fill(m.manageSms, { label, phoneNumber: method.description })
       : fill(m.manage, { label });
-  const actions: UserProfileMenuAction[] = [];
+  const actions: ActionMenuAction[] = [];
 
   if (method.type === 'sms' && method.canSetDefault && !method.isDefault && onSetDefault) {
     actions.push({ label: m.setDefault, onClick: () => onSetDefault(method.id) });
@@ -49,7 +49,7 @@ export function UserProfileMfaRowView({
       </Section.Content>
       {actions.length > 0 ? (
         <Section.Actions>
-          <UserProfileActionMenu
+          <ActionMenu
             actions={actions}
             label={manageLabel}
           />

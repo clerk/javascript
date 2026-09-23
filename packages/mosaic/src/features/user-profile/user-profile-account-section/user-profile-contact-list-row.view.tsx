@@ -1,12 +1,12 @@
 import type { ReactNode } from 'react';
 
+import type { ActionMenuAction } from '../../../components/action-menu';
+import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
-import type { UserProfileMenuAction } from '../user-profile-action-menu';
-import { UserProfileActionMenu } from '../user-profile-action-menu';
 import { styles } from '../user-profile-profile-panel.styles';
 
 export interface UserProfileContactListRowViewProps {
@@ -69,7 +69,7 @@ export function UserProfileContactListRowView({
           </Section.Item>
         ) : (
           items.map(item => {
-            const actions: UserProfileMenuAction[] = [];
+            const actions: ActionMenuAction[] = [];
 
             if (item.isVerified === false && onVerify) {
               actions.push({
@@ -98,7 +98,7 @@ export function UserProfileContactListRowView({
                 </Section.Content>
                 {actions.length > 0 ? (
                   <Section.Actions>
-                    <UserProfileActionMenu
+                    <ActionMenu
                       actions={actions}
                       label={fill(m.manageValue, { value: item.value })}
                     />

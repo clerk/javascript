@@ -1,26 +1,23 @@
 import type { Ref } from 'react';
 
-import { Icon } from '../../components/icon';
-import { Menu } from '../../components/menu';
 import type { IconName } from '../../icons/registry';
+import { Icon } from '../icon';
+import { Menu } from '../menu';
 
-export interface UserProfileMenuAction {
+export interface ActionMenuAction {
   label: string;
   color?: 'neutral' | 'negative';
   icon?: IconName;
   onClick: () => void;
 }
 
-export function UserProfileActionMenu({
-  label,
-  actions,
-  triggerRef,
-}: {
+export interface ActionMenuProps {
   label: string;
-  actions: UserProfileMenuAction[];
-  /** The trigger element, for a caller that has to hand focus back to this row. */
+  actions: ActionMenuAction[];
   triggerRef?: Ref<HTMLButtonElement>;
-}) {
+}
+
+export function ActionMenu({ label, actions, triggerRef }: ActionMenuProps) {
   if (actions.length === 0) {
     return null;
   }

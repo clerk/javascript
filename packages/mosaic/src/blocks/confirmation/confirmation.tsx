@@ -5,6 +5,7 @@ import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import type { DialogFocusTarget, DialogHandle, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
+import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
 import { useConfirmationController } from './confirmation.controller';
 
 /** The weight the confirming button carries: an undoable action takes `primary`. */
@@ -158,16 +159,6 @@ export interface ConfirmationHandle<Payload> extends DialogHandle<Payload> {
 
 function createHandle<Payload>(): ConfirmationHandle<Payload> {
   return Dialog.createHandle<Payload>();
-}
-
-type FromPayload<Payload, Value> = Value | ((payload: Payload) => Value);
-
-function isFromPayload<Payload, Value>(value: FromPayload<Payload, Value>): value is (payload: Payload) => Value {
-  return typeof value === 'function';
-}
-
-function resolve<Payload, Value>(value: FromPayload<Payload, Value>, payload: Payload): Value {
-  return isFromPayload(value) ? value(payload) : value;
 }
 
 export interface ConfirmationHandleProps<Payload> {
