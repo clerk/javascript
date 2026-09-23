@@ -2,7 +2,12 @@ import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import type { ProtectCheckResource, SignInResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
-import { isProtectCheckRequiredError, isSignInProtectGated, navigateOnSignInProtectGate } from '../handleProtectCheck';
+import {
+  isProtectCheckRequiredError,
+  isSignInProtectGated,
+  navigateOnSignInProtectGate,
+  resumeSignInAfterProtectCheck,
+} from '../handleProtectCheck';
 
 const PENDING_CHECK: ProtectCheckResource = {
   status: 'pending',
@@ -83,5 +88,53 @@ describe('navigateOnSignInProtectGate', () => {
 
     expect(handled).toBe(false);
     expect(navigate).not.toHaveBeenCalled();
+  });
+});
+
+describe('resumeSignInAfterProtectCheck with an unidentified sign-in', () => {
+  const setup = () => ({
+    navigate: vi.fn().mockResolvedValue(undefined),
+    resumeEnterpriseSSO: vi.fn().mockResolvedValue(undefined),
+    resumeOAuthContinuation: vi.fn().mockResolvedValue(undefined),
+    startedAsOAuthTransfer: false,
+  });
+
+  it('resumes the enterprise hand-off the start page would have made', async () => {
+    const opts = setup();
+    await resumeSignInAfterProtectCheck(
+      asSignIn({
+        status: 'needs_identifier',
+        protectCheck: null,
+        supportedFirstFactors: [{ strategy: 'enterprise_sso' }] as any,
+      }),
+      opts,
+    );
+    expect(opts.resumeEnterpriseSSO).toHaveBeenCalled();
+    expect(opts.navigate).not.toHaveBeenCalled();
+  });
+
+  it('continues a pending OAuth transfer ahead of an enterprise hand-off', async () => {
+    const opts = setup();
+    await resumeSignInAfterProtectCheck(
+      asSignIn({
+        status: 'needs_identifier',
+        protectCheck: null,
+        supportedFirstFactors: [{ strategy: 'enterprise_sso' }] as any,
+        firstFactorVerification: { status: 'transferable' } as any,
+      }),
+      opts,
+    );
+    expect(opts.resumeOAuthContinuation).toHaveBeenCalled();
+    expect(opts.resumeEnterpriseSSO).not.toHaveBeenCalled();
+  });
+
+  it('returns to the start page when there is no enterprise connection to hand off to', async () => {
+    const opts = setup();
+    await resumeSignInAfterProtectCheck(
+      asSignIn({ status: 'needs_identifier', protectCheck: null, supportedFirstFactors: [] }),
+      opts,
+    );
+    expect(opts.navigate).toHaveBeenCalledWith('..');
+    expect(opts.resumeEnterpriseSSO).not.toHaveBeenCalled();
   });
 });

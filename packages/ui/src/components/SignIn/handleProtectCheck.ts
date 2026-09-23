@@ -2,7 +2,10 @@ import { isClerkRuntimeError } from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type { SignInResource } from '@clerk/shared/types';
 
-import { shouldHandOffToEnterpriseConnection } from './enterpriseSSOFactors';
+import {
+  shouldHandOffToEnterpriseConnection,
+  shouldHandOffUnidentifiedToEnterpriseConnection,
+} from './enterpriseSSOFactors';
 
 /**
  * Detects whether a sign-in response is gated by Clerk Protect.
@@ -94,6 +97,17 @@ export function resumeSignInAfterProtectCheck(
       return navigate('../client-trust');
     case 'needs_new_password':
       return navigate('../reset-password');
+    case 'needs_identifier':
+      // A pending OAuth transfer carries this status too, and continuing it comes first.
+      if (startedAsOAuthTransfer || isSignInPendingOAuthTransfer(signIn)) {
+        return resumeOAuthContinuation();
+      }
+      // The start page hands an unidentified sign-in straight to an enterprise connection when
+      // there is one; the challenge interrupted that hand-off.
+      if (shouldHandOffUnidentifiedToEnterpriseConnection(signIn)) {
+        return resumeEnterpriseSSO();
+      }
+      return navigate('..');
     default:
       return startedAsOAuthTransfer || isSignInPendingOAuthTransfer(signIn)
         ? resumeOAuthContinuation()

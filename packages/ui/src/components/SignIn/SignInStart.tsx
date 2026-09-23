@@ -38,7 +38,11 @@ import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
-import { hasOnlyEnterpriseSSOFirstFactors, shouldHandOffToEnterpriseConnection } from './enterpriseSSOFactors';
+import {
+  hasOnlyEnterpriseSSOFirstFactors,
+  shouldHandOffToEnterpriseConnection,
+  shouldHandOffUnidentifiedToEnterpriseConnection,
+} from './enterpriseSSOFactors';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { isProtectCheckRequiredError, navigateOnSignInProtectGate } from './handleProtectCheck';
 import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM, useHandleAuthenticateWithPasskey } from './shared';
@@ -410,7 +414,7 @@ function SignInStartInternal(): JSX.Element {
       switch (res.status) {
         case 'needs_identifier':
           // Check if we need to initiate an enterprise sso flow
-          if (res.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
+          if (shouldHandOffUnidentifiedToEnterpriseConnection(res)) {
             await authenticateWithEnterpriseSSO();
           }
           break;

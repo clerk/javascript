@@ -66,9 +66,18 @@ function shouldHandOffToEnterpriseConnection(signIn: SignInResource): boolean {
   );
 }
 
+/**
+ * Whether an unidentified sign-in (`needs_identifier`) should be handed to an enterprise connection:
+ * the instance offers one as a first factor, and it identifies the user itself.
+ */
+function shouldHandOffUnidentifiedToEnterpriseConnection(signIn: SignInResource): boolean {
+  return !!signIn.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso');
+}
+
 export {
   getSSOBypassFactor,
   hasMultipleEnterpriseConnections,
   hasOnlyEnterpriseSSOFirstFactors,
   shouldHandOffToEnterpriseConnection,
+  shouldHandOffUnidentifiedToEnterpriseConnection,
 };
