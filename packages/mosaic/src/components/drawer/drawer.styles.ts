@@ -128,7 +128,7 @@ export const styles = stylex.create({
     overflowY: 'auto',
   },
 
-  /** The drag affordance: a short pill, centred, with a hit area taller than it looks. */
+  /** The drag affordance: a short pill, centered, with a hit area taller than it looks. */
   handle: {
     // The grip deepens the instant the handle is pressed, and stays so for as long as it is held —
     // the pointer is captured on it, so `:active` survives the drag. A press elsewhere in the sheet

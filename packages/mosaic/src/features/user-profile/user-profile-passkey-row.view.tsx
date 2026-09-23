@@ -1,12 +1,12 @@
 import type { Ref } from 'react';
 import { useMemo } from 'react';
 
+import type { ActionMenuAction } from '../../components/action-menu';
+import { ActionMenu } from '../../components/action-menu';
 import { Dialog } from '../../components/dialog';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
 import { fill } from '../../localization/messages';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
 import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 import { styles } from './user-profile-passkeys-section.styles';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
@@ -31,7 +31,7 @@ export function UserProfilePasskeyRowView({
       ? fill(m.details, { createdAt: passkey.createdAtLabel, lastUsedAt: passkey.lastUsedAtLabel })
       : passkey.createdAtLabel || passkey.lastUsedAtLabel;
 
-  const actions: UserProfileMenuAction[] = [];
+  const actions: ActionMenuAction[] = [];
   if (onRename) {
     actions.push({ label: m.rename, onClick: () => renameDialog.open(undefined) });
   }
@@ -61,7 +61,7 @@ export function UserProfilePasskeyRowView({
         </Section.Content>
         {actions.length > 0 ? (
           <Section.Actions>
-            <UserProfileActionMenu
+            <ActionMenu
               triggerRef={triggerRef}
               actions={actions}
               label={fill(m.manage, { name: passkey.name })}

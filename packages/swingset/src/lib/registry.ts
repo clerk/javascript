@@ -42,6 +42,12 @@ import {
   meta as confirmationMeta,
   WithError as ConfirmationWithError,
 } from '../stories/confirmation.stories';
+import {
+  Default as CopyButtonDefault,
+  Inline as CopyButtonInline,
+  Labelled as CopyButtonLabelled,
+  meta as copyButtonMeta,
+} from '../stories/copy-button.stories';
 import { Default as DataListDefault, meta as dataListMeta, Plain as DataListPlain } from '../stories/data-list.stories';
 import {
   Default as DestructiveDefault,
@@ -124,6 +130,33 @@ import {
 } from '../stories/localization.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
+import {
+  Default as OrganizationProfileDefault,
+  meta as organizationProfileMeta,
+  Overlay as OrganizationProfileOverlay,
+} from '../stories/organization-profile.stories';
+import {
+  Default as OrganizationProfileApiKeysPanelDefault,
+  Empty as OrganizationProfileApiKeysPanelEmpty,
+  meta as organizationProfileApiKeysPanelMeta,
+  ProposedTable as OrganizationProfileApiKeysPanelProposedTable,
+} from '../stories/organization-profile-api-keys-panel.stories';
+import {
+  Default as OrganizationProfileDangerSectionDefault,
+  LeaveOnly as OrganizationProfileDangerSectionLeaveOnly,
+  meta as organizationProfileDangerSectionMeta,
+  WithError as OrganizationProfileDangerSectionWithError,
+} from '../stories/organization-profile-danger-section.stories';
+import {
+  Default as OrganizationProfileGeneralPanelDefault,
+  meta as organizationProfileGeneralPanelMeta,
+  ReadOnly as OrganizationProfileGeneralPanelReadOnly,
+} from '../stories/organization-profile-general-panel.stories';
+import {
+  Default as OrganizationProfileWorkspaceSectionDefault,
+  meta as organizationProfileWorkspaceSectionMeta,
+  SaveFails as OrganizationProfileWorkspaceSectionSaveFails,
+} from '../stories/organization-profile-workspace-section.stories';
 import {
   Default as OtpComponentDefault,
   Disabled as OtpComponentDisabled,
@@ -218,7 +251,15 @@ import {
   Selection as TableSelection,
   Sorting as TableSorting,
 } from '../stories/table.stories';
+import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
+import {
+  Default as TagInputComponentDefault,
+  Disabled as TagInputComponentDisabled,
+  Invalid as TagInputComponentInvalid,
+  meta as tagInputComponentMeta,
+  Validation as TagInputComponentValidation,
+} from '../stories/tag-input.component.stories';
 import { meta as tagInputMeta } from '../stories/tag-input.stories';
 import {
   Colors as TextColors,
@@ -272,6 +313,7 @@ import {
   Default as UserProfileApiKeysPanelDefault,
   Empty as UserProfileApiKeysPanelEmpty,
   meta as userProfileApiKeysPanelMeta,
+  ProposedTable as UserProfileApiKeysPanelProposedTable,
 } from '../stories/user-profile-api-keys-panel.stories';
 import {
   Default as UserProfileBillingHistorySectionDefault,
@@ -398,6 +440,38 @@ const comboboxModule: StoryModule = {
   Scrolling: ComboboxScrolling,
 };
 
+const copyButtonModule: StoryModule = {
+  meta: copyButtonMeta,
+  Default: CopyButtonDefault,
+  Inline: CopyButtonInline,
+  Labelled: CopyButtonLabelled,
+};
+
+const organizationProfileModule: StoryModule = {
+  meta: organizationProfileMeta,
+  Default: OrganizationProfileDefault,
+  Overlay: OrganizationProfileOverlay,
+};
+
+const organizationProfileGeneralPanelModule: StoryModule = {
+  meta: organizationProfileGeneralPanelMeta,
+  Default: OrganizationProfileGeneralPanelDefault,
+  ReadOnly: OrganizationProfileGeneralPanelReadOnly,
+};
+
+const organizationProfileWorkspaceSectionModule: StoryModule = {
+  meta: organizationProfileWorkspaceSectionMeta,
+  Default: OrganizationProfileWorkspaceSectionDefault,
+  SaveFails: OrganizationProfileWorkspaceSectionSaveFails,
+};
+
+const organizationProfileDangerSectionModule: StoryModule = {
+  meta: organizationProfileDangerSectionMeta,
+  Default: OrganizationProfileDangerSectionDefault,
+  WithError: OrganizationProfileDangerSectionWithError,
+  LeaveOnly: OrganizationProfileDangerSectionLeaveOnly,
+};
+
 const avatarModule: StoryModule = {
   meta: avatarMeta,
   Primary: AvatarPrimary,
@@ -520,6 +594,14 @@ const otpComponentModule: StoryModule = {
   Disabled: OtpComponentDisabled,
 };
 
+const tagInputComponentModule: StoryModule = {
+  meta: tagInputComponentMeta,
+  Default: TagInputComponentDefault,
+  Validation: TagInputComponentValidation,
+  Invalid: TagInputComponentInvalid,
+  Disabled: TagInputComponentDisabled,
+};
+
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
 const tooltipComponentModule: StoryModule = {
@@ -615,12 +697,18 @@ const tableModule: StoryModule = {
   Overflow: TableOverflow,
 };
 
+const tabsComponentModule: StoryModule = {
+  meta: tabsComponentMeta,
+  Default: TabsComponentDefault,
+};
+
 // Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
 const toastModule: StoryModule = { meta: toastMeta, Default: ToastDefault, Anchored: ToastAnchored };
 
 const userProfileApiKeysPanelModule: StoryModule = {
   meta: userProfileApiKeysPanelMeta,
   Default: UserProfileApiKeysPanelDefault,
+  ProposedTable: UserProfileApiKeysPanelProposedTable,
   Empty: UserProfileApiKeysPanelEmpty,
 };
 const userProfileModule: StoryModule = {
@@ -764,6 +852,13 @@ const reverificationModule: StoryModule = {
   MethodPickerPending: ReverificationMethodPickerPending,
   Help: ReverificationHelp,
 };
+const organizationProfileApiKeysPanelModule: StoryModule = {
+  meta: organizationProfileApiKeysPanelMeta,
+  Default: OrganizationProfileApiKeysPanelDefault,
+  ProposedTable: OrganizationProfileApiKeysPanelProposedTable,
+  Empty: OrganizationProfileApiKeysPanelEmpty,
+};
+
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -787,6 +882,14 @@ export const registry: StoryModule[] = [
   userProfileEnterpriseAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
   userProfileDeleteSectionModule,
+  // Organization Profile
+  organizationProfileModule,
+  // Organization Profile · Panels
+  organizationProfileGeneralPanelModule,
+  organizationProfileApiKeysPanelModule,
+  // Organization Profile · Sections
+  organizationProfileWorkspaceSectionModule,
+  organizationProfileDangerSectionModule,
   // Reverification
   reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.
@@ -800,6 +903,7 @@ export const registry: StoryModule[] = [
   cardComponentModule,
   checkboxModule,
   comboboxModule,
+  copyButtonModule,
   flowComponentModule,
   inputModule,
   inputGroupModule,
@@ -820,6 +924,8 @@ export const registry: StoryModule[] = [
   sectionModule,
   selectComponentModule,
   tableModule,
+  tabsComponentModule,
+  tagInputComponentModule,
   textModule,
   toastModule,
   tooltipComponentModule,
