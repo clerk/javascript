@@ -5,6 +5,7 @@ import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps, XStyle } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
+import { tabularNumbersStyle } from '../../utils/typography.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import { styles } from './action-bar.styles';
@@ -224,7 +225,11 @@ const Count = React.forwardRef<HTMLDivElement, ActionBarCountProps>(function Act
     props: {
       'aria-live': 'polite',
       'aria-atomic': true,
-      ...mergeStyleProps(themeProps('action-bar-count'), stylex.props(reset.base, styles.count, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('action-bar-count'),
+        stylex.props(reset.base, styles.count, tabularNumbersStyle.enabled, xstyle),
+        rest,
+      ),
       id,
       children,
     },
