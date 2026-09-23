@@ -166,6 +166,68 @@ describe('Mosaic ActionBar', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Clear selection' }));
     expect(onDismiss).toHaveBeenCalledOnce();
   });
+  describe('with a menu', () => {
+    function ChangeRole() {
+      const [selected, setSelected] = React.useState(true);
+      const selectAllRef = React.useRef<HTMLInputElement>(null);
+      return (
+        <ActionBar.Anchor>
+          <input
+            ref={selectAllRef}
+            type='checkbox'
+            aria-label='Select all'
+          />
+          <ActionBar.Root
+            open={selected}
+            aria-label='Bulk actions'
+            returnFocus={selectAllRef}
+          >
+            <Menu.Root>
+              <Menu.Trigger>Change role</Menu.Trigger>
+              <Menu.Popup>
+                <Menu.Item
+                  label='Admin'
+                  onClick={() => setSelected(false)}
+                >
+                  <Menu.Label>Admin</Menu.Label>
+                </Menu.Item>
+              </Menu.Popup>
+            </Menu.Root>
+            <button type='button'>Remove</button>
+          </ActionBar.Root>
+          <button type='button'>After</button>
+        </ActionBar.Anchor>
+      );
+    }
+
+    it('sends focus to returnFocus when a menu item closes the bar', async () => {
+      const user = userEvent.setup();
+      render(<ChangeRole />);
+      await user.click(screen.getByRole('checkbox', { name: 'Select all' }));
+      await user.tab();
+      await user.keyboard('{Enter}');
+      await screen.findByRole('menuitem', { name: 'Admin' });
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(screen.getByRole('checkbox', { name: 'Select all' })).toHaveFocus());
+      expect(screen.getByRole('toolbar', { hidden: true }).inert).toBe(true);
+    });
+
+    it('keeps a tab stop after tabbing out of an open menu', async () => {
+      const user = userEvent.setup();
+      render(<ChangeRole />);
+      await user.click(screen.getByRole('checkbox', { name: 'Select all' }));
+      await user.tab();
+      await user.keyboard('{Enter}');
+      await screen.findByRole('menuitem', { name: 'Admin' });
+      await user.tab();
+      await waitFor(() => expect(screen.queryByRole('menuitem')).not.toBeInTheDocument());
+      const stops = Array.from(screen.getByRole('toolbar').querySelectorAll('button')).filter(
+        button => button.tabIndex === 0,
+      );
+      expect(stops).toHaveLength(1);
+    });
+  });
+
   describe('with a confirmation dialog', () => {
     function ConfirmRemove() {
       const [selected, setSelected] = React.useState(true);
@@ -189,7 +251,7 @@ describe('Mosaic ActionBar', () => {
               role='alertdialog'
             >
               <Dialog.Trigger>Remove</Dialog.Trigger>
-              <Dialog.Popup finalFocus={() => (selected ? undefined : selectRef.current)}>
+              <Dialog.Popup>
                 <Dialog.Close>Cancel</Dialog.Close>
                 <button
                   type='button'
@@ -217,7 +279,7 @@ describe('Mosaic ActionBar', () => {
       await waitFor(() => expect(screen.getByRole('button', { name: 'Remove' })).toHaveFocus());
     });
 
-    it('sends focus past the closed bar when the dialog confirms', async () => {
+    it('sends focus to returnFocus when the dialog confirms', async () => {
       const user = userEvent.setup();
       render(<ConfirmRemove />);
       await user.click(screen.getByRole('checkbox', { name: 'Select Kyle' }));

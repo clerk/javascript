@@ -16,7 +16,7 @@ const ActionBarContext = React.createContext<{ registerCount: (id: string | unde
 
 function toolbarItems(bar: HTMLElement): HTMLElement[] {
   return Array.from(bar.querySelectorAll<HTMLElement>(ITEM_SELECTOR)).filter(
-    item => !item.matches(':disabled') && item.closest('[role="toolbar"]') === bar,
+    item => !item.matches(':disabled, [data-floating-ui-focus-guard]') && item.closest('[role="toolbar"]') === bar,
   );
 }
 
@@ -76,7 +76,7 @@ export interface ActionBarRootProps extends MosaicComponentProps<'div'> {
  * </ActionBar.Anchor>
  */
 const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function ActionBarRoot(
-  { open, returnFocus, render, xstyle, positionerXstyle, children, onKeyDown, onFocus, ...rest },
+  { open, returnFocus, render, xstyle, positionerXstyle, children, onKeyDown, onFocus, onBlur, ...rest },
   ref,
 ) {
   const barRef = React.useRef<HTMLDivElement>(null);
@@ -85,26 +85,23 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
   const [countId, setCountId] = React.useState<string | undefined>();
   const context = React.useMemo(() => ({ registerCount: setCountId }), []);
 
-  React.useLayoutEffect(() => {
+  const lastFocusedRef = React.useRef<HTMLElement | null>(null);
+
+  const restoreFocus = React.useCallback(() => {
     const bar = barRef.current;
     if (!bar) {
       return;
     }
-    if (!open) {
-      if (bar.contains(bar.ownerDocument.activeElement)) {
-        const target = returnFocus?.current ?? originRef.current;
-        if (target?.isConnected) {
-          target.focus();
-        } else {
-          (bar.ownerDocument.activeElement as HTMLElement | null)?.blur();
-        }
-      }
-      activeRef.current = undefined;
+    const target = returnFocus?.current ?? originRef.current;
+    bar.inert = true;
+    if (target?.isConnected && !bar.contains(target)) {
+      target.focus();
+    } else if (bar.contains(bar.ownerDocument.activeElement)) {
+      (bar.ownerDocument.activeElement as HTMLElement).blur();
     }
-    bar.inert = !open;
-  }, [open, returnFocus]);
+  }, [returnFocus]);
 
-  React.useLayoutEffect(() => {
+  const syncItems = React.useCallback(() => {
     const bar = barRef.current;
     if (!bar) {
       return;
@@ -114,17 +111,58 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
       activeRef.current = items[0];
     }
     syncTabStops(items, activeRef.current);
-  });
+  }, []);
+
+  React.useLayoutEffect(() => {
+    const bar = barRef.current;
+    if (!bar) {
+      return;
+    }
+    if (open) {
+      bar.inert = false;
+      return;
+    }
+    activeRef.current = undefined;
+    const doc = bar.ownerDocument;
+    const active = doc.activeElement as HTMLElement | null;
+    if (bar.contains(active)) {
+      restoreFocus();
+      return;
+    }
+    if (!active || active !== lastFocusedRef.current) {
+      bar.inert = true;
+      return;
+    }
+    let frame = requestAnimationFrame(function watch() {
+      const current = doc.activeElement;
+      if (current === active && active.isConnected) {
+        frame = requestAnimationFrame(watch);
+      } else if (!current || current === doc.body || bar.contains(current)) {
+        restoreFocus();
+      } else {
+        bar.inert = true;
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, restoreFocus]);
+
+  React.useLayoutEffect(syncItems);
 
   const handleFocus = (event: React.FocusEvent<HTMLDivElement>) => {
     onFocus?.(event);
     const bar = barRef.current;
     const target = event.target as HTMLElement;
-    if (!bar) {
+    const previous = lastFocusedRef.current;
+    lastFocusedRef.current = target;
+    if (!bar?.contains(target)) {
+      return;
+    }
+    if (!open) {
+      restoreFocus();
       return;
     }
     const from = event.relatedTarget as HTMLElement | null;
-    if (from && !bar.contains(from)) {
+    if (from && from !== previous && !bar.contains(from)) {
       originRef.current = from;
     }
     const items = toolbarItems(bar);
@@ -132,6 +170,11 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
       activeRef.current = target;
       syncTabStops(items, target);
     }
+  };
+
+  const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+    onBlur?.(event);
+    syncItems();
   };
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -181,6 +224,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
       'aria-orientation': 'horizontal',
       onKeyDown: handleKeyDown,
       onFocus: handleFocus,
+      onBlur: handleBlur,
       children,
     },
   });

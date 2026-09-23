@@ -4,7 +4,7 @@ import { Icon } from '@clerk/mosaic/components/icon';
 import { Menu } from '@clerk/mosaic/components/menu';
 import { Table } from '@clerk/mosaic/components/table';
 import { useDataTable } from '@clerk/mosaic/primitives/hooks';
-import { useId } from 'react';
+import { useId, useRef } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -38,6 +38,7 @@ const members = [
  */
 export function Default() {
   const tableId = useId();
+  const selectAllRef = useRef<HTMLInputElement>(null);
   const table = useDataTable({ data: members, getRowId: row => row.id });
   const count = Object.values(table.rowSelection).filter(Boolean).length;
   const clearSelection = () => table.setRowSelection({});
@@ -49,6 +50,7 @@ export function Default() {
           <Table.Header>
             <Table.Row>
               <Table.SelectAllCell
+                ref={selectAllRef}
                 aria-label='Select all members'
                 checked={table.getIsAllRowsSelected()}
                 indeterminate={table.getIsSomeRowsSelected()}
@@ -79,6 +81,7 @@ export function Default() {
           open={count > 0}
           aria-label='Bulk actions'
           aria-controls={tableId}
+          returnFocus={selectAllRef}
         >
           <ActionBar.Count>{count} selected</ActionBar.Count>
           <ActionBar.Separator />

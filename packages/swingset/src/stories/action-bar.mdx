@@ -55,8 +55,9 @@ animates in when opened. While closed it is inert and click-through.
 - The bar is a single tab stop. `←` / `→` move between its controls and wrap; `Home` / `End` jump to
   the first and last.
 - Give it an `aria-label`, and point `aria-controls` at the table's `id`.
-- When the bar closes while it holds focus, focus returns to the element it came from. Pass
-  `returnFocus` to send it somewhere else.
+- When the bar closes while it holds focus, including from a menu or dialog opened inside it, focus
+  moves to `returnFocus`. Pass the table's select-all checkbox. Without it, focus returns to the
+  element it came from.
 
 ## Styling
 
