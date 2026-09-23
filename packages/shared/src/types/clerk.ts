@@ -1641,6 +1641,7 @@ export type ClerkOptions = ClerkOptionsNavigation &
          */
         rethrowOfflineNetworkErrors: boolean;
         commerce: boolean;
+        webmcp: boolean;
         /**
          * When set to `'headless'`, Clerk will skip script/chunk loading and initialize
          * directly with the provided Clerk instance. Used by React Native / Expo.
