@@ -125,6 +125,11 @@ PR.
   Only `linear` and `0s` are written as literals. A few existing literals are
   deliberate; do not copy them into new code. `custom-rules/mosaic-motion-tokens`
   warns on violations. Details: `references/motion.md`.
+- **Features don't style.** Styling lives in `components/`. Sections, panels,
+  and flows under `features/` compose components and pass at most a small
+  `xstyle` tweak. If a feature needs its own `stylex.create`, the component it
+  uses is missing a variant or slot: add it to the component, or call it out in
+  the PR. `custom-rules/mosaic-no-feature-styles` warns on violations.
 - **Compose before you style.** Before styling a native element inside a
   component, check whether a Mosaic part already renders it with the right
   variant, and pass it through `render`. See "Compose existing parts" in

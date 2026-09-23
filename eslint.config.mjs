@@ -325,6 +325,37 @@ const mosaicTerseComments = {
   },
 };
 
+const mosaicNoFeatureStyles = {
+  meta: {
+    type: 'suggestion',
+    docs: {
+      description: 'Keep styling in Mosaic components; features compose them',
+      recommended: false,
+    },
+    messages: {
+      noFeatureStyles:
+        'Features compose components and do not style. A style here means a component is missing a variant or slot: add it there. See the mosaic skill.',
+    },
+    schema: [],
+  },
+  create(context) {
+    return {
+      CallExpression(node) {
+        const { callee } = node;
+        if (
+          callee.type === 'MemberExpression' &&
+          callee.object.type === 'Identifier' &&
+          callee.object.name === 'stylex' &&
+          callee.property.type === 'Identifier' &&
+          callee.property.name === 'create'
+        ) {
+          context.report({ node, messageId: 'noFeatureStyles' });
+        }
+      },
+    };
+  },
+};
+
 const noPhysicalCssProperties = {
   meta: {
     type: 'problem',
@@ -481,6 +512,7 @@ export default tseslint.config([
           'no-physical-css-properties': noPhysicalCssProperties,
           'mosaic-motion-tokens': mosaicMotionTokens,
           'mosaic-terse-comments': mosaicTerseComments,
+          'mosaic-no-feature-styles': mosaicNoFeatureStyles,
         },
       },
       'simple-import-sort': pluginSimpleImportSort,
@@ -751,6 +783,14 @@ export default tseslint.config([
           message: 'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread.',
         },
       ],
+    },
+  },
+  {
+    name: 'packages/mosaic - features',
+    files: ['packages/mosaic/src/features/**/*'],
+    ignores: ['packages/mosaic/src/**/*.test.{ts,tsx}'],
+    rules: {
+      'custom-rules/mosaic-no-feature-styles': 'warn',
     },
   },
   {
