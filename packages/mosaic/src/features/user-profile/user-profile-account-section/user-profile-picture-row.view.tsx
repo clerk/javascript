@@ -83,7 +83,7 @@ export function UserProfilePictureRowView({
           <Avatar.Root size='fit'>
             <Avatar.Image
               alt={name}
-              src={imageUrl}
+              src={controller.previewUrl ?? imageUrl}
             />
             <Avatar.Fallback>{initials}</Avatar.Fallback>
           </Avatar.Root>
