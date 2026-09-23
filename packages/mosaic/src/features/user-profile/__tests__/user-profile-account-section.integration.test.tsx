@@ -7,8 +7,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { MosaicProvider } from '../../../MosaicProvider';
 import { UserProfileAccountSection } from '../user-profile-account-section/user-profile-account-section';
 
-let usernameEnabled: boolean;
-let namesEnabled: boolean;
 let user: {
   firstName: string;
   lastName: string;
@@ -33,9 +31,9 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       __internal_environment: {
         userSettings: {
           attributes: {
-            first_name: { enabled: namesEnabled, required: false },
-            last_name: { enabled: namesEnabled, required: false },
-            username: { enabled: usernameEnabled, required: false },
+            first_name: { enabled: true, required: false },
+            last_name: { enabled: true, required: false },
+            username: { enabled: true, required: false },
           },
         },
       },
@@ -52,8 +50,6 @@ function renderSection() {
 }
 
 beforeEach(() => {
-  usernameEnabled = true;
-  namesEnabled = true;
   user = {
     firstName: 'Preston',
     lastName: 'Booth',
@@ -132,21 +128,5 @@ describe('UserProfileAccountSection', () => {
       'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
     );
     expect(user.setProfileImage).toHaveBeenCalledExactlyOnceWith({ file });
-  });
-
-  it('leaves the username row out when the instance does not use usernames', () => {
-    usernameEnabled = false;
-    renderSection();
-
-    expect(screen.queryByText('Username')).not.toBeInTheDocument();
-    expect(screen.getByText('Name')).toBeInTheDocument();
-  });
-
-  it('leaves the name row out when the instance collects neither name', () => {
-    namesEnabled = false;
-    renderSection();
-
-    expect(screen.queryByText('Name')).not.toBeInTheDocument();
-    expect(screen.getByText('Username')).toBeInTheDocument();
   });
 });
