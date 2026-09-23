@@ -1,5 +1,5 @@
 import type { UserProfileAuthenticatorCopyProps } from '@clerk/mosaic/features/user-profile/user-profile-authenticator-setup.view';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export const authenticatorSetup = {
   secret: 'JBSWY3DPEHPK3PXP',
@@ -8,14 +8,6 @@ export const authenticatorSetup = {
 
 export function useAuthenticatorCopy() {
   const [copyState, setCopyState] = useState<UserProfileAuthenticatorCopyProps['state']>();
-
-  useEffect(() => {
-    if (copyState?.status !== 'success') {
-      return;
-    }
-    const timeout = setTimeout(() => setCopyState(undefined), 2000);
-    return () => clearTimeout(timeout);
-  }, [copyState]);
 
   return {
     state: copyState,
@@ -26,9 +18,10 @@ export function useAuthenticatorCopy() {
       setCopyState({ status: 'pending' });
       try {
         await navigator.clipboard.writeText(value);
-        setCopyState({ status: 'success' });
-      } catch {
+        setCopyState(undefined);
+      } catch (error) {
         setCopyState({ status: 'error', message: 'Could not copy. Please try again.' });
+        throw error;
       }
     },
   };

@@ -4,15 +4,15 @@ import { useState } from 'react';
 
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
+import { CopyButton } from '../../components/copy-button';
 import { Field } from '../../components/field';
-import { Icon } from '../../components/icon';
 import { InputGroup } from '../../components/input-group';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useMessages } from '../../localization';
 import { styles } from './user-profile-authenticator-setup.styles';
 
 export interface UserProfileAuthenticatorCopyProps {
-  onCopy: (value: string) => void;
+  onCopy: (value: string) => void | Promise<void>;
   state?: { status: 'pending' | 'success' } | { status: 'error'; message: string };
 }
 
@@ -56,15 +56,14 @@ export function UserProfileAuthenticatorSetupView({
                     />
                     {copy ? (
                       <InputGroup.End>
-                        <Button
-                          type='button'
-                          aria-label={copyLabel}
+                        <CopyButton
+                          value={value}
+                          label={copyLabel}
+                          copiedLabel={m.copied}
                           disabled={feedback?.status === 'pending'}
                           focusableWhenDisabled
-                          onClick={() => copy.onCopy(value)}
-                        >
-                          <Icon name={feedback?.status === 'success' ? 'checkmark' : 'clipboard'} />
-                        </Button>
+                          onCopy={copy.onCopy}
+                        />
                       </InputGroup.End>
                     ) : null}
                   </InputGroup.Root>
@@ -75,7 +74,7 @@ export function UserProfileAuthenticatorSetupView({
                     role='status'
                     aria-label={copyLabel}
                   >
-                    {feedback?.status === 'pending' ? m.copying : feedback?.status === 'success' ? m.copied : null}
+                    {feedback?.status === 'pending' ? m.copying : null}
                   </VisuallyHidden>
                 </Field.Root>
               );
