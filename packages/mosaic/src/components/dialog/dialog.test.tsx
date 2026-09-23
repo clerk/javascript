@@ -590,20 +590,14 @@ describe('compactPlacement', () => {
   });
 });
 
-// The card owns its width, so a card popup shrinks to it rather than capping it.
+// The surface owns its width, so the popup shrinks to it rather than capping it.
 describe('popup width', () => {
   const probe = stylex.create({ fit: { width: 'fit-content' } });
 
-  it('shrinks a card popup to the card', () => {
-    renderVariant('card');
+  it.each(['card', 'profile'] as const)('shrinks a %s popup to its surface', variant => {
+    renderVariant(variant);
 
     expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.fit)));
-  });
-
-  it('leaves a profile popup at full width', () => {
-    renderVariant('profile');
-
-    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.fit)));
   });
 });
 

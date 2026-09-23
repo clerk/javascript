@@ -43,19 +43,20 @@ export const styles = stylex.create({
    * The query container, and the flex column the frame fills. It paints NOTHING and carries no
    * band of its own — an element is never its own query container, so every compact rule lives on
    * `layout`, one level inside. It is also the containing block for the dismiss the root carries
-   * inside a dialog. `maxWidth` here so the frame inside is what the width clamps.
+   * inside a dialog. A fixed `width` capped by `max-width`, so a `profile` dialog's popup, which
+   * sizes to its content, takes the full width rather than the width of the current page.
    */
   root: {
-    // Centred where the host is wider — a `profile` dialog's popup spans the viewport. The frame
-    // runs wide; the content inside is held to a reading width of its own, see `contentBody`.
+    // Centered where the host is wider. The frame runs wide; the content inside is held to a
+    // reading width of its own, see `contentBody`.
     marginInline: 'auto',
     containerName: 'cl-profile',
     containerType: 'inline-size',
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
-    maxWidth: '94.625rem',
-    width: '100%',
+    maxWidth: '100%',
+    width: '94.625rem',
   },
 
   /**

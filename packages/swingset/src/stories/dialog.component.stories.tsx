@@ -74,7 +74,7 @@ export function Default(args: Record<string, unknown>) {
         aria-label='Dialog surface'
       >
         <Dialog.CloseButton />
-        <div style={variant === 'profile' ? surface : { ...surface, width: '26.25rem', maxWidth: '100%' }}>
+        <div style={{ ...surface, width: variant === 'profile' ? '94.625rem' : '26.25rem', maxWidth: '100%' }}>
           <Heading size='sm'>The surface</Heading>
           <Text>
             The dashed edge is <code>Dialog.Popup</code>. A real dialog fills it with a Card or a Profile, which paints

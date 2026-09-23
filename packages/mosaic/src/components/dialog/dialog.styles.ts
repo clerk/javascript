@@ -106,7 +106,7 @@ export const styles = stylex.create({
    *
    * Published as a var so the two edges can be driven from one ladder and so anything inside can
    * read it without plumbing — custom properties inherit. The popup needs no width math of its
-   * own: it is `width: 100%` inside this padding, so the inset is already subtracted.
+   * own: it fits its surface within this padding, so the inset is already subtracted.
    *
    * Square everywhere except the phone band, where the sides come in to `1rem` and the block edges
    * stay at `1.25rem`. On a phone the horizontal inset is the expensive one — it is subtracted from
@@ -132,6 +132,9 @@ export const styles = stylex.create({
     // exactly that case, so the popup overflows downward only and scrolls from its top.
     placeItems: 'safe center',
     display: 'grid',
+    // One column that never grows past the track. An `auto` column would widen to the surface's
+    // fixed width, since that width is also its minimum, and the dialog would overflow the screen.
+    gridTemplateColumns: 'minmax(0, 1fr)',
     // The keyboard's share of the viewport, added to the inset on the bottom edge only. A longhand
     // beside the `padding` shorthand above is deliberate — StyleX ranks a longhand higher
     // regardless of order, so this wins without depending on argument order. Falls back to `0px`,
@@ -199,7 +202,11 @@ export const styles = stylex.create({
     overflowWrap: 'anywhere',
     // The containing block for `Dialog.CloseButton`.
     position: 'relative',
-    width: '100%',
+    // Shrinks to the surface, so the surface decides the dialog's width and a press beside it lands
+    // outside the popup. `maxWidth` because a surface's fixed width is also its minimum, which
+    // `fit-content` never goes below.
+    maxWidth: '100%',
+    width: 'fit-content',
     '::after': {
       inset: 0,
       // Follows the popup's own radius.
@@ -355,9 +362,6 @@ export const variants = stylex.create({
     // alone: a `profile` hosting a dialog gets a scrim between the two instead, and would
     // otherwise dim as well as darken.
     '--_cl-stack-veil': { default: 0, ':where([data-stack-base])': STACK_VEIL_OPACITY },
-    // Shrinks to the card, so the card's `size` is the dialog's width and a press beside it lands
-    // outside the popup.
-    width: 'fit-content',
   },
   /**
    * Like `card`, a profile brings its own surface. It is the account-profile and settings surface,
@@ -387,8 +391,8 @@ export const variants = stylex.create({
     // needs somewhere for overflow to go, but putting the scroll on the POPUP takes everything
     // anchored to it along for the ride — the close button most obviously. So the popup clips,
     // and the scroll region is the surface's own: `Profile` scrolls its content column.
-    // Deliberately a flex column with no `align-items` override, so the surface inside stretches
-    // to the popup's width and grows to its height.
+    // Deliberately a flex column with no `align-items` override, so the surface inside grows to
+    // the popup's height.
     //
     // `clip` rather than `hidden` for the same reason as the viewport: `hidden` would make the
     // profile a scroll container, and focusing anything inside it that sits outside its box would
