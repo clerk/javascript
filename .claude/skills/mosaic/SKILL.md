@@ -71,7 +71,7 @@ layer. Copy from it.
 | Writing the controller (local state, pending, action wrapping)         | `references/controllers.md`                            |
 | Authoring or debugging a state machine, or wiring one to React         | `references/machines.md` → in-tree `machine/README.md` |
 | Writing the view (rendering plain props)                               | `references/views.md`                                  |
-| Testing a model, controller, or view                                   | `references/testing.md`                                |
+| Testing a model, controller, or view, or deciding what to test         | `references/testing.md`                                |
 | Migrating a legacy component into Mosaic (the end-to-end workflow)     | `references/migration.md`                              |
 | Running the parity audit that guards a migration                       | `references/parity-audit.md`                           |
 

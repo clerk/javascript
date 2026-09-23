@@ -27,6 +27,27 @@ assert an in-flight state before settling it), `tick()` (flush microtasks so an
 
 Run one file with `pnpm --filter @clerk/ui test <substr>`.
 
+## What to test
+
+Test what this component decides, not what it delegates or how it looks.
+
+- **Don't re-test a component you consume.** If a flow renders `Dialog`, `Menu`,
+  `ScrollArea` and so on, their own suites own focus trapping, Escape to close,
+  keyboard nav, and the rest. The consumer asserts only its own wiring: the
+  props it passes and the callbacks it hands over. Ask: would this test still
+  pass if the primitive's internals changed and this component didn't? If yes,
+  it belongs in the primitive's suite, or it's already there.
+- **Don't assert styles.** No `toHaveStyle`, `getComputedStyle`, or checks on
+  StyleX class names. jsdom lays nothing out, so these only prove a string was
+  passed through. They break on every restyle and never catch a visual bug.
+  Check visuals in swingset instead.
+- **Do assert customization hooks.** `cl-*` classes and `data-*` state
+  attributes are what people target through `appearance`, so they are public
+  API. Cover them in one test per component that checks each hook is present
+  on the right element, rather than repeating them across behavior tests.
+- **Don't add a test just because a file is new.** A file that only wires other
+  pieces together is covered by the integration test.
+
 ---
 
 ## Model — mock Clerk, assert the plain data
