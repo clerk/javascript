@@ -281,9 +281,15 @@ const PolicyRow = ({ policy }: { policy: ProtoPolicy }) => {
   const connection = connectionFor(policy, connections);
   const open = () => void openPolicy(navigate, policy.id);
 
+  const ssoPending = policy.signIn === 'sso' && connection?.status !== 'active';
   const actions: PropsOfComponent<typeof ThreeDotsMenu>['actions'] = [
     { label: protoKey('Edit policy'), onClick: open },
   ];
+  if (ssoPending) {
+    // An abandoned setup is a menu item, not a broken row: the table stays
+    // honest about what applies today (default sign-in) and how to finish.
+    actions.push({ label: protoKey('Continue SSO setup'), onClick: () => void openPolicy(navigate, policy.id, 'sso') });
+  }
   if (!policy.isCatchAll) {
     actions.push({
       label: protoKey('Remove policy'),
@@ -319,12 +325,25 @@ const PolicyRow = ({ policy }: { policy: ProtoPolicy }) => {
         </Text>
       </Td>
       <Td>
-        {policy.signIn === 'sso' && connection ? (
+        {policy.signIn === 'sso' && connection?.status === 'active' ? (
           <ProviderMark
             provider={connection.provider}
             name={connection.name}
             status={connection.status}
           />
+        ) : policy.signIn === 'sso' && connection?.status === 'broken' ? (
+          <ProviderMark
+            provider={connection.provider}
+            name={connection.name}
+            status='broken'
+          />
+        ) : ssoPending ? (
+          <Text
+            colorScheme='secondary'
+            sx={cellTextSx}
+          >
+            SSO · Setting up
+          </Text>
         ) : (
           <Text
             colorScheme='secondary'
