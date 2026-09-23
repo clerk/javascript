@@ -20,12 +20,7 @@ export const clerkMiddleware = (
     // Resolve options: if function, call it with context object; otherwise use as-is
     const resolvedOptions = typeof options === 'function' ? await options({ url: clerkRequest.clerkUrl }) : options;
 
-    // Load options with resolved keys
-    const loadedOptions = loadOptions(clerkRequest, {
-      ...resolvedOptions,
-      publishableKey: resolvedOptions?.publishableKey,
-      secretKey: resolvedOptions?.secretKey,
-    });
+    const loadedOptions = loadOptions(clerkRequest, resolvedOptions);
 
     const requestState = await clerkClient().authenticateRequest(clerkRequest, {
       ...loadedOptions,
