@@ -1512,7 +1512,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
-    if (noUserExists(this)) {
+    if (this.user === null) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderOAuthConsentComponentWhenUserDoesNotExist, {
           code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
