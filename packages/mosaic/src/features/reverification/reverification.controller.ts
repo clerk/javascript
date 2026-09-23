@@ -8,16 +8,21 @@ import type { ReverificationModel, ReverificationReadyModel } from './reverifica
 import type {
   ReverificationMethod,
   ReverificationResult,
+  ReverificationState,
   ReverificationStep,
   ReverificationViewProps,
 } from './reverification.types';
 import { needsPrepare, otpChannelFor } from './reverification.utils';
 
 export type ReverificationController =
-  | { status: 'idle' }
-  | { status: 'loading' }
-  | { status: 'unavailable' }
-  | ({ status: 'ready' } & ReverificationViewProps);
+  | { status: 'idle'; phase: 'inactive' }
+  | { status: 'loading'; phase: Exclude<ReverificationState['phase'], 'inactive'>; onCancel?: () => void }
+  | { status: 'unavailable'; phase: Exclude<ReverificationState['phase'], 'inactive'>; onCancel?: () => void }
+  | ({
+      status: 'ready';
+      phase: Exclude<ReverificationState['phase'], 'inactive'>;
+      onCancel?: () => void;
+    } & ReverificationViewProps);
 
 type OverlayFrom = 'factor' | 'method-picker';
 
@@ -396,8 +401,8 @@ function viewStep(value: string, method: ReverificationMethod | null): Reverific
  *   - status: 'loading' is the pending card rendered in place, before a factor exists
  *   - status: 'ready' && isPending is the inline pending state of the current factor
  *
- * Root reverification `phase` is an input, not part of this return. The factor machine runs
- * while `active` and resets only when `phase` returns to `inactive`. `retrying` keeps the last factor pending.
+ * `phase` is part of this return. The factor machine runs while `active` and resets only when
+ * `phase` returns to `inactive`. `retrying` keeps the last factor pending.
  */
 export function useReverificationController(model: ReverificationModel): ReverificationController {
   const ready = model.status === 'ready' ? model : null;
@@ -428,6 +433,13 @@ export function useReverificationController(model: ReverificationModel): Reverif
   }, [countingDown, resendAvailableAt]);
 
   const reverificationPhase = model.phase;
+  const onCancel =
+    reverificationPhase === 'active'
+      ? () => {
+          send({ type: 'RESET' });
+          model.cancel();
+        }
+      : undefined;
   const needsStart = reverificationPhase === 'active' && Boolean(ready) && snapshot.value === 'inactive';
   const needsReset = reverificationPhase === 'inactive' && snapshot.value !== 'inactive';
   useEffect(() => {
@@ -439,14 +451,14 @@ export function useReverificationController(model: ReverificationModel): Reverif
   }, [needsStart, needsReset, send]);
 
   if (reverificationPhase === 'inactive') {
-    return { status: 'idle' };
+    return { status: 'idle', phase: reverificationPhase };
   }
 
   const { context } = snapshot;
   const activeMethod = context.activeMethod;
 
   if (snapshot.value === 'unavailable') {
-    return { status: 'unavailable' };
+    return { status: 'unavailable', phase: reverificationPhase, onCancel };
   }
 
   // If the action is retrying after success and the component is rendered, we stay
@@ -458,9 +470,9 @@ export function useReverificationController(model: ReverificationModel): Reverif
 
   if (!step) {
     if (snapshot.value === 'inactive' || snapshot.value === 'starting' || snapshot.value === 'done') {
-      return { status: 'loading' };
+      return { status: 'loading', phase: reverificationPhase, onCancel };
     }
-    return { status: 'unavailable' };
+    return { status: 'unavailable', phase: reverificationPhase, onCancel };
   }
 
   // If we are currently on the alternative methods screen and preparing a factor, activeMethod will
@@ -471,6 +483,7 @@ export function useReverificationController(model: ReverificationModel): Reverif
 
   return {
     status: 'ready',
+    phase: reverificationPhase,
     step,
     direction: context.direction,
     value: context.inputValue,
@@ -491,6 +504,7 @@ export function useReverificationController(model: ReverificationModel): Reverif
     onSelectMethod: (id: string) => send({ type: 'SELECT_METHOD', id }),
     otpChannel: activeMethod ? otpChannelFor(activeMethod.strategy) : undefined,
     onResend: () => send({ type: 'RESEND' }),
+    onCancel,
     canResend,
     // We clamp this to 30s because the first render after locking resend
     // will have the old `now` state set, which would result in a value above
