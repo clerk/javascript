@@ -1,4 +1,5 @@
 import { MembersTableTabView } from '@clerk/mosaic/features/organization-profile/members-table-tab.view';
+import type { ReactElement } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -16,17 +17,17 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/features/organization-profile/members-table-tab.view.tsx',
 };
 
-export function Legacy() {
+export function Legacy(): ReactElement {
   const props = useMembersTableFixture();
   return <MembersTableTabView {...props} />;
 }
 
-export function Proposed() {
+export function Proposed(): ReactElement {
   const props = useMembersTableFixture({ proposed: true });
   return <MembersTableTabView {...props} />;
 }
 
-export function Empty() {
+export function Empty(): ReactElement {
   const props = useMembersTableFixture({ empty: true });
   return <MembersTableTabView {...props} />;
 }

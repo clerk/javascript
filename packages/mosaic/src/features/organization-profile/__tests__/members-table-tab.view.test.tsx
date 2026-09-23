@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, type RenderResult, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -43,7 +43,9 @@ function propsFor(overrides: Partial<MembersTableTabViewProps> = {}): MembersTab
   };
 }
 
-function renderView(overrides: Partial<MembersTableTabViewProps> = {}) {
+function renderView(
+  overrides: Partial<MembersTableTabViewProps> = {},
+): RenderResult & { props: MembersTableTabViewProps } {
   const props = propsFor(overrides);
   return {
     props,
@@ -78,7 +80,7 @@ describe('MembersTableTabView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.getByText('No members found')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('No members found');
     rerender(
       <MosaicProvider>
         <MembersTableTabView
@@ -116,6 +118,65 @@ describe('MembersTableTabView', () => {
     expect(props.onBulkAction).not.toHaveBeenCalled();
     expect(screen.queryByRole('toolbar')).not.toBeInTheDocument();
   });
+  it.each<Partial<MembersTableTabViewProps>>([
+    { page: 2 },
+    { pageSize: 20 },
+    { searchValue: 'Grace' },
+    { sort: { column: 'role', direction: 'ascending' } },
+    { sort: { column: 'name', direction: 'descending' } },
+  ])('clears selection when the caller changes result state: %j', async change => {
+    const user = userEvent.setup();
+    const { props, rerender } = renderView({ onBulkAction: vi.fn(), sort: { column: 'name', direction: 'ascending' } });
+    await user.click(screen.getByRole('checkbox', { name: 'Select Grace Hopper' }));
+    rerender(
+      <MosaicProvider>
+        <MembersTableTabView
+          {...props}
+          sort={{ column: 'name', direction: 'ascending' }}
+          isFetching
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).toBeChecked();
+    rerender(
+      <MosaicProvider>
+        <MembersTableTabView
+          {...props}
+          {...change}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('checkbox', { name: 'Select Grace Hopper' })).not.toBeChecked();
+  });
+
+  it('does not retain hidden selection for protected members within a Shift-click range', async () => {
+    const user = userEvent.setup();
+    const member = propsFor().members[1];
+    const members = [
+      { ...member, id: 'first', name: 'First' },
+      { ...member, id: 'self', name: 'Self', isCurrentUser: true },
+      { ...member, id: 'deprovisioned', name: 'Deprovisioned', isDeprovisioned: true },
+      { ...member, id: 'last', name: 'Last' },
+    ];
+    const { props, rerender } = renderView({ members, totalCount: members.length, onBulkAction: vi.fn() });
+    await user.click(screen.getByRole('checkbox', { name: 'Select First' }));
+    await user.keyboard('{Shift>}');
+    await user.click(screen.getByRole('checkbox', { name: 'Select Last' }));
+    await user.keyboard('{/Shift}');
+    expect(screen.getByRole('checkbox', { name: 'Select First' })).toBeChecked();
+    expect(screen.getByRole('checkbox', { name: 'Select Last' })).toBeChecked();
+    rerender(
+      <MosaicProvider>
+        <MembersTableTabView
+          {...props}
+          members={members.map(item => ({ ...item, isCurrentUser: false, isDeprovisioned: false }))}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('checkbox', { name: 'Select Self' })).not.toBeChecked();
+    expect(screen.getByRole('checkbox', { name: 'Select Deprovisioned' })).not.toBeChecked();
+  });
+
   it('routes member actions by id and excludes protected members from removal and role editing', async () => {
     const user = userEvent.setup();
     const { props } = renderView({ onRemove: vi.fn(), onChangeRole: vi.fn(), onInvite: vi.fn() });

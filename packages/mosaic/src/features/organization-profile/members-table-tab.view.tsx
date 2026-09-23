@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { useMemo, useRef, useState } from 'react';
+import { type ReactElement, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Avatar } from '../../components/avatar';
@@ -44,7 +44,7 @@ export function MembersTableTabView({
   onSortChange,
   isLoading,
   isFetching = false,
-}: MembersTableTabViewProps) {
+}: MembersTableTabViewProps): ReactElement {
   const m = useMessages('membersTableTab');
   const searchInput = useRef<HTMLInputElement>(null);
   const inviteButton = useRef<HTMLButtonElement>(null);
@@ -59,6 +59,7 @@ export function MembersTableTabView({
     data: members,
     totalCount,
     getRowId,
+    isRowSelectable: canManageMember,
     sorting: sort ? [{ id: sort.column, desc: sort.direction === 'descending' }] : [],
     onSortingChange: onSortChange
       ? update => {
@@ -87,6 +88,13 @@ export function MembersTableTabView({
       onSearchChange(typeof update === 'function' ? update(searchValue) : update);
     },
   });
+  const resetSelection = useRef(table.setRowSelection);
+  useEffect(() => {
+    resetSelection.current = table.setRowSelection;
+  }, [table.setRowSelection]);
+  useEffect(() => {
+    resetSelection.current({});
+  }, [page, pageSize, searchValue, sort?.column, sort?.direction]);
   const sortHeader = (column: MembersTableSort['column']): Pick<TableHeaderCellProps, 'sort' | 'onSort'> => {
     const active = table.sorting[0];
     return {
@@ -103,8 +111,6 @@ export function MembersTableTabView({
         : undefined,
     };
   };
-  const selectableRows = table.rows.filter(row => canManageMember(row.original));
-  const allSelected = selectableRows.length > 0 && selectableRows.every(row => row.getIsSelected());
   const columnCount = 3 + Number(Boolean(onRemove)) + Number(Boolean(onBulkAction));
   const query = searchValue.trim();
   return (
@@ -116,7 +122,10 @@ export function MembersTableTabView({
             xstyle={styles.search}
           >
             <InputGroup.Start>
-              <Icon name='magnifying-glass' />
+              <Icon
+                name='magnifying-glass'
+                aria-hidden='true'
+              />
             </InputGroup.Start>
             <InputGroup.Input
               ref={searchInput}
@@ -136,7 +145,10 @@ export function MembersTableTabView({
                     searchInput.current?.focus();
                   }}
                 >
-                  <Icon name='x' />
+                  <Icon
+                    name='x'
+                    aria-hidden='true'
+                  />
                 </Button>
               </InputGroup.End>
             ) : null}
@@ -159,11 +171,9 @@ export function MembersTableTabView({
               {onBulkAction ? (
                 <Table.SelectAllCell
                   aria-label={m.selectAll}
-                  checked={allSelected}
-                  indeterminate={!allSelected && selectableRows.some(row => row.getIsSelected())}
-                  onChange={() =>
-                    table.setRowSelection(Object.fromEntries(selectableRows.map(row => [row.id, !allSelected])))
-                  }
+                  checked={table.getIsAllRowsSelected()}
+                  indeterminate={table.getIsSomeRowsSelected()}
+                  onChange={table.toggleAllRowsSelected}
                 />
               ) : null}
               <Table.HeaderCell {...sortHeader('name')}>{m.name}</Table.HeaderCell>
@@ -186,7 +196,7 @@ export function MembersTableTabView({
               </Table.Empty>
             ) : table.rows.length === 0 ? (
               <Table.Empty colSpan={columnCount}>
-                <EmptyState.Root>
+                <EmptyState.Root role='status'>
                   <EmptyState.Icon name='users' />
                   <EmptyState.Label>{query ? m.empty : m.noMembers}</EmptyState.Label>
                   <EmptyState.Description>
