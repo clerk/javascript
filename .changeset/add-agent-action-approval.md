@@ -9,4 +9,4 @@
 '@clerk/localizations': patch
 ---
 
-Add an experimental `AgentActionApproval` component with an interactive mock approval flow.
+Add an experimental `AgentActionApproval` component with an interactive mock approval flow, account and workspace switching, and an unavailable-request state.

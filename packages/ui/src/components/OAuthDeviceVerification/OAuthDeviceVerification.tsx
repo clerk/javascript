@@ -12,6 +12,7 @@ import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
+import { OrgSelect } from '@/ui/elements/OrgSelect';
 import { Alert } from '@/ui/primitives';
 import { Route, Switch } from '@/ui/router';
 import { useFormControl } from '@/ui/utils/useFormControl';
@@ -31,7 +32,6 @@ import {
   LogoGroupItemContainer,
   LogoGroupSeparator,
 } from '../OAuthConsent/LogoGroup';
-import { OrgSelect } from '../OAuthConsent/OrgSelect';
 import { OAuthDeviceVerificationCodeInput } from './OAuthDeviceVerificationCodeInput';
 import { getOAuthDeviceUserCodeFromSearch, isValidOAuthDeviceUserCode, normalizeOAuthDeviceUserCode } from './utils';
 

@@ -17,6 +17,7 @@ export const jaJP: LocalizationResource = {
   agentActionApproval: {
     action__approve: undefined,
     action__deny: undefined,
+    action__switchAccount: undefined,
     commentLabel: undefined,
     commentOptional: undefined,
     commentPlaceholder: undefined,
@@ -25,6 +26,7 @@ export const jaJP: LocalizationResource = {
     expiresIn: undefined,
     parameterCopied: undefined,
     requestedAt: undefined,
+    signedInAs: undefined,
     terminal: {
       approvedSubtitle: undefined,
       approvedTitle: undefined,
@@ -34,6 +36,9 @@ export const jaJP: LocalizationResource = {
       expiredTitle: undefined,
     },
     title: undefined,
+    unavailableSubtitle: undefined,
+    unavailableTitle: undefined,
+    workspace: undefined,
   },
   apiKeys: {
     action__add: '新しいキーを追加',

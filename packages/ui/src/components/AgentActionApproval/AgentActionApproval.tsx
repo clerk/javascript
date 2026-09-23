@@ -1,9 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 
 import { Button, Col, Flex, Flow, FormLabel, Grid, localizationKeys, Text, useLocalizations } from '@/ui/customizables';
 import { Card } from '@/ui/elements/Card';
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
+import { Menu, MenuItem, MenuList, MenuTrigger } from '@/ui/elements/Menu';
+import { OrgSelect } from '@/ui/elements/OrgSelect';
+import { UserPreview } from '@/ui/elements/UserPreview';
 import { CreditCard, ShieldCheck } from '@/ui/icons';
 import { Textarea } from '@/ui/primitives';
 
@@ -22,8 +25,45 @@ const mockAction = {
   ],
 };
 
+type MockWorkspace = {
+  value: string;
+  label: string;
+  response: { status: 200; data: typeof mockAction } | { status: 404 };
+};
+
+type MockAccount = {
+  value: string;
+  label: string;
+  identifier: string;
+  workspaces: MockWorkspace[];
+};
+
+const mockAccounts: MockAccount[] = [
+  {
+    value: 'alex',
+    label: 'Alex Morgan',
+    identifier: 'alex@example.com',
+    workspaces: [
+      { value: 'acme', label: 'Acme', response: { status: 200, data: mockAction } },
+      { value: 'northstar', label: 'Northstar', response: { status: 404 } },
+    ],
+  },
+  {
+    value: 'jordan',
+    label: 'Jordan Lee',
+    identifier: 'jordan@example.com',
+    workspaces: [{ value: 'northstar', label: 'Northstar', response: { status: 404 } }],
+  },
+];
+
 function ApprovalScreen() {
   const { locale, t } = useLocalizations();
+  const workspaceId = useId();
+  const [context, setContext] = useState({
+    account: mockAccounts[0],
+    workspace: mockAccounts[0].workspaces[0],
+  });
+  const { account, workspace } = context;
   const [comment, setComment] = useState('');
   const [decision, setDecision] = useState<TerminalStatus | null>(null);
   const timestamps = useMemo(
@@ -34,91 +74,165 @@ function ApprovalScreen() {
     [],
   );
   const { remaining, isExpired } = useCountdown(timestamps.expiresAt, decision !== null);
+  const action = workspace.response.status === 200 ? workspace.response.data : null;
 
-  if (decision) {
+  if (action && decision) {
     return <TerminalCard status={decision} />;
   }
 
-  if (isExpired) {
+  if (action && isExpired) {
     return <TerminalCard status='expired' />;
   }
 
   return (
     <Card.Root>
       <Card.Content gap={6}>
-        <Col gap={4}>
+        <Col
+          gap={4}
+          role={!action ? 'status' : undefined}
+        >
           <AgentActionIcon icon={ShieldCheck} />
           <Header.Root>
             <Header.Title
               as='h2'
-              localizationKey={localizationKeys('agentActionApproval.title')}
+              localizationKey={localizationKeys(
+                action ? 'agentActionApproval.title' : 'agentActionApproval.unavailableTitle',
+              )}
             />
             <Header.Subtitle
-              localizationKey={localizationKeys('agentActionApproval.requestedAt', {
-                relativeTime: formatRelativeTime(timestamps.createdAt, locale),
-              })}
+              localizationKey={
+                action
+                  ? localizationKeys('agentActionApproval.requestedAt', {
+                      relativeTime: formatRelativeTime(timestamps.createdAt, locale),
+                    })
+                  : localizationKeys('agentActionApproval.unavailableSubtitle')
+              }
             />
           </Header.Root>
-        </Col>
-        <Col
-          gap={4}
-          sx={{ textAlign: 'start' }}
-        >
-          <Text colorScheme='secondary'>{mockAction.description}</Text>
-          <ActionDetails details={mockAction.parameters} />
         </Col>
         <Col
           gap={2}
           sx={{ textAlign: 'start' }}
         >
-          <Flex
-            align='center'
-            justify='between'
-          >
-            <FormLabel
-              htmlFor='agent-action-comment'
-              localizationKey={localizationKeys('agentActionApproval.commentLabel')}
-            />
-            <Text
-              colorScheme='secondary'
-              localizationKey={localizationKeys('agentActionApproval.commentOptional')}
-            />
-          </Flex>
-          <Textarea
-            id='agent-action-comment'
-            value={comment}
-            maxLength={500}
-            rows={3}
-            onChange={event => setComment(event.target.value)}
-            placeholder={t(localizationKeys('agentActionApproval.commentPlaceholder'))}
-            style={{ maxHeight: 'none', minHeight: '4.5rem', resize: 'vertical' }}
+          <FormLabel
+            htmlFor={workspaceId}
+            localizationKey={localizationKeys('agentActionApproval.workspace')}
+          />
+          <OrgSelect
+            id={workspaceId}
+            options={account.workspaces}
+            value={workspace.value}
+            onChange={value => {
+              const nextWorkspace = account.workspaces.find(option => option.value === value);
+              if (!nextWorkspace || nextWorkspace.value === workspace.value) {
+                return;
+              }
+              setContext({ account, workspace: nextWorkspace });
+              setComment('');
+            }}
           />
         </Col>
-        <Grid
-          columns={2}
-          gap={3}
-        >
-          <Button
-            colorScheme='secondary'
-            variant='outline'
-            onClick={() => setDecision('denied')}
-            localizationKey={localizationKeys('agentActionApproval.action__deny')}
-          />
-          <Button
-            onClick={() => setDecision('approved')}
-            localizationKey={localizationKeys('agentActionApproval.action__approve')}
-          />
-          <Text
-            sx={{ fontVariantNumeric: 'tabular-nums', gridColumn: 'span 2' }}
-            variant='caption'
-            colorScheme='secondary'
-            localizationKey={localizationKeys('agentActionApproval.expiresIn', {
-              remaining: formatRemainingTime(remaining),
-            })}
-          />
-        </Grid>
+        {action && (
+          <>
+            <Col
+              gap={4}
+              sx={{ textAlign: 'start' }}
+            >
+              <Text colorScheme='secondary'>{action.description}</Text>
+              <ActionDetails details={action.parameters} />
+            </Col>
+            <Col
+              gap={2}
+              sx={{ textAlign: 'start' }}
+            >
+              <Flex
+                align='center'
+                justify='between'
+              >
+                <FormLabel
+                  htmlFor='agent-action-comment'
+                  localizationKey={localizationKeys('agentActionApproval.commentLabel')}
+                />
+                <Text
+                  colorScheme='secondary'
+                  localizationKey={localizationKeys('agentActionApproval.commentOptional')}
+                />
+              </Flex>
+              <Textarea
+                id='agent-action-comment'
+                value={comment}
+                maxLength={500}
+                rows={3}
+                onChange={event => setComment(event.target.value)}
+                placeholder={t(localizationKeys('agentActionApproval.commentPlaceholder'))}
+                style={{ maxHeight: 'none', minHeight: '4.5rem', resize: 'vertical' }}
+              />
+            </Col>
+            <Grid
+              columns={2}
+              gap={3}
+            >
+              <Button
+                colorScheme='secondary'
+                variant='outline'
+                onClick={() => setDecision('denied')}
+                localizationKey={localizationKeys('agentActionApproval.action__deny')}
+              />
+              <Button
+                onClick={() => setDecision('approved')}
+                localizationKey={localizationKeys('agentActionApproval.action__approve')}
+              />
+              <Text
+                sx={{ fontVariantNumeric: 'tabular-nums', gridColumn: 'span 2' }}
+                variant='caption'
+                colorScheme='secondary'
+                localizationKey={localizationKeys('agentActionApproval.expiresIn', {
+                  remaining: formatRemainingTime(remaining),
+                })}
+              />
+            </Grid>
+          </>
+        )}
       </Card.Content>
-      <Card.Footer />
+      <Card.Footer>
+        <Card.Action
+          align='center'
+          justify='center'
+          sx={{ flexWrap: 'wrap' }}
+        >
+          <Card.ActionText
+            localizationKey={localizationKeys('agentActionApproval.signedInAs', { identifier: account.identifier })}
+          />
+          <Menu>
+            <MenuTrigger>
+              <Button
+                variant='link'
+                textVariant='buttonLarge'
+                colorScheme='neutral'
+                localizationKey={localizationKeys('agentActionApproval.action__switchAccount')}
+              />
+            </MenuTrigger>
+            <MenuList>
+              {mockAccounts
+                .filter(option => option.value !== account.value)
+                .map(option => (
+                  <MenuItem
+                    key={option.value}
+                    onClick={() => {
+                      setContext({ account: option, workspace: option.workspaces[0] });
+                      setComment('');
+                    }}
+                  >
+                    <UserPreview
+                      title={option.label}
+                      subtitle={option.identifier}
+                    />
+                  </MenuItem>
+                ))}
+            </MenuList>
+          </Menu>
+        </Card.Action>
+      </Card.Footer>
     </Card.Root>
   );
 }

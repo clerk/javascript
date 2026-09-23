@@ -5,6 +5,7 @@ export const enUS: LocalizationResource = {
   agentActionApproval: {
     action__approve: 'Approve',
     action__deny: 'Deny',
+    action__switchAccount: 'Switch account',
     commentLabel: 'Comment',
     commentOptional: 'Optional',
     commentPlaceholder: 'Add any additional context for your response',
@@ -13,6 +14,7 @@ export const enUS: LocalizationResource = {
     expiresIn: 'Approval window closes in {{remaining}}',
     parameterCopied: '{{parameter}} copied',
     requestedAt: 'Requested {{relativeTime}}',
+    signedInAs: 'Signed in as {{identifier}}',
     terminal: {
       approvedSubtitle: 'You can close this window, return to your agent, and continue with your request.',
       approvedTitle: 'Action approved',
@@ -23,6 +25,9 @@ export const enUS: LocalizationResource = {
       expiredTitle: 'Approval window closed',
     },
     title: 'Approve agent action',
+    unavailableSubtitle: 'You can try another account or close this window.',
+    unavailableTitle: 'This request is unavailable',
+    workspace: 'Workspace',
   },
   apiKeys: {
     action__add: 'Add new key',

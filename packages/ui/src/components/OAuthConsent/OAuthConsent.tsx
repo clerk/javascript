@@ -9,6 +9,7 @@ import { withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCardContainer } from '@/ui/elements/LoadingCard';
 import { Modal } from '@/ui/elements/Modal';
+import { OrgSelect } from '@/ui/elements/OrgSelect';
 import { Alert, Textarea } from '@/ui/primitives';
 import { Route, Switch } from '@/ui/router';
 
@@ -23,7 +24,6 @@ import {
   ListGroupItemLabel,
 } from './ListGroup';
 import { LogoGroup, LogoGroupIcon, LogoGroupItem, LogoGroupItemContainer, LogoGroupSeparator } from './LogoGroup';
-import { OrgSelect } from './OrgSelect';
 import { getForwardedParams, getOAuthConsentFromSearch, getRedirectDisplay, getRedirectUriFromSearch } from './utils';
 
 const OFFLINE_ACCESS_SCOPE = 'offline_access';
