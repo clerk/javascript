@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -22,47 +23,39 @@ describe('AccessOnboardingPage', () => {
 
     props.setProps({ __internal_accessOnboarding: true });
     const { unmount } = render(<OrganizationProfile />, { wrapper });
-    expect(await screen.findByText('Access & onboarding')).toBeInTheDocument();
+    expect(await screen.findByText('Access')).toBeInTheDocument();
     unmount();
 
     props.setProps({ __internal_accessOnboarding: undefined });
     render(<OrganizationProfile />, { wrapper });
     await waitFor(() => expect(screen.getByText('General')).toBeInTheDocument());
-    expect(screen.queryByText('Access & onboarding')).not.toBeInTheDocument();
+    expect(screen.queryByText('Access')).not.toBeInTheDocument();
   });
 
-  it('renders the seed domain rules with their badges', async () => {
+  it('renders the work-email scenario: the auto-created domain row and the catch-all', async () => {
     const { wrapper } = await createFixtures(withPageFixtures);
 
     render(<AccessOnboardingPage />, { wrapper });
 
-    await waitFor(() => {
-      expect(screen.getByText('acme.com')).toBeInTheDocument();
-      expect(screen.getByText('contractors.acme.com')).toBeInTheDocument();
-    });
-    expect(screen.getByText('Join automatically')).toBeInTheDocument();
-    expect(screen.getByText('SSO · Okta Workforce')).toBeInTheDocument();
-    expect(screen.getByText('Ownership verified')).toBeInTheDocument();
-    expect(screen.getByText('Request access')).toBeInTheDocument();
-    expect(screen.getByText('Default sign-in')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('acmedev.org')).toBeInTheDocument());
+    expect(screen.getByText('Everyone else')).toBeInTheDocument();
+    // Both rows start at the application's defaults.
+    expect(screen.getAllByText('Invitation')).toHaveLength(2);
+    expect(screen.getAllByText('Default')).toHaveLength(2);
   });
 
-  it('locks ownership-gated enrollment options until ownership is verified', async () => {
+  it('adds a domain as a new row at the defaults', async () => {
     const { wrapper } = await createFixtures(withPageFixtures);
 
-    const { userEvent } = render(<AccessOnboardingPage />, { wrapper });
+    render(<AccessOnboardingPage />, { wrapper });
+    await waitFor(() => expect(screen.getByText('acmedev.org')).toBeInTheDocument());
 
-    await waitFor(() => expect(screen.getByText('contractors.acme.com')).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+    const input = await screen.findByPlaceholderText('acme.com');
+    fireEvent.change(input, { target: { value: 'example.org' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add domain' }));
 
-    // contractors.acme.com has affiliation but not ownership.
-    const menus = await screen.findAllByLabelText(/open menu/i);
-    expect(menus.length).toBe(2);
-    await userEvent.click(menus[1]);
-    await userEvent.click(await screen.findByRole('menuitem', { name: 'Manage access' }));
-
-    const joinAutomatically = await screen.findByRole('radio', { name: /join automatically/i });
-    expect(joinAutomatically).toBeDisabled();
-    expect(screen.getByRole('radio', { name: /invitation only/i })).toBeEnabled();
-    expect(screen.getByText('Verify ownership to enable')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('example.org')).toBeInTheDocument());
+    expect(screen.getAllByText('Invitation')).toHaveLength(3);
   });
 });
