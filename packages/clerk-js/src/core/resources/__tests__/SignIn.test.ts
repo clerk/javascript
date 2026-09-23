@@ -344,7 +344,71 @@ describe('SignIn', () => {
       return windowNavigate;
     };
 
-    it('throws protect_check_required after create instead of preparing a hand-off it cannot follow', async () => {
+    // The server builds the hand-off before it decides, so a challenged create can also carry a
+    // usable redirect.
+    const gatedWithHandOff = (url: string) => ({
+      client: null,
+      response: {
+        ...gatedResponse.response,
+        first_factor_verification: { status: 'unverified', external_verification_redirect_url: url },
+      },
+    });
+
+    it('follows the hand-off a challenged OAuth create built, leaving the challenge for the way back', async () => {
+      const windowNavigate = setupClerk();
+      const mockFetch = vi.fn().mockResolvedValue(gatedWithHandOff('https://accounts.google.example/auth'));
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await signIn.authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://accounts.google.example/auth'));
+    });
+
+    it('follows the create hand-off when the enterprise SSO prepare after it hits the same pending challenge', async () => {
+      const windowNavigate = setupClerk();
+      // Create builds the hand-off and is challenged; the prepare that follows lands on the same
+      // pending gate and builds nothing new.
+      const mockFetch = vi.fn().mockResolvedValue(gatedWithHandOff('https://idp.example/from-create'));
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/from-create'));
+    });
+
+    it('does not follow a hand-off left from an earlier attempt when the prepare is challenged', async () => {
+      const windowNavigate = setupClerk();
+      // The challenged prepare builds no verification, so the redirect on the sign-in is stale and
+      // may be for a different connection.
+      BaseResource._fetch = vi.fn().mockResolvedValue(gatedWithHandOff('https://idp.example/earlier-attempt'));
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+          enterpriseConnectionId: 'ent_other',
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      expect(windowNavigate).not.toHaveBeenCalled();
+    });
+
+    it('throws protect_check_required when a challenged create built no hand-off', async () => {
       const windowNavigate = setupClerk();
       const mockFetch = vi.fn().mockResolvedValue(gatedResponse);
       BaseResource._fetch = mockFetch;
