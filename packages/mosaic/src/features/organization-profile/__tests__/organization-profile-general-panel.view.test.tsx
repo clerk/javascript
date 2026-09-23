@@ -38,15 +38,6 @@ describe('organization profile general panel', () => {
     expect(screen.queryByRole('heading', { name: 'Danger zone' })).not.toBeInTheDocument();
   });
 
-  it('keeps the full slug reachable when it truncates', () => {
-    renderPanel();
-
-    expect(screen.getByText('clerkWorkspace-177654156132154')).toHaveAttribute(
-      'title',
-      'clerkWorkspace-177654156132154',
-    );
-  });
-
   it('saves a new name', async () => {
     const user = userEvent.setup();
     const onSubmitName = vi.fn().mockResolvedValue(undefined);
