@@ -13,6 +13,7 @@ export { useToastManager, type UseToastManagerReturn } from './use-toast-manager
 export {
   createToastManager,
   type ExternalToastManager,
+  isAnchored,
   type ToastAddOptions,
   type ToastAlign,
   type ToastManager,

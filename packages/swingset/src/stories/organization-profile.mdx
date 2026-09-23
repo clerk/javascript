@@ -1,0 +1,27 @@
+import * as Stories from './organization-profile.stories';
+
+# OrganizationProfile
+
+The organization profile: a `Profile` whose navigation lists the General, Members, Security,
+Billing, and API Keys pages it was given content for, then any pages of the consumer's own, in the
+order asked for. General and API Keys are built; Members, Security, and Billing hold their place
+with a placeholder.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'General panel', href: '/organization-profile/organization-profile-general-panel', layer: 'Organization Profile' },
+    { name: 'API keys panel', href: '/organization-profile/organization-profile-api-keys-panel', layer: 'Organization Profile' },
+  ]}
+/>
+
+## As an overlay
+
+The same view inside a `profile` dialog, opened from a trigger on the page. The dialog positions
+and animates the popup; the profile paints it, names it, and carries the dismiss.
+
+<Story
+  name='Overlay'
+  storyModule={Stories}
+/>

@@ -9,6 +9,10 @@ export const styles = stylex.create({
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
     minWidth: 0,
     width: '100%',
+    '::-webkit-search-cancel-button': {
+      appearance: 'none',
+      display: 'none',
+    },
     '::file-selector-button': {
       borderStyle: 'none',
       borderWidth: 0,

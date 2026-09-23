@@ -1,5 +1,24 @@
 # Change Log
 
+## 4.6.9
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.7` to `1.1.8`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.8. ([#9830](https://github.com/clerk/javascript/pull/9830)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.5.4` to `1.5.5`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.5. ([#9810](https://github.com/clerk/javascript/pull/9810)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Fix `useLocalCredentials()` reporting `hasCredentials` as `true` after the biometric prompt is cancelled during `setCredentials()`. A cancelled prompt now leaves the stored credentials unchanged, so `authenticate()` no longer fails with a missing password. ([#9869](https://github.com/clerk/javascript/pull/9869)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix the offline resource cache so an app that switches Clerk instances no longer starts offline with the previous instance's cached user and session. ([#9870](https://github.com/clerk/javascript/pull/9870)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix the deprecated `useOAuth()` hook crashing when the sign-in attempt has no external verification redirect URL. It now throws a Clerk error, matching `useSSO()`. ([#9874](https://github.com/clerk/javascript/pull/9874)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`804d3db`](https://github.com/clerk/javascript/commit/804d3db182746d3b403411025b5dccc5aeafc719), [`64c8e3e`](https://github.com/clerk/javascript/commit/64c8e3ec55e79a2ccc79ae27cbadaeef9481f3d9), [`f56a14b`](https://github.com/clerk/javascript/commit/f56a14b3281578c76c4ebd8f50ac41156c437feb), [`07b4c2b`](https://github.com/clerk/javascript/commit/07b4c2b3c8bfa394f4331efcc363ee4064336f9d), [`4e36687`](https://github.com/clerk/javascript/commit/4e366874c5c4348750d43073cd8ec7aa4564e476), [`9e7485c`](https://github.com/clerk/javascript/commit/9e7485c8efc33e9458643372ce133b229347c03d)]:
+  - @clerk/shared@4.34.0
+  - @clerk/react@6.17.0
+  - @clerk/clerk-js@6.33.0
+
 ## 4.6.8
 
 ### Patch Changes

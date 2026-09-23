@@ -81,50 +81,54 @@ Toasts added before the provider mounts show once it does.
 
 ### Anchored
 
-A toast can sit next to the element that caused it, such as a "Copied" confirmation beside a copy button. Give anchored toasts their own provider and manager so they don't stack with the others, wrap each root in `Toast.Positioner`, and pass the anchor through `positionerProps`.
+A toast can sit next to the element that caused it, such as a "Copied" confirmation beside a copy button. Pass the anchor through `positionerProps` and wrap its root in `Toast.Positioner`. Anchored toasts share the provider with the others but stay out of the stack and don't count toward `limit`; use `Toast.isAnchored(toast)` to render them apart.
 
 ```tsx
-const anchoredToastManager = Toast.createToastManager();
-
-<Toast.Provider toastManager={anchoredToastManager}>
-  <Toast.Portal>
-    <Toast.Viewport>
-      <AnchoredToasts />
-    </Toast.Viewport>
-  </Toast.Portal>
-</Toast.Provider>;
-
-function AnchoredToasts() {
+function Toasts() {
   const { toasts } = Toast.useToastManager();
-  return toasts.map(toast => (
-    <Toast.Positioner
-      key={toast.id}
-      toast={toast}
-    >
-      <Toast.Root toast={toast}>
-        <Toast.Arrow />
-        <Toast.Description />
-      </Toast.Root>
-    </Toast.Positioner>
-  ));
+  return (
+    <Toast.Portal>
+      <Toast.Viewport>
+        {toasts
+          .filter(toast => !Toast.isAnchored(toast))
+          .map(toast => (
+            <Toast.Root
+              key={toast.id}
+              toast={toast}
+            >
+              <Toast.Title />
+            </Toast.Root>
+          ))}
+      </Toast.Viewport>
+      {toasts.filter(Toast.isAnchored).map(toast => (
+        <Toast.Positioner
+          key={toast.id}
+          toast={toast}
+        >
+          <Toast.Root toast={toast}>
+            <Toast.Arrow />
+            <Toast.Description />
+          </Toast.Root>
+        </Toast.Positioner>
+      ))}
+    </Toast.Portal>
+  );
 }
 
 function CopyButton() {
-  const buttonRef = React.useRef<HTMLButtonElement | null>(null);
-
-  function handleCopy() {
-    anchoredToastManager.add({
-      description: 'Copied',
-      timeout: 1500,
-      positionerProps: { anchor: buttonRef.current, sideOffset: 8 },
-    });
-  }
+  const toastManager = Toast.useToastManager();
 
   return (
     <button
-      ref={buttonRef}
       type='button'
-      onClick={handleCopy}
+      onClick={event =>
+        toastManager.add({
+          id: 'copy',
+          description: 'Copied',
+          timeout: 1500,
+          positionerProps: { anchor: event.currentTarget, sideOffset: 8 },
+        })
+      }
     >
       Copy
     </button>
@@ -189,12 +193,12 @@ Fields in `toast.positionerProps` override these props.
 
 Returns `{ toasts, add, close, update, promise }`.
 
-| Method    | Signature                                                                            | Description                                                               |
-| --------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- |
-| `add`     | `(options: ToastAddOptions) => string`                                               | Adds a toast at the front of the list and returns its id.                 |
-| `close`   | `(id?: string) => void`                                                              | Starts the exit transition of one toast, or of every toast without an id. |
-| `update`  | `(id: string, options: ToastUpdateOptions \| (toast) => ToastUpdateOptions) => void` | Merges new fields into a toast. A function receives the current toast.    |
-| `promise` | `(promise: Promise<T>, options: ToastPromiseOptions<T>) => Promise<T>`               | Loading → success / error toast, see above.                               |
+| Method    | Signature                                                                            | Description                                                                                                                                                                      |
+| --------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `add`     | `(options: ToastAddOptions) => string`                                               | Adds a toast at the front of the list and returns its id. If a toast with the same `id` is still open, updates it in place, restarts its timer, and bumps `repeatCount` instead. |
+| `close`   | `(id?: string) => void`                                                              | Starts the exit transition of one toast, or of every toast without an id.                                                                                                        |
+| `update`  | `(id: string, options: ToastUpdateOptions \| (toast) => ToastUpdateOptions) => void` | Merges new fields into a toast. A function receives the current toast.                                                                                                           |
+| `promise` | `(promise: Promise<T>, options: ToastPromiseOptions<T>) => Promise<T>`               | Loading → success / error toast, see above.                                                                                                                                      |
 
 ### `ToastObject`
 
@@ -211,8 +215,9 @@ Returns `{ toasts, add, close, update, promise }`.
 | `onClose`         | `() => void`                      | Called when the toast starts closing.                                          |
 | `onRemove`        | `() => void`                      | Called once the toast is removed from the list.                                |
 | `data`            | `Record<string, unknown>`         | Anything the rendering code needs.                                             |
-| `limited`         | `boolean`                         | True while queued beyond the provider `limit`.                                 |
+| `limited`         | `boolean`                         | True while beyond the provider `limit`. Its timer keeps running.               |
 | `height`          | `number`                          | Measured root height, used for `--toast-offset-y`.                             |
+| `repeatCount`     | `number`                          | How many times `add` was called again with this toast's id while it was open.  |
 
 ## Keyboard
 
@@ -231,6 +236,7 @@ Returns `{ toasts, add, close, update, promise }`.
 | `data-limited`        | Root              | Present while the toast is queued beyond `limit`. The root is also `inert`. Hide it with CSS. |
 | `data-behind`         | Content           | Present on every toast stacked behind the frontmost one.                                      |
 | `data-expanded`       | Content           | Same as on Root.                                                                              |
+| `data-repeated`       | Root              | Present after `add` is called again with an open toast's id, until its animation ends.        |
 | `data-starting-style` | Root              | Present on the first frame after mount.                                                       |
 | `data-ending-style`   | Root              | Present from `close` until the exit animations finish.                                        |
 | `data-side`           | Positioner, Arrow | The side the toast ended up on after flipping.                                                |

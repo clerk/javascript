@@ -188,7 +188,7 @@ const rowButton = (disabled = false) => (
   />
 );
 
-/** A row's trailing column, sized and centred so every state lands on the `⋯` button's centre line. */
+/** A row's trailing column, sized and centered so every state lands on the `⋯` button's center line. */
 function Trailing({ children }: { children: ReactNode }) {
   return <Item.Actions xstyle={styles.trailing}>{children}</Item.Actions>;
 }

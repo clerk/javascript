@@ -1,14 +1,16 @@
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useMeasure } from '../../hooks/useMeasure';
 import type { TabsProps } from '../../primitives/tabs';
 import { Tabs } from '../../primitives/tabs';
 import { useRender } from '../../primitives/utils';
+import { autoUpdate, getDimensions } from '../../primitives/utils/dom';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
+import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Drawer } from '../drawer';
@@ -49,8 +51,8 @@ const ContentPanelContext = React.createContext<{ titleId: string; value: string
  * renders is a DOM decision CSS cannot make — one tablist, in the column or in the sheet, never
  * both — and read this way so the breakpoint lives in CSS alone. Unmeasured is wide.
  */
-function isCompact(sentinelWidth: number | null): boolean {
-  return sentinelWidth !== null && sentinelWidth >= 2;
+function isCompact(sentinelWidth: number): boolean {
+  return sentinelWidth >= 2;
 }
 
 function useProfileContext(part: string): ProfileContextValue {
@@ -124,8 +126,14 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   // names the dialog without knowing it is in one — the way `Card.Title` does.
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
-  const [measure, { width }] = useMeasure<HTMLSpanElement>();
-  const compact = isCompact(width);
+  const [sentinel, setSentinel] = React.useState<HTMLSpanElement | null>(null);
+  const [compact, setCompact] = React.useState(false);
+  useSafeLayoutEffect(() => {
+    if (!sentinel) {
+      return;
+    }
+    return autoUpdate(sentinel, () => setCompact(isCompact(getDimensions(sentinel).width)));
+  }, [sentinel]);
   const pageTitles = React.useRef(new Map<string, HTMLElement>());
   const registerPageTitle = React.useCallback((page: string, element: HTMLElement | null) => {
     if (element) {
@@ -174,7 +182,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
         <>
           <span
             aria-hidden
-            ref={measure}
+            ref={setSentinel}
             {...mergeStyleProps(themeProps('profile-sentinel'), stylex.props(reset.base, styles.sentinel))}
           />
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
@@ -318,12 +326,15 @@ export interface ProfileNavItemProps extends MosaicComponentProps<'button'> {
   value: string;
   /** Leads the label. Any node, so a page of the consumer's own can bring its own mark. */
   icon?: React.ReactNode;
+  badge?: React.ReactNode;
   disabled?: boolean;
 }
 
+const navItemBadgeDefaults = { color: 'neutral' } as const;
+
 /** A destination. Selecting it shows the `Profile.ContentPanel` sharing its `value`. */
 const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(function ProfileNavItem(
-  { value, icon, disabled, children, render, xstyle, onClick, ...rest },
+  { value, icon, badge, disabled, children, render, xstyle, onClick, ...rest },
   ref,
 ) {
   const { compact, closeNav } = useProfileContext('Profile.NavItem');
@@ -355,6 +366,11 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
         </span>
       ) : null}
       <span {...themeProps('profile-nav-item-label')}>{children}</span>
+      {badge != null ? (
+        <span {...mergeStyleProps(themeProps('profile-nav-item-badge'), stylex.props(reset.base, styles.navItemBadge))}>
+          <BadgeContext.Provider value={navItemBadgeDefaults}>{badge}</BadgeContext.Provider>
+        </span>
+      ) : null}
     </Tabs.Tab>
   );
 });
@@ -367,7 +383,7 @@ export type ProfilePageTitleProps = MosaicComponentProps<'div'>;
  * sheet. Anywhere else — the wide layout, or a page rendered on its own — it is the heading alone.
  *
  * The caret sits `vertical-align: middle`, which CSS defines as the box's midpoint on the parent's
- * baseline plus half its x-height: optically centred on the lowercase letters rather than on the
+ * baseline plus half its x-height: optically centered on the lowercase letters rather than on the
  * line box. That needs an inline formatting context, so the button is `display: inline`.
  */
 const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(function ProfilePageTitle(
