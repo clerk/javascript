@@ -5,7 +5,7 @@ import { isMalformedURLError } from '@clerk/shared/pathMatcher';
 import type { PendingSessionOptions } from '@clerk/shared/types';
 import type { EventHandler } from 'h3';
 
-import { createError, eventHandler, setResponseHeader, useRuntimeConfig } from '#imports';
+import { appendResponseHeader, createError, eventHandler, useRuntimeConfig } from '#imports';
 
 import { canUseKeyless } from '../utils/feature-flags';
 import { clerkClient } from './clerkClient';
@@ -137,7 +137,7 @@ export const clerkMiddleware: ClerkMiddleware = (...args: unknown[]) => {
 
     if (requestState.headers) {
       requestState.headers.forEach((value, key) => {
-        setResponseHeader(event, key, value);
+        appendResponseHeader(event, key, value);
       });
     }
 
