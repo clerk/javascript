@@ -136,6 +136,12 @@ import {
   Overlay as OrganizationProfileOverlay,
 } from '../stories/organization-profile.stories';
 import {
+  Default as OrganizationProfileApiKeysPanelDefault,
+  Empty as OrganizationProfileApiKeysPanelEmpty,
+  meta as organizationProfileApiKeysPanelMeta,
+  ProposedTable as OrganizationProfileApiKeysPanelProposedTable,
+} from '../stories/organization-profile-api-keys-panel.stories';
+import {
   Default as OrganizationProfileDangerSectionDefault,
   LeaveOnly as OrganizationProfileDangerSectionLeaveOnly,
   meta as organizationProfileDangerSectionMeta,
@@ -831,6 +837,13 @@ const reverificationModule: StoryModule = {
   MethodPickerPending: ReverificationMethodPickerPending,
   Help: ReverificationHelp,
 };
+const organizationProfileApiKeysPanelModule: StoryModule = {
+  meta: organizationProfileApiKeysPanelMeta,
+  Default: OrganizationProfileApiKeysPanelDefault,
+  ProposedTable: OrganizationProfileApiKeysPanelProposedTable,
+  Empty: OrganizationProfileApiKeysPanelEmpty,
+};
+
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -858,6 +871,7 @@ export const registry: StoryModule[] = [
   organizationProfileModule,
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
+  organizationProfileApiKeysPanelModule,
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
   organizationProfileDangerSectionModule,

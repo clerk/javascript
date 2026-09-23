@@ -17,7 +17,7 @@ import { truncationStyles } from '../../utils/typography.styles';
 
 const expirationValues = ['never', '1d', '7d', '30d', '60d', '90d', '180d', '1y'] as const;
 
-export interface UserProfileCreateAPIKeyDialogProps {
+export interface OrganizationProfileCreateAPIKeyDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   finalFocus?: DialogFocusTarget;
@@ -33,7 +33,7 @@ export interface UserProfileCreateAPIKeyDialogProps {
   onCopy: (close: boolean) => void | Promise<void>;
 }
 
-export function UserProfileCreateAPIKeyDialog(props: UserProfileCreateAPIKeyDialogProps) {
+export function OrganizationProfileCreateAPIKeyDialog(props: OrganizationProfileCreateAPIKeyDialogProps) {
   const nameInput = useRef<HTMLInputElement>(null);
 
   return (
@@ -77,8 +77,8 @@ export function UserProfileCreateAPIKeyDialog(props: UserProfileCreateAPIKeyDial
   );
 }
 
-function CreateKeyStep(props: UserProfileCreateAPIKeyDialogProps & { inputRef: Ref<HTMLInputElement> }) {
-  const m = useMessages('userProfileApiKeysPanel');
+function CreateKeyStep(props: OrganizationProfileCreateAPIKeyDialogProps & { inputRef: Ref<HTMLInputElement> }) {
+  const m = useMessages('organizationProfileApiKeysPanel');
   const formId = useId();
 
   return (
@@ -158,8 +158,8 @@ function CreateKeyStep(props: UserProfileCreateAPIKeyDialogProps & { inputRef: R
   );
 }
 
-function CopyKeyStep(props: UserProfileCreateAPIKeyDialogProps) {
-  const m = useMessages('userProfileApiKeysPanel');
+function CopyKeyStep(props: OrganizationProfileCreateAPIKeyDialogProps) {
+  const m = useMessages('organizationProfileApiKeysPanel');
   const formId = useId();
 
   return (

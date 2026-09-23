@@ -5,11 +5,14 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../machines/__tests__/test-utils';
 import { MosaicProvider } from '../../../MosaicProvider';
-import type { UserProfileAPIKey, UserProfileApiKeysPanelViewProps } from '../user-profile-api-keys-panel.types';
-import { UserProfileApiKeysPanelView } from '../user-profile-api-keys-panel.view';
-import type { UserProfileCreateAPIKeyDialogProps } from '../user-profile-create-api-key.dialog';
+import type {
+  OrganizationProfileAPIKey,
+  OrganizationProfileApiKeysPanelViewProps,
+} from '../organization-profile-api-keys-panel.types';
+import { OrganizationProfileApiKeysPanelView } from '../organization-profile-api-keys-panel.view';
+import type { OrganizationProfileCreateAPIKeyDialogProps } from '../organization-profile-create-api-key.dialog';
 
-const apiKeys: UserProfileAPIKey[] = [
+const apiKeys: OrganizationProfileAPIKey[] = [
   {
     id: 'primary',
     name: 'Primary API Key',
@@ -20,7 +23,9 @@ const apiKeys: UserProfileAPIKey[] = [
   { id: 'legacy', name: 'Legacy API Key', createdAtLabel: 'Jul 1, 2024', expiresAtLabel: null, lastUsedAtLabel: null },
 ];
 
-function propsFor(overrides: Partial<UserProfileApiKeysPanelViewProps> = {}): UserProfileApiKeysPanelViewProps {
+function propsFor(
+  overrides: Partial<OrganizationProfileApiKeysPanelViewProps> = {},
+): OrganizationProfileApiKeysPanelViewProps {
   return {
     apiKeys,
     totalCount: 2,
@@ -35,19 +40,19 @@ function propsFor(overrides: Partial<UserProfileApiKeysPanelViewProps> = {}): Us
   };
 }
 
-function renderView(overrides: Partial<UserProfileApiKeysPanelViewProps> = {}) {
+function renderView(overrides: Partial<OrganizationProfileApiKeysPanelViewProps> = {}) {
   const props = propsFor(overrides);
   return {
     props,
     ...render(
       <MosaicProvider>
-        <UserProfileApiKeysPanelView {...props} />
+        <OrganizationProfileApiKeysPanelView {...props} />
       </MosaicProvider>,
     ),
   };
 }
 
-describe('UserProfileApiKeysPanelView', () => {
+describe('OrganizationProfileApiKeysPanelView', () => {
   it('renders supplied metadata and only offers actions when callbacks are provided', async () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView();
@@ -79,7 +84,7 @@ describe('UserProfileApiKeysPanelView', () => {
     await user.keyboard('{Escape}');
     rerender(
       <MosaicProvider>
-        <UserProfileApiKeysPanelView
+        <OrganizationProfileApiKeysPanelView
           {...props}
           onCreate={undefined}
           onRevoke={undefined}
@@ -96,8 +101,8 @@ describe('UserProfileApiKeysPanelView', () => {
     expect(screen.queryByRole('button', { name: /Manage/ })).not.toBeInTheDocument();
   });
   it.each([
-    ['', 'No API Keys created', 'API keys allow apps and scripts to access your account without signing in.'],
-    ['   ', 'No API Keys created', 'API keys allow apps and scripts to access your account without signing in.'],
+    ['', 'No API Keys created', 'API keys allow apps and scripts to access your organization without signing in.'],
+    ['   ', 'No API Keys created', 'API keys allow apps and scripts to access your organization without signing in.'],
     ['Special Key', 'No API keys found', 'Your search for "Special Key" did not return any results.'],
   ])('shows the empty state for search "%s"', (searchValue, label, description) => {
     renderView({ apiKeys: [], totalCount: 0, searchValue });
@@ -113,15 +118,15 @@ describe('UserProfileApiKeysPanelView', () => {
       <MosaicProvider
         localization={{
           overrides: {
-            'userProfileApiKeysPanel.revokeTitle': 'Retirer {name} ?',
-            'userProfileApiKeysPanel.revokeFieldLabel': 'Saisissez « {name} » pour continuer',
-            'userProfileApiKeysPanel.cancel': 'Annuler',
-            'userProfileApiKeysPanel.pageSize': 'Résultats par page',
-            'userProfileApiKeysPanel.revokeError': 'Impossible de révoquer cette clé.',
+            'organizationProfileApiKeysPanel.revokeTitle': 'Retirer {name} ?',
+            'organizationProfileApiKeysPanel.revokeFieldLabel': 'Saisissez « {name} » pour continuer',
+            'organizationProfileApiKeysPanel.cancel': 'Annuler',
+            'organizationProfileApiKeysPanel.pageSize': 'Résultats par page',
+            'organizationProfileApiKeysPanel.revokeError': 'Impossible de révoquer cette clé.',
           },
         }}
       >
-        <UserProfileApiKeysPanelView {...propsFor({ onRevoke, onPageSizeChange: vi.fn() })} />
+        <OrganizationProfileApiKeysPanelView {...propsFor({ onRevoke, onPageSizeChange: vi.fn() })} />
       </MosaicProvider>,
     );
     expect(screen.getByRole('combobox', { name: 'Résultats par page 10' })).toBeVisible();
@@ -148,12 +153,12 @@ describe('UserProfileApiKeysPanelView', () => {
       <MosaicProvider
         localization={{
           overrides: {
-            'userProfileApiKeysPanel.expires': 'Expiration: {expiresDate}',
-            'userProfileApiKeysPanel.search': 'Find a key',
+            'organizationProfileApiKeysPanel.expires': 'Expiration: {expiresDate}',
+            'organizationProfileApiKeysPanel.search': 'Find a key',
           },
         }}
       >
-        <UserProfileApiKeysPanelView
+        <OrganizationProfileApiKeysPanelView
           {...propsFor({
             searchValue: 'unmatched',
             apiKeys: [{ ...apiKeys[0], id: 'ak_1234567890FKWO', expiresAtLabel: 'Jul 1, 2025' }],
@@ -177,7 +182,7 @@ describe('UserProfileApiKeysPanelView', () => {
         const [items, setItems] = useState([apiKeys[0]]);
         return (
           <MosaicProvider>
-            <UserProfileApiKeysPanelView
+            <OrganizationProfileApiKeysPanelView
               {...propsFor({ onCreate: hasCreate ? vi.fn() : undefined })}
               apiKeys={items}
               totalCount={items.length}
@@ -245,7 +250,7 @@ describe('UserProfileApiKeysPanelView', () => {
       const [items, setItems] = useState(apiKeys);
       return (
         <MosaicProvider>
-          <UserProfileApiKeysPanelView
+          <OrganizationProfileApiKeysPanelView
             {...propsFor({ onCreate: undefined })}
             apiKeys={items}
             totalCount={items.length}
@@ -302,7 +307,7 @@ describe('UserProfileApiKeysPanelView', () => {
     expect(screen.getByRole('checkbox', { name: 'Select all API keys' })).toBeChecked();
     rerender(
       <MosaicProvider>
-        <UserProfileApiKeysPanelView
+        <OrganizationProfileApiKeysPanelView
           {...props}
           apiKeys={[apiKeys[1]]}
           totalCount={1}
@@ -313,7 +318,7 @@ describe('UserProfileApiKeysPanelView', () => {
     expect(onBulkAction).not.toHaveBeenCalled();
     rerender(
       <MosaicProvider>
-        <UserProfileApiKeysPanelView
+        <OrganizationProfileApiKeysPanelView
           {...props}
           onBulkAction={undefined}
         />
@@ -324,7 +329,7 @@ describe('UserProfileApiKeysPanelView', () => {
   });
   it('navigates actual pages and clears controlled search without changing page size', async () => {
     const user = userEvent.setup();
-    const items: UserProfileAPIKey[] = Array.from({ length: 11 }, (_, index) => ({
+    const items: OrganizationProfileAPIKey[] = Array.from({ length: 11 }, (_, index) => ({
       ...apiKeys[0],
       id: `key-${index}`,
       name: `Key ${index + 1}`,
@@ -335,7 +340,7 @@ describe('UserProfileApiKeysPanelView', () => {
       const filtered = items.filter(item => item.name.includes(searchValue));
       return (
         <MosaicProvider>
-          <UserProfileApiKeysPanelView
+          <OrganizationProfileApiKeysPanelView
             {...propsFor()}
             apiKeys={filtered.slice((page - 1) * 10, page * 10)}
             totalCount={filtered.length}
@@ -372,14 +377,14 @@ describe('UserProfileApiKeysPanelView', () => {
     const props = propsFor({ apiKeys: [], totalCount: 0, isLoading: true, onCreate: undefined, onRevoke: undefined });
     const view = render(
       <MosaicProvider>
-        <UserProfileApiKeysPanelView {...props} />
+        <OrganizationProfileApiKeysPanelView {...props} />
       </MosaicProvider>,
     );
     expect(screen.getByRole('status')).toHaveTextContent('Loading API keys');
     expect(screen.queryByText('No API Keys created')).not.toBeInTheDocument();
     view.rerender(
       <MosaicProvider>
-        <UserProfileApiKeysPanelView
+        <OrganizationProfileApiKeysPanelView
           {...props}
           apiKeys={apiKeys}
           totalCount={2}
@@ -395,7 +400,7 @@ describe('UserProfileApiKeysPanelView', () => {
     expect(screen.queryByRole('button', { name: 'Create API key' })).not.toBeInTheDocument();
     view.rerender(
       <MosaicProvider>
-        <UserProfileApiKeysPanelView
+        <OrganizationProfileApiKeysPanelView
           {...props}
           isLoading={false}
         />
@@ -407,8 +412,8 @@ describe('UserProfileApiKeysPanelView', () => {
 });
 
 function dialogPropsFor(
-  overrides: Partial<UserProfileCreateAPIKeyDialogProps> = {},
-): UserProfileCreateAPIKeyDialogProps {
+  overrides: Partial<OrganizationProfileCreateAPIKeyDialogProps> = {},
+): OrganizationProfileCreateAPIKeyDialogProps {
   return {
     open: true,
     onOpenChange: vi.fn(),
@@ -426,15 +431,15 @@ function dialogPropsFor(
   };
 }
 
-function dialogView(createDialog: UserProfileCreateAPIKeyDialogProps) {
+function dialogView(createDialog: OrganizationProfileCreateAPIKeyDialogProps) {
   return (
     <MosaicProvider>
-      <UserProfileApiKeysPanelView {...propsFor({ createDialog })} />
+      <OrganizationProfileApiKeysPanelView {...propsFor({ createDialog })} />
     </MosaicProvider>
   );
 }
 
-describe('user API key creation', () => {
+describe('organization API key creation', () => {
   it('focuses the name and requires a trimmed name and explicit expiration before submitting', async () => {
     const user = userEvent.setup();
     const props = dialogPropsFor();
@@ -496,14 +501,14 @@ describe('user API key creation', () => {
     const props = dialogPropsFor({ name: 'Deploy', expiration: 'never' });
     const view = render(dialogView(props));
     await user.click(screen.getByRole('button', { name: 'Add API Key' }));
-    const returned = { ...props, secret: 'ak_user_secret' };
+    const returned = { ...props, secret: 'ak_org_secret' };
     view.rerender(dialogView(returned));
     const dialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
     const secret = within(dialog).getByRole('textbox', { name: 'API key' });
     await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Copy API key' })).toHaveFocus());
     expect(secret).toBeVisible();
     expect(secret).toHaveAttribute('readonly');
-    expect(secret).toHaveValue('ak_user_secret');
+    expect(secret).toHaveValue('ak_org_secret');
     await user.click(secret);
     expect(secret).toHaveFocus();
     await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
@@ -517,7 +522,7 @@ describe('user API key creation', () => {
     expect(props.onOpenChange).not.toHaveBeenCalled();
     view.rerender(dialogView({ ...returned, error: 'Copy failed. Try again.' }));
     expect(within(dialog).getByRole('alert')).toHaveTextContent('Copy failed. Try again.');
-    expect(secret).toHaveValue('ak_user_secret');
+    expect(secret).toHaveValue('ak_org_secret');
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     expect(props.onCopy).toHaveBeenNthCalledWith(1, false);
     expect(props.onCopy).toHaveBeenNthCalledWith(2, true);

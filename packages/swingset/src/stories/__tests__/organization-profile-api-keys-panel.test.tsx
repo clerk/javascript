@@ -1,4 +1,4 @@
-import { UserProfileApiKeysPanelView } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
+import { OrganizationProfileApiKeysPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-api-keys-panel.view';
 import { useMessages } from '@clerk/mosaic/localization';
 import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -9,15 +9,14 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   createExampleAPIKey,
   revokeExampleAPIKey,
-  useUserProfileAPIKeysFixture,
-} from '../fixtures/user-profile-api-keys';
-import { Default as FullProfile, Overlay } from '../user-profile.stories';
-import { Default, Empty, ProposedTable } from '../user-profile-api-keys-panel.stories';
+  useOrganizationProfileAPIKeysFixture,
+} from '../fixtures/organization-profile-api-keys';
+import { Default, Empty, ProposedTable } from '../organization-profile-api-keys-panel.stories';
 
 function Retry() {
-  const m = useMessages('userProfileApiKeysPanel');
+  const m = useMessages('organizationProfileApiKeysPanel');
   const attempts = useRef({ create: false, copy: false, revoke: false });
-  const props = useUserProfileAPIKeysFixture({
+  const props = useOrganizationProfileAPIKeysFixture({
     createKey: async () => {
       const result = await createExampleAPIKey();
       if (!attempts.current.create) {
@@ -41,13 +40,13 @@ function Retry() {
       }
     },
   });
-  return <UserProfileApiKeysPanelView {...props} />;
+  return <OrganizationProfileApiKeysPanelView {...props} />;
 }
 
 function ReadOnly() {
-  const props = useUserProfileAPIKeysFixture();
+  const props = useOrganizationProfileAPIKeysFixture();
   return (
-    <UserProfileApiKeysPanelView
+    <OrganizationProfileApiKeysPanelView
       {...props}
       onCreate={undefined}
       createDialog={undefined}
@@ -56,7 +55,7 @@ function ReadOnly() {
   );
 }
 
-describe('user API keys playground', () => {
+describe('organization API keys playground', () => {
   it('creates and copies a key, then resets the form for the next key', async () => {
     const user = userEvent.setup();
     const copy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
@@ -212,35 +211,6 @@ describe('user API keys playground', () => {
     expect(screen.getByRole('button', { name: 'Next API keys page' })).toBeEnabled();
   });
 
-  it.each([FullProfile, Overlay])('creates and copies a key in the full profile (%#)', async Story => {
-    const user = userEvent.setup();
-    const copy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
-    render(
-      <MosaicProvider>
-        <Story />
-      </MosaicProvider>,
-    );
-    const manage = screen.queryByRole('button', { name: 'Manage account' });
-    if (manage) {
-      await user.click(manage);
-    }
-    await user.click(screen.getByRole('tab', { name: 'API Keys' }));
-    const trigger = screen.getByRole('button', { name: 'Create API key' });
-    await user.click(trigger);
-    const dialog = screen.getByRole('dialog', { name: 'Add new API key' });
-    await user.type(within(dialog).getByLabelText('Secret key name'), 'Full profile key');
-    await user.click(within(dialog).getByRole('combobox', { name: /^Expiration/ }));
-    await user.click(screen.getByRole('option', { name: 'Never' }));
-    await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
-    const copyDialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
-    await waitFor(() => expect(within(copyDialog).getByRole('button', { name: 'Copy API key' })).toHaveFocus());
-    await user.click(within(copyDialog).getByRole('button', { name: 'Copy and close' }));
-    await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Copy your API Key' })).not.toBeInTheDocument());
-    expect(copy).toHaveBeenCalledWith(expect.stringContaining('ak_demo_'));
-    expect(screen.getByText('Full profile key')).toBeVisible();
-    expect(trigger).toHaveFocus();
-  });
-
   it('updates the expiration label after each selection', async () => {
     const user = userEvent.setup();
     render(
@@ -267,7 +237,7 @@ describe('user API keys playground', () => {
       .mockResolvedValue();
     render(
       <MosaicProvider
-        localization={{ overrides: { 'userProfileApiKeysPanel.copyError': 'Impossible de copier cette clé.' } }}
+        localization={{ overrides: { 'organizationProfileApiKeysPanel.copyError': 'Impossible de copier cette clé.' } }}
       >
         <Default />
       </MosaicProvider>,

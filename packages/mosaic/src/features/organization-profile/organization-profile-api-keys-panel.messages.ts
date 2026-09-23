@@ -1,9 +1,9 @@
-export const userProfileApiKeysPanelMessages = {
+export const organizationProfileApiKeysPanelMessages = {
   loading: 'Loading API keys',
   empty: 'No API keys found',
   emptyDescription: 'Your search for "{query}" did not return any results.',
   noKeys: 'No API Keys created',
-  noKeysDescription: 'API keys allow apps and scripts to access your account without signing in.',
+  noKeysDescription: 'API keys allow apps and scripts to access your organization without signing in.',
   clearSearch: 'Clear search',
   pagination: 'API keys pages',
   pageSize: 'Results per page',

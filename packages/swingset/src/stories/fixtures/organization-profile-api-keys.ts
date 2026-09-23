@@ -1,8 +1,8 @@
 import type {
-  UserProfileAPIKeySort,
-  UserProfileApiKeysPanelViewProps,
-} from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.types';
-import type { UserProfileCreateAPIKeyDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-create-api-key.dialog';
+  OrganizationProfileAPIKeySort,
+  OrganizationProfileApiKeysPanelViewProps,
+} from '@clerk/mosaic/features/organization-profile/organization-profile-api-keys-panel.types';
+import type { OrganizationProfileCreateAPIKeyDialogProps } from '@clerk/mosaic/features/organization-profile/organization-profile-create-api-key.dialog';
 import { useLocale, useMessages } from '@clerk/mosaic/localization';
 import { useEffect, useRef, useState } from 'react';
 
@@ -37,7 +37,7 @@ export const exampleAPIKeys: FixtureAPIKey[] = [
   lastUsedAt: index % 3 === 0 ? exampleTime - (index + 2) * 60_000 : null,
 }));
 
-function getExpirationDate(expiration: UserProfileCreateAPIKeyDialogProps['expiration'], now = new Date()) {
+function getExpirationDate(expiration: OrganizationProfileCreateAPIKeyDialogProps['expiration'], now = new Date()) {
   if (expiration === null || expiration === 'never') {
     return null;
   }
@@ -51,7 +51,7 @@ function getExpirationDate(expiration: UserProfileCreateAPIKeyDialogProps['expir
   return date;
 }
 
-function sortAPIKeys(items: FixtureAPIKey[], sort: UserProfileAPIKeySort | null) {
+function sortAPIKeys(items: FixtureAPIKey[], sort: OrganizationProfileAPIKeySort | null) {
   if (!sort) {
     return items;
   }
@@ -82,7 +82,7 @@ export async function revokeExampleAPIKey() {
   await new Promise<void>(resolve => setTimeout(resolve, 600));
 }
 
-export function useUserProfileAPIKeysFixture({
+export function useOrganizationProfileAPIKeysFixture({
   initialKeys = exampleAPIKeys,
   enableSorting = false,
   createKey = createExampleAPIKey,
@@ -93,22 +93,22 @@ export function useUserProfileAPIKeysFixture({
   enableSorting?: boolean;
   createKey?: (input: {
     name: string;
-    expiration: UserProfileCreateAPIKeyDialogProps['expiration'];
+    expiration: OrganizationProfileCreateAPIKeyDialogProps['expiration'];
   }) => Promise<{ id: string; secret: string }>;
   copyKey?: (secret: string) => Promise<void>;
   revokeKey?: (id: string) => Promise<void>;
-} = {}): UserProfileApiKeysPanelViewProps {
-  const m = useMessages('userProfileApiKeysPanel');
+} = {}): OrganizationProfileApiKeysPanelViewProps {
+  const m = useMessages('organizationProfileApiKeysPanel');
   const locale = useLocale();
   const [items, setItems] = useState(initialKeys);
   const [searchValue, setSearchValue] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<UserProfileAPIKeySort | null>(null);
+  const [sort, setSort] = useState<OrganizationProfileAPIKeySort | null>(null);
   const createTrigger = useRef<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
-  const [expiration, setExpiration] = useState<UserProfileCreateAPIKeyDialogProps['expiration']>(null);
+  const [expiration, setExpiration] = useState<OrganizationProfileCreateAPIKeyDialogProps['expiration']>(null);
   const [secret, setSecret] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
