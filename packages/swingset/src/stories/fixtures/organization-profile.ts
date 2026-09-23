@@ -2,6 +2,7 @@ import { OrganizationProfileSaveError } from '@clerk/mosaic/features/organizatio
 import type { OrganizationProfileViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 import { useState } from 'react';
 
+import { useInvitationsTableFixture } from './invitations-table-tab';
 import { useMembersTableFixture } from './members-table-tab';
 import { useOrganizationProfileAPIKeysFixture } from './organization-profile-api-keys';
 import { usePreviewImage } from './use-preview-image';
@@ -24,6 +25,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
   const { imageUrl, showFile, clearImage } = usePreviewImage();
   const apiKeys = useOrganizationProfileAPIKeysFixture();
   const members = useMembersTableFixture();
+  const invitations = useInvitationsTableFixture();
 
   const save = async (field: 'name' | 'slug', apply: () => void) => {
     await settleAfter(800);
@@ -50,7 +52,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
 
   const pages: OrganizationProfileViewProps['pages'] = {
     general,
-    members: { members },
+    members: { members, invitations },
     security: {},
     billing: {},
     apiKeys,
