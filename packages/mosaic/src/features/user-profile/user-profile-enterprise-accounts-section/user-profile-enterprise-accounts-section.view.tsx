@@ -25,25 +25,27 @@ export function UserProfileEnterpriseAccountsSectionView({
   }
   return (
     <Section.Root>
-      <Section.Title>{m.title}</Section.Title>
       <Section.Group>
-        {accounts.map(account => (
-          <UserProfileEnterpriseAccountRowView
-            key={account.id}
-            account={account}
-          />
-        ))}
-        {onConnect
-          ? connections.map(connection => (
-              <UserProfileEnterpriseAccountRowView
-                key={connection.id}
-                account={connection}
-                onConnect={onConnect}
-                isPending={pendingConnectionId === connection.id}
-                disabled={pendingConnectionId !== undefined}
-              />
-            ))
-          : null}
+        <Section.Title>{m.title}</Section.Title>
+        <Section.Surface>
+          {accounts.map(account => (
+            <UserProfileEnterpriseAccountRowView
+              key={account.id}
+              account={account}
+            />
+          ))}
+          {onConnect
+            ? connections.map(connection => (
+                <UserProfileEnterpriseAccountRowView
+                  key={connection.id}
+                  account={connection}
+                  onConnect={onConnect}
+                  isPending={pendingConnectionId === connection.id}
+                  disabled={pendingConnectionId !== undefined}
+                />
+              ))
+            : null}
+        </Section.Surface>
       </Section.Group>
     </Section.Root>
   );

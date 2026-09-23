@@ -8,25 +8,29 @@ import * as SectionStories from './section.stories';
 import { Section } from '@clerk/mosaic/components/section';
 
 <Section.Root>
-  <Section.Title>Account</Section.Title>
   <Section.Group>
-    <Section.Row>
-      <Section.Item>
-        <Section.Media>{icon}</Section.Media>
-        <Section.Content>
-          <Section.Label>Name</Section.Label>
-          <Section.Description>Shown throughout the application.</Section.Description>
-        </Section.Content>
-        <Section.Actions>{control}</Section.Actions>
-      </Section.Item>
-    </Section.Row>
+    <Section.Title>Account</Section.Title>
+    <Section.Surface>
+      <Section.Row>
+        <Section.Item>
+          <Section.Media>{icon}</Section.Media>
+          <Section.Content>
+            <Section.Label>Name</Section.Label>
+            <Section.Description>Shown throughout the application.</Section.Description>
+          </Section.Content>
+          <Section.Actions>{control}</Section.Actions>
+        </Section.Item>
+      </Section.Row>
+    </Section.Surface>
   </Section.Group>
 </Section.Root>
 ```
 
-`Section.Group` owns the outlined surface. Its direct `Section.Row` children own separation and may stack one or more `Section.Item` entries. Each item lays out optional media, flexible content, and trailing actions. `Section.Media` accepts `sm`, `md`, `lg`, and `xl` sizes.
+`Section.Group` pairs an optional `Section.Title` with a `Section.Surface`. The surface is the outlined card. Its direct `Section.Row` children own separation and may stack one or more `Section.Item` entries. Each item lays out optional media, flexible content, and trailing actions. `Section.Media` accepts `sm`, `md`, `lg`, and `xl` sizes.
 
-Use `Section.Items` for a nested value list beneath a row's header item. The row keeps a 12px header-to-list gap, and nested items stack without gaps with 4px vertical padding.
+Use `Section.Items` for a nested value list beneath a row's `Section.Header`. The row keeps a 12px header-to-list gap, and nested items stack without gaps with 4px vertical padding.
+
+A section can hold more than one `Section.Group`. Set `variant='contained'` on a group that holds a nested list, such as a user's email addresses inside the account section. A contained group renders with `role='group'` and `data-variant='contained'`, so it can take its own accessible name and be styled apart from the section's main group.
 
 ## Examples
 
@@ -39,16 +43,20 @@ Use `Section.Items` for a nested value list beneath a row's header item. The row
   ]}
 />
 
-### Multiple email addresses and phone numbers
+### Contained groups
 
 <Story
-  name='MultipleEmailAndPhoneNumbers'
+  name='ContainedGroups'
   storyModule={SectionStories}
-  composition={[
-    { name: 'Badge', href: '/components/badge', layer: 'Components' },
-    { name: 'Button', href: '/components/button', layer: 'Components' },
-    { name: 'Icon', href: '/components/icon', layer: 'Components' },
-  ]}
+/>
+
+### Flat contained groups
+
+Contained groups can be restyled from external CSS so each one reads as its own section. This example targets `.cl-section-group[data-variant='contained']`, `.cl-section-header`, and `.cl-section-items`.
+
+<Story
+  name='FlatContainedGroups'
+  storyModule={SectionStories}
 />
 
 ### Connected accounts

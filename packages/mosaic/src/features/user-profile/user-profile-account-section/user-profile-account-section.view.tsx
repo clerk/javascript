@@ -1,5 +1,3 @@
-import * as stylex from '@stylexjs/stylex';
-
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
@@ -115,10 +113,10 @@ export function UserProfileAccountSectionView({
   );
 
   return (
-    <div {...stylex.props(styles.sections)}>
-      <Section.Root aria-label={m.sectionLabel}>
+    <Section.Root aria-label={m.sectionLabel}>
+      <Section.Group>
         <Section.Title>{m.sectionTitle}</Section.Title>
-        <Section.Group>
+        <Section.Surface>
           <UserProfilePictureRowView
             name={name}
             imageUrl={imageUrl}
@@ -141,18 +139,26 @@ export function UserProfileAccountSectionView({
           />
           {!allowMultipleAccounts ? emailRow : null}
           {!allowMultipleAccounts ? phoneRow : null}
+        </Section.Surface>
+      </Section.Group>
+      {allowMultipleAccounts ? (
+        <Section.Group
+          variant='contained'
+          aria-label={m.email.label}
+          xstyle={styles.containedGroup}
+        >
+          <Section.Surface>{emailRow}</Section.Surface>
         </Section.Group>
-      </Section.Root>
-      {allowMultipleAccounts ? (
-        <Section.Root aria-label={m.email.label}>
-          <Section.Group>{emailRow}</Section.Group>
-        </Section.Root>
       ) : null}
       {allowMultipleAccounts ? (
-        <Section.Root aria-label={m.phone.label}>
-          <Section.Group>{phoneRow}</Section.Group>
-        </Section.Root>
+        <Section.Group
+          variant='contained'
+          aria-label={m.phone.label}
+          xstyle={styles.containedGroup}
+        >
+          <Section.Surface>{phoneRow}</Section.Surface>
+        </Section.Group>
       ) : null}
-    </div>
+    </Section.Root>
   );
 }

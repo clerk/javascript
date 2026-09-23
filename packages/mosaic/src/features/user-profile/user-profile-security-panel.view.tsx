@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 
 import { panelStyles, Profile } from '../../components/profile';
+import { Section } from '../../components/section';
 import { mergeStyleProps, themeProps } from '../../props';
 import type {
   UserProfileActiveDevicesSectionViewProps,
@@ -19,7 +20,6 @@ import type {
   UserProfilePasswordSectionViewProps,
 } from './user-profile-password-section/user-profile-password-section.view';
 import { UserProfilePasswordSectionView } from './user-profile-password-section/user-profile-password-section.view';
-import { styles } from './user-profile-security-panel.styles';
 
 export type {
   UserProfileDevice,
@@ -86,38 +86,43 @@ export function UserProfileSecurityPanelView({
     <div {...mergeStyleProps(themeProps('user-profile-security-panel'), stylex.props(panelStyles.root))}>
       <Profile.PageTitle>Security</Profile.PageTitle>
       <div {...stylex.props(panelStyles.sections)}>
-        <div {...stylex.props(styles.sectionCards, !hasAuthentication && styles.emptySectionCards)}>
-          {showPassword ? (
-            <UserProfilePasswordSectionView
-              hasPassword={hasPassword}
-              managedBy={managedBy}
-              requiresCurrentPassword={requiresCurrentPassword}
-              onSubmitPassword={onSubmitPassword}
-            />
-          ) : null}
-          {showPasskeys ? (
-            <UserProfilePasskeysSectionView
-              passkeys={passkeys}
-              sectionTitle={showPassword ? undefined : 'Authentication'}
-              onAdd={onAddPasskey}
-              addError={addPasskeyError}
-              onRename={onRenamePasskey}
-              onRemove={onRemovePasskey}
-            />
-          ) : null}
-          {mfaMethods !== undefined ? (
-            <UserProfileMfaSectionView
-              methods={mfaMethods}
-              addableMethods={addableMfaMethods}
-              addControl={mfaAddControl}
-              sectionTitle={!showPassword && !showPasskeys ? 'Authentication' : undefined}
-              onAdd={onAddMfaMethod}
-              onRegenerateBackupCodes={onRegenerateBackupCodes}
-              onRemove={onRemoveMfaMethod}
-              onSetDefault={onSetDefaultMfaMethod}
-            />
-          ) : null}
-        </div>
+        {hasAuthentication ? (
+          <Section.Root>
+            {showPassword ? (
+              <UserProfilePasswordSectionView
+                asGroup
+                hasPassword={hasPassword}
+                managedBy={managedBy}
+                requiresCurrentPassword={requiresCurrentPassword}
+                onSubmitPassword={onSubmitPassword}
+              />
+            ) : null}
+            {showPasskeys ? (
+              <UserProfilePasskeysSectionView
+                asGroup
+                passkeys={passkeys}
+                sectionTitle={showPassword ? undefined : 'Authentication'}
+                onAdd={onAddPasskey}
+                addError={addPasskeyError}
+                onRename={onRenamePasskey}
+                onRemove={onRemovePasskey}
+              />
+            ) : null}
+            {mfaMethods !== undefined ? (
+              <UserProfileMfaSectionView
+                asGroup
+                methods={mfaMethods}
+                addableMethods={addableMfaMethods}
+                addControl={mfaAddControl}
+                sectionTitle={!showPassword && !showPasskeys ? 'Authentication' : undefined}
+                onAdd={onAddMfaMethod}
+                onRegenerateBackupCodes={onRegenerateBackupCodes}
+                onRemove={onRemoveMfaMethod}
+                onSetDefault={onSetDefaultMfaMethod}
+              />
+            ) : null}
+          </Section.Root>
+        ) : null}
         {devices ? (
           <UserProfileActiveDevicesSectionView
             devices={devices}

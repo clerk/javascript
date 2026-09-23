@@ -4,6 +4,8 @@ export type {
   SectionContentProps,
   SectionDescriptionProps,
   SectionGroupProps,
+  SectionGroupVariant,
+  SectionHeaderProps,
   SectionItemProps,
   SectionItemsProps,
   SectionLabelProps,
@@ -11,5 +13,6 @@ export type {
   SectionMediaSize,
   SectionRootProps,
   SectionRowProps,
+  SectionSurfaceProps,
   SectionTitleProps,
 } from './section';

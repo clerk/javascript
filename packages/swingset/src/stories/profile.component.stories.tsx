@@ -116,29 +116,31 @@ function StubPage({ id, title }: { id: string; title: string }) {
       <Profile.PageTitle>{title}</Profile.PageTitle>
       {stubSections[id]?.map(section => (
         <Section.Root key={section.title}>
-          <Section.Title>{section.title}</Section.Title>
           <Section.Group>
-            <Section.Row>
-              <Section.Items>
-                {section.rows.map(row => (
-                  <Section.Item key={row.label}>
-                    <Section.Content>
-                      <Section.Label>{row.label}</Section.Label>
-                      <Section.Description>{row.description}</Section.Description>
-                    </Section.Content>
-                    <Section.Actions>
-                      <Button
-                        color='neutral'
-                        size='sm'
-                        variant='outline'
-                      >
-                        Edit
-                      </Button>
-                    </Section.Actions>
-                  </Section.Item>
-                ))}
-              </Section.Items>
-            </Section.Row>
+            <Section.Title>{section.title}</Section.Title>
+            <Section.Surface>
+              <Section.Row>
+                <Section.Items>
+                  {section.rows.map(row => (
+                    <Section.Item key={row.label}>
+                      <Section.Content>
+                        <Section.Label>{row.label}</Section.Label>
+                        <Section.Description>{row.description}</Section.Description>
+                      </Section.Content>
+                      <Section.Actions>
+                        <Button
+                          color='neutral'
+                          size='sm'
+                          variant='outline'
+                        >
+                          Edit
+                        </Button>
+                      </Section.Actions>
+                    </Section.Item>
+                  ))}
+                </Section.Items>
+              </Section.Row>
+            </Section.Surface>
           </Section.Group>
         </Section.Root>
       ))}

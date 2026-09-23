@@ -13,6 +13,8 @@ export interface UserProfilePasswordManagedBy {
 
 export interface UserProfilePasswordSectionViewProps {
   sectionTitle?: string;
+  /** Renders only the group, for composing inside a parent `Section.Root`. */
+  asGroup?: boolean;
   hasPassword?: boolean;
   requiresCurrentPassword?: boolean;
   /** Replaces the edit action with the enterprise provider’s name. */

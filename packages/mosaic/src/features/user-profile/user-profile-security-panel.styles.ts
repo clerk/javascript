@@ -27,7 +27,4 @@ export const styles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
   },
-  emptySectionCards: {
-    display: 'none',
-  },
 });

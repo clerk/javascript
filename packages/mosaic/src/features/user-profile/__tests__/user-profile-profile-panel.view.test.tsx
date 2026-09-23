@@ -211,7 +211,7 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
-  it('breaks out both contact types when multiple accounts are allowed', () => {
+  it('nests both contact types as groups inside Account when multiple accounts are allowed', () => {
     renderView({
       emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true }],
       onAddEmail: vi.fn(),
@@ -220,11 +220,13 @@ describe('UserProfileProfilePanelView', () => {
     });
 
     const accountSection = screen.getByRole('region', { name: 'Account' });
-    const emailSection = screen.getByRole('region', { name: 'Email' });
-    const phoneSection = screen.getByRole('region', { name: 'Phone' });
+    const emailSection = within(accountSection).getByRole('group', { name: 'Email' });
+    const phoneSection = within(accountSection).getByRole('group', { name: 'Phone' });
 
-    expect(accountSection).not.toContainElement(emailSection);
-    expect(accountSection).not.toContainElement(phoneSection);
+    expect(screen.queryByRole('region', { name: 'Email' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Phone' })).not.toBeInTheDocument();
+    expect(emailSection).toHaveAttribute('data-variant', 'contained');
+    expect(emailSection.querySelector('.cl-section-header')).toHaveTextContent('Email');
     expect(emailSection).toHaveTextContent('item1@clerk.dev');
     expect(phoneSection).toHaveTextContent('+1 (801) 888-8181');
     expect(within(emailSection).getByRole('button', { name: 'Add email' })).toHaveTextContent('Add');
@@ -245,8 +247,8 @@ describe('UserProfileProfilePanelView', () => {
     expect(accountSection).toHaveTextContent('+1 (801) 888-8181');
     expect(within(accountSection).getByRole('button', { name: 'Update email' })).toBeInTheDocument();
     expect(within(accountSection).getByRole('button', { name: 'Update phone number' })).toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: 'Email' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: 'Phone' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Email' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Phone' })).not.toBeInTheDocument();
   });
 
   it('forwards inline contact update and add actions', async () => {
@@ -271,7 +273,7 @@ describe('UserProfileProfilePanelView', () => {
   it('renders an actionable empty state when no phone number exists', () => {
     renderView({ phones: [], onSendPhoneCode: () => Promise.resolve(), onVerifyPhoneCode: () => Promise.resolve() });
 
-    const phoneSection = screen.getByRole('region', { name: 'Phone' });
+    const phoneSection = screen.getByRole('group', { name: 'Phone' });
     const emptyState = within(phoneSection).getByText('No phone numbers added');
 
     expect(emptyState.closest('.cl-section-items')).not.toBeNull();

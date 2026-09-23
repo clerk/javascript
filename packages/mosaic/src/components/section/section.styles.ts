@@ -17,6 +17,12 @@ export const styles = stylex.create({
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
   group: {
+    display: 'flex',
+    flexDirection: 'column',
+    rowGap: space['3'],
+    width: '100%',
+  },
+  surface: {
     borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-xl'],
     borderStyle: 'solid',

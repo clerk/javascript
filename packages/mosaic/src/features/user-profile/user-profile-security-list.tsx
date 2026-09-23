@@ -6,6 +6,7 @@ import { Section } from '../../components/section';
 
 export function UserProfileSecurityList({
   sectionTitle,
+  asGroup = false,
   label,
   addLabel,
   emptyLabel,
@@ -15,6 +16,7 @@ export function UserProfileSecurityList({
   children,
 }: {
   sectionTitle?: string;
+  asGroup?: boolean;
   label: string;
   addLabel: string;
   emptyLabel: string;
@@ -23,12 +25,15 @@ export function UserProfileSecurityList({
   addControl?: ReactNode;
   children: ReactNode;
 }) {
-  return (
-    <Section.Root aria-label={sectionTitle ? undefined : label}>
+  const group = (
+    <Section.Group
+      variant={asGroup ? 'contained' : 'default'}
+      aria-label={asGroup ? label : undefined}
+    >
       {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
-      <Section.Group>
+      <Section.Surface>
         <Section.Row>
-          <Section.Item>
+          <Section.Header>
             <Section.Content>
               <Section.Label>{label}</Section.Label>
             </Section.Content>
@@ -52,7 +57,7 @@ export function UserProfileSecurityList({
                 </Button>
               </Section.Actions>
             ) : null}
-          </Section.Item>
+          </Section.Header>
           <Section.Items>
             {hasItems ? (
               children
@@ -65,7 +70,9 @@ export function UserProfileSecurityList({
             )}
           </Section.Items>
         </Section.Row>
-      </Section.Group>
-    </Section.Root>
+      </Section.Surface>
+    </Section.Group>
   );
+
+  return asGroup ? group : <Section.Root aria-label={sectionTitle ? undefined : label}>{group}</Section.Root>;
 }

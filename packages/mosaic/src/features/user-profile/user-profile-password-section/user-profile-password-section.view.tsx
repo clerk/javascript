@@ -12,6 +12,7 @@ export type {
 
 export function UserProfilePasswordSectionView({
   sectionTitle,
+  asGroup = false,
   hasPassword = false,
   requiresCurrentPassword = false,
   managedBy,
@@ -23,17 +24,19 @@ export function UserProfilePasswordSectionView({
     return null;
   }
 
-  return (
-    <Section.Root aria-label={title ? undefined : m.label}>
+  const group = (
+    <Section.Group aria-label={asGroup && !title ? m.label : undefined}>
       {title ? <Section.Title>{title}</Section.Title> : null}
-      <Section.Group>
+      <Section.Surface>
         <UserProfilePasswordRowView
           hasPassword={hasPassword}
           requiresCurrentPassword={requiresCurrentPassword}
           managedBy={managedBy}
           onSubmitPassword={onSubmitPassword}
         />
-      </Section.Group>
-    </Section.Root>
+      </Section.Surface>
+    </Section.Group>
   );
+
+  return asGroup ? group : <Section.Root aria-label={title ? undefined : m.label}>{group}</Section.Root>;
 }

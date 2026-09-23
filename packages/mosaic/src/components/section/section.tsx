@@ -17,8 +17,11 @@ import { styles } from './section.styles';
 
 export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
 export type SectionTitleProps = Omit<HeadingProps, 'size'>;
-export type SectionGroupProps = MosaicComponentProps<'div'>;
+export type SectionGroupVariant = 'default' | 'contained';
+export type SectionGroupProps = MosaicComponentProps<'div'> & { variant?: SectionGroupVariant };
 export type SectionRowProps = MosaicComponentProps<'div'>;
+export type SectionSurfaceProps = MosaicComponentProps<'div'>;
+export type SectionHeaderProps = MosaicComponentProps<'div'>;
 export type SectionItemsProps = MosaicComponentProps<'div'>;
 export type SectionItemProps = MosaicComponentProps<'div'>;
 export type SectionMediaSize = 'sm' | 'md' | 'lg' | 'xl';
@@ -88,6 +91,25 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
 });
 
 const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function SectionGroup(
+  { variant = 'default', render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      role: variant === 'contained' ? 'group' : undefined,
+      ...mergeStyleProps(
+        themeProps('section-group', { variant }),
+        stylex.props(reset.base, styles.group, xstyle),
+        rest,
+      ),
+    },
+  });
+});
+
+const Surface = React.forwardRef<HTMLDivElement, SectionSurfaceProps>(function SectionSurface(
   { render, xstyle, ...rest },
   ref,
 ) {
@@ -96,7 +118,21 @@ const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function Secti
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group, xstyle), rest),
+      ...mergeStyleProps(themeProps('section-surface'), stylex.props(reset.base, styles.surface, xstyle), rest),
+    },
+  });
+});
+
+const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function SectionHeader(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('section-header'), stylex.props(reset.base, styles.item, xstyle), rest),
     },
   });
 });
@@ -289,7 +325,9 @@ export const Section = {
   Root,
   Title,
   Group,
+  Surface,
   Row,
+  Header,
   Items,
   Item,
   Media,

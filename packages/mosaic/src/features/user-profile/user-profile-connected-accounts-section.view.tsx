@@ -43,25 +43,27 @@ export function UserProfileConnectedAccountsSectionView({
     <>
       {hasRows ? (
         <Section.Root>
-          <Section.Title>{m.title}</Section.Title>
           <Section.Group>
-            {accounts.map(account => (
-              <UserProfileConnectedAccountRowView
-                key={account.id}
-                account={account}
-                onReconnect={onReconnect}
-                onRemove={onRemove ? account => removeAccount.open(account) : undefined}
-              />
-            ))}
-            {onConnect
-              ? availableProviders.map(provider => (
-                  <UserProfileConnectedAccountRowView
-                    key={provider.id}
-                    account={provider}
-                    onConnect={onConnect}
-                  />
-                ))
-              : null}
+            <Section.Title>{m.title}</Section.Title>
+            <Section.Surface>
+              {accounts.map(account => (
+                <UserProfileConnectedAccountRowView
+                  key={account.id}
+                  account={account}
+                  onReconnect={onReconnect}
+                  onRemove={onRemove ? account => removeAccount.open(account) : undefined}
+                />
+              ))}
+              {onConnect
+                ? availableProviders.map(provider => (
+                    <UserProfileConnectedAccountRowView
+                      key={provider.id}
+                      account={provider}
+                      onConnect={onConnect}
+                    />
+                  ))
+                : null}
+            </Section.Surface>
           </Section.Group>
         </Section.Root>
       ) : null}

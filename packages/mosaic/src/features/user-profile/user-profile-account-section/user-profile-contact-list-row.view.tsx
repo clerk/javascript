@@ -35,7 +35,7 @@ export function UserProfileContactListRowView({
 
   return (
     <Section.Row>
-      <Section.Item>
+      <Section.Header>
         <Section.Content>
           <Section.Label>{label}</Section.Label>
         </Section.Content>
@@ -59,7 +59,7 @@ export function UserProfileContactListRowView({
             </Button>
           </Section.Actions>
         ) : null}
-      </Section.Item>
+      </Section.Header>
       <Section.Items>
         {items.length === 0 ? (
           <Section.Item>
