@@ -128,6 +128,24 @@ export const styles = stylex.create({
     flexShrink: 0,
     justifyContent: 'flex-end',
   },
+  note: {
+    alignItems: 'center',
+    color: colorVars['--cl-color-foreground-secondary'],
+    columnGap: space['1'],
+    display: 'flex',
+    flexShrink: 0,
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontWeight: fontWeightVars['--cl-font-normal'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+  },
+  noteIcon: {
+    alignItems: 'center',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    height: space['4'],
+    width: space['4'],
+  },
   // Sits under the row's item rather than inside its content, so a message never shifts the
   // media and actions off the center line they share.
   error: {

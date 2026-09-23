@@ -37,4 +37,17 @@ describe('UserProfileNameRowView', () => {
     await user.click(screen.getByRole('button', { name: 'Edit name' }));
     expect(screen.getByRole('dialog', { name: 'Edit name' })).toBeInTheDocument();
   });
+  it('names the connection managing the name in place of the edit action', () => {
+    render(
+      <MosaicProvider>
+        <UserProfileNameRowView
+          name='Preston Booth'
+          managedBy={{ name: 'Okta' }}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByText('Managed by Okta')).toBeInTheDocument();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
 });
