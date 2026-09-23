@@ -42,7 +42,11 @@ function BuiltInPage({
     return pages.apiKeys ? <OrganizationProfileApiKeysPanelView {...pages.apiKeys} /> : null;
   }
   if (id === 'members') {
-    return pages.members ? <OrganizationProfileMembersPanelView {...pages.members} /> : null;
+    return pages.members?.members ? (
+      <OrganizationProfileMembersPanelView {...pages.members} />
+    ) : (
+      <OrganizationProfilePlaceholderPanelView page={id} />
+    );
   }
   return <OrganizationProfilePlaceholderPanelView page={id} />;
 }
