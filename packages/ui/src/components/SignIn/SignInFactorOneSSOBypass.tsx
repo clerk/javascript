@@ -9,6 +9,8 @@ import { handleError } from '@/ui/utils/errorHandler';
 
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { Button, Col, descriptors, Flow, localizationKeys } from '../../customizables';
+import { useRouter } from '../../router';
+import { isProtectCheckRequiredError, navigateOnSignInProtectGate } from './handleProtectCheck';
 import { hasMultipleEnterpriseConnections } from './shared';
 import { SignInFactorOneCodeForm } from './SignInFactorOneCodeForm';
 
@@ -30,6 +32,7 @@ export const SignInFactorOneSSOBypass = (props: SignInFactorOneSSOBypassProps) =
   const card = useCardState();
   const ctx = useSignInContext();
   const signIn = useCoreSignIn();
+  const { navigate } = useRouter();
   const [step, setStep] = React.useState<Step>('sso');
   const [isRedirecting, setIsRedirecting] = React.useState(false);
 
@@ -39,14 +42,23 @@ export const SignInFactorOneSSOBypass = (props: SignInFactorOneSSOBypassProps) =
   };
 
   const authenticateWithEnterpriseSSO = async (enterpriseConnectionId?: string) => {
-    await signIn.authenticateWithRedirect({
-      strategy: 'enterprise_sso',
-      redirectUrl: ctx.ssoCallbackUrl,
-      redirectUrlComplete: ctx.afterSignInUrl || '/',
-      oidcPrompt: ctx.oidcPrompt,
-      continueSignIn: true,
-      ...(enterpriseConnectionId && { enterpriseConnectionId }),
-    });
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl: ctx.ssoCallbackUrl,
+        redirectUrlComplete: ctx.afterSignInUrl || '/',
+        oidcPrompt: ctx.oidcPrompt,
+        continueSignIn: true,
+        ...(enterpriseConnectionId && { enterpriseConnectionId }),
+      });
+    } catch (err) {
+      // Preparing the hand-off can itself raise a challenge. No redirect was issued and the sign-in
+      // is sitting on the gate instead: run the challenge rather than showing it as an error.
+      if (isProtectCheckRequiredError(err) && navigateOnSignInProtectGate(signIn, navigate, '../protect-check')) {
+        return;
+      }
+      throw err;
+    }
   };
 
   const handleSSOError = (err: Error) => handleError(err, [], card.setError);
