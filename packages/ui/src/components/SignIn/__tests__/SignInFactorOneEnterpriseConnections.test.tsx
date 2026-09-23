@@ -78,7 +78,7 @@ describe('SignInFactorOneEnterpriseConnections with a challenge', () => {
     });
     (fixtures.signIn as unknown as SignInResource).supportedFirstFactors = TWO_CONNECTIONS as never;
     // WHEN preparing the hand-off comes back gated: no redirect is issued and the call throws.
-    fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(async () => {
+    fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(() => {
       (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-abc' };
       throw new ClerkRuntimeError('challenge required', { code: 'protect_check_required' });
     });
