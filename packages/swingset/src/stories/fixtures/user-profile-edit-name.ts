@@ -1,5 +1,6 @@
 import type { UserProfileEditNameValue } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-edit-name.dialog';
-import type { FormError } from '@clerk/mosaic/utils/save-result';
+import type { FormError } from '@clerk/mosaic/utils/form-error';
+import { SaveError } from '@clerk/mosaic/utils/form-error';
 import { useState } from 'react';
 
 export interface UserProfileEditNameFixtureOptions {
@@ -28,10 +29,9 @@ export function useUserProfileEditNameFixture({
     onSubmitName: async (value: UserProfileEditNameValue) => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith) {
-        return { error: failWith };
+        throw new SaveError(failWith);
       }
       setName(value);
-      return { error: null };
     },
   };
 }

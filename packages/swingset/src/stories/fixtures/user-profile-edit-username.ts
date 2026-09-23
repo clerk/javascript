@@ -1,4 +1,5 @@
-import type { FormError } from '@clerk/mosaic/utils/save-result';
+import type { FormError } from '@clerk/mosaic/utils/form-error';
+import { SaveError } from '@clerk/mosaic/utils/form-error';
 import { useState } from 'react';
 
 export interface UserProfileEditUsernameFixtureOptions {
@@ -19,10 +20,9 @@ export function useUserProfileEditUsernameFixture({
     onSubmitUsername: async (value: string) => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith) {
-        return { error: failWith };
+        throw new SaveError(failWith);
       }
       setUsername(value);
-      return { error: null };
     },
   };
 }
