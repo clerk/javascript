@@ -231,8 +231,11 @@ export function MembersTableTabView({
                           </Avatar.Root>
                         </Item.Media>
                         <Item.Content>
-                          <Item.Label xstyle={styles.name}>
-                            {member.name}
+                          <Item.Label>{member.name}</Item.Label>
+                          <Item.Description>{member.email}</Item.Description>
+                        </Item.Content>
+                        {member.isCurrentUser || member.isDeprovisioned || member.isBanned ? (
+                          <Item.Actions>
                             {member.isCurrentUser ? (
                               <Badge>{m.you}</Badge>
                             ) : member.isDeprovisioned ? (
@@ -240,9 +243,8 @@ export function MembersTableTabView({
                             ) : member.isBanned ? (
                               <Badge color='negative'>{m.banned}</Badge>
                             ) : null}
-                          </Item.Label>
-                          <Item.Description>{member.email}</Item.Description>
-                        </Item.Content>
+                          </Item.Actions>
+                        ) : null}
                       </Item.Root>
                     </Table.Cell>
                     <Table.Cell xstyle={styles.dateCell}>{member.joinedAtLabel}</Table.Cell>
