@@ -16,7 +16,6 @@ const reduceMotion = '@media (prefers-reduced-motion: reduce)';
 export const styles = stylex.create({
   positioner: {
     pointerEvents: 'none',
-    zIndex: 1,
     width: 'max-content',
   },
   items: {
