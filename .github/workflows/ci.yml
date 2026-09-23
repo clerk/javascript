@@ -558,7 +558,7 @@ jobs:
 
       - name: Delete integration-test users
         if: ${{ always() && steps.integration-tests.outcome != 'skipped' }}
-        timeout-minutes: 4
+        timeout-minutes: 10
         run: pnpm test:integration:cleanup
         env:
           CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET: ${{ secrets.CLERK_E2E_OAUTH_PROVIDER_CLIENT_SECRET }}
