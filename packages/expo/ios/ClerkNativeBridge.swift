@@ -845,21 +845,35 @@ final class ClerkNativeBridge {
     }
 
     let started = try await session.startVerification(level: requestedLevel)
-    let verification: SessionVerification
+    let verification = try await Self.verifyBiometricReverification(started) { level in
+      try await session.verifyWithBiometrics(reason: reason, level: level)
+    }
+    return Self.biometricReverificationPayload(verification, sessionId: sessionId)
+  }
+
+  @MainActor
+  static func verifyBiometricReverification(
+    _ started: SessionVerification,
+    verify: (Session.BiometricVerificationLevel) async throws -> SessionVerification
+  ) async throws -> SessionVerification {
     switch started.status {
     case .needsFirstFactor:
-      verification = try await session.verifyWithBiometrics(reason: reason, level: .firstFactor)
+      let verification = try await verify(.firstFactor)
+      if verification.status == .needsSecondFactor {
+        try Task.checkCancellation()
+        return try await verify(.secondFactor)
+      }
+      return verification
     case .needsSecondFactor:
-      verification = try await session.verifyWithBiometrics(reason: reason, level: .secondFactor)
+      return try await verify(.secondFactor)
     case .complete:
-      verification = started
+      return started
     case .unknown:
       throw ClerkExpoBiometricCredentialError(
         code: "E_BIOMETRIC_REVERIFICATION_FAILED",
         message: "The server returned an unsupported reverification status."
       )
     }
-    return Self.biometricReverificationPayload(verification, sessionId: sessionId)
   }
 
   static func biometricReverificationLevel(_ level: String) throws -> SessionVerification.Level {
@@ -916,6 +930,11 @@ final class ClerkNativeBridge {
 
     if let error = error as? ClerkAPIError {
       return ClerkNativeErrorDescriptor(code: error.code, message: error.localizedDescription)
+    }
+
+    let nsError = error as NSError
+    if nsError.domain == "ClerkKit.BiometricCredentialError", let code = nsError.userInfo["code"] as? String {
+      return ClerkNativeErrorDescriptor(code: code, message: error.localizedDescription)
     }
 
     if let error = error as? BiometricCredentialKeyManagerError {

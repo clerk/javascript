@@ -61,6 +61,114 @@ final class ClerkNativeBridgeTests: XCTestCase {
   }
 
   @MainActor
+  func testBiometricReverificationContinuesToSecondFactor() async throws {
+    var factors: [Session.BiometricVerificationLevel] = []
+    let started = SessionVerification(id: "stepup_test", status: .needsFirstFactor, level: .multiFactor)
+    let result = try await ClerkNativeBridge.verifyBiometricReverification(started) { factor in
+      factors.append(factor)
+      return SessionVerification(id: started.id, status: factor == .firstFactor ? .needsSecondFactor : .complete,
+                                 level: .multiFactor)
+    }
+    XCTAssertEqual(factors, [.firstFactor, .secondFactor])
+    XCTAssertEqual(result.id, started.id)
+    XCTAssertEqual(result.status, .complete)
+  }
+
+  @MainActor
+  func testBiometricReverificationPromptsOnlyForRequiredFactors() async throws {
+    for status in [SessionVerification.Status.needsFirstFactor, .needsSecondFactor, .complete] {
+      var factors: [Session.BiometricVerificationLevel] = []
+      let started = SessionVerification(id: "stepup_test", status: status, level: .multiFactor)
+      let result = try await ClerkNativeBridge.verifyBiometricReverification(started) { factor in
+        factors.append(factor)
+        return SessionVerification(id: started.id, status: .complete, level: .multiFactor)
+      }
+      XCTAssertEqual(factors, status == .complete ? [] : [status == .needsFirstFactor ? .firstFactor : .secondFactor])
+      XCTAssertEqual(result.status, .complete)
+    }
+  }
+
+  @MainActor
+  func testBiometricReverificationDoesNotRetryAnIncompleteSecondFactor() async throws {
+    var factors: [Session.BiometricVerificationLevel] = []
+    let started = SessionVerification(status: .needsFirstFactor, level: .multiFactor)
+    let result = try await ClerkNativeBridge.verifyBiometricReverification(started) { factor in
+      factors.append(factor)
+      return SessionVerification(status: .needsSecondFactor, level: .multiFactor)
+    }
+    XCTAssertEqual(factors, [.firstFactor, .secondFactor])
+    XCTAssertEqual(result.status, .needsSecondFactor)
+  }
+
+  @MainActor
+  func testBiometricReverificationPreservesFactorFailures() async {
+    for failingFactor in [Session.BiometricVerificationLevel.firstFactor, .secondFactor] {
+      var factors: [Session.BiometricVerificationLevel] = []
+      let expected = NSError(domain: "biometric_authentication_canceled", code: 1)
+      do {
+        _ = try await ClerkNativeBridge.verifyBiometricReverification(
+          SessionVerification(status: .needsFirstFactor, level: .multiFactor)
+        ) { factor in
+          factors.append(factor)
+          if factor == failingFactor { throw expected }
+          return SessionVerification(status: .needsSecondFactor, level: .multiFactor)
+        }
+        XCTFail("Expected the factor failure to propagate.")
+      } catch {
+        XCTAssertEqual(error as NSError, expected)
+      }
+      XCTAssertEqual(factors, failingFactor == .firstFactor ? [.firstFactor] : [.firstFactor, .secondFactor])
+    }
+  }
+
+  @MainActor
+  func testCancellationBetweenBiometricFactorsStopsContinuation() async {
+    var factors: [Session.BiometricVerificationLevel] = []
+    let task = Task { @MainActor in
+      try await ClerkNativeBridge.verifyBiometricReverification(
+        SessionVerification(status: .needsFirstFactor, level: .multiFactor)
+      ) { factor in
+        factors.append(factor)
+        withUnsafeCurrentTask { $0?.cancel() }
+        return SessionVerification(status: .needsSecondFactor, level: .multiFactor)
+      }
+    }
+    do {
+      _ = try await task.value
+      XCTFail("Expected cancellation to stop the second factor.")
+    } catch {
+      XCTAssertTrue(error is CancellationError)
+    }
+    XCTAssertEqual(factors, [.firstFactor])
+  }
+
+  @MainActor
+  func testUnknownBiometricVerificationStatusDoesNotPrompt() async {
+    do {
+      _ = try await ClerkNativeBridge.verifyBiometricReverification(
+        SessionVerification(status: .unknown("future_status"), level: .multiFactor)
+      ) { _ in
+        XCTFail("An unknown status must not prompt.")
+        return SessionVerification(status: .complete, level: .multiFactor)
+      }
+      XCTFail("Expected an unsupported status error.")
+    } catch {
+      XCTAssertEqual(ClerkNativeBridge.biometricCredentialErrorDescriptor(error, fallbackCode: "unexpected").code,
+                     "E_BIOMETRIC_REVERIFICATION_FAILED")
+    }
+  }
+
+  func testBiometricReverificationPreservesNativePolicyError() {
+    let error = NSError(domain: "ClerkKit.BiometricCredentialError", code: 1, userInfo: [
+      "code": "biometric_credential_policy_incompatible",
+      NSLocalizedDescriptionKey: "Verify your identity using another method.",
+    ])
+    let result = ClerkNativeBridge.biometricCredentialErrorDescriptor(error, fallbackCode: "unexpected")
+    XCTAssertEqual(result.code, "biometric_credential_policy_incompatible")
+    XCTAssertEqual(result.message, error.localizedDescription)
+  }
+
+  @MainActor
   private func assertEnvironmentUnavailable(
     _ operation: @MainActor () async throws -> Any,
     file: StaticString = #filePath,

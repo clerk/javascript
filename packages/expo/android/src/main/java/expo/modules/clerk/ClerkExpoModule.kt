@@ -31,6 +31,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -122,6 +124,26 @@ internal fun biometricReverificationPayload(
     "level" to verification.level.value,
     "sessionId" to (verification.session?.id ?: sessionId)
 )
+
+internal suspend fun verifyBiometricReverification(
+    started: SessionVerification,
+    verify: suspend (SessionVerification.Level) -> ClerkResult<SessionVerification, ClerkErrorResponse>
+): ClerkResult<SessionVerification, ClerkErrorResponse> = when (started.status) {
+    SessionVerification.Status.NEEDS_FIRST_FACTOR -> {
+        val result = verify(SessionVerification.Level.FIRST_FACTOR)
+        if (result is ClerkResult.Success && result.value.status == SessionVerification.Status.NEEDS_SECOND_FACTOR) {
+            currentCoroutineContext().ensureActive()
+            verify(SessionVerification.Level.SECOND_FACTOR)
+        } else {
+            result
+        }
+    }
+    SessionVerification.Status.NEEDS_SECOND_FACTOR -> verify(SessionVerification.Level.SECOND_FACTOR)
+    SessionVerification.Status.COMPLETE -> ClerkResult.success(started)
+    SessionVerification.Status.UNKNOWN -> ClerkResult.unknownFailure(
+        IllegalStateException("The server returned an unsupported reverification status.")
+    )
+}
 
 internal data class BiometricCredentialBridgeError(
     val code: String,
@@ -816,20 +838,10 @@ class ClerkExpoModule : Module() {
                         return@launch
                     }
                 }
-                val factor = when (started.status) {
-                    SessionVerification.Status.NEEDS_FIRST_FACTOR -> SessionVerification.Level.FIRST_FACTOR
-                    SessionVerification.Status.NEEDS_SECOND_FACTOR -> SessionVerification.Level.SECOND_FACTOR
-                    SessionVerification.Status.COMPLETE -> {
-                        promise.resolve(biometricReverificationPayload(started, sessionId))
-                        return@launch
-                    }
-                    SessionVerification.Status.UNKNOWN -> {
-                        promise.reject("E_BIOMETRIC_REVERIFICATION_FAILED",
-                            "The server returned an unsupported reverification status.", null)
-                        return@launch
-                    }
+                val result = verifyBiometricReverification(started) { factor ->
+                    session.verifyWithBiometrics(promptSubtitle = reason, level = factor)
                 }
-                when (val result = session.verifyWithBiometrics(promptSubtitle = reason, level = factor)) {
+                when (result) {
                     is ClerkResult.Success -> promise.resolve(biometricReverificationPayload(result.value, sessionId))
                     is ClerkResult.Failure -> rejectBiometricCredentialFailure(
                         promise, "E_BIOMETRIC_REVERIFICATION_FAILED", "Unable to reverify with biometrics", result

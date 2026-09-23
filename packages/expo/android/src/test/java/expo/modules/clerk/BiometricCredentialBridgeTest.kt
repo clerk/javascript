@@ -9,11 +9,113 @@ import com.clerk.api.biometriccredential.BiometricCredentialAvailability
 import com.clerk.api.biometriccredential.BiometricCredentialKeyManagerException
 import com.clerk.api.biometriccredential.BiometricCredentialPolicy
 import com.clerk.api.session.SessionVerification
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BiometricCredentialBridgeTest {
+    @Test
+    fun `continues the same attempt when the first factor requires a second factor`() = runBlocking {
+        val factors = mutableListOf<SessionVerification.Level>()
+        val started = SessionVerification(id = "stepup_test", status = SessionVerification.Status.NEEDS_FIRST_FACTOR,
+            level = SessionVerification.Level.MULTI_FACTOR)
+        val result = verifyBiometricReverification(started) { factor ->
+            factors.add(factor)
+            ClerkResult.success(started.copy(status = if (factor == SessionVerification.Level.FIRST_FACTOR)
+                SessionVerification.Status.NEEDS_SECOND_FACTOR else SessionVerification.Status.COMPLETE))
+        }
+        assertEquals(listOf(SessionVerification.Level.FIRST_FACTOR, SessionVerification.Level.SECOND_FACTOR), factors)
+        assertTrue(result is ClerkResult.Success)
+        assertEquals(started.id, (result as ClerkResult.Success).value.id)
+        assertEquals(SessionVerification.Status.COMPLETE, result.value.status)
+    }
+
+    @Test
+    fun `prompts only for the factors still required`() = runBlocking {
+        for (status in listOf(SessionVerification.Status.NEEDS_FIRST_FACTOR,
+            SessionVerification.Status.NEEDS_SECOND_FACTOR, SessionVerification.Status.COMPLETE)) {
+            val factors = mutableListOf<SessionVerification.Level>()
+            val started = SessionVerification(status = status, level = SessionVerification.Level.MULTI_FACTOR)
+            val result = verifyBiometricReverification(started) { factor ->
+                factors.add(factor)
+                ClerkResult.success(started.copy(status = SessionVerification.Status.COMPLETE))
+            }
+            val expected = when (status) {
+                SessionVerification.Status.NEEDS_FIRST_FACTOR -> listOf(SessionVerification.Level.FIRST_FACTOR)
+                SessionVerification.Status.NEEDS_SECOND_FACTOR -> listOf(SessionVerification.Level.SECOND_FACTOR)
+                else -> emptyList()
+            }
+            assertEquals(expected, factors)
+            assertEquals(SessionVerification.Status.COMPLETE, (result as ClerkResult.Success).value.status)
+        }
+    }
+
+    @Test
+    fun `does not retry an incomplete second factor`() = runBlocking {
+        val factors = mutableListOf<SessionVerification.Level>()
+        val started = SessionVerification(status = SessionVerification.Status.NEEDS_FIRST_FACTOR,
+            level = SessionVerification.Level.MULTI_FACTOR)
+        val result = verifyBiometricReverification(started) { factor ->
+            factors.add(factor)
+            ClerkResult.success(started.copy(status = SessionVerification.Status.NEEDS_SECOND_FACTOR))
+        }
+        assertEquals(listOf(SessionVerification.Level.FIRST_FACTOR, SessionVerification.Level.SECOND_FACTOR), factors)
+        assertEquals(SessionVerification.Status.NEEDS_SECOND_FACTOR, (result as ClerkResult.Success).value.status)
+    }
+
+    @Test
+    fun `preserves first and second factor failures`() = runBlocking {
+        for (failingFactor in listOf(SessionVerification.Level.FIRST_FACTOR, SessionVerification.Level.SECOND_FACTOR)) {
+            val factors = mutableListOf<SessionVerification.Level>()
+            val failure = ClerkResult.apiFailure(ClerkErrorResponse(errors = listOf(
+                ClerkAPIError(code = "biometric_authentication_canceled", message = "Canceled")
+            )))
+            val started = SessionVerification(status = SessionVerification.Status.NEEDS_FIRST_FACTOR,
+                level = SessionVerification.Level.MULTI_FACTOR)
+            val result = verifyBiometricReverification(started) { factor ->
+                factors.add(factor)
+                if (factor == failingFactor) failure else
+                    ClerkResult.success(started.copy(status = SessionVerification.Status.NEEDS_SECOND_FACTOR))
+            }
+            assertSame(failure, result)
+            assertEquals(if (failingFactor == SessionVerification.Level.FIRST_FACTOR)
+                listOf(SessionVerification.Level.FIRST_FACTOR) else
+                listOf(SessionVerification.Level.FIRST_FACTOR, SessionVerification.Level.SECOND_FACTOR), factors)
+        }
+    }
+
+    @Test
+    fun `cancellation between factors stops continuation`() = runBlocking {
+        val factors = mutableListOf<SessionVerification.Level>()
+        val job = launch {
+            verifyBiometricReverification(SessionVerification(status = SessionVerification.Status.NEEDS_FIRST_FACTOR,
+                level = SessionVerification.Level.MULTI_FACTOR)) { factor ->
+                factors.add(factor)
+                currentCoroutineContext().cancel()
+                ClerkResult.success(SessionVerification(status = SessionVerification.Status.NEEDS_SECOND_FACTOR,
+                    level = SessionVerification.Level.MULTI_FACTOR))
+            }
+        }
+        job.join()
+        assertTrue(job.isCancelled)
+        assertEquals(listOf(SessionVerification.Level.FIRST_FACTOR), factors)
+    }
+
+    @Test
+    fun `unknown verification status does not prompt`() = runBlocking {
+        val result = verifyBiometricReverification(SessionVerification(status = SessionVerification.Status.UNKNOWN,
+            level = SessionVerification.Level.MULTI_FACTOR)) {
+            throw AssertionError("Unknown verification status must not prompt")
+        }
+        assertTrue(result is ClerkResult.Failure)
+    }
+
     @Test
     fun `maps biometric reverification requirements`() {
         assertEquals(SessionVerification.Level.FIRST_FACTOR, biometricReverificationLevel("first_factor"))
