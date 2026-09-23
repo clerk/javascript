@@ -1776,9 +1776,10 @@ export const ukUA: LocalizationResource = {
       requireUppercase: 'букву у верхньому регістрі',
       sentencePrefix: 'Ваш пароль повинен містити',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Неправильний пароль. У вас залишилася 1 спроба.',
+    password_confirmation_attempts_remaining: 'Неправильний пароль. Залишилося спроб: {{remainingAttempts}}.',
+    password_confirmation_session_ended:
+      'Ваш сеанс завершено, оскільки ви досягли ліміту спроб підтвердження пароля. Увійдіть знову, щоб продовжити.',
     phone_number_exists: 'Цей номер телефону вже використовується. Спробуйте інший.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

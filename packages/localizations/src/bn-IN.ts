@@ -1803,9 +1803,10 @@ export const bnIN: LocalizationResource = {
       requireUppercase: 'একটি বড় হাতের অক্ষর',
       sentencePrefix: 'আপনার পাসওয়ার্ডে অবশ্যই থাকতে হবে',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'ভুল পাসওয়ার্ড। আপনার আর ১টি প্রচেষ্টা বাকি আছে।',
+    password_confirmation_attempts_remaining: 'ভুল পাসওয়ার্ড। আপনার আর {{remainingAttempts}}টি প্রচেষ্টা বাকি আছে।',
+    password_confirmation_session_ended:
+      'পাসওয়ার্ড নিশ্চিতকরণের প্রচেষ্টার সীমায় পৌঁছানোর কারণে আপনার সেশন শেষ হয়েছে। চালিয়ে যেতে আবার সাইন ইন করুন।',
     phone_number_exists: 'এই ফোন নম্বর ব্যবহৃত হয়েছে। দয়া করে অন্য একটি ব্যবহার করুন।',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

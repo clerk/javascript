@@ -1803,9 +1803,10 @@ export const fiFI: LocalizationResource = {
       requireUppercase: 'iso kirjain',
       sentencePrefix: 'Salasanan on sisällettävä',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Väärä salasana. Sinulla on 1 yritys jäljellä.',
+    password_confirmation_attempts_remaining: 'Väärä salasana. Sinulla on {{remainingAttempts}} yritystä jäljellä.',
+    password_confirmation_session_ended:
+      'Istuntosi päättyi, koska saavutit salasanan vahvistusyritysten rajan. Kirjaudu uudelleen sisään jatkaaksesi.',
     phone_number_exists: 'Tämä puhelinnumero on jo käytössä. Kokeile toista.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

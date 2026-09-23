@@ -1787,9 +1787,10 @@ export const plPL: LocalizationResource = {
       requireUppercase: 'wielką literę',
       sentencePrefix: 'Twoje hasło musi zawierać',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Nieprawidłowe hasło. Pozostała 1 próba.',
+    password_confirmation_attempts_remaining: 'Nieprawidłowe hasło. Pozostałe próby: {{remainingAttempts}}.',
+    password_confirmation_session_ended:
+      'Twoja sesja została zakończona, ponieważ osiągnięto limit prób potwierdzenia hasła. Zaloguj się ponownie, aby kontynuować.',
     phone_number_exists: 'Numer telefonu jest już zajęty. Proszę spróbować innego.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

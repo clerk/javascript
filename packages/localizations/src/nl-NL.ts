@@ -1779,9 +1779,10 @@ export const nlNL: LocalizationResource = {
       requireUppercase: 'Wachtwoord moet minstens 1 hoofdletter bevatten.',
       sentencePrefix: 'Wachtwoord moet minstens 1 speciaal teken bevatten.',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Onjuist wachtwoord. Je hebt nog 1 poging.',
+    password_confirmation_attempts_remaining: 'Onjuist wachtwoord. Je hebt nog {{remainingAttempts}} pogingen.',
+    password_confirmation_session_ended:
+      'Je sessie is beëindigd omdat je het maximale aantal pogingen voor wachtwoordbevestiging hebt bereikt. Log opnieuw in om door te gaan.',
     phone_number_exists: 'Dit telefoonnummer is al in gebruik. Probeer een ander nummer.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

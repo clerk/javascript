@@ -1776,9 +1776,10 @@ export const thTH: LocalizationResource = {
       requireUppercase: 'ตัวอักษรพิมพ์ใหญ่',
       sentencePrefix: 'รหัสผ่านของคุณต้องมี',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'รหัสผ่านไม่ถูกต้อง คุณเหลือโอกาสอีก 1 ครั้ง',
+    password_confirmation_attempts_remaining: 'รหัสผ่านไม่ถูกต้อง คุณเหลือโอกาสอีก {{remainingAttempts}} ครั้ง',
+    password_confirmation_session_ended:
+      'เซสชันของคุณสิ้นสุดลงเนื่องจากคุณยืนยันรหัสผ่านครบจำนวนครั้งที่กำหนดแล้ว โปรดลงชื่อเข้าใช้อีกครั้งเพื่อดำเนินการต่อ',
     phone_number_exists: undefined,
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

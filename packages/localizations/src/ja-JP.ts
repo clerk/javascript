@@ -1802,9 +1802,10 @@ export const jaJP: LocalizationResource = {
       requireUppercase: '大文字を含む',
       sentencePrefix: 'パスワードは次の条件を満たす必要があります：',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'パスワードが正しくありません。残り1回試行できます。',
+    password_confirmation_attempts_remaining: 'パスワードが正しくありません。残り{{remainingAttempts}}回試行できます。',
+    password_confirmation_session_ended:
+      'パスワード確認の試行回数の上限に達したため、セッションが終了しました。続行するには再度サインインしてください。',
     phone_number_exists: 'この電話番号は既に使用されています。別のものをお試しください。',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

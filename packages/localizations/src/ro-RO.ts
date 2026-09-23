@@ -1798,9 +1798,10 @@ export const roRO: LocalizationResource = {
       requireUppercase: 'o literă mare',
       sentencePrefix: 'Parola ta trebuie să conțină',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Parolă incorectă. Mai aveți 1 încercare.',
+    password_confirmation_attempts_remaining: 'Parolă incorectă. Încercări rămase: {{remainingAttempts}}.',
+    password_confirmation_session_ended:
+      'Sesiunea dvs. s-a încheiat deoarece ați atins limita de încercări de confirmare a parolei. Autentificați-vă din nou pentru a continua.',
     phone_number_exists: undefined,
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

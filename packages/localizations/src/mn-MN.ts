@@ -1780,9 +1780,10 @@ export const mnMN: LocalizationResource = {
       requireUppercase: 'том үсэг',
       sentencePrefix: 'таны нууц үг агуулсан байх ёстой',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Нууц үг буруу байна. Танд 1 оролдлого үлдлээ.',
+    password_confirmation_attempts_remaining: 'Нууц үг буруу байна. Танд {{remainingAttempts}} оролдлого үлдлээ.',
+    password_confirmation_session_ended:
+      'Нууц үг баталгаажуулах оролдлогын хязгаарт хүрсэн тул таны сесс дууслаа. Үргэлжлүүлэхийн тулд дахин нэвтэрнэ үү.',
     phone_number_exists: 'Энэ утасны дугаарыг авсан. Өөр оролдоно уу.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

@@ -1786,9 +1786,10 @@ export const skSK: LocalizationResource = {
       requireUppercase: 'veľké písmeno',
       sentencePrefix: 'Vaše heslo musí obsahovať',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Nesprávne heslo. Zostáva vám 1 pokus.',
+    password_confirmation_attempts_remaining: 'Nesprávne heslo. Počet zostávajúcich pokusov: {{remainingAttempts}}.',
+    password_confirmation_session_ended:
+      'Vaša relácia bola ukončená, pretože ste dosiahli limit pokusov o potvrdenie hesla. Ak chcete pokračovať, znova sa prihláste.',
     phone_number_exists: 'Toto telefónne číslo je už obsadené. Skúste prosím iné.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

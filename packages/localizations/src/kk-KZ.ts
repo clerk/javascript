@@ -1768,9 +1768,10 @@ export const kkKZ: LocalizationResource = {
       requireUppercase: 'бас әріп',
       sentencePrefix: 'Құпия сөзде болуы керек:',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Құпиясөз қате. Сізде 1 әрекет қалды.',
+    password_confirmation_attempts_remaining: 'Құпиясөз қате. Сізде {{remainingAttempts}} әрекет қалды.',
+    password_confirmation_session_ended:
+      'Құпиясөзді растау әрекеттерінің шегіне жеткендіктен, сеансыңыз аяқталды. Жалғастыру үшін қайта кіріңіз.',
     phone_number_exists: 'Бұл телефон нөмірі тіркелген. Басқасын қолданыңыз.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

@@ -1804,9 +1804,10 @@ export const hiIN: LocalizationResource = {
       requireUppercase: 'एक अपरकेस अक्षर',
       sentencePrefix: 'आपके पासवर्ड में होना चाहिए',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'गलत पासवर्ड। आपके पास 1 प्रयास शेष है।',
+    password_confirmation_attempts_remaining: 'गलत पासवर्ड। आपके पास {{remainingAttempts}} प्रयास शेष हैं।',
+    password_confirmation_session_ended:
+      'पासवर्ड पुष्टि प्रयासों की सीमा पूरी होने के कारण आपका सत्र समाप्त हो गया है। जारी रखने के लिए फिर से साइन इन करें।',
     phone_number_exists: 'यह फोन नंबर पहले से लिया गया है। कृपया दूसरा प्रयास करें।',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

@@ -1800,9 +1800,10 @@ export const frFR: LocalizationResource = {
       requireUppercase: 'une lettre majuscule',
       sentencePrefix: 'Votre mot de passe doit contenir',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Mot de passe incorrect. Il vous reste 1 tentative.',
+    password_confirmation_attempts_remaining: 'Mot de passe incorrect. Il vous reste {{remainingAttempts}} tentatives.',
+    password_confirmation_session_ended:
+      'Votre session a pris fin, car vous avez atteint la limite de tentatives de confirmation du mot de passe. Reconnectez-vous pour continuer.',
     phone_number_exists: 'Ce numéro de téléphone est déjà utilisé. Veuillez essayer un autre.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

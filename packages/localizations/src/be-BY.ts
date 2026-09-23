@@ -1785,9 +1785,10 @@ export const beBY: LocalizationResource = {
       requireUppercase: 'літару ў верхнім рэгістры',
       sentencePrefix: 'Ваш пароль павінен утрымліваць',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Няправільны пароль. У вас засталася 1 спроба.',
+    password_confirmation_attempts_remaining: 'Няправільны пароль. Засталося спроб: {{remainingAttempts}}.',
+    password_confirmation_session_ended:
+      'Ваш сеанс завершаны, бо вы дасягнулі ліміту спроб пацвярджэння пароля. Увайдзіце зноў, каб працягнуць.',
     phone_number_exists: 'Гэты нумар тэлефона ўжо заняты. Калі ласка, паспрабуйце іншы.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

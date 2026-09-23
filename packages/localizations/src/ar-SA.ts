@@ -1774,9 +1774,10 @@ export const arSA: LocalizationResource = {
       requireUppercase: 'حرف كبير',
       sentencePrefix: 'كلمة السر يجب أن تحتوي على',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'كلمة المرور غير صحيحة. لديك محاولة واحدة متبقية.',
+    password_confirmation_attempts_remaining: 'كلمة المرور غير صحيحة. عدد المحاولات المتبقية: {{remainingAttempts}}.',
+    password_confirmation_session_ended:
+      'انتهت جلستك لأنك وصلت إلى الحد الأقصى لمحاولات تأكيد كلمة المرور. سجّل الدخول مرة أخرى للمتابعة.',
     phone_number_exists: 'هذا الرقم مأخوذ الرجاء أختيار رقم آخر',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

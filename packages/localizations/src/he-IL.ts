@@ -1766,9 +1766,10 @@ export const heIL: LocalizationResource = {
       requireUppercase: 'אות גדולה',
       sentencePrefix: 'הסיסמה שלך חייבת להכיל',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'סיסמה שגויה. נותר לך ניסיון אחד.',
+    password_confirmation_attempts_remaining: 'סיסמה שגויה. נותרו לך {{remainingAttempts}} ניסיונות.',
+    password_confirmation_session_ended:
+      'הסשן שלך הסתיים מכיוון שהגעת למגבלת ניסיונות אימות הסיסמה. התחבר שוב כדי להמשיך.',
     phone_number_exists: 'מספר הטלפון הזה כבר בשימוש. אנא נסה מספר אחר.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

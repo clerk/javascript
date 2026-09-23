@@ -1806,9 +1806,10 @@ export const nbNO: LocalizationResource = {
       requireUppercase: 'en stor bokstav',
       sentencePrefix: 'Passordet ditt må inneholde',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Feil passord. Du har 1 forsøk igjen.',
+    password_confirmation_attempts_remaining: 'Feil passord. Du har {{remainingAttempts}} forsøk igjen.',
+    password_confirmation_session_ended:
+      'Økten din er avsluttet fordi du nådde grensen for forsøk på passordbekreftelse. Logg inn på nytt for å fortsette.',
     phone_number_exists: 'Dette telefonnummeret er allerede i bruk. Vennligst bruk et annet telefonnummer.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

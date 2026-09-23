@@ -1799,9 +1799,11 @@ export const elGR: LocalizationResource = {
       requireUppercase: 'ένα κεφαλαίο γράμμα',
       sentencePrefix: 'Ο κωδικός πρόσβασής σας πρέπει να περιέχει',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Λανθασμένος κωδικός πρόσβασης. Σας απομένει 1 προσπάθεια.',
+    password_confirmation_attempts_remaining:
+      'Λανθασμένος κωδικός πρόσβασης. Σας απομένουν {{remainingAttempts}} προσπάθειες.',
+    password_confirmation_session_ended:
+      'Η συνεδρία σας έληξε επειδή φτάσατε το όριο προσπαθειών επιβεβαίωσης κωδικού πρόσβασης. Συνδεθείτε ξανά για να συνεχίσετε.',
     phone_number_exists: 'Αυτός ο αριθμός τηλεφώνου χρησιμοποιείται ήδη. Δοκιμάστε έναν άλλο.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

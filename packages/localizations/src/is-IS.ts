@@ -1806,9 +1806,10 @@ export const isIS: LocalizationResource = {
       requireUppercase: 'hástaf',
       sentencePrefix: 'Lykilorðið þitt verður að innihalda',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Rangt lykilorð. Þú átt 1 tilraun eftir.',
+    password_confirmation_attempts_remaining: 'Rangt lykilorð. Þú átt {{remainingAttempts}} tilraunir eftir.',
+    password_confirmation_session_ended:
+      'Lotunni þinni lauk vegna þess að þú náðir hámarksfjölda tilrauna til að staðfesta lykilorð. Skráðu þig inn aftur til að halda áfram.',
     phone_number_exists: 'Þetta símanúmer er þegar í notkun. Vinsamlegast reyndu annað.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

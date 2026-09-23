@@ -1787,9 +1787,10 @@ export const itIT: LocalizationResource = {
       requireUppercase: undefined,
       sentencePrefix: undefined,
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Password errata. Hai ancora 1 tentativo.',
+    password_confirmation_attempts_remaining: 'Password errata. Hai ancora {{remainingAttempts}} tentativi.',
+    password_confirmation_session_ended:
+      'La sessione è terminata perché hai raggiunto il limite di tentativi di conferma della password. Accedi di nuovo per continuare.',
     phone_number_exists: 'Questo numero di telefono è già in uso. Per favore, prova con un altro.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

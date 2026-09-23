@@ -1788,9 +1788,11 @@ export const idID: LocalizationResource = {
       requireUppercase: 'huruf besar',
       sentencePrefix: 'Kata sandi Anda harus mengandung',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Kata sandi salah. Anda memiliki 1 percobaan tersisa.',
+    password_confirmation_attempts_remaining:
+      'Kata sandi salah. Anda memiliki {{remainingAttempts}} percobaan tersisa.',
+    password_confirmation_session_ended:
+      'Sesi Anda telah berakhir karena Anda mencapai batas percobaan konfirmasi kata sandi. Masuk kembali untuk melanjutkan.',
     phone_number_exists: 'Nomor telepon ini sudah digunakan. Silakan coba yang lain.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

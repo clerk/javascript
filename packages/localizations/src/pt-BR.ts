@@ -1797,9 +1797,10 @@ export const ptBR: LocalizationResource = {
       requireUppercase: 'uma letra maiúscula',
       sentencePrefix: 'Sua senha deve conter',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Senha incorreta. Você tem mais 1 tentativa.',
+    password_confirmation_attempts_remaining: 'Senha incorreta. Você tem mais {{remainingAttempts}} tentativas.',
+    password_confirmation_session_ended:
+      'Sua sessão foi encerrada porque você atingiu o limite de tentativas de confirmação de senha. Faça login novamente para continuar.',
     phone_number_exists: 'Este número de telefone já está em uso. Por favor, tente outro.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

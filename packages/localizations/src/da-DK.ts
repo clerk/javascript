@@ -1775,9 +1775,10 @@ export const daDK: LocalizationResource = {
       requireUppercase: 'et stort bogstav',
       sentencePrefix: 'Din adgangskode skal indeholde',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Forkert adgangskode. Du har 1 forsøg tilbage.',
+    password_confirmation_attempts_remaining: 'Forkert adgangskode. Du har {{remainingAttempts}} forsøg tilbage.',
+    password_confirmation_session_ended:
+      'Din session er afsluttet, fordi du har nået grænsen for forsøg på at bekræfte adgangskoden. Log ind igen for at fortsætte.',
     phone_number_exists: 'Dette telefonnummer er allerede taget. Prøv et andet.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

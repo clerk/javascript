@@ -1781,9 +1781,10 @@ export const svSE: LocalizationResource = {
       requireUppercase: 'Kräver stora bokstäver',
       sentencePrefix: 'Lösenordet måste innehålla',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Felaktigt lösenord. Du har 1 försök kvar.',
+    password_confirmation_attempts_remaining: 'Felaktigt lösenord. Du har {{remainingAttempts}} försök kvar.',
+    password_confirmation_session_ended:
+      'Din session har avslutats eftersom du nådde gränsen för försök att bekräfta lösenordet. Logga in igen för att fortsätta.',
     phone_number_exists: 'Detta telefonnummer är taget. Vänligen prova ett annat.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

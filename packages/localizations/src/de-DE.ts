@@ -1808,9 +1808,10 @@ export const deDE: LocalizationResource = {
       requireUppercase: 'einen Großbuchstaben enthalten',
       sentencePrefix: 'Das Passwort muss',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Falsches Passwort. Sie haben noch 1 Versuch.',
+    password_confirmation_attempts_remaining: 'Falsches Passwort. Sie haben noch {{remainingAttempts}} Versuche.',
+    password_confirmation_session_ended:
+      'Ihre Sitzung wurde beendet, da Sie die maximale Anzahl an Versuchen zur Passwortbestätigung erreicht haben. Melden Sie sich erneut an, um fortzufahren.',
     phone_number_exists: 'Diese Telefonnummer ist bereits vergeben. Bitte wählen Sie eine Andere.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

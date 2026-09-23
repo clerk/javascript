@@ -1791,9 +1791,10 @@ export const esES: LocalizationResource = {
       requireUppercase: 'Al menos una letra mayúscula',
       sentencePrefix: 'Tu contraseña debe contener:',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Contraseña incorrecta. Te queda 1 intento.',
+    password_confirmation_attempts_remaining: 'Contraseña incorrecta. Te quedan {{remainingAttempts}} intentos.',
+    password_confirmation_session_ended:
+      'Tu sesión ha finalizado porque has alcanzado el límite de intentos de confirmación de contraseña. Vuelve a iniciar sesión para continuar.',
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, inténtelo con otro.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

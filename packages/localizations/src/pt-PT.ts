@@ -1803,9 +1803,10 @@ export const ptPT: LocalizationResource = {
       requireUppercase: 'uma letra maiúscula',
       sentencePrefix: 'A sua palavra-passe deve conter',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Palavra-passe incorreta. Tem mais 1 tentativa.',
+    password_confirmation_attempts_remaining: 'Palavra-passe incorreta. Tem mais {{remainingAttempts}} tentativas.',
+    password_confirmation_session_ended:
+      'A sua sessão terminou porque atingiu o limite de tentativas de confirmação da palavra-passe. Inicie sessão novamente para continuar.',
     phone_number_exists: 'Este número de telemóvel já está em uso. Por favor, tente outro.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

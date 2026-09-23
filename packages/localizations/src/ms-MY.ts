@@ -1813,9 +1813,10 @@ export const msMY: LocalizationResource = {
       requireUppercase: 'huruf besar',
       sentencePrefix: 'Kata laluan anda mesti mengandungi',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Kata laluan salah. Anda mempunyai 1 percubaan lagi.',
+    password_confirmation_attempts_remaining: 'Kata laluan salah. Anda mempunyai {{remainingAttempts}} percubaan lagi.',
+    password_confirmation_session_ended:
+      'Sesi anda telah tamat kerana anda telah mencapai had percubaan pengesahan kata laluan. Log masuk semula untuk meneruskan.',
     phone_number_exists: 'Nombor telefon ini telah diambil. Sila cuba yang lain.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

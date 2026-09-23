@@ -1778,9 +1778,10 @@ export const bgBG: LocalizationResource = {
       requireUppercase: 'главна буква',
       sentencePrefix: 'Вашата парола трябва да съдържа',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Грешна парола. Остава ви 1 опит.',
+    password_confirmation_attempts_remaining: 'Грешна парола. Остават ви {{remainingAttempts}} опита.',
+    password_confirmation_session_ended:
+      'Сесията ви приключи, защото достигнахте лимита на опитите за потвърждение на паролата. Влезте отново, за да продължите.',
     phone_number_exists: 'Този телефонен номер е зает. Моля, опитайте с друг.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

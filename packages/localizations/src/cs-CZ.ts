@@ -1790,9 +1790,10 @@ export const csCZ: LocalizationResource = {
       requireUppercase: 'velké písmeno',
       sentencePrefix: 'Vaše heslo musí obsahovat',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Nesprávné heslo. Zbývá vám 1 pokus.',
+    password_confirmation_attempts_remaining: 'Nesprávné heslo. Počet zbývajících pokusů: {{remainingAttempts}}.',
+    password_confirmation_session_ended:
+      'Vaše relace byla ukončena, protože jste dosáhli limitu pokusů o potvrzení hesla. Pro pokračování se znovu přihlaste.',
     phone_number_exists: 'Toto telefonní číslo se používá. Zkuste prosím jiný.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

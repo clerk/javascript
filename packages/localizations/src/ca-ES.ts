@@ -1791,9 +1791,10 @@ export const caES: LocalizationResource = {
       requireUppercase: 'una lletra majúscula',
       sentencePrefix: 'La teva contrasenya ha de contenir',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Contrasenya incorrecta. Et queda 1 intent.',
+    password_confirmation_attempts_remaining: 'Contrasenya incorrecta. Et queden {{remainingAttempts}} intents.',
+    password_confirmation_session_ended:
+      "La teva sessió ha finalitzat perquè has arribat al límit d'intents de confirmació de la contrasenya. Torna a iniciar sessió per continuar.",
     phone_number_exists: "Aquest número de telèfon ja està en ús. Si us plau, prova'n un altre.",
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

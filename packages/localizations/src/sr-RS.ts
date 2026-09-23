@@ -1778,9 +1778,10 @@ export const srRS: LocalizationResource = {
       requireUppercase: 'veliko slovo',
       sentencePrefix: 'Tvoja lozinka mora sadržati',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Pogrešna lozinka. Preostao vam je 1 pokušaj.',
+    password_confirmation_attempts_remaining: 'Pogrešna lozinka. Preostalo pokušaja: {{remainingAttempts}}.',
+    password_confirmation_session_ended:
+      'Vaša sesija je završena jer ste dostigli ograničenje pokušaja potvrde lozinke. Ponovo se prijavite da biste nastavili.',
     phone_number_exists: 'Ovaj telefonski broj je zauzet. Molimo pokušaj sa drugim.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

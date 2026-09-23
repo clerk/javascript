@@ -1808,9 +1808,10 @@ export const teIN: LocalizationResource = {
       requireUppercase: 'ఒక పెద్ద అక్షరం',
       sentencePrefix: 'మీ పాస్‌వర్డ్‌లో ఉండాలి',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'తప్పు పాస్‌వర్డ్. మీకు 1 ప్రయత్నం మిగిలి ఉంది.',
+    password_confirmation_attempts_remaining: 'తప్పు పాస్‌వర్డ్. మీకు {{remainingAttempts}} ప్రయత్నాలు మిగిలి ఉన్నాయి.',
+    password_confirmation_session_ended:
+      'పాస్‌వర్డ్ నిర్ధారణ ప్రయత్నాల పరిమితిని చేరుకున్నందున మీ సెషన్ ముగిసింది. కొనసాగించడానికి మళ్లీ సైన్ ఇన్ చేయండి.',
     phone_number_exists: 'ఈ ఫోన్ నంబర్ తీసుకోబడింది. దయచేసి మరొకదాన్ని ప్రయత్నించండి.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

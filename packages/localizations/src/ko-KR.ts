@@ -1775,9 +1775,10 @@ export const koKR: LocalizationResource = {
       requireUppercase: '대문자',
       sentencePrefix: '비밀번호에는 다음이 꼭 포함돼야 해요',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: '비밀번호가 올바르지 않습니다. 남은 시도 횟수: 1회',
+    password_confirmation_attempts_remaining: '비밀번호가 올바르지 않습니다. 남은 시도 횟수: {{remainingAttempts}}회',
+    password_confirmation_session_ended:
+      '비밀번호 확인 시도 횟수 한도에 도달하여 세션이 종료되었습니다. 계속하려면 다시 로그인하세요.',
     phone_number_exists: '이 전화번호는 이미 사용 중이에요. 다른 번호를 시도해 주세요.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,

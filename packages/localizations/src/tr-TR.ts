@@ -1782,9 +1782,10 @@ export const trTR: LocalizationResource = {
       requireUppercase: 'bir büyük harf içermeli',
       sentencePrefix: 'Şifreniz;',
     },
-    password_confirmation_attempt_remaining: undefined,
-    password_confirmation_attempts_remaining: undefined,
-    password_confirmation_session_ended: undefined,
+    password_confirmation_attempt_remaining: 'Hatalı şifre. 1 deneme hakkınız kaldı.',
+    password_confirmation_attempts_remaining: 'Hatalı şifre. {{remainingAttempts}} deneme hakkınız kaldı.',
+    password_confirmation_session_ended:
+      'Şifre doğrulama deneme sınırına ulaştığınız için oturumunuz sona erdi. Devam etmek için tekrar giriş yapın.',
     phone_number_exists: 'Bu telefon numarası zaten kullanılıyor. Lütfen başka bir numara deneyin.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,
