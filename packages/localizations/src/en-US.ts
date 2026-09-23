@@ -1820,6 +1820,10 @@ export const enUS: LocalizationResource = {
       requireUppercase: 'an uppercase letter',
       sentencePrefix: 'Your password must contain',
     },
+    password_confirmation_attempt_remaining: 'Incorrect password. You have 1 attempt remaining.',
+    password_confirmation_attempts_remaining: 'Incorrect password. You have {{remainingAttempts}} attempts remaining.',
+    password_confirmation_session_ended:
+      'Your session has ended because you reached the password confirmation attempt limit. Sign in again to continue.',
     phone_number_exists: undefined,
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,
