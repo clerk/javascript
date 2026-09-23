@@ -1,7 +1,9 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../../machines/__tests__/test-utils';
 import { MosaicProvider } from '../../../MosaicProvider';
 import type { MembersTableTabViewProps } from '../members-table-tab.types';
 import { MembersTableTabView } from '../members-table-tab.view';
@@ -126,6 +128,9 @@ describe('MembersTableTabView', () => {
     expect(props.onChangeRole).toHaveBeenCalledWith('grace', 'admin');
     await user.click(screen.getByRole('button', { name: 'Manage Grace Hopper' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
+    expect(props.onRemove).not.toHaveBeenCalled();
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(props.onRemove).toHaveBeenCalledWith('grace');
   });
   it('renders the supplied member metadata without optional controls', () => {
@@ -143,4 +148,59 @@ describe('MembersTableTabView', () => {
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Manage|Invite/ })).not.toBeInTheDocument();
   });
+});
+
+it.each([true, false])('restores focus after confirmed removal with invite available: %s', async hasInvite => {
+  const user = userEvent.setup();
+  const pending = deferred<void>();
+  const onMutation = vi
+    .fn<(id: string) => Promise<void>>()
+    .mockImplementationOnce(() => pending.promise)
+    .mockResolvedValue(undefined);
+  function Example() {
+    const [items, setItems] = useState([
+      { ...propsFor().members[1], id: 'ada', name: 'Ada Lovelace' },
+      { ...propsFor().members[1], id: 'grace', name: 'Grace' },
+    ]);
+    return (
+      <MosaicProvider>
+        <MembersTableTabView
+          {...propsFor()}
+          members={items}
+          totalCount={items.length}
+          onInvite={hasInvite ? vi.fn() : undefined}
+          onRemove={async id => {
+            await onMutation(id);
+            setItems(current => current.filter(item => item.id !== id));
+          }}
+        />
+      </MosaicProvider>
+    );
+  }
+  render(<Example />);
+  await user.click(screen.getByRole('button', { name: 'Manage Ada Lovelace' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
+  expect(onMutation).not.toHaveBeenCalled();
+  await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancel' }));
+  await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  expect(onMutation).not.toHaveBeenCalled();
+  await user.click(screen.getByRole('button', { name: 'Manage Ada Lovelace' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
+  await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }));
+  expect(onMutation).toHaveBeenCalledExactlyOnceWith('ada');
+  expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+  await act(async () => {
+    pending.resolve();
+    await pending.promise;
+  });
+  await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  expect(screen.getByRole('button', { name: 'Manage Grace' })).toHaveFocus();
+  await user.click(screen.getByRole('button', { name: 'Manage Grace' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
+  await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }));
+  await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  expect(onMutation).toHaveBeenLastCalledWith('grace');
+  expect(
+    hasInvite ? screen.getByRole('button', { name: 'Invite members' }) : screen.getByRole('searchbox'),
+  ).toHaveFocus();
 });

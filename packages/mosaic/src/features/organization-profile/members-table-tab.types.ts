@@ -29,7 +29,7 @@ export interface MembersTableTabViewProps {
   onPageSizeChange?: (pageSize: number) => void;
   onSearchChange: (value: string) => void;
   onInvite?: () => void;
-  onRemove?: (id: string) => void;
+  onRemove?: (id: string) => void | Promise<void>;
   onChangeRole?: (id: string, role: string) => void;
   onBulkAction?: (ids: string[]) => void;
   sort?: MembersTableSort | null;
