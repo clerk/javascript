@@ -33,10 +33,16 @@ Test what this component decides, not what it delegates or how it looks.
 
 - **Don't re-test a component you consume.** If a flow renders `Dialog`, `Menu`,
   `ScrollArea` and so on, their own suites own focus trapping, Escape to close,
-  keyboard nav, and the rest. The consumer asserts only its own wiring: the
-  props it passes and the callbacks it hands over. Ask: would this test still
-  pass if the primitive's internals changed and this component didn't? If yes,
-  it belongs in the primitive's suite, or it's already there.
+  keyboard nav, and the rest. Ask: would this test still pass if the
+  primitive's internals changed and this component didn't? If yes, it belongs
+  in the primitive's suite, or it's already there.
+- **Don't test that a prop is passed through unchanged.** TypeScript catches a
+  renamed or missing required prop, and the integration test catches a broken
+  wire. Test a prop only when the component maps, picks, or overrides it
+  (`label` becomes `title`, a failed state picks `data-color="negative"`, a
+  consumer `className` wins over a default). An exported component also gets
+  one test that it forwards `ref`, `aria-*`, and the rest of its props to the
+  DOM, since that is its contract with consumers.
 - **Don't assert styles.** No `toHaveStyle`, `getComputedStyle`, or checks on
   StyleX class names. jsdom lays nothing out, so these only prove a string was
   passed through. They break on every restyle and never catch a visual bug.
