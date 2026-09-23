@@ -8,7 +8,7 @@ import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Flow } from '../../components/flow';
 import { Input } from '../../components/input';
-import { Reverification, type ReverificationProps } from '../../features/reverification';
+import { Reverification, type ReverificationController } from '../../features/reverification';
 import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
 import { useConfirmationController } from '../confirmation/confirmation.controller';
 
@@ -38,7 +38,7 @@ export interface DestructiveControlledProps {
   isDeleting?: boolean;
   /** Error message to display if the delete action fails */
   errorMessage?: string;
-  reverification?: ReverificationProps;
+  reverification?: ReverificationController;
 }
 
 type DestructiveCardProps = Omit<DestructiveControlledProps, 'onOpenChange' | 'trigger'>;
@@ -170,8 +170,8 @@ function DestructiveCard({
 function ControlledDestructive({ open, onOpenChange, trigger, reverification, ...props }: DestructiveControlledProps) {
   const handleOpenChange: NonNullable<DialogRootProps['onOpenChange']> = (...args) => {
     const [nextOpen] = args;
-    if (!nextOpen && reverification?.phase === 'active') {
-      reverification.cancel();
+    if (!nextOpen) {
+      reverification?.onCancel?.();
     }
     onOpenChange(...args);
   };

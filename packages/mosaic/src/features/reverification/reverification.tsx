@@ -1,12 +1,30 @@
-import { useReverificationController } from './reverification.controller';
+import { type ReverificationController, useReverificationController } from './reverification.controller';
 import { useReverificationModel } from './reverification.model';
-import type { ReverificationProps } from './reverification.types';
 import { ReverificationPending, ReverificationUnavailable, ReverificationView } from './reverification.view';
+import {
+  type ReverificationFetcher,
+  useReverificationWithState,
+  type UseReverificationWithStateOptions,
+  type UseReverificationWithStateResult,
+} from './use-reverification-with-state';
 
-export function Reverification(props: ReverificationProps) {
-  const model = useReverificationModel(props);
+export type UseReverificationFlowResult<F extends ReverificationFetcher = ReverificationFetcher> = readonly [
+  UseReverificationWithStateResult<F>[0],
+  ReverificationController,
+];
+
+export function useReverificationFlow<F extends ReverificationFetcher = ReverificationFetcher>(
+  fetcher: F,
+  options?: UseReverificationWithStateOptions,
+): UseReverificationFlowResult<F> {
+  const [wrappedFetcher, reverificationState] = useReverificationWithState(fetcher, options);
+  const model = useReverificationModel(reverificationState);
   const controller = useReverificationController(model);
 
+  return [wrappedFetcher, controller];
+}
+
+export function Reverification(controller: ReverificationController) {
   if (controller.status === 'idle') {
     return null;
   }
@@ -17,6 +35,5 @@ export function Reverification(props: ReverificationProps) {
     return <ReverificationUnavailable />;
   }
 
-  const { status: _status, ...viewProps } = controller;
-  return <ReverificationView {...viewProps} />;
+  return <ReverificationView {...controller} />;
 }
