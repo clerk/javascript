@@ -2,4 +2,11 @@ export type { AsyncFieldValidator, FieldConfig, FieldsConfig, FieldValidator } f
 export { FormSubmitError } from './form-submit-error';
 export type { FieldFeedback, FieldFeedbackType, FormError, FormFieldErrors } from './form-submit-error';
 export { useForm } from './use-form';
-export type { FormField, RegisteredField, TextFieldName, UseFormOptions, UseFormResult } from './use-form';
+export type {
+  ControlledField,
+  FormField,
+  RegisteredField,
+  TextFieldName,
+  UseFormOptions,
+  UseFormResult,
+} from './use-form';

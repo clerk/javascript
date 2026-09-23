@@ -82,7 +82,7 @@ export function isSubmittable<TValues extends object>(context: FormContext<TValu
 
 function toFormError<TValues extends object>(cause: unknown, fallbackMessage: string): FormError<TValues> {
   if (cause instanceof FormSubmitError) {
-    return { message: cause.message, fields: cause.fields };
+    return { message: cause.banner, fields: cause.fields };
   }
   if (cause instanceof Error) {
     return { message: cause.message };

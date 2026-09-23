@@ -13,11 +13,13 @@ export interface FormError<TValues extends object> {
 }
 
 export class FormSubmitError<TValues extends object = Record<string, unknown>> extends Error {
-  readonly fields?: FormFieldErrors<TValues>;
+  readonly banner: string | undefined;
+  readonly fields: FormFieldErrors<TValues> | undefined;
 
-  constructor(message: string, fields?: FormFieldErrors<TValues>) {
-    super(message);
+  constructor({ message, fields }: FormError<TValues>) {
+    super(message ?? Object.values(fields ?? {}).join(' '));
     this.name = 'FormSubmitError';
+    this.banner = message;
     this.fields = fields;
   }
 }

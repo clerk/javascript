@@ -107,8 +107,9 @@ describe('useForm: edit password', () => {
   it('shows the server rejection on the banner and under the field the model names', async () => {
     const onSubmit = vi.fn(() =>
       Promise.reject(
-        new FormSubmitError<EditPasswordValues>('Password could not be changed.', {
-          currentPassword: 'Incorrect password.',
+        new FormSubmitError<EditPasswordValues>({
+          message: 'Password could not be changed.',
+          fields: { currentPassword: 'Incorrect password.' },
         }),
       ),
     );

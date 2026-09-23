@@ -45,6 +45,7 @@ describe('useForm', () => {
     expectTypeOf(result.current.setValue).parameter(0).toEqualTypeOf<'username' | 'age'>();
     expectTypeOf(result.current.touch).parameter(0).toEqualTypeOf<'username' | 'age'>();
     expectTypeOf(result.current.register).parameter(0).toEqualTypeOf<'username'>();
+    expectTypeOf(result.current.control).parameter(0).toEqualTypeOf<'username' | 'age'>();
     expectTypeOf(result.current.fields.age.feedback).toEqualTypeOf<FieldFeedback | undefined>();
     expectTypeOf(result.current.error).toEqualTypeOf<string | undefined>();
     expectTypeOf(result.current.reset).parameter(0).toEqualTypeOf<{ username: string; age: number } | undefined>();
@@ -85,7 +86,8 @@ describe('useForm', () => {
     const { result } = renderHook(() =>
       useForm({
         initialValues: { username: 'alex' },
-        onSubmit: () => Promise.reject(new FormSubmitError('Could not save', { username: 'Taken' })),
+        onSubmit: () =>
+          Promise.reject(new FormSubmitError({ message: 'Could not save', fields: { username: 'Taken' } })),
       }),
     );
     await act(async () => {
@@ -97,6 +99,21 @@ describe('useForm', () => {
     act(() => result.current.setValue('username', 'alexc'));
     expect(result.current.error).toBe('Could not save');
     expect(result.current.fields.username.feedback).toBeUndefined();
+  });
+
+  it('maps a fields-only FormSubmitError onto field feedback with no form message', async () => {
+    const failure = new FormSubmitError({ fields: { username: 'Taken', bio: 'Too long' } });
+    expect(failure.message).toBe('Taken Too long');
+    const { result } = renderHook(() =>
+      useForm({ initialValues: { username: 'alex', bio: '' }, onSubmit: () => Promise.reject(failure) }),
+    );
+    await act(async () => {
+      result.current.submit();
+      await flush();
+    });
+    expect(result.current.error).toBeUndefined();
+    expect(result.current.fields.username.feedback).toEqual({ type: 'error', message: 'Taken' });
+    expect(result.current.fields.bio.feedback).toEqual({ type: 'error', message: 'Too long' });
   });
 
   it('shows only the message for a plain Error and a generic message otherwise', async () => {
@@ -348,6 +365,18 @@ describe('useForm', () => {
     expect(result.current.fields.username.touched).toBe(false);
     act(() => result.current.register('username').onBlur());
     expect(result.current.fields.username.touched).toBe(true);
+  });
+
+  it('controls a value-shaped field of any type with its name, value, value and blur handlers', () => {
+    const { result } = renderHook(() => useForm({ initialValues: { code: '', count: 0 }, onSubmit: resolved }));
+    expect(result.current.control('count')).toMatchObject({ name: 'count', value: 0 });
+    act(() => result.current.control('count').onValueChange(2));
+    expect(result.current.values.count).toBe(2);
+    act(() => result.current.control('code').onValueChange('123456'));
+    expect(result.current.control('code').value).toBe('123456');
+    expect(result.current.fields.code.touched).toBe(false);
+    act(() => result.current.control('code').onBlur());
+    expect(result.current.fields.code.touched).toBe(true);
   });
 
   it('focuses the first registered control with an error instead of submitting', () => {

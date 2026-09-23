@@ -35,6 +35,14 @@ export interface RegisteredField<TValues extends object, K extends keyof TValues
   ref: (element: HTMLElement | null) => void;
 }
 
+export interface ControlledField<TValues extends object, K extends keyof TValues> {
+  name: K;
+  value: TValues[K];
+  onValueChange: (value: TValues[K]) => void;
+  onBlur: () => void;
+  ref: (element: HTMLElement | null) => void;
+}
+
 export interface UseFormResult<TValues extends object> {
   id: string;
   values: TValues;
@@ -44,6 +52,7 @@ export interface UseFormResult<TValues extends object> {
   isDirty: boolean;
   canSubmit: boolean;
   register: <K extends TextFieldName<TValues>>(name: K) => RegisteredField<TValues, K>;
+  control: <K extends keyof TValues>(name: K) => ControlledField<TValues, K>;
   setValue: <K extends keyof TValues>(name: K, value: TValues[K]) => void;
   touch: (name: keyof TValues) => void;
   submit: () => void;
@@ -127,6 +136,13 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     onBlur: () => touch(name),
     ref: refFor(name),
   });
+  const control = <K extends keyof TValues>(name: K): ControlledField<TValues, K> => ({
+    name,
+    value: values[name],
+    onValueChange: value => setValue(name, value),
+    onBlur: () => touch(name),
+    ref: refFor(name),
+  });
 
   const isSubmitting = snapshot.value === 'submitting';
   const initial = initialOf(context);
@@ -150,6 +166,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     isDirty: keysOf(values).some(name => fields[name].isDirty),
     canSubmit: !isSubmitting && isSubmittable(context),
     register,
+    control,
     setValue,
     touch,
     submit,
