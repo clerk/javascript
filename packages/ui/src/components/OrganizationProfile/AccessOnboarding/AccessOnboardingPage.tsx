@@ -6,7 +6,7 @@ import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Header } from '@/ui/elements/Header';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
-import { Select } from '@/ui/elements/Select';
+import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tab, TabPanel, TabPanels, Tabs, TabsList } from '@/ui/elements/Tabs';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { Tooltip } from '@/ui/elements/Tooltip';
@@ -95,7 +95,20 @@ const AccessListPage = () => {
             }))}
             value={store.scenario}
             onChange={option => store.setScenario(option.value)}
-          />
+          >
+            <SelectButton
+              sx={t => ({ color: t.colors.$colorMutedForeground, fontSize: t.fontSizes.$sm, textWrap: 'nowrap' })}
+            >
+              <Text
+                as='span'
+                colorScheme='secondary'
+                sx={t => ({ fontSize: t.fontSizes.$sm })}
+              >
+                {`Prototype: ${SCENARIO_LABELS[store.scenario]}`}
+              </Text>
+            </SelectButton>
+            <SelectOptionList />
+          </Select>
         </Flex>
 
         <Tabs>
