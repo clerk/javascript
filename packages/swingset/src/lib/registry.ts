@@ -136,6 +136,12 @@ import {
   Overlay as OrganizationProfileOverlay,
 } from '../stories/organization-profile.stories';
 import {
+  Default as OrganizationProfileApiKeysPanelDefault,
+  Empty as OrganizationProfileApiKeysPanelEmpty,
+  meta as organizationProfileApiKeysPanelMeta,
+  ProposedTable as OrganizationProfileApiKeysPanelProposedTable,
+} from '../stories/organization-profile-api-keys-panel.stories';
+import {
   Default as OrganizationProfileDangerSectionDefault,
   LeaveOnly as OrganizationProfileDangerSectionLeaveOnly,
   meta as organizationProfileDangerSectionMeta,
@@ -245,7 +251,15 @@ import {
   Selection as TableSelection,
   Sorting as TableSorting,
 } from '../stories/table.stories';
+import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
+import {
+  Default as TagInputComponentDefault,
+  Disabled as TagInputComponentDisabled,
+  Invalid as TagInputComponentInvalid,
+  meta as tagInputComponentMeta,
+  Validation as TagInputComponentValidation,
+} from '../stories/tag-input.component.stories';
 import { meta as tagInputMeta } from '../stories/tag-input.stories';
 import {
   Colors as TextColors,
@@ -580,6 +594,14 @@ const otpComponentModule: StoryModule = {
   Disabled: OtpComponentDisabled,
 };
 
+const tagInputComponentModule: StoryModule = {
+  meta: tagInputComponentMeta,
+  Default: TagInputComponentDefault,
+  Validation: TagInputComponentValidation,
+  Invalid: TagInputComponentInvalid,
+  Disabled: TagInputComponentDisabled,
+};
+
 const textModule: StoryModule = { meta: textMeta, Default: TextDefault, Sizes: TextSizes, Colors: TextColors };
 
 const tooltipComponentModule: StoryModule = {
@@ -673,6 +695,11 @@ const tableModule: StoryModule = {
   Selection: TableSelection,
   Empty: TableEmpty,
   Overflow: TableOverflow,
+};
+
+const tabsComponentModule: StoryModule = {
+  meta: tabsComponentMeta,
+  Default: TabsComponentDefault,
 };
 
 // Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
@@ -825,6 +852,13 @@ const reverificationModule: StoryModule = {
   MethodPickerPending: ReverificationMethodPickerPending,
   Help: ReverificationHelp,
 };
+const organizationProfileApiKeysPanelModule: StoryModule = {
+  meta: organizationProfileApiKeysPanelMeta,
+  Default: OrganizationProfileApiKeysPanelDefault,
+  ProposedTable: OrganizationProfileApiKeysPanelProposedTable,
+  Empty: OrganizationProfileApiKeysPanelEmpty,
+};
+
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -852,6 +886,7 @@ export const registry: StoryModule[] = [
   organizationProfileModule,
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
+  organizationProfileApiKeysPanelModule,
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
   organizationProfileDangerSectionModule,
@@ -889,6 +924,8 @@ export const registry: StoryModule[] = [
   sectionModule,
   selectComponentModule,
   tableModule,
+  tabsComponentModule,
+  tagInputComponentModule,
   textModule,
   toastModule,
   tooltipComponentModule,

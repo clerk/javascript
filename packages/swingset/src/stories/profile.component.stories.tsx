@@ -1,3 +1,4 @@
+import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import type { ProfileRootProps } from '@clerk/mosaic/components/profile';
@@ -169,6 +170,7 @@ function Surface({
                 size='sm'
               />
             }
+            badge={item.id === 'security' ? <Badge>2</Badge> : undefined}
           >
             {item.label}
           </Profile.NavItem>

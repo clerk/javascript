@@ -3,6 +3,7 @@ import React from 'react';
 
 import { Icon } from '../components/icon';
 import type { IconName } from '../icons/registry';
+import { autoUpdate, getDimensions } from '../primitives/utils/dom';
 import { feedbackStyles } from './feedback.styles';
 
 export function hasMessage(children: React.ReactNode) {
@@ -17,16 +18,7 @@ export function useMessageHeight(active: HTMLElement | null) {
       return undefined;
     }
 
-    const measure = () => setHeight(active.offsetHeight);
-    measure();
-
-    if (typeof ResizeObserver === 'undefined') {
-      return undefined;
-    }
-
-    const observer = new ResizeObserver(measure);
-    observer.observe(active);
-    return () => observer.disconnect();
+    return autoUpdate(active, () => setHeight(getDimensions(active).height));
   }, [active]);
 
   return height;

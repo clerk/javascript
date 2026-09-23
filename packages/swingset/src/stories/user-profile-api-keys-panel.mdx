@@ -2,7 +2,7 @@ import * as Stories from './user-profile-api-keys-panel.stories';
 
 # UserProfileApiKeysPanel
 
-A controlled API keys table with search, page navigation, and confirmation before revocation. The caller supplies the current page and owns data updates; the panel owns the revoke interaction.
+A controlled API keys table with search, page navigation, and confirmation by typing the key name before revocation. The caller supplies the current page and owns data updates; the panel shares one destructive dialog across all key menus.
 
 ## Example
 
@@ -27,7 +27,7 @@ A controlled API keys table with search, page navigation, and confirmation befor
     { name: 'Field', href: '/components/field', layer: 'Components' },
     { name: 'Input', href: '/components/input', layer: 'Components' },
     { name: 'Select', href: '/components/select', layer: 'Components' },
-    { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
+    { name: 'Destructive', href: '/blocks/destructive', layer: 'Blocks' },
   ]}
 />
 

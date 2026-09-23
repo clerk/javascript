@@ -2,6 +2,7 @@ import { OrganizationProfileSaveError } from '@clerk/mosaic/features/organizatio
 import type { OrganizationProfileViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 import { useState } from 'react';
 
+import { useOrganizationProfileAPIKeysFixture } from './organization-profile-api-keys';
 import { usePreviewImage } from './use-preview-image';
 
 const INITIAL_NAME = 'Clerk';
@@ -20,6 +21,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
   const [name, setName] = useState(INITIAL_NAME);
   const [slug, setSlug] = useState(INITIAL_SLUG);
   const { imageUrl, showFile, clearImage } = usePreviewImage();
+  const apiKeys = useOrganizationProfileAPIKeysFixture();
 
   const save = async (field: 'name' | 'slug', apply: () => void) => {
     await settleAfter(800);
@@ -49,7 +51,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     members: {},
     security: {},
     billing: {},
-    apiKeys: {},
+    apiKeys,
   };
 
   return { activePage, setActivePage, pages, general, name };

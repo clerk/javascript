@@ -3,6 +3,7 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { type ComponentProps, mergeProps, useRender } from '../utils';
+import { autoUpdate, getDimensions } from '../utils/dom';
 import { FlowContext, type FlowContextValue, type FlowDirection } from './flow-context';
 
 export interface FlowRootProps extends ComponentProps<'div'> {
@@ -46,20 +47,10 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
       return;
     }
 
-    const measure = () => {
-      rootRef.current?.style.setProperty('--cl-flow-step-height', `${activeStep.offsetHeight}px`);
+    return autoUpdate(activeStep, () => {
+      rootRef.current?.style.setProperty('--cl-flow-step-height', `${getDimensions(activeStep).height}px`);
       setMeasured(true);
-    };
-
-    measure();
-
-    if (typeof ResizeObserver === 'undefined') {
-      return;
-    }
-
-    const observer = new ResizeObserver(measure);
-    observer.observe(activeStep);
-    return () => observer.disconnect();
+    });
   }, [activeStep]);
 
   useLayoutEffect(() => {

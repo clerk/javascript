@@ -1,13 +1,13 @@
 import type { Ref } from 'react';
 import { useId, useRef } from 'react';
 
-import { Button, SubmitButton } from '../../components/button';
+import { SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
+import { CopyButton } from '../../components/copy-button';
 import type { DialogFocusTarget } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Flow, useFlowAutoFocus } from '../../components/flow';
-import { Icon } from '../../components/icon';
 import { Input } from '../../components/input';
 import { InputGroup } from '../../components/input-group';
 import { Select } from '../../components/select';
@@ -190,15 +190,14 @@ function CopyKeyStep(props: UserProfileCreateAPIKeyDialogProps) {
               xstyle={truncationStyles.singleLine}
             />
             <InputGroup.End>
-              <Button
+              <CopyButton
                 ref={useFlowAutoFocus<HTMLButtonElement>()}
-                type='button'
-                aria-label={m.copy}
+                value={props.secret ?? ''}
+                label={m.copy}
+                copiedLabel={m.copied}
                 disabled={props.isPending}
-                onClick={() => void props.onCopy(false)}
-              >
-                <Icon name='clipboard' />
-              </Button>
+                onCopy={() => props.onCopy(false)}
+              />
             </InputGroup.End>
           </InputGroup.Root>
         </Field.Root>
