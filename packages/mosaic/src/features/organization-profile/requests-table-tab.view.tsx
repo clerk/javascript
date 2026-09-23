@@ -6,6 +6,7 @@ import { Button, SubmitButton } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Icon } from '../../components/icon';
 import { InputGroup } from '../../components/input-group';
+import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
 import { panelStyles } from '../../components/profile';
 import { Spinner } from '../../components/spinner';
@@ -197,31 +198,26 @@ export function RequestsTableTabView({
                     />
                   ) : null}
                   <Table.Cell>
-                    <div {...stylex.props(styles.identity)}>
-                      <Avatar.Root
-                        size='sm'
-                        aria-hidden
-                      >
-                        {request.imageUrl ? (
-                          <Avatar.Image
-                            src={request.imageUrl}
-                            alt=''
-                          />
-                        ) : null}
-                        <Avatar.Fallback />
-                      </Avatar.Root>
-                      <div {...stylex.props(styles.metadata)}>
-                        <Text xstyle={styles.name}>{request.name ?? request.email}</Text>
-                        {request.name ? (
-                          <Text
-                            size='xs'
-                            color='foreground-secondary'
-                          >
-                            {request.email}
-                          </Text>
-                        ) : null}
-                      </div>
-                    </div>
+                    <Item.Root>
+                      <Item.Media>
+                        <Avatar.Root
+                          size='fit'
+                          aria-hidden
+                        >
+                          {request.imageUrl ? (
+                            <Avatar.Image
+                              src={request.imageUrl}
+                              alt=''
+                            />
+                          ) : null}
+                          <Avatar.Fallback />
+                        </Avatar.Root>
+                      </Item.Media>
+                      <Item.Content>
+                        <Item.Label>{request.name ?? request.email}</Item.Label>
+                        {request.name ? <Item.Description>{request.email}</Item.Description> : null}
+                      </Item.Content>
+                    </Item.Root>
                   </Table.Cell>
                   <Table.Cell xstyle={styles.dateCell}>{request.requestedAtLabel}</Table.Cell>
                   {hasActions ? (
