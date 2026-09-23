@@ -5,6 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../components/button';
 import { Menu } from '../../components/menu';
+import type { ReverificationController } from '../../features/reverification';
 import { MosaicProvider } from '../../MosaicProvider';
 import type { DestructiveControlledProps, DestructiveHandleProps } from './destructive';
 import { Destructive } from './destructive';
@@ -32,11 +33,31 @@ function renderBlock(overrides: Partial<DestructiveControlledProps> = {}) {
 }
 
 const confirmButton = () => screen.getByRole('button', { name: 'Delete account' });
-const activeReverification = {
+const startingReverification = {
   status: 'loading' as const,
   phase: 'active' as const,
   onCancel: vi.fn(),
 };
+
+function readyReverification(phase: 'active' | 'retrying'): ReverificationController {
+  return {
+    status: 'ready',
+    phase,
+    step: 'password',
+    value: '',
+    onValueChange: () => {},
+    isPending: phase === 'retrying',
+    onSubmit: () => {},
+    onShowMethods: () => {},
+    onShowHelp: () => {},
+    onBack: () => {},
+    onEmailSupport: () => {},
+    onResend: () => {},
+    canResend: false,
+    methods: [],
+    onSelectMethod: () => {},
+  };
+}
 
 describe('Destructive', () => {
   it('renders nothing until the caller opens it', () => {
@@ -153,8 +174,17 @@ describe('Destructive', () => {
     expect(onDelete).not.toHaveBeenCalled();
   });
 
+  it('keeps the delete confirmation pending while verification is starting', () => {
+    renderBlock({ isDeleting: true, reverification: startingReverification });
+
+    expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'confirm');
+    expect(screen.getByRole('textbox')).toBeDisabled();
+    expect(confirmButton()).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByTestId('reverification')).not.toBeInTheDocument();
+  });
+
   it('shows reverification in the same dialog and card', () => {
-    renderBlock({ isDeleting: true, reverification: activeReverification });
+    renderBlock({ isDeleting: true, reverification: readyReverification('active') });
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
     expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
@@ -170,7 +200,7 @@ describe('Destructive', () => {
     renderBlock({
       isDeleting: true,
       onOpenChange,
-      reverification: { ...activeReverification, onCancel: cancel },
+      reverification: { ...startingReverification, onCancel: cancel },
     });
 
     await user.keyboard('{Escape}');
@@ -195,10 +225,12 @@ describe('Destructive', () => {
         <Destructive
           {...props}
           isDeleting
-          reverification={{ status: 'loading', phase: 'retrying' }}
+          reverification={readyReverification('retrying')}
         />
       </MosaicProvider>,
     );
+    expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
+    expect(screen.getByTestId('reverification')).toHaveTextContent('retrying');
 
     rerender(
       <MosaicProvider>

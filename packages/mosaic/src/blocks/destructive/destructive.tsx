@@ -69,7 +69,8 @@ function DestructiveCard({
   }, [open]);
 
   const isConfirmed = typedValue === confirmationValue;
-  const step = reverification && reverification.phase !== 'inactive' ? 'verify' : 'confirm';
+  const step =
+    reverification && reverification.status !== 'idle' && reverification.status !== 'loading' ? 'verify' : 'confirm';
 
   // The action sits in the footer, outside the form, so `form={formId}` associates the two.
   // That is what makes Enter in the field submit. Both guards are re-checked here because
@@ -170,8 +171,8 @@ function DestructiveCard({
 function ControlledDestructive({ open, onOpenChange, trigger, reverification, ...props }: DestructiveControlledProps) {
   const handleOpenChange: NonNullable<DialogRootProps['onOpenChange']> = (...args) => {
     const [nextOpen] = args;
-    if (!nextOpen) {
-      reverification?.onCancel?.();
+    if (!nextOpen && reverification && reverification.status !== 'idle') {
+      reverification.onCancel?.();
     }
     onOpenChange(...args);
   };
