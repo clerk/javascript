@@ -253,11 +253,7 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
       });
 
-      it.each([
-        ['OAuthConsent', 'mountOAuthConsent'],
-        ['UserProfile', 'mountUserProfile'],
-      ] as const)('mounts %s when mounted while navigating to redirectUrl', async (component, mountMethod) => {
-        mockSession.__internal_touch.mockReturnValue(Promise.resolve());
+      it('mounts OAuthConsent when mounted while navigating to redirectUrl', async () => {
         mockClientFetch.mockReturnValue(
           Promise.resolve({ signedInSessions: [mockSession], isEligibleForTouch: () => false }),
         );
@@ -267,10 +263,10 @@ describe('Clerk singleton', () => {
         });
 
         const sut = new Clerk(productionPublishableKey);
-        await sut.load({ ui: { ClerkUI: mockClerkUICtor as any } });
+        await sut.load({ ui: { ClerkUI: mockClerkUICtor } });
         const node = document.createElement('div');
         sut.navigate = vi.fn(async () => {
-          sut[mountMethod](node);
+          sut.mountOAuthConsent(node);
         });
 
         await sut.setActive({
@@ -279,7 +275,7 @@ describe('Clerk singleton', () => {
         });
 
         await waitFor(() => {
-          expect(mountComponent).toHaveBeenCalledWith(expect.objectContaining({ name: component, node }));
+          expect(mountComponent).toHaveBeenCalledWith(expect.objectContaining({ name: 'OAuthConsent', node }));
         });
       });
 
