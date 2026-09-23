@@ -1,5 +1,5 @@
 import { Button } from '@clerk/mosaic/components/button';
-import { CopyButton } from '@clerk/mosaic/components/copy-button';
+import { Icon } from '@clerk/mosaic/components/icon';
 import { useToastManager } from '@clerk/mosaic/components/toast';
 
 import type { StoryMeta } from '@/lib/types';
@@ -60,12 +60,25 @@ export function Default() {
 }
 
 export function Anchored() {
+  const manager = useToastManager();
   return (
     <div style={{ display: 'flex', justifyContent: 'center', paddingBlock: '3rem' }}>
-      <CopyButton
-        value='acme-inc'
-        resetAfter={1500}
-      />
+      <Button
+        variant='ghost'
+        shape='square'
+        aria-label='Copy'
+        onClick={event =>
+          manager.add({
+            id: 'copy',
+            description: 'Copied',
+            type: 'success',
+            timeout: 1500,
+            positionerProps: { anchor: event.currentTarget },
+          })
+        }
+      >
+        <Icon name='clipboard' />
+      </Button>
     </div>
   );
 }
