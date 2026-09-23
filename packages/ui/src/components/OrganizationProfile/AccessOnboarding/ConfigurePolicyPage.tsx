@@ -23,8 +23,10 @@ import type {
   ProtoProvider,
   ProtoSignIn,
 } from './prototypeState';
+import { DirectorySyncTab, SsoTab } from './PolicyTabs';
 import {
   APP_REVERIFICATION_HOURS,
+  connectionFor,
   ENROLLMENT_LABELS,
   formatReverification,
   needsOwnership,
@@ -55,6 +57,7 @@ export const ConfigurePolicyPage = ({ policyId }: { policyId: string }) => {
   const store = useAccessPrototype();
   const { navigate, queryParams } = useRouter();
   const policy = store.policies.find(entry => entry.id === policyId);
+  const connection = policy ? connectionFor(policy, store.connections) : null;
 
   const tabs: TabKey[] = useMemo(() => {
     if (!policy || policy.isCatchAll) {
@@ -141,12 +144,28 @@ export const ConfigurePolicyPage = ({ policyId }: { policyId: string }) => {
                       onDone={backToPolicies}
                       onContinue={goToTab}
                     />
+                  ) : key === 'sso' && connection ? (
+                    <SsoTab
+                      policy={policy}
+                      connection={connection}
+                      onContinue={() =>
+                        policy.enrollment === 'directory_sync' && !policy.directory?.configured
+                          ? goToTab('directory')
+                          : backToPolicies()
+                      }
+                    />
+                  ) : key === 'directory' ? (
+                    <DirectorySyncTab
+                      policy={policy}
+                      provider={policy.directory?.provider ?? connection?.provider ?? 'saml_okta'}
+                      onContinue={backToPolicies}
+                    />
                   ) : (
                     <Text
                       colorScheme='secondary'
                       sx={t => ({ paddingTop: t.space.$4 })}
                     >
-                      {`${TAB_LABELS[key]} arrives in the next commit.`}
+                      Choose a connection on the Overview tab first.
                     </Text>
                   )}
                 </TabPanel>
