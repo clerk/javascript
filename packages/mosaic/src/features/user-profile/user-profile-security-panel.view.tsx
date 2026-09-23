@@ -15,7 +15,7 @@ import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from './user-profile-passkeys-section.view';
 import type {
   UserProfileEditPasswordValue,
-  UserProfilePasswordManagedBy,
+  UserProfileManagedBy,
   UserProfilePasswordSectionViewProps,
 } from './user-profile-password-section/user-profile-password-section.view';
 import { UserProfilePasswordSectionView } from './user-profile-password-section/user-profile-password-section.view';
@@ -26,8 +26,8 @@ export type {
   UserProfileEditPasswordValue,
   UserProfileMfaAddableMethod,
   UserProfileMfaMethod,
+  UserProfileManagedBy,
   UserProfilePasskey,
-  UserProfilePasswordManagedBy,
 };
 
 export interface UserProfileSecurityPanelViewProps

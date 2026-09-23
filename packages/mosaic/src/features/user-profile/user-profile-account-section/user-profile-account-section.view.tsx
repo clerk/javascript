@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
+import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import { styles } from './user-profile-account-section.styles';
 import type {
   UserProfileEmail,
@@ -34,6 +35,7 @@ export interface UserProfileAccountSectionViewProps {
   lastName?: string;
   firstNameAttribute?: UserProfileNameAttribute;
   lastNameAttribute?: UserProfileNameAttribute;
+  nameManagedBy?: UserProfileManagedBy;
   /** Left out when the instance does not collect the attribute, which drops the row. */
   emails?: UserProfileEmail[];
   phones?: UserProfilePhone[];
@@ -67,6 +69,7 @@ export function UserProfileAccountSectionView({
   lastName,
   firstNameAttribute,
   lastNameAttribute,
+  nameManagedBy,
   emails,
   phones,
   onProfilePictureChange,
@@ -136,6 +139,7 @@ export function UserProfileAccountSectionView({
               lastName={lastName}
               firstNameAttribute={firstNameAttribute}
               lastNameAttribute={lastNameAttribute}
+              managedBy={nameManagedBy}
               onSubmit={onSubmitName}
             />
           ) : null}
