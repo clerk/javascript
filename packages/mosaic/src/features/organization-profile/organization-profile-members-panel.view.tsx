@@ -14,7 +14,10 @@ export interface OrganizationProfileMembersPanelViewProps {
   invitations?: InvitationsTableTabViewProps;
 }
 
-export function OrganizationProfileMembersPanelView({ members, invitations }: OrganizationProfileMembersPanelViewProps) {
+export function OrganizationProfileMembersPanelView({
+  members,
+  invitations,
+}: OrganizationProfileMembersPanelViewProps) {
   const m = useMessages('organizationProfile');
   const membersMessages = useMessages('membersTableTab');
   const invitationsMessages = useMessages('invitationsTableTab');

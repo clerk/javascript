@@ -20,17 +20,32 @@ export const meta: StoryMeta = {
 export function Legacy() {
   const members = useMembersTableFixture();
   const invitations = useInvitationsTableFixture();
-  return <OrganizationProfileMembersPanelView members={members} invitations={invitations} />;
+  return (
+    <OrganizationProfileMembersPanelView
+      members={members}
+      invitations={invitations}
+    />
+  );
 }
 
 export function Proposed() {
   const members = useMembersTableFixture({ proposed: true });
   const invitations = useInvitationsTableFixture({ proposed: true });
-  return <OrganizationProfileMembersPanelView members={members} invitations={invitations} />;
+  return (
+    <OrganizationProfileMembersPanelView
+      members={members}
+      invitations={invitations}
+    />
+  );
 }
 
 export function Empty() {
   const members = useMembersTableFixture({ empty: true });
   const invitations = useInvitationsTableFixture({ empty: true });
-  return <OrganizationProfileMembersPanelView members={members} invitations={invitations} />;
+  return (
+    <OrganizationProfileMembersPanelView
+      members={members}
+      invitations={invitations}
+    />
+  );
 }
