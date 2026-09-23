@@ -11,8 +11,8 @@ export const meta: StoryMeta = {
   status: 'wip',
   substatus: 'needs wire-up',
   title: 'RequestsTableTab',
-  label: 'Requests table tab',
-  navigation: { category: 'Tabs' },
+  label: 'Requests table',
+  navigation: { category: 'Panels' },
   source: 'packages/mosaic/src/features/organization-profile/requests-table-tab.view.tsx',
 };
 
