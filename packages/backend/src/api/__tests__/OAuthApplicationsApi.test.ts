@@ -7,6 +7,33 @@ import { createBackendApiClient } from '../factory';
 describe('OAuthApplications', () => {
   const oauthApplicationId = 'oauthapp_xxxxx';
 
+  describe('list', () => {
+    it('forwards the name filter alongside pagination', async () => {
+      const apiClient = createBackendApiClient({
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'sk_xxxxx',
+      });
+
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/oauth_applications',
+          validateHeaders(({ request }) => {
+            expect(Object.fromEntries(new URL(request.url).searchParams)).toEqual({
+              name_query: 'run-example',
+              limit: '100',
+              offset: '100',
+            });
+            return HttpResponse.json({ data: [], total_count: 100 });
+          }),
+        ),
+      );
+
+      const response = await apiClient.oauthApplications.list({ nameQuery: 'run-example', limit: 100, offset: 100 });
+
+      expect(response).toEqual({ data: [], totalCount: 100 });
+    });
+  });
+
   describe('revokeToken', () => {
     it('revokes an OAuth application token', async () => {
       const apiClient = createBackendApiClient({

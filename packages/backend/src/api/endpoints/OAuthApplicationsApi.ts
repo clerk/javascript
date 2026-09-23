@@ -39,6 +39,7 @@ export type RevokeOAuthApplicationTokenParams = {
 
 /** @generateWithEmptyComment */
 export type GetOAuthApplicationListParams = ClerkPaginationRequest<{
+  nameQuery?: string;
   /**
    * Returns OAuth applications in a particular order. Prefix a value with `+` to sort in ascending order, or `-` to sort in descending order. Defaults to `-created_at`.
    */
