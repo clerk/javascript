@@ -215,7 +215,7 @@ export function MembersTableTabView({
                       />
                     ) : null}
                     <Table.Cell>
-                      <Item.Root xstyle={styles.identity}>
+                      <Item.Root>
                         <Item.Media>
                           <Avatar.Root
                             size='fit'
@@ -230,7 +230,7 @@ export function MembersTableTabView({
                             <Avatar.Fallback />
                           </Avatar.Root>
                         </Item.Media>
-                        <Item.Content xstyle={styles.metadata}>
+                        <Item.Content>
                           <Item.Label xstyle={styles.name}>
                             {member.name}
                             {member.isCurrentUser ? (

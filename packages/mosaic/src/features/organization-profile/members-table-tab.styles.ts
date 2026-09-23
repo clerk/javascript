@@ -11,8 +11,6 @@ export const styles = stylex.create({
     justifyContent: 'space-between',
   },
   search: { maxWidth: '100%', width: '17rem' },
-  identity: { paddingInline: 0, height: 'auto' },
-  metadata: { gap: space['0.5'], minWidth: '20ch' },
   name: { gap: space['2'], alignItems: 'center', display: 'flex' },
   dateCell: { whiteSpace: 'nowrap' },
 });
