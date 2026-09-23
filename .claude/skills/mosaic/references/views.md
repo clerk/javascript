@@ -124,9 +124,9 @@ every successful removal drops focus on the floor.
 
 ## Testing
 
-Render the view directly with **plain props and `vi.fn()` callbacks**. No Clerk
-providers, no fixtures, no machine. **Wrap in `<MosaicProvider>`** — it is not a
-Clerk provider; it supplies the icon-override context, and wrapping keeps the
-test tree matching production. See `testing.md`.
+A view is covered by its feature's integration test, not a test of its own. See
+`testing.md`. Wrap anything you render in `<MosaicProvider>`: it supplies the
+icon-override and localization context, and keeps the test tree matching
+production.
 
 See `references/mosaic-architecture.md` → "Views" for the layer contract.

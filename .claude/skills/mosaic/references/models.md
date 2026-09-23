@@ -89,9 +89,10 @@ drops the fallback instead of holding the space open. Keep the two apart.
 
 ## Testing
 
-Mock `@clerk/shared/react` with mutable module-level vars reset in `beforeEach`,
-then `renderHook` the model and assert its output. This is the **highest-risk,
-least-covered layer**: it holds the Clerk resource semantics no other test can
-reach. When a migration loses behavior, it is usually a model responsibility
+The model is exercised by its feature's integration test, which mocks
+`@clerk/shared/react` and asserts each Clerk call through the DOM. A direct
+`renderHook` test is only for a matrix the DOM cannot reach cheaply (for
+example, URL routing across many redirect options). This is the **highest-risk,
+least-covered layer**: it holds the Clerk resource semantics. When a migration loses behavior, it is usually a model responsibility
 (revalidate timing, a permission gate, an empty-state rule) that quietly went
 missing — concentrate scrutiny here. See `testing.md`.

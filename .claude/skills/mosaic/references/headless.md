@@ -247,5 +247,4 @@ if (!element) return null;
 Tests run under **jsdom**, via Mosaic's own `vitest.config.mts`, and include
 `axe` accessibility assertions (`vitest-axe`'s `toHaveNoViolations`, registered
 in `src/primitives/test-utils/vitest.setup.ts`). `pnpm --filter @clerk/mosaic
-test`. See `testing.md` for the Mosaic flow-layer testing model (a different
-concern — that covers models/controllers/views, not these primitives).
+test`. See `testing.md` for what to test and what not to.

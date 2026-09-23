@@ -408,8 +408,7 @@ the criteria and worked before/afters for the calls in between.
 ### Views
 
 Views take plain props and callbacks. They branch on the props the controller
-derived — `open`, `pendingKey`, an absent callback — never on a machine snapshot,
-so a view test needs neither the machine nor Clerk:
+derived — `open`, `pendingKey`, an absent callback — never on a machine snapshot:
 
 ```tsx
 export function UserButtonView({ open, onOpenChange, pendingKey, onSignOutAll, ...data }: UserButtonProps) {
@@ -438,19 +437,15 @@ half-typed confirmation phrase and compares it, while `open`, `isDeleting`, and
 `errorMessage` come from the controller, because those are what decide whether the
 dialog closes or explains itself.
 
-### Testing the layers
+### Testing a flow
 
-Each layer is tested in isolation, and that isolation is the point — the model is
-the only test that mocks Clerk, and the view needs no machinery at all. See the
-`mosaic` skill's `references/testing.md` for the recipes.
-
-| Layer      | Test file                | What it needs                                   |
-| ---------- | ------------------------ | ----------------------------------------------- |
-| model      | `*.model.test.tsx`       | Mocked Clerk. The highest-risk layer.           |
-| controller | `*.controller.test.tsx`  | A fake model object. No Clerk.                  |
-| view       | `*.view.test.tsx`        | Plain props and `vi.fn()` callbacks.            |
-| wrapper    | `*.test.tsx`             | All three layers mocked; asserts the branching. |
-| whole      | `*.integration.test.tsx` | Mocked Clerk, real layers, real DOM.            |
+The split organizes code; it does not call for a test file per layer. A flow is
+tested mostly through one integration test: the real wrapper, model, controller,
+and view against a mocked `@clerk/shared/react`, driven through the DOM with
+`userEvent` and role queries. Unit tests are for pure helpers and machines with
+a real input space. Tests never mock a module inside `packages/mosaic`, never
+assert machine state or internal keys, and never assert CSS values in jsdom. See
+the `mosaic` skill's `references/testing.md` for the rules and recipes.
 
 ## Coexistence with existing system
 
@@ -509,10 +504,9 @@ The steps above cover the **styling** migration. For **flow** components — whe
 | `src/<feature>/*.view.tsx`              | Clerk-free rendering from plain props                                              |
 | `src/<feature>/*.types.ts`              | The data contract the model and the view both agree on                             |
 | `src/<feature>/*.messages.ts`           | Every string the surface renders; its keys are the `localization` paths            |
-| `src/utils/reset.test.tsx`              | Reset specs                                                                        |
 | `src/__tests__/MosaicProvider.test.tsx` | Icon-override and localization context specs                                       |
 | `src/components/button/button.test.tsx` | Component-level slot/state/variant specs                                           |
-| `src/features/user-button/__tests__/`   | The canonical per-layer test set to copy from                                      |
+| `src/features/user-button/__tests__/`   | `user-button.integration.test.tsx` is the flow test to copy                        |
 
 `machine/` is the runtime; `machines/` is machines written with it. The one-letter
 difference is easy to misread — a feature's own machine belongs in its

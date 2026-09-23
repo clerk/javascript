@@ -78,15 +78,15 @@ whether the interaction has the async lifecycle and mutually-constraining values
 that earn a machine, or whether it is `useState` (`controllers.md` → "Which one
 holds the state").
 
-Each layer is testable in isolation — that isolation is what makes the migration
-verifiable. Follow the recipes in `testing.md`: the model against a mocked Clerk,
-the controller against a fake model object, the view against plain props. The
-**model** is the highest-risk, least-covered layer — concentrate scrutiny there.
-Finish with one `*.integration.test.tsx` proving the layers compose.
+Test the migrated flow through one `*.integration.test.tsx`: the real layers
+against a mocked Clerk, driven through the DOM. Follow `testing.md`. Add a unit
+test only for a pure helper or machine with a real input space. The **model** is
+the highest-risk, least-covered layer, so make sure the integration test covers
+each Clerk call, capability gate, and redirect it owns.
 
 ## Phase 4 — Verify parity (the confidence step)
 
-Machine and view tests only cover branches you remembered to write. To catch the
+Tests only cover branches you remembered to write. To catch the
 ones you didn't, run an automated diff of legacy against new.
 
 Launch an **Explore subagent** with the prompt in `parity-audit.md`. Give it the
