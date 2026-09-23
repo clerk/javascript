@@ -1084,7 +1084,7 @@ class SignInFuture implements SignInFutureResource {
       const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.#resource.identifier;
       const locale = getBrowserLocale();
-      const timezone = this.#resource.id ? null : (params.timezone ?? getBrowserTimezone());
+      const timezone = params.timezone ?? this.#resource.timezone ?? getBrowserTimezone();
       await this.#resource.__internal_basePost({
         path: this.#resource.pathRoot,
         body: {

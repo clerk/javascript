@@ -60,7 +60,7 @@ export type SignInFuturePasswordParams = {
    * [password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled.
    */
   password: string;
-  /** The timezone to assign when this starts a new sign-in. If omitted, defaults to the browser's timezone. */
+  /** The timezone to assign to the new sign-in attempt. If omitted, reuses the current sign-in's timezone, then defaults to the browser's timezone. */
   timezone?: string;
 } & (
   | {

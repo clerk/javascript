@@ -991,7 +991,27 @@ describe('SignIn', () => {
         });
       });
 
-      it('omits timezone when continuing an existing sign-in', async () => {
+      it('reuses the timezone captured by an existing sign-in', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor', identifier: 'user@example.com' },
+        });
+        BaseResource._fetch = mockFetch;
+        const signIn = new SignIn({
+          id: 'signin_123',
+          identifier: 'user@example.com',
+          timezone: 'Europe/Paris',
+        } as any);
+
+        await signIn.__internal_future.password({ password: 'password123' });
+
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'Europe/Paris');
+      });
+
+      it('falls back to the browser timezone when an existing sign-in has none', async () => {
         vi.stubGlobal('Intl', {
           DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
         });
@@ -1004,7 +1024,7 @@ describe('SignIn', () => {
 
         await signIn.__internal_future.password({ password: 'password123' });
 
-        expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'America/New_York');
       });
 
       it('uses previous identifier when no identifier parameter is provided', async () => {
