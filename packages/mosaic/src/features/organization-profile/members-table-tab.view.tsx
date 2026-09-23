@@ -122,10 +122,7 @@ export function MembersTableTabView({
             xstyle={styles.search}
           >
             <InputGroup.Start>
-              <Icon
-                name='magnifying-glass'
-                aria-hidden='true'
-              />
+              <Icon name='magnifying-glass' />
             </InputGroup.Start>
             <InputGroup.Input
               ref={searchInput}
@@ -145,10 +142,7 @@ export function MembersTableTabView({
                     searchInput.current?.focus();
                   }}
                 >
-                  <Icon
-                    name='x'
-                    aria-hidden='true'
-                  />
+                  <Icon name='x' />
                 </Button>
               </InputGroup.End>
             ) : null}
