@@ -1,14 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
+import { ActionMenu } from '../../components/action-menu';
 import { Avatar } from '../../components/avatar';
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Icon } from '../../components/icon';
 import { InputGroup } from '../../components/input-group';
-import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
 import { panelStyles } from '../../components/profile';
 import { Select } from '../../components/select';
@@ -275,10 +275,16 @@ export function MembersTableTabView({
                     {onRemove ? (
                       <Table.Cell align='end'>
                         {!canManageMember(member) ? null : (
-                          <MemberActions
-                            member={member}
-                            registerTrigger={removalFocus.registerTrigger}
-                            onSelect={member => removeDialog.open(member)}
+                          <ActionMenu
+                            label={fill(m.manage, { name: member.name })}
+                            triggerRef={removalFocus.registerTrigger(member.id)}
+                            actions={[
+                              {
+                                label: m.remove,
+                                color: 'negative',
+                                onClick: () => removeDialog.open(member),
+                              },
+                            ]}
                           />
                         )}
                       </Table.Cell>
@@ -323,35 +329,5 @@ export function MembersTableTabView({
         />
       ) : null}
     </>
-  );
-}
-
-function MemberActions({
-  member,
-  registerTrigger,
-  onSelect,
-}: {
-  member: OrganizationProfileMember;
-  registerTrigger: (id: string) => (element: HTMLButtonElement | null) => void;
-  onSelect: (member: OrganizationProfileMember) => void;
-}) {
-  const m = useMessages('membersTableTab');
-  const [triggerRef] = useState(() => registerTrigger(member.id));
-  return (
-    <Menu.Root placement='bottom-end'>
-      <Menu.Trigger
-        ref={triggerRef}
-        aria-label={fill(m.manage, { name: member.name })}
-      />
-      <Menu.Popup>
-        <Menu.Item
-          color='negative'
-          label={m.remove}
-          onClick={() => onSelect(member)}
-        >
-          <Menu.Label>{m.remove}</Menu.Label>
-        </Menu.Item>
-      </Menu.Popup>
-    </Menu.Root>
   );
 }
