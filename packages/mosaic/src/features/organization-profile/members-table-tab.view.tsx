@@ -250,7 +250,7 @@ export function MembersTableTabView({
                     </Table.Cell>
                     <Table.Cell xstyle={styles.dateCell}>{member.joinedAtLabel}</Table.Cell>
                     <Table.Cell>
-                      {onChangeRole && canManageMember(member) ? (
+                      {onChangeRole && !member.isDeprovisioned ? (
                         <Select.Root
                           items={roles}
                           value={member.role}
@@ -262,6 +262,7 @@ export function MembersTableTabView({
                         >
                           <Select.Trigger
                             variant='ghost'
+                            disabled={member.isCurrentUser}
                             aria-label={fill(m.changeRole, { name: member.name })}
                             placeholder={member.roleLabel}
                           />

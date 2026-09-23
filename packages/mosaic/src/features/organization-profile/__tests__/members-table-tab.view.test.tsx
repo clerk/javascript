@@ -176,7 +176,7 @@ describe('MembersTableTabView', () => {
     const user = userEvent.setup();
     const { props } = renderView({ onRemove: vi.fn(), onChangeRole: vi.fn(), onInvite: vi.fn() });
     expect(screen.queryByRole('button', { name: 'Manage Ada Lovelace' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('combobox', { name: /^Change role for Ada Lovelace/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /^Change role for Ada Lovelace/ })).toBeDisabled();
     await user.click(screen.getByRole('button', { name: 'Invite members' }));
     expect(props.onInvite).toHaveBeenCalledOnce();
     await user.click(screen.getByRole('combobox', { name: /^Change role for Grace Hopper/ }));
