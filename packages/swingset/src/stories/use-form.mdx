@@ -1,0 +1,158 @@
+import * as UseFormStories from './use-form.stories';
+
+# useForm
+
+Form state for Mosaic controllers. Takes the initial values, an `onSubmit`, optional per-field validators and an optional submit gate, and returns typed values, per-field feedback, and the props each control needs. Every type is inferred from `initialValues`.
+
+## Example
+
+Try `clerk` for a taken username (the error shows once you leave the field), `error` for a server rejection, and press Enter while the availability check is still running.
+
+<Story
+  name='Default'
+  storyModule={UseFormStories}
+/>
+
+## Usage
+
+```tsx
+import { useForm } from '@clerk/mosaic/components/form';
+
+const form = useForm({
+  initialValues: { username: 'alex', displayName: 'Alex' },
+  fields: {
+    username: {
+      validate: value => (value.length < 3 ? { type: 'error', message: 'Use at least 3 characters.' } : undefined),
+      validateAsync: value => checkUsername(value),
+    },
+  },
+  onSubmit: values => saveProfile(values),
+});
+```
+
+Wire the form element with `id` and `handleSubmit`, a text control with `register`, and a control that reports its value directly with `control`:
+
+```tsx
+<form id={form.id} onSubmit={form.handleSubmit}>
+  {form.error ? (
+    <Banner.Root color='negative'>
+      <Banner.Label>{form.error}</Banner.Label>
+    </Banner.Root>
+  ) : null}
+
+  <Field.Root invalid={form.fields.username.feedback?.type === 'error'}>
+    <Field.Label>Username</Field.Label>
+    <InputGroup.Root>
+      <InputGroup.Input {...form.register('username')} />
+    </InputGroup.Root>
+    <Field.Message>
+      <Field.Error>{feedback?.type === 'error' ? feedback.message : null}</Field.Error>
+      <Field.Success>{feedback?.type === 'success' ? feedback.message : null}</Field.Success>
+    </Field.Message>
+  </Field.Root>
+
+  <PhoneInput {...form.control('phoneNumber')} />
+
+  <SubmitButton isPending={form.isSubmitting} disabled={!form.canSubmit || !form.isDirty}>
+    Save
+  </SubmitButton>
+</form>
+```
+
+`register` accepts only fields whose value is a string. `control` accepts any field and passes the value through unchanged. A checkbox reads and writes through `values` and `setValue`:
+
+```tsx
+<input
+  type='checkbox'
+  checked={form.values.signOutOfOtherSessions}
+  onChange={event => form.setValue('signOutOfOtherSessions', event.target.checked)}
+/>
+```
+
+When the view also needs its own ref on a registered control, merge them:
+
+```tsx
+const { ref, ...control } = form.register('username');
+const mergedRef = useMergeRefs([ref, initialFocusRef]);
+<InputGroup.Input ref={mergedRef} {...control} />;
+```
+
+A model reports a failed save by rejecting `onSubmit` with `FormSubmitError`. `message` lands on `form.error` and each `fields` entry on that field's feedback. Either part may be omitted: fields alone show only under the fields with no banner. A plain `Error` shows only its message, and anything else shows the localized generic message.
+
+```ts
+throw new FormSubmitError<ProfileValues>({
+  message: 'Your profile could not be saved.',
+  fields: { username: 'That username is reserved.' },
+});
+```
+
+A dialog calls `reset()` when it closes, or `reset(values)` to start from values loaded after mount. Both clear touched state, feedback, and the error, and set the baseline `isDirty` compares against.
+
+### Behavior
+
+- Error feedback shows only once a field is touched, by blur or by any submit attempt, and then updates live. Success, warning and info feedback show immediately. An untouched error still blocks submit, and a submit attempt focuses the first registered control in error.
+- A sync `validate` is a pure function of the current values, so cross-field checks need no extra wiring. Its result takes precedence over the async one for the same field.
+- An async `validateAsync` runs when its own field changes. The latest result wins, stale results drop, and the field reports `isValidating` while pending. The previous result stays visible until the next one arrives, but only a settled error blocks submit. It never runs for the initial value. A validator that rejects counts as no feedback.
+- A submit while a validator is pending is queued: `isSubmitting` turns on straight away and `onSubmit` runs once the last check resolves clean. Changing a field drops the queued submit.
+- A submit error under a field clears when that field changes. The banner persists until the next submit.
+- Changes and resets are ignored while `onSubmit` is running.
+
+## Options
+
+| Option          | Type                                    | Default       | Description                                                                 |
+| --------------- | --------------------------------------- | ------------- | --------------------------------------------------------------------------- |
+| `initialValues` | `TValues`                               | — (required)  | Starting values. Every other type is inferred from this object.             |
+| `fields`        | `FieldsConfig<TValues>`                 | —             | Per-field `validate` and `validateAsync`.                                   |
+| `onSubmit`      | `(values: TValues) => Promise<unknown>` | — (required)  | Runs on a valid submit. Reject with `FormSubmitError` to report a failure.  |
+| `canSubmit`     | `(values: TValues) => boolean`          | always `true` | Extra submit gate over the values. Blocks silently, with no field feedback. |
+
+### `FieldConfig`
+
+| Option          | Type                                                     | Default | Description                                       |
+| --------------- | -------------------------------------------------------- | ------- | ------------------------------------------------- |
+| `validate`      | `(value, values) => FieldFeedback \| undefined`          | —       | Sync check, evaluated on every render.            |
+| `validateAsync` | `(value, values) => Promise<FieldFeedback \| undefined>` | —       | Async check, run when this field's value changes. |
+
+## Return
+
+| Value          | Type                               | Description                                                                              |
+| -------------- | ---------------------------------- | ---------------------------------------------------------------------------------------- |
+| `id`           | `string`                           | Stable id for the `<form>` element, so a submit button can target it from outside.       |
+| `values`       | `TValues`                          | Current values.                                                                          |
+| `fields`       | `Record<keyof TValues, FormField>` | Per-field state, see below.                                                              |
+| `error`        | `string \| undefined`              | Banner message from the last failed submit.                                              |
+| `isSubmitting` | `boolean`                          | `onSubmit` is running, or a submit is queued behind async validation.                    |
+| `isDirty`      | `boolean`                          | Any field differs from its initial value.                                                |
+| `canSubmit`    | `boolean`                          | Not submitting, no field in error, and `canSubmit(values)` is `true`.                    |
+| `register`     | `(name) => RegisteredField`        | `name`, `value`, `onChange`, `onBlur` and `ref` for a text control.                      |
+| `control`      | `(name) => ControlledField`        | `name`, `value`, `onValueChange`, `onBlur` and `ref` for a control with `onValueChange`. |
+| `setValue`     | `(name, value) => void`            | Set one value.                                                                           |
+| `touch`        | `(name) => void`                   | Mark one field touched.                                                                  |
+| `submit`       | `() => void`                       | Touch every field and submit if valid.                                                   |
+| `handleSubmit` | `(event) => void`                  | `preventDefault` then `submit`, for `<form onSubmit>`.                                   |
+| `reset`        | `(values?) => void`                | Return to `initialValues`, or to `values`, clearing touched state, feedback and errors.  |
+
+### `FormField`
+
+| Field          | Type                         | Description                                                          |
+| -------------- | ---------------------------- | -------------------------------------------------------------------- |
+| `feedback`     | `FieldFeedback \| undefined` | The message to show. Errors are withheld until the field is touched. |
+| `isValidating` | `boolean`                    | An async check is pending.                                           |
+| `touched`      | `boolean`                    | Blurred or submitted at least once since the last reset.             |
+| `isDirty`      | `boolean`                    | Differs from its initial value.                                      |
+
+## Types
+
+```ts
+type FieldFeedbackType = 'error' | 'warning' | 'success' | 'info';
+interface FieldFeedback {
+  type: FieldFeedbackType;
+  message: string;
+}
+
+class FormSubmitError<TValues extends object> extends Error {
+  constructor(init: { message?: string; fields?: Partial<Record<keyof TValues, string>> });
+}
+
+type TextFieldName<TValues> = keys of TValues whose value is a string;
+```
