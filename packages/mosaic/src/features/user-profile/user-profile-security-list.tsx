@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
@@ -6,6 +6,7 @@ import { Section } from '../../components/section';
 
 export function UserProfileSecurityList({
   sectionTitle,
+  sectionRef,
   label,
   addLabel,
   emptyLabel,
@@ -15,6 +16,7 @@ export function UserProfileSecurityList({
   children,
 }: {
   sectionTitle?: string;
+  sectionRef?: Ref<HTMLElement>;
   label: string;
   addLabel: string;
   emptyLabel: string;
@@ -24,7 +26,11 @@ export function UserProfileSecurityList({
   children: ReactNode;
 }) {
   return (
-    <Section.Root aria-label={sectionTitle ? undefined : label}>
+    <Section.Root
+      ref={sectionRef}
+      tabIndex={-1}
+      aria-label={sectionTitle ? undefined : label}
+    >
       {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
       <Section.Group>
         <Section.Row>
