@@ -55,11 +55,26 @@ export function initialOf<TValues extends object>(context: FormContext<TValues>)
   return context.baseline ?? context.initialValues;
 }
 
+function syncFeedback<TValues extends object>(
+  context: FormContext<TValues>,
+  name: keyof TValues,
+): FieldFeedback | undefined {
+  return context.fields?.[name]?.validate?.(context.values[name], context.values);
+}
+
+function settledAsyncFeedback<TValues extends object>(
+  context: FormContext<TValues>,
+  name: keyof TValues,
+): FieldFeedback | undefined {
+  const state = context.async[name];
+  return state?.pending === true ? undefined : state?.feedback;
+}
+
 export function validatorFeedback<TValues extends object>(
   context: FormContext<TValues>,
   name: keyof TValues,
 ): FieldFeedback | undefined {
-  return context.fields?.[name]?.validate?.(context.values[name], context.values) ?? context.async[name]?.feedback;
+  return syncFeedback(context, name) ?? context.async[name]?.feedback;
 }
 
 export function fieldFeedback<TValues extends object>(
@@ -71,7 +86,9 @@ export function fieldFeedback<TValues extends object>(
 }
 
 export function firstInvalid<TValues extends object>(context: FormContext<TValues>): keyof TValues | undefined {
-  return keysOf(context.values).find(name => validatorFeedback(context, name)?.type === 'error');
+  return keysOf(context.values).find(
+    name => (syncFeedback(context, name) ?? settledAsyncFeedback(context, name))?.type === 'error',
+  );
 }
 
 export function isValid<TValues extends object>(context: FormContext<TValues>): boolean {
@@ -126,7 +143,7 @@ function asyncStateFor<TValues extends object>(
   if (context.fields?.[name]?.validateAsync === undefined || value === initialOf(context)[name]) {
     return undefined;
   }
-  return { value, feedback: undefined, pending: true };
+  return { value, feedback: context.async[name]?.feedback, pending: true };
 }
 
 type FormState = 'editing' | 'submitting';

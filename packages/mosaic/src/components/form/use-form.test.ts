@@ -268,6 +268,51 @@ describe('useForm', () => {
     expect(result.current.fields.password.feedback).toEqual({ type: 'success', message: 'Strong' });
   });
 
+  it('keeps the last async feedback while the next check runs and lets a stale error queue a submit', async () => {
+    const checks = new Map<string, ReturnType<typeof deferred<FieldFeedback | undefined>>>();
+    const onSubmit = vi.fn(resolved);
+    const { result } = renderHook(() =>
+      useForm({
+        initialValues: { username: '' },
+        fields: {
+          username: {
+            validateAsync: (value: string) => {
+              const check = deferred<FieldFeedback | undefined>();
+              checks.set(value, check);
+              return check.promise;
+            },
+          },
+        },
+        onSubmit,
+      }),
+    );
+    act(() => result.current.setValue('username', 'ab'));
+    await act(async () => {
+      checks.get('ab')?.resolve({ type: 'success', message: 'Available' });
+      await flush();
+    });
+    act(() => result.current.setValue('username', 'abc'));
+    expect(result.current.fields.username.isValidating).toBe(true);
+    expect(result.current.fields.username.feedback).toEqual({ type: 'success', message: 'Available' });
+    await act(async () => {
+      checks.get('abc')?.resolve({ type: 'error', message: 'Taken' });
+      await flush();
+    });
+    act(() => result.current.touch('username'));
+    expect(result.current.fields.username.feedback).toEqual({ type: 'error', message: 'Taken' });
+    act(() => result.current.setValue('username', 'abcd'));
+    expect(result.current.fields.username.feedback).toEqual({ type: 'error', message: 'Taken' });
+    expect(result.current.canSubmit).toBe(true);
+    act(() => result.current.submit());
+    expect(result.current.isSubmitting).toBe(true);
+    await act(async () => {
+      checks.get('abcd')?.resolve(undefined);
+      await flush();
+    });
+    expect(onSubmit).toHaveBeenCalledWith({ username: 'abcd' });
+    expect(result.current.fields.username.feedback).toBeUndefined();
+  });
+
   it('queues a submit while async validation is pending and runs it once the field validates', async () => {
     const check = deferred<FieldFeedback | undefined>();
     const onSubmit = vi.fn(resolved);
