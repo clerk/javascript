@@ -79,8 +79,9 @@ export const SsoTab = ({
   onDone: () => void;
   onContinueToDirectory?: () => void;
 }) => {
-  const { access, updatePolicy } = useAccessPrototype();
+  const { access, updatePolicy, addConnection, updateConnection } = useAccessPrototype();
   const [isActivating, setIsActivating] = useState(false);
+  const [isMocking, setIsMocking] = useState(false);
   const owned = policy.domains.every(domain => {
     const proof = policy.proofs[domain];
     return proof?.ownership === 'verified' || proof?.ownership === 'waived';
@@ -94,6 +95,33 @@ export const SsoTab = ({
       updatePolicy(policy.id, { signIn: 'sso', mfaRequired: false, connectionId: connection?.id });
       setIsActivating(false);
       (onContinueToDirectory ?? onDone)();
+    });
+  };
+
+  // Prototype shortcut: completes the three steps (ownership, an Okta
+  // connection, a passing test) so the routing after Activate can be walked
+  // through without doing the setup.
+  const mock = () => {
+    setIsMocking(true);
+    void simulateRequest(600).then(() => {
+      const connectionId = connection?.id ?? addConnection('saml_okta', 'Okta').id;
+      updateConnection(connectionId, current => ({
+        status: 'active',
+        logs: [
+          { id: `log_${Date.now()}`, at: new Date().toISOString(), detail: 'Mocked sign-in', status: 'success' },
+          ...current.logs,
+        ],
+      }));
+      updatePolicy(policy.id, current => ({
+        connectionId,
+        proofs: Object.fromEntries(
+          current.domains.map(domain => [
+            domain,
+            { ...(current.proofs[domain] ?? { affiliation: false }), ownership: 'verified' as const },
+          ]),
+        ),
+      }));
+      setIsMocking(false);
     });
   };
 
@@ -174,7 +202,19 @@ export const SsoTab = ({
         ) : null}
       </Step>
 
-      <FormButtonContainer>
+      <FormButtonContainer sx={{ justifyContent: 'space-between' }}>
+        {!isLive && access.canManage ? (
+          <Button
+            variant='link'
+            textVariant='buttonSmall'
+            block={false}
+            isLoading={isMocking}
+            onClick={mock}
+            localizationKey={protoKey('Mock the setup (prototype)')}
+          />
+        ) : (
+          <span />
+        )}
         {isLive ? (
           <Button
             textVariant='buttonSmall'
@@ -190,7 +230,7 @@ export const SsoTab = ({
               isDisabled={!access.canManage || !owned || !isConnected}
               isLoading={isActivating}
               onClick={activate}
-              localizationKey={protoKey('Activate single sign-on')}
+              localizationKey={protoKey('Save & activate')}
             />
             {!owned || !isConnected ? (
               <Text
@@ -711,7 +751,16 @@ export const DirectorySyncTab = ({
         </Flex>
       ))}
 
-      <FormButtonContainer>
+      <FormButtonContainer sx={{ justifyContent: 'space-between' }}>
+        {/* Prototype shortcut: a token is generated on save if none exists. */}
+        <Button
+          variant='link'
+          textVariant='buttonSmall'
+          block={false}
+          isLoading={isSaving}
+          onClick={save}
+          localizationKey={protoKey('Mock the setup (prototype)')}
+        />
         <Button
           textVariant='buttonSmall'
           block={false}

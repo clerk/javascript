@@ -183,7 +183,10 @@ const PoliciesPanel = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {policies.map(policy => (
+                {[
+                  ...policies.filter(policy => !policy.isCatchAll),
+                  ...policies.filter(policy => policy.isCatchAll),
+                ].map(policy => (
                   <PolicyRow
                     key={policy.id}
                     policy={policy}

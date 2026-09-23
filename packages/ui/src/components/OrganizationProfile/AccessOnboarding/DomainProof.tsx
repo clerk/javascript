@@ -1,11 +1,8 @@
 import { useState } from 'react';
 
 import { ClipboardInput } from '@/ui/elements/ClipboardInput';
-import { useFieldOTP } from '@/ui/elements/CodeControl';
-import { Form } from '@/ui/elements/Form';
-import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { Badge, Box, Button, Col, Flex, Icon, Text } from '../../../customizables';
+import { Badge, Button, Col, Flex, Icon, Text } from '../../../customizables';
 import { ExclamationTriangle } from '../../../icons';
 import type { ProtoPolicy } from './prototypeState';
 import { protoKey, simulateRequest, txtRecordFor, useAccessPrototype } from './prototypeState';
@@ -65,20 +62,23 @@ export const DomainProof = ({
       </ProofLine>
     );
   }
-  if (proof.ownership === 'verified' || (!ownershipNeeded && proof.affiliation)) {
+  if (proof.ownership === 'verified') {
     return (
       <ProofLine domain={domain}>
-        <Badge colorScheme='success'>Verified</Badge>
+        <Badge colorScheme='success'>Ownership verified</Badge>
       </ProofLine>
     );
   }
-  return ownershipNeeded ? (
+  if (!ownershipNeeded) {
+    // Not "verified": nothing was checked. The state says no proof applies.
+    return (
+      <ProofLine domain={domain}>
+        <Badge colorScheme='secondary'>No proof needed</Badge>
+      </ProofLine>
+    );
+  }
+  return (
     <DnsProof
-      policy={policy}
-      domain={domain}
-    />
-  ) : (
-    <AffiliationProof
       policy={policy}
       domain={domain}
     />
@@ -162,95 +162,3 @@ const RecordRow = ({ label, value }: { label: string; value: string }) => (
     <Badge colorScheme='secondary'>{value}</Badge>
   </Flex>
 );
-
-export const AffiliationProof = ({ policy, domain }: { policy: ProtoPolicy; domain: string }) => {
-  const { updatePolicy } = useAccessPrototype();
-  const [step, setStep] = useState<'email' | 'code'>('email');
-  const [isSending, setIsSending] = useState(false);
-  const emailField = useFormControl('affiliationEmailAddress', '', {
-    type: 'text',
-    label: protoKey('Email'),
-    placeholder: protoKey('you'),
-    isRequired: true,
-  });
-  const address = `${emailField.value}@${domain}`;
-
-  const otp = useFieldOTP({
-    onCodeEntryFinished: (_code, resolve) => {
-      // Any six digits pass in the prototype.
-      void simulateRequest().then(async () => {
-        await resolve();
-        updatePolicy(policy.id, current => ({
-          proofs: {
-            ...current.proofs,
-            [domain]: {
-              ...current.proofs[domain],
-              affiliation: true,
-              ownership: 'unverified',
-              affiliationEmail: address,
-            },
-          },
-        }));
-      });
-    },
-    onResendCodeClicked: () => {},
-  });
-
-  const send = (event: React.FormEvent) => {
-    event.preventDefault();
-    setIsSending(true);
-    void simulateRequest().then(() => {
-      setIsSending(false);
-      setStep('code');
-    });
-  };
-
-  if (step === 'code') {
-    return (
-      <Col sx={t => ({ gap: t.space.$2 })}>
-        <Text sx={smallSx}>
-          Enter the code sent to <strong>{address}</strong>
-        </Text>
-        <Form.OTPInput
-          {...otp}
-          label={protoKey('')}
-          description={protoKey('')}
-          resendButton={protoKey("Didn't receive the code? Resend")}
-        />
-      </Col>
-    );
-  }
-
-  return (
-    <Form.Root onSubmit={send}>
-      <Col sx={t => ({ gap: t.space.$2 })}>
-        <Text sx={smallSx}>
-          Confirm your domain with an email ending in <strong>{`@${domain}`}</strong>
-        </Text>
-        <Flex
-          align='end'
-          gap={2}
-        >
-          <Box sx={{ flex: 1 }}>
-            <Form.ControlRow elementId={emailField.id}>
-              <Form.InputGroup
-                {...emailField.props}
-                groupSuffix={`@${domain}`}
-                ignorePasswordManager
-              />
-            </Form.ControlRow>
-          </Box>
-          <Button
-            type='submit'
-            variant='outline'
-            textVariant='buttonSmall'
-            block={false}
-            isDisabled={!emailField.value}
-            isLoading={isSending}
-            localizationKey={protoKey('Send')}
-          />
-        </Flex>
-      </Col>
-    </Form.Root>
-  );
-};

@@ -403,7 +403,15 @@ export const useAccessPrototype = () => {
     (name: string) => {
       const domain = name.trim().toLowerCase();
       const policy = newPolicy(domain);
-      update(previous => ({ ...previous, policies: [...previous.policies, policy] }));
+      // The catch-all is always the last row.
+      update(previous => ({
+        ...previous,
+        policies: [
+          ...previous.policies.filter(entry => !entry.isCatchAll),
+          policy,
+          ...previous.policies.filter(entry => entry.isCatchAll),
+        ],
+      }));
       return policy;
     },
     [update],

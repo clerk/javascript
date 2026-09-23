@@ -210,18 +210,15 @@ const OverviewTab = withCardStateProvider(
 
     const isCatchAll = Boolean(policy.isCatchAll);
     const ownershipNeeded = needsOwnership(draft);
-    // Overview only gates on affiliation: ownership is asked for on the tab
-    // that needs it (SSO), so choosing SSO here never blocks on a DNS record.
-    const affiliationProven = draft.domains.every(domain => {
-      const proof = policy.proofs[domain];
-      return Boolean(proof && (proof.affiliation || proof.ownership === 'verified' || proof.ownership === 'waived'));
-    });
     const activeConnection = policy.connectionId
       ? connections.find(entry => entry.id === policy.connectionId && entry.status === 'active')
       : undefined;
+    // Proof is only ever asked for on the SSO tab, and only when sign-in or
+    // enrollment needs it. Overview never blocks on it.
+    const wantsDirectory = draft.enrollment === 'directory_sync';
     const needsSetup =
-      (draft.signIn === 'sso' && !activeConnection) ||
-      (draft.enrollment === 'directory_sync' && !policy.directory?.configured);
+      ((draft.signIn === 'sso' || wantsDirectory) && !activeConnection) ||
+      (wantsDirectory && !policy.directory?.configured);
 
     const isDirty =
       draft.domains.join() !== policy.domains.join() ||
@@ -255,10 +252,12 @@ const OverviewTab = withCardStateProvider(
           ),
         }));
         setIsSaving(false);
-        // Save & configure: the next thing that needs setting up, else the table.
-        if (draft.signIn === 'sso' && !activeConnection) {
+        // Save & configure: the next thing that needs setting up, else the
+        // table. Directory sync needs a live SSO connection first, so on its
+        // own it still starts on the SSO tab; SSO then hands over to it.
+        if ((draft.signIn === 'sso' || wantsDirectory) && !activeConnection) {
           onContinue('sso');
-        } else if (draft.enrollment === 'directory_sync' && !policy.directory?.configured) {
+        } else if (wantsDirectory && !policy.directory?.configured) {
           onContinue('directory');
         } else {
           onDone();
@@ -354,12 +353,17 @@ const OverviewTab = withCardStateProvider(
                     colorScheme='secondary'
                     sx={t => ({ fontSize: t.fontSizes.$xs })}
                   >
-                    Single sign-on needs proof you own the domain. You’ll add a DNS record on the SSO tab.
+                    {draft.signIn === 'sso'
+                      ? 'Single sign-on needs proof you own the domain. You’ll add a DNS record on the SSO tab.'
+                      : 'Directory sync needs proof you own the domain. You’ll add a DNS record on the SSO tab.'}
                   </Text>
                 ) : null}
               </Col>
             ) : (
-              <Col sx={t => ({ gap: t.space.$4 })}>
+              // Default sign-in with a plain enrollment takes people's word
+              // for their email domain; nothing to prove, and the row says so
+              // rather than claiming a verification that never happened.
+              <Col sx={t => ({ gap: t.space.$2 })}>
                 {draft.domains.map(domain => (
                   <DomainProof
                     key={domain}
@@ -368,6 +372,12 @@ const OverviewTab = withCardStateProvider(
                     ownershipNeeded={false}
                   />
                 ))}
+                <Text
+                  colorScheme='secondary'
+                  sx={t => ({ fontSize: t.fontSizes.$xs })}
+                >
+                  Proof of ownership is only needed for single sign-on or directory sync.
+                </Text>
               </Col>
             )}
           </SettingRow>
@@ -384,11 +394,7 @@ const OverviewTab = withCardStateProvider(
           <Button
             textVariant='buttonSmall'
             block={false}
-            isDisabled={
-              !access.canManage ||
-              (!isDirty && !needsSetup) ||
-              (!isCatchAll && (draft.domains.length === 0 || (!ownershipNeeded && !affiliationProven)))
-            }
+            isDisabled={!access.canManage || (!isDirty && !needsSetup) || (!isCatchAll && draft.domains.length === 0)}
             isLoading={isSaving}
             onClick={save}
             localizationKey={protoKey(needsSetup ? 'Save & configure' : 'Save changes')}
@@ -596,11 +602,12 @@ const EnrollmentSelect = ({
   isCatchAll: boolean;
   directoryConfigured: boolean;
 }) => {
+  // Directory sync is offered whatever the sign-in: it needs SSO today, and
+  // the setup flow takes you there, but the choice itself stays independent
+  // so nothing changes here when the two are decoupled.
   const modes: ProtoEnrollment[] = isCatchAll
     ? ['invitation_only', 'request_access']
-    : draft.signIn === 'sso'
-      ? ['join_automatically', 'directory_sync', 'request_access', 'invitation_only']
-      : ['join_automatically', 'request_access', 'invitation_only'];
+    : ['join_automatically', 'directory_sync', 'request_access', 'invitation_only'];
   const recommended: ProtoEnrollment | null = isCatchAll ? null : 'join_automatically';
   const options = modes.map(mode => ({ value: mode, label: ENROLLMENT_LABELS[mode].label }));
   const selected = ENROLLMENT_LABELS[draft.enrollment];
@@ -657,7 +664,11 @@ const EnrollmentSelect = ({
             }
           />
           {!directoryConfigured ? (
-            <WarningLine>You will configure directory sync after saving this policy</WarningLine>
+            <WarningLine>
+              {draft.signIn === 'sso'
+                ? 'You will configure directory sync after saving this policy'
+                : 'Directory sync needs single sign-on. You will set up both after saving this policy'}
+            </WarningLine>
           ) : null}
         </Col>
       ) : null}
