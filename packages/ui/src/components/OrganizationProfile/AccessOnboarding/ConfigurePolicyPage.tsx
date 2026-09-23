@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { ClipboardInput } from '@/ui/elements/ClipboardInput';
 import { useFieldOTP } from '@/ui/elements/CodeControl';
 import { withCardStateProvider } from '@/ui/elements/contexts';
+import { Field } from '@/ui/elements/FieldControl';
 import { Form } from '@/ui/elements/Form';
 import { FormButtonContainer } from '@/ui/elements/FormButtons';
 import { Header } from '@/ui/elements/Header';
@@ -467,21 +468,50 @@ const SignInOptions = ({
 
   return (
     <Col sx={t => ({ gap: t.space.$3 })}>
-      <Form.RadioGroup
+      {/*
+        Drawn option by option rather than with Form.RadioGroup so the
+        multi-factor switch can sit inside the Default option: it is only
+        supported for default sign-in, so it belongs under that choice and
+        nowhere else.
+      */}
+      <Field.Root
         {...field.props}
         value={draft.signIn}
         onChange={event => set('signIn', (event.target as HTMLInputElement).value as ProtoSignIn)}
-      />
+      >
+        <Col gap={3}>
+          {field.props.radioOptions?.map(option => (
+            <Col
+              key={option.value}
+              sx={t => ({
+                gap: t.space.$2,
+                borderWidth: t.borderWidths.$normal,
+                borderStyle: t.borderStyles.$solid,
+                borderColor: t.colors.$borderAlpha100,
+                borderRadius: t.radii.$md,
+                padding: t.space.$2,
+              })}
+            >
+              <Field.RadioItem
+                value={option.value}
+                label={option.label}
+                description={option.description}
+              />
+              {option.value === 'default' && draft.signIn === 'default' ? (
+                <Box sx={t => ({ paddingInlineStart: t.space.$6, paddingBottom: t.space.$1 })}>
+                  <Switch
+                    isChecked={draft.mfaRequired}
+                    onChange={checked => set('mfaRequired', checked)}
+                    label={protoKey('Require multi-factor verification')}
+                  />
+                </Box>
+              ) : null}
+            </Col>
+          ))}
+        </Col>
+      </Field.Root>
 
-      {draft.signIn === 'default' ? (
-        <Box sx={t => ({ paddingInlineStart: t.space.$6 })}>
-          <Switch
-            isChecked={draft.mfaRequired}
-            onChange={checked => set('mfaRequired', checked)}
-            label={protoKey('Require multi-factor verification')}
-          />
-        </Box>
-      ) : (
+      {draft.signIn === 'sso' ? (
         <Col sx={t => ({ gap: t.space.$2, paddingInlineStart: t.space.$6 })}>
           <Select
             elementId='role'
@@ -527,7 +557,7 @@ const SignInOptions = ({
             <WarningLine>You will configure your provider after saving this policy</WarningLine>
           ) : null}
         </Col>
-      )}
+      ) : null}
 
       {!isCatchAll && !ssoAllowed ? (
         <Col sx={t => ({ gap: t.space.$0x5 })}>
