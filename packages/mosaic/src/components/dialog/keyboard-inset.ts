@@ -11,7 +11,7 @@
  * serves all three sizes without any per-size branching:
  *
  * - `prompt` is `align-self: end`, so it rises to sit exactly on top of the keyboard.
- * - `card` is centred, so it re-centres in the space that is left — it moves up, and its height is
+ * - `card` is centered, so it re-centers in the space that is left — it moves up, and its height is
  *   still driven by its content, so nothing is squashed.
  * - `profile` is `align-self: stretch`, so it shrinks — which is right for the one surface that
  *   already composes its own scroll region.

@@ -97,11 +97,6 @@ const nextConfig = {
     }
 
     config.resolve.alias['@clerk/mosaic'] = resolve(__dirname, '../mosaic/src');
-    // Consume @clerk/headless primitives from source (no dist build needed), mirroring Mosaic.
-    // `/hooks` and `/utils` live outside `primitives/`, so alias them first (more specific wins).
-    config.resolve.alias['@clerk/headless/hooks'] = resolve(__dirname, '../headless/src/hooks');
-    config.resolve.alias['@clerk/headless/utils'] = resolve(__dirname, '../headless/src/utils');
-    config.resolve.alias['@clerk/headless'] = resolve(__dirname, '../headless/src/primitives');
     // Mosaic/headless source imports this. Webpack resolves from the aliased file's
     // directory, which is outside swingset, so the package has to be named here.
     config.resolve.alias['@floating-ui/react'] = dirname(require.resolve('@floating-ui/react/package.json'));

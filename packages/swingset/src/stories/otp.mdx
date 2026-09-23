@@ -2,7 +2,7 @@ import * as OtpStories from './otp.stories';
 
 # OTP
 
-A one-time-password / PIN input from `@clerk/headless`. It is a **headless** primitive: it owns the
+A one-time-password / PIN input. It is a **headless** primitive: it owns the
 value (a single string), splits it across per-character `Input` slots, and handles focus movement,
 keyboard editing, and paste distribution, but ships **no styles** — you bring your own CSS by
 targeting the `data-*` attributes each part emits.
@@ -25,7 +25,7 @@ The value lives in `Otp.Root`. Read the slots with the `useOtp` hook and render 
 slot, passing each its `index`:
 
 ```tsx
-import { Otp } from '@clerk/headless/otp';
+import { Otp } from '@clerk/mosaic/primitives/otp';
 
 function VerifyCode() {
   return (

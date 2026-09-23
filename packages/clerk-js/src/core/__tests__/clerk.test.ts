@@ -253,6 +253,32 @@ describe('Clerk singleton', () => {
         expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
       });
 
+      it('mounts OAuthConsent when mounted while navigating to redirectUrl', async () => {
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({ signedInSessions: [mockSession], isEligibleForTouch: () => false }),
+        );
+        const mountComponent = vi.fn();
+        const mockClerkUICtor = vi.fn(function () {
+          return { ensureMounted: () => Promise.resolve({ mountComponent }) };
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load({ ui: { ClerkUI: mockClerkUICtor } });
+        const node = document.createElement('div');
+        sut.navigate = vi.fn(async () => {
+          sut.mountOAuthConsent(node);
+        });
+
+        await sut.setActive({
+          session: mockSession as any as ActiveSessionResource,
+          redirectUrl: '/oauth-consent',
+        });
+
+        await waitFor(() => {
+          expect(mountComponent).toHaveBeenCalledWith(expect.objectContaining({ name: 'OAuthConsent', node }));
+        });
+      });
+
       describe('with `touchSession` set to false', () => {
         it('calls session.touch by default outside of focus window event', async () => {
           mockSession.touch.mockReturnValue(Promise.resolve());

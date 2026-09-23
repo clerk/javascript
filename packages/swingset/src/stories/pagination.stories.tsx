@@ -13,8 +13,8 @@ export { default as __source } from './pagination.stories?raw';
 export const meta: StoryMeta = {
   group: 'Components',
   status: 'wip',
-  substatus: 'needs design',
   title: 'Pagination',
+  layout: 'wide',
   source: 'packages/mosaic/src/components/pagination/pagination.tsx',
   styles: {
     _variants: {
@@ -22,7 +22,7 @@ export const meta: StoryMeta = {
       disabled: { true: {}, false: {} },
     },
     _defaultVariants: {
-      hasFirstLast: false,
+      hasFirstLast: true,
       disabled: false,
     },
   },
@@ -66,7 +66,7 @@ export function FirstLast(props: Record<string, unknown>) {
   );
 }
 
-export function Siblings(props: Record<string, unknown>) {
+export function MiddlePage(props: Record<string, unknown>) {
   const [page, setPage] = useState(10);
   return (
     <Pagination
@@ -75,7 +75,6 @@ export function Siblings(props: Record<string, unknown>) {
       totalItems={200}
       pageSize={10}
       onChange={setPage}
-      siblingCount={2}
     />
   );
 }

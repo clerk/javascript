@@ -1,4 +1,3 @@
-import type { RenderProps } from '@clerk/headless/utils';
 import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import type { DialogCompactPlacement, DialogVariant } from '@clerk/mosaic/components/dialog';
@@ -7,6 +6,7 @@ import { Heading } from '@clerk/mosaic/components/heading';
 import { Input } from '@clerk/mosaic/components/input';
 import { Text } from '@clerk/mosaic/components/text';
 import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import type { RenderProps } from '@clerk/mosaic/primitives/utils';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -152,7 +152,7 @@ const addEmailTrigger = (props: RenderProps) => <Button {...props}>Add email add
 
 /**
  * `compactPlacement='sheet'` bottom-anchors the surface in the compact band — the dialog viewport
- * under `48rem` — and slides it up from the edge, instead of centring it. Above the band nothing
+ * under `48rem` — and slides it up from the edge, instead of centering it. Above the band nothing
  * changes, so narrow the window to see it.
  *
  * For a dialog that asks one thing and returns: a confirmation, or a single-field form like this

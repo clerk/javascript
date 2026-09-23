@@ -1,15 +1,17 @@
-import { useRender } from '@clerk/headless/utils';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useTransition } from '../../primitives/hooks/use-transition';
+import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../../utils/feedback';
+import { feedbackHeight, feedbackStyles } from '../../utils/feedback.styles';
 import { reset } from '../../utils/reset.styles';
 import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import type { HeadingProps } from '../heading';
 import { Heading } from '../heading';
-import { Icon } from '../icon';
 import { sectionItemsMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
@@ -226,34 +228,54 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
 /**
  * A row-level message, mirroring `Field.Error` for a row that holds no form control. Place it as a
  * sibling of `Section.Item` inside `Section.Row`, not inside `Section.Content`: the item stays a
- * single centred line, so the media and actions hold their position whether or not it is showing.
+ * single centered line, so the media and actions hold their position whether or not it is showing.
  * Carries `role='alert'` for the announcement a `Field.Root` would otherwise wire up.
+ *
+ * It opens and closes on the message it is given, so render it with that message —
+ * `<Section.Error>{error}</Section.Error>` — rather than behind a conditional.
  */
 const SectionError = React.forwardRef<HTMLParagraphElement, SectionErrorProps>(function SectionError(
   { render, xstyle, children, ...rest },
   ref,
 ) {
+  const open = hasMessage(children);
+  const element = React.useRef<HTMLElement | null>(null);
+  const [messageElement, setMessageElement] = React.useState<HTMLElement | null>(null);
+  const height = useMessageHeight(messageElement);
+  const { mounted, transitionProps } = useTransition({ open, ref: element });
+  const message = useHeldMessage(children, open);
+  const messageProps = stylex.props(reset.base, feedbackStyles.message, feedbackStyles.error);
+
   return useRender({
     defaultTagName: 'p',
     render,
-    ref,
+    enabled: mounted,
+    ref: [ref, element],
     props: {
       role: 'alert',
       ...mergeStyleProps(
         themeProps('section-error'),
-        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, styles.error, xstyle),
+        stylex.props(
+          reset.base,
+          typographyStyles.base,
+          typographySizes.xs,
+          feedbackStyles.collapse,
+          feedbackHeight.measured(height),
+          styles.error,
+          xstyle,
+        ),
+        { 'aria-hidden': open ? undefined : true, ...transitionProps },
         rest,
       ),
       children: (
-        <>
-          <Icon
-            name='exclamation-circle'
-            size='sm'
-            aria-hidden='true'
-            xstyle={styles.errorIcon}
-          />
-          <span>{children}</span>
-        </>
+        <span
+          ref={setMessageElement}
+          {...messageProps}
+          {...transitionProps}
+          style={{ ...messageProps.style, ...transitionProps.style }}
+        >
+          <FeedbackBody icon='exclamation-circle'>{message}</FeedbackBody>
+        </span>
       ),
     },
   });

@@ -1,10 +1,11 @@
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
+import { BadgeContext } from './badge.context';
 import { colors, styles } from './badge.styles';
 
 export type BadgeProps = MosaicComponentProps<'span'> & {
@@ -30,9 +31,11 @@ export type BadgeProps = MosaicComponentProps<'span'> & {
  * <Badge render={<a href='/billing' />}>Upgrade</Badge>
  */
 export const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(function MosaicBadge(
-  { color = 'primary', render, xstyle, ...rest },
+  { color: colorProp, render, xstyle, ...rest },
   ref,
 ) {
+  const defaults = React.useContext(BadgeContext);
+  const color = colorProp ?? defaults.color ?? 'primary';
   return useRender({
     defaultTagName: 'span',
     render,

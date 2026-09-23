@@ -39,6 +39,15 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-web3wallets-section': dynamic(() => import('../stories/user-profile-web3-wallets-section.mdx')),
     'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
   },
+  'organization-profile': {
+    'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
+    'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
+    'organization-profile-workspace-section': dynamic(
+      () => import('../stories/organization-profile-workspace-section.mdx'),
+    ),
+    'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
+    'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
+  },
   reverification: {
     reverification: dynamic(() => import('../stories/reverification.mdx')),
   },
@@ -54,6 +63,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     card: dynamic(() => import('../stories/card.component.mdx')),
     checkbox: dynamic(() => import('../stories/checkbox.mdx')),
     combobox: dynamic(() => import('../stories/combobox.mdx')),
+    'copy-button': dynamic(() => import('../stories/copy-button.mdx')),
     'data-list': dynamic(() => import('../stories/data-list.mdx')),
     input: dynamic(() => import('../stories/input.mdx')),
     'input-group': dynamic(() => import('../stories/input-group.mdx')),
@@ -73,6 +83,8 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     section: dynamic(() => import('../stories/section.mdx')),
     select: dynamic(() => import('../stories/select.component.mdx')),
     table: dynamic(() => import('../stories/table.mdx')),
+    tabs: dynamic(() => import('../stories/tabs.component.mdx')),
+    'tag-input': dynamic(() => import('../stories/tag-input.component.mdx')),
     toast: dynamic(() => import('../stories/toast.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.component.mdx')),
@@ -95,6 +107,8 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     popover: dynamic(() => import('../stories/popover.mdx')),
     select: dynamic(() => import('../stories/select.mdx')),
     tabs: dynamic(() => import('../stories/tabs.mdx')),
+    'tag-input': dynamic(() => import('../stories/tag-input.mdx')),
+    toast: dynamic(() => import('../stories/toast.primitive.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.mdx')),
   },
   styles: {

@@ -1,7 +1,5 @@
 'use client';
 
-import { Button as HeadlessButton } from '@clerk/headless/button';
-import type { PopoverProps } from '@clerk/headless/popover';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 import React from 'react';
@@ -20,6 +18,8 @@ import { Spinner } from '../../components/spinner';
 import type { IconName } from '../../icons/registry';
 import type { MosaicMessages } from '../../localization';
 import { fill, plural, useLocale, useMessages } from '../../localization';
+import { Button as HeadlessButton } from '../../primitives/button';
+import type { PopoverProps } from '../../primitives/popover';
 import { applyOrder } from '../../utils/apply-order';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { rtl } from '../../utils/rtl.styles';
@@ -188,7 +188,7 @@ const rowButton = (disabled = false) => (
   />
 );
 
-/** A row's trailing column, sized and centred so every state lands on the `⋯` button's centre line. */
+/** A row's trailing column, sized and centered so every state lands on the `⋯` button's center line. */
 function Trailing({ children }: { children: ReactNode }) {
   return <Item.Actions xstyle={styles.trailing}>{children}</Item.Actions>;
 }

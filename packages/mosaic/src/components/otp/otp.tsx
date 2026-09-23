@@ -1,8 +1,8 @@
-import type { OtpProps as PrimitiveOtpProps } from '@clerk/headless/otp';
-import { Otp as Primitive } from '@clerk/headless/otp';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { OtpProps as PrimitiveOtpProps } from '../../primitives/otp';
+import { Otp as Primitive } from '../../primitives/otp';
 import type { MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { inputStyles } from '../../utils/input.styles';

@@ -1,16 +1,16 @@
-import { useTransition } from '@clerk/headless/hooks';
-import { useRender } from '@clerk/headless/utils';
-import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import type { IconName } from '../../icons/registry';
+import { useTransition } from '../../primitives/hooks';
+import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../../utils/feedback';
+import { feedbackHeight, feedbackStyles } from '../../utils/feedback.styles';
 import { reset } from '../../utils/reset.styles';
 import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import { visuallyHidden } from '../../utils/visually-hidden.styles';
-import { Icon } from '../icon';
 import {
   FieldMessageProvider,
   FieldProvider,
@@ -18,7 +18,7 @@ import {
   useRegisterFieldMessage,
   useRegisterFieldPartId,
 } from './field.context';
-import { dynamic, styles } from './field.styles';
+import { styles } from './field.styles';
 
 function useNativeLabelWarning(label: HTMLElement | null) {
   React.useEffect(() => {
@@ -139,29 +139,6 @@ const Description = React.forwardRef<HTMLParagraphElement, FieldDescriptionProps
 /** Props for the container that animates field feedback height and crossfades its messages. */
 export type FieldMessageProps = MosaicComponentProps<'div'>;
 
-function useMessageHeight(active: HTMLElement | null) {
-  const [height, setHeight] = React.useState(0);
-
-  useSafeLayoutEffect(() => {
-    if (!active) {
-      return undefined;
-    }
-
-    const measure = () => setHeight(active.offsetHeight);
-    measure();
-
-    if (typeof ResizeObserver === 'undefined') {
-      return undefined;
-    }
-
-    const observer = new ResizeObserver(measure);
-    observer.observe(active);
-    return () => observer.disconnect();
-  }, [active]);
-
-  return height;
-}
-
 const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function MosaicFieldMessage(
   { render, xstyle, children, ...rest },
   ref,
@@ -186,7 +163,7 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
     props: {
       ...mergeStyleProps(
         themeProps('field-message'),
-        stylex.props(reset.base, styles.messageRoot, dynamic.messageHeight(height), xstyle),
+        stylex.props(reset.base, feedbackStyles.collapse, feedbackHeight.measured(height), xstyle),
         { role: 'status', ...transitionProps },
         rest,
       ),
@@ -200,16 +177,12 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
 type FieldFeedbackKind = 'error' | 'success';
 
 const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon: IconName; color: stylex.StyleXStyles }> = {
-  error: { slot: 'field-error', icon: 'exclamation-circle', color: styles.error },
-  success: { slot: 'field-success', icon: 'checkmark', color: styles.success },
+  error: { slot: 'field-error', icon: 'exclamation-circle', color: feedbackStyles.error },
+  success: { slot: 'field-success', icon: 'checkmark', color: feedbackStyles.success },
 };
 
 interface FieldFeedbackProps extends MosaicComponentProps<'p'> {
   kind: FieldFeedbackKind;
-}
-
-function hasMessage(children: React.ReactNode) {
-  return React.Children.toArray(children).some(child => child !== '');
 }
 
 const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>(function MosaicFieldFeedback(
@@ -223,10 +196,7 @@ const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>
   const open = hasMessage(children);
   const element = React.useRef<HTMLElement | null>(null);
   const { mounted, transitionProps } = useTransition({ open, ref: element });
-  const lastMessage = React.useRef(children);
-  if (open) {
-    lastMessage.current = children;
-  }
+  const message = useHeldMessage(children, open);
   useRegisterFieldPartId(open ? id : undefined, context?.setMessageIds);
   const registerMessage = useRegisterFieldMessage(open);
   return useRender({
@@ -237,30 +207,12 @@ const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>
     props: {
       ...mergeStyleProps(
         themeProps(slot),
-        stylex.props(
-          reset.base,
-          typographyStyles.base,
-          typographySizes.xs,
-          styles.message,
-          styles.feedback,
-          color,
-          xstyle,
-        ),
+        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, feedbackStyles.message, color, xstyle),
         { 'aria-hidden': open ? undefined : true, ...transitionProps },
         rest,
       ),
       id,
-      children: (
-        <>
-          <Icon
-            name={icon}
-            size='sm'
-            aria-hidden='true'
-            xstyle={styles.feedbackIcon}
-          />
-          <span>{lastMessage.current}</span>
-        </>
-      ),
+      children: <FeedbackBody icon={icon}>{message}</FeedbackBody>,
     },
   });
 });
