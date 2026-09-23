@@ -46,7 +46,7 @@ export const styles = stylex.create({
         ':where([data-starting-style], [data-ending-style])': 'scale(1)',
       },
     },
-    transitionDuration: '150ms',
+    transitionDuration: durationVars['--cl-duration-base'],
     transitionProperty: {
       default: 'opacity, transform',
       '@media (prefers-reduced-motion: reduce)': 'opacity',
