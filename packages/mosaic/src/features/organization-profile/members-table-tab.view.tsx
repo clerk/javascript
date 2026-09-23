@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { type ReactElement, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Avatar } from '../../components/avatar';
@@ -44,7 +44,7 @@ export function MembersTableTabView({
   onSortChange,
   isLoading,
   isFetching = false,
-}: MembersTableTabViewProps): ReactElement {
+}: MembersTableTabViewProps) {
   const m = useMessages('membersTableTab');
   const searchInput = useRef<HTMLInputElement>(null);
   const inviteButton = useRef<HTMLButtonElement>(null);

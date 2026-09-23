@@ -1,4 +1,4 @@
-import { act, render, type RenderResult, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -43,9 +43,7 @@ function propsFor(overrides: Partial<MembersTableTabViewProps> = {}): MembersTab
   };
 }
 
-function renderView(
-  overrides: Partial<MembersTableTabViewProps> = {},
-): RenderResult & { props: MembersTableTabViewProps } {
+function renderView(overrides: Partial<MembersTableTabViewProps> = {}) {
   const props = propsFor(overrides);
   return {
     props,
