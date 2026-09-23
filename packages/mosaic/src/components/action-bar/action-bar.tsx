@@ -1,66 +1,135 @@
+import {
+  autoUpdate,
+  Composite,
+  CompositeItem,
+  FloatingFocusManager,
+  FloatingPortal,
+  getOverflowAncestors,
+  hide,
+  limitShift,
+  offset,
+  shift,
+  useFloating,
+  useMergeRefs,
+} from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useRender } from '../../primitives/utils';
-import type { MosaicComponentProps, MosaicElementProps, XStyle } from '../../props';
+import { mergeProps, useRender } from '../../primitives/utils';
+import type { MosaicComponentProps, XStyle } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { tabularNumbersStyle } from '../../utils/typography.styles';
+import type { ButtonProps } from '../button';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import { styles } from './action-bar.styles';
 
-const ITEM_SELECTOR = 'button, a[href], input, select, textarea, [tabindex]';
+const ITEM_ATTRIBUTE = 'data-action-bar-item';
+const EDGE_GAP = 16;
 
 const ActionBarContext = React.createContext<{ registerCount: (id: string | undefined) => void } | null>(null);
 
-function toolbarItems(bar: HTMLElement): HTMLElement[] {
-  return Array.from(bar.querySelectorAll<HTMLElement>(ITEM_SELECTOR)).filter(
-    item => !item.matches(':disabled, [data-floating-ui-focus-guard]') && item.closest('[role="toolbar"]') === bar,
+function scrollingAncestors(element: Element): Element[] {
+  return getOverflowAncestors(element).filter(
+    (node): node is Element =>
+      node instanceof Element &&
+      node.scrollHeight > node.clientHeight &&
+      /auto|scroll|overlay/.test(getComputedStyle(node).overflowY),
   );
 }
 
-function syncTabStops(items: HTMLElement[], active: HTMLElement | undefined) {
-  for (const item of items) {
-    item.tabIndex = item === active ? 0 : -1;
-  }
+function enabledItems(bar: HTMLElement): HTMLElement[] {
+  return Array.from(bar.querySelectorAll<HTMLElement>(`[${ITEM_ATTRIBUTE}]`)).filter(
+    item => !item.matches(':disabled'),
+  );
 }
-
-export type ActionBarAnchorProps = MosaicComponentProps<'div'>;
-
-/** Wraps the table and `ActionBar.Root`. The bar rests on its bottom edge and stays in view while it scrolls. */
-const Anchor = React.forwardRef<HTMLDivElement, ActionBarAnchorProps>(function ActionBarAnchor(
-  { render, xstyle, ...rest },
-  ref,
-) {
-  return useRender({
-    defaultTagName: 'div',
-    render,
-    ref,
-    props: mergeStyleProps(themeProps('action-bar-anchor'), stylex.props(reset.base, styles.anchor, xstyle), rest),
-  });
-});
 
 export interface ActionBarRootProps extends MosaicComponentProps<'div'> {
   /** Whether the bar is shown. Toggling it animates the bar in and out. */
   open: boolean;
+  /** The table the bar acts on. The bar rests on its bottom edge and stays in view while it scrolls. */
+  anchor: React.RefObject<HTMLElement | null>;
+  /** Where the bar is portalled; `null` waits for the element. Inside a modal dialog, pass the dialog's popup. */
+  portalRoot?: HTMLElement | null;
   /** Where focus goes when the bar closes while holding it. Defaults to where focus came from. */
   returnFocus?: React.RefObject<HTMLElement | null>;
   positionerXstyle?: XStyle;
 }
 
-/** A floating toolbar of actions for a selection. Place it last in `ActionBar.Anchor`. */
+/** A floating toolbar of actions for a selection. */
 const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function ActionBarRoot(
-  { open, returnFocus, render, xstyle, positionerXstyle, children, onKeyDown, onFocus, onBlur, ...rest },
+  { open, anchor, portalRoot, returnFocus, render, xstyle, positionerXstyle, children, onFocus, ...rest },
   ref,
 ) {
-  const barRef = React.useRef<HTMLDivElement>(null);
-  const activeRef = React.useRef<HTMLElement | undefined>(undefined);
+  const barRef = React.useRef<HTMLDivElement | null>(null);
+  const [barElement, setBarElement] = React.useState<HTMLDivElement | null>(null);
+  const setBar = React.useCallback((node: HTMLDivElement | null) => {
+    barRef.current = node;
+    setBarElement(node);
+  }, []);
   const originRef = React.useRef<HTMLElement | null>(null);
+  const lastFocusedRef = React.useRef<HTMLElement | null>(null);
+  const [activeIndex, setActiveIndex] = React.useState(0);
   const [countId, setCountId] = React.useState<string | undefined>();
   const context = React.useMemo(() => ({ registerCount: setCountId }), []);
 
-  const lastFocusedRef = React.useRef<HTMLElement | null>(null);
+  const {
+    refs,
+    elements,
+    floatingStyles,
+    middlewareData,
+    update,
+    context: floatingContext,
+  } = useFloating({
+    open,
+    placement: 'bottom',
+    middleware: [
+      offset(({ rects }) => -rects.floating.height / 2),
+      {
+        name: 'shiftIntoScrollport',
+        fn: state =>
+          shift({
+            mainAxis: false,
+            crossAxis: true,
+            boundary: scrollingAncestors(state.elements.reference as Element),
+            padding: EDGE_GAP,
+            limiter: limitShift({ mainAxis: false, crossAxis: true }),
+          }).fn(state),
+      },
+      hide(),
+    ],
+  });
+
+  React.useLayoutEffect(() => {
+    refs.setReference(anchor.current);
+  });
+
+  React.useEffect(() => {
+    if (!open || !elements.reference || !elements.floating) {
+      return;
+    }
+    return autoUpdate(elements.reference, elements.floating, update);
+  }, [open, elements.reference, elements.floating, update]);
+
+  React.useEffect(() => {
+    if (!open || !barElement) {
+      return;
+    }
+    const doc = barElement.ownerDocument;
+    const recordOrigin = (event: FocusEvent) => {
+      const target = event.target as HTMLElement;
+      if (
+        !barElement.contains(target) &&
+        target !== lastFocusedRef.current &&
+        !target.hasAttribute('data-floating-ui-focus-guard')
+      ) {
+        originRef.current = target;
+      }
+    };
+    doc.addEventListener('focusin', recordOrigin);
+    return () => doc.removeEventListener('focusin', recordOrigin);
+  }, [open, barElement]);
 
   const restoreFocus = React.useCallback(() => {
     const bar = barRef.current;
@@ -76,18 +145,6 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     }
   }, [returnFocus]);
 
-  const syncItems = React.useCallback(() => {
-    const bar = barRef.current;
-    if (!bar) {
-      return;
-    }
-    const items = toolbarItems(bar);
-    if (!activeRef.current || !items.includes(activeRef.current)) {
-      activeRef.current = items[0];
-    }
-    syncTabStops(items, activeRef.current);
-  }, []);
-
   React.useLayoutEffect(() => {
     const bar = barRef.current;
     if (!bar) {
@@ -97,7 +154,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
       bar.inert = false;
       return;
     }
-    activeRef.current = undefined;
+    setActiveIndex(0);
     const doc = bar.ownerDocument;
     const active = doc.activeElement as HTMLElement | null;
     if (bar.contains(active)) {
@@ -119,15 +176,12 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
       }
     });
     return () => cancelAnimationFrame(frame);
-  }, [open, restoreFocus]);
-
-  React.useLayoutEffect(syncItems);
+  }, [open, restoreFocus, barElement]);
 
   const handleFocus = (event: React.FocusEvent<HTMLDivElement>) => {
     onFocus?.(event);
     const bar = barRef.current;
     const target = event.target as HTMLElement;
-    const previous = lastFocusedRef.current;
     lastFocusedRef.current = target;
     if (!bar?.contains(target)) {
       return;
@@ -136,86 +190,128 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
       restoreFocus();
       return;
     }
-    const from = event.relatedTarget as HTMLElement | null;
-    if (from && from !== previous && !bar.contains(from)) {
-      originRef.current = from;
-    }
-    const items = toolbarItems(bar);
-    if (items.includes(target)) {
-      activeRef.current = target;
-      syncTabStops(items, target);
-    }
   };
 
-  const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
-    onBlur?.(event);
-    syncItems();
-  };
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    onKeyDown?.(event);
+  const handleItemsKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const bar = barRef.current;
-    const target = event.target as HTMLElement;
-    if (event.defaultPrevented || !bar || target.matches('input, textarea, select')) {
+    if (!bar?.contains(event.target as Node)) {
+      event.stopPropagation();
       return;
     }
-    const items = toolbarItems(bar);
-    const index = items.indexOf(target);
-    if (index === -1) {
+    if (event.key !== 'Home' && event.key !== 'End') {
       return;
     }
-    const forward = getComputedStyle(bar).direction === 'rtl' ? 'ArrowLeft' : 'ArrowRight';
-    const backward = forward === 'ArrowRight' ? 'ArrowLeft' : 'ArrowRight';
-    let next: number;
-    switch (event.key) {
-      case forward:
-        next = (index + 1) % items.length;
-        break;
-      case backward:
-        next = (index - 1 + items.length) % items.length;
-        break;
-      case 'Home':
-        next = 0;
-        break;
-      case 'End':
-        next = items.length - 1;
-        break;
-      default:
-        return;
+    const items = enabledItems(bar);
+    const target = event.key === 'Home' ? items[0] : items[items.length - 1];
+    if (!target) {
+      return;
     }
     event.preventDefault();
-    items[next].focus();
+    const all = Array.from(bar.querySelectorAll<HTMLElement>(`[${ITEM_ATTRIBUTE}]`));
+    setActiveIndex(all.indexOf(target));
+    target.focus();
   };
-
-  const bar = useRender({
-    defaultTagName: 'div',
-    render,
-    ref: barRef,
-    props: {
-      'aria-describedby': countId,
-      ...mergeStyleProps(themeProps('action-bar', { open }), stylex.props(reset.base, styles.bar, xstyle), rest),
-      'data-open': open,
-      role: 'toolbar',
-      'aria-orientation': 'horizontal',
-      onKeyDown: handleKeyDown,
-      onFocus: handleFocus,
-      onBlur: handleBlur,
-      children,
-    },
-  });
 
   return (
     <ActionBarContext.Provider value={context}>
-      <div
-        ref={ref}
-        {...mergeStyleProps(
-          themeProps('action-bar-positioner'),
-          stylex.props(reset.base, styles.positioner, positionerXstyle),
-        )}
-      >
-        {bar}
-      </div>
+      <FloatingPortal root={portalRoot}>
+        <FloatingFocusManager
+          context={floatingContext}
+          modal={false}
+          initialFocus={-1}
+          returnFocus={false}
+          closeOnFocusOut={false}
+          disabled={!open}
+        >
+          <div
+            ref={useMergeRefs([refs.setFloating, ref])}
+            style={{
+              ...floatingStyles,
+              visibility: middlewareData.hide?.referenceHidden ? 'hidden' : undefined,
+            }}
+            {...mergeStyleProps(
+              themeProps('action-bar-positioner'),
+              stylex.props(reset.base, styles.positioner, positionerXstyle),
+            )}
+          >
+            <Composite
+              orientation='horizontal'
+              loop
+              activeIndex={activeIndex}
+              onNavigate={setActiveIndex}
+              render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
+                const { ref: compositeRef, ...merged } = mergeProps<'div'>(
+                  {
+                    'aria-describedby': countId,
+                    ...mergeStyleProps(
+                      themeProps('action-bar', { open }),
+                      stylex.props(reset.base, styles.bar, xstyle),
+                      rest,
+                    ),
+                  },
+                  compositeProps as Record<string, unknown>,
+                );
+                // eslint-disable-next-line react-hooks/rules-of-hooks
+                return useRender({
+                  defaultTagName: 'div',
+                  render,
+                  ref: [setBar, compositeRef as React.Ref<unknown>],
+                  props: {
+                    ...merged,
+                    'data-open': open,
+                    role: 'toolbar',
+                    onFocus: handleFocus,
+                    children: (
+                      <div
+                        role='presentation'
+                        onKeyDown={handleItemsKeyDown}
+                        {...stylex.props(styles.items)}
+                      >
+                        {children}
+                      </div>
+                    ),
+                  },
+                });
+              }}
+            />
+          </div>
+        </FloatingFocusManager>
+      </FloatingPortal>
     </ActionBarContext.Provider>
+  );
+});
+
+export type ActionBarActionProps = ButtonProps;
+
+/**
+ * A control in the bar: a ghost button that joins the bar's arrow-key navigation. Pass it as the
+ * `render` of a `Menu.Trigger` or `Dialog.Trigger` to open one from the bar.
+ */
+const Action = React.forwardRef<HTMLButtonElement, ActionBarActionProps>(function ActionBarAction(
+  { color, xstyle, ...rest },
+  ref,
+) {
+  return (
+    <CompositeItem
+      render={(itemProps: React.HTMLAttributes<HTMLElement>) => {
+        const { ref: itemRef, ...merged } = mergeProps<'button'>(
+          rest as Record<string, unknown>,
+          itemProps as Record<string, unknown>,
+        );
+        return (
+          <Button
+            variant='ghost'
+            size='md'
+            color={color}
+            {...merged}
+            {...{ [ITEM_ATTRIBUTE]: '' }}
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+            ref={useMergeRefs([ref, itemRef as React.Ref<HTMLButtonElement>])}
+            xstyle={[color === 'negative' && styles.destructive, xstyle]}
+          />
+        );
+      }}
+    />
   );
 });
 
@@ -271,26 +367,24 @@ const Separator = React.forwardRef<HTMLDivElement, ActionBarSeparatorProps>(func
   });
 });
 
-export type ActionBarDismissProps = MosaicElementProps<'button'>;
+export type ActionBarDismissProps = Omit<ActionBarActionProps, 'children'>;
 
 /** Clears the selection. Labelled "Clear selection" by default. */
 const Dismiss = React.forwardRef<HTMLButtonElement, ActionBarDismissProps>(function ActionBarDismiss(
-  { xstyle, 'aria-label': ariaLabel, ...rest },
+  { 'aria-label': ariaLabel, ...rest },
   ref,
 ) {
   return (
-    <Button
+    <Action
       ref={ref}
-      variant='ghost'
       shape='square'
-      size='md'
       aria-label={ariaLabel ?? 'Clear selection'}
-      {...mergeStyleProps(themeProps('action-bar-dismiss'), stylex.props(xstyle), rest)}
+      {...mergeStyleProps(themeProps('action-bar-dismiss'), rest)}
     >
       <Icon name='x' />
-    </Button>
+    </Action>
   );
 });
 
 /** Bulk actions for a table selection. */
-export const ActionBar = { Anchor, Root, Count, Separator, Dismiss };
+export const ActionBar = { Root, Action, Count, Separator, Dismiss };

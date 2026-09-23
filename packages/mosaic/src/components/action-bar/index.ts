@@ -1,6 +1,6 @@
 export { ActionBar } from './action-bar';
 export type {
-  ActionBarAnchorProps,
+  ActionBarActionProps,
   ActionBarCountProps,
   ActionBarDismissProps,
   ActionBarRootProps,

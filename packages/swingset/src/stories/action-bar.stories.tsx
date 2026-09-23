@@ -7,7 +7,7 @@ import { Profile } from '@clerk/mosaic/components/profile';
 import { Table } from '@clerk/mosaic/components/table';
 import { useDataTable } from '@clerk/mosaic/primitives/hooks';
 import type { ComponentProps } from 'react';
-import { useId, useRef } from 'react';
+import { useId, useRef, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -42,16 +42,20 @@ const members = [
   { id: 'ron', name: 'Ron LaFlamme', role: 'Member' },
 ];
 
-function MembersTable({ rows = 10 }: { rows?: number }) {
+function MembersTable({ rows = 10, portalRoot }: { rows?: number; portalRoot?: HTMLElement | null }) {
   const tableId = useId();
+  const tableRef = useRef<HTMLTableElement>(null);
   const selectAllRef = useRef<HTMLInputElement>(null);
   const table = useDataTable({ data: members.slice(0, rows), getRowId: row => row.id });
   const count = Object.values(table.rowSelection).filter(Boolean).length;
   const clearSelection = () => table.setRowSelection({});
 
   return (
-    <ActionBar.Anchor>
-      <Table.Root id={tableId}>
+    <>
+      <Table.Root
+        ref={tableRef}
+        id={tableId}
+      >
         <Table.Header>
           <Table.Row>
             <Table.SelectAllCell
@@ -84,6 +88,8 @@ function MembersTable({ rows = 10 }: { rows?: number }) {
       </Table.Root>
       <ActionBar.Root
         open={count > 0}
+        anchor={tableRef}
+        portalRoot={portalRoot}
         aria-label='Bulk actions'
         aria-controls={tableId}
         returnFocus={selectAllRef}
@@ -91,14 +97,7 @@ function MembersTable({ rows = 10 }: { rows?: number }) {
         <ActionBar.Count>{count} selected</ActionBar.Count>
         <ActionBar.Separator />
         <Menu.Root placement='top'>
-          <Menu.Trigger
-            render={
-              <Button
-                variant='ghost'
-                size='md'
-              />
-            }
-          >
+          <Menu.Trigger render={<ActionBar.Action />}>
             Change role
             <Icon
               name='chevron-down'
@@ -121,20 +120,18 @@ function MembersTable({ rows = 10 }: { rows?: number }) {
           </Menu.Popup>
         </Menu.Root>
         <ActionBar.Separator />
-        <Button
+        <ActionBar.Action
           color='negative'
-          variant='ghost'
           shape='square'
-          size='md'
           aria-label='Remove selected'
           onClick={clearSelection}
         >
           <Icon name='trash' />
-        </Button>
+        </ActionBar.Action>
         <ActionBar.Separator />
         <ActionBar.Dismiss onClick={clearSelection} />
       </ActionBar.Root>
-    </ActionBar.Anchor>
+    </>
   );
 }
 
@@ -148,7 +145,10 @@ export function Default() {
   );
 }
 
-function MembersProfile(props: Partial<ComponentProps<typeof Profile.Root>>) {
+function MembersProfile({
+  portalRoot,
+  ...props
+}: Partial<ComponentProps<typeof Profile.Root>> & { portalRoot?: HTMLElement | null }) {
   return (
     <Profile.Root
       value='members'
@@ -172,7 +172,10 @@ function MembersProfile(props: Partial<ComponentProps<typeof Profile.Root>>) {
         <Profile.ContentPanel value='members'>
           <div style={{ display: 'grid', gap: 24 }}>
             <Profile.PageTitle>Members</Profile.PageTitle>
-            <MembersTable rows={members.length} />
+            <MembersTable
+              rows={members.length}
+              portalRoot={portalRoot}
+            />
             <p>1–18 of 18</p>
           </div>
         </Profile.ContentPanel>
@@ -181,13 +184,17 @@ function MembersProfile(props: Partial<ComponentProps<typeof Profile.Root>>) {
   );
 }
 
-/** In a profile dialog the bar pins to the foot of the content column. */
+/** In a profile dialog the bar is portalled into the dialog and pins to the foot of the content column. */
 export function InDialog() {
+  const [popup, setPopup] = useState<HTMLDivElement | null>(null);
   return (
     <Dialog.Root>
       <Dialog.Trigger render={<Button />}>Manage workspace</Dialog.Trigger>
-      <Dialog.Popup variant='profile'>
-        <MembersProfile />
+      <Dialog.Popup
+        ref={setPopup}
+        variant='profile'
+      >
+        <MembersProfile portalRoot={popup} />
       </Dialog.Popup>
     </Dialog.Root>
   );

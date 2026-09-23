@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../dialog';
 import { Menu } from '../menu';
@@ -15,9 +15,13 @@ const testStyles = stylex.create({
 });
 
 function BulkActions({ open = true, onDismiss }: { open?: boolean; onDismiss?: () => void }) {
+  const tableRef = React.useRef<HTMLTableElement>(null);
   return (
-    <ActionBar.Anchor>
-      <table id='members'>
+    <>
+      <table
+        ref={tableRef}
+        id='members'
+      >
         <tbody>
           <tr>
             <td>
@@ -31,19 +35,35 @@ function BulkActions({ open = true, onDismiss }: { open?: boolean; onDismiss?: (
       </table>
       <ActionBar.Root
         open={open}
+        anchor={tableRef}
         aria-label='Bulk actions'
         aria-controls='members'
       >
         <ActionBar.Count>3 selected</ActionBar.Count>
         <ActionBar.Separator />
-        <button type='button'>Change role</button>
-        <button type='button'>Remove</button>
+        <ActionBar.Action>Change role</ActionBar.Action>
+        <ActionBar.Action>Remove</ActionBar.Action>
         <ActionBar.Separator />
         <ActionBar.Dismiss onClick={onDismiss} />
       </ActionBar.Root>
-    </ActionBar.Anchor>
+      <button type='button'>After</button>
+    </>
   );
 }
+
+function useAnchor() {
+  return React.useRef<HTMLDivElement>(null);
+}
+
+beforeEach(() => {
+  vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockReturnValue(new DOMRect(0, 0, 100, 40));
+  vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024);
+  vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('Mosaic ActionBar', () => {
   it('renders a labelled toolbar tied to its table and described by its count', () => {
@@ -66,13 +86,17 @@ describe('Mosaic ActionBar', () => {
   });
 
   it('styles the positioner independently from the bar', () => {
-    render(
-      <ActionBar.Root
-        open
-        aria-label='Bulk actions'
-        positionerXstyle={testStyles.positioner}
-      />,
-    );
+    function Positioned() {
+      return (
+        <ActionBar.Root
+          open
+          anchor={useAnchor()}
+          aria-label='Bulk actions'
+          positionerXstyle={testStyles.positioner}
+        />
+      );
+    }
+    render(<Positioned />);
     expect(screen.getByRole('toolbar', { name: 'Bulk actions' }).parentElement).toHaveClass(
       ...(stylex.props(testStyles.positioner).className as string).split(' '),
     );
@@ -85,7 +109,7 @@ describe('Mosaic ActionBar', () => {
     await user.tab();
     expect(screen.getByRole('button', { name: 'Change role' })).toHaveFocus();
     await user.tab();
-    expect(document.body).toHaveFocus();
+    expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
   });
 
   it('moves between controls with the arrow keys, Home, and End', async () => {
@@ -118,22 +142,26 @@ describe('Mosaic ActionBar', () => {
 
   it('leaves arrow keys inside a portalled menu to the menu', async () => {
     const user = userEvent.setup();
-    render(
-      <ActionBar.Root
-        open
-        aria-label='Bulk actions'
-      >
-        <Menu.Root>
-          <Menu.Trigger>Change role</Menu.Trigger>
-          <Menu.Popup>
-            <Menu.Item label='Admin'>
-              <Menu.Label>Admin</Menu.Label>
-            </Menu.Item>
-          </Menu.Popup>
-        </Menu.Root>
-        <button type='button'>Remove</button>
-      </ActionBar.Root>,
-    );
+    function WithMenu() {
+      return (
+        <ActionBar.Root
+          open
+          anchor={useAnchor()}
+          aria-label='Bulk actions'
+        >
+          <Menu.Root>
+            <Menu.Trigger render={<ActionBar.Action />}>Change role</Menu.Trigger>
+            <Menu.Popup>
+              <Menu.Item label='Admin'>
+                <Menu.Label>Admin</Menu.Label>
+              </Menu.Item>
+            </Menu.Popup>
+          </Menu.Root>
+          <ActionBar.Action>Remove</ActionBar.Action>
+        </ActionBar.Root>
+      );
+    }
+    render(<WithMenu />);
     await user.click(screen.getByRole('button', { name: 'Change role' }));
     const item = await screen.findByRole('menuitem', { name: 'Admin' });
     item.focus();
@@ -171,7 +199,7 @@ describe('Mosaic ActionBar', () => {
       const [selected, setSelected] = React.useState(true);
       const selectAllRef = React.useRef<HTMLInputElement>(null);
       return (
-        <ActionBar.Anchor>
+        <>
           <input
             ref={selectAllRef}
             type='checkbox'
@@ -179,11 +207,12 @@ describe('Mosaic ActionBar', () => {
           />
           <ActionBar.Root
             open={selected}
+            anchor={selectAllRef}
             aria-label='Bulk actions'
             returnFocus={selectAllRef}
           >
             <Menu.Root>
-              <Menu.Trigger>Change role</Menu.Trigger>
+              <Menu.Trigger render={<ActionBar.Action />}>Change role</Menu.Trigger>
               <Menu.Popup>
                 <Menu.Item
                   label='Admin'
@@ -193,10 +222,10 @@ describe('Mosaic ActionBar', () => {
                 </Menu.Item>
               </Menu.Popup>
             </Menu.Root>
-            <button type='button'>Remove</button>
+            <ActionBar.Action>Remove</ActionBar.Action>
           </ActionBar.Root>
           <button type='button'>After</button>
-        </ActionBar.Anchor>
+        </>
       );
     }
 
@@ -212,7 +241,7 @@ describe('Mosaic ActionBar', () => {
       expect(screen.getByRole('toolbar', { hidden: true }).inert).toBe(true);
     });
 
-    it('keeps a tab stop after tabbing out of an open menu', async () => {
+    it('lets Tab leave an open menu and Shift+Tab come back to the bar', async () => {
       const user = userEvent.setup();
       render(<ChangeRole />);
       await user.click(screen.getByRole('checkbox', { name: 'Select all' }));
@@ -220,11 +249,9 @@ describe('Mosaic ActionBar', () => {
       await user.keyboard('{Enter}');
       await screen.findByRole('menuitem', { name: 'Admin' });
       await user.tab();
-      await waitFor(() => expect(screen.queryByRole('menuitem')).not.toBeInTheDocument());
-      const stops = Array.from(screen.getByRole('toolbar').querySelectorAll('button')).filter(
-        button => button.tabIndex === 0,
-      );
-      expect(stops).toHaveLength(1);
+      await waitFor(() => expect(screen.getByRole('button', { name: 'After' })).toHaveFocus());
+      await user.tab({ shift: true });
+      expect(screen.getByRole('button', { name: 'Change role' })).toHaveFocus();
     });
   });
 
@@ -234,7 +261,7 @@ describe('Mosaic ActionBar', () => {
       const [confirming, setConfirming] = React.useState(false);
       const selectRef = React.useRef<HTMLInputElement>(null);
       return (
-        <ActionBar.Anchor>
+        <>
           <input
             ref={selectRef}
             type='checkbox'
@@ -242,6 +269,7 @@ describe('Mosaic ActionBar', () => {
           />
           <ActionBar.Root
             open={selected}
+            anchor={selectRef}
             aria-label='Bulk actions'
             returnFocus={selectRef}
           >
@@ -250,7 +278,7 @@ describe('Mosaic ActionBar', () => {
               onOpenChange={setConfirming}
               role='alertdialog'
             >
-              <Dialog.Trigger>Remove</Dialog.Trigger>
+              <Dialog.Trigger render={<ActionBar.Action color='negative' />}>Remove</Dialog.Trigger>
               <Dialog.Popup>
                 <Dialog.Close>Cancel</Dialog.Close>
                 <button
@@ -265,7 +293,7 @@ describe('Mosaic ActionBar', () => {
               </Dialog.Popup>
             </Dialog.Root>
           </ActionBar.Root>
-        </ActionBar.Anchor>
+        </>
       );
     }
 

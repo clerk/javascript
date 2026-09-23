@@ -14,18 +14,16 @@ import {
 const reduceMotion = '@media (prefers-reduced-motion: reduce)';
 
 export const styles = stylex.create({
-  anchor: {
-    display: 'flow-root',
-  },
   positioner: {
-    alignItems: 'center',
-    display: 'flex',
-    justifyContent: 'center',
     pointerEvents: 'none',
-    position: 'sticky',
     zIndex: 1,
-    bottom: `calc(${space['5']} + ${space['4']})`,
-    height: 0,
+    width: 'max-content',
+  },
+  items: {
+    display: 'contents',
+  },
+  destructive: {
+    '--_cl-icon-color': colorVars['--cl-color-negative'],
   },
   bar: {
     borderRadius: radiusVars['--cl-radius-lg'],
@@ -66,7 +64,6 @@ export const styles = stylex.create({
       default: easingVars['--cl-ease-enter'],
       ':is([data-open="false"])': easingVars['--cl-ease-exit'],
     },
-    maxWidth: 'calc(100% - 2 * var(--cl-spacing))',
   },
   count: {
     paddingInline: space['2'],
