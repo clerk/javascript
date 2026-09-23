@@ -17,8 +17,6 @@ tests break on safe refactors and still pass when real behavior breaks.
 
 ## The shape: a trophy, not a pile of unit tests
 
-Kent C. Dodds' advice: _write tests, not too many, mostly integration._
-
 | Layer            | What it is in Mosaic                                                                        | How much                                 |
 | ---------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------- |
 | Static           | TypeScript, ESLint, `@stylexjs` lint rules                                                  | Free. Let types catch prop shape errors. |
