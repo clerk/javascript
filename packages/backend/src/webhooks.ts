@@ -135,6 +135,7 @@ export async function verifyWebhook(request: Request, options: VerifyWebhookOpti
       object: 'event',
       data: payload.data,
       event_attributes: payload.event_attributes,
+      timestamp: payload.timestamp,
     } as WebhookEvent;
   } catch (e) {
     return errorThrower.throw(`Unable to verify incoming webhook: ${e instanceof Error ? e.message : 'Unknown error'}`);
