@@ -159,10 +159,7 @@ final class ClerkNativeBridgeTests: XCTestCase {
   }
 
   func testBiometricReverificationPreservesNativePolicyError() {
-    let error = NSError(domain: "ClerkKit.BiometricCredentialError", code: 1, userInfo: [
-      "code": "biometric_credential_policy_incompatible",
-      NSLocalizedDescriptionKey: "Verify your identity using another method.",
-    ])
+    let error = BiometricCredentialError.policyIncompatible
     let result = ClerkNativeBridge.biometricCredentialErrorDescriptor(error, fallbackCode: "unexpected")
     XCTAssertEqual(result.code, "biometric_credential_policy_incompatible")
     XCTAssertEqual(result.message, error.localizedDescription)

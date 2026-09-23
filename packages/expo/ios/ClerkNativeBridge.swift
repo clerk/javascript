@@ -932,9 +932,8 @@ final class ClerkNativeBridge {
       return ClerkNativeErrorDescriptor(code: error.code, message: error.localizedDescription)
     }
 
-    let nsError = error as NSError
-    if nsError.domain == "ClerkKit.BiometricCredentialError", let code = nsError.userInfo["code"] as? String {
-      return ClerkNativeErrorDescriptor(code: code, message: error.localizedDescription)
+    if let error = error as? BiometricCredentialError {
+      return ClerkNativeErrorDescriptor(code: error.rawValue, message: error.localizedDescription)
     }
 
     if let error = error as? BiometricCredentialKeyManagerError {
