@@ -15,6 +15,12 @@ like one of them. If it reads internal state, imports a private module to mock,
 or inspects compiled CSS, it is a third user the code now has to satisfy. Those
 tests break on safe refactors and still pass when real behavior breaks.
 
+**You should very rarely have to change tests when you refactor code.** If a
+refactor that keeps behavior the same (merging the controller into the view,
+renaming a machine state, moving a style) forces test edits, those tests were
+testing implementation details. Fix them to assert behavior rather than
+updating them to match the new internals.
+
 ## The shape: a trophy, not a pile of unit tests
 
 | Layer            | What it is in Mosaic                                                                        | How much                                 |
