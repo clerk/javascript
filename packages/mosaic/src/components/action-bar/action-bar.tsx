@@ -28,7 +28,10 @@ import { styles } from './action-bar.styles';
 const ITEM_ATTRIBUTE = 'data-action-bar-item';
 const EDGE_GAP = 16;
 
-const ActionBarContext = React.createContext<{ registerCount: (id: string | undefined) => void } | null>(null);
+const ActionBarContext = React.createContext<{
+  open: boolean;
+  registerCount: (id: string | undefined) => void;
+} | null>(null);
 
 function scrollingAncestors(element: Element): Element[] {
   return getOverflowAncestors(element).filter(
@@ -72,7 +75,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
   const lastFocusedRef = React.useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [countId, setCountId] = React.useState<string | undefined>();
-  const context = React.useMemo(() => ({ registerCount: setCountId }), []);
+  const context = React.useMemo(() => ({ open, registerCount: setCountId }), [open]);
 
   const {
     refs,
@@ -85,7 +88,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     open,
     placement: 'bottom',
     middleware: [
-      offset(({ rects }) => -rects.floating.height / 2),
+      offset(({ rects }) => -rects.floating.height / 4),
       {
         name: 'shiftIntoScrollport',
         fn: state =>
@@ -317,14 +320,19 @@ const Action = React.forwardRef<HTMLButtonElement, ActionBarActionProps>(functio
 
 export type ActionBarCountProps = MosaicComponentProps<'div'>;
 
-/** The selected count. Describes the toolbar and announces changes. */
+/** The selected count. Describes the toolbar, announces changes, and holds its text while the bar closes. */
 const Count = React.forwardRef<HTMLDivElement, ActionBarCountProps>(function ActionBarCount(
   { render, xstyle, id: idProp, children, ...rest },
   ref,
 ) {
   const generatedId = React.useId();
   const id = idProp ?? generatedId;
-  const registerCount = React.useContext(ActionBarContext)?.registerCount;
+  const context = React.useContext(ActionBarContext);
+  const registerCount = context?.registerCount;
+  const openChildrenRef = React.useRef(children);
+  if (context?.open !== false) {
+    openChildrenRef.current = children;
+  }
   React.useLayoutEffect(() => {
     registerCount?.(id);
     return () => registerCount?.(undefined);
@@ -343,7 +351,7 @@ const Count = React.forwardRef<HTMLDivElement, ActionBarCountProps>(function Act
         rest,
       ),
       id,
-      children,
+      children: openChildrenRef.current,
     },
   });
 });

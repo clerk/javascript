@@ -85,6 +85,25 @@ describe('Mosaic ActionBar', () => {
     expect(bar.inert).toBe(true);
   });
 
+  it('holds its last contents while it closes', () => {
+    function Selection({ count }: { count: number }) {
+      return (
+        <ActionBar.Root
+          open={count > 0}
+          anchor={useAnchor()}
+          aria-label='Bulk actions'
+        >
+          <ActionBar.Count>{count} selected</ActionBar.Count>
+        </ActionBar.Root>
+      );
+    }
+    const { rerender } = render(<Selection count={2} />);
+    rerender(<Selection count={0} />);
+    expect(screen.getByText('2 selected')).toBeInTheDocument();
+    rerender(<Selection count={5} />);
+    expect(screen.getByText('5 selected')).toBeInTheDocument();
+  });
+
   it('styles the positioner independently from the bar', () => {
     function Positioned() {
       return (
