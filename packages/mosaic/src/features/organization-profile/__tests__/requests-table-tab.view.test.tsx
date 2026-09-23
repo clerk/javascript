@@ -40,6 +40,16 @@ describe('RequestsTableTabView', () => {
         <RequestsTableTabView
           {...props}
           isLoading={false}
+          isFetching
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent('Loading requests');
+    rerender(
+      <MosaicProvider>
+        <RequestsTableTabView
+          {...props}
+          isLoading={false}
         />
       </MosaicProvider>,
     );

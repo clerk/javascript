@@ -168,7 +168,7 @@ export function RequestsTableTabView({
             </Table.Row>
           </Table.Header>
           <Table.Body>
-            {isLoading ? (
+            {isLoading || (isFetching && table.rows.length === 0) ? (
               <Table.Empty colSpan={columnCount}>
                 <span role='status'>
                   <Spinner />
