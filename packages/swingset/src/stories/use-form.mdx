@@ -94,7 +94,7 @@ A dialog calls `reset()` when it closes, or `reset(values)` to start from values
 
 - Error feedback shows only once a field is touched, by blur or by any submit attempt, and then updates live. Success, warning and info feedback show immediately. An untouched error still blocks submit, and a submit attempt focuses the first registered control in error.
 - A sync `validate` is a pure function of the current values, so cross-field checks need no extra wiring. Its result takes precedence over the async one for the same field.
-- An async `validateAsync` runs when its own field changes. The latest result wins, stale results drop, and the field reports `isValidating` while pending. The previous result stays visible until the next one arrives, but only a settled error blocks submit. It never runs for the initial value. A validator that rejects counts as no feedback.
+- An async `validateAsync` runs when its own field changes. The latest result wins, stale results drop, and the field reports `isValidating` while pending. The previous result stays visible until the next one arrives, but only a settled error blocks submit. It never runs for the initial value. A validator that rejects or throws counts as no feedback.
 - A submit while a validator is pending is queued: `isSubmitting` turns on straight away and `onSubmit` runs once the last check resolves clean. Changing a field drops the queued submit.
 - A submit error under a field clears when that field changes. The banner persists until the next submit.
 - Changes and resets are ignored while `onSubmit` is running.
