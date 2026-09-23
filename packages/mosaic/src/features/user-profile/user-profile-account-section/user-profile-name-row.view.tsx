@@ -29,7 +29,7 @@ export function UserProfileNameRowView({
       <Section.Item>
         <Section.Content>
           <Section.Label>{m.name.label}</Section.Label>
-          {name ? <Section.Description>{name}</Section.Description> : null}
+          <Section.Description>{name || m.name.empty}</Section.Description>
         </Section.Content>
         {onSubmit ? (
           <Section.Actions>
@@ -72,14 +72,14 @@ function EditName({
       firstNameAttribute={firstNameAttribute}
       lastNameAttribute={lastNameAttribute}
       open={controller.isOpen}
-      title={isSet ? m.name.dialogTitle : m.name.setDialogTitle}
+      title={isSet ? m.name.dialogTitle : m.name.addDialogTitle}
       trigger={
         <Button
           color='neutral'
           size='sm'
           variant='outline'
         >
-          {isSet ? m.name.edit : m.name.set}
+          {isSet ? m.name.edit : m.name.add}
         </Button>
       }
     />

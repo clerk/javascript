@@ -16,7 +16,7 @@ export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUs
       <Section.Item>
         <Section.Content>
           <Section.Label>{m.username.label}</Section.Label>
-          {username ? <Section.Description>{username}</Section.Description> : null}
+          <Section.Description>{username || m.username.empty}</Section.Description>
         </Section.Content>
         {onSubmit ? (
           <Section.Actions>
@@ -40,14 +40,14 @@ function EditUsername({ username, onSubmit }: { username: string; onSubmit: (use
     <UserProfileEditUsernameDialog
       {...controller}
       open={controller.isOpen}
-      title={isSet ? m.username.dialogTitle : m.username.setDialogTitle}
+      title={isSet ? m.username.dialogTitle : m.username.addDialogTitle}
       trigger={
         <Button
           color='neutral'
           size='sm'
           variant='outline'
         >
-          {isSet ? m.username.edit : m.username.set}
+          {isSet ? m.username.edit : m.username.add}
         </Button>
       }
     />
