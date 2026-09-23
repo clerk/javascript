@@ -276,7 +276,7 @@ const OverviewTab = withCardStateProvider(
     };
 
     return (
-      <Col sx={t => ({ paddingTop: t.space.$2 })}>
+      <Col sx={t => ({ paddingTop: t.space.$2, width: '100%' })}>
         {!isCatchAll ? (
           <SettingRow label='Domains'>
             <TagInput

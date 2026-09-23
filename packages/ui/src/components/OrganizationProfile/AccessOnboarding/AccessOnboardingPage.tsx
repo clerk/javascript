@@ -136,60 +136,64 @@ const PoliciesPanel = () => {
   const { policies, access } = useAccessPrototype();
 
   return (
-    <Action.Root>
-      <Col sx={t => ({ gap: t.space.$4, width: '100%', paddingTop: t.space.$4 })}>
-        <Flex
-          justify='between'
-          align='center'
-          gap={4}
-        >
-          <Col sx={t => ({ gap: t.space.$0x5 })}>
-            <Text variant='subtitle'>Policies</Text>
-            <Text
-              colorScheme='secondary'
-              sx={t => ({ fontSize: t.fontSizes.$sm })}
-            >
-              Configure enrollment, sign-in, SSO, and Directory Sync.
-            </Text>
-          </Col>
-          {access.canManage ? (
-            <Action.Trigger value='add'>
-              <Button
-                size='sm'
-                localizationKey={protoKey('Add')}
-              />
-            </Action.Trigger>
-          ) : null}
-        </Flex>
-
-        <Action.Open value='add'>
-          <Action.Card>
-            <AddDomainClose />
-          </Action.Card>
-        </Action.Open>
-
-        <Flex sx={t => ({ overflowX: 'auto', paddingBlock: t.space.$1, width: '100%' })}>
-          <Table>
-            <Thead>
-              <Tr>
-                <Th localizationKey={protoKey('Target')} />
-                <Th localizationKey={protoKey('Enrollment')} />
-                <Th localizationKey={protoKey('Authentication')} />
-                {access.canManage ? <Th localizationKey={protoKey('')} /> : null}
-              </Tr>
-            </Thead>
-            <Tbody>
-              {policies.map(policy => (
-                <PolicyRow
-                  key={policy.id}
-                  policy={policy}
+    // Action.Root renders an animation wrapper with no width of its own; the
+    // tab panel is a row flex, so without this the whole panel shrink-wraps.
+    <Box sx={{ width: '100%' }}>
+      <Action.Root>
+        <Col sx={t => ({ gap: t.space.$4, width: '100%', paddingTop: t.space.$4 })}>
+          <Flex
+            justify='between'
+            align='center'
+            gap={4}
+          >
+            <Col sx={t => ({ gap: t.space.$0x5 })}>
+              <Text variant='subtitle'>Policies</Text>
+              <Text
+                colorScheme='secondary'
+                sx={t => ({ fontSize: t.fontSizes.$sm })}
+              >
+                Configure enrollment, sign-in, SSO, and Directory Sync.
+              </Text>
+            </Col>
+            {access.canManage ? (
+              <Action.Trigger value='add'>
+                <Button
+                  size='sm'
+                  localizationKey={protoKey('Add')}
                 />
-              ))}
-            </Tbody>
-          </Table>
-        </Flex>
-      </Col>
-    </Action.Root>
+              </Action.Trigger>
+            ) : null}
+          </Flex>
+
+          <Action.Open value='add'>
+            <Action.Card>
+              <AddDomainClose />
+            </Action.Card>
+          </Action.Open>
+
+          <Flex sx={t => ({ overflowX: 'auto', paddingBlock: t.space.$1, width: '100%' })}>
+            <Table>
+              <Thead>
+                <Tr>
+                  <Th localizationKey={protoKey('Target')} />
+                  <Th localizationKey={protoKey('Enrollment')} />
+                  <Th localizationKey={protoKey('Authentication')} />
+                  {access.canManage ? <Th localizationKey={protoKey('')} /> : null}
+                </Tr>
+              </Thead>
+              <Tbody>
+                {policies.map(policy => (
+                  <PolicyRow
+                    key={policy.id}
+                    policy={policy}
+                  />
+                ))}
+              </Tbody>
+            </Table>
+          </Flex>
+        </Col>
+      </Action.Root>
+    </Box>
   );
 };
 

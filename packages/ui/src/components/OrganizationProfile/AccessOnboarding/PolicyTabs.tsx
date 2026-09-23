@@ -116,7 +116,7 @@ export const SsoTab = ({
   };
 
   return (
-    <Col sx={t => ({ gap: t.space.$5, paddingTop: t.space.$4 })}>
+    <Col sx={t => ({ gap: t.space.$5, paddingTop: t.space.$4, width: '100%' })}>
       <Flex
         justify='between'
         align='center'
@@ -323,7 +323,7 @@ export const DirectorySyncTab = ({
   };
 
   return (
-    <Col sx={t => ({ gap: t.space.$5, paddingTop: t.space.$4 })}>
+    <Col sx={t => ({ gap: t.space.$5, paddingTop: t.space.$4, width: '100%' })}>
       <Col sx={t => ({ gap: t.space.$0x5 })}>
         <Text variant='subtitle'>Configure</Text>
         <Text
