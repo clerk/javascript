@@ -1,4 +1,3 @@
-import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
@@ -52,7 +51,7 @@ describe('useForm', () => {
   });
 
   it('submits the current values once and ignores submits while pending', async () => {
-    const request = createDeferredPromise();
+    const request = deferred<void>();
     const onSubmit = vi.fn(async (_values: { username: string }) => {
       await request.promise;
     });
@@ -319,7 +318,7 @@ describe('useForm', () => {
   });
 
   it('ignores changes and reset while submitting', async () => {
-    const request = createDeferredPromise();
+    const request = deferred<void>();
     const { result } = renderHook(() =>
       useForm({
         initialValues: { username: 'alex' },
