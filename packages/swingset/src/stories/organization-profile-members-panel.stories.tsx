@@ -2,6 +2,7 @@ import { OrganizationProfileMembersPanelView } from '@clerk/mosaic/features/orga
 
 import type { StoryMeta } from '@/lib/types';
 
+import { useInvitationsTableFixture } from './fixtures/invitations-table-tab';
 import { useMembersTableFixture } from './fixtures/members-table-tab';
 
 export { default as __source } from './organization-profile-members-panel.stories?raw';
@@ -17,16 +18,19 @@ export const meta: StoryMeta = {
 };
 
 export function Legacy() {
-  const props = useMembersTableFixture();
-  return <OrganizationProfileMembersPanelView members={props} />;
+  const members = useMembersTableFixture();
+  const invitations = useInvitationsTableFixture();
+  return <OrganizationProfileMembersPanelView members={members} invitations={invitations} />;
 }
 
 export function Proposed() {
-  const props = useMembersTableFixture({ proposed: true });
-  return <OrganizationProfileMembersPanelView members={props} />;
+  const members = useMembersTableFixture({ proposed: true });
+  const invitations = useInvitationsTableFixture({ proposed: true });
+  return <OrganizationProfileMembersPanelView members={members} invitations={invitations} />;
 }
 
 export function Empty() {
-  const props = useMembersTableFixture({ empty: true });
-  return <OrganizationProfileMembersPanelView members={props} />;
+  const members = useMembersTableFixture({ empty: true });
+  const invitations = useInvitationsTableFixture({ empty: true });
+  return <OrganizationProfileMembersPanelView members={members} invitations={invitations} />;
 }

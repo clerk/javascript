@@ -113,12 +113,6 @@ import {
   Sizes as InputGroupSizes,
 } from '../stories/input-group.stories';
 import {
-  Empty as InvitationsTableTabEmpty,
-  Legacy as InvitationsTableTabLegacy,
-  meta as invitationsTableTabMeta,
-  Proposed as InvitationsTableTabProposed,
-} from '../stories/invitations-table-tab.stories';
-import {
   Default as ItemDefault,
   Group as ItemGroup,
   Interactive as ItemInteractive,
@@ -881,13 +875,6 @@ const organizationProfileMembersPanelModule: StoryModule = {
   Empty: OrganizationProfileMembersPanelEmpty,
 };
 
-const invitationsTableTabModule: StoryModule = {
-  meta: invitationsTableTabMeta,
-  Legacy: InvitationsTableTabLegacy,
-  Proposed: InvitationsTableTabProposed,
-  Empty: InvitationsTableTabEmpty,
-};
-
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -917,7 +904,6 @@ export const registry: StoryModule[] = [
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
   organizationProfileMembersPanelModule,
-  invitationsTableTabModule,
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
   organizationProfileDangerSectionModule,

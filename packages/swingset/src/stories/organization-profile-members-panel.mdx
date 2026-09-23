@@ -2,15 +2,17 @@ import * as Stories from './organization-profile-members-panel.stories';
 
 # OrganizationProfileMembersPanel
 
-The organization profile’s Members panel owns the page title and tab navigation. These examples show its Members tab with a controlled table.
+The organization profile’s Members panel owns the page title and tab navigation. These examples show its Members and Invitations tabs with controlled tables.
 
 Removing a member opens a confirmation dialog. The dialog awaits the action callback and keeps failures visible. After a successful removal, focus moves to a surviving row action or a toolbar control.
+
+Revoking an invitation opens a confirmation dialog. The dialog awaits the action callback and keeps failures visible. After a successful removal, focus moves to a surviving row action or a toolbar control.
 
 ## Example
 
 ### Legacy
 
-The baseline table shows the user, joined date, role, and optional row actions.
+The Members table shows the user, joined date, role, and optional row actions. The Invitations table shows the invited email address, invitation date, role, and optional revoke action.
 
 <Story name='Legacy' storyModule={Stories} composition={[
   { name: 'Profile', href: '/components/profile', layer: 'Components' },
