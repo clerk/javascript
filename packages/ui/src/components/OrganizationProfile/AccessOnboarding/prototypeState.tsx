@@ -1,289 +1,470 @@
 import type { FieldId } from '@clerk/shared/types';
-import React, { createContext, useContext, useReducer } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
 import type { LocalizationKey } from '../../../customizables';
 
 /*
- * Prototype-only state for the Access & onboarding page. The model here
- * deliberately diverges from OrganizationDomainResource: enrollment and
- * authentication are independent axes (enterprise_sso is NOT an enrollment
- * mode), and affiliation/ownership are proof levels that gate which options a
- * self-serve admin can enable. Nothing persists — state is local to the page.
+ * Prototype-only state for the Access page in <OrganizationProfile />.
+ *
+ * The model follows the Sept 2026 design: a policy targets one or more
+ * domains (or is the organization's catch-all), and carries enrollment,
+ * sign-in, MFA, re-verification, and per-domain proof. Connections (SSO,
+ * directory) hang off a policy. Nothing persists beyond the browser tab: a
+ * module singleton mirrored to sessionStorage, so navigating between the
+ * table and the Configure policy page keeps state, and a refresh does too.
  */
 
-export type ProtoEnrollment = 'invitation_only' | 'request_access' | 'join_automatically' | 'directory_synced';
+export type ProtoEnrollment = 'invitation_only' | 'request_access' | 'join_automatically' | 'directory_sync';
+export type ProtoSignIn = 'default' | 'sso';
+export type ProtoProvider = 'saml_okta' | 'saml_microsoft' | 'saml_google' | 'saml_custom' | 'oidc';
+export type ProtoNonDirectoryFallback = 'request_access' | 'block';
+export type ProtoOwnership = 'unverified' | 'pending' | 'verified' | 'waived';
+export type ProtoConnectionStatus = 'pending' | 'active' | 'broken';
 
-export type ProtoProvider = 'saml_okta' | 'saml_microsoft' | 'saml_google' | 'saml_custom';
-
-export type ProtoAuthentication =
-  | { mode: 'default' }
-  | { mode: 'sso'; provider: ProtoProvider; status: 'setting_up' | 'active' };
-
-export type ProtoOwnership = 'unverified' | 'verified' | 'waived';
-
-export type ProtoNonDirectoryFallback = 'block' | 'request_access';
-
-export type ProtoDomain = {
-  id: string;
-  name: string;
-  enrollment: ProtoEnrollment;
-  authentication: ProtoAuthentication;
-  affiliationVerified: boolean;
+/** Proof for one domain on a policy. */
+export type ProtoProof = {
+  /** Someone with an email at the domain confirmed a code. */
+  affiliation: boolean;
+  /** DNS TXT record, or the application owner vouching ("waived"). */
   ownership: ProtoOwnership;
-  txtRecordName: string;
-  txtRecordValue: string;
-  /** Restrict-only extras the C2 can demand on top of the app baseline. */
-  twoStepRequired: boolean;
-  sessionLifetimeHours: number;
-  /** Only read when enrollment is directory_synced. */
+  /** The address the affiliation code went to, for the "sent to" line. */
+  affiliationEmail?: string;
+};
+
+export type ProtoPolicy = {
+  id: string;
+  /** Empty for the catch-all. */
+  domains: string[];
+  isCatchAll?: boolean;
+  enrollment: ProtoEnrollment;
+  /** Only read when enrollment is directory_sync. */
   nonDirectoryFallback: ProtoNonDirectoryFallback;
-  /**
-   * Set by the C1, never by the C2 (crosses the org boundary into the
-   * application's tenancy model) — surfaces here as a read-only fact.
-   */
-  membershipRequired?: boolean;
-  /** Pre-approved from the dashboard: the C1 vouches, so proofs are waived. */
-  createdBy?: 'application';
-  /** True until the C2 configures the rule — the row reads Awaiting setup. */
-  awaitingSetup?: boolean;
+  signIn: ProtoSignIn;
+  mfaRequired: boolean;
+  /** null = the application default (24 hours). */
+  reverificationHours: number | null;
+  /** The SSO connection when signIn is 'sso'. */
+  connectionId?: string;
+  /** Directory credentials once directory sync is configured. */
+  directory?: { configured: boolean; token: string; provider: ProtoProvider };
+  proofs: Record<string, ProtoProof>;
+  createdAt: string;
 };
 
-/*
- * Mirrors the dashboard prototype's application defaults: a rule can require
- * re-verification more often than the application setting, never less.
- */
-export const APP_SESSION_LIFETIME_HOURS = 12;
-export const SESSION_LIFETIME_OPTIONS = [1, 8, 12] as const;
-export const formatSessionLifetime = (hours: number) => (hours === 1 ? '1 hour' : `${hours} hours`);
-
-export const NON_DIRECTORY_FALLBACK_LABELS: Record<ProtoNonDirectoryFallback, { label: string; description: string }> =
-  {
-    block: {
-      label: 'Block them',
-      description: 'The directory is the only way in. They see an error telling them to contact an admin.',
-    },
-    request_access: {
-      label: 'Let them request access',
-      description: 'An admin approves them one by one. Useful when the directory only covers part of the company.',
-    },
-  };
-
-/** The recommendation tracks who is vouching, same as the dashboard wizard. */
-export const recommendedEnrollmentFor = (signInMode: 'default' | 'sso'): ProtoEnrollment =>
-  signInMode === 'sso' ? 'join_automatically' : 'request_access';
-
-export type EnrollmentChoices = {
-  options: { value: string; label: string; description?: string }[];
-  locked: { label: string; reason: string }[];
+export type ProtoTestLog = {
+  id: string;
+  at: string;
+  detail: string;
+  status: 'pending' | 'success' | 'failed';
 };
 
-/*
- * Ordering tracks the sign-in answer (dashboard parity) and the proof
- * matrix decides availability: affiliation unlocks the low-risk modes,
- * ownership unlocks joining automatically, and directory sync needs the
- * domain's single sign-on to be active. Locked modes are listed beneath
- * the radio group with their reasons rather than rendered as dead rows.
- */
-export const enrollmentChoicesFor = (domain: ProtoDomain, signInMode: 'default' | 'sso'): EnrollmentChoices => {
-  const ssoActive = domain.authentication.mode === 'sso' && domain.authentication.status === 'active';
-  const order: ProtoEnrollment[] =
-    signInMode === 'sso'
-      ? ['join_automatically', 'directory_synced', 'request_access', 'invitation_only']
-      : ['join_automatically', 'request_access', 'invitation_only', 'directory_synced'];
-
-  const reasonFor = (mode: ProtoEnrollment): string | null => {
-    if (mode === 'join_automatically' && !hasOwnership(domain)) {
-      return 'verify domain ownership to enable';
-    }
-    if ((mode === 'request_access' || mode === 'invitation_only') && !domain.affiliationVerified) {
-      return 'verify the domain to enable';
-    }
-    if (mode === 'directory_synced' && !ssoActive) {
-      return signInMode === 'sso' ? 'available once single sign-on is active' : 'needs single sign-on';
-    }
-    return null;
-  };
-
-  const options: EnrollmentChoices['options'] = [];
-  const locked: EnrollmentChoices['locked'] = [];
-  for (const mode of order) {
-    const reason = reasonFor(mode);
-    if (reason) {
-      locked.push({ label: ENROLLMENT_LABELS[mode].label, reason });
-    } else {
-      options.push({
-        value: mode,
-        label: ENROLLMENT_LABELS[mode].label,
-        description: ENROLLMENT_LABELS[mode].description,
-      });
-    }
-  }
-  return { options, locked };
+export type ProtoConnection = {
+  id: string;
+  provider: ProtoProvider;
+  name: string;
+  status: ProtoConnectionStatus;
+  logs: ProtoTestLog[];
 };
 
-export const ENROLLMENT_LABELS: Record<ProtoEnrollment, { label: string; description: string }> = {
+export type ScenarioKey = 'work' | 'personal' | 'configured';
+
+export const SCENARIO_LABELS: Record<ScenarioKey, string> = {
+  work: 'New org, work email',
+  personal: 'New org, personal email',
+  configured: 'Configured org',
+};
+
+/** What the application owner allows this organization's members to do. */
+export type ProtoAccess = {
+  /** org:sys_domains:manage. Off = view only. */
+  canManage: boolean;
+  /** The application owner allowed SSO and directory sync for this org. */
+  ssoAllowed: boolean;
+  /** Shown on the SSO option when ssoAllowed is off. */
+  ssoUnavailableMessage: string;
+};
+
+export type ProtoState = {
+  scenario: ScenarioKey;
+  policies: ProtoPolicy[];
+  connections: ProtoConnection[];
+  access: ProtoAccess;
+};
+
+/* ----------------------------------------------------------------- labels */
+
+export const ENROLLMENT_LABELS: Record<
+  ProtoEnrollment,
+  { label: string; short: string; description: (domain: string) => string }
+> = {
   join_automatically: {
     label: 'Join automatically',
-    description: 'Anyone who signs up with an email at this domain becomes a member right away.',
+    short: 'Join automatically',
+    description: domain => `Anyone with a verified @${domain} email joins when they sign up.`,
   },
   request_access: {
     label: 'Request access',
-    description: 'People with an email at this domain can ask to join. An admin approves each request.',
+    short: 'Request access',
+    description: domain => `People with an @${domain} email can ask to join. An admin approves them.`,
   },
   invitation_only: {
     label: 'Invitation only',
-    description: 'Nobody joins on their own. Admins invite each person.',
+    short: 'Invitation',
+    description: () => 'Nobody joins on their own. Admins invite each person.',
   },
-  directory_synced: {
-    label: 'Sync from a directory',
-    description: 'Members are created and removed by the directory. Nobody joins on their own.',
+  directory_sync: {
+    label: 'Sync from directory',
+    short: 'Directory sync',
+    description: () => 'Members are created and removed by your directory.',
   },
 };
 
-export const PROVIDER_LABELS: Record<ProtoProvider, { label: string; iconId: string }> = {
-  saml_okta: { label: 'Okta Workforce', iconId: 'okta' },
-  saml_microsoft: { label: 'Microsoft Entra', iconId: 'microsoft' },
-  saml_google: { label: 'Google Workspace', iconId: 'google' },
-  saml_custom: { label: 'Custom SAML', iconId: 'saml' },
+export const NON_DIRECTORY_FALLBACK_LABELS: Record<ProtoNonDirectoryFallback, { label: string; description: string }> =
+  {
+    request_access: {
+      label: 'Request access',
+      description: 'Users can request access from an admin',
+    },
+    block: {
+      label: 'Block access',
+      description: 'Only directory members can join',
+    },
+  };
+
+export const PROVIDER_LABELS: Record<ProtoProvider, { label: string; iconId: string; kind: 'saml' | 'oidc' }> = {
+  saml_okta: { label: 'Okta Workforce', iconId: 'okta', kind: 'saml' },
+  saml_microsoft: { label: 'Microsoft Entra', iconId: 'microsoft', kind: 'saml' },
+  saml_google: { label: 'Google Workspace', iconId: 'google', kind: 'saml' },
+  saml_custom: { label: 'Custom SAML Provider', iconId: 'saml', kind: 'saml' },
+  oidc: { label: 'OIDC Provider', iconId: 'oidc', kind: 'oidc' },
 };
 
-const txtRecordFor = (name: string) => ({
-  txtRecordName: `_clerk_domain_verification.${name}`,
-  txtRecordValue: `clerk-domain-verification=${name.replace(/[^a-z0-9]/gi, '').slice(0, 6)}8f3k2m`,
+/** Provider marks that ship as a single-colour glyph and take the text colour. */
+export const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta', 'saml', 'oidc']);
+
+export const APP_REVERIFICATION_HOURS = 24;
+export const REVERIFICATION_OPTIONS = [1, 4, 8, 12, 24, 168] as const;
+export const formatReverification = (hours: number) =>
+  hours === 1 ? 'Every hour' : hours === 168 ? 'Every 7 days' : `Every ${hours} hours`;
+
+/** The table's Target column. */
+export const policyTarget = (policy: ProtoPolicy, policies: ProtoPolicy[]) => {
+  if (policy.isCatchAll) {
+    return policies.some(other => !other.isCatchAll) ? 'Everyone else' : 'Everyone';
+  }
+  return policy.domains.join(', ');
+};
+
+/*
+ * Proof rule (Stephen, Sept 22): SSO or directory sync need ownership of
+ * the domain, and ownership supersedes affiliation. Anything else needs
+ * affiliation only. A domain the application owner vouched for needs
+ * nothing.
+ */
+export const needsOwnership = (policy: Pick<ProtoPolicy, 'signIn' | 'enrollment'>) =>
+  policy.signIn === 'sso' || policy.enrollment === 'directory_sync';
+
+export const isProven = (policy: ProtoPolicy, domain: string) => {
+  const proof = policy.proofs[domain];
+  if (!proof) {
+    return false;
+  }
+  if (proof.ownership === 'verified' || proof.ownership === 'waived') {
+    return true;
+  }
+  return !needsOwnership(policy) && proof.affiliation;
+};
+
+export const connectionFor = (policy: ProtoPolicy, connections: ProtoConnection[]) =>
+  policy.connectionId ? (connections.find(connection => connection.id === policy.connectionId) ?? null) : null;
+
+export const policiesForConnection = (connectionId: string, policies: ProtoPolicy[]) =>
+  policies.filter(policy => policy.connectionId === connectionId);
+
+/* --------------------------------------------------------------- builders */
+
+let counter = 0;
+const nextId = (prefix: string) => `${prefix}_${Date.now().toString(36)}_${(counter += 1)}`;
+
+export const txtRecordFor = (domain: string) => ({
+  name: `_clerk.${domain}`,
+  value: `domain-verify=${domain.replace(/[^a-z0-9]/gi, '').slice(0, 8)}nasu3yaiosjef`,
 });
 
-const SEED_DOMAINS: ProtoDomain[] = [
-  {
-    /*
-     * The receiving end of the dashboard's pre-approve flow: the C1 created
-     * this rule, so proofs are vouched (ownership waived, nothing locked)
-     * and the row waits for the C2 to self-serve through SSO and, later,
-     * SCIM. Ownership can still be proven, it just is not required.
-     */
-    id: 'proto_dom_acme',
-    name: 'acme.com',
-    enrollment: 'request_access',
-    authentication: { mode: 'default' },
-    affiliationVerified: true,
-    ownership: 'waived',
-    twoStepRequired: false,
-    sessionLifetimeHours: APP_SESSION_LIFETIME_HOURS,
-    nonDirectoryFallback: 'block',
-    // Set by the C1 alongside the pre-approval, shown as a read-only fact.
-    membershipRequired: true,
-    createdBy: 'application',
-    awaitingSetup: true,
-    ...txtRecordFor('acme.com'),
-  },
-];
+/** The row a domain starts as: the application's defaults, nothing proven. */
+export const newPolicy = (domain: string, overrides: Partial<ProtoPolicy> = {}): ProtoPolicy => ({
+  id: nextId('pol'),
+  domains: [domain],
+  enrollment: 'invitation_only',
+  nonDirectoryFallback: 'request_access',
+  signIn: 'default',
+  mfaRequired: false,
+  reverificationHours: null,
+  proofs: { [domain]: { affiliation: false, ownership: 'unverified' } },
+  createdAt: new Date().toISOString(),
+  ...overrides,
+});
 
-type ProtoAction =
-  | { type: 'addDomain'; name: string }
-  | { type: 'markAffiliationVerified'; id: string }
-  | { type: 'markOwnershipVerified'; id: string }
-  | { type: 'setEnrollment'; id: string; enrollment: ProtoEnrollment }
-  | {
-      type: 'configureRule';
-      id: string;
-      enrollment: ProtoEnrollment;
-      twoStepRequired: boolean;
-      sessionLifetimeHours: number;
-      nonDirectoryFallback: ProtoNonDirectoryFallback;
-      ssoProvider: ProtoProvider | null;
-    }
-  | { type: 'setSsoProvider'; id: string; provider: ProtoProvider }
-  | { type: 'completeSsoSetup'; id: string }
-  | { type: 'simulateFirstSignIn'; id: string }
-  | { type: 'removeDomain'; id: string };
+const catchAll = (overrides: Partial<ProtoPolicy> = {}): ProtoPolicy => ({
+  id: 'pol_catch_all',
+  domains: [],
+  isCatchAll: true,
+  enrollment: 'invitation_only',
+  nonDirectoryFallback: 'request_access',
+  signIn: 'default',
+  mfaRequired: false,
+  reverificationHours: null,
+  proofs: {},
+  createdAt: '2026-09-01T09:00:00.000Z',
+  ...overrides,
+});
 
-const patch = (domains: ProtoDomain[], id: string, changes: Partial<ProtoDomain>) =>
-  domains.map(domain => (domain.id === id ? { ...domain, ...changes } : domain));
+const DEFAULT_ACCESS: ProtoAccess = { canManage: true, ssoAllowed: true, ssoUnavailableMessage: '' };
 
-const reducer = (domains: ProtoDomain[], action: ProtoAction): ProtoDomain[] => {
-  switch (action.type) {
-    case 'addDomain': {
-      const name = action.name.trim().toLowerCase();
-      return [
-        ...domains,
-        {
-          id: `proto_dom_${name.replace(/[^a-z0-9]/g, '_')}`,
-          name,
-          enrollment: 'invitation_only',
-          authentication: { mode: 'default' },
-          affiliationVerified: false,
-          ownership: 'unverified',
-          twoStepRequired: false,
-          sessionLifetimeHours: APP_SESSION_LIFETIME_HOURS,
-          nonDirectoryFallback: 'block',
-          ...txtRecordFor(name),
-        },
-      ];
-    }
-    case 'markAffiliationVerified':
-      return patch(domains, action.id, { affiliationVerified: true });
-    case 'markOwnershipVerified':
-      return patch(domains, action.id, { ownership: 'verified' });
-    case 'setEnrollment':
-      return patch(domains, action.id, { enrollment: action.enrollment });
-    case 'configureRule':
-      return patch(domains, action.id, {
-        awaitingSetup: false,
-        enrollment: action.enrollment,
-        twoStepRequired: action.twoStepRequired,
-        sessionLifetimeHours: action.sessionLifetimeHours,
-        nonDirectoryFallback: action.nonDirectoryFallback,
-        authentication: action.ssoProvider
-          ? { mode: 'sso', provider: action.ssoProvider, status: 'setting_up' }
-          : { mode: 'default' },
-      });
-    case 'setSsoProvider':
-      return patch(domains, action.id, {
-        awaitingSetup: false,
-        authentication: { mode: 'sso', provider: action.provider, status: 'setting_up' },
-      });
-    case 'completeSsoSetup':
-      return domains.map(domain =>
-        domain.id === action.id && domain.authentication.mode === 'sso'
-          ? { ...domain, authentication: { ...domain.authentication, status: 'setting_up' as const } }
-          : domain,
-      );
-    case 'simulateFirstSignIn':
-      return domains.map(domain =>
-        domain.id === action.id && domain.authentication.mode === 'sso'
-          ? { ...domain, authentication: { ...domain.authentication, status: 'active' as const } }
-          : domain,
-      );
-    case 'removeDomain':
-      return domains.filter(domain => domain.id !== action.id);
-    default:
-      return domains;
+const scenario = (key: ScenarioKey): ProtoState => {
+  switch (key) {
+    case 'personal':
+      return { scenario: key, policies: [catchAll()], connections: [], access: DEFAULT_ACCESS };
+    case 'work':
+      return {
+        scenario: key,
+        policies: [
+          newPolicy('acmedev.org', {
+            id: 'pol_acmedev_org',
+            // The creator's own email domain: affiliation came with sign-up.
+            proofs: {
+              'acmedev.org': { affiliation: true, ownership: 'unverified', affiliationEmail: 'you@acmedev.org' },
+            },
+            createdAt: '2026-09-21T15:04:00.000Z',
+          }),
+          catchAll(),
+        ],
+        connections: [],
+        access: DEFAULT_ACCESS,
+      };
+    case 'configured':
+      return {
+        scenario: key,
+        policies: [
+          newPolicy('acme.com', {
+            id: 'pol_acme_com',
+            enrollment: 'directory_sync',
+            nonDirectoryFallback: 'block',
+            signIn: 'sso',
+            connectionId: 'con_okta_acme_com',
+            directory: { configured: true, token: 'FSLKJG2203498NMF02', provider: 'saml_okta' },
+            proofs: { 'acme.com': { affiliation: true, ownership: 'verified' } },
+            createdAt: '2026-08-12T10:00:00.000Z',
+          }),
+          newPolicy('acme.dev', {
+            id: 'pol_acme_dev',
+            enrollment: 'directory_sync',
+            nonDirectoryFallback: 'request_access',
+            signIn: 'sso',
+            connectionId: 'con_okta_acme_dev',
+            directory: { configured: true, token: 'QWERT9981273LKJH01', provider: 'saml_okta' },
+            proofs: { 'acme.dev': { affiliation: true, ownership: 'verified' } },
+            createdAt: '2026-08-20T10:00:00.000Z',
+          }),
+          newPolicy('acmedev.org', {
+            id: 'pol_acmedev_org',
+            enrollment: 'join_automatically',
+            proofs: {
+              'acmedev.org': { affiliation: true, ownership: 'unverified', affiliationEmail: 'you@acmedev.org' },
+            },
+            createdAt: '2026-09-02T10:00:00.000Z',
+          }),
+          catchAll(),
+        ],
+        connections: [
+          {
+            id: 'con_okta_acme_com',
+            provider: 'saml_okta',
+            name: 'Okta',
+            status: 'active',
+            logs: [
+              {
+                id: 'log_1',
+                at: '2026-08-12T10:15:08.000Z',
+                detail: 'Signed in as it-admin@acme.com',
+                status: 'success',
+              },
+            ],
+          },
+          {
+            id: 'con_okta_acme_dev',
+            provider: 'saml_okta',
+            name: 'Okta My Custom Name',
+            // Certificate rotated on the IdP side: sign-in from acme.dev fails.
+            status: 'broken',
+            logs: [{ id: 'log_2', at: '2026-09-20T08:02:41.000Z', detail: 'Invalid signature', status: 'failed' }],
+          },
+        ],
+        access: DEFAULT_ACCESS,
+      };
   }
 };
 
-type AccessOnboardingContextValue = {
-  domains: ProtoDomain[];
-  dispatch: React.Dispatch<ProtoAction>;
-};
+/* ------------------------------------------------------------------ store */
 
-const AccessOnboardingContext = createContext<AccessOnboardingContextValue | null>(null);
+const STORAGE_KEY = 'clerk-access-prototype';
+const SERVER_STATE = scenario('work');
 
-export const AccessOnboardingProvider = ({ children }: { children: React.ReactNode }) => {
-  const [domains, dispatch] = useReducer(reducer, SEED_DOMAINS);
-  return <AccessOnboardingContext.Provider value={{ domains, dispatch }}>{children}</AccessOnboardingContext.Provider>;
-};
+let state: ProtoState | null = null;
+const listeners = new Set<() => void>();
 
-export const useAccessOnboarding = (): AccessOnboardingContextValue => {
-  const context = useContext(AccessOnboardingContext);
-  if (!context) {
-    throw new Error('Clerk: useAccessOnboarding called outside AccessOnboardingProvider.');
+const isScenarioKey = (value: unknown): value is ScenarioKey =>
+  value === 'work' || value === 'personal' || value === 'configured';
+
+const load = (): ProtoState => {
+  if (state) {
+    return state;
   }
-  return context;
+  try {
+    const raw = window.sessionStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const stored = JSON.parse(raw) as Partial<ProtoState>;
+      if (isScenarioKey(stored.scenario)) {
+        state = { ...scenario(stored.scenario), ...stored };
+        return state;
+      }
+    }
+  } catch {
+    // Storage blocked or unreadable: fall through to the seed.
+  }
+  state = SERVER_STATE;
+  return state;
 };
 
-export const hasOwnership = (domain: ProtoDomain) => domain.ownership === 'verified' || domain.ownership === 'waived';
+const commit = (next: ProtoState) => {
+  state = next;
+  try {
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    // Storage blocked: the in-memory copy still works for this page.
+  }
+  listeners.forEach(listener => listener());
+};
+
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+};
+
+export const useAccessPrototype = () => {
+  const current = useSyncExternalStore(subscribe, load, () => SERVER_STATE);
+
+  const update = useCallback((recipe: (previous: ProtoState) => ProtoState) => commit(recipe(load())), []);
+
+  const setScenario = useCallback((key: ScenarioKey) => commit(scenario(key)), []);
+
+  const setAccess = useCallback(
+    (patch: Partial<ProtoAccess>) => update(previous => ({ ...previous, access: { ...previous.access, ...patch } })),
+    [update],
+  );
+
+  // Adding a domain creates the row at the defaults. Configuration happens
+  // by editing the policy afterwards (Stephen, Sept 22).
+  const addDomain = useCallback(
+    (name: string) => {
+      const domain = name.trim().toLowerCase();
+      const policy = newPolicy(domain);
+      update(previous => ({ ...previous, policies: [...previous.policies, policy] }));
+      return policy;
+    },
+    [update],
+  );
+
+  const updatePolicy = useCallback(
+    (id: string, patch: Partial<ProtoPolicy> | ((policy: ProtoPolicy) => Partial<ProtoPolicy>)) =>
+      update(previous => ({
+        ...previous,
+        policies: previous.policies.map(policy =>
+          policy.id === id ? { ...policy, ...(typeof patch === 'function' ? patch(policy) : patch) } : policy,
+        ),
+      })),
+    [update],
+  );
+
+  const removePolicy = useCallback(
+    (id: string) =>
+      update(previous => {
+        const removed = previous.policies.find(policy => policy.id === id);
+        return {
+          ...previous,
+          policies: previous.policies.filter(policy => policy.id !== id),
+          // A connection nothing points at goes with its policy.
+          connections: previous.connections.filter(
+            connection =>
+              connection.id !== removed?.connectionId ||
+              previous.policies.some(policy => policy.id !== id && policy.connectionId === connection.id),
+          ),
+        };
+      }),
+    [update],
+  );
+
+  const addConnection = useCallback(
+    (provider: ProtoProvider, name = PROVIDER_LABELS[provider].label): ProtoConnection => {
+      const connection: ProtoConnection = { id: nextId('con'), provider, name, status: 'pending', logs: [] };
+      update(previous => ({ ...previous, connections: [...previous.connections, connection] }));
+      return connection;
+    },
+    [update],
+  );
+
+  const updateConnection = useCallback(
+    (id: string, patch: Partial<ProtoConnection> | ((connection: ProtoConnection) => Partial<ProtoConnection>)) =>
+      update(previous => ({
+        ...previous,
+        connections: previous.connections.map(connection =>
+          connection.id === id
+            ? { ...connection, ...(typeof patch === 'function' ? patch(connection) : patch) }
+            : connection,
+        ),
+      })),
+    [update],
+  );
+
+  // Removing a connection drops the policies that used it back to default
+  // sign-in; the policies themselves stay.
+  const removeConnection = useCallback(
+    (id: string) =>
+      update(previous => ({
+        ...previous,
+        connections: previous.connections.filter(connection => connection.id !== id),
+        policies: previous.policies.map(policy =>
+          policy.connectionId === id
+            ? {
+                ...policy,
+                connectionId: undefined,
+                signIn: 'default',
+                enrollment: policy.enrollment === 'directory_sync' ? 'invitation_only' : policy.enrollment,
+                directory: undefined,
+              }
+            : policy,
+        ),
+      })),
+    [update],
+  );
+
+  return {
+    ...current,
+    setScenario,
+    setAccess,
+    addDomain,
+    updatePolicy,
+    removePolicy,
+    addConnection,
+    updateConnection,
+    removeConnection,
+  };
+};
 
 // Fakes network latency so buttons show their real loading states.
-export const simulateRequest = () => new Promise<void>(resolve => setTimeout(resolve, 400));
+export const simulateRequest = (ms = 400) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 // Prototype-only: raw strings render fine at runtime (makeLocalizable's string branch).
 export const protoKey = (value: string) => value as unknown as LocalizationKey;

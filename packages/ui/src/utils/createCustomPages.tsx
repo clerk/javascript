@@ -383,7 +383,7 @@ const getOrganizationProfileDefaultRoutes = ({
   if (accessOnboarding) {
     // Prototype page; raw string title, no localization key yet.
     INITIAL_ROUTES.push({
-      name: 'Access & onboarding',
+      name: 'Access',
       id: ORGANIZATION_PROFILE_NAVBAR_ROUTE_ID.ACCESS,
       icon: Connections,
       path: 'organization-access',
