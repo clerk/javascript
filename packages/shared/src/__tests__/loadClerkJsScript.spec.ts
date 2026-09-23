@@ -46,7 +46,7 @@ describe('loadClerkJsScript(options)', () => {
 
   test('throws error when publishableKey is missing', async () => {
     await expect(loadClerkJsScript({} as any)).rejects.toThrow(
-      "@clerk/react: You're ready to set up your Clerk .env keys.\n\nNew to Clerk or not sure? Simply run:\nnpx clerk@latest init",
+      '@clerk/react: Clerk keys are missing from your environment.\n\nTo create a new Clerk app, run:\nnpx clerk@latest init',
     );
   });
 
@@ -310,7 +310,7 @@ describe('loadClerkUIScript(options)', () => {
 
   test('throws error when publishableKey is missing', async () => {
     await expect(loadClerkUIScript({} as any)).rejects.toThrow(
-      "@clerk/react: You're ready to set up your Clerk .env keys.\n\nNew to Clerk or not sure? Simply run:\nnpx clerk@latest init",
+      '@clerk/react: Clerk keys are missing from your environment.\n\nTo create a new Clerk app, run:\nnpx clerk@latest init',
     );
   });
 

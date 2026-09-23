@@ -39,7 +39,7 @@ test.describe('Keyless mode @quickstart', () => {
     const response = await page.goto(`${app.serverUrl}/`);
     expect(response?.status()).toBe(500);
     const content = await page.content();
-    expect(content).toContain('ready to set up your Clerk .env keys');
+    expect(content).toContain('Clerk keys are missing from your environment');
     expect(content).toContain('npx clerk@latest init');
   });
 

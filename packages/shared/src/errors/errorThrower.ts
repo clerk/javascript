@@ -1,22 +1,16 @@
-const keySetupGuidance = `New to Clerk or not sure? Simply run:
-npx clerk@latest init
-
-Already have a Clerk app? Run:
-npx clerk@latest env pull
-
-'npx clerk@latest init' creates a Clerk application and automatically writes API keys to your .env file. It creates an accountless Clerk app, which means you don't have to sign up or have an account to use Clerk. 'npx clerk@latest env pull' pulls API keys into your project's .env file. Keys are also at https://dashboard.clerk.com/~/api-keys in the Clerk Dashboard.`;
+import { existingAppKeyGuidance, keySetupGuidance } from './keySetupGuidance';
 
 const DefaultMessages = Object.freeze({
   InvalidProxyUrlErrorMessage: `The proxyUrl passed to Clerk is invalid. The expected value for proxyUrl is an absolute URL or a relative path with a leading '/'. (key={{url}})`,
   InvalidPublishableKeyErrorMessage: `The publishableKey passed to Clerk is invalid (key={{key}}, expected format: pk_test_... or pk_live_...).
 
 ${keySetupGuidance}`,
-  MissingPublishableKeyErrorMessage: `You're ready to set up your Clerk .env keys.
+  MissingPublishableKeyErrorMessage: `Clerk keys are missing from your environment.
 
 ${keySetupGuidance}`,
-  MissingSecretKeyErrorMessage: `Missing secretKey. You're ready to set up your Clerk .env keys.
+  MissingSecretKeyErrorMessage: `Missing secretKey.
 
-${keySetupGuidance}`,
+${existingAppKeyGuidance}`,
   MissingClerkProvider: `{{source}} can only be used within the <ClerkProvider /> component. Learn more: https://clerk.com/docs/components/clerk-provider`,
 });
 

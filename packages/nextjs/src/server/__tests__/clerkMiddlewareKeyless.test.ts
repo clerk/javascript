@@ -38,7 +38,7 @@ describe('clerkMiddleware when Clerk env vars are missing', () => {
   };
 
   it('throws the missing key error pointing at the CLI instead of bootstrapping keyless', async () => {
-    await expect(runMiddleware()).rejects.toThrow(/ready to set up your Clerk \.env keys/);
+    await expect(runMiddleware()).rejects.toThrow(/Clerk keys are missing from your environment/);
     await expect(runMiddleware()).rejects.toThrow(/npx clerk@latest init/);
   });
 
@@ -49,6 +49,6 @@ describe('clerkMiddleware when Clerk env vars are missing', () => {
   it('throws the same error regardless of NODE_ENV', async () => {
     vi.stubEnv('NODE_ENV', 'production');
     await expect(runMiddleware()).rejects.toThrow(/npx clerk@latest init/);
-    await expect(runMiddleware()).rejects.toThrow(/npx clerk@latest env pull/);
+    await expect(runMiddleware()).rejects.toThrow(/npx clerk@latest env pull --instance prod/);
   });
 });

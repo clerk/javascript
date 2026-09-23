@@ -28,7 +28,7 @@ describe('redirect(redirectAdapter)', () => {
       } as any);
 
       expect(() => redirectToSignIn({ returnBackUrl })).toThrowError(
-        "@clerk/backend: You're ready to set up your Clerk .env keys.\n\nNew to Clerk or not sure? Simply run:\nnpx clerk@latest init",
+        '@clerk/backend: Clerk keys are missing from your environment.\n\nTo create a new Clerk app, run:\nnpx clerk@latest init',
       );
     });
   });
@@ -258,7 +258,7 @@ describe('redirect(redirectAdapter)', () => {
       });
 
       expect(() => redirectToSignUp({ returnBackUrl })).toThrowError(
-        "@clerk/backend: You're ready to set up your Clerk .env keys.\n\nNew to Clerk or not sure? Simply run:\nnpx clerk@latest init",
+        '@clerk/backend: Clerk keys are missing from your environment.\n\nTo create a new Clerk app, run:\nnpx clerk@latest init',
       );
     });
 

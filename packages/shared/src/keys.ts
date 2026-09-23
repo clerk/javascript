@@ -1,4 +1,5 @@
 import { DEV_OR_STAGING_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants';
+import { keySetupGuidance } from './errors/keySetupGuidance';
 import { isomorphicAtob } from './isomorphicAtob';
 import { isomorphicBtoa } from './isomorphicBtoa';
 import type { PublishableKey } from './types';
@@ -98,14 +99,6 @@ function isValidDecodedPublishableKey(decoded: string): boolean {
   return withoutTrailing.includes('.');
 }
 
-const fatalKeyGuidance = `New to Clerk or not sure? Simply run:
-npx clerk@latest init
-
-Already have a Clerk app? Run:
-npx clerk@latest env pull
-
-'npx clerk@latest init' creates a Clerk application and automatically writes API keys to your .env file. It creates an accountless Clerk app, which means you don't have to sign up or have an account to use Clerk. 'npx clerk@latest env pull' pulls API keys into your project's .env file. Keys are also at https://dashboard.clerk.com/~/api-keys in the Clerk Dashboard.`;
-
 export function parsePublishableKey(
   key: string | undefined,
   options: ParsePublishableKeyOptions & { fatal: true },
@@ -135,11 +128,11 @@ export function parsePublishableKey(
 
   if (!key || !isPublishableKey(key)) {
     if (options.fatal && !key) {
-      throw new Error(`Publishable key is missing.\n\n${fatalKeyGuidance}`);
+      throw new Error(`Publishable key is missing.\n\n${keySetupGuidance}`);
     }
     if (options.fatal && !isPublishableKey(key)) {
       throw new Error(
-        `Publishable key not valid (expected format: pk_test_... or pk_live_...).\n\n${fatalKeyGuidance}`,
+        `Publishable key not valid (expected format: pk_test_... or pk_live_...).\n\n${keySetupGuidance}`,
       );
     }
     return null;
@@ -152,14 +145,14 @@ export function parsePublishableKey(
     decodedFrontendApi = isomorphicAtob(key.split('_')[2]);
   } catch {
     if (options.fatal) {
-      throw new Error(`Publishable key not valid: Failed to decode key.\n\n${fatalKeyGuidance}`);
+      throw new Error(`Publishable key not valid: Failed to decode key.\n\n${keySetupGuidance}`);
     }
     return null;
   }
 
   if (!isValidDecodedPublishableKey(decodedFrontendApi)) {
     if (options.fatal) {
-      throw new Error(`Publishable key not valid: Decoded key has invalid format.\n\n${fatalKeyGuidance}`);
+      throw new Error(`Publishable key not valid: Decoded key has invalid format.\n\n${keySetupGuidance}`);
     }
     return null;
   }
