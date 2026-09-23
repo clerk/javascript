@@ -116,7 +116,7 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
   variant?: DialogVariant;
   /**
    * Bottom-anchors the surface in the compact band — the dialog viewport under `48rem` — and
-   * slides it up as a sheet, instead of centring it. For a dialog that asks one thing and returns
+   * slides it up as a sheet, instead of centering it. For a dialog that asks one thing and returns
    * — a confirmation, a single-field form — where the answer belongs within thumb's reach.
    * `card` only. @default 'center'
    */
@@ -256,7 +256,7 @@ function Backdrop({ variant, stacked }: { variant: DialogVariant; stacked: boole
 
 /**
  * The box the popup is sized against and the query container its bands read, holding the track
- * that centres the popup and carries the inset. Two elements because a container cannot query
+ * that centers the popup and carries the inset. Two elements because a container cannot query
  * itself: the width-dependent rules have to sit one level inside the element that is the
  * container. The viewport also locks body scroll and — because the track is what owns the inset —
  * publishes the on-screen keyboard's share of the viewport for the track's bottom padding to
@@ -388,7 +388,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
             compactPlacements[compactPlacement],
             // One cell per (variant, placement) that exists, selected rather than layered: StyleX
             // dedupes by PROPERTY across a `stylex.props` call, so a thin "sheet only" atom would
-            // replace the centred cell's `transform` wholesale and take the desktop scale with it.
+            // replace the centered cell's `transform` wholesale and take the desktop scale with it.
             compactPlacement === 'sheet' ? popupMotion.cardSheet : popupMotion[variant],
             xstyle,
           ),

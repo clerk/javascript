@@ -228,7 +228,7 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
 /**
  * A row-level message, mirroring `Field.Error` for a row that holds no form control. Place it as a
  * sibling of `Section.Item` inside `Section.Row`, not inside `Section.Content`: the item stays a
- * single centred line, so the media and actions hold their position whether or not it is showing.
+ * single centered line, so the media and actions hold their position whether or not it is showing.
  * Carries `role='alert'` for the announcement a `Field.Root` would otherwise wire up.
  *
  * It opens and closes on the message it is given, so render it with that message —
