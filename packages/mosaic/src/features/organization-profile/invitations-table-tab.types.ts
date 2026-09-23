@@ -23,7 +23,7 @@ export interface InvitationsTableTabViewProps {
   onPageSizeChange?: (pageSize: number) => void;
   onSearchChange: (value: string) => void;
   onInvite?: () => void;
-  onRevoke?: (id: string) => void;
+  onRevoke?: (id: string) => void | Promise<void>;
   onBulkAction?: (ids: string[]) => void;
   sort?: InvitationsTableSort | null;
   onSortChange?: (sort: InvitationsTableSort | null) => void;

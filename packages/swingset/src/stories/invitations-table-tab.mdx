@@ -4,6 +4,8 @@ import * as Stories from './invitations-table-tab.stories';
 
 A controlled invitations table for the organization profile’s Invitations tab. The caller supplies the current page, role labels, loading state, and optional invite and revoke callbacks.
 
+Revoking an invitation opens a confirmation dialog. The dialog awaits the action callback and keeps failures visible. After a successful removal, focus moves to a surviving row action or a toolbar control.
+
 Render this view inside the organization members panel’s tab panel; the parent owns tab navigation.
 
 ## Example
@@ -13,6 +15,7 @@ Render this view inside the organization members panel’s tab panel; the parent
 The baseline table shows the invited email address, invitation date, role, and optional revoke action.
 
 <Story name='Legacy' storyModule={Stories} composition={[
+  { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
   { name: 'Table', href: '/components/table', layer: 'Components' },
   { name: 'InputGroup', href: '/components/input-group', layer: 'Components' },
   { name: 'Pagination', href: '/components/pagination', layer: 'Components' },

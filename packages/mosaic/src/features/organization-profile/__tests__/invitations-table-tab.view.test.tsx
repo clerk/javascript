@@ -1,7 +1,9 @@
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../../machines/__tests__/test-utils';
 import { MosaicProvider } from '../../../MosaicProvider';
 import type { InvitationsTableTabViewProps } from '../invitations-table-tab.types';
 import { InvitationsTableTabView } from '../invitations-table-tab.view';
@@ -113,6 +115,9 @@ describe('InvitationsTableTabView', () => {
     expect(props.onInvite).toHaveBeenCalledOnce();
     await user.click(screen.getByRole('button', { name: 'Manage ada@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
+    expect(props.onRevoke).not.toHaveBeenCalled();
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(props.onRevoke).toHaveBeenCalledWith('invite-1');
     rerender(
       <MosaicProvider>
@@ -127,4 +132,59 @@ describe('InvitationsTableTabView', () => {
     expect(screen.queryByRole('button', { name: /Manage|Invite/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
+});
+
+it.each([true, false])('restores focus after confirmed removal with invite available: %s', async hasInvite => {
+  const user = userEvent.setup();
+  const pending = deferred<void>();
+  const onMutation = vi
+    .fn<(id: string) => Promise<void>>()
+    .mockImplementationOnce(() => pending.promise)
+    .mockResolvedValue(undefined);
+  function Example() {
+    const [items, setItems] = useState([
+      { ...propsFor().invitations[0], id: 'ada', email: 'ada@example.com' },
+      { ...propsFor().invitations[0], id: 'grace', email: 'Grace' },
+    ]);
+    return (
+      <MosaicProvider>
+        <InvitationsTableTabView
+          {...propsFor()}
+          invitations={items}
+          totalCount={items.length}
+          onInvite={hasInvite ? vi.fn() : undefined}
+          onRevoke={async id => {
+            await onMutation(id);
+            setItems(current => current.filter(item => item.id !== id));
+          }}
+        />
+      </MosaicProvider>
+    );
+  }
+  render(<Example />);
+  await user.click(screen.getByRole('button', { name: 'Manage ada@example.com' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
+  expect(onMutation).not.toHaveBeenCalled();
+  await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancel' }));
+  await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  expect(onMutation).not.toHaveBeenCalled();
+  await user.click(screen.getByRole('button', { name: 'Manage ada@example.com' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
+  await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+  expect(onMutation).toHaveBeenCalledExactlyOnceWith('ada');
+  expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+  await act(async () => {
+    pending.resolve();
+    await pending.promise;
+  });
+  await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  expect(screen.getByRole('button', { name: 'Manage Grace' })).toHaveFocus();
+  await user.click(screen.getByRole('button', { name: 'Manage Grace' }));
+  await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
+  await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+  await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+  expect(onMutation).toHaveBeenLastCalledWith('grace');
+  expect(
+    hasInvite ? screen.getByRole('button', { name: 'Invite members' }) : screen.getByRole('searchbox'),
+  ).toHaveFocus();
 });
