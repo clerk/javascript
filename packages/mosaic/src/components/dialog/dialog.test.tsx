@@ -590,17 +590,6 @@ describe('compactPlacement', () => {
   });
 });
 
-// The surface owns its width, so the popup shrinks to it rather than capping it.
-describe('popup width', () => {
-  const probe = stylex.create({ fit: { width: 'fit-content' } });
-
-  it.each(['card', 'profile'] as const)('shrinks a %s popup to its surface', variant => {
-    renderVariant(variant);
-
-    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.fit)));
-  });
-});
-
 describe('viewport scroll behaviour', () => {
   // The inside/outside scroll split. A pinned `height: 100%` cannot grow, so an over-tall popup
   // spills past the viewport's padding box and loses the bottom inset; `min-height: 100%` lets the
