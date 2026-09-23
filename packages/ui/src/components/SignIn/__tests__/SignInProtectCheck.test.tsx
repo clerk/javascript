@@ -140,6 +140,25 @@ describe('SignInProtectCheck', () => {
       });
       expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
     });
+
+    it('routes to factor one when the user has an SSO bypass to choose instead', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        ...enterpriseSSOSignIn([{ strategy: 'enterprise_sso' }]),
+        ssoBypassFirstFactors: [{ strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_1' }],
+      } as unknown as SignInResource);
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      // The start page shows the bypass card rather than redirecting, and the resume has to agree.
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-one');
+      });
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+    });
   });
 
   it('renders verification UI', async () => {
