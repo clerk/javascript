@@ -10,3 +10,4 @@ export { type FileUploadItemProps, FileUploadItem as Item } from './file-upload-
 export { type FileUploadItemPreviewProps, FileUploadItemPreview as ItemPreview } from './file-upload-item-preview';
 export { type FileUploadItemDeleteProps, FileUploadItemDelete as ItemDelete } from './file-upload-item-delete';
 export { useFileUpload } from './file-upload-context';
+export { useObjectUrl } from './use-object-url';

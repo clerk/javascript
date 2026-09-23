@@ -1,6 +1,6 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, renderHook } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SaveError } from '../../../utils/form-error';
 import type { UserProfilePictureControllerOptions } from '../user-profile-account-section/user-profile-picture.controller';
@@ -13,6 +13,20 @@ function renderController(options: UserProfilePictureControllerOptions) {
 }
 
 describe('useUserProfilePictureController', () => {
+  // jsdom ships neither half of the object URL API.
+  let nextUrl = 0;
+  const revoked: string[] = [];
+
+  beforeEach(() => {
+    nextUrl = 0;
+    revoked.length = 0;
+    vi.stubGlobal('URL', {
+      ...URL,
+      createObjectURL: () => `blob:preview-${++nextUrl}`,
+      revokeObjectURL: (url: string) => revoked.push(url),
+    });
+  });
+
   it('leaves out the actions the model did not offer', () => {
     const { result } = renderController({});
     expect(result.current.onChange).toBeUndefined();
@@ -84,5 +98,87 @@ describe('useUserProfilePictureController', () => {
 
     await act(async () => result.current.onRemove?.());
     expect(result.current.error).toEqual({ message: 'Nope.' });
+  });
+
+  it('shows the picked file while the upload is still running', async () => {
+    const upload = createDeferredPromise();
+    const onChange = vi.fn(() => upload.promise.then(() => undefined));
+    const { result } = renderController({ onChange });
+
+    expect(result.current.previewUrl).toBeUndefined();
+
+    act(() => {
+      void result.current.onChange?.(file);
+    });
+    expect(result.current.previewUrl).toBe('blob:preview-1');
+
+    await act(async () => {
+      upload.resolve();
+      await upload.promise;
+    });
+    expect(result.current.previewUrl).toBe('blob:preview-1');
+  });
+
+  it('drops the preview when the upload fails, so the avatar is never a lie', async () => {
+    const upload = createDeferredPromise();
+    const onChange = vi.fn(() => upload.promise.then(() => undefined));
+    const { result } = renderController({ onChange });
+
+    act(() => {
+      void result.current.onChange?.(file);
+    });
+    expect(result.current.previewUrl).toBe('blob:preview-1');
+
+    await act(async () => {
+      upload.reject(new SaveError({ global: { message: 'Nope.' } }));
+      await upload.promise.catch(() => undefined);
+    });
+    expect(result.current.previewUrl).toBeUndefined();
+    expect(revoked).toEqual(['blob:preview-1']);
+  });
+
+  it('drops the preview once the picture is removed', async () => {
+    const onChange = vi.fn().mockResolvedValue(undefined);
+    const onRemove = vi.fn().mockResolvedValue(undefined);
+    const { result } = renderController({ onChange, onRemove });
+
+    await act(async () => result.current.onChange?.(file));
+    expect(result.current.previewUrl).toBe('blob:preview-1');
+
+    await act(async () => result.current.onRemove?.());
+    expect(result.current.previewUrl).toBeUndefined();
+    expect(revoked).toEqual(['blob:preview-1']);
+  });
+
+  it('revokes the previous preview when a second pick replaces it', async () => {
+    const onChange = vi.fn().mockResolvedValue(undefined);
+    const { result } = renderController({ onChange });
+
+    await act(async () => result.current.onChange?.(file));
+    await act(async () => result.current.onChange?.(new File(['y'], 'other.png', { type: 'image/png' })));
+
+    expect(result.current.previewUrl).toBe('blob:preview-2');
+    expect(revoked).toEqual(['blob:preview-1']);
+  });
+
+  it('keeps one preview when the same file is picked twice', async () => {
+    const onChange = vi.fn().mockResolvedValue(undefined);
+    const { result } = renderController({ onChange });
+
+    await act(async () => result.current.onChange?.(file));
+    await act(async () => result.current.onChange?.(file));
+
+    expect(result.current.previewUrl).toBe('blob:preview-1');
+    expect(revoked).toEqual([]);
+  });
+
+  it('revokes the preview on unmount', async () => {
+    const onChange = vi.fn().mockResolvedValue(undefined);
+    const { result, unmount } = renderController({ onChange });
+
+    await act(async () => result.current.onChange?.(file));
+    unmount();
+
+    expect(revoked).toEqual(['blob:preview-1']);
   });
 });
