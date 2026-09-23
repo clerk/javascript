@@ -232,3 +232,4 @@ export { OrganizationProfileApiKeysPanelView } from '../features/organization-pr
 export { OrganizationProfileCreateAPIKeyDialog } from '../features/organization-profile/organization-profile-create-api-key.dialog';
 
 export { MembersTableTabView } from '../features/organization-profile/members-table-tab.view';
+export { InvitationsTableTabView } from '../features/organization-profile/invitations-table-tab.view';
