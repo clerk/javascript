@@ -344,7 +344,7 @@ describe('SignIn', () => {
       return windowNavigate;
     };
 
-    it('stops after create instead of preparing a hand-off it cannot follow', async () => {
+    it('throws protect_check_required after create instead of preparing a hand-off it cannot follow', async () => {
       const windowNavigate = setupClerk();
       const mockFetch = vi.fn().mockResolvedValue(gatedResponse);
       BaseResource._fetch = mockFetch;
@@ -356,7 +356,7 @@ describe('SignIn', () => {
           redirectUrl: '/sso-callback',
           redirectUrlComplete: '/',
         }),
-      ).resolves.toBeUndefined();
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
 
       // Only the create call — the prepare is not attempted while the challenge is pending.
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -364,7 +364,7 @@ describe('SignIn', () => {
       expect(signIn.protectCheck?.status).toBe('pending');
     });
 
-    it('stops when preparing the enterprise SSO hand-off returns a challenge', async () => {
+    it('throws protect_check_required when preparing the enterprise SSO hand-off returns a challenge', async () => {
       const windowNavigate = setupClerk();
       const mockFetch = vi.fn().mockResolvedValue(gatedResponse);
       BaseResource._fetch = mockFetch;
@@ -377,10 +377,31 @@ describe('SignIn', () => {
           redirectUrlComplete: '/',
           continueSignIn: true,
         }),
-      ).resolves.toBeUndefined();
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
 
       expect(windowNavigate).not.toHaveBeenCalled();
       expect(signIn.protectCheck?.status).toBe('pending');
+    });
+
+    it('surfaces protect_check_required through an OAuth transport instead of opening it', async () => {
+      // The transport expects a URL back. Returning without one used to surface as
+      // `oauth_transport_missing_verification_url`, which hid the real reason.
+      setupClerk();
+      const transport = { getRedirectUrl: vi.fn().mockResolvedValue('app://callback'), open: vi.fn() };
+      (SignIn.clerk as any).__internal_oauthTransport = transport;
+      BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      expect(transport.open).not.toHaveBeenCalled();
     });
 
     it('follows the hand-off once no challenge is pending', async () => {

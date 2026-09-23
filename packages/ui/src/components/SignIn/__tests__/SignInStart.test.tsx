@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError, ClerkWebAuthnError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
 import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignInResource } from '@clerk/shared/types';
@@ -507,16 +507,37 @@ describe('SignInStart', () => {
           supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
         } as unknown as SignInResource),
       );
-      // No redirect is issued: the sign-in comes back sitting on the challenge instead.
-      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(() => {
+      // No redirect is issued: the sign-in comes back sitting on the challenge and the call throws.
+      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(async () => {
         (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-abc' };
-        return Promise.resolve();
+        throw new ClerkRuntimeError('challenge required', { code: 'protect_check_required' });
       });
       const { userEvent } = render(<SignInStart />, { wrapper });
       await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
       await userEvent.click(screen.getByText('Continue'));
       expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalled();
       expect(fixtures.router.navigate).toHaveBeenCalledWith('protect-check');
+    });
+
+    it('does not route to the challenge for other hand-off errors', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        } as unknown as SignInResource),
+      );
+      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(async () => {
+        (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-abc' };
+        throw new ClerkRuntimeError('something else', { code: 'captcha_unavailable' });
+      });
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalled();
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('protect-check');
     });
   });
 

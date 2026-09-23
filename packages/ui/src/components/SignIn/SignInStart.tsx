@@ -39,7 +39,7 @@ import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
-import { navigateOnSignInProtectGate } from './handleProtectCheck';
+import { isProtectCheckRequiredError, navigateOnSignInProtectGate } from './handleProtectCheck';
 import {
   getSSOBypassFactor,
   hasMultipleEnterpriseConnections,
@@ -455,17 +455,23 @@ function SignInStartInternal(): JSX.Element {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
-    await signIn.authenticateWithRedirect({
-      strategy: 'enterprise_sso',
-      redirectUrl,
-      redirectUrlComplete,
-      oidcPrompt: ctx.oidcPrompt,
-      continueSignIn: true,
-    });
-
-    // Preparing the hand-off can itself raise a challenge, in which case no redirect was issued
-    // and the sign-in is sitting on the gate instead.
-    navigateOnSignInProtectGate(signIn, navigate, 'protect-check');
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl,
+        redirectUrlComplete,
+        oidcPrompt: ctx.oidcPrompt,
+        continueSignIn: true,
+      });
+    } catch (err) {
+      // Preparing the hand-off can itself raise a challenge. No redirect was issued and the sign-in
+      // is sitting on the gate instead. Handled here because the callers' recovery path drops
+      // errors that didn't come from the API.
+      if (isProtectCheckRequiredError(err) && navigateOnSignInProtectGate(signIn, navigate, 'protect-check')) {
+        return;
+      }
+      throw err;
+    }
   };
 
   const attemptToRecoverFromSignInError = async (e: any) => {

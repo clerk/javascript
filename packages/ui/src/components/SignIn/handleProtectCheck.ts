@@ -1,3 +1,5 @@
+import { isClerkRuntimeError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type { SignInResource } from '@clerk/shared/types';
 
 /**
@@ -35,6 +37,19 @@ export function navigateOnSignInProtectGate(
     return true;
   }
   return false;
+}
+
+/**
+ * Whether `err` is the error `authenticateWithRedirect` throws when a challenge stopped it before it
+ * could redirect. The sign-in has already been updated and is sitting on the gate, so the caller
+ * routes to the challenge rather than showing the error.
+ */
+export function isProtectCheckRequiredError(err: unknown): boolean {
+  // The type guard throws on a non-object, and a catch block can receive anything.
+  if (typeof err !== 'object' || err === null) {
+    return false;
+  }
+  return isClerkRuntimeError(err) && err.code === ERROR_CODES.PROTECT_CHECK_REQUIRED;
 }
 
 /**

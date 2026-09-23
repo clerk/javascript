@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -389,9 +390,17 @@ export class SignIn extends BaseResource implements SignInResource {
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
 
-    // Defer external navigation while a challenge is pending: the caller resolves it and calls
-    // back in with `continueSignIn`.
-    const isChallengePending = () => !!this.protectCheck || this.status === 'needs_protect_check';
+    // A pending challenge stops the flow before there is anywhere to navigate to. Throw rather than
+    // return: a caller that doesn't handle challenges then fails visibly instead of stalling. A
+    // caller that does runs the challenge (`protectCheck` is set) and calls back in with
+    // `continueSignIn`.
+    const throwIfChallengePending = () => {
+      if (this.protectCheck || this.status === 'needs_protect_check') {
+        throw new ClerkRuntimeError('A verification challenge must be completed before this sign-in can continue.', {
+          code: ERROR_CODES.PROTECT_CHECK_REQUIRED,
+        });
+      }
+    };
 
     if (!this.id || !continueSignIn) {
       await this.create({
@@ -401,9 +410,7 @@ export class SignIn extends BaseResource implements SignInResource {
         actionCompleteRedirectUrl,
       });
 
-      if (isChallengePending()) {
-        return;
-      }
+      throwIfChallengePending();
     }
 
     if (strategy === 'enterprise_sso') {
@@ -415,9 +422,7 @@ export class SignIn extends BaseResource implements SignInResource {
         enterpriseConnectionId,
       });
 
-      if (isChallengePending()) {
-        return;
-      }
+      throwIfChallengePending();
     }
 
     const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
