@@ -16,6 +16,7 @@ import { useFormControl } from '@/ui/utils/useFormControl';
 import { Badge, Box, Button, Col, descriptors, Flex, Icon, Text } from '../../../customizables';
 import { ExclamationTriangle } from '../../../icons';
 import { useRouter } from '../../../router';
+import { DirectorySyncTab, SsoTab } from './PolicyTabs';
 import type {
   ProtoEnrollment,
   ProtoNonDirectoryFallback,
@@ -23,7 +24,6 @@ import type {
   ProtoProvider,
   ProtoSignIn,
 } from './prototypeState';
-import { DirectorySyncTab, SsoTab } from './PolicyTabs';
 import {
   APP_REVERIFICATION_HOURS,
   connectionFor,

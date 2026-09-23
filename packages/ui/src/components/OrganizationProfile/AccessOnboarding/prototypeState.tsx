@@ -66,12 +66,14 @@ export type ProtoConnection = {
   logs: ProtoTestLog[];
 };
 
-export type ScenarioKey = 'work' | 'personal' | 'configured';
+export type ScenarioKey = 'work' | 'personal' | 'configured' | 'view_only' | 'sso_unavailable';
 
 export const SCENARIO_LABELS: Record<ScenarioKey, string> = {
   work: 'New org, work email',
   personal: 'New org, personal email',
   configured: 'Configured org',
+  view_only: 'Configured org, view only',
+  sso_unavailable: 'New org, SSO not allowed',
 };
 
 /** What the application owner allows this organization's members to do. */
@@ -223,6 +225,21 @@ const DEFAULT_ACCESS: ProtoAccess = { canManage: true, ssoAllowed: true, ssoUnav
 
 const scenario = (key: ScenarioKey): ProtoState => {
   switch (key) {
+    // The two states the application owner's settings produce: a member
+    // without the manage permission, and an org the owner has not allowed
+    // SSO for. Both reuse another scenario's rows with the flags flipped.
+    case 'view_only':
+      return { ...scenario('configured'), scenario: key, access: { ...DEFAULT_ACCESS, canManage: false } };
+    case 'sso_unavailable':
+      return {
+        ...scenario('work'),
+        scenario: key,
+        access: {
+          ...DEFAULT_ACCESS,
+          ssoAllowed: false,
+          ssoUnavailableMessage: 'Single sign-on is available on the Business plan. Contact your account owner.',
+        },
+      };
     case 'personal':
       return { scenario: key, policies: [catchAll()], connections: [], access: DEFAULT_ACCESS };
     case 'work':
@@ -314,7 +331,7 @@ let state: ProtoState | null = null;
 const listeners = new Set<() => void>();
 
 const isScenarioKey = (value: unknown): value is ScenarioKey =>
-  value === 'work' || value === 'personal' || value === 'configured';
+  typeof value === 'string' && Object.keys(SCENARIO_LABELS).includes(value);
 
 const load = (): ProtoState => {
   if (state) {
