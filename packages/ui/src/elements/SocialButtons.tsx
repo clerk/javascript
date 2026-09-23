@@ -213,7 +213,11 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 aria-label={
                   preferBlockButtons
                     ? undefined
-                    : t(localizationKeys('socialButtonsBlockButton', { provider: strategyToDisplayData[strategy].name }))
+                    : t(
+                        localizationKeys('socialButtonsBlockButton', {
+                          provider: strategyToDisplayData[strategy].name,
+                        }),
+                      )
                 }
                 textLocalizationKey={localizedText}
                 icon={imageOrInitial}

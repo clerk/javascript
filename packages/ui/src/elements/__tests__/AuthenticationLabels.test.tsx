@@ -46,8 +46,7 @@ describe.each(['SignIn', 'SignUp'] as const)('%s accessible labels', component =
       );
 
       for (const provider of ['Apple', 'Facebook', 'Google']) {
-        const name =
-          socialButtonsVariant === 'blockButton' ? `Utiliser ${provider}` : `Se connecter avec ${provider}`;
+        const name = socialButtonsVariant === 'blockButton' ? `Utiliser ${provider}` : `Se connecter avec ${provider}`;
         const button = screen.getByRole('button', { name, exact: true });
         expect(button).toHaveAccessibleName(name);
         expect(button.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
