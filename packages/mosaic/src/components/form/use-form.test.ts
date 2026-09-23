@@ -245,9 +245,8 @@ describe('useForm', () => {
       checks.set(value, check);
       return check.promise;
     });
-    const onSubmit = vi.fn(resolved);
     const { result } = renderHook(() =>
-      useForm({ initialValues: { password: '' }, fields: { password: { validateAsync } }, onSubmit }),
+      useForm({ initialValues: { password: '' }, fields: { password: { validateAsync } }, onSubmit: resolved }),
     );
     expect(validateAsync).not.toHaveBeenCalled();
     expect(result.current.fields.password.isValidating).toBe(false);
@@ -255,9 +254,6 @@ describe('useForm', () => {
     act(() => result.current.setValue('password', 'ab'));
     expect(validateAsync).toHaveBeenCalledTimes(2);
     expect(result.current.fields.password.isValidating).toBe(true);
-    expect(result.current.canSubmit).toBe(false);
-    act(() => result.current.submit());
-    expect(onSubmit).not.toHaveBeenCalled();
     await act(async () => {
       checks.get('ab')?.resolve({ type: 'success', message: 'Strong' });
       await flush();
@@ -270,6 +266,69 @@ describe('useForm', () => {
       await flush();
     });
     expect(result.current.fields.password.feedback).toEqual({ type: 'success', message: 'Strong' });
+  });
+
+  it('queues a submit while async validation is pending and runs it once the field validates', async () => {
+    const check = deferred<FieldFeedback | undefined>();
+    const onSubmit = vi.fn(resolved);
+    const { result } = renderHook(() =>
+      useForm({
+        initialValues: { password: '' },
+        fields: { password: { validateAsync: () => check.promise } },
+        onSubmit,
+      }),
+    );
+    act(() => result.current.setValue('password', 'ab'));
+    expect(result.current.canSubmit).toBe(true);
+    act(() => result.current.submit());
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(result.current.isSubmitting).toBe(true);
+    expect(result.current.canSubmit).toBe(false);
+    await act(async () => {
+      check.resolve(undefined);
+      await flush();
+    });
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(onSubmit).toHaveBeenCalledWith({ password: 'ab' });
+    expect(result.current.isSubmitting).toBe(false);
+  });
+
+  it('drops a queued submit when the field changes or its validation fails', async () => {
+    const checks = new Map<string, ReturnType<typeof deferred<FieldFeedback | undefined>>>();
+    const validateAsync = (value: string) => {
+      const check = deferred<FieldFeedback | undefined>();
+      checks.set(value, check);
+      return check.promise;
+    };
+    const onSubmit = vi.fn(resolved);
+    const { result } = renderHook(() =>
+      useForm({ initialValues: { password: '' }, fields: { password: { validateAsync } }, onSubmit }),
+    );
+    act(() => result.current.setValue('password', 'a'));
+    act(() => result.current.submit());
+    expect(result.current.isSubmitting).toBe(true);
+    act(() => result.current.setValue('password', 'ab'));
+    expect(result.current.isSubmitting).toBe(false);
+    act(() => result.current.submit());
+    await act(async () => {
+      checks.get('ab')?.resolve({ type: 'error', message: 'Weak' });
+      await flush();
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(result.current.isSubmitting).toBe(false);
+    expect(result.current.fields.password.feedback).toEqual({ type: 'error', message: 'Weak' });
+  });
+
+  it('treats a rejected async validator as no feedback', async () => {
+    const validateAsync = vi.fn(() => Promise.reject(new Error('Network')));
+    const { result } = renderHook(() =>
+      useForm({ initialValues: { password: '' }, fields: { password: { validateAsync } }, onSubmit: resolved }),
+    );
+    act(() => result.current.setValue('password', 'ab'));
+    await act(flush);
+    expect(result.current.fields.password.isValidating).toBe(false);
+    expect(result.current.fields.password.feedback).toBeUndefined();
+    expect(result.current.canSubmit).toBe(true);
   });
 
   it('skips async validation when the value returns to its initial value', async () => {

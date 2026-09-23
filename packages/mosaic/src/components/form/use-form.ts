@@ -5,7 +5,7 @@ import type { StateMachine } from '../../machine/types';
 import { useMachine } from '../../machine/useMachine';
 import { keysOf, mapKeys } from '../../utils/object';
 import type { FieldsConfig, FormContext, FormEvent } from './form.machine';
-import { createFormMachine, fieldFeedback, firstInvalid, initialOf, isSubmittable } from './form.machine';
+import { createFormMachine, fieldFeedback, firstInvalid, initialOf, isValid } from './form.machine';
 import type { FieldFeedback } from './form-submit-error';
 
 export interface UseFormOptions<TValues extends object> {
@@ -93,7 +93,10 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
       if (validateAsync === undefined || async[name]?.pending !== true || async[name].value !== value) {
         return;
       }
-      void validateAsync(value, next).then(feedback => send({ type: 'VALIDATED', name, value, feedback }));
+      void validateAsync(value, next).then(
+        feedback => send({ type: 'VALIDATED', name, value, feedback }),
+        () => send({ type: 'VALIDATED', name, value, feedback: undefined }),
+      );
     },
     [actor, send],
   );
@@ -144,7 +147,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     ref: refFor(name),
   });
 
-  const isSubmitting = snapshot.value === 'submitting';
+  const isSubmitting = snapshot.value === 'submitting' || context.submitQueued;
   const initial = initialOf(context);
   const fields = mapKeys(values, (name): FormField => {
     const feedback = fieldFeedback(context, name);
@@ -164,7 +167,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     error: context.error?.message,
     isSubmitting,
     isDirty: keysOf(values).some(name => fields[name].isDirty),
-    canSubmit: !isSubmitting && isSubmittable(context),
+    canSubmit: !isSubmitting && isValid(context),
     register,
     control,
     setValue,
