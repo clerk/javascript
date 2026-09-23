@@ -79,6 +79,23 @@ The migration workflow (`migration.md`) ties the flow references together: it
 treats the legacy component as the spec and drives you through the model,
 controller, and view layers, then verifies parity with `parity-audit.md`.
 
+## Shaping a PR
+
+- **Primitive first, styled component second.** A new component lands as a
+  headless primitive PR, then a styled PR built on it (Toast: #9827 → #9850 →
+  #9854; TagInput: #9838 → #9865). Model a new primitive on an established API
+  such as Base UI or Floating UI rather than inventing one.
+- **Small primitive changes ride along** with the styled PR under a "Primitive
+  changes" heading in the description.
+- **Describe the contract, not the work.** List the parts, keyboard behavior,
+  accessibility, `data-*` attributes and CSS variables, and slot classes.
+- **Name what is left out.** State the scope you cut ("swipe to dismiss is left
+  out", "layout animation is a follow-up") so reviewers don't ask.
+- **Keep PRs to one purpose.** A new prop, a build change, and a cleanup are
+  three PRs. Consolidation of drifted duplicates gets its own PR.
+- **Name compound parts consistently.** Parts that pair up follow one scheme:
+  `Nav` / `NavItem` goes with `Content` / `ContentPanel`, not `TabPanel`.
+
 ## Documenting a component in swingset
 
 `packages/swingset/CLAUDE.md` is the house style — archetypes, required section

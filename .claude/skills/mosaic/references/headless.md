@@ -61,9 +61,24 @@ import { Select } from '../../primitives/select';
   (`render={props => <X {...props} />}`) **or an element**
   (`render={<Link />}`) — the element is cloned with the part's computed props
   and refs merged in.
-- **From `@clerk/ui`**, wrap element-rendering parts with `makeCustomizable` to
-  get the theme-aware `sx` prop; pass-through parts (`Root`, `Portal`) are used
-  directly. See `packages/mosaic/src/primitives/README.md`.
+
+## Wrapping a primitive in a styled component
+
+- **Wrap a part only to style it.** A styled part adds `themeProps`, its atoms,
+  and the `xstyle` contract, then hands everything else to the primitive part.
+  It does not re-implement the part's behavior, re-derive its state, or copy its
+  props logic. A part the styled layer does not style stays a thin `xstyle`
+  wrapper (see `Drawer.Trigger`) or is re-exported as is.
+- **Parents find children through a context registry, not the DOM.** A child
+  registers its element with the parent on mount, and the parent looks it up by
+  value (`registerTab` / `getTabElement` in `primitives/tabs`). Never
+  `querySelector` for a `.cl-*` class or `data-*` attribute: it depends on
+  render timing and breaks once the subtree is `hidden` or `inert`, which is how
+  focus ends up on `body`.
+- **Keep a one-consumer workaround in the part that needs it.** When one part
+  needs different merge order, timing, or measuring, fix it in that part's file
+  instead of changing a shared hook or util for everyone. It moves to shared
+  code once a second consumer needs it (see "Sharing code" in `stylex.md`).
 
 ## Authoring a part: the useRender contract
 

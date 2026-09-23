@@ -465,6 +465,25 @@ Write the hover guard and these selectors **raw**, as above — there is no
 `*.styles.ts` files are therefore exempted from the repo's `no-restricted-syntax`
 media-query rule (`eslint.config.mjs`); the `@stylexjs/*` rules still apply.
 
+## Sharing code and single sources of truth
+
+- **Extract on the second consumer, not the first.** A treatment used by one
+  component stays in that component. When a second one needs it, move it to
+  `utils/*.styles.ts` or `primitives/utils/` and point both at it (the tooltip
+  surface moved to `utils/tooltip-surface.styles.ts` when the anchored toast
+  became its second user). When several copies have drifted, consolidate them
+  in one PR, as `primitives/utils/dom.ts` did for DOM measuring.
+- **Let CSS decide and JS read the result.** When JS needs to know whether a
+  media or container query matches, render a sentinel whose size the query
+  changes and read that, instead of recomputing the breakpoint in JS
+  (`Profile`'s compact sentinel is `1px`, `2px` when compact).
+- **One source of truth.** Import the canonical constant instead of rebuilding
+  it by hand. Collapse two atoms that declare the same thing into one. Turn a
+  condition repeated across parts into one named helper. Breakpoints in
+  `@container` / `@media` keys are the exception: they stay literal in each file,
+  because a `defineConsts` value in a query prelude breaks the swingset Vercel
+  build.
+
 ## Dynamic styles: dos and don'ts
 
 A style key can be a **function** of a runtime value:

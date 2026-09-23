@@ -356,6 +356,40 @@ const mosaicNoFeatureStyles = {
   },
 };
 
+const mosaicNoSlotQueries = {
+  meta: {
+    type: 'suggestion',
+    docs: {
+      description: 'Find Mosaic parts through a context registry instead of querying slot classes',
+      recommended: false,
+    },
+    messages: {
+      noSlotQuery:
+        'Register the element with its parent through context instead of querying a `.cl-*` class. See "Wrapping a primitive" in .claude/skills/mosaic/references/headless.md.',
+    },
+    schema: [],
+  },
+  create(context) {
+    const mentionsSlotClass = node =>
+      (node.type === 'Literal' && typeof node.value === 'string' && node.value.includes('.cl-')) ||
+      (node.type === 'TemplateLiteral' && node.quasis.some(quasi => (quasi.value.cooked ?? '').includes('.cl-')));
+
+    return {
+      CallExpression(node) {
+        const { callee } = node;
+        if (
+          callee.type === 'MemberExpression' &&
+          callee.property.type === 'Identifier' &&
+          /^(querySelector(All)?|closest|matches)$/.test(callee.property.name) &&
+          node.arguments.some(mentionsSlotClass)
+        ) {
+          context.report({ node, messageId: 'noSlotQuery' });
+        }
+      },
+    };
+  },
+};
+
 const noPhysicalCssProperties = {
   meta: {
     type: 'problem',
@@ -513,6 +547,7 @@ export default tseslint.config([
           'mosaic-motion-tokens': mosaicMotionTokens,
           'mosaic-terse-comments': mosaicTerseComments,
           'mosaic-no-feature-styles': mosaicNoFeatureStyles,
+          'mosaic-no-slot-queries': mosaicNoSlotQueries,
         },
       },
       'simple-import-sort': pluginSimpleImportSort,
@@ -743,6 +778,7 @@ export default tseslint.config([
       '@stylexjs/valid-styles': 'error',
       'custom-rules/mosaic-motion-tokens': 'warn',
       'custom-rules/mosaic-terse-comments': 'warn',
+      'custom-rules/mosaic-no-slot-queries': 'warn',
       'no-restricted-syntax': [
         'error',
         {
