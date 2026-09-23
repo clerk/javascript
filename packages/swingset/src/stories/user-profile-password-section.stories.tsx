@@ -1,5 +1,6 @@
-import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
+import type { UserProfileEditPasswordField } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.types';
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
+import type { FormError } from '@clerk/mosaic/utils/form-error';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -24,7 +25,7 @@ function PasswordSection({
 }: {
   hasPassword?: boolean;
   requiresCurrentPassword?: boolean;
-  failWith?: UserProfileSaveError;
+  failWith?: FormError<UserProfileEditPasswordField>;
 }) {
   const editPassword = useUserProfileEditPasswordFixture({ hasPassword, requiresCurrentPassword, failWith });
 
@@ -73,9 +74,10 @@ export function ManagedByEnterprise() {
 export function EditPasswordFails() {
   return (
     <PasswordSection
-      failWith={
-        new UserProfileSaveError('Your password could not be updated.', { currentPassword: 'Incorrect password.' })
-      }
+      failWith={{
+        global: { message: 'Your password could not be updated.' },
+        fields: { currentPassword: { message: 'Incorrect password.' } },
+      }}
     />
   );
 }
