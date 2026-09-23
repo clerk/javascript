@@ -82,7 +82,11 @@ const Panel = React.forwardRef<HTMLDivElement, TabsPanelProps>(function MosaicTa
   return (
     <Primitive.Panel
       ref={ref}
-      {...mergeStyleProps(themeProps('tabs-panel'), stylex.props(reset.base, styles.panel, xstyle), rest)}
+      {...mergeStyleProps(
+        themeProps('tabs-panel'),
+        stylex.props(reset.base, styles.panel, focusOutline.visible, xstyle),
+        rest,
+      )}
     />
   );
 });
