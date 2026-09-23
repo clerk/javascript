@@ -428,7 +428,8 @@ function SignInStartInternal(): JSX.Element {
             return navigate('factor-one');
           }
 
-          return authenticateWithEnterpriseSSO();
+          // Awaited so a failed hand-off reaches the catch below instead of escaping this try.
+          return await authenticateWithEnterpriseSSO();
         }
         case 'needs_second_factor':
           return navigate('factor-two');
