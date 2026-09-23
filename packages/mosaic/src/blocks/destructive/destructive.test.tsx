@@ -33,10 +33,9 @@ function renderBlock(overrides: Partial<DestructiveControlledProps> = {}) {
 
 const confirmButton = () => screen.getByRole('button', { name: 'Delete account' });
 const activeReverification = {
+  status: 'loading' as const,
   phase: 'active' as const,
-  complete: vi.fn(),
-  cancel: vi.fn(),
-  level: 'first_factor' as const,
+  onCancel: vi.fn(),
 };
 
 describe('Destructive', () => {
@@ -171,7 +170,7 @@ describe('Destructive', () => {
     renderBlock({
       isDeleting: true,
       onOpenChange,
-      reverification: { ...activeReverification, cancel },
+      reverification: { ...activeReverification, onCancel: cancel },
     });
 
     await user.keyboard('{Escape}');
@@ -196,7 +195,7 @@ describe('Destructive', () => {
         <Destructive
           {...props}
           isDeleting
-          reverification={{ phase: 'retrying' }}
+          reverification={{ status: 'loading', phase: 'retrying' }}
         />
       </MosaicProvider>,
     );
@@ -206,7 +205,7 @@ describe('Destructive', () => {
         <Destructive
           {...props}
           errorMessage='Delete failed.'
-          reverification={{ phase: 'inactive' }}
+          reverification={{ status: 'idle', phase: 'inactive' }}
         />
       </MosaicProvider>,
     );

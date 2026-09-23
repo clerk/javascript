@@ -2,17 +2,17 @@ import { ClerkRuntimeError } from '@clerk/shared/error';
 import { useReverification, useSafeLayoutEffect, useSession } from '@clerk/shared/react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { ReverificationProps } from './reverification.types';
+import type { ReverificationState } from './reverification.types';
 
-type Fetcher = (...args: any[]) => Promise<any> | undefined;
+export type ReverificationFetcher = (...args: any[]) => Promise<any> | undefined;
 
 type UseReverificationOptions = NonNullable<Parameters<typeof useReverification>[1]>;
 
 export type UseReverificationWithStateOptions = Omit<UseReverificationOptions, 'onNeedsReverification'>;
 
-export type UseReverificationWithStateResult<F extends Fetcher = Fetcher> = readonly [
+export type UseReverificationWithStateResult<F extends ReverificationFetcher = ReverificationFetcher> = readonly [
   ReturnType<typeof useReverification<F>>,
-  ReverificationProps,
+  ReverificationState,
 ];
 
 type RuntimeOperation =
@@ -45,7 +45,7 @@ function requestAlreadyInProgressError(): ClerkRuntimeError {
  * This wraps useReverification, but does not pop the default UI and instead manages
  * the lifecycle, use the returned `phase` and callbacks to build your custom UI.
  *
- * This is meant to be paired with the Mosaic <Reverification> component.
+ * useReverificationFlow pairs this lifecycle with <Reverification>.
  *
  * In contrast to useReverification, the returned handler is only allowed to run
  * in serial. Any new calls that happen while it's still pending will throw
@@ -58,13 +58,13 @@ function requestAlreadyInProgressError(): ClerkRuntimeError {
 // constraint for extra safeguards here.
 // If we ever want to make this hook public API, we might want to reconsider the single-flight
 // behavior by first fixing the useReverification hook.
-export function useReverificationWithState<F extends Fetcher>(
+export function useReverificationWithState<F extends ReverificationFetcher>(
   fetcher: F,
   options?: UseReverificationWithStateOptions,
 ): UseReverificationWithStateResult<F> {
   const { session } = useSession();
   // The return is observable and needs to be driven by React state
-  const [reverificationState, setReverificationState] = useState<ReverificationProps>({ phase: 'inactive' });
+  const [reverificationState, setReverificationState] = useState<ReverificationState>({ phase: 'inactive' });
   // State updates are not immediate and since parallel requests can resolve before observing
   // those state changes, the internal state is driven by a ref
   const runtimeRef = useRef<Runtime>({

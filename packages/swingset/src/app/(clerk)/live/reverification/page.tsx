@@ -5,7 +5,7 @@ import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import { Dialog } from '@clerk/mosaic/components/dialog';
 import { Flow, type FlowDirection } from '@clerk/mosaic/components/flow';
-import { Reverification, useReverificationWithState } from '@clerk/mosaic/features/reverification';
+import { Reverification, useReverificationFlow } from '@clerk/mosaic/features/reverification';
 import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 import { useUser } from '@clerk/nextjs';
 import { isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
@@ -40,7 +40,7 @@ function CardHarness() {
   const [status, setStatus] = useState<'idle' | 'success' | 'cancelled' | 'error'>('idle');
   const [message, setMessage] = useState<string | null>(null);
   const [requestPending, setRequestPending] = useState(false);
-  const [deleteAccount, reverification] = useReverificationWithState(() => mockDelete(false));
+  const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(false));
   const busy = requestPending || reverification.phase !== 'inactive';
 
   return (
@@ -95,7 +95,7 @@ type Presentation = 'retain' | 'replace';
 type OuterStep = 'confirm' | 'verify' | 'finalizing';
 
 function DialogHarness() {
-  const [deleteAccount, reverification] = useReverificationWithState(() => mockDelete(true));
+  const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(true));
   const [open, setOpen] = useState(false);
   const [presentation, setPresentation] = useState<Presentation>('retain');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -179,9 +179,7 @@ function DialogHarness() {
           if (requestPending && reverification.phase === 'inactive') {
             return;
           }
-          if (reverification.phase === 'active') {
-            reverification.cancel();
-          }
+          reverification.onCancel?.();
           setOpen(false);
           if (reverification.phase !== 'retrying') {
             setErrorMessage(null);
@@ -265,7 +263,7 @@ function DialogHarness() {
 }
 
 function DestructiveHarness() {
-  const [deleteAccount, reverification] = useReverificationWithState(() => mockDelete(true));
+  const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(true));
   const [open, setOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);

@@ -1,8 +1,10 @@
-export { Reverification } from './reverification';
+export { Reverification, useReverificationFlow } from './reverification';
+export type { ReverificationController } from './reverification.controller';
+export type { UseReverificationFlowResult } from './reverification';
 export type {
   ReverificationMethod,
   ReverificationOtpChannel,
-  ReverificationProps,
+  ReverificationState,
   ReverificationStage,
   ReverificationStep,
   ReverificationStrategy,
