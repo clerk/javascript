@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { fontWeightVars, space } from '../../tokens.stylex';
+import { space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   toolbar: {
@@ -11,8 +11,8 @@ export const styles = stylex.create({
     justifyContent: 'space-between',
   },
   search: { maxWidth: '100%', width: '17rem' },
-  identity: { gap: space['3'], alignItems: 'center', display: 'flex' },
-  metadata: { gap: space['0.5'], display: 'flex', flexDirection: 'column', minWidth: '20ch' },
-  name: { gap: space['2'], alignItems: 'center', display: 'flex', fontWeight: fontWeightVars['--cl-font-medium'] },
+  identity: { paddingInline: 0, height: 'auto' },
+  metadata: { gap: space['0.5'], minWidth: '20ch' },
+  name: { gap: space['2'], alignItems: 'center', display: 'flex' },
   dateCell: { whiteSpace: 'nowrap' },
 });

@@ -9,12 +9,12 @@ import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Icon } from '../../components/icon';
 import { InputGroup } from '../../components/input-group';
+import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
 import { panelStyles } from '../../components/profile';
 import { Select } from '../../components/select';
 import { Spinner } from '../../components/spinner';
 import { Table, type TableHeaderCellProps } from '../../components/table';
-import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import { fill, useMessages } from '../../localization';
@@ -215,21 +215,23 @@ export function MembersTableTabView({
                       />
                     ) : null}
                     <Table.Cell>
-                      <div {...stylex.props(styles.identity)}>
-                        <Avatar.Root
-                          size='sm'
-                          aria-hidden
-                        >
-                          {member.imageUrl ? (
-                            <Avatar.Image
-                              src={member.imageUrl}
-                              alt=''
-                            />
-                          ) : null}
-                          <Avatar.Fallback />
-                        </Avatar.Root>
-                        <div {...stylex.props(styles.metadata)}>
-                          <Text xstyle={styles.name}>
+                      <Item.Root xstyle={styles.identity}>
+                        <Item.Media>
+                          <Avatar.Root
+                            size='fit'
+                            aria-hidden
+                          >
+                            {member.imageUrl ? (
+                              <Avatar.Image
+                                src={member.imageUrl}
+                                alt=''
+                              />
+                            ) : null}
+                            <Avatar.Fallback />
+                          </Avatar.Root>
+                        </Item.Media>
+                        <Item.Content xstyle={styles.metadata}>
+                          <Item.Label xstyle={styles.name}>
                             {member.name}
                             {member.isCurrentUser ? (
                               <Badge>{m.you}</Badge>
@@ -238,15 +240,10 @@ export function MembersTableTabView({
                             ) : member.isBanned ? (
                               <Badge color='negative'>{m.banned}</Badge>
                             ) : null}
-                          </Text>
-                          <Text
-                            size='xs'
-                            color='foreground-secondary'
-                          >
-                            {member.email}
-                          </Text>
-                        </div>
-                      </div>
+                          </Item.Label>
+                          <Item.Description>{member.email}</Item.Description>
+                        </Item.Content>
+                      </Item.Root>
                     </Table.Cell>
                     <Table.Cell xstyle={styles.dateCell}>{member.joinedAtLabel}</Table.Cell>
                     <Table.Cell>
