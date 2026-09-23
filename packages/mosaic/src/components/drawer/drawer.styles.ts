@@ -7,6 +7,8 @@ import { colorVars, durationVars, easingVars, radiusVars, shadowVars, space } fr
 // the same relationship as a prompt opening there, and takes the same scrim.
 const BASE_SCRIM = 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)';
 const NESTED_SCRIM = 'color-mix(in oklab, oklch(0 0 0) 46.67%, transparent)';
+// Safari 26 samples the bar color once, at mount, and skips layers under ~0.15 opacity.
+const SCRIM_ENTER_OPACITY = 0.2;
 
 /** The live drag delta and the resting snap offset the headless layer writes; the sheet rides both. */
 const SWIPE = 'var(--cl-drawer-swipe-movement-y, 0px)';
@@ -22,6 +24,8 @@ const STRENGTH = 'var(--cl-drawer-swipe-strength, 1)';
  * distance above the visible edge.
  */
 const BLEED = space['24'];
+// Safari 26 colors the address bar from whatever sits on the bottom edge at mount.
+const SHEET_ENTER_PEEK = space['2'];
 
 export const styles = stylex.create({
   backdrop: {
@@ -29,7 +33,8 @@ export const styles = stylex.create({
     backgroundColor: BASE_SCRIM,
     opacity: {
       default: 1,
-      ':where([data-starting-style], [data-ending-style])': 0,
+      ':where([data-ending-style])': 0,
+      ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
       ':where([data-swiping])': `calc(1 - ${PROGRESS})`,
     },
     position: 'fixed',
@@ -116,7 +121,8 @@ export const styles = stylex.create({
     // Never above the bleed: whatever the drag engine hands over, the scrim cannot show beneath.
     translate: {
       default: `0 max(calc(${SNAP} + ${SWIPE}), calc(-1 * ${BLEED}))`,
-      ':where([data-starting-style], [data-ending-style])': '0 100%',
+      ':where([data-ending-style])': '0 100%',
+      ':where([data-starting-style])': `0 calc(100% - ${BLEED} - ${SHEET_ENTER_PEEK})`,
     },
     // A mouse drag that crosses text would otherwise select it, and the engine will not start a
     // drag while a selection stands inside the sheet — every pull after that would feel dead until

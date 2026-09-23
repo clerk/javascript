@@ -49,15 +49,15 @@ const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function Drawer
   const nested = isInDialog(host);
   return (
     <Primitive.Portal>
-      <Primitive.Backdrop
-        {...mergeStyleProps(
-          themeProps('drawer-backdrop', { nested }),
-          stylex.props(reset.base, styles.backdrop, nested && styles.backdropNested),
-        )}
-      />
       <Primitive.Viewport
         {...mergeStyleProps(themeProps('drawer-viewport'), stylex.props(reset.base, styles.viewport))}
       >
+        <Primitive.Backdrop
+          {...mergeStyleProps(
+            themeProps('drawer-backdrop', { nested }),
+            stylex.props(reset.base, styles.backdrop, nested && styles.backdropNested),
+          )}
+        />
         <Primitive.Popup
           ref={ref}
           render={render}
