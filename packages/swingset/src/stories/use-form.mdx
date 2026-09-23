@@ -19,7 +19,7 @@ Try `clerk` for a taken username (the error shows once you leave the field), `er
 import { useForm } from '@clerk/mosaic/components/form';
 
 const form = useForm({
-  initialValues: { username: 'alex', displayName: 'Alex' },
+  initialValues: { username: 'alex', displayName: 'Alex', phoneNumber: '' },
   fields: {
     username: {
       validate: value => (value.length < 3 ? { type: 'error', message: 'Use at least 3 characters.' } : undefined),
@@ -28,6 +28,8 @@ const form = useForm({
   },
   onSubmit: values => saveProfile(values),
 });
+
+const { feedback } = form.fields.username;
 ```
 
 Wire the form element with `id` and `handleSubmit`, a text control with `register`, and a control that reports its value directly with `control`:
@@ -40,7 +42,7 @@ Wire the form element with `id` and `handleSubmit`, a text control with `registe
     </Banner.Root>
   ) : null}
 
-  <Field.Root invalid={form.fields.username.feedback?.type === 'error'}>
+  <Field.Root invalid={feedback?.type === 'error'}>
     <Field.Label>Username</Field.Label>
     <InputGroup.Root>
       <InputGroup.Input {...form.register('username')} />

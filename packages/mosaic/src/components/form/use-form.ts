@@ -82,7 +82,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     machineRef.current = createFormMachine(deps);
   }
   const [snapshot, send, actor] = useMachine(machineRef.current, { context: deps });
-  const { context } = snapshot;
+  const context = { ...snapshot.context, ...deps };
   const { values } = context;
 
   const setValue = useCallback(
@@ -93,7 +93,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
       if (validateAsync === undefined || async[name]?.pending !== true || async[name].value !== value) {
         return;
       }
-      void validateAsync(value, next).then(
+      void new Promise<FieldFeedback | undefined>(resolve => resolve(validateAsync(value, next))).then(
         feedback => send({ type: 'VALIDATED', name, value, feedback }),
         () => send({ type: 'VALIDATED', name, value, feedback: undefined }),
       );

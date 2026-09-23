@@ -143,6 +143,54 @@ describe('useForm', () => {
     expect(unknown.result.current.error).toBe('Something went wrong. Please try again.');
   });
 
+  it('falls back to the generic message when a submit error has nothing to show', async () => {
+    const empty = renderHook(() =>
+      useForm({ initialValues: { username: '' }, onSubmit: () => Promise.reject(new Error()) }),
+    );
+    await act(async () => {
+      empty.result.current.submit();
+      await flush();
+    });
+    expect(empty.result.current.error).toBe('Something went wrong. Please try again.');
+
+    const blank = renderHook(() =>
+      useForm({ initialValues: { username: '' }, onSubmit: () => Promise.reject(new FormSubmitError({})) }),
+    );
+    await act(async () => {
+      blank.result.current.submit();
+      await flush();
+    });
+    expect(blank.result.current.error).toBe('Something went wrong. Please try again.');
+  });
+
+  it('recovers from an onSubmit that throws synchronously', async () => {
+    const { result } = renderHook(() =>
+      useForm({
+        initialValues: { username: '' },
+        onSubmit: () => {
+          throw new Error('Nope');
+        },
+      }),
+    );
+    await act(async () => {
+      result.current.submit();
+      await flush();
+    });
+    expect(result.current.isSubmitting).toBe(false);
+    expect(result.current.error).toBe('Nope');
+  });
+
+  it('reads canSubmit and validators from the current render', () => {
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) =>
+        useForm({ initialValues: { username: '' }, onSubmit: resolved, canSubmit: () => enabled }),
+      { initialProps: { enabled: true } },
+    );
+    expect(result.current.canSubmit).toBe(true);
+    rerender({ enabled: false });
+    expect(result.current.canSubmit).toBe(false);
+  });
+
   it('clears the message on the next submit', async () => {
     let fail = true;
     const { result } = renderHook(() =>
@@ -374,6 +422,28 @@ describe('useForm', () => {
     expect(result.current.fields.password.isValidating).toBe(false);
     expect(result.current.fields.password.feedback).toBeUndefined();
     expect(result.current.canSubmit).toBe(true);
+  });
+
+  it('treats an async validator that throws synchronously as no feedback', async () => {
+    const { result } = renderHook(() =>
+      useForm({
+        initialValues: { password: '' },
+        fields: {
+          password: {
+            validateAsync: () => {
+              throw new Error('Nope');
+            },
+          },
+        },
+        onSubmit: resolved,
+      }),
+    );
+    await act(async () => {
+      result.current.setValue('password', 'a');
+      await flush();
+    });
+    expect(result.current.fields.password.isValidating).toBe(false);
+    expect(result.current.fields.password.feedback).toBeUndefined();
   });
 
   it('skips async validation when the value returns to its initial value', async () => {

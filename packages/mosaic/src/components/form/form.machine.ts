@@ -114,13 +114,14 @@ function submitOrStay<TValues extends object>(
 }
 
 function toFormError<TValues extends object>(cause: unknown, fallbackMessage: string): FormError<TValues> {
-  if (cause instanceof FormSubmitError) {
-    return { message: cause.banner, fields: cause.fields };
-  }
-  if (cause instanceof Error) {
-    return { message: cause.message };
-  }
-  return { message: fallbackMessage };
+  const error: FormError<TValues> =
+    cause instanceof FormSubmitError
+      ? { message: cause.banner, fields: cause.fields }
+      : cause instanceof Error
+        ? { message: cause.message }
+        : {};
+  const visible = (error.message ?? '') !== '' || keysOf(error.fields ?? {}).length > 0;
+  return visible ? error : { ...error, message: fallbackMessage };
 }
 
 function withoutField<TValues extends object>(
@@ -199,7 +200,7 @@ export function createFormMachine<TValues extends object>(deps: FormDeps<TValues
         },
       },
       submitting: {
-        invoke: fromPromise(ctx => ctx.onSubmit(ctx.values), {
+        invoke: fromPromise(async ctx => ctx.onSubmit(ctx.values), {
           onDone: 'editing',
           onError: {
             target: 'editing',
