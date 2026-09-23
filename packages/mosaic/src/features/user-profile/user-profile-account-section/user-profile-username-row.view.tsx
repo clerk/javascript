@@ -1,14 +1,12 @@
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
-import type { SaveResult } from '../../../utils/save-result';
 import { useUserProfileEditUsernameController } from './user-profile-edit-username.controller';
-import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
 import { UserProfileEditUsernameDialog } from './user-profile-edit-username.dialog';
 
 export interface UserProfileUsernameRowViewProps {
   username: string;
-  onSubmit?: (username: string) => Promise<SaveResult<UserProfileEditUsernameField>>;
+  onSubmit?: (username: string) => Promise<void>;
 }
 
 export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUsernameRowViewProps) {
@@ -33,13 +31,7 @@ export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUs
   );
 }
 
-function EditUsername({
-  username,
-  onSubmit,
-}: {
-  username: string;
-  onSubmit: (username: string) => Promise<SaveResult<UserProfileEditUsernameField>>;
-}) {
+function EditUsername({ username, onSubmit }: { username: string; onSubmit: (username: string) => Promise<void> }) {
   const m = useMessages('userProfileAccountSection');
   const controller = useUserProfileEditUsernameController({ username, onSubmit });
   const isSet = Boolean(username);

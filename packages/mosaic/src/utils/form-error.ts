@@ -8,13 +8,23 @@ export interface FormError<TField extends string = string> {
   fields?: Partial<Record<TField, LocalizableError>>;
 }
 
-export interface SaveResult<TField extends string = never> {
-  error: FormError<TField> | null;
-}
-
 export const UNEXPECTED_ERROR: LocalizableError = { code: 'generic' };
 
-function toFormError<TField extends string>(cause: unknown, fields: readonly TField[]): FormError<TField> | undefined {
+/** What a save rejects with when the failure is the user's to fix; anything else propagates. */
+export class SaveError<TField extends string = string> extends Error {
+  readonly formError: FormError<TField>;
+
+  constructor(formError: FormError<TField>) {
+    super(formError.global?.message ?? 'Save failed');
+    this.name = 'SaveError';
+    this.formError = formError;
+  }
+}
+
+function toClerkFormError<TField extends string>(
+  cause: unknown,
+  fields: readonly TField[],
+): FormError<TField> | undefined {
   if (isClerkRuntimeError(cause)) {
     return { global: { code: cause.code, ...(cause.longMessage ? { message: cause.longMessage } : {}) } };
   }
@@ -39,18 +49,30 @@ function toFormError<TField extends string>(cause: unknown, fields: readonly TFi
   return error;
 }
 
-export async function toSaveResult<TField extends string = never>(
+/**
+ * Runs a save and rejects with a `SaveError` the view can render. `fields` names the controls the
+ * failure may be routed to; an error that names none of them lands in `global`.
+ */
+export async function save<TField extends string = never>(
   run: () => Promise<unknown>,
   fields: readonly TField[] = [],
-): Promise<SaveResult<TField>> {
+): Promise<void> {
   try {
     await run();
-    return { error: null };
   } catch (cause) {
-    const error = toFormError(cause, fields);
-    if (!error) {
+    const formError = toClerkFormError(cause, fields);
+    if (!formError) {
       throw cause;
     }
-    return { error };
+    throw new SaveError(formError);
   }
+}
+
+/** Reads what a rejected save left for the view. An unrecognized rejection is the generic error. */
+export function toFormError<TField extends string = string>(cause: unknown): FormError<TField> {
+  if (cause instanceof SaveError) {
+    return cause.formError;
+  }
+  console.error(cause);
+  return { global: UNEXPECTED_ERROR };
 }

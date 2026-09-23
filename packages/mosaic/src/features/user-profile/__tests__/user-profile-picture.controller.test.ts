@@ -2,7 +2,7 @@ import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { SaveResult } from '../../../utils/save-result';
+import { SaveError } from '../../../utils/form-error';
 import type { UserProfilePictureControllerOptions } from '../user-profile-account-section/user-profile-picture.controller';
 import { useUserProfilePictureController } from '../user-profile-account-section/user-profile-picture.controller';
 
@@ -21,7 +21,7 @@ describe('useUserProfilePictureController', () => {
 
   it('is pending while the upload runs', async () => {
     const upload = createDeferredPromise();
-    const onChange = vi.fn(() => upload.promise.then(() => ({ error: null })));
+    const onChange = vi.fn(() => upload.promise.then(() => undefined));
     const { result } = renderController({ onChange });
 
     act(() => {
@@ -39,7 +39,7 @@ describe('useUserProfilePictureController', () => {
   });
 
   it('ignores a second pick while one is in flight', () => {
-    const onChange = vi.fn(() => new Promise<SaveResult>(() => {}));
+    const onChange = vi.fn(() => new Promise<void>(() => {}));
     const { result } = renderController({ onChange });
 
     act(() => {
@@ -54,10 +54,8 @@ describe('useUserProfilePictureController', () => {
   it('shows why the upload failed, and clears it on the next attempt', async () => {
     const onChange = vi
       .fn()
-      .mockResolvedValueOnce({
-        error: { global: { code: 'avatar_file_size_exceeded', message: 'Too big.' } },
-      })
-      .mockResolvedValueOnce({ error: null });
+      .mockRejectedValueOnce(new SaveError({ global: { code: 'avatar_file_size_exceeded', message: 'Too big.' } }))
+      .mockResolvedValueOnce(undefined);
     const { result } = renderController({ onChange });
 
     await act(async () => result.current.onChange?.(file));
@@ -81,7 +79,7 @@ describe('useUserProfilePictureController', () => {
   });
 
   it('reports a failed removal the same way', async () => {
-    const onRemove = vi.fn().mockResolvedValue({ error: { global: { message: 'Nope.' } } });
+    const onRemove = vi.fn().mockRejectedValue(new SaveError({ global: { message: 'Nope.' } }));
     const { result } = renderController({ onRemove });
 
     await act(async () => result.current.onRemove?.());

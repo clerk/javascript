@@ -1,11 +1,11 @@
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
-import type { FormError, SaveResult } from '../../../utils/save-result';
-import { UNEXPECTED_ERROR } from '../../../utils/save-result';
+import type { FormError } from '../../../utils/form-error';
+import { toFormError } from '../../../utils/form-error';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
 
 export interface UserProfileEditUsernameContext {
-  saveUsername: (username: string) => Promise<SaveResult<UserProfileEditUsernameField>>;
+  saveUsername: (username: string) => Promise<void>;
   savedUsername: string;
   username: string;
   error: FormError<UserProfileEditUsernameField> | undefined;
@@ -54,17 +54,10 @@ export const userProfileEditUsernameMachine = createMachine({
     },
     saving: {
       invoke: fromPromise(context => context.saveUsername(context.username), {
-        onDone: [
-          {
-            guard: (_, event) => event.output.error !== null,
-            target: 'editing',
-            actions: assign((_, event) => ({ error: event.output.error ?? undefined })),
-          },
-          { target: 'idle', actions: assign(() => ({ error: undefined })) },
-        ],
+        onDone: { target: 'idle', actions: assign(() => ({ error: undefined })) },
         onError: {
           target: 'editing',
-          actions: [(_, event) => console.error(event.error), assign(() => ({ error: { global: UNEXPECTED_ERROR } }))],
+          actions: assign((_, event) => ({ error: toFormError<UserProfileEditUsernameField>(event.error) })),
         },
       }),
     },
@@ -73,7 +66,7 @@ export const userProfileEditUsernameMachine = createMachine({
 
 export interface UserProfileEditUsernameControllerOptions {
   username?: string;
-  onSubmit: (username: string) => Promise<SaveResult<UserProfileEditUsernameField>>;
+  onSubmit: (username: string) => Promise<void>;
 }
 
 export interface UserProfileEditUsernameController {

@@ -2,19 +2,18 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../../machine/createActor';
-import type { FormError, SaveResult } from '../../../utils/save-result';
+import type { FormError } from '../../../utils/form-error';
+import { SaveError } from '../../../utils/form-error';
 import {
   userProfileEditNameMachine,
   useUserProfileEditNameController,
 } from '../user-profile-account-section/user-profile-edit-name.controller';
 import type { UserProfileEditNameField } from '../user-profile-account-section/user-profile-edit-name.dialog';
 
-type Result = SaveResult<UserProfileEditNameField>;
+const saved = (): Promise<void> => Promise.resolve();
+const failed = (error: FormError<UserProfileEditNameField>): Promise<void> => Promise.reject(new SaveError(error));
 
-const saved = (): Promise<Result> => Promise.resolve({ error: null });
-const failed = (error: FormError<UserProfileEditNameField>): Promise<Result> => Promise.resolve({ error });
-
-function start(saveName: () => Promise<Result>, saved = { savedFirstName: 'Preston', savedLastName: 'Booth' }) {
+function start(saveName: () => Promise<void>, saved = { savedFirstName: 'Preston', savedLastName: 'Booth' }) {
   const actor = createActor(userProfileEditNameMachine, { context: { saveName, ...saved } }).start();
   actor.send({ type: 'OPEN' });
   return actor;

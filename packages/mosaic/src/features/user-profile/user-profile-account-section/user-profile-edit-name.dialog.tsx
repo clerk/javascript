@@ -9,7 +9,7 @@ import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Input } from '../../../components/input';
 import { useErrorText, useMessages } from '../../../localization';
-import type { FormError } from '../../../utils/save-result';
+import type { FormError } from '../../../utils/form-error';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
 
 export type UserProfileEditNameField = 'firstName' | 'lastName';
