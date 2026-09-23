@@ -6,9 +6,10 @@ import { useCardState } from '@/ui/elements/contexts';
 import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { handleError } from '@/ui/utils/errorHandler';
+import { createPasswordConfirmationError } from '@/ui/utils/passwordUtils';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
-import { Col, descriptors, Flow, localizationKeys } from '../../customizables';
+import { Col, descriptors, Flow, localizationKeys, useLocalizations } from '../../customizables';
 import { HavingTrouble } from '../SignIn/HavingTrouble';
 import { useAfterVerification } from './use-after-verification';
 
@@ -22,6 +23,7 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
 
   const { handleVerificationResponse } = useAfterVerification();
   const card = useCardState();
+  const { t } = useLocalizations();
 
   const [showHavingTrouble, setShowHavingTrouble] = React.useState(false);
   const toggleHavingTrouble = React.useCallback(() => setShowHavingTrouble(s => !s), [setShowHavingTrouble]);
@@ -30,6 +32,8 @@ export function UserVerificationFactorOnePasswordCard(props: UserVerificationFac
     type: 'password',
     label: localizationKeys('formFieldLabel__password'),
     placeholder: localizationKeys('formFieldInputPlaceholder__password'),
+    validatePassword: false,
+    buildErrorMessage: errors => createPasswordConfirmationError(errors, { t }),
   });
 
   const handlePasswordSubmit: React.FormEventHandler = async e => {
