@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, easingVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, durationVars, easingVars, layerVars, radiusVars, space } from '../../tokens.stylex';
 
 // How far the contents of a surface beneath a stacked dialog are veiled toward its own background.
 // Declared up here rather than beside `STACK_SCALE` further down because `variants` reads it, and
@@ -43,6 +43,10 @@ const DESK = '@container cl-dialog (48rem <= width < 90rem)';
 const WIDE = '@container cl-dialog (width >= 90rem)';
 
 export const styles = stylex.create({
+  overlay: {
+    zIndex: layerVars['--cl-z-index-overlay'],
+  },
+
   // The scrim. Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
   // than darkening it — and it read as haze over the page rather than as a surface lifting off it.
   //

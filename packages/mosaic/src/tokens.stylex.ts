@@ -437,3 +437,14 @@ const shadowDefaults = {
 };
 
 export const shadowVars = stylex.defineVars(shadowDefaults);
+
+// =============================================================================
+// Layer Tokens
+// =============================================================================
+
+// One value for every portalled layer, so DOM order still decides which Mosaic layer is on top.
+const layerDefaults = {
+  '--cl-z-index-overlay': '10000',
+} as const;
+
+export const layerVars = stylex.defineVars(layerDefaults);

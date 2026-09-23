@@ -10,6 +10,8 @@ import { useDrawerContext } from './drawer-context';
 export interface DrawerViewportProps extends ComponentProps<'div'> {
   /** When true, locks body scroll while the drawer is open. Default: true */
   lockScroll?: boolean;
+  /** Props for the fixed overlay element that wraps the viewport, such as a `className` setting its `z-index`. */
+  overlayProps?: React.HTMLAttributes<HTMLDivElement>;
 }
 
 /**
@@ -20,7 +22,7 @@ export interface DrawerViewportProps extends ComponentProps<'div'> {
  */
 export const DrawerViewport = React.forwardRef<HTMLDivElement, DrawerViewportProps>(
   function DrawerViewport(props, ref) {
-    const { render, lockScroll = true, ...otherProps } = props;
+    const { render, lockScroll = true, overlayProps, ...otherProps } = props;
     const { open, mounted, transitionProps, modal } = useDrawerContext();
 
     const state = { open };
@@ -48,8 +50,9 @@ export const DrawerViewport = React.forwardRef<HTMLDivElement, DrawerViewportPro
 
     return (
       <FloatingOverlay
+        {...overlayProps}
         lockScroll={lockScroll}
-        style={modal ? undefined : { pointerEvents: 'none' }}
+        style={modal ? overlayProps?.style : { ...overlayProps?.style, pointerEvents: 'none' }}
       >
         {element}
       </FloatingOverlay>

@@ -68,7 +68,7 @@ const styles = stylex.create({ helpText: { textAlign: 'center' } });
 </Text>;
 ```
 
-Tokens are a second, independent lever: every `--cl-*` custom property (`--cl-color-*`, `--cl-radius-*`, `--cl-font-family-sans`, `--cl-spacing`) can be overridden in plain CSS at `:root` or any scope to re-theme without touching a component.
+Tokens are a second, independent lever: every `--cl-*` custom property (`--cl-color-*`, `--cl-radius-*`, `--cl-font-family-sans`, `--cl-spacing`, `--cl-z-index-overlay`) can be overridden in plain CSS at `:root` or any scope to re-theme without touching a component.
 
 State styling uses real class + attribute-selector specificity — no `&&` boost, no data-attr-vs-class ambiguity.
 

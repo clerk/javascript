@@ -276,6 +276,7 @@ function Viewport({
     <Primitive.Viewport
       overlay
       lockScroll
+      overlayProps={stylex.props(styles.overlay)}
       {...mergeStyleProps(
         themeProps('dialog-viewport', { variant }),
         stylex.props(reset.base, styles.viewport, viewportVariants[variant]),

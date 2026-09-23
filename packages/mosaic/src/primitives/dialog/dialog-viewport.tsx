@@ -10,6 +10,8 @@ import { useDialogContext } from './dialog-context';
 export interface DialogViewportProps extends ComponentProps<'div'> {
   /** When true, locks body scroll while the dialog is open. Default: true */
   lockScroll?: boolean;
+  /** Props for the fixed overlay element that wraps the viewport, such as a `className` setting its `z-index`. */
+  overlayProps?: React.HTMLAttributes<HTMLDivElement>;
   /**
    * When false, renders the viewport in flow — no fixed overlay, no scroll lock — for a dialog
    * presented inline in its host rather than over the page. Default: true
@@ -27,7 +29,7 @@ export interface DialogViewportProps extends ComponentProps<'div'> {
  */
 export const DialogViewport = React.forwardRef<HTMLDivElement, DialogViewportProps>(
   function DialogViewport(props, ref) {
-    const { render, lockScroll = true, overlay = true, ...otherProps } = props;
+    const { render, lockScroll = true, overlay = true, overlayProps, ...otherProps } = props;
     const { open, mounted, isNested, transitionProps, modal } = useDialogContext();
 
     const state = { open, nested: isNested };
@@ -60,8 +62,9 @@ export const DialogViewport = React.forwardRef<HTMLDivElement, DialogViewportPro
 
     return (
       <FloatingOverlay
+        {...overlayProps}
         lockScroll={lockScroll}
-        style={modal ? undefined : { pointerEvents: 'none' }}
+        style={modal ? overlayProps?.style : { ...overlayProps?.style, pointerEvents: 'none' }}
       >
         {element}
       </FloatingOverlay>

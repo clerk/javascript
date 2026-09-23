@@ -6,6 +6,7 @@ import {
   easingVars,
   fontFamilyVars,
   fontWeightVars,
+  layerVars,
   radiusVars,
   shadowVars,
   space,
@@ -29,6 +30,7 @@ export const value = stylex.create({
 export const positioner = stylex.create({
   base: {
     outline: 'none',
+    zIndex: layerVars['--cl-z-index-overlay'],
   },
 });
 

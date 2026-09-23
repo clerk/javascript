@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, easingVars, radiusVars, shadowVars, space } from '../../tokens.stylex';
+import { colorVars, durationVars, easingVars, layerVars, radiusVars, shadowVars, space } from '../../tokens.stylex';
 
 // The dialog's scrim, and the nested value a dialog paints over a `profile` or a `card` — see
 // `dialog.styles.ts` for the composite arithmetic. A sheet opening from inside a profile dialog is
@@ -28,6 +28,10 @@ const BLEED = space['24'];
 const SHEET_ENTER_PEEK = space['2'];
 
 export const styles = stylex.create({
+  overlay: {
+    zIndex: layerVars['--cl-z-index-overlay'],
+  },
+
   backdrop: {
     inset: 0,
     backgroundColor: BASE_SCRIM,

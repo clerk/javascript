@@ -1,14 +1,15 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { durationVars, easingVars } from '../../tokens.stylex';
+import { durationVars, easingVars, layerVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   // Floating wrapper. Positioning styles are applied inline by the headless
-  // positioner; this only clears the focus outline the FloatingFocusManager places
-  // here. No z-index: portalled siblings stack by DOM order, so a menu opened from
-  // inside a popover paints above it.
+  // positioner; this clears the focus outline the FloatingFocusManager places here and
+  // lifts it to the shared overlay layer. Every portalled layer takes the same value, so
+  // siblings still stack by DOM order and a menu opened from inside a popover paints above it.
   positioner: {
     outline: 'none',
+    zIndex: layerVars['--cl-z-index-overlay'],
   },
 
   // The floating box, deliberately chrome-free: background, border, radius,

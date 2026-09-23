@@ -179,6 +179,7 @@ import {
   focusVars,
   fontFamilyVars,
   fontWeightVars,
+  layerVars,
   radiusVars,
   scrollbarVars,
   scrollFadeVars,
@@ -196,6 +197,7 @@ export {
   focusVars,
   fontFamilyVars,
   fontWeightVars,
+  layerVars,
   radiusVars,
   scrollbarVars,
   scrollFadeVars,
@@ -216,6 +218,7 @@ export type FocusVarName = keyof typeof focusVars;
 export type ShadowVarName = keyof typeof shadowVars;
 export type FontFamilyVarName = keyof typeof fontFamilyVars;
 export type FontWeightVarName = keyof typeof fontWeightVars;
+export type LayerVarName = keyof typeof layerVars;
 export type RadiusVarName = keyof typeof radiusVars;
 export type ScrollbarVarName = keyof typeof scrollbarVars;
 export type ScrollFadeVarName = keyof typeof scrollFadeVars;

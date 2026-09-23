@@ -6,18 +6,19 @@ import {
   easingVars,
   fontFamilyVars,
   fontWeightVars,
+  layerVars,
   radiusVars,
   shadowVars,
   space,
   typeScaleVars,
 } from '../../tokens.stylex';
 
-// Positioning is applied inline by the headless positioner; this only clears the
-// focus outline it receives. No z-index: the portalled, fixed positioner already
-// paints above page content, and consumers own their own stacking order.
+// Positioning is applied inline by the headless positioner; this clears the focus outline it
+// receives and lifts it to the shared overlay layer.
 export const positioner = stylex.create({
   base: {
     outline: 'none',
+    zIndex: layerVars['--cl-z-index-overlay'],
   },
 });
 

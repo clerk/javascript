@@ -144,9 +144,10 @@ sheet resists overshooting.
 
 ### `Drawer.Viewport`
 
-| Prop         | Type      | Default | Description                     |
-| ------------ | --------- | ------- | ------------------------------- |
-| `lockScroll` | `boolean` | `true`  | Prevents body scroll while open |
+| Prop           | Type                             | Default | Description                                                                                      |
+| -------------- | -------------------------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| `lockScroll`   | `boolean`                        | `true`  | Prevents body scroll while open                                                                  |
+| `overlayProps` | `HTMLAttributes<HTMLDivElement>` | —       | Props for the fixed overlay that wraps the viewport, such as a `className` setting its `z-index` |
 
 Other parts accept standard HTML attributes plus the `render` prop.
 

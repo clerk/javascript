@@ -192,10 +192,11 @@ When `root` is provided, the dialog is portaled into that container instead of `
 
 ### `Dialog.Viewport`
 
-| Prop         | Type      | Default | Description                                                                  |
-| ------------ | --------- | ------- | ---------------------------------------------------------------------------- |
-| `lockScroll` | `boolean` | `true`  | Prevents body scroll while open                                              |
-| `overlay`    | `boolean` | `true`  | Wraps the viewport in a fixed overlay. `false` renders it in flow, unlocked. |
+| Prop           | Type                             | Default | Description                                                                                      |
+| -------------- | -------------------------------- | ------- | ------------------------------------------------------------------------------------------------ |
+| `lockScroll`   | `boolean`                        | `true`  | Prevents body scroll while open                                                                  |
+| `overlayProps` | `HTMLAttributes<HTMLDivElement>` | —       | Props for the fixed overlay that wraps the viewport, such as a `className` setting its `z-index` |
+| `overlay`      | `boolean`                        | `true`  | Wraps the viewport in a fixed overlay. `false` renders it in flow, unlocked.                     |
 
 `overlay={false}` is for a dialog presented inline in its host rather than over the page — an
 account panel mounted in a page slot. Pair it with `modal={false}` and `closedBy='none'` on the

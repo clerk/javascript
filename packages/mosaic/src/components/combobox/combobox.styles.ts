@@ -6,6 +6,7 @@ import {
   easingVars,
   fontFamilyVars,
   fontWeightVars,
+  layerVars,
   radiusVars,
   shadowVars,
   space,
@@ -15,6 +16,7 @@ import {
 export const styles = stylex.create({
   positioner: {
     outline: 'none',
+    zIndex: layerVars['--cl-z-index-overlay'],
   },
   popup: {
     borderRadius: radiusVars['--cl-radius-lg'],

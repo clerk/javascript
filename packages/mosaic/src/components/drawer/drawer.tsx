@@ -50,6 +50,7 @@ const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function Drawer
   return (
     <Primitive.Portal>
       <Primitive.Viewport
+        overlayProps={stylex.props(styles.overlay)}
         {...mergeStyleProps(themeProps('drawer-viewport'), stylex.props(reset.base, styles.viewport))}
       >
         <Primitive.Backdrop

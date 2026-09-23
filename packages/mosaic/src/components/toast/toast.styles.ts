@@ -6,6 +6,7 @@ import {
   easingVars,
   fontFamilyVars,
   fontWeightVars,
+  layerVars,
   radiusVars,
   shadowVars,
   space,
@@ -28,6 +29,7 @@ export const styles = stylex.create({
     outline: 'none',
     insetBlockEnd: space['4'],
     position: 'fixed',
+    zIndex: layerVars['--cl-z-index-overlay'],
   },
 
   root: {
@@ -142,6 +144,7 @@ export const styles = stylex.create({
 
   anchoredPositioner: {
     outline: 'none',
+    zIndex: layerVars['--cl-z-index-overlay'],
   },
 
   anchoredRoot: {
