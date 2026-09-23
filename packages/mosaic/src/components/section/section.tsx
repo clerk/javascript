@@ -27,6 +27,7 @@ export type SectionContentProps = MosaicComponentProps<'div'>;
 export type SectionLabelProps = MosaicComponentProps<'div'>;
 export type SectionDescriptionProps = MosaicComponentProps<'div'>;
 export type SectionActionsProps = MosaicComponentProps<'div'>;
+export type SectionNoteProps = MosaicComponentProps<'div'> & { icon?: React.ReactNode };
 export type SectionErrorProps = MosaicComponentProps<'p'>;
 
 const mediaSizes = {
@@ -226,6 +227,33 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
 });
 
 /**
+ * Static text that takes an action's place in a row, stating why it offers none. Sits directly in
+ * `Section.Item` where a `Section.Actions` would; it holds its own trailing position, so it does not
+ * need one. `icon` renders into a fixed leading slot, sized to the text, for a logo or a lock.
+ */
+const Note = React.forwardRef<HTMLDivElement, SectionNoteProps>(function SectionNote(
+  { icon, children, render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('section-note'), stylex.props(reset.base, styles.note, xstyle), rest),
+      children: (
+        <>
+          {icon ? (
+            <span {...mergeStyleProps(themeProps('section-note-icon'), stylex.props(styles.noteIcon))}>{icon}</span>
+          ) : null}
+          {children}
+        </>
+      ),
+    },
+  });
+});
+
+/**
  * A row-level message, mirroring `Field.Error` for a row that holds no form control. Place it as a
  * sibling of `Section.Item` inside `Section.Row`, not inside `Section.Content`: the item stays a
  * single centered line, so the media and actions hold their position whether or not it is showing.
@@ -297,5 +325,6 @@ export const Section = {
   Label,
   Description,
   Actions,
+  Note,
   Error: SectionError,
 };

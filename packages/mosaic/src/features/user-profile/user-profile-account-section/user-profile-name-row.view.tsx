@@ -1,6 +1,8 @@
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
-import { useMessages } from '../../../localization';
+import { fill, useMessages } from '../../../localization';
+import type { UserProfileManagedBy } from '../user-profile-managed-by';
+import { UserProfileManagedByLabel } from '../user-profile-managed-by';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
 import { useUserProfileEditNameController } from './user-profile-edit-name.controller';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
@@ -12,6 +14,7 @@ export interface UserProfileNameRowViewProps {
   lastName?: string;
   firstNameAttribute?: UserProfileNameAttribute;
   lastNameAttribute?: UserProfileNameAttribute;
+  managedBy?: UserProfileManagedBy;
   onSubmit?: (value: UserProfileEditNameValue) => Promise<void>;
 }
 
@@ -21,9 +24,11 @@ export function UserProfileNameRowView({
   lastName,
   firstNameAttribute,
   lastNameAttribute,
+  managedBy,
   onSubmit,
 }: UserProfileNameRowViewProps) {
   const m = useMessages('userProfileAccountSection');
+
   return (
     <Section.Row>
       <Section.Item>
@@ -42,6 +47,10 @@ export function UserProfileNameRowView({
               onSubmit={onSubmit}
             />
           </Section.Actions>
+        ) : managedBy ? (
+          <UserProfileManagedByLabel iconUrl={managedBy.iconUrl}>
+            {fill(m.name.managedBy, { name: managedBy.name })}
+          </UserProfileManagedByLabel>
         ) : null}
       </Section.Item>
     </Section.Row>

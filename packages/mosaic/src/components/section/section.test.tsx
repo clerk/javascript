@@ -247,4 +247,44 @@ describe('Section', () => {
     rerender(<Host />);
     await waitFor(() => expect(screen.queryByTestId('error')).not.toBeInTheDocument());
   });
+
+  it('states why a row has no action, with the leading glyph in its own slot', () => {
+    render(
+      <Section.Root>
+        <Section.Group>
+          <Section.Row>
+            <Section.Item data-testid='item'>
+              <Section.Content>
+                <Section.Label>Name</Section.Label>
+              </Section.Content>
+              <Section.Note
+                data-testid='note'
+                icon={
+                  <img
+                    alt=''
+                    src='/okta.svg'
+                  />
+                }
+              >
+                Managed by Okta
+              </Section.Note>
+            </Section.Item>
+          </Section.Row>
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    const note = screen.getByTestId('note');
+    expect(note).toHaveClass('cl-section-note');
+    expect(note).toHaveTextContent('Managed by Okta');
+    expect(note.querySelector('.cl-section-note-icon')).toContainElement(screen.getByRole('presentation'));
+    // Holds the trailing slot itself, so it needs no Section.Actions around it.
+    expect(note.parentElement).toBe(screen.getByTestId('item'));
+  });
+
+  it('leaves out the glyph slot when the note carries no icon', () => {
+    render(<Section.Note data-testid='note'>Managed by Acme SSO</Section.Note>);
+
+    expect(screen.getByTestId('note').querySelector('.cl-section-note-icon')).toBeNull();
+  });
 });
