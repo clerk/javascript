@@ -262,7 +262,7 @@ export function InvitationsTableTabView({
             try {
               await removalFocus.remove(invitation.id);
             } catch (error) {
-              throw error instanceof Error ? error : new Error(m.revokeError);
+              throw error instanceof Error && error.message.trim() ? error : new Error(m.revokeError);
             }
           }}
           finalFocus={removalFocus.finalFocus}

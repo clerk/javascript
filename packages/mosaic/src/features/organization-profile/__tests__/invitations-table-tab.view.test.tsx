@@ -33,6 +33,23 @@ function renderView(overrides: Partial<InvitationsTableTabViewProps> = {}) {
 }
 
 describe('InvitationsTableTabView', () => {
+  it.each(['', '   '])('uses the localized revoke error when the rejection message is "%s"', async message => {
+    const user = userEvent.setup();
+    render(
+      <MosaicProvider
+        localization={{ overrides: { 'invitationsTableTab.revokeError': 'Could not revoke invitation.' } }}
+      >
+        <InvitationsTableTabView {...propsFor({ onRevoke: vi.fn().mockRejectedValue(new Error(message)) })} />
+      </MosaicProvider>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Manage ada@example.com' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not revoke invitation.');
+  });
+
   it('distinguishes loading, an empty invitation list, and an empty search', () => {
     const { props, rerender } = renderView({ invitations: [], totalCount: 0, isLoading: true });
     expect(screen.getByRole('status')).toHaveTextContent('Loading invitations');
