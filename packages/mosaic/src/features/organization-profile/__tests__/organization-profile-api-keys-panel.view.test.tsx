@@ -496,7 +496,7 @@ describe('organization API key creation', () => {
     expect(props.onSubmit).toHaveBeenCalledTimes(2);
   });
 
-  it('focuses Copy beside the read-only input and keeps both copy intents retryable', async () => {
+  it('focuses the secret step and keeps the dialog open while copying or after failure', async () => {
     const user = userEvent.setup();
     const props = dialogPropsFor({ name: 'Deploy', expiration: 'never' });
     const view = render(dialogView(props));
@@ -511,21 +511,17 @@ describe('organization API key creation', () => {
     expect(secret).toHaveValue('ak_org_secret');
     await user.click(secret);
     expect(secret).toHaveFocus();
-    await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
-    expect(props.onCopy).toHaveBeenLastCalledWith(false);
     view.rerender(dialogView({ ...returned, isPending: true }));
-    expect(within(dialog).getByRole('button', { name: 'Copy API key' })).toBeDisabled();
     expect(within(dialog).getByRole('button', { name: 'Copy and close' })).toHaveAttribute('aria-disabled', 'true');
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
-    expect(props.onCopy).toHaveBeenCalledOnce();
+    expect(props.onCopy).not.toHaveBeenCalled();
     await user.keyboard('{Escape}');
     expect(props.onOpenChange).not.toHaveBeenCalled();
     view.rerender(dialogView({ ...returned, error: 'Copy failed. Try again.' }));
     expect(within(dialog).getByRole('alert')).toHaveTextContent('Copy failed. Try again.');
     expect(secret).toHaveValue('ak_org_secret');
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
-    expect(props.onCopy).toHaveBeenNthCalledWith(1, false);
-    expect(props.onCopy).toHaveBeenNthCalledWith(2, true);
+    expect(props.onCopy).toHaveBeenCalledExactlyOnceWith(true);
     await user.keyboard('{Escape}');
     expect(props.onOpenChange).toHaveBeenCalledWith(false);
   });
