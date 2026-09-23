@@ -71,7 +71,7 @@ describe('InvitationsTableTabView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.getByText('No invitations found')).toBeVisible();
+    expect(screen.getByRole('status')).toHaveTextContent('No invitations found');
     rerender(
       <MosaicProvider>
         <InvitationsTableTabView

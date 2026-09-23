@@ -181,7 +181,7 @@ export function InvitationsTableTabView({
               </Table.Empty>
             ) : table.rows.length === 0 ? (
               <Table.Empty colSpan={columnCount}>
-                <EmptyState.Root>
+                <EmptyState.Root role='status'>
                   <EmptyState.Icon name='envelope' />
                   <EmptyState.Label>{query ? m.empty : m.noInvitations}</EmptyState.Label>
                   <EmptyState.Description>
