@@ -249,11 +249,12 @@ describe('verifyWebhook', () => {
     expect(result).toHaveProperty('event_attributes.http_request.user_agent', 'Mozilla/5.0 (Test)');
   });
 
-  it('should parse timestamp', async () => {
+  it('should parse timestamp and instance_id', async () => {
     const clerkPayload = JSON.stringify({
       type: 'user.created',
       data: { id: 'user_123', email: 'test@example.com' },
       timestamp: 1654012591835,
+      instance_id: 'ins_123',
     });
     const svixId = 'msg_123';
     const svixTimestamp = (Date.now() / 1000).toString();
@@ -272,5 +273,6 @@ describe('verifyWebhook', () => {
     const result = await verifyWebhook(mockRequest, { signingSecret: mockSecret });
     expect(result).toHaveProperty('type', 'user.created');
     expect(result).toHaveProperty('timestamp', 1654012591835);
+    expect(result).toHaveProperty('instance_id', 'ins_123');
   });
 });

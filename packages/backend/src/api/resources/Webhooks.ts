@@ -31,6 +31,7 @@ type Webhook<EvtType, Data> = {
   data: Data;
   event_attributes: WebhookEventAttributes;
   timestamp: number;
+  instance_id: string;
 };
 
 export type UserWebhookEvent =
