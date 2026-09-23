@@ -550,7 +550,6 @@ describe('compactPlacement', () => {
   const PHONE = '@container cl-dialog (width < 48rem)';
   const probe = stylex.create({
     anchored: { alignSelf: { [PHONE]: 'end', default: null } },
-    centred: { alignItems: { [PHONE]: 'center', default: null } },
     clipped: { overflow: { [PHONE]: 'clip', default: null } },
   });
 
@@ -580,15 +579,6 @@ describe('compactPlacement', () => {
     expect(classesOf('.cl-dialog-track')).toEqual(expect.arrayContaining(atomFor(probe.clipped)));
   });
 
-  // The band runs to 48rem but a `Card` caps at 26.25rem, so between the two the surface sits
-  // inside a wider popup. Without this it lands against the inline-start edge — a sheet hugging one
-  // side of the screen — because the popup is a flex column and `stretch` is the default.
-  it('centres what the sheet holds, for the widths where the surface caps first', () => {
-    renderPlacement('sheet');
-
-    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.centred)));
-  });
-
   // A profile fills the compact band, with no room to be anchored anywhere else.
   it('ignores a placement on a profile, and warns', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -600,45 +590,20 @@ describe('compactPlacement', () => {
   });
 });
 
-describe('size', () => {
-  const probe = stylex.create({
-    wide: { '--_cl-card-max-width': '36.25rem' },
+// The card owns its width, so a card popup shrinks to it rather than capping it.
+describe('popup width', () => {
+  const probe = stylex.create({ fit: { width: 'fit-content' } });
+
+  it('shrinks a card popup to the card', () => {
+    renderVariant('card');
+
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.fit)));
   });
 
-  const renderSize = (size: 'default' | 'wide', variant: DialogVariant = 'card') =>
-    render(
-      <Dialog.Root defaultOpen>
-        <Dialog.Popup
-          variant={variant}
-          size={size}
-        >
-          <Surface title='Invite members' />
-        </Dialog.Popup>
-      </Dialog.Root>,
-    );
+  it('leaves a profile popup at full width', () => {
+    renderVariant('profile');
 
-  it('leaves the card width alone by default', () => {
-    renderSize('default');
-
-    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.wide)));
-    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'default');
-  });
-
-  it('widens the card', () => {
-    renderSize('wide');
-
-    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.wide)));
-    expect(document.querySelector('.cl-dialog-popup')).toHaveAttribute('data-size', 'wide');
-  });
-
-  it('ignores a size on a profile, and warns', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    renderSize('wide', 'profile');
-
-    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.wide)));
-    expect(document.querySelector('.cl-dialog-popup')).not.toHaveAttribute('data-size');
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('takes no size'));
-    warn.mockRestore();
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.fit)));
   });
 });
 

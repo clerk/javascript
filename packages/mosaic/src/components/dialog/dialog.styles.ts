@@ -7,14 +7,6 @@ import { colorVars, durationVars, easingVars, radiusVars, space } from '../../to
 // StyleX requires a referenced constant to be declared before the `create()` call that reads it.
 const STACK_VEIL_OPACITY = 0.4;
 
-// The card's width cap, read by `variants.card` and restated by `compactPlacements.sheet` — which
-// has to declare `max-width` itself to lift it in the compact band, and would otherwise fork the
-// value.
-const CARD_MAX_WIDTH = '25rem';
-
-// Set by a card `size` and read by both the popup and `Card.Root`, so the surface widens with the box.
-const CARD_MAX_WIDTH_VAR = `var(--_cl-card-max-width, ${CARD_MAX_WIDTH})`;
-
 // The scrim over the bare page. A black wash over `transparent` rather than a percentage of a
 // neutral token: it composites over whatever the host app renders, so the same value reads
 // consistently on any page.
@@ -281,12 +273,10 @@ export const closeInsets = stylex.create({
  * on mobile treatment or footer.
  *
  * `card` is the everyday dialog: a `Card` over the page, whether that holds a sign-in flow, a
- * confirmation, or a single-field form like "add an email address". It matches the width of the
- * legacy card (`theme.sizes.$100`). `profile` is the account-profile and settings surface, which
- * you navigate.
+ * confirmation, or a single-field form like "add an email address". `profile` is the
+ * account-profile and settings surface, which you navigate.
  *
- * `card` sets only `max-width`; the popup is `width: 100%` and its height is whatever the
- * content needs. Where it sits in the compact band is a separate axis — see `compactPlacements`.
+ * `card` takes its width from the `Card` inside it, and its height is whatever the content needs. Where it sits in the compact band is a separate axis — see `compactPlacements`.
  *
  * `profile` fixes the height. Its content NAVIGATES — a settings surface switches sections in
  * place — and a content-driven height would resize the window on every section change, in both
@@ -365,7 +355,9 @@ export const variants = stylex.create({
     // alone: a `profile` hosting a dialog gets a scrim between the two instead, and would
     // otherwise dim as well as darken.
     '--_cl-stack-veil': { default: 0, ':where([data-stack-base])': STACK_VEIL_OPACITY },
-    maxWidth: CARD_MAX_WIDTH_VAR,
+    // Shrinks to the card, so the card's `size` is the dialog's width and a press beside it lands
+    // outside the popup.
+    width: 'fit-content',
   },
   /**
    * Like `card`, a profile brings its own surface. It is the account-profile and settings surface,
@@ -409,12 +401,6 @@ export const variants = stylex.create({
   },
 });
 
-/** The width of a `card`. Applied for `card` alone, like `compactPlacements`. */
-export const sizes = stylex.create({
-  default: {},
-  wide: { '--_cl-card-max-width': '36.25rem' },
-});
-
 /**
  * Where the surface sits in the COMPACT band, which is an axis of its own rather than a property
  * of the size: the same `card` is a centred dialog in one place and a bottom sheet in another, and
@@ -425,25 +411,15 @@ export const sizes = stylex.create({
  * resolves back to the same geometry. Named `compact` rather than for a device because the band is
  * a width, and because `Profile` already calls the identical `48rem` query that.
  *
- * Applied for `card` alone (see `Dialog.Popup`), which is why `sheet` can restate the card's cap:
- * a profile has its own compact treatment and never takes a placement.
+ * Applied for `card` alone (see `Dialog.Popup`): a profile has its own compact treatment and never
+ * takes a placement.
  */
 export const compactPlacements = stylex.create({
   center: {},
   sheet: {
-    // The sheet popup can be wider than Card.Root's own width cap.
-    // Keep the card centered within the available space.
-    alignItems: { [PHONE]: 'center', default: null },
     // `align-self` on the grid item, not `align-items` on the viewport, because the viewport is
-    // shared: bottom-aligning there would drag a centred dialog down with it.
-    //
-    // The popup's own cap is lifted at the same time so it spans the width the inset leaves, and
-    // the surface inside decides how much of that it takes. `default` restates `variants.card`'s cap
-    // rather than leaving it to the cascade: this cell is spread after that one in the same
-    // `stylex.props` call, so StyleX dedupes `max-width` to whatever is written here. Both read
-    // the same constant, so there is one value to retune.
+    // shared: bottom-aligning there would drag a centered dialog down with it.
     alignSelf: { [PHONE]: 'end', default: null },
-    maxWidth: { [PHONE]: 'none', default: CARD_MAX_WIDTH_VAR },
   },
 });
 

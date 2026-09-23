@@ -7,7 +7,6 @@ export type {
   DialogCompactPlacement,
   DialogPopupProps,
   DialogRootProps,
-  DialogSize,
   DialogVariant,
   DialogTriggerProps,
 } from './dialog';

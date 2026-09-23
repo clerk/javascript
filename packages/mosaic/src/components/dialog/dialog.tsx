@@ -20,7 +20,6 @@ import {
   closeInsets,
   compactPlacements,
   popupMotion,
-  sizes,
   styles,
   trackCompactPlacements,
   trackVariants,
@@ -43,9 +42,6 @@ export type DialogVariant = keyof typeof variants;
  * widths.
  */
 export type DialogCompactPlacement = keyof typeof compactPlacements;
-
-/** The width of a `card`. `wide` is for forms that need the room, like a tag input. */
-export type DialogSize = keyof typeof sizes;
 
 /**
  * The dialog surface a part is rendered inside, or `null` when there is none.
@@ -125,8 +121,6 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
    * `card` only. @default 'center'
    */
   compactPlacement?: DialogCompactPlacement;
-  /** The width of the card, which `Card.Root` inside takes on. `card` only. @default 'default' */
-  size?: DialogSize;
   /** Where focus moves when the dialog opens. Default: the first tabbable element inside it. */
   initialFocus?: DialogFocusTarget;
   /** Where focus returns when the dialog closes. Default: the trigger. */
@@ -318,17 +312,6 @@ function useNestedVariantWarning(isNestedInDialog: boolean, variant: DialogVaria
   }, [isNestedInDialog, variant]);
 }
 
-function useSizeWarning(variant: DialogVariant, size: DialogSize) {
-  React.useEffect(() => {
-    if (process.env.NODE_ENV === 'production' || variant !== 'profile' || size === 'default') {
-      return;
-    }
-    console.warn(
-      `[clerk] <Dialog.Popup variant="profile" size="${size}"> — a profile takes its width from the surface and takes no size. It was ignored.`,
-    );
-  }, [variant, size]);
-}
-
 /**
  * Warns when a compact placement is asked of a `profile`, which ignores it.
  *
@@ -352,15 +335,7 @@ function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCom
  * part a consumer composes, so they stay out of the public API.
  */
 const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function DialogPopup(
-  {
-    variant = 'card',
-    compactPlacement: compactPlacementProp = 'center',
-    size: sizeProp = 'default',
-    initialFocus,
-    finalFocus,
-    xstyle,
-    ...rest
-  },
+  { variant = 'card', compactPlacement: compactPlacementProp = 'center', initialFocus, finalFocus, xstyle, ...rest },
   ref,
 ) {
   // The dialog this one renders inside, read before this popup publishes its own.
@@ -371,9 +346,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   const isAlert = role === 'alertdialog';
   // A profile has its own compact-band treatment and takes no placement; the warning says so.
   const compactPlacement: DialogCompactPlacement = variant === 'profile' ? 'center' : compactPlacementProp;
-  const size: DialogSize = variant === 'profile' ? 'default' : sizeProp;
   useCompactPlacementWarning(variant, compactPlacementProp);
-  useSizeWarning(variant, sizeProp);
   useNestedVariantWarning(isNestedInDialog, variant);
 
   const surface = React.useMemo(
@@ -407,12 +380,11 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
         initialFocus={initialFocus}
         finalFocus={finalFocus}
         {...mergeStyleProps(
-          themeProps('dialog-popup', { variant, size: variant === 'card' ? size : null }),
+          themeProps('dialog-popup', { variant }),
           stylex.props(
             reset.base,
             styles.popup,
             variants[variant],
-            sizes[size],
             compactPlacements[compactPlacement],
             // One cell per (variant, placement) that exists, selected rather than layered: StyleX
             // dedupes by PROPERTY across a `stylex.props` call, so a thin "sheet only" atom would

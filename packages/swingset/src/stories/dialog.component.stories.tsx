@@ -1,6 +1,6 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
-import type { DialogCompactPlacement, DialogSize, DialogVariant } from '@clerk/mosaic/components/dialog';
+import type { DialogCompactPlacement, DialogVariant } from '@clerk/mosaic/components/dialog';
 import { Dialog } from '@clerk/mosaic/components/dialog';
 import { Heading } from '@clerk/mosaic/components/heading';
 import { Input } from '@clerk/mosaic/components/input';
@@ -26,12 +26,10 @@ export const meta: StoryMeta = {
     _variants: {
       variant: { card: {}, profile: {} },
       compactPlacement: { center: {}, sheet: {} },
-      size: { default: {}, wide: {} },
     },
     _defaultVariants: {
       variant: 'card',
       compactPlacement: 'center',
-      size: 'default',
     },
   },
 };
@@ -63,10 +61,9 @@ const surface: React.CSSProperties = {
  * from — hence the `aria-label` and the corner `Dialog.CloseButton` standing in for them here.
  */
 export function Default(args: Record<string, unknown>) {
-  const { variant, compactPlacement, size } = args as {
+  const { variant, compactPlacement } = args as {
     variant?: DialogVariant;
     compactPlacement?: DialogCompactPlacement;
-    size?: DialogSize;
   };
   return (
     <Dialog.Root>
@@ -74,11 +71,10 @@ export function Default(args: Record<string, unknown>) {
       <Dialog.Popup
         variant={variant}
         compactPlacement={compactPlacement}
-        size={size}
         aria-label='Dialog surface'
       >
         <Dialog.CloseButton />
-        <div style={surface}>
+        <div style={variant === 'profile' ? surface : { ...surface, width: '26.25rem', maxWidth: '100%' }}>
           <Heading size='sm'>The surface</Heading>
           <Text>
             The dashed edge is <code>Dialog.Popup</code>. A real dialog fills it with a Card or a Profile, which paints

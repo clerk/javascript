@@ -9,6 +9,12 @@ import { Card } from './card';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
 
+const atomFor = (style: Parameters<typeof stylex.props>[0]) =>
+  stylex
+    .props(style)
+    .className!.split(' ')
+    .filter(name => !name.includes('__'));
+
 const callerStyles = stylex.create({
   root: { width: '20rem' },
   header: { textAlign: 'right' },
@@ -85,6 +91,24 @@ describe('Mosaic Card', () => {
 
     expect(screen.getByTestId('root')).toHaveAttribute('data-elevation', 'overlay');
     expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'overlay');
+  });
+
+  it('reflects the size on the root and sets its width', () => {
+    const widths = stylex.create({ md: { width: '26.25rem' }, lg: { width: '36.25rem' } });
+    render(
+      <>
+        <Card.Root data-testid='md' />
+        <Card.Root
+          size='lg'
+          data-testid='lg'
+        />
+      </>,
+    );
+
+    expect(screen.getByTestId('md')).toHaveAttribute('data-size', 'md');
+    expect(screen.getByTestId('md')).toHaveClass(...atomFor(widths.md));
+    expect(screen.getByTestId('lg')).toHaveAttribute('data-size', 'lg');
+    expect(screen.getByTestId('lg')).toHaveClass(...atomFor(widths.lg));
   });
 
   it('composes caller xstyle onto every slot', () => {

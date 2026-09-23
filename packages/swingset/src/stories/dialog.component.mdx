@@ -20,7 +20,7 @@ import * as DialogStories from './dialog.component.stories';
   ]}
 />
 
-`variant`, `size` and `compactPlacement` belong to `Dialog.Popup`; the rest belong to `Dialog.Root`.
+`variant` and `compactPlacement` belong to `Dialog.Popup`; the rest belong to `Dialog.Root`.
 
 ## Usage
 
@@ -67,10 +67,10 @@ committing.
 
 ### Variant
 
-| Value     | Width                                    | For                                                                  |
-| --------- | ---------------------------------------- | -------------------------------------------------------------------- |
-| `card`    | `25rem`, height from content             | Everything a `Card` holds — a flow, a confirmation, a form (default) |
-| `profile` | Width from its surface, fills the height | Account profile and settings — a surface you navigate                |
+| Value     | Width                                      | For                                                                  |
+| --------- | ------------------------------------------ | -------------------------------------------------------------------- |
+| `card`    | Width from its `Card`, height from content | Everything a `Card` holds — a flow, a confirmation, a form (default) |
+| `profile` | Width from its surface, fills the height   | Account profile and settings — a surface you navigate                |
 
 ### Every dialog brings its own surface
 
@@ -78,6 +78,8 @@ The dialog **paints nothing**. A `card` holds a `Card`, and a `profile` holds a 
 `UserProfileView`): the dialog positions and animates the popup, and the surface inside paints it.
 
 A popup with no surface inside renders an unpainted box.
+
+A `card` dialog is as wide as its `Card`. Pass `size='lg'` to `Card.Root` for a form that needs more room.
 
 <Story
   name='CardSurface'
@@ -113,10 +115,10 @@ edge instead of centring it.
   storyModule={DialogStories}
 />
 
-| Value    | Compact band (`< 48rem`)                                      | Above it |
-| -------- | ------------------------------------------------------------- | -------- |
-| `center` | Centred (default)                                             | Centred  |
-| `sheet`  | Bottom-anchored, slides up; full width until the surface caps | Centred  |
+| Value    | Compact band (`< 48rem`)   | Above it |
+| -------- | -------------------------- | -------- |
+| `center` | Centred (default)          | Centred  |
+| `sheet`  | Bottom-anchored, slides up | Centred  |
 
 A `profile` takes no placement and warns in dev if given one.
 
@@ -204,13 +206,13 @@ action as its submit.
 
 ## Parts
 
-| Part                 | Slot                  | Description                                                                                       |
-| -------------------- | --------------------- | ------------------------------------------------------------------------------------------------- |
-| `Dialog.Root`        | —                     | State: open/close, `role`, `modal`, `handle`.                                                     |
-| `Dialog.Trigger`     | —                     | Opens the dialog; `render`, and `handle` + `payload` when detached.                               |
-| `Dialog.Popup`       | `dialog-popup`        | The box the surface sits in; `variant`, `size`, `compactPlacement`, `initialFocus`, `finalFocus`. |
-| `Dialog.Close`       | —                     | Unstyled dismiss; accepts `render`.                                                               |
-| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X, for a surface that anchors its own dismiss.                                  |
+| Part                 | Slot                  | Description                                                                               |
+| -------------------- | --------------------- | ----------------------------------------------------------------------------------------- |
+| `Dialog.Root`        | —                     | State: open/close, `role`, `modal`, `handle`.                                             |
+| `Dialog.Trigger`     | —                     | Opens the dialog; `render`, and `handle` + `payload` when detached.                       |
+| `Dialog.Popup`       | `dialog-popup`        | The box the surface sits in; `variant`, `compactPlacement`, `initialFocus`, `finalFocus`. |
+| `Dialog.Close`       | —                     | Unstyled dismiss; accepts `render`.                                                       |
+| `Dialog.CloseButton` | `dialog-close-button` | The styled corner X, for a surface that anchors its own dismiss.                          |
 
 The name, the description and the button row come from the surface — `Card.Title`,
 `Card.Description` and `Card.Footer` — not from the dialog.
