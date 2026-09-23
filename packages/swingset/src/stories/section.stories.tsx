@@ -188,51 +188,49 @@ export function ContainedGroups() {
           aria-label={label}
         >
           <Section.Surface>
-            <Section.Row>
-              <Section.Header>
-                <Section.Content>
-                  <Section.Label>{label}</Section.Label>
-                </Section.Content>
-                <Section.Actions>
-                  <Button
-                    aria-label={`Add ${label.toLowerCase()}`}
-                    color='neutral'
+            <Section.Header>
+              <Section.Content>
+                <Section.Label>{label}</Section.Label>
+              </Section.Content>
+              <Section.Actions>
+                <Button
+                  aria-label={`Add ${label.toLowerCase()}`}
+                  color='neutral'
+                  size='sm'
+                  variant='outline'
+                >
+                  <Icon
+                    name='plus'
+                    placement='inline-start'
                     size='sm'
-                    variant='outline'
-                  >
-                    <Icon
-                      name='plus'
-                      placement='inline-start'
+                  />
+                  Add
+                </Button>
+              </Section.Actions>
+            </Section.Header>
+            <Section.Items>
+              {values.map((value, index) => (
+                <Section.Item key={value}>
+                  <Section.Content>
+                    <Section.Description xstyle={styles.descriptionFlex}>
+                      {value}
+                      {index === 0 ? <Badge color='neutral'>Primary</Badge> : null}
+                    </Section.Description>
+                  </Section.Content>
+                  <Section.Actions>
+                    <Button
+                      aria-label={`Manage ${value}`}
+                      color='neutral'
+                      shape='square'
                       size='sm'
-                    />
-                    Add
-                  </Button>
-                </Section.Actions>
-              </Section.Header>
-              <Section.Items>
-                {values.map((value, index) => (
-                  <Section.Item key={value}>
-                    <Section.Content>
-                      <Section.Description xstyle={styles.descriptionFlex}>
-                        {value}
-                        {index === 0 ? <Badge color='neutral'>Primary</Badge> : null}
-                      </Section.Description>
-                    </Section.Content>
-                    <Section.Actions>
-                      <Button
-                        aria-label={`Manage ${value}`}
-                        color='neutral'
-                        shape='square'
-                        size='sm'
-                        variant='ghost'
-                      >
-                        <Icon name='ellipsis-horizontal' />
-                      </Button>
-                    </Section.Actions>
-                  </Section.Item>
-                ))}
-              </Section.Items>
-            </Section.Row>
+                      variant='ghost'
+                    >
+                      <Icon name='ellipsis-horizontal' />
+                    </Button>
+                  </Section.Actions>
+                </Section.Item>
+              ))}
+            </Section.Items>
           </Section.Surface>
         </Section.Group>
       ))}
@@ -246,39 +244,31 @@ export function FlatContainedGroups() {
       <style>{`
         @scope {
           .cl-section-group[data-variant='contained'] {
-            margin-block-start: 1.25rem !important;
+            margin-top: 1.25rem !important;
           }
           .cl-section-group[data-variant='contained'] > .cl-section-surface {
-            border: 0 !important;
-            border-radius: 0 !important;
+            border: none !important;
             background: none !important;
-            overflow: visible !important;
           }
-          .cl-section-group[data-variant='contained'] .cl-section-row {
-            margin-inline: 0 !important;
-            padding-block: 0 !important;
-          }
-          .cl-section-group[data-variant='contained'] .cl-section-header .cl-button {
+          .cl-section-header {
+            margin: 0 0 0.75rem !important;
             padding: 0 !important;
-            border: 0 !important;
-            background: none !important;
-            box-shadow: none !important;
+            border: none !important;
           }
-          .cl-section-group[data-variant='contained'] .cl-section-header .cl-section-label {
+          .cl-section-header .cl-section-label {
             font-size: var(--cl-text-base-size) !important;
-            line-height: var(--cl-text-base-leading) !important;
           }
-          .cl-section-group[data-variant='contained'] .cl-section-items {
-            padding-inline: 1rem !important;
+          .cl-section-header .cl-button {
+            padding: 0 !important;
+            border: none !important;
+          }
+          .cl-section-items {
             border: 1px solid var(--cl-color-border) !important;
             border-radius: var(--cl-radius-xl) !important;
-            background-color: var(--cl-color-background) !important;
+            background: var(--cl-color-background) !important;
           }
-          .cl-section-group[data-variant='contained'] .cl-section-item[data-nested] {
-            min-height: calc(4.625rem + 1px) !important;
-          }
-          .cl-section-group[data-variant='contained'] .cl-section-item[data-nested]:first-child {
-            border-block-start-width: 0 !important;
+          .cl-section-items .cl-section-item {
+            min-height: var(--cl-section-row-min-height) !important;
           }
         }
       `}</style>
@@ -332,51 +322,49 @@ export function FlatContainedGroups() {
             aria-label={label}
           >
             <Section.Surface>
-              <Section.Row>
-                <Section.Header>
-                  <Section.Content>
-                    <Section.Label>{label}</Section.Label>
-                  </Section.Content>
-                  <Section.Actions>
-                    <Button
-                      aria-label={`Add ${label.toLowerCase()}`}
-                      color='neutral'
+              <Section.Header>
+                <Section.Content>
+                  <Section.Label>{label}</Section.Label>
+                </Section.Content>
+                <Section.Actions>
+                  <Button
+                    aria-label={`Add ${label.toLowerCase()}`}
+                    color='neutral'
+                    size='sm'
+                    variant='outline'
+                  >
+                    <Icon
+                      name='plus'
+                      placement='inline-start'
                       size='sm'
-                      variant='outline'
-                    >
-                      <Icon
-                        name='plus'
-                        placement='inline-start'
+                    />
+                    Add
+                  </Button>
+                </Section.Actions>
+              </Section.Header>
+              <Section.Items>
+                {values.map((value, index) => (
+                  <Section.Item key={value}>
+                    <Section.Content>
+                      <Section.Description xstyle={styles.descriptionFlex}>
+                        {value}
+                        {index === 0 ? <Badge color='neutral'>Primary</Badge> : null}
+                      </Section.Description>
+                    </Section.Content>
+                    <Section.Actions>
+                      <Button
+                        aria-label={`Manage ${value}`}
+                        color='neutral'
+                        shape='square'
                         size='sm'
-                      />
-                      Add
-                    </Button>
-                  </Section.Actions>
-                </Section.Header>
-                <Section.Items>
-                  {values.map((value, index) => (
-                    <Section.Item key={value}>
-                      <Section.Content>
-                        <Section.Description xstyle={styles.descriptionFlex}>
-                          {value}
-                          {index === 0 ? <Badge color='neutral'>Primary</Badge> : null}
-                        </Section.Description>
-                      </Section.Content>
-                      <Section.Actions>
-                        <Button
-                          aria-label={`Manage ${value}`}
-                          color='neutral'
-                          shape='square'
-                          size='sm'
-                          variant='ghost'
-                        >
-                          <Icon name='ellipsis-horizontal' />
-                        </Button>
-                      </Section.Actions>
-                    </Section.Item>
-                  ))}
-                </Section.Items>
-              </Section.Row>
+                        variant='ghost'
+                      >
+                        <Icon name='ellipsis-horizontal' />
+                      </Button>
+                    </Section.Actions>
+                  </Section.Item>
+                ))}
+              </Section.Items>
             </Section.Surface>
           </Section.Group>
         ))}

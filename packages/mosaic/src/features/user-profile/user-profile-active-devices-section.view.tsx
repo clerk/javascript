@@ -115,41 +115,39 @@ export function UserProfileActiveDevicesSectionView({
             aria-label={m.otherDevicesTitle}
           >
             <Section.Surface>
-              <Section.Row>
-                <Section.Header>
-                  <Section.Content>
-                    <Section.Label>
-                      {fill(otherDevices.length === 1 ? m.otherDevice : m.otherDevices, {
-                        count: String(otherDevices.length),
-                      })}
-                    </Section.Label>
-                  </Section.Content>
-                  {onSignOutAllOtherDevices ? (
-                    <Section.Actions>
-                      <Button
-                        ref={signOutAllTrigger}
-                        color='neutral'
-                        size='sm'
-                        variant='outline'
-                        onClick={() => setIsSignOutAllOpen(true)}
-                      >
-                        {m.signOutAll}
-                      </Button>
-                    </Section.Actions>
-                  ) : null}
-                </Section.Header>
-                <Section.Items>
-                  {otherDevices.map(device => (
-                    <DeviceItem
-                      key={device.id}
-                      device={device}
-                      triggerRef={removalFocus.registerTrigger(device.id)}
-                      onSignOut={openSignOut}
-                      onViewDetails={device => deviceDetails.open(device)}
-                    />
-                  ))}
-                </Section.Items>
-              </Section.Row>
+              <Section.Header>
+                <Section.Content>
+                  <Section.Label>
+                    {fill(otherDevices.length === 1 ? m.otherDevice : m.otherDevices, {
+                      count: String(otherDevices.length),
+                    })}
+                  </Section.Label>
+                </Section.Content>
+                {onSignOutAllOtherDevices ? (
+                  <Section.Actions>
+                    <Button
+                      ref={signOutAllTrigger}
+                      color='neutral'
+                      size='sm'
+                      variant='outline'
+                      onClick={() => setIsSignOutAllOpen(true)}
+                    >
+                      {m.signOutAll}
+                    </Button>
+                  </Section.Actions>
+                ) : null}
+              </Section.Header>
+              <Section.Items>
+                {otherDevices.map(device => (
+                  <DeviceItem
+                    key={device.id}
+                    device={device}
+                    triggerRef={removalFocus.registerTrigger(device.id)}
+                    onSignOut={openSignOut}
+                    onViewDetails={device => deviceDetails.open(device)}
+                  />
+                ))}
+              </Section.Items>
             </Section.Surface>
           </Section.Group>
         ) : null}

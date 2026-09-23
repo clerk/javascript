@@ -12,7 +12,7 @@ import { reset } from '../../utils/reset.styles';
 import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import type { HeadingProps } from '../heading';
 import { Heading } from '../heading';
-import { sectionItemsMarker } from './section.markers.stylex';
+import { sectionNestedItemMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
 export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
@@ -132,7 +132,11 @@ const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function Sec
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section-header'), stylex.props(reset.base, styles.item, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('section-header'),
+        stylex.props(reset.base, styles.item, styles.header, xstyle),
+        rest,
+      ),
     },
   });
 });
@@ -148,7 +152,7 @@ const Items = React.forwardRef<HTMLDivElement, SectionItemsProps>(function Secti
     props: {
       ...mergeStyleProps(
         themeProps('section-items', { nested: true }),
-        stylex.props(reset.base, styles.items, sectionItemsMarker, xstyle),
+        stylex.props(reset.base, styles.items, xstyle),
         rest,
       ),
     },
@@ -176,7 +180,11 @@ const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function Section
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section-item', { nested }), stylex.props(reset.base, styles.item, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('section-item', { nested }),
+        stylex.props(reset.base, styles.item, nested && styles.nestedItem, nested && sectionNestedItemMarker, xstyle),
+        rest,
+      ),
     },
   });
 });

@@ -296,6 +296,10 @@ export const space = stylex.defineVars({
   '40': step(40),
 });
 
+export const sectionVars = stylex.defineVars({
+  '--cl-section-row-min-height': `calc(${space['18.5']} + 1px)`,
+});
+
 // =============================================================================
 // Typography Tokens — type scale
 // =============================================================================

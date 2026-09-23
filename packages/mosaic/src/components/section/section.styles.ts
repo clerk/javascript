@@ -1,10 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
-import { sectionItemsMarker } from './section.markers.stylex';
+import { colorVars, fontWeightVars, radiusVars, sectionVars, space, typeScaleVars } from '../../tokens.stylex';
+import { sectionNestedItemMarker } from './section.markers.stylex';
 
-/* eslint-disable @stylexjs/no-lookahead-selectors -- Mosaic's supported browsers include :has();
-   the marker keeps this selector scoped to Section.Items. */
 export const styles = stylex.create({
   root: {
     display: 'flex',
@@ -33,6 +31,7 @@ export const styles = stylex.create({
   },
   row: {
     marginInline: space['4'],
+    paddingBlock: space['4'],
     borderBlockStartColor: colorVars['--cl-color-border'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: {
@@ -41,47 +40,40 @@ export const styles = stylex.create({
     },
     display: 'flex',
     flexDirection: 'column',
-    paddingBlockEnd: {
-      default: space['4'],
-      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: 0,
-    },
-    paddingBlockStart: {
-      default: space['4'],
-      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: space['3'],
-    },
-    rowGap: {
-      default: space['2'],
-      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: 0,
-    },
-    minHeight: {
-      default: `calc(${space['18.5']} + 1px)`,
-      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: 0,
-    },
+    rowGap: space['2'],
+    minHeight: sectionVars['--cl-section-row-min-height'],
+    width: 'auto',
+  },
+  header: {
+    marginInline: space['4'],
+    paddingBlock: space['3'],
+    borderBlockEndColor: colorVars['--cl-color-border'],
+    borderBlockEndStyle: 'solid',
+    borderBlockEndWidth: '1px',
     width: 'auto',
   },
   items: {
+    paddingInline: space['4'],
     display: 'flex',
     flexDirection: 'column',
-    marginBlockStart: space['3'],
     width: '100%',
   },
   item: {
-    paddingBlock: {
-      default: null,
-      [stylex.when.ancestor(':where(*)', sectionItemsMarker)]: space['4'],
-    },
     alignItems: 'center',
-    borderBlockStartColor: colorVars['--cl-color-border'],
-    borderBlockStartStyle: 'solid',
-    borderBlockStartWidth: {
-      default: '0px',
-      [stylex.when.ancestor(':where(*)', sectionItemsMarker)]: '1px',
-    },
     columnGap: space['3'],
     display: 'flex',
     flexWrap: 'nowrap',
     justifyContent: 'space-between',
     width: '100%',
+  },
+  nestedItem: {
+    paddingBlock: space['4'],
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: {
+      default: '0px',
+      [stylex.when.siblingBefore(':where(*)', sectionNestedItemMarker)]: '1px',
+    },
   },
   mediaBase: {
     alignItems: 'center',
@@ -140,4 +132,3 @@ export const styles = stylex.create({
     width: '100%',
   },
 });
-/* eslint-enable @stylexjs/no-lookahead-selectors */

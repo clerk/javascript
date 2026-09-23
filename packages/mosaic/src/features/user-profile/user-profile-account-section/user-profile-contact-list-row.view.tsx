@@ -34,7 +34,7 @@ export function UserProfileContactListRowView({
   const emptyDescription = m[kind].empty;
 
   return (
-    <Section.Row>
+    <>
       <Section.Header>
         <Section.Content>
           <Section.Label>{label}</Section.Label>
@@ -109,6 +109,6 @@ export function UserProfileContactListRowView({
           })
         )}
       </Section.Items>
-    </Section.Row>
+    </>
   );
 }

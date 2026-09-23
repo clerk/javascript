@@ -28,7 +28,7 @@ import { Section } from '@clerk/mosaic/components/section';
 
 `Section.Group` pairs an optional `Section.Title` with a `Section.Surface`. The surface is the outlined card. Its direct `Section.Row` children own separation and may stack one or more `Section.Item` entries. Each item lays out optional media, flexible content, and trailing actions. `Section.Media` accepts `sm`, `md`, `lg`, and `xl` sizes.
 
-Use `Section.Items` for a nested value list beneath a row's `Section.Header`. The row keeps a 12px header-to-list gap, and nested items stack without gaps with 4px vertical padding.
+For a nested list, place a `Section.Header` and a `Section.Items` directly inside the surface. The header draws the divider above the list, and nested items are separated by dividers of their own.
 
 A section can hold more than one `Section.Group`. Set `variant='contained'` on a group that holds a nested list, such as a user's email addresses inside the account section. A contained group renders with `role='group'` and `data-variant='contained'`, so it can take its own accessible name and be styled apart from the section's main group.
 
@@ -52,7 +52,7 @@ A section can hold more than one `Section.Group`. Set `variant='contained'` on a
 
 ### Flat contained groups
 
-Contained groups can be restyled from external CSS so each one reads as its own section. This example targets `.cl-section-group[data-variant='contained']`, `.cl-section-header`, and `.cl-section-items`.
+Contained groups can be restyled from external CSS so each one reads as its own section. This example targets `.cl-section-group[data-variant='contained']`, `.cl-section-header`, and `.cl-section-items`, and sizes list items with `--cl-section-row-min-height`.
 
 <Story
   name='FlatContainedGroups'

@@ -71,28 +71,26 @@ describe('Section', () => {
     expect(screen.getByRole('heading', { level: 4, name: 'Account' })).toBeInTheDocument();
   });
 
-  it('composes multiple items in one row', () => {
+  it('composes a header over a nested list', () => {
     render(
       <Section.Root>
         <Section.Group>
           <Section.Title>Profile</Section.Title>
           <Section.Surface>
-            <Section.Row data-testid='row'>
-              <Section.Header data-testid='header'>
-                <Section.Content>
-                  <Section.Label>Email</Section.Label>
+            <Section.Header data-testid='header'>
+              <Section.Content>
+                <Section.Label>Email</Section.Label>
+              </Section.Content>
+              <Section.Actions>Edit</Section.Actions>
+            </Section.Header>
+            <Section.Items data-testid='items'>
+              <Section.Item data-testid='nested-item'>
+                <Section.Content data-testid='nested-content'>
+                  <Section.Description>ada@example.com</Section.Description>
                 </Section.Content>
-                <Section.Actions>Edit</Section.Actions>
-              </Section.Header>
-              <Section.Items data-testid='items'>
-                <Section.Item data-testid='nested-item'>
-                  <Section.Content data-testid='nested-content'>
-                    <Section.Description>ada@example.com</Section.Description>
-                  </Section.Content>
-                  <Section.Actions>More</Section.Actions>
-                </Section.Item>
-              </Section.Items>
-            </Section.Row>
+                <Section.Actions>More</Section.Actions>
+              </Section.Item>
+            </Section.Items>
           </Section.Surface>
         </Section.Group>
       </Section.Root>,
@@ -103,7 +101,7 @@ describe('Section', () => {
     expect(screen.getAllByText(/Edit|More/)).toHaveLength(2);
     expect(screen.getByTestId('header')).toHaveClass('cl-section-header');
     expect(screen.getByTestId('items')).toHaveClass('cl-section-items');
-    expect(screen.getByTestId('row')).not.toHaveAttribute('data-variant');
+    expect(screen.getByTestId('header')).not.toHaveAttribute('data-nested');
     expect(screen.getByTestId('items')).toHaveAttribute('data-nested');
     expect(screen.getByTestId('nested-item')).toHaveAttribute('data-nested');
     expect(screen.getByTestId('nested-content')).toHaveAttribute('data-nested');
@@ -133,24 +131,24 @@ describe('Section', () => {
     expect(screen.getByTestId('contained')).toHaveAttribute('data-variant', 'contained');
   });
 
-  it('retains public nesting hooks while deriving layout from the item collection structure', () => {
+  it('marks only items inside Section.Items as nested', () => {
     render(
       <Section.Root>
         <Section.Group>
           <Section.Surface>
-            <Section.Row data-testid='row'>
-              <Section.Item>Email</Section.Item>
-              <Section.Items>
-                <Section.Item>one@example.com</Section.Item>
-                <Section.Item>two@example.com</Section.Item>
-              </Section.Items>
+            <Section.Row>
+              <Section.Item>Name</Section.Item>
             </Section.Row>
+            <Section.Items>
+              <Section.Item>one@example.com</Section.Item>
+              <Section.Item>two@example.com</Section.Item>
+            </Section.Items>
           </Section.Surface>
         </Section.Group>
       </Section.Root>,
     );
 
-    expect(screen.getByTestId('row')).not.toHaveAttribute('data-variant');
+    expect(screen.getByText('Name')).not.toHaveAttribute('data-nested');
     expect(screen.getByText('one@example.com')).toHaveAttribute('data-nested');
     expect(screen.getByText('two@example.com')).toHaveAttribute('data-nested');
   });

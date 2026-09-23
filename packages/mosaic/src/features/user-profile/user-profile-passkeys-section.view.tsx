@@ -56,59 +56,57 @@ export function UserProfilePasskeysSectionView({
     >
       {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
       <Section.Surface>
-        <Section.Row>
-          <Section.Header>
-            <Section.Content>
-              <Section.Label>{m.label}</Section.Label>
-            </Section.Content>
-            {onAdd ? (
-              <Section.Actions>
-                <Button
-                  ref={addButton}
-                  aria-label={m.addLabel}
-                  color='neutral'
+        <Section.Header xstyle={styles.header}>
+          <Section.Content>
+            <Section.Label>{m.label}</Section.Label>
+          </Section.Content>
+          {onAdd ? (
+            <Section.Actions>
+              <Button
+                ref={addButton}
+                aria-label={m.addLabel}
+                color='neutral'
+                size='sm'
+                variant='outline'
+                onClick={onAdd}
+              >
+                <Icon
+                  name='plus'
+                  placement='inline-start'
                   size='sm'
-                  variant='outline'
-                  onClick={onAdd}
-                >
-                  <Icon
-                    name='plus'
-                    placement='inline-start'
-                    size='sm'
-                  />
-                  {m.add}
-                </Button>
-              </Section.Actions>
-            ) : null}
-          </Section.Header>
+                />
+                {m.add}
+              </Button>
+            </Section.Actions>
+          ) : null}
           <Field.Message
             role={addError ? 'alert' : 'status'}
             xstyle={styles.addError}
           >
             <Field.Error>{addError}</Field.Error>
           </Field.Message>
-          {passkeys.length > 0 ? (
-            <Section.Items>
-              {passkeys.map(passkey => (
-                <UserProfilePasskeyRowView
-                  key={passkey.id}
-                  passkey={passkey}
-                  triggerRef={removalFocus.registerTrigger(passkey.id)}
-                  onRename={onRename}
-                  onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
-                />
-              ))}
-            </Section.Items>
-          ) : (
-            <Section.Items>
-              <Section.Item>
-                <Section.Content>
-                  <Section.Description>{m.empty}</Section.Description>
-                </Section.Content>
-              </Section.Item>
-            </Section.Items>
-          )}
-        </Section.Row>
+        </Section.Header>
+        {passkeys.length > 0 ? (
+          <Section.Items>
+            {passkeys.map(passkey => (
+              <UserProfilePasskeyRowView
+                key={passkey.id}
+                passkey={passkey}
+                triggerRef={removalFocus.registerTrigger(passkey.id)}
+                onRename={onRename}
+                onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
+              />
+            ))}
+          </Section.Items>
+        ) : (
+          <Section.Items>
+            <Section.Item>
+              <Section.Content>
+                <Section.Description>{m.empty}</Section.Description>
+              </Section.Content>
+            </Section.Item>
+          </Section.Items>
+        )}
       </Section.Surface>
     </Section.Group>
   );

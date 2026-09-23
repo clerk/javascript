@@ -32,44 +32,42 @@ export function UserProfileSecurityList({
     >
       {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
       <Section.Surface>
-        <Section.Row>
-          <Section.Header>
-            <Section.Content>
-              <Section.Label>{label}</Section.Label>
-            </Section.Content>
-            {addControl ? (
-              <Section.Actions>{addControl}</Section.Actions>
-            ) : onAdd ? (
-              <Section.Actions>
-                <Button
-                  aria-label={addLabel}
-                  color='neutral'
+        <Section.Header>
+          <Section.Content>
+            <Section.Label>{label}</Section.Label>
+          </Section.Content>
+          {addControl ? (
+            <Section.Actions>{addControl}</Section.Actions>
+          ) : onAdd ? (
+            <Section.Actions>
+              <Button
+                aria-label={addLabel}
+                color='neutral'
+                size='sm'
+                variant='outline'
+                onClick={onAdd}
+              >
+                <Icon
+                  name='plus'
+                  placement='inline-start'
                   size='sm'
-                  variant='outline'
-                  onClick={onAdd}
-                >
-                  <Icon
-                    name='plus'
-                    placement='inline-start'
-                    size='sm'
-                  />
-                  Add
-                </Button>
-              </Section.Actions>
-            ) : null}
-          </Section.Header>
-          <Section.Items>
-            {hasItems ? (
-              children
-            ) : (
-              <Section.Item>
-                <Section.Content>
-                  <Section.Description>{emptyLabel}</Section.Description>
-                </Section.Content>
-              </Section.Item>
-            )}
-          </Section.Items>
-        </Section.Row>
+                />
+                Add
+              </Button>
+            </Section.Actions>
+          ) : null}
+        </Section.Header>
+        <Section.Items>
+          {hasItems ? (
+            children
+          ) : (
+            <Section.Item>
+              <Section.Content>
+                <Section.Description>{emptyLabel}</Section.Description>
+              </Section.Content>
+            </Section.Item>
+          )}
+        </Section.Items>
       </Section.Surface>
     </Section.Group>
   );

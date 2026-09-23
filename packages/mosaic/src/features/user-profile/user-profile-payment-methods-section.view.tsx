@@ -31,49 +31,47 @@ export function UserProfilePaymentMethodsSectionView({
     <Section.Root aria-label='Payment methods'>
       <Section.Group>
         <Section.Surface>
-          <Section.Row>
-            <Section.Header>
-              <Section.Content>
-                <Section.Label>Payment methods</Section.Label>
-              </Section.Content>
-              {onAdd ? (
-                <Section.Actions>
-                  <Button
-                    aria-label='Add payment method'
-                    color='neutral'
+          <Section.Header>
+            <Section.Content>
+              <Section.Label>Payment methods</Section.Label>
+            </Section.Content>
+            {onAdd ? (
+              <Section.Actions>
+                <Button
+                  aria-label='Add payment method'
+                  color='neutral'
+                  size='sm'
+                  variant='outline'
+                  onClick={onAdd}
+                >
+                  <Icon
+                    name='plus'
+                    placement='inline-start'
                     size='sm'
-                    variant='outline'
-                    onClick={onAdd}
-                  >
-                    <Icon
-                      name='plus'
-                      placement='inline-start'
-                      size='sm'
-                    />
-                    Add
-                  </Button>
-                </Section.Actions>
-              ) : null}
-            </Section.Header>
-            <Section.Items>
-              {paymentMethods.length > 0 ? (
-                paymentMethods.map(paymentMethod => (
-                  <PaymentMethodItem
-                    key={paymentMethod.id}
-                    paymentMethod={paymentMethod}
-                    onMakeDefault={onMakeDefault}
-                    onRemove={onRemove}
                   />
-                ))
-              ) : (
-                <Section.Item>
-                  <Section.Content>
-                    <Section.Description>No payment methods added</Section.Description>
-                  </Section.Content>
-                </Section.Item>
-              )}
-            </Section.Items>
-          </Section.Row>
+                  Add
+                </Button>
+              </Section.Actions>
+            ) : null}
+          </Section.Header>
+          <Section.Items>
+            {paymentMethods.length > 0 ? (
+              paymentMethods.map(paymentMethod => (
+                <PaymentMethodItem
+                  key={paymentMethod.id}
+                  paymentMethod={paymentMethod}
+                  onMakeDefault={onMakeDefault}
+                  onRemove={onRemove}
+                />
+              ))
+            ) : (
+              <Section.Item>
+                <Section.Content>
+                  <Section.Description>No payment methods added</Section.Description>
+                </Section.Content>
+              </Section.Item>
+            )}
+          </Section.Items>
         </Section.Surface>
       </Section.Group>
     </Section.Root>

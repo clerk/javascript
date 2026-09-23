@@ -119,27 +119,25 @@ function StubPage({ id, title }: { id: string; title: string }) {
           <Section.Group>
             <Section.Title>{section.title}</Section.Title>
             <Section.Surface>
-              <Section.Row>
-                <Section.Items>
-                  {section.rows.map(row => (
-                    <Section.Item key={row.label}>
-                      <Section.Content>
-                        <Section.Label>{row.label}</Section.Label>
-                        <Section.Description>{row.description}</Section.Description>
-                      </Section.Content>
-                      <Section.Actions>
-                        <Button
-                          color='neutral'
-                          size='sm'
-                          variant='outline'
-                        >
-                          Edit
-                        </Button>
-                      </Section.Actions>
-                    </Section.Item>
-                  ))}
-                </Section.Items>
-              </Section.Row>
+              {section.rows.map(row => (
+                <Section.Row key={row.label}>
+                  <Section.Item>
+                    <Section.Content>
+                      <Section.Label>{row.label}</Section.Label>
+                      <Section.Description>{row.description}</Section.Description>
+                    </Section.Content>
+                    <Section.Actions>
+                      <Button
+                        color='neutral'
+                        size='sm'
+                        variant='outline'
+                      >
+                        Edit
+                      </Button>
+                    </Section.Actions>
+                  </Section.Item>
+                </Section.Row>
+              ))}
             </Section.Surface>
           </Section.Group>
         </Section.Root>
