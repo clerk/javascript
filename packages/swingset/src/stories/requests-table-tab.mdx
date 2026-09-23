@@ -4,6 +4,8 @@ import * as Stories from './requests-table-tab.stories';
 
 A controlled requests table for the organization profile’s Requests tab. The caller supplies the current page, loading state, optional names and avatars, and independent accept and decline callbacks. Each row can hold its actions with `pendingAction` while a decision is in flight.
 
+Render this view inside the organization members panel’s tab panel; the parent owns tab navigation.
+
 ## Example
 
 ### Legacy
@@ -11,7 +13,6 @@ A controlled requests table for the organization profile’s Requests tab. The c
 The baseline table shows the requester, request date, and available row actions.
 
 <Story name='Legacy' storyModule={Stories} composition={[
-  { name: 'Tabs', href: '/components/tabs', layer: 'Components' },
   { name: 'Table', href: '/components/table', layer: 'Components' },
   { name: 'InputGroup', href: '/components/input-group', layer: 'Components' },
   { name: 'Pagination', href: '/components/pagination', layer: 'Components' },
