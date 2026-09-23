@@ -43,6 +43,8 @@ click-through.
   aria-label='Bulk actions'
   aria-controls={tableId}
   returnFocus={selectAllRef}
+  announcement={`${selectedCount} selected`}
+  openAnnouncement={`${selectedCount} selected, bulk actions follow the table`}
 >
   <ActionBar.Count>{selectedCount} selected</ActionBar.Count>
   <ActionBar.Separator />
@@ -67,7 +69,7 @@ dialog.
 | --------------------- | -------- | -------------------------------------------------------------------------------------------- |
 | `ActionBar.Root`      | `div`    | The positioner + floating surface, portalled. Takes `open` and `anchor`; `role=toolbar`.     |
 | `ActionBar.Action`    | `button` | A ghost button in the bar's arrow-key navigation. `render` it from a menu or dialog trigger. |
-| `ActionBar.Count`     | `div`    | The leading count of what is selected. Describes the toolbar; announced politely.            |
+| `ActionBar.Count`     | `div`    | The leading count of what is selected. Describes the toolbar.                                |
 | `ActionBar.Separator` | `div`    | A vertical divider between groups.                                                           |
 | `ActionBar.Dismiss`   | `button` | Clears the selection. An icon `ActionBar.Action`; labelled `Clear selection`.                |
 
@@ -75,12 +77,14 @@ dialog.
 
 ### `ActionBar.Root`
 
-| Prop          | Type                     | Default               | Description                                               |
-| ------------- | ------------------------ | --------------------- | --------------------------------------------------------- |
-| `open`        | `boolean`                | — (required)          | Whether the bar is shown.                                 |
-| `anchor`      | `RefObject<HTMLElement>` | — (required)          | The table the bar rests on.                               |
-| `portalRoot`  | `HTMLElement \| null`    | `document.body`       | Where the bar is portalled. `null` waits for the element. |
-| `returnFocus` | `RefObject<HTMLElement>` | where focus came from | Where focus goes when the bar closes while holding it.    |
+| Prop               | Type                     | Default               | Description                                                 |
+| ------------------ | ------------------------ | --------------------- | ----------------------------------------------------------- |
+| `open`             | `boolean`                | — (required)          | Whether the bar is shown.                                   |
+| `anchor`           | `RefObject<HTMLElement>` | — (required)          | The table the bar rests on.                                 |
+| `portalRoot`       | `HTMLElement \| null`    | `document.body`       | Where the bar is portalled. `null` waits for the element.   |
+| `returnFocus`      | `RefObject<HTMLElement>` | where focus came from | Where focus goes when the bar closes while holding it.      |
+| `announcement`     | `string`                 | —                     | Announced when the selection changes while the bar is open. |
+| `openAnnouncement` | `string`                 | `announcement`        | Announced when the bar opens.                               |
 
 ### `ActionBar.Action`
 
@@ -91,6 +95,8 @@ Takes `Button`'s props. `color='negative'` draws the icon at full strength.
 - The bar is a single tab stop, in tab order right after where `ActionBar.Root` renders. `←` / `→`
   move between its actions and wrap; `Home` / `End` jump to the first and last.
 - Give it an `aria-label`, and point `aria-controls` at the table's `id`.
+- A status region outside the bar announces `openAnnouncement` when the bar opens and
+  `announcement` when the selection changes after that. Closing is silent.
 - When the bar closes while it holds focus, including from a menu or dialog opened inside it, focus
   moves to `returnFocus`. Pass the table's select-all checkbox.
 

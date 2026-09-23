@@ -74,7 +74,6 @@ describe('Mosaic ActionBar', () => {
     expect(bar).toHaveAttribute('aria-controls', 'members');
     expect(bar).toHaveAttribute('aria-orientation', 'horizontal');
     expect(bar).toHaveAccessibleDescription('3 selected');
-    expect(screen.getByText('3 selected')).toHaveAttribute('aria-live', 'polite');
     expect(screen.getAllByRole('separator')).toHaveLength(2);
   });
 
@@ -83,6 +82,38 @@ describe('Mosaic ActionBar', () => {
     const bar = screen.getByRole('toolbar', { name: 'Bulk actions', hidden: true });
     expect(bar).toHaveAttribute('data-open', 'false');
     expect(bar.inert).toBe(true);
+  });
+
+  it('announces the bar opening, then selection changes, from outside the bar', () => {
+    function Selection({ count }: { count: number }) {
+      return (
+        <ActionBar.Root
+          open={count > 0}
+          anchor={useAnchor()}
+          aria-label='Bulk actions'
+          announcement={`${count} selected`}
+          openAnnouncement={`${count} selected, bulk actions follow the table`}
+        >
+          <ActionBar.Count>{count} selected</ActionBar.Count>
+        </ActionBar.Root>
+      );
+    }
+    const { rerender } = render(<Selection count={0} />);
+    const status = screen.getByRole('status');
+    expect(status).toHaveTextContent('');
+    expect(status.closest('[role="toolbar"]')).toBeNull();
+
+    rerender(<Selection count={1} />);
+    expect(status).toHaveTextContent('1 selected, bulk actions follow the table');
+
+    rerender(<Selection count={3} />);
+    expect(status).toHaveTextContent(/^3 selected$/);
+
+    rerender(<Selection count={0} />);
+    expect(status).toHaveTextContent('');
+
+    rerender(<Selection count={2} />);
+    expect(status).toHaveTextContent('2 selected, bulk actions follow the table');
   });
 
   it('holds its last contents while it closes', () => {

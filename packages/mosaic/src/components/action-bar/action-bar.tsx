@@ -25,6 +25,7 @@ import { tabularNumbersStyle } from '../../utils/typography.styles';
 import type { ButtonProps } from '../button';
 import { Button } from '../button';
 import { Icon } from '../icon';
+import { VisuallyHidden } from '../visually-hidden';
 import { styles } from './action-bar.styles';
 
 const ITEM_ATTRIBUTE = 'data-action-bar-item';
@@ -59,11 +60,28 @@ export interface ActionBarRootProps extends MosaicComponentProps<'div'> {
   portalRoot?: HTMLElement | null;
   /** Where focus goes when the bar closes while holding it. */
   returnFocus?: React.RefObject<HTMLElement | null>;
+  /** Announced when the selection changes while the bar is open, e.g. `3 selected`. */
+  announcement?: string;
+  /** Announced when the bar opens, e.g. `1 selected, bulk actions follow the table`. Defaults to `announcement`. */
+  openAnnouncement?: string;
   positionerXstyle?: XStyle;
 }
 
 const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function ActionBarRoot(
-  { open, anchor, portalRoot, returnFocus, render, xstyle, positionerXstyle, children, onFocus, ...rest },
+  {
+    open,
+    anchor,
+    portalRoot,
+    returnFocus,
+    announcement,
+    openAnnouncement,
+    render,
+    xstyle,
+    positionerXstyle,
+    children,
+    onFocus,
+    ...rest
+  },
   ref,
 ) {
   const barRef = React.useRef<HTMLDivElement | null>(null);
@@ -73,6 +91,20 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     setBarElement(node);
   }, []);
   const originRef = React.useRef<HTMLElement | null>(null);
+  const wasOpenRef = React.useRef(false);
+  const [status, setStatus] = React.useState('');
+
+  React.useLayoutEffect(() => {
+    const wasOpen = wasOpenRef.current;
+    wasOpenRef.current = open;
+    if (!open) {
+      setStatus('');
+    } else if (!wasOpen) {
+      setStatus(openAnnouncement ?? announcement ?? '');
+    } else {
+      setStatus(announcement ?? '');
+    }
+  }, [open, announcement, openAnnouncement]);
   const lastFocusedRef = React.useRef<HTMLElement | null>(null);
   const [activeIndex, setActiveIndex] = React.useState(0);
   const [countId, setCountId] = React.useState<string | undefined>();
@@ -215,6 +247,13 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
 
   return (
     <ActionBarContext.Provider value={context}>
+      <VisuallyHidden
+        role='status'
+        aria-live='polite'
+        aria-atomic
+      >
+        {status}
+      </VisuallyHidden>
       <FloatingPortal root={portalRoot}>
         <FloatingFocusManager
           context={floatingContext}
@@ -336,8 +375,6 @@ const Count = React.forwardRef<HTMLDivElement, ActionBarCountProps>(function Act
     render,
     ref,
     props: {
-      'aria-live': 'polite',
-      'aria-atomic': true,
       ...mergeStyleProps(
         themeProps('action-bar-count'),
         stylex.props(reset.base, styles.count, tabularNumbersStyle.enabled, xstyle),

@@ -93,6 +93,8 @@ function MembersTable({ rows = 10, portalRoot }: { rows?: number; portalRoot?: H
         aria-label='Bulk actions'
         aria-controls={tableId}
         returnFocus={selectAllRef}
+        announcement={`${count} selected`}
+        openAnnouncement={`${count} selected, bulk actions follow the table`}
       >
         <ActionBar.Count>{count} selected</ActionBar.Count>
         <ActionBar.Separator />
