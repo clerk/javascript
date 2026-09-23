@@ -108,8 +108,27 @@ this axis.
 Which surface the dialog holds, and the geometry that comes with it.
 ```
 
-This is the opposite of the rule for **code**, where a comment earns its place by
-explaining what the code cannot say for itself — the cascade fight behind a
-`null`, the measured reason a duration is what it is. Keep that reasoning where a
-future maintainer will hit it, which is the source file. The trade you rejected
-belongs in a code comment or the PR description; the docs get the conclusion.
+The trade you rejected belongs in the PR description; the docs get the
+conclusion.
+
+## Rules reviewers keep flagging
+
+These come up in review more than anything else. Check each one before opening a
+PR.
+
+- **Comments.** No JSDoc, no comment blocks. At most one terse `//` line, and
+  only for a why the code cannot say (the cascade fight behind a `null`, the
+  measured reason for a value). Rationale and rejected options go in the PR
+  description. `custom-rules/mosaic-terse-comments` warns on violations.
+- **Motion values are tokens.** Durations come from `durationVars`, easings from
+  `easingVars`. `ease-out` is `--cl-ease-enter`, `ease-in` is `--cl-ease-exit`.
+  Only `linear` and `0s` are written as literals. A few existing literals are
+  deliberate; do not copy them into new code. `custom-rules/mosaic-motion-tokens`
+  warns on violations. Details: `references/motion.md`.
+- **Compose before you style.** Before styling a native element inside a
+  component, check whether a Mosaic part already renders it with the right
+  variant, and pass it through `render`. See "Compose existing parts" in
+  `references/stylex.md`.
+- **Changesets.** A change to a published `@clerk/mosaic` component takes a real
+  changeset entry. A change that only touches new, unpublished components takes
+  an empty one.

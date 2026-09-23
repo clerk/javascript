@@ -619,6 +619,25 @@ function Button({ intent, variant, xstyle, ...rest }: ButtonProps) {
   trailing `{...rest}` would clobber the part's own `className` when the part is
   the target of another part's `render`.
 
+### Compose existing parts before styling a native element
+
+When a component needs an element another Mosaic part already styles, render
+that part through the primitive's `render` prop instead of restyling the native
+element. The existing part keeps its sizing, placeholder, focus, and
+coarse-pointer rules in one place.
+
+```tsx
+// no: re-declares border, outline, background, placeholder, font size
+<Primitive.Input {...mergeStyleProps(themeProps('tag-input-input'), stylex.props(styles.input))} />
+
+// yes: the ghost variant is an input whose container draws the chrome
+<Primitive.Input render={<Input variant='ghost' />} />
+```
+
+Common matches: `Input variant='ghost'` for a text input inside a bordered
+container, `Button` variants for anything clickable. Write new atoms only for
+what the existing part does not cover.
+
 ### `xstyle`, not `className`/`style`
 
 A Mosaic part has no `className` or `style` prop. `MosaicComponentProps` and

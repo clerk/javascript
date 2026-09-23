@@ -209,6 +209,122 @@ const noUnstableMethods = {
   },
 };
 
+const MOSAIC_DURATION_PROPERTIES = new Set([
+  'transitionDuration',
+  'transitionDelay',
+  'animationDuration',
+  'animationDelay',
+]);
+const MOSAIC_EASING_PROPERTIES = new Set(['transitionTimingFunction', 'animationTimingFunction']);
+
+const mosaicMotionTokens = {
+  meta: {
+    type: 'suggestion',
+    docs: {
+      description: 'Prefer Mosaic duration and easing tokens over literal motion values',
+      recommended: false,
+    },
+    messages: {
+      useDurationToken:
+        'Use a `durationVars` token instead of "{{value}}". See .claude/skills/mosaic/references/motion.md.',
+      useEasingToken:
+        'Use an `easingVars` token instead of "{{value}}" (`ease-out` → `--cl-ease-enter`, `ease-in` → `--cl-ease-exit`). See .claude/skills/mosaic/references/motion.md.',
+    },
+    schema: [],
+  },
+  create(context) {
+    const durationPattern = /(?<![\w-])(?!0m?s\b)\d*\.?\d+m?s\b/g;
+    const easingPattern = /(?<![\w-])(ease(?:-in-out|-in|-out)?|cubic-bezier\([^)]*\))(?![\w-])/g;
+
+    const staticParts = node => {
+      if (node.type === 'Literal' && typeof node.value === 'string') {
+        return [{ node, text: node.value }];
+      }
+      if (node.type === 'TemplateLiteral') {
+        return node.quasis.map(quasi => ({ node: quasi, text: quasi.value.cooked ?? '' }));
+      }
+      if (node.type === 'ObjectExpression') {
+        return node.properties.flatMap(property => (property.type === 'Property' ? staticParts(property.value) : []));
+      }
+      return [];
+    };
+
+    return {
+      Property(node) {
+        const keyName = node.key.type === 'Identifier' ? node.key.name : node.key.value;
+        const isDuration = MOSAIC_DURATION_PROPERTIES.has(keyName);
+        if (!isDuration && !MOSAIC_EASING_PROPERTIES.has(keyName)) {
+          return;
+        }
+        for (const part of staticParts(node.value)) {
+          for (const [value] of part.text.matchAll(isDuration ? durationPattern : easingPattern)) {
+            context.report({
+              node: part.node,
+              messageId: isDuration ? 'useDurationToken' : 'useEasingToken',
+              data: { value },
+            });
+          }
+        }
+      },
+    };
+  },
+};
+
+const MOSAIC_COMMENT_DIRECTIVE =
+  /^\s*(eslint|@ts-|prettier-ignore|istanbul|c8|global\s|@jsx|webpack|[#@]__PURE__|\/\s*<reference)/;
+
+const mosaicTerseComments = {
+  meta: {
+    type: 'suggestion',
+    docs: {
+      description: 'Keep Mosaic code comments to a single terse line explaining why',
+      recommended: false,
+    },
+    messages: {
+      noJsDoc:
+        'Drop the JSDoc. Name and types should carry the meaning; keep at most one `//` line for a non-obvious why.',
+      noCommentBlock:
+        'Comment blocks are discouraged. Keep at most one terse `//` line for a non-obvious why; rationale belongs in the PR.',
+    },
+    schema: [],
+  },
+  create(context) {
+    const sourceCode = context.sourceCode;
+
+    return {
+      Program() {
+        const comments = sourceCode
+          .getAllComments()
+          .filter(comment => comment.type !== 'Shebang' && !MOSAIC_COMMENT_DIRECTIVE.test(comment.value));
+
+        let previousLine;
+        let runStart;
+        for (const comment of comments) {
+          if (comment.type === 'Block') {
+            previousLine = undefined;
+            if (comment.value.startsWith('*')) {
+              context.report({ loc: comment.loc, messageId: 'noJsDoc' });
+            } else if (comment.loc.start.line !== comment.loc.end.line) {
+              context.report({ loc: comment.loc, messageId: 'noCommentBlock' });
+            }
+            continue;
+          }
+          const line = comment.loc.start.line;
+          if (previousLine === line - 1) {
+            if (runStart) {
+              context.report({ loc: runStart.loc, messageId: 'noCommentBlock' });
+              runStart = undefined;
+            }
+          } else {
+            runStart = comment;
+          }
+          previousLine = line;
+        }
+      },
+    };
+  },
+};
+
 const noPhysicalCssProperties = {
   meta: {
     type: 'problem',
@@ -363,6 +479,8 @@ export default tseslint.config([
           'no-navigate-useClerk': noNavigateUseClerk,
           'no-unstable-methods': noUnstableMethods,
           'no-physical-css-properties': noPhysicalCssProperties,
+          'mosaic-motion-tokens': mosaicMotionTokens,
+          'mosaic-terse-comments': mosaicTerseComments,
         },
       },
       'simple-import-sort': pluginSimpleImportSort,
@@ -591,6 +709,8 @@ export default tseslint.config([
       '@stylexjs/sort-keys': 'error',
       '@stylexjs/valid-shorthands': 'error',
       '@stylexjs/valid-styles': 'error',
+      'custom-rules/mosaic-motion-tokens': 'warn',
+      'custom-rules/mosaic-terse-comments': 'warn',
       'no-restricted-syntax': [
         'error',
         {
