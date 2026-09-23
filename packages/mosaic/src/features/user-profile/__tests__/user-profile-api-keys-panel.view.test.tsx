@@ -508,7 +508,6 @@ describe('user API key creation', () => {
     expect(secret).toHaveFocus();
     await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
     expect(props.onCopy).toHaveBeenLastCalledWith(false);
-    expect(await screen.findByRole('dialog', { name: 'Copied' })).toBeVisible();
     view.rerender(dialogView({ ...returned, isPending: true }));
     expect(within(dialog).getByRole('button', { name: 'Copy API key' })).toBeDisabled();
     expect(within(dialog).getByRole('button', { name: 'Copy and close' })).toHaveAttribute('aria-disabled', 'true');

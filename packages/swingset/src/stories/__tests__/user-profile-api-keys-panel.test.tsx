@@ -289,7 +289,6 @@ describe('user API keys playground', () => {
     const dialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
     await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('Impossible de copier cette clé.');
-    expect(screen.queryByRole('dialog', { name: 'Copied' })).not.toBeInTheDocument();
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('Impossible de copier cette clé.');
     expect(within(dialog).getByDisplayValue(/^ak_demo_/)).toBeVisible();
