@@ -123,7 +123,7 @@ export const createSyncGetAuth = ({
  * @example
  * ### Usage with `getToken()`
  *
- * `getAuth()` returns [`getToken()`](https://clerk.com/docs/reference/backend/types/auth-object#get-token), which is a method that returns the current user's session token or a custom JWT template.
+ * `getAuth()` returns [`getToken()`](https://clerk.com/docs/reference/backend/types/auth-object#gettoken), which is a method that returns the current user's session token or a custom JWT template.
  *
  * ```tsx {{ filename: 'app/api/example/route.ts' }}
  * import { getAuth } from '@clerk/nextjs/server'

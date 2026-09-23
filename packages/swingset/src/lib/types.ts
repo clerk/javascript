@@ -77,7 +77,7 @@ export interface StoryMeta {
   };
   /**
    * Path to the file that exports the documented component, relative to the monorepo
-   * root (e.g. `packages/ui/src/mosaic/components/button.tsx`). Rendered as a "View
+   * root (e.g. `packages/mosaic/src/components/button.tsx`). Rendered as a "View
    * source" link to the file on GitHub. See `lib/source.ts`.
    */
   source?: string;

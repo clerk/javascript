@@ -1,10 +1,18 @@
-import type { IconFrameProps } from '@clerk/ui/mosaic/components/icon';
-import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
-import { colorVars, space } from '@clerk/ui/mosaic/styles';
+import type { IconFrameProps } from '@clerk/mosaic/components/icon';
+import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
+import { colorVars, space } from '@clerk/mosaic/tokens.stylex';
+import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
 
 export { default as __source } from './icon-frame.stories?raw';
+
+const styles = stylex.create({
+  customSurface: {
+    backgroundColor: colorVars['--cl-color-brand'],
+    color: colorVars['--cl-color-brand-foreground'],
+  },
+});
 
 const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
 
@@ -22,7 +30,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'IconFrame',
-  source: 'packages/ui/src/mosaic/components/icon/icon-frame.tsx',
+  source: 'packages/mosaic/src/components/icon/icon-frame.tsx',
   styles: {
     _variants: {
       bordered: { true: {}, false: {} },
@@ -44,7 +52,7 @@ function knobsAsProps(props: Record<string, unknown>) {
 export function Default(props: Record<string, unknown>) {
   return (
     <IconFrame {...knobsAsProps(props)}>
-      <Icon name='check' />
+      <Icon name='checkmark' />
     </IconFrame>
   );
 }
@@ -54,25 +62,25 @@ export function Sizes() {
     <div style={{ alignItems: 'center', display: 'flex', gap: 12 }}>
       <IconFrame size='sm'>
         <Icon
-          name='check'
+          name='checkmark'
           size='sm'
         />
       </IconFrame>
       <IconFrame size='md'>
         <Icon
-          name='check'
+          name='checkmark'
           size='md'
         />
       </IconFrame>
       <IconFrame size='lg'>
         <Icon
-          name='check'
+          name='checkmark'
           size='md'
         />
       </IconFrame>
       <IconFrame size='xl'>
         <Icon
-          name='check'
+          name='checkmark'
           size='lg'
         />
       </IconFrame>
@@ -87,23 +95,23 @@ export function Treatments() {
         aria-label='Unframed'
         bordered={false}
       >
-        <Icon name='check' />
+        <Icon name='checkmark' />
       </IconFrame>
       <IconFrame aria-label='Bordered'>
-        <Icon name='check' />
+        <Icon name='checkmark' />
       </IconFrame>
       <IconFrame
         aria-label='Filled'
         bordered={false}
         filled
       >
-        <Icon name='check' />
+        <Icon name='checkmark' />
       </IconFrame>
       <IconFrame
         aria-label='Bordered and filled'
         filled
       >
-        <Icon name='check' />
+        <Icon name='checkmark' />
       </IconFrame>
     </div>
   );
@@ -111,14 +119,9 @@ export function Treatments() {
 
 export function CustomSurface() {
   return (
-    <IconFrame
-      style={{
-        backgroundColor: colorVars['--cl-color-primary'],
-        color: colorVars['--cl-color-primary-foreground'],
-      }}
-    >
+    <IconFrame xstyle={styles.customSurface}>
       <Icon
-        name='check'
+        name='checkmark'
         size='lg'
       />
     </IconFrame>

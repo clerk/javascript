@@ -477,7 +477,7 @@ describe('SignInStart', () => {
       });
     });
 
-    it('stops short of the redirect when the instance offers an SSO fallback', async () => {
+    it('stops short of the redirect when the instance offers an SSO bypass', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
       });
@@ -485,7 +485,7 @@ describe('SignInStart', () => {
         Promise.resolve({
           status: 'needs_first_factor',
           supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
-          ssoFallbackFirstFactors: [
+          ssoBypassFirstFactors: [
             { strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_hmac' },
           ],
         } as unknown as SignInResource),
@@ -1030,14 +1030,14 @@ describe('SignInStart', () => {
       );
     });
 
-    it('stops short of the redirect when the instance offers an SSO fallback', async () => {
+    it('stops short of the redirect when the instance offers an SSO bypass', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();
       });
       fixtures.signIn.create.mockResolvedValueOnce({
         status: 'needs_first_factor',
         supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
-        ssoFallbackFirstFactors: [
+        ssoBypassFirstFactors: [
           { strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_hmac' },
         ],
       } as unknown as SignInResource);

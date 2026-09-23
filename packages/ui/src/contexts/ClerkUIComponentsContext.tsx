@@ -15,6 +15,7 @@ import type { ReactNode } from 'react';
 import type { AvailableComponentName, AvailableComponentProps } from '../types';
 import {
   APIKeysContext,
+  ConfigureDirectorySyncContext,
   ConfigureSSOContext,
   CreateOrganizationContext,
   GoogleOneTapContext,
@@ -123,6 +124,12 @@ export function ComponentContextProvider({
         <ConfigureSSOContext.Provider value={{ componentName, ...(props as ConfigureSSOProps) }}>
           {children}
         </ConfigureSSOContext.Provider>
+      );
+    case 'ConfigureDirectorySync':
+      return (
+        <ConfigureDirectorySyncContext.Provider value={{ componentName, ...(props as ConfigureSSOProps) }}>
+          {children}
+        </ConfigureDirectorySyncContext.Provider>
       );
     case 'OAuthConsent': {
       // Translate capital-A `oAuth*` props from the accounts portal into

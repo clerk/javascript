@@ -622,7 +622,7 @@ export type __internal_LocalizationResource = {
     enterpriseSSO: {
       formButtonPrimary: LocalizationValue;
     };
-    ssoFallback: {
+    ssoBypass: {
       actionLink: LocalizationValue;
       notice: LocalizationValue;
       code: {
@@ -1197,8 +1197,38 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       removeDialog: {
         title: LocalizationValue;
-        subtitle: LocalizationValue;
+        subtitle: LocalizationValue<'name'>;
         confirmButton: LocalizationValue;
+      };
+      ssoBypassSection: {
+        title: LocalizationValue;
+        description: LocalizationValue;
+        allowlistLabel: LocalizationValue;
+        allowlistCount: LocalizationValue<'count'>;
+        allowlistCount__one: LocalizationValue;
+        menuAction__manage: LocalizationValue;
+        error__load: LocalizationValue;
+      };
+      ssoBypassPage: {
+        title: LocalizationValue;
+        action__search: LocalizationValue;
+        action__add: LocalizationValue;
+        addForm: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          memberLabel: LocalizationValue;
+          changeButton: LocalizationValue;
+          memberPlaceholder: LocalizationValue;
+          noResults: LocalizationValue;
+          submitButton: LocalizationValue;
+        };
+        table: {
+          header__user: LocalizationValue;
+          header__actions: LocalizationValue;
+          emptyState: LocalizationValue;
+          emptyState__search: LocalizationValue;
+          menuAction__remove: LocalizationValue;
+        };
       };
       ssoSection: {
         title: LocalizationValue;
@@ -1209,14 +1239,97 @@ export type __internal_LocalizationResource = {
         descriptionLine1: LocalizationValue;
         primaryButton__startConfiguration: LocalizationValue;
         primaryButton__continueConfiguration: LocalizationValue;
+        primaryButton__addConnection: LocalizationValue;
         domainLabel: LocalizationValue;
         menuAction__edit: LocalizationValue;
+        menuAction__continue: LocalizationValue;
         menuAction__activate: LocalizationValue;
         menuAction__deactivate: LocalizationValue;
         menuAction__remove: LocalizationValue;
         tooltip: LocalizationValue<'role'>;
         tooltip__noRole: LocalizationValue;
         tooltipLabel: LocalizationValue;
+      };
+      connectionPage: {
+        actions: {
+          activate: LocalizationValue;
+          continueSetup: LocalizationValue;
+        };
+        dangerZone: {
+          title: LocalizationValue;
+          deactivateButton: LocalizationValue;
+          removeButton: LocalizationValue;
+        };
+        name: {
+          title: LocalizationValue;
+          editButton: LocalizationValue;
+          form: {
+            title: LocalizationValue;
+          };
+        };
+        domains: {
+          title: LocalizationValue;
+        };
+        serviceProvider: {
+          title: LocalizationValue;
+          acsUrl: LocalizationValue;
+          entityId: LocalizationValue;
+          metadataUrl: LocalizationValue;
+          redirectUri: LocalizationValue;
+        };
+        identityProvider: {
+          title: LocalizationValue;
+          certificateExpires: LocalizationValue;
+          editButton: LocalizationValue;
+          form: {
+            title: LocalizationValue;
+          };
+          clientSecret: {
+            placeholder: LocalizationValue;
+          };
+        };
+        settings: {
+          title: LocalizationValue;
+          syncUserAttributes: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowAdditionalIdentifiers: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowSubdomains: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          allowIdpInitiated: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+          forceAuthn: {
+            label: LocalizationValue;
+            description: LocalizationValue;
+          };
+        };
+      };
+      directorySyncSection: {
+        title: LocalizationValue;
+        badge__unconfigured: LocalizationValue;
+        badge__ssoRequired: LocalizationValue;
+        badge__active: LocalizationValue;
+        badge__inactive: LocalizationValue;
+        description: LocalizationValue;
+        error__load: LocalizationValue;
+        primaryButton__startConfiguration: LocalizationValue;
+        menuAction__edit: LocalizationValue;
+        menuAction__activate: LocalizationValue;
+        menuAction__deactivate: LocalizationValue;
+        menuAction__remove: LocalizationValue;
+        removeDialog: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          confirmButton: LocalizationValue;
+        };
       };
     };
     membersPage: {
@@ -1471,7 +1584,90 @@ export type __internal_LocalizationResource = {
       message: LocalizationValue;
     };
   };
+  configureDirectorySync: {
+    navbar: {
+      title: LocalizationValue;
+    };
+    stepper: {
+      configure: LocalizationValue;
+      attributes: LocalizationValue;
+      test: LocalizationValue;
+    };
+    providers: {
+      okta: LocalizationValue;
+      entra: LocalizationValue;
+      google: LocalizationValue;
+      custom: LocalizationValue;
+    };
+    configureStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      error__ssoRequired: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      warning__googleUnsupported: {
+        title: LocalizationValue;
+        subtitle: LocalizationValue;
+      };
+      warning__ssoInactive: LocalizationValue;
+      domainsLabel: LocalizationValue;
+      instructions: {
+        actionLabel__toggle: LocalizationValue;
+        okta: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+        };
+        entra: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+        };
+        custom: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+        };
+      };
+      formFieldLabel__endpointUrl: LocalizationValue;
+      formFieldLabel__token: LocalizationValue;
+      formFieldInputPlaceholder__token: LocalizationValue;
+      actionLabel__generateToken: LocalizationValue;
+      notice__tokenShownOnce: LocalizationValue;
+      actionLabel__retry: LocalizationValue;
+    };
+    attributeMappingStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue;
+      columns: {
+        directoryAttribute: LocalizationValue;
+        clerkAttribute: LocalizationValue;
+      };
+    };
+    testStep: {
+      title: LocalizationValue;
+      subtitle: LocalizationValue<'provider'>;
+      description: LocalizationValue;
+      noteLabel: LocalizationValue;
+      note: LocalizationValue;
+      empty__waitingForFirstUser: LocalizationValue;
+      badge__active: LocalizationValue;
+      badge__deprovisioned: LocalizationValue;
+      error__loadUsers: LocalizationValue;
+      actionLabel__complete: LocalizationValue;
+    };
+  };
   configureSSO: {
+    connectionScopeBanner: {
+      title__editing: LocalizationValue<'name'>;
+      subtitle__editing: LocalizationValue<'count'>;
+      title__adding: LocalizationValue;
+      subtitle__adding: LocalizationValue<'count'>;
+    };
     missingManageEnterpriseConnectionsPermission: {
       title: LocalizationValue;
       subtitle: LocalizationValue;
@@ -1484,7 +1680,7 @@ export type __internal_LocalizationResource = {
       confirmationFieldLabel: LocalizationValue<'name'>;
       confirmationFieldPlaceholder: LocalizationValue<'name'>;
       resetButton: LocalizationValue;
-      subtitle: LocalizationValue;
+      subtitle: LocalizationValue<'name'>;
       title: LocalizationValue;
     };
     selectProviderStep: {
@@ -1505,7 +1701,7 @@ export type __internal_LocalizationResource = {
     };
     changeProviderDialog: {
       title: LocalizationValue<'provider'>;
-      subtitle: LocalizationValue<'provider' | 'currentProvider'>;
+      subtitle: LocalizationValue<'provider' | 'currentProvider' | 'name'>;
       cancelButton: LocalizationValue;
       confirmButton: LocalizationValue;
     };
@@ -1523,6 +1719,8 @@ export type __internal_LocalizationResource = {
         badge__verified: LocalizationValue;
         badge__unverified: LocalizationValue;
         badge__expired: LocalizationValue;
+        badge__claimed: LocalizationValue;
+        checkboxLabel: LocalizationValue<'domain'>;
         verifiedAtLabel: LocalizationValue<'date'>;
         expiredAtLabel: LocalizationValue<'date'>;
         expiredLabel: LocalizationValue;

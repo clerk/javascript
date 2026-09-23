@@ -167,6 +167,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountPricingTableNodes = new Map<HTMLDivElement, PricingTableProps | undefined>();
   private premountAPIKeysNodes = new Map<HTMLDivElement, APIKeysProps | undefined>();
   private premountConfigureSSONodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
+  private premountConfigureDirectorySyncNodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
   private premountAgentActionApprovalNodes = new Map<HTMLDivElement, AgentActionApprovalProps | undefined>();
   private premountOAuthDeviceVerificationNodes = new Map<HTMLDivElement, OAuthDeviceVerificationProps | undefined>();
@@ -803,6 +804,12 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_mountConfigureSSO(node, props);
     });
 
+    if (typeof clerkjs.__internal_mountConfigureDirectorySync === 'function') {
+      this.premountConfigureDirectorySyncNodes.forEach((props, node) => {
+        clerkjs.__internal_mountConfigureDirectorySync(node, props);
+      });
+    }
+
     this.premountOAuthConsentNodes.forEach((props, node) => {
       clerkjs.__internal_mountOAuthConsent(node, props);
     });
@@ -1391,6 +1398,23 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       this.premountConfigureSSONodes.delete(node);
     }
+  };
+
+  __internal_mountConfigureDirectorySync = (node: HTMLDivElement, props?: ConfigureSSOProps): void => {
+    if (this.clerkjs && this.loaded) {
+      if (typeof this.clerkjs.__internal_mountConfigureDirectorySync === 'function') {
+        this.clerkjs.__internal_mountConfigureDirectorySync(node, props);
+      }
+    } else {
+      this.premountConfigureDirectorySyncNodes.set(node, props);
+    }
+  };
+
+  __internal_unmountConfigureDirectorySync = (node: HTMLDivElement): void => {
+    if (this.clerkjs && this.loaded && typeof this.clerkjs.__internal_unmountConfigureDirectorySync === 'function') {
+      this.clerkjs.__internal_unmountConfigureDirectorySync(node);
+    }
+    this.premountConfigureDirectorySyncNodes.delete(node);
   };
 
   __internal_mountOAuthConsent = (node: HTMLDivElement, props?: OAuthConsentProps) => {

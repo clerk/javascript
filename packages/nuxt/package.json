@@ -1,6 +1,6 @@
 {
   "name": "@clerk/nuxt",
-  "version": "3.1.1",
+  "version": "3.1.3",
   "description": "Clerk SDK for Nuxt",
   "keywords": [
     "clerk",
@@ -55,7 +55,9 @@
   "main": "./dist/module.js",
   "types": "./dist/module.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "!dist/**/*.d.ts.map",
+    "!dist/**/*.d.mts.map"
   ],
   "scripts": {
     "build": "tsdown",

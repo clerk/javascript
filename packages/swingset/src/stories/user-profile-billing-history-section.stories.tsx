@@ -1,5 +1,5 @@
-import type { UserProfileBillingHistoryItem } from '@clerk/ui/mosaic/user-profile/user-profile-billing-history-section.view';
-import { UserProfileBillingHistorySectionView } from '@clerk/ui/mosaic/user-profile/user-profile-billing-history-section.view';
+import type { UserProfileBillingHistoryItem } from '@clerk/mosaic/features/user-profile/user-profile-billing-history-section.view';
+import { UserProfileBillingHistorySectionView } from '@clerk/mosaic/features/user-profile/user-profile-billing-history-section.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -12,7 +12,7 @@ export const meta: StoryMeta = {
   title: 'UserProfileBillingHistorySection',
   label: 'Billing history',
   navigation: { category: 'Sections' },
-  source: 'packages/ui/src/mosaic/user-profile/user-profile-billing-history-section.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-billing-history-section.view.tsx',
 };
 
 const items: UserProfileBillingHistoryItem[] = [

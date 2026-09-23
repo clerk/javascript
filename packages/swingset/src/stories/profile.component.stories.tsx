@@ -1,9 +1,10 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import type { ProfileRootProps } from '@clerk/ui/mosaic/components/profile';
-import { Profile } from '@clerk/ui/mosaic/components/profile';
-import { Section } from '@clerk/ui/mosaic/components/section';
-import { Text } from '@clerk/ui/mosaic/components/text';
+import { Badge } from '@clerk/mosaic/components/badge';
+import { Button } from '@clerk/mosaic/components/button';
+import { Icon } from '@clerk/mosaic/components/icon';
+import type { ProfileRootProps } from '@clerk/mosaic/components/profile';
+import { Profile } from '@clerk/mosaic/components/profile';
+import { Section } from '@clerk/mosaic/components/section';
+import { Text } from '@clerk/mosaic/components/text';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -17,7 +18,7 @@ export const meta: StoryMeta = {
   status: 'wip',
   title: 'Profile',
   layout: 'wide',
-  source: 'packages/ui/src/mosaic/components/profile/profile.tsx',
+  source: 'packages/mosaic/src/components/profile/profile.tsx',
   styles: {
     _variants: {
       elevation: { card: {}, flush: {} },
@@ -169,6 +170,7 @@ function Surface({
                 size='sm'
               />
             }
+            badge={item.id === 'security' ? <Badge>2</Badge> : undefined}
           >
             {item.label}
           </Profile.NavItem>
