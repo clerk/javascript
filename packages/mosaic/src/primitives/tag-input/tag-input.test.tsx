@@ -482,6 +482,28 @@ describe('TagInput', () => {
       expect(new FormData(form).getAll('emails')).toEqual(['a', 'b']);
     });
 
+    it('submits to the form named by form', () => {
+      render(
+        <>
+          <form
+            id='invite'
+            data-testid='form'
+          />
+          <Harness
+            name='emails'
+            form='invite'
+            defaultValue={['a', 'b']}
+          />
+        </>,
+      );
+
+      const form = screen.getByTestId('form');
+      if (!(form instanceof HTMLFormElement)) {
+        throw new Error('expected a form');
+      }
+      expect(new FormData(form).getAll('emails')).toEqual(['a', 'b']);
+    });
+
     it('blocks editing when disabled', async () => {
       const user = userEvent.setup();
       render(
