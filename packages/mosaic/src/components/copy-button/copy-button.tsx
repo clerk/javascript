@@ -114,7 +114,6 @@ const CopyButtonTrigger = React.forwardRef<HTMLButtonElement, Omit<CopyButtonPro
                   <Icon
                     name='checkmark'
                     size='sm'
-                    aria-hidden='true'
                   />
                 </Toast.Root>
               </Toast.Positioner>
