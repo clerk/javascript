@@ -6,7 +6,7 @@ import { MosaicProvider } from '../../../MosaicProvider';
 import { UserProfileUsernameRowView } from '../user-profile-account-section/user-profile-username-row.view';
 
 describe('UserProfileUsernameRowView', () => {
-  it('offers to set a username the user does not have yet', async () => {
+  it('offers to add a username the user does not have yet', async () => {
     const user = userEvent.setup();
     render(
       <MosaicProvider>
@@ -17,8 +17,24 @@ describe('UserProfileUsernameRowView', () => {
       </MosaicProvider>,
     );
 
-    expect(document.querySelector('.cl-section-description')).toBeNull();
-    await user.click(screen.getByRole('button', { name: 'Set username' }));
-    expect(screen.getByRole('dialog', { name: 'Set username' })).toBeInTheDocument();
+    expect(screen.getByText('No username added')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Add username' }));
+    expect(screen.getByRole('dialog', { name: 'Add username' })).toBeInTheDocument();
+  });
+
+  it('offers to edit a username the user has', async () => {
+    const user = userEvent.setup();
+    render(
+      <MosaicProvider>
+        <UserProfileUsernameRowView
+          username='prestonxyz'
+          onSubmit={vi.fn()}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByText('prestonxyz')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Edit username' }));
+    expect(screen.getByRole('dialog', { name: 'Edit username' })).toBeInTheDocument();
   });
 });

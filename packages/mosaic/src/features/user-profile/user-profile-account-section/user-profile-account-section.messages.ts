@@ -21,11 +21,12 @@ export const userProfileAccountSectionMessages = {
   },
   name: {
     label: 'Name',
+    empty: 'No name added',
     edit: 'Edit name',
-    set: 'Set name',
+    add: 'Add name',
 
     dialogTitle: 'Edit name',
-    setDialogTitle: 'Set name',
+    addDialogTitle: 'Add name',
     firstNameLabel: 'First name',
     lastNameLabel: 'Last name',
     cancel: 'Cancel',
@@ -33,11 +34,12 @@ export const userProfileAccountSectionMessages = {
   },
   username: {
     label: 'Username',
+    empty: 'No username added',
     edit: 'Edit username',
-    set: 'Set username',
+    add: 'Add username',
 
     dialogTitle: 'Edit username',
-    setDialogTitle: 'Set username',
+    addDialogTitle: 'Add username',
     fieldLabel: 'Username',
     cancel: 'Cancel',
     save: 'Save changes',
