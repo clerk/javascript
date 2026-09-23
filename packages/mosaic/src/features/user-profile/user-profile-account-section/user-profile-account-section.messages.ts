@@ -18,6 +18,7 @@ export const userProfileAccountSectionMessages = {
     empty: 'No name added',
     edit: 'Edit name',
     add: 'Add name',
+    managedBy: 'Managed by {name}',
 
     dialogTitle: 'Edit name',
     addDialogTitle: 'Add name',

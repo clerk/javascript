@@ -40,6 +40,7 @@ function AccountSection({
   failEmailVerification = false,
   emailRemovalState,
   phoneRemovalState,
+  nameManagedBy,
 }: {
   allowMultipleAccounts: boolean;
   failAt?: UserProfileAddPhoneDialogProps['step'];
@@ -48,6 +49,7 @@ function AccountSection({
   failEmailVerification?: boolean;
   emailRemovalState?: 'pending' | 'error';
   phoneRemovalState?: 'pending' | 'error';
+  nameManagedBy?: { name: string; iconUrl?: string };
 }) {
   const [phoneRemovalFailed, setPhoneRemovalFailed] = useState(false);
   const [emailRemovalFailed, setEmailRemovalFailed] = useState(false);
@@ -86,6 +88,8 @@ function AccountSection({
       imageUrl={imageUrl}
       phones={phones}
       {...addPhone}
+      nameManagedBy={nameManagedBy}
+      onSubmitName={nameManagedBy ? undefined : editName.onSubmitName}
       onProfilePictureChange={showFile}
       onRemoveProfilePicture={clearImage}
       onManageEmail={() => undefined}
@@ -118,6 +122,19 @@ function AccountSection({
 
 export function Default() {
   return <AccountSection allowMultipleAccounts={false} />;
+}
+
+/**
+ * An enterprise connection owns the name, so the row names who manages it in place of an edit
+ * action. The connection's logo leads the label, or a generic lock when the IDP ships none.
+ */
+export function NameManagedByConnection() {
+  return (
+    <AccountSection
+      allowMultipleAccounts={false}
+      nameManagedBy={{ name: 'Okta', iconUrl: '/okta-placeholder.svg' }}
+    />
+  );
 }
 
 export function MultipleAccounts() {
