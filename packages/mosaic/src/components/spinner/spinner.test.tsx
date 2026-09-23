@@ -18,11 +18,7 @@ describe('Mosaic Spinner', () => {
     const el = spinner(container);
     expect(el).toBeInTheDocument();
     expect(el).toHaveAttribute('aria-hidden', 'true');
-  });
-
-  it('applies the default size when none is passed', () => {
-    const { container } = render(<Spinner />);
-    expect(spinner(container)).toHaveAttribute('data-size', 'md');
+    expect(el).toHaveAttribute('data-size', 'md');
   });
 
   it.each(['sm', 'md'] as const)('reflects the %s size', size => {

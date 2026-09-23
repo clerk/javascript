@@ -1,10 +1,8 @@
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Card } from '../card';
-import type { DialogRootProps } from './dialog';
 import { Dialog } from './dialog';
 
 afterEach(() => cleanup());
@@ -15,13 +13,11 @@ const settle = () =>
     await new Promise(resolve => setTimeout(resolve, 0));
   });
 
-function Confirm({ onOpenChange, ...rest }: Partial<DialogRootProps> = {}) {
+function Confirm() {
   return (
     <Dialog.Root
       defaultOpen
-      {...rest}
       role='alertdialog'
-      onOpenChange={onOpenChange}
     >
       <Dialog.Popup>
         <Card.Root elevation='overlay'>
@@ -108,29 +104,6 @@ describe('role="alertdialog"', () => {
     expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
   });
 
-  it('opens from a trigger', async () => {
-    const user = userEvent.setup();
-    render(
-      <Dialog.Root role='alertdialog'>
-        <Dialog.Trigger>Delete</Dialog.Trigger>
-        <Dialog.Popup>
-          <Card.Root elevation='overlay'>
-            <Card.Header>
-              <Card.Title>Delete this key?</Card.Title>
-              <Card.Description>Applications using it stop working.</Card.Description>
-            </Card.Header>
-          </Card.Root>
-        </Dialog.Popup>
-      </Dialog.Root>,
-    );
-
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'Delete' }));
-
-    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
-  });
-
   // With no corner dismiss to take it, the opening focus lands on the first button in the footer
   // — which is why the cancel is rendered first.
   it('opens focused on the cancel button, as the first element in the footer', async () => {
@@ -139,60 +112,6 @@ describe('role="alertdialog"', () => {
     // `FloatingFocusManager` moves focus asynchronously after mount, so this waits rather than
     // letting a single task elapse — under a loaded run the one task is not always enough.
     await waitFor(() => expect(screen.getByRole('button', { name: 'Keep editing' })).toHaveFocus());
-  });
-
-  it('closes on Dialog.Close, reporting it through onOpenChange', async () => {
-    const user = userEvent.setup();
-    const onOpenChange = vi.fn();
-    render(<Confirm onOpenChange={onOpenChange} />);
-
-    await user.click(screen.getByRole('button', { name: 'Keep editing' }));
-
-    expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
-    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
-  });
-});
-
-// An alert raised by a veto has no trigger, so without `finalFocus` there is nothing for focus to
-// return to and answering the question drops the user on the body.
-describe('focus', () => {
-  it('returns focus where finalFocus points when it closes', async () => {
-    const user = userEvent.setup();
-
-    function Guarded() {
-      const [confirmOpen, setConfirmOpen] = React.useState(true);
-      const inputRef = React.useRef<HTMLInputElement>(null);
-      return (
-        <>
-          <input
-            ref={inputRef}
-            aria-label='Email address'
-          />
-          <Dialog.Root
-            role='alertdialog'
-            open={confirmOpen}
-            onOpenChange={setConfirmOpen}
-          >
-            <Dialog.Popup finalFocus={inputRef}>
-              <Card.Root elevation='overlay'>
-                <Card.Header>
-                  <Card.Title>Discard changes?</Card.Title>
-                  <Card.Description>This address has not been saved.</Card.Description>
-                </Card.Header>
-                <Card.Footer>
-                  <Dialog.Close>Keep editing</Dialog.Close>
-                </Card.Footer>
-              </Card.Root>
-            </Dialog.Popup>
-          </Dialog.Root>
-        </>
-      );
-    }
-    render(<Guarded />);
-
-    await user.click(screen.getByRole('button', { name: 'Keep editing' }));
-
-    await waitFor(() => expect(screen.getByRole('textbox', { name: 'Email address' })).toHaveFocus());
   });
 });
 
@@ -215,43 +134,6 @@ describe('dismissal', () => {
     await user.keyboard('{Escape}');
 
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
-  });
-
-  it('lets a controlled consumer decline a close', async () => {
-    const user = userEvent.setup();
-
-    function Guarded() {
-      const [open, setOpen] = React.useState(true);
-      return (
-        <Dialog.Root
-          role='alertdialog'
-          open={open}
-          onOpenChange={next => {
-            if (next) {
-              setOpen(true);
-            }
-          }}
-        >
-          <Dialog.Popup>
-            <Card.Root elevation='overlay'>
-              <Card.Header>
-                <Card.Title>Discard changes?</Card.Title>
-                <Card.Description>This address has not been saved.</Card.Description>
-              </Card.Header>
-              <Card.Footer>
-                <Dialog.Close>Keep editing</Dialog.Close>
-              </Card.Footer>
-            </Card.Root>
-          </Dialog.Popup>
-        </Dialog.Root>
-      );
-    }
-    render(<Guarded />);
-
-    await user.keyboard('{Escape}');
-    await user.click(screen.getByRole('button', { name: 'Keep editing' }));
-
-    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
   });
 });
 

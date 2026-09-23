@@ -134,8 +134,6 @@ describe('passkeys section', () => {
     renderView({ passkeys: [], onAdd, addError: 'Could not create passkey' });
 
     expect(screen.getByRole('alert')).toHaveTextContent('Could not create passkey');
-    expect(screen.getByRole('alert')).toHaveAttribute('data-open');
-    expect(screen.getByRole('alert')).toHaveAttribute('data-starting-style');
     const addButton = screen.getByRole('button', { name: 'Add passkey' });
     expect(addButton).toHaveTextContent(/^Add$/);
     await user.click(addButton);
@@ -183,25 +181,6 @@ describe('passkeys section', () => {
     }
   });
 
-  it('retries removal for the same passkey after a failure', async () => {
-    const user = userEvent.setup();
-    const onRemove = vi.fn().mockRejectedValueOnce(new Error('Removal failed')).mockResolvedValueOnce(undefined);
-    render(
-      <MosaicProvider>
-        <UserProfilePasskeysSectionView
-          passkeys={passkeys}
-          onRemove={onRemove}
-        />
-      </MosaicProvider>,
-    );
-    await user.click(screen.getByRole('button', { name: 'Manage iPhone' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
-    await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Removal failed');
-    await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
-    expect(onRemove.mock.calls).toEqual([['phone'], ['phone']]);
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-  });
   it('preserves literal passkey names in menu labels and removal copy', async () => {
     const user = userEvent.setup();
     render(

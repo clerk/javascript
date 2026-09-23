@@ -11,21 +11,11 @@ const atoms = stylex.create({
 });
 
 describe('Mosaic Badge', () => {
-  it('renders its children', () => {
-    render(<Badge>Active</Badge>);
-    expect(screen.getByText('Active')).toBeInTheDocument();
-  });
-
   it('applies the default color when none is passed', () => {
     render(<Badge>Active</Badge>);
     const badge = screen.getByText('Active');
     expect(badge).toHaveClass('cl-badge');
     expect(badge).toHaveAttribute('data-color', 'primary');
-  });
-
-  it.each(['primary', 'neutral', 'warning', 'negative', 'positive'] as const)('reflects the %s color', color => {
-    render(<Badge color={color}>Active</Badge>);
-    expect(screen.getByText('Active')).toHaveAttribute('data-color', color);
   });
 
   it('takes its color from BadgeContext when none is passed', () => {

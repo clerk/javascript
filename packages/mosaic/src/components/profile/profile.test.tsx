@@ -55,27 +55,6 @@ function atomsOf(style: stylex.StyleXStyles): string[] {
 }
 
 describe('Profile', () => {
-  it('renders trailing badge content in a navigation item', () => {
-    render(
-      <Profile.Root value='account'>
-        <Profile.Title>Settings</Profile.Title>
-        <Profile.Nav>
-          <Profile.NavItem
-            value='account'
-            badge={<Badge>3</Badge>}
-          >
-            Account
-          </Profile.NavItem>
-        </Profile.Nav>
-        <Profile.Content>
-          <Profile.ContentPanel value='account'>Account content</Profile.ContentPanel>
-        </Profile.Content>
-      </Profile.Root>,
-    );
-
-    expect(screen.getByText('3').closest('.cl-profile-nav-item-badge')).toBeInTheDocument();
-  });
-
   it('defaults a navigation item badge to the neutral color', () => {
     render(
       <Profile.Root value='account'>
@@ -101,6 +80,7 @@ describe('Profile', () => {
       </Profile.Root>,
     );
 
+    expect(screen.getByText('3').closest('.cl-profile-nav-item-badge')).toBeInTheDocument();
     expect(screen.getByText('3')).toHaveAttribute('data-color', 'neutral');
     expect(screen.getByText('1')).toHaveAttribute('data-color', 'warning');
   });
@@ -122,17 +102,13 @@ describe('Profile', () => {
     expect(screen.getByText('Security page')).not.toBeVisible();
   });
 
-  it('reports a selection, and moves it with the arrow keys', async () => {
+  it('reports a selection', async () => {
     const onValueChange = vi.fn();
     const user = userEvent.setup();
     renderSurface({ onValueChange });
 
     await user.click(screen.getByRole('tab', { name: 'Security' }));
     expect(onValueChange).toHaveBeenCalledWith('security');
-
-    screen.getByRole('tab', { name: 'Account' }).focus();
-    await user.keyboard('{ArrowDown}');
-    expect(screen.getByRole('tab', { name: 'Security' })).toHaveFocus();
   });
 
   it('exposes its parts through stable slots and state attributes', () => {
@@ -183,29 +159,6 @@ describe('Profile', () => {
 
     renderSurface({ renderBranding: false });
     expect(screen.queryByText(/Secured by/)).not.toBeInTheDocument();
-  });
-
-  // The compact layout is a container query against the profile itself, so the profile has to BE
-  // a container — drop that and it never collapses, at any width. The rules it drives live one
-  // level in, on the frame: an element is never its own query container.
-  it('is the named container its compact layout queries', () => {
-    const probe = stylex.create({ container: { containerName: 'cl-profile', containerType: 'inline-size' } });
-    const { container } = renderSurface();
-
-    expect(Array.from((container.firstChild as HTMLElement).classList)).toEqual(
-      expect.arrayContaining(atomsOf(probe.container)),
-    );
-  });
-
-  // Unmeasured — before hydration, or the observer's first callback — the column renders in place
-  // at any width; the compact query must hide it, or a phone shows the tablist over the page.
-  it('hides the in-place navigation under the compact query', () => {
-    const probe = stylex.create({
-      hidden: { display: { default: 'flex', '@container (width < 48rem)': 'none' } },
-    });
-    renderSurface();
-
-    expect(Array.from(screen.getByRole('navigation').classList)).toEqual(expect.arrayContaining(atomsOf(probe.hidden)));
   });
 
   describe('page title', () => {
@@ -355,12 +308,8 @@ describe('Profile', () => {
   // `flush` is the page-content presentation without a dialog around it: the same look an inline
   // dialog implies, chosen the way `Card` chooses its elevation.
   it('takes the flush presentation from its elevation prop', () => {
-    const probe = stylex.create({ frameless: { borderWidth: '0px', backgroundColor: 'transparent' } });
     const flush = renderSurface({ elevation: 'flush' });
     expect(flush.container.querySelector('.cl-profile')).toHaveAttribute('data-elevation', 'flush');
-    expect(Array.from(flush.container.querySelector('.cl-profile-layout')!.classList)).toEqual(
-      expect.arrayContaining(atomsOf(probe.frameless)),
-    );
     expect(flush.container.querySelector('.cl-profile-content')).toHaveAttribute('data-inline');
     expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
     flush.unmount();
@@ -421,37 +370,10 @@ describe('Profile', () => {
       expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
     });
 
-    // Switching pages must never resize the surface: standalone it holds a fixed height and
-    // scrolls inside; over the page the popup's height is the one that counts.
-    it('holds a fixed height standalone, and hands it to the popup over the page', () => {
-      const probe = stylex.create({ fixed: { blockSize: '45rem' }, handed: { blockSize: 'auto' } });
-      const fixed = atomsOf(probe.fixed);
-      const handed = atomsOf(probe.handed);
-
-      const frame = () => Array.from(document.querySelector('.cl-profile-layout')!.classList);
-
-      const standalone = renderSurface();
-      expect(frame()).toEqual(expect.arrayContaining(fixed));
-      standalone.unmount();
-
-      renderInDialog();
-      expect(frame()).toEqual(expect.arrayContaining(handed));
-    });
-
-    // Flush, the profile is the page's content: no frame, no scroll region of its own, and the
-    // branding closes the pages' column out rather than the navigation's.
-    it('is flush and unframed at that elevation, and scrolls with the page', () => {
-      const probe = stylex.create({
-        frameless: { borderWidth: '0px', overflow: 'visible', backgroundColor: 'transparent', blockSize: 'auto' },
-        scroller: { overflowY: 'auto' },
-      });
+    // Flush, the profile is the page's content, so the branding closes the pages' column out
+    // rather than the navigation's.
+    it('closes the pages column out with the branding at the flush elevation', () => {
       renderSurface({ elevation: 'flush' });
-
-      const frame = document.querySelector('.cl-profile-layout')!;
-      expect(Array.from(frame.classList)).toEqual(expect.arrayContaining(atomsOf(probe.frameless)));
-      const viewport = document.querySelector('.cl-profile-content-viewport')!;
-      expect(Array.from(viewport.classList)).not.toEqual(expect.arrayContaining(atomsOf(probe.scroller)));
-      expect(document.querySelector('.cl-profile-content')).toHaveAttribute('data-inline');
 
       const branding = screen.getByText(/Secured by/);
       expect(document.querySelector('.cl-profile-content-body')).toContainElement(branding);

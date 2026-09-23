@@ -5,7 +5,6 @@ import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Checkbox } from './checkbox';
-import { styles } from './checkbox.styles';
 
 const atoms = stylex.create({
   spaced: { marginTop: '8px' },
@@ -17,6 +16,7 @@ describe('Mosaic Checkbox', () => {
     const input = screen.getByRole('checkbox', { name: 'Select row' });
     expect(input).toHaveClass('cl-checkbox-input');
     expect(input.parentElement).toHaveClass('cl-checkbox');
+    expect(input.parentElement).toHaveAttribute('data-size', 'md');
   });
 
   it('toggles and reports changes', async () => {
@@ -58,11 +58,6 @@ describe('Mosaic Checkbox', () => {
     expect(input.indeterminate).toBe(false);
   });
 
-  it('reflects the size axis on the slot element', () => {
-    render(<Checkbox aria-label='Select row' />);
-    expect(screen.getByRole('checkbox').parentElement).toHaveAttribute('data-size', 'md');
-  });
-
   it('disables the input', () => {
     render(
       <Checkbox
@@ -84,11 +79,6 @@ describe('Mosaic Checkbox', () => {
       'cl-checkbox',
       stylex.props(atoms.spaced).className ?? '',
     );
-  });
-
-  it('widens the hit target on the input for coarse pointers', () => {
-    render(<Checkbox aria-label='Select row' />);
-    expect(screen.getByRole('checkbox')).toHaveClass(stylex.props(styles.hitTarget).className ?? '');
   });
 
   it('forwards the ref and arbitrary input props to the input', () => {

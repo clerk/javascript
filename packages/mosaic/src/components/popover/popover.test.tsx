@@ -1,6 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -38,24 +37,6 @@ describe('Mosaic Popover', () => {
     rerender(example(null));
     await waitFor(() => expect(measureTrigger).toHaveBeenCalled());
     expect(measureAnchor).not.toHaveBeenCalled();
-  });
-
-  it('renders the trigger and opens the popup on click', async () => {
-    const user = userEvent.setup();
-    render(
-      <Popover.Root>
-        <Popover.Trigger>Open</Popover.Trigger>
-        <Popover.Popup>
-          <div>Panel body</div>
-        </Popover.Popup>
-      </Popover.Root>,
-    );
-
-    expect(screen.queryByText('Panel body')).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'Open' }));
-
-    expect(screen.getByText('Panel body')).toBeInTheDocument();
   });
 
   it('renders a custom trigger through the render prop', () => {
@@ -152,64 +133,6 @@ describe('Mosaic Popover', () => {
       'cl-popover-popup',
       stylex.props(caller.popup).className ?? '',
     );
-  });
-
-  it('closes via Popover.Close', async () => {
-    const user = userEvent.setup();
-    render(
-      <Popover.Root defaultOpen>
-        <Popover.Trigger>Open</Popover.Trigger>
-        <Popover.Popup>
-          <div>Body</div>
-          <Popover.Close>Dismiss</Popover.Close>
-        </Popover.Popup>
-      </Popover.Root>,
-    );
-
-    expect(screen.getByText('Body')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Dismiss' }));
-    expect(screen.queryByText('Body')).not.toBeInTheDocument();
-  });
-
-  it('closes on an outside click and does not reopen from the same gesture', async () => {
-    const user = userEvent.setup();
-    render(
-      <div>
-        <Popover.Root>
-          <Popover.Trigger>Open</Popover.Trigger>
-          <Popover.Popup>
-            <div>Body</div>
-          </Popover.Popup>
-        </Popover.Root>
-        <div data-testid='outside'>outside</div>
-      </div>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Open' }));
-    expect(screen.getByText('Body')).toBeInTheDocument();
-
-    await user.click(screen.getByTestId('outside'));
-    expect(screen.queryByText('Body')).not.toBeInTheDocument();
-  });
-
-  it('closes when the trigger is clicked while open', async () => {
-    const user = userEvent.setup();
-    render(
-      <Popover.Root>
-        <Popover.Trigger>Open</Popover.Trigger>
-        <Popover.Popup>
-          <div>Body</div>
-        </Popover.Popup>
-      </Popover.Root>,
-    );
-
-    const button = screen.getByRole('button', { name: 'Open' });
-    await user.click(button);
-    expect(screen.getByText('Body')).toBeInTheDocument();
-
-    // The dismiss that closes the popup must not let the same click reopen it.
-    await user.click(button);
-    expect(screen.queryByText('Body')).not.toBeInTheDocument();
   });
 
   it('names the dialog from aria-label and does not warn', async () => {

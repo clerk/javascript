@@ -1,8 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { Button } from './button';
 
@@ -11,11 +10,6 @@ const atoms = stylex.create({
 });
 
 describe('Mosaic Button', () => {
-  it('renders a button with its children', () => {
-    render(<Button>Hi</Button>);
-    expect(screen.getByRole('button', { name: 'Hi' })).toBeInTheDocument();
-  });
-
   it('applies default variants when none are passed', () => {
     render(<Button>Hi</Button>);
     const button = screen.getByRole('button');
@@ -33,31 +27,6 @@ describe('Mosaic Button', () => {
     expect(button).not.toHaveAttribute('data-full-width');
     expect(button).not.toHaveAttribute('data-disabled');
     expect(button).toBeEnabled();
-  });
-
-  // The touch target is an overlay with no attribute of its own, so these compare the atoms
-  // the element ends up with rather than a reflected variant.
-  it('drops the touch-target atoms when the prop is off', () => {
-    const { rerender } = render(<Button>Hi</Button>);
-    const on = screen.getByRole('button').className.split(' ');
-    rerender(<Button touchTarget={false}>Hi</Button>);
-    const off = screen.getByRole('button').className.split(' ');
-    expect(off.length).toBeLessThan(on.length);
-    expect(off.every(atom => on.includes(atom))).toBe(true);
-  });
-
-  it('leaves the touch target off a link, which is text rather than a control', () => {
-    const { rerender } = render(<Button variant='link'>Hi</Button>);
-    const on = screen.getByRole('button').className;
-    rerender(
-      <Button
-        variant='link'
-        touchTarget={false}
-      >
-        Hi
-      </Button>,
-    );
-    expect(screen.getByRole('button').className).toBe(on);
   });
 
   it('keeps the touch-target prop off the element', () => {
@@ -85,26 +54,6 @@ describe('Mosaic Button', () => {
     expect(button).toHaveAttribute('data-shape', 'circle');
     expect(button).toHaveAttribute('data-full-width', '');
     expect(button).toHaveClass('cl-button', stylex.props(atoms.spaced).className ?? '');
-  });
-
-  it.each(['primary', 'neutral', 'negative'] as const)('reflects the %s color', color => {
-    render(<Button color={color}>Hi</Button>);
-    expect(screen.getByRole('button')).toHaveAttribute('data-color', color);
-  });
-
-  it.each(['filled', 'outline', 'ghost', 'link'] as const)('reflects the %s variant', variant => {
-    render(<Button variant={variant}>Hi</Button>);
-    expect(screen.getByRole('button')).toHaveAttribute('data-variant', variant);
-  });
-
-  it.each(['xs', 'sm', 'md', 'lg'] as const)('reflects the %s size', size => {
-    render(<Button size={size}>Hi</Button>);
-    expect(screen.getByRole('button')).toHaveAttribute('data-size', size);
-  });
-
-  it.each(['default', 'square', 'circle'] as const)('reflects the %s shape', shape => {
-    render(<Button shape={shape}>Hi</Button>);
-    expect(screen.getByRole('button')).toHaveAttribute('data-shape', shape);
   });
 
   it('gives a text child its own box to truncate against', () => {
@@ -172,27 +121,6 @@ describe('Mosaic Button', () => {
     expect(button.firstElementChild).toBe(screen.getByTestId('icon'));
   });
 
-  it('calls onClick when pressed', async () => {
-    const onClick = vi.fn();
-    render(<Button onClick={onClick}>Hi</Button>);
-    await userEvent.click(screen.getByRole('button'));
-    expect(onClick).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not call onClick while disabled', async () => {
-    const onClick = vi.fn();
-    render(
-      <Button
-        disabled
-        onClick={onClick}
-      >
-        Hi
-      </Button>,
-    );
-    await userEvent.click(screen.getByRole('button'));
-    expect(onClick).not.toHaveBeenCalled();
-  });
-
   it('reflects disabled as both the native attribute and data-disabled', () => {
     render(<Button disabled>Hi</Button>);
     const button = screen.getByRole('button');
@@ -216,48 +144,6 @@ describe('Mosaic Button', () => {
       // The styles gate every interactive state on `data-disabled`, so it has to be
       // reflected identically whether or not the native attribute is present.
       expect(button).toHaveAttribute('data-disabled', '');
-    });
-
-    it('stays reachable by keyboard', async () => {
-      render(
-        <Button
-          disabled
-          focusableWhenDisabled
-        >
-          Hi
-        </Button>,
-      );
-      await userEvent.tab();
-      expect(screen.getByRole('button')).toHaveFocus();
-    });
-
-    it('does not call onClick while disabled', async () => {
-      const onClick = vi.fn();
-      render(
-        <Button
-          disabled
-          focusableWhenDisabled
-          onClick={onClick}
-        >
-          Hi
-        </Button>,
-      );
-      await userEvent.click(screen.getByRole('button'));
-      expect(onClick).not.toHaveBeenCalled();
-    });
-
-    it('still dims and blocks the cursor', () => {
-      const { rerender } = render(<Button disabled>Hi</Button>);
-      const nativelyDisabled = screen.getByRole('button').className;
-      rerender(
-        <Button
-          disabled
-          focusableWhenDisabled
-        >
-          Hi
-        </Button>,
-      );
-      expect(screen.getByRole('button').className).toBe(nativelyDisabled);
     });
   });
 

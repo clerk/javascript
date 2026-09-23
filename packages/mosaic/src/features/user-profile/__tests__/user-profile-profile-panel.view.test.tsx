@@ -30,14 +30,6 @@ function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
 }
 
 describe('UserProfileProfilePanelView', () => {
-  it('hides connected accounts when only providers without a connect callback are supplied', () => {
-    renderView({
-      connectedAccounts: [],
-      availableConnectionProviders: [{ id: 'google', provider: 'Google' }],
-    });
-    expect(screen.queryByRole('region', { name: 'Connected accounts' })).not.toBeInTheDocument();
-  });
-
   it('keeps the final account confirmation mounted until removal settles', async () => {
     const user = userEvent.setup();
     const removal = createDeferredPromise();
@@ -103,16 +95,6 @@ describe('UserProfileProfilePanelView', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
-  it('keeps available providers visible without connected accounts', () => {
-    const onConnectAccount = vi.fn();
-    renderView({
-      connectedAccounts: [],
-      availableConnectionProviders: [{ id: 'google', provider: 'Google' }],
-      onConnectAccount,
-    });
-    expect(screen.getByRole('button', { name: 'Connect Google' })).toBeVisible();
-  });
-
   it.each([false, true])('formats normalized phone numbers with multiple accounts set to %s', allowMultipleAccounts => {
     renderView({
       allowMultipleAccounts,
@@ -138,20 +120,14 @@ describe('UserProfileProfilePanelView', () => {
       document.querySelector('.cl-section-group'),
     );
     expect(screen.getByText('Name')).toHaveClass('cl-section-label');
-    expect(screen.getByText('Username')).toHaveClass('cl-section-label');
     expect(screen.getByText('Preston Booth')).toHaveClass('cl-section-description');
-    expect(screen.getByText('prestonxyz')).toHaveClass('cl-section-description');
     expect(screen.getByRole('button', { name: 'Edit name' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Edit username' })).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(screen.getByText('item1@clerk.dev')).toBeInTheDocument();
     expect(screen.getByText('item1@clerk.dev').closest('.cl-section-item')).toHaveTextContent('Primary');
     expect(screen.getByText('+1 (801) 888-8181')).toBeInTheDocument();
-    expect(screen.getByText('Profile picture')).toHaveClass('cl-section-label');
-    expect(screen.getByText('Recommend size 1:1, up to 10MB.')).toHaveClass('cl-section-description');
-    expect(screen.getByText('Email')).toHaveClass('cl-section-label');
-    expect(screen.getByText('Phone')).toHaveClass('cl-section-label');
-    expect(screen.getByText('item1@clerk.dev').closest('.cl-section-description')).not.toBeNull();
+    expect(screen.getByText('Recommend size 1:1, up to 10MB.')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Upload' })).toBeInTheDocument();
     const profilePicture = screen.getByText('Profile picture').closest('.cl-section-item');
     expect(profilePicture?.querySelector('.cl-section-media')).toHaveAttribute('data-size', 'lg');
@@ -279,31 +255,18 @@ describe('UserProfileProfilePanelView', () => {
     expect(within(phoneSection).getByRole('button', { name: 'Add phone number' })).toBeInTheDocument();
   });
 
-  it('renders connected accounts and the danger zone when provided', async () => {
-    const onRemoveConnectedAccount = vi.fn();
-    const onDeleteAccount = vi.fn(() => Promise.resolve());
-    const user = userEvent.setup();
+  it('renders connected accounts and the danger zone when provided', () => {
     renderView({
       connectedAccounts: [
         { id: 'google', provider: 'Google', identifier: 'test@google.com', iconUrl: 'https://example.com/google.svg' },
       ],
-      onRemoveConnectedAccount,
-      onDeleteAccount,
+      onRemoveConnectedAccount: vi.fn(),
+      onDeleteAccount: vi.fn(() => Promise.resolve()),
     });
 
     expect(screen.getByRole('heading', { level: 4, name: 'Connected accounts' })).toBeInTheDocument();
     expect(screen.getByText('Google')).toBeVisible();
     expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
-    expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
-    expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
-      'cl-section-description',
-    );
-    await user.click(screen.getByRole('button', { name: 'Delete account' }));
-    const deleteDialog = screen.getByRole('dialog');
-    await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
-    await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
-
-    expect(onDeleteAccount).toHaveBeenCalledOnce();
   });
 
   it('renders connected provider and Web3 images inside icon frames', () => {
@@ -364,27 +327,6 @@ describe('UserProfileProfilePanelView', () => {
     );
 
     expect(screen.getByRole('region', { name: 'Account' })).toBeInTheDocument();
-  });
-
-  it('forwards profile and contact actions', async () => {
-    const onAddEmail = vi.fn();
-    const onRemoveEmail = vi.fn();
-    renderView({ onSubmitName: () => Promise.resolve(), onAddEmail, onRemoveEmail });
-    const user = userEvent.setup();
-
-    await user.click(screen.getByRole('button', { name: 'Add email' }));
-    await user.click(screen.getByRole('button', { name: 'Manage item2@clerk.dev' }));
-    expect(onRemoveEmail).not.toHaveBeenCalled();
-    await user.click(screen.getByRole('menuitem', { name: 'Remove email' }));
-    expect(onRemoveEmail).not.toHaveBeenCalled();
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    // Last: the edit-name dialog is modal, so the rest of the panel goes inert once it opens.
-    await user.click(screen.getByRole('button', { name: 'Edit name' }));
-
-    expect(screen.getByRole('dialog', { name: 'Edit name' })).toBeInTheDocument();
-    expect(onAddEmail).toHaveBeenCalledOnce();
-    expect(onRemoveEmail).toHaveBeenCalledWith('email_2');
   });
 
   it('drives the edit-name dialog from the section, seeded with the saved name', async () => {

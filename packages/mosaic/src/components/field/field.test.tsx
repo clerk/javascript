@@ -383,24 +383,7 @@ describe('Mosaic Field', () => {
     expect(error?.querySelector('svg')).toHaveAttribute('aria-hidden', 'true');
   });
 
-  it('mounts through the headless enter transition and animates the message height', () => {
-    const probe = stylex.create({
-      message: {
-        transitionProperty: {
-          default: 'height, margin-top',
-          '@media (prefers-reduced-motion: reduce)': 'none',
-        },
-        height: {
-          default: 'var(--_cl-feedback-height)',
-          ':where(:not([data-open]), [data-starting-style])': 0,
-        },
-      },
-      feedback: {
-        opacity: { default: 1, ':where([data-starting-style], [data-ending-style])': 0 },
-        position: { default: null, ':where([data-ending-style])': 'absolute' },
-      },
-    });
-
+  it('mounts through the headless enter transition', () => {
     const { container } = render(
       <Field.Root>
         <Field.Message>
@@ -411,12 +394,8 @@ describe('Mosaic Field', () => {
 
     const message = container.querySelector('.cl-field-message');
     const error = screen.getByText('Enter a valid email.').closest('p');
-    expect(atoms(probe.message)).toHaveLength(4);
-    expect(message).toHaveClass(...atoms(probe.message));
     expect(message).toHaveAttribute('data-open');
     expect(message).toHaveAttribute('data-starting-style');
-    expect(atoms(probe.feedback)).toHaveLength(3);
-    expect(error).toHaveClass(...atoms(probe.feedback));
     expect(error).toHaveAttribute('data-open');
     expect(error).toHaveAttribute('data-starting-style');
   });

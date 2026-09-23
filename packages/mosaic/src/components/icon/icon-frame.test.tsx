@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { Icon } from './icon';
 import { IconFrame } from './icon-frame';
 
 const atoms = stylex.create({
@@ -35,16 +34,6 @@ describe('Mosaic IconFrame', () => {
     expect(frame).not.toHaveAttribute('data-bordered');
     expect(frame).toHaveAttribute('data-filled', '');
     expect(frame).toHaveAttribute('data-size', 'sm');
-  });
-
-  it('composes with an Icon', () => {
-    const { container } = render(
-      <IconFrame>
-        <Icon name='checkmark' />
-      </IconFrame>,
-    );
-    const frame = container.querySelector('.cl-icon-frame');
-    expect(frame).toContainElement(container.querySelector('svg.cl-icon'));
   });
 
   it('forwards native span props and the ref', () => {

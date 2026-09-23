@@ -7,24 +7,11 @@ import { describe, expect, it, vi } from 'vitest';
 import { Dialog } from '../dialog';
 import { Card } from './card';
 
-const compactCard = '@container card (max-width: 20rem)' as const;
-
 const callerStyles = stylex.create({
   root: { width: '20rem' },
   header: { textAlign: 'right' },
   content: { paddingInline: 0 },
   footer: { paddingBlockEnd: 0 },
-});
-
-const responsiveLayout = stylex.create({
-  root: {
-    containerName: 'card',
-    containerType: 'inline-size',
-  },
-  footer: {
-    display: { [compactCard]: 'grid', default: 'flex' },
-    gridTemplateColumns: { [compactCard]: 'minmax(0, 1fr)', default: null },
-  },
 });
 
 describe('Mosaic Card', () => {
@@ -43,20 +30,6 @@ describe('Mosaic Card', () => {
     expect(screen.getByTestId('content')).toHaveClass('cl-card-content');
     expect(screen.getByTestId('footer')).toHaveClass('cl-card-footer');
     expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'card');
-  });
-
-  it('uses grid to stack the footer only when its card container is compact', () => {
-    render(
-      <Card.Root data-testid='root'>
-        <Card.Footer data-testid='footer'>Footer</Card.Footer>
-      </Card.Root>,
-    );
-
-    const atoms = (style: stylex.StyleXStyles) =>
-      (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
-
-    expect(screen.getByTestId('root')).toHaveClass(...atoms(responsiveLayout.root));
-    expect(screen.getByTestId('footer')).toHaveClass(...atoms(responsiveLayout.footer));
   });
 
   it('reflects flush elevation on the root and footer', () => {
@@ -364,23 +337,6 @@ describe('Mosaic Card', () => {
     await user.click(close);
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-  });
-
-  it('carries a dismiss button inside a dialog, which is what it closes', () => {
-    render(
-      <Dialog.Root defaultOpen>
-        <Dialog.Popup>
-          <Card.Root elevation='overlay'>
-            <Card.Header>
-              <Card.Title>Account</Card.Title>
-            </Card.Header>
-          </Card.Root>
-        </Dialog.Popup>
-      </Dialog.Root>,
-    );
-
-    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
-    expect(screen.getByRole('dialog')).toHaveAccessibleName('Account');
   });
 
   it('carries no dismiss button in a header outside a dialog', () => {

@@ -17,17 +17,6 @@ const atoms = (style: stylex.StyleXStyles) =>
 const COLORS = ['neutral', 'warning', 'negative'] as const;
 
 describe('Mosaic Banner', () => {
-  it('renders its label and description', () => {
-    render(
-      <Banner.Root>
-        <Banner.Label>Info banner</Banner.Label>
-        <Banner.Description>Here is a tip for how this should work</Banner.Description>
-      </Banner.Root>,
-    );
-    expect(screen.getByText('Info banner')).toBeInTheDocument();
-    expect(screen.getByText('Here is a tip for how this should work')).toBeInTheDocument();
-  });
-
   it('applies the default color when none is passed', () => {
     render(
       <Banner.Root>

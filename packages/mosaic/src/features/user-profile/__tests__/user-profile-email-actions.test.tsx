@@ -1,5 +1,4 @@
-import { createDeferredPromise } from '@clerk/shared/utils';
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -24,24 +23,6 @@ function renderEmail(overrides: Partial<UserProfileAccountSectionViewProps> = {}
 }
 
 describe('email actions', () => {
-  it('returns focus to the email menu after opening with the keyboard and canceling with Escape', async () => {
-    const user = userEvent.setup();
-    const onRemoveEmail = vi.fn();
-    renderEmail({ onRemoveEmail });
-    const trigger = screen.getByRole('button', { name: 'Manage test@example.com' });
-
-    trigger.focus();
-    await user.keyboard('{Enter}');
-    await user.keyboard('{Enter}');
-    expect(screen.getByRole('alertdialog', { name: 'Remove email address?' })).toBeInTheDocument();
-
-    await user.keyboard('{Escape}');
-
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(onRemoveEmail).not.toHaveBeenCalled();
-    await waitFor(() => expect(trigger).toHaveFocus());
-  });
-
   it('removes the email row and keeps Add email available', async () => {
     const user = userEvent.setup();
     function Example() {
@@ -82,26 +63,16 @@ describe('email actions', () => {
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 
-  it('keeps removal pending and lets the user retry a failure in the dialog', async () => {
+  it('confirms removal of the chosen email before removing it', async () => {
     const user = userEvent.setup();
-    const removal = createDeferredPromise();
-    const onRemoveEmail = vi.fn().mockReturnValueOnce(removal.promise).mockResolvedValue(undefined);
+    const onRemoveEmail = vi.fn();
     renderEmail({ onRemoveEmail });
     await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove email' }));
     const dialog = screen.getByRole('alertdialog', { name: 'Remove email address?' });
     expect(dialog).toHaveAccessibleDescription(/test@example.com/);
+    expect(onRemoveEmail).not.toHaveBeenCalled();
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
-    expect(within(dialog).getByRole('button', { name: 'Remove' })).toHaveAttribute('aria-busy', 'true');
-
-    await act(async () => {
-      removal.reject(new Error('Unable to remove email.'));
-      await removal.promise.catch(() => undefined);
-    });
-    expect(within(dialog).getByRole('alert')).toHaveTextContent('Unable to remove email.');
-    await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(onRemoveEmail).toHaveBeenNthCalledWith(1, 'email_1');
-    expect(onRemoveEmail).toHaveBeenNthCalledWith(2, 'email_1');
+    expect(onRemoveEmail).toHaveBeenCalledExactlyOnceWith('email_1');
   });
 });

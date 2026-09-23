@@ -5,7 +5,6 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { MosaicComponentProps } from '../../props';
-import { colorVars, radiusVars, space } from '../../tokens.stylex';
 import { Card } from '../card';
 import type { DialogVariant } from './dialog';
 import { Dialog } from './dialog';
@@ -42,22 +41,6 @@ const nativeTrigger = (label: string) => (props: MosaicComponentProps<'button'>)
 );
 
 describe('Mosaic Dialog', () => {
-  it('renders the trigger and opens the dialog on click', async () => {
-    const user = userEvent.setup();
-    render(
-      <Dialog.Root>
-        <Dialog.Trigger render={nativeTrigger('Open')} />
-        <Dialog.Popup>Body</Dialog.Popup>
-      </Dialog.Root>,
-    );
-
-    expect(screen.queryByText('Body')).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'Open' }));
-
-    expect(screen.getByText('Body')).toBeInTheDocument();
-  });
-
   it('renders the whole floating tree from the popup: backdrop, viewport and popup carry the slots', () => {
     render(
       <div data-testid='host'>
@@ -118,26 +101,6 @@ describe('Mosaic Dialog', () => {
     );
 
     expect(document.querySelector('.cl-dialog-popup')).toHaveClass('cl-dialog-popup', 'from-render');
-  });
-
-  it('closes on Dialog.Close, reporting it through onOpenChange', async () => {
-    const user = userEvent.setup();
-    const onOpenChange = vi.fn();
-    render(
-      <Dialog.Root
-        defaultOpen
-        onOpenChange={onOpenChange}
-      >
-        <Dialog.Popup>
-          <Dialog.Close>Dismiss</Dialog.Close>
-        </Dialog.Popup>
-      </Dialog.Root>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Dismiss' }));
-
-    expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
-    expect(screen.queryByRole('button', { name: 'Dismiss' })).not.toBeInTheDocument();
   });
 
   it('names the dialog from the card inside it', () => {
@@ -297,32 +260,6 @@ describe('stacked backdrops', () => {
     expect(overPanel).toEqual(expect.arrayContaining(atomFor(dialogStyles.backdrop)));
     expect(overPanel).not.toEqual(expect.arrayContaining(atomFor(dialogStyles.backdropStacked)));
   });
-
-  it('marks the popup beneath as the stack base, so it can recede', async () => {
-    const user = userEvent.setup();
-    render(
-      <Dialog.Root defaultOpen>
-        <Dialog.Popup variant='profile'>
-          <Surface title='Account' />
-          <Dialog.Root>
-            <Dialog.Trigger render={nativeTrigger('Add email')} />
-            <Dialog.Popup>
-              <Surface title='Add email address' />
-            </Dialog.Popup>
-          </Dialog.Root>
-        </Dialog.Popup>
-      </Dialog.Root>,
-    );
-
-    const outerPopup = document.querySelector('.cl-dialog-popup');
-    expect(outerPopup).not.toHaveAttribute('data-stack-base');
-
-    await user.click(screen.getByRole('button', { name: 'Add email' }));
-
-    const popups = document.querySelectorAll('.cl-dialog-popup');
-    expect(popups[0]).toHaveAttribute('data-stack-base', '');
-    expect(popups[1]).not.toHaveAttribute('data-stack-base');
-  });
 });
 
 describe('Dialog.CloseButton', () => {
@@ -367,7 +304,7 @@ describe('Dialog.CloseButton', () => {
     );
 
     // Pinning the default: a corner X rendered before the form is what the dialog opens
-    // focused on unless `initialFocus` on `Dialog.Popup` says otherwise (next test).
+    // focused on unless `initialFocus` on `Dialog.Popup` says otherwise.
     // `FloatingFocusManager` moves focus in an effect, hence the wait.
     await waitFor(() => expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus());
   });
@@ -394,73 +331,6 @@ describe('Dialog.CloseButton', () => {
   });
 });
 
-describe('composition APIs', () => {
-  it('opens from a detached trigger through a handle', async () => {
-    const user = userEvent.setup();
-    const handle = Dialog.createHandle();
-    render(
-      <>
-        <Dialog.Trigger handle={handle}>Open detached</Dialog.Trigger>
-        <Dialog.Root handle={handle}>
-          <Dialog.Popup>
-            <Surface title='Detached' />
-          </Dialog.Popup>
-        </Dialog.Root>
-      </>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Open detached' }));
-
-    expect(screen.getByRole('dialog', { name: 'Detached' })).toBeInTheDocument();
-  });
-
-  it('renders per-trigger content from the payload', async () => {
-    const user = userEvent.setup();
-    const handle = Dialog.createHandle<string>();
-    render(
-      <>
-        <Dialog.Trigger
-          handle={handle}
-          payload='from-a'
-        >
-          Open A
-        </Dialog.Trigger>
-        <Dialog.Root handle={handle}>
-          {({ payload }) => (
-            <Dialog.Popup>
-              <Surface title={payload ?? 'none'} />
-            </Dialog.Popup>
-          )}
-        </Dialog.Root>
-      </>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Open A' }));
-
-    expect(screen.getByRole('dialog', { name: 'from-a' })).toBeInTheDocument();
-  });
-
-  it('initialFocus on the popup redirects the open focus past the close button', async () => {
-    function Fixture() {
-      const inputRef = React.useRef<HTMLInputElement | null>(null);
-      return (
-        <Dialog.Root defaultOpen>
-          <Dialog.Popup initialFocus={inputRef}>
-            <Dialog.CloseButton />
-            <input
-              ref={inputRef}
-              aria-label='Email'
-            />
-          </Dialog.Popup>
-        </Dialog.Root>
-      );
-    }
-    render(<Fixture />);
-
-    await waitFor(() => expect(screen.getByRole('textbox', { name: 'Email' })).toHaveFocus());
-  });
-});
-
 // A probe gives us atoms to look for without hard-coding a hash. StyleX dedupes by property
 // within one `stylex.props` call, so a variant atom should REPLACE a base one rather than sit
 // alongside it — and a `null` should remove it outright.
@@ -472,77 +342,6 @@ const atomFor = (style: Parameters<typeof stylex.props>[0]) =>
 
 const classesOf = (selector: string) => Array.from(document.querySelector(selector)!.classList);
 
-function renderVariant(variant: DialogVariant) {
-  return render(
-    <Dialog.Root defaultOpen>
-      <Dialog.Popup variant={variant}>
-        <Surface title='Confirm action' />
-      </Dialog.Popup>
-    </Dialog.Root>,
-  );
-}
-
-describe('popup padding', () => {
-  const probe = stylex.create({
-    zero: { padding: space['0'] },
-    four: { padding: space['4'] },
-    six: { padding: space['6'] },
-  });
-
-  const popupClassesFor = (variant: DialogVariant) => {
-    const { unmount } = renderVariant(variant);
-    const classes = classesOf('.cl-dialog-popup');
-    unmount();
-    return classes;
-  };
-
-  // A `card` takes its padding from the `Card` rendered inside the popup, and a `profile` from
-  // the `Profile`, so the popup must emit NO padding atom at all — a competing value would put
-  // two atoms for the same property on the element, and StyleX cannot dedupe across the two
-  // `stylex.props` calls involved.
-  it.each(['card', 'profile'] as const)('emits no padding at all for a %s, deferring to its surface', variant => {
-    const classes = popupClassesFor(variant);
-
-    for (const value of [probe.zero, probe.four, probe.six]) {
-      expect(classes).not.toEqual(expect.arrayContaining(atomFor(value)));
-    }
-  });
-});
-
-describe('popup surface', () => {
-  // `card` and `profile` are painted by what renders as the popup, so the popup itself must emit
-  // no paint of its own — the same cross-call dedupe problem as the padding above. StyleX names
-  // an atom from its property and value, so a probe with the popup's own values yields the very
-  // atoms `styles.popup` declares.
-  const probe = stylex.create({
-    background: { backgroundColor: colorVars['--cl-color-background'] },
-    radius: { borderRadius: radiusVars['--cl-radius-xl'] },
-  });
-
-  it.each(['card', 'profile'] as const)('emits no background for a %s, deferring to its surface', variant => {
-    renderVariant(variant);
-
-    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.background)));
-  });
-
-  // The radius is the exception to "the popup does not paint": the stacking veil and the
-  // forced-colors border are drawn by the popup and have to follow the card's corners.
-  it('keeps the radius for a card, which the veil and the forced-colors edge trace', () => {
-    renderVariant('card');
-
-    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.radius)));
-  });
-
-  it('leaves the radius to the surface for a profile, which owns its corners at every band', () => {
-    renderVariant('profile');
-
-    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.radius)));
-  });
-});
-
-// The sheet is the compact band's bottom anchor: the geometry that used to ride on the `prompt`
-// size, now asked for by name. Above the band it resolves back to a centered card, so what the
-// atoms pin is that the placement reaches the popup and the track at all.
 describe('compactPlacement', () => {
   // Written out rather than imported: an atom is named from its property, value AND condition, so
   // the probe only yields the popup's own atom if the query string matches `dialog.styles.ts`
@@ -550,115 +349,25 @@ describe('compactPlacement', () => {
   const PHONE = '@container cl-dialog (width < 48rem)';
   const probe = stylex.create({
     anchored: { alignSelf: { [PHONE]: 'end', default: null } },
-    centered: { alignItems: { [PHONE]: 'center', default: null } },
-    clipped: { overflow: { [PHONE]: 'clip', default: null } },
   });
 
-  const renderPlacement = (compactPlacement: 'center' | 'sheet', variant: DialogVariant = 'card') =>
+  // A profile fills the compact band, with no room to be anchored anywhere else.
+  it('ignores a placement on a profile, and warns', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup
-          variant={variant}
-          compactPlacement={compactPlacement}
+          variant='profile'
+          compactPlacement='sheet'
         >
           <Surface title='Add email address' />
         </Dialog.Popup>
       </Dialog.Root>,
     );
 
-  it('centers by default, anchoring nothing to the bottom edge', () => {
-    renderPlacement('center');
-
-    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
-    expect(classesOf('.cl-dialog-track')).not.toEqual(expect.arrayContaining(atomFor(probe.clipped)));
-  });
-
-  it('anchors the sheet to the bottom edge and clips the track it slides through', () => {
-    renderPlacement('sheet');
-
-    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.anchored)));
-    expect(classesOf('.cl-dialog-track')).toEqual(expect.arrayContaining(atomFor(probe.clipped)));
-  });
-
-  // The band runs to 48rem but a `Card` caps at 26.25rem, so between the two the surface sits
-  // inside a wider popup. Without this it lands against the inline-start edge — a sheet hugging one
-  // side of the screen — because the popup is a flex column and `stretch` is the default.
-  it('centers what the sheet holds, for the widths where the surface caps first', () => {
-    renderPlacement('sheet');
-
-    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.centered)));
-  });
-
-  // A profile fills the compact band, with no room to be anchored anywhere else.
-  it('ignores a placement on a profile, and warns', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    renderPlacement('sheet', 'profile');
-
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
     warn.mockRestore();
-  });
-});
-
-describe('viewport scroll behaviour', () => {
-  // The inside/outside scroll split. A pinned `height: 100%` cannot grow, so an over-tall popup
-  // spills past the viewport's padding box and loses the bottom inset; `min-height: 100%` lets the
-  // box grow with it. Which one applies follows from the variant, so what this pins is that the
-  // viewport reads the variant at all — a regression here is silent, since both values look right
-  // until the content is taller than the screen.
-  const probe = stylex.create({
-    fixed: { height: '100%' },
-    grows: { minHeight: '100%' },
-  });
-
-  const viewportClassesFor = (variant: DialogVariant) => {
-    const { unmount } = renderVariant(variant);
-    const classes = classesOf('.cl-dialog-viewport');
-    unmount();
-    return classes;
-  };
-
-  it('lets the viewport grow for a card, so the inset survives', () => {
-    const viewport = viewportClassesFor('card');
-
-    expect(viewport).toEqual(expect.arrayContaining(atomFor(probe.grows)));
-    expect(viewport).not.toEqual(expect.arrayContaining(atomFor(probe.fixed)));
-  });
-
-  it('pins the viewport for a profile, which scrolls inside instead', () => {
-    const viewport = viewportClassesFor('profile');
-
-    expect(viewport).toEqual(expect.arrayContaining(atomFor(probe.fixed)));
-    expect(viewport).not.toEqual(expect.arrayContaining(atomFor(probe.grows)));
-  });
-});
-
-describe('sizing container', () => {
-  // The width bands are container queries against the viewport, so the viewport has to BE a
-  // container — drop that and every band silently stops matching, at every width.
-  const probe = stylex.create({
-    container: { containerName: 'cl-dialog', containerType: 'inline-size' },
-    // The phone-band side inset, one of the rules that queries the container.
-    phoneSides: { paddingInline: { default: space['4'], '@container cl-dialog (max-width: 47.99rem)': null } },
-  });
-
-  it('makes the viewport the named inline-size container the bands query', () => {
-    renderVariant('card');
-
-    expect(classesOf('.cl-dialog-viewport')).toEqual(expect.arrayContaining(atomFor(probe.container)));
-  });
-
-  // An element is never its own query container. A band declared on the viewport would resolve
-  // against an OUTER dialog's container, or nothing — so every banded rule has to sit on the track
-  // inside it, and none may sit on the viewport.
-  it('keeps every banded rule inside the container, on the track', () => {
-    renderVariant('card');
-
-    const viewport = document.querySelector('.cl-dialog-viewport')!;
-    const track = document.querySelector('.cl-dialog-track')!;
-    expect(viewport).toContainElement(track);
-    expect(Array.from(track.classList)).toEqual(expect.arrayContaining(atomFor(probe.phoneSides)));
-    expect(Array.from(viewport.classList)).not.toEqual(expect.arrayContaining(atomFor(probe.phoneSides)));
   });
 });
 

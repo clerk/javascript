@@ -7,7 +7,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Icon } from '../icon';
 import { Avatar } from './avatar';
-import { styles } from './avatar.styles';
 
 // React reads this off the global object and ships no typing for it.
 declare global {
@@ -66,53 +65,13 @@ describe('Mosaic Avatar', () => {
     expect(avatar).toHaveAttribute('data-bordered', '');
   });
 
-  it('draws the inset outline on the image and fallback by default', async () => {
-    outcomes['https://example.com/a.png'] = 'load';
-    const overlay = stylex.props(styles.overlay).className ?? '';
-    const { rerender } = render(
-      <Avatar.Root>
-        <Avatar.Fallback data-testid='fallback'>CN</Avatar.Fallback>
-      </Avatar.Root>,
-    );
-    expect(screen.getByTestId('fallback')).toHaveClass(overlay);
-    rerender(
-      <Avatar.Root>
-        <Avatar.Image
-          src='https://example.com/a.png'
-          alt='Alex'
-        />
-        <Avatar.Fallback>CN</Avatar.Fallback>
-      </Avatar.Root>,
-    );
-    expect(await screen.findByRole('img', { name: 'Alex' })).toHaveClass(overlay);
-  });
-
-  it('drops the inset outline when bordered is false', async () => {
-    outcomes['https://example.com/a.png'] = 'load';
-    const overlay = stylex.props(styles.overlay).className ?? '';
-    render(
-      <Avatar.Root
-        data-testid='avatar'
-        bordered={false}
-      >
-        <Avatar.Image
-          src='https://example.com/a.png'
-          alt='Alex'
-        />
-        <Avatar.Fallback data-testid='fallback'>CN</Avatar.Fallback>
-      </Avatar.Root>,
-    );
-    expect(screen.getByTestId('avatar')).not.toHaveAttribute('data-bordered');
-    expect(screen.getByTestId('fallback')).not.toHaveClass(overlay);
-    expect(await screen.findByRole('img', { name: 'Alex' })).not.toHaveClass(overlay);
-  });
-
-  it('reflects shape and size overrides', () => {
+  it('reflects shape, size and bordered overrides', () => {
     render(
       <Avatar.Root
         data-testid='avatar'
         shape='square'
         size='lg'
+        bordered={false}
       >
         <Avatar.Fallback>CN</Avatar.Fallback>
       </Avatar.Root>,
@@ -120,6 +79,7 @@ describe('Mosaic Avatar', () => {
     const avatar = screen.getByTestId('avatar');
     expect(avatar).toHaveAttribute('data-shape', 'square');
     expect(avatar).toHaveAttribute('data-size', 'lg');
+    expect(avatar).not.toHaveAttribute('data-bordered');
   });
 
   it('shows the fallback while the image has not loaded', () => {

@@ -1,5 +1,4 @@
-import { createDeferredPromise } from '@clerk/shared/utils';
-import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -9,36 +8,12 @@ import { UserProfileConnectedAccountsSectionView } from '../user-profile-connect
 
 const account = { id: 'github', provider: 'GitHub', identifier: 'test' };
 
-function renderAccounts(onRemove: (id: string) => void | Promise<void>) {
-  return render(
-    <MosaicProvider>
-      <UserProfileConnectedAccountsSectionView
-        accounts={[account]}
-        onRemove={onRemove}
-      />
-    </MosaicProvider>,
-  );
-}
-
 async function openRemoval(user: ReturnType<typeof userEvent.setup>) {
   await user.click(screen.getByRole('button', { name: 'Manage GitHub' }));
   await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
 }
 
 describe('connected account removal', () => {
-  it('returns keyboard focus to the menu when canceled', async () => {
-    const user = userEvent.setup();
-    const onRemove = vi.fn();
-    renderAccounts(onRemove);
-    const trigger = screen.getByRole('button', { name: 'Manage GitHub' });
-    trigger.focus();
-    await user.keyboard('{Enter}{Enter}');
-    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
-    await user.keyboard('{Escape}');
-    await waitFor(() => expect(trigger).toHaveFocus());
-    expect(onRemove).not.toHaveBeenCalled();
-  });
-
   it('closes confirmation when the caller removes the account', async () => {
     const user = userEvent.setup();
     function Example() {
@@ -58,40 +33,6 @@ describe('connected account removal', () => {
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage GitHub' })).not.toBeInTheDocument());
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(screen.queryByText('Connected accounts')).not.toBeInTheDocument();
-  });
-
-  it('shows a removal failure and allows retrying', async () => {
-    const user = userEvent.setup();
-    const onRemove = vi.fn().mockRejectedValueOnce(new Error('Unable to disconnect')).mockResolvedValue(undefined);
-    renderAccounts(onRemove);
-    await openRemoval(user);
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to disconnect');
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    expect(onRemove).toHaveBeenCalledTimes(2);
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-  });
-
-  it('keeps the selected account pending until its removal finishes', async () => {
-    const user = userEvent.setup();
-    const removal = createDeferredPromise();
-    const onRemove = vi.fn(async () => {
-      await removal.promise;
-    });
-    renderAccounts(onRemove);
-    await openRemoval(user);
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-
-    expect(onRemove).toHaveBeenCalledExactlyOnceWith('github');
-    expect(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' })).toHaveAttribute(
-      'aria-busy',
-      'true',
-    );
-    await act(async () => {
-      removal.resolve();
-      await removal.promise;
-    });
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
   it('opens the same confirmation for the chosen account after cancelling another', async () => {

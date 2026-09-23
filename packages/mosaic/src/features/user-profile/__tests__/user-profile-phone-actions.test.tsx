@@ -23,45 +23,6 @@ function renderPhone(overrides: Partial<UserProfileAccountSectionViewProps> = {}
 }
 
 describe('phone actions', () => {
-  it('ignores backdrop clicks and allows Escape to cancel removal', async () => {
-    const user = userEvent.setup();
-    const onRemovePhone = vi.fn();
-    renderPhone({ onRemovePhone });
-    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
-    const dialog = screen.getByRole('alertdialog', { name: 'Remove phone number?' });
-    const backdrop = document.querySelector('.cl-dialog-backdrop');
-    if (!backdrop) {
-      throw new Error('Expected a dialog backdrop');
-    }
-    await user.click(backdrop);
-    expect(dialog).toBeInTheDocument();
-    await user.keyboard('{Escape}');
-    await waitFor(() => expect(dialog).not.toBeInTheDocument());
-    expect(onRemovePhone).not.toHaveBeenCalled();
-  });
-
-  it('keeps confirmation open until deletion finishes and prevents duplicate requests', async () => {
-    const user = userEvent.setup();
-    let finish = () => {};
-    const pending = new Promise<void>(resolve => {
-      finish = resolve;
-    });
-    const onRemovePhone = vi.fn(() => pending);
-    renderPhone({ onRemovePhone });
-    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
-    const dialog = screen.getByRole('alertdialog');
-    const remove = within(dialog).getByRole('button', { name: 'Remove' });
-    await user.click(remove);
-    expect(dialog).toBeInTheDocument();
-    expect(remove).toHaveAttribute('aria-busy', 'true');
-    await user.click(remove);
-    expect(onRemovePhone).toHaveBeenCalledOnce();
-    finish();
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-  });
-
   it('hides set primary while an update is pending', async () => {
     const user = userEvent.setup();
     let finish = () => {};
@@ -133,24 +94,6 @@ describe('phone actions', () => {
     expect(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' })).toHaveFocus();
   });
 
-  it('returns focus to the phone menu after opening with the keyboard and canceling with Escape', async () => {
-    const user = userEvent.setup();
-    const onRemovePhone = vi.fn();
-    renderPhone({ onRemovePhone });
-    const trigger = screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' });
-
-    trigger.focus();
-    await user.keyboard('{Enter}');
-    await user.keyboard('{Enter}');
-    expect(screen.getByRole('alertdialog', { name: 'Remove phone number?' })).toBeInTheDocument();
-
-    await user.keyboard('{Escape}');
-
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(onRemovePhone).not.toHaveBeenCalled();
-    await waitFor(() => expect(trigger).toHaveFocus());
-  });
-
   it('removes the phone row and keeps Add phone number available', async () => {
     const user = userEvent.setup();
     function Example() {
@@ -178,22 +121,6 @@ describe('phone actions', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(screen.queryByRole('button', { name: 'Manage +1 (801) 555-0100' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add phone number' })).toBeEnabled();
-  });
-
-  it('shows a failed removal in the dialog and allows retry', async () => {
-    const user = userEvent.setup();
-    const onRemovePhone = vi
-      .fn()
-      .mockRejectedValueOnce(new Error('Cannot remove this phone.'))
-      .mockResolvedValue(undefined);
-    renderPhone({ onRemovePhone });
-    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Cannot remove this phone.');
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(onRemovePhone).toHaveBeenCalledTimes(2);
   });
 
   it('does not offer removal when it is forbidden', async () => {

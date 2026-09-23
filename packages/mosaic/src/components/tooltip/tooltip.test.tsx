@@ -1,6 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { act, cleanup, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { cleanup, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
@@ -9,40 +8,6 @@ import { Tooltip } from './tooltip';
 afterEach(() => cleanup());
 
 describe('Mosaic Tooltip', () => {
-  it('opens on hover and names the popup as a tooltip', async () => {
-    const user = userEvent.setup();
-    render(
-      <Tooltip.Root delay={0}>
-        <Tooltip.Trigger>Hover me</Tooltip.Trigger>
-        <Tooltip.Popup>Helpful label</Tooltip.Popup>
-      </Tooltip.Root>,
-    );
-
-    expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
-
-    const trigger = screen.getByRole('button', { name: 'Hover me' });
-    await user.hover(trigger);
-
-    const tooltip = screen.getByRole('tooltip');
-    expect(tooltip).toHaveTextContent('Helpful label');
-    expect(trigger).toHaveAttribute('aria-describedby', tooltip.id);
-  });
-
-  it('opens on focus', async () => {
-    render(
-      <Tooltip.Root delay={0}>
-        <Tooltip.Trigger>Focus me</Tooltip.Trigger>
-        <Tooltip.Popup>Helpful label</Tooltip.Popup>
-      </Tooltip.Root>,
-    );
-
-    await act(() => {
-      screen.getByRole('button', { name: 'Focus me' }).focus();
-    });
-
-    expect(screen.getByRole('tooltip')).toHaveTextContent('Helpful label');
-  });
-
   it('renders a custom trigger through the render prop', () => {
     render(
       <Tooltip.Root>

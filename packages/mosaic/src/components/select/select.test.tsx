@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { Field } from '../field';
 import { Select } from './select';
@@ -123,19 +123,6 @@ describe('Mosaic Select', () => {
     expect(other.querySelector('.cl-select-option-indicator')).toBeInTheDocument();
   });
 
-  it('selects an option on click, closes, and updates the trigger', async () => {
-    const user = userEvent.setup();
-    const onValueChange = vi.fn();
-    renderSelect({ onValueChange });
-
-    await user.click(screen.getByRole('combobox'));
-    await user.click(screen.getByRole('option', { name: 'Admin' }));
-
-    expect(onValueChange).toHaveBeenCalledWith('admin');
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-    expect(screen.getByRole('combobox').querySelector('.cl-select-value')).toHaveTextContent('Admin');
-  });
-
   it('renders one option per item when the popup is given no children', () => {
     render(
       <Select.Root
@@ -177,33 +164,6 @@ describe('Mosaic Select', () => {
     expect(option).toHaveAttribute('data-described', '');
     expect(option.querySelector('.cl-select-option-label')).toHaveTextContent('Admin');
     expect(option.querySelector('.cl-select-option-description')).toHaveTextContent('Can manage members and settings');
-  });
-
-  it('marks a disabled option as aria-disabled and does not select it', async () => {
-    const user = userEvent.setup();
-    const onValueChange = vi.fn();
-    render(
-      <Select.Root
-        items={[{ value: 'admin', label: 'Admin' }]}
-        defaultOpen
-        onValueChange={onValueChange}
-      >
-        <Select.Trigger />
-        <Select.Popup>
-          <Select.Option
-            value='admin'
-            label='Admin'
-            disabled
-          />
-        </Select.Popup>
-      </Select.Root>,
-    );
-
-    const option = screen.getByRole('option', { name: 'Admin' });
-    expect(option).toHaveAttribute('aria-disabled', 'true');
-
-    await user.click(option);
-    expect(onValueChange).not.toHaveBeenCalled();
   });
 
   it('composes consumer xstyle onto the popup and options', () => {

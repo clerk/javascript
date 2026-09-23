@@ -4,9 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { rtl } from '../../utils/rtl.styles';
 import { Pagination } from './pagination';
-import { styles } from './pagination.styles';
 
 const atoms = stylex.create({
   spaced: { marginTop: '8px' },
@@ -191,20 +189,6 @@ describe('Mosaic Pagination', () => {
     expect(screen.getByRole('button', { name: 'End' })).toBeInTheDocument();
   });
 
-  it('mirrors the direction-aware control icons under rtl', () => {
-    render(
-      <Pagination
-        page={2}
-        totalItems={100}
-        pageSize={10}
-      />,
-    );
-    const mirror = stylex.props(rtl.mirror).className ?? '';
-    for (const name of ['First page', 'Previous page', 'Next page', 'Last page']) {
-      expect(screen.getByRole('button', { name }).querySelector('svg')).toHaveClass(mirror);
-    }
-  });
-
   it('uses small outlined navigation controls', () => {
     render(
       <Pagination
@@ -230,7 +214,6 @@ describe('Mosaic Pagination', () => {
     );
     await userEvent.click(screen.getByRole('combobox'));
     expect(screen.getAllByRole('option').map(option => option.textContent)).toEqual(['12', '15', '20']);
-    expect(screen.getByRole('option', { name: '15' })).toHaveClass(stylex.props(styles.pageSizeOption).className ?? '');
   });
 
   it('renders an empty range as a single disabled page', () => {

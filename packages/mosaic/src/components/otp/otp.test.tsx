@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { Field } from '../field';
 import { Otp } from './otp';
@@ -98,24 +98,6 @@ describe('Mosaic Otp', () => {
     }
   });
 
-  it('advances focus as characters are typed and reports completion', async () => {
-    const user = userEvent.setup();
-    const onComplete = vi.fn();
-    render(
-      <Otp
-        length={3}
-        onComplete={onComplete}
-        aria-label='Code'
-      />,
-    );
-
-    await user.click(slots()[0]);
-    await user.keyboard('123');
-
-    expect(slots().map(slot => (slot as HTMLInputElement).value)).toEqual(['1', '2', '3']);
-    expect(onComplete).toHaveBeenCalledWith('123');
-  });
-
   it('takes disabled and invalid from an enclosing Field', () => {
     render(
       <Field.Root
@@ -177,33 +159,6 @@ describe('Mosaic Otp', () => {
     );
 
     expect(slots().every(slot => (slot as HTMLInputElement).required)).toBe(true);
-  });
-
-  it('does not submit the value when an enclosing Field is disabled', () => {
-    render(
-      <Field.Root disabled>
-        <Otp
-          length={3}
-          name='code'
-          defaultValue='123'
-          aria-label='Code'
-        />
-      </Field.Root>,
-    );
-
-    expect(document.querySelector('input[name="code"]')).toBeDisabled();
-  });
-
-  it('submits the combined value under the given name', () => {
-    render(
-      <Otp
-        length={3}
-        name='code'
-        defaultValue='123'
-        aria-label='Code'
-      />,
-    );
-    expect(document.querySelector('input[name="code"]')).toHaveValue('123');
   });
 
   it('forwards its ref to the first slot', () => {

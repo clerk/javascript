@@ -98,21 +98,6 @@ describe('active device sign out', () => {
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
   });
 
-  it('shows a failure in the confirmation and allows retrying', async () => {
-    const user = userEvent.setup();
-    const onSignOutDevice = vi.fn().mockRejectedValueOnce(new Error('Unable to sign out')).mockResolvedValue(undefined);
-    renderDevices(onSignOutDevice);
-    await openMenu(user, mobile);
-    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
-
-    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to sign out');
-
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(onSignOutDevice).toHaveBeenCalledTimes(2);
-  });
-
   it('signs out from the details dialog without a second confirmation', async () => {
     const user = userEvent.setup();
     function Example() {

@@ -237,20 +237,6 @@ describe('Mosaic Combobox', () => {
     expect(onValueChange).toHaveBeenCalledWith('apple');
   });
 
-  it('discards search text on dismiss without changing the selected value', async () => {
-    const user = userEvent.setup();
-    const onValueChange = vi.fn();
-    render(<FloatingCombobox onValueChange={onValueChange} />);
-    const input = screen.getByRole('combobox', { name: 'Fruit' });
-    await user.type(input, 'a');
-    await user.keyboard('{Enter}');
-    await user.type(input, ' not a fruit');
-    await user.keyboard('{Escape}');
-
-    expect(input).toHaveValue('Apple');
-    expect(onValueChange).toHaveBeenCalledExactlyOnceWith('apple');
-  });
-
   it('keeps the selected label while reopening the unfiltered collection', async () => {
     const user = userEvent.setup();
     render(

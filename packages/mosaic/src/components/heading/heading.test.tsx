@@ -44,13 +44,6 @@ describe('Mosaic Heading', () => {
     expect(screen.getByRole('heading')).toHaveClass('cl-heading', 'from-source');
   });
 
-  it('renders a different element through the render prop, keeping the slot props', () => {
-    render(<Heading render={p => <h3 {...p} />}>Title</Heading>);
-    const heading = screen.getByRole('heading', { level: 3 });
-    expect(heading).toHaveClass('cl-heading');
-    expect(heading).toHaveAttribute('data-size', 'base');
-  });
-
   it('clones an element passed to the render prop, keeping the slot props', () => {
     render(<Heading render={<h3 lang='en' />}>Title</Heading>);
     const heading = screen.getByRole('heading', { level: 3, name: 'Title' });

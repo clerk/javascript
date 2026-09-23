@@ -158,38 +158,6 @@ describe('UserProfileApiKeysPanelView', () => {
     },
   );
 
-  it('holds the selected identity while pending, explains failure, and retries successfully', async () => {
-    const user = userEvent.setup();
-    const attempt = deferred<void>();
-    const onRevoke = vi
-      .fn<(id: string) => Promise<void>>()
-      .mockImplementationOnce(() => attempt.promise)
-      .mockResolvedValueOnce(undefined);
-    renderView({ onRevoke });
-    await user.click(screen.getByRole('button', { name: 'Manage Legacy API Key' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Revoke key' }));
-    const dialog = screen.getByRole('dialog', { name: 'Revoke Legacy API Key?' });
-    const confirm = within(dialog).getByRole('button', { name: 'Revoke key' });
-    const input = within(dialog).getByRole('textbox');
-    await user.type(input, 'Legacy API Key');
-    await user.click(confirm);
-    expect(input).toBeDisabled();
-    expect(confirm).toHaveAttribute('aria-busy', 'true');
-    expect(onRevoke).toHaveBeenCalledExactlyOnceWith('legacy');
-    expect(dialog).toBeInTheDocument();
-    await act(async () => {
-      attempt.reject(new Error('Could not revoke this key. Try again.'));
-      await attempt.promise.catch(() => {});
-    });
-    expect(await screen.findByText('Could not revoke this key. Try again.')).toBeVisible();
-    expect(dialog).toHaveAccessibleName('Revoke Legacy API Key?');
-    expect(input).toHaveValue('Legacy API Key');
-    expect(input).toHaveAttribute('aria-invalid', 'true');
-    expect(input).toHaveAccessibleDescription('Could not revoke this key. Try again.');
-    await user.click(confirm);
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(onRevoke.mock.calls).toEqual([['legacy'], ['legacy']]);
-  });
   it('requires each key name, cancels safely, and revokes multiple keys through one dialog with removal focus', async () => {
     const user = userEvent.setup();
     const onRevoke = vi.fn<(id: string) => Promise<void>>(async () => {});

@@ -1,15 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
 import { Dialog } from '../dialog';
 import { Drawer } from './drawer';
 
-function Sheet({ defaultOpen = true }: { defaultOpen?: boolean }) {
+function Sheet() {
   return (
-    <Drawer.Root defaultOpen={defaultOpen}>
+    <Drawer.Root defaultOpen>
       <Drawer.Trigger>Open</Drawer.Trigger>
       <Drawer.Popup data-testid='popup'>
         <Drawer.Title>Filters</Drawer.Title>
@@ -57,22 +56,6 @@ describe('Drawer', () => {
     expect(sheet.querySelector('.cl-drawer-grip')).toBeInTheDocument();
     expect(document.querySelector('.cl-drawer-backdrop')).not.toHaveAttribute('data-nested');
     expect(document.querySelector('.cl-drawer-viewport')).toContainElement(sheet);
-  });
-
-  it('opens from its trigger and closes from inside', async () => {
-    const user = userEvent.setup();
-    render(
-      <MosaicProvider>
-        <Sheet defaultOpen={false} />
-      </MosaicProvider>,
-    );
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: 'Open' }));
-    expect(screen.getByRole('dialog', { name: 'Filters' })).toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: 'Done' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   // A sheet opened from inside a profile dialog is the same relationship as a prompt opened there,

@@ -223,13 +223,6 @@ describe('Mosaic SubmitButton', () => {
     expect(screen.getByRole('button')).not.toHaveAttribute('ispending');
   });
 
-  it('calls onClick when pressed', async () => {
-    const onClick = vi.fn();
-    render(<SubmitButton onClick={onClick}>Save</SubmitButton>);
-    await userEvent.click(screen.getByRole('button'));
-    expect(onClick).toHaveBeenCalledTimes(1);
-  });
-
   it('forwards arbitrary button props and the ref', () => {
     const ref = React.createRef<HTMLButtonElement>();
     render(

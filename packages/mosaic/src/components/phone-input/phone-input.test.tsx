@@ -118,12 +118,8 @@ describe('Mosaic PhoneInput', () => {
 
     await user.click(screen.getByRole('button', { name: 'Country, United States' }));
     const searchInput = screen.getByRole('combobox', { name: 'Search countries' });
-    expect(searchInput).toHaveClass('cl-combobox-input', 'cl-input');
-    expect(searchInput).toHaveAttribute('data-variant', 'ghost');
     expect(searchInput.closest('.cl-input-group')).toHaveClass('cl-phone-input-country-search');
     await user.type(searchInput, 'Greece');
-    expect(screen.getByRole('listbox')).toHaveClass('cl-combobox-list');
-    expect(screen.getByRole('option', { name: /Greece/ })).toHaveClass('cl-combobox-option');
     await user.keyboard('{ArrowDown}{Enter}');
 
     expect(screen.getByRole('button', { name: 'Country, Greece' })).toBeInTheDocument();

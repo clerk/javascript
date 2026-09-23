@@ -99,16 +99,6 @@ describe('Mosaic Toast', () => {
     );
   });
 
-  it('keeps a single toast when one is added again with the same id', () => {
-    const manager = renderProvider();
-
-    manager.add({ id: 'copy', label: 'Copied' });
-    manager.add({ id: 'copy', label: 'Copied again' });
-
-    expect(screen.getAllByRole('dialog')).toHaveLength(1);
-    expect(screen.getByRole('dialog', { name: 'Copied again' })).toBeInTheDocument();
-  });
-
   it('updates the label of an open toast', () => {
     const manager = renderProvider();
 

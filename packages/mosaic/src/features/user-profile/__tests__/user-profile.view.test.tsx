@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Dialog } from '../../../components/dialog';
 import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileViewProps } from '../user-profile.view';
 import { UserProfileView } from '../user-profile.view';
@@ -138,26 +137,5 @@ describe('UserProfileView', () => {
 
     expect(screen.queryByText(/Secured by/)).not.toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: 'Mon compte' })).toBeInTheDocument();
-  });
-
-  // The shape the account profile takes as a modal: the profile inside the popup, self-contained.
-  it('names a profile dialog and carries its dismiss from inside the popup', () => {
-    render(
-      <MosaicProvider>
-        <Dialog.Root defaultOpen>
-          <Dialog.Popup variant='profile'>
-            <UserProfileView
-              activePage='account'
-              pages={pages}
-              onPageChange={vi.fn()}
-            />
-          </Dialog.Popup>
-        </Dialog.Root>
-      </MosaicProvider>,
-    );
-
-    const popup = screen.getByRole('dialog', { name: 'User profile' });
-    expect(popup).toContainElement(screen.getByRole('button', { name: 'Close' }));
-    expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
   });
 });

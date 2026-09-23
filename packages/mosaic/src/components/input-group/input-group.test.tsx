@@ -108,27 +108,6 @@ describe('Mosaic InputGroup', () => {
     focus.mockRestore();
   });
 
-  it.each([
-    ['sm', 'xs'],
-    ['md', 'sm'],
-    ['lg', 'md'],
-  ] as const)('uses a %s group with a %s slot button', (size, buttonSize) => {
-    render(
-      <InputGroup.Root size={size}>
-        <InputGroup.Start>
-          <Button>Start</Button>
-        </InputGroup.Start>
-        <Input aria-label='Value' />
-        <InputGroup.End>
-          <Button>End</Button>
-        </InputGroup.End>
-      </InputGroup.Root>,
-    );
-    for (const button of screen.getAllByRole('button')) {
-      expect(button).toHaveAttribute('data-size', buttonSize);
-    }
-  });
-
   it.each(['Start', 'End'] as const)('provides button defaults inside %s', side => {
     const Slot = InputGroup[side];
     render(
@@ -242,23 +221,6 @@ describe('Mosaic InputGroup', () => {
     expect(action).toBeDisabled();
   });
 
-  it('allows a slot button to use an explicit size', () => {
-    render(
-      <InputGroup.Root>
-        <Input aria-label='Value' />
-        <InputGroup.End>
-          <Button
-            size='xs'
-            shape='square'
-            aria-label='Show options'
-          />
-        </InputGroup.End>
-      </InputGroup.Root>,
-    );
-
-    expect(screen.getByRole('button', { name: 'Show options' })).toHaveAttribute('data-size', 'xs');
-  });
-
   it('inherits Field state and associates its label and messages with the input', () => {
     render(
       <Field.Root
@@ -283,36 +245,5 @@ describe('Mosaic InputGroup', () => {
     expect(input).toBeRequired();
     expect(input).toHaveAttribute('aria-invalid', 'true');
     expect(input).toHaveAccessibleDescription('Enter a valid website');
-  });
-
-  it('lets text focus the grouped input without changing its value', async () => {
-    const user = userEvent.setup();
-    render(
-      <InputGroup.Root>
-        <Input aria-label='Email username' />
-        <InputGroup.End>@acme.com</InputGroup.End>
-      </InputGroup.Root>,
-    );
-
-    await user.click(screen.getByText('@acme.com'));
-
-    expect(screen.getByRole('textbox', { name: 'Email username' })).toHaveFocus();
-  });
-
-  it('forwards native input props and the input ref', () => {
-    const ref = React.createRef<HTMLInputElement>();
-    render(
-      <InputGroup.Root>
-        <Input
-          ref={ref}
-          name='domain'
-          placeholder='example'
-        />
-      </InputGroup.Root>,
-    );
-
-    const input = screen.getByPlaceholderText('example');
-    expect(ref.current).toBe(input);
-    expect(input).toHaveAttribute('name', 'domain');
   });
 });

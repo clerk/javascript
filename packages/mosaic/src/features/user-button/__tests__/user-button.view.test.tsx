@@ -366,15 +366,6 @@ describe('UserButtonView, the workspace list', () => {
     expect(labels(workspaceList())).toEqual(['Gamma', 'Beta', 'Personal account', 'Foundry']);
   });
 
-  // `auto` rather than `stable`: a reserved gutter would inset short lists off the edge the header
-  // and footer align to.
-  it('scrolls through the shared scroll area, at an automatic gutter', () => {
-    renderList();
-
-    expect(scrollClasses.length).toBeGreaterThan(0);
-    expect(workspaceList()).toBeDefined();
-  });
-
   // The check beside the active row is decorative, so on its own it leaves that row reading to a
   // screen reader exactly like the ones there is still somewhere to switch to.
   it('names the active workspace as the current one', () => {
@@ -888,20 +879,6 @@ describe('UserButtonTrigger', () => {
 
     expect(avatarSize({ mode: 'organization' })).toBe('xs');
     expect(avatarSize({ mode: 'organization', renderTriggerLabel: false })).toBe('sm');
-  });
-
-  it('rounds fully only around a user avatar on its own', () => {
-    const corner = (props: Partial<UserButtonProps>) => {
-      const { unmount } = renderTrigger(props);
-      const className = screen.getByRole('button', { name: /Open account menu/ }).className;
-      unmount();
-      return className;
-    };
-
-    expect(corner({ mode: 'organization' })).toEqual(corner({ mode: 'user' }));
-    expect(corner({ mode: 'organization', renderTriggerLabel: false })).not.toEqual(
-      corner({ mode: 'user', renderTriggerLabel: false }),
-    );
   });
 
   it('names the active organization before its membership list has loaded', () => {

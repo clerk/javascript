@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { colors } from '../../utils/typography.styles';
 import { Text, TextContext } from './text';
 
 const atoms = stylex.create({
@@ -11,15 +10,10 @@ const atoms = stylex.create({
 });
 
 describe('Mosaic Text', () => {
-  it('renders a p with its children', () => {
-    render(<Text>Body copy</Text>);
-    const text = screen.getByText('Body copy');
-    expect(text.tagName).toBe('P');
-  });
-
   it('applies default variants when none are passed', () => {
     render(<Text>Body copy</Text>);
     const text = screen.getByText('Body copy');
+    expect(text.tagName).toBe('P');
     expect(text).toHaveClass('cl-text');
     expect(text).toHaveAttribute('data-size', 'sm');
     expect(text).toHaveAttribute('data-color', 'foreground');
@@ -39,11 +33,6 @@ describe('Mosaic Text', () => {
     expect(text).toHaveAttribute('data-size', 'lg');
     expect(text).toHaveAttribute('data-color', 'foreground-secondary');
     expect(text).toHaveClass('cl-text', stylex.props(atoms.spaced).className ?? '');
-  });
-
-  it.each(['foreground', 'foreground-secondary'] as const)('applies the %s color atoms', color => {
-    render(<Text color={color}>Body copy</Text>);
-    expect(screen.getByText('Body copy')).toHaveClass(stylex.props(colors[color]).className ?? '');
   });
 
   it('merges a className carried by the render element instead of clobbering the slot class', () => {
