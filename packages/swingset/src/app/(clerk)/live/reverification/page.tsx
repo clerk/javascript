@@ -108,7 +108,7 @@ function DialogHarness() {
   const nextStep: OuterStep | null =
     reverification.phase === 'retrying' && presentation === 'replace'
       ? 'finalizing'
-      : reverification.phase === 'active' || reverification.phase === 'retrying'
+      : reverification.status === 'ready' || reverification.status === 'unavailable'
         ? 'verify'
         : null;
 
@@ -179,7 +179,9 @@ function DialogHarness() {
           if (requestPending && reverification.phase === 'inactive') {
             return;
           }
-          reverification.onCancel?.();
+          if (reverification.status !== 'idle') {
+            reverification.onCancel?.();
+          }
           setOpen(false);
           if (reverification.phase !== 'retrying') {
             setErrorMessage(null);
