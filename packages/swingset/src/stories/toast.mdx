@@ -13,6 +13,8 @@ Transient, self-dismissing feedback for an action that has no surface of its own
 
 ### Anchored
 
+[`CopyButton`](/components/copy-button) copies a value and confirms it in a toast anchored to the button.
+
 <Story
   name='Anchored'
   storyModule={ToastStories}
@@ -37,15 +39,15 @@ Pass `positionerProps.anchor` to show the toast next to an element. Anchored toa
 <Button
   onClick={event =>
     manager.add({
-      id: 'copy',
-      description: 'Copied',
+      id: 'example',
+      description: 'Anchored toast',
       type: 'success',
       timeout: 1500,
       positionerProps: { anchor: event.currentTarget },
     })
   }
 >
-  Copy
+  Show anchored toast
 </Button>
 ```
 
