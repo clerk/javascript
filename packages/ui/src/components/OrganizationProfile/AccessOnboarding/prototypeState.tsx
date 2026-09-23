@@ -66,10 +66,11 @@ export type ProtoConnection = {
   logs: ProtoTestLog[];
 };
 
-export type ScenarioKey = 'work' | 'personal' | 'configured' | 'view_only' | 'sso_unavailable';
+export type ScenarioKey = 'work' | 'unverified' | 'personal' | 'configured' | 'view_only' | 'sso_unavailable';
 
 export const SCENARIO_LABELS: Record<ScenarioKey, string> = {
   work: 'New org, work email',
+  unverified: 'Domain added, nothing verified',
   personal: 'New org, personal email',
   configured: 'Configured org',
   view_only: 'Configured org, view only',
@@ -228,6 +229,20 @@ const scenario = (key: ScenarioKey): ProtoState => {
     // The two states the application owner's settings produce: a member
     // without the manage permission, and an org the owner has not allowed
     // SSO for. Both reuse another scenario's rows with the flags flipped.
+    // A second domain added by hand: no affiliation, no ownership, so every
+    // proof step is exercised from the start.
+    case 'unverified': {
+      const base = scenario('work');
+      return {
+        ...base,
+        scenario: key,
+        policies: [
+          ...base.policies.filter(policy => !policy.isCatchAll),
+          newPolicy('acme-labs.com', { id: 'pol_acme_labs_com', createdAt: '2026-09-22T09:30:00.000Z' }),
+          ...base.policies.filter(policy => policy.isCatchAll),
+        ],
+      };
+    }
     case 'view_only':
       return { ...scenario('configured'), scenario: key, access: { ...DEFAULT_ACCESS, canManage: false } };
     case 'sso_unavailable':

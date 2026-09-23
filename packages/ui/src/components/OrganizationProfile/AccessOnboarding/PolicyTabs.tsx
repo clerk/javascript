@@ -99,10 +99,13 @@ export const SsoTab = ({
 
   return (
     <Col sx={t => ({ gap: t.space.$5, paddingTop: t.space.$4, width: '100%' })}>
-      {connection && isConnected && policy.signIn !== 'sso' ? (
-        <WarningLine>
-          This connection is set up but not in use: sign in for this policy is Default. Activate it below to require it.
-        </WarningLine>
+      {!isLive ? (
+        <Text
+          colorScheme='secondary'
+          sx={smallSx}
+        >
+          {`Sign in for this policy is ${policy.signIn === 'sso' ? 'single sign-on' : policy.mfaRequired ? 'Default with multi-factor' : 'Default'} today. It changes to single sign-on only when you activate it below; leaving before then changes nothing.`}
+        </Text>
       ) : null}
 
       <Step

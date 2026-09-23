@@ -21,7 +21,6 @@ import type {
   ProtoEnrollment,
   ProtoNonDirectoryFallback,
   ProtoPolicy,
-  ProtoProvider,
   ProtoSignIn,
 } from './prototypeState';
 import {
@@ -31,16 +30,14 @@ import {
   formatReverification,
   needsOwnership,
   NON_DIRECTORY_FALLBACK_LABELS,
-  policiesForConnection,
   policyTarget,
   protoFieldId,
   protoKey,
-  PROVIDER_LABELS,
   REVERIFICATION_OPTIONS,
   simulateRequest,
   useAccessPrototype,
 } from './prototypeState';
-import { ProviderIcon, ProviderMark } from './ProviderMark';
+import { ProviderMark } from './ProviderMark';
 
 /*
  * The Configure policy page, built to the Sept 2026 Figma: Overview / SSO /
@@ -192,11 +189,7 @@ type Draft = {
   reverificationHours: number | null;
   enrollment: ProtoEnrollment;
   nonDirectoryFallback: ProtoNonDirectoryFallback;
-  /** An existing connection id, or `new:<provider>` for one to create. */
-  connection: string;
 };
-
-const NEW_PREFIX = 'new:';
 const REVERIFICATION_DEFAULT = 'default';
 
 const OverviewTab = withCardStateProvider(
@@ -210,7 +203,6 @@ const OverviewTab = withCardStateProvider(
       reverificationHours: policy.reverificationHours,
       enrollment: policy.enrollment,
       nonDirectoryFallback: policy.nonDirectoryFallback,
-      connection: policy.connectionId ?? `${NEW_PREFIX}saml_okta`,
     });
     const [isSaving, setIsSaving] = useState(false);
     const set = <K extends keyof Draft>(key: K, value: Draft[K]) =>
@@ -224,10 +216,9 @@ const OverviewTab = withCardStateProvider(
       const proof = policy.proofs[domain];
       return Boolean(proof && (proof.affiliation || proof.ownership === 'verified' || proof.ownership === 'waived'));
     });
-    const activeConnection =
-      policy.connectionId && draft.connection === policy.connectionId
-        ? connections.find(entry => entry.id === policy.connectionId && entry.status === 'active')
-        : undefined;
+    const activeConnection = policy.connectionId
+      ? connections.find(entry => entry.id === policy.connectionId && entry.status === 'active')
+      : undefined;
     const needsSetup =
       (draft.signIn === 'sso' && !activeConnection) ||
       (draft.enrollment === 'directory_sync' && !policy.directory?.configured);
@@ -238,28 +229,23 @@ const OverviewTab = withCardStateProvider(
       draft.mfaRequired !== policy.mfaRequired ||
       draft.reverificationHours !== policy.reverificationHours ||
       draft.enrollment !== policy.enrollment ||
-      draft.nonDirectoryFallback !== policy.nonDirectoryFallback ||
-      (draft.signIn === 'sso' && draft.connection !== policy.connectionId);
+      draft.nonDirectoryFallback !== policy.nonDirectoryFallback;
 
     const save = () => {
       setIsSaving(true);
       void simulateRequest().then(() => {
-        let connectionId = policy.connectionId;
-        if (draft.signIn === 'sso') {
-          if (draft.connection.startsWith(NEW_PREFIX)) {
-            connectionId = store.addConnection(draft.connection.slice(NEW_PREFIX.length) as ProtoProvider).id;
-          } else {
-            connectionId = draft.connection;
-          }
-        }
+        // Sign-in only becomes SSO through Activate on the SSO tab. Choosing
+        // SSO here saves everything else and keeps the current method, so a
+        // policy is never half-way: it is on its previous sign-in until the
+        // connection is live. Choosing Default always applies.
+        const signIn: ProtoSignIn = draft.signIn === 'default' ? 'default' : activeConnection ? 'sso' : policy.signIn;
         store.updatePolicy(policy.id, current => ({
           domains: draft.domains,
-          signIn: draft.signIn,
-          mfaRequired: draft.signIn === 'default' ? draft.mfaRequired : false,
+          signIn,
+          mfaRequired: signIn === 'default' ? draft.mfaRequired : false,
           reverificationHours: draft.reverificationHours,
           enrollment: draft.enrollment,
           nonDirectoryFallback: draft.nonDirectoryFallback,
-          connectionId: draft.signIn === 'sso' ? connectionId : undefined,
           // A domain added on this page starts with no proof.
           proofs: Object.fromEntries(
             draft.domains.map(domain => [
@@ -269,9 +255,8 @@ const OverviewTab = withCardStateProvider(
           ),
         }));
         setIsSaving(false);
-        // Save & continue: the next thing that needs setting up, else the table.
-        const connection = connectionId ? connections.find(entry => entry.id === connectionId) : undefined;
-        if (draft.signIn === 'sso' && connection?.status !== 'active') {
+        // Save & configure: the next thing that needs setting up, else the table.
+        if (draft.signIn === 'sso' && !activeConnection) {
           onContinue('sso');
         } else if (draft.enrollment === 'directory_sync' && !policy.directory?.configured) {
           onContinue('directory');
@@ -455,7 +440,6 @@ const SignInOptions = ({
   activeConnection?: ProtoConnection;
   onManageSso: () => void;
 }) => {
-  const { connections, policies } = useAccessPrototype();
   const canChooseSso = !isCatchAll && ssoAllowed;
   const field = useFormControl(protoFieldId('signIn'), draft.signIn, {
     type: 'radio',
@@ -472,25 +456,6 @@ const SignInOptions = ({
         : []),
     ],
   });
-
-  const connectionOptions = [
-    ...connections.map(connection => {
-      const used = policiesForConnection(connection.id, policies).flatMap(policy => policy.domains);
-      return {
-        value: connection.id,
-        label: connection.name,
-        provider: connection.provider,
-        hint: used.length ? `Used with ${used.join(', ')}` : 'Not used yet',
-      };
-    }),
-    ...(Object.keys(PROVIDER_LABELS) as ProtoProvider[]).map(provider => ({
-      value: `${NEW_PREFIX}${provider}`,
-      label: `New ${PROVIDER_LABELS[provider].label} connection`,
-      provider,
-      hint: '',
-    })),
-  ];
-  const selectedConnection = connectionOptions.find(option => option.value === draft.connection);
 
   return (
     <Col sx={t => ({ gap: t.space.$3 })}>
@@ -557,51 +522,12 @@ const SignInOptions = ({
           />
         </Flex>
       ) : draft.signIn === 'sso' ? (
-        <Col sx={t => ({ gap: t.space.$2, paddingInlineStart: t.space.$6 })}>
-          <Select
-            elementId='role'
-            options={connectionOptions}
-            value={draft.connection}
-            onChange={option => set('connection', option.value)}
-            renderOption={option => (
-              <Flex
-                align='center'
-                gap={2}
-                sx={t => ({ padding: `${t.space.$1x5} ${t.space.$3}` })}
-              >
-                <ProviderIcon provider={option.provider} />
-                <Col>
-                  <Text sx={smallSx}>{option.label}</Text>
-                  {option.hint ? (
-                    <Text
-                      colorScheme='secondary'
-                      sx={t => ({ fontSize: t.fontSizes.$xs })}
-                    >
-                      {option.hint}
-                    </Text>
-                  ) : null}
-                </Col>
-              </Flex>
-            )}
-          >
-            <SelectButton sx={t => ({ color: t.colors.$colorForeground, fontSize: t.fontSizes.$sm })}>
-              {selectedConnection ? (
-                <Flex
-                  as='span'
-                  align='center'
-                  gap={2}
-                >
-                  <ProviderIcon provider={selectedConnection.provider} />
-                  <Text as='span'>{selectedConnection.label}</Text>
-                </Flex>
-              ) : null}
-            </SelectButton>
-            <SelectOptionList />
-          </Select>
-          {!selectedConnection || draft.connection.startsWith(NEW_PREFIX) ? (
-            <WarningLine>You will configure your provider after saving this policy</WarningLine>
-          ) : null}
-        </Col>
+        <Text
+          colorScheme='secondary'
+          sx={t => ({ fontSize: t.fontSizes.$xs, paddingInlineStart: t.space.$6 })}
+        >
+          Sign in stays as it is today until single sign-on is set up and activated on the SSO tab.
+        </Text>
       ) : null}
 
       {!isCatchAll && !ssoAllowed ? (

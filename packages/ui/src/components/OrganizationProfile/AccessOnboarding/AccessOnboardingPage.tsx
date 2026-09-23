@@ -281,13 +281,13 @@ const PolicyRow = ({ policy }: { policy: ProtoPolicy }) => {
   const connection = connectionFor(policy, connections);
   const open = () => void openPolicy(navigate, policy.id);
 
-  const ssoPending = policy.signIn === 'sso' && connection?.status !== 'active';
+  // A connection chosen but not yet activated never changes the row: sign in
+  // stays what it was. The menu is the only trace, so the setup can be resumed.
+  const ssoInProgress = policy.signIn !== 'sso' && Boolean(connection) && connection?.status !== 'active';
   const actions: PropsOfComponent<typeof ThreeDotsMenu>['actions'] = [
     { label: protoKey('Edit policy'), onClick: open },
   ];
-  if (ssoPending) {
-    // An abandoned setup is a menu item, not a broken row: the table stays
-    // honest about what applies today (default sign-in) and how to finish.
+  if (ssoInProgress) {
     actions.push({ label: protoKey('Continue SSO setup'), onClick: () => void openPolicy(navigate, policy.id, 'sso') });
   }
   if (!policy.isCatchAll) {
@@ -337,13 +337,6 @@ const PolicyRow = ({ policy }: { policy: ProtoPolicy }) => {
             name={connection.name}
             status='broken'
           />
-        ) : ssoPending ? (
-          <Text
-            colorScheme='secondary'
-            sx={cellTextSx}
-          >
-            SSO · Setting up
-          </Text>
         ) : (
           <Text
             colorScheme='secondary'
