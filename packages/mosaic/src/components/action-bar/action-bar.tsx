@@ -12,10 +12,12 @@ import {
   useFloating,
   useMergeRefs,
 } from '@floating-ui/react';
+import { activeElement, contains, getDocument, getTarget } from '@floating-ui/react/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { mergeProps, useRender } from '../../primitives/utils';
+import { getComputedStyle } from '../../primitives/utils/dom';
 import type { MosaicComponentProps, XStyle } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
@@ -119,11 +121,11 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     if (!open || !barElement) {
       return;
     }
-    const doc = barElement.ownerDocument;
+    const doc = getDocument(barElement);
     const recordOrigin = (event: FocusEvent) => {
-      const target = event.target as HTMLElement;
+      const target = getTarget(event) as HTMLElement;
       if (
-        !barElement.contains(target) &&
+        !contains(barElement, target) &&
         target !== lastFocusedRef.current &&
         !target.hasAttribute('data-floating-ui-focus-guard')
       ) {
@@ -141,10 +143,11 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     }
     const target = returnFocus?.current ?? originRef.current;
     bar.inert = true;
-    if (target?.isConnected && !bar.contains(target)) {
+    const active = activeElement(getDocument(bar)) as HTMLElement | null;
+    if (target?.isConnected && !contains(bar, target)) {
       target.focus();
-    } else if (bar.contains(bar.ownerDocument.activeElement)) {
-      (bar.ownerDocument.activeElement as HTMLElement).blur();
+    } else if (contains(bar, active)) {
+      active?.blur();
     }
   }, [returnFocus]);
 
@@ -158,9 +161,9 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
       return;
     }
     setActiveIndex(0);
-    const doc = bar.ownerDocument;
-    const active = doc.activeElement as HTMLElement | null;
-    if (bar.contains(active)) {
+    const doc = getDocument(bar);
+    const active = activeElement(doc) as HTMLElement | null;
+    if (contains(bar, active)) {
       restoreFocus();
       return;
     }
@@ -169,10 +172,10 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
       return;
     }
     let frame = requestAnimationFrame(function watch() {
-      const current = doc.activeElement;
+      const current = activeElement(doc);
       if (current === active && active.isConnected) {
         frame = requestAnimationFrame(watch);
-      } else if (!current || current === doc.body || bar.contains(current)) {
+      } else if (!current || current === doc.body || contains(bar, current)) {
         restoreFocus();
       } else {
         bar.inert = true;
@@ -184,20 +187,16 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
   const handleFocus = (event: React.FocusEvent<HTMLDivElement>) => {
     onFocus?.(event);
     const bar = barRef.current;
-    const target = event.target as HTMLElement;
+    const target = getTarget(event.nativeEvent) as HTMLElement;
     lastFocusedRef.current = target;
-    if (!bar?.contains(target)) {
-      return;
-    }
-    if (!open) {
+    if (bar && !open && contains(bar, target)) {
       restoreFocus();
-      return;
     }
   };
 
   const handleItemsKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const bar = barRef.current;
-    if (!bar?.contains(event.target as Node)) {
+    if (!bar || !contains(bar, getTarget(event.nativeEvent) as Element)) {
       event.stopPropagation();
       return;
     }
