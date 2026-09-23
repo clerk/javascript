@@ -77,6 +77,8 @@ declare global {
   }
 }
 
+// `timezone` is create-only and FAPI ignores it on PATCH. Strip it from update bodies built from
+// reused create params (e.g. `upsert`) so it's clear an update can't change it.
 const withoutTimezone = <T extends object>(params: T): Omit<T, 'timezone'> => {
   const body = { ...params } as T & { timezone?: unknown };
   delete body.timezone;
@@ -201,7 +203,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   prepareVerification = (params: PrepareVerificationParams): Promise<this> => {
     debugLogger.debug('SignUp.prepareVerification', { id: this.id, strategy: params.strategy });
     return this._basePost({
-      body: withoutTimezone(params),
+      body: params,
       action: 'prepare_verification',
       coalesce: true,
     });
@@ -210,7 +212,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   attemptVerification = (params: AttemptVerificationParams): Promise<SignUpResource> => {
     debugLogger.debug('SignUp.attemptVerification', { id: this.id, strategy: params.strategy });
     return this._basePost({
-      body: withoutTimezone(params),
+      body: params,
       action: 'attempt_verification',
     });
   };
@@ -1249,7 +1251,7 @@ class SignUpFuture implements SignUpFutureResource {
 
   async ticket(params?: SignUpFutureTicketParams): Promise<{ error: ClerkError | null }> {
     const ticket = params?.ticket ?? getClerkQueryParam('__clerk_ticket');
-    return this.create({ ...withoutTimezone(params ?? {}), strategy: 'ticket', ticket: ticket ?? undefined });
+    return this.create({ ...params, strategy: 'ticket', ticket: ticket ?? undefined });
   }
 
   async finalize(params?: SignUpFutureFinalizeParams): Promise<{ error: ClerkError | null }> {

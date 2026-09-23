@@ -81,21 +81,6 @@ describe('SignUp', () => {
       await Promise.all([first, second]);
     });
 
-    it('does not forward timezone during legacy verification continuation', async () => {
-      const mockFetch = vi.fn().mockResolvedValue({
-        client: null,
-        response: { id: 'signup_123' },
-      });
-      BaseResource._fetch = mockFetch;
-
-      const signUp = new SignUp({ id: 'signup_123' } as any);
-      await signUp.prepareVerification({ strategy: 'email_code', timezone: 'Europe/Paris' } as any);
-      await signUp.attemptVerification({ strategy: 'email_code', code: '123456', timezone: 'Europe/Paris' } as any);
-
-      expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
-      expect(mockFetch.mock.calls[1][0].body).not.toHaveProperty('timezone');
-    });
-
     it('does not coalesce preparations for different verifications', async () => {
       const mockFetch = vi.fn().mockResolvedValue({
         client: null,
