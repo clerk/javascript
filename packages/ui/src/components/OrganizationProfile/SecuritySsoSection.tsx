@@ -1,9 +1,9 @@
-import type { EnterpriseConnectionResource, OAuthProvider } from '@clerk/shared/types';
+import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 
 import { ProfileSection } from '@/ui/elements/Section';
 import { Tooltip } from '@/ui/elements/Tooltip';
 
-import { ProviderIcon } from '../../common';
+import { getEnterpriseProviderIconId, ProviderIcon } from '../../common';
 import { useEnvironment } from '../../contexts';
 import {
   Badge,
@@ -132,7 +132,7 @@ const ConnectionRow = ({ connection, onOpenConnection }: ConnectionRowProps): JS
         sx={t => ({ minWidth: 0, flex: 1, gap: t.space.$2 })}
       >
         <ProviderIcon
-          id={connection.provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider}
+          id={getEnterpriseProviderIconId(connection.provider)}
           iconUrl={connection.logoPublicUrl?.trim() || undefined}
           name={connection.name}
           elementDescriptor={descriptors.organizationProfileSecuritySsoProviderIcon}

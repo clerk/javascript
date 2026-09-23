@@ -38,6 +38,37 @@ describe('SignUp', () => {
     expect(snapshot).toBeDefined();
   });
 
+  describe('__experimental_getEnterpriseConnections', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+    });
+
+    it('maps the enterprise connection provider and logo', async () => {
+      BaseResource._fetch = vi.fn().mockResolvedValue({
+        response: [
+          {
+            object: 'enterprise_connection',
+            id: 'ent_1',
+            name: 'Acme',
+            provider: 'saml_okta',
+            logo_public_url: 'https://img.clerk.com/acme.png',
+          },
+          { object: 'enterprise_connection', id: 'ent_2', name: 'Globex', provider: 'oauth_microsoft' },
+        ],
+      });
+
+      const signUp = new SignUp({ id: 'signup_123' } as any);
+      const connections = await signUp.__experimental_getEnterpriseConnections();
+
+      expect(
+        connections.map(({ id, name, provider, logoPublicUrl }) => ({ id, name, provider, logoPublicUrl })),
+      ).toEqual([
+        { id: 'ent_1', name: 'Acme', provider: 'saml_okta', logoPublicUrl: 'https://img.clerk.com/acme.png' },
+        { id: 'ent_2', name: 'Globex', provider: 'oauth_microsoft', logoPublicUrl: null },
+      ]);
+    });
+  });
+
   describe('prepareVerification', () => {
     afterEach(() => {
       vi.clearAllMocks();

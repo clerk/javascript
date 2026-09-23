@@ -1251,6 +1251,8 @@ class SignUpFuture implements SignUpFutureResource {
 class SignUpEnterpriseConnection extends BaseResource implements SignUpEnterpriseConnectionResource {
   id!: string;
   name!: string;
+  provider!: string;
+  logoPublicUrl: string | null = null;
 
   constructor(data: SignUpEnterpriseConnectionJSON) {
     super();
@@ -1261,6 +1263,8 @@ class SignUpEnterpriseConnection extends BaseResource implements SignUpEnterpris
     if (data) {
       this.id = data.id;
       this.name = data.name;
+      this.provider = data.provider;
+      this.logoPublicUrl = data.logo_public_url ?? null;
     }
 
     return this;

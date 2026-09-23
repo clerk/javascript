@@ -139,4 +139,6 @@ export interface SignUpResource extends ClerkResource {
 export interface SignUpEnterpriseConnectionResource extends ClerkResource {
   id: string;
   name: string;
+  provider: string;
+  logoPublicUrl: string | null;
 }

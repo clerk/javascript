@@ -99,6 +99,8 @@ export const SignInFactorOneSSOBypass = (props: SignInFactorOneSSOBypassProps) =
     const enterpriseConnections = signIn.supportedFirstFactors.map(factor => ({
       id: factor.enterpriseConnectionId,
       name: factor.enterpriseConnectionName,
+      logoPublicUrl: factor.enterpriseConnectionLogoPublicUrl,
+      provider: factor.enterpriseConnectionProvider,
     }));
 
     return (

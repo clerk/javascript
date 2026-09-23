@@ -1688,8 +1688,8 @@ export const enUS: LocalizationResource = {
       title: 'Check your email',
     },
     enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
+      subtitle: 'Select an enterprise account to continue.',
+      title: 'Choose an account',
     },
     enterpriseSSO: {
       formButtonPrimary: 'Continue with SSO',
@@ -1843,8 +1843,8 @@ export const enUS: LocalizationResource = {
       },
     },
     enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
+      subtitle: 'Select an enterprise account to continue.',
+      title: 'Choose an account',
     },
     legalConsent: {
       checkbox: {
