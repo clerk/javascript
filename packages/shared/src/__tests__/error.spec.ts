@@ -16,14 +16,21 @@ describe('ErrorThrower', () => {
 
   it('throws the correct error message and interpolates pkg and known parameters', () => {
     expect(() => errorThrower.throwInvalidPublishableKeyError({ key: 'whatever' })).toThrow(
-      '@clerk/test-package: The publishableKey passed to Clerk is invalid (key=whatever, expected format: pk_test_... or pk_live_...). To create a Clerk application with valid keys, in your terminal run:\n\nnpx clerk@latest init',
+      '@clerk/test-package: The publishableKey passed to Clerk is invalid (key=whatever, expected format: pk_test_... or pk_live_...).\n\nTo create a new Clerk app, run:\nnpx clerk@latest init',
     );
   });
 
   it('throws the correct error message and interpolates pkg if no parameters are provided', () => {
     expect(() => errorThrower.throwMissingPublishableKeyError()).toThrow(
-      '@clerk/test-package: Missing publishableKey. To set up Clerk for this project, in your terminal run:\n\nnpx clerk@latest init',
+      '@clerk/test-package: Clerk keys are missing from your environment.\n\nTo create a new Clerk app, run:\nnpx clerk@latest init',
     );
+  });
+
+  it('names the missing key so the secret key error is distinguishable from the publishable key error', () => {
+    expect(() => errorThrower.throwMissingSecretKeyError()).toThrow(
+      '@clerk/test-package: Missing secretKey.\n\nTo use an existing Clerk app, run:\nnpx clerk@latest link\nnpx clerk@latest env pull',
+    );
+    expect(() => errorThrower.throwMissingSecretKeyError()).not.toThrow(/npx clerk@latest init/);
   });
 
   it('throws a custom error message and interpolates pkg and known parameters', () => {
