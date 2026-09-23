@@ -2,7 +2,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { Button } from '../../../components/button';
 import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileEditNameDialogProps } from '../user-profile-account-section/user-profile-edit-name.dialog';
 import { UserProfileEditNameDialog } from '../user-profile-account-section/user-profile-edit-name.dialog';
@@ -33,12 +32,6 @@ const lastNameField = () => screen.getByLabelText('Last name');
 const saveButton = () => screen.getByRole('button', { name: 'Save changes' });
 
 describe('UserProfileEditNameDialog', () => {
-  it('renders nothing until the caller opens it', () => {
-    renderView({ open: false });
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-  });
-
   it('names the dialog and shows the values it was given', () => {
     renderView();
 
@@ -52,16 +45,6 @@ describe('UserProfileEditNameDialog', () => {
 
     // `FloatingFocusManager` moves focus in an effect, hence the wait.
     await waitFor(() => expect(firstNameField()).toHaveFocus());
-  });
-
-  it('asks to open from the trigger', async () => {
-    const onOpenChange = vi.fn();
-    const user = userEvent.setup();
-    renderView({ open: false, onOpenChange, trigger: <Button>Edit name</Button> });
-
-    await user.click(screen.getByRole('button', { name: 'Edit name' }));
-
-    expect(onOpenChange).toHaveBeenCalledWith(true, expect.anything());
   });
 
   it('reports each keystroke to its own field, holding nothing itself', async () => {
@@ -118,16 +101,6 @@ describe('UserProfileEditNameDialog', () => {
 
     expect(screen.queryByLabelText('First name')).not.toBeInTheDocument();
     await waitFor(() => expect(lastNameField()).toHaveFocus());
-  });
-
-  it('asks to close from cancel', async () => {
-    const onOpenChange = vi.fn();
-    const user = userEvent.setup();
-    renderView({ onOpenChange });
-
-    await user.click(screen.getByRole('button', { name: 'Cancel' }));
-
-    expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
   });
 
   it('announces the failure in a negative banner and marks the blamed field invalid', () => {

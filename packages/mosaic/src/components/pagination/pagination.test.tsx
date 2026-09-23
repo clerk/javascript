@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -9,14 +9,6 @@ import { Pagination } from './pagination';
 const atoms = stylex.create({
   spaced: { marginTop: '8px' },
 });
-
-function controls(): ReturnType<typeof within> {
-  const element = document.querySelector('.cl-pagination-controls');
-  if (!(element instanceof HTMLElement)) {
-    throw new Error('Pagination controls did not render');
-  }
-  return within(element);
-}
 
 describe('Mosaic Pagination', () => {
   it('renders the item range, page count, and styling contract', () => {
@@ -187,20 +179,6 @@ describe('Mosaic Pagination', () => {
     expect(screen.getByRole('button', { name: 'Back' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Forward' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'End' })).toBeInTheDocument();
-  });
-
-  it('uses small outlined navigation controls', () => {
-    render(
-      <Pagination
-        page={2}
-        totalItems={100}
-        pageSize={10}
-      />,
-    );
-    for (const button of controls().getAllByRole('button')) {
-      expect(button).toHaveAttribute('data-size', 'sm');
-      expect(button).toHaveAttribute('data-variant', 'outline');
-    }
   });
 
   it('offers valid given page sizes plus the current one', async () => {

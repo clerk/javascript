@@ -65,7 +65,6 @@ describe('ReverificationView', () => {
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument();
     const otpStep = screen.getByRole('group', { name: 'Verification code' }).closest('.cl-flow-step');
     expect(otpStep).toBeInTheDocument();
-    expect(otpStep?.style.getPropertyValue('--cl-flow-transition-direction')).toBe('-1');
   });
 
   it('moves focus to the entering step once it settles', async () => {

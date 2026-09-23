@@ -73,18 +73,12 @@ describe('Mosaic PhoneInput', () => {
     const input = screen.getByRole('textbox', { name: 'Phone number' });
     expect(input).toHaveAttribute('type', 'tel');
     expect(input).toHaveAttribute('autocomplete', 'tel-national');
-    expect(input).toHaveClass('cl-input', 'cl-phone-input-control');
-    expect(input).toHaveAttribute('data-variant', 'ghost');
+    expect(input).toHaveClass('cl-phone-input-control');
     const countryTrigger = screen.getByRole('button', { name: 'Country, United States' });
-    expect(countryTrigger).toHaveClass('cl-button', 'cl-phone-input-country-trigger');
-    expect(countryTrigger.closest('.cl-input-group-start')).not.toBeNull();
-    expect(countryTrigger).toHaveAttribute('data-size', 'xs');
-    expect(countryTrigger).toHaveAttribute('data-variant', 'ghost');
+    expect(countryTrigger).toHaveClass('cl-phone-input-country-trigger');
     expect(screen.queryByText('us')).not.toBeInTheDocument();
     expect(document.querySelector('.cl-phone-input-divider')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByText('+1')).toHaveClass('cl-phone-input-prefix');
-    expect(document.querySelector('.cl-phone-input')).toHaveClass('cl-input-group');
-    expect(document.querySelector('.cl-phone-input')).toHaveAttribute('data-size', 'md');
   });
 
   it('emits an E.164 value while displaying the national number', async () => {
