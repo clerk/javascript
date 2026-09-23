@@ -128,12 +128,6 @@ import {
   Overrides as LocalizationOverrides,
   PluralRules as LocalizationPluralRules,
 } from '../stories/localization.stories';
-import {
-  Empty as MembersTableTabEmpty,
-  Legacy as MembersTableTabLegacy,
-  meta as membersTableTabMeta,
-  Proposed as MembersTableTabProposed,
-} from '../stories/members-table-tab.stories';
 import { Default as MenuComponentDefault, meta as menuComponentMeta } from '../stories/menu.component.stories';
 import { meta as menuMeta } from '../stories/menu.stories';
 import {
@@ -158,6 +152,12 @@ import {
   meta as organizationProfileGeneralPanelMeta,
   ReadOnly as OrganizationProfileGeneralPanelReadOnly,
 } from '../stories/organization-profile-general-panel.stories';
+import {
+  Empty as OrganizationProfileMembersPanelEmpty,
+  Legacy as OrganizationProfileMembersPanelLegacy,
+  meta as organizationProfileMembersPanelMeta,
+  Proposed as OrganizationProfileMembersPanelProposed,
+} from '../stories/organization-profile-members-panel.stories';
 import {
   Default as OrganizationProfileWorkspaceSectionDefault,
   meta as organizationProfileWorkspaceSectionMeta,
@@ -868,11 +868,11 @@ const organizationProfileApiKeysPanelModule: StoryModule = {
   Empty: OrganizationProfileApiKeysPanelEmpty,
 };
 
-const membersTableTabModule: StoryModule = {
-  meta: membersTableTabMeta,
-  Legacy: MembersTableTabLegacy,
-  Proposed: MembersTableTabProposed,
-  Empty: MembersTableTabEmpty,
+const organizationProfileMembersPanelModule: StoryModule = {
+  meta: organizationProfileMembersPanelMeta,
+  Legacy: OrganizationProfileMembersPanelLegacy,
+  Proposed: OrganizationProfileMembersPanelProposed,
+  Empty: OrganizationProfileMembersPanelEmpty,
 };
 
 export const registry: StoryModule[] = [
@@ -903,7 +903,7 @@ export const registry: StoryModule[] = [
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
-  membersTableTabModule,
+  organizationProfileMembersPanelModule,
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
   organizationProfileDangerSectionModule,

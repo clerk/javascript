@@ -1,12 +1,10 @@
-import * as Stories from './members-table-tab.stories';
+import * as Stories from './organization-profile-members-panel.stories';
 
-# MembersTableTab
+# OrganizationProfileMembersPanel
 
-A controlled members table for the organization profile’s Members tab. The caller supplies the current page, role labels, loading state, and action callbacks.
+The organization profile’s Members panel owns the page title and tab navigation. These examples show its Members tab with a controlled table.
 
 Removing a member opens a confirmation dialog. The dialog awaits the action callback and keeps failures visible. After a successful removal, focus moves to a surviving row action or a toolbar control.
-
-Render this view inside the organization members panel’s tab panel; the parent owns tab navigation.
 
 ## Example
 
@@ -15,6 +13,8 @@ Render this view inside the organization members panel’s tab panel; the parent
 The baseline table shows the user, joined date, role, and optional row actions.
 
 <Story name='Legacy' storyModule={Stories} composition={[
+  { name: 'Profile', href: '/components/profile', layer: 'Components' },
+  { name: 'Tabs', href: '/components/tabs', layer: 'Components' },
   { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
   { name: 'Table', href: '/components/table', layer: 'Components' },
   { name: 'InputGroup', href: '/components/input-group', layer: 'Components' },
