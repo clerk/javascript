@@ -541,7 +541,7 @@ describe('popup surface', () => {
 });
 
 // The sheet is the compact band's bottom anchor: the geometry that used to ride on the `prompt`
-// size, now asked for by name. Above the band it resolves back to a centred card, so what the
+// size, now asked for by name. Above the band it resolves back to a centered card, so what the
 // atoms pin is that the placement reaches the popup and the track at all.
 describe('compactPlacement', () => {
   // Written out rather than imported: an atom is named from its property, value AND condition, so
@@ -565,7 +565,7 @@ describe('compactPlacement', () => {
       </Dialog.Root>,
     );
 
-  it('centres by default, anchoring nothing to the bottom edge', () => {
+  it('centers by default, anchoring nothing to the bottom edge', () => {
     renderPlacement('center');
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));

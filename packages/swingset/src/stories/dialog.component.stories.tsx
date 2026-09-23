@@ -152,7 +152,7 @@ const addEmailTrigger = (props: RenderProps) => <Button {...props}>Add email add
 
 /**
  * `compactPlacement='sheet'` bottom-anchors the surface in the compact band — the dialog viewport
- * under `48rem` — and slides it up from the edge, instead of centring it. Above the band nothing
+ * under `48rem` — and slides it up from the edge, instead of centering it. Above the band nothing
  * changes, so narrow the window to see it.
  *
  * For a dialog that asks one thing and returns: a confirmation, or a single-field form like this

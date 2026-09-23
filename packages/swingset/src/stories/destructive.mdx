@@ -17,9 +17,9 @@ import * as Stories from './destructive.stories';
 
 ## Usage
 
-The block holds one thing: the phrase the user types. Nothing outside the dialog can use a half-typed string, so keeping it inside removes the keystroke plumbing a caller would otherwise write.
+A confirmation for a destructive action that warrants making the user type. Deleting an account, deleting a project, revoking an API key. For actions that do not warrant typing, use [Confirmation](/blocks/confirmation).
 
-Everything that decides what the dialog does next belongs to the caller. `open` closes it, `isDeleting` marks it busy, `errorMessage` explains a failure.
+The block holds the typed phrase and compares it to `confirmationValue`. In the controlled form, everything that decides what the dialog does next belongs to the caller. `open` closes it, `isDeleting` marks it busy, `errorMessage` explains a failure.
 
 ```tsx
 import { Destructive } from '@clerk/mosaic/blocks/destructive';
@@ -58,26 +58,74 @@ A failed attempt leaves the dialog up. Pass the sentence the user should read as
   storyModule={Stories}
 />
 
+## One block, many rows
+
+A table of projects has a Delete in every row. Create a handle, mount the block once after the table, and open it from any row with the project it is about. The copy props take a function of that payload, and `onDelete` receives it. The block owns `open`, the pending state, and the error: a resolved promise closes it, a rejected one keeps it open showing why.
+
+The user must type `confirmationValue` before the action can run. The typed phrase clears when the dialog closes.
+
+```tsx
+const deleteProject = Destructive.createHandle<Project>();
+
+<Menu.Item color='negative' label='Delete project' onClick={() => deleteProject.open(project)}>
+  <Menu.Label>Delete project</Menu.Label>
+</Menu.Item>
+
+<Destructive
+  handle={deleteProject}
+  title={project => `Delete ${project.name}?`}
+  description='All project data will be permanently deleted.'
+  fieldLabel='Type the project name to continue'
+  confirmationValue={project => project.name}
+  actionLabel='Delete project'
+  onDelete={project => api.deleteProject(project.id)}
+/>
+```
+
+Opened from a menu item, focus returns to that menu's trigger when the dialog closes. If deletion removes the trigger, pass `finalFocus` a ref to an element that remains on the page.
+
+<Story
+  name='WithHandle'
+  storyModule={Stories}
+/>
+
 ## Props
 
-| Prop                | Type                      | Description                                                                                                       |
-| ------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `open`              | `boolean`                 | Whether the confirmation is showing. Controlled, the way any dialog is.                                           |
-| `onOpenChange`      | `(open: boolean) => void` | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop.                                    |
-| `trigger`           | `ReactNode`               | Optional. The button that asks to open the dialog.                                                                |
-| `title`             | `string`                  | Names what is about to be destroyed.                                                                              |
-| `description`       | `string`                  | Spells out what is lost. Sits above the confirmation field.                                                       |
-| `fieldLabel`        | `string`                  | Labels the confirmation field.                                                                                    |
-| `confirmationValue` | `string`                  | The phrase the user has to type back. Also the field's placeholder.                                               |
-| `actionLabel`       | `string`                  | The destructive button's label.                                                                                   |
-| `cancelLabel`       | `string`                  | Optional. Defaults to `Cancel`.                                                                                   |
-| `onDelete`          | `() => void`              | Asks the caller to run the action. Reached by the button or by Enter in the field, once the typed phrase matches. |
-| `isDeleting`        | `boolean`                 | Optional. Disables the field and renders the action pending.                                                      |
-| `errorMessage`      | `string`                  | Optional. Marks the field invalid and renders under it.                                                           |
+Controlled:
+
+| Prop                | Type                      | Default      | Description                                                                      |
+| ------------------- | ------------------------- | ------------ | -------------------------------------------------------------------------------- |
+| `open`              | `boolean`                 | — (required) | Whether the confirmation is showing. Controlled, the way any dialog is.          |
+| `onOpenChange`      | `(open: boolean) => void` | — (required) | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop.   |
+| `trigger`           | `ReactNode`               | —            | The button that asks to open the dialog.                                         |
+| `title`             | `string`                  | — (required) | Names what is about to happen.                                                   |
+| `description`       | `ReactNode`               | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                 |
+| `fieldLabel`        | `string`                  | — (required) | Labels the confirmation field.                                                   |
+| `confirmationValue` | `string`                  | — (required) | The phrase the user has to type back. Also the field's placeholder.              |
+| `actionLabel`       | `string`                  | — (required) | The confirming button's label.                                                   |
+| `cancelLabel`       | `string`                  | `'Cancel'`   | The cancel button's label.                                                       |
+| `finalFocus`        | `DialogFocusTarget`       | the trigger  | Where focus returns on close, for a removal that unmounts the trigger.           |
+| `onDelete`          | `() => void`              | — (required) | Asks the caller to run the action, once the typed phrase matches.                |
+| `isDeleting`        | `boolean`                 | `false`      | Disables the field, renders the action pending, and ignores further submissions. |
+| `errorMessage`      | `string`                  | —            | Marks the field invalid and renders under it.                                    |
+
+With a handle:
+
+| Prop                | Type                                           | Default      | Description                                                                            |
+| ------------------- | ---------------------------------------------- | ------------ | -------------------------------------------------------------------------------------- |
+| `handle`            | `DestructiveHandle<Payload>`                   | — (required) | From `Destructive.createHandle<Payload>()`. `handle.open(payload)` opens the block.    |
+| `title`             | `string \| (payload: Payload) => string`       | — (required) | Names what is about to happen.                                                         |
+| `description`       | `ReactNode \| (payload: Payload) => ReactNode` | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                       |
+| `fieldLabel`        | `string \| (payload: Payload) => string`       | — (required) | Labels the confirmation field.                                                         |
+| `confirmationValue` | `string \| (payload: Payload) => string`       | — (required) | The phrase the user has to type back. Also the field's placeholder.                    |
+| `actionLabel`       | `string \| (payload: Payload) => string`       | — (required) | The confirming button's label.                                                         |
+| `cancelLabel`       | `string`                                       | `'Cancel'`   | The cancel button's label.                                                             |
+| `finalFocus`        | `DialogFocusTarget`                            | the trigger  | Where focus returns on close, for a removal that unmounts the trigger.                 |
+| `onDelete`          | `(payload: Payload) => Promise<void> \| void`  | — (required) | Runs the action. Resolve to close; reject with an `Error` to keep it open showing why. |
 
 ## Driving it from a machine
 
-`UserProfileDeleteSection` wires the same block to a state machine rather than to `useState`. The machine's state maps onto the same props:
+A section that wires the block to a state machine maps the machine's state onto the same props:
 
 ```tsx
 <Destructive
