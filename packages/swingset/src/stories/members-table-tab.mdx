@@ -4,6 +4,8 @@ import * as Stories from './members-table-tab.stories';
 
 A controlled members table for the organization profile’s Members tab. The caller supplies the current page, role labels, loading state, and action callbacks.
 
+Render this view inside the organization members panel’s tab panel; the parent owns tab navigation.
+
 ## Example
 
 ### Legacy
@@ -11,7 +13,6 @@ A controlled members table for the organization profile’s Members tab. The cal
 The baseline table shows the user, joined date, role, and optional row actions.
 
 <Story name='Legacy' storyModule={Stories} composition={[
-  { name: 'Tabs', href: '/components/tabs', layer: 'Components' },
   { name: 'Table', href: '/components/table', layer: 'Components' },
   { name: 'InputGroup', href: '/components/input-group', layer: 'Components' },
   { name: 'Pagination', href: '/components/pagination', layer: 'Components' },
