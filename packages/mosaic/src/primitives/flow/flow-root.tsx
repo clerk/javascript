@@ -15,8 +15,9 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
   const { render, value, direction = 1, ...otherProps } = props;
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [activeStep, setActiveStep] = useState<HTMLElement | null>(null);
-  const [activeStepHeight, setActiveStepHeight] = useState<number>();
+  const [measured, setMeasured] = useState(false);
   const [initial, setInitial] = useState(true);
+  const [exitingSteps, setExitingSteps] = useState<ReadonlySet<HTMLElement>>(() => new Set());
 
   const registerActiveStep = useCallback((element: HTMLElement) => {
     setActiveStep(element);
@@ -26,26 +27,52 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
     setActiveStep(current => (current === element ? null : current));
   }, []);
 
+  const registerExitingStep = useCallback((element: HTMLElement) => {
+    setExitingSteps(current => new Set(current).add(element));
+  }, []);
+
+  const unregisterExitingStep = useCallback((element: HTMLElement) => {
+    setExitingSteps(current => {
+      if (!current.has(element)) {
+        return current;
+      }
+      const next = new Set(current);
+      next.delete(element);
+      return next;
+    });
+  }, []);
+
   useLayoutEffect(() => {
     if (!activeStep) {
       return;
     }
 
-    return autoUpdate(activeStep, () => setActiveStepHeight(getDimensions(activeStep).height));
+    return autoUpdate(activeStep, () => {
+      rootRef.current?.style.setProperty('--cl-flow-step-height', `${getDimensions(activeStep).height}px`);
+      setMeasured(true);
+    });
   }, [activeStep]);
 
   useLayoutEffect(() => {
-    if (activeStepHeight === undefined || !initial) {
+    if (!measured || !initial) {
       return;
     }
 
     const frame = requestAnimationFrame(() => setInitial(false));
     return () => cancelAnimationFrame(frame);
-  }, [activeStepHeight, initial]);
+  }, [measured, initial]);
 
   const contextValue = useMemo<FlowContextValue>(
-    () => ({ value, direction, rootRef, registerActiveStep, unregisterActiveStep }),
-    [value, direction, registerActiveStep, unregisterActiveStep],
+    () => ({
+      value,
+      direction,
+      rootRef,
+      registerActiveStep,
+      unregisterActiveStep,
+      registerExitingStep,
+      unregisterExitingStep,
+    }),
+    [value, direction, registerActiveStep, unregisterActiveStep, registerExitingStep, unregisterExitingStep],
   );
 
   const element = useRender({
@@ -55,9 +82,7 @@ export const FlowRoot = React.forwardRef<HTMLDivElement, FlowRootProps>(function
     props: mergeProps<'div'>(
       {
         'data-initial': initial ? '' : undefined,
-        style: {
-          ['--cl-flow-step-height' as string]: activeStepHeight === undefined ? undefined : `${activeStepHeight}px`,
-        },
+        'data-transitioning': exitingSteps.size > 0 ? '' : undefined,
       },
       otherProps,
     ),
