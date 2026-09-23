@@ -113,15 +113,16 @@ function submitOrStay<TValues extends object>(
   return { target: 'submitting', context: { ...patch, submitQueued: false, error: undefined } };
 }
 
-function toFormError<TValues extends object>(cause: unknown, fallbackMessage: string): FormError<TValues> {
+function toFormError<TValues extends object>(cause: unknown, context: FormContext<TValues>): FormError<TValues> {
   const error: FormError<TValues> =
     cause instanceof FormSubmitError
       ? { message: cause.banner, fields: cause.fields }
       : cause instanceof Error
         ? { message: cause.message }
         : {};
-  const visible = (error.message ?? '') !== '' || keysOf(error.fields ?? {}).length > 0;
-  return visible ? error : { ...error, message: fallbackMessage };
+  const visible =
+    (error.message ?? '') !== '' || keysOf(context.values).some(name => (error.fields?.[name] ?? '') !== '');
+  return visible ? error : { ...error, message: context.fallbackMessage };
 }
 
 function withoutField<TValues extends object>(
@@ -204,7 +205,7 @@ export function createFormMachine<TValues extends object>(deps: FormDeps<TValues
           onDone: 'editing',
           onError: {
             target: 'editing',
-            actions: assign((ctx, e) => ({ error: toFormError(e.error, ctx.fallbackMessage) })),
+            actions: assign((ctx, e) => ({ error: toFormError(e.error, ctx) })),
           },
         }),
       },

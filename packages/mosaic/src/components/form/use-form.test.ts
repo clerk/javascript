@@ -161,6 +161,18 @@ describe('useForm', () => {
       await flush();
     });
     expect(blank.result.current.error).toBe('Something went wrong. Please try again.');
+
+    const unknownField = renderHook(() =>
+      useForm({
+        initialValues: { username: '' },
+        onSubmit: () => Promise.reject(new FormSubmitError({ fields: { server: 'Nope' } })),
+      }),
+    );
+    await act(async () => {
+      unknownField.result.current.submit();
+      await flush();
+    });
+    expect(unknownField.result.current.error).toBe('Something went wrong. Please try again.');
   });
 
   it('recovers from an onSubmit that throws synchronously', async () => {
