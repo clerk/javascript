@@ -162,17 +162,18 @@ describe('useForm', () => {
     });
     expect(blank.result.current.error).toBe('Something went wrong. Please try again.');
 
-    const unknownField = renderHook(() =>
+    const undisplayable = renderHook(() =>
       useForm({
         initialValues: { username: '' },
-        onSubmit: () => Promise.reject(new FormSubmitError({ fields: { server: 'Nope' } })),
+        onSubmit: () => Promise.reject(new FormSubmitError({ fields: { username: '', server: 'Nope' } })),
       }),
     );
     await act(async () => {
-      unknownField.result.current.submit();
+      undisplayable.result.current.submit();
       await flush();
     });
-    expect(unknownField.result.current.error).toBe('Something went wrong. Please try again.');
+    expect(undisplayable.result.current.error).toBe('Something went wrong. Please try again.');
+    expect(undisplayable.result.current.fields.username.feedback).toBeUndefined();
   });
 
   it('recovers from an onSubmit that throws synchronously', async () => {
@@ -396,6 +397,32 @@ describe('useForm', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit).toHaveBeenCalledWith({ password: 'ab' });
     expect(result.current.isSubmitting).toBe(false);
+  });
+
+  it('focuses the first registered control in error when a queued submit is rejected by its check', async () => {
+    const check = deferred<FieldFeedback | undefined>();
+    const onSubmit = vi.fn(resolved);
+    const { result } = renderHook(() =>
+      useForm({
+        initialValues: { username: '' },
+        fields: { username: { validateAsync: () => check.promise } },
+        onSubmit,
+      }),
+    );
+    const input = document.body.appendChild(document.createElement('input'));
+    result.current.register('username').ref(input);
+    act(() => result.current.setValue('username', 'ab'));
+    act(() => result.current.submit());
+    expect(result.current.isSubmitting).toBe(true);
+    await act(async () => {
+      check.resolve({ type: 'error', message: 'Taken' });
+      await flush();
+    });
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(result.current.isSubmitting).toBe(false);
+    expect(result.current.fields.username.feedback).toEqual({ type: 'error', message: 'Taken' });
+    expect(document.activeElement).toBe(input);
+    input.remove();
   });
 
   it('drops a queued submit when the field changes or its validation fails', async () => {

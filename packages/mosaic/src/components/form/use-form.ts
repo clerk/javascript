@@ -85,6 +85,12 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
   const context = { ...snapshot.context, ...deps };
   const { values } = context;
 
+  const focusFirstInvalid = useCallback(() => {
+    const invalid = firstInvalid(actor.getSnapshot().context);
+    if (invalid !== undefined) {
+      elements.current.get(invalid)?.focus();
+    }
+  }, [actor]);
   const setValue = useCallback(
     <K extends keyof TValues>(name: K, value: TValues[K]) => {
       send({ type: 'CHANGE', name, value });
@@ -93,12 +99,18 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
       if (validateAsync === undefined || async[name]?.pending !== true || async[name].value !== value) {
         return;
       }
-      void new Promise<FieldFeedback | undefined>(resolve => resolve(validateAsync(value, next))).then(
-        feedback => send({ type: 'VALIDATED', name, value, feedback }),
-        () => send({ type: 'VALIDATED', name, value, feedback: undefined }),
+      const settle = (feedback: FieldFeedback | undefined) => {
+        const { submitQueued } = actor.getSnapshot().context;
+        send({ type: 'VALIDATED', name, value, feedback });
+        if (submitQueued) {
+          focusFirstInvalid();
+        }
+      };
+      void new Promise<FieldFeedback | undefined>(resolve => resolve(validateAsync(value, next))).then(settle, () =>
+        settle(undefined),
       );
     },
-    [actor, send],
+    [actor, focusFirstInvalid, send],
   );
   const touch = useCallback((name: keyof TValues) => send({ type: 'TOUCH', name }), [send]);
   const refFor = useCallback((name: keyof TValues): ElementRef => {
@@ -118,11 +130,8 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
   }, []);
   const submit = useCallback(() => {
     send({ type: 'SUBMIT' });
-    const invalid = firstInvalid(actor.getSnapshot().context);
-    if (invalid !== undefined) {
-      elements.current.get(invalid)?.focus();
-    }
-  }, [actor, send]);
+    focusFirstInvalid();
+  }, [focusFirstInvalid, send]);
   const handleSubmit = useCallback(
     (event: { preventDefault: () => void }) => {
       event.preventDefault();

@@ -1,7 +1,7 @@
 import { setup } from '../../machine/setup';
 import type { TransitionResult } from '../../machine/types';
 import { keysOf, mapKeys } from '../../utils/object';
-import type { FieldFeedback, FormError } from './form-submit-error';
+import type { FieldFeedback, FormError, FormFieldErrors } from './form-submit-error';
 import { FormSubmitError } from './form-submit-error';
 
 export type FieldValidator<TValue, TValues extends object> = (
@@ -113,15 +113,31 @@ function submitOrStay<TValues extends object>(
   return { target: 'submitting', context: { ...patch, submitQueued: false, error: undefined } };
 }
 
+function displayableFields<TValues extends object>(
+  context: FormContext<TValues>,
+  fields: FormFieldErrors<TValues> | undefined,
+): FormFieldErrors<TValues> | undefined {
+  if (fields === undefined) {
+    return undefined;
+  }
+  const result: FormFieldErrors<TValues> = {};
+  for (const name of keysOf(context.values)) {
+    const message = fields[name];
+    if (message !== undefined && message !== '') {
+      result[name] = message;
+    }
+  }
+  return result;
+}
+
 function toFormError<TValues extends object>(cause: unknown, context: FormContext<TValues>): FormError<TValues> {
   const error: FormError<TValues> =
     cause instanceof FormSubmitError
-      ? { message: cause.banner, fields: cause.fields }
+      ? { message: cause.banner, fields: displayableFields(context, cause.fields) }
       : cause instanceof Error
         ? { message: cause.message }
         : {};
-  const visible =
-    (error.message ?? '') !== '' || keysOf(context.values).some(name => (error.fields?.[name] ?? '') !== '');
+  const visible = (error.message ?? '') !== '' || keysOf(error.fields ?? {}).length > 0;
   return visible ? error : { ...error, message: context.fallbackMessage };
 }
 
