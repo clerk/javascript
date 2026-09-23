@@ -201,6 +201,12 @@ import {
   Transitions as ProfileTransitions,
 } from '../stories/profile.component.stories';
 import {
+  Empty as RequestsTableTabEmpty,
+  Legacy as RequestsTableTabLegacy,
+  meta as requestsTableTabMeta,
+  Proposed as RequestsTableTabProposed,
+} from '../stories/requests-table-tab.stories';
+import {
   AuthenticatorOTP as ReverificationAuthenticatorOTP,
   BackupCode as ReverificationBackupCode,
   BackupCodeError as ReverificationBackupCodeError,
@@ -875,6 +881,13 @@ const organizationProfileMembersPanelModule: StoryModule = {
   Empty: OrganizationProfileMembersPanelEmpty,
 };
 
+const requestsTableTabModule: StoryModule = {
+  meta: requestsTableTabMeta,
+  Legacy: RequestsTableTabLegacy,
+  Proposed: RequestsTableTabProposed,
+  Empty: RequestsTableTabEmpty,
+};
+
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -904,6 +917,7 @@ export const registry: StoryModule[] = [
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
   organizationProfileMembersPanelModule,
+  requestsTableTabModule,
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
   organizationProfileDangerSectionModule,
