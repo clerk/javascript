@@ -245,6 +245,7 @@ import {
   Selection as TableSelection,
   Sorting as TableSorting,
 } from '../stories/table.stories';
+import { Default as TabsComponentDefault, meta as tabsComponentMeta } from '../stories/tabs.component.stories';
 import { meta as tabsMeta } from '../stories/tabs.stories';
 import { meta as tagInputMeta } from '../stories/tag-input.stories';
 import {
@@ -675,6 +676,11 @@ const tableModule: StoryModule = {
   Overflow: TableOverflow,
 };
 
+const tabsComponentModule: StoryModule = {
+  meta: tabsComponentMeta,
+  Default: TabsComponentDefault,
+};
+
 // Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
 const toastModule: StoryModule = { meta: toastMeta, Default: ToastDefault, Anchored: ToastAnchored };
 
@@ -889,6 +895,7 @@ export const registry: StoryModule[] = [
   sectionModule,
   selectComponentModule,
   tableModule,
+  tabsComponentModule,
   textModule,
   toastModule,
   tooltipComponentModule,
