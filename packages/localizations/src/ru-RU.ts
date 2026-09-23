@@ -956,6 +956,8 @@ export const ruRU: LocalizationResource = {
   formButtonPrimary: 'Продолжить',
   formButtonPrimary__verify: 'Верификация',
   formFieldAction__forgotPassword: 'Забыли пароль?',
+  formFieldAction__hidePassword: 'Скрыть пароль',
+  formFieldAction__showPassword: 'Показать пароль',
   formFieldError__matchingPasswords: 'Пароли совпадают.',
   formFieldError__notMatchingPasswords: 'Пароли не совпадают.',
   formFieldError__verificationLinkExpired:

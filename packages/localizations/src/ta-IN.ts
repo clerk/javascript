@@ -964,6 +964,8 @@ export const taIN: LocalizationResource = {
   formButtonPrimary: 'தொடரவும்',
   formButtonPrimary__verify: 'சரிபார்க்கவும்',
   formFieldAction__forgotPassword: 'கடவுச்சொல் மறந்துவிட்டதா?',
+  formFieldAction__hidePassword: 'கடவுச்சொல்லை மறை',
+  formFieldAction__showPassword: 'கடவுச்சொல்லைக் காட்டு',
   formFieldError__matchingPasswords: 'கடவுச்சொற்கள் பொருந்துகின்றன.',
   formFieldError__notMatchingPasswords: 'கடவுச்சொற்கள் பொருந்தவில்லை.',
   formFieldError__verificationLinkExpired: 'சரிபார்ப்பு இணைப்பு காலாவதியானது. புதிய இணைப்பைக் கோருங்கள்.',

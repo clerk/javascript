@@ -962,6 +962,8 @@ export const hiIN: LocalizationResource = {
   formButtonPrimary: 'जारी रखें',
   formButtonPrimary__verify: 'सत्यापित करें',
   formFieldAction__forgotPassword: 'पासवर्ड भूल गए?',
+  formFieldAction__hidePassword: 'पासवर्ड छिपाएँ',
+  formFieldAction__showPassword: 'पासवर्ड दिखाएँ',
   formFieldError__matchingPasswords: 'पासवर्ड मेल खाते हैं।',
   formFieldError__notMatchingPasswords: 'पासवर्ड मेल नहीं खाते।',
   formFieldError__verificationLinkExpired: 'सत्यापन लिंक समाप्त हो गया है। कृपया एक नया लिंक अनुरोध करें।',

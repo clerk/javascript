@@ -964,6 +964,8 @@ export const huHU: LocalizationResource = {
   formButtonPrimary: 'Tovább',
   formButtonPrimary__verify: 'Ellenőrzés',
   formFieldAction__forgotPassword: 'Elfelejtetted a jelszavad?',
+  formFieldAction__hidePassword: 'Jelszó elrejtése',
+  formFieldAction__showPassword: 'Jelszó megjelenítése',
   formFieldError__matchingPasswords: 'A jelszavak megegyeznek',
   formFieldError__notMatchingPasswords: 'A jelszavak nem egyeznek',
   formFieldError__verificationLinkExpired: 'A megerősítő link lejárt. Kérlek kérj egy újat.',
