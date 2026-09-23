@@ -84,6 +84,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     select: dynamic(() => import('../stories/select.component.mdx')),
     table: dynamic(() => import('../stories/table.mdx')),
     tabs: dynamic(() => import('../stories/tabs.component.mdx')),
+    'tag-input': dynamic(() => import('../stories/tag-input.component.mdx')),
     toast: dynamic(() => import('../stories/toast.mdx')),
     text: dynamic(() => import('../stories/text.mdx')),
     tooltip: dynamic(() => import('../stories/tooltip.component.mdx')),

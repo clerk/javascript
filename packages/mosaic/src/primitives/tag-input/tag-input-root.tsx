@@ -22,6 +22,7 @@ export interface TagInputProps extends Omit<ComponentProps<'div'>, 'defaultValue
   validate?: (value: string) => boolean;
   delimiters?: string[];
   name?: string;
+  form?: string;
   disabled?: boolean;
   children: ReactNode;
 }
@@ -35,6 +36,7 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
     validate,
     delimiters = DEFAULT_DELIMITERS,
     name,
+    form,
     disabled = false,
     children,
     ...otherProps
@@ -165,6 +167,7 @@ export const TagInputRoot = React.forwardRef<HTMLDivElement, TagInputProps>(func
                 key={item}
                 type='hidden'
                 name={name}
+                form={form}
                 value={item}
                 disabled={disabled}
               />
