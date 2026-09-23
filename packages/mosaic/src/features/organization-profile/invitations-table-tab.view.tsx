@@ -1,13 +1,13 @@
 import * as stylex from '@stylexjs/stylex';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
+import { ActionMenu } from '../../components/action-menu';
 import { Avatar } from '../../components/avatar';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Icon } from '../../components/icon';
 import { InputGroup } from '../../components/input-group';
-import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
 import { panelStyles } from '../../components/profile';
 import { Spinner } from '../../components/spinner';
@@ -223,10 +223,16 @@ export function InvitationsTableTabView({
                   <Table.Cell>{row.original.roleLabel}</Table.Cell>
                   {onRevoke ? (
                     <Table.Cell align='end'>
-                      <InvitationActions
-                        invitation={row.original}
-                        registerTrigger={removalFocus.registerTrigger}
-                        onSelect={invitation => revokeDialog.open(invitation)}
+                      <ActionMenu
+                        label={fill(m.manage, { name: row.original.email })}
+                        triggerRef={removalFocus.registerTrigger(row.original.id)}
+                        actions={[
+                          {
+                            label: m.revoke,
+                            color: 'negative',
+                            onClick: () => revokeDialog.open(row.original),
+                          },
+                        ]}
                       />
                     </Table.Cell>
                   ) : null}
@@ -269,35 +275,5 @@ export function InvitationsTableTabView({
         />
       ) : null}
     </>
-  );
-}
-
-function InvitationActions({
-  invitation,
-  registerTrigger,
-  onSelect,
-}: {
-  invitation: OrganizationProfileInvitation;
-  registerTrigger: (id: string) => (element: HTMLButtonElement | null) => void;
-  onSelect: (invitation: OrganizationProfileInvitation) => void;
-}) {
-  const m = useMessages('invitationsTableTab');
-  const [triggerRef] = useState(() => registerTrigger(invitation.id));
-  return (
-    <Menu.Root placement='bottom-end'>
-      <Menu.Trigger
-        ref={triggerRef}
-        aria-label={fill(m.manage, { name: invitation.email })}
-      />
-      <Menu.Popup>
-        <Menu.Item
-          color='negative'
-          label={m.revoke}
-          onClick={() => onSelect(invitation)}
-        >
-          <Menu.Label>{m.revoke}</Menu.Label>
-        </Menu.Item>
-      </Menu.Popup>
-    </Menu.Root>
   );
 }
