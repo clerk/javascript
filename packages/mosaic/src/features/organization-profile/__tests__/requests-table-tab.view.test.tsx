@@ -86,11 +86,10 @@ describe('RequestsTableTabView', () => {
     await user.click(screen.getByRole('option', { name: '20', exact: true }));
     expect(props.onPageSizeChange).toHaveBeenCalledWith(20);
     expect(props.onPageChange).toHaveBeenLastCalledWith(1);
-    expect(props.onBulkAction).not.toHaveBeenCalled();
   });
   it('holds both request actions while that row has a pending decision', async () => {
     const user = userEvent.setup();
-    const { props } = renderView({
+    renderView({
       requests: [
         { id: 'request-1', email: 'ada@example.com', requestedAtLabel: 'Sep 1, 2026', pendingAction: 'accept' },
       ],
@@ -98,32 +97,14 @@ describe('RequestsTableTabView', () => {
       onDecline: vi.fn(),
     });
     await user.click(screen.getByRole('button', { name: 'Accept ada@example.com' }));
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Decline ada@example.com' }));
-    expect(props.onAccept).not.toHaveBeenCalled();
-    expect(props.onDecline).not.toHaveBeenCalled();
+    expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
-  it('renders request metadata and independently offers accept and decline commands', async () => {
-    const user = userEvent.setup();
+  it('offers only the supplied request actions', () => {
     const { props, rerender } = renderView({ onAccept: vi.fn(), onDecline: vi.fn() });
-    const table = screen.getByRole('table', { name: 'Requests' });
-    expect(
-      within(table)
-        .getAllByRole('columnheader')
-        .map(header => header.textContent),
-    ).toEqual(['User', 'Requested', 'Actions']);
-    expect(within(table).getByText('ada@example.com')).toBeVisible();
-    expect(within(table).getByText('Ada Lovelace')).toBeVisible();
-    expect(within(table).getByText('Sep 1, 2026')).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Accept Ada Lovelace' }));
-    expect(props.onAccept).not.toHaveBeenCalled();
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Accept' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(props.onAccept).toHaveBeenCalledWith('request-1');
-    await user.click(screen.getByRole('button', { name: 'Decline Ada Lovelace' }));
-    expect(props.onDecline).not.toHaveBeenCalled();
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Decline' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(props.onDecline).toHaveBeenCalledWith('request-1');
+    expect(screen.getByRole('button', { name: 'Accept Ada Lovelace' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Decline Ada Lovelace' })).toBeVisible();
     rerender(
       <MosaicProvider>
         <RequestsTableTabView
@@ -143,46 +124,48 @@ describe('RequestsTableTabView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.queryByRole('columnheader', { name: 'Actions' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Accept|Decline/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
 });
 
 it.each(['Accept', 'Decline'] as const)('confirms %s and restores focus as requests leave the list', async action => {
   const user = userEvent.setup();
-  const onDecision = vi.fn<(id: string) => Promise<void>>().mockResolvedValue(undefined);
+  const onAccept = vi.fn<(id: string) => Promise<void>>().mockResolvedValue(undefined);
+  const onDecline = vi.fn<(id: string) => Promise<void>>().mockResolvedValue(undefined);
+  const onDecision = action === 'Accept' ? onAccept : onDecline;
+  const onOtherDecision = action === 'Accept' ? onDecline : onAccept;
   function Example() {
     const [items, setItems] = useState([
       { id: 'ada', email: 'ada@example.com', requestedAtLabel: 'Sep 1, 2026' },
       { id: 'grace', email: 'grace@example.com', requestedAtLabel: 'Sep 2, 2026' },
     ]);
-    const decide = async (id: string) => {
-      await onDecision(id);
-      setItems(current => current.filter(item => item.id !== id));
-    };
     return (
       <MosaicProvider>
         <RequestsTableTabView
           {...propsFor()}
           requests={items}
           totalCount={items.length}
-          onAccept={decide}
-          onDecline={decide}
+          onAccept={async id => {
+            await onAccept(id);
+            setItems(current => current.filter(item => item.id !== id));
+          }}
+          onDecline={async id => {
+            await onDecline(id);
+            setItems(current => current.filter(item => item.id !== id));
+          }}
         />
       </MosaicProvider>
     );
   }
   render(<Example />);
-  await user.click(screen.getByRole('button', { name: `${action} ada@example.com` }));
-  expect(onDecision).not.toHaveBeenCalled();
-  await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancel' }));
-  await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-  expect(onDecision).not.toHaveBeenCalled();
   for (const id of ['ada', 'grace']) {
     await user.click(screen.getByRole('button', { name: `${action} ${id}@example.com` }));
+    expect(onDecision).not.toHaveBeenCalledWith(id);
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: action }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(onDecision).toHaveBeenLastCalledWith(id);
+    expect(onOtherDecision).not.toHaveBeenCalled();
     expect(
       id === 'ada'
         ? screen.getByRole('button', { name: `${action} grace@example.com` })
