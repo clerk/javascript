@@ -99,21 +99,6 @@ export const useLocalizations = () => {
       return '';
     }
 
-    // Password confirmation failures carry a countdown; zero means the session has ended.
-    const remainingAttempts = meta?.remainingAttempts;
-    if (
-      (code === 'form_password_validation_failed' || code === 'form_password_incorrect') &&
-      typeof remainingAttempts === 'number'
-    ) {
-      const countdownKey =
-        remainingAttempts === 0
-          ? localizationKeys('unstable__errors.password_confirmation_session_ended')
-          : remainingAttempts === 1
-            ? localizationKeys('unstable__errors.password_confirmation_attempt_remaining')
-            : localizationKeys('unstable__errors.password_confirmation_attempts_remaining', { remainingAttempts });
-      return t(countdownKey) || longMessage || message;
-    }
-
     return (
       t(localizationKeys(`unstable__errors.${code}__${paramName}` as any)) ||
       t(localizationKeys(`unstable__errors.${code}` as any)) ||
