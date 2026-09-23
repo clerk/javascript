@@ -44,6 +44,15 @@ describe('getDimensions', () => {
 
     expect(getDimensions(element)).toEqual({ width: 120, height: 40 });
   });
+
+  it('falls back per axis', () => {
+    const element = create();
+    element.style.width = '100px';
+    element.style.height = '20.6px';
+    stub(element, { offsetWidth: 120, offsetHeight: 21 });
+
+    expect(getDimensions(element)).toEqual({ width: 120, height: 20.6 });
+  });
 });
 
 describe('getScrollDimensions', () => {

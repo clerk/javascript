@@ -36,10 +36,10 @@ export function getDimensions(element: HTMLElement): Dimensions {
   const style = getComputedStyle(element);
   const width = parseFloat(style.width) || 0;
   const height = parseFloat(style.height) || 0;
-  if (Math.round(width) !== element.offsetWidth || Math.round(height) !== element.offsetHeight) {
-    return { width: element.offsetWidth, height: element.offsetHeight };
-  }
-  return { width, height };
+  return {
+    width: Math.round(width) === element.offsetWidth ? width : element.offsetWidth,
+    height: Math.round(height) === element.offsetHeight ? height : element.offsetHeight,
+  };
 }
 
 /**
