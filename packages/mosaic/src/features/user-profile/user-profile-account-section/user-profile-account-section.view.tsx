@@ -3,15 +3,13 @@ import * as stylex from '@stylexjs/stylex';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
-import type { SaveResult } from '../../../utils/save-result';
 import { styles } from './user-profile-account-section.styles';
 import type {
   UserProfileEmail,
   UserProfileNameAttribute,
   UserProfilePhone,
 } from './user-profile-account-section.types';
-import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.dialog';
-import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
+import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 import { UserProfileEmailRowView } from './user-profile-email-row.view';
 import { UserProfileNameRowView } from './user-profile-name-row.view';
 import { UserProfilePhoneRowView } from './user-profile-phone-row.view';
@@ -39,11 +37,11 @@ export interface UserProfileAccountSectionViewProps {
   /** Left out when the instance does not collect the attribute, which drops the row. */
   emails?: UserProfileEmail[];
   phones?: UserProfilePhone[];
-  onProfilePictureChange?: (file: File) => Promise<SaveResult>;
+  onProfilePictureChange?: (file: File) => Promise<void>;
   onProfilePictureReject?: (rejections: FileRejection[]) => void;
-  onRemoveProfilePicture?: () => Promise<SaveResult>;
-  onSubmitName?: (value: UserProfileEditNameValue) => Promise<SaveResult<UserProfileEditNameField>>;
-  onSubmitUsername?: (username: string) => Promise<SaveResult<UserProfileEditUsernameField>>;
+  onRemoveProfilePicture?: () => Promise<void>;
+  onSubmitName?: (value: UserProfileEditNameValue) => Promise<void>;
+  onSubmitUsername?: (username: string) => Promise<void>;
   onAddEmail?: () => void;
   onSendEmailCode?: (emailAddress: string) => Promise<void>;
   onVerifyEmailCode?: (emailAddress: string, code: string) => Promise<void>;

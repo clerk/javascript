@@ -1,11 +1,11 @@
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
-import type { FormError, SaveResult } from '../../../utils/save-result';
-import { UNEXPECTED_ERROR } from '../../../utils/save-result';
+import type { FormError } from '../../../utils/form-error';
+import { toFormError } from '../../../utils/form-error';
 import type { UserProfileEditNameField, UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 
 export interface UserProfileEditNameContext {
-  saveName: (value: UserProfileEditNameValue) => Promise<SaveResult<UserProfileEditNameField>>;
+  saveName: (value: UserProfileEditNameValue) => Promise<void>;
   /** Injected every render. What `OPEN` seeds the fields from. */
   savedFirstName: string;
   savedLastName: string;
@@ -59,17 +59,10 @@ export const userProfileEditNameMachine = createMachine({
     },
     saving: {
       invoke: fromPromise(context => context.saveName({ firstName: context.firstName, lastName: context.lastName }), {
-        onDone: [
-          {
-            guard: (_, event) => event.output.error !== null,
-            target: 'editing',
-            actions: assign((_, event) => ({ error: event.output.error ?? undefined })),
-          },
-          { target: 'idle', actions: assign(() => ({ error: undefined })) },
-        ],
+        onDone: { target: 'idle', actions: assign(() => ({ error: undefined })) },
         onError: {
           target: 'editing',
-          actions: [(_, event) => console.error(event.error), assign(() => ({ error: { global: UNEXPECTED_ERROR } }))],
+          actions: assign((_, event) => ({ error: toFormError<UserProfileEditNameField>(event.error) })),
         },
       }),
     },
@@ -79,8 +72,8 @@ export const userProfileEditNameMachine = createMachine({
 export interface UserProfileEditNameControllerOptions {
   firstName?: string;
   lastName?: string;
-  /** Resolve with `{ error: null }` to close the dialog, or with an error to keep it open showing why. */
-  onSubmit: (value: UserProfileEditNameValue) => Promise<SaveResult<UserProfileEditNameField>>;
+  /** Resolve to close the dialog, or reject with a `SaveError` to keep it open showing why. */
+  onSubmit: (value: UserProfileEditNameValue) => Promise<void>;
 }
 
 export interface UserProfileEditNameController {

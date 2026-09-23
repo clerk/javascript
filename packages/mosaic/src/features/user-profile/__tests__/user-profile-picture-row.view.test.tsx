@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
+import { SaveError } from '../../../utils/form-error';
 import type { UserProfilePictureRowViewProps } from '../user-profile-account-section/user-profile-picture-row.view';
 import { UserProfilePictureRowView } from '../user-profile-account-section/user-profile-picture-row.view';
 
@@ -22,7 +23,7 @@ describe('UserProfilePictureRowView', () => {
     const user = userEvent.setup();
     renderView({
       hasImage: true,
-      onRemove: vi.fn().mockResolvedValue({ error: { global: { code: 'action_blocked' } } }),
+      onRemove: vi.fn().mockRejectedValue(new SaveError({ global: { code: 'action_blocked' } })),
     });
 
     await user.click(screen.getByRole('button', { name: 'Manage profile picture' }));
@@ -36,7 +37,7 @@ describe('UserProfilePictureRowView', () => {
     const { container } = renderView({
       hasImage: true,
       onChange: vi.fn(),
-      onRemove: vi.fn().mockResolvedValue({ error: { global: { code: 'action_blocked' } } }),
+      onRemove: vi.fn().mockRejectedValue(new SaveError({ global: { code: 'action_blocked' } })),
     });
     const input = container.querySelector('input[type="file"]');
     if (!(input instanceof HTMLInputElement)) {

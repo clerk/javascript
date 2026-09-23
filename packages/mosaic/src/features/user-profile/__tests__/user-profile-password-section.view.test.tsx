@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
-import { UserProfileSaveError } from '../user-profile-account-section/user-profile-account-section.types';
+import { SaveError } from '../../../utils/form-error';
 import type { UserProfilePasswordSectionViewProps } from '../user-profile-password-section/user-profile-password-section.types';
 import { UserProfilePasswordSectionView } from '../user-profile-password-section/user-profile-password-section.view';
 
@@ -66,8 +66,9 @@ describe('UserProfilePasswordSectionView', () => {
     const onSubmitPassword = vi
       .fn()
       .mockRejectedValueOnce(
-        new UserProfileSaveError('Your password could not be updated.', {
-          currentPassword: 'Incorrect password.',
+        new SaveError({
+          global: { message: 'Your password could not be updated.' },
+          fields: { currentPassword: { message: 'Incorrect password.' } },
         }),
       )
       .mockResolvedValue(undefined);

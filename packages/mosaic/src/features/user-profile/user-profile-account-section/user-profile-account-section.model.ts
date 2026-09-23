@@ -3,7 +3,7 @@ import { useUser } from '@clerk/shared/react';
 import type { AttributeData, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
-import { toSaveResult } from '../../../utils/save-result';
+import { save } from '../../../utils/form-error';
 import type {
   UserProfileEmail,
   UserProfileNameAttribute,
@@ -100,14 +100,14 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     username: showUsername ? (user.username ?? '') : undefined,
     emails: showEmails ? toEmails(user) : undefined,
     phones: showPhones ? toPhones(user) : undefined,
-    onProfilePictureChange: file => toSaveResult(() => user.setProfileImage({ file })),
-    onRemoveProfilePicture: user.hasImage ? () => toSaveResult(() => user.setProfileImage({ file: null })) : undefined,
+    onProfilePictureChange: file => save(() => user.setProfileImage({ file })),
+    onRemoveProfilePicture: user.hasImage ? () => save(() => user.setProfileImage({ file: null })) : undefined,
     onSubmitName: nameReadOnly
       ? undefined
-      : value => toSaveResult(() => user.update({ firstName: value.firstName, lastName: value.lastName }), NAME_FIELDS),
+      : value => save(() => user.update({ firstName: value.firstName, lastName: value.lastName }), NAME_FIELDS),
     onSubmitUsername:
       showUsername && !usernameImmutable
-        ? username => toSaveResult(() => user.update({ username }), USERNAME_FIELDS)
+        ? username => save(() => user.update({ username }), USERNAME_FIELDS)
         : undefined,
   };
 }
