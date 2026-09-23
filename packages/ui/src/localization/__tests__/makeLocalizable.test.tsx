@@ -145,6 +145,84 @@ describe('Test localizable components', () => {
     ).toBe('form_identifier_exists__email_address');
   });
 
+  it.each([
+    ['form_password_validation_failed', 2, 'Incorrect password. You have 2 attempts remaining.'],
+    ['form_password_incorrect', 1, 'Incorrect password. You have 1 attempt remaining.'],
+    [
+      'form_password_validation_failed',
+      0,
+      'Your session has ended because you reached the password confirmation attempt limit. Sign in again to continue.',
+    ],
+    [
+      'form_password_incorrect',
+      0,
+      'Your session has ended because you reached the password confirmation attempt limit. Sign in again to continue.',
+    ],
+  ])(
+    'shows the confirmation countdown for %s with %i attempts remaining',
+    async (code, remainingAttempts, expected) => {
+      const { wrapper, fixtures } = await createFixtures();
+      fixtures.options.localization = {
+        unstable__errors: {
+          form_password_validation_failed: 'Generic translated password error',
+          form_password_incorrect: 'Generic translated password error',
+        },
+      };
+      const { result } = renderHook(() => useLocalizations(), { wrapper });
+
+      expect(
+        result.current.translateError({
+          code,
+          message: 'Incorrect password',
+          longMessage: 'Server message',
+          meta: { remainingAttempts },
+        }),
+      ).toBe(expected);
+    },
+  );
+
+  it('uses customer translations for the confirmation countdown', async () => {
+    const { wrapper, fixtures } = await createFixtures();
+    fixtures.options.localization = {
+      unstable__errors: {
+        password_confirmation_attempts_remaining: 'Mot de passe incorrect. {{remainingAttempts}} tentatives restantes.',
+        password_confirmation_session_ended: 'Votre session est terminée.',
+      },
+    };
+    const { result } = renderHook(() => useLocalizations(), { wrapper });
+
+    expect(
+      result.current.translateError({
+        code: 'form_password_validation_failed',
+        message: 'Incorrect password',
+        meta: { remainingAttempts: 3 },
+      }),
+    ).toBe('Mot de passe incorrect. 3 tentatives restantes.');
+    expect(
+      result.current.translateError({
+        code: 'form_password_incorrect',
+        message: 'Incorrect password',
+        meta: { remainingAttempts: 0 },
+      }),
+    ).toBe('Votre session est terminée.');
+  });
+
+  it('keeps translated password errors when there is no confirmation countdown', async () => {
+    const { wrapper, fixtures } = await createFixtures();
+    fixtures.options.localization = {
+      unstable__errors: { form_password_validation_failed: 'Translated password error' },
+    };
+    const { result } = renderHook(() => useLocalizations(), { wrapper });
+
+    expect(
+      result.current.translateError({
+        code: 'form_password_validation_failed',
+        message: 'Incorrect password',
+        longMessage: 'Incorrect password. Please try again.',
+      }),
+    ).toBe('Translated password error');
+  });
+
   it('translates native OAuth access denied errors using the default localization resource', async () => {
     const { wrapper } = await createFixtures();
     const { result } = renderHook(() => useLocalizations(), { wrapper });
