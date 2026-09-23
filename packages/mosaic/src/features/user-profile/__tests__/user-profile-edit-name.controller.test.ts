@@ -19,6 +19,13 @@ function start(saveName: () => Promise<void>, saved = { savedFirstName: 'Preston
   return actor;
 }
 
+/** The save is guarded on a change, so a test about the save has to make one first. */
+function startEdited(saveName: () => Promise<void>) {
+  const actor = start(saveName);
+  actor.send({ type: 'TYPE', field: 'firstName', value: 'Ada' });
+  return actor;
+}
+
 describe('userProfileEditNameMachine', () => {
   it('seeds both fields from the saved name on open', () => {
     const actor = start(saved);
@@ -64,7 +71,7 @@ describe('userProfileEditNameMachine', () => {
   });
 
   it('carries field copy through when the error names a control', async () => {
-    const actor = start(() =>
+    const actor = startEdited(() =>
       failed({
         global: { message: 'Your name could not be updated.' },
         fields: { firstName: { message: 'First name is required.' } },
@@ -80,7 +87,7 @@ describe('userProfileEditNameMachine', () => {
   it('shows the generic banner and logs when the save throws unexpectedly', async () => {
     const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     const failure = new TypeError('boom');
-    const actor = start(() => Promise.reject(failure));
+    const actor = startEdited(() => Promise.reject(failure));
     actor.send({ type: 'SAVE' });
 
     await vi.waitFor(() => expect(actor.getSnapshot().context.error).toEqual({ global: { code: 'generic' } }));
@@ -89,7 +96,7 @@ describe('userProfileEditNameMachine', () => {
   });
 
   it('drops the error when the dialog is cancelled', async () => {
-    const actor = start(() => failed({ global: { message: 'nope' } }));
+    const actor = startEdited(() => failed({ global: { message: 'nope' } }));
     actor.send({ type: 'SAVE' });
     await vi.waitFor(() => expect(actor.getSnapshot().context.error?.global?.message).toBe('nope'));
 
@@ -133,5 +140,17 @@ describe('useUserProfileEditNameController', () => {
     act(() => result.current.onSubmit());
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({ firstName: 'Ada', lastName: 'Booth' }));
+  });
+
+  it('withholds the save while the name is unchanged', () => {
+    const { result } = renderHook(() =>
+      useUserProfileEditNameController({ firstName: 'Preston', lastName: 'Booth', onSubmit: saved }),
+    );
+
+    act(() => result.current.onOpenChange(true));
+    expect(result.current.canSave).toBe(false);
+
+    act(() => result.current.onLastNameChange('Barton'));
+    expect(result.current.canSave).toBe(true);
   });
 });

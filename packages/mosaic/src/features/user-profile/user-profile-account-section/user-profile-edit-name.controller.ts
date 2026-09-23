@@ -26,6 +26,10 @@ function notSeated(): Promise<never> {
   return Promise.reject(new Error('edit-name deps are not seated'));
 }
 
+function isSaveable(context: UserProfileEditNameContext): boolean {
+  return context.firstName !== context.savedFirstName || context.lastName !== context.savedLastName;
+}
+
 export const userProfileEditNameMachine = createMachine({
   id: 'editName',
   initial: 'idle',
@@ -53,7 +57,7 @@ export const userProfileEditNameMachine = createMachine({
     editing: {
       on: {
         TYPE: { actions: assign((_, event) => ({ [event.field]: event.value })) },
-        SAVE: 'saving',
+        SAVE: { target: 'saving', guard: isSaveable },
         CANCEL: { target: 'idle', actions: assign(() => ({ error: undefined })) },
       },
     },
@@ -84,6 +88,7 @@ export interface UserProfileEditNameController {
   onFirstNameChange: (value: string) => void;
   onLastNameChange: (value: string) => void;
   onSubmit: () => void;
+  canSave: boolean;
   isSaving: boolean;
   error: FormError<UserProfileEditNameField> | undefined;
 }
@@ -105,6 +110,7 @@ export function useUserProfileEditNameController({
     onFirstNameChange: value => send({ type: 'TYPE', field: 'firstName', value }),
     onLastNameChange: value => send({ type: 'TYPE', field: 'lastName', value }),
     onSubmit: () => send({ type: 'SAVE' }),
+    canSave: isSaveable(snapshot.context),
     isSaving: snapshot.value === 'saving',
     error: snapshot.context.error,
   };

@@ -5,14 +5,22 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
+import type { LocalizableError } from '../../../localization';
 import { useErrorText, useMessages } from '../../../localization';
-import type { FileRejection } from '../../../primitives/file-upload';
+import type { FileRejection, FileRejectionReason } from '../../../primitives/file-upload';
 import { FileUpload } from '../../../primitives/file-upload';
 import { useUserProfilePictureController } from './user-profile-picture.controller';
 
 const PROFILE_PICTURE_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
 /** Matches the limit the row's own description advertises. */
 const PROFILE_PICTURE_MAX_BYTES = 10 * 1000 * 1000;
+
+/** Rejecting a pick locally reads the same as the server rejecting the upload. */
+const REJECTION_ERRORS: Record<FileRejectionReason, LocalizableError> = {
+  accept: { code: 'avatar_file_type_invalid' },
+  size: { code: 'avatar_file_size_exceeded' },
+  overflow: { code: 'avatar_file_count_exceeded' },
+};
 
 export interface UserProfilePictureRowViewProps {
   name: string;
@@ -34,12 +42,12 @@ export function UserProfilePictureRowView({
   const m = useMessages('userProfileAccountSection');
   const errorText = useErrorText();
   const controller = useUserProfilePictureController({ onChange, onRemove });
-  const [rejectionError, setRejectionError] = useState<string>();
-  const displayedError = rejectionError ?? (controller.error ? errorText(controller.error) : undefined);
+  const [rejection, setRejection] = useState<LocalizableError>();
+  const error = rejection ?? controller.error;
   const remove = controller.onRemove;
   const handleRemove = remove
     ? () => {
-        setRejectionError(undefined);
+        setRejection(undefined);
         return remove();
       }
     : undefined;
@@ -58,14 +66,14 @@ export function UserProfilePictureRowView({
       aria-busy={controller.isPending || undefined}
       render={<Section.Row />}
       onReject={rejections => {
-        const rejection = rejections[0];
-        setRejectionError(rejection ? m.picture.errors[rejection.reason] : undefined);
+        const rejected = rejections[0];
+        setRejection(rejected ? REJECTION_ERRORS[rejected.reason] : undefined);
         onReject?.(rejections);
       }}
       onValueChange={files => {
         const file = files[0];
         if (file) {
-          setRejectionError(undefined);
+          setRejection(undefined);
           void controller.onChange?.(file);
         }
       }}
@@ -90,7 +98,7 @@ export function UserProfilePictureRowView({
           onRemove={handleRemove}
         />
       </Section.Item>
-      <Section.Error>{displayedError}</Section.Error>
+      <Section.Error>{error ? errorText(error) : undefined}</Section.Error>
     </FileUpload.Root>
   );
 }

@@ -1,6 +1,7 @@
 export const errorMessages: { readonly generic: string } & Readonly<Record<string, string>> = {
   generic: 'Something went wrong. Please try again.',
   action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
+  avatar_file_count_exceeded: 'Only one file can be uploaded at a time.',
   avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
   avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
   form_new_password_matches_current: 'New password cannot be the same as the current password.',

@@ -32,6 +32,7 @@ export interface UserProfileEditNameDialogProps {
   onFirstNameChange: (value: string) => void;
   onLastNameChange: (value: string) => void;
   title?: string;
+  canSave?: boolean;
   isSaving?: boolean;
   error?: FormError<UserProfileEditNameField>;
   onSubmit: () => void;
@@ -53,6 +54,7 @@ export function UserProfileEditNameDialog({
   onFirstNameChange,
   onLastNameChange,
   title,
+  canSave = true,
   isSaving = false,
   error,
   onSubmit,
@@ -64,10 +66,10 @@ export function UserProfileEditNameDialog({
   const { enabled: showFirstName = true, required: firstNameRequired = false } = firstNameAttribute;
   const { enabled: showLastName = true, required: lastNameRequired = false } = lastNameAttribute;
 
-  // `isSaving` only cancels the press on the action; it does not stop a native submit.
+  // `canSave`/`isSaving` only cancel the press on the action; they do not stop a native submit.
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isSaving) {
+    if (canSave && !isSaving) {
       onSubmit();
     }
   };
@@ -158,6 +160,8 @@ export function UserProfileEditNameDialog({
               form={formId}
               fullWidth
               isPending={isSaving}
+              disabled={!canSave}
+              focusableWhenDisabled
             >
               {m.name.save}
             </SubmitButton>
