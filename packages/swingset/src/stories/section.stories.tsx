@@ -261,6 +261,7 @@ export function FlatContainedGroups() {
           .cl-section-header .cl-button {
             padding: 0 !important;
             border: none !important;
+            background: none !important;
           }
           .cl-section-items {
             border: 1px solid var(--cl-color-border) !important;
