@@ -291,16 +291,23 @@ describe('reverificationMachine', () => {
 describe('useReverificationController', () => {
   it('is idle when reverification is not active', () => {
     const { result } = renderHook(() => useReverificationController(readyModel({ phase: 'inactive' })));
-    expect(result.current).toEqual({ status: 'idle' });
+    expect(result.current).toEqual({ status: 'idle', phase: 'inactive' });
   });
 
   it('is loading while the model is still waiting on Clerk', () => {
+    const cancel = vi.fn();
     const loading: ReverificationModel = {
       status: 'loading',
       phase: 'active',
+      cancel,
     };
     const { result } = renderHook(() => useReverificationController(loading));
     expect(result.current.status).toBe('loading');
+    if (result.current.status !== 'loading') {
+      throw new Error('expected loading');
+    }
+    result.current.onCancel?.();
+    expect(cancel).toHaveBeenCalledOnce();
   });
 
   it('is unavailable when start fails', async () => {
@@ -423,6 +430,42 @@ describe('useReverificationController', () => {
     expect(finish).not.toHaveBeenCalled();
   });
 
+  it('cancels an in-flight attempt before it can finish', async () => {
+    const attempt = deferred<ReverificationResult>();
+    const finish = vi.fn(() => Promise.resolve());
+    const cancel = vi.fn();
+    const { result } = renderHook(() =>
+      useReverificationController(readyModel({ attempt: () => attempt.promise, finish, cancel })),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    act(() => {
+      if (result.current.status === 'ready') {
+        result.current.onValueChange('secret');
+        result.current.onSubmit();
+      }
+    });
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.isPending).toBe(true);
+      }
+    });
+
+    act(() => {
+      if (result.current.status === 'ready') {
+        result.current.onCancel?.();
+      }
+    });
+    expect(cancel).toHaveBeenCalledOnce();
+
+    act(() => {
+      attempt.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
+    });
+    await waitFor(() => expect(cancel).toHaveBeenCalledTimes(2));
+    expect(finish).not.toHaveBeenCalled();
+  });
+
   it('stays on the current step pending while finish runs', async () => {
     const finish = deferred<void>();
     const { result } = renderHook(() =>
@@ -494,7 +537,7 @@ describe('useReverificationController', () => {
     await waitFor(() => expect(result.current.status).toBe('ready'));
     expect(start).toHaveBeenCalledOnce();
 
-    rerender({ model: { status: 'loading', phase: 'active' } });
+    rerender({ model: { status: 'loading', phase: 'active', cancel: vi.fn() } });
     expect(result.current.status).toBe('ready');
     if (result.current.status === 'ready') {
       expect(result.current.step).toBe('password');
@@ -532,7 +575,7 @@ describe('useReverificationController', () => {
       }
     });
 
-    rerender({ model: { status: 'loading', phase: 'active' } });
+    rerender({ model: { status: 'loading', phase: 'active', cancel: vi.fn() } });
     expect(result.current.status).toBe('ready');
     if (result.current.status === 'ready') {
       expect(result.current.step).toBe('password');
@@ -555,7 +598,7 @@ describe('useReverificationController', () => {
 
     await waitFor(() => expect(result.current.status).toBe('ready'));
     rerender({ model: readyModel({ start, phase: 'inactive' }) });
-    expect(result.current).toEqual({ status: 'idle' });
+    expect(result.current).toEqual({ status: 'idle', phase: 'inactive' });
 
     rerender({ model: readyModel({ start, phase: 'active' }) });
     await waitFor(() => expect(result.current.status).toBe('ready'));
@@ -750,6 +793,7 @@ describe('useReverificationController', () => {
     if (result.current.status === 'ready') {
       expect(result.current.step).toBe('password');
       expect(result.current.isPending).toBe(true);
+      expect(result.current.onCancel).toBeUndefined();
     }
     expect(start).toHaveBeenCalledOnce();
 
@@ -766,6 +810,6 @@ describe('useReverificationController', () => {
     expect(cancel).not.toHaveBeenCalled();
 
     rerender({ model: { ...active, phase: 'inactive' } });
-    expect(result.current).toEqual({ status: 'idle' });
+    expect(result.current).toEqual({ status: 'idle', phase: 'inactive' });
   });
 });

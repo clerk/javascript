@@ -5,7 +5,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred, tick } from '../../../machines/__tests__/test-utils';
-import type { ReverificationProps } from '../reverification.types';
+import type { ReverificationState } from '../reverification.types';
 import { useReverificationWithState } from '../use-reverification-with-state';
 
 type NeedsReverificationParameters = {
@@ -59,7 +59,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
   };
 });
 
-function assertActive(state: ReverificationProps): asserts state is Extract<ReverificationProps, { phase: 'active' }> {
+function assertActive(state: ReverificationState): asserts state is Extract<ReverificationState, { phase: 'active' }> {
   expect(state.phase).toBe('active');
   if (state.phase !== 'active') {
     throw new Error('expected active reverification');

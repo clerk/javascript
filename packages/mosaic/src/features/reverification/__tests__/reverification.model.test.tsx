@@ -101,9 +101,14 @@ describe('useReverificationModel', () => {
 
   it('is loading until the session and environment are both present', () => {
     session = null;
-    const { result } = renderHook(() => useReverificationModel(activeProps()));
+    const cancel = vi.fn();
+    const { result } = renderHook(() => useReverificationModel({ ...activeProps(), cancel }));
     expect(result.current.status).toBe('loading');
     expect(result.current.phase).toBe('active');
+    if (result.current.status === 'loading') {
+      result.current.cancel();
+    }
+    expect(cancel).toHaveBeenCalledOnce();
   });
 
   it('is loading until supportEmail is resolved', () => {
