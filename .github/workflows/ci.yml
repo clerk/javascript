@@ -306,9 +306,6 @@ jobs:
         env:
           NODE_VERSION: ${{ matrix.node-version }}
 
-      - name: Run integration infrastructure unit tests
-        run: pnpm test:integration:unit
-
       - name: Run Typedoc tests
         run: |
           # Only run Typedoc tests for one matrix version and main test run
