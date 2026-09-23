@@ -12,6 +12,6 @@ describe('loadOptions', () => {
     ['only the secret key is missing', { publishableKey: 'pk_test_Zm9vLWJhci0xMi5jbGVyay5hY2NvdW50cy5kZXYk' }],
     ['both keys are missing', {}],
   ])('throws the CLI-pointing error when %s', (_, overrides) => {
-    expect(() => loadOptions(request, overrides)).toThrow(/Missing secretKey[\s\S]*npx clerk@latest link/);
+    expect(() => loadOptions(request, overrides)).toThrow(/Missing secretKey[\s\S]*npx clerk@latest init/);
   });
 });
