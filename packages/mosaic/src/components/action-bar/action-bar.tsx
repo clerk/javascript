@@ -51,18 +51,17 @@ function enabledItems(bar: HTMLElement): HTMLElement[] {
 }
 
 export interface ActionBarRootProps extends MosaicComponentProps<'div'> {
-  /** Whether the bar is shown. Toggling it animates the bar in and out. */
+  /** Whether the bar is shown. */
   open: boolean;
-  /** The table the bar acts on. The bar rests on its bottom edge and stays in view while it scrolls. */
+  /** The table the bar rests on. */
   anchor: React.RefObject<HTMLElement | null>;
-  /** Where the bar is portalled; `null` waits for the element. Inside a modal dialog, pass the dialog's popup. */
+  /** Where the bar is portalled. Inside a modal dialog, pass its popup. */
   portalRoot?: HTMLElement | null;
-  /** Where focus goes when the bar closes while holding it. Defaults to where focus came from. */
+  /** Where focus goes when the bar closes while holding it. */
   returnFocus?: React.RefObject<HTMLElement | null>;
   positionerXstyle?: XStyle;
 }
 
-/** A floating toolbar of actions for a selection. */
 const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function ActionBarRoot(
   { open, anchor, portalRoot, returnFocus, render, xstyle, positionerXstyle, children, onFocus, ...rest },
   ref,
@@ -285,10 +284,6 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
 
 export type ActionBarActionProps = ButtonProps;
 
-/**
- * A control in the bar: a ghost button that joins the bar's arrow-key navigation. Pass it as the
- * `render` of a `Menu.Trigger` or `Dialog.Trigger` to open one from the bar.
- */
 const Action = React.forwardRef<HTMLButtonElement, ActionBarActionProps>(function ActionBarAction(
   { color, xstyle, ...rest },
   ref,
@@ -319,7 +314,6 @@ const Action = React.forwardRef<HTMLButtonElement, ActionBarActionProps>(functio
 
 export type ActionBarCountProps = MosaicComponentProps<'div'>;
 
-/** The selected count. Describes the toolbar, announces changes, and holds its text while the bar closes. */
 const Count = React.forwardRef<HTMLDivElement, ActionBarCountProps>(function ActionBarCount(
   { render, xstyle, id: idProp, children, ...rest },
   ref,
@@ -357,7 +351,6 @@ const Count = React.forwardRef<HTMLDivElement, ActionBarCountProps>(function Act
 
 export type ActionBarSeparatorProps = MosaicComponentProps<'div'>;
 
-/** A vertical divider between groups of the bar. */
 const Separator = React.forwardRef<HTMLDivElement, ActionBarSeparatorProps>(function ActionBarSeparator(
   { render, xstyle, ...rest },
   ref,
@@ -376,7 +369,6 @@ const Separator = React.forwardRef<HTMLDivElement, ActionBarSeparatorProps>(func
 
 export type ActionBarDismissProps = Omit<ActionBarActionProps, 'children'>;
 
-/** Clears the selection. Labelled "Clear selection" by default. */
 const Dismiss = React.forwardRef<HTMLButtonElement, ActionBarDismissProps>(function ActionBarDismiss(
   { 'aria-label': ariaLabel, ...rest },
   ref,
@@ -393,5 +385,4 @@ const Dismiss = React.forwardRef<HTMLButtonElement, ActionBarDismissProps>(funct
   );
 });
 
-/** Bulk actions for a table selection. */
 export const ActionBar = { Root, Action, Count, Separator, Dismiss };

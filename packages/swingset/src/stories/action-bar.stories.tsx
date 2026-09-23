@@ -135,7 +135,6 @@ function MembersTable({ rows = 10, portalRoot }: { rows?: number; portalRoot?: H
   );
 }
 
-/** Select rows and scroll: the bar stays pinned until the table's bottom edge comes into view. */
 export function Default() {
   return (
     <div style={{ height: 420, width: '100%', overflowY: 'auto', padding: 16 }}>
@@ -184,7 +183,6 @@ function MembersProfile({
   );
 }
 
-/** In a profile dialog the bar is portalled into the dialog and pins to the foot of the content column. */
 export function InDialog() {
   const [popup, setPopup] = useState<HTMLDivElement | null>(null);
   return (
@@ -200,7 +198,6 @@ export function InDialog() {
   );
 }
 
-/** Inline, the page scrolls, so the bar pins to the foot of the viewport. */
 export function Inline() {
   return <MembersProfile elevation='flush' />;
 }
