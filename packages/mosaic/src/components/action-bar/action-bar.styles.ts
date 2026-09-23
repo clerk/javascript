@@ -48,16 +48,23 @@ export const styles = stylex.create({
     },
     transform: {
       default: 'translateY(0)',
+      [reduceMotion]: {
+        default: 'translateY(0)',
+        ':is([data-open="false"])': 'translateY(0)',
+      },
       ':is([data-open="false"])': 'translateY(0.25rem)',
     },
     transitionDuration: {
-      default: `${durationVars['--cl-duration-base']}, ${durationVars['--cl-duration-base']}`,
-      [reduceMotion]: `${durationVars['--cl-duration-instant']}, ${durationVars['--cl-duration-instant']}`,
-      ':is([data-open="false"])': `${durationVars['--cl-duration-instant']}, ${durationVars['--cl-duration-instant']}`,
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
+      ':is([data-open="false"])': durationVars['--cl-duration-fast'],
     },
-    transitionProperty: 'opacity, transform',
+    transitionProperty: {
+      default: 'opacity, transform',
+      [reduceMotion]: 'opacity',
+    },
     transitionTimingFunction: {
-      default: `linear, ${easingVars['--cl-ease-enter']}`,
+      default: easingVars['--cl-ease-enter'],
+      ':is([data-open="false"])': easingVars['--cl-ease-exit'],
     },
     maxWidth: 'calc(100% - 2 * var(--cl-spacing))',
   },

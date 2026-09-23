@@ -28,12 +28,7 @@ function syncTabStops(items: HTMLElement[], active: HTMLElement | undefined) {
 
 export type ActionBarAnchorProps = MosaicComponentProps<'div'>;
 
-/**
- * Wraps the surface the bar acts on — a `Table.Root` — together with `ActionBar.Root`, which goes
- * last. The bar rests on the anchor's bottom edge and, while that edge is scrolled out of view,
- * pins to the foot of the nearest scroll container: the content column of a `Profile` in a dialog,
- * or the page when the profile is inline.
- */
+/** Wraps the table and `ActionBar.Root`. The bar rests on its bottom edge and stays in view while it scrolls. */
 const Anchor = React.forwardRef<HTMLDivElement, ActionBarAnchorProps>(function ActionBarAnchor(
   { render, xstyle, ...rest },
   ref,
@@ -49,32 +44,12 @@ const Anchor = React.forwardRef<HTMLDivElement, ActionBarAnchorProps>(function A
 export interface ActionBarRootProps extends MosaicComponentProps<'div'> {
   /** Whether the bar is shown. Toggling it animates the bar in and out. */
   open: boolean;
-  /**
-   * Where focus goes when the bar closes while it holds focus. Defaults to the element focus
-   * entered the bar from, when that is still on the page.
-   */
+  /** Where focus goes when the bar closes while holding it. Defaults to where focus came from. */
   returnFocus?: React.RefObject<HTMLElement | null>;
   positionerXstyle?: XStyle;
 }
 
-/**
- * A floating toolbar of actions for a selection, placed as the last child of `ActionBar.Anchor`.
- * It is one tab stop: the arrow keys, `Home`, and `End` move between its controls. While `open` is
- * false it is inert and click-through, and if it held focus, focus returns to where it came from.
- * Label it, and point `aria-controls` at the table it acts on:
- *
- * @example
- * <ActionBar.Anchor>
- *   <Table.Root id={tableId}>…</Table.Root>
- *   <ActionBar.Root open={count > 0} aria-label='Bulk actions' aria-controls={tableId}>
- *     <ActionBar.Count>{count} selected</ActionBar.Count>
- *     <ActionBar.Separator />
- *     <Menu.Root>…</Menu.Root>
- *     <ActionBar.Separator />
- *     <ActionBar.Dismiss onClick={clearSelection} />
- *   </ActionBar.Root>
- * </ActionBar.Anchor>
- */
+/** A floating toolbar of actions for a selection. Place it last in `ActionBar.Anchor`. */
 const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function ActionBarRoot(
   { open, returnFocus, render, xstyle, positionerXstyle, children, onKeyDown, onFocus, onBlur, ...rest },
   ref,
@@ -246,10 +221,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
 
 export type ActionBarCountProps = MosaicComponentProps<'div'>;
 
-/**
- * The leading count of what is selected, e.g. `3 selected`. It describes the toolbar and is a
- * polite live region, so a change in the selection is announced.
- */
+/** The selected count. Describes the toolbar and announces changes. */
 const Count = React.forwardRef<HTMLDivElement, ActionBarCountProps>(function ActionBarCount(
   { render, xstyle, id: idProp, children, ...rest },
   ref,
@@ -301,7 +273,7 @@ const Separator = React.forwardRef<HTMLDivElement, ActionBarSeparatorProps>(func
 
 export type ActionBarDismissProps = MosaicElementProps<'button'>;
 
-/** Dismisses the bar. A ghost icon button; defaults its label to "Clear selection". */
+/** Clears the selection. Labelled "Clear selection" by default. */
 const Dismiss = React.forwardRef<HTMLButtonElement, ActionBarDismissProps>(function ActionBarDismiss(
   { xstyle, 'aria-label': ariaLabel, ...rest },
   ref,
@@ -320,9 +292,5 @@ const Dismiss = React.forwardRef<HTMLButtonElement, ActionBarDismissProps>(funct
   );
 });
 
-/**
- * A floating toolbar of actions for a current selection, composed through `ActionBar.Anchor`,
- * `ActionBar.Root`, `ActionBar.Count`, `ActionBar.Separator`, and `ActionBar.Dismiss`. The actions
- * themselves (a `Menu`, a `Button`) are whatever children you place between them.
- */
+/** Bulk actions for a table selection. */
 export const ActionBar = { Anchor, Root, Count, Separator, Dismiss };

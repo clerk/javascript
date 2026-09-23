@@ -31,11 +31,7 @@ const members = [
   { id: 'steve', name: 'Steve Hayes', role: 'Admin' },
 ];
 
-/**
- * The bar rests on the table's bottom edge. The example sits in a short scroll container, as a
- * `Profile` content column does in a dialog: select a few rows and scroll up, and the bar stays
- * pinned to the foot of the container until the table's edge comes back into view.
- */
+/** Select rows and scroll: the bar stays pinned until the table's bottom edge comes into view. */
 export function Default() {
   const tableId = useId();
   const selectAllRef = useRef<HTMLInputElement>(null);
