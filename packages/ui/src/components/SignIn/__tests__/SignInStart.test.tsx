@@ -394,6 +394,23 @@ describe('SignInStart', () => {
         });
       });
     });
+
+    it('explains a challenge the social button cannot run, instead of showing the raw error', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+      });
+      fixtures.signIn.authenticateWithRedirect.mockRejectedValueOnce(
+        new ClerkRuntimeError('A verification challenge must be completed before this sign-in can continue.', {
+          code: 'protect_check_required',
+        }),
+      );
+
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.click(screen.getByText('Continue with Google'));
+
+      expect(await screen.findByText(/needs an extra verification step/i)).toBeInTheDocument();
+      expect(screen.queryByText(/code="protect_check_required"/)).not.toBeInTheDocument();
+    });
   });
 
   describe('navigation', () => {
