@@ -11,8 +11,8 @@ export const meta: StoryMeta = {
   status: 'wip',
   substatus: 'needs wire-up',
   title: 'InvitationsTableTab',
-  label: 'Invitations table tab',
-  navigation: { category: 'Tabs' },
+  label: 'Invitations table',
+  navigation: { category: 'Panels' },
   source: 'packages/mosaic/src/features/organization-profile/invitations-table-tab.view.tsx',
 };
 
