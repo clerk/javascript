@@ -23,8 +23,8 @@ export interface RequestsTableTabViewProps {
   onPageChange: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   onSearchChange: (value: string) => void;
-  onAccept?: (id: string) => void;
-  onDecline?: (id: string) => void;
+  onAccept?: (id: string) => void | Promise<void>;
+  onDecline?: (id: string) => void | Promise<void>;
   onBulkAction?: (ids: string[]) => void;
   sort?: RequestsTableSort | null;
   onSortChange?: (sort: RequestsTableSort | null) => void;
