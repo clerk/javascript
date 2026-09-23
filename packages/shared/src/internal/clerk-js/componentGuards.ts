@@ -11,11 +11,11 @@ export const isSignedInAndSingleSessionModeEnabled: ComponentGuard = (clerk, env
 };
 
 export const noUserExists: ComponentGuard = clerk => {
-  return !clerk.user;
+  return clerk.user === null;
 };
 
 export const noOrganizationExists: ComponentGuard = clerk => {
-  return !clerk.organization;
+  return clerk.organization === null;
 };
 
 export const disabledOrganizationsFeature: ComponentGuard = (_, environment) => {
