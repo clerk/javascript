@@ -1,9 +1,10 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { Dialog } from '../dialog';
 import { Menu } from '../menu';
 import { ActionBar } from './action-bar';
 
@@ -164,5 +165,66 @@ describe('Mosaic ActionBar', () => {
     render(<BulkActions onDismiss={onDismiss} />);
     await userEvent.click(screen.getByRole('button', { name: 'Clear selection' }));
     expect(onDismiss).toHaveBeenCalledOnce();
+  });
+  describe('with a confirmation dialog', () => {
+    function ConfirmRemove() {
+      const [selected, setSelected] = React.useState(true);
+      const [confirming, setConfirming] = React.useState(false);
+      const selectRef = React.useRef<HTMLInputElement>(null);
+      return (
+        <ActionBar.Anchor>
+          <input
+            ref={selectRef}
+            type='checkbox'
+            aria-label='Select Kyle'
+          />
+          <ActionBar.Root
+            open={selected}
+            aria-label='Bulk actions'
+            returnFocus={selectRef}
+          >
+            <Dialog.Root
+              open={confirming}
+              onOpenChange={setConfirming}
+              role='alertdialog'
+            >
+              <Dialog.Trigger>Remove</Dialog.Trigger>
+              <Dialog.Popup finalFocus={() => (selected ? undefined : selectRef.current)}>
+                <Dialog.Close>Cancel</Dialog.Close>
+                <button
+                  type='button'
+                  onClick={() => {
+                    setSelected(false);
+                    setConfirming(false);
+                  }}
+                >
+                  Confirm
+                </button>
+              </Dialog.Popup>
+            </Dialog.Root>
+          </ActionBar.Root>
+        </ActionBar.Anchor>
+      );
+    }
+
+    it('returns focus to the bar when the dialog is cancelled', async () => {
+      const user = userEvent.setup();
+      render(<ConfirmRemove />);
+      await user.click(screen.getByRole('checkbox', { name: 'Select Kyle' }));
+      await user.tab();
+      await user.keyboard('{Enter}');
+      await user.click(await screen.findByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Remove' })).toHaveFocus());
+    });
+
+    it('sends focus past the closed bar when the dialog confirms', async () => {
+      const user = userEvent.setup();
+      render(<ConfirmRemove />);
+      await user.click(screen.getByRole('checkbox', { name: 'Select Kyle' }));
+      await user.tab();
+      await user.keyboard('{Enter}');
+      await user.click(await screen.findByRole('button', { name: 'Confirm' }));
+      await waitFor(() => expect(screen.getByRole('checkbox', { name: 'Select Kyle' })).toHaveFocus());
+    });
   });
 });
