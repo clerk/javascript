@@ -22,7 +22,11 @@ let user: {
   username: string | null;
   imageUrl: string;
   hasImage: boolean;
-  enterpriseAccounts: { active: boolean }[];
+  enterpriseAccounts: {
+    active: boolean;
+    provider: string;
+    enterpriseConnection: { name: string; logoPublicUrl: string | null } | null;
+  }[];
   primaryEmailAddressId: string | null;
   primaryPhoneNumberId: string | null;
   emailAddresses: { id: string; emailAddress: string; verification: { status: string | null } }[];
@@ -31,6 +35,7 @@ let user: {
   update: ReturnType<typeof vi.fn>;
 } | null;
 let attributes: Record<'first_name' | 'last_name' | 'username' | 'email_address' | 'phone_number', FakeAttribute>;
+let usernameSettings: { min_length: number; max_length: number };
 let environmentHydrated: boolean;
 
 function attribute(overrides: Partial<FakeAttribute> = {}): FakeAttribute {
@@ -43,7 +48,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useUser: () => ({ isLoaded: isUserLoaded, user }),
     useClerk: () => ({
-      __internal_environment: environmentHydrated ? { userSettings: { attributes } } : null,
+      __internal_environment: environmentHydrated ? { userSettings: { attributes, usernameSettings } } : null,
     }),
   };
 });
@@ -86,6 +91,7 @@ function apiError(paramName?: string) {
 beforeEach(() => {
   isUserLoaded = true;
   environmentHydrated = true;
+  usernameSettings = { min_length: 4, max_length: 64 };
   attributes = {
     first_name: attribute(),
     last_name: attribute(),
@@ -199,9 +205,21 @@ describe('useUserProfileAccountSectionModel', () => {
       });
     });
 
-    it('is read only while an enterprise account is active', () => {
-      user?.enterpriseAccounts.push({ active: true });
-      expect(ready().onSubmitName).toBeUndefined();
+    it('names the connection managing the name instead of offering to edit it', () => {
+      user?.enterpriseAccounts.push({
+        active: true,
+        provider: 'saml_okta',
+        enterpriseConnection: { name: 'Okta', logoPublicUrl: 'https://img.clerk.com/okta.svg' },
+      });
+      expect(ready()).toMatchObject({
+        nameManagedBy: { name: 'Okta', iconUrl: 'https://img.clerk.com/okta.svg' },
+        onSubmitName: undefined,
+      });
+    });
+
+    it('falls back to the provider when the active account carries no connection', () => {
+      user?.enterpriseAccounts.push({ active: true, provider: 'saml_okta', enterpriseConnection: null });
+      expect(ready().nameManagedBy).toEqual({ name: 'okta', iconUrl: undefined });
     });
 
     it('passes the instance name attributes through for the row to hide itself', () => {
@@ -232,11 +250,16 @@ describe('useUserProfileAccountSectionModel', () => {
       expect(user?.update).toHaveBeenCalledWith({ username: 'preston' });
     });
 
-    it('maps a username error onto the field', async () => {
+    it('maps a username error onto the field, with the configured length bounds to fill its message', async () => {
       user?.update.mockRejectedValue(apiError('username'));
       await expect(rejection(ready().onSubmitUsername?.('x'))).resolves.toEqual({
         fields: {
-          username: { code: 'form_param_invalid', paramName: 'username', message: 'That value is invalid.' },
+          username: {
+            code: 'form_param_invalid',
+            paramName: 'username',
+            message: 'That value is invalid.',
+            params: { min_length: 4, max_length: 64 },
+          },
         },
       });
     });

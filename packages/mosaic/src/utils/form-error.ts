@@ -1,7 +1,7 @@
 import { isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
-import type { LocalizableError } from '../localization';
+import type { LocalizableError, MessageValues } from '../localization';
 
 export interface FormError<TField extends string = string> {
   global?: LocalizableError;
@@ -24,9 +24,16 @@ export class SaveError<TField extends string = string> extends Error {
 function toClerkFormError<TField extends string>(
   cause: unknown,
   fields: readonly TField[],
+  params: MessageValues | undefined,
 ): FormError<TField> | undefined {
   if (isClerkRuntimeError(cause)) {
-    return { global: { code: cause.code, ...(cause.longMessage ? { message: cause.longMessage } : {}) } };
+    return {
+      global: {
+        code: cause.code,
+        ...(cause.longMessage ? { message: cause.longMessage } : {}),
+        ...(params ? { params } : {}),
+      },
+    };
   }
   if (!isClerkAPIResponseError(cause)) {
     return undefined;
@@ -38,6 +45,7 @@ function toClerkFormError<TField extends string>(
       code: apiError.code,
       ...(paramName ? { paramName } : {}),
       message: apiError.longMessage || apiError.message,
+      ...(params ? { params } : {}),
     };
     const field = fields.find(f => paramName && snakeToCamel(paramName) === f);
     if (field) {
@@ -51,16 +59,19 @@ function toClerkFormError<TField extends string>(
 
 /**
  * Runs a save and rejects with a `SaveError` the view can render. `fields` names the controls the
- * failure may be routed to; an error that names none of them lands in `global`.
+ * failure may be routed to; an error that names none of them lands in `global`. `params` carries
+ * the instance settings a failure's message may need to read — the length bounds a username was
+ * measured against, say — since only the caller's layer can resolve them.
  */
 export async function save<TField extends string = never>(
   run: () => Promise<unknown>,
   fields: readonly TField[] = [],
+  params?: MessageValues,
 ): Promise<void> {
   try {
     await run();
   } catch (cause) {
-    const formError = toClerkFormError(cause, fields);
+    const formError = toClerkFormError(cause, fields, params);
     if (!formError) {
       throw cause;
     }

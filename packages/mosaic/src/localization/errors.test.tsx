@@ -41,6 +41,19 @@ describe('useErrorText', () => {
     );
   });
 
+  it('fills the values the error carries into its message', () => {
+    expect(errorText()({ code: 'form_username_invalid_length', params: { min_length: 4, max_length: 64 } })).toBe(
+      'Your username must be between 4 and 64 characters long.',
+    );
+  });
+
+  it('fills an override the same way', () => {
+    const text = errorText({ 'errors.form_username_invalid_length': 'Entre {min_length} y {max_length} caracteres.' });
+    expect(text({ code: 'form_username_invalid_length', params: { min_length: 4, max_length: 64 } })).toBe(
+      'Entre 4 y 64 caracteres.',
+    );
+  });
+
   it('falls back to the generic message when there is nothing else', () => {
     expect(errorText({ 'errors.generic': 'Algo salió mal.' })({})).toBe('Algo salió mal.');
     expect(errorText()({ code: 'toString' })).toBe('Something went wrong. Please try again.');

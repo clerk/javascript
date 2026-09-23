@@ -11,5 +11,6 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   form_password_not_strong_enough: 'Your password is not strong enough.',
   form_password_pwned:
     'This password has been found as part of a breach and can not be used, please try another password instead.',
+  form_username_invalid_length: 'Your username must be between {min_length} and {max_length} characters long.',
   form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
 };
