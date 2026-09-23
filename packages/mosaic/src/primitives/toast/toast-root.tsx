@@ -15,6 +15,7 @@ import React, {
 
 import { useTransition } from '../hooks/use-transition';
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { autoUpdate, getDimensions } from '../utils/dom';
 import { ToastRootContext, type ToastRootContextValue, useToastContext } from './toast-context';
 import { isAnchored, type ToastObject } from './toast-manager';
 
@@ -132,21 +133,15 @@ export const ToastRoot = React.forwardRef<HTMLDivElement, ToastRootProps>(functi
       return;
     }
     const unregister = registerRoot(toast.id, element);
-    const measure = () => {
+    const cleanup = autoUpdate(element, () => {
       const previousHeight = element.style.height;
       element.style.height = 'auto';
-      const height = element.offsetHeight;
+      const { height } = getDimensions(element);
       element.style.height = previousHeight;
       setHeight(toast.id, height);
-    };
-    measure();
-    if (typeof ResizeObserver === 'undefined') {
-      return unregister;
-    }
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
+    });
     return () => {
-      observer.disconnect();
+      cleanup();
       unregister();
     };
   }, [toast.id, registerRoot, setHeight]);

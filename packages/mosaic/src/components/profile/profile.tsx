@@ -1,10 +1,11 @@
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useMeasure } from '../../hooks/useMeasure';
 import type { TabsProps } from '../../primitives/tabs';
 import { Tabs } from '../../primitives/tabs';
 import { useRender } from '../../primitives/utils';
+import { autoUpdate, getDimensions } from '../../primitives/utils/dom';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
@@ -50,8 +51,8 @@ const ContentPanelContext = React.createContext<{ titleId: string; value: string
  * renders is a DOM decision CSS cannot make — one tablist, in the column or in the sheet, never
  * both — and read this way so the breakpoint lives in CSS alone. Unmeasured is wide.
  */
-function isCompact(sentinelWidth: number | null): boolean {
-  return sentinelWidth !== null && sentinelWidth >= 2;
+function isCompact(sentinelWidth: number): boolean {
+  return sentinelWidth >= 2;
 }
 
 function useProfileContext(part: string): ProfileContextValue {
@@ -125,8 +126,14 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   // names the dialog without knowing it is in one — the way `Card.Title` does.
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
-  const [measure, { width }] = useMeasure<HTMLSpanElement>();
-  const compact = isCompact(width);
+  const [sentinel, setSentinel] = React.useState<HTMLSpanElement | null>(null);
+  const [compact, setCompact] = React.useState(false);
+  useSafeLayoutEffect(() => {
+    if (!sentinel) {
+      return;
+    }
+    return autoUpdate(sentinel, () => setCompact(isCompact(getDimensions(sentinel).width)));
+  }, [sentinel]);
   const pageTitles = React.useRef(new Map<string, HTMLElement>());
   const registerPageTitle = React.useCallback((page: string, element: HTMLElement | null) => {
     if (element) {
@@ -175,7 +182,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
         <>
           <span
             aria-hidden
-            ref={measure}
+            ref={setSentinel}
             {...mergeStyleProps(themeProps('profile-sentinel'), stylex.props(reset.base, styles.sentinel))}
           />
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
