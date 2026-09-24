@@ -13,6 +13,7 @@ import type {
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   __internal_UserVerificationProps,
+  AgentActionApprovalProps,
   APIKeysNamespace,
   APIKeysProps,
   AuthenticateWithBaseParams,
@@ -168,6 +169,7 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
   private premountConfigureSSONodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
   private premountConfigureDirectorySyncNodes = new Map<HTMLDivElement, ConfigureSSOProps | undefined>();
   private premountOAuthConsentNodes = new Map<HTMLDivElement, __internal_OAuthConsentProps | undefined>();
+  private premountAgentActionApprovalNodes = new Map<HTMLDivElement, AgentActionApprovalProps | undefined>();
   private premountOAuthDeviceVerificationNodes = new Map<HTMLDivElement, OAuthDeviceVerificationProps | undefined>();
   private premountTaskChooseOrganizationNodes = new Map<HTMLDivElement, TaskChooseOrganizationProps | undefined>();
   private premountTaskResetPasswordNodes = new Map<HTMLDivElement, TaskResetPasswordProps | undefined>();
@@ -812,6 +814,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
       clerkjs.__internal_mountOAuthConsent(node, props);
     });
 
+    this.premountAgentActionApprovalNodes.forEach((props, node) => {
+      clerkjs.__experimental_mountAgentActionApproval(node, props);
+    });
+
     if (typeof clerkjs.__internal_mountOAuthDeviceVerification === 'function') {
       this.premountOAuthDeviceVerificationNodes.forEach((props, node) => {
         clerkjs.__internal_mountOAuthDeviceVerification(node, props);
@@ -1433,6 +1439,22 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
 
   unmountOAuthConsent = (node: HTMLDivElement) => {
     this.__internal_unmountOAuthConsent(node);
+  };
+
+  __experimental_mountAgentActionApproval = (node: HTMLDivElement, props?: AgentActionApprovalProps) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__experimental_mountAgentActionApproval(node, props);
+    } else {
+      this.premountAgentActionApprovalNodes.set(node, props);
+    }
+  };
+
+  __experimental_unmountAgentActionApproval = (node: HTMLDivElement) => {
+    if (this.clerkjs && this.loaded) {
+      this.clerkjs.__experimental_unmountAgentActionApproval(node);
+    } else {
+      this.premountAgentActionApprovalNodes.delete(node);
+    }
   };
 
   __internal_mountOAuthDeviceVerification = (node: HTMLDivElement, props?: OAuthDeviceVerificationProps) => {

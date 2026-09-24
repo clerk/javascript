@@ -14,6 +14,32 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const taIN: LocalizationResource = {
   locale: 'ta-IN',
+  agentActionApproval: {
+    action__approve: undefined,
+    action__deny: undefined,
+    action__switchAccount: undefined,
+    commentLabel: undefined,
+    commentOptional: undefined,
+    commentPlaceholder: undefined,
+    copyParameter: undefined,
+    detailsLabel: undefined,
+    expiresIn: undefined,
+    parameterCopied: undefined,
+    requestedAt: undefined,
+    signedInAs: undefined,
+    terminal: {
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+    },
+    title: undefined,
+    unavailableSubtitle: undefined,
+    unavailableTitle: undefined,
+    workspace: undefined,
+  },
   apiKeys: {
     action__add: 'புதிய விசையைச் சேர்',
     action__search: 'விசைகளைத் தேடு',

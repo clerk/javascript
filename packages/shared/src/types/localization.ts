@@ -1517,6 +1517,32 @@ export type __internal_LocalizationResource = {
       subtitle: LocalizationValue<'applicationName'>;
     };
   };
+  agentActionApproval: {
+    title: LocalizationValue;
+    unavailableTitle: LocalizationValue;
+    unavailableSubtitle: LocalizationValue;
+    workspace: LocalizationValue;
+    signedInAs: LocalizationValue<'identifier'>;
+    requestedAt: LocalizationValue<'relativeTime'>;
+    commentLabel: LocalizationValue;
+    commentOptional: LocalizationValue;
+    commentPlaceholder: LocalizationValue;
+    detailsLabel: LocalizationValue;
+    copyParameter: LocalizationValue<'parameter'>;
+    parameterCopied: LocalizationValue<'parameter'>;
+    expiresIn: LocalizationValue<'remaining'>;
+    action__approve: LocalizationValue;
+    action__deny: LocalizationValue;
+    action__switchAccount: LocalizationValue;
+    terminal: {
+      approvedTitle: LocalizationValue;
+      approvedSubtitle: LocalizationValue;
+      deniedTitle: LocalizationValue;
+      deniedSubtitle: LocalizationValue;
+      expiredTitle: LocalizationValue;
+      expiredSubtitle: LocalizationValue;
+    };
+  };
   oauthDeviceVerification: {
     start: {
       title: LocalizationValue;
