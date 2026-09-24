@@ -55,6 +55,47 @@ describe.each(['SignIn', 'SignUp'] as const)('%s accessible labels', component =
     },
   );
 
+  it.each(['auto', 'iconButton', 'blockButton'] as const)(
+    'includes the localized last-used badge in the accessible name with the %s layout',
+    async socialButtonsVariant => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'apple' });
+        f.withSocialProvider({ provider: 'facebook' });
+        f.withSocialProvider({ provider: 'google' });
+      });
+      fixtures.clerk.client.lastAuthenticationStrategy = 'oauth_google';
+      fixtures.options.localization = {
+        ...frFR,
+        lastAuthenticationStrategy: 'Dernière utilisation',
+        socialButtonsBlockButton: 'Se connecter avec {{provider}}',
+      };
+
+      render(
+        <AppearanceProvider
+          appearanceKey={component === 'SignIn' ? 'signIn' : 'signUp'}
+          appearance={{ options: { socialButtonsVariant } }}
+        >
+          <CardStateProvider>
+            <SocialButtons
+              oauthCallback={vi.fn()}
+              web3Callback={vi.fn()}
+              alternativePhoneCodeCallback={vi.fn()}
+              enableOAuthProviders
+              enableWeb3Providers={false}
+              enableAlternativePhoneCodeProviders={false}
+              showLastAuthenticationStrategy
+            />
+          </CardStateProvider>
+        </AppearanceProvider>,
+        { wrapper },
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Dernière utilisation Se connecter avec Google', exact: true }),
+      ).toBeVisible();
+    },
+  );
+
   it.each([
     { localization: frFR, show: 'Afficher le mot de passe', hide: 'Masquer le mot de passe' },
     {

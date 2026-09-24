@@ -173,6 +173,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           })}
         >
           {row.map(strategy => {
+            const isLastAuthenticationStrategy = strategy === lastAuthenticationStrategy && totalEnabledAuthMethods > 1;
             const shouldShowPreText =
               remainingStrategiesLength === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD ||
               (strategy === lastAuthenticationStrategy && row.length === 1);
@@ -211,7 +212,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 isDisabled={card.isLoading}
                 label={label}
                 aria-label={
-                  preferBlockButtons
+                  preferBlockButtons || isLastAuthenticationStrategy
                     ? undefined
                     : t(
                         localizationKeys('socialButtonsBlockButton', {
@@ -221,7 +222,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 }
                 textLocalizationKey={localizedText}
                 icon={imageOrInitial}
-                lastAuthenticationStrategy={strategy === lastAuthenticationStrategy && totalEnabledAuthMethods > 1}
+                lastAuthenticationStrategy={isLastAuthenticationStrategy}
               />
             );
           })}
