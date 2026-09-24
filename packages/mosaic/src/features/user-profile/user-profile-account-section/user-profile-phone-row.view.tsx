@@ -5,6 +5,7 @@ import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
+import { useListRemovalFocus } from '../../../hooks/useListRemovalFocus';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfilePhone } from './user-profile-account-section.types';
 import type { UserProfileAddPhoneControllerOptions } from './user-profile-add-phone.controller';
@@ -35,6 +36,12 @@ export function UserProfilePhoneRowView({
   onRemovePhone,
 }: UserProfilePhoneRowViewProps) {
   const m = useMessages('userProfileAccountSection');
+  const row = useRef<HTMLDivElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: phones.map(phone => phone.id),
+    onRemove: onRemovePhone,
+    fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
+  });
   const addPhoneAction =
     onSendPhoneCode && onVerifyPhoneCode ? (
       <AddPhone
@@ -91,6 +98,8 @@ export function UserProfilePhoneRowView({
   return (
     <>
       <UserProfileContactListRowView
+        rowRef={row}
+        triggerRef={removalFocus.registerTrigger}
         items={formattedPhones}
         kind='phone'
         label={m.phone.label}
@@ -116,7 +125,8 @@ export function UserProfilePhoneRowView({
           }
           actionLabel={m.phone.removeDialog.confirm}
           cancelLabel={m.phone.removeDialog.cancel}
-          onConfirm={phone => onRemovePhone(phone.id)}
+          finalFocus={removalFocus.finalFocus}
+          onConfirm={phone => removalFocus.remove(phone.id)}
         />
       ) : null}
     </>

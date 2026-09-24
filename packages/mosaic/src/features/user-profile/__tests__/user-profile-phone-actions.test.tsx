@@ -151,7 +151,7 @@ describe('phone actions', () => {
     await waitFor(() => expect(trigger).toHaveFocus());
   });
 
-  it('removes the phone row and keeps Add phone number available', async () => {
+  it('focuses Add phone number after removing the last phone', async () => {
     const user = userEvent.setup();
     function Example() {
       const [phones, setPhones] = useState([{ id: 'phone_1', value: '+18015550100', isVerified: true }]);
@@ -178,6 +178,7 @@ describe('phone actions', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(screen.queryByRole('button', { name: 'Manage +1 (801) 555-0100' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add phone number' })).toBeEnabled();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Add phone number' })).toHaveFocus());
   });
 
   it('shows a failed removal in the dialog and allows retry', async () => {
