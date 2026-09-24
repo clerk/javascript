@@ -20,10 +20,11 @@ const biometricCredentials: UseBiometricCredentialsReturn = Object.freeze({
   enroll: rejectUnsupported,
   revoke: rejectUnsupported,
   signIn: rejectUnsupported,
+  reverify: rejectUnsupported,
 });
 
 /**
- * Accesses biometric credential enrollment and sign-in.
+ * Accesses biometric credential enrollment, sign-in, and session reverification.
  *
  * Biometric credentials are currently supported on iOS and Android.
  */
