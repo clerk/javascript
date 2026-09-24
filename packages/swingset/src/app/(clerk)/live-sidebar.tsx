@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/sidebar';
 
 const flows = [
+  { title: 'Password', href: '/live/password' },
   { title: 'Delete account', href: '/live/delete-account' },
   { title: 'Reverification', href: '/live/reverification' },
 ];
