@@ -35,6 +35,24 @@ function stubPrototype(target: object, name: string, descriptor: PropertyDescrip
 }
 
 describe('Mosaic Field', () => {
+  it('associates text-only info feedback with the control in a live region', () => {
+    render(
+      <Field.Root>
+        <Field.Label>Password</Field.Label>
+        <Input />
+        <Field.Message>
+          <Field.Info>Try a longer password.</Field.Info>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Password' })).toHaveAccessibleDescription('Try a longer password.');
+    expect(screen.getByRole('status')).toHaveTextContent('Try a longer password.');
+    const info = screen.getByText('Try a longer password.').closest('p');
+    expect(info).toHaveClass('cl-field-info');
+    expect(info?.querySelector('svg')).toBeNull();
+  });
+
   afterEach(() => {
     restores.splice(0).forEach(restore => restore());
   });
