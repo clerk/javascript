@@ -1,4 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
+import type { MouseEventHandler } from 'react';
 
 import { panelStyles, Profile } from '../../components/profile';
 import { Tabs } from '../../components/tabs';
@@ -8,6 +9,8 @@ import type { InvitationsTableTabViewProps } from './invitations-table-tab.types
 import { InvitationsTableTabView } from './invitations-table-tab.view';
 import type { MembersTableTabViewProps } from './members-table-tab.types';
 import { MembersTableTabView } from './members-table-tab.view';
+import type { OrganizationProfileInviteMembersDialogProps } from './organization-profile-invite-members.dialog';
+import { OrganizationProfileInviteMembersDialog } from './organization-profile-invite-members.dialog';
 import type { RequestsTableTabViewProps } from './requests-table-tab.types';
 import { RequestsTableTabView } from './requests-table-tab.view';
 
@@ -15,12 +18,16 @@ export interface OrganizationProfileMembersPanelViewProps {
   members?: MembersTableTabViewProps;
   invitations?: InvitationsTableTabViewProps;
   requests?: RequestsTableTabViewProps;
+  onInvite?: MouseEventHandler<HTMLButtonElement>;
+  inviteDialog?: OrganizationProfileInviteMembersDialogProps;
 }
 
 export function OrganizationProfileMembersPanelView({
   members,
   invitations,
   requests,
+  onInvite,
+  inviteDialog,
 }: OrganizationProfileMembersPanelViewProps) {
   const m = useMessages('organizationProfile');
   const membersMessages = useMessages('membersTableTab');
@@ -30,17 +37,32 @@ export function OrganizationProfileMembersPanelView({
     {
       id: 'members',
       label: membersMessages.title,
-      content: members ? <MembersTableTabView {...members} /> : null,
+      content: members ? (
+        <MembersTableTabView
+          {...members}
+          onInvite={onInvite ?? members.onInvite}
+        />
+      ) : null,
     },
     {
       id: 'invitations',
       label: invitationsMessages.title,
-      content: invitations ? <InvitationsTableTabView {...invitations} /> : null,
+      content: invitations ? (
+        <InvitationsTableTabView
+          {...invitations}
+          onInvite={onInvite ?? invitations.onInvite}
+        />
+      ) : null,
     },
     {
       id: 'requests',
       label: requestsMessages.title,
-      content: requests ? <RequestsTableTabView {...requests} /> : null,
+      content: requests ? (
+        <RequestsTableTabView
+          {...requests}
+          onInvite={onInvite ?? requests.onInvite}
+        />
+      ) : null,
     },
   ].filter(tab => tab.content !== null);
 
@@ -70,6 +92,7 @@ export function OrganizationProfileMembersPanelView({
           ))}
         </Tabs.Root>
       ) : null}
+      {inviteDialog ? <OrganizationProfileInviteMembersDialog {...inviteDialog} /> : null}
     </div>
   );
 }

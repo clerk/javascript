@@ -4,7 +4,7 @@ import { FloatingFocusManager } from '@floating-ui/react';
 import React, { useEffect } from 'react';
 
 import { type FocusTarget, useFinalFocus } from '../hooks/use-focus-target';
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, getModalExemptElements, mergeProps, useRender } from '../utils';
 import { DrawerAttrs, DrawerCssVars } from './css-vars';
 import { useDrawerContext } from './drawer-context';
 
@@ -116,6 +116,7 @@ export const DrawerPopup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(fu
       context={floatingContext}
       modal={modal}
       outsideElementsInert={modal}
+      getInsideElements={() => getModalExemptElements(popupRef.current)}
       initialFocus={autoFocus ? undefined : popupRef}
       returnFocus={resolvedReturnFocus}
     >

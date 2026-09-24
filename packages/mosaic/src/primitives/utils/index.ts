@@ -1,6 +1,7 @@
 export { cssVars } from './css-vars';
 export { Freeze, type FreezeProps } from './freeze';
 export { isKeyboardEvent, isKeyboardOpen } from './interaction-modality';
+export { getModalExemptElements, modalExemptProps } from './modal-exempt';
 export { resolveSideOffset, type SideOffset } from './side-offset';
 export {
   type ComponentProps,

@@ -3,6 +3,8 @@ import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
+import { Dialog } from '../dialog';
+import { Drawer } from '../drawer';
 import { type ToastManager, type ToastPromiseOptions, useToastManager } from './use-toast-manager';
 
 afterEach(() => cleanup());
@@ -131,5 +133,40 @@ describe('Mosaic Toast', () => {
     expect(screen.getByRole('dialog', { name: 'Sending invites' })).toBeInTheDocument();
     await done;
     expect(await screen.findByRole('dialog', { name: '2 invites sent' })).toBeInTheDocument();
+  });
+});
+
+describe('Toast under a modal', () => {
+  it.each(['dialog', 'drawer'] as const)('stays reachable while a %s holds the page', async surface => {
+    let captured: ToastManager | undefined;
+    function Capture() {
+      captured = useToastManager();
+      return null;
+    }
+    render(
+      <MosaicProvider>
+        <Capture />
+        {surface === 'dialog' ? (
+          <Dialog.Root defaultOpen>
+            <Dialog.Popup>
+              <button type='button'>Inside</button>
+            </Dialog.Popup>
+          </Dialog.Root>
+        ) : (
+          <Drawer.Root defaultOpen>
+            <Drawer.Popup>
+              <button type='button'>Inside</button>
+            </Drawer.Popup>
+          </Drawer.Root>
+        )}
+      </MosaicProvider>,
+    );
+    await screen.findByRole('button', { name: 'Inside' });
+    act(() => {
+      captured?.add({ label: 'Invitations sent' });
+    });
+
+    const toast = await screen.findByRole('dialog', { name: 'Invitations sent' });
+    expect(toast.closest('[inert], [aria-hidden="true"]')).toBeNull();
   });
 });

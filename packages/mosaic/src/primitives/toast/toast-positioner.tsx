@@ -3,7 +3,7 @@
 import { arrow, autoUpdate, flip, hide, offset, type Placement, shift, useFloating } from '@floating-ui/react';
 import React, { useMemo, useRef } from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, modalExemptProps, useRender } from '../utils';
 import { cssVars } from '../utils/css-vars';
 import { ToastPositionerContext, type ToastPositionerContextValue } from './toast-context';
 import type { ToastAlign, ToastObject, ToastPositionerOptions, ToastSide } from './toast-manager';
@@ -59,6 +59,7 @@ export const ToastPositioner = React.forwardRef<HTMLDivElement, ToastPositionerP
     );
 
     const defaultProps = {
+      ...modalExemptProps,
       'data-side': placedSide,
       'data-align': placedAlign,
       ...(middlewareData.hide?.referenceHidden && { 'data-anchor-hidden': '' }),

@@ -1,3 +1,5 @@
+import type { MouseEventHandler } from 'react';
+
 export interface OrganizationProfileMember {
   id: string;
   name: string;
@@ -28,7 +30,7 @@ export interface MembersTableTabViewProps {
   onPageChange: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   onSearchChange: (value: string) => void;
-  onInvite?: () => void;
+  onInvite?: MouseEventHandler<HTMLButtonElement>;
   onRemove?: (id: string) => void | Promise<void>;
   onChangeRole?: (id: string, role: string) => void;
   onBulkAction?: (ids: string[]) => void;

@@ -6,7 +6,7 @@ export const membersTableTabMessages = {
   actions: 'Actions',
   search: 'Search members',
   clearSearch: 'Clear search',
-  invite: 'Invite members',
+  invite: 'Invite',
   empty: 'No members found',
   emptyDescription: 'Your search for "{query}" did not return any results.',
   noMembers: 'No members yet',

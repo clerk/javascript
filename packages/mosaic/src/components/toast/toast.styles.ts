@@ -28,6 +28,7 @@ export const styles = stylex.create({
     outline: 'none',
     insetBlockEnd: space['4'],
     position: 'fixed',
+    zIndex: 1,
   },
 
   root: {
@@ -142,6 +143,7 @@ export const styles = stylex.create({
 
   anchoredPositioner: {
     outline: 'none',
+    zIndex: 1,
   },
 
   anchoredRoot: {
