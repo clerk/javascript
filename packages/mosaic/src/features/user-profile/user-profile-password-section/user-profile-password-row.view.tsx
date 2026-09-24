@@ -58,7 +58,6 @@ function ManagedByLabel({ name, iconUrl }: UserProfilePasswordManagedBy) {
         />
       ) : (
         <Icon
-          aria-hidden
           name='lock'
           size='sm'
           xstyle={styles.managedByText}
@@ -92,9 +91,10 @@ function EditPassword({
 
   return (
     <UserProfileEditPasswordDialog
-      {...controller}
+      form={controller.form}
       hasPassword={hasPassword}
       open={controller.isOpen}
+      onOpenChange={controller.onOpenChange}
       requiresCurrentPassword={requiresCurrentPassword}
       trigger={
         <Button

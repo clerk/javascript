@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
+import { useRef } from 'react';
 
 import { panelStyles, Profile } from '../../components/profile';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -82,9 +83,15 @@ export function UserProfileProfilePanelView({
   onRemoveWeb3Wallet,
   onDeleteAccount,
 }: UserProfileProfilePanelViewProps): ReactElement {
+  const pageTitle = useRef<HTMLDivElement>(null);
   return (
     <div {...mergeStyleProps(themeProps('user-profile-profile-panel'), stylex.props(panelStyles.root))}>
-      <Profile.PageTitle>Account</Profile.PageTitle>
+      <Profile.PageTitle
+        ref={pageTitle}
+        tabIndex={-1}
+      >
+        Account
+      </Profile.PageTitle>
       <div {...stylex.props(panelStyles.sections)}>
         <UserProfileAccountSectionView
           allowMultipleAccounts={allowMultipleAccounts}
@@ -118,6 +125,7 @@ export function UserProfileProfilePanelView({
           onSubmitUsername={onSubmitUsername}
         />
         <UserProfileConnectedAccountsSectionView
+          fallbackFocus={() => pageTitle.current}
           accounts={connectedAccounts}
           availableProviders={availableConnectionProviders}
           onReconnect={onReconnectAccount}
@@ -125,6 +133,7 @@ export function UserProfileProfilePanelView({
           onRemove={onRemoveConnectedAccount}
         />
         <UserProfileWeb3WalletsSectionView
+          fallbackFocus={() => pageTitle.current}
           wallets={web3Wallets}
           availableProviders={availableWeb3Providers}
           onConnect={onConnectWeb3Wallet}

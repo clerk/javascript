@@ -171,6 +171,8 @@ export interface ProtectCheckJSON {
 export interface SignUpEnterpriseConnectionJSON extends ClerkResourceJSON {
   id: string;
   name: string;
+  provider: string;
+  logo_public_url?: string | null;
 }
 
 export interface SessionJSON extends ClerkResourceJSON {

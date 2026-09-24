@@ -1,11 +1,15 @@
 import { __internal_useOrganizationSSOBypassAllowlist, useOrganization, useUser } from '@clerk/shared/react';
 import type {
   AddSSOBypassAllowlistUserParams,
-  OrganizationMembershipResource,
+  AddSSOBypassAllowlistUsersParams,
+  OrganizationCustomRoleKey,
+  OrganizationResource,
+  SSOBypassAllowlistBulkCreateResult,
   SSOBypassAllowlistUserResource,
 } from '@clerk/shared/types';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
+import { ExclamationTriangle, InformationCircle, UserPlus } from '@/icons';
 import { Action } from '@/ui/elements/Action';
 import { useActionContext } from '@/ui/elements/Action/ActionRoot';
 import { Alert } from '@/ui/elements/Alert';
@@ -17,32 +21,153 @@ import { Form } from '@/ui/elements/Form';
 import { FormButtons } from '@/ui/elements/FormButtons';
 import { FormContainer } from '@/ui/elements/FormContainer';
 import { Header } from '@/ui/elements/Header';
+import { IconCircle } from '@/ui/elements/IconCircle';
 import { ProfileCard } from '@/ui/elements/ProfileCard';
 import { SearchInput } from '@/ui/elements/SearchInput';
+import { SegmentedControl } from '@/ui/elements/SegmentedControl';
+import { SuccessPage } from '@/ui/elements/SuccessPage';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { UserPreview } from '@/ui/elements/UserPreview';
 import { handleError } from '@/ui/utils/errorHandler';
+import { useFormControl } from '@/ui/utils/useFormControl';
 
+import { useWizard, Wizard } from '../../common';
+import type { LocalizationKey } from '../../customizables';
 import {
   Badge,
   Button,
   Col,
   descriptors,
   Flex,
+  Icon,
   localizationKeys,
   Td,
   Text,
   useLocalizations,
 } from '../../customizables';
+import { useFetch } from '../../hooks/useFetch';
+import { useFetchRoles } from '../../hooks/useFetchRoles';
 import { mqu } from '../../styledSystem';
+import { RoleSelect } from './MemberListTable';
 import { SecurityBackControl } from './SecurityBackControl';
 
 type SSOBypassAllowlistPageProps = {
   onBack: () => void;
 };
 
-const MEMBER_SEARCH_DEBOUNCE_MS = 500;
-const MEMBER_SEARCH_PAGE_SIZE = 10;
+const MEMBER_LOOKUP_PAGE_SIZE = 10;
+const ROLE_MEMBERS_PAGE_SIZE = 100;
+
+type BulkResult = { mode: AddMode; added: number; skipped: number; skippedCode: string | null };
+type AddMode = 'email' | 'role';
+type FormMessage = LocalizationKey | string;
+
+const DOMAIN_NOT_SERVED = 'sso_bypass_domain_not_served';
+const NOT_A_MEMBER = 'resource_not_found';
+type RoleOption = { value: string; label: string };
+
+const findMemberByEmail = async (organization: OrganizationResource, email: string) => {
+  const wanted = email.toLowerCase();
+  let fetched = 0;
+  for (let page = 1; ; page++) {
+    const { data, total_count } = await organization.getMemberships({
+      query: email,
+      pageSize: MEMBER_LOOKUP_PAGE_SIZE,
+      initialPage: page,
+    });
+    const match = data.find(membership => membership.publicUserData?.identifier?.toLowerCase() === wanted);
+    fetched += data.length;
+    if (match || data.length === 0 || fetched >= total_count) {
+      return match;
+    }
+  }
+};
+
+const useRoleMemberCounts = (roles: RoleOption[] | undefined, enabled: boolean): Record<string, number> => {
+  const { organization } = useOrganization();
+  const roleKeys = (roles ?? []).map(role => role.value);
+
+  const fetchCounts = async ({ keys }: { keys: string[] }) => {
+    if (!organization) {
+      return {};
+    }
+    const entries = await Promise.all(
+      keys.map(async role => {
+        const { total_count } = await organization.getMemberships({ role: [role], pageSize: 1 });
+        return [role, total_count] as const;
+      }),
+    );
+    return Object.fromEntries(entries) as Record<string, number>;
+  };
+
+  const shouldFetch = enabled && Boolean(organization?.id) && roleKeys.length > 0;
+  const { data } = useFetch(shouldFetch ? fetchCounts : undefined, {
+    keys: roleKeys,
+    orgId: organization?.id,
+    enabled: shouldFetch,
+  });
+
+  return data ?? {};
+};
+
+const collectUserIdsByRole = async (organization: OrganizationResource, role: OrganizationCustomRoleKey) => {
+  const userIds: string[] = [];
+  let fetched = 0;
+  for (let page = 1; ; page++) {
+    const { data, total_count } = await organization.getMemberships({
+      role: [role],
+      pageSize: ROLE_MEMBERS_PAGE_SIZE,
+      initialPage: page,
+    });
+    fetched += data.length;
+    data.forEach(membership => {
+      const userId = membership.publicUserData?.userId;
+      if (userId) {
+        userIds.push(userId);
+      }
+    });
+    if (data.length === 0 || fetched >= total_count) {
+      return userIds;
+    }
+  }
+};
+
+const sharedCode = (codes: string[]): string | null =>
+  codes.length > 0 && codes.every(code => code === codes[0]) ? codes[0] : null;
+
+const skippedText = (skipped: number, code: string | null): LocalizationKey => {
+  const reason = code === DOMAIN_NOT_SERVED ? 'domainNotServed' : code === NOT_A_MEMBER ? 'notMember' : 'unknown';
+  return skipped === 1
+    ? localizationKeys(`organizationProfile.securityPage.ssoBypassPage.bulkResult.${reason}__one` as const)
+    : localizationKeys(`organizationProfile.securityPage.ssoBypassPage.bulkResult.${reason}` as const, {
+        count: String(skipped),
+      });
+};
+
+const InlineMessage = (props: {
+  icon: React.ComponentType;
+  text: FormMessage;
+  elementDescriptor?: (typeof descriptors)[keyof typeof descriptors];
+}): JSX.Element => (
+  <Flex
+    elementDescriptor={props.elementDescriptor}
+    align='center'
+    gap={2}
+  >
+    <Icon
+      icon={props.icon}
+      size='sm'
+      colorScheme='neutral'
+      sx={{ flexShrink: 0 }}
+    />
+    <Text
+      as='span'
+      colorScheme='secondary'
+      variant='caption'
+      {...(typeof props.text === 'string' ? { children: props.text } : { localizationKey: props.text })}
+    />
+  </Flex>
+);
 
 const matchesSearch = (entry: SSOBypassAllowlistUserResource, term: string): boolean => {
   const { firstName, lastName, identifier, username } = entry.publicUserData;
@@ -54,7 +179,7 @@ export const SSOBypassAllowlistPage = withCardStateProvider(({ onBack }: SSOBypa
   const card = useCardState();
   const { t } = useLocalizations();
   const { user } = useUser();
-  const { data, isLoading, error, addUser, removeUser } = __internal_useOrganizationSSOBypassAllowlist();
+  const { data, isLoading, error, addUser, addUsers, removeUser } = __internal_useOrganizationSSOBypassAllowlist();
 
   const [search, setSearch] = useState('');
   const term = search.trim().toLowerCase();
@@ -128,6 +253,7 @@ export const SSOBypassAllowlistPage = withCardStateProvider(({ onBack }: SSOBypa
                   <AddMemberScreen
                     allowlistedUserIds={allowlistedUserIds}
                     addUser={addUser}
+                    addUsers={addUsers}
                   />
                 </Action.Card>
               </Flex>
@@ -220,17 +346,62 @@ const AllowlistRow = ({ entry, isCurrentUser, onRemove }: AllowlistRowProps): JS
 type AddMemberProps = {
   allowlistedUserIds: Set<string>;
   addUser: (params: AddSSOBypassAllowlistUserParams) => Promise<unknown>;
+  addUsers: (params: AddSSOBypassAllowlistUsersParams) => Promise<SSOBypassAllowlistBulkCreateResult | undefined>;
+};
+
+const addedText = (result: BulkResult | null): LocalizationKey => {
+  if (result?.mode === 'email') {
+    return localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.addedMember');
+  }
+  return result?.added === 1
+    ? localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.added__one')
+    : localizationKeys('organizationProfile.securityPage.ssoBypassPage.bulkResult.added', {
+        count: String(result?.added ?? 0),
+      });
 };
 
 const AddMemberScreen = (props: AddMemberProps): JSX.Element => {
   const { close } = useActionContext();
+  const wizard = useWizard();
+  const [bulkResult, setBulkResult] = useState<BulkResult | null>(null);
 
   return (
-    <AddMemberForm
-      {...props}
-      onSuccess={close}
-      onReset={close}
-    />
+    <Wizard {...wizard.props}>
+      <AddMemberForm
+        {...props}
+        onReset={close}
+        onResult={result => {
+          setBulkResult(result);
+          wizard.nextStep();
+        }}
+      />
+      <SuccessPage
+        elementDescriptor={descriptors.organizationProfileSecuritySsoBypassBulkResult}
+        title={localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.title')}
+        contents={
+          <Col gap={4}>
+            <Flex
+              direction='col'
+              center
+              gap={4}
+            >
+              <IconCircle icon={UserPlus} />
+              <Text
+                localizationKey={addedText(bulkResult)}
+                sx={{ textAlign: 'center' }}
+              />
+            </Flex>
+            {bulkResult && bulkResult.skipped > 0 && (
+              <Alert
+                variant='warning'
+                title={skippedText(bulkResult.skipped, bulkResult.skippedCode)}
+              />
+            )}
+          </Col>
+        }
+        onFinish={close}
+      />
+    </Wizard>
   );
 };
 
@@ -238,178 +409,180 @@ const AddMemberForm = withCardStateProvider(
   ({
     allowlistedUserIds,
     addUser,
-    onSuccess,
+    addUsers,
+    onResult,
     onReset,
-  }: AddMemberProps & { onSuccess: () => void; onReset: () => void }): JSX.Element => {
+  }: AddMemberProps & {
+    onReset: () => void;
+    onResult: (result: BulkResult) => void;
+  }): JSX.Element => {
     const card = useCardState();
-    const { t } = useLocalizations();
-    const [search, setSearch] = useState('');
-    const [query, setQuery] = useState('');
-    const [selected, setSelected] = useState<OrganizationMembershipResource | null>(null);
-    const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const { t, translateError } = useLocalizations();
+    const [mode, setMode] = useState<AddMode>('email');
+    const [role, setRole] = useState('');
+    const [failure, setFailure] = useState<FormMessage | null>(null);
+    const { organization } = useOrganization();
+    const { options: roles } = useFetchRoles();
+    const roleCounts = useRoleMemberCounts(roles, mode === 'role');
 
-    const { memberships } = useOrganization({
-      memberships: {
-        keepPreviousData: true,
-        pageSize: MEMBER_SEARCH_PAGE_SIZE,
-        query: query || undefined,
+    const emailField = useFormControl('emailAddress', '', {
+      type: 'email',
+      label: localizationKeys('formFieldLabel__emailAddress'),
+      placeholder: localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.emailPlaceholder'),
+      isRequired: true,
+    });
+
+    const formatRoleLabel = useCallback(
+      (label: string, role: RoleOption) => {
+        const count = roleCounts[role.value];
+        return count === undefined
+          ? label
+          : t(
+              localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.roleOption', {
+                role: label,
+                count: String(count),
+              }),
+            );
       },
-    });
+      [roleCounts, t],
+    );
 
-    const options = (memberships?.data ?? []).filter(membership => {
-      const userId = membership.publicUserData?.userId;
-      return Boolean(userId) && !allowlistedUserIds.has(userId as string);
-    });
+    const email = emailField.value.trim();
+    const canSubmit = !card.isLoading && (mode === 'email' ? email !== '' : Boolean(role));
 
-    const handleSearchChange = (value: string) => {
-      setSearch(value);
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-      }
-      if (value.trim() === '') {
-        setQuery('');
+    const changeMode = (next: AddMode) => {
+      setFailure(null);
+      setMode(next);
+    };
+
+    const addByEmail = async (): Promise<BulkResult | undefined> => {
+      if (!organization) {
         return;
       }
-      debounceTimer.current = setTimeout(() => setQuery(value.trim()), MEMBER_SEARCH_DEBOUNCE_MS);
-    };
-
-    const handleClear = () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
+      const member = await findMemberByEmail(organization, email);
+      const userId = member?.publicUserData?.userId;
+      if (!userId) {
+        setFailure(localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.error__memberNotFound'));
+        return;
       }
-      setSearch('');
-      setQuery('');
+      if (allowlistedUserIds.has(userId)) {
+        setFailure(localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.error__alreadyAdded'));
+        return;
+      }
+      await addUser({ userId });
+      return { mode: 'email' as const, added: 1, skipped: 0, skippedCode: null };
     };
 
-    const selectedUserId = selected?.publicUserData?.userId;
-    const canSubmit = Boolean(selectedUserId) && !card.isLoading;
+    const addByRole = async (): Promise<BulkResult | undefined> => {
+      if (!organization) {
+        return;
+      }
+      const userIds = (await collectUserIdsByRole(organization, role)).filter(
+        userId => !allowlistedUserIds.has(userId),
+      );
+      if (userIds.length === 0) {
+        setFailure(localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.error__allAlreadyAdded'));
+        return;
+      }
+      const result = await addUsers({ userIds });
+      const added = result?.data.length ?? 0;
+      const skipped = result?.errors ?? [];
+      const skippedCode = sharedCode(skipped.map(error => error.code));
+      if (added === 0) {
+        setFailure(skippedText(skipped.length, skippedCode));
+        return;
+      }
+      return { mode: 'role' as const, added, skipped: skipped.length, skippedCode };
+    };
 
     const onSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
 
-      if (!selectedUserId || card.isLoading) {
+      if (!canSubmit) {
         return;
       }
 
+      setFailure(null);
+
       try {
-        await card.runAsync(() => addUser({ userId: selectedUserId }));
-        onSuccess();
+        const result = await card.runAsync(mode === 'email' ? addByEmail : addByRole);
+        if (result) {
+          onResult(result);
+        }
       } catch (err) {
-        handleError(err as Error, [], card.setError);
+        handleError(err as Error, [emailField], error => setFailure(translateError(error)));
       }
     };
 
     return (
       <FormContainer
+        gap={4}
         headerTitle={localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.title')}
         headerSubtitle={localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.subtitle')}
       >
-        <Form.Root onSubmit={onSubmit}>
-          <Col gap={2}>
-            <Text
-              as='span'
-              variant='subtitle'
-              localizationKey={localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.memberLabel')}
+        <Form.Root
+          gap={4}
+          onSubmit={onSubmit}
+        >
+          <SegmentedControl.Root
+            aria-label={t(localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.modeLabel'))}
+            value={mode}
+            onChange={next => changeMode(next as AddMode)}
+            size='lg'
+            sx={{ alignSelf: 'flex-start' }}
+          >
+            <SegmentedControl.Button
+              value='email'
+              text={localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.mode__email')}
             />
+            <SegmentedControl.Button
+              value='role'
+              text={localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.mode__role')}
+            />
+          </SegmentedControl.Root>
 
-            {selected ? (
-              <Flex
-                align='center'
-                justify='between'
-                gap={2}
-                sx={t => ({
-                  padding: `${t.space.$2} ${t.space.$3}`,
-                  borderRadius: t.radii.$md,
-                  borderWidth: t.borderWidths.$normal,
-                  borderStyle: t.borderStyles.$solid,
-                  borderColor: t.colors.$borderAlpha150,
-                })}
-              >
-                <UserPreview
-                  size='sm'
-                  user={selected.publicUserData}
-                  subtitle={selected.publicUserData?.identifier}
-                  subtitleProps={{ variant: 'caption' }}
-                />
-                <Button
-                  type='button'
-                  variant='ghost'
-                  colorScheme='secondary'
-                  size='xs'
-                  onClick={() => setSelected(null)}
-                  localizationKey={localizationKeys(
-                    'organizationProfile.securityPage.ssoBypassPage.addForm.changeButton',
-                  )}
-                />
-              </Flex>
-            ) : (
-              <>
-                <SearchInput
-                  value={search}
+          {mode === 'email' ? (
+            <Col gap={2}>
+              <Form.ControlRow elementId={emailField.id}>
+                <Form.PlainInput
+                  {...emailField.props}
                   autoFocus
-                  isLoading={Boolean(search) && Boolean(memberships?.isFetching)}
-                  aria-label={t(
-                    localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.memberPlaceholder'),
-                  )}
-                  placeholder={t(
-                    localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.memberPlaceholder'),
-                  )}
-                  elementDescriptor={descriptors.organizationProfileSecuritySsoBypassMemberSearchInput}
-                  leftIconElementDescriptor={descriptors.organizationProfileSecuritySsoBypassMemberSearchInputIcon}
-                  onChange={e => handleSearchChange(e.target.value)}
-                  onClear={handleClear}
+                  ignorePasswordManager
+                  elementDescriptor={descriptors.organizationProfileSecuritySsoBypassEmailInput}
                 />
-
-                <Col
-                  elementDescriptor={descriptors.organizationProfileSecuritySsoBypassMemberOptions}
-                  role='listbox'
-                  sx={t => ({
-                    maxHeight: t.sizes.$60,
-                    overflowY: 'auto',
-                    gap: t.space.$0x5,
-                  })}
-                >
-                  {options.map(membership => (
-                    <Button
-                      key={membership.id}
-                      type='button'
-                      role='option'
-                      aria-selected={false}
-                      variant='unstyled'
-                      elementDescriptor={descriptors.organizationProfileSecuritySsoBypassMemberOption}
-                      onClick={() => setSelected(membership)}
-                      sx={t => ({
-                        display: 'flex',
-                        justifyContent: 'flex-start',
-                        width: '100%',
-                        height: 'auto',
-                        padding: `${t.space.$1x5} ${t.space.$2}`,
-                        borderRadius: t.radii.$md,
-                        ':hover, :focus-visible': { backgroundColor: t.colors.$neutralAlpha50 },
-                      })}
-                    >
-                      <UserPreview
-                        size='sm'
-                        user={membership.publicUserData}
-                        subtitle={membership.publicUserData?.identifier}
-                        subtitleProps={{ variant: 'caption' }}
-                      />
-                    </Button>
-                  ))}
-
-                  {options.length === 0 && !memberships?.isLoading && (
-                    <Text
-                      colorScheme='secondary'
-                      variant='caption'
-                      localizationKey={localizationKeys(
-                        'organizationProfile.securityPage.ssoBypassPage.addForm.noResults',
-                      )}
-                    />
-                  )}
-                </Col>
-              </>
-            )}
-          </Col>
+              </Form.ControlRow>
+              {failure && (
+                <InlineMessage
+                  icon={ExclamationTriangle}
+                  text={failure}
+                  elementDescriptor={descriptors.organizationProfileSecuritySsoBypassFailure}
+                />
+              )}
+            </Col>
+          ) : (
+            <Col gap={2}>
+              <RoleSelect
+                roles={roles}
+                value={role}
+                formatLabel={formatRoleLabel}
+                onChange={setRole}
+                isDisabled={card.isLoading}
+                triggerSx={t => ({ width: '100%', justifyContent: 'space-between', color: t.colors.$colorForeground })}
+              />
+              {failure && (
+                <InlineMessage
+                  icon={ExclamationTriangle}
+                  text={failure}
+                  elementDescriptor={descriptors.organizationProfileSecuritySsoBypassFailure}
+                />
+              )}
+              <InlineMessage
+                icon={InformationCircle}
+                text={localizationKeys('organizationProfile.securityPage.ssoBypassPage.addForm.roleWarning')}
+                elementDescriptor={descriptors.organizationProfileSecuritySsoBypassRoleWarning}
+              />
+            </Col>
+          )}
 
           <FormButtons
             isDisabled={!canSubmit}

@@ -6,6 +6,7 @@ import type { UserProfilePasswordSectionViewProps } from './user-profile-passwor
 export type {
   UserProfileEditPasswordField,
   UserProfileEditPasswordValue,
+  UserProfileEditPasswordValues,
   UserProfilePasswordManagedBy,
   UserProfilePasswordSectionViewProps,
 } from './user-profile-password-section.types';

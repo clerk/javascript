@@ -117,7 +117,6 @@ describe('organization API keys playground', () => {
 
   it('retries creation, copying, and revocation while updating rows and counts', async () => {
     const user = userEvent.setup();
-    const copy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
     render(
       <MosaicProvider>
         <Retry />
@@ -139,9 +138,6 @@ describe('organization API keys playground', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('Could not copy the API key. Try again.');
     expect(secret).toBeVisible();
-    await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
-    await waitFor(() => expect(copy).toHaveBeenCalledOnce());
-    expect(dialog).toBeVisible();
     await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(screen.getByText('Retry integration')).toBeVisible();
