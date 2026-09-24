@@ -287,6 +287,27 @@ describe('registerWebMcpTools', () => {
     });
   });
 
+  it("returns the account's own methods when the requested one isn't available", async () => {
+    setup.signIn.create.mockImplementation(
+      setup.update({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [
+          { strategy: 'oauth_google' },
+          { strategy: 'password' },
+          { strategy: 'reset_password_email_code' },
+        ],
+      }),
+    );
+    await register();
+
+    await expect(call('clerk_sign_in', { method: 'email_code', identifier: 'jane@acme.com' })).resolves.toEqual({
+      status: 'error',
+      message: "This account can't sign in with email_code.",
+      otherMethods: ['oauth_google', 'password'],
+    });
+    expect(setup.signIn.prepareFirstFactor).not.toHaveBeenCalled();
+  });
+
   it('rejects methods the instance has not enabled', async () => {
     await register();
 
