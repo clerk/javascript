@@ -202,11 +202,12 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
   return <FieldMessageProvider register={register}>{rendered}</FieldMessageProvider>;
 });
 
-type FieldFeedbackKind = 'error' | 'success';
+type FieldFeedbackKind = 'error' | 'success' | 'info';
 
-const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon: IconName; color: stylex.StyleXStyles }> = {
+const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon?: IconName; color: stylex.StyleXStyles }> = {
   error: { slot: 'field-error', icon: 'exclamation-circle', color: feedbackStyles.error },
   success: { slot: 'field-success', icon: 'checkmark', color: feedbackStyles.success },
+  info: { slot: 'field-info', color: feedbackStyles.info },
 };
 
 interface FieldFeedbackProps extends MosaicComponentProps<'p'> {
@@ -240,7 +241,7 @@ const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>
         rest,
       ),
       id,
-      children: <FeedbackBody icon={icon}>{message}</FeedbackBody>,
+      children: icon ? <FeedbackBody icon={icon}>{message}</FeedbackBody> : message,
     },
   });
 });
@@ -271,5 +272,26 @@ const FieldSuccess = React.forwardRef<HTMLParagraphElement, FieldSuccessProps>(f
   );
 });
 
+export type FieldInfoProps = MosaicComponentProps<'p'>;
+
+const FieldInfo = React.forwardRef<HTMLParagraphElement, FieldInfoProps>(function MosaicFieldInfo(props, ref) {
+  return (
+    <FieldFeedback
+      ref={ref}
+      kind='info'
+      {...props}
+    />
+  );
+});
+
 /** Styled parts for composing an automatically associated single-control field. */
-export const Field = { Root, Label, Content, Description, Message, Error: FieldError, Success: FieldSuccess };
+export const Field = {
+  Root,
+  Label,
+  Content,
+  Description,
+  Message,
+  Error: FieldError,
+  Success: FieldSuccess,
+  Info: FieldInfo,
+};
