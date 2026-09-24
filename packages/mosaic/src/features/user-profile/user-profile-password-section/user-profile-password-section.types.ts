@@ -19,6 +19,7 @@ export interface UserProfilePasswordManagedBy {
 }
 
 export interface UserProfilePasswordSectionViewProps {
+  action?: ReactNode;
   sectionTitle?: string;
   hasPassword?: boolean;
   requiresCurrentPassword?: boolean;
@@ -26,3 +27,4 @@ export interface UserProfilePasswordSectionViewProps {
   managedBy?: UserProfilePasswordManagedBy;
   onSubmitPassword?: (value: UserProfileEditPasswordValue) => Promise<void>;
 }
+import type { ReactNode } from 'react';
