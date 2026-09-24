@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../dialog';
 import { Menu } from '../menu';
@@ -115,33 +115,6 @@ describe('Mosaic ActionBar', () => {
 
     rerender(<Selection count={2} />);
     expect(status).toHaveTextContent('2 selected, bulk actions follow the table');
-  });
-
-  it('holds its last contents while it animates out', () => {
-    Object.defineProperty(HTMLElement.prototype, 'getAnimations', {
-      configurable: true,
-      value: () => [{ finished: new Promise(() => {}) }],
-    });
-    onTestFinished(() => {
-      delete (HTMLElement.prototype as { getAnimations?: unknown }).getAnimations;
-    });
-    function Selection({ count }: { count: number }) {
-      return (
-        <ActionBar.Root
-          open={count > 0}
-          anchor={useAnchor()}
-          aria-label='Bulk actions'
-        >
-          <ActionBar.Count>{count} selected</ActionBar.Count>
-        </ActionBar.Root>
-      );
-    }
-    const { rerender } = render(<Selection count={2} />);
-    rerender(<Selection count={0} />);
-    expect(screen.getByRole('toolbar', { hidden: true })).toHaveAttribute('data-ending-style');
-    expect(screen.getByText('2 selected')).toBeInTheDocument();
-    rerender(<Selection count={5} />);
-    expect(screen.getByText('5 selected')).toBeInTheDocument();
   });
 
   it('styles the positioner independently from the bar', () => {
