@@ -2123,6 +2123,8 @@ export const enUS: LocalizationResource = {
     protect_check_execution_failed: "Verification didn't complete. Please try again.",
     protect_check_invalid_script: "Couldn't load verification. Please contact support if this persists.",
     protect_check_invalid_sdk_url: "Verification couldn't start. Please contact support.",
+    protect_check_required:
+      "This sign-in needs an extra verification step that can't be shown here. Please try again or use a different sign-in method.",
     protect_check_script_load_failed:
       "Couldn't load verification. This may be caused by a network issue or a Content Security Policy that blocks the verification script. Please try again or contact support.",
     protect_check_timed_out: "Verification didn't complete in time. Please try again.",
