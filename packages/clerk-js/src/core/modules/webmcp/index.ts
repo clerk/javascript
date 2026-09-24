@@ -19,7 +19,7 @@ type WebMcpTool = {
 };
 
 type ModelContext = {
-  registerTool: (tool: WebMcpTool, options?: { signal?: AbortSignal }) => Promise<void> | void;
+  registerTool: (tool: WebMcpTool) => Promise<void> | void;
 };
 
 type SavedPassword = Credential & { password?: string };
@@ -337,7 +337,11 @@ const getSwitchOrganizationTool = (clerk: Clerk) =>
       required: ['organization'],
     },
     execute: async ({ organization }) => {
-      const membership = clerk.user?.organizationMemberships.find(
+      if (!clerk.user) {
+        return { status: 'error', message: 'Not signed in. Call clerk_sign_in first.' };
+      }
+
+      const membership = clerk.user.organizationMemberships.find(
         ({ organization: org }) => org.id === organization || org.slug === organization,
       );
       if (!membership) {
@@ -365,33 +369,16 @@ export const registerWebMcpTools = (clerk: Clerk): void => {
     return;
   }
 
-  const register = (tools: WebMcpTool[], signal?: AbortSignal) => {
-    tools.forEach(tool => {
-      void Promise.resolve()
-        .then(() => modelContext.registerTool(tool, { signal }))
-        .catch(() => null);
-    });
-  };
-
-  register([getAuthStateTool(clerk)]);
-
-  let signedIn: boolean | undefined;
-  let controller: AbortController | undefined;
-  clerk.addListener(({ session }) => {
-    if (signedIn === Boolean(session)) {
-      return;
-    }
-
-    signedIn = Boolean(session);
-    controller?.abort();
-    controller = new AbortController();
-
-    const organizationsEnabled = clerk.__internal_environment?.organizationSettings.enabled;
-    register(
-      signedIn
-        ? [...(organizationsEnabled ? [getSwitchOrganizationTool(clerk)] : []), getSignOutTool(clerk)]
-        : [getSignInTool(clerk), getSubmitCodeTool(clerk)],
-      controller.signal,
-    );
+  const organizationsEnabled = clerk.__internal_environment?.organizationSettings.enabled;
+  [
+    getAuthStateTool(clerk),
+    getSignInTool(clerk),
+    getSubmitCodeTool(clerk),
+    ...(organizationsEnabled ? [getSwitchOrganizationTool(clerk)] : []),
+    getSignOutTool(clerk),
+  ].forEach(tool => {
+    void Promise.resolve()
+      .then(() => modelContext.registerTool(tool))
+      .catch(() => null);
   });
 };
