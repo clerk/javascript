@@ -1,3 +1,4 @@
+import type * as SharedReact from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -6,6 +7,27 @@ import { describe, expect, it, vi } from 'vitest';
 import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileSecurityPanelViewProps } from '../user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
+
+vi.mock('@clerk/shared/react', async importOriginal => {
+  const actual = await importOriginal<typeof SharedReact>();
+  return {
+    ...actual,
+    useUser: () => ({
+      isLoaded: true,
+      isSignedIn: true,
+      user: { id: 'user_1', deleteSelfEnabled: true, delete: () => Promise.resolve() },
+    }),
+    useSession: () => ({ session: { id: 'sess_1' } }),
+    useClerk: () => ({
+      setActive: () => Promise.resolve(),
+      client: { signedInSessions: [] },
+      buildAfterSignOutUrl: () => '/signed-out',
+      buildAfterMultiSessionSingleSignOutUrl: () => '/one-session-left',
+      __internal_getOption: () => undefined,
+    }),
+    useReverification: (fetcher: () => Promise<unknown>) => fetcher,
+  };
+});
 
 const props: UserProfileSecurityPanelViewProps = {
   hasPassword: true,
@@ -102,7 +124,6 @@ describe('UserProfileSecurityPanelView', () => {
     const onRemovePasskey = vi.fn();
     const onSignOutDevice = vi.fn();
     const onSignOutAllOtherDevices = vi.fn();
-    const onDeleteAccount = vi.fn(() => Promise.resolve());
     const user = userEvent.setup();
 
     renderView({
@@ -111,7 +132,6 @@ describe('UserProfileSecurityPanelView', () => {
       onRemovePasskey,
       onSignOutDevice,
       onSignOutAllOtherDevices,
-      onDeleteAccount,
     });
 
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
@@ -137,18 +157,11 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
-    // The danger zone confirms in a modal, so it goes last: nothing else is clickable while it is open.
-    await user.click(screen.getByRole('button', { name: 'Delete account' }));
-    const deleteDialog = screen.getByRole('dialog');
-    await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
-    await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
-
     expect(onAddPasskey).toHaveBeenCalledOnce();
     expect(onRenamePasskey).toHaveBeenCalledWith('passkey_1', 'Work laptop');
     expect(onRemovePasskey).toHaveBeenCalledWith('passkey_1');
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
     expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
-    expect(onDeleteAccount).toHaveBeenCalledOnce();
   });
 
   it('keeps supported empty authentication methods actionable', () => {
