@@ -6,8 +6,6 @@ import { ActionMenu } from '../../components/action-menu';
 import { Avatar } from '../../components/avatar';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
-import { Icon } from '../../components/icon';
-import { InputGroup } from '../../components/input-group';
 import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
 import { panelStyles } from '../../components/profile';
@@ -18,7 +16,6 @@ import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import { fill, useMessages } from '../../localization';
 import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
-import { styles } from './invitations-table-tab.styles';
 import type {
   InvitationsTableSort,
   InvitationsTableTabViewProps,
@@ -107,37 +104,14 @@ export function InvitationsTableTabView({
   return (
     <>
       <div {...mergeStyleProps(themeProps('invitations-table-tab'), stylex.props(panelStyles.root))}>
-        <div {...stylex.props(styles.toolbar)}>
-          <InputGroup.Root
-            size='md'
-            xstyle={styles.search}
-          >
-            <InputGroup.Start>
-              <Icon name='magnifying-glass' />
-            </InputGroup.Start>
-            <InputGroup.Input
-              ref={searchInput}
-              type='search'
-              autoComplete='off'
-              aria-label={m.search}
-              placeholder={m.search}
-              value={table.globalFilter}
-              onChange={event => table.setGlobalFilter(event.currentTarget.value)}
-            />
-            {table.globalFilter ? (
-              <InputGroup.End>
-                <Button
-                  aria-label={m.clearSearch}
-                  onClick={() => {
-                    table.setGlobalFilter('');
-                    searchInput.current?.focus();
-                  }}
-                >
-                  <Icon name='x' />
-                </Button>
-              </InputGroup.End>
-            ) : null}
-          </InputGroup.Root>
+        <Table.Toolbar>
+          <Table.Search
+            ref={searchInput}
+            label={m.search}
+            clearLabel={m.clearSearch}
+            value={table.globalFilter}
+            onValueChange={table.setGlobalFilter}
+          />
           {onInvite ? (
             <Button
               ref={inviteButton}
@@ -146,7 +120,7 @@ export function InvitationsTableTabView({
               {m.invite}
             </Button>
           ) : null}
-        </div>
+        </Table.Toolbar>
         <Table.Root
           aria-label={m.title}
           aria-busy={isLoading || isFetching}
@@ -223,7 +197,7 @@ export function InvitationsTableTabView({
                       </Item.Content>
                     </Item.Root>
                   </Table.Cell>
-                  <Table.Cell xstyle={styles.dateCell}>{row.original.invitedAtLabel}</Table.Cell>
+                  <Table.Cell noWrap>{row.original.invitedAtLabel}</Table.Cell>
                   <Table.Cell>{row.original.roleLabel}</Table.Cell>
                   {onRevoke ? (
                     <Table.Cell align='end'>
