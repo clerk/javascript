@@ -16,6 +16,10 @@ import { navigateOnSignInProtectGate } from './handleProtectCheck';
 /** Search param set when navigating from the start page "Forgot password?" action. */
 export const SIGN_IN_RESET_PASSWORD_INTENT_PARAM = '__clerk_reset_password';
 
+/** OIDC `prompt` param; FAPI forwards `select_account` on the sign-in URL when the user should pick an existing account. */
+export const SIGN_IN_PROMPT_PARAM = 'prompt';
+export const SIGN_IN_PROMPT_SELECT_ACCOUNT = 'select_account';
+
 /**
  * @param onSecondFactor - invoked when the passkey attempt resolves to a second factor.
  * @param protectCheckPath - route to the protect-check card relative to the caller's mount.

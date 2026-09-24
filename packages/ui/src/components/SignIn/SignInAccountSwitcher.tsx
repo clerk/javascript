@@ -12,7 +12,11 @@ import { Add, ArrowRight } from '../../icons';
 import { SignOutAllActions } from '../UserButton/SessionActions';
 import { useMultisessionActions } from '../UserButton/useMultisessionActions';
 
-const SignInAccountSwitcherInternal = () => {
+type SignInAccountSwitcherProps = {
+  onAddAccount?: () => Promise<unknown> | void;
+};
+
+const SignInAccountSwitcherInternal = ({ onAddAccount }: SignInAccountSwitcherProps) => {
   const card = useCardState();
   const { userProfileUrl } = useEnvironment().displayConfig;
   const { afterSignInUrl, path: signInPath, signInUrl, taskUrl } = useSignInContext();
@@ -75,7 +79,7 @@ const SignInAccountSwitcherInternal = () => {
                 iconElementId={descriptors.accountSwitcherActionButtonIcon.setId('addAccount')}
                 icon={Add}
                 label={localizationKeys('signIn.accountSwitcher.action__addAccount')}
-                onClick={handleAddAccountClicked}
+                onClick={onAddAccount ?? handleAddAccountClicked}
                 iconSx={t => ({
                   width: t.sizes.$9,
                   height: t.sizes.$6,
