@@ -2,22 +2,23 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import type { DestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../MosaicProvider';
-import type { UserProfileDeleteSectionViewProps } from '../user-profile-delete-section/user-profile-delete-section.view';
 import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
 
-function viewProps(overrides: Partial<UserProfileDeleteSectionViewProps> = {}): UserProfileDeleteSectionViewProps {
+function viewProps(overrides: Partial<DestructiveController> = {}): DestructiveController {
   return {
-    isOpen: false,
+    open: false,
     onOpenChange: vi.fn(),
-    onConfirm: vi.fn(),
+    onDelete: vi.fn(),
     isDeleting: false,
     errorMessage: undefined,
+    openDestructiveDialog: vi.fn(),
     ...overrides,
   };
 }
 
-function view(props: UserProfileDeleteSectionViewProps) {
+function view(props: DestructiveController) {
   return (
     <MosaicProvider>
       <UserProfileDeleteSectionView {...props} />
@@ -25,7 +26,7 @@ function view(props: UserProfileDeleteSectionViewProps) {
   );
 }
 
-function renderView(overrides: Partial<UserProfileDeleteSectionViewProps> = {}) {
+function renderView(overrides: Partial<DestructiveController> = {}) {
   const props = viewProps(overrides);
   return { ...render(view(props)), props };
 }
@@ -36,9 +37,10 @@ describe('UserProfileDeleteSectionView', () => {
     const { props } = renderView();
 
     expect(screen.getByRole('heading', { name: 'Danger zone' })).toBeInTheDocument();
-    expect(
-      screen.getByText('Permanently delete this account and all its data. This cannot be undone.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
+    expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
+      'cl-section-description',
+    );
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
@@ -46,9 +48,9 @@ describe('UserProfileDeleteSectionView', () => {
   });
 
   it('confirms only after the phrase is typed back', async () => {
-    const onConfirm = vi.fn();
+    const onDelete = vi.fn();
     const user = userEvent.setup();
-    renderView({ isOpen: true, onConfirm });
+    renderView({ open: true, onDelete });
 
     const dialog = screen.getByRole('dialog');
     const confirm = within(dialog).getByRole('button', { name: 'Delete account' });
@@ -59,11 +61,11 @@ describe('UserProfileDeleteSectionView', () => {
     await user.type(within(dialog).getByRole('textbox'), 'Delete account');
     await user.click(confirm);
 
-    expect(onConfirm).toHaveBeenCalledOnce();
+    expect(onDelete).toHaveBeenCalledOnce();
   });
 
   it('renders a delete failure while keeping the dialog open', () => {
-    renderView({ isOpen: true, errorMessage: 'Your subscription is still active.' });
+    renderView({ open: true, errorMessage: 'Your subscription is still active.' });
 
     expect(screen.getByText('Your subscription is still active.')).toBeInTheDocument();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -71,7 +73,7 @@ describe('UserProfileDeleteSectionView', () => {
 
   it('clears the phrase when the dialog is cancelled', async () => {
     const user = userEvent.setup();
-    const props = viewProps({ isOpen: true });
+    const props = viewProps({ open: true });
     const { rerender } = render(view(props));
 
     const dialog = screen.getByRole('dialog');
@@ -79,9 +81,9 @@ describe('UserProfileDeleteSectionView', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
 
     expect(props.onOpenChange).toHaveBeenCalledWith(false, expect.anything());
-    rerender(view({ ...props, isOpen: false }));
+    rerender(view({ ...props, open: false }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    rerender(view({ ...props, isOpen: true }));
+    rerender(view({ ...props, open: true }));
     expect(screen.getByRole('textbox')).toHaveValue('');
   });
 });
