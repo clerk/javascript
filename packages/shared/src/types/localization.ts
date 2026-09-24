@@ -1218,11 +1218,16 @@ export type __internal_LocalizationResource = {
         addForm: {
           title: LocalizationValue;
           subtitle: LocalizationValue;
-          memberLabel: LocalizationValue;
-          changeButton: LocalizationValue;
-          memberPlaceholder: LocalizationValue;
-          noResults: LocalizationValue;
+          modeLabel: LocalizationValue;
+          mode__email: LocalizationValue;
+          mode__role: LocalizationValue;
+          emailPlaceholder: LocalizationValue;
+          roleOption: LocalizationValue<'role' | 'count'>;
+          roleWarning: LocalizationValue;
           submitButton: LocalizationValue;
+          error__memberNotFound: LocalizationValue;
+          error__alreadyAdded: LocalizationValue;
+          error__allAlreadyAdded: LocalizationValue;
         };
         table: {
           header__user: LocalizationValue;
@@ -1230,6 +1235,17 @@ export type __internal_LocalizationResource = {
           emptyState: LocalizationValue;
           emptyState__search: LocalizationValue;
           menuAction__remove: LocalizationValue;
+        };
+        bulkResult: {
+          added: LocalizationValue<'count'>;
+          added__one: LocalizationValue;
+          addedMember: LocalizationValue;
+          domainNotServed: LocalizationValue<'count'>;
+          domainNotServed__one: LocalizationValue;
+          notMember: LocalizationValue<'count'>;
+          notMember__one: LocalizationValue;
+          unknown: LocalizationValue<'count'>;
+          unknown__one: LocalizationValue;
         };
       };
       ssoSection: {
@@ -2449,6 +2465,7 @@ type UnstableErrors = WithParamName<{
     requireSpecialCharacter: LocalizationValue;
   };
   session_exists: LocalizationValue;
+  sso_bypass_domain_not_served: LocalizationValue;
   ticket_expired_code: LocalizationValue;
   ticket_invalid_code: LocalizationValue;
   zxcvbn: {
