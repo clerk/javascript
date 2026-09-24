@@ -22,27 +22,33 @@ export function UserProfilePasswordRowView({
 }: Omit<UserProfilePasswordSectionViewProps, 'sectionTitle'>) {
   const m = useMessages('userProfilePasswordSection');
   return (
-    <Section.Row>
-      <Section.Item>
+    <>
+      <Section.Header>
         <Section.Content>
           <Section.Label>{m.label}</Section.Label>
-          <Section.Description>{hasPassword ? m.masked : m.noPasswordSet}</Section.Description>
         </Section.Content>
-        {managedBy ? (
-          <Section.Actions>
-            <ManagedByLabel {...managedBy} />
-          </Section.Actions>
-        ) : onSubmitPassword ? (
-          <Section.Actions>
-            <EditPassword
-              hasPassword={hasPassword}
-              requiresCurrentPassword={requiresCurrentPassword}
-              onSubmit={onSubmitPassword}
-            />
-          </Section.Actions>
-        ) : null}
-      </Section.Item>
-    </Section.Row>
+      </Section.Header>
+      <Section.Items>
+        <Section.Item>
+          <Section.Content>
+            <Section.Description>{hasPassword ? m.masked : m.noPasswordSet}</Section.Description>
+          </Section.Content>
+          {managedBy ? (
+            <Section.Actions>
+              <ManagedByLabel {...managedBy} />
+            </Section.Actions>
+          ) : onSubmitPassword ? (
+            <Section.Actions>
+              <EditPassword
+                hasPassword={hasPassword}
+                requiresCurrentPassword={requiresCurrentPassword}
+                onSubmit={onSubmitPassword}
+              />
+            </Section.Actions>
+          ) : null}
+        </Section.Item>
+      </Section.Items>
+    </>
   );
 }
 

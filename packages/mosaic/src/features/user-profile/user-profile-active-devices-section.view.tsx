@@ -73,9 +73,9 @@ export function UserProfileActiveDevicesSectionView({
     }
   };
 
-  // Confirming takes the whole card with it, trigger included — hence the dialog mounted outside
-  // it, and the current device as the place focus lands. Cancelling keeps the trigger, so focus
-  // goes back to it.
+  // Confirming takes the trigger with the other devices — hence the dialog mounted outside it, and
+  // the current device as the place focus lands. Cancelling keeps the trigger, so focus goes back
+  // to it.
   const focusAfterSignOutAll = () => {
     const signedOut = signedOutAll.current;
     signedOutAll.current = false;
@@ -86,7 +86,20 @@ export function UserProfileActiveDevicesSectionView({
     <div {...stylex.props(styles.sectionCards)}>
       <Section.Root>
         <Section.Group>
-          <Section.Title>{m.title}</Section.Title>
+          <div {...stylex.props(styles.titleRow)}>
+            <Section.Title>{m.title}</Section.Title>
+            {onSignOutAllOtherDevices && otherDevices.length > 0 ? (
+              <Button
+                ref={signOutAllTrigger}
+                color='neutral'
+                size='sm'
+                variant='ghost'
+                onClick={() => setIsSignOutAllOpen(true)}
+              >
+                {m.signOutAll}
+              </Button>
+            ) : null}
+          </div>
           <Section.Surface>
             {currentDevices.length > 0 ? (
               currentDevices.map(device => (
@@ -107,50 +120,18 @@ export function UserProfileActiveDevicesSectionView({
                 </Section.Item>
               </Section.Row>
             )}
+            {otherDevices.map(device => (
+              <Section.Row key={device.id}>
+                <DeviceItem
+                  device={device}
+                  triggerRef={removalFocus.registerTrigger(device.id)}
+                  onSignOut={openSignOut}
+                  onViewDetails={device => deviceDetails.open(device)}
+                />
+              </Section.Row>
+            ))}
           </Section.Surface>
         </Section.Group>
-        {otherDevices.length > 0 ? (
-          <Section.Group
-            variant='contained'
-            aria-label={m.otherDevicesTitle}
-          >
-            <Section.Surface>
-              <Section.Header>
-                <Section.Content>
-                  <Section.Label>
-                    {fill(otherDevices.length === 1 ? m.otherDevice : m.otherDevices, {
-                      count: String(otherDevices.length),
-                    })}
-                  </Section.Label>
-                </Section.Content>
-                {onSignOutAllOtherDevices ? (
-                  <Section.Actions>
-                    <Button
-                      ref={signOutAllTrigger}
-                      color='neutral'
-                      size='sm'
-                      variant='outline'
-                      onClick={() => setIsSignOutAllOpen(true)}
-                    >
-                      {m.signOutAll}
-                    </Button>
-                  </Section.Actions>
-                ) : null}
-              </Section.Header>
-              <Section.Items>
-                {otherDevices.map(device => (
-                  <DeviceItem
-                    key={device.id}
-                    device={device}
-                    triggerRef={removalFocus.registerTrigger(device.id)}
-                    onSignOut={openSignOut}
-                    onViewDetails={device => deviceDetails.open(device)}
-                  />
-                ))}
-              </Section.Items>
-            </Section.Surface>
-          </Section.Group>
-        ) : null}
       </Section.Root>
       {onSignOutAllOtherDevices ? (
         <Confirmation

@@ -25,7 +25,10 @@ export function UserProfilePasswordSectionView({
   }
 
   const group = (
-    <Section.Group aria-label={asGroup && !title ? m.label : undefined}>
+    <Section.Group
+      variant={asGroup ? 'contained' : 'default'}
+      aria-label={asGroup ? m.label : undefined}
+    >
       {title ? <Section.Title>{title}</Section.Title> : null}
       <Section.Surface>
         <UserProfilePasswordRowView
