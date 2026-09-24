@@ -1,7 +1,6 @@
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
-import { styles } from './user-profile-account-section.styles';
 import type {
   UserProfileEmail,
   UserProfileNameAttribute,
@@ -145,7 +144,6 @@ export function UserProfileAccountSectionView({
         <Section.Group
           variant='contained'
           aria-label={m.email.label}
-          xstyle={styles.containedGroup}
         >
           <Section.Surface>{emailRow}</Section.Surface>
         </Section.Group>
@@ -154,7 +152,6 @@ export function UserProfileAccountSectionView({
         <Section.Group
           variant='contained'
           aria-label={m.phone.label}
-          xstyle={styles.containedGroup}
         >
           <Section.Surface>{phoneRow}</Section.Surface>
         </Section.Group>

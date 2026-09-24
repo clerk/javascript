@@ -25,7 +25,6 @@ export const styles = stylex.create({
     borderRadius: radiusVars['--cl-radius-xl'],
     borderStyle: 'solid',
     borderWidth: '1px',
-    overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-background'],
     width: '100%',
   },
