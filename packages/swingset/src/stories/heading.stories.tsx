@@ -1,5 +1,6 @@
 import type { HeadingProps } from '@clerk/mosaic/components/heading';
-import { Heading } from '@clerk/mosaic/components/heading';
+import { Heading, HeadingLevelProvider, useHeadingLevel } from '@clerk/mosaic/components/heading';
+import type { ReactNode } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -123,6 +124,29 @@ export function Colors(props: Record<string, unknown>) {
       >
         Positive heading
       </Heading>
+    </div>
+  );
+}
+
+function LevelHeading({ children }: { children: ReactNode }) {
+  const level = useHeadingLevel();
+  return (
+    <Heading level={level}>
+      {children} (h{level})
+    </Heading>
+  );
+}
+
+export function Levels() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <LevelHeading>Profile</LevelHeading>
+      <HeadingLevelProvider>
+        <LevelHeading>Page</LevelHeading>
+        <HeadingLevelProvider>
+          <LevelHeading>Section</LevelHeading>
+        </HeadingLevelProvider>
+      </HeadingLevelProvider>
     </div>
   );
 }

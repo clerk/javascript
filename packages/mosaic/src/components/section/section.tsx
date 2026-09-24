@@ -11,7 +11,7 @@ import { feedbackHeight, feedbackStyles } from '../../utils/feedback.styles';
 import { reset } from '../../utils/reset.styles';
 import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import type { HeadingProps } from '../heading';
-import { Heading } from '../heading';
+import { Heading, useHeadingLevel } from '../heading';
 import { sectionItemsMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
@@ -65,6 +65,7 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
 ) {
   const setTitleIds = React.useContext(SectionTitleContext);
   const generatedId = React.useId();
+  const level = useHeadingLevel();
   const id = idProp ?? (setTitleIds ? `cl-section-${generatedId}-title` : undefined);
 
   useSafeLayoutEffect(() => {
@@ -80,7 +81,8 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
     <Heading
       ref={ref}
       id={id}
-      render={render ?? (props => <h4 {...props} />)}
+      level={level}
+      render={render}
       size='base'
       {...mergeStyleProps(themeProps('section-title'), stylex.props(styles.title, xstyle), rest)}
     />

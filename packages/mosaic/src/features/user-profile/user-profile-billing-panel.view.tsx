@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
+import { HeadingLevelProvider } from '../../components/heading';
 import { panelStyles, Profile } from '../../components/profile';
 import { mergeStyleProps, themeProps } from '../../props';
 import type {
@@ -50,25 +51,27 @@ export function UserProfileBillingPanelView({
   return (
     <div {...mergeStyleProps(themeProps('user-profile-billing-panel'), stylex.props(panelStyles.root))}>
       <Profile.PageTitle>Billing</Profile.PageTitle>
-      <div {...stylex.props(panelStyles.sections)}>
-        <UserProfileSubscriptionSectionView
-          subscription={subscription}
-          onChangePlan={onChangePlan}
-        />
-        <UserProfilePaymentMethodsSectionView
-          paymentMethods={paymentMethods}
-          onAdd={onAddPaymentMethod}
-          onMakeDefault={onMakeDefaultPaymentMethod}
-          onRemove={onRemovePaymentMethod}
-        />
-        <UserProfileBillingHistorySectionView
-          items={historyItems}
-          pagination={historyPagination}
-          onPageChange={onBillingHistoryPageChange}
-          onPageSizeChange={onBillingHistoryPageSizeChange}
-          onView={onViewInvoice}
-        />
-      </div>
+      <HeadingLevelProvider>
+        <div {...stylex.props(panelStyles.sections)}>
+          <UserProfileSubscriptionSectionView
+            subscription={subscription}
+            onChangePlan={onChangePlan}
+          />
+          <UserProfilePaymentMethodsSectionView
+            paymentMethods={paymentMethods}
+            onAdd={onAddPaymentMethod}
+            onMakeDefault={onMakeDefaultPaymentMethod}
+            onRemove={onRemovePaymentMethod}
+          />
+          <UserProfileBillingHistorySectionView
+            items={historyItems}
+            pagination={historyPagination}
+            onPageChange={onBillingHistoryPageChange}
+            onPageSizeChange={onBillingHistoryPageSizeChange}
+            onView={onViewInvoice}
+          />
+        </div>
+      </HeadingLevelProvider>
     </div>
   );
 }

@@ -8,7 +8,9 @@ import { MosaicProvider } from '../../MosaicProvider';
 import { Badge } from '../badge';
 import { Card } from '../card';
 import { Dialog } from '../dialog';
+import { HeadingLevelProvider } from '../heading';
 import { Icon } from '../icon';
+import { Section } from '../section';
 import type { ProfileRootProps } from './profile';
 import { Profile } from './profile';
 
@@ -31,7 +33,11 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
       <Profile.Content>
         <Profile.ContentPanel value='account'>
           <Profile.PageTitle>Account</Profile.PageTitle>
-          Account page
+          <HeadingLevelProvider>
+            <Section.Root>
+              <Section.Title>Email addresses</Section.Title>
+            </Section.Root>
+          </HeadingLevelProvider>
         </Profile.ContentPanel>
         <Profile.ContentPanel value='security'>Security page</Profile.ContentPanel>
       </Profile.Content>
@@ -118,7 +124,7 @@ describe('Profile', () => {
     const page = screen.getByRole('tabpanel');
     expect(account).toHaveAttribute('aria-selected', 'true');
     expect(account).toHaveAttribute('aria-controls', page.id);
-    expect(page).toHaveTextContent('Account page');
+    expect(page).toHaveTextContent('Email addresses');
     expect(screen.getByText('Security page')).not.toBeVisible();
   });
 
@@ -208,14 +214,47 @@ describe('Profile', () => {
     expect(Array.from(screen.getByRole('navigation').classList)).toEqual(expect.arrayContaining(atomsOf(probe.hidden)));
   });
 
+  describe('heading levels', () => {
+    it('nests the title, page title, and section titles one level apart', () => {
+      renderSurface();
+      expect(screen.getByRole('heading', { level: 2, name: 'User profile' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 4, name: 'Email addresses' })).toBeInTheDocument();
+    });
+
+    it('starts from the level of an enclosing HeadingLevelProvider', () => {
+      render(
+        <MosaicProvider>
+          <HeadingLevelProvider level={3}>
+            <Surface />
+          </HeadingLevelProvider>
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('heading', { level: 3, name: 'User profile' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 4, name: 'Account' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 5, name: 'Email addresses' })).toBeInTheDocument();
+    });
+
+    it('lets the render prop override the title level', () => {
+      render(
+        <MosaicProvider>
+          <Profile.Root value='account'>
+            <Profile.Title render={<h1 />}>User profile</Profile.Title>
+          </Profile.Root>
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('heading', { level: 1, name: 'User profile' })).toHaveClass('cl-profile-title');
+    });
+  });
+
   describe('page title', () => {
-    it('is a level-3 heading, and alone outside a profile', () => {
+    it('is a level-2 heading alone outside a profile', () => {
       render(
         <MosaicProvider>
           <Profile.PageTitle>Account</Profile.PageTitle>
         </MosaicProvider>,
       );
-      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toHaveClass('cl-heading');
+      expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toHaveClass('cl-heading');
       expect(screen.queryByRole('button')).not.toBeInTheDocument();
     });
 
