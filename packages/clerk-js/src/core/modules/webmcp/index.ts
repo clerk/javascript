@@ -1,4 +1,10 @@
-import type { ClerkAPIError, OAuthStrategy, SignInResource, SignInSecondFactor } from '@clerk/shared/types';
+import type {
+  ClerkAPIError,
+  OAuthStrategy,
+  SignInInitialValues,
+  SignInResource,
+  SignInSecondFactor,
+} from '@clerk/shared/types';
 
 import type { Clerk } from '../../clerk';
 
@@ -29,7 +35,11 @@ const toError = (error: unknown): ToolResult => {
   if (first) {
     return { status: 'error', code: first.code, message: first.longMessage || first.message };
   }
-  return { status: 'error', message: error instanceof Error ? error.message : String(error) };
+  return {
+    status: 'error',
+    code: (error as { code?: string } | undefined)?.code,
+    message: error instanceof Error ? error.message : String(error),
+  };
 };
 
 const defineTool = (tool: WebMcpTool): WebMcpTool => ({
@@ -121,7 +131,32 @@ const continueSignIn = async (clerk: Clerk, signIn: SignInResource): Promise<Too
   };
 };
 
-const signInWithSavedPassword = async (clerk: Clerk, signIn: SignInResource): Promise<ToolResult> => {
+const getInitialValues = (identifier?: string): SignInInitialValues | undefined => {
+  if (!identifier) {
+    return undefined;
+  }
+  if (identifier.includes('@')) {
+    return { emailAddress: identifier };
+  }
+  return identifier.startsWith('+') ? { phoneNumber: identifier } : { username: identifier };
+};
+
+const openSignInForm = (clerk: Clerk, identifier?: string): ToolResult => {
+  const initialValues = getInitialValues(identifier);
+  try {
+    clerk.openSignIn({ initialValues });
+    return { signInForm: 'opened' };
+  } catch {
+    return { signInUrl: clerk.buildSignInUrl({ initialValues }) };
+  }
+};
+
+const signInWithSavedPassword = async (
+  clerk: Clerk,
+  signIn: SignInResource,
+  identifier: string | undefined,
+  otherMethods: string[],
+): Promise<ToolResult> => {
   const credential = (await navigator.credentials
     ?.get({ password: true, mediation: 'required' } as CredentialRequestOptions)
     .catch(() => null)) as SavedPassword | null | undefined;
@@ -129,7 +164,10 @@ const signInWithSavedPassword = async (clerk: Clerk, signIn: SignInResource): Pr
   if (!credential?.password) {
     return {
       status: 'needs_user_action',
-      message: 'No saved password was chosen. The person needs to type their password into the sign-in form.',
+      message:
+        'No saved password was chosen. The person needs to type their password into the sign-in form, or try another method.',
+      ...openSignInForm(clerk, identifier),
+      otherMethods,
     };
   }
 
@@ -182,7 +220,7 @@ const getSignInTool = (clerk: Clerk) => {
   const methods = getSignInMethods(clerk);
   return defineTool({
     name: 'clerk_sign_in',
-    description: `Starts signing in to ${getAppName(clerk)}. Never takes a password: "password" opens the browser's saved-password picker, "passkey" opens the browser's passkey prompt, and "oauth_*" or "enterprise_sso" redirect to the provider. Returns a status: signed_in, needs_code, needs_user_action, redirecting, session_task or error.`,
+    description: `Starts signing in to ${getAppName(clerk)}. Never takes a password: "password" opens the browser's saved-password picker, "passkey" opens the browser's passkey prompt, and "oauth_*" or "enterprise_sso" redirect to the provider. Only use "passkey" or "password" if the person has one saved in this browser; otherwise start with another method. Returns a status: signed_in, needs_code, needs_user_action, redirecting, session_task or error.`,
     inputSchema: {
       type: 'object',
       properties: {
@@ -201,29 +239,46 @@ const getSignInTool = (clerk: Clerk) => {
         return { status: 'error', message: `Use one of: ${methods.join(', ')}.` };
       }
 
+      const otherMethods = methods.filter(other => other !== method);
+      const identifierValue = typeof identifier === 'string' && identifier ? identifier : undefined;
+
       if (method === 'passkey') {
-        return continueSignIn(clerk, await signIn.authenticateWithPasskey({ flow: 'discoverable' }));
+        return signIn.authenticateWithPasskey({ flow: 'discoverable' }).then(
+          result => continueSignIn(clerk, result),
+          (error: unknown) => {
+            if ((error as { code?: string } | undefined)?.code !== 'passkey_retrieval_cancelled') {
+              throw error;
+            }
+            return {
+              status: 'error',
+              code: 'passkey_retrieval_cancelled',
+              message:
+                'No passkey was used: none is saved in this browser, or the prompt was closed. Try another method.',
+              otherMethods,
+            };
+          },
+        );
       }
 
       if (method === 'password') {
-        return signInWithSavedPassword(clerk, signIn);
+        return signInWithSavedPassword(clerk, signIn, identifierValue, otherMethods);
       }
 
       if (method.startsWith('oauth_') || method === 'enterprise_sso') {
         await signIn.authenticateWithRedirect({
           strategy: method as OAuthStrategy | 'enterprise_sso',
-          identifier: typeof identifier === 'string' ? identifier : undefined,
+          identifier: identifierValue,
           redirectUrl: getSignInCallbackUrl(clerk, '/sso-callback'),
           redirectUrlComplete: window.location.href,
         });
         return { status: 'redirecting', next: 'clerk_get_auth_state' };
       }
 
-      if (typeof identifier !== 'string' || !identifier) {
+      if (!identifierValue) {
         return { status: 'error', message: `${method} needs an identifier.` };
       }
 
-      return signInWithIdentifier(clerk, signIn, method, identifier);
+      return signInWithIdentifier(clerk, signIn, method, identifierValue);
     },
   });
 };
