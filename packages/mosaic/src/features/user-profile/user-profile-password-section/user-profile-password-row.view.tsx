@@ -15,6 +15,7 @@ import type {
 } from './user-profile-password-section.types';
 
 export function UserProfilePasswordRowView({
+  action,
   hasPassword = false,
   requiresCurrentPassword = false,
   managedBy,
@@ -27,7 +28,9 @@ export function UserProfilePasswordRowView({
         <Section.Content>
           <Section.Description>{hasPassword ? m.masked : m.noPasswordSet}</Section.Description>
         </Section.Content>
-        {managedBy ? (
+        {action ? (
+          <Section.Actions>{action}</Section.Actions>
+        ) : managedBy ? (
           <Section.Actions>
             <ManagedByLabel {...managedBy} />
           </Section.Actions>
@@ -78,7 +81,10 @@ function EditPassword({
   const m = useMessages('userProfilePasswordSection');
   const controller = useUserProfileEditPasswordController({
     requiresCurrentPassword: hasPassword && requiresCurrentPassword,
-    onSubmit,
+    onSubmit: async value => {
+      await onSubmit(value);
+      return { status: 'saved' };
+    },
   });
 
   return (

@@ -18,9 +18,11 @@ export interface UserProfilePasswordManagedBy {
 }
 
 export interface UserProfilePasswordSectionViewProps {
+  action?: ReactNode;
   hasPassword?: boolean;
   requiresCurrentPassword?: boolean;
   /** Replaces the edit action with the enterprise provider’s name. */
   managedBy?: UserProfilePasswordManagedBy;
   onSubmitPassword?: (value: UserProfileEditPasswordValue) => Promise<void>;
 }
+import type { ReactNode } from 'react';
