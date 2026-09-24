@@ -20,6 +20,7 @@ import {
 
 const flows = [
   { title: 'API keys', href: '/live/api-keys' },
+  { title: 'Password', href: '/live/password' },
   { title: 'Delete account', href: '/live/delete-account' },
   { title: 'Reverification', href: '/live/reverification' },
 ];
