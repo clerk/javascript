@@ -1,9 +1,9 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { UserProfileSaveError } from '../user-profile-account-section/user-profile-account-section.types';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import type { UserProfileEditPasswordValue } from './user-profile-password-section.types';
+import { UserProfileSaveError } from './user-profile-password-section.types';
 
 function deferred() {
   let resolve: () => void = () => {};
