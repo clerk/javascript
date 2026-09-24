@@ -153,6 +153,12 @@ import {
   ReadOnly as OrganizationProfileGeneralPanelReadOnly,
 } from '../stories/organization-profile-general-panel.stories';
 import {
+  Empty as OrganizationProfileMembersPanelEmpty,
+  Legacy as OrganizationProfileMembersPanelLegacy,
+  meta as organizationProfileMembersPanelMeta,
+  Proposed as OrganizationProfileMembersPanelProposed,
+} from '../stories/organization-profile-members-panel.stories';
+import {
   Default as OrganizationProfileWorkspaceSectionDefault,
   meta as organizationProfileWorkspaceSectionMeta,
   SaveFails as OrganizationProfileWorkspaceSectionSaveFails,
@@ -862,6 +868,13 @@ const organizationProfileApiKeysPanelModule: StoryModule = {
   Empty: OrganizationProfileApiKeysPanelEmpty,
 };
 
+const organizationProfileMembersPanelModule: StoryModule = {
+  meta: organizationProfileMembersPanelMeta,
+  Legacy: OrganizationProfileMembersPanelLegacy,
+  Proposed: OrganizationProfileMembersPanelProposed,
+  Empty: OrganizationProfileMembersPanelEmpty,
+};
+
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -890,6 +903,7 @@ export const registry: StoryModule[] = [
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
+  organizationProfileMembersPanelModule,
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
   organizationProfileDangerSectionModule,
