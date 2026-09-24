@@ -141,22 +141,22 @@ A machine maps onto those same props:
 
 Controlled:
 
-| Prop                | Type                        | Default      | Description                                                                      |
-| ------------------- | --------------------------- | ------------ | -------------------------------------------------------------------------------- |
-| `open`              | `boolean`                   | — (required) | Whether the confirmation is showing. Controlled, the way any dialog is.          |
-| `onOpenChange`      | `(open: boolean) => void`   | — (required) | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop.   |
-| `trigger`           | `ReactNode`                 | —            | The button that asks to open the dialog.                                         |
-| `title`             | `string`                    | — (required) | Names what is about to happen.                                                   |
-| `description`       | `ReactNode`                 | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                 |
-| `fieldLabel`        | `string`                    | — (required) | Labels the confirmation field.                                                   |
-| `confirmationValue` | `string`                    | — (required) | The phrase the user has to type back. Also the field's placeholder.              |
-| `actionLabel`       | `string`                    | — (required) | The confirming button's label.                                                   |
-| `cancelLabel`       | `string`                    | `'Cancel'`   | The cancel button's label.                                                       |
-| `finalFocus`        | `DialogFocusTarget`         | the trigger  | Where focus returns on close, for a removal that unmounts the trigger.           |
-| `onDelete`          | `() => void`                | — (required) | Asks the caller to run the action, once the typed phrase matches.                |
-| `isDeleting`        | `boolean`                   | `false`      | Disables the field, renders the action pending, and ignores further submissions. |
-| `errorMessage`      | `string`                    | —            | Marks the field invalid and renders under it.                                    |
-| `reverification`    | `ReverificationController`  | —            | Renders reverification in the same dialog after the action requests it.          |
+| Prop                | Type                       | Default      | Description                                                                      |
+| ------------------- | -------------------------- | ------------ | -------------------------------------------------------------------------------- |
+| `open`              | `boolean`                  | — (required) | Whether the confirmation is showing. Controlled, the way any dialog is.          |
+| `onOpenChange`      | `(open: boolean) => void`  | — (required) | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop.   |
+| `trigger`           | `ReactNode`                | —            | The button that asks to open the dialog.                                         |
+| `title`             | `string`                   | — (required) | Names what is about to happen.                                                   |
+| `description`       | `ReactNode`                | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                 |
+| `fieldLabel`        | `string`                   | — (required) | Labels the confirmation field.                                                   |
+| `confirmationValue` | `string`                   | — (required) | The phrase the user has to type back. Also the field's placeholder.              |
+| `actionLabel`       | `string`                   | — (required) | The confirming button's label.                                                   |
+| `cancelLabel`       | `string`                   | `'Cancel'`   | The cancel button's label.                                                       |
+| `finalFocus`        | `DialogFocusTarget`        | the trigger  | Where focus returns on close, for a removal that unmounts the trigger.           |
+| `onDelete`          | `() => void`               | — (required) | Asks the caller to run the action, once the typed phrase matches.                |
+| `isDeleting`        | `boolean`                  | `false`      | Disables the field, renders the action pending, and ignores further submissions. |
+| `errorMessage`      | `string`                   | —            | Marks the field invalid and renders under it.                                    |
+| `reverification`    | `ReverificationController` | —            | Renders reverification in the same dialog after the action requests it.          |
 
 With a handle:
 
