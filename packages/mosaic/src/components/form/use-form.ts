@@ -35,7 +35,7 @@ export interface RegisteredField<TValues extends object, K extends keyof TValues
   ref: (element: HTMLElement | null) => void;
 }
 
-export interface ControlledField<TValues extends object, K extends keyof TValues> {
+export interface RegisteredValueField<TValues extends object, K extends keyof TValues> {
   name: K;
   value: TValues[K];
   onValueChange: (value: TValues[K]) => void;
@@ -51,8 +51,25 @@ export interface UseFormResult<TValues extends object> {
   isSubmitting: boolean;
   isDirty: boolean;
   canSubmit: boolean;
+  /**
+   * Props for a control that takes `onChange(event)`, such as `<input>` or `<textarea>`.
+   * Wires `value`, `onChange`, `onBlur` and `ref`. Accepts only string fields. For a
+   * control that takes `onValueChange(value)`, use `registerValue`.
+   *
+   * @example
+   * <InputGroup.Input {...form.register('username')} />
+   */
   register: <K extends TextFieldName<TValues>>(name: K) => RegisteredField<TValues, K>;
-  control: <K extends keyof TValues>(name: K) => ControlledField<TValues, K>;
+  /**
+   * Props for a control that takes `onValueChange(value)`, such as `PhoneInput` or `OTP`.
+   * Wires `value`, `onValueChange`, `onBlur` and `ref`. Passes the value through unchanged,
+   * so it accepts a field of any type. For a control that takes `onChange(event)`, use
+   * `register`.
+   *
+   * @example
+   * <PhoneInput {...form.registerValue('phoneNumber')} />
+   */
+  registerValue: <K extends keyof TValues>(name: K) => RegisteredValueField<TValues, K>;
   setValue: <K extends keyof TValues>(name: K, value: TValues[K]) => void;
   touch: (name: keyof TValues) => void;
   submit: () => void;
@@ -148,7 +165,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     onBlur: () => touch(name),
     ref: refFor(name),
   });
-  const control = <K extends keyof TValues>(name: K): ControlledField<TValues, K> => ({
+  const registerValue = <K extends keyof TValues>(name: K): RegisteredValueField<TValues, K> => ({
     name,
     value: values[name],
     onValueChange: value => setValue(name, value),
@@ -178,7 +195,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     isDirty: keysOf(values).some(name => fields[name].isDirty),
     canSubmit: !isSubmitting && isValid(context),
     register,
-    control,
+    registerValue,
     setValue,
     touch,
     submit,

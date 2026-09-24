@@ -19,6 +19,7 @@ function functionalUpdate<T>(updater: Updater<T>, old: T): T {
 export interface UseDataTableOptions<TData> {
   data: TData[];
   getRowId?: (row: TData, index: number) => string;
+  isRowSelectable?: (row: TData) => boolean;
   totalCount?: number;
 
   sorting?: SortingState;
@@ -135,10 +136,11 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
 
   // ── Rows ────────────────────────────────────────────────────────────────────
 
-  const { getRowId } = opts;
+  const { getRowId, isRowSelectable } = opts;
   const selectionAnchor = useRef<string | null>(null);
   const rows = useMemo<DataTableRow<TData>[]>(() => {
     const ids = opts.data.map((original, i) => (getRowId ? getRowId(original, i) : String(i)));
+    const selectableIds = ids.filter((_, i) => !isRowSelectable || isRowSelectable(opts.data[i]));
     return opts.data.map((original, i) => {
       const id = ids[i];
       return {
@@ -146,21 +148,25 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
         original,
         getIsSelected: () => !!rowSelection[id],
         toggleSelected: options => {
+          const index = selectableIds.indexOf(id);
+          if (index === -1) {
+            return;
+          }
           const anchor = selectionAnchor.current;
-          const anchorIndex = options?.range && anchor !== null ? ids.indexOf(anchor) : -1;
+          const anchorIndex = options?.range && anchor !== null ? selectableIds.indexOf(anchor) : -1;
           selectionAnchor.current = id;
           setRowSelection(old => {
             const selected = !old[id];
             if (anchorIndex === -1) {
               return { ...old, [id]: selected };
             }
-            const rangeIds = ids.slice(Math.min(anchorIndex, i), Math.max(anchorIndex, i) + 1);
+            const rangeIds = selectableIds.slice(Math.min(anchorIndex, index), Math.max(anchorIndex, index) + 1);
             return { ...old, ...Object.fromEntries(rangeIds.map(rangeId => [rangeId, selected])) };
           });
         },
       };
     });
-  }, [opts.data, getRowId, rowSelection, setRowSelection]);
+  }, [opts.data, getRowId, isRowSelectable, rowSelection, setRowSelection]);
 
   // ── Pagination helpers ──────────────────────────────────────────────────────
 
@@ -198,19 +204,24 @@ export function useDataTable<TData>(opts: UseDataTableOptions<TData>): UseDataTa
 
   // ── Selection helpers ───────────────────────────────────────────────────────
 
+  const selectableRows = useMemo(
+    () => rows.filter(row => !isRowSelectable || isRowSelectable(row.original)),
+    [rows, isRowSelectable],
+  );
+
   const getIsAllRowsSelected = useCallback(
-    () => rows.length > 0 && rows.every(r => !!rowSelection[r.id]),
-    [rows, rowSelection],
+    () => selectableRows.length > 0 && selectableRows.every(r => !!rowSelection[r.id]),
+    [selectableRows, rowSelection],
   );
 
   const getIsSomeRowsSelected = useCallback(
-    () => rows.some(r => !!rowSelection[r.id]) && !getIsAllRowsSelected(),
-    [rows, rowSelection, getIsAllRowsSelected],
+    () => selectableRows.some(r => !!rowSelection[r.id]) && !getIsAllRowsSelected(),
+    [selectableRows, rowSelection, getIsAllRowsSelected],
   );
 
   const toggleAllRowsSelected = useCallback(() => {
-    setRowSelection(getIsAllRowsSelected() ? {} : Object.fromEntries(rows.map(r => [r.id, true])));
-  }, [rows, getIsAllRowsSelected, setRowSelection]);
+    setRowSelection(getIsAllRowsSelected() ? {} : Object.fromEntries(selectableRows.map(r => [r.id, true])));
+  }, [selectableRows, getIsAllRowsSelected, setRowSelection]);
 
   return {
     rows,
