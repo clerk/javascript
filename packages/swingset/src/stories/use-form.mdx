@@ -32,7 +32,7 @@ const form = useForm({
 const { feedback } = form.fields.username;
 ```
 
-Wire the form element with `id` and `handleSubmit`, a text control with `register`, and a control that reports its value directly with `control`:
+Wire the form element with `id` and `handleSubmit`, a text control with `register`, and a control that reports its value directly with `registerValue`:
 
 ```tsx
 <form id={form.id} onSubmit={form.handleSubmit}>
@@ -53,7 +53,7 @@ Wire the form element with `id` and `handleSubmit`, a text control with `registe
     </Field.Message>
   </Field.Root>
 
-  <PhoneInput {...form.control('phoneNumber')} />
+  <PhoneInput {...form.registerValue('phoneNumber')} />
 
   <SubmitButton isPending={form.isSubmitting} disabled={!form.canSubmit || !form.isDirty}>
     Save
@@ -61,7 +61,7 @@ Wire the form element with `id` and `handleSubmit`, a text control with `registe
 </form>
 ```
 
-`register` accepts only fields whose value is a string. `control` accepts any field and passes the value through unchanged. A checkbox reads and writes through `values` and `setValue`:
+`register` accepts only fields whose value is a string. `registerValue` accepts any field and passes the value through unchanged. A checkbox reads and writes through `values` and `setValue`:
 
 ```tsx
 <input
@@ -117,22 +117,22 @@ A dialog calls `reset()` when it closes, or `reset(values)` to start from values
 
 ## Return
 
-| Value          | Type                               | Description                                                                              |
-| -------------- | ---------------------------------- | ---------------------------------------------------------------------------------------- |
-| `id`           | `string`                           | Stable id for the `<form>` element, so a submit button can target it from outside.       |
-| `values`       | `TValues`                          | Current values.                                                                          |
-| `fields`       | `Record<keyof TValues, FormField>` | Per-field state, see below.                                                              |
-| `error`        | `string \| undefined`              | Banner message from the last failed submit.                                              |
-| `isSubmitting` | `boolean`                          | `onSubmit` is running, or a submit is queued behind async validation.                    |
-| `isDirty`      | `boolean`                          | Any field differs from its initial value, compared with `Object.is`.                     |
-| `canSubmit`    | `boolean`                          | Not submitting, no field in error, and `canSubmit(values)` is `true`.                    |
-| `register`     | `(name) => RegisteredField`        | `name`, `value`, `onChange`, `onBlur` and `ref` for a text control.                      |
-| `control`      | `(name) => ControlledField`        | `name`, `value`, `onValueChange`, `onBlur` and `ref` for a control with `onValueChange`. |
-| `setValue`     | `(name, value) => void`            | Set one value.                                                                           |
-| `touch`        | `(name) => void`                   | Mark one field touched.                                                                  |
-| `submit`       | `() => void`                       | Touch every field and submit if valid.                                                   |
-| `handleSubmit` | `(event) => void`                  | `preventDefault` then `submit`, for `<form onSubmit>`.                                   |
-| `reset`        | `(values?) => void`                | Return to `initialValues`, or to `values`, clearing touched state, feedback and errors.  |
+| Value           | Type                               | Description                                                                              |
+| --------------- | ---------------------------------- | ---------------------------------------------------------------------------------------- |
+| `id`            | `string`                           | Stable id for the `<form>` element, so a submit button can target it from outside.       |
+| `values`        | `TValues`                          | Current values.                                                                          |
+| `fields`        | `Record<keyof TValues, FormField>` | Per-field state, see below.                                                              |
+| `error`         | `string \| undefined`              | Banner message from the last failed submit.                                              |
+| `isSubmitting`  | `boolean`                          | `onSubmit` is running, or a submit is queued behind async validation.                    |
+| `isDirty`       | `boolean`                          | Any field differs from its initial value, compared with `Object.is`.                     |
+| `canSubmit`     | `boolean`                          | Not submitting, no field in error, and `canSubmit(values)` is `true`.                    |
+| `register`      | `(name) => RegisteredField`        | `name`, `value`, `onChange`, `onBlur` and `ref` for a text control.                      |
+| `registerValue` | `(name) => RegisteredValueField`   | `name`, `value`, `onValueChange`, `onBlur` and `ref` for a control with `onValueChange`. |
+| `setValue`      | `(name, value) => void`            | Set one value.                                                                           |
+| `touch`         | `(name) => void`                   | Mark one field touched.                                                                  |
+| `submit`        | `() => void`                       | Touch every field and submit if valid.                                                   |
+| `handleSubmit`  | `(event) => void`                  | `preventDefault` then `submit`, for `<form onSubmit>`.                                   |
+| `reset`         | `(values?) => void`                | Return to `initialValues`, or to `values`, clearing touched state, feedback and errors.  |
 
 ### `FormField`
 
