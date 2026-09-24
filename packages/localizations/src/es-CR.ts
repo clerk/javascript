@@ -956,6 +956,8 @@ export const esCR: LocalizationResource = {
   formButtonPrimary: 'Continuar',
   formButtonPrimary__verify: 'Verificar',
   formFieldAction__forgotPassword: 'Has olvidado tu contraseña?',
+  formFieldAction__hidePassword: 'Ocultar contraseña',
+  formFieldAction__showPassword: 'Mostrar contraseña',
   formFieldError__matchingPasswords: 'Las contraseñas coinciden.',
   formFieldError__notMatchingPasswords: 'Las contraseñas no coinciden.',
   formFieldError__verificationLinkExpired: 'El enlace de verificación expiró. Por favor, vuelve a solicitarlo.',

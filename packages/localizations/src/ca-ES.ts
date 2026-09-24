@@ -963,6 +963,8 @@ export const caES: LocalizationResource = {
   formButtonPrimary: 'Continua',
   formButtonPrimary__verify: 'Verifica',
   formFieldAction__forgotPassword: 'Has oblidat la contrasenya?',
+  formFieldAction__hidePassword: 'Amaga la contrasenya',
+  formFieldAction__showPassword: 'Mostra la contrasenya',
   formFieldError__matchingPasswords: 'Les contrasenyes coincideixen.',
   formFieldError__notMatchingPasswords: 'Les contrasenyes no coincideixen.',
   formFieldError__verificationLinkExpired: "L'enllaç de verificació ha caducat. Si us plau, sol·licita un nou enllaç.",

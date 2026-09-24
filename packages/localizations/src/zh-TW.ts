@@ -958,6 +958,8 @@ export const zhTW: LocalizationResource = {
   formButtonPrimary: '繼續',
   formButtonPrimary__verify: '驗證',
   formFieldAction__forgotPassword: '忘記密碼？',
+  formFieldAction__hidePassword: '隱藏密碼',
+  formFieldAction__showPassword: '顯示密碼',
   formFieldError__matchingPasswords: '密碼匹配。',
   formFieldError__notMatchingPasswords: '密碼不匹配。',
   formFieldError__verificationLinkExpired: '驗證連結已過期，請請求新的連結。',

@@ -959,6 +959,8 @@ export const thTH: LocalizationResource = {
   formButtonPrimary: 'ดำเนินการต่อ',
   formButtonPrimary__verify: 'ยืนยัน',
   formFieldAction__forgotPassword: 'ลืมรหัสผ่าน?',
+  formFieldAction__hidePassword: 'ซ่อนรหัสผ่าน',
+  formFieldAction__showPassword: 'แสดงรหัสผ่าน',
   formFieldError__matchingPasswords: 'รหัสผ่านตรงกัน',
   formFieldError__notMatchingPasswords: 'รหัสผ่านไม่ตรงกัน',
   formFieldError__verificationLinkExpired: 'ลิงก์ยืนยันหมดอายุแล้ว โปรดขอลิงก์ใหม่',

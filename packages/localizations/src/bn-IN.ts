@@ -962,6 +962,8 @@ export const bnIN: LocalizationResource = {
   formButtonPrimary: 'চালিয়ে যান',
   formButtonPrimary__verify: 'যাচাই করুন',
   formFieldAction__forgotPassword: 'পাসওয়ার্ড ভুলে গেছেন?',
+  formFieldAction__hidePassword: 'পাসওয়ার্ড লুকান',
+  formFieldAction__showPassword: 'পাসওয়ার্ড দেখান',
   formFieldError__matchingPasswords: 'পাসওয়ার্ড মিলেছে।',
   formFieldError__notMatchingPasswords: 'পাসওয়ার্ড মিলে না।',
   formFieldError__verificationLinkExpired: 'যাচাইকরণ লিংকের মেয়াদ শেষ হয়েছে। দয়া করে একটি নতুন লিংক অনুরোধ করুন।',

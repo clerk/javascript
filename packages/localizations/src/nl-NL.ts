@@ -956,6 +956,8 @@ export const nlNL: LocalizationResource = {
   formButtonPrimary: 'Doorgaan',
   formButtonPrimary__verify: 'Verifieer',
   formFieldAction__forgotPassword: 'Wachtwoord vergeten?',
+  formFieldAction__hidePassword: 'Wachtwoord verbergen',
+  formFieldAction__showPassword: 'Wachtwoord tonen',
   formFieldError__matchingPasswords: 'Wachtwoorden matchen.',
   formFieldError__notMatchingPasswords: 'Wachtwoorden komen niet overeen.',
   formFieldError__verificationLinkExpired: 'De verificatielink is verlopen. Vraag een nieuwe link aan.',

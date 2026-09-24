@@ -962,6 +962,8 @@ export const fiFI: LocalizationResource = {
   formButtonPrimary: 'Jatka',
   formButtonPrimary__verify: 'Vahvista',
   formFieldAction__forgotPassword: 'Unohditko salasanasi?',
+  formFieldAction__hidePassword: 'Piilota salasana',
+  formFieldAction__showPassword: 'Näytä salasana',
   formFieldError__matchingPasswords: 'Salasanat täsmäävät.',
   formFieldError__notMatchingPasswords: 'Salasanat eivät täsmää.',
   formFieldError__verificationLinkExpired: 'Vahvistuslinkki on vanhentunut. Pyydä uusi linkki.',
