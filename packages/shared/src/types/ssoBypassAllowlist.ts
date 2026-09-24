@@ -25,6 +25,30 @@ export type AddSSOBypassAllowlistUserParams = {
   userId: string;
 };
 
+export type AddSSOBypassAllowlistUsersParams = {
+  userIds: string[];
+};
+
+export interface SSOBypassAllowlistBulkCreateErrorJSON {
+  user_id: string;
+  code: string;
+}
+
+export interface SSOBypassAllowlistBulkCreateJSON {
+  data: SSOBypassAllowlistUserJSON[];
+  errors: SSOBypassAllowlistBulkCreateErrorJSON[];
+}
+
+export interface SSOBypassAllowlistBulkCreateError {
+  userId: string;
+  code: string;
+}
+
+export interface SSOBypassAllowlistBulkCreateResult {
+  data: SSOBypassAllowlistUserResource[];
+  errors: SSOBypassAllowlistBulkCreateError[];
+}
+
 export interface SSOBypassAllowlistResource {
   /**
    * Lists the members who may sign in with an email code when the organization's enterprise SSO is unavailable.
@@ -36,6 +60,11 @@ export interface SSOBypassAllowlistResource {
    * organization's enterprise connections.
    */
   addUser: (params: AddSSOBypassAllowlistUserParams) => Promise<SSOBypassAllowlistUserResource>;
+  /**
+   * Adds several members to the allowlist, one request per 100 ids. Members who cannot be added are reported in
+   * `errors` with the same code `addUser` returns for them, and do not fail the batch.
+   */
+  addUsers: (params: AddSSOBypassAllowlistUsersParams) => Promise<SSOBypassAllowlistBulkCreateResult>;
   /**
    * Removes a member from the allowlist.
    */

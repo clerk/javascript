@@ -1,10 +1,11 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../machines/__tests__/test-utils';
 import { MosaicProvider } from '../../../MosaicProvider';
-import type { UserProfileMfaSectionViewProps } from '../user-profile-mfa-section.view';
+import type { UserProfileMfaMethod, UserProfileMfaSectionViewProps } from '../user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from '../user-profile-mfa-section.view';
 
 function renderView(overrides: Partial<UserProfileMfaSectionViewProps> = {}) {
@@ -28,6 +29,44 @@ function renderView(overrides: Partial<UserProfileMfaSectionViewProps> = {}) {
 }
 
 describe('MFA section', () => {
+  it.each(['picker', 'custom', 'none'] as const)(
+    'restores focus after removing methods with %s add control',
+    async add => {
+      const user = userEvent.setup();
+      function Example() {
+        const [methods, setMethods] = useState<UserProfileMfaMethod[]>([
+          { id: 'totp', type: 'authenticator' },
+          { id: 'sms', type: 'sms' },
+        ]);
+        return (
+          <MosaicProvider>
+            <UserProfileMfaSectionView
+              methods={methods}
+              sectionTitle='Authentication'
+              addableMethods={['sms', 'authenticator']}
+              onAdd={add === 'picker' ? () => {} : undefined}
+              addControl={add === 'custom' ? <button type='button'>Add custom method</button> : undefined}
+              onRemove={id => setMethods(current => current.filter(method => method.id !== id))}
+            />
+          </MosaicProvider>
+        );
+      }
+      render(<Example />);
+      await user.click(screen.getByRole('button', { name: 'Manage Authenticator app' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+      await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Manage SMS verification' })).toHaveFocus());
+      await user.keyboard('{Enter}');
+      await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+      await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+      const fallback =
+        add === 'none'
+          ? screen.getByRole('region', { name: 'Authentication' })
+          : screen.getByRole('button', { name: add === 'picker' ? 'Add verification method' : 'Add custom method' });
+      await waitFor(() => expect(fallback).toHaveFocus());
+    },
+  );
+
   it.each(['sms', 'authenticator'] as const)('continues immediately when the %s option is activated', async type => {
     const user = userEvent.setup();
     const { props } = renderView({

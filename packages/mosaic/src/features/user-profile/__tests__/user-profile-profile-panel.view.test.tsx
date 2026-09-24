@@ -70,6 +70,7 @@ describe('UserProfileProfilePanelView', () => {
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(screen.getByRole('heading', { name: 'Account', level: 3 })).toBeVisible();
+    await waitFor(() => expect(document.activeElement).toHaveTextContent(/^Account$/));
   });
 
   it('keeps the final wallet confirmation mounted until removal settles', async () => {
@@ -101,6 +102,7 @@ describe('UserProfileProfilePanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(document.activeElement).toHaveTextContent(/^Account$/));
   });
 
   it('keeps available providers visible without connected accounts', () => {

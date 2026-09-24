@@ -40,6 +40,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
   },
   'organization-profile': {
+    'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
     'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
     'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
     'organization-profile-workspace-section': dynamic(
@@ -118,6 +119,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
   hooks: {
     // Headless hooks — alphabetical.
     'use-data-table': dynamic(() => import('../stories/use-data-table.mdx')),
+    'use-form': dynamic(() => import('../stories/use-form.mdx')),
   },
   localization: {
     localization: dynamic(() => import('../stories/localization.mdx')),

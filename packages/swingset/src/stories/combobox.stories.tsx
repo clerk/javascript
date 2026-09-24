@@ -39,7 +39,6 @@ export function Default() {
               <Icon
                 name='chevron-down'
                 size='sm'
-                aria-hidden='true'
               />
             </Combobox.Trigger>
           </InputGroup.End>
@@ -84,7 +83,6 @@ export function Scrolling() {
               <Icon
                 name='chevron-down'
                 size='sm'
-                aria-hidden='true'
               />
             </Combobox.Trigger>
           </InputGroup.End>
