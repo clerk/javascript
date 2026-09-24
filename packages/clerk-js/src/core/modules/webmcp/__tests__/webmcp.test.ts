@@ -16,16 +16,14 @@ const createModelContext = () => {
   const tools = new Map<string, Tool>();
   return {
     tools,
-    registerTool: vi.fn((tool: Tool, options?: { signal?: AbortSignal }) => {
+    registerTool: vi.fn((tool: Tool) => {
       tools.set(tool.name, tool);
-      options?.signal?.addEventListener('abort', () => tools.delete(tool.name));
       return Promise.resolve();
     }),
   };
 };
 
 const createClerk = () => {
-  let listener: ((resources: { session: unknown }) => void) | undefined;
   const signIn = {
     status: null as string | null,
     createdSessionId: null as string | null,
@@ -55,11 +53,6 @@ const createClerk = () => {
     }),
     signOut: vi.fn(),
     redirectToSignIn: vi.fn(),
-    addListener: vi.fn((callback: typeof listener) => {
-      listener = callback;
-      callback?.({ session: clerk.session });
-      return () => {};
-    }),
     __internal_getOption: vi.fn(() => undefined),
     __internal_environment: {
       displayConfig: { applicationName: 'Acme', signInUrl: 'https://accounts.acme.com/sign-in' },
@@ -81,7 +74,6 @@ const createClerk = () => {
   const signInAs = (user: unknown) => {
     clerk.session = { id: 'sess_1' };
     clerk.user = user;
-    listener?.({ session: clerk.session });
   };
 
   return { clerk, signIn, update, signInAs };
@@ -120,13 +112,19 @@ describe('registerWebMcpTools', () => {
 
     registerWebMcpTools(setup.clerk as unknown as Clerk);
 
-    expect(setup.clerk.addListener).not.toHaveBeenCalled();
+    expect(modelContext.registerTool).not.toHaveBeenCalled();
   });
 
-  it('registers the signed-out tools with the sign-in methods the instance accepts', async () => {
+  it('registers every tool once, with the sign-in methods the instance accepts', async () => {
     await register();
 
-    expect([...modelContext.tools.keys()]).toEqual(['clerk_get_auth_state', 'clerk_sign_in', 'clerk_submit_code']);
+    expect([...modelContext.tools.keys()]).toEqual([
+      'clerk_get_auth_state',
+      'clerk_sign_in',
+      'clerk_submit_code',
+      'clerk_switch_organization',
+      'clerk_sign_out',
+    ]);
     expect(modelContext.tools.get('clerk_sign_in')?.inputSchema?.properties.method?.enum).toEqual([
       'passkey',
       'oauth_google',
@@ -138,19 +136,6 @@ describe('registerWebMcpTools', () => {
       signedIn: false,
       signInMethods: ['passkey', 'oauth_google', 'email_code', 'email_link', 'password'],
     });
-  });
-
-  it('swaps to the signed-in tools once a session exists', async () => {
-    await register();
-
-    setup.signInAs({ organizationMemberships: [] });
-    await flush();
-
-    expect([...modelContext.tools.keys()]).toEqual([
-      'clerk_get_auth_state',
-      'clerk_switch_organization',
-      'clerk_sign_out',
-    ]);
   });
 
   it('signs in with an email code', async () => {
@@ -341,10 +326,14 @@ describe('registerWebMcpTools', () => {
 
   it('only switches to organizations the user belongs to', async () => {
     await register();
+    await expect(call('clerk_switch_organization', { organization: 'acme' })).resolves.toEqual({
+      status: 'error',
+      message: 'Not signed in. Call clerk_sign_in first.',
+    });
+
     setup.signInAs({
       organizationMemberships: [{ organization: { id: 'org_1', slug: 'acme', name: 'Acme' }, role: 'org:admin' }],
     });
-    await flush();
 
     await expect(call('clerk_switch_organization', { organization: 'globex' })).resolves.toMatchObject({
       status: 'error',
