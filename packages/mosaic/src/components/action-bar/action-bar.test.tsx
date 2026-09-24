@@ -38,7 +38,7 @@ function BulkActions({ open = true, onDismiss }: { open?: boolean; onDismiss?: (
       <ActionBar.Root
         open={open}
         anchor={tableRef}
-        returnFocus={selectRef}
+        finalFocus={selectRef}
         aria-label='Bulk actions'
         aria-controls='members'
       >
@@ -226,7 +226,7 @@ describe('Mosaic ActionBar', () => {
     expect(screen.getByRole('button', { name: 'Remove' })).not.toHaveFocus();
   });
 
-  it('sends focus to returnFocus when the bar closes around it', async () => {
+  it('sends focus to finalFocus when the bar closes around it', async () => {
     const user = userEvent.setup();
     function Harness() {
       const [open, setOpen] = React.useState(true);
@@ -243,6 +243,31 @@ describe('Mosaic ActionBar', () => {
     await user.tab();
     await user.keyboard('{ArrowLeft}{Enter}');
     await waitFor(() => expect(checkbox).toHaveFocus());
+  });
+
+  it('resolves a function finalFocus when it closes', async () => {
+    const user = userEvent.setup();
+    function Harness() {
+      const [open, setOpen] = React.useState(true);
+      return (
+        <>
+          <button type='button'>Next row</button>
+          <ActionBar.Root
+            open={open}
+            anchor={useAnchor()}
+            aria-label='Bulk actions'
+            finalFocus={() => screen.getByRole('button', { name: 'Next row' })}
+          >
+            <ActionBar.Dismiss onClick={() => setOpen(false)} />
+          </ActionBar.Root>
+        </>
+      );
+    }
+    render(<Harness />);
+    await user.click(screen.getByRole('button', { name: 'Next row' }));
+    await user.tab();
+    await user.keyboard('{Enter}');
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Next row' })).toHaveFocus());
   });
 
   it('dismisses with a labelled button', async () => {
@@ -266,7 +291,7 @@ describe('Mosaic ActionBar', () => {
             open={selected}
             anchor={selectAllRef}
             aria-label='Bulk actions'
-            returnFocus={selectAllRef}
+            finalFocus={selectAllRef}
           >
             <Menu.Root>
               <Menu.Trigger render={<ActionBar.Action />}>Change role</Menu.Trigger>
@@ -286,7 +311,7 @@ describe('Mosaic ActionBar', () => {
       );
     }
 
-    it('sends focus to returnFocus when a menu item closes the bar', async () => {
+    it('sends focus to finalFocus when a menu item closes the bar', async () => {
       const user = userEvent.setup();
       render(<ChangeRole />);
       await user.click(screen.getByRole('checkbox', { name: 'Select all' }));
@@ -328,7 +353,7 @@ describe('Mosaic ActionBar', () => {
             open={selected}
             anchor={selectRef}
             aria-label='Bulk actions'
-            returnFocus={selectRef}
+            finalFocus={selectRef}
           >
             <Dialog.Trigger
               handle={handle}
@@ -360,7 +385,7 @@ describe('Mosaic ActionBar', () => {
       await waitFor(() => expect(screen.getByRole('button', { name: 'Remove' })).toHaveFocus());
     });
 
-    it('sends focus to returnFocus when the dialog confirms', async () => {
+    it('sends focus to finalFocus when the dialog confirms', async () => {
       const user = userEvent.setup();
       render(<ConfirmRemove />);
       await user.click(screen.getByRole('checkbox', { name: 'Select Kyle' }));

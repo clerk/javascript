@@ -12,7 +12,7 @@ import {
   useFloating,
   useMergeRefs,
 } from '@floating-ui/react';
-import { activeElement, contains, getDocument, getTarget } from '@floating-ui/react/utils';
+import { activeElement, contains, getDocument, getTarget, useLatestRef } from '@floating-ui/react/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -49,8 +49,8 @@ export interface ActionBarRootProps extends MosaicComponentProps<'div'> {
   anchor: React.RefObject<HTMLElement | null>;
   /** Where the bar is portalled. Inside a modal dialog, pass its popup. */
   portalRoot?: HTMLElement | null;
-  /** Where focus goes when the bar closes while holding it. */
-  returnFocus?: React.RefObject<HTMLElement | null>;
+  /** Where focus goes when the bar closes while holding it: an element ref, or a function returning one. */
+  finalFocus?: React.RefObject<HTMLElement | null> | (() => HTMLElement | null);
   /** Announced when the selection changes while the bar is open, e.g. `3 selected`. */
   announcement?: string;
   /** Announced when the bar opens, e.g. `1 selected, bulk actions follow the table`. Defaults to `announcement`. */
@@ -63,7 +63,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     open,
     anchor,
     portalRoot,
-    returnFocus,
+    finalFocus,
     announcement,
     openAnnouncement,
     render,
@@ -130,22 +130,27 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
   const runOnAnimationsFinished = useAnimationsFinished(barRef, open);
 
   const focusWithinRef = React.useRef(false);
+  const finalFocusRef = useLatestRef(finalFocus);
 
   React.useEffect(() => {
     if (transitionStatus !== 'ending') {
       return;
     }
+    const moveFocus = () => {
+      const target = finalFocusRef.current;
+      (typeof target === 'function' ? target() : target?.current)?.focus();
+    };
     const bar = barRef.current;
     if (bar && contains(bar, activeElement(getDocument(bar)))) {
-      returnFocus?.current?.focus();
+      moveFocus();
     }
     return runOnAnimationsFinished(() => {
       if (focusWithinRef.current) {
-        returnFocus?.current?.focus();
+        moveFocus();
       }
       setMounted(false);
     });
-  }, [transitionStatus, runOnAnimationsFinished, returnFocus, setMounted]);
+  }, [transitionStatus, runOnAnimationsFinished, finalFocusRef, setMounted]);
 
   const guardPortalledKeys = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const bar = barRef.current;

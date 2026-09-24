@@ -41,7 +41,7 @@ is portalled, so no ancestor clips it. It mounts when opened and unmounts once i
   anchor={tableRef}
   aria-label='Bulk actions'
   aria-controls={tableId}
-  returnFocus={selectAllRef}
+  finalFocus={selectAllRef}
   announcement={`${selectedCount} selected`}
   openAnnouncement={`${selectedCount} selected, bulk actions follow the table`}
 >
@@ -80,14 +80,14 @@ checkbox for when the confirmation closes the bar.
 
 ### `ActionBar.Root`
 
-| Prop               | Type                     | Default         | Description                                                 |
-| ------------------ | ------------------------ | --------------- | ----------------------------------------------------------- |
-| `open`             | `boolean`                | — (required)    | Whether the bar is shown.                                   |
-| `anchor`           | `RefObject<HTMLElement>` | — (required)    | The table the bar rests on.                                 |
-| `portalRoot`       | `HTMLElement \| null`    | `document.body` | Where the bar is portalled. `null` waits for the element.   |
-| `returnFocus`      | `RefObject<HTMLElement>` | —               | Where focus goes when the bar closes while holding it.      |
-| `announcement`     | `string`                 | —               | Announced when the selection changes while the bar is open. |
-| `openAnnouncement` | `string`                 | `announcement`  | Announced when the bar opens.                               |
+| Prop               | Type                                                  | Default         | Description                                                 |
+| ------------------ | ----------------------------------------------------- | --------------- | ----------------------------------------------------------- |
+| `open`             | `boolean`                                             | — (required)    | Whether the bar is shown.                                   |
+| `anchor`           | `RefObject<HTMLElement>`                              | — (required)    | The table the bar rests on.                                 |
+| `portalRoot`       | `HTMLElement \| null`                                 | `document.body` | Where the bar is portalled. `null` waits for the element.   |
+| `finalFocus`       | `RefObject<HTMLElement> \| () => HTMLElement \| null` | —               | Where focus goes when the bar closes while holding it.      |
+| `announcement`     | `string`                                              | —               | Announced when the selection changes while the bar is open. |
+| `openAnnouncement` | `string`                                              | `announcement`  | Announced when the bar opens.                               |
 
 ### `ActionBar.Action`
 
@@ -101,7 +101,7 @@ Takes `Button`'s props. `color='negative'` draws the icon at full strength.
 - A status region outside the bar announces `openAnnouncement` when the bar opens and
   `announcement` when the selection changes after that. Closing is silent.
 - When the bar closes while it holds focus, including from a menu or dialog opened inside it, focus
-  moves to `returnFocus`. Pass the table's select-all checkbox.
+  moves to `finalFocus`: the table's select-all checkbox, or a function that picks an element when the bar closes.
 
 ## Styling
 
