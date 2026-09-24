@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const deDE: LocalizationResource = {
   locale: 'de-DE',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Neuen API-Key hinzufügen',
     action__search: 'Suche',

@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const viVN: LocalizationResource = {
   locale: 'vi-VN',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Thêm khoá mới',
     action__search: 'Tìm kiếm khoá',

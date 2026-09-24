@@ -19,6 +19,7 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 import { handleError } from '@/ui/utils/errorHandler';
 import { isMobileDevice } from '@/ui/utils/isMobileDevice';
 import type { FormControlState } from '@/ui/utils/useFormControl';
@@ -26,6 +27,7 @@ import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
 import type { SignInStartIdentifier } from '../../common';
 import {
+  ActionBlockedCard,
   getIdentifierControlDisplayValues,
   groupIdentifiers,
   withRedirectToAfterSignIn,
@@ -605,6 +607,11 @@ function SignInStartInternal(): JSX.Element {
     lastAuthenticationStrategy && totalEnabledAuthMethods > 1
       ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
       : false;
+
+  const blockedDetails = actionBlockedDetailsFrom(card.rawError);
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
+  }
 
   return (
     <Flow.Part part='start'>

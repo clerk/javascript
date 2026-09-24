@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const huHU: LocalizationResource = {
   locale: 'hu-HU',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Új kulcs hozzáadása',
     action__search: 'Kulcsok keresése',

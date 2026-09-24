@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const itIT: LocalizationResource = {
   locale: 'it-IT',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Aggiungi nuova chiave',
     action__search: 'Cerca chiavi',

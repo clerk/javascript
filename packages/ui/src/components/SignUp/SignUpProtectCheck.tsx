@@ -4,8 +4,9 @@ import { type ComponentType, useEffect, useRef, useState } from 'react';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
+import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 
-import { withRedirectToAfterSignUp } from '../../common';
+import { ActionBlockedCard, withRedirectToAfterSignUp } from '../../common';
 import { useCoreSignUp } from '../../contexts';
 import {
   Box,
@@ -101,6 +102,11 @@ function SignUpProtectCheckInternal({
   // shell for one paint. Must stay below every hook call.
   if (!signUp.protectCheck && !everSawProtectCheck) {
     return null;
+  }
+
+  const blockedDetails = actionBlockedDetailsFrom(card.rawError);
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
   }
 
   return (

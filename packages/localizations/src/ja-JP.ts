@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: '新しいキーを追加',
     action__search: 'キーを検索',

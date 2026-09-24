@@ -6,8 +6,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
+import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 
-import { withRedirectToAfterSignIn } from '../../common';
+import { ActionBlockedCard, withRedirectToAfterSignIn } from '../../common';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import {
   Box,
@@ -138,6 +139,11 @@ function SignInProtectCheckInternal(): JSX.Element | null {
   // below every hook call.
   if (!signIn.protectCheck && !everSawProtectCheck) {
     return null;
+  }
+
+  const blockedDetails = actionBlockedDetailsFrom(card.rawError);
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
   }
 
   return (
