@@ -1,33 +1,18 @@
-import type * as SharedReact from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../MosaicProvider';
+import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
 
-vi.mock('@clerk/shared/react', async importOriginal => {
-  const actual = await importOriginal<typeof SharedReact>();
-  return {
-    ...actual,
-    useUser: () => ({
-      isLoaded: true,
-      isSignedIn: true,
-      user: { id: 'user_1', deleteSelfEnabled: true, delete: () => Promise.resolve() },
-    }),
-    useSession: () => ({ session: { id: 'sess_1' } }),
-    useClerk: () => ({
-      setActive: () => Promise.resolve(),
-      client: { signedInSessions: [] },
-      buildAfterSignOutUrl: () => '/signed-out',
-      buildAfterMultiSessionSingleSignOutUrl: () => '/one-session-left',
-      __internal_getOption: () => undefined,
-    }),
-    useReverification: (fetcher: () => Promise<unknown>) => fetcher,
-  };
-});
+function DeleteAccount() {
+  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
+  return <UserProfileDeleteSectionView {...controller} />;
+}
 
 const props: UserProfileProfilePanelViewProps = {
   allowMultipleAccounts: true,
@@ -308,7 +293,7 @@ describe('UserProfileProfilePanelView', () => {
       connectedAccounts: [
         { id: 'google', provider: 'Google', identifier: 'test@google.com', iconUrl: 'https://example.com/google.svg' },
       ],
-      onDeleteAccount: () => Promise.resolve(),
+      deleteAccountSlot: <DeleteAccount />,
     });
 
     expect(screen.getByRole('heading', { level: 4, name: 'Connected accounts' })).toBeInTheDocument();

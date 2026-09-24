@@ -1,33 +1,18 @@
-import type * as SharedReact from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../MosaicProvider';
+import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
 import type { UserProfileSecurityPanelViewProps } from '../user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
-vi.mock('@clerk/shared/react', async importOriginal => {
-  const actual = await importOriginal<typeof SharedReact>();
-  return {
-    ...actual,
-    useUser: () => ({
-      isLoaded: true,
-      isSignedIn: true,
-      user: { id: 'user_1', deleteSelfEnabled: true, delete: () => Promise.resolve() },
-    }),
-    useSession: () => ({ session: { id: 'sess_1' } }),
-    useClerk: () => ({
-      setActive: () => Promise.resolve(),
-      client: { signedInSessions: [] },
-      buildAfterSignOutUrl: () => '/signed-out',
-      buildAfterMultiSessionSingleSignOutUrl: () => '/one-session-left',
-      __internal_getOption: () => undefined,
-    }),
-    useReverification: (fetcher: () => Promise<unknown>) => fetcher,
-  };
-});
+function DeleteAccount() {
+  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
+  return <UserProfileDeleteSectionView {...controller} />;
+}
 
 const props: UserProfileSecurityPanelViewProps = {
   hasPassword: true,
@@ -80,7 +65,7 @@ function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) 
 
 describe('UserProfileSecurityPanelView', () => {
   it('composes authentication, active devices, and the danger zone', () => {
-    renderView({ onDeleteAccount: vi.fn(() => Promise.resolve()) });
+    renderView({ deleteAccountSlot: <DeleteAccount /> });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Security' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 4, name: 'Authentication' })).toBeInTheDocument();
