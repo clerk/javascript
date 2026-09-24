@@ -1,0 +1,246 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
+import type * as SharedReact from '@clerk/shared/react';
+import { ClerkInstanceContext } from '@clerk/shared/react';
+import type { LoadedClerk } from '@clerk/shared/types';
+import { act, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { MosaicProvider } from '../../../MosaicProvider';
+import { UserProfilePasswordSection } from '../user-profile-password-section/user-profile-password-section';
+import type { UserProfileEditPasswordValue } from '../user-profile-password-section/user-profile-password-section.types';
+
+const updatePassword = vi.fn<(input: UserProfileEditPasswordValue) => Promise<unknown>>();
+const user: {
+  id: string;
+  passwordEnabled: boolean;
+  enterpriseAccounts: { active: boolean }[];
+  updatePassword: typeof updatePassword;
+} = { id: 'user_1', passwordEnabled: true, enterpriseAccounts: [], updatePassword };
+const session = {
+  id: 'session_1',
+  publicUserData: { identifier: 'person@example.com' },
+  startVerification: vi.fn(),
+  attemptFirstFactorVerification: vi.fn(),
+};
+const environment = {
+  userSettings: {
+    instanceIsPasswordBased: true,
+    passwordSettings: { min_length: 8, max_length: 72, show_zxcvbn: false },
+  },
+  authConfig: { reverification: true },
+  displayConfig: { preferredSignInStrategy: 'password', supportEmail: 'support@example.com' },
+};
+const clerk = {
+  user,
+  session,
+  __internal_environment: environment,
+  __internal_getOption: () => undefined,
+  setActive: vi.fn(),
+};
+let isSessionLoaded = true;
+
+vi.mock('@clerk/shared/react', async importOriginal => {
+  const actual = await importOriginal<typeof SharedReact>();
+  return {
+    ...actual,
+    useClerk: () => clerk,
+    useUser: () => ({ isLoaded: true, user }),
+    useSession: () => ({ isLoaded: isSessionLoaded, session }),
+  };
+});
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  isSessionLoaded = true;
+  user.updatePassword.mockReset();
+  user.passwordEnabled = true;
+  user.enterpriseAccounts = [];
+  environment.authConfig.reverification = true;
+  environment.userSettings.instanceIsPasswordBased = true;
+  user.updatePassword.mockResolvedValue(user);
+  clerk.setActive.mockResolvedValue(undefined);
+  session.startVerification.mockResolvedValue({
+    status: 'needs_first_factor',
+    supportedFirstFactors: [{ strategy: 'password' }],
+  });
+  session.attemptFirstFactorVerification.mockResolvedValue({ status: 'complete' });
+});
+
+function passwordTree() {
+  return (
+    <ClerkInstanceContext.Provider value={{ value: clerk as unknown as LoadedClerk }}>
+      <MosaicProvider>
+        <UserProfilePasswordSection />
+      </MosaicProvider>
+    </ClerkInstanceContext.Provider>
+  );
+}
+
+function renderPassword() {
+  return render(passwordTree());
+}
+
+async function editPassword() {
+  const events = userEvent.setup();
+  await events.click(screen.getByRole('button', { name: 'Change password' }));
+  await events.type(screen.getByLabelText('New password'), 'new-password-123');
+  await events.type(screen.getByLabelText('Confirm password'), 'new-password-123');
+  await events.click(screen.getByRole('checkbox', { name: 'Sign out of all other devices' }));
+  return events;
+}
+
+describe('UserProfilePasswordSection', () => {
+  it('shows a failed retry instead of reporting a save when verification is required again', async () => {
+    user.updatePassword.mockRejectedValue(
+      new ClerkAPIResponseError('Verify', {
+        status: 403,
+        data: [{ code: 'session_reverification_required', message: 'Verify' }],
+      }),
+    );
+    renderPassword();
+    const events = await editPassword();
+    await events.click(screen.getByRole('button', { name: 'Save changes' }));
+    await events.type(await screen.findByLabelText('Password'), 'current-password');
+    await events.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Your password was not saved. Please try verifying again.',
+    );
+    expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
+    expect(user.updatePassword).toHaveBeenCalledTimes(2);
+  });
+
+  it('hides the section when instance passwords are disabled', () => {
+    environment.userSettings.instanceIsPasswordBased = false;
+    renderPassword();
+    expect(screen.queryByRole('region', { name: 'Authentication' })).not.toBeInTheDocument();
+  });
+
+  it('keeps the active verification mounted while session data briefly reloads', async () => {
+    user.updatePassword.mockRejectedValueOnce(
+      new ClerkAPIResponseError('Verify', {
+        status: 403,
+        data: [{ code: 'session_reverification_required', message: 'Verify' }],
+      }),
+    );
+    const { rerender } = renderPassword();
+    const events = await editPassword();
+    await events.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByLabelText('Password');
+
+    isSessionLoaded = false;
+    rerender(passwordTree());
+    expect(screen.getByLabelText('Password')).toBeVisible();
+    isSessionLoaded = true;
+    rerender(passwordTree());
+    await events.click(screen.getByRole('button', { name: 'Back', exact: true }));
+    expect(await screen.findByLabelText('New password')).toHaveValue('new-password-123');
+  });
+
+  it('keeps an enterprise-managed password visible without offering a mutation', () => {
+    user.enterpriseAccounts = [{ active: true }];
+    renderPassword();
+    expect(screen.getByText('Your organization manages your password.')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Change password' })).not.toBeInTheDocument();
+  });
+
+  it('shows the configured password rule without making it a new submit restriction', async () => {
+    renderPassword();
+    const events = userEvent.setup();
+    await events.click(screen.getByRole('button', { name: 'Change password' }));
+    await events.type(screen.getByLabelText('New password'), 'short');
+    await events.type(screen.getByLabelText('Confirm password'), 'short');
+
+    expect(await screen.findByText('Use at least 8 characters.')).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Save changes' })).not.toHaveAttribute('aria-disabled', 'true');
+  });
+
+  it('shows password API errors at the visible field and preserves the draft', async () => {
+    user.updatePassword.mockRejectedValueOnce(
+      new ClerkAPIResponseError('Invalid', {
+        status: 422,
+        data: [
+          {
+            code: 'form_password_pwned',
+            message: 'Choose a different password.',
+            meta: { param_name: 'new_password' },
+          },
+        ],
+      }),
+    );
+    renderPassword();
+    const events = await editPassword();
+    await events.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription('Choose a different password.'),
+    );
+    expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
+  });
+
+  it('returns from verification to the same draft without showing an error', async () => {
+    user.updatePassword.mockRejectedValueOnce(
+      new ClerkAPIResponseError('Verify', {
+        status: 403,
+        data: [{ code: 'session_reverification_required', message: 'Verify' }],
+      }),
+    );
+    renderPassword();
+    const events = await editPassword();
+    await events.click(screen.getByRole('button', { name: 'Save changes' }));
+    await screen.findByLabelText('Password');
+    await events.click(screen.getByRole('button', { name: 'Back', exact: true }));
+
+    expect(await screen.findByLabelText('New password')).toHaveValue('new-password-123');
+    expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
+    expect(screen.getByRole('checkbox')).not.toBeChecked();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(user.updatePassword).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('button', { name: 'Save changes' })).not.toBeDisabled();
+  });
+
+  it('verifies, retries the original values, and waits for the retry before closing', async () => {
+    let finish: () => void = () => {};
+    const retry = new Promise<void>(resolve => {
+      finish = resolve;
+    });
+    user.updatePassword
+      .mockRejectedValueOnce(
+        new ClerkAPIResponseError('Verify', {
+          status: 403,
+          data: [{ code: 'session_reverification_required', message: 'Verify' }],
+        }),
+      )
+      .mockImplementationOnce(() => retry.then(() => user));
+    renderPassword();
+    const events = await editPassword();
+    await events.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await events.type(await screen.findByLabelText('Password'), 'current-password');
+    await events.click(screen.getByRole('button', { name: 'Continue' }));
+    await waitFor(() => expect(user.updatePassword).toHaveBeenCalledTimes(2));
+    expect(user.updatePassword.mock.calls[1]).toEqual(user.updatePassword.mock.calls[0]);
+    expect(clerk.setActive).toHaveBeenCalledWith({ session: 'session_1' });
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-disabled', 'true');
+
+    await act(async () => {
+      finish();
+      await retry;
+    });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('saves through the model and closes after the request succeeds', async () => {
+    renderPassword();
+    const events = await editPassword();
+    await events.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    expect(user.updatePassword).toHaveBeenCalledExactlyOnceWith({
+      newPassword: 'new-password-123',
+      signOutOfOtherSessions: false,
+    });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+});
