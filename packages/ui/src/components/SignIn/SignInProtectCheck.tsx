@@ -24,7 +24,11 @@ import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
 import { buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
-import { isSignInPendingOAuthTransfer, resumeSignInAfterProtectCheck } from './handleProtectCheck';
+import {
+  isSignInPendingOAuthTransfer,
+  isSignInProtectGated,
+  resumeSignInAfterProtectCheck,
+} from './handleProtectCheck';
 
 function SignInProtectCheckInternal(): JSX.Element | null {
   const card = useCardState();
@@ -43,17 +47,37 @@ function SignInProtectCheckInternal(): JSX.Element | null {
   // persist that a protect check existed at some point
   const [everSawProtectCheck, setEverSawProtectCheck] = useState(!!signIn.protectCheck);
   const didStartNoCheckFallbackRef = useRef(false);
+  // 'none' | 'pending' | 'done' — one bounded reload for a gate signalled by status alone
+  const [statusOnlyReload, setStatusOnlyReload] = useState<'none' | 'pending' | 'done'>('none');
 
   if (signIn.protectCheck && !everSawProtectCheck) {
     setEverSawProtectCheck(true);
   }
 
   useEffect(() => {
-    if (!signIn.protectCheck && !everSawProtectCheck && !didStartNoCheckFallbackRef.current) {
+    if (signIn.protectCheck || everSawProtectCheck) {
+      return;
+    }
+    // A gate signalled by `status: 'needs_protect_check'` without an inline `protectCheck`
+    // payload is an in-progress, server-gated sign-in (e.g. gated on an OAuth callback
+    // exchange) — reload to fetch the challenge; bouncing to the flow start would discard
+    // the sign-in and force the user to restart.
+    if (isSignInProtectGated(signIn) && statusOnlyReload === 'none') {
+      setStatusOnlyReload('pending');
+      void signIn
+        .reload()
+        .catch(() => {})
+        .finally(() => setStatusOnlyReload('done'));
+      return;
+    }
+    if (statusOnlyReload === 'pending') {
+      return;
+    }
+    if (!didStartNoCheckFallbackRef.current) {
       didStartNoCheckFallbackRef.current = true;
       void navigateToFlowStart();
     }
-  }, [everSawProtectCheck, navigateToFlowStart, signIn.protectCheck]);
+  }, [everSawProtectCheck, navigateToFlowStart, signIn, statusOnlyReload]);
 
   const { containerRef, isRunning, isWidgetVisible, hasError, retry } = useProtectCheckRunner<SignInResource>({
     getProtectCheck: () => signIn.protectCheck,
@@ -101,7 +125,8 @@ function SignInProtectCheckInternal(): JSX.Element | null {
   // resolves" guarantee, nor keep a spinner next to the retry button.
   const showSpinner = useSpinDelay(isRunning, { delay: 300 });
 
-  // Stale/direct visit that never had a check: render nothing while the flow-start redirect
+  // No challenge payload yet (stale/direct visit, or the status-only reload above is in
+  // flight): render nothing while the flow-start redirect
   // scheduled above kicks in, instead of flashing the card shell for one paint. Must stay
   // below every hook call.
   if (!signIn.protectCheck && !everSawProtectCheck) {

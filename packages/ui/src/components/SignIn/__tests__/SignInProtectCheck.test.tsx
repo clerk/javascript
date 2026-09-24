@@ -617,4 +617,46 @@ describe('SignInProtectCheck', () => {
     await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('/sign-in'));
     expect(mockExecute).not.toHaveBeenCalled();
   });
+  it('reloads a status-only gate instead of bouncing to the flow start', async () => {
+    // `needs_protect_check` can be signalled without an inline `protectCheck` payload
+    // (e.g. a gate surfacing on an OAuth callback exchange); the challenge arrives on reload.
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignInWithProtectCheck();
+    });
+    (fixtures.signIn as any).protectCheck = null;
+    const reload = vi.fn(() => {
+      (fixtures.signIn as any).protectCheck = {
+        status: 'pending',
+        token: 'challenge-token',
+        sdkUrl: 'https://protect.example.com/sdk.js',
+      };
+      return Promise.resolve(fixtures.signIn as unknown as SignInResource);
+    });
+    (fixtures.signIn as any).reload = reload;
+    mockExecute.mockReturnValue(new Promise(() => {}));
+
+    const { findByText } = render(<SignInProtectCheck />, { wrapper });
+
+    await waitFor(() => expect(reload).toHaveBeenCalled());
+    expect(await findByText(/verifying your request/i)).toBeInTheDocument();
+    expect(fixtures.router.navigate).not.toHaveBeenCalled();
+  });
+
+  it('falls back to the flow start when the reload still carries no challenge', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignInWithProtectCheck();
+    });
+    (fixtures.signIn as any).protectCheck = null;
+    const reload = vi.fn(() => Promise.resolve(fixtures.signIn as unknown as SignInResource));
+    (fixtures.signIn as any).reload = reload;
+    fixtures.router.currentPath = '/sign-in/protect-check';
+    fixtures.router.fullPath = '/sign-in';
+    fixtures.router.indexPath = '/sign-in';
+
+    render(<SignInProtectCheck />, { wrapper });
+
+    await waitFor(() => expect(reload).toHaveBeenCalled());
+    await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('/sign-in'));
+    expect(mockExecute).not.toHaveBeenCalled();
+  });
 });
