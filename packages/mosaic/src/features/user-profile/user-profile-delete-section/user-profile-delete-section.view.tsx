@@ -1,23 +1,10 @@
 import { Destructive } from '../../../blocks/destructive';
+import type { DestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
 
-export interface UserProfileDeleteSectionViewProps {
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: () => void;
-  isDeleting: boolean;
-  errorMessage: string | undefined;
-}
-
-export function UserProfileDeleteSectionView({
-  isOpen,
-  onOpenChange,
-  onConfirm,
-  isDeleting,
-  errorMessage,
-}: UserProfileDeleteSectionViewProps) {
+export function UserProfileDeleteSectionView(destructiveProps: DestructiveController) {
   const m = useMessages('userProfileDeleteSection');
 
   return (
@@ -32,8 +19,7 @@ export function UserProfileDeleteSectionView({
             </Section.Content>
             <Section.Actions>
               <Destructive
-                open={isOpen}
-                onOpenChange={onOpenChange}
+                {...destructiveProps}
                 trigger={
                   <Button
                     color='negative'
@@ -49,9 +35,6 @@ export function UserProfileDeleteSectionView({
                 confirmationValue={m.fieldPlaceholder}
                 actionLabel={m.actionLabel}
                 cancelLabel={m.cancelLabel}
-                onDelete={onConfirm}
-                isDeleting={isDeleting}
-                errorMessage={errorMessage}
               />
             </Section.Actions>
           </Section.Item>

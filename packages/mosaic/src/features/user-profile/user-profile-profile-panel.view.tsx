@@ -132,7 +132,7 @@ export function UserProfileProfilePanelView({
           onSetPrimary={onSetPrimaryWeb3Wallet}
         />
         {/* TODO: This is temporary, a view should not render a connected component */}
-        {onDeleteAccount ? <UserProfileDeleteSection onDelete={onDeleteAccount} /> : null}
+        {onDeleteAccount ? <UserProfileDeleteSection /> : null}
       </div>
     </div>
   );
