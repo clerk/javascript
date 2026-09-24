@@ -143,10 +143,12 @@ const buildApp = async (adapter: MachineAuthTestAdapter, addRoutes: RouteBuilder
 };
 
 const createOAuthClient = (app: Application) =>
-  createClerkClient({
-    secretKey: app.env.privateVariables.get('CLERK_SECRET_KEY'),
-    publishableKey: app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
-  });
+  withRetry(
+    createClerkClient({
+      secretKey: app.env.privateVariables.get('CLERK_SECRET_KEY'),
+      publishableKey: app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
+    }),
+  );
 
 export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void => {
   test.describe('API key auth', () => {
