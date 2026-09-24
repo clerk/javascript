@@ -960,6 +960,8 @@ export const csCZ: LocalizationResource = {
   formButtonPrimary: 'Pokračovat',
   formButtonPrimary__verify: 'Ověřit',
   formFieldAction__forgotPassword: 'Zapomněli jste heslo?',
+  formFieldAction__hidePassword: 'Skrýt heslo',
+  formFieldAction__showPassword: 'Zobrazit heslo',
   formFieldError__matchingPasswords: 'Hesla se shodují.',
   formFieldError__notMatchingPasswords: 'Hesla se neshodují.',
   formFieldError__verificationLinkExpired: 'Ověřovací odkaz vypršel. Prosím, požádejte o nový odkaz.',

@@ -959,6 +959,8 @@ export const koKR: LocalizationResource = {
   formButtonPrimary: '계속',
   formButtonPrimary__verify: '확인하기',
   formFieldAction__forgotPassword: '비밀번호를 잊으셨나요?',
+  formFieldAction__hidePassword: '비밀번호 숨기기',
+  formFieldAction__showPassword: '비밀번호 표시',
   formFieldError__matchingPasswords: '비밀번호가 일치해요.',
   formFieldError__notMatchingPasswords: '비밀번호가 일치하지 않아요.',
   formFieldError__verificationLinkExpired: '인증 링크가 만료됐어요. 새 링크를 요청해 주세요.',

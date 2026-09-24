@@ -956,6 +956,8 @@ export const idID: LocalizationResource = {
   formButtonPrimary: 'Lanjutkan',
   formButtonPrimary__verify: 'Verifikasi',
   formFieldAction__forgotPassword: 'Lupa kata sandi?',
+  formFieldAction__hidePassword: 'Sembunyikan kata sandi',
+  formFieldAction__showPassword: 'Tampilkan kata sandi',
   formFieldError__matchingPasswords: 'Kata sandi cocok.',
   formFieldError__notMatchingPasswords: 'Kata sandi tidak cocok.',
   formFieldError__verificationLinkExpired: 'Tautan verifikasi telah kedaluwarsa. Silakan minta tautan baru.',

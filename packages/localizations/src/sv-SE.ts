@@ -956,6 +956,8 @@ export const svSE: LocalizationResource = {
   formButtonPrimary: 'Fortsätt',
   formButtonPrimary__verify: 'Verifiera',
   formFieldAction__forgotPassword: 'Glömt lösenord?',
+  formFieldAction__hidePassword: 'Dölj lösenord',
+  formFieldAction__showPassword: 'Visa lösenord',
   formFieldError__matchingPasswords: 'Lösenorden matchar.',
   formFieldError__notMatchingPasswords: 'Lösenorden matchar inte.',
   formFieldError__verificationLinkExpired: 'Verifieringslänken har löpt ut. Vänligen begär en ny länk.',

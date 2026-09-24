@@ -963,6 +963,8 @@ export const jaJP: LocalizationResource = {
   formButtonPrimary: '続ける',
   formButtonPrimary__verify: '確認する',
   formFieldAction__forgotPassword: 'パスワードをお忘れですか？',
+  formFieldAction__hidePassword: 'パスワードを非表示にする',
+  formFieldAction__showPassword: 'パスワードを表示する',
   formFieldError__matchingPasswords: 'パスワードが一致します。',
   formFieldError__notMatchingPasswords: 'パスワードが一致しません。',
   formFieldError__verificationLinkExpired: '検証リンクの有効期限が切れています。新しいリンクをリクエストしてください。',
