@@ -2,10 +2,10 @@ import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useState } from 'react';
 
 import type { ReverificationController } from '../../features/reverification';
-import type { DestructiveProps } from './destructive';
+import type { DestructiveControlledProps } from './destructive';
 
 export type DestructiveController = Pick<
-  DestructiveProps,
+  DestructiveControlledProps,
   'open' | 'isDeleting' | 'errorMessage' | 'onOpenChange' | 'reverification'
 > & {
   onDelete: () => Promise<unknown>;
