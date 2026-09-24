@@ -54,6 +54,8 @@ const createClerk = () => {
       return Promise.resolve();
     }),
     signOut: vi.fn(),
+    openSignIn: vi.fn(),
+    buildSignInUrl: vi.fn(() => 'https://accounts.acme.com/sign-in'),
     addListener: vi.fn((callback: typeof listener) => {
       listener = callback;
       callback?.({ session: clerk.session });
@@ -244,6 +246,44 @@ describe('registerWebMcpTools', () => {
       strategy: 'password',
       identifier: 'jane@acme.com',
       password: 'hunter2',
+    });
+  });
+
+  it('opens the sign-in form when no saved password is chosen', async () => {
+    Object.defineProperty(navigator, 'credentials', {
+      value: { get: vi.fn().mockResolvedValue(null) },
+      configurable: true,
+    });
+    await register();
+
+    await expect(call('clerk_sign_in', { method: 'password', identifier: 'jane@acme.com' })).resolves.toMatchObject({
+      status: 'needs_user_action',
+      signInForm: 'opened',
+      otherMethods: ['passkey', 'oauth_google', 'email_code', 'email_link'],
+    });
+    expect(setup.clerk.openSignIn).toHaveBeenCalledWith({ initialValues: { emailAddress: 'jane@acme.com' } });
+
+    setup.clerk.openSignIn.mockImplementation(() => {
+      throw new Error('Clerk was not loaded with Ui components');
+    });
+    await expect(call('clerk_sign_in', { method: 'password' })).resolves.toMatchObject({
+      status: 'needs_user_action',
+      signInUrl: 'https://accounts.acme.com/sign-in',
+    });
+  });
+
+  it('suggests other methods when no passkey is used', async () => {
+    setup.signIn.authenticateWithPasskey.mockRejectedValue(
+      Object.assign(new Error('The operation either timed out or was not allowed.'), {
+        code: 'passkey_retrieval_cancelled',
+      }),
+    );
+    await register();
+
+    await expect(call('clerk_sign_in', { method: 'passkey' })).resolves.toMatchObject({
+      status: 'error',
+      code: 'passkey_retrieval_cancelled',
+      otherMethods: ['oauth_google', 'email_code', 'email_link', 'password'],
     });
   });
 
