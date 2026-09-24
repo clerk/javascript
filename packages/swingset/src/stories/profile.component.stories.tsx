@@ -1,6 +1,7 @@
 import { Badge } from '@clerk/mosaic/components/badge';
 import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
+import { Panel } from '@clerk/mosaic/components/panel';
 import type { ProfileRootProps } from '@clerk/mosaic/components/profile';
 import { Profile } from '@clerk/mosaic/components/profile';
 import { Section } from '@clerk/mosaic/components/section';
@@ -43,10 +44,10 @@ const pages = [
 
 function Placeholder({ title }: { title: string }) {
   return (
-    <div style={{ display: 'grid', gap: '0.5rem' }}>
-      <Profile.PageTitle>{title}</Profile.PageTitle>
+    <Panel.Root>
+      <Panel.Title>{title}</Panel.Title>
       <Text>Content for the {title.toLowerCase()} page.</Text>
-    </div>
+    </Panel.Root>
   );
 }
 
@@ -112,37 +113,39 @@ const stubSections: Record<string, { title: string; rows: { label: string; descr
 
 function StubPage({ id, title }: { id: string; title: string }) {
   return (
-    <div style={{ display: 'grid', gap: '1rem' }}>
-      <Profile.PageTitle>{title}</Profile.PageTitle>
-      {stubSections[id]?.map(section => (
-        <Section.Root key={section.title}>
-          <Section.Title>{section.title}</Section.Title>
-          <Section.Group>
-            <Section.Row>
-              <Section.Items>
-                {section.rows.map(row => (
-                  <Section.Item key={row.label}>
-                    <Section.Content>
-                      <Section.Label>{row.label}</Section.Label>
-                      <Section.Description>{row.description}</Section.Description>
-                    </Section.Content>
-                    <Section.Actions>
-                      <Button
-                        color='neutral'
-                        size='sm'
-                        variant='outline'
-                      >
-                        Edit
-                      </Button>
-                    </Section.Actions>
-                  </Section.Item>
-                ))}
-              </Section.Items>
-            </Section.Row>
-          </Section.Group>
-        </Section.Root>
-      ))}
-    </div>
+    <Panel.Root>
+      <Panel.Title>{title}</Panel.Title>
+      <Panel.Sections>
+        {stubSections[id]?.map(section => (
+          <Section.Root key={section.title}>
+            <Section.Title>{section.title}</Section.Title>
+            <Section.Group>
+              <Section.Row>
+                <Section.Items>
+                  {section.rows.map(row => (
+                    <Section.Item key={row.label}>
+                      <Section.Content>
+                        <Section.Label>{row.label}</Section.Label>
+                        <Section.Description>{row.description}</Section.Description>
+                      </Section.Content>
+                      <Section.Actions>
+                        <Button
+                          color='neutral'
+                          size='sm'
+                          variant='outline'
+                        >
+                          Edit
+                        </Button>
+                      </Section.Actions>
+                    </Section.Item>
+                  ))}
+                </Section.Items>
+              </Section.Row>
+            </Section.Group>
+          </Section.Root>
+        ))}
+      </Panel.Sections>
+    </Panel.Root>
   );
 }
 

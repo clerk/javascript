@@ -78,21 +78,21 @@ sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 ## Heading levels
 
 The profile's headings follow the nearest `HeadingLevelProvider`. `Profile.Title` renders at the
-current level, and `Profile.ContentPanel` moves its page one level down, where `Profile.PageTitle`
-renders. A page wraps its sections in its own `HeadingLevelProvider` so their titles sit below the
-page title. See [Heading](/components/heading).
+current level, and `Profile.ContentPanel` moves its page one level down, where `Panel.Title`
+renders. `Panel.Sections` puts section titles one level below the page title. See
+[Heading](/components/heading) and [Panel](/components/panel).
 
-| Usage                                           | `Profile.Title` | `Profile.PageTitle` | `Section.Title` |
-| ----------------------------------------------- | --------------- | ------------------- | --------------- |
-| Profile                                         | `h2`            | `h3`                | `h4`            |
-| Profile inside `HeadingLevelProvider level={3}` | `h3`            | `h4`                | `h5`            |
-| A page alone                                    | —               | `h2`                | `h3`            |
+| Usage                                           | `Profile.Title` | `Panel.Title` | `Section.Title` |
+| ----------------------------------------------- | --------------- | ------------- | --------------- |
+| Profile                                         | `h2`            | `h3`          | `h4`            |
+| Profile inside `HeadingLevelProvider level={3}` | `h3`            | `h4`          | `h5`            |
+| A page alone                                    | —               | `h2`          | `h3`            |
 
 ## Compact layout
 
 Below `48rem` of the profile's **own** width — or, over the page, the dialog's viewport's, so the
 profile collapses exactly when the dialog fills the screen — the frame goes: the profile is the page
-there, flush with whatever holds it, and the navigation leaves the column for a sheet: `Profile.PageTitle`
+there, flush with whatever holds it, and the navigation leaves the column for a sheet: `Panel.Title`
 grows a caret that opens a `Drawer` holding the tablist, and a choice closes it. Where the tablist
 renders is a DOM decision — one tablist, in the column or in the sheet, never both — so the root
 reads the query's answer off a sentinel it renders, `1px` wide and `2px` once the query matches,

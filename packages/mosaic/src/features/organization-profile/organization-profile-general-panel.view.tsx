@@ -1,10 +1,8 @@
-import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
-import { HeadingLevelProvider } from '../../components/heading';
-import { panelStyles, Profile } from '../../components/profile';
+import { Panel } from '../../components/panel';
 import { useMessages } from '../../localization';
-import { mergeStyleProps, themeProps } from '../../props';
+import { themeProps } from '../../props';
 import type { OrganizationProfileDangerSectionViewProps } from './organization-profile-danger-section/organization-profile-danger-section.view';
 import { OrganizationProfileDangerSectionView } from './organization-profile-danger-section/organization-profile-danger-section.view';
 import type { OrganizationProfileWorkspaceSectionViewProps } from './organization-profile-workspace-section/organization-profile-workspace-section.view';
@@ -30,29 +28,27 @@ export function OrganizationProfileGeneralPanelView({
   const m = useMessages('organizationProfile');
 
   return (
-    <div {...mergeStyleProps(themeProps('organization-profile-general-panel'), stylex.props(panelStyles.root))}>
-      <Profile.PageTitle>{m.pages.general}</Profile.PageTitle>
-      <HeadingLevelProvider>
-        <div {...stylex.props(panelStyles.sections)}>
-          <OrganizationProfileWorkspaceSectionView
-            name={name}
-            slug={slug}
-            imageUrl={imageUrl}
-            hasImage={hasImage}
-            onLogoChange={onLogoChange}
-            onLogoReject={onLogoReject}
-            onRemoveLogo={onRemoveLogo}
-            onSubmitName={onSubmitName}
-            onSubmitSlug={onSubmitSlug}
-          />
-          <OrganizationProfileDangerSectionView
-            name={name}
-            memberCount={memberCount}
-            onLeave={onLeave}
-            onDelete={onDelete}
-          />
-        </div>
-      </HeadingLevelProvider>
-    </div>
+    <Panel.Root render={<div {...themeProps('organization-profile-general-panel')} />}>
+      <Panel.Title>{m.pages.general}</Panel.Title>
+      <Panel.Sections>
+        <OrganizationProfileWorkspaceSectionView
+          name={name}
+          slug={slug}
+          imageUrl={imageUrl}
+          hasImage={hasImage}
+          onLogoChange={onLogoChange}
+          onLogoReject={onLogoReject}
+          onRemoveLogo={onRemoveLogo}
+          onSubmitName={onSubmitName}
+          onSubmitSlug={onSubmitSlug}
+        />
+        <OrganizationProfileDangerSectionView
+          name={name}
+          memberCount={memberCount}
+          onLeave={onLeave}
+          onDelete={onDelete}
+        />
+      </Panel.Sections>
+    </Panel.Root>
   );
 }
