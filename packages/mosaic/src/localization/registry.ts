@@ -1,4 +1,5 @@
 import { formMessages } from '../components/form/form.messages';
+import { invitationsTableTabMessages } from '../features/organization-profile/invitations-table-tab.messages';
 import { membersTableTabMessages } from '../features/organization-profile/members-table-tab.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileApiKeysPanelMessages } from '../features/organization-profile/organization-profile-api-keys-panel.messages';
@@ -28,6 +29,7 @@ import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-pr
 export const mosaicMessages = {
   form: formMessages,
   membersTableTab: membersTableTabMessages,
+  invitationsTableTab: invitationsTableTabMessages,
   organizationProfile: organizationProfileMessages,
   organizationProfileDangerSection: organizationProfileDangerSectionMessages,
   organizationProfileWorkspaceSection: organizationProfileWorkspaceSectionMessages,
