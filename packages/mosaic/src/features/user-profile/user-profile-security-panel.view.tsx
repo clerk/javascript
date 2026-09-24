@@ -125,7 +125,7 @@ export function UserProfileSecurityPanelView({
           />
         ) : null}
         {/* TODO: This is temporary, a view should not render a connected component */}
-        {onDeleteAccount ? <UserProfileDeleteSection onDelete={onDeleteAccount} /> : null}
+        {onDeleteAccount ? <UserProfileDeleteSection /> : null}
       </Panel.Sections>
     </Panel.Root>
   );
