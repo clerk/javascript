@@ -1,6 +1,6 @@
-import type { AvatarProps } from '@clerk/ui/mosaic/components/avatar';
-import { Avatar } from '@clerk/ui/mosaic/components/avatar';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
+import type { AvatarProps } from '@clerk/mosaic/components/avatar';
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Icon } from '@clerk/mosaic/components/icon';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -12,14 +12,17 @@ export { default as __source } from './avatar.stories?raw';
 // here to drive the playground + prop table. Keys mirror `AvatarProps`.
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Avatar',
-  source: 'packages/ui/src/mosaic/components/avatar/avatar.tsx',
+  source: 'packages/mosaic/src/components/avatar/avatar.tsx',
   styles: {
     _variants: {
+      bordered: { true: {}, false: {} },
       shape: { circle: {}, square: {} },
-      size: { xs: {}, sm: {}, md: {}, lg: {}, xl: {} },
+      size: { xs: {}, sm: {}, md: {}, lg: {} },
     },
     _defaultVariants: {
+      bordered: true,
       shape: 'circle',
       size: 'md',
     },
@@ -75,7 +78,7 @@ export function Interactive(props: Record<string, unknown>) {
   return (
     <Avatar.Root
       {...knobsAsProps(props)}
-      size='xl'
+      size='lg'
       render={
         <button
           type='button'
@@ -98,7 +101,7 @@ export function Interactive(props: Record<string, unknown>) {
 export function Sizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      {(['xs', 'sm', 'md', 'lg', 'xl'] as const).map(size => (
+      {(['xs', 'sm', 'md', 'lg'] as const).map(size => (
         <Avatar.Root
           key={size}
           {...knobsAsProps(props)}

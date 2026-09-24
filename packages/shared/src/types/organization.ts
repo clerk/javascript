@@ -1,5 +1,6 @@
 import type { BillingPayerMethods } from './billing';
 import type { DeletedObjectResource } from './deletedObject';
+import type { CreateDirectorySyncParams, DirectorySyncResource } from './directorySync';
 import type {
   CreateOrganizationEnterpriseConnectionParams,
   EnterpriseConnectionResource,
@@ -23,6 +24,7 @@ import type { ClerkPaginatedResponse, ClerkPaginationParams } from './pagination
 import type { ClerkResource } from './resource';
 import type { RoleResource } from './role';
 import type { OrganizationJSONSnapshot } from './snapshots';
+import type { SSOBypassAllowlistResource } from './ssoBypassAllowlist';
 import type { GetEnterpriseConnectionsParams } from './user';
 
 declare global {
@@ -191,7 +193,7 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
    */
   prepareOwnershipVerification: (domainIds: string[]) => Promise<OrganizationDomainsBulkOwnershipVerificationResource>;
   /**
-   * Completes the verification process started by [`prepareOwnershipVerification()`](https://clerk.com/docs/reference/objects/organization#prepare-ownership-verification), by resolving the published TXT record for each of the given domains in a single request. A single bad domain does not fail the batch; it lands in the returned [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object's `errors` array.
+   * Completes the verification process started by [`prepareOwnershipVerification()`](https://clerk.com/docs/reference/objects/organization#prepareownershipverification), by resolving the published TXT record for each of the given domains in a single request. A single bad domain does not fail the batch; it lands in the returned [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object's `errors` array.
    * @returns An [`OrganizationDomainsBulkOwnershipVerificationResource`](https://clerk.com/docs/reference/types/organization-domains-bulk-ownership-verification-resource) object.
    * @param domainIds - The unique identifiers of the domains to attempt.
    */
@@ -221,6 +223,23 @@ export interface OrganizationResource extends ClerkResource, BillingPayerMethods
     enterpriseConnectionId: string,
     params?: GetEnterpriseConnectionTestRunsParams,
   ) => Promise<ClerkPaginatedResponse<EnterpriseConnectionTestRunResource>>;
+  /**
+   * Gets the Directory Sync directory bound to the given enterprise connection.
+   */
+  getDirectorySync: (enterpriseConnectionId: string) => Promise<DirectorySyncResource>;
+  /**
+   * Provisions Directory Sync for the given enterprise connection. The returned resource is the only place the SCIM
+   * bearer token (`apiKey`) is ever available; rotate it to obtain a new one.
+   */
+  createDirectorySync: (
+    enterpriseConnectionId: string,
+    params?: CreateDirectorySyncParams,
+  ) => Promise<DirectorySyncResource>;
+  /**
+   * The organization's SSO bypass allowlist: the members who may sign in with an email code when the organization's
+   * enterprise SSO is unavailable. Managing it requires the `org:sys_entconns_sso_bypass:manage` permission.
+   */
+  ssoBypassAllowlist: SSOBypassAllowlistResource;
   /**
    * Deletes the Organization. Only administrators can delete an Organization.
    *

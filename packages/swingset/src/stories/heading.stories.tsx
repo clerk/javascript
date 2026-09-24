@@ -1,5 +1,5 @@
-import type { HeadingProps } from '@clerk/ui/mosaic/components/heading';
-import { Heading } from '@clerk/ui/mosaic/components/heading';
+import type { HeadingProps } from '@clerk/mosaic/components/heading';
+import { Heading } from '@clerk/mosaic/components/heading';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -9,16 +9,24 @@ export { default as __source } from './heading.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'wip',
   title: 'Heading',
-  source: 'packages/ui/src/mosaic/components/heading/heading.tsx',
+  source: 'packages/mosaic/src/components/heading/heading.tsx',
   styles: {
     _variants: {
       size: { xs: {}, sm: {}, base: {}, lg: {}, xl: {}, '2xl': {} },
-      color: { primary: {}, neutral: {}, warning: {}, negative: {}, positive: {} },
+      color: {
+        brand: {},
+        foreground: {},
+        'foreground-secondary': {},
+        warning: {},
+        negative: {},
+        positive: {},
+      },
     },
     _defaultVariants: {
       size: 'base',
-      color: 'primary',
+      color: 'foreground',
     },
   },
 };
@@ -81,15 +89,21 @@ export function Colors(props: Record<string, unknown>) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       <Heading
         {...knobsAsProps(props)}
-        color='primary'
+        color='brand'
       >
-        Primary heading
+        Brand heading
       </Heading>
       <Heading
         {...knobsAsProps(props)}
-        color='neutral'
+        color='foreground'
       >
-        Neutral heading
+        Foreground heading
+      </Heading>
+      <Heading
+        {...knobsAsProps(props)}
+        color='foreground-secondary'
+      >
+        Foreground secondary heading
       </Heading>
       <Heading
         {...knobsAsProps(props)}

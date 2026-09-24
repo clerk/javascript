@@ -39,7 +39,7 @@ test.describe('Keyless mode @quickstart', () => {
     const response = await page.goto(`${app.serverUrl}/`);
     expect(response?.status()).toBe(500);
     const content = await page.content();
-    expect(content).toContain('Missing publishableKey');
+    expect(content).toContain('Clerk keys are missing from your environment');
     expect(content).toContain('npx clerk@latest init');
   });
 
@@ -58,7 +58,7 @@ test.describe('Keyless mode @quickstart', () => {
       publishableKey,
       secretKey,
       claimUrl: 'https://dashboard.clerk.com/apps/claim',
-      apiKeysUrl: 'https://dashboard.clerk.com/last-active?path=api-keys',
+      apiKeysUrl: 'https://dashboard.clerk.com/~/api-keys',
     });
     await app.keylessToEnv();
     /**

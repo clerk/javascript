@@ -1,3 +1,4 @@
+import { removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import type { SignInResource } from '@clerk/shared/types';
 import { useEffect, useRef, useState } from 'react';
@@ -24,7 +25,12 @@ import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
 import { buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
-import { isSignInPendingOAuthTransfer, resumeSignInAfterProtectCheck } from './handleProtectCheck';
+import {
+  isProtectCheckRequiredError,
+  isSignInPendingOAuthTransfer,
+  isSignInProtectGated,
+  resumeSignInAfterProtectCheck,
+} from './handleProtectCheck';
 
 function SignInProtectCheckInternal(): JSX.Element | null {
   const card = useCardState();
@@ -68,6 +74,9 @@ function SignInProtectCheckInternal(): JSX.Element | null {
         return;
       }
       if (updatedSignIn.status === 'complete' && updatedSignIn.createdSessionId) {
+        // A ticket sign-in that would have completed on the start page is completing here
+        // instead, so the ticket has to be cleared here too — otherwise it stays in the URL.
+        removeClerkQueryParam('__clerk_ticket');
         await setActive({
           session: updatedSignIn.createdSessionId,
           navigate: async ({ session, decorateUrl }) => {
@@ -78,6 +87,29 @@ function SignInProtectCheckInternal(): JSX.Element | null {
       }
       await resumeSignInAfterProtectCheck(updatedSignIn, {
         navigate,
+        // No `enterpriseConnectionId` is passed: this runs only under
+        // `shouldHandOffToEnterpriseConnection`, which requires a single connection, so the server
+        // has exactly one to prepare. If that guard is ever loosened to resume a connection the
+        // user chose, the id has to be carried across the challenge and passed here.
+        resumeEnterpriseSSO: async () => {
+          try {
+            await signIn.authenticateWithRedirect({
+              strategy: 'enterprise_sso',
+              redirectUrl: ctx.ssoCallbackUrl,
+              redirectUrlComplete: afterSignInUrl || '/',
+              oidcPrompt: ctx.oidcPrompt,
+              continueSignIn: true,
+            });
+          } catch (err) {
+            // Preparing the hand-off can raise a further challenge, in which case no redirect was
+            // issued: stay here and run it on the next render.
+            if (isProtectCheckRequiredError(err) && isSignInProtectGated(signIn)) {
+              await navigate('.');
+              return;
+            }
+            throw err;
+          }
+        },
         startedAsOAuthTransfer: startedAsOAuthTransfer.current,
         resumeOAuthContinuation: () =>
           typeof __internal_resumeAfterProtectCheck === 'function'

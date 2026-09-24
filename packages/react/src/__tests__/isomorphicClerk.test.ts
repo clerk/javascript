@@ -256,6 +256,22 @@ describe('isomorphicClerk', () => {
     ).resolves.toBeUndefined();
   });
 
+  it('does nothing when clerk-js predates OAuth device verification mounting', () => {
+    const isomorphicClerk = new IsomorphicClerk({ publishableKey: 'pk_test_XXX' });
+    const node = document.createElement('div');
+
+    isomorphicClerk.__internal_mountOAuthDeviceVerification(node);
+
+    expect(() =>
+      (isomorphicClerk as any).replayInterceptedInvocations({
+        addListener: vi.fn(),
+        loaded: true,
+      } as unknown as BrowserClerk),
+    ).not.toThrow();
+    expect(() => isomorphicClerk.__internal_mountOAuthDeviceVerification(node)).not.toThrow();
+    expect(() => isomorphicClerk.__internal_unmountOAuthDeviceVerification(node)).not.toThrow();
+  });
+
   it('calls __internal_handleResourceCallback immediately after clerk-js has loaded', async () => {
     const signInOrUp = {} as unknown as SignInResource;
     const params: HandleOAuthCallbackParams = { signInUrl: '/sign-in' };

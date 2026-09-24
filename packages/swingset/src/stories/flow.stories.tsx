@@ -1,14 +1,15 @@
 'use client';
 
-import { Flow, type FlowDirection } from '@clerk/headless/flow';
+import { Flow, type FlowDirection } from '@clerk/mosaic/primitives/flow';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Flow',
-  source: 'packages/headless/src/primitives/flow/index.ts',
+  source: 'packages/mosaic/src/primitives/flow/index.ts',
 };
 
 const steps = [

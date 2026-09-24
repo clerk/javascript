@@ -18,12 +18,12 @@ The machine runtime is documented **next to the code**, and that in-tree doc is
 the source of truth (it is updated in the same diff when the runtime changes and
 is readable by every tool, not just Claude Code). Read:
 
-- **`packages/ui/src/mosaic/machine/README.md`** — the mental model (state /
+- **`packages/mosaic/src/machine/README.md`** — the mental model (state /
   event / context / transition), your first machine, `setup` to drop the type
   boilerplate, running it with `createActor` / `useMachine`, and the API at a
   glance (`assign`, `invoke`, `guard`, `always`, `entry`/`exit`, `final`,
   `mockActor`, `useActor`, `useSelector`, `recheck()`).
-- **`packages/ui/src/mosaic/machine/ADOPTION.md`** — when a flow is worth a
+- **`packages/mosaic/src/machine/ADOPTION.md`** — when a flow is worth a
   machine and when it isn't.
 
 Two directories one letter apart: `machine/` is the runtime, `machines/` holds

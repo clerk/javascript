@@ -35,7 +35,7 @@ export type VerifyTokenOptions = Simplify<
   Omit<VerifyJwtOptions, 'key'> &
     Omit<LoadClerkJWKFromRemoteOptions, 'kid'> & {
       /**
-       * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](https://clerk.com/docs/guides/sessions/manual-jwt-verification).
+       * Used to verify the session token in a networkless manner. Supply the PEM public key from the **[**API keys**](https://dashboard.clerk.com/~/api-keys) page -> Show JWT public key -> PEM Public Key** section in the Clerk Dashboard. **It's recommended to use [the environment variable](https://clerk.com/docs/guides/development/clerk-environment-variables) instead.** For more information, refer to [Manual JWT verification](https://clerk.com/docs/guides/sessions/manual-jwt-verification).
        */
       jwtKey?: string;
     }
@@ -227,9 +227,21 @@ async function verifyOAuthToken(
 ): Promise<MachineTokenReturnType<IdPOAuthAccessToken, MachineTokenVerificationError>> {
   try {
     const client = createBackendApiClient(options);
-    const verifiedToken = await client.idPOAuthAccessToken.verify(accessToken);
+    const verifiedToken = await client.idPOAuthAccessToken.verify(accessToken, { audience: options.audience });
     return { data: verifiedToken, tokenType: TokenType.OAuthToken, errors: undefined };
   } catch (err: any) {
+    if (err instanceof TokenVerificationError) {
+      return {
+        data: undefined,
+        tokenType: TokenType.OAuthToken,
+        errors: [
+          new MachineTokenVerificationError({
+            code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            message: err.message,
+          }),
+        ],
+      };
+    }
     return handleClerkAPIError(TokenType.OAuthToken, err, 'OAuth token not found');
   }
 }

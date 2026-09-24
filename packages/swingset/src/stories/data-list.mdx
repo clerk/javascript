@@ -1,0 +1,59 @@
+import * as DataListStories from './data-list.stories';
+
+# DataList
+
+<Story
+  name='Default'
+  storyModule={DataListStories}
+/>
+
+## Usage
+
+```tsx
+import { DataList } from '@clerk/mosaic/components/data-list';
+
+<DataList.Root>
+  <DataList.Item>
+    <DataList.Label>IP address</DataList.Label>
+    <DataList.Value>2600:100e:b10b:787b:e8ae:6e75</DataList.Value>
+  </DataList.Item>
+</DataList.Root>;
+```
+
+`divided={false}` drops the rules between items, for pairs few enough to scan as a block.
+
+<Story
+  name='Plain'
+  storyModule={DataListStories}
+/>
+
+## Parts
+
+| Part             | Element | Class                 | Description                                                                  |
+| ---------------- | ------- | --------------------- | ---------------------------------------------------------------------------- |
+| `DataList.Root`  | `dl`    | `.cl-data-list`       | The panel. Owns the gutter and `divided`, and passes `divided` to the items. |
+| `DataList.Item`  | `div`   | `.cl-data-list-item`  | One pair, laid out as a row.                                                 |
+| `DataList.Label` | `dt`    | `.cl-data-list-label` | What the value is.                                                           |
+| `DataList.Value` | `dd`    | `.cl-data-list-value` | The value itself.                                                            |
+
+## Props
+
+### `DataList.Root`
+
+| Prop      | Type      | Default | Description              |
+| --------- | --------- | ------- | ------------------------ |
+| `divided` | `boolean` | `true`  | Rules between the items. |
+
+`DataList.Item`, `DataList.Label`, and `DataList.Value` take no props of their own. Every part accepts `render` and `xstyle` and forwards its ref.
+
+## Styling
+
+```css
+.cl-data-list {
+  background-color: var(--cl-color-background);
+}
+
+.cl-data-list[data-divided] .cl-data-list-item {
+  border-block-end-color: var(--cl-color-border-subtle);
+}
+```

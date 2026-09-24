@@ -1,5 +1,17 @@
 # @clerk/expo-google-signin
 
+## 1.0.4
+
+### Patch Changes
+
+- Fix Android builds failing on Android Gradle Plugin 9 with `Cannot add extension with name 'kotlin'`. ([#9662](https://github.com/clerk/javascript/pull/9662)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 1.0.3
+
+### Patch Changes
+
+- Android now reports the Google account's stable identifier (the ID token's `sub` claim) as `user.id` instead of the email address, matching iOS. ([#9606](https://github.com/clerk/javascript/pull/9606)) by [@wobsoriano](https://github.com/wobsoriano)
+
 ## 1.0.2
 
 ### Patch Changes

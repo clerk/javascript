@@ -1,5 +1,10 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
-import type { InstanceType, OAuthConsentInfoJSON } from '@clerk/shared/types';
+import type {
+  InstanceType,
+  OAuthConsentInfoJSON,
+  OAuthDeviceVerificationInfoJSON,
+  OAuthDeviceVerificationResultJSON,
+} from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
 import { mockFetch } from '@/test/core-fixtures';
@@ -19,6 +24,34 @@ const consentPayload: OAuthConsentInfoJSON = {
   state: 'st',
   scopes: [{ scope: 'openid', description: 'OpenID', requires_consent: true }],
 };
+
+const deviceVerificationPayload: OAuthDeviceVerificationInfoJSON = {
+  oauth_application_name: 'TV App',
+  oauth_application_logo_url: null,
+  client_id: 'client_device',
+  scopes: [{ scope: 'profile', description: 'Your profile', requires_consent: true }],
+  status: 'pending',
+  expires_at: 1_800_000_000_000,
+};
+
+const deviceVerificationResultPayload: OAuthDeviceVerificationResultJSON = {
+  object: 'oauth_device_verification',
+  status: 'approved',
+};
+
+function setFapiClerk() {
+  BaseResource.clerk = {
+    getFapiClient: () =>
+      createFapiClient({
+        frontendApi: 'clerk.example.com',
+        getSessionId: () => undefined,
+        instanceType: 'development' as InstanceType,
+      }),
+    __internal_setCountry: vi.fn(),
+    handleUnauthenticated: vi.fn(),
+    __internal_handleUnauthenticatedDevBrowser: vi.fn(),
+  } as any;
+}
 
 describe('OAuthApplication', () => {
   let oauthApp: OAuthApplication;
@@ -220,6 +253,152 @@ describe('OAuthApplication', () => {
 
       expect(buildUrlWithAuth).toHaveBeenCalledOnce();
       expect(result).toContain('__clerk_db_jwt=devjwt');
+    });
+  });
+
+  describe('lookupDeviceVerification', () => {
+    it.each([
+      ['direct', deviceVerificationPayload],
+      ['enveloped', { response: deviceVerificationPayload }],
+    ])('maps a %s FAPI response', async (_shape, response) => {
+      const fetchSpy = vi.spyOn(BaseResource, '_fetch').mockResolvedValue(response as any);
+      BaseResource.clerk = {} as any;
+
+      await expect(oauthApp.lookupDeviceVerification({ userCode: 'bcdf ghjk' })).resolves.toEqual({
+        oauthApplicationName: 'TV App',
+        oauthApplicationLogoUrl: null,
+        clientId: 'client_device',
+        scopes: [{ scope: 'profile', description: 'Your profile', requiresConsent: true }],
+        status: 'pending',
+        expiresAt: 1_800_000_000_000,
+      });
+      expect(fetchSpy).toHaveBeenCalledWith(
+        {
+          method: 'POST',
+          path: '/me/oauth/device/lookup',
+          body: { userCode: 'bcdf ghjk' },
+        },
+        { skipUpdateClient: true },
+      );
+    });
+
+    it('defaults missing scopes to an empty array', async () => {
+      vi.spyOn(BaseResource, '_fetch').mockResolvedValue({
+        response: { ...deviceVerificationPayload, scopes: undefined },
+      } as any);
+      BaseResource.clerk = {} as any;
+
+      await expect(oauthApp.lookupDeviceVerification({ userCode: 'BCDF-GHJK' })).resolves.toMatchObject({ scopes: [] });
+    });
+
+    it.each(['pending', 'approved', 'denied', 'consumed'] as const)('preserves the %s lookup status', async status => {
+      vi.spyOn(BaseResource, '_fetch').mockResolvedValue({
+        response: { ...deviceVerificationPayload, status },
+      } as any);
+      BaseResource.clerk = {} as any;
+
+      await expect(oauthApp.lookupDeviceVerification({ userCode: 'BCDF-GHJK' })).resolves.toMatchObject({ status });
+    });
+
+    it('sends one credentialed form request with a snake-case user code field', async () => {
+      mockFetch(true, 200, deviceVerificationPayload);
+      setFapiClerk();
+
+      await oauthApp.lookupDeviceVerification({ userCode: 'BCDF-GHJK' });
+
+      expect(global.fetch).toHaveBeenCalledOnce();
+      const [url, init] = (global.fetch as Mock).mock.calls[0];
+      expect(url.toString()).toContain('/v1/me/oauth/device/lookup');
+      expect(init).toMatchObject({ credentials: 'include', method: 'POST', body: 'user_code=BCDF-GHJK' });
+    });
+
+    it('throws a network error when _fetch returns null', async () => {
+      vi.spyOn(BaseResource, '_fetch').mockResolvedValue(null);
+      BaseResource.clerk = {} as any;
+
+      await expect(oauthApp.lookupDeviceVerification({ userCode: 'BCDF-GHJK' })).rejects.toMatchObject({
+        code: 'network_error',
+      });
+    });
+
+    it('propagates FAPI errors without retrying', async () => {
+      const error = new ClerkAPIResponseError('Unknown device code', {
+        data: [{ code: 'resource_not_found', message: 'Unknown device code' }],
+        status: 404,
+      });
+      const fetchSpy = vi.spyOn(BaseResource, '_fetch').mockRejectedValue(error);
+      BaseResource.clerk = {} as any;
+
+      await expect(oauthApp.lookupDeviceVerification({ userCode: 'BCDF-GHJK' })).rejects.toBe(error);
+      expect(fetchSpy).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe('submitDeviceVerification', () => {
+    it.each([
+      ['direct', deviceVerificationResultPayload],
+      ['enveloped', { response: deviceVerificationResultPayload }],
+    ])('posts a decision and maps a %s FAPI response', async (_shape, response) => {
+      const fetchSpy = vi.spyOn(BaseResource, '_fetch').mockResolvedValue(response as any);
+      BaseResource.clerk = {} as any;
+
+      await expect(
+        oauthApp.submitDeviceVerification({
+          userCode: 'BCDF-GHJK',
+          approved: true,
+          organizationId: 'org_123',
+        }),
+      ).resolves.toEqual(deviceVerificationResultPayload);
+      expect(fetchSpy).toHaveBeenCalledWith(
+        {
+          method: 'POST',
+          path: '/me/oauth/device',
+          body: { userCode: 'BCDF-GHJK', approved: true, organizationId: 'org_123' },
+        },
+        { skipUpdateClient: true },
+      );
+    });
+
+    it('omits organizationId through the FAPI form encoder when undefined', async () => {
+      const fetchSpy = vi.spyOn(BaseResource, '_fetch').mockResolvedValue(deviceVerificationResultPayload as any);
+      BaseResource.clerk = {} as any;
+
+      await oauthApp.submitDeviceVerification({ userCode: 'BCDF-GHJK', approved: false });
+
+      expect(fetchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { userCode: 'BCDF-GHJK', approved: false, organizationId: undefined },
+        }),
+        { skipUpdateClient: true },
+      );
+    });
+
+    it('sends a snake-case decision form and omits an undefined organization', async () => {
+      mockFetch(true, 200, deviceVerificationResultPayload);
+      setFapiClerk();
+
+      await oauthApp.submitDeviceVerification({ userCode: 'BCDF-GHJK', approved: false });
+
+      expect(global.fetch).toHaveBeenCalledOnce();
+      const [url, init] = (global.fetch as Mock).mock.calls[0];
+      expect(url.toString()).toContain('/v1/me/oauth/device');
+      expect(init).toMatchObject({
+        credentials: 'include',
+        method: 'POST',
+        body: 'user_code=BCDF-GHJK&approved=false',
+      });
+    });
+
+    it('propagates decision errors without retrying', async () => {
+      const error = new ClerkAPIResponseError('No longer pending', {
+        data: [{ code: 'bad_request', message: 'No longer pending' }],
+        status: 400,
+      });
+      const fetchSpy = vi.spyOn(BaseResource, '_fetch').mockRejectedValue(error);
+      BaseResource.clerk = {} as any;
+
+      await expect(oauthApp.submitDeviceVerification({ userCode: 'BCDF-GHJK', approved: true })).rejects.toBe(error);
+      expect(fetchSpy).toHaveBeenCalledOnce();
     });
   });
 });

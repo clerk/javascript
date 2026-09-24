@@ -2,7 +2,7 @@ import * as IconFrameStories from './icon-frame.stories';
 
 # IconFrame
 
-IconFrame centers an icon or other visual in a square Mosaic surface. `bordered` and `filled` are independent treatments, while `size` controls the frame dimensions. The default is a bordered 40px frame; the filled treatment uses `oklch(0.9702 0 0)` in light mode and `oklch(0.2393 0 0)` in dark mode.
+IconFrame centers an icon or other visual in a square Mosaic surface. `bordered` and `filled` are independent treatments, while `size` controls the frame dimensions. The default is a bordered 40px frame; the filled treatment uses `--cl-color-background-subtle`.
 
 ## Playground
 
@@ -21,14 +21,14 @@ IconFrame centers an icon or other visual in a square Mosaic surface. `bordered`
 ## Usage
 
 ```tsx
-import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
+import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
 
 <IconFrame
   bordered={false}
   filled
   size='lg'
 >
-  <Icon name='check' />
+  <Icon name='checkmark' />
 </IconFrame>
 ```
 

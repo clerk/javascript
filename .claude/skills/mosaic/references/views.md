@@ -80,6 +80,48 @@ Which affordance lands in which slot, and how a consumer's `order` array
 rearranges a list, are decisions with no React in them. They live in
 `*.layout.ts` / `*.utils.ts` and get their own tests — the view calls the result.
 
+## Removing a row takes focus with it
+
+A dialog returns focus to its trigger on close. When the action removes the row
+that trigger sits on — signing a device out, removing an email — the trigger
+unmounts and focus falls to `<body>`. Nothing catches it: the menu item that
+opened the dialog unmounted with the menu, and a dialog mounted at the section
+rather than inside the menu has no floating-tree ancestor to walk back to. A
+keyboard user loses their place mid-list and a screen reader announces nothing.
+
+Hand focus to a surviving element. `finalFocus` on `Dialog.Popup` and on the
+`Confirmation` block takes a function, resolved when the dialog closes — which is
+after the row has gone, so it can pick from what is left:
+
+```tsx
+const triggers = useRef(new Map<string, HTMLButtonElement>());
+const removed = useRef<number | undefined>(undefined);
+
+const removeRow = async (row: Row) => {
+  const index = rows.findIndex(candidate => candidate.id === row.id);
+  await onRemove(row.id);
+  // Only once it is really gone: a cancelled or failed attempt keeps its own trigger.
+  removed.current = index;
+};
+
+const focusAfterRemove = () => {
+  const index = removed.current;
+  removed.current = undefined;
+  if (index === undefined) {
+    return null; // null keeps the default — the trigger, which is still there
+  }
+  const next = rows[Math.min(index, rows.length - 1)] ?? anchorRow;
+  return (next && triggers.current.get(next.id)) ?? null;
+};
+```
+
+Prefer the row that took the removed one's place, the last row when it was the
+last, and a control that outlives the list once it is empty.
+
+Test the removal, not just the cancel: `toHaveFocus()` on the row that should
+have caught it. A suite that only asserts focus after cancelling passes while
+every successful removal drops focus on the floor.
+
 ## Testing
 
 Render the view directly with **plain props and `vi.fn()` callbacks**. No Clerk

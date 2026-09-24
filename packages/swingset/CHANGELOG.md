@@ -1,5 +1,69 @@
 # @clerk/swingset
 
+## 0.0.49
+
+### Patch Changes
+
+- Updated dependencies [[`b3af79e`](https://github.com/clerk/javascript/commit/b3af79e946aaa403595b31e472b07b138db39dc6), [`cc6f11a`](https://github.com/clerk/javascript/commit/cc6f11af564b62daf186f9721594efd864ce093f), [`d46b544`](https://github.com/clerk/javascript/commit/d46b5446e89f15c5532bfbbc09fdc05a0fbcbf8d), [`f50f48c`](https://github.com/clerk/javascript/commit/f50f48cf3c67807c8def30d4a6d29d6c7bf904d2)]:
+  - @clerk/shared@4.35.0
+  - @clerk/mosaic@0.1.1
+  - @clerk/nextjs@7.9.6
+
+## 0.0.48
+
+### Patch Changes
+
+- Updated dependencies [[`f626fae`](https://github.com/clerk/javascript/commit/f626fae6387392ddd0fccac261d1f27b0551f062), [`b6c7426`](https://github.com/clerk/javascript/commit/b6c742600051eba4768a72ad90b3d2ad834557ad), [`804d3db`](https://github.com/clerk/javascript/commit/804d3db182746d3b403411025b5dccc5aeafc719), [`64c8e3e`](https://github.com/clerk/javascript/commit/64c8e3ec55e79a2ccc79ae27cbadaeef9481f3d9), [`970583c`](https://github.com/clerk/javascript/commit/970583c13d14f7f975b8efb59841bdc1a995eab7), [`43c7fbe`](https://github.com/clerk/javascript/commit/43c7fbeee313bdfeb520e60f140c164d17a61476), [`75e42d5`](https://github.com/clerk/javascript/commit/75e42d528c68265096c17c26ba6c823af8bdef22), [`75e42d5`](https://github.com/clerk/javascript/commit/75e42d528c68265096c17c26ba6c823af8bdef22), [`a982913`](https://github.com/clerk/javascript/commit/a982913d23004074b16cf5fb26f54b9d2e70576f), [`67f7387`](https://github.com/clerk/javascript/commit/67f73875bf9fbaac1c630fda13477c92a8094331), [`5e2a46f`](https://github.com/clerk/javascript/commit/5e2a46f2c9944ca6ba129b2db3a4d3a2937d26cf), [`07b4c2b`](https://github.com/clerk/javascript/commit/07b4c2b3c8bfa394f4331efcc363ee4064336f9d), [`4e36687`](https://github.com/clerk/javascript/commit/4e366874c5c4348750d43073cd8ec7aa4564e476), [`9e7485c`](https://github.com/clerk/javascript/commit/9e7485c8efc33e9458643372ce133b229347c03d)]:
+  - @clerk/mosaic@0.1.0
+  - @clerk/nextjs@7.9.5
+  - @clerk/shared@4.34.0
+
+## 0.0.47
+
+### Patch Changes
+
+- Updated dependencies [[`855c24f`](https://github.com/clerk/javascript/commit/855c24f451314c6b8a586daf422b8463638f1f37), [`cb6a376`](https://github.com/clerk/javascript/commit/cb6a376c5e34fa7869821f554c73f2968019776f), [`288e21e`](https://github.com/clerk/javascript/commit/288e21ecaa64b5b33eada96234e6de01ba1c102a)]:
+  - @clerk/ui@1.33.1
+  - @clerk/headless@0.0.34
+
+## 0.0.46
+
+### Patch Changes
+
+- Updated dependencies [[`b5a3abe`](https://github.com/clerk/javascript/commit/b5a3abe19629dc00839fecf03b364dff1b4e2e2e), [`a3038cb`](https://github.com/clerk/javascript/commit/a3038cb6c39735b76c38ae7880625e5d37c643a7), [`39782e3`](https://github.com/clerk/javascript/commit/39782e3abf25363053866dae1996eaaaf5e91b42)]:
+  - @clerk/ui@1.33.0
+  - @clerk/headless@0.0.33
+
+## 0.0.45
+
+### Patch Changes
+
+- Updated dependencies [[`7ea009f`](https://github.com/clerk/javascript/commit/7ea009fda71c052ac6e4d712830baa856f347954), [`dcd065a`](https://github.com/clerk/javascript/commit/dcd065ae48a12f5134a17d671696bd6ee81e7aa3), [`5b79f76`](https://github.com/clerk/javascript/commit/5b79f7668ee1ca6a63f76f2756aa67f2d89c296a), [`65342c6`](https://github.com/clerk/javascript/commit/65342c62edb593afd7d55c8cd5da867aa62b68e5)]:
+  - @clerk/ui@1.32.3
+  - @clerk/headless@0.0.32
+
+## 0.0.44
+
+### Patch Changes
+
+- Updated dependencies [[`689622f`](https://github.com/clerk/javascript/commit/689622f810179b3b98f58e6b7ec4ca1f41025026)]:
+  - @clerk/ui@1.32.2
+
+## 0.0.43
+
+### Patch Changes
+
+- Updated dependencies [[`20da00b`](https://github.com/clerk/javascript/commit/20da00bd93dc2f98ad2b8ec454686bc8aa30f1f3)]:
+  - @clerk/ui@1.32.1
+
+## 0.0.42
+
+### Patch Changes
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241), [`0c2a73c`](https://github.com/clerk/javascript/commit/0c2a73cae32245153ab66a78e7dd1e01ff2523f9)]:
+  - @clerk/ui@1.32.0
+  - @clerk/headless@0.0.31
+
 ## 0.0.41
 
 ### Patch Changes

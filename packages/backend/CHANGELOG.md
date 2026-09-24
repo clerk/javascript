@@ -1,5 +1,83 @@
 # Change Log
 
+## 3.20.0
+
+### Minor Changes
+
+- Add an optional `nameQuery` filter to `oauthApplications.list()` to search OAuth applications by name or exact client ID. ([#9904](https://github.com/clerk/javascript/pull/9904)) by [@austincalvelage](https://github.com/austincalvelage)
+
+### Patch Changes
+
+- Updated dependencies [[`b3af79e`](https://github.com/clerk/javascript/commit/b3af79e946aaa403595b31e472b07b138db39dc6), [`cc6f11a`](https://github.com/clerk/javascript/commit/cc6f11af564b62daf186f9721594efd864ce093f), [`d46b544`](https://github.com/clerk/javascript/commit/d46b5446e89f15c5532bfbbc09fdc05a0fbcbf8d), [`f50f48c`](https://github.com/clerk/javascript/commit/f50f48cf3c67807c8def30d4a6d29d6c7bf904d2)]:
+  - @clerk/shared@4.35.0
+
+## 3.19.0
+
+### Minor Changes
+
+- - Fixes an issue where OAuth token validation did not correctly validate audience (`aud`) claims. Previous usages that specified `audience` were falsely passing. This upgrade will cause those to start rejecting if the `audience` indeed does not match the OAuth token's `aud` claim, including cases where the `aud` claim is omitted. ([#9724](https://github.com/clerk/javascript/pull/9724)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  - Adds an optional `audience` parameter to `idPOAuthAccessToken.verify()`
+
+- Expose the optional `aud` audience on verified OAuth access tokens. ([#9585](https://github.com/clerk/javascript/pull/9585)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+### Patch Changes
+
+- Clarify domain API documentation and deletion parameter names. The active domain cannot be deleted. ([#9741](https://github.com/clerk/javascript/pull/9741)) by [@rafaelrcamargo](https://github.com/rafaelrcamargo)
+
+- Updated dependencies [[`804d3db`](https://github.com/clerk/javascript/commit/804d3db182746d3b403411025b5dccc5aeafc719), [`64c8e3e`](https://github.com/clerk/javascript/commit/64c8e3ec55e79a2ccc79ae27cbadaeef9481f3d9), [`07b4c2b`](https://github.com/clerk/javascript/commit/07b4c2b3c8bfa394f4331efcc363ee4064336f9d), [`4e36687`](https://github.com/clerk/javascript/commit/4e366874c5c4348750d43073cd8ec7aa4564e476), [`9e7485c`](https://github.com/clerk/javascript/commit/9e7485c8efc33e9458643372ce133b229347c03d)]:
+  - @clerk/shared@4.34.0
+
+## 3.18.1
+
+### Patch Changes
+
+- Updated dependencies [[`855c24f`](https://github.com/clerk/javascript/commit/855c24f451314c6b8a586daf422b8463638f1f37), [`cb6a376`](https://github.com/clerk/javascript/commit/cb6a376c5e34fa7869821f554c73f2968019776f)]:
+  - @clerk/shared@4.33.0
+
+## 3.18.0
+
+### Minor Changes
+
+- Add experimental `emails.createBatch()` for submitting up to 100 transactional emails. Each message supports its own idempotency key and returns an independent success or error result. ([#9711](https://github.com/clerk/javascript/pull/9711)) by [@jescalan](https://github.com/jescalan)
+
+  Transactional messages now support sender and reply-to display names, cross-domain Reply-To addresses, CC/BCC recipients, attachments, and custom headers. These options require a backend deployment that supports them.
+
+### Patch Changes
+
+- Update docs deep links in JSDoc comments to match clerk.com's new heading anchors (`#get-token` is now `#gettoken`, `#o-auth-strategy` is now `#oauthstrategy`, and so on). ([#9520](https://github.com/clerk/javascript/pull/9520)) by [@manovotny](https://github.com/manovotny)
+
+- Update the `lockUser()` JSDoc to point at the **System** page under **Protect** > **Rules** (`/~/protect/rules/system`), matching the Clerk Dashboard's Protect navigation. ([#9691](https://github.com/clerk/javascript/pull/9691)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`b5a3abe`](https://github.com/clerk/javascript/commit/b5a3abe19629dc00839fecf03b364dff1b4e2e2e), [`ddf9afc`](https://github.com/clerk/javascript/commit/ddf9afc6dc82528d28223ba9b775f8aa6647bbd7), [`39782e3`](https://github.com/clerk/javascript/commit/39782e3abf25363053866dae1996eaaaf5e91b42)]:
+  - @clerk/shared@4.32.0
+
+## 3.17.2
+
+### Patch Changes
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Updated dependencies [[`452107a`](https://github.com/clerk/javascript/commit/452107a4cfe06ce5d72b008ddaf670ea604e857d), [`7ea009f`](https://github.com/clerk/javascript/commit/7ea009fda71c052ac6e4d712830baa856f347954), [`06be25f`](https://github.com/clerk/javascript/commit/06be25fadde3d068f7686b565848a02d832f6211), [`c47e9cb`](https://github.com/clerk/javascript/commit/c47e9cb5e74de91bdec17111ba7b01d3e2ea459a), [`1601100`](https://github.com/clerk/javascript/commit/16011007218787509fd8457081ed5640e61bec48)]:
+  - @clerk/shared@4.31.1
+
+## 3.17.1
+
+### Patch Changes
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/shared@4.31.0
+
+## 3.17.0
+
+### Minor Changes
+
+- Add experimental methods for sending and retrieving internal transactional emails, including Clerk suppression state and reasons. ([#9553](https://github.com/clerk/javascript/pull/9553)) by [@jescalan](https://github.com/jescalan)
+
+### Patch Changes
+
+- Reject JWT-template tokens presented as session tokens in the `Authorization` header when `acceptsToken` is `'any'` or an array that includes `'session_token'`. `authenticateRequest()` now returns a signed-out state with reason `token-type-mismatch` for such a token, matching the existing `acceptsToken: 'session_token'` behavior. ([#9511](https://github.com/clerk/javascript/pull/9511)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
 ## 3.16.13
 
 ### Patch Changes

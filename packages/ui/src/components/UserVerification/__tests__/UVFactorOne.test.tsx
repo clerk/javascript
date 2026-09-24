@@ -136,6 +136,45 @@ describe('UserVerificationFactorOne', () => {
   });
 
   describe('Use another method', () => {
+    it('does not show use another method when password is the only first factor', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [{ strategy: 'password' }],
+      });
+
+      const { findByText, queryByText } = render(<UserVerificationFactorOne />, { wrapper });
+
+      await findByText('Verification required');
+      expect(queryByText('Use another method')).toBeNull();
+      await findByText('Get help');
+    });
+
+    it('does not show use another method when email is the only first factor', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withUser({ username: 'clerkuser' });
+        f.withPreferredSignInStrategy({ strategy: 'otp' });
+      });
+      fixtures.session?.startVerification.mockResolvedValue({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [
+          {
+            strategy: 'email_code',
+            emailAddressId: 'email_1',
+            safeIdentifier: 'xxx@hello.com',
+          },
+        ],
+      });
+      fixtures.session?.prepareFirstFactorVerification.mockResolvedValue({});
+
+      const { findByText, queryByText } = render(<UserVerificationFactorOne />, { wrapper });
+
+      await findByText('Verification required');
+      expect(queryByText('Use another method')).toBeNull();
+    });
+
     it('should list enabled first factor methods without the current one', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withUser({ username: 'clerkuser' });

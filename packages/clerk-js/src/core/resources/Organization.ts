@@ -2,11 +2,14 @@ import type {
   AddMemberParams,
   ClerkPaginatedResponse,
   ClerkResourceReloadParams,
+  CreateDirectorySyncParams,
   CreateOrganizationDomainParams,
   CreateOrganizationEnterpriseConnectionParams,
   CreateOrganizationParams,
   DeletedObjectJSON,
   DeletedObjectResource,
+  DirectorySyncJSON,
+  DirectorySyncResource,
   EnterpriseConnectionJSON,
   EnterpriseConnectionResource,
   EnterpriseConnectionTestRunInitJSON,
@@ -37,6 +40,7 @@ import type {
   OrganizationResource,
   RoleJSON,
   SetOrganizationLogoParams,
+  SSOBypassAllowlistResource,
   UpdateMembershipParams,
   UpdateOrganizationEnterpriseConnectionParams,
   UpdateOrganizationParams,
@@ -49,6 +53,7 @@ import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '..
 import {
   BaseResource,
   DeletedObject,
+  DirectorySync,
   EnterpriseConnection,
   EnterpriseConnectionTestRun,
   OrganizationInvitation,
@@ -57,9 +62,12 @@ import {
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 import { Role } from './Role';
+import { SSOBypassAllowlist } from './SSOBypassAllowlist';
 
 export class Organization extends BaseResource implements OrganizationResource {
   pathRoot = '/organizations';
+
+  ssoBypassAllowlist: SSOBypassAllowlistResource = new SSOBypassAllowlist(this);
 
   id!: string;
   name!: string;
@@ -272,6 +280,32 @@ export class Organization extends BaseResource implements OrganizationResource {
       total_count: payload?.total_count ?? 0,
       data: (payload?.data ?? []).map((row: EnterpriseConnectionTestRunJSON) => new EnterpriseConnectionTestRun(row)),
     };
+  };
+
+  getDirectorySync = async (enterpriseConnectionId: string): Promise<DirectorySyncResource> => {
+    const json = (
+      await BaseResource._fetch<DirectorySyncJSON>({
+        path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}/directory`,
+        method: 'GET',
+      })
+    )?.response as unknown as DirectorySyncJSON;
+
+    return new DirectorySync(json, this.id);
+  };
+
+  createDirectorySync = async (
+    enterpriseConnectionId: string,
+    params?: CreateDirectorySyncParams,
+  ): Promise<DirectorySyncResource> => {
+    const json = (
+      await BaseResource._fetch<DirectorySyncJSON>({
+        path: `/organizations/${this.id}/enterprise_connections/${enterpriseConnectionId}/directory`,
+        method: 'POST',
+        body: { name: params?.name } as any,
+      })
+    )?.response as unknown as DirectorySyncJSON;
+
+    return new DirectorySync(json, this.id);
   };
 
   getMembershipRequests = async (

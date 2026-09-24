@@ -109,7 +109,7 @@ export type LoadClerkJWKFromRemoteOptions = {
    */
   skipJwksCache?: boolean;
   /**
-   * The Clerk Secret Key from the [**API keys**](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
+   * The Clerk Secret Key from the [**API keys**](https://dashboard.clerk.com/~/api-keys) page in the Clerk Dashboard.
    */
   secretKey?: string;
   /**

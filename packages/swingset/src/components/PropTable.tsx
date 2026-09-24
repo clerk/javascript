@@ -15,16 +15,9 @@ interface ExtraProp {
 interface PropTableProps {
   meta: StoryMeta;
   extra?: ExtraProp[];
-  /** Set false for a component that styles itself and does not want `className`/`style` advertised. */
-  styleProps?: boolean;
 }
 
-const STYLEX_ROWS: ExtraProp[] = [
-  { name: 'className', type: 'string' },
-  { name: 'style', type: 'CSSProperties' },
-];
-
-export function PropTable({ meta, extra = [], styleProps = true }: PropTableProps) {
+export function PropTable({ meta, extra = [] }: PropTableProps) {
   const playground = usePlayground();
   const variants = meta.styles?._variants ?? {};
   const defaults = meta.styles?._defaultVariants ?? {};
@@ -40,7 +33,7 @@ export function PropTable({ meta, extra = [], styleProps = true }: PropTableProp
       return { name, type, default: defDisplay };
     }),
     ...extra,
-    ...(styleProps ? STYLEX_ROWS : []),
+    { name: 'xstyle', type: 'XStyle' },
   ];
 
   return (
@@ -56,7 +49,7 @@ export function PropTable({ meta, extra = [], styleProps = true }: PropTableProp
       <tbody>
         {rows.map(row => {
           // The default is a static cell; the Value column is the live control. Variant
-          // props get a knob there; non-variant rows (the engine rows, extra) have no control.
+          // props get a knob there; the extra and xstyle rows have no control.
           const knob = playground?.knobs[row.name];
           return (
             <tr key={row.name}>

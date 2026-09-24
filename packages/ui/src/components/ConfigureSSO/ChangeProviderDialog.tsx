@@ -11,6 +11,7 @@ type ChangeProviderDialogProps = {
   isSubmitting?: boolean;
   nextProviderLabel: LocalizationKey;
   currentProviderLabel: LocalizationKey;
+  connectionName: string;
   contentRef: React.RefObject<HTMLDivElement>;
 };
 
@@ -40,7 +41,7 @@ export const ChangeProviderDialog = (props: ChangeProviderDialogProps): JSX.Elem
 };
 
 const ChangeProviderDialogContent = withCardStateProvider((props: ChangeProviderDialogProps) => {
-  const { onClose, onConfirm, isSubmitting, nextProviderLabel, currentProviderLabel } = props;
+  const { onClose, onConfirm, isSubmitting, nextProviderLabel, currentProviderLabel, connectionName } = props;
   const { t } = useLocalizations();
 
   const nextProvider = t(nextProviderLabel);
@@ -67,6 +68,7 @@ const ChangeProviderDialogContent = withCardStateProvider((props: ChangeProvider
               localizationKey={localizationKeys('configureSSO.changeProviderDialog.subtitle', {
                 provider: nextProvider,
                 currentProvider,
+                name: connectionName,
               })}
             />
           </Col>

@@ -3,7 +3,7 @@
 Migrating a legacy component means taking logic that was fused into one file and
 pulling it apart into the model / controller / view layers (see the skill
 overview and `references/mosaic-architecture.md` → "Flow and data architecture").
-`packages/ui/src/mosaic/user-button/` is the fullest worked example of the
+`packages/mosaic/src/features/user-button/` is the fullest worked example of the
 finished shape.
 
 **The core risk this workflow exists to manage:** a legacy component fuses
@@ -23,7 +23,7 @@ make each layer account for a specific row.
 ## Phase 1 — Inventory the legacy behavior (the spec)
 
 Locate the legacy files (usually under `packages/ui/src/components/<Feature>/`).
-Then grep them for the primitives that carry hidden, load-bearing logic. Every
+Then grep them for the primitives that carry hidden logic. Every
 hit is a row you must consciously place or drop later:
 
 | Primitive                         | The behavior it usually hides                      |

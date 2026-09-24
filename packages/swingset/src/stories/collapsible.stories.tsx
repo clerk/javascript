@@ -1,9 +1,9 @@
-import { Collapsible } from '@clerk/headless/collapsible';
+import { Collapsible } from '@clerk/mosaic/primitives/collapsible';
 
 import type { StoryMeta } from '@/lib/types';
 
 // Headless primitives ship no styles. This single demo renders the primitive raw —
-// unstyled — so it faithfully reflects what `@clerk/headless` provides: behavior, state,
+// unstyled — so it faithfully reflects what the primitive provides: behavior, state,
 // and ARIA wiring via the `data-*` attributes each part emits, with zero appearance.
 // It is embedded once into the overview via `<Story>` in the MDX (the one thing prose
 // can't convey: that it actually expands/collapses). There is no interactive knob canvas
@@ -11,8 +11,9 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Collapsible',
-  source: 'packages/headless/src/primitives/collapsible/index.ts',
+  source: 'packages/mosaic/src/primitives/collapsible/index.ts',
 };
 
 export function Default() {

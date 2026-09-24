@@ -1,4 +1,4 @@
-import { ClerkOfflineError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import { ClerkOfflineError, ClerkRuntimeError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ActiveSessionResource,
@@ -251,6 +251,32 @@ describe('Clerk singleton', () => {
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
         expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
+      });
+
+      it('mounts OAuthConsent when mounted while navigating to redirectUrl', async () => {
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({ signedInSessions: [mockSession], isEligibleForTouch: () => false }),
+        );
+        const mountComponent = vi.fn();
+        const mockClerkUICtor = vi.fn(function () {
+          return { ensureMounted: () => Promise.resolve({ mountComponent }) };
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load({ ui: { ClerkUI: mockClerkUICtor } });
+        const node = document.createElement('div');
+        sut.navigate = vi.fn(async () => {
+          sut.mountOAuthConsent(node);
+        });
+
+        await sut.setActive({
+          session: mockSession as any as ActiveSessionResource,
+          redirectUrl: '/oauth-consent',
+        });
+
+        await waitFor(() => {
+          expect(mountComponent).toHaveBeenCalledWith(expect.objectContaining({ name: 'OAuthConsent', node }));
+        });
       });
 
       describe('with `touchSession` set to false', () => {
@@ -1289,6 +1315,53 @@ describe('Clerk singleton', () => {
         });
       },
     );
+
+    it('completes local sign-out when removing sessions fails with an offline network error', async () => {
+      mockClientRemoveSessions.mockRejectedValue(
+        new ClerkRuntimeError('Network request failed.', { code: 'network_error' }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          ...clientTouchDefaults,
+          signedInSessions: [mockSession1],
+          sessions: [mockSession1],
+          destroy: mockClientDestroy,
+          removeSessions: mockClientRemoveSessions,
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.navigate = vi.fn();
+      await sut.load();
+
+      await expect(sut.signOut()).resolves.toBeUndefined();
+
+      expect(sut.session).toBeNull();
+      expect(sut.navigate).toHaveBeenCalledWith('/');
+    });
+
+    it('rethrows non-network errors when removing sessions during sign-out', async () => {
+      const error = new ClerkRuntimeError('Request failed.', { code: 'unexpected_error' });
+      mockClientRemoveSessions.mockRejectedValue(error);
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          ...clientTouchDefaults,
+          signedInSessions: [mockSession1],
+          sessions: [mockSession1],
+          destroy: mockClientDestroy,
+          removeSessions: mockClientRemoveSessions,
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.navigate = vi.fn();
+      await sut.load();
+
+      await expect(sut.signOut()).rejects.toBe(error);
+
+      expect(sut.session).toBeUndefined();
+      expect(sut.navigate).not.toHaveBeenCalled();
+    });
 
     it('only removes the session that corresponds to the passed sessionId if it is not the current', async () => {
       mockClientFetch.mockReturnValue(

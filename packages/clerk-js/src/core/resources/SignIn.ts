@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -118,6 +119,7 @@ export class SignIn extends BaseResource implements SignInResource {
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedFirstFactors: SignInFirstFactor[] | null = [];
   supportedSecondFactors: SignInSecondFactor[] | null = null;
+  ssoBypassFirstFactors: SignInFirstFactor[] | null = null;
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
   identifier: string | null = null;
@@ -388,6 +390,27 @@ export class SignIn extends BaseResource implements SignInResource {
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
 
+    const isChallengePending = () => !!this.protectCheck || this.status === 'needs_protect_check';
+    const pendingHandOff = () => {
+      const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
+      return status === 'unverified' ? externalVerificationRedirectURL : null;
+    };
+
+    // A pending challenge with nowhere to navigate to. Throw rather than return, so the method still
+    // either navigates or throws: a caller that doesn't handle challenges gets an error it can
+    // recognise instead of a silent success. A caller that does runs the challenge and calls back
+    // in with `continueSignIn`.
+    const throwChallengeRequired = (): never => {
+      throw new ClerkRuntimeError('A verification challenge must be completed before this sign-in can continue.', {
+        code: ERROR_CODES.PROTECT_CHECK_REQUIRED,
+      });
+    };
+
+    // The hand-off a challenged create built, if any. The server builds it before deciding, so a
+    // challenge on create can arrive with a usable redirect: that means "go to the identity
+    // provider first" and the challenge runs on the way back, where the callback routes to it.
+    let challengedCreateHandOff: URL | null = null;
+
     if (!this.id || !continueSignIn) {
       await this.create({
         strategy,
@@ -395,6 +418,13 @@ export class SignIn extends BaseResource implements SignInResource {
         redirectUrl,
         actionCompleteRedirectUrl,
       });
+
+      if (isChallengePending()) {
+        challengedCreateHandOff = pendingHandOff();
+        if (!challengedCreateHandOff) {
+          throwChallengeRequired();
+        }
+      }
     }
 
     if (strategy === 'enterprise_sso') {
@@ -405,6 +435,17 @@ export class SignIn extends BaseResource implements SignInResource {
         oidcPrompt,
         enterpriseConnectionId,
       });
+
+      // A challenged prepare builds no verification, so any redirect left on the sign-in is from an
+      // earlier attempt and may be for another connection. Only this call's create hand-off is safe
+      // to follow.
+      if (isChallengePending()) {
+        if (challengedCreateHandOff) {
+          navigateCallback(challengedCreateHandOff);
+          return;
+        }
+        throwChallengeRequired();
+      }
     }
 
     const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
@@ -639,6 +680,9 @@ export class SignIn extends BaseResource implements SignInResource {
       this.identifier = data.identifier;
       this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
       this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
+      this.ssoBypassFirstFactors = deepSnakeToCamel(data.sso_bypass_first_factors ?? null) as
+        | SignInFirstFactor[]
+        | null;
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
@@ -708,6 +752,7 @@ export class SignIn extends BaseResource implements SignInResource {
       supported_identifiers: this.supportedIdentifiers,
       supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
       supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
+      sso_bypass_first_factors: deepCamelToSnake(this.ssoBypassFirstFactors) ?? undefined,
       first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
       second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),
       identifier: this.identifier,
@@ -825,6 +870,10 @@ class SignInFuture implements SignInFutureResource {
 
   get supportedSecondFactors() {
     return this.#resource.supportedSecondFactors ?? [];
+  }
+
+  get ssoBypassFirstFactors() {
+    return this.#resource.ssoBypassFirstFactors ?? [];
   }
 
   get isTransferable() {

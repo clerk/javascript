@@ -1,5 +1,25 @@
 # @clerk/upgrade
 
+## 2.0.8
+
+### Patch Changes
+
+- Correct the minimum Next.js version in the Core 3 upgrade guidance: `@clerk/nextjs` v7 requires Next.js 15.2.8 or later, or 16.0.10 or later on Next.js 16, not 15.2.3. ([#9790](https://github.com/clerk/javascript/pull/9790)) by [@manovotny](https://github.com/manovotny)
+
+## 2.0.7
+
+### Patch Changes
+
+- Update docs deep links in JSDoc comments to match clerk.com's new heading anchors (`#get-token` is now `#gettoken`, `#o-auth-strategy` is now `#oauthstrategy`, and so on). ([#9520](https://github.com/clerk/javascript/pull/9520)) by [@manovotny](https://github.com/manovotny)
+
+## 2.0.6
+
+### Patch Changes
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Update the `chalk`, `jscodeshift`, `marked`, and `tinyglobby` dependency ranges. ([#9026](https://github.com/clerk/javascript/pull/9026)) by [@renovate](https://github.com/apps/renovate)
+
 ## 2.0.5
 
 ### Patch Changes

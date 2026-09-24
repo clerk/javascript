@@ -311,6 +311,189 @@ describe('SignIn', () => {
     });
   });
 
+  describe('authenticateWithRedirect with a pending challenge', () => {
+    const originalFetch = BaseResource._fetch;
+
+    afterEach(() => {
+      BaseResource._fetch = originalFetch;
+      vi.clearAllMocks();
+      SignIn.clerk = {} as any;
+    });
+
+    const gatedResponse = {
+      client: null,
+      response: {
+        id: 'signin_123',
+        status: 'needs_protect_check',
+        first_factor_verification: null,
+        protect_check: {
+          status: 'pending',
+          token: 'challenge-token-abc',
+          sdk_url: 'https://sdk.example.com/challenge.js',
+        },
+      },
+    };
+
+    const setupClerk = () => {
+      const windowNavigate = vi.fn();
+      SignIn.clerk = {
+        buildUrlWithAuth: vi.fn(u => u),
+        __internal_windowNavigate: windowNavigate,
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+      return windowNavigate;
+    };
+
+    // The server builds the hand-off before it decides, so a challenged create can also carry a
+    // usable redirect.
+    const gatedWithHandOff = (url: string) => ({
+      client: null,
+      response: {
+        ...gatedResponse.response,
+        first_factor_verification: { status: 'unverified', external_verification_redirect_url: url },
+      },
+    });
+
+    it('follows the hand-off a challenged OAuth create built, leaving the challenge for the way back', async () => {
+      const windowNavigate = setupClerk();
+      const mockFetch = vi.fn().mockResolvedValue(gatedWithHandOff('https://accounts.google.example/auth'));
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await signIn.authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://accounts.google.example/auth'));
+    });
+
+    it('follows the create hand-off when the enterprise SSO prepare after it hits the same pending challenge', async () => {
+      const windowNavigate = setupClerk();
+      // Create builds the hand-off and is challenged; the prepare that follows lands on the same
+      // pending gate and builds nothing new.
+      const mockFetch = vi.fn().mockResolvedValue(gatedWithHandOff('https://idp.example/from-create'));
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/from-create'));
+    });
+
+    it('does not follow a hand-off left from an earlier attempt when the prepare is challenged', async () => {
+      const windowNavigate = setupClerk();
+      // The challenged prepare builds no verification, so the redirect on the sign-in is stale and
+      // may be for a different connection.
+      BaseResource._fetch = vi.fn().mockResolvedValue(gatedWithHandOff('https://idp.example/earlier-attempt'));
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+          enterpriseConnectionId: 'ent_other',
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      expect(windowNavigate).not.toHaveBeenCalled();
+    });
+
+    it('throws protect_check_required when a challenged create built no hand-off', async () => {
+      const windowNavigate = setupClerk();
+      const mockFetch = vi.fn().mockResolvedValue(gatedResponse);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      // Only the create call — the prepare is not attempted while the challenge is pending.
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(windowNavigate).not.toHaveBeenCalled();
+      expect(signIn.protectCheck?.status).toBe('pending');
+    });
+
+    it('throws protect_check_required when preparing the enterprise SSO hand-off returns a challenge', async () => {
+      const windowNavigate = setupClerk();
+      const mockFetch = vi.fn().mockResolvedValue(gatedResponse);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      expect(windowNavigate).not.toHaveBeenCalled();
+      expect(signIn.protectCheck?.status).toBe('pending');
+    });
+
+    it('surfaces protect_check_required through an OAuth transport instead of opening it', async () => {
+      // The transport expects a URL back. Returning without one used to surface as
+      // `oauth_transport_missing_verification_url`, which hid the real reason.
+      setupClerk();
+      const transport = { getRedirectUrl: vi.fn().mockResolvedValue('app://callback'), open: vi.fn() };
+      (SignIn.clerk as any).__internal_oauthTransport = transport;
+      BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      expect(transport.open).not.toHaveBeenCalled();
+    });
+
+    it('follows the hand-off once no challenge is pending', async () => {
+      const windowNavigate = setupClerk();
+      BaseResource._fetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            status: 'unverified',
+            external_verification_redirect_url: 'https://idp.example/auth',
+          },
+        },
+      });
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+        continueSignIn: true,
+      });
+
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/auth'));
+    });
+  });
+
   describe('signIn.create', () => {
     afterEach(() => {
       vi.clearAllMocks();
@@ -3289,6 +3472,50 @@ describe('SignIn', () => {
       );
       expect(result.status).toBe('needs_first_factor');
       expect(result.protectCheck).toBeNull();
+    });
+  });
+
+  describe('ssoBypassFirstFactors', () => {
+    const baseJSON = {
+      id: 'signin_123',
+      object: 'sign_in',
+      status: 'needs_first_factor',
+      supported_identifiers: [],
+      identifier: 'user@corp.com',
+      user_data: {} as any,
+      supported_first_factors: [{ strategy: 'enterprise_sso' }],
+      supported_second_factors: [],
+      first_factor_verification: null,
+      second_factor_verification: null,
+      created_session_id: null,
+    } as any;
+
+    it('defaults to null when the field is absent', () => {
+      const signIn = new SignIn(baseJSON);
+
+      expect(signIn.ssoBypassFirstFactors).toBeNull();
+      expect(signIn.__internal_future.ssoBypassFirstFactors).toEqual([]);
+      expect(signIn.__internal_toSnapshot().sso_bypass_first_factors).toBeUndefined();
+    });
+
+    it('round-trips the field through the snapshot', () => {
+      const signIn = new SignIn({
+        ...baseJSON,
+        sso_bypass_first_factors: [
+          { strategy: 'email_code', safe_identifier: 'user@corp.com', email_address_id: 'idn_hmac' },
+        ],
+      });
+
+      expect(signIn.ssoBypassFirstFactors).toEqual([
+        { strategy: 'email_code', safeIdentifier: 'user@corp.com', emailAddressId: 'idn_hmac' },
+      ]);
+      expect(signIn.__internal_future.ssoBypassFirstFactors).toEqual(signIn.ssoBypassFirstFactors);
+
+      const snapshot = signIn.__internal_toSnapshot();
+      expect(snapshot.sso_bypass_first_factors).toEqual([
+        { strategy: 'email_code', safe_identifier: 'user@corp.com', email_address_id: 'idn_hmac' },
+      ]);
+      expect(new SignIn(snapshot).ssoBypassFirstFactors).toEqual(signIn.ssoBypassFirstFactors);
     });
   });
 });

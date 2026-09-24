@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
 import { CAPTCHA_ELEMENT_ID } from '@clerk/shared/internal/clerk-js/constants';
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type { SignInResource } from '@clerk/shared/types';
@@ -152,6 +152,32 @@ describe('SignInStart', () => {
             flow: 'autofill',
           });
         });
+      });
+
+      it('does not display related-origin errors from passkey autofill', async () => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPasskey();
+          f.withPasskeySettings({
+            allow_autofill: true,
+            show_sign_in_button: true,
+          });
+        });
+
+        fixtures.signIn.authenticateWithPasskey.mockRejectedValue(
+          new ClerkWebAuthnError('The operation is insecure.', {
+            code: 'passkey_invalid_rpID_or_domain',
+          }),
+        );
+        render(<SignInStart />, { wrapper });
+
+        await waitFor(() => {
+          expect(fixtures.signIn.authenticateWithPasskey).toHaveBeenCalledWith({
+            flow: 'autofill',
+          });
+        });
+        expect(screen.queryByText(/operation is insecure/i)).not.toBeInTheDocument();
+        screen.getByText('Use passkey instead');
       });
 
       it('skips autofill when the host reports no autofill support', async () => {
@@ -368,6 +394,23 @@ describe('SignInStart', () => {
         });
       });
     });
+
+    it('explains a challenge the social button cannot run, instead of showing the raw error', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withSocialProvider({ provider: 'google' });
+      });
+      fixtures.signIn.authenticateWithRedirect.mockRejectedValueOnce(
+        new ClerkRuntimeError('A verification challenge must be completed before this sign-in can continue.', {
+          code: 'protect_check_required',
+        }),
+      );
+
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.click(screen.getByText('Continue with Google'));
+
+      expect(await screen.findByText(/needs an extra verification step/i)).toBeInTheDocument();
+      expect(screen.queryByText(/code="protect_check_required"/)).not.toBeInTheDocument();
+    });
   });
 
   describe('navigation', () => {
@@ -449,6 +492,69 @@ describe('SignInStart', () => {
         redirectUrlComplete: '/',
         continueSignIn: true,
       });
+    });
+
+    it('stops short of the redirect when the instance offers an SSO bypass', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+          ssoBypassFirstFactors: [
+            { strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_hmac' },
+          ],
+        } as unknown as SignInResource),
+      );
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one');
+    });
+
+    it('routes to the challenge when preparing the hand-off raises one', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        } as unknown as SignInResource),
+      );
+      // No redirect is issued: the sign-in comes back sitting on the challenge and the call throws.
+      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(async () => {
+        (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-abc' };
+        throw new ClerkRuntimeError('challenge required', { code: 'protect_check_required' });
+      });
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalled();
+      expect(fixtures.router.navigate).toHaveBeenCalledWith('protect-check');
+    });
+
+    it('does not route to the challenge for other hand-off errors', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockReturnValueOnce(
+        Promise.resolve({
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        } as unknown as SignInResource),
+      );
+      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(async () => {
+        (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-abc' };
+        throw new ClerkRuntimeError('something else', { code: 'captcha_unavailable' });
+      });
+      const { userEvent } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+      expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalled();
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('protect-check');
     });
   });
 
@@ -982,6 +1088,38 @@ describe('SignInStart', () => {
         '',
         expect.not.stringContaining('__clerk_ticket'),
       );
+    });
+
+    it('stops short of the redirect when the instance offers an SSO bypass', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+      });
+      fixtures.signIn.create.mockResolvedValueOnce({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        ssoBypassFirstFactors: [
+          { strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_hmac' },
+        ],
+      } as unknown as SignInResource);
+
+      Object.defineProperty(window, 'location', {
+        writable: true,
+        value: { href: 'http://localhost/sign-in?__clerk_ticket=test_ticket' },
+      });
+      Object.defineProperty(window, 'history', {
+        writable: true,
+        value: { replaceState: vi.fn() },
+      });
+
+      render(
+        <CardStateProvider>
+          <SignInStart />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('factor-one'));
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
     });
   });
 
