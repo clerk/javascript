@@ -3577,6 +3577,7 @@ export class Clerk implements ClerkInterface {
     this.#clearClerkQueryParams();
     this.#handleImpersonationFab();
     this.#handleKeylessPrompt();
+    this.#handleWebMcp();
 
     this.#publicEventBus.emit(clerkEvents.Status, initializationDegradedCounter > 0 ? 'degraded' : 'ready');
   };
@@ -3795,6 +3796,14 @@ export class Clerk implements ClerkInterface {
             },
           });
         });
+    }
+  };
+
+  #handleWebMcp = () => {
+    if (this.#options.experimental?.webmcp) {
+      void import(/* webpackChunkName: "webmcp" */ './modules/webmcp')
+        .then(({ registerWebMcpTools }) => registerWebMcpTools(this))
+        .catch(noop);
     }
   };
 
