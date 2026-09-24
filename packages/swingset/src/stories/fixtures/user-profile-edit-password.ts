@@ -1,9 +1,8 @@
 import type {
-  UserProfileEditPasswordField,
   UserProfileEditPasswordValue,
+  UserProfileFormError,
 } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.types';
-import type { FormError } from '@clerk/mosaic/utils/form-error';
-import { SaveError } from '@clerk/mosaic/utils/form-error';
+import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.types';
 import { useState } from 'react';
 
 export interface UserProfileEditPasswordFixtureOptions {
@@ -11,7 +10,7 @@ export interface UserProfileEditPasswordFixtureOptions {
   requiresCurrentPassword?: boolean;
   latency?: number;
   /** Rejects the first save so the next attempt can succeed. */
-  failWith?: FormError<UserProfileEditPasswordField>;
+  failWith?: UserProfileFormError;
 }
 
 export function useUserProfileEditPasswordFixture({
@@ -30,7 +29,7 @@ export function useUserProfileEditPasswordFixture({
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith && !hasFailed) {
         setHasFailed(true);
-        throw new SaveError(failWith);
+        throw new UserProfileSaveError(failWith.message ?? 'Something went wrong.', failWith.fields);
       }
       setHasPassword(true);
     },
