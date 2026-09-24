@@ -1,7 +1,8 @@
+import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import type { ProtectCheckResource, SignInResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
-import { isSignInProtectGated, navigateOnSignInProtectGate } from '../handleProtectCheck';
+import { isProtectCheckRequiredError, isSignInProtectGated, navigateOnSignInProtectGate } from '../handleProtectCheck';
 
 const PENDING_CHECK: ProtectCheckResource = {
   status: 'pending',
@@ -22,6 +23,22 @@ describe('isSignInProtectGated', () => {
 
   it('is false when neither signal is present', () => {
     expect(isSignInProtectGated(asSignIn({ status: 'needs_first_factor', protectCheck: null }))).toBe(false);
+  });
+});
+
+describe('isProtectCheckRequiredError', () => {
+  it('is true for the runtime error authenticateWithRedirect throws on a pending challenge', () => {
+    expect(isProtectCheckRequiredError(new ClerkRuntimeError('x', { code: 'protect_check_required' }))).toBe(true);
+  });
+
+  it('is false for other runtime errors, API errors and non-errors', () => {
+    expect(isProtectCheckRequiredError(new ClerkRuntimeError('x', { code: 'captcha_unavailable' }))).toBe(false);
+    expect(
+      isProtectCheckRequiredError(
+        new ClerkAPIResponseError('x', { data: [{ code: 'protect_check_required', message: 'x' }], status: 400 }),
+      ),
+    ).toBe(false);
+    expect(isProtectCheckRequiredError(undefined)).toBe(false);
   });
 });
 
