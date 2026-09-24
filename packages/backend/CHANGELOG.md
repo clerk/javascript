@@ -1,5 +1,22 @@
 # Change Log
 
+## 3.19.0
+
+### Minor Changes
+
+- - Fixes an issue where OAuth token validation did not correctly validate audience (`aud`) claims. Previous usages that specified `audience` were falsely passing. This upgrade will cause those to start rejecting if the `audience` indeed does not match the OAuth token's `aud` claim, including cases where the `aud` claim is omitted. ([#9724](https://github.com/clerk/javascript/pull/9724)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+  - Adds an optional `audience` parameter to `idPOAuthAccessToken.verify()`
+
+- Expose the optional `aud` audience on verified OAuth access tokens. ([#9585](https://github.com/clerk/javascript/pull/9585)) by [@thiskevinwang](https://github.com/thiskevinwang)
+
+### Patch Changes
+
+- Clarify domain API documentation and deletion parameter names. The active domain cannot be deleted. ([#9741](https://github.com/clerk/javascript/pull/9741)) by [@rafaelrcamargo](https://github.com/rafaelrcamargo)
+
+- Updated dependencies [[`804d3db`](https://github.com/clerk/javascript/commit/804d3db182746d3b403411025b5dccc5aeafc719), [`64c8e3e`](https://github.com/clerk/javascript/commit/64c8e3ec55e79a2ccc79ae27cbadaeef9481f3d9), [`07b4c2b`](https://github.com/clerk/javascript/commit/07b4c2b3c8bfa394f4331efcc363ee4064336f9d), [`4e36687`](https://github.com/clerk/javascript/commit/4e366874c5c4348750d43073cd8ec7aa4564e476), [`9e7485c`](https://github.com/clerk/javascript/commit/9e7485c8efc33e9458643372ce133b229347c03d)]:
+  - @clerk/shared@4.34.0
+
 ## 3.18.1
 
 ### Patch Changes

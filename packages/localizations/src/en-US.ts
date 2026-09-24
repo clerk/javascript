@@ -1013,6 +1013,8 @@ export const enUS: LocalizationResource = {
   formButtonPrimary: 'Continue',
   formButtonPrimary__verify: 'Verify',
   formFieldAction__forgotPassword: 'Forgot password?',
+  formFieldAction__hidePassword: 'Hide password',
+  formFieldAction__showPassword: 'Show password',
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldError__notMatchingPasswords: "Passwords don't match.",
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
@@ -1443,13 +1445,31 @@ export const enUS: LocalizationResource = {
         action__add: 'Add',
         action__search: 'Search users',
         addForm: {
-          changeButton: 'Change',
-          memberLabel: 'Member',
-          memberPlaceholder: 'Search members',
-          noResults: 'No members found',
-          submitButton: 'Add',
+          emailPlaceholder: "Enter the member's email address",
+          error__allAlreadyAdded: 'Everyone with that role is already on the allow list.',
+          error__alreadyAdded: 'This member is already on the allow list.',
+          error__memberNotFound: 'No member of this organization has that email address.',
+          modeLabel: 'Add by',
+          mode__email: 'Email',
+          mode__role: 'Role',
+          roleOption: '{{role}} ({{count}})',
+          roleWarning: 'This list does not sync, members are managed manually.',
+          submitButton: 'Add members',
           subtitle: 'Members on this list can sign in with an email code when SSO is unavailable.',
-          title: 'Add member',
+          title: 'Add members',
+        },
+        bulkResult: {
+          added: 'Added {{count}} members',
+          addedMember: 'Added member successfully',
+          added__one: 'Added 1 member',
+          domainNotServed:
+            '{{count}} members could not be added because their email address is not served by a connection.',
+          domainNotServed__one:
+            '1 member could not be added because their email address is not served by a connection.',
+          notMember: '{{count}} members could not be added because they are no longer in the organization.',
+          notMember__one: '1 member could not be added because they are no longer in the organization.',
+          unknown: '{{count}} members could not be added.',
+          unknown__one: '1 member could not be added.',
         },
         table: {
           emptyState: 'No members on the allow list',
@@ -1458,11 +1478,11 @@ export const enUS: LocalizationResource = {
           header__user: 'User',
           menuAction__remove: 'Remove',
         },
-        title: 'SSO allow list',
+        title: 'SSO bypass',
       },
       ssoBypassSection: {
-        allowlistCount: '{{count}} users',
-        allowlistCount__one: '1 user',
+        allowlistCount: '{{count}} members',
+        allowlistCount__one: '1 member',
         allowlistLabel: 'Allow list:',
         description: 'Members on this list can sign in with an email code when SSO is unavailable.',
         error__load: 'Could not load the SSO allow list',
@@ -1715,8 +1735,8 @@ export const enUS: LocalizationResource = {
       title: 'Check your email',
     },
     enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
+      subtitle: 'Select an enterprise account to continue.',
+      title: 'Choose an account',
     },
     enterpriseSSO: {
       formButtonPrimary: 'Continue with SSO',
@@ -1870,8 +1890,8 @@ export const enUS: LocalizationResource = {
       },
     },
     enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
+      subtitle: 'Select an enterprise account to continue.',
+      title: 'Choose an account',
     },
     legalConsent: {
       checkbox: {
@@ -2131,6 +2151,8 @@ export const enUS: LocalizationResource = {
     protect_check_unsupported_environment:
       "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
+    sso_bypass_domain_not_served:
+      'This member could not be added because their email address is not served by a connection.',
     ticket_expired_code: 'This link has expired. Please start again or request a new link.',
     ticket_invalid_code:
       'This link is no longer valid or has already been used. Please start again or request a new link.',

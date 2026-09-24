@@ -70,6 +70,7 @@ export async function create(
         createOptions.rp.id,
         createOptions.user.id,
         createOptions.user.displayName,
+        createOptions.excludeCredentials?.map(c => c.id) ?? [],
       ),
     default: null,
   });

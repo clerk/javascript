@@ -38,16 +38,6 @@ describe('organization profile general panel', () => {
     expect(screen.queryByRole('heading', { name: 'Danger zone' })).not.toBeInTheDocument();
   });
 
-  it('offers a copy button for the slug, and keeps the full value reachable when it truncates', () => {
-    renderPanel();
-
-    expect(screen.getByRole('button', { name: 'Copy slug' })).toBeVisible();
-    expect(screen.getByText('clerkWorkspace-177654156132154')).toHaveAttribute(
-      'title',
-      'clerkWorkspace-177654156132154',
-    );
-  });
-
   it('saves a new name', async () => {
     const user = userEvent.setup();
     const onSubmitName = vi.fn().mockResolvedValue(undefined);

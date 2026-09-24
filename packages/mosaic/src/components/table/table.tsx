@@ -1,3 +1,4 @@
+import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -9,6 +10,8 @@ import { Button } from '../button';
 import type { CheckboxProps } from '../checkbox';
 import { Checkbox } from '../checkbox';
 import { Icon } from '../icon';
+import type { InputProps } from '../input';
+import { InputGroup } from '../input-group';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { aligns, styles } from './table.styles';
 
@@ -21,6 +24,74 @@ export type TableAlign = keyof typeof aligns;
 export type TableSort = 'ascending' | 'descending' | 'none';
 
 export type TableProps = MosaicElementProps<'table'>;
+
+export type TableToolbarProps = MosaicComponentProps<'div'>;
+
+const Toolbar = React.forwardRef<HTMLDivElement, TableToolbarProps>(function MosaicTableToolbar(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('table-toolbar'), stylex.props(reset.base, styles.toolbar, xstyle), rest),
+  });
+});
+
+export interface TableSearchProps extends Omit<
+  InputProps,
+  'value' | 'defaultValue' | 'onChange' | 'type' | 'children' | 'size' | 'variant'
+> {
+  label: string;
+  clearLabel: string;
+  value: string;
+  onValueChange: (value: string) => void;
+}
+
+const Search = React.forwardRef<HTMLInputElement, TableSearchProps>(function MosaicTableSearch(
+  { label, clearLabel, value, onValueChange, disabled, readOnly, ...rest },
+  ref,
+) {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const mergedRef = useMergeRefs([ref, inputRef]);
+  return (
+    <InputGroup.Root
+      disabled={disabled}
+      {...mergeStyleProps(themeProps('table-search'), stylex.props(styles.search))}
+    >
+      <InputGroup.Start>
+        <Icon name='magnifying-glass' />
+      </InputGroup.Start>
+      <InputGroup.Input
+        ref={mergedRef}
+        autoComplete='off'
+        aria-label={label}
+        placeholder={label}
+        {...rest}
+        type='search'
+        value={value}
+        readOnly={readOnly}
+        onChange={event => onValueChange(event.currentTarget.value)}
+      />
+      {value ? (
+        <InputGroup.End>
+          <Button
+            type='button'
+            aria-label={clearLabel}
+            disabled={disabled || readOnly}
+            onClick={() => {
+              onValueChange('');
+              inputRef.current?.focus();
+            }}
+          >
+            <Icon name='x' />
+          </Button>
+        </InputGroup.End>
+      ) : null}
+    </InputGroup.Root>
+  );
+});
 
 const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable({ xstyle, ...rest }, ref) {
   return (
@@ -147,10 +218,11 @@ const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
 
 export interface TableCellProps extends Omit<MosaicComponentProps<'td'>, 'align'> {
   align?: TableAlign;
+  noWrap?: boolean;
 }
 
 const Cell = React.forwardRef<HTMLTableCellElement, TableCellProps>(function MosaicTableCell(
-  { align = 'start', render, xstyle, ...rest },
+  { align = 'start', noWrap = false, render, xstyle, ...rest },
   ref,
 ) {
   return useRender({
@@ -158,8 +230,8 @@ const Cell = React.forwardRef<HTMLTableCellElement, TableCellProps>(function Mos
     render,
     ref,
     props: mergeStyleProps(
-      themeProps('table-cell', { align }),
-      stylex.props(reset.base, styles.cell, aligns[align], xstyle),
+      themeProps('table-cell', { align, noWrap }),
+      stylex.props(reset.base, styles.cell, aligns[align], noWrap && styles.noWrap, xstyle),
       rest,
     ),
   });
@@ -227,4 +299,4 @@ const Empty = React.forwardRef<HTMLTableCellElement, TableEmptyProps>(function M
   );
 });
 
-export const Table = { Root, Header, Body, Row, HeaderCell, Cell, SelectAllCell, SelectCell, Empty };
+export const Table = { Root, Toolbar, Search, Header, Body, Row, HeaderCell, Cell, SelectAllCell, SelectCell, Empty };

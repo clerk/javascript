@@ -1,3 +1,5 @@
+import type { Ref } from 'react';
+
 import type { ActionMenuAction } from '../../components/action-menu';
 import { ActionMenu } from '../../components/action-menu';
 import { Badge } from '../../components/badge';
@@ -9,11 +11,13 @@ import { UserProfileSecurityIcon } from './user-profile-security-icon';
 
 export function UserProfileMfaRowView({
   method,
+  triggerRef,
   onRemove,
   onSetDefault,
   onRegenerateBackupCodes,
 }: Pick<UserProfileMfaSectionViewProps, 'onRegenerateBackupCodes'> & {
   method: UserProfileMfaMethod;
+  triggerRef?: Ref<HTMLButtonElement>;
   onRemove?: () => void;
   onSetDefault?: (id: string) => void;
 }) {
@@ -50,6 +54,7 @@ export function UserProfileMfaRowView({
       {actions.length > 0 ? (
         <Section.Actions>
           <ActionMenu
+            triggerRef={triggerRef}
             actions={actions}
             label={manageLabel}
           />
