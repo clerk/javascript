@@ -38,14 +38,14 @@ import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
+import {
+  hasOnlyEnterpriseSSOFirstFactors,
+  shouldHandOffToEnterpriseConnection,
+  shouldHandOffUnidentifiedToEnterpriseConnection,
+} from './enterpriseSSOFactors';
 import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
 import { isProtectCheckRequiredError, navigateOnSignInProtectGate } from './handleProtectCheck';
-import {
-  getSSOBypassFactor,
-  hasMultipleEnterpriseConnections,
-  SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
-  useHandleAuthenticateWithPasskey,
-} from './shared';
+import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import {
@@ -242,7 +242,7 @@ function SignInStartInternal(): JSX.Element {
         }
         switch (res.status) {
           case 'needs_first_factor': {
-            if (!canRedirectToEnterpriseSSO(res)) {
+            if (!shouldHandOffToEnterpriseConnection(res)) {
               return navigate('factor-one');
             }
 
@@ -414,12 +414,12 @@ function SignInStartInternal(): JSX.Element {
       switch (res.status) {
         case 'needs_identifier':
           // Check if we need to initiate an enterprise sso flow
-          if (res.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
+          if (shouldHandOffUnidentifiedToEnterpriseConnection(res)) {
             await authenticateWithEnterpriseSSO();
           }
           break;
         case 'needs_first_factor': {
-          if (!canRedirectToEnterpriseSSO(res)) {
+          if (!shouldHandOffToEnterpriseConnection(res)) {
             if (options?.resetPasswordIntent) {
               return navigate('factor-one', {
                 searchParams: new URLSearchParams({ [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' }),
@@ -730,25 +730,6 @@ function SignInStartInternal(): JSX.Element {
     </Flow.Part>
   );
 }
-
-const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
-  if (!signIn.supportedFirstFactors?.length) {
-    return false;
-  }
-
-  return signIn.supportedFirstFactors.every(ff => ff.strategy === 'enterprise_sso');
-};
-
-/**
- * Whether the sign-in can go straight to the identity provider without showing a card first.
- *
- * A connection choice and an SSO bypass are both only reachable from one, so either sends the
- * user to `factor-one` instead.
- */
-const canRedirectToEnterpriseSSO = (signIn: SignInResource): boolean =>
-  hasOnlyEnterpriseSSOFirstFactors(signIn) &&
-  !hasMultipleEnterpriseConnections(signIn.supportedFirstFactors) &&
-  !getSSOBypassFactor(signIn);
 
 const InstantPasswordRow = ({
   field,

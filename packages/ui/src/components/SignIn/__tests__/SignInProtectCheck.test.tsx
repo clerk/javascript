@@ -4,7 +4,7 @@ import { act, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { fireEvent, render } from '@/test/utils';
+import { fireEvent, render, screen } from '@/test/utils';
 
 import { SignInProtectCheck } from '../SignInProtectCheck';
 
@@ -23,6 +23,144 @@ beforeEach(() => {
 });
 
 describe('SignInProtectCheck', () => {
+  describe('enterprise SSO', () => {
+    const enterpriseSSOSignIn = (supportedFirstFactors: unknown[]) =>
+      ({
+        status: 'needs_first_factor',
+        protectCheck: null,
+        createdSessionId: null,
+        supportedFirstFactors,
+      }) as unknown as SignInResource;
+
+    it('hands off to the connection once the challenge resolves', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue(enterpriseSSOSignIn([{ strategy: 'enterprise_sso' }]));
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
+          strategy: 'enterprise_sso',
+          redirectUrl: 'http://localhost:3000/#/sso-callback',
+          redirectUrlComplete: '/',
+          oidcPrompt: undefined,
+          continueSignIn: true,
+        });
+      });
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../factor-one');
+    });
+
+    it('stays on the challenge when preparing the hand-off raises another one', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue(enterpriseSSOSignIn([{ strategy: 'enterprise_sso' }]));
+      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(() => {
+        (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-2' };
+        throw new ClerkRuntimeError('challenge required', { code: 'protect_check_required' });
+      });
+
+      const { rerender } = render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('.');
+      });
+
+      // The router mock doesn't navigate, so re-render as the resource update would, and check the
+      // second challenge actually runs rather than just that we stayed on the route.
+      rerender(<SignInProtectCheck />);
+      await waitFor(() => {
+        expect(mockExecute).toHaveBeenCalledTimes(2);
+      });
+      expect(mockExecute.mock.calls[1][0]).toMatchObject({ token: 'challenge-token-2' });
+    });
+
+    it('shows a failed hand-off and lets the user retry it, after clearing the challenge cancelled the run', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      // As in production, the submit clears the challenge on the live resource itself, so the next
+      // render drops the challenge token and cancels the run that is still continuing the flow.
+      fixtures.signIn.submitProtectCheck.mockImplementation(() => {
+        Object.assign(fixtures.signIn as any, {
+          protectCheck: null,
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        });
+        return Promise.resolve(fixtures.signIn as unknown as SignInResource);
+      });
+      let failHandOff: (err: Error) => void = () => {};
+      fixtures.signIn.authenticateWithRedirect
+        .mockImplementationOnce(
+          () =>
+            new Promise<void>((_, reject) => {
+              failHandOff = reject;
+            }),
+        )
+        .mockResolvedValueOnce(undefined);
+
+      const { rerender, userEvent } = render(<SignInProtectCheck />, { wrapper });
+      await waitFor(() => {
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledTimes(1);
+      });
+      rerender(<SignInProtectCheck />);
+      act(() => {
+        failHandOff(new Error('network down'));
+      });
+
+      // The failure is reported rather than swallowed, and the spinner gives way to a retry.
+      const retryButton = await screen.findByRole('button', { name: /try again/i });
+      await userEvent.click(retryButton);
+      await waitFor(() => {
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    it('routes to factor one when there is more than one connection to choose from', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue(
+        enterpriseSSOSignIn([
+          { strategy: 'enterprise_sso', enterpriseConnectionId: 'ent_1', enterpriseConnectionName: 'Okta' },
+          { strategy: 'enterprise_sso', enterpriseConnectionId: 'ent_2', enterpriseConnectionName: 'Entra' },
+        ]),
+      );
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-one');
+      });
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+    });
+
+    it('routes to factor one when the user has an SSO bypass to choose instead', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        ...enterpriseSSOSignIn([{ strategy: 'enterprise_sso' }]),
+        ssoBypassFirstFactors: [{ strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_1' }],
+      } as unknown as SignInResource);
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      // The start page shows the bypass card rather than redirecting, and the resume has to agree.
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-one');
+      });
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+    });
+  });
+
   it('renders verification UI', async () => {
     const { wrapper } = await createFixtures(f => {
       f.startSignInWithProtectCheck();
