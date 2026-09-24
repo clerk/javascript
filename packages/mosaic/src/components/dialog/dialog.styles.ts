@@ -17,6 +17,9 @@ const CARD_MAX_WIDTH = '25rem';
 // consistently on any page.
 const BASE_SCRIM = 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)';
 
+// Safari 26 samples the bar color once, at mount, and skips layers under ~0.15 opacity.
+const SCRIM_ENTER_OPACITY = 0.2;
+
 /**
  * The width bands, queried against the VIEWPORT ELEMENT rather than the window — it is a
  * `container-type: inline-size` named `cl-dialog`, and every `@container` below reads it.
@@ -487,7 +490,8 @@ export const backdropMotion = stylex.create({
   card: {
     opacity: {
       default: 1,
-      ':where([data-starting-style], [data-ending-style])': 0,
+      ':where([data-ending-style])': 0,
+      ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
     },
     // One step below the popup's own entrance, so the dim lands first and the surface arrives
     // into an already-darkened page rather than alongside the darkening. Symmetric in and out:
@@ -510,7 +514,8 @@ export const backdropMotion = stylex.create({
   profile: {
     opacity: {
       default: 1,
-      ':where([data-starting-style], [data-ending-style])': 0,
+      ':where([data-ending-style])': 0,
+      ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
     },
     transitionDuration: {
       default: durationVars['--cl-duration-fast'],
@@ -672,7 +677,7 @@ export const popupMotion = stylex.create({
         default: null,
         '@media (prefers-reduced-motion: no-preference)': {
           default: null,
-          ':where([data-starting-style], [data-ending-style])': '0 100%',
+          ':where([data-starting-style], [data-ending-style])': '0 calc(100% + var(--_cl-dialog-inset))',
         },
       },
       default: null,

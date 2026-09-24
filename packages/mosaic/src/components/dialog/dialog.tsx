@@ -26,7 +26,7 @@ import {
   variants,
   viewportVariants,
 } from './dialog.styles';
-import { acquireKeyboardInset } from './keyboard-inset';
+import { acquireKeyboardInset, focusWithoutScroll } from './keyboard-inset';
 
 /**
  * Which surface the dialog holds, and so the geometry it is given: `card` is a `Card` at the
@@ -286,6 +286,7 @@ function Viewport({
           themeProps('dialog-track', { variant }),
           stylex.props(reset.base, styles.track, trackVariants[variant], trackCompactPlacements[compactPlacement]),
         )}
+        onTouchEnd={focusWithoutScroll}
       >
         {children}
       </div>
@@ -403,17 +404,17 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
 
   return (
     <Primitive.Portal>
-      <Backdrop
-        variant={variant}
-        // A card stacked on a card paints no scrim of its own — one serves the whole stack.
-        // Decided here rather than keyed on `data-stacked`, because whether this is a stack
-        // depends on the variant of the dialog beneath, which the headless layer has no notion of.
-        stacked={isNestedInDialog && host?.variant === 'card'}
-      />
       <Viewport
         variant={variant}
         compactPlacement={compactPlacement}
       >
+        <Backdrop
+          variant={variant}
+          // A card stacked on a card paints no scrim of its own — one serves the whole stack.
+          // Decided here rather than keyed on `data-stacked`, because whether this is a stack
+          // depends on the variant of the dialog beneath, which the headless layer has no notion of.
+          stacked={isNestedInDialog && host?.variant === 'card'}
+        />
         {popup}
       </Viewport>
     </Primitive.Portal>
