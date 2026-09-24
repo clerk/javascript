@@ -962,6 +962,8 @@ export const itIT: LocalizationResource = {
   formButtonPrimary: 'Continua',
   formButtonPrimary__verify: 'Verifica',
   formFieldAction__forgotPassword: 'Password dimenticata?',
+  formFieldAction__hidePassword: 'Nascondi password',
+  formFieldAction__showPassword: 'Mostra password',
   formFieldError__matchingPasswords: 'Le password coincidono.',
   formFieldError__notMatchingPasswords: 'Le password non coincidono.',
   formFieldError__verificationLinkExpired: 'Il link di verifica è scaduto. Per favore richiedi un nuovo link.',

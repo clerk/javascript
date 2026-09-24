@@ -12,7 +12,7 @@ import type {
   UseBiometricCredentialsReturn,
 } from './types';
 
-const DEFAULT_POLICY = 'biometry_or_device_passcode';
+const DEFAULT_POLICY = 'biometry_current_set';
 
 function toBiometricCredentialPlatform(platform: string): BiometricCredentialPlatform {
   return platform === 'ios' || platform === 'android' ? platform : 'unknown';
@@ -82,6 +82,56 @@ function createBiometricCredentials(clerk: ReturnType<typeof useClerk>): UseBiom
       const credential = await nativeModule.revokeTrustedDevice(id);
       return toBiometricCredential(credential);
     },
+    reverify: async params => {
+      const nativeModule = getNativeModule();
+      if (typeof nativeModule.reverifyWithBiometrics !== 'function') {
+        return errorThrower.throw(
+          'Biometric reverification requires a development build containing a compatible version of @clerk/expo.',
+        );
+      }
+      const level = params?.level ?? 'first_factor';
+      if (level !== 'first_factor' && level !== 'second_factor' && level !== 'multi_factor') {
+        return errorThrower.throw(
+          'Biometric reverification level must be first_factor, second_factor, or multi_factor.',
+        );
+      }
+      const session = clerk.session;
+      if (!session) {
+        return errorThrower.throw('Biometric reverification requires an active session.');
+      }
+      await waitForPendingJsToNativeSync();
+      if (clerk.session?.id !== session.id) {
+        return errorThrower.throw('The active session changed before biometric reverification started.');
+      }
+      const verification = await nativeModule.reverifyWithBiometrics(session.id, level, params?.reason ?? null);
+      if (verification.sessionId !== session.id) {
+        return errorThrower.throw('Biometric reverification returned a different session.');
+      }
+      if (verification.status === 'complete') {
+        session.clearCache();
+      }
+      await synchronizeNativeClientToJs();
+      const synchronizedSession = clerk.session;
+      if (synchronizedSession?.id !== session.id) {
+        return errorThrower.throw('The active session changed during biometric reverification.');
+      }
+      if (verification.status === 'complete') {
+        synchronizedSession.clearCache();
+        const token = await synchronizedSession.getToken({ skipCache: true });
+        if (!token) {
+          return errorThrower.throw('Unable to refresh the session token after biometric reverification.');
+        }
+        if (clerk.session?.id !== session.id) {
+          return errorThrower.throw('The active session changed during biometric reverification.');
+        }
+      }
+      return {
+        id: verification.id,
+        status: verification.status,
+        level: verification.level,
+        session: synchronizedSession,
+      };
+    },
     signIn: async params => {
       const nativeModule = getNativeModule();
       await waitForPendingJsToNativeSync();
@@ -129,7 +179,7 @@ function createBiometricCredentials(clerk: ReturnType<typeof useClerk>): UseBiom
 }
 
 /**
- * Accesses biometric credential enrollment and sign-in on iOS and Android.
+ * Accesses biometric credential enrollment, sign-in, and session reverification on iOS and Android.
  *
  * The private key and biometric prompt are managed by Clerk's native SDK.
  */

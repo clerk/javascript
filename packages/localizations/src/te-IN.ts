@@ -963,6 +963,8 @@ export const teIN: LocalizationResource = {
   formButtonPrimary: 'కొనసాగించండి',
   formButtonPrimary__verify: 'ధృవీకరించండి',
   formFieldAction__forgotPassword: 'పాస్‌వర్డ్ మర్చిపోయారా?',
+  formFieldAction__hidePassword: 'పాస్‌వర్డ్‌ను దాచు',
+  formFieldAction__showPassword: 'పాస్‌వర్డ్‌ను చూపించు',
   formFieldError__matchingPasswords: 'పాస్‌వర్డ్‌లు సరిపోలాయి.',
   formFieldError__notMatchingPasswords: 'పాస్‌వర్డ్‌లు సరిపోలడం లేదు.',
   formFieldError__verificationLinkExpired: 'ధృవీకరణ లింక్ గడువు ముగిసింది. దయచేసి కొత్త లింక్‌ను అభ్యర్థించండి.',

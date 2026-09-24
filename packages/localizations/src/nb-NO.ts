@@ -963,6 +963,8 @@ export const nbNO: LocalizationResource = {
   formButtonPrimary: 'Fortsett',
   formButtonPrimary__verify: 'Verifiser',
   formFieldAction__forgotPassword: 'Glemt passord?',
+  formFieldAction__hidePassword: 'Skjul passord',
+  formFieldAction__showPassword: 'Vis passord',
   formFieldError__matchingPasswords: 'Passordene stemmer overens.',
   formFieldError__notMatchingPasswords: 'Passordene stemmer ikke overens.',
   formFieldError__verificationLinkExpired: 'Verifikasjonslenken har utløpt. Vennligst be om en ny lenke.',

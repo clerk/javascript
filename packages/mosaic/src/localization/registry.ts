@@ -1,3 +1,5 @@
+import { formMessages } from '../components/form/form.messages';
+import { membersTableTabMessages } from '../features/organization-profile/members-table-tab.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileApiKeysPanelMessages } from '../features/organization-profile/organization-profile-api-keys-panel.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
@@ -24,6 +26,8 @@ import { userProfilePasswordSectionMessages } from '../features/user-profile/use
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets.messages';
 
 export const mosaicMessages = {
+  form: formMessages,
+  membersTableTab: membersTableTabMessages,
   organizationProfile: organizationProfileMessages,
   organizationProfileDangerSection: organizationProfileDangerSectionMessages,
   organizationProfileWorkspaceSection: organizationProfileWorkspaceSectionMessages,

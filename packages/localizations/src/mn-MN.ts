@@ -956,6 +956,8 @@ export const mnMN: LocalizationResource = {
   formButtonPrimary: 'Үргэлжлүүлэх',
   formButtonPrimary__verify: 'Баталгаажуулах',
   formFieldAction__forgotPassword: 'Нууц үгээ мартсан?',
+  formFieldAction__hidePassword: 'Нууц үгийг нуух',
+  formFieldAction__showPassword: 'Нууц үгийг харуулах',
   formFieldError__matchingPasswords: 'Нууц үг таарч байна.',
   formFieldError__notMatchingPasswords: 'Нууц үг таарахгүй байна.',
   formFieldError__verificationLinkExpired: 'Баталгаажуулах холбоосын хугацаа дууссан. Шинэ холбоос хүсэлт гаргана уу.',

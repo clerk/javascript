@@ -956,6 +956,8 @@ export const skSK: LocalizationResource = {
   formButtonPrimary: 'Pokračovať',
   formButtonPrimary__verify: 'Overiť',
   formFieldAction__forgotPassword: 'Zabudli ste heslo?',
+  formFieldAction__hidePassword: 'Skryť heslo',
+  formFieldAction__showPassword: 'Zobraziť heslo',
   formFieldError__matchingPasswords: 'Heslá sa musia zhodovať.',
   formFieldError__notMatchingPasswords: 'Heslá sa nezhodujú.',
   formFieldError__verificationLinkExpired: 'Overovací odkaz vypršal. Vyžiadajte si nový odkaz.',

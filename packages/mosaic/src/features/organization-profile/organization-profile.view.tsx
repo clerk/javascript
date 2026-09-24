@@ -16,6 +16,7 @@ import type {
 } from './organization-profile.types';
 import { OrganizationProfileApiKeysPanelView } from './organization-profile-api-keys-panel.view';
 import { OrganizationProfileGeneralPanelView } from './organization-profile-general-panel.view';
+import { OrganizationProfileMembersPanelView } from './organization-profile-members-panel.view';
 import { OrganizationProfilePlaceholderPanelView } from './organization-profile-placeholder-panel.view';
 
 export interface OrganizationProfileViewProps extends Omit<ProfileRootProps, 'children' | 'value' | 'onValueChange'> {
@@ -39,6 +40,13 @@ function BuiltInPage({
   }
   if (id === 'apiKeys') {
     return pages.apiKeys ? <OrganizationProfileApiKeysPanelView {...pages.apiKeys} /> : null;
+  }
+  if (id === 'members') {
+    return pages.members?.members ? (
+      <OrganizationProfileMembersPanelView {...pages.members} />
+    ) : (
+      <OrganizationProfilePlaceholderPanelView page={id} />
+    );
   }
   return <OrganizationProfilePlaceholderPanelView page={id} />;
 }

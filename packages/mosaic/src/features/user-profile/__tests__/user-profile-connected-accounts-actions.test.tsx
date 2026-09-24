@@ -32,21 +32,25 @@ describe('connected account removal', () => {
     renderAccounts(onRemove);
     const trigger = screen.getByRole('button', { name: 'Manage GitHub' });
     trigger.focus();
-    await user.keyboard('{Enter}{Enter}');
+    await user.keyboard('{Enter}');
+    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Remove' })).toHaveFocus());
+    await user.keyboard('{Enter}');
     expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     await user.keyboard('{Escape}');
     await waitFor(() => expect(trigger).toHaveFocus());
     expect(onRemove).not.toHaveBeenCalled();
   });
 
-  it('closes confirmation when the caller removes the account', async () => {
+  it('focuses the remaining account and then Connect when the caller removes rows', async () => {
     const user = userEvent.setup();
     function Example() {
-      const [accounts, setAccounts] = useState([account]);
+      const [accounts, setAccounts] = useState([account, { ...account, id: 'second', provider: 'Google' }]);
       return (
         <MosaicProvider>
           <UserProfileConnectedAccountsSectionView
             accounts={accounts}
+            availableProviders={[{ id: 'available', provider: 'Other' }]}
+            onConnect={() => {}}
             onRemove={id => setAccounts(current => current.filter(item => item.id !== id))}
           />
         </MosaicProvider>
@@ -55,9 +59,11 @@ describe('connected account removal', () => {
     render(<Example />);
     await openRemoval(user);
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage GitHub' })).not.toBeInTheDocument());
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(screen.queryByText('Connected accounts')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Google' })).toHaveFocus());
+    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Connect Other' })).toHaveFocus());
   });
 
   it('shows a removal failure and allows retrying', async () => {

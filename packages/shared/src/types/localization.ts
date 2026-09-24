@@ -141,6 +141,8 @@ export type __internal_LocalizationResource = {
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldError__verificationLinkExpired: LocalizationValue;
   formFieldAction__forgotPassword: LocalizationValue;
+  formFieldAction__hidePassword: LocalizationValue;
+  formFieldAction__showPassword: LocalizationValue;
   formFieldHintText__optional: LocalizationValue;
   formFieldHintText__slug: LocalizationValue;
   formButtonPrimary: LocalizationValue;

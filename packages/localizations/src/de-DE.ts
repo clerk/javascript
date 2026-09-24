@@ -964,6 +964,8 @@ export const deDE: LocalizationResource = {
   formButtonPrimary: 'Fortsetzen',
   formButtonPrimary__verify: 'Verifizieren',
   formFieldAction__forgotPassword: 'Passwort vergessen?',
+  formFieldAction__hidePassword: 'Passwort verbergen',
+  formFieldAction__showPassword: 'Passwort anzeigen',
   formFieldError__matchingPasswords: 'Passwörter stimmen überein.',
   formFieldError__notMatchingPasswords: 'Passwörter stimmen nicht überein.',
   formFieldError__verificationLinkExpired:

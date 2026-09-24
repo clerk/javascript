@@ -957,6 +957,8 @@ export const esMX: LocalizationResource = {
   formButtonPrimary: 'Continuar',
   formButtonPrimary__verify: 'Verificar',
   formFieldAction__forgotPassword: 'Has olvidado tu contraseña?',
+  formFieldAction__hidePassword: 'Ocultar contraseña',
+  formFieldAction__showPassword: 'Mostrar contraseña',
   formFieldError__matchingPasswords: 'Las contraseñas coinciden.',
   formFieldError__notMatchingPasswords: 'Las no contraseñas coinciden.',
   formFieldError__verificationLinkExpired: 'El link de verificación expiro. Por favor vuelve a solicitarlo.',

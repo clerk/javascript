@@ -962,6 +962,8 @@ export const viVN: LocalizationResource = {
   formButtonPrimary: 'Tiếp tục',
   formButtonPrimary__verify: 'Xác minh',
   formFieldAction__forgotPassword: 'Quên mật khẩu?',
+  formFieldAction__hidePassword: 'Ẩn mật khẩu',
+  formFieldAction__showPassword: 'Hiện mật khẩu',
   formFieldError__matchingPasswords: 'Mật khẩu trùng khớp.',
   formFieldError__notMatchingPasswords: 'Mật khẩu không trùng khớp.',
   formFieldError__verificationLinkExpired: 'Liên kết xác minh đã hết hạn. Vui lòng yêu cầu liên kết mới.',

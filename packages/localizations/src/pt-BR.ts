@@ -963,6 +963,8 @@ export const ptBR: LocalizationResource = {
   formButtonPrimary: 'Continuar',
   formButtonPrimary__verify: 'Verificar',
   formFieldAction__forgotPassword: 'Esqueceu a senha?',
+  formFieldAction__hidePassword: 'Ocultar senha',
+  formFieldAction__showPassword: 'Mostrar senha',
   formFieldError__matchingPasswords: 'Senhas conferem.',
   formFieldError__notMatchingPasswords: 'Senhas não conferem.',
   formFieldError__verificationLinkExpired: 'O link de verificação expirou. Por favor solicite um novo link.',

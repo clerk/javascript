@@ -14,7 +14,7 @@ export function TabsIndicator(props: TabsIndicatorProps) {
   const { value, getTabElement, orientation, listElement } = useTabsContext();
 
   const [style, setStyle] = useState<React.CSSProperties>({});
-  const previousRectRef = useRef<Rect | null>(null);
+  const lastMeasureRef = useRef<{ value: string; rect: Rect } | null>(null);
 
   // Measure synchronously before paint so the indicator never commits a frame
   // at a stale position when the active tab changes.
@@ -30,15 +30,19 @@ export function TabsIndicator(props: TabsIndicatorProps) {
     return autoUpdate([el, list], () => {
       const newRect = getRectRelativeTo(el, list);
 
-      const prev = previousRectRef.current;
-      previousRectRef.current = newRect;
+      const last = lastMeasureRef.current;
+      lastMeasureRef.current = { value, rect: newRect };
+      if (last && isSameRect(last.rect, newRect)) {
+        return;
+      }
+      const isTabChange = last != null && last.value !== value;
 
       const sharedVars = {
         ['--cl-tab-left' as string]: `${newRect.x}px`,
         ['--cl-tab-width' as string]: `${newRect.width}px`,
         ['--cl-tab-top' as string]: `${newRect.y}px`,
         ['--cl-tab-height' as string]: `${newRect.height}px`,
-        ...(prev == null ? { transition: 'none' } : {}),
+        ...(isTabChange ? {} : { transition: 'none' }),
       };
 
       if (orientation === 'horizontal') {
@@ -59,4 +63,8 @@ export function TabsIndicator(props: TabsIndicatorProps) {
     render,
     props: mergeProps<'span'>(defaultProps, otherProps),
   });
+}
+
+function isSameRect(a: Rect, b: Rect) {
+  return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
 }

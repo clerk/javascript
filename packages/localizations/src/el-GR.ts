@@ -956,6 +956,8 @@ export const elGR: LocalizationResource = {
   formButtonPrimary: 'Συνέχεια',
   formButtonPrimary__verify: 'Επαλήθευση',
   formFieldAction__forgotPassword: 'Ξεχάσατε τον κωδικό;',
+  formFieldAction__hidePassword: 'Απόκρυψη κωδικού πρόσβασης',
+  formFieldAction__showPassword: 'Εμφάνιση κωδικού πρόσβασης',
   formFieldError__matchingPasswords: 'Οι κωδικοί ταιριάζουν.',
   formFieldError__notMatchingPasswords: 'Οι κωδικοί δεν ταιριάζουν.',
   formFieldError__verificationLinkExpired: 'Ο σύνδεσμος επαλήθευσης έληξε. Παρακαλώ ζητήστε νέο σύνδεσμο.',

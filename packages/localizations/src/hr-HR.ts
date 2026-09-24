@@ -963,6 +963,8 @@ export const hrHR: LocalizationResource = {
   formButtonPrimary: 'Nastavi',
   formButtonPrimary__verify: 'Potvrdi',
   formFieldAction__forgotPassword: 'Zaboravili ste lozinku?',
+  formFieldAction__hidePassword: 'Sakrij lozinku',
+  formFieldAction__showPassword: 'Prikaži lozinku',
   formFieldError__matchingPasswords: 'Lozinke se podudaraju.',
   formFieldError__notMatchingPasswords: 'Lozinke se ne podudaraju.',
   formFieldError__verificationLinkExpired: 'Verifikacijska poveznica je istekla. Molimo zatražite novu poveznicu.',

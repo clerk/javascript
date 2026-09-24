@@ -956,6 +956,8 @@ export const ukUA: LocalizationResource = {
   formButtonPrimary: 'Продовжити',
   formButtonPrimary__verify: 'Verify',
   formFieldAction__forgotPassword: 'Забули пароль?',
+  formFieldAction__hidePassword: 'Приховати пароль',
+  formFieldAction__showPassword: 'Показати пароль',
   formFieldError__matchingPasswords: 'Паролі збігаються.',
   formFieldError__notMatchingPasswords: 'Паролі не збігаються.',
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',

@@ -955,6 +955,8 @@ export const heIL: LocalizationResource = {
   formButtonPrimary: 'המשך',
   formButtonPrimary__verify: 'Verify',
   formFieldAction__forgotPassword: 'שכחת סיסמה?',
+  formFieldAction__hidePassword: 'הסתרת סיסמה',
+  formFieldAction__showPassword: 'הצגת סיסמה',
   formFieldError__matchingPasswords: 'הסיסמאות תואמות.',
   formFieldError__notMatchingPasswords: 'הסיסמאות אינן תואמות.',
   formFieldError__verificationLinkExpired: 'הקישור לאימות פג תוקף. אנא בקש/י קישור חדש.',

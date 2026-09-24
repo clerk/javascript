@@ -955,6 +955,8 @@ export const enGB: LocalizationResource = {
   formButtonPrimary: 'Continue',
   formButtonPrimary__verify: 'Verify',
   formFieldAction__forgotPassword: 'Forgot password?',
+  formFieldAction__hidePassword: 'Hide password',
+  formFieldAction__showPassword: 'Show password',
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldError__notMatchingPasswords: "Passwords don't match.",
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',

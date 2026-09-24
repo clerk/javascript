@@ -956,6 +956,8 @@ export const srRS: LocalizationResource = {
   formButtonPrimary: 'Nastavi',
   formButtonPrimary__verify: 'Verifikuj',
   formFieldAction__forgotPassword: 'Zaboravljena lozinka?',
+  formFieldAction__hidePassword: 'Sakrij lozinku',
+  formFieldAction__showPassword: 'Prikaži lozinku',
   formFieldError__matchingPasswords: 'Lozinke se poklapaju.',
   formFieldError__notMatchingPasswords: 'Lozinke se ne poklapaju.',
   formFieldError__verificationLinkExpired: 'Link za verifikaciju je istekao. Molimo zatražite novi link.',

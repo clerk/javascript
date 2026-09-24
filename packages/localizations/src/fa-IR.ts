@@ -961,6 +961,8 @@ export const faIR: LocalizationResource = {
   formButtonPrimary: 'ادامه',
   formButtonPrimary__verify: 'تأیید',
   formFieldAction__forgotPassword: 'رمز عبور را فراموش کرده‌اید؟',
+  formFieldAction__hidePassword: 'پنهان کردن رمز عبور',
+  formFieldAction__showPassword: 'نمایش رمز عبور',
   formFieldError__matchingPasswords: 'رمزهای عبور مطابقت دارند.',
   formFieldError__notMatchingPasswords: 'رمزهای عبور مطابقت ندارند.',
   formFieldError__verificationLinkExpired: 'لینک تأیید منقضی شده است. لطفاً درخواست لینک جدید بدهید.',

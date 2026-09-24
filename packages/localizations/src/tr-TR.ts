@@ -956,6 +956,8 @@ export const trTR: LocalizationResource = {
   formButtonPrimary: 'İleri',
   formButtonPrimary__verify: 'Doğrula',
   formFieldAction__forgotPassword: 'Şifremi unuttum',
+  formFieldAction__hidePassword: 'Şifreyi gizle',
+  formFieldAction__showPassword: 'Şifreyi göster',
   formFieldError__matchingPasswords: 'Şifreler eşleşmeli.',
   formFieldError__notMatchingPasswords: 'Şifreler eşleşmiyor.',
   formFieldError__verificationLinkExpired: 'Doğrulama bağlantısının süresi doldu. Lütfen yeni bir bağlantı isteyin.',

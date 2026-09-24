@@ -955,6 +955,8 @@ export const arSA: LocalizationResource = {
   formButtonPrimary: 'متابعة',
   formButtonPrimary__verify: 'تحقق',
   formFieldAction__forgotPassword: 'نسيت كلمة المرور؟',
+  formFieldAction__hidePassword: 'إخفاء كلمة المرور',
+  formFieldAction__showPassword: 'إظهار كلمة المرور',
   formFieldError__matchingPasswords: 'كلمة المرور مطابقة',
   formFieldError__notMatchingPasswords: 'كلمة المرور لا تتطابق',
   formFieldError__verificationLinkExpired: 'صلاحية رمز التأكيد أنتهت. يرجى طلب رابط جديد',

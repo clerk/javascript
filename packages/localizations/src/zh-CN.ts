@@ -955,6 +955,8 @@ export const zhCN: LocalizationResource = {
   formButtonPrimary: '继续',
   formButtonPrimary__verify: '验证',
   formFieldAction__forgotPassword: '忘记密码？',
+  formFieldAction__hidePassword: '隐藏密码',
+  formFieldAction__showPassword: '显示密码',
   formFieldError__matchingPasswords: '密码匹配。',
   formFieldError__notMatchingPasswords: '密码不匹配。',
   formFieldError__verificationLinkExpired: '验证链接已过期。请申请新的链接。',

@@ -1,4 +1,11 @@
-import type { SetActive, SignInResource, SignInStatus } from '@clerk/shared/types';
+import type {
+  SessionResource,
+  SessionVerificationLevel,
+  SessionVerificationStatus,
+  SetActive,
+  SignInResource,
+  SignInStatus,
+} from '@clerk/shared/types';
 
 export type BiometricCredentialUnavailableReason =
   | 'environment_unavailable'
@@ -55,6 +62,20 @@ export type SignInWithBiometricsParams = {
   reason?: string;
 };
 
+/** Options for starting biometric reverification of the active session. */
+export type ReverifyWithBiometricsParams = {
+  level?: SessionVerificationLevel;
+  reason?: string;
+};
+
+/** The verification outcome and synchronized session, without creating or activating a session. */
+export type BiometricReverificationResult = {
+  id: string | null;
+  status: SessionVerificationStatus | (string & {});
+  level: SessionVerificationLevel | (string & {});
+  session: SessionResource;
+};
+
 export type BiometricSignInResult = {
   status: SignInStatus | (string & {});
   createdSessionId: string | null;
@@ -70,4 +91,5 @@ export type UseBiometricCredentialsReturn = {
   enroll: (params?: EnrollBiometricCredentialParams) => Promise<BiometricCredential>;
   revoke: (id: string) => Promise<BiometricCredential>;
   signIn: (params?: SignInWithBiometricsParams) => Promise<BiometricSignInResult>;
+  reverify: (params?: ReverifyWithBiometricsParams) => Promise<BiometricReverificationResult>;
 };

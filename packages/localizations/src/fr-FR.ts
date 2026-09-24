@@ -965,6 +965,8 @@ export const frFR: LocalizationResource = {
   formButtonPrimary: 'Continuer',
   formButtonPrimary__verify: 'Vérifier',
   formFieldAction__forgotPassword: 'Mot de passe oublié ?',
+  formFieldAction__hidePassword: 'Masquer le mot de passe',
+  formFieldAction__showPassword: 'Afficher le mot de passe',
   formFieldError__matchingPasswords: 'Les mots de passe correspondent.',
   formFieldError__notMatchingPasswords: 'Les mots de passe ne correspondent pas.',
   formFieldError__verificationLinkExpired: 'Le lien de vérification a expiré. Merci de demander un nouveau lien.',

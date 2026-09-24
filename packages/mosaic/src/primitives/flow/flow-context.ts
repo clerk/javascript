@@ -8,6 +8,8 @@ export interface FlowContextValue {
   rootRef: RefObject<HTMLDivElement | null>;
   registerActiveStep: (element: HTMLElement) => void;
   unregisterActiveStep: (element: HTMLElement) => void;
+  registerExitingStep: (element: HTMLElement) => void;
+  unregisterExitingStep: (element: HTMLElement) => void;
 }
 
 export const FlowContext = createContext<FlowContextValue | null>(null);

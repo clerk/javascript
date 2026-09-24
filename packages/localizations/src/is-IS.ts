@@ -962,6 +962,8 @@ export const isIS: LocalizationResource = {
   formButtonPrimary: 'Halda áfram',
   formButtonPrimary__verify: 'Staðfesta',
   formFieldAction__forgotPassword: 'Gleymt lykilorð?',
+  formFieldAction__hidePassword: 'Fela lykilorð',
+  formFieldAction__showPassword: 'Sýna lykilorð',
   formFieldError__matchingPasswords: 'Lykilorð passa saman.',
   formFieldError__notMatchingPasswords: 'Lykilorð passa ekki saman.',
   formFieldError__verificationLinkExpired: 'Staðfestingartengillinn er útrunninn. Vinsamlegast biðjið um nýjan tengil.',

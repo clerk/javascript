@@ -956,6 +956,8 @@ export const kkKZ: LocalizationResource = {
   formButtonPrimary: 'Жалғастыру',
   formButtonPrimary__verify: 'Растау',
   formFieldAction__forgotPassword: 'Құпия сөзді ұмыттыңыз ба?',
+  formFieldAction__hidePassword: 'Құпия сөзді жасыру',
+  formFieldAction__showPassword: 'Құпия сөзді көрсету',
   formFieldError__matchingPasswords: 'Құпия сөздер сәйкес келеді.',
   formFieldError__notMatchingPasswords: 'Құпия сөздер сәйкес келмейді.',
   formFieldError__verificationLinkExpired: 'Растау сілтемесінің мерзімі бітті. Жаңа сілтеме сұраңыз.',

@@ -955,6 +955,8 @@ export const daDK: LocalizationResource = {
   formButtonPrimary: 'Fortsæt',
   formButtonPrimary__verify: 'Verificer',
   formFieldAction__forgotPassword: 'Glemt adgangskode?',
+  formFieldAction__hidePassword: 'Skjul adgangskode',
+  formFieldAction__showPassword: 'Vis adgangskode',
   formFieldError__matchingPasswords: 'Adgangskoderne matcher.',
   formFieldError__notMatchingPasswords: 'Adgangskoderne matcher ikke.',
   formFieldError__verificationLinkExpired: 'Bekræftelseslinket er udløbet. Venligst anmod om et nyt link.',

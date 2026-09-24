@@ -956,6 +956,8 @@ export const plPL: LocalizationResource = {
   formButtonPrimary: 'Kontynuuj',
   formButtonPrimary__verify: 'Zweryfikuj',
   formFieldAction__forgotPassword: 'Zapomniałem/am hasła',
+  formFieldAction__hidePassword: 'Ukryj hasło',
+  formFieldAction__showPassword: 'Pokaż hasło',
   formFieldError__matchingPasswords: 'Hasła się zgadzają.',
   formFieldError__notMatchingPasswords: 'Hasła się nie zgadzają.',
   formFieldError__verificationLinkExpired: 'Link weryfikacyjny wygasł. Spróbuj ponownie.',

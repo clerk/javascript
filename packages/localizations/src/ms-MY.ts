@@ -964,6 +964,8 @@ export const msMY: LocalizationResource = {
   formButtonPrimary: 'Teruskan',
   formButtonPrimary__verify: 'Sahkan',
   formFieldAction__forgotPassword: 'Lupa kata laluan?',
+  formFieldAction__hidePassword: 'Sembunyikan kata laluan',
+  formFieldAction__showPassword: 'Tunjukkan kata laluan',
   formFieldError__matchingPasswords: 'Kata laluan sepadan.',
   formFieldError__notMatchingPasswords: 'Kata laluan tidak sepadan.',
   formFieldError__verificationLinkExpired: 'Pautan pengesahan telah tamat tempoh. Sila minta pautan baharu.',
