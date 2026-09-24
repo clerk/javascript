@@ -9,7 +9,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouter.withEmailCodes'] })('navi
 
   test.beforeAll(async () => {
     const m = createTestUtils({ app });
-    fakeUser = m.services.users.createFakeUser();
+    fakeUser = m.services.users.createFakeUser(test);
     await m.services.users.createBapiUser(fakeUser);
   });
 

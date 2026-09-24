@@ -1,3 +1,4 @@
+import { buildURL, trimTrailingSlash } from '@clerk/shared/internal/clerk-js/url';
 import type { HandleOAuthCallbackParams } from '@clerk/shared/types';
 
 import type { SignInContextType } from '../../contexts/components/SignIn';
@@ -23,12 +24,27 @@ export function buildSignInOAuthCallbackParams(ctx: SignInContextType): HandleOA
 }
 
 export function buildSignInOAuthTransportCallbackParams(ctx: SignInContextType): HandleOAuthCallbackParams {
+  // Path form, not `#/step`: the in-place component router matches on pathname only and would drop the hash.
+  const signUpStepUrl = (step: string): string => {
+    if (ctx.isCombinedFlow) {
+      return `create/${step}`;
+    }
+    const url = buildURL({ base: ctx.signUpUrl }, { stringify: false });
+    url.pathname = `${trimTrailingSlash(url.pathname)}/${step}`;
+    url.hash = '';
+    return url.href;
+  };
+
   return {
     ...buildSignInOAuthCallbackParams(ctx),
     firstFactorUrl: 'factor-one',
     secondFactorUrl: 'factor-two',
     resetPasswordUrl: 'reset-password',
     signInProtectCheckUrl: 'protect-check',
+    continueSignUpUrl: signUpStepUrl('continue'),
+    verifyEmailAddressUrl: signUpStepUrl('verify-email-address'),
+    verifyPhoneNumberUrl: signUpStepUrl('verify-phone-number'),
+    signUpProtectCheckUrl: signUpStepUrl('protect-check'),
   };
 }
 

@@ -1,12 +1,10 @@
 import type { Without } from '@clerk/shared/types';
-import { headers } from 'next/headers';
 import type { PropsWithChildren } from 'react';
 import React from 'react';
 
 import type { NextClerkProviderProps } from '../../types';
 import { canUseKeyless } from '../../utils/feature-flags';
 import { mergeNextClerkPropsWithEnv } from '../../utils/mergeNextClerkPropsWithEnv';
-import { onlyTry } from '../../utils/only-try';
 import { ClientClerkProvider } from '../client/ClerkProvider';
 import { deleteKeylessAction } from '../keyless-actions';
 
@@ -38,13 +36,12 @@ type KeylessProviderProps = PropsWithChildren<{
 export const KeylessProvider = async (props: KeylessProviderProps) => {
   const { rest, runningWithClaimedKeys, __internal_scriptsSlot, children } = props;
 
-  // NOTE: Create or read keys on every render. Usually this means only on hard refresh or hard navigations.
+  // Read-only: the SDK no longer mints keyless applications, it only reads claimed keys from disk.
   const newOrReadKeys = await import('../../server/keyless-node.js')
-    .then(mod => mod.keyless().getOrCreateKeys())
+    .then(mod => mod.keyless().readKeys() ?? null)
     .catch(() => null);
 
-  const { clerkDevelopmentCache, createConfirmationMessage, createKeylessModeMessage } =
-    await import('../../server/keyless-log-cache.js');
+  const { clerkDevelopmentCache, createConfirmationMessage } = await import('../../server/keyless-log-cache.js');
 
   if (!newOrReadKeys) {
     // When case keyless should run, but keys are not available, then fallback to throwing for missing keys
@@ -98,31 +95,7 @@ export const KeylessProvider = async (props: KeylessProviderProps) => {
       cacheKey: `${newOrReadKeys.publishableKey}_claimed`,
       msg: createConfirmationMessage(),
     });
-
-    return clientProvider;
   }
 
-  const KeylessCookieSync = await import('../client/keyless-cookie-sync.js').then(mod => mod.KeylessCookieSync);
-
-  const headerStore = await headers();
-  /**
-   * Allow developer to return to local application after claiming
-   */
-  const host = headerStore.get('x-forwarded-host');
-  const proto = headerStore.get('x-forwarded-proto');
-
-  const claimUrl = new URL(newOrReadKeys.claimUrl);
-  if (host && proto) {
-    onlyTry(() => claimUrl.searchParams.set('return_url', new URL(`${proto}://${host}`).href));
-  }
-
-  /**
-   * Notify developers.
-   */
-  clerkDevelopmentCache?.log({
-    cacheKey: newOrReadKeys.publishableKey,
-    msg: createKeylessModeMessage({ ...newOrReadKeys, claimUrl: claimUrl.href }),
-  });
-
-  return <KeylessCookieSync {...newOrReadKeys}>{clientProvider}</KeylessCookieSync>;
+  return clientProvider;
 };

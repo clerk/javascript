@@ -1,17 +1,44 @@
-import * as OrganizationProfileApiKeysPanelStories from './organization-profile-api-keys-panel.stories';
+import * as Stories from './organization-profile-api-keys-panel.stories';
 
-# Organization Profile API Keys Panel
+# OrganizationProfileApiKeysPanel
 
-The API keys tab panel of the Organization Profile — lists an organization's API keys and owns the create and revoke flows. It gates on `org:sys_api_keys:read` to view and `org:sys_api_keys:manage` to create or revoke.
+A controlled organization API keys table with search, page navigation, and confirmation before revocation. The caller supplies the current page and owns data updates; the panel requires typing the key's exact name before revoking it.
+
+## Example
 
 <Story
   name='Default'
-  storyModule={OrganizationProfileApiKeysPanelStories}
+  storyModule={Stories}
   composition={[
-    {
-      name: 'OrganizationProfile',
-      href: '/organization/organization-profile',
-      layer: 'Organization',
-    },
+    { name: 'Table', href: '/components/table', layer: 'Components' },
+    { name: 'EmptyState', href: '/components/empty-state', layer: 'Components' },
+    { name: 'useDataTable', href: '/hooks/use-data-table', layer: 'Hooks' },
+    { name: 'Pagination', href: '/components/pagination', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Text', href: '/components/text', layer: 'Components' },
+    { name: 'Spinner', href: '/components/spinner', layer: 'Components' },
+    { name: 'Profile', href: '/components/profile', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Field', href: '/components/field', layer: 'Components' },
+    { name: 'Input', href: '/components/input', layer: 'Components' },
+    { name: 'Select', href: '/components/select', layer: 'Components' },
+    { name: 'Destructive', href: '/blocks/destructive', layer: 'Blocks' },
   ]}
 />
+
+## Examples
+
+### Empty
+
+<Story name='Empty' storyModule={Stories} />
+
+### Proposed table
+
+This example enables sorting and row selection through `onSortChange` and `onBulkAction`. Click Name, Date created, or Last used to cycle through ascending, descending, and unsorted order. The caller sorts all results before pagination and resets to page 1. Keys that have never been used sort last.
+
+The bulk callback is a placeholder that enables selection checkboxes. Sorting clears the current selection.
+
+<Story name='ProposedTable' storyModule={Stories} />

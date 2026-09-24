@@ -112,7 +112,7 @@ test.describe('composed UserProfile exports @generic', () => {
     await app.dev();
 
     const m = createTestUtils({ app });
-    fakeUser = m.services.users.createFakeUser({
+    fakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
       withPhoneNumber: true,
@@ -221,7 +221,7 @@ test.describe('composed UserProfile exports @generic', () => {
 
   test('can delete the account', async ({ page, context }) => {
     const m = createTestUtils({ app });
-    const delFakeUser = m.services.users.createFakeUser({
+    const delFakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
       withPhoneNumber: true,
@@ -358,7 +358,7 @@ test.describe('composed OrganizationProfile exports @generic', () => {
     await app.dev();
 
     const m = createTestUtils({ app });
-    fakeUser = m.services.users.createFakeUser({ fictionalEmail: true });
+    fakeUser = m.services.users.createFakeUser(test, { fictionalEmail: true });
     const user = await m.services.users.createBapiUser(fakeUser);
     fakeOrganization = await m.services.users.createFakeOrganization(user.id);
   });
@@ -415,7 +415,7 @@ test.describe('composed OrganizationProfile exports @generic', () => {
 
   test('can delete the organization', async ({ page, context }) => {
     const m = createTestUtils({ app });
-    const delFakeUser = m.services.users.createFakeUser({ fictionalEmail: true });
+    const delFakeUser = m.services.users.createFakeUser(test, { fictionalEmail: true });
     const delUser = await m.services.users.createBapiUser(delFakeUser);
     const delOrg = await m.services.users.createFakeOrganization(delUser.id);
 

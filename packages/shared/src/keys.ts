@@ -1,4 +1,5 @@
 import { DEV_OR_STAGING_SUFFIXES, LEGACY_DEV_INSTANCE_SUFFIXES } from './constants';
+import { keySetupGuidance } from './errors/keySetupGuidance';
 import { isomorphicAtob } from './isomorphicAtob';
 import { isomorphicBtoa } from './isomorphicBtoa';
 import type { PublishableKey } from './types';
@@ -127,12 +128,12 @@ export function parsePublishableKey(
 
   if (!key || !isPublishableKey(key)) {
     if (options.fatal && !key) {
-      throw new Error(
-        'Publishable key is missing. Ensure that your publishable key is correctly configured. Double-check your environment configuration for your keys, or access them here: https://dashboard.clerk.com/last-active?path=api-keys',
-      );
+      throw new Error(`Publishable key is missing.\n\n${keySetupGuidance}`);
     }
     if (options.fatal && !isPublishableKey(key)) {
-      throw new Error('Publishable key not valid.');
+      throw new Error(
+        `Publishable key not valid (expected format: pk_test_... or pk_live_...).\n\n${keySetupGuidance}`,
+      );
     }
     return null;
   }
@@ -144,14 +145,14 @@ export function parsePublishableKey(
     decodedFrontendApi = isomorphicAtob(key.split('_')[2]);
   } catch {
     if (options.fatal) {
-      throw new Error('Publishable key not valid: Failed to decode key.');
+      throw new Error(`Publishable key not valid: Failed to decode key.\n\n${keySetupGuidance}`);
     }
     return null;
   }
 
   if (!isValidDecodedPublishableKey(decodedFrontendApi)) {
     if (options.fatal) {
-      throw new Error('Publishable key not valid: Decoded key has invalid format.');
+      throw new Error(`Publishable key not valid: Decoded key has invalid format.\n\n${keySetupGuidance}`);
     }
     return null;
   }

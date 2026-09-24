@@ -1,7 +1,6 @@
-/** @jsxImportSource @emotion/react */
-import type { ButtonProps } from '@clerk/ui/mosaic/components/button';
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
+import type { ButtonProps } from '@clerk/mosaic/components/button';
+import { Button, SubmitButton } from '@clerk/mosaic/components/button';
+import { Icon } from '@clerk/mosaic/components/icon';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -12,14 +11,14 @@ export { default as __source } from './button.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Button',
-  source: 'packages/ui/src/mosaic/components/button/button.tsx',
-  styleEngine: 'stylex',
+  source: 'packages/mosaic/src/components/button/button.tsx',
   styles: {
     _variants: {
       color: { primary: {}, neutral: {}, negative: {} },
       variant: { filled: {}, outline: {}, ghost: {}, link: {} },
-      size: { sm: {}, md: {}, lg: {} },
+      size: { xs: {}, sm: {}, md: {}, lg: {} },
       shape: { default: {}, square: {}, circle: {} },
       fullWidth: { true: {}, false: {} },
       touchTarget: { true: {}, false: {} },
@@ -48,6 +47,12 @@ export function Primary(props: Record<string, unknown>) {
 export function Sizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <Button
+        {...knobsAsProps(props)}
+        size='xs'
+      >
+        Extra small
+      </Button>
       <Button
         {...knobsAsProps(props)}
         size='sm'
@@ -188,7 +193,7 @@ export function Icons(props: Record<string, unknown>) {
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
       <Button {...knobsAsProps(props)}>
         <Icon
-          name='check'
+          name='checkmark'
           placement='inline-start'
         />
         Approve
@@ -202,7 +207,7 @@ export function Icons(props: Record<string, unknown>) {
       </Button>
       <Button {...knobsAsProps(props)}>
         <Icon
-          name='check'
+          name='checkmark'
           placement='inline-start'
         />
         Both sides
@@ -220,7 +225,7 @@ export function Icons(props: Record<string, unknown>) {
 export function IconSizes(props: Record<string, unknown>) {
   return (
     <div style={{ display: 'grid', gap: 12, justifyItems: 'start' }}>
-      {(['sm', 'md', 'lg'] as const).map(size => (
+      {(['xs', 'sm', 'md', 'lg'] as const).map(size => (
         <div
           key={size}
           style={{ display: 'flex', gap: 8, alignItems: 'center' }}
@@ -230,9 +235,9 @@ export function IconSizes(props: Record<string, unknown>) {
             size={size}
           >
             <Icon
-              name='check'
+              name='checkmark'
               placement='inline-start'
-              size={size}
+              size={size === 'xs' ? 'sm' : size}
             />
             Approve
           </Button>
@@ -250,7 +255,7 @@ export function IconSizes(props: Record<string, unknown>) {
             <Icon
               name='chevron-down'
               placement='inline-end'
-              size={size}
+              size={size === 'xs' ? 'sm' : size}
             />
           </Button>
         </div>
@@ -282,7 +287,7 @@ export function Truncation(props: Record<string, unknown>) {
         fullWidth
       >
         <Icon
-          name='check'
+          name='checkmark'
           placement='inline-start'
         />
         Save this organization&rsquo;s billing details
@@ -299,5 +304,126 @@ export function Disabled(props: Record<string, unknown>) {
     >
       Disabled
     </Button>
+  );
+}
+
+// Two rows so the difference is reachable from the keyboard: tab through each and watch where
+// focus lands. The neighbours are the point — the middle button is the one that changes.
+export function FocusableWhenDisabled(props: Record<string, unknown>) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <Button variant='outline'>Before</Button>
+        <Button
+          {...knobsAsProps(props)}
+          disabled
+        >
+          Skipped
+        </Button>
+        <Button variant='outline'>After</Button>
+      </div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <Button variant='outline'>Before</Button>
+        <Button
+          {...knobsAsProps(props)}
+          disabled
+          focusableWhenDisabled
+        >
+          Focusable
+        </Button>
+        <Button variant='outline'>After</Button>
+      </div>
+    </div>
+  );
+}
+
+// Stands in for an async submit, so the example can be pressed and the flip between the two
+// states watched — including that the button doesn't resize under the spinner.
+function usePendingOnPress(duration = 2000) {
+  const [isPending, setIsPending] = React.useState(false);
+  const timeout = React.useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  React.useEffect(() => () => clearTimeout(timeout.current), []);
+
+  return {
+    isPending,
+    onClick: () => {
+      setIsPending(true);
+      timeout.current = setTimeout(() => setIsPending(false), duration);
+    },
+  };
+}
+
+export function Submit(props: Record<string, unknown>) {
+  const { isPending, onClick } = usePendingOnPress();
+  return (
+    <SubmitButton
+      {...knobsAsProps(props)}
+      isPending={isPending}
+      onClick={onClick}
+    >
+      Save changes
+    </SubmitButton>
+  );
+}
+
+// Press both: only the slow one ever draws a spinner. The fast one is pending the whole time it
+// says it is — it just finishes before the spinner is due, so nothing flashes.
+export function SubmitDelay(props: Record<string, unknown>) {
+  const slow = usePendingOnPress(2000);
+  const fast = usePendingOnPress(150);
+  return (
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      <SubmitButton
+        {...knobsAsProps(props)}
+        isPending={slow.isPending}
+        onClick={slow.onClick}
+      >
+        Slow action
+      </SubmitButton>
+      <SubmitButton
+        {...knobsAsProps(props)}
+        isPending={fast.isPending}
+        onClick={fast.onClick}
+      >
+        Fast action
+      </SubmitButton>
+    </div>
+  );
+}
+
+export function SubmitSizes(props: Record<string, unknown>) {
+  return (
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      {(['xs', 'sm', 'md', 'lg'] as const).map(size => (
+        <SubmitButton
+          key={size}
+          {...knobsAsProps(props)}
+          size={size}
+          isPending
+        >
+          Save changes
+        </SubmitButton>
+      ))}
+    </div>
+  );
+}
+
+// The spinner takes its arc from `currentColor`, so it reads on a fill and on a bare surface
+// alike — no color prop to keep in step with the button's.
+export function SubmitVariants(props: Record<string, unknown>) {
+  return (
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+      {(['filled', 'outline', 'ghost'] as const).map(variant => (
+        <SubmitButton
+          key={variant}
+          {...knobsAsProps(props)}
+          variant={variant}
+          isPending
+        >
+          Save changes
+        </SubmitButton>
+      ))}
+    </div>
   );
 }

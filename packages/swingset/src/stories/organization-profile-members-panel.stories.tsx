@@ -1,73 +1,58 @@
-/** @jsxImportSource @emotion/react */
-import { useMachine } from '@clerk/ui/mosaic/machine/useMachine';
-import type { MemberRow } from '@clerk/ui/mosaic/organization/organization-profile-members-panel.controller';
-import { organizationProfileMembersPanelMachine } from '@clerk/ui/mosaic/organization/organization-profile-members-panel.machine';
-import { OrganizationProfileMembersPanelView } from '@clerk/ui/mosaic/organization/organization-profile-members-panel.view';
-import { useState } from 'react';
+import { OrganizationProfileMembersPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-members-panel.view';
 
 import type { StoryMeta } from '@/lib/types';
 
+import { useInvitationsTableFixture } from './fixtures/invitations-table-tab';
+import { useMembersTableFixture } from './fixtures/members-table-tab';
+import { useRequestsTableFixture } from './fixtures/requests-table-tab';
+
+export { default as __source } from './organization-profile-members-panel.stories?raw';
+
 export const meta: StoryMeta = {
-  group: 'Organization',
+  group: 'Organization Profile',
+  status: 'wip',
+  substatus: 'needs wire-up',
   title: 'OrganizationProfileMembersPanel',
-  source: 'packages/ui/src/mosaic/organization/organization-profile-members-panel.tsx',
+  label: 'Members panel',
+  navigation: { category: 'Panels' },
+  source: 'packages/mosaic/src/features/organization-profile/organization-profile-members-panel.view.tsx',
 };
 
-const DEMO_MEMBERS: Omit<MemberRow, 'onRemove'>[] = [
-  {
-    id: 'mem_1',
-    name: 'Ada Lovelace',
-    identifier: 'ada@example.com',
-    roleLabel: 'Admin',
-    joinedAt: '1/12/2024',
-    isCurrentUser: true,
-    isBanned: false,
-  },
-  {
-    id: 'mem_2',
-    name: 'Alan Turing',
-    identifier: 'alan@example.com',
-    roleLabel: 'Member',
-    joinedAt: '3/4/2024',
-    isCurrentUser: false,
-    isBanned: false,
-  },
-  {
-    id: 'mem_3',
-    name: 'Grace Hopper',
-    identifier: 'grace@example.com',
-    roleLabel: 'Member',
-    joinedAt: '6/9/2024',
-    isCurrentUser: false,
-    isBanned: true,
-  },
-];
-
-export function Default() {
-  const [snapshot, send] = useMachine(organizationProfileMembersPanelMachine);
-  const [page, setPage] = useState(1);
-
-  const rows: MemberRow[] = DEMO_MEMBERS.map(member => ({
-    ...member,
-    onRemove: () =>
-      send({
-        type: 'REMOVE_MEMBER',
-        membershipId: member.id,
-        // Simulate the network round-trip so the row shows its "Removing…" state.
-        run: () => new Promise<void>(resolve => setTimeout(resolve, 700)),
-      }),
-  }));
-
+export function Legacy() {
+  const members = useMembersTableFixture();
+  const invitations = useInvitationsTableFixture();
+  const requests = useRequestsTableFixture();
   return (
     <OrganizationProfileMembersPanelView
-      snapshot={snapshot}
-      send={send}
-      rows={rows}
-      canManage
-      page={page}
-      pageCount={3}
-      isLoading={false}
-      onPageChange={setPage}
+      members={members}
+      invitations={invitations}
+      requests={requests}
+    />
+  );
+}
+
+export function Proposed() {
+  const members = useMembersTableFixture({ proposed: true });
+  const invitations = useInvitationsTableFixture({ proposed: true });
+  const requests = useRequestsTableFixture({ proposed: true });
+  return (
+    <OrganizationProfileMembersPanelView
+      members={members}
+      invitations={invitations}
+      requests={requests}
+    />
+  );
+}
+
+export function Empty() {
+  const members = useMembersTableFixture({ empty: true });
+  const invitations = useInvitationsTableFixture({ empty: true });
+  const requests = useRequestsTableFixture({ empty: true });
+  return (
+    <OrganizationProfileMembersPanelView
+      members={members}
+      invitations={invitations}
+      requests={requests}
     />
   );
 }

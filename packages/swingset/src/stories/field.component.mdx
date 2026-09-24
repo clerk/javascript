@@ -1,0 +1,107 @@
+import * as FieldStories from './field.component.stories';
+
+# Field
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={FieldStories}
+/>
+
+## Usage
+
+Compose one Mosaic control inside each `Field.Root` to generate its ID, the label relationship, and the message relationships. Rendering multiple controls logs a development warning. The caller owns validation and decides when to render an error. Use a separate `Field.Root` for each control; grouped controls should use native `<fieldset>` and `<legend>` semantics until dedicated Mosaic `Fieldset` and `Field.Item` components are available.
+
+```tsx
+import { Field } from '@clerk/mosaic/components/field';
+import { Input } from '@clerk/mosaic/components/input';
+
+<Field.Root>
+  <Field.Label>Email address</Field.Label>
+  <Input
+    name='email'
+    type='email'
+    required
+    aria-invalid={Boolean(error)}
+  />
+  <Field.Description>Used for account notifications.</Field.Description>
+  <Field.Message>
+    <Field.Error>{error}</Field.Error>
+  </Field.Message>
+</Field.Root>;
+```
+
+Explicit `id`, `htmlFor`, `aria-labelledby`, and `aria-describedby` values remain supported. Field preserves explicit IDs after hydration and merges external ARIA references with its generated relationships. During server rendering, Field emits its generated control ID and native label relationship; explicit control IDs and generated label and message ARIA references finalize during hydration. `name` still identifies the submitted form value and is typically what form libraries use for registration.
+
+Field does not validate controls or render errors automatically. Its parts may also be used independently without `Field.Root`.
+
+### Visually hidden label
+
+<Story
+  name='VisuallyHiddenLabel'
+  storyModule={FieldStories}
+/>
+
+Pass `visuallyHidden` to `Field.Label` when the surrounding UI already makes the label redundant. The label is still rendered and still associated with the control, so the control keeps its accessible name — unlike dropping the label and relying on a `placeholder`, which is not an accessible name. It applies the same style as the [VisuallyHidden](/components/visually-hidden) component.
+
+### Error
+
+<Story
+  name='WithError'
+  storyModule={FieldStories}
+/>
+
+Wrap `Field.Error` in `Field.Message` and pass the message as its children. `Field.Message` measures whichever message is showing and animates its own height to match, so it grows when a message arrives, follows the text when the message changes, and collapses after it clears. The caller never conditionally mounts either part. Under `prefers-reduced-motion` the height snaps and only the message fades.
+
+`Field.Message` is also the field's live region. It stays mounted and carries `role='status'`, so a message that arrives while the user is in the control is announced politely, and a message that is fading out is hidden from assistive technology so only the incoming one is read. Pass `role='alert'` when a message must interrupt, for example a submit-time validation error.
+
+### Success
+
+<Story
+  name='WithFeedback'
+  storyModule={FieldStories}
+/>
+
+`Field.Success` is the positive counterpart. Render both inside one `Field.Message` and pass each its own message; when one replaces the other, the outgoing message fades out over the incoming one while the container height moves once from the old height to the new.
+
+### Controls without a native label
+
+<Story
+  name='WithSelect'
+  storyModule={FieldStories}
+/>
+
+A native `<label>` activates the control it names, which for a `Select` trigger would open the
+listbox on every label click. A control that cannot be natively labelled registers as such, and
+`Field.Label` then renders a `span` instead: clicking it focuses the control, and the control is named
+through `aria-labelledby` rather than `htmlFor`. Description and error relationships are unchanged.
+Explicit `htmlFor` still renders a native `label`. `Select.Trigger` opts in; `Input` and `OTP` keep
+the native label.
+
+## Parts
+
+| Part                | Stable slot class       | Description                                                                                                                                          |
+| ------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Field.Root`        | `.cl-field-root`        | Unstyled `div` and field context provider.                                                                                                           |
+| `Field.Label`       | `.cl-field-label`       | Native `label` associated with the field control; a `span` that focuses the control when it cannot be natively labelled, such as a `Select` trigger. |
+| `Field.Description` | `.cl-field-description` | Supporting `p` associated with the field control.                                                                                                    |
+| `Field.Message`     | `.cl-field-message`     | Height-animated live region for the messages below.                                                                                                  |
+| `Field.Error`       | `.cl-field-error`       | Associated error `p` with an alert icon.                                                                                                             |
+| `Field.Success`     | `.cl-field-success`     | Associated success `p` with a check icon.                                                                                                            |
+
+## Styling
+
+The Mosaic field is themed with **StyleX**. Each styled part carries the stable public slot class shown above alongside the generated StyleX atoms. Consumers never target the hashed atomic classes—override a `.cl-field-*` class from a CSS layer that wins over `@clerk/mosaic/styles.css`:
+
+```css
+@import '@clerk/mosaic/styles.css' layer(components);
+
+@layer overrides {
+  .cl-field-label {
+    font-weight: 600;
+  }
+}
+```
+
+`Field.Root` ships no layout. Higher-level blocks own how its parts are arranged; for example, a settings row can provide the grid and alignment for a field. Customize an `Input` through its exposed tokens, `.cl-input`, `className`, and `style`; Field does not add control-specific styling.

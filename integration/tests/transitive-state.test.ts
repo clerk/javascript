@@ -41,14 +41,14 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('transitiv
     });
 
     // Org switching test: 1 user with 2 orgs
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
     const user = await u.services.users.createBapiUser(fakeUser);
     orgB = await u.services.users.createFakeOrganization(user.id);
     orgA = await u.services.users.createFakeOrganization(user.id);
 
     // User switching test: 2 users for multi-session
-    userA = u.services.users.createFakeUser();
-    userB = u.services.users.createFakeUser();
+    userA = u.services.users.createFakeUser(test);
+    userB = u.services.users.createFakeUser(test);
     const createdUserA = await u.services.users.createBapiUser(userA);
     const createdUserB = await u.services.users.createBapiUser(userB);
     userAId = createdUserA.id;

@@ -108,7 +108,7 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
         ...common.textVariants(t)[textVariant],
       })}
     >
-      {title ? (
+      {title || badge ? (
         <Span
           sx={t => ({
             display: 'inline-flex',
@@ -123,7 +123,7 @@ const Title = React.forwardRef<HTMLTableCellElement, TitleProps>(({ title, descr
               aria-hidden
             />
           ) : null}
-          <Span localizationKey={title} />
+          {title ? <Span localizationKey={title} /> : null}
           {badge ? <Box>{badge}</Box> : null}
         </Span>
       ) : null}
@@ -169,9 +169,18 @@ interface DescriptionProps {
   copyLabel?: string;
   prefix?: string | LocalizationKey;
   suffix?: string | LocalizationKey;
+  descriptionInnerAlignment?: 'start' | 'center' | 'end';
 }
 
-function Description({ text, prefix, suffix, truncateText = false, copyText = false, copyLabel }: DescriptionProps) {
+function Description({
+  text,
+  prefix,
+  suffix,
+  truncateText = false,
+  copyText = false,
+  copyLabel,
+  descriptionInnerAlignment = 'end',
+}: DescriptionProps) {
   const context = React.useContext(GroupContext);
   if (!context) {
     throw new Error('LineItems.Description must be used within LineItems.Group');
@@ -192,7 +201,7 @@ function Description({ text, prefix, suffix, truncateText = false, copyText = fa
         sx={t => ({
           display: 'inline-flex',
           justifyContent: 'flex-end',
-          alignItems: 'end',
+          alignItems: descriptionInnerAlignment,
           gap: t.space.$1,
           minWidth: '0',
         })}

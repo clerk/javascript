@@ -1,0 +1,35 @@
+import * as Stories from './user-profile-enterprise-accounts-section.stories';
+
+# UserProfileEnterpriseAccountsSection
+
+Linked enterprise accounts and available connection rows, driven entirely by supplied data and callbacks. Accounts and available connections are already filtered by the caller. Selecting a connection in these examples only changes preview state; it does not start SSO.
+
+<Story name='Default' storyModule={Stories} composition={[
+  { name: 'Section', href: '/components/section', layer: 'Components' },
+  { name: 'Button', href: '/components/button', layer: 'Components' },
+  { name: 'Badge', href: '/components/badge', layer: 'Components' },
+  { name: 'Icon', href: '/components/icon', layer: 'Components' },
+  { name: 'Spinner', href: '/components/spinner', layer: 'Components' },
+]} />
+
+## Linked accounts
+
+<Story name='LinkedAccounts' storyModule={Stories} />
+
+## Requires action
+
+The badge is informational. The caller decides whether it applies; it does not introduce a repair or remove action.
+
+<Story name='RequiresAction' storyModule={Stories} />
+
+## Connect only
+
+Eligible connections can be displayed without any linked accounts. Select Connect to see its pending state; after a short delay, it becomes a linked account.
+
+<Story name='ConnectOnly' storyModule={Stories} />
+
+## Connection error
+
+The inline error is supplied by the caller. Selecting Connect clears the error, shows pending state, then adds the linked account.
+
+<Story name='ConnectionError' storyModule={Stories} />

@@ -2,7 +2,9 @@ name: Release
 run-name: >-
   ${{
     github.event_name == 'issue_comment'
-      && format('[Snapshot] Release by {0}', github.actor)
+      && format('[Snapshot] Request by {0}', github.actor)
+    || github.event_name == 'workflow_dispatch'
+      && format('[Snapshot] Release by {0}', inputs.requester)
     || contains(github.event.head_commit.message, 'Version packages')
       && format('[Production] Release from {0}', github.ref_name)
     || format('[Canary] Release from {0}', github.ref_name)
@@ -14,9 +16,31 @@ on:
       - main
   issue_comment:
     types: [created]
+  workflow_dispatch:
+    inputs:
+      snapshot_name:
+        description: Snapshot tag name (lowercase letters and hyphens); defaults to "snapshot"
+        type: string
+        default: ''
+      pr_number:
+        description: Pull request number the snapshot was requested from
+        type: string
+        required: true
+      head_sha:
+        description: Commit the snapshot request was validated against
+        type: string
+        required: true
+      comment_id:
+        description: ID of the !snapshot comment
+        type: string
+        required: true
+      requester:
+        description: GitHub login of the person who requested the snapshot
+        type: string
+        required: true
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event_name == 'issue_comment' && format('issue-{0}-{1}', github.event.issue.number, github.actor) || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'issue_comment' && format('issue-{0}-{1}', github.event.issue.number, github.actor) || github.event_name == 'workflow_dispatch' && format('snapshot-{0}-{1}', inputs.pr_number, inputs.requester) || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -24,7 +48,7 @@ jobs:
     name: Release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    timeout-minutes: 25
 
     permissions:
       actions: read
@@ -43,7 +67,7 @@ jobs:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
       - name: Checkout repo
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
           show-progress: false
@@ -238,7 +262,7 @@ jobs:
       - name: Send commit log to Slack
         id: slack
         if: steps.changesets.outputs.published == 'true'
-        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
+        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
         with:
           payload: ${{ steps.notification.outputs.payload }}
         env:
@@ -247,7 +271,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: ${{ always() && steps.changesets.outcome == 'failure' }}
-        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
+        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
         with:
           payload: |
             {
@@ -269,13 +293,13 @@ jobs:
     name: Canary release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    timeout-minutes: 25
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Checkout repo
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
           fetch-depth: 1
@@ -347,7 +371,7 @@ jobs:
 
       - name: Notify Slack on failure
         if: ${{ always() && steps.publish.outcome == 'failure' }}
-        uses: slackapi/slack-github-action@e28cf165c92ffef168d23c5c9000cffc8a25e117 # v1.24.0
+        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
         with:
           payload: |
             {
@@ -365,15 +389,15 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SDK_SLACKER_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
 
-  snapshot-release:
-    name: Snapshot release
+  snapshot-request:
+    name: Snapshot request
     if: ${{ github.event_name == 'issue_comment' && startsWith(github.event.comment.body, '!snapshot') && github.repository == 'clerk/javascript' && github.event.issue.pull_request }}
-    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
-    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+    runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
+    timeout-minutes: 5
 
     permissions:
+      actions: write
       contents: read
-      id-token: write
       pull-requests: write
 
     steps:
@@ -397,12 +421,27 @@ jobs:
               core.setFailed(`@${context.actor} is not a member of the Clerk organization`);
             }
 
-      - name: Validate PR source and freshness
+      - name: Extract snapshot name
+        id: extract-snapshot-name
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const match = context.payload.comment.body.match(/!snapshot (.*)/)
+            const name = match && match[1] || '';
+            const isKebabCase = name.match(/^[a-z]+(-[a-z]+)*$/)
+            if(name && !isKebabCase) {
+              core.setFailed(`Invalid snapshot name: ${name}`);
+            }
+            core.setOutput('name', name);
+
+      - name: Validate PR and dispatch snapshot release
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          SNAPSHOT_NAME: ${{ steps.extract-snapshot-name.outputs.name }}
         with:
           result-encoding: string
           retries: 3
-          retry-exempt-status-codes: 400,401
+          retry-exempt-status-codes: 400,401,422
           script: |
             const { data: pr } = await github.rest.pulls.get({
               owner: 'clerk',
@@ -420,12 +459,67 @@ jobs:
 
             if (prLastUpdated > commentCreated) {
               core.setFailed("The PR has been updated since !snapshot was initiated. Please review the changes and re-run the !snapshot command.");
+              return;
+            }
+
+            try {
+              await github.rest.actions.createWorkflowDispatch({
+                owner: 'clerk',
+                repo: 'javascript',
+                workflow_id: 'release.yml',
+                ref: pr.head.ref,
+                inputs: {
+                  snapshot_name: process.env.SNAPSHOT_NAME,
+                  pr_number: String(context.issue.number),
+                  head_sha: pr.head.sha,
+                  comment_id: String(context.payload.comment.id),
+                  requester: context.payload.comment.user.login,
+                },
+              });
+            } catch (e) {
+              if (e.status === 422) {
+                core.setFailed('This branch does not support snapshot releases yet. Rebase it on main and re-run the !snapshot command.');
+                return;
+              }
+              throw e;
+            }
+
+      - name: Acknowledge request
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        with:
+          comment-id: ${{ github.event.comment.id }}
+          reactions: eyes
+
+  snapshot-release:
+    name: Snapshot release
+    if: ${{ github.event_name == 'workflow_dispatch' && github.repository == 'clerk/javascript' }}
+    runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
+    timeout-minutes: 25
+
+    permissions:
+      contents: read
+      id-token: write
+      pull-requests: write
+
+    steps:
+      - name: Validate dispatch inputs
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          SNAPSHOT_NAME: ${{ inputs.snapshot_name }}
+          HEAD_SHA: ${{ inputs.head_sha }}
+        with:
+          script: |
+            const { SNAPSHOT_NAME, HEAD_SHA } = process.env;
+            if (SNAPSHOT_NAME && !SNAPSHOT_NAME.match(/^[a-z]+(-[a-z]+)*$/)) {
+              core.setFailed(`Invalid snapshot name: ${SNAPSHOT_NAME}`);
+            }
+            if (HEAD_SHA !== context.sha) {
+              core.setFailed(`The branch moved since the snapshot was requested (expected ${HEAD_SHA}, got ${context.sha}). Re-run the !snapshot command.`);
             }
 
       - name: Checkout repo
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          ref: refs/pull/${{ github.event.issue.number }}/head
           persist-credentials: false
           fetch-depth: 1
           fetch-tags: false
@@ -443,22 +537,11 @@ jobs:
       - name: Upgrade npm for trusted publishing
         run: npx npm@11 install -g npm@11
 
-      - name: Extract snapshot name
-        id: extract-snapshot-name
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
-        with:
-          script: |
-            const match = context.payload.comment.body.match(/!snapshot (.*)/)
-            const name = match && match[1] || '';
-            const isKebabCase = name.match(/^[a-z]+(-[a-z]+)*$/)
-            if(name && !isKebabCase) {
-              core.setFailed(`Invalid snapshot name: ${name}`);
-            }
-            core.setOutput('name', name);
-
       - name: Version packages for snapshot
         id: version-packages
-        run: pnpm version-packages:snapshot ${{ steps.extract-snapshot-name.outputs.name }} | tail -1 >> "$GITHUB_OUTPUT"
+        env:
+          SNAPSHOT_NAME: ${{ inputs.snapshot_name }}
+        run: pnpm version-packages:snapshot "$SNAPSHOT_NAME" | tail -1 >> "$GITHUB_OUTPUT"
 
       - name: Build release
         if: steps.version-packages.outputs.success == '1'
@@ -474,6 +557,8 @@ jobs:
         if: steps.version-packages.outputs.success == '1'
         id: package-info
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          SNAPSHOT_NAME: ${{ inputs.snapshot_name }}
         with:
           script: |
             const fs = require("fs");
@@ -483,7 +568,7 @@ jobs:
                 const { name, version } = JSON.parse(fs.readFileSync(file, "utf8"));
                 return { name, version };
               })
-              .filter(({ version }) => version.includes("-${{ steps.extract-snapshot-name.outputs.name }}"));
+              .filter(({ version }) => version.includes(`-${process.env.SNAPSHOT_NAME}`));
 
             let table = `| Package | Version |\n| --- | --- |\n`;
             descriptors.forEach(({ name, version }) => {
@@ -500,20 +585,22 @@ jobs:
 
       - name: Update Comment
         if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@3383acd359705b10cb1eeef05c0e88c056ea4666 # v3.0.0
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
         with:
-          comment-id: ${{ github.event.comment.id }}
+          comment-id: ${{ inputs.comment_id }}
           reactions: heart
 
       - name: Minimize previous snapshot comments
         if: steps.version-packages.outputs.success == '1'
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          PR_NUMBER: ${{ inputs.pr_number }}
         with:
           script: |
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
+              issue_number: Number(process.env.PR_NUMBER),
               per_page: 100,
             });
 
@@ -536,11 +623,11 @@ jobs:
 
       - name: Create snapshot release comment
         if: steps.version-packages.outputs.success == '1'
-        uses: peter-evans/create-or-update-comment@3383acd359705b10cb1eeef05c0e88c056ea4666 # v3.0.0
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
         with:
-          issue-number: ${{ github.event.issue.number }}
+          issue-number: ${{ inputs.pr_number }}
           body: |
-            Hey @${{ github.event.comment.user.login }} - the snapshot version command generated the following package versions:
+            Hey @${{ inputs.requester }} - the snapshot version command generated the following package versions:
             ${{ steps.package-info.outputs.table }}
             Tip: Use the snippet copy button below to quickly install the required packages.
             ${{ steps.package-info.outputs.snippets }}
@@ -565,7 +652,7 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
           fetch-depth: 1

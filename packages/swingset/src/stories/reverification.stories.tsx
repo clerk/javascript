@@ -1,0 +1,528 @@
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import type { ReverificationMethod, ReverificationStep } from '@clerk/mosaic/features/reverification';
+import { otpChannelFor } from '@clerk/mosaic/features/reverification/reverification.utils';
+import { ReverificationView } from '@clerk/mosaic/features/reverification/reverification.view';
+import { ReverificationBackupCode } from '@clerk/mosaic/features/reverification/steps/reverification-backup-code';
+import { ReverificationHelp } from '@clerk/mosaic/features/reverification/steps/reverification-help';
+import { ReverificationMethodPicker } from '@clerk/mosaic/features/reverification/steps/reverification-method-picker';
+import { ReverificationOTP } from '@clerk/mosaic/features/reverification/steps/reverification-otp';
+import { ReverificationPasskey } from '@clerk/mosaic/features/reverification/steps/reverification-passkey';
+import { ReverificationPassword } from '@clerk/mosaic/features/reverification/steps/reverification-password';
+import { useRef, useState } from 'react';
+
+import type { StoryMeta } from '@/lib/types';
+
+export { default as __source } from './reverification.stories?raw';
+
+export const meta: StoryMeta = {
+  group: 'Reverification',
+  status: 'wip',
+  title: 'Reverification',
+  source: 'packages/mosaic/src/features/reverification/reverification.view.tsx',
+};
+
+const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+
+const methodPickerMessages = {
+  title: 'Use another method',
+  description: 'Facing issues? You can use any of these methods for verification.',
+  backButton: 'Back',
+  helpText: 'Don’t have any of these?',
+  helpButton: 'Get help',
+};
+
+const helpMessages = {
+  title: 'Get help',
+  description:
+    'If you have trouble verifying your account, email us and we will work with you to restore access as soon as possible.',
+  backButton: 'Back',
+  supportButton: 'Email support',
+};
+
+const allMethods: ReverificationMethod[] = [
+  { id: 'password', stage: 'first', strategy: 'password' },
+  { id: 'passkey', stage: 'first', strategy: 'passkey' },
+  {
+    id: 'email_code:idn_1',
+    stage: 'first',
+    strategy: 'email_code',
+    emailAddressId: 'idn_1',
+    identifier: 'a***@ex.com',
+  },
+  {
+    id: 'phone_code:pn_1',
+    stage: 'first',
+    strategy: 'phone_code',
+    phoneNumberId: 'pn_1',
+    identifier: '+1••••1',
+  },
+  { id: 'totp', stage: 'second', strategy: 'totp' },
+  { id: 'backup_code', stage: 'second', strategy: 'backup_code' },
+];
+
+function methodById(id: string): ReverificationMethod | undefined {
+  return allMethods.find(method => method.id === id);
+}
+
+function stepFor(id: string): ReverificationStep {
+  const strategy = methodById(id)?.strategy;
+  if (strategy === 'passkey') {
+    return 'passkey';
+  }
+  if (strategy === 'backup_code') {
+    return 'backup-code';
+  }
+  if (strategy === 'email_code' || strategy === 'phone_code' || strategy === 'totp') {
+    return 'otp';
+  }
+  return 'password';
+}
+
+function WorkingExample({ onComplete }: { onComplete: () => void }): JSX.Element {
+  const [step, setStep] = useState<ReverificationStep>('password');
+  const [direction, setDirection] = useState<-1 | 1>(1);
+  const [methodId, setMethodId] = useState('password');
+  const [value, setValue] = useState('');
+  const valueRef = useRef(value);
+  const [errorMessage, setErrorMessage] = useState<string>();
+  const [isPending, setIsPending] = useState(false);
+  const [canResend, setCanResend] = useState(true);
+  const [supportRequested, setSupportRequested] = useState(false);
+  const activeMethod = methodById(methodId);
+
+  const navigate = (next: ReverificationStep, nextDirection: -1 | 1) => {
+    setDirection(nextDirection);
+    setStep(next);
+    valueRef.current = '';
+    setValue('');
+    setErrorMessage(undefined);
+    setCanResend(true);
+  };
+
+  const onValueChange = (nextValue: string) => {
+    valueRef.current = nextValue;
+    setValue(nextValue);
+    setErrorMessage(undefined);
+  };
+
+  const submitPassword = async () => {
+    const password = valueRef.current;
+    if (!password.trim()) {
+      setErrorMessage('This field is required.');
+      return;
+    }
+    setIsPending(true);
+    await settleAfter(700);
+    setIsPending(false);
+    if (password.toLowerCase() === 'error') {
+      setErrorMessage('That password is incorrect. Try again.');
+      return;
+    }
+    setMethodId('totp');
+    navigate('otp', 1);
+  };
+
+  const submitOtp = async (code: string) => {
+    if (code.length !== 6) {
+      setErrorMessage('Enter the complete verification code.');
+      return;
+    }
+    setIsPending(true);
+    await settleAfter(700);
+    setIsPending(false);
+    if (code === '000000') {
+      setErrorMessage('That verification code is incorrect. Try again.');
+      return;
+    }
+    onComplete();
+  };
+
+  const submitBackupCode = async () => {
+    const code = valueRef.current;
+    if (!code.trim()) {
+      setErrorMessage('This field is required.');
+      return;
+    }
+    setIsPending(true);
+    await settleAfter(700);
+    setIsPending(false);
+    if (code.toLowerCase() === 'error') {
+      setErrorMessage('That backup code is incorrect. Try again.');
+      return;
+    }
+    onComplete();
+  };
+
+  const submitPasskey = async () => {
+    setIsPending(true);
+    await settleAfter(700);
+    setIsPending(false);
+    onComplete();
+  };
+
+  const selectMethod = async (id: string) => {
+    setIsPending(true);
+    await settleAfter(700);
+    setIsPending(false);
+    setMethodId(id);
+    navigate(stepFor(id), 1);
+  };
+
+  const onResend = () => {
+    if (!canResend || isPending) {
+      return;
+    }
+    void (async () => {
+      setIsPending(true);
+      await settleAfter(700);
+      setIsPending(false);
+      setCanResend(false);
+      await settleAfter(3_000);
+      setCanResend(true);
+    })();
+  };
+
+  const onSubmit = () => {
+    if (step === 'backup-code') {
+      void submitBackupCode();
+      return;
+    }
+    if (step === 'otp') {
+      void submitOtp(valueRef.current);
+      return;
+    }
+    if (step === 'passkey') {
+      void submitPasskey();
+      return;
+    }
+    void submitPassword();
+  };
+
+  return (
+    <>
+      <ReverificationView
+        step={step}
+        direction={direction}
+        value={value}
+        onValueChange={onValueChange}
+        errorMessage={errorMessage}
+        isPending={isPending}
+        onSubmit={onSubmit}
+        onShowMethods={() => navigate('method-picker', 1)}
+        onResend={onResend}
+        canResend={canResend}
+        onShowHelp={() => navigate('help', 1)}
+        onBack={() => {
+          if (step === 'help') {
+            navigate('method-picker', -1);
+            return;
+          }
+          if (step === 'method-picker') {
+            navigate(stepFor(methodId), -1);
+          }
+        }}
+        onEmailSupport={() => setSupportRequested(true)}
+        methods={allMethods.filter(method => method.id !== methodId)}
+        onSelectMethod={id => void selectMethod(id)}
+        otpChannel={activeMethod ? otpChannelFor(activeMethod.strategy) : undefined}
+      />
+      {supportRequested ? <p>Email support requested.</p> : null}
+    </>
+  );
+}
+
+export function Default(): JSX.Element {
+  const [runId, setRunId] = useState(0);
+  const [complete, setComplete] = useState(false);
+
+  if (complete) {
+    return (
+      <div>
+        <p>Reverification complete.</p>
+        <Button
+          type='button'
+          onClick={() => {
+            setComplete(false);
+            setRunId(current => current + 1);
+          }}
+        >
+          Restart
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <WorkingExample
+      key={runId}
+      onComplete={() => setComplete(true)}
+    />
+  );
+}
+
+function PasswordPanel({
+  isPending = false,
+  errorMessage,
+}: {
+  isPending?: boolean;
+  errorMessage?: string;
+}): JSX.Element {
+  const [value, setValue] = useState(errorMessage ? 'incorrect-password' : '');
+
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationPassword
+        messages={{
+          title: 'Verification required',
+          description: 'Enter your current password to continue',
+          fieldLabel: 'Password',
+          fieldPlaceholder: 'Enter your password',
+          secondaryActionLabel: 'Cancel',
+          primaryActionLabel: 'Continue',
+          pendingLabel: 'Verifying',
+        }}
+        value={value}
+        errorMessage={errorMessage}
+        isPending={isPending}
+        onValueChange={setValue}
+        onSubmit={() => undefined}
+        onCancel={() => setValue('')}
+      />
+    </Card.Root>
+  );
+}
+
+export function Password(): JSX.Element {
+  return <PasswordPanel />;
+}
+
+export function PasswordPending(): JSX.Element {
+  return <PasswordPanel isPending />;
+}
+
+export function PasswordError(): JSX.Element {
+  return <PasswordPanel errorMessage='That password is incorrect. Try again.' />;
+}
+
+function PasskeyPanel({
+  isPending = false,
+  errorMessage,
+}: {
+  isPending?: boolean;
+  errorMessage?: string;
+}): JSX.Element {
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationPasskey
+        messages={{
+          title: 'Use your passkey',
+          description:
+            'Using your passkey confirms your identity. Your device may ask for your fingerprint, face, or screen lock.',
+          secondaryActionLabel: 'Cancel',
+          primaryActionLabel: 'Use your passkey',
+          pendingLabel: 'Verifying',
+        }}
+        errorMessage={errorMessage}
+        isPending={isPending}
+        onSubmit={() => undefined}
+        onCancel={() => undefined}
+      />
+    </Card.Root>
+  );
+}
+
+export function Passkey(): JSX.Element {
+  return <PasskeyPanel />;
+}
+
+export function PasskeyPending(): JSX.Element {
+  return <PasskeyPanel isPending />;
+}
+
+export function PasskeyError(): JSX.Element {
+  return <PasskeyPanel errorMessage='We couldn’t verify that passkey. Try again.' />;
+}
+
+function OTPPanel({
+  description,
+  isPending = false,
+  errorMessage,
+  isResending = false,
+  renderResend = true,
+}: {
+  description: string;
+  isPending?: boolean;
+  errorMessage?: string;
+  isResending?: boolean;
+  renderResend?: boolean;
+}): JSX.Element {
+  const [value, setValue] = useState(isPending || errorMessage ? '123456' : '');
+
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationOTP
+        messages={{
+          title: 'Verification required',
+          description,
+          fieldLabel: 'Verification code',
+          secondaryActionLabel: 'Cancel',
+          primaryActionLabel: 'Continue',
+          pendingLabel: 'Verifying',
+        }}
+        value={value}
+        errorMessage={errorMessage}
+        isPending={isPending}
+        resend={
+          renderResend
+            ? {
+                label: isResending ? 'Sending a new code…' : 'Didn’t receive a code? Resend',
+                disabled: isResending,
+                onClick: () => setValue(''),
+              }
+            : undefined
+        }
+        onValueChange={setValue}
+        onSubmit={() => undefined}
+        onCancel={() => setValue('')}
+      />
+    </Card.Root>
+  );
+}
+
+export function OTP(): JSX.Element {
+  return <OTPPanel description='Enter the code sent to your phone to continue' />;
+}
+
+export function AuthenticatorOTP(): JSX.Element {
+  return (
+    <OTPPanel
+      description='Enter the code generated by your authenticator app to continue'
+      renderResend={false}
+    />
+  );
+}
+
+export function OTPPending(): JSX.Element {
+  return (
+    <OTPPanel
+      description='Enter the code sent to your phone to continue'
+      isPending
+    />
+  );
+}
+
+export function OTPError(): JSX.Element {
+  return (
+    <OTPPanel
+      description='Enter the code sent to your phone to continue'
+      errorMessage='That verification code is incorrect. Try again.'
+    />
+  );
+}
+
+export function OTPResending(): JSX.Element {
+  return (
+    <OTPPanel
+      description='Enter the code sent to your phone to continue'
+      isResending
+    />
+  );
+}
+
+function BackupCodePanel({
+  isPending = false,
+  errorMessage,
+}: {
+  isPending?: boolean;
+  errorMessage?: string;
+}): JSX.Element {
+  const [value, setValue] = useState(errorMessage ? 'invalid-code' : '');
+
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationBackupCode
+        messages={{
+          title: 'Enter a backup code',
+          description: 'Enter the backup code you received when setting up two-step authentication',
+          fieldLabel: 'Backup code',
+          secondaryActionLabel: 'Cancel',
+          primaryActionLabel: 'Continue',
+          pendingLabel: 'Verifying',
+        }}
+        value={value}
+        errorMessage={errorMessage}
+        isPending={isPending}
+        onValueChange={setValue}
+        onSubmit={() => undefined}
+        onCancel={() => setValue('')}
+      />
+    </Card.Root>
+  );
+}
+
+export function BackupCode(): JSX.Element {
+  return <BackupCodePanel />;
+}
+
+export function BackupCodePending(): JSX.Element {
+  return <BackupCodePanel isPending />;
+}
+
+export function BackupCodeError(): JSX.Element {
+  return <BackupCodePanel errorMessage='That backup code is incorrect. Try again.' />;
+}
+
+export function MethodPicker(): JSX.Element {
+  const [pendingMethodId, setPendingMethodId] = useState<string>();
+
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationMethodPicker
+        messages={methodPickerMessages}
+        methods={[
+          { id: 'password', label: 'Continue with your password', icon: 'security-lock-square' },
+          { id: 'phone', label: 'Send SMS code to ••• ••• 1234', icon: 'security-phone' },
+          { id: 'totp', label: 'Use your authenticator app', icon: 'security-lock-square' },
+          { id: 'passkey', label: 'Use your passkey', icon: 'security-passkey' },
+        ]}
+        pendingMethodId={pendingMethodId}
+        onSelect={setPendingMethodId}
+        onHelp={() => undefined}
+        onBack={() => setPendingMethodId(undefined)}
+      />
+    </Card.Root>
+  );
+}
+
+export function MethodPickerPending(): JSX.Element {
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationMethodPicker
+        messages={methodPickerMessages}
+        methods={[
+          { id: 'password', label: 'Continue with your password', icon: 'security-lock-square' },
+          { id: 'phone', label: 'Send SMS code to ••• ••• 1234', icon: 'security-phone' },
+          { id: 'totp', label: 'Use your authenticator app', icon: 'security-lock-square' },
+          { id: 'passkey', label: 'Use your passkey', icon: 'security-passkey' },
+        ]}
+        pendingMethodId='phone'
+        onSelect={() => undefined}
+        onHelp={() => undefined}
+        onBack={() => undefined}
+      />
+    </Card.Root>
+  );
+}
+
+export function Help(): JSX.Element {
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationHelp
+        messages={helpMessages}
+        onEmailSupport={() => undefined}
+        onBack={() => undefined}
+      />
+    </Card.Root>
+  );
+}

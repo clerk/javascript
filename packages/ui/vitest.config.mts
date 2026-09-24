@@ -1,4 +1,3 @@
-import stylex from '@stylexjs/unplugin/vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 import { defineConfig } from 'vitest/config';
@@ -27,14 +26,7 @@ function viteSvgMockPlugin() {
 }
 
 export default defineConfig({
-  plugins: [
-    // Compile StyleX (`defineVars`/`create`/`props`) in tests so migrated Mosaic
-    // components return real classNames. `dev: true` emits readable, debuggable
-    // class names; the Button tests assert class/attr presence, not computed styles.
-    stylex({ dev: true, unstable_moduleResolution: { type: 'commonJS', rootDir: uiPath } }),
-    react({ jsxRuntime: 'automatic', jsxImportSource: '@emotion/react' }),
-    viteSvgMockPlugin(),
-  ],
+  plugins: [react({ jsxRuntime: 'automatic', jsxImportSource: '@emotion/react' }), viteSvgMockPlugin()],
   define: {
     __BUILD_DISABLE_RHC__: JSON.stringify(false),
     PACKAGE_NAME: JSON.stringify('@clerk/ui'),
@@ -54,7 +46,7 @@ export default defineConfig({
     globals: false,
     include: ['**/*.test.?(c|m)[jt]s?(x)', '**/*.spec.?(c|m)[jt]s?(x)'],
     exclude: ['node_modules/**', 'dist/**'],
-    setupFiles: '../clerk-js/vitest.setup.mts',
+    setupFiles: ['../clerk-js/vitest.setup.mts', './vitest.setup.mts'],
     testTimeout: 5000,
   },
   resolve: {

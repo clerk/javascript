@@ -16,8 +16,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Impersona
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
 
-    user1 = u.services.users.createFakeUser();
-    user2 = u.services.users.createFakeUser();
+    user1 = u.services.users.createFakeUser(test);
+    user2 = u.services.users.createFakeUser(test);
 
     user1Created = await u.services.users.createBapiUser(user1);
     user2Created = await u.services.users.createBapiUser(user2);

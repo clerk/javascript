@@ -33,6 +33,7 @@ import { useConfigureSSO } from '../../../ConfigureSSOContext';
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
+import { ActiveConnectionAlert } from '../shared/ActiveConnectionAlert';
 import {
   IdentityProviderConfigurationModes,
   type SamlIdpConfigurationMode,
@@ -817,6 +818,7 @@ const SamlMicrosoftIdentityProviderMetadataStep = (): JSX.Element => {
             }}
           />
           <IdentityProviderConfigurationForm {...formProps} />
+          <ActiveConnectionAlert />
         </Step.Section>
       </Step.Body>
 

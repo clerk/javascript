@@ -16,10 +16,10 @@ testAgainstRunningApps({
 
   test.beforeAll(async () => {
     const m = createTestUtils({ app });
-    fakeAdmin = m.services.users.createFakeUser();
+    fakeAdmin = m.services.users.createFakeUser(test);
     const admin = await m.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await m.services.users.createFakeOrganization(admin.id);
-    fakeViewer = m.services.users.createFakeUser();
+    fakeViewer = m.services.users.createFakeUser(test);
     const viewer = await m.services.users.createBapiUser(fakeViewer);
     await m.services.clerk.organizations.createOrganizationMembership({
       organizationId: fakeOrganization.organization.id,
@@ -42,8 +42,6 @@ testAgainstRunningApps({
     await u.po.signIn.waitForMounted();
     await u.po.signIn.signInWithEmailAndInstantPassword({ email: fakeAdmin.email, password: fakeAdmin.password });
     await u.po.expect.toBeSignedIn();
-    const jwtVersion = await page.evaluate(() => window.Clerk.session?.lastActiveToken?.jwt?.claims?.v);
-    expect(jwtVersion).toBe(app.env.id === 'withBillingStaging' ? 2 : undefined);
 
     await u.po.organizationSwitcher.goTo();
     await u.po.organizationSwitcher.waitForMounted();

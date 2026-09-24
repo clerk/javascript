@@ -1,3 +1,4 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { __experimental_useCheckout as useCheckout } from '@clerk/shared/react';
 import type { BillingPaymentMethodResource, ConfirmCheckoutParams, RemoveFunctions } from '@clerk/shared/types';
 import { useMemo, useState } from 'react';
@@ -10,7 +11,7 @@ import { LineItems } from '@/ui/elements/LineItems';
 import { SegmentedControl } from '@/ui/elements/SegmentedControl';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Tooltip } from '@/ui/elements/Tooltip';
-import { toNegativeAmount } from '@/ui/utils/billing';
+import { getDiscountDescription, toNegativeAmount } from '@/ui/utils/billing';
 import {
   getCheckoutSeatUnitTotal,
   getIncludedSeatsUnitTotalTier,
@@ -28,12 +29,14 @@ import {
   descriptors,
   Flex,
   Form,
+  Icon,
+  Input,
   localizationKeys,
   Spinner,
   Text,
   useLocalizations,
 } from '../../customizables';
-import { ChevronUpDown, InformationCircle } from '../../icons';
+import { ChevronUpDown, Close, InformationCircle } from '../../icons';
 import type { PropsOfComponent, ThemableCssProp } from '../../styledSystem';
 import * as AddPaymentMethod from '../PaymentMethods/AddPaymentMethod';
 import { PaymentMethodRow } from '../PaymentMethods/PaymentMethodRow';
@@ -44,6 +47,170 @@ type PaymentMethodSource = 'existing' | 'new';
 const capitalize = (name: string) => name[0].toUpperCase() + name.slice(1);
 
 const HIDDEN_INPUT_NAME = 'payment_method_id';
+
+const promoCodeErrorMessage = (error: unknown) => {
+  if (isClerkAPIResponseError(error)) {
+    return error.errors[0]?.longMessage || error.errors[0]?.message;
+  }
+  return error instanceof Error ? error.message : undefined;
+};
+
+const useUpdatePromoCode = () => {
+  const { checkout } = useCheckout();
+  const { t } = useLocalizations();
+  const [error, setError] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const updatePromoCode = async (value: string) => {
+    setError(undefined);
+    setIsLoading(true);
+    const result = await checkout.update({ promoCode: value });
+    setIsLoading(false);
+
+    if (result.error) {
+      setError(promoCodeErrorMessage(result.error) || t(localizationKeys('unstable__errors.form_param_value_invalid')));
+      return false;
+    }
+
+    return true;
+  };
+
+  return { error, isLoading, setError, updatePromoCode };
+};
+
+const AppliedPromoCodeRow = () => {
+  const { checkout } = useCheckout();
+  const { $, t } = useLocalizations();
+  const { isLoading, updatePromoCode } = useUpdatePromoCode();
+  const discount = checkout.status === 'needs_confirmation' ? checkout.totals.discounts?.discount : undefined;
+  const appliedPromoCode = discount?.promoCode;
+
+  if (!discount || !appliedPromoCode) {
+    return null;
+  }
+
+  return (
+    <LineItems.Group
+      variant='primary'
+      borderTop
+    >
+      <LineItems.Title
+        title={appliedPromoCode}
+        description={
+          checkout.planPeriod
+            ? getDiscountDescription(discount, discount.cyclesRemaining, checkout.planPeriod, { $, t })
+            : undefined
+        }
+        badge={
+          <Button
+            elementDescriptor={descriptors.checkoutFormPromoCodeRemoveButton}
+            type='button'
+            variant='ghost'
+            colorScheme='neutral'
+            aria-label={t(localizationKeys('billing.checkout.removePromoCode'))}
+            isDisabled={isLoading}
+            onClick={() => void updatePromoCode('')}
+            sx={{
+              padding: 0,
+              position: 'relative',
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                inset: '-18px',
+              },
+            }}
+          >
+            <Icon
+              icon={Close}
+              size='xs'
+            />
+          </Button>
+        }
+      />
+      <LineItems.Description
+        text={$(toNegativeAmount(discount.amount))}
+        descriptionInnerAlignment='start'
+      />
+    </LineItems.Group>
+  );
+};
+
+const PromoCodeInput = () => {
+  const { checkout } = useCheckout();
+  const { t } = useLocalizations();
+  const [promoCode, setPromoCode] = useState('');
+  const { error, isLoading, setError, updatePromoCode } = useUpdatePromoCode();
+
+  if (checkout.status !== 'needs_confirmation' || checkout.totals.discounts?.discount) {
+    return null;
+  }
+
+  const errorId = 'checkout-promo-code-error';
+
+  return (
+    <Box
+      elementDescriptor={descriptors.checkoutFormPromoCodeRoot}
+      sx={theme => ({
+        padding: theme.space.$4,
+        borderBottomWidth: theme.borderWidths.$normal,
+        borderBottomStyle: theme.borderStyles.$solid,
+        borderBottomColor: theme.colors.$borderAlpha100,
+      })}
+    >
+      <Box
+        as='form'
+        onSubmit={event => {
+          event.preventDefault();
+          void updatePromoCode(promoCode.trim()).then(success => {
+            if (success) {
+              setPromoCode('');
+            }
+          });
+        }}
+        sx={theme => ({
+          display: 'grid',
+          gridTemplateColumns: 'minmax(0, 1fr) auto',
+          gap: theme.space.$2,
+        })}
+      >
+        <Input
+          elementDescriptor={descriptors.checkoutFormPromoCodeInput}
+          aria-label={t(localizationKeys('billing.checkout.promoCodePlaceholder'))}
+          aria-describedby={error ? errorId : undefined}
+          hasError={Boolean(error)}
+          isDisabled={isLoading}
+          placeholder={t(localizationKeys('billing.checkout.promoCodePlaceholder'))}
+          value={promoCode}
+          onChange={event => {
+            setPromoCode(event.target.value);
+            setError(undefined);
+          }}
+        />
+        <Button
+          elementDescriptor={descriptors.checkoutFormPromoCodeApplyButton}
+          type='submit'
+          variant='bordered'
+          colorScheme='secondary'
+          isDisabled={!promoCode.trim()}
+          isLoading={isLoading}
+          localizationKey={localizationKeys('billing.checkout.applyPromoCode')}
+        />
+        {error ? (
+          <Text
+            elementDescriptor={descriptors.checkoutFormPromoCodeErrorText}
+            id={errorId}
+            role='alert'
+            variant='caption'
+            colorScheme='danger'
+            sx={{ gridColumn: '1 / -1' }}
+          >
+            {error}
+          </Text>
+        ) : null}
+      </Box>
+    </Box>
+  );
+};
 
 export const CheckoutForm = withCardStateProvider(() => {
   const { checkout } = useCheckout();
@@ -172,6 +339,8 @@ export const CheckoutForm = withCardStateProvider(() => {
             </LineItems.Group>
           )}
 
+          <AppliedPromoCodeRow />
+
           {!!freeTrialEndsAt && !!plan.freeTrialDays && totals.totalDueAfterFreeTrial ? (
             <LineItems.Group variant='tertiary'>
               <LineItems.Title
@@ -206,6 +375,8 @@ export const CheckoutForm = withCardStateProvider(() => {
           )}
         </LineItems.Root>
       </Box>
+
+      <PromoCodeInput />
 
       {showDowngradeInfo && (
         <Box

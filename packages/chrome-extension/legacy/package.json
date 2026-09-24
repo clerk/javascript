@@ -1,0 +1,5 @@
+{
+  "main": "../dist/cjs/legacy.js",
+  "module": "../dist/esm/legacy.js",
+  "types": "../dist/types/legacy.d.ts"
+}

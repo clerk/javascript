@@ -1,9 +1,11 @@
+import { VIRTUAL_ROUTER_BASE_PATH } from '@clerk/shared/internal/clerk-js/url';
 import { useClerk } from '@clerk/shared/react';
 import React, { useEffect } from 'react';
 
 import { useClerkModalStateParams } from '../hooks';
 import { BaseRouter } from './BaseRouter';
-export const VIRTUAL_ROUTER_BASE_PATH = 'CLERK-ROUTER/VIRTUAL';
+
+export { VIRTUAL_ROUTER_BASE_PATH };
 
 interface VirtualRouterProps {
   startPath: string;

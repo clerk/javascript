@@ -1,26 +1,35 @@
-/** @jsxImportSource @emotion/react */
-import { OrganizationProfileGeneralPanelView } from '@clerk/ui/mosaic/organization/organization-profile-general-panel-view';
+import { OrganizationProfileGeneralPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-general-panel.view';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { Default as OrganizationProfileDeleteSectionDemo } from './organization-profile-delete-section.stories';
-import { Default as OrganizationProfileDomainsSectionDemo } from './organization-profile-domains-section.stories';
-import { Default as OrganizationProfileLeaveSectionDemo } from './organization-profile-leave-section.stories';
-import { Default as OrganizationProfileProfileSectionDemo } from './organization-profile-profile-section.stories';
+import { useOrganizationProfileFixture } from './fixtures/organization-profile';
+
+export { default as __source } from './organization-profile-general-panel.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'Organization',
+  group: 'Organization Profile',
+  status: 'wip',
+  substatus: 'needs wire-up',
   title: 'OrganizationProfileGeneralPanel',
-  source: 'packages/ui/src/mosaic/organization/organization-profile-general-panel.tsx',
+  label: 'General panel',
+  navigation: { category: 'Panels' },
+  source: 'packages/mosaic/src/features/organization-profile/organization-profile-general-panel.view.tsx',
 };
 
 export function Default() {
+  const { general } = useOrganizationProfileFixture();
+  return <OrganizationProfileGeneralPanelView {...general} />;
+}
+
+export function ReadOnly() {
+  const { general } = useOrganizationProfileFixture();
   return (
     <OrganizationProfileGeneralPanelView
-      profile={<OrganizationProfileProfileSectionDemo />}
-      domains={<OrganizationProfileDomainsSectionDemo />}
-      leaveOrganization={<OrganizationProfileLeaveSectionDemo />}
-      deleteOrganization={<OrganizationProfileDeleteSectionDemo />}
+      name={general.name}
+      slug={general.slug}
+      memberCount={general.memberCount}
+      imageUrl={general.imageUrl}
+      hasImage={general.hasImage}
     />
   );
 }

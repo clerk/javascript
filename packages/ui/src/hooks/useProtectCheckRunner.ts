@@ -1,9 +1,11 @@
 import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
+import { useClerk } from '@clerk/shared/react';
 import type { ProtectCheckResource } from '@clerk/shared/types';
 import React from 'react';
 import { flushSync } from 'react-dom';
 
+import { useEnvironment } from '@/ui/contexts/EnvironmentContext';
 import { useCardState } from '@/ui/elements/contexts';
 import { handleError } from '@/ui/utils/errorHandler';
 
@@ -16,9 +18,6 @@ import { handleError } from '@/ui/utils/errorHandler';
  * being decided with the clerk_go team; this cap is the defensive floor until that lands.
  */
 const MAX_EXPIRED_RELOADS = 2;
-
-/** Upper bound on how long we wait for the challenge SDK to settle before failing loud. */
-const PROTECT_CHECK_SCRIPT_TIMEOUT_MS = 60_000;
 
 export interface ProtectCheckRunnerParams<TResource> {
   /**
@@ -67,6 +66,26 @@ export interface ProtectCheckRunner {
  */
 export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParams<TResource>): ProtectCheckRunner {
   const card = useCardState();
+
+  // Override for the module-LOAD bound only (see `executeProtectCheck`), resolved loader first
+  // and instance second: a loader being rolled out gradually can carry its own value without
+  // changing anything for browsers still on the loader it replaces. Undefined at both levels
+  // leaves the SDK default in force. Read here rather than inside the effect so the effect keeps
+  // depending on primitives.
+  // Older clerk-js versions omit this getter; undefined preserves the instance/default fallback.
+  const loaderTimeoutMs = useClerk().__internal_protectChallengeLoadTimeoutMs;
+  const instanceTimeoutMs = useEnvironment().protectConfig?.challenge_load_timeout_ms;
+  const loadTimeoutMs = loaderTimeoutMs ?? instanceTimeoutMs;
+
+  // `handleError` re-throws what it does not recognise, and this runner awaits caller code that
+  // raises plain errors (a transient fetch failure, an OAuth continuation that did not complete).
+  const reportError = (err: any) => {
+    try {
+      handleError(err, [], card.setError);
+    } catch {
+      card.setError('Unable to complete action at this time. If the problem persists please contact support.');
+    }
+  };
 
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const isRunningRef = React.useRef(false);
@@ -186,7 +205,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
           // re-triggers this effect (keyed on the token), which then runs it.
         } catch (err: any) {
           if (mountedRef.current) {
-            handleError(err, [], card.setError);
+            reportError(err);
           }
         } finally {
           if (mountedRef.current) {
@@ -217,7 +236,6 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     setIsRunning(true);
 
     const runChallenge = async () => {
-      let timeoutId: ReturnType<typeof setTimeout> | undefined;
       try {
         // Load the Protect SDK loader lazily, gated on the same compile-time flag as the
         // fail-closed guard above. In no-RHC builds `__BUILD_DISABLE_RHC__` is `true`, so this
@@ -228,20 +246,19 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
           return;
         }
         const { executeProtectCheck } = await import('@clerk/shared/internal/clerk-js/protectCheck');
-        const proofToken = await Promise.race([
-          executeProtectCheck(protectCheck, container, { signal: abortController.signal, setWidgetVisible }),
-          new Promise<never>((_, reject) => {
-            timeoutId = setTimeout(() => {
-              // Stop the (possibly hung) SDK and surface a retryable timeout error.
-              abortController.abort();
-              reject(
-                new ClerkRuntimeError('Protect verification timed out', {
-                  code: ERROR_CODES.PROTECT_CHECK_TIMED_OUT,
-                }),
-              );
-            }, PROTECT_CHECK_SCRIPT_TIMEOUT_MS);
-          }),
-        ]);
+        // Deliberately unraced. `executeProtectCheck` bounds LOADING the challenge module and
+        // nothing after it: once control passes to the challenge, the challenge owns its own
+        // deadline. We cannot know an honest duration for it — the challenge type is chosen
+        // server-side, per decision, long after this bundle shipped, and its work may be waiting
+        // on a person or moving a server-chosen number of bytes over a link we know nothing
+        // about. The wall that used to be here aborted valid challenges and reported them to the
+        // user as a timeout, and since a re-run restarts the work from the beginning, retrying
+        // could never win on any connection slow enough to trip it in the first place.
+        const proofToken = await executeProtectCheck(protectCheck, container, {
+          signal: abortController.signal,
+          setWidgetVisible,
+          loadTimeoutMs,
+        });
         if (cancelled) {
           return;
         }
@@ -274,11 +291,8 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
         if (cancelled) {
           return;
         }
-        handleError(err, [], card.setError);
+        reportError(err);
       } finally {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
         if (!cancelled) {
           isRunningRef.current = false;
           setIsRunning(false);

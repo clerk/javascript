@@ -76,12 +76,8 @@ test.describe('root and subdomain production apps @sessions', () => {
       });
 
       const u = createTestUtils({ app: apps[0].app });
-      fakeUser = u.services.users.createFakeUser();
-      try {
-        await u.services.users.createBapiUser(fakeUser);
-      } catch (error) {
-        console.error(error);
-      }
+      fakeUser = u.services.users.createFakeUser(test);
+      await u.services.users.createBapiUser(fakeUser);
     });
 
     test.afterAll(async () => {
@@ -214,7 +210,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       });
 
       const u = apps.map(a => createTestUtils({ app: a.app }));
-      fakeUsers = await Promise.all(u.map(u => u.services.users.createFakeUser()));
+      fakeUsers = await Promise.all(u.map(u => u.services.users.createFakeUser(test)));
       await Promise.all([
         await u[0].services.users.createBapiUser(fakeUsers[0]),
         await u[1].services.users.createBapiUser(fakeUsers[1]),
@@ -346,7 +342,7 @@ test.describe('root and subdomain production apps @sessions', () => {
       });
 
       const u = apps.map(a => createTestUtils({ app: a.app }));
-      fakeUsers = await Promise.all(u.map(u => u.services.users.createFakeUser()));
+      fakeUsers = await Promise.all(u.map(u => u.services.users.createFakeUser(test)));
       await Promise.all([
         await u[0].services.users.createBapiUser(fakeUsers[0]),
         await u[1].services.users.createBapiUser(fakeUsers[1]),

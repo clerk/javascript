@@ -66,6 +66,7 @@ export const application = (
   const stdoutFilePath = path.resolve(appDirPath, `e2e.${now}.log`);
   const stderrFilePath = path.resolve(appDirPath, `e2e.${now}.err.log`);
   let buildOutput = '';
+  let devOutput = '';
   let serveOutput = '';
 
   const self = {
@@ -105,7 +106,15 @@ export const application = (
         await run('pnpm list @clerk/* --depth 100', { cwd: appDirPath, log: clerkPackagesLog });
       }
     },
-    dev: async (opts: { port?: number; manualStart?: boolean; detached?: boolean; serverUrl?: string } = {}) => {
+    dev: async (
+      opts: {
+        port?: number;
+        manualStart?: boolean;
+        detached?: boolean;
+        serverUrl?: string;
+        acceptAnyResponse?: boolean;
+      } = {},
+    ) => {
       const log = logger.child({ prefix: 'dev' }).info;
       const port = opts.port || (await getPort());
       const runtimeServerUrl = resolveServerUrl(opts.serverUrl, serverUrl, port);
@@ -125,11 +134,21 @@ export const application = (
         detached: opts.detached,
         stdout: opts.detached ? fs.openSync(stdoutFilePath, 'a') : undefined,
         stderr: opts.detached ? fs.openSync(stderrFilePath, 'a') : undefined,
-        log: opts.detached ? undefined : log,
+        log: opts.detached
+          ? undefined
+          : (msg: string) => {
+              devOutput += `\n${msg}`;
+              log(msg);
+            },
       });
 
       const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
-      await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
+      await waitForServer(runtimeServerUrl, {
+        log,
+        maxAttempts: Infinity,
+        shouldExit,
+        acceptAnyResponse: opts.acceptAnyResponse,
+      });
       log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
       cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       state.serverUrl = runtimeServerUrl;
@@ -185,6 +204,9 @@ export const application = (
     },
     get buildOutput() {
       return buildOutput;
+    },
+    get devOutput() {
+      return devOutput;
     },
     get serveOutput() {
       return serveOutput;

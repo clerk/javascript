@@ -25,6 +25,7 @@ import type { OAuthTransport } from './oauthTransport';
 import type { OrganizationResource } from './organization';
 import type { OrganizationCustomRoleKey } from './organizationMembership';
 import type { ClerkPaginationParams } from './pagination';
+import type { ProtectAssertion } from './protectConfig';
 import type {
   AfterMultiSessionSingleSignOutUrl,
   AfterSignOutUrl,
@@ -294,6 +295,20 @@ export interface Clerk {
   __internal_getOption<K extends keyof ClerkOptions>(key: K): ClerkOptions[K];
 
   /**
+   * Sets the Protect assertion attached to subsequent sign-in and sign-up requests, replacing
+   * any value supplied via the `protectAssertion` option. Pass `undefined` to clear it.
+   *
+   * Use this when the token is not available at `Clerk.load()` time — for example when your
+   * app fetches one from your backend after the page has started. Passing a function instead
+   * of a string has it re-read for each request, which is what you want if the token is
+   * refreshed while the page is open.
+   *
+   * @param assertion - A token minted by your backend, a function returning one, or
+   * `undefined`.
+   */
+  setProtectAssertion: (assertion?: ProtectAssertion) => void;
+
+  /**
    * @internal
    * Primary `window.location.href` navigation chokepoint for `@clerk/clerk-js` and `@clerk/ui`.
    * By default the resolved URL is validated against the customer-supplied
@@ -316,6 +331,16 @@ export interface Clerk {
    * @internal
    */
   __internal_moduleManager: ModuleManager | undefined;
+
+  /**
+   * The verification-module load timeout asked for by the loader this browser was assigned, or
+   * undefined when it asked for nothing. The assignment is randomized per page load, so it cannot
+   * be recomputed from the environment config; callers fall back to the instance-wide value on
+   * that config, and then to the SDK default.
+   *
+   * @internal
+   */
+  __internal_protectChallengeLoadTimeoutMs?: number;
 
   frontendApi: string;
 
@@ -792,6 +817,24 @@ export interface Clerk {
   __internal_unmountConfigureSSO: (targetNode: HTMLDivElement) => void;
 
   /**
+   * Mount a configure Directory Sync component at the target element.
+   *
+   * @param targetNode - Target to mount the ConfigureDirectorySync component.
+   * @param props - Configuration parameters.
+   * @hidden
+   */
+  __internal_mountConfigureDirectorySync: (targetNode: HTMLDivElement, props?: ConfigureSSOProps) => void;
+
+  /**
+   * Unmount a configure Directory Sync component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode - Target node to unmount the ConfigureDirectorySync component from.
+   * @hidden
+   */
+  __internal_unmountConfigureDirectorySync: (targetNode: HTMLDivElement) => void;
+
+  /**
    * Mounts a OAuth consent component at the target element.
    *
    * @param targetNode - Target node to mount the OAuth consent component.
@@ -822,6 +865,23 @@ export interface Clerk {
    * @param targetNode - Target node to unmount the OAuth consent component from.
    */
   unmountOAuthConsent: (targetNode: HTMLDivElement) => void;
+
+  /**
+   * Mounts an OAuth device verification component at the target element.
+   *
+   * @param targetNode - Target node to mount the OAuth device verification component.
+   * @param props - OAuth device verification configuration parameters.
+   * @internal
+   */
+  __internal_mountOAuthDeviceVerification: (targetNode: HTMLDivElement, props?: OAuthDeviceVerificationProps) => void;
+
+  /**
+   * Unmounts an OAuth device verification component from the target element.
+   * If there is no component mounted at the target node, this is a noop.
+   *
+   * @internal
+   */
+  __internal_unmountOAuthDeviceVerification: (targetNode: HTMLDivElement) => void;
 
   /**
    * Mounts a TaskChooseOrganization component at the target element.
@@ -1091,7 +1151,7 @@ export interface Clerk {
   redirectToTasks(opts?: TasksRedirectOptions): Promise<unknown>;
 
   /**
-   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/objects/clerk#authenticate-with-google-one-tap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
+   * Completes a Google One Tap redirection flow started by [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/objects/clerk#authenticatewithgoogleonetap). This method should be called after the user is redirected back from visiting the Google One Tap prompt.
    *
    * @param signInOrUp - The resource returned from the initial `authenticateWithGoogleOneTap()` call (before redirect).
    * @param params - Additional props that define where the user will be redirected to at the end of a successful Google One Tap flow.
@@ -1137,6 +1197,22 @@ export interface Clerk {
    */
   handleRedirectCallback: (
     params: HandleOAuthCallbackParams | HandleSamlCallbackParams,
+    customNavigate?: (to: string) => Promise<unknown>,
+  ) => Promise<unknown>;
+
+  /**
+   * Resumes redirect-callback routing after a verification challenge has been cleared, from
+   * a page that is no longer the callback route.
+   *
+   * A challenge can interrupt a callback partway through routing, on a step whose
+   * continuation is not one of the interactive sign-in cards — an OAuth sign-in that has to
+   * become a sign-up, for instance. Once the challenge clears, the flow has to pick up where
+   * the callback left off rather than start over.
+   *
+   * @internal
+   */
+  __internal_resumeAfterProtectCheck: (
+    params?: ResumeAfterProtectCheckParams,
     customNavigate?: (to: string) => Promise<unknown>,
   ) => Promise<unknown>;
 
@@ -1325,9 +1401,42 @@ export type HandleOAuthCallbackParams = TransferableOption &
       redirectUrl: string;
       decorateUrl: (url: string) => string;
     }) => Promise<unknown>;
+    /**
+     * Internal navigation hook used by Clerk UI to keep intermediate OAuth callback navigations
+     * (continue, factor steps, sign-in/sign-up switches) inside the component's own router when the
+     * callback completes in-process (transport flows). Not set by the web redirect/popup paths.
+     *
+     * @internal
+     */
+    __internal_navigate?: (to: string) => Promise<unknown>;
   };
 
 export type HandleSamlCallbackParams = HandleOAuthCallbackParams;
+
+/**
+ * The continuation a caller observed on the resource *before* it ran a verification
+ * challenge. Supplied explicitly, because resolving a challenge re-serializes the sign-in
+ * and sign-up resources and can drop the marker the router would otherwise read back off
+ * them.
+ *
+ * @internal
+ */
+export type ProtectCheckContinuation = 'transfer_to_sign_up';
+
+/**
+ * Params for resuming a redirect callback that a Protect challenge interrupted.
+ *
+ * @internal
+ */
+export type ResumeAfterProtectCheckParams = HandleOAuthCallbackParams & {
+  /**
+   * What the flow was doing before the challenge interrupted it. See
+   * {@link ProtectCheckContinuation}.
+   *
+   * @internal
+   */
+  continuation?: ProtectCheckContinuation;
+};
 
 /**
  * A function used to navigate to a given URL after certain steps in the Clerk processes.
@@ -1426,6 +1535,18 @@ export type ClerkOptions = ClerkOptionsNavigation &
      * An object to localize your components. Will only affect [Clerk Components](https://clerk.com/docs/reference/components/overview) and not [Account Portal](https://clerk.com/docs/guides/account-portal/overview) pages.
      */
     localization?: LocalizationResource;
+    /**
+     * A Clerk Protect assertion — a short-lived, signed token you mint from your own backend
+     * with the Clerk Backend API — carrying key/value pairs your Protect rules can read. Clerk
+     * attaches it to sign-in and sign-up requests.
+     *
+     * Pass a string if you already have one, or a function to have it re-read for each request.
+     * Prefer the function when a page can outlive the token: assertions are short-lived by
+     * design, and a string captured here stops applying once it expires.
+     *
+     * Can also be set later with `Clerk.setProtectAssertion()`.
+     */
+    protectAssertion?: ProtectAssertion;
     /**
      * Indicates whether Clerk should poll against Clerk's backend every 5 minutes.
      *
@@ -1881,6 +2002,7 @@ export type __internal_AttemptToEnableEnvironmentSettingParams = {
     | 'CreateOrganization'
     | 'TaskChooseOrganization'
     | 'ConfigureSSO'
+    | 'ConfigureDirectorySync'
     | 'useOrganizationList'
     | 'useOrganization';
   onClose?: () => void;
@@ -2684,6 +2806,13 @@ export type OAuthConsentProps = {
   onDeny?: () => void;
 };
 
+export type OAuthDeviceVerificationProps = {
+  /**
+   * Customization options to fully match the Clerk component to your own brand.
+   */
+  appearance?: ClerkAppearanceTheme;
+};
+
 /** @deprecated Use OAuthConsentProps instead. */
 export type __internal_OAuthConsentProps = OAuthConsentProps;
 
@@ -3074,7 +3203,7 @@ export type IsomorphicClerkOptions = Without<ClerkOptions, 'isSatellite'> & {
    */
   __internal_clerkUIVersion?: string;
   /**
-   * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/last-active?path=api-keys) page in the Clerk Dashboard.
+   * The Clerk Publishable Key for your instance. This can be found on the [API keys](https://dashboard.clerk.com/~/api-keys) page in the Clerk Dashboard.
    */
   publishableKey: string;
   /**

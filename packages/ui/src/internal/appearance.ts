@@ -233,6 +233,11 @@ export type ElementsConfig = {
   alternativeMethodsBlockButtonArrow: WithOptions<OAuthProvider | Web3Provider | PhoneCodeChannel>;
 
   checkoutFormLineItemsRoot: WithOptions;
+  checkoutFormPromoCodeRoot: WithOptions;
+  checkoutFormPromoCodeInput: WithOptions;
+  checkoutFormPromoCodeApplyButton: WithOptions;
+  checkoutFormPromoCodeErrorText: WithOptions;
+  checkoutFormPromoCodeRemoveButton: WithOptions;
   checkoutFormElementsRoot: WithOptions;
 
   checkoutSuccessRoot: WithOptions;
@@ -375,6 +380,19 @@ export type ElementsConfig = {
   organizationProfileSecuritySsoDetailRowChip: WithOptions<string>;
   organizationProfileSecuritySsoDetailRowLink: WithOptions<string>;
   organizationProfileSecuritySsoProviderIcon: WithOptions;
+  organizationProfileSecuritySsoConnectionRow: WithOptions;
+  organizationProfileSecuritySsoConnectionPage: WithOptions;
+  organizationProfileSecuritySsoBypassDescription: WithOptions;
+  organizationProfileSecuritySsoBypassCountLabel: WithOptions;
+  organizationProfileSecuritySsoBypassCountBadge: WithOptions;
+  organizationProfileSecuritySsoBypassPage: WithOptions;
+  organizationProfileSecuritySsoBypassSearchInput: WithOptions;
+  organizationProfileSecuritySsoBypassSearchInputIcon: WithOptions;
+  organizationProfileSecuritySsoBypassAddButton: WithOptions;
+  organizationProfileSecuritySsoBypassEmailInput: WithOptions;
+  organizationProfileSecuritySsoBypassRoleWarning: WithOptions;
+  organizationProfileSecuritySsoBypassFailure: WithOptions;
+  organizationProfileSecuritySsoBypassBulkResult: WithOptions;
 
   organizationListPreviewItems: WithOptions;
   organizationListPreviewItem: WithOptions;
@@ -687,6 +705,7 @@ export type ElementsConfig = {
   enterpriseConnectionButton: WithOptions;
   enterpriseConnectionButtonText: WithOptions;
 
+  configureSSOConnectionScopeBanner: WithOptions;
   configureSSOHeader: WithOptions;
   configureSSOHeaderBackButton: WithOptions;
   configureSSOMobileNavbar: WithOptions;
@@ -722,7 +741,8 @@ export type ElementsConfig = {
   configureSSOVerifyDomainList: WithOptions;
   configureSSOVerifyDomainSuggestion: WithOptions;
   configureSSOVerifyDomainCard: WithOptions<'verified' | 'unverified' | 'expired'>;
-  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified' | 'expired'>;
+  configureSSOVerifyDomainCardBadge: WithOptions<'verified' | 'unverified' | 'expired' | 'claimed'>;
+  configureSSOVerifyDomainCardCheckbox: WithOptions;
   configureSSOVerifyDomainCardRemoveButton: WithOptions;
   configureSSOVerifyDomainCardTxtRecord: WithOptions;
   configureSSOVerifyDomainCardTxtRecordValue: WithOptions;
@@ -777,6 +797,31 @@ export type ElementsConfig = {
   configureSSORemoveDomainDialog: WithOptions;
   configureSSORemoveDomainDialogCancelButton: WithOptions;
   configureSSORemoveDomainDialogSubmitButton: WithOptions;
+
+  configureDirectorySyncConnectionCard: WithOptions;
+  configureDirectorySyncConnectionCardName: WithOptions;
+  configureDirectorySyncConnectionCardDomains: WithOptions;
+  configureDirectorySyncConnectionCardDomainBadge: WithOptions;
+  configureDirectorySyncInstructionsToggle: WithOptions;
+  configureDirectorySyncInstructionsList: WithOptions;
+  configureDirectorySyncInstructionsListItem: WithOptions;
+  configureDirectorySyncFieldLabel: WithOptions<string>;
+  configureDirectorySyncEndpointUrlInput: WithOptions;
+  configureDirectorySyncTokenInput: WithOptions;
+  configureDirectorySyncGenerateTokenButton: WithOptions;
+  configureDirectorySyncTokenNotice: WithOptions;
+  configureDirectorySyncRetryButton: WithOptions;
+  configureDirectorySyncAttributeMappingTable: WithOptions;
+  configureDirectorySyncAttributeMappingHeader: WithOptions<string>;
+  configureDirectorySyncAttributeMappingValue: WithOptions<string>;
+  configureDirectorySyncUsersList: WithOptions;
+  configureDirectorySyncUsersRow: WithOptions;
+  configureDirectorySyncUserIdentifier: WithOptions;
+  configureDirectorySyncUserName: WithOptions;
+  configureDirectorySyncUserTimestamp: WithOptions;
+  configureDirectorySyncUserStatusBadge: WithOptions<string>;
+  configureDirectorySyncUsersEmpty: WithOptions;
+  configureDirectorySyncCompleteButton: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;
@@ -1156,6 +1201,7 @@ export type SubscriptionDetailsTheme = Theme;
 export type APIKeysTheme = Theme;
 export type ConfigureSSOTheme = Theme;
 export type OAuthConsentTheme = Theme;
+export type OAuthDeviceVerificationTheme = Theme;
 export type TaskChooseOrganizationTheme = Theme;
 export type TaskResetPasswordTheme = Theme;
 export type TaskSetupMFATheme = Theme;
@@ -1236,9 +1282,17 @@ export type Appearance<T = Theme> = T &
      */
     configureSSO?: T;
     /**
+     * Theme overrides that only apply to the `<ConfigureDirectorySync />` component
+     */
+    configureDirectorySync?: T;
+    /**
      * Theme overrides that only apply to the `<OAuthConsent />` component
      */
     __internal_oauthConsent?: T;
+    /**
+     * Theme overrides that only apply to the `<OAuthDeviceVerification />` component
+     */
+    oauthDeviceVerification?: T;
     /**
      * Theme overrides that only apply to the `<TaskChooseOrganization />` component
      */

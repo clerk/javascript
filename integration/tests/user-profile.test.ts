@@ -70,7 +70,7 @@ export default function Page() {
     await app.dev();
 
     const m = createTestUtils({ app });
-    fakeUser = m.services.users.createFakeUser({
+    fakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
       withPhoneNumber: true,
@@ -267,7 +267,7 @@ export default function Page() {
 
   test('can delete account', async ({ page, context }) => {
     const m = createTestUtils({ app });
-    const delFakeUser = m.services.users.createFakeUser({
+    const delFakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
       withPhoneNumber: true,
@@ -314,7 +314,7 @@ export default function Page() {
 
   test('closes the modal after delete', async ({ page, context }) => {
     const m = createTestUtils({ app });
-    const delFakeUser = m.services.users.createFakeUser({
+    const delFakeUser = m.services.users.createFakeUser(test, {
       withUsername: true,
       fictionalEmail: true,
       withPhoneNumber: true,

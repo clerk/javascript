@@ -15,6 +15,7 @@ import { AuthErrorReason, handshake, signedIn, signedOut, signedOutInvalidToken 
 import { createClerkRequest } from './clerkRequest';
 import { getCookieName, getCookieValue } from './cookie';
 import { HandshakeService } from './handshake';
+import { hasNonSessionJwtCategory } from './jwtCategories';
 import { getMachineTokenType, isMachineJwt, isMachineToken, isTokenTypeAccepted } from './machine';
 import { OrganizationMatcher } from './organizationMatcher';
 import type { MachineTokenType, SessionTokenType } from './tokenTypes';
@@ -419,11 +420,12 @@ export const authenticateRequest: AuthenticateRequest = (async (
   async function authenticateRequestWithTokenInHeader() {
     const { tokenInHeader } = authenticateContext;
 
-    // Reject machine JWTs (OAuth or M2M) that may appear in headers when expecting session tokens.
-    // These are valid Clerk-signed JWTs and will pass verify() verification,
-    // but should not be accepted as session tokens.
+    // Reject JWTs of another class (machine tokens, JWT templates) presented where a session
+    // token is expected. They are validly signed by the same instance key and pass
+    // verifyToken(), but a JWT-template token carries no `sid` and outlives revocation of the
+    // session that minted it (SEC-340).
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (isMachineJwt(tokenInHeader!)) {
+    if (isMachineJwt(tokenInHeader!) || hasNonSessionJwtCategory(tokenInHeader!)) {
       return signedOut({
         tokenType: TokenType.SessionToken,
         authenticateContext,
@@ -631,9 +633,14 @@ export const authenticateRequest: AuthenticateRequest = (async (
       return handleSessionTokenError(decodedErrors[0], 'cookie');
     }
 
-    // Machine JWTs pass verifyToken() but must not be accepted as session tokens (mirrors header path).
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (isMachineJwt(authenticateContext.sessionTokenInCookie!)) {
+    // Machine JWTs and JWT-template tokens pass verifyToken() but must not be accepted as
+    // session tokens (mirrors header path).
+    if (
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      isMachineJwt(authenticateContext.sessionTokenInCookie!) ||
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      hasNonSessionJwtCategory(authenticateContext.sessionTokenInCookie!)
+    ) {
       return signedOut({
         tokenType: TokenType.SessionToken,
         authenticateContext,
@@ -857,7 +864,16 @@ export const authenticateRequest: AuthenticateRequest = (async (
       });
     }
 
-    // Handle as a regular session token
+    // Handle as a regular session token. Mirrors the session-only header path (SEC-340).
+    if (hasNonSessionJwtCategory(tokenInHeader)) {
+      return signedOut({
+        tokenType: TokenType.SessionToken,
+        authenticateContext,
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+    }
+
     const { data, errors } = await verifyToken(tokenInHeader, authenticateContext);
     if (errors) {
       return handleSessionTokenError(errors[0], 'header');

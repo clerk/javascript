@@ -1,5 +1,4 @@
 import { forwardClerkQueryParams } from '@clerk/shared/internal/clerk-js/queryParams';
-import { useClerk } from '@clerk/shared/react';
 import type { SignUpResource } from '@clerk/shared/types';
 import React from 'react';
 
@@ -9,7 +8,7 @@ import { VerificationCodeCard } from '@/ui/elements/VerificationCodeCard';
 import { SignInContext, useSignUpContext } from '../../contexts';
 import type { LocalizationKey } from '../../customizables';
 import { useRouter } from '../../router';
-import { completeSignUpFlow } from './util';
+import { useCompleteSignUpFlow } from './useCompleteSignUpFlow';
 
 type SignInFactorOneCodeFormProps = {
   cardTitle: LocalizationKey;
@@ -26,9 +25,9 @@ type SignInFactorOneCodeFormProps = {
 };
 
 export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) => {
-  const { afterSignUpUrl, navigateOnSetActive, isCombinedFlow: _isCombinedFlow } = useSignUpContext();
-  const { setActive } = useClerk();
+  const { isCombinedFlow: _isCombinedFlow } = useSignUpContext();
   const { navigate } = useRouter();
+  const completeSignUpFlow = useCompleteSignUpFlow();
 
   const isWithinSignInContext = !!React.useContext(SignInContext);
   const isCombinedFlow = !!(isWithinSignInContext && _isCombinedFlow);
@@ -49,14 +48,6 @@ export const SignUpVerificationCodeForm = (props: SignInFactorOneCodeFormProps) 
           verifyPhonePath: '../verify-phone-number',
           protectCheckPath: '../protect-check',
           continuePath: '../continue',
-          handleComplete: () =>
-            setActive({
-              session: res.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
-              },
-            }),
-          navigate,
         });
       })
       .catch(err => {

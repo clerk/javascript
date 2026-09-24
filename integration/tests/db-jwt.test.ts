@@ -20,7 +20,7 @@ test.describe('Dev browser test', () => {
         await app.setup();
         await app.withEnv(appConfigs.envs.withEmailCodes);
         await app.dev();
-        fakeUser = createTestUtils({ app }).services.users.createFakeUser();
+        fakeUser = createTestUtils({ app }).services.users.createFakeUser(test);
       });
 
       test.afterAll(async () => {

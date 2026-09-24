@@ -32,7 +32,7 @@ test.describe('switching instances on localhost same port @localhost', () => {
     const { app } = await prepareApplication('sessions-dev-1', port);
     let page = await context.newPage();
     let u = createTestUtils({ app, page, context, useTestingToken: false });
-    let fakeUser = u.services.users.createFakeUser();
+    let fakeUser = u.services.users.createFakeUser(test);
     fakeUsers.push(fakeUser);
 
     await u.services.users.createBapiUser(fakeUser);
@@ -49,7 +49,7 @@ test.describe('switching instances on localhost same port @localhost', () => {
 
     page = await context.newPage();
     u = createTestUtils({ app, page, context, useTestingToken: false });
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
     fakeUsers.push(fakeUser);
     await u.services.users.createBapiUser(fakeUser);
 

@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 import eslint from '@eslint/js';
 import configPrettier from 'eslint-config-prettier';
 import configTurbo from 'eslint-config-turbo/flat';
@@ -17,10 +20,43 @@ import tseslint from 'typescript-eslint';
 
 import { CUSTOM_BLOCK_TAGS, CUSTOM_MODIFIER_TAGS } from './.typedoc/custom-tags.mjs';
 
+const REPO_ROOT = import.meta.dirname;
 const ECMA_VERSION = 2021,
   JAVASCRIPT_FILES = ['**/*.cjs', '**/*.js', '**/*.jsx', '**/*.mjs'],
   TEST_FILES = ['**/*.test.js', '**/*.test.jsx', '**/*.test.ts', '**/*.test.tsx', '**/test/**', '**/__tests__/**'],
-  TYPESCRIPT_FILES = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'];
+  TYPESCRIPT_FILES = ['**/*.cts', '**/*.mts', '**/*.ts', '**/*.tsx'],
+  // turbo lint runs `eslint src` from each package cwd; these must be repo-absolute
+  IMPORT_RESOLVER_TSCONFIGS = [`${REPO_ROOT}/integration/tsconfig.json`],
+  IMPORT_RESOLVER_TSCONFIG_NAMES = ['tsconfig.json', 'tsconfig.src.json', 'tsconfig.test.json', 'tsconfig.mosaic.json'];
+
+// Each package must see only its own tsconfigs. Several packages define `@/*`, and a
+// shared project list lets the resolver apply clerk-js's alias to UI or shared files.
+const PACKAGE_IMPORT_RESOLVER_CONFIGS = fs
+  .readdirSync(path.join(REPO_ROOT, 'packages'), { withFileTypes: true })
+  .filter(entry => entry.isDirectory() && fs.existsSync(path.join(REPO_ROOT, 'packages', entry.name, 'package.json')))
+  .flatMap(entry => {
+    const project = IMPORT_RESOLVER_TSCONFIG_NAMES.map(name =>
+      path.join(REPO_ROOT, 'packages', entry.name, name),
+    ).filter(file => fs.existsSync(file));
+    if (project.length === 0) {
+      return [];
+    }
+    return [
+      {
+        name: `packages/${entry.name}/import-resolver`,
+        files: [`packages/${entry.name}/**/*.{ts,tsx,js,jsx,mts,cts}`],
+        settings: {
+          'import/resolver': {
+            node: true,
+            typescript: {
+              alwaysTryTypes: true,
+              project,
+            },
+          },
+        },
+      },
+    ];
+  });
 
 const noNavigateUseClerk = {
   meta: {
@@ -339,7 +375,7 @@ export default tseslint.config([
         node: true,
         typescript: {
           alwaysTryTypes: true,
-          project: ['packages/*/tsconfig.json', 'integration/tsconfig.json'],
+          project: IMPORT_RESOLVER_TSCONFIGS,
         },
       },
     },
@@ -517,6 +553,7 @@ export default tseslint.config([
       'react-hooks/rules-of-hooks': 'warn',
     },
   },
+  ...PACKAGE_IMPORT_RESOLVER_CONFIGS,
   {
     name: 'packages/clerk-js',
     files: ['packages/clerk-js/src/ui/**/*'],
@@ -537,9 +574,10 @@ export default tseslint.config([
     },
   },
   {
-    name: 'packages/ui/mosaic',
-    files: ['packages/ui/src/mosaic/**/*'],
-    ignores: ['packages/ui/src/mosaic/utils.ts', 'packages/ui/src/mosaic/__tests__/**'],
+    name: 'packages/mosaic',
+    files: ['packages/mosaic/src/**/*'],
+    // Tests assert on style values they receive; they are not authoring styles.
+    ignores: ['packages/mosaic/src/__tests__/**', 'packages/mosaic/src/**/*.test.{ts,tsx}'],
     plugins: {
       '@stylexjs': pluginStylex,
     },
@@ -553,10 +591,6 @@ export default tseslint.config([
       '@stylexjs/sort-keys': 'error',
       '@stylexjs/valid-shorthands': 'error',
       '@stylexjs/valid-styles': 'error',
-      // Mosaic renders elements through `render={p => <el {...p} />}`, so children and controls sit on
-      // the outer component. Both rules only see the empty inner element and always report.
-      'jsx-a11y/heading-has-content': 'off',
-      'jsx-a11y/label-has-associated-control': 'off',
       'no-restricted-syntax': [
         'error',
         {
@@ -572,7 +606,41 @@ export default tseslint.config([
           message:
             "Use motionSafe() from mosaic/utils instead of raw '@media (prefers-reduced-motion: no-preference)'.",
         },
+        // A Mosaic part takes `xstyle`, not `className`/`style`; its prop types already reject the pair,
+        // this names the replacement. Native elements (lowercase) are unaffected.
+        {
+          selector:
+            "JSXOpeningElement[name.type='JSXIdentifier'][name.name=/^[A-Z]/] > JSXAttribute[name.name=/^(className|style)$/]",
+          message: 'Mosaic parts take `xstyle` (StyleX atoms) instead of `className`/`style`.',
+        },
+        {
+          selector:
+            "JSXOpeningElement[name.type='JSXMemberExpression'] > JSXAttribute[name.name=/^(className|style)$/]",
+          message: 'Mosaic parts take `xstyle` (StyleX atoms) instead of `className`/`style`.',
+        },
+        // `{...stylex.props(x)}` is the same pair by another route; the types miss it because a
+        // spread's optional keys skip excess-property checks.
+        {
+          selector:
+            "JSXOpeningElement[name.type='JSXIdentifier'][name.name=/^[A-Z]/] > JSXSpreadAttribute > CallExpression[callee.object.name='stylex'][callee.property.name='props']",
+          message: 'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread.',
+        },
+        {
+          selector:
+            "JSXOpeningElement[name.type='JSXMemberExpression'] > JSXSpreadAttribute > CallExpression[callee.object.name='stylex'][callee.property.name='props']",
+          message: 'Mosaic parts take the atoms as `xstyle`, not a `stylex.props(...)` spread.',
+        },
       ],
+    },
+  },
+  {
+    name: 'packages/mosaic/jsx-a11y',
+    files: ['packages/mosaic/src/**/*'],
+    rules: {
+      // Mosaic renders elements through `render={p => <el {...p} />}`, so children and controls sit on
+      // the outer component. Both rules only see the empty inner element and always report.
+      'jsx-a11y/heading-has-content': 'off',
+      'jsx-a11y/label-has-associated-control': 'off',
     },
   },
   {
@@ -580,8 +648,18 @@ export default tseslint.config([
     // is compile-time and cannot inline a `hover()`/`motionSafe()` helper imported into `create`,
     // so the media-query restrictions above (an Emotion-runtime convention) can't apply here. The
     // `@stylexjs/*` rules from the mosaic block still cover these files.
-    name: 'packages/ui/mosaic - stylex styles',
-    files: ['packages/ui/src/mosaic/**/*.styles.ts'],
+    name: 'packages/mosaic - stylex styles',
+    files: ['packages/mosaic/src/**/*.styles.ts'],
+    rules: {
+      'no-restricted-syntax': 'off',
+    },
+  },
+  {
+    // Primitives are unstyled and take `className`/`style` like any other headless component; the
+    // `xstyle`-only rule targets styled Mosaic parts and otherwise false-positives on things like
+    // `<FloatingOverlay style={...}>`, a third-party component, not a Mosaic part.
+    name: 'packages/mosaic - primitives',
+    files: ['packages/mosaic/src/primitives/**/*'],
     rules: {
       'no-restricted-syntax': 'off',
     },
@@ -658,6 +736,18 @@ export default tseslint.config([
         'error',
         {
           allowList: ['_NEXT_ROUTER_BASEPATH'],
+        },
+      ],
+    },
+  },
+  {
+    name: 'packages/swingset',
+    files: ['packages/swingset/src/**/*'],
+    rules: {
+      'turbo/no-undeclared-env-vars': [
+        'error',
+        {
+          allowList: ['SWINGSET_DASHBOARD_URL'],
         },
       ],
     },

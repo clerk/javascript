@@ -30,7 +30,7 @@ import { determineActiveFields, emailOrPhone, getInitialActiveIdentifier, showFo
 import { SignUpRestrictedAccess } from './SignUpRestrictedAccess';
 import { SignUpSocialButtons } from './SignUpSocialButtons';
 import { SignUpStartAlternativePhoneCodePhoneNumberCard } from './SignUpStartAlternativePhoneCodePhoneNumberCard';
-import { completeSignUpFlow } from './util';
+import { useCompleteSignUpFlow } from './useCompleteSignUpFlow';
 
 function SignUpStartInternal(): JSX.Element {
   const card = useCardState();
@@ -41,10 +41,10 @@ function SignUpStartInternal(): JSX.Element {
   const { userSettings, authConfig } = useEnvironment();
   const { navigate } = useRouter();
   const { attributes } = userSettings;
-  const { setActive } = useClerk();
   const ctx = useSignUpContext();
   const isWithinSignInContext = !!React.useContext(SignInContext);
-  const { afterSignUpUrl, signInUrl, unsafeMetadata, navigateOnSetActive } = ctx;
+  const { signInUrl, unsafeMetadata } = ctx;
+  const completeSignUpFlow = useCompleteSignUpFlow();
   const isCombinedFlow = !!(ctx.isCombinedFlow && !!isWithinSignInContext);
   const [activeCommIdentifierType, setActiveCommIdentifierType] = React.useState<ActiveIdentifier>(() =>
     getInitialActiveIdentifier(attributes, userSettings.signUp.progressive, {
@@ -131,7 +131,6 @@ function SignUpStartInternal(): JSX.Element {
   const hasEmail = !!formState.emailAddress.value;
   const isProgressiveSignUp = userSettings.signUp.progressive;
   const isLegalConsentEnabled = userSettings.signUp.legal_consent_enabled;
-  const oidcPrompt = ctx.oidcPrompt;
 
   const fields = determineActiveFields({
     attributes,
@@ -158,27 +157,12 @@ function SignUpStartInternal(): JSX.Element {
           setMissingRequirementsWithTicket(true);
         }
 
-        const redirectUrl = ctx.ssoCallbackUrl;
-        const redirectUrlComplete = ctx.afterSignUpUrl || '/';
-
         return completeSignUpFlow({
           signUp,
-          redirectUrl,
-          redirectUrlComplete,
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
           protectCheckPath: 'protect-check',
           continuePath: 'continue',
-          handleComplete: () => {
-            return setActive({
-              session: signUp.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
-              },
-            });
-          },
-          navigate,
-          oidcPrompt,
         });
       })
       .catch(err => {
@@ -339,9 +323,6 @@ function SignUpStartInternal(): JSX.Element {
     card.setLoading();
     card.setError(undefined);
 
-    const redirectUrl = ctx.ssoCallbackUrl;
-    const redirectUrlComplete = ctx.afterSignUpUrl || '/';
-
     let signUpAttempt: Promise<SignUpResource>;
     if (!fields.ticket && !hasExistingSignUpWithTicket) {
       signUpAttempt = signUp.create(buildRequest(fieldsToSubmit));
@@ -356,17 +337,6 @@ function SignUpStartInternal(): JSX.Element {
           verifyEmailPath: 'verify-email-address',
           verifyPhonePath: 'verify-phone-number',
           protectCheckPath: 'protect-check',
-          handleComplete: () =>
-            setActive({
-              session: res.createdSessionId,
-              navigate: async ({ session, decorateUrl }) => {
-                await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
-              },
-            }),
-          navigate,
-          redirectUrl,
-          redirectUrlComplete,
-          oidcPrompt,
         }),
       )
       .catch(err => {

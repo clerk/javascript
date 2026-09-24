@@ -11,7 +11,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('redirect 
 
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser({
+    fakeUser = u.services.users.createFakeUser(test, {
       fictionalEmail: true,
       withPhoneNumber: true,
       withUsername: true,
@@ -69,7 +69,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('redirect 
   test.describe('SignUpButton', () => {
     test('sign up button respects forceRedirectUrl', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
-      const fakeUser = u.services.users.createFakeUser({
+      const fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
         withUsername: true,
@@ -99,7 +99,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('redirect 
 
     test('sign up button respects fallbackRedirectUrl', async ({ page, context }) => {
       const u = createTestUtils({ app, page, context });
-      const fakeUser = u.services.users.createFakeUser({
+      const fakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
         withUsername: true,

@@ -212,6 +212,8 @@ Passkey support works in two modes, selected automatically per request:
 - **Renderer mode**: when your window loads content over `https://` from an origin that matches your passkey RP (Relying Party) ID, the renderer's built-in Chromium WebAuthn is used. Credentials are synced by the OS/browser ecosystem (Windows Hello works out of the box; Touch ID on macOS requires Electron ≥ 42 and [`app.configureWebAuthn`](https://www.electronjs.org/docs/latest/api/app#appconfigurewebauthnoptions-macos)).
 - **Native mode**: when your window loads a local bundle (e.g. `scheme://host`), WebAuthn's origin checks reject the request, so the ceremony is routed over IPC to the main process and serviced by the OS WebAuthn APIs (AuthenticationServices on macOS, `webauthn.dll` on Windows) via the optional [`@clerk/electron-passkeys`](https://github.com/clerk/javascript/tree/main/packages/electron-passkeys) native module.
 
+Passkey autofill relies on WebAuthn conditional mediation, which only the renderer can provide. In native mode passkeys are offered through the explicit "Use passkey" action instead; the sign-in form never opens a passkey prompt on its own.
+
 ### Setup
 
 Native mode requires the optional native module:

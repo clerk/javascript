@@ -5,6 +5,7 @@ import { appConfigs } from '../presets';
 import { instanceKeys } from '../presets/envs';
 import type { FakeUser } from '../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../testUtils';
+import { withRetry } from '../testUtils/retryableClerkClient';
 import { createUserService } from '../testUtils/usersService';
 
 testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
@@ -17,12 +18,12 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
 
     test.beforeEach(() => {
       const u = createTestUtils({ app });
-      regularFakeUser = u.services.users.createFakeUser({
+      regularFakeUser = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
         withUsername: true,
       });
-      fakeUserForOAuth = u.services.users.createFakeUser({
+      fakeUserForOAuth = u.services.users.createFakeUser(test, {
         fictionalEmail: true,
         withPhoneNumber: true,
         withUsername: true,
@@ -39,7 +40,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
         secretKey: instanceKeys.get('oauth-provider').sk,
         publishableKey: instanceKeys.get('oauth-provider').pk,
       });
-      const users = createUserService(client);
+      const users = createUserService(withRetry(client));
       await users.deleteIfExists({ email: fakeUserForOAuth.email });
 
       await app.teardown();

@@ -19,7 +19,7 @@ test.describe('vercel deployment', () => {
       test.beforeAll(async () => {
         test.setTimeout(120_000);
         app = await vercelDeployment(config);
-        fakeUser = createTestUtils({ app }).services.users.createFakeUser();
+        fakeUser = createTestUtils({ app }).services.users.createFakeUser(test);
       });
 
       test.afterAll(async () => {

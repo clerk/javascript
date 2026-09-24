@@ -1,7 +1,7 @@
 # Parity audit — Phase 4 reference
 
 The parity audit is the confidence step of a Mosaic migration. It diffs the
-legacy component against the new machine/controller/view and classifies every
+legacy component against the new model/controller/view and classifies every
 legacy behavior, so behavior that lived implicitly in the old blob can't be
 silently dropped.
 
@@ -19,8 +19,8 @@ In the repo at <repo-root>, audit a Mosaic migration for behavioral parity.
 LEGACY component files (the spec — behavior must be preserved or consciously changed):
   <absolute paths to the legacy component + its sub-forms/flows>
 
-NEW Mosaic files (machine / controller / view / wrapper):
-  <absolute paths to the *.machine.ts, *.controller.tsx, *.view.tsx, *.tsx>
+NEW Mosaic files (model / controller / view / wrapper):
+  <absolute paths to the *.model.tsx, *.controller.tsx, *.view.tsx, *.tsx>
 
 Enumerate EVERY behavior in the legacy files — each: effect, guard, error path,
 empty/loading state, permission gate, revalidate/reload call, reset-on-close,
@@ -40,9 +40,9 @@ by a `// TODO` (these are the regressions at risk of shipping).
 
 ## Output table format
 
-| Legacy behavior                                         | Layer it should live in | Status                      | Evidence (legacy → new)                                                           |
-| ------------------------------------------------------- | ----------------------- | --------------------------- | --------------------------------------------------------------------------------- |
-| Per-field error mapping via `handleError(err, [field])` | machine/view            | Deferred (only a `// TODO`) | `AddDomainForm.tsx` handleError → `*-add-verify.machine.ts` single `errorMessage` |
+| Legacy behavior                                         | Layer it should live in | Status                      | Evidence (legacy → new)                                                    |
+| ------------------------------------------------------- | ----------------------- | --------------------------- | -------------------------------------------------------------------------- |
+| Per-field error mapping via `handleError(err, [field])` | controller/view         | Deferred (only a `// TODO`) | `AddDomainForm.tsx` handleError → `*.controller.tsx` single `errorMessage` |
 
 `Status` is one of: **Migrated** · **Deliberately changed** · **Deferred**.
 
@@ -56,14 +56,14 @@ rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protec
 ## Worked example — `OrganizationProfileDomainsSection`
 
 The audit run against the finished domains migration surfaced three behaviors
-that the machine/controller/view split dropped, each tracked only by a buried
+that the model/controller/view split dropped, each tracked only by a buried
 `// TODO` (i.e. invisible at review time):
 
 1. **Per-field error mapping.** Legacy `handleError(err, [field])` mapped errors
-   to the specific field; the new add/verify machine collapses every failure to
-   one `errorMessage` string in context.
+   to the specific field; the new add/verify flow collapses every failure to one
+   `errorMessage` string in the controller's machine context.
 2. **Step-up reverification on domain delete.** Legacy `RemoveDomainForm` left a
-   TODO to wrap `domain.delete()` in `useReverification`; the new remove machine
+   TODO to wrap `domain.delete()` in `useReverification`; the new remove flow
    omits the step-up entirely.
 3. **Pending-invitations callout.** Legacy `useCalloutLabel` computed a count
    from `totalPendingInvitations + totalPendingSuggestions`; the new view

@@ -1,0 +1,20 @@
+import * as Stories from './user-profile-billing-history-section.stories';
+
+# UserProfileBillingHistorySection
+
+Billing history rendered as a section-local semantic table.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>
+
+<Story
+  name='Empty'
+  storyModule={Stories}
+/>

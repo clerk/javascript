@@ -1,13 +1,17 @@
 # Subflow: launch from a clean state and land signed out.
 appId: com.clerk.exponativebuildfixture
 ---
-- launchApp:
-    clearState: true
-    clearKeychain: true
-- extendedWaitUntil:
-    visible:
-      id: 'auth-state'
-    timeout: 30000
+# Android can kill a fresh launch when pm clear's task removal lands after am start.
+- retry:
+    maxRetries: 1
+    commands:
+      - launchApp:
+          clearState: true
+          clearKeychain: true
+      - extendedWaitUntil:
+          visible:
+            id: 'auth-state'
+          timeout: 30000
 # Text-only matching from here on: iOS failed combined id+text filters on RN
 # Text elements in CI while id-only and text-only both match. Also wait out
 # clerk-js init ('loading') with a retrying wait; assertVisible never retries.

@@ -15,8 +15,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withSessionTasks] })(
     test.beforeAll(async () => {
       const u = createTestUtils({ app });
 
-      user1 = u.services.users.createFakeUser();
-      user2 = u.services.users.createFakeUser();
+      user1 = u.services.users.createFakeUser(test);
+      user2 = u.services.users.createFakeUser(test);
 
       await u.services.users.createBapiUser(user1);
       await u.services.users.createBapiUser(user2);

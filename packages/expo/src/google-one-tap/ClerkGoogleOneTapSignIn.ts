@@ -56,6 +56,20 @@ export function isErrorWithCode(error: unknown): error is { code: string; messag
   );
 }
 
+// Android's Credential Manager reports provider failures through the same cancellation exception it
+// uses for a dismissed chooser. Only Google Play services prefixes its messages with a status code,
+// so a prefixed message that does not say "cancelled by user" is a failure rather than a dismissal.
+const PLAY_SERVICES_STATUS_PREFIX = /^\s*(?:\[\d+]|\d+:)/;
+const CANCELLED_BY_USER = /cancell?ed by user/i;
+
+function rethrowIfProviderFailure(error: { code: string; message: string }): void {
+  if (!PLAY_SERVICES_STATUS_PREFIX.test(error.message) || CANCELLED_BY_USER.test(error.message)) {
+    return;
+  }
+
+  throw Object.assign(new Error(error.message), { code: 'GOOGLE_SIGN_IN_ERROR', cause: error });
+}
+
 /**
  * Internal Google One Tap Sign-In module.
  *
@@ -97,6 +111,7 @@ export const ClerkGoogleOneTapSignIn = {
     } catch (error) {
       if (isErrorWithCode(error)) {
         if (error.code === 'SIGN_IN_CANCELLED') {
+          rethrowIfProviderFailure(error);
           return { type: 'cancelled', data: null };
         }
         if (error.code === 'NO_SAVED_CREDENTIAL_FOUND') {
@@ -124,6 +139,7 @@ export const ClerkGoogleOneTapSignIn = {
     } catch (error) {
       if (isErrorWithCode(error)) {
         if (error.code === 'SIGN_IN_CANCELLED') {
+          rethrowIfProviderFailure(error);
           return { type: 'cancelled', data: null };
         }
         if (error.code === 'NO_SAVED_CREDENTIAL_FOUND') {
@@ -151,6 +167,7 @@ export const ClerkGoogleOneTapSignIn = {
     } catch (error) {
       if (isErrorWithCode(error)) {
         if (error.code === 'SIGN_IN_CANCELLED') {
+          rethrowIfProviderFailure(error);
           return { type: 'cancelled', data: null };
         }
       }

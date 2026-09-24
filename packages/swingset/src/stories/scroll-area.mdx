@@ -17,17 +17,18 @@ slot class, which stays the hook a theme targets.
 
 ## Usage
 
-`scrollAreaViewport()` returns an array, hence the `...` spread.
+`scrollAreaViewport()` returns an array of atoms. A Mosaic part takes it as `xstyle`; a native element
+spreads it into `stylex.props`.
 
 ```tsx
-import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
+import { scrollAreaRoot, scrollAreaViewport } from '@clerk/mosaic/components/scroll-area';
 import * as stylex from '@stylexjs/stylex';
 
 <div
   {...stylex.props(scrollAreaRoot)}
   style={{ height: 260 }}
 >
-  <Item.Group {...stylex.props(...scrollAreaViewport())}>{organizations}</Item.Group>
+  <Item.Group xstyle={scrollAreaViewport()}>{organizations}</Item.Group>
 </div>;
 ```
 
@@ -45,14 +46,15 @@ const root = stylex.props(scrollAreaRoot);
 
 ## Parts
 
-| Export                        | Goes on               | Description                                                                       |
-| ----------------------------- | --------------------- | --------------------------------------------------------------------------------- |
-| `scrollAreaViewport(gutter?)` | the scrolling element | The scroll box itself: overflow, the edge fades, the scrollbar, and a focus ring. |
-| `scrollAreaRoot`              | a positioned ancestor | Only needed when something anchors against the scroll box.                        |
+| Export                               | Goes on               | Description                                                                       |
+| ------------------------------------ | --------------------- | --------------------------------------------------------------------------------- |
+| `scrollAreaViewport(gutter?, axis?)` | the scrolling element | The scroll box itself: overflow, the edge fades, the scrollbar, and a focus ring. |
+| `scrollAreaRoot`                     | a positioned ancestor | Only needed when something anchors against the scroll box.                        |
 
-`gutter` is the one argument — `auto` (the default) or `stable`, see [Gutter](#gutter). It is an
-author-time decision rather than a theme one, since whether a region needs it depends on whether its
-content can resize in place.
+`gutter` is `auto` (the default) or `stable`, see [Gutter](#gutter). `axis` is `block` (the default)
+or `inline`, see [Horizontal](#horizontal). Both are author-time decisions rather than theme ones:
+whether a region needs a gutter depends on whether its content can resize in place, and which way it
+scrolls is a property of the content itself.
 
 ## Examples
 
@@ -82,6 +84,22 @@ the list starts overflowing, `stable` doesn't move.
 Two conditions must **both** hold for the two to differ at all: space-consuming scrollbars, and
 content that can stop overflowing. Where the platform overlays its scrollbars they render
 identically, which is why `auto` is the default.
+
+### Horizontal
+
+<Story
+  name='Horizontal'
+  storyModule={ScrollAreaStories}
+/>
+
+`axis: 'inline'` turns the whole surface sideways: the box scrolls horizontally, the fades move to
+the left and right edges, the scroll timeline reads inline progress, and the scrollbar lane along
+the bottom is held clear of the mask. The other axis is clipped. It is the shape a wide
+[Table](/components/table) takes on a narrow screen.
+
+```tsx
+<div {...stylex.props(...scrollAreaViewport('auto', 'inline'))}>{columns}</div>
+```
 
 ### Reveal on hover
 
@@ -153,13 +171,13 @@ can drive itself from them.
 }
 .cl-item-group::before {
   top: 0;
-  background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
   opacity: var(--cl-scroll-area-progress-start);
   transform: translateY(calc((var(--cl-scroll-area-progress-start) - 1) * var(--cl-scroll-fade-size)));
 }
 .cl-item-group::after {
   bottom: 0;
-  background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-card-foreground) 22%, transparent), transparent);
+  background: linear-gradient(to top, color-mix(in oklab, var(--cl-color-foreground) 22%, transparent), transparent);
   opacity: var(--cl-scroll-area-progress-end);
   transform: translateY(calc((1 - var(--cl-scroll-area-progress-end)) * var(--cl-scroll-fade-size)));
 }
@@ -169,7 +187,7 @@ The vars are registered as `<number>`, so they drive position as readily as opac
 slides out from behind its own edge as it fades in. Clip the root — `overflow: hidden` — so the half
 that is still offscreen stays there.
 
-Mix the scrim from a theme colour rather than hardcoding black: `--cl-color-card-foreground` inverts
+Mix the scrim from a theme colour rather than hardcoding black: `--cl-color-foreground` inverts
 with the theme, so one declaration reads as a shadow on light and a soft glow on dark, where black
 would vanish.
 

@@ -21,7 +21,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEmailCodes] })('Safari IT
 
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
     await u.services.users.createBapiUser(fakeUser);
   });
 

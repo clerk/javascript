@@ -44,7 +44,7 @@ test.describe('api keys component @machine', () => {
     await app.dev();
 
     const u = createTestUtils({ app });
-    fakeAdmin = u.services.users.createFakeUser();
+    fakeAdmin = u.services.users.createFakeUser(test);
     const admin = await u.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await u.services.users.createFakeOrganization(admin.id);
   });
@@ -99,7 +99,7 @@ test.describe('api keys component @machine', () => {
     const u = createTestUtils({ app, page, context });
 
     // Create user and 11 API keys to trigger pagination (default perPage is 10)
-    const fakeUser = u.services.users.createFakeUser();
+    const fakeUser = u.services.users.createFakeUser(test);
     const bapiUser = await u.services.users.createBapiUser(fakeUser);
     const fakeAPIKeys = await Promise.all(
       Array.from({ length: 11 }, () => u.services.users.createFakeAPIKey(bapiUser.id)),
@@ -553,7 +553,7 @@ test.describe('api keys component @machine', () => {
       const u = createTestUtils({ app, page, context });
 
       // Create a dedicated user for this test to ensure clean state
-      const dedicatedUser = u.services.users.createFakeUser();
+      const dedicatedUser = u.services.users.createFakeUser(test);
       const bapiUser = await u.services.users.createBapiUser(dedicatedUser);
 
       // Create exactly 9 API keys for this user (not using shared organization)
@@ -685,7 +685,7 @@ test.describe('api keys component @machine', () => {
       const u = createTestUtils({ app, page, context });
 
       // Create a dedicated user for this test to ensure clean state
-      const dedicatedUser = u.services.users.createFakeUser();
+      const dedicatedUser = u.services.users.createFakeUser(test);
       const bapiUser = await u.services.users.createBapiUser(dedicatedUser);
 
       // Create exactly 15 API keys for this user to have 2 pages (10 per page)

@@ -105,8 +105,11 @@ export const deDE: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'Sie können diesen Plan nicht abonnieren. Ihr vorhandenes Abonnement ist teurer als dieser Plan.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'Ihre Bezahlung war erfolgreich.',
       description__subscriptionSuccessful: 'Ihr Abonnement wurde erfolgreich aktiviert.',
+      discount: undefined,
       downgradeNotice:
         'Sie behalten Ihr aktuelles Abonnement bis zum Ende des Abrechnungszeitraums. So lange können Sie weiterhin alle Funktionen nutzen, danach werden Sie auf dieses Abonnement umgestellt.',
       emailForm: {
@@ -122,6 +125,8 @@ export const deDE: LocalizationResource = {
       },
       pastDueNotice: 'Ihr vorheriges Abonnement war überfällig, ohne Zahlung.',
       perMonth: 'pro Monat',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'Bezahlung',
       title__paymentSuccessful: 'Zahlung erfolgreich!',
       title__subscriptionSuccessful: 'Geschafft!',
@@ -132,6 +137,9 @@ export const deDE: LocalizationResource = {
     credit: 'Guthaben',
     creditRemainder: 'Verbleibendes Guthaben für den restlichen Abrechnungszeitraum.',
     defaultFreePlanActive: 'Sie nutzen aktuell den kostenlosen Plan.',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'Kostenlos',
     getStarted: 'Jetzt starten',
     highlightedPlanBadge: 'Beliebt',
@@ -143,6 +151,7 @@ export const deDE: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'Monatlich',
+    months: undefined,
     pastDue: 'Überfällig',
     pay: '{{amount}} bezahlen',
     payerCreditRemainder: undefined,
@@ -221,6 +230,84 @@ export const deDE: LocalizationResource = {
     year: 'Jahr',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -711,6 +798,12 @@ export const deDE: LocalizationResource = {
         title: undefined,
       },
     },
+    connectionScopeBanner: {
+      subtitle__adding: undefined,
+      subtitle__editing: undefined,
+      title__adding: undefined,
+      title__editing: undefined,
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'Wenden Sie sich an Ihren Organisationsadministrator, um Ihre Berechtigungen zu erweitern.',
       title: 'Sie haben keine Berechtigung, Single Sign-On (SSO) zu verwalten',
@@ -720,9 +813,11 @@ export const deDE: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__claimed: undefined,
         badge__expired: undefined,
         badge__unverified: 'Nicht verifiziert',
         badge__verified: 'Verifiziert',
+        checkboxLabel: undefined,
         expiredAtLabel: undefined,
         expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
@@ -869,6 +964,8 @@ export const deDE: LocalizationResource = {
   formButtonPrimary: 'Fortsetzen',
   formButtonPrimary__verify: 'Verifizieren',
   formFieldAction__forgotPassword: 'Passwort vergessen?',
+  formFieldAction__hidePassword: 'Passwort verbergen',
+  formFieldAction__showPassword: 'Passwort anzeigen',
   formFieldError__matchingPasswords: 'Passwörter stimmen überein.',
   formFieldError__notMatchingPasswords: 'Passwörter stimmen nicht überein.',
   formFieldError__verificationLinkExpired:
@@ -946,11 +1043,53 @@ export const deDE: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'Organisation erstellen',
@@ -1166,9 +1305,136 @@ export const deDE: LocalizationResource = {
       title: 'Domain entfernen',
     },
     securityPage: {
+      connectionPage: {
+        actions: {
+          activate: undefined,
+          continueSetup: undefined,
+        },
+        dangerZone: {
+          deactivateButton: undefined,
+          removeButton: undefined,
+          title: undefined,
+        },
+        domains: {
+          title: undefined,
+        },
+        identityProvider: {
+          certificateExpires: undefined,
+          clientSecret: {
+            placeholder: undefined,
+          },
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        name: {
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        serviceProvider: {
+          acsUrl: undefined,
+          entityId: undefined,
+          metadataUrl: undefined,
+          redirectUri: undefined,
+          title: undefined,
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: undefined,
+            label: undefined,
+          },
+          allowIdpInitiated: {
+            description: undefined,
+            label: undefined,
+          },
+          allowSubdomains: {
+            description: undefined,
+            label: undefined,
+          },
+          forceAuthn: {
+            description: undefined,
+            label: undefined,
+          },
+          syncUserAttributes: {
+            description: undefined,
+            label: undefined,
+          },
+          title: undefined,
+        },
+      },
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
+        title: undefined,
+      },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
         title: undefined,
       },
       ssoSection: {
@@ -1179,9 +1445,11 @@ export const deDE: LocalizationResource = {
         descriptionLine1: undefined,
         domainLabel: undefined,
         menuAction__activate: undefined,
+        menuAction__continue: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
+        primaryButton__addConnection: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
@@ -1417,6 +1685,9 @@ export const deDE: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'Passwort-Code zurücksetzen',
       resendButton: 'Sie haben keinen Code erhalten? Erneut senden',
@@ -1483,6 +1754,15 @@ export const deDE: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'Bevor wir Ihr Passwort zurücksetzen können, müssen wir Ihre Identität überprüfen.',
+    },
+    ssoBypass: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'Registrieren',
@@ -1759,6 +2039,7 @@ export const deDE: LocalizationResource = {
     form_password_compromised__sign_in: undefined,
     form_password_incorrect: 'Das eingegebene Passwort ist falsch.',
     form_password_length_too_short: 'Das Passwort ist zu kurz. Es muss mindestens 8 Zeichen lang sein.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'Passwort nicht stark genug.',
     form_password_or_identifier_incorrect:
       'Passwort oder E-Mail-Adresse ist falsch. Versuchen Sie es erneut oder verwenden Sie eine andere Methode.',
@@ -1822,6 +2103,9 @@ export const deDE: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Sie sind bereits angemeldet.',
+    sso_bypass_domain_not_served: undefined,
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier:
       'Eine Web3 Wallet-Erweiterung wurde nicht gefunden. Bitte installieren Sie eine, um fortzufahren.',
     web3_signature_request_rejected:

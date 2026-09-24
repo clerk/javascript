@@ -1,16 +1,14 @@
-/** @jsxImportSource @emotion/react */
-import { Tabs } from '@clerk/ui/mosaic/components/tabs';
+import { Tabs } from '@clerk/mosaic/components/tabs';
 
 import type { StoryMeta } from '@/lib/types';
 
-// Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
-// renders a code footer with its function's source. See `StoryModule.__source`.
 export { default as __source } from './tabs.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Tabs',
-  source: 'packages/ui/src/mosaic/components/tabs.tsx',
+  source: 'packages/mosaic/src/components/tabs/tabs.tsx',
 };
 
 export function Default() {
@@ -18,18 +16,15 @@ export function Default() {
     <Tabs.Root defaultValue='account'>
       <Tabs.List>
         <Tabs.Tab value='account'>Account</Tabs.Tab>
-        <Tabs.Tab value='password'>Password</Tabs.Tab>
-        <Tabs.Tab
-          value='disabled'
-          disabled
-        >
-          Disabled
-        </Tabs.Tab>
+        <Tabs.Tab value='security'>Security</Tabs.Tab>
+        <Tabs.Tab value='notifications'>Notifications</Tabs.Tab>
         <Tabs.Indicator />
       </Tabs.List>
-      <Tabs.Panel value='account'>Manage your account settings here.</Tabs.Panel>
-      <Tabs.Panel value='password'>Change your password here.</Tabs.Panel>
-      <Tabs.Panel value='disabled'>This panel is unreachable.</Tabs.Panel>
+      <Tabs.Panels>
+        <Tabs.Panel value='account'>Manage your account details.</Tabs.Panel>
+        <Tabs.Panel value='security'>Update your password and sessions.</Tabs.Panel>
+        <Tabs.Panel value='notifications'>Choose what you get notified about.</Tabs.Panel>
+      </Tabs.Panels>
     </Tabs.Root>
   );
 }

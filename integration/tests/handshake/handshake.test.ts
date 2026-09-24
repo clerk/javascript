@@ -53,7 +53,7 @@ test.describe('handshake flow @handshake', () => {
 
       const u = createTestUtils({ app, useTestingToken: false });
       // AND an existing user in the instance
-      fakeUser = u.services.users.createFakeUser({ withEmail: true }) as FakeUserWithEmail;
+      fakeUser = u.services.users.createFakeUser(test, { withEmail: true }) as FakeUserWithEmail;
       await u.services.users.createBapiUser(fakeUser);
     });
 

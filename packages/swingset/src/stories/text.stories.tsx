@@ -1,6 +1,5 @@
-/** @jsxImportSource @emotion/react */
-import type { TextProps } from '@clerk/ui/mosaic/components/text';
-import { Text } from '@clerk/ui/mosaic/components/text';
+import type { TextProps } from '@clerk/mosaic/components/text';
+import { Text } from '@clerk/mosaic/components/text';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -10,17 +9,24 @@ export { default as __source } from './text.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'wip',
   title: 'Text',
-  source: 'packages/ui/src/mosaic/components/text/text.tsx',
-  styleEngine: 'stylex',
+  source: 'packages/mosaic/src/components/text/text.tsx',
   styles: {
     _variants: {
       size: { xs: {}, sm: {}, base: {}, lg: {}, xl: {}, '2xl': {} },
-      color: { primary: {}, neutral: {}, warning: {}, negative: {}, positive: {} },
+      color: {
+        brand: {},
+        foreground: {},
+        'foreground-secondary': {},
+        warning: {},
+        negative: {},
+        positive: {},
+      },
     },
     _defaultVariants: {
       size: 'sm',
-      color: 'primary',
+      color: 'foreground',
     },
   },
 };
@@ -83,15 +89,21 @@ export function Colors(props: Record<string, unknown>) {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
       <Text
         {...knobsAsProps(props)}
-        color='primary'
+        color='brand'
       >
-        Primary text
+        Brand text
       </Text>
       <Text
         {...knobsAsProps(props)}
-        color='neutral'
+        color='foreground'
       >
-        Neutral text
+        Foreground text
+      </Text>
+      <Text
+        {...knobsAsProps(props)}
+        color='foreground-secondary'
+      >
+        Foreground secondary text
       </Text>
       <Text
         {...knobsAsProps(props)}

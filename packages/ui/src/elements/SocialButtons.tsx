@@ -17,6 +17,7 @@ import {
   Spinner,
   Text,
   useAppearance,
+  useLocalizations,
 } from '../customizables';
 import { useEnabledThirdPartyProviders } from '../hooks';
 import { useTotalEnabledAuthMethods } from '../hooks/useTotalEnabledAuthMethods';
@@ -68,6 +69,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
   const totalEnabledAuthMethods = useTotalEnabledAuthMethods();
   const card = useCardState();
   const clerk = useClerk();
+  const { t } = useLocalizations();
   const { socialButtonsVariant } = useAppearance().parsedOptions;
 
   type TStrategy = OAuthStrategy | Web3Strategy | PhoneCodeChannel;
@@ -171,6 +173,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
           })}
         >
           {row.map(strategy => {
+            const isLastAuthenticationStrategy = strategy === lastAuthenticationStrategy && totalEnabledAuthMethods > 1;
             const shouldShowPreText =
               remainingStrategiesLength === SOCIAL_BUTTON_PRE_TEXT_THRESHOLD ||
               (strategy === lastAuthenticationStrategy && row.length === 1);
@@ -194,7 +197,7 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 name={strategyToDisplayData[strategy].name}
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
-                alt={`Sign in with ${strategyToDisplayData[strategy].name}`}
+                aria-hidden
                 elementDescriptor={[descriptors.providerIcon, descriptors.socialButtonsProviderIcon]}
                 elementId={descriptors.socialButtonsProviderIcon.setId(strategyToDisplayData[strategy].id)}
               />
@@ -208,9 +211,18 @@ export const SocialButtons = React.memo((props: SocialButtonsRootProps) => {
                 isLoading={card.loadingMetadata === strategy}
                 isDisabled={card.isLoading}
                 label={label}
+                aria-label={
+                  preferBlockButtons || isLastAuthenticationStrategy
+                    ? undefined
+                    : t(
+                        localizationKeys('socialButtonsBlockButton', {
+                          provider: strategyToDisplayData[strategy].name,
+                        }),
+                      )
+                }
                 textLocalizationKey={localizedText}
                 icon={imageOrInitial}
-                lastAuthenticationStrategy={strategy === lastAuthenticationStrategy && totalEnabledAuthMethods > 1}
+                lastAuthenticationStrategy={isLastAuthenticationStrategy}
               />
             );
           })}

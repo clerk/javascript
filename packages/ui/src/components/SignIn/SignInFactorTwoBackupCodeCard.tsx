@@ -19,7 +19,7 @@ import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import { isResetPasswordStrategy } from './utils';
 
 type SignInFactorTwoBackupCodeCardProps = {
-  onShowAlternativeMethodsClicked: React.MouseEventHandler;
+  onShowAlternativeMethodsClicked?: React.MouseEventHandler;
 };
 
 export const SignInFactorTwoBackupCodeCard = (props: SignInFactorTwoBackupCodeCardProps) => {

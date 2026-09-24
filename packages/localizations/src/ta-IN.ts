@@ -107,8 +107,11 @@ export const taIN: LocalizationResource = {
     cannotSubscribeUnrecoverable:
       'இந்த திட்டத்திற்கு நீங்கள் சந்தா செலுத்த முடியாது. உங்கள் தற்போதைய சந்தா இந்த திட்டத்தை விட விலை அதிகம்.',
     checkout: {
+      addPromoCode: undefined,
+      applyPromoCode: undefined,
       description__paymentSuccessful: 'உங்கள் கட்டணம் வெற்றிகரமாக முடிந்தது.',
       description__subscriptionSuccessful: 'உங்கள் புதிய சந்தா முழுமையாகத் தயாராக உள்ளது.',
+      discount: undefined,
       downgradeNotice:
         'பில்லிங் சுழற்சியின் முடிவு வரை உங்கள் தற்போதைய சந்தாவையும் அதன் அம்சங்களையும் வைத்திருப்பீர்கள், பின்னர் நீங்கள் இந்த சந்தாவிற்கு மாற்றப்படுவீர்கள்.',
       emailForm: {
@@ -124,6 +127,8 @@ export const taIN: LocalizationResource = {
       },
       pastDueNotice: 'உங்கள் முந்தைய சந்தா நிலுவையில் இருந்தது, கட்டணம் எதுவும் இல்லாமல்.',
       perMonth: 'மாதத்திற்கு',
+      promoCodePlaceholder: undefined,
+      removePromoCode: undefined,
       title: 'செக்அவுட்',
       title__paymentSuccessful: 'கட்டணம் வெற்றிகரமாக முடிந்தது!',
       title__subscriptionSuccessful: 'வெற்றி!',
@@ -134,6 +139,9 @@ export const taIN: LocalizationResource = {
     credit: 'கடன்',
     creditRemainder: 'உங்கள் தற்போதைய சந்தாவின் மீதமுள்ள காலத்திற்கான கடன்.',
     defaultFreePlanActive: 'நீங்கள் தற்போது இலவச திட்டத்தில் உள்ளீர்கள்',
+    discountAmount: undefined,
+    discountCyclesRemaining: undefined,
+    discountDuration: undefined,
     free: 'இலவசம்',
     getStarted: 'தொடங்குங்கள்',
     highlightedPlanBadge: 'பிரபலமான',
@@ -145,6 +153,7 @@ export const taIN: LocalizationResource = {
     monthAbbreviation: undefined,
     monthPerUnit: undefined,
     monthly: 'மாதந்தோறும்',
+    months: undefined,
     pastDue: 'நிலுவை',
     pay: '{{amount}} செலுத்து',
     payerCreditRemainder: undefined,
@@ -223,6 +232,84 @@ export const taIN: LocalizationResource = {
     year: 'ஆண்டு',
     yearAbbreviation: undefined,
     yearPerUnit: undefined,
+    years: undefined,
+  },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: undefined,
+        directoryAttribute: undefined,
+      },
+      subtitle: undefined,
+      title: undefined,
+    },
+    configureStep: {
+      actionLabel__generateToken: undefined,
+      actionLabel__retry: undefined,
+      domainsLabel: undefined,
+      error__ssoRequired: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      formFieldInputPlaceholder__token: undefined,
+      formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__token: undefined,
+      instructions: {
+        actionLabel__toggle: undefined,
+        custom: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        entra: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+        okta: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+        },
+      },
+      notice__tokenShownOnce: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning__googleUnsupported: {
+        subtitle: undefined,
+        title: undefined,
+      },
+      warning__ssoInactive: undefined,
+    },
+    navbar: {
+      title: undefined,
+    },
+    providers: {
+      custom: undefined,
+      entra: undefined,
+      google: undefined,
+      okta: undefined,
+    },
+    stepper: {
+      attributes: undefined,
+      configure: undefined,
+      test: undefined,
+    },
+    testStep: {
+      actionLabel__complete: undefined,
+      badge__active: undefined,
+      badge__deprovisioned: undefined,
+      description: undefined,
+      empty__waitingForFirstUser: undefined,
+      error__loadUsers: undefined,
+      note: undefined,
+      noteLabel: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
   },
   configureSSO: {
     activate: {
@@ -713,6 +800,12 @@ export const taIN: LocalizationResource = {
         title: undefined,
       },
     },
+    connectionScopeBanner: {
+      subtitle__adding: undefined,
+      subtitle__editing: undefined,
+      title__adding: undefined,
+      title__editing: undefined,
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: 'உங்கள் அனுமதிகளை மேம்படுத்த உங்கள் நிறுவனத்தின் நிர்வாகியைத் தொடர்பு கொள்ளவும்.',
       title: 'ஒற்றை உள்நுழைவை (SSO) நிர்வகிக்க உங்களுக்கு அனுமதி இல்லை',
@@ -722,9 +815,11 @@ export const taIN: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__claimed: undefined,
         badge__expired: undefined,
         badge__unverified: 'சரிபார்க்கப்படவில்லை',
         badge__verified: 'சரிபார்க்கப்பட்டது',
+        checkboxLabel: undefined,
         expiredAtLabel: undefined,
         expiredLabel: undefined,
         removeButtonTooltip__lastVerifiedDomain: undefined,
@@ -869,6 +964,8 @@ export const taIN: LocalizationResource = {
   formButtonPrimary: 'தொடரவும்',
   formButtonPrimary__verify: 'சரிபார்க்கவும்',
   formFieldAction__forgotPassword: 'கடவுச்சொல் மறந்துவிட்டதா?',
+  formFieldAction__hidePassword: 'கடவுச்சொல்லை மறை',
+  formFieldAction__showPassword: 'கடவுச்சொல்லைக் காட்டு',
   formFieldError__matchingPasswords: 'கடவுச்சொற்கள் பொருந்துகின்றன.',
   formFieldError__notMatchingPasswords: 'கடவுச்சொற்கள் பொருந்தவில்லை.',
   formFieldError__verificationLinkExpired: 'சரிபார்ப்பு இணைப்பு காலாவதியானது. புதிய இணைப்பைக் கோருங்கள்.',
@@ -944,11 +1041,53 @@ export const taIN: LocalizationResource = {
       title: undefined,
     },
     scopeList: {
+      privateMetadata: undefined,
       title: undefined,
     },
     subtitle: undefined,
     viewFullUrl: undefined,
     warning: undefined,
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: undefined,
+    confirmation: {
+      action__approve: undefined,
+      action__deny: undefined,
+      scopeListTitle: undefined,
+      subtitle: undefined,
+      title: undefined,
+      warning: undefined,
+    },
+    error: {
+      expiredSubtitle: undefined,
+      expiredTitle: undefined,
+      genericSubtitle: undefined,
+      genericTitle: undefined,
+      invalidCode: undefined,
+      rateLimitedSubtitle: undefined,
+      rateLimitedTitle: undefined,
+      unknownCode: undefined,
+    },
+    start: {
+      action__continue: undefined,
+      subtitle: undefined,
+      title: undefined,
+      userCodeLabel: undefined,
+    },
+    status: {
+      alreadyApprovedSubtitle: undefined,
+      alreadyApprovedTitle: undefined,
+      alreadyDecidedSubtitle: undefined,
+      alreadyDecidedTitle: undefined,
+      alreadyDeniedSubtitle: undefined,
+      alreadyDeniedTitle: undefined,
+      approvedSubtitle: undefined,
+      approvedTitle: undefined,
+      consumedSubtitle: undefined,
+      consumedTitle: undefined,
+      deniedSubtitle: undefined,
+      deniedTitle: undefined,
+    },
   },
   organizationList: {
     action__createOrganization: 'நிறுவனத்தை உருவாக்கு',
@@ -1165,9 +1304,136 @@ export const taIN: LocalizationResource = {
       title: 'டொமைன் நீக்கு',
     },
     securityPage: {
+      connectionPage: {
+        actions: {
+          activate: undefined,
+          continueSetup: undefined,
+        },
+        dangerZone: {
+          deactivateButton: undefined,
+          removeButton: undefined,
+          title: undefined,
+        },
+        domains: {
+          title: undefined,
+        },
+        identityProvider: {
+          certificateExpires: undefined,
+          clientSecret: {
+            placeholder: undefined,
+          },
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        name: {
+          editButton: undefined,
+          form: {
+            title: undefined,
+          },
+          title: undefined,
+        },
+        serviceProvider: {
+          acsUrl: undefined,
+          entityId: undefined,
+          metadataUrl: undefined,
+          redirectUri: undefined,
+          title: undefined,
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: undefined,
+            label: undefined,
+          },
+          allowIdpInitiated: {
+            description: undefined,
+            label: undefined,
+          },
+          allowSubdomains: {
+            description: undefined,
+            label: undefined,
+          },
+          forceAuthn: {
+            description: undefined,
+            label: undefined,
+          },
+          syncUserAttributes: {
+            description: undefined,
+            label: undefined,
+          },
+          title: undefined,
+        },
+      },
+      directorySyncSection: {
+        badge__active: undefined,
+        badge__inactive: undefined,
+        badge__ssoRequired: undefined,
+        badge__unconfigured: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__activate: undefined,
+        menuAction__deactivate: undefined,
+        menuAction__edit: undefined,
+        menuAction__remove: undefined,
+        primaryButton__startConfiguration: undefined,
+        removeDialog: {
+          confirmButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        title: undefined,
+      },
       removeDialog: {
         confirmButton: undefined,
         subtitle: undefined,
+        title: undefined,
+      },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
         title: undefined,
       },
       ssoSection: {
@@ -1178,9 +1444,11 @@ export const taIN: LocalizationResource = {
         descriptionLine1: undefined,
         domainLabel: undefined,
         menuAction__activate: undefined,
+        menuAction__continue: undefined,
         menuAction__deactivate: undefined,
         menuAction__edit: undefined,
         menuAction__remove: undefined,
+        primaryButton__addConnection: undefined,
         primaryButton__continueConfiguration: undefined,
         primaryButton__startConfiguration: undefined,
         title: undefined,
@@ -1416,6 +1684,9 @@ export const taIN: LocalizationResource = {
       subtitle: 'நீங்கள் தொடர விரும்பும் நிறுவன கணக்கைத் தேர்ந்தெடுக்கவும்.',
       title: 'உங்கள் நிறுவன கணக்கைத் தேர்வு செய்யவும்',
     },
+    enterpriseSSO: {
+      formButtonPrimary: undefined,
+    },
     forgotPassword: {
       formTitle: 'கடவுச்சொல் மீட்டமைப்பு குறியீடு',
       resendButton: 'குறியீடு கிடைக்கவில்லையா? மீண்டும் அனுப்பு',
@@ -1481,6 +1752,15 @@ export const taIN: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'உங்கள் கடவுச்சொல்லை மீட்டமைப்பதற்கு முன் உங்கள் அடையாளத்தை சரிபார்க்க வேண்டும்.',
+    },
+    ssoBypass: {
+      actionLink: undefined,
+      code: {
+        resendButton: undefined,
+        subtitle: undefined,
+        title: undefined,
+      },
+      notice: undefined,
     },
     start: {
       actionLink: 'பதிவு செய்',
@@ -1765,6 +2045,7 @@ export const taIN: LocalizationResource = {
     form_password_incorrect: 'நீங்கள் உள்ளிட்ட கடவுச்சொல் தவறானது. மீண்டும் முயற்சிக்கவும்.',
     form_password_length_too_short:
       'உங்கள் கடவுச்சொல் மிகவும் குறுகியது. இது குறைந்தது 8 எழுத்துகள் நீளமாக இருக்க வேண்டும்.',
+    form_password_matches_identifier: undefined,
     form_password_not_strong_enough: 'உங்கள் கடவுச்சொல் போதுமான வலிமை இல்லை.',
     form_password_or_identifier_incorrect:
       'கடவுச்சொல் அல்லது மின்னஞ்சல் முகவரி தவறானது. மீண்டும் முயற்சிக்கவும் அல்லது வேறு முறையைப் பயன்படுத்தவும்.',
@@ -1829,6 +2110,9 @@ export const taIN: LocalizationResource = {
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    sso_bypass_domain_not_served: undefined,
+    ticket_expired_code: undefined,
+    ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3 வாலட் நீட்டிப்பு காணப்படவில்லை. தொடர ஒன்றை நிறுவவும்.',
     web3_signature_request_rejected: 'நீங்கள் கையொப்ப கோரிக்கையை நிராகரித்துவிட்டீர்கள். தொடர மீண்டும் முயற்சிக்கவும்.',
     web3_solana_signature_generation_failed:

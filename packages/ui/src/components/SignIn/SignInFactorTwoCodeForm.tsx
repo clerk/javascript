@@ -46,6 +46,8 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
   const supportEmail = useSupportEmail();
   const clerk = useClerk();
 
+  const signInAsDifferentUser = () => navigate('../');
+
   // Only show the new device verification notice if the user is new
   // and no attributes are explicitly used for second factor.
   // Retained for backwards compatibility.
@@ -134,6 +136,7 @@ export const SignInFactorTwoCodeForm = (props: SignInFactorTwoCodeFormProps) => 
       profileImageUrl={signIn.userData.imageUrl}
       identityPreviewEditButtonAriaLabel={localizationKeys('identityPreviewEditButton__identifier')}
       onShowAlternativeMethodsClicked={props.onShowAlternativeMethodsClicked}
+      onDifferentAccountClicked={signInAsDifferentUser}
     >
       {isResettingPassword(signIn) && (
         <Text

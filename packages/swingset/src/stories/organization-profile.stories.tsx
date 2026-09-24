@@ -1,24 +1,47 @@
-/** @jsxImportSource @emotion/react */
-import { OrganizationProfileView } from '@clerk/ui/mosaic/organization/organization-profile-view';
+import { Button } from '@clerk/mosaic/components/button';
+import { Dialog } from '@clerk/mosaic/components/dialog';
+import { OrganizationProfileView } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { Default as OrganizationProfileApiKeysPanelDemo } from './organization-profile-api-keys-panel.stories';
-import { Default as OrganizationProfileGeneralPanelDemo } from './organization-profile-general-panel.stories';
-import { Default as OrganizationProfileMembersPanelDemo } from './organization-profile-members-panel.stories';
+import { useOrganizationProfileFixture } from './fixtures/organization-profile';
+
+export { default as __source } from './organization-profile.stories?raw';
 
 export const meta: StoryMeta = {
-  group: 'Organization',
+  group: 'Organization Profile',
+  status: 'wip',
+  substatus: 'needs wire-up',
   title: 'OrganizationProfile',
-  source: 'packages/ui/src/mosaic/organization/organization-profile.tsx',
+  label: 'Organization profile',
+  layout: 'wide',
+  source: 'packages/mosaic/src/features/organization-profile/organization-profile.view.tsx',
 };
 
 export function Default() {
+  const { activePage, setActivePage, pages } = useOrganizationProfileFixture();
   return (
     <OrganizationProfileView
-      general={<OrganizationProfileGeneralPanelDemo />}
-      members={<OrganizationProfileMembersPanelDemo />}
-      apiKeys={<OrganizationProfileApiKeysPanelDemo />}
+      activePage={activePage}
+      pages={pages}
+      onPageChange={setActivePage}
+      elevation='flush'
     />
+  );
+}
+
+export function Overlay() {
+  const { activePage, setActivePage, pages } = useOrganizationProfileFixture();
+  return (
+    <Dialog.Root>
+      <Dialog.Trigger render={<Button />}>Manage workspace</Dialog.Trigger>
+      <Dialog.Popup variant='profile'>
+        <OrganizationProfileView
+          activePage={activePage}
+          pages={pages}
+          onPageChange={setActivePage}
+        />
+      </Dialog.Popup>
+    </Dialog.Root>
   );
 }

@@ -1,8 +1,7 @@
-/** @jsxImportSource @emotion/react */
-import type { IconProps } from '@clerk/ui/mosaic/components/icon';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import { iconRegistry } from '@clerk/ui/mosaic/icons/registry';
-import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
+import type { IconProps } from '@clerk/mosaic/components/icon';
+import { Icon } from '@clerk/mosaic/components/icon';
+import { iconRegistry } from '@clerk/mosaic/icons/registry';
+import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -12,9 +11,9 @@ export { default as __source } from './icon.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Icon',
-  source: 'packages/ui/src/mosaic/components/icon/icon.tsx',
-  styleEngine: 'stylex',
+  source: 'packages/mosaic/src/components/icon/icon.tsx',
   styles: {
     _variants: {
       size: { sm: {}, md: {}, lg: {} },
@@ -63,47 +62,76 @@ export function Sizes(props: Record<string, unknown>) {
   );
 }
 
-export function Names() {
+const deviceIllustrationNames: IconProps['name'][] = ['device-phone', 'device-laptop'];
+
+function IconGallery({ names }: { names: readonly IconProps['name'][] }) {
   return (
-    <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
-      {(Object.keys(iconRegistry) as Array<keyof typeof iconRegistry>).map(name => (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 120px), 1fr))',
+        gap: 8,
+        width: '100%',
+      }}
+    >
+      {names.map(name => (
         <div
           key={name}
-          style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center', fontSize: 12 }}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 12,
+            minWidth: 0,
+            minHeight: 104,
+            padding: '20px 8px 12px',
+            border: '1px solid color-mix(in srgb, currentColor 10%, transparent)',
+            borderRadius: 8,
+            textAlign: 'center',
+          }}
         >
           <Icon
             name={name}
             size='lg'
           />
-          <code>{name}</code>
+          <code style={{ fontSize: 11, lineHeight: 1.5, overflowWrap: 'anywhere' }}>{name}</code>
         </div>
       ))}
     </div>
   );
 }
 
+export function Names() {
+  const names = (Object.keys(iconRegistry) as Array<keyof typeof iconRegistry>).filter(
+    name => !deviceIllustrationNames.includes(name),
+  );
+  return <IconGallery names={names} />;
+}
+
+export function DeviceIllustrations() {
+  return <IconGallery names={deviceIllustrationNames} />;
+}
+
 export function Override() {
   return (
+    // Overrides are elements, not render functions: Mosaic injects its sizing className and
+    // `data-size` into the element via cloneElement, so the replacement only supplies its own
+    // content and need not be an `svg`. Passing an element (vs a function) also lets overrides
+    // be supplied from a Server Component, since elements serialize across the RSC boundary.
     <MosaicProvider
-      appearance={{
-        // Overrides are elements, not render functions: Mosaic injects its sizing className and
-        // `data-size` into the element via cloneElement, so the replacement only supplies its own
-        // content and need not be an `svg`. Passing an element (vs a function) also lets overrides
-        // be supplied from a Server Component, since elements serialize across the RSC boundary.
-        icons: {
-          'chevron-right': (
-            <svg
-              viewBox='0 0 20 20'
-              fill='currentColor'
-            >
-              <circle
-                cx={10}
-                cy={10}
-                r={6}
-              />
-            </svg>
-          ),
-        },
+      icons={{
+        'chevron-right': (
+          <svg
+            viewBox='0 0 20 20'
+            fill='currentColor'
+          >
+            <circle
+              cx={10}
+              cy={10}
+              r={6}
+            />
+          </svg>
+        ),
       }}
     >
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>

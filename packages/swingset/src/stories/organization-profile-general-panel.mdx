@@ -1,27 +1,24 @@
-import * as OrganizationProfileGeneralPanelStories from './organization-profile-general-panel.stories';
+import * as Stories from './organization-profile-general-panel.stories';
 
-# Organization Profile General Panel
+# OrganizationProfileGeneralPanel
 
-The General tab panel of the Organization Profile — composes the organization-level sections shown under "General".
+The workspace's General page: its details, and the danger zone under them.
 
 <Story
   name='Default'
-  storyModule={OrganizationProfileGeneralPanelStories}
+  storyModule={Stories}
   composition={[
-    {
-      name: 'OrganizationProfileProfileSection',
-      href: '/organization/organization-profile-profile-section',
-      layer: 'Organization',
-    },
-    {
-      name: 'OrganizationProfileLeaveSection',
-      href: '/organization/organization-profile-leave-section',
-      layer: 'Organization',
-    },
-    {
-      name: 'OrganizationProfileDeleteSection',
-      href: '/organization/organization-profile-delete-section',
-      layer: 'Organization',
-    },
+    { name: 'Workspace details', href: '/organization-profile/organization-profile-workspace-section', layer: 'Organization Profile' },
+    { name: 'Danger zone', href: '/organization-profile/organization-profile-danger-section', layer: 'Organization Profile' },
   ]}
+/>
+
+## Without permission to manage
+
+Each action appears only when the panel is handed its callback, so a member who cannot manage the
+workspace sees the details and nothing to act on.
+
+<Story
+  name='ReadOnly'
+  storyModule={Stories}
 />

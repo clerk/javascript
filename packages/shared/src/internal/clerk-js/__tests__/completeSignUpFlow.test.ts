@@ -239,6 +239,33 @@ describe('completeSignUpFlow', () => {
     });
   });
 
+  it.each([
+    ['redirectUrl is missing', { redirectUrlComplete: 'https://example.com/done' }],
+    ['redirectUrlComplete is missing', { redirectUrl: 'https://example.com/acs' }],
+    ['both are missing', {}],
+    ['redirectUrl is empty', { redirectUrl: '', redirectUrlComplete: 'https://example.com/done' }],
+    ['redirectUrlComplete is empty', { redirectUrl: 'https://example.com/acs', redirectUrlComplete: '' }],
+  ])('throws rather than starting an Enterprise SSO flow when %s', (_label, urls) => {
+    const mockSignUp = {
+      status: 'missing_requirements',
+      missingFields: ['enterprise_sso'],
+      authenticateWithRedirect: mockAuthenticateWithRedirect,
+    } as unknown as SignUpResource;
+
+    expect(() =>
+      completeSignUpFlow({
+        signUp: mockSignUp,
+        handleComplete: mockHandleComplete,
+        navigate: mockNavigate,
+        ...urls,
+      }),
+    ).toThrow(/redirectUrl/);
+
+    expect(mockAuthenticateWithRedirect).not.toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(mockHandleComplete).not.toHaveBeenCalled();
+  });
+
   it('forwards clerk ticket and status query params when navigating to verify email', async () => {
     const mockSignUp = {
       status: 'missing_requirements',

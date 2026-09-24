@@ -12,7 +12,7 @@ test.describe('chrome extension background service worker @chrome-extension', ()
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
-    fakeUser = await createTestUser(env);
+    fakeUser = await createTestUser(env, test);
   });
 
   test.afterAll(async () => {

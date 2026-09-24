@@ -1,3 +1,4 @@
+import { SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ClientJSON,
   DisplayConfigJSON,
@@ -16,7 +17,6 @@ import type {
   VerificationJSON,
 } from '@clerk/shared/types';
 
-import { SIGN_UP_MODES } from '@/core/constants';
 import type { OrgParams } from '@/test/core-fixtures';
 import { createUser, getOrganizationId } from '@/test/core-fixtures';
 
@@ -116,9 +116,16 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     supportResetPassword?: boolean;
   };
 
+  type SignInWithEnterpriseSSOParams = {
+    identifier?: string;
+    enterpriseConnections?: Array<{ id: string; name: string; logoPublicUrl?: string; provider?: string }>;
+    supportSSOBypass?: boolean;
+  };
+
   type SignInFactorTwoParams = {
     identifier?: string;
     supportPhoneCode?: boolean;
+    supportEmailCode?: boolean;
     supportTotp?: boolean;
     supportBackupCode?: boolean;
     supportResetPasswordEmail?: boolean;
@@ -157,6 +164,30 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignInJSON;
   };
 
+  const startSignInWithEnterpriseSSO = (params?: SignInWithEnterpriseSSOParams) => {
+    const { identifier = 'hello@clerk.com', enterpriseConnections, supportSSOBypass } = params || {};
+    baseClient.sign_in = {
+      status: 'needs_first_factor',
+      identifier,
+      supported_identifiers: ['email_address'],
+      supported_first_factors: enterpriseConnections?.length
+        ? enterpriseConnections.map(({ id, name, logoPublicUrl, provider }) => ({
+            strategy: 'enterprise_sso',
+            enterprise_connection_id: id,
+            enterprise_connection_name: name,
+            enterprise_connection_logo_public_url: logoPublicUrl,
+            enterprise_connection_provider: provider,
+          }))
+        : [{ strategy: 'enterprise_sso' }],
+      ...(supportSSOBypass && {
+        sso_bypass_first_factors: [
+          { strategy: 'email_code', safe_identifier: identifier, email_address_id: 'idn_hmac' },
+        ],
+      }),
+      user_data: { ...(createUserFixture() as any) },
+    } as SignInJSON;
+  };
+
   const startSignInWithPhoneNumber = (params?: SignInWithPhoneNumberParams) => {
     const {
       identifier = '+301234567890',
@@ -185,17 +216,21 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignInJSON;
   };
 
-  const startSignInFactorTwo = (params?: SignInFactorTwoParams) => {
+  const startSignInVerification = (
+    status: Extract<SignInJSON['status'], 'needs_client_trust' | 'needs_second_factor'>,
+    params?: SignInFactorTwoParams,
+  ) => {
     const {
       identifier = '+30 691 1111111',
       supportPhoneCode = true,
+      supportEmailCode,
       supportTotp,
       supportBackupCode,
       supportResetPasswordEmail,
       supportResetPasswordPhone,
     } = params || {};
     baseClient.sign_in = {
-      status: 'needs_second_factor',
+      status,
       identifier,
       ...(supportResetPasswordEmail
         ? {
@@ -216,6 +251,7 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
       supported_identifiers: ['email_address', 'phone_number'],
       supported_second_factors: [
         ...(supportPhoneCode ? [{ strategy: 'phone_code', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
+        ...(supportEmailCode ? [{ strategy: 'email_code', safe_identifier: 'n*****@clerk.com' }] : []),
         ...(supportTotp ? [{ strategy: 'totp', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
         ...(supportBackupCode ? [{ strategy: 'backup_code', safe_identifier: identifier || 'n*****@clerk.com' }] : []),
       ],
@@ -223,19 +259,49 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignInJSON;
   };
 
+  const startSignInFactorTwo = (params?: SignInFactorTwoParams) =>
+    startSignInVerification('needs_second_factor', params);
+
+  const startSignInClientTrust = (params?: SignInFactorTwoParams) =>
+    startSignInVerification('needs_client_trust', params);
+
   const startSignInWithProtectCheck = (params?: {
     expiresAt?: number;
     uiHints?: Record<string, string>;
     sdkUrl?: string;
+    /**
+     * Set for an OAuth sign-in that has no account yet: the server has recorded the account
+     * transfer and marked the first factor `transferable`, so the flow's continuation is a
+     * sign-up rather than any interactive sign-in step.
+     */
+    pendingOAuthTransfer?: boolean;
+    /** Overrides the gated status; `needs_identifier` is what a pending transfer carries. */
+    status?: SignInJSON['status'];
   }) => {
-    const { expiresAt, uiHints, sdkUrl = 'https://protect.example.com/sdk.js' } = params || {};
+    const {
+      expiresAt,
+      uiHints,
+      sdkUrl = 'https://protect.example.com/sdk.js',
+      pendingOAuthTransfer = false,
+      status = 'needs_protect_check',
+    } = params || {};
     baseClient.sign_in = {
       id: 'sia_2HseAXFGN12eqlwARPMxyyUa9o9',
-      status: 'needs_protect_check',
+      status,
       identifier: 'test@clerk.com',
       supported_first_factors: [],
       supported_second_factors: [],
-      first_factor_verification: null,
+      first_factor_verification: pendingOAuthTransfer
+        ? {
+            status: 'transferable',
+            strategy: 'oauth_google',
+            error: {
+              code: 'external_account_not_found',
+              message: 'Invalid external account',
+              long_message: 'The External Account was not found.',
+            },
+          }
+        : null,
       second_factor_verification: null,
       created_session_id: null,
       protect_check: {
@@ -249,7 +315,14 @@ const createSignInFixtureHelpers = (baseClient: ClientJSON) => {
     } as SignInJSON;
   };
 
-  return { startSignInWithEmailAddress, startSignInWithPhoneNumber, startSignInFactorTwo, startSignInWithProtectCheck };
+  return {
+    startSignInWithEmailAddress,
+    startSignInWithEnterpriseSSO,
+    startSignInWithPhoneNumber,
+    startSignInFactorTwo,
+    startSignInClientTrust,
+    startSignInWithProtectCheck,
+  };
 };
 
 const createSignUpFixtureHelpers = (baseClient: ClientJSON) => {
@@ -585,9 +658,13 @@ const createUserSettingsFixtureHelpers = (environment: EnvironmentJSON) => {
     };
   };
 
-  const withEnterpriseSso = (opts?: { selfServeSSO?: boolean }) => {
+  const withEnterpriseSso = (opts?: { selfServeSSO?: boolean; selfServeDirectorySync?: boolean }) => {
     us.saml = { enabled: true };
-    us.enterprise_sso = { enabled: true, self_serve_sso: opts?.selfServeSSO ?? false };
+    us.enterprise_sso = {
+      enabled: true,
+      self_serve_sso: opts?.selfServeSSO ?? false,
+      self_serve_directory_sync: opts?.selfServeDirectorySync ?? false,
+    };
   };
 
   const withBackupCode = (opts?: Partial<UserSettingsJSON['attributes']['backup_code']>) => {

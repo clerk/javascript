@@ -14,6 +14,7 @@ import type {
   CheckoutSignalValue,
   ConfirmCheckoutParams,
   CreateCheckoutParams,
+  UpdateCheckoutParams,
 } from '@clerk/shared/types';
 import { computed, endBatch, signal, startBatch } from 'alien-signals';
 
@@ -117,7 +118,7 @@ export const createSignals = () => {
   return { resourceSignal, errorSignal, fetchSignal, computedSignal };
 };
 
-type CheckoutTask = 'start' | 'confirm' | 'finalize';
+type CheckoutTask = 'start' | 'update' | 'confirm' | 'finalize';
 
 export class CheckoutFlow implements CheckoutFlowResourceNonStrict {
   private resource = new BillingCheckout(null);
@@ -197,6 +198,24 @@ export class CheckoutFlow implements CheckoutFlowResourceNonStrict {
     });
   }
 
+  async update(params: Pick<UpdateCheckoutParams, 'promoCode'>): Promise<{ error: ClerkError | null }> {
+    if (!this.resource.id) {
+      throw new Error('Clerk: `start()` must be called before `update()`');
+    }
+    return this.runAsyncCheckoutTask(
+      'update',
+      async () => {
+        this.resource = (await BillingCheckout.clerk.billing?.updateCheckout({
+          id: this.resource.id,
+          orgId: this.resource.payer.organizationId || undefined,
+          ...params,
+        })) as BillingCheckout;
+      },
+      undefined,
+      false,
+    );
+  }
+
   async finalize(params?: CheckoutFlowFinalizeParams): Promise<{ error: ClerkError | null }> {
     const { navigate } = params || {};
     return this.runAsyncCheckoutTask('finalize', async () => {
@@ -208,13 +227,23 @@ export class CheckoutFlow implements CheckoutFlowResourceNonStrict {
     });
   }
 
-  private runAsyncCheckoutTask<T>(operationType: CheckoutTask, task: () => Promise<T>, beforeTask?: () => void) {
+  private runAsyncCheckoutTask<T>(
+    operationType: CheckoutTask,
+    task: () => Promise<T>,
+    beforeTask?: () => void,
+    updateErrorSignal = true,
+  ) {
     // Noops during transitive state
     if (typeof BillingCheckout.clerk.user === 'undefined') {
       console.warn('Clerk: Checkout operations cannot be performed during transitive state');
       return { error: null };
     }
-    return createRunAsyncCheckoutTask(this, this.signals, this.pendingOperations)(operationType, task, beforeTask);
+    return createRunAsyncCheckoutTask(this, this.signals, this.pendingOperations)(
+      operationType,
+      task,
+      beforeTask,
+      updateErrorSignal,
+    );
   }
 }
 
@@ -226,8 +255,9 @@ function createRunAsyncCheckoutTask(
   operationType: CheckoutTask,
   task: () => Promise<T>,
   beforeTask?: () => void,
+  updateErrorSignal?: boolean,
 ) => Promise<{ error: ClerkError | null }> {
-  return async (operationType, task, beforeTask?: () => void) => {
+  return async (operationType, task, beforeTask?: () => void, updateErrorSignal = true) => {
     if (pendingOperations.get(operationType)) {
       // Wait for the existing operation to complete and return its result
       // If it fails, all callers should receive the same error
@@ -246,7 +276,9 @@ function createRunAsyncCheckoutTask(
         signals.resourceSignal({ resource: resource });
         return { error: null };
       } catch (err) {
-        signals.errorSignal({ error: err });
+        if (updateErrorSignal) {
+          signals.errorSignal({ error: err });
+        }
         return { error: err };
       } finally {
         pendingOperations.delete(operationType);

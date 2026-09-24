@@ -14,7 +14,7 @@ testAgainstRunningApps({})('per-seat pricing @billing', ({ app }) => {
   test.beforeAll(async () => {
     const u = createTestUtils({ app });
 
-    fakeAdmin = u.services.users.createFakeUser();
+    fakeAdmin = u.services.users.createFakeUser(test);
     const admin = await u.services.users.createBapiUser(fakeAdmin);
     fakeOrganization = await u.services.users.createFakeOrganization(admin.id);
   });

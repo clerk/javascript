@@ -8,20 +8,29 @@ Component explorer for the Mosaic design system. Runs at http://localhost:6006.
 pnpm dev --filter @clerk/swingset
 ```
 
+## Live Sandbox
+
+`/live` runs Mosaic flows against a real Clerk application. Copy `packages/swingset/.env.example` to `packages/swingset/.env.local`, set `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, and restart Swingset. `CLERK_SECRET_KEY` is optional (needed for SSO / OAuth). `SWINGSET_DASHBOARD_URL` is optional (deep-links the application name on the overview).
+
+The component explorer works without these keys.
+
 ## Adding a component
 
 **1. Create a story file** — `src/stories/my-component.stories.tsx`
 
 ```tsx
-/** @jsxImportSource @emotion/react */
 import type { StoryMeta } from '@/lib/types';
-import { MyComponent, myComponentStyles } from '@clerk/ui/mosaic/components/my-component';
+import { MyComponent, type MyComponentProps } from '@clerk/mosaic/components/my-component';
 
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'My Component',
-  source: 'packages/ui/src/mosaic/components/my-component.tsx', // repo-root path → "View source" link
-  styles: myComponentStyles, // CVA style object — knobs auto-generated from _variants
+  source: 'packages/mosaic/src/components/my-component/my-component.tsx', // repo-root path → "View source" link
+  // Variant surface, declared by hand — knobs are generated from `_variants`
+  styles: {
+    _variants: { variant: { primary: {}, outline: {} }, size: { sm: {}, md: {} } },
+    _defaultVariants: { variant: 'primary', size: 'md' },
+  },
 };
 
 export function Default(props: Record<string, unknown>) {
@@ -29,7 +38,7 @@ export function Default(props: Record<string, unknown>) {
 }
 ```
 
-Knobs are generated automatically from the CVA `_variants` on the style object. Boolean variants (`true`/`false` keys) become toggles; all others become selects. Default values come from `defaultVariants`.
+Knobs are generated automatically from the hand-written `_variants` on `meta.styles`. Boolean variants (`true`/`false` keys) become toggles; all others become selects. Default values come from `_defaultVariants`.
 
 `source` is the path to the component's exporting file relative to the monorepo root; `DocsViewer` renders it as a "View source" link to the file on GitHub (`lib/source.ts`).
 
@@ -42,7 +51,7 @@ const myModule: StoryModule = { meta: myMeta, Default };
 export const registry: StoryModule[] = [..., myModule];
 ```
 
-Import stories explicitly (not `import *`) to control sidebar order.
+Import stories explicitly (not `import *`) and add the module under its group's comment in the `registry` array. The sidebar sorts `Blocks`, `Components`, `Primitives`, `Styles`, and `Hooks` alphabetically by `title`; `User Button`, `User Profile`, and `Reverification` render in array order.
 
 **3. Add docs** — `src/stories/my-component.mdx`
 
@@ -64,10 +73,9 @@ import * as Stories from './my-component.stories';
 ```
 
 `<Preview>` renders the live component inline in the overview — there are no separate
-per-story pages. Its props are edited through the controls in the `<PropTable>` below it,
-and a collapsible Variables panel attached to the preview exposes Mosaic token overrides
-that re-theme it. Both share the page's playground state. Use `<Story name='Sizes' …>` for
-additional static demos of specific variations (no controls).
+per-story pages. Its props are edited through the controls in the `<PropTable>` below it;
+the two share the page's playground state. Use `<Story name='Sizes' …>` for additional
+static demos of specific variations (no controls).
 
 Register in `src/components/DocsViewer.tsx`:
 
@@ -77,11 +85,11 @@ const docModules = {
 };
 ```
 
-Also update the root redirect in `src/app/page.tsx` if this is now the first component.
+Also update the root redirect in `src/app/(explorer)/page.tsx` if this is now the first component.
 
 ## PropTable
 
-In MDX, use `<PropTable>` to auto-generate the props table from the CVA style object:
+In MDX, use `<PropTable>` to auto-generate the props table from the story's declared variant surface:
 
 ```mdx
 import * as Stories from './my-component.stories';
@@ -89,28 +97,29 @@ import * as Stories from './my-component.stories';
 <PropTable meta={Stories.meta} />
 ```
 
-Variant props (type and default) are derived from `meta.styles._variants` and `meta.styles._defaultVariants`. The `sx` prop is always appended automatically. Pass `extra` for any other non-variant props.
+Variant props (type and default) are derived from `meta.styles._variants` and `meta.styles._defaultVariants`. The `className` and `style` escape-hatch rows are always appended automatically. Pass `extra` for any other non-variant props.
 
 ## Architecture
 
 ```
 src/
-  app/                 Next.js App Router
+  app/
+    (explorer)/        Component explorer (`/`, `/[group]/[component]`)
+    (clerk)/           Live Sandbox (`/live`, `/sign-in`, `/sign-up`)
   components/
     app-sidebar.tsx    Left nav (reads from registry)
     ClientRoot.tsx     SidebarProvider + breadcrumb header
     DocsViewer.tsx       Renders MDX docs for /components/[slug]; provides PlaygroundContext
-    PlaygroundContext.tsx Shared per-page knob values + Mosaic variables
+    PlaygroundContext.tsx Shared per-page knob values
     StoryPreview.tsx     Live <Preview> embed, props driven by the playground state
     StoryEmbed.tsx       Static <Story> embed: a single variation, no controls
     PropTable.tsx        Interactive props table — controls live in the Value column
     KnobControl.tsx      A single auto-generated control (switch/select/input)
-    VariablesPanel.tsx   Mosaic CSS variable overrides (collapsible, attached to the preview)
     CodeBlock.tsx        Shiki syntax highlighter (css-variables theme)
     ViewSource.tsx       "View source" link to the component's file on GitHub
   lib/
     registry.ts        Story registry — add new stories here
-    generateKnobs.ts   CVA _variants → knob definitions
+    generateKnobs.ts   meta.styles._variants → knob definitions
     types.ts           StoryMeta, StoryModule, KnobDef etc.
     slug.ts            URL slug utilities
     source.ts          Builds GitHub URLs from meta.source paths

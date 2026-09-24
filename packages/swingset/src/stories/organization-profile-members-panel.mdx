@@ -1,17 +1,40 @@
-import * as OrganizationProfileMembersPanelStories from './organization-profile-members-panel.stories';
+import * as Stories from './organization-profile-members-panel.stories';
 
-# Organization Profile Members Panel
+# OrganizationProfileMembersPanel
 
-The Members tab panel of the Organization Profile — lists an organization's active members and owns the search and remove flows. It gates on `org:sys_memberships:read` to view and `org:sys_memberships:manage` to remove a member.
+The organization profile’s Members panel owns the page title and tab navigation. These examples show its Members, Invitations, and Requests tabs with controlled tables. Each table uses the shared Table toolbar and search field.
 
-<Story
-  name='Default'
-  storyModule={OrganizationProfileMembersPanelStories}
-  composition={[
-    {
-      name: 'OrganizationProfile',
-      href: '/organization/organization-profile',
-      layer: 'Organization',
-    },
-  ]}
-/>
+Removing a member opens a confirmation dialog. The dialog awaits the action callback and keeps failures visible. After a successful removal, focus moves to a surviving row action or a toolbar control.
+
+Revoking an invitation opens a confirmation dialog. The dialog awaits the action callback and keeps failures visible. After a successful removal, focus moves to a surviving row action or a toolbar control.
+
+Accepting or declining a request runs immediately. Both row actions are held while the callback is pending, and failures appear beside the actions so the user can retry. After a successful removal, focus moves to a surviving row action or the search field.
+
+## Example
+
+### Legacy
+
+The Members table shows the user, joined date, role, and optional row actions. The Invitations table shows the invited email address, invitation date, role, and optional revoke action. The Requests table shows the requester, request date, and available row actions.
+
+<Story name='Legacy' storyModule={Stories} composition={[
+  { name: 'Profile', href: '/components/profile', layer: 'Components' },
+  { name: 'Tabs', href: '/components/tabs', layer: 'Components' },
+  { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
+  { name: 'Table', href: '/components/table', layer: 'Components' },
+  { name: 'Pagination', href: '/components/pagination', layer: 'Components' },
+  { name: 'Select', href: '/components/select', layer: 'Components' },
+  { name: 'Menu', href: '/components/menu', layer: 'Components' },
+  { name: 'Button', href: '/components/button', layer: 'Components' },
+]} />
+
+## Examples
+
+### Proposed
+
+Sorting and selection are enabled through optional callbacks, following the API keys table. The caller sorts before pagination. The current user and deprovisioned members cannot be selected, removed, or have their role changed. Selection clears when search, sorting, or pagination changes. The bulk callback enables selection; no bulk action toolbar is rendered.
+
+<Story name='Proposed' storyModule={Stories} />
+
+### Empty
+
+<Story name='Empty' storyModule={Stories} />

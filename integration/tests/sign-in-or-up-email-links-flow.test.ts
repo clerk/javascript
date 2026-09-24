@@ -10,7 +10,7 @@ testAgainstRunningApps({ withEnv: [] })('sign-in-or-up email links flow', ({ app
 
   test.beforeAll(() => {
     const u = createTestUtils({ app });
-    fakeUser = u.services.users.createFakeUser();
+    fakeUser = u.services.users.createFakeUser(test);
   });
 
   test.afterAll(async () => {

@@ -16,6 +16,7 @@ import {
   disabledEmailAddressAttribute,
   disabledOrganizationAPIKeysFeature,
   disabledOrganizationsFeature,
+  disabledSelfServeDirectorySyncFeature,
   disabledSelfServeSSOFeature,
   disabledUserAPIKeysFeature,
   isSignedInAndSingleSessionModeEnabled,
@@ -99,18 +100,21 @@ import type {
   LoadedClerk,
   NavigateOptions,
   OAuthApplicationNamespace,
+  OAuthDeviceVerificationProps,
   OAuthTransport,
   OrganizationListProps,
   OrganizationProfileProps,
   OrganizationResource,
   OrganizationSwitcherProps,
   PricingTableProps,
+  ProtectAssertion,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
   RedirectOptions,
   Resources,
+  ResumeAfterProtectCheckParams,
   SDKMetadata,
   SessionResource,
   SessionTouchParams,
@@ -190,6 +194,7 @@ import { Billing } from './modules/billing';
 import { createCheckoutInstance } from './modules/checkout/instance';
 import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
+import { protectAssertionParams } from './protectAssertion';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
@@ -272,6 +277,9 @@ export class Clerk implements ClerkInterface {
   #listeners: Array<(emission: Resources) => void> = [];
   #navigationListeners: Array<() => void> = [];
   #options: ClerkOptions = {};
+  #protectAssertion: ProtectAssertion | undefined;
+  // Distinguishes never-set from cleared-with-undefined, so clearing does not fall back to the option.
+  #protectAssertionSet = false;
   #oauthTransport: OAuthTransport | null = null;
   #pageLifecycle: ReturnType<typeof createPageLifecycle> | null = null;
   #touchThrottledUntil = 0;
@@ -319,6 +327,16 @@ export class Clerk implements ClerkInterface {
 
   get __internal_oauthTransport(): OAuthTransport | null {
     return this.#oauthTransport;
+  }
+
+  /**
+   * The verification-module load timeout asked for by the loader THIS browser was assigned, or
+   * undefined when it asked for nothing. Exposed because the assignment is a random draw per page
+   * load and cannot be recomputed from the environment config; callers fall back to the
+   * instance-wide value on that config, and then to the SDK default.
+   */
+  get __internal_protectChallengeLoadTimeoutMs(): number | undefined {
+    return this.#protect?.challengeLoadTimeoutMs;
   }
 
   public __internal_getCachedResources:
@@ -477,6 +495,36 @@ export class Clerk implements ClerkInterface {
     return this.#options[key];
   }
 
+  public setProtectAssertion = (assertion?: ProtectAssertion): void => {
+    this.#protectAssertion = assertion;
+    this.#protectAssertionSet = true;
+  };
+
+  /** The last value passed to `setProtectAssertion` once called, otherwise the `protectAssertion` option. */
+  #currentProtectAssertion(): ProtectAssertion | undefined {
+    return this.#protectAssertionSet ? this.#protectAssertion : this.#options.protectAssertion;
+  }
+
+  /**
+   * The Protect params for one sign-in or sign-up body. The application-supplied assertion and the
+   * server-configured session token are independent features that write disjoint params, so both
+   * contribute and neither can suppress the other: they are resolved concurrently, and a failure on
+   * one side costs only that side's params. Resolves to `undefined` when neither produces anything,
+   * so a request from an instance using no Protect feature is byte-for-byte what it was before.
+   */
+  async #protectParams(): Promise<Record<string, string | undefined> | undefined> {
+    const [assertion, session] = await Promise.all([
+      protectAssertionParams(this.#currentProtectAssertion()).catch(() => undefined),
+      this.#protect?.getRequestParams().catch(() => undefined),
+    ]);
+
+    if (!assertion && !session) {
+      return undefined;
+    }
+
+    return { ...assertion, ...session };
+  }
+
   get isSignedIn(): boolean {
     const hasPendingSession = this?.session?.status === 'pending';
     if (hasPendingSession) {
@@ -514,6 +562,7 @@ export class Clerk implements ClerkInterface {
       getSessionId: () => {
         return this.session?.id;
       },
+      getProtectParams: () => this.#protectParams(),
       proxyUrl: this.proxyUrl,
     });
     this.#publicEventBus.emit(clerkEvents.Status, 'loading');
@@ -741,10 +790,16 @@ export class Clerk implements ClerkInterface {
     if (!opts.sessionId || this.client.signedInSessions.length === 1) {
       this.#setTransitiveState();
 
-      if (this.#options.experimental?.persistClient ?? true) {
-        await this.client.removeSessions();
-      } else {
-        await this.client.destroy();
+      try {
+        if (this.#options.experimental?.persistClient ?? true) {
+          await this.client.removeSessions();
+        } else {
+          await this.client.destroy();
+        }
+      } catch (err) {
+        if (!isClerkRuntimeError(err) || err.code !== 'network_error') {
+          throw err;
+        }
       }
 
       await executeSignOut();
@@ -1457,7 +1512,7 @@ export class Clerk implements ClerkInterface {
   };
 
   public mountOAuthConsent = (node: HTMLDivElement, props?: __internal_OAuthConsentProps) => {
-    if (noUserExists(this)) {
+    if (this.user === null) {
       if (this.#instanceType === 'development') {
         throw new ClerkRuntimeError(warnings.cannotRenderOAuthConsentComponentWhenUserDoesNotExist, {
           code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
@@ -1496,6 +1551,36 @@ export class Clerk implements ClerkInterface {
    */
   public __internal_unmountOAuthConsent = (node: HTMLDivElement) => {
     return this.unmountOAuthConsent(node);
+  };
+
+  public __internal_mountOAuthDeviceVerification = (node: HTMLDivElement, props?: OAuthDeviceVerificationProps) => {
+    if (noUserExists(this)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderOAuthDeviceVerificationComponentWhenUserDoesNotExist, {
+          code: CANNOT_RENDER_USER_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'OAuthDeviceVerification';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'oauthDeviceVerification',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  public __internal_unmountOAuthDeviceVerification = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
   /**
@@ -1631,6 +1716,77 @@ export class Clerk implements ClerkInterface {
    * @hidden
    */
   public __internal_unmountConfigureSSO = (node: HTMLDivElement) => {
+    void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
+  };
+
+  /**
+   * Mount the Directory Sync onboarding component at the target element.
+   * Directory Sync provisions members through the organization's SSO connection,
+   * so it requires organizations to be enabled and the self-serve Directory Sync
+   * feature to be turned on for the instance.
+   *
+   * @param targetNode Target to mount the ConfigureDirectorySync component.
+   * @param props Configuration parameters.
+   * @hidden
+   */
+  public __internal_mountConfigureDirectorySync = (node: HTMLDivElement, props?: ConfigureSSOProps) => {
+    const { isEnabled: isOrganizationsEnabled } = this.__internal_attemptToEnableEnvironmentSetting({
+      for: 'organizations',
+      caller: 'ConfigureDirectorySync',
+      onClose: () => {
+        throw new ClerkRuntimeError(warnings.cannotRenderAnyOrganizationComponent('ConfigureDirectorySync'), {
+          code: CANNOT_RENDER_ORGANIZATIONS_DISABLED_ERROR_CODE,
+        });
+      },
+    });
+
+    if (!isOrganizationsEnabled) {
+      return;
+    }
+
+    const userExists = !noUserExists(this);
+    if (noOrganizationExists(this) && userExists) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.createCannotRenderComponentWhenOrgDoesNotExist('ConfigureDirectorySync'), {
+          code: CANNOT_RENDER_ORGANIZATION_MISSING_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    if (disabledSelfServeDirectorySyncFeature(this, this.environment)) {
+      if (this.#instanceType === 'development') {
+        throw new ClerkRuntimeError(warnings.cannotRenderConfigureDirectorySyncComponentWhenDisabled, {
+          code: CANNOT_RENDER_SELF_SERVE_SSO_DISABLED_ERROR_CODE,
+        });
+      }
+      return;
+    }
+
+    this.assertComponentsReady(this.#clerkUI);
+    const component = 'ConfigureDirectorySync';
+    void this.#clerkUI
+      .then(ui => ui.ensureMounted({ preloadHint: component }))
+      .then(controls =>
+        controls.mountComponent({
+          name: component,
+          appearanceKey: 'configureDirectorySync',
+          node,
+          props,
+        }),
+      );
+
+    this.telemetry?.record(eventPrebuiltComponentMounted(component, props));
+  };
+
+  /**
+   * Unmount the Directory Sync onboarding component from the target element.
+   * If there is no component mounted at the target node, results in a noop.
+   *
+   * @param targetNode Target node to unmount the ConfigureDirectorySync component from.
+   * @hidden
+   */
+  public __internal_unmountConfigureDirectorySync = (node: HTMLDivElement) => {
     void this.#clerkUI?.then(ui => ui.ensureMounted()).then(controls => controls.unmountComponent({ node }));
   };
 
@@ -2389,10 +2545,14 @@ export class Clerk implements ClerkInterface {
     const signIn = 'identifier' in (signInOrUp || {}) ? (signInOrUp as SignInResource) : _signIn;
     const signUp = 'missingFields' in (signInOrUp || {}) ? (signInOrUp as SignUpResource) : _signUp;
 
+    // The component router expects raw component-relative paths; buildUrlWithAuth would absolutize
+    // them on development instances and push the navigation back out to the window.
     const navigate = (to: string) =>
       customNavigate && typeof customNavigate === 'function'
         ? customNavigate(this.buildUrlWithAuth(to))
-        : this.navigate(this.buildUrlWithAuth(to));
+        : params.__internal_navigate && typeof params.__internal_navigate === 'function'
+          ? params.__internal_navigate(to)
+          : this.navigate(this.buildUrlWithAuth(to));
 
     return this._handleRedirectCallback(params, {
       signUp,
@@ -2410,15 +2570,17 @@ export class Clerk implements ClerkInterface {
   };
 
   private _handleRedirectCallback = async (
-    params: HandleOAuthCallbackParams,
+    params: ResumeAfterProtectCheckParams,
     {
       signIn,
       signUp,
       navigate,
+      resuming = false,
     }: {
       signIn: SignInResource;
       signUp: SignUpResource;
       navigate: (to: string) => Promise<unknown>;
+      resuming?: boolean;
     },
   ): Promise<unknown> => {
     if (!this.loaded || !this.environment || !this.client) {
@@ -2562,14 +2724,14 @@ export class Clerk implements ClerkInterface {
     // sign-in's challenge. We only consult `si` here unless this is explicitly a sign-up callback.
     // Transfers are unaffected: the `signIn.create({ transfer })` path below checks its own fresh
     // response for the gate.
-    if (params.reloadResource !== 'signUp' && (si.protectCheck || si.status === 'needs_protect_check')) {
+    if (!resuming && params.reloadResource !== 'signUp' && (si.protectCheck || si.status === 'needs_protect_check')) {
       return navigateToSignInProtectCheck();
     }
 
     // The sign-up resource can be gated the same way (e.g. a callback that resolves straight into a
     // gated sign-up). Scope to the sign-up intent for the symmetric reason — a stale sign-up's gate
     // shouldn't hijack a sign-in callback.
-    if (params.reloadResource !== 'signIn' && su.protectCheck) {
+    if (!resuming && params.reloadResource !== 'signIn' && su.protectCheck) {
       return navigateToSignUpProtectCheck();
     }
 
@@ -2629,7 +2791,8 @@ export class Clerk implements ClerkInterface {
       return navigateToResetPassword();
     }
 
-    const userNeedsToBeCreated = si.firstFactorVerificationStatus === 'transferable';
+    const userNeedsToBeCreated =
+      si.firstFactorVerificationStatus === 'transferable' || params.continuation === 'transfer_to_sign_up';
 
     if (userNeedsToBeCreated) {
       if (params.transferable === false) {
@@ -2732,6 +2895,27 @@ export class Clerk implements ClerkInterface {
     return navigateToSignIn();
   };
 
+  public __internal_resumeAfterProtectCheck = async (
+    params: ResumeAfterProtectCheckParams = {},
+    customNavigate?: (to: string) => Promise<unknown>,
+  ): Promise<unknown> => {
+    if (!this.loaded || !this.environment || !this.client) {
+      return;
+    }
+    const { signIn, signUp } = this.client;
+
+    const resolvedNavigate = customNavigate ?? params.__internal_navigate;
+    const navigate = (to: string) =>
+      resolvedNavigate && typeof resolvedNavigate === 'function' ? resolvedNavigate(to) : this.navigate(to);
+
+    return this._handleRedirectCallback(params, {
+      signUp,
+      signIn,
+      navigate,
+      resuming: true,
+    });
+  };
+
   public handleRedirectCallback = async (
     params: HandleOAuthCallbackParams = {},
     customNavigate?: (to: string) => Promise<unknown>,
@@ -2741,8 +2925,9 @@ export class Clerk implements ClerkInterface {
     }
     const { signIn, signUp } = this.client;
 
+    const resolvedNavigate = customNavigate ?? params.__internal_navigate;
     const navigate = (to: string) =>
-      customNavigate && typeof customNavigate === 'function' ? customNavigate(to) : this.navigate(to);
+      resolvedNavigate && typeof resolvedNavigate === 'function' ? resolvedNavigate(to) : this.navigate(to);
 
     return this._handleRedirectCallback(params, {
       signUp,
@@ -3284,7 +3469,11 @@ export class Clerk implements ClerkInterface {
         const initEnvironmentPromise = Environment.getInstance()
           .fetch({ touch: shouldTouchEnv })
           .then(res => this.updateEnvironment(res))
-          .catch(() => {
+          .catch(err => {
+            if (isError(err, 'dev_browser_unauthenticated')) {
+              throw err;
+            }
+
             ++initializationDegradedCounter;
             const environmentSnapshot = SafeLocalStorage.getItem<EnvironmentJSONSnapshot | null>(
               CLERK_ENVIRONMENT_STORAGE_ENTRY,
@@ -3346,7 +3535,11 @@ export class Clerk implements ClerkInterface {
             });
         };
 
-        const [, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+        const [environmentResult, clientResult] = await allSettled([initEnvironmentPromise, initClient()]);
+        if (environmentResult.status === 'rejected') {
+          throw environmentResult.reason;
+        }
+
         if (clientResult.status === 'rejected') {
           const e = clientResult.reason;
 
