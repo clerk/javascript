@@ -2,17 +2,19 @@ import * as Stories from './organization-profile-members-panel.stories';
 
 # OrganizationProfileMembersPanel
 
-The organization profile’s Members panel owns the page title and tab navigation. These examples show its Members and Invitations tabs with controlled tables.
+The organization profile’s Members panel owns the page title and tab navigation. These examples show its Members, Invitations, and Requests tabs with controlled tables.
 
 Removing a member opens a confirmation dialog. The dialog awaits the action callback and keeps failures visible. After a successful removal, focus moves to a surviving row action or a toolbar control.
 
 Revoking an invitation opens a confirmation dialog. The dialog awaits the action callback and keeps failures visible. After a successful removal, focus moves to a surviving row action or a toolbar control.
 
+Accepting or declining a request runs immediately. Both row actions are held while the callback is pending, and failures appear beside the actions so the user can retry. After a successful removal, focus moves to a surviving row action or the search field.
+
 ## Example
 
 ### Legacy
 
-The Members table shows the user, joined date, role, and optional row actions. The Invitations table shows the invited email address, invitation date, role, and optional revoke action.
+The Members table shows the user, joined date, role, and optional row actions. The Invitations table shows the invited email address, invitation date, role, and optional revoke action. The Requests table shows the requester, request date, and available row actions.
 
 <Story name='Legacy' storyModule={Stories} composition={[
   { name: 'Profile', href: '/components/profile', layer: 'Components' },
@@ -23,6 +25,7 @@ The Members table shows the user, joined date, role, and optional row actions. T
   { name: 'Pagination', href: '/components/pagination', layer: 'Components' },
   { name: 'Select', href: '/components/select', layer: 'Components' },
   { name: 'Menu', href: '/components/menu', layer: 'Components' },
+  { name: 'Button', href: '/components/button', layer: 'Components' },
 ]} />
 
 ## Examples

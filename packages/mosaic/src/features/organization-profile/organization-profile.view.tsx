@@ -42,7 +42,7 @@ function BuiltInPage({
     return pages.apiKeys ? <OrganizationProfileApiKeysPanelView {...pages.apiKeys} /> : null;
   }
   if (id === 'members') {
-    return pages.members?.members || pages.members?.invitations ? (
+    return pages.members?.members || pages.members?.invitations || pages.members?.requests ? (
       <OrganizationProfileMembersPanelView {...pages.members} />
     ) : (
       <OrganizationProfilePlaceholderPanelView page={id} />
