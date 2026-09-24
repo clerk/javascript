@@ -151,7 +151,7 @@ Use these to animate the indicator:
 }
 ```
 
-The initial render suppresses the transition to prevent the indicator from animating from `0,0`.
+The transition only runs when the active tab changes. The initial render and resizes (font load, container resize) skip it, so the indicator never animates from `0,0` or on mount.
 
 ### Panel (with `shouldForceMount`)
 
