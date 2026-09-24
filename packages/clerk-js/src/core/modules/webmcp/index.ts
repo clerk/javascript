@@ -182,6 +182,7 @@ const signInWithIdentifier = async (
   signIn: SignInResource,
   method: string,
   identifier: string,
+  methods: string[],
 ): Promise<ToolResult> => {
   const created = await signIn.create({ identifier });
   const factor = created.supportedFirstFactors?.find(supported => supported.strategy === method);
@@ -205,7 +206,10 @@ const signInWithIdentifier = async (
     return { status: 'needs_code', sentTo: factor.safeIdentifier, next: 'clerk_submit_code' };
   }
 
-  return { status: 'error', message: `This account can't sign in with ${method}.` };
+  const accountMethods = [...new Set(created.supportedFirstFactors?.map(supported => supported.strategy))].filter(
+    strategy => strategy !== method && methods.includes(strategy),
+  );
+  return { status: 'error', message: `This account can't sign in with ${method}.`, otherMethods: accountMethods };
 };
 
 const getAuthStateTool = (clerk: Clerk) =>
@@ -278,7 +282,7 @@ const getSignInTool = (clerk: Clerk) => {
         return { status: 'error', message: `${method} needs an identifier.` };
       }
 
-      return signInWithIdentifier(clerk, signIn, method, identifierValue);
+      return signInWithIdentifier(clerk, signIn, method, identifierValue, methods);
     },
   });
 };
