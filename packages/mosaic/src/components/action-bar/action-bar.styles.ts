@@ -37,23 +37,23 @@ export const styles = stylex.create({
     flexShrink: 0,
     opacity: {
       default: 1,
-      ':is([data-open="false"])': 0,
+      ':where([data-starting-style], [data-ending-style])': 0,
     },
     pointerEvents: {
       default: 'auto',
-      ':is([data-open="false"])': 'none',
+      ':where([data-ending-style])': 'none',
     },
     transform: {
       default: 'translateY(0)',
       [reduceMotion]: {
         default: 'translateY(0)',
-        ':is([data-open="false"])': 'translateY(0)',
+        ':where([data-starting-style], [data-ending-style])': 'translateY(0)',
       },
-      ':is([data-open="false"])': 'translateY(0.25rem)',
+      ':where([data-starting-style], [data-ending-style])': 'translateY(0.25rem)',
     },
     transitionDuration: {
       default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
-      ':is([data-open="false"])': durationVars['--cl-duration-fast'],
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
     },
     transitionProperty: {
       default: 'opacity, transform',
@@ -61,7 +61,7 @@ export const styles = stylex.create({
     },
     transitionTimingFunction: {
       default: easingVars['--cl-ease-enter'],
-      ':is([data-open="false"])': easingVars['--cl-ease-exit'],
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
     },
   },
   count: {

@@ -5,8 +5,7 @@ import * as ActionBarStories from './action-bar.stories';
 A floating toolbar of actions for a current selection. It rests on the bottom edge of the table it
 acts on and, while that edge is scrolled out of view, stays pinned to the foot of the nearest scroll
 container — the content column of a profile in a dialog, or the page when the profile is inline. It
-is portalled, so no ancestor clips it. It animates in when opened, and while closed it is inert and
-click-through.
+is portalled, so no ancestor clips it. It mounts when opened and unmounts once it has animated out.
 
 ## Example
 
@@ -63,6 +62,10 @@ click-through.
 Inside a modal dialog, pass the dialog's popup element as `portalRoot`, so the bar stays inside the
 dialog.
 
+To confirm a destructive action, render the `Dialog` beside the bar rather than inside it. Put a
+`Dialog.Trigger` with a `handle` in the bar, and point the popup's `finalFocus` at the select-all
+checkbox for when the confirmation closes the bar.
+
 ## Parts
 
 | Part                  | Element  | Description                                                                                  |
@@ -77,14 +80,14 @@ dialog.
 
 ### `ActionBar.Root`
 
-| Prop               | Type                     | Default               | Description                                                 |
-| ------------------ | ------------------------ | --------------------- | ----------------------------------------------------------- |
-| `open`             | `boolean`                | — (required)          | Whether the bar is shown.                                   |
-| `anchor`           | `RefObject<HTMLElement>` | — (required)          | The table the bar rests on.                                 |
-| `portalRoot`       | `HTMLElement \| null`    | `document.body`       | Where the bar is portalled. `null` waits for the element.   |
-| `returnFocus`      | `RefObject<HTMLElement>` | where focus came from | Where focus goes when the bar closes while holding it.      |
-| `announcement`     | `string`                 | —                     | Announced when the selection changes while the bar is open. |
-| `openAnnouncement` | `string`                 | `announcement`        | Announced when the bar opens.                               |
+| Prop               | Type                     | Default         | Description                                                 |
+| ------------------ | ------------------------ | --------------- | ----------------------------------------------------------- |
+| `open`             | `boolean`                | — (required)    | Whether the bar is shown.                                   |
+| `anchor`           | `RefObject<HTMLElement>` | — (required)    | The table the bar rests on.                                 |
+| `portalRoot`       | `HTMLElement \| null`    | `document.body` | Where the bar is portalled. `null` waits for the element.   |
+| `returnFocus`      | `RefObject<HTMLElement>` | —               | Where focus goes when the bar closes while holding it.      |
+| `announcement`     | `string`                 | —               | Announced when the selection changes while the bar is open. |
+| `openAnnouncement` | `string`                 | `announcement`  | Announced when the bar opens.                               |
 
 ### `ActionBar.Action`
 
@@ -93,7 +96,7 @@ Takes `Button`'s props. `color='negative'` draws the icon at full strength.
 ## Accessibility
 
 - The bar is a single tab stop, in tab order right after where `ActionBar.Root` renders. `←` / `→`
-  move between its actions and wrap; `Home` / `End` jump to the first and last.
+  move between its actions and wrap.
 - Give it an `aria-label`, and point `aria-controls` at the table's `id`.
 - A status region outside the bar announces `openAnnouncement` when the bar opens and
   `announcement` when the selection changes after that. Closing is silent.
@@ -102,5 +105,5 @@ Takes `Button`'s props. `color='negative'` draws the icon at full strength.
 
 ## Styling
 
-`ActionBar.Root` reflects `data-open` (`true` / `false`) on its surface, so the entrance
-transition and the closed (click-through) state are both selectable.
+`ActionBar.Root` reflects `data-open` (`true` / `false`) on its surface, and `data-starting-style` /
+`data-ending-style` while it animates in and out.

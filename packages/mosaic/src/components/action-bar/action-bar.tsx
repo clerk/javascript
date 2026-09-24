@@ -16,6 +16,7 @@ import { activeElement, contains, getDocument, getTarget } from '@floating-ui/re
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useAnimationsFinished, useTransitionStatus } from '../../primitives/hooks';
 import { mergeProps, useRender } from '../../primitives/utils';
 import { getComputedStyle } from '../../primitives/utils/dom';
 import type { MosaicComponentProps, XStyle } from '../../props';
@@ -28,13 +29,9 @@ import { Icon } from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
 import { styles } from './action-bar.styles';
 
-const ITEM_ATTRIBUTE = 'data-action-bar-item';
 const EDGE_GAP = 16;
 
-const ActionBarContext = React.createContext<{
-  open: boolean;
-  registerCount: (id: string | undefined) => void;
-} | null>(null);
+const ActionBarContext = React.createContext<{ countId: string } | null>(null);
 
 function scrollingAncestors(element: Element): Element[] {
   return getOverflowAncestors(element).filter(
@@ -42,12 +39,6 @@ function scrollingAncestors(element: Element): Element[] {
       node instanceof Element &&
       node.scrollHeight > node.clientHeight &&
       /auto|scroll|overlay/.test(getComputedStyle(node).overflowY),
-  );
-}
-
-function enabledItems(bar: HTMLElement): HTMLElement[] {
-  return Array.from(bar.querySelectorAll<HTMLElement>(`[${ITEM_ATTRIBUTE}]`)).filter(
-    item => !item.matches(':disabled'),
   );
 }
 
@@ -79,21 +70,20 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     xstyle,
     positionerXstyle,
     children,
-    onFocus,
     ...rest
   },
   ref,
 ) {
   const barRef = React.useRef<HTMLDivElement | null>(null);
-  const [barElement, setBarElement] = React.useState<HTMLDivElement | null>(null);
-  const setBar = React.useCallback((node: HTMLDivElement | null) => {
-    barRef.current = node;
-    setBarElement(node);
-  }, []);
-  const originRef = React.useRef<HTMLElement | null>(null);
+  const countId = React.useId();
+  const context = React.useMemo(() => ({ countId }), [countId]);
+  const openChildrenRef = React.useRef(children);
+  if (open) {
+    openChildrenRef.current = children;
+  }
+
   const wasOpenRef = React.useRef(false);
   const [status, setStatus] = React.useState('');
-
   React.useLayoutEffect(() => {
     const wasOpen = wasOpenRef.current;
     wasOpenRef.current = open;
@@ -105,21 +95,16 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
       setStatus(announcement ?? '');
     }
   }, [open, announcement, openAnnouncement]);
-  const lastFocusedRef = React.useRef<HTMLElement | null>(null);
-  const [activeIndex, setActiveIndex] = React.useState(0);
-  const [countId, setCountId] = React.useState<string | undefined>();
-  const context = React.useMemo(() => ({ open, registerCount: setCountId }), [open]);
 
   const {
     refs,
-    elements,
     floatingStyles,
     middlewareData,
-    update,
     context: floatingContext,
   } = useFloating({
     open,
     placement: 'bottom',
+    whileElementsMounted: autoUpdate,
     middleware: [
       offset(({ rects }) => -rects.floating.height / 4),
       {
@@ -141,109 +126,35 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
     refs.setReference(anchor.current);
   });
 
-  React.useEffect(() => {
-    if (!open || !elements.reference || !elements.floating) {
-      return;
-    }
-    return autoUpdate(elements.reference, elements.floating, update);
-  }, [open, elements.reference, elements.floating, update]);
+  const { mounted, transitionStatus, setMounted } = useTransitionStatus(open);
+  const runOnAnimationsFinished = useAnimationsFinished(barRef, open);
+
+  const focusWithinRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (!open || !barElement) {
+    if (transitionStatus !== 'ending') {
       return;
     }
-    const doc = getDocument(barElement);
-    const recordOrigin = (event: FocusEvent) => {
-      const target = getTarget(event) as HTMLElement;
-      if (
-        !contains(barElement, target) &&
-        target !== lastFocusedRef.current &&
-        !target.hasAttribute('data-floating-ui-focus-guard')
-      ) {
-        originRef.current = target;
-      }
-    };
-    doc.addEventListener('focusin', recordOrigin);
-    return () => doc.removeEventListener('focusin', recordOrigin);
-  }, [open, barElement]);
-
-  const restoreFocus = React.useCallback(() => {
     const bar = barRef.current;
-    if (!bar) {
-      return;
+    if (bar && contains(bar, activeElement(getDocument(bar)))) {
+      returnFocus?.current?.focus();
     }
-    const target = returnFocus?.current ?? originRef.current;
-    bar.inert = true;
-    const active = activeElement(getDocument(bar)) as HTMLElement | null;
-    if (target?.isConnected && !contains(bar, target)) {
-      target.focus();
-    } else if (contains(bar, active)) {
-      active?.blur();
-    }
-  }, [returnFocus]);
-
-  React.useLayoutEffect(() => {
-    const bar = barRef.current;
-    if (!bar) {
-      return;
-    }
-    if (open) {
-      bar.inert = false;
-      return;
-    }
-    setActiveIndex(0);
-    const doc = getDocument(bar);
-    const active = activeElement(doc) as HTMLElement | null;
-    if (contains(bar, active)) {
-      restoreFocus();
-      return;
-    }
-    if (!active || active !== lastFocusedRef.current) {
-      bar.inert = true;
-      return;
-    }
-    let frame = requestAnimationFrame(function watch() {
-      const current = activeElement(doc);
-      if (current === active && active.isConnected) {
-        frame = requestAnimationFrame(watch);
-      } else if (!current || current === doc.body || contains(bar, current)) {
-        restoreFocus();
-      } else {
-        bar.inert = true;
+    return runOnAnimationsFinished(() => {
+      if (focusWithinRef.current) {
+        returnFocus?.current?.focus();
       }
+      setMounted(false);
     });
-    return () => cancelAnimationFrame(frame);
-  }, [open, restoreFocus, barElement]);
+  }, [transitionStatus, runOnAnimationsFinished, returnFocus, setMounted]);
 
-  const handleFocus = (event: React.FocusEvent<HTMLDivElement>) => {
-    onFocus?.(event);
-    const bar = barRef.current;
-    const target = getTarget(event.nativeEvent) as HTMLElement;
-    lastFocusedRef.current = target;
-    if (bar && !open && contains(bar, target)) {
-      restoreFocus();
-    }
-  };
-
-  const handleItemsKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const guardPortalledKeys = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const bar = barRef.current;
     if (!bar || !contains(bar, getTarget(event.nativeEvent) as Element)) {
       event.stopPropagation();
-      return;
     }
-    if (event.key !== 'Home' && event.key !== 'End') {
-      return;
-    }
-    const items = enabledItems(bar);
-    const target = event.key === 'Home' ? items[0] : items[items.length - 1];
-    if (!target) {
-      return;
-    }
-    event.preventDefault();
-    const all = Array.from(bar.querySelectorAll<HTMLElement>(`[${ITEM_ATTRIBUTE}]`));
-    setActiveIndex(all.indexOf(target));
-    target.focus();
   };
+
+  const floatingRef = useMergeRefs([refs.setFloating, ref]);
 
   return (
     <ActionBarContext.Provider value={context}>
@@ -254,69 +165,77 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
       >
         {status}
       </VisuallyHidden>
-      <FloatingPortal root={portalRoot}>
-        <FloatingFocusManager
-          context={floatingContext}
-          modal={false}
-          initialFocus={-1}
-          returnFocus={false}
-          closeOnFocusOut={false}
-          disabled={!open}
-        >
-          <div
-            ref={useMergeRefs([refs.setFloating, ref])}
-            style={{
-              ...floatingStyles,
-              visibility: middlewareData.hide?.referenceHidden ? 'hidden' : undefined,
-            }}
-            {...mergeStyleProps(
-              themeProps('action-bar-positioner'),
-              stylex.props(reset.base, styles.positioner, positionerXstyle),
-            )}
+      {mounted ? (
+        <FloatingPortal root={portalRoot}>
+          <FloatingFocusManager
+            context={floatingContext}
+            modal={false}
+            initialFocus={-1}
+            returnFocus={false}
+            closeOnFocusOut={false}
           >
-            <Composite
-              orientation='horizontal'
-              loop
-              activeIndex={activeIndex}
-              onNavigate={setActiveIndex}
-              render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
-                const { ref: compositeRef, ...merged } = mergeProps<'div'>(
-                  {
-                    'aria-describedby': countId,
-                    ...mergeStyleProps(
-                      themeProps('action-bar', { open }),
-                      stylex.props(reset.base, styles.bar, xstyle),
-                      rest,
-                    ),
-                  },
-                  compositeProps as Record<string, unknown>,
-                );
-                // eslint-disable-next-line react-hooks/rules-of-hooks
-                return useRender({
-                  defaultTagName: 'div',
-                  render,
-                  ref: [setBar, compositeRef as React.Ref<unknown>],
-                  props: {
-                    ...merged,
-                    'data-open': open,
-                    role: 'toolbar',
-                    onFocus: handleFocus,
-                    children: (
-                      <div
-                        role='presentation'
-                        onKeyDown={handleItemsKeyDown}
-                        {...stylex.props(styles.items)}
-                      >
-                        {children}
-                      </div>
-                    ),
-                  },
-                });
+            <div
+              ref={floatingRef}
+              style={{
+                ...floatingStyles,
+                visibility: middlewareData.hide?.referenceHidden ? 'hidden' : undefined,
               }}
-            />
-          </div>
-        </FloatingFocusManager>
-      </FloatingPortal>
+              {...mergeStyleProps(
+                themeProps('action-bar-positioner'),
+                stylex.props(reset.base, styles.positioner, positionerXstyle),
+              )}
+            >
+              <Composite
+                orientation='horizontal'
+                loop
+                render={(compositeProps: React.HTMLAttributes<HTMLElement>) => {
+                  const { ref: compositeRef, ...merged } = mergeProps<'div'>(
+                    {
+                      'aria-describedby': countId,
+                      ...mergeStyleProps(
+                        themeProps('action-bar', { open }),
+                        stylex.props(reset.base, styles.bar, xstyle),
+                        rest,
+                      ),
+                    },
+                    compositeProps as Record<string, unknown>,
+                  );
+                  // eslint-disable-next-line react-hooks/rules-of-hooks
+                  return useRender({
+                    defaultTagName: 'div',
+                    render,
+                    ref: [barRef, compositeRef as React.Ref<unknown>],
+                    props: {
+                      ...merged,
+                      ...(transitionStatus === 'starting'
+                        ? { 'data-starting-style': '', style: { transition: 'none' } }
+                        : null),
+                      ...(transitionStatus === 'ending' ? { 'data-ending-style': '' } : null),
+                      'data-open': open,
+                      role: 'toolbar',
+                      onFocus: () => {
+                        focusWithinRef.current = true;
+                      },
+                      onBlur: () => {
+                        focusWithinRef.current = false;
+                      },
+                      children: (
+                        <div
+                          role='presentation'
+                          onKeyDown={guardPortalledKeys}
+                          {...stylex.props(styles.items)}
+                        >
+                          {open ? children : openChildrenRef.current}
+                        </div>
+                      ),
+                    },
+                  });
+                }}
+              />
+            </div>
+          </FloatingFocusManager>
+        </FloatingPortal>
+      ) : null}
     </ActionBarContext.Provider>
   );
 });
@@ -340,7 +259,6 @@ const Action = React.forwardRef<HTMLButtonElement, ActionBarActionProps>(functio
             size='md'
             color={color}
             {...merged}
-            {...{ [ITEM_ATTRIBUTE]: '' }}
             // eslint-disable-next-line react-hooks/rules-of-hooks
             ref={useMergeRefs([ref, itemRef as React.Ref<HTMLButtonElement>])}
             xstyle={[color === 'negative' && styles.destructive, xstyle]}
@@ -351,25 +269,13 @@ const Action = React.forwardRef<HTMLButtonElement, ActionBarActionProps>(functio
   );
 });
 
-export type ActionBarCountProps = MosaicComponentProps<'div'>;
+export type ActionBarCountProps = Omit<MosaicComponentProps<'div'>, 'id'>;
 
 const Count = React.forwardRef<HTMLDivElement, ActionBarCountProps>(function ActionBarCount(
-  { render, xstyle, id: idProp, children, ...rest },
+  { render, xstyle, ...rest },
   ref,
 ) {
-  const generatedId = React.useId();
-  const id = idProp ?? generatedId;
-  const context = React.useContext(ActionBarContext);
-  const registerCount = context?.registerCount;
-  const openChildrenRef = React.useRef(children);
-  if (context?.open !== false) {
-    openChildrenRef.current = children;
-  }
-  React.useLayoutEffect(() => {
-    registerCount?.(id);
-    return () => registerCount?.(undefined);
-  }, [registerCount, id]);
-
+  const countId = React.useContext(ActionBarContext)?.countId;
   return useRender({
     defaultTagName: 'div',
     render,
@@ -380,8 +286,7 @@ const Count = React.forwardRef<HTMLDivElement, ActionBarCountProps>(function Act
         stylex.props(reset.base, styles.count, tabularNumbersStyle.enabled, xstyle),
         rest,
       ),
-      id,
-      children: openChildrenRef.current,
+      id: countId,
     },
   });
 });

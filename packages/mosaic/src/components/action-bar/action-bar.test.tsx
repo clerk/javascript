@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import { Dialog } from '../dialog';
 import { Menu } from '../menu';
@@ -16,6 +16,7 @@ const testStyles = stylex.create({
 
 function BulkActions({ open = true, onDismiss }: { open?: boolean; onDismiss?: () => void }) {
   const tableRef = React.useRef<HTMLTableElement>(null);
+  const selectRef = React.useRef<HTMLInputElement>(null);
   return (
     <>
       <table
@@ -26,6 +27,7 @@ function BulkActions({ open = true, onDismiss }: { open?: boolean; onDismiss?: (
           <tr>
             <td>
               <input
+                ref={selectRef}
                 type='checkbox'
                 aria-label='Select Kyle'
               />
@@ -36,6 +38,7 @@ function BulkActions({ open = true, onDismiss }: { open?: boolean; onDismiss?: (
       <ActionBar.Root
         open={open}
         anchor={tableRef}
+        returnFocus={selectRef}
         aria-label='Bulk actions'
         aria-controls='members'
       >
@@ -77,11 +80,9 @@ describe('Mosaic ActionBar', () => {
     expect(screen.getAllByRole('separator')).toHaveLength(2);
   });
 
-  it('marks the bar inert while closed', () => {
+  it('renders nothing while closed', () => {
     render(<BulkActions open={false} />);
-    const bar = screen.getByRole('toolbar', { name: 'Bulk actions', hidden: true });
-    expect(bar).toHaveAttribute('data-open', 'false');
-    expect(bar.inert).toBe(true);
+    expect(screen.queryByRole('toolbar', { hidden: true })).not.toBeInTheDocument();
   });
 
   it('announces the bar opening, then selection changes, from outside the bar', () => {
@@ -116,7 +117,14 @@ describe('Mosaic ActionBar', () => {
     expect(status).toHaveTextContent('2 selected, bulk actions follow the table');
   });
 
-  it('holds its last contents while it closes', () => {
+  it('holds its last contents while it animates out', () => {
+    Object.defineProperty(HTMLElement.prototype, 'getAnimations', {
+      configurable: true,
+      value: () => [{ finished: new Promise(() => {}) }],
+    });
+    onTestFinished(() => {
+      delete (HTMLElement.prototype as { getAnimations?: unknown }).getAnimations;
+    });
     function Selection({ count }: { count: number }) {
       return (
         <ActionBar.Root
@@ -130,6 +138,7 @@ describe('Mosaic ActionBar', () => {
     }
     const { rerender } = render(<Selection count={2} />);
     rerender(<Selection count={0} />);
+    expect(screen.getByRole('toolbar', { hidden: true })).toHaveAttribute('data-ending-style');
     expect(screen.getByText('2 selected')).toBeInTheDocument();
     rerender(<Selection count={5} />);
     expect(screen.getByText('5 selected')).toBeInTheDocument();
@@ -162,21 +171,19 @@ describe('Mosaic ActionBar', () => {
     expect(screen.getByRole('button', { name: 'After' })).toHaveFocus();
   });
 
-  it('moves between controls with the arrow keys, Home, and End', async () => {
+  it('moves between controls with the arrow keys, wrapping at the ends', async () => {
     const user = userEvent.setup();
     render(<BulkActions />);
     await user.click(screen.getByRole('checkbox', { name: 'Select Kyle' }));
     await user.tab();
     await user.keyboard('{ArrowRight}');
     expect(screen.getByRole('button', { name: 'Remove' })).toHaveFocus();
-    await user.keyboard('{End}');
+    await user.keyboard('{ArrowRight}');
     expect(screen.getByRole('button', { name: 'Clear selection' })).toHaveFocus();
     await user.keyboard('{ArrowRight}');
     expect(screen.getByRole('button', { name: 'Change role' })).toHaveFocus();
     await user.keyboard('{ArrowLeft}');
     expect(screen.getByRole('button', { name: 'Clear selection' })).toHaveFocus();
-    await user.keyboard('{Home}');
-    expect(screen.getByRole('button', { name: 'Change role' })).toHaveFocus();
   });
 
   it('returns to the last focused control when tabbed back into', async () => {
@@ -219,7 +226,7 @@ describe('Mosaic ActionBar', () => {
     expect(screen.getByRole('button', { name: 'Remove' })).not.toHaveFocus();
   });
 
-  it('returns focus to where it came from when the bar closes around it', async () => {
+  it('sends focus to returnFocus when the bar closes around it', async () => {
     const user = userEvent.setup();
     function Harness() {
       const [open, setOpen] = React.useState(true);
@@ -234,8 +241,8 @@ describe('Mosaic ActionBar', () => {
     const checkbox = screen.getByRole('checkbox', { name: 'Select Kyle' });
     await user.click(checkbox);
     await user.tab();
-    await user.keyboard('{End}{Enter}');
-    expect(checkbox).toHaveFocus();
+    await user.keyboard('{ArrowLeft}{Enter}');
+    await waitFor(() => expect(checkbox).toHaveFocus());
   });
 
   it('dismisses with a labelled button', async () => {
@@ -288,7 +295,7 @@ describe('Mosaic ActionBar', () => {
       await screen.findByRole('menuitem', { name: 'Admin' });
       await user.keyboard('{Enter}');
       await waitFor(() => expect(screen.getByRole('checkbox', { name: 'Select all' })).toHaveFocus());
-      expect(screen.getByRole('toolbar', { hidden: true }).inert).toBe(true);
+      await waitFor(() => expect(screen.queryByRole('toolbar', { hidden: true })).not.toBeInTheDocument());
     });
 
     it('lets Tab leave an open menu and Shift+Tab come back to the bar', async () => {
@@ -305,10 +312,10 @@ describe('Mosaic ActionBar', () => {
     });
   });
 
-  describe('with a confirmation dialog', () => {
+  describe('with a confirmation dialog beside the bar', () => {
     function ConfirmRemove() {
       const [selected, setSelected] = React.useState(true);
-      const [confirming, setConfirming] = React.useState(false);
+      const handle = React.useMemo(() => Dialog.createHandle(), []);
       const selectRef = React.useRef<HTMLInputElement>(null);
       return (
         <>
@@ -323,26 +330,22 @@ describe('Mosaic ActionBar', () => {
             aria-label='Bulk actions'
             returnFocus={selectRef}
           >
-            <Dialog.Root
-              open={confirming}
-              onOpenChange={setConfirming}
-              role='alertdialog'
+            <Dialog.Trigger
+              handle={handle}
+              render={<ActionBar.Action color='negative' />}
             >
-              <Dialog.Trigger render={<ActionBar.Action color='negative' />}>Remove</Dialog.Trigger>
-              <Dialog.Popup>
-                <Dialog.Close>Cancel</Dialog.Close>
-                <button
-                  type='button'
-                  onClick={() => {
-                    setSelected(false);
-                    setConfirming(false);
-                  }}
-                >
-                  Confirm
-                </button>
-              </Dialog.Popup>
-            </Dialog.Root>
+              Remove
+            </Dialog.Trigger>
           </ActionBar.Root>
+          <Dialog.Root
+            handle={handle}
+            role='alertdialog'
+          >
+            <Dialog.Popup finalFocus={() => (selected ? undefined : selectRef.current)}>
+              <Dialog.Close>Cancel</Dialog.Close>
+              <Dialog.Close onClick={() => setSelected(false)}>Confirm</Dialog.Close>
+            </Dialog.Popup>
+          </Dialog.Root>
         </>
       );
     }
