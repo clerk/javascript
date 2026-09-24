@@ -2,10 +2,8 @@ import * as stylex from '@stylexjs/stylex';
 import { useRef, useState } from 'react';
 
 import { Avatar } from '../../components/avatar';
-import { Button, SubmitButton } from '../../components/button';
+import { SubmitButton } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
-import { Icon } from '../../components/icon';
-import { InputGroup } from '../../components/input-group';
 import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
 import { panelStyles } from '../../components/profile';
@@ -109,38 +107,15 @@ export function RequestsTableTabView({
   };
   return (
     <div {...mergeStyleProps(themeProps('requests-table-tab'), stylex.props(panelStyles.root))}>
-      <div {...stylex.props(styles.toolbar)}>
-        <InputGroup.Root
-          size='md'
-          xstyle={styles.search}
-        >
-          <InputGroup.Start>
-            <Icon name='magnifying-glass' />
-          </InputGroup.Start>
-          <InputGroup.Input
-            ref={searchInput}
-            type='search'
-            autoComplete='off'
-            aria-label={m.search}
-            placeholder={m.search}
-            value={table.globalFilter}
-            onChange={event => table.setGlobalFilter(event.currentTarget.value)}
-          />
-          {table.globalFilter ? (
-            <InputGroup.End>
-              <Button
-                aria-label={m.clearSearch}
-                onClick={() => {
-                  table.setGlobalFilter('');
-                  searchInput.current?.focus();
-                }}
-              >
-                <Icon name='x' />
-              </Button>
-            </InputGroup.End>
-          ) : null}
-        </InputGroup.Root>
-      </div>
+      <Table.Toolbar>
+        <Table.Search
+          ref={searchInput}
+          label={m.search}
+          clearLabel={m.clearSearch}
+          value={table.globalFilter}
+          onValueChange={table.setGlobalFilter}
+        />
+      </Table.Toolbar>
       <Table.Root
         aria-label={m.title}
         aria-busy={isLoading || isFetching}
@@ -219,7 +194,7 @@ export function RequestsTableTabView({
                       </Item.Content>
                     </Item.Root>
                   </Table.Cell>
-                  <Table.Cell xstyle={styles.dateCell}>{request.requestedAtLabel}</Table.Cell>
+                  <Table.Cell noWrap>{request.requestedAtLabel}</Table.Cell>
                   {hasActions ? (
                     <Table.Cell align='end'>
                       <RequestActions
