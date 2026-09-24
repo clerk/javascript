@@ -45,7 +45,7 @@ describe('useForm', () => {
     expectTypeOf(result.current.setValue).parameter(0).toEqualTypeOf<'username' | 'age'>();
     expectTypeOf(result.current.touch).parameter(0).toEqualTypeOf<'username' | 'age'>();
     expectTypeOf(result.current.register).parameter(0).toEqualTypeOf<'username'>();
-    expectTypeOf(result.current.control).parameter(0).toEqualTypeOf<'username' | 'age'>();
+    expectTypeOf(result.current.registerValue).parameter(0).toEqualTypeOf<'username' | 'age'>();
     expectTypeOf(result.current.fields.age.feedback).toEqualTypeOf<FieldFeedback | undefined>();
     expectTypeOf(result.current.error).toEqualTypeOf<string | undefined>();
     expectTypeOf(result.current.reset).parameter(0).toEqualTypeOf<{ username: string; age: number } | undefined>();
@@ -582,13 +582,13 @@ describe('useForm', () => {
 
   it('controls a value-shaped field of any type with its name, value, value and blur handlers', () => {
     const { result } = renderHook(() => useForm({ initialValues: { code: '', count: 0 }, onSubmit: resolved }));
-    expect(result.current.control('count')).toMatchObject({ name: 'count', value: 0 });
-    act(() => result.current.control('count').onValueChange(2));
+    expect(result.current.registerValue('count')).toMatchObject({ name: 'count', value: 0 });
+    act(() => result.current.registerValue('count').onValueChange(2));
     expect(result.current.values.count).toBe(2);
-    act(() => result.current.control('code').onValueChange('123456'));
-    expect(result.current.control('code').value).toBe('123456');
+    act(() => result.current.registerValue('code').onValueChange('123456'));
+    expect(result.current.registerValue('code').value).toBe('123456');
     expect(result.current.fields.code.touched).toBe(false);
-    act(() => result.current.control('code').onBlur());
+    act(() => result.current.registerValue('code').onBlur());
     expect(result.current.fields.code.touched).toBe(true);
   });
 
