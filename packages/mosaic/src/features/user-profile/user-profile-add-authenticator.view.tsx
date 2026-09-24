@@ -9,13 +9,9 @@ import { Otp } from '../../components/otp';
 import { Text } from '../../components/text';
 import { useMessages } from '../../localization';
 import { styles } from './user-profile-add-authenticator.styles';
-import type { UserProfileAuthenticatorSetupViewProps } from './user-profile-authenticator-setup.view';
 import { UserProfileAuthenticatorSetupView } from './user-profile-authenticator-setup.view';
 
-export interface UserProfileAddAuthenticatorViewProps extends Omit<
-  UserProfileAuthenticatorSetupViewProps,
-  'secret' | 'uri'
-> {
+export interface UserProfileAddAuthenticatorViewProps {
   setup?: { secret: string; uri: string };
   setupErrorMessage?: string;
   onRetry: () => void;
@@ -32,8 +28,6 @@ export function UserProfileAddAuthenticatorView({
   setup,
   setupErrorMessage,
   onRetry,
-  secretCopy,
-  uriCopy,
   code,
   onCodeChange,
   onSubmit,
@@ -54,11 +48,7 @@ export function UserProfileAddAuthenticatorView({
   return (
     <>
       {setup ? (
-        <UserProfileAuthenticatorSetupView
-          {...setup}
-          secretCopy={secretCopy}
-          uriCopy={uriCopy}
-        />
+        <UserProfileAuthenticatorSetupView {...setup} />
       ) : (
         <>
           <Card.Header>

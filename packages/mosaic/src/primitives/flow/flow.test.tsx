@@ -245,6 +245,36 @@ describe('Flow', () => {
     expect(root).not.toHaveAttribute('data-initial');
     offsetHeight.mockRestore();
   });
+  it('marks the root as transitioning only while a step is exiting', async () => {
+    let finishAnimation!: () => void;
+    const animationFinished = new Promise<void>(resolve => {
+      finishAnimation = resolve;
+    });
+    const { rerender } = render(<TestFlow value='password' />);
+    const root = screen.getByTestId('flow-root');
+    const outgoingStep = screen.getByTestId('password-step');
+    outgoingStep.getAnimations = vi.fn(() => [{ finished: animationFinished }] as unknown as Animation[]);
+
+    expect(root).not.toHaveAttribute('data-transitioning');
+
+    rerender(<TestFlow value='password-error' />);
+
+    expect(root).not.toHaveAttribute('data-transitioning');
+
+    rerender(<TestFlow value='otp' />);
+
+    expect(root).toHaveAttribute('data-transitioning');
+
+    outgoingStep.getAnimations = vi.fn(() => []);
+    await act(async () => {
+      finishAnimation();
+      await animationFinished;
+    });
+
+    expect(screen.queryByTestId('password-step')).not.toBeInTheDocument();
+    expect(root).not.toHaveAttribute('data-transitioning');
+  });
+
   describe('useFlowAutoFocus', () => {
     it('does not focus the initially active step', () => {
       render(<TestFlow value='password' />);

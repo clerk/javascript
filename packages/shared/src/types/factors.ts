@@ -134,6 +134,16 @@ export type EnterpriseSSOFactor = {
    * @experimental
    */
   enterpriseConnectionName?: string;
+  /**
+   * The public URL of the enterprise connection logo.
+   * @experimental
+   */
+  enterpriseConnectionLogoPublicUrl?: string | null;
+  /**
+   * The provider of the enterprise connection.
+   * @experimental
+   */
+  enterpriseConnectionProvider?: string;
 };
 
 /** @inline */

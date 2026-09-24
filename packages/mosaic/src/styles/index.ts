@@ -230,3 +230,7 @@ export { UserProfileApiKeysPanelView } from '../features/user-profile/user-profi
 
 export { OrganizationProfileApiKeysPanelView } from '../features/organization-profile/organization-profile-api-keys-panel.view';
 export { OrganizationProfileCreateAPIKeyDialog } from '../features/organization-profile/organization-profile-create-api-key.dialog';
+
+export { MembersTableTabView } from '../features/organization-profile/members-table-tab.view';
+export { InvitationsTableTabView } from '../features/organization-profile/invitations-table-tab.view';
+export { RequestsTableTabView } from '../features/organization-profile/requests-table-tab.view';

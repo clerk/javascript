@@ -419,7 +419,7 @@ describe('UserButton (connected)', () => {
     await waitFor(() => expect(userInvitations.revalidate).toHaveBeenCalledTimes(1));
 
     // Longer than the spinner's minDuration, so a fire-and-forget refresh would have cleared it.
-    await new Promise(resolve => setTimeout(resolve, 250));
+    await new Promise(resolve => setTimeout(resolve, 450));
     expect(spinner()).toBeInTheDocument();
 
     deferred.resolve();
@@ -686,7 +686,7 @@ describe('UserButton (connected)', () => {
     await act.click(trigger());
     expect(popup()).toBeNull();
 
-    await new Promise(resolve => setTimeout(resolve, 250));
+    await new Promise(resolve => setTimeout(resolve, 450));
     await act.click(trigger());
 
     const switchAccount = screen.getByRole('button', { name: 'Switch account' });
