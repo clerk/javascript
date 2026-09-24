@@ -270,7 +270,10 @@ describe('Mosaic SubmitButton spin delay', () => {
     const hidden = atoms(spinner());
     expect(screen.getByRole('progressbar', { name: 'pending' })).toBeInTheDocument();
 
-    advance(300);
+    advance(149);
+    expect(atoms(spinner())).toEqual(hidden);
+
+    advance(1);
     const shown = atoms(spinner());
     expect(hidden.length).toBeGreaterThan(shown.length);
     expect(isSupersetOf(hidden, shown)).toBe(true);
@@ -283,7 +286,7 @@ describe('Mosaic SubmitButton spin delay', () => {
     rerender(<SubmitButton isPending>Save</SubmitButton>);
     expect(atoms(content())).toEqual(idle);
 
-    advance(300);
+    advance(150);
     const faded = atoms(content());
     expect(faded.length).toBeGreaterThan(idle.length);
     expect(isSupersetOf(faded, idle)).toBe(true);
@@ -294,7 +297,7 @@ describe('Mosaic SubmitButton spin delay', () => {
     const idle = atoms(content());
 
     rerender(<SubmitButton isPending>Save</SubmitButton>);
-    advance(200);
+    advance(100);
     rerender(<SubmitButton>Save</SubmitButton>);
     advance(1000);
 
@@ -360,7 +363,10 @@ describe('Mosaic SubmitButton spin delay', () => {
     rerender(<SubmitButton spinDelay={{ delay: 0 }}>Save</SubmitButton>);
     expect(spinner()).toBeInTheDocument();
 
-    advance(200);
+    advance(399);
+    expect(spinner()).toBeInTheDocument();
+
+    advance(1);
     expect(spinner()).not.toBeInTheDocument();
   });
 
@@ -382,13 +388,16 @@ describe('Mosaic SubmitButton spin delay', () => {
   // Otherwise an action that resolves just after the spinner appears would flash it off again.
   it('holds the spinner on screen briefly after the action finishes', () => {
     const { rerender } = render(<SubmitButton isPending>Save</SubmitButton>);
-    advance(300);
+    advance(150);
     const shown = atoms(spinner());
 
     rerender(<SubmitButton>Save</SubmitButton>);
     expect(atoms(spinner())).toEqual(shown);
 
-    advance(200);
+    advance(399);
+    expect(atoms(spinner())).toEqual(shown);
+
+    advance(1);
     expect(spinner()).not.toBeInTheDocument();
   });
 });

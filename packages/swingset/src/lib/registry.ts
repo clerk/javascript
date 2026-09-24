@@ -153,6 +153,12 @@ import {
   ReadOnly as OrganizationProfileGeneralPanelReadOnly,
 } from '../stories/organization-profile-general-panel.stories';
 import {
+  Empty as OrganizationProfileMembersPanelEmpty,
+  Legacy as OrganizationProfileMembersPanelLegacy,
+  meta as organizationProfileMembersPanelMeta,
+  Proposed as OrganizationProfileMembersPanelProposed,
+} from '../stories/organization-profile-members-panel.stories';
+import {
   Default as OrganizationProfileWorkspaceSectionDefault,
   meta as organizationProfileWorkspaceSectionMeta,
   SaveFails as OrganizationProfileWorkspaceSectionSaveFails,
@@ -248,6 +254,7 @@ import {
   Empty as TableEmpty,
   meta as tableMeta,
   Overflow as TableOverflow,
+  Search as TableSearch,
   Selection as TableSelection,
   Sorting as TableSorting,
 } from '../stories/table.stories';
@@ -277,6 +284,7 @@ import {
 } from '../stories/tooltip.component.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
+import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
 import {
   Combined as UserButtonCombined,
   meta as userButtonMeta,
@@ -678,6 +686,8 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+const useFormModule: StoryModule = { meta: useFormMeta, Default: UseFormDefault };
+
 const localizationModule: StoryModule = {
   meta: localizationMeta,
   Overrides: LocalizationOverrides,
@@ -692,6 +702,7 @@ const tableModule: StoryModule = {
   meta: tableMeta,
   Default: TableDefault,
   Sorting: TableSorting,
+  Search: TableSearch,
   Selection: TableSelection,
   Empty: TableEmpty,
   Overflow: TableOverflow,
@@ -859,6 +870,13 @@ const organizationProfileApiKeysPanelModule: StoryModule = {
   Empty: OrganizationProfileApiKeysPanelEmpty,
 };
 
+const organizationProfileMembersPanelModule: StoryModule = {
+  meta: organizationProfileMembersPanelMeta,
+  Legacy: OrganizationProfileMembersPanelLegacy,
+  Proposed: OrganizationProfileMembersPanelProposed,
+  Empty: OrganizationProfileMembersPanelEmpty,
+};
+
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -887,6 +905,7 @@ export const registry: StoryModule[] = [
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
+  organizationProfileMembersPanelModule,
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
   organizationProfileDangerSectionModule,
@@ -952,6 +971,7 @@ export const registry: StoryModule[] = [
   scrollAreaModule,
   // Hooks
   useDataTableModule,
+  useFormModule,
   // Localization
   localizationModule,
 ];

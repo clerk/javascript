@@ -4,8 +4,6 @@ import { useMemo, useRef, useState } from 'react';
 import { Destructive } from '../../blocks/destructive';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
-import { Icon } from '../../components/icon';
-import { InputGroup } from '../../components/input-group';
 import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
 import { panelStyles, Profile } from '../../components/profile';
@@ -114,37 +112,14 @@ export function UserProfileApiKeysPanelView({
     <>
       <div {...mergeStyleProps(themeProps('user-profile-api-keys-panel'), stylex.props(panelStyles.root))}>
         <Profile.PageTitle>{m.title}</Profile.PageTitle>
-        <div {...stylex.props(styles.toolbar)}>
-          <InputGroup.Root
-            size='md'
-            xstyle={styles.search}
-          >
-            <InputGroup.Start>
-              <Icon name='magnifying-glass' />
-            </InputGroup.Start>
-            <InputGroup.Input
-              ref={searchInput}
-              autoComplete='off'
-              type='search'
-              aria-label={m.search}
-              placeholder={m.search}
-              value={table.globalFilter}
-              onChange={event => table.setGlobalFilter(event.currentTarget.value)}
-            />
-            {table.globalFilter ? (
-              <InputGroup.End>
-                <Button
-                  aria-label={m.clearSearch}
-                  onClick={() => {
-                    table.setGlobalFilter('');
-                    searchInput.current?.focus();
-                  }}
-                >
-                  <Icon name='x' />
-                </Button>
-              </InputGroup.End>
-            ) : null}
-          </InputGroup.Root>
+        <Table.Toolbar>
+          <Table.Search
+            ref={searchInput}
+            label={m.search}
+            clearLabel={m.clearSearch}
+            value={table.globalFilter}
+            onValueChange={table.setGlobalFilter}
+          />
           {onCreate ? (
             <Button
               ref={createButton}
@@ -153,7 +128,7 @@ export function UserProfileApiKeysPanelView({
               {m.create}
             </Button>
           ) : null}
-        </div>
+        </Table.Toolbar>
         <Table.Root
           aria-label={m.title}
           aria-busy={isLoading || isFetching}
@@ -229,10 +204,10 @@ export function UserProfileApiKeysPanelView({
                       </Text>
                     </div>
                   </Table.Cell>
-                  <Table.Cell xstyle={styles.dateCell}>
+                  <Table.Cell noWrap>
                     <Text>{row.original.createdAtLabel}</Text>
                   </Table.Cell>
-                  <Table.Cell xstyle={styles.dateCell}>
+                  <Table.Cell noWrap>
                     <Text>{row.original.lastUsedAtLabel ?? m.neverUsed}</Text>
                   </Table.Cell>
                   {onRevoke ? (

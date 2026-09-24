@@ -201,6 +201,48 @@ export function Default() {
   );
 }
 
+export function Search() {
+  const [search, setSearch] = React.useState('');
+  const filtered = apiKeys.filter(key => key.name.toLowerCase().includes(search.trim().toLowerCase()));
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <Table.Toolbar>
+        <Table.Search
+          label='Search API keys'
+          clearLabel='Clear search'
+          value={search}
+          onValueChange={setSearch}
+        />
+        <Button>Create API key</Button>
+      </Table.Toolbar>
+      <Table.Root aria-label='API keys'>
+        <Table.Header>
+          <Table.Row>
+            <Table.HeaderCell>Name</Table.HeaderCell>
+            <Table.HeaderCell>Created</Table.HeaderCell>
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {filtered.length ? (
+            filtered.map(key => (
+              <Table.Row key={key.id}>
+                <Table.Cell>{key.name}</Table.Cell>
+                <Table.Cell noWrap>{key.created}</Table.Cell>
+              </Table.Row>
+            ))
+          ) : (
+            <Table.Empty>
+              <EmptyState.Root role='status'>
+                <EmptyState.Label>No API keys found</EmptyState.Label>
+              </EmptyState.Root>
+            </Table.Empty>
+          )}
+        </Table.Body>
+      </Table.Root>
+    </div>
+  );
+}
+
 export function Sorting() {
   const { sorting, setSorting, sorted } = useSortedApiKeys(apiKeys);
 
