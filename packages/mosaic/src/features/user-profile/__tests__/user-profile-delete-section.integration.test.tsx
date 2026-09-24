@@ -115,9 +115,7 @@ describe('UserProfileDeleteSection', () => {
     await user.type(within(dialog).getByRole('textbox'), 'Delete account');
     await user.click(within(dialog).getByRole('button', { name: 'Delete account' }));
 
-    await waitFor(() =>
-      expect(setActive).toHaveBeenCalledWith({ session: null, redirectUrl: '/one-session-left' }),
-    );
+    await waitFor(() => expect(setActive).toHaveBeenCalledWith({ session: null, redirectUrl: '/one-session-left' }));
   });
 
   it('keeps the dialog up with a message when the delete fails', async () => {

@@ -80,7 +80,7 @@ function DestructiveCard({
     event.preventDefault();
     if (isConfirmed && !isDeleting) {
       // Errors are meant to be handled on the outside, so we swallow them here
-      onDelete()?.catch(() => { });
+      onDelete()?.catch(() => {});
     }
   };
 
