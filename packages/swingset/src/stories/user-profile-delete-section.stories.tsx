@@ -1,4 +1,4 @@
-import { useUserProfileDeleteSectionController } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.controller';
+import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import { UserProfileDeleteSectionView } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.view';
 import { useState } from 'react';
 
@@ -20,7 +20,7 @@ export const meta: StoryMeta = {
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 function DeleteSectionHarness({ onDelete }: { onDelete: () => Promise<void> }) {
-  const controller = useUserProfileDeleteSectionController({ onDelete });
+  const controller = useDestructiveController({ onDelete });
   return <UserProfileDeleteSectionView {...controller} />;
 }
 
