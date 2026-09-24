@@ -106,4 +106,28 @@ describe('useSpinDelay', () => {
     await act(() => rerender({ value: 'b' }));
     expect(result.current).toBe('b');
   });
+
+  it('waits 150ms before surfacing the value by default', async () => {
+    const { result, rerender } = render(null);
+    rerender({ value: 'a' });
+
+    await advance(149);
+    expect(result.current).toBeNull();
+
+    await advance(1);
+    expect(result.current).toBe('a');
+  });
+
+  it('holds the value for 400ms by default', async () => {
+    const { result, rerender } = render(null);
+    rerender({ value: 'a' });
+    await advance(150);
+
+    rerender({ value: null });
+    await advance(399);
+    expect(result.current).toBe('a');
+
+    await advance(1);
+    expect(result.current).toBeNull();
+  });
 });
