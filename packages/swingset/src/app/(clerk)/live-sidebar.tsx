@@ -18,7 +18,10 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 
-const flows = [{ title: 'Reverification', href: '/live/reverification' }];
+const flows = [
+  { title: 'Delete account', href: '/live/delete-account' },
+  { title: 'Reverification', href: '/live/reverification' },
+];
 
 function flowIsActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
