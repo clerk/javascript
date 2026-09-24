@@ -280,6 +280,44 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.aud).toEqual(aud);
   });
 
+  describe.each(['opaque', 'at+jwt'] as const)('%s OAuth token actor', format => {
+    const act = {
+      iss: 'https://clerk.oauth.example.test',
+      sub: 'client_exchanging',
+      act: { iss: 'https://clerk.oauth.example.test', sub: 'client_subject' },
+    };
+
+    beforeEach(() => {
+      vi.setSystemTime(new Date(mockOAuthAccessTokenJwtPayload.iat * 1000));
+    });
+
+    it.each([{ act: undefined }, { act: { sub: 'client_exchanging' } }, { act }])(
+      'returns act=$act',
+      async ({ act }) => {
+        let token: string;
+        if (format === 'opaque') {
+          token = 'oat_8XOIucKvqHVr5tYP123456789abcdefghij';
+          server.use(
+            http.post('https://api.clerk.test/oauth_applications/access_tokens/verify', () =>
+              HttpResponse.json({ ...mockVerificationResults.oauth_token, ...(act === undefined ? {} : { act }) }),
+            ),
+          );
+        } else {
+          server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+          token = await createSignedOAuthJwt({ ...mockOAuthAccessTokenJwtPayload, act }, format);
+        }
+
+        const result = await verifyMachineAuthToken(token, {
+          apiUrl: 'https://api.clerk.test',
+          secretKey: 'a-valid-key',
+        });
+
+        expect(result.errors).toBeUndefined();
+        expect((result.data as IdPOAuthAccessToken).act).toEqual(act);
+      },
+    );
+  });
+
   describe.each(['opaque', 'at+jwt', 'application/at+jwt'] as const)('%s OAuth token audience verification', format => {
     const audience = 'https://resource.example.com';
     const otherAudience = 'https://other.example.com';
