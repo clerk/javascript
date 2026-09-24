@@ -19,39 +19,29 @@ import * as Stories from './destructive.stories';
 
 A confirmation for a destructive action that warrants making the user type. Deleting an account, deleting a project, revoking an API key. For actions that do not warrant typing, use [Confirmation](/blocks/confirmation).
 
-The block holds the typed phrase and compares it to `confirmationValue`. In the controlled form, everything that decides what the dialog does next belongs to the caller. `open` closes it, `isDeleting` marks it busy, `errorMessage` explains a failure.
+The block holds the typed phrase and compares it to `confirmationValue`. `useDestructiveController` owns the dialog for a single action. Resolve `onDelete` and the dialog closes. Reject it and the dialog stays open. Pass the same props yourself to drive it from `useState` or a machine, or mount one block with a handle when many rows share it.
 
 ```tsx
 import { Destructive } from '@clerk/mosaic/blocks/destructive';
+import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import { Button } from '@clerk/mosaic/components/button';
 
-const [open, setOpen] = useState(false);
-const [isDeleting, setIsDeleting] = useState(false);
-
-const handleDelete = async () => {
-  setIsDeleting(true);
-  await deleteAccount();
-  setIsDeleting(false);
-  setOpen(false);
-};
+const destructive = useDestructiveController({ onDelete: deleteAccount });
 
 <Destructive
-  open={open}
-  onOpenChange={setOpen}
+  {...destructive}
   trigger={<Button color='negative' variant='outline'>Delete account</Button>}
   title='Delete account?'
   description='Are you sure you want to delete your account? All of your data will be permanently deleted.'
   fieldLabel='Type “Delete account” below to continue'
   confirmationValue='Delete account'
   actionLabel='Delete account'
-  onDelete={() => void handleDelete()}
-  isDeleting={isDeleting}
 />;
 ```
 
 ## Failure
 
-A failed attempt leaves the dialog up. Pass the sentence the user should read as `errorMessage`, and clear it when the next attempt starts. The field is marked invalid for as long as a message is set.
+A rejection leaves the dialog up. The field is marked invalid for as long as the message is set.
 
 <Story
   name='WithError'
@@ -60,44 +50,15 @@ A failed attempt leaves the dialog up. Pass the sentence the user should read as
 
 ## Reverification
 
-Wrap the action with `useReverificationWithState` and pass the returned state to keep confirmation and verification in the same dialog and card.
+Wrap the action with `useReverificationFlow` and pass the result to the controller. Confirmation and verification stay in the same dialog and card.
 
 ```tsx
-import { useReverificationWithState } from '@clerk/mosaic/features/reverification';
-import { isReverificationCancelledError } from '@clerk/shared/error';
-import { useState } from 'react';
+import { useReverificationFlow } from '@clerk/mosaic/features/reverification';
 
-const [open, setOpen] = useState(false);
-const [isDeleting, setIsDeleting] = useState(false);
-const [errorMessage, setErrorMessage] = useState<string>();
-const [runDelete, reverification] = useReverificationWithState(deleteAccount);
+const [runDelete, reverification] = useReverificationFlow(deleteAccount);
+const destructive = useDestructiveController({ onDelete: runDelete, reverification });
 
-const handleDelete = async () => {
-  setIsDeleting(true);
-  setErrorMessage(undefined);
-  try {
-    await runDelete();
-    setOpen(false);
-  } catch (error) {
-    if (isReverificationCancelledError(error)) {
-      setOpen(false);
-      return;
-    }
-    setErrorMessage(error instanceof Error ? error.message : 'Delete failed.');
-  } finally {
-    setIsDeleting(false);
-  }
-};
-
-<Destructive
-  {...copy}
-  open={open}
-  onOpenChange={setOpen}
-  onDelete={() => void handleDelete()}
-  isDeleting={isDeleting}
-  errorMessage={errorMessage}
-  reverification={reverification}
-/>;
+<Destructive {...copy} {...destructive} />;
 ```
 
 ## One block, many rows
@@ -131,26 +92,71 @@ Opened from a menu item, focus returns to that menu's trigger when the dialog cl
   storyModule={Stories}
 />
 
+## Controlled
+
+The same props can be passed directly, from `useState` or from a machine. `open` closes the dialog, `isDeleting` marks it busy, `errorMessage` explains a failure.
+
+```tsx
+import { Destructive } from '@clerk/mosaic/blocks/destructive';
+import { Button } from '@clerk/mosaic/components/button';
+
+const [open, setOpen] = useState(false);
+const [isDeleting, setIsDeleting] = useState(false);
+
+const handleDelete = async () => {
+  setIsDeleting(true);
+  await deleteAccount();
+  setIsDeleting(false);
+  setOpen(false);
+};
+
+<Destructive
+  open={open}
+  onOpenChange={setOpen}
+  trigger={<Button color='negative' variant='outline'>Delete account</Button>}
+  title='Delete account?'
+  description='Are you sure you want to delete your account? All of your data will be permanently deleted.'
+  fieldLabel='Type “Delete account” below to continue'
+  confirmationValue='Delete account'
+  actionLabel='Delete account'
+  onDelete={() => void handleDelete()}
+  isDeleting={isDeleting}
+/>;
+```
+
+A machine maps onto those same props:
+
+```tsx
+<Destructive
+  open={snapshot.value === 'confirming' || snapshot.value === 'deleting'}
+  onOpenChange={open => send({ type: open ? 'OPEN' : 'CANCEL' })}
+  onDelete={() => send({ type: 'CONFIRM' })}
+  isDeleting={snapshot.value === 'deleting'}
+  errorMessage={snapshot.context.errorMessage}
+  {...copy}
+/>
+```
+
 ## Props
 
 Controlled:
 
-| Prop                | Type                      | Default      | Description                                                                      |
-| ------------------- | ------------------------- | ------------ | -------------------------------------------------------------------------------- |
-| `open`              | `boolean`                 | — (required) | Whether the confirmation is showing. Controlled, the way any dialog is.          |
-| `onOpenChange`      | `(open: boolean) => void` | — (required) | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop.   |
-| `trigger`           | `ReactNode`               | —            | The button that asks to open the dialog.                                         |
-| `title`             | `string`                  | — (required) | Names what is about to happen.                                                   |
-| `description`       | `ReactNode`               | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                 |
-| `fieldLabel`        | `string`                  | — (required) | Labels the confirmation field.                                                   |
-| `confirmationValue` | `string`                  | — (required) | The phrase the user has to type back. Also the field's placeholder.              |
-| `actionLabel`       | `string`                  | — (required) | The confirming button's label.                                                   |
-| `cancelLabel`       | `string`                  | `'Cancel'`   | The cancel button's label.                                                       |
-| `finalFocus`        | `DialogFocusTarget`       | the trigger  | Where focus returns on close, for a removal that unmounts the trigger.           |
-| `onDelete`          | `() => void`              | — (required) | Asks the caller to run the action, once the typed phrase matches.                |
-| `isDeleting`        | `boolean`                 | `false`      | Disables the field, renders the action pending, and ignores further submissions. |
-| `errorMessage`      | `string`                  | —            | Marks the field invalid and renders under it.                                    |
-| `reverification`    | `ReverificationProps`     | —            | Renders reverification in the same dialog after the action requests it.          |
+| Prop                | Type                        | Default      | Description                                                                      |
+| ------------------- | --------------------------- | ------------ | -------------------------------------------------------------------------------- |
+| `open`              | `boolean`                   | — (required) | Whether the confirmation is showing. Controlled, the way any dialog is.          |
+| `onOpenChange`      | `(open: boolean) => void`   | — (required) | Asks to open or close. Fired by the trigger, Cancel, Escape, and the backdrop.   |
+| `trigger`           | `ReactNode`                 | —            | The button that asks to open the dialog.                                         |
+| `title`             | `string`                    | — (required) | Names what is about to happen.                                                   |
+| `description`       | `ReactNode`                 | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                 |
+| `fieldLabel`        | `string`                    | — (required) | Labels the confirmation field.                                                   |
+| `confirmationValue` | `string`                    | — (required) | The phrase the user has to type back. Also the field's placeholder.              |
+| `actionLabel`       | `string`                    | — (required) | The confirming button's label.                                                   |
+| `cancelLabel`       | `string`                    | `'Cancel'`   | The cancel button's label.                                                       |
+| `finalFocus`        | `DialogFocusTarget`         | the trigger  | Where focus returns on close, for a removal that unmounts the trigger.           |
+| `onDelete`          | `() => void`                | — (required) | Asks the caller to run the action, once the typed phrase matches.                |
+| `isDeleting`        | `boolean`                   | `false`      | Disables the field, renders the action pending, and ignores further submissions. |
+| `errorMessage`      | `string`                    | —            | Marks the field invalid and renders under it.                                    |
+| `reverification`    | `ReverificationController`  | —            | Renders reverification in the same dialog after the action requests it.          |
 
 With a handle:
 
@@ -165,18 +171,3 @@ With a handle:
 | `cancelLabel`       | `string`                                       | `'Cancel'`   | The cancel button's label.                                                             |
 | `finalFocus`        | `DialogFocusTarget`                            | the trigger  | Where focus returns on close, for a removal that unmounts the trigger.                 |
 | `onDelete`          | `(payload: Payload) => Promise<void> \| void`  | — (required) | Runs the action. Resolve to close; reject with an `Error` to keep it open showing why. |
-
-## Driving it from a machine
-
-A section that wires the block to a state machine maps the machine's state onto the same props:
-
-```tsx
-<Destructive
-  open={snapshot.value === 'confirming' || snapshot.value === 'deleting'}
-  onOpenChange={open => send({ type: open ? 'OPEN' : 'CANCEL' })}
-  onDelete={() => send({ type: 'CONFIRM' })}
-  isDeleting={snapshot.value === 'deleting'}
-  errorMessage={snapshot.context.errorMessage}
-  {...copy}
-/>
-```
