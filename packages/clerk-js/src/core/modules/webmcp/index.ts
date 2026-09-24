@@ -141,16 +141,6 @@ const getInitialValues = (identifier?: string): SignInInitialValues | undefined 
   return identifier.startsWith('+') ? { phoneNumber: identifier } : { username: identifier };
 };
 
-const openSignInForm = (clerk: Clerk, identifier?: string): ToolResult => {
-  const initialValues = getInitialValues(identifier);
-  try {
-    clerk.openSignIn({ initialValues });
-    return { signInForm: 'opened' };
-  } catch {
-    return { signInUrl: clerk.buildSignInUrl({ initialValues }) };
-  }
-};
-
 const signInWithSavedPassword = async (
   clerk: Clerk,
   signIn: SignInResource,
@@ -162,11 +152,21 @@ const signInWithSavedPassword = async (
     .catch(() => null)) as SavedPassword | null | undefined;
 
   if (!credential?.password) {
+    const signInForm = document.querySelector('.cl-signIn-root:not(:empty)');
+    if (!signInForm) {
+      await clerk.redirectToSignIn({ initialValues: getInitialValues(identifier) });
+      return {
+        status: 'redirecting',
+        message:
+          'No saved password was chosen. Opening the sign-in page, where the person needs to type their password.',
+        next: 'clerk_get_auth_state',
+      };
+    }
+    signInForm.scrollIntoView({ block: 'center' });
     return {
       status: 'needs_user_action',
       message:
-        'No saved password was chosen. The person needs to type their password into the sign-in form, or try another method.',
-      ...openSignInForm(clerk, identifier),
+        'No saved password was chosen. The person needs to type their password into the sign-in form on this page, or try another method.',
       otherMethods,
     };
   }
