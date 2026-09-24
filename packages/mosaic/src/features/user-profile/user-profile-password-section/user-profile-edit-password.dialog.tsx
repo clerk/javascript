@@ -1,6 +1,6 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
-import type { RefObject } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import { useId, useRef, useState } from 'react';
 
 import { Banner } from '../../../components/banner';
@@ -9,7 +9,7 @@ import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
-import type { UseFormResult } from '../../../components/form';
+import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
 import { Text } from '../../../components/text';
@@ -21,6 +21,9 @@ import type {
 } from './user-profile-password-section.types';
 
 export interface UserProfileEditPasswordDialogProps {
+  children?: ReactNode;
+  passwordFeedback?: FieldFeedback;
+  identifier?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
@@ -30,6 +33,9 @@ export interface UserProfileEditPasswordDialogProps {
 }
 
 export function UserProfileEditPasswordDialog({
+  children,
+  passwordFeedback,
+  identifier = '',
   open,
   onOpenChange,
   trigger,
@@ -57,97 +63,109 @@ export function UserProfileEditPasswordDialog({
           elevation='overlay'
           renderBranding={false}
         >
-          <Card.Header>
-            <Card.Title>{hasPassword ? m.dialogTitle.change : m.dialogTitle.set}</Card.Title>
-          </Card.Header>
-          <Card.Content
-            render={
-              <form
-                id={form.id}
-                onSubmit={form.handleSubmit}
-              />
-            }
-          >
-            {form.error ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
+          {children ?? (
+            <>
+              <Card.Header>
+                <Card.Title>{hasPassword ? m.dialogTitle.change : m.dialogTitle.set}</Card.Title>
+              </Card.Header>
+              <Card.Content
+                render={
+                  <form
+                    id={form.id}
+                    onSubmit={form.handleSubmit}
+                  />
+                }
               >
-                <Banner.Label>{form.error}</Banner.Label>
-              </Banner.Root>
-            ) : null}
-            {showCurrentPassword ? (
-              <PasswordField
-                autoComplete='current-password'
-                form={form}
-                inputRef={initialFocusRef}
-                label={m.currentPasswordLabel}
-                name='currentPassword'
-              />
-            ) : null}
-            <PasswordField
-              autoComplete='new-password'
-              form={form}
-              inputRef={showCurrentPassword ? undefined : initialFocusRef}
-              label={m.newPasswordLabel}
-              name='newPassword'
-            />
-            <PasswordField
-              autoComplete='new-password'
-              form={form}
-              label={m.confirmPasswordLabel}
-              name='confirmPassword'
-            />
-            <div {...stylex.props(styles.checkboxField)}>
-              <input
-                aria-describedby={signOutDescriptionId}
-                checked={form.values.signOutOfOtherSessions}
-                disabled={form.isSubmitting}
-                id={signOutId}
-                type='checkbox'
-                {...stylex.props(styles.checkbox)}
-                onChange={event => form.setValue('signOutOfOtherSessions', event.target.checked)}
-              />
-              <div {...stylex.props(styles.checkboxCopy)}>
-                <Text
-                  render={<label htmlFor={signOutId} />}
-                  size='sm'
-                  xstyle={styles.checkboxLabel}
-                >
-                  {m.signOutOfOtherSessionsLabel}
-                </Text>
-                <Text
-                  id={signOutDescriptionId}
-                  size='xs'
-                  xstyle={styles.checkboxDescription}
-                >
-                  {m.signOutOfOtherSessionsDescription}
-                </Text>
-              </div>
-            </div>
-          </Card.Content>
-          <Card.Footer>
-            <Dialog.Close
-              render={
-                <Button
-                  variant='outline'
-                  color='neutral'
+                <input
+                  readOnly
+                  hidden
+                  name='identifier'
+                  autoComplete='username'
+                  value={identifier}
+                />
+                {form.error ? (
+                  <Banner.Root
+                    role='alert'
+                    color='negative'
+                  >
+                    <Banner.Label>{form.error}</Banner.Label>
+                  </Banner.Root>
+                ) : null}
+                {showCurrentPassword ? (
+                  <PasswordField
+                    autoComplete='current-password'
+                    form={form}
+                    inputRef={initialFocusRef}
+                    label={m.currentPasswordLabel}
+                    name='currentPassword'
+                  />
+                ) : null}
+                <PasswordField
+                  autoComplete='new-password'
+                  form={form}
+                  inputRef={showCurrentPassword ? undefined : initialFocusRef}
+                  label={m.newPasswordLabel}
+                  name='newPassword'
+                  advisoryFeedback={passwordFeedback}
+                />
+                <PasswordField
+                  autoComplete='new-password'
+                  form={form}
+                  label={m.confirmPasswordLabel}
+                  name='confirmPassword'
+                />
+                <div {...stylex.props(styles.checkboxField)}>
+                  <input
+                    aria-describedby={signOutDescriptionId}
+                    checked={form.values.signOutOfOtherSessions}
+                    disabled={form.isSubmitting}
+                    id={signOutId}
+                    type='checkbox'
+                    {...stylex.props(styles.checkbox)}
+                    onChange={event => form.setValue('signOutOfOtherSessions', event.target.checked)}
+                  />
+                  <div {...stylex.props(styles.checkboxCopy)}>
+                    <Text
+                      render={<label htmlFor={signOutId} />}
+                      size='sm'
+                      xstyle={styles.checkboxLabel}
+                    >
+                      {m.signOutOfOtherSessionsLabel}
+                    </Text>
+                    <Text
+                      id={signOutDescriptionId}
+                      size='xs'
+                      xstyle={styles.checkboxDescription}
+                    >
+                      {m.signOutOfOtherSessionsDescription}
+                    </Text>
+                  </div>
+                </div>
+              </Card.Content>
+              <Card.Footer>
+                <Dialog.Close
+                  render={
+                    <Button
+                      variant='outline'
+                      color='neutral'
+                      fullWidth
+                    >
+                      {m.cancel}
+                    </Button>
+                  }
+                />
+                <SubmitButton
+                  form={form.id}
                   fullWidth
+                  isPending={form.isSubmitting}
+                  disabled={!form.canSubmit}
+                  focusableWhenDisabled
                 >
-                  {m.cancel}
-                </Button>
-              }
-            />
-            <SubmitButton
-              form={form.id}
-              fullWidth
-              isPending={form.isSubmitting}
-              disabled={!form.canSubmit}
-              focusableWhenDisabled
-            >
-              {m.save}
-            </SubmitButton>
-          </Card.Footer>
+                  {m.save}
+                </SubmitButton>
+              </Card.Footer>
+            </>
+          )}
         </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
@@ -160,12 +178,14 @@ function PasswordField({
   form,
   inputRef,
   name,
+  advisoryFeedback,
 }: {
   label: string;
   autoComplete: 'current-password' | 'new-password';
   form: UseFormResult<UserProfileEditPasswordValues>;
   inputRef?: RefObject<HTMLInputElement>;
   name: UserProfileEditPasswordField;
+  advisoryFeedback?: FieldFeedback;
 }) {
   const m = useMessages('userProfilePasswordSection');
   const [visible, setVisible] = useState(false);
@@ -198,7 +218,11 @@ function PasswordField({
           </Button>
         </InputGroup.End>
       </InputGroup.Root>
-      {error ? <Field.Error>{error}</Field.Error> : null}
+      {error ? (
+        <Field.Error>{error}</Field.Error>
+      ) : advisoryFeedback ? (
+        <Field.Description>{advisoryFeedback.message}</Field.Description>
+      ) : null}
     </Field.Root>
   );
 }
