@@ -29,7 +29,15 @@ function firstInDocumentOrder(elements: Iterable<HTMLElement>): HTMLElement | nu
 
 export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function FlowStep(props, forwardedRef) {
   const { render, ids, children, ...otherProps } = props;
-  const { value, direction, rootRef, registerActiveStep, unregisterActiveStep } = useFlowContext();
+  const {
+    value,
+    direction,
+    rootRef,
+    registerActiveStep,
+    unregisterActiveStep,
+    registerExitingStep,
+    unregisterExitingStep,
+  } = useFlowContext();
   const open = ids.includes(value);
   const stepRef = useRef<HTMLDivElement | null>(null);
   const activeChildrenRef = useRef(children);
@@ -54,6 +62,18 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
     registerActiveStep(element);
     return () => unregisterActiveStep(element);
   }, [open, registerActiveStep, unregisterActiveStep]);
+
+  const exiting = mounted && !open;
+
+  useLayoutEffect(() => {
+    const element = stepRef.current;
+    if (!exiting || !element) {
+      return;
+    }
+
+    registerExitingStep(element);
+    return () => unregisterExitingStep(element);
+  }, [exiting, registerExitingStep, unregisterExitingStep]);
 
   useEffect(() => {
     const entering = open && !wasOpenRef.current;
