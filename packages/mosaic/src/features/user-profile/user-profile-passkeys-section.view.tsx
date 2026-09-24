@@ -20,7 +20,6 @@ export interface UserProfilePasskey {
 
 export interface UserProfilePasskeysSectionViewProps {
   passkeys: UserProfilePasskey[];
-  sectionTitle?: string;
   /** Renders only the group, for composing inside a parent `Section.Root`. */
   asGroup?: boolean;
   onAdd?: () => void;
@@ -31,7 +30,6 @@ export interface UserProfilePasskeysSectionViewProps {
 
 export function UserProfilePasskeysSectionView({
   passkeys,
-  sectionTitle,
   asGroup = false,
   onAdd,
   addError,
@@ -54,7 +52,6 @@ export function UserProfilePasskeysSectionView({
       variant={asGroup ? 'contained' : 'default'}
       aria-label={asGroup ? m.label : undefined}
     >
-      {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
       <Section.Surface>
         <Section.Header xstyle={styles.header}>
           <Section.Content>
@@ -119,7 +116,7 @@ export function UserProfilePasskeysSectionView({
         <Section.Root
           ref={section}
           tabIndex={-1}
-          aria-label={sectionTitle ? undefined : m.label}
+          aria-label={m.label}
         >
           {group}
         </Section.Root>

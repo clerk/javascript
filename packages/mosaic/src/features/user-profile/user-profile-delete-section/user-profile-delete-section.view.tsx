@@ -19,10 +19,14 @@ export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSect
   });
 
   return (
-    <Section.Root>
+    <Section.Root aria-label={m.sectionTitle}>
       <Section.Group>
-        <Section.Title>{m.sectionTitle}</Section.Title>
         <Section.Surface>
+          <Section.Header>
+            <Section.Content>
+              <Section.Label>{m.sectionTitle}</Section.Label>
+            </Section.Content>
+          </Section.Header>
           <Section.Row>
             <Section.Item>
               <Section.Content>

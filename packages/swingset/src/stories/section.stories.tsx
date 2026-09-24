@@ -264,6 +264,8 @@ export function FlatContainedGroups() {
             background: none !important;
           }
           .cl-section-items {
+            margin-inline: 0 !important;
+            padding-inline: calc(var(--cl-spacing) * 4) !important;
             border: 1px solid var(--cl-color-border) !important;
             border-radius: var(--cl-radius-xl) !important;
             background: var(--cl-color-background) !important;

@@ -24,10 +24,14 @@ export function UserProfileEnterpriseAccountsSectionView({
     return null;
   }
   return (
-    <Section.Root>
+    <Section.Root aria-label={m.title}>
       <Section.Group>
-        <Section.Title>{m.title}</Section.Title>
         <Section.Surface>
+          <Section.Header>
+            <Section.Content>
+              <Section.Label>{m.title}</Section.Label>
+            </Section.Content>
+          </Section.Header>
           {accounts.map(account => (
             <UserProfileEnterpriseAccountRowView
               key={account.id}

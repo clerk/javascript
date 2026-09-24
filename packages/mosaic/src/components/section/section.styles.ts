@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, sectionVars, space, typeScaleVars } from '../../tokens.stylex';
-import { sectionNestedItemMarker } from './section.markers.stylex';
+import { sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
 
 export const styles = stylex.create({
   root: {
@@ -46,16 +46,20 @@ export const styles = stylex.create({
   header: {
     marginInline: space['4'],
     paddingBlock: space['3'],
-    borderBlockEndColor: colorVars['--cl-color-border'],
-    borderBlockEndStyle: 'solid',
-    borderBlockEndWidth: '1px',
+    minHeight: space['13'],
     width: 'auto',
   },
   items: {
-    paddingInline: space['4'],
+    marginInline: space['4'],
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: {
+      default: '0px',
+      [stylex.when.siblingBefore(':where(*)', sectionHeaderMarker)]: '1px',
+    },
     display: 'flex',
     flexDirection: 'column',
-    width: '100%',
+    width: 'auto',
   },
   item: {
     alignItems: 'center',

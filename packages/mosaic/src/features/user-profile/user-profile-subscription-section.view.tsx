@@ -21,10 +21,14 @@ export function UserProfileSubscriptionSectionView({
   onChangePlan,
 }: UserProfileSubscriptionSectionViewProps) {
   return (
-    <Section.Root>
+    <Section.Root aria-label='Subscription'>
       <Section.Group>
-        <Section.Title>Subscription</Section.Title>
         <Section.Surface>
+          <Section.Header>
+            <Section.Content>
+              <Section.Label>Subscription</Section.Label>
+            </Section.Content>
+          </Section.Header>
           <Section.Row>
             <Section.Item>
               <Section.Content>

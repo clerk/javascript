@@ -43,7 +43,7 @@ describe('UserProfilePasswordSectionView', () => {
     const user = userEvent.setup();
     renderView({ hasPassword: false, onSubmitPassword });
 
-    expect(screen.getByRole('heading', { level: 4, name: 'Authentication' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Password' })).toBeInTheDocument();
     expect(screen.getByText('Password')).toBeVisible();
     expect(screen.queryByText('••••••••••••••••••')).not.toBeInTheDocument();
     expect(screen.getByText('No password set')).toBeVisible();
@@ -109,7 +109,7 @@ describe('UserProfilePasswordSectionView', () => {
       </MosaicProvider>,
     );
 
-    expect(screen.getByRole('region', { name: 'Authentication' })).toBeVisible();
+    expect(screen.getByRole('region', { name: 'Password' })).toBeVisible();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 

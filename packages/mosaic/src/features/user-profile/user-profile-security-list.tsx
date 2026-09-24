@@ -5,7 +5,6 @@ import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
 
 export function UserProfileSecurityList({
-  sectionTitle,
   asGroup = false,
   label,
   addLabel,
@@ -15,7 +14,6 @@ export function UserProfileSecurityList({
   addControl,
   children,
 }: {
-  sectionTitle?: string;
   asGroup?: boolean;
   label: string;
   addLabel: string;
@@ -30,7 +28,6 @@ export function UserProfileSecurityList({
       variant={asGroup ? 'contained' : 'default'}
       aria-label={asGroup ? label : undefined}
     >
-      {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
       <Section.Surface>
         <Section.Header>
           <Section.Content>
@@ -72,5 +69,5 @@ export function UserProfileSecurityList({
     </Section.Group>
   );
 
-  return asGroup ? group : <Section.Root aria-label={sectionTitle ? undefined : label}>{group}</Section.Root>;
+  return asGroup ? group : <Section.Root aria-label={label}>{group}</Section.Root>;
 }

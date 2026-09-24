@@ -54,7 +54,7 @@ describe('UserProfileBillingPanelView', () => {
     renderView();
 
     expect(screen.getByRole('heading', { level: 3, name: 'Billing' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 4, name: 'Subscription' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Subscription' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Payment methods' })).toBeInTheDocument();
     expect(screen.getByText('Basic Plan')).toBeInTheDocument();
     expect(screen.getByText('$12.00')).toBeInTheDocument();

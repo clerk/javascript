@@ -28,7 +28,7 @@ import { Section } from '@clerk/mosaic/components/section';
 
 `Section.Group` pairs an optional `Section.Title` with a `Section.Surface`. The surface is the outlined card. Its direct `Section.Row` children own separation and may stack one or more `Section.Item` entries. Each item lays out optional media, flexible content, and trailing actions. `Section.Media` accepts `sm`, `md`, `lg`, and `xl` sizes.
 
-For a nested list, place a `Section.Header` and a `Section.Items` directly inside the surface. The header draws the divider above the list, and nested items are separated by dividers of their own.
+For a nested list, place a `Section.Header` and a `Section.Items` directly inside the surface. The list draws the divider below the header, and nested items are separated by dividers of their own. A `Section.Header` can also head plain `Section.Row` children, which draw their own dividers.
 
 A section can hold more than one `Section.Group`. Set `variant='contained'` on a group that holds a nested list, such as a user's email addresses inside the account section. A contained group renders with `role='group'` and `data-variant='contained'`, so it can take its own accessible name and be styled apart from the section's main group.
 

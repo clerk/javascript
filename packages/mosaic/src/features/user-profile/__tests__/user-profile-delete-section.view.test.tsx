@@ -22,7 +22,7 @@ describe('UserProfileDeleteSectionView', () => {
   it('renders the danger zone with the dialog closed', () => {
     renderView();
 
-    expect(screen.getByRole('heading', { name: 'Danger zone' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Danger zone' })).toBeInTheDocument();
     expect(
       screen.getByText('Permanently delete this account and all its data. This cannot be undone.'),
     ).toBeInTheDocument();

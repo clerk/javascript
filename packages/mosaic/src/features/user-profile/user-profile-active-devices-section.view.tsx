@@ -84,23 +84,27 @@ export function UserProfileActiveDevicesSectionView({
 
   return (
     <div {...stylex.props(styles.sectionCards)}>
-      <Section.Root>
+      <Section.Root aria-label={m.title}>
         <Section.Group>
-          <div {...stylex.props(styles.titleRow)}>
-            <Section.Title>{m.title}</Section.Title>
-            {onSignOutAllOtherDevices && otherDevices.length > 0 ? (
-              <Button
-                ref={signOutAllTrigger}
-                color='neutral'
-                size='sm'
-                variant='ghost'
-                onClick={() => setIsSignOutAllOpen(true)}
-              >
-                {m.signOutAll}
-              </Button>
-            ) : null}
-          </div>
           <Section.Surface>
+            <Section.Header>
+              <Section.Content>
+                <Section.Label>{m.title}</Section.Label>
+              </Section.Content>
+              {onSignOutAllOtherDevices && otherDevices.length > 0 ? (
+                <Section.Actions>
+                  <Button
+                    ref={signOutAllTrigger}
+                    color='neutral'
+                    size='sm'
+                    variant='outline'
+                    onClick={() => setIsSignOutAllOpen(true)}
+                  >
+                    {m.signOutAll}
+                  </Button>
+                </Section.Actions>
+              ) : null}
+            </Section.Header>
             {currentDevices.length > 0 ? (
               currentDevices.map(device => (
                 <Section.Row key={device.id}>

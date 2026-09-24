@@ -373,8 +373,11 @@ export const panelStyles = stylex.create({
     flexDirection: 'column',
   },
   sections: {
-    gap: space['10'],
+    gap: space['8'],
     display: 'flex',
     flexDirection: 'column',
+  },
+  groups: {
+    rowGap: space['8'],
   },
 });

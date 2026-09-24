@@ -61,7 +61,7 @@ describe('UserProfileProfilePanelView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.queryByRole('heading', { name: 'Connected accounts' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Connected accounts' })).not.toBeInTheDocument();
     expect(screen.getByRole('alertdialog', { name: 'Remove connected account' })).toBeInTheDocument();
 
     await act(async () => {
@@ -94,7 +94,7 @@ describe('UserProfileProfilePanelView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.queryByRole('heading', { name: 'Web3 wallets' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Web3 wallets' })).not.toBeInTheDocument();
     expect(screen.getByRole('alertdialog')).toHaveTextContent('0x1234');
     await act(async () => {
       removal.resolve();
@@ -293,9 +293,9 @@ describe('UserProfileProfilePanelView', () => {
       onDeleteAccount,
     });
 
-    expect(screen.getByRole('heading', { level: 4, name: 'Connected accounts' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Connected accounts' })).toBeInTheDocument();
     expect(screen.getByText('Google')).toBeVisible();
-    expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Danger zone' })).toBeInTheDocument();
     expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
@@ -349,7 +349,7 @@ describe('UserProfileProfilePanelView', () => {
       onRemoveWeb3Wallet: vi.fn(),
     });
 
-    expect(screen.getByRole('heading', { level: 4, name: 'Web3 wallets' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Web3 wallets' })).toBeInTheDocument();
     expect(screen.getByText('MetaMask')).toBeInTheDocument();
     expect(screen.getByText('0x1234...5678')).toBeInTheDocument();
     expect(within(screen.getByRole('region', { name: 'Web3 wallets' })).getByText('Primary')).toBeInTheDocument();

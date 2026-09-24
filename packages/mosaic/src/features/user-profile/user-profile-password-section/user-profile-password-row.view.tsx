@@ -19,7 +19,7 @@ export function UserProfilePasswordRowView({
   requiresCurrentPassword = false,
   managedBy,
   onSubmitPassword,
-}: Omit<UserProfilePasswordSectionViewProps, 'sectionTitle'>) {
+}: UserProfilePasswordSectionViewProps) {
   const m = useMessages('userProfilePasswordSection');
   return (
     <>

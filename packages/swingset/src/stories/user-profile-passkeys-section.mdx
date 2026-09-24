@@ -14,14 +14,13 @@ import * as Stories from './user-profile-passkeys-section.stories';
 
 ## Props
 
-| Prop           | Type                                                  | Default      | Description                                                      |
-| -------------- | ----------------------------------------------------- | ------------ | ---------------------------------------------------------------- |
-| `passkeys`     | `UserProfilePasskey[]`                                | — (required) | Names and formatted creation/last-used labels.                   |
-| `sectionTitle` | `string`                                              | —            | Optional surrounding section heading.                            |
-| `onAdd`        | `() => void`                                          | —            | Shows Add when supplied.                                         |
-| `addError`     | `string`                                              | —            | Inline creation error.                                           |
-| `onRename`     | `(id: string, name: string) => void \| Promise<void>` | —            | Resolve to close; reject with an Error to display the failure.   |
-| `onRemove`     | `(id: string) => void \| Promise<void>`               | —            | Shared confirmation awaits removal and displays rejected errors. |
+| Prop       | Type                                                  | Default      | Description                                                      |
+| ---------- | ----------------------------------------------------- | ------------ | ---------------------------------------------------------------- |
+| `passkeys` | `UserProfilePasskey[]`                                | — (required) | Names and formatted creation/last-used labels.                   |
+| `onAdd`    | `() => void`                                          | —            | Shows Add when supplied.                                         |
+| `addError` | `string`                                              | —            | Inline creation error.                                           |
+| `onRename` | `(id: string, name: string) => void \| Promise<void>` | —            | Resolve to close; reject with an Error to display the failure.   |
+| `onRemove` | `(id: string) => void \| Promise<void>`               | —            | Shared confirmation awaits removal and displays rejected errors. |
 
 ## Usage
 

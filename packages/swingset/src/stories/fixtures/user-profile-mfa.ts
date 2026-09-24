@@ -327,7 +327,6 @@ export function useUserProfileMfaFixture({
     section: {
       methods,
       addableMethods,
-      sectionTitle: 'Authentication',
       onAdd: open,
       onRegenerateBackupCodes:
         account.hasBackupCodes && onGenerateBackupCodes ? () => void generateBackupCodes('regenerate') : undefined,

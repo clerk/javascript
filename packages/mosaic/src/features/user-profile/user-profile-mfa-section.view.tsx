@@ -25,7 +25,6 @@ export interface UserProfileMfaSectionViewProps {
   addableMethods?: readonly UserProfileMfaAddableMethod[];
   addButtonRef?: Ref<HTMLButtonElement>;
   addControl?: ReactNode;
-  sectionTitle?: string;
   /** Renders only the group, for composing inside a parent `Section.Root`. */
   asGroup?: boolean;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
@@ -39,7 +38,6 @@ export function UserProfileMfaSectionView({
   addableMethods,
   addButtonRef,
   addControl,
-  sectionTitle,
   asGroup,
   onAdd,
   onRegenerateBackupCodes,
@@ -102,7 +100,6 @@ export function UserProfileMfaSectionView({
         emptyLabel={m.empty}
         hasItems={methods.length > 0}
         label={m.label}
-        sectionTitle={sectionTitle}
         asGroup={asGroup}
       >
         {methods.map(method => (

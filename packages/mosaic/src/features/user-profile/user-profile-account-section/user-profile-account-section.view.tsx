@@ -1,3 +1,4 @@
+import { panelStyles } from '../../../components/profile';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
@@ -112,10 +113,17 @@ export function UserProfileAccountSectionView({
   );
 
   return (
-    <Section.Root aria-label={m.sectionLabel}>
+    <Section.Root
+      aria-label={m.sectionLabel}
+      xstyle={panelStyles.groups}
+    >
       <Section.Group>
-        <Section.Title>{m.sectionTitle}</Section.Title>
         <Section.Surface>
+          <Section.Header>
+            <Section.Content>
+              <Section.Label>{m.sectionTitle}</Section.Label>
+            </Section.Content>
+          </Section.Header>
           <UserProfilePictureRowView
             name={name}
             imageUrl={imageUrl}

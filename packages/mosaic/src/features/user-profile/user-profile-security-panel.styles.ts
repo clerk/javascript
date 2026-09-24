@@ -22,12 +22,6 @@ export const styles = stylex.create({
     borderWidth: '1px',
     backgroundColor: colorVars['--cl-color-background-subtle'],
   },
-  titleRow: {
-    alignItems: 'center',
-    columnGap: space['3'],
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
   sectionCards: {
     gap: space['3'],
     display: 'flex',

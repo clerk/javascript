@@ -46,10 +46,14 @@ export function UserProfileWeb3WalletsSectionView({
   return (
     <>
       {hasRows ? (
-        <Section.Root>
+        <Section.Root aria-label={m.title}>
           <Section.Group>
-            <Section.Title>{m.title}</Section.Title>
             <Section.Surface>
+              <Section.Header>
+                <Section.Content>
+                  <Section.Label>{m.title}</Section.Label>
+                </Section.Content>
+              </Section.Header>
               {wallets.map(wallet => (
                 <UserProfileWeb3WalletRowView
                   key={wallet.id}

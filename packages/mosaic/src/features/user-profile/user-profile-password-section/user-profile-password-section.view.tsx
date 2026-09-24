@@ -11,7 +11,6 @@ export type {
 } from './user-profile-password-section.types';
 
 export function UserProfilePasswordSectionView({
-  sectionTitle,
   asGroup = false,
   hasPassword = false,
   requiresCurrentPassword = false,
@@ -19,7 +18,6 @@ export function UserProfilePasswordSectionView({
   onSubmitPassword,
 }: UserProfilePasswordSectionViewProps) {
   const m = useMessages('userProfilePasswordSection');
-  const title = sectionTitle ?? m.sectionTitle;
   if (!hasPassword && !managedBy && !onSubmitPassword) {
     return null;
   }
@@ -29,7 +27,6 @@ export function UserProfilePasswordSectionView({
       variant={asGroup ? 'contained' : 'default'}
       aria-label={asGroup ? m.label : undefined}
     >
-      {title ? <Section.Title>{title}</Section.Title> : null}
       <Section.Surface>
         <UserProfilePasswordRowView
           hasPassword={hasPassword}
@@ -41,5 +38,5 @@ export function UserProfilePasswordSectionView({
     </Section.Group>
   );
 
-  return asGroup ? group : <Section.Root aria-label={title ? undefined : m.label}>{group}</Section.Root>;
+  return asGroup ? group : <Section.Root aria-label={m.label}>{group}</Section.Root>;
 }
