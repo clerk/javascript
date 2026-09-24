@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, focusVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   shell: {
@@ -64,6 +64,12 @@ export const styles = stylex.create({
     paddingInlineStart: space['4'],
     verticalAlign: 'middle',
     width: 0,
+  },
+  cellFocus: {
+    outlineOffset: {
+      default: null,
+      ':focus-visible': `calc(-1 * ${focusVars['--cl-focus-outline-width']})`,
+    },
   },
   emptyCell: {
     textAlign: 'center',

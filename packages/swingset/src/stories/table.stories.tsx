@@ -273,6 +273,70 @@ export function Selection() {
   );
 }
 
+export function Grid() {
+  const table = useDataTable({ data: apiKeys, getRowId: row => row.id });
+
+  return (
+    <Table.Root
+      grid
+      aria-label='API keys'
+    >
+      <Table.Header>
+        <Table.Row>
+          <Table.SelectAllCell
+            aria-label='Select all keys'
+            checked={table.getIsAllRowsSelected()}
+            indeterminate={table.getIsSomeRowsSelected()}
+            onChange={() => table.toggleAllRowsSelected()}
+          />
+          <Table.HeaderCell>Name</Table.HeaderCell>
+          <Table.HeaderCell>Last used</Table.HeaderCell>
+          <Table.HeaderCell>
+            <VisuallyHidden>Actions</VisuallyHidden>
+          </Table.HeaderCell>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {table.rows.map(row => (
+          <Table.Row
+            key={row.id}
+            selected={row.getIsSelected()}
+          >
+            <Table.SelectCell
+              aria-label={`Select ${row.original.name}`}
+              checked={row.getIsSelected()}
+              onToggleSelected={row.toggleSelected}
+            />
+            <Table.Cell>{row.original.name}</Table.Cell>
+            <Table.Cell>{row.original.lastUsed}</Table.Cell>
+            <Table.Cell align='end'>
+              <Menu.Root>
+                <Menu.Trigger
+                  render={
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      shape='square'
+                      aria-label={`Actions for ${row.original.name}`}
+                    />
+                  }
+                >
+                  <Icon name='ellipsis-horizontal' />
+                </Menu.Trigger>
+                <Menu.Popup>
+                  <Menu.Item label='Revoke'>
+                    <Menu.Label>Revoke</Menu.Label>
+                  </Menu.Item>
+                </Menu.Popup>
+              </Menu.Root>
+            </Table.Cell>
+          </Table.Row>
+        ))}
+      </Table.Body>
+    </Table.Root>
+  );
+}
+
 export function Empty() {
   return (
     <Table.Root>
