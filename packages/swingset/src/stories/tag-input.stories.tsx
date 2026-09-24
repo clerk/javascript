@@ -1,7 +1,7 @@
+import { useLayoutAnimation } from '@clerk/mosaic/primitives/hooks';
 import { TagInput } from '@clerk/mosaic/primitives/tag-input';
 import { X } from 'lucide-react';
-import { type ComponentProps, type ReactNode, useId, useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
+import { type ComponentProps, type ReactNode, useId, useRef } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -48,58 +48,16 @@ const tagClassName =
 
 const presenceTagClassName = `${tagClassName} data-ending-style:scale-90 data-ending-style:opacity-0 data-starting-style:scale-90 data-starting-style:opacity-0 transition-[opacity,scale] duration-150 ease-out motion-reduce:transition-none`;
 
-const viewTransitionTagClassName = `${tagClassName} [view-transition-class:tag] [view-transition-name:match-element]`;
+type LayoutItemProps = ReturnType<typeof useLayoutAnimation>['itemProps'];
 
-const viewTransitionInputClassName = '[view-transition-class:tag-input] [view-transition-name:match-element]';
-
-const viewTransitionCss = `
-::view-transition-group(*.tag),
-::view-transition-group(*.tag-input) {
-  animation-duration: 200ms;
-  animation-timing-function: ease-out;
-}
-::view-transition-old(*.tag):only-child {
-  animation: tag-exit 150ms ease-in forwards;
-}
-::view-transition-new(*.tag):only-child {
-  animation: tag-enter 150ms ease-out;
-}
-::view-transition-old(*.tag-input) {
-  display: none;
-}
-::view-transition-new(*.tag-input) {
-  animation: none;
-  block-size: 100%;
-  object-fit: none;
-  object-position: left center;
-}
-html[dir='rtl']::view-transition-new(*.tag-input) {
-  object-position: right center;
-}
-@keyframes tag-exit {
-  to { opacity: 0; transform: scale(0.9); }
-}
-@keyframes tag-enter {
-  from { opacity: 0; transform: scale(0.9); }
-}
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-group(*.tag),
-  ::view-transition-group(*.tag-input),
-  ::view-transition-old(*.tag),
-  ::view-transition-new(*.tag) {
-    animation: none;
-  }
-}
-`;
-
-function StyledTags({ className, presentOnly = false }: { className: string; presentOnly?: boolean }) {
+function StyledTags({ className, itemProps }: { className: string; itemProps?: LayoutItemProps }) {
   const { tags } = TagInput.useTagInput();
-  const visible = presentOnly ? tags.filter(tag => tag.present) : tags;
-  return visible.map(tag => (
+  return tags.map(tag => (
     <TagInput.Tag
       key={tag.value}
       value={tag.value}
       className={className}
+      {...itemProps}
     >
       {tag.value}
       <TagInput.TagRemove className='hover:bg-foreground/10 rounded-sm p-0.5'>
@@ -111,10 +69,11 @@ function StyledTags({ className, presentOnly = false }: { className: string; pre
 
 type StyledFieldProps = Omit<ComponentProps<typeof TagInput.Root>, 'children'> & {
   tags: ReactNode;
-  inputClassName?: string;
+  rootClassName?: string;
+  inputItemProps?: LayoutItemProps;
 };
 
-function StyledField({ tags, inputClassName = '', ...rootProps }: StyledFieldProps) {
+function StyledField({ tags, rootClassName = '', inputItemProps, ...rootProps }: StyledFieldProps) {
   const id = useId();
   const inputId = `${id}-input`;
   const hintId = `${id}-hint`;
@@ -137,7 +96,7 @@ function StyledField({ tags, inputClassName = '', ...rootProps }: StyledFieldPro
       <TagInput.Root
         validate={value => value.includes('@')}
         {...rootProps}
-        className='border-input focus-within:ring-ring/50 flex min-h-24 cursor-text flex-wrap content-start gap-1.5 rounded-lg border p-2 focus-within:ring-2'
+        className={`border-input focus-within:ring-ring/50 flex min-h-24 cursor-text flex-wrap content-start gap-1.5 rounded-lg border p-2 focus-within:ring-2 ${rootClassName}`}
       >
         <TagInput.List
           aria-label='Email addresses'
@@ -148,7 +107,8 @@ function StyledField({ tags, inputClassName = '', ...rootProps }: StyledFieldPro
         <TagInput.Input
           id={inputId}
           aria-describedby={hintId}
-          className={`min-w-[8ch] flex-1 bg-transparent text-sm outline-none ${inputClassName}`}
+          className='min-w-[8ch] flex-1 bg-transparent text-sm outline-none'
+          {...inputItemProps}
         />
       </TagInput.Root>
     </div>
@@ -164,58 +124,21 @@ export function Styled() {
   );
 }
 
-function usesViewTransition(root: HTMLElement | null) {
-  if (typeof document.startViewTransition !== 'function' || !root) {
-    return false;
-  }
-  const target = root.querySelector('[data-value]') ?? root.querySelector('input:not([type="hidden"])');
-  return target !== null && getComputedStyle(target).getPropertyValue('view-transition-name') !== 'none';
-}
-
-function ViewTransitionField({ tagClassName, inputClassName }: { tagClassName: string; inputClassName?: string }) {
+export function LayoutAnimation() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const [value, setValue] = useState(['preston@clerk.dev', 'nate@clerk.dev']);
-  const [viewTransition, setViewTransition] = useState(true);
+  const { itemProps } = useLayoutAnimation(rootRef);
   return (
-    <>
-      <style>{viewTransitionCss}</style>
-      <StyledField
-        ref={rootRef}
-        value={value}
-        onValueChange={next => {
-          if (!usesViewTransition(rootRef.current)) {
-            setViewTransition(false);
-            setValue(next);
-            return;
-          }
-          document.startViewTransition(() => {
-            flushSync(() => {
-              setViewTransition(true);
-              setValue(next);
-            });
-          });
-        }}
-        tags={
-          <StyledTags
-            className={tagClassName}
-            presentOnly={viewTransition}
-          />
-        }
-        inputClassName={inputClassName}
-      />
-    </>
-  );
-}
-
-export function ViewTransition() {
-  return (
-    <ViewTransitionField
-      tagClassName={viewTransitionTagClassName}
-      inputClassName={viewTransitionInputClassName}
+    <StyledField
+      ref={rootRef}
+      defaultValue={['preston@clerk.dev', 'nate@clerk.dev']}
+      rootClassName='relative [--cl-layout-duration:200ms] [--cl-layout-easing:ease-out]'
+      inputItemProps={itemProps}
+      tags={
+        <StyledTags
+          className={presenceTagClassName}
+          itemProps={itemProps}
+        />
+      }
     />
   );
-}
-
-export function ViewTransitionOptOut() {
-  return <ViewTransitionField tagClassName={`${presenceTagClassName} [view-transition-name:none]`} />;
 }
