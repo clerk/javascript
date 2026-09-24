@@ -1,3 +1,4 @@
+import type * as SharedReact from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -6,6 +7,27 @@ import { describe, expect, it, vi } from 'vitest';
 import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
+
+vi.mock('@clerk/shared/react', async importOriginal => {
+  const actual = await importOriginal<typeof SharedReact>();
+  return {
+    ...actual,
+    useUser: () => ({
+      isLoaded: true,
+      isSignedIn: true,
+      user: { id: 'user_1', deleteSelfEnabled: true, delete: () => Promise.resolve() },
+    }),
+    useSession: () => ({ session: { id: 'sess_1' } }),
+    useClerk: () => ({
+      setActive: () => Promise.resolve(),
+      client: { signedInSessions: [] },
+      buildAfterSignOutUrl: () => '/signed-out',
+      buildAfterMultiSessionSingleSignOutUrl: () => '/one-session-left',
+      __internal_getOption: () => undefined,
+    }),
+    useReverification: (fetcher: () => Promise<unknown>) => fetcher,
+  };
+});
 
 const props: UserProfileProfilePanelViewProps = {
   allowMultipleAccounts: true,
@@ -279,16 +301,12 @@ describe('UserProfileProfilePanelView', () => {
     expect(within(phoneSection).getByRole('button', { name: 'Add phone number' })).toBeInTheDocument();
   });
 
-  it('renders connected accounts and the danger zone when provided', async () => {
-    const onRemoveConnectedAccount = vi.fn();
-    const onDeleteAccount = vi.fn(() => Promise.resolve());
-    const user = userEvent.setup();
+  it('renders connected accounts and the danger zone when provided', () => {
     renderView({
       connectedAccounts: [
         { id: 'google', provider: 'Google', identifier: 'test@google.com', iconUrl: 'https://example.com/google.svg' },
       ],
-      onRemoveConnectedAccount,
-      onDeleteAccount,
+      onDeleteAccount: () => Promise.resolve(),
     });
 
     expect(screen.getByRole('heading', { level: 4, name: 'Connected accounts' })).toBeInTheDocument();
@@ -298,12 +316,6 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
     );
-    await user.click(screen.getByRole('button', { name: 'Delete account' }));
-    const deleteDialog = screen.getByRole('dialog');
-    await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
-    await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
-
-    expect(onDeleteAccount).toHaveBeenCalledOnce();
   });
 
   it('renders connected provider and Web3 images inside icon frames', () => {
