@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, durationVars, easingVars, fontFamilyVars, space, typeScaleVars } from '../../tokens.stylex';
 
 const reduceMotion = '@media (prefers-reduced-motion: reduce)' as const;
+const halfGap = `calc(${space['5']} / -2)`;
 
 export const styles = stylex.create({
   root: {
@@ -42,6 +43,17 @@ export const styles = stylex.create({
     opacity: { default: 1, ':is([data-disabled])': 0.5 },
     paddingBottom: space['3'],
     paddingTop: space['2.5'],
+  },
+  hitArea: {
+    '--_cl-tab-hit-start': { default: halfGap, ':first-child': '0px' },
+    position: 'relative',
+    '::before': {
+      insetBlock: 0,
+      content: '""',
+      insetInlineEnd: halfGap,
+      insetInlineStart: 'var(--_cl-tab-hit-start)',
+      position: 'absolute',
+    },
   },
   panels: {
     display: 'grid',

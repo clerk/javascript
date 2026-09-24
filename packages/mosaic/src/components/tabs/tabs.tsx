@@ -55,7 +55,7 @@ const Tab = React.forwardRef<HTMLButtonElement, TabsTabProps>(function MosaicTab
       ref={ref}
       {...mergeStyleProps(
         themeProps('tabs-tab'),
-        stylex.props(reset.base, styles.tab, focusOutline.visible, xstyle),
+        stylex.props(reset.base, styles.tab, styles.hitArea, focusOutline.visible, xstyle),
         rest,
       )}
     />
