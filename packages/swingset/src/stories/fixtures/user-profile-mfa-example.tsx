@@ -2,13 +2,10 @@ import { UserProfileAddMfaDialog } from '@clerk/mosaic/features/user-profile/use
 import { UserProfileMfaSetupView } from '@clerk/mosaic/features/user-profile/user-profile-mfa-setup.view';
 import type { UserProfileSecurityPanelViewProps } from '@clerk/mosaic/features/user-profile/user-profile-security-panel.view';
 
-import { useAuthenticatorCopy } from './user-profile-authenticator';
 import { useUserProfileMfaFixture } from './user-profile-mfa';
 
 export function useUserProfileMfaExample() {
   const fixture = useUserProfileMfaFixture();
-  const secretCopy = useAuthenticatorCopy();
-  const uriCopy = useAuthenticatorCopy();
   const addControl = (
     <UserProfileAddMfaDialog
       open={fixture.setup.open}
@@ -19,7 +16,7 @@ export function useUserProfileMfaExample() {
         methods={fixture.section.addableMethods ?? []}
         onSelect={type => fixture.section.onAdd?.(type)}
         sms={fixture.sms}
-        authenticator={{ ...fixture.authenticator, secretCopy, uriCopy }}
+        authenticator={fixture.authenticator}
         backupCodes={fixture.backupCodes}
         onBack={fixture.setup.onBack}
         onCancel={() => fixture.setup.onOpenChange(false)}
