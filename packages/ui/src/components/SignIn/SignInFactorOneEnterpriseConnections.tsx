@@ -26,6 +26,8 @@ const SignInFactorOneEnterpriseConnectionsInternal = () => {
   const enterpriseConnections = signIn.supportedFirstFactors.map(ff => ({
     id: ff.enterpriseConnectionId,
     name: ff.enterpriseConnectionName,
+    logoPublicUrl: ff.enterpriseConnectionLogoPublicUrl,
+    provider: ff.enterpriseConnectionProvider,
   }));
 
   const handleEnterpriseSSO = (enterpriseConnectionId: string) => {
