@@ -33,7 +33,7 @@ export interface DestructiveControlledProps {
   /** Text of the cancel button (default: "Cancel") */
   cancelLabel?: string;
   /** Callback when delete is confirmed, by button or by Enter */
-  onDelete: () => void;
+  onDelete: () => Promise<unknown> | void;
   /** Whether the delete action is in progress */
   isDeleting?: boolean;
   /** Error message to display if the delete action fails */
@@ -79,7 +79,8 @@ function DestructiveCard({
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isConfirmed && !isDeleting) {
-      onDelete();
+      // Errors are meant to be handled on the outside, so we swallow them here
+      onDelete()?.catch(() => { });
     }
   };
 
