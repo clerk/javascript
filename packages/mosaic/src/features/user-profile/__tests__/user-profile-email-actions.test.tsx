@@ -42,7 +42,7 @@ describe('email actions', () => {
     await waitFor(() => expect(trigger).toHaveFocus());
   });
 
-  it('removes the email row and keeps Add email available', async () => {
+  it('focuses Add email after removing the last email', async () => {
     const user = userEvent.setup();
     function Example() {
       const [emails, setEmails] = useState([{ id: 'email_1', value: 'test@example.com', isVerified: true }]);
@@ -69,6 +69,7 @@ describe('email actions', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(screen.queryByRole('button', { name: 'Manage test@example.com' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add email' })).toBeEnabled();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Add email' })).toHaveFocus());
   });
 
   it('shows a primary update error without opening a dialog', async () => {

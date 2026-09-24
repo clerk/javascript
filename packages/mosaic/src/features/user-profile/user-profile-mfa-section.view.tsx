@@ -2,6 +2,7 @@ import { type ReactNode, type Ref, useMemo, useRef, useState } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Text } from '../../components/text';
+import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import { fill, type MosaicMessages, useMessages } from '../../localization';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
@@ -44,6 +45,12 @@ export function UserProfileMfaSectionView({
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
+  const section = useRef<HTMLElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: methods.map(method => method.id),
+    onRemove,
+    fallback: () => section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? section.current,
+  });
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [isSettingDefault, setIsSettingDefault] = useState(false);
@@ -77,6 +84,7 @@ export function UserProfileMfaSectionView({
   return (
     <>
       <UserProfileSecurityList
+        sectionRef={section}
         addControl={
           addControl ??
           (onAdd && addableMethods?.length ? (
@@ -105,6 +113,7 @@ export function UserProfileMfaSectionView({
           <UserProfileMfaRowView
             key={method.id}
             method={method}
+            triggerRef={removalFocus.registerTrigger(method.id)}
             onRemove={onRemove ? () => removeMethod.open(method) : undefined}
             onSetDefault={onSetDefault && !isSettingDefault ? id => void setDefault(id) : undefined}
             onRegenerateBackupCodes={onRegenerateBackupCodes}
@@ -125,7 +134,8 @@ export function UserProfileMfaSectionView({
           title={method => (method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle)}
           description={method => describeMethodRemoval(method, m)}
           actionLabel={m.removeDialog.confirm}
-          onConfirm={method => onRemove(method.id)}
+          finalFocus={removalFocus.finalFocus}
+          onConfirm={method => removalFocus.remove(method.id)}
         />
       ) : null}
     </>

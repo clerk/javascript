@@ -48,7 +48,6 @@ export function UserProfilePasskeyRowView({
             bordered={false}
           >
             <Icon
-              aria-hidden
               name='security-passkey'
               size='md'
               xstyle={styles.icon}

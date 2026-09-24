@@ -153,6 +153,12 @@ import {
   ReadOnly as OrganizationProfileGeneralPanelReadOnly,
 } from '../stories/organization-profile-general-panel.stories';
 import {
+  Empty as OrganizationProfileMembersPanelEmpty,
+  Legacy as OrganizationProfileMembersPanelLegacy,
+  meta as organizationProfileMembersPanelMeta,
+  Proposed as OrganizationProfileMembersPanelProposed,
+} from '../stories/organization-profile-members-panel.stories';
+import {
   Default as OrganizationProfileWorkspaceSectionDefault,
   meta as organizationProfileWorkspaceSectionMeta,
   SaveFails as OrganizationProfileWorkspaceSectionSaveFails,
@@ -277,6 +283,7 @@ import {
 } from '../stories/tooltip.component.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
+import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
 import {
   Combined as UserButtonCombined,
   meta as userButtonMeta,
@@ -678,6 +685,8 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+const useFormModule: StoryModule = { meta: useFormMeta, Default: UseFormDefault };
+
 const localizationModule: StoryModule = {
   meta: localizationMeta,
   Overrides: LocalizationOverrides,
@@ -859,6 +868,13 @@ const organizationProfileApiKeysPanelModule: StoryModule = {
   Empty: OrganizationProfileApiKeysPanelEmpty,
 };
 
+const organizationProfileMembersPanelModule: StoryModule = {
+  meta: organizationProfileMembersPanelMeta,
+  Legacy: OrganizationProfileMembersPanelLegacy,
+  Proposed: OrganizationProfileMembersPanelProposed,
+  Empty: OrganizationProfileMembersPanelEmpty,
+};
+
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -887,6 +903,7 @@ export const registry: StoryModule[] = [
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
+  organizationProfileMembersPanelModule,
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
   organizationProfileDangerSectionModule,
@@ -952,6 +969,7 @@ export const registry: StoryModule[] = [
   scrollAreaModule,
   // Hooks
   useDataTableModule,
+  useFormModule,
   // Localization
   localizationModule,
 ];

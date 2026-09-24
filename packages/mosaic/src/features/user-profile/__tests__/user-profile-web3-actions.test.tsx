@@ -41,14 +41,16 @@ describe('Web3 wallet removal', () => {
     expect(onRemove).not.toHaveBeenCalled();
   });
 
-  it('removes the wallet and its dialog when the caller updates the list', async () => {
+  it('focuses the remaining wallet and then Connect when the caller removes rows', async () => {
     const user = userEvent.setup();
     function Example() {
-      const [wallets, setWallets] = useState([wallet]);
+      const [wallets, setWallets] = useState([wallet, { ...wallet, id: 'second', provider: 'Coinbase Wallet' }]);
       return (
         <MosaicProvider>
           <UserProfileWeb3WalletsSectionView
             wallets={wallets}
+            availableProviders={[{ id: 'available', provider: 'Other' }]}
+            onConnect={() => {}}
             onRemove={id => setWallets(current => current.filter(item => item.id !== id))}
           />
         </MosaicProvider>
@@ -57,8 +59,11 @@ describe('Web3 wallet removal', () => {
     render(<Example />);
     await openRemoval(user);
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage MetaMask' })).not.toBeInTheDocument());
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Coinbase Wallet' })).toHaveFocus());
+    await user.click(screen.getByRole('button', { name: 'Manage Coinbase Wallet' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Connect Other' })).toHaveFocus());
   });
 
   it('keeps confirmation open while pending and allows retrying a rejected removal', async () => {

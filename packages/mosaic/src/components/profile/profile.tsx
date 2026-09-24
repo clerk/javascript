@@ -429,7 +429,6 @@ const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(functi
             >
               {children}
               <Icon
-                aria-hidden
                 name='chevron-down'
                 size='inherit'
                 {...mergeStyleProps(themeProps('profile-nav-trigger-caret'), stylex.props(styles.caret))}
