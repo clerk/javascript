@@ -964,6 +964,8 @@ export const ptPT: LocalizationResource = {
   formButtonPrimary: 'Continuar',
   formButtonPrimary__verify: 'Verificar',
   formFieldAction__forgotPassword: 'Esqueceu a palavra-passe?',
+  formFieldAction__hidePassword: 'Ocultar palavra-passe',
+  formFieldAction__showPassword: 'Mostrar palavra-passe',
   formFieldError__matchingPasswords: 'As palavras-passe coincidem.',
   formFieldError__notMatchingPasswords: 'As palavras-passe não coincidem.',
   formFieldError__verificationLinkExpired: 'A ligação de verificação expirou. Solicite uma nova ligação.',

@@ -963,6 +963,8 @@ export const roRO: LocalizationResource = {
   formButtonPrimary: 'Continuă',
   formButtonPrimary__verify: 'Verifică',
   formFieldAction__forgotPassword: 'Ai uitat parola?',
+  formFieldAction__hidePassword: 'Ascunde parola',
+  formFieldAction__showPassword: 'Afișează parola',
   formFieldError__matchingPasswords: 'Parolele coincid.',
   formFieldError__notMatchingPasswords: 'Parolele nu coincid.',
   formFieldError__verificationLinkExpired: 'Linkul de verificare a expirat. Te rugăm să soliciți unul nou.',

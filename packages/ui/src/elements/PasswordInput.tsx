@@ -107,7 +107,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>((p
       <IconButton
         elementDescriptor={descriptors.formFieldInputShowPasswordButton}
         iconElementDescriptor={descriptors.formFieldInputShowPasswordIcon}
-        aria-label={`${hidden ? 'Show' : 'Hide'} password`}
+        aria-label={t(localizationKeys(hidden ? 'formFieldAction__showPassword' : 'formFieldAction__hidePassword'))}
         variant='ghost'
         size='xs'
         tabIndex={tabIndex}

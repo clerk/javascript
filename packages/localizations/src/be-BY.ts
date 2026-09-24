@@ -956,6 +956,8 @@ export const beBY: LocalizationResource = {
   formButtonPrimary: 'Працягнуць',
   formButtonPrimary__verify: 'Праверыць',
   formFieldAction__forgotPassword: 'Забылі пароль?',
+  formFieldAction__hidePassword: 'Схаваць пароль',
+  formFieldAction__showPassword: 'Паказаць пароль',
   formFieldError__matchingPasswords: 'Паролі супадаюць.',
   formFieldError__notMatchingPasswords: 'Паролі не супадаюць.',
   formFieldError__verificationLinkExpired: 'Спасылка на верыфікацыю спампавала. Калі ласка, запытайце новую спасылку.',

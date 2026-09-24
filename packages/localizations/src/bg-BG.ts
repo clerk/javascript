@@ -957,6 +957,8 @@ export const bgBG: LocalizationResource = {
   formButtonPrimary: 'Продължи',
   formButtonPrimary__verify: 'Потвърди',
   formFieldAction__forgotPassword: 'Забравена парола?',
+  formFieldAction__hidePassword: 'Скриване на паролата',
+  formFieldAction__showPassword: 'Показване на паролата',
   formFieldError__matchingPasswords: 'Паролите съвпадат.',
   formFieldError__notMatchingPasswords: 'Паролите не съвпадат.',
   formFieldError__verificationLinkExpired: 'Линкът за потвърждение е изтекъл. Моля, заявете нов линк.',
