@@ -178,7 +178,11 @@ setup('cleanup instances ', async () => {
           const applicationsToDelete: Array<{ id: string; name: string }> = [];
 
           while (true) {
-            const { data, totalCount } = await clerkClient.oauthApplications.list({ limit, offset });
+            const { data, totalCount } = await clerkClient.oauthApplications.list({
+              nameQuery: applicationRunMarker,
+              limit,
+              offset,
+            });
             applicationsToDelete.push(...data.filter(application => application.name.endsWith(applicationRunMarker)));
 
             offset += data.length;
