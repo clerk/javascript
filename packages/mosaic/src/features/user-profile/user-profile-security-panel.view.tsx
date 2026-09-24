@@ -8,7 +8,6 @@ import type {
   UserProfileDevice,
 } from './user-profile-active-devices-section.view';
 import { UserProfileActiveDevicesSectionView } from './user-profile-active-devices-section.view';
-import { UserProfileDeleteSection } from './user-profile-delete-section/user-profile-delete-section';
 import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
@@ -51,8 +50,8 @@ export interface UserProfileSecurityPanelViewProps
   onRegenerateBackupCodes?: () => void;
   onRemoveMfaMethod?: (id: string) => void | Promise<void>;
   onSetDefaultMfaMethod?: (id: string) => void | Promise<void>;
-  /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
-  onDeleteAccount?: () => Promise<void>;
+  /** Danger zone. Omit to hide it. */
+  deleteAccountSlot?: ReactNode;
 }
 
 export function UserProfileSecurityPanelView({
@@ -76,7 +75,7 @@ export function UserProfileSecurityPanelView({
   onSetDefaultMfaMethod,
   onSignOutDevice,
   onSignOutAllOtherDevices,
-  onDeleteAccount,
+  deleteAccountSlot,
 }: UserProfileSecurityPanelViewProps): ReactElement {
   const showPassword = hasPassword || Boolean(onSubmitPassword) || Boolean(managedBy);
   const showPasskeys = passkeys !== undefined && passkeysVisible;
@@ -125,8 +124,7 @@ export function UserProfileSecurityPanelView({
             onSignOutDevice={onSignOutDevice}
           />
         ) : null}
-        {/* TODO: This is temporary, a view should not render a connected component */}
-        {onDeleteAccount ? <UserProfileDeleteSection /> : null}
+        {deleteAccountSlot}
       </div>
     </div>
   );
