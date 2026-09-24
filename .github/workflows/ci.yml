@@ -454,6 +454,10 @@ jobs:
       - name: Build packages
         run: pnpm turbo build $TURBO_ARGS --only
 
+      - name: Test integration fixtures
+        if: ${{ matrix.test-name == 'machine' }}
+        run: pnpm exec vitest run --config integration/vitest.config.mts integration/testUtils/__tests__
+
       - name: Publish to local registry
         run: pkglab pub --force
 
