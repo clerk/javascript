@@ -2,7 +2,7 @@
 
 import React, { type CSSProperties, type FocusEvent, useEffect } from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, modalExemptProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { useToastContext } from './toast-context';
 
 export type ToastViewportProps = ComponentProps<'div'>;
@@ -54,7 +54,6 @@ export const ToastViewport = React.forwardRef<HTMLDivElement, ToastViewportProps
   };
 
   const defaultProps = {
-    ...modalExemptProps,
     role: 'region',
     'aria-label': 'Notifications',
     tabIndex: -1,

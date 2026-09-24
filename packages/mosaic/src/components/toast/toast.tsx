@@ -121,6 +121,10 @@ function ToastViewport() {
   const stacked = toasts.filter(toast => !Primitive.isAnchored(toast));
   const anchored = toasts.filter(Primitive.isAnchored);
 
+  if (toasts.length === 0) {
+    return null;
+  }
+
   return (
     <Primitive.Portal>
       <Primitive.Viewport {...mergeStyleProps(themeProps('toast-viewport'), stylex.props(reset.base, styles.viewport))}>

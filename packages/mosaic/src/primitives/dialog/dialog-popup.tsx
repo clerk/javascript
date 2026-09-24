@@ -4,14 +4,7 @@ import { FloatingFocusManager } from '@floating-ui/react';
 import React from 'react';
 
 import { type FocusTarget, useFinalFocus, useInitialFocus } from '../hooks/use-focus-target';
-import {
-  type ComponentProps,
-  type DefaultProps,
-  Freeze,
-  getModalExemptElements,
-  mergeProps,
-  useRender,
-} from '../utils';
+import { type ComponentProps, type DefaultProps, Freeze, mergeProps, useRender } from '../utils';
 import { useDialogContext } from './dialog-context';
 
 /** Where a popup's focus goes on open (`initialFocus`) or close (`finalFocus`); see `useFocusTarget`. */
@@ -91,7 +84,6 @@ export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(fu
       context={floatingContext}
       modal={modal}
       outsideElementsInert={modal}
-      getInsideElements={() => getModalExemptElements(popupRef.current)}
       initialFocus={resolvedInitialFocus}
       returnFocus={resolvedReturnFocus}
     >

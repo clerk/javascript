@@ -168,5 +168,7 @@ describe('Toast under a modal', () => {
 
     const toast = await screen.findByRole('dialog', { name: 'Invitations sent' });
     expect(toast.closest('[inert], [aria-hidden="true"]')).toBeNull();
+    const inside = screen.getByRole('button', { name: 'Inside' });
+    expect(inside.compareDocumentPosition(toast) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });
