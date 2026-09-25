@@ -423,7 +423,7 @@ function Header() {
   const actions: HeaderAction[] = [];
   for (const action of data.layout.actions.header) {
     if (action === 'inviteMembers' && data.onInviteMembers) {
-      actions.push({ id: action, label: m.manage.invite, icon: 'users', onClick: data.onInviteMembers });
+      actions.push({ id: action, label: m.manage.invite, icon: 'users-add-right', onClick: data.onInviteMembers });
     }
     // An account that leads takes "Sign out" in the labelled slot **Invite** holds for an organization.
     if (action === 'signOut' && signOutSession) {
@@ -832,7 +832,7 @@ function SwitchAccountRow() {
             <Spinner size='sm' />
           ) : (
             <Icon
-              name='arrow-left-right'
+              name='switch-account'
               size='sm'
             />
           )}

@@ -80,10 +80,12 @@ import { ShieldClose } from './glyphs/shield-close';
 import { Sidebar } from './glyphs/sidebar';
 import { Spinner } from './glyphs/spinner';
 import { Support } from './glyphs/support';
+import { SwitchAccount } from './glyphs/switch-account';
 import { Trash } from './glyphs/trash';
 import { UserCircle } from './glyphs/user-circle';
 import { UserCirclePlus } from './glyphs/user-circle-plus';
 import { Users } from './glyphs/users';
+import { UsersAddRight } from './glyphs/users-add-right';
 import { X } from './glyphs/x';
 import { XCircle } from './glyphs/x-circle';
 
@@ -309,10 +311,12 @@ export const iconRegistry = {
   sidebar: Sidebar,
   spinner: Spinner,
   support: Support,
+  'switch-account': SwitchAccount,
   trash: Trash,
   'user-circle': UserCircle,
   'user-circle-plus': UserCirclePlus,
   users: Users,
+  'users-add-right': UsersAddRight,
   x: X,
   'x-circle': XCircle,
 } satisfies Record<string, IconComponent>;
