@@ -33,7 +33,7 @@ export function startWorker() {
   return worker.start({
     quiet: true,
     onUnhandledRequest: request => {
-      if (request.url.startsWith(FAPI)) {
+      if (new URL(request.url).origin === FAPI) {
         unhandled.push(`${request.method} ${request.url}`);
       }
     },
