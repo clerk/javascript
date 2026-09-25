@@ -342,6 +342,15 @@ export interface Clerk {
    */
   __internal_protectChallengeLoadTimeoutMs?: number;
 
+  /**
+   * Registers a prebuilt component that renders Protect challenges itself, so clerk-js leaves a
+   * pending `protect_check` on the resource instead of opening its own modal. Returns the
+   * unregister function.
+   *
+   * @internal
+   */
+  __internal_registerProtectCheckHandler?: () => () => void;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */
@@ -1978,6 +1987,11 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 };
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
+
+export type __internal_ProtectCheckModalProps = {
+  resource: SignInResource | SignUpResource;
+  onResolved: () => void;
+};
 
 export type __internal_EnableOrganizationsPromptProps = {
   onSuccess?: () => void;
