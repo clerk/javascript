@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
+import { colorVars, radiusVars, shadowVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   triggerContent: {
@@ -9,15 +9,8 @@ export const styles = stylex.create({
     display: 'flex',
   },
   flag: {
-    fontSize: typeScaleVars['--cl-text-sm-size'],
-    lineHeight: 1,
-  },
-  triggerFlag: {
-    alignItems: 'center',
-    display: 'flex',
+    display: 'block',
     flexShrink: 0,
-    fontSize: space['4'],
-    justifyContent: 'center',
     height: space['4'],
     width: space['4'],
   },

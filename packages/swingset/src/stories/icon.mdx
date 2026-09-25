@@ -62,6 +62,16 @@ The filled phone and laptop from [Figma](https://www.figma.com/design/yt5qKlfNyI
   showCode={false}
 />
 
+### Country flags
+
+[Figma flag artwork](https://www.figma.com/design/yt5qKlfNyIIdaKaMoav1v2/Clerk-Mosaic-2.0?node-id=10800-84326) for the same 238 countries supported by the legacy phone input, labeled by country code. `getCountryFlag(iso)` returns the flag glyph used by the phone input; unknown codes return a globe.
+
+<Story
+  name='Flags'
+  storyModule={IconStories}
+  showCode={false}
+/>
+
 ### Overriding a glyph
 
 Pass `icons` to `MosaicProvider` to replace a glyph by name. The override is a plain element of any type, not just an `svg`; Mosaic clones it with the resolved sizing `className` and `data-size`, keeping any class the element already had. The replacement only supplies its own content.

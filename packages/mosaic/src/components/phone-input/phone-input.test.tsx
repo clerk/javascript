@@ -7,6 +7,41 @@ import { Field } from '../field';
 import { PhoneInput } from './phone-input';
 
 describe('Mosaic PhoneInput', () => {
+  it('renders SVG country flags and updates the selected flag after choosing a country', async () => {
+    const user = userEvent.setup();
+    render(<PhoneInput aria-label='Phone number' />);
+
+    const trigger = screen.getByRole('button', { name: 'Country, United States' });
+    await waitFor(() => expect(trigger.querySelector('svg.cl-phone-input-flag path[fill="#D80027"]')).not.toBeNull());
+    const selectedFlagArtwork = trigger.querySelector('svg.cl-phone-input-flag')?.innerHTML;
+    expect(trigger.querySelector('svg.cl-phone-input-flag')).toHaveAttribute('viewBox', '0 0 16 16');
+    expect(trigger.querySelector('svg.cl-phone-input-flag')).toHaveAttribute('aria-hidden', 'true');
+    expect(trigger).not.toHaveTextContent('🇺🇸');
+
+    await user.click(trigger);
+
+    for (const option of screen.getAllByRole('option')) {
+      expect(option.querySelector('svg.cl-phone-input-flag')).toHaveAttribute('aria-hidden', 'true');
+      expect(option).not.toHaveTextContent(/\p{Regional_Indicator}/u);
+    }
+
+    const japan = screen.getByRole('option', { name: /Japan/ });
+    await waitFor(() => expect(japan.querySelector('svg.cl-phone-input-flag path[d^="M8.00001"]')).not.toBeNull());
+    const japanArtwork = japan.querySelector('svg.cl-phone-input-flag')?.innerHTML;
+    expect(japanArtwork).toBeTruthy();
+    expect(japanArtwork).not.toBe(selectedFlagArtwork);
+
+    await user.type(screen.getByRole('combobox', { name: 'Search countries' }), 'Japan');
+    await user.keyboard('{ArrowDown}{Enter}');
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Country, Japan' }).querySelector('svg.cl-phone-input-flag')?.innerHTML,
+      ).toBe(japanArtwork),
+    );
+    expect(screen.getByRole('textbox', { name: 'Phone number' })).toHaveFocus();
+  });
+
   it('focuses the country search when opened with a pointer', async () => {
     const user = userEvent.setup();
     render(<PhoneInput aria-label='Phone number' />);
