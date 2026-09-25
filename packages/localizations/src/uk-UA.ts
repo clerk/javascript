@@ -1576,6 +1576,11 @@ export const ukUA: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: undefined,
       subtitle: undefined,
@@ -1723,6 +1728,10 @@ export const ukUA: LocalizationResource = {
       title: 'Не вдалося увійти',
     },
     passkey: {
+      subtitle: undefined,
+      title: undefined,
+    },
+    passkeyMfa: {
       subtitle: undefined,
       title: undefined,
     },

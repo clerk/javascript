@@ -1588,6 +1588,11 @@ export const ptBR: LocalizationResource = {
         'Usar sua chave de acesso confirma a sua identidade. Seu dispositivo pode solicitar sua impressão digital, reconhecimento facial ou PIN.',
       title: 'Use sua chave de acesso.',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Usar outro método',
       subtitle: 'Digite sua senha para continuar.',
@@ -1738,6 +1743,10 @@ export const ptBR: LocalizationResource = {
       subtitle:
         'Usar sua chave de acesso confirma a sua identidade. Seu dispositivo pode solicitar sua impressão digital, reconhecimento facial ou PIN.',
       title: 'Use sua chave de acesso.',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Utilize outro método',

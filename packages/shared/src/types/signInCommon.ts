@@ -84,7 +84,13 @@ export type SignInFirstFactor =
   | OauthFactor
   | EnterpriseSSOFactor;
 
-export type SignInSecondFactor = PhoneCodeFactor | TOTPFactor | BackupCodeFactor | EmailCodeFactor | EmailLinkFactor;
+export type SignInSecondFactor =
+  | PhoneCodeFactor
+  | TOTPFactor
+  | BackupCodeFactor
+  | EmailCodeFactor
+  | EmailLinkFactor
+  | PasskeyFactor;
 
 export interface UserData {
   firstName?: string;
@@ -115,9 +121,18 @@ export type AttemptFirstFactorParams =
   | ResetPasswordPhoneCodeAttempt
   | ResetPasswordEmailCodeAttempt;
 
-export type PrepareSecondFactorParams = PhoneCodeSecondFactorConfig | EmailCodeSecondFactorConfig | EmailLinkConfig;
+export type PrepareSecondFactorParams =
+  | PhoneCodeSecondFactorConfig
+  | EmailCodeSecondFactorConfig
+  | EmailLinkConfig
+  | PassKeyConfig;
 
-export type AttemptSecondFactorParams = PhoneCodeAttempt | TOTPAttempt | BackupCodeAttempt | EmailCodeAttempt;
+export type AttemptSecondFactorParams =
+  | PhoneCodeAttempt
+  | TOTPAttempt
+  | BackupCodeAttempt
+  | EmailCodeAttempt
+  | PasskeyAttempt;
 
 export type SignInCreateParams = (
   | {
@@ -181,6 +196,16 @@ export type ResetPasswordParams = {
 };
 
 export type AuthenticateWithPasskeyParams = {
+  /**
+   * The passkey flow to use when the passkey is the FIRST factor:
+   * `'autofill'` (conditional UI) or `'discoverable'` both create a new
+   * sign-in and identify the user from the passkey itself, discarding any
+   * in-progress sign-in.
+   *
+   * Omit it to complete the second factor of a sign-in in the
+   * `needs_second_factor` (or `needs_client_trust`) status that offers
+   * `passkey` among its supported second factors.
+   */
   flow?: 'autofill' | 'discoverable';
 };
 
