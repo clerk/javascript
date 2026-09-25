@@ -219,11 +219,12 @@ export interface SessionResource extends ClerkResource {
    */
   status: SessionStatus;
   /**
-   * The date and time when the session will expire.
+   * The date and time when the session will expire. Unix epoch zero means no maximum lifetime.
    */
   expireAt: Date;
+  readonly hasMaximumLifetime?: boolean;
   /**
-   * The date and time when the session was abandoned by the user.
+   * The abandonment deadline. Unix epoch zero means no abandonment deadline.
    */
   abandonAt: Date;
   /**
@@ -378,6 +379,7 @@ export interface SessionWithActivitiesResource extends ClerkResource {
   id: string;
   status: string;
   expireAt: Date;
+  readonly hasMaximumLifetime?: boolean;
   abandonAt: Date;
   lastActiveAt: Date;
   latestActivity: SessionActivity;

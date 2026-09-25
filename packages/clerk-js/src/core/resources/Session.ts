@@ -87,6 +87,10 @@ export class Session extends BaseResource implements SessionResource {
     return !!resource && resource instanceof Session;
   }
 
+  get hasMaximumLifetime(): boolean {
+    return this.expireAt.getTime() > 0;
+  }
+
   constructor(data: SessionJSON | SessionJSONSnapshot) {
     super();
 
