@@ -4,6 +4,7 @@ import type {
   __internal_CheckoutProps,
   __internal_EnableOrganizationsPromptProps,
   __internal_PlanDetailsProps,
+  __internal_ProtectCheckModalProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationProps,
   Clerk,
@@ -39,6 +40,7 @@ import {
   KeylessPrompt,
   OrganizationProfileModal,
   preloadComponent,
+  ProtectCheckModal,
   SignInModal,
   SignUpModal,
   UserProfileModal,
@@ -97,6 +99,7 @@ export type ComponentControls = {
       | 'userVerification'
       | 'waitlist'
       | 'blankCaptcha'
+      | 'protectCheck'
       | 'enableOrganizationsPrompt',
   >(
     modal: T,
@@ -112,7 +115,9 @@ export type ComponentControls = {
               ? InviteMembersModalProps
               : T extends 'enableOrganizationsPrompt'
                 ? __internal_EnableOrganizationsPromptProps
-                : UserProfileProps,
+                : T extends 'protectCheck'
+                  ? __internal_ProtectCheckModalProps
+                  : UserProfileProps,
   ) => void;
   closeModal: (
     modal:
@@ -126,6 +131,7 @@ export type ComponentControls = {
       | 'userVerification'
       | 'waitlist'
       | 'blankCaptcha'
+      | 'protectCheck'
       | 'enableOrganizationsPrompt',
     options?: {
       notify?: boolean;
@@ -180,6 +186,7 @@ interface ComponentsState {
   createOrganizationModal: null | CreateOrganizationModalProps;
   enableOrganizationsPromptModal: null | __internal_EnableOrganizationsPromptProps;
   blankCaptchaModal: null;
+  protectCheckModal: null | __internal_ProtectCheckModalProps;
   organizationSwitcherPrefetch: boolean;
   waitlistModal: null | WaitlistModalProps;
   checkoutDrawer: {
@@ -313,6 +320,7 @@ const Components = (props: ComponentsProps) => {
     organizationSwitcherPrefetch: false,
     waitlistModal: null,
     blankCaptchaModal: null,
+    protectCheckModal: null,
     checkoutDrawer: {
       open: false,
       props: null,
@@ -339,6 +347,7 @@ const Components = (props: ComponentsProps) => {
     createOrganizationModal,
     waitlistModal,
     blankCaptchaModal,
+    protectCheckModal,
     checkoutDrawer,
     planDetailsDrawer,
     subscriptionDetailsDrawer,
@@ -686,6 +695,23 @@ const Components = (props: ComponentsProps) => {
     </LazyModalRenderer>
   );
 
+  const mountedProtectCheckModal = protectCheckModal && (
+    <LazyModalRenderer
+      globalAppearance={state.appearance}
+      appearanceKey={'protectCheck' as any}
+      componentAppearance={{}}
+      flowName={'protectCheck'}
+      onClose={() => componentsControls.closeModal('protectCheck')}
+      startPath={buildVirtualRouterUrl({ base: '/protect-check', path: urlStateParam?.path })}
+      componentName={'ProtectCheckModal'}
+      canCloseModal={false}
+      modalContainerSx={t => ({ alignItems: 'center', backdropFilter: `blur(${t.sizes.$2})` })}
+      getContainer={() => null}
+    >
+      <ProtectCheckModal {...protectCheckModal} />
+    </LazyModalRenderer>
+  );
+
   return (
     <Suspense fallback={''}>
       <LazyProviders
@@ -718,6 +744,7 @@ const Components = (props: ComponentsProps) => {
         {createOrganizationModal && mountedCreateOrganizationModal}
         {waitlistModal && mountedWaitlistModal}
         {blankCaptchaModal && mountedBlankCaptchaModal}
+        {mountedProtectCheckModal}
 
         <MountedCheckoutDrawer
           appearance={state.appearance}

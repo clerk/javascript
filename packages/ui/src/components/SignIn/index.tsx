@@ -52,6 +52,8 @@ function RedirectToSignIn() {
 function SignInRoutes(): JSX.Element {
   const signInContext = useSignInContext();
   const signUpContext = useSignUpContext();
+  const clerk = useClerk();
+  React.useEffect(() => clerk.__internal_registerProtectCheckHandler?.(), [clerk]);
 
   return (
     <Flow.Root flow='signIn'>
