@@ -41,7 +41,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
-    { id: 'email_2', value: 'preston.booth@gmail.com', isVerified: true },
+    { id: 'email_2', value: 'preston.booth@gmail.com', isDefault: false, isVerified: true },
   ]);
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
@@ -62,9 +62,10 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const apiKeys = useUserProfileAPIKeysFixture();
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const addEmail = (value: string) =>
-    setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: false }]);
+    setEmails(current => [...current, { id: `email_${Date.now()}`, value, isDefault: false, isVerified: false }]);
   const emailFlow = createUserProfileAddEmailFixture({
-    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+    onVerified: value =>
+      setEmails(current => [...current, { id: `email_${Date.now()}`, value, isDefault: false, isVerified: true }]),
   });
 
   const pages: UserProfileViewProps['pages'] = {
@@ -90,7 +91,8 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onSendEmailCode: onAddEmail ? undefined : emailFlow.onSendEmailCode,
       onVerifyEmailCode: onAddEmail ? undefined : emailFlow.onVerifyEmailCode,
       ...createUserProfileAddPhoneFixture({
-        onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
+        onVerified: value =>
+          setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isDefault: false, isVerified: true }]),
       }),
       onDeleteAccount: () => Promise.resolve(),
       onManageEmail: () => undefined,

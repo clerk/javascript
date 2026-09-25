@@ -1,5 +1,5 @@
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
@@ -13,6 +13,7 @@ import { useUserProfileAddPhoneController } from './user-profile-add-phone.contr
 import { UserProfileAddPhoneDialog } from './user-profile-add-phone.dialog';
 import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
 import { UserProfileContactRowView } from './user-profile-contact-row.view';
+import { useUserProfileSetPrimaryController } from './user-profile-set-primary.controller';
 
 export interface UserProfilePhoneRowViewProps {
   phones: UserProfilePhone[];
@@ -50,31 +51,15 @@ export function UserProfilePhoneRowView({
       />
     ) : undefined;
   const removePhoneConfirmation = useMemo(() => Confirmation.createHandle<UserProfilePhone>(), []);
-  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
-  const [primaryError, setPrimaryError] = useState<string>();
-  const settingPrimary = useRef(false);
-
-  const setPrimaryPhone = async (id: string) => {
-    const phone = phones.find(phone => phone.id === id);
-    if (!onSetPrimaryPhone || !phone?.isVerified || phone.isDefault || settingPrimary.current) {
-      return;
-    }
-    settingPrimary.current = true;
-    setIsSettingPrimary(true);
-    setPrimaryError(undefined);
-    try {
-      await onSetPrimaryPhone(id);
-    } catch (error) {
-      setPrimaryError(error instanceof Error ? error.message : m.phone.primaryError);
-    } finally {
-      settingPrimary.current = false;
-      setIsSettingPrimary(false);
-    }
-  };
+  const primary = useUserProfileSetPrimaryController({
+    items: phones,
+    onSetPrimary: onSetPrimaryPhone,
+    fallbackError: m.phone.primaryError,
+  });
 
   const removePhone = (id: string) => {
     const phone = phones.find(phone => phone.id === id);
-    if (phone && phone.canRemove !== false && onRemovePhone) {
+    if (phone && onRemovePhone) {
       removePhoneConfirmation.open(phone);
     }
   };
@@ -105,15 +90,15 @@ export function UserProfilePhoneRowView({
         label={m.phone.label}
         addAction={addPhoneAction}
         onRemove={onRemovePhone ? removePhone : undefined}
-        onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}
+        onSetPrimary={primary.onSetPrimary}
         onVerify={onVerifyPhone}
       />
-      {primaryError ? (
+      {primary.error ? (
         <Text
           role='alert'
           color='negative'
         >
-          {primaryError}
+          {primary.error}
         </Text>
       ) : null}
       {onRemovePhone ? (
@@ -121,7 +106,9 @@ export function UserProfilePhoneRowView({
           handle={removePhoneConfirmation}
           title={m.phone.removeDialog.title}
           description={phone =>
-            fill(m.phone.removeDialog.description, { phoneNumber: stringToFormattedPhoneString(phone.value) })
+            fill(phone.isVerified ? m.phone.removeDialog.verifiedDescription : m.phone.removeDialog.description, {
+              phoneNumber: stringToFormattedPhoneString(phone.value),
+            })
           }
           actionLabel={m.phone.removeDialog.confirm}
           cancelLabel={m.phone.removeDialog.cancel}
