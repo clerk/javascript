@@ -8,6 +8,11 @@ import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileAccountSectionViewProps } from '../user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '../user-profile-account-section/user-profile-account-section.view';
 
+const codeVerifier = {
+  start: () => ({ method: 'code', sent: Promise.resolve() }) as const,
+  verifyCode: () => Promise.resolve(),
+};
+
 function renderEmail(overrides: Partial<UserProfileAccountSectionViewProps> = {}) {
   return render(
     <MosaicProvider>
@@ -56,8 +61,8 @@ describe('email actions', () => {
             username='test'
             phones={[]}
             emails={emails}
-            onSendEmailCode={() => Promise.resolve()}
-            onVerifyEmailCode={() => Promise.resolve()}
+            onCreateEmail={() => Promise.resolve(codeVerifier)}
+            getEmailVerifier={() => codeVerifier}
             onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
           />
         </MosaicProvider>

@@ -16,3 +16,13 @@ export interface UserProfileContact {
 export type UserProfileEmail = UserProfileContact;
 
 export type UserProfilePhone = UserProfileContact;
+
+export interface UserProfileEmailVerification {
+  method: 'code';
+  sent: Promise<void>;
+}
+
+export interface UserProfileEmailVerifier {
+  start: () => UserProfileEmailVerification;
+  verifyCode: (code: string) => Promise<void>;
+}

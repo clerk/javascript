@@ -1,10 +1,11 @@
+import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import type { FormEvent, Ref } from 'react';
 import { useId, useRef } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
-import type { DialogTriggerProps } from '../../../components/dialog';
+import type { DialogFocusTarget, DialogHandle } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Flow, useFlowAutoFocus } from '../../../components/flow';
@@ -16,10 +17,12 @@ import { styles } from '../user-profile-profile-panel.styles';
 export interface UserProfileAddEmailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  trigger?: DialogTriggerProps['render'];
+  handle?: DialogHandle<unknown>;
+  finalFocus?: DialogFocusTarget;
   step: 'email' | 'verify';
   emailAddress: string;
   onEmailAddressChange: (value: string) => void;
+  canSubmitEmail?: boolean;
   code: string;
   onCodeChange: (value: string) => void;
   onSubmit: (code?: string) => void;
@@ -32,16 +35,18 @@ export interface UserProfileAddEmailDialogProps {
 
 export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps) {
   const emailRef = useRef<HTMLInputElement>(null);
+  const codeRef = useRef<HTMLInputElement>(null);
 
   return (
     <Dialog.Root
+      handle={props.handle}
       open={props.open}
       onOpenChange={props.onOpenChange}
     >
-      {props.trigger ? <Dialog.Trigger render={props.trigger} /> : null}
       <Dialog.Popup
         variant='card'
-        initialFocus={props.step === 'email' ? emailRef : undefined}
+        initialFocus={props.step === 'email' ? emailRef : codeRef}
+        finalFocus={props.finalFocus}
       >
         <Card.Root
           elevation='overlay'
@@ -59,12 +64,14 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                     emailAddress={current.emailAddress}
                     onEmailAddressChange={current.onEmailAddressChange}
                     onSubmit={current.onSubmit}
+                    canSubmit={current.canSubmitEmail !== false}
                     isPending={current.isPending}
                     errorMessage={current.errorMessage}
                   />
                 </Flow.Step>
                 <Flow.Step ids={['verify']}>
                   <VerifyEmailStep
+                    inputRef={codeRef}
                     emailAddress={current.emailAddress}
                     code={current.code}
                     onCodeChange={current.onCodeChange}
@@ -90,6 +97,7 @@ interface EnterEmailStepProps {
   emailAddress: string;
   onEmailAddressChange: (value: string) => void;
   onSubmit: () => void;
+  canSubmit: boolean;
   isPending?: boolean;
   errorMessage?: string;
 }
@@ -138,6 +146,7 @@ function EnterEmailStep(props: EnterEmailStepProps) {
         <SubmitButton
           form={emailFormId}
           fullWidth
+          disabled={!props.canSubmit}
           isPending={props.isPending}
           pendingLabel={m.email.pending}
         >
@@ -149,6 +158,7 @@ function EnterEmailStep(props: EnterEmailStepProps) {
 }
 
 interface VerifyEmailStepProps {
+  inputRef: Ref<HTMLInputElement>;
   emailAddress: string;
   code: string;
   onCodeChange: (value: string) => void;
@@ -163,6 +173,7 @@ interface VerifyEmailStepProps {
 function VerifyEmailStep(props: VerifyEmailStepProps) {
   const m = useMessages('userProfileAddEmail');
   const verifyFormId = useId();
+  const inputRef = useMergeRefs([props.inputRef, useFlowAutoFocus<HTMLInputElement>()]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -190,7 +201,7 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
         >
           <Field.Label visuallyHidden>{m.verify.label}</Field.Label>
           <Otp
-            ref={useFlowAutoFocus<HTMLInputElement>()}
+            ref={inputRef}
             name='code'
             value={props.code}
             onValueChange={props.onCodeChange}

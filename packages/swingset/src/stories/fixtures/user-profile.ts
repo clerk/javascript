@@ -9,9 +9,6 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 import { useState } from 'react';
 
-import { useChaosFixture } from '@/components/ChaosProvider';
-import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
-
 import { usePreviewImage } from './use-preview-image';
 import { useUserProfileActiveDevicesFixture } from './user-profile-active-devices';
 import { createUserProfileAddEmailFixture } from './user-profile-add-email';
@@ -30,26 +27,6 @@ export interface UserProfileFixtureOptions {
   onAddEmail?: () => void;
 }
 
-const exampleEmails: UserProfileEmail[] = [
-  { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
-  { id: 'email_2', value: 'preston.booth@gmail.com', isVerified: true },
-];
-
-const examplePhones: UserProfilePhone[] = [
-  { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
-];
-
-const exampleSubscription: UserProfileSubscription = {
-  planName: 'Basic Plan',
-  priceLabel: '$12 / Month',
-  totalDueLabel: '$12.00',
-  renewsAtLabel: 'Renews Aug 26',
-};
-
-const examplePaymentMethods: UserProfilePaymentMethod[] = [
-  { id: 'visa', label: 'Visa •••• 0644', expiryLabel: 'Expires 02/2029', isDefault: true },
-];
-
 /**
  * Every page of the user profile, backed by local state so the actions on them do something. For
  * stories that need a realistic profile surface without being about it.
@@ -62,43 +39,34 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const editPassword = useUserProfileEditPasswordFixture();
   const mfa = useUserProfileMfaExample();
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
-  const seedEmails = useChaosFixture(exampleEmails, items =>
-    chaosRows(items, 8).map((email, index) => ({ ...email, value: chaosEmail(index), isDefault: index === 0 })),
-  );
-  const seedPhones = useChaosFixture(examplePhones, items =>
-    chaosRows(items, 6).map((phone, index) => ({
-      ...phone,
-      value: `${phone.value} ext. 1234567890`,
-      isDefault: index === 0,
-    })),
-  );
-  const [emails, setEmails] = useState(seedEmails);
-  const [phones, setPhones] = useState(seedPhones);
+  const [emails, setEmails] = useState<UserProfileEmail[]>([
+    { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
+    { id: 'email_2', value: 'preston.booth@gmail.com', isDefault: false, isVerified: true },
+  ]);
+  const [phones, setPhones] = useState<UserProfilePhone[]>([
+    { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
+  ]);
   const passkeys = usePasskeysFixture();
   const activeDevices = useUserProfileActiveDevicesFixture();
 
-  const seedSubscription = useChaosFixture(exampleSubscription, subscription => ({
-    planName: chaosText(subscription.planName),
-    priceLabel: '$1,234,567.89 / Month',
-    totalDueLabel: '$1,234,567.89',
-    renewsAtLabel: chaosText(subscription.renewsAtLabel),
-  }));
-  const seedPaymentMethods = useChaosFixture(examplePaymentMethods, items =>
-    chaosRows(items, 8).map((method, index) => ({
-      ...method,
-      label: chaosText(method.label),
-      isDefault: index === 0,
-    })),
-  );
-  const [subscription, setSubscription] = useState<UserProfileSubscription>(seedSubscription);
-  const [paymentMethods, setPaymentMethods] = useState<UserProfilePaymentMethod[]>(seedPaymentMethods);
+  const [subscription, setSubscription] = useState<UserProfileSubscription>({
+    planName: 'Basic Plan',
+    priceLabel: '$12 / Month',
+    totalDueLabel: '$12.00',
+    renewsAtLabel: 'Renews Aug 26',
+  });
+  const [paymentMethods, setPaymentMethods] = useState<UserProfilePaymentMethod[]>([
+    { id: 'visa', label: 'Visa •••• 0644', expiryLabel: 'Expires 02/2029', isDefault: true },
+  ]);
   const [historyPageSize, setHistoryPageSize] = useState(10);
   const apiKeys = useUserProfileAPIKeysFixture();
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const addEmail = (value: string) =>
-    setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: false }]);
+    setEmails(current => [...current, { id: `email_${Date.now()}`, value, isDefault: false, isVerified: false }]);
   const emailFlow = createUserProfileAddEmailFixture({
-    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+    onCreated: (id, value) => setEmails(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+    onVerified: id =>
+      setEmails(current => current.map(email => (email.id === id ? { ...email, isVerified: true } : email))),
   });
 
   const pages: UserProfileViewProps['pages'] = {
@@ -121,10 +89,11 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       emails,
       phones,
       onAddEmail,
-      onSendEmailCode: onAddEmail ? undefined : emailFlow.onSendEmailCode,
-      onVerifyEmailCode: onAddEmail ? undefined : emailFlow.onVerifyEmailCode,
+      onCreateEmail: onAddEmail ? undefined : emailFlow.onCreateEmail,
+      getEmailVerifier: onAddEmail ? undefined : emailFlow.getEmailVerifier,
       ...createUserProfileAddPhoneFixture({
-        onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
+        onVerified: value =>
+          setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isDefault: false, isVerified: true }]),
       }),
       onDeleteAccount: () => Promise.resolve(),
       onManageEmail: () => undefined,

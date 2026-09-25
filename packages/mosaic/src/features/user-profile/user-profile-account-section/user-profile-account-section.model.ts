@@ -7,11 +7,13 @@ import { save } from '../../../utils/form-error';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import type {
   UserProfileEmail,
+  UserProfileEmailVerifier,
   UserProfileNameAttribute,
   UserProfilePhone,
 } from './user-profile-account-section.types';
 import { isAttributeAvailable, sortByVerification } from './user-profile-account-section.utils';
 import type { UserProfileAccountSectionViewProps } from './user-profile-account-section.view';
+import type { UserProfileAddEmailField } from './user-profile-add-email.controller';
 import type { UserProfileEditNameField } from './user-profile-edit-name.dialog';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
 
@@ -29,6 +31,8 @@ type UserProfileAccountSectionData = Pick<
   | 'username'
   | 'emails'
   | 'phones'
+  | 'onCreateEmail'
+  | 'getEmailVerifier'
   | 'onSetPrimaryEmail'
   | 'onRemoveEmail'
   | 'onProfilePictureChange'
@@ -44,6 +48,7 @@ export type UserProfileAccountSectionModel =
 
 const NAME_FIELDS: readonly UserProfileEditNameField[] = ['firstName', 'lastName'];
 const USERNAME_FIELDS: readonly UserProfileEditUsernameField[] = ['username'];
+const ADD_EMAIL_FIELDS: readonly UserProfileAddEmailField[] = ['emailAddress', 'code'];
 
 function emailById(user: UserResource, id: string): EmailAddressResource {
   const email = user.emailAddresses.find(email => email.id === id);
@@ -51,6 +56,22 @@ function emailById(user: UserResource, id: string): EmailAddressResource {
     throw new Error(`No email address with id ${id}`);
   }
   return email;
+}
+
+function toEmailVerifier(email: EmailAddressResource): UserProfileEmailVerifier {
+  return {
+    start: () => ({ method: 'code', sent: save(() => email.prepareVerification({ strategy: 'email_code' })) }),
+    verifyCode: code => save(() => email.attemptVerification({ code }), ADD_EMAIL_FIELDS),
+  };
+}
+
+function canAddIdentifications(user: UserResource, enterpriseSSOEnabled: boolean): boolean {
+  return (
+    !enterpriseSSOEnabled ||
+    !user.enterpriseAccounts.some(
+      account => account.active && account.enterpriseConnection?.disableAdditionalIdentifications,
+    )
+  );
 }
 
 function toManagedBy(account: EnterpriseAccountResource | undefined): UserProfileManagedBy | undefined {
@@ -98,13 +119,14 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     return { status: 'hidden' };
   }
 
-  const { attributes, usernameSettings } = environment.userSettings;
+  const { attributes, usernameSettings, enterpriseSSO } = environment.userSettings;
   const usernameAttribute = attributes.username;
   const usernameImmutable = Boolean(usernameAttribute?.immutable);
   const showUsername = isAttributeAvailable(usernameAttribute) && !(usernameImmutable && !user.username);
   const nameManagedBy = toManagedBy(user.enterpriseAccounts.find(account => account.active));
   const showEmails = isAttributeAvailable(attributes.email_address);
   const emailsImmutable = Boolean(attributes.email_address?.immutable);
+  const canCreateEmail = showEmails && !emailsImmutable && canAddIdentifications(user, enterpriseSSO.enabled);
   const showPhones = isAttributeAvailable(attributes.phone_number);
 
   return {
@@ -121,6 +143,14 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     username: showUsername ? (user.username ?? '') : undefined,
     emails: showEmails ? toEmails(user) : undefined,
     phones: showPhones ? toPhones(user) : undefined,
+    onCreateEmail: canCreateEmail
+      ? async emailAddress => {
+          const request = user.createEmailAddress({ email: emailAddress });
+          await save(() => request, ADD_EMAIL_FIELDS);
+          return toEmailVerifier(await request);
+        }
+      : undefined,
+    getEmailVerifier: showEmails ? id => toEmailVerifier(emailById(user, id)) : undefined,
     onSetPrimaryEmail: showEmails ? id => save(() => user.update({ primaryEmailAddressId: id })) : undefined,
     onRemoveEmail: showEmails && !emailsImmutable ? id => save(() => emailById(user, id).destroy()) : undefined,
     onProfilePictureChange: file => save(() => user.setProfileImage({ file })),
