@@ -1,10 +1,13 @@
+import { isReverificationCancelledError } from '@clerk/shared/error';
 import type { ReactNode } from 'react';
 
 import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
-import type { DialogFocusTarget, DialogHandle, DialogTriggerProps } from '../../components/dialog';
+import type { DialogFocusTarget, DialogHandle, DialogRootProps, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
+import { Flow } from '../../components/flow';
+import { Reverification, type ReverificationController } from '../../features/reverification';
 import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
 import { useConfirmationController } from './confirmation.controller';
 
@@ -21,6 +24,7 @@ interface ConfirmationCardProps {
   onConfirm: () => void;
   isConfirming: boolean;
   errorMessage: string | undefined;
+  reverification?: ReverificationController;
 }
 
 function ConfirmationCard({
@@ -33,7 +37,85 @@ function ConfirmationCard({
   onConfirm,
   isConfirming,
   errorMessage,
+  reverification,
 }: ConfirmationCardProps) {
+  const step =
+    reverification && reverification.status !== 'idle' && reverification.status !== 'loading' ? 'verify' : 'confirm';
+
+  const confirmation = (
+    <>
+      <Card.Header>
+        <Card.Title>{title}</Card.Title>
+        <Card.Description>{description}</Card.Description>
+      </Card.Header>
+      {errorMessage ? (
+        <Card.Content>
+          <Banner.Root
+            role='alert'
+            color='negative'
+          >
+            <Banner.Label>{errorMessage}</Banner.Label>
+          </Banner.Root>
+        </Card.Content>
+      ) : null}
+      <Card.Footer>
+        <Dialog.Close
+          render={
+            <Button
+              variant='outline'
+              fullWidth
+            >
+              {cancelLabel}
+            </Button>
+          }
+        />
+        <SubmitButton
+          type='button'
+          fullWidth
+          color={color}
+          isPending={isConfirming}
+          onClick={onConfirm}
+        >
+          {actionLabel}
+        </SubmitButton>
+      </Card.Footer>
+    </>
+  );
+
+  const content = reverification ? (
+    <Flow.Root
+      value={step}
+      direction={step === 'verify' ? 1 : -1}
+      state={step}
+    >
+      {() => (
+        <>
+          <Flow.Step ids={['confirm']}>{confirmation}</Flow.Step>
+          <Flow.Step ids={['verify']}>
+            {reverification ? (
+              <>
+                <Reverification {...reverification} />
+                <Card.Footer>
+                  <Button
+                    variant='outline'
+                    color='neutral'
+                    fullWidth
+                    disabled={reverification.phase === 'retrying'}
+                    onClick={reverification.status === 'idle' ? undefined : reverification.onCancel}
+                  >
+                    {cancelLabel}
+                  </Button>
+                </Card.Footer>
+              </>
+            ) : null}
+          </Flow.Step>
+        </>
+      )}
+    </Flow.Root>
+  ) : (
+    confirmation
+  );
+
   return (
     <Dialog.Popup
       compactPlacement='sheet'
@@ -43,41 +125,7 @@ function ConfirmationCard({
         elevation='overlay'
         renderBranding={false}
       >
-        <Card.Header>
-          <Card.Title>{title}</Card.Title>
-          <Card.Description>{description}</Card.Description>
-        </Card.Header>
-        {errorMessage ? (
-          <Card.Content>
-            <Banner.Root
-              role='alert'
-              color='negative'
-            >
-              <Banner.Label>{errorMessage}</Banner.Label>
-            </Banner.Root>
-          </Card.Content>
-        ) : null}
-        <Card.Footer>
-          <Dialog.Close
-            render={
-              <Button
-                variant='outline'
-                fullWidth
-              >
-                {cancelLabel}
-              </Button>
-            }
-          />
-          <SubmitButton
-            type='button'
-            fullWidth
-            color={color}
-            isPending={isConfirming}
-            onClick={onConfirm}
-          >
-            {actionLabel}
-          </SubmitButton>
-        </Card.Footer>
+        {content}
       </Card.Root>
     </Dialog.Popup>
   );
@@ -94,7 +142,7 @@ export interface ConfirmationControlledProps {
    */
   finalFocus?: DialogFocusTarget;
   /** Callback when open state changes */
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: NonNullable<DialogRootProps['onOpenChange']>;
   /** Element that opens the dialog */
   trigger?: DialogTriggerProps['render'];
   /** Dialog heading */
@@ -111,6 +159,7 @@ export interface ConfirmationControlledProps {
   isConfirming?: boolean;
   /** Error message to display if the confirmed action fails */
   errorMessage?: string;
+  reverification?: ReverificationController;
 }
 
 function ControlledConfirmation({
@@ -126,12 +175,21 @@ function ControlledConfirmation({
   onConfirm,
   isConfirming = false,
   errorMessage,
+  reverification,
 }: ConfirmationControlledProps) {
+  const handleOpenChange: NonNullable<DialogRootProps['onOpenChange']> = (...args) => {
+    const [nextOpen] = args;
+    if (!nextOpen && reverification && reverification.status !== 'idle') {
+      reverification.onCancel?.();
+    }
+    onOpenChange(...args);
+  };
+
   return (
     <Dialog.Root
       role='alertdialog'
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={handleOpenChange}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <ConfirmationCard
@@ -144,6 +202,7 @@ function ControlledConfirmation({
         onConfirm={onConfirm}
         isConfirming={isConfirming}
         errorMessage={errorMessage}
+        reverification={reverification}
       />
     </Dialog.Root>
   );
@@ -181,6 +240,8 @@ export interface ConfirmationHandleProps<Payload> {
   cancelLabel?: string;
   /** Runs the action for the payload. Resolve to close the dialog; reject with an `Error` to keep it open showing why */
   onConfirm: (payload: Payload) => Promise<void> | void;
+  /** Challenge shown in place of the confirmation while the action waits on reverification. Cancelling it closes the dialog */
+  reverification?: ReverificationController;
 }
 
 function HandleConfirmation<Payload>({
@@ -192,15 +253,23 @@ function HandleConfirmation<Payload>({
   actionLabel,
   cancelLabel = 'Cancel',
   onConfirm,
+  reverification,
 }: ConfirmationHandleProps<Payload>) {
   const controller = useConfirmationController();
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open && reverification && reverification.status !== 'idle') {
+      reverification.onCancel?.();
+    }
+    controller.onOpenChange(open);
+  };
 
   return (
     <Dialog.Root
       role='alertdialog'
       handle={handle}
       open={controller.isOpen}
-      onOpenChange={controller.onOpenChange}
+      onOpenChange={handleOpenChange}
     >
       {({ payload }) =>
         payload === undefined ? null : (
@@ -213,11 +282,18 @@ function HandleConfirmation<Payload>({
             cancelLabel={cancelLabel}
             onConfirm={() =>
               controller.onConfirm(async () => {
-                await onConfirm(payload);
+                try {
+                  await onConfirm(payload);
+                } catch (error) {
+                  if (!isReverificationCancelledError(error)) {
+                    throw error;
+                  }
+                }
               })
             }
             isConfirming={controller.isConfirming}
             errorMessage={controller.errorMessage}
+            reverification={reverification}
           />
         )
       }

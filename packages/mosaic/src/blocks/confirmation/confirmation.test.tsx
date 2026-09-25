@@ -1,8 +1,10 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../components/button';
+import type { ReverificationController } from '../../features/reverification';
 import { MosaicProvider } from '../../MosaicProvider';
 import type { ConfirmationControlledProps, ConfirmationHandleProps } from './confirmation';
 import { Confirmation } from './confirmation';
@@ -219,5 +221,126 @@ describe('Confirmation with a handle', () => {
 
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(handle.isOpen).toBe(false);
+  });
+});
+
+describe('Confirmation with reverification', () => {
+  function challenge(onCancel = vi.fn()): ReverificationController {
+    return {
+      status: 'ready',
+      phase: 'active',
+      step: 'password',
+      value: '',
+      onValueChange: vi.fn(),
+      isPending: false,
+      onSubmit: vi.fn(),
+      onShowMethods: vi.fn(),
+      onShowHelp: vi.fn(),
+      onBack: vi.fn(),
+      onEmailSupport: vi.fn(),
+      onResend: vi.fn(),
+      canResend: true,
+      methods: [],
+      onSelectMethod: vi.fn(),
+      onCancel,
+    };
+  }
+
+  function Example({
+    handle,
+    reverification,
+    onConfirm,
+  }: {
+    handle: ReturnType<typeof Confirmation.createHandle<Member>>;
+    reverification: ReverificationController;
+    onConfirm: ConfirmationHandleProps<Member>['onConfirm'];
+  }) {
+    return (
+      <MosaicProvider>
+        <Confirmation
+          handle={handle}
+          title='Remove member'
+          description={member => `${member.name} will be removed from the organization.`}
+          actionLabel={member => `Remove ${member.name}`}
+          onConfirm={onConfirm}
+          reverification={reverification}
+        />
+      </MosaicProvider>
+    );
+  }
+
+  it('cancels the challenge when the controlled dialog closes', async () => {
+    const user = userEvent.setup();
+    const onCancel = vi.fn();
+    const onOpenChange = vi.fn();
+    renderBlock({ onOpenChange, reverification: challenge(onCancel) });
+
+    await user.keyboard('{Escape}');
+
+    expect(onCancel).toHaveBeenCalledOnce();
+    expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+  });
+
+  it('shows the challenge in place of the confirmation', () => {
+    const handle = Confirmation.createHandle<Member>();
+    const { rerender } = render(
+      <Example
+        handle={handle}
+        reverification={{ status: 'idle', phase: 'inactive' }}
+        onConfirm={() => new Promise(() => {})}
+      />,
+    );
+    act(() => {
+      handle.open(preston);
+    });
+    expect(screen.getByText('Preston Booth will be removed from the organization.')).toBeInTheDocument();
+
+    rerender(
+      <Example
+        handle={handle}
+        reverification={challenge()}
+        onConfirm={() => new Promise(() => {})}
+      />,
+    );
+
+    expect(screen.getAllByRole('alertdialog')).toHaveLength(1);
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+  });
+
+  it('closes without an error when the challenge is cancelled', async () => {
+    const user = userEvent.setup();
+    const handle = Confirmation.createHandle<Member>();
+    let rejectCancelled: (error: unknown) => void = () => {};
+    const onCancel = vi.fn(() =>
+      rejectCancelled(new ClerkRuntimeError('cancelled', { code: 'reverification_cancelled' })),
+    );
+    const onConfirm = () =>
+      new Promise<void>((_, reject) => {
+        rejectCancelled = reject;
+      });
+    const { rerender } = render(
+      <Example
+        handle={handle}
+        reverification={{ status: 'idle', phase: 'inactive' }}
+        onConfirm={onConfirm}
+      />,
+    );
+    act(() => {
+      handle.open(preston);
+    });
+    await user.click(removeButton());
+    rerender(
+      <Example
+        handle={handle}
+        reverification={challenge(onCancel)}
+        onConfirm={onConfirm}
+      />,
+    );
+
+    await user.keyboard('{Escape}');
+
+    expect(onCancel).toHaveBeenCalledOnce();
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });
