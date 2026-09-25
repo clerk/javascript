@@ -32,24 +32,26 @@ export function OrganizationProfileWorkspaceSectionView({
 
   return (
     <Section.Root>
-      <Section.Title>{m.sectionTitle}</Section.Title>
       <Section.Group>
-        <OrganizationProfileLogoRowView
-          name={name}
-          imageUrl={imageUrl}
-          hasImage={hasImage}
-          onChange={onLogoChange}
-          onReject={onLogoReject}
-          onRemove={onRemoveLogo}
-        />
-        <OrganizationProfileNameRowView
-          name={name}
-          onSubmit={onSubmitName}
-        />
-        <OrganizationProfileSlugRowView
-          slug={slug}
-          onSubmit={onSubmitSlug}
-        />
+        <Section.Title>{m.sectionTitle}</Section.Title>
+        <Section.Surface>
+          <OrganizationProfileLogoRowView
+            name={name}
+            imageUrl={imageUrl}
+            hasImage={hasImage}
+            onChange={onLogoChange}
+            onReject={onLogoReject}
+            onRemove={onRemoveLogo}
+          />
+          <OrganizationProfileNameRowView
+            name={name}
+            onSubmit={onSubmitName}
+          />
+          <OrganizationProfileSlugRowView
+            slug={slug}
+            onSubmit={onSubmitSlug}
+          />
+        </Section.Surface>
       </Section.Group>
     </Section.Root>
   );

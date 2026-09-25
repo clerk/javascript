@@ -3,7 +3,11 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
+  header: {
+    flexWrap: 'wrap',
+  },
   addError: {
+    flexBasis: '100%',
     marginTop: {
       default: space['2'],
       ':where(:not([data-open]), [data-starting-style])': 0,
