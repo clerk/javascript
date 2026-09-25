@@ -2081,7 +2081,7 @@ export const esUY: LocalizationResource = {
     password_confirmation_attempt_remaining: 'Contraseña incorrecta. Te queda 1 intento.',
     password_confirmation_attempts_remaining: 'Contraseña incorrecta. Te quedan {{remainingAttempts}} intentos.',
     password_confirmation_session_ended:
-      'Tu sesión finalizó porque alcanzaste el límite de intentos de confirmación de contraseña. Vuelve a iniciar sesión para continuar.',
+      'Tu sesión finalizó porque alcanzaste el límite de intentos de confirmación de contraseña. Volvé a iniciar sesión para continuar.',
     phone_number_exists: 'Este número de teléfono ya está en uso. Por favor, probá con otro.',
     protect_check_aborted: undefined,
     protect_check_already_resolved: undefined,
