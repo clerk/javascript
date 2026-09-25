@@ -44,6 +44,11 @@ export const createLongRunningApps = () => {
     { id: 'next.appRouterBundledUI.withEmailCodes', config: next.appRouterBundledUI, env: envs.withEmailCodes },
 
     /**
+     * NextJS apps - Mosaic
+     */
+    { id: 'next.appRouterMosaic.withEmailCodes', config: next.appRouterMosaic, env: envs.withEmailCodes },
+
+    /**
      * NextJS apps - cache components
      */
     { id: 'next.cacheComponents', config: next.cacheComponents, env: envs.withEmailCodes },
