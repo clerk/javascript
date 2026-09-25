@@ -1,9 +1,8 @@
 import { randomBytes } from 'node:crypto';
 
-import type { ClerkClient, M2MToken, Machine, OAuthApplication, User } from '@clerk/backend';
+import type { ClerkClient, M2MToken, OAuthApplication, User } from '@clerk/backend';
 import { createClerkClient } from '@clerk/backend';
 import { TokenType } from '@clerk/backend/internal';
-import { faker } from '@faker-js/faker';
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
@@ -13,60 +12,10 @@ import type { EnvironmentConfig } from '../models/environment';
 import { appConfigs } from '../presets';
 import { instanceKeys } from '../presets/envs';
 import { createTestUtils } from './index';
+import type { FakeMachineNetwork } from './machineNetwork';
+import { createFakeMachineNetwork } from './machineNetwork';
+import { withRetry } from './retryableClerkClient';
 import type { FakeAPIKey, FakeUser } from './usersService';
-
-export type FakeMachineNetwork = {
-  primaryServer: Machine;
-  scopedSender: Machine;
-  unscopedSender: Machine;
-  scopedSenderToken: M2MToken;
-  unscopedSenderToken: M2MToken;
-  cleanup: () => Promise<void>;
-};
-
-async function createFakeMachineNetwork(clerkClient: ClerkClient): Promise<FakeMachineNetwork> {
-  const fakeCompanyName = faker.company.name();
-
-  const primaryServer = await clerkClient.machines.create({
-    name: `${fakeCompanyName} Primary API Server`,
-  });
-
-  const scopedSender = await clerkClient.machines.create({
-    name: `${fakeCompanyName} Scoped Sender`,
-    scopedMachines: [primaryServer.id],
-  });
-  const scopedSenderToken = await clerkClient.m2m.createToken({
-    machineSecretKey: scopedSender.secretKey,
-    secondsUntilExpiration: 60 * 30,
-  });
-
-  const unscopedSender = await clerkClient.machines.create({
-    name: `${fakeCompanyName} Unscoped Sender`,
-  });
-  const unscopedSenderToken = await clerkClient.m2m.createToken({
-    machineSecretKey: unscopedSender.secretKey,
-    secondsUntilExpiration: 60 * 30,
-  });
-
-  return {
-    primaryServer,
-    scopedSender,
-    unscopedSender,
-    scopedSenderToken,
-    unscopedSenderToken,
-    cleanup: async () => {
-      await Promise.all([
-        clerkClient.m2m.revokeToken({ m2mTokenId: scopedSenderToken.id }),
-        clerkClient.m2m.revokeToken({ m2mTokenId: unscopedSenderToken.id }),
-      ]);
-      await Promise.all([
-        clerkClient.machines.delete(scopedSender.id),
-        clerkClient.machines.delete(unscopedSender.id),
-        clerkClient.machines.delete(primaryServer.id),
-      ]);
-    },
-  };
-}
 
 async function createJwtM2MToken(clerkClient: ClerkClient, senderSecretKey: string): Promise<M2MToken> {
   return clerkClient.m2m.createToken({
@@ -182,9 +131,11 @@ export type MachineAuthTestAdapter = {
 const createApiKeysEnv = (): EnvironmentConfig => appConfigs.envs.withAPIKeys.clone();
 
 const createMachineClient = () =>
-  createClerkClient({
-    secretKey: instanceKeys.get('with-api-keys').sk,
-  });
+  withRetry(
+    createClerkClient({
+      secretKey: instanceKeys.get('with-api-keys').sk,
+    }),
+  );
 
 const buildApp = async (adapter: MachineAuthTestAdapter, addRoutes: RouteBuilder): Promise<Application> => {
   const config = addRoutes(adapter.baseConfig.clone());
@@ -192,10 +143,12 @@ const buildApp = async (adapter: MachineAuthTestAdapter, addRoutes: RouteBuilder
 };
 
 const createOAuthClient = (app: Application) =>
-  createClerkClient({
-    secretKey: app.env.privateVariables.get('CLERK_SECRET_KEY'),
-    publishableKey: app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
-  });
+  withRetry(
+    createClerkClient({
+      secretKey: app.env.privateVariables.get('CLERK_SECRET_KEY'),
+      publishableKey: app.env.publicVariables.get('CLERK_PUBLISHABLE_KEY'),
+    }),
+  );
 
 export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void => {
   test.describe('API key auth', () => {
@@ -293,7 +246,7 @@ export const registerApiKeyAuthTests = (adapter: MachineAuthTestAdapter): void =
 
 export const registerM2MAuthTests = (adapter: MachineAuthTestAdapter): void => {
   test.describe('M2M auth', () => {
-    test.describe.configure({ mode: 'parallel' });
+    test.describe.configure({ mode: 'default' });
     let app: Application;
     let network: FakeMachineNetwork;
 
@@ -314,8 +267,11 @@ export const registerM2MAuthTests = (adapter: MachineAuthTestAdapter): void => {
     });
 
     test.afterAll(async () => {
-      await network?.cleanup();
-      await app?.teardown();
+      const results = await Promise.allSettled([network?.cleanup(), app?.teardown()]);
+      const errors = results.flatMap(result => (result.status === 'rejected' ? [result.reason] : []));
+      if (errors.length > 0) {
+        throw new AggregateError(errors, 'Failed to tear down M2M tests');
+      }
     });
 
     test('rejects requests with invalid M2M tokens', async ({ request }) => {
