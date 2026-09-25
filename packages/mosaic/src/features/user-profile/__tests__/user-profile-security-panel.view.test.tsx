@@ -67,8 +67,8 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.getByText('Password')).toBeVisible();
     expect(screen.getByText('Passkeys')).toBeVisible();
     expect(screen.getByText('2-step verification')).toBeVisible();
-    expect(screen.getByRole('region', { name: 'Passkeys' })).toBeInTheDocument();
-    expect(screen.getByRole('region', { name: '2-step verification' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Passkeys' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: '2-step verification' })).toBeInTheDocument();
     expect(screen.getByText('This device')).toBeInTheDocument();
     expect(screen.getByText('2 other devices')).toBeInTheDocument();
     expect(
@@ -131,7 +131,7 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove', exact: true }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
-    const otherDevices = screen.getByRole('region', { name: 'Other devices' });
+    const otherDevices = screen.getByRole('group', { name: 'Other devices' });
     await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
@@ -203,7 +203,7 @@ describe('UserProfileSecurityPanelView', () => {
     expect(within(section).getByText('No passkeys added')).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
-    expect(screen.getByRole('region', { name: '2-step verification' })).toBeVisible();
+    expect(screen.getByRole('group', { name: '2-step verification' })).toBeVisible();
   });
 
   it('keeps the empty section and final passkey confirmation mounted without Add', async () => {

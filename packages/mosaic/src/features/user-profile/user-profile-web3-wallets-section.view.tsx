@@ -63,26 +63,28 @@ export function UserProfileWeb3WalletsSectionView({
           ref={section}
           tabIndex={-1}
         >
-          <Section.Title>{m.title}</Section.Title>
           <Section.Group>
-            {wallets.map(wallet => (
-              <UserProfileWeb3WalletRowView
-                key={wallet.id}
-                wallet={wallet}
-                triggerRef={removalFocus.registerTrigger(wallet.id)}
-                onSetPrimary={onSetPrimary}
-                onRemove={onRemove ? wallet => removeWallet.open(wallet) : undefined}
-              />
-            ))}
-            {onConnect
-              ? availableProviders.map(provider => (
-                  <UserProfileWeb3WalletRowView
-                    key={provider.id}
-                    wallet={provider}
-                    onConnect={onConnect}
-                  />
-                ))
-              : null}
+            <Section.Title>{m.title}</Section.Title>
+            <Section.Surface>
+              {wallets.map(wallet => (
+                <UserProfileWeb3WalletRowView
+                  key={wallet.id}
+                  wallet={wallet}
+                  triggerRef={removalFocus.registerTrigger(wallet.id)}
+                  onSetPrimary={onSetPrimary}
+                  onRemove={onRemove ? wallet => removeWallet.open(wallet) : undefined}
+                />
+              ))}
+              {onConnect
+                ? availableProviders.map(provider => (
+                    <UserProfileWeb3WalletRowView
+                      key={provider.id}
+                      wallet={provider}
+                      onConnect={onConnect}
+                    />
+                  ))
+                : null}
+            </Section.Surface>
           </Section.Group>
         </Section.Root>
       ) : null}
