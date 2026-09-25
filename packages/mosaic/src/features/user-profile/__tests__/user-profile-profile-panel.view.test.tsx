@@ -12,10 +12,10 @@ const props: UserProfileProfilePanelViewProps = {
   name: 'Preston Booth',
   username: 'prestonxyz',
   emails: [
-    { id: 'email_1', value: 'item1@clerk.dev', isDefault: true },
-    { id: 'email_2', value: 'item2@clerk.dev' },
+    { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
+    { id: 'email_2', value: 'item2@clerk.dev', isDefault: false, isVerified: true },
   ],
-  phones: [{ id: 'phone_1', value: '+1 801-888-8181' }],
+  phones: [{ id: 'phone_1', value: '+1 801-888-8181', isDefault: false, isVerified: true }],
 };
 
 function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
@@ -118,7 +118,7 @@ describe('UserProfileProfilePanelView', () => {
   it.each([false, true])('formats normalized phone numbers with multiple accounts set to %s', allowMultipleAccounts => {
     renderView({
       allowMultipleAccounts,
-      phones: [{ id: 'phone_added', value: '+18015558181' }],
+      phones: [{ id: 'phone_added', value: '+18015558181', isDefault: false, isVerified: true }],
       onRemovePhone: vi.fn(),
     });
 
@@ -218,7 +218,7 @@ describe('UserProfileProfilePanelView', () => {
 
   it('breaks out both contact types when multiple accounts are allowed', () => {
     renderView({
-      emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true }],
+      emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true }],
       onAddEmail: vi.fn(),
       onSendPhoneCode: () => Promise.resolve(),
       onVerifyPhoneCode: () => Promise.resolve(),
@@ -239,7 +239,7 @@ describe('UserProfileProfilePanelView', () => {
   it('keeps both contact types inside Account when multiple accounts are not allowed', () => {
     renderView({
       allowMultipleAccounts: false,
-      emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true }],
+      emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true }],
       onManageEmail: vi.fn(),
       onManagePhone: vi.fn(),
     });
@@ -440,12 +440,12 @@ describe('UserProfileProfilePanelView', () => {
     renderView({
       emails: [
         { id: 'email_primary', value: 'primary@clerk.dev', isDefault: true, isVerified: false },
-        { id: 'email_secondary', value: 'secondary@clerk.dev', isVerified: true },
-        { id: 'email_unverified', value: 'unverified@clerk.dev', isVerified: false },
+        { id: 'email_secondary', value: 'secondary@clerk.dev', isDefault: false, isVerified: true },
+        { id: 'email_unverified', value: 'unverified@clerk.dev', isDefault: false, isVerified: false },
       ],
       phones: [
-        { id: 'phone_unverified', value: '+1 801-555-0100', isVerified: false },
-        { id: 'phone_secondary', value: '+1 801-555-0101', isVerified: true },
+        { id: 'phone_unverified', value: '+1 801-555-0100', isDefault: false, isVerified: false },
+        { id: 'phone_secondary', value: '+1 801-555-0101', isDefault: false, isVerified: true },
       ],
       connectedAccounts: [{ id: 'github', provider: 'GitHub', identifier: 'prestonxyz' }],
       onVerifyEmail,
@@ -520,14 +520,12 @@ describe('UserProfileProfilePanelView', () => {
           value: 'immutable@clerk.dev',
           isDefault: true,
           isVerified: true,
-          canRemove: false,
         },
       ],
       phones: [],
       connectedAccounts: [{ id: 'github', provider: 'GitHub', identifier: 'prestonxyz', canRemove: false }],
       onVerifyEmail: vi.fn(),
       onSetPrimaryEmail: vi.fn(),
-      onRemoveEmail: vi.fn(),
       onRemoveConnectedAccount: vi.fn(),
     });
 

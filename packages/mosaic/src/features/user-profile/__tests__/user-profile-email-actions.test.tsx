@@ -16,7 +16,7 @@ function renderEmail(overrides: Partial<UserProfileAccountSectionViewProps> = {}
         name='Test'
         username='test'
         phones={[]}
-        emails={[{ id: 'email_1', value: 'test@example.com', isVerified: true }]}
+        emails={[{ id: 'email_1', value: 'test@example.com', isDefault: false, isVerified: true }]}
         {...overrides}
       />
     </MosaicProvider>,
@@ -45,7 +45,9 @@ describe('email actions', () => {
   it('focuses Add email after removing the last email', async () => {
     const user = userEvent.setup();
     function Example() {
-      const [emails, setEmails] = useState([{ id: 'email_1', value: 'test@example.com', isVerified: true }]);
+      const [emails, setEmails] = useState([
+        { id: 'email_1', value: 'test@example.com', isDefault: false, isVerified: true },
+      ]);
       return (
         <MosaicProvider>
           <UserProfileAccountSectionView
@@ -104,5 +106,23 @@ describe('email actions', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(onRemoveEmail).toHaveBeenNthCalledWith(1, 'email_1');
     expect(onRemoveEmail).toHaveBeenNthCalledWith(2, 'email_1');
+  });
+  it.each([
+    [true, 'You won’t be able to use it to sign in.'],
+    [false, undefined],
+  ])('warns about signing in only when removing a verified email (verified: %s)', async (isVerified, warning) => {
+    const user = userEvent.setup();
+    renderEmail({
+      emails: [{ id: 'email_1', value: 'test@example.com', isDefault: false, isVerified }],
+      onRemoveEmail: vi.fn(),
+    });
+    await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove email' }));
+    const dialog = screen.getByRole('alertdialog');
+    if (warning) {
+      expect(dialog).toHaveTextContent(warning);
+    } else {
+      expect(dialog).not.toHaveTextContent('sign in');
+    }
   });
 });

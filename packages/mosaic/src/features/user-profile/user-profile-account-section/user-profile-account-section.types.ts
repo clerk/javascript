@@ -6,18 +6,13 @@ export interface UserProfileNameAttribute {
   required?: boolean;
 }
 
-export interface UserProfilePhone {
+export interface UserProfileContact {
   id: string;
   value: string;
-  isDefault?: boolean;
-  isVerified?: boolean;
-  canRemove?: boolean;
+  isDefault: boolean;
+  isVerified: boolean;
 }
 
-export interface UserProfileEmail {
-  id: string;
-  value: string;
-  isDefault?: boolean;
-  isVerified?: boolean;
-  canRemove?: boolean;
-}
+export type UserProfileEmail = UserProfileContact;
+
+export type UserProfilePhone = UserProfileContact;

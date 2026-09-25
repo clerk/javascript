@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
@@ -12,6 +12,7 @@ import { useUserProfileAddEmailController } from './user-profile-add-email.contr
 import { UserProfileAddEmailDialog } from './user-profile-add-email.dialog';
 import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
 import { UserProfileContactRowView } from './user-profile-contact-row.view';
+import { useUserProfileSetPrimaryController } from './user-profile-set-primary.controller';
 
 export interface UserProfileEmailRowViewProps {
   emails: UserProfileEmail[];
@@ -68,31 +69,15 @@ export function UserProfileEmailRowView({
       </Button>
     ) : undefined;
   const removeEmailConfirmation = useMemo(() => Confirmation.createHandle<UserProfileEmail>(), []);
-  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
-  const [primaryError, setPrimaryError] = useState<string>();
-  const settingPrimary = useRef(false);
-
-  const setPrimaryEmail = async (id: string) => {
-    const email = emails.find(email => email.id === id);
-    if (!onSetPrimaryEmail || !email?.isVerified || email.isDefault || settingPrimary.current) {
-      return;
-    }
-    settingPrimary.current = true;
-    setIsSettingPrimary(true);
-    setPrimaryError(undefined);
-    try {
-      await onSetPrimaryEmail(id);
-    } catch (error) {
-      setPrimaryError(error instanceof Error ? error.message : m.email.primaryError);
-    } finally {
-      settingPrimary.current = false;
-      setIsSettingPrimary(false);
-    }
-  };
+  const primary = useUserProfileSetPrimaryController({
+    items: emails,
+    onSetPrimary: onSetPrimaryEmail,
+    fallbackError: m.email.primaryError,
+  });
 
   const removeEmail = (id: string) => {
     const email = emails.find(email => email.id === id);
-    if (email && email.canRemove !== false && onRemoveEmail) {
+    if (email && onRemoveEmail) {
       removeEmailConfirmation.open(email);
     }
   };
@@ -119,22 +104,26 @@ export function UserProfileEmailRowView({
         label={m.email.label}
         addAction={addEmailAction}
         onRemove={onRemoveEmail ? removeEmail : undefined}
-        onSetPrimary={onSetPrimaryEmail && !isSettingPrimary ? id => void setPrimaryEmail(id) : undefined}
+        onSetPrimary={primary.onSetPrimary}
         onVerify={onVerifyEmail}
       />
-      {primaryError ? (
+      {primary.error ? (
         <Text
           role='alert'
           color='negative'
         >
-          {primaryError}
+          {primary.error}
         </Text>
       ) : null}
       {onRemoveEmail ? (
         <Confirmation
           handle={removeEmailConfirmation}
           title={m.email.removeDialog.title}
-          description={email => fill(m.email.removeDialog.description, { emailAddress: email.value })}
+          description={email =>
+            fill(email.isVerified ? m.email.removeDialog.verifiedDescription : m.email.removeDialog.description, {
+              emailAddress: email.value,
+            })
+          }
           actionLabel={m.email.removeDialog.confirm}
           cancelLabel={m.email.removeDialog.cancel}
           finalFocus={removalFocus.finalFocus}

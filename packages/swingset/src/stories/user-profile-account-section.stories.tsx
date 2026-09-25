@@ -59,22 +59,24 @@ function AccountSection({
     allowMultipleAccounts
       ? [
           { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
-          { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
+          { id: 'email_2', value: 'item2@clerk.dev', isDefault: false, isVerified: true },
         ]
       : [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true }],
   );
   const [phones, setPhones] = useState<UserProfilePhone[]>([
     { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
-    ...(allowMultipleAccounts ? [{ id: 'phone_2', value: '+18015550100', isVerified: true }] : []),
+    ...(allowMultipleAccounts ? [{ id: 'phone_2', value: '+18015550100', isDefault: false, isVerified: true }] : []),
   ]);
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const addPhone = createUserProfileAddPhoneFixture({
     failAt,
-    onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
+    onVerified: value =>
+      setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isDefault: false, isVerified: true }]),
   });
   const emailFlow = createUserProfileAddEmailFixture({
     failAt: failEmailVerification ? 'verify' : undefined,
-    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+    onVerified: value =>
+      setEmails(current => [...current, { id: `email_${Date.now()}`, value, isDefault: false, isVerified: true }]),
   });
 
   return (

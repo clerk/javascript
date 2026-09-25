@@ -15,6 +15,11 @@ interface FakeAttribute {
   used_for_second_factor: boolean;
 }
 
+interface FakeVerification {
+  status: string | null;
+  expireAt?: Date | null;
+}
+
 let isUserLoaded: boolean;
 let user: {
   firstName: string | null;
@@ -29,8 +34,13 @@ let user: {
   }[];
   primaryEmailAddressId: string | null;
   primaryPhoneNumberId: string | null;
-  emailAddresses: { id: string; emailAddress: string; verification: { status: string | null } }[];
-  phoneNumbers: { id: string; phoneNumber: string; verification: { status: string | null } }[];
+  emailAddresses: {
+    id: string;
+    emailAddress: string;
+    verification: FakeVerification;
+    destroy?: ReturnType<typeof vi.fn>;
+  }[];
+  phoneNumbers: { id: string; phoneNumber: string; verification: FakeVerification }[];
   setProfileImage: ReturnType<typeof vi.fn>;
   update: ReturnType<typeof vi.fn>;
 } | null;
@@ -109,8 +119,18 @@ beforeEach(() => {
     primaryEmailAddressId: 'email_1',
     primaryPhoneNumberId: null,
     emailAddresses: [
-      { id: 'email_2', emailAddress: 'other@clerk.dev', verification: { status: null } },
-      { id: 'email_1', emailAddress: 'preston@clerk.dev', verification: { status: 'verified' } },
+      {
+        id: 'email_2',
+        emailAddress: 'other@clerk.dev',
+        verification: { status: null },
+        destroy: vi.fn(() => Promise.resolve()),
+      },
+      {
+        id: 'email_1',
+        emailAddress: 'preston@clerk.dev',
+        verification: { status: 'verified' },
+        destroy: vi.fn(() => Promise.resolve()),
+      },
     ],
     phoneNumbers: [{ id: 'phone_1', phoneNumber: '+18018888181', verification: { status: 'verified' } }],
     setProfileImage: vi.fn(() => Promise.resolve({})),
@@ -153,6 +173,50 @@ describe('useUserProfileAccountSectionModel', () => {
     });
   });
 
+  it('orders contacts primary first, then verified, then pending by expiry, then never started', () => {
+    if (!user) {
+      throw new Error('expected a user');
+    }
+    user.primaryEmailAddressId = 'email_primary';
+    user.primaryPhoneNumberId = 'phone_primary';
+    user.emailAddresses = [
+      { id: 'email_unstarted', emailAddress: 'd@clerk.dev', verification: { status: null } },
+      {
+        id: 'email_late',
+        emailAddress: 'e@clerk.dev',
+        verification: { status: 'unverified', expireAt: new Date(2000) },
+      },
+      { id: 'email_verified_b', emailAddress: 'b@clerk.dev', verification: { status: 'verified' } },
+      {
+        id: 'email_primary',
+        emailAddress: 'a@clerk.dev',
+        verification: { status: 'unverified', expireAt: new Date(3000) },
+      },
+      {
+        id: 'email_early',
+        emailAddress: 'f@clerk.dev',
+        verification: { status: 'unverified', expireAt: new Date(1000) },
+      },
+      { id: 'email_verified_a', emailAddress: 'c@clerk.dev', verification: { status: 'verified' } },
+    ];
+    user.phoneNumbers = [
+      { id: 'phone_unstarted', phoneNumber: '+18018888183', verification: { status: null } },
+      { id: 'phone_verified', phoneNumber: '+18018888182', verification: { status: 'verified' } },
+      { id: 'phone_primary', phoneNumber: '+18018888181', verification: { status: 'verified' } },
+    ];
+    const model = ready();
+
+    expect(model.emails?.map(email => email.id)).toEqual([
+      'email_primary',
+      'email_verified_a',
+      'email_verified_b',
+      'email_early',
+      'email_late',
+      'email_unstarted',
+    ]);
+    expect(model.phones?.map(phone => phone.id)).toEqual(['phone_primary', 'phone_verified', 'phone_unstarted']);
+  });
+
   it('leaves out the contacts the instance does not collect', () => {
     attributes.email_address = attribute({ enabled: false });
     attributes.phone_number = attribute({ enabled: false });
@@ -160,6 +224,40 @@ describe('useUserProfileAccountSectionModel', () => {
 
     expect(model.emails).toBeUndefined();
     expect(model.phones).toBeUndefined();
+  });
+
+  describe('emails', () => {
+    it('sets the chosen email as primary', async () => {
+      await ready().onSetPrimaryEmail?.('email_2');
+      expect(user?.update).toHaveBeenCalledWith({ primaryEmailAddressId: 'email_2' });
+    });
+
+    it('returns the API message when setting the primary fails', async () => {
+      user?.update.mockRejectedValue(apiError());
+      await expect(rejection(ready().onSetPrimaryEmail?.('email_2'))).resolves.toEqual({
+        global: { code: 'form_param_invalid', message: 'That value is invalid.' },
+      });
+    });
+
+    it('removes the chosen email', async () => {
+      await ready().onRemoveEmail?.('email_2');
+      expect(user?.emailAddresses[0]?.destroy).toHaveBeenCalled();
+      expect(user?.emailAddresses[1]?.destroy).not.toHaveBeenCalled();
+    });
+
+    it('returns the API message when removing fails', async () => {
+      user?.emailAddresses[0]?.destroy?.mockRejectedValue(apiError());
+      await expect(rejection(ready().onRemoveEmail?.('email_2'))).resolves.toEqual({
+        global: { code: 'form_param_invalid', message: 'That value is invalid.' },
+      });
+    });
+
+    it('still offers a new primary but no removal when the email address is immutable', () => {
+      attributes.email_address = attribute({ immutable: true });
+      const model = ready();
+      expect(model.onSetPrimaryEmail).toBeDefined();
+      expect(model.onRemoveEmail).toBeUndefined();
+    });
   });
 
   describe('profile picture', () => {
