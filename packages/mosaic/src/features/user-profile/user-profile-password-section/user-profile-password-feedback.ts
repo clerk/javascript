@@ -4,6 +4,7 @@ import type { ClerkAPIError, PasswordSettingsData } from '@clerk/shared/types';
 import { FormSubmitError } from '../../../components/form';
 import type { MosaicMessages } from '../../../localization';
 import { fill } from '../../../localization';
+import { UserProfilePasswordUpdateError } from './user-profile-password-section.types';
 
 type Messages = MosaicMessages['userProfilePasswordSection'];
 type Settings = Pick<PasswordSettingsData, 'min_length' | 'max_length'>;
@@ -73,6 +74,11 @@ export function passwordFormError(
   messages: Messages,
   locale: string,
 ): unknown {
+  if (error instanceof UserProfilePasswordUpdateError) {
+    return error.code === 'current_password_required'
+      ? new FormSubmitError({ fields: { currentPassword: messages.errors.currentPasswordRequired } })
+      : new FormSubmitError({ message: messages.errors.unavailable });
+  }
   if (!isClerkAPIResponseError(error)) {
     return error;
   }

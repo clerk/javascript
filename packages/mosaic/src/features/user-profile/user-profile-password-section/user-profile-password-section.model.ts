@@ -7,6 +7,7 @@ import { useCallback } from 'react';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
 import type { UserProfileEditPasswordValue } from './user-profile-password-section.types';
+import { UserProfilePasswordUpdateError } from './user-profile-password-section.types';
 
 type EditablePasswordPolicy =
   | { mode: 'set'; requiresCurrentPassword: false }
@@ -106,11 +107,11 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
         currentPolicy.mode !== policy.mode ||
         currentPolicy.requiresCurrentPassword !== policy.requiresCurrentPassword
       ) {
-        throw new Error('Password update is no longer available.');
+        throw new UserProfilePasswordUpdateError('unavailable');
       }
 
       if (policy.requiresCurrentPassword && !currentPassword) {
-        throw new Error('Current password is required.');
+        throw new UserProfilePasswordUpdateError('current_password_required');
       }
 
       return currentUser.updatePassword({

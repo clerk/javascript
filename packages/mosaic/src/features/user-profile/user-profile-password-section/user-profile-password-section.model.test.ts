@@ -89,7 +89,7 @@ describe('useUserProfilePasswordModel', () => {
         newPassword: 'new password',
         signOutOfOtherSessions: true,
       }),
-    ).rejects.toThrow('Current password is required.');
+    ).rejects.toMatchObject({ code: 'current_password_required' });
     expect(user.updatePassword).not.toHaveBeenCalled();
   });
 
@@ -139,9 +139,9 @@ describe('useUserProfilePasswordModel', () => {
     }
 
     const input = { currentPassword: 'old password', newPassword: 'new password', signOutOfOtherSessions: true };
-    await expect(action(input)).rejects.toThrow('Password update is no longer available.');
+    await expect(action(input)).rejects.toMatchObject({ code: 'unavailable' });
     rerender();
-    await expect(action(input)).rejects.toThrow('Password update is no longer available.');
+    await expect(action(input)).rejects.toMatchObject({ code: 'unavailable' });
     expect(updatePassword).not.toHaveBeenCalled();
   });
 
@@ -153,7 +153,7 @@ describe('useUserProfilePasswordModel', () => {
     const { result } = renderHook(() => useUserProfilePasswordModel());
     await expect(
       ready(result.current).updatePassword({ newPassword: 'new password', signOutOfOtherSessions: true }),
-    ).rejects.toThrow('Password update is no longer available.');
+    ).rejects.toMatchObject({ code: 'unavailable' });
     expect(user.updatePassword).not.toHaveBeenCalled();
   });
 

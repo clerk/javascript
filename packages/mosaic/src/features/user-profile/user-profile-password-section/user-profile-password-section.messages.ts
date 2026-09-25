@@ -65,6 +65,8 @@ export const userProfilePasswordSectionMessages = {
 
   errors: {
     verificationIncomplete: 'Your password was not saved. Please try verifying again.',
+    unavailable: 'Password update is no longer available.',
+    currentPasswordRequired: 'Current password is required.',
     mismatch: "Passwords don't match.",
   },
 } as const;

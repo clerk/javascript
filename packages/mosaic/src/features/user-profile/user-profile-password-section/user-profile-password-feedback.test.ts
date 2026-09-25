@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { FormSubmitError } from '../../../components/form';
 import { resolveLocalization } from '../../../localization';
 import { passwordFormError } from './user-profile-password-feedback';
+import { UserProfilePasswordUpdateError } from './user-profile-password-section.types';
 
 const settings = { min_length: 12, max_length: 64 };
 const localization = resolveLocalization({
@@ -118,5 +119,15 @@ describe('password error feedback', () => {
         },
       ]).fields?.newPassword,
     ).toBe('Your password is not strong enough.');
+  });
+
+  it('localizes update errors raised before the request is sent', () => {
+    const translate = (code: UserProfilePasswordUpdateError['code']) =>
+      passwordFormError(new UserProfilePasswordUpdateError(code), true, settings, messages, localization.locale);
+
+    expect(translate('unavailable')).toMatchObject({ banner: 'Password update is no longer available.' });
+    expect(translate('current_password_required')).toMatchObject({
+      fields: { currentPassword: 'Current password is required.' },
+    });
   });
 });
