@@ -9,7 +9,7 @@ export interface UserProfileFormError<TField extends string = string> {
   fields?: Partial<Record<TField, string>>;
 }
 
-/** What a save rejects with when the failure names a control; a plain `Error` shows only the banner. */
+/** What a save rejects with to show its message and name the failing controls; anything else shows the generic error. */
 export class UserProfileSaveError<TField extends string = string> extends FormSubmitError<Record<TField, unknown>> {
   constructor(message: string, fields?: Partial<Record<TField, string>>) {
     super({ message, fields });

@@ -148,17 +148,17 @@ function savedFieldErrors<TValues extends object>(
 }
 
 function toFormError<TValues extends object>(cause: unknown, context: FormContext<TValues>): FormError<TValues> {
+  if (!(cause instanceof FormSubmitError) && !(cause instanceof SaveError)) {
+    console.error(cause);
+    return { message: context.fallbackMessage };
+  }
   const error: FormError<TValues> =
     cause instanceof FormSubmitError
       ? { message: cause.banner, fields: displayableFields(context, cause.fields) }
-      : cause instanceof SaveError
-        ? {
-            message: cause.formError.global ? context.errorText(cause.formError.global) : undefined,
-            fields: savedFieldErrors(context, cause.formError.fields),
-          }
-        : cause instanceof Error
-          ? { message: cause.message }
-          : {};
+      : {
+          message: cause.formError.global ? context.errorText(cause.formError.global) : undefined,
+          fields: savedFieldErrors(context, cause.formError.fields),
+        };
   const visible = (error.message ?? '') !== '' || keysOf(error.fields ?? {}).length > 0;
   return visible ? error : { ...error, message: context.fallbackMessage };
 }
