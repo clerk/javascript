@@ -144,21 +144,16 @@ createClerkBridge({
 
 ## Allowed origins
 
-`@clerk/electron` authenticates renderer requests with a bearer token, and Chromium adds an `Origin` header to each of them. Clerk's Frontend API rejects requests that carry both headers unless the origin is in your instance's allowed origins. Until you add it, every request fails with "Setting both the 'Origin' and 'Authorization' headers is forbidden".
+Add your renderer's origins to your instance's allowed origins. Otherwise Clerk rejects every renderer request with "Setting both the 'Origin' and 'Authorization' headers is forbidden".
 
-Add every origin your renderer loads from. That includes the custom scheme origin of packaged builds (for example, `my-app://renderer`) and your dev server's origin during development (for example, `http://localhost:5173`). Set them with the Backend SDK on each instance you use:
-
-```ts
-import { createClerkClient } from '@clerk/backend';
-
-const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
-
-await clerkClient.instance.update({
-  allowedOrigins: ['my-app://renderer', 'http://localhost:5173'],
-});
+```sh
+curl -X PATCH https://api.clerk.com/v1/instance \
+  -H "Authorization: Bearer $CLERK_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"allowed_origins": ["my-app://renderer", "http://localhost:5173"]}'
 ```
 
-Pass the full list of origins each time you call it.
+Include your custom scheme origin and, during development, your dev server's origin.
 
 ## Content Security Policy
 
@@ -169,7 +164,7 @@ Replace `{fapi_host}` below with your instance's **Frontend API** host, found in
 ```
 default-src 'self';
 script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com https://*.protect.clerk.com;
-connect-src 'self' https://{fapi_host} https://*.protect.clerk.com https://clerk-telemetry.com;
+connect-src 'self' https://{fapi_host} https://*.protect.clerk.com:* https://clerk-telemetry.com;
 img-src 'self' https://img.clerk.com data:;
 style-src 'self' 'unsafe-inline';
 worker-src 'self' blob:;
@@ -185,7 +180,7 @@ Apply it either with a `<meta>` tag in your renderer HTML:
 ```html
 <meta
   http-equiv="Content-Security-Policy"
-  content="default-src 'self'; script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com https://*.protect.clerk.com; connect-src 'self' https://{fapi_host} https://*.protect.clerk.com https://clerk-telemetry.com; img-src 'self' https://img.clerk.com data:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com; form-action 'self';"
+  content="default-src 'self'; script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com https://*.protect.clerk.com; connect-src 'self' https://{fapi_host} https://*.protect.clerk.com:* https://clerk-telemetry.com; img-src 'self' https://img.clerk.com data:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com; form-action 'self';"
 />
 ```
 
@@ -206,7 +201,7 @@ app.whenReady().then(() => {
           [
             "default-src 'self'",
             `script-src 'self' 'unsafe-inline' https://${fapiHost} https://challenges.cloudflare.com https://*.protect.clerk.com`,
-            `connect-src 'self' https://${fapiHost} https://*.protect.clerk.com https://clerk-telemetry.com`,
+            `connect-src 'self' https://${fapiHost} https://*.protect.clerk.com:* https://clerk-telemetry.com`,
             "img-src 'self' https://img.clerk.com data:",
             "style-src 'self' 'unsafe-inline'",
             "worker-src 'self' blob:",
