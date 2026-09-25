@@ -4,12 +4,15 @@ import { Confirmation } from '../../blocks/confirmation';
 import { Section } from '../../components/section';
 import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import { fill, useMessages } from '../../localization';
+import type { ReverificationController } from '../reverification';
 import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
+import { UserProfileConnectedAccountsReverificationDialog } from './user-profile-connected-accounts-reverification.dialog';
 
 export interface UserProfileConnectionProvider {
   id: string;
   provider: string;
   iconUrl?: string;
+  monochromeIcon?: boolean;
   connectError?: string;
 }
 
@@ -25,6 +28,9 @@ export interface UserProfileConnectedAccountsSectionViewProps {
   fallbackFocus?: () => HTMLElement | null;
   accounts: UserProfileConnectedAccount[];
   availableProviders?: UserProfileConnectionProvider[];
+  pendingId?: string;
+  connectReverification?: ReverificationController;
+  removeReverification?: ReverificationController;
   onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
   onRemove?: (id: string) => void | Promise<void>;
@@ -34,12 +40,17 @@ export function UserProfileConnectedAccountsSectionView({
   accounts,
   fallbackFocus,
   availableProviders = [],
+  pendingId,
+  connectReverification,
+  removeReverification,
   onConnect,
   onReconnect,
   onRemove,
 }: UserProfileConnectedAccountsSectionViewProps) {
   const m = useMessages('userProfileConnectedAccounts');
   const section = useRef<HTMLElement>(null);
+  const actionTriggers = useRef(new Map<string, HTMLButtonElement>());
+  const lastActionId = useRef<string | undefined>(undefined);
   const removalFocus = useListRemovalFocus({
     ids: accounts.map(account => account.id),
     onRemove,
@@ -51,6 +62,37 @@ export function UserProfileConnectedAccountsSectionView({
   });
   const removeAccount = useMemo(() => Confirmation.createHandle<UserProfileConnectedAccount>(), []);
   const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
+  const isBusy = pendingId !== undefined;
+
+  const registerActionTrigger = (id: string) => (element: HTMLButtonElement | null) => {
+    if (element) {
+      actionTriggers.current.set(id, element);
+    } else {
+      actionTriggers.current.delete(id);
+    }
+  };
+
+  const reverificationFinalFocus = () => {
+    const id = lastActionId.current;
+    if (!id) {
+      return true;
+    }
+    return actionTriggers.current.get(id) ?? true;
+  };
+
+  const handleConnect = onConnect
+    ? (id: string) => {
+        lastActionId.current = id;
+        onConnect(id);
+      }
+    : undefined;
+
+  const handleReconnect = onReconnect
+    ? (id: string) => {
+        lastActionId.current = id;
+        onReconnect(id);
+      }
+    : undefined;
 
   return (
     <>
@@ -65,17 +107,24 @@ export function UserProfileConnectedAccountsSectionView({
               <UserProfileConnectedAccountRowView
                 key={account.id}
                 account={account}
-                triggerRef={removalFocus.registerTrigger(account.id)}
-                onReconnect={onReconnect}
+                triggerRef={element => {
+                  removalFocus.registerTrigger(account.id)(element);
+                  registerActionTrigger(account.id)(element);
+                }}
+                isDisabled={isBusy}
+                onReconnect={handleReconnect}
                 onRemove={onRemove ? account => removeAccount.open(account) : undefined}
               />
             ))}
-            {onConnect
+            {handleConnect
               ? availableProviders.map(provider => (
                   <UserProfileConnectedAccountRowView
                     key={provider.id}
                     account={provider}
-                    onConnect={onConnect}
+                    triggerRef={registerActionTrigger(provider.id)}
+                    isPending={pendingId === provider.id}
+                    isDisabled={isBusy}
+                    onConnect={handleConnect}
                   />
                 ))
               : null}
@@ -91,6 +140,13 @@ export function UserProfileConnectedAccountsSectionView({
           cancelLabel={m.removeDialog.cancel}
           finalFocus={removalFocus.finalFocus}
           onConfirm={account => removalFocus.remove(account.id)}
+          reverification={removeReverification}
+        />
+      ) : null}
+      {connectReverification ? (
+        <UserProfileConnectedAccountsReverificationDialog
+          reverification={connectReverification}
+          finalFocus={reverificationFinalFocus}
         />
       ) : null}
     </>

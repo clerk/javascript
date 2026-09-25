@@ -13,4 +13,9 @@ export const userProfileConnectedAccountsMessages = {
     confirm: 'Remove',
     cancel: 'Cancel',
   },
+  reverificationCancel: 'Cancel',
+  errors: {
+    generic: 'Something went wrong. Please try again.',
+    verificationIncomplete: 'Verification was not completed. Please try again.',
+  },
 } as const;
