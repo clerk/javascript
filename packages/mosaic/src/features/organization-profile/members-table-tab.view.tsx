@@ -7,6 +7,7 @@ import { Avatar } from '../../components/avatar';
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
+import { Icon } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
 import { panelStyles } from '../../components/profile';
@@ -127,6 +128,7 @@ export function MembersTableTabView({
               ref={inviteButton}
               onClick={onInvite}
             >
+              <Icon name='plus' />
               {m.invite}
             </Button>
           ) : null}

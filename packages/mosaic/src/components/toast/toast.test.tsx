@@ -3,6 +3,7 @@ import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
+import { Dialog } from '../dialog';
 import { type ToastManager, type ToastPromiseOptions, useToastManager } from './use-toast-manager';
 
 afterEach(() => cleanup());
@@ -131,5 +132,35 @@ describe('Mosaic Toast', () => {
     expect(screen.getByRole('dialog', { name: 'Sending invites' })).toBeInTheDocument();
     await done;
     expect(await screen.findByRole('dialog', { name: '2 invites sent' })).toBeInTheDocument();
+  });
+});
+
+describe('Toast under a modal', () => {
+  it('renders a toast fired inside a profile dialog within that dialog, above its content', async () => {
+    let inner: ToastManager | undefined;
+    function Capture() {
+      inner = useToastManager();
+      return null;
+    }
+    render(
+      <MosaicProvider>
+        <Dialog.Root defaultOpen>
+          <Dialog.Popup variant='profile'>
+            <button type='button'>Inside</button>
+            <Capture />
+          </Dialog.Popup>
+        </Dialog.Root>
+      </MosaicProvider>,
+    );
+    const inside = await screen.findByRole('button', { name: 'Inside' });
+    act(() => {
+      inner?.add({ label: 'Invitations sent' });
+    });
+
+    const toast = await screen.findByRole('dialog', { name: 'Invitations sent' });
+    const dialogPortal = inside.closest('[data-floating-ui-portal]');
+    expect(dialogPortal?.contains(toast)).toBe(true);
+    expect(inside.compareDocumentPosition(toast) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(toast.closest('[inert], [aria-hidden="true"]')).toBeNull();
   });
 });

@@ -4,6 +4,7 @@ import { membersTableTabMessages } from '../features/organization-profile/member
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileApiKeysPanelMessages } from '../features/organization-profile/organization-profile-api-keys-panel.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
+import { organizationProfileInviteMembersMessages } from '../features/organization-profile/organization-profile-invite-members.messages';
 import { organizationProfileWorkspaceSectionMessages } from '../features/organization-profile/organization-profile-workspace-section/organization-profile-workspace-section.messages';
 import { requestsTableTabMessages } from '../features/organization-profile/requests-table-tab.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
@@ -36,6 +37,7 @@ export const mosaicMessages = {
   organizationProfileDangerSection: organizationProfileDangerSectionMessages,
   organizationProfileWorkspaceSection: organizationProfileWorkspaceSectionMessages,
   organizationProfileApiKeysPanel: organizationProfileApiKeysPanelMessages,
+  organizationProfileInviteMembers: organizationProfileInviteMembersMessages,
   userProfileApiKeysPanel: userProfileApiKeysPanelMessages,
   reverification: reverificationMessages,
   userButton: userButtonMessages,

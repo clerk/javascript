@@ -30,17 +30,23 @@ export function Default() {
   );
 }
 
-export function Overlay() {
+function OverlayProfile() {
   const { activePage, setActivePage, pages } = useOrganizationProfileFixture();
+  return (
+    <OrganizationProfileView
+      activePage={activePage}
+      pages={pages}
+      onPageChange={setActivePage}
+    />
+  );
+}
+
+export function Overlay() {
   return (
     <Dialog.Root>
       <Dialog.Trigger render={<Button />}>Manage workspace</Dialog.Trigger>
       <Dialog.Popup variant='profile'>
-        <OrganizationProfileView
-          activePage={activePage}
-          pages={pages}
-          onPageChange={setActivePage}
-        />
+        <OverlayProfile />
       </Dialog.Popup>
     </Dialog.Root>
   );

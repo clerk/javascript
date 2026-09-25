@@ -15,6 +15,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
+import { ToastProvider } from '../toast/toast';
 import {
   backdropMotion,
   closeInsets,
@@ -402,22 +403,24 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
     </DialogContext.Provider>
   );
 
-  return (
-    <Primitive.Portal>
-      <Viewport
+  const viewport = (
+    <Viewport
+      variant={variant}
+      compactPlacement={compactPlacement}
+    >
+      <Backdrop
         variant={variant}
-        compactPlacement={compactPlacement}
-      >
-        <Backdrop
-          variant={variant}
-          // A card stacked on a card paints no scrim of its own — one serves the whole stack.
-          // Decided here rather than keyed on `data-stacked`, because whether this is a stack
-          // depends on the variant of the dialog beneath, which the headless layer has no notion of.
-          stacked={isNestedInDialog && host?.variant === 'card'}
-        />
-        {popup}
-      </Viewport>
-    </Primitive.Portal>
+        // A card stacked on a card paints no scrim of its own — one serves the whole stack.
+        // Decided here rather than keyed on `data-stacked`, because whether this is a stack
+        // depends on the variant of the dialog beneath, which the headless layer has no notion of.
+        stacked={isNestedInDialog && host?.variant === 'card'}
+      />
+      {popup}
+    </Viewport>
+  );
+
+  return (
+    <Primitive.Portal>{variant === 'profile' ? <ToastProvider>{viewport}</ToastProvider> : viewport}</Primitive.Portal>
   );
 });
 
