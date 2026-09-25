@@ -90,7 +90,7 @@ describe('password error feedback', () => {
     ).toBe('Your password must contain less than 64 characters.');
   });
 
-  it('retains the server fallback for untranslated special codes', () => {
+  it('uses the legacy wording when the new password matches the current one', () => {
     expect(
       format([
         {
@@ -99,7 +99,28 @@ describe('password error feedback', () => {
           meta: { param_name: 'new_password' },
         },
       ]).fields?.newPassword,
-    ).toBe('Use a different password');
+    ).toBe('New password cannot be the same as the current password.');
+  });
+
+  it('retains the server fallback for untranslated special codes', () => {
+    const defaults = resolveLocalization({ locale: 'en' });
+    const result = passwordFormError(
+      new ClerkAPIResponseError('Invalid', {
+        status: 422,
+        data: [
+          {
+            code: 'form_password_size_in_bytes_exceeded',
+            message: 'Password is too large',
+            meta: { param_name: 'new_password' },
+          },
+        ],
+      }),
+      false,
+      settings,
+      defaults.messages.userProfilePasswordSection,
+      defaults.locale,
+    );
+    expect(result).toMatchObject({ fields: { newPassword: 'Password is too large' } });
   });
 
   it('handles missing and unrecognized suggestion metadata without leaking codes', () => {
