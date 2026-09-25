@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { useRef } from 'react';
 
 import { Panel } from '../../components/panel';
@@ -33,6 +33,8 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
   availableWeb3Providers?: UserProfileWeb3Provider[];
   onConnectAccount?: (id: string) => void;
   onRemoveConnectedAccount?: (id: string) => void | Promise<void>;
+  /** Connected accounts section. Replaces the one built from `connectedAccounts` and its callbacks. */
+  connectedAccountsSlot?: ReactNode;
   onConnectWeb3Wallet?: (id: string) => void;
   onSetPrimaryWeb3Wallet?: (id: string) => void;
   onRemoveWeb3Wallet?: (id: string) => void | Promise<void>;
@@ -77,6 +79,7 @@ export function UserProfileProfilePanelView({
   onRemovePhone,
   onConnectAccount,
   onRemoveConnectedAccount,
+  connectedAccountsSlot,
   onConnectWeb3Wallet,
   onSetPrimaryWeb3Wallet,
   onRemoveWeb3Wallet,
@@ -123,14 +126,16 @@ export function UserProfileProfilePanelView({
           onSubmitName={onSubmitName}
           onSubmitUsername={onSubmitUsername}
         />
-        <UserProfileConnectedAccountsSectionView
-          fallbackFocus={() => pageTitle.current}
-          accounts={connectedAccounts}
-          availableProviders={availableConnectionProviders}
-          onReconnect={onReconnectAccount}
-          onConnect={onConnectAccount}
-          onRemove={onRemoveConnectedAccount}
-        />
+        {connectedAccountsSlot ?? (
+          <UserProfileConnectedAccountsSectionView
+            fallbackFocus={() => pageTitle.current}
+            accounts={connectedAccounts}
+            availableProviders={availableConnectionProviders}
+            onReconnect={onReconnectAccount}
+            onConnect={onConnectAccount}
+            onRemove={onRemoveConnectedAccount}
+          />
+        )}
         <UserProfileWeb3WalletsSectionView
           fallbackFocus={() => pageTitle.current}
           wallets={web3Wallets}
