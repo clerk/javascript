@@ -4,6 +4,8 @@ import { colorVars, durationVars, fontFamilyVars, radiusVars, space, typeScaleVa
 
 export const styles = stylex.create({
   root: {
+    '--cl-layout-duration': '200ms',
+    '--cl-layout-easing': 'ease-out',
     padding: space['2'],
     borderRadius: radiusVars['--cl-radius-md'],
     gap: space['2'],
@@ -13,6 +15,7 @@ export const styles = stylex.create({
     display: 'flex',
     flexWrap: 'wrap',
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
+    position: 'relative',
     minHeight: space['20'],
     width: '100%',
   },
