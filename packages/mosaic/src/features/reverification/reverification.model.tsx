@@ -13,15 +13,15 @@ import { useMosaicSupportEmail } from '../../hooks/useMosaicSupportEmail';
 import type {
   ReverificationMethod,
   ReverificationPreparableMethod,
-  ReverificationProps,
   ReverificationResult,
   ReverificationStage,
+  ReverificationState,
 } from './reverification.types';
 import { pickStartingMethod } from './reverification.utils';
 
 export type ReverificationReadyModel = {
   status: 'ready';
-  isActive: boolean;
+  phase: ReverificationState['phase'];
   supportEmail: string;
   start: () => Promise<ReverificationResult>;
   prepare: (method: ReverificationPreparableMethod) => Promise<void>;
@@ -30,7 +30,9 @@ export type ReverificationReadyModel = {
   cancel: () => void;
 };
 
-export type ReverificationModel = { status: 'loading'; isActive: boolean } | ReverificationReadyModel;
+export type ReverificationModel =
+  | { status: 'loading'; phase: ReverificationState['phase']; cancel: () => void }
+  | ReverificationReadyModel;
 
 function toError(error: unknown): Error {
   if (isClerkAPIResponseError(error)) {
@@ -114,15 +116,21 @@ function toResult(
   };
 }
 
-export function useReverificationModel(props: ReverificationProps): ReverificationModel {
+export function useReverificationModel(reverificationState: ReverificationState): ReverificationModel {
   const { session } = useSession();
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
   const supportEmail = useMosaicSupportEmail();
-  const { isActive, cancel, complete, level } = props;
+  const phase = reverificationState.phase;
+  const level = reverificationState.phase === 'active' ? reverificationState.level : undefined;
+  const cancel = reverificationState.phase === 'active' ? reverificationState.cancel : undefined;
+  const complete = reverificationState.phase === 'active' ? reverificationState.complete : undefined;
+  const cancelVerification = () => {
+    cancel?.();
+  };
 
   if (!session || !environment || supportEmail === undefined) {
-    return { status: 'loading', isActive };
+    return { status: 'loading', phase, cancel: cancelVerification };
   }
 
   const webAuthnSupported = isWebAuthnSupported();
@@ -133,7 +141,7 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
 
   return {
     status: 'ready',
-    isActive,
+    phase,
     supportEmail,
     start: async () => {
       try {
@@ -142,9 +150,7 @@ export function useReverificationModel(props: ReverificationProps): Reverificati
         throw toError(error);
       }
     },
-    cancel: () => {
-      cancel?.();
-    },
+    cancel: cancelVerification,
     prepare: async method => {
       try {
         switch (method.strategy) {

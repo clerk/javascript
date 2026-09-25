@@ -39,8 +39,8 @@ Two shapes, chosen by whether the slice fetches its own data:
 - A **wrapper composes** model + controller + view, and the view is a pure
   function of props (`user-button.tsx`).
 - A **leaf view owns its controller** and takes the effect as a prop
-  (`UserProfileDeleteSectionView` calls `useUserProfileDeleteSectionController`
-  with its `onDelete`). Still no Clerk — the effect arrives from above.
+  (`UserProfileUsernameRowView` calls `useUserProfileEditUsernameController`
+  with its `onSubmit`). Still no Clerk — the effect arrives from above.
 
 ## Where the strings live
 

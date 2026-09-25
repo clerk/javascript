@@ -3,9 +3,16 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../MosaicProvider';
+import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
+
+function DeleteAccount() {
+  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
+  return <UserProfileDeleteSectionView {...controller} />;
+}
 
 const props: UserProfileProfilePanelViewProps = {
   allowMultipleAccounts: true,
@@ -281,16 +288,12 @@ describe('UserProfileProfilePanelView', () => {
     expect(within(phoneSection).getByRole('button', { name: 'Add phone number' })).toBeInTheDocument();
   });
 
-  it('renders connected accounts and the danger zone when provided', async () => {
-    const onRemoveConnectedAccount = vi.fn();
-    const onDeleteAccount = vi.fn(() => Promise.resolve());
-    const user = userEvent.setup();
+  it('renders connected accounts and the danger zone when provided', () => {
     renderView({
       connectedAccounts: [
         { id: 'google', provider: 'Google', identifier: 'test@google.com', iconUrl: 'https://example.com/google.svg' },
       ],
-      onRemoveConnectedAccount,
-      onDeleteAccount,
+      deleteAccountSlot: <DeleteAccount />,
     });
 
     expect(screen.getByRole('heading', { level: 4, name: 'Connected accounts' })).toBeInTheDocument();
@@ -300,12 +303,6 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
     );
-    await user.click(screen.getByRole('button', { name: 'Delete account' }));
-    const deleteDialog = screen.getByRole('dialog');
-    await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
-    await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
-
-    expect(onDeleteAccount).toHaveBeenCalledOnce();
   });
 
   it('renders connected provider and Web3 images inside icon frames', () => {

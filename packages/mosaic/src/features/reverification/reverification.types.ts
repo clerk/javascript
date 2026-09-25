@@ -18,8 +18,7 @@ export type ReverificationMethod =
 
 export type ReverificationPreparableMethod = Extract<ReverificationMethod, { strategy: 'email_code' | 'phone_code' }>;
 
-export type ReverificationViewProps = {
-  step: ReverificationStep;
+type ReverificationViewFields = {
   direction?: FlowDirection;
   value: string;
   onValueChange: (value: string) => void;
@@ -39,9 +38,14 @@ export type ReverificationViewProps = {
   resendRemainingSeconds?: number;
 };
 
-export type ReverificationProps =
-  | { isActive: false; complete?: undefined; cancel?: undefined; level?: undefined }
-  | { isActive: true; complete: () => void; cancel: () => void; level: SessionVerificationLevel | undefined };
+export type ReverificationViewProps = ReverificationViewFields & {
+  step: ReverificationStep;
+};
+
+export type ReverificationState =
+  | { phase: 'inactive' }
+  | { phase: 'active'; complete: () => void; cancel: () => void; level: SessionVerificationLevel | undefined }
+  | { phase: 'retrying' };
 
 export type ReverificationResult = {
   status: 'needs_first_factor' | 'needs_second_factor' | 'complete';

@@ -1,21 +1,39 @@
-import { useReverificationController } from './reverification.controller';
+import { type ReverificationController, useReverificationController } from './reverification.controller';
 import { useReverificationModel } from './reverification.model';
-import type { ReverificationProps } from './reverification.types';
-import { ReverificationView } from './reverification.view';
+import { ReverificationPending, ReverificationUnavailable, ReverificationView } from './reverification.view';
+import {
+  type ReverificationFetcher,
+  useReverificationWithState,
+  type UseReverificationWithStateOptions,
+  type UseReverificationWithStateResult,
+} from './use-reverification-with-state';
 
-export function Reverification(props: ReverificationProps) {
-  const model = useReverificationModel(props);
+export type UseReverificationFlowResult<F extends ReverificationFetcher = ReverificationFetcher> = readonly [
+  UseReverificationWithStateResult<F>[0],
+  ReverificationController,
+];
+
+export function useReverificationFlow<F extends ReverificationFetcher = ReverificationFetcher>(
+  fetcher: F,
+  options?: UseReverificationWithStateOptions,
+): UseReverificationFlowResult<F> {
+  const [wrappedFetcher, reverificationState] = useReverificationWithState(fetcher, options);
+  const model = useReverificationModel(reverificationState);
   const controller = useReverificationController(model);
 
-  if (!props.isActive) {
+  return [wrappedFetcher, controller];
+}
+
+export function Reverification(controller: ReverificationController) {
+  if (controller.status === 'idle') {
     return null;
   }
 
-  if (controller.status !== 'ready') {
-    // TODO: Implement unavailable and loading states, could also live in the .view.
-    return null;
+  if (controller.status === 'loading') {
+    return <ReverificationPending />;
+  } else if (controller.status === 'unavailable') {
+    return <ReverificationUnavailable />;
   }
 
-  const { status: _status, ...viewProps } = controller;
-  return <ReverificationView {...viewProps} />;
+  return <ReverificationView {...controller} />;
 }

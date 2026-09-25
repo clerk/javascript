@@ -1,22 +1,11 @@
 import { Destructive } from '../../../blocks/destructive';
+import type { DestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
-import { useUserProfileDeleteSectionController } from './user-profile-delete-section.controller';
 
-export interface UserProfileDeleteSectionViewProps {
-  /**
-   * Deletes the account. Resolve and the confirmation dialog closes; reject with an `Error`
-   * and it stays open with that message under the confirmation field.
-   */
-  onDelete: () => Promise<void>;
-}
-
-export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSectionViewProps) {
+export function UserProfileDeleteSectionView(destructiveProps: DestructiveController) {
   const m = useMessages('userProfileDeleteSection');
-  const { isOpen, onOpenChange, onConfirm, isDeleting, errorMessage } = useUserProfileDeleteSectionController({
-    onDelete,
-  });
 
   return (
     <Section.Root>
@@ -30,8 +19,7 @@ export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSect
             </Section.Content>
             <Section.Actions>
               <Destructive
-                open={isOpen}
-                onOpenChange={onOpenChange}
+                {...destructiveProps}
                 trigger={
                   <Button
                     color='negative'
@@ -47,9 +35,6 @@ export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSect
                 confirmationValue={m.fieldPlaceholder}
                 actionLabel={m.actionLabel}
                 cancelLabel={m.cancelLabel}
-                onDelete={onConfirm}
-                isDeleting={isDeleting}
-                errorMessage={errorMessage}
               />
             </Section.Actions>
           </Section.Item>

@@ -50,7 +50,7 @@ function startActor(deps: ReverificationDeps = seatedDeps()) {
 function readyModel(overrides: Partial<ReverificationReadyModel> = {}): ReverificationReadyModel {
   return {
     status: 'ready',
-    isActive: true,
+    phase: 'active',
     supportEmail: 'support@example.com',
     start: vi.fn(async () => firstFactorResult()),
     prepare: vi.fn(async () => {}),
@@ -290,17 +290,24 @@ describe('reverificationMachine', () => {
 
 describe('useReverificationController', () => {
   it('is idle when reverification is not active', () => {
-    const { result } = renderHook(() => useReverificationController(readyModel({ isActive: false })));
-    expect(result.current.status).toBe('idle');
+    const { result } = renderHook(() => useReverificationController(readyModel({ phase: 'inactive' })));
+    expect(result.current).toEqual({ status: 'idle', phase: 'inactive' });
   });
 
   it('is loading while the model is still waiting on Clerk', () => {
+    const cancel = vi.fn();
     const loading: ReverificationModel = {
       status: 'loading',
-      isActive: true,
+      phase: 'active',
+      cancel,
     };
     const { result } = renderHook(() => useReverificationController(loading));
     expect(result.current.status).toBe('loading');
+    if (result.current.status !== 'loading') {
+      throw new Error('expected loading');
+    }
+    result.current.onCancel?.();
+    expect(cancel).toHaveBeenCalledOnce();
   });
 
   it('is unavailable when start fails', async () => {
@@ -413,13 +420,49 @@ describe('useReverificationController', () => {
       }
     });
 
-    rerender({ model: { ...activeModel, isActive: false } });
+    rerender({ model: { ...activeModel, phase: 'inactive' } });
     expect(result.current.status).toBe('idle');
 
     act(() => {
       attempt.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
     });
     await waitFor(() => expect(cancel).toHaveBeenCalledOnce());
+    expect(finish).not.toHaveBeenCalled();
+  });
+
+  it('cancels an in-flight attempt before it can finish', async () => {
+    const attempt = deferred<ReverificationResult>();
+    const finish = vi.fn(() => Promise.resolve());
+    const cancel = vi.fn();
+    const { result } = renderHook(() =>
+      useReverificationController(readyModel({ attempt: () => attempt.promise, finish, cancel })),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    act(() => {
+      if (result.current.status === 'ready') {
+        result.current.onValueChange('secret');
+        result.current.onSubmit();
+      }
+    });
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.isPending).toBe(true);
+      }
+    });
+
+    act(() => {
+      if (result.current.status === 'ready') {
+        result.current.onCancel?.();
+      }
+    });
+    expect(cancel).toHaveBeenCalledOnce();
+
+    act(() => {
+      attempt.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
+    });
+    await waitFor(() => expect(cancel).toHaveBeenCalledTimes(2));
     expect(finish).not.toHaveBeenCalled();
   });
 
@@ -494,7 +537,7 @@ describe('useReverificationController', () => {
     await waitFor(() => expect(result.current.status).toBe('ready'));
     expect(start).toHaveBeenCalledOnce();
 
-    rerender({ model: { status: 'loading', isActive: true } });
+    rerender({ model: { status: 'loading', phase: 'active', cancel: vi.fn() } });
     expect(result.current.status).toBe('ready');
     if (result.current.status === 'ready') {
       expect(result.current.step).toBe('password');
@@ -532,7 +575,7 @@ describe('useReverificationController', () => {
       }
     });
 
-    rerender({ model: { status: 'loading', isActive: true } });
+    rerender({ model: { status: 'loading', phase: 'active', cancel: vi.fn() } });
     expect(result.current.status).toBe('ready');
     if (result.current.status === 'ready') {
       expect(result.current.step).toBe('password');
@@ -554,10 +597,10 @@ describe('useReverificationController', () => {
     );
 
     await waitFor(() => expect(result.current.status).toBe('ready'));
-    rerender({ model: readyModel({ start, isActive: false }) });
-    expect(result.current.status).toBe('idle');
+    rerender({ model: readyModel({ start, phase: 'inactive' }) });
+    expect(result.current).toEqual({ status: 'idle', phase: 'inactive' });
 
-    rerender({ model: readyModel({ start, isActive: true }) });
+    rerender({ model: readyModel({ start, phase: 'active' }) });
     await waitFor(() => expect(result.current.status).toBe('ready'));
     expect(start).toHaveBeenCalledTimes(2);
   });
@@ -711,5 +754,62 @@ describe('useReverificationController', () => {
         expect(result.current.canResend).toBe(true);
       }
     });
+  });
+
+  it('keeps the last factor pending during retrying and resets only when inactive', async () => {
+    const finish = deferred<void>();
+    const start = vi.fn(() => Promise.resolve(firstFactorResult()));
+    const cancel = vi.fn();
+    const active = readyModel({
+      start,
+      cancel,
+      attempt: vi.fn(() =>
+        Promise.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null })),
+      ),
+      finish: () => finish.promise,
+    });
+    const { result, rerender } = renderHook(
+      ({ model }: { model: ReverificationModel }) => useReverificationController(model),
+      { initialProps: { model: active } },
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    act(() => {
+      if (result.current.status === 'ready') {
+        result.current.onValueChange('secret');
+        result.current.onSubmit();
+      }
+    });
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.step).toBe('password');
+        expect(result.current.isPending).toBe(true);
+      }
+    });
+
+    rerender({ model: { ...active, phase: 'retrying' } });
+    expect(result.current.status).toBe('ready');
+    if (result.current.status === 'ready') {
+      expect(result.current.step).toBe('password');
+      expect(result.current.isPending).toBe(true);
+      expect(result.current.onCancel).toBeUndefined();
+    }
+    expect(start).toHaveBeenCalledOnce();
+
+    act(() => {
+      finish.resolve();
+    });
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.step).toBe('password');
+        expect(result.current.isPending).toBe(true);
+      }
+    });
+    expect(cancel).not.toHaveBeenCalled();
+
+    rerender({ model: { ...active, phase: 'inactive' } });
+    expect(result.current).toEqual({ status: 'idle', phase: 'inactive' });
   });
 });
