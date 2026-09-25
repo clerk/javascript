@@ -62,6 +62,7 @@ import type {
   __internal_EnableOrganizationsPromptProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
+  __internal_ProtectCheckModalProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   APIKeysNamespace,
@@ -989,6 +990,46 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUI
       ?.then(ui => ui.ensureMounted())
       .then(controls => controls.closeModal('enableOrganizationsPrompt'));
+  };
+
+  #protectCheckHandlers = 0;
+
+  public __internal_registerProtectCheckHandler = (): (() => void) => {
+    this.#protectCheckHandlers += 1;
+    let released = false;
+    return () => {
+      if (released) {
+        return;
+      }
+      released = true;
+      this.#protectCheckHandlers -= 1;
+    };
+  };
+
+  get __internal_hasProtectCheckHandler(): boolean {
+    return this.#protectCheckHandlers > 0;
+  }
+
+  public __internal_openProtectCheckModal = (
+    props: Omit<__internal_ProtectCheckModalProps, 'onResolved'>,
+  ): Promise<void> => {
+    if (!this.#clerkUI) {
+      return Promise.resolve();
+    }
+    return this.#clerkUI
+      .then(ui => ui.ensureMounted())
+      .then(
+        controls =>
+          new Promise<void>(resolve => {
+            controls.openModal('protectCheck', {
+              ...props,
+              onResolved: () => {
+                controls.closeModal('protectCheck');
+                resolve();
+              },
+            });
+          }),
+      );
   };
 
   public __internal_openBlankCaptchaModal = (): Promise<unknown> => {

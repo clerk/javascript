@@ -4003,6 +4003,79 @@ describe('Clerk singleton', () => {
     });
   });
 
+  describe('protect check modal', () => {
+    beforeEach(() => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => true,
+          isDevelopmentOrStaging: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+        }),
+      );
+    });
+
+    const gatedSignIn = () => ({
+      protectCheck: { status: 'pending', token: 'tok', sdkUrl: 'https://p.example.com/sdk.js' },
+    });
+
+    it('resolves at once when Clerk was loaded without UI components', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await expect(sut.__internal_openProtectCheckModal({ resource: gatedSignIn() as any })).resolves.toBeUndefined();
+    });
+
+    it('opens the modal and resolves once the modal reports the gate cleared', async () => {
+      const openModal = vi.fn();
+      const closeModal = vi.fn();
+      const mockClerkUICtor = vi.fn(function () {
+        return { ensureMounted: () => Promise.resolve({ openModal, closeModal }) };
+      });
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      const resource = gatedSignIn() as any;
+
+      let settled = false;
+      const pending = sut.__internal_openProtectCheckModal({ resource }).then(() => {
+        settled = true;
+      });
+      await vi.waitFor(() => expect(openModal).toHaveBeenCalled());
+      expect(openModal).toHaveBeenCalledWith('protectCheck', {
+        resource,
+        onResolved: expect.any(Function),
+      });
+      expect(settled).toBe(false);
+
+      openModal.mock.calls[0][1].onResolved();
+      await pending;
+      expect(closeModal).toHaveBeenCalledWith('protectCheck');
+      expect(settled).toBe(true);
+    });
+
+    it('counts registered prebuilt handlers and releases each one once', () => {
+      const sut = new Clerk(productionPublishableKey);
+      expect(sut.__internal_hasProtectCheckHandler).toBe(false);
+
+      const releaseFirst = sut.__internal_registerProtectCheckHandler();
+      const releaseSecond = sut.__internal_registerProtectCheckHandler();
+      expect(sut.__internal_hasProtectCheckHandler).toBe(true);
+
+      releaseFirst();
+      releaseFirst();
+      expect(sut.__internal_hasProtectCheckHandler).toBe(true);
+
+      releaseSecond();
+      expect(sut.__internal_hasProtectCheckHandler).toBe(false);
+    });
+  });
+
   describe('ui.ClerkUI option', () => {
     beforeEach(() => {
       mockEnvironmentFetch.mockReturnValue(

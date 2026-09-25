@@ -2,6 +2,7 @@ import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../events';
+import { ProtectCheckGate } from '../../protectCheckGate';
 import { signInErrorSignal, signInResourceSignal } from '../../signals';
 import { BaseResource } from '../internal';
 import { SignIn } from '../SignIn';
@@ -17,6 +18,10 @@ vi.mock('../../../utils/authenticateWithPopup', async () => {
 
 // Import the mocked function after mocking
 import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPopup';
+
+beforeEach(() => {
+  vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+});
 
 // Mock the CaptchaChallenge module
 vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
@@ -3672,5 +3677,46 @@ describe('SignIn', () => {
       ]);
       expect(new SignIn(snapshot).ssoBypassFirstFactors).toEqual(signIn.ssoBypassFirstFactors);
     });
+  });
+});
+
+describe('SignIn protect_check gate', () => {
+  const clerk = {} as any;
+  let previousClerk: any;
+
+  beforeEach(() => {
+    previousClerk = BaseResource.clerk;
+    BaseResource.clerk = clerk;
+  });
+
+  afterEach(() => {
+    BaseResource.clerk = previousClerk;
+  });
+
+  const gatedResponse = {
+    client: null,
+    response: {
+      id: 'signin_123',
+      protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
+    },
+  };
+
+  it('hands the resource to the gate after a mutation', async () => {
+    BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
+    const signIn = new SignIn({ id: 'signin_123' } as any);
+
+    await signIn.create({ identifier: 'a@example.com' });
+
+    expect(signIn.protectCheck?.token).toBe('challenge-token');
+    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(clerk, signIn);
+  });
+
+  it('hands the resource to the gate after a reload', async () => {
+    BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
+    const signIn = new SignIn({ id: 'signin_123' } as any);
+
+    await signIn.reload();
+
+    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(clerk, signIn);
   });
 });
