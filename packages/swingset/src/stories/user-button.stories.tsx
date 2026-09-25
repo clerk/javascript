@@ -20,8 +20,7 @@ export const meta: StoryMeta = {
   group: 'User Button',
   title: 'UserButton',
   label: 'User button',
-  status: 'wip',
-  substatus: 'needs wire-up',
+  status: 'stable',
   source: 'packages/mosaic/src/features/user-button/user-button.view.tsx',
 };
 
