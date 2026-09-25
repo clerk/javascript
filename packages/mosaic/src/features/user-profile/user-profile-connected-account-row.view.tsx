@@ -4,7 +4,7 @@ import type { Ref } from 'react';
 import type { ActionMenuAction } from '../../components/action-menu';
 import { ActionMenu } from '../../components/action-menu';
 import { Badge } from '../../components/badge';
-import { Button } from '../../components/button';
+import { SubmitButton } from '../../components/button';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
 import { fill, useMessages } from '../../localization';
@@ -14,12 +14,16 @@ import type { UserProfileConnectedAccount } from './user-profile-connected-accou
 export function UserProfileConnectedAccountRowView({
   account,
   triggerRef,
+  isPending = false,
+  isDisabled = false,
   onConnect,
   onReconnect,
   onRemove,
 }: {
   account: UserProfileConnectedAccount;
   triggerRef?: Ref<HTMLButtonElement>;
+  isPending?: boolean;
+  isDisabled?: boolean;
   onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
   onRemove?: (account: UserProfileConnectedAccount) => void;
@@ -27,7 +31,7 @@ export function UserProfileConnectedAccountRowView({
   const m = useMessages('userProfileConnectedAccounts');
   const iconUrl = account.iconUrl?.trim();
   const actions: ActionMenuAction[] = [];
-  if (account.status === 'reconnect' && onReconnect) {
+  if (account.status === 'reconnect' && onReconnect && !isDisabled) {
     actions.push({ label: m.reconnect, onClick: () => onReconnect(account.id) });
   }
   if (onRemove && account.canRemove !== false) {
@@ -38,7 +42,12 @@ export function UserProfileConnectedAccountRowView({
       <Section.Item>
         <Section.Media size='lg'>
           <IconFrame>
-            {iconUrl ? (
+            {iconUrl && account.monochromeIcon ? (
+              <span
+                aria-hidden
+                {...stylex.props(styles.maskedIcon, styles.maskImage(iconUrl))}
+              />
+            ) : iconUrl ? (
               <img
                 src={iconUrl}
                 alt=''
@@ -71,11 +80,15 @@ export function UserProfileConnectedAccountRowView({
         </Section.Content>
         {onConnect ? (
           <Section.Actions>
-            <Button
+            <SubmitButton
+              ref={triggerRef}
+              type='button'
               size='sm'
               variant='outline'
               color='neutral'
               aria-label={fill(m.connectLabel, { provider: account.provider })}
+              isPending={isPending}
+              disabled={isDisabled && !isPending}
               onClick={() => onConnect(account.id)}
             >
               {m.connect}
@@ -84,7 +97,7 @@ export function UserProfileConnectedAccountRowView({
                 placement='inline-end'
                 size='sm'
               />
-            </Button>
+            </SubmitButton>
           </Section.Actions>
         ) : actions.length > 0 ? (
           <Section.Actions>

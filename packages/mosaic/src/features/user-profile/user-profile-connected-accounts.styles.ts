@@ -5,6 +5,16 @@ import { colorVars, radiusVars, space } from '../../tokens.stylex';
 export const styles = stylex.create({
   connectRow: { justifyContent: 'center' },
   icon: { display: 'block', objectFit: 'contain', height: space['6'], width: space['6'] },
+  maskedIcon: {
+    backgroundColor: 'currentColor',
+    display: 'block',
+    maskPosition: 'center',
+    maskRepeat: 'no-repeat',
+    maskSize: 'contain',
+    height: space['6'],
+    width: space['6'],
+  },
+  maskImage: (url: string) => ({ maskImage: `url(${JSON.stringify(url)})` }),
   fallback: {
     borderRadius: radiusVars['--cl-radius-sm'],
     alignItems: 'center',
