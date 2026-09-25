@@ -244,9 +244,9 @@ const FieldSuccess = React.forwardRef<HTMLParagraphElement, FieldSuccessProps>(f
   );
 });
 
-export type FieldInfoProps = MosaicComponentProps<'p'>;
+export type FieldHintProps = MosaicComponentProps<'p'>;
 
-const FieldInfo = React.forwardRef<HTMLParagraphElement, FieldInfoProps>(function MosaicFieldInfo(props, ref) {
+const FieldHint = React.forwardRef<HTMLParagraphElement, FieldHintProps>(function MosaicFieldHint(props, ref) {
   return (
     <FieldFeedback
       ref={ref}
@@ -264,5 +264,5 @@ export const Field = {
   Message,
   Error: FieldError,
   Success: FieldSuccess,
-  Info: FieldInfo,
+  Hint: FieldHint,
 };

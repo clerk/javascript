@@ -41,7 +41,7 @@ describe('Mosaic Field', () => {
         <Field.Label>Password</Field.Label>
         <Input />
         <Field.Message>
-          <Field.Info>Try a longer password.</Field.Info>
+          <Field.Hint>Try a longer password.</Field.Hint>
         </Field.Message>
       </Field.Root>,
     );

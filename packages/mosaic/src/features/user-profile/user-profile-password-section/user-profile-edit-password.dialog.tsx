@@ -249,7 +249,7 @@ function PasswordField({
       </InputGroup.Root>
       <Field.Message>
         <Field.Error>{feedbackType === 'error' ? message?.message : null}</Field.Error>
-        <Field.Info>{feedbackType === 'info' || feedbackType === 'warning' ? message?.message : null}</Field.Info>
+        <Field.Hint>{feedbackType === 'info' || feedbackType === 'warning' ? message?.message : null}</Field.Hint>
         <Field.Success>{feedbackType === 'success' ? message?.message : null}</Field.Success>
       </Field.Message>
     </Field.Root>
