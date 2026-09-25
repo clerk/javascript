@@ -24,16 +24,11 @@ export const userProfilePasswordSectionMessages = {
   back: 'Back',
   save: 'Save changes',
   rules: {
-    minLength: 'Your password must contain {length} or more characters.',
-    maxLength: 'Use fewer than {length} characters.',
-    lowercase: 'Add a lowercase letter.',
-    uppercase: 'Add an uppercase letter.',
-    number: 'Add a number.',
-    special: 'Add a special character.',
     weak: 'Your password is not strong enough.',
     stronger: 'Your password works, but could be stronger. Try adding more characters.',
     strong: 'Your password meets all the necessary requirements.',
   },
+
   complexity: {
     sentence: 'Your password must contain {requirements}.',
     minimumLength: '{length} or more characters',
