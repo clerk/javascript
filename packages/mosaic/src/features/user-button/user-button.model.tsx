@@ -116,7 +116,7 @@ function displayName(user: UserResource): string {
   return getFullName(user) || getIdentifier(user);
 }
 
-function toMembership(organization: OrganizationResource, roleLabel?: string): UserButtonMembership {
+function toMembership(organization: OrganizationResource): UserButtonMembership {
   return {
     kind: 'membership',
     organizationId: organization.id,
@@ -125,7 +125,6 @@ function toMembership(organization: OrganizationResource, roleLabel?: string): U
     membersCount: organization.membersCount,
     // TODO: set `planLabel` once the organization resource carries its billing plan; the view and
     // types already render it, so today the badge only appears with Swingset's mock data.
-    roleLabel,
   };
 }
 
@@ -146,11 +145,7 @@ export function useUserButtonModel(options?: UserButtonModelOptions, modals?: Us
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   // The active org names the trigger. That is not a request to turn Organizations on.
-  const {
-    isLoaded: isOrgLoaded,
-    organization,
-    membership,
-  } = useOrganization({
+  const { isLoaded: isOrgLoaded, organization } = useOrganization({
     __internal_skipAttemptToEnableOrganizations: true,
   });
   const clerk = useClerk();
@@ -219,7 +214,7 @@ export function useUserButtonModel(options?: UserButtonModelOptions, modals?: Us
   const suggestionData = userSuggestions.data ?? [];
   const invitationData = userInvitations.data ?? [];
 
-  const memberships: UserButtonMembership[] = membershipData.map(m => toMembership(m.organization, m.roleName));
+  const memberships: UserButtonMembership[] = membershipData.map(m => toMembership(m.organization));
 
   const suggestions: UserButtonSuggestion[] = suggestionData.map(s => ({
     kind: 'suggestion',
@@ -268,7 +263,7 @@ export function useUserButtonModel(options?: UserButtonModelOptions, modals?: Us
     organizationsEnabled,
     renderBranding: displayConfig.branded,
     activeSession: toSession(session.id, user),
-    activeOrganization: organization ? toMembership(organization, membership?.roleName) : null,
+    activeOrganization: organization ? toMembership(organization) : null,
     // The user resource settles this before the paginated list answers; the count covers a stale resource.
     hasOrganizations: user.organizationMemberships.length > 0 || (userMemberships.count ?? 0) > 0,
     hidePersonal: forceOrganizationSelection || (options?.hidePersonal ?? false),

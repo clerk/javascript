@@ -20,13 +20,12 @@ import { Spinner } from '../../components/spinner';
 import type { IconName } from '../../icons/registry';
 import type { MosaicMessages } from '../../localization';
 import { fill, plural, useLocale, useMessages } from '../../localization';
-import { mergeStyleProps, themeProps } from '../../props';
+import { themeProps } from '../../props';
 import { applyOrder } from '../../utils/apply-order';
 import { focusOutline } from '../../utils/focus-outline.styles';
-import { reset } from '../../utils/reset.styles';
 import { rtl } from '../../utils/rtl.styles';
 import { truncationStyles } from '../../utils/typography.styles';
-import type { UserButtonAction, UserButtonLayout } from './user-button.layout';
+import type { UserButtonAction, UserButtonLayout, UserButtonSlot } from './user-button.layout';
 import { resolveUserButtonLayout } from './user-button.layout';
 import { styles } from './user-button.styles';
 import type {
@@ -54,7 +53,7 @@ export type * from './user-button.types';
 export const userButtonBusyKeys = {
   selectOrganization: (organizationId: string | null) => `select-org:${organizationId ?? 'personal'}`,
   switchSession: (sessionId: string) => `switch:${sessionId}`,
-  signOutSession: (sessionId: string) => `sign-out:${sessionId}`,
+  signOutSession: (sessionId: string, from: UserButtonSlot) => `sign-out:${from}:${sessionId}`,
   signOutAll: () => 'sign-out-all',
   acceptSuggestion: (suggestionId: string) => `accept-suggestion:${suggestionId}`,
   acceptInvitation: (invitationId: string) => `accept-invitation:${invitationId}`,
@@ -99,7 +98,7 @@ type ActiveWorkspace =
       shape: 'square';
       organization: UserButtonMembership;
     }
-  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle'; organization: UserButtonMembership | null }
+  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle' }
   | { kind: 'none'; name: string; imageUrl?: string; shape: 'square' };
 
 /**
@@ -109,29 +108,26 @@ type ActiveWorkspace =
 type Messages = MosaicMessages['userButton'];
 
 function leadWorkspace(
-  { layout, activeOrganization, activeSession, hidePersonal }: UserButtonContextValue,
+  { layout, activeOrganization, activeSession }: UserButtonContextValue,
   m: Messages,
 ): ActiveWorkspace {
-  if (layout.leadWith === 'organization') {
-    if (activeOrganization) {
-      return {
-        kind: 'organization',
-        name: activeOrganization.name,
-        imageUrl: activeOrganization.imageUrl,
-        shape: 'square',
-        organization: activeOrganization,
-      };
-    }
-    if (hidePersonal) {
-      return { kind: 'none', name: m.workspaces.notSelected, shape: 'square' };
-    }
+  if (layout.lead === 'organization' && activeOrganization) {
+    return {
+      kind: 'organization',
+      name: activeOrganization.name,
+      imageUrl: activeOrganization.imageUrl,
+      shape: 'square',
+      organization: activeOrganization,
+    };
+  }
+  if (layout.lead === 'none') {
+    return { kind: 'none', name: m.workspaces.notSelected, shape: 'square' };
   }
   return {
     kind: 'user',
     name: activeSession.name,
     imageUrl: activeSession.imageUrl,
     shape: 'circle',
-    organization: layout.describeAccountByOrganization ? activeOrganization : null,
   };
 }
 
@@ -143,10 +139,6 @@ function membershipSubtitle(membership: UserButtonMembership, m: Messages, local
   const members =
     membership.membersCount === undefined ? undefined : plural(m.workspaces.members, membership.membersCount, locale);
   return joinDetails(membership.planLabel, members);
-}
-
-function roleSubtitle(membership: UserButtonMembership): string {
-  return joinDetails(membership.name, membership.roleLabel);
 }
 
 function initials(name: string): string {
@@ -182,43 +174,6 @@ function RowAvatar({ name, imageUrl, shape, size, xstyle }: RowAvatarProps) {
       ) : null}
       <Avatar.Fallback>{initials(name)}</Avatar.Fallback>
     </Avatar.Root>
-  );
-}
-
-/**
- * The lead workspace's mark. An account working in an organization wears its avatar in the corner,
- * on a grid rather than floated, so the overhang takes up room and whatever follows keeps its gap.
- */
-function WorkspaceAvatar({ workspace, size }: { workspace: ActiveWorkspace; size: AvatarProps['size'] }) {
-  const organization = workspace.kind === 'user' ? workspace.organization : null;
-  if (!organization) {
-    return (
-      <RowAvatar
-        name={workspace.name}
-        imageUrl={workspace.imageUrl}
-        shape={workspace.shape}
-        size={size}
-      />
-    );
-  }
-
-  return (
-    <span {...mergeStyleProps(themeProps('user-button-avatar'), stylex.props(reset.base, styles.workspaceAvatar))}>
-      <RowAvatar
-        name={workspace.name}
-        imageUrl={workspace.imageUrl}
-        shape={workspace.shape}
-        size={size}
-        xstyle={[styles.workspaceAvatarLead, size === 'xs' ? null : styles.workspaceAvatarLeadMd]}
-      />
-      <RowAvatar
-        name={organization.name}
-        imageUrl={organization.imageUrl}
-        shape='square'
-        size='fit'
-        xstyle={[styles.nestedAvatar, size === 'xs' ? styles.nestedAvatarSm : styles.nestedAvatarMd]}
-      />
-    </span>
   );
 }
 
@@ -397,34 +352,49 @@ function HeaderActionButton({
   onClick,
   busyKey,
 }: HeaderAction & { layout: UserButtonHeaderLayout }) {
+  const m = useMessages('userButton');
   const { busy, disabled } = useBusy(busyKey);
   const stacked = layout === 'stacked';
   const compact = !stacked && iconOnly;
-  // The spinner takes the icon's place where there is one, and leads the label otherwise, so the
-  // button keeps its width while the action runs.
-  const leading = busy ? (
-    <Spinner size='sm' />
-  ) : stacked || compact ? (
-    <Icon
-      name={icon}
-      size='sm'
-    />
-  ) : null;
+  const buttonProps = {
+    variant: 'outline',
+    color: 'neutral',
+    size: 'sm',
+    shape: compact ? 'square' : 'default',
+    fullWidth: stacked,
+    'aria-label': compact ? label : undefined,
+    disabled,
+    onClick,
+  } as const;
+  const leading =
+    stacked || compact ? (
+      <Icon
+        name={icon}
+        size='sm'
+      />
+    ) : null;
+  const text = compact ? null : label;
+
+  if (busyKey === undefined) {
+    return (
+      <Button {...buttonProps}>
+        {leading}
+        {text}
+      </Button>
+    );
+  }
 
   return (
-    <Button
-      variant='outline'
-      color='neutral'
-      size='sm'
-      shape={compact ? 'square' : 'default'}
-      fullWidth={stacked}
-      aria-label={compact ? label : undefined}
-      disabled={busy || disabled}
-      onClick={onClick}
+    <SubmitButton
+      {...buttonProps}
+      type='button'
+      isPending={busy}
+      pendingLabel={m.workspaces.pending}
+      spinDelay={{ delay: 0 }}
     >
       {leading}
-      {compact ? null : label}
-    </Button>
+      {text}
+    </SubmitButton>
   );
 }
 
@@ -439,20 +409,13 @@ function Header() {
   const workspace = leadWorkspace(data, m);
   const { name } = workspace;
   const organization = workspace.kind === 'organization' ? workspace.organization : undefined;
-  // An account is described by the organization it works in where the surface carries one, and by
-  // its identifier otherwise. An account with no name is titled by its identifier, and repeating it
-  // underneath says nothing. No selection is not the account, so it carries no identifier line either.
-  const accountSubtitle =
-    workspace.kind === 'user' && workspace.organization
-      ? roleSubtitle(workspace.organization)
-      : identifier === name
-        ? ''
-        : identifier;
+  // An account with no name is titled by its identifier, and repeating it underneath says nothing.
+  // No selection is not the account, so it carries no identifier line either.
   const subtitle =
     workspace.kind === 'organization'
       ? membershipSubtitle(workspace.organization, m, locale)
-      : workspace.kind === 'user'
-        ? accountSubtitle
+      : workspace.kind === 'user' && identifier !== name
+        ? identifier
         : '';
 
   const actions: HeaderAction[] = [];
@@ -460,15 +423,14 @@ function Header() {
     if (action === 'inviteMembers' && data.onInviteMembers) {
       actions.push({ id: action, label: m.manage.invite, icon: 'users', onClick: data.onInviteMembers });
     }
-    // Every other mode hangs "Sign out" off the organization heading. An account-only one has no
-    // such heading, so it takes the labelled slot **Invite** occupies elsewhere, left of the gear.
+    // An account that leads takes "Sign out" in the labelled slot **Invite** holds for an organization.
     if (action === 'signOut' && signOutSession) {
       actions.push({
         id: action,
         label: m.accounts.signOut,
         icon: 'log-out',
-        onClick: () => signOutSession(sessionId),
-        busyKey: userButtonBusyKeys.signOutSession(sessionId),
+        onClick: () => signOutSession(sessionId, 'header'),
+        busyKey: userButtonBusyKeys.signOutSession(sessionId, 'header'),
       });
     }
     // The gear manages whatever the header names, which is settled by the data rather than the mode.
@@ -498,8 +460,10 @@ function Header() {
     <UserButtonHeader
       layout={layout}
       avatar={
-        <WorkspaceAvatar
-          workspace={workspace}
+        <RowAvatar
+          name={workspace.name}
+          imageUrl={workspace.imageUrl}
+          shape={workspace.shape}
           size='sm'
         />
       }
@@ -567,7 +531,7 @@ function OrganizationsHeading() {
   const signOutSession = data.onSignOutSession;
   const { identifier, sessionId } = data.activeSession;
   // Its actions live in a menu that closes on click, so the row itself carries their spinner.
-  const { busy, disabled } = useBusy(userButtonBusyKeys.signOutSession(sessionId));
+  const { busy, disabled } = useBusy(userButtonBusyKeys.signOutSession(sessionId, 'organizationsHeading'));
 
   const actions: RowAction[] = [];
   for (const action of data.layout.actions.organizationsHeading) {
@@ -581,7 +545,7 @@ function OrganizationsHeading() {
       actions.push({
         label: m.accounts.signOut,
         color: 'negative',
-        onClick: () => signOutSession(sessionId),
+        onClick: () => signOutSession(sessionId, 'organizationsHeading'),
       });
     }
   }
@@ -990,12 +954,9 @@ function OrganizationSection() {
             <OrganizationListLoadingRow />
           ) : (
             <>
-              {/* What is on offer leads the list: an invitation or suggestion is the one row here
-                  that goes away if it is not acted on, and the workspaces held are not going
-                  anywhere. This is the order the existing OrganizationSwitcher lists them in. */}
-              <PendingRows />
               <PersonalRow />
               <MembershipRows />
+              <PendingRows />
               {data.paging?.hasMore ? <div ref={data.paging.ref} /> : null}
             </>
           ))}
@@ -1056,8 +1017,8 @@ function Footer() {
               />
             }
             label={m.accounts.signOut}
-            onClick={() => signOutSession(sessionId)}
-            busyKey={userButtonBusyKeys.signOutSession(sessionId)}
+            onClick={() => signOutSession(sessionId, 'footer')}
+            busyKey={userButtonBusyKeys.signOutSession(sessionId, 'footer')}
           />
         ),
       });
@@ -1131,20 +1092,10 @@ export interface UserButtonRootProps
  * the data through context.
  */
 export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
-  const {
-    children,
-    mode = 'combined',
-    modePriority = 'organization',
-    open,
-    defaultOpen,
-    onOpenChange,
-    placement,
-    sideOffset,
-    ...data
-  } = props;
+  const { children, mode = 'combined', open, defaultOpen, onOpenChange, placement, sideOffset, ...data } = props;
   // Resolved here so the sections below never read `mode` again: which affordance lands in which
   // slot is settled once, in one table, rather than re-derived by each part that renders one.
-  const layout = resolveUserButtonLayout(mode, modePriority, data);
+  const layout = resolveUserButtonLayout(mode, data);
 
   return (
     <Popover.Root
@@ -1200,8 +1151,10 @@ export function UserButtonTrigger({
         !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
       ]}
     >
-      <WorkspaceAvatar
-        workspace={workspace}
+      <RowAvatar
+        name={workspace.name}
+        imageUrl={workspace.imageUrl}
+        shape={workspace.shape}
         size={renderTriggerLabel ? 'xs' : 'sm'}
       />
       {renderTriggerLabel ? (

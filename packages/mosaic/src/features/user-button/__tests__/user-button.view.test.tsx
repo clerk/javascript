@@ -144,15 +144,16 @@ describe('UserButtonView, user mode', () => {
     expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
     await userEvent.setup().click(screen.getByRole('button', { name: 'Sign out' }));
 
-    expect(onSignOutSession).toHaveBeenCalledWith('sess_1');
+    expect(onSignOutSession).toHaveBeenCalledWith('sess_1', 'header');
   });
 
   it('spins the header sign-out while it is in flight', () => {
-    renderUserMode({ pendingKey: userButtonBusyKeys.signOutSession('sess_1') });
+    renderUserMode({ pendingKey: userButtonBusyKeys.signOutSession('sess_1', 'header') });
 
     const button = screen.getByRole('button', { name: 'Sign out' });
-    expect(button).toBeDisabled();
-    expect(button.querySelector('.cl-spinner')).not.toBeNull();
+    expect(button).toHaveAttribute('type', 'button');
+    expect(button).toHaveAttribute('aria-busy', 'true');
+    expect(within(button).getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('opens the accounts from the foot rather than listing them inline', async () => {
@@ -199,7 +200,8 @@ describe('UserButtonView, organization mode', () => {
     renderOrganizationMode({ activeOrganization: null });
 
     expect(within(header()).getByText('Alice Smith')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
+    expect(within(header()).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
+    expect(within(header()).getByRole('button', { name: 'Sign out' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
   });
 
@@ -269,13 +271,6 @@ describe('UserButtonView, combined mode', () => {
     expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
   });
 
-  it('heads the surface with the account where the user takes priority', () => {
-    renderCombined({ modePriority: 'user' });
-
-    expect(screen.queryByText('Pro · 24 members')).toBeNull();
-    expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
-  });
-
   it('heads the workspace list with the active account and its own actions', async () => {
     const onSignOutSession = vi.fn();
     const act = userEvent.setup();
@@ -284,10 +279,9 @@ describe('UserButtonView, combined mode', () => {
     await act.click(screen.getByRole('button', { name: 'Actions for alice@example.com' }));
 
     expect(await screen.findByRole('menuitem', { name: 'Manage account' })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Create organization' })).toBeInTheDocument();
     await act.click(screen.getByRole('menuitem', { name: 'Sign out' }));
 
-    expect(onSignOutSession).toHaveBeenCalledWith('sess_1');
+    expect(onSignOutSession).toHaveBeenCalledWith('sess_1', 'organizationsHeading');
   });
 
   it('trails the workspaces with "Create organization", below the last of them', async () => {
@@ -364,10 +358,10 @@ describe('UserButtonView, the workspace list', () => {
   }
 
   // Accepting an invitation joins; a suggestion only files a request, so invitations lead.
-  it('leads with the invitations, then the suggestions, then the workspaces held', () => {
+  it('lists the workspaces held, then the invitations, then the suggestions', () => {
     renderList({ invitations: [gamma], suggestions: [beta] });
 
-    expect(labels(workspaceList())).toEqual(['Gamma', 'Beta', 'Personal account', 'Foundry']);
+    expect(labels(workspaceList())).toEqual(['Personal account', 'Foundry', 'Gamma', 'Beta']);
   });
 
   // `auto` rather than `stable`: a reserved gutter would inset short lists off the edge the header
@@ -476,7 +470,7 @@ describe('UserButtonView, the workspace list', () => {
     it('lists them with no memberships to list them beside', () => {
       renderList({ hasOrganizations: false, activeOrganization: null, memberships: [], invitations: [gamma] });
 
-      expect(labels(workspaceList())).toEqual(['Gamma', 'Personal account']);
+      expect(labels(workspaceList())).toEqual(['Personal account', 'Gamma']);
       expect(screen.getByRole('button', { name: 'Accept' })).toBeInTheDocument();
     });
 
@@ -692,7 +686,7 @@ describe('UserButtonView, the foot', () => {
     const rows = within(groups().at(-1) ?? document.body);
     await userEvent.click(rows.getByRole('button', { name: 'Sign out' }));
 
-    expect(onSignOutSession).toHaveBeenCalledWith('sess_1');
+    expect(onSignOutSession).toHaveBeenCalledWith('sess_1', 'footer');
   });
 });
 
@@ -753,6 +747,19 @@ describe('UserButtonView, one action at a time', () => {
     const row = screen.getByRole('button', { name: 'Other Co' });
     expect(row).toHaveAttribute('aria-busy', 'true');
     expect(within(row).getByRole('progressbar')).toHaveAccessibleName('pending');
+  });
+
+  it('spins only the sign-out that was pressed where the surface offers it in several places', () => {
+    render(
+      surface(userButtonBusyKeys.signOutSession('sess_1', 'header'), {
+        activeOrganization: null,
+        additionalSessions: [],
+      }),
+    );
+
+    const spinners = popup().querySelectorAll<HTMLElement>('.cl-spinner');
+    expect(spinners).toHaveLength(1);
+    expect(within(header()).getByRole('button', { name: 'Sign out' })).toContainElement(spinners[0]);
   });
 
   // The rows waiting on it are not running anything, so they carry the indicator's opposite.
@@ -852,13 +859,6 @@ describe('UserButtonTrigger', () => {
     expect(screen.getByText('Pro')).toBeInTheDocument();
   });
 
-  it('names the account in combined mode where the user takes priority', () => {
-    renderTrigger({ mode: 'combined', modePriority: 'user' });
-
-    expect(screen.getByText('Alice Smith')).toBeInTheDocument();
-    expect(screen.queryByText('Pro')).toBeNull();
-  });
-
   it('renders the avatar alone when the label is off', () => {
     renderTrigger({ mode: 'organization', renderTriggerLabel: false });
 
@@ -925,7 +925,7 @@ describe('UserButtonView, the header', () => {
   function renderHeader(props: Partial<UserButtonProps> = {}) {
     return renderView({
       hasOrganizations: true,
-      activeOrganization: { ...foundry, roleLabel: 'Admin' },
+      activeOrganization: foundry,
       memberships: [foundry, otherCo],
       ...props,
     });
@@ -973,11 +973,11 @@ describe('UserButtonView, the header', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: 'Settings' }));
     expect(onManageAccount).toHaveBeenCalled();
     await userEvent.setup().click(screen.getByRole('button', { name: 'Sign out' }));
-    expect(onSignOutSession).toHaveBeenCalledWith('sess_1');
+    expect(onSignOutSession).toHaveBeenCalledWith('sess_1', 'header');
   });
 
   it('runs the gear inline as an icon where it is the only action', () => {
-    renderHeader({ activeOrganization: null });
+    renderHeader({ hidePersonal: true, activeOrganization: null });
 
     expect(header()).toHaveAttribute('data-layout', 'inline');
     expect(screen.getByRole('button', { name: 'Manage account' })).toHaveAttribute('data-shape', 'square');
@@ -985,34 +985,32 @@ describe('UserButtonView, the header', () => {
     expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
   });
 
-  it('signs a lone account out from the foot, beside "Add account", leaving the header its gear', async () => {
+  it('signs a lone account out from the header in user mode, leaving the foot to add one', async () => {
     const onSignOutSession = vi.fn();
     renderHeader({ mode: 'user', additionalSessions: [], onSignOutSession });
 
-    expect(header()).toHaveAttribute('data-layout', 'inline');
-    expect(within(header()).getByRole('button', { name: 'Manage account' })).toHaveAttribute('data-shape', 'square');
-    expect(within(header()).queryByRole('button', { name: 'Sign out' })).toBeNull();
+    expect(header()).toHaveAttribute('data-layout', 'stacked');
     expect(screen.getByRole('button', { name: 'Add account' })).toBeInTheDocument();
-    await userEvent.setup().click(screen.getByRole('button', { name: 'Sign out' }));
-    expect(onSignOutSession).toHaveBeenCalledWith('sess_1');
+    expect(screen.getAllByRole('button', { name: 'Sign out' })).toHaveLength(1);
+    await userEvent.setup().click(within(header()).getByRole('button', { name: 'Sign out' }));
+    expect(onSignOutSession).toHaveBeenCalledWith('sess_1', 'header');
   });
 
-  it('names the organization and the role under an account that leads a combined surface', () => {
-    renderHeader({ modePriority: 'user' });
+  it('leads a combined surface with the account where no organization is active', async () => {
+    const onSignOutSession = vi.fn();
+    const onManageAccount = vi.fn();
+    renderHeader({ activeOrganization: null, onSignOutSession, onManageAccount });
 
     expect(within(header()).getByText('Alice Smith')).toBeInTheDocument();
-    expect(within(header()).getByText('Foundry · Admin')).toBeInTheDocument();
-    expect(within(header()).queryByText('alice@example.com')).toBeNull();
-  });
-
-  it('names the organization alone where the role is unknown', () => {
-    renderHeader({ modePriority: 'user', activeOrganization: foundry });
-
-    expect(within(header()).getByText('Foundry')).toBeInTheDocument();
+    expect(header()).toHaveAttribute('data-layout', 'stacked');
+    await userEvent.setup().click(within(header()).getByRole('button', { name: 'Settings' }));
+    expect(onManageAccount).toHaveBeenCalled();
+    await userEvent.setup().click(within(header()).getByRole('button', { name: 'Sign out' }));
+    expect(onSignOutSession).toHaveBeenCalledWith('sess_1', 'header');
   });
 
   it('falls back to the identifier where no organization is active', () => {
-    renderHeader({ modePriority: 'user', activeOrganization: null });
+    renderHeader({ activeOrganization: null });
 
     expect(within(header()).getByText('alice@example.com')).toBeInTheDocument();
   });
@@ -1021,31 +1019,5 @@ describe('UserButtonView, the header', () => {
     renderHeader({ mode: 'user' });
 
     expect(within(header()).getByText('alice@example.com')).toBeInTheDocument();
-    expect(screen.queryByText('Foundry · Admin')).toBeNull();
-  });
-
-  it('nests the organization avatar in the account avatar where the account leads', () => {
-    renderHeader({ modePriority: 'user' });
-
-    const trigger = screen.getByRole('button', { name: 'Open account menu for Alice Smith' });
-    const nestedInTrigger = trigger.querySelector('.cl-user-button-avatar .cl-avatar[data-shape="square"]');
-    expect(nestedInTrigger).toHaveAttribute('data-shape', 'square');
-    expect(nestedInTrigger?.textContent).toBe('F');
-
-    const nestedInHeader = header().querySelector('.cl-user-button-avatar .cl-avatar[data-shape="square"]');
-    expect(nestedInHeader).toHaveAttribute('data-shape', 'square');
-  });
-
-  it('nests no avatar where the organization leads, none is active, or the surface carries none', () => {
-    const nested = (props: Partial<UserButtonProps>) => {
-      const { unmount } = renderHeader(props);
-      const found = header().querySelector('.cl-user-button-avatar');
-      unmount();
-      return found;
-    };
-
-    expect(nested({})).toBeNull();
-    expect(nested({ modePriority: 'user', activeOrganization: null })).toBeNull();
-    expect(nested({ mode: 'user' })).toBeNull();
   });
 });

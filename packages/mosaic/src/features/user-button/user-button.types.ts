@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import type { UserButtonSlot } from './user-button.layout';
+
 // ─── Data contract ──────────────────────────────────────────────────────────
 // Session-backed, discriminated resource rows. 1:1 with `useUserButtonModel()`'s output, so the
 // model and the view agree on a shape neither one owns.
@@ -19,8 +21,6 @@ export interface UserButtonMembership {
   imageUrl?: string;
   membersCount?: number;
   planLabel?: string;
-  /** The role the active account holds in the organization, named for display. */
-  roleLabel?: string;
 }
 
 export interface UserButtonSuggestion {
@@ -94,7 +94,7 @@ export interface UserButtonCallbacks {
   onAcceptSuggestion?: (suggestionId: string) => void;
   onAcceptInvitation?: (invitationId: string) => void;
   onSwitchSession?: (sessionId: string) => void;
-  onSignOutSession?: (sessionId: string) => void;
+  onSignOutSession?: (sessionId: string, from: UserButtonSlot) => void;
   onSignOutAll?: () => void;
   onManageOrganization?: () => void;
   onInviteMembers?: () => void;
@@ -111,19 +111,12 @@ export interface UserButtonCallbacks {
 export type UserButtonMode = 'combined' | 'organization' | 'user';
 
 /**
- * Which of the two switchers a `combined` surface leads with: the one named in the trigger and
- * headed in the popup. Both are still listed either way. The single-purpose modes have only one
- * thing to lead with, so they ignore it.
- */
-export type UserButtonModePriority = 'organization' | 'user';
-
-/**
  * How the header carries its actions: `inline` trails the workspace with them, the gear as an icon;
  * `stacked` runs them under it as full-width labelled buttons.
  */
 export type UserButtonHeaderLayout = 'inline' | 'stacked';
 
-/** Which switchers the surface carries, and which one it leads with. */
+/** Which switchers the surface carries. */
 export interface UserButtonModeProps {
   /**
    * Which switchers the popup carries: both, organizations alone, or accounts alone.
@@ -131,13 +124,6 @@ export interface UserButtonModeProps {
    * @default 'combined'
    */
   mode?: UserButtonMode;
-  /**
-   * Which switcher a `combined` surface leads with in the trigger and the popup's header. The other
-   * one is still listed. Ignored by the single-purpose modes, which have only one thing to lead with.
-   *
-   * @default 'organization'
-   */
-  modePriority?: UserButtonModePriority;
 }
 
 /** Whether the surface signs itself with Clerk's mark. */
@@ -169,7 +155,8 @@ export interface UserButtonBusyState {
  * `switchAccount` and `addAccount` share a slot: the foot carries the flyout of signed-in accounts
  * where there is more than one, and the row it would have opened onto where there is not. Name both
  * to place that slot whichever way it resolves. So do `signOutAll` and `signOut`: the foot signs out
- * of every account where there is more than one, and of the one account where there is not.
+ * of every account where there is more than one, and, in `combined` mode, of the one account where
+ * there is not.
  */
 export type UserButtonMenuItemId = 'switchAccount' | 'addAccount' | 'signOutAll' | 'signOut';
 
