@@ -1,9 +1,19 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, fontFamilyVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  durationVars,
+  easingVars,
+  fontFamilyVars,
+  radiusVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 
 export const styles = stylex.create({
   root: {
+    '--cl-layout-duration': durationVars['--cl-duration-slow'],
+    '--cl-layout-easing': easingVars['--cl-ease-default'],
     padding: space['2'],
     borderRadius: radiusVars['--cl-radius-md'],
     gap: space['2'],
@@ -13,6 +23,7 @@ export const styles = stylex.create({
     display: 'flex',
     flexWrap: 'wrap',
     fontFamily: fontFamilyVars['--cl-font-family-sans'],
+    position: 'relative',
     minHeight: space['20'],
     width: '100%',
   },
