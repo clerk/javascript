@@ -53,6 +53,35 @@ describe('Mosaic Menu', () => {
     expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
   });
 
+  it('keeps a disabled default trigger focusable and closed when focusableWhenDisabled is set', async () => {
+    render(
+      <Menu.Root>
+        <Menu.Trigger
+          aria-label='Actions'
+          disabled
+          focusableWhenDisabled
+        />
+        <Menu.Popup>
+          <Menu.Item label='Add workspace'>
+            <Menu.Label>Add workspace</Menu.Label>
+          </Menu.Item>
+        </Menu.Popup>
+      </Menu.Root>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Actions' });
+
+    expect(trigger).toBeEnabled();
+    expect(trigger).toHaveAttribute('aria-disabled', 'true');
+
+    const act = userEvent.setup();
+    await act.tab();
+    expect(trigger).toHaveFocus();
+
+    await act.keyboard('{Enter}');
+    await act.click(trigger);
+    expect(screen.queryByRole('menu')).toBeNull();
+  });
+
   it('renders a consumer trigger passed via render', () => {
     render(
       <Menu.Root>

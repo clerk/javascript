@@ -1,5 +1,4 @@
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
-import type { UserProfileAPIKey } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
@@ -8,12 +7,13 @@ import type {
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';
 import { useUserProfileActiveDevicesFixture } from './user-profile-active-devices';
 import { createUserProfileAddEmailFixture } from './user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
+import { useUserProfileAPIKeysFixture } from './user-profile-api-keys';
 import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';
@@ -26,24 +26,6 @@ export interface UserProfileFixtureOptions {
   /** Replaces the default OTP flow, e.g. for a custom dialog example. */
   onAddEmail?: () => void;
 }
-
-const initialAPIKeys: UserProfileAPIKey[] = [
-  {
-    id: 'primary',
-    name: 'Primary API Key',
-    expirationLabel: 'Expires Dec 31, 2027',
-    createdAtLabel: 'Jan 05, 2026',
-    lastUsedAtLabel: 'Dec 31, 2026',
-  },
-  {
-    id: 'legacy',
-    name: 'Legacy API Key',
-    expirationLabel: 'Expired Jul 1, 2025',
-    createdAtLabel: 'Jul 1, 2024',
-    lastUsedAtLabel: 'Jul 1, 2025',
-    isExpired: true,
-  },
-];
 
 /**
  * Every page of the user profile, backed by local state so the actions on them do something. For
@@ -77,16 +59,8 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
     { id: 'visa', label: 'Visa •••• 0644', expiryLabel: 'Expires 02/2029', isDefault: true },
   ]);
   const [historyPageSize, setHistoryPageSize] = useState(10);
-  const [apiKeys, setAPIKeys] = useState(initialAPIKeys);
-  const [apiKeysPageSize, setAPIKeysPageSize] = useState(10);
-  const [searchValue, setSearchValue] = useState('');
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const apiKeys = useUserProfileAPIKeysFixture();
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
-  const visibleAPIKeys = useMemo(
-    () => apiKeys.filter(apiKey => apiKey.name.toLowerCase().includes(searchValue.toLowerCase())),
-    [apiKeys, searchValue],
-  );
-
   const addEmail = (value: string) =>
     setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: false }]);
   const emailFlow = createUserProfileAddEmailFixture({
@@ -186,30 +160,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onBillingHistoryPageSizeChange: setHistoryPageSize,
       onViewInvoice: () => undefined,
     },
-    apiKeys: {
-      apiKeys: visibleAPIKeys,
-      pagination: { page: 1, pageCount: 1, pageSize: apiKeysPageSize },
-      searchValue,
-      selectedIds,
-      onCreate: () =>
-        setAPIKeys(current => [
-          ...current,
-          {
-            id: `key-${Date.now()}`,
-            name: `API Key ${current.length + 1}`,
-            expirationLabel: 'Expires Never',
-            createdAtLabel: 'Just now',
-            lastUsedAtLabel: 'Never',
-          },
-        ]),
-      onPageSizeChange: setAPIKeysPageSize,
-      onRevoke: id => {
-        setAPIKeys(current => current.filter(apiKey => apiKey.id !== id));
-        setSelectedIds(current => current.filter(selectedId => selectedId !== id));
-      },
-      onSearchChange: setSearchValue,
-      onSelectionChange: setSelectedIds,
-    },
+    apiKeys,
   };
 
   return { activePage, setActivePage, pages, addEmail, devices: activeDevices.devices };

@@ -21,6 +21,7 @@ its dismiss, and fills the popup; standalone it paints the same frame and takes 
 ## Usage
 
 ```tsx
+import { Badge } from '@clerk/mosaic/components/badge';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Profile } from '@clerk/mosaic/components/profile';
 
@@ -39,6 +40,7 @@ import { Profile } from '@clerk/mosaic/components/profile';
     <Profile.NavItem
       value='security'
       icon={<Icon name='shield-check' size='sm' />}
+      badge={<Badge>2</Badge>}
     >
       Security
     </Profile.NavItem>
@@ -53,9 +55,9 @@ import { Profile } from '@clerk/mosaic/components/profile';
 `Root` is controlled: `value` names the open page and `onValueChange` reports a selection. Its
 `elevation` picks how it sits, the way `Card`'s does: `card` (default) is framed, with a fixed
 height and the pages scrolling inside; `flush` is the page's own content — no frame, the page
-scrolls, the columns a gap apart, held to a reading width and centred. A
-`NavItem` and a `Page` pair by `value`. `icon` takes any node, so a page of the consumer's own can
-bring its own mark. `Title` is a visually hidden heading: it names the navigation, the compact
+scrolls, the columns a gap apart, held to a reading width and centered. A
+`NavItem` and a `Page` pair by `value`. `icon` and `badge` take nodes, so a page can supply its own
+leading mark and trailing status. A `Badge` passed to `badge` is `neutral` unless it sets its own `color`. `Title` is a visually hidden heading: it names the navigation, the compact
 sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 
 ## Parts
@@ -73,11 +75,24 @@ sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 `Content` is a plain `div`, not a `main`: the profile is usually the content of the host's own
 `main`, or of a dialog.
 
+## Heading levels
+
+The profile's headings follow the nearest `HeadingLevelProvider`. `Profile.Title` renders at the
+current level, and `Profile.ContentPanel` moves its page one level down, where `Panel.Title`
+renders. `Panel.Sections` puts section titles one level below the page title. See
+[Heading](/components/heading) and [Panel](/components/panel).
+
+| Usage                                           | `Profile.Title` | `Panel.Title` | `Section.Title` |
+| ----------------------------------------------- | --------------- | ------------- | --------------- |
+| Profile                                         | `h2`            | `h3`          | `h4`            |
+| Profile inside `HeadingLevelProvider level={3}` | `h3`            | `h4`          | `h5`            |
+| A page alone                                    | —               | `h2`          | `h3`            |
+
 ## Compact layout
 
 Below `48rem` of the profile's **own** width — or, over the page, the dialog's viewport's, so the
 profile collapses exactly when the dialog fills the screen — the frame goes: the profile is the page
-there, flush with whatever holds it, and the navigation leaves the column for a sheet: `Profile.PageTitle`
+there, flush with whatever holds it, and the navigation leaves the column for a sheet: `Panel.Title`
 grows a caret that opens a `Drawer` holding the tablist, and a choice closes it. Where the tablist
 renders is a DOM decision — one tablist, in the column or in the sheet, never both — so the root
 reads the query's answer off a sentinel it renders, `1px` wide and `2px` once the query matches,

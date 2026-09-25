@@ -88,7 +88,7 @@ export function UserProfileEnterpriseAccountRowView({
           </Section.Actions>
         ) : null}
       </Section.Item>
-      {onConnect && account.connectError ? <Section.Error>{account.connectError}</Section.Error> : null}
+      <Section.Error>{onConnect ? account.connectError : undefined}</Section.Error>
     </Section.Row>
   );
 }

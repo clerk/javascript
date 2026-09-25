@@ -1,5 +1,11 @@
 # @clerk/upgrade
 
+## 2.0.8
+
+### Patch Changes
+
+- Correct the minimum Next.js version in the Core 3 upgrade guidance: `@clerk/nextjs` v7 requires Next.js 15.2.8 or later, or 16.0.10 or later on Next.js 16, not 15.2.3. ([#9790](https://github.com/clerk/javascript/pull/9790)) by [@manovotny](https://github.com/manovotny)
+
 ## 2.0.7
 
 ### Patch Changes

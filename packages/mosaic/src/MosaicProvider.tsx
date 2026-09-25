@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { ToastProvider } from './components/toast/toast';
 import type { MosaicIconOverrides } from './icons/overrides';
 import { MosaicIconsProvider } from './icons/overrides';
 import type { MosaicLocalization } from './localization';
@@ -22,7 +23,9 @@ export function MosaicProvider({ children, icons, localization }: MosaicProvider
 
   return (
     <MosaicIconsProvider value={iconsValue}>
-      <MosaicLocalizationProvider value={localizationValue}>{children}</MosaicLocalizationProvider>
+      <MosaicLocalizationProvider value={localizationValue}>
+        <ToastProvider>{children}</ToastProvider>
+      </MosaicLocalizationProvider>
     </MosaicIconsProvider>
   );
 }

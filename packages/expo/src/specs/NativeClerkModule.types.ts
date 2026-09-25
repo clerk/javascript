@@ -1,4 +1,4 @@
-import type { SignInStatus } from '@clerk/shared/types';
+import type { SessionVerificationLevel, SessionVerificationStatus, SignInStatus } from '@clerk/shared/types';
 
 import type { BiometricCredentialAvailability, BiometricCredentialPolicy } from '../biometric-credentials/types';
 
@@ -31,6 +31,13 @@ export type NativeBiometricSignInResult = {
   createdSessionId: string | null;
 };
 
+export type NativeBiometricReverificationResult = {
+  id: string | null;
+  status: SessionVerificationStatus | (string & {});
+  level: SessionVerificationLevel | (string & {});
+  sessionId: string;
+};
+
 export type NativeBiometricCredentialModule = {
   getTrustedDeviceAvailability(
     id: string | null,
@@ -49,4 +56,9 @@ export type NativeBiometricCredentialModule = {
     identifierHint: string | null,
     reason: string | null,
   ): Promise<NativeBiometricSignInResult>;
+  reverifyWithBiometrics(
+    sessionId: string,
+    level: SessionVerificationLevel,
+    reason: string | null,
+  ): Promise<NativeBiometricReverificationResult>;
 };

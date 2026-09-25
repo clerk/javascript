@@ -7,15 +7,13 @@ import { colorVars, durationVars, easingVars, radiusVars, space } from '../../to
 // StyleX requires a referenced constant to be declared before the `create()` call that reads it.
 const STACK_VEIL_OPACITY = 0.4;
 
-// The card's width cap, read by `variants.card` and restated by `compactPlacements.sheet` — which
-// has to declare `max-width` itself to lift it in the compact band, and would otherwise fork the
-// value.
-const CARD_MAX_WIDTH = '25rem';
-
 // The scrim over the bare page. A black wash over `transparent` rather than a percentage of a
 // neutral token: it composites over whatever the host app renders, so the same value reads
 // consistently on any page.
 const BASE_SCRIM = 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)';
+
+// Safari 26 samples the bar color once, at mount, and skips layers under ~0.15 opacity.
+const SCRIM_ENTER_OPACITY = 0.2;
 
 /**
  * The width bands, queried against the VIEWPORT ELEMENT rather than the window — it is a
@@ -92,7 +90,7 @@ export const styles = stylex.create({
    * `inline-size` rather than `size`: block-size containment would stop the box growing with its
    * content, which is exactly what the outside-scroll variants need it to do, and no band queries
    * height. A grid so the track fills it: an `auto` row stretches to the container's used height,
-   * `min-height` included, which is what hands the track a definite box to centre within.
+   * `min-height` included, which is what hands the track a definite box to center within.
    */
   viewport: {
     containerName: 'cl-dialog',
@@ -102,7 +100,7 @@ export const styles = stylex.create({
   },
 
   /**
-   * The centering track: the inset, and the grid the popup is centred in. The gap between a
+   * The centering track: the inset, and the grid the popup is centered in. The gap between a
    * dialog and the edge of the screen is a FIXED INSET, not a percentage. A percentage margin is
    * asymmetric between the axes and the asymmetry tracks the viewport's aspect ratio: at 90vw/90dvh
    * a 1920x1080 screen leaves 96px at the sides and 54px top and bottom, an ultrawide closer to
@@ -111,7 +109,7 @@ export const styles = stylex.create({
    *
    * Published as a var so the two edges can be driven from one ladder and so anything inside can
    * read it without plumbing — custom properties inherit. The popup needs no width math of its
-   * own: it is `width: 100%` inside this padding, so the inset is already subtracted.
+   * own: it fits its surface within this padding, so the inset is already subtracted.
    *
    * Square everywhere except the phone band, where the sides come in to `1rem` and the block edges
    * stay at `1.25rem`. On a phone the horizontal inset is the expensive one — it is subtracted from
@@ -132,11 +130,14 @@ export const styles = stylex.create({
     // there is exactly one place to retune each band.
     paddingInline: { [ABOVE_PHONE]: 'var(--_cl-dialog-inset)', default: space['4'] },
     // `safe center` rather than plain `center`, and it is what makes an over-tall popup reachable.
-    // Centring an item TALLER than its box overflows it equally in both directions, leaving the
+    // Centering an item TALLER than its box overflows it equally in both directions, leaving the
     // top half above the scroll origin and unreachable; `safe` falls back to start alignment in
     // exactly that case, so the popup overflows downward only and scrolls from its top.
     placeItems: 'safe center',
     display: 'grid',
+    // One column that never grows past the track. An `auto` column would widen to the surface's
+    // fixed width, since that width is also its minimum, and the dialog would overflow the screen.
+    gridTemplateColumns: 'minmax(0, 1fr)',
     // The keyboard's share of the viewport, added to the inset on the bottom edge only. A longhand
     // beside the `padding` shorthand above is deliberate — StyleX ranks a longhand higher
     // regardless of order, so this wins without depending on argument order. Falls back to `0px`,
@@ -204,7 +205,11 @@ export const styles = stylex.create({
     overflowWrap: 'anywhere',
     // The containing block for `Dialog.CloseButton`.
     position: 'relative',
-    width: '100%',
+    // Shrinks to the surface, so the surface decides the dialog's width and a press beside it lands
+    // outside the popup. `maxWidth` because a surface's fixed width is also its minimum, which
+    // `fit-content` never goes below.
+    maxWidth: '100%',
+    width: 'fit-content',
     '::after': {
       inset: 0,
       // Follows the popup's own radius.
@@ -278,16 +283,14 @@ export const closeInsets = stylex.create({
  * on mobile treatment or footer.
  *
  * `card` is the everyday dialog: a `Card` over the page, whether that holds a sign-in flow, a
- * confirmation, or a single-field form like "add an email address". It matches the width of the
- * legacy card (`theme.sizes.$100`). `profile` is the account-profile and settings surface, which
- * you navigate.
+ * confirmation, or a single-field form like "add an email address". `profile` is the
+ * account-profile and settings surface, which you navigate.
  *
- * `card` sets only `max-width`; the popup is `width: 100%` and its height is whatever the
- * content needs. Where it sits in the compact band is a separate axis — see `compactPlacements`.
+ * `card` takes its width from the `Card` inside it, and its height is whatever the content needs. Where it sits in the compact band is a separate axis — see `compactPlacements`.
  *
  * `profile` fixes the height. Its content NAVIGATES — a settings surface switches sections in
  * place — and a content-driven height would resize the window on every section change, in both
- * directions at once since the viewport centres it. Its width is the surface's own.
+ * directions at once since the viewport centers it. Its width is the surface's own.
  */
 /**
  * How the viewport behaves when the popup is taller than the screen — the "inside scroll" vs
@@ -304,7 +307,7 @@ export const closeInsets = stylex.create({
  * `padding-block-end` stays behind at the fold, and the popup runs flush into the bottom edge with
  * none of the inset that surrounds it everywhere else. `min-height: 100%` lets the box grow
  * instead: the padding travels with the content, and short dialogs still fill the overlay so the
- * track has something to centre against.
+ * track has something to center against.
  */
 export const viewportVariants = stylex.create({
   card: { minHeight: '100%' },
@@ -362,7 +365,6 @@ export const variants = stylex.create({
     // alone: a `profile` hosting a dialog gets a scrim between the two instead, and would
     // otherwise dim as well as darken.
     '--_cl-stack-veil': { default: 0, ':where([data-stack-base])': STACK_VEIL_OPACITY },
-    maxWidth: CARD_MAX_WIDTH,
   },
   /**
    * Like `card`, a profile brings its own surface. It is the account-profile and settings surface,
@@ -392,8 +394,8 @@ export const variants = stylex.create({
     // needs somewhere for overflow to go, but putting the scroll on the POPUP takes everything
     // anchored to it along for the ride — the close button most obviously. So the popup clips,
     // and the scroll region is the surface's own: `Profile` scrolls its content column.
-    // Deliberately a flex column with no `align-items` override, so the surface inside stretches
-    // to the popup's width and grows to its height.
+    // Deliberately a flex column with no `align-items` override, so the surface inside grows to
+    // the popup's height.
     //
     // `clip` rather than `hidden` for the same reason as the viewport: `hidden` would make the
     // profile a scroll container, and focusing anything inside it that sits outside its box would
@@ -408,33 +410,23 @@ export const variants = stylex.create({
 
 /**
  * Where the surface sits in the COMPACT band, which is an axis of its own rather than a property
- * of the size: the same `card` is a centred dialog in one place and a bottom sheet in another, and
+ * of the size: the same `card` is a centered dialog in one place and a bottom sheet in another, and
  * the size is what it IS rather than where it is presented.
  *
- * Only that band differs. Above it a sheet is a centred dialog like any other — there is no screen
+ * Only that band differs. Above it a sheet is a centered dialog like any other — there is no screen
  * edge close enough for anchoring to mean anything — so `center` is genuinely empty and `sheet`
  * resolves back to the same geometry. Named `compact` rather than for a device because the band is
  * a width, and because `Profile` already calls the identical `48rem` query that.
  *
- * Applied for `card` alone (see `Dialog.Popup`), which is why `sheet` can restate the card's cap:
- * a profile has its own compact treatment and never takes a placement.
+ * Applied for `card` alone (see `Dialog.Popup`): a profile has its own compact treatment and never
+ * takes a placement.
  */
 export const compactPlacements = stylex.create({
   center: {},
   sheet: {
-    // The sheet popup can be wider than Card.Root's own width cap.
-    // Keep the card centered within the available space.
-    alignItems: { [PHONE]: 'center', default: null },
     // `align-self` on the grid item, not `align-items` on the viewport, because the viewport is
-    // shared: bottom-aligning there would drag a centred dialog down with it.
-    //
-    // The popup's own cap is lifted at the same time so it spans the width the inset leaves, and
-    // the surface inside decides how much of that it takes. `default` restates `variants.card`'s cap
-    // rather than leaving it to the cascade: this cell is spread after that one in the same
-    // `stylex.props` call, so StyleX dedupes `max-width` to whatever is written here. Both read
-    // the same constant, so there is one value to retune.
+    // shared: bottom-aligning there would drag a centered dialog down with it.
     alignSelf: { [PHONE]: 'end', default: null },
-    maxWidth: { [PHONE]: 'none', default: CARD_MAX_WIDTH },
   },
 });
 
@@ -467,7 +459,7 @@ export const trackCompactPlacements = stylex.create({
 /**
  * Enter/exit motion, keyed by size, because the two surfaces want opposite things.
  *
- * `card` scales from its centre. `profile` fades without scaling — it is most of the
+ * `card` scales from its center. `profile` fades without scaling — it is most of the
  * viewport, and the larger a surface is the worse a scale reads on it: the absolute travel
  * is `(1 − scale) ×` its own dimensions, so the same 2% that is a few pixels on a card is
  * tens of pixels on a profile, and it arrives as a zoom rather than an emergence.
@@ -487,7 +479,8 @@ export const backdropMotion = stylex.create({
   card: {
     opacity: {
       default: 1,
-      ':where([data-starting-style], [data-ending-style])': 0,
+      ':where([data-ending-style])': 0,
+      ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
     },
     // One step below the popup's own entrance, so the dim lands first and the surface arrives
     // into an already-darkened page rather than alongside the darkening. Symmetric in and out:
@@ -510,7 +503,8 @@ export const backdropMotion = stylex.create({
   profile: {
     opacity: {
       default: 1,
-      ':where([data-starting-style], [data-ending-style])': 0,
+      ':where([data-ending-style])': 0,
+      ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
     },
     transitionDuration: {
       default: durationVars['--cl-duration-fast'],
@@ -561,7 +555,7 @@ const STACK_LIFT = '-0.5rem';
 
 export const popupMotion = stylex.create({
   /**
-   * `compactPlacement='sheet'`: a card that scales from its centre above the compact band, and slides up
+   * `compactPlacement='sheet'`: a card that scales from its center above the compact band, and slides up
    * from the bottom edge as a sheet below it. Written as its own cell rather than as an overlay on
    * top of `card`: StyleX dedupes by PROPERTY across a `stylex.props` call, so a thin "mobile
    * only" atom declaring `transform` would replace `card`'s wholesale and take the desktop scale
@@ -672,14 +666,14 @@ export const popupMotion = stylex.create({
         default: null,
         '@media (prefers-reduced-motion: no-preference)': {
           default: null,
-          ':where([data-starting-style], [data-ending-style])': '0 100%',
+          ':where([data-starting-style], [data-ending-style])': '0 calc(100% + var(--_cl-dialog-inset))',
         },
       },
       default: null,
     },
   },
 
-  /** The default placement: centred and centre-scaled at every width. */
+  /** The default placement: centered and center-scaled at every width. */
   card: {
     opacity: {
       default: 1,

@@ -5,7 +5,7 @@ import React, { type RefObject, useLayoutEffect, useRef, useState } from 'react'
 import { useAnimationsFinished } from '../hooks/use-animations-finished';
 import { useTransition } from '../hooks/use-transition';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
-import { resetLayoutStyles } from '../utils/reset-layout-styles';
+import { autoUpdate, getScrollDimensions } from '../utils/dom';
 import { useCollapsibleContext } from './collapsible-context';
 
 export type CollapsiblePanelProps = ComponentProps<'div'>;
@@ -41,25 +41,11 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
         return;
       }
 
-      // Reset flex/grid alignment before measuring so non-default alignment
-      // can't shrink the reported scroll dimensions.
-      let restoreLayoutStyles: (() => void) | undefined;
-      const measure = () => {
-        restoreLayoutStyles?.();
-        restoreLayoutStyles = resetLayoutStyles(panel);
-        setHeight(panel.scrollHeight);
-        setWidth(panel.scrollWidth);
-      };
-
-      measure();
-
-      const ro = new ResizeObserver(measure);
-      ro.observe(panel, { box: 'border-box' });
-
-      return () => {
-        ro.disconnect();
-        restoreLayoutStyles?.();
-      };
+      return autoUpdate(panel, () => {
+        const dimensions = getScrollDimensions(panel);
+        setHeight(dimensions.height);
+        setWidth(dimensions.width);
+      });
     }, [mounted]);
 
     // Once the open animation settles, drop the measured pixel dimensions so the
@@ -84,10 +70,9 @@ export const CollapsiblePanel = React.forwardRef<HTMLDivElement, CollapsiblePane
       if (!panel) {
         return;
       }
-      const restoreLayoutStyles = resetLayoutStyles(panel);
-      setHeight(panel.scrollHeight);
-      setWidth(panel.scrollWidth);
-      return restoreLayoutStyles;
+      const dimensions = getScrollDimensions(panel);
+      setHeight(dimensions.height);
+      setWidth(dimensions.width);
     }, [open, transitionStatus]);
 
     const state = { open };

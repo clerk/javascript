@@ -2,7 +2,7 @@ import { isClerkRuntimeError, isUserLockedError } from '@clerk/shared/error';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { __internal_WebAuthnAbortService } from '@clerk/shared/internal/clerk-js/passkeys';
 import { useClerk } from '@clerk/shared/react';
-import type { EmailCodeFactor, EnterpriseSSOFactor, SignInFirstFactor, SignInResource } from '@clerk/shared/types';
+import type { SignInResource } from '@clerk/shared/types';
 import { useCallback, useEffect } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -102,40 +102,5 @@ function useHandleAuthenticateWithPasskey(
   }, []);
 }
 
-/**
- * Type guard that checks if all factors in the array are enterprise SSO factors
- * with both `enterpriseConnectionId` and `enterpriseConnectionName` properties.
- * This is used to determine if the user should be presented with a choice
- * between multiple enterprise connections.
- * @experimental
- */
-function hasMultipleEnterpriseConnections(
-  factors: SignInFirstFactor[] | null,
-): factors is Array<EnterpriseSSOFactor & { enterpriseConnectionId: string; enterpriseConnectionName: string }> {
-  if (!factors?.length) {
-    return false;
-  }
-
-  return (
-    factors.filter(
-      factor =>
-        factor.strategy === 'enterprise_sso' &&
-        'enterpriseConnectionId' in factor &&
-        'enterpriseConnectionName' in factor,
-    ).length > 1
-  );
-}
-
-/**
- * Returns the email code factor a sign-in may fall back to, or `null`.
- * @experimental
- */
-function getSSOBypassFactor(signIn: SignInResource): EmailCodeFactor | null {
-  if (!signIn.supportedFirstFactors?.some(factor => factor.strategy === 'enterprise_sso')) {
-    return null;
-  }
-
-  return (signIn.ssoBypassFirstFactors?.find(factor => factor.strategy === 'email_code') as EmailCodeFactor) ?? null;
-}
-
-export { getSSOBypassFactor, hasMultipleEnterpriseConnections, useHandleAuthenticateWithPasskey };
+export { getSSOBypassFactor, hasMultipleEnterpriseConnections } from './enterpriseSSOFactors';
+export { useHandleAuthenticateWithPasskey };

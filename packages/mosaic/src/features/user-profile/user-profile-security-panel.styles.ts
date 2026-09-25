@@ -22,24 +22,12 @@ export const styles = stylex.create({
     borderWidth: '1px',
     backgroundColor: colorVars['--cl-color-background-subtle'],
   },
-  root: {
-    gap: space['4'],
-    display: 'flex',
-    flexDirection: 'column',
-  },
   sectionCards: {
     gap: space['3'],
     display: 'flex',
     flexDirection: 'column',
-    width: '100%',
   },
   emptySectionCards: {
     display: 'none',
-  },
-  sections: {
-    gap: space['10'],
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%',
   },
 });

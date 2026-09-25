@@ -375,12 +375,9 @@ describe('EnterpriseConnectionPage', () => {
         });
       });
 
-      // auto-animate keeps a clone of the closing card in the DOM until its exit animation ends, which
-      // outlasts the default waitFor budget on CI, so the restored Edit trigger is the close signal.
-      await waitFor(() => expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2), {
-        timeout: 10_000,
-      });
-    }, 15_000);
+      await waitFor(() => expect(container.querySelector('.cl-actionCard')).not.toBeInTheDocument());
+      expect(screen.getAllByRole('button', { name: 'Edit' })).toHaveLength(2);
+    });
 
     it('opens the SAML Edit form on the metadata URL mode for a metadata-configured connection', async () => {
       const { wrapper, fixtures } = await createFixtures(withPageFixtures);

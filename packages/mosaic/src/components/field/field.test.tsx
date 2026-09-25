@@ -391,7 +391,7 @@ describe('Mosaic Field', () => {
           '@media (prefers-reduced-motion: reduce)': 'none',
         },
         height: {
-          default: 'var(--_cl-field-message-height)',
+          default: 'var(--_cl-feedback-height)',
           ':where(:not([data-open]), [data-starting-style])': 0,
         },
       },

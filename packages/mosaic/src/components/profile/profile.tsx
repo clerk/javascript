@@ -1,47 +1,24 @@
+import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useMeasure } from '../../hooks/useMeasure';
 import type { TabsProps } from '../../primitives/tabs';
 import { Tabs } from '../../primitives/tabs';
 import { useRender } from '../../primitives/utils';
+import { autoUpdate, getDimensions } from '../../primitives/utils/dom';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
+import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Drawer } from '../drawer';
-import { Heading } from '../heading';
-import { Icon } from '../icon';
+import { HeadingLevelProvider, useHeadingLevel } from '../heading';
 import { VisuallyHidden } from '../visually-hidden';
+import type { ProfileContextValue } from './profile.context';
+import { ContentPanelContext, ProfileContext } from './profile.context';
 import { contentScroll, contentViewportScroll, styles } from './profile.styles';
-
-interface ProfileContextValue {
-  /** The id `Profile.Title` renders under; the navigation and the sheet point their names at it. */
-  titleId: string;
-  renderBranding: boolean;
-  /** Below `COMPACT_WIDTH`: the navigation lives in a sheet, opened from a page's title. */
-  compact: boolean;
-  navOpen: boolean;
-  openNav: () => void;
-  closeNav: () => void;
-  /** The selected page, by `value`. */
-  value: string;
-  /**
-   * `Profile.PageTitle` registers the control it renders under its page's `value`, the way a tab
-   * registers with the tabs root; the sheet returns focus through `pageTitleFor`.
-   */
-  registerPageTitle: (value: string, element: HTMLElement | null) => void;
-  pageTitleFor: (value: string) => HTMLElement | null;
-  /** Flush: the page's own content, selected by `elevation='flush'`. */
-  inline: boolean;
-}
-
-const ProfileContext = React.createContext<ProfileContextValue | null>(null);
-
-/** The page a `Profile.PageTitle` is in: the id it renders under, so the panel can be named by it, and the page's `value`. */
-const ContentPanelContext = React.createContext<{ titleId: string; value: string } | null>(null);
 
 /**
  * Whether the compact container query matches, read off the sentinel `Profile.Root` renders: `1px`
@@ -49,8 +26,8 @@ const ContentPanelContext = React.createContext<{ titleId: string; value: string
  * renders is a DOM decision CSS cannot make — one tablist, in the column or in the sheet, never
  * both — and read this way so the breakpoint lives in CSS alone. Unmeasured is wide.
  */
-function isCompact(sentinelWidth: number | null): boolean {
-  return sentinelWidth !== null && sentinelWidth >= 2;
+function isCompact(sentinelWidth: number): boolean {
+  return sentinelWidth >= 2;
 }
 
 function useProfileContext(part: string): ProfileContextValue {
@@ -124,8 +101,14 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   // names the dialog without knowing it is in one — the way `Card.Title` does.
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
-  const [measure, { width }] = useMeasure<HTMLSpanElement>();
-  const compact = isCompact(width);
+  const [sentinel, setSentinel] = React.useState<HTMLSpanElement | null>(null);
+  const [compact, setCompact] = React.useState(false);
+  useSafeLayoutEffect(() => {
+    if (!sentinel) {
+      return;
+    }
+    return autoUpdate(sentinel, () => setCompact(isCompact(getDimensions(sentinel).width)));
+  }, [sentinel]);
   const pageTitles = React.useRef(new Map<string, HTMLElement>());
   const registerPageTitle = React.useCallback((page: string, element: HTMLElement | null) => {
     if (element) {
@@ -174,7 +157,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
         <>
           <span
             aria-hidden
-            ref={measure}
+            ref={setSentinel}
             {...mergeStyleProps(themeProps('profile-sentinel'), stylex.props(reset.base, styles.sentinel))}
           />
           {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
@@ -226,10 +209,11 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
   ref,
 ) {
   const { titleId } = useProfileContext('Profile.Title');
+  const Tag = `h${useHeadingLevel()}` as const;
   return (
     <VisuallyHidden
       ref={ref as React.Ref<HTMLSpanElement>}
-      render={render ?? <h2 />}
+      render={render ?? <Tag />}
       {...mergeStyleProps(themeProps('profile-title'), stylex.props(xstyle), rest)}
       // The ids the navigation and the dialog point at, so the caller's cannot displace it.
       id={titleId}
@@ -252,7 +236,7 @@ function NavBranding() {
  * `Profile.NavItem`s; they render inside the tablist, so nothing else belongs among them.
  *
  * Beside the content it is a column. Compact, it renders nothing in place: the tablist moves into
- * a sheet that a page's title opens (`Profile.PageTitle`), and closes on a choice — the branding
+ * a sheet that a page's title opens (`Panel.Title`), and closes on a choice — the branding
  * stays behind, since a sheet is not the surface. One tablist, wherever it lives — two would be
  * two sets of tabs for one set of pages.
  */
@@ -318,12 +302,15 @@ export interface ProfileNavItemProps extends MosaicComponentProps<'button'> {
   value: string;
   /** Leads the label. Any node, so a page of the consumer's own can bring its own mark. */
   icon?: React.ReactNode;
+  badge?: React.ReactNode;
   disabled?: boolean;
 }
 
+const navItemBadgeDefaults = { color: 'neutral' } as const;
+
 /** A destination. Selecting it shows the `Profile.ContentPanel` sharing its `value`. */
 const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(function ProfileNavItem(
-  { value, icon, disabled, children, render, xstyle, onClick, ...rest },
+  { value, icon, badge, disabled, children, render, xstyle, onClick, ...rest },
   ref,
 ) {
   const { compact, closeNav } = useProfileContext('Profile.NavItem');
@@ -355,77 +342,13 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
         </span>
       ) : null}
       <span {...themeProps('profile-nav-item-label')}>{children}</span>
+      {badge != null ? (
+        <span {...mergeStyleProps(themeProps('profile-nav-item-badge'), stylex.props(reset.base, styles.navItemBadge))}>
+          <BadgeContext.Provider value={navItemBadgeDefaults}>{badge}</BadgeContext.Provider>
+        </span>
+      ) : null}
     </Tabs.Tab>
   );
-});
-
-export type ProfilePageTitleProps = MosaicComponentProps<'div'>;
-
-/**
- * A page's headline. Inside a profile that has gone compact the headline IS the way to the other
- * pages: the heading holds a button — the title, and a caret beside it — that opens the navigation
- * sheet. Anywhere else — the wide layout, or a page rendered on its own — it is the heading alone.
- *
- * The caret sits `vertical-align: middle`, which CSS defines as the box's midpoint on the parent's
- * baseline plus half its x-height: optically centred on the lowercase letters rather than on the
- * line box. That needs an inline formatting context, so the button is `display: inline`.
- */
-const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(function ProfilePageTitle(
-  { children, render, xstyle, ...rest },
-  ref,
-) {
-  const profile = React.useContext(ProfileContext);
-  const panel = React.useContext(ContentPanelContext);
-  const registerPageTitle = profile?.registerPageTitle;
-  const page = panel?.value;
-  // The sheet's return-focus target. A no-op outside a profile's page, where there is no sheet.
-  const registerTrigger = React.useCallback(
-    (element: HTMLButtonElement | null) => {
-      if (page !== undefined) {
-        registerPageTitle?.(page, element);
-      }
-    },
-    [registerPageTitle, page],
-  );
-  return useRender({
-    defaultTagName: 'div',
-    render,
-    ref,
-    props: {
-      ...mergeStyleProps(themeProps('profile-page-title'), stylex.props(reset.base, styles.pageTitle, xstyle), rest),
-      children: (
-        <Heading
-          id={panel?.titleId}
-          render={<h3 />}
-          size='2xl'
-        >
-          {profile?.compact ? (
-            <button
-              ref={registerTrigger}
-              type='button'
-              aria-haspopup='dialog'
-              aria-expanded={profile.navOpen}
-              onClick={profile.openNav}
-              {...mergeStyleProps(
-                themeProps('profile-nav-trigger'),
-                stylex.props(reset.base, styles.navTrigger, focusOutline.visible),
-              )}
-            >
-              {children}
-              <Icon
-                aria-hidden
-                name='chevron-down'
-                size='inherit'
-                {...mergeStyleProps(themeProps('profile-nav-trigger-caret'), stylex.props(styles.caret))}
-              />
-            </button>
-          ) : (
-            children
-          )}
-        </Heading>
-      ),
-    },
-  });
 });
 
 export type ProfileContentProps = MosaicComponentProps<'div'>;
@@ -507,23 +430,25 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
   const panel = React.useMemo(() => ({ titleId, value }), [titleId, value]);
   return (
     <ContentPanelContext.Provider value={panel}>
-      <Tabs.Panel
-        ref={ref}
-        value={value}
-        shouldForceMount={shouldForceMount}
-        // Compact, the tab it would be named by exists only while the sheet is open, so the panel
-        // is named by its own title instead — `Profile.PageTitle` takes this id. Spread only then:
-        // an explicit `undefined` would displace the primitive's own `aria-labelledby`.
-        {...(compact ? { 'aria-labelledby': titleId } : null)}
-        {...mergeStyleProps(themeProps('profile-content-panel', { value }), stylex.props(xstyle), rest)}
-      />
+      <HeadingLevelProvider>
+        <Tabs.Panel
+          ref={ref}
+          value={value}
+          shouldForceMount={shouldForceMount}
+          // Compact, the tab it would be named by exists only while the sheet is open, so the panel
+          // is named by its own title instead — `Panel.Title` takes this id. Spread only then:
+          // an explicit `undefined` would displace the primitive's own `aria-labelledby`.
+          {...(compact ? { 'aria-labelledby': titleId } : null)}
+          {...mergeStyleProps(themeProps('profile-content-panel', { value }), stylex.props(xstyle), rest)}
+        />
+      </HeadingLevelProvider>
     </ContentPanelContext.Provider>
   );
 });
 
 /**
  * A surface you navigate, composed through `Profile.Root`, `Profile.Title`, `Profile.Nav`,
- * `Profile.NavItem`, `Profile.Content`, `Profile.ContentPanel`, and `Profile.PageTitle`. Every part
+ * `Profile.NavItem`, `Profile.Content`, and `Profile.ContentPanel`. Every part
  * accepts the Mosaic `render` prop and forwards its ref.
  *
  * ```tsx
@@ -538,4 +463,4 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
  * </Profile.Root>
  * ```
  */
-export const Profile = { Root, Title, Nav, NavItem, PageTitle, Content, ContentPanel };
+export const Profile = { Root, Title, Nav, NavItem, Content, ContentPanel };

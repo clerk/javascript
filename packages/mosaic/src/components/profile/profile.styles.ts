@@ -43,19 +43,20 @@ export const styles = stylex.create({
    * The query container, and the flex column the frame fills. It paints NOTHING and carries no
    * band of its own — an element is never its own query container, so every compact rule lives on
    * `layout`, one level inside. It is also the containing block for the dismiss the root carries
-   * inside a dialog. `maxWidth` here so the frame inside is what the width clamps.
+   * inside a dialog. A fixed `width` capped by `max-width`, so a `profile` dialog's popup, which
+   * sizes to its content, takes the full width rather than the width of the current page.
    */
   root: {
-    // Centred where the host is wider — a `profile` dialog's popup spans the viewport. The frame
-    // runs wide; the content inside is held to a reading width of its own, see `contentBody`.
+    // Centered where the host is wider. The frame runs wide; the content inside is held to a
+    // reading width of its own, see `contentBody`.
     marginInline: 'auto',
     containerName: 'cl-profile',
     containerType: 'inline-size',
     display: 'flex',
     flexDirection: 'column',
     position: 'relative',
-    maxWidth: '94.625rem',
-    width: '100%',
+    maxWidth: '100%',
+    width: '94.625rem',
   },
 
   /**
@@ -147,13 +148,14 @@ export const styles = stylex.create({
     // No frame to inset from, so neither column carries padding; a gap holds them apart.
     columnGap: space['10'],
     gridTemplateRows: 'auto',
-    // As wide as the navigation, the gap and the pages' reading column, centred in the host. The
+    // As wide as the navigation, the gap and the pages' reading column, centered in the host. The
     // explicit width matters: auto margins on a column-flex item otherwise shrink it to its content.
     inlineSize: '100%',
     maxWidth: `calc(${NAV_WIDTH} + ${space['10']} + ${CONTENT_MAX_WIDTH})`,
   },
 
   layoutInDialog: {
+    borderWidth: '0px',
     blockSize: 'auto',
     // Lifted off the page like a card in a dialog: the card's elevation, none compact, where the
     // popup is the screen and there is nothing to lift off.
@@ -170,9 +172,9 @@ export const styles = stylex.create({
     borderInlineEndColor: colorVars['--cl-color-border'],
     borderInlineEndStyle: 'solid',
     borderInlineEndWidth: '1px',
-    // Until measured — before hydration, or the first observer callback — the column renders in
-    // place at any width, so compact CSS hides it rather than stack a tablist over the page. The
-    // sheet's copy is portalled out of the container and never matches.
+    // Until measured — before hydration — the column renders in place at any width, so compact
+    // CSS hides it rather than stack a tablist over the page. The sheet's copy is portalled out of
+    // the container and never matches.
     display: {
       [compact]: 'none',
       default: 'flex',
@@ -263,6 +265,13 @@ export const styles = stylex.create({
     flexShrink: 0,
   },
 
+  navItemBadge: {
+    alignItems: 'center',
+    display: 'inline-flex',
+    flexShrink: 0,
+    marginInlineStart: 'auto',
+  },
+
   branding: {
     display: 'block',
     marginBlockStart: 'auto',
@@ -309,43 +318,10 @@ export const styles = stylex.create({
     },
   },
 
-  /** The pages' column: held to a reading width and centred, however wide the frame runs. */
+  /** The pages' column: held to a reading width and centered, however wide the frame runs. */
   contentBody: {
     marginInline: 'auto',
     maxInlineSize: CONTENT_MAX_WIDTH,
-  },
-
-  /** The headline row. */
-  pageTitle: {
-    display: 'block',
-  },
-
-  /**
-   * The headline as a button: the heading's own type, inline so the caret can align to its
-   * x-height, with a little room around it for the focus ring.
-   */
-  navTrigger: {
-    font: 'inherit',
-    borderRadius: radiusVars['--cl-radius-md'],
-    marginInline: `calc(-1 * ${space['1']})`,
-    paddingInline: space['1'],
-    backgroundColor: 'transparent',
-    color: 'inherit',
-    cursor: 'pointer',
-    display: 'inline',
-    textAlign: 'start',
-  },
-  /**
-   * Beside the title, `vertical-align: middle`: the caret's midpoint on the baseline plus half the
-   * x-height, which centres it on the lowercase letters rather than the line box. Sized in `em`
-   * through the icon's `inherit` size, so it scales with the heading; coloured through the icon's
-   * own variable rather than `color`, which the icon sets itself.
-   */
-  caret: {
-    '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
-    fontSize: '0.6em',
-    marginInlineStart: '0.25em',
-    verticalAlign: 'middle',
   },
 });
 

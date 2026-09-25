@@ -69,7 +69,8 @@ describe('UserProfileProfilePanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(screen.getByRole('heading', { name: 'Account', level: 3 })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Account', level: 2 })).toBeVisible();
+    await waitFor(() => expect(document.activeElement).toHaveTextContent(/^Account$/));
   });
 
   it('keeps the final wallet confirmation mounted until removal settles', async () => {
@@ -101,6 +102,7 @@ describe('UserProfileProfilePanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(document.activeElement).toHaveTextContent(/^Account$/));
   });
 
   it('keeps available providers visible without connected accounts', () => {
@@ -133,7 +135,7 @@ describe('UserProfileProfilePanelView', () => {
       onSubmitUsername: () => Promise.resolve(),
     });
 
-    expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Account' })).toContainElement(
       document.querySelector('.cl-section-group'),
     );
@@ -291,9 +293,9 @@ describe('UserProfileProfilePanelView', () => {
       onDeleteAccount,
     });
 
-    expect(screen.getByRole('heading', { level: 4, name: 'Connected accounts' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Connected accounts' })).toBeInTheDocument();
     expect(screen.getByText('Google')).toBeVisible();
-    expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
     expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
@@ -347,7 +349,7 @@ describe('UserProfileProfilePanelView', () => {
       onRemoveWeb3Wallet: vi.fn(),
     });
 
-    expect(screen.getByRole('heading', { level: 4, name: 'Web3 wallets' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Web3 wallets' })).toBeInTheDocument();
     expect(screen.getByText('MetaMask')).toBeInTheDocument();
     expect(screen.getByText('0x1234...5678')).toBeInTheDocument();
     expect(within(screen.getByRole('region', { name: 'Web3 wallets' })).getByText('Primary')).toBeInTheDocument();

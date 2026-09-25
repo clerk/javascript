@@ -31,10 +31,28 @@ vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
 }));
 
 describe('SignIn', () => {
+  beforeEach(() => {
+    vi.stubGlobal('Intl', undefined);
+  });
+
   it('can be serialized with JSON.stringify', () => {
     const signIn = new SignIn();
     const snapshot = JSON.stringify(signIn);
     expect(snapshot).toBeDefined();
+  });
+
+  it('keeps a null timezone across JSON, resource, and snapshot representations', () => {
+    const signIn = new SignIn({ timezone: null } as any);
+
+    expect(signIn.timezone).toBeNull();
+    expect(signIn.__internal_toSnapshot().timezone).toBeNull();
+  });
+
+  it('defaults a missing timezone from an older snapshot to null', () => {
+    const signIn = new SignIn({ id: 'signin_123' } as any);
+
+    expect(signIn.timezone).toBeNull();
+    expect(signIn.__internal_toSnapshot().timezone).toBeNull();
   });
 
   describe('prepareSecondFactor', () => {
@@ -311,6 +329,189 @@ describe('SignIn', () => {
     });
   });
 
+  describe('authenticateWithRedirect with a pending challenge', () => {
+    const originalFetch = BaseResource._fetch;
+
+    afterEach(() => {
+      BaseResource._fetch = originalFetch;
+      vi.clearAllMocks();
+      SignIn.clerk = {} as any;
+    });
+
+    const gatedResponse = {
+      client: null,
+      response: {
+        id: 'signin_123',
+        status: 'needs_protect_check',
+        first_factor_verification: null,
+        protect_check: {
+          status: 'pending',
+          token: 'challenge-token-abc',
+          sdk_url: 'https://sdk.example.com/challenge.js',
+        },
+      },
+    };
+
+    const setupClerk = () => {
+      const windowNavigate = vi.fn();
+      SignIn.clerk = {
+        buildUrlWithAuth: vi.fn(u => u),
+        __internal_windowNavigate: windowNavigate,
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+      return windowNavigate;
+    };
+
+    // The server builds the hand-off before it decides, so a challenged create can also carry a
+    // usable redirect.
+    const gatedWithHandOff = (url: string) => ({
+      client: null,
+      response: {
+        ...gatedResponse.response,
+        first_factor_verification: { status: 'unverified', external_verification_redirect_url: url },
+      },
+    });
+
+    it('follows the hand-off a challenged OAuth create built, leaving the challenge for the way back', async () => {
+      const windowNavigate = setupClerk();
+      const mockFetch = vi.fn().mockResolvedValue(gatedWithHandOff('https://accounts.google.example/auth'));
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await signIn.authenticateWithRedirect({
+        strategy: 'oauth_google',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://accounts.google.example/auth'));
+    });
+
+    it('follows the create hand-off when the enterprise SSO prepare after it hits the same pending challenge', async () => {
+      const windowNavigate = setupClerk();
+      // Create builds the hand-off and is challenged; the prepare that follows lands on the same
+      // pending gate and builds nothing new.
+      const mockFetch = vi.fn().mockResolvedValue(gatedWithHandOff('https://idp.example/from-create'));
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+      });
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/from-create'));
+    });
+
+    it('does not follow a hand-off left from an earlier attempt when the prepare is challenged', async () => {
+      const windowNavigate = setupClerk();
+      // The challenged prepare builds no verification, so the redirect on the sign-in is stale and
+      // may be for a different connection.
+      BaseResource._fetch = vi.fn().mockResolvedValue(gatedWithHandOff('https://idp.example/earlier-attempt'));
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+          enterpriseConnectionId: 'ent_other',
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      expect(windowNavigate).not.toHaveBeenCalled();
+    });
+
+    it('throws protect_check_required when a challenged create built no hand-off', async () => {
+      const windowNavigate = setupClerk();
+      const mockFetch = vi.fn().mockResolvedValue(gatedResponse);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      // Only the create call — the prepare is not attempted while the challenge is pending.
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(windowNavigate).not.toHaveBeenCalled();
+      expect(signIn.protectCheck?.status).toBe('pending');
+    });
+
+    it('throws protect_check_required when preparing the enterprise SSO hand-off returns a challenge', async () => {
+      const windowNavigate = setupClerk();
+      const mockFetch = vi.fn().mockResolvedValue(gatedResponse);
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      expect(windowNavigate).not.toHaveBeenCalled();
+      expect(signIn.protectCheck?.status).toBe('pending');
+    });
+
+    it('surfaces protect_check_required through an OAuth transport instead of opening it', async () => {
+      // The transport expects a URL back. Returning without one used to surface as
+      // `oauth_transport_missing_verification_url`, which hid the real reason.
+      setupClerk();
+      const transport = { getRedirectUrl: vi.fn().mockResolvedValue('app://callback'), open: vi.fn() };
+      (SignIn.clerk as any).__internal_oauthTransport = transport;
+      BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await expect(
+        signIn.authenticateWithRedirect({
+          strategy: 'enterprise_sso',
+          redirectUrl: '/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+        }),
+      ).rejects.toMatchObject({ code: 'protect_check_required' });
+
+      expect(transport.open).not.toHaveBeenCalled();
+    });
+
+    it('follows the hand-off once no challenge is pending', async () => {
+      const windowNavigate = setupClerk();
+      BaseResource._fetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            status: 'unverified',
+            external_verification_redirect_url: 'https://idp.example/auth',
+          },
+        },
+      });
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/',
+        continueSignIn: true,
+      });
+
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/auth'));
+    });
+  });
+
   describe('signIn.create', () => {
     afterEach(() => {
       vi.clearAllMocks();
@@ -384,6 +585,86 @@ describe('SignIn', () => {
           },
         }),
       );
+    });
+
+    it('includes the detected timezone when creating a sign-in', async () => {
+      vi.stubGlobal('Intl', {
+        DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+      });
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'needs_first_factor' },
+      });
+      BaseResource._fetch = mockFetch;
+      const signIn = new SignIn();
+      SignIn.clerk = {
+        client: { captchaBypass: false },
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      await signIn.create({ identifier: 'user@example.com' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.objectContaining({ timezone: 'America/New_York' }),
+        }),
+      );
+    });
+
+    it('omits timezone when browser detection is unavailable', async () => {
+      vi.stubGlobal('Intl', undefined);
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'needs_first_factor' },
+      });
+      BaseResource._fetch = mockFetch;
+      const signIn = new SignIn();
+      SignIn.clerk = {
+        client: { captchaBypass: false },
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      await signIn.create({ identifier: 'user@example.com' });
+
+      expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
+    });
+
+    it('preserves an explicitly supplied timezone when creating a sign-in', async () => {
+      vi.stubGlobal('Intl', {
+        DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+      });
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'needs_first_factor' },
+      });
+      BaseResource._fetch = mockFetch;
+      const signIn = new SignIn();
+      SignIn.clerk = {
+        client: { captchaBypass: false },
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      await signIn.create({ identifier: 'user@example.com', timezone: 'Europe/Paris' });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.objectContaining({ body: expect.objectContaining({ timezone: 'Europe/Paris' }) }),
+      );
+    });
+
+    it('does not inject timezone when continuing an existing sign-in', async () => {
+      vi.stubGlobal('Intl', {
+        DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+      });
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'needs_first_factor' },
+      });
+      BaseResource._fetch = mockFetch;
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+
+      await signIn.prepareFirstFactor({ strategy: 'email_code', emailAddressId: 'email_123' });
+
+      expect(mockFetch.mock.calls[0][0].body).not.toHaveProperty('timezone');
     });
 
     it('includes captcha params when signUpIfMissing is true', async () => {
@@ -695,6 +976,12 @@ describe('SignIn', () => {
       expect(snapshot).toBeDefined();
     });
 
+    it('exposes the sign-in timezone', () => {
+      const signIn = new SignIn({ timezone: 'America/New_York' } as any);
+
+      expect(signIn.__internal_future.timezone).toBe('America/New_York');
+    });
+
     describe('selectFirstFactor', () => {
       beforeAll(() => {
         const signInCreatedJSON = {
@@ -835,6 +1122,21 @@ describe('SignIn', () => {
             identifier: 'user@example.com',
           },
         });
+      });
+
+      it('includes the detected timezone when creating a sign-in', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor' },
+        });
+        BaseResource._fetch = mockFetch;
+
+        await new SignIn().__internal_future.create({ identifier: 'user@example.com' });
+
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'America/New_York');
       });
 
       it('returns error property on success', async () => {
@@ -1079,6 +1381,42 @@ describe('SignIn', () => {
             locale: 'de-DE',
           },
         });
+      });
+
+      it('reuses the timezone captured by an existing sign-in', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor', identifier: 'user@example.com' },
+        });
+        BaseResource._fetch = mockFetch;
+        const signIn = new SignIn({
+          id: 'signin_123',
+          identifier: 'user@example.com',
+          timezone: 'Europe/Paris',
+        } as any);
+
+        await signIn.__internal_future.password({ password: 'password123' });
+
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'Europe/Paris');
+      });
+
+      it('falls back to the browser timezone when an existing sign-in has none', async () => {
+        vi.stubGlobal('Intl', {
+          DateTimeFormat: () => ({ resolvedOptions: () => ({ timeZone: 'America/New_York' }) }),
+        });
+        const mockFetch = vi.fn().mockResolvedValue({
+          client: null,
+          response: { id: 'signin_123', status: 'needs_first_factor', identifier: 'user@example.com' },
+        });
+        BaseResource._fetch = mockFetch;
+        const signIn = new SignIn({ id: 'signin_123', identifier: 'user@example.com' } as any);
+
+        await signIn.__internal_future.password({ password: 'password123' });
+
+        expect(mockFetch.mock.calls[0][0].body).toHaveProperty('timezone', 'America/New_York');
       });
 
       it('uses previous identifier when no identifier parameter is provided', async () => {

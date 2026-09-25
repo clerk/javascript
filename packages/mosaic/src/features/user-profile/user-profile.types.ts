@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { UserProfileApiKeysPanelViewProps } from './user-profile-api-keys-panel.view';
+import type { UserProfileApiKeysPanelViewProps } from './user-profile-api-keys-panel.types';
 import type { UserProfileBillingPanelViewProps } from './user-profile-billing-panel.view';
 import type { UserProfileProfilePanelViewProps } from './user-profile-profile-panel.view';
 import type { UserProfileSecurityPanelViewProps } from './user-profile-security-panel.view';

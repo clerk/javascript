@@ -13,7 +13,10 @@ import * as HeadingStories from './heading.stories';
 
 <PropTable
   meta={HeadingStories.meta}
-  extra={[{ name: 'render', type: '(props) => ReactNode' }]}
+  extra={[
+    { name: 'level', type: '1 | 2 | 3 | 4 | 5 | 6', default: '2' },
+    { name: 'render', type: '(props) => ReactNode' },
+  ]}
 />
 
 ## Usage
@@ -40,5 +43,42 @@ import * as HeadingStories from './heading.stories';
 
 <Story
   name='Colors'
+  storyModule={HeadingStories}
+/>
+
+### Heading levels
+
+`HeadingLevelProvider` sets the heading level for everything inside it, and `useHeadingLevel()`
+reads it. A provider without a `level` sits one level below the provider around it. Outside any
+provider the level is `2`.
+
+`Heading` does not read the provider on its own. A plain `<Heading>` renders an `h2`, so pass
+`level={useHeadingLevel()}` when it should follow the provider.
+
+`Profile.Title`, `Panel.Title`, and `Section.Title` all take their level this way. The same part
+renders an `h2` when used alone and nests correctly inside a profile.
+
+```tsx
+import { Heading, HeadingLevelProvider, useHeadingLevel } from '@clerk/mosaic/components/heading';
+
+function Title({ children }) {
+  return <Heading level={useHeadingLevel()}>{children}</Heading>;
+}
+
+<Title>Profile</Title> {/* h2 */}
+<HeadingLevelProvider>
+  <Title>Page</Title> {/* h3 */}
+  <HeadingLevelProvider>
+    <Title>Section</Title> {/* h4 */}
+  </HeadingLevelProvider>
+</HeadingLevelProvider>
+
+<HeadingLevelProvider level={3}>
+  <Title>Starts at h3</Title>
+</HeadingLevelProvider>
+```
+
+<Story
+  name='Levels'
   storyModule={HeadingStories}
 />

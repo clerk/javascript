@@ -6,6 +6,7 @@ import { Tooltip as Primitive } from '../../primitives/tooltip';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
+import { tooltipSurface } from '../../utils/tooltip-surface.styles';
 import { styles } from './tooltip.styles';
 
 export type TooltipRootProps = HeadlessTooltipProps;
@@ -34,7 +35,7 @@ const Popup = React.forwardRef<HTMLDivElement, TooltipPopupProps>(function Toolt
       >
         <Primitive.Popup
           ref={ref}
-          {...mergeStyleProps(themeProps('tooltip-popup'), stylex.props(reset.base, styles.popup, xstyle), rest)}
+          {...mergeStyleProps(themeProps('tooltip-popup'), stylex.props(reset.base, tooltipSurface.base, xstyle), rest)}
         />
       </Primitive.Positioner>
     </Primitive.Portal>

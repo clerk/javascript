@@ -28,6 +28,21 @@ import { Section } from '@clerk/mosaic/components/section';
 
 Use `Section.Items` for a nested value list beneath a row's header item. The row keeps a 12px header-to-list gap, and nested items stack without gaps with 4px vertical padding.
 
+`Section.Title` renders at the level from the nearest `HeadingLevelProvider`, or `h2` outside one.
+On a page, put the sections in `Panel.Sections` so their titles sit one level below the page title.
+See [Panel](/components/panel) and [Heading](/components/heading).
+
+```tsx
+<Panel.Root>
+  <Panel.Title>Account</Panel.Title>
+  <Panel.Sections>
+    <Section.Root>
+      <Section.Title>Email addresses</Section.Title>
+    </Section.Root>
+  </Panel.Sections>
+</Panel.Root>
+```
+
 ## Examples
 
 <Story

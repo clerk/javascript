@@ -1,8 +1,9 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { HeadingLevelProvider } from '../heading';
 import { Section } from './section';
 
 const overrides = stylex.create({
@@ -41,7 +42,7 @@ describe('Section', () => {
     );
 
     expect(screen.getByRole('region', { name: 'Account' })).toHaveClass('cl-section');
-    expect(screen.getByRole('heading', { level: 4, name: 'Account' })).toHaveClass('cl-section-title');
+    expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toHaveClass('cl-section-title');
     expect(screen.getByTestId('group')).toHaveClass('cl-section-group');
     expect(screen.getByTestId('row')).toHaveClass('cl-section-row');
     expect(screen.getByTestId('item')).toHaveClass('cl-section-item');
@@ -53,6 +54,28 @@ describe('Section', () => {
     expect(screen.getByTestId('actions')).toHaveClass('cl-section-actions');
   });
 
+  it('takes its title level from an enclosing HeadingLevelProvider', () => {
+    render(
+      <HeadingLevelProvider level={5}>
+        <Section.Root>
+          <Section.Title>Account</Section.Title>
+        </Section.Root>
+      </HeadingLevelProvider>,
+    );
+
+    expect(screen.getByRole('heading', { level: 5, name: 'Account' })).toBeInTheDocument();
+  });
+
+  it('lets the render prop override the heading level', () => {
+    render(
+      <Section.Root>
+        <Section.Title render={<h5 />}>Account</Section.Title>
+      </Section.Root>,
+    );
+
+    expect(screen.getByRole('heading', { level: 5, name: 'Account' })).toHaveClass('cl-section-title');
+  });
+
   it('supports an explicit accessible name', () => {
     render(
       <Section.Root aria-label='Account preferences'>
@@ -62,7 +85,7 @@ describe('Section', () => {
     );
 
     expect(screen.getByRole('region', { name: 'Account preferences' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 4, name: 'Account' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toBeInTheDocument();
   });
 
   it('composes multiple items in one row', () => {
@@ -196,7 +219,7 @@ describe('Section', () => {
     // A row-level message announces itself; there is no field to describe it.
     expect(error).toHaveAttribute('role', 'alert');
     expect(error).toHaveTextContent('File type not supported.');
-    // Outside the item, so the item's media and actions keep their centre line.
+    // Outside the item, so the item's media and actions keep their center line.
     expect(screen.getByTestId('item')).not.toContainElement(error);
     expect(screen.getByTestId('row')).toContainElement(error);
 
@@ -204,5 +227,47 @@ describe('Section', () => {
     expect(icon).toBeInTheDocument();
     expect(icon).toHaveAttribute('aria-hidden', 'true');
     expect(icon).toHaveAttribute('data-size', 'sm');
+  });
+
+  it('renders nothing while the row has no message', () => {
+    render(
+      <Section.Row>
+        <Section.Item>
+          <Section.Content>
+            <Section.Label>Profile picture</Section.Label>
+          </Section.Content>
+        </Section.Item>
+        <Section.Error data-testid='error'>{undefined}</Section.Error>
+      </Section.Row>,
+    );
+
+    expect(screen.queryByTestId('error')).not.toBeInTheDocument();
+  });
+
+  it('opens on a new message and leaves when it clears', async () => {
+    function Host({ message }: { message?: string }) {
+      return (
+        <Section.Row>
+          <Section.Item>
+            <Section.Content>
+              <Section.Label>Profile picture</Section.Label>
+            </Section.Content>
+          </Section.Item>
+          <Section.Error data-testid='error'>{message}</Section.Error>
+        </Section.Row>
+      );
+    }
+
+    const { rerender } = render(<Host />);
+    rerender(<Host message='File type not supported.' />);
+
+    const error = await screen.findByTestId('error');
+    await waitFor(() => expect(error).toHaveAttribute('data-open'));
+    expect(error).toHaveTextContent('File type not supported.');
+    expect(error).not.toHaveAttribute('aria-hidden');
+
+    // jsdom runs no transitions, so the exit finishes at once and the row empties again.
+    rerender(<Host />);
+    await waitFor(() => expect(screen.queryByTestId('error')).not.toBeInTheDocument());
   });
 });

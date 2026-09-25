@@ -15,6 +15,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
+import { ToastProvider } from '../toast/toast';
 import {
   backdropMotion,
   closeInsets,
@@ -26,7 +27,7 @@ import {
   variants,
   viewportVariants,
 } from './dialog.styles';
-import { acquireKeyboardInset } from './keyboard-inset';
+import { acquireKeyboardInset, focusWithoutScroll } from './keyboard-inset';
 
 /**
  * Which surface the dialog holds, and so the geometry it is given: `card` is a `Card` at the
@@ -116,7 +117,7 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
   variant?: DialogVariant;
   /**
    * Bottom-anchors the surface in the compact band — the dialog viewport under `48rem` — and
-   * slides it up as a sheet, instead of centring it. For a dialog that asks one thing and returns
+   * slides it up as a sheet, instead of centering it. For a dialog that asks one thing and returns
    * — a confirmation, a single-field form — where the answer belongs within thumb's reach.
    * `card` only. @default 'center'
    */
@@ -256,7 +257,7 @@ function Backdrop({ variant, stacked }: { variant: DialogVariant; stacked: boole
 
 /**
  * The box the popup is sized against and the query container its bands read, holding the track
- * that centres the popup and carries the inset. Two elements because a container cannot query
+ * that centers the popup and carries the inset. Two elements because a container cannot query
  * itself: the width-dependent rules have to sit one level inside the element that is the
  * container. The viewport also locks body scroll and — because the track is what owns the inset —
  * publishes the on-screen keyboard's share of the viewport for the track's bottom padding to
@@ -286,6 +287,7 @@ function Viewport({
           themeProps('dialog-track', { variant }),
           stylex.props(reset.base, styles.track, trackVariants[variant], trackCompactPlacements[compactPlacement]),
         )}
+        onTouchEnd={focusWithoutScroll}
       >
         {children}
       </div>
@@ -388,7 +390,7 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
             compactPlacements[compactPlacement],
             // One cell per (variant, placement) that exists, selected rather than layered: StyleX
             // dedupes by PROPERTY across a `stylex.props` call, so a thin "sheet only" atom would
-            // replace the centred cell's `transform` wholesale and take the desktop scale with it.
+            // replace the centered cell's `transform` wholesale and take the desktop scale with it.
             compactPlacement === 'sheet' ? popupMotion.cardSheet : popupMotion[variant],
             xstyle,
           ),
@@ -401,8 +403,11 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
     </DialogContext.Provider>
   );
 
-  return (
-    <Primitive.Portal>
+  const viewport = (
+    <Viewport
+      variant={variant}
+      compactPlacement={compactPlacement}
+    >
       <Backdrop
         variant={variant}
         // A card stacked on a card paints no scrim of its own — one serves the whole stack.
@@ -410,13 +415,12 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
         // depends on the variant of the dialog beneath, which the headless layer has no notion of.
         stacked={isNestedInDialog && host?.variant === 'card'}
       />
-      <Viewport
-        variant={variant}
-        compactPlacement={compactPlacement}
-      >
-        {popup}
-      </Viewport>
-    </Primitive.Portal>
+      {popup}
+    </Viewport>
+  );
+
+  return (
+    <Primitive.Portal>{variant === 'profile' ? <ToastProvider>{viewport}</ToastProvider> : viewport}</Primitive.Portal>
   );
 });
 

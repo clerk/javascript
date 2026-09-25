@@ -36,6 +36,7 @@
         "tsconfig.json",
         "tsconfig.*.json",
         "rspack.config.js",
+        "vitest.*.mts",
 
         "!**/__snapshots__/**",
         "!coverage/**",

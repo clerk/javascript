@@ -24,8 +24,8 @@ export interface SubmitButtonProps extends ButtonProps {
    */
   pendingLabel?: string;
   /**
-   * Tunes when the spinner appears and how long it stays. `delay` (default `300`) is how long the
-   * action has to run before the spinner is drawn at all; `minDuration` (default `200`) is how
+   * Tunes when the spinner appears and how long it stays. `delay` (default `150`) is how long the
+   * action has to run before the spinner is drawn at all; `minDuration` (default `400`) is how
    * long it stays once drawn. Neither affects the pending state itself, which always applies
    * immediately. Set `delay: 0` for an action already known to be slow.
    */
@@ -35,13 +35,6 @@ export interface SubmitButtonProps extends ButtonProps {
 // The spinner scale stops at `md`, so `xs` and `sm` share the small ring while `md` and `lg`
 // share the larger one.
 const spinnerSizes = { xs: 'sm', sm: 'sm', md: 'md', lg: 'md' } as const;
-
-// Long enough that a request served from cache or a local mutation never draws a spinner, short
-// enough that a press which is going to take a while doesn't sit there looking ignored. Set here
-// rather than on `useSpinDelay` itself: a button is pressed and watched, so it wants a tighter
-// window than a hook shared with background loads. `minDuration` has no such tension, so it takes
-// the hook's default.
-const DEFAULT_SPIN_DELAY = 300;
 
 /**
  * A `Button` that submits its form, with a pending affordance. Takes every `Button` prop;
@@ -61,13 +54,11 @@ export const SubmitButton = React.forwardRef<HTMLButtonElement, SubmitButtonProp
   { isPending = false, pendingLabel = 'pending', size = 'md', spinDelay, xstyle, children, onClick, ...rest },
   ref,
 ) {
-  const { delay = DEFAULT_SPIN_DELAY, minDuration } = spinDelay ?? {};
-
   // `isPending` drives the semantics, this drives the pixels. The split is deliberate: the button
   // has to go inert and start announcing the moment the action does, or a fast action gets
   // submitted twice and assistive tech misses it — but drawing a spinner that fast only produces
   // a flash, so the visual waits out the delay and then sticks around long enough to be read.
-  const showPending = useSpinDelay(isPending || null, { delay, minDuration }) !== null;
+  const showPending = useSpinDelay(isPending || null, spinDelay) !== null;
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (isPending) {

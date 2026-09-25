@@ -3,6 +3,8 @@ import type { Ref } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
+import type { ActionMenuAction } from '../../components/action-menu';
+import { ActionMenu } from '../../components/action-menu';
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Dialog } from '../../components/dialog';
@@ -10,8 +12,6 @@ import { Section } from '../../components/section';
 import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import type { MosaicMessages } from '../../localization';
 import { fill, plural, useLocale, useMessages } from '../../localization';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 import { UserProfileDeviceDetailsDialog } from './user-profile-device-details.dialog';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
@@ -211,7 +211,7 @@ function DeviceItem({
   onSignOut?: (device: UserProfileDevice) => void;
 }) {
   const m = useMessages('userProfileActiveDevices');
-  const actions: UserProfileMenuAction[] = [{ label: m.viewDetails, onClick: () => onViewDetails(device) }];
+  const actions: ActionMenuAction[] = [{ label: m.viewDetails, onClick: () => onViewDetails(device) }];
 
   if (onSignOut) {
     actions.push({ label: m.signOut, onClick: () => onSignOut(device) });
@@ -235,7 +235,7 @@ function DeviceItem({
         {device.description ? <Section.Description>{device.description}</Section.Description> : null}
       </Section.Content>
       <Section.Actions>
-        <UserProfileActionMenu
+        <ActionMenu
           actions={actions}
           label={fill(m.manageLabel, { name: device.name })}
           triggerRef={triggerRef}

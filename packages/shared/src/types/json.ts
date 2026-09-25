@@ -147,6 +147,7 @@ export interface SignUpJSON extends ClerkResourceJSON {
   abandon_at: number | null;
   legal_accepted_at: number | null;
   locale: string | null;
+  timezone: string | null;
   verifications: SignUpVerificationsJSON | null;
   protect_check?: ProtectCheckJSON | null;
 }
@@ -171,6 +172,8 @@ export interface ProtectCheckJSON {
 export interface SignUpEnterpriseConnectionJSON extends ClerkResourceJSON {
   id: string;
   name: string;
+  provider: string;
+  logo_public_url?: string | null;
 }
 
 export interface SessionJSON extends ClerkResourceJSON {
@@ -329,6 +332,7 @@ export interface UserJSON extends ClerkResourceJSON {
   create_organizations_limit: number | null;
   delete_self_enabled: boolean;
   legal_accepted_at: number | null;
+  timezone: string | null;
   updated_at: number;
   created_at: number;
 }

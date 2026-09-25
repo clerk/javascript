@@ -1,4 +1,4 @@
-import type { UserButtonData, UserButtonMode, UserButtonModePriority } from './user-button.types';
+import type { UserButtonData, UserButtonHeaderLayout, UserButtonMode } from './user-button.types';
 
 /*
  * Which mode puts what where. The surface is three slots deep, in this order, and each mode fills
@@ -6,12 +6,13 @@ import type { UserButtonData, UserButtonMode, UserButtonModePriority } from './u
  *
  *  combined                       organization                 user
  *  ┌────────────────────────────┐ ┌──────────────────────────┐ ┌────────────────────────────┐
- *  │ Foundry       [Invite][⚙]  │ │ Foundry     [Invite][⚙]  │ │ Alice     [Sign out][⚙]    │ header
+ *  │ Foundry                    │ │ Foundry                  │ │ Alice                      │ header
+ *  │ [⚙ Settings] [Invite]      │ │ [⚙ Settings] [Invite]    │ │ [⚙ Settings] [Sign out]    │
  *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
  *  │ alice@x.com           [⋯]  │ │                          │ │                            │ organizationsHeading
- *  │ Personal account           │ │ Personal account         │ │                            │ ┐
+ *  │ Personal account         │ │ Personal account       │ │                            │ ┐
  *  │ ✓ Foundry                  │ │ ✓ Foundry                │ │                            │ ┘ organization rows
- *  │ + Create organization      │ │ + Create organization    │ │                            │ organizationsFooter
+ *  │ + Create organization            │ │ + Create organization          │ │                            │ organizationsFooter
  *  ├────────────────────────────┤ ├──────────────────────────┤ ├────────────────────────────┤
  *  │ ⇄ Switch account        ›  │ │                          │ │ ⇄ Switch account        ›  │ ┐
  *  │ ⤴ Sign out of all accounts │ │                          │ │ ⤴ Sign out of all accounts │ ┘ footer
@@ -20,6 +21,10 @@ import type { UserButtonData, UserButtonMode, UserButtonModePriority } from './u
  * The organizations are listed on the surface, headed by the active account, since they are the
  * workspaces that account can switch between. The other signed-in accounts are not: they are one
  * row at the foot that opens a flyout of them, so the surface stays about the workspace it is on.
+ *
+ * The header is about whatever leads, not the mode: an organization is managed and invited to, an
+ * account is managed and signed out of. With no organization active, a combined surface leads with
+ * the account.
  */
 
 /** The four places an action can land. Every mode has a header and a footer; the list's two vary. */
@@ -34,49 +39,59 @@ export type UserButtonAction =
   | 'manageAccount'
   | 'signOut'
   | 'signOutAll'
-  /** The flyout of signed-in accounts. Collapses to `addAccount` where there is only the one. */
+  /** The flyout of signed-in accounts. */
   | 'switchAccount';
 
-/** One mode's whole surface, top to bottom. */
+/**
+ * What the trigger names and the header leads with. `none` is an organization-led surface with no
+ * organization active and no personal workspace to fall back to.
+ */
+export type UserButtonLead = 'organization' | 'user' | 'none';
+
+const headers = {
+  organization: ['inviteMembers', 'manageLead'],
+  user: ['signOut', 'manageLead'],
+  none: ['manageLead'],
+} as const satisfies Record<UserButtonLead, readonly UserButtonAction[]>;
+
+/** One mode's whole surface below the header, top to bottom. */
 interface ModeLayout {
-  header: readonly UserButtonAction[];
   /**
    * The workspaces the active account switches between: its own, plus the organizations it is in.
    * `false` is a list the mode does not carry at all; `heading: false` runs the rows unheaded.
    * `footer` trails the rows, inside the list, since what it offers is one more workspace.
    */
   organizations: { heading: readonly UserButtonAction[] | false; footer: readonly UserButtonAction[] } | false;
-  footer: readonly UserButtonAction[];
+  /**
+   * With a second account the foot opens onto all of them and signs out of every one. With just the
+   * one there is nothing to switch between or to sign out of "all" of.
+   */
+  footer: { multiSession: readonly UserButtonAction[]; singleSession: readonly UserButtonAction[] };
 }
 
 const modes = {
   combined: {
-    header: ['inviteMembers', 'manageLead'],
-    organizations: { heading: ['createOrganization', 'manageAccount', 'signOut'], footer: ['createOrganization'] },
-    footer: ['switchAccount', 'signOutAll'],
+    organizations: { heading: ['manageAccount', 'signOut'], footer: ['createOrganization'] },
+    footer: { multiSession: ['switchAccount', 'signOutAll'], singleSession: ['addAccount', 'signOut'] },
   },
   // Not about the account, so it heads its workspaces with nothing and offers no other account.
   organization: {
-    header: ['inviteMembers', 'manageLead'],
     organizations: { heading: false, footer: ['createOrganization'] },
-    footer: [],
+    footer: { multiSession: [], singleSession: [] },
   },
-  // No workspaces at all, so the header takes the account's own actions and the foot is the
-  // accounts flyout and what acts across every one of them.
+  // No workspaces at all. The header already signs the lone account out, so the foot only adds one.
   user: {
-    header: ['signOut', 'manageLead'],
     organizations: false,
-    footer: ['switchAccount', 'signOutAll'],
+    footer: { multiSession: ['switchAccount', 'signOutAll'], singleSession: ['addAccount'] },
   },
 } as const satisfies Record<UserButtonMode, ModeLayout>;
 
 /**
- * Where each of the surface's actions landed, resolved once from `mode`, `modePriority` and the
- * data, so no section has to read any of them again.
+ * Where each of the surface's actions landed, resolved once from `mode` and the data, so no section
+ * has to read either of them again.
  */
 export interface UserButtonLayout {
-  /** Which workspace the trigger names and the header leads with. */
-  leadWith: 'organization' | 'user';
+  lead: UserButtonLead;
   /** The organization rows: their own workspace, the organizations, and what is on offer. */
   showOrganizations: boolean;
   /**
@@ -84,15 +99,22 @@ export interface UserButtonLayout {
    * still needs somewhere to manage and sign out of itself.
    */
   showOrganizationsHeading: boolean;
+  headerLayout: UserButtonHeaderLayout;
   /** What each slot carries, in the order it renders. */
   actions: Record<UserButtonSlot, UserButtonAction[]>;
 }
 
-export function resolveUserButtonLayout(
-  mode: UserButtonMode,
-  modePriority: UserButtonModePriority,
-  data: UserButtonData,
-): UserButtonLayout {
+function resolveLead(mode: UserButtonMode, data: UserButtonData): UserButtonLead {
+  if (mode === 'user') {
+    return 'user';
+  }
+  if (data.activeOrganization) {
+    return 'organization';
+  }
+  return data.hidePersonal ? 'none' : 'user';
+}
+
+export function resolveUserButtonLayout(mode: UserButtonMode, data: UserButtonData): UserButtonLayout {
   const declared: ModeLayout = modes[mode];
   const organizationsHeading = declared.organizations === false ? false : declared.organizations.heading;
   const organizationsFooter = declared.organizations === false ? [] : declared.organizations.footer;
@@ -102,39 +124,19 @@ export function resolveUserButtonLayout(
   // Loading does not count, so an account with none never opens a list that then disappears.
   const hasOrganizations = data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0;
 
-  /** The action this surface actually carries in place of the one declared, or `null` for none. */
-  const resolve = (action: UserButtonAction): UserButtonAction | null => {
-    switch (action) {
-      // Inviting belongs to whichever organization is active, even where the account is what heads
-      // the surface.
-      case 'inviteMembers':
-        return data.activeOrganization ? action : null;
-      // "All accounts" is one account. The account's own row already signs out of it, so the foot
-      // would be offering the same thing over again, in the plural.
-      case 'signOutAll':
-        return hasOtherSessions ? action : null;
-      // With no second account there is nothing to switch between, so the flyout collapses to the
-      // one row it would have opened onto.
-      case 'switchAccount':
-        return hasOtherSessions ? action : 'addAccount';
-      default:
-        return action;
-    }
-  };
-
-  const slot = (actions: readonly UserButtonAction[]): UserButtonAction[] =>
-    actions.map(resolve).filter((action): action is UserButtonAction => action !== null);
+  const lead = resolveLead(mode, data);
+  const header = [...headers[lead]];
 
   return {
-    // Only a combined surface has two things to choose between; the other two are what they are.
-    leadWith: mode === 'combined' ? modePriority : mode,
+    lead,
     showOrganizations: declared.organizations !== false && hasOrganizations,
     showOrganizationsHeading: organizationsHeading !== false,
+    headerLayout: header.some(action => action !== 'manageLead') ? 'stacked' : 'inline',
     actions: {
-      header: slot(declared.header),
-      organizationsHeading: organizationsHeading === false ? [] : slot(organizationsHeading),
-      organizationsFooter: slot(organizationsFooter),
-      footer: slot(declared.footer),
+      header,
+      organizationsHeading: organizationsHeading === false ? [] : [...organizationsHeading],
+      organizationsFooter: [...organizationsFooter],
+      footer: [...(hasOtherSessions ? declared.footer.multiSession : declared.footer.singleSession)],
     },
   };
 }

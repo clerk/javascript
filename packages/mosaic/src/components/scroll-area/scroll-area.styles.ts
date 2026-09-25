@@ -71,6 +71,8 @@ const styles = stylex.create({
    * lives in `axes` below.
    */
   viewport: {
+    '--cl-scroll-area-progress-end': 0,
+    '--cl-scroll-area-progress-start': 0,
     flexBasis: 'auto',
     flexGrow: 1,
     flexShrink: 1,

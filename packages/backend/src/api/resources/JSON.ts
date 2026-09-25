@@ -707,6 +707,10 @@ export interface UserJSON extends ClerkResourceJSON {
    * The locale of the user in BCP-47 format.
    */
   locale: string | null;
+  /**
+   * The timezone of the user.
+   */
+  timezone: string | null;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -963,6 +967,7 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   expiration: number | null;
   created_at: number;
   updated_at: number;
+  aud?: string[];
 }
 
 export interface BillingPayerJSON extends ClerkResourceJSON {

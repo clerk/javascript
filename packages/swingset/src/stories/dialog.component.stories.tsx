@@ -19,7 +19,7 @@ export { default as __source } from './dialog.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Dialog',
   source: 'packages/mosaic/src/components/dialog/dialog.tsx',
   styles: {
@@ -74,7 +74,7 @@ export function Default(args: Record<string, unknown>) {
         aria-label='Dialog surface'
       >
         <Dialog.CloseButton />
-        <div style={surface}>
+        <div style={{ ...surface, width: variant === 'profile' ? '94.625rem' : '26.25rem', maxWidth: '100%' }}>
           <Heading size='sm'>The surface</Heading>
           <Text>
             The dashed edge is <code>Dialog.Popup</code>. A real dialog fills it with a Card or a Profile, which paints
@@ -152,7 +152,7 @@ const addEmailTrigger = (props: RenderProps) => <Button {...props}>Add email add
 
 /**
  * `compactPlacement='sheet'` bottom-anchors the surface in the compact band — the dialog viewport
- * under `48rem` — and slides it up from the edge, instead of centring it. Above the band nothing
+ * under `48rem` — and slides it up from the edge, instead of centering it. Above the band nothing
  * changes, so narrow the window to see it.
  *
  * For a dialog that asks one thing and returns: a confirmation, or a single-field form like this
