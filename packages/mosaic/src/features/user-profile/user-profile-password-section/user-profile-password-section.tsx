@@ -75,7 +75,7 @@ function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { st
       if (strength?.state === 'pass') {
         return { type: 'warning', message: m.rules.stronger };
       }
-      return strength ? { type: 'success', message: m.rules.strong } : undefined;
+      return { type: 'success', message: m.rules.strong };
     },
     [validatePassword, passwordSettings, m, locale],
   );

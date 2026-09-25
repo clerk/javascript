@@ -286,6 +286,23 @@ describe('UserProfilePasswordSection', () => {
     );
   });
 
+  it('confirms that requirements are met when strength checking is disabled', async () => {
+    renderPassword();
+    const events = await editPassword();
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password meets all the necessary requirements.',
+      ),
+    );
+    await events.clear(screen.getByLabelText('New password'));
+    await events.type(screen.getByLabelText('New password'), 'short');
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password must contain 8 or more characters.',
+      ),
+    );
+  });
+
   it('shows specific client strength suggestions without blocking submission', async () => {
     environment.userSettings.passwordSettings.show_zxcvbn = true;
     renderPassword();
