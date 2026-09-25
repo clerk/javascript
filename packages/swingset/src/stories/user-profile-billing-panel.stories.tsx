@@ -2,8 +2,8 @@ import type {
   UserProfileBillingHistoryItem,
   UserProfilePaymentMethod,
   UserProfileSubscription,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-billing-panel.view';
-import { UserProfileBillingPanelView } from '@clerk/ui/mosaic/features/user-profile/user-profile-billing-panel.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
+import { UserProfileBillingPanelView } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -16,7 +16,7 @@ export const meta: StoryMeta = {
   title: 'UserProfileBillingPanel',
   label: 'Billing panel',
   navigation: { category: 'Panels' },
-  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-billing-panel.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-billing-panel.view.tsx',
 };
 
 const initialSubscription: UserProfileSubscription = {

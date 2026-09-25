@@ -25,9 +25,9 @@ import * as DialogStories from './dialog.component.stories';
 ## Usage
 
 ```tsx
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Card } from '@clerk/ui/mosaic/components/card';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import { Dialog } from '@clerk/mosaic/components/dialog';
 
 <Dialog.Root>
   <Dialog.Trigger render={<Button />}>Open dialog</Dialog.Trigger>
@@ -67,10 +67,10 @@ committing.
 
 ### Variant
 
-| Value     | Width                                    | For                                                                  |
-| --------- | ---------------------------------------- | -------------------------------------------------------------------- |
-| `card`    | `25rem`, height from content             | Everything a `Card` holds — a flow, a confirmation, a form (default) |
-| `profile` | Width from its surface, fills the height | Account profile and settings — a surface you navigate                |
+| Value     | Width                                      | For                                                                  |
+| --------- | ------------------------------------------ | -------------------------------------------------------------------- |
+| `card`    | Width from its `Card`, height from content | Everything a `Card` holds — a flow, a confirmation, a form (default) |
+| `profile` | Width from its surface, fills the height   | Account profile and settings — a surface you navigate                |
 
 ### Every dialog brings its own surface
 
@@ -78,6 +78,8 @@ The dialog **paints nothing**. A `card` holds a `Card`, and a `profile` holds a 
 `UserProfileView`): the dialog positions and animates the popup, and the surface inside paints it.
 
 A popup with no surface inside renders an unpainted box.
+
+A `card` dialog is as wide as its `Card`. Pass `size='lg'` to `Card.Root` for a form that needs more room.
 
 <Story
   name='CardSurface'
@@ -87,9 +89,9 @@ A popup with no surface inside renders an unpainted box.
 A `profile` composes the same way, with the user page in place of the card.
 
 ```tsx
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
-import { UserProfileView } from '@clerk/ui/mosaic/features/user-profile/user-profile.view';
+import { Button } from '@clerk/mosaic/components/button';
+import { Dialog } from '@clerk/mosaic/components/dialog';
+import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
 
 <Dialog.Root>
   <Dialog.Trigger render={<Button />}>Manage account</Dialog.Trigger>
@@ -106,17 +108,17 @@ import { UserProfileView } from '@clerk/ui/mosaic/features/user-profile/user-pro
 ### Compact placement
 
 `compactPlacement='sheet'` bottom-anchors the surface in the compact container query and slides it up from the
-edge instead of centring it.
+edge instead of centering it.
 
 <Story
   name='Sheet'
   storyModule={DialogStories}
 />
 
-| Value    | Compact band (`< 48rem`)                                      | Above it |
-| -------- | ------------------------------------------------------------- | -------- |
-| `center` | Centred (default)                                             | Centred  |
-| `sheet`  | Bottom-anchored, slides up; full width until the surface caps | Centred  |
+| Value    | Compact band (`< 48rem`)   | Above it |
+| -------- | -------------------------- | -------- |
+| `center` | Centered (default)         | Centered |
+| `sheet`  | Bottom-anchored, slides up | Centered |
 
 A `profile` takes no placement and warns in dev if given one.
 
@@ -220,10 +222,10 @@ The name, the description and the button row come from the surface — `Card.Tit
 
 ## Styling
 
-Override by targeting the `.cl-*` slot from a layer that wins over `@clerk/ui/styles.css`:
+Override by targeting the `.cl-*` slot from a layer that wins over `@clerk/mosaic/styles.css`:
 
 ```css
-@import '@clerk/ui/styles.css' layer(components);
+@import '@clerk/mosaic/styles.css' layer(components);
 
 @layer overrides {
   .cl-dialog-popup[data-variant='profile'] {

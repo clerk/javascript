@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 const require = createRequire(import.meta.url);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const uiRoot = resolve(__dirname, '../ui');
+const mosaicRoot = resolve(__dirname, '../mosaic');
 const isDev = process.env.NODE_ENV !== 'production';
 
 // StyleX CSS. `@stylexjs/postcss-plugin` scans the Mosaic source, runs the StyleX babel
@@ -23,6 +23,7 @@ const isDev = process.env.NODE_ENV !== 'production';
 // defaults never change mid-session, so they stay correct.
 const stylexExtraction = {
   '@stylexjs/postcss-plugin': {
+    include: [resolve(__dirname, 'src/**/*.{ts,tsx}'), resolve(mosaicRoot, 'src/**/*.{ts,tsx}')],
     useCSSLayers: true,
     babelConfig: {
       babelrc: false,
@@ -35,8 +36,8 @@ const stylexExtraction = {
           {
             dev: isDev,
             runtimeInjection: false,
-            unstable_moduleResolution: { type: 'commonJS', rootDir: uiRoot },
-            aliases: { '@clerk/ui/mosaic/*': [resolve(uiRoot, 'src/mosaic/*')] },
+            unstable_moduleResolution: { type: 'commonJS', rootDir: mosaicRoot },
+            aliases: { '@clerk/mosaic/*': [resolve(mosaicRoot, 'src/*')] },
           },
         ],
       ],

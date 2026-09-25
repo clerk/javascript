@@ -2,6 +2,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  actionBlocked: {
+    subtitle: 'For your security, this request could not be completed.',
+    title: "We couldn't complete this request",
+    traceIdLabel: 'Reference',
+  },
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
@@ -232,15 +237,24 @@ export const enUS: LocalizationResource = {
     },
     configureStep: {
       actionLabel__generateToken: 'Generate new token',
+      actionLabel__replaceKey: 'Replace JSON key',
       actionLabel__retry: 'Try again',
+      actionLabel__uploadKey: 'Upload JSON key',
+      badge__credentialsConfigured: 'Configured',
+      badge__credentialsMissing: 'Not configured',
       domainsLabel: 'Domains:',
+      error__invalidKeyFile: 'That file is not valid JSON. Upload the key file downloaded from Google.',
       error__ssoRequired: {
         subtitle:
           'Directory Sync requires an SSO connection. Configure and verify your SSO connection first, then return here to set up provisioning.',
         title: 'Single Sign-On is not configured yet',
       },
+      formFieldHint__subjectEmail: 'The directory is read as this admin. They must be an active Workspace admin.',
+      formFieldInputPlaceholder__subjectEmail: 'admin@yourcompany.com',
       formFieldInputPlaceholder__token: 'Generate a new token to reveal it',
       formFieldLabel__endpointUrl: 'SCIM endpoint URL',
+      formFieldLabel__serviceAccountKey: 'Service account key',
+      formFieldLabel__subjectEmail: 'Google Workspace admin email',
       formFieldLabel__token: 'Bearer token',
       instructions: {
         actionLabel__toggle: 'View instructions',
@@ -258,6 +272,16 @@ export const enUS: LocalizationResource = {
           step3: 'Select Provisioning and set the provisioning mode to Automatic.',
           step4: 'Assign the users and groups to provision, then turn provisioning On.',
         },
+        google: {
+          step1:
+            'In the Google Cloud console, create a project and a service account, then create a JSON key for it and download the file.',
+          step2: 'Enable the Admin SDK API for that project.',
+          step3:
+            'In the Google Admin console, open Security, then API controls, then Domain-wide delegation, and add the service account using its client ID.',
+          step4:
+            'Grant it the read-only directory scopes: https://www.googleapis.com/auth/admin.directory.user.readonly and https://www.googleapis.com/auth/admin.directory.group.readonly.',
+          step5: 'Upload the JSON key below and enter the email of a Google Workspace admin to read the directory as.',
+        },
         okta: {
           step1: 'In the Okta Admin Console, open the application used for your SSO connection.',
           step2: 'Open the Provisioning tab and select the Integration setting.',
@@ -268,12 +292,8 @@ export const enUS: LocalizationResource = {
       notice__tokenShownOnce: 'This token is only shown once. Generate a new token if you lose it.',
       subtitle: 'Add these credentials to your identity provider to configure Directory Sync',
       title: 'Configure',
-      warning__googleUnsupported: {
-        subtitle: 'Please contact support to set up your Google Workspace integration.',
-        title: 'Google Workspace connections are not configurable via self-serve',
-      },
       warning__ssoInactive:
-        'Your SSO connection is configured but not active. Members can be provisioned now, but they can only sign in once SSO is activated.',
+        "This SSO connection is configured but not yet active. You can provision members, but they won't be able to sign in until it's active.",
     },
     navbar: {
       title: 'Configure Directory Sync',
@@ -291,14 +311,29 @@ export const enUS: LocalizationResource = {
     },
     testStep: {
       actionLabel__complete: 'Complete',
+      actionLabel__syncNow: 'Sync now',
       badge__active: 'Active',
       badge__deprovisioned: 'Deprovisioned',
       description: 'Users appear here as your identity provider provisions them, most recent activity first.',
+      description__pull:
+        'Your directory is read on a schedule. Start a sync to pull users now, most recent activity first.',
+      empty__noUsersProvisioned: 'No users have been provisioned yet.',
+      empty__waitingForFirstSync: 'Waiting for the first sync to finish…',
       empty__waitingForFirstUser: 'Waiting for the first provisioned user…',
+      error__lastSyncFailed: 'The last sync failed',
       error__loadUsers: 'Could not load provisioned users',
+      error__syncFailed: 'Could not start the sync. Check your connection and try again.',
       note: 'only users with an email address from a configured domain will be processed.',
       noteLabel: 'Note:',
       subtitle: 'Assign or push a test user from {{provider}} to verify provisioning.',
+      syncRow: {
+        neverSynced: 'Not synced yet',
+        title: 'Directory sync',
+      },
+      syncStatus__cancelled: 'Cancelled',
+      syncStatus__failed: 'Failed',
+      syncStatus__running: 'Running',
+      syncStatus__succeeded: 'Succeeded',
       title: 'Test provisioning',
     },
   },
@@ -986,6 +1021,8 @@ export const enUS: LocalizationResource = {
   formButtonPrimary: 'Continue',
   formButtonPrimary__verify: 'Verify',
   formFieldAction__forgotPassword: 'Forgot password?',
+  formFieldAction__hidePassword: 'Hide password',
+  formFieldAction__showPassword: 'Show password',
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldError__notMatchingPasswords: "Passwords don't match.",
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
@@ -1412,6 +1449,54 @@ export const enUS: LocalizationResource = {
           'Are you sure you want to remove the connection "{{name}}"? This action is irreversible and deletes the connection and all of its configuration.',
         title: 'Remove SSO connection',
       },
+      ssoBypassPage: {
+        action__add: 'Add',
+        action__search: 'Search users',
+        addForm: {
+          emailPlaceholder: "Enter the member's email address",
+          error__allAlreadyAdded: 'Everyone with that role is already on the allow list.',
+          error__alreadyAdded: 'This member is already on the allow list.',
+          error__memberNotFound: 'No member of this organization has that email address.',
+          modeLabel: 'Add by',
+          mode__email: 'Email',
+          mode__role: 'Role',
+          roleOption: '{{role}} ({{count}})',
+          roleWarning: 'This list does not sync, members are managed manually.',
+          submitButton: 'Add members',
+          subtitle: 'Members on this list can sign in with an email code when SSO is unavailable.',
+          title: 'Add members',
+        },
+        bulkResult: {
+          added: 'Added {{count}} members',
+          addedMember: 'Added member successfully',
+          added__one: 'Added 1 member',
+          domainNotServed:
+            '{{count}} members could not be added because their email address is not served by a connection.',
+          domainNotServed__one:
+            '1 member could not be added because their email address is not served by a connection.',
+          notMember: '{{count}} members could not be added because they are no longer in the organization.',
+          notMember__one: '1 member could not be added because they are no longer in the organization.',
+          unknown: '{{count}} members could not be added.',
+          unknown__one: '1 member could not be added.',
+        },
+        table: {
+          emptyState: 'No members on the allow list',
+          emptyState__search: 'No members match your search',
+          header__actions: 'Actions',
+          header__user: 'User',
+          menuAction__remove: 'Remove',
+        },
+        title: 'SSO bypass',
+      },
+      ssoBypassSection: {
+        allowlistCount: '{{count}} members',
+        allowlistCount__one: '1 member',
+        allowlistLabel: 'Allow list:',
+        description: 'Members on this list can sign in with an email code when SSO is unavailable.',
+        error__load: 'Could not load the SSO allow list',
+        menuAction__manage: 'Manage',
+        title: 'SSO bypass',
+      },
       ssoSection: {
         badge__active: 'Active',
         badge__inProgress: 'In Progress',
@@ -1658,8 +1743,8 @@ export const enUS: LocalizationResource = {
       title: 'Check your email',
     },
     enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
+      subtitle: 'Select an enterprise account to continue.',
+      title: 'Choose an account',
     },
     enterpriseSSO: {
       formButtonPrimary: 'Continue with SSO',
@@ -1729,7 +1814,7 @@ export const enUS: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'We need to verify your identity before resetting your password.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: "Can't use SSO?",
       code: {
         resendButton: "Didn't receive a code? Resend",
@@ -1813,8 +1898,8 @@ export const enUS: LocalizationResource = {
       },
     },
     enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
+      subtitle: 'Select an enterprise account to continue.',
+      title: 'Choose an account',
     },
     legalConsent: {
       checkbox: {
@@ -2068,12 +2153,16 @@ export const enUS: LocalizationResource = {
     protect_check_execution_failed: "Verification didn't complete. Please try again.",
     protect_check_invalid_script: "Couldn't load verification. Please contact support if this persists.",
     protect_check_invalid_sdk_url: "Verification couldn't start. Please contact support.",
+    protect_check_required:
+      "This sign-in needs an extra verification step that can't be shown here. Please try again or use a different sign-in method.",
     protect_check_script_load_failed:
       "Couldn't load verification. This may be caused by a network issue or a Content Security Policy that blocks the verification script. Please try again or contact support.",
     protect_check_timed_out: "Verification didn't complete in time. Please try again.",
     protect_check_unsupported_environment:
       "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
+    sso_bypass_domain_not_served:
+      'This member could not be added because their email address is not served by a connection.',
     ticket_expired_code: 'This link has expired. Please start again or request a new link.',
     ticket_invalid_code:
       'This link is no longer valid or has already been used. Please start again or request a new link.',

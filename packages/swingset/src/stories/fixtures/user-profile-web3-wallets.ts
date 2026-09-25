@@ -1,7 +1,7 @@
 import type {
   UserProfileWeb3Provider,
   UserProfileWeb3Wallet,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
 import { useState } from 'react';
 
 interface DemoWallet extends UserProfileWeb3Wallet {

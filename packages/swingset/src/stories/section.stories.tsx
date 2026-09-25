@@ -1,9 +1,9 @@
-import { Avatar } from '@clerk/ui/mosaic/components/avatar';
-import { Badge } from '@clerk/ui/mosaic/components/badge';
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Icon, IconFrame } from '@clerk/ui/mosaic/components/icon';
-import { Section } from '@clerk/ui/mosaic/components/section';
-import { space } from '@clerk/ui/mosaic/tokens.stylex';
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Badge } from '@clerk/mosaic/components/badge';
+import { Button } from '@clerk/mosaic/components/button';
+import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
+import { Section } from '@clerk/mosaic/components/section';
+import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -41,7 +41,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'Section',
-  source: 'packages/ui/src/mosaic/components/section/section.tsx',
+  source: 'packages/mosaic/src/components/section/section.tsx',
 };
 
 export function Default() {
@@ -233,7 +233,7 @@ export function MultipleEmailAndPhoneNumbers() {
                   size='sm'
                   variant='ghost'
                 >
-                  <Icon name='ellipsis' />
+                  <Icon name='ellipsis-horizontal' />
                 </Button>
               </Section.Actions>
             </Section.Item>
@@ -249,7 +249,7 @@ export function MultipleEmailAndPhoneNumbers() {
                   size='sm'
                   variant='ghost'
                 >
-                  <Icon name='ellipsis' />
+                  <Icon name='ellipsis-horizontal' />
                 </Button>
               </Section.Actions>
             </Section.Item>
@@ -287,7 +287,7 @@ export function MultipleEmailAndPhoneNumbers() {
                   size='sm'
                   variant='ghost'
                 >
-                  <Icon name='ellipsis' />
+                  <Icon name='ellipsis-horizontal' />
                 </Button>
               </Section.Actions>
             </Section.Item>
@@ -318,7 +318,7 @@ export function ConnectedAccounts() {
                 size='sm'
                 variant='ghost'
               >
-                <Icon name='ellipsis' />
+                <Icon name='ellipsis-horizontal' />
               </Button>
             </Section.Actions>
           </Section.Item>
@@ -337,7 +337,7 @@ export function ConnectedAccounts() {
               >
                 Connect
                 <Icon
-                  name='arrow-right-top'
+                  name='arrow-up-right'
                   placement='inline-end'
                   size='sm'
                 />

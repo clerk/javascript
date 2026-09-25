@@ -1,13 +1,13 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import type { UserProfileFormError } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
+import { Button } from '@clerk/mosaic/components/button';
+import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type {
   UserProfileEmail,
   UserProfilePhone,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
-import { UserProfileAccountSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileAddPhoneDialogProps } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
-import { UserProfileVerifyEmailLinkDialog } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-link.dialog';
-import { UserProfileVerifyEmailSsoDialog } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-sso.dialog';
+} from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
+import { UserProfileAccountSectionView } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
+import type { UserProfileAddPhoneDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
+import { UserProfileVerifyEmailLinkDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-link.dialog';
+import { UserProfileVerifyEmailSsoDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-sso.dialog';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -29,7 +29,7 @@ export const meta: StoryMeta = {
   label: 'Account',
   navigation: { category: 'Sections' },
   source:
-    'packages/ui/src/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view.tsx',
+    'packages/mosaic/src/features/user-profile/user-profile-account-section/user-profile-account-section.view.tsx',
 };
 
 function AccountSection({

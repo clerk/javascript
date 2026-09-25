@@ -1,6 +1,6 @@
 'use client';
 
-import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 import { RotateCcwIcon } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';

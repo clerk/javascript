@@ -1,4 +1,4 @@
-import { UserProfileEnterpriseAccountsSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view';
+import { UserProfileEnterpriseAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -13,7 +13,7 @@ export const meta: StoryMeta = {
   label: 'Enterprise accounts',
   navigation: { category: 'Sections' },
   source:
-    'packages/ui/src/mosaic/features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view.tsx',
+    'packages/mosaic/src/features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view.tsx',
 };
 
 export function Default() {

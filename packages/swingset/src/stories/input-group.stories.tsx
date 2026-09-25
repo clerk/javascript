@@ -1,9 +1,9 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Field } from '@clerk/ui/mosaic/components/field';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import type { InputGroupRootProps } from '@clerk/ui/mosaic/components/input-group';
-import { InputGroup } from '@clerk/ui/mosaic/components/input-group';
-import { colorVars, space } from '@clerk/ui/mosaic/tokens.stylex';
+import { Button } from '@clerk/mosaic/components/button';
+import { Field } from '@clerk/mosaic/components/field';
+import { Icon } from '@clerk/mosaic/components/icon';
+import type { InputGroupRootProps } from '@clerk/mosaic/components/input-group';
+import { InputGroup } from '@clerk/mosaic/components/input-group';
+import { colorVars, space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import { useState } from 'react';
 
@@ -15,7 +15,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'wip',
   title: 'InputGroup',
-  source: 'packages/ui/src/mosaic/components/input-group/input-group.tsx',
+  source: 'packages/mosaic/src/components/input-group/input-group.tsx',
   styles: {
     _variants: {
       size: { sm: {}, md: {}, lg: {} },

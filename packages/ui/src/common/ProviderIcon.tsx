@@ -9,11 +9,14 @@ type ProviderId = OAuthProvider | Web3Provider | PhoneCodeChannel;
 
 export const SUPPORTS_MASK_IMAGE = ['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x'] as const;
 
-const supportsMaskImage = (id: ProviderId): boolean => {
-  return (SUPPORTS_MASK_IMAGE as readonly string[]).includes(id);
+export const getEnterpriseProviderIconId = (provider: string) =>
+  provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider;
+
+const supportsMaskImage = (id?: ProviderId): boolean => {
+  return !!id && (SUPPORTS_MASK_IMAGE as readonly string[]).includes(id);
 };
 
-const getIconImageStyles = (theme: InternalTheme, id: ProviderId, iconUrl: string) => {
+const getIconImageStyles = (theme: InternalTheme, id: ProviderId | undefined, iconUrl: string) => {
   if (supportsMaskImage(id)) {
     return {
       '--cl-icon-fill': theme.colors.$colorForeground,
@@ -41,7 +44,7 @@ export type ProviderIconProps = Omit<
   PropsOfComponent<typeof Span>,
   'elementDescriptor' | 'elementId' | 'aria-label'
 > & {
-  id: ProviderId;
+  id?: ProviderId;
   iconUrl?: string | null;
   name: string;
   size?: string;

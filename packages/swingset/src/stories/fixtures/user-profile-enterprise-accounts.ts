@@ -1,7 +1,7 @@
 import type {
   UserProfileEnterpriseAccount,
   UserProfileEnterpriseConnection,
-} from '@clerk/ui/mosaic/features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.types';
+} from '@clerk/mosaic/features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.types';
 import { useState } from 'react';
 
 export const accounts: UserProfileEnterpriseAccount[] = [

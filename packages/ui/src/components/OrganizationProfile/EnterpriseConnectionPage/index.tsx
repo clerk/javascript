@@ -1,4 +1,4 @@
-import type { EnterpriseConnectionResource, OAuthProvider } from '@clerk/shared/types';
+import type { EnterpriseConnectionResource } from '@clerk/shared/types';
 
 import { Card } from '@/elements/Card';
 import { useCardState, withCardStateProvider } from '@/elements/contexts';
@@ -6,7 +6,7 @@ import { Header } from '@/elements/Header';
 import { ProfileCard } from '@/elements/ProfileCard';
 import { handleError } from '@/utils/errorHandler';
 
-import { ProviderIcon } from '../../../common';
+import { getEnterpriseProviderIconId, ProviderIcon } from '../../../common';
 import { Badge, Button, Col, descriptors, Flex, localizationKeys, Text } from '../../../customizables';
 import { isOidcProvider } from '../../ConfigureSSO/domain/organizationEnterpriseConnection';
 import { providerLabel, toProviderCard } from '../../ConfigureSSO/domain/providers';
@@ -146,7 +146,7 @@ const ConnectionHeader = ({
         sx={t => ({ gap: t.space.$2 })}
       >
         <ProviderIcon
-          id={connection.provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider}
+          id={getEnterpriseProviderIconId(connection.provider)}
           iconUrl={connection.logoPublicUrl?.trim() || undefined}
           name={connection.name}
           elementDescriptor={descriptors.organizationProfileSecuritySsoProviderIcon}

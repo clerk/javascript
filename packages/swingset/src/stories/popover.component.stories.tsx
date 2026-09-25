@@ -1,8 +1,8 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Card } from '@clerk/ui/mosaic/components/card';
-import { Heading } from '@clerk/ui/mosaic/components/heading';
-import { Popover } from '@clerk/ui/mosaic/components/popover';
-import { Text } from '@clerk/ui/mosaic/components/text';
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import { Heading } from '@clerk/mosaic/components/heading';
+import { Popover } from '@clerk/mosaic/components/popover';
+import { Text } from '@clerk/mosaic/components/text';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -15,7 +15,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'Popover',
-  source: 'packages/ui/src/mosaic/components/popover/popover.tsx',
+  source: 'packages/mosaic/src/components/popover/popover.tsx',
 };
 
 const styles = stylex.create({

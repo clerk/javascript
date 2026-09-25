@@ -135,6 +135,9 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>((props, ref)
   const passwordManagerProps = ignorePasswordManager
     ? {
         'data-1p-ignore': true,
+        'data-bwignore': true,
+        'data-lpignore': true,
+        'data-form-type': 'other',
       }
     : undefined;
 

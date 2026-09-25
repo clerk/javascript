@@ -1,8 +1,9 @@
-import type { UserProfilePasskey } from '@clerk/ui/mosaic/features/user-profile/user-profile-passkeys-section.view';
-import { UserProfilePasskeysSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-passkeys-section.view';
-import { useState } from 'react';
+import { UserProfilePasskeysSectionView } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
+import type { ReactElement } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
+
+import { usePasskeysFixture } from './fixtures/user-profile-passkeys';
 
 export { default as __source } from './user-profile-passkeys-section.stories?raw';
 
@@ -12,49 +13,38 @@ export const meta: StoryMeta = {
   title: 'UserProfilePasskeysSection',
   label: 'Passkeys',
   navigation: { category: 'Sections' },
-  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-passkeys-section.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-passkeys-section.view.tsx',
 };
 
-export function Default() {
-  const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([
-    {
-      id: 'passkey',
-      name: 'Passkey',
-      createdAtLabel: 'Created today at 10:12 PM',
-      lastUsedAtLabel: 'Last used 1h ago',
-    },
-  ]);
-
+function PasskeysExample({ empty = false, failOnce = false }: { empty?: boolean; failOnce?: boolean }): ReactElement {
+  const fixture = usePasskeysFixture({ empty, failOnce });
   return (
     <UserProfilePasskeysSectionView
-      passkeys={passkeys}
+      {...fixture}
       sectionTitle='Authentication'
-      onAdd={() =>
-        setPasskeys(current => [
-          ...current,
-          { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
-        ])
-      }
-      onManage={() => undefined}
-      onRemove={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
     />
   );
 }
 
-export function Empty() {
-  const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>([]);
+export function Default(): ReactElement {
+  return <PasskeysExample />;
+}
 
+export function Empty(): ReactElement {
+  return <PasskeysExample empty />;
+}
+
+export function CreationUnavailable(): ReactElement {
+  const fixture = usePasskeysFixture();
   return (
     <UserProfilePasskeysSectionView
-      passkeys={passkeys}
+      {...fixture}
       sectionTitle='Authentication'
-      onAdd={() =>
-        setPasskeys(current => [
-          ...current,
-          { id: `passkey-${Date.now()}`, name: `Passkey ${current.length + 1}`, createdAtLabel: 'Created just now' },
-        ])
-      }
-      onRemove={id => setPasskeys(current => current.filter(passkey => passkey.id !== id))}
+      onAdd={undefined}
     />
   );
+}
+
+export function RecoverableErrors(): ReactElement {
+  return <PasskeysExample failOnce />;
 }

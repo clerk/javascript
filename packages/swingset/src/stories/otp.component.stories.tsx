@@ -1,6 +1,6 @@
-import { Field } from '@clerk/ui/mosaic/components/field';
-import type { OtpProps } from '@clerk/ui/mosaic/components/otp';
-import { Otp } from '@clerk/ui/mosaic/components/otp';
+import { Field } from '@clerk/mosaic/components/field';
+import type { OtpProps } from '@clerk/mosaic/components/otp';
+import { Otp } from '@clerk/mosaic/components/otp';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -13,7 +13,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'OTP',
-  source: 'packages/ui/src/mosaic/components/otp/otp.tsx',
+  source: 'packages/mosaic/src/components/otp/otp.tsx',
   styles: {
     _variants: {
       status: { neutral: {}, success: {}, error: {} },

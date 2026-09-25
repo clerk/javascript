@@ -1,13 +1,13 @@
 import { __createClerkTestQueryClient } from '@clerk/shared/react';
 import type { ActiveSessionResource, LoadedClerk } from '@clerk/shared/types';
-import { type Mocked, vi } from 'vitest';
+import { type Mock, vi } from 'vitest';
 
 import type { RouteContextValue } from '@/ui/router';
 
 type FunctionLike = (...args: any) => any;
 
 type DeepVitestMocked<T> = T extends FunctionLike
-  ? Mocked<T>
+  ? Mock<T>
   : T extends object
     ? {
         [k in keyof T]: DeepVitestMocked<T[k]>;
@@ -70,6 +70,7 @@ export const mockClerkMethods = (clerk: LoadedClerk): DeepVitestMocked<LoadedCle
           mockMethodsOf(m);
           if (m.organization) {
             mockMethodsOf(m.organization);
+            mockMethodsOf(m.organization.ssoBypassAllowlist);
           }
         });
         sessionAny.user.passkeys?.forEach((m: any) => mockMethodsOf(m));

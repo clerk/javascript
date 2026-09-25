@@ -1,8 +1,9 @@
-import { Avatar } from '@clerk/ui/mosaic/components/avatar';
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Item } from '@clerk/ui/mosaic/components/item';
-import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
-import { radiusVars, space } from '@clerk/ui/mosaic/tokens.stylex';
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Badge } from '@clerk/mosaic/components/badge';
+import { Button } from '@clerk/mosaic/components/button';
+import { Item } from '@clerk/mosaic/components/item';
+import { scrollAreaRoot, scrollAreaViewport } from '@clerk/mosaic/components/scroll-area';
+import { radiusVars, space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import * as React from 'react';
 
@@ -19,13 +20,21 @@ const styles = stylex.create({
   noMask: {
     maskImage: 'none',
   },
+  strip: {
+    display: 'flex',
+    gap: space['2'],
+    padding: space['3'],
+  },
+  chip: {
+    flexShrink: 0,
+  },
 });
 
 export const meta: StoryMeta = {
   group: 'Styles',
   title: 'Scroll Area',
   status: 'stable',
-  source: 'packages/ui/src/mosaic/components/scroll-area/scroll-area.styles.ts',
+  source: 'packages/mosaic/src/components/scroll-area/scroll-area.styles.ts',
 };
 
 const accounts = [
@@ -208,6 +217,40 @@ const manyRows = [
   'Black Mesa',
   'Oscorp',
 ];
+
+/**
+ * The same atoms turned sideways: `inline` scrolls horizontally, fades the left and right edges,
+ * and keeps the scrollbar lane along the bottom clear of the mask.
+ */
+export function Horizontal() {
+  const root = stylex.props(scrollAreaRoot);
+
+  return (
+    <div
+      {...root}
+      className={`${root.className} border-border w-full border`}
+      style={{ borderRadius: radiusVars['--cl-radius-sm'] }}
+    >
+      <div
+        role='region'
+        aria-label='Team members'
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Safari does not focus an overflowing scroll container on its own, and the strip holds nothing focusable.
+        tabIndex={0}
+        {...stylex.props(...scrollAreaViewport('auto', 'inline'), styles.strip)}
+      >
+        {manyRows.map(name => (
+          <Badge
+            key={name}
+            color='neutral'
+            xstyle={styles.chip}
+          >
+            {name}
+          </Badge>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 /**
  * Taking `--cl-scrollbar-thumb-idle` to zero alpha removes the bar entirely until the pointer

@@ -1,8 +1,8 @@
 'use client';
 
-import { Field } from '@clerk/ui/mosaic/components/field';
-import type { PhoneInputProps } from '@clerk/ui/mosaic/components/phone-input';
-import { PhoneInput } from '@clerk/ui/mosaic/components/phone-input';
+import { Field } from '@clerk/mosaic/components/field';
+import type { PhoneInputProps } from '@clerk/mosaic/components/phone-input';
+import { PhoneInput } from '@clerk/mosaic/components/phone-input';
 import * as stylex from '@stylexjs/stylex';
 
 import type { StoryMeta } from '@/lib/types';
@@ -15,7 +15,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'wip',
   title: 'PhoneInput',
-  source: 'packages/ui/src/mosaic/components/phone-input/phone-input.tsx',
+  source: 'packages/mosaic/src/components/phone-input/phone-input.tsx',
   styles: {
     _variants: {
       size: { sm: {}, md: {}, lg: {} },

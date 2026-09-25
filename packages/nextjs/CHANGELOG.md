@@ -1,5 +1,36 @@
 # Change Log
 
+## 7.9.7
+
+### Patch Changes
+
+- Updated dependencies [[`645a532`](https://github.com/clerk/javascript/commit/645a5327d9c7cae8052e39958ec4d737457d179a), [`84ee588`](https://github.com/clerk/javascript/commit/84ee588a712ffa0bb2988531d7a2727c9e06ac37), [`4e538ac`](https://github.com/clerk/javascript/commit/4e538ac07ed412706516531d9be9696bbd31bf24)]:
+  - @clerk/shared@4.36.0
+  - @clerk/react@6.17.2
+  - @clerk/backend@3.20.1
+
+## 7.9.6
+
+### Patch Changes
+
+- Updated dependencies [[`b3af79e`](https://github.com/clerk/javascript/commit/b3af79e946aaa403595b31e472b07b138db39dc6), [`cc6f11a`](https://github.com/clerk/javascript/commit/cc6f11af564b62daf186f9721594efd864ce093f), [`9d78a1f`](https://github.com/clerk/javascript/commit/9d78a1f42e83874ebac54b67d81d444b376350e5), [`d46b544`](https://github.com/clerk/javascript/commit/d46b5446e89f15c5532bfbbc09fdc05a0fbcbf8d), [`f50f48c`](https://github.com/clerk/javascript/commit/f50f48cf3c67807c8def30d4a6d29d6c7bf904d2)]:
+  - @clerk/shared@4.35.0
+  - @clerk/backend@3.20.0
+  - @clerk/react@6.17.1
+
+## 7.9.5
+
+### Patch Changes
+
+- Fix a development-only React key warning when using `ClerkProvider` in the App Router. ([#9816](https://github.com/clerk/javascript/pull/9816)) by [@joshrowley](https://github.com/joshrowley)
+
+- Fix a cross-request credential leak in `clerkMiddleware()`. When using dynamic keys (an options callback that resolves a different `secretKey` per request), a `clerkClient()` call made inside the middleware handler could be built with another concurrent request's secret key. Each request now gets its own isolated store, so the keys resolved for a request are only ever visible to that request. ([#9723](https://github.com/clerk/javascript/pull/9723)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Updated dependencies [[`804d3db`](https://github.com/clerk/javascript/commit/804d3db182746d3b403411025b5dccc5aeafc719), [`64c8e3e`](https://github.com/clerk/javascript/commit/64c8e3ec55e79a2ccc79ae27cbadaeef9481f3d9), [`f56a14b`](https://github.com/clerk/javascript/commit/f56a14b3281578c76c4ebd8f50ac41156c437feb), [`07b4c2b`](https://github.com/clerk/javascript/commit/07b4c2b3c8bfa394f4331efcc363ee4064336f9d), [`4e36687`](https://github.com/clerk/javascript/commit/4e366874c5c4348750d43073cd8ec7aa4564e476), [`917453a`](https://github.com/clerk/javascript/commit/917453a23ec594e644834815d6f84af77146256d), [`3d6ed25`](https://github.com/clerk/javascript/commit/3d6ed25dd62603647e39447454cd8b964fe3558d), [`40f40f2`](https://github.com/clerk/javascript/commit/40f40f213507285ae1dfe1714fde2e88adb7ccc2), [`9e7485c`](https://github.com/clerk/javascript/commit/9e7485c8efc33e9458643372ce133b229347c03d)]:
+  - @clerk/shared@4.34.0
+  - @clerk/react@6.17.0
+  - @clerk/backend@3.19.0
+
 ## 7.9.4
 
 ### Patch Changes

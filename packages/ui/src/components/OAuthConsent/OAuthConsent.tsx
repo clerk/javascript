@@ -263,22 +263,24 @@ function _OAuthConsent() {
                 onChange={setSelectedOrg}
               />
             )}
-            <ListGroup>
-              <ListGroupHeader>
-                <ListGroupHeaderTitle
-                  localizationKey={localizationKeys('oauthConsent.scopeList.title', {
-                    applicationName: oauthApplicationName,
-                  })}
-                />
-              </ListGroupHeader>
-              <ListGroupContent>
-                {displayedScopes.map(item => (
-                  <ListGroupItem key={item.scope}>
-                    <ListGroupItemLabel>{item.description || item.scope || ''}</ListGroupItemLabel>
-                  </ListGroupItem>
-                ))}
-              </ListGroupContent>
-            </ListGroup>
+            {displayedScopes.length > 0 && (
+              <ListGroup>
+                <ListGroupHeader>
+                  <ListGroupHeaderTitle
+                    localizationKey={localizationKeys('oauthConsent.scopeList.title', {
+                      applicationName: oauthApplicationName,
+                    })}
+                  />
+                </ListGroupHeader>
+                <ListGroupContent>
+                  {displayedScopes.map(item => (
+                    <ListGroupItem key={item.scope}>
+                      <ListGroupItemLabel>{item.description || item.scope || ''}</ListGroupItemLabel>
+                    </ListGroupItem>
+                  ))}
+                </ListGroupContent>
+              </ListGroup>
+            )}
             <Alert colorScheme='warning'>
               <Text
                 colorScheme='warning'

@@ -21,8 +21,9 @@ its dismiss, and fills the popup; standalone it paints the same frame and takes 
 ## Usage
 
 ```tsx
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import { Profile } from '@clerk/ui/mosaic/components/profile';
+import { Badge } from '@clerk/mosaic/components/badge';
+import { Icon } from '@clerk/mosaic/components/icon';
+import { Profile } from '@clerk/mosaic/components/profile';
 
 <Profile.Root
   value={page}
@@ -39,6 +40,7 @@ import { Profile } from '@clerk/ui/mosaic/components/profile';
     <Profile.NavItem
       value='security'
       icon={<Icon name='shield-check' size='sm' />}
+      badge={<Badge>2</Badge>}
     >
       Security
     </Profile.NavItem>
@@ -53,9 +55,9 @@ import { Profile } from '@clerk/ui/mosaic/components/profile';
 `Root` is controlled: `value` names the open page and `onValueChange` reports a selection. Its
 `elevation` picks how it sits, the way `Card`'s does: `card` (default) is framed, with a fixed
 height and the pages scrolling inside; `flush` is the page's own content — no frame, the page
-scrolls, the columns a gap apart, held to a reading width and centred. A
-`NavItem` and a `Page` pair by `value`. `icon` takes any node, so a page of the consumer's own can
-bring its own mark. `Title` is a visually hidden heading: it names the navigation, the compact
+scrolls, the columns a gap apart, held to a reading width and centered. A
+`NavItem` and a `Page` pair by `value`. `icon` and `badge` take nodes, so a page can supply its own
+leading mark and trailing status. A `Badge` passed to `badge` is `neutral` unless it sets its own `color`. `Title` is a visually hidden heading: it names the navigation, the compact
 sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 
 ## Parts

@@ -1,5 +1,5 @@
-import type { TextProps } from '@clerk/ui/mosaic/components/text';
-import { Text } from '@clerk/ui/mosaic/components/text';
+import type { TextProps } from '@clerk/mosaic/components/text';
+import { Text } from '@clerk/mosaic/components/text';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -11,7 +11,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'wip',
   title: 'Text',
-  source: 'packages/ui/src/mosaic/components/text/text.tsx',
+  source: 'packages/mosaic/src/components/text/text.tsx',
   styles: {
     _variants: {
       size: { xs: {}, sm: {}, base: {}, lg: {}, xl: {}, '2xl': {} },

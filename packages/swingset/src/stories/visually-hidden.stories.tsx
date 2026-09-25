@@ -1,8 +1,8 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import { Text } from '@clerk/ui/mosaic/components/text';
-import type { VisuallyHiddenProps } from '@clerk/ui/mosaic/components/visually-hidden';
-import { VisuallyHidden } from '@clerk/ui/mosaic/components/visually-hidden';
+import { Button } from '@clerk/mosaic/components/button';
+import { Icon } from '@clerk/mosaic/components/icon';
+import { Text } from '@clerk/mosaic/components/text';
+import type { VisuallyHiddenProps } from '@clerk/mosaic/components/visually-hidden';
+import { VisuallyHidden } from '@clerk/mosaic/components/visually-hidden';
 import * as React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -15,7 +15,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'VisuallyHidden',
-  source: 'packages/ui/src/mosaic/components/visually-hidden/visually-hidden.tsx',
+  source: 'packages/mosaic/src/components/visually-hidden/visually-hidden.tsx',
 };
 
 function knobsAsProps(props: Record<string, unknown>) {
