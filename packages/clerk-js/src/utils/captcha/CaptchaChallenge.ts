@@ -15,12 +15,14 @@ export class CaptchaChallenge {
    * always use the fallback key.
    */
   public async invisible(opts?: Partial<CaptchaOptions>) {
-    const { captchaSiteKey, canUseCaptcha, captchaPublicKeyInvisible, nonce } = retrieveCaptchaInfo(this.clerk);
+    const { captchaSiteKey, canUseCaptcha, captchaProvider, captchaPublicKeyInvisible, nonce } = retrieveCaptchaInfo(
+      this.clerk,
+    );
 
     if (canUseCaptcha && captchaSiteKey && captchaPublicKeyInvisible) {
       const captchaResult = await getCaptchaToken({
         action: opts?.action,
-        captchaProvider: 'turnstile',
+        captchaProvider,
         invisibleSiteKey: captchaPublicKeyInvisible,
         nonce: opts?.nonce || nonce || undefined,
         siteKey: captchaPublicKeyInvisible,
