@@ -31,7 +31,7 @@
 > [!WARNING]
 > `@clerk/electron` is in beta. APIs may change before 1.0.
 
-The package has one entrypoint per Electron process:
+The package has these entrypoints:
 
 - `@clerk/electron` runs in the main process.
 - `@clerk/electron/preload` runs in preload scripts.
