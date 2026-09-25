@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.20.2
+
+### Patch Changes
+
+- Update the `allowedOrigins` JSDoc for Electron apps to describe the custom renderer scheme used by `@clerk/electron`. ([#9784](https://github.com/clerk/javascript/pull/9784)) by [@manovotny](https://github.com/manovotny)
+
+- Capture authentication timezones so Clerk emails can display timestamps in a stored user timezone. ([#9540](https://github.com/clerk/javascript/pull/9540)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`6a14691`](https://github.com/clerk/javascript/commit/6a14691f8d98dcafd3956e1ea97cb35d56a34864), [`0ee4ee2`](https://github.com/clerk/javascript/commit/0ee4ee2b49286a8cae5f251ec997f30c8a863205)]:
+  - @clerk/shared@4.37.0
+
 ## 3.20.1
 
 ### Patch Changes
