@@ -10,6 +10,7 @@ import { Card } from '../card';
 import { Dialog } from '../dialog';
 import { HeadingLevelProvider } from '../heading';
 import { Icon } from '../icon';
+import { Panel } from '../panel';
 import { Section } from '../section';
 import type { ProfileRootProps } from './profile';
 import { Profile } from './profile';
@@ -32,12 +33,14 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
       </Profile.Nav>
       <Profile.Content>
         <Profile.ContentPanel value='account'>
-          <Profile.PageTitle>Account</Profile.PageTitle>
-          <HeadingLevelProvider>
-            <Section.Root>
-              <Section.Title>Email addresses</Section.Title>
-            </Section.Root>
-          </HeadingLevelProvider>
+          <Panel.Root>
+            <Panel.Title>Account</Panel.Title>
+            <Panel.Sections>
+              <Section.Root>
+                <Section.Title>Email addresses</Section.Title>
+              </Section.Root>
+            </Panel.Sections>
+          </Panel.Root>
         </Profile.ContentPanel>
         <Profile.ContentPanel value='security'>Security page</Profile.ContentPanel>
       </Profile.Content>
@@ -248,16 +251,6 @@ describe('Profile', () => {
   });
 
   describe('page title', () => {
-    it('is a level-2 heading alone outside a profile', () => {
-      render(
-        <MosaicProvider>
-          <Profile.PageTitle>Account</Profile.PageTitle>
-        </MosaicProvider>,
-      );
-      expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toHaveClass('cl-heading');
-      expect(screen.queryByRole('button')).not.toBeInTheDocument();
-    });
-
     it('is a plain heading while the navigation is beside the content', () => {
       renderSurface();
       expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
@@ -335,10 +328,10 @@ describe('Profile', () => {
             </Profile.Nav>
             <Profile.Content>
               <Profile.ContentPanel value='account'>
-                <Profile.PageTitle>Account</Profile.PageTitle>
+                <Panel.Title>Account</Panel.Title>
               </Profile.ContentPanel>
               <Profile.ContentPanel value='security'>
-                <Profile.PageTitle>Security</Profile.PageTitle>
+                <Panel.Title>Security</Panel.Title>
               </Profile.ContentPanel>
             </Profile.Content>
           </Profile.Root>

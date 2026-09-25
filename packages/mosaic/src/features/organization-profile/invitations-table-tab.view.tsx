@@ -9,7 +9,6 @@ import { EmptyState } from '../../components/empty-state';
 import { Icon } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
-import { panelStyles } from '../../components/profile';
 import { Spinner } from '../../components/spinner';
 import { Table, type TableHeaderCellProps } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
@@ -22,6 +21,7 @@ import type {
   InvitationsTableTabViewProps,
   OrganizationProfileInvitation,
 } from './invitations-table-tab.types';
+import { tableTabStyles } from './table-tab.styles';
 
 const getRowId = (invitation: OrganizationProfileInvitation) => invitation.id;
 
@@ -104,7 +104,7 @@ export function InvitationsTableTabView({
   };
   return (
     <>
-      <div {...mergeStyleProps(themeProps('invitations-table-tab'), stylex.props(panelStyles.root))}>
+      <div {...mergeStyleProps(themeProps('invitations-table-tab'), stylex.props(tableTabStyles.root))}>
         <Table.Toolbar>
           <Table.Search
             ref={searchInput}

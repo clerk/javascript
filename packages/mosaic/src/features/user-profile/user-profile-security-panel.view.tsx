@@ -1,9 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 
-import { HeadingLevelProvider } from '../../components/heading';
-import { panelStyles, Profile } from '../../components/profile';
-import { mergeStyleProps, themeProps } from '../../props';
+import { Panel } from '../../components/panel';
+import { themeProps } from '../../props';
 import type {
   UserProfileActiveDevicesSectionViewProps,
   UserProfileDevice,
@@ -84,52 +83,50 @@ export function UserProfileSecurityPanelView({
   const hasAuthentication = showPassword || showPasskeys || mfaMethods !== undefined;
 
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-security-panel'), stylex.props(panelStyles.root))}>
-      <Profile.PageTitle>Security</Profile.PageTitle>
-      <HeadingLevelProvider>
-        <div {...stylex.props(panelStyles.sections)}>
-          <div {...stylex.props(styles.sectionCards, !hasAuthentication && styles.emptySectionCards)}>
-            {showPassword ? (
-              <UserProfilePasswordSectionView
-                hasPassword={hasPassword}
-                managedBy={managedBy}
-                requiresCurrentPassword={requiresCurrentPassword}
-                onSubmitPassword={onSubmitPassword}
-              />
-            ) : null}
-            {showPasskeys ? (
-              <UserProfilePasskeysSectionView
-                passkeys={passkeys}
-                sectionTitle={showPassword ? undefined : 'Authentication'}
-                onAdd={onAddPasskey}
-                addError={addPasskeyError}
-                onRename={onRenamePasskey}
-                onRemove={onRemovePasskey}
-              />
-            ) : null}
-            {mfaMethods !== undefined ? (
-              <UserProfileMfaSectionView
-                methods={mfaMethods}
-                addableMethods={addableMfaMethods}
-                addControl={mfaAddControl}
-                sectionTitle={!showPassword && !showPasskeys ? 'Authentication' : undefined}
-                onAdd={onAddMfaMethod}
-                onRegenerateBackupCodes={onRegenerateBackupCodes}
-                onRemove={onRemoveMfaMethod}
-                onSetDefault={onSetDefaultMfaMethod}
-              />
-            ) : null}
-          </div>
-          {devices ? (
-            <UserProfileActiveDevicesSectionView
-              devices={devices}
-              onSignOutAllOtherDevices={onSignOutAllOtherDevices}
-              onSignOutDevice={onSignOutDevice}
+    <Panel.Root render={<div {...themeProps('user-profile-security-panel')} />}>
+      <Panel.Title>Security</Panel.Title>
+      <Panel.Sections>
+        <div {...stylex.props(styles.sectionCards, !hasAuthentication && styles.emptySectionCards)}>
+          {showPassword ? (
+            <UserProfilePasswordSectionView
+              hasPassword={hasPassword}
+              managedBy={managedBy}
+              requiresCurrentPassword={requiresCurrentPassword}
+              onSubmitPassword={onSubmitPassword}
             />
           ) : null}
-          {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
+          {showPasskeys ? (
+            <UserProfilePasskeysSectionView
+              passkeys={passkeys}
+              sectionTitle={showPassword ? undefined : 'Authentication'}
+              onAdd={onAddPasskey}
+              addError={addPasskeyError}
+              onRename={onRenamePasskey}
+              onRemove={onRemovePasskey}
+            />
+          ) : null}
+          {mfaMethods !== undefined ? (
+            <UserProfileMfaSectionView
+              methods={mfaMethods}
+              addableMethods={addableMfaMethods}
+              addControl={mfaAddControl}
+              sectionTitle={!showPassword && !showPasskeys ? 'Authentication' : undefined}
+              onAdd={onAddMfaMethod}
+              onRegenerateBackupCodes={onRegenerateBackupCodes}
+              onRemove={onRemoveMfaMethod}
+              onSetDefault={onSetDefaultMfaMethod}
+            />
+          ) : null}
         </div>
-      </HeadingLevelProvider>
-    </div>
+        {devices ? (
+          <UserProfileActiveDevicesSectionView
+            devices={devices}
+            onSignOutAllOtherDevices={onSignOutAllOtherDevices}
+            onSignOutDevice={onSignOutDevice}
+          />
+        ) : null}
+        {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
+      </Panel.Sections>
+    </Panel.Root>
   );
 }

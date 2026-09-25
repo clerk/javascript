@@ -1,9 +1,7 @@
-import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
-import { HeadingLevelProvider } from '../../components/heading';
-import { panelStyles, Profile } from '../../components/profile';
-import { mergeStyleProps, themeProps } from '../../props';
+import { Panel } from '../../components/panel';
+import { themeProps } from '../../props';
 import type {
   UserProfileBillingHistoryItem,
   UserProfileBillingHistoryPagination,
@@ -49,29 +47,27 @@ export function UserProfileBillingPanelView({
   onViewInvoice,
 }: UserProfileBillingPanelViewProps): ReactElement {
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-billing-panel'), stylex.props(panelStyles.root))}>
-      <Profile.PageTitle>Billing</Profile.PageTitle>
-      <HeadingLevelProvider>
-        <div {...stylex.props(panelStyles.sections)}>
-          <UserProfileSubscriptionSectionView
-            subscription={subscription}
-            onChangePlan={onChangePlan}
-          />
-          <UserProfilePaymentMethodsSectionView
-            paymentMethods={paymentMethods}
-            onAdd={onAddPaymentMethod}
-            onMakeDefault={onMakeDefaultPaymentMethod}
-            onRemove={onRemovePaymentMethod}
-          />
-          <UserProfileBillingHistorySectionView
-            items={historyItems}
-            pagination={historyPagination}
-            onPageChange={onBillingHistoryPageChange}
-            onPageSizeChange={onBillingHistoryPageSizeChange}
-            onView={onViewInvoice}
-          />
-        </div>
-      </HeadingLevelProvider>
-    </div>
+    <Panel.Root render={<div {...themeProps('user-profile-billing-panel')} />}>
+      <Panel.Title>Billing</Panel.Title>
+      <Panel.Sections>
+        <UserProfileSubscriptionSectionView
+          subscription={subscription}
+          onChangePlan={onChangePlan}
+        />
+        <UserProfilePaymentMethodsSectionView
+          paymentMethods={paymentMethods}
+          onAdd={onAddPaymentMethod}
+          onMakeDefault={onMakeDefaultPaymentMethod}
+          onRemove={onRemovePaymentMethod}
+        />
+        <UserProfileBillingHistorySectionView
+          items={historyItems}
+          pagination={historyPagination}
+          onPageChange={onBillingHistoryPageChange}
+          onPageSizeChange={onBillingHistoryPageSizeChange}
+          onView={onViewInvoice}
+        />
+      </Panel.Sections>
+    </Panel.Root>
   );
 }

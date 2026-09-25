@@ -1,10 +1,8 @@
-import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 import { useRef } from 'react';
 
-import { HeadingLevelProvider } from '../../components/heading';
-import { panelStyles, Profile } from '../../components/profile';
-import { mergeStyleProps, themeProps } from '../../props';
+import { Panel } from '../../components/panel';
+import { themeProps } from '../../props';
 import type {
   UserProfileAccountSectionViewProps,
   UserProfileEmail,
@@ -86,65 +84,63 @@ export function UserProfileProfilePanelView({
 }: UserProfileProfilePanelViewProps): ReactElement {
   const pageTitle = useRef<HTMLDivElement>(null);
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-profile-panel'), stylex.props(panelStyles.root))}>
-      <Profile.PageTitle
+    <Panel.Root render={<div {...themeProps('user-profile-profile-panel')} />}>
+      <Panel.Title
         ref={pageTitle}
         tabIndex={-1}
       >
         Account
-      </Profile.PageTitle>
-      <HeadingLevelProvider>
-        <div {...stylex.props(panelStyles.sections)}>
-          <UserProfileAccountSectionView
-            allowMultipleAccounts={allowMultipleAccounts}
-            emails={emails}
-            firstName={firstName}
-            firstNameAttribute={firstNameAttribute}
-            hasImage={hasImage}
-            imageUrl={imageUrl}
-            lastName={lastName}
-            lastNameAttribute={lastNameAttribute}
-            name={name}
-            phones={phones}
-            username={username}
-            onAddEmail={onAddEmail}
-            onSendPhoneCode={onSendPhoneCode}
-            onVerifyPhoneCode={onVerifyPhoneCode}
-            onSendEmailCode={onSendEmailCode}
-            onVerifyEmailCode={onVerifyEmailCode}
-            onManageEmail={onManageEmail}
-            onManagePhone={onManagePhone}
-            onProfilePictureChange={onProfilePictureChange}
-            onProfilePictureReject={onProfilePictureReject}
-            onRemoveEmail={onRemoveEmail}
-            onRemovePhone={onRemovePhone}
-            onRemoveProfilePicture={onRemoveProfilePicture}
-            onSetPrimaryEmail={onSetPrimaryEmail}
-            onSetPrimaryPhone={onSetPrimaryPhone}
-            onVerifyEmail={onVerifyEmail}
-            onVerifyPhone={onVerifyPhone}
-            onSubmitName={onSubmitName}
-            onSubmitUsername={onSubmitUsername}
-          />
-          <UserProfileConnectedAccountsSectionView
-            fallbackFocus={() => pageTitle.current}
-            accounts={connectedAccounts}
-            availableProviders={availableConnectionProviders}
-            onReconnect={onReconnectAccount}
-            onConnect={onConnectAccount}
-            onRemove={onRemoveConnectedAccount}
-          />
-          <UserProfileWeb3WalletsSectionView
-            fallbackFocus={() => pageTitle.current}
-            wallets={web3Wallets}
-            availableProviders={availableWeb3Providers}
-            onConnect={onConnectWeb3Wallet}
-            onRemove={onRemoveWeb3Wallet}
-            onSetPrimary={onSetPrimaryWeb3Wallet}
-          />
-          {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
-        </div>
-      </HeadingLevelProvider>
-    </div>
+      </Panel.Title>
+      <Panel.Sections>
+        <UserProfileAccountSectionView
+          allowMultipleAccounts={allowMultipleAccounts}
+          emails={emails}
+          firstName={firstName}
+          firstNameAttribute={firstNameAttribute}
+          hasImage={hasImage}
+          imageUrl={imageUrl}
+          lastName={lastName}
+          lastNameAttribute={lastNameAttribute}
+          name={name}
+          phones={phones}
+          username={username}
+          onAddEmail={onAddEmail}
+          onSendPhoneCode={onSendPhoneCode}
+          onVerifyPhoneCode={onVerifyPhoneCode}
+          onSendEmailCode={onSendEmailCode}
+          onVerifyEmailCode={onVerifyEmailCode}
+          onManageEmail={onManageEmail}
+          onManagePhone={onManagePhone}
+          onProfilePictureChange={onProfilePictureChange}
+          onProfilePictureReject={onProfilePictureReject}
+          onRemoveEmail={onRemoveEmail}
+          onRemovePhone={onRemovePhone}
+          onRemoveProfilePicture={onRemoveProfilePicture}
+          onSetPrimaryEmail={onSetPrimaryEmail}
+          onSetPrimaryPhone={onSetPrimaryPhone}
+          onVerifyEmail={onVerifyEmail}
+          onVerifyPhone={onVerifyPhone}
+          onSubmitName={onSubmitName}
+          onSubmitUsername={onSubmitUsername}
+        />
+        <UserProfileConnectedAccountsSectionView
+          fallbackFocus={() => pageTitle.current}
+          accounts={connectedAccounts}
+          availableProviders={availableConnectionProviders}
+          onReconnect={onReconnectAccount}
+          onConnect={onConnectAccount}
+          onRemove={onRemoveConnectedAccount}
+        />
+        <UserProfileWeb3WalletsSectionView
+          fallbackFocus={() => pageTitle.current}
+          wallets={web3Wallets}
+          availableProviders={availableWeb3Providers}
+          onConnect={onConnectWeb3Wallet}
+          onRemove={onRemoveWeb3Wallet}
+          onSetPrimary={onSetPrimaryWeb3Wallet}
+        />
+        {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
+      </Panel.Sections>
+    </Panel.Root>
   );
 }

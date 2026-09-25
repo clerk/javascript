@@ -533,7 +533,7 @@ describe('UserButton (connected)', () => {
     renderUserButton();
     const act = await open();
 
-    await accountAction(act, 'Create organization');
+    await act.click(screen.getByRole('button', { name: 'Create organization' }));
 
     expect(openCreateOrganization).toHaveBeenCalled();
     expect(navigate).not.toHaveBeenCalled();
@@ -544,21 +544,20 @@ describe('UserButton (connected)', () => {
     renderUserButton({ createOrganizationUrl: '/new-org' });
     const act = await open();
 
-    await accountAction(act, 'Create organization');
+    await act.click(screen.getByRole('button', { name: 'Create organization' }));
 
     expect(navigate).toHaveBeenCalledWith('/new-org');
     expect(openCreateOrganization).not.toHaveBeenCalled();
     await waitFor(() => expect(popup()).toBeNull());
   });
 
-  it('leaves create-organization out of the account menu for a user who cannot open one', async () => {
+  it('leaves "Create organization" out of the list for a user who cannot open one', async () => {
     user = { ...(user as FakeUser), createOrganizationEnabled: false };
     renderUserButton();
-    const act = await open();
-    await act.click(accountMenu());
+    await open();
 
-    expect(await screen.findByRole('menuitem', { name: 'Manage account' })).toBeInTheDocument();
-    expect(screen.queryByRole('menuitem', { name: 'Create organization' })).toBeNull();
+    expect(await screen.findByRole('button', { name: 'Other' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Create organization' })).toBeNull();
   });
 
   it('spins the clicked affordance and stands every other one down while an action is in flight', async () => {
@@ -576,7 +575,7 @@ describe('UserButton (connected)', () => {
     // keeps its place in the tab order. Dropping it to a static row would remount it, and with it
     // the avatar it carries.
     expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toHaveAttribute('aria-disabled', 'true');
-    expect(screen.getByRole('button', { name: 'Switch account' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Switch account' })).toHaveAttribute('aria-disabled', 'true');
     expect(popup()).toBeInTheDocument();
 
     deferred.resolve();
