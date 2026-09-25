@@ -1,3 +1,4 @@
+import { isClerkRuntimeError } from '@clerk/shared/error';
 import { __internal_WebAuthnAbortService } from '@clerk/shared/internal/clerk-js/passkeys';
 import { useSession } from '@clerk/shared/react';
 import React from 'react';
@@ -42,7 +43,12 @@ export const UVFactorTwoPasskeyCard = (props: UVFactorTwoPasskeyCardProps) => {
       .then(response => {
         return handleVerificationResponse(response);
       })
-      .catch(err => handleError(err, [], card.setError))
+      .catch(err => {
+        if (isClerkRuntimeError(err) && err.code === 'passkey_operation_aborted') {
+          return;
+        }
+        handleError(err, [], card.setError);
+      })
       .finally(() => card.setIdle());
 
     return;
