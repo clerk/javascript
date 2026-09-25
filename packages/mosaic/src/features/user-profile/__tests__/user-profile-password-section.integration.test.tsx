@@ -194,7 +194,11 @@ describe('UserProfilePasswordSection', () => {
   it('keeps an enterprise-managed password visible without offering a mutation', () => {
     user.enterpriseAccounts = [{ active: true }];
     renderPassword();
-    expect(screen.getByText('Your organization manages your password.')).toBeVisible();
+    expect(
+      screen.getByText(
+        'Your password can currently not be edited because you can sign in only via the enterprise connection.',
+      ),
+    ).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Change password' })).not.toBeInTheDocument();
   });
 
