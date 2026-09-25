@@ -21,7 +21,7 @@ export const meta: StoryMeta = {
   source: 'packages/mosaic/src/components/action-bar/action-bar.tsx',
 };
 
-const members = [
+const namedMembers = [
   { id: 'kyle', name: 'Kyle Mac', role: 'Member' },
   { id: 'austin', name: 'Austin Calvelage', role: 'Member' },
   { id: 'colin', name: 'Colin Sidoti', role: 'Admin' },
@@ -42,6 +42,15 @@ const members = [
   { id: 'ron', name: 'Ron LaFlamme', role: 'Member' },
 ];
 
+const members = [
+  ...namedMembers,
+  ...Array.from({ length: 50 - namedMembers.length }, (_, index) => ({
+    id: `guest-${index + 1}`,
+    name: `Guest ${index + 1}`,
+    role: 'Member',
+  })),
+];
+
 function MembersTable({ rows = 10, portalRoot }: { rows?: number; portalRoot?: HTMLElement | null }) {
   const tableId = useId();
   const tableRef = useRef<HTMLTableElement>(null);
@@ -53,6 +62,7 @@ function MembersTable({ rows = 10, portalRoot }: { rows?: number; portalRoot?: H
   return (
     <>
       <Table.Root
+        grid
         ref={tableRef}
         id={tableId}
       >
@@ -81,7 +91,32 @@ function MembersTable({ rows = 10, portalRoot }: { rows?: number; portalRoot?: H
                 onToggleSelected={row.toggleSelected}
               />
               <Table.Cell>{row.original.name}</Table.Cell>
-              <Table.Cell>{row.original.role}</Table.Cell>
+              <Table.Cell>
+                <Menu.Root>
+                  <Menu.Trigger
+                    render={
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                      />
+                    }
+                  >
+                    {row.original.role}
+                    <Icon
+                      name='chevron-down'
+                      placement='inline-end'
+                    />
+                  </Menu.Trigger>
+                  <Menu.Popup>
+                    <Menu.Item label='Admin'>
+                      <Menu.Label>Admin</Menu.Label>
+                    </Menu.Item>
+                    <Menu.Item label='Member'>
+                      <Menu.Label>Member</Menu.Label>
+                    </Menu.Item>
+                  </Menu.Popup>
+                </Menu.Root>
+              </Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
@@ -174,7 +209,7 @@ function MembersProfile({
           <div style={{ display: 'grid', gap: 24 }}>
             <Profile.PageTitle>Members</Profile.PageTitle>
             <MembersTable
-              rows={members.length}
+              rows={namedMembers.length}
               portalRoot={portalRoot}
             />
             <p>1–18 of 18</p>
@@ -202,4 +237,8 @@ export function InDialog() {
 
 export function Inline() {
   return <MembersProfile elevation='flush' />;
+}
+
+export function LongTable() {
+  return <MembersTable rows={members.length} />;
 }

@@ -91,6 +91,24 @@ Each sortable header cycles through ascending, descending, and unsorted. The sto
   storyModule={TableStories}
 />
 
+### Grid
+
+With `grid`, the table is one tab stop and the keyboard moves between cells:
+
+| Key                            | Moves to                                                   |
+| ------------------------------ | ---------------------------------------------------------- |
+| `←` `→` `↑` `↓`                | The neighboring cell                                       |
+| `Home` / `End`                 | The first / last cell in the row                           |
+| `Ctrl` + `Home` / `End`        | The first / last cell in the table                         |
+| `Enter` or `F2`, then `Escape` | Into a cell with several controls or a text field, and out |
+
+A cell with one control focuses that control; `Enter` or `Space` operate it as usual.
+
+<Story
+  name='Grid'
+  storyModule={TableStories}
+/>
+
 ### Empty
 
 <Story

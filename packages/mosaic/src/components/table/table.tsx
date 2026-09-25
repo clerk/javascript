@@ -1,9 +1,11 @@
+import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import type { CheckboxProps } from '../checkbox';
@@ -11,6 +13,7 @@ import { Checkbox } from '../checkbox';
 import { Icon } from '../icon';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 import { aligns, styles } from './table.styles';
+import { useGridNavigation } from './use-grid-navigation';
 
 type TableSection = 'header' | 'body';
 
@@ -20,22 +23,33 @@ export type TableAlign = keyof typeof aligns;
 
 export type TableSort = 'ascending' | 'descending' | 'none';
 
-export type TableProps = MosaicElementProps<'table'>;
+export interface TableProps extends MosaicElementProps<'table'> {
+  /** Makes the table a grid: one tab stop, with the arrow keys moving between cells. */
+  grid?: boolean;
+}
 
-const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable({ xstyle, ...rest }, ref) {
+const Root = React.forwardRef<HTMLTableElement, TableProps>(function MosaicTable(
+  { grid = false, xstyle, ...rest },
+  ref,
+) {
+  const [table, setTable] = React.useState<HTMLTableElement | null>(null);
+  const tableRef = useMergeRefs([ref, setTable]);
+  useGridNavigation(table, grid);
+
   return (
     <div {...mergeStyleProps(themeProps('table-shell'), stylex.props(reset.base, scrollAreaRoot, styles.shell))}>
       <div
-        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Safari does not focus an overflowing scroll container on its own, and a table without sortable or selectable cells holds nothing focusable.
-        tabIndex={0}
+        // Safari does not focus an overflowing scroll container on its own, and a table without sortable or selectable cells holds nothing focusable.
+        tabIndex={grid ? undefined : 0}
         {...mergeStyleProps(
           themeProps('table-viewport'),
           stylex.props(reset.base, scrollAreaViewport('auto', 'inline'), styles.viewport),
         )}
       >
         <table
-          ref={ref}
-          {...mergeStyleProps(themeProps('table'), stylex.props(reset.base, styles.table, xstyle), rest)}
+          ref={tableRef}
+          role={grid ? 'grid' : undefined}
+          {...mergeStyleProps(themeProps('table', { grid }), stylex.props(reset.base, styles.table, xstyle), rest)}
         />
       </div>
     </div>
@@ -119,7 +133,15 @@ const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
       scope: 'col',
       ...mergeStyleProps(
         themeProps('table-header-cell', { align, sortable, sort: sortable && sort !== 'none' ? sort : undefined }),
-        stylex.props(reset.base, styles.headerCell, aligns[align], sortable && styles.sortableHeaderCell, xstyle),
+        stylex.props(
+          reset.base,
+          styles.headerCell,
+          aligns[align],
+          sortable && styles.sortableHeaderCell,
+          focusOutline.visible,
+          styles.cellFocus,
+          xstyle,
+        ),
         { 'aria-sort': sortable && sort !== 'none' ? sort : undefined },
         rest,
       ),
@@ -159,7 +181,7 @@ const Cell = React.forwardRef<HTMLTableCellElement, TableCellProps>(function Mos
     ref,
     props: mergeStyleProps(
       themeProps('table-cell', { align }),
-      stylex.props(reset.base, styles.cell, aligns[align], xstyle),
+      stylex.props(reset.base, styles.cell, aligns[align], focusOutline.visible, styles.cellFocus, xstyle),
       rest,
     ),
   });
@@ -172,7 +194,10 @@ export interface TableSelectCellProps extends CheckboxProps {
 }
 
 const selectCellProps = (slot: string) =>
-  mergeStyleProps(themeProps(slot), stylex.props(reset.base, styles.cell, styles.selectCell));
+  mergeStyleProps(
+    themeProps(slot),
+    stylex.props(reset.base, styles.cell, styles.selectCell, focusOutline.visible, styles.cellFocus),
+  );
 
 const isShiftClick = (event: Event) => 'shiftKey' in event && event.shiftKey === true;
 

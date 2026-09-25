@@ -4,6 +4,7 @@ import {
   Default as ActionBarDefault,
   InDialog as ActionBarInDialog,
   Inline as ActionBarInline,
+  LongTable as ActionBarLongTable,
   meta as actionBarMeta,
 } from '../stories/action-bar.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
@@ -252,6 +253,7 @@ import { meta as selectMeta } from '../stories/select.stories';
 import {
   Default as TableDefault,
   Empty as TableEmpty,
+  Grid as TableGrid,
   meta as tableMeta,
   Overflow as TableOverflow,
   Selection as TableSelection,
@@ -483,6 +485,7 @@ const actionBarModule: StoryModule = {
   Default: ActionBarDefault,
   InDialog: ActionBarInDialog,
   Inline: ActionBarInline,
+  LongTable: ActionBarLongTable,
 };
 
 const avatarModule: StoryModule = {
@@ -706,6 +709,7 @@ const tableModule: StoryModule = {
   Default: TableDefault,
   Sorting: TableSorting,
   Selection: TableSelection,
+  Grid: TableGrid,
   Empty: TableEmpty,
   Overflow: TableOverflow,
 };
