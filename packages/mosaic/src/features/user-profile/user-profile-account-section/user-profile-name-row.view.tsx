@@ -77,10 +77,11 @@ function EditName({
 
   return (
     <UserProfileEditNameDialog
-      {...controller}
+      form={controller.form}
       firstNameAttribute={firstNameAttribute}
       lastNameAttribute={lastNameAttribute}
       open={controller.isOpen}
+      onOpenChange={controller.onOpenChange}
       title={isSet ? m.name.dialogTitle : m.name.addDialogTitle}
       trigger={
         <Button
