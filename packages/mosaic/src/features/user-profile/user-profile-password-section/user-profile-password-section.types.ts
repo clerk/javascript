@@ -1,3 +1,10 @@
+export class UserProfilePasswordUpdateError extends Error {
+  constructor(readonly code: 'unavailable' | 'current_password_required') {
+    super(code);
+    this.name = 'UserProfilePasswordUpdateError';
+  }
+}
+
 export type UserProfileEditPasswordField = 'currentPassword' | 'newPassword' | 'confirmPassword';
 
 export interface UserProfileEditPasswordValues {
