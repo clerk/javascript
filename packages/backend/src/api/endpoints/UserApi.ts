@@ -251,6 +251,8 @@ export type CreateUserParams = {
   lastName?: string;
   /** The locale of the user in BCP-47 format (e.g., `'en-US'`, `'fr-FR'`). */
   locale?: string;
+  /** The timezone of the user. */
+  timezone?: string;
   /** When set to `true`, all password checks are skipped. It is recommended to use this method only when migrating plaintext passwords to Clerk. Upon migration the user base should be prompted to pick stronger password. */
   skipPasswordChecks?: boolean;
   /** When set to `true`, password is not required anymore when creating the user and can be omitted. This is useful when you are trying to create a user that doesn't have a password, in an instance that is using passwords. **You cannot use this flag if password is the only way for a user to sign into your instance.** */
@@ -324,6 +326,8 @@ export type UpdateUserParams = {
   legalAcceptedAt?: Date;
   /** The locale of the user in BCP-47 format (e.g., `'en-US'`). */
   locale?: string;
+  /** The timezone of the user. */
+  timezone?: string;
   /** If `true`, the user can delete themselves with the Frontend API. */
   deleteSelfEnabled?: boolean;
   /** If `true`, the user can create Organizations with the Frontend API. */

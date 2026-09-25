@@ -6,6 +6,7 @@ import { ActionMenu } from '../../components/action-menu';
 import { Avatar } from '../../components/avatar';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
+import { Icon } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
 import { panelStyles } from '../../components/profile';
@@ -117,6 +118,7 @@ export function InvitationsTableTabView({
               ref={inviteButton}
               onClick={onInvite}
             >
+              <Icon name='plus' />
               {m.invite}
             </Button>
           ) : null}

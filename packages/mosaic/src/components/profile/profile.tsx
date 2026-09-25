@@ -14,7 +14,7 @@ import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Drawer } from '../drawer';
-import { Heading } from '../heading';
+import { Heading, HeadingLevelProvider, useHeadingLevel } from '../heading';
 import { Icon } from '../icon';
 import { VisuallyHidden } from '../visually-hidden';
 import { contentScroll, contentViewportScroll, styles } from './profile.styles';
@@ -234,10 +234,11 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
   ref,
 ) {
   const { titleId } = useProfileContext('Profile.Title');
+  const Tag = `h${useHeadingLevel()}` as const;
   return (
     <VisuallyHidden
       ref={ref as React.Ref<HTMLSpanElement>}
-      render={render ?? <h2 />}
+      render={render ?? <Tag />}
       {...mergeStyleProps(themeProps('profile-title'), stylex.props(xstyle), rest)}
       // The ids the navigation and the dialog point at, so the caller's cannot displace it.
       id={titleId}
@@ -394,6 +395,7 @@ const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(functi
   const panel = React.useContext(ContentPanelContext);
   const registerPageTitle = profile?.registerPageTitle;
   const page = panel?.value;
+  const level = useHeadingLevel();
   // The sheet's return-focus target. A no-op outside a profile's page, where there is no sheet.
   const registerTrigger = React.useCallback(
     (element: HTMLButtonElement | null) => {
@@ -412,7 +414,7 @@ const PageTitle = React.forwardRef<HTMLDivElement, ProfilePageTitleProps>(functi
       children: (
         <Heading
           id={panel?.titleId}
-          render={<h3 />}
+          level={level}
           size='2xl'
         >
           {profile?.compact ? (
@@ -522,16 +524,18 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
   const panel = React.useMemo(() => ({ titleId, value }), [titleId, value]);
   return (
     <ContentPanelContext.Provider value={panel}>
-      <Tabs.Panel
-        ref={ref}
-        value={value}
-        shouldForceMount={shouldForceMount}
-        // Compact, the tab it would be named by exists only while the sheet is open, so the panel
-        // is named by its own title instead — `Profile.PageTitle` takes this id. Spread only then:
-        // an explicit `undefined` would displace the primitive's own `aria-labelledby`.
-        {...(compact ? { 'aria-labelledby': titleId } : null)}
-        {...mergeStyleProps(themeProps('profile-content-panel', { value }), stylex.props(xstyle), rest)}
-      />
+      <HeadingLevelProvider>
+        <Tabs.Panel
+          ref={ref}
+          value={value}
+          shouldForceMount={shouldForceMount}
+          // Compact, the tab it would be named by exists only while the sheet is open, so the panel
+          // is named by its own title instead — `Profile.PageTitle` takes this id. Spread only then:
+          // an explicit `undefined` would displace the primitive's own `aria-labelledby`.
+          {...(compact ? { 'aria-labelledby': titleId } : null)}
+          {...mergeStyleProps(themeProps('profile-content-panel', { value }), stylex.props(xstyle), rest)}
+        />
+      </HeadingLevelProvider>
     </ContentPanelContext.Provider>
   );
 });

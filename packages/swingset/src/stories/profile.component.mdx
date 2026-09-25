@@ -75,6 +75,19 @@ sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 `Content` is a plain `div`, not a `main`: the profile is usually the content of the host's own
 `main`, or of a dialog.
 
+## Heading levels
+
+The profile's headings follow the nearest `HeadingLevelProvider`. `Profile.Title` renders at the
+current level, and `Profile.ContentPanel` moves its page one level down, where `Profile.PageTitle`
+renders. A page wraps its sections in its own `HeadingLevelProvider` so their titles sit below the
+page title. See [Heading](/components/heading).
+
+| Usage                                           | `Profile.Title` | `Profile.PageTitle` | `Section.Title` |
+| ----------------------------------------------- | --------------- | ------------------- | --------------- |
+| Profile                                         | `h2`            | `h3`                | `h4`            |
+| Profile inside `HeadingLevelProvider level={3}` | `h3`            | `h4`                | `h5`            |
+| A page alone                                    | —               | `h2`                | `h3`            |
+
 ## Compact layout
 
 Below `48rem` of the profile's **own** width — or, over the page, the dialog's viewport's, so the

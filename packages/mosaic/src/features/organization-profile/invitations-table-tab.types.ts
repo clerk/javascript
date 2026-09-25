@@ -1,3 +1,5 @@
+import type { MouseEventHandler } from 'react';
+
 export interface OrganizationProfileInvitation {
   id: string;
   email: string;
@@ -22,7 +24,7 @@ export interface InvitationsTableTabViewProps {
   onPageChange: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   onSearchChange: (value: string) => void;
-  onInvite?: () => void;
+  onInvite?: MouseEventHandler<HTMLButtonElement>;
   onRevoke?: (id: string) => void | Promise<void>;
   onBulkAction?: (ids: string[]) => void;
   sort?: InvitationsTableSort | null;

@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
+import { HeadingLevelProvider } from '../../components/heading';
 import { panelStyles, Profile } from '../../components/profile';
 import { useMessages } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -31,25 +32,27 @@ export function OrganizationProfileGeneralPanelView({
   return (
     <div {...mergeStyleProps(themeProps('organization-profile-general-panel'), stylex.props(panelStyles.root))}>
       <Profile.PageTitle>{m.pages.general}</Profile.PageTitle>
-      <div {...stylex.props(panelStyles.sections)}>
-        <OrganizationProfileWorkspaceSectionView
-          name={name}
-          slug={slug}
-          imageUrl={imageUrl}
-          hasImage={hasImage}
-          onLogoChange={onLogoChange}
-          onLogoReject={onLogoReject}
-          onRemoveLogo={onRemoveLogo}
-          onSubmitName={onSubmitName}
-          onSubmitSlug={onSubmitSlug}
-        />
-        <OrganizationProfileDangerSectionView
-          name={name}
-          memberCount={memberCount}
-          onLeave={onLeave}
-          onDelete={onDelete}
-        />
-      </div>
+      <HeadingLevelProvider>
+        <div {...stylex.props(panelStyles.sections)}>
+          <OrganizationProfileWorkspaceSectionView
+            name={name}
+            slug={slug}
+            imageUrl={imageUrl}
+            hasImage={hasImage}
+            onLogoChange={onLogoChange}
+            onLogoReject={onLogoReject}
+            onRemoveLogo={onRemoveLogo}
+            onSubmitName={onSubmitName}
+            onSubmitSlug={onSubmitSlug}
+          />
+          <OrganizationProfileDangerSectionView
+            name={name}
+            memberCount={memberCount}
+            onLeave={onLeave}
+            onDelete={onDelete}
+          />
+        </div>
+      </HeadingLevelProvider>
     </div>
   );
 }

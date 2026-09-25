@@ -4,6 +4,27 @@ import { describe, expect, it, vi } from 'vitest';
 import { StateProxy } from '../stateProxy';
 
 describe('StateProxy', () => {
+  it.each(['signIn', 'signUp'] as const)(
+    'exposes %s timezone after loading and follows the active attempt',
+    resource => {
+      const clientAttempt = { timezone: 'America/New_York' };
+      let stateAttempt: { timezone: string } | null = { timezone: 'Europe/Paris' };
+      const isomorphicClerk = {
+        loaded: false,
+        client: { [resource]: { __internal_future: clientAttempt } },
+        __internal_state: { [`${resource}Signal`]: () => ({ [resource]: stateAttempt }) },
+      };
+      const proxy = new StateProxy(isomorphicClerk as any);
+      const attempt = resource === 'signIn' ? proxy.signInSignal().signIn : proxy.signUpSignal().signUp;
+
+      expect(attempt.timezone).toBeNull();
+      isomorphicClerk.loaded = true;
+      expect(attempt.timezone).toBe('Europe/Paris');
+      stateAttempt = null;
+      expect(attempt.timezone).toBe('America/New_York');
+    },
+  );
+
   it('preserves a completed sign-in across chained calls when the client clears its sign-in attempt', async () => {
     const emptySignIn = {
       status: 'needs_identifier',

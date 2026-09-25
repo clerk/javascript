@@ -43,7 +43,7 @@ describe('UserProfilePasswordSectionView', () => {
     const user = userEvent.setup();
     renderView({ hasPassword: false, onSubmitPassword });
 
-    expect(screen.getByRole('heading', { level: 4, name: 'Authentication' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Authentication' })).toBeInTheDocument();
     expect(screen.getByText('Password')).toBeVisible();
     expect(screen.queryByText('••••••••••••••••••')).not.toBeInTheDocument();
     expect(screen.getByText('No password set')).toBeVisible();

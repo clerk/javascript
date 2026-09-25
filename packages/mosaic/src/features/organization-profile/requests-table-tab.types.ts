@@ -1,3 +1,5 @@
+import type { MouseEventHandler } from 'react';
+
 export interface OrganizationProfileRequest {
   id: string;
   email: string;
@@ -23,6 +25,7 @@ export interface RequestsTableTabViewProps {
   onPageChange: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   onSearchChange: (value: string) => void;
+  onInvite?: MouseEventHandler<HTMLButtonElement>;
   onAccept?: (id: string) => void | Promise<void>;
   onDecline?: (id: string) => void | Promise<void>;
   onBulkAction?: (ids: string[]) => void;

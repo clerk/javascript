@@ -171,6 +171,22 @@ describe('RequestsTableTabView', () => {
     expect(screen.queryByRole('button', { name: /Accept|Decline/ })).not.toBeInTheDocument();
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
+
+  it('routes invite only when the caller supplies it', async () => {
+    const user = userEvent.setup();
+    const { props, rerender } = renderView({ onInvite: vi.fn() });
+    await user.click(screen.getByRole('button', { name: 'Invite' }));
+    expect(props.onInvite).toHaveBeenCalledOnce();
+    rerender(
+      <MosaicProvider>
+        <RequestsTableTabView
+          {...props}
+          onInvite={undefined}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('button', { name: 'Invite' })).not.toBeInTheDocument();
+  });
 });
 
 it.each(['Accept', 'Decline'] as const)(

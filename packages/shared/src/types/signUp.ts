@@ -71,11 +71,16 @@ export interface SignUpResource extends ClerkResource {
   abandonAt: number | null;
   legalAcceptedAt: number | null;
   locale: string | null;
+  timezone: string | null;
 
   create: (params: SignUpCreateParams) => Promise<SignUpResource>;
 
   update: (params: SignUpUpdateParams) => Promise<SignUpResource>;
 
+  /**
+   * Updates the current sign-up if it exists, otherwise creates one.
+   * `timezone` only applies when a sign-up is created and is ignored when updating an existing one.
+   */
   upsert: (params: SignUpCreateParams | SignUpUpdateParams) => Promise<SignUpResource>;
 
   prepareVerification: (params: PrepareVerificationParams) => Promise<SignUpResource>;

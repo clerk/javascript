@@ -118,7 +118,7 @@ describe('InvitationsTableTabView', () => {
   it('routes invite and withholds unavailable actions', async () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView({ onInvite: vi.fn(), onRevoke: vi.fn() });
-    await user.click(screen.getByRole('button', { name: 'Invite members' }));
+    await user.click(screen.getByRole('button', { name: 'Invite' }));
     expect(props.onInvite).toHaveBeenCalledOnce();
     expect(screen.getByRole('button', { name: 'Manage ada@example.com' })).toBeVisible();
     rerender(
@@ -182,8 +182,6 @@ it.each([true, false])(
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(onMutation).toHaveBeenLastCalledWith('grace');
-    expect(
-      hasInvite ? screen.getByRole('button', { name: 'Invite members' }) : screen.getByRole('searchbox'),
-    ).toHaveFocus();
+    expect(hasInvite ? screen.getByRole('button', { name: 'Invite' }) : screen.getByRole('searchbox')).toHaveFocus();
   },
 );

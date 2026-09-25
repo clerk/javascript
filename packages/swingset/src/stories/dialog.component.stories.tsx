@@ -19,7 +19,7 @@ export { default as __source } from './dialog.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Dialog',
   source: 'packages/mosaic/src/components/dialog/dialog.tsx',
   styles: {
