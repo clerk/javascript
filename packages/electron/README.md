@@ -29,15 +29,15 @@
 [Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_electron) is the easiest way to add authentication and user management to your Electron application.
 
 > [!WARNING]
-> `@clerk/electron` is under active development and is not yet ready for production use. The API is incomplete and subject to change.
+> `@clerk/electron` is in beta. APIs may change before 1.0.
 
-This package exposes entrypoints for Electron's distinct runtime contexts:
+The package has these entrypoints:
 
-- `@clerk/electron` — for use in the Electron **main** process.
-- `@clerk/electron/preload` — for use in Electron **preload** scripts.
-- `@clerk/electron/react` — for use in the Electron **renderer** process.
-- `@clerk/electron/storage` — default token storage backed by `electron-store`.
-- `@clerk/electron/passkeys` — passkey (WebAuthn) support for the **renderer** process.
+- `@clerk/electron` runs in the main process.
+- `@clerk/electron/preload` runs in preload scripts.
+- `@clerk/electron/react` runs in the renderer process.
+- `@clerk/electron/storage` is the default token storage, backed by `electron-store`.
+- `@clerk/electron/passkeys` adds passkey (WebAuthn) support to the renderer process.
 
 ```ts
 // main.ts
@@ -77,13 +77,13 @@ if (clerk.isPrimaryInstance) {
 ```
 
 On Windows and Linux, a deep link starts a second copy of the app, so the callback only reaches the
-running process through Electron's single-instance lock. When a renderer scheme is configured,
-`createClerkBridge` acquires that lock by default and quits secondary processes once their
-command-line arguments have been forwarded. Call it before `app.whenReady()`, and stop your own
-bootstrap when `isPrimaryInstance` is `false` — `app.quit()` is asynchronous, so `whenReady` can
-still fire in a process that is on its way out. The lock is released by `cleanup()` unless it was
-already owned by the application. macOS is unaffected: deep links arrive through `open-url`, so no
-lock is taken and `isPrimaryInstance` is always `true`.
+running process through Electron's single-instance lock. When you configure a renderer scheme,
+`createClerkBridge` acquires that lock by default and quits secondary processes after it forwards
+their command-line arguments. Call it before `app.whenReady()`, and stop your own bootstrap when
+`isPrimaryInstance` is `false`. `app.quit()` is asynchronous, so `whenReady` can still fire in a
+process that is shutting down. `cleanup()` releases the lock unless the application already owned
+it. macOS doesn't need the lock. Deep links arrive through `open-url`, so Clerk takes no lock and
+`isPrimaryInstance` is always `true`.
 
 If the application manages the lock, acquire it before creating the bridge and disable Clerk's lock
 management:
@@ -132,7 +132,7 @@ import { passkeys } from '@clerk/electron/passkeys';
 </ClerkProvider>;
 ```
 
-Pass `userAgent` to `createClerkBridge` before creating renderer windows to set an app-specific product token, such as `Acme Co/1.0.0`. Clerk preserves Electron's platform details, such as `Macintosh` or `Windows`, while using the product token for UserProfile session activity attribution:
+To set an app-specific product token such as `Acme Co/1.0.0`, pass `userAgent` to `createClerkBridge` before creating renderer windows. Clerk keeps Electron's platform details, such as `Macintosh` or `Windows`. UserProfile's session activity then shows your product token as the app name:
 
 ```ts
 createClerkBridge({
@@ -142,32 +142,45 @@ createClerkBridge({
 });
 ```
 
+## Allowed origins
+
+Add your renderer's origins to your instance's allowed origins. Otherwise Clerk rejects every renderer request with "Setting both the 'Origin' and 'Authorization' headers is forbidden".
+
+```sh
+curl -X PATCH https://api.clerk.com/v1/instance \
+  -H "Authorization: Bearer $CLERK_SECRET_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"allowed_origins": ["my-app://renderer", "http://localhost:5173"]}'
+```
+
+Include your custom scheme origin and, during development, your dev server's origin.
+
 ## Content Security Policy
 
-`@clerk/electron` loads Clerk's prebuilt UI from Clerk's CDN at runtime rather than bundling it, so your renderer's Content Security Policy must allow Clerk's Frontend API host. If it doesn't, the UI script fails to load and Clerk components never render.
+`@clerk/electron` loads Clerk's prebuilt UI from Clerk's CDN at runtime instead of bundling it, so your renderer's Content Security Policy must allow Clerk's Frontend API host. If it doesn't, the UI script fails to load and Clerk components never render.
 
-Replace `{fapi_host}` below with your instance's **Frontend API** host, found in the [Clerk Dashboard](https://dashboard.clerk.com) under **API keys**. It includes a `clerk.` segment (for example, `clerk.your-app.com` in production or `your-slug.clerk.accounts.dev` in development). This is _not_ the Account Portal URL (`your-slug.accounts.dev`) — using that host blocks the UI script from loading.
+Replace `{fapi_host}` below with your instance's **Frontend API** host, found in the [Clerk Dashboard](https://dashboard.clerk.com) under **API keys**. It includes a `clerk.` segment (for example, `clerk.your-app.com` in production or `your-slug.clerk.accounts.dev` in development). Don't use the Account Portal URL (`your-slug.accounts.dev`). That host blocks the UI script from loading.
 
 ```
 default-src 'self';
-script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com;
-connect-src 'self' https://{fapi_host};
+script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com https://*.protect.clerk.com;
+connect-src 'self' https://{fapi_host} https://*.protect.clerk.com:* https://clerk-telemetry.com;
 img-src 'self' https://img.clerk.com data:;
 style-src 'self' 'unsafe-inline';
 worker-src 'self' blob:;
-frame-src 'self' https://challenges.cloudflare.com;
+frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com;
 form-action 'self';
 ```
 
 > [!NOTE]
-> This covers sign-in/up and the hotloaded UI. If you use Clerk Billing (Stripe) or other features, you'll need to allow additional origins; see Clerk's [CSP guide](https://clerk.com/docs/guides/secure/best-practices/csp-headers) for the full list.
+> This policy covers sign-in, sign-up, and the hotloaded UI. Clerk Billing (Stripe) and other features need more origins. See Clerk's [CSP guide](https://clerk.com/docs/guides/secure/best-practices/csp-headers) for the full list.
 
 Apply it either with a `<meta>` tag in your renderer HTML:
 
 ```html
 <meta
   http-equiv="Content-Security-Policy"
-  content="default-src 'self'; script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com; connect-src 'self' https://{fapi_host}; img-src 'self' https://img.clerk.com data:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' https://challenges.cloudflare.com; form-action 'self';"
+  content="default-src 'self'; script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com https://*.protect.clerk.com; connect-src 'self' https://{fapi_host} https://*.protect.clerk.com:* https://clerk-telemetry.com; img-src 'self' https://img.clerk.com data:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com; form-action 'self';"
 />
 ```
 
@@ -187,12 +200,12 @@ app.whenReady().then(() => {
         'Content-Security-Policy': [
           [
             "default-src 'self'",
-            `script-src 'self' 'unsafe-inline' https://${fapiHost} https://challenges.cloudflare.com`,
-            `connect-src 'self' https://${fapiHost}`,
+            `script-src 'self' 'unsafe-inline' https://${fapiHost} https://challenges.cloudflare.com https://*.protect.clerk.com`,
+            `connect-src 'self' https://${fapiHost} https://*.protect.clerk.com:* https://clerk-telemetry.com`,
             "img-src 'self' https://img.clerk.com data:",
             "style-src 'self' 'unsafe-inline'",
             "worker-src 'self' blob:",
-            "frame-src 'self' https://challenges.cloudflare.com",
+            "frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com",
             "form-action 'self'",
           ].join('; '),
         ],
@@ -203,16 +216,16 @@ app.whenReady().then(() => {
 ```
 
 > [!NOTE]
-> Loading the renderer from a dev server (such as Vite) requires looser rules for HMR: add `'unsafe-eval'` to `script-src` and your dev server's origin to `connect-src` (for example, `ws://localhost:<port> http://localhost:<port>`). Many apps skip CSP during development and apply it only to packaged builds.
+> HMR needs looser rules when the renderer loads from a dev server such as Vite. Add `'unsafe-eval'` to `script-src` and your dev server's origin to `connect-src` (for example, `ws://localhost:<port> http://localhost:<port>`). Many apps skip CSP during development and apply it only to packaged builds.
 
 ## Passkeys
 
-Passkey support works in two modes, selected automatically per request:
+Passkeys work in two modes. Clerk picks one for each request:
 
-- **Renderer mode**: when your window loads content over `https://` from an origin that matches your passkey RP (Relying Party) ID, the renderer's built-in Chromium WebAuthn is used. Credentials are synced by the OS/browser ecosystem (Windows Hello works out of the box; Touch ID on macOS requires Electron ≥ 42 and [`app.configureWebAuthn`](https://www.electronjs.org/docs/latest/api/app#appconfigurewebauthnoptions-macos)).
-- **Native mode**: when your window loads a local bundle (e.g. `scheme://host`), WebAuthn's origin checks reject the request, so the ceremony is routed over IPC to the main process and serviced by the OS WebAuthn APIs (AuthenticationServices on macOS, `webauthn.dll` on Windows) via the optional [`@clerk/electron-passkeys`](https://github.com/clerk/javascript/tree/main/packages/electron-passkeys) native module.
+- **Renderer mode**: when your window loads content over `https://` from an origin that matches your passkey RP (Relying Party) ID, the renderer uses Chromium's built-in WebAuthn. The OS or browser syncs credentials. Windows Hello works without setup. Touch ID on macOS requires Electron 42 or later and [`app.configureWebAuthn`](https://www.electronjs.org/docs/latest/api/app#appconfigurewebauthnoptions-macos).
+- **Native mode**: when your window loads a local bundle such as `scheme://host`, WebAuthn's origin checks reject the request. Clerk sends the ceremony over IPC to the main process instead. The optional [`@clerk/electron-passkeys`](https://github.com/clerk/javascript/tree/main/packages/electron-passkeys) native module then calls the OS WebAuthn APIs (AuthenticationServices on macOS, `webauthn.dll` on Windows).
 
-Passkey autofill relies on WebAuthn conditional mediation, which only the renderer can provide. In native mode passkeys are offered through the explicit "Use passkey" action instead; the sign-in form never opens a passkey prompt on its own.
+Passkey autofill relies on WebAuthn conditional mediation, which only the renderer can provide. In native mode, the sign-in form offers passkeys through the "Use passkey" action instead. It never opens a passkey prompt on its own.
 
 ### Setup
 
@@ -250,7 +263,7 @@ import { passkeys } from '@clerk/electron/passkeys';
 </ClerkProvider>;
 ```
 
-Passkey code is only bundled and initialized when you pass the `passkeys` prop. If you manage the Clerk instance yourself instead of using `ClerkProvider`, wire it up before `clerk.load()`:
+Your app only bundles and initializes passkey code when you pass the `passkeys` prop. If you manage the Clerk instance yourself instead of using `ClerkProvider`, wire it up before `clerk.load()`:
 
 ```ts
 // renderer process (vanilla)
@@ -266,18 +279,18 @@ await clerk.load();
 
 Like passkeys on iOS, the macOS platform APIs require a verified association between your app and your domain:
 
-1. In the Clerk Dashboard, navigate to the [Native applications](https://dashboard.clerk.com/~/native-applications) page and ensure that the Native API is enabled. This is required to integrate Clerk in your Electron application.
-2. Add an iOS application to the [Native applications](https://dashboard.clerk.com/~/native-applications) page in the Clerk Dashboard. You will need your app's App ID Prefix and Bundle ID. An Electron macOS app uses the same configuration as iOS applications.
-3. Sign your app with `com.apple.developer.associated-domains` containing `webcredentials:<rp-domain>`. This is a _restricted_ entitlement: the build must embed a provisioning profile with the Associated Domains capability for the bundle ID, and the entitlements must also include `com.apple.application-identifier` and `com.apple.developer.team-identifier` matching the profile.
+1. In the Clerk Dashboard, go to the [Native applications](https://dashboard.clerk.com/~/native-applications) page and make sure the Native API is enabled. Your Electron app needs it.
+2. Add an iOS application to the [Native applications](https://dashboard.clerk.com/~/native-applications) page in the Clerk Dashboard. You need your app's App ID Prefix and Bundle ID. An Electron macOS app uses the same configuration as an iOS app.
+3. Sign your app with `com.apple.developer.associated-domains` containing `webcredentials:<rp-domain>`. This is a _restricted_ entitlement. The build must embed a provisioning profile with the Associated Domains capability for the bundle ID, and the entitlements must also include `com.apple.application-identifier` and `com.apple.developer.team-identifier` matching the profile.
 
-Quick Tips (each of these failure modes produces the same opaque "not associated with domain" error):
+Each of these mistakes produces the same opaque "not associated with domain" error:
 
-- Sign with an **Apple Development** identity (`mac.type: development` in electron-builder) and a **macOS App Development** profile that includes your Mac; also install the profile on the machine (`~/Library/Developer/Xcode/UserData/Provisioning Profiles/<UUID>.provisionprofile`).
-- Copy `.app` bundles with `ditto`. Other copy methods may break the app seal and macOS silently ignores the entitlements of an app whose signature fails `codesign --verify --deep --strict`.
-- The system registers the domain association via `swcd` when the app launches; verify with `sudo swcutil show`. If state gets stuck, `sudo swcutil reset` and relaunch.
-- Prefer the default (production/CDN) association route. `?mode=developer` + `sudo swcutil developer-mode -e true` exists but is often flaky.
+- Sign with an **Apple Development** identity (`mac.type: development` in electron-builder) and a **macOS App Development** profile that includes your Mac. Also install the profile on the machine (`~/Library/Developer/Xcode/UserData/Provisioning Profiles/<UUID>.provisionprofile`).
+- Copy `.app` bundles with `ditto`. Other copy methods can break the app seal, and macOS ignores the entitlements of an app whose signature fails `codesign --verify --deep --strict`.
+- `swcd` registers the domain association when the app launches. Check it with `sudo swcutil show`. If it gets stuck, run `sudo swcutil reset` and relaunch.
+- Prefer the default (production/CDN) association route. `?mode=developer` with `sudo swcutil developer-mode -e true` also works, but it's often flaky.
 
-Windows has no equivalent requirement. On Linux there is no native path; passkeys work in renderer mode only (including external security keys).
+Windows has no equivalent requirement. Linux has no native mode, so passkeys only work in renderer mode there. External security keys work too.
 
 ## Support
 
