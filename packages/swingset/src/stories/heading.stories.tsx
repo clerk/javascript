@@ -1,5 +1,5 @@
-import type { HeadingProps } from '@clerk/ui/mosaic/components/heading';
-import { Heading } from '@clerk/ui/mosaic/components/heading';
+import type { HeadingProps } from '@clerk/mosaic/components/heading';
+import { Heading } from '@clerk/mosaic/components/heading';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -11,7 +11,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'wip',
   title: 'Heading',
-  source: 'packages/ui/src/mosaic/components/heading/heading.tsx',
+  source: 'packages/mosaic/src/components/heading/heading.tsx',
   styles: {
     _variants: {
       size: { xs: {}, sm: {}, base: {}, lg: {}, xl: {}, '2xl': {} },

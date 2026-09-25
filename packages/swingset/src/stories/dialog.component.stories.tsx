@@ -1,12 +1,12 @@
-import type { RenderProps } from '@clerk/headless/utils';
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Card } from '@clerk/ui/mosaic/components/card';
-import type { DialogCompactPlacement, DialogVariant } from '@clerk/ui/mosaic/components/dialog';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
-import { Heading } from '@clerk/ui/mosaic/components/heading';
-import { Input } from '@clerk/ui/mosaic/components/input';
-import { Text } from '@clerk/ui/mosaic/components/text';
-import { UserProfileView } from '@clerk/ui/mosaic/features/user-profile/user-profile.view';
+import { Button } from '@clerk/mosaic/components/button';
+import { Card } from '@clerk/mosaic/components/card';
+import type { DialogCompactPlacement, DialogVariant } from '@clerk/mosaic/components/dialog';
+import { Dialog } from '@clerk/mosaic/components/dialog';
+import { Heading } from '@clerk/mosaic/components/heading';
+import { Input } from '@clerk/mosaic/components/input';
+import { Text } from '@clerk/mosaic/components/text';
+import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import type { RenderProps } from '@clerk/mosaic/primitives/utils';
 import React from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -21,7 +21,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'wip',
   title: 'Dialog',
-  source: 'packages/ui/src/mosaic/components/dialog/dialog.tsx',
+  source: 'packages/mosaic/src/components/dialog/dialog.tsx',
   styles: {
     _variants: {
       variant: { card: {}, profile: {} },
@@ -74,7 +74,7 @@ export function Default(args: Record<string, unknown>) {
         aria-label='Dialog surface'
       >
         <Dialog.CloseButton />
-        <div style={surface}>
+        <div style={{ ...surface, width: variant === 'profile' ? '94.625rem' : '26.25rem', maxWidth: '100%' }}>
           <Heading size='sm'>The surface</Heading>
           <Text>
             The dashed edge is <code>Dialog.Popup</code>. A real dialog fills it with a Card or a Profile, which paints
@@ -152,7 +152,7 @@ const addEmailTrigger = (props: RenderProps) => <Button {...props}>Add email add
 
 /**
  * `compactPlacement='sheet'` bottom-anchors the surface in the compact band — the dialog viewport
- * under `48rem` — and slides it up from the edge, instead of centring it. Above the band nothing
+ * under `48rem` — and slides it up from the edge, instead of centering it. Above the band nothing
  * changes, so narrow the window to see it.
  *
  * For a dialog that asks one thing and returns: a confirmation, or a single-field form like this

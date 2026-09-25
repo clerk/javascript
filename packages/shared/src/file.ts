@@ -4,17 +4,20 @@
  * Probably paired with:
  *  <input type='file' accept='application/JSON' ... />
  */
-export function readJSONFile(file: File): Promise<unknown> {
-  return new Promise((resolve, reject) => {
+export async function readJSONFile(file: File): Promise<unknown> {
+  const text = await new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.addEventListener('load', function () {
-      const result = JSON.parse(reader.result as string);
-      resolve(result);
+      resolve(reader.result as string);
     });
 
     reader.addEventListener('error', reject);
     reader.readAsText(file);
   });
+
+  // Parsed here rather than in the load listener, where a throw never reaches
+  // the promise and leaves it pending.
+  return JSON.parse(text);
 }
 
 const MimeTypeToExtensionMap = Object.freeze({

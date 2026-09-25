@@ -142,7 +142,9 @@ export interface TestRunsView {
  * seam: a future non-org context only swaps this source and everything below
  * stays put.
  */
-export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterpriseConnectionResult => {
+export const useOrganizationEnterpriseConnection = ({
+  manage = true,
+}: { manage?: boolean } = {}): UseOrganizationEnterpriseConnectionResult => {
   const {
     data: sourceConnections,
     isLoading: isLoadingEnterpriseConnections,
@@ -218,7 +220,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     setPage: setTestRunPage,
     refresh: refreshTestRuns,
     revalidateHasSuccessfulTestRun,
-  } = useEnterpriseConnectionTestRuns(enterpriseConnection, testRunsActive);
+  } = useEnterpriseConnectionTestRuns(enterpriseConnection, testRunsActive && manage);
 
   const { user } = useUser();
   const { session } = useSession();
@@ -262,6 +264,7 @@ export const useOrganizationEnterpriseConnection = (): UseOrganizationEnterprise
     attemptOwnershipVerification,
     revalidate: revalidateDomains,
   } = __internal_useOrganizationDomains({
+    enabled: manage,
     enrollmentMode: 'enterprise_sso',
     onOwnershipVerified: handleDomainOwnershipVerified,
   });

@@ -49,6 +49,8 @@ const FILES_WITHOUT_HEADINGS = [
  * Ideally this is a temporary solution until every one of these files are published in production and can be linked to.
  */
 const LINK_REPLACEMENTS = [
+  ['get-token-options', '/docs/reference/objects/session#gettokenoptions'],
+  ['sign-out-options', '/docs/reference/objects/clerk#signoutoptions'],
   ['set-active-params', '/docs/reference/types/set-active-params'],
   ['clerk-paginated-response', '/docs/reference/types/clerk-paginated-response'],
   ['paginated-resources', '#paginatedresources'],

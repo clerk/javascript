@@ -1,6 +1,6 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import { Dialog } from '@clerk/ui/mosaic/components/dialog';
-import { UserProfileView } from '@clerk/ui/mosaic/features/user-profile/user-profile.view';
+import { Button } from '@clerk/mosaic/components/button';
+import { Dialog } from '@clerk/mosaic/components/dialog';
+import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profile.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -14,7 +14,7 @@ export const meta: StoryMeta = {
   title: 'UserProfile',
   label: 'User profile',
   layout: 'wide',
-  source: 'packages/ui/src/mosaic/features/user-profile/user-profile.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile.view.tsx',
 };
 
 /**

@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { APIKey, IdPOAuthAccessToken, M2MToken } from '../../api';
+import { MachineTokenVerificationError, MachineTokenVerificationErrorCode } from '../../errors';
 import {
   createJwt,
   mockJwks,
@@ -22,7 +23,7 @@ import { JWT_CATEGORY_M2M_TOKEN } from '../jwtCategories';
 import { verifyMachineAuthToken, verifyToken } from '../verify';
 
 async function createSignedOAuthJwt(
-  payload = mockOAuthAccessTokenJwtPayload,
+  payload: Record<string, unknown> = mockOAuthAccessTokenJwtPayload,
   typ: 'at+jwt' | 'application/at+jwt' | 'JWT' = 'at+jwt',
 ) {
   const { data } = await signJwt(payload, signingJwks, {
@@ -32,7 +33,10 @@ async function createSignedOAuthJwt(
   return data!;
 }
 
-async function createSignedM2MJwt(payload = mockM2MJwtPayload, cat: string | undefined = JWT_CATEGORY_M2M_TOKEN) {
+async function createSignedM2MJwt(
+  payload: Record<string, unknown> = mockM2MJwtPayload,
+  cat: string | undefined = JWT_CATEGORY_M2M_TOKEN,
+) {
   const { data } = await signJwt(payload, signingJwks, {
     algorithm: 'RS256',
     header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', ...(cat !== undefined ? { cat } : {}) },
@@ -67,6 +71,19 @@ describe('tokens.verify(token, options)', () => {
     });
 
     expect(data).toEqual(mockJwtPayload);
+  });
+
+  it('continues accepting session JWTs without aud when audience is configured', async () => {
+    server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+
+    const result = await verifyToken(mockJwt, {
+      apiUrl: 'https://api.clerk.test',
+      secretKey: 'a-valid-key',
+      audience: 'https://resource.example.com',
+    });
+
+    expect(result.data).toEqual(mockJwtPayload);
+    expect(result.errors).toBeUndefined();
   });
 
   it('verifies the token by fetching the JWKs from Backend API when secretKey is provided', async () => {
@@ -230,14 +247,19 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
   });
 
-  it('verifies provided OAuth token', async () => {
+  it.each([
+    { aud: undefined },
+    { aud: [] },
+    { aud: ['https://my-resource.example.com'] },
+    { aud: ['https://my-resource.example.com', 'https://other-resource.example.com'] },
+  ])('verifies opaque OAuth token with aud=$aud', async ({ aud }) => {
     const token = 'oat_8XOIucKvqHVr5tYP123456789abcdefghij';
 
     server.use(
       http.post(
         'https://api.clerk.test/oauth_applications/access_tokens/verify',
         validateHeaders(() => {
-          return HttpResponse.json(mockVerificationResults.oauth_token);
+          return HttpResponse.json({ ...mockVerificationResults.oauth_token, ...(aud === undefined ? {} : { aud }) });
         }),
       ),
     );
@@ -255,6 +277,101 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.id).toBe('oat_2VTWUzvGC5UhdJCNx6xG1D98edc');
     expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
     expect(data.scopes).toEqual(['read:foo', 'write:bar']);
+    expect(data.aud).toEqual(aud);
+  });
+
+  describe.each(['opaque', 'at+jwt', 'application/at+jwt'] as const)('%s OAuth token audience verification', format => {
+    const audience = 'https://resource.example.com';
+    const otherAudience = 'https://other.example.com';
+
+    beforeEach(() => {
+      vi.setSystemTime(new Date(mockOAuthAccessTokenJwtPayload.iat * 1000));
+    });
+
+    async function verifyWithAudience(aud: unknown, audience?: string | string[]) {
+      let token: string;
+      if (format === 'opaque') {
+        token = 'oat_8XOIucKvqHVr5tYP123456789abcdefghij';
+        server.use(
+          http.post('https://api.clerk.test/oauth_applications/access_tokens/verify', () => {
+            return HttpResponse.json({ ...mockVerificationResults.oauth_token, aud });
+          }),
+        );
+      } else {
+        server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+        token = await createSignedOAuthJwt({ ...mockOAuthAccessTokenJwtPayload, aud }, format);
+      }
+
+      return verifyMachineAuthToken(token, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        audience,
+      });
+    }
+
+    it.each([
+      { aud: audience, audience },
+      { aud: audience, audience: [otherAudience, audience] },
+      { aud: [otherAudience, audience], audience },
+      { aud: [otherAudience, audience], audience: [audience] },
+      { aud: undefined, audience: undefined },
+      { aud: undefined, audience: '' },
+      { aud: undefined, audience: [] },
+      { aud: '', audience: undefined },
+      { aud: [], audience: undefined },
+      { aud: otherAudience, audience: undefined },
+      { aud: otherAudience, audience: '' },
+      { aud: otherAudience, audience: [] },
+    ])('accepts aud=$aud with audience=$audience', async ({ aud, audience }) => {
+      const result = await verifyWithAudience(aud, audience);
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toBeDefined();
+      expect(result.errors).toBeUndefined();
+    });
+
+    it.each([
+      { aud: otherAudience, audience },
+      { aud: otherAudience, audience: [audience] },
+      { aud: [otherAudience], audience },
+      { aud: [otherAudience], audience: [audience] },
+      { aud: `${audience}/other`, audience },
+      { aud: audience.toUpperCase(), audience },
+    ])('rejects aud=$aud with audience=$audience', async ({ aud, audience }) => {
+      const result = await verifyWithAudience(aud, audience);
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toBeUndefined();
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors![0]).toBeInstanceOf(MachineTokenVerificationError);
+      expect(result.errors![0]).toMatchObject({
+        code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+        message: expect.stringContaining('OAuth audience mismatch'),
+      });
+    });
+
+    it.each([undefined, null, '', [], [''], [audience, ''], 42, true, {}, [audience, 42]].map(aud => ({ aud })))(
+      'rejects missing, empty, or malformed aud=$aud when audience is configured',
+      async ({ aud }) => {
+        const result = await verifyWithAudience(aud, audience);
+
+        expect(result.tokenType).toBe('oauth_token');
+        expect(result.data).toBeUndefined();
+        expect(result.errors).toHaveLength(1);
+        expect(result.errors![0]).toBeInstanceOf(MachineTokenVerificationError);
+        expect(result.errors![0]).toMatchObject({
+          code: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message: expect.stringContaining('Invalid OAuth audience claim'),
+        });
+      },
+    );
+
+    it('rejects missing aud when audience is an array', async () => {
+      const result = await verifyWithAudience(undefined, [audience]);
+
+      expect(result.data).toBeUndefined();
+      expect(result.errors?.[0].code).toBe(MachineTokenVerificationErrorCode.TokenVerificationFailed);
+    });
   });
 
   describe('handles API errors for API keys', () => {
@@ -424,6 +541,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(data.type).toBe('oauth_token');
       expect(data.subject).toBe('user_2vYVtestTESTtestTESTtestTESTtest');
       expect(data.scopes).toEqual(['read:foo', 'write:bar']);
+      expect(data.aud).toBeUndefined();
       // Timestamps are exposed in milliseconds, matching M2MToken and the API JSON shape
       expect(data.expiration).toBe(mockOAuthAccessTokenJwtPayload.exp * 1000);
       expect(data.createdAt).toBe(mockOAuthAccessTokenJwtPayload.iat * 1000);
@@ -558,7 +676,7 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
           payload.sub = sub;
         }
 
-        const oauthJwt = await createSignedOAuthJwt(payload as typeof mockOAuthAccessTokenJwtPayload, 'at+jwt');
+        const oauthJwt = await createSignedOAuthJwt(payload, 'at+jwt');
 
         const result = await verifyMachineAuthToken(oauthJwt, {
           apiUrl: 'https://api.clerk.test',
@@ -569,6 +687,68 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
         expect(result.tokenType).toBe('oauth_token');
       },
     );
+
+    it.each([
+      { aud: 'https://my-resource.example.com' },
+      { aud: ['https://my-resource.example.com', 'https://other-resource.example.com'] },
+    ])('verifies OAuth JWT with a matching resource audience aud=$aud', async ({ aud }) => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const audience = 'https://my-resource.example.com';
+      const oauthJwt = await createSignedOAuthJwt({
+        ...mockOAuthAccessTokenJwtPayload,
+        aud,
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        audience,
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toMatchObject({
+        aud: [aud].flat(),
+        scopes: ['read:foo', 'write:bar'],
+      });
+      expect(result.errors).toBeUndefined();
+    });
+
+    it('rejects OAuth JWT with a mismatched RFC 8707 resource audience', async () => {
+      server.use(
+        http.get(
+          'https://api.clerk.test/v1/jwks',
+          validateHeaders(() => {
+            return HttpResponse.json(mockJwks);
+          }),
+        ),
+      );
+
+      const oauthJwt = await createSignedOAuthJwt({
+        ...mockOAuthAccessTokenJwtPayload,
+        aud: 'https://attacker.example.com',
+      });
+
+      const result = await verifyMachineAuthToken(oauthJwt, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        audience: 'https://my-resource.example.com',
+      });
+
+      expect(result.tokenType).toBe('oauth_token');
+      expect(result.data).toBeUndefined();
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors![0]).toMatchInlineSnapshot(
+        `[MachineTokenVerificationError: OAuth audience mismatch. Verification expected audience ["https://my-resource.example.com"], but incoming token has aud "https://attacker.example.com".]`,
+      );
+    });
   });
 
   describe('verifyM2MToken with JWT', () => {
@@ -606,6 +786,21 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       expect(data.id).toBe('mt_2xKa9Bgv7NxMRDFyQw8LpZ3cTmU1vHjE');
       expect(data.subject).toBe('mch_2vYVtestTESTtestTESTtestTESTtest');
       expect(data.scopes).toEqual(['mch_1xxxxx', 'mch_2xxxxx']);
+    });
+
+    it('continues accepting M2M JWTs without aud when audience is configured', async () => {
+      server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+      const token = await createSignedM2MJwt({ ...mockM2MJwtPayload, aud: undefined });
+
+      const result = await verifyMachineAuthToken(token, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+        audience: 'https://resource.example.com',
+      });
+
+      expect(result.tokenType).toBe('m2m_token');
+      expect(result.data).toBeDefined();
+      expect(result.errors).toBeUndefined();
     });
 
     it('rejects M2M JWT with alg: none', async () => {

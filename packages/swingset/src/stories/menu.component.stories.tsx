@@ -1,6 +1,6 @@
-import { Avatar } from '@clerk/ui/mosaic/components/avatar';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
-import { Menu } from '@clerk/ui/mosaic/components/menu';
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Icon } from '@clerk/mosaic/components/icon';
+import { Menu } from '@clerk/mosaic/components/menu';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -12,7 +12,7 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'Menu',
-  source: 'packages/ui/src/mosaic/components/menu/menu.tsx',
+  source: 'packages/mosaic/src/components/menu/menu.tsx',
 };
 
 export function Default() {
@@ -37,7 +37,7 @@ export function Default() {
           color='negative'
         >
           <Menu.Media>
-            <Icon name='close' />
+            <Icon name='x' />
           </Menu.Media>
           <Menu.Label>Delete user</Menu.Label>
         </Menu.Item>
@@ -72,7 +72,7 @@ export function Accounts() {
             <Menu.Label>{account.identifier}</Menu.Label>
             {account.active ? (
               <Icon
-                name='check'
+                name='checkmark'
                 size='sm'
               />
             ) : null}

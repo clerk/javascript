@@ -13,7 +13,7 @@ import { localizationKeys } from '../../localization';
 import { useRouter } from '../../router';
 import type { AlternativeMethodsMode } from './AlternativeMethods';
 import { AlternativeMethods } from './AlternativeMethods';
-import { getSSOFallbackFactor, hasMultipleEnterpriseConnections, SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from './shared';
+import { getSSOBypassFactor, hasMultipleEnterpriseConnections, SIGN_IN_RESET_PASSWORD_INTENT_PARAM } from './shared';
 import { SignInFactorOneAlternativePhoneCodeCard } from './SignInFactorOneAlternativePhoneCodeCard';
 import { SignInFactorOneEmailCodeCard } from './SignInFactorOneEmailCodeCard';
 import { SignInFactorOneEmailLinkCard } from './SignInFactorOneEmailLinkCard';
@@ -23,7 +23,7 @@ import { SignInFactorOnePasskey } from './SignInFactorOnePasskey';
 import type { PasswordErrorCode } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePasswordCard } from './SignInFactorOnePasswordCard';
 import { SignInFactorOnePhoneCodeCard } from './SignInFactorOnePhoneCodeCard';
-import { SignInFactorOneSSOFallback } from './SignInFactorOneSSOFallback';
+import { SignInFactorOneSSOBypass } from './SignInFactorOneSSOBypass';
 import { useResetPasswordFactor } from './useResetPasswordFactor';
 import { determineStartingSignInFactor, factorHasLocalStrategy } from './utils';
 
@@ -112,7 +112,7 @@ function SignInFactorOneInternal(): JSX.Element {
 
   // Frozen on mount: client-piggybacking may drop the field, which would otherwise unmount the
   // fallback screens mid-flow.
-  const ssoFallbackFactor = React.useRef(getSSOFallbackFactor(signIn)).current;
+  const ssoBypassFactor = React.useRef(getSSOBypassFactor(signIn)).current;
 
   const resetPasswordFactor = useResetPasswordFactor();
   const resetPasswordIntent = router.queryParams[SIGN_IN_RESET_PASSWORD_INTENT_PARAM] === 'true';
@@ -167,8 +167,8 @@ function SignInFactorOneInternal(): JSX.Element {
     }));
   };
 
-  if (ssoFallbackFactor) {
-    return <SignInFactorOneSSOFallback fallbackFactor={ssoFallbackFactor} />;
+  if (ssoBypassFactor) {
+    return <SignInFactorOneSSOBypass bypassFactor={ssoBypassFactor} />;
   }
 
   /**

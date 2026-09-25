@@ -67,7 +67,7 @@ onto it, and it fades its content at whichever edge still has something to revea
 />
 
 ```tsx
-import { scrollAreaRoot, scrollAreaViewport } from '@clerk/ui/mosaic/components/scroll-area';
+import { scrollAreaRoot, scrollAreaViewport } from '@clerk/mosaic/components/scroll-area';
 import * as stylex from '@stylexjs/stylex';
 
 <div
@@ -86,8 +86,8 @@ there is nothing to scroll, the token table, and how to replace the fade entirel
 ## Usage
 
 ```tsx
-import { Avatar } from '@clerk/ui/mosaic/components/avatar';
-import { Item } from '@clerk/ui/mosaic/components/item';
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Item } from '@clerk/mosaic/components/item';
 
 <Item.Group>
   <Item.Root render={({ children, ...props }) => <a {...props} href='/org'>{children}</a>}>

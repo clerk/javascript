@@ -1,4 +1,4 @@
-import { UserProfileConnectedAccountsSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-connected-accounts-section.view';
+import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -11,7 +11,7 @@ export const meta: StoryMeta = {
   title: 'UserProfileConnectedAccountsSection',
   label: 'Connected accounts',
   navigation: { category: 'Sections' },
-  source: 'packages/ui/src/mosaic/features/user-profile/user-profile-connected-accounts-section.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-connected-accounts-section.view.tsx',
 };
 export function Default() {
   const fixture = useConnectedAccountsFixture();

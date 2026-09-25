@@ -79,9 +79,9 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
   return (
     <ClerkNextOptionsProvider options={mergedProps}>
       <ReactClerkProvider {...mergedProps}>
-        <RouterTelemetry />
-        {__internal_scriptsSlot ?? <ClerkScripts />}
-        {children}
+        <RouterTelemetry key='clerk-router-telemetry' />
+        {__internal_scriptsSlot ?? <ClerkScripts key='clerk-scripts' />}
+        <React.Fragment key='clerk-children'>{children}</React.Fragment>
       </ReactClerkProvider>
     </ClerkNextOptionsProvider>
   );

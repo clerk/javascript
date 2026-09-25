@@ -47,6 +47,30 @@ export const assertAudienceClaim = (aud?: unknown, audience?: unknown) => {
   }
 };
 
+export const assertOAuthAudienceClaim = (aud: unknown, audience?: string | string[]) => {
+  const audienceList = [audience].flat().filter(a => !!a);
+  if (audienceList.length === 0) {
+    return;
+  }
+
+  const audFromToken = aud ? [aud].flat() : undefined;
+  if (!isArrayString(audFromToken) || audFromToken.some(a => a.length === 0)) {
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenVerificationFailed,
+      message: `Invalid OAuth audience claim (aud) ${JSON.stringify(aud)}. Expected a non-empty string or a non-empty array of non-empty strings.`,
+    });
+  }
+
+  if (!audFromToken.some(a => audienceList.includes(a))) {
+    throw new TokenVerificationError({
+      reason: TokenVerificationErrorReason.TokenVerificationFailed,
+      message: `OAuth audience mismatch. Verification expected audience ${JSON.stringify(
+        audienceList,
+      )}, but incoming token has aud ${JSON.stringify(aud)}.`,
+    });
+  }
+};
+
 export const assertHeaderType = (typ?: unknown, allowedTypes?: string | string[]) => {
   if (typeof typ === 'undefined' && typeof allowedTypes === 'undefined') {
     return;

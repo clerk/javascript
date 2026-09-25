@@ -1,5 +1,89 @@
+import * as ToastStories from './toast.stories';
+
 # Toast
 
-Transient, self-dismissing message raised over the surface it belongs to, for feedback that has nowhere of its own to live — a picture the picker turned away, an action that failed after the row it started from is gone. Not yet implemented.
+Transient, self-dismissing feedback for an action that has no surface of its own. The styled component is built on the headless Toast primitive and inherits its timers, queueing, keyboard handling, and announcements. `MosaicProvider` renders the toast viewport, so any component below it can raise a toast with `useToastManager()`. Toasts stack at the bottom center of the screen and fan out on hover; a toast with an anchor shows beside that element instead, styled like a tooltip.
 
-Until it lands, a row that must report a failure renders it inline: `Section.Error` under the row, or `Field.Error` inside a `Field.Root`. The profile picture row is the case this component is meant to take over.
+## Example
+
+<Story
+  name='Default'
+  storyModule={ToastStories}
+/>
+
+### Anchored
+
+<Story
+  name='Anchored'
+  storyModule={ToastStories}
+/>
+
+## Usage
+
+```tsx
+import { useToastManager } from '@clerk/mosaic/components/toast';
+
+function InviteButton() {
+  const manager = useToastManager();
+  return <Button onClick={() => manager.add({ label: '2 invites sent', type: 'success' })}>Invite</Button>;
+}
+```
+
+`type` picks the icon: `'success'`, `'error'`, or `'loading'`. Any other value, or none, renders the toast without an icon. `manager.promise(...)` moves a toast from `loading` to `success` or `error`.
+
+Pass `positionerProps.anchor` to show the toast next to an element. Anchored toasts stay out of the stack and the limit:
+
+```tsx
+<Button
+  onClick={event =>
+    manager.add({
+      id: 'copy',
+      description: 'Copied',
+      type: 'success',
+      timeout: 1500,
+      positionerProps: { anchor: event.currentTarget },
+    })
+  }
+>
+  Copy
+</Button>
+```
+
+Adding a toast with the id of one that is still open updates that toast, restarts its timer, and shakes it instead of adding another.
+
+## Parts
+
+| Part              | Class                | Description                                                                         |
+| ----------------- | -------------------- | ----------------------------------------------------------------------------------- |
+| `MosaicProvider`  | `.cl-toast-viewport` | Owns the toast list and renders the portalled viewport fixed to the bottom center.  |
+| `useToastManager` | —                    | Returns `{ toasts, add, close, update, promise }` for the nearest `MosaicProvider`. |
+
+## Styling
+
+The viewports render these slots for each toast:
+
+| Slot                            | Attributes                                                                                |
+| ------------------------------- | ----------------------------------------------------------------------------------------- |
+| `.cl-toast-root`                | `data-type`, `data-expanded`, `data-repeated`, `data-starting-style`, `data-ending-style` |
+| `.cl-toast-item`                | `data-behind`, `data-expanded`                                                            |
+| `.cl-toast-content`             | —                                                                                         |
+| `.cl-toast-anchored-positioner` | `data-side`, `data-align`, `data-anchor-hidden`                                           |
+| `.cl-toast-anchored-root`       | `data-type`, `data-repeated`, `data-starting-style`, `data-ending-style`                  |
+| `.cl-toast-label`               | —                                                                                         |
+| `.cl-toast-description`         | —                                                                                         |
+| `.cl-toast-icon`                | `data-type`: `success` \| `error` \| `loading`                                            |
+
+The stacked toast reads `--cl-color-background`, `--cl-color-foreground`, `--cl-shadow-lg`, and `--cl-radius-lg`; its icon is tinted from `--cl-color-positive` or `--cl-color-negative`. The anchored toast shares the tooltip surface: `--cl-color-foreground` fill with `--cl-color-background` text.
+
+```css
+@import '@clerk/mosaic/styles.css' layer(components);
+
+@layer overrides {
+  .cl-toast-root {
+    border-radius: var(--cl-radius-xl);
+  }
+  .cl-toast-icon[data-type='error'] {
+    color: var(--cl-color-warning);
+  }
+}
+```

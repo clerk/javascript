@@ -347,9 +347,9 @@ export interface SignInFutureResource {
   readonly supportedSecondFactors: SignInSecondFactor[];
 
   /**
-   * Factors an enterprise SSO user can fall back to when they cannot reach their identity provider. Empty unless the instance has allowlisted this user for a fallback.
+   * Factors an enterprise SSO user may verify instead of reaching their identity provider. Empty unless the instance has allowlisted this user to bypass SSO.
    */
-  readonly ssoFallbackFirstFactors: SignInFirstFactor[];
+  readonly ssoBypassFirstFactors: SignInFirstFactor[];
 
   /**
    * The current status of the sign-in.

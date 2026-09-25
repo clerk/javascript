@@ -40,6 +40,7 @@ import type {
   OrganizationResource,
   RoleJSON,
   SetOrganizationLogoParams,
+  SSOBypassAllowlistResource,
   UpdateMembershipParams,
   UpdateOrganizationEnterpriseConnectionParams,
   UpdateOrganizationParams,
@@ -61,9 +62,12 @@ import {
 import { OrganizationDomain } from './OrganizationDomain';
 import { OrganizationMembershipRequest } from './OrganizationMembershipRequest';
 import { Role } from './Role';
+import { SSOBypassAllowlist } from './SSOBypassAllowlist';
 
 export class Organization extends BaseResource implements OrganizationResource {
   pathRoot = '/organizations';
+
+  ssoBypassAllowlist: SSOBypassAllowlistResource = new SSOBypassAllowlist(this);
 
   id!: string;
   name!: string;

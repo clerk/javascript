@@ -1,5 +1,5 @@
-import type { UserProfileFormError } from '@clerk/ui/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
-import { UserProfilePasswordSectionView } from '@clerk/ui/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
+import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
+import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -14,7 +14,7 @@ export const meta: StoryMeta = {
   label: 'Password',
   navigation: { category: 'Sections' },
   source:
-    'packages/ui/src/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view.tsx',
+    'packages/mosaic/src/features/user-profile/user-profile-password-section/user-profile-password-section.view.tsx',
 };
 
 function PasswordSection({

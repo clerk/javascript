@@ -17,15 +17,17 @@ import * as Stories from './confirmation.stories';
 
 ## Usage
 
-A confirmation for a destructive action that is worth a second look but not worth making the user type for. Removing a connected account, revoking a session, signing out everywhere. For the actions that do warrant typing, use [Destructive](/components/destructive).
+A confirmation for an action worth a second look but not worth making the user type for. Removing a connected account, revoking a session, signing out everywhere. For the destructive actions that do warrant typing, use [Destructive](/components/destructive).
+
+`color` sets the weight the confirming button carries: `negative` for what cannot be undone, `primary` for what can.
 
 It is an `alertdialog`: it announces as an interruption, an outside press cannot dismiss it, and the card carries no corner dismiss. Escape and the footer's Cancel action dismiss it. Under the phone band it arrives as a bottom sheet.
 
 The block holds nothing of its own. Everything that decides what the dialog does next belongs to the caller. `open` closes it, `isConfirming` marks it busy, `errorMessage` explains a failure.
 
 ```tsx
-import { Confirmation } from '@clerk/ui/mosaic/blocks/confirmation';
-import { Button } from '@clerk/ui/mosaic/components/button';
+import { Confirmation } from '@clerk/mosaic/blocks/confirmation';
+import { Button } from '@clerk/mosaic/components/button';
 import { useState } from 'react';
 
 const [open, setOpen] = useState(false);
@@ -103,8 +105,10 @@ Controlled:
 | `trigger`      | `ReactNode`               | —            | The button that asks to open the dialog.                                                   |
 | `title`        | `string`                  | — (required) | Names what is about to happen.                                                             |
 | `description`  | `ReactNode`               | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                           |
-| `actionLabel`  | `string`                  | — (required) | The destructive button's label.                                                            |
+| `actionLabel`  | `string`                  | — (required) | The confirming button's label.                                                             |
 | `cancelLabel`  | `string`                  | `'Cancel'`   | The cancel button's label.                                                                 |
+| `color`        | `'negative' \| 'primary'` | `'negative'` | The weight the confirming button carries.                                                  |
+| `finalFocus`   | `DialogFocusTarget`       | the trigger  | Where focus returns on close, for a removal that unmounts the trigger.                     |
 | `onConfirm`    | `() => void`              | — (required) | Asks the caller to run the action.                                                         |
 | `isConfirming` | `boolean`                 | `false`      | Renders the action pending and ignores further presses.                                    |
 | `errorMessage` | `string`                  | —            | Renders as a negative banner above the actions.                                            |
@@ -116,8 +120,10 @@ With a handle:
 | `handle`      | `ConfirmationHandle<Payload>`                  | — (required) | From `Confirmation.createHandle<Payload>()`. `handle.open(payload)` opens the block.   |
 | `title`       | `string \| (payload: Payload) => string`       | — (required) | Names what is about to happen.                                                         |
 | `description` | `ReactNode \| (payload: Payload) => ReactNode` | — (required) | Spells out what it means. Takes markup, for a name to emphasise.                       |
-| `actionLabel` | `string \| (payload: Payload) => string`       | — (required) | The destructive button's label.                                                        |
+| `actionLabel` | `string \| (payload: Payload) => string`       | — (required) | The confirming button's label.                                                         |
 | `cancelLabel` | `string`                                       | `'Cancel'`   | The cancel button's label.                                                             |
+| `color`       | `'negative' \| 'primary'`                      | `'negative'` | The weight the confirming button carries.                                              |
+| `finalFocus`  | `DialogFocusTarget`                            | the trigger  | Where focus returns on close, for a removal that unmounts the trigger.                 |
 | `onConfirm`   | `(payload: Payload) => Promise<void> \| void`  | — (required) | Runs the action. Resolve to close; reject with an `Error` to keep it open showing why. |
 
 ## Driving it from a machine

@@ -1,6 +1,6 @@
-import type { AvatarProps } from '@clerk/ui/mosaic/components/avatar';
-import { Avatar } from '@clerk/ui/mosaic/components/avatar';
-import { Icon } from '@clerk/ui/mosaic/components/icon';
+import type { AvatarProps } from '@clerk/mosaic/components/avatar';
+import { Avatar } from '@clerk/mosaic/components/avatar';
+import { Icon } from '@clerk/mosaic/components/icon';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -14,13 +14,15 @@ export const meta: StoryMeta = {
   group: 'Components',
   status: 'stable',
   title: 'Avatar',
-  source: 'packages/ui/src/mosaic/components/avatar/avatar.tsx',
+  source: 'packages/mosaic/src/components/avatar/avatar.tsx',
   styles: {
     _variants: {
+      bordered: { true: {}, false: {} },
       shape: { circle: {}, square: {} },
       size: { xs: {}, sm: {}, md: {}, lg: {} },
     },
     _defaultVariants: {
+      bordered: true,
       shape: 'circle',
       size: 'md',
     },
