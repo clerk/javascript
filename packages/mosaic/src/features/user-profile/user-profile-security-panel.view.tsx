@@ -12,29 +12,15 @@ import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-p
 import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from './user-profile-passkeys-section.view';
-import type {
-  UserProfileEditPasswordValue,
-  UserProfilePasswordManagedBy,
-  UserProfilePasswordSectionViewProps,
-} from './user-profile-password-section/user-profile-password-section.view';
-import { UserProfilePasswordSectionView } from './user-profile-password-section/user-profile-password-section.view';
 
-export type {
-  UserProfileDevice,
-  UserProfileEditPasswordValue,
-  UserProfileMfaAddableMethod,
-  UserProfileMfaMethod,
-  UserProfilePasskey,
-  UserProfilePasswordManagedBy,
-};
+export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMethod, UserProfilePasskey };
 
-export interface UserProfileSecurityPanelViewProps
-  extends
-    Omit<UserProfileActiveDevicesSectionViewProps, 'devices'>,
-    Pick<
-      UserProfilePasswordSectionViewProps,
-      'hasPassword' | 'requiresCurrentPassword' | 'managedBy' | 'onSubmitPassword'
-    > {
+export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiveDevicesSectionViewProps, 'devices'> {
+  /**
+   * The password section. Omit it when passwords are unavailable rather than passing a section that renders
+   * nothing, so the Authentication heading stays correct.
+   */
+  passwordSlot?: ReactNode;
   passkeys?: UserProfilePasskey[];
   passkeysVisible?: boolean;
   mfaMethods?: UserProfileMfaMethod[];
@@ -54,16 +40,13 @@ export interface UserProfileSecurityPanelViewProps
 }
 
 export function UserProfileSecurityPanelView({
-  hasPassword = false,
-  requiresCurrentPassword,
-  managedBy,
+  passwordSlot,
   passkeys,
   passkeysVisible = true,
   mfaMethods,
   addableMfaMethods,
   mfaAddControl,
   devices,
-  onSubmitPassword,
   onAddPasskey,
   addPasskeyError,
   onRenamePasskey,
@@ -76,7 +59,7 @@ export function UserProfileSecurityPanelView({
   onSignOutAllOtherDevices,
   deleteAccountSlot,
 }: UserProfileSecurityPanelViewProps): ReactElement {
-  const showPassword = hasPassword || Boolean(onSubmitPassword) || Boolean(managedBy);
+  const showPassword = Boolean(passwordSlot);
   const showPasskeys = passkeys !== undefined && passkeysVisible;
   const hasAuthentication = showPassword || showPasskeys || mfaMethods !== undefined;
 
@@ -86,14 +69,7 @@ export function UserProfileSecurityPanelView({
       <Panel.Sections>
         {hasAuthentication ? (
           <Section.Root aria-label='Authentication'>
-            {showPassword ? (
-              <UserProfilePasswordSectionView
-                hasPassword={hasPassword}
-                managedBy={managedBy}
-                requiresCurrentPassword={requiresCurrentPassword}
-                onSubmitPassword={onSubmitPassword}
-              />
-            ) : null}
+            {passwordSlot}
             {showPasskeys ? (
               <UserProfilePasskeysSectionView
                 passkeys={passkeys}
