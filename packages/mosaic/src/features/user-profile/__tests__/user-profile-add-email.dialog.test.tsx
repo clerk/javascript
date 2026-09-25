@@ -54,7 +54,7 @@ describe('UserProfileAddEmailDialog', () => {
   it.each(['', 'invalid-address'])('uses native email validation for %j', async emailAddress => {
     const user = userEvent.setup();
     const { props } = renderView({ emailAddress });
-    await user.click(screen.getByRole('button', { name: 'Send code' }));
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
     expect(props.onSubmit).not.toHaveBeenCalled();
     expect(screen.getByRole('textbox', { name: 'Email' })).toBeInvalid();
   });
@@ -63,8 +63,7 @@ describe('UserProfileAddEmailDialog', () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(<VerificationExample onSubmit={onSubmit} />);
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Close', exact: true })).toHaveFocus());
-    await user.click(screen.getByRole('textbox', { name: 'Verification code' }));
+    await waitFor(() => expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveFocus());
 
     if (method === 'typing') {
       await user.keyboard('12345');
@@ -77,7 +76,7 @@ describe('UserProfileAddEmailDialog', () => {
     expect(onSubmit).toHaveBeenCalledExactlyOnceWith('123456');
   });
 
-  it('focuses the email field and submits through the form or Send code', async () => {
+  it('focuses the email field and submits through the form or Continue', async () => {
     const user = userEvent.setup();
     const { props } = renderView();
 
@@ -91,7 +90,7 @@ describe('UserProfileAddEmailDialog', () => {
     emailForm.requestSubmit();
     expect(props.onSubmit).toHaveBeenCalledOnce();
 
-    await user.click(screen.getByRole('button', { name: 'Send code' }));
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
 
     expect(props.onSubmit).toHaveBeenCalledTimes(2);
   });
@@ -181,6 +180,11 @@ describe('UserProfileAddEmailDialog', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.getByRole('button', { name: 'Sending a new code…' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Sending code…' })).toBeDisabled();
+  });
+
+  it('disables Continue when the email cannot be submitted', () => {
+    renderView({ canSubmitEmail: false });
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
   });
 });

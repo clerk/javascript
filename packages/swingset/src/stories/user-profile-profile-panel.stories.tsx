@@ -42,8 +42,9 @@ export function Default(_args: Record<string, unknown>) {
   const editName = useUserProfileEditNameFixture();
   const editUsername = useUserProfileEditUsernameFixture();
   const emailFlow = createUserProfileAddEmailFixture({
-    onVerified: value =>
-      setEmails(current => [...current, { id: `email_${Date.now()}`, value, isDefault: false, isVerified: true }]),
+    onCreated: (id, value) => setEmails(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+    onVerified: id =>
+      setEmails(current => current.map(email => (email.id === id ? { ...email, isVerified: true } : email))),
   });
 
   return (

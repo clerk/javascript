@@ -61,8 +61,8 @@ export function UserProfileProfilePanelView({
   onSubmitName,
   onSubmitUsername,
   onAddEmail,
-  onSendEmailCode,
-  onVerifyEmailCode,
+  onCreateEmail,
+  getEmailVerifier,
   onManageEmail,
   onVerifyEmail,
   onSetPrimaryEmail,
@@ -103,10 +103,10 @@ export function UserProfileProfilePanelView({
           phones={phones}
           username={username}
           onAddEmail={onAddEmail}
+          onCreateEmail={onCreateEmail}
           onSendPhoneCode={onSendPhoneCode}
           onVerifyPhoneCode={onVerifyPhoneCode}
-          onSendEmailCode={onSendEmailCode}
-          onVerifyEmailCode={onVerifyEmailCode}
+          getEmailVerifier={getEmailVerifier}
           onManageEmail={onManageEmail}
           onManagePhone={onManagePhone}
           onProfilePictureChange={onProfilePictureChange}

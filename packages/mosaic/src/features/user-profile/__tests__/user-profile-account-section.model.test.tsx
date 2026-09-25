@@ -30,7 +30,11 @@ let user: {
   enterpriseAccounts: {
     active: boolean;
     provider: string;
-    enterpriseConnection: { name: string; logoPublicUrl: string | null } | null;
+    enterpriseConnection: {
+      name: string;
+      logoPublicUrl: string | null;
+      disableAdditionalIdentifications?: boolean;
+    } | null;
   }[];
   primaryEmailAddressId: string | null;
   primaryPhoneNumberId: string | null;
@@ -39,14 +43,18 @@ let user: {
     emailAddress: string;
     verification: FakeVerification;
     destroy?: ReturnType<typeof vi.fn>;
+    prepareVerification?: ReturnType<typeof vi.fn>;
+    attemptVerification?: ReturnType<typeof vi.fn>;
   }[];
   phoneNumbers: { id: string; phoneNumber: string; verification: FakeVerification }[];
   setProfileImage: ReturnType<typeof vi.fn>;
   update: ReturnType<typeof vi.fn>;
+  createEmailAddress: ReturnType<typeof vi.fn>;
 } | null;
 let attributes: Record<'first_name' | 'last_name' | 'username' | 'email_address' | 'phone_number', FakeAttribute>;
 let usernameSettings: { min_length: number; max_length: number };
 let environmentHydrated: boolean;
+let enterpriseSSOEnabled: boolean;
 
 function attribute(overrides: Partial<FakeAttribute> = {}): FakeAttribute {
   return { enabled: true, required: false, used_for_first_factor: false, used_for_second_factor: false, ...overrides };
@@ -58,7 +66,9 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useUser: () => ({ isLoaded: isUserLoaded, user }),
     useClerk: () => ({
-      __internal_environment: environmentHydrated ? { userSettings: { attributes, usernameSettings } } : null,
+      __internal_environment: environmentHydrated
+        ? { userSettings: { attributes, usernameSettings, enterpriseSSO: { enabled: enterpriseSSOEnabled } } }
+        : null,
     }),
   };
 });
@@ -67,7 +77,7 @@ function renderModel() {
   return renderHook(() => useUserProfileAccountSectionModel()).result.current;
 }
 
-async function rejection(save: Promise<void> | undefined): Promise<FormError | undefined> {
+async function rejection(save: void | Promise<unknown> | undefined): Promise<FormError | undefined> {
   try {
     await save;
     return undefined;
@@ -101,6 +111,7 @@ function apiError(paramName?: string) {
 beforeEach(() => {
   isUserLoaded = true;
   environmentHydrated = true;
+  enterpriseSSOEnabled = true;
   usernameSettings = { min_length: 4, max_length: 64 };
   attributes = {
     first_name: attribute(),
@@ -124,6 +135,8 @@ beforeEach(() => {
         emailAddress: 'other@clerk.dev',
         verification: { status: null },
         destroy: vi.fn(() => Promise.resolve()),
+        prepareVerification: vi.fn(() => Promise.resolve()),
+        attemptVerification: vi.fn(() => Promise.resolve()),
       },
       {
         id: 'email_1',
@@ -135,6 +148,7 @@ beforeEach(() => {
     phoneNumbers: [{ id: 'phone_1', phoneNumber: '+18018888181', verification: { status: 'verified' } }],
     setProfileImage: vi.fn(() => Promise.resolve({})),
     update: vi.fn(() => Promise.resolve(user)),
+    createEmailAddress: vi.fn(() => Promise.resolve({ id: 'email_new' })),
   };
 });
 
@@ -250,6 +264,73 @@ describe('useUserProfileAccountSectionModel', () => {
       await expect(rejection(ready().onRemoveEmail?.('email_2'))).resolves.toEqual({
         global: { code: 'form_param_invalid', message: 'That value is invalid.' },
       });
+    });
+
+    it('maps a create error onto the email field', async () => {
+      user?.createEmailAddress.mockRejectedValue(apiError('email_address'));
+      await expect(rejection(ready().onCreateEmail?.('taken@clerk.dev'))).resolves.toEqual({
+        fields: {
+          emailAddress: {
+            code: 'form_param_invalid',
+            paramName: 'email_address',
+            message: 'That value is invalid.',
+          },
+        },
+      });
+    });
+
+    it('sends a code to the chosen email', async () => {
+      const verification = ready().getEmailVerifier?.('email_2').start();
+      if (verification?.method !== 'code') {
+        throw new Error('expected a code verification');
+      }
+      await expect(verification.sent).resolves.toBeUndefined();
+      expect(user?.emailAddresses[0]?.prepareVerification).toHaveBeenCalledWith({ strategy: 'email_code' });
+    });
+
+    it('creates an email and verifies the created address before the user reloads', async () => {
+      const prepareVerification = vi.fn(() => Promise.resolve());
+      user?.createEmailAddress.mockResolvedValue({ id: 'email_new', prepareVerification });
+      const email = await ready().onCreateEmail?.('new@clerk.dev');
+      expect(user?.createEmailAddress).toHaveBeenCalledWith({ email: 'new@clerk.dev' });
+      email?.start();
+      expect(prepareVerification).toHaveBeenCalledWith({ strategy: 'email_code' });
+    });
+
+    it('verifies the code for the chosen email', async () => {
+      await ready().getEmailVerifier?.('email_2').verifyCode('123456');
+      expect(user?.emailAddresses[0]?.attemptVerification).toHaveBeenCalledWith({ code: '123456' });
+    });
+
+    it('maps a wrong code onto the code field', async () => {
+      user?.emailAddresses[0]?.attemptVerification?.mockRejectedValue(apiError('code'));
+      await expect(rejection(ready().getEmailVerifier?.('email_2').verifyCode('000000'))).resolves.toEqual({
+        fields: { code: { code: 'form_param_invalid', paramName: 'code', message: 'That value is invalid.' } },
+      });
+    });
+
+    it('offers no new email when the email address is immutable', () => {
+      attributes.email_address = attribute({ immutable: true });
+      expect(ready().onCreateEmail).toBeUndefined();
+    });
+
+    it('offers no new email when the active enterprise connection forbids more identifications', () => {
+      user?.enterpriseAccounts.push({
+        active: true,
+        provider: 'saml_okta',
+        enterpriseConnection: { name: 'Okta', logoPublicUrl: null, disableAdditionalIdentifications: true },
+      });
+      expect(ready().onCreateEmail).toBeUndefined();
+    });
+
+    it('ignores the enterprise restriction when the instance has enterprise SSO off', () => {
+      enterpriseSSOEnabled = false;
+      user?.enterpriseAccounts.push({
+        active: true,
+        provider: 'saml_okta',
+        enterpriseConnection: { name: 'Okta', logoPublicUrl: null, disableAdditionalIdentifications: true },
+      });
+      expect(ready().onCreateEmail).toBeDefined();
     });
 
     it('still offers a new primary but no removal when the email address is immutable', () => {

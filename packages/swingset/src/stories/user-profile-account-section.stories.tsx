@@ -74,9 +74,10 @@ function AccountSection({
       setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isDefault: false, isVerified: true }]),
   });
   const emailFlow = createUserProfileAddEmailFixture({
-    failAt: failEmailVerification ? 'verify' : undefined,
-    onVerified: value =>
-      setEmails(current => [...current, { id: `email_${Date.now()}`, value, isDefault: false, isVerified: true }]),
+    fail: failEmailVerification ? 'verify' : undefined,
+    onCreated: (id, value) => setEmails(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+    onVerified: id =>
+      setEmails(current => current.map(email => (email.id === id ? { ...email, isVerified: true } : email))),
   });
 
   return (
