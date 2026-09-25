@@ -14,7 +14,9 @@ describe('contact removal focus', () => {
     const labels = kind === 'email' ? values : ['+1 (801) 555-0100', '+1 (801) 555-0200'];
 
     function Example() {
-      const [items, setItems] = useState(values.map(value => ({ id: value, value })));
+      const [items, setItems] = useState(
+        values.map(value => ({ id: value, value, isDefault: false, isVerified: true })),
+      );
       const remove = (id: string) => setItems(current => current.filter(item => item.id !== id));
       return (
         <MosaicProvider>

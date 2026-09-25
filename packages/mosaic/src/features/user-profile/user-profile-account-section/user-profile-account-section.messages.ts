@@ -40,6 +40,7 @@ export const userProfileAccountSectionMessages = {
     save: 'Save changes',
   },
   primary: 'Primary',
+  unverified: 'Unverified',
   add: 'Add',
   manage: 'Manage',
   setPrimary: 'Set as primary',
@@ -56,7 +57,8 @@ export const userProfileAccountSectionMessages = {
     primaryError: 'Unable to set the primary email address. Try again.',
     removeDialog: {
       title: 'Remove email address?',
-      description: '{emailAddress} will be removed from your account. You won’t be able to use it to sign in.',
+      description: '{emailAddress} will be removed from your account.',
+      verifiedDescription: '{emailAddress} will be removed from your account. You won’t be able to use it to sign in.',
       confirm: 'Remove',
       cancel: 'Cancel',
     },
@@ -71,7 +73,8 @@ export const userProfileAccountSectionMessages = {
     primaryError: 'Unable to set the primary phone number. Try again.',
     removeDialog: {
       title: 'Remove phone number?',
-      description: '{phoneNumber} will be removed from your account. You won’t be able to use it to sign in.',
+      description: '{phoneNumber} will be removed from your account.',
+      verifiedDescription: '{phoneNumber} will be removed from your account. You won’t be able to use it to sign in.',
       confirm: 'Remove',
       cancel: 'Cancel',
     },

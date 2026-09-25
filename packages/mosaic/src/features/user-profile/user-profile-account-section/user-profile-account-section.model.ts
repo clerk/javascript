@@ -1,6 +1,6 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import { useUser } from '@clerk/shared/react';
-import type { AttributeData, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
+import type { AttributeData, EmailAddressResource, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
 import { save } from '../../../utils/form-error';
@@ -10,7 +10,7 @@ import type {
   UserProfileNameAttribute,
   UserProfilePhone,
 } from './user-profile-account-section.types';
-import { isAttributeAvailable } from './user-profile-account-section.utils';
+import { isAttributeAvailable, sortByVerification } from './user-profile-account-section.utils';
 import type { UserProfileAccountSectionViewProps } from './user-profile-account-section.view';
 import type { UserProfileEditNameField } from './user-profile-edit-name.dialog';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
@@ -29,6 +29,8 @@ type UserProfileAccountSectionData = Pick<
   | 'username'
   | 'emails'
   | 'phones'
+  | 'onSetPrimaryEmail'
+  | 'onRemoveEmail'
   | 'onProfilePictureChange'
   | 'onRemoveProfilePicture'
   | 'onSubmitName'
@@ -42,6 +44,14 @@ export type UserProfileAccountSectionModel =
 
 const NAME_FIELDS: readonly UserProfileEditNameField[] = ['firstName', 'lastName'];
 const USERNAME_FIELDS: readonly UserProfileEditUsernameField[] = ['username'];
+
+function emailById(user: UserResource, id: string): EmailAddressResource {
+  const email = user.emailAddresses.find(email => email.id === id);
+  if (!email) {
+    throw new Error(`No email address with id ${id}`);
+  }
+  return email;
+}
 
 function toManagedBy(account: EnterpriseAccountResource | undefined): UserProfileManagedBy | undefined {
   if (!account) {
@@ -58,12 +68,8 @@ function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameA
   return { enabled: attribute?.enabled ?? false, required: attribute?.required ?? false };
 }
 
-function primaryFirst<T extends { id: string }>(items: T[], primaryId: string | null): T[] {
-  return [...items.filter(item => item.id === primaryId), ...items.filter(item => item.id !== primaryId)];
-}
-
 function toEmails(user: UserResource): UserProfileEmail[] {
-  return primaryFirst(user.emailAddresses, user.primaryEmailAddressId).map(email => ({
+  return sortByVerification(user.emailAddresses, user.primaryEmailAddressId).map(email => ({
     id: email.id,
     value: email.emailAddress,
     isDefault: email.id === user.primaryEmailAddressId,
@@ -72,7 +78,7 @@ function toEmails(user: UserResource): UserProfileEmail[] {
 }
 
 function toPhones(user: UserResource): UserProfilePhone[] {
-  return primaryFirst(user.phoneNumbers, user.primaryPhoneNumberId).map(phone => ({
+  return sortByVerification(user.phoneNumbers, user.primaryPhoneNumberId).map(phone => ({
     id: phone.id,
     value: phone.phoneNumber,
     isDefault: phone.id === user.primaryPhoneNumberId,
@@ -98,6 +104,7 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
   const showUsername = isAttributeAvailable(usernameAttribute) && !(usernameImmutable && !user.username);
   const nameManagedBy = toManagedBy(user.enterpriseAccounts.find(account => account.active));
   const showEmails = isAttributeAvailable(attributes.email_address);
+  const emailsImmutable = Boolean(attributes.email_address?.immutable);
   const showPhones = isAttributeAvailable(attributes.phone_number);
 
   return {
@@ -114,6 +121,8 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     username: showUsername ? (user.username ?? '') : undefined,
     emails: showEmails ? toEmails(user) : undefined,
     phones: showPhones ? toPhones(user) : undefined,
+    onSetPrimaryEmail: showEmails ? id => save(() => user.update({ primaryEmailAddressId: id })) : undefined,
+    onRemoveEmail: showEmails && !emailsImmutable ? id => save(() => emailById(user, id).destroy()) : undefined,
     onProfilePictureChange: file => save(() => user.setProfileImage({ file })),
     onRemoveProfilePicture: user.hasImage ? () => save(() => user.setProfileImage({ file: null })) : undefined,
     onSubmitName: nameManagedBy
