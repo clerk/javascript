@@ -99,6 +99,7 @@
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
     "@vitejs/plugin-react": "^4.7.0",
+    "@vitest/browser-playwright": "5.0.0",
     "@vitest/coverage-v8": "5.0.0",
     "chalk": "4.1.2",
     "citty": "^0.2.2",

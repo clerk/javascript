@@ -43,7 +43,7 @@ export default defineConfig({
           name: 'mosaic',
           include: ['**/*.test.?(c|m)[jt]s?(x)', '**/*.spec.?(c|m)[jt]s?(x)'],
           exclude: ['src/primitives/**', featureTests],
-          setupFiles: ['./vitest.setup.mts'],
+          setupFiles: [resolve(import.meta.dirname, 'vitest.setup.mts')],
         },
       },
       {
@@ -62,7 +62,7 @@ export default defineConfig({
         test: {
           name: 'feature',
           include: [featureTests],
-          setupFiles: ['./vitest.setup.browser.mts'],
+          setupFiles: [resolve(import.meta.dirname, 'vitest.setup.browser.mts')],
           browser: {
             enabled: true,
             headless: true,
