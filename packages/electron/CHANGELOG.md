@@ -1,5 +1,16 @@
 # @clerk/electron
 
+## 0.0.48
+
+### Patch Changes
+
+- Export the `StorageOptions`, `RendererSchemeOptions`, and `SetupPasskeysMainReturn` types so consumers can type their configuration without reaching through `CreateClerkBridgeOptions['renderer']`. ([#9783](https://github.com/clerk/javascript/pull/9783)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`6a14691`](https://github.com/clerk/javascript/commit/6a14691f8d98dcafd3956e1ea97cb35d56a34864), [`0ee4ee2`](https://github.com/clerk/javascript/commit/0ee4ee2b49286a8cae5f251ec997f30c8a863205)]:
+  - @clerk/clerk-js@6.35.0
+  - @clerk/shared@4.37.0
+  - @clerk/react@6.17.3
+
 ## 0.0.47
 
 ### Patch Changes
