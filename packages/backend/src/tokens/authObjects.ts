@@ -1,6 +1,7 @@
-import { createCheckAuthorization } from '@clerk/shared/authorization';
+import { createCheckAuthorization, createCheckAuthorizationFromOAuthScopes } from '@clerk/shared/authorization';
 import { __experimental_JWTPayloadToAuthObjectProperties } from '@clerk/shared/jwtPayloadParser';
 import type {
+  CheckAuthorizationFromOAuthScopes,
   CheckAuthorizationFromSessionClaims,
   Jwt,
   JwtPayload,
@@ -30,6 +31,10 @@ type AuthObjectDebugData = Record<string, any>;
 type AuthObjectDebug = () => AuthObjectDebugData;
 
 type Claims = Record<string, any>;
+
+type CheckAuthorizationFromMachineToken<T extends MachineTokenType> = T extends typeof TokenType.OAuthToken
+  ? CheckAuthorizationFromOAuthScopes
+  : CheckAuthorizationFromSessionClaims;
 
 /**
  * @internal
@@ -119,7 +124,7 @@ export type AuthenticatedMachineObject<T extends MachineTokenType = MachineToken
       subject: string;
       scopes: string[];
       getToken: () => Promise<string>;
-      has: CheckAuthorizationFromSessionClaims;
+      has: CheckAuthorizationFromMachineToken<T>;
       debug: AuthObjectDebug;
       tokenType: T;
       isAuthenticated: true;
@@ -140,7 +145,7 @@ export type UnauthenticatedMachineObject<T extends MachineTokenType = MachineTok
       subject: null;
       scopes: null;
       getToken: () => Promise<null>;
-      has: CheckAuthorizationFromSessionClaims;
+      has: CheckAuthorizationFromMachineToken<T>;
       debug: AuthObjectDebug;
       tokenType: T;
       isAuthenticated: false;
@@ -310,6 +315,10 @@ export function authenticatedMachineObject<T extends MachineTokenType>(
         scopes: result.scopes,
         userId: result.subject,
         clientId: result.clientId,
+        has: createCheckAuthorizationFromOAuthScopes({
+          userId: result.subject,
+          oauthScopes: result.scopes,
+        }),
       } as unknown as AuthenticatedMachineObject<T>;
     }
     default:

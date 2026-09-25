@@ -358,8 +358,14 @@ describe('authenticatedMachineObject', () => {
       expect(retrievedToken).toBe(token);
     });
 
-    it('has() always returns false', () => {
+    it('has() checks exact OAuth scopes and denies other authorization checks', () => {
       const authObject = authenticatedMachineObject('oauth_token', token, verificationResult, debugData);
+      expect(authObject.has({ oauth_scope: 'read:foo' })).toBe(true);
+      expect(authObject.has({ oauth_scope: 'write:bar' })).toBe(true);
+      expect(authObject.has({ oauth_scope: 'read:baz' })).toBe(false);
+      expect(authObject.has({ oauth_scope: 'READ:FOO' })).toBe(false);
+      expect(authObject.has({ oauth_scope: '' })).toBe(false);
+      expect(authObject.has({ role: 'org:admin' })).toBe(false);
       expect(authObject.has({})).toBe(false);
     });
 
@@ -413,6 +419,18 @@ describe('unauthenticatedMachineObject', () => {
   it('has() always returns false', () => {
     const authObject = unauthenticatedMachineObject('m2m_token');
     expect(authObject.has({})).toBe(false);
+  });
+
+  it('accepts OAuth scope checks and returns false for unauthenticated OAuth tokens', () => {
+    const authObject = unauthenticatedMachineObject('oauth_token');
+    expect(authObject.has({ oauth_scope: 'read:foo' })).toBe(false);
+  });
+
+  it('does not expose OAuth scope checks on other machine token types', () => {
+    const authObject = unauthenticatedMachineObject('api_key');
+
+    // @ts-expect-error OAuth scope checks are only available for OAuth tokens.
+    expect(authObject.has({ oauth_scope: 'read:foo' })).toBe(false);
   });
 
   it('getToken always returns null ', async () => {

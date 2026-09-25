@@ -153,6 +153,15 @@ export type CheckAuthorizationFromSessionClaims = <P extends OrganizationCustomP
 ) => boolean;
 
 /**
+ * Type guard for authorization checks using OAuth access token scopes.
+ * Session authorization parameter shapes remain accepted for backwards compatibility,
+ * but cannot be authorized from OAuth scope data.
+ */
+export type CheckAuthorizationFromOAuthScopes = <P extends OrganizationCustomPermissionKey>(
+  isAuthorizedParams: CheckAuthorizationParamsFromOAuthScopes<P>,
+) => boolean;
+
+/**
  * @interface
  */
 export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCustomPermissionKey> = WithReverification<
@@ -194,6 +203,20 @@ export type CheckAuthorizationParamsFromSessionClaims<P extends OrganizationCust
     }
   | { role?: never; permission?: never; feature?: never; plan?: never }
 >;
+
+type CheckAuthorizationParamsFromOAuthScopes<P extends OrganizationCustomPermissionKey> =
+  | (CheckAuthorizationParamsFromSessionClaims<P> & { oauth_scope?: never })
+  | {
+      /**
+       * The OAuth access token scope to check for.
+       */
+      oauth_scope: string;
+      role?: never;
+      permission?: never;
+      feature?: never;
+      plan?: never;
+      reverification?: never;
+    };
 
 /**
  * The `Session` object is an abstraction over an HTTP session. It models the period of information exchange between a user and the server.
@@ -289,6 +312,7 @@ export interface SessionResource extends ClerkResource {
   getToken: GetToken;
   /**
    * Checks if the user is [authorized for the specified Role, Permission, Feature, or Plan](https://clerk.com/docs/guides/secure/authorization-checks) or requires the user to [reverify their credentials](https://clerk.com/docs/guides/secure/reverification) if their last verification is older than allowed.
+   *
    * @skipParametersSection
    */
   checkAuthorization: CheckAuthorization;
@@ -306,12 +330,15 @@ export interface SessionResource extends ClerkResource {
   updatedAt: Date;
   /**
    * Initiates the reverification flow.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
    */
   startVerification: (params: SessionVerifyCreateParams) => Promise<SessionVerificationResource>;
   /**
    * Initiates the [first factor verification](!first-factor-verification) process. This is a required step to complete a reverification flow when using a preparable factor.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   *
    * @skipParametersSection
    */
   prepareFirstFactorVerification: (
@@ -319,7 +346,9 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   /**
    * Attempts to complete the [first factor verification](!first-factor-verification) process.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   *
    * @skipParametersSection
    */
   attemptFirstFactorVerification: (
@@ -327,7 +356,9 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   /**
    * Initiates the [second factor verification](!second-factor-verification) process. This is a required step to complete a reverification flow when using a preparable factor.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   *
    * @skipParametersSection
    */
   prepareSecondFactorVerification: (
@@ -335,7 +366,9 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   /**
    * Attempts to complete the [second factor verification](!second-factor-verification) process.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
+   *
    * @skipParametersSection
    */
   attemptSecondFactorVerification: (
@@ -343,6 +376,7 @@ export interface SessionResource extends ClerkResource {
   ) => Promise<SessionVerificationResource>;
   /**
    * Initiates a verification flow using passkeys.
+   *
    * @returns A [`SessionVerification`](https://clerk.com/docs/reference/types/session-verification) instance with its status and supported factors.
    */
   verifyWithPasskey: () => Promise<SessionVerificationResource>;
