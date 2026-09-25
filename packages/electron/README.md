@@ -29,7 +29,7 @@
 [Clerk](https://clerk.com/?utm_source=github&utm_medium=clerk_electron) is the easiest way to add authentication and user management to your Electron application.
 
 > [!WARNING]
-> `@clerk/electron` is under active development and is not yet ready for production use. The API is incomplete and subject to change.
+> `@clerk/electron` is in beta. APIs may change before 1.0.
 
 This package exposes entrypoints for Electron's distinct runtime contexts:
 
@@ -142,6 +142,24 @@ createClerkBridge({
 });
 ```
 
+## Allowed origins
+
+`@clerk/electron` authenticates renderer requests with a bearer token, and Chromium adds an `Origin` header to each of them. Clerk's Frontend API rejects requests that carry both headers unless the origin is in your instance's allowed origins. Until you add it, every request fails with "Setting both the 'Origin' and 'Authorization' headers is forbidden".
+
+Add every origin your renderer loads from. That includes the custom scheme origin of packaged builds (for example, `my-app://renderer`) and your dev server's origin during development (for example, `http://localhost:5173`). Set them with the Backend SDK on each instance you use:
+
+```ts
+import { createClerkClient } from '@clerk/backend';
+
+const clerkClient = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY });
+
+await clerkClient.instance.update({
+  allowedOrigins: ['my-app://renderer', 'http://localhost:5173'],
+});
+```
+
+Pass the full list of origins each time you call it.
+
 ## Content Security Policy
 
 `@clerk/electron` loads Clerk's prebuilt UI from Clerk's CDN at runtime rather than bundling it, so your renderer's Content Security Policy must allow Clerk's Frontend API host. If it doesn't, the UI script fails to load and Clerk components never render.
@@ -150,12 +168,12 @@ Replace `{fapi_host}` below with your instance's **Frontend API** host, found in
 
 ```
 default-src 'self';
-script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com;
-connect-src 'self' https://{fapi_host};
+script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com https://*.protect.clerk.com;
+connect-src 'self' https://{fapi_host} https://*.protect.clerk.com https://clerk-telemetry.com;
 img-src 'self' https://img.clerk.com data:;
 style-src 'self' 'unsafe-inline';
 worker-src 'self' blob:;
-frame-src 'self' https://challenges.cloudflare.com;
+frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com;
 form-action 'self';
 ```
 
@@ -167,7 +185,7 @@ Apply it either with a `<meta>` tag in your renderer HTML:
 ```html
 <meta
   http-equiv="Content-Security-Policy"
-  content="default-src 'self'; script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com; connect-src 'self' https://{fapi_host}; img-src 'self' https://img.clerk.com data:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' https://challenges.cloudflare.com; form-action 'self';"
+  content="default-src 'self'; script-src 'self' 'unsafe-inline' https://{fapi_host} https://challenges.cloudflare.com https://*.protect.clerk.com; connect-src 'self' https://{fapi_host} https://*.protect.clerk.com https://clerk-telemetry.com; img-src 'self' https://img.clerk.com data:; style-src 'self' 'unsafe-inline'; worker-src 'self' blob:; frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com; form-action 'self';"
 />
 ```
 
@@ -187,12 +205,12 @@ app.whenReady().then(() => {
         'Content-Security-Policy': [
           [
             "default-src 'self'",
-            `script-src 'self' 'unsafe-inline' https://${fapiHost} https://challenges.cloudflare.com`,
-            `connect-src 'self' https://${fapiHost}`,
+            `script-src 'self' 'unsafe-inline' https://${fapiHost} https://challenges.cloudflare.com https://*.protect.clerk.com`,
+            `connect-src 'self' https://${fapiHost} https://*.protect.clerk.com https://clerk-telemetry.com`,
             "img-src 'self' https://img.clerk.com data:",
             "style-src 'self' 'unsafe-inline'",
             "worker-src 'self' blob:",
-            "frame-src 'self' https://challenges.cloudflare.com",
+            "frame-src 'self' https://challenges.cloudflare.com https://*.protect.clerk.com",
             "form-action 'self'",
           ].join('; '),
         ],
