@@ -10,6 +10,7 @@ export interface UserProfileConnectionProvider {
   id: string;
   provider: string;
   iconUrl?: string;
+  monochromeIcon?: boolean;
   connectError?: string;
 }
 
@@ -25,6 +26,7 @@ export interface UserProfileConnectedAccountsSectionViewProps {
   fallbackFocus?: () => HTMLElement | null;
   accounts: UserProfileConnectedAccount[];
   availableProviders?: UserProfileConnectionProvider[];
+  pendingId?: string;
   onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
   onRemove?: (id: string) => void | Promise<void>;
@@ -34,6 +36,7 @@ export function UserProfileConnectedAccountsSectionView({
   accounts,
   fallbackFocus,
   availableProviders = [],
+  pendingId,
   onConnect,
   onReconnect,
   onRemove,
@@ -51,6 +54,7 @@ export function UserProfileConnectedAccountsSectionView({
   });
   const removeAccount = useMemo(() => Confirmation.createHandle<UserProfileConnectedAccount>(), []);
   const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
+  const isBusy = pendingId !== undefined;
 
   return (
     <>
@@ -66,6 +70,7 @@ export function UserProfileConnectedAccountsSectionView({
                 key={account.id}
                 account={account}
                 triggerRef={removalFocus.registerTrigger(account.id)}
+                isDisabled={isBusy}
                 onReconnect={onReconnect}
                 onRemove={onRemove ? account => removeAccount.open(account) : undefined}
               />
@@ -75,6 +80,8 @@ export function UserProfileConnectedAccountsSectionView({
                   <UserProfileConnectedAccountRowView
                     key={provider.id}
                     account={provider}
+                    isPending={pendingId === provider.id}
+                    isDisabled={isBusy}
                     onConnect={onConnect}
                   />
                 ))
