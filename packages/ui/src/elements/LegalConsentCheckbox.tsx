@@ -55,6 +55,7 @@ const LegalCheckboxLabel = (props: { termsUrl?: string; privacyPolicyUrl?: strin
           text={t(localizationKey)}
           isExternal
           sx={t => ({
+            display: 'inline',
             textDecoration: 'underline',
             textUnderlineOffset: t.space.$1,
           })}
