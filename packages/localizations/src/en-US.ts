@@ -293,7 +293,7 @@ export const enUS: LocalizationResource = {
       subtitle: 'Add these credentials to your identity provider to configure Directory Sync',
       title: 'Configure',
       warning__ssoInactive:
-        'Your SSO connection is configured but not active. Members can be provisioned now, but they can only sign in once SSO is activated.',
+        "This SSO connection is configured but not yet active. You can provision members, but they won't be able to sign in until it's active.",
     },
     navbar: {
       title: 'Configure Directory Sync',
