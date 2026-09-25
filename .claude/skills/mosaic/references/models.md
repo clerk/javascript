@@ -89,9 +89,8 @@ drops the fallback instead of holding the space open. Keep the two apart.
 
 ## Testing
 
-Mock `@clerk/shared/react` with mutable module-level vars reset in `beforeEach`,
-then `renderHook` the model and assert its output. This is the **highest-risk,
-least-covered layer**: it holds the Clerk resource semantics no other test can
-reach. When a migration loses behavior, it is usually a model responsibility
-(revalidate timing, a permission gate, an empty-state rule) that quietly went
-missing — concentrate scrutiny here. See `testing.md`.
+The model is covered by the feature's feature test, which runs it against a real
+Clerk with FAPI faked, rather than by a test of its own. It is the
+**highest-risk layer**: when a migration loses behavior, it is usually a model
+responsibility (revalidate timing, a permission gate, an empty-state rule) that
+quietly went missing, so give those cases a feature test each. See `testing.md`.
