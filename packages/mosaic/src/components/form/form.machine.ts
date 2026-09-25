@@ -1,5 +1,7 @@
+import type { LocalizableError } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { TransitionResult } from '../../machine/types';
+import { SaveError } from '../../utils/form-error';
 import { keysOf, mapKeys } from '../../utils/object';
 import type { FieldFeedback, FormError, FormFieldErrors } from './form-submit-error';
 import { FormSubmitError } from './form-submit-error';
@@ -33,6 +35,7 @@ export interface FormDeps<TValues extends object> {
   onSubmit: (values: TValues) => Promise<unknown>;
   canSubmit: (values: TValues) => boolean;
   fallbackMessage: string;
+  errorText: (error: LocalizableError) => string;
 }
 
 export interface FormContext<TValues extends object> extends FormDeps<TValues> {
@@ -130,13 +133,32 @@ function displayableFields<TValues extends object>(
   return result;
 }
 
+function savedFieldErrors<TValues extends object>(
+  context: FormContext<TValues>,
+  fields: Partial<Record<string, LocalizableError>> | undefined,
+): FormFieldErrors<TValues> {
+  const result: FormFieldErrors<TValues> = {};
+  for (const name of keysOf(context.values)) {
+    const error = typeof name === 'string' ? fields?.[name] : undefined;
+    if (error !== undefined) {
+      result[name] = context.errorText(error);
+    }
+  }
+  return result;
+}
+
 function toFormError<TValues extends object>(cause: unknown, context: FormContext<TValues>): FormError<TValues> {
   const error: FormError<TValues> =
     cause instanceof FormSubmitError
       ? { message: cause.banner, fields: displayableFields(context, cause.fields) }
-      : cause instanceof Error
-        ? { message: cause.message }
-        : {};
+      : cause instanceof SaveError
+        ? {
+            message: cause.formError.global ? context.errorText(cause.formError.global) : undefined,
+            fields: savedFieldErrors(context, cause.formError.fields),
+          }
+        : cause instanceof Error
+          ? { message: cause.message }
+          : {};
   const visible = (error.message ?? '') !== '' || keysOf(error.fields ?? {}).length > 0;
   return visible ? error : { ...error, message: context.fallbackMessage };
 }
