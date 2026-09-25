@@ -85,34 +85,37 @@ export function UserProfileActiveDevicesSectionView({
   return (
     <div {...stylex.props(styles.sectionCards)}>
       <Section.Root>
-        <Section.Title>{m.title}</Section.Title>
         <Section.Group>
-          {currentDevices.length > 0 ? (
-            currentDevices.map(device => (
-              <Section.Row key={device.id}>
-                <DeviceItem
-                  device={device}
-                  triggerRef={device.id === currentDevices[0]?.id ? currentDeviceTrigger : undefined}
-                  onViewDetails={device => deviceDetails.open(device)}
-                />
+          <Section.Title>{m.title}</Section.Title>
+          <Section.Surface>
+            {currentDevices.length > 0 ? (
+              currentDevices.map(device => (
+                <Section.Row key={device.id}>
+                  <DeviceItem
+                    device={device}
+                    triggerRef={device.id === currentDevices[0]?.id ? currentDeviceTrigger : undefined}
+                    onViewDetails={device => deviceDetails.open(device)}
+                  />
+                </Section.Row>
+              ))
+            ) : (
+              <Section.Row>
+                <Section.Item>
+                  <Section.Content>
+                    <Section.Description>{m.emptyCurrent}</Section.Description>
+                  </Section.Content>
+                </Section.Item>
               </Section.Row>
-            ))
-          ) : (
-            <Section.Row>
-              <Section.Item>
-                <Section.Content>
-                  <Section.Description>{m.emptyCurrent}</Section.Description>
-                </Section.Content>
-              </Section.Item>
-            </Section.Row>
-          )}
+            )}
+          </Section.Surface>
         </Section.Group>
-      </Section.Root>
-      {otherDevices.length > 0 ? (
-        <Section.Root aria-label={m.otherDevicesTitle}>
-          <Section.Group>
-            <Section.Row>
-              <Section.Item>
+        {otherDevices.length > 0 ? (
+          <Section.Group
+            variant='contained'
+            aria-label={m.otherDevicesTitle}
+          >
+            <Section.Surface>
+              <Section.Header>
                 <Section.Content>
                   <Section.Label>
                     {fill(otherDevices.length === 1 ? m.otherDevice : m.otherDevices, {
@@ -133,7 +136,7 @@ export function UserProfileActiveDevicesSectionView({
                     </Button>
                   </Section.Actions>
                 ) : null}
-              </Section.Item>
+              </Section.Header>
               <Section.Items>
                 {otherDevices.map(device => (
                   <DeviceItem
@@ -145,10 +148,10 @@ export function UserProfileActiveDevicesSectionView({
                   />
                 ))}
               </Section.Items>
-            </Section.Row>
+            </Section.Surface>
           </Section.Group>
-        </Section.Root>
-      ) : null}
+        ) : null}
+      </Section.Root>
       {onSignOutAllOtherDevices ? (
         <Confirmation
           open={isSignOutAllOpen}

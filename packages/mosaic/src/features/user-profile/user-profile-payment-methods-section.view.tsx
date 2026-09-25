@@ -30,8 +30,8 @@ export function UserProfilePaymentMethodsSectionView({
   return (
     <Section.Root aria-label='Payment methods'>
       <Section.Group>
-        <Section.Row>
-          <Section.Item>
+        <Section.Surface>
+          <Section.Header>
             <Section.Content>
               <Section.Label>Payment methods</Section.Label>
             </Section.Content>
@@ -53,7 +53,7 @@ export function UserProfilePaymentMethodsSectionView({
                 </Button>
               </Section.Actions>
             ) : null}
-          </Section.Item>
+          </Section.Header>
           <Section.Items>
             {paymentMethods.length > 0 ? (
               paymentMethods.map(paymentMethod => (
@@ -72,7 +72,7 @@ export function UserProfilePaymentMethodsSectionView({
               </Section.Item>
             )}
           </Section.Items>
-        </Section.Row>
+        </Section.Surface>
       </Section.Group>
     </Section.Root>
   );

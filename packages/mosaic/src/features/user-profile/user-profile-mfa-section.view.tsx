@@ -27,6 +27,8 @@ export interface UserProfileMfaSectionViewProps {
   addButtonRef?: Ref<HTMLButtonElement>;
   addControl?: ReactNode;
   sectionTitle?: string;
+  /** Renders only the group, for composing inside a parent `Section.Root`. */
+  asGroup?: boolean;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
   onRemove?: (id: string) => void | Promise<void>;
@@ -39,13 +41,14 @@ export function UserProfileMfaSectionView({
   addButtonRef,
   addControl,
   sectionTitle,
+  asGroup,
   onAdd,
   onRegenerateBackupCodes,
   onRemove,
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
-  const section = useRef<HTMLElement>(null);
+  const section = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: methods.map(method => method.id),
     onRemove,
@@ -108,6 +111,7 @@ export function UserProfileMfaSectionView({
         hasItems={methods.length > 0}
         label={m.label}
         sectionTitle={sectionTitle}
+        asGroup={asGroup}
       >
         {methods.map(method => (
           <UserProfileMfaRowView

@@ -118,12 +118,12 @@ function StubPage({ id, title }: { id: string; title: string }) {
       <Panel.Sections>
         {stubSections[id]?.map(section => (
           <Section.Root key={section.title}>
-            <Section.Title>{section.title}</Section.Title>
             <Section.Group>
-              <Section.Row>
-                <Section.Items>
-                  {section.rows.map(row => (
-                    <Section.Item key={row.label}>
+              <Section.Title>{section.title}</Section.Title>
+              <Section.Surface>
+                {section.rows.map(row => (
+                  <Section.Row key={row.label}>
+                    <Section.Item>
                       <Section.Content>
                         <Section.Label>{row.label}</Section.Label>
                         <Section.Description>{row.description}</Section.Description>
@@ -138,9 +138,9 @@ function StubPage({ id, title }: { id: string; title: string }) {
                         </Button>
                       </Section.Actions>
                     </Section.Item>
-                  ))}
-                </Section.Items>
-              </Section.Row>
+                  </Section.Row>
+                ))}
+              </Section.Surface>
             </Section.Group>
           </Section.Root>
         ))}
