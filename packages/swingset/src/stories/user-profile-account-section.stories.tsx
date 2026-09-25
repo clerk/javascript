@@ -1,12 +1,10 @@
-import { Button } from '@clerk/mosaic/components/button';
+import type { UserProfileEmailVerification } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type {
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
 import type { UserProfileAddPhoneDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
-import { UserProfileVerifyEmailLinkDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-link.dialog';
-import { UserProfileVerifyEmailSsoDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-sso.dialog';
 import type { FormError } from '@clerk/mosaic/utils/form-error';
 import { useState } from 'react';
 
@@ -17,8 +15,6 @@ import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-em
 import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
 import { useUserProfileEditNameFixture } from './fixtures/user-profile-edit-name';
 import { useUserProfileEditUsernameFixture } from './fixtures/user-profile-edit-username';
-import { useUserProfileVerifyEmailLinkFixture } from './fixtures/user-profile-verify-email-link';
-import { useUserProfileVerifyEmailSsoFixture } from './fixtures/user-profile-verify-email-sso';
 
 export { default as __source } from './user-profile-account-section.stories?raw';
 
@@ -38,6 +34,7 @@ function AccountSection({
   failWith,
   usernameFailWith,
   failEmailVerification = false,
+  emailVerificationMethod,
   emailRemovalState,
   phoneRemovalState,
   nameManagedBy,
@@ -47,6 +44,7 @@ function AccountSection({
   failWith?: FormError;
   usernameFailWith?: FormError;
   failEmailVerification?: boolean;
+  emailVerificationMethod?: UserProfileEmailVerification['method'];
   emailRemovalState?: 'pending' | 'error';
   phoneRemovalState?: 'pending' | 'error';
   nameManagedBy?: { name: string; iconUrl?: string };
@@ -74,6 +72,7 @@ function AccountSection({
       setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isDefault: false, isVerified: true }]),
   });
   const emailFlow = createUserProfileAddEmailFixture({
+    method: emailVerificationMethod,
     fail: failEmailVerification ? 'verify' : undefined,
     onCreated: (id, value) => setEmails(current => [...current, { id, value, isDefault: false, isVerified: false }]),
     onVerified: id =>
@@ -154,69 +153,39 @@ export function AddEmailFails() {
 }
 
 export function EmailLinkVerification() {
-  const fixture = useUserProfileVerifyEmailLinkFixture();
   return (
-    <UserProfileVerifyEmailLinkDialog
-      {...fixture}
-      trigger={
-        <Button
-          variant='outline'
-          color='neutral'
-        >
-          Verify email link
-        </Button>
-      }
+    <AccountSection
+      allowMultipleAccounts
+      emailVerificationMethod='link'
     />
   );
 }
 
-export function EmailLinkResendFails() {
-  const fixture = useUserProfileVerifyEmailLinkFixture({ failResend: true });
+export function EmailLinkFails() {
   return (
-    <UserProfileVerifyEmailLinkDialog
-      {...fixture}
-      trigger={
-        <Button
-          variant='outline'
-          color='neutral'
-        >
-          Verify email link
-        </Button>
-      }
+    <AccountSection
+      allowMultipleAccounts
+      emailVerificationMethod='link'
+      failEmailVerification
     />
   );
 }
 
 export function EmailSsoVerification() {
-  const fixture = useUserProfileVerifyEmailSsoFixture();
   return (
-    <UserProfileVerifyEmailSsoDialog
-      {...fixture}
-      trigger={
-        <Button
-          variant='outline'
-          color='neutral'
-        >
-          Verify with SSO
-        </Button>
-      }
+    <AccountSection
+      allowMultipleAccounts
+      emailVerificationMethod='sso'
     />
   );
 }
 
-export function EmailSsoConnectFails() {
-  const fixture = useUserProfileVerifyEmailSsoFixture({ failConnect: true });
+export function EmailSsoFails() {
   return (
-    <UserProfileVerifyEmailSsoDialog
-      {...fixture}
-      trigger={
-        <Button
-          variant='outline'
-          color='neutral'
-        >
-          Verify with SSO
-        </Button>
-      }
+    <AccountSection
+      allowMultipleAccounts
+      emailVerificationMethod='sso'
+      failEmailVerification
     />
   );
 }

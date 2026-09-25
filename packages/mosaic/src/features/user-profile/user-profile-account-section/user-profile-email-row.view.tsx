@@ -16,6 +16,7 @@ import { useUserProfileSetPrimaryController } from './user-profile-set-primary.c
 
 export interface UserProfileEmailRowViewProps {
   emails: UserProfileEmail[];
+  username?: string;
   allowMultipleAccounts?: boolean;
   onAddEmail?: () => void;
   onCreateEmail?: (emailAddress: string) => Promise<UserProfileEmailVerifier>;
@@ -28,6 +29,7 @@ export interface UserProfileEmailRowViewProps {
 
 export function UserProfileEmailRowView({
   emails,
+  username,
   allowMultipleAccounts = false,
   onAddEmail,
   onCreateEmail,
@@ -44,7 +46,10 @@ export function UserProfileEmailRowView({
     onRemove: onRemoveEmail,
     fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
   });
-  const verification = useUserProfileAddEmailController({ onCreate: onCreateEmail });
+  const verification = useUserProfileAddEmailController({
+    username,
+    onCreate: onCreateEmail,
+  });
   const verificationDialog = useMemo(() => Dialog.createHandle(), []);
   const canVerify = Boolean(getEmailVerifier);
   const addEmailLabel = (

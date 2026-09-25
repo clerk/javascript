@@ -17,4 +17,18 @@ export const userProfileAddEmailMessages = {
     resending: 'Sending code…',
     resendCountdown: 'Didn’t receive a code? Resend ({seconds})',
   },
+  link: {
+    title: 'Verify your email',
+    description: 'Open the link we sent to {emailAddress}',
+    cancel: 'Cancel',
+    resend: 'Didn’t receive a link? Resend',
+    resendCountdown: 'Didn’t receive a link? Resend ({seconds})',
+  },
+  sso: {
+    title: 'Verify your email',
+    description: 'Connect below to verify {emailAddress}',
+    connection: 'Enterprise SSO',
+    connect: 'Connect',
+    cancel: 'Cancel',
+  },
 } as const;
