@@ -1,5 +1,6 @@
-import type { FormEvent } from 'react';
-import { useId, useRef } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import type { RefObject } from 'react';
+import { useRef } from 'react';
 
 import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
@@ -7,9 +8,9 @@ import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
+import type { UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
-import { useErrorText, useMessages } from '../../../localization';
-import type { FormError } from '../../../utils/form-error';
+import { useMessages } from '../../../localization';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
 
 export type UserProfileEditNameField = 'firstName' | 'lastName';
@@ -24,55 +25,31 @@ export interface UserProfileEditNameDialogProps {
   onOpenChange: (open: boolean) => void;
   /** Rendering the opener here is what returns focus to it on close. */
   trigger?: DialogTriggerProps['render'];
-  firstName: string;
-  lastName: string;
   /** A disabled attribute drops its field; a required one blocks the submit while empty. */
   firstNameAttribute?: UserProfileNameAttribute;
   lastNameAttribute?: UserProfileNameAttribute;
-  onFirstNameChange: (value: string) => void;
-  onLastNameChange: (value: string) => void;
   title?: string;
-  canSave?: boolean;
-  isSaving?: boolean;
-  error?: FormError<UserProfileEditNameField>;
-  onSubmit: () => void;
+  form: UseFormResult<UserProfileEditNameValue>;
 }
 
 /**
- * Edits the user's first and last name. Holds nothing, and validates nothing beyond the native
- * `required` the instance asks for: the name the API will take is the API's to decide, so the action
- * stays live and a rejection comes back as `error`.
+ * Edits the user's first and last name. Validates nothing beyond the native `required` the
+ * instance asks for: the name the API will take is the API's to decide, so a rejection comes back
+ * through the form.
  */
 export function UserProfileEditNameDialog({
   open,
   onOpenChange,
   trigger,
-  firstName,
-  lastName,
   firstNameAttribute = {},
   lastNameAttribute = {},
-  onFirstNameChange,
-  onLastNameChange,
   title,
-  canSave = true,
-  isSaving = false,
-  error,
-  onSubmit,
+  form,
 }: UserProfileEditNameDialogProps) {
   const m = useMessages('userProfileAccountSection');
-  const errorText = useErrorText();
-  const formId = useId();
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const { enabled: showFirstName = true, required: firstNameRequired = false } = firstNameAttribute;
   const { enabled: showLastName = true, required: lastNameRequired = false } = lastNameAttribute;
-
-  // `canSave`/`isSaving` only cancel the press on the action; they do not stop a native submit.
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (canSave && !isSaving) {
-      onSubmit();
-    }
-  };
 
   return (
     <Dialog.Root
@@ -94,54 +71,38 @@ export function UserProfileEditNameDialog({
           <Card.Content
             render={
               <form
-                id={formId}
-                onSubmit={handleSubmit}
+                id={form.id}
+                onSubmit={form.handleSubmit}
               />
             }
           >
-            {error?.global ? (
+            {form.error ? (
               <Banner.Root
                 role='alert'
                 color='negative'
               >
-                <Banner.Label>{errorText(error.global)}</Banner.Label>
+                <Banner.Label>{form.error}</Banner.Label>
               </Banner.Root>
             ) : null}
             {showFirstName ? (
-              <Field.Root
-                invalid={Boolean(error?.fields?.firstName)}
+              <NameField
+                autoComplete='given-name'
+                form={form}
+                inputRef={initialFocusRef}
+                label={m.name.firstNameLabel}
+                name='firstName'
                 required={firstNameRequired}
-              >
-                <Field.Label>{m.name.firstNameLabel}</Field.Label>
-                <Input
-                  ref={initialFocusRef}
-                  autoComplete='given-name'
-                  disabled={isSaving}
-                  value={firstName}
-                  onChange={event => onFirstNameChange(event.target.value)}
-                />
-                <Field.Message>
-                  <Field.Error>{error?.fields?.firstName ? errorText(error.fields.firstName) : null}</Field.Error>
-                </Field.Message>
-              </Field.Root>
+              />
             ) : null}
             {showLastName ? (
-              <Field.Root
-                invalid={Boolean(error?.fields?.lastName)}
+              <NameField
+                autoComplete='family-name'
+                form={form}
+                inputRef={showFirstName ? undefined : initialFocusRef}
+                label={m.name.lastNameLabel}
+                name='lastName'
                 required={lastNameRequired}
-              >
-                <Field.Label>{m.name.lastNameLabel}</Field.Label>
-                <Input
-                  ref={showFirstName ? undefined : initialFocusRef}
-                  autoComplete='family-name'
-                  disabled={isSaving}
-                  value={lastName}
-                  onChange={event => onLastNameChange(event.target.value)}
-                />
-                <Field.Message>
-                  <Field.Error>{error?.fields?.lastName ? errorText(error.fields.lastName) : null}</Field.Error>
-                </Field.Message>
-              </Field.Root>
+              />
             ) : null}
           </Card.Content>
           <Card.Footer>
@@ -157,10 +118,10 @@ export function UserProfileEditNameDialog({
               }
             />
             <SubmitButton
-              form={formId}
+              form={form.id}
               fullWidth
-              isPending={isSaving}
-              disabled={!canSave}
+              isPending={form.isSubmitting}
+              disabled={!form.canSubmit}
               focusableWhenDisabled
             >
               {m.name.save}
@@ -169,5 +130,42 @@ export function UserProfileEditNameDialog({
         </Card.Root>
       </Dialog.Popup>
     </Dialog.Root>
+  );
+}
+
+function NameField({
+  label,
+  autoComplete,
+  form,
+  inputRef,
+  name,
+  required,
+}: {
+  label: string;
+  autoComplete: 'given-name' | 'family-name';
+  form: UseFormResult<UserProfileEditNameValue>;
+  inputRef?: RefObject<HTMLInputElement>;
+  name: UserProfileEditNameField;
+  required: boolean;
+}) {
+  const { feedback } = form.fields[name];
+  const error = feedback?.type === 'error' ? feedback.message : undefined;
+  const { ref, ...control } = form.register(name);
+  const mergedRef = useMergeRefs([ref, inputRef]);
+
+  return (
+    <Field.Root
+      disabled={form.isSubmitting}
+      invalid={error !== undefined}
+      required={required}
+    >
+      <Field.Label>{label}</Field.Label>
+      <Input
+        ref={mergedRef}
+        autoComplete={autoComplete}
+        {...control}
+      />
+      {error ? <Field.Error>{error}</Field.Error> : null}
+    </Field.Root>
   );
 }
