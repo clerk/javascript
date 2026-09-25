@@ -83,9 +83,10 @@ export function useUserProfileEditPasswordController({
   });
 
   const password = form.values.newPassword;
+  const passwordLeft = form.fields.newPassword.touched;
   useEffect(() => {
     setPasswordFeedback(undefined);
-    if (!isOpen || password === '' || !validatePassword) {
+    if (!isOpen || (password === '' && !passwordLeft) || !validatePassword) {
       return;
     }
 
@@ -103,7 +104,7 @@ export function useUserProfileEditPasswordController({
     return () => {
       active = false;
     };
-  }, [isOpen, password, validatePassword]);
+  }, [isOpen, password, passwordLeft, validatePassword]);
 
   const onOpenChange = (open: boolean) => {
     if (!open && reverification && reverification.status !== 'idle') {

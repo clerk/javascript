@@ -67,6 +67,28 @@ describe('useUserProfileEditPasswordController', () => {
     expect(result.current.passwordFeedback).toBeUndefined();
   });
 
+  it('checks an empty new password only once it has been left', async () => {
+    const validatePassword = vi.fn(() =>
+      Promise.resolve<FieldFeedback>({ type: 'info', message: 'Your password must contain 8 or more characters.' }),
+    );
+    const { result } = renderHook(() =>
+      useUserProfileEditPasswordController({ onSubmit: () => Promise.resolve(), validatePassword }),
+    );
+    open(result);
+    await act(() => Promise.resolve());
+    expect(validatePassword).not.toHaveBeenCalled();
+
+    act(() => result.current.form.touch('newPassword'));
+
+    await waitFor(() =>
+      expect(result.current.passwordFeedback).toEqual({
+        type: 'info',
+        message: 'Your password must contain 8 or more characters.',
+      }),
+    );
+    expect(validatePassword).toHaveBeenCalledWith('');
+  });
+
   it('can submit while an advisory password check is pending', async () => {
     const check = deferred<FieldFeedback>();
     const validatePassword = vi.fn(() => check.promise);

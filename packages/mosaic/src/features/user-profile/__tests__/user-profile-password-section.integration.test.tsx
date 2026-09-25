@@ -290,6 +290,25 @@ describe('UserProfilePasswordSection', () => {
     );
   });
 
+  it('shows the minimum length as an error after the new password is left empty', async () => {
+    renderPassword();
+    const events = userEvent.setup();
+    await events.click(screen.getByRole('button', { name: 'Change password' }));
+    await events.click(screen.getByLabelText('New password'));
+    expect(screen.getByLabelText('New password')).not.toHaveAccessibleDescription(
+      'Your password must contain 8 or more characters.',
+    );
+
+    await events.click(screen.getByLabelText('Confirm password'));
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password must contain 8 or more characters.',
+      ),
+    );
+    expect(screen.getByLabelText('New password')).toHaveAttribute('aria-invalid', 'true');
+  });
+
   it('confirms that requirements are met when strength checking is disabled', async () => {
     renderPassword();
     const events = await editPassword();
