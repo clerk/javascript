@@ -463,6 +463,6 @@ test.describe('composed OrganizationProfile exports @generic', () => {
     // the composed counterpart to the security tab (there are no composable sub-sections here).
     await expect(u.page.getByRole('heading', { name: /^security$/i })).toBeVisible();
     await expect(u.page.getByText(/^SSO$/)).toBeVisible();
-    await expect(u.page.getByRole('button', { name: /start configuration/i })).toBeVisible();
+    await expect(u.page.locator('.cl-profileSection__sso').getByRole('button', { name: /^configure$/i })).toBeVisible();
   });
 });

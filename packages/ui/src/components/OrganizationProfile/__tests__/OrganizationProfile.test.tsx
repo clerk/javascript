@@ -594,7 +594,7 @@ describe('OrganizationProfile', () => {
       renderSecurityRoute(wrapper);
 
       expect(await screen.findByText(SECURITY_DESCRIPTION)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Configure' })).toBeInTheDocument();
     });
 
     it('blocks the security page on the guarded route when the user lacks the manage enterprise connections permission', async () => {
@@ -608,7 +608,7 @@ describe('OrganizationProfile', () => {
       expect(fixtures.clerk.organization?.getEnterpriseConnections).not.toHaveBeenCalled();
       expect(screen.queryByRole('heading', { name: 'Security' })).not.toBeInTheDocument();
       expect(screen.queryByText(SECURITY_DESCRIPTION)).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Configure' })).not.toBeInTheDocument();
     });
   });
 
