@@ -7,11 +7,15 @@ import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import type { FieldFeedback } from '../../../components/form';
 import { Text } from '../../../components/text';
-import { fill, useLocale, useMessages } from '../../../localization';
+import { useLocale, useMessages } from '../../../localization';
 import { Reverification, useReverificationFlow } from '../../reverification';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
-import { passwordFormError, passwordStrengthMessage } from './user-profile-password-feedback';
+import {
+  passwordComplexityMessage,
+  passwordFormError,
+  passwordStrengthMessage,
+} from './user-profile-password-feedback';
 import type { UserProfilePasswordModel } from './user-profile-password-section.model';
 import { useUserProfilePasswordModel } from './user-profile-password-section.model';
 import { UserProfilePasswordSectionView } from './user-profile-password-section.view';
@@ -58,18 +62,12 @@ function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { st
   const feedback = useCallback(
     async (password: string): Promise<FieldFeedback | undefined> => {
       const { complexity, strength } = await validatePassword(password);
-      if (complexity?.min_length) {
-        return { type: 'info', message: fill(m.rules.minLength, { length: passwordSettings.min_length }) };
-      }
-      const messages = [
-        complexity?.max_length && fill(m.rules.maxLength, { length: passwordSettings.max_length }),
-        complexity?.require_lowercase && m.rules.lowercase,
-        complexity?.require_uppercase && m.rules.uppercase,
-        complexity?.require_numbers && m.rules.number,
-        complexity?.require_special_char && m.rules.special,
-      ].filter(Boolean);
-      if (messages.length > 0) {
-        return { type: 'error', message: messages.join(' ') };
+      const failures = Object.entries(complexity ?? {})
+        .filter(([, failed]) => failed)
+        .map(([code]) => code);
+      const message = passwordComplexityMessage(failures, passwordSettings, m, locale);
+      if (message) {
+        return { type: complexity?.min_length ? 'info' : 'error', message };
       }
       if (strength?.state === 'fail') {
         return { type: 'error', message: passwordStrengthMessage(strength.result.feedback.suggestions, m) };
@@ -79,7 +77,7 @@ function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { st
       }
       return strength ? { type: 'success', message: m.rules.strong } : undefined;
     },
-    [validatePassword, passwordSettings, m],
+    [validatePassword, passwordSettings, m, locale],
   );
   const controller = useUserProfileEditPasswordController({
     validatePassword: feedback,

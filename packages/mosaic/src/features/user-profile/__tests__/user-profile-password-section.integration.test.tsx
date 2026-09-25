@@ -272,6 +272,20 @@ describe('UserProfilePasswordSection', () => {
     expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
   });
 
+  it('uses legacy wording and list formatting for live complexity feedback', async () => {
+    environment.userSettings.passwordSettings.require_uppercase = true;
+    environment.userSettings.passwordSettings.require_numbers = true;
+    renderPassword();
+    const events = userEvent.setup();
+    await events.click(screen.getByRole('button', { name: 'Change password' }));
+    await events.type(screen.getByLabelText('New password'), 'longpassword');
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password must contain a number and an uppercase letter.',
+      ),
+    );
+  });
+
   it('shows specific client strength suggestions without blocking submission', async () => {
     environment.userSettings.passwordSettings.show_zxcvbn = true;
     renderPassword();
