@@ -8,7 +8,15 @@ import type {
 import { http, HttpResponse, type JsonBodyType } from 'msw';
 import { setupWorker } from 'msw/browser';
 
-import { fapiClient, type FapiEnvironment, fapiEnvironment, fapiPage, fapiToken } from './fapi';
+import {
+  fapiClient,
+  type FapiEnvironment,
+  fapiEnvironment,
+  fapiMembership,
+  fapiOrganization,
+  fapiPage,
+  fapiToken,
+} from './fapi';
 
 export const PUBLISHABLE_KEY = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
 const FAPI = 'https://clerk.abcef.12345.prod.lclclerk.com';
@@ -141,6 +149,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       const accepted = { ...invitation, status: 'accepted' as const };
       state.invitations = state.invitations.map(i => (i.id === accepted.id ? accepted : i));
+      state.memberships = [...state.memberships, fapiMembership(fapiOrganization(invitation.public_organization_data))];
       return envelope(accepted, state.client);
     }),
     http.post(fapiUrl('/v1/me/organization_suggestions/:id/accept'), ({ params }) => {
@@ -163,12 +172,26 @@ export interface HeldRequests {
   fail: (code?: string) => void;
 }
 
+const unsettledHolds = new Set<string>();
+
+export function takeUnsettledHolds(): string[] {
+  const holds = [...unsettledHolds];
+  unsettledHolds.clear();
+  return holds;
+}
+
 export function holdRequests(method: 'get' | 'post', path: string): HeldRequests {
   const requests: Request[] = [];
-  let settle: (response: Response | undefined) => void = () => {};
+  const hold = `${method.toUpperCase()} ${path}`;
+  let resolveGate: (response: Response | undefined) => void = () => {};
   const gate = new Promise<Response | undefined>(resolve => {
-    settle = resolve;
+    resolveGate = resolve;
   });
+  const settle = (response: Response | undefined) => {
+    unsettledHolds.delete(hold);
+    resolveGate(response);
+  };
+  unsettledHolds.add(hold);
 
   worker.use(
     http[method](fapiUrl(path), ({ request }) => {
