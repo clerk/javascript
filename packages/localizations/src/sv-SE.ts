@@ -2107,6 +2107,7 @@ export const svSE: LocalizationResource = {
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: undefined,
     web3_signature_request_rejected: 'Du avvisade signaturbegäran. Försök igen för att fortsätta.',
     web3_solana_signature_generation_failed:
