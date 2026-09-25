@@ -1,4 +1,5 @@
 import { hasUrlInFragment, stripOrigin } from '@clerk/shared/internal/clerk-js/url';
+import type { NavigateOptions } from '@clerk/shared/types';
 import React from 'react';
 
 import type { RefreshEvent } from './BaseRouter';
@@ -14,11 +15,16 @@ interface HashRouterProps {
 }
 
 export const HashRouter = ({ preservedParams, children }: HashRouterProps): JSX.Element => {
-  const internalNavigate = async (toURL: URL): Promise<void> => {
+  const internalNavigate = async (toURL: URL, options?: NavigateOptions): Promise<void> => {
     if (!toURL) {
       return;
     }
-    window.location.hash = stripOrigin(toURL).substring(1 + hashRouterBase.length);
+    const hash = stripOrigin(toURL).substring(1 + hashRouterBase.length);
+    if (options?.replace) {
+      window.location.replace('#' + hash);
+    } else {
+      window.location.hash = hash;
+    }
     return Promise.resolve();
   };
 
