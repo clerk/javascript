@@ -226,8 +226,32 @@ describe('UserProfilePasswordSection', () => {
     await events.click(screen.getByRole('button', { name: 'Save changes' }));
 
     await waitFor(() =>
-      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription('Choose a different password.'),
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'This password has been found as part of a breach and can not be used, please try another password instead.',
+      ),
     );
+    expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
+  });
+
+  it('prioritizes the backend minimum-length error over an earlier complexity error', async () => {
+    user.updatePassword.mockRejectedValueOnce(
+      new ClerkAPIResponseError('Invalid', {
+        status: 422,
+        data: [
+          { code: 'form_password_no_uppercase', message: 'Raw uppercase', meta: { param_name: 'new_password' } },
+          { code: 'form_password_length_too_short', message: 'Raw minimum', meta: { param_name: 'new_password' } },
+        ],
+      }),
+    );
+    renderPassword();
+    const events = await editPassword();
+    await events.click(screen.getByRole('button', { name: 'Save changes' }));
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password must contain 8 or more characters.',
+      ),
+    );
+    expect(screen.getByLabelText('New password')).toHaveAttribute('aria-invalid', 'true');
     expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
   });
 
