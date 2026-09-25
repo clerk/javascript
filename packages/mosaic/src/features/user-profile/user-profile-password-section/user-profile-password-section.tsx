@@ -1,14 +1,11 @@
-import { isReverificationHint } from '@clerk/shared/authorization-errors';
-import { isReverificationCancelledError } from '@clerk/shared/error';
 import type { ReactNode } from 'react';
 import { useCallback, useRef } from 'react';
 
 import { Button } from '../../../components/button';
-import { Card } from '../../../components/card';
 import type { FieldFeedback } from '../../../components/form';
 import { Text } from '../../../components/text';
 import { useLocale, useMessages } from '../../../localization';
-import { Reverification, useReverificationFlow } from '../../reverification';
+import { useReverificationFlow } from '../../reverification';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
 import {
@@ -57,7 +54,7 @@ export function UserProfilePasswordSection({ fallback = null }: UserProfilePassw
 function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { status: 'ready' }> }) {
   const m = useMessages('userProfilePasswordSection');
   const locale = useLocale();
-  const [updatePassword, verification] = useReverificationFlow(model.updatePassword);
+  const [updatePassword, reverification] = useReverificationFlow(model.updatePassword);
   const { validatePassword, passwordSettings } = model;
   const feedback = useCallback(
     async (password: string): Promise<FieldFeedback | undefined> => {
@@ -82,20 +79,9 @@ function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { st
   const controller = useUserProfileEditPasswordController({
     validatePassword: feedback,
     requiresCurrentPassword: model.requiresCurrentPassword,
-    onSubmit: async value => {
-      try {
-        const result = await updatePassword(value);
-        if (isReverificationHint(result)) {
-          throw new Error(m.errors.verificationIncomplete);
-        }
-        return { status: 'saved' };
-      } catch (error) {
-        if (isReverificationCancelledError(error)) {
-          return { status: 'cancelled' };
-        }
-        throw passwordFormError(error, model.requiresCurrentPassword, passwordSettings, m, locale);
-      }
-    },
+    onSubmit: updatePassword,
+    formatError: error => passwordFormError(error, model.requiresCurrentPassword, passwordSettings, m, locale),
+    reverification,
   });
 
   return (
@@ -107,15 +93,10 @@ function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { st
           passwordFeedback={controller.passwordFeedback}
           identifier={model.identifier}
           open={controller.isOpen}
-          onOpenChange={open => {
-            if (!open && verification.status !== 'idle') {
-              verification.onCancel?.();
-              return;
-            }
-            controller.onOpenChange(open);
-          }}
+          onOpenChange={controller.onOpenChange}
           hasPassword={model.mode === 'change'}
           requiresCurrentPassword={model.requiresCurrentPassword}
+          reverification={controller.reverification}
           trigger={
             <Button
               color='neutral'
@@ -125,24 +106,7 @@ function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { st
               {model.mode === 'change' ? m.change : m.set}
             </Button>
           }
-        >
-          {verification.status !== 'idle' && verification.status !== 'loading' ? (
-            <>
-              <Reverification {...verification} />
-              <Card.Footer>
-                <Button
-                  variant='outline'
-                  color='neutral'
-                  fullWidth
-                  disabled={verification.phase === 'retrying'}
-                  onClick={verification.onCancel}
-                >
-                  {m.back}
-                </Button>
-              </Card.Footer>
-            </>
-          ) : undefined}
-        </UserProfileEditPasswordDialog>
+        />
       }
     />
   );

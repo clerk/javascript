@@ -1,6 +1,6 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
-import type { ReactNode, RefObject } from 'react';
+import type { RefObject } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 
 import { Banner } from '../../../components/banner';
@@ -15,6 +15,8 @@ import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
 import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
+import type { ReverificationController } from '../../reverification';
+import { Reverification } from '../../reverification';
 import { styles } from './user-profile-password-section.styles';
 import type {
   UserProfileEditPasswordField,
@@ -22,7 +24,7 @@ import type {
 } from './user-profile-password-section.types';
 
 export interface UserProfileEditPasswordDialogProps {
-  children?: ReactNode;
+  reverification?: ReverificationController;
   passwordFeedback?: FieldFeedback;
   identifier?: string;
   open: boolean;
@@ -34,7 +36,7 @@ export interface UserProfileEditPasswordDialogProps {
 }
 
 export function UserProfileEditPasswordDialog({
-  children,
+  reverification,
   passwordFeedback,
   identifier = '',
   open,
@@ -50,15 +52,20 @@ export function UserProfileEditPasswordDialog({
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const showCurrentPassword = hasPassword && requiresCurrentPassword;
   const restoreEditorFocus = useRef(false);
+  const verification =
+    reverification && reverification.status !== 'idle' && reverification.status !== 'loading'
+      ? reverification
+      : undefined;
+  const verifying = verification !== undefined;
 
   useEffect(() => {
-    if (children) {
+    if (verifying) {
       restoreEditorFocus.current = true;
     } else if (restoreEditorFocus.current && !form.isSubmitting) {
       restoreEditorFocus.current = false;
       initialFocusRef.current?.focus({ preventScroll: true });
     }
-  }, [children, form.isSubmitting]);
+  }, [verifying, form.isSubmitting]);
 
   return (
     <Dialog.Root
@@ -75,9 +82,9 @@ export function UserProfileEditPasswordDialog({
           renderBranding={false}
         >
           <Flow.Root
-            value={children ? 'verify' : 'edit'}
-            direction={children ? 1 : -1}
-            state={children ? 'verify' : 'edit'}
+            value={verifying ? 'verify' : 'edit'}
+            direction={verifying ? 1 : -1}
+            state={verifying ? 'verify' : 'edit'}
           >
             {() => (
               <>
@@ -184,7 +191,24 @@ export function UserProfileEditPasswordDialog({
                     </Card.Footer>
                   </>
                 </Flow.Step>
-                <Flow.Step ids={['verify']}>{children}</Flow.Step>
+                <Flow.Step ids={['verify']}>
+                  {verification ? (
+                    <>
+                      <Reverification {...verification} />
+                      <Card.Footer>
+                        <Button
+                          variant='outline'
+                          color='neutral'
+                          fullWidth
+                          disabled={verification.phase === 'retrying'}
+                          onClick={verification.onCancel}
+                        >
+                          {m.back}
+                        </Button>
+                      </Card.Footer>
+                    </>
+                  ) : null}
+                </Flow.Step>
               </>
             )}
           </Flow.Root>
