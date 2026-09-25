@@ -19,10 +19,12 @@ export const meta: StoryMeta = {
     _variants: {
       elevation: { card: {}, flush: {}, overlay: {} },
       renderBranding: { true: {}, false: {} },
+      size: { md: {}, lg: {} },
     },
     _defaultVariants: {
       elevation: 'card',
       renderBranding: true,
+      size: 'md',
     },
   },
 };

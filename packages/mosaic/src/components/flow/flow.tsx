@@ -1,7 +1,7 @@
-import { Flow as HeadlessFlow, type FlowDirection } from '@clerk/headless/flow';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { Flow as HeadlessFlow, type FlowDirection } from '../../primitives/flow';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';

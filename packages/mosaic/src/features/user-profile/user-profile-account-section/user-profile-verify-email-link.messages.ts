@@ -6,4 +6,4 @@ export const userProfileVerifyEmailLinkMessages = {
   resendCountdown: 'Didn’t receive a link? Resend ({seconds})',
   resending: 'Sending a new link…',
   cancel: 'Cancel',
-};
+} as const;

@@ -1,8 +1,8 @@
-import type { DrawerFocusTarget, DrawerProps as HeadlessDrawerProps } from '@clerk/headless/drawer';
-import { Drawer as Primitive, registerDrawerCssVars } from '@clerk/headless/drawer';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import type { DrawerFocusTarget, DrawerProps as HeadlessDrawerProps } from '../../primitives/drawer';
+import { Drawer as Primitive, registerDrawerCssVars } from '../../primitives/drawer';
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
@@ -49,15 +49,15 @@ const Popup = React.forwardRef<HTMLDivElement, DrawerPopupProps>(function Drawer
   const nested = isInDialog(host);
   return (
     <Primitive.Portal>
-      <Primitive.Backdrop
-        {...mergeStyleProps(
-          themeProps('drawer-backdrop', { nested }),
-          stylex.props(reset.base, styles.backdrop, nested && styles.backdropNested),
-        )}
-      />
       <Primitive.Viewport
         {...mergeStyleProps(themeProps('drawer-viewport'), stylex.props(reset.base, styles.viewport))}
       >
+        <Primitive.Backdrop
+          {...mergeStyleProps(
+            themeProps('drawer-backdrop', { nested }),
+            stylex.props(reset.base, styles.backdrop, nested && styles.backdropNested),
+          )}
+        />
         <Primitive.Popup
           ref={ref}
           render={render}

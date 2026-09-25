@@ -8,7 +8,7 @@ import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import { Input } from '../../../components/input';
-import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
+import { useMessages } from '../../../localization';
 import type { UserProfileFormError, UserProfileNameAttribute } from './user-profile-account-section.types';
 
 export type UserProfileEditNameField = 'firstName' | 'lastName';
@@ -54,6 +54,7 @@ export function UserProfileEditNameDialog({
   error,
   onSubmit,
 }: UserProfileEditNameDialogProps) {
+  const m = useMessages('userProfileAccountSection');
   const formId = useId();
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const { enabled: showFirstName = true, required: firstNameRequired = false } = firstNameAttribute;

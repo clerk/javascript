@@ -412,4 +412,127 @@ describe('Organization', () => {
       });
     });
   });
+
+  describe('SSO bypass allowlist', () => {
+    const ALLOWLIST_PATH = `/organizations/${ORG_ID}/sso_bypass_allowlist_users`;
+
+    const entryJSON = {
+      object: 'sso_bypass_allowlist_user' as const,
+      user_id: 'user_1',
+      public_user_data: {
+        first_name: 'Cameron',
+        last_name: 'Walker',
+        image_url: 'https://img.clerk.com/cameron',
+        has_image: true,
+        identifier: 'cameron@example.com',
+        username: null,
+      },
+      created_at: 1700000000000,
+      updated_at: 1700000000000,
+    };
+
+    it('lists the allowlisted users', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: [entryJSON] }));
+
+      const organization = createOrganization();
+      const entries = await organization.ssoBypassAllowlist.getUsers();
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'GET', path: ALLOWLIST_PATH });
+      expect(entries).toHaveLength(1);
+      expect(entries[0].id).toBe('user_1');
+      expect(entries[0].userId).toBe('user_1');
+      expect(entries[0].publicUserData.firstName).toBe('Cameron');
+      expect(entries[0].publicUserData.identifier).toBe('cameron@example.com');
+      expect(entries[0].createdAt).toEqual(new Date(1700000000000));
+      expect(entries[0].__internal_toSnapshot()).toMatchObject({
+        object: 'sso_bypass_allowlist_user',
+        user_id: 'user_1',
+      });
+    });
+
+    it('adds a user by id as a form field', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn().mockReturnValue(Promise.resolve({ response: entryJSON }));
+
+      const organization = createOrganization();
+      const entry = await organization.ssoBypassAllowlist.addUser({ userId: 'user_1' });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({
+        method: 'POST',
+        path: ALLOWLIST_PATH,
+        body: { user_id: 'user_1' },
+      });
+      expect(entry.userId).toBe('user_1');
+    });
+
+    it('adds users in chunks of 100 and merges the partial results', async () => {
+      const userIds = Array.from({ length: 150 }, (_, i) => `user_${i}`);
+      const fetchMock = vi
+        .fn()
+        .mockResolvedValueOnce({
+          response: { data: [entryJSON], errors: [{ user_id: 'user_5', code: 'sso_bypass_domain_not_served' }] },
+        })
+        .mockResolvedValueOnce({
+          response: { data: [{ ...entryJSON, user_id: 'user_120' }], errors: [] },
+        });
+      // @ts-ignore
+      BaseResource._fetch = fetchMock;
+
+      const organization = createOrganization();
+      const result = await organization.ssoBypassAllowlist.addUsers({ userIds });
+
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(fetchMock).toHaveBeenNthCalledWith(1, {
+        method: 'POST',
+        path: `${ALLOWLIST_PATH}/bulk`,
+        body: { user_id: userIds.slice(0, 100) },
+      });
+      expect(fetchMock).toHaveBeenNthCalledWith(2, {
+        method: 'POST',
+        path: `${ALLOWLIST_PATH}/bulk`,
+        body: { user_id: userIds.slice(100) },
+      });
+      expect(result.data.map(entry => entry.userId)).toEqual(['user_1', 'user_120']);
+      expect(result.errors).toEqual([{ userId: 'user_5', code: 'sso_bypass_domain_not_served' }]);
+    });
+
+    it('sends nothing for an empty batch', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi.fn();
+
+      const organization = createOrganization();
+      const result = await organization.ssoBypassAllowlist.addUsers({ userIds: [] });
+
+      // @ts-ignore
+      expect(BaseResource._fetch).not.toHaveBeenCalled();
+      expect(result).toEqual({ data: [], errors: [] });
+    });
+
+    it('removes a user by id', async () => {
+      // @ts-ignore
+      BaseResource._fetch = vi
+        .fn()
+        .mockReturnValue(
+          Promise.resolve({ response: { object: 'sso_bypass_allowlist_user', id: 'user_1', deleted: true } }),
+        );
+
+      const organization = createOrganization();
+      const result = await organization.ssoBypassAllowlist.removeUser('user_1');
+
+      // @ts-ignore
+      expect(BaseResource._fetch).toHaveBeenCalledWith({ method: 'DELETE', path: `${ALLOWLIST_PATH}/user_1` });
+      expect(result.id).toBe('user_1');
+      expect(result.deleted).toBe(true);
+    });
+
+    it('does not create a cycle when the organization is serialized', () => {
+      const organization = createOrganization();
+
+      expect(() => JSON.stringify(organization)).not.toThrow();
+      expect(JSON.parse(JSON.stringify(organization)).ssoBypassAllowlist).toEqual({});
+    });
+  });
 });

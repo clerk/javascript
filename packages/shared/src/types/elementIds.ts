@@ -83,6 +83,7 @@ export type ProfileSectionId =
   | 'ssoConnectionIdentityProvider'
   | 'ssoConnectionSettings'
   | 'ssoConnectionDangerZone'
+  | 'ssoBypass'
   | 'accountCredits';
 export type ProfilePageId =
   | 'account'
@@ -108,7 +109,7 @@ export type CardActionId =
   | 'usePasskey'
   | 'waitlist'
   | 'signOut'
-  | 'ssoFallback';
+  | 'ssoBypass';
 
 export type MenuId = 'invitation' | 'member' | ProfileSectionId;
 export type SelectId = 'countryCode' | 'role' | 'paymentMethod' | 'apiKeyExpiration';

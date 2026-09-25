@@ -1,9 +1,4 @@
 /**
- * Every string the surface renders. Shaped the way `@clerk/i18n` takes a base definition, so
- * localizing this component is a matter of registering the namespace and swapping the reads for
- * `useMessages('userProfileAccountSection', userProfileAccountSectionMessages)`, not of hunting the
- * literals down first.
- *
  * Email and phone keep separate keys rather than sharing one templated string: a locale that
  * inflects around the noun cannot build either from the other.
  */
@@ -80,4 +75,4 @@ export const userProfileAccountSectionMessages = {
       cancel: 'Cancel',
     },
   },
-};
+} as const;

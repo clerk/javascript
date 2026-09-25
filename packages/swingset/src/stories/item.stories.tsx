@@ -145,7 +145,7 @@ export function Group() {
               size='sm'
               shape='square'
             >
-              <Icon name='ellipsis' />
+              <Icon name='ellipsis-horizontal' />
             </Button>
           </Item.Actions>
         </Item.Root>
@@ -166,7 +166,7 @@ export function Group() {
             <Item.Label>Clerk</Item.Label>
           </Item.Content>
           <Icon
-            name='check'
+            name='checkmark'
             size='md'
             xstyle={styles.iconWidth}
           />

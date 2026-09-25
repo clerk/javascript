@@ -51,7 +51,7 @@ export interface SignInResource extends ClerkResource {
   supportedIdentifiers: SignInIdentifier[];
   supportedFirstFactors: SignInFirstFactor[] | null;
   supportedSecondFactors: SignInSecondFactor[] | null;
-  ssoFallbackFirstFactors: SignInFirstFactor[] | null;
+  ssoBypassFirstFactors: SignInFirstFactor[] | null;
   clientTrustState?: ClientTrustState;
   firstFactorVerification: VerificationResource;
   secondFactorVerification: VerificationResource;
@@ -131,7 +131,7 @@ export interface SignInJSON extends ClerkResourceJSON {
   user_data: UserDataJSON;
   supported_first_factors: SignInFirstFactorJSON[];
   supported_second_factors: SignInSecondFactorJSON[];
-  sso_fallback_first_factors?: SignInFirstFactorJSON[];
+  sso_bypass_first_factors?: SignInFirstFactorJSON[];
   first_factor_verification: VerificationJSON | null;
   second_factor_verification: VerificationJSON | null;
   created_session_id: string | null;

@@ -8,7 +8,6 @@
         "src/**",
         "tsconfig.json",
         "tsconfig.base.json",
-        "tsconfig.build.json",
         "tsdown.config.mts",
         "tsdown.css.config.mts",
         "stylex-lightningcss.config.mjs",

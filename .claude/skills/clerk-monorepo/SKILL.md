@@ -11,8 +11,8 @@ description: >-
 
 # Working in the clerk/javascript monorepo
 
-This is Clerk's JavaScript SDK monorepo: 25 packages (22 published `@clerk/*` plus the private
-`@clerk/msw`, `@clerk/headless`, and `@clerk/swingset`) managed with pnpm
+This is Clerk's JavaScript SDK monorepo: 24 packages (22 published `@clerk/*` plus the private
+`@clerk/msw` and `@clerk/swingset`) managed with pnpm
 workspaces and Turborepo. Read this before building, testing, committing, or touching anything
 under `packages/`.
 
@@ -48,7 +48,7 @@ The ~10 packages people touch most. Full 25-package table, the dependency pyrami
 | `@clerk/backend`       | Server-side: JWT verification, the Backend API REST client, webhooks. Used by every framework adapter.                                                      |
 | `@clerk/clerk-js`      | ⚠️ The browser runtime loaded via script tag. **Backwards-compat sensitive** (see rules).                                                                   |
 | `@clerk/ui`            | ⚠️ The React components powering the hosted sign-in / sign-up UI. **Backwards-compat sensitive**.                                                           |
-| `@clerk/mosaic`        | Experimental next-generation components (`UserButton` today). Independently releasable; reads Clerk context from the host SDK.                             |
+| `@clerk/mosaic`        | Experimental next-generation components (`UserButton` today). Independently releasable; reads Clerk context from the host SDK.                              |
 | `@clerk/react`         | Shared React hooks/context (`useAuth`, `useUser`, ...) consumed by the React-based adapters.                                                                |
 | `@clerk/nextjs`        | Next.js SDK: middleware, route handlers, server components.                                                                                                 |
 | `@clerk/express`       | Express middleware and server helpers.                                                                                                                      |
@@ -109,13 +109,29 @@ Repo/tooling-only or private-package-only change — the file is exactly two del
 ---
 ```
 
-`@clerk/swingset`, `@clerk/msw`, and `@clerk/headless` are private and never appear in a changeset;
+`@clerk/swingset` and `@clerk/msw` are private and never appear in a changeset;
 every other `packages/*` entry publishes, **including `@clerk/ui` and `@clerk/clerk-js`**. Bump
 selection, which packages to list, body-writing rules, and the major-version gate are in
 [`references/changesets.md`](references/changesets.md).
 
 Test runner differs by package (`shared`, `clerk-js`, most adapters use vitest; `backend` runs a
 multi-runtime suite), but the `pnpm --filter <name> test` invocation is uniform.
+
+If the `bundlewatch` CI job fails, a built file in `@clerk/clerk-js` or `@clerk/ui` exceeds its
+`maxSize` in that package's `bundlewatch.config.json` (often after a rebase on `main`). If the growth
+is expected, raise the limits; if it is larger than the change explains, investigate instead:
+
+```bash
+pnpm turbo build --filter=@clerk/clerk-js       # measures dist/, so build first
+pnpm --filter @clerk/clerk-js bundlewatch:fix   # failing maxSize -> current size + 1KB, rounded up
+```
+
+Same commands with `@clerk/ui` for the UI package. Commit the updated `bundlewatch.config.json` and
+call out the bump in the PR description; never raise limits silently.
+
+Check the printed diff: if any file's `maxSize` goes up by more than 10KB, stop before committing and
+flag it to the user, listing each file with its old and new limit. Only commit the bump once they
+confirm the growth is expected.
 
 If the editor or a build reports stale types from `@clerk/shared`, rebuild the foundations:
 `pnpm turbo build --filter=@clerk/shared`.

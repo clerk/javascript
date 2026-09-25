@@ -23,6 +23,7 @@ const isDev = process.env.NODE_ENV !== 'production';
 // defaults never change mid-session, so they stay correct.
 const stylexExtraction = {
   '@stylexjs/postcss-plugin': {
+    include: [resolve(__dirname, 'src/**/*.{ts,tsx}'), resolve(mosaicRoot, 'src/**/*.{ts,tsx}')],
     useCSSLayers: true,
     babelConfig: {
       babelrc: false,

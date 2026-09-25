@@ -2,8 +2,8 @@ import * as FileUploadStories from './file-upload.stories';
 
 # File Upload
 
-A file picker that accepts input from a trigger button or drag-and-drop, from `@clerk/headless`.
-It is a **headless** primitive: it owns the selected-file state, a hidden `<input type="file">`,
+A file picker that accepts input from a trigger button or drag-and-drop. It is a **headless**
+primitive: it owns the selected-file state, a hidden `<input type="file">`,
 `accept` filtering (applied to both the picker and dropped files), single/multiple modes, and image
 preview thumbnails, but ships **no styles** — you bring your own CSS by targeting the `data-*`
 attributes each part emits.
@@ -22,7 +22,7 @@ renders an `<img>` preview with a remove button. Non-image files render no previ
 ## Usage
 
 ```tsx
-import { FileUpload } from '@clerk/headless/file-upload';
+import { FileUpload } from '@clerk/mosaic/primitives/file-upload';
 
 <FileUpload.Root
   accept='image/*'

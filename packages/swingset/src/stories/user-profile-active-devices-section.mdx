@@ -2,10 +2,32 @@ import * as Stories from './user-profile-active-devices-section.stories';
 
 # UserProfileActiveDevicesSection
 
-The current device and other active sessions composed with `Section`.
-
 <Story
   name='Default'
   storyModule={Stories}
-  composition={[{ name: 'Section', href: '/components/section', layer: 'Components' }]}
+  composition={[
+    { name: 'Badge', href: '/components/badge', layer: 'Components' },
+    { name: 'DataList', href: '/components/data-list', layer: 'Components' },
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+    { name: 'Menu', href: '/components/menu', layer: 'Components' },
+    { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+    { name: 'Confirmation', href: '/blocks/confirmation', layer: 'Blocks' },
+  ]}
+/>
+
+## Sign out failure
+
+The first attempt of each kind fails, second attempt succeeds.
+
+<Story
+  name='SignOutError'
+  storyModule={Stories}
+/>
+
+## Impersonation
+
+<Story
+  name='Impersonation'
+  storyModule={Stories}
 />

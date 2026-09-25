@@ -1,6 +1,6 @@
 import { Section } from '../../../components/section';
+import { useMessages } from '../../../localization';
 import { UserProfileEnterpriseAccountRowView } from './user-profile-enterprise-account-row.view';
-import { userProfileEnterpriseAccountsMessages as m } from './user-profile-enterprise-accounts-section.messages';
 import type {
   UserProfileEnterpriseAccount,
   UserProfileEnterpriseConnection,
@@ -19,6 +19,7 @@ export function UserProfileEnterpriseAccountsSectionView({
   pendingConnectionId,
   onConnect,
 }: UserProfileEnterpriseAccountsSectionViewProps) {
+  const m = useMessages('userProfileEnterpriseAccountsSection');
   if (accounts.length === 0 && (connections.length === 0 || !onConnect)) {
     return null;
   }

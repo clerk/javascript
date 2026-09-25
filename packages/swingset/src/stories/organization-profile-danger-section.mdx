@@ -1,0 +1,34 @@
+import * as Stories from './organization-profile-danger-section.stories';
+
+# OrganizationProfileDangerSection
+
+Leaving and deleting the workspace. Both ask for the workspace's name to be typed out, as the
+legacy organization profile does.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Destructive', href: '/blocks/destructive', layer: 'Blocks' },
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+  ]}
+/>
+
+## A failed action
+
+The dialog stays up and renders the reason under the confirmation field.
+
+<Story
+  name='WithError'
+  storyModule={Stories}
+/>
+
+## One action only
+
+A row appears only when its callback is given, so a member who cannot delete the workspace is left
+with leaving it.
+
+<Story
+  name='LeaveOnly'
+  storyModule={Stories}
+/>

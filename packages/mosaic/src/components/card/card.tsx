@@ -1,7 +1,7 @@
-import { useRender } from '@clerk/headless/utils';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
@@ -13,6 +13,8 @@ import { cardContentMarker } from './card.markers.stylex';
 import * as slots from './card.styles';
 
 type CardElevation = 'card' | 'flush' | 'overlay';
+
+export type CardSize = keyof typeof slots.sizes;
 
 const DEFAULT_ELEVATION: CardElevation = 'card';
 
@@ -29,6 +31,8 @@ function CardBranding() {
 export interface CardProps extends MosaicComponentProps<'div'> {
   /** Surface treatment applied to the card. @default 'card' */
   elevation?: CardElevation;
+  /** The card's width. `lg` is for forms that need the room, like a tag input. @default 'md' */
+  size?: CardSize;
   /**
    * Signs the foot of the card with "Secured by Clerk". An instance that has paid the branding off
    * carries none of it, so a connected surface passes `displayConfig.branded` here.
@@ -39,7 +43,7 @@ export interface CardProps extends MosaicComponentProps<'div'> {
 }
 
 const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
-  { elevation = DEFAULT_ELEVATION, renderBranding = true, render, xstyle, children, ...rest },
+  { elevation = DEFAULT_ELEVATION, size = 'md', renderBranding = true, render, xstyle, children, ...rest },
   ref,
 ) {
   const element = useRender({
@@ -48,8 +52,8 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
     ref,
     props: {
       ...mergeStyleProps(
-        themeProps('card-root', { elevation }),
-        stylex.props(reset.base, slots.root.base, slots.root[elevation], xstyle),
+        themeProps('card-root', { elevation, size }),
+        stylex.props(reset.base, slots.root.base, slots.root[elevation], slots.sizes[size], xstyle),
         rest,
       ),
       children: (
@@ -82,7 +86,7 @@ function HeaderCloseButton() {
         />
       )}
     >
-      <Icon name='close' />
+      <Icon name='x' />
     </Dialog.Close>
   );
 }

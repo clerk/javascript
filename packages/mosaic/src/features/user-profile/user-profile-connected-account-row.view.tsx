@@ -1,29 +1,32 @@
 import * as stylex from '@stylexjs/stylex';
+import type { Ref } from 'react';
 
+import type { ActionMenuAction } from '../../components/action-menu';
+import { ActionMenu } from '../../components/action-menu';
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
-import { fill } from '../../utils/messages';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
-import { userProfileConnectedAccountsMessages as m } from './user-profile-connected-accounts.messages';
+import { fill, useMessages } from '../../localization';
 import { styles } from './user-profile-connected-accounts.styles';
 import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
 
 export function UserProfileConnectedAccountRowView({
   account,
+  triggerRef,
   onConnect,
   onReconnect,
   onRemove,
 }: {
   account: UserProfileConnectedAccount;
+  triggerRef?: Ref<HTMLButtonElement>;
   onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
   onRemove?: (account: UserProfileConnectedAccount) => void;
 }) {
+  const m = useMessages('userProfileConnectedAccounts');
   const iconUrl = account.iconUrl?.trim();
-  const actions: UserProfileMenuAction[] = [];
+  const actions: ActionMenuAction[] = [];
   if (account.status === 'reconnect' && onReconnect) {
     actions.push({ label: m.reconnect, onClick: () => onReconnect(account.id) });
   }
@@ -77,7 +80,7 @@ export function UserProfileConnectedAccountRowView({
             >
               {m.connect}
               <Icon
-                name='arrow-right-top'
+                name='arrow-up-right'
                 placement='inline-end'
                 size='sm'
               />
@@ -85,18 +88,17 @@ export function UserProfileConnectedAccountRowView({
           </Section.Actions>
         ) : actions.length > 0 ? (
           <Section.Actions>
-            <UserProfileActionMenu
+            <ActionMenu
+              triggerRef={triggerRef}
               label={fill(m.manageLabel, { provider: account.provider })}
               actions={actions}
             />
           </Section.Actions>
         ) : null}
       </Section.Item>
-      {account.connectError ? <Section.Error>{account.connectError}</Section.Error> : null}
-      {account.reconnectError ? <Section.Error>{account.reconnectError}</Section.Error> : null}
-      {account.status === 'error' && account.verificationError ? (
-        <Section.Error>{account.verificationError}</Section.Error>
-      ) : null}
+      <Section.Error>{account.connectError}</Section.Error>
+      <Section.Error>{account.reconnectError}</Section.Error>
+      <Section.Error>{account.status === 'error' ? account.verificationError : undefined}</Section.Error>
     </Section.Row>
   );
 }

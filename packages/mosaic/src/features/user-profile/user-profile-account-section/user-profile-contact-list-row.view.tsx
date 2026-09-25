@@ -1,16 +1,17 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
+import type { ActionMenuAction } from '../../../components/action-menu';
+import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
-import { fill } from '../../../utils/messages';
-import type { UserProfileMenuAction } from '../user-profile-action-menu';
-import { UserProfileActionMenu } from '../user-profile-action-menu';
+import { fill, useMessages } from '../../../localization';
 import { styles } from '../user-profile-profile-panel.styles';
-import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
 
 export interface UserProfileContactListRowViewProps {
+  rowRef?: Ref<HTMLDivElement>;
+  triggerRef?: (id: string) => Ref<HTMLButtonElement>;
   addAction?: ReactNode;
   kind: 'email' | 'phone';
   label: string;
@@ -30,11 +31,19 @@ export function UserProfileContactListRowView({
   onSetPrimary,
   onRemove,
   addAction,
+  rowRef,
+  triggerRef,
 }: UserProfileContactListRowViewProps) {
+  const m = useMessages('userProfileAccountSection');
   const emptyDescription = m[kind].empty;
 
   return (
-    <Section.Row>
+    <Section.Row
+      ref={rowRef}
+      role='group'
+      tabIndex={-1}
+      aria-label={label}
+    >
       <Section.Item>
         <Section.Content>
           <Section.Label>{label}</Section.Label>
@@ -69,7 +78,7 @@ export function UserProfileContactListRowView({
           </Section.Item>
         ) : (
           items.map(item => {
-            const actions: UserProfileMenuAction[] = [];
+            const actions: ActionMenuAction[] = [];
 
             if (item.isVerified === false && onVerify) {
               actions.push({
@@ -98,7 +107,8 @@ export function UserProfileContactListRowView({
                 </Section.Content>
                 {actions.length > 0 ? (
                   <Section.Actions>
-                    <UserProfileActionMenu
+                    <ActionMenu
+                      triggerRef={triggerRef?.(item.id)}
                       actions={actions}
                       label={fill(m.manageValue, { value: item.value })}
                     />

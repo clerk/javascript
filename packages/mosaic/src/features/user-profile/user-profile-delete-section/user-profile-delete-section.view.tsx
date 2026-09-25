@@ -1,9 +1,8 @@
 import { Destructive } from '../../../blocks/destructive';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
-import { fill } from '../../../utils/messages';
+import { fill, useMessages } from '../../../localization';
 import { useUserProfileDeleteSectionController } from './user-profile-delete-section.controller';
-import { userProfileDeleteSectionMessages as m } from './user-profile-delete-section.messages';
 
 export interface UserProfileDeleteSectionViewProps {
   /**
@@ -14,6 +13,7 @@ export interface UserProfileDeleteSectionViewProps {
 }
 
 export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSectionViewProps) {
+  const m = useMessages('userProfileDeleteSection');
   const { isOpen, onOpenChange, onConfirm, isDeleting, errorMessage } = useUserProfileDeleteSectionController({
     onDelete,
   });

@@ -6,9 +6,8 @@ import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Spinner } from '../../../components/spinner';
-import { fill } from '../../../utils/messages';
+import { fill, useMessages } from '../../../localization';
 import { UserProfileProviderIcon } from '../user-profile-provider-icon';
-import { userProfileVerifyEmailSsoMessages as m } from './user-profile-verify-email-sso.messages';
 import { styles } from './user-profile-verify-email-sso.styles';
 
 export interface UserProfileVerifyEmailSsoDialogProps {
@@ -36,6 +35,7 @@ export function UserProfileVerifyEmailSsoDialog({
   isConnecting = false,
   errorMessage,
 }: UserProfileVerifyEmailSsoDialogProps) {
+  const m = useMessages('userProfileVerifyEmailSso');
   return (
     <Dialog.Root
       open={open}
@@ -79,7 +79,7 @@ export function UserProfileVerifyEmailSsoDialog({
                     <Spinner size='sm' />
                   ) : (
                     <Icon
-                      name='arrow-right-top'
+                      name='arrow-up-right'
                       placement='inline-end'
                       size='sm'
                     />

@@ -4,8 +4,8 @@ import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
-import { fill } from '../../../utils/messages';
-import { userProfileAccountSectionMessages as m } from './user-profile-account-section.messages';
+import { useListRemovalFocus } from '../../../hooks/useListRemovalFocus';
+import { fill, useMessages } from '../../../localization';
 import type { UserProfileEmail } from './user-profile-account-section.types';
 import type { UserProfileAddEmailControllerOptions } from './user-profile-add-email.controller';
 import { useUserProfileAddEmailController } from './user-profile-add-email.controller';
@@ -36,6 +36,13 @@ export function UserProfileEmailRowView({
   onSetPrimaryEmail,
   onRemoveEmail,
 }: UserProfileEmailRowViewProps) {
+  const m = useMessages('userProfileAccountSection');
+  const row = useRef<HTMLDivElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: emails.map(email => email.id),
+    onRemove: onRemoveEmail,
+    fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
+  });
   const addEmailAction =
     onSendEmailCode && onVerifyEmailCode ? (
       <AddEmail
@@ -105,6 +112,8 @@ export function UserProfileEmailRowView({
   return (
     <>
       <UserProfileContactListRowView
+        rowRef={row}
+        triggerRef={removalFocus.registerTrigger}
         items={emails}
         kind='email'
         label={m.email.label}
@@ -128,7 +137,8 @@ export function UserProfileEmailRowView({
           description={email => fill(m.email.removeDialog.description, { emailAddress: email.value })}
           actionLabel={m.email.removeDialog.confirm}
           cancelLabel={m.email.removeDialog.cancel}
-          onConfirm={email => onRemoveEmail(email.id)}
+          finalFocus={removalFocus.finalFocus}
+          onConfirm={email => removalFocus.remove(email.id)}
         />
       ) : null}
     </>
@@ -136,6 +146,7 @@ export function UserProfileEmailRowView({
 }
 
 function AddEmail({ options, compact }: { options: UserProfileAddEmailControllerOptions; compact: boolean }) {
+  const m = useMessages('userProfileAccountSection');
   const controller = useUserProfileAddEmailController(options);
   return (
     <UserProfileAddEmailDialog

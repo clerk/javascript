@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 
+import { useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/useMachine';
 import type { UserProfileAddPhoneDialogProps } from './user-profile-add-phone.dialog';
-import { userProfileAddPhoneMessages as m } from './user-profile-add-phone.messages';
 
 export interface UserProfileAddPhoneControllerOptions {
   initialPhoneNumber?: string;
@@ -14,7 +14,7 @@ export interface UserProfileAddPhoneControllerOptions {
 interface Context extends UserProfileAddPhoneControllerOptions {
   phoneNumber: string;
   code: string;
-  errorMessage: string | undefined;
+  error: unknown;
   resendSeconds: number;
 }
 
@@ -33,8 +33,11 @@ function missingDependency(): Promise<never> {
   return Promise.reject(new Error('Add phone callbacks are missing'));
 }
 
-function errorMessage(cause: unknown): string {
-  return cause instanceof Error ? cause.message : m.error;
+function errorMessage(cause: unknown, fallback: string): string | undefined {
+  if (cause === undefined) {
+    return undefined;
+  }
+  return cause instanceof Error ? cause.message : fallback;
 }
 
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
@@ -47,7 +50,7 @@ const machine = createMachine({
     onVerify: missingDependency,
     phoneNumber: '',
     code: '',
-    errorMessage: undefined,
+    error: undefined,
     resendSeconds: 0,
   },
   states: {
@@ -58,7 +61,7 @@ const machine = createMachine({
           actions: assign(context => ({
             phoneNumber: context.initialPhoneNumber ?? '',
             code: '',
-            errorMessage: undefined,
+            error: undefined,
             resendSeconds: 0,
           })),
         },
@@ -67,8 +70,8 @@ const machine = createMachine({
     phone: {
       on: {
         CANCEL: 'idle',
-        TYPE_PHONE: { actions: assign((_, event) => ({ phoneNumber: event.value, errorMessage: undefined })) },
-        SUBMIT: { target: 'sending', actions: assign(() => ({ errorMessage: undefined })) },
+        TYPE_PHONE: { actions: assign((_, event) => ({ phoneNumber: event.value, error: undefined })) },
+        SUBMIT: { target: 'sending', actions: assign(() => ({ error: undefined })) },
       },
     },
     sending: {
@@ -76,9 +79,7 @@ const machine = createMachine({
         onDone: { target: 'verify', actions: assign(() => ({ code: '', resendSeconds: 12 })) },
         onError: {
           target: 'phone',
-          actions: assign((_, event) => ({
-            errorMessage: errorMessage(event.error),
-          })),
+          actions: assign((_, event) => ({ error: event.error })),
         },
       }),
     },
@@ -89,12 +90,12 @@ const machine = createMachine({
         RESEND: {
           target: 'resending',
           guard: context => context.resendSeconds === 0,
-          actions: assign(() => ({ errorMessage: undefined })),
+          actions: assign(() => ({ error: undefined })),
         },
-        TYPE_CODE: { actions: assign((_, event) => ({ code: event.value, errorMessage: undefined })) },
+        TYPE_CODE: { actions: assign((_, event) => ({ code: event.value, error: undefined })) },
         SUBMIT: {
           target: 'verifying',
-          actions: assign((context, event) => ({ code: event.code ?? context.code, errorMessage: undefined })),
+          actions: assign((context, event) => ({ code: event.code ?? context.code, error: undefined })),
         },
       },
     },
@@ -103,9 +104,7 @@ const machine = createMachine({
         onDone: { target: 'verify', actions: assign(() => ({ code: '', resendSeconds: 12 })) },
         onError: {
           target: 'verify',
-          actions: assign((_, event) => ({
-            errorMessage: errorMessage(event.error),
-          })),
+          actions: assign((_, event) => ({ error: event.error })),
         },
       }),
     },
@@ -115,9 +114,7 @@ const machine = createMachine({
         onDone: 'idle',
         onError: {
           target: 'verify',
-          actions: assign((_, event) => ({
-            errorMessage: errorMessage(event.error),
-          })),
+          actions: assign((_, event) => ({ error: event.error })),
         },
       }),
     },
@@ -127,6 +124,7 @@ const machine = createMachine({
 export function useUserProfileAddPhoneController(
   options: UserProfileAddPhoneControllerOptions,
 ): UserProfileAddPhoneDialogProps {
+  const m = useMessages('userProfileAddPhone');
   const [snapshot, send] = useMachine(machine, { context: options });
   const { resendSeconds } = snapshot.context;
   const open = snapshot.value !== 'idle';
@@ -148,7 +146,7 @@ export function useUserProfileAddPhoneController(
         : 'phone',
     phoneNumber: snapshot.context.phoneNumber,
     code: snapshot.context.code,
-    errorMessage: snapshot.context.errorMessage,
+    errorMessage: errorMessage(snapshot.context.error, m.error),
     isPending: snapshot.value === 'sending' || snapshot.value === 'verifying',
     onOpenChange: open => send({ type: open ? 'OPEN' : 'CANCEL' }),
     onPhoneNumberChange: value => send({ type: 'TYPE_PHONE', value }),

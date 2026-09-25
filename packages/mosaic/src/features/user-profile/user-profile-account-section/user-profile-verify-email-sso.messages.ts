@@ -4,4 +4,4 @@ export const userProfileVerifyEmailSsoMessages = {
   connectionDescription: '{domain} · Enterprise SSO',
   connect: 'Connect',
   cancel: 'Cancel',
-};
+} as const;

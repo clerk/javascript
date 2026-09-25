@@ -68,4 +68,4 @@ export const reverificationMessages = {
   unstable__errors__generic: 'Something went wrong. Please try again.',
   /** Announced while an attempt is in flight; the button's own label stays visible. */
   verifying: 'Verifying',
-};
+} as const;

@@ -220,6 +220,21 @@ In some cases, we might need to add new methods to our publicly exposed APIs tha
 1. [Open a Pull Request](https://github.com/clerk/javascript/compare?expand=1). Make sure the description includes enough information for the reviewer to understand what the PR is about.
 1. Follow the instructions of the pull request template
 
+### Bundle size checks
+
+CI runs [bundlewatch](https://github.com/bundlewatch/bundlewatch) against `@clerk/clerk-js` and `@clerk/ui`. It fails when a built file grows past its `maxSize` in the package's `bundlewatch.config.json`. This can happen on a PR that was previously green, for example after rebasing on `main` brings in other size increases.
+
+The check exists so that size growth is acknowledged, not to block it. If the growth is expected, raise the limits:
+
+```sh
+pnpm turbo build --filter=@clerk/clerk-js
+pnpm --filter @clerk/clerk-js bundlewatch:fix
+```
+
+Use `@clerk/ui` in place of `@clerk/clerk-js` for the UI package. The script measures the files in `dist/`, so build first. It sets each failing file's `maxSize` to its current size plus 1KB, rounded up to the nearest KB, and prints the diff. Commit the updated `bundlewatch.config.json` and mention the bump in your PR description.
+
+If the growth is larger than your change explains, investigate before bumping.
+
 ### Changesets
 
 For more details about changesets, see [Adding a Changeset](https://github.com/changesets/changesets/blob/main/docs/adding-a-changeset.md).

@@ -13,4 +13,4 @@ export const userProfileConnectedAccountsMessages = {
     confirm: 'Remove',
     cancel: 'Cancel',
   },
-};
+} as const;

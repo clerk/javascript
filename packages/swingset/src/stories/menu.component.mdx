@@ -41,7 +41,7 @@ import { Menu } from '@clerk/mosaic/components/menu';
       onClick={deleteUser}
     >
       <Menu.Media>
-        <Icon name='close' />
+        <Icon name='x' />
       </Menu.Media>
       <Menu.Label>Delete user</Menu.Label>
     </Menu.Item>
@@ -87,7 +87,7 @@ menu; pass `closeOnClick={false}` to keep it open.
   color='negative'
 >
   <Menu.Media>
-    <Icon name='close' />
+    <Icon name='x' />
   </Menu.Media>
   <Menu.Label>Delete</Menu.Label>
 </Menu.Item>
@@ -107,7 +107,7 @@ text no longer starts on one line.
 
 ```tsx
 <Menu.Media size='xs'>
-  <Icon name='check' />
+  <Icon name='checkmark' />
 </Menu.Media>
 ```
 
@@ -131,7 +131,7 @@ The two together are the whole of a row that leads with an avatar and trails wit
     </Avatar.Root>
   </Menu.Media>
   <Menu.Label>colin@clerk.dev</Menu.Label>
-  <Icon name='check' size='sm' />
+  <Icon name='checkmark' size='sm' />
 </Menu.Item>
 ```
 

@@ -1,32 +1,35 @@
 import * as stylex from '@stylexjs/stylex';
+import type { Ref } from 'react';
 
+import type { ActionMenuAction } from '../../components/action-menu';
+import { ActionMenu } from '../../components/action-menu';
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
-import { fill } from '../../utils/messages';
-import type { UserProfileMenuAction } from './user-profile-action-menu';
-import { UserProfileActionMenu } from './user-profile-action-menu';
-import { userProfileWeb3WalletsMessages as m } from './user-profile-web3-wallets.messages';
+import { fill, useMessages } from '../../localization';
 import { styles } from './user-profile-web3-wallets.styles';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
 
 export function UserProfileWeb3WalletRowView({
   wallet,
+  triggerRef,
   onConnect,
   onSetPrimary,
   onRemove,
 }: {
   wallet: UserProfileWeb3Wallet | UserProfileWeb3Provider;
+  triggerRef?: Ref<HTMLButtonElement>;
   onConnect?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (wallet: UserProfileWeb3Wallet) => void;
 }) {
+  const m = useMessages('userProfileWeb3Wallets');
   const iconUrl = wallet.iconUrl?.trim();
   const linkedWallet = 'address' in wallet ? wallet : undefined;
   const address = linkedWallet?.address;
   const shortAddress = address && (address.length <= 10 ? address : `${address.slice(0, 6)}...${address.slice(-4)}`);
-  const actions: UserProfileMenuAction[] = [];
+  const actions: ActionMenuAction[] = [];
 
   if (linkedWallet && !linkedWallet.isPrimary && linkedWallet.isVerified && onSetPrimary) {
     actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(wallet.id) });
@@ -85,7 +88,7 @@ export function UserProfileWeb3WalletRowView({
             >
               {m.connect}
               <Icon
-                name='arrow-right-top'
+                name='arrow-up-right'
                 placement='inline-end'
                 size='sm'
               />
@@ -93,15 +96,16 @@ export function UserProfileWeb3WalletRowView({
           </Section.Actions>
         ) : actions.length > 0 ? (
           <Section.Actions>
-            <UserProfileActionMenu
+            <ActionMenu
+              triggerRef={triggerRef}
               actions={actions}
               label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
             />
           </Section.Actions>
         ) : null}
       </Section.Item>
-      {'connectError' in wallet && wallet.connectError ? <Section.Error>{wallet.connectError}</Section.Error> : null}
-      {linkedWallet?.primaryError ? <Section.Error>{linkedWallet.primaryError}</Section.Error> : null}
+      <Section.Error>{'connectError' in wallet ? wallet.connectError : undefined}</Section.Error>
+      <Section.Error>{linkedWallet?.primaryError}</Section.Error>
     </Section.Row>
   );
 }

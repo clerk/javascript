@@ -1,0 +1,24 @@
+import * as Stories from './organization-profile-general-panel.stories';
+
+# OrganizationProfileGeneralPanel
+
+The workspace's General page: its details, and the danger zone under them.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Workspace details', href: '/organization-profile/organization-profile-workspace-section', layer: 'Organization Profile' },
+    { name: 'Danger zone', href: '/organization-profile/organization-profile-danger-section', layer: 'Organization Profile' },
+  ]}
+/>
+
+## Without permission to manage
+
+Each action appears only when the panel is handed its callback, so a member who cannot manage the
+workspace sees the details and nothing to act on.
+
+<Story
+  name='ReadOnly'
+  storyModule={Stories}
+/>

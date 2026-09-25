@@ -12,9 +12,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@clerk/mosaic": ["../mosaic/src"],
-      "@clerk/mosaic/*": ["../mosaic/src/*"],
-      "@clerk/headless/hooks": ["../headless/src/hooks"],
-      "@clerk/headless/*": ["../headless/src/primitives/*"]
+      "@clerk/mosaic/*": ["../mosaic/src/*"]
     },
     "plugins": [
       {
@@ -22,9 +20,10 @@
       }
     ],
     "allowJs": true,
+    "allowImportingTsExtensions": true,
     "noEmit": true,
     "incremental": true
   },
-  "include": ["mdx-components.tsx", "next.config.mjs", "src", ".next/types/**/*.ts"],
+  "include": ["mdx-components.tsx", "next.config.mjs", "vitest.config.mts", "src", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }

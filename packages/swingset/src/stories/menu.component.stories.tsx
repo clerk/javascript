@@ -37,7 +37,7 @@ export function Default() {
           color='negative'
         >
           <Menu.Media>
-            <Icon name='close' />
+            <Icon name='x' />
           </Menu.Media>
           <Menu.Label>Delete user</Menu.Label>
         </Menu.Item>
@@ -72,7 +72,7 @@ export function Accounts() {
             <Menu.Label>{account.identifier}</Menu.Label>
             {account.active ? (
               <Icon
-                name='check'
+                name='checkmark'
                 size='sm'
               />
             ) : null}

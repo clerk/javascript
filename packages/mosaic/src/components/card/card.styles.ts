@@ -12,8 +12,7 @@ export const root = stylex.create({
     containerType: 'inline-size',
     display: 'flex',
     flexDirection: 'column',
-    maxWidth: '26.25rem',
-    width: '100%',
+    maxWidth: '100%',
   },
   card: {
     borderRadius: radiusVars['--cl-radius-xl'],
@@ -35,6 +34,13 @@ export const root = stylex.create({
   },
 });
 
+// A fixed `width` capped by `max-width`, not the reverse, so a parent that sizes to its content
+// (a dialog popup) takes the card's full width rather than the width of its text.
+export const sizes = stylex.create({
+  md: { width: '26.25rem' },
+  lg: { width: '36.25rem' },
+});
+
 export const header = stylex.create({
   // `row-reverse` so the dismiss button leads in the DOM — and so takes the dialog's opening
   // focus — while sitting at the inline end.
@@ -49,7 +55,7 @@ export const header = stylex.create({
     display: 'flex',
     flexDirection: 'column',
     flexGrow: '1',
-    rowGap: space['1'],
+    rowGap: space['0.5'],
   },
   title: {
     color: colorVars['--cl-color-foreground'],

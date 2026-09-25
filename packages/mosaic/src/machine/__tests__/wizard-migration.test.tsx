@@ -28,8 +28,7 @@ import { useActor, useMachine, useSelector } from '../useMachine';
  *   - init:    `initialState(config)` walks forward while the *next* step's guard
  *              holds → the furthest contiguously-reachable step.
  *   - no-op:   EVERY blocked / out-of-bounds path returns the IDENTICAL `state`
- *              ref (`=== state`) — load-bearing for React's bail-out and for the
- *              seam's terminal/first "bubble to parent" detection.
+ *              ref (`=== state`).
  *
  * `ConfigureSSO/elements/Wizard/useWizardMachine.ts` (the React seam)
  *   - mirrors `state`/`config` into refs during render so the stable handlers see

@@ -3,4 +3,4 @@ export const userProfileEnterpriseAccountsMessages = {
   connect: 'Connect',
   connectProvider: 'Connect {provider}',
   requiresAction: 'Requires action',
-};
+} as const;

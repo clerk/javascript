@@ -68,7 +68,7 @@ export const styles = stylex.create({
   },
 
   // The trailing column is as wide as the `⋯` menu button that owns it, so whatever stands in
-  // that button's place — the active check, a spinner — lands on the same centre line and the
+  // that button's place — the active check, a spinner — lands on the same center line and the
   // right edge of every row holds still as rows change state.
   trailing: {
     justifyContent: 'center',
