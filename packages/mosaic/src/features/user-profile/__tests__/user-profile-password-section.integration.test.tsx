@@ -26,7 +26,14 @@ const session = {
 const environment = {
   userSettings: {
     instanceIsPasswordBased: true,
-    passwordSettings: { min_length: 8, max_length: 72, show_zxcvbn: false },
+    passwordSettings: {
+      min_length: 8,
+      max_length: 72,
+      show_zxcvbn: false,
+      min_zxcvbn_strength: 3,
+      require_uppercase: false,
+      require_numbers: false,
+    },
   },
   authConfig: { reverification: true },
   displayConfig: { preferredSignInStrategy: 'password', supportEmail: 'support@example.com' },
@@ -35,10 +42,17 @@ const clerk = {
   user,
   session,
   __internal_environment: environment,
+  __internal_moduleManager: {},
   __internal_getOption: () => undefined,
   setActive: vi.fn(),
 };
 let isSessionLoaded = true;
+
+vi.mock('@clerk/shared/internal/clerk-js/passwords/loadZxcvbn', () => ({
+  createLoadZxcvbn: () => ({
+    loadZxcvbn: () => Promise.resolve(() => ({ score: 0, feedback: { suggestions: ['anotherWord'] } })),
+  }),
+}));
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof SharedReact>();
@@ -57,6 +71,9 @@ beforeEach(() => {
   user.passwordEnabled = true;
   user.enterpriseAccounts = [];
   environment.authConfig.reverification = true;
+  environment.userSettings.passwordSettings.show_zxcvbn = false;
+  environment.userSettings.passwordSettings.require_uppercase = false;
+  environment.userSettings.passwordSettings.require_numbers = false;
   environment.userSettings.instanceIsPasswordBased = true;
   user.updatePassword.mockResolvedValue(user);
   clerk.setActive.mockResolvedValue(undefined);
@@ -253,6 +270,19 @@ describe('UserProfilePasswordSection', () => {
     );
     expect(screen.getByLabelText('New password')).toHaveAttribute('aria-invalid', 'true');
     expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
+  });
+
+  it('shows specific client strength suggestions without blocking submission', async () => {
+    environment.userSettings.passwordSettings.show_zxcvbn = true;
+    renderPassword();
+    const events = await editPassword();
+    await waitFor(() =>
+      expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+        'Your password is not strong enough. Add more words that are less common.',
+      ),
+    );
+    await events.click(screen.getByRole('button', { name: 'Save changes' }));
+    expect(user.updatePassword).toHaveBeenCalled();
   });
 
   it('returns from verification to the same draft without showing an error', async () => {

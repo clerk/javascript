@@ -31,8 +31,8 @@ export const userProfilePasswordSectionMessages = {
     number: 'Add a number.',
     special: 'Add a special character.',
     weak: 'Your password is not strong enough.',
-    stronger: 'Your password could be stronger.',
-    strong: 'Strong password.',
+    stronger: 'Your password works, but could be stronger. Try adding more characters.',
+    strong: 'Your password meets all the necessary requirements.',
   },
   complexity: {
     sentence: 'Your password must contain {requirements}.',

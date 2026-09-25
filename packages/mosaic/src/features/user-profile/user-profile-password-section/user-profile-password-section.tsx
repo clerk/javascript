@@ -11,7 +11,7 @@ import { fill, useLocale, useMessages } from '../../../localization';
 import { Reverification, useReverificationFlow } from '../../reverification';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
-import { passwordFormError } from './user-profile-password-feedback';
+import { passwordFormError, passwordStrengthMessage } from './user-profile-password-feedback';
 import type { UserProfilePasswordModel } from './user-profile-password-section.model';
 import { useUserProfilePasswordModel } from './user-profile-password-section.model';
 import { UserProfilePasswordSectionView } from './user-profile-password-section.view';
@@ -72,7 +72,7 @@ function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { st
         return { type: 'error', message: messages.join(' ') };
       }
       if (strength?.state === 'fail') {
-        return { type: 'error', message: m.rules.weak };
+        return { type: 'error', message: passwordStrengthMessage(strength.result.feedback.suggestions, m) };
       }
       if (strength?.state === 'pass') {
         return { type: 'warning', message: m.rules.stronger };
