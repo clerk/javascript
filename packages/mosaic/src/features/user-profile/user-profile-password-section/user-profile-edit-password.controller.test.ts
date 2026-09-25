@@ -1,13 +1,15 @@
+import { reverificationError } from '@clerk/shared/authorization-errors';
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { FieldFeedback } from '../../../components/form/form-submit-error';
+import type { ReverificationController } from '../../reverification';
 import { UserProfileSaveError } from '../user-profile-account-section/user-profile-account-section.types';
-import type { UserProfileEditPasswordSubmitResult } from './user-profile-edit-password.controller';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import type { UserProfileEditPasswordValue } from './user-profile-password-section.types';
 
-function deferred<T = UserProfileEditPasswordSubmitResult>() {
+function deferred<T = unknown>() {
   let resolve: (result: T) => void = () => {};
   const promise = new Promise<T>(r => {
     resolve = r;
@@ -16,8 +18,7 @@ function deferred<T = UserProfileEditPasswordSubmitResult>() {
 }
 
 function renderController(
-  onSubmit: (value: UserProfileEditPasswordValue) => Promise<UserProfileEditPasswordSubmitResult> = () =>
-    Promise.resolve({ status: 'saved' }),
+  onSubmit: (value: UserProfileEditPasswordValue) => Promise<unknown> = () => Promise.resolve(),
   requiresCurrentPassword = true,
 ) {
   return renderHook(() => useUserProfileEditPasswordController({ requiresCurrentPassword, onSubmit }));
@@ -42,7 +43,7 @@ describe('useUserProfileEditPasswordController', () => {
     const validatePassword = vi.fn().mockReturnValueOnce(older.promise).mockReturnValueOnce(newer.promise);
     const { result } = renderHook(() =>
       useUserProfileEditPasswordController({
-        onSubmit: () => Promise.resolve({ status: 'saved' }),
+        onSubmit: () => Promise.resolve(),
         validatePassword,
       }),
     );
@@ -69,7 +70,7 @@ describe('useUserProfileEditPasswordController', () => {
   it('can submit while an advisory password check is pending', async () => {
     const check = deferred<FieldFeedback>();
     const validatePassword = vi.fn(() => check.promise);
-    const onSubmit = vi.fn(() => Promise.resolve<UserProfileEditPasswordSubmitResult>({ status: 'saved' }));
+    const onSubmit = vi.fn(() => Promise.resolve());
     const { result } = renderHook(() => useUserProfileEditPasswordController({ onSubmit, validatePassword }));
     open(result);
     fill(result);
@@ -102,7 +103,7 @@ describe('useUserProfileEditPasswordController', () => {
     expect(result.current.isOpen).toBe(true);
     expect(onSubmit).toHaveBeenCalledTimes(1);
     await act(async () => {
-      save.resolve({ status: 'saved' });
+      save.resolve(undefined);
       await save.promise;
     });
     await waitFor(() => expect(result.current.isOpen).toBe(false));
@@ -115,7 +116,7 @@ describe('useUserProfileEditPasswordController', () => {
         message: 'Try a longer password.',
       }),
     );
-    const onSubmit = vi.fn(() => Promise.resolve<UserProfileEditPasswordSubmitResult>({ status: 'saved' }));
+    const onSubmit = vi.fn(() => Promise.resolve());
     const { result } = renderHook(() =>
       useUserProfileEditPasswordController({ requiresCurrentPassword: true, onSubmit, validatePassword }),
     );
@@ -142,7 +143,7 @@ describe('useUserProfileEditPasswordController', () => {
     const { result } = renderHook(() =>
       useUserProfileEditPasswordController({
         requiresCurrentPassword: true,
-        onSubmit: () => Promise.resolve({ status: 'cancelled' }),
+        onSubmit: () => Promise.reject(new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' })),
       }),
     );
     open(result);
@@ -164,7 +165,7 @@ describe('useUserProfileEditPasswordController', () => {
   });
 
   it('blocks direct submission with an empty confirmation', () => {
-    const onSubmit = vi.fn(() => Promise.resolve<UserProfileEditPasswordSubmitResult>({ status: 'saved' }));
+    const onSubmit = vi.fn(() => Promise.resolve());
     const { result } = renderController(onSubmit);
     open(result);
     fill(result);
@@ -195,7 +196,7 @@ describe('useUserProfileEditPasswordController', () => {
   });
 
   it('saves the current password alongside the new one when it is required, then closes', async () => {
-    const onSubmit = vi.fn(() => Promise.resolve<UserProfileEditPasswordSubmitResult>({ status: 'saved' }));
+    const onSubmit = vi.fn(() => Promise.resolve());
     const { result } = renderController(onSubmit);
     open(result);
     fill(result);
@@ -214,7 +215,7 @@ describe('useUserProfileEditPasswordController', () => {
   });
 
   it('leaves the current password out when reverification stands in for it', async () => {
-    const onSubmit = vi.fn(() => Promise.resolve<UserProfileEditPasswordSubmitResult>({ status: 'saved' }));
+    const onSubmit = vi.fn(() => Promise.resolve());
     const { result } = renderController(onSubmit, false);
     open(result);
     act(() => result.current.form.setValue('newPassword', 'new-secret-123'));
@@ -307,7 +308,7 @@ describe('useUserProfileEditPasswordController', () => {
 
     expect(result.current.isOpen).toBe(true);
     await act(async () => {
-      save.resolve({ status: 'saved' });
+      save.resolve(undefined);
       await save.promise;
     });
     await waitFor(() => expect(result.current.isOpen).toBe(false));
@@ -355,5 +356,50 @@ describe('useUserProfileEditPasswordController', () => {
       type: 'error',
       message: "Passwords don't match.",
     });
+  });
+
+  it('keeps the draft and reports a failed retry when verification is required again', async () => {
+    const onSubmit = vi.fn(() => Promise.resolve(reverificationError()));
+    const { result } = renderController(onSubmit);
+    open(result);
+    fill(result);
+
+    act(() => result.current.form.submit());
+
+    await waitFor(() =>
+      expect(result.current.form.error).toBe('Your password was not saved. Please try verifying again.'),
+    );
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.form.values.newPassword).toBe('new-secret-123');
+  });
+
+  it('formats a failed save before the form shows it', async () => {
+    const failure = new Error('raw');
+    const formatError = vi.fn(() => new UserProfileSaveError('Formatted.'));
+    const { result } = renderHook(() =>
+      useUserProfileEditPasswordController({ onSubmit: () => Promise.reject(failure), formatError }),
+    );
+    open(result);
+    fill(result);
+
+    act(() => result.current.form.submit());
+
+    await waitFor(() => expect(result.current.form.error).toBe('Formatted.'));
+    expect(formatError).toHaveBeenCalledWith(failure);
+  });
+
+  it('cancels an active verification instead of closing the editor', () => {
+    const onCancel = vi.fn();
+    const reverification = { status: 'unavailable', phase: 'active', onCancel } as ReverificationController;
+    const { result } = renderHook(() =>
+      useUserProfileEditPasswordController({ onSubmit: () => Promise.resolve(), reverification }),
+    );
+    open(result);
+
+    act(() => result.current.onOpenChange(false));
+
+    expect(onCancel).toHaveBeenCalledOnce();
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.reverification).toBe(reverification);
   });
 });

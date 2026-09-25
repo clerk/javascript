@@ -89,10 +89,7 @@ function EditPassword({
   const m = useMessages('userProfilePasswordSection');
   const controller = useUserProfileEditPasswordController({
     requiresCurrentPassword: hasPassword && requiresCurrentPassword,
-    onSubmit: async value => {
-      await onSubmit(value);
-      return { status: 'saved' };
-    },
+    onSubmit,
   });
 
   return (
