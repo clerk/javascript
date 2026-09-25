@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { simulatedLatency } from './simulated-latency';
+
 export function useUserProfileVerifyEmailLinkFixture({ failResend = false } = {}) {
   const [open, setOpen] = useState(false);
   const [resendSeconds, setResendSeconds] = useState(12);
@@ -18,7 +20,7 @@ export function useUserProfileVerifyEmailLinkFixture({ failResend = false } = {}
         } else {
           setResendSeconds(12);
         }
-      }, 700);
+      }, simulatedLatency(700));
       return () => clearTimeout(timer);
     }
     if (resendSeconds > 0) {

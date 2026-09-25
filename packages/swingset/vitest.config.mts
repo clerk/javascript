@@ -14,4 +14,7 @@ export default mergeConfig(mosaicConfig, {
       '@': resolve(import.meta.dirname, 'src'),
     },
   },
+  test: {
+    setupFiles: ['./vitest.setup.ts'],
+  },
 });

@@ -3,6 +3,8 @@ import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-p
 import type { UserProfileEditPasswordValue } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.types';
 import { useState } from 'react';
 
+import { settleAfter } from './simulated-latency';
+
 export interface UserProfileEditPasswordFixtureOptions {
   hasPassword?: boolean;
   requiresCurrentPassword?: boolean;
@@ -24,7 +26,7 @@ export function useUserProfileEditPasswordFixture({
     hasPassword,
     requiresCurrentPassword,
     onSubmitPassword: async (_value: UserProfileEditPasswordValue) => {
-      await new Promise(resolve => setTimeout(resolve, latency));
+      await settleAfter(latency);
       if (failWith && !hasFailed) {
         setHasFailed(true);
         throw new UserProfileSaveError(failWith.message ?? 'Something went wrong.', failWith.fields);

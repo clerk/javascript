@@ -1,6 +1,8 @@
 import type { UserProfileDevice } from '@clerk/mosaic/features/user-profile/user-profile-active-devices.types';
 import { useRef, useState } from 'react';
 
+import { settleAfter } from './simulated-latency';
+
 export const userProfileDevices: UserProfileDevice[] = [
   {
     id: 'current',
@@ -88,7 +90,7 @@ export function useUserProfileActiveDevicesFixture({
   const failed = useRef({ device: false, all: false });
 
   const settle = async (kind: 'device' | 'all') => {
-    await new Promise(resolve => setTimeout(resolve, latency));
+    await settleAfter(latency);
     if (failWith && !failed.current[kind]) {
       failed.current[kind] = true;
       throw new Error(failWith);

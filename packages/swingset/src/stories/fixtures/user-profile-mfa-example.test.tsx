@@ -9,6 +9,7 @@ import type { ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { useUserProfileFixture } from './user-profile';
+import { mfaDemoOptions } from './user-profile-mfa';
 
 function ProfileExample({
   overlay = false,
@@ -85,6 +86,14 @@ describe('Profile MFA flows', () => {
   it('retries SMS verification in one dialog, saves backup codes, and regenerates them', async () => {
     const user = userEvent.setup();
     const copy = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue();
+    let releaseRegenerate = () => {};
+    const regenerate = mfaDemoOptions.onGenerateBackupCodes;
+    vi.spyOn(mfaDemoOptions, 'onGenerateBackupCodes').mockImplementation(async () => {
+      await new Promise<void>(resolve => {
+        releaseRegenerate = resolve;
+      });
+      return regenerate?.() ?? [];
+    });
     render(<ProfileExample />);
     const add = screen.getByRole('button', { name: 'Add verification method' });
     await user.click(add);
@@ -108,6 +117,7 @@ describe('Profile MFA flows', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Regenerate' }));
     expect(screen.getByRole('status', { name: 'Generating backup codes' })).toBeVisible();
     expect(screen.queryByRole('list', { name: 'Backup codes' })).not.toBeInTheDocument();
+    releaseRegenerate();
     expect(await screen.findByText('demo-new-01')).toBeVisible();
   });
 });

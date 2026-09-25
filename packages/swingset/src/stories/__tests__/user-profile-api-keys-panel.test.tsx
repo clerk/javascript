@@ -14,17 +14,21 @@ import {
 import { Default as FullProfile, Overlay } from '../user-profile.stories';
 import { Default, Empty, ProposedTable } from '../user-profile-api-keys-panel.stories';
 
+let releaseFailedAttempt = () => {};
+
 function Retry() {
   const m = useMessages('userProfileApiKeysPanel');
   const attempts = useRef({ create: false, copy: false, revoke: false });
   const props = useUserProfileAPIKeysFixture({
     createKey: async () => {
-      const result = await createExampleAPIKey();
       if (!attempts.current.create) {
         attempts.current.create = true;
+        await new Promise<void>(resolve => {
+          releaseFailedAttempt = resolve;
+        });
         throw new Error(m.createError);
       }
-      return result;
+      return createExampleAPIKey();
     },
     copyKey: async secret => {
       if (!attempts.current.copy) {
@@ -34,11 +38,14 @@ function Retry() {
       await navigator.clipboard.writeText(secret);
     },
     revokeKey: async () => {
-      await revokeExampleAPIKey();
       if (!attempts.current.revoke) {
         attempts.current.revoke = true;
+        await new Promise<void>(resolve => {
+          releaseFailedAttempt = resolve;
+        });
         throw new Error(m.revokeError);
       }
+      await revokeExampleAPIKey();
     },
   });
   return <UserProfileApiKeysPanelView {...props} />;
@@ -131,6 +138,7 @@ describe('user API keys playground', () => {
     await user.click(screen.getByRole('option', { name: 'Never' }));
     await user.click(screen.getByRole('button', { name: 'Add API Key' }));
     expect(screen.getByRole('button', { name: 'Add API Key' })).toHaveAttribute('aria-busy', 'true');
+    releaseFailedAttempt();
     expect(await screen.findByRole('alert')).toHaveTextContent('Could not create the API key. Try again.');
     expect(screen.getByRole('textbox', { name: 'Secret key name' })).toHaveValue('Retry integration');
     await user.click(screen.getByRole('button', { name: 'Add API Key' }));
@@ -151,13 +159,14 @@ describe('user API keys playground', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Revoke key' }));
     expect(screen.getByRole('button', { name: 'Revoke key' })).toHaveAttribute('aria-busy', 'true');
+    releaseFailedAttempt();
     expect(await screen.findByText('Something went wrong. Please try again.')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Revoke key' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(screen.queryByText('Retry integration')).not.toBeInTheDocument();
     expect(screen.getAllByRole('row')).toHaveLength(13);
     expect(screen.getByRole('button', { name: 'Manage Web app' })).toHaveFocus();
-  }, 15000);
+  });
 
   it.each([ReadOnly, Empty])('keeps read-only panels visible without creation or row actions (%#)', Story => {
     render(

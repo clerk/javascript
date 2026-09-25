@@ -4,6 +4,8 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
 import { useState } from 'react';
 
+import { settleAfter } from './simulated-latency';
+
 interface DemoWallet extends UserProfileWeb3Wallet {
   providerId?: string;
 }
@@ -97,7 +99,7 @@ export function useWeb3WalletsFixture({
     },
     onRemove: async (id: string) => {
       if (removalState === 'pending') {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await settleAfter(1500);
       }
       if (removalState === 'error' && !removalFailed) {
         setRemovalFailed(true);

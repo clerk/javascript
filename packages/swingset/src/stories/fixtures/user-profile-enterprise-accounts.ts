@@ -4,6 +4,8 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.types';
 import { useState } from 'react';
 
+import { simulatedLatency } from './simulated-latency';
+
 export const accounts: UserProfileEnterpriseAccount[] = [
   {
     id: 'account_okta',
@@ -49,7 +51,7 @@ export function useEnterpriseAccountsFixture({
         ]);
         setAvailableConnections(current => current.filter(item => item.id !== id));
         setPendingConnectionId(undefined);
-      }, 1500);
+      }, simulatedLatency(1500));
     },
   };
 }

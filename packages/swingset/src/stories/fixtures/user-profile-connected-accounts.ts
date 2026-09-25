@@ -4,6 +4,8 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section.view';
 import { useState } from 'react';
 
+import { settleAfter } from './simulated-latency';
+
 export const connectedAccount = {
   id: 'google',
   provider: 'Google',
@@ -50,7 +52,7 @@ export function useConnectedAccountsFixture({
       ),
     onRemove: async (id: string) => {
       if (removalState === 'pending') {
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        await settleAfter(1500);
       }
       if (removalState === 'error' && !hasRemovalFailed) {
         setHasRemovalFailed(true);

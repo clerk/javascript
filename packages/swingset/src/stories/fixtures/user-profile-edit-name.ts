@@ -3,6 +3,8 @@ import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-p
 import type { UserProfileEditNameValue } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-edit-name.dialog';
 import { useState } from 'react';
 
+import { settleAfter } from './simulated-latency';
+
 export interface UserProfileEditNameFixtureOptions {
   firstName?: string;
   lastName?: string;
@@ -27,7 +29,7 @@ export function useUserProfileEditNameFixture({
     ...name,
     name: [name.firstName, name.lastName].filter(Boolean).join(' '),
     onSubmitName: async (value: UserProfileEditNameValue) => {
-      await new Promise(resolve => setTimeout(resolve, latency));
+      await settleAfter(latency);
       if (failWith) {
         throw new UserProfileSaveError(failWith.message ?? 'Something went wrong.', failWith.fields);
       }

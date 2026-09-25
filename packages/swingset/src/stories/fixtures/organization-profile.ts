@@ -6,13 +6,12 @@ import { useInvitationsTableFixture } from './invitations-table-tab';
 import { useMembersTableFixture } from './members-table-tab';
 import { useOrganizationProfileAPIKeysFixture } from './organization-profile-api-keys';
 import { useRequestsTableFixture } from './requests-table-tab';
+import { settleAfter } from './simulated-latency';
 import { usePreviewImage } from './use-preview-image';
 
 const INITIAL_NAME = 'Clerk';
 const INITIAL_SLUG = 'clerkWorkspace-177654156132154';
 const MEMBER_COUNT = 20;
-
-const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 export interface OrganizationProfileFixtureOptions {
   /** Rejects that field's save with this message, scoped to the field so it renders under it. */

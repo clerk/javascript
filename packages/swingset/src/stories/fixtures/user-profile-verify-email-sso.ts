@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { simulatedLatency } from './simulated-latency';
+
 export function useUserProfileVerifyEmailSsoFixture({ failConnect = false } = {}) {
   const [open, setOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -16,7 +18,7 @@ export function useUserProfileVerifyEmailSsoFixture({ failConnect = false } = {}
       } else {
         setOpen(false);
       }
-    }, 1200);
+    }, simulatedLatency(1200));
     return () => clearTimeout(timer);
   }, [isConnecting, failConnect]);
 

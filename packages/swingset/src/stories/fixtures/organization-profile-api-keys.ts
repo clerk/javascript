@@ -6,6 +6,8 @@ import type { OrganizationProfileCreateAPIKeyDialogProps } from '@clerk/mosaic/f
 import { useLocale, useMessages } from '@clerk/mosaic/localization';
 import { useEffect, useRef, useState } from 'react';
 
+import { settleAfter, simulatedLatency } from './simulated-latency';
+
 interface FixtureAPIKey {
   id: string;
   name: string;
@@ -74,12 +76,12 @@ function sortAPIKeys(items: FixtureAPIKey[], sort: OrganizationProfileAPIKeySort
 }
 
 export async function createExampleAPIKey() {
-  await new Promise<void>(resolve => setTimeout(resolve, 600));
+  await settleAfter(600);
   return { id: `ak_demo_${crypto.randomUUID()}`, secret: `ak_demo_${crypto.randomUUID()}` };
 }
 
 export async function revokeExampleAPIKey() {
-  await new Promise<void>(resolve => setTimeout(resolve, 600));
+  await settleAfter(600);
 }
 
 export function useOrganizationProfileAPIKeysFixture({
@@ -132,7 +134,7 @@ export function useOrganizationProfileAPIKeysFixture({
     const timer = setTimeout(() => {
       setQuery(next);
       setPage(1);
-    }, 500);
+    }, simulatedLatency(500));
     return () => clearTimeout(timer);
   }, [searchValue, query]);
 

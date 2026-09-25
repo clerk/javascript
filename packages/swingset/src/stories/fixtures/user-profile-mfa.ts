@@ -7,6 +7,7 @@ import type { UserProfileMfaSetupViewProps } from '@clerk/mosaic/features/user-p
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { useEffect, useState } from 'react';
 
+import { settleAfter } from './simulated-latency';
 import { authenticatorSetup } from './user-profile-authenticator';
 
 interface FixtureOptions {
@@ -31,7 +32,7 @@ export const mfaDemoOptions: FixtureOptions = {
     'ycga0jge',
   ],
   onGenerateBackupCodes: async () => {
-    await pause();
+    await settleAfter(600);
     return [
       'demo-new-01',
       'demo-new-02',
@@ -56,8 +57,6 @@ export const mfaDemoOptions: FixtureOptions = {
     setTimeout(() => URL.revokeObjectURL(url), 0);
   },
 };
-
-const pause = () => new Promise(resolve => setTimeout(resolve, 600));
 
 export function useUserProfileMfaFixture({
   initialFlow,
@@ -213,7 +212,7 @@ export function useUserProfileMfaFixture({
     }
     setErrorMessage(undefined);
     setPending('submit');
-    await pause();
+    await settleAfter(600);
     if (value === '000000') {
       setErrorMessage('That code is incorrect. Try again.');
       setPending(undefined);
@@ -246,7 +245,7 @@ export function useUserProfileMfaFixture({
     }
     setErrorMessage(undefined);
     setPending('submit');
-    await pause();
+    await settleAfter(600);
     if (step === 'verify' && value === '000000') {
       setErrorMessage('That code is incorrect. Try again.');
       setPending(undefined);
@@ -279,7 +278,7 @@ export function useUserProfileMfaFixture({
     setPending('resend');
     setCode('');
     setErrorMessage(undefined);
-    await pause();
+    await settleAfter(600);
     setPending(undefined);
     setResendSeconds(12);
   };
@@ -332,11 +331,11 @@ export function useUserProfileMfaFixture({
       onRegenerateBackupCodes:
         account.hasBackupCodes && onGenerateBackupCodes ? () => void generateBackupCodes('regenerate') : undefined,
       onSetDefault: async id => {
-        await pause();
+        await settleAfter(600);
         setAccount(current => ({ ...current, defaultPhoneId: id }));
       },
       onRemove: async id => {
-        await pause();
+        await settleAfter(600);
         const phones = account.phones.map(phone => (phone.id === id ? { ...phone, enrolled: false } : phone));
         const authenticator = id === 'authenticator' ? false : account.authenticator;
         const hasSecondFactor = authenticator || phones.some(phone => phone.enrolled);

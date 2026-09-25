@@ -2,6 +2,8 @@ import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/u
 import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import { useState } from 'react';
 
+import { settleAfter } from './simulated-latency';
+
 export interface UserProfileEditUsernameFixtureOptions {
   username?: string;
   latency?: number;
@@ -18,7 +20,7 @@ export function useUserProfileEditUsernameFixture({
   return {
     username,
     onSubmitUsername: async (value: string) => {
-      await new Promise(resolve => setTimeout(resolve, latency));
+      await settleAfter(latency);
       if (failWith) {
         throw new UserProfileSaveError(failWith.message ?? 'Something went wrong.', failWith.fields);
       }
