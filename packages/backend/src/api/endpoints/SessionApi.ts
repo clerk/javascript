@@ -12,9 +12,9 @@ const basePath = '/sessions';
 /** @generateWithEmptyComment */
 export type SessionListParams = ClerkPaginationRequest<{
   /** The ID of the client to get sessions for. */
-  clientId?: string;
+  client_id?: string;
   /** The ID of the user to get sessions for. */
-  userId?: string;
+  user_id?: string;
   /** The status of the sessions to get. */
   status?: SessionStatus;
 }>;
