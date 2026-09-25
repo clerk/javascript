@@ -11,6 +11,7 @@ interface FakeAttribute {
   enabled: boolean;
   required: boolean;
   immutable?: boolean;
+  verifications: string[];
   used_for_first_factor: boolean;
   used_for_second_factor: boolean;
 }
@@ -18,6 +19,7 @@ interface FakeAttribute {
 interface FakeVerification {
   status: string | null;
   expireAt?: Date | null;
+  externalVerificationRedirectURL?: URL | null;
 }
 
 let isUserLoaded: boolean;
@@ -45,6 +47,9 @@ let user: {
     destroy?: ReturnType<typeof vi.fn>;
     prepareVerification?: ReturnType<typeof vi.fn>;
     attemptVerification?: ReturnType<typeof vi.fn>;
+    createEmailLinkFlow?: ReturnType<typeof vi.fn>;
+    matchesSsoConnection?: boolean;
+    createEnterpriseSSOLinkFlow?: ReturnType<typeof vi.fn>;
   }[];
   phoneNumbers: { id: string; phoneNumber: string; verification: FakeVerification }[];
   setProfileImage: ReturnType<typeof vi.fn>;
@@ -55,9 +60,22 @@ let attributes: Record<'first_name' | 'last_name' | 'username' | 'email_address'
 let usernameSettings: { min_length: number; max_length: number };
 let environmentHydrated: boolean;
 let enterpriseSSOEnabled: boolean;
+let emailLinkFlow: { startEmailLinkFlow: ReturnType<typeof vi.fn>; cancelEmailLinkFlow: ReturnType<typeof vi.fn> };
+let ssoLinkFlow: {
+  startEnterpriseSSOLinkFlow: ReturnType<typeof vi.fn>;
+  cancelEnterpriseSSOLinkFlow: ReturnType<typeof vi.fn>;
+};
+const navigate = vi.fn();
 
 function attribute(overrides: Partial<FakeAttribute> = {}): FakeAttribute {
-  return { enabled: true, required: false, used_for_first_factor: false, used_for_second_factor: false, ...overrides };
+  return {
+    enabled: true,
+    required: false,
+    verifications: [],
+    used_for_first_factor: false,
+    used_for_second_factor: false,
+    ...overrides,
+  };
 }
 
 vi.mock('@clerk/shared/react', async importOriginal => {
@@ -66,8 +84,12 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useUser: () => ({ isLoaded: isUserLoaded, user }),
     useClerk: () => ({
+      navigate,
       __internal_environment: environmentHydrated
-        ? { userSettings: { attributes, usernameSettings, enterpriseSSO: { enabled: enterpriseSSOEnabled } } }
+        ? {
+            displayConfig: { userProfileUrl: 'https://accounts.clerk.dev/user' },
+            userSettings: { attributes, usernameSettings, enterpriseSSO: { enabled: enterpriseSSOEnabled } },
+          }
         : null,
     }),
   };
@@ -112,6 +134,9 @@ beforeEach(() => {
   isUserLoaded = true;
   environmentHydrated = true;
   enterpriseSSOEnabled = true;
+  emailLinkFlow = { startEmailLinkFlow: vi.fn(() => Promise.resolve()), cancelEmailLinkFlow: vi.fn() };
+  ssoLinkFlow = { startEnterpriseSSOLinkFlow: vi.fn(() => Promise.resolve()), cancelEnterpriseSSOLinkFlow: vi.fn() };
+  navigate.mockReset();
   usernameSettings = { min_length: 4, max_length: 64 };
   attributes = {
     first_name: attribute(),
@@ -137,6 +162,8 @@ beforeEach(() => {
         destroy: vi.fn(() => Promise.resolve()),
         prepareVerification: vi.fn(() => Promise.resolve()),
         attemptVerification: vi.fn(() => Promise.resolve()),
+        createEmailLinkFlow: vi.fn(() => emailLinkFlow),
+        createEnterpriseSSOLinkFlow: vi.fn(() => ssoLinkFlow),
       },
       {
         id: 'email_1',
@@ -295,6 +322,52 @@ describe('useUserProfileAccountSectionModel', () => {
       expect(user?.createEmailAddress).toHaveBeenCalledWith({ email: 'new@clerk.dev' });
       email?.start();
       expect(prepareVerification).toHaveBeenCalledWith({ strategy: 'email_code' });
+    });
+
+    it('sends a link back to the profile when the instance verifies by link', async () => {
+      attributes.email_address = attribute({ verifications: ['email_code', 'email_link'] });
+      const verification = ready().getEmailVerifier?.('email_2').start();
+      if (verification?.method !== 'link') {
+        throw new Error('expected a link verification');
+      }
+      await expect(verification.verified).resolves.toBeUndefined();
+      expect(emailLinkFlow.startEmailLinkFlow).toHaveBeenCalledWith({
+        redirectUrl: 'https://accounts.clerk.dev/user#/verify',
+      });
+      verification.cancel();
+      expect(emailLinkFlow.cancelEmailLinkFlow).toHaveBeenCalledOnce();
+    });
+
+    it('returns the API message when the link cannot be sent', async () => {
+      attributes.email_address = attribute({ verifications: ['email_link'] });
+      emailLinkFlow.startEmailLinkFlow.mockRejectedValue(apiError());
+      const verification = ready().getEmailVerifier?.('email_2').start();
+      if (verification?.method !== 'link') {
+        throw new Error('expected a link verification');
+      }
+      await expect(rejection(verification.verified)).resolves.toEqual({
+        global: { code: 'form_param_invalid', message: 'That value is invalid.' },
+      });
+    });
+
+    it('verifies an email that matches an SSO connection with the provider, even when links are on', async () => {
+      attributes.email_address = attribute({ verifications: ['email_link'] });
+      const email = user?.emailAddresses[0];
+      if (!email) {
+        throw new Error('email missing');
+      }
+      email.matchesSsoConnection = true;
+      email.verification.externalVerificationRedirectURL = new URL('https://idp.acme.co/sso');
+      const verification = ready().getEmailVerifier?.('email_2').start();
+      if (verification?.method !== 'sso') {
+        throw new Error('expected an SSO verification');
+      }
+      await expect(verification.verified).resolves.toBeUndefined();
+      expect(ssoLinkFlow.startEnterpriseSSOLinkFlow).toHaveBeenCalledWith({ redirectUrl: window.location.href });
+      verification.connect();
+      expect(navigate).toHaveBeenCalledWith('https://idp.acme.co/sso');
+      verification.cancel();
+      expect(ssoLinkFlow.cancelEnterpriseSSOLinkFlow).toHaveBeenCalledOnce();
     });
 
     it('verifies the code for the chosen email', async () => {

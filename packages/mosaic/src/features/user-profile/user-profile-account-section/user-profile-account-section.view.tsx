@@ -109,6 +109,7 @@ export function UserProfileAccountSectionView({
   const emailRow = emails ? (
     <UserProfileEmailRowView
       emails={emails}
+      username={username}
       allowMultipleAccounts={allowMultipleAccounts}
       onAddEmail={onAddEmail}
       onCreateEmail={onCreateEmail}

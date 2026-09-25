@@ -18,6 +18,7 @@ function renderView(overrides: Partial<UserProfileAddEmailDialogProps> = {}) {
     onCodeChange: vi.fn(),
     onSubmit: vi.fn(),
     onResend: vi.fn(),
+    onConnect: vi.fn(),
     ...overrides,
   };
   return {
@@ -45,6 +46,7 @@ function VerificationExample({ onSubmit }: Pick<UserProfileAddEmailDialogProps, 
         onCodeChange={setCode}
         onSubmit={onSubmit}
         onResend={() => undefined}
+        onConnect={() => undefined}
       />
     </MosaicProvider>
   );
@@ -181,6 +183,52 @@ describe('UserProfileAddEmailDialog', () => {
       </MosaicProvider>,
     );
     expect(screen.getByRole('button', { name: 'Sending code…' })).toBeDisabled();
+  });
+
+  it('asks the user to open the link, and lets them send a new one after the countdown', async () => {
+    const user = userEvent.setup();
+    const { props, rerender } = renderView({ step: 'link', resendSeconds: 60, errorMessage: 'Link expired' });
+    const dialog = screen.getByRole('dialog', { name: 'Verify your email' });
+    expect(dialog).toHaveTextContent('Open the link we sent to person@example.com');
+    expect(dialog).toHaveTextContent('Link expired');
+    expect(screen.queryByRole('textbox', { name: 'Verification code' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Didn’t receive a link? Resend (60)' }));
+    expect(props.onResend).not.toHaveBeenCalled();
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileAddEmailDialog
+          {...props}
+          resendSeconds={0}
+        />
+      </MosaicProvider>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Didn’t receive a link? Resend' }));
+    expect(props.onResend).toHaveBeenCalledOnce();
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(props.onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+  });
+
+  it('asks the user to connect with the SSO provider for their email domain', async () => {
+    const user = userEvent.setup();
+    const { props } = renderView({
+      step: 'sso',
+      emailAddress: 'person@acme.co',
+      errorMessage: 'Unable to connect. Try again.',
+    });
+
+    expect(screen.getByRole('dialog', { name: 'Verify your email' })).toHaveAccessibleDescription(
+      'Connect below to verify person@acme.co',
+    );
+    expect(screen.getByText('acme.co')).toBeInTheDocument();
+    expect(screen.getByText('Enterprise SSO')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('Unable to connect. Try again.');
+
+    await user.click(screen.getByRole('button', { name: 'Connect' }));
+    expect(props.onConnect).toHaveBeenCalledOnce();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(props.onOpenChange).toHaveBeenCalledWith(false, expect.anything());
   });
 
   it('disables Continue when the email cannot be submitted', () => {
