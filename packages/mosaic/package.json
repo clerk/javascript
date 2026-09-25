@@ -78,7 +78,6 @@
     "@testing-library/user-event": "^14.6.5",
     "@types/react": "catalog:react",
     "@types/react-dom": "catalog:react",
-    "@vitest/browser-playwright": "5.0.0",
     "axe-core": "^4.11.3",
     "bundlewatch": "^0.4.2",
     "happy-dom": "^20.8.9",
