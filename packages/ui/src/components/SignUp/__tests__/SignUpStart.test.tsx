@@ -639,7 +639,6 @@ describe('SignUpStart', () => {
         simulateCaptchaInteractive(getCaptcha());
 
         await waitFor(() => expect(google.closest('[inert]')).not.toBeNull());
-        expect(google.closest('[inert]')?.hasAttribute('inert')).toBe(true);
         expect(getCaptcha().closest('[inert]')).toBeNull();
         expect(screen.getByRole('heading').closest('[inert]')).toBeNull();
 
