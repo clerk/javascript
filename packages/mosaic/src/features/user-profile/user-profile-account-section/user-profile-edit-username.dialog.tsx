@@ -1,5 +1,5 @@
-import type { FormEvent } from 'react';
-import { useId, useRef } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import { useRef } from 'react';
 
 import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
@@ -7,48 +7,37 @@ import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
+import type { UseFormResult } from '../../../components/form';
 import { Input } from '../../../components/input';
-import { useErrorText, useMessages } from '../../../localization';
-import type { FormError } from '../../../utils/form-error';
+import { useMessages } from '../../../localization';
 
 export type UserProfileEditUsernameField = 'username';
+
+export interface UserProfileEditUsernameValue {
+  username: string;
+}
 
 export interface UserProfileEditUsernameDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
-  username: string;
-  onUsernameChange: (value: string) => void;
   title?: string;
-  canSave?: boolean;
-  isSaving?: boolean;
-  error?: FormError<UserProfileEditUsernameField>;
-  onSubmit: () => void;
+  form: UseFormResult<UserProfileEditUsernameValue>;
 }
 
 export function UserProfileEditUsernameDialog({
   open,
   onOpenChange,
   trigger,
-  username,
-  onUsernameChange,
   title,
-  canSave = true,
-  isSaving = false,
-  error,
-  onSubmit,
+  form,
 }: UserProfileEditUsernameDialogProps) {
   const m = useMessages('userProfileAccountSection');
-  const errorText = useErrorText();
-  const formId = useId();
   const usernameRef = useRef<HTMLInputElement>(null);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (canSave && !isSaving) {
-      onSubmit();
-    }
-  };
+  const { feedback } = form.fields.username;
+  const error = feedback?.type === 'error' ? feedback.message : undefined;
+  const { ref, ...control } = form.register('username');
+  const mergedRef = useMergeRefs([ref, usernameRef]);
 
   return (
     <Dialog.Root
@@ -71,31 +60,30 @@ export function UserProfileEditUsernameDialog({
           <Card.Content
             render={
               <form
-                id={formId}
-                onSubmit={handleSubmit}
+                id={form.id}
+                onSubmit={form.handleSubmit}
               />
             }
           >
-            {error?.global ? (
+            {form.error ? (
               <Banner.Root
                 role='alert'
                 color='negative'
               >
-                <Banner.Label>{errorText(error.global)}</Banner.Label>
+                <Banner.Label>{form.error}</Banner.Label>
               </Banner.Root>
             ) : null}
-            <Field.Root invalid={Boolean(error?.fields?.username)}>
+            <Field.Root
+              disabled={form.isSubmitting}
+              invalid={error !== undefined}
+            >
               <Field.Label>{m.username.fieldLabel}</Field.Label>
               <Input
-                ref={usernameRef}
+                ref={mergedRef}
                 autoComplete='username'
-                disabled={isSaving}
-                value={username}
-                onChange={event => onUsernameChange(event.target.value)}
+                {...control}
               />
-              <Field.Message>
-                <Field.Error>{error?.fields?.username ? errorText(error.fields.username) : null}</Field.Error>
-              </Field.Message>
+              {error ? <Field.Error>{error}</Field.Error> : null}
             </Field.Root>
           </Card.Content>
           <Card.Footer>
@@ -111,10 +99,10 @@ export function UserProfileEditUsernameDialog({
               }
             />
             <SubmitButton
-              form={formId}
+              form={form.id}
               fullWidth
-              isPending={isSaving}
-              disabled={!canSave}
+              isPending={form.isSubmitting}
+              disabled={!form.canSubmit}
               focusableWhenDisabled
             >
               {m.username.save}
