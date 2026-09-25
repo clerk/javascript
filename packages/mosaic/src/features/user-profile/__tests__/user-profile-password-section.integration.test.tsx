@@ -309,6 +309,23 @@ describe('UserProfilePasswordSection', () => {
     expect(screen.getByLabelText('New password')).toHaveAttribute('aria-invalid', 'true');
   });
 
+  it('keeps the mismatch visible after the confirmation is cleared', async () => {
+    renderPassword();
+    const events = userEvent.setup();
+    await events.click(screen.getByRole('button', { name: 'Change password' }));
+    await events.type(screen.getByLabelText('New password'), 'new-password-123');
+    await events.type(screen.getByLabelText('Confirm password'), 'new-password-12');
+    await events.click(screen.getByLabelText('New password'));
+    await waitFor(() =>
+      expect(screen.getByLabelText('Confirm password')).toHaveAccessibleDescription("Passwords don't match."),
+    );
+
+    await events.clear(screen.getByLabelText('Confirm password'));
+
+    expect(screen.getByLabelText('Confirm password')).toHaveAccessibleDescription("Passwords don't match.");
+    expect(screen.getByLabelText('Confirm password')).toHaveAttribute('aria-invalid', 'true');
+  });
+
   it('confirms that requirements are met when strength checking is disabled', async () => {
     renderPassword();
     const events = await editPassword();
