@@ -66,7 +66,7 @@ Two rows deserve extra care because they have no obvious home:
 - **Pure derivation** (slot layout, ordering a consumer's list) belongs in
   `*.layout.ts` / `*.utils.ts` beside the view, where it gets its own test.
 
-## Phase 3 — Implement and test per layer
+## Phase 3 — Implement and test
 
 File shape: `<feature>.model.tsx` · `<feature>.controller.tsx` ·
 `<feature>.view.tsx` · `<feature>.tsx` (composition wrapper), plus
@@ -78,15 +78,15 @@ whether the interaction has the async lifecycle and mutually-constraining values
 that earn a machine, or whether it is `useState` (`controllers.md` → "Which one
 holds the state").
 
-Each layer is testable in isolation — that isolation is what makes the migration
-verifiable. Follow the recipes in `testing.md`: the model against a mocked Clerk,
-the controller against a fake model object, the view against plain props. The
-**model** is the highest-risk, least-covered layer — concentrate scrutiny there.
-Finish with one `*.integration.test.tsx` proving the layers compose.
+Test the feature with one `*.feature.test.tsx` that uses it the way a user
+would, against a real Clerk with FAPI faked (`testing.md`). Turn each inventory
+row into a test there, not into per-layer tests. The **model** is the
+highest-risk layer, so make sure its rows (revalidation, permission gates,
+empty states) each have one.
 
 ## Phase 4 — Verify parity (the confidence step)
 
-Machine and view tests only cover branches you remembered to write. To catch the
+Tests only cover branches you remembered to write. To catch the
 ones you didn't, run an automated diff of legacy against new.
 
 Launch an **Explore subagent** with the prompt in `parity-audit.md`. Give it the

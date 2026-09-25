@@ -5,7 +5,7 @@ description: >-
   tokens, `themeProps`), or building a flow — writing the model (the Clerk
   adapter), the controller (local state, in React state or a state machine:
   `setup`, states/guards/`invoke`, wired to React with `useMachine`/`useActor`/
-  `useSelector`), or the view (rendering), testing any of those layers, or
+  `useSelector`), or the view (rendering), testing a feature, or
   migrating a legacy / pre-Mosaic component into the model / controller / view
   split. Use when building, styling, debugging, testing, or migrating anything
   Mosaic. `references/mosaic-architecture.md` (repo root) holds the design-system
@@ -57,8 +57,8 @@ architecture" section that defines the split. Read it for the _what_; this skill
 is the _how-to_.
 
 `packages/mosaic/src/features/user-button/` is the fullest worked example of the split
-in the repo — model, controller, view, wrapper, types, messages, and a test per
-layer. Copy from it.
+in the repo — model, controller, view, wrapper, types, messages, and a feature
+test. Copy from it.
 
 ## Which reference to read
 
@@ -71,7 +71,7 @@ layer. Copy from it.
 | Writing the controller (local state, pending, action wrapping)         | `references/controllers.md`                            |
 | Authoring or debugging a state machine, or wiring one to React         | `references/machines.md` → in-tree `machine/README.md` |
 | Writing the view (rendering plain props)                               | `references/views.md`                                  |
-| Testing a model, controller, or view                                   | `references/testing.md`                                |
+| Testing a feature (feature tests, unit tests)                          | `references/testing.md`                                |
 | Migrating a legacy component into Mosaic (the end-to-end workflow)     | `references/migration.md`                              |
 | Running the parity audit that guards a migration                       | `references/parity-audit.md`                           |
 
