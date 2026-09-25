@@ -11,7 +11,7 @@ export interface HeadingLevelProviderProps {
   children?: React.ReactNode;
 }
 
-export function HeadingLevelProvider({ level, children }: HeadingLevelProviderProps) {
+export function HeadingLevelProvider({ level, children }: HeadingLevelProviderProps): React.ReactElement {
   const parent = React.useContext(HeadingLevelContext);
   return <HeadingLevelContext.Provider value={level ?? nextLevel[parent]}>{children}</HeadingLevelContext.Provider>;
 }

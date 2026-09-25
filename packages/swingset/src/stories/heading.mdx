@@ -52,6 +52,9 @@ import * as HeadingStories from './heading.stories';
 reads it. A provider without a `level` sits one level below the provider around it. Outside any
 provider the level is `2`.
 
+`Heading` does not read the provider on its own. A plain `<Heading>` renders an `h2`, so pass
+`level={useHeadingLevel()}` when it should follow the provider.
+
 `Profile.Title`, `Profile.PageTitle`, and `Section.Title` all take their level this way. The same part
 renders an `h2` when used alone and nests correctly inside a profile.
 
