@@ -1,4 +1,3 @@
-import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { validate as validateComplexity } from '@clerk/shared/internal/clerk-js/passwords/complexity';
 import { createLoadZxcvbn } from '@clerk/shared/internal/clerk-js/passwords/loadZxcvbn';
 import { createValidatePasswordStrength } from '@clerk/shared/internal/clerk-js/passwords/strength';
@@ -6,29 +5,8 @@ import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, PasswordSettingsData, PasswordValidation, UserResource } from '@clerk/shared/types';
 import { useCallback } from 'react';
 
-import { FormSubmitError } from '../../../components/form';
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
 import type { UserProfileEditPasswordValue } from './user-profile-password-section.types';
-
-export function passwordFormError(error: unknown, requiresCurrentPassword: boolean): unknown {
-  if (!isClerkAPIResponseError(error)) {
-    return error;
-  }
-  const fields: { currentPassword?: string; newPassword?: string } = {};
-  let message: string | undefined;
-  for (const item of error.errors) {
-    const text = item.longMessage || item.message;
-    const name = item.meta?.paramName;
-    if ((name === 'current_password' || name === 'currentPassword') && requiresCurrentPassword) {
-      fields.currentPassword ??= text;
-    } else if (name === 'new_password' || name === 'newPassword' || name === 'password') {
-      fields.newPassword ??= text;
-    } else {
-      message ??= text;
-    }
-  }
-  return new FormSubmitError({ message, fields });
-}
 
 type EditablePasswordPolicy =
   | { mode: 'set'; requiresCurrentPassword: false }

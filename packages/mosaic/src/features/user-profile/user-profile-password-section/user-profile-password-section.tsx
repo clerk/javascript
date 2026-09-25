@@ -7,12 +7,13 @@ import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import type { FieldFeedback } from '../../../components/form';
 import { Text } from '../../../components/text';
-import { fill, useMessages } from '../../../localization';
+import { fill, useLocale, useMessages } from '../../../localization';
 import { Reverification, useReverificationFlow } from '../../reverification';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
+import { passwordFormError } from './user-profile-password-feedback';
 import type { UserProfilePasswordModel } from './user-profile-password-section.model';
-import { passwordFormError, useUserProfilePasswordModel } from './user-profile-password-section.model';
+import { useUserProfilePasswordModel } from './user-profile-password-section.model';
 import { UserProfilePasswordSectionView } from './user-profile-password-section.view';
 
 export interface UserProfilePasswordSectionProps {
@@ -51,6 +52,7 @@ export function UserProfilePasswordSection({ fallback = null }: UserProfilePassw
 
 function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { status: 'ready' }> }) {
   const m = useMessages('userProfilePasswordSection');
+  const locale = useLocale();
   const [updatePassword, verification] = useReverificationFlow(model.updatePassword);
   const { validatePassword, passwordSettings } = model;
   const feedback = useCallback(
@@ -93,7 +95,7 @@ function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { st
         if (isReverificationCancelledError(error)) {
           return { status: 'cancelled' };
         }
-        throw passwordFormError(error, model.requiresCurrentPassword);
+        throw passwordFormError(error, model.requiresCurrentPassword, passwordSettings, m, locale);
       }
     },
   });

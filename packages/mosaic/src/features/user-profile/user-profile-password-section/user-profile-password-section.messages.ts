@@ -30,9 +30,42 @@ export const userProfilePasswordSectionMessages = {
     uppercase: 'Add an uppercase letter.',
     number: 'Add a number.',
     special: 'Add a special character.',
-    weak: 'Choose a stronger password.',
+    weak: 'Your password is not strong enough.',
     stronger: 'Your password could be stronger.',
     strong: 'Strong password.',
+  },
+  complexity: {
+    sentence: 'Your password must contain {requirements}.',
+    minimumLength: '{length} or more characters',
+    maximumLength: 'less than {length} characters',
+    lowercase: 'a lowercase letter',
+    uppercase: 'an uppercase letter',
+    number: 'a number',
+    special: 'a special character',
+  },
+  passwordErrors: {
+    form_password_pwned:
+      'This password has been found as part of a breach and can not be used, please try another password instead.',
+    form_password_matches_identifier:
+      'Password cannot match your email address, phone number or username. For account safety, please use a different password.',
+    form_password_size_in_bytes_exceeded: '',
+    form_new_password_matches_current: '',
+  },
+  suggestions: {
+    allUppercase: 'Capitalize some, but not all letters.',
+    anotherWord: 'Add more words that are less common.',
+    associatedYears: 'Avoid years that are associated with you.',
+    capitalization: 'Capitalize more than the first letter.',
+    dates: 'Avoid dates and years that are associated with you.',
+    l33t: "Avoid predictable letter substitutions like '@' for 'a'.",
+    longerKeyboardPattern: 'Use longer keyboard patterns and change typing direction multiple times.',
+    noNeed: 'You can create strong passwords without using symbols, numbers, or uppercase letters.',
+    pwned: 'If you use this password elsewhere, you should change it.',
+    recentYears: 'Avoid recent years.',
+    repeated: 'Avoid repeated words and characters.',
+    reverseWords: 'Avoid reversed spellings of common words.',
+    sequences: 'Avoid common character sequences.',
+    useWords: 'Use multiple words, but avoid common phrases.',
   },
 
   errors: {
