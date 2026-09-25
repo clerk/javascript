@@ -79,12 +79,10 @@ export type UserButtonProps = UserButtonModelOptions &
  * ```
  *
  * @example
- * `mode` narrows the menu to one switcher, and `modePriority` picks which one a combined menu leads
- * with — in its header, and in the trigger beside the avatar. The other one is still listed.
+ * `mode` narrows the menu to one switcher.
  * ```tsx
  * <UserButton mode='organization' />
  * <UserButton mode='user' />
- * <UserButton modePriority='user' />
  * ```
  *
  * @example
@@ -133,7 +131,6 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
     renderTriggerLabel,
     renderTriggerBadge,
     mode,
-    modePriority,
     userProfileProps,
     organizationProfileProps,
     customMenuItems,
@@ -170,7 +167,7 @@ export function UserButton(props: UserButtonProps = {}): ReactElement | null {
       appearance: organizationProfileProps?.appearance,
     },
   });
-  const controller = useUserButtonController(model, { mode, modePriority, customMenuItems, menuItemOrder });
+  const controller = useUserButtonController(model, { mode, customMenuItems, menuItemOrder });
 
   if (controller.status === 'loading') {
     return (
