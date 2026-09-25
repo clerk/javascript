@@ -52,7 +52,7 @@ export function useUserProfileEditPasswordController({
     fields: {
       confirmPassword: {
         validate: (value, values) =>
-          value !== '' && value !== values.newPassword ? { type: 'error', message: m.errors.mismatch } : undefined,
+          value !== values.newPassword ? { type: 'error', message: m.errors.mismatch } : undefined,
       },
     },
     canSubmit: values =>

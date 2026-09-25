@@ -287,6 +287,29 @@ describe('useUserProfileEditPasswordController', () => {
     expect(result.current.form.fields.confirmPassword.feedback).toBeUndefined();
   });
 
+  it('keeps the mismatch after the confirmation is cleared', () => {
+    const { result } = renderController();
+    open(result);
+    act(() => result.current.form.setValue('newPassword', 'new-secret-123'));
+    act(() => result.current.form.setValue('confirmPassword', 'new-secret-12'));
+    act(() => result.current.form.touch('confirmPassword'));
+
+    act(() => result.current.form.setValue('confirmPassword', ''));
+
+    expect(result.current.form.fields.confirmPassword.feedback).toEqual({
+      type: 'error',
+      message: "Passwords don't match.",
+    });
+  });
+
+  it('leaves an untouched empty confirmation quiet', () => {
+    const { result } = renderController();
+    open(result);
+    act(() => result.current.form.setValue('newPassword', 'new-secret-123'));
+
+    expect(result.current.form.fields.confirmPassword.feedback).toBeUndefined();
+  });
+
   it('forgets what was typed when the dialog is cancelled', () => {
     const { result } = renderController();
     open(result);
