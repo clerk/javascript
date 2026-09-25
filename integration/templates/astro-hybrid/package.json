@@ -22,7 +22,8 @@
   },
   "pnpm": {
     "overrides": {
-      "@astrojs/compiler": "2.13.1"
+      "@astrojs/compiler": "2.13.1",
+      "github-slugger": "2.0.0"
     }
   }
 }
