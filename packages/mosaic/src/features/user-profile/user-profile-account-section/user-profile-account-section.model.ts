@@ -3,10 +3,13 @@ import { useUser } from '@clerk/shared/react';
 import type { AttributeData, EmailAddressResource, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
+import type { MosaicRouter } from '../../../hooks/useMosaicRouter';
+import { useMosaicRouter } from '../../../hooks/useMosaicRouter';
 import { save } from '../../../utils/form-error';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import type {
   UserProfileEmail,
+  UserProfileEmailVerification,
   UserProfileEmailVerifier,
   UserProfileNameAttribute,
   UserProfilePhone,
@@ -58,9 +61,49 @@ function emailById(user: UserResource, id: string): EmailAddressResource {
   return email;
 }
 
-function toEmailVerifier(email: EmailAddressResource): UserProfileEmailVerifier {
+function verifyRedirectUrl(userProfileUrl: string): string {
+  const url = new URL(userProfileUrl);
+  url.hash = '/verify';
+  return url.toString();
+}
+
+function startEmailVerification(
+  email: EmailAddressResource,
+  linkRedirectUrl: string | undefined,
+  router: MosaicRouter,
+): UserProfileEmailVerification {
+  if (email.matchesSsoConnection) {
+    const { startEnterpriseSSOLinkFlow, cancelEnterpriseSSOLinkFlow } = email.createEnterpriseSSOLinkFlow();
+    return {
+      method: 'sso',
+      verified: save(() => startEnterpriseSSOLinkFlow({ redirectUrl: window.location.href })),
+      cancel: cancelEnterpriseSSOLinkFlow,
+      connect: () => {
+        const url = email.verification.externalVerificationRedirectURL;
+        if (url) {
+          void router.navigate(url.href);
+        }
+      },
+    };
+  }
+  if (linkRedirectUrl === undefined) {
+    return { method: 'code', sent: save(() => email.prepareVerification({ strategy: 'email_code' })) };
+  }
+  const { startEmailLinkFlow, cancelEmailLinkFlow } = email.createEmailLinkFlow();
   return {
-    start: () => ({ method: 'code', sent: save(() => email.prepareVerification({ strategy: 'email_code' })) }),
+    method: 'link',
+    verified: save(() => startEmailLinkFlow({ redirectUrl: linkRedirectUrl })),
+    cancel: cancelEmailLinkFlow,
+  };
+}
+
+function toEmailVerifier(
+  email: EmailAddressResource,
+  linkRedirectUrl: string | undefined,
+  router: MosaicRouter,
+): UserProfileEmailVerifier {
+  return {
+    start: () => startEmailVerification(email, linkRedirectUrl, router),
     verifyCode: code => save(() => email.attemptVerification({ code }), ADD_EMAIL_FIELDS),
   };
 }
@@ -110,6 +153,7 @@ function toPhones(user: UserResource): UserProfilePhone[] {
 export function useUserProfileAccountSectionModel(): UserProfileAccountSectionModel {
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
+  const router = useMosaicRouter();
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -127,7 +171,10 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
   const showEmails = isAttributeAvailable(attributes.email_address);
   const emailsImmutable = Boolean(attributes.email_address?.immutable);
   const canCreateEmail = showEmails && !emailsImmutable && canAddIdentifications(user, enterpriseSSO.enabled);
+  const verifiesEmailByLink = Boolean(attributes.email_address?.verifications.includes('email_link'));
   const showPhones = isAttributeAvailable(attributes.phone_number);
+  const linkRedirectUrl = verifiesEmailByLink ? verifyRedirectUrl(environment.displayConfig.userProfileUrl) : undefined;
+  const verifierFor = (email: EmailAddressResource) => toEmailVerifier(email, linkRedirectUrl, router);
 
   return {
     status: 'ready',
@@ -147,10 +194,10 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
       ? async emailAddress => {
           const request = user.createEmailAddress({ email: emailAddress });
           await save(() => request, ADD_EMAIL_FIELDS);
-          return toEmailVerifier(await request);
+          return verifierFor(await request);
         }
       : undefined,
-    getEmailVerifier: showEmails ? id => toEmailVerifier(emailById(user, id)) : undefined,
+    getEmailVerifier: showEmails ? id => verifierFor(emailById(user, id)) : undefined,
     onSetPrimaryEmail: showEmails ? id => save(() => user.update({ primaryEmailAddressId: id })) : undefined,
     onRemoveEmail: showEmails && !emailsImmutable ? id => save(() => emailById(user, id).destroy()) : undefined,
     onProfilePictureChange: file => save(() => user.setProfileImage({ file })),

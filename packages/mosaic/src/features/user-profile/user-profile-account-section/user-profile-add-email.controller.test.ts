@@ -8,6 +8,10 @@ import { useUserProfileAddEmailController } from './user-profile-add-email.contr
 
 const sentCode = (): UserProfileEmailVerification => ({ method: 'code', sent: Promise.resolve() });
 
+function sentLink(verified: Promise<void>, cancel = vi.fn()) {
+  return (): UserProfileEmailVerification => ({ method: 'link', verified, cancel });
+}
+
 function verifier(
   start: () => UserProfileEmailVerification = sentCode,
   verifyCode: (code: string) => Promise<void> = () => Promise.resolve(),
@@ -218,11 +222,83 @@ describe('useUserProfileAddEmailController', () => {
     await waitFor(() => expect(result.current.errorMessage).toBe('That email is taken.'));
   });
 
-  it('moves from the email step straight to the code step', async () => {
+  it('waits for the link to be opened, then closes', async () => {
+    const verified = createDeferredPromise();
+    const { result } = renderHook(() => useUserProfileAddEmailController({}));
+
+    act(() =>
+      result.current.onVerifyEmail('other@example.com', verifier(sentLink(verified.promise.then(() => undefined)))),
+    );
+    expect(result.current.step).toBe('link');
+    expect(result.current.resendSeconds).toBe(60);
+
+    await act(async () => {
+      verified.resolve();
+      await verified.promise;
+    });
+    expect(result.current.open).toBe(false);
+  });
+
+  it('stops waiting for the link when closed or unmounted', async () => {
+    const cancel = vi.fn();
+    const email = verifier(sentLink(new Promise(() => {}), cancel));
+    const { result, unmount } = renderHook(() => useUserProfileAddEmailController({}));
+
+    act(() => result.current.onVerifyEmail('other@example.com', email));
+    await waitFor(() => expect(result.current.step).toBe('link'));
+    act(() => result.current.onOpenChange(false));
+    expect(cancel).toHaveBeenCalledOnce();
+
+    act(() => result.current.onVerifyEmail('other@example.com', email));
+    await waitFor(() => expect(result.current.step).toBe('link'));
+    unmount();
+    expect(cancel).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows a link failure and lets the user send a new link', async () => {
+    const email = verifier(sentLink(Promise.reject(saveError('Link expired'))));
+    const { result } = renderHook(() => useUserProfileAddEmailController({}));
+
+    act(() => result.current.onVerifyEmail('other@example.com', email));
+    await waitFor(() => expect(result.current.errorMessage).toBe('Link expired'));
+    expect(result.current.step).toBe('link');
+    expect(result.current.open).toBe(true);
+  });
+
+  it('connects through the SSO provider, closes once verified, and stops waiting when closed', async () => {
+    const verified = createDeferredPromise();
+    const cancel = vi.fn();
+    const connect = vi.fn();
+    const email = verifier(() => ({
+      method: 'sso',
+      verified: verified.promise.then(() => undefined),
+      cancel,
+      connect,
+    }));
+    const { result } = renderHook(() => useUserProfileAddEmailController({}));
+
+    act(() => result.current.onVerifyEmail('person@acme.co', email));
+    expect(result.current.step).toBe('sso');
+    expect(result.current.resendSeconds).toBe(0);
+    result.current.onConnect();
+    expect(connect).toHaveBeenCalledOnce();
+    act(() => result.current.onOpenChange(false));
+    expect(cancel).toHaveBeenCalledOnce();
+
+    act(() => result.current.onVerifyEmail('person@acme.co', email));
+    await waitFor(() => expect(result.current.step).toBe('sso'));
+    await act(async () => {
+      verified.resolve();
+      await verified.promise;
+    });
+    expect(result.current.open).toBe(false);
+  });
+
+  it('moves from the email step straight to the step for the verification method', async () => {
     const shown: string[] = [];
     const { result } = renderHook(() => {
       const controller = useUserProfileAddEmailController({
-        onCreate: created,
+        onCreate: () => Promise.resolve(verifier(sentLink(new Promise(() => {})))),
       });
       if (controller.open && shown.at(-1) !== controller.step) {
         shown.push(controller.step);
@@ -233,7 +309,21 @@ describe('useUserProfileAddEmailController', () => {
     act(() => result.current.onOpenChange(true));
     act(() => result.current.onEmailAddressChange('new@example.com'));
     act(() => result.current.onSubmit());
-    await waitFor(() => expect(result.current.resendSeconds).toBeGreaterThan(0));
-    expect(shown).toEqual(['email', 'verify']);
+    await waitFor(() => expect(result.current.step).toBe('link'));
+    expect(shown).toEqual(['email', 'link']);
+  });
+
+  it('does not add an email that is the same as the username', () => {
+    const onCreate = vi.fn(created);
+    const { result } = renderHook(() => useUserProfileAddEmailController({ username: 'person@example.com', onCreate }));
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.onEmailAddressChange('person@example.com'));
+    expect(result.current.canSubmitEmail).toBe(false);
+    act(() => result.current.onSubmit());
+    expect(onCreate).not.toHaveBeenCalled();
+    expect(result.current.isPending).toBe(false);
+
+    act(() => result.current.onEmailAddressChange('other@example.com'));
+    expect(result.current.canSubmitEmail).toBe(true);
   });
 });
