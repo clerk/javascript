@@ -1,14 +1,14 @@
-import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
-import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type { UserProfileEditNameValue } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-edit-name.dialog';
+import type { FormError } from '@clerk/mosaic/utils/form-error';
+import { SaveError } from '@clerk/mosaic/utils/form-error';
 import { useState } from 'react';
 
 export interface UserProfileEditNameFixtureOptions {
   firstName?: string;
   lastName?: string;
   latency?: number;
-  /** Rejects every save instead of committing it. */
-  failWith?: UserProfileFormError;
+  /** Fails every save instead of committing it. */
+  failWith?: FormError;
 }
 
 /** Stands in for the model. Everything else the dialog needs belongs to the controller. */
@@ -29,7 +29,7 @@ export function useUserProfileEditNameFixture({
     onSubmitName: async (value: UserProfileEditNameValue) => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith) {
-        throw new UserProfileSaveError(failWith.message ?? 'Something went wrong.', failWith.fields);
+        throw new SaveError(failWith);
       }
       setName(value);
     },

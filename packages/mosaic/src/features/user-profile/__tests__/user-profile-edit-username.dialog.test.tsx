@@ -3,27 +3,40 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../../components/button';
+import type { MosaicLocalization } from '../../../localization';
 import { MosaicProvider } from '../../../MosaicProvider';
+import { SaveError } from '../../../utils/form-error';
+import { useUserProfileEditUsernameController } from '../user-profile-account-section/user-profile-edit-username.controller';
 import type { UserProfileEditUsernameDialogProps } from '../user-profile-account-section/user-profile-edit-username.dialog';
 import { UserProfileEditUsernameDialog } from '../user-profile-account-section/user-profile-edit-username.dialog';
 
-function renderView(overrides: Partial<UserProfileEditUsernameDialogProps> = {}) {
-  const props: UserProfileEditUsernameDialogProps = {
+type ViewProps = Omit<UserProfileEditUsernameDialogProps, 'form'> & {
+  onSubmit: (username: string) => Promise<void>;
+};
+
+function View({ onSubmit, ...props }: ViewProps) {
+  const { form } = useUserProfileEditUsernameController({ username: 'prestonxyz', onSubmit });
+  return (
+    <UserProfileEditUsernameDialog
+      {...props}
+      form={form}
+    />
+  );
+}
+
+function renderView(overrides: Partial<ViewProps> = {}, localization?: MosaicLocalization) {
+  const props: ViewProps = {
     open: true,
     onOpenChange: vi.fn(),
-    username: 'prestonxyz',
-    onUsernameChange: vi.fn(),
-    onSubmit: vi.fn(),
+    onSubmit: vi.fn(() => Promise.resolve()),
     ...overrides,
   };
-  return {
-    props,
-    ...render(
-      <MosaicProvider>
-        <UserProfileEditUsernameDialog {...props} />
-      </MosaicProvider>,
-    ),
-  };
+  render(
+    <MosaicProvider localization={localization}>
+      <View {...props} />
+    </MosaicProvider>,
+  );
+  return props;
 }
 
 const usernameField = () => screen.getByLabelText('Username');
@@ -36,7 +49,7 @@ describe('UserProfileEditUsernameDialog', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('names the dialog and shows the value it was given', () => {
+  it('names the dialog and shows the saved username', () => {
     renderView();
 
     expect(screen.getByRole('dialog', { name: 'Edit username' })).toBeInTheDocument();
@@ -46,97 +59,98 @@ describe('UserProfileEditUsernameDialog', () => {
   it('opens on the field rather than the corner dismiss', async () => {
     renderView();
 
-    // `FloatingFocusManager` moves focus in an effect, hence the wait.
     await waitFor(() => expect(usernameField()).toHaveFocus());
   });
 
   it('asks to open from the trigger', async () => {
-    const onOpenChange = vi.fn();
     const user = userEvent.setup();
-    renderView({ open: false, onOpenChange, trigger: <Button>Edit username</Button> });
+    const props = renderView({ open: false, trigger: <Button>Edit username</Button> });
 
     await user.click(screen.getByRole('button', { name: 'Edit username' }));
 
-    expect(onOpenChange).toHaveBeenCalledWith(true, expect.anything());
+    expect(props.onOpenChange).toHaveBeenCalledWith(true, expect.anything());
   });
 
-  it('reports each keystroke, holding nothing itself', async () => {
-    const onUsernameChange = vi.fn();
+  it('withholds the save until the value moves, keeping the action reachable', async () => {
     const user = userEvent.setup();
-    renderView({ onUsernameChange });
+    const props = renderView();
 
-    await user.type(usernameField(), 'x');
+    expect(saveButton()).toHaveAttribute('aria-disabled', 'true');
+    await user.click(saveButton());
+    await user.type(usernameField(), '{Enter}');
 
-    expect(onUsernameChange).toHaveBeenCalledWith('prestonxyzx');
-    // Controlled: the rendered value only moves when the caller says so.
-    expect(usernameField()).toHaveValue('prestonxyz');
+    expect(props.onSubmit).not.toHaveBeenCalled();
   });
 
   it('submits from the action and from enter in the field', async () => {
-    const onSubmit = vi.fn();
     const user = userEvent.setup();
-    renderView({ onSubmit });
+    const props = renderView({ onSubmit: vi.fn(() => Promise.reject(new SaveError({ global: { message: 'no' } }))) });
 
+    await user.type(usernameField(), 'x');
     await user.click(saveButton());
-    // One field, so native implicit submission carries Enter with no submit button in the form.
+    await screen.findByRole('alert');
     await user.type(usernameField(), '{Enter}');
 
-    expect(onSubmit).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(props.onSubmit).toHaveBeenCalledTimes(2));
+    expect(props.onSubmit).toHaveBeenCalledWith('prestonxyzx');
   });
 
   it('asks to close from cancel', async () => {
-    const onOpenChange = vi.fn();
     const user = userEvent.setup();
-    renderView({ onOpenChange });
+    const props = renderView();
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
-    expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+    expect(props.onOpenChange).toHaveBeenCalledWith(false, expect.anything());
   });
 
-  it('announces the failure in a negative banner', () => {
-    renderView({ error: { message: 'Your username could not be updated.' } });
+  it('announces a general failure in a negative banner', async () => {
+    const user = userEvent.setup();
+    renderView({
+      onSubmit: () => Promise.reject(new SaveError({ global: { message: 'Your username could not be updated.' } })),
+    });
 
-    const banner = screen.getByRole('alert');
+    await user.type(usernameField(), 'x');
+    await user.click(saveButton());
+
+    const banner = await screen.findByRole('alert');
     expect(banner).toHaveAttribute('data-color', 'negative');
     expect(banner).toHaveTextContent('Your username could not be updated.');
     expect(usernameField()).not.toHaveAttribute('aria-invalid', 'true');
   });
 
-  it('renders a field-scoped failure with no banner', () => {
-    renderView({ error: { fields: { username: 'That username is taken.' } } });
-
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-    expect(screen.getByText('That username is taken.')).toBeInTheDocument();
-    expect(usernameField()).toHaveAttribute('aria-invalid', 'true');
-  });
-
-  it('withholds the save while the caller says the value is unacceptable', async () => {
-    const onSubmit = vi.fn();
+  it('shows the translation for the error code on the field, with no banner', async () => {
     const user = userEvent.setup();
-    renderView({ canSave: false, onSubmit });
+    renderView(
+      {
+        onSubmit: () =>
+          Promise.reject(
+            new SaveError({
+              fields: { username: { code: 'form_identifier_exists', paramName: 'username', message: 'Taken.' } },
+            }),
+          ),
+      },
+      { overrides: { 'errors.form_identifier_exists__username': 'Ese nombre de usuario ya existe.' } },
+    );
 
-    // Inert but still reachable, so the reason stays discoverable by keyboard.
-    expect(saveButton()).toHaveAttribute('aria-disabled', 'true');
+    await user.type(usernameField(), 'x');
     await user.click(saveButton());
-    await user.type(usernameField(), '{Enter}');
 
-    expect(onSubmit).not.toHaveBeenCalled();
+    await waitFor(() => expect(usernameField()).toHaveAccessibleDescription('Ese nombre de usuario ya existe.'));
+    expect(usernameField()).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
   it('stays inert while the save runs', async () => {
-    const onSubmit = vi.fn();
-    const onUsernameChange = vi.fn();
     const user = userEvent.setup();
-    renderView({ isSaving: true, onSubmit, onUsernameChange });
+    const props = renderView({ onSubmit: vi.fn(() => new Promise<void>(() => {})) });
 
-    await user.type(usernameField(), 'ada');
+    await user.type(usernameField(), 'x');
+    await user.click(saveButton());
 
     expect(usernameField()).toBeDisabled();
-    expect(onUsernameChange).not.toHaveBeenCalled();
-    // Busy, not unavailable: the pending affordance is `isPending`, not a second disabled state.
     expect(saveButton()).toHaveAttribute('aria-busy', 'true');
     await user.click(saveButton());
-    expect(onSubmit).not.toHaveBeenCalled();
+    expect(props.onSubmit).toHaveBeenCalledOnce();
   });
 });

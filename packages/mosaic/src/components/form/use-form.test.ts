@@ -1,6 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
+import { SaveError } from '../../utils/form-error';
 import type { FieldFeedback } from './form-submit-error';
 import { FormSubmitError } from './form-submit-error';
 import { useForm } from './use-form';
@@ -101,6 +102,25 @@ describe('useForm', () => {
     expect(result.current.fields.username.feedback).toBeUndefined();
   });
 
+  it('localizes a SaveError onto the form message and field feedback', async () => {
+    const failure = new SaveError<'username'>({
+      global: { code: 'unknown_code', message: 'Could not save' },
+      fields: { username: { code: 'generic' } },
+    });
+    const { result } = renderHook(() =>
+      useForm({ initialValues: { username: 'alex' }, onSubmit: () => Promise.reject(failure) }),
+    );
+    await act(async () => {
+      result.current.submit();
+      await flush();
+    });
+    expect(result.current.error).toBe('Could not save');
+    expect(result.current.fields.username.feedback).toEqual({
+      type: 'error',
+      message: 'Something went wrong. Please try again.',
+    });
+  });
+
   it('maps a fields-only FormSubmitError onto field feedback with no form message', async () => {
     const failure = new FormSubmitError({ fields: { username: 'Taken', bio: 'Too long' } });
     expect(failure.message).toBe('Taken Too long');
@@ -116,36 +136,32 @@ describe('useForm', () => {
     expect(result.current.fields.bio.feedback).toEqual({ type: 'error', message: 'Too long' });
   });
 
-  it('shows only the message for a plain Error and a generic message otherwise', async () => {
-    const plain = renderHook(() =>
-      useForm({ initialValues: { username: '' }, onSubmit: () => Promise.reject(new Error('Nope')) }),
-    );
-    await act(async () => {
-      plain.result.current.submit();
-      await flush();
-    });
-    expect(plain.result.current.error).toBe('Nope');
-
-    const cause: unknown = 'boom';
-    const unknown = renderHook(() =>
-      useForm({
-        initialValues: { username: '' },
-        onSubmit: async () => {
-          await Promise.resolve();
-          throw cause;
-        },
-      }),
-    );
-    await act(async () => {
-      unknown.result.current.submit();
-      await flush();
-    });
-    expect(unknown.result.current.error).toBe('Something went wrong. Please try again.');
+  it('shows the generic message and logs the cause for an unrecognized rejection', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const causes: unknown[] = [new Error('Nope'), 'boom'];
+    for (const cause of causes) {
+      const { result } = renderHook(() =>
+        useForm({
+          initialValues: { username: '' },
+          onSubmit: async () => {
+            await Promise.resolve();
+            throw cause;
+          },
+        }),
+      );
+      await act(async () => {
+        result.current.submit();
+        await flush();
+      });
+      expect(result.current.error).toBe('Something went wrong. Please try again.');
+      expect(log).toHaveBeenCalledWith(cause);
+    }
+    log.mockRestore();
   });
 
   it('falls back to the generic message when a submit error has nothing to show', async () => {
     const empty = renderHook(() =>
-      useForm({ initialValues: { username: '' }, onSubmit: () => Promise.reject(new Error()) }),
+      useForm({ initialValues: { username: '' }, onSubmit: () => Promise.reject(new SaveError({})) }),
     );
     await act(async () => {
       empty.result.current.submit();
@@ -181,7 +197,7 @@ describe('useForm', () => {
       useForm({
         initialValues: { username: '' },
         onSubmit: () => {
-          throw new Error('Nope');
+          throw new FormSubmitError({ message: 'Nope' });
         },
       }),
     );
@@ -209,7 +225,7 @@ describe('useForm', () => {
     const { result } = renderHook(() =>
       useForm({
         initialValues: { username: '' },
-        onSubmit: () => (fail ? Promise.reject(new Error('Nope')) : Promise.resolve()),
+        onSubmit: () => (fail ? Promise.reject(new FormSubmitError({ message: 'Nope' })) : Promise.resolve()),
       }),
     );
     await act(async () => {

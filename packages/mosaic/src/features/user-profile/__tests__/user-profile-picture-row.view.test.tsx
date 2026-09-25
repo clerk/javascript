@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
+import { SaveError } from '../../../utils/form-error';
 import type { UserProfilePictureRowViewProps } from '../user-profile-account-section/user-profile-picture-row.view';
 import { UserProfilePictureRowView } from '../user-profile-account-section/user-profile-picture-row.view';
 
@@ -18,18 +19,41 @@ function renderView(overrides: Partial<UserProfilePictureRowViewProps> = {}) {
 }
 
 describe('UserProfilePictureRowView', () => {
-  it('renders and clears the error supplied by the section', () => {
-    const { rerender } = renderView({ errorMessage: 'File size exceeds the maximum limit of 10MB.' });
+  it('shows why removing the picture failed', async () => {
+    const user = userEvent.setup();
+    renderView({
+      hasImage: true,
+      onRemove: vi.fn().mockRejectedValue(new SaveError({ global: { code: 'action_blocked' } })),
+    });
 
-    expect(screen.getByRole('alert')).toHaveTextContent('File size exceeds the maximum limit of 10MB.');
+    await user.click(screen.getByRole('button', { name: 'Manage profile picture' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove avatar' }));
 
-    rerender(
-      <MosaicProvider>
-        <UserProfilePictureRowView name='Preston Booth' />
-      </MosaicProvider>,
-    );
+    expect(await screen.findByRole('alert')).toHaveTextContent("This action couldn't be completed.");
+  });
 
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  it('replaces a rejected pick with the result of a removal', async () => {
+    const user = userEvent.setup();
+    const { container } = renderView({
+      hasImage: true,
+      onChange: vi.fn(),
+      onRemove: vi.fn().mockRejectedValue(new SaveError({ global: { code: 'action_blocked' } })),
+    });
+    const input = container.querySelector('input[type="file"]');
+    if (!(input instanceof HTMLInputElement)) {
+      throw new Error('expected a file input');
+    }
+
+    const tooBig = new File(['x'], 'big.png', { type: 'image/png' });
+    Object.defineProperty(tooBig, 'size', { value: 11 * 1024 * 1024 });
+    await user.upload(input, tooBig);
+    const rejection = screen.getByRole('alert').textContent;
+
+    await user.click(screen.getByRole('button', { name: 'Manage profile picture' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove avatar' }));
+
+    await waitFor(() => expect(screen.getByRole('alert')).not.toHaveTextContent(rejection ?? ''));
+    expect(screen.getByRole('alert')).toHaveTextContent("This action couldn't be completed.");
   });
 
   it('offers Upload while the avatar is only a generated default', () => {

@@ -12,18 +12,16 @@ export const userProfileAccountSectionMessages = {
     manage: 'Manage profile picture',
     change: 'Change avatar',
     remove: 'Remove avatar',
-
-    errors: {
-      accept: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
-      size: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
-      overflow: 'Only one file can be uploaded at a time.',
-    },
   },
   name: {
     label: 'Name',
+    empty: 'No name added',
     edit: 'Edit name',
+    add: 'Add name',
+    managedBy: 'Managed by {name}',
 
     dialogTitle: 'Edit name',
+    addDialogTitle: 'Add name',
     firstNameLabel: 'First name',
     lastNameLabel: 'Last name',
     cancel: 'Cancel',
@@ -31,9 +29,12 @@ export const userProfileAccountSectionMessages = {
   },
   username: {
     label: 'Username',
+    empty: 'No username added',
     edit: 'Edit username',
+    add: 'Add username',
 
     dialogTitle: 'Edit username',
+    addDialogTitle: 'Add username',
     fieldLabel: 'Username',
     cancel: 'Cancel',
     save: 'Save changes',

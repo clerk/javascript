@@ -16,7 +16,7 @@ export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUs
       <Section.Item>
         <Section.Content>
           <Section.Label>{m.username.label}</Section.Label>
-          <Section.Description>{username}</Section.Description>
+          <Section.Description>{username || m.username.empty}</Section.Description>
         </Section.Content>
         {onSubmit ? (
           <Section.Actions>
@@ -34,18 +34,21 @@ export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUs
 function EditUsername({ username, onSubmit }: { username: string; onSubmit: (username: string) => Promise<void> }) {
   const m = useMessages('userProfileAccountSection');
   const controller = useUserProfileEditUsernameController({ username, onSubmit });
+  const isSet = Boolean(username);
 
   return (
     <UserProfileEditUsernameDialog
-      {...controller}
+      form={controller.form}
       open={controller.isOpen}
+      onOpenChange={controller.onOpenChange}
+      title={isSet ? m.username.dialogTitle : m.username.addDialogTitle}
       trigger={
         <Button
           color='neutral'
           size='sm'
           variant='outline'
         >
-          {m.username.edit}
+          {isSet ? m.username.edit : m.username.add}
         </Button>
       }
     />

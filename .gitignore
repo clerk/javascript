@@ -92,6 +92,7 @@ yalc.lock
 # Workflow Outputs
 /packages/*/*.tgz
 /packages/*/tsconfig*.vitest-temp.json
+/packages/*/.vitest/
 /packages/*/tsup.config.bundled_*
 
 # Scripts

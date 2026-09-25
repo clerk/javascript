@@ -1,5 +1,4 @@
 import { Button } from '@clerk/mosaic/components/button';
-import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type {
   UserProfileEmail,
   UserProfilePhone,
@@ -8,6 +7,7 @@ import { UserProfileAccountSectionView } from '@clerk/mosaic/features/user-profi
 import type { UserProfileAddPhoneDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
 import { UserProfileVerifyEmailLinkDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-link.dialog';
 import { UserProfileVerifyEmailSsoDialog } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-verify-email-sso.dialog';
+import type { FormError } from '@clerk/mosaic/utils/form-error';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -40,14 +40,16 @@ function AccountSection({
   failEmailVerification = false,
   emailRemovalState,
   phoneRemovalState,
+  nameManagedBy,
 }: {
   allowMultipleAccounts: boolean;
   failAt?: UserProfileAddPhoneDialogProps['step'];
-  failWith?: UserProfileFormError;
-  usernameFailWith?: UserProfileFormError;
+  failWith?: FormError;
+  usernameFailWith?: FormError;
   failEmailVerification?: boolean;
   emailRemovalState?: 'pending' | 'error';
   phoneRemovalState?: 'pending' | 'error';
+  nameManagedBy?: { name: string; iconUrl?: string };
 }) {
   const [phoneRemovalFailed, setPhoneRemovalFailed] = useState(false);
   const [emailRemovalFailed, setEmailRemovalFailed] = useState(false);
@@ -86,6 +88,8 @@ function AccountSection({
       imageUrl={imageUrl}
       phones={phones}
       {...addPhone}
+      nameManagedBy={nameManagedBy}
+      onSubmitName={nameManagedBy ? undefined : editName.onSubmitName}
       onProfilePictureChange={showFile}
       onRemoveProfilePicture={clearImage}
       onManageEmail={() => undefined}
@@ -118,6 +122,19 @@ function AccountSection({
 
 export function Default() {
   return <AccountSection allowMultipleAccounts={false} />;
+}
+
+/**
+ * An enterprise connection owns the name, so the row names who manages it in place of an edit
+ * action. The connection's logo leads the label, or a generic lock when the IDP ships none.
+ */
+export function NameManagedByConnection() {
+  return (
+    <AccountSection
+      allowMultipleAccounts={false}
+      nameManagedBy={{ name: 'Okta', iconUrl: '/okta-placeholder.svg' }}
+    />
+  );
 }
 
 export function MultipleAccounts() {
@@ -207,8 +224,8 @@ export function EditNameFails() {
     <AccountSection
       allowMultipleAccounts={false}
       failWith={{
-        message: 'Your name could not be updated.',
-        fields: { lastName: 'Last name must be 64 characters or fewer.' },
+        global: { message: 'Your name could not be updated.' },
+        fields: { lastName: { message: 'Last name must be 64 characters or fewer.' } },
       }}
     />
   );
@@ -219,8 +236,8 @@ export function EditUsernameFails() {
     <AccountSection
       allowMultipleAccounts={false}
       usernameFailWith={{
-        message: 'Your username could not be updated.',
-        fields: { username: 'That username is already taken.' },
+        global: { message: 'Your username could not be updated.' },
+        fields: { username: { message: 'That username is already taken.' } },
       }}
     />
   );
