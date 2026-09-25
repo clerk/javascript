@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -389,6 +390,27 @@ export class SignIn extends BaseResource implements SignInResource {
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
 
+    const isChallengePending = () => !!this.protectCheck || this.status === 'needs_protect_check';
+    const pendingHandOff = () => {
+      const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
+      return status === 'unverified' ? externalVerificationRedirectURL : null;
+    };
+
+    // A pending challenge with nowhere to navigate to. Throw rather than return, so the method still
+    // either navigates or throws: a caller that doesn't handle challenges gets an error it can
+    // recognise instead of a silent success. A caller that does runs the challenge and calls back
+    // in with `continueSignIn`.
+    const throwChallengeRequired = (): never => {
+      throw new ClerkRuntimeError('A verification challenge must be completed before this sign-in can continue.', {
+        code: ERROR_CODES.PROTECT_CHECK_REQUIRED,
+      });
+    };
+
+    // The hand-off a challenged create built, if any. The server builds it before deciding, so a
+    // challenge on create can arrive with a usable redirect: that means "go to the identity
+    // provider first" and the challenge runs on the way back, where the callback routes to it.
+    let challengedCreateHandOff: URL | null = null;
+
     if (!this.id || !continueSignIn) {
       await this.create({
         strategy,
@@ -396,6 +418,13 @@ export class SignIn extends BaseResource implements SignInResource {
         redirectUrl,
         actionCompleteRedirectUrl,
       });
+
+      if (isChallengePending()) {
+        challengedCreateHandOff = pendingHandOff();
+        if (!challengedCreateHandOff) {
+          throwChallengeRequired();
+        }
+      }
     }
 
     if (strategy === 'enterprise_sso') {
@@ -406,6 +435,17 @@ export class SignIn extends BaseResource implements SignInResource {
         oidcPrompt,
         enterpriseConnectionId,
       });
+
+      // A challenged prepare builds no verification, so any redirect left on the sign-in is from an
+      // earlier attempt and may be for another connection. Only this call's create hand-off is safe
+      // to follow.
+      if (isChallengePending()) {
+        if (challengedCreateHandOff) {
+          navigateCallback(challengedCreateHandOff);
+          return;
+        }
+        throwChallengeRequired();
+      }
     }
 
     const { status, externalVerificationRedirectURL } = this.firstFactorVerification;

@@ -1,3 +1,4 @@
+export * from './ActionBlockedCard';
 export * from './CalloutWithAction';
 export * from './constants';
 export * from './EmailLinkStatusCard';

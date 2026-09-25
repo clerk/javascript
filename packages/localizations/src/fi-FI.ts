@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Lisää uusi avain',
     action__search: 'Etsi avaimia',
@@ -2096,6 +2101,7 @@ export const fiFI: LocalizationResource = {
     protect_check_execution_failed: 'Tarkistus ei valmistunut. Yritä uudelleen.',
     protect_check_invalid_script: 'Tarkistusta ei voitu ladata. Ota yhteyttä tukeen, jos ongelma jatkuu.',
     protect_check_invalid_sdk_url: 'Tarkistusta ei voitu käynnistää. Ota yhteyttä tukeen.',
+    protect_check_required: undefined,
     protect_check_script_load_failed:
       'Tarkistusta ei voitu ladata. Syynä voi olla verkkoyhteys tai sisällön suojauskäytäntö, joka estää tarkistuksen skriptin. Yritä uudelleen tai ota yhteyttä tukeen.',
     protect_check_timed_out: 'Tarkistus ei valmistunut ajoissa. Yritä uudelleen.',

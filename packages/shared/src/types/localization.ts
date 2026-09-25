@@ -2240,6 +2240,20 @@ export type __internal_LocalizationResource = {
       doneButton: LocalizationValue;
     };
   };
+  /**
+   * The screen shown when a request is blocked and there is no way for the end
+   * user to retry. These are the fallbacks: an application can supply its own
+   * title and description, and when it does they are used instead.
+   */
+  actionBlocked: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue;
+    /**
+     * Labels the short reference the end user can quote when contacting
+     * support.
+     */
+    traceIdLabel: LocalizationValue;
+  };
   apiKeys: {
     formTitle: LocalizationValue;
     formHint: LocalizationValue;
@@ -2410,6 +2424,7 @@ type UnstableErrors = WithParamName<{
   protect_check_execution_failed: LocalizationValue;
   protect_check_invalid_script: LocalizationValue;
   protect_check_invalid_sdk_url: LocalizationValue;
+  protect_check_required: LocalizationValue;
   protect_check_script_load_failed: LocalizationValue;
   protect_check_timed_out: LocalizationValue;
   protect_check_unsupported_environment: LocalizationValue;
