@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type { SignInResource } from '@clerk/shared/types';
 import { describe, expect, it } from 'vitest';
 
@@ -64,6 +65,24 @@ describe('SignInFactorOne SSO bypass', () => {
     expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith(
       expect.objectContaining({ strategy: 'enterprise_sso', continueSignIn: true }),
     );
+  });
+
+  it('routes to the challenge when preparing the hand-off raises one', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withEmailAddress();
+      f.startSignInWithEnterpriseSSO({ supportSSOBypass: true });
+    });
+    // No redirect is issued: the sign-in comes back sitting on the challenge and the call throws.
+    fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(() => {
+      (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-abc' };
+      throw new ClerkRuntimeError('challenge required', { code: 'protect_check_required' });
+    });
+
+    const { userEvent } = render(<SignInFactorOne />, { wrapper });
+    await userEvent.click(await screen.findByText('Continue with SSO'));
+
+    expect(fixtures.router.navigate).toHaveBeenCalledWith('../protect-check');
+    expect(screen.queryByText(/needs an extra verification step/i)).not.toBeInTheDocument();
   });
 
   it('prepares the email code with the handle and warns on the code screen', async () => {

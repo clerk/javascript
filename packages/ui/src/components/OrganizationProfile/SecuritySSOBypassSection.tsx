@@ -31,16 +31,44 @@ export const SecuritySSOBypassSection = ({ onManage }: SecuritySSOBypassSectionP
     >
       <Col gap={4}>
         <Flex
-          align='start'
+          align='center'
           justify='between'
           gap={3}
         >
-          <Text
-            as='p'
-            elementDescriptor={descriptors.organizationProfileSecuritySsoBypassDescription}
-            colorScheme='secondary'
-            localizationKey={localizationKeys('organizationProfile.securityPage.ssoBypassSection.description')}
-          />
+          {isLoading ? (
+            <Spinner
+              size='xs'
+              colorScheme='neutral'
+              elementDescriptor={descriptors.spinner}
+            />
+          ) : error ? (
+            <Alert
+              variant='danger'
+              title={localizationKeys('organizationProfile.securityPage.ssoBypassSection.error__load')}
+              subtitle={error.message}
+            />
+          ) : (
+            <Flex
+              align='center'
+              gap={2}
+            >
+              <Text
+                as='span'
+                elementDescriptor={descriptors.organizationProfileSecuritySsoBypassCountLabel}
+                localizationKey={localizationKeys('organizationProfile.securityPage.ssoBypassSection.allowlistLabel')}
+              />
+              <Badge
+                elementDescriptor={descriptors.organizationProfileSecuritySsoBypassCountBadge}
+                localizationKey={
+                  count === 1
+                    ? localizationKeys('organizationProfile.securityPage.ssoBypassSection.allowlistCount__one')
+                    : localizationKeys('organizationProfile.securityPage.ssoBypassSection.allowlistCount', {
+                        count: String(count),
+                      })
+                }
+              />
+            </Flex>
+          )}
 
           <ThreeDotsMenu
             elementId='ssoBypass'
@@ -53,43 +81,12 @@ export const SecuritySSOBypassSection = ({ onManage }: SecuritySSOBypassSectionP
           />
         </Flex>
 
-        {isLoading ? (
-          <Flex align='center'>
-            <Spinner
-              size='xs'
-              colorScheme='neutral'
-              elementDescriptor={descriptors.spinner}
-            />
-          </Flex>
-        ) : error ? (
-          <Alert
-            variant='danger'
-            title={localizationKeys('organizationProfile.securityPage.ssoBypassSection.error__load')}
-            subtitle={error.message}
-          />
-        ) : (
-          <Flex
-            align='center'
-            gap={2}
-          >
-            <Text
-              as='span'
-              elementDescriptor={descriptors.organizationProfileSecuritySsoBypassCountLabel}
-              colorScheme='secondary'
-              localizationKey={localizationKeys('organizationProfile.securityPage.ssoBypassSection.allowlistLabel')}
-            />
-            <Badge
-              elementDescriptor={descriptors.organizationProfileSecuritySsoBypassCountBadge}
-              localizationKey={
-                count === 1
-                  ? localizationKeys('organizationProfile.securityPage.ssoBypassSection.allowlistCount__one')
-                  : localizationKeys('organizationProfile.securityPage.ssoBypassSection.allowlistCount', {
-                      count: String(count),
-                    })
-              }
-            />
-          </Flex>
-        )}
+        <Text
+          as='p'
+          elementDescriptor={descriptors.organizationProfileSecuritySsoBypassDescription}
+          colorScheme='secondary'
+          localizationKey={localizationKeys('organizationProfile.securityPage.ssoBypassSection.description')}
+        />
       </Col>
     </ProfileSection.Root>
   );

@@ -4,21 +4,43 @@ import { panelStyles, Profile } from '../../components/profile';
 import { Tabs } from '../../components/tabs';
 import { useMessages } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
+import type { InvitationsTableTabViewProps } from './invitations-table-tab.types';
+import { InvitationsTableTabView } from './invitations-table-tab.view';
 import type { MembersTableTabViewProps } from './members-table-tab.types';
 import { MembersTableTabView } from './members-table-tab.view';
+import type { RequestsTableTabViewProps } from './requests-table-tab.types';
+import { RequestsTableTabView } from './requests-table-tab.view';
 
 export interface OrganizationProfileMembersPanelViewProps {
   members?: MembersTableTabViewProps;
+  invitations?: InvitationsTableTabViewProps;
+  requests?: RequestsTableTabViewProps;
 }
 
-export function OrganizationProfileMembersPanelView({ members }: OrganizationProfileMembersPanelViewProps) {
+export function OrganizationProfileMembersPanelView({
+  members,
+  invitations,
+  requests,
+}: OrganizationProfileMembersPanelViewProps) {
   const m = useMessages('organizationProfile');
   const membersMessages = useMessages('membersTableTab');
+  const invitationsMessages = useMessages('invitationsTableTab');
+  const requestsMessages = useMessages('requestsTableTab');
   const tabs = [
     {
       id: 'members',
       label: membersMessages.title,
       content: members ? <MembersTableTabView {...members} /> : null,
+    },
+    {
+      id: 'invitations',
+      label: invitationsMessages.title,
+      content: invitations ? <InvitationsTableTabView {...invitations} /> : null,
+    },
+    {
+      id: 'requests',
+      label: requestsMessages.title,
+      content: requests ? <RequestsTableTabView {...requests} /> : null,
     },
   ].filter(tab => tab.content !== null);
 

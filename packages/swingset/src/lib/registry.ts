@@ -254,6 +254,7 @@ import {
   Empty as TableEmpty,
   meta as tableMeta,
   Overflow as TableOverflow,
+  Search as TableSearch,
   Selection as TableSelection,
   Sorting as TableSorting,
 } from '../stories/table.stories';
@@ -701,6 +702,7 @@ const tableModule: StoryModule = {
   meta: tableMeta,
   Default: TableDefault,
   Sorting: TableSorting,
+  Search: TableSearch,
   Selection: TableSelection,
   Empty: TableEmpty,
   Overflow: TableOverflow,

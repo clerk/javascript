@@ -1,5 +1,27 @@
 # @clerk/tanstack-react-start
 
+## 1.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`645a532`](https://github.com/clerk/javascript/commit/645a5327d9c7cae8052e39958ec4d737457d179a), [`84ee588`](https://github.com/clerk/javascript/commit/84ee588a712ffa0bb2988531d7a2727c9e06ac37), [`4e538ac`](https://github.com/clerk/javascript/commit/4e538ac07ed412706516531d9be9696bbd31bf24)]:
+  - @clerk/shared@4.36.0
+  - @clerk/react@6.17.2
+  - @clerk/backend@3.20.1
+
+## 1.6.0
+
+### Minor Changes
+
+- In development, missing Clerk keys no longer activate keyless mode. When `VITE_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` are not set, the SDK now fails with an error directing you to run `npx clerk@latest init`, which provisions a Clerk application and writes the keys to `.env.local`. Keys that keyless mode stored in the `.clerk/` directory are no longer read, and `VITE_CLERK_KEYLESS_DISABLED` and `CLERK_KEYLESS_DISABLED` no longer have any effect. Existing apps with configured keys are unaffected. ([#9578](https://github.com/clerk/javascript/pull/9578)) by [@djgould](https://github.com/djgould)
+
+### Patch Changes
+
+- Updated dependencies [[`b3af79e`](https://github.com/clerk/javascript/commit/b3af79e946aaa403595b31e472b07b138db39dc6), [`cc6f11a`](https://github.com/clerk/javascript/commit/cc6f11af564b62daf186f9721594efd864ce093f), [`9d78a1f`](https://github.com/clerk/javascript/commit/9d78a1f42e83874ebac54b67d81d444b376350e5), [`d46b544`](https://github.com/clerk/javascript/commit/d46b5446e89f15c5532bfbbc09fdc05a0fbcbf8d), [`f50f48c`](https://github.com/clerk/javascript/commit/f50f48cf3c67807c8def30d4a6d29d6c7bf904d2)]:
+  - @clerk/shared@4.35.0
+  - @clerk/backend@3.20.0
+  - @clerk/react@6.17.1
+
 ## 1.5.16
 
 ### Patch Changes

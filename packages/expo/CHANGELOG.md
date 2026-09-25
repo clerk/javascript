@@ -1,5 +1,31 @@
 # Change Log
 
+## 4.7.1
+
+### Patch Changes
+
+- Updated dependencies [[`645a532`](https://github.com/clerk/javascript/commit/645a5327d9c7cae8052e39958ec4d737457d179a), [`84ee588`](https://github.com/clerk/javascript/commit/84ee588a712ffa0bb2988531d7a2727c9e06ac37), [`4e538ac`](https://github.com/clerk/javascript/commit/4e538ac07ed412706516531d9be9696bbd31bf24)]:
+  - @clerk/shared@4.36.0
+  - @clerk/clerk-js@6.34.1
+  - @clerk/react@6.17.2
+
+## 4.7.0
+
+### Minor Changes
+
+- Add `useBiometricCredentials().reverify()` for first-, second-, and multi-factor verification of the active session on iOS and Android. If the first factor still requires a second factor, reverification continues the same attempt automatically. Successful verification refreshes the JavaScript session token without creating a new session. ([#9829](https://github.com/clerk/javascript/pull/9829)) by [@seanperez29](https://github.com/seanperez29)
+
+  New biometric enrollments default to `biometry_current_set`, requiring biometrics without device-passcode fallback. Existing credentials keep their original policy; reverification on iOS and Android requires the stronger policy and returns `biometric_credential_policy_incompatible` for older, weaker credentials. Apps should offer another verification method in that case. Reverification requires an updated native development build.
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.5.5` to `1.5.6`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.6. ([#9892](https://github.com/clerk/javascript/pull/9892)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`b3af79e`](https://github.com/clerk/javascript/commit/b3af79e946aaa403595b31e472b07b138db39dc6), [`cc6f11a`](https://github.com/clerk/javascript/commit/cc6f11af564b62daf186f9721594efd864ce093f), [`ee136a9`](https://github.com/clerk/javascript/commit/ee136a9ca41c3f3223eea516c7f3d2e7053ba2e8), [`d46b544`](https://github.com/clerk/javascript/commit/d46b5446e89f15c5532bfbbc09fdc05a0fbcbf8d), [`f50f48c`](https://github.com/clerk/javascript/commit/f50f48cf3c67807c8def30d4a6d29d6c7bf904d2)]:
+  - @clerk/clerk-js@6.34.0
+  - @clerk/shared@4.35.0
+  - @clerk/react@6.17.1
+
 ## 4.6.9
 
 ### Patch Changes

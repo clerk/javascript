@@ -1,9 +1,11 @@
 import { formMessages } from '../components/form/form.messages';
+import { invitationsTableTabMessages } from '../features/organization-profile/invitations-table-tab.messages';
 import { membersTableTabMessages } from '../features/organization-profile/members-table-tab.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
 import { organizationProfileApiKeysPanelMessages } from '../features/organization-profile/organization-profile-api-keys-panel.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
 import { organizationProfileWorkspaceSectionMessages } from '../features/organization-profile/organization-profile-workspace-section/organization-profile-workspace-section.messages';
+import { requestsTableTabMessages } from '../features/organization-profile/requests-table-tab.messages';
 import { reverificationMessages } from '../features/reverification/reverification.messages';
 import { userButtonMessages } from '../features/user-button/user-button.messages';
 import { userProfileMessages } from '../features/user-profile/user-profile.messages';
@@ -28,6 +30,8 @@ import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-pr
 export const mosaicMessages = {
   form: formMessages,
   membersTableTab: membersTableTabMessages,
+  invitationsTableTab: invitationsTableTabMessages,
+  requestsTableTab: requestsTableTabMessages,
   organizationProfile: organizationProfileMessages,
   organizationProfileDangerSection: organizationProfileDangerSectionMessages,
   organizationProfileWorkspaceSection: organizationProfileWorkspaceSectionMessages,

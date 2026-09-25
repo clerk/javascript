@@ -20,7 +20,22 @@
  * aligns to its top rather than having its head cut off.
  */
 
+import type React from 'react';
+
 const PROPERTY = '--_cl-keyboard-inset';
+
+const NON_TEXT_INPUT_TYPES = new Set([
+  'button',
+  'checkbox',
+  'color',
+  'file',
+  'hidden',
+  'image',
+  'radio',
+  'range',
+  'reset',
+  'submit',
+]);
 
 let listeners = 0;
 let detach: (() => void) | null = null;
@@ -42,7 +57,7 @@ function measure(): number {
   if (viewport.scale > 1) {
     return 0;
   }
-  return Math.max(0, Math.round(window.innerHeight - (viewport.height + viewport.offsetTop)));
+  return Math.max(0, Math.round(document.documentElement.clientHeight - (viewport.height + viewport.offsetTop)));
 }
 
 function publish(): void {
@@ -79,4 +94,22 @@ export function acquireKeyboardInset(): () => void {
       detach = null;
     }
   };
+}
+
+function opensKeyboard(element: EventTarget | null): element is HTMLElement {
+  return (
+    (element instanceof HTMLInputElement && !NON_TEXT_INPUT_TYPES.has(element.type)) ||
+    element instanceof HTMLTextAreaElement ||
+    (element instanceof HTMLElement && element.isContentEditable)
+  );
+}
+
+// iOS's reveal pan stops at the end of the locked page, leaving the canvas under the keyboard; the inset lifts the dialog instead.
+export function focusWithoutScroll(event: React.TouchEvent): void {
+  const target = event.target;
+  if (!opensKeyboard(target) || target === document.activeElement || target.matches(':disabled')) {
+    return;
+  }
+  event.preventDefault();
+  target.focus({ preventScroll: true });
 }
