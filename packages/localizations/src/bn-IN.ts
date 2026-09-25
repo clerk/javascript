@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const bnIN: LocalizationResource = {
   locale: 'bn-IN',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'নতুন কী যোগ করুন',
     action__search: 'কী অনুসন্ধান করুন',
@@ -962,6 +967,8 @@ export const bnIN: LocalizationResource = {
   formButtonPrimary: 'চালিয়ে যান',
   formButtonPrimary__verify: 'যাচাই করুন',
   formFieldAction__forgotPassword: 'পাসওয়ার্ড ভুলে গেছেন?',
+  formFieldAction__hidePassword: 'পাসওয়ার্ড লুকান',
+  formFieldAction__showPassword: 'পাসওয়ার্ড দেখান',
   formFieldError__matchingPasswords: 'পাসওয়ার্ড মিলেছে।',
   formFieldError__notMatchingPasswords: 'পাসওয়ার্ড মিলে না।',
   formFieldError__verificationLinkExpired: 'যাচাইকরণ লিংকের মেয়াদ শেষ হয়েছে। দয়া করে একটি নতুন লিংক অনুরোধ করুন।',
@@ -1383,6 +1390,52 @@ export const bnIN: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
       ssoSection: {
         badge__active: undefined,
         badge__inProgress: undefined,
@@ -1700,7 +1753,7 @@ export const bnIN: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'আপনার পাসওয়ার্ড রিসেট করার আগে আমাদের আপনার পরিচয় যাচাই করতে হবে।',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
@@ -2042,10 +2095,12 @@ export const bnIN: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
     web3_missing_identifier: 'একটি Web3 ওয়ালেট এক্সটেনশন পাওয়া যায়নি। চালিয়ে যেতে দয়া করে একটি ইনস্টল করুন।',

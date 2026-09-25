@@ -23,9 +23,11 @@ const pages: UserProfileViewProps['pages'] = {
   apiKeys: {
     apiKeys: [],
     searchValue: '',
-    selectedIds: [],
+    totalCount: 0,
+    page: 1,
+    isLoading: false,
     onSearchChange: vi.fn(),
-    onSelectionChange: vi.fn(),
+    onPageChange: vi.fn(),
   },
 };
 

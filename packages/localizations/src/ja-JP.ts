@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const jaJP: LocalizationResource = {
   locale: 'ja-JP',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: '新しいキーを追加',
     action__search: 'キーを検索',
@@ -963,6 +968,8 @@ export const jaJP: LocalizationResource = {
   formButtonPrimary: '続ける',
   formButtonPrimary__verify: '確認する',
   formFieldAction__forgotPassword: 'パスワードをお忘れですか？',
+  formFieldAction__hidePassword: 'パスワードを非表示にする',
+  formFieldAction__showPassword: 'パスワードを表示する',
   formFieldError__matchingPasswords: 'パスワードが一致します。',
   formFieldError__notMatchingPasswords: 'パスワードが一致しません。',
   formFieldError__verificationLinkExpired: '検証リンクの有効期限が切れています。新しいリンクをリクエストしてください。',
@@ -1383,6 +1390,52 @@ export const jaJP: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
       ssoSection: {
         badge__active: undefined,
         badge__inProgress: undefined,
@@ -1700,7 +1753,7 @@ export const jaJP: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'パスワードをリセットする前に、身元を確認する必要があります。',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
@@ -2041,10 +2094,12 @@ export const jaJP: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '既にサインインしています。',
+    sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3ウォレット拡張機能が見つかりません。続行するにはインストールしてください。',

@@ -2,6 +2,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  actionBlocked: {
+    subtitle: 'For your security, this request could not be completed.',
+    title: "We couldn't complete this request",
+    traceIdLabel: 'Reference',
+  },
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
@@ -986,6 +991,8 @@ export const enUS: LocalizationResource = {
   formButtonPrimary: 'Continue',
   formButtonPrimary__verify: 'Verify',
   formFieldAction__forgotPassword: 'Forgot password?',
+  formFieldAction__hidePassword: 'Hide password',
+  formFieldAction__showPassword: 'Show password',
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldError__notMatchingPasswords: "Passwords don't match.",
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
@@ -1412,6 +1419,54 @@ export const enUS: LocalizationResource = {
           'Are you sure you want to remove the connection "{{name}}"? This action is irreversible and deletes the connection and all of its configuration.',
         title: 'Remove SSO connection',
       },
+      ssoBypassPage: {
+        action__add: 'Add',
+        action__search: 'Search users',
+        addForm: {
+          emailPlaceholder: "Enter the member's email address",
+          error__allAlreadyAdded: 'Everyone with that role is already on the allow list.',
+          error__alreadyAdded: 'This member is already on the allow list.',
+          error__memberNotFound: 'No member of this organization has that email address.',
+          modeLabel: 'Add by',
+          mode__email: 'Email',
+          mode__role: 'Role',
+          roleOption: '{{role}} ({{count}})',
+          roleWarning: 'This list does not sync, members are managed manually.',
+          submitButton: 'Add members',
+          subtitle: 'Members on this list can sign in with an email code when SSO is unavailable.',
+          title: 'Add members',
+        },
+        bulkResult: {
+          added: 'Added {{count}} members',
+          addedMember: 'Added member successfully',
+          added__one: 'Added 1 member',
+          domainNotServed:
+            '{{count}} members could not be added because their email address is not served by a connection.',
+          domainNotServed__one:
+            '1 member could not be added because their email address is not served by a connection.',
+          notMember: '{{count}} members could not be added because they are no longer in the organization.',
+          notMember__one: '1 member could not be added because they are no longer in the organization.',
+          unknown: '{{count}} members could not be added.',
+          unknown__one: '1 member could not be added.',
+        },
+        table: {
+          emptyState: 'No members on the allow list',
+          emptyState__search: 'No members match your search',
+          header__actions: 'Actions',
+          header__user: 'User',
+          menuAction__remove: 'Remove',
+        },
+        title: 'SSO bypass',
+      },
+      ssoBypassSection: {
+        allowlistCount: '{{count}} members',
+        allowlistCount__one: '1 member',
+        allowlistLabel: 'Allow list:',
+        description: 'Members on this list can sign in with an email code when SSO is unavailable.',
+        error__load: 'Could not load the SSO allow list',
+        menuAction__manage: 'Manage',
+        title: 'SSO bypass',
+      },
       ssoSection: {
         badge__active: 'Active',
         badge__inProgress: 'In Progress',
@@ -1658,8 +1713,8 @@ export const enUS: LocalizationResource = {
       title: 'Check your email',
     },
     enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
+      subtitle: 'Select an enterprise account to continue.',
+      title: 'Choose an account',
     },
     enterpriseSSO: {
       formButtonPrimary: 'Continue with SSO',
@@ -1729,7 +1784,7 @@ export const enUS: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'We need to verify your identity before resetting your password.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: "Can't use SSO?",
       code: {
         resendButton: "Didn't receive a code? Resend",
@@ -1813,8 +1868,8 @@ export const enUS: LocalizationResource = {
       },
     },
     enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
+      subtitle: 'Select an enterprise account to continue.',
+      title: 'Choose an account',
     },
     legalConsent: {
       checkbox: {
@@ -2068,12 +2123,16 @@ export const enUS: LocalizationResource = {
     protect_check_execution_failed: "Verification didn't complete. Please try again.",
     protect_check_invalid_script: "Couldn't load verification. Please contact support if this persists.",
     protect_check_invalid_sdk_url: "Verification couldn't start. Please contact support.",
+    protect_check_required:
+      "This sign-in needs an extra verification step that can't be shown here. Please try again or use a different sign-in method.",
     protect_check_script_load_failed:
       "Couldn't load verification. This may be caused by a network issue or a Content Security Policy that blocks the verification script. Please try again or contact support.",
     protect_check_timed_out: "Verification didn't complete in time. Please try again.",
     protect_check_unsupported_environment:
       "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
+    sso_bypass_domain_not_served:
+      'This member could not be added because their email address is not served by a connection.',
     ticket_expired_code: 'This link has expired. Please start again or request a new link.',
     ticket_invalid_code:
       'This link is no longer valid or has already been used. Please start again or request a new link.',

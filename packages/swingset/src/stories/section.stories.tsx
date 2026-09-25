@@ -233,7 +233,7 @@ export function MultipleEmailAndPhoneNumbers() {
                   size='sm'
                   variant='ghost'
                 >
-                  <Icon name='ellipsis' />
+                  <Icon name='ellipsis-horizontal' />
                 </Button>
               </Section.Actions>
             </Section.Item>
@@ -249,7 +249,7 @@ export function MultipleEmailAndPhoneNumbers() {
                   size='sm'
                   variant='ghost'
                 >
-                  <Icon name='ellipsis' />
+                  <Icon name='ellipsis-horizontal' />
                 </Button>
               </Section.Actions>
             </Section.Item>
@@ -287,7 +287,7 @@ export function MultipleEmailAndPhoneNumbers() {
                   size='sm'
                   variant='ghost'
                 >
-                  <Icon name='ellipsis' />
+                  <Icon name='ellipsis-horizontal' />
                 </Button>
               </Section.Actions>
             </Section.Item>
@@ -318,7 +318,7 @@ export function ConnectedAccounts() {
                 size='sm'
                 variant='ghost'
               >
-                <Icon name='ellipsis' />
+                <Icon name='ellipsis-horizontal' />
               </Button>
             </Section.Actions>
           </Section.Item>
@@ -337,7 +337,7 @@ export function ConnectedAccounts() {
               >
                 Connect
                 <Icon
-                  name='arrow-right-top'
+                  name='arrow-up-right'
                   placement='inline-end'
                   size='sm'
                 />

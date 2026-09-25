@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const ukUA: LocalizationResource = {
   locale: 'uk-UA',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
@@ -956,6 +961,8 @@ export const ukUA: LocalizationResource = {
   formButtonPrimary: 'Продовжити',
   formButtonPrimary__verify: 'Verify',
   formFieldAction__forgotPassword: 'Забули пароль?',
+  formFieldAction__hidePassword: 'Приховати пароль',
+  formFieldAction__showPassword: 'Показати пароль',
   formFieldError__matchingPasswords: 'Паролі збігаються.',
   formFieldError__notMatchingPasswords: 'Паролі не збігаються.',
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
@@ -1375,6 +1382,52 @@ export const ukUA: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
       ssoSection: {
         badge__active: undefined,
         badge__inProgress: undefined,
@@ -1688,7 +1741,7 @@ export const ukUA: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Необхідно верифікувати вашу особу перед відновленням пароля',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
@@ -2015,10 +2068,12 @@ export const ukUA: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Ви вже увійшли в систему.',
+    sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
     web3_missing_identifier: undefined,

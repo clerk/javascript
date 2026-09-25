@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const daDK: LocalizationResource = {
   locale: 'da-DK',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
@@ -955,6 +960,8 @@ export const daDK: LocalizationResource = {
   formButtonPrimary: 'Fortsæt',
   formButtonPrimary__verify: 'Verificer',
   formFieldAction__forgotPassword: 'Glemt adgangskode?',
+  formFieldAction__hidePassword: 'Skjul adgangskode',
+  formFieldAction__showPassword: 'Vis adgangskode',
   formFieldError__matchingPasswords: 'Adgangskoderne matcher.',
   formFieldError__notMatchingPasswords: 'Adgangskoderne matcher ikke.',
   formFieldError__verificationLinkExpired: 'Bekræftelseslinket er udløbet. Venligst anmod om et nyt link.',
@@ -1374,6 +1381,52 @@ export const daDK: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
       ssoSection: {
         badge__active: undefined,
         badge__inProgress: undefined,
@@ -1688,7 +1741,7 @@ export const daDK: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Vi skal bekræfte din identitet, før du nulstiller din adgangskode.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
@@ -2014,10 +2067,12 @@ export const daDK: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Du er allerede logget ind.',
+    sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
     web3_missing_identifier: undefined,

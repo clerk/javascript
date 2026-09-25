@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const taIN: LocalizationResource = {
   locale: 'ta-IN',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'புதிய விசையைச் சேர்',
     action__search: 'விசைகளைத் தேடு',
@@ -964,6 +969,8 @@ export const taIN: LocalizationResource = {
   formButtonPrimary: 'தொடரவும்',
   formButtonPrimary__verify: 'சரிபார்க்கவும்',
   formFieldAction__forgotPassword: 'கடவுச்சொல் மறந்துவிட்டதா?',
+  formFieldAction__hidePassword: 'கடவுச்சொல்லை மறை',
+  formFieldAction__showPassword: 'கடவுச்சொல்லைக் காட்டு',
   formFieldError__matchingPasswords: 'கடவுச்சொற்கள் பொருந்துகின்றன.',
   formFieldError__notMatchingPasswords: 'கடவுச்சொற்கள் பொருந்தவில்லை.',
   formFieldError__verificationLinkExpired: 'சரிபார்ப்பு இணைப்பு காலாவதியானது. புதிய இணைப்பைக் கோருங்கள்.',
@@ -1388,6 +1395,52 @@ export const taIN: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
       ssoSection: {
         badge__active: undefined,
         badge__inProgress: undefined,
@@ -1705,7 +1758,7 @@ export const taIN: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'உங்கள் கடவுச்சொல்லை மீட்டமைப்பதற்கு முன் உங்கள் அடையாளத்தை சரிபார்க்க வேண்டும்.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
@@ -2053,10 +2106,12 @@ export const taIN: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3 வாலட் நீட்டிப்பு காணப்படவில்லை. தொடர ஒன்றை நிறுவவும்.',

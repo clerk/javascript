@@ -11,7 +11,10 @@
         "*.d.ts",
         "src/**",
         "tsconfig.json",
+        "tsconfig.base.json",
+        "tsconfig.src.json",
         "rspack.config.js",
+        "tsdown.config.mts",
 
         "!**/*.test.*",
         "!**/test/**",
@@ -33,6 +36,7 @@
         "tsconfig.json",
         "tsconfig.*.json",
         "rspack.config.js",
+        "vitest.*.mts",
 
         "!**/__snapshots__/**",
         "!coverage/**",

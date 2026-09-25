@@ -79,7 +79,7 @@ export function UserProfileEnterpriseAccountRowView({
                 <Spinner size='sm' />
               ) : (
                 <Icon
-                  name='arrow-right-top'
+                  name='arrow-up-right'
                   placement='inline-end'
                   size='sm'
                 />
@@ -88,7 +88,7 @@ export function UserProfileEnterpriseAccountRowView({
           </Section.Actions>
         ) : null}
       </Section.Item>
-      {onConnect && account.connectError ? <Section.Error>{account.connectError}</Section.Error> : null}
+      <Section.Error>{onConnect ? account.connectError : undefined}</Section.Error>
     </Section.Row>
   );
 }

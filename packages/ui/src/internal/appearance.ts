@@ -279,6 +279,12 @@ export type ElementsConfig = {
   formHeaderSubtitle: WithOptions<never, ErrorState>;
   formResendCodeLink: WithOptions;
 
+  actionBlockedIconBox: WithOptions;
+  actionBlockedIcon: WithOptions;
+  actionBlockedLink: WithOptions;
+  actionBlockedTraceIdBox: WithOptions;
+  actionBlockedTraceIdLabel: WithOptions;
+  actionBlockedTraceId: WithOptions;
   verificationLinkStatusBox: WithOptions;
   verificationLinkStatusIconBox: WithOptions;
   verificationLinkStatusIcon: WithOptions;
@@ -382,6 +388,17 @@ export type ElementsConfig = {
   organizationProfileSecuritySsoProviderIcon: WithOptions;
   organizationProfileSecuritySsoConnectionRow: WithOptions;
   organizationProfileSecuritySsoConnectionPage: WithOptions;
+  organizationProfileSecuritySsoBypassDescription: WithOptions;
+  organizationProfileSecuritySsoBypassCountLabel: WithOptions;
+  organizationProfileSecuritySsoBypassCountBadge: WithOptions;
+  organizationProfileSecuritySsoBypassPage: WithOptions;
+  organizationProfileSecuritySsoBypassSearchInput: WithOptions;
+  organizationProfileSecuritySsoBypassSearchInputIcon: WithOptions;
+  organizationProfileSecuritySsoBypassAddButton: WithOptions;
+  organizationProfileSecuritySsoBypassEmailInput: WithOptions;
+  organizationProfileSecuritySsoBypassRoleWarning: WithOptions;
+  organizationProfileSecuritySsoBypassFailure: WithOptions;
+  organizationProfileSecuritySsoBypassBulkResult: WithOptions;
 
   organizationListPreviewItems: WithOptions;
   organizationListPreviewItem: WithOptions;

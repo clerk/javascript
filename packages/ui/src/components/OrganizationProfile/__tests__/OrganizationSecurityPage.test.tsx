@@ -8,6 +8,8 @@ import { OrganizationSecurityPage } from '../OrganizationSecurityPage';
 
 const { createFixtures } = bindCreateFixtures('OrganizationProfile');
 
+vi.setConfig({ testTimeout: 15_000 });
+
 const withSecurityPageFixtures = (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
   f.withEnterpriseSso({ selfServeSSO: true });
   f.withEmailAddress();

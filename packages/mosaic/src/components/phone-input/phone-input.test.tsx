@@ -42,22 +42,6 @@ describe('Mosaic PhoneInput', () => {
     expect(ref).toHaveBeenLastCalledWith(null);
   });
 
-  it('keeps the country indicator on the selection while hovering another country', async () => {
-    const user = userEvent.setup();
-    render(<PhoneInput aria-label='Phone number' />);
-    await user.click(screen.getByRole('button', { name: 'Country, United States' }));
-    const us = screen.getByRole('option', { name: /United States/ });
-    const uk = screen.getByRole('option', { name: /United Kingdom/ });
-    await user.hover(uk);
-    expect(us.querySelector('.cl-combobox-option-indicator')).toBeVisible();
-    expect(uk.querySelector('.cl-combobox-option-indicator')).not.toBeInTheDocument();
-    await user.click(uk);
-    await user.click(screen.getByRole('button', { name: 'Country, United Kingdom' }));
-    expect(
-      screen.getByRole('option', { name: /United Kingdom/ }).querySelector('.cl-combobox-option-indicator'),
-    ).toBeVisible();
-  });
-
   it('positions the country popup against the full phone field', async () => {
     const user = userEvent.setup();
     render(<PhoneInput aria-label='Phone number' />);

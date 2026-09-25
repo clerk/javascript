@@ -90,6 +90,8 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const isRunningRef = React.useRef(false);
   const reloadCountRef = React.useRef(0);
+  // Identifies the most recent run, so a continuation can tell when a newer challenge replaced it.
+  const runIdRef = React.useRef(0);
   const [isRunning, setIsRunning] = React.useState(false);
   const [isWidgetVisible, setIsWidgetVisibleState] = React.useState(false);
   const [retryNonce, setRetryNonce] = React.useState(0);
@@ -181,6 +183,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
       reloadCountRef.current += 1;
       isRunningRef.current = true;
       setIsRunning(true);
+      runIdRef.current += 1;
       void (async () => {
         try {
           await reload();
@@ -234,6 +237,15 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
 
     isRunningRef.current = true;
     setIsRunning(true);
+    const runId = ++runIdRef.current;
+
+    // Whether this run still owns the card's error and spinner. Until the gate clears, that ends
+    // with the run's cancellation. Afterwards the continuation (`onResolved`) is still this run's
+    // even though clearing the gate cancelled it, so it only stops owning them on unmount or when a
+    // newer challenge has started a run of its own. Keying the continuation on `cancelled` swallowed
+    // its failures and left the spinner running with no error.
+    let continuing = false;
+    const ownsOutcome = () => (continuing ? !isUnmounted() && runIdRef.current === runId : !cancelled);
 
     const runChallenge = async () => {
       try {
@@ -274,6 +286,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
           // past this gate. Reload to clear the stale local protectCheck, then continue routing on
           // the refreshed live resource.
           if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === ERROR_CODES.PROTECT_CHECK_ALREADY_RESOLVED) {
+            continuing = true;
             await reload();
             if (isUnmounted()) {
               return;
@@ -286,14 +299,15 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
         if (isUnmounted()) {
           return;
         }
+        continuing = true;
         await onResolved(updatedResource, isUnmounted);
       } catch (err: any) {
-        if (cancelled) {
+        if (!ownsOutcome()) {
           return;
         }
         reportError(err);
       } finally {
-        if (!cancelled) {
+        if (ownsOutcome()) {
           isRunningRef.current = false;
           setIsRunning(false);
         }
@@ -312,6 +326,30 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     card.setError('');
     reloadCountRef.current = 0;
     isRunningRef.current = false;
+
+    // The gate already cleared and it was the continuation that failed: there is no challenge left
+    // to re-run, so re-running the effect would do nothing. Retry the continuation instead.
+    const { getProtectCheck, getResource, onResolved } = paramsRef.current;
+    if (!getProtectCheck()) {
+      const runId = ++runIdRef.current;
+      const ownsOutcome = () => mountedRef.current && runIdRef.current === runId;
+      isRunningRef.current = true;
+      setIsRunning(true);
+      void onResolved(getResource(), () => !mountedRef.current)
+        .catch(err => {
+          if (ownsOutcome()) {
+            reportError(err);
+          }
+        })
+        .finally(() => {
+          if (ownsOutcome()) {
+            isRunningRef.current = false;
+            setIsRunning(false);
+          }
+        });
+      return;
+    }
+
     setRetryNonce(n => n + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

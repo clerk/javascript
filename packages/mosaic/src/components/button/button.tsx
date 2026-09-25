@@ -1,7 +1,7 @@
-import { Button as HeadlessButton } from '@clerk/headless/button';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { Button as HeadlessButton } from '../../primitives/button';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';

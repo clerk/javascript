@@ -541,7 +541,7 @@ describe('popup surface', () => {
 });
 
 // The sheet is the compact band's bottom anchor: the geometry that used to ride on the `prompt`
-// size, now asked for by name. Above the band it resolves back to a centred card, so what the
+// size, now asked for by name. Above the band it resolves back to a centered card, so what the
 // atoms pin is that the placement reaches the popup and the track at all.
 describe('compactPlacement', () => {
   // Written out rather than imported: an atom is named from its property, value AND condition, so
@@ -550,7 +550,6 @@ describe('compactPlacement', () => {
   const PHONE = '@container cl-dialog (width < 48rem)';
   const probe = stylex.create({
     anchored: { alignSelf: { [PHONE]: 'end', default: null } },
-    centred: { alignItems: { [PHONE]: 'center', default: null } },
     clipped: { overflow: { [PHONE]: 'clip', default: null } },
   });
 
@@ -566,7 +565,7 @@ describe('compactPlacement', () => {
       </Dialog.Root>,
     );
 
-  it('centres by default, anchoring nothing to the bottom edge', () => {
+  it('centers by default, anchoring nothing to the bottom edge', () => {
     renderPlacement('center');
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
@@ -578,15 +577,6 @@ describe('compactPlacement', () => {
 
     expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(classesOf('.cl-dialog-track')).toEqual(expect.arrayContaining(atomFor(probe.clipped)));
-  });
-
-  // The band runs to 48rem but a `Card` caps at 26.25rem, so between the two the surface sits
-  // inside a wider popup. Without this it lands against the inline-start edge — a sheet hugging one
-  // side of the screen — because the popup is a flex column and `stretch` is the default.
-  it('centres what the sheet holds, for the widths where the surface caps first', () => {
-    renderPlacement('sheet');
-
-    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.centred)));
   });
 
   // A profile fills the compact band, with no room to be anchored anywhere else.

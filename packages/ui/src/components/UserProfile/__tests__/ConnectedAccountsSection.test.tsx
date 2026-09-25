@@ -429,8 +429,9 @@ describe('ConnectedAccountsSection ', () => {
 
       await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
 
-      // The cancel button should be clickable
-      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+      await waitFor(() =>
+        expect(screen.queryByRole('heading', { name: /Remove connected account/i })).not.toBeInTheDocument(),
+      );
     });
   });
 

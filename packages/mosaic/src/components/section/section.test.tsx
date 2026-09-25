@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
@@ -196,7 +196,7 @@ describe('Section', () => {
     // A row-level message announces itself; there is no field to describe it.
     expect(error).toHaveAttribute('role', 'alert');
     expect(error).toHaveTextContent('File type not supported.');
-    // Outside the item, so the item's media and actions keep their centre line.
+    // Outside the item, so the item's media and actions keep their center line.
     expect(screen.getByTestId('item')).not.toContainElement(error);
     expect(screen.getByTestId('row')).toContainElement(error);
 
@@ -204,5 +204,47 @@ describe('Section', () => {
     expect(icon).toBeInTheDocument();
     expect(icon).toHaveAttribute('aria-hidden', 'true');
     expect(icon).toHaveAttribute('data-size', 'sm');
+  });
+
+  it('renders nothing while the row has no message', () => {
+    render(
+      <Section.Row>
+        <Section.Item>
+          <Section.Content>
+            <Section.Label>Profile picture</Section.Label>
+          </Section.Content>
+        </Section.Item>
+        <Section.Error data-testid='error'>{undefined}</Section.Error>
+      </Section.Row>,
+    );
+
+    expect(screen.queryByTestId('error')).not.toBeInTheDocument();
+  });
+
+  it('opens on a new message and leaves when it clears', async () => {
+    function Host({ message }: { message?: string }) {
+      return (
+        <Section.Row>
+          <Section.Item>
+            <Section.Content>
+              <Section.Label>Profile picture</Section.Label>
+            </Section.Content>
+          </Section.Item>
+          <Section.Error data-testid='error'>{message}</Section.Error>
+        </Section.Row>
+      );
+    }
+
+    const { rerender } = render(<Host />);
+    rerender(<Host message='File type not supported.' />);
+
+    const error = await screen.findByTestId('error');
+    await waitFor(() => expect(error).toHaveAttribute('data-open'));
+    expect(error).toHaveTextContent('File type not supported.');
+    expect(error).not.toHaveAttribute('aria-hidden');
+
+    // jsdom runs no transitions, so the exit finishes at once and the row empties again.
+    rerender(<Host />);
+    await waitFor(() => expect(screen.queryByTestId('error')).not.toBeInTheDocument());
   });
 });

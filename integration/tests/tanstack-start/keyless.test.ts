@@ -1,16 +1,11 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import type { Application } from '../../models/application';
 import { appConfigs } from '../../presets';
-import {
-  testClaimedAppWithMissingKeys,
-  testKeylessRemovedAfterEnvAndRestart,
-  testToggleCollapsePopoverAndClaim,
-} from '../../testUtils/keylessHelpers';
 
-const commonSetup = appConfigs.reactRouter.reactRouterNode.clone();
+const commonSetup = appConfigs.tanstack.reactStart.clone();
 
-test.describe('Keyless mode @react-router', () => {
+test.describe('Keyless mode @tanstack-react-start', () => {
   test.describe.configure({ mode: 'serial' });
   test.setTimeout(90_000);
 
@@ -21,35 +16,25 @@ test.describe('Keyless mode @react-router', () => {
   });
 
   let app: Application;
-  let dashboardUrl = 'https://dashboard.clerk.com/';
 
   test.beforeAll(async () => {
     app = await commonSetup.commit();
     await app.setup();
     await app.withEnv(appConfigs.envs.withKeyless);
-    if (appConfigs.envs.withKeyless.privateVariables.get('CLERK_API_URL')?.includes('clerkstage')) {
-      dashboardUrl = 'https://dashboard.clerkstage.dev/';
-    }
-    await app.dev();
+    // Without keys the app 500s on every request, so readiness can't wait for a 2xx
+    await app.dev({ acceptAnyResponse: true });
   });
 
   test.afterAll(async () => {
-    // Keep files for debugging
     await app?.teardown();
   });
 
-  test('Toggle collapse popover and claim.', async ({ page, context }) => {
-    await testToggleCollapsePopoverAndClaim({ page, context, app, dashboardUrl, framework: 'react-router' });
-  });
-
-  test('Lands on claimed application with missing explicit keys, expanded by default, click to get keys from dashboard.', async ({
+  test('Without keys, requests fail with the missing env vars error instead of keyless bootstrap.', async ({
     page,
-    context,
   }) => {
-    await testClaimedAppWithMissingKeys({ page, context, app, dashboardUrl });
-  });
-
-  test('Keyless popover is removed after adding keys to .env and restarting.', async ({ page, context }) => {
-    await testKeylessRemovedAfterEnvAndRestart({ page, context, app });
+    const response = await page.goto(`${app.serverUrl}/`);
+    expect(response?.status()).toBe(500);
+    expect(app.devOutput).toContain('Missing secretKey');
+    expect(app.devOutput).toContain('npx clerk@latest link');
   });
 });

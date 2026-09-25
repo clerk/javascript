@@ -18,7 +18,7 @@ const methodIcon = {
   passkey: 'security-passkey',
   email_code: 'code',
   phone_code: 'security-phone',
-  totp: 'security-authenticator',
+  totp: 'security-lock-square',
   backup_code: 'security-phone',
 } as const satisfies Record<ReverificationMethod['strategy'], IconName>;
 

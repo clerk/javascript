@@ -106,7 +106,7 @@ const handleSubmit = async e => {
 Problems:
 
 - Two state objects (`status` + `card`) must be driven in lockstep.
-- `finally` is load-bearing: forget it and the button spins forever.
+- `finally` is required: forget it and the button spins forever.
 - `wizard.nextStep()` is a third piece of state in a third abstraction.
 - Nothing prevents calling `status.setLoading()` while already in `loading`
   (e.g. a double-submit race).
@@ -189,7 +189,7 @@ const [snapshot, send] = useMachine(machine);
 | ---------------------------------------- | ------------------------------------------------- |
 | 2 state objects (`status` + `card`)      | 1 machine                                         |
 | 4 manual state calls per submit          | 1 `send({ type: 'SUBMIT' })`                      |
-| `finally` block (load-bearing)           | gone — `invoke` always exits `submitting`         |
+| `finally` block (required)               | gone — `invoke` always exits `submitting`         |
 | Double-submit possible                   | impossible — `SUBMIT` not handled in `submitting` |
 | Logic testable only with React           | pure actor test, no rendering needed              |
 | `isLoading` derived from `status.status` | `snapshot.value === 'submitting'`                 |
@@ -314,7 +314,7 @@ const [modal, send] = useMachine(apiKeyModalMachine);
 | Both modals can be open simultaneously           | impossible — `closed                                 | revoking | copying` |
 | Stale `selectedAPIKeyID` when modal closed       | impossible — payload only exists in `revoking` state |
 | 3-call atomic close (must zero ID + name + bool) | 1 `send({ type: 'CLOSE' })`                          |
-| `onClose` handler is load-bearing                | gone — `CLOSE` transitions atomically                |
+| `onClose` handler is required                    | gone — `CLOSE` transitions atomically                |
 | Logic testable only with React                   | pure actor test, no rendering needed                 |
 
 **Net: 5 `useState` calls → 1 machine. 3 impossible states made
@@ -499,7 +499,7 @@ const handleSubmit = async e => {
 The component then disables all buttons with `status.isLoading` and shows a
 spinner on whichever button was clicked by passing the strategy down as a
 separate prop or via a ref. Two sync calls per async entry point, a
-load-bearing `finally` in each, and nothing that prevents both handlers
+required `finally` in each, and nothing that prevents both handlers
 from calling `setLoading` simultaneously.
 
 ### After
@@ -606,7 +606,7 @@ const active = snapshot.context.activeStrategy;
 | `card.setLoading()` (disables everything)       | `snapshot.value === 'submitting'`                       |
 | Per-button `status.isLoading` (which one spins) | `snapshot.context.activeStrategy === strategy`          |
 | `card.setError(msg)`                            | `snapshot.context.error`                                |
-| `finally` block in each handler (load-bearing)  | gone — `invoke` always exits `submitting`               |
+| `finally` block in each handler (required)      | gone — `invoke` always exits `submitting`               |
 | Two handlers racing on `setLoading`             | impossible — `CLICK_SOCIAL` not handled in `submitting` |
 | Logic testable only with React                  | pure actor test, no rendering needed                    |
 

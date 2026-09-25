@@ -1,0 +1,24 @@
+import * as Stories from './organization-profile-workspace-section.stories';
+
+# OrganizationProfileWorkspaceSection
+
+The workspace's logo, name, and slug. The slug carries a `CopyButton` beside its value.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+    { name: 'CopyButton', href: '/components/copy-button', layer: 'Components' },
+  ]}
+/>
+
+## A rejected save
+
+The dialog stays open and renders the reason in its banner.
+
+<Story
+  name='SaveFails'
+  storyModule={Stories}
+/>

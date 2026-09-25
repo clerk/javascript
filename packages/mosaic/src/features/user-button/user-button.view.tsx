@@ -1,7 +1,5 @@
 'use client';
 
-import { Button as HeadlessButton } from '@clerk/headless/button';
-import type { PopoverProps } from '@clerk/headless/popover';
 import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 import React from 'react';
@@ -19,6 +17,8 @@ import { Spinner } from '../../components/spinner';
 import type { IconName } from '../../icons/registry';
 import type { MosaicMessages } from '../../localization';
 import { fill, plural, useLocale, useMessages } from '../../localization';
+import { Button as HeadlessButton } from '../../primitives/button';
+import type { PopoverProps } from '../../primitives/popover';
 import { themeProps } from '../../props';
 import { applyOrder } from '../../utils/apply-order';
 import { focusOutline } from '../../utils/focus-outline.styles';
@@ -283,7 +283,7 @@ function SwitcherRow({
       ) : active ? (
         <UserButtonItemTrailing>
           <Icon
-            name='check'
+            name='checkmark'
             size='sm'
           />
         </UserButtonItemTrailing>
@@ -445,7 +445,7 @@ function Header() {
         actions.push({
           id: action,
           label: layout === 'stacked' ? m.manage.settings : manage.label,
-          icon: 'cog',
+          icon: 'cog-6-teeth',
           iconOnly: true,
           onClick: manage.onClick,
         });
@@ -792,7 +792,7 @@ function SessionMenuItem({ session, active }: { session: UserButtonSession; acti
       {active ? (
         <Menu.Media>
           <Icon
-            name='check'
+            name='checkmark'
             size='sm'
           />
         </Menu.Media>
@@ -832,7 +832,7 @@ function SwitchAccountRow() {
             <Spinner size='sm' />
           ) : (
             <Icon
-              name='switch-horizontal'
+              name='arrow-left-right'
               size='sm'
             />
           )}
@@ -1157,7 +1157,6 @@ export function UserButtonTrigger({
           <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
           {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
           <Icon
-            aria-hidden
             name='chevron-down'
             size='sm'
             xstyle={styles.triggerCaret}

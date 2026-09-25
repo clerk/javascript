@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const isIS: LocalizationResource = {
   locale: 'is-IS',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Bæta við lykli',
     action__search: 'Leita að lyklum',
@@ -962,6 +967,8 @@ export const isIS: LocalizationResource = {
   formButtonPrimary: 'Halda áfram',
   formButtonPrimary__verify: 'Staðfesta',
   formFieldAction__forgotPassword: 'Gleymt lykilorð?',
+  formFieldAction__hidePassword: 'Fela lykilorð',
+  formFieldAction__showPassword: 'Sýna lykilorð',
   formFieldError__matchingPasswords: 'Lykilorð passa saman.',
   formFieldError__notMatchingPasswords: 'Lykilorð passa ekki saman.',
   formFieldError__verificationLinkExpired: 'Staðfestingartengillinn er útrunninn. Vinsamlegast biðjið um nýjan tengil.',
@@ -1384,6 +1391,52 @@ export const isIS: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
       ssoSection: {
         badge__active: undefined,
         badge__inProgress: undefined,
@@ -1702,7 +1755,7 @@ export const isIS: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Við þurfum að staðfesta auðkenni þitt áður en við endurstillum lykilorðið þitt.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
@@ -2045,10 +2098,12 @@ export const isIS: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Þú ert nú þegar innskráður.',
+    sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
     web3_missing_identifier: 'Ekki fannst Web3 veskisviðbót. Vinsamlegast settu upp eina til að halda áfram.',

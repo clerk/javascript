@@ -9,7 +9,7 @@ import { MosaicProvider } from '../MosaicProvider';
 
 describe('MosaicProvider icons', () => {
   it('exposes the icon overrides via useMosaicIcons', () => {
-    const icons: MosaicIconOverrides = { check: React.createElement('svg') };
+    const icons: MosaicIconOverrides = { checkmark: React.createElement('svg') };
     const { result } = renderHook(() => useMosaicIcons(), {
       wrapper: ({ children }) => React.createElement(MosaicProvider, { icons }, children),
     });

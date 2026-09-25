@@ -193,7 +193,7 @@ export function Icons(props: Record<string, unknown>) {
     <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
       <Button {...knobsAsProps(props)}>
         <Icon
-          name='check'
+          name='checkmark'
           placement='inline-start'
         />
         Approve
@@ -207,7 +207,7 @@ export function Icons(props: Record<string, unknown>) {
       </Button>
       <Button {...knobsAsProps(props)}>
         <Icon
-          name='check'
+          name='checkmark'
           placement='inline-start'
         />
         Both sides
@@ -235,7 +235,7 @@ export function IconSizes(props: Record<string, unknown>) {
             size={size}
           >
             <Icon
-              name='check'
+              name='checkmark'
               placement='inline-start'
               size={size === 'xs' ? 'sm' : size}
             />
@@ -287,7 +287,7 @@ export function Truncation(props: Record<string, unknown>) {
         fullWidth
       >
         <Icon
-          name='check'
+          name='checkmark'
           placement='inline-start'
         />
         Save this organization&rsquo;s billing details

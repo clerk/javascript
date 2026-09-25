@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const mnMN: LocalizationResource = {
   locale: 'mn-MN',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: undefined,
     action__search: undefined,
@@ -956,6 +961,8 @@ export const mnMN: LocalizationResource = {
   formButtonPrimary: 'Үргэлжлүүлэх',
   formButtonPrimary__verify: 'Баталгаажуулах',
   formFieldAction__forgotPassword: 'Нууц үгээ мартсан?',
+  formFieldAction__hidePassword: 'Нууц үгийг нуух',
+  formFieldAction__showPassword: 'Нууц үгийг харуулах',
   formFieldError__matchingPasswords: 'Нууц үг таарч байна.',
   formFieldError__notMatchingPasswords: 'Нууц үг таарахгүй байна.',
   formFieldError__verificationLinkExpired: 'Баталгаажуулах холбоосын хугацаа дууссан. Шинэ холбоос хүсэлт гаргана уу.',
@@ -1377,6 +1384,52 @@ export const mnMN: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
       ssoSection: {
         badge__active: undefined,
         badge__inProgress: undefined,
@@ -1692,7 +1745,7 @@ export const mnMN: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Нууц үгээ шинэчлэхээс өмнө бид таны хувийн мэдээллийг баталгаажуулах шаардлагатай.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
@@ -2019,10 +2072,12 @@ export const mnMN: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Та аль хэдийн нэвтэрсэн байна.',
+    sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
     web3_missing_identifier: undefined,

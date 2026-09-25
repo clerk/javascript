@@ -141,6 +141,8 @@ export type __internal_LocalizationResource = {
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldError__verificationLinkExpired: LocalizationValue;
   formFieldAction__forgotPassword: LocalizationValue;
+  formFieldAction__hidePassword: LocalizationValue;
+  formFieldAction__showPassword: LocalizationValue;
   formFieldHintText__optional: LocalizationValue;
   formFieldHintText__slug: LocalizationValue;
   formButtonPrimary: LocalizationValue;
@@ -622,7 +624,7 @@ export type __internal_LocalizationResource = {
     enterpriseSSO: {
       formButtonPrimary: LocalizationValue;
     };
-    ssoFallback: {
+    ssoBypass: {
       actionLink: LocalizationValue;
       notice: LocalizationValue;
       code: {
@@ -1199,6 +1201,52 @@ export type __internal_LocalizationResource = {
         title: LocalizationValue;
         subtitle: LocalizationValue<'name'>;
         confirmButton: LocalizationValue;
+      };
+      ssoBypassSection: {
+        title: LocalizationValue;
+        description: LocalizationValue;
+        allowlistLabel: LocalizationValue;
+        allowlistCount: LocalizationValue<'count'>;
+        allowlistCount__one: LocalizationValue;
+        menuAction__manage: LocalizationValue;
+        error__load: LocalizationValue;
+      };
+      ssoBypassPage: {
+        title: LocalizationValue;
+        action__search: LocalizationValue;
+        action__add: LocalizationValue;
+        addForm: {
+          title: LocalizationValue;
+          subtitle: LocalizationValue;
+          modeLabel: LocalizationValue;
+          mode__email: LocalizationValue;
+          mode__role: LocalizationValue;
+          emailPlaceholder: LocalizationValue;
+          roleOption: LocalizationValue<'role' | 'count'>;
+          roleWarning: LocalizationValue;
+          submitButton: LocalizationValue;
+          error__memberNotFound: LocalizationValue;
+          error__alreadyAdded: LocalizationValue;
+          error__allAlreadyAdded: LocalizationValue;
+        };
+        table: {
+          header__user: LocalizationValue;
+          header__actions: LocalizationValue;
+          emptyState: LocalizationValue;
+          emptyState__search: LocalizationValue;
+          menuAction__remove: LocalizationValue;
+        };
+        bulkResult: {
+          added: LocalizationValue<'count'>;
+          added__one: LocalizationValue;
+          addedMember: LocalizationValue;
+          domainNotServed: LocalizationValue<'count'>;
+          domainNotServed__one: LocalizationValue;
+          notMember: LocalizationValue<'count'>;
+          notMember__one: LocalizationValue;
+          unknown: LocalizationValue<'count'>;
+          unknown__one: LocalizationValue;
+        };
       };
       ssoSection: {
         title: LocalizationValue;
@@ -2192,6 +2240,20 @@ export type __internal_LocalizationResource = {
       doneButton: LocalizationValue;
     };
   };
+  /**
+   * The screen shown when a request is blocked and there is no way for the end
+   * user to retry. These are the fallbacks: an application can supply its own
+   * title and description, and when it does they are used instead.
+   */
+  actionBlocked: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue;
+    /**
+     * Labels the short reference the end user can quote when contacting
+     * support.
+     */
+    traceIdLabel: LocalizationValue;
+  };
   apiKeys: {
     formTitle: LocalizationValue;
     formHint: LocalizationValue;
@@ -2362,6 +2424,7 @@ type UnstableErrors = WithParamName<{
   protect_check_execution_failed: LocalizationValue;
   protect_check_invalid_script: LocalizationValue;
   protect_check_invalid_sdk_url: LocalizationValue;
+  protect_check_required: LocalizationValue;
   protect_check_script_load_failed: LocalizationValue;
   protect_check_timed_out: LocalizationValue;
   protect_check_unsupported_environment: LocalizationValue;
@@ -2417,6 +2480,7 @@ type UnstableErrors = WithParamName<{
     requireSpecialCharacter: LocalizationValue;
   };
   session_exists: LocalizationValue;
+  sso_bypass_domain_not_served: LocalizationValue;
   ticket_expired_code: LocalizationValue;
   ticket_invalid_code: LocalizationValue;
   zxcvbn: {

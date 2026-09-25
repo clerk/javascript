@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const fiFI: LocalizationResource = {
   locale: 'fi-FI',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Lisää uusi avain',
     action__search: 'Etsi avaimia',
@@ -962,6 +967,8 @@ export const fiFI: LocalizationResource = {
   formButtonPrimary: 'Jatka',
   formButtonPrimary__verify: 'Vahvista',
   formFieldAction__forgotPassword: 'Unohditko salasanasi?',
+  formFieldAction__hidePassword: 'Piilota salasana',
+  formFieldAction__showPassword: 'Näytä salasana',
   formFieldError__matchingPasswords: 'Salasanat täsmäävät.',
   formFieldError__notMatchingPasswords: 'Salasanat eivät täsmää.',
   formFieldError__verificationLinkExpired: 'Vahvistuslinkki on vanhentunut. Pyydä uusi linkki.',
@@ -1384,6 +1391,52 @@ export const fiFI: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
       ssoSection: {
         badge__active: undefined,
         badge__inProgress: undefined,
@@ -1701,7 +1754,7 @@ export const fiFI: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Ennen salasanan nollaamista on varmistettava henkilöllisyytesi.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
@@ -2044,12 +2097,14 @@ export const fiFI: LocalizationResource = {
     protect_check_execution_failed: 'Tarkistus ei valmistunut. Yritä uudelleen.',
     protect_check_invalid_script: 'Tarkistusta ei voitu ladata. Ota yhteyttä tukeen, jos ongelma jatkuu.',
     protect_check_invalid_sdk_url: 'Tarkistusta ei voitu käynnistää. Ota yhteyttä tukeen.',
+    protect_check_required: undefined,
     protect_check_script_load_failed:
       'Tarkistusta ei voitu ladata. Syynä voi olla verkkoyhteys tai sisällön suojauskäytäntö, joka estää tarkistuksen skriptin. Yritä uudelleen tai ota yhteyttä tukeen.',
     protect_check_timed_out: 'Tarkistus ei valmistunut ajoissa. Yritä uudelleen.',
     protect_check_unsupported_environment:
       'Tarkistusta ei tueta tässä ympäristössä. Jatka tavallisella selaimella tai ota yhteyttä tukeen.',
     session_exists: 'Olet jo kirjautunut sisään.',
+    sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3-lompakkoa ei löytynyt. Asenna sellainen jatkaaksesi.',

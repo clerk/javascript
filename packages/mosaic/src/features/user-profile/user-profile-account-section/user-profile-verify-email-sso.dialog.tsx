@@ -79,7 +79,7 @@ export function UserProfileVerifyEmailSsoDialog({
                     <Spinner size='sm' />
                   ) : (
                     <Icon
-                      name='arrow-right-top'
+                      name='arrow-up-right'
                       placement='inline-end'
                       size='sm'
                     />

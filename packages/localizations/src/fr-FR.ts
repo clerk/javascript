@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const frFR: LocalizationResource = {
   locale: 'fr-FR',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Ajouter une nouvelle clé',
     action__search: 'Rechercher des clés',
@@ -965,6 +970,8 @@ export const frFR: LocalizationResource = {
   formButtonPrimary: 'Continuer',
   formButtonPrimary__verify: 'Vérifier',
   formFieldAction__forgotPassword: 'Mot de passe oublié ?',
+  formFieldAction__hidePassword: 'Masquer le mot de passe',
+  formFieldAction__showPassword: 'Afficher le mot de passe',
   formFieldError__matchingPasswords: 'Les mots de passe correspondent.',
   formFieldError__notMatchingPasswords: 'Les mots de passe ne correspondent pas.',
   formFieldError__verificationLinkExpired: 'Le lien de vérification a expiré. Merci de demander un nouveau lien.',
@@ -1389,6 +1396,52 @@ export const frFR: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
       ssoSection: {
         badge__active: undefined,
         badge__inProgress: undefined,
@@ -1707,7 +1760,7 @@ export const frFR: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'Nous devons vérifier votre identité avant de réinitialiser votre mot de passe.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
@@ -2039,10 +2092,12 @@ export const frFR: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: 'Vous êtes déjà connecté.',
+    sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
     web3_missing_identifier: 'Aucune extension de portefeuille Web3 trouvée. Veuillez en installer une pour continuer.',

@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const koKR: LocalizationResource = {
   locale: 'ko-KR',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: '새 키 만들기',
     action__search: '키 검색',
@@ -959,6 +964,8 @@ export const koKR: LocalizationResource = {
   formButtonPrimary: '계속',
   formButtonPrimary__verify: '확인하기',
   formFieldAction__forgotPassword: '비밀번호를 잊으셨나요?',
+  formFieldAction__hidePassword: '비밀번호 숨기기',
+  formFieldAction__showPassword: '비밀번호 표시',
   formFieldError__matchingPasswords: '비밀번호가 일치해요.',
   formFieldError__notMatchingPasswords: '비밀번호가 일치하지 않아요.',
   formFieldError__verificationLinkExpired: '인증 링크가 만료됐어요. 새 링크를 요청해 주세요.',
@@ -1375,6 +1382,52 @@ export const koKR: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
       ssoSection: {
         badge__active: undefined,
         badge__inProgress: undefined,
@@ -1685,7 +1738,7 @@ export const koKR: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: '비밀번호를 재설정하기 전에 신원을 확인해야 해요.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
@@ -2014,10 +2067,12 @@ export const koKR: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: '이미 로그인 중이에요.',
+    sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3 지갑 확장 프로그램을 찾을 수 없어요. 계속하려면 설치해 주세요.',

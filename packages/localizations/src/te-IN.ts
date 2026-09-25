@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const teIN: LocalizationResource = {
   locale: 'te-IN',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'కొత్త కీని జోడించు',
     action__search: 'కీలను శోధించు',
@@ -963,6 +968,8 @@ export const teIN: LocalizationResource = {
   formButtonPrimary: 'కొనసాగించండి',
   formButtonPrimary__verify: 'ధృవీకరించండి',
   formFieldAction__forgotPassword: 'పాస్‌వర్డ్ మర్చిపోయారా?',
+  formFieldAction__hidePassword: 'పాస్‌వర్డ్‌ను దాచు',
+  formFieldAction__showPassword: 'పాస్‌వర్డ్‌ను చూపించు',
   formFieldError__matchingPasswords: 'పాస్‌వర్డ్‌లు సరిపోలాయి.',
   formFieldError__notMatchingPasswords: 'పాస్‌వర్డ్‌లు సరిపోలడం లేదు.',
   formFieldError__verificationLinkExpired: 'ధృవీకరణ లింక్ గడువు ముగిసింది. దయచేసి కొత్త లింక్‌ను అభ్యర్థించండి.',
@@ -1385,6 +1392,52 @@ export const teIN: LocalizationResource = {
         subtitle: undefined,
         title: undefined,
       },
+      ssoBypassPage: {
+        action__add: undefined,
+        action__search: undefined,
+        addForm: {
+          emailPlaceholder: undefined,
+          error__allAlreadyAdded: undefined,
+          error__alreadyAdded: undefined,
+          error__memberNotFound: undefined,
+          modeLabel: undefined,
+          mode__email: undefined,
+          mode__role: undefined,
+          roleOption: undefined,
+          roleWarning: undefined,
+          submitButton: undefined,
+          subtitle: undefined,
+          title: undefined,
+        },
+        bulkResult: {
+          added: undefined,
+          addedMember: undefined,
+          added__one: undefined,
+          domainNotServed: undefined,
+          domainNotServed__one: undefined,
+          notMember: undefined,
+          notMember__one: undefined,
+          unknown: undefined,
+          unknown__one: undefined,
+        },
+        table: {
+          emptyState: undefined,
+          emptyState__search: undefined,
+          header__actions: undefined,
+          header__user: undefined,
+          menuAction__remove: undefined,
+        },
+        title: undefined,
+      },
+      ssoBypassSection: {
+        allowlistCount: undefined,
+        allowlistCount__one: undefined,
+        allowlistLabel: undefined,
+        description: undefined,
+        error__load: undefined,
+        menuAction__manage: undefined,
+        title: undefined,
+      },
       ssoSection: {
         badge__active: undefined,
         badge__inProgress: undefined,
@@ -1703,7 +1756,7 @@ export const teIN: LocalizationResource = {
     resetPasswordMfa: {
       detailsLabel: 'మీ పాస్‌వర్డ్‌ను రీసెట్ చేయడానికి ముందు మీ గుర్తింపును మేము ధృవీకరించాలి.',
     },
-    ssoFallback: {
+    ssoBypass: {
       actionLink: undefined,
       code: {
         resendButton: undefined,
@@ -2047,10 +2100,12 @@ export const teIN: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
     session_exists: undefined,
+    sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
     web3_missing_identifier: 'Web3 వాలెట్ పొడిగింపు కనుగొనబడలేదు. కొనసాగించడానికి దయచేసి ఒకదాన్ని ఇన్‌స్టాల్ చేయండి.',
