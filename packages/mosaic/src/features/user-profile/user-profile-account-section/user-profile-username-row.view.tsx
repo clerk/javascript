@@ -38,8 +38,9 @@ function EditUsername({ username, onSubmit }: { username: string; onSubmit: (use
 
   return (
     <UserProfileEditUsernameDialog
-      {...controller}
+      form={controller.form}
       open={controller.isOpen}
+      onOpenChange={controller.onOpenChange}
       title={isSet ? m.username.dialogTitle : m.username.addDialogTitle}
       trigger={
         <Button
