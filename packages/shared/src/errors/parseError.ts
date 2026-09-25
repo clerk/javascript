@@ -41,6 +41,7 @@ export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
       is_plan_upgrade_possible: error?.meta?.isPlanUpgradePossible,
       seats_quantity_to_add: error?.meta?.seatsQuantityToAdd,
       seats_quantity: error?.meta?.seatsQuantity,
+      remaining_attempts: error?.meta?.remainingAttempts,
       trace_id: error?.meta?.traceId,
       kind: error?.meta?.kind,
       title: error?.meta?.title,

@@ -28,6 +28,7 @@ export class ClerkAPIError<Meta extends ClerkAPIErrorMeta = any> implements Cler
         isPlanUpgradePossible: json.meta?.is_plan_upgrade_possible,
         seatsQuantityToAdd: json.meta?.seats_quantity_to_add,
         seatsQuantity: json.meta?.seats_quantity,
+        remainingAttempts: json.meta?.remaining_attempts,
         traceId: json.meta?.trace_id,
         kind: json.meta?.kind,
         title: json.meta?.title,

@@ -23,6 +23,7 @@ export interface ClerkAPIErrorJSON {
     is_plan_upgrade_possible?: boolean;
     seats_quantity_to_add?: number;
     seats_quantity?: number;
+    remaining_attempts?: number;
     trace_id?: string;
     kind?: string;
     title?: string;
@@ -74,6 +75,8 @@ export interface ClerkAPIError {
     isPlanUpgradePossible?: boolean;
     seatsQuantityToAdd?: number;
     seatsQuantity?: number;
+    /** Remaining password confirmation attempts in the current session; zero means the session has ended. */
+    remainingAttempts?: number;
     /**
      * A short reference for the request that produced this error. It is shown to
      * the end user so they can quote it when contacting support.
