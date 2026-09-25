@@ -7,6 +7,7 @@ import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import { styles } from './user-profile-account-section.styles';
 import type {
   UserProfileEmail,
+  UserProfileEmailVerifier,
   UserProfileNameAttribute,
   UserProfilePhone,
 } from './user-profile-account-section.types';
@@ -45,8 +46,8 @@ export interface UserProfileAccountSectionViewProps {
   onSubmitName?: (value: UserProfileEditNameValue) => Promise<void>;
   onSubmitUsername?: (username: string) => Promise<void>;
   onAddEmail?: () => void;
-  onSendEmailCode?: (emailAddress: string) => Promise<void>;
-  onVerifyEmailCode?: (emailAddress: string, code: string) => Promise<void>;
+  onCreateEmail?: (emailAddress: string) => Promise<UserProfileEmailVerifier>;
+  getEmailVerifier?: (id: string) => UserProfileEmailVerifier;
   onManageEmail?: (id: string) => void;
   onVerifyEmail?: (id: string) => void;
   onSetPrimaryEmail?: (id: string) => void | Promise<void>;
@@ -78,8 +79,8 @@ export function UserProfileAccountSectionView({
   onSubmitName,
   onSubmitUsername,
   onAddEmail,
-  onSendEmailCode,
-  onVerifyEmailCode,
+  onCreateEmail,
+  getEmailVerifier,
   onManageEmail,
   onVerifyEmail,
   onSetPrimaryEmail,
@@ -110,8 +111,8 @@ export function UserProfileAccountSectionView({
       emails={emails}
       allowMultipleAccounts={allowMultipleAccounts}
       onAddEmail={onAddEmail}
-      onSendEmailCode={onSendEmailCode}
-      onVerifyEmailCode={onVerifyEmailCode}
+      onCreateEmail={onCreateEmail}
+      getEmailVerifier={getEmailVerifier}
       onManageEmail={onManageEmail}
       onVerifyEmail={onVerifyEmail}
       onSetPrimaryEmail={onSetPrimaryEmail}

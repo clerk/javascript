@@ -64,8 +64,9 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const addEmail = (value: string) =>
     setEmails(current => [...current, { id: `email_${Date.now()}`, value, isDefault: false, isVerified: false }]);
   const emailFlow = createUserProfileAddEmailFixture({
-    onVerified: value =>
-      setEmails(current => [...current, { id: `email_${Date.now()}`, value, isDefault: false, isVerified: true }]),
+    onCreated: (id, value) => setEmails(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+    onVerified: id =>
+      setEmails(current => current.map(email => (email.id === id ? { ...email, isVerified: true } : email))),
   });
 
   const pages: UserProfileViewProps['pages'] = {
@@ -88,8 +89,8 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       emails,
       phones,
       onAddEmail,
-      onSendEmailCode: onAddEmail ? undefined : emailFlow.onSendEmailCode,
-      onVerifyEmailCode: onAddEmail ? undefined : emailFlow.onVerifyEmailCode,
+      onCreateEmail: onAddEmail ? undefined : emailFlow.onCreateEmail,
+      getEmailVerifier: onAddEmail ? undefined : emailFlow.getEmailVerifier,
       ...createUserProfileAddPhoneFixture({
         onVerified: value =>
           setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isDefault: false, isVerified: true }]),

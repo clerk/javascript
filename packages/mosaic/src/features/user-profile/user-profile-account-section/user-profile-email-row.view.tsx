@@ -2,12 +2,12 @@ import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
+import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
 import { useListRemovalFocus } from '../../../hooks/useListRemovalFocus';
 import { fill, useMessages } from '../../../localization';
-import type { UserProfileEmail } from './user-profile-account-section.types';
-import type { UserProfileAddEmailControllerOptions } from './user-profile-add-email.controller';
+import type { UserProfileEmail, UserProfileEmailVerifier } from './user-profile-account-section.types';
 import { useUserProfileAddEmailController } from './user-profile-add-email.controller';
 import { UserProfileAddEmailDialog } from './user-profile-add-email.dialog';
 import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
@@ -18,8 +18,8 @@ export interface UserProfileEmailRowViewProps {
   emails: UserProfileEmail[];
   allowMultipleAccounts?: boolean;
   onAddEmail?: () => void;
-  onSendEmailCode?: (emailAddress: string) => Promise<void>;
-  onVerifyEmailCode?: (emailAddress: string, code: string) => Promise<void>;
+  onCreateEmail?: (emailAddress: string) => Promise<UserProfileEmailVerifier>;
+  getEmailVerifier?: (id: string) => UserProfileEmailVerifier;
   onManageEmail?: (id: string) => void;
   onVerifyEmail?: (id: string) => void;
   onSetPrimaryEmail?: (id: string) => void | Promise<void>;
@@ -30,8 +30,8 @@ export function UserProfileEmailRowView({
   emails,
   allowMultipleAccounts = false,
   onAddEmail,
-  onSendEmailCode,
-  onVerifyEmailCode,
+  onCreateEmail,
+  getEmailVerifier,
   onManageEmail,
   onVerifyEmail,
   onSetPrimaryEmail,
@@ -44,30 +44,55 @@ export function UserProfileEmailRowView({
     onRemove: onRemoveEmail,
     fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
   });
+  const verification = useUserProfileAddEmailController({ onCreate: onCreateEmail });
+  const verificationDialog = useMemo(() => Dialog.createHandle(), []);
+  const canVerify = Boolean(getEmailVerifier);
+  const addEmailLabel = (
+    <>
+      {allowMultipleAccounts ? (
+        <Icon
+          name='plus'
+          placement='inline-start'
+          size='sm'
+        />
+      ) : null}
+      {allowMultipleAccounts ? m.add : m.email.add}
+    </>
+  );
   const addEmailAction =
-    onSendEmailCode && onVerifyEmailCode ? (
-      <AddEmail
-        options={{ onSend: onSendEmailCode, onVerify: onVerifyEmailCode }}
-        compact={allowMultipleAccounts}
-      />
+    canVerify && onCreateEmail ? (
+      <Dialog.Trigger
+        handle={verificationDialog}
+        render={
+          <Button
+            aria-label={m.email.add}
+            color='neutral'
+            size='sm'
+            variant='outline'
+          />
+        }
+      >
+        {addEmailLabel}
+      </Dialog.Trigger>
     ) : onAddEmail ? (
       <Button
-        onClick={onAddEmail}
         aria-label={m.email.add}
         color='neutral'
         size='sm'
         variant='outline'
+        onClick={onAddEmail}
       >
-        {allowMultipleAccounts ? (
-          <Icon
-            name='plus'
-            placement='inline-start'
-            size='sm'
-          />
-        ) : null}
-        {allowMultipleAccounts ? m.add : m.email.add}
+        {addEmailLabel}
       </Button>
     ) : undefined;
+  const verifyingId = useRef<string | undefined>(undefined);
+  const verifyEmail = (id: string) => {
+    const email = emails.find(email => email.id === id);
+    if (email && getEmailVerifier) {
+      verifyingId.current = id;
+      verification.onVerifyEmail(email.value, getEmailVerifier(id));
+    }
+  };
   const removeEmailConfirmation = useMemo(() => Confirmation.createHandle<UserProfileEmail>(), []);
   const primary = useUserProfileSetPrimaryController({
     items: emails,
@@ -82,15 +107,30 @@ export function UserProfileEmailRowView({
     }
   };
 
+  const dialog = canVerify ? (
+    <UserProfileAddEmailDialog
+      {...verification}
+      handle={verificationDialog}
+      finalFocus={() => {
+        const id = verifyingId.current;
+        verifyingId.current = undefined;
+        return id ? removalFocus.trigger(id) : null;
+      }}
+    />
+  ) : null;
+
   if (!allowMultipleAccounts) {
     return (
-      <UserProfileContactRowView
-        items={emails}
-        kind='email'
-        label={m.email.label}
-        addAction={addEmailAction}
-        onManage={onManageEmail}
-      />
+      <>
+        <UserProfileContactRowView
+          items={emails}
+          kind='email'
+          label={m.email.label}
+          addAction={addEmailAction}
+          onManage={onManageEmail}
+        />
+        {dialog}
+      </>
     );
   }
 
@@ -105,8 +145,9 @@ export function UserProfileEmailRowView({
         addAction={addEmailAction}
         onRemove={onRemoveEmail ? removeEmail : undefined}
         onSetPrimary={primary.onSetPrimary}
-        onVerify={onVerifyEmail}
+        onVerify={canVerify ? verifyEmail : onVerifyEmail}
       />
+      {dialog}
       {primary.error ? (
         <Text
           role='alert'
@@ -131,32 +172,5 @@ export function UserProfileEmailRowView({
         />
       ) : null}
     </>
-  );
-}
-
-function AddEmail({ options, compact }: { options: UserProfileAddEmailControllerOptions; compact: boolean }) {
-  const m = useMessages('userProfileAccountSection');
-  const controller = useUserProfileAddEmailController(options);
-  return (
-    <UserProfileAddEmailDialog
-      {...controller}
-      trigger={
-        <Button
-          aria-label={m.email.add}
-          color='neutral'
-          size='sm'
-          variant='outline'
-        >
-          {compact ? (
-            <Icon
-              name='plus'
-              placement='inline-start'
-              size='sm'
-            />
-          ) : null}
-          {compact ? m.add : m.email.add}
-        </Button>
-      }
-    />
   );
 }
