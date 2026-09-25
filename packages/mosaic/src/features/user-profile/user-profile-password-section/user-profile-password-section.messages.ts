@@ -4,7 +4,7 @@ export const userProfilePasswordSectionMessages = {
   masked: '••••••••••••••••••',
   noPasswordSet: 'No password set',
   managedBy: 'Managed by {name}',
-  readonly: 'Your organization manages your password.',
+  readonly: 'Your password can currently not be edited because you can sign in only via the enterprise connection.',
   change: 'Change password',
   set: 'Set password',
 
