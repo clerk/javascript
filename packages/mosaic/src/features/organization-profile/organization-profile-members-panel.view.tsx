@@ -1,10 +1,9 @@
-import * as stylex from '@stylexjs/stylex';
 import type { MouseEventHandler } from 'react';
 
-import { panelStyles, Profile } from '../../components/profile';
+import { Panel } from '../../components/panel';
 import { Tabs } from '../../components/tabs';
 import { useMessages } from '../../localization';
-import { mergeStyleProps, themeProps } from '../../props';
+import { themeProps } from '../../props';
 import type { InvitationsTableTabViewProps } from './invitations-table-tab.types';
 import { InvitationsTableTabView } from './invitations-table-tab.view';
 import type { MembersTableTabViewProps } from './members-table-tab.types';
@@ -67,8 +66,8 @@ export function OrganizationProfileMembersPanelView({
   ].filter(tab => tab.content !== null);
 
   return (
-    <div {...mergeStyleProps(themeProps('organization-profile-members-panel'), stylex.props(panelStyles.root))}>
-      <Profile.PageTitle>{m.pages.members}</Profile.PageTitle>
+    <Panel.Root render={<div {...themeProps('organization-profile-members-panel')} />}>
+      <Panel.Title>{m.pages.members}</Panel.Title>
       {tabs.length > 0 ? (
         <Tabs.Root defaultValue={tabs[0]?.id}>
           <Tabs.List aria-label={m.pages.members}>
@@ -93,6 +92,6 @@ export function OrganizationProfileMembersPanelView({
         </Tabs.Root>
       ) : null}
       {inviteDialog ? <OrganizationProfileInviteMembersDialog {...inviteDialog} /> : null}
-    </div>
+    </Panel.Root>
   );
 }

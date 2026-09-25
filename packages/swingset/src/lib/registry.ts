@@ -185,6 +185,7 @@ import {
   Primary as PaginationPrimary,
   SinglePage as PaginationSinglePage,
 } from '../stories/pagination.stories';
+import { Default as PanelDefault, meta as panelMeta } from '../stories/panel.component.stories';
 import {
   Default as PhoneInputDefault,
   Disabled as PhoneInputDisabled,
@@ -560,6 +561,7 @@ const popoverComponentModule: StoryModule = {
   Placement: PopoverComponentPlacement,
   Alignment: PopoverComponentAlignment,
 };
+const panelModule: StoryModule = { meta: panelMeta, Default: PanelDefault };
 const profileComponentModule: StoryModule = {
   meta: profileComponentMeta,
   Default: ProfileDefault,
@@ -952,6 +954,7 @@ export const registry: StoryModule[] = [
   menuComponentModule,
   otpComponentModule,
   paginationModule,
+  panelModule,
   popoverComponentModule,
   profileComponentModule,
   sectionModule,

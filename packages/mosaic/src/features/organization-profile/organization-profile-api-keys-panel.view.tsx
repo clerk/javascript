@@ -6,7 +6,7 @@ import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
-import { panelStyles, Profile } from '../../components/profile';
+import { Panel } from '../../components/panel';
 import { Spinner } from '../../components/spinner';
 import type { TableHeaderCellProps } from '../../components/table';
 import { Table } from '../../components/table';
@@ -15,7 +15,7 @@ import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import { fill, useMessages } from '../../localization';
 import { useDataTable } from '../../primitives/hooks';
-import { mergeStyleProps, themeProps } from '../../props';
+import { themeProps } from '../../props';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 import { styles } from './organization-profile-api-keys-panel.styles';
 import type {
@@ -112,8 +112,8 @@ export function OrganizationProfileApiKeysPanelView({
     : { label: m.noKeys, description: m.noKeysDescription };
   return (
     <>
-      <div {...mergeStyleProps(themeProps('organization-profile-api-keys-panel'), stylex.props(panelStyles.root))}>
-        <Profile.PageTitle>{m.title}</Profile.PageTitle>
+      <Panel.Root render={<div {...themeProps('organization-profile-api-keys-panel')} />}>
+        <Panel.Title>{m.title}</Panel.Title>
         <Table.Toolbar>
           <Table.Search
             ref={searchInput}
@@ -241,7 +241,7 @@ export function OrganizationProfileApiKeysPanelView({
             onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
           />
         ) : null}
-      </div>
+      </Panel.Root>
       {createDialog ? <OrganizationProfileCreateAPIKeyDialog {...createDialog} /> : null}
       {onRevoke ? (
         <Destructive

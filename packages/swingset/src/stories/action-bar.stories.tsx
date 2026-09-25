@@ -3,6 +3,7 @@ import { Button } from '@clerk/mosaic/components/button';
 import { Dialog } from '@clerk/mosaic/components/dialog';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { Menu } from '@clerk/mosaic/components/menu';
+import { Panel } from '@clerk/mosaic/components/panel';
 import { Profile } from '@clerk/mosaic/components/profile';
 import { Table } from '@clerk/mosaic/components/table';
 import { useDataTable } from '@clerk/mosaic/primitives/hooks';
@@ -171,14 +172,14 @@ function MembersProfile({
       </Profile.Nav>
       <Profile.Content>
         <Profile.ContentPanel value='members'>
-          <div style={{ display: 'grid', gap: 24 }}>
-            <Profile.PageTitle>Members</Profile.PageTitle>
+          <Panel.Root>
+            <Panel.Title>Members</Panel.Title>
             <MembersTable
               rows={members.length}
               portalRoot={portalRoot}
             />
             <p>1–18 of 18</p>
-          </div>
+          </Panel.Root>
         </Profile.ContentPanel>
       </Profile.Content>
     </Profile.Root>
