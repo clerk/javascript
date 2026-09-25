@@ -2,7 +2,7 @@ export { Field } from './field';
 export type {
   FieldDescriptionProps,
   FieldErrorProps,
-  FieldInfoProps,
+  FieldHintProps,
   FieldLabelProps,
   FieldMessageProps,
   FieldRootProps,
