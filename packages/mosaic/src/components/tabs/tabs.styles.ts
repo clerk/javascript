@@ -45,12 +45,13 @@ export const styles = stylex.create({
     paddingTop: space['2.5'],
   },
   hitArea: {
+    '--_cl-tab-hit-end': { default: '0px', ':has(+ [role="tab"])': halfGap },
     '--_cl-tab-hit-start': { default: halfGap, ':first-child': '0px' },
     position: 'relative',
     '::before': {
       insetBlock: 0,
       content: '""',
-      insetInlineEnd: halfGap,
+      insetInlineEnd: 'var(--_cl-tab-hit-end)',
       insetInlineStart: 'var(--_cl-tab-hit-start)',
       position: 'absolute',
     },
