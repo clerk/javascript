@@ -20,23 +20,25 @@ describe('Section', () => {
   it('renders an accessible section and every compound part', () => {
     render(
       <Section.Root>
-        <Section.Title>Account</Section.Title>
         <Section.Group data-testid='group'>
-          <Section.Row data-testid='row'>
-            <Section.Item data-testid='item'>
-              <Section.Media
-                size='lg'
-                data-testid='media'
-              >
-                Icon
-              </Section.Media>
-              <Section.Content data-testid='content'>
-                <Section.Label data-testid='label'>Name</Section.Label>
-                <Section.Description data-testid='description'>Shown throughout the application.</Section.Description>
-              </Section.Content>
-              <Section.Actions data-testid='actions'>Control</Section.Actions>
-            </Section.Item>
-          </Section.Row>
+          <Section.Title>Account</Section.Title>
+          <Section.Surface data-testid='surface'>
+            <Section.Row data-testid='row'>
+              <Section.Item data-testid='item'>
+                <Section.Media
+                  size='lg'
+                  data-testid='media'
+                >
+                  Icon
+                </Section.Media>
+                <Section.Content data-testid='content'>
+                  <Section.Label data-testid='label'>Name</Section.Label>
+                  <Section.Description data-testid='description'>Shown throughout the application.</Section.Description>
+                </Section.Content>
+                <Section.Actions data-testid='actions'>Control</Section.Actions>
+              </Section.Item>
+            </Section.Row>
+          </Section.Surface>
         </Section.Group>
       </Section.Root>,
     );
@@ -44,6 +46,8 @@ describe('Section', () => {
     expect(screen.getByRole('region', { name: 'Account' })).toHaveClass('cl-section');
     expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toHaveClass('cl-section-title');
     expect(screen.getByTestId('group')).toHaveClass('cl-section-group');
+    expect(screen.getByTestId('group')).toContainElement(screen.getByRole('heading', { name: 'Account' }));
+    expect(screen.getByTestId('surface')).toHaveClass('cl-section-surface');
     expect(screen.getByTestId('row')).toHaveClass('cl-section-row');
     expect(screen.getByTestId('item')).toHaveClass('cl-section-item');
     expect(screen.getByTestId('media')).toHaveClass('cl-section-media');
@@ -79,8 +83,10 @@ describe('Section', () => {
   it('supports an explicit accessible name', () => {
     render(
       <Section.Root aria-label='Account preferences'>
-        <Section.Title>Account</Section.Title>
-        <Section.Group />
+        <Section.Group>
+          <Section.Title>Account</Section.Title>
+          <Section.Surface />
+        </Section.Group>
       </Section.Root>,
     );
 
@@ -88,18 +94,18 @@ describe('Section', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toBeInTheDocument();
   });
 
-  it('composes multiple items in one row', () => {
+  it('composes a header over a nested list', () => {
     render(
       <Section.Root>
-        <Section.Title>Profile</Section.Title>
         <Section.Group>
-          <Section.Row data-testid='row'>
-            <Section.Item>
+          <Section.Title>Profile</Section.Title>
+          <Section.Surface>
+            <Section.Header data-testid='header'>
               <Section.Content>
                 <Section.Label>Email</Section.Label>
               </Section.Content>
               <Section.Actions>Edit</Section.Actions>
-            </Section.Item>
+            </Section.Header>
             <Section.Items data-testid='items'>
               <Section.Item data-testid='nested-item'>
                 <Section.Content data-testid='nested-content'>
@@ -108,7 +114,7 @@ describe('Section', () => {
                 <Section.Actions>More</Section.Actions>
               </Section.Item>
             </Section.Items>
-          </Section.Row>
+          </Section.Surface>
         </Section.Group>
       </Section.Root>,
     );
@@ -116,29 +122,56 @@ describe('Section', () => {
     expect(screen.getByText('Email')).toBeInTheDocument();
     expect(screen.getByText('ada@example.com')).toBeInTheDocument();
     expect(screen.getAllByText(/Edit|More/)).toHaveLength(2);
+    expect(screen.getByTestId('header')).toHaveClass('cl-section-header');
     expect(screen.getByTestId('items')).toHaveClass('cl-section-items');
-    expect(screen.getByTestId('row')).not.toHaveAttribute('data-variant');
+    expect(screen.getByTestId('header')).not.toHaveAttribute('data-nested');
     expect(screen.getByTestId('items')).toHaveAttribute('data-nested');
     expect(screen.getByTestId('nested-item')).toHaveAttribute('data-nested');
     expect(screen.getByTestId('nested-content')).toHaveAttribute('data-nested');
   });
 
-  it('retains public nesting hooks while deriving layout from the item collection structure', () => {
+  it('renders a contained group as a named group inside the one section', () => {
     render(
       <Section.Root>
-        <Section.Group>
-          <Section.Row data-testid='row'>
-            <Section.Item>Email</Section.Item>
-            <Section.Items>
-              <Section.Item>one@example.com</Section.Item>
-              <Section.Item>two@example.com</Section.Item>
-            </Section.Items>
-          </Section.Row>
+        <Section.Group data-testid='group'>
+          <Section.Title>Account</Section.Title>
+          <Section.Surface />
+        </Section.Group>
+        <Section.Group
+          variant='contained'
+          aria-label='Email'
+          data-testid='contained'
+        >
+          <Section.Surface />
         </Section.Group>
       </Section.Root>,
     );
 
-    expect(screen.getByTestId('row')).not.toHaveAttribute('data-variant');
+    expect(screen.getAllByRole('region')).toHaveLength(1);
+    expect(screen.getByTestId('group')).toHaveAttribute('data-variant', 'default');
+    expect(screen.getByTestId('group')).not.toHaveAttribute('role');
+    expect(screen.getByRole('group', { name: 'Email' })).toBe(screen.getByTestId('contained'));
+    expect(screen.getByTestId('contained')).toHaveAttribute('data-variant', 'contained');
+  });
+
+  it('marks only items inside Section.Items as nested', () => {
+    render(
+      <Section.Root>
+        <Section.Group>
+          <Section.Surface>
+            <Section.Row>
+              <Section.Item>Name</Section.Item>
+            </Section.Row>
+            <Section.Items>
+              <Section.Item>one@example.com</Section.Item>
+              <Section.Item>two@example.com</Section.Item>
+            </Section.Items>
+          </Section.Surface>
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    expect(screen.getByText('Name')).not.toHaveAttribute('data-nested');
     expect(screen.getByText('one@example.com')).toHaveAttribute('data-nested');
     expect(screen.getByText('two@example.com')).toHaveAttribute('data-nested');
   });
@@ -156,22 +189,24 @@ describe('Section', () => {
         render={props => <article {...props} />}
         xstyle={overrides.root}
       >
-        <Section.Title>Account</Section.Title>
         <Section.Group
           ref={groupRef}
           xstyle={overrides.group}
         >
-          <Section.Row>
-            <Section.Item
-              ref={itemRef}
-              xstyle={overrides.item}
-            >
-              <Section.Content ref={contentRef}>
-                <Section.Label xstyle={overrides.label}>Name</Section.Label>
-              </Section.Content>
-              <Section.Actions ref={actionsRef} />
-            </Section.Item>
-          </Section.Row>
+          <Section.Title>Account</Section.Title>
+          <Section.Surface>
+            <Section.Row>
+              <Section.Item
+                ref={itemRef}
+                xstyle={overrides.item}
+              >
+                <Section.Content ref={contentRef}>
+                  <Section.Label xstyle={overrides.label}>Name</Section.Label>
+                </Section.Content>
+                <Section.Actions ref={actionsRef} />
+              </Section.Item>
+            </Section.Row>
+          </Section.Surface>
         </Section.Group>
       </Section.Root>,
     );
@@ -201,14 +236,16 @@ describe('Section', () => {
     render(
       <Section.Root>
         <Section.Group>
-          <Section.Row data-testid='row'>
-            <Section.Item data-testid='item'>
-              <Section.Content>
-                <Section.Label>Profile picture</Section.Label>
-              </Section.Content>
-            </Section.Item>
-            <Section.Error data-testid='error'>File type not supported.</Section.Error>
-          </Section.Row>
+          <Section.Surface>
+            <Section.Row data-testid='row'>
+              <Section.Item data-testid='item'>
+                <Section.Content>
+                  <Section.Label>Profile picture</Section.Label>
+                </Section.Content>
+              </Section.Item>
+              <Section.Error data-testid='error'>File type not supported.</Section.Error>
+            </Section.Row>
+          </Section.Surface>
         </Section.Group>
       </Section.Root>,
     );

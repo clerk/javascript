@@ -41,9 +41,20 @@ function unwrapReturn(fnSource: string): string {
     return expr;
   }
 
-  // `return <X … />;` — a single expression statement; take up to its terminating semicolon.
-  const semicolon = expr.indexOf(';');
-  return semicolon === -1 ? expr : expr.slice(0, semicolon);
+  // `return <X … />;` — the return is the function's last statement, so its terminating semicolon
+  // is the last one; an earlier one can sit inside the JSX (an inline `<style>` block, say).
+  const semicolon = expr.lastIndexOf(';');
+  return alignToFirstLine(semicolon === -1 ? expr : expr.slice(0, semicolon));
+}
+
+function alignToFirstLine(text: string): string {
+  const [first, ...rest] = text.replace(/\s+$/, '').split('\n');
+  const last = rest.at(-1);
+  if (!last) {
+    return first;
+  }
+  const indent = last.length - last.trimStart().length;
+  return [first, ...rest.map(line => line.slice(Math.min(indent, line.length - line.trimStart().length)))].join('\n');
 }
 
 /** Removes the common leading indentation shared by every non-blank line. */

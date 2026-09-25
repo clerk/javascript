@@ -107,15 +107,16 @@ export function UserProfilePhoneRowView({
         onRemove={onRemovePhone ? removePhone : undefined}
         onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}
         onVerify={onVerifyPhone}
-      />
-      {primaryError ? (
-        <Text
-          role='alert'
-          color='negative'
-        >
-          {primaryError}
-        </Text>
-      ) : null}
+      >
+        {primaryError ? (
+          <Text
+            role='alert'
+            color='negative'
+          >
+            {primaryError}
+          </Text>
+        ) : null}
+      </UserProfileContactListRowView>
       {onRemovePhone ? (
         <Confirmation
           handle={removePhoneConfirmation}

@@ -121,15 +121,16 @@ export function UserProfileEmailRowView({
         onRemove={onRemoveEmail ? removeEmail : undefined}
         onSetPrimary={onSetPrimaryEmail && !isSettingPrimary ? id => void setPrimaryEmail(id) : undefined}
         onVerify={onVerifyEmail}
-      />
-      {primaryError ? (
-        <Text
-          role='alert'
-          color='negative'
-        >
-          {primaryError}
-        </Text>
-      ) : null}
+      >
+        {primaryError ? (
+          <Text
+            role='alert'
+            color='negative'
+          >
+            {primaryError}
+          </Text>
+        ) : null}
+      </UserProfileContactListRowView>
       {onRemoveEmail ? (
         <Confirmation
           handle={removeEmailConfirmation}
