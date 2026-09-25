@@ -8,4 +8,4 @@ Remove the `modePriority` prop from `UserButton`. The header now follows what it
 
 The rows in the `UserButton` popup are now themed through their own `.cl-user-button-item` slots (`-media`, `-content`, `-label`, `-description`, `-trailing`), plus `.cl-user-button-group` and `.cl-user-button-separator`, instead of the shared `.cl-item` slots.
 
-`Menu.Trigger` accepts `focusableWhenDisabled`, which keeps a disabled default trigger in the tab order. The `UserButton` menu triggers now use it, so they keep focus while an action is in flight.
+`Menu.Trigger` accepts `focusableWhenDisabled`, which keeps a disabled default trigger in the tab order. The `UserButton` menu triggers now use it, so they keep focus while an action is in flight. A row running an action now reports it to assistive tech, busy with a named progress indicator.

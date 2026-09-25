@@ -741,10 +741,22 @@ describe('UserButtonView, one action at a time', () => {
   // The press leaves focus on the row, so the row is what gets re-read while it works. It takes
   // the same pairing as a pending `SubmitButton` — `aria-busy` beside an indicator carrying a name
   // of its own — since a row that only stands down `aria-disabled` reads as unavailable instead.
-  it('reports the switch on the row that owns it, the way a pending button does', () => {
-    render(surface(userButtonBusyKeys.selectOrganization('org_2')));
+  it.each([
+    ['a workspace row', 'Other Co', userButtonBusyKeys.selectOrganization('org_2')],
+    ['an action row', 'Sign out of all accounts', userButtonBusyKeys.signOutAll()],
+    ['the accounts flyout', 'Switch account', userButtonBusyKeys.switchSession('sess_2')],
+    [
+      'the account menu',
+      'Actions for alice@example.com',
+      userButtonBusyKeys.signOutSession('sess_1', 'organizationsHeading'),
+    ],
+  ])('reports the action on %s that owns it, in place, the way a pending button does', (_name, label, key) => {
+    const { rerender } = render(surface(null));
+    const row = screen.getByRole('button', { name: label });
 
-    const row = screen.getByRole('button', { name: 'Other Co' });
+    rerender(surface(key));
+
+    expect(screen.getByRole('button', { name: label })).toBe(row);
     expect(row).toHaveAttribute('aria-busy', 'true');
     expect(within(row).getByRole('progressbar')).toHaveAccessibleName('pending');
   });
@@ -786,13 +798,6 @@ describe('UserButtonView, one action at a time', () => {
     expect(stoodDown).toBe(row);
     expect(stoodDown).toHaveAttribute('aria-disabled', 'true');
     expect(stoodDown).toBeEnabled();
-  });
-
-  // The flyout closes on pick, so the row that opened it is what is left to report the switch.
-  it('reports a switch on the row that opened the flyout', () => {
-    render(surface(userButtonBusyKeys.switchSession('sess_2')));
-
-    expect(screen.getByRole('button', { name: 'Switch account' }).querySelector('.cl-spinner')).not.toBeNull();
   });
 
   // `aria-disabled` is advisory, so the row has to drop the press itself.

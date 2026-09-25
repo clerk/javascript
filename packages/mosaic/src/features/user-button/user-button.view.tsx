@@ -204,6 +204,22 @@ const rowButton = (disabled = false) => (
   />
 );
 
+// Focus stays on the row for the length of the action, so the row is what gets re-read when it
+// changes. A decorative spinner changes nothing there and the wait passes in silence, so the
+// indicator is named in its own right — the pairing `SubmitButton` makes, and the reason its
+// pending state is spoken where this one was not.
+function PendingSpinner() {
+  const m = useMessages('userButton');
+  return (
+    <Spinner
+      role='progressbar'
+      aria-hidden={undefined}
+      aria-label={m.workspaces.pending}
+      size='sm'
+    />
+  );
+}
+
 interface SwitcherRowProps {
   name: string;
   /**
@@ -237,7 +253,6 @@ function SwitcherRow({
   busy,
   disabled,
 }: SwitcherRowProps) {
-  const m = useMessages('userButton');
   // Selecting what is already selected does nothing, so the active row is not a button at all. A
   // row that is merely waiting stays one, disabled.
   const select = active ? undefined : onSelect;
@@ -267,16 +282,7 @@ function SwitcherRow({
       </UserButtonItemContent>
       {busy ? (
         <UserButtonItemTrailing>
-          <Spinner
-            // Focus stays on the row for the length of the action, so the row is what gets re-read
-            // when it changes. A decorative spinner changes nothing there and the wait passes in
-            // silence, so the indicator is named in its own right — the pairing `SubmitButton`
-            // makes, and the reason its pending state is spoken where this one was not.
-            role='progressbar'
-            aria-hidden={undefined}
-            aria-label={m.workspaces.pending}
-            size='sm'
-          />
+          <PendingSpinner />
         </UserButtonItemTrailing>
       ) : trailing ? (
         <UserButtonItemTrailing>{trailing}</UserButtonItemTrailing>
@@ -321,10 +327,11 @@ function ActionRow({ icon, label, href, onClick, busyKey }: ActionRowProps) {
     <UserButtonItem
       // A link is the browser's navigation rather than one of the surface's one-shot actions, so it
       // has nothing to wait behind and never stands down.
+      aria-busy={busy || undefined}
       render={href ? asAnchor(href) : rowButton(busy || disabled)}
       onClick={onClick}
     >
-      <UserButtonItemMedia>{busy ? <Spinner size='sm' /> : icon}</UserButtonItemMedia>
+      <UserButtonItemMedia>{busy ? <PendingSpinner /> : icon}</UserButtonItemMedia>
       <UserButtonItemContent>
         <UserButtonItemLabel variant='interactive'>{label}</UserButtonItemLabel>
       </UserButtonItemContent>
@@ -493,7 +500,15 @@ interface RowAction {
 }
 
 /** The `⋯` that hangs off a row's trailing edge. Renders nothing when it would be empty. */
-function ActionMenu({ label, actions, disabled }: { label: string; actions: RowAction[]; disabled?: boolean }) {
+interface ActionMenuProps {
+  label: string;
+  actions: RowAction[];
+  busy?: boolean;
+  disabled?: boolean;
+}
+
+function ActionMenu({ label, actions, busy = false, disabled }: ActionMenuProps) {
+  const m = useMessages('userButton');
   if (actions.length === 0) {
     return null;
   }
@@ -503,8 +518,20 @@ function ActionMenu({ label, actions, disabled }: { label: string; actions: RowA
       <Menu.Root>
         <Menu.Trigger
           aria-label={label}
-          disabled={disabled}
-          focusableWhenDisabled
+          disabled={busy || disabled}
+          render={props => (
+            <SubmitButton
+              variant='ghost'
+              size='sm'
+              shape='square'
+              type='button'
+              isPending={busy}
+              pendingLabel={m.workspaces.pending}
+              spinDelay={{ delay: 0 }}
+              focusableWhenDisabled
+              {...props}
+            />
+          )}
         />
         <Menu.Popup>
           {actions.map(a => (
@@ -558,17 +585,12 @@ function OrganizationsHeading() {
       <UserButtonItemContent>
         <UserButtonItemDescription xstyle={styles.accountIdentifier}>{identifier}</UserButtonItemDescription>
       </UserButtonItemContent>
-      {busy ? (
-        <UserButtonItemTrailing>
-          <Spinner size='sm' />
-        </UserButtonItemTrailing>
-      ) : (
-        <ActionMenu
-          label={fill(m.accounts.actionsFor, { identifier })}
-          actions={actions}
-          disabled={disabled}
-        />
-      )}
+      <ActionMenu
+        label={fill(m.accounts.actionsFor, { identifier })}
+        actions={actions}
+        busy={busy}
+        disabled={disabled}
+      />
     </UserButtonItem>
   );
 }
@@ -826,10 +848,13 @@ function SwitchAccountRow() {
       sideOffset={{ x: 12, y: 8 }}
       fallbackPlacements={['left-start', 'top-start', 'bottom-start']}
     >
-      <Menu.Trigger render={<UserButtonItem render={rowButton(disabled)} />}>
+      <Menu.Trigger
+        aria-busy={busy || undefined}
+        render={<UserButtonItem render={rowButton(disabled)} />}
+      >
         <UserButtonItemMedia>
           {busy ? (
-            <Spinner size='sm' />
+            <PendingSpinner />
           ) : (
             <Icon
               name='switch-account'
