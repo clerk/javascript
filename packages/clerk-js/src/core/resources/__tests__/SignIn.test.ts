@@ -18,6 +18,14 @@ vi.mock('../../../utils/authenticateWithPopup', async () => {
 // Import the mocked function after mocking
 import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPopup';
 
+const getFapiClient = () => ({
+  buildUrl: ({ path, search }: { path: string; search?: Record<string, string> }) => {
+    const url = new URL(`https://clerk.example.com/v1${path}`);
+    Object.entries(search ?? {}).forEach(([key, value]) => url.searchParams.set(key, value));
+    return url;
+  },
+});
+
 // Mock the CaptchaChallenge module
 vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
   CaptchaChallenge: vi.fn().mockImplementation(function () {
@@ -2626,6 +2634,7 @@ describe('SignIn', () => {
 
         SignIn.clerk = {
           buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
+          getFapiClient,
           __internal_environment: {
             displayConfig: {
               captchaOauthBypass: [],
@@ -2680,6 +2689,7 @@ describe('SignIn', () => {
 
         SignIn.clerk = {
           buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
+          getFapiClient,
           __internal_environment: {
             displayConfig: {
               captchaOauthBypass: [],
@@ -2718,6 +2728,7 @@ describe('SignIn', () => {
 
         SignIn.clerk = {
           buildUrlWithAuth: vi.fn().mockReturnValue('https://example.com/sso-callback'),
+          getFapiClient,
           __internal_environment: {
             displayConfig: {
               captchaOauthBypass: [],
@@ -2842,6 +2853,7 @@ describe('SignIn', () => {
           buildUrlWithAuth: mockBuildUrlWithAuth,
           buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
           frontendApi: 'clerk.example.com',
+          getFapiClient,
           __internal_environment: {
             displayConfig: {
               captchaOauthBypass: [],
@@ -2918,6 +2930,7 @@ describe('SignIn', () => {
           buildUrlWithAuth: mockBuildUrlWithAuth,
           buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
           frontendApi: 'clerk.example.com',
+          getFapiClient,
           __internal_environment: {
             displayConfig: {
               captchaOauthBypass: [],
@@ -2998,6 +3011,7 @@ describe('SignIn', () => {
           buildUrlWithAuth: mockBuildUrlWithAuth,
           buildUrl: vi.fn().mockImplementation(path => 'https://example.com' + path),
           frontendApi: 'clerk.example.com',
+          getFapiClient,
           __internal_environment: {
             displayConfig: {
               captchaOauthBypass: [],
@@ -3047,6 +3061,7 @@ describe('SignIn', () => {
           expect.objectContaining({
             popup: mockPopup,
             externalVerificationRedirectURL: expect.any(URL),
+            state: expect.stringMatching(/^[0-9a-f]{64}$/),
           }),
         );
         expect(mockPopup.location.href).toBe('https://sso.example.com/auth');
@@ -3055,8 +3070,8 @@ describe('SignIn', () => {
         expect(mockFetch).toHaveBeenCalledWith(
           expect.objectContaining({
             body: expect.objectContaining({
-              redirectUrl: expect.stringContaining('/popup-callback'),
-              actionCompleteRedirectUrl: expect.stringContaining('/popup-callback'),
+              redirectUrl: expect.stringContaining('/popup_auth_callback'),
+              actionCompleteRedirectUrl: expect.stringContaining('/popup_auth_callback'),
             }),
           }),
         );
