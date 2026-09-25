@@ -324,6 +324,42 @@ jobs:
           path: .turbo/runs
           retention-days: 5
 
+  mosaic-feature-tests:
+    needs: [check-permissions, build-packages]
+    name: Mosaic Feature Tests
+    permissions:
+      contents: read
+    runs-on: 'blacksmith-8vcpu-ubuntu-2204'
+    defaults:
+      run:
+        shell: bash
+    timeout-minutes: ${{ vars.TIMEOUT_MINUTES_NORMAL && fromJSON(vars.TIMEOUT_MINUTES_NORMAL) || 10 }}
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+          fetch-tags: false
+          filter: 'blob:none'
+          show-progress: false
+
+      - name: Setup
+        uses: ./.github/actions/init-blacksmith
+        with:
+          cache-enabled: true
+          playwright-enabled: true
+          turbo-signature: ${{ secrets.TURBO_REMOTE_CACHE_SIGNATURE_KEY }}
+          turbo-team: ${{ vars.TURBO_TEAM }}
+          turbo-token: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Build Mosaic and its dependencies
+        run: pnpm turbo build $TURBO_ARGS --filter=@clerk/mosaic...
+
+      - name: Run feature tests
+        run: pnpm --filter @clerk/mosaic test:feature
+
   integration-tests:
     needs: [check-permissions, build-packages]
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}

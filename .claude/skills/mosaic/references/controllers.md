@@ -6,8 +6,8 @@ the model's actions so the surface can report and survive them.
 
 It does **not** touch Clerk. Its effects arrive as injected plain functions:
 from a model (`models.md`) when a wrapper composes the two, or as a prop when a
-leaf view calls its own controller. That is what lets a controller test run
-against a fake object instead of a mocked Clerk.
+leaf view calls its own controller. That keeps the controller independent of
+where its effects come from.
 
 Worked examples:
 
@@ -122,7 +122,7 @@ have a machine.
 
 ## Testing
 
-Feed the controller a **fake model object** — a plain literal with
-`status: 'ready'` and `vi.fn()` callbacks — and render a tiny harness that
-surfaces what it returns. No Clerk mocking. Assert the pending key, what closes
-the surface, and that an absent model callback stays absent. See `testing.md`.
+The controller is covered by the feature test, not a test of its own. Hold the
+FAPI request an action makes to assert its in-flight state (the spinner, the rows
+stood down), then release or fail it to assert what closes the surface. See
+`testing.md`.
