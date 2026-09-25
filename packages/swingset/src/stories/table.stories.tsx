@@ -19,7 +19,7 @@ export { default as __source } from './table.stories?raw';
 export const meta: StoryMeta = {
   group: 'Components',
   title: 'Table',
-  status: 'wip',
+  status: 'stable',
   layout: 'wide',
   source: 'packages/mosaic/src/components/table/table.tsx',
 };

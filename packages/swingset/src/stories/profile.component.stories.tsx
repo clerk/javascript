@@ -15,7 +15,7 @@ export { default as __source } from './profile.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Profile',
   layout: 'wide',
   source: 'packages/mosaic/src/components/profile/profile.tsx',

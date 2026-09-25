@@ -9,7 +9,7 @@ export { default as __source } from './text.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Text',
   source: 'packages/mosaic/src/components/text/text.tsx',
   styles: {
