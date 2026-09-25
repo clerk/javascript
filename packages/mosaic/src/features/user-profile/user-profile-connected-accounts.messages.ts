@@ -13,4 +13,7 @@ export const userProfileConnectedAccountsMessages = {
     confirm: 'Remove',
     cancel: 'Cancel',
   },
+  errors: {
+    generic: 'Something went wrong. Please try again.',
+  },
 } as const;
