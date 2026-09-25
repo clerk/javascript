@@ -78,6 +78,7 @@ import { Shield } from './glyphs/shield';
 import { ShieldCheck } from './glyphs/shield-check';
 import { ShieldClose } from './glyphs/shield-close';
 import { Sidebar } from './glyphs/sidebar';
+import { SignOut } from './glyphs/sign-out';
 import { Spinner } from './glyphs/spinner';
 import { Support } from './glyphs/support';
 import { SwitchAccount } from './glyphs/switch-account';
@@ -309,6 +310,7 @@ export const iconRegistry = {
   'shield-check': ShieldCheck,
   'shield-close': ShieldClose,
   sidebar: Sidebar,
+  'sign-out': SignOut,
   spinner: Spinner,
   support: Support,
   'switch-account': SwitchAccount,

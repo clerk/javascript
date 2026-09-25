@@ -430,7 +430,7 @@ function Header() {
       actions.push({
         id: action,
         label: m.accounts.signOut,
-        icon: 'log-out',
+        icon: 'sign-out',
         onClick: () => signOutSession(sessionId, 'header'),
         busyKey: userButtonBusyKeys.signOutSession(sessionId, 'header'),
       });
@@ -1007,7 +1007,7 @@ function Footer() {
           <ActionRow
             icon={
               <Icon
-                name='log-out'
+                name='sign-out'
                 size='sm'
               />
             }
@@ -1025,7 +1025,7 @@ function Footer() {
           <ActionRow
             icon={
               <Icon
-                name='log-out'
+                name='sign-out'
                 size='sm'
                 xstyle={rtl.mirror}
               />
