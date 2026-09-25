@@ -51,7 +51,7 @@ export const styles = stylex.create({
     borderRadius: radiusVars['--cl-radius-full'],
   },
 
-  // Matches `Item.Label`, so the trigger names a workspace the same way its row does. Capped,
+  // Matches `UserButtonItemLabel`, so the trigger names a workspace the same way its row does. Capped,
   // because the trigger sits in a host app's chrome and a long workspace name would push it apart.
   triggerName: {
     color: colorVars['--cl-color-foreground'],
@@ -71,13 +71,5 @@ export const styles = stylex.create({
   // is ours.
   scroll: {
     maxHeight: '18rem',
-  },
-
-  // The trailing column is as wide as the `⋯` menu button that owns it, so whatever stands in
-  // that button's place — the active check, a spinner — lands on the same centre line and the
-  // right edge of every row holds still as rows change state.
-  trailing: {
-    justifyContent: 'center',
-    width: space['7'],
   },
 });

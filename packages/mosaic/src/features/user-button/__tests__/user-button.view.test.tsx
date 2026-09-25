@@ -72,7 +72,7 @@ const popup = () => screen.getByRole('dialog', { name: 'Account' });
 
 // The `cl-` slot classes are Mosaic's public theming hooks, so they are a stable handle on the
 // popup's sections rather than an implementation detail.
-const groups = () => Array.from(popup().querySelectorAll<HTMLElement>('.cl-item-group'));
+const groups = () => Array.from(popup().querySelectorAll<HTMLElement>('.cl-user-button-group'));
 const header = () => {
   const node = popup().querySelector<HTMLElement>('.cl-user-button-header');
   if (!node) {
@@ -81,12 +81,12 @@ const header = () => {
   return node;
 };
 const labels = (group: HTMLElement | undefined) =>
-  Array.from(group?.querySelectorAll(".cl-item-label[data-variant='default']") ?? []).map(
+  Array.from(group?.querySelectorAll(".cl-user-button-item-label[data-variant='default']") ?? []).map(
     node => node.textContent ?? '',
   );
 const row = (group: HTMLElement | undefined, label: string) =>
-  Array.from(group?.querySelectorAll<HTMLElement>('.cl-item') ?? []).find(
-    node => node.querySelector(".cl-item-label[data-variant='default']")?.textContent === label,
+  Array.from(group?.querySelectorAll<HTMLElement>('.cl-user-button-item') ?? []).find(
+    node => node.querySelector(".cl-user-button-item-label[data-variant='default']")?.textContent === label,
   );
 
 const scrollClasses = stylex.props(...scrollAreaViewport('auto')).className?.split(' ') ?? [];
@@ -289,7 +289,7 @@ describe('UserButtonView, combined mode', () => {
     renderCombined({ onCreateOrganization });
 
     // Not `labels`: the row is an action rather than a workspace, so its label is the interactive one.
-    const rows = Array.from(workspaceList()?.querySelectorAll('.cl-item-label') ?? []);
+    const rows = Array.from(workspaceList()?.querySelectorAll('.cl-user-button-item-label') ?? []);
     expect(rows.at(-1)?.textContent).toBe('Create organization');
     await userEvent.setup().click(screen.getByRole('button', { name: 'Create organization' }));
 
@@ -586,7 +586,7 @@ describe('UserButtonView, the foot', () => {
 
   /** The foot's rows, in the order it lists them. It is the last group in the popup. */
   const footActions = () =>
-    Array.from(groups().at(-1)?.querySelectorAll(".cl-item-label[data-variant='interactive']") ?? []).map(
+    Array.from(groups().at(-1)?.querySelectorAll(".cl-user-button-item-label[data-variant='interactive']") ?? []).map(
       node => node.textContent ?? '',
     );
 
@@ -776,7 +776,7 @@ describe('UserButtonView, one action at a time', () => {
   it.each([
     ['the account menu', 'Actions for alice@example.com'],
     ['the accounts flyout', 'Switch account'],
-  ])('holds %s in place, disabled, while another action runs', (_name, label) => {
+  ])('holds %s in place, aria-disabled and still focusable, while another action runs', (_name, label) => {
     const { rerender } = render(surface(null));
     const row = screen.getByRole('button', { name: label });
 
@@ -784,7 +784,8 @@ describe('UserButtonView, one action at a time', () => {
 
     const stoodDown = screen.getByRole('button', { name: label });
     expect(stoodDown).toBe(row);
-    expect(stoodDown).toBeDisabled();
+    expect(stoodDown).toHaveAttribute('aria-disabled', 'true');
+    expect(stoodDown).toBeEnabled();
   });
 
   // The flyout closes on pick, so the row that opened it is what is left to report the switch.

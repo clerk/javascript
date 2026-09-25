@@ -12,7 +12,6 @@ import { Badge } from '../../components/badge';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Icon } from '../../components/icon';
-import { Item } from '../../components/item';
 import { Menu } from '../../components/menu';
 import { Popover } from '../../components/popover';
 import { scrollAreaViewport } from '../../components/scroll-area';
@@ -41,6 +40,16 @@ import type {
   UserButtonSession,
 } from './user-button.types';
 import { UserButtonHeader } from './user-button-header.view';
+import {
+  UserButtonGroup,
+  UserButtonItem,
+  UserButtonItemContent,
+  UserButtonItemDescription,
+  UserButtonItemLabel,
+  UserButtonItemMedia,
+  UserButtonItemTrailing,
+  UserButtonSeparator,
+} from './user-button-item.view';
 
 // The data contract, the mode flags, and the menu item shapes live in `user-button.types`; they are
 // what the model and the view agree on, so neither file owns them.
@@ -195,11 +204,6 @@ const rowButton = (disabled = false) => (
   />
 );
 
-/** A row's trailing column, sized and centred so every state lands on the `⋯` button's centre line. */
-function Trailing({ children }: { children: ReactNode }) {
-  return <Item.Actions xstyle={styles.trailing}>{children}</Item.Actions>;
-}
-
 interface SwitcherRowProps {
   name: string;
   /**
@@ -240,8 +244,7 @@ function SwitcherRow({
   const waiting = Boolean(busy || disabled);
 
   return (
-    <Item.Root
-      size='xs'
+    <UserButtonItem
       // The check is decorative, so without this the active row reads like the ones you can switch to.
       aria-current={active ? 'true' : undefined}
       // Every row stands down `aria-disabled` together, so on its own that reads as unavailable
@@ -250,7 +253,7 @@ function SwitcherRow({
       render={select ? rowButton(waiting) : undefined}
       onClick={select}
     >
-      <Item.Media>
+      <UserButtonItemMedia>
         <RowAvatar
           name={avatarName}
           imageUrl={imageUrl}
@@ -258,12 +261,12 @@ function SwitcherRow({
           size='fit'
           xstyle={styles.rowAvatar}
         />
-      </Item.Media>
-      <Item.Content>
-        <Item.Label id={labelId}>{name}</Item.Label>
-      </Item.Content>
+      </UserButtonItemMedia>
+      <UserButtonItemContent>
+        <UserButtonItemLabel id={labelId}>{name}</UserButtonItemLabel>
+      </UserButtonItemContent>
       {busy ? (
-        <Trailing>
+        <UserButtonItemTrailing>
           <Spinner
             // Focus stays on the row for the length of the action, so the row is what gets re-read
             // when it changes. A decorative spinner changes nothing there and the wait passes in
@@ -274,18 +277,18 @@ function SwitcherRow({
             aria-label={m.workspaces.pending}
             size='sm'
           />
-        </Trailing>
+        </UserButtonItemTrailing>
       ) : trailing ? (
-        <Item.Actions>{trailing}</Item.Actions>
+        <UserButtonItemTrailing>{trailing}</UserButtonItemTrailing>
       ) : active ? (
-        <Trailing>
+        <UserButtonItemTrailing>
           <Icon
             name='check'
             size='sm'
           />
-        </Trailing>
+        </UserButtonItemTrailing>
       ) : null}
-    </Item.Root>
+    </UserButtonItem>
   );
 }
 
@@ -315,18 +318,17 @@ function ActionRow({ icon, label, href, onClick, busyKey }: ActionRowProps) {
   const { busy, disabled } = useBusy(busyKey);
 
   return (
-    <Item.Root
-      size='xs'
+    <UserButtonItem
       // A link is the browser's navigation rather than one of the surface's one-shot actions, so it
       // has nothing to wait behind and never stands down.
       render={href ? asAnchor(href) : rowButton(busy || disabled)}
       onClick={onClick}
     >
-      <Item.Media>{busy ? <Spinner size='sm' /> : icon}</Item.Media>
-      <Item.Content>
-        <Item.Label variant='interactive'>{label}</Item.Label>
-      </Item.Content>
-    </Item.Root>
+      <UserButtonItemMedia>{busy ? <Spinner size='sm' /> : icon}</UserButtonItemMedia>
+      <UserButtonItemContent>
+        <UserButtonItemLabel variant='interactive'>{label}</UserButtonItemLabel>
+      </UserButtonItemContent>
+    </UserButtonItem>
   );
 }
 
@@ -497,11 +499,12 @@ function ActionMenu({ label, actions, disabled }: { label: string; actions: RowA
   }
 
   return (
-    <Trailing>
+    <UserButtonItemTrailing>
       <Menu.Root>
         <Menu.Trigger
           aria-label={label}
           disabled={disabled}
+          focusableWhenDisabled
         />
         <Menu.Popup>
           {actions.map(a => (
@@ -516,7 +519,7 @@ function ActionMenu({ label, actions, disabled }: { label: string; actions: RowA
           ))}
         </Menu.Popup>
       </Menu.Root>
-    </Trailing>
+    </UserButtonItemTrailing>
   );
 }
 
@@ -551,14 +554,14 @@ function OrganizationsHeading() {
   }
 
   return (
-    <Item.Root size='xs'>
-      <Item.Content>
-        <Item.Description xstyle={styles.accountIdentifier}>{identifier}</Item.Description>
-      </Item.Content>
+    <UserButtonItem>
+      <UserButtonItemContent>
+        <UserButtonItemDescription xstyle={styles.accountIdentifier}>{identifier}</UserButtonItemDescription>
+      </UserButtonItemContent>
       {busy ? (
-        <Trailing>
+        <UserButtonItemTrailing>
           <Spinner size='sm' />
-        </Trailing>
+        </UserButtonItemTrailing>
       ) : (
         <ActionMenu
           label={fill(m.accounts.actionsFor, { identifier })}
@@ -566,7 +569,7 @@ function OrganizationsHeading() {
           disabled={disabled}
         />
       )}
-    </Item.Root>
+    </UserButtonItem>
   );
 }
 
@@ -669,7 +672,7 @@ function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: Pe
       labelId={labelId}
       trailing={
         note ? (
-          <Item.Description>{note}</Item.Description>
+          <UserButtonItemDescription>{note}</UserButtonItemDescription>
         ) : onAccept ? (
           // Every other affordance here swaps its icon for a spinner, but this one is a labelled
           // button, so the spinner goes inside it rather than taking the row's trailing edge — the
@@ -823,16 +826,8 @@ function SwitchAccountRow() {
       sideOffset={{ x: 12, y: 8 }}
       fallbackPlacements={['left-start', 'top-start', 'bottom-start']}
     >
-      <Menu.Trigger
-        disabled={disabled}
-        render={
-          <Item.Root
-            size='xs'
-            render={<button type='button' />}
-          />
-        }
-      >
-        <Item.Media>
+      <Menu.Trigger render={<UserButtonItem render={rowButton(disabled)} />}>
+        <UserButtonItemMedia>
           {busy ? (
             <Spinner size='sm' />
           ) : (
@@ -841,17 +836,17 @@ function SwitchAccountRow() {
               size='sm'
             />
           )}
-        </Item.Media>
-        <Item.Content>
-          <Item.Label variant='interactive'>{m.accounts.switch}</Item.Label>
-        </Item.Content>
-        <Trailing>
+        </UserButtonItemMedia>
+        <UserButtonItemContent>
+          <UserButtonItemLabel variant='interactive'>{m.accounts.switch}</UserButtonItemLabel>
+        </UserButtonItemContent>
+        <UserButtonItemTrailing>
           <Icon
             name='chevron-right'
             xstyle={rtl.mirror}
             size='sm'
           />
-        </Trailing>
+        </UserButtonItemTrailing>
       </Menu.Trigger>
       <Menu.Popup>
         {/* The account it is on leads, checked: the flyout is the full set of accounts rather than
@@ -892,14 +887,14 @@ function OrganizationListLoadingRow() {
   return (
     // Plain text rather than a live region: it mounts with its copy already in it, so there is no
     // change for one to report, and the popup it lands in is read on open either way.
-    <Item.Root size='xs'>
-      <Item.Media>
+    <UserButtonItem>
+      <UserButtonItemMedia>
         <Spinner size='sm' />
-      </Item.Media>
-      <Item.Content>
-        <Item.Description>{m.workspaces.loading}</Item.Description>
-      </Item.Content>
-    </Item.Root>
+      </UserButtonItemMedia>
+      <UserButtonItemContent>
+        <UserButtonItemDescription>{m.workspaces.loading}</UserButtonItemDescription>
+      </UserButtonItemContent>
+    </UserButtonItem>
   );
 }
 
@@ -940,11 +935,11 @@ function OrganizationSection() {
 
   return (
     <>
-      <Item.Separator />
+      <UserButtonSeparator />
       {/* `auto` rather than `stable`: a reserved gutter insets the rows whether or not the list
           overflows, so short lists would sit their avatars and icons off the edge the header and
           footer align to. */}
-      <Item.Group xstyle={[scrollAreaViewport('auto'), styles.scroll]}>
+      <UserButtonGroup xstyle={[scrollAreaViewport('auto'), styles.scroll]}>
         {showOrganizationsHeading ? <OrganizationsHeading /> : null}
         {/* Memberships, invitations and suggestions are three separate requests landing at three
             different moments. Rendering each as it arrives walks the list in in stages, so the
@@ -963,7 +958,7 @@ function OrganizationSection() {
         {/* Trails the rows rather than sitting at the foot of the surface: what it offers is one
             more of the workspaces above it, not an action on the account. */}
         {actions}
-      </Item.Group>
+      </UserButtonGroup>
     </>
   );
 }
@@ -1058,12 +1053,12 @@ function Footer() {
 
   return (
     <>
-      <Item.Separator />
-      <Item.Group>
+      <UserButtonSeparator />
+      <UserButtonGroup>
         {rows.map(r => (
           <React.Fragment key={r.id}>{r.node}</React.Fragment>
         ))}
-      </Item.Group>
+      </UserButtonGroup>
     </>
   );
 }

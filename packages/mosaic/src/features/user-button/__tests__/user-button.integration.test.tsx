@@ -575,7 +575,7 @@ describe('UserButton (connected)', () => {
     // keeps its place in the tab order. Dropping it to a static row would remount it, and with it
     // the avatar it carries.
     expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toHaveAttribute('aria-disabled', 'true');
-    expect(screen.getByRole('button', { name: 'Switch account' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Switch account' })).toHaveAttribute('aria-disabled', 'true');
     expect(popup()).toBeInTheDocument();
 
     deferred.resolve();
