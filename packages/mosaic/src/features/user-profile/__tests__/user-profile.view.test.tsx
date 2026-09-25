@@ -6,10 +6,11 @@ import { Dialog } from '../../../components/dialog';
 import { MosaicProvider } from '../../../MosaicProvider';
 import type { UserProfileViewProps } from '../user-profile.view';
 import { UserProfileView } from '../user-profile.view';
+import { UserProfilePasswordSectionView } from '../user-profile-password-section/user-profile-password-section.view';
 
 const pages: UserProfileViewProps['pages'] = {
   account: { name: 'Preston Booth', username: 'prestonxyz' },
-  security: { hasPassword: true },
+  security: { passwordSlot: <UserProfilePasswordSectionView hasPassword /> },
   billing: {
     subscription: {
       planName: 'Basic Plan',

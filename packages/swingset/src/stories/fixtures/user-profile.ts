@@ -3,6 +3,7 @@ import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
 } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
+import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import type {
   UserProfileEmail,
   UserProfilePhone,
@@ -141,7 +142,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
         setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
     },
     security: {
-      ...editPassword,
+      passwordSlot: <UserProfilePasswordSectionView {...editPassword} />,
       passkeys: passkeys.passkeys,
       addPasskeyError: passkeys.addError,
       onRenamePasskey: passkeys.onRename,

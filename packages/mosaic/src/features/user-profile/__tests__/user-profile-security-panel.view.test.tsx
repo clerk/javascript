@@ -4,11 +4,12 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
+import { UserProfilePasswordSectionView } from '../user-profile-password-section/user-profile-password-section.view';
 import type { UserProfileSecurityPanelViewProps } from '../user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 const props: UserProfileSecurityPanelViewProps = {
-  hasPassword: true,
+  passwordSlot: <UserProfilePasswordSectionView hasPassword />,
   passkeys: [
     {
       id: 'passkey_1',
@@ -162,7 +163,7 @@ describe('UserProfileSecurityPanelView', () => {
 
   it('keeps supported empty authentication methods actionable', () => {
     renderView({
-      hasPassword: false,
+      passwordSlot: undefined,
       passkeys: [],
       mfaMethods: [],
       devices: [],
@@ -190,7 +191,7 @@ describe('UserProfileSecurityPanelView', () => {
 
   it('keeps the authentication section on MFA when existing passkeys are hidden', () => {
     renderView({
-      hasPassword: false,
+      passwordSlot: undefined,
       passkeysVisible: false,
       onAddPasskey: vi.fn(),
       onRenamePasskey: vi.fn(),
@@ -205,7 +206,7 @@ describe('UserProfileSecurityPanelView', () => {
   });
 
   it('keeps the passkeys card in the authentication section when passkeys are empty and Add is unavailable', () => {
-    renderView({ hasPassword: false, passkeys: [], onAddPasskey: undefined });
+    renderView({ passwordSlot: undefined, passkeys: [], onAddPasskey: undefined });
 
     const section = screen.getByRole('region', { name: 'Authentication' });
     expect(within(section).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeVisible();
@@ -220,7 +221,7 @@ describe('UserProfileSecurityPanelView', () => {
     const onRemovePasskey = vi.fn(async () => {
       await removal.promise;
     });
-    const { rerender } = renderView({ hasPassword: false, mfaMethods: undefined, onRemovePasskey });
+    const { rerender } = renderView({ passwordSlot: undefined, mfaMethods: undefined, onRemovePasskey });
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
