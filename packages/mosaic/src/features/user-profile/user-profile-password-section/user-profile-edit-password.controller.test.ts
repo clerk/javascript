@@ -198,7 +198,7 @@ describe('useUserProfileEditPasswordController', () => {
   });
 
   it('keeps a failed save visible next to a fresh mismatch', async () => {
-    const { result } = renderController(() => Promise.reject(new Error('Incorrect password.')));
+    const { result } = renderController(() => Promise.reject(new UserProfileSaveError('Incorrect password.')));
     open(result);
     fill(result);
     act(() => result.current.form.submit());
