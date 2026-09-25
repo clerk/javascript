@@ -52,8 +52,6 @@ export const PROVIDER_GROUPS: ReadonlyArray<ProviderGroup> = [
   },
 ];
 
-export const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
-
 export const providerLabel = (provider: ProviderType): LocalizationKey | undefined =>
   PROVIDER_GROUPS.flatMap(group => group.options).find(option => option.id === provider)?.label;
 
