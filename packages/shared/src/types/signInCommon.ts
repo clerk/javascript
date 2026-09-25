@@ -195,12 +195,12 @@ export type AuthenticateWithPasskeyParams = {
   /**
    * The passkey flow to use when the passkey is the FIRST factor:
    * `'autofill'` (conditional UI) or `'discoverable'` both create a new
-   * sign-in and identify the user from the passkey itself.
+   * sign-in and identify the user from the passkey itself, discarding any
+   * in-progress sign-in.
    *
-   * Ignored when the sign-in is already in the `needs_second_factor` (or
-   * `needs_client_trust`) status — autofill/discoverable are
-   * identifier-first concepts, so the method always runs the discrete
-   * prepare/attempt second-factor flow against the in-progress sign-in.
+   * Omit it to complete the second factor of a sign-in in the
+   * `needs_second_factor` (or `needs_client_trust`) status that offers
+   * `passkey` among its supported second factors.
    */
   flow?: 'autofill' | 'discoverable';
 };

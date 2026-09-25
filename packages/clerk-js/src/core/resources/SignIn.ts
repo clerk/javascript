@@ -568,19 +568,18 @@ export class SignIn extends BaseResource implements SignInResource {
   /**
    * Authenticates the sign-in with a passkey.
    *
-   * When the sign-in status is `needs_second_factor` (or `needs_client_trust`) and the sign-in
-   * offers `passkey` among its `supportedSecondFactors`, the passkey acts as the second factor:
-   * the in-progress sign-in is reused via the discrete prepare/attempt second-factor flow, and
-   * `params.flow` is ignored — `'autofill'` and `'discoverable'` are identifier-first concepts
-   * whose `create()` call would discard the in-progress sign-in.
+   * When called without `params.flow` while the sign-in status is `needs_second_factor` (or
+   * `needs_client_trust`) and the sign-in offers `passkey` among its `supportedSecondFactors`, the
+   * passkey acts as the second factor: the in-progress sign-in is reused via the discrete
+   * prepare/attempt second-factor flow.
    *
    * Otherwise the passkey verifies the first factor, with `params.flow` selecting how the ceremony
    * starts: `'autofill'`/`'discoverable'` create a new sign-in and identify the user from the
-   * passkey itself, while the default requires a sign-in created beforehand. A sign-in parked at a
-   * second-factor status that does NOT offer passkey (the backend advertises it only when the
-   * instance allows passkeys to satisfy the second factor, the user has one registered, and the
-   * client version supports it) also takes this path, matching clients that predate passkey second
-   * factors: the ceremony starts over instead of failing.
+   * passkey itself, discarding any in-progress sign-in, while the default requires a sign-in
+   * created beforehand. A sign-in parked at a second-factor status that does NOT offer passkey (the
+   * backend advertises it only when the instance allows passkeys to satisfy the second factor, the
+   * user has one registered, and the client version supports it) also takes this path, matching
+   * clients that predate passkey second factors: the ceremony starts over instead of failing.
    *
    * Throws a `ClerkWebAuthnError` when WebAuthn is unsupported or the passkey ceremony fails.
    * @returns The updated `SignIn` resource.
@@ -606,7 +605,7 @@ export class SignIn extends BaseResource implements SignInResource {
 
     const isSecondFactor = this.status === 'needs_second_factor' || this.status === 'needs_client_trust';
     const hasPasskeySecondFactor = (this.supportedSecondFactors || []).some(f => f.strategy === 'passkey');
-    if (isSecondFactor && hasPasskeySecondFactor) {
+    if (!flow && isSecondFactor && hasPasskeySecondFactor) {
       await this.prepareSecondFactor({ strategy: 'passkey' });
 
       const { nonce: secondFactorNonce } = this.secondFactorVerification;

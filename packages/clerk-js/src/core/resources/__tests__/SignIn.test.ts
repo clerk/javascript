@@ -561,51 +561,66 @@ describe('SignIn', () => {
       );
     });
 
-    it('ignores the flow param and never calls create when the sign-in needs a second factor', async () => {
-      const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
-      const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
-        publicKeyCredential: mockPublicKeyCredential,
-        error: null,
-      });
-
-      SignIn.clerk = {
-        __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
-        __internal_getPublicCredentials: mockWebAuthnGetCredential,
-      } as any;
-
-      const mockFetch = vi
-        .fn()
-        .mockResolvedValueOnce({
-          client: null,
-          response: {
-            id: 'signin_123',
-            status: 'needs_second_factor',
-            supported_second_factors: [{ strategy: 'passkey' }],
-            second_factor_verification: {
-              nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
-            },
-          },
-        })
-        .mockResolvedValueOnce({
-          client: null,
-          response: { id: 'signin_123', status: 'complete' },
+    it.each(['autofill', 'discoverable'] as const)(
+      'creates a new sign-in for the %s flow even when the sign-in needs a passkey second factor',
+      async flow => {
+        const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
+        const mockIsWebAuthnAutofillSupported = vi.fn().mockResolvedValue(true);
+        const mockWebAuthnGetCredential = vi.fn().mockResolvedValue({
+          publicKeyCredential: mockPublicKeyCredential,
+          error: null,
         });
-      BaseResource._fetch = mockFetch;
 
-      const signIn = new SignIn({
-        id: 'signin_123',
-        status: 'needs_second_factor',
-        supported_second_factors: [{ strategy: 'passkey' }],
-      } as any);
-      await signIn.authenticateWithPasskey({ flow: 'autofill' });
+        SignIn.clerk = {
+          __internal_isWebAuthnSupported: mockIsWebAuthnSupported,
+          __internal_isWebAuthnAutofillSupported: mockIsWebAuthnAutofillSupported,
+          __internal_getPublicCredentials: mockWebAuthnGetCredential,
+        } as any;
 
-      expect(mockFetch).toHaveBeenNthCalledWith(
-        1,
-        expect.objectContaining({
-          path: '/client/sign_ins/signin_123/prepare_second_factor',
-        }),
-      );
-    });
+        const mockFetch = vi
+          .fn()
+          .mockResolvedValueOnce({
+            client: null,
+            response: {
+              id: 'signin_456',
+              status: 'needs_first_factor',
+              first_factor_verification: {
+                nonce: JSON.stringify({ challenge: 'Y2hhbGxlbmdl' }),
+              },
+            },
+          })
+          .mockResolvedValueOnce({
+            client: null,
+            response: { id: 'signin_456', status: 'complete' },
+          });
+        BaseResource._fetch = mockFetch;
+
+        const signIn = new SignIn({
+          id: 'signin_123',
+          status: 'needs_second_factor',
+          supported_second_factors: [{ strategy: 'passkey' }],
+        } as any);
+        await signIn.authenticateWithPasskey({ flow });
+
+        expect(mockFetch).toHaveBeenNthCalledWith(
+          1,
+          expect.objectContaining({
+            method: 'POST',
+            path: '/client/sign_ins',
+            body: expect.objectContaining({ strategy: 'passkey' }),
+          }),
+        );
+        expect(mockFetch).toHaveBeenNthCalledWith(
+          2,
+          expect.objectContaining({
+            path: '/client/sign_ins/signin_456/attempt_first_factor',
+          }),
+        );
+        expect(mockWebAuthnGetCredential).toHaveBeenCalledWith(
+          expect.objectContaining({ conditionalUI: flow === 'autofill' }),
+        );
+      },
+    );
 
     it('falls through to the first-factor flow when the sign-in needs a second factor but does not offer passkey', async () => {
       const mockIsWebAuthnSupported = vi.fn().mockReturnValue(true);
