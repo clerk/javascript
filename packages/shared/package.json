@@ -9,6 +9,7 @@
   },
   "license": "MIT",
   "author": "Clerk",
+  "sideEffects": false,
   "exports": {
     ".": {
       "import": {
