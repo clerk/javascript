@@ -30,7 +30,7 @@ import type {
  * The header is about whatever leads, not the mode: an organization is managed and invited to, an
  * account is managed and signed out of. With no organization active, a combined surface leads with
  * the account. A combined surface can lead with the account while an organization is active too, and
- * then the account is badged with that organization and invites to it.
+ * then the account is badged with that organization, and invites to and manages it.
  */
 
 /** The four places an action can land. Every mode has a header and a footer; the list's two vary. */
@@ -40,7 +40,7 @@ export type UserButtonAction =
   | 'addAccount'
   | 'createOrganization'
   | 'inviteMembers'
-  /** The gear. Manages whatever the header names: the organization where one leads, else the account. */
+  /** The gear. Manages the header's organization, whether it leads or badges the account, else the account. */
   | 'manageLead'
   | 'manageAccount'
   | 'signOut'

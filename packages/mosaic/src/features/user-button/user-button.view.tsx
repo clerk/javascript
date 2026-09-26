@@ -383,7 +383,12 @@ function Header() {
   const { sessionId, identifier } = data.activeSession;
   const workspace = leadWorkspace(data, m);
   const { name } = workspace;
-  const organization = workspace.kind === 'organization' ? workspace.organization : undefined;
+  const organization =
+    workspace.kind === 'organization'
+      ? workspace.organization
+      : workspace.kind === 'user'
+        ? workspace.badge
+        : undefined;
   // An account with no name is titled by its identifier, and repeating it underneath says nothing.
   // No selection is not the account, so it carries no identifier line either.
   const subtitle =
@@ -408,7 +413,7 @@ function Header() {
         busyKey: userButtonBusyKeys.signOutSession(sessionId, 'header'),
       });
     }
-    // The gear manages whatever the header names, which is settled by the data rather than the mode.
+    // The gear manages the header's organization, named or badged, and otherwise the account.
     // Inline it is the icon alone, named for what it manages; stacked it reads "Settings".
     if (action === 'manageLead') {
       const manage = organization

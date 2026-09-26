@@ -1041,13 +1041,15 @@ describe('UserButtonView, the header', () => {
 
   it('leads a combined surface with the account, badged with its active organization, where asked', async () => {
     const onManageAccount = vi.fn();
+    const onManageOrganization = vi.fn();
     const onInviteMembers = vi.fn();
-    renderHeader({ modePriority: 'user', onManageAccount, onInviteMembers });
+    renderHeader({ modePriority: 'user', onManageAccount, onManageOrganization, onInviteMembers });
 
     expect(header().querySelector('.cl-user-button-header-title')?.textContent).toBe('Alice Smith');
     expect(header().querySelector('.cl-user-button-avatar-badge')?.textContent).toBe('F');
     await userEvent.setup().click(within(header()).getByRole('button', { name: 'Settings' }));
-    expect(onManageAccount).toHaveBeenCalled();
+    expect(onManageOrganization).toHaveBeenCalled();
+    expect(onManageAccount).not.toHaveBeenCalled();
     await userEvent.setup().click(within(header()).getByRole('button', { name: 'Invite' }));
     expect(onInviteMembers).toHaveBeenCalled();
   });
