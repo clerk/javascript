@@ -25,7 +25,14 @@ type WebhookEventAttributes = {
   };
 };
 
-type Webhook<EvtType, Data> = { type: EvtType; object: 'event'; data: Data; event_attributes: WebhookEventAttributes };
+type Webhook<EvtType, Data> = {
+  type: EvtType;
+  object: 'event';
+  data: Data;
+  event_attributes: WebhookEventAttributes;
+  timestamp: number;
+  instance_id: string;
+};
 
 export type UserWebhookEvent =
   | Webhook<'user.created' | 'user.updated', UserJSON>
