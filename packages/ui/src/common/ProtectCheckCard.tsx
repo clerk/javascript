@@ -1,9 +1,5 @@
 import type { ProtectCheckFlow } from '@clerk/shared/types';
 
-import { Card } from '@/ui/elements/Card';
-import { useCardState } from '@/ui/elements/contexts';
-import { Header } from '@/ui/elements/Header';
-
 import {
   Box,
   Button,
@@ -15,6 +11,9 @@ import {
   Spinner,
   useLocalizations,
 } from '../customizables';
+import { Card } from '../elements/Card';
+import { useCardState } from '../elements/contexts';
+import { Header } from '../elements/Header';
 import { useSpinDelay } from '../hooks';
 import type { ProtectCheckRunner } from '../hooks/useProtectCheckRunner';
 
