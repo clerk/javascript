@@ -1018,18 +1018,20 @@ export class Clerk implements ClerkInterface {
     }
     return this.#clerkUI
       .then(ui => ui.ensureMounted())
-      .then(
-        controls =>
-          new Promise<void>(resolve => {
-            controls.openModal('protectCheck', {
-              ...props,
-              onResolved: () => {
-                controls.closeModal('protectCheck');
-                resolve();
-              },
-            });
-          }),
-      );
+      .then(controls => {
+        if (!controls.openProtectCheckModal) {
+          return;
+        }
+        return new Promise<void>(resolve => {
+          controls.openProtectCheckModal?.({
+            ...props,
+            onResolved: () => {
+              controls.closeModal('protectCheck');
+              resolve();
+            },
+          });
+        });
+      });
   };
 
   public __internal_openBlankCaptchaModal = (): Promise<unknown> => {

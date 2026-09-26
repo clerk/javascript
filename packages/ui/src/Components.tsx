@@ -156,6 +156,7 @@ export type ComponentControls = {
   prefetch: (component: 'organizationSwitcher') => void;
   // Special case, as the impersonation fab mounts automatically
   mountImpersonationFab: () => void;
+  openProtectCheckModal: (props: __internal_ProtectCheckModalProps) => void;
 };
 
 interface HtmlNodeOptions {
@@ -484,6 +485,10 @@ const Components = (props: ComponentsProps) => {
 
     componentsControls.mountImpersonationFab = () => {
       setState(s => ({ ...s, impersonationFab: true }));
+    };
+
+    componentsControls.openProtectCheckModal = props => {
+      componentsControls.openModal('protectCheck', props);
     };
 
     componentsControls.openDrawer = (name, props) => {

@@ -1,5 +1,5 @@
 import type { ModuleManager } from '../moduleManager';
-import type { Clerk, ClerkOptions, EnvironmentResource } from '../types';
+import type { __internal_ProtectCheckModalProps, Clerk, ClerkOptions, EnvironmentResource } from '../types';
 
 // TODO @nikos
 type Appearance = any;
@@ -21,6 +21,7 @@ export type ComponentControls = {
   closeDrawer: (drawer: string, options?: { notify?: boolean }) => void;
   prefetch: (component: 'organizationSwitcher') => void;
   mountImpersonationFab: () => void;
+  openProtectCheckModal?: (props: __internal_ProtectCheckModalProps) => void;
 };
 
 // Instance shape that the class will implement

@@ -4032,11 +4032,25 @@ describe('Clerk singleton', () => {
       await expect(sut.__internal_openProtectCheckModal({ resource: gatedSignIn() as any })).resolves.toBeUndefined();
     });
 
-    it('opens the modal and resolves once the modal reports the gate cleared', async () => {
+    it('resolves at once and leaves the gate when the UI predates the Protect modal', async () => {
       const openModal = vi.fn();
+      const mockClerkUICtor = vi.fn(function () {
+        return { ensureMounted: () => Promise.resolve({ openModal, closeModal: vi.fn() }) };
+      });
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      const resource = gatedSignIn() as any;
+
+      await expect(sut.__internal_openProtectCheckModal({ resource })).resolves.toBeUndefined();
+      expect(openModal).not.toHaveBeenCalled();
+      expect(resource.protectCheck).not.toBeNull();
+    });
+
+    it('opens the modal and resolves once the modal reports the gate cleared', async () => {
+      const openProtectCheckModal = vi.fn();
       const closeModal = vi.fn();
       const mockClerkUICtor = vi.fn(function () {
-        return { ensureMounted: () => Promise.resolve({ openModal, closeModal }) };
+        return { ensureMounted: () => Promise.resolve({ openProtectCheckModal, closeModal }) };
       });
       const sut = new Clerk(productionPublishableKey);
       await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
@@ -4046,14 +4060,14 @@ describe('Clerk singleton', () => {
       const pending = sut.__internal_openProtectCheckModal({ resource }).then(() => {
         settled = true;
       });
-      await vi.waitFor(() => expect(openModal).toHaveBeenCalled());
-      expect(openModal).toHaveBeenCalledWith('protectCheck', {
+      await vi.waitFor(() => expect(openProtectCheckModal).toHaveBeenCalled());
+      expect(openProtectCheckModal).toHaveBeenCalledWith({
         resource,
         onResolved: expect.any(Function),
       });
       expect(settled).toBe(false);
 
-      openModal.mock.calls[0][1].onResolved();
+      openProtectCheckModal.mock.calls[0][0].onResolved();
       await pending;
       expect(closeModal).toHaveBeenCalledWith('protectCheck');
       expect(settled).toBe(true);
