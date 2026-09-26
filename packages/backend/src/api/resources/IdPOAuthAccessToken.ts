@@ -1,6 +1,6 @@
 import type { JwtPayload } from '@clerk/shared/types';
 
-import type { IdPOAuthAccessTokenJSON } from './JSON';
+import type { IdPOAuthAccessTokenActorJSON, IdPOAuthAccessTokenJSON } from './JSON';
 
 type OAuthJwtPayload = JwtPayload & {
   aud?: string | string[];
@@ -8,6 +8,7 @@ type OAuthJwtPayload = JwtPayload & {
   client_id?: string;
   scope?: string;
   scp?: string[];
+  act?: IdPOAuthAccessTokenActorJSON;
 };
 
 export class IdPOAuthAccessToken {
@@ -28,6 +29,8 @@ export class IdPOAuthAccessToken {
     readonly updatedAt: number,
     /** The intended audience for the access token. */
     readonly aud?: string[],
+    /** The actor chain of a token issued by an OAuth 2.0 Token Exchange (RFC 8693 section 4.1). */
+    readonly act?: IdPOAuthAccessTokenActorJSON,
   ) {}
 
   static fromJSON(data: IdPOAuthAccessTokenJSON) {
@@ -44,6 +47,7 @@ export class IdPOAuthAccessToken {
       data.created_at,
       data.updated_at,
       data.aud,
+      data.act,
     );
   }
 
@@ -69,6 +73,7 @@ export class IdPOAuthAccessToken {
       payload.iat * 1000, // milliseconds: createdAt, converted from JWT iat claim
       payload.iat * 1000, // milliseconds: updatedAt, no JWT equivalent, defaults to iat
       oauthPayload.aud === undefined ? undefined : [oauthPayload.aud].flat(),
+      oauthPayload.act,
     );
   }
 }
