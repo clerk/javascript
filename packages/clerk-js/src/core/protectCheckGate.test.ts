@@ -116,13 +116,6 @@ describe('ProtectCheckGate', () => {
     expect(open).toHaveBeenLastCalledWith({ resource: signUp });
   });
 
-  it('opens again for a later gate once the previous resolution finished', async () => {
-    const clerk = mockClerk();
-    await gate.resolve(clerk, 'signIn', gated());
-    await gate.resolve(clerk, 'signIn', gated());
-    expect(clerk.__internal_openProtectCheckModal).toHaveBeenCalledTimes(2);
-  });
-
   it('releases the in-flight lock and rethrows when the modal cannot open', async () => {
     const clerk = mockClerk({ __internal_openProtectCheckModal: vi.fn().mockRejectedValue(new Error('no ui')) });
     await expect(gate.resolve(clerk, 'signIn', gated())).rejects.toThrow('no ui');

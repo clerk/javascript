@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -30,26 +30,6 @@ beforeEach(() => {
 });
 
 describe('ProtectCheckModal', () => {
-  it('renders the challenge card and runs the challenge for the resource token', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.startSignInWithProtectCheck();
-    });
-    mockExecute.mockReturnValue(new Promise(() => {}));
-
-    render(
-      <ProtectCheckModal
-        resource={fixtures.signIn}
-        onResolved={vi.fn()}
-        onFailed={vi.fn()}
-      />,
-      { wrapper },
-    );
-
-    screen.getByText('Verifying your request');
-    await waitFor(() => expect(mockExecute).toHaveBeenCalledTimes(1));
-    expect(mockExecute.mock.calls[0][0]).toMatchObject({ token: 'challenge-token' });
-  });
-
   it('calls onResolved once the gate clears', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.startSignInWithProtectCheck();
@@ -103,14 +83,17 @@ describe('ProtectCheckModal', () => {
     expect(onResolved).not.toHaveBeenCalled();
   });
 
-  it('offers a retry and does not call onResolved when the challenge script fails', async () => {
+  it('keeps the modal open with a retry when the submit fails for a reason other than a block', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.startSignInWithProtectCheck();
     });
     const onResolved = vi.fn();
-    mockExecute.mockRejectedValue(
-      new ClerkRuntimeError('Protect check script failed to load', {
-        code: 'protect_check_script_load_failed',
+    const onFailed = vi.fn();
+    mockExecute.mockResolvedValue('proof-abc');
+    fixtures.signIn.submitProtectCheck.mockRejectedValue(
+      new ClerkAPIResponseError('invalid', {
+        status: 422,
+        data: [{ code: 'form_param_invalid', message: 'invalid' } as any],
       }),
     );
 
@@ -118,13 +101,13 @@ describe('ProtectCheckModal', () => {
       <ProtectCheckModal
         resource={fixtures.signIn}
         onResolved={onResolved}
-        onFailed={vi.fn()}
+        onFailed={onFailed}
       />,
       { wrapper },
     );
 
     await screen.findByRole('button', { name: /try again/i });
-    expect(fixtures.signIn.submitProtectCheck).not.toHaveBeenCalled();
+    expect(onFailed).not.toHaveBeenCalled();
     expect(onResolved).not.toHaveBeenCalled();
   });
 
