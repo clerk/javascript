@@ -1,11 +1,11 @@
+import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type { __internal_ProtectCheckModalProps, SignInResource, SignUpResource } from '@clerk/shared/types';
 
 import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
-import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 
-import { ActionBlockedCard } from '../../common';
 import {
   Box,
   Button,
@@ -39,75 +39,78 @@ const flowLocalizationKeys = {
 const flowOf = (resource: SignInResource | SignUpResource) =>
   resource.pathRoot.endsWith('sign_ups') ? 'signUp' : 'signIn';
 
-const ProtectCheckCard = withCardStateProvider(({ resource, onResolved }: __internal_ProtectCheckModalProps) => {
-  const card = useCardState();
-  const { t } = useLocalizations();
-  const keys = flowLocalizationKeys[flowOf(resource)];
+const ProtectCheckCard = withCardStateProvider(
+  ({ resource, onResolved, onFailed }: __internal_ProtectCheckModalProps) => {
+    const card = useCardState();
+    const { t } = useLocalizations();
+    const keys = flowLocalizationKeys[flowOf(resource)];
 
-  const { containerRef, isRunning, isWidgetVisible, hasError, retry } = useProtectCheckRunner<
-    SignInResource | SignUpResource
-  >({
-    getProtectCheck: () => resource.protectCheck,
-    getResource: () => resource,
-    reload: () => resource.reload(),
-    submitProtectCheck: params => resource.submitProtectCheck(params),
-    onResolved: (updated, isCancelled) => {
-      if (!isCancelled() && !updated.protectCheck) {
-        onResolved();
-      }
-      return Promise.resolve();
-    },
-  });
+    const { containerRef, isRunning, isWidgetVisible, hasError, retry } = useProtectCheckRunner<
+      SignInResource | SignUpResource
+    >({
+      getProtectCheck: () => resource.protectCheck,
+      getResource: () => resource,
+      reload: () => resource.reload(),
+      submitProtectCheck: params =>
+        resource.submitProtectCheck(params).catch((error: unknown) => {
+          if (isClerkAPIResponseError(error) && error.errors[0]?.code === ERROR_CODES.FRAUD_ACTION_BLOCKED) {
+            onFailed(error);
+          }
+          throw error;
+        }),
+      onResolved: (updated, isCancelled) => {
+        if (!isCancelled() && !updated.protectCheck) {
+          onResolved();
+        }
+        return Promise.resolve();
+      },
+    });
 
-  const showSpinner = useSpinDelay(isRunning, { delay: 300 });
+    const showSpinner = useSpinDelay(isRunning, { delay: 300 });
 
-  const blockedDetails = actionBlockedDetailsFrom(card.rawError);
-  if (blockedDetails) {
-    return <ActionBlockedCard details={blockedDetails} />;
-  }
-
-  return (
-    <Flow.Part part='protectCheck'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title localizationKey={keys.title} />
-            <Header.Subtitle localizationKey={keys.subtitle} />
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Col
-            elementDescriptor={descriptors.main}
-            gap={6}
-          >
-            <Box
-              ref={containerRef}
-              id='clerk-protect-check'
-              aria-busy={isRunning}
-              style={{ display: 'block', alignSelf: 'center', position: isWidgetVisible ? 'static' : 'absolute' }}
-            />
-            {showSpinner && !hasError && !isWidgetVisible ? (
-              <Flex center>
-                <Spinner
-                  size='lg'
-                  colorScheme='primary'
-                  elementDescriptor={descriptors.spinner}
-                  aria-label={t(keys.loading)}
-                />
-              </Flex>
-            ) : null}
-            {hasError ? (
-              <Button
-                onClick={retry}
-                localizationKey={keys.retryButton}
+    return (
+      <Flow.Part part='protectCheck'>
+        <Card.Root>
+          <Card.Content>
+            <Header.Root showLogo>
+              <Header.Title localizationKey={keys.title} />
+              <Header.Subtitle localizationKey={keys.subtitle} />
+            </Header.Root>
+            <Card.Alert>{card.error}</Card.Alert>
+            <Col
+              elementDescriptor={descriptors.main}
+              gap={6}
+            >
+              <Box
+                ref={containerRef}
+                id='clerk-protect-check'
+                aria-busy={isRunning}
+                style={{ display: 'block', alignSelf: 'center', position: isWidgetVisible ? 'static' : 'absolute' }}
               />
-            ) : null}
-          </Col>
-        </Card.Content>
-        <Card.Footer />
-      </Card.Root>
-    </Flow.Part>
-  );
-});
+              {showSpinner && !hasError && !isWidgetVisible ? (
+                <Flex center>
+                  <Spinner
+                    size='lg'
+                    colorScheme='primary'
+                    elementDescriptor={descriptors.spinner}
+                    aria-label={t(keys.loading)}
+                  />
+                </Flex>
+              ) : null}
+              {hasError ? (
+                <Button
+                  onClick={retry}
+                  localizationKey={keys.retryButton}
+                />
+              ) : null}
+            </Col>
+          </Card.Content>
+          <Card.Footer />
+        </Card.Root>
+      </Flow.Part>
+    );
+  },
+);
 
 function ProtectCheckModal(props: __internal_ProtectCheckModalProps): JSX.Element {
   return (

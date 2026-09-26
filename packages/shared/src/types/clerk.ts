@@ -1991,6 +1991,7 @@ export type __internal_UserVerificationModalProps = WithoutRouting<__internal_Us
 export type __internal_ProtectCheckModalProps = {
   resource: SignInResource | SignUpResource;
   onResolved: () => void;
+  onFailed: (error: Error) => void;
 };
 
 export type __internal_EnableOrganizationsPromptProps = {

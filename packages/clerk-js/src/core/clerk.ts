@@ -1011,7 +1011,7 @@ export class Clerk implements ClerkInterface {
   }
 
   public __internal_openProtectCheckModal = (
-    props: Omit<__internal_ProtectCheckModalProps, 'onResolved'>,
+    props: Pick<__internal_ProtectCheckModalProps, 'resource'>,
   ): Promise<void> => {
     if (!this.#clerkUI) {
       return Promise.resolve();
@@ -1022,12 +1022,16 @@ export class Clerk implements ClerkInterface {
         if (!controls.openProtectCheckModal) {
           return;
         }
-        return new Promise<void>(resolve => {
+        return new Promise<void>((resolve, reject) => {
           controls.openProtectCheckModal?.({
             ...props,
             onResolved: () => {
               controls.closeModal('protectCheck');
               resolve();
+            },
+            onFailed: error => {
+              controls.closeModal('protectCheck');
+              reject(error);
             },
           });
         });

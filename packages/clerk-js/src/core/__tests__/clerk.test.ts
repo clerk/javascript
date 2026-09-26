@@ -4064,6 +4064,7 @@ describe('Clerk singleton', () => {
       expect(openProtectCheckModal).toHaveBeenCalledWith({
         resource,
         onResolved: expect.any(Function),
+        onFailed: expect.any(Function),
       });
       expect(settled).toBe(false);
 
@@ -4071,6 +4072,24 @@ describe('Clerk singleton', () => {
       await pending;
       expect(closeModal).toHaveBeenCalledWith('protectCheck');
       expect(settled).toBe(true);
+    });
+
+    it('closes the modal and rejects with the error the modal reports', async () => {
+      const openProtectCheckModal = vi.fn();
+      const closeModal = vi.fn();
+      const mockClerkUICtor = vi.fn(function () {
+        return { ensureMounted: () => Promise.resolve({ openProtectCheckModal, closeModal }) };
+      });
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      const blocked = new Error('blocked');
+
+      const pending = sut.__internal_openProtectCheckModal({ resource: gatedSignIn() as any });
+      await vi.waitFor(() => expect(openProtectCheckModal).toHaveBeenCalled());
+      openProtectCheckModal.mock.calls[0][0].onFailed(blocked);
+
+      await expect(pending).rejects.toBe(blocked);
+      expect(closeModal).toHaveBeenCalledWith('protectCheck');
     });
 
     it('counts registered prebuilt handlers and releases each one once', () => {

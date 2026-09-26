@@ -1,4 +1,4 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import { waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -40,6 +40,7 @@ describe('ProtectCheckModal', () => {
       <ProtectCheckModal
         resource={fixtures.signIn}
         onResolved={vi.fn()}
+        onFailed={vi.fn()}
       />,
       { wrapper },
     );
@@ -64,6 +65,7 @@ describe('ProtectCheckModal', () => {
       <ProtectCheckModal
         resource={fixtures.signIn}
         onResolved={onResolved}
+        onFailed={vi.fn()}
       />,
       { wrapper },
     );
@@ -91,6 +93,7 @@ describe('ProtectCheckModal', () => {
       <ProtectCheckModal
         resource={fixtures.signIn}
         onResolved={onResolved}
+        onFailed={vi.fn()}
       />,
       { wrapper },
     );
@@ -115,12 +118,39 @@ describe('ProtectCheckModal', () => {
       <ProtectCheckModal
         resource={fixtures.signIn}
         onResolved={onResolved}
+        onFailed={vi.fn()}
       />,
       { wrapper },
     );
 
     await screen.findByRole('button', { name: /try again/i });
     expect(fixtures.signIn.submitProtectCheck).not.toHaveBeenCalled();
+    expect(onResolved).not.toHaveBeenCalled();
+  });
+
+  it('hands a blocked verdict to onFailed instead of resolving', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignInWithProtectCheck();
+    });
+    const blocked = new ClerkAPIResponseError('blocked', {
+      status: 403,
+      data: [{ code: 'action_blocked', message: 'blocked', meta: { traceId: 'trace_1' } } as any],
+    });
+    mockExecute.mockResolvedValue('proof-abc');
+    fixtures.signIn.submitProtectCheck.mockRejectedValue(blocked);
+    const onResolved = vi.fn();
+    const onFailed = vi.fn();
+
+    render(
+      <ProtectCheckModal
+        resource={fixtures.signIn}
+        onResolved={onResolved}
+        onFailed={onFailed}
+      />,
+      { wrapper },
+    );
+
+    await waitFor(() => expect(onFailed).toHaveBeenCalledWith(blocked));
     expect(onResolved).not.toHaveBeenCalled();
   });
 
@@ -148,6 +178,7 @@ describe('ProtectCheckModal', () => {
       <ProtectCheckModal
         resource={fixtures.signUp}
         onResolved={vi.fn()}
+        onFailed={vi.fn()}
       />,
       { wrapper },
     );
