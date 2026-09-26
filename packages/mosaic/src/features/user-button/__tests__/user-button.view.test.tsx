@@ -865,6 +865,30 @@ describe('UserButtonTrigger', () => {
     expect(screen.getByText('Pro')).toBeInTheDocument();
   });
 
+  it('names the account, badged with its active organization, where the account leads', () => {
+    renderTrigger({ mode: 'combined', modePriority: 'user' });
+
+    const trigger = screen.getByRole('button', { name: 'Open account menu for Alice Smith' });
+    expect(within(trigger).getByText('Alice Smith')).toBeInTheDocument();
+    expect(screen.queryByText('Pro')).toBeNull();
+    expect(trigger.querySelector('.cl-user-button-avatar-badge')?.textContent).toBe('F');
+  });
+
+  it('badges the avatar alone the same way', () => {
+    renderTrigger({ mode: 'combined', modePriority: 'user', renderTriggerLabel: false });
+
+    const trigger = screen.getByRole('button', { name: 'Open account menu for Alice Smith' });
+    expect(trigger.querySelector('.cl-user-button-avatar-badge')?.textContent).toBe('F');
+  });
+
+  it('badges nothing where the organization or no organization leads', () => {
+    renderTrigger({ mode: 'combined' });
+    renderTrigger({ mode: 'combined', modePriority: 'user', activeOrganization: null });
+    renderTrigger({ mode: 'user', modePriority: 'user' });
+
+    expect(document.querySelector('.cl-user-button-avatar-badge')).toBeNull();
+  });
+
   it('renders the avatar alone when the label is off', () => {
     renderTrigger({ mode: 'organization', renderTriggerLabel: false });
 
@@ -1013,6 +1037,21 @@ describe('UserButtonView, the header', () => {
     expect(onManageAccount).toHaveBeenCalled();
     await userEvent.setup().click(within(header()).getByRole('button', { name: 'Sign out' }));
     expect(onSignOutSession).toHaveBeenCalledWith('sess_1', 'header');
+  });
+
+  it('leads a combined surface with the account, badged with its active organization, where asked', async () => {
+    const onManageAccount = vi.fn();
+    const onManageOrganization = vi.fn();
+    const onInviteMembers = vi.fn();
+    renderHeader({ modePriority: 'user', onManageAccount, onManageOrganization, onInviteMembers });
+
+    expect(header().querySelector('.cl-user-button-header-title')?.textContent).toBe('Alice Smith');
+    expect(header().querySelector('.cl-user-button-avatar-badge')?.textContent).toBe('F');
+    await userEvent.setup().click(within(header()).getByRole('button', { name: 'Settings' }));
+    expect(onManageOrganization).toHaveBeenCalled();
+    expect(onManageAccount).not.toHaveBeenCalled();
+    await userEvent.setup().click(within(header()).getByRole('button', { name: 'Invite' }));
+    expect(onInviteMembers).toHaveBeenCalled();
   });
 
   it('falls back to the identifier where no organization is active', () => {

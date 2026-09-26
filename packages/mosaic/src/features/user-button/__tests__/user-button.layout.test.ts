@@ -1,14 +1,18 @@
 import { describe, expect, it } from 'vitest';
 
 import { resolveUserButtonLayout } from '../user-button.layout';
-import type { UserButtonData, UserButtonMode } from '../user-button.types';
+import type { UserButtonData, UserButtonMode, UserButtonModePriority } from '../user-button.types';
 
 const alice = { sessionId: 'sess_1', name: 'Alice Smith', identifier: 'alice@example.com' };
 const bob = { sessionId: 'sess_2', name: 'Bob Jones', identifier: 'bob@example.com' };
 const foundry = { kind: 'membership', organizationId: 'org_1', name: 'Foundry' } as const;
 
-function resolve(mode: UserButtonMode, data: Partial<UserButtonData> = {}) {
-  return resolveUserButtonLayout(mode, {
+function resolve(
+  mode: UserButtonMode,
+  data: Partial<UserButtonData> = {},
+  modePriority: UserButtonModePriority = 'organization',
+) {
+  return resolveUserButtonLayout(mode, modePriority, {
     activeSession: alice,
     activeOrganization: foundry,
     hasOrganizations: true,
@@ -75,6 +79,27 @@ describe('resolveUserButtonLayout, what the data settles', () => {
 
     expect(layout.actions.header).toEqual(['signOut', 'manageLead']);
     expect(layout.actions.footer).toEqual(['addAccount']);
+  });
+});
+
+describe('resolveUserButtonLayout, a combined surface led by the account', () => {
+  it('leads with the account inside its active organization, inviting to that organization', () => {
+    const layout = resolve('combined', {}, 'user');
+
+    expect(layout.lead).toBe('member');
+    expect(layout.actions.header).toEqual(['inviteMembers', 'manageLead']);
+  });
+
+  it('leads with the account alone where no organization is active', () => {
+    const layout = resolve('combined', { activeOrganization: null, hidePersonal: true }, 'user');
+
+    expect(layout.lead).toBe('user');
+    expect(layout.actions.header).toEqual(['signOut', 'manageLead']);
+  });
+
+  it('is ignored by the single-purpose modes', () => {
+    expect(resolve('organization', {}, 'user').lead).toBe('organization');
+    expect(resolve('user', {}, 'user').lead).toBe('user');
   });
 });
 
