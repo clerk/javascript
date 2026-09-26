@@ -60,8 +60,8 @@ export async function bulkCreateFeaturesPermissionsRoles(
         } catch (err: unknown) {
           // we are okay if the error is assigning an existing permission
           if (
-            isClerkAPIResponseError(err) &&
-            err.errors[0].code !== 'organization_role_permission_association_exists'
+            !isClerkAPIResponseError(err) ||
+            err.errors[0]?.code !== 'organization_role_permission_association_exists'
           ) {
             throw err;
           }
