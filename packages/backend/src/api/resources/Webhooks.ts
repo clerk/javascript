@@ -33,6 +33,37 @@ export type UserWebhookEvent =
 
 export type EmailWebhookEvent = Webhook<'email.created', EmailJSON>;
 
+export type EmailBounceType = 'Permanent' | 'Transient' | 'Undetermined';
+
+type EmailOutcomeWebhook<Type, Details = unknown> = {
+  object: 'event';
+  type: Type;
+  timestamp: number;
+  instance_id: string;
+  event_attributes: WebhookEventAttributes;
+  data: { id: string; to: [string] } & Details;
+};
+
+export type EmailDeliveryWebhookEvent =
+  | EmailOutcomeWebhook<'email.delivered' | 'email.delivery_delayed' | 'email.complained'>
+  | EmailOutcomeWebhook<'email.bounced', { bounce: { type: EmailBounceType; message: string } }>
+  | EmailOutcomeWebhook<
+      'email.failed',
+      { failed: { reason: 'provider_rejected' | 'delivery_retry_exhausted' | 'send_retry_exhausted' } }
+    >
+  | EmailOutcomeWebhook<
+      'email.suppressed',
+      {
+        suppressed:
+          | { type: 'OnProviderSuppressionList'; message: string }
+          | {
+              type: 'ClerkPolicy';
+              reason: 'unverified_email_dns' | 'provider_domain_restriction' | 'application_communication_lock';
+              message: string;
+            };
+      }
+    >;
+
 export type SMSWebhookEvent = Webhook<'sms.created', SMSMessageJSON>;
 
 export type SessionWebhookEvent = Webhook<
@@ -100,6 +131,7 @@ export type WebhookEvent =
   | UserWebhookEvent
   | SessionWebhookEvent
   | EmailWebhookEvent
+  | EmailDeliveryWebhookEvent
   | SMSWebhookEvent
   | OrganizationWebhookEvent
   | OrganizationDomainWebhookEvent

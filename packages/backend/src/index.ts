@@ -173,6 +173,8 @@ export type {
  */
 export type {
   EmailWebhookEvent,
+  EmailBounceType,
+  EmailDeliveryWebhookEvent,
   OrganizationWebhookEvent,
   OrganizationDomainWebhookEvent,
   OrganizationInvitationAcceptedWebhookEvent,
