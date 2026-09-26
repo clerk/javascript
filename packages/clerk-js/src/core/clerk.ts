@@ -30,6 +30,7 @@ import {
   CLERK_SYNCED_STATUS,
   ERROR_CODES,
 } from '@clerk/shared/internal/clerk-js/constants';
+import { hasMultipleEnterpriseConnections } from '@clerk/shared/internal/clerk-js/enterpriseSSOFactors';
 import { RedirectUrls } from '@clerk/shared/internal/clerk-js/redirectUrls';
 import {
   getTaskEndpoint,
@@ -2665,6 +2666,10 @@ export class Clerk implements ClerkInterface {
     const signUpProtectCheckUrl =
       params.signUpProtectCheckUrl ||
       buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true });
+    const enterpriseConnectionsUrl = buildURL(
+      { base: displayConfig.signUpUrl, hashPath: '/enterprise-connections' },
+      { stringify: true },
+    );
 
     const navigateToSignUpProtectCheck = makeNavigate(signUpProtectCheckUrl);
 
@@ -2785,6 +2790,13 @@ export class Clerk implements ClerkInterface {
       return navigateToFactorOne();
     }
 
+    const userMustChooseEnterpriseConnection =
+      si.status === 'needs_first_factor' && hasMultipleEnterpriseConnections(signIn.supportedFirstFactors);
+
+    if (userMustChooseEnterpriseConnection) {
+      return navigateToFactorOne();
+    }
+
     const userNeedsNewPassword = si.status === 'needs_new_password';
 
     if (userNeedsNewPassword) {
@@ -2881,6 +2893,7 @@ export class Clerk implements ClerkInterface {
         verifyEmailAddressUrl,
         verifyPhoneNumberUrl,
         signUpProtectCheckUrl,
+        enterpriseConnectionsUrl,
         navigate,
       });
     }
