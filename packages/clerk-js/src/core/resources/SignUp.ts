@@ -530,7 +530,7 @@ export class SignUp extends BaseResource implements SignUpResource {
   };
 
   protected _afterMutate(): Promise<void> {
-    return ProtectCheckGate.getInstance().resolve(SignUp.clerk, this);
+    return ProtectCheckGate.getInstance().resolve(SignUp.clerk, 'signUp', this);
   }
 
   protected fromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {

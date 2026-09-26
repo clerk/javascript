@@ -53,7 +53,11 @@ function SignInRoutes(): JSX.Element {
   const signInContext = useSignInContext();
   const signUpContext = useSignUpContext();
   const clerk = useClerk();
-  React.useEffect(() => clerk.__internal_registerProtectCheckHandler?.(), [clerk]);
+  const { isCombinedFlow } = signInContext;
+  React.useEffect(
+    () => clerk.__internal_registerProtectCheckHandler?.(isCombinedFlow ? ['signIn', 'signUp'] : ['signIn']),
+    [clerk, isCombinedFlow],
+  );
 
   return (
     <Flow.Root flow='signIn'>

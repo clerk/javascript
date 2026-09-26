@@ -4100,25 +4100,27 @@ describe('Clerk singleton', () => {
 
       await sut.__internal_resolvePendingProtectCheck();
 
-      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signIn);
-      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signUp);
+      expect(resolve).toHaveBeenCalledWith(sut, 'signIn', sut.client?.signIn);
+      expect(resolve).toHaveBeenCalledWith(sut, 'signUp', sut.client?.signUp);
       resolve.mockRestore();
     });
 
-    it('counts registered prebuilt handlers and releases each one once', () => {
+    it('counts prebuilt handlers per flow and releases each registration once', () => {
       const sut = new Clerk(productionPublishableKey);
-      expect(sut.__internal_hasProtectCheckHandler).toBe(false);
+      expect(sut.__internal_hasProtectCheckHandler('signIn')).toBe(false);
 
-      const releaseFirst = sut.__internal_registerProtectCheckHandler();
-      const releaseSecond = sut.__internal_registerProtectCheckHandler();
-      expect(sut.__internal_hasProtectCheckHandler).toBe(true);
+      const releaseCombined = sut.__internal_registerProtectCheckHandler(['signIn', 'signUp']);
+      const releaseSignUp = sut.__internal_registerProtectCheckHandler(['signUp']);
+      expect(sut.__internal_hasProtectCheckHandler('signIn')).toBe(true);
+      expect(sut.__internal_hasProtectCheckHandler('signUp')).toBe(true);
 
-      releaseFirst();
-      releaseFirst();
-      expect(sut.__internal_hasProtectCheckHandler).toBe(true);
+      releaseCombined();
+      releaseCombined();
+      expect(sut.__internal_hasProtectCheckHandler('signIn')).toBe(false);
+      expect(sut.__internal_hasProtectCheckHandler('signUp')).toBe(true);
 
-      releaseSecond();
-      expect(sut.__internal_hasProtectCheckHandler).toBe(false);
+      releaseSignUp();
+      expect(sut.__internal_hasProtectCheckHandler('signUp')).toBe(false);
     });
   });
 

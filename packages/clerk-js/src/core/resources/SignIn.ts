@@ -683,7 +683,7 @@ export class SignIn extends BaseResource implements SignInResource {
   };
 
   protected _afterMutate(): Promise<void> {
-    return ProtectCheckGate.getInstance().resolve(SignIn.clerk, this);
+    return ProtectCheckGate.getInstance().resolve(SignIn.clerk, 'signIn', this);
   }
 
   protected fromJSON(data: SignInJSON | SignInJSONSnapshot | null): this {

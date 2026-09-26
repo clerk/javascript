@@ -3708,7 +3708,7 @@ describe('SignIn protect_check gate', () => {
     await signIn.create({ identifier: 'a@example.com' });
 
     expect(signIn.protectCheck?.token).toBe('challenge-token');
-    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(clerk, signIn);
+    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(clerk, 'signIn', signIn);
   });
 
   it('leaves reloads to the caller', async () => {

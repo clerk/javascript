@@ -32,7 +32,7 @@ function SignUpRoutes(): JSX.Element {
 
   const signUpContext = useSignUpContext();
   const clerk = useClerk();
-  React.useEffect(() => clerk.__internal_registerProtectCheckHandler?.(), [clerk]);
+  React.useEffect(() => clerk.__internal_registerProtectCheckHandler?.(['signUp']), [clerk]);
 
   return (
     <Flow.Root flow='signUp'>

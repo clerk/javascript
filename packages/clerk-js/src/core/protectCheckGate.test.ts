@@ -11,7 +11,7 @@ const clear = () => ({ protectCheck: null });
 
 const mockClerk = (overrides: Partial<Clerk> = {}) =>
   ({
-    __internal_hasProtectCheckHandler: false,
+    __internal_hasProtectCheckHandler: vi.fn().mockReturnValue(false),
     __internal_openProtectCheckModal: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   }) as unknown as Clerk;
@@ -29,7 +29,7 @@ describe('ProtectCheckGate', () => {
     const resource = gated() as any;
 
     let settled = false;
-    const pending = gate.resolve(clerk, resource).then(() => {
+    const pending = gate.resolve(clerk, 'signIn', resource).then(() => {
       settled = true;
     });
     await Promise.resolve();
@@ -43,22 +43,30 @@ describe('ProtectCheckGate', () => {
 
   it('does nothing when the resource has no gate', async () => {
     const clerk = mockClerk();
-    await gate.resolve(clerk, clear() as any);
+    await gate.resolve(clerk, 'signIn', clear() as any);
     expect(clerk.__internal_openProtectCheckModal).not.toHaveBeenCalled();
   });
 
   it('leaves the gate to a registered prebuilt handler', async () => {
-    const clerk = mockClerk({ __internal_hasProtectCheckHandler: true });
-    await gate.resolve(clerk, gated() as any);
+    const clerk = mockClerk({ __internal_hasProtectCheckHandler: vi.fn().mockReturnValue(true) });
+    await gate.resolve(clerk, 'signIn', gated() as any);
     expect(clerk.__internal_openProtectCheckModal).not.toHaveBeenCalled();
+  });
+
+  it('opens the modal for a flow no prebuilt component handles', async () => {
+    const hasHandler = vi.fn((flow: string) => flow === 'signUp');
+    const clerk = mockClerk({ __internal_hasProtectCheckHandler: hasHandler as any });
+    await gate.resolve(clerk, 'signIn', gated() as any);
+    expect(hasHandler).toHaveBeenCalledWith('signIn');
+    expect(clerk.__internal_openProtectCheckModal).toHaveBeenCalledTimes(1);
   });
 
   it('returns immediately for requests made while a resolution is in flight', async () => {
     const deferred = createDeferredPromise();
     const clerk = mockClerk({ __internal_openProtectCheckModal: vi.fn().mockReturnValue(deferred.promise) });
 
-    const outer = gate.resolve(clerk, gated() as any);
-    await gate.resolve(clerk, gated() as any);
+    const outer = gate.resolve(clerk, 'signIn', gated() as any);
+    await gate.resolve(clerk, 'signIn', gated() as any);
     expect(clerk.__internal_openProtectCheckModal).toHaveBeenCalledTimes(1);
 
     deferred.resolve();
@@ -67,17 +75,17 @@ describe('ProtectCheckGate', () => {
 
   it('opens again for a later gate once the previous resolution finished', async () => {
     const clerk = mockClerk();
-    await gate.resolve(clerk, gated() as any);
-    await gate.resolve(clerk, gated() as any);
+    await gate.resolve(clerk, 'signIn', gated() as any);
+    await gate.resolve(clerk, 'signIn', gated() as any);
     expect(clerk.__internal_openProtectCheckModal).toHaveBeenCalledTimes(2);
   });
 
   it('releases the in-flight lock and rethrows when the modal cannot open', async () => {
     const clerk = mockClerk({ __internal_openProtectCheckModal: vi.fn().mockRejectedValue(new Error('no ui')) });
-    await expect(gate.resolve(clerk, gated() as any)).rejects.toThrow('no ui');
+    await expect(gate.resolve(clerk, 'signIn', gated() as any)).rejects.toThrow('no ui');
 
     const next = mockClerk();
-    await gate.resolve(next, gated() as any);
+    await gate.resolve(next, 'signIn', gated() as any);
     expect(next.__internal_openProtectCheckModal).toHaveBeenCalledTimes(1);
   });
 });

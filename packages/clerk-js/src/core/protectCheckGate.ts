@@ -1,4 +1,4 @@
-import type { SignInResource, SignUpResource } from '@clerk/shared/types';
+import type { ProtectCheckFlow, SignInResource, SignUpResource } from '@clerk/shared/types';
 
 import type { Clerk } from './resources/internal';
 
@@ -20,8 +20,13 @@ export class ProtectCheckGate {
     return ProtectCheckGate.instance;
   }
 
-  public async resolve(clerk: Clerk, resource: SignInResource | SignUpResource): Promise<void> {
-    if (__BUILD_DISABLE_RHC__ || !resource.protectCheck || this.inflight || clerk.__internal_hasProtectCheckHandler) {
+  public async resolve(clerk: Clerk, flow: ProtectCheckFlow, resource: SignInResource | SignUpResource): Promise<void> {
+    if (
+      __BUILD_DISABLE_RHC__ ||
+      !resource.protectCheck ||
+      this.inflight ||
+      clerk.__internal_hasProtectCheckHandler(flow)
+    ) {
       return;
     }
     this.inflight = clerk.__internal_openProtectCheckModal({ resource }).finally(() => {

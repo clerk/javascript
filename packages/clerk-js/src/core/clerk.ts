@@ -109,6 +109,7 @@ import type {
   OrganizationSwitcherProps,
   PricingTableProps,
   ProtectAssertion,
+  ProtectCheckFlow,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -993,31 +994,31 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.closeModal('enableOrganizationsPrompt'));
   };
 
-  #protectCheckHandlers = 0;
+  #protectCheckHandlers: Record<ProtectCheckFlow, number> = { signIn: 0, signUp: 0 };
 
-  public __internal_registerProtectCheckHandler = (): (() => void) => {
-    this.#protectCheckHandlers += 1;
+  public __internal_registerProtectCheckHandler = (flows: ProtectCheckFlow[]): (() => void) => {
+    flows.forEach(flow => (this.#protectCheckHandlers[flow] += 1));
     let released = false;
     return () => {
       if (released) {
         return;
       }
       released = true;
-      this.#protectCheckHandlers -= 1;
+      flows.forEach(flow => (this.#protectCheckHandlers[flow] -= 1));
     };
   };
 
-  get __internal_hasProtectCheckHandler(): boolean {
-    return this.#protectCheckHandlers > 0;
-  }
+  public __internal_hasProtectCheckHandler = (flow: ProtectCheckFlow): boolean => {
+    return this.#protectCheckHandlers[flow] > 0;
+  };
 
   public __internal_resolvePendingProtectCheck = async (): Promise<void> => {
     if (!this.client) {
       return;
     }
     const gate = ProtectCheckGate.getInstance();
-    await gate.resolve(this, this.client.signIn);
-    await gate.resolve(this, this.client.signUp);
+    await gate.resolve(this, 'signIn', this.client.signIn);
+    await gate.resolve(this, 'signUp', this.client.signUp);
   };
 
   public __internal_openProtectCheckModal = (

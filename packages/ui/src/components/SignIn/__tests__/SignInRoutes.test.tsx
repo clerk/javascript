@@ -17,6 +17,7 @@ describe('SignIn', () => {
     const { unmount } = render(<SignIn />, { wrapper });
 
     expect(register).toHaveBeenCalledTimes(1);
+    expect(register).toHaveBeenCalledWith(['signIn']);
     expect(unregister).not.toHaveBeenCalled();
     unmount();
     expect(unregister).toHaveBeenCalledTimes(1);
