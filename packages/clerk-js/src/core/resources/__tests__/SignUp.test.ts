@@ -2,6 +2,7 @@ import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../events';
+import { ProtectCheckGate } from '../../protectCheckGate';
 import { signUpErrorSignal, signUpResourceSignal } from '../../signals';
 import { BaseResource } from '../internal';
 import { SignUp } from '../SignUp';
@@ -18,6 +19,10 @@ vi.mock('../../../utils/authenticateWithPopup', async () => {
 // Import the mocked function after mocking
 import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../../utils/captcha/CaptchaChallenge';
+
+beforeEach(() => {
+  vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+});
 
 // Mock the CaptchaChallenge module
 vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
@@ -2332,5 +2337,47 @@ describe('SignUp', () => {
       expect(result.status).toBe('complete');
       expect(result.protectCheck).toBeNull();
     });
+  });
+});
+
+describe('SignUp protect_check gate', () => {
+  const clerk = {} as any;
+  let previousClerk: any;
+
+  beforeEach(() => {
+    previousClerk = SignUp.clerk;
+    SignUp.clerk = clerk;
+  });
+
+  afterEach(() => {
+    SignUp.clerk = previousClerk;
+  });
+
+  const gatedResponse = {
+    client: null,
+    response: {
+      id: 'signup_123',
+      protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
+    },
+  };
+
+  it('hands the resource to the gate after a mutation', async () => {
+    BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
+    const signUp = new SignUp({ id: 'signup_123' } as any);
+
+    await signUp.update({ emailAddress: 'a@example.com' });
+
+    expect(signUp.protectCheck?.token).toBe('challenge-token');
+    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(clerk, 'signUp', signUp, undefined);
+  });
+
+  it('leaves reloads to the caller', async () => {
+    BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
+    const signUp = new SignUp({ id: 'signup_123' } as any);
+
+    await signUp.reload();
+
+    expect(signUp.protectCheck?.token).toBe('challenge-token');
+    expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
   });
 });

@@ -16,6 +16,7 @@ const componentImportPaths = {
   ImpersonationFab: () => import(/* webpackChunkName: "impersonationfab" */ './../components/ImpersonationFab'),
   GoogleOneTap: () => import(/* webpackChunkName: "onetap" */ './../components/GoogleOneTap'),
   BlankCaptchaModal: () => import(/* webpackChunkName: "blankcaptcha" */ './../components/BlankCaptchaModal'),
+  ProtectCheckModal: () => import(/* webpackChunkName: "protectcheck" */ './../components/ProtectCheckModal'),
   UserVerification: () => import(/* webpackChunkName: "userverification" */ './../components/UserVerification'),
   Waitlist: () => import(/* webpackChunkName: "waitlist" */ './../components/Waitlist'),
   KeylessPrompt: () => import(/* webpackChunkName: "keylessPrompt" */ '../components/devPrompts/KeylessPrompt'),
@@ -121,6 +122,10 @@ export const BlankCaptchaModal = lazy(() =>
   componentImportPaths.BlankCaptchaModal().then(module => ({ default: module.BlankCaptchaModal })),
 );
 
+export const ProtectCheckModal = lazy(() =>
+  componentImportPaths.ProtectCheckModal().then(module => ({ default: module.ProtectCheckModal })),
+);
+
 export const ImpersonationFab = lazy(() =>
   componentImportPaths.ImpersonationFab().then(module => ({ default: module.ImpersonationFab })),
 );
@@ -203,6 +208,7 @@ export const ClerkComponents = {
   Waitlist,
   WaitlistModal,
   BlankCaptchaModal,
+  ProtectCheckModal,
   PricingTable,
   Checkout,
   PlanDetails,

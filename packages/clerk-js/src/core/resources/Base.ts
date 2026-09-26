@@ -232,7 +232,13 @@ export abstract class BaseResource {
     const { action, body, method, path, signal } = params;
     // TODO @userland-errors:
     const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body, signal });
-    return this.fromJSON((json?.response || json) as J);
+    const resource = this.fromJSON((json?.response || json) as J);
+    await this._afterMutate(params);
+    return resource;
+  }
+
+  protected _afterMutate(_params: BaseMutateParams): Promise<void> {
+    return Promise.resolve();
   }
 
   protected async _baseMutateBypass<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
