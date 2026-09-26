@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRightIcon, FlaskConicalIcon } from 'lucide-react';
+import { ChevronRightIcon, FlaskConicalIcon, SearchIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import * as React from 'react';
@@ -150,7 +150,10 @@ function SidebarEntryMenu({
   );
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  onSearchOpen,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { onSearchOpen: () => void }) {
   const pathname = usePathname();
 
   return (
@@ -187,6 +190,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </svg>
         <span className='text-sidebar-foreground/70 text-[10px] font-medium'>Mosaic - Swingset</span>
       </SidebarHeader>
+      <div className='border-b px-2 py-2'>
+        <button
+          type='button'
+          onClick={onSearchOpen}
+          aria-label='Search components'
+          className='border-input bg-background text-sidebar-foreground/50 hover:bg-accent/50 flex h-8 w-full items-center gap-2 rounded-md border px-2 text-xs shadow-none'
+        >
+          <SearchIcon className='size-3.5 shrink-0' />
+          <span>Search…</span>
+          <kbd className='bg-muted ml-auto flex shrink-0 items-center gap-0.5 rounded border px-1 py-0.5 font-mono text-[10px]'>
+            <span className='text-[11px]'>⌘</span>K
+          </kbd>
+        </button>
+      </div>
       <SidebarContent className='gap-0'>
         {groups.map(({ group, groupSlug, components }) => (
           <React.Fragment key={group}>
