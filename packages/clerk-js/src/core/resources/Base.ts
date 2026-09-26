@@ -13,7 +13,6 @@ import { debugLogger } from '@/utils/debug';
 import { clerkMissingFapiClientInResources } from '../errors';
 import type { FapiClient, FapiRequestInit, FapiResponse, FapiResponseJSON, HTTPMethod } from '../fapiClient';
 import { FraudProtection } from '../fraudProtection';
-import { ProtectCheckGate } from '../protectCheckGate';
 import { type Clerk, getClientResourceFromPayload } from './internal';
 
 export type BaseFetchOptions = ClerkResourceReloadParams & {
@@ -226,9 +225,7 @@ export abstract class BaseResource {
       opts,
     );
 
-    const resource = this.fromJSON((json?.response || json) as J);
-    await ProtectCheckGate.getInstance().resolve(BaseResource.clerk, resource);
-    return resource;
+    return this.fromJSON((json?.response || json) as J);
   }
 
   protected async _baseMutate<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {
@@ -236,8 +233,12 @@ export abstract class BaseResource {
     // TODO @userland-errors:
     const json = await BaseResource._fetch<J>({ method, path: path || this.path(action), body, signal });
     const resource = this.fromJSON((json?.response || json) as J);
-    await ProtectCheckGate.getInstance().resolve(BaseResource.clerk, resource);
+    await this._afterMutate(params);
     return resource;
+  }
+
+  protected _afterMutate(_params: BaseMutateParams): Promise<void> {
+    return Promise.resolve();
   }
 
   protected async _baseMutateBypass<J extends ClerkResourceJSON | null>(params: BaseMutateParams): Promise<this> {

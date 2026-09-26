@@ -41,12 +41,6 @@ describe('ProtectCheckGate', () => {
     expect(settled).toBe(true);
   });
 
-  it('does nothing for a resource that cannot carry a gate', async () => {
-    const clerk = mockClerk();
-    await gate.resolve(clerk, { id: 'user_1' } as any);
-    expect(clerk.__internal_openProtectCheckModal).not.toHaveBeenCalled();
-  });
-
   it('does nothing when the resource has no gate', async () => {
     const clerk = mockClerk();
     await gate.resolve(clerk, clear() as any);

@@ -3685,12 +3685,12 @@ describe('SignIn protect_check gate', () => {
   let previousClerk: any;
 
   beforeEach(() => {
-    previousClerk = BaseResource.clerk;
-    BaseResource.clerk = clerk;
+    previousClerk = SignIn.clerk;
+    SignIn.clerk = clerk;
   });
 
   afterEach(() => {
-    BaseResource.clerk = previousClerk;
+    SignIn.clerk = previousClerk;
   });
 
   const gatedResponse = {
@@ -3711,12 +3711,13 @@ describe('SignIn protect_check gate', () => {
     expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(clerk, signIn);
   });
 
-  it('hands the resource to the gate after a reload', async () => {
+  it('leaves reloads to the caller', async () => {
     BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
     const signIn = new SignIn({ id: 'signin_123' } as any);
 
     await signIn.reload();
 
-    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(clerk, signIn);
+    expect(signIn.protectCheck?.token).toBe('challenge-token');
+    expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
   });
 });
