@@ -196,6 +196,7 @@ import { createCheckoutInstance } from './modules/checkout/instance';
 import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { protectAssertionParams } from './protectAssertion';
+import { ProtectCheckGate } from './protectCheckGate';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
@@ -1009,6 +1010,15 @@ export class Clerk implements ClerkInterface {
   get __internal_hasProtectCheckHandler(): boolean {
     return this.#protectCheckHandlers > 0;
   }
+
+  public __internal_resolvePendingProtectCheck = async (): Promise<void> => {
+    if (!this.client) {
+      return;
+    }
+    const gate = ProtectCheckGate.getInstance();
+    await gate.resolve(this, this.client.signIn);
+    await gate.resolve(this, this.client.signUp);
+  };
 
   public __internal_openProtectCheckModal = (
     props: Pick<__internal_ProtectCheckModalProps, 'resource'>,

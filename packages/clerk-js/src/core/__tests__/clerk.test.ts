@@ -17,6 +17,7 @@ import { mockJwt } from '@/test/core-fixtures';
 import { mockNativeRuntime } from '../../test/utils';
 import { Clerk } from '../clerk';
 import { eventBus, events } from '../events';
+import { ProtectCheckGate } from '../protectCheckGate';
 import type { DisplayConfig, Organization } from '../resources/internal';
 import { BaseResource, Client, Environment, SignIn, SignUp } from '../resources/internal';
 
@@ -4090,6 +4091,18 @@ describe('Clerk singleton', () => {
 
       await expect(pending).rejects.toBe(blocked);
       expect(closeModal).toHaveBeenCalledWith('protectCheck');
+    });
+
+    it('resolves gates the client carries on its sign-in and sign-up', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.__internal_resolvePendingProtectCheck();
+
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signIn);
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signUp);
+      resolve.mockRestore();
     });
 
     it('counts registered prebuilt handlers and releases each one once', () => {

@@ -351,6 +351,14 @@ export interface Clerk {
    */
   __internal_registerProtectCheckHandler?: () => () => void;
 
+  /**
+   * Resolves a pending `protect_check` on the client's current sign-in or sign-up through Clerk's
+   * Protect modal. Callback pages need it because the gate arrives with the client, not on a request.
+   *
+   * @internal
+   */
+  __internal_resolvePendingProtectCheck?: () => Promise<void>;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */
