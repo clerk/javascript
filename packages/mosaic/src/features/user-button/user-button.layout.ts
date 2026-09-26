@@ -1,4 +1,9 @@
-import type { UserButtonData, UserButtonHeaderLayout, UserButtonMode } from './user-button.types';
+import type {
+  UserButtonData,
+  UserButtonHeaderLayout,
+  UserButtonMode,
+  UserButtonModePriority,
+} from './user-button.types';
 
 /*
  * Which mode puts what where. The surface is three slots deep, in this order, and each mode fills
@@ -24,7 +29,8 @@ import type { UserButtonData, UserButtonHeaderLayout, UserButtonMode } from './u
  *
  * The header is about whatever leads, not the mode: an organization is managed and invited to, an
  * account is managed and signed out of. With no organization active, a combined surface leads with
- * the account.
+ * the account. A combined surface can lead with the account while an organization is active too, and
+ * then the account is badged with that organization and invites to it.
  */
 
 /** The four places an action can land. Every mode has a header and a footer; the list's two vary. */
@@ -43,13 +49,15 @@ export type UserButtonAction =
   | 'switchAccount';
 
 /**
- * What the trigger names and the header leads with. `none` is an organization-led surface with no
- * organization active and no personal workspace to fall back to.
+ * What the trigger names and the header leads with. `member` is the account, badged with the
+ * organization it is active in. `none` is an organization-led surface with no organization active
+ * and no personal workspace to fall back to.
  */
-export type UserButtonLead = 'organization' | 'user' | 'none';
+export type UserButtonLead = 'organization' | 'member' | 'user' | 'none';
 
 const headers = {
   organization: ['inviteMembers', 'manageLead'],
+  member: ['inviteMembers', 'manageLead'],
   user: ['signOut', 'manageLead'],
   none: ['manageLead'],
 } as const satisfies Record<UserButtonLead, readonly UserButtonAction[]>;
@@ -87,8 +95,8 @@ const modes = {
 } as const satisfies Record<UserButtonMode, ModeLayout>;
 
 /**
- * Where each of the surface's actions landed, resolved once from `mode` and the data, so no section
- * has to read either of them again.
+ * Where each of the surface's actions landed, resolved once from `mode`, `modePriority` and the
+ * data, so no section has to read any of them again.
  */
 export interface UserButtonLayout {
   lead: UserButtonLead;
@@ -104,9 +112,12 @@ export interface UserButtonLayout {
   actions: Record<UserButtonSlot, UserButtonAction[]>;
 }
 
-function resolveLead(mode: UserButtonMode, data: UserButtonData): UserButtonLead {
+function resolveLead(mode: UserButtonMode, modePriority: UserButtonModePriority, data: UserButtonData): UserButtonLead {
   if (mode === 'user') {
     return 'user';
+  }
+  if (mode === 'combined' && modePriority === 'user') {
+    return data.activeOrganization ? 'member' : 'user';
   }
   if (data.activeOrganization) {
     return 'organization';
@@ -114,7 +125,11 @@ function resolveLead(mode: UserButtonMode, data: UserButtonData): UserButtonLead
   return data.hidePersonal ? 'none' : 'user';
 }
 
-export function resolveUserButtonLayout(mode: UserButtonMode, data: UserButtonData): UserButtonLayout {
+export function resolveUserButtonLayout(
+  mode: UserButtonMode,
+  modePriority: UserButtonModePriority,
+  data: UserButtonData,
+): UserButtonLayout {
   const declared: ModeLayout = modes[mode];
   const organizationsHeading = declared.organizations === false ? false : declared.organizations.heading;
   const organizationsFooter = declared.organizations === false ? [] : declared.organizations.footer;
@@ -124,7 +139,7 @@ export function resolveUserButtonLayout(mode: UserButtonMode, data: UserButtonDa
   // Loading does not count, so an account with none never opens a list that then disappears.
   const hasOrganizations = data.hasOrganizations || data.suggestions.length > 0 || data.invitations.length > 0;
 
-  const lead = resolveLead(mode, data);
+  const lead = resolveLead(mode, modePriority, data);
   const header = [...headers[lead]];
 
   return {
