@@ -13,22 +13,9 @@ applyKotlinExpoModulesCorePlugin()
 group = 'com.clerk.expo'
 version = '1.0.0'
 
-// The native SDKs report the @clerk/expo version in the x-clerk-host-sdk-version header.
-def resolveClerkExpoVersion() {
-  try {
-    def process = new ProcessBuilder("node", "--print", "require.resolve('@clerk/expo/package.json')")
-      .directory(projectDir)
-      .start()
-    def clerkExpoPackageJsonPath = process.inputStream.text.trim()
-    if (process.waitFor() == 0 && clerkExpoPackageJsonPath) {
-      return new JsonSlurper().parse(new File(clerkExpoPackageJsonPath)).version.toString()
-    }
-  } catch (Exception ignored) {
-  }
-  return new JsonSlurper().parse(new File(projectDir, "../package.json")).version.toString()
-}
-
-def clerkExpoVersion = resolveClerkExpoVersion()
+// Set by the @clerk/expo-native config plugin to the installed @clerk/expo version.
+def clerkExpoVersion = rootProject.findProperty("clerkExpo.hostSdkVersion")?.toString() ?:
+  new JsonSlurper().parse(new File(projectDir, "../package.json")).version.toString()
 
 // Dependency versions - centralized for easier updates
 // See: https://docs.gradle.org/current/userguide/version_catalogs.html for app-level version catalogs

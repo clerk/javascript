@@ -14,24 +14,29 @@ const {
   withDangerousMod,
   withInfoPlist,
   withAppBuildGradle,
+  withGradleProperties,
 } = require('@expo/config-plugins');
 const path = require('path');
 const fs = require('fs');
 const packageJson = require('./package.json');
 
 const CLERK_MIN_IOS_VERSION = '17.0';
+const HOST_SDK_VERSION_GRADLE_PROPERTY = 'clerkExpo.hostSdkVersion';
 
-// The native SDKs report the @clerk/expo version in the x-clerk-host-sdk-version header.
-const resolveHostSdkVersion = projectRoot => {
+const resolveClerkExpo = projectRoot => {
   try {
-    const paths = [projectRoot, process.cwd(), __dirname].filter(Boolean);
-    return require(require.resolve('@clerk/expo/package.json', { paths })).version;
+    const paths = [projectRoot, process.cwd()].filter(Boolean);
+    const clerkExpoPackageJsonPath = require.resolve('@clerk/expo/package.json', { paths });
+    return {
+      dir: path.dirname(clerkExpoPackageJsonPath),
+      version: require(clerkExpoPackageJsonPath).version,
+    };
   } catch {
-    return packageJson.version;
+    return null;
   }
 };
 
-const withClerkIOS = config => {
+const withClerkIOS = (config, hostSdkVersion) => {
   console.log('✅ Clerk iOS plugin loaded');
 
   // IMPORTANT: Set iOS deployment target in Podfile.properties.json BEFORE pod install
@@ -89,7 +94,6 @@ const withClerkIOS = config => {
     return config;
   });
 
-  const hostSdkVersion = resolveHostSdkVersion(config._internal?.projectRoot);
   config = withInfoPlist(config, modConfig => {
     modConfig.modResults.ClerkExpoVersion = hostSdkVersion;
     return modConfig;
@@ -102,8 +106,16 @@ const withClerkIOS = config => {
  * Add packaging exclusions to Android app build.gradle to resolve
  * duplicate META-INF file conflicts from clerk-android dependencies.
  */
-const withClerkAndroid = config => {
+const withClerkAndroid = (config, hostSdkVersion) => {
   console.log('✅ Clerk Android plugin loaded');
+
+  config = withGradleProperties(config, modConfig => {
+    modConfig.modResults = modConfig.modResults.filter(
+      item => !(item.type === 'property' && item.key === HOST_SDK_VERSION_GRADLE_PROPERTY),
+    );
+    modConfig.modResults.push({ type: 'property', key: HOST_SDK_VERSION_GRADLE_PROPERTY, value: hostSdkVersion });
+    return modConfig;
+  });
 
   return withAppBuildGradle(config, modConfig => {
     let buildGradle = modConfig.modResults.contents;
@@ -294,9 +306,18 @@ const withClerkTheme = (config, props = {}) => {
   return config;
 };
 
-const withClerkExpoNative = (config, props = {}) => {
-  config = withClerkIOS(config);
-  config = withClerkAndroid(config);
+const withClerkExpoNative = (config, props = {}, resolve = resolveClerkExpo) => {
+  const clerkExpo = resolve(config._internal?.projectRoot);
+  if (clerkExpo && fs.existsSync(path.join(clerkExpo.dir, 'expo-module.config.json'))) {
+    throw new Error(
+      `Clerk: @clerk/expo@${clerkExpo.version} still bundles the Clerk native module, which conflicts with @clerk/expo-native. Upgrade @clerk/expo to a version that supports @clerk/expo-native.`,
+    );
+  }
+  // Native requests report the @clerk/expo version in the x-clerk-host-sdk-version header.
+  const hostSdkVersion = clerkExpo?.version ?? packageJson.version;
+
+  config = withClerkIOS(config, hostSdkVersion);
+  config = withClerkAndroid(config, hostSdkVersion);
   config = withClerkKeychainService(config, props);
   config = withClerkTheme(config, props);
   return config;
@@ -304,6 +325,7 @@ const withClerkExpoNative = (config, props = {}) => {
 
 module.exports = createRunOncePlugin(withClerkExpoNative, packageJson.name, packageJson.version);
 module.exports._testing = {
+  withClerkExpoNative,
   validateThemeJson,
   isPlainObject,
   VALID_COLOR_KEYS,
