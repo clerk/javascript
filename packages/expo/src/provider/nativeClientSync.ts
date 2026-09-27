@@ -97,7 +97,7 @@ function fingerprint(clerk: SyncableClerk): string {
   return JSON.stringify([
     client?.id ?? null,
     client?.lastActiveSessionId ?? null,
-    client?.signedInSessions.map(session => [session.id, session.status, +session.updatedAt]) ?? [],
+    client?.signedInSessions.map(session => [session.id, session.status]) ?? [],
     user?.id ?? null,
     +(user?.updatedAt ?? 0),
   ]);
