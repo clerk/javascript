@@ -1,0 +1,53 @@
+{
+  "name": "@clerk/expo-biometrics",
+  "version": "0.0.0",
+  "description": "Native biometric credential module to be used with Clerk for Expo",
+  "keywords": [
+    "react-native",
+    "expo",
+    "biometrics",
+    "face-id",
+    "touch-id",
+    "ClerkExpoBiometrics",
+    "clerk"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/expo-biometrics"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "android",
+    "ios",
+    "expo-module.config.json"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
+    "dev": "tsup --watch",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "devDependencies": {
+    "expo": "~54.0.36"
+  },
+  "peerDependencies": {
+    "expo": "catalog:peer-expo"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

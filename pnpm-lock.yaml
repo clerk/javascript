@@ -702,6 +702,12 @@ importers:
         specifier: ^0.86.0
         version: 0.86.0(@babel/core@7.29.7)(@react-native-community/cli@12.3.7(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@5.0.10)
 
+  packages/expo-biometrics:
+    devDependencies:
+      expo:
+        specifier: ~54.0.36
+        version: 54.0.36(@babel/core@7.29.7)(bufferutil@4.1.0)(graphql@16.14.1)(react-native@0.86.0(@babel/core@7.29.7)(@react-native-community/cli@12.3.7(bufferutil@4.1.0)(utf-8-validate@5.0.10))(@types/react@18.3.28)(bufferutil@4.1.0)(react@18.3.1)(utf-8-validate@5.0.10))(react@18.3.1)(typescript@5.9.3)(utf-8-validate@5.0.10)
+
   packages/expo-google-signin:
     devDependencies:
       '@expo/config-plugins':
