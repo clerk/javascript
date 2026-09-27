@@ -8,14 +8,14 @@ const mocks = vi.hoisted(() => ({
   nativeProps: vi.fn(),
 }));
 
-vi.mock('../../specs/NativeClerkUserButtonView', () => ({
+vi.mock('../specs/NativeClerkUserButtonView', () => ({
   default: React.forwardRef((props: Record<string, unknown>, _ref) => {
     mocks.nativeProps(props);
     return null;
   }),
 }));
 
-vi.mock('../../utils/native-module', () => ({
+vi.mock('../utils/native-module', () => ({
   isNativeSupported: true,
 }));
 

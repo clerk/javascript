@@ -1,8 +1,8 @@
+import { useAuth } from '@clerk/expo';
 import { useEffect, useState } from 'react';
 
-import { useAuth } from '../hooks/useAuth';
-import type { NativeAuthFlowState } from '../specs/NativeClerkModule.types';
-import { ClerkExpoModule as ClerkExpo } from '../utils/native-module';
+import type { NativeAuthFlowState } from './specs/NativeClerkModule.types';
+import { ClerkExpoModule as ClerkExpo } from './utils/native-module';
 
 const nativeAuthFlowChangedEvent = 'clerkNativeAuthFlowChanged';
 
