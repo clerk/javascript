@@ -193,6 +193,9 @@ final class BiometricCredentialStoreTests: XCTestCase {
     XCTAssertEqual(listed[0]["identifierHint"] as? String, "a@b.co")
     XCTAssertNil(listed[1]["identifierHint"])
     XCTAssertNil(listed[2]["identifierHint"])
+    XCTAssertEqual(listed[0]["identifierHintSha256"] as? String, "80305c9bb1bb2480e03894350e0a8a366dcbdeb302e69e0817aa0743abd77054")
+    XCTAssertTrue(listed[1]["identifierHintSha256"] is NSNull)
+    XCTAssertTrue(listed[2]["identifierHintSha256"] is NSNull)
     XCTAssertTrue(json.contains(#""futureField":[1,true,null]"#))
     XCTAssertTrue(json.contains(#""updatedAt":1714000000001"#))
   }

@@ -58,6 +58,10 @@ public final class ClerkExpoBiometricsModule: Module {
       Bundle.main.bundleIdentifier ?? ""
     }
 
+    Function("hashIdentifierHint") { (hint: String) -> String? in
+      BiometricCredentialCoding.identifierHintSHA256(hint)
+    }
+
     AsyncFunction("getAvailability") { () -> BiometricAvailabilityResult in
       let availability = self.keyManager.availability()
       let result = BiometricAvailabilityResult()

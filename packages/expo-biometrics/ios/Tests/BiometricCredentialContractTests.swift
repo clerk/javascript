@@ -220,6 +220,15 @@ final class BiometricCredentialContractTests: XCTestCase {
     XCTAssertEqual((listed[0]["createdAt"] as? NSNumber)?.doubleValue, 1_714_000_000_000.25)
   }
 
+  func testIdentifierHintHashMatchesAndroidContractVector() {
+    XCTAssertEqual(
+      BiometricCredentialCoding.identifierHintSHA256("  User@Example.COM\n"),
+      "b4c9a289323b21a01c3e940f150eb9b8c542587f1abfd8f0e1cc1ffc5e475514"
+    )
+    XCTAssertNil(BiometricCredentialCoding.identifierHintSHA256(" \n\t"))
+    XCTAssertNil(BiometricCredentialCoding.identifierHintSHA256(nil))
+  }
+
   func testInstallationMarkerKeyMatchesContractFormat() {
     XCTAssertEqual(
       BiometricCredentialCoding.installationMarkerKey(service: "com.clerk.example", accessGroup: nil, appIdentifier: "com.clerk.example"),

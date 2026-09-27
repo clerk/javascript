@@ -7,7 +7,11 @@
  */
 export type BiometricCredentialPolicy = 'biometry_current_set' | 'biometry_any' | 'biometry_or_device_passcode';
 
-export type BiometryType = 'faceID' | 'touchID' | 'opticID' | 'none';
+/**
+ * The biometry the device supports. iOS reports `faceID`, `touchID`, or `opticID`. Android cannot tell which sensor is a
+ * strong (Class 3) biometric, so it reports `biometric` whenever one is present.
+ */
+export type BiometryType = 'faceID' | 'touchID' | 'opticID' | 'biometric' | 'none';
 
 export interface BiometricAvailability {
   /** The biometry the device supports, or `none`. */
@@ -44,7 +48,10 @@ export interface BiometricCredentialRecord {
   userId: string;
   /** App identifier the credential was enrolled for (see `getAppIdentifier()`). */
   appIdentifier: string;
-  /** Local-only identifier hint. Normalized (trimmed, lowercased) when stored; empty values are omitted. */
+  /**
+   * Local-only identifier hint. Normalized (trimmed, lowercased) when stored; empty values are omitted.
+   * iOS stores the normalized hint; Android stores only its hash (see `hashIdentifierHint()`).
+   */
   identifierHint?: string;
   policy: BiometricCredentialPolicy;
   /** Server credential creation time, in milliseconds since the Unix epoch. */
@@ -56,18 +63,28 @@ export interface BiometricCredentialRecord {
 /**
  * A record read from the store. Fields written by other SDK versions are passed through unchanged.
  */
-export type StoredBiometricCredentialRecord = BiometricCredentialRecord & { readonly [field: string]: unknown };
+export type StoredBiometricCredentialRecord = Omit<BiometricCredentialRecord, 'identifierHint'> & {
+  /** The normalized identifier hint on iOS, when one was stored. Always `null` on Android, which stores only the hash. */
+  identifierHint?: string | null;
+  /** `hashIdentifierHint()` of the stored identifier hint, or `null` when there is none. Compare hints with this field. */
+  identifierHintSha256: string | null;
+  readonly [field: string]: unknown;
+};
 
 export interface SaveRecordOptions {
   /**
    * Delete every other record for the same `appIdentifier`, along with its private key, after the record is saved.
    * Set this after a successful enrollment, since the server has already replaced those credentials.
+   * On Android only the same `userId`'s other records are deleted, as the shared storage contract requires.
    */
   removeOtherRecordsForApp: boolean;
 }
 
 export interface InstallationMarkerResult {
-  /** `true` when this is a new installation and the records left behind by a previous one were deleted. */
+  /**
+   * `true` when this is a new installation and the records left behind by a previous one were deleted.
+   * Always `false` on Android, where uninstalling the app already deletes its records and keys.
+   */
   wiped: boolean;
 }
 

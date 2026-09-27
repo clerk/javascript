@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 // Mirrors the format pinned by clerk-ios BiometricCredentialStorageContractTests. Any change here must stay
@@ -41,6 +42,12 @@ enum BiometricCredentialCoding {
   private static func encodeInstallationMarkerComponent(_ value: String?) -> String {
     guard let value else { return "n" }
     return "s\(value.utf8.count):\(value)"
+  }
+
+  /// Lowercase hex SHA-256 of the normalized hint, as clerk-android's storage contract v2 stores it; `nil` when it is empty.
+  static func identifierHintSHA256(_ identifierHint: String?) -> String? {
+    guard let normalized = BiometricCredentialRecord.normalizedIdentifierHint(identifierHint) else { return nil }
+    return SHA256.hash(data: Data(normalized.utf8)).map { String(format: "%02x", $0) }.joined()
   }
 
   static func base64URLEncodedString<D: DataProtocol>(_ data: D) -> String {
@@ -141,6 +148,7 @@ struct BiometricCredentialRecord: Equatable {
     static let userId = "userId"
     static let appIdentifier = "appIdentifier"
     static let identifierHint = "identifierHint"
+    static let identifierHintSha256 = "identifierHintSha256"
     static let policy = "policy"
     static let createdAt = "createdAt"
     static let updatedAt = "updatedAt"
@@ -275,7 +283,8 @@ enum BiometricCredentialRecordList {
     }
   }
 
-  /// Well-formed records with their stored fields passed through and `identifierHint` normalized as ClerkKit reads it.
+  /// Well-formed records with their stored fields passed through, `identifierHint` normalized as ClerkKit reads it, and
+  /// its `identifierHintSha256`.
   static func listable(_ records: [[String: Any]]) -> [[String: Any]] {
     records.compactMap { object in
       guard let record = BiometricCredentialRecord(jsonObject: object) else { return nil }
@@ -285,6 +294,8 @@ enum BiometricCredentialRecordList {
       } else {
         listed.removeValue(forKey: BiometricCredentialRecord.Field.identifierHint)
       }
+      listed[BiometricCredentialRecord.Field.identifierHintSha256] =
+        BiometricCredentialCoding.identifierHintSHA256(record.identifierHint) ?? NSNull()
       return listed
     }
   }
