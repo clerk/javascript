@@ -11,6 +11,17 @@ export type NativeAuthFlowModule = {
   getAuthFlowState(): Promise<NativeAuthFlowState>;
 };
 
+/**
+ * Native storage owns the device token. JS reads it before each FAPI request, writes rotated tokens
+ * back with compare-and-set, and refetches its own client on `clerkNativeClientInvalidated`.
+ */
+export type NativeClientSyncModule = {
+  configureNative(publishableKey: string, seedDeviceToken: string | null): Promise<void>;
+  getDeviceToken(): Promise<string | null>;
+  setDeviceToken(token: string | null, expected: string | null): Promise<boolean>;
+  refreshClient(): Promise<void>;
+};
+
 export type NativeBiometricCredential = {
   id: string;
   object: 'trusted_device';

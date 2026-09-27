@@ -3,6 +3,8 @@
 package expo.modules.clerk
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -37,12 +39,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.json.JSONObject
 
 private const val TAG = "ClerkExpoModule"
 private const val NATIVE_AUTH_FLOW_CHANGED_EVENT = "clerkNativeAuthFlowChanged"
 private const val NATIVE_CLIENT_CHANGED_EVENT = "clerkNativeClientChanged"
+private const val NATIVE_CLIENT_INVALIDATED_EVENT = "clerkNativeClientInvalidated"
 private const val HOST_SDK_HEADER = "x-clerk-host-sdk"
 private const val HOST_SDK_VERSION_HEADER = "x-clerk-host-sdk-version"
 private const val HOST_SDK = "expo"
@@ -204,6 +208,12 @@ class ClerkExpoModule : Module() {
     private var lastObservedClientState: ClientStateSnapshot? = null
     private var jsOriginatedClientSyncDepth = 0
     private var configuredPublishableKey: String? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private var clientInvalidationObserverJob: Job? = null
+    private val clientInvalidationTracker = ClerkClientInvalidationTracker(
+        schedule = { flush -> mainHandler.post(flush) },
+        emit = { sendEvent(NATIVE_CLIENT_INVALIDATED_EVENT, emptyMap<String, Any?>()) }
+    )
 
     private data class AuthFlowStateSnapshot(
         val isLoaded: Boolean,
@@ -238,7 +248,7 @@ class ClerkExpoModule : Module() {
     override fun definition() = ModuleDefinition {
         Name("ClerkExpo")
 
-        Events(NATIVE_AUTH_FLOW_CHANGED_EVENT, NATIVE_CLIENT_CHANGED_EVENT)
+        Events(NATIVE_AUTH_FLOW_CHANGED_EVENT, NATIVE_CLIENT_CHANGED_EVENT, NATIVE_CLIENT_INVALIDATED_EVENT)
 
         OnCreate {
             sharedInstance = this@ClerkExpoModule
@@ -253,6 +263,9 @@ class ClerkExpoModule : Module() {
             authFlowStateObserverJob = null
             clientStateObserverJob?.cancel()
             clientStateObserverJob = null
+            clientInvalidationObserverJob?.cancel()
+            clientInvalidationObserverJob = null
+            mainHandler.removeCallbacksAndMessages(null)
         }
 
         AsyncFunction("configure") { pubKey: String, bearerToken: String?, promise: Promise ->
@@ -261,6 +274,22 @@ class ClerkExpoModule : Module() {
 
         AsyncFunction("getClientToken") { promise: Promise ->
             getClientToken(promise)
+        }
+
+        AsyncFunction("configureNative") { pubKey: String, seedDeviceToken: String?, promise: Promise ->
+            configureNative(pubKey, seedDeviceToken, promise)
+        }
+
+        AsyncFunction("getDeviceToken") { promise: Promise ->
+            getDeviceToken(promise)
+        }
+
+        AsyncFunction("setDeviceToken") { token: String?, expected: String?, promise: Promise ->
+            setDeviceToken(token, expected, promise)
+        }
+
+        AsyncFunction("refreshClient") { promise: Promise ->
+            refreshClient(promise)
         }
 
         AsyncFunction("getAuthFlowState") { promise: Promise ->
@@ -611,6 +640,140 @@ class ClerkExpoModule : Module() {
                 promise.resolve(null)
             } catch (e: Exception) {
                 promise.reject("E_INIT_FAILED", "Failed to initialize Clerk SDK: ${e.message}", e)
+            }
+        }
+    }
+
+    // MARK: - single-token client sync
+
+    private fun configureNative(pubKey: String, seedDeviceToken: String?, promise: Promise) {
+        val context = reactContext ?: run {
+            promise.reject("E_CONFIGURE_FAILED", "React context is not available", null)
+            return
+        }
+
+        coroutineScope.launch {
+            try {
+                val activePublishableKey = configuredPublishableKey ?: Clerk.publishableKey
+                val didConfigure = when {
+                    activePublishableKey == null -> {
+                        Clerk.initialize(context, pubKey, clerkConfigurationOptions())
+                        true
+                    }
+                    activePublishableKey != pubKey -> {
+                        Clerk.switchConfiguration(context, pubKey, clerkConfigurationOptions())
+                        true
+                    }
+                    else -> false
+                }
+                if (didConfigure) {
+                    configuredPublishableKey = pubKey
+                    appContext.currentActivity?.let { Clerk.attachActivity(it) }
+                    // Must follow initialize(), which resets customTheme.
+                    loadThemeFromAssets(context)
+                }
+                startClientStateObserver()
+
+                val didAdoptSeed = adoptSeedDeviceTokenIfNeeded(seedDeviceToken)
+                startClientInvalidationObserver()
+                lastObservedClientState = clientStateSnapshot()
+                if (didAdoptSeed) {
+                    // An initialization refresh started before the seed was stored is fenced off by the token change.
+                    launch {
+                        val result = Clerk.refreshClient()
+                        if (result is ClerkResult.Failure) {
+                            debugLog(TAG, "configureNative - refresh after seed adoption failed: ${result.error}")
+                        }
+                        clientInvalidationTracker.observe(clientFingerprint())
+                    }
+                }
+                promise.resolve(null)
+            } catch (e: Exception) {
+                promise.reject("E_CONFIGURE_FAILED", "Failed to configure Clerk SDK: ${e.message}", e)
+            }
+        }
+    }
+
+    private suspend fun adoptSeedDeviceTokenIfNeeded(seedDeviceToken: String?): Boolean {
+        val seed = seedDeviceToken?.trim()?.takeIf { it.isNotEmpty() } ?: return false
+        return withContext(Dispatchers.IO) {
+            Clerk.getDeviceToken() == null && Clerk.setDeviceToken(seed, null)
+        }
+    }
+
+    private fun startClientInvalidationObserver() {
+        clientInvalidationTracker.reset(clientFingerprint())
+        if (clientInvalidationObserverJob != null) {
+            return
+        }
+
+        clientInvalidationObserverJob = coroutineScope.launch {
+            Clerk.clientFlow.collect { client ->
+                clientInvalidationTracker.observe(clientFingerprint(client))
+            }
+        }
+    }
+
+    private fun clientFingerprint(client: Client? = Clerk.clientFlow.value): ClerkClientFingerprint {
+        return ClerkClientFingerprint.from(client, clientStateSnapshot(client).deviceToken)
+    }
+
+    private fun isClerkConfigured(): Boolean = Clerk.publishableKey != null
+
+    private fun getDeviceToken(promise: Promise) {
+        if (!isClerkConfigured()) {
+            promise.resolve(null)
+            return
+        }
+        try {
+            promise.resolve(Clerk.getDeviceToken())
+        } catch (e: Exception) {
+            promise.reject("E_GET_DEVICE_TOKEN_FAILED", e.message ?: "Unable to read the device token", e)
+        }
+    }
+
+    private fun setDeviceToken(token: String?, expected: String?, promise: Promise) {
+        coroutineScope.launch {
+            try {
+                val didSet = withContext(Dispatchers.IO) { Clerk.setDeviceToken(token, expected) }
+                val fingerprint = clientFingerprint()
+                if (didSet) {
+                    clientInvalidationTracker.acknowledgeDeviceToken(fingerprint.deviceToken, fingerprint)
+                } else {
+                    clientInvalidationTracker.observe(fingerprint)
+                }
+                promise.resolve(didSet)
+            } catch (e: Exception) {
+                val error = clerkSetDeviceTokenBridgeError(e)
+                promise.reject(error.code, error.message, e)
+            }
+        }
+    }
+
+    private fun refreshClient(promise: Promise) {
+        if (!isClerkConfigured()) {
+            promise.reject(
+                "E_NOT_CONFIGURED",
+                "Clerk must be configured with configureNative before syncing client state.",
+                null
+            )
+            return
+        }
+
+        coroutineScope.launch {
+            try {
+                val result = Clerk.refreshClient()
+                clientInvalidationTracker.observe(clientFingerprint())
+                when (result) {
+                    is ClerkResult.Success -> promise.resolve(null)
+                    is ClerkResult.Failure -> promise.reject(
+                        "E_REFRESH_CLIENT_FAILED",
+                        result.error?.firstMessage() ?: result.throwable?.message ?: "Client refresh failed",
+                        result.throwable
+                    )
+                }
+            } catch (e: Exception) {
+                promise.reject("E_REFRESH_CLIENT_FAILED", e.message ?: "Client refresh failed", e)
             }
         }
     }

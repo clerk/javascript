@@ -18,7 +18,7 @@ else
 end
 
 clerk_ios_repo = 'https://github.com/clerk/clerk-ios.git'
-clerk_ios_version = '1.5.7'
+clerk_ios_branch = 'mike/framework-set-device-token'
 
 Pod::Spec.new do |s|
   s.name           = 'ClerkExpo'
@@ -44,7 +44,7 @@ Pod::Spec.new do |s|
     spm_dependency(
       s,
       url: clerk_ios_repo,
-      requirement: { :kind => 'exactVersion', :version => clerk_ios_version },
+      requirement: { :kind => 'branch', :branch => clerk_ios_branch },
       products: ['ClerkKit', 'ClerkKitUI']
     )
   else
@@ -52,6 +52,7 @@ Pod::Spec.new do |s|
   end
 
   s.source_files = "ClerkNativeBridge.swift",
+                   "ClerkClientInvalidation.swift",
                    "ClerkAppDelegateSubscriber.swift",
                    "ClerkExpoModule.swift",
                    "ClerkNativeViewHost.swift",

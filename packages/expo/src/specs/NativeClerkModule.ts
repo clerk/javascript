@@ -1,8 +1,12 @@
 import { requireOptionalNativeModule } from 'expo';
 
-import type { NativeAuthFlowModule, NativeBiometricCredentialModule } from './NativeClerkModule.types';
+import type {
+  NativeAuthFlowModule,
+  NativeBiometricCredentialModule,
+  NativeClientSyncModule,
+} from './NativeClerkModule.types';
 
-export interface Spec extends NativeAuthFlowModule, NativeBiometricCredentialModule {
+export interface Spec extends NativeAuthFlowModule, NativeBiometricCredentialModule, Partial<NativeClientSyncModule> {
   // Exposed by Expo Modules EventEmitter for internal native client change events.
   // This is not part of the public @clerk/expo API.
   addListener?(eventName: string, listener?: (...args: unknown[]) => void): { remove: () => void };
