@@ -145,18 +145,16 @@ describe('native client sync behavior', () => {
       await expectConverged(h);
     });
 
-    it('never replaces a signed-in JS client with a foreign sessionless native client', async () => {
-      const { server, token, clientId, sessionIds } = seedDevice(['user_1']);
+    it('follows native onto a new client when native replaces the shared device token', async () => {
+      const { server, token } = seedDevice(['user_1']);
       const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
-      const emissionIndex = h.js.emissions.length;
 
       await h.run(() => h.native.switchToForeignSessionlessClient());
       await h.settle();
 
-      expect(h.js.client?.id).toBe(clientId);
-      expect(h.js.session?.id).toBe(sessionIds.user_1);
-      expect(signedOutEmissionsSince(h, emissionIndex)).toEqual([]);
-      expect(await h.jsDeviceToken()).toBe(token);
+      expect(h.native.token).not.toBe(token);
+      expect(h.js.client?.id).toBe(server.clientIdForToken(h.native.token));
+      expect(h.js.session).toBeNull();
       await expectConverged(h);
     });
 
@@ -174,6 +172,35 @@ describe('native client sync behavior', () => {
       await expectConverged(h);
     });
 
+    it('signs JS out when a JS request is rejected after native removed the only session', async () => {
+      const { server, token } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+
+      h.native.holdChangeNotifications();
+      await h.run(() => h.native.signOut());
+      await h.run(() => h.js.getSessionToken());
+
+      expect(h.js.session).toBeNull();
+      expect(h.js.client?.signedInSessions).toEqual([]);
+      await h.run(() => h.native.releaseChangeNotifications());
+      await expectConverged(h);
+    });
+
+    it('refetches the JS client a bounded number of times for a burst of rejected requests', async () => {
+      const { server, token, sessionIds } = seedDevice(['user_1', 'user_2'], 'user_1');
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+      const jsClientFetchesBefore = server.requestCount('js', 'GET /client');
+
+      h.native.holdChangeNotifications();
+      await h.run(() => h.native.signOutSession(sessionIds.user_1));
+      await h.run(() => Promise.all(Array.from({ length: 5 }, () => h.js.getSessionToken())));
+
+      expect(h.js.session?.id).toBe(sessionIds.user_2);
+      expect(server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBeLessThanOrEqual(2);
+      await h.run(() => h.native.releaseChangeNotifications());
+      await expectConverged(h);
+    });
+
     it('settles a native change without an echo loop', async () => {
       const { server, token, sessionIds } = seedDevice(['user_1', 'user_2'], 'user_1');
       const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
@@ -185,8 +212,8 @@ describe('native client sync behavior', () => {
       await h.settle();
 
       await expectConverged(h);
-      expect(server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBeLessThanOrEqual(2);
-      expect(h.native.clientRefreshCount - nativeRefreshesBefore).toBeLessThanOrEqual(1);
+      expect(server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBe(1);
+      expect(h.native.clientRefreshCount - nativeRefreshesBefore).toBe(0);
     });
   });
 
@@ -273,7 +300,7 @@ describe('native client sync behavior', () => {
 
       await expectConverged(h);
       expect(server.requestCount('js', 'GET /client') - jsClientFetchesBefore).toBeLessThanOrEqual(1);
-      expect(h.native.clientRefreshCount - nativeRefreshesBefore).toBeLessThanOrEqual(2);
+      expect(h.native.clientRefreshCount - nativeRefreshesBefore).toBe(1);
     });
   });
 
@@ -297,6 +324,46 @@ describe('native client sync behavior', () => {
       await waitFor(() => expect(h.native.token).toBe(token));
       await waitFor(() => expect(h.native.activeSessionId).toBe(sessionIds.user_1));
       await expectConverged(h);
+    });
+
+    it('configures native once when ClerkProvider mounts under StrictMode', async () => {
+      const { server, token, sessionIds } = seedDevice(['user_1']);
+
+      const h = await start({ server, jsDeviceToken: token, strictMode: true });
+
+      expect(h.nativeModuleCalls.filter(call => call === 'configureNative')).toHaveLength(1);
+      expect(h.js.session?.id).toBe(sessionIds.user_1);
+      await expectConverged(h);
+    });
+
+    it('keeps JS working on its own token cache with sync disabled when native fails to configure', async () => {
+      const { server, token, sessionIds } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token, failNativeConfigure: true });
+
+      expect(h.js.session?.id).toBe(sessionIds.user_1);
+      server.rotateTokenOnNextResponse(token);
+      await h.run(() => h.js.updateProfile());
+      await h.settle();
+
+      const rotatedToken = h.persistentTokenCache?.read(CLERK_CLIENT_JWT_KEY) ?? null;
+      expect(rotatedToken).not.toBe(token);
+      expect(await h.jsDeviceToken()).toBe(rotatedToken);
+      expect(h.native.token).toBe(token);
+      expect(h.nativeModuleCalls.filter(call => call !== 'configureNative' && call !== 'addListener')).toEqual([]);
+      await expect(h.run(() => h.awaitJsToNativeSync())).resolves.toBeUndefined();
+    });
+
+    it('mirrors the shared device token into the app token cache', async () => {
+      const server = new FakeClerkServer();
+      const stale = server.seedClient();
+      const signedIn = server.seedClient({ users: ['user_1'] });
+
+      const h = await start({ server, jsDeviceToken: stale.token, nativeDeviceToken: signedIn.token });
+      server.rotateTokenOnNextResponse(signedIn.token);
+      await h.run(() => h.js.updateProfile());
+
+      await waitFor(() => expect(h.persistentTokenCache?.read(CLERK_CLIENT_JWT_KEY)).toBe(h.native.token));
+      expect(h.native.token).not.toBe(signedIn.token);
     });
 
     it('delivers a JS sign-in that happens while native is still starting up', async () => {
@@ -348,6 +415,24 @@ describe('native client sync behavior', () => {
       expect(h.js.client?.signedInSessions.map(session => session.id)).toContain(sessionId);
       expect(h.js.session?.id).toBe(sessionId);
     });
+
+    it('rejects with environment_unavailable when native does not finish a refresh in time', async () => {
+      const h = await start({ delayNativeStartup: true });
+      await h.run(() => h.js.signIn('user_1'));
+
+      vi.useFakeTimers();
+      try {
+        const barrier = expect(h.awaitJsToNativeSync()).rejects.toMatchObject({ code: 'environment_unavailable' });
+        await vi.advanceTimersByTimeAsync(5_000);
+        await barrier;
+      } finally {
+        vi.useRealTimers();
+      }
+
+      await h.run(() => h.releaseNativeStartup());
+      await expect(h.run(() => h.awaitJsToNativeSync())).resolves.toBeUndefined();
+      await expectConverged(h);
+    });
   });
 
   describe('without native client sync', () => {
@@ -368,9 +453,8 @@ describe('native client sync behavior', () => {
     });
   });
 
-  describe('known gaps in the current engine', () => {
-    // Native adopts whatever token JS passes to `configure`, so a stale JS token replaces native's signed-in one.
-    it.fails('keeps the native signed-in session when JS starts with a stale device token', async () => {
+  describe('shared device token', () => {
+    it('keeps the native signed-in session when JS starts with a stale device token', async () => {
       const server = new FakeClerkServer();
       const stale = server.seedClient();
       const signedIn = server.seedClient({ users: ['user_1'] });
@@ -381,8 +465,7 @@ describe('native client sync behavior', () => {
       await expectConverged(h);
     });
 
-    // Without compare-and-set, each side keeps its own rotation and they end on different tokens.
-    it.fails('converges on one device token when JS and native rotate it at the same time', async () => {
+    it('converges on one device token when JS and native rotate it at the same time', async () => {
       const { server, token, sessionIds } = seedDevice(['user_1']);
       const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
 

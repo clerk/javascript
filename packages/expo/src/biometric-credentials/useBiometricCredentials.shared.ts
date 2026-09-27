@@ -1,7 +1,7 @@
 import { useClerk } from '@clerk/react';
 import { useMemo } from 'react';
 
-import { synchronizeNativeClientToJs, waitForPendingJsToNativeSync } from '../provider/nativeClientSyncCoordinator';
+import { idle, pullFromNative } from '../provider/nativeClientSync';
 import type { NativeBiometricCredential, NativeBiometricCredentialModule } from '../specs/NativeClerkModule.types';
 import { errorThrower } from '../utils/errors';
 import { ClerkExpoModule } from '../utils/native-module';
@@ -65,18 +65,18 @@ function createBiometricCredentials(clerk: ReturnType<typeof useClerk>): UseBiom
   return {
     getAvailability: async params => {
       const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
+      await idle();
       return nativeModule.getTrustedDeviceAvailability(params?.id ?? null, params?.identifierHint ?? null);
     },
     list: async () => {
       const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
+      await idle();
       const credentials = await nativeModule.listTrustedDevices();
       return credentials.map(toBiometricCredential);
     },
     enroll: async params => {
       const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
+      await idle();
       const credential = await nativeModule.enrollTrustedDevice(
         params?.name ?? null,
         params?.identifierHint ?? null,
@@ -87,7 +87,7 @@ function createBiometricCredentials(clerk: ReturnType<typeof useClerk>): UseBiom
     },
     revoke: async id => {
       const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
+      await idle();
       const credential = await nativeModule.revokeTrustedDevice(id);
       return toBiometricCredential(credential);
     },
@@ -108,7 +108,7 @@ function createBiometricCredentials(clerk: ReturnType<typeof useClerk>): UseBiom
       if (!session) {
         return errorThrower.throw('Biometric reverification requires an active session.');
       }
-      await waitForPendingJsToNativeSync();
+      await idle();
       if (clerk.session?.id !== session.id) {
         return errorThrower.throw('The active session changed before biometric reverification started.');
       }
@@ -119,7 +119,7 @@ function createBiometricCredentials(clerk: ReturnType<typeof useClerk>): UseBiom
       if (verification.status === 'complete') {
         session.clearCache();
       }
-      await synchronizeNativeClientToJs();
+      await pullFromNative();
       const synchronizedSession = clerk.session;
       if (synchronizedSession?.id !== session.id) {
         return errorThrower.throw('The active session changed during biometric reverification.');
@@ -143,13 +143,13 @@ function createBiometricCredentials(clerk: ReturnType<typeof useClerk>): UseBiom
     },
     signIn: async params => {
       const nativeModule = getNativeModule();
-      await waitForPendingJsToNativeSync();
+      await idle();
       const nativeSignIn = await nativeModule.signInWithTrustedDevice(
         params?.id ?? null,
         params?.identifierHint ?? null,
         params?.reason ?? null,
       );
-      await synchronizeNativeClientToJs();
+      await pullFromNative();
 
       const client = clerk.client;
       const signIn = client?.signIn;

@@ -1,11 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import {
-  __internal_resetNativeClientSyncCoordinator,
-  registerNativeToJsSyncHandler,
-  trackPendingJsToNativeSync,
-} from '../../provider/nativeClientSyncCoordinator';
 import { isBiometricCredentialError } from '../errors';
 import { useBiometricCredentials as useBiometricCredentialsOnUnsupportedPlatform } from '../useBiometricCredentials';
 import { useBiometricCredentials as useBiometricCredentialsOnAndroid } from '../useBiometricCredentials.android';
@@ -23,7 +18,8 @@ const mocks = vi.hoisted(() => ({
   jsSignedInSessions: [{ id: 'sess_123' }],
   useClerk: vi.fn(),
   setActive: vi.fn(),
-  synchronizeNativeClientToJs: vi.fn(),
+  idle: vi.fn(),
+  pullFromNative: vi.fn(),
   isNativeModuleInstalled: true,
   nativeModule: {
     getTrustedDeviceAvailability: vi.fn(),
@@ -36,6 +32,11 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@clerk/react', () => ({
   useClerk: mocks.useClerk,
+}));
+
+vi.mock('../../provider/nativeClientSync', () => ({
+  idle: mocks.idle,
+  pullFromNative: mocks.pullFromNative,
 }));
 
 vi.mock('../../utils/native-module', () => ({
@@ -68,12 +69,9 @@ function renderBiometricCredentials(useHook = useBiometricCredentialsOnIos) {
   return renderHook(() => useHook()).result.current;
 }
 
-let unregisterNativeToJsSyncHandler: (() => void) | undefined;
-
 beforeEach(() => {
-  __internal_resetNativeClientSyncCoordinator();
-  unregisterNativeToJsSyncHandler = registerNativeToJsSyncHandler(mocks.synchronizeNativeClientToJs);
-  mocks.synchronizeNativeClientToJs.mockResolvedValue(undefined);
+  mocks.idle.mockResolvedValue(undefined);
+  mocks.pullFromNative.mockResolvedValue(undefined);
   mocks.useClerk.mockReturnValue({
     client: { signIn: mocks.jsSignIn, signedInSessions: mocks.jsSignedInSessions },
     setActive: mocks.setActive,
@@ -88,7 +86,6 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers();
-  unregisterNativeToJsSyncHandler?.();
 });
 
 describe('useBiometricCredentials on iOS', () => {
@@ -117,7 +114,7 @@ describe('useBiometricCredentials on iOS', () => {
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
     });
-    trackPendingJsToNativeSync(nativeSync);
+    mocks.idle.mockReturnValueOnce(nativeSync);
     mocks.nativeModule.getTrustedDeviceAvailability.mockResolvedValue({
       isAvailable: true,
       unavailableReason: null,
@@ -134,21 +131,12 @@ describe('useBiometricCredentials on iOS', () => {
   });
 
   test('rejects availability when native client synchronization times out', async () => {
-    vi.useFakeTimers();
-    let finishNativeSync!: () => void;
-    const nativeSync = new Promise<void>(resolve => {
-      finishNativeSync = resolve;
-    });
-    trackPendingJsToNativeSync(nativeSync);
+    mocks.idle.mockRejectedValueOnce(Object.assign(new Error('timed out'), { code: 'environment_unavailable' }));
 
-    const availability = expect(renderBiometricCredentials().getAvailability()).rejects.toMatchObject({
+    await expect(renderBiometricCredentials().getAvailability()).rejects.toMatchObject({
       code: 'environment_unavailable',
     });
-
-    await vi.advanceTimersByTimeAsync(5_000);
-    await availability;
     expect(mocks.nativeModule.getTrustedDeviceAvailability).not.toHaveBeenCalled();
-    finishNativeSync();
   });
 
   test('lists biometric credentials and converts native timestamps to dates', async () => {
@@ -185,7 +173,7 @@ describe('useBiometricCredentials on iOS', () => {
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
     });
-    trackPendingJsToNativeSync(nativeSync);
+    mocks.idle.mockReturnValueOnce(nativeSync);
     mocks.nativeModule.listTrustedDevices.mockResolvedValue([nativeBiometricCredential]);
 
     const listing = renderBiometricCredentials().list();
@@ -230,7 +218,7 @@ describe('useBiometricCredentials on iOS', () => {
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
     });
-    trackPendingJsToNativeSync(nativeSync);
+    mocks.idle.mockReturnValueOnce(nativeSync);
     mocks.nativeModule.enrollTrustedDevice.mockResolvedValue(nativeBiometricCredential);
 
     const enrollment = renderBiometricCredentials().enroll();
@@ -262,7 +250,7 @@ describe('useBiometricCredentials on iOS', () => {
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
     });
-    trackPendingJsToNativeSync(nativeSync);
+    mocks.idle.mockReturnValueOnce(nativeSync);
     mocks.nativeModule.revokeTrustedDevice.mockResolvedValue({
       ...nativeBiometricCredential,
       status: 'revoked',
@@ -362,7 +350,7 @@ describe('useBiometricCredentials on iOS', () => {
     const nativeSync = new Promise<void>(resolve => {
       finishNativeSync = resolve;
     });
-    trackPendingJsToNativeSync(nativeSync);
+    mocks.idle.mockReturnValueOnce(nativeSync);
     mocks.nativeModule.signInWithTrustedDevice.mockResolvedValue({
       id: 'sia_123',
       status: 'complete',
@@ -389,7 +377,7 @@ describe('useBiometricCredentials on iOS', () => {
       status,
       createdSessionId: null,
     });
-    mocks.synchronizeNativeClientToJs.mockImplementation(() => {
+    mocks.pullFromNative.mockImplementation(() => {
       Object.assign(mocks.jsSignIn, {
         id: 'sia_mfa',
         status,
@@ -415,7 +403,7 @@ describe('useBiometricCredentials on iOS', () => {
       status: 'complete',
       createdSessionId: 'sess_123',
     });
-    mocks.synchronizeNativeClientToJs.mockReturnValue(
+    mocks.pullFromNative.mockReturnValue(
       new Promise<void>(resolve => {
         finishSync = resolve;
       }),
@@ -428,7 +416,7 @@ describe('useBiometricCredentials on iOS', () => {
         didResolve = true;
         return result;
       });
-    await vi.waitFor(() => expect(mocks.synchronizeNativeClientToJs).toHaveBeenCalled());
+    await vi.waitFor(() => expect(mocks.pullFromNative).toHaveBeenCalled());
     expect(didResolve).toBe(false);
 
     finishSync();
