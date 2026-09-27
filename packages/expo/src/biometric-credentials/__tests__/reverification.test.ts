@@ -23,10 +23,7 @@ vi.mock('../../utils/native-module', () => ({
   },
 }));
 vi.mock('../loadExpoBiometrics', () => ({ loadExpoBiometrics: mocks.loadExpoBiometrics }));
-vi.mock('../../provider/nativeClientSyncCoordinator', () => ({
-  waitForPendingJsToNativeSync: mocks.idle,
-  synchronizeNativeClientToJs: mocks.synchronize,
-}));
+vi.mock('../../provider/nativeClientSync', () => ({ idle: mocks.idle, pullFromNative: mocks.synchronize }));
 vi.mock('react-native', () => ({ Platform: { OS: 'ios' } }));
 
 const session = {

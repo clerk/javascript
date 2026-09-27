@@ -18,10 +18,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@clerk/react', () => ({ useClerk: mocks.useClerk }));
 vi.mock('../loadExpoBiometrics', () => ({ loadExpoBiometrics: mocks.loadExpoBiometrics }));
-vi.mock('../../provider/nativeClientSyncCoordinator', () => ({
-  waitForPendingJsToNativeSync: mocks.idle,
-  synchronizeNativeClientToJs: mocks.pullFromNative,
-}));
+vi.mock('../../provider/nativeClientSync', () => ({ idle: mocks.idle, pullFromNative: mocks.pullFromNative }));
 vi.mock('../../utils/native-module', () => ({ ClerkExpoModule: null }));
 vi.mock('react-native', () => ({ Platform: mocks.platform }));
 

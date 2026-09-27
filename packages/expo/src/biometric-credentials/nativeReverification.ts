@@ -1,6 +1,6 @@
 import type { useClerk } from '@clerk/react';
 
-import { synchronizeNativeClientToJs, waitForPendingJsToNativeSync } from '../provider/nativeClientSyncCoordinator';
+import { idle, pullFromNative } from '../provider/nativeClientSync';
 import { errorThrower } from '../utils/errors';
 import { ClerkExpoModule } from '../utils/native-module';
 import type { UseBiometricCredentialsReturn } from './types';
@@ -29,7 +29,7 @@ export function createNativeReverify(clerk: ReturnType<typeof useClerk>): UseBio
     if (!session) {
       return errorThrower.throw('Biometric reverification requires an active session.');
     }
-    await waitForPendingJsToNativeSync();
+    await idle();
     if (clerk.session?.id !== session.id) {
       return errorThrower.throw('The active session changed before biometric reverification started.');
     }
@@ -40,7 +40,7 @@ export function createNativeReverify(clerk: ReturnType<typeof useClerk>): UseBio
     if (verification.status === 'complete') {
       session.clearCache();
     }
-    await synchronizeNativeClientToJs();
+    await pullFromNative();
     const synchronizedSession = clerk.session;
     if (synchronizedSession?.id !== session.id) {
       return errorThrower.throw('The active session changed during biometric reverification.');
