@@ -1,4 +1,4 @@
-import { useAuth } from '@clerk/expo';
+import { useAuth } from '@clerk/react';
 import { useEffect, useState } from 'react';
 
 import type { NativeAuthFlowState } from './specs/NativeClerkModule.types';

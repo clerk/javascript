@@ -123,6 +123,7 @@
   "devDependencies": {
     "@clerk/expo-biometrics": "workspace:*",
     "@clerk/expo-google-signin": "workspace:*",
+    "@clerk/expo-native": "workspace:*",
     "@clerk/expo-passkeys": "workspace:*",
     "@expo/config-plugins": "^54.0.4",
     "@types/base-64": "^1.0.2",
@@ -139,7 +140,7 @@
   "peerDependencies": {
     "@clerk/expo-biometrics": ">=0.1.0",
     "@clerk/expo-google-signin": ">=0.1.0",
-    "@clerk/expo-native": "workspace:>=0.0.1",
+    "@clerk/expo-native": ">=0.1.0",
     "@clerk/expo-passkeys": ">=0.0.6",
     "expo": "catalog:peer-expo",
     "expo-apple-authentication": ">=7.0.0",

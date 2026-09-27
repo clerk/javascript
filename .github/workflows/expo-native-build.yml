@@ -125,7 +125,7 @@ jobs:
       - name: Build and pack Clerk packages
         if: steps.native-build-cache.outputs.cache-hit != 'true'
         run: |
-          pnpm turbo build --filter=@clerk/expo-native... --filter=@clerk/expo-biometrics
+          pnpm --filter @clerk/expo... --filter @clerk/expo-biometrics build
           mkdir -p "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo pack --pack-destination "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo-google-signin pack --pack-destination "$SDK_PACK_DIR"
