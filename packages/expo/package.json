@@ -121,6 +121,7 @@
     "tslib": "catalog:repo"
   },
   "devDependencies": {
+    "@clerk/expo-biometrics": "workspace:*",
     "@clerk/expo-google-signin": "workspace:*",
     "@clerk/expo-native-components": "workspace:*",
     "@clerk/expo-passkeys": "workspace:*",
@@ -137,6 +138,7 @@
     "react-native": "^0.86.0"
   },
   "peerDependencies": {
+    "@clerk/expo-biometrics": ">=0.1.0",
     "@clerk/expo-google-signin": ">=0.1.0",
     "@clerk/expo-native-components": ">=0.1.0",
     "@clerk/expo-passkeys": ">=0.0.6",
@@ -153,6 +155,9 @@
     "react-native": ">=0.75"
   },
   "peerDependenciesMeta": {
+    "@clerk/expo-biometrics": {
+      "optional": true
+    },
     "@clerk/expo-google-signin": {
       "optional": true
     },
