@@ -1,6 +1,6 @@
 /**
- * Expo config plugin for @clerk/clerk-expo
- * Automatically configures iOS and Android to work with Clerk native components
+ * Expo config plugin for @clerk/expo-native
+ * Configures iOS and Android for the Clerk native SDKs (clerk-ios / clerk-android)
  *
  * When this plugin is used:
  * 1. iOS is configured with the required deployment target and metadata
@@ -9,13 +9,11 @@
  * Native modules and views are registered via Expo Modules autolinking.
  */
 const {
-  AndroidConfig,
+  createRunOncePlugin,
   withXcodeProject,
   withDangerousMod,
   withInfoPlist,
   withAppBuildGradle,
-  withAndroidManifest,
-  withEntitlementsPlist,
 } = require('@expo/config-plugins');
 const path = require('path');
 const fs = require('fs');
@@ -23,33 +21,14 @@ const packageJson = require('./package.json');
 
 const CLERK_MIN_IOS_VERSION = '17.0';
 
-const addHostedAuthIntentFilter = (mainActivity, packageName) => {
-  const callbackHost = `${packageName}.hosted-callback`;
-  const intentFilters = mainActivity['intent-filter'] || [];
-  const hasAndroidName = (entries, name) => entries?.some(entry => entry.$?.['android:name'] === name);
-  const callbackIsRegistered = intentFilters.some(
-    intentFilter =>
-      hasAndroidName(intentFilter.action, 'android.intent.action.VIEW') &&
-      hasAndroidName(intentFilter.category, 'android.intent.category.DEFAULT') &&
-      hasAndroidName(intentFilter.category, 'android.intent.category.BROWSABLE') &&
-      intentFilter.data?.some(
-        data => data.$?.['android:scheme'] === 'clerk' && data.$?.['android:host'] === callbackHost,
-      ),
-  );
-
-  if (callbackIsRegistered) {
-    return;
+// The native SDKs report the @clerk/expo version in the x-clerk-host-sdk-version header.
+const resolveHostSdkVersion = projectRoot => {
+  try {
+    const paths = [projectRoot, process.cwd(), __dirname].filter(Boolean);
+    return require(require.resolve('@clerk/expo/package.json', { paths })).version;
+  } catch {
+    return packageJson.version;
   }
-
-  intentFilters.push({
-    action: [{ $: { 'android:name': 'android.intent.action.VIEW' } }],
-    category: [
-      { $: { 'android:name': 'android.intent.category.DEFAULT' } },
-      { $: { 'android:name': 'android.intent.category.BROWSABLE' } },
-    ],
-    data: [{ $: { 'android:scheme': 'clerk', 'android:host': callbackHost } }],
-  });
-  mainActivity['intent-filter'] = intentFilters;
 };
 
 const withClerkIOS = config => {
@@ -110,8 +89,9 @@ const withClerkIOS = config => {
     return config;
   });
 
+  const hostSdkVersion = resolveHostSdkVersion(config._internal?.projectRoot);
   config = withInfoPlist(config, modConfig => {
-    modConfig.modResults.ClerkExpoVersion = packageJson.version;
+    modConfig.modResults.ClerkExpoVersion = hostSdkVersion;
     return modConfig;
   });
 
@@ -124,15 +104,6 @@ const withClerkIOS = config => {
  */
 const withClerkAndroid = config => {
   console.log('✅ Clerk Android plugin loaded');
-
-  config = withAndroidManifest(config, modConfig => {
-    const packageName = config.android?.package;
-    if (packageName) {
-      const mainActivity = AndroidConfig.Manifest.getMainActivityOrThrow(modConfig.modResults);
-      addHostedAuthIntentFilter(mainActivity, packageName);
-    }
-    return modConfig;
-  });
 
   return withAppBuildGradle(config, modConfig => {
     let buildGradle = modConfig.modResults.contents;
@@ -187,15 +158,6 @@ const withClerkAndroid = config => {
 };
 
 /**
- * Combined Clerk Expo plugin
- *
- * When this plugin is configured in app.json/app.config.js:
- * 1. iOS gets the deployment target and metadata required by Clerk native views
- * 2. Android gets packaging exclusions for dependency conflicts
- *
- * Native modules and views are registered via Expo Modules autolinking.
- */
-/**
  * Write ClerkKeychainService to Info.plist when keychainService is provided.
  * This allows extension apps (watch, widget, app clip) to share the same
  * keychain entry as the main app by using a custom service identifier.
@@ -208,37 +170,6 @@ const withClerkKeychainService = (config, { keychainService } = {}) => {
   return withInfoPlist(config, modConfig => {
     modConfig.modResults.ClerkKeychainService = keychainService;
     console.log(`✅ Set ClerkKeychainService in Info.plist: ${keychainService}`);
-    return modConfig;
-  });
-};
-
-const withClerkFaceIDPermission = (config, { faceIDPermission } = {}) => {
-  if (faceIDPermission === undefined) {
-    return config;
-  }
-
-  if (typeof faceIDPermission !== 'string' || faceIDPermission.trim().length === 0) {
-    throw new Error('Clerk: faceIDPermission must be a non-empty string');
-  }
-
-  return withInfoPlist(config, modConfig => {
-    if (!Object.hasOwn(modConfig.modResults, 'NSFaceIDUsageDescription')) {
-      modConfig.modResults.NSFaceIDUsageDescription = faceIDPermission;
-    }
-    return modConfig;
-  });
-};
-
-/**
- * Add Sign in with Apple entitlement to the iOS app.
- * Required for the native Apple Sign In flow via ASAuthorizationController.
- */
-const withClerkAppleSignIn = config => {
-  return withEntitlementsPlist(config, modConfig => {
-    if (!modConfig.modResults['com.apple.developer.applesignin']) {
-      modConfig.modResults['com.apple.developer.applesignin'] = ['Default'];
-      console.log('✅ Added Sign in with Apple entitlement');
-    }
     return modConfig;
   });
 };
@@ -363,23 +294,16 @@ const withClerkTheme = (config, props = {}) => {
   return config;
 };
 
-const withClerkExpo = (config, props = {}) => {
-  const { appleSignIn = true } = props;
+const withClerkExpoNative = (config, props = {}) => {
   config = withClerkIOS(config);
-  if (appleSignIn !== false) {
-    config = withClerkAppleSignIn(config);
-  }
   config = withClerkAndroid(config);
   config = withClerkKeychainService(config, props);
-  config = withClerkFaceIDPermission(config, props);
   config = withClerkTheme(config, props);
   return config;
 };
 
-module.exports = withClerkExpo;
+module.exports = createRunOncePlugin(withClerkExpoNative, packageJson.name, packageJson.version);
 module.exports._testing = {
-  addHostedAuthIntentFilter,
-  withClerkFaceIDPermission,
   validateThemeJson,
   isPlainObject,
   VALID_COLOR_KEYS,

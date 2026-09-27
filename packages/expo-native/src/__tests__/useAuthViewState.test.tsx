@@ -1,7 +1,7 @@
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import type { NativeAuthFlowState } from '../../specs/NativeClerkModule.types';
+import type { NativeAuthFlowState } from '../specs/NativeClerkModule.types';
 import { useAuthViewState } from '../useAuthViewState';
 
 const mocks = vi.hoisted(() => ({
@@ -13,11 +13,11 @@ const mocks = vi.hoisted(() => ({
   remove: vi.fn(),
 }));
 
-vi.mock('../../hooks/useAuth', () => ({
+vi.mock('@clerk/expo', () => ({
   useAuth: () => mocks.auth,
 }));
 
-vi.mock('../../utils/native-module', () => ({
+vi.mock('../utils/native-module', () => ({
   get ClerkExpoModule() {
     return mocks.module;
   },
