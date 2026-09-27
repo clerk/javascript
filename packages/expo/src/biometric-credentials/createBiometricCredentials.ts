@@ -173,6 +173,29 @@ function toBiometricCredential(credential: BiometricCredentialResource): Biometr
   };
 }
 
+function toApiBiometricCredentialError(error: unknown, fallbackCode: OperationErrorCode): unknown {
+  if (isClerkAPIResponseError(error)) {
+    const apiError = error.errors[0];
+    return biometricCredentialError(
+      apiError?.code ?? fallbackCode,
+      apiError?.longMessage ?? apiError?.message ?? error.message,
+      error,
+    );
+  }
+  if (error instanceof Error && typeof (error as { code?: unknown }).code === 'string') {
+    return error;
+  }
+  return biometricCredentialError(fallbackCode, error instanceof Error ? error.message : String(error), error);
+}
+
+async function callApi<T>(fallbackCode: OperationErrorCode, request: () => Promise<T>): Promise<T> {
+  try {
+    return await request();
+  } catch (error) {
+    throw toApiBiometricCredentialError(error, fallbackCode);
+  }
+}
+
 function isMissingCredentialError(error: unknown): boolean {
   return (
     isClerkAPIResponseError(error) &&
@@ -296,7 +319,9 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
       return { unavailableReason: 'no_local_credential' };
     }
 
-    const serverCredentials = await activeUser.__experimental_getBiometricCredentials();
+    const serverCredentials = await callApi(biometrics.fallbackCode, () =>
+      activeUser.__experimental_getBiometricCredentials(),
+    );
     let firstUnavailableReason: BiometricCredentialUnavailableReason | null = null;
     for (const record of activeUserRecords) {
       const serverCredential = serverCredentials.find(credential => credential.id === record.id);
@@ -325,8 +350,9 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     },
 
     list: async () => {
-      requireBiometrics('E_TRUSTED_DEVICE_LIST_FAILED');
-      const credentials = await requireUser('E_TRUSTED_DEVICE_LIST_FAILED').__experimental_getBiometricCredentials();
+      const biometrics = requireBiometrics('E_TRUSTED_DEVICE_LIST_FAILED');
+      const user = requireUser(biometrics.fallbackCode);
+      const credentials = await callApi(biometrics.fallbackCode, () => user.__experimental_getBiometricCredentials());
       return credentials.map(toBiometricCredential);
     },
 
@@ -360,15 +386,19 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
 
       let credential: BiometricCredentialResource;
       try {
-        const challenge = await user.__experimental_prepareBiometricCredential(enrollment);
+        const challenge = await callApi(biometrics.fallbackCode, () =>
+          user.__experimental_prepareBiometricCredential(enrollment),
+        );
         const signature = await callModule(biometrics, module =>
           module.sign(key.localKeyId, challenge.clientData, params?.reason ?? DEFAULT_ENROLLMENT_REASON),
         );
-        credential = await user.__experimental_attemptBiometricCredential({
-          ...enrollment,
-          clientData: challenge.clientData,
-          signature,
-        });
+        credential = await callApi(biometrics.fallbackCode, () =>
+          user.__experimental_attemptBiometricCredential({
+            ...enrollment,
+            clientData: challenge.clientData,
+            signature,
+          }),
+        );
       } catch (error) {
         await ignoreErrors(() => biometrics.module.deleteKey(key.localKeyId));
         throw error;
@@ -401,7 +431,10 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
 
     revoke: async id => {
       const biometrics = requireBiometrics('E_TRUSTED_DEVICE_REVOCATION_FAILED');
-      const credential = await requireUser(biometrics.fallbackCode).__experimental_revokeBiometricCredential(id);
+      const user = requireUser(biometrics.fallbackCode);
+      const credential = await callApi(biometrics.fallbackCode, () =>
+        user.__experimental_revokeBiometricCredential(id),
+      );
       await ignoreErrors(async () => {
         const records = await biometrics.module.listRecords();
         const localKeyIds = new Set(records.filter(record => record.id === id).map(record => record.localKeyId));
@@ -435,7 +468,7 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
         if (isMissingCredentialError(error)) {
           await ignoreErrors(() => deleteLocalCredential(biometrics, record));
         }
-        return error;
+        return toApiBiometricCredentialError(error, biometrics.fallbackCode);
       };
 
       let signIn: SignInResource;
