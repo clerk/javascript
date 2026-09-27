@@ -1,29 +1,32 @@
 import { renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import {
-  __internal_resetNativeClientSyncCoordinator,
-  registerNativeToJsSyncHandler,
-  trackPendingJsToNativeSync,
-} from '../../provider/nativeClientSyncCoordinator';
 import { useBiometricCredentials as useUnsupportedBiometrics } from '../useBiometricCredentials';
 import { useBiometricCredentials as useAndroidBiometrics } from '../useBiometricCredentials.android';
 import { useBiometricCredentials as useIosBiometrics } from '../useBiometricCredentials.ios';
 
 const mocks = vi.hoisted(() => ({
   useClerk: vi.fn(),
+  idle: vi.fn(),
+  synchronize: vi.fn(),
+  isNativeModuleInstalled: true,
   nativeModule: {
-    getTrustedDeviceAvailability: vi.fn(),
-    listTrustedDevices: vi.fn(),
-    enrollTrustedDevice: vi.fn(),
-    revokeTrustedDevice: vi.fn(),
-    signInWithTrustedDevice: vi.fn(),
     reverifyWithBiometrics: vi.fn(),
   },
+  loadExpoBiometrics: vi.fn(),
 }));
 
 vi.mock('@clerk/react', () => ({ useClerk: mocks.useClerk }));
-vi.mock('../../utils/native-module', () => ({ ClerkExpoModule: mocks.nativeModule }));
+vi.mock('../../utils/native-module', () => ({
+  get ClerkExpoModule() {
+    return mocks.isNativeModuleInstalled ? mocks.nativeModule : null;
+  },
+}));
+vi.mock('../loadExpoBiometrics', () => ({ loadExpoBiometrics: mocks.loadExpoBiometrics }));
+vi.mock('../../provider/nativeClientSyncCoordinator', () => ({
+  waitForPendingJsToNativeSync: mocks.idle,
+  synchronizeNativeClientToJs: mocks.synchronize,
+}));
 vi.mock('react-native', () => ({ Platform: { OS: 'ios' } }));
 
 const session = {
@@ -32,13 +35,11 @@ const session = {
   getToken: vi.fn(),
 };
 const clerk = { session: session as typeof session | null, setActive: vi.fn() };
-const synchronize = vi.fn();
-let unregister: () => void;
+const synchronize = mocks.synchronize;
 
 beforeEach(() => {
   vi.resetAllMocks();
-  __internal_resetNativeClientSyncCoordinator();
-  unregister = registerNativeToJsSyncHandler(synchronize);
+  mocks.idle.mockResolvedValue(undefined);
   clerk.session = session;
   mocks.useClerk.mockReturnValue(clerk);
   session.getToken.mockResolvedValue('fresh-token');
@@ -49,8 +50,6 @@ beforeEach(() => {
     sessionId: session.id,
   });
 });
-
-afterEach(() => unregister());
 
 describe.each([
   ['iOS', useIosBiometrics],
@@ -76,7 +75,7 @@ describe.each([
     expect(session.getToken).toHaveBeenCalledWith({ skipCache: true });
     expect(synchronize.mock.invocationCallOrder[0]).toBeLessThan(session.getToken.mock.invocationCallOrder[0]);
     expect(clerk.setActive).not.toHaveBeenCalled();
-    expect(mocks.nativeModule.signInWithTrustedDevice).not.toHaveBeenCalled();
+    expect(mocks.loadExpoBiometrics).not.toHaveBeenCalled();
   });
 
   test.each(['first_factor', 'second_factor', 'multi_factor'] as const)(
@@ -115,7 +114,7 @@ test('incomplete verification returns the synchronized session without refreshin
 
 test('waits for pending JS-to-native synchronization', async () => {
   let finish!: () => void;
-  trackPendingJsToNativeSync(
+  mocks.idle.mockReturnValueOnce(
     new Promise<void>(resolve => {
       finish = resolve;
     }),
@@ -130,7 +129,7 @@ test('waits for pending JS-to-native synchronization', async () => {
 
 test('does not start a biometric operation after the active session changes during synchronization', async () => {
   let finish!: () => void;
-  trackPendingJsToNativeSync(
+  mocks.idle.mockReturnValueOnce(
     new Promise<void>(resolve => {
       finish = resolve;
     }),
@@ -223,16 +222,26 @@ test('rejects completion if the active session changes while refreshing its toke
   expect(clerk.setActive).not.toHaveBeenCalled();
 });
 
-test('older native builds keep existing operations but explain the missing reverification method', async () => {
+test('explains the missing reverification method in older @clerk/expo builds', async () => {
   const reverify = mocks.nativeModule.reverifyWithBiometrics;
   Object.assign(mocks.nativeModule, { reverifyWithBiometrics: undefined });
-  mocks.nativeModule.listTrustedDevices.mockResolvedValue([]);
   try {
     const { result } = renderHook(useIosBiometrics);
-    await expect(result.current.list()).resolves.toEqual([]);
     await expect(result.current.reverify()).rejects.toThrow('Biometric reverification requires a development build');
   } finally {
     Object.assign(mocks.nativeModule, { reverifyWithBiometrics: reverify });
+  }
+});
+
+test('explains that reverification requires a development build', async () => {
+  mocks.isNativeModuleInstalled = false;
+  try {
+    const { result } = renderHook(useIosBiometrics);
+    await expect(result.current.reverify()).rejects.toThrow(
+      'Biometric reverification requires a development build containing a compatible version of @clerk/expo.',
+    );
+  } finally {
+    mocks.isNativeModuleInstalled = true;
   }
 });
 
