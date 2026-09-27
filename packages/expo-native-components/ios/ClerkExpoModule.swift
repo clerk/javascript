@@ -10,13 +10,14 @@ import Foundation
 public class ClerkExpoModule: Module {
   private static let nativeAuthFlowChangedEvent = "clerkNativeAuthFlowChanged"
   private static let nativeClientChangedEvent = "clerkNativeClientChanged"
+  private static let nativeClientInvalidatedEvent = "clerkNativeClientInvalidated"
 
   private static weak var sharedInstance: ClerkExpoModule?
 
   public func definition() -> ModuleDefinition {
     Name("ClerkExpo")
 
-    Events(Self.nativeAuthFlowChangedEvent, Self.nativeClientChangedEvent)
+    Events(Self.nativeAuthFlowChangedEvent, Self.nativeClientChangedEvent, Self.nativeClientInvalidatedEvent)
 
     OnCreate {
       Self.sharedInstance = self
@@ -26,6 +27,9 @@ public class ClerkExpoModule: Module {
       ClerkNativeBridge.setClientChangedEmitter { body in
         Self.emitClientChanged(body)
       }
+      ClerkNativeBridge.setClientInvalidatedEmitter {
+        Self.emitClientInvalidated()
+      }
     }
 
     OnDestroy {
@@ -33,6 +37,7 @@ public class ClerkExpoModule: Module {
         Self.sharedInstance = nil
         ClerkNativeBridge.setAuthFlowChangedEmitter(nil)
         ClerkNativeBridge.setClientChangedEmitter(nil)
+        ClerkNativeBridge.setClientInvalidatedEmitter(nil)
       }
     }
 
@@ -42,6 +47,51 @@ public class ClerkExpoModule: Module {
 
     AsyncFunction("getClientToken") { (promise: Promise) in
       self.getClientToken(promise: promise)
+    }
+
+    AsyncFunction("configureNative") { (publishableKey: String, seedDeviceToken: String?, promise: Promise) in
+      Task { @MainActor in
+        do {
+          try await ClerkNativeBridge.shared.configureNative(
+            publishableKey: publishableKey,
+            seedDeviceToken: seedDeviceToken
+          )
+          promise.resolve()
+        } catch {
+          promise.reject("E_CONFIGURE_FAILED", error.localizedDescription)
+        }
+      }
+    }
+
+    AsyncFunction("getDeviceToken") { (promise: Promise) in
+      Task { @MainActor in
+        promise.resolve(ClerkNativeBridge.shared.getDeviceToken())
+      }
+    }
+
+    AsyncFunction("setDeviceToken") { (token: String?, expected: String?, promise: Promise) in
+      Task { @MainActor in
+        do {
+          let didSet = try await ClerkNativeBridge.shared.setDeviceToken(token, expected: expected)
+          promise.resolve(didSet)
+        } catch {
+          let descriptor = clerkSetDeviceTokenErrorDescriptor(error)
+          promise.reject(descriptor.code, descriptor.message)
+        }
+      }
+    }
+
+    AsyncFunction("refreshClient") { (promise: Promise) in
+      Task { @MainActor in
+        do {
+          try await ClerkNativeBridge.shared.refreshClient()
+          promise.resolve()
+        } catch ClerkClientSyncError.notConfigured {
+          promise.reject("E_NOT_CONFIGURED", ClerkClientSyncError.notConfigured.localizedDescription)
+        } catch {
+          promise.reject("E_REFRESH_CLIENT_FAILED", error.localizedDescription)
+        }
+      }
     }
 
     AsyncFunction("getAuthFlowState") { (promise: Promise) in
@@ -298,6 +348,16 @@ public class ClerkExpoModule: Module {
 
     DispatchQueue.main.async { [weak instance] in
       instance?.sendEvent(Self.nativeClientChangedEvent, eventBody)
+    }
+  }
+
+  static func emitClientInvalidated() {
+    guard let instance = sharedInstance else {
+      return
+    }
+
+    DispatchQueue.main.async { [weak instance] in
+      instance?.sendEvent(Self.nativeClientInvalidatedEvent, [:])
     }
   }
 
