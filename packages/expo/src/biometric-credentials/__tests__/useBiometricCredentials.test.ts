@@ -114,9 +114,27 @@ function serverCredential(overrides: Record<string, unknown> = {}) {
 
 function apiError(code: string, paramName?: string) {
   return new ClerkAPIResponseError(code, {
-    data: [{ code, message: code, long_message: code, meta: paramName ? { param_name: paramName } : {} }],
+    data: [
+      {
+        code,
+        message: `${code} message`,
+        long_message: `${code} long message`,
+        meta: paramName ? { param_name: paramName } : {},
+      },
+    ],
     status: 422,
   });
+}
+
+async function expectBiometricApiError(operation: Promise<unknown>, cause: ClerkAPIResponseError) {
+  const error = await operation.then(
+    () => expect.unreachable('Expected the operation to reject'),
+    (rejection: unknown) => rejection,
+  );
+  const code = cause.errors[0].code;
+  expect(isBiometricCredentialError(error)).toBe(true);
+  expect(error).not.toBeInstanceOf(ClerkAPIResponseError);
+  expect(error).toMatchObject({ code, message: `${code} long message`, cause });
 }
 
 function createClerk() {
@@ -386,7 +404,7 @@ describe('getAvailability', () => {
       const error = apiError('session_reverification_required');
       clerk.user.__experimental_getBiometricCredentials.mockRejectedValue(error);
 
-      await expect(renderBiometricCredentials().getAvailability()).rejects.toBe(error);
+      await expectBiometricApiError(renderBiometricCredentials().getAvailability(), error);
       expect(biometrics.store.records).toHaveLength(1);
     });
   });
@@ -567,7 +585,7 @@ describe('enroll', () => {
     const error = apiError('session_reverification_required');
     clerk.user.__experimental_prepareBiometricCredential.mockRejectedValue(error);
 
-    await expect(renderBiometricCredentials().enroll()).rejects.toBe(error);
+    await expectBiometricApiError(renderBiometricCredentials().enroll(), error);
     expect(biometrics.deleteKey).toHaveBeenCalledWith('key_new');
     expect(biometrics.sign).not.toHaveBeenCalled();
     expect(biometrics.saveRecord).not.toHaveBeenCalled();
@@ -587,7 +605,7 @@ describe('enroll', () => {
     const error = apiError('form_param_invalid', 'signature');
     clerk.user.__experimental_attemptBiometricCredential.mockRejectedValue(error);
 
-    await expect(renderBiometricCredentials().enroll()).rejects.toBe(error);
+    await expectBiometricApiError(renderBiometricCredentials().enroll(), error);
     expect(biometrics.deleteKey).toHaveBeenCalledWith('key_new');
     expect(biometrics.saveRecord).not.toHaveBeenCalled();
     expect(clerk.user.__experimental_revokeBiometricCredential).not.toHaveBeenCalled();
@@ -637,7 +655,7 @@ describe('revoke', () => {
     const error = apiError('session_reverification_required');
     clerk.user.__experimental_revokeBiometricCredential.mockRejectedValue(error);
 
-    await expect(renderBiometricCredentials().revoke('td_1')).rejects.toBe(error);
+    await expectBiometricApiError(renderBiometricCredentials().revoke('td_1'), error);
     expect(biometrics.deleteRecord).not.toHaveBeenCalled();
   });
 
@@ -744,7 +762,7 @@ describe('signIn', () => {
       const error = apiError(code, 'trusted_device_id');
       clerk.clientSignIn.create.mockRejectedValue(error);
 
-      await expect(renderBiometricCredentials().signIn()).rejects.toBe(error);
+      await expectBiometricApiError(renderBiometricCredentials().signIn(), error);
       expect(biometrics.deleteRecord).toHaveBeenCalledWith('key_1');
       expect(biometrics.store.records).toEqual([]);
     },
@@ -755,7 +773,7 @@ describe('signIn', () => {
     const error = apiError('trusted_device_not_registered', 'trusted_device_id');
     clerk.createdSignIn.attemptFirstFactor.mockRejectedValue(error);
 
-    await expect(renderBiometricCredentials().signIn()).rejects.toBe(error);
+    await expectBiometricApiError(renderBiometricCredentials().signIn(), error);
     expect(biometrics.store.records).toEqual([]);
   });
 
@@ -764,7 +782,7 @@ describe('signIn', () => {
     const error = apiError('form_resource_not_found', 'sign_in_id');
     clerk.createdSignIn.attemptFirstFactor.mockRejectedValue(error);
 
-    await expect(renderBiometricCredentials().signIn()).rejects.toBe(error);
+    await expectBiometricApiError(renderBiometricCredentials().signIn(), error);
     expect(biometrics.deleteRecord).not.toHaveBeenCalled();
   });
 
@@ -803,6 +821,51 @@ describe('signIn', () => {
     await expect(renderBiometricCredentials().signIn()).rejects.toThrow('server_credential_missing');
     expect(biometrics.store.records).toEqual([]);
     expect(clerk.clientSignIn.create).not.toHaveBeenCalled();
+  });
+});
+
+describe('API errors', () => {
+  test('surface a reverification-required error with its API code', async () => {
+    signInClerkUser();
+    clerk.user.__experimental_prepareBiometricCredential.mockRejectedValue(apiError('session_reverification_required'));
+
+    const operation = renderBiometricCredentials().enroll();
+
+    await expect(operation).rejects.toMatchObject({ code: 'session_reverification_required' });
+    await operation.catch(error => expect(isBiometricCredentialError(error)).toBe(true));
+  });
+
+  test('surface a trusted_device_not_registered error with its API code', async () => {
+    addLocalCredential();
+    clerk.clientSignIn.create.mockRejectedValue(apiError('trusted_device_not_registered', 'trusted_device_id'));
+
+    const operation = renderBiometricCredentials().signIn();
+
+    await expect(operation).rejects.toMatchObject({
+      code: 'trusted_device_not_registered',
+      message: 'trusted_device_not_registered long message',
+    });
+    await operation.catch(error => expect(isBiometricCredentialError(error)).toBe(true));
+  });
+
+  test('fall back to the short message and the operation code', async () => {
+    signInClerkUser();
+    const withoutLongMessage = new ClerkAPIResponseError('native_api_disabled', {
+      data: [{ code: 'native_api_disabled', message: 'Native API is disabled', long_message: undefined as never }],
+      status: 403,
+    });
+    clerk.user.__experimental_getBiometricCredentials.mockRejectedValueOnce(withoutLongMessage);
+    clerk.user.__experimental_getBiometricCredentials.mockRejectedValueOnce(new Error('Network down'));
+    const biometricCredentials = renderBiometricCredentials();
+
+    await expect(biometricCredentials.list()).rejects.toMatchObject({
+      code: 'native_api_disabled',
+      message: 'Native API is disabled',
+    });
+    await expect(biometricCredentials.list()).rejects.toMatchObject({
+      code: 'E_TRUSTED_DEVICE_LIST_FAILED',
+      message: 'Network down',
+    });
   });
 });
 
