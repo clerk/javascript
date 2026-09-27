@@ -24,6 +24,7 @@ const mocks = vi.hoisted(() => ({
   useClerk: vi.fn(),
   setActive: vi.fn(),
   synchronizeNativeClientToJs: vi.fn(),
+  isNativeModuleInstalled: true,
   nativeModule: {
     getTrustedDeviceAvailability: vi.fn(),
     listTrustedDevices: vi.fn(),
@@ -38,7 +39,9 @@ vi.mock('@clerk/react', () => ({
 }));
 
 vi.mock('../../utils/native-module', () => ({
-  ClerkExpoModule: mocks.nativeModule,
+  get ClerkExpoModule() {
+    return mocks.isNativeModuleInstalled ? mocks.nativeModule : null;
+  },
 }));
 
 vi.mock('react-native', () => ({
@@ -539,13 +542,25 @@ describe('useBiometricCredentials on iOS', () => {
     });
   });
 
+  test('explains how to install @clerk/expo-native when the native module is missing', async () => {
+    mocks.isNativeModuleInstalled = false;
+
+    try {
+      await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
+        'Biometric credentials require the @clerk/expo-native package in a development build. Install it with `npx expo install @clerk/expo-native`',
+      );
+    } finally {
+      mocks.isNativeModuleInstalled = true;
+    }
+  });
+
   test('explains that the development client must contain the native methods', async () => {
     const signInWithTrustedDevice = mocks.nativeModule.signInWithTrustedDevice;
     Object.assign(mocks.nativeModule, { signInWithTrustedDevice: undefined });
 
     try {
       await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
-        'Biometric credentials require a development build containing a compatible version of @clerk/expo.',
+        'Biometric credentials require a development build containing a compatible version of @clerk/expo-native.',
       );
     } finally {
       Object.assign(mocks.nativeModule, { signInWithTrustedDevice });

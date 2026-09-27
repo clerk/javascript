@@ -14,6 +14,9 @@ import type {
 
 const DEFAULT_POLICY = 'biometry_current_set';
 
+const CLERK_EXPO_NATIVE_INSTALL_INSTRUCTIONS =
+  'Install it with `npx expo install @clerk/expo-native`, add "@clerk/expo-native" to the plugins array in your app config, then rebuild your development build.';
+
 function toBiometricCredentialPlatform(platform: string): BiometricCredentialPlatform {
   return platform === 'ios' || platform === 'android' ? platform : 'unknown';
 }
@@ -25,15 +28,21 @@ function toBiometricCredentialStatus(status: string): BiometricCredentialStatus 
 function getNativeModule(): NativeBiometricCredentialModule {
   const nativeModule = ClerkExpoModule;
 
+  if (!nativeModule) {
+    return errorThrower.throw(
+      `Biometric credentials require the @clerk/expo-native package in a development build. ${CLERK_EXPO_NATIVE_INSTALL_INSTRUCTIONS}`,
+    );
+  }
+
   if (
-    !nativeModule?.getTrustedDeviceAvailability ||
+    !nativeModule.getTrustedDeviceAvailability ||
     !nativeModule.listTrustedDevices ||
     !nativeModule.enrollTrustedDevice ||
     !nativeModule.revokeTrustedDevice ||
     !nativeModule.signInWithTrustedDevice
   ) {
     return errorThrower.throw(
-      'Biometric credentials require a development build containing a compatible version of @clerk/expo.',
+      'Biometric credentials require a development build containing a compatible version of @clerk/expo-native.',
     );
   }
 
@@ -86,7 +95,7 @@ function createBiometricCredentials(clerk: ReturnType<typeof useClerk>): UseBiom
       const nativeModule = getNativeModule();
       if (typeof nativeModule.reverifyWithBiometrics !== 'function') {
         return errorThrower.throw(
-          'Biometric reverification requires a development build containing a compatible version of @clerk/expo.',
+          'Biometric reverification requires a development build containing a compatible version of @clerk/expo-native.',
         );
       }
       const level = params?.level ?? 'first_factor';
