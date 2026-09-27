@@ -11,6 +11,7 @@ on:
       - 'integration/tests/expo-native/**'
       - 'packages/expo/**'
       - 'packages/expo-google-signin/**'
+      - 'packages/expo-native/**'
   workflow_dispatch:
 
 permissions:
@@ -85,6 +86,7 @@ jobs:
               packages/clerk-js \
               packages/expo \
               packages/expo-google-signin \
+              packages/expo-native \
               packages/react \
               packages/shared \
               "$FIXTURE_DIR" |
@@ -121,10 +123,11 @@ jobs:
       - name: Build and pack Clerk packages
         if: steps.native-build-cache.outputs.cache-hit != 'true'
         run: |
-          pnpm --filter @clerk/expo... build
+          pnpm turbo build --filter=@clerk/expo-native...
           mkdir -p "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo pack --pack-destination "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo-google-signin pack --pack-destination "$SDK_PACK_DIR"
+          pnpm --filter @clerk/expo-native pack --pack-destination "$SDK_PACK_DIR"
 
       - name: Install fixture dependencies
         if: steps.native-build-cache.outputs.cache-hit != 'true'
@@ -135,10 +138,11 @@ jobs:
         run: |
           cp "package.sdk-$EXPO_SDK.json" package.json
           pnpm install --no-frozen-lockfile
-          # [0-9] keeps this glob off the clerk-expo-google-signin tarball.
+          # [0-9] keeps this glob off the clerk-expo-google-signin and clerk-expo-native tarballs.
           SDK_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-[0-9]*.tgz)"
           GOOGLE_SIGNIN_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-google-signin-*.tgz)"
-          pnpm add "$SDK_TARBALL" "$GOOGLE_SIGNIN_TARBALL" -w
+          NATIVE_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-native-*.tgz)"
+          pnpm add "$SDK_TARBALL" "$GOOGLE_SIGNIN_TARBALL" "$NATIVE_TARBALL" -w
           # expo-dev-client makes even release builds boot into the dev
           # launcher (unreachable Metro in CI), which stalls every Maestro
           # flow on a blank screen. Skip it on e2e jobs only.
