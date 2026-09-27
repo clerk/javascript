@@ -30,7 +30,7 @@
     },
     "./app.plugin.js": "./app.plugin.js",
     "./native": {
-      "types": "./dist/native/index.d.ts",
+      "types": "./native/index.d.ts",
       "default": "./dist/native/index.js"
     },
     "./web": {
@@ -85,8 +85,6 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
-    "android",
-    "ios",
     "native",
     "web",
     "local-credentials",
@@ -99,9 +97,6 @@
     "hosted-auth",
     "experimental",
     "legacy",
-    "src/specs",
-    "expo-module.config.json",
-    "react-native.config.js",
     "app.plugin.js",
     "app.plugin.d.ts"
   ],
@@ -144,6 +139,7 @@
   "peerDependencies": {
     "@clerk/expo-biometrics": ">=0.1.0",
     "@clerk/expo-google-signin": ">=0.1.0",
+    "@clerk/expo-native": "workspace:>=0.0.1",
     "@clerk/expo-passkeys": ">=0.0.6",
     "expo": "catalog:peer-expo",
     "expo-apple-authentication": ">=7.0.0",
@@ -162,6 +158,9 @@
       "optional": true
     },
     "@clerk/expo-google-signin": {
+      "optional": true
+    },
+    "@clerk/expo-native": {
       "optional": true
     },
     "@clerk/expo-passkeys": {
@@ -197,10 +196,5 @@
   },
   "publishConfig": {
     "access": "public"
-  },
-  "codegenConfig": {
-    "name": "ClerkExpoSpec",
-    "type": "all",
-    "jsSrcsDir": "src/specs"
   }
 }
