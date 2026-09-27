@@ -289,6 +289,26 @@ describe('native client sync behavior', () => {
       await expectConverged(h);
     });
 
+    it('refreshes native for a profile update but not for session activity that only bumps the session', async () => {
+      const { server, token, sessionIds } = seedDevice(['user_1']);
+      const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
+      const refreshesBefore = h.native.clientRefreshCount;
+      const updatedAtBefore = h.js.session?.updatedAt.getTime();
+
+      await h.run(() => Promise.all([h.js.getSessionToken(), h.js.getSessionToken()]));
+      await h.settle();
+
+      expect(h.js.session?.updatedAt.getTime()).toBeGreaterThan(updatedAtBefore ?? Infinity);
+      expect(h.native.clientRefreshCount - refreshesBefore).toBe(0);
+
+      await h.run(() => h.js.updateProfile());
+      await h.settle();
+
+      expect(h.native.clientRefreshCount - refreshesBefore).toBe(1);
+      expect(h.native.client?.sessions.find(session => session.id === sessionIds.user_1)?.profileVersion).toBe(1);
+      await expectConverged(h);
+    });
+
     it('settles a JS change without an echo loop', async () => {
       const { server, token, sessionIds } = seedDevice(['user_1', 'user_2'], 'user_1');
       const h = await start({ server, jsDeviceToken: token, nativeDeviceToken: token });
