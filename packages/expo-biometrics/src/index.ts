@@ -87,16 +87,31 @@ function assertRecord(record: BiometricCredentialRecord): void {
   assertTimestamp(record.updatedAt, 'record.updatedAt');
 }
 
-/**
- * Returns the identifier Clerk uses as the credential's `app_identifier` (the iOS bundle identifier).
- */
-export function getAppIdentifier(): string {
+function callNativeSync<T>(fn: (module: ClerkExpoBiometricsNativeModule) => T): T {
   const module = nativeModule();
   try {
-    return module.getAppIdentifier();
+    return fn(module);
   } catch (error) {
     throw toClerkBiometricsError(error);
   }
+}
+
+/**
+ * Returns the identifier Clerk uses as the credential's `app_identifier` (the iOS bundle identifier or the Android package name).
+ */
+export function getAppIdentifier(): string {
+  return callNativeSync(module => module.getAppIdentifier());
+}
+
+/**
+ * Returns the SHA-256 of `hint` after trimming and lowercasing it, as 64 lowercase hex characters, or `null` when the
+ * normalized hint is empty. Compare it with a record's `identifierHintSha256` to match an identifier on every platform.
+ */
+export function hashIdentifierHint(hint: string): string | null {
+  if (typeof hint !== 'string') {
+    throw invalidArgument('hint must be a string.');
+  }
+  return callNativeSync(module => module.hashIdentifierHint(hint));
 }
 
 /**
@@ -120,7 +135,7 @@ export async function createKey(policy: BiometricCredentialPolicy): Promise<Biom
  * Prompts for local authentication and signs the UTF-8 bytes of `clientData` with ES256.
  * Resolves with the raw `r || s` signature, base64url-encoded without padding.
  *
- * @param reason - The message shown in the authentication prompt.
+ * @param reason - The message shown in the authentication prompt. On Android it is the prompt title, which defaults to the app name.
  */
 export async function sign(localKeyId: string, clientData: string, reason: string | null = null): Promise<string> {
   assertNonEmptyString(localKeyId, 'localKeyId');
@@ -202,6 +217,7 @@ export async function deleteRecord(localKeyId: string): Promise<void> {
 /**
  * Detects a new installation and deletes the records and keys a previous installation of this app left in the Keychain.
  * Safe to call repeatedly. The store operations above call it before they read or write.
+ * On Android it always resolves `{ wiped: false }`: uninstalling the app deletes its records and keys.
  */
 export function ensureInstallationMarker(): Promise<InstallationMarkerResult> {
   return callNative(module => module.ensureInstallationMarker());

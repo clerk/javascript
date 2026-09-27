@@ -14,8 +14,11 @@ vi.mock('expo', () => ({
   },
 }));
 
+const HINT_SHA256 = 'b4c9a289323b21a01c3e940f150eb9b8c542587f1abfd8f0e1cc1ffc5e475514';
+
 const createNativeModule = () => ({
   getAppIdentifier: vi.fn().mockReturnValue('com.clerk.example'),
+  hashIdentifierHint: vi.fn().mockReturnValue(HINT_SHA256),
   getAvailability: vi.fn().mockResolvedValue({
     biometryType: 'faceID',
     canEvaluateBiometrics: true,
@@ -94,6 +97,44 @@ describe('@clerk/expo-biometrics', () => {
     );
     await expect(biometrics.getAvailability()).rejects.toMatchObject({ code: 'native_module_unavailable' });
     await expect(biometrics.listRecords()).rejects.toMatchObject({ code: 'native_module_unavailable' });
+    expect(() => biometrics.hashIdentifierHint('user@example.com')).toThrow(
+      expect.objectContaining({ code: 'native_module_unavailable' }),
+    );
+  });
+
+  describe('hashIdentifierHint', () => {
+    test('returns the native hash synchronously', async () => {
+      const biometrics = await load();
+
+      expect(biometrics.hashIdentifierHint('  User@Example.COM\n')).toBe(HINT_SHA256);
+      expect(native.hashIdentifierHint).toHaveBeenCalledWith('  User@Example.COM\n');
+    });
+
+    test('passes through null for empty hints', async () => {
+      native.hashIdentifierHint.mockReturnValueOnce(null);
+      const biometrics = await load();
+
+      expect(biometrics.hashIdentifierHint('   ')).toBeNull();
+    });
+
+    test('rejects non-string hints without calling native', async () => {
+      const biometrics = await load();
+
+      // @ts-expect-error testing a non-string hint
+      expect(() => biometrics.hashIdentifierHint(null)).toThrow(expect.objectContaining({ code: 'invalid_argument' }));
+      expect(native.hashIdentifierHint).not.toHaveBeenCalled();
+    });
+
+    test('wraps native errors', async () => {
+      native.hashIdentifierHint.mockImplementationOnce(() => {
+        throw nativeError('ERR_ARGUMENT_CAST');
+      });
+      const biometrics = await load();
+
+      expect(() => biometrics.hashIdentifierHint('user@example.com')).toThrow(
+        expect.objectContaining({ name: 'ClerkBiometricsError', code: 'unknown' }),
+      );
+    });
   });
 
   describe('keys', () => {
@@ -212,13 +253,24 @@ describe('@clerk/expo-biometrics', () => {
   describe('store', () => {
     test('listRecords parses native JSON and passes unknown fields through', async () => {
       native.listRecords.mockResolvedValueOnce(
-        JSON.stringify([{ ...record, futureField: { nested: [1, true, null] } }]),
+        JSON.stringify([{ ...record, identifierHintSha256: HINT_SHA256, futureField: { nested: [1, true, null] } }]),
       );
       const biometrics = await load();
 
       const records = await biometrics.listRecords();
 
-      expect(records).toEqual([{ ...record, futureField: { nested: [1, true, null] } }]);
+      expect(records).toEqual([
+        { ...record, identifierHintSha256: HINT_SHA256, futureField: { nested: [1, true, null] } },
+      ]);
+    });
+
+    test('listRecords returns Android records with only the hashed identifier hint', async () => {
+      const { identifierHint: _, ...withoutHint } = record;
+      const androidRecord = { ...withoutHint, identifierHint: null, identifierHintSha256: HINT_SHA256 };
+      native.listRecords.mockResolvedValueOnce(JSON.stringify([androidRecord]));
+      const biometrics = await load();
+
+      await expect(biometrics.listRecords()).resolves.toEqual([androidRecord]);
     });
 
     test('listRecords rejects with storage_failed on invalid native output', async () => {

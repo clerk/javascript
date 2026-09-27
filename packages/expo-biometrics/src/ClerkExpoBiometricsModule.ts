@@ -11,6 +11,7 @@ import type {
 
 export interface ClerkExpoBiometricsNativeModule {
   getAppIdentifier(): string;
+  hashIdentifierHint(hint: string): string | null;
   getAvailability(): Promise<BiometricAvailability>;
   createKey(policy: BiometricCredentialPolicy): Promise<BiometricCredentialKey>;
   sign(localKeyId: string, clientData: string, reason: string | null): Promise<string>;
