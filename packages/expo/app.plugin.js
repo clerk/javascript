@@ -118,7 +118,7 @@ const withClerkExpoNative = (config, props = {}, resolvePlugin = resolveClerkExp
   if (config._internal?.pluginHistory?.[CLERK_EXPO_NATIVE]) {
     if (nativeOptionNames) {
       console.warn(
-        `⚠️  Clerk: ${nativeOptionNames} passed to the "@clerk/expo" plugin will be ignored because the "${CLERK_EXPO_NATIVE}" plugin already ran. Pass them to the "${CLERK_EXPO_NATIVE}" plugin instead.`,
+        `⚠️  Clerk: The following "@clerk/expo" plugin options are ignored because the "${CLERK_EXPO_NATIVE}" plugin already ran: ${nativeOptionNames}. Pass them to the "${CLERK_EXPO_NATIVE}" plugin instead.`,
       );
     }
     return config;
@@ -128,7 +128,7 @@ const withClerkExpoNative = (config, props = {}, resolvePlugin = resolveClerkExp
   if (!clerkExpoNativePlugin) {
     if (nativeOptionNames) {
       console.warn(
-        `⚠️  Clerk: ${nativeOptionNames} configure Clerk native components, which have moved to ${CLERK_EXPO_NATIVE}. Install it with \`npx expo install ${CLERK_EXPO_NATIVE}\` and add "${CLERK_EXPO_NATIVE}" to the plugins array in your app config.`,
+        `⚠️  Clerk: The following "@clerk/expo" plugin options require ${CLERK_EXPO_NATIVE} and are ignored: ${nativeOptionNames}. Install it with \`npx expo install ${CLERK_EXPO_NATIVE}\` and add "${CLERK_EXPO_NATIVE}" to the plugins array in your app config.`,
       );
     }
     return config;
