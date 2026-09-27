@@ -1,3 +1,5 @@
+import { stringifyQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
+import { camelToSnake } from '@clerk/shared/underscore';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -757,6 +759,89 @@ describe('SignIn', () => {
           }),
         }),
       );
+    });
+  });
+
+  describe('trusted_device strategy', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.unstubAllGlobals();
+    });
+
+    const toFormFields = (body: Record<string, unknown>) =>
+      Object.fromEntries(new URLSearchParams(stringifyQueryParams(body, { keyEncoder: camelToSnake })));
+
+    it('creates a sign-in with a trusted device id', async () => {
+      vi.stubGlobal('navigator', { language: '' });
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            object: 'verification_trusted_device',
+            status: 'unverified',
+            strategy: 'trusted_device',
+            attempts: 0,
+            trusted_device_challenge: {
+              object: 'trusted_device_challenge',
+              challenge: 'challenge_value',
+              challenge_id: 'tdch_123',
+              trusted_device_id: 'td_123',
+              client_data: 'client_data_value',
+              expires_at: 1_700_000_300,
+              algorithm: 'ES256',
+            },
+          },
+        },
+      });
+      BaseResource._fetch = mockFetch;
+      SignIn.clerk = {
+        client: { captchaBypass: false },
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      const signIn = new SignIn();
+      await signIn.create({ strategy: 'trusted_device', trustedDeviceId: 'td_123' });
+
+      const { path, method, body } = mockFetch.mock.calls[0][0];
+      expect({ path, method }).toEqual({ path: '/client/sign_ins', method: 'POST' });
+      expect(toFormFields(body)).toEqual({ strategy: 'trusted_device', trusted_device_id: 'td_123' });
+      expect(signIn.firstFactorVerification.trustedDeviceChallenge).toEqual({
+        challenge: 'challenge_value',
+        challengeId: 'tdch_123',
+        trustedDeviceId: 'td_123',
+        clientData: 'client_data_value',
+        expiresAt: new Date(1_700_000_300_000),
+        algorithm: 'ES256',
+      });
+    });
+
+    it('attempts the first factor with a signed challenge', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'complete' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await signIn.attemptFirstFactor({
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_123',
+        clientData: 'client_data_value',
+        signature: 'signature_value',
+        algorithm: 'ES256',
+      });
+
+      const { path, method, body } = mockFetch.mock.calls[0][0];
+      expect({ path, method }).toEqual({ path: '/client/sign_ins/signin_123/attempt_first_factor', method: 'POST' });
+      expect(toFormFields(body)).toEqual({
+        strategy: 'trusted_device',
+        trusted_device_id: 'td_123',
+        client_data: 'client_data_value',
+        signature: 'signature_value',
+        algorithm: 'ES256',
+      });
     });
   });
 

@@ -1,8 +1,10 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import { isDevelopmentFromPublishableKey } from '@clerk/shared/keys';
 import type {
+  AttemptBiometricCredentialParams,
   BackupCodeJSON,
   BackupCodeResource,
+  BiometricCredentialResource,
   CreateEmailAddressParams,
   CreateExternalAccountParams,
   CreatePhoneNumberParams,
@@ -23,10 +25,12 @@ import type {
   OrganizationMembershipResource,
   PasskeyResource,
   PhoneNumberResource,
+  PrepareBiometricCredentialParams,
   RemoveUserPasswordParams,
   SetProfileImageParams,
   TOTPJSON,
   TOTPResource,
+  TrustedDeviceChallengeResource,
   UpdateUserMetadataParams,
   UpdateUserParams,
   UpdateUserPasswordParams,
@@ -45,6 +49,7 @@ import { addPaymentMethod, getPaymentMethods, initializePaymentMethod } from '..
 import { BackupCode } from './BackupCode';
 import {
   BaseResource,
+  BiometricCredential,
   DeletedObject,
   EmailAddress,
   EnterpriseAccount,
@@ -227,6 +232,26 @@ export class User extends BaseResource implements UserResource {
     )?.response as unknown as BackupCodeJSON;
 
     return new BackupCode(json);
+  };
+
+  __experimental_getBiometricCredentials = (): Promise<BiometricCredentialResource[]> => {
+    return BiometricCredential.list();
+  };
+
+  __experimental_prepareBiometricCredential = (
+    params: PrepareBiometricCredentialParams,
+  ): Promise<TrustedDeviceChallengeResource> => {
+    return BiometricCredential.prepare(params);
+  };
+
+  __experimental_attemptBiometricCredential = (
+    params: AttemptBiometricCredentialParams,
+  ): Promise<BiometricCredentialResource> => {
+    return BiometricCredential.attempt(params);
+  };
+
+  __experimental_revokeBiometricCredential = (biometricCredentialId: string): Promise<BiometricCredentialResource> => {
+    return BiometricCredential.revoke(biometricCredentialId);
   };
 
   update = async (params: UpdateUserParams): Promise<UserResource> => {
