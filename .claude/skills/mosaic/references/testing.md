@@ -33,10 +33,17 @@ Rule of thumb: **test each behavior once, at the boundary that owns it.**
 Visual states (loading, empty, every error, every variant) are swingset stories
 with plain props, reviewed by eye. Don't duplicate them as view tests.
 
-Do **not** add per-layer model, controller, view, or wrapper tests with mocked
-layers. If a behavior is visible to the user, the feature test owns it. Some
-features still carry per-layer tests from before this rule; delete them once a
-feature test covers the same behavior.
+Default to a feature test for behavior the user can see. Reach for a smaller
+test when it is the better tool, for example:
+
+- Logic with many combinations (ordering, labels, layout rules). Pull it into
+  a pure function and unit-test the table.
+- States or timing that are awkward to produce through FAPI.
+- A bug that is much easier to pin down at a single layer.
+
+Avoid per-layer tests with mocked layers that repeat what a feature test
+already covers. Older per-layer tests like that can go once a feature test
+covers the same behavior.
 
 ## Running
 
