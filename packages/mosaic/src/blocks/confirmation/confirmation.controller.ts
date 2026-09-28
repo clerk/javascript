@@ -8,11 +8,7 @@ export interface ConfirmationContext {
   error: string | undefined;
 }
 
-export type ConfirmationEvent =
-  | { type: 'OPEN' }
-  | { type: 'CONFIRM'; run: () => Promise<void> }
-  | { type: 'CANCEL' }
-  | { type: 'CANCEL_REVERIFICATION' };
+export type ConfirmationEvent = { type: 'OPEN' } | { type: 'CONFIRM'; run: () => Promise<void> } | { type: 'CANCEL' };
 
 const { createMachine, assign, fromPromise } = setup<ConfirmationContext, ConfirmationEvent>();
 
@@ -44,15 +40,12 @@ export const confirmationMachine = createMachine({
       },
     },
     pending: {
-      on: {
-        CANCEL_REVERIFICATION: { target: 'idle', actions: assign(() => ({ error: undefined })) },
-      },
       invoke: fromPromise(context => context.run(), {
         onDone: { target: 'idle', actions: assign(() => ({ error: undefined })) },
         onError: [
           {
             guard: (_, event) => isReverificationCancelledError(event.error),
-            target: 'idle',
+            target: 'confirming',
             actions: assign(() => ({ error: undefined })),
           },
           {
@@ -73,9 +66,7 @@ export interface ConfirmationController {
   errorMessage: string | undefined;
 }
 
-export function useConfirmationController({
-  canCancelPending = false,
-}: { canCancelPending?: boolean } = {}): ConfirmationController {
+export function useConfirmationController(): ConfirmationController {
   const [snapshot, send] = useMachine(confirmationMachine);
 
   return {
@@ -83,8 +74,6 @@ export function useConfirmationController({
     onOpenChange: open => {
       if (open) {
         send({ type: 'OPEN' });
-      } else if (canCancelPending && snapshot.value === 'pending') {
-        send({ type: 'CANCEL_REVERIFICATION' });
       } else {
         send({ type: 'CANCEL' });
       }

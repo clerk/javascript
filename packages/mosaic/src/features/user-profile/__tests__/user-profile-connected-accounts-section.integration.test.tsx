@@ -424,7 +424,7 @@ describe('UserProfileConnectedAccountsSection', () => {
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('You cannot remove your last sign-in method.');
   });
 
-  it('closes the confirmation without an error when reverification is cancelled', async () => {
+  it('returns to confirmation without an error when reverification is cancelled', async () => {
     externalAccounts = [
       externalAccount({
         id: 'idn_google',
@@ -438,7 +438,10 @@ describe('UserProfileConnectedAccountsSection', () => {
     const dialog = await openRemoval(user, 'Google');
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
 
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(within(dialog).getByRole('button', { name: 'Remove' })).not.toHaveAttribute('aria-busy', 'true'),
+    );
+    expect(screen.getByRole('alertdialog')).toBe(dialog);
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 });

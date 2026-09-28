@@ -104,6 +104,7 @@ export function UserProfileConnectedAccountsSectionView({
           description={account => fill(m.removeDialog.description, { provider: account.provider })}
           actionLabel={m.removeDialog.confirm}
           cancelLabel={m.removeDialog.cancel}
+          backLabel={m.removeDialog.back}
           finalFocus={removalFocus.finalFocus}
           onConfirm={account => removalFocus.remove(account.id)}
         />

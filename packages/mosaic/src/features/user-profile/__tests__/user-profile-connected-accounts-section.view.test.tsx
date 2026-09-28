@@ -20,7 +20,7 @@ describe('connected accounts section', () => {
     await user.click(screen.getByRole('button', { name: 'Manage Google' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
 
-    expect(screen.getAllByRole('alertdialog')).toHaveLength(1);
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
     expect(screen.getByText('Cannot verify your account')).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });

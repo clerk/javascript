@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -31,7 +32,7 @@ describe('Confirmation', () => {
   it.each(['active', 'retrying'] as const)('shows verification loading during %s', phase => {
     renderBlock({ reverification: { status: 'loading', phase } });
 
-    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument();
   });
 
@@ -43,17 +44,38 @@ describe('Confirmation', () => {
     await user.keyboard('{Escape}');
 
     expect(onOpenChange).not.toHaveBeenCalled();
-    expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled();
   });
 
   it('shows reverification inside its existing dialog without typed confirmation', () => {
     renderBlock({ reverification: { status: 'unavailable', phase: 'active', onCancel: vi.fn() } });
 
-    expect(screen.getAllByRole('alertdialog')).toHaveLength(1);
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
     expect(screen.getByText('Cannot verify your account')).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument();
   });
+
+  it.each(['Back', 'Close', 'Escape'])(
+    'keeps controlled confirmation open after %s cancels verification',
+    async action => {
+      const onOpenChange = vi.fn();
+      const onCancel = vi.fn();
+      const user = userEvent.setup();
+      renderBlock({ onOpenChange, reverification: { status: 'unavailable', phase: 'active', onCancel } });
+
+      if (action === 'Escape') {
+        await user.keyboard('{Escape}');
+      } else {
+        await user.click(screen.getByRole('button', { name: action }));
+      }
+
+      expect(onCancel).toHaveBeenCalledOnce();
+      expect(onOpenChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    },
+  );
 
   it('renders nothing until the caller opens it', () => {
     renderBlock({ open: false });
@@ -155,6 +177,9 @@ const removeButton = () => screen.getByRole('button', { name: 'Remove Preston Bo
 describe('Confirmation with a handle', () => {
   it.each(['resolve', 'reject'] as const)('ignores a stale %s after cancelling and reopening', async settlement => {
     const pending = deferred<void>();
+    const cancellation = deferred<void>();
+    const onCancel = () =>
+      cancellation.reject(new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' }));
     const user = userEvent.setup();
     const handle = Confirmation.createHandle<Member>();
     const view = (reverification: ReverificationController) => (
@@ -164,7 +189,7 @@ describe('Confirmation with a handle', () => {
           title='Remove member'
           description='Remove this member'
           actionLabel='Remove'
-          onConfirm={() => pending.promise}
+          onConfirm={() => Promise.race([pending.promise, cancellation.promise])}
           reverification={reverification}
         />
       </MosaicProvider>
@@ -172,10 +197,12 @@ describe('Confirmation with a handle', () => {
     const { rerender } = render(view({ status: 'idle', phase: 'inactive' }));
     act(() => handle.open(preston));
     await user.click(confirmButton());
-    rerender(view({ status: 'loading', phase: 'active', onCancel: vi.fn() }));
+    rerender(view({ status: 'loading', phase: 'active', onCancel }));
     await user.keyboard('{Escape}');
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     rerender(view({ status: 'idle', phase: 'inactive' }));
+    await waitFor(() => expect(confirmButton()).not.toHaveAttribute('aria-busy', 'true'));
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     act(() => handle.open(preston));
 
     await act(async () => {
@@ -218,7 +245,10 @@ describe('Confirmation with a handle', () => {
       rerender(view({ status: 'loading', phase: 'retrying' }));
 
       await user.keyboard('{Escape}');
-      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Back' })).toBeDisabled();
+      await user.click(screen.getByRole('button', { name: 'Close' }));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument();
       expect(onConfirm).toHaveBeenCalledOnce();
 
@@ -241,11 +271,14 @@ describe('Confirmation with a handle', () => {
     },
   );
 
-  it('keeps verification in the same dialog and cancels the pending challenge on Escape', async () => {
+  it.each(['Back', 'Close', 'Escape'])('returns to confirmation without an error from %s', async action => {
     const user = userEvent.setup();
     const handle = Confirmation.createHandle<Member>();
-    const onCancel = vi.fn();
-    const onConfirm = vi.fn(() => new Promise<void>(() => {}));
+    const pending = deferred<void>();
+    const onCancel = vi.fn(() =>
+      pending.reject(new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' })),
+    );
+    const onConfirm = vi.fn(() => pending.promise);
     const view = (verifying: boolean) => (
       <MosaicProvider>
         <Confirmation
@@ -262,16 +295,28 @@ describe('Confirmation with a handle', () => {
     );
     const { rerender } = render(view(false));
     act(() => handle.open(preston));
-    await user.click(screen.getByRole('button', { name: 'Remove' }));
+    await user.click(confirmButton());
     const dialog = screen.getByRole('alertdialog');
 
     rerender(view(true));
-    expect(screen.getByRole('alertdialog')).toBe(dialog);
+    expect(screen.getByRole('dialog')).toBe(dialog);
     expect(screen.getByText('Cannot verify your account')).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
 
-    await user.keyboard('{Escape}');
+    if (action === 'Escape') {
+      await user.keyboard('{Escape}');
+    } else {
+      await user.click(screen.getByRole('button', { name: action }));
+    }
     expect(onCancel).toHaveBeenCalledOnce();
+    rerender(view(false));
+
+    await waitFor(() => expect(confirmButton()).not.toHaveAttribute('aria-busy', 'true'));
+    expect(screen.getByRole('alertdialog')).toBe(dialog);
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Cancel' })).toHaveFocus());
+    await user.keyboard('{Escape}');
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
