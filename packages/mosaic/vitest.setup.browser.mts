@@ -19,8 +19,10 @@ afterEach(() => {
   cleanup();
   __resetClerkQueryClientForTest();
   worker.resetHandlers();
-  expect(takeUnhandledRequests(), 'Frontend API requests without a handler').toEqual([]);
-  expect(takeUnsettledHolds(), 'Held Frontend API requests never released or failed').toEqual([]);
+  const unhandled = takeUnhandledRequests();
+  const unsettled = takeUnsettledHolds();
+  expect(unhandled, 'Frontend API requests without a handler').toEqual([]);
+  expect(unsettled, 'Held Frontend API requests never released or failed').toEqual([]);
 });
 
 afterAll(() => {

@@ -163,29 +163,34 @@ export interface HeldRequests {
   fail: (code?: string) => void;
 }
 
-const unsettledHolds = new Map<string, () => void>();
+interface Hold {
+  name: string;
+  release: () => void;
+}
+
+const unsettledHolds = new Set<Hold>();
 
 export function takeUnsettledHolds(): string[] {
-  const holds = [...unsettledHolds.entries()];
+  const holds = [...unsettledHolds];
   unsettledHolds.clear();
-  for (const [, release] of holds) {
-    release();
+  for (const hold of holds) {
+    hold.release();
   }
-  return holds.map(([hold]) => hold);
+  return holds.map(hold => hold.name);
 }
 
 export function holdRequests(method: 'get' | 'post', path: string): HeldRequests {
   const requests: Request[] = [];
-  const hold = `${method.toUpperCase()} ${path}`;
   let resolveGate: (response: Response | undefined) => void = () => {};
   const gate = new Promise<Response | undefined>(resolve => {
     resolveGate = resolve;
   });
+  const hold: Hold = { name: `${method.toUpperCase()} ${path}`, release: () => resolveGate(undefined) };
   const settle = (response: Response | undefined) => {
     unsettledHolds.delete(hold);
     resolveGate(response);
   };
-  unsettledHolds.set(hold, () => resolveGate(undefined));
+  unsettledHolds.add(hold);
 
   worker.use(
     http[method](fapiUrl(path), ({ request }) => {
