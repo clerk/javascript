@@ -2108,6 +2108,7 @@ export const trTR: LocalizationResource = {
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Web3 için tanımlayıcı eksik.',
     web3_signature_request_rejected: 'İmza isteğini reddettiniz. Devam etmek için lütfen tekrar deneyin.',
     web3_solana_signature_generation_failed:

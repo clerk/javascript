@@ -13,6 +13,7 @@ import type {
   PublicKeyCredentialWithAuthenticatorAttestationResponse,
   UpdatePasskeyParams,
 } from '@clerk/shared/types';
+import { noop } from '@clerk/shared/utils';
 import {
   isWebAuthnPlatformAuthenticatorSupported as isWebAuthnPlatformAuthenticatorSupportedOnWindow,
   isWebAuthnSupported as isWebAuthnSupportedOnWindow,
@@ -78,32 +79,43 @@ export class Passkey extends BaseResource implements PasskeyResource {
 
     const passkey = await this.create();
 
-    const { verification } = passkey;
+    let publicKeyCredential: PublicKeyCredentialWithAuthenticatorAttestationResponse;
+    try {
+      const { verification } = passkey;
 
-    const publicKey = verification?.publicKey;
+      const publicKey = verification?.publicKey;
 
-    // This should never occur, just a fail-safe
-    if (!publicKey) {
-      clerkMissingWebAuthnPublicKeyOptions('create');
-    }
-
-    if (publicKey.authenticatorSelection?.authenticatorAttachment === 'platform') {
-      if (!(await isWebAuthnPlatformAuthenticatorSupported())) {
-        throw new ClerkWebAuthnError(
-          'Registration requires a platform authenticator but the device does not support it.',
-          {
-            code: 'passkey_pa_not_supported',
-          },
-        );
+      // This should never occur, just a fail-safe
+      if (!publicKey) {
+        clerkMissingWebAuthnPublicKeyOptions('create');
       }
-    }
 
-    // Invoke the WebAuthn create() method.
-    const { publicKeyCredential, error } = await webAuthnCreateCredential(publicKey);
+      if (publicKey.authenticatorSelection?.authenticatorAttachment === 'platform') {
+        if (!(await isWebAuthnPlatformAuthenticatorSupported())) {
+          throw new ClerkWebAuthnError(
+            'Registration requires a platform authenticator but the device does not support it.',
+            {
+              code: 'passkey_pa_not_supported',
+            },
+          );
+        }
+      }
 
-    if (!publicKeyCredential) {
+      // Invoke the WebAuthn create() method.
+      const credential = await webAuthnCreateCredential(publicKey);
+
+      if (!credential.publicKeyCredential) {
+        throw credential.error;
+      }
+
+      publicKeyCredential = credential.publicKeyCredential;
+    } catch (error) {
+      if (passkey.id) {
+        await passkey.delete().catch(noop);
+      }
       throw error;
     }
+
     return this.attemptVerification(passkey.id, publicKeyCredential);
   }
 
