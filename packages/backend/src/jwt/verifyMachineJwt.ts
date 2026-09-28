@@ -71,11 +71,11 @@ async function resolveKeyAndVerifyJwt(
       };
     }
 
-    // Pass only the options declared on JwtMachineVerifyOptions. Callers (e.g. authenticateRequest)
-    // hand us wider option objects whose session-token claim options (issuer, audience,
-    // authorizedParties) must not be asserted against machine tokens, which carry different claims.
+    // Callers such as authenticateRequest pass wider option objects; session-only claim options
+    // (issuer, authorizedParties) must not be asserted against machine tokens.
     const { data: payload, errors: verifyErrors } = await verifyJwt(token, {
       key,
+      audience: options.audience,
       clockSkewInMs: options.clockSkewInMs,
       ...(headerType ? { headerType } : {}),
     });
