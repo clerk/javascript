@@ -33,6 +33,20 @@ Rule of thumb: **test each behavior once, at the boundary that owns it.**
 Visual states (loading, empty, every error, every variant) are swingset stories
 with plain props, reviewed by eye. Don't duplicate them as view tests.
 
+Each behavior lives in one tier. A feature test owns everything the feature
+does on screen, including edge cases, busy states, and errors. E2E only proves
+what a faked FAPI can't:
+
+- The framework SDK mounts the component.
+- An action really changes the session: sign-out clears it, a switch survives a
+  reload.
+- A route the component sends the user to really exists.
+- Components from another package, such as the `UserProfile` modal, render
+  what Mosaic hands them.
+
+Keep a feature's E2E to one short smoke file. Don't repeat modes, orderings, or
+failure cases there.
+
 Default to a feature test for behavior the user can see. Reach for a smaller
 test when it is the better tool, for example:
 
