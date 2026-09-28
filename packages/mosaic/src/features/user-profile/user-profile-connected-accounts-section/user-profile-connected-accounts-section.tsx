@@ -162,9 +162,9 @@ export function UserProfileConnectedAccountsSection({
         {...controller}
         fallbackFocus={fallbackFocus}
         onRemove={remove}
+        removeReverification={removeReverification}
       />
       <Reverification {...createReverification} />
-      <Reverification {...removeReverification} />
     </>
   );
 }

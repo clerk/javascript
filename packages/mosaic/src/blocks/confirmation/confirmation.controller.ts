@@ -8,7 +8,11 @@ export interface ConfirmationContext {
   error: string | undefined;
 }
 
-export type ConfirmationEvent = { type: 'OPEN' } | { type: 'CONFIRM'; run: () => Promise<void> } | { type: 'CANCEL' };
+export type ConfirmationEvent =
+  | { type: 'OPEN' }
+  | { type: 'CONFIRM'; run: () => Promise<void> }
+  | { type: 'CANCEL' }
+  | { type: 'CANCEL_REVERIFICATION' };
 
 const { createMachine, assign, fromPromise } = setup<ConfirmationContext, ConfirmationEvent>();
 
@@ -16,10 +20,7 @@ function notSeated(): Promise<never> {
   return Promise.reject(new Error('confirmation run is not seated'));
 }
 
-function toMessage(cause: unknown): string | undefined {
-  if (isReverificationCancelledError(cause)) {
-    return undefined;
-  }
+function toMessage(cause: unknown): string {
   return cause instanceof Error ? cause.message : 'Something went wrong. Please try again.';
 }
 
@@ -43,12 +44,22 @@ export const confirmationMachine = createMachine({
       },
     },
     pending: {
+      on: {
+        CANCEL_REVERIFICATION: { target: 'idle', actions: assign(() => ({ error: undefined })) },
+      },
       invoke: fromPromise(context => context.run(), {
         onDone: { target: 'idle', actions: assign(() => ({ error: undefined })) },
-        onError: {
-          target: 'confirming',
-          actions: assign((_, event) => ({ error: toMessage(event.error) })),
-        },
+        onError: [
+          {
+            guard: (_, event) => isReverificationCancelledError(event.error),
+            target: 'idle',
+            actions: assign(() => ({ error: undefined })),
+          },
+          {
+            target: 'confirming',
+            actions: assign((_, event) => ({ error: toMessage(event.error) })),
+          },
+        ],
       }),
     },
   },
@@ -62,12 +73,22 @@ export interface ConfirmationController {
   errorMessage: string | undefined;
 }
 
-export function useConfirmationController(): ConfirmationController {
+export function useConfirmationController({
+  canCancelPending = false,
+}: { canCancelPending?: boolean } = {}): ConfirmationController {
   const [snapshot, send] = useMachine(confirmationMachine);
 
   return {
     isOpen: snapshot.value === 'confirming' || snapshot.value === 'pending',
-    onOpenChange: open => send({ type: open ? 'OPEN' : 'CANCEL' }),
+    onOpenChange: open => {
+      if (open) {
+        send({ type: 'OPEN' });
+      } else if (canCancelPending && snapshot.value === 'pending') {
+        send({ type: 'CANCEL_REVERIFICATION' });
+      } else {
+        send({ type: 'CANCEL' });
+      }
+    },
     onConfirm: run => send({ type: 'CONFIRM', run }),
     isConfirming: snapshot.value === 'pending',
     errorMessage: snapshot.context.error,

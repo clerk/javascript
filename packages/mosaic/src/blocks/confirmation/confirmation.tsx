@@ -3,8 +3,10 @@ import type { ReactNode } from 'react';
 import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
-import type { DialogFocusTarget, DialogHandle, DialogTriggerProps } from '../../components/dialog';
+import type { DialogFocusTarget, DialogHandle, DialogRootProps, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
+import { Flow } from '../../components/flow';
+import { Reverification, type ReverificationController } from '../../features/reverification';
 import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
 import { useConfirmationController } from './confirmation.controller';
 
@@ -21,6 +23,7 @@ interface ConfirmationCardProps {
   onConfirm: () => void;
   isConfirming: boolean;
   errorMessage: string | undefined;
+  reverification?: ReverificationController;
 }
 
 function ConfirmationCard({
@@ -33,7 +36,49 @@ function ConfirmationCard({
   onConfirm,
   isConfirming,
   errorMessage,
+  reverification,
 }: ConfirmationCardProps) {
+  const step = reverification && reverification.phase !== 'inactive' ? 'verify' : 'confirm';
+  const confirmation = (
+    <>
+      <Card.Header>
+        <Card.Title>{title}</Card.Title>
+        <Card.Description>{description}</Card.Description>
+      </Card.Header>
+      {errorMessage ? (
+        <Card.Content>
+          <Banner.Root
+            role='alert'
+            color='negative'
+          >
+            <Banner.Label>{errorMessage}</Banner.Label>
+          </Banner.Root>
+        </Card.Content>
+      ) : null}
+      <Card.Footer>
+        <Dialog.Close
+          render={
+            <Button
+              variant='outline'
+              fullWidth
+            >
+              {cancelLabel}
+            </Button>
+          }
+        />
+        <SubmitButton
+          type='button'
+          fullWidth
+          color={color}
+          isPending={isConfirming}
+          onClick={onConfirm}
+        >
+          {actionLabel}
+        </SubmitButton>
+      </Card.Footer>
+    </>
+  );
+
   return (
     <Dialog.Popup
       compactPlacement='sheet'
@@ -43,47 +88,31 @@ function ConfirmationCard({
         elevation='overlay'
         renderBranding={false}
       >
-        <Card.Header>
-          <Card.Title>{title}</Card.Title>
-          <Card.Description>{description}</Card.Description>
-        </Card.Header>
-        {errorMessage ? (
-          <Card.Content>
-            <Banner.Root
-              role='alert'
-              color='negative'
-            >
-              <Banner.Label>{errorMessage}</Banner.Label>
-            </Banner.Root>
-          </Card.Content>
-        ) : null}
-        <Card.Footer>
-          <Dialog.Close
-            render={
-              <Button
-                variant='outline'
-                fullWidth
-              >
-                {cancelLabel}
-              </Button>
-            }
-          />
-          <SubmitButton
-            type='button'
-            fullWidth
-            color={color}
-            isPending={isConfirming}
-            onClick={onConfirm}
+        {reverification ? (
+          <Flow.Root
+            value={step}
+            direction={step === 'verify' ? 1 : -1}
+            state={step}
           >
-            {actionLabel}
-          </SubmitButton>
-        </Card.Footer>
+            {() => (
+              <>
+                <Flow.Step ids={['confirm']}>{confirmation}</Flow.Step>
+                <Flow.Step ids={['verify']}>
+                  <Reverification {...reverification} />
+                </Flow.Step>
+              </>
+            )}
+          </Flow.Root>
+        ) : (
+          confirmation
+        )}
       </Card.Root>
     </Dialog.Popup>
   );
 }
 
 export interface ConfirmationControlledProps {
+  reverification?: ReverificationController;
   /** Whether the dialog is open */
   open: boolean;
   /** The weight the confirming button carries. An action that can be undone takes `primary` (default: `negative`) */
@@ -94,7 +123,7 @@ export interface ConfirmationControlledProps {
    */
   finalFocus?: DialogFocusTarget;
   /** Callback when open state changes */
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: NonNullable<DialogRootProps['onOpenChange']>;
   /** Element that opens the dialog */
   trigger?: DialogTriggerProps['render'];
   /** Dialog heading */
@@ -126,12 +155,21 @@ function ControlledConfirmation({
   onConfirm,
   isConfirming = false,
   errorMessage,
+  reverification,
 }: ConfirmationControlledProps) {
   return (
     <Dialog.Root
       role='alertdialog'
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={(nextOpen, details) => {
+        if (!nextOpen && reverification?.phase === 'retrying') {
+          return;
+        }
+        if (!nextOpen && reverification?.phase === 'active') {
+          reverification.onCancel?.();
+        }
+        onOpenChange(nextOpen, details);
+      }}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <ConfirmationCard
@@ -144,6 +182,7 @@ function ControlledConfirmation({
         onConfirm={onConfirm}
         isConfirming={isConfirming}
         errorMessage={errorMessage}
+        reverification={reverification}
       />
     </Dialog.Root>
   );
@@ -162,6 +201,7 @@ function createHandle<Payload>(): ConfirmationHandle<Payload> {
 }
 
 export interface ConfirmationHandleProps<Payload> {
+  reverification?: ReverificationController;
   /** Opens the dialog with a payload from anywhere: `handle.open(payload)` */
   handle: ConfirmationHandle<Payload>;
   /** The weight the confirming button carries. An action that can be undone takes `primary` (default: `negative`) */
@@ -192,15 +232,21 @@ function HandleConfirmation<Payload>({
   actionLabel,
   cancelLabel = 'Cancel',
   onConfirm,
+  reverification,
 }: ConfirmationHandleProps<Payload>) {
-  const controller = useConfirmationController();
+  const controller = useConfirmationController({ canCancelPending: reverification?.phase === 'active' });
 
   return (
     <Dialog.Root
       role='alertdialog'
       handle={handle}
       open={controller.isOpen}
-      onOpenChange={controller.onOpenChange}
+      onOpenChange={nextOpen => {
+        if (!nextOpen && reverification?.phase === 'active') {
+          reverification.onCancel?.();
+        }
+        controller.onOpenChange(nextOpen);
+      }}
     >
       {({ payload }) =>
         payload === undefined ? null : (
@@ -218,6 +264,7 @@ function HandleConfirmation<Payload>({
             }
             isConfirming={controller.isConfirming}
             errorMessage={controller.errorMessage}
+            reverification={reverification}
           />
         )
       }

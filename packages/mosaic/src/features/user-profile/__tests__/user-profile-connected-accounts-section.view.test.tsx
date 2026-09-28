@@ -7,6 +7,24 @@ import { UserProfileConnectedAccountsSectionView } from '../user-profile-connect
 const account = { id: 'account_1', provider: 'Google', identifier: 'test@example.com' };
 
 describe('connected accounts section', () => {
+  it('shows removal reverification in the confirmation dialog without a typed phrase', async () => {
+    const user = userEvent.setup();
+    render(
+      <UserProfileConnectedAccountsSectionView
+        accounts={[account]}
+        onRemove={vi.fn()}
+        removeReverification={{ status: 'unavailable', phase: 'active', onCancel: vi.fn() }}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
+
+    expect(screen.getAllByRole('alertdialog')).toHaveLength(1);
+    expect(screen.getByText('Cannot verify your account')).toBeInTheDocument();
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
   it.each([{ availableProviders: [] }, { availableProviders: [{ id: 'google', provider: 'Google' }] }])(
     'hides the entire section without accounts or actionable providers (%j)',
     ({ availableProviders }) => {
