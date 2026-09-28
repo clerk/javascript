@@ -1,6 +1,21 @@
 import { useEffect, useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosText } from '@/lib/chaos';
+
+const exampleConnection = {
+  provider: 'Okta SSO',
+  domain: 'acme.co',
+  iconUrl: 'https://img.clerk.com/static/okta.svg',
+};
+
 export function useUserProfileVerifyEmailSsoFixture({ failConnect = false } = {}) {
+  const emailAddress = useChaosFixture('example@email.com', () => chaosEmail(0));
+  const connection = useChaosFixture(exampleConnection, item => ({
+    ...item,
+    provider: chaosText(item.provider),
+    domain: 'engineering.eu-west.very-long-company-name.example.com',
+  }));
   const [open, setOpen] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>();
@@ -22,12 +37,8 @@ export function useUserProfileVerifyEmailSsoFixture({ failConnect = false } = {}
 
   return {
     open,
-    emailAddress: 'example@email.com',
-    connection: {
-      provider: 'Okta SSO',
-      domain: 'acme.co',
-      iconUrl: 'https://img.clerk.com/static/okta.svg',
-    },
+    emailAddress,
+    connection,
     isConnecting,
     errorMessage,
     onOpenChange: (value: boolean) => {
