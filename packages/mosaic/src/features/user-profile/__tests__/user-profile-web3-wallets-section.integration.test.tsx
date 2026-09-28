@@ -8,6 +8,7 @@ import { MosaicProvider } from '../../../MosaicProvider';
 import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section';
 
 const request = vi.fn();
+const attributes: { web3_wallet?: { enabled: boolean } } = {};
 vi.mock('@clerk/shared/internal/clerk-js/web3', () => ({
   createWeb3: () => ({ getWeb3Identifier: () => Promise.resolve('0x1234') }),
 }));
@@ -37,7 +38,11 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       __internal_getOption: () => undefined,
       __internal_moduleManager: {},
       __internal_environment: {
-        userSettings: { web3FirstFactors: ['web3_metamask_signature'], enterpriseSSO: { enabled: false } },
+        userSettings: {
+          attributes,
+          web3FirstFactors: ['web3_metamask_signature'],
+          enterpriseSSO: { enabled: false },
+        },
         displayConfig: { supportEmail: 'support@example.com' },
       },
     }),
@@ -46,10 +51,26 @@ vi.mock('@clerk/shared/react', async importOriginal => {
   };
 });
 
-describe('Web3 wallet cancellation', () => {
+describe('Web3 wallets', () => {
   beforeEach(() => {
+    attributes.web3_wallet = { enabled: true };
     request.mockReset().mockRejectedValue(new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' }));
   });
+
+  it.each([false, undefined])('hides existing wallets and providers when Web3 enabled is %s', enabled => {
+    attributes.web3_wallet = enabled === undefined ? undefined : { enabled };
+
+    render(
+      <MosaicProvider>
+        <UserProfileWeb3WalletsSection />
+      </MosaicProvider>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Manage 0xabcdef' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Connect MetaMask' })).not.toBeInTheDocument();
+    expect(request).not.toHaveBeenCalled();
+  });
+
   it.each(['connect', 'primary', 'remove'] as const)(
     'keeps %s cancellation out of the visible errors',
     async action => {
