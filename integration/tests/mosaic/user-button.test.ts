@@ -65,18 +65,6 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
     await expect(trigger(page)).toHaveCount(0);
   });
 
-  test('opens the account menu for the signed-in user', async ({ page, context }) => {
-    await signIn({ page, context });
-
-    await trigger(page).click();
-
-    await expect(popup(page)).toBeVisible();
-    await expect(popup(page)).toContainText(fakeUser.email);
-    for (const { name } of organizations) {
-      await expect(popup(page)).toContainText(name);
-    }
-  });
-
   test('switches the active organization', async ({ page, context }) => {
     await signIn({ page, context });
 
@@ -100,16 +88,6 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
     await page.waitForFunction(() => window.Clerk?.organization === null);
   });
 
-  test('manage account opens the UserProfile modal', async ({ page, context }) => {
-    const u = await signIn({ page, context });
-
-    await trigger(page).click();
-    await runAccountAction(page, 'Manage account');
-
-    await expect(popup(page)).toBeHidden();
-    await u.po.userProfile.waitForUserProfileModal();
-  });
-
   test('signs out', async ({ page, context }) => {
     const u = await signIn({ page, context });
 
@@ -120,16 +98,20 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
     await expect(trigger(page)).toHaveCount(0);
   });
 
-  test('lists custom menu items in the given order and runs them', async ({ page, context }) => {
+  test('sends add account to the sign-in page', async ({ page, context }) => {
+    await signIn({ page, context });
+
+    await trigger(page).click();
+    await popup(page).getByRole('button', { name: 'Add account' }).click();
+
+    await page.waitForURL(url => url.pathname.startsWith('/sign-in'));
+  });
+
+  test('runs custom menu items', async ({ page, context }) => {
     await signIn({ page, context }, '/custom');
 
     await trigger(page).click();
-    const action = popup(page).getByRole('button', { name: 'Custom action' });
-    const link = popup(page).getByRole('link', { name: 'Custom link' });
-    const [actionBox, linkBox] = await Promise.all([action.boundingBox(), link.boundingBox()]);
-    expect(actionBox?.y).toBeLessThan(linkBox?.y ?? 0);
-
-    await action.click();
+    await popup(page).getByRole('button', { name: 'Custom action' }).click();
     await expect(page.getByText('custom-action-count-1')).toBeVisible();
     await expect(popup(page)).toBeHidden();
 

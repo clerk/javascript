@@ -14,7 +14,6 @@ export default function Page() {
           { id: 'custom-link', label: 'Custom link', href: '/custom/link-target' },
           { id: 'custom-action', label: 'Custom action', onClick: () => setActionCount(count => count + 1) },
         ]}
-        menuItemOrder={['custom-action', 'custom-link']}
         userProfileProps={{
           customPages: [{ label: 'Custom page', path: 'custom-page', content: <p>custom-page-content</p> }],
         }}
