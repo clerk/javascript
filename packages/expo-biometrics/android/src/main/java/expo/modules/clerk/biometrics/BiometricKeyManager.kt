@@ -24,6 +24,7 @@ internal data class BiometricAvailability(
   val canEvaluateBiometrics: Boolean,
   val canEvaluateDeviceOwner: Boolean,
   val errorCode: BiometricsErrorCode?,
+  val secureKeyStorageAvailable: Boolean,
 )
 
 internal data class BiometricCredentialKey(val localKeyId: String, val publicKeyJwk: String)
@@ -31,8 +32,8 @@ internal data class BiometricCredentialKey(val localKeyId: String, val publicKey
 /** Android Keystore keys laid out as clerk-android's `DefaultBiometricCredentialKeyManager` creates them. */
 internal class BiometricKeyManager {
   fun availability(context: Context): BiometricAvailability {
-    if (Build.VERSION.SDK_INT < BiometricCredentialCoding.MIN_SDK) {
-      return BiometricAvailability("none", false, false, BiometricsErrorCode.BIOMETRY_NOT_AVAILABLE)
+    if (!secureKeyStorageAvailable()) {
+      return BiometricAvailability("none", false, false, BiometricsErrorCode.BIOMETRY_NOT_AVAILABLE, false)
     }
     val manager = BiometricManager.from(context)
     val strong = manager.canAuthenticate(Authenticators.BIOMETRIC_STRONG)
@@ -50,11 +51,17 @@ internal class BiometricKeyManager {
       canEvaluateBiometrics = canEvaluateBiometrics,
       canEvaluateDeviceOwner = canEvaluateDeviceOwner,
       errorCode = if (canEvaluateBiometrics) null else BiometricsError.forCanAuthenticate(strong).code,
+      secureKeyStorageAvailable = true,
     )
   }
 
   fun createKey(context: Context, policy: BiometricCredentialPolicy): BiometricCredentialKey {
-    requireSupportedSdk()
+    if (!secureKeyStorageAvailable()) {
+      throw BiometricsError(
+        BiometricsErrorCode.SECURE_KEY_STORAGE_UNAVAILABLE,
+        "Biometric credential keys require Android 9 (API 28) or later.",
+      )
+    }
     val status = BiometricManager.from(context).canAuthenticate(promptAuthenticators(policy))
     if (status != BiometricManager.BIOMETRIC_SUCCESS) {
       throw BiometricsError.forCanAuthenticate(status)
@@ -185,6 +192,8 @@ internal class BiometricKeyManager {
 
   companion object {
     private const val ANDROID_KEY_STORE = "AndroidKeyStore"
+
+    fun secureKeyStorageAvailable(sdkInt: Int = Build.VERSION.SDK_INT): Boolean = sdkInt >= BiometricCredentialCoding.MIN_SDK
 
     /** Contract v2 section 2: device credentials only for biometry_or_device_passcode, and only on API 30+. */
     fun promptAuthenticators(policy: BiometricCredentialPolicy, sdkInt: Int = Build.VERSION.SDK_INT): Int =

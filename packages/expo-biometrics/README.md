@@ -37,7 +37,7 @@ The key and record layout is shared with the Clerk iOS and Android SDKs, so cred
 - Expo SDK 54 or later, in a development build (the module is not available in Expo Go or on the web)
 - iOS: `NSFaceIDUsageDescription` in your `Info.plist`. The `@clerk/expo` config plugin sets it through its `faceIDPermission` option.
 - iOS: a device with a Secure Enclave. The iOS Simulator has none, so `createKey()` rejects there with `secure_key_storage_unavailable`.
-- Android 9 (API level 28) or later with a strong (Class 3) biometric. On older versions every key operation rejects with `biometry_not_available`.
+- Android 9 (API level 28) or later with a strong (Class 3) biometric. On older versions `getAvailability()` reports `secureKeyStorageAvailable: false`, `createKey()` rejects with `secure_key_storage_unavailable`, and `sign()` with `biometry_not_available`.
 
 ## Installation
 

@@ -23,7 +23,8 @@ export interface BiometricAvailability {
   /** Why biometric authentication cannot be evaluated, or `null` when it can. */
   errorCode: BiometricsErrorCode | null;
   /**
-   * Whether the device has hardware-backed key storage (the Secure Enclave on iOS). `false` on the iOS Simulator.
+   * Whether the device has hardware-backed key storage: the Secure Enclave on iOS, which the iOS Simulator lacks, or the
+   * Android Keystore on Android 9 (API level 28) and later.
    * `createKey()` rejects with `secure_key_storage_unavailable` when this is `false`.
    */
   secureKeyStorageAvailable: boolean;

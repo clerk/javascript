@@ -11,6 +11,7 @@ internal enum class BiometricsErrorCode(val value: String) {
   BIOMETRY_NOT_ENROLLED("biometry_not_enrolled"),
   BIOMETRY_LOCKOUT("biometry_lockout"),
   PASSCODE_NOT_SET("passcode_not_set"),
+  SECURE_KEY_STORAGE_UNAVAILABLE("secure_key_storage_unavailable"),
   KEY_NOT_FOUND("key_not_found"),
   KEY_INVALIDATED("key_invalidated"),
   KEY_GENERATION_FAILED("key_generation_failed"),
