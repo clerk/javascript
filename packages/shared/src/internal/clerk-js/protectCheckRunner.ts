@@ -53,10 +53,6 @@ export class ProtectCheckRunner<TResource> {
       return this.reloadExpired();
     }
 
-    while (container.firstChild) {
-      container.removeChild(container.firstChild);
-    }
-
     // Deliberately unraced. Only the module load is bounded. The challenge itself may wait on a
     // person, and a timeout here used to abort valid challenges.
     const proofToken = await executeProtectCheck(protectCheck, container, { signal, setWidgetVisible, loadTimeoutMs });
@@ -68,6 +64,9 @@ export class ProtectCheckRunner<TResource> {
       const resource = await this.resource.submitProtectCheck({ proofToken });
       return { status: 'resolved', resource };
     } catch (err) {
+      if (signal?.aborted) {
+        throw abortedError();
+      }
       if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === ERROR_CODES.PROTECT_CHECK_ALREADY_RESOLVED) {
         await this.resource.reload();
         return { status: 'resolved', resource: this.resource.getResource() };

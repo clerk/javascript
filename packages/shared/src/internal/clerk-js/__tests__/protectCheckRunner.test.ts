@@ -63,15 +63,6 @@ describe('ProtectCheckRunner', () => {
     expect(outcome).toEqual({ status: 'resolved', resource: submitted });
   });
 
-  it('empties the container before the challenge script draws into it', async () => {
-    const { runner, container } = setup();
-    container.appendChild(document.createElement('iframe'));
-
-    await runner.run(challenge(), { container });
-
-    expect(container.childNodes).toHaveLength(0);
-  });
-
   it('does nothing when the signal is already aborted, even for an expired challenge', async () => {
     const { runner, ops, container } = setup();
     const controller = new AbortController();
@@ -118,6 +109,20 @@ describe('ProtectCheckRunner', () => {
 
     expect(ops.reload).toHaveBeenCalledTimes(1);
     expect(outcome).toEqual({ status: 'resolved', resource: live });
+  });
+
+  it('does not reload or resolve an already-resolved submit once the signal aborted', async () => {
+    const { runner, ops, container } = setup();
+    const controller = new AbortController();
+    ops.submitProtectCheck.mockImplementation(() => {
+      controller.abort();
+      return Promise.reject(alreadyResolved());
+    });
+
+    await expect(runner.run(challenge(), { container, signal: controller.signal })).rejects.toMatchObject({
+      code: 'protect_check_aborted',
+    });
+    expect(ops.reload).not.toHaveBeenCalled();
   });
 
   it('rethrows other submit errors without a reload', async () => {

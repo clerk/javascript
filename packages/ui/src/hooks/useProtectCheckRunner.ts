@@ -91,19 +91,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   const paramsRef = React.useRef(params);
   paramsRef.current = params;
 
-  // Imported per run so a failed chunk load can be retried, and only behind the no-RHC flag so
-  // those builds tree-shake the remote `import(sdk_url)` out.
   const runnerRef = React.useRef<ProtectCheckRunnerCore<TResource> | null>(null);
-  const getRunner = async () => {
-    const { ProtectCheckRunner } = await import('@clerk/shared/internal/clerk-js/protectCheckRunner');
-    runnerRef.current ??= new ProtectCheckRunner<TResource>({
-      getProtectCheck: () => paramsRef.current.getProtectCheck(),
-      getResource: () => paramsRef.current.getResource(),
-      reload: () => paramsRef.current.reload(),
-      submitProtectCheck: p => paramsRef.current.submitProtectCheck(p),
-    });
-    return runnerRef.current;
-  };
 
   const token = params.getProtectCheck()?.token;
 
@@ -168,7 +156,14 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
       return;
     }
 
-    // The runner empties the container, so reset visibility now instead of waiting on the observer.
+    // This run owns the container outright: drop anything a previous run left behind (a solved or
+    // errored widget) so the spinner covers the load phase and a re-rendering SDK can't stack a
+    // second widget under a stale one. Reset visibility in the same breath — the container is
+    // empty by construction here, and waiting on the observer callback would leave the state
+    // stale for a scheduling-dependent window (especially on the MutationObserver fallback).
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
     setIsWidgetVisibleState(false);
 
     isRunningRef.current = true;
@@ -185,11 +180,24 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
 
     const runChallenge = async () => {
       try {
+        // Load the Protect SDK loader lazily, gated on the same compile-time flag as the
+        // fail-closed guard above. In no-RHC builds `__BUILD_DISABLE_RHC__` is `true`, so this
+        // branch (and the dynamic `import()` below it) is dead-code-eliminated — the loader and
+        // its remote `import(sdk_url)` are tree-shaken out of those bundles entirely rather than
+        // merely shipped-but-unused.
         if (__BUILD_DISABLE_RHC__) {
           return;
         }
-        const runner = await getRunner();
-        const outcome = await runner.run(protectCheck, {
+        if (!runnerRef.current) {
+          const { ProtectCheckRunner } = await import('@clerk/shared/internal/clerk-js/protectCheckRunner');
+          runnerRef.current ??= new ProtectCheckRunner<TResource>({
+            getProtectCheck: () => paramsRef.current.getProtectCheck(),
+            getResource: () => paramsRef.current.getResource(),
+            reload: () => paramsRef.current.reload(),
+            submitProtectCheck: p => paramsRef.current.submitProtectCheck(p),
+          });
+        }
+        const outcome = await runnerRef.current.run(protectCheck, {
           container,
           signal: abortController.signal,
           setWidgetVisible,
