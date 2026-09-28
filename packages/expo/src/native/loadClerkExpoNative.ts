@@ -9,9 +9,9 @@ export type ClerkExpoNativeModule = Partial<
 
 export function loadClerkExpoNative(): ClerkExpoNativeModule | null {
   try {
-    // Synchronous require() in try/catch so Metro treats @clerk/expo-native as an optional dependency.
+    // Synchronous require() in try/catch so Metro treats @clerk/expo-native-components as an optional dependency.
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require('@clerk/expo-native') as ClerkExpoNativeModule;
+    return require('@clerk/expo-native-components') as ClerkExpoNativeModule;
   } catch {
     return null;
   }

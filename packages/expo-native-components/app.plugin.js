@@ -1,5 +1,5 @@
 /**
- * Expo config plugin for @clerk/expo-native
+ * Expo config plugin for @clerk/expo-native-components
  * Configures iOS and Android for the Clerk native SDKs (clerk-ios / clerk-android)
  *
  * When this plugin is used:
@@ -306,11 +306,11 @@ const withClerkTheme = (config, props = {}) => {
   return config;
 };
 
-const withClerkExpoNative = (config, props = {}, resolve = resolveClerkExpo) => {
+const withClerkExpoNativeComponents = (config, props = {}, resolve = resolveClerkExpo) => {
   const clerkExpo = resolve(config._internal?.projectRoot);
   if (clerkExpo && fs.existsSync(path.join(clerkExpo.dir, 'expo-module.config.json'))) {
     throw new Error(
-      `Clerk: @clerk/expo@${clerkExpo.version} still bundles the Clerk native module, which conflicts with @clerk/expo-native. Upgrade @clerk/expo to a version that supports @clerk/expo-native.`,
+      `Clerk: @clerk/expo@${clerkExpo.version} still bundles the Clerk native module, which conflicts with @clerk/expo-native-components. Upgrade @clerk/expo to a version that supports @clerk/expo-native-components.`,
     );
   }
   // Native requests report the @clerk/expo version in the x-clerk-host-sdk-version header.
@@ -323,9 +323,9 @@ const withClerkExpoNative = (config, props = {}, resolve = resolveClerkExpo) => 
   return config;
 };
 
-module.exports = createRunOncePlugin(withClerkExpoNative, packageJson.name, packageJson.version);
+module.exports = createRunOncePlugin(withClerkExpoNativeComponents, packageJson.name, packageJson.version);
 module.exports._testing = {
-  withClerkExpoNative,
+  withClerkExpoNativeComponents,
   validateThemeJson,
   isPlainObject,
   VALID_COLOR_KEYS,

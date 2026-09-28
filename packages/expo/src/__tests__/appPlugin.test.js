@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports -- CJS plugin, no ESM export
-const { withClerkExpoNative, withClerkFaceIDPermission } = require('../../app.plugin.js')._testing;
+const { withClerkExpoNativeComponents, withClerkFaceIDPermission } = require('../../app.plugin.js')._testing;
 
 function applyInfoPlistMod(config, modResults) {
   return config.mods.ios.infoPlist({
@@ -50,16 +50,16 @@ describe('withClerkFaceIDPermission', () => {
   });
 });
 
-describe('withClerkExpoNative', () => {
+describe('withClerkExpoNativeComponents', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  test('applies the @clerk/expo-native plugin with its options when it is installed', () => {
+  test('applies the @clerk/expo-native-components plugin with its options when it is installed', () => {
     const nativePlugin = vi.fn(config => ({ ...config, applied: true }));
     const config = { name: 'test', slug: 'test' };
 
-    const result = withClerkExpoNative(
+    const result = withClerkExpoNativeComponents(
       config,
       { keychainService: 'com.example.shared', theme: './theme.json', appleSignIn: false },
       () => nativePlugin,
@@ -69,15 +69,19 @@ describe('withClerkExpoNative', () => {
     expect(nativePlugin).toHaveBeenCalledWith(config, { keychainService: 'com.example.shared', theme: './theme.json' });
   });
 
-  test('prefers options passed to an explicitly listed @clerk/expo-native plugin', () => {
+  test('prefers options passed to an explicitly listed @clerk/expo-native-components plugin', () => {
     const nativePlugin = vi.fn(config => config);
     const config = {
       name: 'test',
       slug: 'test',
-      plugins: ['@clerk/expo', ['@clerk/expo-native', { theme: './native-theme.json' }]],
+      plugins: ['@clerk/expo', ['@clerk/expo-native-components', { theme: './native-theme.json' }]],
     };
 
-    withClerkExpoNative(config, { keychainService: 'com.example.shared', theme: './theme.json' }, () => nativePlugin);
+    withClerkExpoNativeComponents(
+      config,
+      { keychainService: 'com.example.shared', theme: './theme.json' },
+      () => nativePlugin,
+    );
 
     expect(nativePlugin).toHaveBeenCalledWith(config, {
       keychainService: 'com.example.shared',
@@ -85,36 +89,40 @@ describe('withClerkExpoNative', () => {
     });
   });
 
-  test('does not apply the @clerk/expo-native plugin twice', () => {
+  test('does not apply the @clerk/expo-native-components plugin twice', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const nativePlugin = vi.fn(config => config);
     const config = {
       name: 'test',
       slug: 'test',
-      _internal: { pluginHistory: { '@clerk/expo-native': { name: '@clerk/expo-native', version: '0.0.1' } } },
+      _internal: {
+        pluginHistory: { '@clerk/expo-native-components': { name: '@clerk/expo-native-components', version: '0.0.1' } },
+      },
     };
 
-    expect(withClerkExpoNative(config, {}, () => nativePlugin)).toBe(config);
+    expect(withClerkExpoNativeComponents(config, {}, () => nativePlugin)).toBe(config);
     expect(nativePlugin).not.toHaveBeenCalled();
     expect(warn).not.toHaveBeenCalled();
 
-    withClerkExpoNative(config, { theme: './theme.json' }, () => nativePlugin);
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Pass them to the "@clerk/expo-native" plugin instead'));
+    withClerkExpoNativeComponents(config, { theme: './theme.json' }, () => nativePlugin);
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('Pass them to the "@clerk/expo-native-components" plugin instead'),
+    );
   });
 
-  test('leaves the config untouched when @clerk/expo-native is not installed', () => {
+  test('leaves the config untouched when @clerk/expo-native-components is not installed', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const config = { name: 'test', slug: 'test' };
 
-    expect(withClerkExpoNative(config, {}, () => null)).toBe(config);
+    expect(withClerkExpoNativeComponents(config, {}, () => null)).toBe(config);
     expect(warn).not.toHaveBeenCalled();
   });
 
-  test('warns with install instructions when native-only options are passed without @clerk/expo-native', () => {
+  test('warns with install instructions when native-only options are passed without @clerk/expo-native-components', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const config = { name: 'test', slug: 'test' };
 
-    expect(withClerkExpoNative(config, { keychainService: 'com.example.shared' }, () => null)).toBe(config);
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('npx expo install @clerk/expo-native'));
+    expect(withClerkExpoNativeComponents(config, { keychainService: 'com.example.shared' }, () => null)).toBe(config);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('npx expo install @clerk/expo-native-components'));
   });
 });

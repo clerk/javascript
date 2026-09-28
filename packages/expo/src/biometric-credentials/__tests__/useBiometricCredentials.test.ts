@@ -542,12 +542,12 @@ describe('useBiometricCredentials on iOS', () => {
     });
   });
 
-  test('explains how to install @clerk/expo-native when the native module is missing', async () => {
+  test('explains how to install @clerk/expo-native-components when the native module is missing', async () => {
     mocks.isNativeModuleInstalled = false;
 
     try {
       await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
-        'Biometric credentials require the @clerk/expo-native package in a development build. Install it with `npx expo install @clerk/expo-native`',
+        'Biometric credentials require the @clerk/expo-native-components package in a development build. Install it with `npx expo install @clerk/expo-native-components`',
       );
     } finally {
       mocks.isNativeModuleInstalled = true;
@@ -560,7 +560,7 @@ describe('useBiometricCredentials on iOS', () => {
 
     try {
       await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
-        'Biometric credentials require a development build containing a compatible version of @clerk/expo-native.',
+        'Biometric credentials require a development build containing a compatible version of @clerk/expo-native-components.',
       );
     } finally {
       Object.assign(mocks.nativeModule, { signInWithTrustedDevice });

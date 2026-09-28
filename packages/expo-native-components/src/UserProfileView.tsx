@@ -75,7 +75,7 @@ export interface UserProfileViewProps extends EmbeddedNavigationProps {
  *
  * @example
  * ```tsx
- * import { UserProfileView } from '@clerk/expo-native';
+ * import { UserProfileView } from '@clerk/expo-native-components';
  * import { useAuth } from '@clerk/expo';
  *
  * export default function ProfileScreen() {
@@ -128,7 +128,7 @@ export function UserProfileView({
         <Text style={styles.text}>
           {!isNativeSupported
             ? 'Native UserProfileView is only available on iOS and Android'
-            : 'Native UserProfileView requires a development build with the @clerk/expo-native config plugin. Add "@clerk/expo-native" to your app.json plugins array and rebuild your native app.'}
+            : 'Native UserProfileView requires a development build with the @clerk/expo-native-components config plugin. Add "@clerk/expo-native-components" to your app.json plugins array and rebuild your native app.'}
         </Text>
       </View>
     );

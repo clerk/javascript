@@ -4,11 +4,11 @@
  * When this plugin is used:
  * 1. Android registers the hosted auth callback intent filter
  * 2. iOS gets the Sign in with Apple entitlement and, when configured, the Face ID usage description
- * 3. If @clerk/expo-native is installed, its config plugin is applied for the Clerk native SDKs
+ * 3. If @clerk/expo-native-components is installed, its config plugin is applied for the Clerk native SDKs
  */
 const { AndroidConfig, withAndroidManifest, withEntitlementsPlist, withInfoPlist } = require('@expo/config-plugins');
 
-const CLERK_EXPO_NATIVE = '@clerk/expo-native';
+const CLERK_EXPO_NATIVE = '@clerk/expo-native-components';
 const CLERK_EXPO_NATIVE_OPTIONS = ['keychainService', 'theme'];
 
 const addHostedAuthIntentFilter = (mainActivity, packageName) => {
@@ -104,10 +104,10 @@ const getListedPluginProps = (config, name) => {
 };
 
 /**
- * Apply the @clerk/expo-native config plugin when it is installed, so apps that only list
+ * Apply the @clerk/expo-native-components config plugin when it is installed, so apps that only list
  * "@clerk/expo" keep the iOS deployment target and native SDK configuration they need.
  */
-const withClerkExpoNative = (config, props = {}, resolvePlugin = resolveClerkExpoNativePlugin) => {
+const withClerkExpoNativeComponents = (config, props = {}, resolvePlugin = resolveClerkExpoNativePlugin) => {
   const nativeProps = Object.fromEntries(
     CLERK_EXPO_NATIVE_OPTIONS.filter(option => props[option] !== undefined).map(option => [option, props[option]]),
   );
@@ -144,13 +144,13 @@ const withClerkExpo = (config, props = {}) => {
   }
   config = withClerkHostedAuthCallback(config);
   config = withClerkFaceIDPermission(config, props);
-  config = withClerkExpoNative(config, props);
+  config = withClerkExpoNativeComponents(config, props);
   return config;
 };
 
 module.exports = withClerkExpo;
 module.exports._testing = {
   addHostedAuthIntentFilter,
-  withClerkExpoNative,
+  withClerkExpoNativeComponents,
   withClerkFaceIDPermission,
 };

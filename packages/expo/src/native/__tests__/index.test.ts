@@ -9,7 +9,7 @@ describe('@clerk/expo/native', () => {
     vi.restoreAllMocks();
   });
 
-  describe('when @clerk/expo-native is not installed', () => {
+  describe('when @clerk/expo-native-components is not installed', () => {
     beforeEach(() => {
       vi.doMock('../loadClerkExpoNative', () => ({ loadClerkExpoNative: () => null }));
     });
@@ -20,7 +20,7 @@ describe('@clerk/expo/native', () => {
         const Component = (await importNativeEntry())[name] as (props: object) => unknown;
 
         expect(() => Component({})).toThrow(
-          /`.+` is unavailable\. Native components have moved to the @clerk\/expo-native package\. Install it with `npx expo install @clerk\/expo-native`/,
+          /`.+` is unavailable\. Native components have moved to the @clerk\/expo-native-components package\. Install it with `npx expo install @clerk\/expo-native-components`/,
         );
       },
     );
@@ -31,12 +31,12 @@ describe('@clerk/expo/native', () => {
         const hook = (await importNativeEntry())[name] as () => unknown;
 
         expect(() => hook()).toThrow(`\`${name}\` is unavailable.`);
-        expect(() => hook()).toThrow('add "@clerk/expo-native" to the plugins array in your app config');
+        expect(() => hook()).toThrow('add "@clerk/expo-native-components" to the plugins array in your app config');
       },
     );
   });
 
-  test('re-exports @clerk/expo-native when it is installed', async () => {
+  test('re-exports @clerk/expo-native-components when it is installed', async () => {
     const clerkExpoNative = {
       AuthView: vi.fn(() => null),
       UserButton: vi.fn(() => null),

@@ -19,7 +19,7 @@ on:
       - 'packages/clerk-js/**'
       - 'packages/expo/**'
       - 'packages/expo-google-signin/**'
-      - 'packages/expo-native/**'
+      - 'packages/expo-native-components/**'
       - 'packages/expo-passkeys/**'
       - 'packages/express/**'
       - 'packages/fastify/**'
@@ -57,7 +57,7 @@ env:
     --filter=@clerk/clerk-js
     --filter=@clerk/expo
     --filter=@clerk/expo-google-signin
-    --filter=@clerk/expo-native
+    --filter=@clerk/expo-native-components
     --filter=@clerk/expo-passkeys
     --filter=@clerk/express
     --filter=@clerk/fastify

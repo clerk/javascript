@@ -5,12 +5,12 @@ import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports -- CJS plugin, no ESM export
-const { withClerkExpoNative } = require('../../app.plugin.js')._testing;
+const { withClerkExpoNativeComponents } = require('../../app.plugin.js')._testing;
 
 const applyMod = (config, platform, mod, modResults) =>
   config.mods[platform][mod]({ ...config, modRequest: {}, modResults });
 
-describe('withClerkExpoNative', () => {
+describe('withClerkExpoNativeComponents', () => {
   let clerkExpoDir;
 
   beforeEach(() => {
@@ -24,7 +24,7 @@ describe('withClerkExpoNative', () => {
   });
 
   test('reports the installed @clerk/expo version on iOS and Android', async () => {
-    const config = withClerkExpoNative({ name: 'test', slug: 'test' }, {}, () => ({
+    const config = withClerkExpoNativeComponents({ name: 'test', slug: 'test' }, {}, () => ({
       dir: clerkExpoDir,
       version: '4.8.0',
     }));
@@ -44,7 +44,10 @@ describe('withClerkExpoNative', () => {
     fs.writeFileSync(path.join(clerkExpoDir, 'expo-module.config.json'), '{}');
 
     expect(() =>
-      withClerkExpoNative({ name: 'test', slug: 'test' }, {}, () => ({ dir: clerkExpoDir, version: '4.7.1' })),
+      withClerkExpoNativeComponents({ name: 'test', slug: 'test' }, {}, () => ({
+        dir: clerkExpoDir,
+        version: '4.7.1',
+      })),
     ).toThrow('@clerk/expo@4.7.1 still bundles the Clerk native module');
   });
 });

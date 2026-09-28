@@ -1,1 +1,1 @@
-export * from '@clerk/expo-native';
+export * from '@clerk/expo-native-components';

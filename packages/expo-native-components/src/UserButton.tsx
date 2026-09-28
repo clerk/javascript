@@ -47,7 +47,7 @@ export interface UserButtonProps {
  *
  * @example
  * ```tsx
- * import { UserButton } from '@clerk/expo-native';
+ * import { UserButton } from '@clerk/expo-native-components';
  *
  * export default function Home() {
  *   return (

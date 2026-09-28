@@ -7,12 +7,12 @@
  *
  * ## Installation
  *
- * Native components require the `@clerk/expo-native` config plugin in your `app.json`, alongside `@clerk/expo`:
+ * Native components require the `@clerk/expo-native-components` config plugin in your `app.json`, alongside `@clerk/expo`:
  *
  * ```json
  * {
  *   "expo": {
- *     "plugins": ["@clerk/expo", "@clerk/expo-native"]
+ *     "plugins": ["@clerk/expo", "@clerk/expo-native-components"]
  *   }
  * }
  * ```
@@ -25,7 +25,7 @@
  * - {@link UserProfileView} - User profile and account management, renders inline
  * - {@link UserButton} - Avatar button that opens the native user profile
  *
- * @module @clerk/expo-native
+ * @module @clerk/expo-native-components
  */
 
 export { AuthView } from './AuthView';

@@ -2,12 +2,12 @@ import { errorThrower } from '../errorThrower';
 import type { ClerkExpoNativeModule } from './loadClerkExpoNative';
 import { loadClerkExpoNative } from './loadClerkExpoNative';
 
-// Public types are declared in native/index.d.ts, which re-exports them from @clerk/expo-native.
+// Public types are declared in native/index.d.ts, which re-exports them from @clerk/expo-native-components.
 
 const CLERK_EXPO_NATIVE_MISSING_MESSAGE =
-  'Native components have moved to the @clerk/expo-native package. ' +
-  'Install it with `npx expo install @clerk/expo-native`, add "@clerk/expo-native" to the plugins array in your app config, ' +
-  'then rebuild your native app. You can then import them from "@clerk/expo-native".';
+  'Native components have moved to the @clerk/expo-native-components package. ' +
+  'Install it with `npx expo install @clerk/expo-native-components`, add "@clerk/expo-native-components" to the plugins array in your app config, ' +
+  'then rebuild your native app. You can then import them from "@clerk/expo-native-components".';
 
 const clerkExpoNative = loadClerkExpoNative();
 
