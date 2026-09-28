@@ -45,6 +45,7 @@ class ClerkExpoBiometricsModule : Module() {
         "canEvaluateBiometrics" to availability.canEvaluateBiometrics,
         "canEvaluateDeviceOwner" to availability.canEvaluateDeviceOwner,
         "errorCode" to availability.errorCode?.value,
+        "secureKeyStorageAvailable" to availability.secureKeyStorageAvailable,
       )
     }
 
