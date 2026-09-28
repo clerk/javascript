@@ -89,8 +89,9 @@ drops the fallback instead of holding the space open. Keep the two apart.
 
 ## Testing
 
-The model is covered by the feature's feature test, which runs it against a real
-Clerk with FAPI faked, rather than by a test of its own. It is the
+The feature test covers the model by default, running it against a real Clerk
+with FAPI faked. It is the
 **highest-risk layer**: when a migration loses behavior, it is usually a model
 responsibility (revalidate timing, a permission gate, an empty-state rule) that
-quietly went missing, so give those cases a feature test each. See `testing.md`.
+quietly went missing, so give those cases a feature test each. A rule with many
+combinations can move into a pure function with a unit test. See `testing.md`.

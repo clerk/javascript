@@ -122,7 +122,7 @@ have a machine.
 
 ## Testing
 
-The controller is covered by the feature test, not a test of its own. Hold the
+The feature test covers the controller by default. Hold the
 FAPI request an action makes to assert its in-flight state (the spinner, the rows
-stood down), then release or fail it to assert what closes the surface. See
-`testing.md`.
+stood down), then release or fail it to assert what closes the surface. Timing
+that is awkward to drive through FAPI can get a smaller test. See `testing.md`.

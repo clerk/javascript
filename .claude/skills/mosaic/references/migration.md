@@ -80,7 +80,8 @@ holds the state").
 
 Test the feature with one `*.feature.test.tsx` that uses it the way a user
 would, against a real Clerk with FAPI faked (`testing.md`). Turn each inventory
-row into a test there, not into per-layer tests. The **model** is the
+row into a test there by default, and reach for a smaller test only where
+`testing.md` says it is the better tool. The **model** is the
 highest-risk layer, so make sure its rows (revalidation, permission gates,
 empty states) each have one.
 
