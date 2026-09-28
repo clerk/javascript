@@ -1,3 +1,4 @@
+import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useRef, useState } from 'react';
 
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from '../user-profile-web3-wallets-section.view';
@@ -34,6 +35,9 @@ export function useUserProfileWeb3WalletsController({
       await action();
       return true;
     } catch (error) {
+      if (isReverificationCancelledError(error)) {
+        return false;
+      }
       const message =
         error instanceof Error && error.message ? error.message : 'Something went wrong. Please try again.';
       setErrors(current => ({ ...current, [id]: message }));
