@@ -40,7 +40,8 @@ function ConfirmationCard({
   errorMessage,
   reverification,
 }: ConfirmationCardProps) {
-  const step = reverification && reverification.phase !== 'inactive' ? 'verify' : 'confirm';
+  const step =
+    reverification && reverification.status !== 'idle' && reverification.status !== 'loading' ? 'verify' : 'confirm';
   const cancelRef = useRef<HTMLButtonElement>(null);
   const restoreConfirmationFocus = useRef(false);
 
@@ -187,7 +188,11 @@ function ControlledConfirmation({
 }: ConfirmationControlledProps) {
   return (
     <Dialog.Root
-      role={reverification && reverification.phase !== 'inactive' ? 'dialog' : 'alertdialog'}
+      role={
+        reverification && reverification.status !== 'idle' && reverification.status !== 'loading'
+          ? 'dialog'
+          : 'alertdialog'
+      }
       open={open}
       onOpenChange={(nextOpen, details) => {
         if (!nextOpen && reverification?.phase === 'retrying') {
@@ -270,7 +275,11 @@ function HandleConfirmation<Payload>({
 
   return (
     <Dialog.Root
-      role={reverification && reverification.phase !== 'inactive' ? 'dialog' : 'alertdialog'}
+      role={
+        reverification && reverification.status !== 'idle' && reverification.status !== 'loading'
+          ? 'dialog'
+          : 'alertdialog'
+      }
       handle={handle}
       open={controller.isOpen}
       onOpenChange={nextOpen => {

@@ -29,17 +29,19 @@ function renderBlock(overrides: Partial<ConfirmationControlledProps> = {}) {
 const confirmButton = () => screen.getByRole('button', { name: 'Remove' });
 
 describe('Confirmation', () => {
-  it.each(['active', 'retrying'] as const)('shows verification loading during %s', phase => {
-    renderBlock({ reverification: { status: 'loading', phase } });
+  it('keeps the confirmation pending while verification loads', () => {
+    renderBlock({ isConfirming: true, reverification: { status: 'loading', phase: 'active' } });
 
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument();
+    expect(screen.getByRole('alertdialog')).toHaveAccessibleName('Remove connected account');
+    expect(confirmButton()).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
   });
 
   it('ignores Escape while the verified action is retrying', async () => {
     const onOpenChange = vi.fn();
     const user = userEvent.setup();
-    renderBlock({ onOpenChange, isConfirming: true, reverification: { status: 'loading', phase: 'retrying' } });
+    renderBlock({ onOpenChange, isConfirming: true, reverification: { status: 'unavailable', phase: 'retrying' } });
 
     await user.keyboard('{Escape}');
 
@@ -242,7 +244,16 @@ describe('Confirmation with a handle', () => {
       act(() => handle.open(preston));
       await user.click(confirmButton());
       rerender(view({ status: 'loading', phase: 'active', onCancel: vi.fn() }));
-      rerender(view({ status: 'loading', phase: 'retrying' }));
+      const dialog = screen.getByRole('alertdialog');
+      expect(dialog).toHaveAccessibleName('Remove member');
+      expect(confirmButton()).toHaveAttribute('aria-busy', 'true');
+      expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+      rerender(view({ status: 'unavailable', phase: 'active', onCancel: vi.fn() }));
+      expect(screen.getByRole('dialog')).toBe(dialog);
+      expect(screen.getByText('Cannot verify your account')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument();
+      rerender(view({ status: 'unavailable', phase: 'retrying' }));
 
       await user.keyboard('{Escape}');
       expect(screen.getByRole('dialog')).toBeInTheDocument();
