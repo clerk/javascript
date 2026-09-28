@@ -47,6 +47,10 @@ export const styles = stylex.create({
     transitionProperty: 'opacity',
   },
 
+  triggerRinglessAvatar: {
+    outlineStyle: 'none',
+  },
+
   triggerRound: {
     borderRadius: radiusVars['--cl-radius-full'],
   },

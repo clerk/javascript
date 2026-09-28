@@ -283,6 +283,31 @@ export function CombinedPersonalWorkspace(_args: Record<string, unknown>) {
   );
 }
 
+export function CombinedUserPriority(_args: Record<string, unknown>) {
+  const prototype = usePrototype({ hidePersonal: true });
+
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='combined'
+      modePriority='user'
+    />
+  );
+}
+
+export function CombinedUserPriorityAvatarTrigger(_args: Record<string, unknown>) {
+  const prototype = usePrototype({ hidePersonal: true });
+
+  return (
+    <UserButtonView
+      {...prototype}
+      mode='combined'
+      modePriority='user'
+      renderTriggerLabel={false}
+    />
+  );
+}
+
 // ─── Mode: Org only ─────────────────────────────────────────────────────────
 
 export function Organizations(_args: Record<string, unknown>) {
