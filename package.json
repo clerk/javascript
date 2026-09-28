@@ -77,7 +77,7 @@
   },
   "devDependencies": {
     "@actions/core": "^1.11.1",
-    "@arethetypeswrong/cli": "0.18.2",
+    "@arethetypeswrong/cli": "0.18.3",
     "@changesets/cli": "^2.31.1",
     "@changesets/get-github-info": "^0.8.0",
     "@clerk/backend": "workspace:*",
