@@ -280,8 +280,8 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
     expect(data.aud).toEqual(aud);
   });
 
-  describe.each(['opaque', 'at+jwt'] as const)('%s OAuth token actor', format => {
-    const act = {
+  describe.each(['opaque', 'at+jwt', 'application/at+jwt'] as const)('%s OAuth token actor', format => {
+    const chainedAct = {
       iss: 'https://clerk.oauth.example.test',
       sub: 'client_exchanging',
       act: { iss: 'https://clerk.oauth.example.test', sub: 'client_subject' },
@@ -291,29 +291,54 @@ describe('tokens.verifyMachineAuthToken(token, options)', () => {
       vi.setSystemTime(new Date(mockOAuthAccessTokenJwtPayload.iat * 1000));
     });
 
-    it.each([{ act: undefined }, { act: { sub: 'client_exchanging' } }, { act }])(
+    async function verifyWithAct(act: unknown) {
+      let token: string;
+      if (format === 'opaque') {
+        token = 'oat_8XOIucKvqHVr5tYP123456789abcdefghij';
+        server.use(
+          http.post('https://api.clerk.test/oauth_applications/access_tokens/verify', () =>
+            HttpResponse.json({
+              object: 'clerk_idp_oauth_access_token',
+              ...mockVerificationResults.oauth_token,
+              ...(act === undefined ? {} : { act }),
+            }),
+          ),
+        );
+      } else {
+        server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
+        token = await createSignedOAuthJwt({ ...mockOAuthAccessTokenJwtPayload, act }, format);
+      }
+
+      const result = await verifyMachineAuthToken(token, {
+        apiUrl: 'https://api.clerk.test',
+        secretKey: 'a-valid-key',
+      });
+
+      expect(result.errors).toBeUndefined();
+      return (result.data as IdPOAuthAccessToken).act;
+    }
+
+    it.each([{ act: undefined }, { act: { sub: 'client_exchanging' } }, { act: chainedAct }])(
       'returns act=$act',
       async ({ act }) => {
-        let token: string;
-        if (format === 'opaque') {
-          token = 'oat_8XOIucKvqHVr5tYP123456789abcdefghij';
-          server.use(
-            http.post('https://api.clerk.test/oauth_applications/access_tokens/verify', () =>
-              HttpResponse.json({ ...mockVerificationResults.oauth_token, ...(act === undefined ? {} : { act }) }),
-            ),
-          );
-        } else {
-          server.use(http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)));
-          token = await createSignedOAuthJwt({ ...mockOAuthAccessTokenJwtPayload, act }, format);
-        }
+        expect(await verifyWithAct(act)).toEqual(act);
+      },
+    );
 
-        const result = await verifyMachineAuthToken(token, {
-          apiUrl: 'https://api.clerk.test',
-          secretKey: 'a-valid-key',
-        });
+    it('keeps only iss, sub, and one nested actor', async () => {
+      const act = await verifyWithAct({
+        ...chainedAct,
+        extra: 'dropped',
+        act: { ...chainedAct.act, extra: 'dropped', act: { sub: 'client_deeper' } },
+      });
 
-        expect(result.errors).toBeUndefined();
-        expect((result.data as IdPOAuthAccessToken).act).toEqual(act);
+      expect(act).toStrictEqual(chainedAct);
+    });
+
+    it.each([{ act: 'client_exchanging' }, { act: { iss: 'https://clerk.oauth.example.test' } }, { act: { sub: 42 } }])(
+      'drops malformed act=$act',
+      async ({ act }) => {
+        expect(await verifyWithAct(act)).toBeUndefined();
       },
     );
   });

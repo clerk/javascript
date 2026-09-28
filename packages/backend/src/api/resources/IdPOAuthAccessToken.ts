@@ -8,8 +8,24 @@ type OAuthJwtPayload = JwtPayload & {
   client_id?: string;
   scope?: string;
   scp?: string[];
-  act?: IdPOAuthAccessTokenActorJSON;
+  act?: unknown;
 };
+
+function toActor(value: unknown, nestedLevels: number): IdPOAuthAccessTokenActorJSON | undefined {
+  if (typeof value !== 'object' || value === null) {
+    return undefined;
+  }
+  const { iss, sub, act } = value as Record<string, unknown>;
+  if (typeof sub !== 'string') {
+    return undefined;
+  }
+  const nested = nestedLevels > 0 ? toActor(act, nestedLevels - 1) : undefined;
+  return {
+    ...(typeof iss === 'string' ? { iss } : {}),
+    sub,
+    ...(nested ? { act: nested } : {}),
+  };
+}
 
 export class IdPOAuthAccessToken {
   constructor(
@@ -47,7 +63,7 @@ export class IdPOAuthAccessToken {
       data.created_at,
       data.updated_at,
       data.aud,
-      data.act,
+      toActor(data.act, 1),
     );
   }
 
@@ -73,7 +89,7 @@ export class IdPOAuthAccessToken {
       payload.iat * 1000, // milliseconds: createdAt, converted from JWT iat claim
       payload.iat * 1000, // milliseconds: updatedAt, no JWT equivalent, defaults to iat
       oauthPayload.aud === undefined ? undefined : [oauthPayload.aud].flat(),
-      oauthPayload.act,
+      toActor(oauthPayload.act, 1),
     );
   }
 }
