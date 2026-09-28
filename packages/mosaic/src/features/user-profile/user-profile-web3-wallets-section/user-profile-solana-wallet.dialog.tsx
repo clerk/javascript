@@ -34,7 +34,7 @@ export function UserProfileSolanaWalletDialog({
 }) {
   const m = useMessages('userProfileWeb3Wallets');
   const [wallets, setWallets] = useState(installedSolanaWallets);
-  const selectedWalletName = useRef<string>();
+  const [selectedWalletName, setSelectedWalletName] = useState<string>();
   const selectedWallet = useRef<HTMLButtonElement | null>(null);
   const restorePickerFocus = useRef(false);
   const verification =
@@ -118,7 +118,7 @@ export function UserProfileSolanaWalletDialog({
                       <SubmitButton
                         key={wallet.name}
                         ref={element => {
-                          if (selectedWalletName.current === wallet.name) {
+                          if (selectedWalletName === wallet.name) {
                             selectedWallet.current = element;
                           }
                         }}
@@ -126,10 +126,10 @@ export function UserProfileSolanaWalletDialog({
                         variant='outline'
                         color='neutral'
                         fullWidth
-                        isPending={pending}
+                        isPending={pending && selectedWalletName === wallet.name}
                         disabled={pending}
                         onClick={event => {
-                          selectedWalletName.current = wallet.name;
+                          setSelectedWalletName(wallet.name);
                           selectedWallet.current = event.currentTarget;
                           onConnect(wallet.name);
                         }}
