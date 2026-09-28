@@ -30,9 +30,16 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
 
   test.afterAll(async () => {
     const u = createTestUtils({ app });
-    await Promise.all(organizations.map(({ id }) => u.services.clerk.organizations.deleteOrganization(id)));
-    await Promise.all([fakeUser.deleteIfExists(), otherFakeUser.deleteIfExists()]);
+    const results = await Promise.allSettled([
+      ...organizations.map(({ id }) => u.services.clerk.organizations.deleteOrganization(id)),
+      fakeUser.deleteIfExists(),
+      otherFakeUser.deleteIfExists(),
+    ]);
     await app.teardown();
+    const failures = results.flatMap(result => (result.status === 'rejected' ? [result.reason] : []));
+    if (failures.length > 0) {
+      throw new AggregateError(failures, 'Mosaic UserButton cleanup failed');
+    }
   });
 
   const trigger = (page: Page) => page.getByRole('button', { name: /^Open account menu for / });
