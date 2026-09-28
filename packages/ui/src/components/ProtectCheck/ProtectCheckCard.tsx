@@ -1,3 +1,6 @@
+import { Card } from '@/ui/elements/Card';
+import { Header } from '@/ui/elements/Header';
+
 import {
   Box,
   Button,
@@ -8,12 +11,9 @@ import {
   localizationKeys,
   Spinner,
   useLocalizations,
-} from '../customizables';
-import { Card } from '../elements/Card';
-import { useCardState } from '../elements/contexts';
-import { Header } from '../elements/Header';
-import { useSpinDelay } from '../hooks';
-import type { ProtectCheckRunner } from '../hooks/useProtectCheckRunner';
+} from '../../customizables';
+import { useSpinDelay } from '../../hooks';
+import type { ProtectCheckRunnerState } from '../../hooks/useProtectCheckRunner';
 
 const localizationKeysByFlow = {
   signIn: {
@@ -32,19 +32,19 @@ const localizationKeysByFlow = {
 
 type ProtectCheckCardProps = {
   flow: 'signIn' | 'signUp';
-  runner: ProtectCheckRunner;
+  runner: ProtectCheckRunnerState;
 };
 
 export const ProtectCheckCard = ({ flow, runner }: ProtectCheckCardProps) => {
-  const { containerRef, isRunning, isWidgetVisible, hasError, retry } = runner;
-  const card = useCardState();
+  const { containerRef, isRunning, isWidgetVisible, error, retry } = runner;
   const { t } = useLocalizations();
   const keys = localizationKeysByFlow[flow];
 
   // Debounce the spinner's entrance so a near-instant check (or a script that signals its
-  // widget immediately) never flashes it. The error and widget-visibility gates stay outside
-  // the delay hook: its minimum visible duration must never outrank the handshake's "spinner is
-  // gone when the promise resolves" guarantee, nor keep a spinner next to the retry button.
+  // widget immediately) never flashes it — the card header alone carries the first ~300ms.
+  // The error and widget-visibility gates stay OUTSIDE the delay hook below: its minimum
+  // visible duration must never outrank the handshake's "spinner is gone when the promise
+  // resolves" guarantee, nor keep a spinner next to the retry button.
   const showSpinner = useSpinDelay(isRunning, { delay: 300 });
 
   return (
@@ -55,7 +55,7 @@ export const ProtectCheckCard = ({ flow, runner }: ProtectCheckCardProps) => {
             <Header.Title localizationKey={keys.title} />
             <Header.Subtitle localizationKey={keys.subtitle} />
           </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
+          <Card.Alert>{error}</Card.Alert>
           <Col
             elementDescriptor={descriptors.main}
             gap={6}
@@ -68,7 +68,7 @@ export const ProtectCheckCard = ({ flow, runner }: ProtectCheckCardProps) => {
               // gutter above the spinner (same idiom as CaptchaElement's `gapless` mode).
               style={{ display: 'block', alignSelf: 'center', position: isWidgetVisible ? 'static' : 'absolute' }}
             />
-            {showSpinner && !hasError && !isWidgetVisible ? (
+            {showSpinner && !error && !isWidgetVisible ? (
               <Flex center>
                 <Spinner
                   size='lg'
@@ -78,7 +78,7 @@ export const ProtectCheckCard = ({ flow, runner }: ProtectCheckCardProps) => {
                 />
               </Flex>
             ) : null}
-            {hasError ? (
+            {error ? (
               <Button
                 onClick={retry}
                 localizationKey={keys.retryButton}

@@ -6,11 +6,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 
-import { ActionBlockedCard, ProtectCheckCard, withRedirectToAfterSignIn } from '../../common';
+import { ActionBlockedCard, withRedirectToAfterSignIn } from '../../common';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
 import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
+import { ProtectCheckCard } from '../ProtectCheck/ProtectCheckCard';
 import { buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
 import {
   isProtectCheckRequiredError,

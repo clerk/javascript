@@ -4,10 +4,11 @@ import { type ComponentType, useEffect, useRef, useState } from 'react';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 
-import { ActionBlockedCard, ProtectCheckCard, withRedirectToAfterSignUp } from '../../common';
+import { ActionBlockedCard, withRedirectToAfterSignUp } from '../../common';
 import { useCoreSignUp } from '../../contexts';
 import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
+import { ProtectCheckCard } from '../ProtectCheck/ProtectCheckCard';
 import { useCompleteSignUpFlow } from './useCompleteSignUpFlow';
 
 /**

@@ -8,7 +8,6 @@ export * from './Gate';
 export * from './InfiniteListSpinner';
 export * from './NotificationCountBadge';
 export * from './PrintableComponent';
-export * from './ProtectCheckCard';
 export * from './ProviderInitialIcon';
 export * from './ProviderIcon';
 export * from './QRCode';
