@@ -39,6 +39,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     useClerk: () => ({
       __internal_environment: {
         userSettings: { social, enterpriseSSO: { enabled: enterpriseAccounts.length > 0 } },
+        displayConfig: { supportEmail: 'support@example.com' },
       },
       __internal_oauthTransport: transport,
       __internal_getOption: () => undefined,
@@ -297,6 +298,34 @@ describe('UserProfileConnectedAccountsSection', () => {
     expect(JSON.parse(window.atob(encoded))).toMatchObject({ componentName: 'UserProfile' });
   });
 
+  it('clears Reconnect without an error when reverification is cancelled', async () => {
+    externalAccounts = [
+      externalAccount({
+        id: 'idn_google',
+        provider: 'google',
+        verification: {
+          status: 'unverified',
+          strategy: 'oauth_google',
+          error: { code: 'external_account_missing_refresh_token', longMessage: 'Missing token' },
+        },
+      }),
+    ];
+    createExternalAccount = vi.fn(() =>
+      Promise.reject(new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' })),
+    );
+    const user = userEvent.setup();
+    renderSection();
+
+    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
+
+    await waitFor(() => expect(createExternalAccount).toHaveBeenCalledOnce());
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(navigate).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    expect(screen.getByRole('menuitem', { name: 'Reconnect' })).toBeEnabled();
+  });
+
   it('reauthorizes an account missing requested scopes', async () => {
     const google = externalAccount({
       id: 'idn_google',
@@ -319,6 +348,36 @@ describe('UserProfileConnectedAccountsSection', () => {
     );
     expect(createExternalAccount).not.toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledWith('https://accounts.example/consent');
+  });
+
+  it('shows the API error and allows another Reconnect attempt after reauthorization fails', async () => {
+    const google = externalAccount({
+      id: 'idn_google',
+      provider: 'google',
+      approvedScopes: 'email',
+      reauthorize: vi
+        .fn()
+        .mockRejectedValueOnce(
+          new ClerkAPIResponseError('failed', {
+            data: [{ code: 'oauth_error', message: 'failed', long_message: 'Calendar access was denied.' }],
+            status: 422,
+          }),
+        )
+        .mockResolvedValueOnce(verificationResponse()),
+    });
+    externalAccounts = [google];
+    const user = userEvent.setup();
+    renderSection({ additionalOAuthScopes: { google: ['calendar'] } });
+
+    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
+    expect(await screen.findByText('Calendar access was denied.')).toBeInTheDocument();
+    expect(navigate).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
+    await waitFor(() => expect(google.reauthorize).toHaveBeenCalledTimes(2));
+    expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize');
   });
 
   it('removes the selected account and closes the confirmation', async () => {

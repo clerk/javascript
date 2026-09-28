@@ -12,7 +12,7 @@ import type { ReactNode } from 'react';
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
 import { useMosaicRouter } from '../../../hooks/useMosaicRouter';
 import { useMessages } from '../../../localization';
-import { Reverification, useReverificationWithState } from '../../reverification';
+import { Reverification, useReverificationFlow } from '../../reverification';
 import { UserProfileConnectedAccountsSectionView } from '../user-profile-connected-accounts-section.view';
 import type { ConnectedAccountActionResult } from './user-profile-connected-accounts-section.controller';
 import { useUserProfileConnectedAccountsController } from './user-profile-connected-accounts-section.controller';
@@ -44,10 +44,10 @@ export function UserProfileConnectedAccountsSection({
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
   const transport = clerk.__internal_oauthTransport;
-  const [createExternalAccount, createReverification] = useReverificationWithState(
-    (params: CreateExternalAccountParams) => user?.createExternalAccount(params),
+  const [createExternalAccount, createReverification] = useReverificationFlow((params: CreateExternalAccountParams) =>
+    user?.createExternalAccount(params),
   );
-  const [destroyAccount, removeReverification] = useReverificationWithState((accountId: string) =>
+  const [destroyAccount, removeReverification] = useReverificationFlow((accountId: string) =>
     user?.externalAccounts.find(account => account.id === accountId)?.destroy(),
   );
 
@@ -163,8 +163,8 @@ export function UserProfileConnectedAccountsSection({
         fallbackFocus={fallbackFocus}
         onRemove={remove}
       />
-      {createReverification.isActive ? <Reverification {...createReverification} /> : null}
-      {removeReverification.isActive ? <Reverification {...removeReverification} /> : null}
+      <Reverification {...createReverification} />
+      <Reverification {...removeReverification} />
     </>
   );
 }
