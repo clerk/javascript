@@ -22,6 +22,8 @@ export const styles = stylex.create({
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
     whiteSpace: 'nowrap',
     height: space['5'],
+    maxWidth: '100%',
+    minWidth: 0,
   },
 });
 

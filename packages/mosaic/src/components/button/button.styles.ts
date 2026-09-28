@@ -98,15 +98,8 @@ export const styles = stylex.create({
     transitionTimingFunction: 'linear',
     // A double-click on a button is a double-click, not a text selection.
     userSelect: 'none',
-    // A wrapped label would outgrow the fixed height, so it truncates instead (see `label`).
+    // A wrapped label would outgrow the fixed height, so it truncates instead (see `withTruncatableLabel`).
     whiteSpace: 'nowrap',
-  },
-
-  // The ellipsis comes from `truncationStyles.singleLine`; this adds the part specific to
-  // sitting in the button's row — releasing the flex-item min-width floor, without which
-  // the box never shrinks enough to clip. `item` releases the floor on the parent instead.
-  label: {
-    minWidth: 0,
   },
 
   // shape — icon buttons zero their inline padding; width tracks the height. Longhands because
