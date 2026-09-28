@@ -10,6 +10,8 @@ import {
 } from '@clerk/mosaic/features/user-button/user-button.view';
 import { useEffect, useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosName, chaosText } from '@/lib/chaos';
 import type { StoryMeta } from '@/lib/types';
 
 // Exposes this file's own source (via the `?raw` webpack rule) so each `<Story>` example
@@ -112,6 +114,21 @@ const otherAccounts: Account[] = [
   { session: cameron('sess_cameron_3'), ...personalWorkspace },
 ];
 
+function chaosAccounts(accounts: Account[]): Account[] {
+  return accounts.map((account, index) => ({
+    ...account,
+    session: { ...account.session, name: chaosName(index), identifier: chaosEmail(index) },
+    memberships: account.memberships.map(m => ({
+      ...m,
+      name: chaosText(m.name),
+      planLabel: chaosText(m.planLabel),
+      membersCount: 1_234_567,
+    })),
+    suggestions: account.suggestions.map(s => ({ ...s, name: chaosText(s.name) })),
+    invitations: account.invitations.map(i => ({ ...i, organizationName: chaosText(i.organizationName) })),
+  }));
+}
+
 /** Joining is what turns a suggestion or an invitation into a workspace you can switch to. */
 function join(account: Account, organizationId: string, name: string, imageUrl?: string): Account {
   return {
@@ -145,10 +162,11 @@ function usePrototype({
   hidePersonal?: boolean;
 } = {}): Omit<UserButtonProps, 'mode'> {
   const [open, setOpen] = useState(false);
-  const [accounts, setAccounts] = useState<Account[]>(() => [
-    { session: cameron('sess_cameron_1'), ...workspaces },
-    ...(singleSession ? [] : otherAccounts),
-  ]);
+  const seed = useChaosFixture(
+    [{ session: cameron('sess_cameron_1'), ...workspaces }, ...(singleSession ? [] : otherAccounts)],
+    chaosAccounts,
+  );
+  const [accounts, setAccounts] = useState(seed);
   const [activeSessionId, setActiveSessionId] = useState('sess_cameron_1');
   const [pendingKey, setPendingKey] = useState<string | null>(null);
 

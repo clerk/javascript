@@ -6,6 +6,9 @@ import type { OrganizationProfileCreateAPIKeyDialogProps } from '@clerk/mosaic/f
 import { useLocale, useMessages } from '@clerk/mosaic/localization';
 import { useEffect, useRef, useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosRows, chaosText } from '@/lib/chaos';
+
 interface FixtureAPIKey {
   id: string;
   name: string;
@@ -91,7 +94,10 @@ export function useOrganizationProfileAPIKeysFixture({
 } = {}): OrganizationProfileApiKeysPanelViewProps {
   const m = useMessages('organizationProfileApiKeysPanel');
   const locale = useLocale();
-  const [items, setItems] = useState(initialKeys);
+  const seed = useChaosFixture(initialKeys, items =>
+    chaosRows(items).map(key => ({ ...key, name: chaosText(key.name) })),
+  );
+  const [items, setItems] = useState(seed);
   const [searchValue, setSearchValue] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);

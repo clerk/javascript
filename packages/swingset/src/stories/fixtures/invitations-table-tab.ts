@@ -5,6 +5,9 @@ import type {
 import { useLocale } from '@clerk/mosaic/localization';
 import { useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
+
 const exampleInvitations = [
   'ada',
   'grace',
@@ -27,7 +30,14 @@ const exampleInvitations = [
 
 export function useInvitationsTableFixture({ proposed = false, empty = false } = {}): InvitationsTableTabViewProps {
   const locale = useLocale();
-  const [items, setItems] = useState(empty ? [] : exampleInvitations);
+  const invitations = useChaosFixture(exampleInvitations, items =>
+    chaosRows(items).map((invitation, index) => ({
+      ...invitation,
+      email: chaosEmail(index),
+      roleLabel: chaosText(invitation.roleLabel),
+    })),
+  );
+  const [items, setItems] = useState(empty ? [] : invitations);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchValue, setSearchValue] = useState('');

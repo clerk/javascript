@@ -1,6 +1,9 @@
 import type { UserProfileDevice } from '@clerk/mosaic/features/user-profile/user-profile-active-devices.types';
 import { useRef, useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosText } from '@/lib/chaos';
+
 export const userProfileDevices: UserProfileDevice[] = [
   {
     id: 'current',
@@ -84,7 +87,17 @@ export function useUserProfileActiveDevicesFixture({
   latency = 1200,
   failWith,
 }: UserProfileActiveDevicesFixtureOptions = {}) {
-  const [devices, setDevices] = useState(initialDevices);
+  const seed = useChaosFixture(initialDevices, items =>
+    items.map(device => ({
+      ...device,
+      name: chaosText(device.name),
+      description: chaosText(device.description),
+      model: chaosText(device.model),
+      browser: chaosText(device.browser),
+      location: chaosText(device.location),
+    })),
+  );
+  const [devices, setDevices] = useState(seed);
   const failed = useRef({ device: false, all: false });
 
   const settle = async (kind: 'device' | 'all') => {

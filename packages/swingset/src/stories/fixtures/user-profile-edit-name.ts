@@ -3,6 +3,9 @@ import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-p
 import type { UserProfileEditNameValue } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-edit-name.dialog';
 import { useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosName } from '@/lib/chaos';
+
 export interface UserProfileEditNameFixtureOptions {
   firstName?: string;
   lastName?: string;
@@ -18,10 +21,11 @@ export function useUserProfileEditNameFixture({
   latency = 800,
   failWith,
 }: UserProfileEditNameFixtureOptions = {}) {
-  const [name, setName] = useState<UserProfileEditNameValue>({
-    firstName: initialFirstName,
-    lastName: initialLastName,
-  });
+  const seed = useChaosFixture({ firstName: initialFirstName, lastName: initialLastName }, () => ({
+    firstName: chaosName(0),
+    lastName: chaosName(7),
+  }));
+  const [name, setName] = useState<UserProfileEditNameValue>(seed);
 
   return {
     ...name,

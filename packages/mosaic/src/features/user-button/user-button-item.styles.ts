@@ -92,13 +92,18 @@ export const styles = stylex.create({
 
   // At least as wide as the `⋯` menu button that owns it, so whatever stands in that button's
   // place — the active check, a spinner — lands on the same center line and the right edge of every
-  // row holds still as rows change state. A labelled button or a note grows it past that.
+  // row holds still as rows change state. A labelled button or a note grows it past that, up to half
+  // the row, and truncates beyond it: the `minmax(0, auto)` columns let a button shrink below its
+  // label, which a flex item holding `flexShrink: 0` never does.
   trailing: {
     gap: space['2'],
     alignItems: 'center',
-    display: 'flex',
+    display: 'grid',
     flexShrink: 0,
+    gridAutoColumns: 'minmax(0, auto)',
+    gridAutoFlow: 'column',
     justifyContent: 'center',
+    maxWidth: '50%',
     minWidth: space['7'],
   },
 

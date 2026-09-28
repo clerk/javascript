@@ -5,6 +5,9 @@ import type {
 import { useLocale } from '@clerk/mosaic/localization';
 import { useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosRows } from '@/lib/chaos';
+
 const exampleRequests = [
   'ada',
   'grace',
@@ -26,7 +29,10 @@ const exampleRequests = [
 
 export function useRequestsTableFixture({ proposed = false, empty = false } = {}): RequestsTableTabViewProps {
   const locale = useLocale();
-  const [items, setItems] = useState(empty ? [] : exampleRequests);
+  const requests = useChaosFixture(exampleRequests, items =>
+    chaosRows(items).map((request, index) => ({ ...request, email: chaosEmail(index) })),
+  );
+  const [items, setItems] = useState(empty ? [] : requests);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchValue, setSearchValue] = useState('');

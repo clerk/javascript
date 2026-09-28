@@ -382,6 +382,9 @@ jobs:
           - test-name: 'cache-components'
             test-project: 'chrome'
             next-version: '16'
+          - test-name: 'mosaic'
+            test-project: 'chrome'
+            next-version: '16'
 
     steps:
       - name: Checkout Repo
