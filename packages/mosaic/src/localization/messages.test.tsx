@@ -39,6 +39,11 @@ describe('plural', () => {
     expect(plural(forms, 1)).toBe('1 items');
   });
 
+  it('formats the count for the locale', () => {
+    expect(plural(members, 1234567)).toBe('1,234,567 members');
+    expect(plural(members, 1234567, 'de')).toBe('1.234.567 members');
+  });
+
   it('selects by locale', () => {
     const forms = { one: 'one', few: 'few', many: 'many', other: 'other' };
     expect(plural(forms, 3, 'pl')).toBe('few');
