@@ -1163,7 +1163,7 @@ export function useNativeClientBootstrap({
             if (__DEV__) {
               console.debug(
                 `[ClerkProvider] Native Clerk module not available. ` +
-                  `To enable native features, install @clerk/expo-native and add "@clerk/expo-native" to your app.json plugins array.`,
+                  `To enable native features, install @clerk/expo-native-components and add "@clerk/expo-native-components" to your app.json plugins array.`,
               );
             }
           } else if (__DEV__) {

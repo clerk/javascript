@@ -1,5 +1,5 @@
 {
-  "name": "@clerk/expo-native",
+  "name": "@clerk/expo-native-components",
   "version": "0.0.1",
   "description": "Native Clerk components and native SDK integration for Expo, powered by clerk-ios and clerk-android",
   "keywords": [
@@ -18,7 +18,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/clerk/javascript.git",
-    "directory": "packages/expo-native"
+    "directory": "packages/expo-native-components"
   },
   "license": "MIT",
   "author": "Clerk",

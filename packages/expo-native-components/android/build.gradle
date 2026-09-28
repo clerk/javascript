@@ -13,7 +13,7 @@ applyKotlinExpoModulesCorePlugin()
 group = 'com.clerk.expo'
 version = '1.0.0'
 
-// Set by the @clerk/expo-native config plugin to the installed @clerk/expo version.
+// Set by the @clerk/expo-native-components config plugin to the installed @clerk/expo version.
 def clerkExpoVersion = rootProject.findProperty("clerkExpo.hostSdkVersion")?.toString() ?:
   new JsonSlurper().parse(new File(projectDir, "../package.json")).version.toString()
 
@@ -98,7 +98,7 @@ try {
   }
 } catch (Exception ignored) {
   // Future Gradle versions with Isolated Projects may block cross-project configuration.
-  // In that case, users should add '@clerk/expo-native' to their app.json plugins array instead,
+  // In that case, users should add '@clerk/expo-native-components' to their app.json plugins array instead,
   // which applies the flag via the config plugin's withClerkAndroid.
 }
 
