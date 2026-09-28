@@ -133,6 +133,9 @@ export function UserProfileWeb3WalletsSection({ fallback, fallbackFocus }: UserP
   if (!isLoaded || !environment) {
     return fallback ?? null;
   }
+  if (!environment.userSettings.attributes.web3_wallet?.enabled) {
+    return null;
+  }
   if (projection.status === 'hidden') {
     return null;
   }
