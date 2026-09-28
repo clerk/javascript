@@ -19,7 +19,7 @@ export interface ProtectCheckRunnerParams<TResource> extends ProtectCheckRunnerR
   onResolved: (resource: TResource, isCancelled: () => boolean) => Promise<unknown>;
 }
 
-export interface ProtectCheckRunner {
+export interface ProtectCheckRunnerState {
   containerRef: React.MutableRefObject<HTMLDivElement | null>;
   isRunning: boolean;
   /**
@@ -28,8 +28,8 @@ export interface ProtectCheckRunner {
    * callers should hide their own spinner and give the container layout space.
    */
   isWidgetVisible: boolean;
-  /** Whether the card is currently showing a (recoverable) error. */
-  hasError: boolean;
+  /** The (recoverable) error the card is currently showing, if any. */
+  error: string | undefined;
   /** Clears the error and re-runs the challenge from scratch. */
   retry: () => void;
 }
@@ -41,7 +41,7 @@ export interface ProtectCheckRunner {
  *
  * Must be called from within a `CardStateProvider`.
  */
-export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParams<TResource>): ProtectCheckRunner {
+export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParams<TResource>): ProtectCheckRunnerState {
   const card = useCardState();
 
   // Override for the module-LOAD bound only (see `executeProtectCheck`), resolved loader first
@@ -252,5 +252,5 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { containerRef, isRunning, isWidgetVisible, hasError: !!card.error, retry };
+  return { containerRef, isRunning, isWidgetVisible, error: card.error, retry };
 }
