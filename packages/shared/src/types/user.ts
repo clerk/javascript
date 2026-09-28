@@ -200,6 +200,8 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    * The date and time when the user was created.
    */
   createdAt: Date | null;
+  /** The user's timezone. */
+  timezone: string | null;
 
   /**
    * Updates the user's attributes. Use this method to save information you collected about the user.

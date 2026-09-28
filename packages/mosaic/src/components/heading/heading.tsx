@@ -9,21 +9,31 @@ import { reset } from '../../utils/reset.styles';
 import type { TypographyColor, TypographySize } from '../../utils/typography.styles';
 import { colors, sizes, styles as typographyStyles } from '../../utils/typography.styles';
 import { styles as headingStyles } from './heading.styles';
+import type { HeadingLevel } from './heading-level';
 
 export interface HeadingProps extends MosaicComponentProps<'h2'> {
   size?: TypographySize;
   color?: TypographyColor;
+  level?: HeadingLevel;
 }
 
 export const HeadingContext = React.createContext<Partial<HeadingProps> | null>(null);
 
 /**
  * Themeable heading. Renders an `<h2>` by default, forwards refs, and supports
- * `size` and `color` variants. Pass `render` for a different heading level.
+ * `size` and `color` variants. Pass `level` for a different heading level.
  */
 export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(function MosaicHeading(rawProps, ref) {
-  const { size = 'base', color = 'foreground', render, xstyle, ...rest } = useContextProps(rawProps, HeadingContext);
+  const {
+    size = 'base',
+    color = 'foreground',
+    level = 2,
+    render,
+    xstyle,
+    ...rest
+  } = useContextProps(rawProps, HeadingContext);
 
+  const Tag = `h${level}` as const;
   const props = mergeStyleProps(
     themeProps('heading', { size, color }),
     stylex.props(reset.base, typographyStyles.base, headingStyles.base, sizes[size], colors[color], xstyle),
@@ -34,7 +44,7 @@ export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(functi
   // inside the consumer's own JSX there. The no-render fallback must stay JSX —
   // React.createElement bypasses Emotion's factory, leaking css to the DOM.
   const element = useRender({
-    defaultTagName: 'h2',
+    defaultTagName: Tag,
     render,
     ref,
     enabled: Boolean(render),
@@ -44,7 +54,7 @@ export const Heading = React.forwardRef<HTMLHeadingElement, HeadingProps>(functi
     return element;
   }
   return (
-    <h2
+    <Tag
       ref={ref}
       {...props}
     />

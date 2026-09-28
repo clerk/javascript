@@ -1,8 +1,7 @@
-import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
-import { panelStyles, Profile } from '../../components/profile';
-import { mergeStyleProps, themeProps } from '../../props';
+import { Panel } from '../../components/panel';
+import { themeProps } from '../../props';
 import type {
   UserProfileBillingHistoryItem,
   UserProfileBillingHistoryPagination,
@@ -48,9 +47,9 @@ export function UserProfileBillingPanelView({
   onViewInvoice,
 }: UserProfileBillingPanelViewProps): ReactElement {
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-billing-panel'), stylex.props(panelStyles.root))}>
-      <Profile.PageTitle>Billing</Profile.PageTitle>
-      <div {...stylex.props(panelStyles.sections)}>
+    <Panel.Root render={<div {...themeProps('user-profile-billing-panel')} />}>
+      <Panel.Title>Billing</Panel.Title>
+      <Panel.Sections>
         <UserProfileSubscriptionSectionView
           subscription={subscription}
           onChangePlan={onChangePlan}
@@ -68,7 +67,7 @@ export function UserProfileBillingPanelView({
           onPageSizeChange={onBillingHistoryPageSizeChange}
           onView={onViewInvoice}
         />
-      </div>
-    </div>
+      </Panel.Sections>
+    </Panel.Root>
   );
 }

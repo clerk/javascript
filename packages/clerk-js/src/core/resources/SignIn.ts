@@ -88,6 +88,7 @@ import {
 import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { getBrowserTimezone } from '../../utils/timezone';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
@@ -127,6 +128,7 @@ export class SignIn extends BaseResource implements SignInResource {
   userData: UserData = new UserData(null);
   clientTrustState?: ClientTrustState;
   protectCheck: ProtectCheckResource | null = null;
+  timezone: string | null = null;
 
   /**
    * The current status of the sign-in process.
@@ -198,6 +200,13 @@ export class SignIn extends BaseResource implements SignInResource {
     const browserLocale = getBrowserLocale();
     if (browserLocale) {
       body.locale = browserLocale;
+    }
+
+    if (body.timezone === undefined) {
+      const browserTimezone = getBrowserTimezone();
+      if (browserTimezone) {
+        body.timezone = browserTimezone;
+      }
     }
 
     if (
@@ -697,6 +706,7 @@ export class SignIn extends BaseResource implements SignInResource {
             uiHints: data.protect_check.ui_hints,
           }
         : null;
+      this.timezone = data.timezone ?? null;
     }
 
     eventBus.emit('resource:update', { resource: this });
@@ -758,6 +768,7 @@ export class SignIn extends BaseResource implements SignInResource {
       identifier: this.identifier,
       created_session_id: this.createdSessionId,
       user_data: this.userData.__internal_toSnapshot(),
+      timezone: this.timezone,
       protect_check: this.protectCheck
         ? {
             status: this.protectCheck.status,
@@ -849,6 +860,10 @@ class SignInFuture implements SignInFutureResource {
 
   get identifier() {
     return this.#resource.identifier;
+  }
+
+  get timezone() {
+    return this.#resource.timezone;
   }
 
   get createdSessionId() {
@@ -1076,6 +1091,7 @@ class SignInFuture implements SignInFutureResource {
 
   private async _create(params: SignInFutureCreateParams): Promise<void> {
     const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken(params);
+    const timezone = params.timezone ?? getBrowserTimezone();
 
     const body: Record<string, unknown> = {
       ...params,
@@ -1083,6 +1099,7 @@ class SignInFuture implements SignInFutureResource {
       captchaWidgetType,
       captchaError,
       locale: getBrowserLocale() || undefined,
+      ...(timezone !== null ? { timezone } : {}),
     };
 
     await this.#resource.__internal_basePost({
@@ -1107,12 +1124,14 @@ class SignInFuture implements SignInFutureResource {
       const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.#resource.identifier;
       const locale = getBrowserLocale();
+      const timezone = params.timezone ?? this.#resource.timezone ?? getBrowserTimezone();
       await this.#resource.__internal_basePost({
         path: this.#resource.pathRoot,
         body: {
           identifier: identifier || previousIdentifier,
           password: params.password,
           ...(locale ? { locale } : {}),
+          ...(timezone !== null ? { timezone } : {}),
         },
       });
     });

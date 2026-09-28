@@ -7,9 +7,9 @@ import { Avatar } from '../../components/avatar';
 import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
+import { Icon } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
-import { panelStyles } from '../../components/profile';
 import { Select } from '../../components/select';
 import { Spinner } from '../../components/spinner';
 import { Table, type TableHeaderCellProps } from '../../components/table';
@@ -20,6 +20,7 @@ import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
 import { styles } from './members-table-tab.styles';
 import type { MembersTableSort, MembersTableTabViewProps, OrganizationProfileMember } from './members-table-tab.types';
+import { tableTabStyles } from './table-tab.styles';
 
 const getRowId = (member: OrganizationProfileMember) => member.id;
 const canManageMember = (member: OrganizationProfileMember) => !member.isCurrentUser && !member.isDeprovisioned;
@@ -113,7 +114,7 @@ export function MembersTableTabView({
   const query = searchValue.trim();
   return (
     <>
-      <div {...mergeStyleProps(themeProps('members-table-tab'), stylex.props(panelStyles.root))}>
+      <div {...mergeStyleProps(themeProps('members-table-tab'), stylex.props(tableTabStyles.root))}>
         <Table.Toolbar>
           <Table.Search
             ref={searchInput}
@@ -127,6 +128,7 @@ export function MembersTableTabView({
               ref={inviteButton}
               onClick={onInvite}
             >
+              <Icon name='plus' />
               {m.invite}
             </Button>
           ) : null}

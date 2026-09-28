@@ -462,7 +462,12 @@ describe('useUserButtonModel', () => {
     render(<Harness />);
 
     const rows = memberships();
-    expect(rows[0]).toMatchObject({ kind: 'membership', organizationId: 'org_1', name: 'Acme', membersCount: 3 });
+    expect(rows[0]).toMatchObject({
+      kind: 'membership',
+      organizationId: 'org_1',
+      name: 'Acme',
+      membersCount: 3,
+    });
 
     const suggestions = JSON.parse(screen.getByTestId('suggestions').textContent ?? '[]');
     expect(suggestions[0]).toMatchObject({

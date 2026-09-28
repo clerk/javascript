@@ -159,6 +159,8 @@ export type {
   PopoverTitleProps,
   PopoverTriggerProps,
 } from '../components/popover';
+export { Panel } from '../components/panel';
+export type { PanelRootProps, PanelSectionsProps, PanelTitleProps } from '../components/panel';
 export { Profile } from '../components/profile';
 export type {
   ProfileContentProps,
@@ -166,7 +168,6 @@ export type {
   ProfileNavItemProps,
   ProfileNavProps,
   ProfileContentPanelProps,
-  ProfilePageTitleProps,
   ProfileRootProps,
   ProfileTitleProps,
 } from '../components/profile';

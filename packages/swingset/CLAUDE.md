@@ -14,7 +14,9 @@ pnpm build --filter @clerk/swingset  # next build
 pnpm format --filter @clerk/swingset # format-package.mjs (--check for CI)
 ```
 
-There are no tests or lint scripts in this package, yet.
+There is no lint script in this package.
+
+Swingset has no tests, and none should be added. Don't add test files, a Vitest config, or a `test` script here. Test components and flows in `@clerk/mosaic`, next to the code they cover. Stories and fixtures exist only to drive the explorer, so don't add options or exports to them for tests.
 
 ## Key architecture facts
 

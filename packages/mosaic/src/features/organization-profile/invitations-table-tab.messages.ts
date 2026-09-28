@@ -6,7 +6,7 @@ export const invitationsTableTabMessages = {
   actions: 'Actions',
   search: 'Search invitations',
   clearSearch: 'Clear search',
-  invite: 'Invite members',
+  invite: 'Invite',
   empty: 'No invitations found',
   emptyDescription: 'Your search for "{query}" did not return any results.',
   noInvitations: 'No pending invitations',

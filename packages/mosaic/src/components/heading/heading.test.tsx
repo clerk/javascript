@@ -39,6 +39,11 @@ describe('Mosaic Heading', () => {
     expect(heading).toHaveClass('cl-heading', stylex.props(atoms.spaced).className ?? '');
   });
 
+  it('renders the heading element for the level it is given', () => {
+    render(<Heading level={4}>Title</Heading>);
+    expect(screen.getByRole('heading', { level: 4, name: 'Title' })).toHaveClass('cl-heading');
+  });
+
   it('merges a className carried by the render element instead of clobbering the slot class', () => {
     render(<Heading render={<h3 className='from-source' />}>Title</Heading>);
     expect(screen.getByRole('heading')).toHaveClass('cl-heading', 'from-source');

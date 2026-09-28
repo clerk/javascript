@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useInvitationsTableFixture } from './invitations-table-tab';
 import { useMembersTableFixture } from './members-table-tab';
 import { useOrganizationProfileAPIKeysFixture } from './organization-profile-api-keys';
+import { useInviteMembersFixture } from './organization-profile-invite-members';
 import { useRequestsTableFixture } from './requests-table-tab';
 import { usePreviewImage } from './use-preview-image';
 
@@ -28,6 +29,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
   const members = useMembersTableFixture();
   const invitations = useInvitationsTableFixture();
   const requests = useRequestsTableFixture();
+  const { onInvite, inviteDialog } = useInviteMembersFixture();
 
   const save = async (field: 'name' | 'slug', apply: () => void) => {
     await settleAfter(800);
@@ -54,7 +56,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
 
   const pages: OrganizationProfileViewProps['pages'] = {
     general,
-    members: { members, invitations, requests },
+    members: { members, invitations, requests, onInvite, inviteDialog },
     security: {},
     billing: {},
     apiKeys,

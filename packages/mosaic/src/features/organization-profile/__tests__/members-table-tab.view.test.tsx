@@ -177,7 +177,7 @@ describe('MembersTableTabView', () => {
     const { props } = renderView({ onRemove: vi.fn(), onChangeRole: vi.fn(), onInvite: vi.fn() });
     expect(screen.queryByRole('button', { name: 'Manage Ada Lovelace' })).not.toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /^Change role for Ada Lovelace/ })).toBeDisabled();
-    await user.click(screen.getByRole('button', { name: 'Invite members' }));
+    await user.click(screen.getByRole('button', { name: 'Invite' }));
     expect(props.onInvite).toHaveBeenCalledOnce();
     await user.click(screen.getByRole('combobox', { name: /^Change role for Grace Hopper/ }));
     await user.click(screen.getByRole('option', { name: 'Admin' }));
@@ -236,7 +236,5 @@ it.each([true, false])('removes the confirmed member and restores focus with inv
   await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }));
   await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   expect(onMutation).toHaveBeenLastCalledWith('grace');
-  expect(
-    hasInvite ? screen.getByRole('button', { name: 'Invite members' }) : screen.getByRole('searchbox'),
-  ).toHaveFocus();
+  expect(hasInvite ? screen.getByRole('button', { name: 'Invite' }) : screen.getByRole('searchbox')).toHaveFocus();
 });

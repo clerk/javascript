@@ -60,10 +60,10 @@ describe('UserProfileSecurityPanelView', () => {
   it('composes authentication, active devices, and the danger zone', () => {
     renderView({ onDeleteAccount: vi.fn(() => Promise.resolve()) });
 
-    expect(screen.getByRole('heading', { level: 3, name: 'Security' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 4, name: 'Authentication' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 4, name: 'Active devices' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Security' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Authentication' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Active devices' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
     expect(screen.getByText('Password')).toBeVisible();
     expect(screen.getByText('Passkeys')).toBeVisible();
     expect(screen.getByText('2-step verification')).toBeVisible();

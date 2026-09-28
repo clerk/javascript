@@ -13,6 +13,7 @@ export const requestsTableTabMessages = {
   declineRequest: 'Decline {name}',
   search: 'Search requests',
   clearSearch: 'Clear search',
+  invite: 'Invite',
   empty: 'No requests found',
   emptyDescription: 'Your search for "{query}" did not return any results.',
   noRequests: 'No pending requests',
