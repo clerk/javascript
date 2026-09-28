@@ -9,7 +9,7 @@ export function ReverificationDialog({
 }: ReverificationController & { finalFocus?: DialogFocusTarget }) {
   return (
     <Dialog.Root
-      open={controller.phase !== 'inactive'}
+      open={controller.status === 'ready' || controller.status === 'unavailable'}
       onOpenChange={open => {
         if (!open && controller.phase === 'active') {
           controller.onCancel?.();

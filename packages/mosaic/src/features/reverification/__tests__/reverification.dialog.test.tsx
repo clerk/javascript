@@ -41,6 +41,42 @@ describe('ReverificationDialog', () => {
     expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
   });
 
+  it('waits for the challenge to load before opening', () => {
+    const { rerender } = render(
+      <MosaicProvider>
+        <ReverificationDialog
+          status='loading'
+          phase='active'
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    rerender(
+      <MosaicProvider>
+        <ReverificationDialog {...ready('active')} />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('dialog', { name: 'Verification required' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Password')).toBeInTheDocument();
+  });
+
+  it('opens when verification is unavailable', () => {
+    render(
+      <MosaicProvider>
+        <ReverificationDialog
+          status='unavailable'
+          phase='active'
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Close' })).toBeInTheDocument();
+  });
+
   it('cancels the active challenge when dismissed', async () => {
     const user = userEvent.setup();
     const onCancel = vi.fn();
