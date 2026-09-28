@@ -4,7 +4,7 @@ import type { Ref } from 'react';
 import type { ActionMenuAction } from '../../components/action-menu';
 import { ActionMenu } from '../../components/action-menu';
 import { Badge } from '../../components/badge';
-import { Button } from '../../components/button';
+import { SubmitButton } from '../../components/button';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
 import { fill, useMessages } from '../../localization';
@@ -14,12 +14,16 @@ import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-prof
 export function UserProfileWeb3WalletRowView({
   wallet,
   triggerRef,
+  isPending = false,
+  isDisabled = false,
   onConnect,
   onSetPrimary,
   onRemove,
 }: {
   wallet: UserProfileWeb3Wallet | UserProfileWeb3Provider;
   triggerRef?: Ref<HTMLButtonElement>;
+  isPending?: boolean;
+  isDisabled?: boolean;
   onConnect?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (wallet: UserProfileWeb3Wallet) => void;
@@ -31,7 +35,7 @@ export function UserProfileWeb3WalletRowView({
   const shortAddress = address && (address.length <= 10 ? address : `${address.slice(0, 6)}...${address.slice(-4)}`);
   const actions: ActionMenuAction[] = [];
 
-  if (linkedWallet && !linkedWallet.isPrimary && linkedWallet.isVerified && onSetPrimary) {
+  if (linkedWallet && !linkedWallet.isPrimary && linkedWallet.isVerified && onSetPrimary && !isDisabled) {
     actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(wallet.id) });
   }
   if (linkedWallet && onRemove && linkedWallet.canRemove !== false) {
@@ -79,10 +83,12 @@ export function UserProfileWeb3WalletRowView({
         </Section.Content>
         {onConnect ? (
           <Section.Actions>
-            <Button
+            <SubmitButton
               color='neutral'
               size='sm'
               variant='outline'
+              isPending={isPending}
+              disabled={isDisabled && !isPending}
               aria-label={fill(m.connectLabel, { provider: wallet.provider ?? '' })}
               onClick={() => onConnect(wallet.id)}
             >
@@ -92,7 +98,7 @@ export function UserProfileWeb3WalletRowView({
                 placement='inline-end'
                 size='sm'
               />
-            </Button>
+            </SubmitButton>
           </Section.Actions>
         ) : actions.length > 0 ? (
           <Section.Actions>
