@@ -18,6 +18,11 @@ export interface BiometricAvailability {
   canEvaluateDeviceOwner: boolean;
   /** Why biometric authentication cannot be evaluated, or `null` when it can. */
   errorCode: BiometricsErrorCode | null;
+  /**
+   * Whether the device has hardware-backed key storage (the Secure Enclave on iOS). `false` on the iOS Simulator.
+   * `createKey()` rejects with `secure_key_storage_unavailable` when this is `false`.
+   */
+  secureKeyStorageAvailable: boolean;
 }
 
 export interface BiometricCredentialKey {
@@ -75,6 +80,7 @@ export type BiometricsErrorCode =
   | 'biometry_not_enrolled'
   | 'biometry_lockout'
   | 'passcode_not_set'
+  | 'secure_key_storage_unavailable'
   | 'key_not_found'
   | 'key_invalidated'
   | 'key_generation_failed'

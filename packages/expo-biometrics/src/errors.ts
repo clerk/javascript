@@ -9,6 +9,7 @@ const ERROR_CODES: ReadonlySet<string> = new Set<BiometricsErrorCode>([
   'biometry_not_enrolled',
   'biometry_lockout',
   'passcode_not_set',
+  'secure_key_storage_unavailable',
   'key_not_found',
   'key_invalidated',
   'key_generation_failed',

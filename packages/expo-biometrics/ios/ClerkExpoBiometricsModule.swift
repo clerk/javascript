@@ -20,6 +20,7 @@ struct BiometricAvailabilityResult: Record {
   @Field var canEvaluateBiometrics: Bool = false
   @Field var canEvaluateDeviceOwner: Bool = false
   @Field var errorCode: String?
+  @Field var secureKeyStorageAvailable: Bool = false
 }
 
 struct BiometricCredentialKeyResult: Record {
@@ -64,6 +65,7 @@ public final class ClerkExpoBiometricsModule: Module {
       result.canEvaluateBiometrics = availability.canEvaluateBiometrics
       result.canEvaluateDeviceOwner = availability.canEvaluateDeviceOwner
       result.errorCode = availability.errorCode?.rawValue
+      result.secureKeyStorageAvailable = availability.secureKeyStorageAvailable
       return result
     }
 

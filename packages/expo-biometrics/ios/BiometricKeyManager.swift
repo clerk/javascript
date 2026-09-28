@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 import LocalAuthentication
 import Security
@@ -7,6 +8,7 @@ struct BiometricAvailability: Equatable {
   let canEvaluateBiometrics: Bool
   let canEvaluateDeviceOwner: Bool
   let errorCode: BiometricsError.Code?
+  let secureKeyStorageAvailable: Bool
 }
 
 struct BiometricCredentialKey: Equatable {
@@ -16,6 +18,21 @@ struct BiometricCredentialKey: Equatable {
 
 /// Secure Enclave keys laid out as ClerkKit's `BiometricCredentialKeyManager` creates them.
 final class BiometricKeyManager {
+  private let isSecureEnclaveAvailable: () -> Bool
+
+  init(isSecureEnclaveAvailable: @escaping () -> Bool = BiometricKeyManager.deviceHasSecureEnclave) {
+    self.isSecureEnclaveAvailable = isSecureEnclaveAvailable
+  }
+
+  static func deviceHasSecureEnclave() -> Bool {
+    // SecureEnclave.isAvailable is true on the Simulator, where Secure Enclave keys still fail with errSecAuthFailed.
+    #if targetEnvironment(simulator)
+      return false
+    #else
+      return SecureEnclave.isAvailable
+    #endif
+  }
+
   func availability() -> BiometricAvailability {
     let context = LAContext()
     var biometricsError: NSError?
@@ -31,11 +48,16 @@ final class BiometricKeyManager {
       canEvaluateDeviceOwner: canEvaluateDeviceOwner,
       errorCode: canEvaluateBiometrics
         ? nil
-        : BiometricsError.localAuthentication(biometricsError, fallback: .biometryNotAvailable).code
+        : BiometricsError.localAuthentication(biometricsError, fallback: .biometryNotAvailable).code,
+      secureKeyStorageAvailable: isSecureEnclaveAvailable()
     )
   }
 
   func createKey(policy: BiometricCredentialPolicy) throws -> BiometricCredentialKey {
+    guard isSecureEnclaveAvailable() else {
+      throw BiometricsError(.secureKeyStorageUnavailable, "This device has no Secure Enclave to hold the biometric credential key.")
+    }
+
     let context = LAContext()
     var laError: NSError?
     guard context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &laError) else {
