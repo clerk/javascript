@@ -6,6 +6,12 @@ export const styles = stylex.create({
   accountIdentifier: {
     fontWeight: fontWeightVars['--cl-font-medium'],
   },
+  rowAvatar: {
+    '--_cl-avatar-radius': radiusVars['--cl-radius-sm'],
+    fontSize: '0.5rem',
+    height: space['5'],
+    width: space['5'],
+  },
   trigger: {
     padding: 0,
     borderRadius: radiusVars['--cl-radius-md'],
@@ -15,6 +21,8 @@ export const styles = stylex.create({
     cursor: 'pointer',
     display: 'inline-flex',
     transitionDuration: durationVars['--cl-duration-base'],
+    maxWidth: '100%',
+    minWidth: 0,
   },
 
   triggerLabelled: {
@@ -41,11 +49,15 @@ export const styles = stylex.create({
     transitionProperty: 'opacity',
   },
 
+  triggerRinglessAvatar: {
+    outlineStyle: 'none',
+  },
+
   triggerRound: {
     borderRadius: radiusVars['--cl-radius-full'],
   },
 
-  // Matches `Item.Label`, so the trigger names a workspace the same way its row does. Capped,
+  // Matches `UserButtonItemLabel`, so the trigger names a workspace the same way its row does. Capped,
   // because the trigger sits in a host app's chrome and a long workspace name would push it apart.
   triggerName: {
     color: colorVars['--cl-color-foreground'],
@@ -65,13 +77,5 @@ export const styles = stylex.create({
   // is ours.
   scroll: {
     maxHeight: '18rem',
-  },
-
-  // The trailing column is as wide as the `⋯` menu button that owns it, so whatever stands in
-  // that button's place — the active check, a spinner — lands on the same center line and the
-  // right edge of every row holds still as rows change state.
-  trailing: {
-    justifyContent: 'center',
-    width: space['7'],
   },
 });

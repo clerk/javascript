@@ -1,5 +1,11 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
+import {
+  Default as ActionBarDefault,
+  InDialog as ActionBarInDialog,
+  Inline as ActionBarInline,
+  meta as actionBarMeta,
+} from '../stories/action-bar.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
@@ -179,6 +185,7 @@ import {
   Primary as PaginationPrimary,
   SinglePage as PaginationSinglePage,
 } from '../stories/pagination.stories';
+import { Default as PanelDefault, meta as panelMeta } from '../stories/panel.component.stories';
 import {
   Default as PhoneInputDefault,
   Disabled as PhoneInputDisabled,
@@ -480,6 +487,13 @@ const organizationProfileDangerSectionModule: StoryModule = {
   LeaveOnly: OrganizationProfileDangerSectionLeaveOnly,
 };
 
+const actionBarModule: StoryModule = {
+  meta: actionBarMeta,
+  Default: ActionBarDefault,
+  InDialog: ActionBarInDialog,
+  Inline: ActionBarInline,
+};
+
 const avatarModule: StoryModule = {
   meta: avatarMeta,
   Primary: AvatarPrimary,
@@ -547,6 +561,7 @@ const popoverComponentModule: StoryModule = {
   Placement: PopoverComponentPlacement,
   Alignment: PopoverComponentAlignment,
 };
+const panelModule: StoryModule = { meta: panelMeta, Default: PanelDefault };
 const profileComponentModule: StoryModule = {
   meta: profileComponentMeta,
   Default: ProfileDefault,
@@ -915,6 +930,7 @@ export const registry: StoryModule[] = [
   confirmationModule,
   destructiveModule,
   // Components
+  actionBarModule,
   avatarModule,
   badgeModule,
   bannerModule,
@@ -938,6 +954,7 @@ export const registry: StoryModule[] = [
   menuComponentModule,
   otpComponentModule,
   paginationModule,
+  panelModule,
   popoverComponentModule,
   profileComponentModule,
   sectionModule,

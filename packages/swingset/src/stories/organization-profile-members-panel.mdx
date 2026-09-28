@@ -10,6 +10,8 @@ Revoking an invitation opens a confirmation dialog. The dialog awaits the action
 
 Accepting or declining a request runs immediately. Both row actions are held while the callback is pending, and failures appear beside the actions so the user can retry. After a successful removal, focus moves to a surviving row action or the search field.
 
+Every tab shows an Invite button when the panel is given `onInvite`. It opens the invite dialog, which takes email addresses in a tag input and a role. Malformed email addresses, and any the caller passes in `rejectedEmailAddresses`, show as invalid tags and disable sending. The dialog stays open while `isPending` is true.
+
 ## Example
 
 ### Legacy
@@ -25,6 +27,10 @@ The Members table shows the user, joined date, role, and optional row actions. T
   { name: 'Select', href: '/components/select', layer: 'Components' },
   { name: 'Menu', href: '/components/menu', layer: 'Components' },
   { name: 'Button', href: '/components/button', layer: 'Components' },
+  { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
+  { name: 'Card', href: '/components/card', layer: 'Components' },
+  { name: 'Field', href: '/components/field', layer: 'Components' },
+  { name: 'TagInput', href: '/components/tag-input', layer: 'Components' },
 ]} />
 
 ## Examples

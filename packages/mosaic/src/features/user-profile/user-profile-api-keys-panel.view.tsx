@@ -6,7 +6,7 @@ import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
-import { panelStyles, Profile } from '../../components/profile';
+import { Panel } from '../../components/panel';
 import { Spinner } from '../../components/spinner';
 import type { TableHeaderCellProps } from '../../components/table';
 import { Table } from '../../components/table';
@@ -15,7 +15,7 @@ import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import { fill, useMessages } from '../../localization';
 import { useDataTable } from '../../primitives/hooks';
-import { mergeStyleProps, themeProps } from '../../props';
+import { themeProps } from '../../props';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 import { styles } from './user-profile-api-keys-panel.styles';
 import type {
@@ -110,8 +110,8 @@ export function UserProfileApiKeysPanelView({
     : { label: m.noKeys, description: m.noKeysDescription };
   return (
     <>
-      <div {...mergeStyleProps(themeProps('user-profile-api-keys-panel'), stylex.props(panelStyles.root))}>
-        <Profile.PageTitle>{m.title}</Profile.PageTitle>
+      <Panel.Root render={<div {...themeProps('user-profile-api-keys-panel')} />}>
+        <Panel.Title>{m.title}</Panel.Title>
         <Table.Toolbar>
           <Table.Search
             ref={searchInput}
@@ -239,7 +239,7 @@ export function UserProfileApiKeysPanelView({
             onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
           />
         ) : null}
-      </div>
+      </Panel.Root>
       {createDialog ? <UserProfileCreateAPIKeyDialog {...createDialog} /> : null}
       {onRevoke ? (
         <Destructive

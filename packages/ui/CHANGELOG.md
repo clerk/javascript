@@ -1,5 +1,31 @@
 # @clerk/ui
 
+## 1.36.0
+
+### Minor Changes
+
+- `<SignIn />` and `<SignUp />` show a dedicated screen when a request is blocked, with a reference the user can quote to support. ([#9600](https://github.com/clerk/javascript/pull/9600)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+  `action_blocked` errors now expose `traceId`, `title`, `description`, `linkUrl`, `linkText`, `kind` and `data` on `meta`.
+
+### Patch Changes
+
+- Clear the invitation ticket from the URL when a sign-in completes on a verification challenge. ([#9621](https://github.com/clerk/javascript/pull/9621)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Fix enterprise SSO sign-ins erroring instead of showing a verification challenge raised while handing off to the identity provider. ([#9619](https://github.com/clerk/javascript/pull/9619)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+  If you use the prebuilt `<SignIn />` component, there is nothing to do. If you have Clerk Protect enabled and call `signIn.authenticateWithRedirect()` or `signIn.authenticateWithPopup()` from a custom sign-in flow, catch a `ClerkRuntimeError` with code `protect_check_required` and show the verification challenge, to avoid a stalled sign-in.
+
+  That error means a verification challenge has to be completed before the sign-in can redirect. It replaces the generic "not supported" error these methods threw before. When it is thrown, the sign-in is gated: `signIn.protectCheck` is set, or its status is `needs_protect_check`. For enterprise SSO, run the challenge and then call `authenticateWithRedirect()` again with `continueSignIn: true`. If the server has already prepared the redirect, the sign-in continues to the identity provider and the challenge runs when it returns, so no error is thrown.
+
+- Fix the verification challenge card spinning indefinitely when continuing the sign-in after a completed challenge fails. The error is now shown, and "Try again" retries the continuation. ([#9620](https://github.com/clerk/javascript/pull/9620)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Fix sign-ins that use an enterprise connection stranding on "Use another method" after a verification challenge, instead of continuing to the identity provider. ([#9620](https://github.com/clerk/javascript/pull/9620)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+- Updated dependencies [[`645a532`](https://github.com/clerk/javascript/commit/645a5327d9c7cae8052e39958ec4d737457d179a), [`84ee588`](https://github.com/clerk/javascript/commit/84ee588a712ffa0bb2988531d7a2727c9e06ac37), [`4e538ac`](https://github.com/clerk/javascript/commit/4e538ac07ed412706516531d9be9696bbd31bf24)]:
+  - @clerk/localizations@4.20.0
+  - @clerk/shared@4.36.0
+
 ## 1.35.0
 
 ### Minor Changes

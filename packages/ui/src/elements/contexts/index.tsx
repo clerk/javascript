@@ -9,7 +9,13 @@ import { useLocalizations } from '../../customizables';
 
 type Status = 'idle' | 'loading' | 'error';
 type Metadata = string | undefined;
-type State = { status: Status; metadata: Metadata; error: string | undefined };
+type CardError = ClerkRuntimeError | ClerkAPIError | Metadata | string;
+type State = {
+  status: Status;
+  metadata: Metadata;
+  error: string | undefined;
+  rawError?: CardError;
+};
 type CardStateCtxValue = {
   state: State;
   setState: React.Dispatch<React.SetStateAction<State>>;
@@ -21,17 +27,16 @@ export const CardStateProvider = (props: React.PropsWithChildren<any>) => {
   const { translateError } = useLocalizations();
   const router = useRouter();
 
-  const [state, setState] = React.useState<State>(() => ({
-    status: 'idle',
-    metadata: undefined,
-    error: translateError(window?.Clerk?.__internal_last_error || undefined),
-  }));
+  const [state, setState] = React.useState<State>(() => {
+    const lastError = window?.Clerk?.__internal_last_error || undefined;
+    return { status: 'idle', metadata: undefined, error: translateError(lastError), rawError: lastError };
+  });
 
   React.useEffect(() => {
     const error = window?.Clerk?.__internal_last_error;
 
     if (error) {
-      setState(s => ({ ...s, error: translateError(error) }));
+      setState(s => ({ ...s, error: translateError(error), rawError: error }));
     }
   }, [translateError, setState, router.currentPath]);
 
@@ -44,8 +49,8 @@ export const useCardState = () => {
   const { translateError } = useLocalizations();
 
   const setIdle = (metadata?: Metadata) => setState(s => ({ ...s, status: 'idle', metadata }));
-  const setError = (metadata: ClerkRuntimeError | ClerkAPIError | Metadata | string) =>
-    setState(s => ({ ...s, error: translateError(metadata) }));
+  const setError = (metadata: CardError) =>
+    setState(s => ({ ...s, error: translateError(metadata), rawError: metadata || undefined }));
   const setLoading = (metadata?: Metadata) => setState(s => ({ ...s, status: 'loading', metadata }));
   const runAsync = async <T = unknown,>(cb: Promise<T> | (() => Promise<T>), metadata?: Metadata) => {
     setLoading(metadata);
@@ -63,6 +68,7 @@ export const useCardState = () => {
     runAsync,
     loadingMetadata: state.status === 'loading' ? state.metadata : undefined,
     error: state.error ? state.error : undefined,
+    rawError: state.rawError,
     isLoading: state.status === 'loading',
     isIdle: state.status === 'idle',
     state,
@@ -144,7 +150,8 @@ export type FlowMetadata = {
     | 'configureMapAttributes'
     | 'testSso'
     | 'ssoActivate'
-    | 'protectCheck';
+    | 'protectCheck'
+    | 'actionBlocked';
 };
 
 const [FlowMetadataCtx, useFlowMetadata] = createContextAndHook<FlowMetadata>('FlowMetadata');

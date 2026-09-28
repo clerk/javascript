@@ -2,11 +2,11 @@ import * as stylex from '@stylexjs/stylex';
 import { useRef, useState } from 'react';
 
 import { Avatar } from '../../components/avatar';
-import { SubmitButton } from '../../components/button';
+import { Button, SubmitButton } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
+import { Icon } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
-import { panelStyles } from '../../components/profile';
 import { Spinner } from '../../components/spinner';
 import { Table, type TableHeaderCellProps } from '../../components/table';
 import { Text } from '../../components/text';
@@ -21,11 +21,13 @@ import type {
   RequestsTableSort,
   RequestsTableTabViewProps,
 } from './requests-table-tab.types';
+import { tableTabStyles } from './table-tab.styles';
 
 const getRowId = (request: OrganizationProfileRequest) => request.id;
 
 export function RequestsTableTabView({
   requests,
+  onInvite,
   onAccept,
   onDecline,
   totalCount,
@@ -46,15 +48,16 @@ export function RequestsTableTabView({
   const columnCount = 2 + Number(hasActions) + Number(Boolean(onBulkAction));
   const query = searchValue.trim();
   const searchInput = useRef<HTMLInputElement>(null);
+  const inviteButton = useRef<HTMLButtonElement>(null);
   const acceptFocus = useListRemovalFocus({
     ids: requests.map(getRowId),
     onRemove: onAccept,
-    fallback: () => searchInput.current,
+    fallback: () => inviteButton.current ?? searchInput.current,
   });
   const declineFocus = useListRemovalFocus({
     ids: requests.map(getRowId),
     onRemove: onDecline,
-    fallback: () => searchInput.current,
+    fallback: () => inviteButton.current ?? searchInput.current,
   });
   const pagination = { pageIndex: page - 1, pageSize };
   const table = useDataTable({
@@ -106,7 +109,7 @@ export function RequestsTableTabView({
     };
   };
   return (
-    <div {...mergeStyleProps(themeProps('requests-table-tab'), stylex.props(panelStyles.root))}>
+    <div {...mergeStyleProps(themeProps('requests-table-tab'), stylex.props(tableTabStyles.root))}>
       <Table.Toolbar>
         <Table.Search
           ref={searchInput}
@@ -115,6 +118,15 @@ export function RequestsTableTabView({
           value={table.globalFilter}
           onValueChange={table.setGlobalFilter}
         />
+        {onInvite ? (
+          <Button
+            ref={inviteButton}
+            onClick={onInvite}
+          >
+            <Icon name='plus' />
+            {m.invite}
+          </Button>
+        ) : null}
       </Table.Toolbar>
       <Table.Root
         aria-label={m.title}

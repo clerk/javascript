@@ -14,6 +14,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const roRO: LocalizationResource = {
   locale: 'ro-RO',
+  actionBlocked: {
+    subtitle: undefined,
+    title: undefined,
+    traceIdLabel: undefined,
+  },
   apiKeys: {
     action__add: 'Adaugă cheie nouă',
     action__search: 'Caută chei',
@@ -243,14 +248,23 @@ export const roRO: LocalizationResource = {
     },
     configureStep: {
       actionLabel__generateToken: undefined,
+      actionLabel__replaceKey: undefined,
       actionLabel__retry: undefined,
+      actionLabel__uploadKey: undefined,
+      badge__credentialsConfigured: undefined,
+      badge__credentialsMissing: undefined,
       domainsLabel: undefined,
+      error__invalidKeyFile: undefined,
       error__ssoRequired: {
         subtitle: undefined,
         title: undefined,
       },
+      formFieldHint__subjectEmail: undefined,
+      formFieldInputPlaceholder__subjectEmail: undefined,
       formFieldInputPlaceholder__token: undefined,
       formFieldLabel__endpointUrl: undefined,
+      formFieldLabel__serviceAccountKey: undefined,
+      formFieldLabel__subjectEmail: undefined,
       formFieldLabel__token: undefined,
       instructions: {
         actionLabel__toggle: undefined,
@@ -266,6 +280,13 @@ export const roRO: LocalizationResource = {
           step3: undefined,
           step4: undefined,
         },
+        google: {
+          step1: undefined,
+          step2: undefined,
+          step3: undefined,
+          step4: undefined,
+          step5: undefined,
+        },
         okta: {
           step1: undefined,
           step2: undefined,
@@ -276,10 +297,6 @@ export const roRO: LocalizationResource = {
       notice__tokenShownOnce: undefined,
       subtitle: undefined,
       title: undefined,
-      warning__googleUnsupported: {
-        subtitle: undefined,
-        title: undefined,
-      },
       warning__ssoInactive: undefined,
     },
     navbar: {
@@ -298,14 +315,28 @@ export const roRO: LocalizationResource = {
     },
     testStep: {
       actionLabel__complete: undefined,
+      actionLabel__syncNow: undefined,
       badge__active: undefined,
       badge__deprovisioned: undefined,
       description: undefined,
+      description__pull: undefined,
+      empty__noUsersProvisioned: undefined,
+      empty__waitingForFirstSync: undefined,
       empty__waitingForFirstUser: undefined,
+      error__lastSyncFailed: undefined,
       error__loadUsers: undefined,
+      error__syncFailed: undefined,
       note: undefined,
       noteLabel: undefined,
       subtitle: undefined,
+      syncRow: {
+        neverSynced: undefined,
+        title: undefined,
+      },
+      syncStatus__cancelled: undefined,
+      syncStatus__failed: undefined,
+      syncStatus__running: undefined,
+      syncStatus__succeeded: undefined,
       title: undefined,
     },
   },
@@ -2085,6 +2116,7 @@ export const roRO: LocalizationResource = {
     protect_check_execution_failed: undefined,
     protect_check_invalid_script: undefined,
     protect_check_invalid_sdk_url: undefined,
+    protect_check_required: undefined,
     protect_check_script_load_failed: undefined,
     protect_check_timed_out: undefined,
     protect_check_unsupported_environment: undefined,
@@ -2092,6 +2124,7 @@ export const roRO: LocalizationResource = {
     sso_bypass_domain_not_served: undefined,
     ticket_expired_code: undefined,
     ticket_invalid_code: undefined,
+    too_many_unverified_identifications: undefined,
     web3_missing_identifier: 'Nu am găsit o extensie pentru portofel Web3. Te rugăm instalează una pentru a continua.',
     web3_signature_request_rejected: 'Ați respins solicitarea de semnătură. Încercați din nou pentru a continua.',
     web3_solana_signature_generation_failed:

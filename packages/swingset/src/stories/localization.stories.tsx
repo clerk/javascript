@@ -14,7 +14,7 @@ export { default as __source } from './localization.stories?raw';
 export const meta: StoryMeta = {
   group: 'Localization',
   title: 'Localization',
-  status: 'wip',
+  status: 'stable',
   source: 'packages/mosaic/src/localization/context.tsx',
 };
 

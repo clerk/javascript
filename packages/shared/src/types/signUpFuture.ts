@@ -45,6 +45,8 @@ export interface SignUpFutureAdditionalParams {
 
 /** @generateWithEmptyComment */
 export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
+  /** The timezone to assign to the user. If omitted, defaults to the browser's timezone. */
+  timezone?: string;
   /**
    * The strategy to use for the sign-up. The following strategies are supported:
    * <ul>
@@ -474,6 +476,7 @@ export interface SignUpFutureResource {
    * The locale of the user in [BCP 47](https://developer.mozilla.org/en-US/docs/Glossary/BCP_47_language_tag) format (e.g., "en-US", "fr-FR"), or `null` if not set.
    */
   readonly locale: string | null;
+  readonly timezone: string | null;
 
   /**
    * The current protect check challenge, if one is pending. Only populated when Protect mid-flow

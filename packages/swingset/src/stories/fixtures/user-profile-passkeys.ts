@@ -1,6 +1,9 @@
 import type { UserProfilePasskey } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
 import { useRef, useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosName, chaosRows, chaosText } from '@/lib/chaos';
+
 interface PasskeysFixture {
   passkeys: UserProfilePasskey[];
   addError: string | undefined;
@@ -9,18 +12,24 @@ interface PasskeysFixture {
   onRemove: (id: string) => Promise<void>;
 }
 
+const examplePasskeys: UserProfilePasskey[] = [
+  { id: 'laptop', name: 'MacBook', createdAtLabel: 'Created today', lastUsedAtLabel: 'Last used 1 hour ago' },
+  { id: 'phone', name: 'iPhone', createdAtLabel: 'Created yesterday' },
+];
+
 export function usePasskeysFixture({
   empty = false,
   failOnce = false,
 }: { empty?: boolean; failOnce?: boolean } = {}): PasskeysFixture {
-  const [passkeys, setPasskeys] = useState<UserProfilePasskey[]>(
-    empty
-      ? []
-      : [
-          { id: 'laptop', name: 'MacBook', createdAtLabel: 'Created today', lastUsedAtLabel: 'Last used 1 hour ago' },
-          { id: 'phone', name: 'iPhone', createdAtLabel: 'Created yesterday' },
-        ],
+  const seed = useChaosFixture(examplePasskeys, items =>
+    chaosRows(items, 12).map((passkey, index) => ({
+      ...passkey,
+      name: chaosName(index),
+      createdAtLabel: chaosText(passkey.createdAtLabel),
+      lastUsedAtLabel: chaosText(passkey.lastUsedAtLabel),
+    })),
   );
+  const [passkeys, setPasskeys] = useState(empty ? [] : seed);
   const [addError, setAddError] = useState<string>();
   const failures = useRef(new Set<string>());
   const nextId = useRef(1);

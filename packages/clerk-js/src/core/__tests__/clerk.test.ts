@@ -13,6 +13,7 @@ import { waitFor } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { mockJwt } from '@/test/core-fixtures';
+import { restoreDocument, setDocumentVisibilityState } from '@/test/document-helpers';
 
 import { mockNativeRuntime } from '../../test/utils';
 import { Clerk } from '../clerk';
@@ -124,6 +125,7 @@ describe('Clerk singleton', () => {
     };
 
     Object.defineProperty(global.window, 'addEventListener', {
+      configurable: true,
       value: mockAddEventListener,
     });
 
@@ -4064,6 +4066,119 @@ describe('Clerk singleton', () => {
       } as any);
 
       expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+  });
+
+  describe('page focus session touch', () => {
+    const windowListeners = new Map<string, Array<(event: any) => void>>();
+
+    const firePageFocus = () => {
+      for (const listener of windowListeners.get('focus') ?? []) {
+        listener(new Event('focus'));
+      }
+    };
+
+    const mockSession = {
+      id: 'sess_1',
+      status: 'active',
+      user: {},
+      touch: vi.fn(() => Promise.resolve()),
+      getToken: vi.fn(),
+      lastActiveToken: { getRawString: () => 'mocked-token' },
+    };
+
+    beforeEach(() => {
+      windowListeners.clear();
+      const recordWindowListener = (type: string, callback: (e: any) => void) => {
+        const listeners = windowListeners.get(type) ?? [];
+        listeners.push(callback);
+        windowListeners.set(type, listeners);
+
+        if (type === 'message') {
+          callback({
+            origin: 'https://' + productionPublishableKey,
+            data: {
+              browserToken: 'hey',
+            },
+          });
+        }
+      };
+      Object.defineProperty(global.window, 'addEventListener', {
+        configurable: true,
+        value: recordWindowListener,
+      });
+
+      mockSession.touch.mockReset();
+      mockSession.touch.mockResolvedValue(undefined);
+      setDocumentVisibilityState('visible');
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: { singleSessionMode: true },
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => true,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [mockSession],
+          lastActiveSessionId: mockSession.id,
+        }),
+      );
+    });
+
+    afterEach(() => {
+      restoreDocument();
+    });
+
+    it('does not surface a failed focus touch as an unhandled rejection', async () => {
+      const unhandled: unknown[] = [];
+      const onUnhandledRejection = (reason: unknown) => {
+        unhandled.push(reason);
+      };
+      process.on('unhandledRejection', onUnhandledRejection);
+
+      try {
+        mockSession.touch.mockRejectedValue(
+          new Error(
+            'ClerkJS: Network error at "https://clerk.example.com/v1/client/sessions/sess_1/touch" - TypeError: NetworkError when attempting to fetch resource. Please try again.',
+          ),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        firePageFocus();
+
+        expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'focus' });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(unhandled).toEqual([]);
+      } finally {
+        process.off('unhandledRejection', onUnhandledRejection);
+      }
+    });
+
+    it('still handles an unauthenticated focus touch', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load();
+      const handleUnauthenticated = vi.spyOn(sut, 'handleUnauthenticated').mockResolvedValue(undefined);
+      mockSession.touch.mockRejectedValue({ status: 401 });
+
+      firePageFocus();
+
+      await waitFor(() => {
+        expect(handleUnauthenticated).toHaveBeenCalled();
+      });
+    });
+
+    it('does not touch the session on focus when touchSession is false', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ touchSession: false });
+
+      firePageFocus();
+
+      expect(mockSession.touch).not.toHaveBeenCalled();
     });
   });
 });

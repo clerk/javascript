@@ -1,9 +1,8 @@
-import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 import { useRef } from 'react';
 
-import { panelStyles, Profile } from '../../components/profile';
-import { mergeStyleProps, themeProps } from '../../props';
+import { Panel } from '../../components/panel';
+import { themeProps } from '../../props';
 import type {
   UserProfileAccountSectionViewProps,
   UserProfileEmail,
@@ -85,14 +84,14 @@ export function UserProfileProfilePanelView({
 }: UserProfileProfilePanelViewProps): ReactElement {
   const pageTitle = useRef<HTMLDivElement>(null);
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-profile-panel'), stylex.props(panelStyles.root))}>
-      <Profile.PageTitle
+    <Panel.Root render={<div {...themeProps('user-profile-profile-panel')} />}>
+      <Panel.Title
         ref={pageTitle}
         tabIndex={-1}
       >
         Account
-      </Profile.PageTitle>
-      <div {...stylex.props(panelStyles.sections)}>
+      </Panel.Title>
+      <Panel.Sections>
         <UserProfileAccountSectionView
           allowMultipleAccounts={allowMultipleAccounts}
           emails={emails}
@@ -141,7 +140,7 @@ export function UserProfileProfilePanelView({
           onSetPrimary={onSetPrimaryWeb3Wallet}
         />
         {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
-      </div>
-    </div>
+      </Panel.Sections>
+    </Panel.Root>
   );
 }

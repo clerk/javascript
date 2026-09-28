@@ -6,7 +6,7 @@ import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 export function LiveUserButton() {
   return (
     <MosaicProvider>
-      <UserButton modePriority='user' />
+      <UserButton />
     </MosaicProvider>
   );
 }

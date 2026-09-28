@@ -277,6 +277,25 @@ describe('UserButton (connected)', () => {
     });
   });
 
+  it('renders the fallback while Clerk is still loading', () => {
+    isUserLoaded = false;
+    renderUserButton({ fallback: <output data-testid='fallback' /> });
+    expect(screen.getByTestId('fallback')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Open account menu/ })).toBeNull();
+  });
+
+  it('drops the fallback once nobody is signed in', () => {
+    const props = { fallback: <output data-testid='fallback' /> };
+    isUserLoaded = false;
+    const { rerender } = renderUserButton(props);
+    expect(screen.getByTestId('fallback')).toBeInTheDocument();
+
+    isUserLoaded = true;
+    user = null;
+    rerender(tree(props));
+    expect(host()).toBeEmptyDOMElement();
+  });
+
   it('renders the trigger and keeps the popover closed until clicked', () => {
     renderUserButton();
     expect(trigger()).toBeInTheDocument();
@@ -533,7 +552,7 @@ describe('UserButton (connected)', () => {
     renderUserButton();
     const act = await open();
 
-    await accountAction(act, 'Create organization');
+    await act.click(screen.getByRole('button', { name: 'Create organization' }));
 
     expect(openCreateOrganization).toHaveBeenCalled();
     expect(navigate).not.toHaveBeenCalled();
@@ -544,21 +563,20 @@ describe('UserButton (connected)', () => {
     renderUserButton({ createOrganizationUrl: '/new-org' });
     const act = await open();
 
-    await accountAction(act, 'Create organization');
+    await act.click(screen.getByRole('button', { name: 'Create organization' }));
 
     expect(navigate).toHaveBeenCalledWith('/new-org');
     expect(openCreateOrganization).not.toHaveBeenCalled();
     await waitFor(() => expect(popup()).toBeNull());
   });
 
-  it('leaves create-organization out of the account menu for a user who cannot open one', async () => {
+  it('leaves "Create organization" out of the list for a user who cannot open one', async () => {
     user = { ...(user as FakeUser), createOrganizationEnabled: false };
     renderUserButton();
-    const act = await open();
-    await act.click(accountMenu());
+    await open();
 
-    expect(await screen.findByRole('menuitem', { name: 'Manage account' })).toBeInTheDocument();
-    expect(screen.queryByRole('menuitem', { name: 'Create organization' })).toBeNull();
+    expect(await screen.findByRole('button', { name: 'Other' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Create organization' })).toBeNull();
   });
 
   it('spins the clicked affordance and stands every other one down while an action is in flight', async () => {
@@ -576,7 +594,7 @@ describe('UserButton (connected)', () => {
     // keeps its place in the tab order. Dropping it to a static row would remount it, and with it
     // the avatar it carries.
     expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toHaveAttribute('aria-disabled', 'true');
-    expect(screen.getByRole('button', { name: 'Switch account' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Switch account' })).toHaveAttribute('aria-disabled', 'true');
     expect(popup()).toBeInTheDocument();
 
     deferred.resolve();

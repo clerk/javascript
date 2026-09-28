@@ -3,6 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useLayoutAnimation } from '../../primitives/hooks';
 import type {
   TagInputInputProps as PrimitiveTagInputInputProps,
   TagInputProps as PrimitiveTagInputProps,
@@ -31,13 +32,16 @@ export interface TagInputProps
 
 const defaultRemoveLabel = (value: string) => `Remove ${value}`;
 
-function Tags({ removeLabel }: { removeLabel: (value: string) => string }) {
+type LayoutItemProps = ReturnType<typeof useLayoutAnimation>['itemProps'];
+
+function Tags({ removeLabel, itemProps }: { removeLabel: (value: string) => string; itemProps: LayoutItemProps }) {
   const { tags, disabled } = Primitive.useTagInput();
 
   return tags.map(tag => (
     <Primitive.Tag
       key={tag.value}
       value={tag.value}
+      {...itemProps}
       {...mergeStyleProps(
         themeProps('tag-input-tag', { invalid: tag.invalid, disabled }),
         stylex.props(reset.base, focusOutline.visible, styles.tag, tag.invalid && styles.tagInvalid),
@@ -59,10 +63,10 @@ function Tags({ removeLabel }: { removeLabel: (value: string) => string }) {
   ));
 }
 
-type TextInputProps = Omit<PrimitiveTagInputInputProps, 'className' | 'style'>;
+type TextInputProps = Omit<PrimitiveTagInputInputProps, 'className' | 'style'> & { itemProps: LayoutItemProps };
 
 const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(function MosaicTagInputText(
-  { required, ...rest },
+  { required, itemProps, ...rest },
   ref,
 ) {
   const { value } = Primitive.useTagInput();
@@ -72,6 +76,7 @@ const TextInput = React.forwardRef<HTMLInputElement, TextInputProps>(function Mo
       ref={ref}
       required={required && value.length === 0}
       aria-required={required || undefined}
+      {...itemProps}
       {...mergeStyleProps(themeProps('tag-input-input'), stylex.props(reset.base, styles.input), rest)}
     />
   );
@@ -115,8 +120,12 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
   const ariaInvalid = fieldProps?.['aria-invalid'] ?? ariaInvalidProp;
   const invalid = ariaInvalid === true || ariaInvalid === 'true';
 
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const { itemProps } = useLayoutAnimation(rootRef);
+
   return (
     <Primitive.Root
+      ref={rootRef}
       value={value}
       defaultValue={defaultValue}
       onValueChange={onValueChange}
@@ -131,11 +140,15 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
       )}
     >
       <Primitive.List {...mergeStyleProps(themeProps('tag-input-list'), stylex.props(reset.base, styles.list))}>
-        <Tags removeLabel={removeLabel} />
+        <Tags
+          removeLabel={removeLabel}
+          itemProps={itemProps}
+        />
       </Primitive.List>
       <TextInput
         {...inputProps}
         ref={ref}
+        itemProps={itemProps}
         id={fieldProps?.id ?? id}
         required={required}
         aria-invalid={ariaInvalid}
