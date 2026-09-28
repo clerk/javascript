@@ -15,6 +15,7 @@ export interface ProtectCheckRunnerResource<TResource> {
 
 export interface ProtectCheckRunOptions {
   container: HTMLDivElement;
+  expiredReloads: { current: number };
   signal?: AbortSignal;
   setWidgetVisible?: (visible: boolean) => Promise<void>;
   loadTimeoutMs?: number;
@@ -31,65 +32,59 @@ const expiredError = () =>
 
 const abortedError = () => new ClerkRuntimeError('Protect check aborted by caller', { code: 'protect_check_aborted' });
 
+const reloadExpired = async <TResource>(
+  resource: ProtectCheckRunnerResource<TResource>,
+  expiredReloads: { current: number },
+): Promise<ProtectCheckRunOutcome<TResource>> => {
+  if (expiredReloads.current >= MAX_EXPIRED_PROTECT_CHECK_RELOADS) {
+    throw expiredError();
+  }
+  expiredReloads.current += 1;
+
+  await resource.reload();
+
+  const refreshed = resource.getProtectCheck();
+  if (!refreshed) {
+    return { status: 'resolved', resource: resource.getResource() };
+  }
+  if (isExpired(refreshed)) {
+    throw expiredError();
+  }
+  return { status: 'reissued' };
+};
+
 /** Runs one Protect challenge against a sign-in or sign-up resource and submits the proof token. */
-export class ProtectCheckRunner<TResource> {
-  private expiredReloads = 0;
-
-  public constructor(private readonly resource: ProtectCheckRunnerResource<TResource>) {}
-
-  public reset(): void {
-    this.expiredReloads = 0;
+export async function runProtectCheck<TResource>(
+  resource: ProtectCheckRunnerResource<TResource>,
+  protectCheck: ProtectCheckResource,
+  options: ProtectCheckRunOptions,
+): Promise<ProtectCheckRunOutcome<TResource>> {
+  const { container, expiredReloads, signal, setWidgetVisible, loadTimeoutMs } = options;
+  if (signal?.aborted) {
+    throw abortedError();
+  }
+  if (isExpired(protectCheck)) {
+    return reloadExpired(resource, expiredReloads);
   }
 
-  public async run(
-    protectCheck: ProtectCheckResource,
-    options: ProtectCheckRunOptions,
-  ): Promise<ProtectCheckRunOutcome<TResource>> {
-    const { container, signal, setWidgetVisible, loadTimeoutMs } = options;
+  // Deliberately unraced. Only the module load is bounded. The challenge itself may wait on a
+  // person, and a timeout here used to abort valid challenges.
+  const proofToken = await executeProtectCheck(protectCheck, container, { signal, setWidgetVisible, loadTimeoutMs });
+  if (signal?.aborted) {
+    throw abortedError();
+  }
+
+  try {
+    const updated = await resource.submitProtectCheck({ proofToken });
+    return { status: 'resolved', resource: updated };
+  } catch (err) {
     if (signal?.aborted) {
       throw abortedError();
     }
-    if (isExpired(protectCheck)) {
-      return this.reloadExpired();
+    if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === ERROR_CODES.PROTECT_CHECK_ALREADY_RESOLVED) {
+      await resource.reload();
+      return { status: 'resolved', resource: resource.getResource() };
     }
-
-    // Deliberately unraced. Only the module load is bounded. The challenge itself may wait on a
-    // person, and a timeout here used to abort valid challenges.
-    const proofToken = await executeProtectCheck(protectCheck, container, { signal, setWidgetVisible, loadTimeoutMs });
-    if (signal?.aborted) {
-      throw abortedError();
-    }
-
-    try {
-      const resource = await this.resource.submitProtectCheck({ proofToken });
-      return { status: 'resolved', resource };
-    } catch (err) {
-      if (signal?.aborted) {
-        throw abortedError();
-      }
-      if (isClerkAPIResponseError(err) && err.errors?.[0]?.code === ERROR_CODES.PROTECT_CHECK_ALREADY_RESOLVED) {
-        await this.resource.reload();
-        return { status: 'resolved', resource: this.resource.getResource() };
-      }
-      throw err;
-    }
-  }
-
-  private async reloadExpired(): Promise<ProtectCheckRunOutcome<TResource>> {
-    if (this.expiredReloads >= MAX_EXPIRED_PROTECT_CHECK_RELOADS) {
-      throw expiredError();
-    }
-    this.expiredReloads += 1;
-
-    await this.resource.reload();
-
-    const refreshed = this.resource.getProtectCheck();
-    if (!refreshed) {
-      return { status: 'resolved', resource: this.resource.getResource() };
-    }
-    if (isExpired(refreshed)) {
-      throw expiredError();
-    }
-    return { status: 'reissued' };
+    throw err;
   }
 }

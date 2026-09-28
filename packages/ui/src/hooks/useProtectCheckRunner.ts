@@ -1,9 +1,6 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
-import type {
-  ProtectCheckRunner as ProtectCheckRunnerCore,
-  ProtectCheckRunnerResource,
-} from '@clerk/shared/internal/clerk-js/protectCheckRunner';
+import type { ProtectCheckRunnerResource } from '@clerk/shared/internal/clerk-js/protectCheckRunner';
 import { useClerk } from '@clerk/shared/react';
 import React from 'react';
 import { flushSync } from 'react-dom';
@@ -39,7 +36,7 @@ export interface ProtectCheckRunner {
 
 /**
  * Shared driver for the `<SignInProtectCheck />` and `<SignUpProtectCheck />` cards. The challenge
- * lifecycle itself lives in `ProtectCheckRunner` from `@clerk/shared`. This hook binds it to the
+ * lifecycle itself lives in `runProtectCheck` from `@clerk/shared`. This hook binds it to the
  * card's spinner, error, and continuation.
  *
  * Must be called from within a `CardStateProvider`.
@@ -91,7 +88,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   const paramsRef = React.useRef(params);
   paramsRef.current = params;
 
-  const runnerRef = React.useRef<ProtectCheckRunnerCore<TResource> | null>(null);
+  const reloadCountRef = React.useRef(0);
 
   const token = params.getProtectCheck()?.token;
 
@@ -188,17 +185,10 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
         if (__BUILD_DISABLE_RHC__) {
           return;
         }
-        if (!runnerRef.current) {
-          const { ProtectCheckRunner } = await import('@clerk/shared/internal/clerk-js/protectCheckRunner');
-          runnerRef.current ??= new ProtectCheckRunner<TResource>({
-            getProtectCheck: () => paramsRef.current.getProtectCheck(),
-            getResource: () => paramsRef.current.getResource(),
-            reload: () => paramsRef.current.reload(),
-            submitProtectCheck: p => paramsRef.current.submitProtectCheck(p),
-          });
-        }
-        const outcome = await runnerRef.current.run(protectCheck, {
+        const { runProtectCheck } = await import('@clerk/shared/internal/clerk-js/protectCheckRunner');
+        const outcome = await runProtectCheck(paramsRef.current, protectCheck, {
           container,
+          expiredReloads: reloadCountRef,
           signal: abortController.signal,
           setWidgetVisible,
           loadTimeoutMs,
@@ -233,7 +223,7 @@ export function useProtectCheckRunner<TResource>(params: ProtectCheckRunnerParam
   const retry = React.useCallback(() => {
     card.setError('');
     isRunningRef.current = false;
-    runnerRef.current?.reset();
+    reloadCountRef.current = 0;
 
     // The gate already cleared and it was the continuation that failed: there is no challenge left
     // to re-run, so re-running the effect would do nothing. Retry the continuation instead.
