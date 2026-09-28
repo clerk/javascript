@@ -433,7 +433,7 @@ describe('UserButton', () => {
       const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
       const user = await open();
 
-      await accountAction(user, 'Create organization');
+      await user.click(await screen.findByRole('button', { name: 'Create organization' }));
 
       expect(openCreateOrganization).toHaveBeenCalled();
       expect(navigate).not.toHaveBeenCalled();
@@ -445,7 +445,7 @@ describe('UserButton', () => {
       const openCreateOrganization = vi.spyOn(clerk, 'openCreateOrganization').mockImplementation(() => {});
       const user = await open();
 
-      await accountAction(user, 'Create organization');
+      await user.click(await screen.findByRole('button', { name: 'Create organization' }));
 
       expect(navigate).toHaveBeenCalledWith('/new-org');
       expect(openCreateOrganization).not.toHaveBeenCalled();
@@ -458,11 +458,10 @@ describe('UserButton', () => {
         {},
         signedIn({ client: fapiClient([fapiSession({ ...aliceSession, user: restricted }), bobSession]) }),
       );
-      const user = await open();
-      await user.click(accountMenu());
+      await open();
 
-      expect(await screen.findByRole('menuitem', { name: 'Manage account' })).toBeInTheDocument();
-      expect(screen.queryByRole('menuitem', { name: 'Create organization' })).toBeNull();
+      expect(await screen.findByRole('button', { name: 'Other' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Create organization' })).toBeNull();
     });
   });
 
@@ -477,7 +476,7 @@ describe('UserButton', () => {
 
       expect(spinner()).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Sign out of all accounts' })).toHaveAttribute('aria-disabled', 'true');
-      expect(screen.getByRole('button', { name: 'Switch account' })).toBeDisabled();
+      expect(screen.getByRole('button', { name: 'Switch account' })).toHaveAttribute('aria-disabled', 'true');
       expect(popup()).toBeInTheDocument();
 
       touch.release();
