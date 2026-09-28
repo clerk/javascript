@@ -232,10 +232,10 @@ describe('getRecovery', () => {
     ).toBeNull();
   });
 
-  it('does not reauthorize when no scopes were approved', () => {
+  it('recreates an account when scopes are missing and none were approved', () => {
     expect(
       getRecovery(account({ id: 'idn_1', provider: 'google', approvedScopes: '' }), { google: ['calendar'] }),
-    ).toBeNull();
+    ).toEqual({ kind: 'create', strategy: 'oauth_google', additionalScopes: ['calendar'] });
   });
 
   it('ignores unrecognized verification errors', () => {

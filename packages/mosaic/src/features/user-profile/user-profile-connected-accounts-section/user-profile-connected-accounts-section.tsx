@@ -1,11 +1,18 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { useClerk, useUser } from '@clerk/shared/react';
-import type { ExternalAccountResource, OAuthProvider, OAuthStrategy } from '@clerk/shared/types';
+import type {
+  CreateExternalAccountParams,
+  ExternalAccountResource,
+  OAuthProvider,
+  OAuthStrategy,
+} from '@clerk/shared/types';
 import type { ReactNode } from 'react';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
 import { useMosaicRouter } from '../../../hooks/useMosaicRouter';
 import { useMessages } from '../../../localization';
+import { Reverification, useReverificationWithState } from '../../reverification';
 import { UserProfileConnectedAccountsSectionView } from '../user-profile-connected-accounts-section.view';
 import type { ConnectedAccountActionResult } from './user-profile-connected-accounts-section.controller';
 import { useUserProfileConnectedAccountsController } from './user-profile-connected-accounts-section.controller';
@@ -20,12 +27,14 @@ export type UserProfileConnectedAccountsSectionProps = {
   additionalOAuthScopes?: AdditionalOAuthScopes;
   fallback?: ReactNode;
   fallbackFocus?: () => HTMLElement | null;
+  mode?: 'modal' | 'mounted';
 };
 
 export function UserProfileConnectedAccountsSection({
   additionalOAuthScopes,
   fallback,
   fallbackFocus,
+  mode,
 }: UserProfileConnectedAccountsSectionProps) {
   const m = useMessages('userProfileConnectedAccounts');
 
@@ -35,6 +44,12 @@ export function UserProfileConnectedAccountsSection({
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
   const transport = clerk.__internal_oauthTransport;
+  const [createExternalAccount, createReverification] = useReverificationWithState(
+    (params: CreateExternalAccountParams) => user?.createExternalAccount(params),
+  );
+  const [destroyAccount, removeReverification] = useReverificationWithState((accountId: string) =>
+    user?.externalAccounts.find(account => account.id === accountId)?.destroy(),
+  );
 
   const guard = async <Result,>(run: () => Promise<Result>): Promise<Result> => {
     try {
@@ -49,6 +64,8 @@ export function UserProfileConnectedAccountsSection({
   };
 
   const getRedirectUrl = async () => (transport ? String(await transport.getRedirectUrl()) : window.location.href);
+  const withModalState = (url: string, socialProvider?: string) =>
+    mode === 'modal' ? appendModalState({ url, componentName: 'UserProfile', socialProvider }) : url;
 
   const completeVerification = async (
     response: ExternalAccountResource | undefined,
@@ -74,9 +91,9 @@ export function UserProfileConnectedAccountsSection({
   const connect = async (strategy: string) => {
     const provider = strategy.replace('oauth_', '') as OAuthProvider;
     const response = await guard(async () =>
-      user?.createExternalAccount({
+      createExternalAccount({
         strategy: strategy as OAuthStrategy,
-        redirectUrl: await getRedirectUrl(),
+        redirectUrl: withModalState(await getRedirectUrl(), provider),
         additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider] : [],
       }),
     );
@@ -93,10 +110,10 @@ export function UserProfileConnectedAccountsSection({
     const response = await guard(async () => {
       const redirectUrl = await getRedirectUrl();
       return recovery.kind === 'reauthorize'
-        ? account.reauthorize({ additionalScopes: recovery.additionalScopes, redirectUrl })
-        : user?.createExternalAccount({
+        ? account.reauthorize({ additionalScopes: recovery.additionalScopes, redirectUrl: withModalState(redirectUrl) })
+        : createExternalAccount({
             strategy: recovery.strategy,
-            redirectUrl,
+            redirectUrl: withModalState(redirectUrl),
             additionalScopes: recovery.additionalScopes,
           });
     });
@@ -105,7 +122,7 @@ export function UserProfileConnectedAccountsSection({
 
   const remove = (accountId: string) =>
     guard(async () => {
-      await user?.externalAccounts.find(account => account.id === accountId)?.destroy();
+      await destroyAccount(accountId);
     });
 
   const projection =
@@ -137,10 +154,14 @@ export function UserProfileConnectedAccountsSection({
   }
 
   return (
-    <UserProfileConnectedAccountsSectionView
-      {...controller}
-      fallbackFocus={fallbackFocus}
-      onRemove={remove}
-    />
+    <>
+      <UserProfileConnectedAccountsSectionView
+        {...controller}
+        fallbackFocus={fallbackFocus}
+        onRemove={remove}
+      />
+      {createReverification.isActive ? <Reverification {...createReverification} /> : null}
+      {removeReverification.isActive ? <Reverification {...removeReverification} /> : null}
+    </>
   );
 }

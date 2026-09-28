@@ -44,6 +44,8 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       __internal_getOption: () => undefined,
       navigate,
     }),
+    useSession: () => ({ session: { id: 'session_1' } }),
+    useReverification: <F,>(fetcher: F) => fetcher,
   };
 });
 
@@ -141,6 +143,21 @@ describe('UserProfileConnectedAccountsSection', () => {
     expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize');
   });
 
+  it('preserves modal state when connecting an account', async () => {
+    const user = userEvent.setup();
+    renderSection({ mode: 'modal' });
+
+    await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+
+    await waitFor(() => expect(createExternalAccount).toHaveBeenCalledOnce());
+    const redirectUrl = createExternalAccount.mock.calls[0]?.[0]?.redirectUrl;
+    expect(redirectUrl).toBeDefined();
+    const encoded = new URL(redirectUrl).searchParams.get('__clerk_modal_state');
+    expect(encoded).toBeTruthy();
+    const state = JSON.parse(window.atob(encoded));
+    expect(state).toMatchObject({ componentName: 'UserProfile', socialProvider: 'github' });
+  });
+
   it('keeps Connect pending and ignores repeat clicks while the request runs', async () => {
     const deferred = createDeferredPromise();
     createExternalAccount = vi.fn(() => deferred.promise);
@@ -236,6 +253,32 @@ describe('UserProfileConnectedAccountsSection', () => {
       }),
     );
     expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize');
+  });
+
+  it('preserves modal state when reconnecting an account', async () => {
+    externalAccounts = [
+      externalAccount({
+        id: 'idn_google',
+        provider: 'google',
+        verification: {
+          status: 'unverified',
+          strategy: 'oauth_google',
+          error: { code: 'external_account_missing_refresh_token', longMessage: 'Missing token' },
+        },
+      }),
+    ];
+    const user = userEvent.setup();
+    renderSection({ mode: 'modal' });
+
+    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
+
+    await waitFor(() => expect(createExternalAccount).toHaveBeenCalledOnce());
+    const redirectUrl = createExternalAccount.mock.calls[0]?.[0]?.redirectUrl;
+    expect(redirectUrl).toBeDefined();
+    const encoded = new URL(redirectUrl).searchParams.get('__clerk_modal_state');
+    expect(encoded).toBeTruthy();
+    expect(JSON.parse(window.atob(encoded))).toMatchObject({ componentName: 'UserProfile' });
   });
 
   it('reauthorizes an account missing requested scopes', async () => {
