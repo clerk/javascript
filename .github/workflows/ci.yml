@@ -296,6 +296,7 @@ jobs:
 
       - name: Run tests in packages
         run: |
+          TURBO_ARGS=$(sed -E 's/--concurrency=[0-9]+/--concurrency=1/' <<< "$TURBO_ARGS")
           if [ "${{ matrix.test-filter }}" = "**" ]; then
             echo "Running full test suite on Node ${{ matrix.node-version }}"
             pnpm turbo test $TURBO_ARGS
