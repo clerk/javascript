@@ -7,6 +7,13 @@ export const userProfileWeb3WalletsMessages = {
   setPrimary: 'Set as primary',
   primary: 'Primary',
   unverified: 'Unverified',
+  solanaDialog: {
+    title: 'Select a Solana wallet',
+    description: 'Choose an installed wallet to connect to your account.',
+    noneAvailable: 'No Solana wallets are available.',
+    findWallet: 'Find a Solana wallet',
+    cancel: 'Cancel',
+  },
   removeDialog: {
     title: 'Remove wallet?',
     description: '{wallet} will be removed from this account.',

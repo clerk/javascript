@@ -64,7 +64,8 @@
   },
   "dependencies": {
     "@clerk/shared": "workspace:^",
-    "@floating-ui/react": "catalog:repo"
+    "@floating-ui/react": "catalog:repo",
+    "@wallet-standard/core": "catalog:module-manager"
   },
   "devDependencies": {
     "@clerk/clerk-js": "workspace:^",
