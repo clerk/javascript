@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail } from '@/lib/chaos';
+
 export function useUserProfileVerifyEmailLinkFixture({ failResend = false } = {}) {
+  const emailAddress = useChaosFixture('example@email.com', () => chaosEmail(0));
   const [open, setOpen] = useState(false);
   const [resendSeconds, setResendSeconds] = useState(12);
   const [isResending, setIsResending] = useState(false);
@@ -29,7 +33,7 @@ export function useUserProfileVerifyEmailLinkFixture({ failResend = false } = {}
 
   return {
     open,
-    emailAddress: 'example@email.com',
+    emailAddress,
     resendSeconds,
     isResending,
     errorMessage,

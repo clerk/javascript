@@ -6,7 +6,10 @@ import type {
 import { useLocale } from '@clerk/mosaic/localization';
 import { useState } from 'react';
 
-const roles = [
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosName, chaosRows, chaosText } from '@/lib/chaos';
+
+const exampleRoles = [
   { value: 'admin', label: 'Admin' },
   { value: 'member', label: 'Member' },
 ];
@@ -34,7 +37,16 @@ const exampleMembers = [
 
 export function useMembersTableFixture({ proposed = false, empty = false } = {}): MembersTableTabViewProps {
   const locale = useLocale();
-  const [items, setItems] = useState(empty ? [] : exampleMembers);
+  const roles = useChaosFixture(exampleRoles, items => items.map(role => ({ ...role, label: chaosText(role.label) })));
+  const seed = useChaosFixture(exampleMembers, items =>
+    chaosRows(items).map((member, index) => ({
+      ...member,
+      name: chaosName(index),
+      email: chaosEmail(index),
+      isCurrentUser: index === 0,
+    })),
+  );
+  const [items, setItems] = useState(empty ? [] : seed);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchValue, setSearchValue] = useState('');
