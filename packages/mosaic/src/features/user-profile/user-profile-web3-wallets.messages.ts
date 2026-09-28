@@ -8,6 +8,7 @@ export const userProfileWeb3WalletsMessages = {
   primary: 'Primary',
   unverified: 'Unverified',
   solanaDialog: {
+    back: 'Back',
     title: 'Select a Solana wallet',
     description: 'Choose an installed wallet to connect to your account.',
     noneAvailable: 'No Solana wallets are available.',
