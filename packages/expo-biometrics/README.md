@@ -37,6 +37,7 @@ The key and record layout is shared with the Clerk iOS SDK, so credentials enrol
 - Expo SDK 54 or later, in a development build (the module is not available in Expo Go or on the web)
 - iOS. Android support is not implemented yet: every call rejects with `not_implemented`.
 - `NSFaceIDUsageDescription` in your `Info.plist`. The `@clerk/expo` config plugin sets it through its `faceIDPermission` option.
+- A device with a Secure Enclave. The iOS Simulator has none, so `createKey()` rejects there with `secure_key_storage_unavailable`.
 
 ## Installation
 
@@ -66,7 +67,7 @@ import {
 | Function                                       | Description                                                                                                              |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | `getAppIdentifier()`                           | The app identifier sent to Clerk as `app_identifier` (the iOS bundle identifier).                                        |
-| `getAvailability()`                            | The device's biometry type and whether biometrics or device owner authentication can be evaluated.                       |
+| `getAvailability()`                            | The device's biometry type, whether biometrics or device owner authentication can be evaluated, and secure key storage.  |
 | `createKey(policy)`                            | Creates a Secure Enclave P-256 key and returns its `localKeyId` and public key JWK.                                      |
 | `sign(localKeyId, clientData, reason?)`        | Prompts for authentication and returns an ES256 signature over `clientData` (raw `r \|\| s`, base64url without padding). |
 | `hasKey(localKeyId)` / `deleteKey(localKeyId)` | Checks for or deletes a key.                                                                                             |

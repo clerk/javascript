@@ -108,7 +108,8 @@ export function getAvailability(): Promise<BiometricAvailability> {
 
 /**
  * Creates a new hardware-backed P-256 private key protected by `policy`.
- * Rejects with `biometry_not_available`, `biometry_not_enrolled`, or `biometry_lockout` when biometrics cannot be used.
+ * Rejects with `secure_key_storage_unavailable` when the device has no hardware-backed key storage (see `getAvailability()`),
+ * and with `biometry_not_available`, `biometry_not_enrolled`, or `biometry_lockout` when biometrics cannot be used.
  */
 export async function createKey(policy: BiometricCredentialPolicy): Promise<BiometricCredentialKey> {
   assertPolicy(policy);

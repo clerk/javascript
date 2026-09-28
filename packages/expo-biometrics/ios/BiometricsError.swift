@@ -12,6 +12,7 @@ struct BiometricsError: Error, Equatable {
     case biometryNotEnrolled = "biometry_not_enrolled"
     case biometryLockout = "biometry_lockout"
     case passcodeNotSet = "passcode_not_set"
+    case secureKeyStorageUnavailable = "secure_key_storage_unavailable"
     case keyNotFound = "key_not_found"
     case keyInvalidated = "key_invalidated"
     case keyGenerationFailed = "key_generation_failed"

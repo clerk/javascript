@@ -21,6 +21,7 @@ const createNativeModule = () => ({
     canEvaluateBiometrics: true,
     canEvaluateDeviceOwner: true,
     errorCode: null,
+    secureKeyStorageAvailable: true,
   }),
   createKey: vi.fn().mockResolvedValue({ localKeyId: 'tdlk_1', publicKeyJwk: '{"kty":"EC"}' }),
   sign: vi.fn().mockResolvedValue('c2lnbmF0dXJl'),
@@ -67,7 +68,21 @@ describe('@clerk/expo-biometrics', () => {
       canEvaluateBiometrics: true,
       canEvaluateDeviceOwner: true,
       errorCode: null,
+      secureKeyStorageAvailable: true,
     });
+  });
+
+  test('getAvailability reports missing secure key storage', async () => {
+    native.getAvailability.mockResolvedValueOnce({
+      biometryType: 'faceID',
+      canEvaluateBiometrics: true,
+      canEvaluateDeviceOwner: true,
+      errorCode: null,
+      secureKeyStorageAvailable: false,
+    });
+    const biometrics = await load();
+
+    await expect(biometrics.getAvailability()).resolves.toMatchObject({ secureKeyStorageAvailable: false });
   });
 
   test('rejects with native_module_unavailable when the native module is missing', async () => {
@@ -90,6 +105,17 @@ describe('@clerk/expo-biometrics', () => {
         publicKeyJwk: '{"kty":"EC"}',
       });
       expect(native.createKey).toHaveBeenCalledWith('biometry_or_device_passcode');
+    });
+
+    test('createKey preserves secure_key_storage_unavailable', async () => {
+      native.createKey.mockRejectedValueOnce(nativeError('secure_key_storage_unavailable', 'no Secure Enclave'));
+      const biometrics = await load();
+
+      await expect(biometrics.createKey('biometry_current_set')).rejects.toMatchObject({
+        name: 'ClerkBiometricsError',
+        code: 'secure_key_storage_unavailable',
+        message: 'no Secure Enclave',
+      });
     });
 
     test('createKey rejects unknown policies without calling native', async () => {
@@ -139,6 +165,7 @@ describe('@clerk/expo-biometrics', () => {
       'biometry_not_enrolled',
       'biometry_lockout',
       'passcode_not_set',
+      'secure_key_storage_unavailable',
       'key_not_found',
       'key_invalidated',
       'key_generation_failed',
@@ -176,6 +203,7 @@ describe('@clerk/expo-biometrics', () => {
       const { isBiometricsErrorCode } = await load();
 
       expect(isBiometricsErrorCode('biometry_lockout')).toBe(true);
+      expect(isBiometricsErrorCode('secure_key_storage_unavailable')).toBe(true);
       expect(isBiometricsErrorCode('ERR_UNKNOWN')).toBe(false);
       expect(isBiometricsErrorCode(undefined)).toBe(false);
     });

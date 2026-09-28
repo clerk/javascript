@@ -76,6 +76,29 @@ final class BiometricKeyManagerTests: XCTestCase {
     XCTAssertEqual(availability.errorCode == nil, availability.canEvaluateBiometrics)
   }
 
+  func testSimulatorReportsNoSecureKeyStorage() throws {
+    #if targetEnvironment(simulator)
+      XCTAssertFalse(BiometricKeyManager().availability().secureKeyStorageAvailable)
+    #else
+      throw XCTSkip("Only the Simulator is known to lack a Secure Enclave.")
+    #endif
+  }
+
+  func testAvailabilityReportsSecureKeyStorage() {
+    XCTAssertTrue(BiometricKeyManager(isSecureEnclaveAvailable: { true }).availability().secureKeyStorageAvailable)
+    XCTAssertFalse(BiometricKeyManager(isSecureEnclaveAvailable: { false }).availability().secureKeyStorageAvailable)
+  }
+
+  func testCreateKeyRejectsWithoutSecureKeyStorage() {
+    let keyManager = BiometricKeyManager(isSecureEnclaveAvailable: { false })
+
+    for policy in BiometricCredentialPolicy.allCases {
+      XCTAssertThrowsError(try keyManager.createKey(policy: policy)) { error in
+        XCTAssertEqual((error as? BiometricsError)?.code, .secureKeyStorageUnavailable)
+      }
+    }
+  }
+
   func testErrorMapping() {
     XCTAssertEqual(BiometricsError.code(forLAErrorCode: LAError.Code.userCancel.rawValue), .userCanceled)
     XCTAssertEqual(BiometricsError.code(forLAErrorCode: LAError.Code.systemCancel.rawValue), .systemCanceled)
