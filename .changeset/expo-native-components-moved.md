@@ -2,9 +2,9 @@
 '@clerk/expo': minor
 ---
 
-The native components (`AuthView`, `UserButton`, `UserProfileView`), the native module behind biometric credentials, and native client sync have moved to the new `@clerk/expo-native` package. Apps that don't install it no longer include the Clerk iOS and Android SDKs and no longer require iOS 17.
+The native components (`AuthView`, `UserButton`, `UserProfileView`) and native client sync have moved to the new `@clerk/expo-native` package. Apps that don't install it no longer include the Clerk iOS and Android SDKs and no longer require iOS 17.
 
-If you use the native components or `useBiometricCredentials()`, install the new package:
+If you use the native components, install the new package:
 
 ```sh
 npx expo install @clerk/expo-native
