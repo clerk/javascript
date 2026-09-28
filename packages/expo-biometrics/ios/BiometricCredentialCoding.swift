@@ -1,6 +1,6 @@
 import Foundation
 
-// Implements clerk-ios Documentation/BiometricCredentialStorageContract.md (version 1). Any change here must stay
+// Mirrors the format pinned by clerk-ios BiometricCredentialStorageContractTests. Any change here must stay
 // byte-compatible with ClerkKit, which reads and writes the same keys, Keychain item, and UserDefaults marker.
 
 enum BiometricCredentialPolicy: String, CaseIterable {
