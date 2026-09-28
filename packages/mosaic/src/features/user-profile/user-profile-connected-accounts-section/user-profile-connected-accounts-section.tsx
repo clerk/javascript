@@ -7,12 +7,13 @@ import type {
   OAuthProvider,
   OAuthStrategy,
 } from '@clerk/shared/types';
-import type { ReactNode } from 'react';
+import { type ReactNode, useRef } from 'react';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
 import { useMosaicRouter } from '../../../hooks/useMosaicRouter';
 import { useMessages } from '../../../localization';
-import { Reverification, useReverificationFlow } from '../../reverification';
+import { currentInteractionOrigin } from '../../../primitives/utils/interaction-origin';
+import { ReverificationDialog, useReverificationFlow } from '../../reverification';
 import { UserProfileConnectedAccountsSectionView } from '../user-profile-connected-accounts-section.view';
 import type { ConnectedAccountActionResult } from './user-profile-connected-accounts-section.controller';
 import { useUserProfileConnectedAccountsController } from './user-profile-connected-accounts-section.controller';
@@ -43,6 +44,7 @@ export function UserProfileConnectedAccountsSection({
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
   const router = useMosaicRouter();
+  const reverificationFocus = useRef<HTMLElement | null>(null);
   const transport = clerk.__internal_oauthTransport;
   const [createExternalAccount, createReverification] = useReverificationFlow((params: CreateExternalAccountParams) =>
     user?.createExternalAccount(params),
@@ -69,6 +71,10 @@ export function UserProfileConnectedAccountsSection({
   const getRedirectUrl = async () => (transport ? String(await transport.getRedirectUrl()) : window.location.href);
   const withModalState = (url: string, socialProvider?: string) =>
     mode === 'modal' ? appendModalState({ url, componentName: 'UserProfile', socialProvider }) : url;
+  const captureReverificationFocus = () => {
+    const active = document.activeElement;
+    reverificationFocus.current = currentInteractionOrigin() ?? (active instanceof HTMLElement ? active : null);
+  };
 
   const completeVerification = async (
     response: ExternalAccountResource | undefined,
@@ -92,6 +98,7 @@ export function UserProfileConnectedAccountsSection({
   };
 
   const connect = async (strategy: string) => {
+    captureReverificationFocus();
     const provider = strategy.replace('oauth_', '') as OAuthProvider;
     const response = await guard(async () =>
       createExternalAccount({
@@ -104,6 +111,7 @@ export function UserProfileConnectedAccountsSection({
   };
 
   const reconnect = async (accountId: string) => {
+    captureReverificationFocus();
     const account = user?.externalAccounts.find(candidate => candidate.id === accountId);
     const recovery = account ? getRecovery(account, additionalOAuthScopes) : null;
     if (!account || !recovery) {
@@ -164,7 +172,10 @@ export function UserProfileConnectedAccountsSection({
         onRemove={remove}
         removeReverification={removeReverification}
       />
-      <Reverification {...createReverification} />
+      <ReverificationDialog
+        {...createReverification}
+        finalFocus={reverificationFocus}
+      />
     </>
   );
 }
