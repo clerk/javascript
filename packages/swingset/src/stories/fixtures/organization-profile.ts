@@ -2,6 +2,9 @@ import { OrganizationProfileSaveError } from '@clerk/mosaic/features/organizatio
 import type { OrganizationProfileViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 import { useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosName } from '@/lib/chaos';
+
 import { useInvitationsTableFixture } from './invitations-table-tab';
 import { useMembersTableFixture } from './members-table-tab';
 import { useOrganizationProfileAPIKeysFixture } from './organization-profile-api-keys';
@@ -9,9 +12,7 @@ import { useInviteMembersFixture } from './organization-profile-invite-members';
 import { useRequestsTableFixture } from './requests-table-tab';
 import { usePreviewImage } from './use-preview-image';
 
-const INITIAL_NAME = 'Clerk';
-const INITIAL_SLUG = 'clerkWorkspace-177654156132154';
-const MEMBER_COUNT = 20;
+const exampleOrganization = { name: 'Clerk', slug: 'clerkWorkspace-177654156132154', memberCount: 20 };
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
@@ -22,8 +23,13 @@ export interface OrganizationProfileFixtureOptions {
 
 export function useOrganizationProfileFixture({ failWith }: OrganizationProfileFixtureOptions = {}) {
   const [activePage, setActivePage] = useState<OrganizationProfileViewProps['activePage']>('general');
-  const [name, setName] = useState(INITIAL_NAME);
-  const [slug, setSlug] = useState(INITIAL_SLUG);
+  const organization = useChaosFixture(exampleOrganization, () => ({
+    name: chaosName(0),
+    slug: 'a-really-long-organization-slug-that-never-seems-to-end-177654156132154',
+    memberCount: 1_234_567,
+  }));
+  const [name, setName] = useState(organization.name);
+  const [slug, setSlug] = useState(organization.slug);
   const { imageUrl, showFile, clearImage } = usePreviewImage();
   const apiKeys = useOrganizationProfileAPIKeysFixture();
   const members = useMembersTableFixture();
@@ -43,7 +49,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
   const general: OrganizationProfileViewProps['pages']['general'] = {
     name,
     slug,
-    memberCount: MEMBER_COUNT,
+    memberCount: organization.memberCount,
     imageUrl,
     hasImage: Boolean(imageUrl),
     onLogoChange: showFile,

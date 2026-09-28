@@ -4,7 +4,10 @@ import { useMessages } from '@clerk/mosaic/localization';
 import type { MouseEvent } from 'react';
 import { useRef, useState } from 'react';
 
-const roles = [
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosText } from '@/lib/chaos';
+
+const exampleRoles = [
   { value: 'member', label: 'Member', description: 'Role with non-privileged permissions in the organization.' },
   { value: 'admin', label: 'Admin', description: 'Role with elevated permissions in the organization.' },
 ];
@@ -16,6 +19,9 @@ export function useInviteMembersFixture(): {
   inviteDialog: OrganizationProfileInviteMembersDialogProps;
 } {
   const m = useMessages('organizationProfileInviteMembers');
+  const roles = useChaosFixture(exampleRoles, items =>
+    items.map(role => ({ ...role, label: chaosText(role.label), description: chaosText(role.description) })),
+  );
   const toast = useToastManager();
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
