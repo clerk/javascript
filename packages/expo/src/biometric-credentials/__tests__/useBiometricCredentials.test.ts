@@ -58,6 +58,7 @@ function createExpoBiometrics({ withHash = true }: { withHash?: boolean } = {}) 
       canEvaluateBiometrics: true,
       canEvaluateDeviceOwner: true,
       errorCode: null,
+      secureKeyStorageAvailable: true as boolean | undefined,
     })),
     createKey: asyncFn(() => {
       store.keys.add('key_new');
@@ -218,6 +219,42 @@ describe('getAvailability', () => {
       unavailableReason: reason,
     });
     expect(biometrics.listRecords).not.toHaveBeenCalled();
+  });
+
+  test('reports biometric authentication unavailable without secure key storage, before reading local records', async () => {
+    addLocalCredential();
+    biometrics.getAvailability.mockResolvedValue({
+      biometryType: 'faceID',
+      canEvaluateBiometrics: true,
+      canEvaluateDeviceOwner: true,
+      errorCode: null,
+      secureKeyStorageAvailable: false,
+    });
+
+    await expect(renderBiometricCredentials().getAvailability()).resolves.toEqual({
+      isAvailable: false,
+      unavailableReason: 'biometric_authentication_unavailable',
+    });
+    expect(biometrics.listRecords).not.toHaveBeenCalled();
+    expect(biometrics.hasKey).not.toHaveBeenCalled();
+    expect(biometrics.deleteRecord).not.toHaveBeenCalled();
+    expect(biometrics.store.records).toHaveLength(1);
+  });
+
+  test('treats a module that does not report secure key storage as having it', async () => {
+    addLocalCredential();
+    biometrics.getAvailability.mockResolvedValue({
+      biometryType: 'faceID',
+      canEvaluateBiometrics: true,
+      canEvaluateDeviceOwner: true,
+      errorCode: null,
+      secureKeyStorageAvailable: undefined,
+    });
+
+    await expect(renderBiometricCredentials().getAvailability()).resolves.toEqual({
+      isAvailable: true,
+      unavailableReason: null,
+    });
   });
 
   test('reports no local credential when the device has none for this app', async () => {
@@ -581,6 +618,18 @@ describe('enroll', () => {
     expect(clerk.user.__experimental_prepareBiometricCredential).not.toHaveBeenCalled();
   });
 
+  test('fails fast when the device has no secure key storage', async () => {
+    biometrics.createKey.mockRejectedValue(moduleError('secure_key_storage_unavailable', 'No Secure Enclave'));
+
+    await expect(renderBiometricCredentials().enroll()).rejects.toMatchObject({
+      code: 'biometric_authentication_unavailable',
+      message: 'No Secure Enclave',
+    });
+    expect(clerk.user.__experimental_prepareBiometricCredential).not.toHaveBeenCalled();
+    expect(biometrics.sign).not.toHaveBeenCalled();
+    expect(biometrics.saveRecord).not.toHaveBeenCalled();
+  });
+
   test('surfaces reverification errors from prepare unchanged and deletes the key', async () => {
     const error = apiError('session_reverification_required');
     clerk.user.__experimental_prepareBiometricCredential.mockRejectedValue(error);
@@ -738,6 +787,23 @@ describe('signIn', () => {
     await expect(operation).rejects.toMatchObject({ code: 'E_TRUSTED_DEVICE_SIGN_IN_FAILED' });
     await expect(operation).rejects.toThrow('no_local_credential');
     expect(clerk.clientSignIn.create).not.toHaveBeenCalled();
+  });
+
+  test('rejects without contacting the server when the device has no secure key storage', async () => {
+    addLocalCredential();
+    biometrics.getAvailability.mockResolvedValue({
+      biometryType: 'faceID',
+      canEvaluateBiometrics: true,
+      canEvaluateDeviceOwner: true,
+      errorCode: null,
+      secureKeyStorageAvailable: false,
+    });
+
+    const operation = renderBiometricCredentials().signIn();
+
+    await expect(operation).rejects.toThrow('biometric_authentication_unavailable');
+    expect(clerk.clientSignIn.create).not.toHaveBeenCalled();
+    expect(biometrics.sign).not.toHaveBeenCalled();
   });
 
   test('rejects when the Clerk client is unavailable', async () => {

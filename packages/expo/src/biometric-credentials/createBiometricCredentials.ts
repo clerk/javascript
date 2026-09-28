@@ -61,6 +61,7 @@ const MODULE_ERROR_CODES: Record<string, BiometricCredentialErrorCode | undefine
   biometry_not_enrolled: 'biometric_authentication_unavailable',
   biometry_lockout: 'biometric_authentication_unavailable',
   passcode_not_set: 'biometric_authentication_unavailable',
+  secure_key_storage_unavailable: 'biometric_authentication_unavailable',
   key_not_found: 'key_not_found',
   key_invalidated: 'key_invalidated',
   key_generation_failed: 'key_generation_failed',
@@ -263,6 +264,12 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
       return unavailableReason;
     }
 
+    const device = await callModule(biometrics, module => module.getAvailability());
+    // Older @clerk/expo-biometrics versions do not report secureKeyStorageAvailable.
+    if (device.secureKeyStorageAvailable === false) {
+      return 'biometric_authentication_unavailable';
+    }
+
     const matchesIdentifierHint = await identifierHintMatcher(biometrics, identifierHint);
     const records = (await callModule(biometrics, module => module.listRecords()))
       .filter(
@@ -288,7 +295,6 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
       return 'local_key_missing';
     }
 
-    const device = await callModule(biometrics, module => module.getAvailability());
     const supportedRecords = recordsWithKeys.filter(record =>
       record.policy === 'biometry_or_device_passcode' ? device.canEvaluateDeviceOwner : device.canEvaluateBiometrics,
     );
