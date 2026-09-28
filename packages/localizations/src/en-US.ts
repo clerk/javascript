@@ -1425,16 +1425,14 @@ export const enUS: LocalizationResource = {
       directorySyncSection: {
         badge__active: 'Active',
         badge__inactive: 'Inactive',
-        badge__ssoRequired: 'SSO Required',
-        badge__unconfigured: 'Unconfigured',
-        description:
-          "Automatically add, update, and remove organization members from your identity provider's directory. Requires an SSO connection.",
+        badge__ssoRequired: 'SSO required',
+        description: 'Keep organization members synced with your identity provider. Requires an SSO connection.',
         error__load: 'Could not load Directory Sync',
         menuAction__activate: 'Activate',
         menuAction__deactivate: 'Deactivate',
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
-        primaryButton__startConfiguration: 'Start configuration',
+        primaryButton__configure: 'Configure',
         removeDialog: {
           confirmButton: 'Remove Directory Sync',
           subtitle:
@@ -1510,6 +1508,7 @@ export const enUS: LocalizationResource = {
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
         primaryButton__addConnection: 'Add connection',
+        primaryButton__configure: 'Configure',
         primaryButton__continueConfiguration: 'Continue configuration',
         primaryButton__startConfiguration: 'Start configuration',
         title: 'SSO',
