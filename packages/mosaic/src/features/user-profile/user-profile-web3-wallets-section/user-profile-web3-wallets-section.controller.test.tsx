@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
@@ -72,3 +73,41 @@ describe('Web3 wallet controller', () => {
     expect(result.current.solanaPickerOpen).toBe(false);
   });
 });
+
+it.each(['connect', 'primary', 'solana'] as const)(
+  'cancels %s verification without an error and allows retry',
+  async action => {
+    const cancelled = new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' });
+    const request = vi.fn().mockRejectedValueOnce(cancelled).mockResolvedValueOnce(undefined);
+    const { result } = renderHook(() =>
+      useUserProfileWeb3WalletsController({
+        wallets,
+        availableProviders: [...availableProviders, { id: 'web3_solana_signature', provider: 'Solana' }],
+        connect: request,
+        setPrimary: request,
+      }),
+    );
+    const run = () =>
+      action === 'primary'
+        ? result.current.onSetPrimary('wallet_1')
+        : action === 'solana'
+          ? result.current.connectSolana('Phantom')
+          : result.current.onConnect('web3_metamask_signature');
+    if (action === 'solana') {
+      act(() => void result.current.onConnect('web3_solana_signature'));
+    }
+    await act(async () => {
+      await run();
+    });
+    expect(result.current.pendingId).toBeUndefined();
+    expect(result.current.wallets[0].primaryError).toBeUndefined();
+    expect(result.current.availableProviders.every(provider => provider.connectError === undefined)).toBe(true);
+    if (action === 'solana') {
+      expect(result.current.solanaPickerOpen).toBe(true);
+    }
+    await act(async () => {
+      await run();
+    });
+    expect(request).toHaveBeenCalledTimes(2);
+  },
+);
