@@ -1,3 +1,4 @@
+import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useRef, useState } from 'react';
 
 import type {
@@ -50,8 +51,10 @@ export function useUserProfileConnectedAccountsController({
         return;
       }
     } catch (error) {
-      const message = error instanceof Error && error.message ? error.message : fallbackErrorMessage;
-      setErrors(current => ({ ...current, [id]: message }));
+      if (!isReverificationCancelledError(error)) {
+        const message = error instanceof Error && error.message ? error.message : fallbackErrorMessage;
+        setErrors(current => ({ ...current, [id]: message }));
+      }
     }
 
     inFlight.current = undefined;

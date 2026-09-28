@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import type * as SharedReact from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -195,14 +195,30 @@ describe('UserProfileConnectedAccountsSection', () => {
     expect(navigate).not.toHaveBeenCalled();
   });
 
-  it('shows a generic error when the provider returns no verification URL', async () => {
+  it('clears Connect without an error when reverification is cancelled', async () => {
+    createExternalAccount = vi.fn(() =>
+      Promise.reject(new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' })),
+    );
+    const user = userEvent.setup();
+    renderSection();
+
+    await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Connect GitHub' })).not.toHaveAttribute('aria-busy', 'true'),
+    );
+    expect(screen.queryByText('Something went wrong. Please try again.')).not.toBeInTheDocument();
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('shows the OAuth error when the provider returns no verification URL', async () => {
     createExternalAccount = vi.fn(() => Promise.resolve({ verification: null }));
     const user = userEvent.setup();
     renderSection();
 
     await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
 
-    expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+    expect(await screen.findByText('OAuth flow did not receive a verification URL.')).toBeInTheDocument();
   });
 
   it('opens the transport and reloads the user with the callback nonce', async () => {
@@ -347,5 +363,24 @@ describe('UserProfileConnectedAccountsSection', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
 
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('You cannot remove your last sign-in method.');
+  });
+
+  it('keeps the confirmation open without an error when reverification is cancelled', async () => {
+    externalAccounts = [
+      externalAccount({
+        id: 'idn_google',
+        provider: 'google',
+        destroy: vi.fn(() => Promise.reject(new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' }))),
+      }),
+    ];
+    const user = userEvent.setup();
+    renderSection();
+
+    const dialog = await openRemoval(user, 'Google');
+    await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
+
+    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Remove' })).not.toBeDisabled());
+    expect(dialog).toBeInTheDocument();
+    expect(within(dialog).queryByRole('alert')).not.toBeInTheDocument();
   });
 });

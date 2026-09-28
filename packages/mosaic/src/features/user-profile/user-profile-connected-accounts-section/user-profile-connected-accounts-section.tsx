@@ -1,4 +1,4 @@
-import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { isClerkAPIResponseError, isReverificationCancelledError } from '@clerk/shared/error';
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type {
@@ -55,6 +55,9 @@ export function UserProfileConnectedAccountsSection({
     try {
       return await run();
     } catch (error) {
+      if (isReverificationCancelledError(error)) {
+        throw error;
+      }
       if (isClerkAPIResponseError(error)) {
         const first = error.errors[0];
         throw new Error(first?.longMessage || first?.message || m.errors.generic);
@@ -72,7 +75,7 @@ export function UserProfileConnectedAccountsSection({
   ): Promise<ConnectedAccountActionResult> => {
     const url = response?.verification?.externalVerificationRedirectURL;
     if (!url) {
-      throw new Error(m.errors.generic);
+      throw new Error('OAuth flow did not receive a verification URL.');
     }
 
     if (transport) {

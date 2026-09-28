@@ -1,3 +1,5 @@
+import { isReverificationCancelledError } from '@clerk/shared/error';
+
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
 
@@ -14,7 +16,10 @@ function notSeated(): Promise<never> {
   return Promise.reject(new Error('confirmation run is not seated'));
 }
 
-function toMessage(cause: unknown): string {
+function toMessage(cause: unknown): string | undefined {
+  if (isReverificationCancelledError(cause)) {
+    return undefined;
+  }
   return cause instanceof Error ? cause.message : 'Something went wrong. Please try again.';
 }
 
