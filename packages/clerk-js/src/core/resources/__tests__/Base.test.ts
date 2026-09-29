@@ -70,7 +70,6 @@ describe('BaseResource', () => {
     const updateClient = vi.fn();
 
     BaseResource.clerk = {
-      // @ts-expect-error - We're not about to mock the entire FapiClient
       getFapiClient: () => ({
         request: vi.fn().mockResolvedValue({
           payload: {
@@ -110,7 +109,6 @@ describe('BaseResource', () => {
       const handleSessionEnded = vi.fn().mockResolvedValue(undefined);
 
       BaseResource.clerk = {
-        // @ts-expect-error - We're not about to mock the entire FapiClient
         getFapiClient: () => ({
           request: vi.fn().mockResolvedValue({
             payload: {
