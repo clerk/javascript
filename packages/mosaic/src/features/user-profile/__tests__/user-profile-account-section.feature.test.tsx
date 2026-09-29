@@ -1,9 +1,10 @@
 import type { PhoneNumberJSON } from '@clerk/shared/types';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
-import { type FakeFapiSeed, serveFapi, VERIFICATION_CODE } from '../../../__tests__/feature/fake-fapi';
+import { type FakeFapiSeed, fapiUrl, serveFapi, VERIFICATION_CODE, worker } from '../../../__tests__/feature/fake-fapi';
 import type { FapiAttributeOverrides } from '../../../__tests__/feature/fapi';
 import {
   fapiClient,
@@ -27,6 +28,7 @@ function signedIn(phones: PhoneNumberJSON[] = [], overrides: Partial<FakeFapiSee
     id: 'user_1',
     first_name: 'Alice',
     last_name: 'Smith',
+    username: 'alicesmith',
     email_addresses: [fapiEmailAddress({ id: 'idn_email' })],
     phone_numbers: phones,
     primary_phone_number_id: phones[0]?.id ?? null,
@@ -162,6 +164,75 @@ describe('the user profile phone numbers', () => {
 
     expect(await screen.findByRole('menuitem', { name: 'Set as primary' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Remove phone number' })).not.toBeInTheDocument();
+  });
+});
+
+function fileInput(container: Element): HTMLInputElement {
+  const input = container.querySelector('input[type="file"]');
+  if (!(input instanceof HTMLInputElement)) {
+    throw new Error('expected a file input');
+  }
+  return input;
+}
+
+function failsWith(path: string, error: Record<string, unknown>, status: number) {
+  worker.use(http.post(fapiUrl(path), () => HttpResponse.json({ errors: [error] }, { status })));
+}
+
+describe('the user profile name, username and picture', () => {
+  it('saves an edited name and closes the dialog', async () => {
+    const { actor } = await renderSection();
+
+    await actor.click(screen.getByRole('button', { name: 'Edit name' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit name' });
+    await actor.clear(within(dialog).getByLabelText('First name'));
+    await actor.type(within(dialog).getByLabelText('First name'), 'Alicia');
+    await actor.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByText('Alicia Smith')).toBeInTheDocument();
+  });
+
+  it('keeps the username dialog open on the error the server names it for', async () => {
+    const { actor } = await renderSection();
+    failsWith(
+      '/v1/me',
+      {
+        code: 'form_identifier_exists',
+        message: 'Taken',
+        long_message: 'That username is taken. Please try another.',
+        meta: { param_name: 'username' },
+      },
+      422,
+    );
+
+    await actor.click(screen.getByRole('button', { name: 'Edit username' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit username' });
+    await actor.type(within(dialog).getByLabelText('Username'), '2');
+    await actor.click(within(dialog).getByRole('button', { name: 'Save changes' }));
+
+    expect(await within(dialog).findByText('That username is taken. Please try another.')).toBeInTheDocument();
+  });
+
+  it('uploads a picked picture and then offers to change or remove it', async () => {
+    const { actor, container } = await renderSection();
+
+    expect(screen.queryByRole('button', { name: 'Manage profile picture' })).not.toBeInTheDocument();
+    await actor.upload(fileInput(container), new File(['x'], 'me.png', { type: 'image/png' }));
+
+    await actor.click(await screen.findByRole('button', { name: 'Manage profile picture' }));
+    expect(await screen.findByRole('menuitem', { name: 'Remove avatar' })).toBeInTheDocument();
+  });
+
+  it('says why an upload was refused', async () => {
+    const { actor, container } = await renderSection();
+    failsWith('/v1/me/profile_image', { code: 'avatar_file_size_exceeded', message: 'Too large' }, 413);
+
+    await actor.upload(fileInput(container), new File(['x'], 'me.png', { type: 'image/png' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+    );
   });
 });
 

@@ -84,6 +84,7 @@ function rejected(code: string, message: string) {
 }
 
 export const VERIFICATION_CODE = '424242';
+export const PROFILE_IMAGE_URL = 'https://img.clerk.com/uploaded.png';
 
 const USER_FIELDS = [
   'first_name',
@@ -195,6 +196,18 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const body = new URLSearchParams(await request.text());
       const user = updateUser(state, user => patchUser(user, body));
       return user ? envelope(user, state.client) : missing();
+    }),
+    http.post(fapiUrl('/v1/me/profile_image'), async ({ request }) => {
+      if (new URL(request.url).searchParams.get('_method') === 'DELETE') {
+        const user = updateUser(state, user => ({ ...user, image_url: '', has_image: false }));
+        return user ? envelope({ id: 'img_1', name: null, public_url: null }, state.client) : missing();
+      }
+      const file = (await request.formData()).get('file');
+      if (!(file instanceof File)) {
+        return rejected('form_param_missing', 'file is required');
+      }
+      const user = updateUser(state, user => ({ ...user, image_url: PROFILE_IMAGE_URL, has_image: true }));
+      return user ? envelope({ id: 'img_1', name: file.name, public_url: PROFILE_IMAGE_URL }, state.client) : missing();
     }),
     http.post(fapiUrl('/v1/me/phone_numbers'), async ({ request }) => {
       const body = new URLSearchParams(await request.text());
