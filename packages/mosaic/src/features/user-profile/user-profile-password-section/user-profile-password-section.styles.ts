@@ -28,16 +28,11 @@ export const styles = stylex.create({
   checkboxDescription: {
     color: colorVars['--cl-color-foreground-secondary'],
   },
-  managedContent: {
-    flexShrink: 0,
-  },
-  managedActions: {
-    flexShrink: 1,
-  },
   managedBy: {
     gap: space['1.5'],
     alignItems: 'center',
     display: 'flex',
+    marginBlockStart: space['1'],
   },
   managedByText: {
     color: colorVars['--cl-color-foreground-secondary'],

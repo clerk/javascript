@@ -25,16 +25,13 @@ export function UserProfilePasswordRowView({
   return (
     <Section.Items>
       <Section.Item>
-        <Section.Content xstyle={!action && managedBy && styles.managedContent}>
+        <Section.Content>
           <Section.Description>{hasPassword ? m.masked : m.noPasswordSet}</Section.Description>
+          {!action && managedBy ? <ManagedByLabel {...managedBy} /> : null}
         </Section.Content>
         {action ? (
           <Section.Actions>{action}</Section.Actions>
-        ) : managedBy ? (
-          <Section.Actions xstyle={styles.managedActions}>
-            <ManagedByLabel {...managedBy} />
-          </Section.Actions>
-        ) : onSubmitPassword ? (
+        ) : !managedBy && onSubmitPassword ? (
           <Section.Actions>
             <EditPassword
               hasPassword={hasPassword}
