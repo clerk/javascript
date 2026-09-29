@@ -2,12 +2,17 @@
 import { ReflectionKind } from 'typedoc';
 import { MemberRouter } from 'typedoc-plugin-markdown';
 
-import { REFERENCE_OBJECT_PAGE_SYMBOLS } from './reference-objects.mjs';
+import { REFERENCE_OBJECT_CONFIG, REFERENCE_OBJECT_PAGE_SYMBOLS } from './reference-objects.mjs';
 import { toUrlSlug } from './slug.mjs';
 import { isInlineModifierWithoutStandalonePage } from './standalone-page-tag.mjs';
 
 /** @type {Set<string>} */
 const REFERENCE_OBJECT_SYMBOL_NAMES = new Set(Object.values(REFERENCE_OBJECT_PAGE_SYMBOLS));
+const INLINE_METHOD_SYMBOL_NAMES = new Set(
+  Object.values(REFERENCE_OBJECT_CONFIG)
+    .filter(entry => 'inlineMethods' in entry && entry.inlineMethods)
+    .map(entry => entry.symbol),
+);
 
 /**
  * From a filepath divided by `/` only keep the first and last part
@@ -87,12 +92,13 @@ class ClerkRouter extends MemberRouter {
     filePath = flattenDirName(filePath);
 
     /**
-     * Put each reference object in its own folder alongside `properties.mdx` and `methods/` from `extract-methods.mjs`.
-     * E.g. `shared/clerk.mdx` -> `shared/clerk/clerk.mdx`, `shared/clerk/properties.mdx`, and `shared/clerk/methods/`.
+     * Put reference objects in folders alongside `properties.mdx` and `methods/` from `extract-methods.mjs`.
+     * Entries with `inlineMethods: true` keep the flat TypeDoc path and render methods in that file.
      */
     if (
       (reflection.kind === ReflectionKind.Interface || reflection.kind === ReflectionKind.Class) &&
-      REFERENCE_OBJECT_SYMBOL_NAMES.has(reflection.name)
+      REFERENCE_OBJECT_SYMBOL_NAMES.has(reflection.name) &&
+      !INLINE_METHOD_SYMBOL_NAMES.has(reflection.name)
     ) {
       const kebab = toUrlSlug(reflection.name);
       const m = filePath.match(/^([^/]+)\/([^/]+)$/);

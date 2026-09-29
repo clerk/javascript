@@ -1,10 +1,6 @@
 // @ts-check
 /**
- * TypeDoc plugin that runs during the markdown render pass. For each reference-object page listed in {@link REFERENCE_OBJECT_CONFIG} (e.g. `shared/clerk/clerk.mdx`), this listener:
- *
- * - copies the body of the page's `## Properties` section (table only, no heading) into a sibling `properties.mdx`,
- * - mutates `output.contents` to drop the `## Properties` section from the main page,
- * - writes one `methods/<name>.mdx` per callable child on the reflection (and on any `extraMethodInterfaces`), alongside the main page in that resource folder.
+ * TypeDoc plugin that runs during the markdown render pass. For reference-object pages listed in {@link REFERENCE_OBJECT_CONFIG}, this listener normally moves the Properties table to `properties.mdx` and writes callable members to `methods/<name>.mdx`. Entries with `inlineMethods: true` keep the methods under a `## Methods` heading in the main file.
  *
  * Must load **after** `custom-plugin.mjs` so its `MarkdownPageEvent.END` listener — which applies link replacements to `output.contents` — runs first. The Properties body we copy out is then already in its final, replaced form.
  *
@@ -1407,6 +1403,7 @@ export function load(app) {
       return;
     }
     const entry = configEntryForPageUrl(pageUrl);
+    const inlineMethods = 'inlineMethods' in entry && entry.inlineMethods === true;
     const methodFormat = methodFormatForPageUrl(pageUrl);
     const decl = /** @type {import('typedoc').DeclarationReflection | undefined} */ (output.model);
     if (!decl?.children) {
@@ -1448,9 +1445,23 @@ export function load(app) {
       fs.mkdirSync(objectDir, { recursive: true });
 
       // `output.contents` is already prettier-formatted by typedoc-plugin-markdown's earlier
-      // pre-write job. Extract the Properties body from it (also formatted), write it out,
-      // then strip the section so the main page no longer ships it.
+      // pre-write job. Move the Properties body to a sibling file for reference objects, or
+      // keep it in the main file alongside methods for inline-method resources.
       const { propertiesBody, stripped } = splitPropertiesFromContents(output.contents ?? '');
+      if (inlineMethods) {
+        const sections = [stripped.trimEnd()];
+        const hasProperties = decl.children.some(
+          child => !shouldExtractCallableMember(child, ctx) && !hasExtractMethodsModifier(child),
+        );
+        if (hasProperties && propertiesBody) {
+          sections.push(`## Properties\n\n${propertiesBody.trimEnd()}`);
+        }
+        if (methodFiles.length) {
+          sections.push('## Methods', ...methodFiles.map(({ content }) => content.trimEnd()));
+        }
+        output.contents = `${sections.filter(Boolean).join('\n\n')}\n`;
+        return;
+      }
       if (propertiesBody) {
         const propertiesPath = path.join(objectDir, 'properties.mdx');
         fs.writeFileSync(propertiesPath, `${propertiesBody.trimEnd()}\n`, 'utf-8');

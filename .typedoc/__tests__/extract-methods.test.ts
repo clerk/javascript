@@ -83,6 +83,17 @@ describe('extract-methods snapshots', () => {
     await expect(content).toMatchFileSnapshot('./__snapshots__/user-api-methods-remove-password.mdx');
   });
 
+  it('SSO bypass methods render in one type page', async () => {
+    const content = await readGenerated('shared/sso-bypass-allowlist-resource.mdx');
+    expect(content).toContain('[`Organization`](/docs/reference/objects/organization#properties) object');
+    expect(content).toContain('## Methods');
+    expect(content).not.toContain('## Properties');
+    for (const method of ['addUser', 'addUsers', 'getUsers', 'removeUser']) {
+      expect(content).toContain(`### \`${method}()\``);
+      expect(content).toContain(`function ${method}(`);
+    }
+  });
+
   it('properties extracted + prettier-aligned: clerk', async () => {
     const content = await readGenerated('shared/clerk/properties.mdx');
     await expect(content).toMatchFileSnapshot('./__snapshots__/clerk-properties.mdx');

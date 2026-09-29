@@ -58,7 +58,7 @@ export interface SSOBypassAllowlistBulkCreateResult {
 /**
  * The `SSOBypassAllowlistResource` object manages which Organization members can sign in with an email code instead of
  * using their enterprise single sign-on (SSO) connection. Access it through `organization.ssoBypassAllowlist` on the
- * [`Organization` object](https://clerk.com/docs/reference/objects/organization#properties).
+ * [`Organization`](https://clerk.com/docs/reference/objects/organization#properties) object.
  *
  * Managing the allowlist requires the `org:sys_entconns_sso_bypass:manage` [System Permission](https://clerk.com/docs/guides/organizations/control-access/roles-and-permissions#system-permissions).
  *
