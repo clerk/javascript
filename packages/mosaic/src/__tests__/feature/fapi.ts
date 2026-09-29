@@ -1,4 +1,6 @@
 import type {
+  ApiKeyJSON,
+  APIKeysSettingsJSON,
   AttributeDataJSON,
   AttributesJSON,
   AuthConfigJSON,
@@ -29,6 +31,7 @@ export type FapiEnvironment = Omit<EnvironmentJSON, 'user_settings' | 'organizat
 };
 
 export interface FapiEnvironmentOverrides {
+  api_keys_settings?: Partial<Settings<APIKeysSettingsJSON>>;
   auth_config?: Partial<AuthConfigJSON>;
   display_config?: Partial<DisplayConfigJSON>;
   organization_settings?: Partial<Settings<OrganizationSettingsJSON>>;
@@ -104,6 +107,7 @@ export function fapiEnvironment(overrides: FapiEnvironmentOverrides = {}): FapiE
       id: 'api_keys_settings_1',
       user_api_keys_enabled: false,
       orgs_api_keys_enabled: false,
+      ...overrides.api_keys_settings,
     },
     auth_config: {
       object: 'auth_config',
@@ -383,6 +387,25 @@ export function fapiSuggestion(
     id,
     public_organization_data: publicOrganizationData(organization),
     status: 'pending',
+    created_at: createdAt,
+    updated_at: createdAt,
+    ...overrides,
+  };
+}
+
+export function fapiApiKey(overrides: Partial<ApiKeyJSON> & Pick<ApiKeyJSON, 'id' | 'name' | 'subject'>): ApiKeyJSON {
+  return {
+    object: 'api_key',
+    type: 'api_key',
+    scopes: [],
+    claims: null,
+    revoked: false,
+    revocation_reason: null,
+    expired: false,
+    expiration: null,
+    created_by: null,
+    description: null,
+    last_used_at: null,
     created_at: createdAt,
     updated_at: createdAt,
     ...overrides,

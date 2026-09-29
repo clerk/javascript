@@ -20,6 +20,8 @@ export const userProfileApiKeysPanelMessages = {
   search: 'Search API keys',
   create: 'Create API key',
   createError: 'Could not create the API key. Try again.',
+  nameTakenError: 'API Key name already exists.',
+  quotaExceededError: 'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
   createTitle: 'Add new API key',
   createDescription: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
   nameLabel: 'Secret key name',

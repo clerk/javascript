@@ -17,15 +17,17 @@ import { truncationStyles } from '../../utils/typography.styles';
 
 const expirationValues = ['never', '1d', '7d', '30d', '60d', '90d', '180d', '1y'] as const;
 
+export type UserProfileAPIKeyExpiration = (typeof expirationValues)[number];
+
 export interface UserProfileCreateAPIKeyDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   finalFocus?: DialogFocusTarget;
   name: string;
   onNameChange: (name: string) => void;
-  expiration: (typeof expirationValues)[number] | null;
+  expiration: UserProfileAPIKeyExpiration | null;
   expirationDateLabel: string | null;
-  onExpirationChange: (expiration: (typeof expirationValues)[number] | null) => void;
+  onExpirationChange: (expiration: UserProfileAPIKeyExpiration | null) => void;
   secret: string | null;
   isPending: boolean;
   error: string | null;

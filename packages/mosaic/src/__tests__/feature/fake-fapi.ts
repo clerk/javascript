@@ -1,4 +1,5 @@
 import type {
+  ApiKeyJSON,
   ClientJSON,
   OrganizationMembershipJSON,
   OrganizationSuggestionJSON,
@@ -9,6 +10,7 @@ import { http, HttpResponse, type JsonBodyType } from 'msw';
 import { setupWorker } from 'msw/browser';
 
 import {
+  fapiApiKey,
   fapiClient,
   type FapiEnvironment,
   fapiEnvironment,
@@ -29,6 +31,7 @@ export interface FakeFapiState {
   memberships: OrganizationMembershipJSON[];
   invitations: UserOrganizationInvitationJSON[];
   suggestions: OrganizationSuggestionJSON[];
+  apiKeys: ApiKeyJSON[];
 }
 
 export type FakeFapiSeed = Partial<FakeFapiState>;
@@ -71,6 +74,10 @@ function findSession(state: FakeFapiState, id: unknown): SessionJSON | undefined
   return state.client.sessions.find(session => session.id === id);
 }
 
+function error(code: string, status = 400) {
+  return HttpResponse.json({ errors: [{ code, message: code, long_message: code }] }, { status });
+}
+
 function missing() {
   return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
 }
@@ -82,6 +89,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     memberships: [],
     invitations: [],
     suggestions: [],
+    apiKeys: [],
     ...seed,
   };
 
@@ -161,6 +169,41 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       state.suggestions = state.suggestions.map(s => (s.id === accepted.id ? accepted : s));
       return envelope(accepted, state.client);
     }),
+    http.get(fapiUrl('/api_keys'), ({ request }) => {
+      const url = new URL(request.url);
+      const subject = url.searchParams.get('subject');
+      const query = (url.searchParams.get('query') ?? '').toLowerCase();
+      const keys = state.apiKeys.filter(
+        key => !key.revoked && key.subject === subject && key.name.toLowerCase().includes(query),
+      );
+      return HttpResponse.json(page(keys, url));
+    }),
+    http.post(fapiUrl('/api_keys'), async ({ request }) => {
+      const body: { name: string; subject: string; seconds_until_expiration?: number } = await request.json();
+      if (state.apiKeys.some(key => !key.revoked && key.subject === body.subject && key.name === body.name)) {
+        return error('token_creation_conflict', 409);
+      }
+      const now = Date.now();
+      const created = fapiApiKey({
+        id: `ak_${state.apiKeys.length + 1}`,
+        name: body.name,
+        subject: body.subject,
+        expiration: body.seconds_until_expiration ? now + body.seconds_until_expiration * 1000 : null,
+        created_at: now,
+        updated_at: now,
+      });
+      state.apiKeys = [created, ...state.apiKeys];
+      return HttpResponse.json({ ...created, secret: `ak_secret_${created.id}` });
+    }),
+    http.post(fapiUrl('/api_keys/:id/revoke'), ({ params }) => {
+      const key = state.apiKeys.find(k => k.id === params.id);
+      if (!key) {
+        return missing();
+      }
+      const revoked = { ...key, revoked: true };
+      state.apiKeys = state.apiKeys.map(k => (k.id === revoked.id ? revoked : k));
+      return HttpResponse.json(revoked);
+    }),
   );
 
   return state;
@@ -211,7 +254,6 @@ export function holdRequests(method: 'get' | 'post', path: string): HeldRequests
   return {
     requests,
     release: () => settle(undefined),
-    fail: (code = 'form_param_invalid') =>
-      settle(HttpResponse.json({ errors: [{ code, message: code, long_message: code }] }, { status: 400 })),
+    fail: (code = 'form_param_invalid') => settle(error(code)),
   };
 }
