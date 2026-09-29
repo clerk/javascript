@@ -100,4 +100,46 @@ describe('BaseResource', () => {
       }),
     );
   });
+  it.each([
+    [0, 1],
+    [1, 0],
+  ])(
+    'completes the sign-out when a password confirmation ends the session (remaining attempts: %i)',
+    async (remainingAttempts, expectedCalls) => {
+      const updateClient = vi.fn();
+      const handleSessionEnded = vi.fn().mockResolvedValue(undefined);
+
+      BaseResource.clerk = {
+        // @ts-expect-error - We're not about to mock the entire FapiClient
+        getFapiClient: () => ({
+          request: vi.fn().mockResolvedValue({
+            payload: {
+              client: { id: 'client_1', sessions: [] },
+              errors: [
+                {
+                  code: 'form_password_validation_failed',
+                  message: 'Password is incorrect',
+                  meta: { remaining_attempts: remainingAttempts },
+                },
+              ],
+            },
+            status: 422,
+            statusText: 'Unprocessable Entity',
+            headers: new Headers(),
+          }),
+        }),
+        __internal_setCountry: vi.fn(),
+        __internal_handleSessionEnded: handleSessionEnded,
+        updateClient,
+      } as any;
+
+      const resource = new TestResource();
+      await expect(resource.mutate()).rejects.toMatchObject({
+        errors: [expect.objectContaining({ meta: expect.objectContaining({ remainingAttempts }) })],
+      });
+
+      expect(updateClient).toHaveBeenCalledTimes(1);
+      expect(handleSessionEnded).toHaveBeenCalledTimes(expectedCalls);
+    },
+  );
 });
