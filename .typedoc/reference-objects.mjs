@@ -45,6 +45,10 @@ export const REFERENCE_OBJECT_CONFIG = {
     symbol: 'OrganizationResource',
     declarationHint: 'types/organization',
   },
+  'shared/sso-bypass-allowlist-resource/sso-bypass-allowlist-resource.mdx': {
+    symbol: 'SSOBypassAllowlistResource',
+    declarationHint: 'types/ssoBypassAllowlist',
+  },
   'shared/api-key-resource/api-key-resource.mdx': {
     symbol: 'APIKeyResource',
     declarationHint: 'types/apiKeys',
