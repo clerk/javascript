@@ -132,7 +132,7 @@ describe('reverificationMachine', () => {
     expect(actor.getSnapshot().value).toBe('methodPicker');
   });
 
-  it('does not leave submitting when reset until the attempt settles', async () => {
+  it('leaves submitting immediately when reset and ignores a late failure', async () => {
     const attempt = deferred<ReverificationResult>();
     const cancel = vi.fn();
     const actor = startActor(seatedDeps({ attempt: () => attempt.promise, cancel }));
@@ -142,16 +142,16 @@ describe('reverificationMachine', () => {
     expect(actor.getSnapshot().value).toBe('submitting');
 
     actor.send({ type: 'RESET' });
-    expect(actor.getSnapshot().value).toBe('submitting');
-    expect(cancel).not.toHaveBeenCalled();
+    expect(actor.getSnapshot().value).toBe('inactive');
 
     attempt.reject(new Error('cancelled'));
     await tick();
-    expect(actor.getSnapshot().value).toBe('done');
-    expect(cancel).toHaveBeenCalledOnce();
+    expect(actor.getSnapshot().value).toBe('inactive');
+    expect(actor.getSnapshot().context.errorMessage).toBeUndefined();
+    expect(cancel).not.toHaveBeenCalled();
   });
 
-  it('cancels a successful attempt that settled after reset', async () => {
+  it('ignores a successful attempt that settled after reset', async () => {
     const attempt = deferred<ReverificationResult>();
     const finish = vi.fn(async () => {});
     const cancel = vi.fn();
@@ -163,9 +163,9 @@ describe('reverificationMachine', () => {
 
     attempt.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
     await tick();
-    expect(actor.getSnapshot().value).toBe('done');
-    expect(cancel).toHaveBeenCalledOnce();
+    expect(actor.getSnapshot().value).toBe('inactive');
     expect(finish).not.toHaveBeenCalled();
+    expect(cancel).not.toHaveBeenCalled();
   });
 
   it('finishes on success without replacing the active method', async () => {
@@ -396,7 +396,7 @@ describe('useReverificationController', () => {
     });
   });
 
-  it('resets once while an attempt is in flight', async () => {
+  it('resets immediately while an attempt is in flight', async () => {
     const attempt = deferred<ReverificationResult>();
     const finish = vi.fn(() => Promise.resolve());
     const cancel = vi.fn();
@@ -423,10 +423,12 @@ describe('useReverificationController', () => {
     rerender({ model: { ...activeModel, phase: 'inactive' } });
     expect(result.current.status).toBe('idle');
 
-    act(() => {
+    await act(async () => {
       attempt.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
+      await tick();
     });
-    await waitFor(() => expect(cancel).toHaveBeenCalledOnce());
+    expect(result.current.status).toBe('idle');
+    expect(cancel).not.toHaveBeenCalled();
     expect(finish).not.toHaveBeenCalled();
   });
 
@@ -459,11 +461,63 @@ describe('useReverificationController', () => {
     });
     expect(cancel).toHaveBeenCalledOnce();
 
-    act(() => {
+    await act(async () => {
       attempt.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
+      await tick();
     });
-    await waitFor(() => expect(cancel).toHaveBeenCalledTimes(2));
+    expect(cancel).toHaveBeenCalledOnce();
     expect(finish).not.toHaveBeenCalled();
+  });
+
+  it('starts a fresh flow when reopened while a cancelled attempt is still in flight', async () => {
+    const attempt = deferred<ReverificationResult>();
+    const start = vi.fn(async () => firstFactorResult());
+    const finish = vi.fn(() => Promise.resolve());
+    const cancel = vi.fn();
+    const model = readyModel({ start, attempt: () => attempt.promise, finish, cancel });
+    const { result, rerender } = renderHook(
+      ({ model }: { model: ReverificationModel }) => useReverificationController(model),
+      { initialProps: { model } },
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    act(() => {
+      if (result.current.status === 'ready') {
+        result.current.onValueChange('secret');
+        result.current.onSubmit();
+      }
+    });
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.isPending).toBe(true);
+      }
+    });
+
+    rerender({ model: { ...model, phase: 'inactive' } });
+    expect(result.current.status).toBe('idle');
+
+    rerender({ model: { ...model, phase: 'active' } });
+    await waitFor(() => expect(start).toHaveBeenCalledTimes(2));
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+      if (result.current.status === 'ready') {
+        expect(result.current.isPending).toBe(false);
+        expect(result.current.value).toBe('');
+      }
+    });
+
+    await act(async () => {
+      attempt.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
+      await tick();
+    });
+
+    expect(cancel).not.toHaveBeenCalled();
+    expect(finish).not.toHaveBeenCalled();
+    expect(result.current.status).toBe('ready');
+    if (result.current.status === 'ready') {
+      expect(result.current.isPending).toBe(false);
+    }
   });
 
   it('stays on the current step pending while finish runs', async () => {
