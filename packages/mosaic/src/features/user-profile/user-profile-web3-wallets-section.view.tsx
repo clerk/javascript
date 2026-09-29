@@ -5,8 +5,6 @@ import { Section } from '../../components/section';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../localization';
 import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visible';
-import type { ReverificationController } from '../reverification';
-import { ReverificationConfirmation } from '../reverification/reverification-confirmation';
 import { UserProfileWeb3WalletRowView } from './user-profile-web3-wallet-row.view';
 
 export interface UserProfileWeb3Provider {
@@ -32,7 +30,6 @@ export interface UserProfileWeb3WalletsSectionViewProps {
   wallets: UserProfileWeb3Wallet[];
   availableProviders?: UserProfileWeb3Provider[];
   pendingId?: string;
-  removeReverification?: ReverificationController;
   onConnect?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (id: string) => void | Promise<void>;
@@ -46,7 +43,6 @@ export function UserProfileWeb3WalletsSectionView({
   onConnect,
   onSetPrimary,
   onRemove,
-  removeReverification,
 }: UserProfileWeb3WalletsSectionViewProps) {
   const m = useMessages('userProfileWeb3Wallets');
   const section = useRef<HTMLDivElement>(null);
@@ -101,9 +97,8 @@ export function UserProfileWeb3WalletsSectionView({
         </Section.Root>
       ) : null}
       {onRemove ? (
-        <ReverificationConfirmation
+        <Confirmation
           handle={removeWallet}
-          reverification={removeReverification}
           title={m.removeDialog.title}
           description={wallet =>
             fill(wallet.isVerified ? m.removeDialog.verifiedDescription : m.removeDialog.description, {

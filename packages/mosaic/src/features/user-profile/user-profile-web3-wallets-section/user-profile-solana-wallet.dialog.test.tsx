@@ -1,141 +1,59 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getWallets } from '@wallet-standard/core';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
-import type { ReverificationController } from '../../reverification';
 import { UserProfileSolanaWalletDialog } from './user-profile-solana-wallet.dialog';
 
-function renderDialog(reverification: ReverificationController, pending = true) {
+function renderDialog(pending = false, error?: string) {
   const onOpenChange = vi.fn();
-  const view = render(
+  render(
     <MosaicProvider>
       <UserProfileSolanaWalletDialog
         open
         pending={pending}
+        error={error}
         onOpenChange={onOpenChange}
         onConnect={vi.fn()}
-        reverification={reverification}
       />
     </MosaicProvider>,
   );
-  return { ...view, onOpenChange };
+  return onOpenChange;
 }
 
-function retryingVerification(): ReverificationController {
-  return {
-    status: 'retrying',
-    step: 'password',
-    value: '',
-    onValueChange: vi.fn(),
-    isPending: true,
-    onSubmit: vi.fn(),
-    onShowMethods: vi.fn(),
-    onShowHelp: vi.fn(),
-    onBack: vi.fn(),
-    onEmailSupport: vi.fn(),
-    methods: [],
-    onSelectMethod: vi.fn(),
-    onResend: vi.fn(),
-    canResend: false,
-  };
-}
+describe('Solana wallet picker', () => {
+  it.each(['Close', 'Escape'])('closes directly with %s when idle', async control => {
+    const user = userEvent.setup();
+    const onOpenChange = renderDialog();
 
-describe('Solana wallet reverification', () => {
-  it('keeps the picker visible while verification loads', () => {
-    renderDialog({ status: 'loading' });
-    expect(screen.getByText(/No Solana wallets are available/)).toBeInTheDocument();
+    if (control === 'Escape') {
+      await user.keyboard('{Escape}');
+    } else {
+      await user.click(screen.getByRole('button', { name: 'Close' }));
+    }
+
+    expect(onOpenChange).toHaveBeenCalledExactlyOnceWith(false);
+  });
+
+  it('blocks Close and Escape while the wallet provider is pending', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = renderDialog(true);
+
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    await user.keyboard('{Escape}');
+
+    expect(onOpenChange).not.toHaveBeenCalled();
+  });
+
+  it('shows a direct connection error in the picker', () => {
+    renderDialog(false, 'Wallet connection failed');
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Wallet connection failed');
+    expect(screen.getByRole('dialog', { name: 'Select a Solana wallet' })).toBeInTheDocument();
     expect(screen.queryByText('Cannot verify your account')).not.toBeInTheDocument();
-    expect(screen.getAllByRole('dialog')).toHaveLength(1);
   });
-
-  it('cancels a loading verification with Escape when cancellation is available', async () => {
-    const onCancel = vi.fn();
-    const { onOpenChange } = renderDialog({ status: 'loading', onCancel });
-
-    await userEvent.setup().keyboard('{Escape}');
-
-    expect(onCancel).toHaveBeenCalledOnce();
-    expect(onOpenChange).not.toHaveBeenCalled();
-  });
-
-  it.each(['Back', 'Close', 'Escape'])(
-    'returns to the picker when verification is cancelled with %s',
-    async control => {
-      const user = userEvent.setup();
-      const onCancel = vi.fn();
-      const { onOpenChange } = renderDialog({ status: 'unavailable', onCancel });
-      expect(screen.getByText('Cannot verify your account')).toBeInTheDocument();
-      expect(screen.getAllByRole('dialog')).toHaveLength(1);
-      if (control === 'Escape') {
-        await user.keyboard('{Escape}');
-      } else {
-        await user.click(screen.getByRole('button', { name: control, exact: true }));
-      }
-      expect(onCancel).toHaveBeenCalledOnce();
-      expect(onOpenChange).not.toHaveBeenCalled();
-    },
-  );
-
-  it('blocks dismissal while the protected operation retries', async () => {
-    const user = userEvent.setup();
-    const { onOpenChange } = renderDialog(retryingVerification());
-    expect(screen.getByRole('button', { name: 'Back', exact: true })).toBeDisabled();
-    await user.click(screen.getByRole('button', { name: 'Close', exact: true }));
-    await user.keyboard('{Escape}');
-    expect(onOpenChange).not.toHaveBeenCalled();
-  });
-
-  it('blocks dismissal while waiting for the wallet provider', async () => {
-    const user = userEvent.setup();
-    const { onOpenChange } = renderDialog({ status: 'idle' });
-    await user.click(screen.getByRole('button', { name: 'Close', exact: true }));
-    await user.keyboard('{Escape}');
-    expect(onOpenChange).not.toHaveBeenCalled();
-  });
-});
-
-it('returns focus to the selected wallet after cancelling verification', async () => {
-  const unregister = getWallets().register({
-    version: '1.0.0',
-    name: 'Test Solana wallet',
-    icon: 'data:image/svg+xml;base64,',
-    chains: ['solana:mainnet'],
-    accounts: [],
-    features: { 'solana:signMessage': {} },
-  });
-  const user = userEvent.setup();
-  function Harness() {
-    const [active, setActive] = useState(false);
-    return (
-      <UserProfileSolanaWalletDialog
-        open
-        pending={active}
-        onOpenChange={vi.fn()}
-        onConnect={() => setActive(true)}
-        reverification={active ? { status: 'unavailable', onCancel: () => setActive(false) } : { status: 'idle' }}
-      />
-    );
-  }
-  try {
-    render(
-      <MosaicProvider>
-        <Harness />
-      </MosaicProvider>,
-    );
-    await user.click(screen.getByRole('button', { name: 'Test Solana wallet' }));
-    expect(screen.getByText('Cannot verify your account')).toBeInTheDocument();
-    await waitFor(() =>
-      expect(screen.queryByRole('button', { name: 'Test Solana wallet', hidden: true })).not.toBeInTheDocument(),
-    );
-    await user.click(screen.getByRole('button', { name: 'Back', exact: true }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Test Solana wallet' })).toHaveFocus());
-    expect(screen.getAllByRole('dialog')).toHaveLength(1);
-  } finally {
-    unregister();
-  }
 });
 
 it('shows loading only on the selected wallet and disables both choices until it settles', async () => {
