@@ -47,7 +47,7 @@ export function useUserProfileConnectedAccountsController({
 
     try {
       if ((await action(id)) === 'redirecting') {
-        return;
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
     } catch (error) {
       const message = error instanceof Error && error.message ? error.message : fallbackErrorMessage;
