@@ -5,7 +5,6 @@ import { Button } from '../../../components/button';
 import type { FieldFeedback } from '../../../components/form';
 import { Text } from '../../../components/text';
 import { useLocale, useMessages } from '../../../localization';
-import { useReverificationFlow } from '../../reverification';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
 import {
@@ -44,17 +43,16 @@ export function UserProfilePasswordSection({ fallback = null }: UserProfilePassw
     return null;
   }
   return (
-    <PasswordFlow
+    <PasswordEditor
       key={`${model.userId}:${model.sessionId}`}
       model={model}
     />
   );
 }
 
-function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { status: 'ready' }> }) {
+function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { status: 'ready' }> }) {
   const m = useMessages('userProfilePasswordSection');
   const locale = useLocale();
-  const [updatePassword, reverification] = useReverificationFlow(model.updatePassword);
   const { validatePassword, passwordSettings } = model;
   const feedback = useCallback(
     async (password: string): Promise<FieldFeedback | undefined> => {
@@ -79,9 +77,8 @@ function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { st
   const controller = useUserProfileEditPasswordController({
     validatePassword: feedback,
     requiresCurrentPassword: model.requiresCurrentPassword,
-    onSubmit: updatePassword,
+    onSubmit: model.updatePassword,
     formatError: error => passwordFormError(error, model.requiresCurrentPassword, passwordSettings, m, locale),
-    reverification,
   });
 
   return (
@@ -96,7 +93,6 @@ function PasswordFlow({ model }: { model: Extract<UserProfilePasswordModel, { st
           onOpenChange={controller.onOpenChange}
           hasPassword={model.mode === 'change'}
           requiresCurrentPassword={model.requiresCurrentPassword}
-          reverification={controller.reverification}
           trigger={
             <Button
               color='neutral'

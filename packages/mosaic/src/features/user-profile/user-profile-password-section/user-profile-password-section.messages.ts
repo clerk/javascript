@@ -20,7 +20,6 @@ export const userProfilePasswordSectionMessages = {
   signOutOfOtherSessionsDescription:
     'It is recommended to sign out of all other devices which may have used your old password.',
   cancel: 'Cancel',
-  back: 'Back',
   save: 'Save changes',
   rules: {
     weak: 'Your password is not strong enough.',
@@ -63,7 +62,6 @@ export const userProfilePasswordSectionMessages = {
   },
 
   errors: {
-    verificationIncomplete: 'Your password was not saved. Please try verifying again.',
     unavailable: 'Password update is no longer available.',
     currentPasswordRequired: 'Current password is required.',
     mismatch: "Passwords don't match.",

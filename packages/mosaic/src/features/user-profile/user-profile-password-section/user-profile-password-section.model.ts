@@ -43,7 +43,7 @@ function getPasswordPolicy(
   }
 
   const policy: EditablePasswordPolicy = user.passwordEnabled
-    ? { mode: 'change', requiresCurrentPassword: !environment.authConfig.reverification }
+    ? { mode: 'change', requiresCurrentPassword: true }
     : { mode: 'set', requiresCurrentPassword: false };
 
   if (user.enterpriseAccounts.some(account => account.active)) {

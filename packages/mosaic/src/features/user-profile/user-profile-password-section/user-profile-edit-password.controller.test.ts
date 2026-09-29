@@ -1,10 +1,7 @@
-import { reverificationError } from '@clerk/shared/authorization-errors';
-import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { FieldFeedback } from '../../../components/form/form-submit-error';
-import type { ReverificationController } from '../../reverification';
 import { UserProfileSaveError } from '../user-profile-account-section/user-profile-account-section.types';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import type { UserProfileEditPasswordValue } from './user-profile-password-section.types';
@@ -161,11 +158,11 @@ describe('useUserProfileEditPasswordController', () => {
     });
   });
 
-  it('returns to editing without losing the draft when the flow cancels verification', async () => {
+  it('keeps the draft and shows a direct save error', async () => {
     const { result } = renderHook(() =>
       useUserProfileEditPasswordController({
         requiresCurrentPassword: true,
-        onSubmit: () => Promise.reject(new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' })),
+        onSubmit: () => Promise.reject(new Error('Save failed')),
       }),
     );
     open(result);
@@ -176,7 +173,7 @@ describe('useUserProfileEditPasswordController', () => {
 
     await waitFor(() => expect(result.current.form.isSubmitting).toBe(false));
     expect(result.current.isOpen).toBe(true);
-    expect(result.current.form.error).toBeUndefined();
+    expect(result.current.form.error).toBe('Save failed');
     expect(result.current.form.values).toEqual({
       currentPassword: 'old-secret',
       newPassword: 'new-secret-123',
@@ -236,7 +233,7 @@ describe('useUserProfileEditPasswordController', () => {
     await waitFor(() => expect(result.current.isOpen).toBe(false));
   });
 
-  it('leaves the current password out when reverification stands in for it', async () => {
+  it('leaves the current password out when setting a first password', async () => {
     const onSubmit = vi.fn(() => Promise.resolve());
     const { result } = renderController(onSubmit, false);
     open(result);
@@ -403,19 +400,18 @@ describe('useUserProfileEditPasswordController', () => {
     });
   });
 
-  it('keeps the draft and reports a failed retry when verification is required again', async () => {
-    const onSubmit = vi.fn(() => Promise.resolve(reverificationError()));
+  it('does not retry a rejected direct save', async () => {
+    const onSubmit = vi.fn(() => Promise.reject(new Error('Save failed')));
     const { result } = renderController(onSubmit);
     open(result);
     fill(result);
 
     act(() => result.current.form.submit());
 
-    await waitFor(() =>
-      expect(result.current.form.error).toBe('Your password was not saved. Please try verifying again.'),
-    );
+    await waitFor(() => expect(result.current.form.error).toBe('Save failed'));
     expect(result.current.isOpen).toBe(true);
     expect(result.current.form.values.newPassword).toBe('new-secret-123');
+    expect(onSubmit).toHaveBeenCalledOnce();
   });
 
   it('formats a failed save before the form shows it', async () => {
@@ -433,18 +429,19 @@ describe('useUserProfileEditPasswordController', () => {
     expect(formatError).toHaveBeenCalledWith(failure);
   });
 
-  it('cancels an active verification instead of closing the editor', () => {
-    const onCancel = vi.fn();
-    const reverification: ReverificationController = { status: 'unavailable', onCancel };
+  it('closes after a failed direct save', async () => {
     const { result } = renderHook(() =>
-      useUserProfileEditPasswordController({ onSubmit: () => Promise.resolve(), reverification }),
+      useUserProfileEditPasswordController({ onSubmit: () => Promise.reject(new Error('Save failed')) }),
     );
     open(result);
+    fill(result);
+
+    act(() => result.current.form.submit());
+    await waitFor(() => expect(result.current.form.error).toBe('Save failed'));
 
     act(() => result.current.onOpenChange(false));
 
-    expect(onCancel).toHaveBeenCalledOnce();
-    expect(result.current.isOpen).toBe(true);
-    expect(result.current.reverification).toBe(reverification);
+    expect(result.current.isOpen).toBe(false);
+    expect(result.current.form.values.newPassword).toBe('');
   });
 });

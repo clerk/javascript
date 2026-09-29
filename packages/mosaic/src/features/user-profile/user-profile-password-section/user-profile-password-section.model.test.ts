@@ -93,57 +93,48 @@ describe('useUserProfilePasswordModel', () => {
     expect(user.updatePassword).not.toHaveBeenCalled();
   });
 
-  it.each([
-    'signed out',
-    'different user',
-    'different session',
-    'no session',
-    'disabled',
-    'enterprise',
-    'mode',
-    'proof',
-  ])('rejects a captured action after the context changes: %s', async change => {
-    if (!user || !session || !environment) {
-      throw new Error('expected loaded fixtures');
-    }
-    user.passwordEnabled = true;
-    const updatePassword = user.updatePassword;
-    const { result, rerender } = renderHook(() => useUserProfilePasswordModel());
-    const action = ready(result.current).updatePassword;
+  it.each(['signed out', 'different user', 'different session', 'no session', 'disabled', 'enterprise', 'mode'])(
+    'rejects a captured action after the context changes: %s',
+    async change => {
+      if (!user || !session || !environment) {
+        throw new Error('expected loaded fixtures');
+      }
+      user.passwordEnabled = true;
+      const updatePassword = user.updatePassword;
+      const { result, rerender } = renderHook(() => useUserProfilePasswordModel());
+      const action = ready(result.current).updatePassword;
 
-    switch (change) {
-      case 'signed out':
-        user = null;
-        break;
-      case 'different user':
-        user = { ...user, id: 'user_2' };
-        break;
-      case 'different session':
-        session = { ...session, id: 'session_2' };
-        break;
-      case 'no session':
-        session = null;
-        break;
-      case 'disabled':
-        environment.userSettings.instanceIsPasswordBased = false;
-        break;
-      case 'enterprise':
-        user.enterpriseAccounts = [{ active: true }];
-        break;
-      case 'mode':
-        user.passwordEnabled = false;
-        break;
-      case 'proof':
-        environment.authConfig.reverification = true;
-        break;
-    }
+      switch (change) {
+        case 'signed out':
+          user = null;
+          break;
+        case 'different user':
+          user = { ...user, id: 'user_2' };
+          break;
+        case 'different session':
+          session = { ...session, id: 'session_2' };
+          break;
+        case 'no session':
+          session = null;
+          break;
+        case 'disabled':
+          environment.userSettings.instanceIsPasswordBased = false;
+          break;
+        case 'enterprise':
+          user.enterpriseAccounts = [{ active: true }];
+          break;
+        case 'mode':
+          user.passwordEnabled = false;
+          break;
+      }
 
-    const input = { currentPassword: 'old password', newPassword: 'new password', signOutOfOtherSessions: true };
-    await expect(action(input)).rejects.toMatchObject({ code: 'unavailable' });
-    rerender();
-    await expect(action(input)).rejects.toMatchObject({ code: 'unavailable' });
-    expect(updatePassword).not.toHaveBeenCalled();
-  });
+      const input = { currentPassword: 'old password', newPassword: 'new password', signOutOfOtherSessions: true };
+      await expect(action(input)).rejects.toMatchObject({ code: 'unavailable' });
+      rerender();
+      await expect(action(input)).rejects.toMatchObject({ code: 'unavailable' });
+      expect(updatePassword).not.toHaveBeenCalled();
+    },
+  );
 
   it('rejects updates when a loaded user has no active session', async () => {
     if (!user) {
@@ -158,11 +149,11 @@ describe('useUserProfilePasswordModel', () => {
   });
 
   it.each([
-    { passwordEnabled: false, reverification: false, signOutOfOtherSessions: true, currentPassword: undefined },
-    { passwordEnabled: false, reverification: true, signOutOfOtherSessions: false, currentPassword: undefined },
-    { passwordEnabled: true, reverification: false, signOutOfOtherSessions: false, currentPassword: ' old secret ' },
-    { passwordEnabled: true, reverification: true, signOutOfOtherSessions: true, currentPassword: undefined },
-  ])('sends the legacy payload for %j', async policy => {
+    { passwordEnabled: false, reverification: false, signOutOfOtherSessions: true },
+    { passwordEnabled: false, reverification: true, signOutOfOtherSessions: false },
+    { passwordEnabled: true, reverification: false, signOutOfOtherSessions: false },
+    { passwordEnabled: true, reverification: true, signOutOfOtherSessions: true },
+  ])('sends the direct password payload for %j', async policy => {
     if (!user || !environment) {
       throw new Error('expected loaded fixtures');
     }
@@ -183,7 +174,7 @@ describe('useUserProfilePasswordModel', () => {
       signOutOfOtherSessions: policy.signOutOfOtherSessions,
     };
     expect(user.updatePassword).toHaveBeenCalledExactlyOnceWith(
-      policy.currentPassword === undefined ? expected : { ...expected, currentPassword: ' old secret ' },
+      policy.passwordEnabled ? { ...expected, currentPassword: ' old secret ' } : expected,
     );
   });
 
@@ -224,8 +215,8 @@ describe('useUserProfilePasswordModel', () => {
     { passwordEnabled: false, reverification: false, mode: 'set', requiresCurrentPassword: false },
     { passwordEnabled: false, reverification: true, mode: 'set', requiresCurrentPassword: false },
     { passwordEnabled: true, reverification: false, mode: 'change', requiresCurrentPassword: true },
-    { passwordEnabled: true, reverification: true, mode: 'change', requiresCurrentPassword: false },
-  ])('derives $mode mode with reverification=$reverification', policy => {
+    { passwordEnabled: true, reverification: true, mode: 'change', requiresCurrentPassword: true },
+  ])('derives $mode mode independently of reverification=$reverification', policy => {
     if (!user || !environment) {
       throw new Error('expected loaded fixtures');
     }

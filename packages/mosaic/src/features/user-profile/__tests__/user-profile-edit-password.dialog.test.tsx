@@ -4,7 +4,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { FormField, UseFormResult } from '../../../components/form';
 import { MosaicProvider } from '../../../MosaicProvider';
-import type { ReverificationController } from '../../reverification';
 import type { UserProfileEditPasswordDialogProps } from '../user-profile-password-section/user-profile-edit-password.dialog';
 import { UserProfileEditPasswordDialog } from '../user-profile-password-section/user-profile-edit-password.dialog';
 import type { UserProfileEditPasswordValues } from '../user-profile-password-section/user-profile-password-section.types';
@@ -69,45 +68,14 @@ const confirmPasswordField = () => screen.getByLabelText('Confirm password');
 const signOutCheckbox = () => screen.getByRole('checkbox', { name: 'Sign out of all other devices' });
 const saveButton = () => screen.getByRole('button', { name: 'Save changes' });
 
-function verification(status: 'ready' | 'retrying', onCancel?: () => void): ReverificationController {
-  const view = {
-    step: 'password',
-    value: '',
-    onValueChange: vi.fn(),
-    isPending: status === 'retrying',
-    onSubmit: vi.fn(),
-    onShowMethods: vi.fn(),
-    onShowHelp: vi.fn(),
-    onBack: vi.fn(),
-    onEmailSupport: vi.fn(),
-    onResend: vi.fn(),
-    canResend: true,
-    methods: [],
-    onSelectMethod: vi.fn(),
-  };
-  return status === 'ready' ? { ...view, status, onCancel } : { ...view, status };
-}
-
 describe('UserProfileEditPasswordDialog', () => {
-  it('allows Back while verification can be cancelled and disables it during the retry', async () => {
-    const onCancel = vi.fn();
+  it('closes directly when Cancel is selected', async () => {
     const user = userEvent.setup();
-    const { rerender, props } = renderView({ reverification: verification('ready', onCancel) });
-    const back = screen.getByRole('button', { name: 'Back', exact: true });
+    const { props } = renderView();
 
-    expect(back).not.toBeDisabled();
-    await user.click(back);
-    expect(onCancel).toHaveBeenCalledOnce();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
 
-    rerender(
-      <MosaicProvider>
-        <UserProfileEditPasswordDialog
-          {...props}
-          reverification={verification('retrying')}
-        />
-      </MosaicProvider>,
-    );
-    expect(screen.getByRole('button', { name: 'Back', exact: true })).toBeDisabled();
+    expect(props.onOpenChange).toHaveBeenCalledWith(false, expect.anything());
   });
 
   it('names the dialog for a change and masks every field', () => {
@@ -178,7 +146,7 @@ describe('UserProfileEditPasswordDialog', () => {
     expect(screen.queryByLabelText('Current password')).not.toBeInTheDocument();
   });
 
-  it('skips the current password when reverification stands in for it', async () => {
+  it('skips the current password when it is not required', async () => {
     renderView({ requiresCurrentPassword: false });
 
     expect(screen.queryByLabelText('Current password')).not.toBeInTheDocument();
