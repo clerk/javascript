@@ -301,7 +301,7 @@ describe('useReverificationModel', () => {
     const { result } = renderHook(() => useReverificationModel(activeProps()));
     await expect(
       ready(result.current).attempt({ id: 'password', stage: 'first', strategy: 'password' }, 'bad'),
-    ).rejects.toThrow('That password is incorrect.');
+    ).rejects.toMatchObject({ message: 'That password is incorrect.' });
   });
 
   it('activates the verified session before complete', async () => {
@@ -327,7 +327,7 @@ describe('useReverificationModel', () => {
     const props = activeProps();
     const { result } = renderHook(() => useReverificationModel(props));
 
-    await expect(ready(result.current).finish()).rejects.toThrow('Session could not be activated.');
+    await expect(ready(result.current).finish()).rejects.toMatchObject({ message: 'Session could not be activated.' });
     expect(setActive).toHaveBeenCalledWith({ session: 'sess_1' });
     expect(props.complete).not.toHaveBeenCalled();
   });
