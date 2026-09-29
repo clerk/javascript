@@ -42,6 +42,7 @@ export function UserProfileCreateAPIKeyDialog(props: UserProfileCreateAPIKeyDial
 
   return (
     <Dialog.Root
+      role={props.secret ? 'alertdialog' : 'dialog'}
       open={props.open}
       onOpenChange={props.onOpenChange}
     >

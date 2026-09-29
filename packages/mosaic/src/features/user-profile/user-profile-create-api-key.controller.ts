@@ -60,7 +60,7 @@ export function useUserProfileCreateAPIKeyController({
     dialog: {
       open,
       onOpenChange: next => {
-        if (!form.isSubmitting && (secret === null || copyError !== null)) {
+        if (!form.isSubmitting) {
           setOpen(next);
         }
       },

@@ -172,7 +172,7 @@ describe('UserProfileApiKeysPanel', () => {
       expect(secret).toHaveValue(`ak_secret_${created.id}`);
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
       expect(await within(table()).findByText('Deploy')).toBeVisible();
     });
 
@@ -186,23 +186,29 @@ describe('UserProfileApiKeysPanel', () => {
       await user.click(await within(dialog).findByRole('button', { name: 'Copy API key' }));
 
       await expect(navigator.clipboard.readText()).resolves.toBe(`ak_secret_${fapi.apiKeys[0].id}`);
-      expect(screen.getByRole('dialog', { name: 'Add new API key' })).toBeVisible();
+      expect(screen.getByRole('alertdialog', { name: 'Add new API key' })).toBeVisible();
     });
 
-    it('keeps the secret open until it is copied', async () => {
+    it('keeps the secret open on an outside click but closes it on Escape', async () => {
       const { user } = await renderPanel();
       const dialog = await openCreate(user);
       await fillCreate(user, dialog, 'Deploy', 'Never');
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
       await within(dialog).findByRole('textbox', { name: 'API key' });
+      const backdrop = document.querySelector('.cl-dialog-backdrop');
+      if (!backdrop) {
+        throw new Error('Expected the dialog backdrop');
+      }
+
+      await user.click(backdrop);
+      expect(dialog).not.toHaveAttribute('data-closed');
+      expect(screen.getByRole('alertdialog', { name: 'Add new API key' })).toBeVisible();
 
       await user.keyboard('{Escape}');
-
-      expect(dialog).not.toHaveAttribute('data-closed');
-      expect(dialog).toBeVisible();
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     });
 
-    it('explains a failed copy and lets the user dismiss the secret', async () => {
+    it('explains a failed copy', async () => {
       const { user } = await renderPanel();
       const dialog = await openCreate(user);
       await fillCreate(user, dialog, 'Deploy', 'Never');
@@ -213,9 +219,7 @@ describe('UserProfileApiKeysPanel', () => {
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
       expect(await within(dialog).findByRole('alert')).toHaveTextContent('Could not copy the API key. Try again.');
-
-      await user.keyboard('{Escape}');
-      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(dialog).toBeVisible();
     });
 
     it('requires a name longer than two characters', async () => {
