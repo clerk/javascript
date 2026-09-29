@@ -1,4 +1,3 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
 import type * as SharedReact from '@clerk/shared/react';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -47,14 +46,13 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       },
     }),
     useSession: () => ({ session: { id: 'session_1' } }),
-    useReverification: <F,>(fetcher: F) => fetcher,
   };
 });
 
 describe('Web3 wallets', () => {
   beforeEach(() => {
     attributes.web3_wallet = { enabled: true };
-    request.mockReset().mockRejectedValue(new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' }));
+    request.mockReset().mockRejectedValue(new Error('Wallet request failed'));
   });
 
   it.each([false, undefined])('hides existing wallets and providers when Web3 enabled is %s', enabled => {
@@ -72,7 +70,7 @@ describe('Web3 wallets', () => {
   });
 
   it.each(['connect', 'primary', 'remove'] as const)(
-    'keeps %s cancellation out of the visible errors',
+    'shows a direct %s failure without retrying automatically',
     async action => {
       const user = userEvent.setup();
       render(
@@ -92,6 +90,8 @@ describe('Web3 wallets', () => {
         }
       }
       await waitFor(() => expect(request).toHaveBeenCalledOnce());
+      expect(await screen.findByRole('alert')).toHaveTextContent('Wallet request failed');
+      expect(screen.queryByText('Cannot verify your account')).not.toBeInTheDocument();
       if (action === 'remove') {
         await waitFor(() =>
           expect(
@@ -101,8 +101,6 @@ describe('Web3 wallets', () => {
       } else {
         await waitFor(() => expect(screen.getByRole('button', { name: 'Connect MetaMask' })).not.toBeDisabled());
       }
-      expect(screen.queryByText(/Cancelled/)).not.toBeInTheDocument();
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
       if (action === 'remove') {
         expect(screen.getByRole('alertdialog')).toBeInTheDocument();
       }
