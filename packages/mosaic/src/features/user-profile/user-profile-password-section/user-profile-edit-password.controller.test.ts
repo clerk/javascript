@@ -435,7 +435,7 @@ describe('useUserProfileEditPasswordController', () => {
 
   it('cancels an active verification instead of closing the editor', () => {
     const onCancel = vi.fn();
-    const reverification = { status: 'unavailable', phase: 'active', onCancel } as ReverificationController;
+    const reverification: ReverificationController = { status: 'unavailable', onCancel };
     const { result } = renderHook(() =>
       useUserProfileEditPasswordController({ onSubmit: () => Promise.resolve(), reverification }),
     );
