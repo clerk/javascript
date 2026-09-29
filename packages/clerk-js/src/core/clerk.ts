@@ -998,13 +998,18 @@ export class Clerk implements ClerkInterface {
     return ProtectCheckGate.getInstance().register(flows);
   };
 
-  public __internal_resolvePendingProtectCheck = async (): Promise<void> => {
-    if (!this.client) {
+  public __internal_resolvePendingProtectCheck = async (flow?: ProtectCheckFlow): Promise<void> => {
+    const client = this.client;
+    if (!client || client.signIn.status === 'complete' || client.signUp.status === 'complete') {
       return;
     }
     const gate = ProtectCheckGate.getInstance();
-    await gate.resolve(this, 'signIn', this.client.signIn);
-    await gate.resolve(this, 'signUp', this.client.signUp);
+    if (flow !== 'signUp') {
+      await gate.resolve(this, 'signIn', client.signIn);
+    }
+    if (flow !== 'signIn') {
+      await gate.resolve(this, 'signUp', client.signUp);
+    }
   };
 
   public __internal_openProtectCheckModal = (

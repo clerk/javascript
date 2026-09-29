@@ -354,10 +354,13 @@ export interface Clerk {
   /**
    * Resolves a pending `protect_check` on the client's current sign-in or sign-up through Clerk's
    * Protect modal. Callback pages need it because the gate arrives with the client, not on a request.
+   * Does nothing once either attempt is `complete`. Pass `flow` to resolve only that attempt's gate,
+   * so a callback for one flow does not open the challenge of a stale attempt on the other. Without
+   * `flow`, the sign-in gate is resolved before the sign-up gate.
    *
    * @internal
    */
-  __internal_resolvePendingProtectCheck?: () => Promise<void>;
+  __internal_resolvePendingProtectCheck?: (flow?: ProtectCheckFlow) => Promise<void>;
 
   frontendApi: string;
 
@@ -2001,7 +2004,7 @@ export type ProtectCheckFlow = 'signIn' | 'signUp';
 export type __internal_ProtectCheckModalProps = {
   resource: SignInResource | SignUpResource;
   onResolved: () => void;
-  onFailed: (error: Error) => void;
+  onFailed: (error: unknown) => void;
 };
 
 export type __internal_EnableOrganizationsPromptProps = {

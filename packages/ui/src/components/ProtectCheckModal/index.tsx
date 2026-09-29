@@ -1,5 +1,3 @@
-import { isClerkAPIResponseError } from '@clerk/shared/error';
-import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type { __internal_ProtectCheckModalProps, SignInResource, SignUpResource } from '@clerk/shared/types';
 
 import { withCardStateProvider } from '@/ui/elements/contexts';
@@ -18,19 +16,14 @@ const ProtectCheckModalCard = withCardStateProvider(
       getProtectCheck: () => resource.protectCheck,
       getResource: () => resource,
       reload: () => resource.reload(),
-      submitProtectCheck: params =>
-        resource.submitProtectCheck(params).catch((error: unknown) => {
-          if (isClerkAPIResponseError(error) && error.errors[0]?.code === ERROR_CODES.FRAUD_ACTION_BLOCKED) {
-            onFailed(error);
-          }
-          throw error;
-        }),
+      submitProtectCheck: params => resource.submitProtectCheck(params),
       onResolved: (updated, isCancelled) => {
         if (!isCancelled() && !updated.protectCheck) {
           onResolved();
         }
         return Promise.resolve();
       },
+      onError: onFailed,
     });
 
     return (

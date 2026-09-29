@@ -1,4 +1,5 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import { waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -83,19 +84,18 @@ describe('ProtectCheckModal', () => {
     expect(onResolved).not.toHaveBeenCalled();
   });
 
-  it('keeps the modal open with a retry when the submit fails for a reason other than a block', async () => {
+  it('hands a submit failure other than a block to onFailed instead of offering a retry', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.startSignInWithProtectCheck();
     });
     const onResolved = vi.fn();
     const onFailed = vi.fn();
+    const invalid = new ClerkAPIResponseError('invalid', {
+      status: 422,
+      data: [{ code: 'form_param_invalid', message: 'invalid' } as any],
+    });
     mockExecute.mockResolvedValue('proof-abc');
-    fixtures.signIn.submitProtectCheck.mockRejectedValue(
-      new ClerkAPIResponseError('invalid', {
-        status: 422,
-        data: [{ code: 'form_param_invalid', message: 'invalid' } as any],
-      }),
-    );
+    fixtures.signIn.submitProtectCheck.mockRejectedValue(invalid);
 
     render(
       <ProtectCheckModal
@@ -106,8 +106,35 @@ describe('ProtectCheckModal', () => {
       { wrapper },
     );
 
-    await screen.findByRole('button', { name: /try again/i });
-    expect(onFailed).not.toHaveBeenCalled();
+    await waitFor(() => expect(onFailed).toHaveBeenCalledWith(invalid));
+    expect(screen.queryByRole('button', { name: /try again/i })).toBeNull();
+    expect(onResolved).not.toHaveBeenCalled();
+  });
+
+  it('hands the timed-out error to onFailed when the challenge is expired and a reload keeps it expired', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignInWithProtectCheck({ expiresAt: Date.now() - 1000 });
+    });
+    const onResolved = vi.fn();
+    const onFailed = vi.fn();
+    const reloadMock = vi.fn().mockResolvedValue(fixtures.signIn);
+    (fixtures.signIn as any).reload = reloadMock;
+
+    render(
+      <ProtectCheckModal
+        resource={fixtures.signIn}
+        onResolved={onResolved}
+        onFailed={onFailed}
+      />,
+      { wrapper },
+    );
+
+    await waitFor(() =>
+      expect(onFailed).toHaveBeenCalledWith(expect.objectContaining({ code: ERROR_CODES.PROTECT_CHECK_TIMED_OUT })),
+    );
+    expect(reloadMock).toHaveBeenCalledTimes(1);
+    expect(mockExecute).not.toHaveBeenCalled();
+    expect(screen.queryByRole('button', { name: /try again/i })).toBeNull();
     expect(onResolved).not.toHaveBeenCalled();
   });
 

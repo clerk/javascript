@@ -78,8 +78,10 @@ export function HandleSSOCallback(props: HandleSSOCallbackProps): ReactNode {
       // Prevent re-running this effect if the page is re-rendered during session activation (such as on Next.js).
       hasRun.current = true;
 
+      const intent = new URLSearchParams(window.location.search).get('intent');
+      const flow = intent === 'signIn' || intent === 'signUp' ? intent : undefined;
       try {
-        await clerk.__internal_resolvePendingProtectCheck?.();
+        await clerk.__internal_resolvePendingProtectCheck?.(flow);
       } catch {
         return navigateToSignIn();
       }

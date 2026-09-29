@@ -142,6 +142,28 @@ describe('<HandleSSOCallback />', () => {
     );
   });
 
+  it('scopes the Protect gate to the intent carried by the callback URL', async () => {
+    const href = window.location.href;
+    window.history.replaceState(null, '', '/sso-callback?intent=signUp');
+    mockSignUp = { status: 'missing_requirements' };
+
+    try {
+      render(
+        <HandleSSOCallback
+          navigateToApp={mockNavigateToApp}
+          navigateToSignIn={mockNavigateToSignIn}
+          navigateToSignUp={mockNavigateToSignUp}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(mockResolvePendingProtectCheck).toHaveBeenCalledWith('signUp');
+      });
+    } finally {
+      window.history.replaceState(null, '', href);
+    }
+  });
+
   it('navigates to sign-in when Protect blocks the attempt', async () => {
     mockSignIn = { status: 'needs_protect_check' };
     mockResolvePendingProtectCheck.mockRejectedValue(new Error('blocked'));

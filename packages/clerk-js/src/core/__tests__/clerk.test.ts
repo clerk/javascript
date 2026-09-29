@@ -4138,14 +4138,41 @@ describe('Clerk singleton', () => {
       expect(closeModal).toHaveBeenCalledWith('protectCheck');
     });
 
-    it('resolves gates the client carries on its sign-in and sign-up', async () => {
-      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+    const loadWithClient = async (client: { signIn: Record<string, unknown>; signUp: Record<string, unknown> }) => {
+      mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [], ...client }));
       const sut = new Clerk(productionPublishableKey);
       await sut.load(mockedLoadOptions);
+      return sut;
+    };
+
+    it('resolves gates the client carries on its sign-in and sign-up', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = await loadWithClient({ signIn: gatedSignIn(), signUp: gatedSignIn() });
 
       await sut.__internal_resolvePendingProtectCheck();
 
       expect(resolve).toHaveBeenCalledWith(sut, 'signIn', sut.client?.signIn);
+      expect(resolve).toHaveBeenCalledWith(sut, 'signUp', sut.client?.signUp);
+      resolve.mockRestore();
+    });
+
+    it('leaves every gate alone once the sign-in is complete', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = await loadWithClient({ signIn: { status: 'complete' }, signUp: gatedSignIn() });
+
+      await sut.__internal_resolvePendingProtectCheck();
+
+      expect(resolve).not.toHaveBeenCalled();
+      resolve.mockRestore();
+    });
+
+    it('resolves only the sign-up gate when the callback is a sign-up', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = await loadWithClient({ signIn: gatedSignIn(), signUp: gatedSignIn() });
+
+      await sut.__internal_resolvePendingProtectCheck('signUp');
+
+      expect(resolve).toHaveBeenCalledTimes(1);
       expect(resolve).toHaveBeenCalledWith(sut, 'signUp', sut.client?.signUp);
       resolve.mockRestore();
     });
