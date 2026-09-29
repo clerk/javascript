@@ -3,7 +3,6 @@ import { useCallback, useRef } from 'react';
 
 import { Button } from '../../../components/button';
 import type { FieldFeedback } from '../../../components/form';
-import { Text } from '../../../components/text';
 import { useLocale, useMessages } from '../../../localization';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
@@ -35,7 +34,10 @@ export function UserProfilePasswordSection({ fallback = null }: UserProfilePassw
     return (
       <UserProfilePasswordSectionView
         hasPassword={model.mode === 'change'}
-        action={<Text size='sm'>{m.readonly}</Text>}
+        managedBy={{
+          name: model.enterpriseConnection?.name || m.enterpriseConnection,
+          iconUrl: model.enterpriseConnection?.logoPublicUrl ?? undefined,
+        }}
       />
     );
   }

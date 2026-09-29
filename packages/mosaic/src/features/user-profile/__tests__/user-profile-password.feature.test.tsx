@@ -130,14 +130,35 @@ describe('Changing a password', () => {
     expect(screen.queryByRole('button', { name: 'Change password' })).toBeNull();
   });
 
-  it('keeps an enterprise-managed password read-only', async () => {
-    await renderPassword(fapiUser({ ...alice, enterprise_accounts: [fapiEnterpriseAccount({ id: 'ent_1' })] }));
+  it.each([true, false])('shows the managed view when passwordEnabled is %s', async passwordEnabled => {
+    await renderPassword(
+      fapiUser({
+        ...alice,
+        password_enabled: passwordEnabled,
+        enterprise_accounts: [
+          fapiEnterpriseAccount({ id: 'inactive', active: false, enterprise_connection: null }),
+          fapiEnterpriseAccount({ id: 'ent_1' }),
+        ],
+      }),
+    );
 
-    expect(
-      screen.getByText(
-        'Your password can currently not be edited because you can sign in only via the enterprise connection.',
-      ),
-    ).toBeVisible();
+    expect(screen.getByText(/Managed by|Your password can currently/)).toHaveTextContent('Managed by Company SSO');
+    if (!passwordEnabled) {
+      expect(screen.getByText('No password set')).toBeVisible();
+    }
+    expect(screen.queryByRole('button', { name: 'Change password' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Set password' })).toBeNull();
+  });
+
+  it('keeps the managed view when connection details are unavailable', async () => {
+    await renderPassword(
+      fapiUser({
+        ...alice,
+        enterprise_accounts: [fapiEnterpriseAccount({ id: 'ent_1', enterprise_connection: null })],
+      }),
+    );
+
+    expect(screen.getByText('Managed by your enterprise connection')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Change password' })).toBeNull();
   });
 
