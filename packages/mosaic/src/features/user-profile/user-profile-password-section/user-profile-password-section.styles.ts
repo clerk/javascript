@@ -32,10 +32,8 @@ export const styles = stylex.create({
     gap: space['1.5'],
     alignItems: 'center',
     display: 'flex',
-    marginBlockStart: space['1'],
   },
   managedByText: {
     color: colorVars['--cl-color-foreground-secondary'],
-    overflowWrap: 'anywhere',
   },
 });
