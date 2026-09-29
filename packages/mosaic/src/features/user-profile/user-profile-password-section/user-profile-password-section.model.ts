@@ -2,7 +2,13 @@ import { validate as validateComplexity } from '@clerk/shared/internal/clerk-js/
 import { createLoadZxcvbn } from '@clerk/shared/internal/clerk-js/passwords/loadZxcvbn';
 import { createValidatePasswordStrength } from '@clerk/shared/internal/clerk-js/passwords/strength';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
-import type { EnvironmentResource, PasswordSettingsData, PasswordValidation, UserResource } from '@clerk/shared/types';
+import type {
+  EnterpriseAccountResource,
+  EnvironmentResource,
+  PasswordSettingsData,
+  PasswordValidation,
+  UserResource,
+} from '@clerk/shared/types';
 import { useCallback } from 'react';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
@@ -15,7 +21,12 @@ type EditablePasswordPolicy =
 
 type UnavailablePasswordModel =
   | { status: 'hidden'; reason: 'no_user' | 'password_disabled' }
-  | { status: 'readonly'; mode: 'set' | 'change'; reason: 'enterprise_account' };
+  | {
+      status: 'readonly';
+      mode: 'set' | 'change';
+      reason: 'enterprise_account';
+      enterpriseConnection: EnterpriseAccountResource['enterpriseConnection'];
+    };
 
 export type UserProfilePasswordModel =
   | { status: 'loading' }
@@ -46,8 +57,14 @@ function getPasswordPolicy(
     ? { mode: 'change', requiresCurrentPassword: true }
     : { mode: 'set', requiresCurrentPassword: false };
 
-  if (user.enterpriseAccounts.some(account => account.active)) {
-    return { status: 'readonly', mode: policy.mode, reason: 'enterprise_account' };
+  const enterpriseAccount = user.enterpriseAccounts.find(account => account.active);
+  if (enterpriseAccount) {
+    return {
+      status: 'readonly',
+      mode: policy.mode,
+      reason: 'enterprise_account',
+      enterpriseConnection: enterpriseAccount.enterpriseConnection,
+    };
   }
 
   return { status: 'ready', userId: user.id, ...policy };
