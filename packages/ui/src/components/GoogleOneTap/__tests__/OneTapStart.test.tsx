@@ -43,13 +43,7 @@ describe('OneTapStart', () => {
     window.google = { accounts: { id: { initialize, prompt: vi.fn(), cancel: vi.fn() } } };
   });
 
-  it('does not claim the Protect flows on mount', async () => {
-    const { register } = await mountOneTap();
-
-    expect(register).not.toHaveBeenCalled();
-  });
-
-  it('claims both Protect flows only while it authenticates and handles the callback', async () => {
+  it('claims both Protect flows only while it authenticates, not on mount', async () => {
     const { fixtures, register, release, callback } = await mountOneTap();
     let finishAuth!: (value: SignInResource) => void;
     fixtures.clerk.authenticateWithGoogleOneTap.mockReturnValue(
@@ -58,6 +52,7 @@ describe('OneTapStart', () => {
       }),
     );
     fixtures.clerk.handleGoogleOneTapCallback.mockResolvedValue(undefined);
+    expect(register).not.toHaveBeenCalled();
 
     const pending = callback({ credential: 'cred' });
 

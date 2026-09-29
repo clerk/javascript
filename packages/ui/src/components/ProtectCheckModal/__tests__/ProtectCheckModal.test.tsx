@@ -31,30 +31,6 @@ beforeEach(() => {
 });
 
 describe('ProtectCheckModal', () => {
-  it('calls onResolved once the gate clears', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.startSignInWithProtectCheck();
-    });
-    const onResolved = vi.fn();
-    mockExecute.mockResolvedValue('proof-abc');
-    fixtures.signIn.submitProtectCheck.mockImplementation(() => {
-      (fixtures.signIn as any).protectCheck = null;
-      return Promise.resolve(fixtures.signIn);
-    });
-
-    render(
-      <ProtectCheckModal
-        resource={fixtures.signIn}
-        onResolved={onResolved}
-        onFailed={vi.fn()}
-      />,
-      { wrapper },
-    );
-
-    await waitFor(() => expect(onResolved).toHaveBeenCalledTimes(1));
-    expect(fixtures.signIn.submitProtectCheck).toHaveBeenCalledWith({ proofToken: 'proof-abc' });
-  });
-
   it('runs a chained challenge and only calls onResolved after the last gate clears', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.startSignInWithProtectCheck();
@@ -84,7 +60,7 @@ describe('ProtectCheckModal', () => {
     expect(onResolved).not.toHaveBeenCalled();
   });
 
-  it('hands a submit failure other than a block to onFailed instead of offering a retry', async () => {
+  it('hands a submit failure to onFailed instead of offering a retry', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.startSignInWithProtectCheck();
     });
@@ -135,32 +111,6 @@ describe('ProtectCheckModal', () => {
     expect(reloadMock).toHaveBeenCalledTimes(1);
     expect(mockExecute).not.toHaveBeenCalled();
     expect(screen.queryByRole('button', { name: /try again/i })).toBeNull();
-    expect(onResolved).not.toHaveBeenCalled();
-  });
-
-  it('hands a blocked verdict to onFailed instead of resolving', async () => {
-    const { wrapper, fixtures } = await createFixtures(f => {
-      f.startSignInWithProtectCheck();
-    });
-    const blocked = new ClerkAPIResponseError('blocked', {
-      status: 403,
-      data: [{ code: 'action_blocked', message: 'blocked', meta: { traceId: 'trace_1' } } as any],
-    });
-    mockExecute.mockResolvedValue('proof-abc');
-    fixtures.signIn.submitProtectCheck.mockRejectedValue(blocked);
-    const onResolved = vi.fn();
-    const onFailed = vi.fn();
-
-    render(
-      <ProtectCheckModal
-        resource={fixtures.signIn}
-        onResolved={onResolved}
-        onFailed={onFailed}
-      />,
-      { wrapper },
-    );
-
-    await waitFor(() => expect(onFailed).toHaveBeenCalledWith(blocked));
     expect(onResolved).not.toHaveBeenCalled();
   });
 

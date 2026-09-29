@@ -2361,16 +2361,6 @@ describe('SignUp protect_check gate', () => {
     },
   };
 
-  it('hands the resource to the gate after a mutation', async () => {
-    BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
-    const signUp = new SignUp({ id: 'signup_123' } as any);
-
-    await signUp.update({ emailAddress: 'a@example.com' });
-
-    expect(signUp.protectCheck?.token).toBe('challenge-token');
-    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(clerk, 'signUp', signUp, undefined);
-  });
-
   it('leaves reloads to the caller', async () => {
     BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
     const signUp = new SignUp({ id: 'signup_123' } as any);

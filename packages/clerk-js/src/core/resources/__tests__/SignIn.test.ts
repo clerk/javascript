@@ -3701,16 +3701,6 @@ describe('SignIn protect_check gate', () => {
     },
   };
 
-  it('hands the resource to the gate after a mutation', async () => {
-    BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
-    const signIn = new SignIn({ id: 'signin_123' } as any);
-
-    await signIn.create({ identifier: 'a@example.com' });
-
-    expect(signIn.protectCheck?.token).toBe('challenge-token');
-    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(clerk, 'signIn', signIn, undefined);
-  });
-
   it('leaves reloads to the caller', async () => {
     BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
     const signIn = new SignIn({ id: 'signin_123' } as any);

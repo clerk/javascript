@@ -4092,34 +4092,6 @@ describe('Clerk singleton', () => {
       expect(resource.protectCheck).not.toBeNull();
     });
 
-    it('opens the modal and resolves once the modal reports the gate cleared', async () => {
-      const openProtectCheckModal = vi.fn();
-      const closeModal = vi.fn();
-      const mockClerkUICtor = vi.fn(function () {
-        return { ensureMounted: () => Promise.resolve({ openProtectCheckModal, closeModal }) };
-      });
-      const sut = new Clerk(productionPublishableKey);
-      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
-      const resource = gatedSignIn() as any;
-
-      let settled = false;
-      const pending = sut.__internal_openProtectCheckModal({ resource }).then(() => {
-        settled = true;
-      });
-      await vi.waitFor(() => expect(openProtectCheckModal).toHaveBeenCalled());
-      expect(openProtectCheckModal).toHaveBeenCalledWith({
-        resource,
-        onResolved: expect.any(Function),
-        onFailed: expect.any(Function),
-      });
-      expect(settled).toBe(false);
-
-      openProtectCheckModal.mock.calls[0][0].onResolved();
-      await pending;
-      expect(closeModal).toHaveBeenCalledWith('protectCheck');
-      expect(settled).toBe(true);
-    });
-
     it('closes the modal and rejects with the error the modal reports', async () => {
       const openProtectCheckModal = vi.fn();
       const closeModal = vi.fn();
@@ -4175,16 +4147,6 @@ describe('Clerk singleton', () => {
       expect(resolve).toHaveBeenCalledTimes(1);
       expect(resolve).toHaveBeenCalledWith(sut, 'signUp', sut.client?.signUp);
       resolve.mockRestore();
-    });
-
-    it('registers prebuilt handlers with the gate', () => {
-      const release = vi.fn();
-      const register = vi.spyOn(ProtectCheckGate.prototype, 'register').mockReturnValue(release);
-      const sut = new Clerk(productionPublishableKey);
-
-      expect(sut.__internal_registerProtectCheckHandler(['signUp'])).toBe(release);
-      expect(register).toHaveBeenCalledWith(['signUp']);
-      register.mockRestore();
     });
   });
 

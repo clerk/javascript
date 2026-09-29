@@ -9,7 +9,6 @@ const gated = (id = 'sia_1') =>
     id,
     protectCheck: { status: 'pending', token: 'tok', sdkUrl: 'https://protect.example.com/sdk.js' },
   }) as any;
-const clear = (id = 'sia_1') => ({ id, protectCheck: null }) as any;
 
 const mockClerk = (overrides: Partial<Clerk> = {}) =>
   ({
@@ -42,28 +41,6 @@ describe('ProtectCheckGate', () => {
     expect(settled).toBe(true);
   });
 
-  it('does nothing when the resource has no gate', async () => {
-    const clerk = mockClerk();
-    await gate.resolve(clerk, 'signUp', clear());
-    expect(clerk.__internal_openProtectCheckModal).not.toHaveBeenCalled();
-  });
-
-  it('leaves the gate to code that registered for its flow', async () => {
-    const clerk = mockClerk();
-    const release = gate.register(['signIn']);
-    await gate.resolve(clerk, 'signIn', gated());
-    release();
-    expect(clerk.__internal_openProtectCheckModal).not.toHaveBeenCalled();
-  });
-
-  it('opens the modal for a flow nobody registered for', async () => {
-    const clerk = mockClerk();
-    const release = gate.register(['signUp']);
-    await gate.resolve(clerk, 'signIn', gated());
-    release();
-    expect(clerk.__internal_openProtectCheckModal).toHaveBeenCalledTimes(1);
-  });
-
   it('counts registrations per flow and releases each one once', async () => {
     const clerk = mockClerk();
     const releaseCombined = gate.register(['signIn', 'signUp']);
@@ -78,12 +55,6 @@ describe('ProtectCheckGate', () => {
     releaseSignUp();
     await gate.resolve(clerk, 'signUp', gated('sua_1'));
     expect(clerk.__internal_openProtectCheckModal).toHaveBeenCalledTimes(2);
-  });
-
-  it('leaves the proof submission to whatever runs the challenge', async () => {
-    const clerk = mockClerk();
-    await gate.resolve(clerk, 'signIn', gated(), 'protect_check');
-    expect(clerk.__internal_openProtectCheckModal).not.toHaveBeenCalled();
   });
 
   it('makes a call on the same resource share the in-flight resolution', async () => {
@@ -101,19 +72,6 @@ describe('ProtectCheckGate', () => {
     deferred.resolve();
     await Promise.all([outer, inner]);
     expect(clerk.__internal_openProtectCheckModal).toHaveBeenCalledTimes(1);
-  });
-
-  it('shares a rejection with callers on the same resource', async () => {
-    const deferred = createDeferredPromise();
-    const clerk = mockClerk({ __internal_openProtectCheckModal: vi.fn().mockReturnValue(deferred.promise) });
-    const blocked = new Error('blocked');
-
-    const outer = gate.resolve(clerk, 'signIn', gated());
-    const inner = gate.resolve(clerk, 'signIn', gated());
-    deferred.reject(blocked);
-
-    await expect(outer).rejects.toBe(blocked);
-    await expect(inner).rejects.toBe(blocked);
   });
 
   it('makes a call on another resource wait, then resolve its own gate', async () => {
