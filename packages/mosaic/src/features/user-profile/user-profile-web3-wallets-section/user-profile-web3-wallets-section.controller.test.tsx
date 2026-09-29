@@ -12,7 +12,13 @@ describe('Web3 wallet controller', () => {
     const pending = createDeferredPromise();
     const connect = vi.fn(() => pending.promise);
     const { result } = renderHook(() =>
-      useUserProfileWeb3WalletsController({ wallets, availableProviders, connect, setPrimary: vi.fn() }),
+      useUserProfileWeb3WalletsController({
+        wallets,
+        availableProviders,
+        connect,
+        setPrimary: vi.fn(),
+        fallbackErrorMessage: 'Something went wrong. Please try again.',
+      }),
     );
 
     act(() => {
@@ -29,5 +35,23 @@ describe('Web3 wallet controller', () => {
       await pending.promise;
     });
     await waitFor(() => expect(result.current.pendingId).toBeUndefined());
+  });
+
+  it('uses the localized fallback when a wallet action rejects without a message', async () => {
+    const { result } = renderHook(() =>
+      useUserProfileWeb3WalletsController({
+        wallets: [],
+        availableProviders: [{ id: 'web3_metamask_signature', provider: 'MetaMask' }],
+        connect: () => Promise.reject(new Error('')),
+        setPrimary: () => Promise.resolve(),
+        fallbackErrorMessage: 'Impossible de connecter le portefeuille.',
+      }),
+    );
+
+    await act(async () => {
+      await result.current.onConnect('web3_metamask_signature');
+    });
+
+    expect(result.current.availableProviders[0]?.connectError).toBe('Impossible de connecter le portefeuille.');
   });
 });

@@ -14,6 +14,7 @@ import {
   fapiWeb3Wallet,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../MosaicProvider';
 import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section';
 
 describe('Web3 wallets', () => {
@@ -127,6 +128,25 @@ describe('Web3 wallets', () => {
     expect(request).toHaveBeenCalledWith({ method: 'eth_requestAccounts' });
     expect(request).toHaveBeenCalledWith({ method: 'personal_sign', params: expect.any(Array) });
     expect(await screen.findByRole('button', { name: 'Manage MetaMask' })).toBeInTheDocument();
+  });
+
+  it('shows a localized fallback when the wallet provider rejects without a message', async () => {
+    vi.stubGlobal('ethereum', { request: vi.fn(() => Promise.reject(new Error(''))) });
+    serveFapi({
+      environment: web3Environment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+    });
+    await renderWithClerk(
+      <MosaicProvider
+        localization={{ messages: { userProfileWeb3Wallets: { errors: { generic: 'Connexion impossible.' } } } }}
+      >
+        <UserProfileWeb3WalletsSection />
+      </MosaicProvider>,
+    );
+
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect MetaMask' }));
+
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Connexion impossible.'));
   });
 
   it('holds one provider pending and allows a manual retry after an API error', async () => {

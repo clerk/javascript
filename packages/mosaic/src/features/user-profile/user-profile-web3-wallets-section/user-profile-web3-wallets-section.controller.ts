@@ -7,11 +7,13 @@ export function useUserProfileWeb3WalletsController({
   availableProviders,
   connect,
   setPrimary,
+  fallbackErrorMessage,
 }: {
   wallets: UserProfileWeb3Wallet[];
   availableProviders: UserProfileWeb3Provider[];
   connect: (strategy: string, walletName?: string) => Promise<unknown>;
   setPrimary: (walletId: string) => Promise<unknown>;
+  fallbackErrorMessage: string;
 }) {
   const [pendingId, setPendingId] = useState<string>();
   const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
@@ -34,8 +36,7 @@ export function useUserProfileWeb3WalletsController({
       await action();
       return true;
     } catch (error) {
-      const message =
-        error instanceof Error && error.message ? error.message : 'Something went wrong. Please try again.';
+      const message = error instanceof Error && error.message ? error.message : fallbackErrorMessage;
       setErrors(current => ({ ...current, [id]: message }));
       return false;
     } finally {
