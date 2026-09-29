@@ -1,13 +1,16 @@
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../mosaic-provider';
+import { UserProfileConnectedAccountsSectionView } from '../user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
+import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
 
 function DeleteAccount() {
   const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
@@ -37,23 +40,48 @@ function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
 }
 
 describe('UserProfileProfilePanelView', () => {
+  it('renders account and wallet slots with a focus target at the panel title', () => {
+    const titleRef = createRef<HTMLDivElement>();
+
+    renderView({
+      titleRef,
+      connectedAccountsSlot: <div data-testid='connected-slot'>Connected</div>,
+      web3WalletsSlot: <div data-testid='wallet-slot'>Wallets</div>,
+    });
+
+    expect(screen.getByTestId('connected-slot')).toBeInTheDocument();
+    expect(screen.getByTestId('wallet-slot')).toBeInTheDocument();
+    expect(titleRef.current).toHaveTextContent(/^Account$/);
+  });
+
   it('hides connected accounts when only providers without a connect callback are supplied', () => {
     renderView({
-      connectedAccounts: [],
-      availableConnectionProviders: [{ id: 'google', provider: 'Google' }],
+      connectedAccountsSlot: (
+        <UserProfileConnectedAccountsSectionView
+          accounts={[]}
+          availableProviders={[{ id: 'google', provider: 'Google' }]}
+        />
+      ),
     });
     expect(screen.queryByRole('region', { name: 'Connected accounts' })).not.toBeInTheDocument();
   });
 
   it('keeps the final account confirmation mounted until removal settles', async () => {
     const user = userEvent.setup();
+    const titleRef = createRef<HTMLDivElement>();
     const removal = createDeferredPromise();
     const onRemoveConnectedAccount = vi.fn(async () => {
       await removal.promise;
     });
     const { rerender } = renderView({
-      connectedAccounts: [{ id: 'github', provider: 'GitHub' }],
-      onRemoveConnectedAccount,
+      titleRef,
+      connectedAccountsSlot: (
+        <UserProfileConnectedAccountsSectionView
+          accounts={[{ id: 'github', provider: 'GitHub' }]}
+          fallbackFocus={() => titleRef.current}
+          onRemove={onRemoveConnectedAccount}
+        />
+      ),
     });
     await user.click(screen.getByRole('button', { name: 'Manage GitHub' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
@@ -63,8 +91,14 @@ describe('UserProfileProfilePanelView', () => {
       <MosaicProvider>
         <UserProfileProfilePanelView
           {...props}
-          connectedAccounts={[]}
-          onRemoveConnectedAccount={onRemoveConnectedAccount}
+          titleRef={titleRef}
+          connectedAccountsSlot={
+            <UserProfileConnectedAccountsSectionView
+              accounts={[]}
+              fallbackFocus={() => titleRef.current}
+              onRemove={onRemoveConnectedAccount}
+            />
+          }
         />
       </MosaicProvider>,
     );
@@ -82,13 +116,20 @@ describe('UserProfileProfilePanelView', () => {
 
   it('keeps the final wallet confirmation mounted until removal settles', async () => {
     const user = userEvent.setup();
+    const titleRef = createRef<HTMLDivElement>();
     const removal = createDeferredPromise();
     const onRemoveWeb3Wallet = vi.fn(async () => {
       await removal.promise;
     });
     const { rerender } = renderView({
-      web3Wallets: [{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }],
-      onRemoveWeb3Wallet,
+      titleRef,
+      web3WalletsSlot: (
+        <UserProfileWeb3WalletsSectionView
+          wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
+          fallbackFocus={() => titleRef.current}
+          onRemove={onRemoveWeb3Wallet}
+        />
+      ),
     });
     await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
@@ -97,8 +138,14 @@ describe('UserProfileProfilePanelView', () => {
       <MosaicProvider>
         <UserProfileProfilePanelView
           {...props}
-          web3Wallets={[]}
-          onRemoveWeb3Wallet={onRemoveWeb3Wallet}
+          titleRef={titleRef}
+          web3WalletsSlot={
+            <UserProfileWeb3WalletsSectionView
+              wallets={[]}
+              fallbackFocus={() => titleRef.current}
+              onRemove={onRemoveWeb3Wallet}
+            />
+          }
         />
       </MosaicProvider>,
     );
@@ -115,9 +162,13 @@ describe('UserProfileProfilePanelView', () => {
   it('keeps available providers visible without connected accounts', () => {
     const onConnectAccount = vi.fn();
     renderView({
-      connectedAccounts: [],
-      availableConnectionProviders: [{ id: 'google', provider: 'Google' }],
-      onConnectAccount,
+      connectedAccountsSlot: (
+        <UserProfileConnectedAccountsSectionView
+          accounts={[]}
+          availableProviders={[{ id: 'google', provider: 'Google' }]}
+          onConnect={onConnectAccount}
+        />
+      ),
     });
     expect(screen.getByRole('button', { name: 'Connect Google' })).toBeVisible();
   });
@@ -294,10 +345,20 @@ describe('UserProfileProfilePanelView', () => {
 
   it('renders connected accounts and the danger zone when provided', () => {
     renderView({
-      connectedAccounts: [
-        { id: 'google', provider: 'Google', identifier: 'test@google.com', iconUrl: 'https://example.com/google.svg' },
-      ],
-      deleteAccountSlot: <DeleteAccount />,
+      connectedAccountsSlot: (
+        <UserProfileConnectedAccountsSectionView
+          accounts={[
+            {
+              id: 'google',
+              provider: 'Google',
+              identifier: 'test@google.com',
+              iconUrl: 'https://example.com/google.svg',
+            },
+          ]}
+          onRemove={onRemoveConnectedAccount}
+        />
+      ),
+      onDeleteAccount,
     });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Connected accounts' })).toBeInTheDocument();
@@ -311,10 +372,18 @@ describe('UserProfileProfilePanelView', () => {
 
   it('renders connected provider and Web3 images inside icon frames', () => {
     const { container } = renderView({
-      connectedAccounts: [{ id: 'google', provider: 'Google', iconUrl: '/google.svg' }],
-      web3Wallets: [
-        { id: 'metamask', provider: 'MetaMask', address: 'test', isVerified: true, iconUrl: '/metamask.svg' },
-      ],
+      connectedAccountsSlot: (
+        <UserProfileConnectedAccountsSectionView
+          accounts={[{ id: 'google', provider: 'Google', iconUrl: '/google.svg' }]}
+        />
+      ),
+      web3WalletsSlot: (
+        <UserProfileWeb3WalletsSectionView
+          wallets={[
+            { id: 'metamask', provider: 'MetaMask', address: 'test', isVerified: true, iconUrl: '/metamask.svg' },
+          ]}
+        />
+      ),
     });
 
     const frames = container.querySelectorAll('.cl-icon-frame');
@@ -328,26 +397,30 @@ describe('UserProfileProfilePanelView', () => {
 
   it('composes linked wallets and available providers', () => {
     renderView({
-      web3Wallets: [
-        {
-          id: 'primary',
-          address: '0x1234567890abcdef1234567890abcdef12345678',
-          provider: 'MetaMask',
-          iconUrl: 'https://example.com/metamask.svg',
-          isPrimary: true,
-          isVerified: true,
-        },
-        {
-          id: 'secondary',
-          address: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
-          provider: 'Coinbase Wallet',
-          isVerified: true,
-        },
-      ],
-      availableWeb3Providers: [{ id: 'disconnected', provider: 'Coinbase Wallet' }],
-      onConnectWeb3Wallet: vi.fn(),
-      onSetPrimaryWeb3Wallet: vi.fn(),
-      onRemoveWeb3Wallet: vi.fn(),
+      web3WalletsSlot: (
+        <UserProfileWeb3WalletsSectionView
+          wallets={[
+            {
+              id: 'primary',
+              address: '0x1234567890abcdef1234567890abcdef12345678',
+              provider: 'MetaMask',
+              iconUrl: 'https://example.com/metamask.svg',
+              isPrimary: true,
+              isVerified: true,
+            },
+            {
+              id: 'secondary',
+              address: '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd',
+              provider: 'Coinbase Wallet',
+              isVerified: true,
+            },
+          ]}
+          availableProviders={[{ id: 'disconnected', provider: 'Coinbase Wallet' }]}
+          onConnect={vi.fn()}
+          onSetPrimary={vi.fn()}
+          onRemove={vi.fn()}
+        />
+      ),
     });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Web3 wallets' })).toBeInTheDocument();
@@ -445,14 +518,18 @@ describe('UserProfileProfilePanelView', () => {
         { id: 'phone_unverified', value: '+1 801-555-0100', isVerified: false },
         { id: 'phone_secondary', value: '+1 801-555-0101', isVerified: true },
       ],
-      connectedAccounts: [{ id: 'github', provider: 'GitHub', identifier: 'prestonxyz' }],
+      connectedAccountsSlot: (
+        <UserProfileConnectedAccountsSectionView
+          accounts={[{ id: 'github', provider: 'GitHub', identifier: 'prestonxyz' }]}
+          onRemove={onRemoveConnectedAccount}
+        />
+      ),
       onVerifyEmail,
       onSetPrimaryEmail,
       onRemoveEmail,
       onVerifyPhone,
       onSetPrimaryPhone,
       onRemovePhone,
-      onRemoveConnectedAccount,
     });
 
     await user.click(screen.getByRole('button', { name: 'Manage primary@clerk.dev' }));
@@ -522,11 +599,15 @@ describe('UserProfileProfilePanelView', () => {
         },
       ],
       phones: [],
-      connectedAccounts: [{ id: 'github', provider: 'GitHub', identifier: 'prestonxyz', canRemove: false }],
+      connectedAccountsSlot: (
+        <UserProfileConnectedAccountsSectionView
+          accounts={[{ id: 'github', provider: 'GitHub', identifier: 'prestonxyz', canRemove: false }]}
+          onRemove={vi.fn()}
+        />
+      ),
       onVerifyEmail: vi.fn(),
       onSetPrimaryEmail: vi.fn(),
       onRemoveEmail: vi.fn(),
-      onRemoveConnectedAccount: vi.fn(),
     });
 
     expect(screen.queryByRole('button', { name: 'Manage immutable@clerk.dev' })).not.toBeInTheDocument();
