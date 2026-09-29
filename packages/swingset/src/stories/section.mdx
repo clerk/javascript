@@ -9,8 +9,11 @@ import { Section } from '@clerk/mosaic/components/section';
 
 <Section.Root>
   <Section.Group>
-    <Section.Title>Account</Section.Title>
-    <Section.Surface>
+    <Section.Header>
+      <Section.Title>Account</Section.Title>
+      <Section.Actions>{control}</Section.Actions>
+    </Section.Header>
+    <Section.Body>
       <Section.Row>
         <Section.Item>
           <Section.Media>{icon}</Section.Media>
@@ -21,31 +24,53 @@ import { Section } from '@clerk/mosaic/components/section';
           <Section.Actions>{control}</Section.Actions>
         </Section.Item>
       </Section.Row>
-    </Section.Surface>
+    </Section.Body>
   </Section.Group>
 </Section.Root>
 ```
 
-`Section.Group` pairs an optional `Section.Title` with a `Section.Surface`. The surface is the outlined card and a query container named `cl-section`, so rows can adapt to its width. Its direct `Section.Row` children own separation and may stack one or more `Section.Item` entries. Each item lays out optional media, flexible content, and trailing actions. `Section.Media` accepts `sm`, `md`, `lg`, and `xl` sizes. `Section.Item` accepts `wrap`, which moves the actions under the content when the surface is narrower than `26rem`. `sectionCompactStyles.hidden` and `sectionCompactStyles.only` toggle inline content at the same width.
+`Section.Root` holds one topic and stacks its cards. It has no title of its own; pass `aria-label`
+to expose it as a named region.
 
-For a nested list, place a `Section.Header` and a `Section.Items` directly inside the surface. The header draws the divider above the list, and nested items are separated by dividers of their own.
+`Section.Group` is a card. `Section.Header` holds its `Section.Title`, an optional
+`Section.Description`, and optional `Section.Actions`; the card takes its accessible name from
+the title. `Section.Body` wraps everything under the header and draws the divider between the two.
 
-A section can hold more than one `Section.Group`. Set `variant='contained'` on a group that holds a nested list, such as a user's email addresses inside the account section. A contained group renders with `role='group'` and `data-variant='contained'`, so it can take its own accessible name and be styled apart from the section's main group.
+Inside the body, a `Section.Row` holds one setting as a `Section.Item`. `Section.Items` renders a
+list of values, one `Section.Item` per entry, and each item becomes a list item. Items lay out
+optional media, flexible content, and trailing actions. `Section.Media` accepts `sm`, `md`, `lg`,
+and `xl` sizes.
+
+`Section.Group` is a query container named `cl-section`, so rows can adapt to the card's width.
+`Section.Item` accepts `wrap`, which moves the actions under the content when the card is narrower
+than `26rem`. `sectionCompactStyles.hidden` and `sectionCompactStyles.only` toggle inline content at
+the same width.
 
 `Section.Title` renders at the level from the nearest `HeadingLevelProvider`, or `h2` outside one.
-On a page, put the sections in `Panel.Sections` so their titles sit one level below the page title.
-See [Panel](/components/panel) and [Heading](/components/heading).
+On a page, put the sections in `Panel.Sections` so the card titles sit one level below the page
+title. See [Panel](/components/panel) and [Heading](/components/heading).
 
-```tsx
-<Panel.Root>
-  <Panel.Title>Account</Panel.Title>
-  <Panel.Sections>
-    <Section.Root>
-      <Section.Title>Email addresses</Section.Title>
-    </Section.Root>
-  </Panel.Sections>
-</Panel.Root>
-```
+## Parts
+
+| Part                  | Element     | Class                     | Notes                                                           |
+| --------------------- | ----------- | ------------------------- | --------------------------------------------------------------- |
+| `Section.Root`        | `<section>` | `.cl-section`             | Stacks cards. Unnamed unless given `aria-label`.                |
+| `Section.Group`       | `<div>`     | `.cl-section-group`       | The card, with `role='group'` named by its title.               |
+| `Section.Header`      | `<div>`     | `.cl-section-header`      | Title, optional description, optional actions.                  |
+| `Section.Title`       | heading     | `.cl-section-title`       | The card's heading.                                             |
+| `Section.Body`        | `<div>`     | `.cl-section-body`        | The card's content; draws the divider under the header.         |
+| `Section.Row`         | `<div>`     | `.cl-section-row`         | One setting.                                                    |
+| `Section.Items`       | `<ul>`      | `.cl-section-items`       | A list of values.                                               |
+| `Section.Item`        | `<div>`     | `.cl-section-item`        | Media, content, and actions on one line. `<li>` inside `Items`. |
+| `Section.Media`       | `<div>`     | `.cl-section-media`       | Reflects `data-size`.                                           |
+| `Section.Content`     | `<div>`     | `.cl-section-content`     | Label and description.                                          |
+| `Section.Label`       | `<div>`     | `.cl-section-label`       |                                                                 |
+| `Section.Description` | `<div>`     | `.cl-section-description` |                                                                 |
+| `Section.Actions`     | `<div>`     | `.cl-section-actions`     |                                                                 |
+| `Section.Error`       | `<p>`       | `.cl-section-error`       | A row-level message, placed beside the item inside the row.     |
+
+Every part takes `xstyle`, `ref`, and `render` along with its element's props. Items and content
+inside `Section.Items` reflect `data-nested`.
 
 ## Examples
 
@@ -58,19 +83,17 @@ See [Panel](/components/panel) and [Heading](/components/heading).
   ]}
 />
 
-### Contained groups
+### Cards
 
 <Story
-  name='ContainedGroups'
+  name='Cards'
   storyModule={SectionStories}
 />
 
-### Flat contained groups
-
-Contained groups can be restyled from external CSS so each one reads as its own section. This example targets `.cl-section-group[data-variant='contained']`, `.cl-section-header`, and `.cl-section-items`, and sizes list items with `--cl-section-row-min-height`.
+### Header description
 
 <Story
-  name='FlatContainedGroups'
+  name='HeaderDescription'
   storyModule={SectionStories}
 />
 

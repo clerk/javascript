@@ -61,14 +61,17 @@ describe('UserProfileSecurityPanelView', () => {
     renderView({ onDeleteAccount: vi.fn(() => Promise.resolve()) });
 
     expect(screen.getByRole('heading', { level: 2, name: 'Security' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 3, name: 'Authentication' })).toBeInTheDocument();
+    const authentication = screen.getByRole('region', { name: 'Authentication' });
+    expect(screen.queryByRole('heading', { name: 'Authentication' })).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Active devices' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
     expect(screen.getByText('Password')).toBeVisible();
-    expect(screen.getByText('Passkeys')).toBeVisible();
-    expect(screen.getByText('2-step verification')).toBeVisible();
-    expect(screen.getByRole('group', { name: 'Passkeys' })).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: '2-step verification' })).toBeInTheDocument();
+    expect(within(authentication).getByRole('group', { name: 'Password' })).toBeInTheDocument();
+    expect(within(authentication).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeInTheDocument();
+    expect(within(authentication).getByRole('heading', { level: 3, name: '2-step verification' })).toBeInTheDocument();
+    expect(within(authentication).getByRole('group', { name: 'Passkeys' })).toBeInTheDocument();
+    expect(within(authentication).getByRole('group', { name: '2-step verification' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: '2 other devices' })).toBeInTheDocument();
     expect(screen.getByText('This device')).toBeInTheDocument();
     expect(screen.getByText('2 other devices')).toBeInTheDocument();
     expect(
@@ -131,7 +134,7 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove', exact: true }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
-    const otherDevices = screen.getByRole('group', { name: 'Other devices' });
+    const otherDevices = screen.getByRole('group', { name: '2 other devices' });
     await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
@@ -179,7 +182,7 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByRole('menuitem', { name: 'Sign out' })).not.toBeInTheDocument();
   });
 
-  it('keeps the authentication heading on MFA when existing passkeys are hidden', () => {
+  it('keeps the authentication section on MFA when existing passkeys are hidden', () => {
     renderView({
       hasPassword: false,
       passkeysVisible: false,
@@ -191,17 +194,16 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByText('Passkeys')).not.toBeInTheDocument();
     expect(screen.queryByText('Passkey')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
-    expect(screen.getByText('2-step verification')).toBeVisible();
+    expect(screen.getByRole('region', { name: 'Authentication' })).toBeVisible();
+    expect(screen.getByRole('heading', { level: 3, name: '2-step verification' })).toBeVisible();
   });
 
-  it('keeps one authentication heading when passkeys are empty and Add is unavailable', () => {
+  it('keeps the passkeys card in the authentication section when passkeys are empty and Add is unavailable', () => {
     renderView({ hasPassword: false, passkeys: [], onAddPasskey: undefined });
 
     const section = screen.getByRole('region', { name: 'Authentication' });
-    expect(within(section).getByText('Passkeys')).toBeVisible();
+    expect(within(section).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeVisible();
     expect(within(section).getByText('No passkeys added')).toBeVisible();
-    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
     expect(screen.getByRole('group', { name: '2-step verification' })).toBeVisible();
   });
@@ -226,7 +228,7 @@ describe('UserProfileSecurityPanelView', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.getByText('Authentication')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Authentication' })).toBeInTheDocument();
     expect(screen.getByRole('alertdialog', { name: 'Remove passkey' })).toBeVisible();
 
     await act(async () => {
@@ -234,8 +236,8 @@ describe('UserProfileSecurityPanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
-    expect(screen.getByText('Passkeys')).toBeVisible();
+    expect(screen.getByRole('region', { name: 'Authentication' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Passkeys' })).toBeVisible();
     expect(screen.getByText('No passkeys added')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
   });

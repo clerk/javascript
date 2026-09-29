@@ -39,7 +39,7 @@ export function UserProfileConnectedAccountsSectionView({
   onRemove,
 }: UserProfileConnectedAccountsSectionViewProps) {
   const m = useMessages('userProfileConnectedAccounts');
-  const section = useRef<HTMLElement>(null);
+  const section = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: accounts.map(account => account.id),
     onRemove,
@@ -55,13 +55,15 @@ export function UserProfileConnectedAccountsSectionView({
   return (
     <>
       {hasRows ? (
-        <Section.Root
-          ref={section}
-          tabIndex={-1}
-        >
-          <Section.Group>
-            <Section.Title>{m.title}</Section.Title>
-            <Section.Surface>
+        <Section.Root>
+          <Section.Group
+            ref={section}
+            tabIndex={-1}
+          >
+            <Section.Header>
+              <Section.Title>{m.title}</Section.Title>
+            </Section.Header>
+            <Section.Body>
               {accounts.map(account => (
                 <UserProfileConnectedAccountRowView
                   key={account.id}
@@ -80,7 +82,7 @@ export function UserProfileConnectedAccountsSectionView({
                     />
                   ))
                 : null}
-            </Section.Surface>
+            </Section.Body>
           </Section.Group>
         </Section.Root>
       ) : null}

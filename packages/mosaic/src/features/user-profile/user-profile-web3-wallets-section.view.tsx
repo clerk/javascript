@@ -43,7 +43,7 @@ export function UserProfileWeb3WalletsSectionView({
   onRemove,
 }: UserProfileWeb3WalletsSectionViewProps) {
   const m = useMessages('userProfileWeb3Wallets');
-  const section = useRef<HTMLElement>(null);
+  const section = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: wallets.map(wallet => wallet.id),
     onRemove,
@@ -59,13 +59,15 @@ export function UserProfileWeb3WalletsSectionView({
   return (
     <>
       {hasRows ? (
-        <Section.Root
-          ref={section}
-          tabIndex={-1}
-        >
-          <Section.Group>
-            <Section.Title>{m.title}</Section.Title>
-            <Section.Surface>
+        <Section.Root>
+          <Section.Group
+            ref={section}
+            tabIndex={-1}
+          >
+            <Section.Header>
+              <Section.Title>{m.title}</Section.Title>
+            </Section.Header>
+            <Section.Body>
               {wallets.map(wallet => (
                 <UserProfileWeb3WalletRowView
                   key={wallet.id}
@@ -84,7 +86,7 @@ export function UserProfileWeb3WalletsSectionView({
                     />
                   ))
                 : null}
-            </Section.Surface>
+            </Section.Body>
           </Section.Group>
         </Section.Root>
       ) : null}

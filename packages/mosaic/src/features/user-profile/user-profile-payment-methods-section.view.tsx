@@ -28,32 +28,30 @@ export function UserProfilePaymentMethodsSectionView({
   onRemove,
 }: UserProfilePaymentMethodsSectionViewProps) {
   return (
-    <Section.Root aria-label='Payment methods'>
+    <Section.Root>
       <Section.Group>
-        <Section.Surface>
-          <Section.Header>
-            <Section.Content>
-              <Section.Label>Payment methods</Section.Label>
-            </Section.Content>
-            {onAdd ? (
-              <Section.Actions>
-                <Button
-                  aria-label='Add payment method'
-                  color='neutral'
+        <Section.Header>
+          <Section.Title>Payment methods</Section.Title>
+          {onAdd ? (
+            <Section.Actions>
+              <Button
+                aria-label='Add payment method'
+                color='neutral'
+                size='sm'
+                variant='outline'
+                onClick={onAdd}
+              >
+                <Icon
+                  name='plus'
+                  placement='inline-start'
                   size='sm'
-                  variant='outline'
-                  onClick={onAdd}
-                >
-                  <Icon
-                    name='plus'
-                    placement='inline-start'
-                    size='sm'
-                  />
-                  Add
-                </Button>
-              </Section.Actions>
-            ) : null}
-          </Section.Header>
+                />
+                Add
+              </Button>
+            </Section.Actions>
+          ) : null}
+        </Section.Header>
+        <Section.Body>
           <Section.Items>
             {paymentMethods.length > 0 ? (
               paymentMethods.map(paymentMethod => (
@@ -72,7 +70,7 @@ export function UserProfilePaymentMethodsSectionView({
               </Section.Item>
             )}
           </Section.Items>
-        </Section.Surface>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );

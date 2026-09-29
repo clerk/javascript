@@ -48,8 +48,10 @@ export function Default() {
   return (
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
-        <Section.Title>Profile</Section.Title>
-        <Section.Surface>
+        <Section.Header>
+          <Section.Title>Profile</Section.Title>
+        </Section.Header>
+        <Section.Body>
           <Section.Row>
             <Section.Item>
               <Section.Media size='lg'>
@@ -130,18 +132,20 @@ export function Default() {
               </Section.Actions>
             </Section.Item>
           </Section.Row>
-        </Section.Surface>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );
 }
 
-export function ContainedGroups() {
+export function Cards() {
   return (
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
-        <Section.Title>Account</Section.Title>
-        <Section.Surface>
+        <Section.Header>
+          <Section.Title>Profile</Section.Title>
+        </Section.Header>
+        <Section.Body>
           <Section.Row>
             <Section.Item>
               <Section.Content>
@@ -176,38 +180,32 @@ export function ContainedGroups() {
               </Section.Actions>
             </Section.Item>
           </Section.Row>
-        </Section.Surface>
+        </Section.Body>
       </Section.Group>
       {[
         { label: 'Email', values: ['item1@clerk.dev', 'item2@clerk.dev'] },
         { label: 'Phone', values: ['+1 801-888-8181'] },
       ].map(({ label, values }) => (
-        <Section.Group
-          key={label}
-          variant='contained'
-          aria-label={label}
-        >
-          <Section.Surface>
-            <Section.Header>
-              <Section.Content>
-                <Section.Label>{label}</Section.Label>
-              </Section.Content>
-              <Section.Actions>
-                <Button
-                  aria-label={`Add ${label.toLowerCase()}`}
-                  color='neutral'
+        <Section.Group key={label}>
+          <Section.Header>
+            <Section.Title>{label}</Section.Title>
+            <Section.Actions>
+              <Button
+                aria-label={`Add ${label.toLowerCase()}`}
+                color='neutral'
+                size='sm'
+                variant='outline'
+              >
+                <Icon
+                  name='plus'
+                  placement='inline-start'
                   size='sm'
-                  variant='outline'
-                >
-                  <Icon
-                    name='plus'
-                    placement='inline-start'
-                    size='sm'
-                  />
-                  Add
-                </Button>
-              </Section.Actions>
-            </Section.Header>
+                />
+                Add
+              </Button>
+            </Section.Actions>
+          </Section.Header>
+          <Section.Body>
             <Section.Items>
               {values.map((value, index) => (
                 <Section.Item key={value}>
@@ -231,146 +229,55 @@ export function ContainedGroups() {
                 </Section.Item>
               ))}
             </Section.Items>
-          </Section.Surface>
+          </Section.Body>
         </Section.Group>
       ))}
     </Section.Root>
   );
 }
 
-export function FlatContainedGroups() {
+export function HeaderDescription() {
   return (
-    <>
-      <style>{`
-        @scope {
-          .cl-section-group[data-variant='contained'] {
-            margin-top: 1.25rem !important;
-          }
-          .cl-section-group[data-variant='contained'] > .cl-section-surface {
-            border: none !important;
-            background: none !important;
-          }
-          .cl-section-header {
-            margin: 0 0 0.75rem !important;
-            padding: 0 !important;
-            border: none !important;
-          }
-          .cl-section-header .cl-section-label {
-            font-size: var(--cl-text-base-size) !important;
-          }
-          .cl-section-header .cl-button {
-            padding: 0 !important;
-            border: none !important;
-            background: none !important;
-          }
-          .cl-section-items {
-            border: 1px solid var(--cl-color-border) !important;
-            border-radius: var(--cl-radius-xl) !important;
-            background: var(--cl-color-background) !important;
-          }
-          .cl-section-items .cl-section-item {
-            min-height: var(--cl-section-row-min-height) !important;
-          }
-        }
-      `}</style>
-      <Section.Root xstyle={styles.rootMax}>
-        <Section.Group>
-          <Section.Title>Account</Section.Title>
-          <Section.Surface>
-            <Section.Row>
-              <Section.Item>
+    <Section.Root xstyle={styles.rootMax}>
+      <Section.Group>
+        <Section.Header>
+          <Section.Title>Active devices</Section.Title>
+          <Section.Description>Devices signed in to this account.</Section.Description>
+          <Section.Actions>
+            <Button
+              color='neutral'
+              size='sm'
+              variant='outline'
+            >
+              Sign out all
+            </Button>
+          </Section.Actions>
+        </Section.Header>
+        <Section.Body>
+          <Section.Items>
+            {['Chrome on macOS', 'Safari on iOS'].map(name => (
+              <Section.Item key={name}>
                 <Section.Content>
-                  <Section.Label>Name</Section.Label>
-                  <Section.Description>Preston Booth</Section.Description>
+                  <Section.Label>{name}</Section.Label>
+                  <Section.Description>Last seen today</Section.Description>
                 </Section.Content>
                 <Section.Actions>
                   <Button
+                    aria-label={`Manage ${name}`}
                     color='neutral'
+                    shape='square'
                     size='sm'
-                    variant='outline'
+                    variant='ghost'
                   >
-                    Edit name
+                    <Icon name='ellipsis-horizontal' />
                   </Button>
                 </Section.Actions>
               </Section.Item>
-            </Section.Row>
-            <Section.Row>
-              <Section.Item>
-                <Section.Content>
-                  <Section.Label>Username</Section.Label>
-                  <Section.Description>Prestonb.xyz</Section.Description>
-                </Section.Content>
-                <Section.Actions>
-                  <Button
-                    color='neutral'
-                    size='sm'
-                    variant='outline'
-                  >
-                    Edit username
-                  </Button>
-                </Section.Actions>
-              </Section.Item>
-            </Section.Row>
-          </Section.Surface>
-        </Section.Group>
-        {[
-          { label: 'Email', values: ['item1@clerk.dev', 'item2@clerk.dev'] },
-          { label: 'Phone', values: ['+1 801-888-8181'] },
-        ].map(({ label, values }) => (
-          <Section.Group
-            key={label}
-            variant='contained'
-            aria-label={label}
-          >
-            <Section.Surface>
-              <Section.Header>
-                <Section.Content>
-                  <Section.Label>{label}</Section.Label>
-                </Section.Content>
-                <Section.Actions>
-                  <Button
-                    aria-label={`Add ${label.toLowerCase()}`}
-                    color='neutral'
-                    size='sm'
-                    variant='outline'
-                  >
-                    <Icon
-                      name='plus'
-                      placement='inline-start'
-                      size='sm'
-                    />
-                    Add
-                  </Button>
-                </Section.Actions>
-              </Section.Header>
-              <Section.Items>
-                {values.map((value, index) => (
-                  <Section.Item key={value}>
-                    <Section.Content>
-                      <Section.Description xstyle={styles.descriptionFlex}>
-                        {value}
-                        {index === 0 ? <Badge color='neutral'>Primary</Badge> : null}
-                      </Section.Description>
-                    </Section.Content>
-                    <Section.Actions>
-                      <Button
-                        aria-label={`Manage ${value}`}
-                        color='neutral'
-                        shape='square'
-                        size='sm'
-                        variant='ghost'
-                      >
-                        <Icon name='ellipsis-horizontal' />
-                      </Button>
-                    </Section.Actions>
-                  </Section.Item>
-                ))}
-              </Section.Items>
-            </Section.Surface>
-          </Section.Group>
-        ))}
-      </Section.Root>
-    </>
+            ))}
+          </Section.Items>
+        </Section.Body>
+      </Section.Group>
+    </Section.Root>
   );
 }
 
@@ -378,8 +285,10 @@ export function ConnectedAccounts() {
   return (
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
-        <Section.Title>Connected accounts</Section.Title>
-        <Section.Surface>
+        <Section.Header>
+          <Section.Title>Connected accounts</Section.Title>
+        </Section.Header>
+        <Section.Body>
           <Section.Row>
             <Section.Item>
               <ProviderMedia provider='google' />
@@ -422,7 +331,7 @@ export function ConnectedAccounts() {
               </Section.Actions>
             </Section.Item>
           </Section.Row>
-        </Section.Surface>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );
@@ -432,8 +341,10 @@ export function IconFrameMedia() {
   return (
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
-        <Section.Title>Team</Section.Title>
-        <Section.Surface>
+        <Section.Header>
+          <Section.Title>Team</Section.Title>
+        </Section.Header>
+        <Section.Body>
           <Section.Row>
             <Section.Item>
               <Section.Media size='lg'>
@@ -450,7 +361,7 @@ export function IconFrameMedia() {
               </Section.Content>
             </Section.Item>
           </Section.Row>
-        </Section.Surface>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );
@@ -460,8 +371,10 @@ export function Destructive() {
   return (
     <Section.Root>
       <Section.Group>
-        <Section.Title>Danger zone</Section.Title>
-        <Section.Surface>
+        <Section.Header>
+          <Section.Title>Danger zone</Section.Title>
+        </Section.Header>
+        <Section.Body>
           <Section.Row>
             <Section.Item wrap>
               <Section.Content>
@@ -481,7 +394,7 @@ export function Destructive() {
               </Section.Actions>
             </Section.Item>
           </Section.Row>
-        </Section.Surface>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );

@@ -28,8 +28,10 @@ export function Default() {
         {sections.map(section => (
           <Section.Root key={section.title}>
             <Section.Group>
-              <Section.Title>{section.title}</Section.Title>
-              <Section.Surface>
+              <Section.Header>
+                <Section.Title>{section.title}</Section.Title>
+              </Section.Header>
+              <Section.Body>
                 <Section.Row>
                   <Section.Item>
                     <Section.Content>
@@ -47,7 +49,7 @@ export function Default() {
                     </Section.Actions>
                   </Section.Item>
                 </Section.Row>
-              </Section.Surface>
+              </Section.Body>
             </Section.Group>
           </Section.Root>
         ))}

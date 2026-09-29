@@ -5,9 +5,7 @@ import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
 
 export function UserProfileSecurityList({
-  sectionTitle,
   sectionRef,
-  asGroup = false,
   label,
   addLabel,
   emptyLabel,
@@ -16,9 +14,7 @@ export function UserProfileSecurityList({
   addControl,
   children,
 }: {
-  sectionTitle?: string;
   sectionRef?: Ref<HTMLDivElement>;
-  asGroup?: boolean;
   label: string;
   addLabel: string;
   emptyLabel: string;
@@ -27,40 +23,35 @@ export function UserProfileSecurityList({
   addControl?: ReactNode;
   children: ReactNode;
 }) {
-  const group = (
+  return (
     <Section.Group
-      ref={asGroup ? sectionRef : undefined}
-      tabIndex={asGroup ? -1 : undefined}
-      variant={asGroup ? 'contained' : 'default'}
-      aria-label={asGroup ? label : undefined}
+      ref={sectionRef}
+      tabIndex={-1}
     >
-      {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
-      <Section.Surface>
-        <Section.Header>
-          <Section.Content>
-            <Section.Label>{label}</Section.Label>
-          </Section.Content>
-          {addControl ? (
-            <Section.Actions>{addControl}</Section.Actions>
-          ) : onAdd ? (
-            <Section.Actions>
-              <Button
-                aria-label={addLabel}
-                color='neutral'
+      <Section.Header>
+        <Section.Title>{label}</Section.Title>
+        {addControl ? (
+          <Section.Actions>{addControl}</Section.Actions>
+        ) : onAdd ? (
+          <Section.Actions>
+            <Button
+              aria-label={addLabel}
+              color='neutral'
+              size='sm'
+              variant='outline'
+              onClick={onAdd}
+            >
+              <Icon
+                name='plus'
+                placement='inline-start'
                 size='sm'
-                variant='outline'
-                onClick={onAdd}
-              >
-                <Icon
-                  name='plus'
-                  placement='inline-start'
-                  size='sm'
-                />
-                Add
-              </Button>
-            </Section.Actions>
-          ) : null}
-        </Section.Header>
+              />
+              Add
+            </Button>
+          </Section.Actions>
+        ) : null}
+      </Section.Header>
+      <Section.Body>
         <Section.Items>
           {hasItems ? (
             children
@@ -72,19 +63,7 @@ export function UserProfileSecurityList({
             </Section.Item>
           )}
         </Section.Items>
-      </Section.Surface>
+      </Section.Body>
     </Section.Group>
-  );
-
-  return asGroup ? (
-    group
-  ) : (
-    <Section.Root
-      ref={sectionRef}
-      tabIndex={-1}
-      aria-label={sectionTitle ? undefined : label}
-    >
-      {group}
-    </Section.Root>
   );
 }

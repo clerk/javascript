@@ -21,8 +21,10 @@ export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSect
   return (
     <Section.Root>
       <Section.Group>
-        <Section.Title>{m.sectionTitle}</Section.Title>
-        <Section.Surface>
+        <Section.Header>
+          <Section.Title>{m.sectionTitle}</Section.Title>
+        </Section.Header>
+        <Section.Body>
           <Section.Row>
             <Section.Item wrap>
               <Section.Content>
@@ -55,7 +57,7 @@ export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSect
               </Section.Actions>
             </Section.Item>
           </Section.Row>
-        </Section.Surface>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );

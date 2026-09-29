@@ -86,10 +86,9 @@ export function UserProfileSecurityPanelView({
       <Panel.Title>Security</Panel.Title>
       <Panel.Sections>
         {hasAuthentication ? (
-          <Section.Root>
+          <Section.Root aria-label='Authentication'>
             {showPassword ? (
               <UserProfilePasswordSectionView
-                asGroup
                 hasPassword={hasPassword}
                 managedBy={managedBy}
                 requiresCurrentPassword={requiresCurrentPassword}
@@ -98,9 +97,7 @@ export function UserProfileSecurityPanelView({
             ) : null}
             {showPasskeys ? (
               <UserProfilePasskeysSectionView
-                asGroup
                 passkeys={passkeys}
-                sectionTitle={showPassword ? undefined : 'Authentication'}
                 onAdd={onAddPasskey}
                 addError={addPasskeyError}
                 onRename={onRenamePasskey}
@@ -109,11 +106,9 @@ export function UserProfileSecurityPanelView({
             ) : null}
             {mfaMethods !== undefined ? (
               <UserProfileMfaSectionView
-                asGroup
                 methods={mfaMethods}
                 addableMethods={addableMfaMethods}
                 addControl={mfaAddControl}
-                sectionTitle={!showPassword && !showPasskeys ? 'Authentication' : undefined}
                 onAdd={onAddMfaMethod}
                 onRegenerateBackupCodes={onRegenerateBackupCodes}
                 onRemove={onRemoveMfaMethod}

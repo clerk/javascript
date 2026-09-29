@@ -33,8 +33,10 @@ export function OrganizationProfileWorkspaceSectionView({
   return (
     <Section.Root>
       <Section.Group>
-        <Section.Title>{m.sectionTitle}</Section.Title>
-        <Section.Surface>
+        <Section.Header>
+          <Section.Title>{m.sectionTitle}</Section.Title>
+        </Section.Header>
+        <Section.Body>
           <OrganizationProfileLogoRowView
             name={name}
             imageUrl={imageUrl}
@@ -51,7 +53,7 @@ export function OrganizationProfileWorkspaceSectionView({
             slug={slug}
             onSubmit={onSubmitSlug}
           />
-        </Section.Surface>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );

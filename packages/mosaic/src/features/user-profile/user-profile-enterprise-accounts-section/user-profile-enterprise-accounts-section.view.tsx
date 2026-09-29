@@ -26,8 +26,10 @@ export function UserProfileEnterpriseAccountsSectionView({
   return (
     <Section.Root>
       <Section.Group>
-        <Section.Title>{m.title}</Section.Title>
-        <Section.Surface>
+        <Section.Header>
+          <Section.Title>{m.title}</Section.Title>
+        </Section.Header>
+        <Section.Body>
           {accounts.map(account => (
             <UserProfileEnterpriseAccountRowView
               key={account.id}
@@ -45,7 +47,7 @@ export function UserProfileEnterpriseAccountsSectionView({
                 />
               ))
             : null}
-        </Section.Surface>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );

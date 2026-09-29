@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, sectionVars, space, typeScaleVars } from '../../tokens.stylex';
-import { sectionNestedItemMarker } from './section.markers.stylex';
+import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
+import { sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
 
 const compact = '@container cl-section (width < 26rem)';
 
@@ -9,20 +9,10 @@ export const styles = stylex.create({
   root: {
     display: 'flex',
     flexDirection: 'column',
-    rowGap: space['3'],
+    rowGap: space['8'],
     width: '100%',
-  },
-  title: {
-    color: colorVars['--cl-color-foreground'],
-    fontWeight: fontWeightVars['--cl-font-medium'],
   },
   group: {
-    display: 'flex',
-    flexDirection: 'column',
-    rowGap: space['3'],
-    width: '100%',
-  },
-  surface: {
     borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-xl'],
     borderStyle: 'solid',
@@ -30,10 +20,40 @@ export const styles = stylex.create({
     backgroundColor: colorVars['--cl-color-background'],
     containerName: 'cl-section',
     containerType: 'inline-size',
+    display: 'flex',
+    flexDirection: 'column',
     width: '100%',
   },
-  row: {
+  header: {
     marginInline: space['4'],
+    paddingBlock: space['3'],
+    alignContent: 'center',
+    flexWrap: 'wrap',
+    minHeight: space['13'],
+    width: 'auto',
+  },
+  title: {
+    color: colorVars['--cl-color-foreground'],
+    flexGrow: 1,
+    fontWeight: fontWeightVars['--cl-font-medium'],
+    minWidth: 0,
+  },
+  headerDescription: {
+    flexBasis: '100%',
+  },
+  body: {
+    marginInline: space['4'],
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: {
+      default: '0px',
+      [stylex.when.siblingBefore(':where(*)', sectionHeaderMarker)]: '1px',
+    },
+    display: 'flex',
+    flexDirection: 'column',
+    width: 'auto',
+  },
+  row: {
     paddingBlock: space['4'],
     borderBlockStartColor: colorVars['--cl-color-border'],
     borderBlockStartStyle: 'solid',
@@ -44,19 +64,11 @@ export const styles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
     rowGap: space['2'],
-    minHeight: sectionVars['--cl-section-row-min-height'],
-    width: 'auto',
-  },
-  header: {
-    marginInline: space['4'],
-    paddingBlock: space['3'],
-    borderBlockEndColor: colorVars['--cl-color-border'],
-    borderBlockEndStyle: 'solid',
-    borderBlockEndWidth: '1px',
-    width: 'auto',
+    minHeight: `calc(${space['18.5']} + 1px)`,
+    width: '100%',
   },
   items: {
-    paddingInline: space['4'],
+    listStyle: 'none',
     display: 'flex',
     flexDirection: 'column',
     width: '100%',

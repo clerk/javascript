@@ -86,8 +86,10 @@ export function UserProfileActiveDevicesSectionView({
     <div {...stylex.props(styles.sectionCards)}>
       <Section.Root>
         <Section.Group>
-          <Section.Title>{m.title}</Section.Title>
-          <Section.Surface>
+          <Section.Header>
+            <Section.Title>{m.title}</Section.Title>
+          </Section.Header>
+          <Section.Body>
             {currentDevices.length > 0 ? (
               currentDevices.map(device => (
                 <Section.Row key={device.id}>
@@ -107,36 +109,31 @@ export function UserProfileActiveDevicesSectionView({
                 </Section.Item>
               </Section.Row>
             )}
-          </Section.Surface>
+          </Section.Body>
         </Section.Group>
         {otherDevices.length > 0 ? (
-          <Section.Group
-            variant='contained'
-            aria-label={m.otherDevicesTitle}
-          >
-            <Section.Surface>
-              <Section.Header>
-                <Section.Content>
-                  <Section.Label>
-                    {fill(otherDevices.length === 1 ? m.otherDevice : m.otherDevices, {
-                      count: String(otherDevices.length),
-                    })}
-                  </Section.Label>
-                </Section.Content>
-                {onSignOutAllOtherDevices ? (
-                  <Section.Actions>
-                    <Button
-                      ref={signOutAllTrigger}
-                      color='neutral'
-                      size='sm'
-                      variant='outline'
-                      onClick={() => setIsSignOutAllOpen(true)}
-                    >
-                      {m.signOutAll}
-                    </Button>
-                  </Section.Actions>
-                ) : null}
-              </Section.Header>
+          <Section.Group>
+            <Section.Header>
+              <Section.Title>
+                {fill(otherDevices.length === 1 ? m.otherDevice : m.otherDevices, {
+                  count: String(otherDevices.length),
+                })}
+              </Section.Title>
+              {onSignOutAllOtherDevices ? (
+                <Section.Actions>
+                  <Button
+                    ref={signOutAllTrigger}
+                    color='neutral'
+                    size='sm'
+                    variant='outline'
+                    onClick={() => setIsSignOutAllOpen(true)}
+                  >
+                    {m.signOutAll}
+                  </Button>
+                </Section.Actions>
+              ) : null}
+            </Section.Header>
+            <Section.Body>
               <Section.Items>
                 {otherDevices.map(device => (
                   <DeviceItem
@@ -148,7 +145,7 @@ export function UserProfileActiveDevicesSectionView({
                   />
                 ))}
               </Section.Items>
-            </Section.Surface>
+            </Section.Body>
           </Section.Group>
         ) : null}
       </Section.Root>

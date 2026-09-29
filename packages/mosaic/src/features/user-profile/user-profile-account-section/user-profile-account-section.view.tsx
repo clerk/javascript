@@ -114,8 +114,10 @@ export function UserProfileAccountSectionView({
   return (
     <Section.Root aria-label={m.sectionLabel}>
       <Section.Group>
-        <Section.Title>{m.sectionTitle}</Section.Title>
-        <Section.Surface>
+        <Section.Header>
+          <Section.Title>{m.sectionTitle}</Section.Title>
+        </Section.Header>
+        <Section.Body>
           <UserProfilePictureRowView
             name={name}
             imageUrl={imageUrl}
@@ -138,7 +140,7 @@ export function UserProfileAccountSectionView({
           />
           {!allowMultipleAccounts ? emailRow : null}
           {!allowMultipleAccounts ? phoneRow : null}
-        </Section.Surface>
+        </Section.Body>
       </Section.Group>
       {allowMultipleAccounts ? emailRow : null}
       {allowMultipleAccounts ? phoneRow : null}

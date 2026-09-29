@@ -23,8 +23,10 @@ export function UserProfileSubscriptionSectionView({
   return (
     <Section.Root>
       <Section.Group>
-        <Section.Title>Subscription</Section.Title>
-        <Section.Surface>
+        <Section.Header>
+          <Section.Title>Subscription</Section.Title>
+        </Section.Header>
+        <Section.Body>
           <Section.Row>
             <Section.Item>
               <Section.Content>
@@ -56,7 +58,7 @@ export function UserProfileSubscriptionSectionView({
               </Section.Actions>
             </Section.Item>
           </Section.Row>
-        </Section.Surface>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );

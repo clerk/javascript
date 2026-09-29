@@ -2,10 +2,10 @@ export { Section } from './section';
 export { sectionCompactStyles } from './section.styles';
 export type {
   SectionActionsProps,
+  SectionBodyProps,
   SectionContentProps,
   SectionDescriptionProps,
   SectionGroupProps,
-  SectionGroupVariant,
   SectionHeaderProps,
   SectionItemProps,
   SectionItemsProps,
@@ -14,6 +14,5 @@ export type {
   SectionMediaSize,
   SectionRootProps,
   SectionRowProps,
-  SectionSurfaceProps,
   SectionTitleProps,
 } from './section';

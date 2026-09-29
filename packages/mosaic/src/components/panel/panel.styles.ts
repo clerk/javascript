@@ -40,7 +40,7 @@ export const styles = stylex.create({
     verticalAlign: 'middle',
   },
   sections: {
-    gap: space['10'],
+    gap: space['8'],
     display: 'flex',
     flexDirection: 'column',
   },

@@ -27,8 +27,10 @@ export function OrganizationProfileDangerSectionView({
   return (
     <Section.Root>
       <Section.Group>
-        <Section.Title>{m.sectionTitle}</Section.Title>
-        <Section.Surface>
+        <Section.Header>
+          <Section.Title>{m.sectionTitle}</Section.Title>
+        </Section.Header>
+        <Section.Body>
           {onLeave ? (
             <DangerRow
               confirmationValue={name}
@@ -51,7 +53,7 @@ export function OrganizationProfileDangerSectionView({
               onRun={onDelete}
             />
           ) : null}
-        </Section.Surface>
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );

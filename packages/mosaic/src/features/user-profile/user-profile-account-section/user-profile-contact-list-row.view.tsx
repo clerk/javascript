@@ -42,36 +42,32 @@ export function UserProfileContactListRowView({
   return (
     <Section.Group
       ref={rowRef}
-      variant='contained'
       tabIndex={-1}
-      aria-label={label}
     >
-      <Section.Surface>
-        <Section.Header>
-          <Section.Content>
-            <Section.Label>{label}</Section.Label>
-          </Section.Content>
-          {addAction ? (
-            <Section.Actions>{addAction}</Section.Actions>
-          ) : onAdd ? (
-            <Section.Actions>
-              <Button
-                aria-label={m[kind].add}
-                color='neutral'
+      <Section.Header>
+        <Section.Title>{label}</Section.Title>
+        {addAction ? (
+          <Section.Actions>{addAction}</Section.Actions>
+        ) : onAdd ? (
+          <Section.Actions>
+            <Button
+              aria-label={m[kind].add}
+              color='neutral'
+              size='sm'
+              variant='outline'
+              onClick={onAdd}
+            >
+              <Icon
+                name='plus'
+                placement='inline-start'
                 size='sm'
-                variant='outline'
-                onClick={onAdd}
-              >
-                <Icon
-                  name='plus'
-                  placement='inline-start'
-                  size='sm'
-                />
-                {m.add}
-              </Button>
-            </Section.Actions>
-          ) : null}
-        </Section.Header>
+              />
+              {m.add}
+            </Button>
+          </Section.Actions>
+        ) : null}
+      </Section.Header>
+      <Section.Body>
         <Section.Items>
           {items.length === 0 ? (
             <Section.Item>
@@ -123,7 +119,7 @@ export function UserProfileContactListRowView({
           )}
         </Section.Items>
         {children}
-      </Section.Surface>
+      </Section.Body>
     </Section.Group>
   );
 }
