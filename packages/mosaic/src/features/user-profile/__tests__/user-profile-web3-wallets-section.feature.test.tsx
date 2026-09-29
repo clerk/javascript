@@ -5,7 +5,14 @@ import type { WindowAppReadyEventAPI } from '@wallet-standard/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
-import { fapiClient, fapiEnvironment, fapiSession, fapiUser, fapiWeb3Wallet } from '../../../__tests__/feature/fapi';
+import {
+  fapiClient,
+  fapiEnvironment,
+  fapiSession,
+  fapiUser,
+  fapiVerification,
+  fapiWeb3Wallet,
+} from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section';
 
@@ -44,6 +51,49 @@ describe('Web3 wallets', () => {
 
     expect(await screen.findByText('Web3 wallets')).toBeInTheDocument();
     expect(screen.getByText('0x1234...cdef')).toBeInTheDocument();
+  });
+
+  it.each(['verified', 'unverified'] as const)(
+    'warns about sign-in loss only when removing a verified admin wallet (%s)',
+    async status => {
+      const address = '0x1234567890abcdef1234567890abcdef12345678';
+      await renderWeb3({
+        web3_wallets: [
+          fapiWeb3Wallet({
+            id: 'admin_wallet',
+            web3_wallet: address,
+            verification: fapiVerification({ strategy: 'admin', status }),
+          }),
+        ],
+      });
+      const user = userEvent.setup();
+      expect(screen.getByText('0x1234...5678')).toBeInTheDocument();
+      await user.click(screen.getByRole('button', { name: `Manage ${address}` }));
+      await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
+      const warning = 'You will no longer be able to sign in using this web3 wallet.';
+      if (status === 'verified') {
+        expect(screen.getByRole('alertdialog')).toHaveTextContent(warning);
+      } else {
+        expect(screen.getByRole('alertdialog')).not.toHaveTextContent(warning);
+      }
+    },
+  );
+
+  it('keeps an unverified wallet available to connect without offering to make it primary', async () => {
+    await renderWeb3({
+      web3_wallets: [
+        fapiWeb3Wallet({
+          id: 'wallet_1',
+          web3_wallet: '0x1234567890abcdef',
+          verification: fapiVerification({ strategy: 'web3_metamask_signature', status: 'unverified' }),
+        }),
+      ],
+    });
+    expect(screen.getByText('Unverified')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Manage MetaMask' }));
+    expect(screen.getByRole('menuitem', { name: 'Remove wallet' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).toBeNull();
   });
 
   it('hides existing wallets when Web3 is disabled in the Clerk environment', async () => {
@@ -116,6 +166,9 @@ describe('Web3 wallets', () => {
     const user = userEvent.setup();
 
     await waitFor(() => expect(screen.getAllByRole('button', { name: 'Manage MetaMask' })).toHaveLength(2));
+    await user.click(screen.getAllByRole('button', { name: 'Manage MetaMask' })[0]);
+    expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).toBeNull();
+    await user.keyboard('{Escape}');
     await user.click(screen.getAllByRole('button', { name: 'Manage MetaMask' })[1]);
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
 
