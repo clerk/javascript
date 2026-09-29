@@ -392,6 +392,23 @@ describe('useReverificationWithState', () => {
     expect(challengeCancel).toHaveBeenCalledOnce();
   });
 
+  it('cancels the challenge when the owner unmounts before reverification is needed', async () => {
+    const response = deferred<Hint>();
+    const fetcher = vi.fn().mockImplementationOnce(() => response.promise);
+    const { result, unmount } = renderHook(() => useReverificationWithState(fetcher));
+
+    let pending!: Promise<unknown>;
+    act(() => {
+      pending = result.current[0]();
+    });
+    unmount();
+
+    const settled = expect(pending).rejects.toMatchObject({ code: 'reverification_cancelled' });
+    response.resolve({ reverificationLevel: 'first_factor' });
+    await settled;
+    expect(challengeCancel).toHaveBeenCalledOnce();
+  });
+
   it('does not cancel when the owner unmounts during retry', async () => {
     const retry = deferred<string>();
     const fetcher = vi

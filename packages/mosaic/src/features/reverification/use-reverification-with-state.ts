@@ -100,6 +100,8 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
     onNeedsReverification: ({ complete, cancel, level }) => {
       const operation = runtimeRef.current.operation;
       if (operation.status !== 'requesting') {
+        // This can happen e.g. when the component unmounts mid-flight
+        cancel();
         return;
       }
 
