@@ -380,7 +380,7 @@ jobs:
         test-name:
           [
             'generic',
-            'bundled-ui',
+            'composed',
             'express',
             'fastify',
             'ap-flows',

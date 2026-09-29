@@ -702,7 +702,7 @@
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
     },
-    "//#test:integration:bundled-ui": {
+    "//#test:integration:composed": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],
       "inputs": [
         "integration/**",

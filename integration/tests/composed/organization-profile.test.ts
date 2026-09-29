@@ -4,7 +4,7 @@ import type { FakeOrganization, FakeUser } from '../../testUtils';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
 
 testAgainstRunningApps({ withPattern: ['next.appRouterBundledUI.*'] })(
-  'composed OrganizationProfile exports @bundled-ui',
+  'composed OrganizationProfile exports @composed',
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
     let fakeUser: FakeUser;

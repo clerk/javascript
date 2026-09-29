@@ -24,7 +24,7 @@ import { stringPhoneNumber } from '../../testUtils/phoneUtils';
  */
 
 testAgainstRunningApps({ withPattern: ['next.appRouterBundledUI.*'] })(
-  'composed UserProfile exports @bundled-ui',
+  'composed UserProfile exports @composed',
   ({ app }) => {
     test.describe.configure({ mode: 'serial' });
     let fakeUser: FakeUser;
