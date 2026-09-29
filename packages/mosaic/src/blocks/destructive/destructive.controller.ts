@@ -1,84 +1,55 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useState } from 'react';
 
-import type { ReverificationController } from '../../features/reverification';
+import type { ActionContext } from '../../hooks/useAction';
+import { useAction } from '../../hooks/useAction';
+import type { Prompt } from '../../utils/prompt';
 import type { DestructiveControlledProps } from './destructive';
 
 export type DestructiveController = Pick<
   DestructiveControlledProps,
-  'open' | 'isDeleting' | 'errorMessage' | 'onOpenChange' | 'step'
+  'open' | 'isDeleting' | 'errorMessage' | 'onOpenChange' | 'prompt'
 > & {
-  onDelete: () => Promise<unknown>;
+  onDelete: () => Promise<void>;
   openDestructiveDialog: () => void;
 };
 
-type DestructiveState =
-  | { status: 'closed' }
-  | { status: 'open-needs-confirmation' }
-  | { status: 'open-pending' }
-  | { status: 'open-error'; errorMessage: string };
-
 /** Optional controller for use with Destructive block */
-export function useDestructiveController({
-  onDelete,
-  reverification,
-}: {
-  onDelete: () => Promise<unknown>;
-  reverification?: ReverificationController;
-}): DestructiveController {
-  const [destructiveState, setDestructiveState] = useState<DestructiveState>({ status: 'closed' });
-  const { status } = destructiveState;
-
-  const openDestructiveDialog = () => {
-    if (status === 'closed') {
-      setDestructiveState({ status: 'open-needs-confirmation' });
-    }
-  };
-
-  const isDeleting = status === 'open-pending';
-  const step =
-    reverification && reverification.status !== 'idle' && reverification.status !== 'loading' ? 'verify' : 'confirm';
+export function useDestructiveController(
+  onDelete: (ctx: ActionContext) => Promise<unknown>,
+  prompt: Prompt | null = null,
+): DestructiveController {
+  const [open, setOpen] = useState(false);
+  const action = useAction(async (ctx: ActionContext) => {
+    ctx.onSettled(result => {
+      if (result.status !== 'failed') {
+        setOpen(false);
+      }
+    });
+    return onDelete(ctx);
+  });
+  const { state } = action;
+  const isDeleting = state.status === 'running';
 
   return {
-    open: status !== 'closed',
+    open,
     isDeleting,
-    errorMessage: status === 'open-error' ? destructiveState.errorMessage : undefined,
-    step,
-    openDestructiveDialog,
+    errorMessage: state.status === 'failed' ? 'Something went wrong' : undefined,
+    prompt,
+    openDestructiveDialog: () => setOpen(true),
     onDelete: async () => {
-      if (status === 'open-needs-confirmation' || status === 'open-error') {
-        setDestructiveState({ status: 'open-pending' });
-        try {
-          await onDelete();
-          // TODO: It's possible this might give a flash of the confirm page after
-          //       reverification.
-          //       While we do stay on the current page throughout the retry, the
-          //       useReverificationWithState `.finally` runs first and sets phase
-          //       to inactive. That resets the reverification state and this
-          //       dialog could flash to the first screen. Unconfirmed.
-          setDestructiveState({ status: 'closed' });
-        } catch (error: unknown) {
-          if (isReverificationCancelledError(error)) {
-            setDestructiveState({ status: 'closed' });
-            return;
-          }
-          // TODO: Better error handling, localization
-          setDestructiveState({ status: 'open-error', errorMessage: 'Something went wrong' });
-        }
-      }
+      await action.run();
     },
     onOpenChange: nextIsOpen => {
-      const cancelReverification = reverification?.onCancel;
-      if (!nextIsOpen && isDeleting && !cancelReverification) {
+      if (nextIsOpen) {
+        setOpen(true);
         return;
       }
-
-      if (nextIsOpen) {
-        setDestructiveState({ status: 'open-needs-confirmation' });
-      } else {
-        cancelReverification?.();
-        setDestructiveState({ status: 'closed' });
+      if (isDeleting) {
+        prompt?.cancel?.();
+        return;
       }
+      action.reset();
+      setOpen(false);
     },
   };
 }

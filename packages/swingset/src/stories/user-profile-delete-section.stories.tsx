@@ -20,7 +20,7 @@ export const meta: StoryMeta = {
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 
 function DeleteSectionHarness({ onDelete }: { onDelete: () => Promise<void> }) {
-  const controller = useDestructiveController({ onDelete });
+  const controller = useDestructiveController(onDelete);
   return <UserProfileDeleteSectionView {...controller} />;
 }
 

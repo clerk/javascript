@@ -17,17 +17,17 @@ The example pauses briefly in each pending state. Enter `error` in password or b
 
 ## Usage
 
-The feature wrapper reads Clerk state and drives the reverification flow. It renders nothing while `status` is `idle`. While a challenge is still preparing, the parent card shows a verification header, a centered spinner, and a disabled continue button, then shows the factor without a step transition. Keep the same card around the component for a ready factor, a pending retry, or the unavailable state. Isolated panel stories below are for visual development only.
+`useReverify` reads Clerk state and drives the reverification flow. Run the request through `reverify` inside a `useAction` action. `prompt` stays `null` until a challenge is ready, so the caller can keep showing what it had while verification loads. Once shown, it stays until the action settles, and clears in the same render as the action's own settled state. Render `prompt.content` inside a card; it covers a ready factor, a pending retry, and the unavailable state. Isolated panel stories below are for visual development only.
 
 ```tsx
 import { Card } from '@clerk/mosaic/components/card';
-import { Reverification, useReverificationFlow } from '@clerk/mosaic/features/reverification';
+import { useReverify } from '@clerk/mosaic/features/reverification';
+import { useAction } from '@clerk/mosaic/hooks/useAction';
 
-const [runAction, reverification] = useReverificationFlow(action);
+const { reverify, prompt } = useReverify();
+const runAction = useAction(ctx => reverify(ctx, action));
 
-<Card.Root renderBranding={false}>
-  <Reverification {...reverification} />
-</Card.Root>;
+{prompt ? <Card.Root renderBranding={false}>{prompt.content}</Card.Root> : null}
 ```
 
 ## Panels

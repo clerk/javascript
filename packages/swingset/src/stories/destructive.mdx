@@ -19,14 +19,14 @@ import * as Stories from './destructive.stories';
 
 A confirmation for a destructive action that warrants making the user type. Deleting an account, deleting a project, revoking an API key. For actions that do not warrant typing, use [Confirmation](/blocks/confirmation).
 
-The block holds the typed phrase and compares it to `confirmationValue`. `useDestructiveController` owns the dialog for a single action. Resolve `onDelete` and the dialog closes. Reject it and the dialog stays open. Pass the same props yourself to drive it from `useState` or a machine, or mount one block with a handle when many rows share it.
+The block holds the typed phrase and compares it to `confirmationValue`. `useDestructiveController` owns the dialog for a single async action. Resolve the action and the dialog closes. Reject it and the dialog stays open. Pass the same props yourself to drive it from `useState` or a machine, or mount one block with a handle when many rows share it.
 
 ```tsx
 import { Destructive } from '@clerk/mosaic/blocks/destructive';
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import { Button } from '@clerk/mosaic/components/button';
 
-const destructive = useDestructiveController({ onDelete: deleteAccount });
+const destructive = useDestructiveController(deleteAccount);
 
 <Destructive
   {...destructive}
@@ -50,18 +50,17 @@ A rejection leaves the dialog up. The field is marked invalid for as long as the
 
 ## Reverification
 
-Wrap the action with `useReverificationFlow` and pass the result to the controller. The controller decides which step is showing, cancels the verification when the dialog closes, and blocks closing while the action is being retried. Render the verification in `verificationSlot`, and confirmation and verification stay in the same dialog and card.
+Run the request through `reverify` inside the action, and pass the `prompt` from `useReverify` to the controller. The dialog stays on the confirmation step while verification loads, then moves to it in the same dialog and card. It stays there until the whole action finishes, including any work after the request. Closing the dialog cancels the verification, and closing is blocked while the action is being retried.
 
 ```tsx
-import { Reverification, useReverificationFlow } from '@clerk/mosaic/features/reverification';
+import { useReverify } from '@clerk/mosaic/features/reverification';
 
-const [runDelete, reverification] = useReverificationFlow(deleteAccount);
-const destructive = useDestructiveController({ onDelete: runDelete, reverification });
+const { reverify, prompt } = useReverify();
+const destructive = useDestructiveController(ctx => reverify(ctx, () => user.delete()), prompt);
 
 <Destructive
   {...copy}
   {...destructive}
-  verificationSlot={<Reverification {...reverification} />}
 />;
 ```
 

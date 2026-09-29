@@ -28,7 +28,7 @@ function renderBlock(overrides: Partial<DestructiveControlledProps> = {}) {
 }
 
 const confirmButton = () => screen.getByRole('button', { name: 'Delete account' });
-const verificationSlot = <output data-testid='verification'>Verify</output>;
+const verificationPrompt = { content: <output data-testid='verification'>Verify</output> };
 
 describe('Destructive', () => {
   it('renders nothing until the caller opens it', () => {
@@ -145,8 +145,8 @@ describe('Destructive', () => {
     expect(onDelete).not.toHaveBeenCalled();
   });
 
-  it('keeps the delete confirmation pending until the step is verify', () => {
-    renderBlock({ isDeleting: true, verificationSlot });
+  it('keeps the delete confirmation pending until there is a prompt', () => {
+    renderBlock({ isDeleting: true, prompt: null });
 
     expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'confirm');
     expect(screen.getByRole('textbox')).toBeDisabled();
@@ -154,17 +154,17 @@ describe('Destructive', () => {
     expect(screen.queryByTestId('verification')).not.toBeInTheDocument();
   });
 
-  it('shows the verification slot in the same dialog and card', () => {
-    renderBlock({ isDeleting: true, step: 'verify', verificationSlot });
+  it('shows the prompt in the same dialog and card', () => {
+    renderBlock({ isDeleting: true, prompt: verificationPrompt });
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
     expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
-    expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
+    expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'prompt');
     expect(screen.getByTestId('verification')).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
-  it('moves from the verify step back to confirm with the error', () => {
+  it('moves from the prompt back to confirm with the error', () => {
     const props = {
       open: true,
       onOpenChange: vi.fn(),
@@ -180,12 +180,11 @@ describe('Destructive', () => {
         <Destructive
           {...props}
           isDeleting
-          step='verify'
-          verificationSlot={verificationSlot}
+          prompt={verificationPrompt}
         />
       </MosaicProvider>,
     );
-    expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
+    expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'prompt');
     expect(screen.getByTestId('verification')).toBeInTheDocument();
 
     rerender(
@@ -193,8 +192,7 @@ describe('Destructive', () => {
         <Destructive
           {...props}
           errorMessage='Delete failed.'
-          step='confirm'
-          verificationSlot={verificationSlot}
+          prompt={null}
         />
       </MosaicProvider>,
     );

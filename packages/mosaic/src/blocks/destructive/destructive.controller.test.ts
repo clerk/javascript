@@ -1,16 +1,17 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { ReverificationController } from '../../features/reverification';
+import type { ActionContext } from '../../hooks/useAction';
 import { deferred } from '../../machines/__tests__/test-utils';
 import { useDestructiveController } from './destructive.controller';
 
-const idleReverification = { status: 'idle' } as ReverificationController;
+function renderController(fn: (ctx: ActionContext) => Promise<unknown>) {
+  return renderHook(() => useDestructiveController(fn));
+}
 
 describe('useDestructiveController', () => {
   it('starts closed and opens from the opener or from onOpenChange', () => {
-    const { result } = renderHook(() => useDestructiveController({ onDelete: () => Promise.resolve() }));
+    const { result } = renderController(() => Promise.resolve());
     expect(result.current.open).toBe(false);
     expect(result.current.isDeleting).toBe(false);
 
@@ -22,48 +23,36 @@ describe('useDestructiveController', () => {
 
     act(() => result.current.onOpenChange(true));
     expect(result.current.open).toBe(true);
-    expect(result.current.isDeleting).toBe(false);
-  });
-
-  it('ignores the opener once the dialog is already open', () => {
-    const { result } = renderHook(() => useDestructiveController({ onDelete: () => Promise.resolve() }));
-    act(() => result.current.onOpenChange(true));
-    act(() => {
-      void result.current.onDelete();
-    });
-
-    act(() => result.current.openDestructiveDialog());
-
-    expect(result.current.isDeleting).toBe(true);
   });
 
   it('stays open and pending until the action resolves, then closes', async () => {
     const pending = deferred<void>();
-    const onDelete = vi.fn(() => pending.promise);
-    const { result } = renderHook(() => useDestructiveController({ onDelete }));
+    const fn = vi.fn(() => pending.promise);
+    const { result } = renderController(fn);
     act(() => result.current.onOpenChange(true));
 
+    let deleting: Promise<void> | undefined;
     act(() => {
-      void result.current.onDelete();
+      deleting = result.current.onDelete();
     });
-    expect(onDelete).toHaveBeenCalledOnce();
+    expect(fn).toHaveBeenCalledOnce();
     expect(result.current.open).toBe(true);
     expect(result.current.isDeleting).toBe(true);
 
     await act(async () => {
       pending.resolve();
-      await pending.promise;
+      await deleting;
     });
-    await waitFor(() => expect(result.current.open).toBe(false));
+    expect(result.current.open).toBe(false);
     expect(result.current.isDeleting).toBe(false);
   });
 
-  it('stays open with a message when the action rejects, and a retry can succeed', async () => {
-    const onDelete = vi
+  it('stays open with a message when the action fails, and a retry can succeed', async () => {
+    const fn = vi
       .fn<() => Promise<unknown>>()
       .mockRejectedValueOnce(new Error('Your subscription is still active.'))
       .mockResolvedValueOnce(undefined);
-    const { result } = renderHook(() => useDestructiveController({ onDelete }));
+    const { result } = renderController(fn);
     act(() => result.current.onOpenChange(true));
 
     await act(async () => {
@@ -76,30 +65,26 @@ describe('useDestructiveController', () => {
     await act(async () => {
       await result.current.onDelete();
     });
-    await waitFor(() => expect(result.current.open).toBe(false));
-    expect(onDelete).toHaveBeenCalledTimes(2);
+    expect(result.current.open).toBe(false);
+    expect(fn).toHaveBeenCalledTimes(2);
   });
 
-  it('closes without a message when reverification is cancelled', async () => {
-    const onDelete = vi.fn(() =>
-      Promise.reject(new ClerkRuntimeError('cancelled', { code: 'reverification_cancelled' })),
-    );
-    const { result } = renderHook(() => useDestructiveController({ onDelete, reverification: idleReverification }));
+  it('clears the error when the dialog is closed', async () => {
+    const { result } = renderController(() => Promise.reject(new Error('nope')));
     act(() => result.current.onOpenChange(true));
-
     await act(async () => {
       await result.current.onDelete();
     });
 
-    expect(result.current.open).toBe(false);
+    act(() => result.current.onOpenChange(false));
+    act(() => result.current.onOpenChange(true));
+
     expect(result.current.errorMessage).toBeUndefined();
   });
 
-  it('ignores a close while the action is in flight, unless reverification is active', async () => {
+  it('ignores a close while the action is in flight without a prompt', async () => {
     const pending = deferred<void>();
-    const { result } = renderHook(() =>
-      useDestructiveController({ onDelete: () => pending.promise, reverification: idleReverification }),
-    );
+    const { result } = renderController(() => pending.promise);
     act(() => result.current.onOpenChange(true));
     act(() => {
       void result.current.onDelete();
@@ -115,97 +100,57 @@ describe('useDestructiveController', () => {
     });
   });
 
-  it('lets an active reverification close the dialog while the action is still pending', () => {
-    const { result } = renderHook(() =>
-      useDestructiveController({
-        onDelete: () => new Promise(() => {}),
-        reverification: { status: 'ready', onCancel: vi.fn() } as ReverificationController,
-      }),
-    );
+  it('cancels the prompt instead of closing while the action waits on it', async () => {
+    const pending = deferred<void>();
+    const prompt = { content: null, cancel: vi.fn() };
+    const { result } = renderHook(() => useDestructiveController(() => pending.promise, prompt));
     act(() => result.current.onOpenChange(true));
     act(() => {
       void result.current.onDelete();
     });
 
     act(() => result.current.onOpenChange(false));
+
+    expect(prompt.cancel).toHaveBeenCalledOnce();
+    expect(result.current.open).toBe(true);
+
+    await act(async () => {
+      pending.resolve();
+      await pending.promise;
+    });
+  });
+
+  it('closes without a message when the action ends cancelled', async () => {
+    const { result } = renderController(ctx => Promise.resolve().then(() => ctx.cancelled()));
+    act(() => result.current.onOpenChange(true));
+
+    await act(async () => {
+      await result.current.onDelete();
+    });
 
     expect(result.current.open).toBe(false);
+    expect(result.current.errorMessage).toBeUndefined();
   });
 
-  it('ignores a close while reverification is retrying the action', () => {
-    const { result } = renderHook(() =>
-      useDestructiveController({
-        onDelete: () => new Promise(() => {}),
-        reverification: { status: 'retrying' } as ReverificationController,
-      }),
+  it('closes in the same render the action settles', async () => {
+    const work = deferred<void>();
+    const renders: string[] = [];
+    const { result } = renderHook(
+      () => {
+        const controller = useDestructiveController(() => work.promise);
+        renders.push(`${controller.open ? 'open' : 'closed'} ${controller.isDeleting ? 'deleting' : 'idle'}`);
+        return controller;
+      },
+      { legacyRoot: true },
     );
-    act(() => result.current.onOpenChange(true));
+    act(() => result.current.openDestructiveDialog());
     act(() => {
       void result.current.onDelete();
     });
 
-    act(() => result.current.onOpenChange(false));
+    work.resolve();
+    await vi.waitFor(() => expect(result.current.open).toBe(false));
 
-    expect(result.current.open).toBe(true);
-    expect(result.current.isDeleting).toBe(true);
-  });
-
-  it('is on the confirm step without reverification', () => {
-    const { result } = renderHook(() => useDestructiveController({ onDelete: () => Promise.resolve() }));
-
-    expect(result.current.step).toBe('confirm');
-  });
-
-  it.each([
-    ['idle', 'confirm'],
-    ['loading', 'confirm'],
-    ['unavailable', 'verify'],
-    ['ready', 'verify'],
-    ['retrying', 'verify'],
-  ] as const)('reverification status %s uses the %s step', (status, step) => {
-    const { result } = renderHook(() =>
-      useDestructiveController({
-        onDelete: () => Promise.resolve(),
-        reverification: { status } as ReverificationController,
-      }),
-    );
-
-    expect(result.current.step).toBe(step);
-  });
-
-  it('cancels reverification when the dialog closes', () => {
-    const onCancel = vi.fn();
-    const { result } = renderHook(() =>
-      useDestructiveController({
-        onDelete: () => new Promise(() => {}),
-        reverification: { status: 'ready', onCancel } as ReverificationController,
-      }),
-    );
-    act(() => result.current.onOpenChange(true));
-    act(() => {
-      void result.current.onDelete();
-    });
-
-    act(() => result.current.onOpenChange(false));
-
-    expect(onCancel).toHaveBeenCalledOnce();
-    expect(result.current.open).toBe(false);
-  });
-
-  it('does not cancel reverification when a close is ignored', () => {
-    const { result } = renderHook(() =>
-      useDestructiveController({
-        onDelete: () => new Promise(() => {}),
-        reverification: { status: 'retrying' } as ReverificationController,
-      }),
-    );
-    act(() => result.current.onOpenChange(true));
-    act(() => {
-      void result.current.onDelete();
-    });
-
-    act(() => result.current.onOpenChange(false));
-
-    expect(result.current.open).toBe(true);
+    expect(renders.slice(renders.indexOf('open deleting'))).toEqual(['open deleting', 'closed idle']);
   });
 });

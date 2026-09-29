@@ -10,7 +10,7 @@ import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-p
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
 
 function DeleteAccount() {
-  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
+  const controller = useDestructiveController(() => Promise.resolve());
   return <UserProfileDeleteSectionView {...controller} />;
 }
 

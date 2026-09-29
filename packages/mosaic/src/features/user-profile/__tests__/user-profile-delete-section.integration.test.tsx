@@ -1,3 +1,4 @@
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import type * as SharedReact from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -12,6 +13,13 @@ let deleteSelfEnabled: boolean;
 let signedInSessions: { user?: { id: string } }[];
 let deleteUser: ReturnType<typeof vi.fn>;
 let setActive: ReturnType<typeof vi.fn>;
+let needsReverification: boolean;
+let startVerification: ReturnType<typeof vi.fn>;
+let session: {
+  id: string;
+  startVerification: ReturnType<typeof vi.fn>;
+  attemptFirstFactorVerification: ReturnType<typeof vi.fn>;
+};
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof SharedReact>();
@@ -22,15 +30,37 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       isSignedIn: isLoaded,
       user: isLoaded ? { id: 'user_1', deleteSelfEnabled, delete: deleteUser } : undefined,
     }),
-    useSession: () => ({ session: { id: 'sess_1' } }),
+    useSession: () => ({ session }),
     useClerk: () => ({
       setActive,
       client: { signedInSessions },
       buildAfterSignOutUrl: () => '/signed-out',
       buildAfterMultiSessionSingleSignOutUrl: () => '/one-session-left',
-      __internal_getOption: () => undefined,
+      __internal_getOption: (key: string) => (key === 'supportEmail' ? 'support@example.com' : undefined),
+      __internal_environment: { displayConfig: { preferredSignInStrategy: 'password' } },
     }),
-    useReverification: (fetcher: () => Promise<unknown>) => fetcher,
+    useReverification:
+      (
+        fetcher: (...args: unknown[]) => Promise<unknown>,
+        options?: {
+          onNeedsReverification?: (params: { complete: () => void; cancel: () => void; level: undefined }) => void;
+        },
+      ) =>
+      async (...args: unknown[]) => {
+        if (needsReverification) {
+          await new Promise<void>((resolve, reject) =>
+            options?.onNeedsReverification?.({
+              level: undefined,
+              complete: resolve,
+              cancel: () =>
+                reject(
+                  new ClerkRuntimeError('User cancelled attempted verification', { code: 'reverification_cancelled' }),
+                ),
+            }),
+          );
+        }
+        return fetcher(...args);
+      },
   };
 });
 
@@ -40,6 +70,17 @@ function renderSection(fallback?: React.ReactNode) {
       <UserProfileDeleteSection fallback={fallback} />
     </MosaicProvider>,
   );
+}
+
+function flowStep() {
+  return document.querySelector('.cl-flow-root')?.getAttribute('data-value');
+}
+
+async function confirmDelete(user: ReturnType<typeof userEvent.setup>) {
+  const dialog = await openDialog(user);
+  await user.type(within(dialog).getByRole('textbox'), 'Delete account');
+  await user.click(within(dialog).getByRole('button', { name: 'Delete account' }));
+  return dialog;
 }
 
 async function openDialog(user: ReturnType<typeof userEvent.setup>) {
@@ -54,6 +95,15 @@ describe('UserProfileDeleteSection', () => {
     signedInSessions = [];
     deleteUser = vi.fn(() => Promise.resolve());
     setActive = vi.fn(() => Promise.resolve());
+    needsReverification = false;
+    startVerification = vi.fn(() =>
+      Promise.resolve({ status: 'needs_first_factor', supportedFirstFactors: [{ strategy: 'password' }] }),
+    );
+    session = {
+      id: 'sess_1',
+      startVerification,
+      attemptFirstFactorVerification: vi.fn(() => Promise.resolve({ status: 'complete' })),
+    };
   });
 
   it('renders the fallback until the user has loaded', () => {
@@ -161,5 +211,69 @@ describe('UserProfileDeleteSection', () => {
 
     const reopened = await openDialog(user);
     expect(within(reopened).getByRole('textbox')).toHaveValue('');
+  });
+
+  it('stays on the confirm step and ignores close while verification loads, then moves to it', async () => {
+    needsReverification = true;
+    const started = createDeferredPromise();
+    startVerification.mockReturnValue(started.promise);
+    const user = userEvent.setup();
+    renderSection();
+    const dialog = await confirmDelete(user);
+
+    await waitFor(() => expect(startVerification).toHaveBeenCalledOnce());
+    expect(flowStep()).toBe('confirm');
+    expect(within(dialog).getByRole('button', { name: 'Delete account' })).toHaveAttribute('aria-busy', 'true');
+    await user.keyboard('{Escape}');
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    started.resolve({ status: 'needs_first_factor', supportedFirstFactors: [{ strategy: 'password' }] });
+
+    expect(await screen.findByLabelText('Password')).toBeInTheDocument();
+    expect(flowStep()).toBe('prompt');
+    expect(deleteUser).not.toHaveBeenCalled();
+  });
+
+  it('closes without deleting or an error when the dialog is closed during verification', async () => {
+    needsReverification = true;
+    const user = userEvent.setup();
+    renderSection();
+    await confirmDelete(user);
+    await screen.findByLabelText('Password');
+
+    await user.keyboard('{Escape}');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(deleteUser).not.toHaveBeenCalled();
+    expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument();
+  });
+
+  it('stays on the verification step until signing out finishes', async () => {
+    needsReverification = true;
+    const signedOut = createDeferredPromise();
+    setActive = vi.fn(({ session }: { session: string | null }) => (session ? Promise.resolve() : signedOut.promise));
+    const steps: (string | null | undefined)[] = [];
+    const observer = new MutationObserver(() => steps.push(flowStep()));
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['data-value'],
+    });
+    const user = userEvent.setup();
+    renderSection();
+    await confirmDelete(user);
+
+    await user.type(await screen.findByLabelText('Password'), 'hunter2{Enter}');
+    await waitFor(() => expect(setActive).toHaveBeenCalledWith({ session: null, redirectUrl: '/signed-out' }));
+    expect(deleteUser).toHaveBeenCalledOnce();
+    expect(flowStep()).toBe('prompt');
+
+    signedOut.resolve();
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    observer.disconnect();
+
+    expect(steps).toContain('prompt');
+    expect(steps.slice(steps.indexOf('prompt'))).not.toContain('confirm');
   });
 });

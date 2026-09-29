@@ -8,6 +8,7 @@ import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Flow } from '../../components/flow';
 import { Input } from '../../components/input';
+import type { Prompt } from '../../utils/prompt';
 import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
 import { useConfirmationController } from '../confirmation/confirmation.controller';
 
@@ -37,10 +38,8 @@ export interface DestructiveControlledProps {
   isDeleting?: boolean;
   /** Error message to display if the delete action fails */
   errorMessage?: string;
-  /** Which step of the dialog is showing. Only has an effect with `verificationSlot` (default: "confirm") */
-  step?: 'confirm' | 'verify';
-  /** Content shown in place of the confirmation while `step` is "verify", such as a verification flow. Without it the dialog has no verify step */
-  verificationSlot?: ReactNode;
+  /** Input the delete action is waiting on, such as a verification flow. The dialog moves to it while set */
+  prompt?: Prompt | null;
 }
 
 type DestructiveCardProps = Omit<DestructiveControlledProps, 'onOpenChange' | 'trigger'>;
@@ -57,8 +56,7 @@ function DestructiveCard({
   onDelete,
   isDeleting = false,
   errorMessage,
-  step = 'confirm',
-  verificationSlot,
+  prompt,
 }: DestructiveCardProps) {
   const formId = useId();
   const [typedValue, setTypedValue] = useState('');
@@ -138,21 +136,19 @@ function DestructiveCard({
     </>
   );
 
-  const content = verificationSlot ? (
+  const content = (
     <Flow.Root
-      value={step}
-      direction={step === 'verify' ? 1 : -1}
-      state={step}
+      value={prompt ? 'prompt' : 'confirm'}
+      direction={prompt ? 1 : -1}
+      state={prompt}
     >
-      {() => (
+      {current => (
         <>
           <Flow.Step ids={['confirm']}>{confirmation}</Flow.Step>
-          <Flow.Step ids={['verify']}>{verificationSlot}</Flow.Step>
+          <Flow.Step ids={['prompt']}>{current?.content}</Flow.Step>
         </>
       )}
     </Flow.Root>
-  ) : (
-    confirmation
   );
 
   return (

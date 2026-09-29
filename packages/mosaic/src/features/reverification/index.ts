@@ -1,6 +1,5 @@
-export { Reverification, useReverificationFlow } from './reverification';
+export { Reverification } from './reverification';
 export type { ReverificationController } from './reverification.controller';
-export type { UseReverificationFlowResult } from './reverification';
 export type {
   ReverificationMethod,
   ReverificationOtpChannel,
@@ -10,5 +9,5 @@ export type {
   ReverificationStrategy,
   ReverificationViewProps,
 } from './reverification.types';
-export type { UseReverificationWithStateResult } from './use-reverification-with-state';
-export { useReverificationWithState } from './use-reverification-with-state';
+export type { Reverify, UseReverifyResult } from './use-reverify';
+export { useReverify } from './use-reverify';

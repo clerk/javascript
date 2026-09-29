@@ -5,13 +5,13 @@ import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destr
 import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import { Dialog } from '@clerk/mosaic/components/dialog';
-import { Flow, type FlowDirection } from '@clerk/mosaic/components/flow';
-import { Reverification, useReverificationFlow } from '@clerk/mosaic/features/reverification';
+import { Flow } from '@clerk/mosaic/components/flow';
+import { useReverify } from '@clerk/mosaic/features/reverification';
+import { useAction } from '@clerk/mosaic/hooks/useAction';
 import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 import { useUser } from '@clerk/nextjs';
-import { isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 const SUCCESS_DELAY_MS = 3000;
 
@@ -38,11 +38,13 @@ async function resetMockDelete() {
 }
 
 function CardHarness() {
-  const [status, setStatus] = useState<'idle' | 'success' | 'cancelled' | 'error'>('idle');
-  const [message, setMessage] = useState<string | null>(null);
-  const [requestPending, setRequestPending] = useState(false);
-  const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(false));
-  const busy = requestPending || reverification.status !== 'idle';
+  const [outcome, setOutcome] = useState<{ status: 'success' | 'cancelled' | 'error'; message: string } | null>(null);
+  const { reverify, prompt } = useReverify();
+  const deleteAccount = useAction(async ctx => {
+    await resetMockDelete();
+    return reverify(ctx, () => mockDelete(false));
+  });
+  const busy = deleteAccount.state.status === 'running';
 
   return (
     <div className='flex flex-col gap-4'>
@@ -51,107 +53,59 @@ function CardHarness() {
           color='negative'
           disabled={busy}
           onClick={() => {
-            if (busy) {
-              return;
-            }
-            setRequestPending(true);
-            setStatus('idle');
-            setMessage(null);
-            void (async () => {
-              try {
+            setOutcome(null);
+            void deleteAccount.run().then(async result => {
+              if (result.status !== 'done') {
                 await resetMockDelete();
-                await deleteAccount();
-                setStatus('success');
-                setMessage('Mock delete completed. The account was not deleted.');
-              } catch (error) {
-                if (isClerkRuntimeError(error) && error.code === 'request_already_in_progress') {
-                  return;
-                }
-                await resetMockDelete();
-                if (isReverificationCancelledError(error)) {
-                  setStatus('cancelled');
-                  setMessage('Reverification cancelled.');
-                  return;
-                }
-                setStatus('error');
-                setMessage(error instanceof Error ? error.message : 'Mock delete failed.');
-              } finally {
-                setRequestPending(false);
               }
-            })();
+              if (result.status === 'done') {
+                setOutcome({ status: 'success', message: 'Mock delete completed. The account was not deleted.' });
+              } else if (result.status === 'cancelled') {
+                setOutcome({ status: 'cancelled', message: 'Reverification cancelled.' });
+              } else {
+                setOutcome({
+                  status: 'error',
+                  message: result.error instanceof Error ? result.error.message : 'Mock delete failed.',
+                });
+              }
+            });
           }}
         >
           Delete account
         </Button>
       </div>
-      <Card.Root renderBranding={false}>
-        <Reverification {...reverification} />
-      </Card.Root>
-      {message ? <p className={status === 'error' ? 'text-sm text-red-600' : 'text-sm'}>{message}</p> : null}
+      {prompt ? <Card.Root renderBranding={false}>{prompt.content}</Card.Root> : null}
+      {outcome ? (
+        <p className={outcome.status === 'error' ? 'text-sm text-red-600' : 'text-sm'}>{outcome.message}</p>
+      ) : null}
     </div>
   );
 }
 
-type Presentation = 'retain' | 'replace';
-type OuterStep = 'confirm' | 'verify' | 'finalizing';
-
 function DialogHarness() {
-  const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(true));
   const [open, setOpen] = useState(false);
-  const [presentation, setPresentation] = useState<Presentation>('retain');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [requestPending, setRequestPending] = useState(false);
-  const [direction, setDirection] = useState<FlowDirection>(1);
-  const [step, setStep] = useState<OuterStep>('confirm');
-  const runRef = useRef(false);
-
-  const nextStep: OuterStep | null =
-    reverification.status === 'retrying' && presentation === 'replace'
-      ? 'finalizing'
-      : reverification.status === 'ready' || reverification.status === 'unavailable'
-        ? 'verify'
-        : null;
-
-  if (nextStep && nextStep !== step) {
-    setStep(nextStep);
-    setDirection(1);
-  }
-
-  const continueDelete = () => {
-    if (runRef.current || reverification.status !== 'idle') {
-      return;
-    }
-    runRef.current = true;
-    setRequestPending(true);
-    setErrorMessage(null);
-    setSuccessMessage(null);
-    void (async () => {
-      try {
-        await resetMockDelete();
-        await deleteAccount();
+  const { reverify, prompt } = useReverify();
+  const deleteAccount = useAction(async ctx => {
+    ctx.onSettled(result => {
+      if (result.status === 'done') {
         setSuccessMessage('Mock delete completed. The account was not deleted.');
-        setOpen(false);
-      } catch (error) {
-        if (isClerkRuntimeError(error) && error.code === 'request_already_in_progress') {
-          return;
-        }
-        await resetMockDelete();
-        if (isReverificationCancelledError(error)) {
-          setErrorMessage(null);
-          setOpen(false);
-          return;
-        }
-        setErrorMessage(error instanceof Error ? error.message : 'Mock delete failed.');
-        setStep('confirm');
-        setDirection(-1);
-        setOpen(true);
-      } finally {
-        runRef.current = false;
-        setRequestPending(false);
       }
-    })();
-  };
+      if (result.status !== 'failed') {
+        setOpen(false);
+      }
+    });
+    setSuccessMessage(null);
+    await resetMockDelete();
+    try {
+      return await reverify(ctx, () => mockDelete(true));
+    } catch (error) {
+      await resetMockDelete();
+      throw error;
+    }
+  });
+  const { state } = deleteAccount;
+  const running = state.status === 'running';
 
   return (
     <div className='flex flex-col gap-4'>
@@ -159,13 +113,10 @@ function DialogHarness() {
         <Button
           color='negative'
           onClick={() => {
-            setErrorMessage(null);
             setSuccessMessage(null);
-            setStep('confirm');
-            setDirection(1);
             setOpen(true);
           }}
-          disabled={open || requestPending}
+          disabled={open || running}
         >
           Delete account
         </Button>
@@ -177,17 +128,12 @@ function DialogHarness() {
           if (next) {
             return;
           }
-          if (requestPending && reverification.status === 'idle') {
+          if (running) {
+            prompt?.cancel?.();
             return;
           }
-          if (reverification.status !== 'idle') {
-            reverification.onCancel?.();
-          }
+          deleteAccount.reset();
           setOpen(false);
-          if (reverification.status !== 'retrying') {
-            setErrorMessage(null);
-            void resetMockDelete();
-          }
         }}
       >
         <Dialog.Popup>
@@ -196,11 +142,11 @@ function DialogHarness() {
             renderBranding={false}
           >
             <Flow.Root
-              value={step}
-              direction={direction}
-              state={{ step }}
+              value={prompt ? 'verify' : 'confirm'}
+              direction={prompt ? 1 : -1}
+              state={prompt}
             >
-              {() => (
+              {current => (
                 <>
                   <Flow.Step ids={['confirm']}>
                     <Card.Header>
@@ -210,51 +156,24 @@ function DialogHarness() {
                       </Card.Description>
                     </Card.Header>
                     <Card.Content>
-                      <fieldset className='flex flex-col gap-2 text-sm'>
-                        <legend className='mb-1 font-medium'>While the mock delete finishes</legend>
-                        <label className='flex items-center gap-2'>
-                          <input
-                            type='radio'
-                            name='reverification-presentation'
-                            checked={presentation === 'retain'}
-                            onChange={() => setPresentation('retain')}
-                            disabled={requestPending}
-                          />
-                          Keep the verification step
-                        </label>
-                        <label className='flex items-center gap-2'>
-                          <input
-                            type='radio'
-                            name='reverification-presentation'
-                            checked={presentation === 'replace'}
-                            onChange={() => setPresentation('replace')}
-                            disabled={requestPending}
-                          />
-                          Show a finalizing step
-                        </label>
-                      </fieldset>
-                      {errorMessage ? <p className='mt-3 text-sm text-red-600'>{errorMessage}</p> : null}
+                      {state.status === 'failed' ? (
+                        <p className='text-sm text-red-600'>
+                          {state.error instanceof Error ? state.error.message : 'Mock delete failed.'}
+                        </p>
+                      ) : null}
                     </Card.Content>
                     <Card.Footer>
                       <Button
                         color='negative'
                         fullWidth
-                        onClick={continueDelete}
-                        disabled={requestPending}
+                        onClick={() => void deleteAccount.run()}
+                        disabled={running}
                       >
                         Continue
                       </Button>
                     </Card.Footer>
                   </Flow.Step>
-                  <Flow.Step ids={['verify']}>
-                    <Reverification {...reverification} />
-                  </Flow.Step>
-                  <Flow.Step ids={['finalizing']}>
-                    <Card.Header>
-                      <Card.Title>Finalizing</Card.Title>
-                      <Card.Description>Completing the mock delete. The account is not deleted.</Card.Description>
-                    </Card.Header>
-                  </Flow.Step>
+                  <Flow.Step ids={['verify']}>{current?.content}</Flow.Step>
                 </>
               )}
             </Flow.Root>
@@ -267,21 +186,18 @@ function DialogHarness() {
 
 function DestructiveHarness() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(true));
-  const destructive = useDestructiveController({
-    onDelete: async () => {
-      setSuccessMessage(null);
+  const { reverify, prompt } = useReverify();
+  const destructive = useDestructiveController(async ctx => {
+    setSuccessMessage(null);
+    await resetMockDelete();
+    try {
+      await reverify(ctx, () => mockDelete(true));
+      setSuccessMessage('Mock delete completed. The account was not deleted.');
+    } catch (error) {
       await resetMockDelete();
-      try {
-        await deleteAccount();
-        setSuccessMessage('Mock delete completed. The account was not deleted.');
-      } catch (error) {
-        await resetMockDelete();
-        throw error;
-      }
-    },
-    reverification,
-  });
+      throw error;
+    }
+  }, prompt);
 
   return (
     <div className='flex flex-col gap-4'>
@@ -305,7 +221,6 @@ function DestructiveHarness() {
         fieldLabel='Type “Delete account” below to continue'
         confirmationValue='Delete account'
         actionLabel='Delete account'
-        verificationSlot={<Reverification {...reverification} />}
       />
     </div>
   );
@@ -361,8 +276,7 @@ export default function ReverificationLivePage() {
           <div className='flex flex-col gap-1'>
             <h2 className='text-base font-semibold'>Dialog / Flow</h2>
             <p className='text-muted-foreground text-sm'>
-              Reverification renders inside the dialog&apos;s card. The action retry can stay on the verification step,
-              or move to its own finalizing step.
+              Reverification renders inside the dialog&apos;s card and stays there while the action retries.
             </p>
           </div>
           {isLoaded && isSignedIn ? <DialogHarness key={demoKey} /> : null}

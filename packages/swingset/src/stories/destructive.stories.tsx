@@ -38,7 +38,7 @@ const copy = {
 };
 
 function Example({ onDelete }: { onDelete: () => Promise<void> }) {
-  const controller = useDestructiveController({ onDelete });
+  const controller = useDestructiveController(onDelete);
   return (
     <Destructive
       {...copy}

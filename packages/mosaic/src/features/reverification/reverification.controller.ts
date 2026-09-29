@@ -330,7 +330,7 @@ export const reverificationMachine = createMachine({
 
     // This means we are retrying the action after successful reverification
     // This state is usually left by the model state going to 'inactive',
-    // which it does when the retry has completed
+    // which it does when the action that needed reverification has settled
     retrying: {
       on: { RESET: 'inactive' },
     },

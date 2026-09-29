@@ -28,7 +28,7 @@ import { usePasskeysFixture } from './user-profile-passkeys';
 import { useWeb3WalletsFixture } from './user-profile-web3-wallets';
 
 export function UserProfileDeleteAccountPreview() {
-  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
+  const controller = useDestructiveController(() => Promise.resolve());
   return <UserProfileDeleteSectionView {...controller} />;
 }
 
