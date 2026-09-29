@@ -84,7 +84,7 @@ const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function Sec
     props: {
       ...mergeStyleProps(
         themeProps('section-header'),
-        stylex.props(reset.base, styles.item, styles.header, sectionHeaderMarker, xstyle),
+        stylex.props(reset.base, styles.header, sectionHeaderMarker, xstyle),
         rest,
       ),
     },
@@ -251,6 +251,7 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
   ref,
 ) {
   const wrap = React.useContext(SectionItemWrapContext);
+  const inHeader = React.useContext(SectionHeaderContext);
 
   return useRender({
     defaultTagName: 'div',
@@ -258,7 +259,7 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
     ref,
     props: mergeStyleProps(
       themeProps('section-actions'),
-      stylex.props(reset.base, styles.actions, wrap && styles.actionsWrap, xstyle),
+      stylex.props(reset.base, styles.actions, wrap && styles.actionsWrap, inHeader && styles.headerActions, xstyle),
       rest,
     ),
   });
