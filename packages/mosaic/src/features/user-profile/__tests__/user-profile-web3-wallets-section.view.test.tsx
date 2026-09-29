@@ -1,5 +1,6 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
@@ -79,6 +80,41 @@ describe('Web3 wallets section', () => {
       }
     },
   );
+
+  it('returns from wallet removal verification to the same confirmation', async () => {
+    const user = userEvent.setup();
+    const onCancel = vi.fn();
+    const onRemove = vi.fn();
+    function Harness() {
+      const [verifying, setVerifying] = useState(true);
+      return (
+        <UserProfileWeb3WalletsSectionView
+          wallets={[{ id: 'wallet_1', address: '0x1234', isVerified: true }]}
+          onRemove={onRemove}
+          removeReverification={
+            verifying
+              ? {
+                  status: 'unavailable',
+                  onCancel: () => {
+                    onCancel();
+                    setVerifying(false);
+                  },
+                }
+              : { status: 'idle' }
+          }
+        />
+      );
+    }
+    render(<Harness />);
+
+    await user.click(screen.getByRole('button', { name: 'Manage 0x1234' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
+    expect(screen.getByRole('dialog')).toHaveTextContent('Cannot verify your account');
+    await user.click(screen.getByRole('button', { name: 'Back', exact: true }));
+    expect(onCancel).toHaveBeenCalledOnce();
+    await waitFor(() => expect(screen.getByRole('alertdialog')).toHaveTextContent('Remove wallet?'));
+    expect(onRemove).not.toHaveBeenCalled();
+  });
 
   it('shows connection errors while keeping Connect available', () => {
     render(
