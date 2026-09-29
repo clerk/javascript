@@ -1,12 +1,15 @@
 import type { MouseEventHandler } from 'react';
 import { useRef, useState } from 'react';
 
+import { useForm } from '../../components/form';
 import { useLocale, useMessages } from '../../localization';
 import { formatDate, getExpirationDate } from './user-profile-api-keys.format';
 import type {
-  UserProfileAPIKeyExpiration,
   UserProfileCreateAPIKeyDialogProps,
+  UserProfileCreateAPIKeyValues,
 } from './user-profile-create-api-key.dialog';
+
+const initialValues: UserProfileCreateAPIKeyValues = { name: '', expiration: null };
 
 export interface UserProfileCreateAPIKeyInput {
   name: string;
@@ -29,48 +32,43 @@ export function useUserProfileCreateAPIKeyController({
   const locale = useLocale();
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [expiration, setExpiration] = useState<UserProfileAPIKeyExpiration | null>(null);
   const [secret, setSecret] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [copyError, setCopyError] = useState<string | null>(null);
+
+  const form = useForm({
+    initialValues,
+    canSubmit: values => values.name.trim() !== '' && values.expiration !== null,
+    onSubmit: async ({ name, expiration }) => {
+      if (expiration === null) {
+        return;
+      }
+      setSecret(await onCreate({ name: name.trim(), expiresAt: getExpirationDate(expiration, new Date()) }));
+    },
+  });
+
+  const { expiration } = form.values;
   const expirationDate = expiration === null ? null : getExpirationDate(expiration, new Date());
 
   return {
     onOpen: event => {
       trigger.current = event.currentTarget;
-      setName('');
-      setExpiration(null);
+      form.reset();
       setSecret(null);
-      setError(null);
+      setCopyError(null);
       setOpen(true);
     },
     dialog: {
       open,
-      onOpenChange: setOpen,
-      finalFocus: trigger,
-      name,
-      onNameChange: setName,
-      expiration,
-      expirationDateLabel: expirationDate ? formatDate(expirationDate, locale) : null,
-      onExpirationChange: setExpiration,
-      secret,
-      isPending,
-      error,
-      onSubmit: async () => {
-        if (expiration === null) {
-          return;
-        }
-        setIsPending(true);
-        setError(null);
-        try {
-          setSecret(await onCreate({ name: name.trim(), expiresAt: getExpirationDate(expiration, new Date()) }));
-        } catch (caught) {
-          setError(caught instanceof Error ? caught.message : m.createError);
-        } finally {
-          setIsPending(false);
+      onOpenChange: next => {
+        if (!form.isSubmitting) {
+          setOpen(next);
         }
       },
+      finalFocus: trigger,
+      form,
+      expirationDateLabel: expirationDate ? formatDate(expirationDate, locale) : null,
+      secret,
+      copyError,
       onCopy: async close => {
         if (!close) {
           return;
@@ -79,7 +77,7 @@ export function useUserProfileCreateAPIKeyController({
           await navigator.clipboard.writeText(secret ?? '');
           setOpen(false);
         } catch {
-          setError(m.copyError);
+          setCopyError(m.copyError);
         }
       },
     },

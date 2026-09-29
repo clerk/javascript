@@ -251,7 +251,7 @@ describe('UserProfileApiKeysPanel', () => {
       await user.click(within(dialog).getByRole('button', { name: 'Revoke key' }));
 
       expect(await within(table()).findByText('Key 1')).toBeVisible();
-      expect(screen.queryByRole('button', { name: 'Next API keys page' })).toBeNull();
+      await waitFor(() => expect(screen.queryByRole('button', { name: 'Next API keys page' })).toBeNull());
     });
   });
 });
