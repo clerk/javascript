@@ -4,7 +4,6 @@ import { ReverificationPending, ReverificationUnavailable, ReverificationView } 
 import {
   type ReverificationFetcher,
   useReverificationWithState,
-  type UseReverificationWithStateOptions,
   type UseReverificationWithStateResult,
 } from './use-reverification-with-state';
 
@@ -15,9 +14,8 @@ export type UseReverificationFlowResult<F extends ReverificationFetcher = Reveri
 
 export function useReverificationFlow<F extends ReverificationFetcher = ReverificationFetcher>(
   fetcher: F,
-  options?: UseReverificationWithStateOptions,
 ): UseReverificationFlowResult<F> {
-  const [wrappedFetcher, reverificationState] = useReverificationWithState(fetcher, options);
+  const [wrappedFetcher, reverificationState] = useReverificationWithState(fetcher);
   const model = useReverificationModel(reverificationState);
   const controller = useReverificationController(model);
 

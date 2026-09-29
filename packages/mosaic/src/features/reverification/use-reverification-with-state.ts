@@ -6,10 +6,6 @@ import type { ReverificationState } from './reverification.types';
 
 export type ReverificationFetcher = (...args: any[]) => Promise<any> | undefined;
 
-type UseReverificationOptions = NonNullable<Parameters<typeof useReverification>[1]>;
-
-export type UseReverificationWithStateOptions = Omit<UseReverificationOptions, 'onNeedsReverification'>;
-
 export type UseReverificationWithStateResult<F extends ReverificationFetcher = ReverificationFetcher> = readonly [
   ReturnType<typeof useReverification<F>>,
   ReverificationState,
@@ -42,15 +38,12 @@ function requestAlreadyInProgressError(): ClerkRuntimeError {
 }
 
 /**
- * This wraps useReverification, but does not pop the default UI and instead manages
- * the lifecycle, use the returned `phase` and callbacks to build your custom UI.
+ * Wraps useReverification without the default UI. Returns [handler, state]: call handler
+ * to run the action, and render your own UI from state.phase ('inactive' | 'active' |
+ * 'retrying'). While 'active', state.complete and state.cancel end the challenge.
  *
- * useReverificationFlow pairs this lifecycle with <Reverification>.
- *
- * In contrast to useReverification, the returned handler is only allowed to run
- * in serial. Any new calls that happen while it's still pending will throw
- * request_already_in_progress. If you always guard against double-invocation,
- * you wont see this error.
+ * The handler runs one call at a time. A call made while another is pending rejects with a
+ * ClerkRuntimeError with code 'request_already_in_progress'.
  */
 // The reason we need to enforce single-flight is that we need a direct link between
 // a single invocation of the handler and a specific reverification. useReverification
@@ -60,7 +53,6 @@ function requestAlreadyInProgressError(): ClerkRuntimeError {
 // behavior by first fixing the useReverification hook.
 export function useReverificationWithState<F extends ReverificationFetcher>(
   fetcher: F,
-  options?: UseReverificationWithStateOptions,
 ): UseReverificationWithStateResult<F> {
   const { session } = useSession();
   // The return is observable and needs to be driven by React state
@@ -96,7 +88,6 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
   }, []);
 
   const wrapped = useReverification(fetcher, {
-    ...options,
     onNeedsReverification: ({ complete, cancel, level }) => {
       const operation = runtimeRef.current.operation;
       if (operation.status !== 'requesting') {
