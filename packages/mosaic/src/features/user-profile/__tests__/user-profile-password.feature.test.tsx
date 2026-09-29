@@ -180,6 +180,7 @@ describe('Changing a password', () => {
     await renderPassword();
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Change password' }));
+    await waitFor(() => expect(screen.getByLabelText('Current password')).toHaveFocus());
     await user.type(screen.getByLabelText('New password'), 'new-password-123');
     await user.type(screen.getByLabelText('Confirm password'), 'new-password-12');
     await user.click(screen.getByLabelText('New password'));
@@ -188,7 +189,11 @@ describe('Changing a password', () => {
     );
     await user.clear(screen.getByLabelText('Confirm password'));
 
-    expect(screen.getByLabelText('Confirm password')).toHaveAccessibleDescription("Passwords don't match.");
+    expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
+    expect(screen.getByLabelText('Confirm password')).toHaveValue('');
+    await waitFor(() =>
+      expect(screen.getByLabelText('Confirm password')).toHaveAccessibleDescription("Passwords don't match."),
+    );
     expect(screen.getByRole('button', { name: 'Save changes' })).toHaveAttribute('aria-disabled', 'true');
   });
 
