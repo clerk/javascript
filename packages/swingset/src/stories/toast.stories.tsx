@@ -8,7 +8,7 @@ export { default as __source } from './toast.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'Toast',
   source: 'packages/mosaic/src/components/toast/toast.tsx',
 };

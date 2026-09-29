@@ -6,6 +6,9 @@ import type { OrganizationProfileCreateAPIKeyDialogProps } from '@clerk/mosaic/f
 import { useLocale, useMessages } from '@clerk/mosaic/localization';
 import { useEffect, useRef, useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosRows, chaosText } from '@/lib/chaos';
+
 interface FixtureAPIKey {
   id: string;
   name: string;
@@ -73,34 +76,28 @@ function sortAPIKeys(items: FixtureAPIKey[], sort: OrganizationProfileAPIKeySort
   });
 }
 
-export async function createExampleAPIKey() {
+async function createExampleAPIKey() {
   await new Promise<void>(resolve => setTimeout(resolve, 600));
   return { id: `ak_demo_${crypto.randomUUID()}`, secret: `ak_demo_${crypto.randomUUID()}` };
 }
 
-export async function revokeExampleAPIKey() {
+async function revokeExampleAPIKey() {
   await new Promise<void>(resolve => setTimeout(resolve, 600));
 }
 
 export function useOrganizationProfileAPIKeysFixture({
   initialKeys = exampleAPIKeys,
   enableSorting = false,
-  createKey = createExampleAPIKey,
-  copyKey = (secret: string) => navigator.clipboard.writeText(secret),
-  revokeKey = revokeExampleAPIKey,
 }: {
   initialKeys?: FixtureAPIKey[];
   enableSorting?: boolean;
-  createKey?: (input: {
-    name: string;
-    expiration: OrganizationProfileCreateAPIKeyDialogProps['expiration'];
-  }) => Promise<{ id: string; secret: string }>;
-  copyKey?: (secret: string) => Promise<void>;
-  revokeKey?: (id: string) => Promise<void>;
 } = {}): OrganizationProfileApiKeysPanelViewProps {
   const m = useMessages('organizationProfileApiKeysPanel');
   const locale = useLocale();
-  const [items, setItems] = useState(initialKeys);
+  const seed = useChaosFixture(initialKeys, items =>
+    chaosRows(items).map(key => ({ ...key, name: chaosText(key.name) })),
+  );
+  const [items, setItems] = useState(seed);
   const [searchValue, setSearchValue] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -188,7 +185,7 @@ export function useOrganizationProfileAPIKeysFixture({
         setIsPending(true);
         setError(null);
         try {
-          const result = await createKey({ name: name.trim(), expiration });
+          const result = await createExampleAPIKey();
           const createdAt = new Date();
           const expiresAt = getExpirationDate(expiration, createdAt);
           setItems(current => [
@@ -215,7 +212,7 @@ export function useOrganizationProfileAPIKeysFixture({
         setIsPending(true);
         setError(null);
         try {
-          await copyKey(secret);
+          await navigator.clipboard.writeText(secret);
           if (close) {
             setOpen(false);
           }
@@ -240,7 +237,7 @@ export function useOrganizationProfileAPIKeysFixture({
         }
       : undefined,
     onRevoke: async id => {
-      await revokeKey(id);
+      await revokeExampleAPIKey();
       setItems(current => current.filter(item => item.id !== id));
     },
   };

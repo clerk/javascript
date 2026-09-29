@@ -2,6 +2,9 @@ import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/u
 import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import { useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosName } from '@/lib/chaos';
+
 export interface UserProfileEditUsernameFixtureOptions {
   username?: string;
   latency?: number;
@@ -13,7 +16,8 @@ export function useUserProfileEditUsernameFixture({
   latency = 800,
   failWith,
 }: UserProfileEditUsernameFixtureOptions = {}) {
-  const [username, setUsername] = useState(initialUsername);
+  const seed = useChaosFixture(initialUsername, () => chaosName(7).toLowerCase());
+  const [username, setUsername] = useState(seed);
 
   return {
     username,

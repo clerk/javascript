@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import type { UserButtonSlot } from './user-button.layout';
+
 // ─── Data contract ──────────────────────────────────────────────────────────
 // Session-backed, discriminated resource rows. 1:1 with `useUserButtonModel()`'s output, so the
 // model and the view agree on a shape neither one owns.
@@ -92,7 +94,7 @@ export interface UserButtonCallbacks {
   onAcceptSuggestion?: (suggestionId: string) => void;
   onAcceptInvitation?: (invitationId: string) => void;
   onSwitchSession?: (sessionId: string) => void;
-  onSignOutSession?: (sessionId: string) => void;
+  onSignOutSession?: (sessionId: string, from: UserButtonSlot) => void;
   onSignOutAll?: () => void;
   onManageOrganization?: () => void;
   onInviteMembers?: () => void;
@@ -107,6 +109,12 @@ export interface UserButtonCallbacks {
  * even when one is active.
  */
 export type UserButtonMode = 'combined' | 'organization' | 'user';
+
+/**
+ * How the header carries its actions: `inline` trails the workspace with them, the gear as an icon;
+ * `stacked` runs them under it as full-width labelled buttons.
+ */
+export type UserButtonHeaderLayout = 'inline' | 'stacked';
 
 /**
  * Which of the two switchers a `combined` surface leads with: the one named in the trigger and
@@ -124,8 +132,9 @@ export interface UserButtonModeProps {
    */
   mode?: UserButtonMode;
   /**
-   * Which switcher a `combined` surface leads with in the trigger and the popup's header. The other
-   * one is still listed. Ignored by the single-purpose modes, which have only one thing to lead with.
+   * Which switcher a `combined` surface leads with in the trigger and the popup's header. Leading
+   * with the account while an organization is active badges the account's avatar with it. Ignored
+   * by the single-purpose modes, which have only one thing to lead with.
    *
    * @default 'organization'
    */
@@ -160,9 +169,11 @@ export interface UserButtonBusyState {
  *
  * `switchAccount` and `addAccount` share a slot: the foot carries the flyout of signed-in accounts
  * where there is more than one, and the row it would have opened onto where there is not. Name both
- * to place that slot whichever way it resolves.
+ * to place that slot whichever way it resolves. So do `signOutAll` and `signOut`: the foot signs out
+ * of every account where there is more than one, and, in `combined` mode, of the one account where
+ * there is not.
  */
-export type UserButtonMenuItemId = 'switchAccount' | 'addAccount' | 'signOutAll';
+export type UserButtonMenuItemId = 'switchAccount' | 'addAccount' | 'signOutAll' | 'signOut';
 
 interface UserButtonMenuItemBase {
   /** Identifies the row, for ordering. */

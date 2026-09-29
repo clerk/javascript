@@ -279,6 +279,12 @@ export type ElementsConfig = {
   formHeaderSubtitle: WithOptions<never, ErrorState>;
   formResendCodeLink: WithOptions;
 
+  actionBlockedIconBox: WithOptions;
+  actionBlockedIcon: WithOptions;
+  actionBlockedLink: WithOptions;
+  actionBlockedTraceIdBox: WithOptions;
+  actionBlockedTraceIdLabel: WithOptions;
+  actionBlockedTraceId: WithOptions;
   verificationLinkStatusBox: WithOptions;
   verificationLinkStatusIconBox: WithOptions;
   verificationLinkStatusIcon: WithOptions;
@@ -822,6 +828,15 @@ export type ElementsConfig = {
   configureDirectorySyncUserStatusBadge: WithOptions<string>;
   configureDirectorySyncUsersEmpty: WithOptions;
   configureDirectorySyncCompleteButton: WithOptions;
+  configureDirectorySyncCredentialsForm: WithOptions;
+  configureDirectorySyncCredentialsBadge: WithOptions;
+  configureDirectorySyncUploadKeyButton: WithOptions;
+  configureDirectorySyncUploadedFileName: WithOptions;
+  configureDirectorySyncSubjectEmailInput: WithOptions;
+  configureDirectorySyncSyncRow: WithOptions;
+  configureDirectorySyncSyncNowButton: WithOptions;
+  configureDirectorySyncStatusBadge: WithOptions<string>;
+  configureDirectorySyncLastSyncedAt: WithOptions;
 
   web3SolanaWalletButtonsRoot: WithOptions;
   web3SolanaWalletButtons: WithOptions;

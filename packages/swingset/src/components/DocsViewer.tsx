@@ -57,6 +57,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     destructive: dynamic(() => import('../stories/destructive.mdx')),
   },
   components: {
+    'action-bar': dynamic(() => import('../stories/action-bar.mdx')),
     avatar: dynamic(() => import('../stories/avatar.mdx')),
     badge: dynamic(() => import('../stories/badge.mdx')),
     banner: dynamic(() => import('../stories/banner.mdx')),
@@ -79,6 +80,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'icon-frame': dynamic(() => import('../stories/icon-frame.mdx')),
     menu: dynamic(() => import('../stories/menu.component.mdx')),
     otp: dynamic(() => import('../stories/otp.component.mdx')),
+    panel: dynamic(() => import('../stories/panel.component.mdx')),
     popover: dynamic(() => import('../stories/popover.component.mdx')),
     profile: dynamic(() => import('../stories/profile.component.mdx')),
     section: dynamic(() => import('../stories/section.mdx')),

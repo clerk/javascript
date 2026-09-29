@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
+import { HeadingLevelProvider } from '../heading';
 import { Section } from './section';
 
 const overrides = stylex.create({
@@ -41,7 +42,7 @@ describe('Section', () => {
     );
 
     expect(screen.getByRole('region', { name: 'Account' })).toHaveClass('cl-section');
-    expect(screen.getByRole('heading', { level: 4, name: 'Account' })).toHaveClass('cl-section-title');
+    expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toHaveClass('cl-section-title');
     expect(screen.getByTestId('group')).toHaveClass('cl-section-group');
     expect(screen.getByTestId('row')).toHaveClass('cl-section-row');
     expect(screen.getByTestId('item')).toHaveClass('cl-section-item');
@@ -53,6 +54,28 @@ describe('Section', () => {
     expect(screen.getByTestId('actions')).toHaveClass('cl-section-actions');
   });
 
+  it('takes its title level from an enclosing HeadingLevelProvider', () => {
+    render(
+      <HeadingLevelProvider level={5}>
+        <Section.Root>
+          <Section.Title>Account</Section.Title>
+        </Section.Root>
+      </HeadingLevelProvider>,
+    );
+
+    expect(screen.getByRole('heading', { level: 5, name: 'Account' })).toBeInTheDocument();
+  });
+
+  it('lets the render prop override the heading level', () => {
+    render(
+      <Section.Root>
+        <Section.Title render={<h5 />}>Account</Section.Title>
+      </Section.Root>,
+    );
+
+    expect(screen.getByRole('heading', { level: 5, name: 'Account' })).toHaveClass('cl-section-title');
+  });
+
   it('supports an explicit accessible name', () => {
     render(
       <Section.Root aria-label='Account preferences'>
@@ -62,7 +85,7 @@ describe('Section', () => {
     );
 
     expect(screen.getByRole('region', { name: 'Account preferences' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 4, name: 'Account' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toBeInTheDocument();
   });
 
   it('composes multiple items in one row', () => {

@@ -2,6 +2,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  actionBlocked: {
+    subtitle: 'For your security, this request could not be completed.',
+    title: "We couldn't complete this request",
+    traceIdLabel: 'Reference',
+  },
   agentActionApproval: {
     action__approve: 'Approve',
     action__deny: 'Deny',
@@ -259,15 +264,24 @@ export const enUS: LocalizationResource = {
     },
     configureStep: {
       actionLabel__generateToken: 'Generate new token',
+      actionLabel__replaceKey: 'Replace JSON key',
       actionLabel__retry: 'Try again',
+      actionLabel__uploadKey: 'Upload JSON key',
+      badge__credentialsConfigured: 'Configured',
+      badge__credentialsMissing: 'Not configured',
       domainsLabel: 'Domains:',
+      error__invalidKeyFile: 'That file is not valid JSON. Upload the key file downloaded from Google.',
       error__ssoRequired: {
         subtitle:
           'Directory Sync requires an SSO connection. Configure and verify your SSO connection first, then return here to set up provisioning.',
         title: 'Single Sign-On is not configured yet',
       },
+      formFieldHint__subjectEmail: 'The directory is read as this admin. They must be an active Workspace admin.',
+      formFieldInputPlaceholder__subjectEmail: 'admin@yourcompany.com',
       formFieldInputPlaceholder__token: 'Generate a new token to reveal it',
       formFieldLabel__endpointUrl: 'SCIM endpoint URL',
+      formFieldLabel__serviceAccountKey: 'Service account key',
+      formFieldLabel__subjectEmail: 'Google Workspace admin email',
       formFieldLabel__token: 'Bearer token',
       instructions: {
         actionLabel__toggle: 'View instructions',
@@ -285,6 +299,16 @@ export const enUS: LocalizationResource = {
           step3: 'Select Provisioning and set the provisioning mode to Automatic.',
           step4: 'Assign the users and groups to provision, then turn provisioning On.',
         },
+        google: {
+          step1:
+            'In the Google Cloud console, create a project and a service account, then create a JSON key for it and download the file.',
+          step2: 'Enable the Admin SDK API for that project.',
+          step3:
+            'In the Google Admin console, open Security, then API controls, then Domain-wide delegation, and add the service account using its client ID.',
+          step4:
+            'Grant it the read-only directory scopes: https://www.googleapis.com/auth/admin.directory.user.readonly and https://www.googleapis.com/auth/admin.directory.group.readonly.',
+          step5: 'Upload the JSON key below and enter the email of a Google Workspace admin to read the directory as.',
+        },
         okta: {
           step1: 'In the Okta Admin Console, open the application used for your SSO connection.',
           step2: 'Open the Provisioning tab and select the Integration setting.',
@@ -295,12 +319,8 @@ export const enUS: LocalizationResource = {
       notice__tokenShownOnce: 'This token is only shown once. Generate a new token if you lose it.',
       subtitle: 'Add these credentials to your identity provider to configure Directory Sync',
       title: 'Configure',
-      warning__googleUnsupported: {
-        subtitle: 'Please contact support to set up your Google Workspace integration.',
-        title: 'Google Workspace connections are not configurable via self-serve',
-      },
       warning__ssoInactive:
-        'Your SSO connection is configured but not active. Members can be provisioned now, but they can only sign in once SSO is activated.',
+        "This SSO connection is configured but not yet active. You can provision members, but they won't be able to sign in until it's active.",
     },
     navbar: {
       title: 'Configure Directory Sync',
@@ -318,14 +338,29 @@ export const enUS: LocalizationResource = {
     },
     testStep: {
       actionLabel__complete: 'Complete',
+      actionLabel__syncNow: 'Sync now',
       badge__active: 'Active',
       badge__deprovisioned: 'Deprovisioned',
       description: 'Users appear here as your identity provider provisions them, most recent activity first.',
+      description__pull:
+        'Your directory is read on a schedule. Start a sync to pull users now, most recent activity first.',
+      empty__noUsersProvisioned: 'No users have been provisioned yet.',
+      empty__waitingForFirstSync: 'Waiting for the first sync to finish…',
       empty__waitingForFirstUser: 'Waiting for the first provisioned user…',
+      error__lastSyncFailed: 'The last sync failed',
       error__loadUsers: 'Could not load provisioned users',
+      error__syncFailed: 'Could not start the sync. Check your connection and try again.',
       note: 'only users with an email address from a configured domain will be processed.',
       noteLabel: 'Note:',
       subtitle: 'Assign or push a test user from {{provider}} to verify provisioning.',
+      syncRow: {
+        neverSynced: 'Not synced yet',
+        title: 'Directory sync',
+      },
+      syncStatus__cancelled: 'Cancelled',
+      syncStatus__failed: 'Failed',
+      syncStatus__running: 'Running',
+      syncStatus__succeeded: 'Succeeded',
       title: 'Test provisioning',
     },
   },
@@ -1417,16 +1452,14 @@ export const enUS: LocalizationResource = {
       directorySyncSection: {
         badge__active: 'Active',
         badge__inactive: 'Inactive',
-        badge__ssoRequired: 'SSO Required',
-        badge__unconfigured: 'Unconfigured',
-        description:
-          "Automatically add, update, and remove organization members from your identity provider's directory. Requires an SSO connection.",
+        badge__ssoRequired: 'SSO required',
+        description: 'Keep organization members synced with your identity provider. Requires an SSO connection.',
         error__load: 'Could not load Directory Sync',
         menuAction__activate: 'Activate',
         menuAction__deactivate: 'Deactivate',
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
-        primaryButton__startConfiguration: 'Start configuration',
+        primaryButton__configure: 'Configure',
         removeDialog: {
           confirmButton: 'Remove Directory Sync',
           subtitle:
@@ -1502,6 +1535,7 @@ export const enUS: LocalizationResource = {
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
         primaryButton__addConnection: 'Add connection',
+        primaryButton__configure: 'Configure',
         primaryButton__continueConfiguration: 'Continue configuration',
         primaryButton__startConfiguration: 'Start configuration',
         title: 'SSO',
@@ -2145,6 +2179,8 @@ export const enUS: LocalizationResource = {
     protect_check_execution_failed: "Verification didn't complete. Please try again.",
     protect_check_invalid_script: "Couldn't load verification. Please contact support if this persists.",
     protect_check_invalid_sdk_url: "Verification couldn't start. Please contact support.",
+    protect_check_required:
+      "This sign-in needs an extra verification step that can't be shown here. Please try again or use a different sign-in method.",
     protect_check_script_load_failed:
       "Couldn't load verification. This may be caused by a network issue or a Content Security Policy that blocks the verification script. Please try again or contact support.",
     protect_check_timed_out: "Verification didn't complete in time. Please try again.",
@@ -2156,6 +2192,8 @@ export const enUS: LocalizationResource = {
     ticket_expired_code: 'This link has expired. Please start again or request a new link.',
     ticket_invalid_code:
       'This link is no longer valid or has already been used. Please start again or request a new link.',
+    too_many_unverified_identifications:
+      'Too many verifications are pending on this account. Remove an unverified email address, phone number, or wallet you no longer need, or wait a few minutes for an incomplete passkey setup to expire, then try again.',
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
     web3_solana_signature_generation_failed:

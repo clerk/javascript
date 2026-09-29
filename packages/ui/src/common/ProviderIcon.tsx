@@ -7,7 +7,7 @@ import { ProviderInitialIcon } from './ProviderInitialIcon';
 
 type ProviderId = OAuthProvider | Web3Provider | PhoneCodeChannel;
 
-export const SUPPORTS_MASK_IMAGE = ['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x'] as const;
+export const SUPPORTS_MASK_IMAGE = ['agentid', 'apple', 'github', 'okta', 'okx_wallet', 'vercel', 'x'] as const;
 
 export const getEnterpriseProviderIconId = (provider: string) =>
   provider.replace(/(oauth_|saml_)/, '').trim() as OAuthProvider;

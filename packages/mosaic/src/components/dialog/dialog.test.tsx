@@ -550,7 +550,6 @@ describe('compactPlacement', () => {
   const PHONE = '@container cl-dialog (width < 48rem)';
   const probe = stylex.create({
     anchored: { alignSelf: { [PHONE]: 'end', default: null } },
-    centered: { alignItems: { [PHONE]: 'center', default: null } },
     clipped: { overflow: { [PHONE]: 'clip', default: null } },
   });
 
@@ -578,15 +577,6 @@ describe('compactPlacement', () => {
 
     expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(classesOf('.cl-dialog-track')).toEqual(expect.arrayContaining(atomFor(probe.clipped)));
-  });
-
-  // The band runs to 48rem but a `Card` caps at 26.25rem, so between the two the surface sits
-  // inside a wider popup. Without this it lands against the inline-start edge — a sheet hugging one
-  // side of the screen — because the popup is a flex column and `stretch` is the default.
-  it('centers what the sheet holds, for the widths where the surface caps first', () => {
-    renderPlacement('sheet');
-
-    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.centered)));
   });
 
   // A profile fills the compact band, with no room to be anchored anywhere else.

@@ -4,6 +4,9 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.types';
 import { useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosText } from '@/lib/chaos';
+
 export const accounts: UserProfileEnterpriseAccount[] = [
   {
     id: 'account_okta',
@@ -25,9 +28,18 @@ export function useEnterpriseAccountsFixture({
   initialAccounts?: UserProfileEnterpriseAccount[];
   initialError?: string;
 } = {}) {
-  const [linkedAccounts, setLinkedAccounts] = useState(initialAccounts);
+  const seedAccounts = useChaosFixture(initialAccounts, items =>
+    items.map((account, index) => ({ ...account, name: chaosText(account.name), emailAddress: chaosEmail(index) })),
+  );
+  const seedConnections = useChaosFixture(connections, items =>
+    items.map(connection => ({ ...connection, name: chaosText(connection.name) })),
+  );
+  const [linkedAccounts, setLinkedAccounts] = useState(seedAccounts);
   const [availableConnections, setAvailableConnections] = useState(
-    connections.map((connection, index) => ({ ...connection, connectError: index === 0 ? initialError : undefined })),
+    seedConnections.map((connection, index) => ({
+      ...connection,
+      connectError: index === 0 ? initialError : undefined,
+    })),
   );
   const [pendingConnectionId, setPendingConnectionId] = useState<string>();
 

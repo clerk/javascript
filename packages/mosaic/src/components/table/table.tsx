@@ -58,7 +58,8 @@ const Search = React.forwardRef<HTMLInputElement, TableSearchProps>(function Mos
   return (
     <InputGroup.Root
       disabled={disabled}
-      {...mergeStyleProps(themeProps('table-search'), stylex.props(styles.search))}
+      xstyle={styles.search}
+      {...themeProps('table-search')}
     >
       <InputGroup.Start>
         <Icon name='magnifying-glass' />

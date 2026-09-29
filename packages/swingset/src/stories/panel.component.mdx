@@ -1,0 +1,73 @@
+import * as PanelStories from './panel.component.stories';
+
+# Panel
+
+Panel lays out one page of content: a title, and the sections below it. `Panel.Root` stacks its
+children, `Panel.Title` renders the page's heading, and `Panel.Sections` stacks a column of
+[Section](/components/section)s one heading level below the title. Inside a
+[Profile](/components/profile) page that has gone compact, `Panel.Title` opens the navigation sheet.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={PanelStories}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Button', href: '/components/button', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+```tsx
+import { Panel } from '@clerk/mosaic/components/panel';
+
+<Panel.Root>
+  <Panel.Title>Account</Panel.Title>
+  <Panel.Sections>
+    <Section.Root>
+      <Section.Title>Email addresses</Section.Title>
+    </Section.Root>
+  </Panel.Sections>
+</Panel.Root>;
+```
+
+## Parts
+
+| Part             | Element | Notes                                                                         |
+| ---------------- | ------- | ----------------------------------------------------------------------------- |
+| `Panel.Root`     | `<div>` | Stacks the title and content.                                                 |
+| `Panel.Title`    | `<div>` | Holds the page heading, at the level from the nearest `HeadingLevelProvider`. |
+| `Panel.Sections` | `<div>` | Stacks sections, one heading level below the title.                           |
+
+Every part takes `xstyle`, `ref`, and `render` along with its element's props.
+
+## Heading levels
+
+`Panel.Title` renders at the level from the nearest `HeadingLevelProvider`, or `h2` outside one.
+`Panel.Sections` moves its content one level down. See [Heading](/components/heading).
+
+| Usage                                   | `Panel.Title` | `Section.Title` |
+| --------------------------------------- | ------------- | --------------- |
+| A panel alone                           | `h2`          | `h3`            |
+| Inside `Profile.ContentPanel`           | `h3`          | `h4`            |
+| Inside `HeadingLevelProvider level={4}` | `h4`          | `h5`            |
+
+## Styling
+
+Each part carries a stable class and reflects no state, so target the classes directly:
+
+| Class                           | Part                                  |
+| ------------------------------- | ------------------------------------- |
+| `.cl-panel`                     | `Panel.Root`                          |
+| `.cl-panel-title`               | `Panel.Title`                         |
+| `.cl-panel-sections`            | `Panel.Sections`                      |
+| `.cl-profile-nav-trigger`       | The compact title's navigation button |
+| `.cl-profile-nav-trigger-caret` | The caret beside that button's label  |
+
+```css
+.cl-panel-sections {
+  gap: 3rem;
+}
+```

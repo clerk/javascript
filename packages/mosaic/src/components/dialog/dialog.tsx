@@ -15,6 +15,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
+import { ToastProvider } from '../toast/toast';
 import {
   backdropMotion,
   closeInsets,
@@ -26,7 +27,7 @@ import {
   variants,
   viewportVariants,
 } from './dialog.styles';
-import { acquireKeyboardInset } from './keyboard-inset';
+import { acquireKeyboardInset, focusWithoutScroll } from './keyboard-inset';
 
 /**
  * Which surface the dialog holds, and so the geometry it is given: `card` is a `Card` at the
@@ -286,6 +287,7 @@ function Viewport({
           themeProps('dialog-track', { variant }),
           stylex.props(reset.base, styles.track, trackVariants[variant], trackCompactPlacements[compactPlacement]),
         )}
+        onTouchEnd={focusWithoutScroll}
       >
         {children}
       </div>
@@ -401,8 +403,11 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
     </DialogContext.Provider>
   );
 
-  return (
-    <Primitive.Portal>
+  const viewport = (
+    <Viewport
+      variant={variant}
+      compactPlacement={compactPlacement}
+    >
       <Backdrop
         variant={variant}
         // A card stacked on a card paints no scrim of its own — one serves the whole stack.
@@ -410,13 +415,12 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
         // depends on the variant of the dialog beneath, which the headless layer has no notion of.
         stacked={isNestedInDialog && host?.variant === 'card'}
       />
-      <Viewport
-        variant={variant}
-        compactPlacement={compactPlacement}
-      >
-        {popup}
-      </Viewport>
-    </Primitive.Portal>
+      {popup}
+    </Viewport>
+  );
+
+  return (
+    <Primitive.Portal>{variant === 'profile' ? <ToastProvider>{viewport}</ToastProvider> : viewport}</Primitive.Portal>
   );
 });
 

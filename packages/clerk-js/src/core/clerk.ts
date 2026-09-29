@@ -3674,7 +3674,17 @@ export class Clerk implements ClerkInterface {
       this.#touchThrottledUntil = Date.now() + 5_000;
 
       if (this.#options.touchSession) {
-        void this.#touchCurrentSession(this.session, 'focus');
+        // Even if touch fails, we're still in a generally good state that can recover.
+        // There are some caveats and edge cases, like if you reload the tab after a failed
+        // touch in a multi-tab scenario, you might get the last active user/org that was
+        // recorded by the other tab, but that's not catastrophic.
+        // We were previously not swallowing errors here, which led to unnecessary uncaught
+        // error logs in the browser console and noise in error tracking tools.
+        // This is a POST and does not currently retry, we could reconsider that if we wanted
+        // to, but probably only leads to unnecessary complexity for little gain.
+        this.#touchCurrentSession(this.session, 'focus').catch(error => {
+          debugLogger.warn('Session touch on page focus failed', { error }, 'clerk');
+        });
       }
     });
 
