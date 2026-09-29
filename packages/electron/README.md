@@ -144,7 +144,7 @@ createClerkBridge({
 
 ## Allowed origins
 
-Add your renderer's origins to your instance's allowed origins. Otherwise Clerk rejects every renderer request with "Setting both the 'Origin' and 'Authorization' headers is forbidden".
+Add your renderer's origins to your instance's allowed origins. Otherwise, Clerk rejects renderer requests that carry both an `Origin` and an `Authorization` header with "Setting both the 'Origin' and 'Authorization' headers is forbidden". The renderer sends both once it has a client token.
 
 ```sh
 curl -X PATCH https://api.clerk.com/v1/instance \
@@ -153,7 +153,7 @@ curl -X PATCH https://api.clerk.com/v1/instance \
   -d '{"allowed_origins": ["my-app://renderer", "http://localhost:5173"]}'
 ```
 
-Include your custom scheme origin and, during development, your dev server's origin.
+Include your custom scheme origin and, during development, your dev server's origin. The command replaces the instance's whole list, so include every origin the instance already allows. To see the current list, send a `GET` request to the same endpoint.
 
 ## Content Security Policy
 
@@ -279,18 +279,18 @@ await clerk.load();
 
 Like passkeys on iOS, the macOS platform APIs require a verified association between your app and your domain:
 
-1. In the Clerk Dashboard, go to the [Native applications](https://dashboard.clerk.com/~/native-applications) page and make sure the Native API is enabled. Your Electron app needs it.
+1. In the Clerk Dashboard, go to the [Native applications](https://dashboard.clerk.com/~/native-applications) page and ensure the Native API is enabled. Your Electron app needs it.
 2. Add an iOS application to the [Native applications](https://dashboard.clerk.com/~/native-applications) page in the Clerk Dashboard. You need your app's App ID Prefix and Bundle ID. An Electron macOS app uses the same configuration as an iOS app.
 3. Sign your app with `com.apple.developer.associated-domains` containing `webcredentials:<rp-domain>`. This is a _restricted_ entitlement. The build must embed a provisioning profile with the Associated Domains capability for the bundle ID, and the entitlements must also include `com.apple.application-identifier` and `com.apple.developer.team-identifier` matching the profile.
 
-Each of these mistakes produces the same opaque "not associated with domain" error:
+These tips all guard against the same vague "not associated with domain" error:
 
 - Sign with an **Apple Development** identity (`mac.type: development` in electron-builder) and a **macOS App Development** profile that includes your Mac. Also install the profile on the machine (`~/Library/Developer/Xcode/UserData/Provisioning Profiles/<UUID>.provisionprofile`).
 - Copy `.app` bundles with `ditto`. Other copy methods can break the app seal, and macOS ignores the entitlements of an app whose signature fails `codesign --verify --deep --strict`.
 - `swcd` registers the domain association when the app launches. Check it with `sudo swcutil show`. If it gets stuck, run `sudo swcutil reset` and relaunch.
 - Prefer the default (production/CDN) association route. `?mode=developer` with `sudo swcutil developer-mode -e true` also works, but it's often flaky.
 
-Windows has no equivalent requirement. Linux has no native mode, so passkeys only work in renderer mode there. External security keys work too.
+Windows has no equivalent requirement. Linux has no native mode, so passkeys, including external security keys, only work in renderer mode there.
 
 ## Support
 
