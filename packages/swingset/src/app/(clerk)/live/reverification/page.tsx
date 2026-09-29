@@ -1,6 +1,7 @@
 'use client';
 
 import { Destructive } from '@clerk/mosaic/blocks/destructive';
+import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import { Dialog } from '@clerk/mosaic/components/dialog';
@@ -265,45 +266,22 @@ function DialogHarness() {
 }
 
 function DestructiveHarness() {
-  const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(true));
-  const [open, setOpen] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [requestPending, setRequestPending] = useState(false);
-  const runRef = useRef(false);
-
-  const continueDelete = () => {
-    if (runRef.current || reverification.status !== 'idle') {
-      return;
-    }
-    runRef.current = true;
-    setRequestPending(true);
-    setErrorMessage(null);
-    setSuccessMessage(null);
-    void (async () => {
+  const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(true));
+  const destructive = useDestructiveController({
+    onDelete: async () => {
+      setSuccessMessage(null);
+      await resetMockDelete();
       try {
-        await resetMockDelete();
         await deleteAccount();
         setSuccessMessage('Mock delete completed. The account was not deleted.');
-        setOpen(false);
       } catch (error) {
-        if (isClerkRuntimeError(error) && error.code === 'request_already_in_progress') {
-          return;
-        }
         await resetMockDelete();
-        if (isReverificationCancelledError(error)) {
-          setErrorMessage(null);
-          setOpen(false);
-          return;
-        }
-        setErrorMessage(error instanceof Error ? error.message : 'Mock delete failed.');
-        setOpen(true);
-      } finally {
-        runRef.current = false;
-        setRequestPending(false);
+        throw error;
       }
-    })();
-  };
+    },
+    reverification,
+  });
 
   return (
     <div className='flex flex-col gap-4'>
@@ -311,37 +289,23 @@ function DestructiveHarness() {
         <Button
           color='negative'
           onClick={() => {
-            setErrorMessage(null);
             setSuccessMessage(null);
-            setOpen(true);
+            destructive.openDestructiveDialog();
           }}
-          disabled={open || requestPending}
+          disabled={destructive.open}
         >
           Delete account
         </Button>
       </div>
       {successMessage ? <p className='text-sm'>{successMessage}</p> : null}
       <Destructive
-        open={open}
-        onOpenChange={next => {
-          if (!next && requestPending && reverification.status === 'idle') {
-            return;
-          }
-          setOpen(next);
-          if (!next && reverification.status !== 'retrying') {
-            setErrorMessage(null);
-            void resetMockDelete();
-          }
-        }}
+        {...destructive}
         title='Delete account?'
         description='This mock asks for verification, then waits before a fake success. The account is not deleted.'
         fieldLabel='Type “Delete account” below to continue'
         confirmationValue='Delete account'
         actionLabel='Delete account'
-        onDelete={continueDelete}
-        isDeleting={requestPending}
-        errorMessage={errorMessage ?? undefined}
-        reverification={reverification}
+        verificationSlot={<Reverification {...reverification} />}
       />
     </div>
   );

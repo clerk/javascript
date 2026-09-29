@@ -1,10 +1,14 @@
+import type { ReactNode } from 'react';
+
 import { Destructive } from '../../../blocks/destructive';
 import type { DestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
 
-export function UserProfileDeleteSectionView(destructiveProps: DestructiveController) {
+export function UserProfileDeleteSectionView(
+  destructiveProps: DestructiveController & { verificationSlot?: ReactNode },
+) {
   const m = useMessages('userProfileDeleteSection');
 
   return (
