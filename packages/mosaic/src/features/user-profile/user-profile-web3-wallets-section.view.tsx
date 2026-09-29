@@ -6,6 +6,7 @@ import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../localization';
 import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visible';
 import type { ReverificationController } from '../reverification';
+import { ReverificationConfirmation } from '../reverification/reverification-confirmation';
 import { UserProfileWeb3WalletRowView } from './user-profile-web3-wallet-row.view';
 
 export interface UserProfileWeb3Provider {
@@ -100,7 +101,7 @@ export function UserProfileWeb3WalletsSectionView({
         </Section.Root>
       ) : null}
       {onRemove ? (
-        <Confirmation
+        <ReverificationConfirmation
           handle={removeWallet}
           reverification={removeReverification}
           title={m.removeDialog.title}
