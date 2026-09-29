@@ -74,6 +74,7 @@ export const styles = stylex.create({
     },
     display: 'flex',
     flexDirection: 'column',
+    justifyContent: 'center',
     rowGap: space['2'],
     minHeight: `calc(${space['18.5']} + 1px)`,
     width: '100%',

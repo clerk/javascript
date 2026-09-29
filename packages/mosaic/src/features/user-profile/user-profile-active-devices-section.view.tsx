@@ -94,7 +94,7 @@ export function UserProfileActiveDevicesSectionView({
                   ref={signOutAllTrigger}
                   color='neutral'
                   size='sm'
-                  variant='ghost'
+                  variant='outline'
                   onClick={() => setIsSignOutAllOpen(true)}
                 >
                   {m.signOutAll}

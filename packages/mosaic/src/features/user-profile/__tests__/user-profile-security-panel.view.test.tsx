@@ -120,7 +120,7 @@ describe('UserProfileSecurityPanelView', () => {
 
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     const signOutAll = screen.getByRole('button', { name: 'Sign out of all devices' });
-    expect(signOutAll).toHaveAttribute('data-variant', 'ghost');
+    expect(signOutAll).toHaveAttribute('data-variant', 'outline');
     expect(screen.getByRole('group', { name: 'Active devices' }).querySelector('.cl-section-header')).toContainElement(
       signOutAll,
     );
