@@ -25,11 +25,20 @@ import type {
   UserOrganizationInvitationJSON,
   UserSettingsJSON,
   VerificationJSON,
+  Web3Strategy,
+  Web3WalletJSON,
 } from '@clerk/shared/types';
 
 type Settings<T> = Omit<T, 'id' | 'object'>;
 
-export type FapiUserSettings = Omit<Settings<UserSettingsJSON>, 'social'> & { social: Partial<OAuthProviders> };
+type FapiWeb3Attribute = Omit<AttributeDataJSON, 'first_factors'> & {
+  first_factors: Array<AttributeDataJSON['first_factors'][number] | Web3Strategy>;
+};
+
+export type FapiUserSettings = Omit<Settings<UserSettingsJSON>, 'social' | 'attributes'> & {
+  social: Partial<OAuthProviders>;
+  attributes: Omit<AttributesJSON, 'web3_wallet'> & { web3_wallet: FapiWeb3Attribute };
+};
 
 export type FapiEnvironment = Omit<EnvironmentJSON, 'user_settings' | 'organization_settings'> & {
   user_settings: FapiUserSettings;
@@ -349,6 +358,25 @@ export function fapiEnterpriseAccount(
     verification: null,
     last_authenticated_at: null,
     enterprise_connection_id: 'sso_1',
+    ...overrides,
+  };
+}
+
+export function fapiWeb3Wallet(
+  overrides: Partial<Web3WalletJSON> & Pick<Web3WalletJSON, 'id' | 'web3_wallet'>,
+): Web3WalletJSON {
+  return {
+    object: 'web3_wallet',
+    verification: {
+      id: 'verification_1',
+      object: 'verification',
+      status: 'verified',
+      verified_at_client: '',
+      strategy: 'web3_metamask_signature',
+      attempts: 1,
+      expire_at: 0,
+      error: { code: '', message: '' },
+    },
     ...overrides,
   };
 }

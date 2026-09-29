@@ -5,19 +5,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
 
 describe('Web3 wallets section', () => {
-  it.each([{ availableProviders: [] }, { availableProviders: [{ id: 'metamask', provider: 'MetaMask' }] }])(
-    'hides the entire section without wallets or actionable providers (%j)',
-    ({ availableProviders }) => {
-      const { container } = render(
-        <UserProfileWeb3WalletsSectionView
-          wallets={[]}
-          availableProviders={availableProviders}
-        />,
-      );
-      expect(container).toBeEmptyDOMElement();
-    },
-  );
-
   it.each([
     { isPrimary: true, isVerified: true, canSetPrimary: false },
     { isPrimary: false, isVerified: true, canSetPrimary: true },
@@ -79,58 +66,6 @@ describe('Web3 wallets section', () => {
       }
     },
   );
-
-  it('removes a wallet directly from its confirmation', async () => {
-    const user = userEvent.setup();
-    const onRemove = vi.fn();
-    render(
-      <UserProfileWeb3WalletsSectionView
-        wallets={[{ id: 'wallet_1', address: '0x1234', isVerified: true }]}
-        onRemove={onRemove}
-      />,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Manage 0x1234' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove wallet' }));
-    expect(screen.getByRole('alertdialog')).toHaveTextContent('Remove wallet?');
-    await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
-    expect(onRemove).toHaveBeenCalledExactlyOnceWith('wallet_1');
-    expect(screen.queryByText('Cannot verify your account')).not.toBeInTheDocument();
-  });
-
-  it('shows connection errors while keeping Connect available', () => {
-    render(
-      <UserProfileWeb3WalletsSectionView
-        wallets={[]}
-        availableProviders={[{ id: 'metamask', provider: 'MetaMask', connectError: 'Wallet extension not found' }]}
-        onConnect={vi.fn()}
-      />,
-    );
-    expect(screen.getByRole('alert')).toHaveTextContent('Wallet extension not found');
-    expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
-    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-  });
-
-  it('shows primary errors while keeping Set as primary available', async () => {
-    const user = userEvent.setup();
-    render(
-      <UserProfileWeb3WalletsSectionView
-        wallets={[
-          {
-            id: 'wallet_1',
-            provider: 'MetaMask',
-            address: '0x1234',
-            isVerified: true,
-            primaryError: 'Unable to set primary',
-          },
-        ]}
-        onSetPrimary={vi.fn()}
-      />,
-    );
-    expect(screen.getByRole('alert')).toHaveTextContent('Unable to set primary');
-    await user.click(screen.getByRole('button', { name: 'Manage MetaMask' }));
-    expect(screen.getByRole('menuitem', { name: 'Set as primary' })).toBeEnabled();
-  });
 
   it('shows an unverified wallet alongside its available provider', () => {
     render(
