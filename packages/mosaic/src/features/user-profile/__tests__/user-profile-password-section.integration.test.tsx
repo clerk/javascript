@@ -101,6 +101,7 @@ function renderPassword() {
 async function editPassword() {
   const events = userEvent.setup();
   await events.click(screen.getByRole('button', { name: 'Change password' }));
+  await events.type(screen.getByLabelText('Current password'), 'old-secret');
   await events.type(screen.getByLabelText('New password'), 'new-password-123');
   await events.type(screen.getByLabelText('Confirm password'), 'new-password-123');
   await events.click(screen.getByRole('checkbox', { name: 'Sign out of all other devices' }));
@@ -108,43 +109,31 @@ async function editPassword() {
 }
 
 describe('UserProfilePasswordSection', () => {
-  it('keeps the editor pending until verification is ready and returns to the draft', async () => {
-    let finishVerification: (value: unknown) => void = () => {};
-    session.startVerification.mockReturnValueOnce(
+  it('keeps the editor pending until the direct update finishes', async () => {
+    let finishUpdate: (value: unknown) => void = () => {};
+    user.updatePassword.mockReturnValueOnce(
       new Promise(resolve => {
-        finishVerification = resolve;
-      }),
-    );
-    user.updatePassword.mockRejectedValueOnce(
-      new ClerkAPIResponseError('Verify', {
-        status: 403,
-        data: [{ code: 'session_reverification_required', message: 'Verify' }],
+        finishUpdate = resolve;
       }),
     );
     renderPassword();
     const events = await editPassword();
     await events.click(screen.getByRole('button', { name: 'Save changes' }));
-    await waitFor(() => expect(session.startVerification).toHaveBeenCalled());
+    await waitFor(() => expect(user.updatePassword).toHaveBeenCalledOnce());
 
     expect(screen.getByLabelText('New password')).toBeVisible();
     expect(screen.getByLabelText('New password')).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Save changes' })).toHaveAttribute('aria-busy', 'true');
     expect(screen.queryByText('Verification required')).not.toBeInTheDocument();
+    expect(session.startVerification).not.toHaveBeenCalled();
 
     await act(() => {
-      finishVerification({ status: 'needs_first_factor', supportedFirstFactors: [{ strategy: 'password' }] });
+      finishUpdate(user);
     });
-    await waitFor(() => expect(screen.getByLabelText('Password')).toBeVisible());
-    const back = screen.getByRole('button', { name: 'Back', exact: true });
-    await events.click(back);
-    await waitFor(() => expect(screen.getByLabelText('New password')).toBeVisible());
-    expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
-    await waitFor(() => expect(screen.getByLabelText('New password')).toHaveFocus());
-    await events.click(screen.getByRole('button', { name: 'Save changes' }));
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
-  it('shows a failed retry instead of reporting a save when verification is required again', async () => {
+  it('shows a direct API error without verification or an automatic retry', async () => {
     user.updatePassword.mockRejectedValue(
       new ClerkAPIResponseError('Verify', {
         status: 403,
@@ -154,14 +143,12 @@ describe('UserProfilePasswordSection', () => {
     renderPassword();
     const events = await editPassword();
     await events.click(screen.getByRole('button', { name: 'Save changes' }));
-    await events.type(await screen.findByLabelText('Password'), 'current-password');
-    await events.click(screen.getByRole('button', { name: 'Continue' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Your password was not saved. Please try verifying again.',
-    );
+    expect(await screen.findByRole('alert')).toHaveTextContent('Verify');
     expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
-    expect(user.updatePassword).toHaveBeenCalledTimes(2);
+    expect(user.updatePassword).toHaveBeenCalledOnce();
+    expect(session.startVerification).not.toHaveBeenCalled();
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
   });
 
   it('hides the section when instance passwords are disabled', () => {
@@ -170,25 +157,17 @@ describe('UserProfilePasswordSection', () => {
     expect(screen.queryByRole('region', { name: 'Authentication' })).not.toBeInTheDocument();
   });
 
-  it('keeps the active verification mounted while session data briefly reloads', async () => {
-    user.updatePassword.mockRejectedValueOnce(
-      new ClerkAPIResponseError('Verify', {
-        status: 403,
-        data: [{ code: 'session_reverification_required', message: 'Verify' }],
-      }),
-    );
+  it('keeps the password draft while session data briefly reloads', async () => {
     const { rerender } = renderPassword();
-    const events = await editPassword();
-    await events.click(screen.getByRole('button', { name: 'Save changes' }));
-    await screen.findByLabelText('Password');
+    await editPassword();
 
     isSessionLoaded = false;
     rerender(passwordTree());
-    expect(screen.getByLabelText('Password')).toBeVisible();
+    expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
     isSessionLoaded = true;
     rerender(passwordTree());
-    await events.click(screen.getByRole('button', { name: 'Back', exact: true }));
-    expect(await screen.findByLabelText('New password')).toHaveValue('new-password-123');
+    expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
+    expect(screen.getByLabelText('Current password')).toHaveValue('old-secret');
   });
 
   it('keeps an enterprise-managed password visible without offering a mutation', () => {
@@ -206,6 +185,7 @@ describe('UserProfilePasswordSection', () => {
     renderPassword();
     const events = userEvent.setup();
     await events.click(screen.getByRole('button', { name: 'Change password' }));
+    await events.type(screen.getByLabelText('Current password'), 'old-secret');
     await events.type(screen.getByLabelText('New password'), 'short');
     await waitFor(() =>
       expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
@@ -226,7 +206,11 @@ describe('UserProfilePasswordSection', () => {
     expect(screen.getByLabelText('New password')).not.toHaveAttribute('aria-invalid', 'true');
     expect(screen.getByRole('button', { name: 'Save changes' })).not.toHaveAttribute('aria-disabled', 'true');
     await events.click(screen.getByRole('button', { name: 'Save changes' }));
-    expect(user.updatePassword).toHaveBeenCalledExactlyOnceWith({ newPassword: 'short', signOutOfOtherSessions: true });
+    expect(user.updatePassword).toHaveBeenCalledExactlyOnceWith({
+      currentPassword: 'old-secret',
+      newPassword: 'short',
+      signOutOfOtherSessions: true,
+    });
   });
 
   it('shows password API errors at the visible field and preserves the draft', async () => {
@@ -356,55 +340,43 @@ describe('UserProfilePasswordSection', () => {
     expect(user.updatePassword).toHaveBeenCalled();
   });
 
-  it('returns from verification to the same draft without showing an error', async () => {
+  it('keeps the draft and checkbox choice after a rejected update', async () => {
     user.updatePassword.mockRejectedValueOnce(
-      new ClerkAPIResponseError('Verify', {
-        status: 403,
-        data: [{ code: 'session_reverification_required', message: 'Verify' }],
+      new ClerkAPIResponseError('Update failed', {
+        status: 500,
+        data: [{ code: 'server_error', message: 'Update failed' }],
       }),
     );
     renderPassword();
     const events = await editPassword();
     await events.click(screen.getByRole('button', { name: 'Save changes' }));
-    await screen.findByLabelText('Password');
-    await events.click(screen.getByRole('button', { name: 'Back', exact: true }));
 
-    expect(await screen.findByLabelText('New password')).toHaveValue('new-password-123');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Update failed');
+    expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
     expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
     expect(screen.getByRole('checkbox')).not.toBeChecked();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     expect(user.updatePassword).toHaveBeenCalledTimes(1);
     expect(screen.getByRole('button', { name: 'Save changes' })).not.toBeDisabled();
   });
 
-  it('verifies, retries the original values, and waits for the retry before closing', async () => {
+  it('waits for the direct update before closing', async () => {
     let finish: () => void = () => {};
-    const retry = new Promise<void>(resolve => {
+    const update = new Promise<void>(resolve => {
       finish = resolve;
     });
-    user.updatePassword
-      .mockRejectedValueOnce(
-        new ClerkAPIResponseError('Verify', {
-          status: 403,
-          data: [{ code: 'session_reverification_required', message: 'Verify' }],
-        }),
-      )
-      .mockImplementationOnce(() => retry.then(() => user));
+    user.updatePassword.mockImplementationOnce(() => update.then(() => user));
     renderPassword();
     const events = await editPassword();
     await events.click(screen.getByRole('button', { name: 'Save changes' }));
 
-    await events.type(await screen.findByLabelText('Password'), 'current-password');
-    await events.click(screen.getByRole('button', { name: 'Continue' }));
-    await waitFor(() => expect(user.updatePassword).toHaveBeenCalledTimes(2));
-    expect(user.updatePassword.mock.calls[1]).toEqual(user.updatePassword.mock.calls[0]);
-    expect(clerk.setActive).toHaveBeenCalledWith({ session: 'session_1' });
+    await waitFor(() => expect(user.updatePassword).toHaveBeenCalledOnce());
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
-    expect(screen.getByRole('button', { name: 'Continue' })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('button', { name: 'Save changes' })).toHaveAttribute('aria-busy', 'true');
+    expect(session.startVerification).not.toHaveBeenCalled();
 
     await act(async () => {
       finish();
-      await retry;
+      await update;
     });
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
@@ -415,6 +387,7 @@ describe('UserProfilePasswordSection', () => {
     await events.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(user.updatePassword).toHaveBeenCalledExactlyOnceWith({
+      currentPassword: 'old-secret',
       newPassword: 'new-password-123',
       signOutOfOtherSessions: false,
     });
