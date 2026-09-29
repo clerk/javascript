@@ -24,12 +24,41 @@ function renderDialog(reverification: ReverificationController, pending = true) 
   return { ...view, onOpenChange };
 }
 
+function retryingVerification(): ReverificationController {
+  return {
+    status: 'retrying',
+    step: 'password',
+    value: '',
+    onValueChange: vi.fn(),
+    isPending: true,
+    onSubmit: vi.fn(),
+    onShowMethods: vi.fn(),
+    onShowHelp: vi.fn(),
+    onBack: vi.fn(),
+    onEmailSupport: vi.fn(),
+    methods: [],
+    onSelectMethod: vi.fn(),
+    onResend: vi.fn(),
+    canResend: false,
+  };
+}
+
 describe('Solana wallet reverification', () => {
   it('keeps the picker visible while verification loads', () => {
-    renderDialog({ status: 'loading', phase: 'active' });
+    renderDialog({ status: 'loading' });
     expect(screen.getByText(/No Solana wallets are available/)).toBeInTheDocument();
     expect(screen.queryByText('Cannot verify your account')).not.toBeInTheDocument();
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
+  });
+
+  it('cancels a loading verification with Escape when cancellation is available', async () => {
+    const onCancel = vi.fn();
+    const { onOpenChange } = renderDialog({ status: 'loading', onCancel });
+
+    await userEvent.setup().keyboard('{Escape}');
+
+    expect(onCancel).toHaveBeenCalledOnce();
+    expect(onOpenChange).not.toHaveBeenCalled();
   });
 
   it.each(['Back', 'Close', 'Escape'])(
@@ -37,7 +66,7 @@ describe('Solana wallet reverification', () => {
     async control => {
       const user = userEvent.setup();
       const onCancel = vi.fn();
-      const { onOpenChange } = renderDialog({ status: 'unavailable', phase: 'active', onCancel });
+      const { onOpenChange } = renderDialog({ status: 'unavailable', onCancel });
       expect(screen.getByText('Cannot verify your account')).toBeInTheDocument();
       expect(screen.getAllByRole('dialog')).toHaveLength(1);
       if (control === 'Escape') {
@@ -52,18 +81,16 @@ describe('Solana wallet reverification', () => {
 
   it('blocks dismissal while the protected operation retries', async () => {
     const user = userEvent.setup();
-    const onCancel = vi.fn();
-    const { onOpenChange } = renderDialog({ status: 'unavailable', phase: 'retrying', onCancel });
+    const { onOpenChange } = renderDialog(retryingVerification());
     expect(screen.getByRole('button', { name: 'Back', exact: true })).toBeDisabled();
     await user.click(screen.getByRole('button', { name: 'Close', exact: true }));
     await user.keyboard('{Escape}');
-    expect(onCancel).not.toHaveBeenCalled();
     expect(onOpenChange).not.toHaveBeenCalled();
   });
 
   it('blocks dismissal while waiting for the wallet provider', async () => {
     const user = userEvent.setup();
-    const { onOpenChange } = renderDialog({ status: 'idle', phase: 'inactive' });
+    const { onOpenChange } = renderDialog({ status: 'idle' });
     await user.click(screen.getByRole('button', { name: 'Close', exact: true }));
     await user.keyboard('{Escape}');
     expect(onOpenChange).not.toHaveBeenCalled();
@@ -88,11 +115,7 @@ it('returns focus to the selected wallet after cancelling verification', async (
         pending={active}
         onOpenChange={vi.fn()}
         onConnect={() => setActive(true)}
-        reverification={
-          active
-            ? { status: 'unavailable', phase: 'active', onCancel: () => setActive(false) }
-            : { status: 'idle', phase: 'inactive' }
-        }
+        reverification={active ? { status: 'unavailable', onCancel: () => setActive(false) } : { status: 'idle' }}
       />
     );
   }

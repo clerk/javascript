@@ -38,7 +38,11 @@ export function UserProfileSolanaWalletDialog({
   const selectedWallet = useRef<HTMLButtonElement | null>(null);
   const restorePickerFocus = useRef(false);
   const verification =
-    reverification?.status === 'ready' || reverification?.status === 'unavailable' ? reverification : undefined;
+    reverification?.status === 'ready' ||
+    reverification?.status === 'unavailable' ||
+    reverification?.status === 'retrying'
+      ? reverification
+      : undefined;
   const verifying = verification !== undefined;
 
   useEffect(() => {
@@ -66,11 +70,11 @@ export function UserProfileSolanaWalletDialog({
     <Dialog.Root
       open={open}
       onOpenChange={nextOpen => {
-        if (!nextOpen && reverification?.phase === 'active') {
-          reverification.onCancel?.();
+        if (!nextOpen && reverification?.onCancel) {
+          reverification.onCancel();
           return;
         }
-        if (!nextOpen && pending) {
+        if (!nextOpen && (verification || pending)) {
           return;
         }
         onOpenChange(nextOpen);
@@ -171,7 +175,7 @@ export function UserProfileSolanaWalletDialog({
                           variant='outline'
                           color='neutral'
                           fullWidth
-                          disabled={verification.phase === 'retrying'}
+                          disabled={!verification.onCancel}
                           onClick={verification.onCancel}
                         >
                           {m.solanaDialog.back}
