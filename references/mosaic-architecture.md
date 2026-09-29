@@ -409,7 +409,7 @@ the criteria and worked before/afters for the calls in between.
 
 Views take plain props and callbacks. They branch on the props the controller
 derived — `open`, `pendingKey`, an absent callback — never on a machine snapshot,
-so a view test needs neither the machine nor Clerk:
+so the view needs neither the machine nor Clerk:
 
 ```tsx
 export function UserButtonView({ open, onOpenChange, pendingKey, onSignOutAll, ...data }: UserButtonProps) {
@@ -438,19 +438,17 @@ half-typed confirmation phrase and compares it, while `open`, `isDeleting`, and
 `errorMessage` come from the controller, because those are what decide whether the
 dialog closes or explains itself.
 
-### Testing the layers
+### Testing a flow
 
-Each layer is tested in isolation, and that isolation is the point — the model is
-the only test that mocks Clerk, and the view needs no machinery at all. See the
-`mosaic` skill's `references/testing.md` for the recipes.
+A flow is tested as a whole, not per layer. The props between layers are
+internal and change as the flow grows, so tests pinned to them churn without
+proving what the user sees. See the `mosaic` skill's `references/testing.md`.
 
-| Layer      | Test file                | What it needs                                   |
-| ---------- | ------------------------ | ----------------------------------------------- |
-| model      | `*.model.test.tsx`       | Mocked Clerk. The highest-risk layer.           |
-| controller | `*.controller.test.tsx`  | A fake model object. No Clerk.                  |
-| view       | `*.view.test.tsx`        | Plain props and `vi.fn()` callbacks.            |
-| wrapper    | `*.test.tsx`             | All three layers mocked; asserts the branching. |
-| whole      | `*.integration.test.tsx` | Mocked Clerk, real layers, real DOM.            |
+| Tier    | Test file            | What it needs                                                  |
+| ------- | -------------------- | -------------------------------------------------------------- |
+| unit    | `*.test.ts(x)`       | Nothing, or fake timers. Pure helpers and shared primitives.   |
+| feature | `*.feature.test.tsx` | Real `Clerk` and real layers in Chromium, FAPI faked with MSW. |
+| E2E     | `/integration`       | Real apps against a real Clerk backend (the Playwright suite). |
 
 ## Coexistence with existing system
 
@@ -512,7 +510,8 @@ The steps above cover the **styling** migration. For **flow** components — whe
 | `src/utils/reset.test.tsx`              | Reset specs                                                                        |
 | `src/__tests__/MosaicProvider.test.tsx` | Icon-override and localization context specs                                       |
 | `src/components/button/button.test.tsx` | Component-level slot/state/variant specs                                           |
-| `src/features/user-button/__tests__/`   | The canonical per-layer test set to copy from                                      |
+| `src/__tests__/feature/`                | FAPI builders, the fake FAPI, and `renderWithClerk` for feature tests              |
+| `src/features/user-button/__tests__/`   | `user-button.feature.test.tsx` is the feature test to copy from                    |
 
 `machine/` is the runtime; `machines/` is machines written with it. The one-letter
 difference is easy to misread — a feature's own machine belongs in its

@@ -1,3 +1,4 @@
+import { within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { clearFetchCache } from '@/hooks/useFetch';
@@ -109,7 +110,7 @@ describe('SSO bypass allowlist', () => {
 
       renderPage(wrapper);
 
-      expect(await screen.findByRole('button', { name: 'Start configuration' })).toBeInTheDocument();
+      expect(await screen.findByRole('button', { name: 'Configure' })).toBeInTheDocument();
       expect(screen.queryByText('SSO bypass')).not.toBeInTheDocument();
     });
 
@@ -152,7 +153,11 @@ describe('SSO bypass allowlist', () => {
 
       expect(await screen.findByText('1 member')).toBeInTheDocument();
 
-      await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
+      await userEvent.click(
+        within(document.querySelector('.cl-profileSection__ssoBypass') as HTMLElement).getByRole('button', {
+          name: /open menu/i,
+        }),
+      );
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Manage' }));
 
       expect(await screen.findByRole('heading', { name: 'SSO bypass' })).toBeInTheDocument();
@@ -187,7 +192,11 @@ describe('SSO bypass allowlist', () => {
 
     const userEventOpen = async (userEvent: ReturnType<typeof render>['userEvent']) => {
       await screen.findByText('SSO bypass');
-      await userEvent.click(screen.getByRole('button', { name: /open menu/i }));
+      await userEvent.click(
+        within(document.querySelector('.cl-profileSection__ssoBypass') as HTMLElement).getByRole('button', {
+          name: /open menu/i,
+        }),
+      );
       await userEvent.click(await screen.findByRole('menuitem', { name: 'Manage' }));
       await screen.findByRole('heading', { name: 'SSO bypass' });
     };
@@ -474,9 +483,13 @@ describe('SSO bypass allowlist', () => {
       expect(screen.getByText(SSO_DESCRIPTION)).toBeInTheDocument();
       expect(screen.getByText('Active')).toBeInTheDocument();
 
-      expect(screen.queryByRole('button', { name: /clerk\.com/ })).not.toBeInTheDocument();
+      expect(
+        within(document.querySelector('.cl-profileSection__sso') as HTMLElement).queryByRole('button', {
+          name: /open menu/i,
+        }),
+      ).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Add connection' })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Start configuration' })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Configure' })).not.toBeInTheDocument();
       expect(fixtures.clerk.organization?.getEnterpriseConnectionTestRuns).not.toHaveBeenCalled();
     });
 

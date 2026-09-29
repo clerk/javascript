@@ -1255,7 +1255,11 @@ export type __internal_LocalizationResource = {
         badge__active: LocalizationValue;
         badge__inactive: LocalizationValue;
         descriptionLine1: LocalizationValue;
+        /**
+         * @deprecated Use `primaryButton__configure` instead.
+         */
         primaryButton__startConfiguration: LocalizationValue;
+        primaryButton__configure: LocalizationValue;
         primaryButton__continueConfiguration: LocalizationValue;
         primaryButton__addConnection: LocalizationValue;
         domainLabel: LocalizationValue;
@@ -1332,13 +1336,12 @@ export type __internal_LocalizationResource = {
       };
       directorySyncSection: {
         title: LocalizationValue;
-        badge__unconfigured: LocalizationValue;
         badge__ssoRequired: LocalizationValue;
         badge__active: LocalizationValue;
         badge__inactive: LocalizationValue;
         description: LocalizationValue;
         error__load: LocalizationValue;
-        primaryButton__startConfiguration: LocalizationValue;
+        primaryButton__configure: LocalizationValue;
         menuAction__edit: LocalizationValue;
         menuAction__activate: LocalizationValue;
         menuAction__deactivate: LocalizationValue;
