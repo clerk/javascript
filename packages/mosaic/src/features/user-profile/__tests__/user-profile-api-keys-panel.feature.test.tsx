@@ -176,6 +176,19 @@ describe('UserProfileApiKeysPanel', () => {
       expect(await within(table()).findByText('Deploy')).toBeVisible();
     });
 
+    it('copies the secret without closing the dialog', async () => {
+      await navigator.clipboard.writeText('');
+      const { fapi, user } = await renderPanel();
+      const dialog = await openCreate(user);
+      await fillCreate(user, dialog, 'Deploy', 'Never');
+      await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
+
+      await user.click(await within(dialog).findByRole('button', { name: 'Copy API key' }));
+
+      await expect(navigator.clipboard.readText()).resolves.toBe(`ak_secret_${fapi.apiKeys[0].id}`);
+      expect(screen.getByRole('dialog', { name: 'Add new API key' })).toBeVisible();
+    });
+
     it('holds the form while the key is created', async () => {
       const { user } = await renderPanel();
       const dialog = await openCreate(user);

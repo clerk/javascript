@@ -70,14 +70,18 @@ export function useUserProfileCreateAPIKeyController({
       secret,
       copyError,
       onCopy: async close => {
-        if (!close) {
-          return;
-        }
         try {
           await navigator.clipboard.writeText(secret ?? '');
-          setOpen(false);
-        } catch {
+        } catch (error) {
           setCopyError(m.copyError);
+          if (!close) {
+            throw error;
+          }
+          return;
+        }
+        setCopyError(null);
+        if (close) {
+          setOpen(false);
         }
       },
     },
