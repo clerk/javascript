@@ -35,7 +35,6 @@ interface ReverificationContext {
   activeMethod: ReverificationMethod | null;
   methods: readonly ReverificationMethod[];
   resendAvailableAt: number | undefined;
-  abortRequested: boolean;
   submitRequested: boolean;
   frozenActiveMethodId: string | undefined;
   overlayFrom: OverlayFrom;
@@ -137,17 +136,6 @@ const afterResult = [
   { target: 'verifying' as const, actions: applyResult },
 ];
 
-const abortAfterInvoke = {
-  target: 'done' as const,
-  guard: (ctx: ReverificationContext) => ctx.abortRequested,
-  actions: [
-    (ctx: ReverificationContext) => {
-      ctx.deps.cancel();
-    },
-    assign(() => ({ abortRequested: false })),
-  ],
-};
-
 const factorEvents = {
   TYPE: {
     actions: assign((_, event) => ({ inputValue: event.value, errorMessage: undefined })),
@@ -183,7 +171,6 @@ export const reverificationMachine = createMachine({
     activeMethod: null,
     methods: [],
     resendAvailableAt: undefined,
-    abortRequested: false,
     submitRequested: false,
     frozenActiveMethodId: undefined,
     overlayFrom: 'factor',
@@ -195,7 +182,6 @@ export const reverificationMachine = createMachine({
       entry: assign(() => ({
         inputValue: '',
         errorMessage: undefined,
-        abortRequested: false,
         submitRequested: false,
         ...unlockResend(),
       })),
@@ -282,21 +268,13 @@ export const reverificationMachine = createMachine({
     },
 
     submitting: {
-      on: {
-        RESET: {
-          guard: ctx => !ctx.abortRequested,
-          actions: assign(() => ({ abortRequested: true })),
-        },
-      },
+      on: { RESET: 'inactive' },
       invoke: fromPromise(submit, {
-        onDone: [abortAfterInvoke, ...afterResult],
-        onError: [
-          abortAfterInvoke,
-          {
-            target: 'verifying',
-            actions: assign((_, event) => ({ errorMessage: errorMessage(event.error) })),
-          },
-        ],
+        onDone: afterResult,
+        onError: {
+          target: 'verifying',
+          actions: assign((_, event) => ({ errorMessage: errorMessage(event.error) })),
+        },
       }),
     },
 

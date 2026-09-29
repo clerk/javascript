@@ -132,6 +132,24 @@ describe('useDestructiveController', () => {
     expect(result.current.open).toBe(false);
   });
 
+  it('ignores a close while reverification is retrying the action', () => {
+    const { result } = renderHook(() =>
+      useDestructiveController({
+        onDelete: () => new Promise(() => {}),
+        reverification: { status: 'ready', phase: 'retrying' } as ReverificationController,
+      }),
+    );
+    act(() => result.current.onOpenChange(true));
+    act(() => {
+      void result.current.onDelete();
+    });
+
+    act(() => result.current.onOpenChange(false));
+
+    expect(result.current.open).toBe(true);
+    expect(result.current.isDeleting).toBe(true);
+  });
+
   it('passes reverification through', () => {
     const { result } = renderHook(() =>
       useDestructiveController({ onDelete: () => Promise.resolve(), reverification: idleReverification }),
