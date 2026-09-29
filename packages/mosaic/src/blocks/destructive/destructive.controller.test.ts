@@ -150,11 +150,62 @@ describe('useDestructiveController', () => {
     expect(result.current.isDeleting).toBe(true);
   });
 
-  it('passes reverification through', () => {
+  it('is on the confirm step without reverification', () => {
+    const { result } = renderHook(() => useDestructiveController({ onDelete: () => Promise.resolve() }));
+
+    expect(result.current.step).toBe('confirm');
+  });
+
+  it.each([
+    ['idle', 'confirm'],
+    ['loading', 'confirm'],
+    ['unavailable', 'verify'],
+    ['ready', 'verify'],
+    ['retrying', 'verify'],
+  ] as const)('reverification status %s uses the %s step', (status, step) => {
     const { result } = renderHook(() =>
-      useDestructiveController({ onDelete: () => Promise.resolve(), reverification: idleReverification }),
+      useDestructiveController({
+        onDelete: () => Promise.resolve(),
+        reverification: { status } as ReverificationController,
+      }),
     );
 
-    expect(result.current.reverification).toBe(idleReverification);
+    expect(result.current.step).toBe(step);
+  });
+
+  it('cancels reverification when the dialog closes', () => {
+    const onCancel = vi.fn();
+    const { result } = renderHook(() =>
+      useDestructiveController({
+        onDelete: () => new Promise(() => {}),
+        reverification: { status: 'ready', onCancel } as ReverificationController,
+      }),
+    );
+    act(() => result.current.onOpenChange(true));
+    act(() => {
+      void result.current.onDelete();
+    });
+
+    act(() => result.current.onOpenChange(false));
+
+    expect(onCancel).toHaveBeenCalledOnce();
+    expect(result.current.open).toBe(false);
+  });
+
+  it('does not cancel reverification when a close is ignored', () => {
+    const { result } = renderHook(() =>
+      useDestructiveController({
+        onDelete: () => new Promise(() => {}),
+        reverification: { status: 'retrying' } as ReverificationController,
+      }),
+    );
+    act(() => result.current.onOpenChange(true));
+    act(() => {
+      void result.current.onDelete();
+    });
+
+    act(() => result.current.onOpenChange(false));
+
+    expect(result.current.open).toBe(true);
   });
 });

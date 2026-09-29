@@ -50,15 +50,19 @@ A rejection leaves the dialog up. The field is marked invalid for as long as the
 
 ## Reverification
 
-Wrap the action with `useReverificationFlow` and pass the result to the controller. Confirmation and verification stay in the same dialog and card.
+Wrap the action with `useReverificationFlow` and pass the result to the controller. The controller decides which step is showing, cancels the verification when the dialog closes, and blocks closing while the action is being retried. Render the verification in `verificationSlot`, and confirmation and verification stay in the same dialog and card.
 
 ```tsx
-import { useReverificationFlow } from '@clerk/mosaic/features/reverification';
+import { Reverification, useReverificationFlow } from '@clerk/mosaic/features/reverification';
 
 const [runDelete, reverification] = useReverificationFlow(deleteAccount);
 const destructive = useDestructiveController({ onDelete: runDelete, reverification });
 
-<Destructive {...copy} {...destructive} />;
+<Destructive
+  {...copy}
+  {...destructive}
+  verificationSlot={<Reverification {...reverification} />}
+/>;
 ```
 
 ## One block, many rows

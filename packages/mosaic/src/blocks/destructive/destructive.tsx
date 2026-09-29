@@ -8,7 +8,6 @@ import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Flow } from '../../components/flow';
 import { Input } from '../../components/input';
-import { Reverification, type ReverificationController } from '../../features/reverification';
 import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
 import { useConfirmationController } from '../confirmation/confirmation.controller';
 
@@ -38,7 +37,10 @@ export interface DestructiveControlledProps {
   isDeleting?: boolean;
   /** Error message to display if the delete action fails */
   errorMessage?: string;
-  reverification?: ReverificationController;
+  /** Which step of the dialog is showing. Only has an effect with `verificationSlot` (default: "confirm") */
+  step?: 'confirm' | 'verify';
+  /** Content shown in place of the confirmation while `step` is "verify", such as a verification flow. Without it the dialog has no verify step */
+  verificationSlot?: ReactNode;
 }
 
 type DestructiveCardProps = Omit<DestructiveControlledProps, 'onOpenChange' | 'trigger'>;
@@ -55,7 +57,8 @@ function DestructiveCard({
   onDelete,
   isDeleting = false,
   errorMessage,
-  reverification,
+  step = 'confirm',
+  verificationSlot,
 }: DestructiveCardProps) {
   const formId = useId();
   const [typedValue, setTypedValue] = useState('');
@@ -69,8 +72,6 @@ function DestructiveCard({
   }, [open]);
 
   const isConfirmed = typedValue === confirmationValue;
-  const step =
-    reverification && reverification.status !== 'idle' && reverification.status !== 'loading' ? 'verify' : 'confirm';
 
   // The action sits in the footer, outside the form, so `form={formId}` associates the two.
   // That is what makes Enter in the field submit. Both guards are re-checked here because
@@ -137,7 +138,7 @@ function DestructiveCard({
     </>
   );
 
-  const content = reverification ? (
+  const content = verificationSlot ? (
     <Flow.Root
       value={step}
       direction={step === 'verify' ? 1 : -1}
@@ -146,7 +147,7 @@ function DestructiveCard({
       {() => (
         <>
           <Flow.Step ids={['confirm']}>{confirmation}</Flow.Step>
-          <Flow.Step ids={['verify']}>{reverification ? <Reverification {...reverification} /> : null}</Flow.Step>
+          <Flow.Step ids={['verify']}>{verificationSlot}</Flow.Step>
         </>
       )}
     </Flow.Root>
@@ -169,24 +170,15 @@ function DestructiveCard({
   );
 }
 
-function ControlledDestructive({ open, onOpenChange, trigger, reverification, ...props }: DestructiveControlledProps) {
-  const handleOpenChange: NonNullable<DialogRootProps['onOpenChange']> = (...args) => {
-    const [nextOpen] = args;
-    if (!nextOpen && reverification && reverification.status !== 'idle') {
-      reverification.onCancel?.();
-    }
-    onOpenChange(...args);
-  };
-
+function ControlledDestructive({ open, onOpenChange, trigger, ...props }: DestructiveControlledProps) {
   return (
     <Dialog.Root
       open={open}
-      onOpenChange={handleOpenChange}
+      onOpenChange={onOpenChange}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <DestructiveCard
         open={open}
-        reverification={reverification}
         {...props}
       />
     </Dialog.Root>

@@ -5,14 +5,9 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../components/button';
 import { Menu } from '../../components/menu';
-import type { ReverificationController } from '../../features/reverification';
 import { MosaicProvider } from '../../MosaicProvider';
 import type { DestructiveControlledProps, DestructiveHandleProps } from './destructive';
 import { Destructive } from './destructive';
-
-vi.mock('../../features/reverification', () => ({
-  Reverification: ({ status }: { status: string }) => <output data-testid='reverification'>{status}</output>,
-}));
 
 function renderBlock(overrides: Partial<DestructiveControlledProps> = {}) {
   return render(
@@ -33,29 +28,7 @@ function renderBlock(overrides: Partial<DestructiveControlledProps> = {}) {
 }
 
 const confirmButton = () => screen.getByRole('button', { name: 'Delete account' });
-const startingReverification = {
-  status: 'loading' as const,
-  onCancel: vi.fn(),
-};
-
-function readyReverification(status: 'ready' | 'retrying'): ReverificationController {
-  const view = {
-    step: 'password' as const,
-    value: '',
-    onValueChange: () => {},
-    isPending: status === 'retrying',
-    onSubmit: () => {},
-    onShowMethods: () => {},
-    onShowHelp: () => {},
-    onBack: () => {},
-    onEmailSupport: () => {},
-    onResend: () => {},
-    canResend: false,
-    methods: [],
-    onSelectMethod: () => {},
-  };
-  return status === 'retrying' ? { status, ...view } : { status, ...view };
-}
+const verificationSlot = <output data-testid='verification'>Verify</output>;
 
 describe('Destructive', () => {
   it('renders nothing until the caller opens it', () => {
@@ -172,42 +145,26 @@ describe('Destructive', () => {
     expect(onDelete).not.toHaveBeenCalled();
   });
 
-  it('keeps the delete confirmation pending while verification is starting', () => {
-    renderBlock({ isDeleting: true, reverification: startingReverification });
+  it('keeps the delete confirmation pending until the step is verify', () => {
+    renderBlock({ isDeleting: true, verificationSlot });
 
     expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'confirm');
     expect(screen.getByRole('textbox')).toBeDisabled();
     expect(confirmButton()).toHaveAttribute('aria-busy', 'true');
-    expect(screen.queryByTestId('reverification')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('verification')).not.toBeInTheDocument();
   });
 
-  it('shows reverification in the same dialog and card', () => {
-    renderBlock({ isDeleting: true, reverification: readyReverification('ready') });
+  it('shows the verification slot in the same dialog and card', () => {
+    renderBlock({ isDeleting: true, step: 'verify', verificationSlot });
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
     expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
     expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
-    expect(screen.getByTestId('reverification')).toHaveTextContent('ready');
+    expect(screen.getByTestId('verification')).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
-  it('cancels active reverification when the dialog closes', async () => {
-    const cancel = vi.fn();
-    const onOpenChange = vi.fn();
-    const user = userEvent.setup();
-    renderBlock({
-      isDeleting: true,
-      onOpenChange,
-      reverification: { ...startingReverification, onCancel: cancel },
-    });
-
-    await user.keyboard('{Escape}');
-
-    expect(cancel).toHaveBeenCalledOnce();
-    expect(onOpenChange).toHaveBeenCalledWith(false, expect.anything());
-  });
-
-  it('keeps the retrying factor visible until the hook becomes inactive', () => {
+  it('moves from the verify step back to confirm with the error', () => {
     const props = {
       open: true,
       onOpenChange: vi.fn(),
@@ -223,19 +180,21 @@ describe('Destructive', () => {
         <Destructive
           {...props}
           isDeleting
-          reverification={readyReverification('retrying')}
+          step='verify'
+          verificationSlot={verificationSlot}
         />
       </MosaicProvider>,
     );
     expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
-    expect(screen.getByTestId('reverification')).toHaveTextContent('retrying');
+    expect(screen.getByTestId('verification')).toBeInTheDocument();
 
     rerender(
       <MosaicProvider>
         <Destructive
           {...props}
           errorMessage='Delete failed.'
-          reverification={{ status: 'idle' }}
+          step='confirm'
+          verificationSlot={verificationSlot}
         />
       </MosaicProvider>,
     );
