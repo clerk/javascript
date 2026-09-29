@@ -40,6 +40,7 @@
     "test:integration:astro": "E2E_APP_ID=astro.* pnpm test:integration:base --grep @astro",
     "test:integration:base": "pnpm playwright test --config integration/playwright.config.ts",
     "test:integration:billing": "E2E_APP_ID=withBillingJwtV2.* pnpm test:integration:base --grep @billing",
+    "test:integration:bundled-ui": "E2E_APP_ID=next.appRouterBundledUI.* pnpm test:integration:base --grep @bundled-ui",
     "test:integration:cache-components": "E2E_APP_ID=next.cacheComponents pnpm test:integration:base --grep @cache-components",
     "test:integration:chrome-extension": "pnpm playwright test --config integration/playwright.chrome-extension.config.ts",
     "test:integration:cleanup": "pnpm playwright test --config integration/playwright.cleanup.config.ts",

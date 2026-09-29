@@ -343,6 +343,7 @@ jobs:
         test-name:
           [
             'generic',
+            'bundled-ui',
             'express',
             'fastify',
             'ap-flows',
