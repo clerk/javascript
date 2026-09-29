@@ -19,6 +19,8 @@ function OneTapStartInternal(): JSX.Element | null {
 
   const ctx = useGoogleOneTapContext();
 
+  useEffect(() => clerk.__internal_registerProtectCheckHandler?.(['signIn', 'signUp']), [clerk]);
+
   async function oneTapCallback(response: GISCredentialResponse) {
     isPromptedRef.current = false;
     try {

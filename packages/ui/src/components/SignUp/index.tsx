@@ -31,6 +31,8 @@ function SignUpRoutes(): JSX.Element {
   usePreloadTasks();
 
   const signUpContext = useSignUpContext();
+  const clerk = useClerk();
+  React.useEffect(() => clerk.__internal_registerProtectCheckHandler?.(['signUp']), [clerk]);
 
   return (
     <Flow.Root flow='signUp'>
