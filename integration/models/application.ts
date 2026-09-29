@@ -142,6 +142,8 @@ export const application = (
             },
       });
 
+      cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
+
       const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
       await waitForServer(runtimeServerUrl, {
         log,
@@ -150,7 +152,6 @@ export const application = (
         acceptAnyResponse: opts.acceptAnyResponse,
       });
       log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
-      cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       state.serverUrl = runtimeServerUrl;
 
       // Setup Clerk testing tokens after the server is running
@@ -253,6 +254,8 @@ export const application = (
             },
       });
 
+      cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
+
       if (opts.detached) {
         const shouldExit = () => !!proc.exitCode && proc.exitCode !== 0;
         await waitForServer(runtimeServerUrl, { log, maxAttempts: Infinity, shouldExit });
@@ -261,7 +264,6 @@ export const application = (
       }
 
       log(`Server started at ${runtimeServerUrl}, pid: ${proc.pid}`);
-      cleanupFns.push(() => awaitableTreekill(proc.pid, 'SIGKILL'));
       state.serverUrl = runtimeServerUrl;
       return { port, serverUrl: runtimeServerUrl, pid: proc.pid };
     },

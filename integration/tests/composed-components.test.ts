@@ -98,6 +98,7 @@ test.describe('composed UserProfile exports @generic', () => {
   let fakeUser: FakeUser;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000);
     app = await appConfigs.next.appRouter
       .clone()
       // The composed exports are bundled into the app (they run in the host React tree and read the
@@ -126,9 +127,9 @@ test.describe('composed UserProfile exports @generic', () => {
 
   test.afterAll(async () => {
     try {
-      await fakeUser.deleteIfExists();
+      await fakeUser?.deleteIfExists();
     } finally {
-      await app.teardown();
+      await app?.teardown();
     }
   });
 
@@ -345,6 +346,7 @@ test.describe('composed OrganizationProfile exports @generic', () => {
   let fakeOrganization: FakeOrganization;
 
   test.beforeAll(async () => {
+    test.setTimeout(90_000);
     app = await appConfigs.next.appRouter
       .clone()
       .addDependency('@clerk/ui', PKGLAB)
@@ -366,10 +368,10 @@ test.describe('composed OrganizationProfile exports @generic', () => {
   test.afterAll(async () => {
     try {
       // The delete test removes its own organization; ignore if this one is already gone.
-      await fakeOrganization.delete().catch(() => {});
-      await fakeUser.deleteIfExists();
+      await fakeOrganization?.delete().catch(() => {});
+      await fakeUser?.deleteIfExists();
     } finally {
-      await app.teardown();
+      await app?.teardown();
     }
   });
 
