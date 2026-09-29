@@ -2,4 +2,4 @@
 "@clerk/mosaic": patch
 ---
 
-Keep long enterprise names from overlapping the password label in UserProfile on narrow screens.
+Show enterprise password providers below the password in UserProfile, with room for long names to wrap.
