@@ -2,6 +2,8 @@
 '@clerk/expo-biometrics': minor
 ---
 
-Add `@clerk/expo-biometrics`, an experimental Expo native module that creates and signs with the device-bound keys behind Clerk biometric credentials and manages their on-device records. It is iOS-only for now; on Android every call rejects with `not_implemented`.
+Add `@clerk/expo-biometrics`, an experimental Expo native module for iOS and Android that creates and signs with the device-bound keys behind Clerk biometric credentials and manages their on-device records. `@clerk/expo`'s `useBiometricCredentials()` uses it for enrollment and sign-in.
+
+On Android, keys live in the Android Keystore and records in storage shared with the Clerk Android SDK, so credentials enrolled by either SDK in the same app are visible to both. `hashIdentifierHint()` and the `identifierHintSha256` field on records returned by `listRecords()` let identifier hints be matched on both platforms (Android stores only the hash).
 
 If you try this out, make sure to pin your version as breaking changes can happen in minors.

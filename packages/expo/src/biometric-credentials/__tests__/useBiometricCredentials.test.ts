@@ -307,7 +307,7 @@ describe('getAvailability', () => {
   test('falls back to the raw identifier hint when the module cannot hash hints', async () => {
     biometrics = createExpoBiometrics({ withHash: false });
     const { identifierHintSha256: _, ...legacyRecord } = localRecord({ identifierHint: 'sean@example.com' });
-    biometrics.store.records.push(legacyRecord);
+    biometrics.store.records.push(legacyRecord as ExpoBiometricsRecord);
     biometrics.store.keys.add(legacyRecord.localKeyId);
     const biometricCredentials = renderBiometricCredentials();
 
@@ -355,6 +355,7 @@ describe('getAvailability', () => {
       canEvaluateBiometrics: false,
       canEvaluateDeviceOwner: true,
       errorCode: null,
+      secureKeyStorageAvailable: true,
     });
 
     await expect(renderBiometricCredentials().getAvailability()).resolves.toEqual({
@@ -370,6 +371,7 @@ describe('getAvailability', () => {
       canEvaluateBiometrics: false,
       canEvaluateDeviceOwner: true,
       errorCode: null,
+      secureKeyStorageAvailable: true,
     });
 
     await expect(renderBiometricCredentials().getAvailability()).resolves.toMatchObject({ isAvailable: true });
