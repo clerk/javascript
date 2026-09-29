@@ -29,6 +29,7 @@ export interface FakeFapiState {
   memberships: OrganizationMembershipJSON[];
   invitations: UserOrganizationInvitationJSON[];
   suggestions: OrganizationSuggestionJSON[];
+  passwordUpdates: URLSearchParams[];
 }
 
 export type FakeFapiSeed = Partial<FakeFapiState>;
@@ -82,6 +83,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     memberships: [],
     invitations: [],
     suggestions: [],
+    passwordUpdates: [],
     ...seed,
   };
 
@@ -123,6 +125,19 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const sessions = state.client.sessions.filter(s => s.id !== session.id);
       state.client = { ...state.client, sessions, last_active_session_id: sessions[0]?.id ?? null };
       return envelope({ ...session, status: 'removed' }, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/change_password'), async ({ request }) => {
+      const session = findSession(state, state.client.last_active_session_id);
+      if (!session) {
+        return missing();
+      }
+      state.passwordUpdates.push(new URLSearchParams(await request.text()));
+      const updatedUser = { ...session.user, password_enabled: true };
+      state.client = {
+        ...state.client,
+        sessions: state.client.sessions.map(item => (item.id === session.id ? { ...item, user: updatedUser } : item)),
+      };
+      return envelope(updatedUser, state.client);
     }),
     http.post(fapiUrl('/v1/client/sessions'), ({ request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
@@ -169,7 +184,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
 export interface HeldRequests {
   requests: Request[];
   release: () => void;
-  fail: (code?: string) => void;
+  fail: (code?: string, longMessage?: string, paramName?: string) => void;
 }
 
 interface Hold {
@@ -211,7 +226,21 @@ export function holdRequests(method: 'get' | 'post', path: string): HeldRequests
   return {
     requests,
     release: () => settle(undefined),
-    fail: (code = 'form_param_invalid') =>
-      settle(HttpResponse.json({ errors: [{ code, message: code, long_message: code }] }, { status: 400 })),
+    fail: (code = 'form_param_invalid', longMessage = code, paramName?: string) =>
+      settle(
+        HttpResponse.json(
+          {
+            errors: [
+              {
+                code,
+                message: code,
+                long_message: longMessage,
+                ...(paramName ? { meta: { param_name: paramName } } : {}),
+              },
+            ],
+          },
+          { status: 400 },
+        ),
+      ),
   };
 }
