@@ -86,6 +86,17 @@ export type AuthenticateRequestOptions = {
    * @default false
    */
   satelliteAutoSync?: boolean;
+  /**
+   * When `true`, handshake payload resolution only runs for requests that are eligible for a
+   * handshake redirect. Requests that are not eligible ignore any handshake cookie or query param,
+   * so a stale handshake nonce no longer triggers a failing Backend API call on every request.
+   * Eligible requests still resolve and still redirect, so development instances keep working.
+   * Intended for API-only backends that cannot return `Set-Cookie` headers to the browser.
+   *
+   * @internal
+   * @default false
+   */
+  __internal_resolveHandshakeOnlyForNavigation?: boolean;
 } & VerifyTokenOptions;
 
 /**
