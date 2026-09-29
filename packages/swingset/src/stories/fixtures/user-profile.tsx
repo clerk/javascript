@@ -1,10 +1,10 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
-import { UserProfileDeleteSectionView } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
 } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
+import { UserProfileDeleteSectionView } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.view';
 import type {
   UserProfileEmail,
   UserProfilePhone,
