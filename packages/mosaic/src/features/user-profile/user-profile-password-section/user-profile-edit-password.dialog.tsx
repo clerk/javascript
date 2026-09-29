@@ -200,7 +200,7 @@ export function UserProfileEditPasswordDialog({
                           variant='outline'
                           color='neutral'
                           fullWidth
-                          disabled={verification.phase === 'retrying'}
+                          disabled={!verification.onCancel}
                           onClick={verification.onCancel}
                         >
                           {m.back}
