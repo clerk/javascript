@@ -9,7 +9,7 @@ export default function ThemesPage() {
       <div>
         <h2>Dark</h2>
         <SignIn
-          appearance={{ baseTheme: dark }}
+          appearance={{ theme: dark }}
           routing='hash'
           fallback={<>Loading dark theme</>}
         />
@@ -17,7 +17,7 @@ export default function ThemesPage() {
       <div>
         <h2>Neobrutalism</h2>
         <SignIn
-          appearance={{ baseTheme: neobrutalism }}
+          appearance={{ theme: neobrutalism }}
           routing='hash'
           fallback={<>Loading neobrutalism theme</>}
         />
@@ -25,7 +25,7 @@ export default function ThemesPage() {
       <div>
         <h2>Shades of Purple</h2>
         <SignIn
-          appearance={{ baseTheme: shadesOfPurple }}
+          appearance={{ theme: shadesOfPurple }}
           routing='hash'
           fallback={<>Loading shadesOfPurple theme</>}
         />
@@ -33,7 +33,7 @@ export default function ThemesPage() {
       <div>
         <h2>Shadcn</h2>
         <SignIn
-          appearance={{ baseTheme: shadcn }}
+          appearance={{ theme: shadcn }}
           routing='hash'
           fallback={<>Loading shadcn theme</>}
         />
