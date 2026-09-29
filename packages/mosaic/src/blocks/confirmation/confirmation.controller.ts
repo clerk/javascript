@@ -66,7 +66,9 @@ export interface ConfirmationController {
   errorMessage: string | undefined;
 }
 
-export function useConfirmationController(): ConfirmationController {
+export function useConfirmationController({
+  onPendingCancel,
+}: { onPendingCancel?: () => void } = {}): ConfirmationController {
   const [snapshot, send] = useMachine(confirmationMachine);
 
   return {
@@ -74,6 +76,8 @@ export function useConfirmationController(): ConfirmationController {
     onOpenChange: open => {
       if (open) {
         send({ type: 'OPEN' });
+      } else if (snapshot.value === 'pending') {
+        onPendingCancel?.();
       } else {
         send({ type: 'CANCEL' });
       }

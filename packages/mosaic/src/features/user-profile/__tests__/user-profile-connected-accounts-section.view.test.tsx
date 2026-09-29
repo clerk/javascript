@@ -13,7 +13,7 @@ describe('connected accounts section', () => {
       <UserProfileConnectedAccountsSectionView
         accounts={[account]}
         onRemove={vi.fn()}
-        removeReverification={{ status: 'unavailable', phase: 'active', onCancel: vi.fn() }}
+        removeReverification={{ status: 'unavailable', onCancel: vi.fn() }}
       />,
     );
 

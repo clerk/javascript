@@ -8,10 +8,8 @@ import type { ReverificationController } from '../reverification.controller';
 import { ReverificationDialog } from '../reverification.dialog';
 
 function ready(phase: 'active' | 'retrying', onCancel = vi.fn()): ReverificationController {
-  return {
-    status: 'ready',
-    phase,
-    step: 'password',
+  const view = {
+    step: 'password' as const,
     value: '',
     onValueChange: vi.fn(),
     isPending: phase === 'retrying',
@@ -24,8 +22,8 @@ function ready(phase: 'active' | 'retrying', onCancel = vi.fn()): Reverification
     canResend: true,
     methods: [],
     onSelectMethod: vi.fn(),
-    onCancel,
   };
+  return phase === 'retrying' ? { ...view, status: 'retrying' } : { ...view, status: 'ready', onCancel };
 }
 
 describe('ReverificationDialog', () => {
@@ -44,10 +42,7 @@ describe('ReverificationDialog', () => {
   it('waits for the challenge to load before opening', () => {
     const { rerender } = render(
       <MosaicProvider>
-        <ReverificationDialog
-          status='loading'
-          phase='active'
-        />
+        <ReverificationDialog status='loading' />
       </MosaicProvider>,
     );
 
@@ -66,10 +61,7 @@ describe('ReverificationDialog', () => {
   it('opens when verification is unavailable', () => {
     render(
       <MosaicProvider>
-        <ReverificationDialog
-          status='unavailable'
-          phase='active'
-        />
+        <ReverificationDialog status='unavailable' />
       </MosaicProvider>,
     );
 
@@ -109,10 +101,7 @@ describe('ReverificationDialog', () => {
   it('stays closed when the flow is inactive', () => {
     render(
       <MosaicProvider>
-        <ReverificationDialog
-          status='idle'
-          phase='inactive'
-        />
+        <ReverificationDialog status='idle' />
       </MosaicProvider>,
     );
 
@@ -126,7 +115,7 @@ describe('ReverificationDialog', () => {
       const [phase, setPhase] = useState<'inactive' | 'active'>('inactive');
       const actionRef = useRef<HTMLButtonElement>(null);
       const controller: ReverificationController =
-        phase === 'active' ? ready('active', () => setPhase('inactive')) : { status: 'idle', phase: 'inactive' };
+        phase === 'active' ? ready('active', () => setPhase('inactive')) : { status: 'idle', onCancel: undefined };
 
       return (
         <>

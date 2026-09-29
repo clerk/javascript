@@ -5,15 +5,37 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../components/button';
 import type { ReverificationController } from '../../features/reverification';
+import { ReverificationConfirmation } from '../../features/reverification/reverification-confirmation';
 import { deferred } from '../../machines/__tests__/test-utils';
 import { MosaicProvider } from '../../mosaic-provider';
 import type { ConfirmationControlledProps, ConfirmationHandleProps } from './confirmation';
 import { Confirmation } from './confirmation';
 
-function renderBlock(overrides: Partial<ConfirmationControlledProps> = {}) {
+function retrying(): ReverificationController {
+  return {
+    status: 'retrying',
+    step: 'password',
+    value: '',
+    isPending: true,
+    onValueChange: vi.fn(),
+    onSubmit: vi.fn(),
+    onShowMethods: vi.fn(),
+    onShowHelp: vi.fn(),
+    onBack: vi.fn(),
+    onEmailSupport: vi.fn(),
+    onResend: vi.fn(),
+    canResend: true,
+    methods: [],
+    onSelectMethod: vi.fn(),
+  };
+}
+
+function renderBlock(
+  overrides: Partial<ConfirmationControlledProps> & { reverification?: ReverificationController } = {},
+) {
   return render(
     <MosaicProvider>
-      <Confirmation
+      <ReverificationConfirmation
         open
         onOpenChange={vi.fn()}
         title='Remove connected account'
@@ -30,7 +52,7 @@ const confirmButton = () => screen.getByRole('button', { name: 'Remove' });
 
 describe('Confirmation', () => {
   it('keeps the confirmation pending while verification loads', () => {
-    renderBlock({ isConfirming: true, reverification: { status: 'loading', phase: 'active' } });
+    renderBlock({ isConfirming: true, reverification: { status: 'loading' } });
 
     expect(screen.getByRole('alertdialog')).toHaveAccessibleName('Remove connected account');
     expect(confirmButton()).toHaveAttribute('aria-busy', 'true');
@@ -41,7 +63,7 @@ describe('Confirmation', () => {
   it('ignores Escape while the verified action is retrying', async () => {
     const onOpenChange = vi.fn();
     const user = userEvent.setup();
-    renderBlock({ onOpenChange, isConfirming: true, reverification: { status: 'unavailable', phase: 'retrying' } });
+    renderBlock({ onOpenChange, isConfirming: true, reverification: retrying() });
 
     await user.keyboard('{Escape}');
 
@@ -51,7 +73,7 @@ describe('Confirmation', () => {
   });
 
   it('shows reverification inside its existing dialog without typed confirmation', () => {
-    renderBlock({ reverification: { status: 'unavailable', phase: 'active', onCancel: vi.fn() } });
+    renderBlock({ reverification: { status: 'unavailable', onCancel: vi.fn() } });
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
     expect(screen.getByText('Cannot verify your account')).toBeInTheDocument();
@@ -65,7 +87,7 @@ describe('Confirmation', () => {
       const onOpenChange = vi.fn();
       const onCancel = vi.fn();
       const user = userEvent.setup();
-      renderBlock({ onOpenChange, reverification: { status: 'unavailable', phase: 'active', onCancel } });
+      renderBlock({ onOpenChange, reverification: { status: 'unavailable', onCancel } });
 
       if (action === 'Escape') {
         await user.keyboard('{Escape}');
@@ -158,7 +180,7 @@ function renderWithHandle(onConfirm: ConfirmationHandleProps<Member>['onConfirm'
   const handle = Confirmation.createHandle<Member>();
   render(
     <MosaicProvider>
-      <Confirmation
+      <ReverificationConfirmation
         handle={handle}
         title='Remove member'
         description={member => (
@@ -186,7 +208,7 @@ describe('Confirmation with a handle', () => {
     const handle = Confirmation.createHandle<Member>();
     const view = (reverification: ReverificationController) => (
       <MosaicProvider>
-        <Confirmation
+        <ReverificationConfirmation
           handle={handle}
           title='Remove member'
           description='Remove this member'
@@ -196,12 +218,12 @@ describe('Confirmation with a handle', () => {
         />
       </MosaicProvider>
     );
-    const { rerender } = render(view({ status: 'idle', phase: 'inactive' }));
+    const { rerender } = render(view({ status: 'idle' }));
     act(() => handle.open(preston));
     await user.click(confirmButton());
-    rerender(view({ status: 'loading', phase: 'active', onCancel }));
+    rerender(view({ status: 'loading', onCancel }));
     await user.keyboard('{Escape}');
-    rerender(view({ status: 'idle', phase: 'inactive' }));
+    rerender(view({ status: 'idle' }));
     await waitFor(() => expect(confirmButton()).not.toHaveAttribute('aria-busy', 'true'));
     await user.click(screen.getByRole('button', { name: 'Cancel' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
@@ -230,7 +252,7 @@ describe('Confirmation with a handle', () => {
       const onConfirm = vi.fn(() => pending.promise);
       const view = (reverification: ReverificationController) => (
         <MosaicProvider>
-          <Confirmation
+          <ReverificationConfirmation
             handle={handle}
             title='Remove member'
             description='Remove this member'
@@ -240,20 +262,20 @@ describe('Confirmation with a handle', () => {
           />
         </MosaicProvider>
       );
-      const { rerender } = render(view({ status: 'idle', phase: 'inactive' }));
+      const { rerender } = render(view({ status: 'idle' }));
       act(() => handle.open(preston));
       await user.click(confirmButton());
-      rerender(view({ status: 'loading', phase: 'active', onCancel: vi.fn() }));
+      rerender(view({ status: 'loading', onCancel: vi.fn() }));
       const dialog = screen.getByRole('alertdialog');
       expect(dialog).toHaveAccessibleName('Remove member');
       expect(confirmButton()).toHaveAttribute('aria-busy', 'true');
       expect(screen.queryByRole('button', { name: 'Back' })).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
-      rerender(view({ status: 'unavailable', phase: 'active', onCancel: vi.fn() }));
+      rerender(view({ status: 'unavailable', onCancel: vi.fn() }));
       expect(screen.getByRole('dialog')).toBe(dialog);
       expect(screen.getByText('Cannot verify your account')).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument();
-      rerender(view({ status: 'unavailable', phase: 'retrying' }));
+      rerender(view(retrying()));
 
       await user.keyboard('{Escape}');
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -271,7 +293,7 @@ describe('Confirmation with a handle', () => {
         }
         await pending.promise.catch(() => undefined);
       });
-      rerender(view({ status: 'idle', phase: 'inactive' }));
+      rerender(view({ status: 'idle' }));
 
       if (settlement === 'resolve') {
         await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
@@ -292,15 +314,13 @@ describe('Confirmation with a handle', () => {
     const onConfirm = vi.fn(() => pending.promise);
     const view = (verifying: boolean) => (
       <MosaicProvider>
-        <Confirmation
+        <ReverificationConfirmation
           handle={handle}
           title='Remove member'
           description='Remove this member'
           actionLabel='Remove'
           onConfirm={onConfirm}
-          reverification={
-            verifying ? { status: 'unavailable', phase: 'active', onCancel } : { status: 'idle', phase: 'inactive' }
-          }
+          reverification={verifying ? { status: 'unavailable', onCancel } : { status: 'idle' }}
         />
       </MosaicProvider>
     );

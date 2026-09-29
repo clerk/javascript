@@ -6,7 +6,6 @@ import { Card } from '../../components/card';
 import type { DialogFocusTarget, DialogHandle, DialogRootProps, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Flow } from '../../components/flow';
-import { Reverification, type ReverificationController } from '../../features/reverification';
 import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
 import { useConfirmationController } from './confirmation.controller';
 
@@ -20,11 +19,11 @@ interface ConfirmationCardProps {
   description: ReactNode;
   actionLabel: string;
   cancelLabel: string;
-  backLabel: string;
   onConfirm: () => void;
   isConfirming: boolean;
   errorMessage: string | undefined;
-  reverification?: ReverificationController;
+  step?: 'confirm' | 'verify';
+  verificationSlot?: ReactNode;
 }
 
 function ConfirmationCard({
@@ -34,14 +33,12 @@ function ConfirmationCard({
   description,
   actionLabel,
   cancelLabel,
-  backLabel,
   onConfirm,
   isConfirming,
   errorMessage,
-  reverification,
+  step = 'confirm',
+  verificationSlot,
 }: ConfirmationCardProps) {
-  const step =
-    reverification && reverification.status !== 'idle' && reverification.status !== 'loading' ? 'verify' : 'confirm';
   const cancelRef = useRef<HTMLButtonElement>(null);
   const restoreConfirmationFocus = useRef(false);
 
@@ -104,7 +101,7 @@ function ConfirmationCard({
         elevation='overlay'
         renderBranding={false}
       >
-        {reverification ? (
+        {verificationSlot ? (
           <Flow.Root
             value={step}
             direction={step === 'verify' ? 1 : -1}
@@ -113,20 +110,7 @@ function ConfirmationCard({
             {() => (
               <>
                 <Flow.Step ids={['confirm']}>{confirmation}</Flow.Step>
-                <Flow.Step ids={['verify']}>
-                  <Reverification {...reverification} />
-                  <Card.Footer>
-                    <Button
-                      variant='outline'
-                      color='neutral'
-                      fullWidth
-                      disabled={reverification.phase === 'retrying'}
-                      onClick={reverification.phase === 'active' ? reverification.onCancel : undefined}
-                    >
-                      {backLabel}
-                    </Button>
-                  </Card.Footer>
-                </Flow.Step>
+                <Flow.Step ids={['verify']}>{verificationSlot}</Flow.Step>
               </>
             )}
           </Flow.Root>
@@ -139,7 +123,8 @@ function ConfirmationCard({
 }
 
 export interface ConfirmationControlledProps {
-  reverification?: ReverificationController;
+  step?: 'confirm' | 'verify';
+  verificationSlot?: ReactNode;
   /** Whether the dialog is open */
   open: boolean;
   /** The weight the confirming button carries. An action that can be undone takes `primary` (default: `negative`) */
@@ -161,7 +146,6 @@ export interface ConfirmationControlledProps {
   actionLabel: string;
   /** Text of the cancel button (default: "Cancel") */
   cancelLabel?: string;
-  backLabel?: string;
   /** Callback when the action is confirmed */
   onConfirm: () => void;
   /** Whether the confirmed action is in progress */
@@ -180,30 +164,17 @@ function ControlledConfirmation({
   description,
   actionLabel,
   cancelLabel = 'Cancel',
-  backLabel = 'Back',
   onConfirm,
   isConfirming = false,
   errorMessage,
-  reverification,
+  step = 'confirm',
+  verificationSlot,
 }: ConfirmationControlledProps) {
   return (
     <Dialog.Root
-      role={
-        reverification && reverification.status !== 'idle' && reverification.status !== 'loading'
-          ? 'dialog'
-          : 'alertdialog'
-      }
+      role={step === 'verify' ? 'dialog' : 'alertdialog'}
       open={open}
-      onOpenChange={(nextOpen, details) => {
-        if (!nextOpen && reverification?.phase === 'retrying') {
-          return;
-        }
-        if (!nextOpen && reverification?.phase === 'active') {
-          reverification.onCancel?.();
-          return;
-        }
-        onOpenChange(nextOpen, details);
-      }}
+      onOpenChange={onOpenChange}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <ConfirmationCard
@@ -213,11 +184,11 @@ function ControlledConfirmation({
         description={description}
         actionLabel={actionLabel}
         cancelLabel={cancelLabel}
-        backLabel={backLabel}
         onConfirm={onConfirm}
         isConfirming={isConfirming}
         errorMessage={errorMessage}
-        reverification={reverification}
+        step={step}
+        verificationSlot={verificationSlot}
       />
     </Dialog.Root>
   );
@@ -236,7 +207,9 @@ function createHandle<Payload>(): ConfirmationHandle<Payload> {
 }
 
 export interface ConfirmationHandleProps<Payload> {
-  reverification?: ReverificationController;
+  onPendingCancel?: () => void;
+  step?: 'confirm' | 'verify';
+  verificationSlot?: ReactNode;
   /** Opens the dialog with a payload from anywhere: `handle.open(payload)` */
   handle: ConfirmationHandle<Payload>;
   /** The weight the confirming button carries. An action that can be undone takes `primary` (default: `negative`) */
@@ -254,12 +227,12 @@ export interface ConfirmationHandleProps<Payload> {
   actionLabel: FromPayload<Payload, string>;
   /** Text of the cancel button (default: "Cancel") */
   cancelLabel?: string;
-  backLabel?: string;
   /** Runs the action for the payload. Resolve to close the dialog; reject with an `Error` to keep it open showing why */
   onConfirm: (payload: Payload) => Promise<void> | void;
 }
 
 function HandleConfirmation<Payload>({
+  onPendingCancel,
   handle,
   color = 'negative',
   finalFocus,
@@ -267,31 +240,18 @@ function HandleConfirmation<Payload>({
   description,
   actionLabel,
   cancelLabel = 'Cancel',
-  backLabel = 'Back',
   onConfirm,
-  reverification,
+  step = 'confirm',
+  verificationSlot,
 }: ConfirmationHandleProps<Payload>) {
-  const controller = useConfirmationController();
+  const controller = useConfirmationController({ onPendingCancel });
 
   return (
     <Dialog.Root
-      role={
-        reverification && reverification.status !== 'idle' && reverification.status !== 'loading'
-          ? 'dialog'
-          : 'alertdialog'
-      }
+      role={step === 'verify' ? 'dialog' : 'alertdialog'}
       handle={handle}
       open={controller.isOpen}
-      onOpenChange={nextOpen => {
-        if (!nextOpen && reverification?.phase === 'retrying') {
-          return;
-        }
-        if (!nextOpen && reverification?.phase === 'active') {
-          reverification.onCancel?.();
-          return;
-        }
-        controller.onOpenChange(nextOpen);
-      }}
+      onOpenChange={controller.onOpenChange}
     >
       {({ payload }) =>
         payload === undefined ? null : (
@@ -302,7 +262,6 @@ function HandleConfirmation<Payload>({
             description={resolve(description, payload)}
             actionLabel={resolve(actionLabel, payload)}
             cancelLabel={cancelLabel}
-            backLabel={backLabel}
             onConfirm={() =>
               controller.onConfirm(async () => {
                 await onConfirm(payload);
@@ -310,7 +269,8 @@ function HandleConfirmation<Payload>({
             }
             isConfirming={controller.isConfirming}
             errorMessage={controller.errorMessage}
-            reverification={reverification}
+            step={step}
+            verificationSlot={verificationSlot}
           />
         )
       }
@@ -325,9 +285,8 @@ export type ConfirmationProps<Payload = unknown> = ConfirmationControlledProps |
  * Use `Destructive` for the destructive actions that are. `color` sets the weight the confirming
  * button carries: `negative` for what cannot be undone, `primary` for what can.
  *
- * The confirmation is an `alertdialog` with Cancel as its dismiss action. Reverification uses
- * a dialog with Back and corner dismiss actions that return to confirmation. Under the phone
- * band it arrives as a bottom sheet.
+ * The confirmation is an `alertdialog` with Cancel as its dismiss action. A verification slot
+ * uses a dialog. Under the phone band it arrives as a bottom sheet.
  *
  * Two forms. Controlled: the caller owns `open`, `isConfirming`, and `errorMessage`, and the
  * block holds nothing of its own. With a `handle`: the block owns all three. Mount it once,
