@@ -31,11 +31,11 @@ export type {
 
 export interface UserProfileSecurityPanelViewProps
   extends
-  Omit<UserProfileActiveDevicesSectionViewProps, 'devices'>,
-  Pick<
-    UserProfilePasswordSectionViewProps,
-    'hasPassword' | 'requiresCurrentPassword' | 'managedBy' | 'onSubmitPassword'
-  > {
+    Omit<UserProfileActiveDevicesSectionViewProps, 'devices'>,
+    Pick<
+      UserProfilePasswordSectionViewProps,
+      'hasPassword' | 'requiresCurrentPassword' | 'managedBy' | 'onSubmitPassword'
+    > {
   passkeys?: UserProfilePasskey[];
   passkeysVisible?: boolean;
   mfaMethods?: UserProfileMfaMethod[];
