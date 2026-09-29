@@ -41,7 +41,7 @@ function CardHarness() {
   const [message, setMessage] = useState<string | null>(null);
   const [requestPending, setRequestPending] = useState(false);
   const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(false));
-  const busy = requestPending || reverification.phase !== 'inactive';
+  const busy = requestPending || reverification.status !== 'idle';
 
   return (
     <div className='flex flex-col gap-4'>
@@ -106,7 +106,7 @@ function DialogHarness() {
   const runRef = useRef(false);
 
   const nextStep: OuterStep | null =
-    reverification.phase === 'retrying' && presentation === 'replace'
+    reverification.status === 'retrying' && presentation === 'replace'
       ? 'finalizing'
       : reverification.status === 'ready' || reverification.status === 'unavailable'
         ? 'verify'
@@ -118,7 +118,7 @@ function DialogHarness() {
   }
 
   const continueDelete = () => {
-    if (runRef.current || reverification.phase !== 'inactive') {
+    if (runRef.current || reverification.status !== 'idle') {
       return;
     }
     runRef.current = true;
@@ -176,14 +176,14 @@ function DialogHarness() {
           if (next) {
             return;
           }
-          if (requestPending && reverification.phase === 'inactive') {
+          if (requestPending && reverification.status === 'idle') {
             return;
           }
           if (reverification.status !== 'idle') {
             reverification.onCancel?.();
           }
           setOpen(false);
-          if (reverification.phase !== 'retrying') {
+          if (reverification.status !== 'retrying') {
             setErrorMessage(null);
             void resetMockDelete();
           }
@@ -273,7 +273,7 @@ function DestructiveHarness() {
   const runRef = useRef(false);
 
   const continueDelete = () => {
-    if (runRef.current || reverification.phase !== 'inactive') {
+    if (runRef.current || reverification.status !== 'idle') {
       return;
     }
     runRef.current = true;
@@ -324,11 +324,11 @@ function DestructiveHarness() {
       <Destructive
         open={open}
         onOpenChange={next => {
-          if (!next && requestPending && reverification.phase === 'inactive') {
+          if (!next && requestPending && reverification.status === 'idle') {
             return;
           }
           setOpen(next);
-          if (!next && reverification.phase !== 'retrying') {
+          if (!next && reverification.status !== 'retrying') {
             setErrorMessage(null);
             void resetMockDelete();
           }

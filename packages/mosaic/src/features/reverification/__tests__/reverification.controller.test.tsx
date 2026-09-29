@@ -8,7 +8,7 @@ import {
   reverificationMachine,
   useReverificationController,
 } from '../reverification.controller';
-import type { ReverificationModel, ReverificationReadyModel } from '../reverification.model';
+import type { ReverificationActiveModel, ReverificationModel } from '../reverification.model';
 import type { ReverificationMethod, ReverificationResult } from '../reverification.types';
 
 const password: ReverificationMethod = { id: 'password', stage: 'first', strategy: 'password' };
@@ -47,10 +47,9 @@ function startActor(deps: ReverificationDeps = seatedDeps()) {
   return actor;
 }
 
-function readyModel(overrides: Partial<ReverificationReadyModel> = {}): ReverificationReadyModel {
+function buildActiveModel(overrides: Partial<ReverificationActiveModel> = {}): ReverificationActiveModel {
   return {
-    status: 'ready',
-    phase: 'active',
+    status: 'active',
     supportEmail: 'support@example.com',
     start: vi.fn(async () => firstFactorResult()),
     prepare: vi.fn(async () => {}),
@@ -180,10 +179,10 @@ describe('reverificationMachine', () => {
     actor.send({ type: 'TYPE', value: 'secret' });
     actor.send({ type: 'SUBMIT' });
     await tick();
-    expect(actor.getSnapshot().value).toBe('completing');
+    expect(actor.getSnapshot().value).toBe('finishing');
     expect(actor.getSnapshot().context.activeMethod?.strategy).toBe('password');
     finish.resolve();
-    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('done'));
+    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('retrying'));
   });
 
   it('returns to the current method with the error when finish fails', async () => {
@@ -244,7 +243,7 @@ describe('reverificationMachine', () => {
     prepare.resolve();
     await tick();
     expect(attempt).toHaveBeenCalledOnce();
-    expect(actor.getSnapshot().value).toBe('completing');
+    expect(actor.getSnapshot().value).toBe('finishing');
   });
 
   it('keeps the factor interactive and queues submit while resend prepares', async () => {
@@ -290,15 +289,14 @@ describe('reverificationMachine', () => {
 
 describe('useReverificationController', () => {
   it('is idle when reverification is not active', () => {
-    const { result } = renderHook(() => useReverificationController(readyModel({ phase: 'inactive' })));
-    expect(result.current).toEqual({ status: 'idle', phase: 'inactive' });
+    const { result } = renderHook(() => useReverificationController({ status: 'inactive' }));
+    expect(result.current).toEqual({ status: 'idle' });
   });
 
   it('is loading while the model is still waiting on Clerk', () => {
     const cancel = vi.fn();
     const loading: ReverificationModel = {
       status: 'loading',
-      phase: 'active',
       cancel,
     };
     const { result } = renderHook(() => useReverificationController(loading));
@@ -314,7 +312,7 @@ describe('useReverificationController', () => {
     const cancel = vi.fn();
     const { result } = renderHook(() =>
       useReverificationController(
-        readyModel({ start: vi.fn(async () => Promise.reject(new Error('no session'))), cancel }),
+        buildActiveModel({ start: vi.fn(async () => Promise.reject(new Error('no session'))), cancel }),
       ),
     );
     await waitFor(() => expect(result.current.status).toBe('unavailable'));
@@ -325,7 +323,7 @@ describe('useReverificationController', () => {
     const cancel = vi.fn();
     const { result } = renderHook(() =>
       useReverificationController(
-        readyModel({
+        buildActiveModel({
           start: vi.fn(async () => firstFactorResult({ methods: [], startingMethod: null })),
           cancel,
         }),
@@ -338,7 +336,7 @@ describe('useReverificationController', () => {
   it('still passes onShowMethods when only one method is available', async () => {
     const { result } = renderHook(() =>
       useReverificationController(
-        readyModel({
+        buildActiveModel({
           start: vi.fn(async () => firstFactorResult({ methods: [password], startingMethod: password })),
         }),
       ),
@@ -356,7 +354,7 @@ describe('useReverificationController', () => {
   it('keeps onResend during the resend cooldown', async () => {
     const { result } = renderHook(() =>
       useReverificationController(
-        readyModel({
+        buildActiveModel({
           start: vi.fn(async () => firstFactorResult({ methods: [email], startingMethod: email })),
         }),
       ),
@@ -374,7 +372,9 @@ describe('useReverificationController', () => {
 
   it('marks the current step pending while an attempt is in flight', async () => {
     const attempt = deferred<ReverificationResult>();
-    const { result } = renderHook(() => useReverificationController(readyModel({ attempt: () => attempt.promise })));
+    const { result } = renderHook(() =>
+      useReverificationController(buildActiveModel({ attempt: () => attempt.promise })),
+    );
 
     await waitFor(() => expect(result.current.status).toBe('ready'));
     act(() => {
@@ -400,7 +400,7 @@ describe('useReverificationController', () => {
     const attempt = deferred<ReverificationResult>();
     const finish = vi.fn(() => Promise.resolve());
     const cancel = vi.fn();
-    const activeModel = readyModel({ attempt: () => attempt.promise, finish, cancel });
+    const activeModel = buildActiveModel({ attempt: () => attempt.promise, finish, cancel });
     const { result, rerender } = renderHook(
       ({ model }: { model: ReverificationModel }) => useReverificationController(model),
       { initialProps: { model: activeModel } },
@@ -420,7 +420,7 @@ describe('useReverificationController', () => {
       }
     });
 
-    rerender({ model: { ...activeModel, phase: 'inactive' } });
+    rerender({ model: { status: 'inactive' } });
     expect(result.current.status).toBe('idle');
 
     await act(async () => {
@@ -437,7 +437,7 @@ describe('useReverificationController', () => {
     const finish = vi.fn(() => Promise.resolve());
     const cancel = vi.fn();
     const { result } = renderHook(() =>
-      useReverificationController(readyModel({ attempt: () => attempt.promise, finish, cancel })),
+      useReverificationController(buildActiveModel({ attempt: () => attempt.promise, finish, cancel })),
     );
 
     await waitFor(() => expect(result.current.status).toBe('ready'));
@@ -474,7 +474,7 @@ describe('useReverificationController', () => {
     const start = vi.fn(async () => firstFactorResult());
     const finish = vi.fn(() => Promise.resolve());
     const cancel = vi.fn();
-    const model = readyModel({ start, attempt: () => attempt.promise, finish, cancel });
+    const model = buildActiveModel({ start, attempt: () => attempt.promise, finish, cancel });
     const { result, rerender } = renderHook(
       ({ model }: { model: ReverificationModel }) => useReverificationController(model),
       { initialProps: { model } },
@@ -494,10 +494,10 @@ describe('useReverificationController', () => {
       }
     });
 
-    rerender({ model: { ...model, phase: 'inactive' } });
+    rerender({ model: { status: 'inactive' } });
     expect(result.current.status).toBe('idle');
 
-    rerender({ model: { ...model, phase: 'active' } });
+    rerender({ model });
     await waitFor(() => expect(start).toHaveBeenCalledTimes(2));
     await waitFor(() => {
       expect(result.current.status).toBe('ready');
@@ -524,7 +524,7 @@ describe('useReverificationController', () => {
     const finish = deferred<void>();
     const { result } = renderHook(() =>
       useReverificationController(
-        readyModel({
+        buildActiveModel({
           attempt: vi.fn(async () => firstFactorResult({ status: 'complete', methods: [], startingMethod: null })),
           finish: () => finish.promise,
         }),
@@ -550,13 +550,13 @@ describe('useReverificationController', () => {
     act(() => {
       finish.resolve();
     });
-    await waitFor(() => expect(result.current.status).toBe('loading'));
+    await waitFor(() => expect(result.current.status).toBe('retrying'));
   });
 
   it('stays on the current step with the error when finish fails', async () => {
     const { result } = renderHook(() =>
       useReverificationController(
-        readyModel({
+        buildActiveModel({
           attempt: vi.fn(async () => firstFactorResult({ status: 'complete', methods: [], startingMethod: null })),
           finish: vi.fn(async () => Promise.reject(new Error('Session could not be activated.'))),
         }),
@@ -585,13 +585,13 @@ describe('useReverificationController', () => {
     const start = vi.fn(async () => firstFactorResult());
     const { result, rerender } = renderHook(
       ({ model }: { model: ReverificationModel }) => useReverificationController(model),
-      { initialProps: { model: readyModel({ start }) } },
+      { initialProps: { model: buildActiveModel({ start }) } },
     );
 
     await waitFor(() => expect(result.current.status).toBe('ready'));
     expect(start).toHaveBeenCalledOnce();
 
-    rerender({ model: { status: 'loading', phase: 'active', cancel: vi.fn() } });
+    rerender({ model: { status: 'loading', cancel: vi.fn() } });
     expect(result.current.status).toBe('ready');
     if (result.current.status === 'ready') {
       expect(result.current.step).toBe('password');
@@ -606,7 +606,7 @@ describe('useReverificationController', () => {
       ({ model }: { model: ReverificationModel }) => useReverificationController(model),
       {
         initialProps: {
-          model: readyModel({
+          model: buildActiveModel({
             attempt: vi.fn(async () => firstFactorResult({ status: 'complete', methods: [], startingMethod: null })),
             finish: finishFn,
           }),
@@ -629,7 +629,7 @@ describe('useReverificationController', () => {
       }
     });
 
-    rerender({ model: { status: 'loading', phase: 'active', cancel: vi.fn() } });
+    rerender({ model: { status: 'loading', cancel: vi.fn() } });
     expect(result.current.status).toBe('ready');
     if (result.current.status === 'ready') {
       expect(result.current.step).toBe('password');
@@ -639,7 +639,7 @@ describe('useReverificationController', () => {
     act(() => {
       finish.resolve();
     });
-    await waitFor(() => expect(result.current.status).toBe('loading'));
+    await waitFor(() => expect(result.current.status).toBe('retrying'));
     expect(finishFn).toHaveBeenCalledOnce();
   });
 
@@ -647,14 +647,14 @@ describe('useReverificationController', () => {
     const start = vi.fn(async () => firstFactorResult());
     const { result, rerender } = renderHook(
       ({ model }: { model: ReverificationModel }) => useReverificationController(model),
-      { initialProps: { model: readyModel({ start }) } },
+      { initialProps: { model: buildActiveModel({ start }) } },
     );
 
     await waitFor(() => expect(result.current.status).toBe('ready'));
-    rerender({ model: readyModel({ start, phase: 'inactive' }) });
-    expect(result.current).toEqual({ status: 'idle', phase: 'inactive' });
+    rerender({ model: { status: 'inactive' } });
+    expect(result.current).toEqual({ status: 'idle' });
 
-    rerender({ model: readyModel({ start, phase: 'active' }) });
+    rerender({ model: buildActiveModel({ start }) });
     await waitFor(() => expect(result.current.status).toBe('ready'));
     expect(start).toHaveBeenCalledTimes(2);
   });
@@ -663,7 +663,7 @@ describe('useReverificationController', () => {
     const prepare = deferred<void>();
     const { result } = renderHook(() =>
       useReverificationController(
-        readyModel({
+        buildActiveModel({
           start: vi.fn(async () => firstFactorResult({ methods: [email, password], startingMethod: email })),
           prepare: () => prepare.promise,
         }),
@@ -705,7 +705,7 @@ describe('useReverificationController', () => {
     const attempt = vi.fn(async () => firstFactorResult({ status: 'complete', methods: [], startingMethod: null }));
     const { result } = renderHook(() =>
       useReverificationController(
-        readyModel({
+        buildActiveModel({
           start: vi.fn(async () => firstFactorResult({ methods: [email], startingMethod: email })),
           prepare: () => prepare.promise,
           attempt,
@@ -735,7 +735,7 @@ describe('useReverificationController', () => {
     const prepare = deferred<void>();
     const { result } = renderHook(() =>
       useReverificationController(
-        readyModel({
+        buildActiveModel({
           prepare: () => prepare.promise,
         }),
       ),
@@ -782,7 +782,7 @@ describe('useReverificationController', () => {
     const prepare = deferred<void>();
     const { result } = renderHook(() =>
       useReverificationController(
-        readyModel({
+        buildActiveModel({
           prepare: () => prepare.promise,
         }),
       ),
@@ -814,7 +814,7 @@ describe('useReverificationController', () => {
     const finish = deferred<void>();
     const start = vi.fn(() => Promise.resolve(firstFactorResult()));
     const cancel = vi.fn();
-    const active = readyModel({
+    const active = buildActiveModel({
       start,
       cancel,
       attempt: vi.fn(() =>
@@ -842,7 +842,7 @@ describe('useReverificationController', () => {
       }
     });
 
-    rerender({ model: { ...active, phase: 'retrying' } });
+    rerender({ model: { status: 'retrying' } });
     expect(result.current.status).toBe('ready');
     if (result.current.status === 'ready') {
       expect(result.current.step).toBe('password');
@@ -855,15 +855,60 @@ describe('useReverificationController', () => {
       finish.resolve();
     });
     await waitFor(() => {
-      expect(result.current.status).toBe('ready');
-      if (result.current.status === 'ready') {
+      expect(result.current.status).toBe('retrying');
+      if (result.current.status === 'retrying') {
         expect(result.current.step).toBe('password');
         expect(result.current.isPending).toBe(true);
+        expect(result.current.onCancel).toBeUndefined();
       }
     });
     expect(cancel).not.toHaveBeenCalled();
 
-    rerender({ model: { ...active, phase: 'inactive' } });
-    expect(result.current).toEqual({ status: 'idle', phase: 'inactive' });
+    rerender({ model: { status: 'inactive' } });
+    expect(result.current).toEqual({ status: 'idle' });
+  });
+
+  it('is retrying without onCancel as soon as finish resolves', async () => {
+    const { result } = renderHook(() =>
+      useReverificationController(
+        buildActiveModel({
+          attempt: vi.fn(() =>
+            Promise.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null })),
+          ),
+        }),
+      ),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('ready'));
+    act(() => {
+      if (result.current.status === 'ready') {
+        result.current.onValueChange('secret');
+        result.current.onSubmit();
+      }
+    });
+
+    await waitFor(() => expect(result.current.status).toBe('retrying'));
+    expect(result.current.onCancel).toBeUndefined();
+  });
+
+  it('shows the pending card, not unavailable, when start completes without a factor', async () => {
+    const finish = deferred<void>();
+    const { result } = renderHook(() =>
+      useReverificationController(
+        buildActiveModel({
+          start: vi.fn(() =>
+            Promise.resolve(firstFactorResult({ status: 'complete', methods: [], startingMethod: null })),
+          ),
+          finish: () => finish.promise,
+        }),
+      ),
+    );
+
+    await waitFor(() => expect(result.current.status).toBe('loading'));
+    act(() => {
+      finish.resolve();
+    });
+    await tick();
+    expect(result.current.status).toBe('loading');
   });
 });

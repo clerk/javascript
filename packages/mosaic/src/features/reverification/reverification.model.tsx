@@ -19,9 +19,8 @@ import type {
 } from './reverification.types';
 import { pickStartingMethod } from './reverification.utils';
 
-export type ReverificationReadyModel = {
-  status: 'ready';
-  phase: ReverificationState['phase'];
+export type ReverificationActiveModel = {
+  status: 'active';
   supportEmail: string;
   start: () => Promise<ReverificationResult>;
   prepare: (method: ReverificationPreparableMethod) => Promise<void>;
@@ -31,8 +30,10 @@ export type ReverificationReadyModel = {
 };
 
 export type ReverificationModel =
-  | { status: 'loading'; phase: ReverificationState['phase']; cancel: () => void }
-  | ReverificationReadyModel;
+  | { status: 'inactive' }
+  | { status: 'loading'; cancel: () => void }
+  | ReverificationActiveModel
+  | { status: 'retrying' };
 
 function toError(error: unknown): Error {
   if (isClerkAPIResponseError(error)) {
@@ -121,16 +122,19 @@ export function useReverificationModel(reverificationState: ReverificationState)
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
   const supportEmail = useMosaicSupportEmail();
-  const phase = reverificationState.phase;
-  const level = reverificationState.phase === 'active' ? reverificationState.level : undefined;
-  const cancel = reverificationState.phase === 'active' ? reverificationState.cancel : undefined;
-  const complete = reverificationState.phase === 'active' ? reverificationState.complete : undefined;
-  const cancelVerification = () => {
-    cancel?.();
-  };
+
+  if (reverificationState.phase === 'inactive') {
+    return { status: 'inactive' };
+  }
+
+  if (reverificationState.phase === 'retrying') {
+    return { status: 'retrying' };
+  }
+
+  const { level, cancel, complete } = reverificationState;
 
   if (!session || !environment || supportEmail === undefined) {
-    return { status: 'loading', phase, cancel: cancelVerification };
+    return { status: 'loading', cancel };
   }
 
   const webAuthnSupported = isWebAuthnSupported();
@@ -140,8 +144,7 @@ export function useReverificationModel(reverificationState: ReverificationState)
     toResult(resource, preferredSignInStrategy, webAuthnSupported);
 
   return {
-    status: 'ready',
-    phase,
+    status: 'active',
     supportEmail,
     start: async () => {
       try {
@@ -150,7 +153,7 @@ export function useReverificationModel(reverificationState: ReverificationState)
         throw toError(error);
       }
     },
-    cancel: cancelVerification,
+    cancel,
     prepare: async method => {
       try {
         switch (method.strategy) {
@@ -213,7 +216,7 @@ export function useReverificationModel(reverificationState: ReverificationState)
     finish: async () => {
       try {
         await clerk.setActive({ session: session.id });
-        complete?.();
+        complete();
       } catch (error) {
         throw toError(error);
       }
