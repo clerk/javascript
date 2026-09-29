@@ -155,6 +155,8 @@ describe('UserProfileApiKeysPanel', () => {
       await user.click(screen.getByRole('button', { name: 'Previous API keys page' }));
       expect(await within(table()).findByText('Key 1')).toBeVisible();
     });
+
+    it.todo('uses a configured page size');
   });
 
   describe('creating a key', () => {
@@ -272,6 +274,8 @@ describe('UserProfileApiKeysPanel', () => {
         'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
       );
     });
+
+    it.todo('creates a key with an optional description when descriptions are enabled');
   });
 
   describe('revoking a key', () => {
