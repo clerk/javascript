@@ -37,7 +37,7 @@ export function useUserProfileCreateAPIKeyController({
 
   const form = useForm({
     initialValues,
-    canSubmit: values => values.name.trim() !== '' && values.expiration !== null,
+    canSubmit: values => values.name.trim().length > 2 && values.expiration !== null,
     onSubmit: async ({ name, expiration }) => {
       if (expiration === null) {
         return;
@@ -60,7 +60,7 @@ export function useUserProfileCreateAPIKeyController({
     dialog: {
       open,
       onOpenChange: next => {
-        if (!form.isSubmitting) {
+        if (!form.isSubmitting && (secret === null || copyError !== null)) {
           setOpen(next);
         }
       },
