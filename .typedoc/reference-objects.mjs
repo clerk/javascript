@@ -7,14 +7,12 @@
 /**
  * Reference object page: MDX path → TypeDoc symbol + optional source hint.
  *
- * Keys **must** match `custom-router.mjs` (`ClerkRouter`): reference objects normally use
- * `shared/<kebab(symbol)>/<kebab(symbol)>.mdx` (e.g. `SessionResource` →
- * `shared/session-resource/session-resource.mdx`). Entries with `inlineMethods: true` use a flat
- * `shared/<kebab(symbol)>.mdx` file with their methods rendered in that file.
+ * Keys **must** match `custom-router.mjs` (`ClerkRouter`): for each symbol, `shared/<kebab(symbol)>/<kebab(symbol)>.mdx`
+ * (e.g. `SessionResource` → `shared/session-resource/session-resource.mdx`). If the path drifts, TypeDoc writes one folder while `extract-methods.mjs` strips/writes under another.
  *
  * `declarationHint` is a substring of `packages/shared/src/**` file paths (used by `findInterfaceOrClass()` in `extract-methods.mjs` when multiple reflections share the same interface/class name).
  *
- * `extract-methods.mjs` writes `properties.mdx` and `methods/` snippets for foldered entries. For `inlineMethods` entries, it keeps properties and methods in the flat page.
+ * `extract-methods.mjs` reads each file, writes `properties.mdx` with the same Properties table as TypeDoc (no `## Properties` heading), strips Properties from `<object>.mdx`, and writes methods under `methods/`.
  *
  * Optional **`extraMethodInterfaces`**: extra `interface` / `class` declarations whose callable members (and `@extractMethods` namespaces) are emitted into the same `methods/` folder. Use when the documented resource type and the API surface live on different types (e.g. `APIKeyResource` vs `APIKeysNamespace` on `Clerk.apiKeys`).
  */
@@ -46,11 +44,6 @@ export const REFERENCE_OBJECT_CONFIG = {
   'shared/organization-resource/organization-resource.mdx': {
     symbol: 'OrganizationResource',
     declarationHint: 'types/organization',
-  },
-  'shared/sso-bypass-allowlist-resource.mdx': {
-    symbol: 'SSOBypassAllowlistResource',
-    declarationHint: 'types/ssoBypassAllowlist',
-    inlineMethods: true,
   },
   'shared/api-key-resource/api-key-resource.mdx': {
     symbol: 'APIKeyResource',
