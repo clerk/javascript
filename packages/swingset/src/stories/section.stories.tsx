@@ -399,3 +399,129 @@ export function Destructive() {
     </Section.Root>
   );
 }
+
+export function Flat() {
+  return (
+    <>
+      <style>{`
+        @scope {
+          .cl-section-group {
+            border: none !important;
+            border-radius: 0 !important;
+            background: none !important;
+          }
+          .cl-section-header {
+            margin: 0 0 0.75rem !important;
+            padding: 0 !important;
+            min-height: 0 !important;
+          }
+          .cl-section-header .cl-button {
+            padding: 0 !important;
+            border: none !important;
+            background: none !important;
+          }
+          .cl-section-body {
+            margin: 0 !important;
+            padding-inline: 1rem !important;
+            border: 1px solid var(--cl-color-border) !important;
+            border-radius: var(--cl-radius-xl) !important;
+            background: var(--cl-color-background) !important;
+          }
+        }
+      `}</style>
+      <Section.Root xstyle={styles.rootMax}>
+        <Section.Group>
+          <Section.Header>
+            <Section.Title>Profile</Section.Title>
+          </Section.Header>
+          <Section.Body>
+            <Section.Row>
+              <Section.Item>
+                <Section.Content>
+                  <Section.Label>Name</Section.Label>
+                  <Section.Description>Preston Booth</Section.Description>
+                </Section.Content>
+                <Section.Actions>
+                  <Button
+                    color='neutral'
+                    size='sm'
+                    variant='outline'
+                  >
+                    Edit name
+                  </Button>
+                </Section.Actions>
+              </Section.Item>
+            </Section.Row>
+            <Section.Row>
+              <Section.Item>
+                <Section.Content>
+                  <Section.Label>Username</Section.Label>
+                  <Section.Description>Prestonb.xyz</Section.Description>
+                </Section.Content>
+                <Section.Actions>
+                  <Button
+                    color='neutral'
+                    size='sm'
+                    variant='outline'
+                  >
+                    Edit username
+                  </Button>
+                </Section.Actions>
+              </Section.Item>
+            </Section.Row>
+          </Section.Body>
+        </Section.Group>
+        {[
+          { label: 'Email', values: ['item1@clerk.dev', 'item2@clerk.dev'] },
+          { label: 'Phone', values: ['+1 801-888-8181'] },
+        ].map(({ label, values }) => (
+          <Section.Group key={label}>
+            <Section.Header>
+              <Section.Title>{label}</Section.Title>
+              <Section.Actions>
+                <Button
+                  aria-label={`Add ${label.toLowerCase()}`}
+                  color='neutral'
+                  size='sm'
+                  variant='outline'
+                >
+                  <Icon
+                    name='plus'
+                    placement='inline-start'
+                    size='sm'
+                  />
+                  Add
+                </Button>
+              </Section.Actions>
+            </Section.Header>
+            <Section.Body>
+              <Section.Items>
+                {values.map((value, index) => (
+                  <Section.Item key={value}>
+                    <Section.Content>
+                      <Section.Description xstyle={styles.descriptionFlex}>
+                        {value}
+                        {index === 0 ? <Badge color='neutral'>Primary</Badge> : null}
+                      </Section.Description>
+                    </Section.Content>
+                    <Section.Actions>
+                      <Button
+                        aria-label={`Manage ${value}`}
+                        color='neutral'
+                        shape='square'
+                        size='sm'
+                        variant='ghost'
+                      >
+                        <Icon name='ellipsis-horizontal' />
+                      </Button>
+                    </Section.Actions>
+                  </Section.Item>
+                ))}
+              </Section.Items>
+            </Section.Body>
+          </Section.Group>
+        ))}
+      </Section.Root>
+    </>
+  );
+}

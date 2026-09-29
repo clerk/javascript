@@ -65,15 +65,16 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByRole('heading', { name: 'Authentication' })).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Active devices' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
-    expect(screen.getByText('Password')).toBeVisible();
+    expect(within(authentication).getByRole('heading', { level: 3, name: 'Password' })).toBeInTheDocument();
     expect(within(authentication).getByRole('group', { name: 'Password' })).toBeInTheDocument();
     expect(within(authentication).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeInTheDocument();
     expect(within(authentication).getByRole('heading', { level: 3, name: '2-step verification' })).toBeInTheDocument();
     expect(within(authentication).getByRole('group', { name: 'Passkeys' })).toBeInTheDocument();
     expect(within(authentication).getByRole('group', { name: '2-step verification' })).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: '2 other devices' })).toBeInTheDocument();
+    const activeDevices = screen.getByRole('group', { name: 'Active devices' });
+    expect(within(activeDevices).getAllByRole('listitem')).toHaveLength(3);
+    expect(screen.queryByRole('button', { name: 'Sign out of all devices' })).not.toBeInTheDocument();
     expect(screen.getByText('This device')).toBeInTheDocument();
-    expect(screen.getByText('2 other devices')).toBeInTheDocument();
     expect(
       screen.getByText('Permanently delete this account and all its data. This cannot be undone.'),
     ).toBeInTheDocument();
@@ -118,7 +119,12 @@ describe('UserProfileSecurityPanelView', () => {
     });
 
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-    await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+    const signOutAll = screen.getByRole('button', { name: 'Sign out of all devices' });
+    expect(signOutAll).toHaveAttribute('data-variant', 'ghost');
+    expect(screen.getByRole('group', { name: 'Active devices' }).querySelector('.cl-section-header')).toContainElement(
+      signOutAll,
+    );
+    await user.click(signOutAll);
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
@@ -134,8 +140,8 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove', exact: true }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
-    const otherDevices = screen.getByRole('group', { name: '2 other devices' });
-    await user.click(within(otherDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
+    const activeDevices = screen.getByRole('group', { name: 'Active devices' });
+    await user.click(within(activeDevices).getByRole('button', { name: 'Manage Safari on iOS' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());

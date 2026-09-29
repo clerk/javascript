@@ -73,9 +73,9 @@ export function UserProfileActiveDevicesSectionView({
     }
   };
 
-  // Confirming takes the whole card with it, trigger included — hence the dialog mounted outside
-  // it, and the current device as the place focus lands. Cancelling keeps the trigger, so focus
-  // goes back to it.
+  // Confirming removes the other devices and the trigger with them — hence the dialog mounted
+  // outside the card, and the current device as the place focus lands. Cancelling keeps the
+  // trigger, so focus goes back to it.
   const focusAfterSignOutAll = () => {
     const signedOut = signedOutAll.current;
     signedOutAll.current = false;
@@ -88,66 +88,50 @@ export function UserProfileActiveDevicesSectionView({
         <Section.Group>
           <Section.Header>
             <Section.Title>{m.title}</Section.Title>
+            {onSignOutAllOtherDevices && otherDevices.length > 0 ? (
+              <Section.Actions>
+                <Button
+                  ref={signOutAllTrigger}
+                  color='neutral'
+                  size='sm'
+                  variant='ghost'
+                  onClick={() => setIsSignOutAllOpen(true)}
+                >
+                  {m.signOutAll}
+                </Button>
+              </Section.Actions>
+            ) : null}
           </Section.Header>
           <Section.Body>
-            {currentDevices.length > 0 ? (
-              currentDevices.map(device => (
-                <Section.Row key={device.id}>
+            <Section.Items>
+              {currentDevices.length > 0 ? (
+                currentDevices.map(device => (
                   <DeviceItem
+                    key={device.id}
                     device={device}
                     triggerRef={device.id === currentDevices[0]?.id ? currentDeviceTrigger : undefined}
                     onViewDetails={device => deviceDetails.open(device)}
                   />
-                </Section.Row>
-              ))
-            ) : (
-              <Section.Row>
+                ))
+              ) : (
                 <Section.Item>
                   <Section.Content>
                     <Section.Description>{m.emptyCurrent}</Section.Description>
                   </Section.Content>
                 </Section.Item>
-              </Section.Row>
-            )}
+              )}
+              {otherDevices.map(device => (
+                <DeviceItem
+                  key={device.id}
+                  device={device}
+                  triggerRef={removalFocus.registerTrigger(device.id)}
+                  onSignOut={openSignOut}
+                  onViewDetails={device => deviceDetails.open(device)}
+                />
+              ))}
+            </Section.Items>
           </Section.Body>
         </Section.Group>
-        {otherDevices.length > 0 ? (
-          <Section.Group>
-            <Section.Header>
-              <Section.Title>
-                {fill(otherDevices.length === 1 ? m.otherDevice : m.otherDevices, {
-                  count: String(otherDevices.length),
-                })}
-              </Section.Title>
-              {onSignOutAllOtherDevices ? (
-                <Section.Actions>
-                  <Button
-                    ref={signOutAllTrigger}
-                    color='neutral'
-                    size='sm'
-                    variant='outline'
-                    onClick={() => setIsSignOutAllOpen(true)}
-                  >
-                    {m.signOutAll}
-                  </Button>
-                </Section.Actions>
-              ) : null}
-            </Section.Header>
-            <Section.Body>
-              <Section.Items>
-                {otherDevices.map(device => (
-                  <DeviceItem
-                    key={device.id}
-                    device={device}
-                    triggerRef={removalFocus.registerTrigger(device.id)}
-                    onSignOut={openSignOut}
-                    onViewDetails={device => deviceDetails.open(device)}
-                  />
-                ))}
-              </Section.Items>
-            </Section.Body>
-          </Section.Group>
-        ) : null}
       </Section.Root>
       {onSignOutAllOtherDevices ? (
         <Confirmation

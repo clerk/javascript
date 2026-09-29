@@ -25,7 +25,6 @@ export function UserProfilePasswordRowView({
     <Section.Row>
       <Section.Item>
         <Section.Content>
-          <Section.Label>{m.label}</Section.Label>
           <Section.Description>{hasPassword ? m.masked : m.noPasswordSet}</Section.Description>
         </Section.Content>
         {managedBy ? (

@@ -44,8 +44,7 @@ describe('UserProfilePasswordSectionView', () => {
     renderView({ hasPassword: false, onSubmitPassword });
 
     expect(screen.getByRole('group', { name: 'Password' })).toBeInTheDocument();
-    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
-    expect(screen.getByText('Password')).toBeVisible();
+    expect(screen.getByRole('heading', { level: 2, name: 'Password' })).toHaveClass('cl-section-title');
     expect(screen.queryByText('••••••••••••••••••')).not.toBeInTheDocument();
     expect(screen.getByText('No password set')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Set password' }));

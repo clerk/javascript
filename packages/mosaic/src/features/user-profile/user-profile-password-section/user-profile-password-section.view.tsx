@@ -23,7 +23,10 @@ export function UserProfilePasswordSectionView({
   }
 
   return (
-    <Section.Group aria-label={m.label}>
+    <Section.Group>
+      <Section.Header>
+        <Section.Title>{m.label}</Section.Title>
+      </Section.Header>
       <Section.Body>
         <UserProfilePasswordRowView
           hasPassword={hasPassword}
