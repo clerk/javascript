@@ -4,7 +4,6 @@ import type {
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileAddPhoneDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
 import type { FormError } from '@clerk/mosaic/utils/form-error';
 import { useState } from 'react';
 
@@ -30,7 +29,7 @@ export const meta: StoryMeta = {
 
 function AccountSection({
   allowMultipleAccounts,
-  failAt,
+  failPhone,
   failWith,
   usernameFailWith,
   failEmailVerification = false,
@@ -40,7 +39,7 @@ function AccountSection({
   nameManagedBy,
 }: {
   allowMultipleAccounts: boolean;
-  failAt?: UserProfileAddPhoneDialogProps['step'];
+  failPhone?: 'create' | 'verify';
   failWith?: FormError;
   usernameFailWith?: FormError;
   failEmailVerification?: boolean;
@@ -67,9 +66,10 @@ function AccountSection({
   ]);
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const addPhone = createUserProfileAddPhoneFixture({
-    failAt,
-    onVerified: value =>
-      setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isDefault: false, isVerified: true }]),
+    fail: failPhone,
+    onCreated: (id, value) => setPhones(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+    onVerified: id =>
+      setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
   });
   const emailFlow = createUserProfileAddEmailFixture({
     method: emailVerificationMethod,
@@ -219,7 +219,7 @@ export function AddPhoneFails() {
   return (
     <AccountSection
       allowMultipleAccounts
-      failAt='phone'
+      failPhone='create'
     />
   );
 }

@@ -28,7 +28,10 @@ export type FapiEnvironment = Omit<EnvironmentJSON, 'user_settings' | 'organizat
   organization_settings: Settings<OrganizationSettingsJSON>;
 };
 
+export type FapiAttributeOverrides = Partial<Record<keyof AttributesJSON, Partial<AttributeDataJSON>>>;
+
 export interface FapiEnvironmentOverrides {
+  attributes?: FapiAttributeOverrides;
   auth_config?: Partial<AuthConfigJSON>;
   display_config?: Partial<DisplayConfigJSON>;
   organization_settings?: Partial<Settings<OrganizationSettingsJSON>>;
@@ -74,23 +77,24 @@ function attribute(overrides: Partial<AttributeDataJSON> = {}): AttributeDataJSO
   };
 }
 
-function attributes(): AttributesJSON {
+function attributes(overrides: FapiAttributeOverrides = {}): AttributesJSON {
   return {
     email_address: attribute({
       verifications: ['email_code'],
       used_for_first_factor: true,
       first_factors: ['email_code'],
       verify_at_sign_up: true,
+      ...overrides.email_address,
     }),
-    phone_number: attribute({ enabled: false }),
-    username: attribute(),
-    first_name: attribute(),
-    last_name: attribute(),
-    password: attribute(),
-    web3_wallet: attribute({ enabled: false }),
-    authenticator_app: attribute({ enabled: false }),
-    backup_code: attribute({ enabled: false }),
-    passkey: attribute({ enabled: false }),
+    phone_number: attribute({ enabled: false, verifications: ['phone_code'], ...overrides.phone_number }),
+    username: attribute(overrides.username),
+    first_name: attribute(overrides.first_name),
+    last_name: attribute(overrides.last_name),
+    password: attribute(overrides.password),
+    web3_wallet: attribute({ enabled: false, ...overrides.web3_wallet }),
+    authenticator_app: attribute({ enabled: false, ...overrides.authenticator_app }),
+    backup_code: attribute({ enabled: false, ...overrides.backup_code }),
+    passkey: attribute({ enabled: false, ...overrides.passkey }),
   };
 }
 
@@ -182,7 +186,7 @@ export function fapiEnvironment(overrides: FapiEnvironmentOverrides = {}): FapiE
       ...overrides.organization_settings,
     },
     user_settings: {
-      attributes: attributes(),
+      attributes: attributes(overrides.attributes),
       actions: { delete_self: true, create_organization: true },
       social: {},
       enterprise_sso: { enabled: false, self_serve_sso: false, self_serve_directory_sync: false },
@@ -223,6 +227,33 @@ export function fapiEmailAddress(
     verification: null,
     linked_to: [],
     matches_sso_connection: false,
+    ...overrides,
+  };
+}
+
+export function fapiVerification(overrides: Partial<VerificationJSON> = {}): VerificationJSON {
+  return {
+    object: 'verification',
+    id: 'ver_1',
+    status: 'verified',
+    strategy: 'phone_code',
+    verified_at_client: '',
+    attempts: 0,
+    expire_at: farFuture,
+    error: { code: '', message: '' },
+    ...overrides,
+  };
+}
+
+export function fapiPhoneNumber(
+  overrides: Partial<PhoneNumberJSON> & Pick<PhoneNumberJSON, 'id' | 'phone_number'>,
+): PhoneNumberJSON {
+  return {
+    object: 'phone_number',
+    reserved_for_second_factor: false,
+    default_second_factor: false,
+    linked_to: [],
+    verification: null,
     ...overrides,
   };
 }

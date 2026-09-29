@@ -10,6 +10,7 @@ import type {
   UserProfileEmailVerifier,
   UserProfileNameAttribute,
   UserProfilePhone,
+  UserProfilePhoneVerifier,
 } from './user-profile-account-section.types';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
 import { UserProfileEmailRowView } from './user-profile-email-row.view';
@@ -52,8 +53,8 @@ export interface UserProfileAccountSectionViewProps {
   onVerifyEmail?: (id: string) => void;
   onSetPrimaryEmail?: (id: string) => void | Promise<void>;
   onRemoveEmail?: (id: string) => void | Promise<void>;
-  onSendPhoneCode?: (phoneNumber: string) => Promise<void>;
-  onVerifyPhoneCode?: (phoneNumber: string, code: string) => Promise<void>;
+  onCreatePhone?: (phoneNumber: string) => Promise<UserProfilePhoneVerifier>;
+  getPhoneVerifier?: (id: string) => UserProfilePhoneVerifier;
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
   onSetPrimaryPhone?: (id: string) => void | Promise<void>;
@@ -85,8 +86,8 @@ export function UserProfileAccountSectionView({
   onVerifyEmail,
   onSetPrimaryEmail,
   onRemoveEmail,
-  onSendPhoneCode,
-  onVerifyPhoneCode,
+  onCreatePhone,
+  getPhoneVerifier,
   onManagePhone,
   onVerifyPhone,
   onSetPrimaryPhone,
@@ -98,8 +99,8 @@ export function UserProfileAccountSectionView({
     <UserProfilePhoneRowView
       phones={phones}
       allowMultipleAccounts={allowMultipleAccounts}
-      onSendPhoneCode={onSendPhoneCode}
-      onVerifyPhoneCode={onVerifyPhoneCode}
+      onCreatePhone={onCreatePhone}
+      getPhoneVerifier={getPhoneVerifier}
       onManagePhone={onManagePhone}
       onVerifyPhone={onVerifyPhone}
       onSetPrimaryPhone={onSetPrimaryPhone}

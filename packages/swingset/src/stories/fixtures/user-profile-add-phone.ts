@@ -1,28 +1,39 @@
+import type { UserProfilePhoneVerifier } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import type { UserProfileAccountSectionViewProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileAddPhoneDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-add-phone.dialog';
 
 interface FixtureOptions {
-  failAt?: UserProfileAddPhoneDialogProps['step'];
-  onVerified?: (phoneNumber: string) => void;
+  fail?: 'create' | 'verify';
+  onCreated?: (id: string, phoneNumber: string) => void;
+  onVerified?: (id: string) => void;
 }
 
-export function createUserProfileAddPhoneFixture({ failAt, onVerified }: FixtureOptions = {}): Pick<
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+export function createUserProfileAddPhoneFixture({ fail, onCreated, onVerified }: FixtureOptions = {}): Pick<
   UserProfileAccountSectionViewProps,
-  'onSendPhoneCode' | 'onVerifyPhoneCode'
+  'onCreatePhone' | 'getPhoneVerifier'
 > {
-  return {
-    onSendPhoneCode: async () => {
-      await new Promise(resolve => setTimeout(resolve, 700));
-      if (failAt === 'phone') {
-        throw new Error('We couldn’t send a code. Try again.');
-      }
-    },
-    onVerifyPhoneCode: async (phoneNumber, code) => {
-      await new Promise(resolve => setTimeout(resolve, 700));
-      if (failAt === 'verify' || code === '000000') {
+  const verifier = (id: string): UserProfilePhoneVerifier => ({
+    sendCode: () => delay(700).then(() => undefined),
+    verifyCode: async code => {
+      await delay(700);
+      if (fail === 'verify' || code === '000000') {
         throw new Error('That code is incorrect. Try again.');
       }
-      onVerified?.(phoneNumber);
+      onVerified?.(id);
     },
+  });
+
+  return {
+    onCreatePhone: async phoneNumber => {
+      await delay(700);
+      if (fail === 'create') {
+        throw new Error('We couldn’t add this phone number. Try again.');
+      }
+      const id = `phone_${Date.now()}`;
+      onCreated?.(id, phoneNumber);
+      return verifier(id);
+    },
+    getPhoneVerifier: verifier,
   };
 }

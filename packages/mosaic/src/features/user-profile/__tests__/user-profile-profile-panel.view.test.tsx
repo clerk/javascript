@@ -29,6 +29,8 @@ function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
   );
 }
 
+const phoneVerifier = { sendCode: () => Promise.resolve(), verifyCode: () => Promise.resolve() };
+
 describe('UserProfileProfilePanelView', () => {
   it('hides connected accounts when only providers without a connect callback are supplied', () => {
     renderView({
@@ -220,8 +222,8 @@ describe('UserProfileProfilePanelView', () => {
     renderView({
       emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true }],
       onAddEmail: vi.fn(),
-      onSendPhoneCode: () => Promise.resolve(),
-      onVerifyPhoneCode: () => Promise.resolve(),
+      onCreatePhone: () => Promise.resolve(phoneVerifier),
+      getPhoneVerifier: () => phoneVerifier,
     });
 
     const accountSection = screen.getByRole('region', { name: 'Account' });
@@ -274,7 +276,11 @@ describe('UserProfileProfilePanelView', () => {
   });
 
   it('renders an actionable empty state when no phone number exists', () => {
-    renderView({ phones: [], onSendPhoneCode: () => Promise.resolve(), onVerifyPhoneCode: () => Promise.resolve() });
+    renderView({
+      phones: [],
+      onCreatePhone: () => Promise.resolve(phoneVerifier),
+      getPhoneVerifier: () => phoneVerifier,
+    });
 
     const phoneSection = screen.getByRole('region', { name: 'Phone' });
     const emptyState = within(phoneSection).getByText('No phone numbers added');

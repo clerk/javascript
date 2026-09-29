@@ -1,6 +1,12 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import { useUser } from '@clerk/shared/react';
-import type { AttributeData, EmailAddressResource, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
+import type {
+  AttributeData,
+  EmailAddressResource,
+  EnterpriseAccountResource,
+  PhoneNumberResource,
+  UserResource,
+} from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
 import type { MosaicRouter } from '../../../hooks/useMosaicRouter';
@@ -8,15 +14,15 @@ import { useMosaicRouter } from '../../../hooks/useMosaicRouter';
 import { save } from '../../../utils/form-error';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import type {
-  UserProfileEmail,
   UserProfileEmailVerification,
   UserProfileEmailVerifier,
   UserProfileNameAttribute,
-  UserProfilePhone,
+  UserProfilePhoneVerifier,
 } from './user-profile-account-section.types';
-import { isAttributeAvailable, sortByVerification } from './user-profile-account-section.utils';
+import { isAttributeAvailable, toContacts } from './user-profile-account-section.utils';
 import type { UserProfileAccountSectionViewProps } from './user-profile-account-section.view';
 import type { UserProfileAddEmailField } from './user-profile-add-email.controller';
+import type { UserProfileAddPhoneField } from './user-profile-add-phone.controller';
 import type { UserProfileEditNameField } from './user-profile-edit-name.dialog';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
 
@@ -38,6 +44,10 @@ type UserProfileAccountSectionData = Pick<
   | 'getEmailVerifier'
   | 'onSetPrimaryEmail'
   | 'onRemoveEmail'
+  | 'onCreatePhone'
+  | 'getPhoneVerifier'
+  | 'onSetPrimaryPhone'
+  | 'onRemovePhone'
   | 'onProfilePictureChange'
   | 'onRemoveProfilePicture'
   | 'onSubmitName'
@@ -52,13 +62,14 @@ export type UserProfileAccountSectionModel =
 const NAME_FIELDS: readonly UserProfileEditNameField[] = ['firstName', 'lastName'];
 const USERNAME_FIELDS: readonly UserProfileEditUsernameField[] = ['username'];
 const ADD_EMAIL_FIELDS: readonly UserProfileAddEmailField[] = ['emailAddress', 'code'];
+const ADD_PHONE_FIELDS: readonly UserProfileAddPhoneField[] = ['phoneNumber', 'code'];
 
-function emailById(user: UserResource, id: string): EmailAddressResource {
-  const email = user.emailAddresses.find(email => email.id === id);
-  if (!email) {
-    throw new Error(`No email address with id ${id}`);
+function byId<T extends { id: string }>(items: T[], id: string, kind: string): T {
+  const item = items.find(item => item.id === id);
+  if (!item) {
+    throw new Error(`No ${kind} with id ${id}`);
   }
-  return email;
+  return item;
 }
 
 function verifyRedirectUrl(userProfileUrl: string): string {
@@ -132,22 +143,11 @@ function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameA
   return { enabled: attribute?.enabled ?? false, required: attribute?.required ?? false };
 }
 
-function toEmails(user: UserResource): UserProfileEmail[] {
-  return sortByVerification(user.emailAddresses, user.primaryEmailAddressId).map(email => ({
-    id: email.id,
-    value: email.emailAddress,
-    isDefault: email.id === user.primaryEmailAddressId,
-    isVerified: email.verification.status === 'verified',
-  }));
-}
-
-function toPhones(user: UserResource): UserProfilePhone[] {
-  return sortByVerification(user.phoneNumbers, user.primaryPhoneNumberId).map(phone => ({
-    id: phone.id,
-    value: phone.phoneNumber,
-    isDefault: phone.id === user.primaryPhoneNumberId,
-    isVerified: phone.verification.status === 'verified',
-  }));
+function toPhoneVerifier(phone: PhoneNumberResource): UserProfilePhoneVerifier {
+  return {
+    sendCode: () => save(() => phone.prepareVerification(), ADD_PHONE_FIELDS),
+    verifyCode: code => save(() => phone.attemptVerification({ code }), ADD_PHONE_FIELDS),
+  };
 }
 
 export function useUserProfileAccountSectionModel(): UserProfileAccountSectionModel {
@@ -173,6 +173,8 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
   const canCreateEmail = showEmails && !emailsImmutable && canAddIdentifications(user, enterpriseSSO.enabled);
   const verifiesEmailByLink = Boolean(attributes.email_address?.verifications.includes('email_link'));
   const showPhones = isAttributeAvailable(attributes.phone_number);
+  const phonesImmutable = Boolean(attributes.phone_number?.immutable);
+  const canCreatePhone = showPhones && !phonesImmutable && canAddIdentifications(user, enterpriseSSO.enabled);
   const linkRedirectUrl = verifiesEmailByLink ? verifyRedirectUrl(environment.displayConfig.userProfileUrl) : undefined;
   const verifierFor = (email: EmailAddressResource) => toEmailVerifier(email, linkRedirectUrl, router);
 
@@ -188,8 +190,12 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     imageUrl: user.imageUrl,
     hasImage: user.hasImage,
     username: showUsername ? (user.username ?? '') : undefined,
-    emails: showEmails ? toEmails(user) : undefined,
-    phones: showPhones ? toPhones(user) : undefined,
+    emails: showEmails
+      ? toContacts(user.emailAddresses, user.primaryEmailAddressId, email => email.emailAddress)
+      : undefined,
+    phones: showPhones
+      ? toContacts(user.phoneNumbers, user.primaryPhoneNumberId, phone => phone.phoneNumber)
+      : undefined,
     onCreateEmail: canCreateEmail
       ? async emailAddress => {
           const request = user.createEmailAddress({ email: emailAddress });
@@ -197,9 +203,25 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
           return verifierFor(await request);
         }
       : undefined,
-    getEmailVerifier: showEmails ? id => verifierFor(emailById(user, id)) : undefined,
+    getEmailVerifier: showEmails ? id => verifierFor(byId(user.emailAddresses, id, 'email address')) : undefined,
     onSetPrimaryEmail: showEmails ? id => save(() => user.update({ primaryEmailAddressId: id })) : undefined,
-    onRemoveEmail: showEmails && !emailsImmutable ? id => save(() => emailById(user, id).destroy()) : undefined,
+    onRemoveEmail:
+      showEmails && !emailsImmutable
+        ? id => save(() => byId(user.emailAddresses, id, 'email address').destroy())
+        : undefined,
+    onCreatePhone: canCreatePhone
+      ? async phoneNumber => {
+          const request = user.createPhoneNumber({ phoneNumber });
+          await save(() => request, ADD_PHONE_FIELDS);
+          return toPhoneVerifier(await request);
+        }
+      : undefined,
+    getPhoneVerifier: showPhones ? id => toPhoneVerifier(byId(user.phoneNumbers, id, 'phone number')) : undefined,
+    onSetPrimaryPhone: showPhones ? id => save(() => user.update({ primaryPhoneNumberId: id })) : undefined,
+    onRemovePhone:
+      showPhones && !phonesImmutable
+        ? id => save(() => byId(user.phoneNumbers, id, 'phone number').destroy())
+        : undefined,
     onProfilePictureChange: file => save(() => user.setProfileImage({ file })),
     onRemoveProfilePicture: user.hasImage ? () => save(() => user.setProfileImage({ file: null })) : undefined,
     onSubmitName: nameManagedBy

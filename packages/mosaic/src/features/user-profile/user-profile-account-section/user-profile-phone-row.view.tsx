@@ -3,12 +3,12 @@ import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
+import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
 import { useListRemovalFocus } from '../../../hooks/useListRemovalFocus';
 import { fill, useMessages } from '../../../localization';
-import type { UserProfilePhone } from './user-profile-account-section.types';
-import type { UserProfileAddPhoneControllerOptions } from './user-profile-add-phone.controller';
+import type { UserProfilePhone, UserProfilePhoneVerifier } from './user-profile-account-section.types';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';
 import { UserProfileAddPhoneDialog } from './user-profile-add-phone.dialog';
 import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
@@ -18,8 +18,8 @@ import { useUserProfileSetPrimaryController } from './user-profile-set-primary.c
 export interface UserProfilePhoneRowViewProps {
   phones: UserProfilePhone[];
   allowMultipleAccounts?: boolean;
-  onSendPhoneCode?: (phoneNumber: string) => Promise<void>;
-  onVerifyPhoneCode?: (phoneNumber: string, code: string) => Promise<void>;
+  onCreatePhone?: (phoneNumber: string) => Promise<UserProfilePhoneVerifier>;
+  getPhoneVerifier?: (id: string) => UserProfilePhoneVerifier;
   onManagePhone?: (id: string) => void;
   onVerifyPhone?: (id: string) => void;
   onSetPrimaryPhone?: (id: string) => void | Promise<void>;
@@ -29,8 +29,8 @@ export interface UserProfilePhoneRowViewProps {
 export function UserProfilePhoneRowView({
   phones,
   allowMultipleAccounts = false,
-  onSendPhoneCode,
-  onVerifyPhoneCode,
+  onCreatePhone,
+  getPhoneVerifier,
   onManagePhone,
   onVerifyPhone,
   onSetPrimaryPhone,
@@ -43,13 +43,40 @@ export function UserProfilePhoneRowView({
     onRemove: onRemovePhone,
     fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
   });
+  const verification = useUserProfileAddPhoneController({ onCreate: onCreatePhone });
+  const verificationDialog = useMemo(() => Dialog.createHandle(), []);
+  const canVerify = Boolean(getPhoneVerifier);
   const addPhoneAction =
-    onSendPhoneCode && onVerifyPhoneCode ? (
-      <AddPhone
-        options={{ onSend: onSendPhoneCode, onVerify: onVerifyPhoneCode }}
-        compact={allowMultipleAccounts}
-      />
+    canVerify && onCreatePhone ? (
+      <Dialog.Trigger
+        handle={verificationDialog}
+        render={
+          <Button
+            aria-label={m.phone.add}
+            color='neutral'
+            size='sm'
+            variant='outline'
+          />
+        }
+      >
+        {allowMultipleAccounts ? (
+          <Icon
+            name='plus'
+            placement='inline-start'
+            size='sm'
+          />
+        ) : null}
+        {allowMultipleAccounts ? m.add : m.phone.add}
+      </Dialog.Trigger>
     ) : undefined;
+  const verifyingId = useRef<string | undefined>(undefined);
+  const verifyPhone = (id: string) => {
+    const phone = phones.find(phone => phone.id === id);
+    if (phone && getPhoneVerifier) {
+      verifyingId.current = id;
+      verification.onVerifyPhone(phone.value, getPhoneVerifier(id));
+    }
+  };
   const removePhoneConfirmation = useMemo(() => Confirmation.createHandle<UserProfilePhone>(), []);
   const primary = useUserProfileSetPrimaryController({
     items: phones,
@@ -68,15 +95,30 @@ export function UserProfilePhoneRowView({
     value: stringToFormattedPhoneString(phone.value),
   }));
 
+  const dialog = canVerify ? (
+    <UserProfileAddPhoneDialog
+      {...verification}
+      handle={verificationDialog}
+      finalFocus={() => {
+        const id = verifyingId.current;
+        verifyingId.current = undefined;
+        return id ? removalFocus.trigger(id) : null;
+      }}
+    />
+  ) : null;
+
   if (!allowMultipleAccounts) {
     return (
-      <UserProfileContactRowView
-        items={formattedPhones}
-        kind='phone'
-        label={m.phone.label}
-        addAction={addPhoneAction}
-        onManage={onManagePhone}
-      />
+      <>
+        <UserProfileContactRowView
+          items={formattedPhones}
+          kind='phone'
+          label={m.phone.label}
+          addAction={addPhoneAction}
+          onManage={onManagePhone}
+        />
+        {dialog}
+      </>
     );
   }
 
@@ -91,8 +133,9 @@ export function UserProfilePhoneRowView({
         addAction={addPhoneAction}
         onRemove={onRemovePhone ? removePhone : undefined}
         onSetPrimary={primary.onSetPrimary}
-        onVerify={onVerifyPhone}
+        onVerify={canVerify ? verifyPhone : onVerifyPhone}
       />
+      {dialog}
       {primary.error ? (
         <Text
           role='alert'
@@ -117,32 +160,5 @@ export function UserProfilePhoneRowView({
         />
       ) : null}
     </>
-  );
-}
-
-function AddPhone({ options, compact }: { options: UserProfileAddPhoneControllerOptions; compact: boolean }) {
-  const m = useMessages('userProfileAccountSection');
-  const controller = useUserProfileAddPhoneController(options);
-  return (
-    <UserProfileAddPhoneDialog
-      {...controller}
-      trigger={
-        <Button
-          aria-label={m.phone.add}
-          color='neutral'
-          size='sm'
-          variant='outline'
-        >
-          {compact ? (
-            <Icon
-              name='plus'
-              placement='inline-start'
-              size='sm'
-            />
-          ) : null}
-          {compact ? m.add : m.phone.add}
-        </Button>
-      }
-    />
   );
 }

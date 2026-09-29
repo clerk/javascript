@@ -63,6 +63,11 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const addEmail = (value: string) =>
     setEmails(current => [...current, { id: `email_${Date.now()}`, value, isDefault: false, isVerified: false }]);
+  const phoneFlow = createUserProfileAddPhoneFixture({
+    onCreated: (id, value) => setPhones(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+    onVerified: id =>
+      setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
+  });
   const emailFlow = createUserProfileAddEmailFixture({
     onCreated: (id, value) => setEmails(current => [...current, { id, value, isDefault: false, isVerified: false }]),
     onVerified: id =>
@@ -91,10 +96,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onAddEmail,
       onCreateEmail: onAddEmail ? undefined : emailFlow.onCreateEmail,
       getEmailVerifier: onAddEmail ? undefined : emailFlow.getEmailVerifier,
-      ...createUserProfileAddPhoneFixture({
-        onVerified: value =>
-          setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isDefault: false, isVerified: true }]),
-      }),
+      ...phoneFlow,
       onDeleteAccount: () => Promise.resolve(),
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,

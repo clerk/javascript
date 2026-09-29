@@ -1,5 +1,5 @@
 import { UNSAFE_PortalProvider as PortalProvider } from '@clerk/shared/react';
-import type { CustomPage, PhoneNumberJSON, UserJSON, Web3WalletJSON } from '@clerk/shared/types';
+import type { CustomPage, UserJSON, Web3WalletJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -12,6 +12,7 @@ import {
   fapiInvitation,
   fapiMembership,
   fapiOrganization,
+  fapiPhoneNumber,
   fapiSession,
   fapiSuggestion,
   fapiUser,
@@ -851,15 +852,7 @@ describe('UserButton', () => {
   });
 
   describe('naming the account', () => {
-    const phone: PhoneNumberJSON = {
-      object: 'phone_number',
-      id: 'idn_phone',
-      phone_number: '+15550100',
-      reserved_for_second_factor: false,
-      default_second_factor: false,
-      linked_to: [],
-      verification: null,
-    };
+    const phone = fapiPhoneNumber({ id: 'idn_phone', phone_number: '+15550100' });
     const wallet: Web3WalletJSON = {
       object: 'web3_wallet',
       id: 'idn_wallet',

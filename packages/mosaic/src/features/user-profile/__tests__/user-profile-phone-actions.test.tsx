@@ -22,6 +22,8 @@ function renderPhone(overrides: Partial<UserProfileAccountSectionViewProps> = {}
   );
 }
 
+const phoneVerifier = { sendCode: () => Promise.resolve(), verifyCode: () => Promise.resolve() };
+
 describe('phone actions', () => {
   it('ignores backdrop clicks and allows Escape to cancel removal', async () => {
     const user = userEvent.setup();
@@ -165,8 +167,8 @@ describe('phone actions', () => {
             username='test'
             emails={[]}
             phones={phones}
-            onSendPhoneCode={() => Promise.resolve()}
-            onVerifyPhoneCode={() => Promise.resolve()}
+            getPhoneVerifier={() => phoneVerifier}
+            onCreatePhone={() => Promise.resolve(phoneVerifier)}
             onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
           />
         </MosaicProvider>

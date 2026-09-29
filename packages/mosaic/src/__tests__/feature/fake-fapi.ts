@@ -2,7 +2,9 @@ import type {
   ClientJSON,
   OrganizationMembershipJSON,
   OrganizationSuggestionJSON,
+  PhoneNumberJSON,
   SessionJSON,
+  UserJSON,
   UserOrganizationInvitationJSON,
 } from '@clerk/shared/types';
 import { http, HttpResponse, type JsonBodyType } from 'msw';
@@ -15,7 +17,9 @@ import {
   fapiMembership,
   fapiOrganization,
   fapiPage,
+  fapiPhoneNumber,
   fapiToken,
+  fapiVerification,
 } from './fapi';
 
 export const PUBLISHABLE_KEY = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
@@ -75,6 +79,58 @@ function missing() {
   return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
 }
 
+function rejected(code: string, message: string) {
+  return HttpResponse.json({ errors: [{ code, message, long_message: message }] }, { status: 400 });
+}
+
+export const VERIFICATION_CODE = '424242';
+
+const USER_FIELDS = [
+  'first_name',
+  'last_name',
+  'username',
+  'primary_email_address_id',
+  'primary_phone_number_id',
+] as const satisfies readonly (keyof UserJSON)[];
+
+function patchUser(user: UserJSON, body: URLSearchParams): UserJSON {
+  const patch: Partial<Pick<UserJSON, (typeof USER_FIELDS)[number]>> = {};
+  for (const field of USER_FIELDS) {
+    if (body.has(field)) {
+      patch[field] = body.get(field) || null;
+    }
+  }
+  return { ...user, ...patch };
+}
+
+function activeSession(state: FakeFapiState): SessionJSON | undefined {
+  return state.client.sessions.find(session => session.id === state.client.last_active_session_id);
+}
+
+function updateUser(state: FakeFapiState, next: (user: UserJSON) => UserJSON): UserJSON | undefined {
+  const session = activeSession(state);
+  if (!session) {
+    return undefined;
+  }
+  const user = next(session.user);
+  state.client = {
+    ...state.client,
+    sessions: state.client.sessions.map(s => (s.id === session.id ? { ...s, user } : s)),
+  };
+  return user;
+}
+
+function findPhone(state: FakeFapiState, id: unknown): PhoneNumberJSON | undefined {
+  return activeSession(state)?.user.phone_numbers.find(phone => phone.id === id);
+}
+
+function replacePhone(state: FakeFapiState, phone: PhoneNumberJSON) {
+  updateUser(state, user => ({
+    ...user,
+    phone_numbers: user.phone_numbers.map(p => (p.id === phone.id ? phone : p)),
+  }));
+}
+
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
   const state: FakeFapiState = {
     environment: fapiEnvironment(),
@@ -84,6 +140,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     suggestions: [],
     ...seed,
   };
+  let identifications = 0;
 
   worker.use(
     http.get(fapiUrl('/v1/environment'), () => HttpResponse.json(state.environment)),
@@ -130,6 +187,57 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       state.client = { ...state.client, sessions: [], last_active_session_id: null };
       return envelope(state.client, state.client);
+    }),
+    http.post(fapiUrl('/v1/me'), async ({ request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
+        return undefined;
+      }
+      const body = new URLSearchParams(await request.text());
+      const user = updateUser(state, user => patchUser(user, body));
+      return user ? envelope(user, state.client) : missing();
+    }),
+    http.post(fapiUrl('/v1/me/phone_numbers'), async ({ request }) => {
+      const body = new URLSearchParams(await request.text());
+      const phone = fapiPhoneNumber({ id: `idn_${++identifications}`, phone_number: body.get('phone_number') ?? '' });
+      const user = updateUser(state, user => ({ ...user, phone_numbers: [...user.phone_numbers, phone] }));
+      return user ? envelope(phone, state.client) : missing();
+    }),
+    http.post(fapiUrl('/v1/me/phone_numbers/:id/prepare_verification'), ({ params }) => {
+      const phone = findPhone(state, params.id);
+      if (!phone) {
+        return missing();
+      }
+      const prepared = { ...phone, verification: fapiVerification({ status: 'unverified' }) };
+      replacePhone(state, prepared);
+      return envelope(prepared, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/phone_numbers/:id/attempt_verification'), async ({ params, request }) => {
+      const phone = findPhone(state, params.id);
+      if (!phone) {
+        return missing();
+      }
+      const body = new URLSearchParams(await request.text());
+      if (body.get('code') !== VERIFICATION_CODE) {
+        return rejected('form_code_incorrect', 'Incorrect code');
+      }
+      const verified = { ...phone, verification: fapiVerification() };
+      replacePhone(state, verified);
+      return envelope(verified, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/phone_numbers/:id'), ({ params, request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
+        return undefined;
+      }
+      const phone = findPhone(state, params.id);
+      if (!phone) {
+        return missing();
+      }
+      updateUser(state, user => ({
+        ...user,
+        phone_numbers: user.phone_numbers.filter(p => p.id !== phone.id),
+        primary_phone_number_id: user.primary_phone_number_id === phone.id ? null : user.primary_phone_number_id,
+      }));
+      return envelope({ object: 'phone_number', id: phone.id, deleted: true }, state.client);
     }),
     http.get(fapiUrl('/v1/me/organization_memberships'), ({ request }) =>
       envelope(page(state.memberships, new URL(request.url)), null),

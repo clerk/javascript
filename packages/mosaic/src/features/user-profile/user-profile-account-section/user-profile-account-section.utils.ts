@@ -1,5 +1,7 @@
 import type { AttributeData, VerificationResource } from '@clerk/shared/types';
 
+import type { UserProfileContact } from './user-profile-account-section.types';
+
 export function isAttributeAvailable(attribute: AttributeData | undefined): boolean {
   return Boolean(attribute?.enabled || attribute?.used_for_first_factor || attribute?.used_for_second_factor);
 }
@@ -20,4 +22,17 @@ export function sortByVerification<T extends Identification>(items: T[], primary
   });
 
   return [...items.filter(item => item.id === primaryId), ...verified, ...pending, ...unstarted];
+}
+
+export function toContacts<T extends Identification>(
+  items: T[],
+  primaryId: string | null,
+  value: (item: T) => string,
+): UserProfileContact[] {
+  return sortByVerification(items, primaryId).map(item => ({
+    id: item.id,
+    value: value(item),
+    isDefault: item.id === primaryId,
+    isVerified: item.verification.status === 'verified',
+  }));
 }

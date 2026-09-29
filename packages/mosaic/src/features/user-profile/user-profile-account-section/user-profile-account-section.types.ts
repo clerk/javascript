@@ -26,3 +26,8 @@ export interface UserProfileEmailVerifier {
   start: () => UserProfileEmailVerification;
   verifyCode: (code: string) => Promise<void>;
 }
+
+export interface UserProfilePhoneVerifier {
+  sendCode: () => Promise<void>;
+  verifyCode: (code: string) => Promise<void>;
+}
