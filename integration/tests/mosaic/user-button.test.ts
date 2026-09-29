@@ -59,6 +59,12 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
     const { id, name } = organization;
 
     await trigger(page).click();
+    await popup(page).getByRole('button', { name: 'Personal account' }).click();
+    await page.waitForFunction(() => window.Clerk?.organization === null);
+    await page.keyboard.press('Escape');
+    await expect(popup(page)).toBeHidden();
+
+    await trigger(page).click();
     await popup(page).getByRole('button', { name }).click();
     await page.waitForFunction(orgId => window.Clerk?.organization?.id === orgId, id);
 
