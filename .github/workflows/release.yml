@@ -148,7 +148,7 @@ jobs:
               const targets = [
                 { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
                 { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
-                { repo: 'clerk-docs', workflow_id: 'typedoc.yml' },
+                { repo: 'clerk', workflow_id: 'docs-typedoc.yml' },
               ];
               const results = await Promise.allSettled(
                 targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
@@ -230,7 +230,7 @@ jobs:
             const targets = [
               { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
               { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
-              { repo: 'clerk-docs', workflow_id: 'typedoc.yml' },
+              { repo: 'clerk', workflow_id: 'docs-typedoc.yml' },
             ];
             const results = await Promise.allSettled(
               targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
