@@ -58,6 +58,27 @@ describe('Menu', () => {
       expect(screen.getByText('Actions')).toHaveAttribute('data-open', '');
     });
 
+    it('lets a mouse press focus the trigger as it opens', async () => {
+      const user = userEvent.setup();
+      render(
+        <Menu.Root>
+          <Menu.Trigger>Actions</Menu.Trigger>
+          <Menu.Positioner>
+            <Menu.Popup>
+              <Menu.Item label='Cut'>Cut</Menu.Item>
+            </Menu.Popup>
+          </Menu.Positioner>
+        </Menu.Root>,
+      );
+      const onFocus = vi.fn();
+      screen.getByText('Actions').addEventListener('focus', onFocus);
+
+      await user.pointer({ keys: '[MouseLeft>]', target: screen.getByText('Actions') });
+
+      expect(onFocus).toHaveBeenCalled();
+      expect(screen.getByText('Cut')).toBeInTheDocument();
+    });
+
     it('closes on trigger click when open', async () => {
       const user = userEvent.setup();
       render(
