@@ -22,4 +22,6 @@ add its config plugin alongside `@clerk/expo` in your app config:
 
 then rebuild your native app. `@clerk/expo/native` keeps working and re-exports the components from `@clerk/expo-native-components`, which you can also import from directly. Without `@clerk/expo-native-components` installed, rendering a component from `@clerk/expo/native` throws an error explaining how to install it.
 
+`useBiometricCredentials().reverify()` also runs through Clerk's native SDK and now requires `@clerk/expo-native-components`. Enrollment and sign-in only need `@clerk/expo-biometrics`.
+
 The `keychainService` and `theme` config plugin options now belong to the `@clerk/expo-native-components` plugin. The `@clerk/expo` plugin forwards them when `@clerk/expo-native-components` is installed, and warns otherwise.

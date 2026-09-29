@@ -222,7 +222,7 @@ test('rejects completion if the active session changes while refreshing its toke
   expect(clerk.setActive).not.toHaveBeenCalled();
 });
 
-test('explains the missing reverification method in older @clerk/expo builds', async () => {
+test('explains the missing reverification method in older @clerk/expo-native-components builds', async () => {
   const reverify = mocks.nativeModule.reverifyWithBiometrics;
   Object.assign(mocks.nativeModule, { reverifyWithBiometrics: undefined });
   try {
@@ -233,12 +233,12 @@ test('explains the missing reverification method in older @clerk/expo builds', a
   }
 });
 
-test('explains that reverification requires a development build', async () => {
+test('explains how to install @clerk/expo-native-components', async () => {
   mocks.isNativeModuleInstalled = false;
   try {
     const { result } = renderHook(useIosBiometrics);
     await expect(result.current.reverify()).rejects.toThrow(
-      'Biometric reverification requires a development build containing a compatible version of @clerk/expo.',
+      'Biometric reverification requires the @clerk/expo-native-components package in a development build. Install it with `npx expo install @clerk/expo-native-components`',
     );
   } finally {
     mocks.isNativeModuleInstalled = true;
