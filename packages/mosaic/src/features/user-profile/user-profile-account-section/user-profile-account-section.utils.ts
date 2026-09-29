@@ -6,6 +6,23 @@ export function isAttributeAvailable(attribute: AttributeData | undefined): bool
   return Boolean(attribute?.enabled || attribute?.used_for_first_factor || attribute?.used_for_second_factor);
 }
 
+export interface UserProfileContactAccess {
+  show: boolean;
+  canCreate: boolean;
+  canRemove: boolean;
+}
+
+export function toContactAccess(
+  attribute: AttributeData | undefined,
+  count: number,
+  canAddIdentifications: boolean,
+): UserProfileContactAccess {
+  const available = isAttributeAvailable(attribute);
+  const mutable = available && !attribute?.immutable;
+  const canCreate = mutable && canAddIdentifications;
+  return { show: available && (canCreate || count > 0), canCreate, canRemove: mutable };
+}
+
 type Identification = { id: string; verification: Pick<VerificationResource, 'status' | 'expireAt'> };
 
 export function sortByVerification<T extends Identification>(items: T[], primaryId: string | null): T[] {

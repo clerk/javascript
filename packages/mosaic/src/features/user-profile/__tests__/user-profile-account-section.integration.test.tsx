@@ -36,6 +36,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
             username: { enabled: true, required: false },
           },
           usernameSettings: { min_length: 4, max_length: 64 },
+          enterpriseSSO: { enabled: false },
         },
       },
     }),

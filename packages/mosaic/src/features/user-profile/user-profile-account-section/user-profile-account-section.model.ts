@@ -19,7 +19,7 @@ import type {
   UserProfileNameAttribute,
   UserProfilePhoneVerifier,
 } from './user-profile-account-section.types';
-import { isAttributeAvailable, toContacts } from './user-profile-account-section.utils';
+import { isAttributeAvailable, toContactAccess, toContacts } from './user-profile-account-section.utils';
 import type { UserProfileAccountSectionViewProps } from './user-profile-account-section.view';
 import type { UserProfileAddEmailField } from './user-profile-add-email.controller';
 import type { UserProfileAddPhoneField } from './user-profile-add-phone.controller';
@@ -168,13 +168,10 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
   const usernameImmutable = Boolean(usernameAttribute?.immutable);
   const showUsername = isAttributeAvailable(usernameAttribute) && !(usernameImmutable && !user.username);
   const nameManagedBy = toManagedBy(user.enterpriseAccounts.find(account => account.active));
-  const showEmails = isAttributeAvailable(attributes.email_address);
-  const emailsImmutable = Boolean(attributes.email_address?.immutable);
-  const canCreateEmail = showEmails && !emailsImmutable && canAddIdentifications(user, enterpriseSSO.enabled);
+  const canAddMore = canAddIdentifications(user, enterpriseSSO.enabled);
+  const emailAccess = toContactAccess(attributes.email_address, user.emailAddresses.length, canAddMore);
+  const phoneAccess = toContactAccess(attributes.phone_number, user.phoneNumbers.length, canAddMore);
   const verifiesEmailByLink = Boolean(attributes.email_address?.verifications.includes('email_link'));
-  const showPhones = isAttributeAvailable(attributes.phone_number);
-  const phonesImmutable = Boolean(attributes.phone_number?.immutable);
-  const canCreatePhone = showPhones && !phonesImmutable && canAddIdentifications(user, enterpriseSSO.enabled);
   const linkRedirectUrl = verifiesEmailByLink ? verifyRedirectUrl(environment.displayConfig.userProfileUrl) : undefined;
   const verifierFor = (email: EmailAddressResource) => toEmailVerifier(email, linkRedirectUrl, router);
 
@@ -190,38 +187,36 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     imageUrl: user.imageUrl,
     hasImage: user.hasImage,
     username: showUsername ? (user.username ?? '') : undefined,
-    emails: showEmails
+    emails: emailAccess.show
       ? toContacts(user.emailAddresses, user.primaryEmailAddressId, email => email.emailAddress)
       : undefined,
-    phones: showPhones
+    phones: phoneAccess.show
       ? toContacts(user.phoneNumbers, user.primaryPhoneNumberId, phone => phone.phoneNumber)
       : undefined,
-    onCreateEmail: canCreateEmail
+    onCreateEmail: emailAccess.canCreate
       ? async emailAddress => {
           const request = user.createEmailAddress({ email: emailAddress });
           await save(() => request, ADD_EMAIL_FIELDS);
           return verifierFor(await request);
         }
       : undefined,
-    getEmailVerifier: showEmails ? id => verifierFor(byId(user.emailAddresses, id, 'email address')) : undefined,
-    onSetPrimaryEmail: showEmails ? id => save(() => user.update({ primaryEmailAddressId: id })) : undefined,
-    onRemoveEmail:
-      showEmails && !emailsImmutable
-        ? id => save(() => byId(user.emailAddresses, id, 'email address').destroy())
-        : undefined,
-    onCreatePhone: canCreatePhone
+    getEmailVerifier: emailAccess.show ? id => verifierFor(byId(user.emailAddresses, id, 'email address')) : undefined,
+    onSetPrimaryEmail: emailAccess.show ? id => save(() => user.update({ primaryEmailAddressId: id })) : undefined,
+    onRemoveEmail: emailAccess.canRemove
+      ? id => save(() => byId(user.emailAddresses, id, 'email address').destroy())
+      : undefined,
+    onCreatePhone: phoneAccess.canCreate
       ? async phoneNumber => {
           const request = user.createPhoneNumber({ phoneNumber });
           await save(() => request, ADD_PHONE_FIELDS);
           return toPhoneVerifier(await request);
         }
       : undefined,
-    getPhoneVerifier: showPhones ? id => toPhoneVerifier(byId(user.phoneNumbers, id, 'phone number')) : undefined,
-    onSetPrimaryPhone: showPhones ? id => save(() => user.update({ primaryPhoneNumberId: id })) : undefined,
-    onRemovePhone:
-      showPhones && !phonesImmutable
-        ? id => save(() => byId(user.phoneNumbers, id, 'phone number').destroy())
-        : undefined,
+    getPhoneVerifier: phoneAccess.show ? id => toPhoneVerifier(byId(user.phoneNumbers, id, 'phone number')) : undefined,
+    onSetPrimaryPhone: phoneAccess.show ? id => save(() => user.update({ primaryPhoneNumberId: id })) : undefined,
+    onRemovePhone: phoneAccess.canRemove
+      ? id => save(() => byId(user.phoneNumbers, id, 'phone number').destroy())
+      : undefined,
     onProfilePictureChange: file => save(() => user.setProfileImage({ file })),
     onRemoveProfilePicture: user.hasImage ? () => save(() => user.setProfileImage({ file: null })) : undefined,
     onSubmitName: nameManagedBy

@@ -164,3 +164,29 @@ describe('the user profile phone numbers', () => {
     expect(screen.queryByRole('menuitem', { name: 'Remove phone number' })).not.toBeInTheDocument();
   });
 });
+
+describe('a contact row the user cannot add to', () => {
+  it('is left out when it has nothing to list', async () => {
+    await renderSection({
+      environment: fapiEnvironment({
+        attributes: {
+          email_address: { enabled: true, immutable: true },
+          phone_number: { enabled: true, immutable: true },
+        },
+      }),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+    });
+
+    expect(screen.queryByRole('group', { name: 'Email' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Phone' })).not.toBeInTheDocument();
+  });
+});
+
+describe('reverification', () => {
+  it.todo('confirms it is the user before an email address is added, then adds it');
+  it.todo('confirms it is the user before an email address becomes the primary one');
+  it.todo('confirms it is the user before a phone number is added, then adds it');
+  it.todo('confirms it is the user before a phone number becomes the primary one');
+  it.todo('confirms it is the user before the username changes');
+  it.todo('leaves the add dialog open and untouched when the confirmation is dismissed');
+});
