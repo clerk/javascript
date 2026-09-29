@@ -78,6 +78,12 @@ export function HandleSSOCallback(props: HandleSSOCallbackProps): ReactNode {
       // Prevent re-running this effect if the page is re-rendered during session activation (such as on Next.js).
       hasRun.current = true;
 
+      try {
+        await clerk.__internal_resolvePendingProtectCheck?.();
+      } catch {
+        return navigateToSignIn();
+      }
+
       // If this was a sign-in, and it's complete, there's nothing else to do.
       // Note: We perform a cast here to prevent TypeScript from narrowing the type of signIn.status. TypeScript
       // doesn't understand that the status can be mutated during the execution of this function.

@@ -69,6 +69,8 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
+import { ProtectCheckGate } from '../protectCheckGate';
+import type { BaseMutateParams } from './internal';
 import { BaseResource, SignUpVerifications } from './internal';
 
 declare global {
@@ -527,6 +529,10 @@ export class SignUp extends BaseResource implements SignUpResource {
       })(password, cb);
     }
   };
+
+  protected _afterMutate({ action }: BaseMutateParams): Promise<void> {
+    return ProtectCheckGate.getInstance().resolve(SignUp.clerk, 'signUp', this, action);
+  }
 
   protected fromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
     if (data) {

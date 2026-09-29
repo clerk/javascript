@@ -1649,6 +1649,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     }
   };
 
+  __internal_resolvePendingProtectCheck = async (): Promise<void> => {
+    await this.clerkjs?.__internal_resolvePendingProtectCheck?.();
+  };
+
   __internal_resumeAfterProtectCheck = async (
     params?: ResumeAfterProtectCheckParams,
     customNavigate?: (to: string) => Promise<unknown>,

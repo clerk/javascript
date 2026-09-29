@@ -18,6 +18,7 @@ import { restoreDocument, setDocumentVisibilityState } from '@/test/document-hel
 import { mockNativeRuntime } from '../../test/utils';
 import { Clerk } from '../clerk';
 import { eventBus, events } from '../events';
+import { ProtectCheckGate } from '../protectCheckGate';
 import type { DisplayConfig, Organization } from '../resources/internal';
 import { BaseResource, Client, Environment, SignIn, SignUp } from '../resources/internal';
 
@@ -3186,6 +3187,49 @@ describe('Clerk singleton', () => {
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/protect-check');
       });
     });
+
+    it('owns both Protect flows while it routes a callback', async () => {
+      const release = vi.fn();
+      const register = vi.spyOn(ProtectCheckGate.prototype, 'register').mockReturnValue(release);
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+          onWindowLocationHost: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({ signedInSessions: [], signIn: new SignIn(null), signUp: new SignUp(null) }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      await sut.handleRedirectCallback();
+
+      expect(register).toHaveBeenCalledWith(['signIn', 'signUp']);
+      expect(release).toHaveBeenCalledTimes(1);
+      register.mockRestore();
+    });
+
+    it('releases its Protect claim when routing a callback throws', async () => {
+      const release = vi.fn();
+      const register = vi.spyOn(ProtectCheckGate.prototype, 'register').mockReturnValue(release);
+      mockEnvironmentFetch.mockReturnValue(Promise.resolve({ authConfig: {}, userSettings: mockUserSettings }));
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({ signedInSessions: [], signIn: new SignIn(null), signUp: new SignUp(null) }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      await expect(sut.handleRedirectCallback()).rejects.toThrow();
+
+      expect(release).toHaveBeenCalledTimes(1);
+      register.mockRestore();
+    });
   });
 
   describe('.handleEmailLinkVerification()', () => {
@@ -4002,6 +4046,118 @@ describe('Clerk singleton', () => {
         expect(result?.isEnabled).toBe(true);
         expect(__internal_openEnableOrganizationsPromptSpy).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('protect check modal', () => {
+    beforeEach(() => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => true,
+          isDevelopmentOrStaging: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+        }),
+      );
+    });
+
+    const gatedSignIn = () => ({
+      protectCheck: { status: 'pending', token: 'tok', sdkUrl: 'https://p.example.com/sdk.js' },
+    });
+
+    it('resolves at once when Clerk was loaded without UI components', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await expect(sut.__internal_openProtectCheckModal({ resource: gatedSignIn() as any })).resolves.toBeUndefined();
+    });
+
+    it('resolves at once and leaves the gate when the UI predates the Protect modal', async () => {
+      const openModal = vi.fn();
+      const mockClerkUICtor = vi.fn(function () {
+        return { ensureMounted: () => Promise.resolve({ openModal, closeModal: vi.fn() }) };
+      });
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      const resource = gatedSignIn() as any;
+
+      await expect(sut.__internal_openProtectCheckModal({ resource })).resolves.toBeUndefined();
+      expect(openModal).not.toHaveBeenCalled();
+      expect(resource.protectCheck).not.toBeNull();
+    });
+
+    it('opens the modal and resolves once the modal reports the gate cleared', async () => {
+      const openProtectCheckModal = vi.fn();
+      const closeModal = vi.fn();
+      const mockClerkUICtor = vi.fn(function () {
+        return { ensureMounted: () => Promise.resolve({ openProtectCheckModal, closeModal }) };
+      });
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      const resource = gatedSignIn() as any;
+
+      let settled = false;
+      const pending = sut.__internal_openProtectCheckModal({ resource }).then(() => {
+        settled = true;
+      });
+      await vi.waitFor(() => expect(openProtectCheckModal).toHaveBeenCalled());
+      expect(openProtectCheckModal).toHaveBeenCalledWith({
+        resource,
+        onResolved: expect.any(Function),
+        onFailed: expect.any(Function),
+      });
+      expect(settled).toBe(false);
+
+      openProtectCheckModal.mock.calls[0][0].onResolved();
+      await pending;
+      expect(closeModal).toHaveBeenCalledWith('protectCheck');
+      expect(settled).toBe(true);
+    });
+
+    it('closes the modal and rejects with the error the modal reports', async () => {
+      const openProtectCheckModal = vi.fn();
+      const closeModal = vi.fn();
+      const mockClerkUICtor = vi.fn(function () {
+        return { ensureMounted: () => Promise.resolve({ openProtectCheckModal, closeModal }) };
+      });
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      const blocked = new Error('blocked');
+
+      const pending = sut.__internal_openProtectCheckModal({ resource: gatedSignIn() as any });
+      await vi.waitFor(() => expect(openProtectCheckModal).toHaveBeenCalled());
+      openProtectCheckModal.mock.calls[0][0].onFailed(blocked);
+
+      await expect(pending).rejects.toBe(blocked);
+      expect(closeModal).toHaveBeenCalledWith('protectCheck');
+    });
+
+    it('resolves gates the client carries on its sign-in and sign-up', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.__internal_resolvePendingProtectCheck();
+
+      expect(resolve).toHaveBeenCalledWith(sut, 'signIn', sut.client?.signIn);
+      expect(resolve).toHaveBeenCalledWith(sut, 'signUp', sut.client?.signUp);
+      resolve.mockRestore();
+    });
+
+    it('registers prebuilt handlers with the gate', () => {
+      const release = vi.fn();
+      const register = vi.spyOn(ProtectCheckGate.prototype, 'register').mockReturnValue(release);
+      const sut = new Clerk(productionPublishableKey);
+
+      expect(sut.__internal_registerProtectCheckHandler(['signUp'])).toBe(release);
+      expect(register).toHaveBeenCalledWith(['signUp']);
+      register.mockRestore();
     });
   });
 
