@@ -11,7 +11,7 @@ import type { DestructiveControlledProps, DestructiveHandleProps } from './destr
 import { Destructive } from './destructive';
 
 vi.mock('../../features/reverification', () => ({
-  Reverification: ({ phase }: { phase: string }) => <output data-testid='reverification'>{phase}</output>,
+  Reverification: ({ status }: { status: string }) => <output data-testid='reverification'>{status}</output>,
 }));
 
 function renderBlock(overrides: Partial<DestructiveControlledProps> = {}) {
@@ -35,18 +35,15 @@ function renderBlock(overrides: Partial<DestructiveControlledProps> = {}) {
 const confirmButton = () => screen.getByRole('button', { name: 'Delete account' });
 const startingReverification = {
   status: 'loading' as const,
-  phase: 'active' as const,
   onCancel: vi.fn(),
 };
 
-function readyReverification(phase: 'active' | 'retrying'): ReverificationController {
-  return {
-    status: 'ready',
-    phase,
-    step: 'password',
+function readyReverification(status: 'ready' | 'retrying'): ReverificationController {
+  const view = {
+    step: 'password' as const,
     value: '',
     onValueChange: () => {},
-    isPending: phase === 'retrying',
+    isPending: status === 'retrying',
     onSubmit: () => {},
     onShowMethods: () => {},
     onShowHelp: () => {},
@@ -57,6 +54,7 @@ function readyReverification(phase: 'active' | 'retrying'): ReverificationContro
     methods: [],
     onSelectMethod: () => {},
   };
+  return status === 'retrying' ? { status, ...view } : { status, ...view };
 }
 
 describe('Destructive', () => {
@@ -184,12 +182,12 @@ describe('Destructive', () => {
   });
 
   it('shows reverification in the same dialog and card', () => {
-    renderBlock({ isDeleting: true, reverification: readyReverification('active') });
+    renderBlock({ isDeleting: true, reverification: readyReverification('ready') });
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
     expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
     expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
-    expect(screen.getByTestId('reverification')).toHaveTextContent('active');
+    expect(screen.getByTestId('reverification')).toHaveTextContent('ready');
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
   });
 
@@ -237,7 +235,7 @@ describe('Destructive', () => {
         <Destructive
           {...props}
           errorMessage='Delete failed.'
-          reverification={{ status: 'idle', phase: 'inactive' }}
+          reverification={{ status: 'idle' }}
         />
       </MosaicProvider>,
     );

@@ -9,12 +9,11 @@ import { Reverification } from '../reverification';
 import type { ReverificationController } from '../reverification.controller';
 import type { ReverificationViewProps } from '../reverification.types';
 
-let controller: ReverificationController = { status: 'idle', phase: 'inactive' };
+let controller: ReverificationController = { status: 'idle' };
 
 function surface(overrides: Partial<ReverificationViewProps> = {}): ReverificationController {
   return {
     status: 'ready',
-    phase: 'active',
     step: 'password',
     value: '',
     onValueChange: vi.fn(),
@@ -75,7 +74,7 @@ function Nested({ step }: { step: 'confirm' | 'verify' | 'finalizing' }) {
 
 describe('reverification inside an outer flow', () => {
   it('keeps one dialog and one card, and nests a flow only while verifying', () => {
-    controller = { status: 'idle', phase: 'inactive' };
+    controller = { status: 'idle' };
     const { rerender } = render(<Nested step='confirm' />);
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
@@ -84,7 +83,7 @@ describe('reverification inside an outer flow', () => {
     expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'confirm');
     expect(screen.getByText('Confirm the mock delete.')).toBeInTheDocument();
 
-    controller = { status: 'loading', phase: 'active' };
+    controller = { status: 'loading' };
     rerender(<Nested step='verify' />);
 
     const flows = document.querySelectorAll('.cl-flow-root');
@@ -110,7 +109,7 @@ describe('reverification inside an outer flow', () => {
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
     expect(screen.queryByText('Confirm the mock delete.')).not.toBeInTheDocument();
 
-    controller = { status: 'idle', phase: 'inactive' };
+    controller = { status: 'idle' };
     rerender(<Nested step='finalizing' />);
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
@@ -127,7 +126,7 @@ describe('reverification inside an outer flow', () => {
     expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
 
-    controller = { status: 'idle', phase: 'inactive' };
+    controller = { status: 'idle' };
     rerender(<Nested step='verify' />);
 
     expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
@@ -151,7 +150,7 @@ describe('reverification inside an outer flow', () => {
 
 describe('reverification card states', () => {
   it('keeps one card from the pending state through a factor', () => {
-    controller = { status: 'loading', phase: 'active' };
+    controller = { status: 'loading' };
     const { container, rerender } = render(
       <MosaicProvider>
         <Card.Root renderBranding={false}>
@@ -185,7 +184,7 @@ describe('reverification card states', () => {
   });
 
   it('shows a dismiss button on the pending card inside a dialog', () => {
-    controller = { status: 'loading', phase: 'active' };
+    controller = { status: 'loading' };
     render(
       <MosaicProvider>
         <Dialog.Root open>
@@ -204,7 +203,7 @@ describe('reverification card states', () => {
   });
 
   it('renders unavailable outside the factor flow, then mounts that flow in the same card', () => {
-    controller = { status: 'unavailable', phase: 'active' };
+    controller = { status: 'unavailable' };
     const { container, rerender } = render(
       <MosaicProvider>
         <Card.Root renderBranding={false}>

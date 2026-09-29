@@ -66,8 +66,8 @@ export function useDestructiveController({
       }
     },
     onOpenChange: nextIsOpen => {
-      const pendingForReverification = reverification?.phase === 'active';
-      if (!nextIsOpen && isDeleting && !pendingForReverification) {
+      const canCancel = Boolean(reverification?.onCancel);
+      if (!nextIsOpen && isDeleting && !canCancel) {
         return;
       }
 

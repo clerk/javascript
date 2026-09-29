@@ -6,7 +6,7 @@ import type { ReverificationController } from '../../features/reverification';
 import { deferred } from '../../machines/__tests__/test-utils';
 import { useDestructiveController } from './destructive.controller';
 
-const idleReverification = { status: 'idle', phase: 'inactive' } as ReverificationController;
+const idleReverification = { status: 'idle' } as ReverificationController;
 
 describe('useDestructiveController', () => {
   it('starts closed and opens from the opener or from onOpenChange', () => {
@@ -119,7 +119,7 @@ describe('useDestructiveController', () => {
     const { result } = renderHook(() =>
       useDestructiveController({
         onDelete: () => new Promise(() => {}),
-        reverification: { status: 'ready', phase: 'active' } as ReverificationController,
+        reverification: { status: 'ready', onCancel: vi.fn() } as ReverificationController,
       }),
     );
     act(() => result.current.onOpenChange(true));
@@ -136,7 +136,7 @@ describe('useDestructiveController', () => {
     const { result } = renderHook(() =>
       useDestructiveController({
         onDelete: () => new Promise(() => {}),
-        reverification: { status: 'ready', phase: 'retrying' } as ReverificationController,
+        reverification: { status: 'retrying' } as ReverificationController,
       }),
     );
     act(() => result.current.onOpenChange(true));

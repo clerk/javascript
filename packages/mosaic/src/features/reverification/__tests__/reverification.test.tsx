@@ -5,7 +5,7 @@ import { Reverification } from '../reverification';
 import type { ReverificationController } from '../reverification.controller';
 import type { ReverificationViewProps } from '../reverification.types';
 
-let controller: ReverificationController = { status: 'idle', phase: 'inactive' };
+let controller: ReverificationController = { status: 'idle' };
 
 vi.mock('../reverification.view', () => ({
   ReverificationPending: () => <output data-testid='pending' />,
@@ -16,7 +16,6 @@ vi.mock('../reverification.view', () => ({
 function ready(overrides: Partial<ReverificationViewProps> = {}): ReverificationController {
   return {
     status: 'ready',
-    phase: 'active',
     step: 'password',
     value: '',
     onValueChange: vi.fn(),
@@ -36,18 +35,18 @@ function ready(overrides: Partial<ReverificationViewProps> = {}): Reverification
 
 describe('Reverification', () => {
   it('renders nothing while reverification is inactive', () => {
-    controller = { status: 'idle', phase: 'inactive' };
+    controller = { status: 'idle' };
     const { container } = render(<Reverification {...controller} />);
     expect(container).toBeEmptyDOMElement();
   });
 
   it('renders pending, unavailable, or the factor view', () => {
-    controller = { status: 'loading', phase: 'active' };
+    controller = { status: 'loading' };
     const { rerender } = render(<Reverification {...controller} />);
     expect(screen.getByTestId('pending')).toBeInTheDocument();
     expect(screen.queryByTestId('view')).not.toBeInTheDocument();
 
-    controller = { status: 'unavailable', phase: 'active' };
+    controller = { status: 'unavailable' };
     rerender(<Reverification {...controller} />);
     expect(screen.getByTestId('unavailable')).toBeInTheDocument();
     expect(screen.queryByTestId('view')).not.toBeInTheDocument();
@@ -62,7 +61,7 @@ describe('Reverification', () => {
     const { rerender } = render(<Reverification {...controller} />);
     expect(screen.getByTestId('view')).toHaveTextContent('password');
 
-    controller = { status: 'idle', phase: 'inactive' };
+    controller = { status: 'idle' };
     rerender(<Reverification {...controller} />);
     expect(screen.queryByTestId('view')).not.toBeInTheDocument();
   });
