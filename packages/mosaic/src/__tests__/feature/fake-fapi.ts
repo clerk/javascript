@@ -1,9 +1,12 @@
+import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type {
   ApiKeyJSON,
   ClientJSON,
+  OAuthProvider,
   OrganizationMembershipJSON,
   OrganizationSuggestionJSON,
   SessionJSON,
+  UserJSON,
   UserOrganizationInvitationJSON,
 } from '@clerk/shared/types';
 import { http, HttpResponse, type JsonBodyType } from 'msw';
@@ -20,10 +23,12 @@ import {
   fapiClient,
   type FapiEnvironment,
   fapiEnvironment,
+  fapiExternalAccount,
   fapiMembership,
   fapiOrganization,
   fapiPage,
   fapiToken,
+  fapiVerification,
 } from './fapi';
 
 export const PUBLISHABLE_KEY = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
@@ -88,6 +93,17 @@ function error(code: string, status = 400) {
   return HttpResponse.json({ errors: [{ code, message: code, long_message: code }] }, { status });
 }
 
+function activeUser(state: FakeFapiState): UserJSON | undefined {
+  return findSession(state, state.client.last_active_session_id)?.user;
+}
+
+function updateUser(state: FakeFapiState, user: UserJSON): void {
+  state.client = {
+    ...state.client,
+    sessions: state.client.sessions.map(session => (session.user.id === user.id ? { ...session, user } : session)),
+  };
+}
+
 function missing() {
   return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
 }
@@ -110,6 +126,66 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     ...verificationHandlers(state, fapiUrl),
     http.get(fapiUrl('/v1/environment'), () => HttpResponse.json(state.environment)),
     http.get(fapiUrl('/v1/client'), () => envelope(state.client, null)),
+    http.get(fapiUrl('/v1/me'), () => {
+      const user = activeUser(state);
+      return user ? envelope(user, state.client) : missing();
+    }),
+    http.post(fapiUrl('/v1/me/external_accounts'), async ({ request }) => {
+      const user = activeUser(state);
+      if (!user) {
+        return missing();
+      }
+      const body = new URLSearchParams(await request.text());
+      const strategy = body.get('strategy');
+      if (!strategy) {
+        return missing();
+      }
+      const provider: OAuthProvider | undefined = OAUTH_PROVIDERS.find(item => item.strategy === strategy)?.provider;
+      if (!provider) {
+        return missing();
+      }
+      const account = fapiExternalAccount({
+        id: `idn_${provider}`,
+        provider,
+        verification: fapiVerification({
+          status: 'unverified',
+          strategy,
+          external_verification_redirect_url: 'https://accounts.example/authorize',
+        }),
+      });
+      return envelope(account, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/external_accounts/:id/reauthorize'), ({ params, request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
+        return undefined;
+      }
+      const account = activeUser(state)?.external_accounts.find(item => item.id === params.id);
+      return account
+        ? envelope(
+            {
+              ...account,
+              verification: fapiVerification({
+                status: 'unverified',
+                strategy: `oauth_${account.provider}`,
+                external_verification_redirect_url: 'https://accounts.example/consent',
+              }),
+            },
+            state.client,
+          )
+        : missing();
+    }),
+    http.post(fapiUrl('/v1/me/external_accounts/:id'), ({ params, request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
+        return undefined;
+      }
+      const user = activeUser(state);
+      const account = user?.external_accounts.find(item => item.id === params.id);
+      if (!user || !account) {
+        return missing();
+      }
+      updateUser(state, { ...user, external_accounts: user.external_accounts.filter(item => item.id !== account.id) });
+      return envelope({ ...account, object: 'external_account' }, state.client);
+    }),
     http.post(fapiUrl('/v1/client/sessions/:id/tokens'), ({ params }) => {
       const session = findSession(state, params.id);
       return session

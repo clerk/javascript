@@ -9,6 +9,7 @@ import type {
   EmailAddressJSON,
   EnterpriseAccountJSON,
   EnvironmentJSON,
+  ExternalAccountJSON,
   OAuthProviders,
   OrganizationJSON,
   OrganizationMembershipJSON,
@@ -231,6 +232,80 @@ export function fapiEmailAddress(
     verification: null,
     linked_to: [],
     matches_sso_connection: false,
+    ...overrides,
+  };
+}
+
+export function fapiExternalAccount(
+  overrides: Partial<ExternalAccountJSON> & Pick<ExternalAccountJSON, 'id' | 'provider'>,
+): ExternalAccountJSON {
+  return {
+    object: 'external_account',
+    identification_id: overrides.id,
+    provider_user_id: 'provider_user_1',
+    approved_scopes: 'email',
+    email_address: `${overrides.provider}@example.com`,
+    first_name: '',
+    last_name: '',
+    image_url: '',
+    username: '',
+    phone_number: '',
+    public_metadata: {},
+    label: '',
+    verification: fapiVerification({ strategy: `oauth_${overrides.provider}` }),
+    ...overrides,
+  };
+}
+
+export function fapiVerification(
+  overrides: Partial<VerificationJSON> & Pick<VerificationJSON, 'strategy'>,
+): VerificationJSON {
+  return {
+    object: 'verification',
+    id: 'verification_1',
+    status: 'verified',
+    verified_at_client: '',
+    attempts: 0,
+    expire_at: Date.UTC(2100, 0, 1),
+    error: { code: '', message: '', long_message: '' },
+    ...overrides,
+  };
+}
+
+export function fapiEnterpriseAccount(
+  overrides: Partial<EnterpriseAccountJSON> & Pick<EnterpriseAccountJSON, 'id'>,
+): EnterpriseAccountJSON {
+  return {
+    object: 'enterprise_account',
+    active: true,
+    email_address: 'sso@example.com',
+    enterprise_connection: {
+      object: 'enterprise_connection',
+      id: 'sso_1',
+      active: true,
+      allow_idp_initiated: false,
+      allow_subdomains: false,
+      disable_additional_identifications: true,
+      domain: 'example.com',
+      logo_public_url: null,
+      name: 'Company SSO',
+      protocol: 'saml',
+      provider: 'saml_okta',
+      sync_user_attributes: false,
+      allow_organization_account_linking: false,
+      created_at: createdAt,
+      updated_at: createdAt,
+      enterprise_connection_id: 'sso_1',
+    },
+    first_name: null,
+    last_name: null,
+    protocol: 'saml',
+    provider: 'saml_okta',
+    provider_user_id: null,
+    public_metadata: {},
+    verification: null,
+    last_authenticated_at: null,
+    enterprise_connection_id: 'sso_1',
     ...overrides,
   };
 }
