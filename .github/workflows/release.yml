@@ -130,7 +130,6 @@ jobs:
 
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'
-        continue-on-error: true
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           result-encoding: string
@@ -148,7 +147,7 @@ jobs:
               const targets = [
                 { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
                 { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
-                { repo: 'clerk', workflow_id: 'docs-typedoc.yml' },
+                { repo: 'clerk', workflow_id: 'docs-typedoc.yml', inputs: { javascript_ref: context.sha } },
               ];
               const results = await Promise.allSettled(
                 targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
@@ -171,7 +170,6 @@ jobs:
       # if the packages are already live.
       - name: Recover downstream notifications
         if: always() && steps.changesets.conclusion == 'failure'
-        continue-on-error: true
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           result-encoding: string
@@ -230,7 +228,7 @@ jobs:
             const targets = [
               { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
               { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
-              { repo: 'clerk', workflow_id: 'docs-typedoc.yml' },
+              { repo: 'clerk', workflow_id: 'docs-typedoc.yml', inputs: { javascript_ref: context.sha } },
             ];
             const results = await Promise.allSettled(
               targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
