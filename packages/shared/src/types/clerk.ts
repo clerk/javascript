@@ -342,6 +342,23 @@ export interface Clerk {
    */
   __internal_protectChallengeLoadTimeoutMs?: number;
 
+  /**
+   * Registers a prebuilt component that renders Protect challenges itself for the given flows, so
+   * clerk-js leaves a pending `protect_check` on those resources instead of opening its own modal.
+   * Returns the unregister function.
+   *
+   * @internal
+   */
+  __internal_registerProtectCheckHandler?: (flows: ProtectCheckFlow[]) => () => void;
+
+  /**
+   * Resolves a pending `protect_check` on the client's current sign-in or sign-up through Clerk's
+   * Protect modal. Callback pages need it because the gate arrives with the client, not on a request.
+   *
+   * @internal
+   */
+  __internal_resolvePendingProtectCheck?: () => Promise<void>;
+
   frontendApi: string;
 
   /** Your Clerk [Publishable Key](!publishable-key). */
@@ -1978,6 +1995,14 @@ export type __internal_UserVerificationProps = RoutingOptions & {
 };
 
 export type __internal_UserVerificationModalProps = WithoutRouting<__internal_UserVerificationProps>;
+
+export type ProtectCheckFlow = 'signIn' | 'signUp';
+
+export type __internal_ProtectCheckModalProps = {
+  resource: SignInResource | SignUpResource;
+  onResolved: () => void;
+  onFailed: (error: Error) => void;
+};
 
 export type __internal_EnableOrganizationsPromptProps = {
   onSuccess?: () => void;
