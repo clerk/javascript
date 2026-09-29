@@ -144,7 +144,7 @@ describe('useReverificationWithState', () => {
 
     retry.reject(new Error('Mock delete failed.'));
     await act(async () => {
-      await expect(pending).rejects.toThrow('Mock delete failed.');
+      await expect(pending).rejects.toMatchObject({ message: 'Mock delete failed.' });
     });
     await waitFor(() => expect(result.current[1]).toEqual({ phase: 'inactive' }));
     expect(challengeCancel).not.toHaveBeenCalled();
