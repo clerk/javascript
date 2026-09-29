@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
-import { sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
+import { sectionHeaderDescriptionMarker, sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
 
 const compact = '@container cl-section (width < 26rem)';
 
@@ -46,7 +46,11 @@ export const styles = stylex.create({
   },
   headerActions: {
     gridColumn: '2',
-    gridRow: '1',
+    gridRowEnd: {
+      default: 'auto',
+      [stylex.when.siblingBefore(':where(*)', sectionHeaderDescriptionMarker)]: 'span 2',
+    },
+    gridRowStart: '1',
   },
   body: {
     marginInline: space['4'],

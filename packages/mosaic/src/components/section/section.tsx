@@ -12,7 +12,7 @@ import { reset } from '../../utils/reset.styles';
 import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
-import { sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
+import { sectionHeaderDescriptionMarker, sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
 import { styles } from './section.styles';
 
 export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
@@ -116,7 +116,7 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
       ref={ref}
       id={id}
       level={level}
-      size='sm'
+      size='base'
       xstyle={[styles.title, xstyle]}
       {...mergeStyleProps(themeProps('section-title'), rest)}
     />
@@ -240,7 +240,13 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
     ref,
     props: mergeStyleProps(
       themeProps('section-description'),
-      stylex.props(reset.base, styles.description, inHeader && styles.headerDescription, xstyle),
+      stylex.props(
+        reset.base,
+        styles.description,
+        inHeader && styles.headerDescription,
+        inHeader && sectionHeaderDescriptionMarker,
+        xstyle,
+      ),
       rest,
     ),
   });
