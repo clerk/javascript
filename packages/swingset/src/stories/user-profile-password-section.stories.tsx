@@ -64,20 +64,6 @@ export function ManagedByEnterprise() {
   );
 }
 
-export function ManagedByEnterpriseLongName() {
-  return (
-    <div style={{ width: 320, maxWidth: '100%' }}>
-      <UserProfilePasswordSectionView
-        hasPassword
-        managedBy={{
-          name: 'Acme International Enterprise Identity and Access Management Production Organization',
-          iconUrl: oktaIcon,
-        }}
-      />
-    </div>
-  );
-}
-
 /** The first save shows field and form errors; retrying succeeds. */
 export function EditPasswordFails() {
   return (
