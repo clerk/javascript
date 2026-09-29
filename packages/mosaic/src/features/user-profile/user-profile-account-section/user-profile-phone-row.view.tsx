@@ -81,7 +81,6 @@ export function UserProfilePhoneRowView({
   const primary = useUserProfileSetPrimaryController({
     items: phones,
     onSetPrimary: onSetPrimaryPhone,
-    fallbackError: m.phone.primaryError,
   });
 
   const removePhone = (id: string) => {

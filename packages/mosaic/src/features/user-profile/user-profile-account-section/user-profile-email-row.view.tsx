@@ -102,7 +102,6 @@ export function UserProfileEmailRowView({
   const primary = useUserProfileSetPrimaryController({
     items: emails,
     onSetPrimary: onSetPrimaryEmail,
-    fallbackError: m.email.primaryError,
   });
 
   const removeEmail = (id: string) => {

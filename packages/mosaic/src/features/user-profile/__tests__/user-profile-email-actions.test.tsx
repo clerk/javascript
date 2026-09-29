@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
+import { SaveError } from '../../../utils/form-error';
 import type { UserProfileAccountSectionViewProps } from '../user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '../user-profile-account-section/user-profile-account-section.view';
 
@@ -79,15 +80,28 @@ describe('email actions', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add email' })).toHaveFocus());
   });
 
-  it('shows a primary update error without opening a dialog', async () => {
+  it('shows why the primary update failed, without opening a dialog', async () => {
     const user = userEvent.setup();
-    const onSetPrimaryEmail = vi.fn().mockRejectedValue(new Error('Unable to update primary email.'));
+    const onSetPrimaryEmail = vi.fn().mockRejectedValue(new SaveError({ global: { message: 'Not verified yet.' } }));
     renderEmail({ onSetPrimaryEmail });
     await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryEmail).toHaveBeenCalledExactlyOnceWith('email_1');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to update primary email.');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Not verified yet.');
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('shows the generic message and logs a primary update that threw unexpectedly', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+    const failure = new TypeError('boom');
+    const onSetPrimaryEmail = vi.fn().mockRejectedValue(failure);
+    renderEmail({ onSetPrimaryEmail });
+    await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+    expect(log).toHaveBeenCalledWith(failure);
+    log.mockRestore();
   });
 
   it('keeps removal pending and lets the user retry a failure in the dialog', async () => {

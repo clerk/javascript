@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
+import { SaveError } from '../../../utils/form-error';
 import type { UserProfileAccountSectionViewProps } from '../user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '../user-profile-account-section/user-profile-account-section.view';
 
@@ -210,15 +211,28 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     expect(screen.queryByRole('menuitem', { name: 'Remove phone number' })).not.toBeInTheDocument();
   });
-  it('shows a primary update error without opening a dialog', async () => {
+  it('shows why the primary update failed, without opening a dialog', async () => {
     const user = userEvent.setup();
-    const onSetPrimaryPhone = vi.fn().mockRejectedValue(new Error('Unable to update primary phone.'));
+    const onSetPrimaryPhone = vi.fn().mockRejectedValue(new SaveError({ global: { message: 'Not verified yet.' } }));
     renderPhone({ onSetPrimaryPhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryPhone).toHaveBeenCalledExactlyOnceWith('phone_1');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to update primary phone.');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Not verified yet.');
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+  });
+
+  it('shows the generic message and logs a primary update that threw unexpectedly', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+    const failure = new TypeError('boom');
+    const onSetPrimaryPhone = vi.fn().mockRejectedValue(failure);
+    renderPhone({ onSetPrimaryPhone });
+    await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+    expect(log).toHaveBeenCalledWith(failure);
+    log.mockRestore();
   });
   it('requires confirmation before removing a phone number', async () => {
     const user = userEvent.setup();

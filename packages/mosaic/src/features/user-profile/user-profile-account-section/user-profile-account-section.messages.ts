@@ -54,7 +54,6 @@ export const userProfileAccountSectionMessages = {
     add: 'Add email',
     verify: 'Verify',
     remove: 'Remove email',
-    primaryError: 'Unable to set the primary email address. Try again.',
     removeDialog: {
       title: 'Remove email address?',
       description: '{emailAddress} will be removed from your account.',
@@ -70,7 +69,6 @@ export const userProfileAccountSectionMessages = {
     add: 'Add phone number',
     verify: 'Verify phone number',
     remove: 'Remove phone number',
-    primaryError: 'Unable to set the primary phone number. Try again.',
     removeDialog: {
       title: 'Remove phone number?',
       description: '{phoneNumber} will be removed from your account.',
