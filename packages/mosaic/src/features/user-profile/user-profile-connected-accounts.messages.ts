@@ -12,7 +12,6 @@ export const userProfileConnectedAccountsMessages = {
       '{provider} will be removed from this account. You will no longer be able to use this connected account and any dependent features will no longer work.',
     confirm: 'Remove',
     cancel: 'Cancel',
-    back: 'Back',
   },
   errors: {
     generic: 'Something went wrong. Please try again.',

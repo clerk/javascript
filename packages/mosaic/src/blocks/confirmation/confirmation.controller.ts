@@ -1,5 +1,3 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
-
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
 
@@ -42,17 +40,10 @@ export const confirmationMachine = createMachine({
     pending: {
       invoke: fromPromise(context => context.run(), {
         onDone: { target: 'idle', actions: assign(() => ({ error: undefined })) },
-        onError: [
-          {
-            guard: (_, event) => isReverificationCancelledError(event.error),
-            target: 'confirming',
-            actions: assign(() => ({ error: undefined })),
-          },
-          {
-            target: 'confirming',
-            actions: assign((_, event) => ({ error: toMessage(event.error) })),
-          },
-        ],
+        onError: {
+          target: 'confirming',
+          actions: assign((_, event) => ({ error: toMessage(event.error) })),
+        },
       }),
     },
   },
@@ -66,22 +57,12 @@ export interface ConfirmationController {
   errorMessage: string | undefined;
 }
 
-export function useConfirmationController({
-  onPendingCancel,
-}: { onPendingCancel?: () => void } = {}): ConfirmationController {
+export function useConfirmationController(): ConfirmationController {
   const [snapshot, send] = useMachine(confirmationMachine);
 
   return {
     isOpen: snapshot.value === 'confirming' || snapshot.value === 'pending',
-    onOpenChange: open => {
-      if (open) {
-        send({ type: 'OPEN' });
-      } else if (snapshot.value === 'pending') {
-        onPendingCancel?.();
-      } else {
-        send({ type: 'CANCEL' });
-      }
-    },
+    onOpenChange: open => send({ type: open ? 'OPEN' : 'CANCEL' }),
     onConfirm: run => send({ type: 'CONFIRM', run }),
     isConfirming: snapshot.value === 'pending',
     errorMessage: snapshot.context.error,

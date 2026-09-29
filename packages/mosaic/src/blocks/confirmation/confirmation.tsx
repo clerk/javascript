@@ -1,11 +1,10 @@
-import { type ReactNode, useEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
 
 import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
-import type { DialogFocusTarget, DialogHandle, DialogRootProps, DialogTriggerProps } from '../../components/dialog';
+import type { DialogFocusTarget, DialogHandle, DialogTriggerProps } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
-import { Flow } from '../../components/flow';
 import { type FromPayload, resolveFromPayload as resolve } from '../../utils/resolve-from-payload';
 import { useConfirmationController } from './confirmation.controller';
 
@@ -22,8 +21,6 @@ interface ConfirmationCardProps {
   onConfirm: () => void;
   isConfirming: boolean;
   errorMessage: string | undefined;
-  step?: 'confirm' | 'verify';
-  verificationSlot?: ReactNode;
 }
 
 function ConfirmationCard({
@@ -36,62 +33,7 @@ function ConfirmationCard({
   onConfirm,
   isConfirming,
   errorMessage,
-  step = 'confirm',
-  verificationSlot,
 }: ConfirmationCardProps) {
-  const cancelRef = useRef<HTMLButtonElement>(null);
-  const restoreConfirmationFocus = useRef(false);
-
-  useEffect(() => {
-    if (step === 'verify') {
-      restoreConfirmationFocus.current = true;
-    } else if (restoreConfirmationFocus.current && !isConfirming) {
-      restoreConfirmationFocus.current = false;
-      cancelRef.current?.focus({ preventScroll: true });
-    }
-  }, [step, isConfirming]);
-
-  const confirmation = (
-    <>
-      <Card.Header>
-        <Card.Title>{title}</Card.Title>
-        <Card.Description>{description}</Card.Description>
-      </Card.Header>
-      {errorMessage ? (
-        <Card.Content>
-          <Banner.Root
-            role='alert'
-            color='negative'
-          >
-            <Banner.Label>{errorMessage}</Banner.Label>
-          </Banner.Root>
-        </Card.Content>
-      ) : null}
-      <Card.Footer>
-        <Dialog.Close
-          render={
-            <Button
-              ref={cancelRef}
-              variant='outline'
-              fullWidth
-            >
-              {cancelLabel}
-            </Button>
-          }
-        />
-        <SubmitButton
-          type='button'
-          fullWidth
-          color={color}
-          isPending={isConfirming}
-          onClick={onConfirm}
-        >
-          {actionLabel}
-        </SubmitButton>
-      </Card.Footer>
-    </>
-  );
-
   return (
     <Dialog.Popup
       compactPlacement='sheet'
@@ -101,30 +43,47 @@ function ConfirmationCard({
         elevation='overlay'
         renderBranding={false}
       >
-        {verificationSlot ? (
-          <Flow.Root
-            value={step}
-            direction={step === 'verify' ? 1 : -1}
-            state={step}
+        <Card.Header>
+          <Card.Title>{title}</Card.Title>
+          <Card.Description>{description}</Card.Description>
+        </Card.Header>
+        {errorMessage ? (
+          <Card.Content>
+            <Banner.Root
+              role='alert'
+              color='negative'
+            >
+              <Banner.Label>{errorMessage}</Banner.Label>
+            </Banner.Root>
+          </Card.Content>
+        ) : null}
+        <Card.Footer>
+          <Dialog.Close
+            render={
+              <Button
+                variant='outline'
+                fullWidth
+              >
+                {cancelLabel}
+              </Button>
+            }
+          />
+          <SubmitButton
+            type='button'
+            fullWidth
+            color={color}
+            isPending={isConfirming}
+            onClick={onConfirm}
           >
-            {() => (
-              <>
-                <Flow.Step ids={['confirm']}>{confirmation}</Flow.Step>
-                <Flow.Step ids={['verify']}>{verificationSlot}</Flow.Step>
-              </>
-            )}
-          </Flow.Root>
-        ) : (
-          confirmation
-        )}
+            {actionLabel}
+          </SubmitButton>
+        </Card.Footer>
       </Card.Root>
     </Dialog.Popup>
   );
 }
 
 export interface ConfirmationControlledProps {
-  step?: 'confirm' | 'verify';
-  verificationSlot?: ReactNode;
   /** Whether the dialog is open */
   open: boolean;
   /** The weight the confirming button carries. An action that can be undone takes `primary` (default: `negative`) */
@@ -135,7 +94,7 @@ export interface ConfirmationControlledProps {
    */
   finalFocus?: DialogFocusTarget;
   /** Callback when open state changes */
-  onOpenChange: NonNullable<DialogRootProps['onOpenChange']>;
+  onOpenChange: (open: boolean) => void;
   /** Element that opens the dialog */
   trigger?: DialogTriggerProps['render'];
   /** Dialog heading */
@@ -167,12 +126,10 @@ function ControlledConfirmation({
   onConfirm,
   isConfirming = false,
   errorMessage,
-  step = 'confirm',
-  verificationSlot,
 }: ConfirmationControlledProps) {
   return (
     <Dialog.Root
-      role={step === 'verify' ? 'dialog' : 'alertdialog'}
+      role='alertdialog'
       open={open}
       onOpenChange={onOpenChange}
     >
@@ -187,8 +144,6 @@ function ControlledConfirmation({
         onConfirm={onConfirm}
         isConfirming={isConfirming}
         errorMessage={errorMessage}
-        step={step}
-        verificationSlot={verificationSlot}
       />
     </Dialog.Root>
   );
@@ -207,9 +162,6 @@ function createHandle<Payload>(): ConfirmationHandle<Payload> {
 }
 
 export interface ConfirmationHandleProps<Payload> {
-  onPendingCancel?: () => void;
-  step?: 'confirm' | 'verify';
-  verificationSlot?: ReactNode;
   /** Opens the dialog with a payload from anywhere: `handle.open(payload)` */
   handle: ConfirmationHandle<Payload>;
   /** The weight the confirming button carries. An action that can be undone takes `primary` (default: `negative`) */
@@ -232,7 +184,6 @@ export interface ConfirmationHandleProps<Payload> {
 }
 
 function HandleConfirmation<Payload>({
-  onPendingCancel,
   handle,
   color = 'negative',
   finalFocus,
@@ -241,14 +192,12 @@ function HandleConfirmation<Payload>({
   actionLabel,
   cancelLabel = 'Cancel',
   onConfirm,
-  step = 'confirm',
-  verificationSlot,
 }: ConfirmationHandleProps<Payload>) {
-  const controller = useConfirmationController({ onPendingCancel });
+  const controller = useConfirmationController();
 
   return (
     <Dialog.Root
-      role={step === 'verify' ? 'dialog' : 'alertdialog'}
+      role='alertdialog'
       handle={handle}
       open={controller.isOpen}
       onOpenChange={controller.onOpenChange}
@@ -269,8 +218,6 @@ function HandleConfirmation<Payload>({
             }
             isConfirming={controller.isConfirming}
             errorMessage={controller.errorMessage}
-            step={step}
-            verificationSlot={verificationSlot}
           />
         )
       }
@@ -285,8 +232,9 @@ export type ConfirmationProps<Payload = unknown> = ConfirmationControlledProps |
  * Use `Destructive` for the destructive actions that are. `color` sets the weight the confirming
  * button carries: `negative` for what cannot be undone, `primary` for what can.
  *
- * The confirmation is an `alertdialog` with Cancel as its dismiss action. A verification slot
- * uses a dialog. Under the phone band it arrives as a bottom sheet.
+ * An `alertdialog`: it announces as an interruption, an outside press cannot answer it, and the
+ * card withholds its corner dismiss. Escape still closes it, the way the cancel action does. Under
+ * the phone band it arrives as a bottom sheet, within reach of the thumb that has to answer it.
  *
  * Two forms. Controlled: the caller owns `open`, `isConfirming`, and `errorMessage`, and the
  * block holds nothing of its own. With a `handle`: the block owns all three. Mount it once,

@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type * as SharedReact from '@clerk/shared/react';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -46,7 +46,6 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       navigate,
     }),
     useSession: () => ({ session: { id: 'session_1' } }),
-    useReverification: <F,>(fetcher: F) => fetcher,
   };
 });
 
@@ -196,9 +195,14 @@ describe('UserProfileConnectedAccountsSection', () => {
     expect(navigate).not.toHaveBeenCalled();
   });
 
-  it('clears Connect without an error when reverification is cancelled', async () => {
+  it('shows verification-required Connect errors without opening a challenge', async () => {
     createExternalAccount = vi.fn(() =>
-      Promise.reject(new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' })),
+      Promise.reject(
+        new ClerkAPIResponseError('Verification required', {
+          status: 403,
+          data: [{ code: 'session_reverification_required', message: 'Verify your session.' }],
+        }),
+      ),
     );
     const user = userEvent.setup();
     renderSection();
@@ -208,7 +212,8 @@ describe('UserProfileConnectedAccountsSection', () => {
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Connect GitHub' })).not.toHaveAttribute('aria-busy', 'true'),
     );
-    expect(screen.queryByText('Something went wrong. Please try again.')).not.toBeInTheDocument();
+    expect(await screen.findByText('Verify your session.')).toBeInTheDocument();
+    expect(createExternalAccount).toHaveBeenCalledOnce();
     expect(navigate).not.toHaveBeenCalled();
   });
 
@@ -298,7 +303,7 @@ describe('UserProfileConnectedAccountsSection', () => {
     expect(JSON.parse(window.atob(encoded))).toMatchObject({ componentName: 'UserProfile' });
   });
 
-  it('clears Reconnect without an error when reverification is cancelled', async () => {
+  it('shows verification-required Reconnect errors and allows another attempt', async () => {
     externalAccounts = [
       externalAccount({
         id: 'idn_google',
@@ -311,7 +316,12 @@ describe('UserProfileConnectedAccountsSection', () => {
       }),
     ];
     createExternalAccount = vi.fn(() =>
-      Promise.reject(new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' })),
+      Promise.reject(
+        new ClerkAPIResponseError('Verification required', {
+          status: 403,
+          data: [{ code: 'session_reverification_required', message: 'Verify your session.' }],
+        }),
+      ),
     );
     const user = userEvent.setup();
     renderSection();
@@ -320,7 +330,7 @@ describe('UserProfileConnectedAccountsSection', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
 
     await waitFor(() => expect(createExternalAccount).toHaveBeenCalledOnce());
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(await screen.findByText('Verify your session.')).toBeInTheDocument();
     expect(navigate).not.toHaveBeenCalled();
     await user.click(screen.getByRole('button', { name: 'Manage Google' }));
     expect(screen.getByRole('menuitem', { name: 'Reconnect' })).toBeEnabled();
@@ -424,12 +434,19 @@ describe('UserProfileConnectedAccountsSection', () => {
     expect(await within(dialog).findByRole('alert')).toHaveTextContent('You cannot remove your last sign-in method.');
   });
 
-  it('returns to confirmation without an error when reverification is cancelled', async () => {
+  it('keeps removal confirmation open with a verification-required API error', async () => {
     externalAccounts = [
       externalAccount({
         id: 'idn_google',
         provider: 'google',
-        destroy: vi.fn(() => Promise.reject(new ClerkRuntimeError('Cancelled', { code: 'reverification_cancelled' }))),
+        destroy: vi.fn(() =>
+          Promise.reject(
+            new ClerkAPIResponseError('Verification required', {
+              status: 403,
+              data: [{ code: 'session_reverification_required', message: 'Verify your session.' }],
+            }),
+          ),
+        ),
       }),
     ];
     const user = userEvent.setup();
@@ -442,6 +459,6 @@ describe('UserProfileConnectedAccountsSection', () => {
       expect(within(dialog).getByRole('button', { name: 'Remove' })).not.toHaveAttribute('aria-busy', 'true'),
     );
     expect(screen.getByRole('alertdialog')).toBe(dialog);
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(await screen.findByText('Verify your session.')).toBeInTheDocument();
   });
 });

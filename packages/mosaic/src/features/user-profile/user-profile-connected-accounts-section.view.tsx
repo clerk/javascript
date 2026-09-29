@@ -4,8 +4,6 @@ import { Confirmation } from '../../blocks/confirmation';
 import { Section } from '../../components/section';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../localization';
-import type { ReverificationController } from '../reverification';
-import { ReverificationConfirmation } from '../reverification/reverification-confirmation';
 import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
 
 export interface UserProfileConnectionProvider {
@@ -32,7 +30,6 @@ export interface UserProfileConnectedAccountsSectionViewProps {
   onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
   onRemove?: (id: string) => void | Promise<void>;
-  removeReverification?: ReverificationController;
 }
 
 export function UserProfileConnectedAccountsSectionView({
@@ -43,7 +40,6 @@ export function UserProfileConnectedAccountsSectionView({
   onConnect,
   onReconnect,
   onRemove,
-  removeReverification,
 }: UserProfileConnectedAccountsSectionViewProps) {
   const m = useMessages('userProfileConnectedAccounts');
   const section = useRef<HTMLDivElement>(null);
@@ -98,14 +94,12 @@ export function UserProfileConnectedAccountsSectionView({
         </Section.Root>
       ) : null}
       {onRemove ? (
-        <ReverificationConfirmation
-          reverification={removeReverification}
+        <Confirmation
           handle={removeAccount}
           title={m.removeDialog.title}
           description={account => fill(m.removeDialog.description, { provider: account.provider })}
           actionLabel={m.removeDialog.confirm}
           cancelLabel={m.removeDialog.cancel}
-          backLabel={m.removeDialog.back}
           finalFocus={removalFocus.finalFocus}
           onConfirm={account => removalFocus.remove(account.id)}
         />
