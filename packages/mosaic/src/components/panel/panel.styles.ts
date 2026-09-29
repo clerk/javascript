@@ -4,7 +4,7 @@ import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   root: {
-    gap: space['4'],
+    gap: space['6'],
     display: 'flex',
     flexDirection: 'column',
   },
