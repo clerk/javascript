@@ -88,7 +88,8 @@ const fade = cardBannerVars['--_cl-card-banner-fade'];
 export const banner = stylex.create({
   // A root flex item, not a content grid item: a grid track floors at 0 whatever the margin, so the gap would stay.
   collapse: {
-    // The ramp shortens rather than sliding out, so the moving edge stays fully soft until it stops.
+    // Two mechanisms: entering, the ramp shortens so the moving edge stays soft until it stops;
+    // leaving, the gradient slides up into the box so the edge fades rather than vanishing.
     '--_cl-card-banner-fade': {
       default: '0px',
       ':where([data-starting-style], [data-ending-style])': FADE,
@@ -99,18 +100,27 @@ export const banner = stylex.create({
       ':where(:not([data-open]), [data-starting-style])': '0fr',
     },
     maskImage: `linear-gradient(to bottom, black calc(100% - ${fade}), transparent)`,
+    maskPosition: 'top',
+    maskRepeat: 'no-repeat',
+    maskSize: {
+      default: `100% calc(100% + ${FADE})`,
+      ':where([data-starting-style], [data-ending-style])': '100% 100%',
+    },
     transitionDelay: {
-      default: `${durationVars['--cl-duration-instant']}, calc(${durationVars['--cl-duration-slow']} - ${durationVars['--cl-duration-fast']})`,
+      default: `${durationVars['--cl-duration-instant']}, calc(${durationVars['--cl-duration-slow']} - ${durationVars['--cl-duration-fast']}), ${durationVars['--cl-duration-slow']}`,
       ':where([data-ending-style])': durationVars['--cl-duration-instant'],
     },
-    transitionDuration: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-fast']}`,
+    transitionDuration: {
+      default: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-instant']}`,
+      ':where([data-ending-style])': `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-instant']}, ${durationVars['--cl-duration-fast']}`,
+    },
     transitionProperty: {
-      default: 'grid-template-rows, --_cl-card-banner-fade',
+      default: 'grid-template-rows, --_cl-card-banner-fade, mask-size',
       '@media (prefers-reduced-motion: reduce)': 'none',
     },
     transitionTimingFunction: {
-      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-exit']}`,
-      ':where([data-ending-style])': `${easingVars['--cl-ease-in-out']}, ${easingVars['--cl-ease-enter']}`,
+      default: easingVars['--cl-ease-enter'],
+      ':where([data-ending-style])': `${easingVars['--cl-ease-in-out']}, ${easingVars['--cl-ease-in-out']}, ${easingVars['--cl-ease-enter']}`,
     },
   },
   // No padding here: it would be the 0fr track's minimum.
