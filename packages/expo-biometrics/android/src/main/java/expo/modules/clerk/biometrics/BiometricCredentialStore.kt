@@ -52,10 +52,10 @@ internal class BiometricCredentialStore(
   /** Every decodable record for every app, mapped to the JS field names, with unknown stored fields passed through. */
   fun listRecordsJson(): String = JSONArray(fileStore.records().map(::bridgeJson)).toString()
 
-  fun save(input: BiometricCredentialRecordInput, removeOtherRecordsForApp: Boolean) {
+  fun save(input: BiometricCredentialRecordInput, removeOtherRecordsForApp: Boolean) = synchronized(operationLock) {
     val record = input.toLocalRecord()
     fileStore.save(record)?.let { runCatching { deleteKey(it) } }
-    if (!removeOtherRecordsForApp) return
+    if (!removeOtherRecordsForApp) return@synchronized
 
     // Only the same user's other credentials; other users' are left for reconciliation, as clerk-android does.
     val removable =
@@ -69,12 +69,14 @@ internal class BiometricCredentialStore(
   }
 
   /** Deletes the key, then every record that references it. When the key cannot be deleted the records are kept. */
-  fun deleteRecords(localKeyId: String) {
+  fun deleteRecords(localKeyId: String) = synchronized(operationLock) {
     deleteKey(localKeyId)
     fileStore.delete(fileStore.records().filter { it.record.localKeyId == localKeyId }.map { it.record.id }.toSet())
   }
 
   companion object {
+    private val operationLock = Any()
+
     fun bridgeJson(stored: StoredBiometricCredentialRecord): JSONObject {
       val json = JSONObject()
       for (key in stored.json.keys()) {
