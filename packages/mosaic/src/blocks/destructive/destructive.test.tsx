@@ -182,7 +182,7 @@ describe('Destructive', () => {
   });
 
   it('shows reverification in the same dialog and card', () => {
-    renderBlock({ isDeleting: true, reverification: readyReverification('ready') });
+    renderBlock({ isDeleting: true, step: 'verify', reverification: readyReverification('ready') });
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
     expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
@@ -207,6 +207,7 @@ describe('Destructive', () => {
         <Destructive
           {...props}
           isDeleting
+          step='verify'
           reverification={readyReverification('retrying')}
         />
       </MosaicProvider>,
@@ -219,6 +220,7 @@ describe('Destructive', () => {
         <Destructive
           {...props}
           errorMessage='Delete failed.'
+          step='confirm'
           reverification={{ status: 'idle' }}
         />
       </MosaicProvider>,

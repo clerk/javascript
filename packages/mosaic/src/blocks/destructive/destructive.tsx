@@ -39,6 +39,7 @@ export interface DestructiveControlledProps {
   /** Error message to display if the delete action fails */
   errorMessage?: string;
   reverification?: ReverificationController;
+  step?: 'confirm' | 'verify';
 }
 
 type DestructiveCardProps = Omit<DestructiveControlledProps, 'onOpenChange' | 'trigger'>;
@@ -56,6 +57,7 @@ function DestructiveCard({
   isDeleting = false,
   errorMessage,
   reverification,
+  step = 'confirm',
 }: DestructiveCardProps) {
   const formId = useId();
   const [typedValue, setTypedValue] = useState('');
@@ -69,9 +71,6 @@ function DestructiveCard({
   }, [open]);
 
   const isConfirmed = typedValue === confirmationValue;
-  const step =
-    reverification && reverification.status !== 'idle' && reverification.status !== 'loading' ? 'verify' : 'confirm';
-
   // The action sits in the footer, outside the form, so `form={formId}` associates the two.
   // That is what makes Enter in the field submit. Both guards are re-checked here because
   // neither spelling stops a native submit: `focusableWhenDisabled` only marks the button

@@ -158,6 +158,29 @@ describe('useDestructiveController', () => {
     expect(result.current.reverification).toBe(idleReverification);
   });
 
+  it('is on the confirm step without reverification', () => {
+    const { result } = renderHook(() => useDestructiveController({ onDelete: () => Promise.resolve() }));
+
+    expect(result.current.step).toBe('confirm');
+  });
+
+  it.each([
+    ['idle', 'confirm'],
+    ['loading', 'confirm'],
+    ['unavailable', 'verify'],
+    ['ready', 'verify'],
+    ['retrying', 'verify'],
+  ] as const)('reverification status %s uses the %s step', (status, step) => {
+    const { result } = renderHook(() =>
+      useDestructiveController({
+        onDelete: () => Promise.resolve(),
+        reverification: { status } as ReverificationController,
+      }),
+    );
+
+    expect(result.current.step).toBe(step);
+  });
+
   it('cancels reverification when the dialog closes', () => {
     const onCancel = vi.fn();
     const { result } = renderHook(() =>
