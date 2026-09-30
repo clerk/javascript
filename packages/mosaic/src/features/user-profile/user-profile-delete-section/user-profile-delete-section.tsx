@@ -1,7 +1,7 @@
 import { useClerk, useUser } from '@clerk/shared/react';
 
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
-import { Reverification, useReverificationActors } from '../../reverification';
+import { ReverifiedAction, useReverifiedAction } from '../../reverification';
 import { UserProfileDeleteSectionView } from './user-profile-delete-section.view';
 
 export type UserProfileDeleteSectionProps = {
@@ -36,10 +36,7 @@ export function UserProfileDeleteSection(props: UserProfileDeleteSectionProps) {
   };
 
   // -- Controllers --
-  const destructiveController = useDestructiveController({
-    onDelete: deleteAccount,
-    reverification: useReverificationActors(),
-  });
+  const destructiveController = useDestructiveController({ onDelete: useReverifiedAction(deleteAccount) });
 
   // -- View --
   if (!isLoaded) {
@@ -53,7 +50,7 @@ export function UserProfileDeleteSection(props: UserProfileDeleteSectionProps) {
   return (
     <UserProfileDeleteSectionView
       {...destructiveController}
-      verificationSlot={<Reverification actor={destructiveController.verification} />}
+      verificationSlot={<ReverifiedAction actor={destructiveController.action} />}
     />
   );
 }

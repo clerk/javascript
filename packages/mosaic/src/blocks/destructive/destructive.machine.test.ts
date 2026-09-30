@@ -1,59 +1,49 @@
-import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { ClerkRuntimeError } from '@clerk/shared/error';
 import { describe, expect, it, vi } from 'vitest';
 
-import { reverificationMachine } from '../../features/reverification/reverification.machine';
-import type { ReverificationMethod, ReverificationResult } from '../../features/reverification/reverification.types';
 import { childActor, createActor } from '../../machine/createActor';
+import { createMachine } from '../../machine/createMachine';
 import { destructiveMachine } from './destructive.machine';
 
 const tick = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 
-const password: ReverificationMethod = { id: 'password', stage: 'first', strategy: 'password' };
+type StepEvent = { type: 'NEXT' } | { type: 'FAIL' };
 
-const needsReverification = () =>
-  new ClerkAPIResponseError('reverify', {
-    data: [{ code: 'session_reverification_required', message: 'Reverify', long_message: 'Reverify' }],
-    status: 403,
-  });
+const pausingAction = createMachine<object, StepEvent>({
+  initial: 'waiting',
+  states: {
+    waiting: { tags: ['cancellable'], on: { NEXT: 'working', FAIL: 'cancelled' } },
+    working: { on: { NEXT: 'done' } },
+    done: { type: 'final' },
+    cancelled: {
+      type: 'final',
+      error: () => new ClerkRuntimeError('cancelled', { code: 'reverification_cancelled' }),
+    },
+  },
+});
 
-const needsFactor: ReverificationResult = {
-  status: 'needs_first_factor',
-  methods: [password],
-  startingMethod: password,
-};
-const complete: ReverificationResult = { status: 'complete', methods: [], startingMethod: null };
-
-function setupFlow(action: () => Promise<unknown>) {
-  const actors = {
-    action: vi.fn(action),
-    reverification: reverificationMachine,
-    startVerification: vi.fn(() => Promise.resolve(needsFactor)),
-    prepareFactor: vi.fn(() => Promise.resolve()),
-    attemptFactor: vi.fn(() => Promise.resolve(complete)),
-    finishVerification: vi.fn(() => Promise.resolve()),
-  };
-  const actor = createActor(destructiveMachine, { actors, context: { reverifiable: true } }).start();
-  const reverification = () => childActor(actor.getSnapshot().children.reverification, reverificationMachine);
-  return { actor, actors, reverification };
+function open(action: (() => Promise<unknown>) | typeof pausingAction) {
+  const spy = typeof action === 'function' ? vi.fn(action) : action;
+  const actor = createActor(destructiveMachine, { actors: { action: spy } }).start();
+  actor.send({ type: 'OPEN' });
+  return { actor, action: spy };
 }
 
 describe('destructive flow', () => {
   it('closes after the action succeeds', async () => {
-    const { actor, actors } = setupFlow(() => Promise.resolve());
+    const { actor, action } = open(() => Promise.resolve());
 
-    actor.send({ type: 'OPEN' });
     actor.send({ type: 'CONFIRM' });
     expect(actor.getSnapshot().value).toBe('open.running');
     await tick();
 
-    expect(actors.action).toHaveBeenCalledTimes(1);
+    expect(action).toHaveBeenCalledTimes(1);
     expect(actor.getSnapshot().value).toBe('closed');
   });
 
   it('cannot be closed while the action runs', () => {
-    const { actor } = setupFlow(() => new Promise(() => {}));
+    const { actor } = open(() => new Promise(() => {}));
 
-    actor.send({ type: 'OPEN' });
     actor.send({ type: 'CONFIRM' });
     actor.send({ type: 'CLOSE' });
 
@@ -61,9 +51,8 @@ describe('destructive flow', () => {
   });
 
   it('shows an error when the action fails and lets the user try again', async () => {
-    const { actor, actors } = setupFlow(() => Promise.reject(new Error('boom')));
+    const { actor, action } = open(() => Promise.reject(new Error('boom')));
 
-    actor.send({ type: 'OPEN' });
     actor.send({ type: 'CONFIRM' });
     await tick();
     expect(actor.getSnapshot().value).toBe('open.failed');
@@ -71,104 +60,54 @@ describe('destructive flow', () => {
 
     actor.send({ type: 'CONFIRM' });
     expect(actor.getSnapshot().value).toBe('open.running');
-    expect(actors.action).toHaveBeenCalledTimes(2);
+    expect(action).toHaveBeenCalledTimes(2);
   });
 
-  it('reverifies, retries the action and closes', async () => {
-    let calls = 0;
-    const { actor, actors, reverification } = setupFlow(() =>
-      ++calls === 1 ? Promise.reject(needsReverification()) : Promise.resolve(),
-    );
+  describe('with an action that pauses for the user', () => {
+    const child = (actor: ReturnType<typeof open>['actor']) =>
+      childActor(actor.getSnapshot().children.action, pausingAction);
 
-    actor.send({ type: 'OPEN' });
-    actor.send({ type: 'CONFIRM' });
-    await tick();
-    expect(actor.getSnapshot().value).toBe('open.verifying.challenge');
-    expect(reverification()?.getSnapshot().value).toBe('factor.editing.ready');
+    it('can be closed while the action is cancellable, stopping it', () => {
+      const { actor } = open(pausingAction);
+      actor.send({ type: 'CONFIRM' });
+      const running = child(actor);
 
-    reverification()?.send({ type: 'TYPE', value: 'hunter2' });
-    reverification()?.send({ type: 'SUBMIT' });
-    await tick();
-    await tick();
+      actor.send({ type: 'CLOSE' });
 
-    expect(actors.attemptFactor).toHaveBeenCalledWith({ method: password, value: 'hunter2' });
-    expect(actors.finishVerification).toHaveBeenCalledTimes(1);
-    expect(actors.action).toHaveBeenCalledTimes(2);
-    expect(actor.getSnapshot().value).toBe('closed');
-    expect(actor.getSnapshot().children).toEqual({});
-  });
+      expect(actor.getSnapshot().value).toBe('closed');
+      expect(running?.getSnapshot().status).toBe('stopped');
+    });
 
-  it('keeps the dialog open and pending while retrying', async () => {
-    let calls = 0;
-    const { actor, reverification } = setupFlow(() =>
-      ++calls === 1 ? Promise.reject(needsReverification()) : new Promise(() => {}),
-    );
+    it('cannot be closed once the action stops being cancellable', () => {
+      const { actor } = open(pausingAction);
+      actor.send({ type: 'CONFIRM' });
 
-    actor.send({ type: 'OPEN' });
-    actor.send({ type: 'CONFIRM' });
-    await tick();
-    reverification()?.send({ type: 'SUBMIT' });
-    await tick();
-    await tick();
+      child(actor)?.send({ type: 'NEXT' });
+      actor.send({ type: 'CLOSE' });
 
-    expect(actor.getSnapshot().value).toBe('open.verifying.retrying');
-    expect(reverification()?.getSnapshot().value).toBe('verified');
-    actor.send({ type: 'CLOSE' });
-    expect(actor.getSnapshot().value).toBe('open.verifying.retrying');
-  });
+      expect(actor.getSnapshot().value).toBe('open.running');
+    });
 
-  it('stops reverification and skips the retry when closed during the challenge', async () => {
-    const { actor, actors, reverification } = setupFlow(() => Promise.reject(needsReverification()));
+    it('closes when the action finishes', async () => {
+      const { actor } = open(pausingAction);
+      actor.send({ type: 'CONFIRM' });
 
-    actor.send({ type: 'OPEN' });
-    actor.send({ type: 'CONFIRM' });
-    await tick();
-    const child = reverification();
+      child(actor)?.send({ type: 'NEXT' });
+      child(actor)?.send({ type: 'NEXT' });
+      await tick();
 
-    actor.send({ type: 'CLOSE' });
+      expect(actor.getSnapshot().value).toBe('closed');
+    });
 
-    expect(actor.getSnapshot().value).toBe('closed');
-    expect(child?.getSnapshot().status).toBe('stopped');
-    expect(actors.action).toHaveBeenCalledTimes(1);
-  });
+    it('closes without an error when the action is cancelled', async () => {
+      const { actor } = open(pausingAction);
+      actor.send({ type: 'CONFIRM' });
 
-  it('closes when the session changes during the challenge', async () => {
-    const { actor } = setupFlow(() => Promise.reject(needsReverification()));
+      child(actor)?.send({ type: 'FAIL' });
+      await tick();
 
-    actor.send({ type: 'SESSION_CHANGED' });
-    actor.send({ type: 'OPEN' });
-    actor.send({ type: 'CONFIRM' });
-    await tick();
-    actor.send({ type: 'SESSION_CHANGED' });
-
-    expect(actor.getSnapshot().value).toBe('closed');
-  });
-
-  it('treats a reverification error as a failure when it cannot reverify', async () => {
-    const actor = createActor(destructiveMachine, {
-      actors: { action: () => Promise.reject(needsReverification()) },
-    }).start();
-
-    actor.send({ type: 'OPEN' });
-    actor.send({ type: 'CONFIRM' });
-    await tick();
-
-    expect(actor.getSnapshot().value).toBe('open.failed');
-  });
-
-  it('shows the error when the retry fails', async () => {
-    let calls = 0;
-    const { actor, reverification } = setupFlow(() =>
-      ++calls === 1 ? Promise.reject(needsReverification()) : Promise.reject(new Error('boom')),
-    );
-
-    actor.send({ type: 'OPEN' });
-    actor.send({ type: 'CONFIRM' });
-    await tick();
-    reverification()?.send({ type: 'SUBMIT' });
-    await tick();
-    await tick();
-
-    expect(actor.getSnapshot().value).toBe('open.failed');
+      expect(actor.getSnapshot().value).toBe('closed');
+      expect(actor.getSnapshot().context.errorMessage).toBeUndefined();
+    });
   });
 });

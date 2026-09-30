@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { childActor, createActor } from '../createActor';
-import { createMachine } from '../createMachine';
-import { stateIn } from '../guards';
+import { createMachine, provide } from '../createMachine';
+import { childHasTag, stateIn } from '../guards';
 
 const tick = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 
@@ -264,5 +264,136 @@ describe('stateIn', () => {
 
     expect(queued.getSnapshot().value).toBe('submitting');
     expect(plain.getSnapshot().value).toBe('ready');
+  });
+});
+
+describe('tags', () => {
+  it('reports the tags of the active state and its ancestors', () => {
+    const machine = createMachine<object, Evt>({
+      initial: 'open',
+      states: {
+        open: {
+          tags: ['visible'],
+          initial: 'editing',
+          states: { editing: { tags: ['cancellable'], on: { NEXT: 'saving' } }, saving: {} },
+        },
+      },
+    });
+    const actor = createActor(machine).start();
+
+    expect(actor.getSnapshot().hasTag('visible')).toBe(true);
+    expect(actor.getSnapshot().hasTag('cancellable')).toBe(true);
+
+    actor.send({ type: 'NEXT' });
+
+    expect(actor.getSnapshot().hasTag('visible')).toBe(true);
+    expect(actor.getSnapshot().hasTag('cancellable')).toBe(false);
+  });
+
+  it('lets a parent guard on a tag of an invoked child', () => {
+    const child = createMachine<object, Evt>({
+      initial: 'waiting',
+      states: { waiting: { tags: ['cancellable'], on: { NEXT: 'busy' } }, busy: {} },
+    });
+    const parent = createMachine<object, Evt>({
+      initial: 'working',
+      states: {
+        working: {
+          invoke: { id: 'job', src: child },
+          on: { CLOSE: [{ target: 'closed', guard: childHasTag('job', 'cancellable') }, {}] },
+        },
+        closed: {},
+      },
+    });
+    const busy = createActor(parent).start();
+    busy.getSnapshot().children.job?.send({ type: 'NEXT' } as never);
+    busy.send({ type: 'CLOSE' });
+    expect(busy.getSnapshot().value).toBe('working');
+
+    const waiting = createActor(parent).start();
+    waiting.send({ type: 'CLOSE' });
+    expect(waiting.getSnapshot().value).toBe('closed');
+  });
+});
+
+describe('a child that finishes with an error', () => {
+  it('takes the parent onError with the error', async () => {
+    const child = createMachine<{ reason: string }, Evt>({
+      initial: 'working',
+      context: { reason: 'nope' },
+      states: {
+        working: { on: { NEXT: 'failed' } },
+        failed: { type: 'final', error: ctx => new Error(ctx.reason) },
+      },
+    });
+    const parent = createMachine<{ error: unknown }, Evt>({
+      initial: 'running',
+      context: { error: undefined },
+      states: {
+        running: {
+          invoke: {
+            id: 'job',
+            src: child,
+            onDone: 'done',
+            onError: ({ event }) => ({ target: 'failed', context: { error: event.error } }),
+          },
+        },
+        done: {},
+        failed: {},
+      },
+    });
+    const actor = createActor(parent).start();
+    const job = childActor(actor.getSnapshot().children.job, child);
+
+    job?.send({ type: 'NEXT' });
+    expect(job?.getSnapshot().status).toBe('error');
+    expect(job?.getSnapshot().error).toEqual(new Error('nope'));
+    await tick();
+
+    expect(actor.getSnapshot().value).toBe('failed');
+    expect(actor.getSnapshot().context.error).toEqual(new Error('nope'));
+  });
+});
+
+describe('provide', () => {
+  const child = createMachine<object, Evt>({
+    initial: 'working',
+    states: { working: { invoke: { src: 'work', onDone: 'done' } }, done: { type: 'final' } },
+  });
+
+  it('binds actors to a machine', async () => {
+    const work = vi.fn(() => Promise.resolve());
+    const actor = createActor(provide(child, { work })).start();
+    await tick();
+
+    expect(work).toHaveBeenCalledTimes(1);
+    expect(actor.getSnapshot().value).toBe('done');
+  });
+
+  it('keeps a child on its own actors when the parent has one with the same name', async () => {
+    const own = vi.fn(() => Promise.resolve());
+    const parentWork = vi.fn(() => new Promise<void>(() => {}));
+    const parent = createMachine<object, Evt>({
+      initial: 'running',
+      states: { running: { invoke: { id: 'job', src: 'job', onDone: 'done' } }, done: {} },
+    });
+    const actor = createActor(parent, { actors: { job: provide(child, { work: own }), work: parentWork } }).start();
+    await tick();
+    await tick();
+
+    expect(own).toHaveBeenCalledTimes(1);
+    expect(parentWork).not.toHaveBeenCalled();
+    expect(actor.getSnapshot().value).toBe('done');
+  });
+
+  it('is still recognised by childActor as the original machine', () => {
+    const provided = provide(child, { work: () => new Promise<void>(() => {}) });
+    const parent = createMachine<object, Evt>({
+      initial: 'running',
+      states: { running: { invoke: { id: 'job', src: provided } } },
+    });
+    const actor = createActor(parent).start();
+
+    expect(childActor(actor.getSnapshot().children.job, child)?.getSnapshot().value).toBe('working');
   });
 });

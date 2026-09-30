@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { assign, isAssignAction } from '../assign';
 import { createActor, mockActor } from '../createActor';
 import { createMachine } from '../createMachine';
-import type { DoneInvokeEvent } from '../types';
+import type { DoneInvokeEvent, ErrorInvokeEvent } from '../types';
 import {
   createDeleteOrgMachine,
   createLoaderMachine,
@@ -310,6 +310,40 @@ describe('createActor — invoke (async)', () => {
     gate.resolve('late');
     await tick();
     expect(actor.getSnapshot().value).toBe('idle'); // stale onDone did not fire
+  });
+
+  it('routes an input that throws to onError without calling the actor', async () => {
+    const load = vi.fn((id: string) => Promise.resolve(id));
+    const machine = createMachine<{ error: unknown }, { type: 'GO' }, { load: typeof load }>({
+      initial: 'idle',
+      context: { error: undefined },
+      states: {
+        idle: { on: { GO: 'loading' } },
+        loading: {
+          invoke: {
+            src: 'load',
+            input: () => {
+              throw new Error('no id');
+            },
+            onDone: 'done',
+            onError: {
+              target: 'failed',
+              actions: assign<{ error: unknown }, ErrorInvokeEvent>((_, e) => ({ error: e.error })),
+            },
+          },
+        },
+        done: {},
+        failed: {},
+      },
+    });
+    const actor = createActor(machine, { actors: { load } }).start();
+
+    actor.send({ type: 'GO' });
+    await tick();
+
+    expect(load).not.toHaveBeenCalled();
+    expect(actor.getSnapshot().value).toBe('failed');
+    expect(actor.getSnapshot().context.error).toEqual(new Error('no id'));
   });
 });
 

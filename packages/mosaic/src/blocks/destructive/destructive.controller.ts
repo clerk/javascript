@@ -1,9 +1,7 @@
-import { useEffect, useRef } from 'react';
-
-import type { AnyActor, ProvidedActors } from '../../machine/types';
-import { useMachine } from '../../machine/useMachine';
+import type { AnyActor } from '../../machine/types';
+import { useChildSnapshot, useMachine } from '../../machine/useMachine';
 import type { DestructiveControlledProps } from './destructive';
-import { destructiveMachine } from './destructive.machine';
+import { type DestructiveActors, destructiveMachine } from './destructive.machine';
 
 export type DestructiveController = Pick<
   DestructiveControlledProps,
@@ -11,45 +9,25 @@ export type DestructiveController = Pick<
 > & {
   onDelete: () => void;
   openDestructiveDialog: () => void;
-  verification: AnyActor | undefined;
+  action: AnyActor | undefined;
 };
-
-export interface DestructiveReverification {
-  actors: ProvidedActors;
-  sessionId: string | null | undefined;
-}
 
 export function useDestructiveController({
   onDelete,
-  reverification,
 }: {
-  onDelete: () => Promise<unknown>;
-  reverification?: DestructiveReverification;
+  onDelete: DestructiveActors['action'];
 }): DestructiveController {
-  const [snapshot, send] = useMachine(destructiveMachine, {
-    context: { reverifiable: reverification !== undefined },
-    actors: { ...reverification?.actors, action: onDelete },
-  });
-
-  const sessionId = reverification?.sessionId;
-  const knownSessionId = useRef(sessionId);
-  useEffect(() => {
-    if (sessionId === undefined) {
-      return;
-    }
-    const previous = knownSessionId.current;
-    knownSessionId.current = sessionId;
-    if (previous !== undefined && previous !== sessionId) {
-      send({ type: 'SESSION_CHANGED' });
-    }
-  }, [sessionId, send]);
+  const [snapshot, send] = useMachine(destructiveMachine, { actors: { action: onDelete } });
+  const action = snapshot.children.action;
+  const actionSnapshot = useChildSnapshot(action);
+  const cancellable = actionSnapshot?.hasTag('cancellable') ?? false;
 
   return {
     open: snapshot.matches('open'),
-    isDeleting: snapshot.matches('open.running') || snapshot.matches('open.verifying.retrying'),
+    isDeleting: snapshot.matches('open.running') && !cancellable,
     errorMessage: snapshot.matches('open.failed') ? snapshot.context.errorMessage : undefined,
-    step: snapshot.matches('open.verifying') ? 'verify' : 'confirm',
-    verification: snapshot.children.reverification,
+    step: actionSnapshot?.hasTag('interactive') ? 'verify' : 'confirm',
+    action,
     openDestructiveDialog: () => send({ type: 'OPEN' }),
     onDelete: () => send({ type: 'CONFIRM' }),
     onOpenChange: nextIsOpen => send(nextIsOpen ? { type: 'OPEN' } : { type: 'CLOSE' }),

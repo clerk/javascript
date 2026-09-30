@@ -40,10 +40,25 @@ export type ReverificationEvent =
   | { type: 'SELECT_METHOD'; id: string }
   | { type: 'BACK' };
 
-const { createMachine, assign } = setup<ReverificationContext, ReverificationEvent>();
+const { createMachine, assign } = setup<ReverificationContext, ReverificationEvent, ReverificationActors>();
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+}
+
+function requireMethod(method: ReverificationMethod | null): ReverificationMethod {
+  if (method === null) {
+    throw new Error('No verification method selected');
+  }
+  return method;
+}
+
+function requirePreparable(method: ReverificationMethod | null): ReverificationPreparableMethod {
+  const selected = requireMethod(method);
+  if (!needsPrepare(selected)) {
+    throw new Error('Verification method cannot be prepared');
+  }
+  return selected;
 }
 
 function canResend(ctx: ReverificationContext): boolean {
@@ -151,7 +166,7 @@ export const reverificationMachine = createMachine({
               initial: 'idle',
               invoke: {
                 src: 'prepareFactor',
-                input: ctx => ctx.activeMethod,
+                input: ctx => requirePreparable(ctx.activeMethod),
                 onDone: [
                   { target: '#factor.submitting', guard: stateIn('factor.editing.preparing.queued') },
                   { target: 'ready' },
@@ -168,7 +183,7 @@ export const reverificationMachine = createMachine({
         submitting: {
           invoke: {
             src: 'attemptFactor',
-            input: ctx => ({ method: ctx.activeMethod, value: ctx.inputValue }),
+            input: ctx => ({ method: requireMethod(ctx.activeMethod), value: ctx.inputValue }),
             onDone: afterResult,
             onError: { target: 'editing', actions: showError },
           },
@@ -201,7 +216,7 @@ export const reverificationMachine = createMachine({
           entry: lockResend,
           invoke: {
             src: 'prepareFactor',
-            input: ctx => ctx.pendingMethod,
+            input: ctx => requirePreparable(ctx.pendingMethod),
             onDone: { target: '#factor', actions: assign(ctx => activate(ctx.pendingMethod)) },
             onError: {
               target: '#factor',

@@ -9,7 +9,7 @@ import type {
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 
 import { useMosaicEnvironment } from '../../hooks/useMosaicEnvironment';
-import { type ReverificationActors, reverificationMachine } from './reverification.machine';
+import type { ReverificationActors } from './reverification.machine';
 import type { ReverificationMethod, ReverificationResult, ReverificationStage } from './reverification.types';
 import { pickStartingMethod } from './reverification.utils';
 
@@ -103,10 +103,7 @@ async function rethrow<T>(work: () => Promise<T>): Promise<T> {
   }
 }
 
-export function useReverificationActors(): {
-  sessionId: string | null | undefined;
-  actors: ReverificationActors & { reverification: typeof reverificationMachine };
-} {
+export function useReverificationActors(): ReverificationActors {
   const { session } = useSession();
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
@@ -120,7 +117,7 @@ export function useReverificationActors(): {
   const handleResponse = (resource: SessionVerificationResource) =>
     toResult(resource, environment?.displayConfig.preferredSignInStrategy, isWebAuthnSupported());
 
-  const actors: ReverificationActors = {
+  return {
     startVerification: level =>
       rethrow(async () =>
         handleResponse(await verifiedSession().startVerification({ level: level ?? 'second_factor' })),
@@ -176,10 +173,5 @@ export function useReverificationActors(): {
       rethrow(async () => {
         await clerk.setActive({ session: verifiedSession().id });
       }),
-  };
-
-  return {
-    sessionId: session === undefined ? undefined : (session?.id ?? null),
-    actors: { reverification: reverificationMachine, ...actors },
   };
 }

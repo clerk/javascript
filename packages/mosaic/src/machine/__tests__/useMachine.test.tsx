@@ -1,11 +1,11 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, renderHook, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { assign } from '../assign';
 import { createActor, mockActor } from '../createActor';
 import { createMachine } from '../createMachine';
-import { useActor, useMachine, useSelector } from '../useMachine';
+import { useActor, useChildSnapshot, useMachine, useSelector } from '../useMachine';
 import { createDeleteOrgMachine } from './delete-organization-machine';
 
 /** A promise whose resolution the test controls. */
@@ -357,5 +357,27 @@ describe('useMachine — live context keeps injected functions current', () => {
 
     expect(freshFn).toHaveBeenCalledTimes(1);
     expect(staleFn).not.toHaveBeenCalled();
+  });
+});
+
+describe('useChildSnapshot — follows an optional child actor', () => {
+  const child = createMachine<object, { type: 'NEXT' }>({
+    initial: 'a',
+    states: { a: { tags: ['first'], on: { NEXT: 'b' } }, b: {} },
+  });
+
+  it('returns undefined without an actor', () => {
+    const { result } = renderHook(() => useChildSnapshot(undefined));
+    expect(result.current).toBeUndefined();
+  });
+
+  it('re-renders when the child transitions', () => {
+    const actor = createActor(child).start();
+    const { result } = renderHook(() => useChildSnapshot(actor));
+    expect(result.current?.hasTag('first')).toBe(true);
+
+    act(() => actor.send({ type: 'NEXT' }));
+
+    expect(result.current?.hasTag('first')).toBe(false);
   });
 });

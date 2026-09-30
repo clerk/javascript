@@ -7,6 +7,8 @@ import type {
   EventObject,
   InvokeConfig,
   MachineConfig,
+  PromiseSrc,
+  ProvidedActors,
   StateMachine,
   Transition,
 } from './types';
@@ -38,10 +40,15 @@ import type {
  * `onError`, or `after` — eliminating the need to write
  * `assign<Ctx, Extract<Event, { type: 'X' }>>` by hand.
  */
-export function setup<TContext extends object, TEvent extends EventObject>() {
+export function setup<
+  TContext extends object,
+  TEvent extends EventObject,
+  TActors extends ProvidedActors = ProvidedActors,
+>() {
   return {
-    createMachine: (config: MachineConfig<TContext, TEvent>): StateMachine<TContext, TEvent> =>
-      _createMachine<TContext, TEvent>(config),
+    createMachine: (
+      config: MachineConfig<TContext, TEvent, string, TActors>,
+    ): StateMachine<TContext, TEvent, TActors> => _createMachine<TContext, TEvent, string, TActors>(config),
 
     assign: <TEvt extends EventObject = EventObject>(
       fn: (context: TContext, event: TEvt) => Partial<TContext>,
@@ -74,11 +81,8 @@ export function setup<TContext extends object, TEvent extends EventObject>() {
         onDone?: Transition<TContext, DoneInvokeEvent<TOutput>, TStates>;
         onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
       },
-    ): InvokeConfig<TContext, TEvent, TOutput, TStates> => ({
-      // SAFETY: fn only uses context (no event param), but InvokeConfig.src accepts
-      // (context, event) for parity with state-entry event access. The extra event
-      // parameter is unused; callers receive only context at runtime.
-      src: fn as unknown as InvokeConfig<TContext, TEvent, TOutput, TStates>['src'],
+    ): InvokeConfig<TContext, TEvent, TOutput, TStates> & { src: PromiseSrc<TContext, TEvent, TOutput> } => ({
+      src: fn,
       ...config,
     }),
   };

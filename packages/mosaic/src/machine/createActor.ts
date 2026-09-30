@@ -2,6 +2,7 @@ import { isAssignAction } from './assign';
 import type {
   Actions,
   Actor,
+  ActorOptionsArgs,
   AfterEvent,
   AnyActor,
   AnyEventObject,
@@ -13,6 +14,7 @@ import type {
   EventObject,
   GuardMeta,
   InvokeConfig,
+  ProvidedActors,
   Snapshot,
   SnapshotListener,
   StateConfig,
@@ -67,11 +69,11 @@ function descend<TContext>(node: StateNode<TContext> | undefined, path: string):
   return path.split('.').reduce<StateNode<TContext> | undefined>((current, key) => current?.children[key], node);
 }
 
-export function childActor<TContext extends object, TEvent extends EventObject>(
+export function childActor<TContext extends object, TEvent extends EventObject, TActors extends ProvidedActors>(
   child: AnyActor | undefined,
-  machine: StateMachine<TContext, TEvent>,
+  machine: StateMachine<TContext, TEvent, TActors>,
 ): Actor<TContext, TEvent> | undefined {
-  if (child === undefined || actorMachines.get(child) !== machine) {
+  if (child === undefined || actorMachines.get(child)?.config !== machine.config) {
     return undefined;
   }
   return child as unknown as Actor<TContext, TEvent>;
@@ -91,12 +93,16 @@ export function childActor<TContext extends object, TEvent extends EventObject>(
  * actor.send({ type: 'TOGGLE' });
  * ```
  */
-export function createActor<TContext extends object, TEvent extends EventObject>(
-  machine: StateMachine<TContext, TEvent>,
-  options: CreateActorOptions<TContext> = {},
+export function createActor<
+  TContext extends object,
+  TEvent extends EventObject,
+  TActors extends ProvidedActors = ProvidedActors,
+>(
+  machine: StateMachine<TContext, TEvent, TActors>,
+  ...[options = {}]: ActorOptionsArgs<TActors, CreateActorOptions<TContext, TActors>>
 ): Actor<TContext, TEvent> {
   const teleport = options.snapshot;
-  const actors = options.actors ?? {};
+  const findActor = (name: string) => machine.actors[name] ?? options.actors?.[name];
 
   const ids = new Map<string, StateNode<TContext>>();
   function buildNode(
@@ -149,6 +155,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // entry/always/invoke for the state it was dropped into.
   let started = teleport !== undefined;
   let status: Snapshot<TContext>['status'] = leaf?.config.type === 'final' ? 'done' : 'active';
+  let error: unknown;
 
   // Invokes and `after` timers of every active state node. Leaving a node (or
   // stopping) drops its entry, so a stale promise or child resolving after the
@@ -157,11 +164,20 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   let children: Record<string, AnyActor> = {};
 
   const currentValue = () => leaf?.path ?? fallbackValue;
-  const guardMeta: GuardMeta = { matches: path => matchesValue(currentValue(), path) };
+  const guardMeta: GuardMeta = { matches: path => matchesValue(currentValue(), path), child: id => children[id] };
 
   function makeSnapshot(): Snapshot<TContext> {
     const value = currentValue();
-    return { value, context, status, children, matches: path => matchesValue(value, path) };
+    const tags = new Set(activeNodes().flatMap(node => node.config.tags ?? []));
+    return {
+      value,
+      context,
+      status,
+      error,
+      children,
+      matches: path => matchesValue(value, path),
+      hasTag: tag => tags.has(tag),
+    };
   }
 
   // The snapshot is cached and only replaced on an actual change, so
@@ -330,7 +346,9 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   function settle(event: EventObject): void {
     if (leaf?.config.type === 'final' && leaf.parent === root) {
-      status = 'done';
+      const toError = leaf.config.error;
+      status = toError ? 'error' : 'done';
+      error = toError?.(context);
       stopAllActivities();
       return;
     }
@@ -363,14 +381,14 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       return;
     }
     if (typeof invoke.src === 'string') {
-      const provided = actors[invoke.src];
+      const provided = findActor(invoke.src);
       if (provided === undefined) {
         throw new Error(`Unknown actor "${invoke.src}" invoked from "${node.path}"`);
       }
       if (isMachine(provided)) {
         startChild(node, activity, invoke, provided);
       } else {
-        settlePromise(node, activity, invoke, provided(invoke.input?.(context)));
+        settlePromise(node, activity, invoke, new Promise(resolve => resolve(provided(invoke.input?.(context)))));
       }
       return;
     }
@@ -410,13 +428,20 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   ): void {
     const id = invoke.id ?? node.path;
     const input = invoke.input?.(context);
-    const child = createActor(logic, { context: typeof input === 'object' && input !== null ? input : {}, actors });
+    const child = createActor(logic, {
+      context: typeof input === 'object' && input !== null ? input : {},
+      actors: { ...machine.actors, ...options.actors },
+    });
     activity.childId = id;
     children = { ...children, [id]: child };
     child.subscribe(childSnapshot => {
       if (childSnapshot.status === 'done') {
         const done: DoneInvokeEvent = { type: INVOKE_DONE, output: childSnapshot.context };
         queueMicrotask(() => fire(node, activity, invoke.onDone, done));
+      }
+      if (childSnapshot.status === 'error') {
+        const failed: ErrorInvokeEvent = { type: INVOKE_ERROR, error: childSnapshot.error };
+        queueMicrotask(() => fire(node, activity, invoke.onError, failed));
       }
     });
     child.start();
@@ -475,6 +500,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       }
       started = true;
       status = 'active';
+      error = undefined;
       // Reset state and context so a restart (e.g. after StrictMode stop/start)
       // begins from idle rather than re-entering and re-invoking a mid-flight state.
       context = { ...machine.context, ...liveContextPatch };
@@ -603,9 +629,10 @@ export function createActor<TContext extends object, TEvent extends EventObject>
  * actor.getSnapshot(); // → { value: 'deleting', context: {...}, status: 'active' }
  * ```
  */
-export function mockActor<TContext extends object, TEvent extends EventObject>(
-  machine: StateMachine<TContext, TEvent>,
+export function mockActor<TContext extends object, TEvent extends EventObject, TActors extends ProvidedActors>(
+  machine: StateMachine<TContext, TEvent, TActors>,
   snapshot: { value: string; context?: Partial<TContext> },
 ): Actor<TContext, TEvent> {
-  return createActor(machine, { snapshot });
+  const inert: StateMachine<TContext, TEvent> = machine;
+  return createActor(inert, { snapshot });
 }

@@ -76,7 +76,7 @@ describe('useReverificationActors', () => {
     session?.startVerification.mockResolvedValue(resource());
     const { result } = renderHook(() => useReverificationActors());
 
-    await result.current.actors.startVerification(undefined);
+    await result.current.startVerification(undefined);
 
     expect(session?.startVerification).toHaveBeenCalledWith({ level: 'second_factor' });
   });
@@ -100,7 +100,7 @@ describe('useReverificationActors', () => {
     );
 
     const { result } = renderHook(() => useReverificationActors());
-    const started = await result.current.actors.startVerification('first_factor');
+    const started = await result.current.startVerification('first_factor');
 
     expect(session?.startVerification).toHaveBeenCalledWith({ level: 'first_factor' });
     expect(started.methods.map(method => method.strategy)).toEqual(['password', 'email_code']);
@@ -122,7 +122,7 @@ describe('useReverificationActors', () => {
     );
 
     const { result } = renderHook(() => useReverificationActors());
-    const started = await result.current.actors.startVerification('first_factor');
+    const started = await result.current.startVerification('first_factor');
     expect(started.startingMethod?.strategy).toBe('passkey');
   });
 
@@ -140,7 +140,7 @@ describe('useReverificationActors', () => {
     );
 
     const { result } = renderHook(() => useReverificationActors());
-    const started = await result.current.actors.startVerification('second_factor');
+    const started = await result.current.startVerification('second_factor');
     expect(started.status).toBe('needs_second_factor');
     expect(started.startingMethod).toEqual({ id: 'totp', stage: 'second', strategy: 'totp' });
     expect(started.methods.find(method => method.strategy === 'phone_code')).toEqual({
@@ -158,8 +158,8 @@ describe('useReverificationActors', () => {
     session?.attemptFirstFactorVerification.mockResolvedValue(resource({ status: 'complete' }));
 
     const { result } = renderHook(() => useReverificationActors());
-    await result.current.actors.startVerification('first_factor');
-    await result.current.actors.prepareFactor({
+    await result.current.startVerification('first_factor');
+    await result.current.prepareFactor({
       id: 'email_code:idn_1',
       stage: 'first',
       strategy: 'email_code',
@@ -171,7 +171,7 @@ describe('useReverificationActors', () => {
       emailAddressId: 'idn_1',
     });
 
-    await result.current.actors.attemptFactor({
+    await result.current.attemptFactor({
       method: { id: 'password', stage: 'first', strategy: 'password' },
       value: 'secret',
     });
@@ -180,7 +180,7 @@ describe('useReverificationActors', () => {
       password: 'secret',
     });
 
-    await result.current.actors.prepareFactor({
+    await result.current.prepareFactor({
       id: 'phone_code:pn_1',
       stage: 'first',
       strategy: 'phone_code',
@@ -205,8 +205,8 @@ describe('useReverificationActors', () => {
     session?.attemptSecondFactorVerification.mockResolvedValue(resource({ status: 'complete' }));
 
     const { result } = renderHook(() => useReverificationActors());
-    await result.current.actors.startVerification('second_factor');
-    await result.current.actors.prepareFactor({
+    await result.current.startVerification('second_factor');
+    await result.current.prepareFactor({
       id: 'phone_code:pn_1',
       stage: 'second',
       strategy: 'phone_code',
@@ -218,7 +218,7 @@ describe('useReverificationActors', () => {
       phoneNumberId: 'pn_1',
     });
 
-    await result.current.actors.attemptFactor({
+    await result.current.attemptFactor({
       method: { id: 'totp', stage: 'second', strategy: 'totp' },
       value: '123456',
     });
@@ -229,7 +229,7 @@ describe('useReverificationActors', () => {
     session?.verifyWithPasskey.mockResolvedValue(resource({ status: 'complete' }));
     const { result } = renderHook(() => useReverificationActors());
 
-    await result.current.actors.attemptFactor({
+    await result.current.attemptFactor({
       method: { id: 'passkey', stage: 'first', strategy: 'passkey' },
       value: '',
     });
@@ -252,7 +252,7 @@ describe('useReverificationActors', () => {
 
     const { result } = renderHook(() => useReverificationActors());
     await expect(
-      result.current.actors.attemptFactor({
+      result.current.attemptFactor({
         method: { id: 'password', stage: 'first', strategy: 'password' },
         value: 'bad',
       }),
@@ -262,7 +262,7 @@ describe('useReverificationActors', () => {
   it('activates the verified session to finish', async () => {
     const { result } = renderHook(() => useReverificationActors());
 
-    await result.current.actors.finishVerification();
+    await result.current.finishVerification();
 
     expect(setActive).toHaveBeenCalledWith({ session: 'sess_1' });
   });
@@ -271,7 +271,7 @@ describe('useReverificationActors', () => {
     setActive.mockRejectedValue(new Error('Session could not be activated.'));
     const { result } = renderHook(() => useReverificationActors());
 
-    await expect(result.current.actors.finishVerification()).rejects.toMatchObject({
+    await expect(result.current.finishVerification()).rejects.toMatchObject({
       message: 'Session could not be activated.',
     });
   });
@@ -280,14 +280,6 @@ describe('useReverificationActors', () => {
     session = null;
     const { result } = renderHook(() => useReverificationActors());
 
-    await expect(result.current.actors.startVerification(undefined)).rejects.toBeInstanceOf(Error);
-    expect(result.current.sessionId).toBeNull();
-  });
-
-  it('reports an unloaded session as undefined', () => {
-    session = undefined;
-    const { result } = renderHook(() => useReverificationActors());
-
-    expect(result.current.sessionId).toBeUndefined();
+    await expect(result.current.startVerification(undefined)).rejects.toBeInstanceOf(Error);
   });
 });

@@ -1,30 +1,25 @@
-import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { isReverificationCancelledError } from '@clerk/shared/error';
 
+import { childHasTag } from '../../machine/guards';
 import { setup } from '../../machine/setup';
-import type { ErrorInvokeEvent } from '../../machine/types';
+import type { AnyStateMachine, ErrorInvokeEvent } from '../../machine/types';
 
 export interface DestructiveContext {
   errorMessage: string | undefined;
-  reverifiable: boolean;
 }
 
-export type DestructiveEvent = { type: 'OPEN' } | { type: 'CLOSE' } | { type: 'CONFIRM' } | { type: 'SESSION_CHANGED' };
+export type DestructiveEvent = { type: 'OPEN' } | { type: 'CLOSE' } | { type: 'CONFIRM' };
 
-const { createMachine, assign } = setup<DestructiveContext, DestructiveEvent>();
-
-export function isReverificationRequired(error: unknown): boolean {
-  return isClerkAPIResponseError(error) && error.errors.some(({ code }) => code === 'session_reverification_required');
-}
-
-const fail = {
-  target: '#destructive.open.failed',
-  actions: assign<ErrorInvokeEvent>(() => ({ errorMessage: 'Something went wrong' })),
+export type DestructiveActors = {
+  action: (() => Promise<unknown>) | AnyStateMachine;
 };
+
+const { createMachine, assign } = setup<DestructiveContext, DestructiveEvent, DestructiveActors>();
 
 export const destructiveMachine = createMachine({
   id: 'destructive',
   initial: 'closed',
-  context: { errorMessage: undefined, reverifiable: false },
+  context: { errorMessage: undefined },
   states: {
     closed: {
       on: { OPEN: 'open' },
@@ -37,27 +32,18 @@ export const destructiveMachine = createMachine({
           on: { CONFIRM: 'running' },
         },
         running: {
-          on: { CLOSE: {} },
+          on: { CLOSE: [{ target: '#destructive.closed', guard: childHasTag('action', 'cancellable') }, {}] },
           invoke: {
+            id: 'action',
             src: 'action',
             onDone: '#destructive.closed',
             onError: [
-              { target: 'verifying', guard: (ctx, event) => ctx.reverifiable && isReverificationRequired(event.error) },
-              fail,
+              { target: '#destructive.closed', guard: (_, event) => isReverificationCancelledError(event.error) },
+              {
+                target: 'failed',
+                actions: assign<ErrorInvokeEvent>(() => ({ errorMessage: 'Something went wrong' })),
+              },
             ],
-          },
-        },
-        verifying: {
-          initial: 'challenge',
-          invoke: { id: 'reverification', src: 'reverification', onDone: '.retrying' },
-          states: {
-            challenge: {
-              on: { SESSION_CHANGED: '#destructive.closed' },
-            },
-            retrying: {
-              on: { CLOSE: {} },
-              invoke: { src: 'action', onDone: '#destructive.closed', onError: fail },
-            },
           },
         },
         failed: {

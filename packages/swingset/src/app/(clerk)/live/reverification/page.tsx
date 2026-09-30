@@ -3,7 +3,7 @@
 import { Destructive } from '@clerk/mosaic/blocks/destructive';
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import { Button } from '@clerk/mosaic/components/button';
-import { Reverification, useReverificationActors } from '@clerk/mosaic/features/reverification';
+import { ReverifiedAction, useReverifiedAction } from '@clerk/mosaic/features/reverification';
 import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
 import { useUser } from '@clerk/nextjs';
 import { ClerkAPIResponseError } from '@clerk/shared/error';
@@ -40,12 +40,11 @@ async function resetMockDelete() {
 function DestructiveHarness() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const destructive = useDestructiveController({
-    onDelete: async () => {
+    onDelete: useReverifiedAction(async () => {
       setSuccessMessage(null);
       await mockDelete(true);
       setSuccessMessage('Mock delete completed. The account was not deleted.');
-    },
-    reverification: useReverificationActors(),
+    }),
   });
 
   return (
@@ -71,7 +70,7 @@ function DestructiveHarness() {
         fieldLabel='Type “Delete account” below to continue'
         confirmationValue='Delete account'
         actionLabel='Delete account'
-        verificationSlot={<Reverification actor={destructive.verification} />}
+        verificationSlot={<ReverifiedAction actor={destructive.action} />}
       />
     </div>
   );

@@ -1,9 +1,21 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 
 import { createActor } from './createActor';
-import type { Actor, CreateActorOptions, EventObject, ProvidedActors, Snapshot, StateMachine } from './types';
+import type {
+  Actor,
+  ActorOptionsArgs,
+  AnyActor,
+  CreateActorOptions,
+  EventObject,
+  ProvidedActors,
+  Snapshot,
+  StateMachine,
+} from './types';
 
-export interface UseMachineOptions<TContext> extends CreateActorOptions<TContext> {
+export interface UseMachineOptions<
+  TContext,
+  TActors extends ProvidedActors = ProvidedActors,
+> extends CreateActorOptions<TContext, TActors> {
   /** Called once when the machine reaches a final state (`type: 'final'`). */
   onDone?: () => void;
 }
@@ -23,6 +35,14 @@ export function useActor<TContext extends object, TEvent extends EventObject>(
   return [snapshot, actor.send];
 }
 
+const noSubscription = () => () => {};
+
+export function useChildSnapshot(actor: AnyActor | undefined): Snapshot<object> | undefined {
+  const subscribe = actor?.subscribe ?? noSubscription;
+  const getSnapshot = useCallback(() => actor?.getSnapshot(), [actor]);
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+}
+
 /**
  * Create-and-own an actor for a machine, started for the component's lifetime.
  *
@@ -34,14 +54,19 @@ export function useActor<TContext extends object, TEvent extends EventObject>(
  * return <button onClick={() => send({ type: 'TOGGLE' })}>{snapshot.value}</button>;
  * ```
  */
-export function useMachine<TContext extends object, TEvent extends EventObject>(
-  machine: StateMachine<TContext, TEvent>,
-  options?: UseMachineOptions<TContext>,
+export function useMachine<
+  TContext extends object,
+  TEvent extends EventObject,
+  TActors extends ProvidedActors = ProvidedActors,
+>(
+  machine: StateMachine<TContext, TEvent, TActors>,
+  ...[options]: ActorOptionsArgs<TActors, UseMachineOptions<TContext, TActors>>
 ): [Snapshot<TContext>, Actor<TContext, TEvent>['send'], Actor<TContext, TEvent>] {
   const actorRef = useRef<Actor<TContext, TEvent> | null>(null);
   const actorsRef = useRef<ProvidedActors>({});
   if (actorRef.current === null) {
-    actorRef.current = createActor(machine, { ...options, actors: actorsRef.current });
+    const latest: StateMachine<TContext, TEvent> = machine;
+    actorRef.current = createActor(latest, { ...options, actors: actorsRef.current });
   }
   const actor = actorRef.current;
 

@@ -50,17 +50,17 @@ A rejection leaves the dialog up. The field is marked invalid for as long as the
 
 ## Reverification
 
-Pass `useReverificationActors()` to the controller. When the action fails with `session_reverification_required`, the controller starts reverification as a child of the dialog, retries the action once it succeeds, and blocks closing while the retry runs. Closing the dialog or switching sessions stops the verification. Render the child in `verificationSlot`, and confirmation and verification stay in the same dialog and card.
+Wrap the action with `useReverifiedAction` and pass it as `onDelete`. When the action fails with `session_reverification_required`, the wrapped action asks the user to verify, then retries. The controller does not know about reverification: it shows the verify step while the action asks for input, allows closing only while the action can be cancelled, and exposes the running action as `destructive.action`. Render it with `ReverifiedAction` in `verificationSlot`, and confirmation and verification stay in the same dialog and card. Closing the dialog or switching sessions stops the verification.
 
 ```tsx
-import { Reverification, useReverificationActors } from '@clerk/mosaic/features/reverification';
+import { ReverifiedAction, useReverifiedAction } from '@clerk/mosaic/features/reverification';
 
-const destructive = useDestructiveController({ onDelete: deleteAccount, reverification: useReverificationActors() });
+const destructive = useDestructiveController({ onDelete: useReverifiedAction(deleteAccount) });
 
 <Destructive
   {...copy}
   {...destructive}
-  verificationSlot={<Reverification actor={destructive.verification} />}
+  verificationSlot={<ReverifiedAction actor={destructive.action} />}
 />;
 ```
 

@@ -18,6 +18,7 @@ export interface AnyEventObject extends EventObject {
 
 export interface GuardMeta {
   matches: (path: string) => boolean;
+  child: (id: string) => AnyActor | undefined;
 }
 
 /** Pure predicate that gates a transition. */
@@ -121,13 +122,29 @@ export type PromiseSrc<TContext, TEvent extends EventObject, TOutput> = (
   event: TEvent | DoneInvokeEvent | ErrorInvokeEvent,
 ) => Promise<TOutput>;
 
-export type AnyStateMachine = StateMachine<any, any>;
+export type AnyStateMachine = StateMachine<any, any, any>;
 
 export type ProvidedActor = AnyStateMachine | ((input: any) => Promise<unknown>);
 
 export type ProvidedActors = Record<string, ProvidedActor>;
 
-/** Invoke a promise on state entry and branch on its settlement. */
+/** What a provided actor accepts: a promise actor's argument, or a context patch for a machine. */
+export type ActorInput<TActor> =
+  TActor extends StateMachine<infer TContext, any, any>
+    ? Partial<TContext>
+    : TActor extends (input: infer TInput) => Promise<unknown>
+      ? TInput
+      : never;
+
+/** What a provided actor finishes with: a promise actor's result, or a machine's final context. */
+export type ActorOutput<TActor> =
+  TActor extends StateMachine<infer TContext, any, any>
+    ? TContext
+    : TActor extends (input: any) => Promise<infer TOutput>
+      ? TOutput
+      : never;
+
+/** Invoke a promise or machine on state entry and branch on its settlement. */
 export interface InvokeConfig<
   TContext,
   TEvent extends EventObject,
@@ -141,10 +158,36 @@ export interface InvokeConfig<
   onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
 }
 
-export interface StateConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
+/** Invoke an actor from the machine's registry by name, typed by that actor's input and output. */
+export type NamedInvokeConfig<TContext, TActors extends ProvidedActors, TStates extends string = string> = {
+  [K in keyof TActors & string]: {
+    src: K;
+    id?: string;
+    input?: (context: TContext) => ActorInput<TActors[K]>;
+    onDone?: Transition<TContext, DoneInvokeEvent<ActorOutput<TActors[K]>>, TStates>;
+    onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
+  };
+}[keyof TActors & string];
+
+/** An inline invoke (the src is given directly) or a named one from the registry. */
+export type StateInvokeConfig<
+  TContext,
+  TEvent extends EventObject,
+  TActors extends ProvidedActors,
+  TStates extends string = string,
+> =
+  | (InvokeConfig<TContext, TEvent, any, TStates> & { src: PromiseSrc<TContext, TEvent, any> | AnyStateMachine })
+  | NamedInvokeConfig<TContext, TActors, TStates>;
+
+export interface StateConfig<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TActors extends ProvidedActors = ProvidedActors,
+> {
   id?: string;
   initial?: string;
-  states?: Record<string, StateConfig<TContext, TEvent, string>>;
+  states?: Record<string, StateConfig<TContext, TEvent, string, TActors>>;
   /**
    * Entry precondition — "may navigation LAND on this state right now?". Checked
    * uniformly by *every* transition (and the derived initial) that targets this
@@ -182,13 +225,20 @@ export interface StateConfig<TContext, TEvent extends EventObject, TStates exten
    * `setup().fromPromise`) to carry the resolved type to `onDone.actions`.
    * A raw `src` function is also accepted — `e.output` is `any` in that case.
    */
-  invoke?: InvokeConfig<TContext, TEvent, any, TStates>;
+  invoke?: StateInvokeConfig<TContext, TEvent, TActors, TStates>;
   /** Actions run when the state is entered. */
   entry?: Actions<TContext, TEvent>;
   /** Actions run when the state is exited. */
   exit?: Actions<TContext, TEvent>;
   /** A terminal state — no further events are processed once reached. */
   type?: 'final';
+  /**
+   * On a final state: finish with an error instead of succeeding. An invoking
+   * parent takes `onError` with this value rather than `onDone`.
+   */
+  error?: (context: TContext) => unknown;
+  /** Labels readable from outside via `snapshot.hasTag`, e.g. by a parent that invoked this machine. */
+  tags?: string[];
 }
 
 /**
@@ -197,11 +247,16 @@ export interface StateConfig<TContext, TEvent extends EventObject, TStates exten
  */
 export type InitialResolver<TContext, TStates extends string = string> = (context: TContext) => TStates;
 
-export interface MachineConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
+export interface MachineConfig<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TActors extends ProvidedActors = ProvidedActors,
+> {
   id?: string;
   initial: TStates | InitialResolver<TContext, TStates>;
   context?: TContext;
-  states: Record<TStates, StateConfig<TContext, TEvent, TStates>>;
+  states: Record<TStates, StateConfig<TContext, TEvent, TStates, TActors>>;
 }
 
 /**
@@ -209,15 +264,17 @@ export interface MachineConfig<TContext, TEvent extends EventObject, TStates ext
  * {@link createMachine}. `states` is exposed so docs/tests can enumerate every
  * step without running anything.
  */
-export interface StateMachine<TContext, TEvent extends EventObject> {
+export interface StateMachine<TContext, TEvent extends EventObject, TActors extends ProvidedActors = ProvidedActors> {
   id: string | undefined;
   initial: string | InitialResolver<TContext>;
   context: TContext;
-  states: Record<string, StateConfig<TContext, TEvent>>;
-  config: MachineConfig<TContext, TEvent>;
+  states: Record<string, StateConfig<TContext, TEvent, string, TActors>>;
+  config: MachineConfig<TContext, TEvent, string, TActors>;
+  /** Actors bound with `provide`. They take precedence over actors passed by an invoking parent. */
+  actors: ProvidedActors;
 }
 
-export type ActorStatus = 'active' | 'done' | 'stopped';
+export type ActorStatus = 'active' | 'done' | 'error' | 'stopped';
 
 export type AnyActor = Actor<object, never>;
 
@@ -226,8 +283,11 @@ export interface Snapshot<TContext> {
   value: string;
   context: TContext;
   status: ActorStatus;
+  /** Set when the actor finished in a final state with an `error`. */
+  error: unknown;
   children: Readonly<Record<string, AnyActor>>;
   matches: (path: string) => boolean;
+  hasTag: (tag: string) => boolean;
 }
 
 /** A subscriber receives the latest snapshot on every transition. */
@@ -269,7 +329,7 @@ export interface Actor<TContext, TEvent extends EventObject> {
   recheck: () => void;
 }
 
-export interface CreateActorOptions<TContext> {
+export interface CreateActorOptions<TContext, TActors extends ProvidedActors = ProvidedActors> {
   /**
    * Runtime context merged over machine defaults at actor creation time.
    * Use this to inject dependencies (e.g. an async function from a hook)
@@ -283,5 +343,13 @@ export interface CreateActorOptions<TContext> {
    * actions, immediates, or invokes run for the teleported state).
    */
   snapshot?: { value: string; context?: Partial<TContext> };
-  actors?: ProvidedActors;
+  actors?: TActors;
 }
+
+/**
+ * The options argument of `createActor`/`useMachine`. A machine with a typed
+ * registry (from `setup<Ctx, Evt, Actors>()`) must be given every actor it names.
+ */
+export type ActorOptionsArgs<TActors extends ProvidedActors, TOptions> = string extends keyof TActors
+  ? [options?: TOptions]
+  : [options: TOptions & { actors: TActors }];

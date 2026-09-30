@@ -1,4 +1,4 @@
-import type { EventObject, MachineConfig, StateMachine } from './types';
+import type { EventObject, MachineConfig, ProvidedActors, StateMachine } from './types';
 
 /**
  * Create a state-machine definition from a config object.
@@ -24,7 +24,8 @@ export function createMachine<
   TContext extends object = Record<string, never>,
   TEvent extends EventObject = EventObject,
   TStates extends string = string,
->(config: MachineConfig<TContext, TEvent, TStates>): StateMachine<TContext, TEvent> {
+  TActors extends ProvidedActors = ProvidedActors,
+>(config: MachineConfig<TContext, TEvent, TStates, TActors>): StateMachine<TContext, TEvent, TActors> {
   return {
     id: config.id,
     initial: config.initial,
@@ -34,5 +35,21 @@ export function createMachine<
     context: config.context ?? ({} as TContext),
     states: config.states,
     config,
+    actors: {},
   };
+}
+
+/**
+ * Bind actors to a machine so it carries its own dependencies. The result can
+ * be invoked by a parent that knows nothing about those actors.
+ *
+ * ```ts
+ * const flow = provide(checkoutMachine, { charge: card => api.charge(card) });
+ * ```
+ */
+export function provide<TContext, TEvent extends EventObject, TActors extends ProvidedActors>(
+  machine: StateMachine<TContext, TEvent, TActors>,
+  actors: TActors,
+): StateMachine<TContext, TEvent> {
+  return { ...machine, actors: { ...machine.actors, ...actors } };
 }
