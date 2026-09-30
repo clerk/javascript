@@ -154,6 +154,7 @@ export function UserProfileApiKeysPanelView({
             </Table.Row>
           </Table.Header>
           <Table.Body>
+            {/* TODO: Replace with a shared Table.Loading built on a Mosaic Skeleton component (skeleton rows sized to the columns). */}
             {isLoading ? (
               <Table.Empty colSpan={columnCount}>
                 <span role='status'>
