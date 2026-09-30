@@ -3,9 +3,6 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, durationVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  accountIdentifier: {
-    fontWeight: fontWeightVars['--cl-font-medium'],
-  },
   rowAvatar: {
     '--_cl-avatar-radius': radiusVars['--cl-radius-sm'],
     fontSize: '0.5rem',

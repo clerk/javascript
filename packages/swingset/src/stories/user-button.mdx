@@ -2,11 +2,12 @@ import * as UserButtonStories from './user-button.stories';
 
 # UserButton
 
-The account & organization switcher behind the user avatar. The active organization heads the surface,
-carrying a **gear** and **Invite**. The account's workspaces sit under it: every organization, plus
+The account & organization switcher behind the user avatar. The account heads the surface, badged
+with the active organization, carrying **Settings** and **Invite**. The account's workspaces sit under it: every organization, plus
 **suggested** and **invited** ones it can Join. **Switch account** at the foot opens the signed-in
-accounts as a flyout — the active one checked — so an account never reads as a workspace. With
-nobody to switch to, that row is **Add account** instead. The foot signs out of everything. `mode` narrows all of it;
+accounts as a flyout — the active one checked — so an account never reads as a workspace. The
+flyout also adds an account and signs out of all of them. With nobody to switch to, that row is
+**Add account** instead. The foot signs out of the active account. `mode` narrows all of it;
 see [Modes](#modes).
 
 Only the active account's organizations are listed. Not a design choice: org requests are scoped to
@@ -73,8 +74,8 @@ Exports are flat (not `UserButton.Trigger`) so each part declares its own `'use 
 
 ## Trigger
 
-The active workspace's avatar and what it is called: the org and its plan where one is active, no
-selection when personal is hidden and none is active, the account otherwise.
+The avatar and name of whatever leads the popup, badged with the active organization where the
+account leads.
 
 `renderTriggerLabel={false}` leaves the avatar alone. A user's avatar on its own rounds the trigger
 fully to match it; see [User only](#user-only).
@@ -95,8 +96,11 @@ fully to match it; see [User only](#user-only).
 
 The header names whatever leads and carries what you can do about it, stacked under it as
 full-width labelled buttons. An organization is described by its plan and member count, and carries
-**Settings** with **Invite**. An account is described by its identifier, and carries **Settings**
-with **Sign out**. Where the gear is the only action, it trails the workspace inline as an icon.
+**Settings** with **Invite**. An account is described by its identifier. Where the gear is the only
+action, as it is for an account, it trails the workspace inline as an icon.
+
+With an organization active in `combined`, **Settings** opens a menu of **Organization settings** and
+**Profile settings**. Where only one of them is available, **Settings** opens it directly.
 
 ## Modes
 
@@ -105,7 +109,7 @@ Everything else is data.
 
 | Mode                 | Popup                                | Leads with                        |
 | -------------------- | ------------------------------------ | --------------------------------- |
-| `combined` (default) | Organizations and accounts together. | The active org, else the account. |
+| `combined` (default) | Organizations and accounts together. | The account, badged with the org. |
 | `organization`       | Organizations only; no account rows. | The active org, else the account. |
 | `user`               | Accounts only; never shows an org.   | The account.                      |
 
@@ -113,12 +117,18 @@ What a mode leads with is named in the trigger and heads the popup — the two a
 
 ### Combined
 
-The active org heads it. The workspaces sit under the account's identifier, whose `⋯` manages or
-signs out of the account, with **Create organization** at their foot. **Switch account** opens the
-signed-in accounts, and the foot signs out of all of them.
+The account heads it, badged with the active org, with **Settings** and **Invite**. The workspaces
+sit under it, with **Create organization** at their foot. **Switch account** opens the signed-in
+accounts, with **Add account** and **Sign out of all accounts**, and **Sign out** at the foot signs
+out of the active account.
 
 <Story
   name='Combined'
+  storyModule={UserButtonStories}
+/>
+
+<Story
+  name='CombinedIconTrigger'
   storyModule={UserButtonStories}
 />
 
@@ -126,27 +136,6 @@ With one account signed in, the foot is **Add account** and **Sign out**.
 
 <Story
   name='CombinedSingleAccount'
-  storyModule={UserButtonStories}
-/>
-
-With the personal workspace selected, the account leads, and the header carries **Sign out**.
-
-<Story
-  name='CombinedPersonalWorkspace'
-  storyModule={UserButtonStories}
-/>
-
-`modePriority='user'` leads with the account instead. With an organization active, the account's
-avatar is badged with it, and the header carries **Settings** for the account and **Invite** for the
-organization.
-
-<Story
-  name='CombinedUserPriority'
-  storyModule={UserButtonStories}
-/>
-
-<Story
-  name='CombinedUserPriorityAvatarTrigger'
   storyModule={UserButtonStories}
 />
 
@@ -167,8 +156,8 @@ nothing else is on offer, so the popup ends there.
 
 ### User only
 
-The account heads it, with **Settings** and **Sign out**. No workspaces are listed, so **Switch
-account** and **Sign out of all accounts** at the foot are the whole of it.
+The account heads it, with the gear inline. No workspaces are listed, so **Switch account** and
+**Sign out** at the foot are the whole of it.
 
 <Story
   name='User'
@@ -180,7 +169,7 @@ account** and **Sign out of all accounts** at the foot are the whole of it.
   storyModule={UserButtonStories}
 />
 
-With one account signed in, the foot is **Add account** alone.
+With one account signed in, the foot is **Add account** and **Sign out**.
 
 <Story
   name='UserAvatarSingleSession'
@@ -191,7 +180,7 @@ With one account signed in, the foot is **Add account** alone.
 
 Memberships, invitations and suggestions are three separate requests, and the popup opens before any
 of them land. `organizationsLoading` holds the workspace list's place until the last one is in — one
-placeholder for all three, so the list does not walk itself in a row at a time. The account row is
+placeholder for all three, so the list does not walk itself in a row at a time. The header is
 already known, so it renders throughout.
 
 Reopen the popup to watch it again.
@@ -205,9 +194,8 @@ Reopen the popup to watch it again.
 
 An instance in single-session mode holds one account at a time, so there is nothing to switch to and
 no second account to add. It hands the view an empty `additionalSessions` and leaves `onAddAccount`
-and `onSignOutAll` off — the surface withholds **Switch account** and **Add account**. The foot keeps
-its sign-out row, but as **Sign out** of the one account, since that is all "all accounts" ever
-meant here.
+and `onSignOutAll` off — the surface withholds **Switch account**, **Add account**, and **Sign out of
+all accounts**. The foot keeps **Sign out**.
 
 <Story
   name='SingleSession'
@@ -217,9 +205,8 @@ meant here.
 ## No organization selected
 
 `hidePersonal` withholds the personal workspace — the instance does this when it forces an
-organization, or the app does it itself. With no org active either, the lead is not the account:
-trigger and header say **No organization selected**, the mark is square, and the gear is **Manage
-account**.
+organization, or the app does it itself. In `organization` mode with no org active either, trigger and
+header say **No organization selected**, the mark is square, and the gear is **Manage account**.
 
 <Story
   name='NoOrganizationSelected'
@@ -234,13 +221,11 @@ on its own, so it stays followable while another action is in flight. The `icon`
 without one still holds the column, so labels stay in line.
 
 `menuItemOrder` names the foot's rows by id, and whatever it leaves out follows what it named. The
-ids it knows are `switchAccount`, `addAccount`, `signOutAll`, `signOut`, and each custom item's `id`.
-Those are the only actions the foot lists as rows; the rest live in the header, behind a `⋯`, or with
-the workspaces, where there is no list for an order to run in.
+ids it knows are `switchAccount`, `addAccount`, `signOut`, and each custom item's `id`.
+Those are the only actions the foot lists as rows; the rest live in the header or with the workspaces, where there is no list for an order to run in.
 
-The accounts row is `switchAccount` where there is somebody to switch to and `addAccount` where there
-is not, and the sign-out row is `signOutAll` where there is a second account and `signOut` where
-there is not. Name both ids to place a row whichever way it resolves. An id the surface has not got
+In `combined`, the accounts row is `switchAccount` where there is somebody to switch to and
+`addAccount` where there is not. Name both ids to place a row whichever way it resolves. An id the surface has not got
 is ignored rather than an error, so one order can cover every mode.
 
 <Story

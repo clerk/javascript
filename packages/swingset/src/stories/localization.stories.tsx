@@ -35,7 +35,6 @@ const esES: MosaicCatalog = {
       pending: 'pendiente',
     },
     accounts: {
-      actionsFor: 'Acciones para {identifier}',
       switch: 'Cambiar de cuenta',
       add: 'Añadir cuenta',
       signOut: 'Cerrar sesión',
@@ -45,6 +44,8 @@ const esES: MosaicCatalog = {
       invite: 'Invitar',
       account: 'Gestionar cuenta',
       organization: 'Gestionar organización',
+      organizationSettings: 'Configuración de la organización',
+      profileSettings: 'Configuración del perfil',
       createOrganization: 'Crear organización',
     },
   },
