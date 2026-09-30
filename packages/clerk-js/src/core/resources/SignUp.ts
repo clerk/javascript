@@ -70,7 +70,6 @@ import {
 } from '../errors';
 import { eventBus } from '../events';
 import { ProtectCheckGate } from '../protectCheckGate';
-import type { BaseMutateParams } from './internal';
 import { BaseResource, SignUpVerifications } from './internal';
 
 declare global {
@@ -144,7 +143,11 @@ export class SignUp extends BaseResource implements SignUpResource {
    * This property is used to provide access to underlying Client methods to `SignUpFuture`, which wraps an instance
    * of `SignUp`.
    */
-  __internal_basePost = this._basePost.bind(this);
+  __internal_basePost: typeof this._basePost = async params => {
+    await this._basePost(params);
+    await ProtectCheckGate.getInstance().resolve(SignUp.clerk, this, params?.action);
+    return this;
+  };
 
   /**
    * @internal Only used for internal purposes, and is not intended to be used directly.
@@ -152,7 +155,11 @@ export class SignUp extends BaseResource implements SignUpResource {
    * This property is used to provide access to underlying Client methods to `SignUpFuture`, which wraps an instance
    * of `SignUp`.
    */
-  __internal_basePatch = this._basePatch.bind(this);
+  __internal_basePatch: typeof this._basePatch = async params => {
+    await this._basePatch(params);
+    await ProtectCheckGate.getInstance().resolve(SignUp.clerk, this, params?.action);
+    return this;
+  };
 
   constructor(data: SignUpJSON | SignUpJSONSnapshot | null = null) {
     super();
@@ -529,10 +536,6 @@ export class SignUp extends BaseResource implements SignUpResource {
       })(password, cb);
     }
   };
-
-  protected _afterMutate({ action }: BaseMutateParams): Promise<void> {
-    return ProtectCheckGate.getInstance().resolve(SignUp.clerk, 'signUp', this, action);
-  }
 
   protected fromJSON(data: SignUpJSON | SignUpJSONSnapshot | null): this {
     if (data) {

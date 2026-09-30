@@ -29,7 +29,7 @@ describe('ProtectCheckGate', () => {
     const resource = gated();
 
     let settled = false;
-    const pending = gate.resolve(clerk, 'signIn', resource).then(() => {
+    const pending = gate.resolve(clerk, resource).then(() => {
       settled = true;
     });
     await Promise.resolve();
@@ -41,29 +41,21 @@ describe('ProtectCheckGate', () => {
     expect(settled).toBe(true);
   });
 
-  it('counts registrations per flow and releases each one once', async () => {
+  it('leaves the proof submission to whatever runs the challenge', async () => {
     const clerk = mockClerk();
-    const releaseCombined = gate.register(['signIn', 'signUp']);
-    const releaseSignUp = gate.register(['signUp']);
 
-    releaseCombined();
-    releaseCombined();
-    await gate.resolve(clerk, 'signIn', gated('sia_1'));
-    await gate.resolve(clerk, 'signUp', gated('sua_1'));
-    expect(clerk.__internal_openProtectCheckModal).toHaveBeenCalledTimes(1);
+    await gate.resolve(clerk, gated(), 'protect_check');
 
-    releaseSignUp();
-    await gate.resolve(clerk, 'signUp', gated('sua_1'));
-    expect(clerk.__internal_openProtectCheckModal).toHaveBeenCalledTimes(2);
+    expect(clerk.__internal_openProtectCheckModal).not.toHaveBeenCalled();
   });
 
   it('makes a call on the same resource share the in-flight resolution', async () => {
     const deferred = createDeferredPromise();
     const clerk = mockClerk({ __internal_openProtectCheckModal: vi.fn().mockReturnValue(deferred.promise) });
 
-    const outer = gate.resolve(clerk, 'signIn', gated());
+    const outer = gate.resolve(clerk, gated());
     let innerSettled = false;
-    const inner = gate.resolve(clerk, 'signIn', gated()).then(() => {
+    const inner = gate.resolve(clerk, gated()).then(() => {
       innerSettled = true;
     });
     await Promise.resolve();
@@ -80,8 +72,8 @@ describe('ProtectCheckGate', () => {
     const clerk = mockClerk({ __internal_openProtectCheckModal: open });
     const signUp = gated('sua_1');
 
-    const outer = gate.resolve(clerk, 'signIn', gated('sia_1'));
-    const other = gate.resolve(clerk, 'signUp', signUp);
+    const outer = gate.resolve(clerk, gated('sia_1'));
+    const other = gate.resolve(clerk, signUp);
     await Promise.resolve();
     expect(open).toHaveBeenCalledTimes(1);
 
@@ -93,10 +85,10 @@ describe('ProtectCheckGate', () => {
 
   it('releases the in-flight lock and rethrows when the modal cannot open', async () => {
     const clerk = mockClerk({ __internal_openProtectCheckModal: vi.fn().mockRejectedValue(new Error('no ui')) });
-    await expect(gate.resolve(clerk, 'signIn', gated())).rejects.toThrow('no ui');
+    await expect(gate.resolve(clerk, gated())).rejects.toThrow('no ui');
 
     const next = mockClerk();
-    await gate.resolve(next, 'signIn', gated());
+    await gate.resolve(next, gated());
     expect(next.__internal_openProtectCheckModal).toHaveBeenCalledTimes(1);
   });
 });

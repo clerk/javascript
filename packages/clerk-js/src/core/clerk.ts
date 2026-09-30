@@ -994,10 +994,6 @@ export class Clerk implements ClerkInterface {
       .then(controls => controls.closeModal('enableOrganizationsPrompt'));
   };
 
-  public __internal_registerProtectCheckHandler = (flows: ProtectCheckFlow[]): (() => void) => {
-    return ProtectCheckGate.getInstance().register(flows);
-  };
-
   public __internal_resolvePendingProtectCheck = async (flow?: ProtectCheckFlow): Promise<void> => {
     const client = this.client;
     if (!client || client.signIn.status === 'complete' || client.signUp.status === 'complete') {
@@ -1005,10 +1001,10 @@ export class Clerk implements ClerkInterface {
     }
     const gate = ProtectCheckGate.getInstance();
     if (flow !== 'signUp') {
-      await gate.resolve(this, 'signIn', client.signIn);
+      await gate.resolve(this, client.signIn);
     }
     if (flow !== 'signIn') {
-      await gate.resolve(this, 'signUp', client.signUp);
+      await gate.resolve(this, client.signUp);
     }
   };
 
@@ -2618,16 +2614,7 @@ export class Clerk implements ClerkInterface {
     return this.__internal_handleResourceCallback(signInOrUp, params, customNavigate);
   };
 
-  private _handleRedirectCallback = async (...args: Parameters<Clerk['_routeRedirectCallback']>): Promise<unknown> => {
-    const release = ProtectCheckGate.getInstance().register(['signIn', 'signUp']);
-    try {
-      return await this._routeRedirectCallback(...args);
-    } finally {
-      release();
-    }
-  };
-
-  private _routeRedirectCallback = async (
+  private _handleRedirectCallback = async (
     params: ResumeAfterProtectCheckParams,
     {
       signIn,

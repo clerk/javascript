@@ -3187,49 +3187,6 @@ describe('Clerk singleton', () => {
         expect(mockNavigate.mock.calls[0][0]).toBe('/sign-in#/protect-check');
       });
     });
-
-    it('owns both Protect flows while it routes a callback', async () => {
-      const release = vi.fn();
-      const register = vi.spyOn(ProtectCheckGate.prototype, 'register').mockReturnValue(release);
-      mockEnvironmentFetch.mockReturnValue(
-        Promise.resolve({
-          authConfig: {},
-          userSettings: mockUserSettings,
-          displayConfig: mockDisplayConfig,
-          isSingleSession: () => false,
-          isProduction: () => false,
-          isDevelopmentOrStaging: () => true,
-          onWindowLocationHost: () => false,
-        }),
-      );
-      mockClientFetch.mockReturnValue(
-        Promise.resolve({ signedInSessions: [], signIn: new SignIn(null), signUp: new SignUp(null) }),
-      );
-
-      const sut = new Clerk(productionPublishableKey);
-      await sut.load(mockedLoadOptions);
-      await sut.handleRedirectCallback();
-
-      expect(register).toHaveBeenCalledWith(['signIn', 'signUp']);
-      expect(release).toHaveBeenCalledTimes(1);
-      register.mockRestore();
-    });
-
-    it('releases its Protect claim when routing a callback throws', async () => {
-      const release = vi.fn();
-      const register = vi.spyOn(ProtectCheckGate.prototype, 'register').mockReturnValue(release);
-      mockEnvironmentFetch.mockReturnValue(Promise.resolve({ authConfig: {}, userSettings: mockUserSettings }));
-      mockClientFetch.mockReturnValue(
-        Promise.resolve({ signedInSessions: [], signIn: new SignIn(null), signUp: new SignUp(null) }),
-      );
-
-      const sut = new Clerk(productionPublishableKey);
-      await sut.load(mockedLoadOptions);
-      await expect(sut.handleRedirectCallback()).rejects.toThrow();
-
-      expect(release).toHaveBeenCalledTimes(1);
-      register.mockRestore();
-    });
   });
 
   describe('.handleEmailLinkVerification()', () => {
@@ -4123,8 +4080,8 @@ describe('Clerk singleton', () => {
 
       await sut.__internal_resolvePendingProtectCheck();
 
-      expect(resolve).toHaveBeenCalledWith(sut, 'signIn', sut.client?.signIn);
-      expect(resolve).toHaveBeenCalledWith(sut, 'signUp', sut.client?.signUp);
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signIn);
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signUp);
       resolve.mockRestore();
     });
 
@@ -4145,7 +4102,7 @@ describe('Clerk singleton', () => {
       await sut.__internal_resolvePendingProtectCheck('signUp');
 
       expect(resolve).toHaveBeenCalledTimes(1);
-      expect(resolve).toHaveBeenCalledWith(sut, 'signUp', sut.client?.signUp);
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signUp);
       resolve.mockRestore();
     });
   });

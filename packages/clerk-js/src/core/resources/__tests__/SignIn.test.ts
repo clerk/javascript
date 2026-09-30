@@ -19,10 +19,6 @@ vi.mock('../../../utils/authenticateWithPopup', async () => {
 // Import the mocked function after mocking
 import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPopup';
 
-beforeEach(() => {
-  vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
-});
-
 // Mock the CaptchaChallenge module
 vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
   CaptchaChallenge: vi.fn().mockImplementation(function () {
@@ -3681,31 +3677,39 @@ describe('SignIn', () => {
 });
 
 describe('SignIn protect_check gate', () => {
-  const clerk = {} as any;
   let previousClerk: any;
 
   beforeEach(() => {
     previousClerk = SignIn.clerk;
-    SignIn.clerk = clerk;
+    SignIn.clerk = {} as any;
+    vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+    BaseResource._fetch = vi.fn().mockResolvedValue({
+      client: null,
+      response: {
+        id: 'signin_123',
+        status: 'needs_protect_check',
+        protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
+      },
+    });
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     SignIn.clerk = previousClerk;
   });
 
-  const gatedResponse = {
-    client: null,
-    response: {
-      id: 'signin_123',
-      protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
-    },
-  };
+  it('hands the resource to the gate after a Future call', async () => {
+    const signIn = new SignIn();
 
-  it('leaves reloads to the caller', async () => {
-    BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
-    const signIn = new SignIn({ id: 'signin_123' } as any);
+    await signIn.__internal_future.create({ identifier: 'user@example.com' });
 
-    await signIn.reload();
+    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(SignIn.clerk, signIn, undefined);
+  });
+
+  it('returns a classic call with the gate still pending', async () => {
+    const signIn = new SignIn();
+
+    await signIn.create({ identifier: 'user@example.com' });
 
     expect(signIn.protectCheck?.token).toBe('challenge-token');
     expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();

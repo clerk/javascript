@@ -1,4 +1,4 @@
-import type { ProtectCheckFlow, SignInResource, SignUpResource } from '@clerk/shared/types';
+import type { SignInResource, SignUpResource } from '@clerk/shared/types';
 
 import type { Clerk } from './resources/internal';
 
@@ -6,16 +6,13 @@ import type { Clerk } from './resources/internal';
  * Resolves a pending `protect_check` on a sign-in or sign-up resource by opening Clerk's Protect
  * modal and waiting for the challenge to clear. One resolution runs at a time. A call on the same
  * resource shares it, and a call on another resource waits for it before resolving its own gate.
- * Skips the proof submission, which belongs to whatever runs the challenge, flows claimed through
- * `register` by code that routes the gate itself, and no-RHC builds where the challenge script must
- * not be loaded.
+ * Skips the proof submission, which belongs to whatever runs the challenge, and no-RHC builds where
+ * the challenge script must not be loaded.
  */
 export class ProtectCheckGate {
   private static instance: ProtectCheckGate;
 
   private inflight: { resourceId: string | undefined; promise: Promise<void> } | null = null;
-
-  private handlers: Record<ProtectCheckFlow, number> = { signIn: 0, signUp: 0 };
 
   public static getInstance(): ProtectCheckGate {
     if (!ProtectCheckGate.instance) {
@@ -24,25 +21,7 @@ export class ProtectCheckGate {
     return ProtectCheckGate.instance;
   }
 
-  /** Claims the given flows until the returned function is called, which counts only once. */
-  public register(flows: ProtectCheckFlow[]): () => void {
-    flows.forEach(flow => (this.handlers[flow] += 1));
-    let released = false;
-    return () => {
-      if (released) {
-        return;
-      }
-      released = true;
-      flows.forEach(flow => (this.handlers[flow] -= 1));
-    };
-  }
-
-  public async resolve(
-    clerk: Clerk,
-    flow: ProtectCheckFlow,
-    resource: SignInResource | SignUpResource,
-    action?: string,
-  ): Promise<void> {
+  public async resolve(clerk: Clerk, resource: SignInResource | SignUpResource, action?: string): Promise<void> {
     if (__BUILD_DISABLE_RHC__ || action === 'protect_check') {
       return;
     }
@@ -52,7 +31,7 @@ export class ProtectCheckGate {
       }
       await this.inflight.promise.catch(() => {});
     }
-    if (!resource.protectCheck || this.handlers[flow] > 0) {
+    if (!resource.protectCheck) {
       return;
     }
     const promise = clerk.__internal_openProtectCheckModal({ resource }).finally(() => {

@@ -20,10 +20,6 @@ vi.mock('../../../utils/authenticateWithPopup', async () => {
 import { _futureAuthenticateWithPopup } from '../../../utils/authenticateWithPopup';
 import { CaptchaChallenge } from '../../../utils/captcha/CaptchaChallenge';
 
-beforeEach(() => {
-  vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
-});
-
 // Mock the CaptchaChallenge module
 vi.mock('../../../utils/captcha/CaptchaChallenge', () => ({
   CaptchaChallenge: vi.fn().mockImplementation(function () {
@@ -2341,31 +2337,39 @@ describe('SignUp', () => {
 });
 
 describe('SignUp protect_check gate', () => {
-  const clerk = {} as any;
   let previousClerk: any;
 
   beforeEach(() => {
     previousClerk = SignUp.clerk;
-    SignUp.clerk = clerk;
+    SignUp.clerk = { __internal_environment: { displayConfig: { captchaOauthBypass: [] } } } as any;
+    vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+    BaseResource._fetch = vi.fn().mockResolvedValue({
+      client: null,
+      response: {
+        id: 'signup_123',
+        status: 'needs_protect_check',
+        protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
+      },
+    });
   });
 
   afterEach(() => {
+    vi.restoreAllMocks();
     SignUp.clerk = previousClerk;
   });
 
-  const gatedResponse = {
-    client: null,
-    response: {
-      id: 'signup_123',
-      protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
-    },
-  };
+  it('hands the resource to the gate after a Future call', async () => {
+    const signUp = new SignUp();
 
-  it('leaves reloads to the caller', async () => {
-    BaseResource._fetch = vi.fn().mockResolvedValue(gatedResponse);
-    const signUp = new SignUp({ id: 'signup_123' } as any);
+    await signUp.__internal_future.create({ emailAddress: 'user@example.com' });
 
-    await signUp.reload();
+    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(SignUp.clerk, signUp, undefined);
+  });
+
+  it('returns a classic call with the gate still pending', async () => {
+    const signUp = new SignUp();
+
+    await signUp.create({ emailAddress: 'user@example.com' });
 
     expect(signUp.protectCheck?.token).toBe('challenge-token');
     expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
