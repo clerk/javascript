@@ -81,7 +81,6 @@ export const header = stylex.create({
   },
 });
 
-// The fade covers exactly the surface's top margin, so both read one value.
 const INSET = space['4'];
 
 export const banner = stylex.create({
@@ -92,8 +91,6 @@ export const banner = stylex.create({
       default: '1fr',
       ':where(:not([data-open]), [data-starting-style])': '0fr',
     },
-    // The content rides the moving edge, so the clip lands under the header, where the banner's top
-    // margin gives a static fade room to sit without touching content at rest.
     maskImage: `linear-gradient(to bottom, transparent, black ${INSET})`,
     transitionDuration: durationVars['--cl-duration-slow'],
     transitionProperty: {
@@ -105,8 +102,7 @@ export const banner = stylex.create({
       ':where([data-ending-style])': easingVars['--cl-ease-in-out'],
     },
   },
-  // No padding here: it would be the 0fr track's minimum. Spanning into the implicit second row
-  // keeps the item at the wrapper's height; a fractional fr track alone re-resolves against it.
+  // No padding (it is the 0fr track's minimum); the span sizes the item to the wrapper, not the re-resolved track.
   clip: {
     overflow: 'clip',
     alignContent: 'end',
@@ -131,7 +127,6 @@ export const banner = stylex.create({
       },
     },
     transformOrigin: 'top',
-    // Waits for a row that, under reduced motion, has already snapped open.
     transitionDelay: {
       default: durationVars['--cl-duration-fast'],
       ':where([data-ending-style])': durationVars['--cl-duration-instant'],
