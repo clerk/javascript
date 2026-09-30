@@ -3,24 +3,20 @@ import type { ReactElement, ReactNode } from 'react';
 import { Panel } from '../../components/panel';
 import { Section } from '../../components/section';
 import { themeProps } from '../../props';
-import type {
-  UserProfileActiveDevicesSectionViewProps,
-  UserProfileDevice,
-} from './user-profile-active-devices-section.view';
-import { UserProfileActiveDevicesSectionView } from './user-profile-active-devices-section.view';
+import type { UserProfileDevice } from './user-profile-active-devices-section.view';
 import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 
 export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMethod, UserProfilePasskey };
 
-export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiveDevicesSectionViewProps, 'devices'> {
+export interface UserProfileSecurityPanelViewProps {
   passwordSlot?: ReactNode;
   passkeysSlot?: ReactNode;
   mfaMethods?: UserProfileMfaMethod[];
   addableMfaMethods?: readonly UserProfileMfaAddableMethod[];
   mfaAddControl?: ReactNode;
-  devices?: UserProfileDevice[];
+  activeDevicesSlot?: ReactNode;
   onAddMfaMethod?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
   onRemoveMfaMethod?: (id: string) => void | Promise<void>;
@@ -33,13 +29,11 @@ export function UserProfileSecurityPanelView({
   mfaMethods,
   addableMfaMethods,
   mfaAddControl,
-  devices,
+  activeDevicesSlot,
   onAddMfaMethod,
   onRegenerateBackupCodes,
   onRemoveMfaMethod,
   onSetDefaultMfaMethod,
-  onSignOutDevice,
-  onSignOutAllOtherDevices,
 }: UserProfileSecurityPanelViewProps): ReactElement {
   const hasAuthentication = passwordSlot != null || Boolean(passkeysSlot) || mfaMethods !== undefined;
 
@@ -64,13 +58,7 @@ export function UserProfileSecurityPanelView({
             ) : null}
           </Section.Root>
         ) : null}
-        {devices ? (
-          <UserProfileActiveDevicesSectionView
-            devices={devices}
-            onSignOutAllOtherDevices={onSignOutAllOtherDevices}
-            onSignOutDevice={onSignOutDevice}
-          />
-        ) : null}
+        {activeDevicesSlot}
       </Panel.Sections>
     </Panel.Root>
   );
