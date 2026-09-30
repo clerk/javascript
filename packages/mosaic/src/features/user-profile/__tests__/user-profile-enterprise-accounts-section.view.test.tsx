@@ -52,7 +52,10 @@ describe('UserProfileEnterpriseAccountsSectionView', () => {
         pendingConnectionId='okta'
       />,
     );
-    expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toHaveAttribute('aria-busy', 'true');
+    const pending = screen.getByRole('button', { name: 'Connect Acme Okta' });
+    expect(pending).toHaveAttribute('aria-busy', 'true');
+    expect(pending).toHaveTextContent('Connect');
+    expect(screen.getByRole('progressbar', { name: 'Connecting' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Connect Custom SAML' })).toBeDisabled();
     await user.click(screen.getByRole('button', { name: 'Connect Custom SAML' }));
     expect(onConnect).not.toHaveBeenCalled();
@@ -64,6 +67,7 @@ describe('UserProfileEnterpriseAccountsSectionView', () => {
       />,
     );
     expect(screen.getByRole('alert')).toHaveTextContent('Unable to connect');
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Connect Custom SAML' })).toBeEnabled();
   });
