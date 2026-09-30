@@ -56,11 +56,8 @@ export function useUserProfileActiveDevicesController(
   }, [loadSessions, send]);
 
   const revoke = async (id: string) => {
-    const removed = await model.revoke(id);
-    if (removed) {
-      send({ type: 'REMOVED', id });
-    }
-    return removed;
+    await model.revoke(id);
+    send({ type: 'REMOVED', id });
   };
 
   return {

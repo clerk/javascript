@@ -165,65 +165,64 @@ describe('Active devices', () => {
     expect(devices.find(item => item.id === 'sess_current')?.status).toBe('active');
   });
 
-  it.each(['user', 'session'])(
-    'does not retry an old revoke after switching %s during reverification',
-    async switchKind => {
-      const nextUser = switchKind === 'user' ? fapiUser({ id: 'user_2' }) : alice;
-      const fapi = serveFapi({
-        client: fapiClient([
-          fapiSession({ id: 'sess_current', user: alice }),
-          fapiSession({ id: 'sess_next', user: nextUser }),
-        ]),
-      });
-      const devices = [
-        device('sess_current', 'active'),
-        device('sess_next', 'active', { device_type: 'Next laptop' }),
-        device('sess_other', 'active', { device_type: 'iPhone' }),
-      ];
-      const nextDevices = switchKind === 'user' ? devices.filter(item => item.id === 'sess_next') : devices;
-      const attempts: string[] = [];
-      worker.use(
-        http.get(fapiUrl('/v1/me/sessions/active'), () =>
-          HttpResponse.json(fapi.client.last_active_session_id === 'sess_next' ? nextDevices : devices),
-        ),
-        http.post(fapiUrl('/v1/me/sessions/:id/revoke'), ({ params }) => {
-          attempts.push(String(params.id));
-          return HttpResponse.json(
-            { errors: [{ code: 'session_reverification_required', message: 'Verification required' }] },
-            { status: 400 },
-          );
-        }),
-      );
-      const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
-      const verification = createDeferredPromise<() => void>();
-      vi.spyOn(view.clerk, '__internal_openReverification').mockImplementation(props => {
-        if (props?.afterVerification) {
-          verification.resolve(props.afterVerification);
+  it.each(['user', 'session'])('keeps the new %s view intact when an old revoke completes', async switchKind => {
+    const nextUser = switchKind === 'user' ? fapiUser({ id: 'user_2' }) : alice;
+    const fapi = serveFapi({
+      client: fapiClient([
+        fapiSession({ id: 'sess_current', user: alice }),
+        fapiSession({ id: 'sess_next', user: nextUser }),
+      ]),
+    });
+    const devices = [
+      device('sess_current', 'active'),
+      device('sess_next', 'active', { device_type: 'Next laptop' }),
+      device('sess_other', 'active', { device_type: 'iPhone' }),
+    ];
+    const nextDevices = switchKind === 'user' ? devices.filter(item => item.id === 'sess_next') : devices;
+    const attempts: string[] = [];
+    const revokeStarted = createDeferredPromise();
+    const releaseRevoke = createDeferredPromise();
+    worker.use(
+      http.get(fapiUrl('/v1/me/sessions/active'), () =>
+        HttpResponse.json(fapi.client.last_active_session_id === 'sess_next' ? nextDevices : devices),
+      ),
+      http.post(fapiUrl('/v1/me/sessions/:id/revoke'), async ({ params }) => {
+        attempts.push(String(params.id));
+        revokeStarted.resolve();
+        await releaseRevoke.promise;
+        const target = devices.find(item => item.id === params.id);
+        if (!target) {
+          return new HttpResponse(null, { status: 404 });
         }
-      });
-      view.rerender(<UserProfileActiveDevicesSection />);
-      const user = userEvent.setup();
-      await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
-      await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-      await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
-      const complete = await verification.promise;
+        target.status = 'revoked';
+        return HttpResponse.json({ response: target, client: null });
+      }),
+    );
+    const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+    await revokeStarted.promise;
 
+    try {
       await act(() => view.clerk.setActive({ session: 'sess_next' }));
-      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
-      expect(view.clerk.session?.id).toBe('sess_next');
-      expect(fapi.client.last_active_session_id).toBe('sess_next');
-      await act(() => complete());
+    } finally {
+      releaseRevoke.resolve();
+    }
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(view.clerk.session?.id).toBe('sess_next');
+    expect(fapi.client.last_active_session_id).toBe('sess_next');
 
-      await user.click(await screen.findByRole('button', { name: 'Manage Safari on Next laptop' }));
-      expect(screen.queryByRole('menuitem', { name: 'Sign out' })).toBeNull();
-      expect(attempts).toEqual(['sess_other']);
-      expect(devices.find(item => item.id === 'sess_other')?.status).toBe('active');
-      if (switchKind === 'user') {
-        expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull();
-      }
-      expect(screen.queryByRole('alert')).toBeNull();
-    },
-  );
+    await user.click(await screen.findByRole('button', { name: 'Manage Safari on Next laptop' }));
+    expect(screen.queryByRole('menuitem', { name: 'Sign out' })).toBeNull();
+    expect(attempts).toEqual(['sess_other']);
+    await waitFor(() => expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked'));
+    if (switchKind === 'user') {
+      expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull();
+    }
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
 
   it('localizes relative and formatted activity dates with surrounding text', async () => {
     const now = new Date();
@@ -258,49 +257,31 @@ describe('Active devices', () => {
     expect(screen.getAllByRole('button', { name: 'Manage Safari sur MacBook Pro' })).toHaveLength(3);
   });
 
-  it('keeps a device and closes quietly when reverification is cancelled', async () => {
-    const devices = serveDevices([device('sess_current', 'active'), device('sess_other', 'active')], {
-      reverifyOnceId: 'sess_other',
-    });
-    const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
-    const openReverification = vi.spyOn(view.clerk, '__internal_openReverification').mockImplementation(props => {
-      props?.afterVerificationCancelled?.();
-    });
-    view.rerender(<UserProfileActiveDevicesSection />);
-    const user = userEvent.setup();
-    const other = await screen.findAllByRole('button', { name: 'Manage Safari on MacBook Pro' });
-    await user.click(other[1]);
-    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+  it.each(['confirmation', 'details'] as const)(
+    'surfaces verification-required errors in the %s without opening reverification',
+    async surface => {
+      const devices = serveDevices(
+        [device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })],
+        {
+          reverifyOnceId: 'sess_other',
+        },
+      );
+      const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
+      const openReverification = vi.spyOn(view.clerk, '__internal_openReverification').mockImplementation(() => {});
+      view.rerender(<UserProfileActiveDevicesSection />);
+      const user = userEvent.setup();
+      await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+      await user.click(screen.getByRole('menuitem', { name: surface === 'details' ? 'View details' : 'Sign out' }));
+      const dialog = screen.getByRole(surface === 'details' ? 'dialog' : 'alertdialog');
+      await user.click(within(dialog).getByRole('button', { name: 'Sign out' }));
 
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
-    expect(openReverification).toHaveBeenCalledOnce();
-    expect(screen.queryByRole('alert')).toBeNull();
-    expect(devices.find(item => item.id === 'sess_other')?.status).toBe('active');
-    expect(screen.getAllByRole('button', { name: 'Manage Safari on MacBook Pro' })).toHaveLength(2);
-  });
-
-  it('retries the revoke after reverification succeeds', async () => {
-    const devices = serveDevices([device('sess_current', 'active'), device('sess_other', 'active')], {
-      reverifyOnceId: 'sess_other',
-    });
-    const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
-    const openReverification = vi.spyOn(view.clerk, '__internal_openReverification').mockImplementation(props => {
-      props?.afterVerification?.();
-    });
-    view.rerender(<UserProfileActiveDevicesSection />);
-    const user = userEvent.setup();
-    const other = await screen.findAllByRole('button', { name: 'Manage Safari on MacBook Pro' });
-    await user.click(other[1]);
-    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
-
-    await waitFor(() =>
-      expect(screen.getAllByRole('button', { name: 'Manage Safari on MacBook Pro' })).toHaveLength(1),
-    );
-    expect(openReverification).toHaveBeenCalledOnce();
-    expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked');
-  });
+      expect(await within(dialog).findByRole('alert')).toHaveTextContent('Verification required');
+      expect(openReverification).not.toHaveBeenCalled();
+      expect(devices.find(item => item.id === 'sess_other')?.status).toBe('active');
+      expect(screen.getByRole('button', { name: 'Manage Safari on iPhone' })).toBeInTheDocument();
+      expect(within(dialog).getByRole('button', { name: 'Sign out' })).not.toHaveAttribute('aria-busy', 'true');
+    },
+  );
 
   it('keeps device details open until its pending sign out completes', async () => {
     const otherDevice = device('sess_other', 'active', { device_type: 'iPhone' });
