@@ -1,6 +1,8 @@
+import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { SwitcherView } from '@clerk/mosaic/features/switcher/switcher.view';
 import { Cog6Teeth } from '@clerk/mosaic/icons/glyphs/cog-6-teeth';
+import { useUserProfileModal } from '@clerk/mosaic/features/user-profile/user-profile.modal';
 import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -192,6 +194,44 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
       ]}
       menuItemOrder={['docs', 'settings', 'inviteMembers', 'app-settings']}
     />
+  );
+}
+
+const integrationsPage = {
+  label: 'Integrations',
+  path: 'integrations',
+  content: <p>An app-provided page, passed to the profile modal as a custom page.</p>,
+};
+
+export function ProfileModal(_args: Record<string, unknown>) {
+  const prototype = usePrototype({ singleSession: true });
+  const userProfile = useUserProfileModal({ customPages: [integrationsPage] });
+
+  return (
+    <div className='flex flex-wrap items-center gap-2'>
+      <SwitcherView
+        {...prototype}
+        mode='user'
+        onManageAccount={() => {
+          prototype.onManageAccount?.();
+          userProfile.open();
+        }}
+      />
+      <Button
+        variant='outline'
+        onClick={() => userProfile.open({ page: 'security' })}
+        onPointerEnter={userProfile.preload}
+      >
+        Open security
+      </Button>
+      <Button
+        variant='outline'
+        onClick={() => userProfile.open({ page: 'integrations' })}
+        onPointerEnter={userProfile.preload}
+      >
+        Open integrations
+      </Button>
+    </div>
   );
 }
 
