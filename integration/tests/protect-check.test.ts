@@ -146,4 +146,29 @@ test.describe('protect check in custom flows @custom', () => {
     await u.page.waitForURL(/protected/);
     await u.po.expect.toBeSignedIn();
   });
+
+  test('goes to the SSO provider before the Protect challenge', async ({ page, context }) => {
+    const u = createTestUtils({ app, page, context });
+    const protectCheckRequests: string[] = [];
+    page.on('request', request => {
+      if (request.url().includes('/protect_check')) {
+        protectCheckRequests.push(request.url());
+      }
+    });
+
+    await u.page.goToRelative('/sign-in');
+    await expect(u.page.getByText('Sign in', { exact: true })).toBeVisible();
+    await page.waitForFunction(() => !!window.Clerk?.loaded && !!window.Clerk?.client);
+    const providerRedirect = page.waitForURL(/accounts\.google\.com/, { waitUntil: 'commit' });
+    await page.evaluate(() => {
+      void window.Clerk.client?.signIn.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: '/protected',
+        redirectCallbackUrl: '/sso-callback',
+      });
+    });
+
+    await providerRedirect;
+    expect(protectCheckRequests).toEqual([]);
+  });
 });
