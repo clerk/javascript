@@ -103,13 +103,17 @@ app.get('/m2m', c => {
         .addFile('src/server/app.ts', () =>
           createAppFile(`
 app.get('/oauth-verify', c => {
-  const { userId, tokenType } = getAuth(c, { acceptsToken: 'oauth_token' });
+  const auth = getAuth(c, { acceptsToken: 'oauth_token' });
 
-  if (!userId) {
+  if (!auth.userId) {
     return c.text('Unauthorized', 401);
   }
 
-  return c.json({ userId, tokenType });
+  if (!auth.has({ oauth_scope: 'profile' })) {
+    return c.text('Forbidden', 403);
+  }
+
+  return c.json({ userId: auth.userId, tokenType: auth.tokenType });
 });
 
 app.get('/oauth/callback', c => {

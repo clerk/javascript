@@ -166,6 +166,86 @@ describe('getAuthDataFromRequest', () => {
     expect(auth.isAuthenticated).toBe(true);
   });
 
+  it('reconstructs OAuth scope authorization from encrypted machine auth data', () => {
+    const machineAuthObject = createMockMachineAuthObject({
+      tokenType: 'oauth_token',
+      id: 'oat_id123',
+      subject: 'user_12345',
+      userId: 'user_12345',
+      clientId: 'client_12345',
+      scopes: ['profile', 'email'],
+      isAuthenticated: true,
+    });
+
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: 'Bearer oat_secret123',
+      }),
+      machineAuthObject,
+    });
+
+    const auth = getAuthDataFromRequest(req, { acceptsToken: 'oauth_token' });
+
+    expect(auth.tokenType).toBe('oauth_token');
+    expect(auth.isAuthenticated).toBe(true);
+    if (auth.tokenType !== 'oauth_token') {
+      throw new Error('Expected an OAuth auth object');
+    }
+    expect(auth.has({ oauth_scope: 'profile' })).toBe(true);
+    expect(auth.has({ oauth_scope: 'email' })).toBe(true);
+    expect(auth.has({ oauth_scope: 'openid' })).toBe(false);
+    expect(auth.has({ oauth_scope: 'PROFILE' })).toBe(false);
+  });
+
+  it('keeps OAuth scope authorization disabled for unauthenticated reconstructed auth data', () => {
+    const machineAuthObject = createMockMachineAuthObject({
+      tokenType: 'oauth_token',
+      isAuthenticated: false,
+    });
+
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: 'Bearer oat_invalid',
+      }),
+      machineAuthObject,
+    });
+
+    const auth = getAuthDataFromRequest(req, { acceptsToken: 'oauth_token' });
+
+    expect(auth.tokenType).toBe('oauth_token');
+    expect(auth.isAuthenticated).toBe(false);
+    if (auth.tokenType !== 'oauth_token') {
+      throw new Error('Expected an OAuth auth object');
+    }
+    expect(auth.has({ oauth_scope: 'profile' })).toBe(false);
+  });
+
+  it('keeps non-OAuth machine token authorization disabled after reconstruction', () => {
+    const machineAuthObject = createMockMachineAuthObject({
+      tokenType: 'api_key',
+      id: 'ak_id123',
+      subject: 'user_12345',
+      scopes: ['profile'],
+      isAuthenticated: true,
+    });
+
+    const req = mockRequest({
+      url: '/api/protected',
+      headers: new Headers({
+        [constants.Headers.Authorization]: 'Bearer ak_secret123',
+      }),
+      machineAuthObject,
+    });
+
+    const auth = getAuthDataFromRequest(req, { acceptsToken: 'api_key' });
+
+    expect(auth.tokenType).toBe('api_key');
+    expect(auth.isAuthenticated).toBe(true);
+    expect(auth.has({})).toBe(false);
+  });
+
   it('returns authenticated object when token type exists in acceptsToken array', () => {
     const machineAuthObject = createMockMachineAuthObject({
       tokenType: 'api_key',

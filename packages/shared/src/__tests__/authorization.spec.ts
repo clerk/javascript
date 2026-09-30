@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createCheckAuthorization, splitByScope } from '../authorization';
+import { createCheckAuthorization, createCheckAuthorizationFromOAuthScopes, splitByScope } from '../authorization';
 
 describe('createCheckAuthorization', () => {
   it('correctly parses features', () => {
@@ -374,6 +374,91 @@ describe('createCheckAuthorization', () => {
       factorVerificationAge: [-1, -1],
     });
     expect(has({ permission: 'org:sys_memberships:read', reverification: 'strict' })).toBe(false);
+  });
+});
+
+describe('createCheckAuthorizationFromOAuthScopes', () => {
+  it('authorizes an exact, case-sensitive scope match', () => {
+    const has = createCheckAuthorizationFromOAuthScopes({
+      userId: 'user_123',
+      oauthScopes: ['profile', 'Email'],
+    });
+
+    expect(has({ oauth_scope: 'profile' })).toBe(true);
+    expect(has({ oauth_scope: 'Email' })).toBe(true);
+    expect(has({ oauth_scope: 'PROFILE' })).toBe(false);
+    expect(has({ oauth_scope: 'email' })).toBe(false);
+    expect(has({ oauth_scope: 'missing' })).toBe(false);
+  });
+
+  it('fails closed for invalid requested scopes', () => {
+    const has = createCheckAuthorizationFromOAuthScopes({
+      userId: 'user_123',
+      oauthScopes: ['profile'],
+    });
+
+    expect(has({ oauth_scope: '' })).toBe(false);
+    expect(has({ oauth_scope: null } as any)).toBe(false);
+    expect(has({ oauth_scope: 123 } as any)).toBe(false);
+    expect(has({ oauth_scope: undefined } as any)).toBe(false);
+  });
+
+  it.each([undefined, null, {}, ['profile', 123], ['profile', '']])(
+    'fails closed for malformed granted scopes: %j',
+    oauthScopes => {
+      const has = createCheckAuthorizationFromOAuthScopes({
+        userId: 'user_123',
+        oauthScopes: oauthScopes as any,
+      });
+
+      expect(has({ oauth_scope: 'profile' })).toBe(false);
+    },
+  );
+
+  it.each([undefined, null, ''])('fails when userId is missing: %j', userId => {
+    const has = createCheckAuthorizationFromOAuthScopes({
+      userId,
+      oauthScopes: ['profile'],
+    });
+
+    expect(has({ oauth_scope: 'profile' })).toBe(false);
+  });
+
+  it('accepts previous session authorization shapes but denies them', () => {
+    const has = createCheckAuthorizationFromOAuthScopes({
+      userId: 'user_123',
+      oauthScopes: ['profile'],
+    });
+
+    expect(has({ role: 'org:admin' })).toBe(false);
+    expect(has({ permission: 'org:read' })).toBe(false);
+    expect(has({ feature: 'user:premium' })).toBe(false);
+    expect(has({ plan: 'user:pro' })).toBe(false);
+    expect(has({ reverification: 'strict' })).toBe(false);
+  });
+
+  it.each([
+    { role: 'org:admin' },
+    { permission: 'org:read' },
+    { feature: 'user:premium' },
+    { plan: 'user:pro' },
+    { reverification: 'strict' },
+  ])('denies a valid OAuth scope mixed with another recognized dimension: %j', params => {
+    const has = createCheckAuthorizationFromOAuthScopes({
+      userId: 'user_123',
+      oauthScopes: ['profile'],
+    });
+
+    expect(has({ oauth_scope: 'profile', ...params } as any)).toBe(false);
+  });
+
+  it('fails when no authorization dimension is requested', () => {
+    const has = createCheckAuthorizationFromOAuthScopes({
+      userId: 'user_123',
+      oauthScopes: ['profile'],
+    });
+
+    expect(has({})).toBe(false);
   });
 });
 

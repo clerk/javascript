@@ -1,5 +1,6 @@
 import type {
   ActClaim,
+  CheckAuthorizationFromOAuthScopes,
   CheckAuthorizationWithCustomPermissions,
   GetToken,
   JwtPayload,
@@ -25,6 +26,11 @@ type AuthorizationOptions = {
   plans: string | null | undefined;
 };
 
+type OAuthAuthorizationOptions = {
+  userId: string | null | undefined;
+  oauthScopes: string[] | null | undefined;
+};
+
 // Internal verdict for each authorization dimension.
 // pass  = caller asked, the dimension is satisfied
 // fail  = caller asked, the dimension is not satisfied (includes "data missing" - fail closed)
@@ -46,6 +52,11 @@ type CheckReverificationAuthorization = (
     reverification?: ReverificationConfig;
   },
   { factorVerificationAge }: AuthorizationOptions,
+) => CheckResult;
+
+type CheckOAuthScopeAuthorization = (
+  params: { oauth_scope?: string },
+  options: Pick<OAuthAuthorizationOptions, 'oauthScopes'>,
 ) => CheckResult;
 
 const TYPES_TO_OBJECTS: TypesToConfig = {
@@ -327,6 +338,24 @@ const checkReverificationAuthorization: CheckReverificationAuthorization = (para
   }
 };
 
+const checkOAuthScopeAuthorization: CheckOAuthScopeAuthorization = (params, { oauthScopes }) => {
+  const oauthScopeAsked = params.oauth_scope !== undefined;
+
+  if (!oauthScopeAsked) {
+    return 'skip';
+  }
+
+  if (typeof params.oauth_scope !== 'string' || !params.oauth_scope) {
+    return 'fail';
+  }
+
+  if (!Array.isArray(oauthScopes) || oauthScopes.some(scope => typeof scope !== 'string' || !scope)) {
+    return 'fail';
+  }
+
+  return oauthScopes.includes(params.oauth_scope) ? 'pass' : 'fail';
+};
+
 // At least one dimension must have passed, and every non-skip result must be a pass.
 // This is an AND across asked dimensions with a fail-closed default: if a helper ever
 // returns anything other than 'pass' or 'skip' (a typo, off-type, or future variant),
@@ -351,6 +380,33 @@ const createCheckAuthorization = (options: AuthorizationOptions): CheckAuthoriza
       checkOrgAuthorization(params, options),
       checkBillingAuthorization(params, options),
       checkReverificationAuthorization(params, options),
+    ]);
+  };
+};
+
+const createCheckAuthorizationFromOAuthScopes = (
+  options: OAuthAuthorizationOptions,
+): CheckAuthorizationFromOAuthScopes => {
+  const unavailableSessionOptions: AuthorizationOptions = {
+    userId: options.userId,
+    orgId: null,
+    orgRole: null,
+    orgPermissions: null,
+    factorVerificationAge: null,
+    features: null,
+    plans: null,
+  };
+
+  return params => {
+    if (!options.userId) {
+      return false;
+    }
+
+    return combine([
+      checkOrgAuthorization(params, unavailableSessionOptions),
+      checkBillingAuthorization(params, unavailableSessionOptions),
+      checkReverificationAuthorization(params, unavailableSessionOptions),
+      checkOAuthScopeAuthorization(params, options),
     ]);
   };
 };
@@ -481,4 +537,10 @@ const resolveAuthState = ({
   }
 };
 
-export { createCheckAuthorization, resolveAuthState, splitByScope, validateReverificationConfig };
+export {
+  createCheckAuthorization,
+  createCheckAuthorizationFromOAuthScopes,
+  resolveAuthState,
+  splitByScope,
+  validateReverificationConfig,
+};
