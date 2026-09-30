@@ -112,6 +112,7 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     identifier: session?.publicUserData.identifier ?? '',
     passwordSettings: environment.userSettings.passwordSettings,
     validatePassword,
+    // TODO: Add session reverification for password updates; surface API errors until then.
     updatePassword: async ({ currentPassword, newPassword, signOutOfOtherSessions }) => {
       const currentUser = clerk.user;
       const currentPolicy = getPasswordPolicy(currentUser, environment);
