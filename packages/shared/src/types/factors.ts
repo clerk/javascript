@@ -338,17 +338,31 @@ export type PasskeyAttempt = {
 /**
  * @experimental
  */
+export type TrustedDeviceConfig = {
+  /**
+   * The strategy type.
+   */
+  strategy: TrustedDeviceStrategy;
+  /**
+   * The ID of the trusted device (biometric credential) to verify with.
+   */
+  trustedDeviceId: string;
+};
+
+/**
+ * @experimental
+ */
 export type TrustedDeviceAttempt = {
   /**
    * The strategy type.
    */
   strategy: TrustedDeviceStrategy;
   /**
-   * The ID of the trusted device (biometric credential) used to sign in.
+   * The ID of the trusted device (biometric credential) used to sign in or reverify the session.
    */
   trustedDeviceId: string;
   /**
-   * The `clientData` string from the sign-in's `firstFactorVerification.trustedDeviceChallenge`.
+   * The `clientData` string from the verification's `trustedDeviceChallenge`.
    */
   clientData: string;
   /**

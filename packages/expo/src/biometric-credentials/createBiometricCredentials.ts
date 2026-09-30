@@ -4,6 +4,9 @@ import type {
   BiometricCredentialResource,
   EnvironmentResource,
   PrepareBiometricCredentialParams,
+  SessionResource,
+  SessionVerificationLevel,
+  SessionVerificationResource,
   SignInResource,
   UserResource,
 } from '@clerk/shared/types';
@@ -13,7 +16,6 @@ import { errorThrower } from '../utils/errors';
 import type { BiometricCredentialError, BiometricCredentialErrorCode } from './errors';
 import type { ExpoBiometricsModule, ExpoBiometricsRecord } from './loadExpoBiometrics';
 import { loadExpoBiometrics } from './loadExpoBiometrics';
-import { createNativeReverify } from './nativeReverification';
 import type {
   BiometricCredential,
   BiometricCredentialPlatform,
@@ -30,7 +32,8 @@ type OperationErrorCode =
   | 'E_TRUSTED_DEVICE_LIST_FAILED'
   | 'E_TRUSTED_DEVICE_ENROLLMENT_FAILED'
   | 'E_TRUSTED_DEVICE_REVOCATION_FAILED'
-  | 'E_TRUSTED_DEVICE_SIGN_IN_FAILED';
+  | 'E_TRUSTED_DEVICE_SIGN_IN_FAILED'
+  | 'E_BIOMETRIC_REVERIFICATION_FAILED';
 
 type Biometrics = {
   module: ExpoBiometricsModule;
@@ -45,6 +48,8 @@ type LocalCredentialSelection =
 const DEFAULT_POLICY: BiometricCredentialPolicy = 'biometry_current_set';
 const DEFAULT_ENROLLMENT_REASON = 'Use biometrics to enroll this device.';
 const DEFAULT_SIGN_IN_REASON = 'Use biometrics to sign in.';
+const DEFAULT_REVERIFICATION_REASON = 'Use biometrics to verify your identity.';
+const REVERIFICATION_LEVELS = new Set<SessionVerificationLevel>(['first_factor', 'second_factor', 'multi_factor']);
 
 const EXPO_BIOMETRICS_INSTALL_INSTRUCTIONS =
   'Install it with `npx expo install @clerk/expo-biometrics`, then rebuild your development build.';
@@ -346,6 +351,95 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     return { unavailableReason: firstUnavailableReason ?? 'server_credential_missing' };
   }
 
+  async function reverificationCredential(biometrics: Biometrics, userId: string): Promise<ExpoBiometricsRecord> {
+    const candidates = await localCredentialCandidates(biometrics, undefined, undefined);
+    if (typeof candidates === 'string') {
+      throw biometricCredentialError(
+        biometrics.fallbackCode,
+        `Biometric reverification is unavailable: ${candidates}.`,
+      );
+    }
+    const userRecords = candidates.filter(record => record.userId === userId);
+    if (userRecords.length === 0) {
+      throw biometricCredentialError(
+        biometrics.fallbackCode,
+        'Biometric reverification is unavailable: no_local_credential.',
+      );
+    }
+    const record = userRecords.find(candidate => candidate.policy === 'biometry_current_set');
+    if (!record) {
+      throw biometricCredentialError(
+        'biometric_credential_policy_incompatible',
+        'This biometric credential cannot be used for reverification. Verify your identity using another method.',
+      );
+    }
+    return record;
+  }
+
+  async function verifySessionFactor(
+    biometrics: Biometrics,
+    session: SessionResource,
+    record: ExpoBiometricsRecord,
+    factor: 'first' | 'second',
+    reason: string,
+  ): Promise<SessionVerificationResource> {
+    const forgetLocalCredentialIfMissing = async (error: unknown) => {
+      if (isMissingCredentialError(error)) {
+        await ignoreErrors(() => deleteLocalCredential(biometrics, record));
+      }
+      return toApiBiometricCredentialError(error, biometrics.fallbackCode);
+    };
+
+    let prepared: SessionVerificationResource;
+    try {
+      const config = { strategy: 'trusted_device', trustedDeviceId: record.id } as const;
+      prepared =
+        factor === 'first'
+          ? await session.prepareFirstFactorVerification(config)
+          : await session.prepareSecondFactorVerification(config);
+    } catch (error) {
+      throw await forgetLocalCredentialIfMissing(error);
+    }
+
+    const verification = factor === 'first' ? prepared.firstFactorVerification : prepared.secondFactorVerification;
+    const challenge = verification?.strategy === 'trusted_device' ? verification.trustedDeviceChallenge : null;
+    if (!challenge || (challenge.trustedDeviceId && challenge.trustedDeviceId !== record.id)) {
+      throw biometricCredentialError(
+        biometrics.fallbackCode,
+        'Biometric reverification did not return a matching challenge.',
+      );
+    }
+    if (challenge.expiresAt && challenge.expiresAt.getTime() <= Date.now()) {
+      throw biometricCredentialError(biometrics.fallbackCode, 'Biometric reverification challenge has expired.');
+    }
+
+    let signature: string;
+    try {
+      signature = await biometrics.module.sign(record.localKeyId, challenge.clientData, reason);
+    } catch (error) {
+      const biometricError = toBiometricCredentialError(error, biometrics.fallbackCode);
+      if (biometricError.code === 'key_invalidated' || biometricError.code === 'key_not_found') {
+        await ignoreErrors(() => deleteLocalCredential(biometrics, record));
+      }
+      throw biometricError;
+    }
+
+    try {
+      const attempt = {
+        strategy: 'trusted_device',
+        trustedDeviceId: record.id,
+        clientData: challenge.clientData,
+        signature,
+        algorithm: 'ES256',
+      } as const;
+      return factor === 'first'
+        ? await session.attemptFirstFactorVerification(attempt)
+        : await session.attemptSecondFactorVerification(attempt);
+    } catch (error) {
+      throw await forgetLocalCredentialIfMissing(error);
+    }
+  }
+
   return {
     getAvailability: async params => {
       const biometrics = requireBiometrics('E_TRUSTED_DEVICE_AVAILABILITY_FAILED');
@@ -527,6 +621,51 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
       };
     },
 
-    reverify: createNativeReverify(clerk),
+    reverify: async params => {
+      const biometrics = requireBiometrics('E_BIOMETRIC_REVERIFICATION_FAILED');
+      const level = params?.level ?? 'first_factor';
+      if (!REVERIFICATION_LEVELS.has(level)) {
+        throw biometricCredentialError(
+          'invalid_reverification_level',
+          'Biometric reverification level must be first_factor, second_factor, or multi_factor.',
+        );
+      }
+      const session = clerk.session;
+      if (!session || (session.status !== 'active' && session.status !== 'pending') || !session.user) {
+        throw biometricCredentialError(
+          'biometric_reverification_session_unavailable',
+          'Biometric reverification requires an active or pending session with a user.',
+        );
+      }
+      const record = await reverificationCredential(biometrics, session.user.id);
+      const reason = params?.reason ?? DEFAULT_REVERIFICATION_REASON;
+
+      let verification = await callApi(biometrics.fallbackCode, () => session.startVerification({ level }));
+      if (verification.status === 'needs_first_factor') {
+        verification = await verifySessionFactor(biometrics, session, record, 'first', reason);
+        if (verification.status === 'needs_second_factor') {
+          verification = await verifySessionFactor(biometrics, session, record, 'second', reason);
+        }
+      } else if (verification.status === 'needs_second_factor') {
+        verification = await verifySessionFactor(biometrics, session, record, 'second', reason);
+      } else if (verification.status !== 'complete') {
+        throw biometricCredentialError(
+          biometrics.fallbackCode,
+          'The server returned an unsupported reverification status.',
+        );
+      }
+
+      if (verification.status === 'complete') {
+        session.clearCache();
+        const token = await session.getToken({ skipCache: true });
+        if (!token) {
+          throw biometricCredentialError(
+            biometrics.fallbackCode,
+            'Unable to refresh the session token after biometric reverification.',
+          );
+        }
+      }
+      return { id: verification.id ?? null, status: verification.status, level: verification.level, session };
+    },
   };
 }
