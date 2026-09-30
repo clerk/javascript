@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError, isReverificationCancelledError } from '@clerk/shared/error';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { describe, expect, it, vi } from 'vitest';
 
 import { childActor, createActor } from '../../../machine/createActor';
@@ -115,8 +115,8 @@ describe('reverified action', () => {
 
     actor.send({ type: 'SESSION_CHANGED' });
 
-    expect(actor.getSnapshot().status).toBe('error');
-    expect(isReverificationCancelledError(actor.getSnapshot().error)).toBe(true);
+    expect(actor.getSnapshot().status).toBe('done');
+    expect(actor.getSnapshot().value).toBe('cancelled');
     expect(action).toHaveBeenCalledTimes(1);
   });
 });

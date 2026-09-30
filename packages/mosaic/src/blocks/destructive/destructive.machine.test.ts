@@ -1,4 +1,3 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
 import { describe, expect, it, vi } from 'vitest';
 
 import { childActor, createActor } from '../../machine/createActor';
@@ -7,18 +6,14 @@ import { destructiveMachine } from './destructive.machine';
 
 const tick = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 
-type StepEvent = { type: 'NEXT' } | { type: 'FAIL' };
+type StepEvent = { type: 'NEXT' };
 
 const pausingAction = createMachine<object, StepEvent>({
   initial: 'waiting',
   states: {
-    waiting: { tags: ['cancellable'], on: { NEXT: 'working', FAIL: 'cancelled' } },
+    waiting: { tags: ['cancellable'], on: { NEXT: 'working' } },
     working: { on: { NEXT: 'done' } },
     done: { type: 'final' },
-    cancelled: {
-      type: 'final',
-      error: () => new ClerkRuntimeError('cancelled', { code: 'reverification_cancelled' }),
-    },
   },
 });
 
@@ -97,17 +92,6 @@ describe('destructive flow', () => {
       await tick();
 
       expect(actor.getSnapshot().value).toBe('closed');
-    });
-
-    it('closes without an error when the action is cancelled', async () => {
-      const { actor } = open(pausingAction);
-      actor.send({ type: 'CONFIRM' });
-
-      child(actor)?.send({ type: 'FAIL' });
-      await tick();
-
-      expect(actor.getSnapshot().value).toBe('closed');
-      expect(actor.getSnapshot().context.errorMessage).toBeUndefined();
     });
   });
 });

@@ -1,5 +1,3 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
-
 import { childHasTag } from '../../machine/guards';
 import { setup } from '../../machine/setup';
 import type { AnyStateMachine, ErrorInvokeEvent } from '../../machine/types';
@@ -37,13 +35,10 @@ export const destructiveMachine = createMachine({
             id: 'action',
             src: 'action',
             onDone: '#destructive.closed',
-            onError: [
-              { target: '#destructive.closed', guard: (_, event) => isReverificationCancelledError(event.error) },
-              {
-                target: 'failed',
-                actions: assign<ErrorInvokeEvent>(() => ({ errorMessage: 'Something went wrong' })),
-              },
-            ],
+            onError: {
+              target: 'failed',
+              actions: assign<ErrorInvokeEvent>(() => ({ errorMessage: 'Something went wrong' })),
+            },
           },
         },
         failed: {

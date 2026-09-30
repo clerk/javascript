@@ -1,4 +1,4 @@
-import { ClerkRuntimeError, isClerkAPIResponseError } from '@clerk/shared/error';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
 
 import { setup } from '../../machine/setup';
 import type { ErrorInvokeEvent, StateMachine } from '../../machine/types';
@@ -54,9 +54,6 @@ export const reverifiedActionMachine = createMachine({
     },
     done: { type: 'final' },
     failed: { type: 'final', error: ctx => ctx.error },
-    cancelled: {
-      type: 'final',
-      error: () => new ClerkRuntimeError('Reverification was cancelled', { code: 'reverification_cancelled' }),
-    },
+    cancelled: { type: 'final' },
   },
 });

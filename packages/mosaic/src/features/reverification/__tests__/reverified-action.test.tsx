@@ -1,4 +1,4 @@
-import { ClerkAPIResponseError, isReverificationCancelledError } from '@clerk/shared/error';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type * as SharedReact from '@clerk/shared/react';
 import { render, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -104,7 +104,7 @@ describe('ReverifiedAction', () => {
       return { actor, rerender: () => view.rerender(<ReverifiedAction actor={actor} />) };
     }
 
-    const cancelled = (actor: AnyActor) => isReverificationCancelledError(actor.getSnapshot().error);
+    const cancelled = (actor: AnyActor) => actor.getSnapshot().matches('cancelled');
 
     it('cancels when the user switches sessions', async () => {
       const { actor, rerender } = await mounted();
