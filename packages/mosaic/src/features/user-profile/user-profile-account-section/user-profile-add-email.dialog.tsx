@@ -342,11 +342,13 @@ function VerifySsoStep(props: VerifySsoStepProps) {
           </Text>
         ) : null}
         {/*
-          TODO: show the connection the way the designs do — its logo, its name as the label, and
-          `{domain} · Enterprise SSO` as the description. `EmailAddressResource` carries only
-          `matchesSsoConnection`, so the domain here is split off the address and the name and logo
-          are not available at all. FAPI has to name the matching connection on the email address
-          first, the way `EnterpriseAccountResource` already carries `enterpriseConnection`.
+          TODO: show the connections the way the designs do — a row each, with the logo, the name as
+          the label, and `{domain} · Enterprise SSO` as the description. The domain here is split off
+          the address because `EmailAddressResource` carries only `matchesSsoConnection`, and the one
+          endpoint that lists connections returns their full configuration, so it is not sent to the
+          frontend. clerk_go#22625 adds `enterprise_connections` ({ id, name, provider,
+          logoPublicUrl }) to the email address — the connections sign-in would offer for it, oldest
+          first — which is the data to render once it lands.
         */}
         <Item.Root xstyle={styles.ssoConnection}>
           <Item.Content>
