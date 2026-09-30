@@ -36,14 +36,16 @@ export const ModalRegistryContext = React.createContext<ModalRegistry | null>(nu
 
 export const ModalDefaultsContext = React.createContext<MosaicModalDefaults>({});
 
+const noDefaults: MosaicModalDefaults = {};
+
 export function ModalHost({
-  defaults,
+  defaults = noDefaults,
   children,
 }: {
-  defaults: MosaicModalDefaults;
+  defaults?: MosaicModalDefaults;
   children: React.ReactNode;
 }): React.ReactElement {
-  const registry = React.useMemo(createModalRegistry, []);
+  const [registry] = React.useState(createModalRegistry);
   const slots = React.useSyncExternalStore(registry.subscribe, registry.getSlots, registry.getSlots);
 
   return (
