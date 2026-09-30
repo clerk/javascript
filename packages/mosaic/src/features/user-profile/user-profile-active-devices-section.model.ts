@@ -1,5 +1,5 @@
-import { isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
-import { useClerk, useReverification, useSession, useUser } from '@clerk/shared/react';
+import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/shared/types';
 import { useCallback } from 'react';
 
@@ -13,7 +13,7 @@ export type UserProfileActiveDevicesModel =
       status: 'ready';
       identity: string;
       loadSessions: () => Promise<UserProfileDevice[]>;
-      revoke: (id: string) => Promise<boolean>;
+      revoke: (id: string) => Promise<void>;
     };
 
 function lastActiveLabel(date: Date, locale: string): string {
@@ -37,26 +37,6 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
   const m = useMessages('userProfileActiveDevices');
   const userId = user?.id;
   const sessionId = session?.id;
-
-  const revokeSession = useReverification(async (originIdentity: string, id: string): Promise<void> => {
-    if (
-      !userId ||
-      !sessionId ||
-      originIdentity !== `${userId}:${sessionId}` ||
-      clerk.user?.id !== userId ||
-      clerk.session?.id !== sessionId ||
-      id === sessionId
-    ) {
-      throw new Error(m.signOutError);
-    }
-    const target = (await user?.getSessions())?.find(
-      item => item.id === id && (item.status === 'active' || item.status === 'pending'),
-    );
-    if (!target || clerk.user?.id !== userId || clerk.session?.id !== sessionId) {
-      throw new Error(m.signOutError);
-    }
-    await target.revoke();
-  });
 
   const toDevice = useCallback(
     (item: SessionWithActivitiesResource): UserProfileDevice => {
@@ -110,14 +90,20 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
     identity: `${user.id}:${session.id}`,
     loadSessions,
     // TODO: Add bulk revocation when a dedicated API is available, preserving the current session and reverification.
+    // TODO: Add session reverification for device revocation; surface API errors until then.
     revoke: async id => {
       try {
-        await revokeSession(`${user.id}:${session.id}`, id);
-        return true;
-      } catch (error) {
-        if (isClerkRuntimeError(error) && error.code === 'reverification_cancelled') {
-          return false;
+        if (clerk.user?.id !== userId || clerk.session?.id !== sessionId || id === sessionId) {
+          throw new Error(m.signOutError);
         }
+        const target = (await user.getSessions()).find(
+          item => item.id === id && (item.status === 'active' || item.status === 'pending'),
+        );
+        if (!target || clerk.user?.id !== userId || clerk.session?.id !== sessionId) {
+          throw new Error(m.signOutError);
+        }
+        await target.revoke();
+      } catch (error) {
         if (isClerkAPIResponseError(error)) {
           const first = error.errors[0];
           throw new Error(first?.longMessage || first?.message || m.signOutError);
