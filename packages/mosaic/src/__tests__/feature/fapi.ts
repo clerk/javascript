@@ -11,12 +11,15 @@ import type {
   OrganizationMembershipJSON,
   OrganizationSettingsJSON,
   OrganizationSuggestionJSON,
+  PublicKeyCredentialRequestOptionsJSON,
   PublicOrganizationDataJSON,
   SessionJSON,
+  SessionVerificationJSON,
   TokenJSON,
   UserJSON,
   UserOrganizationInvitationJSON,
   UserSettingsJSON,
+  VerificationJSON,
 } from '@clerk/shared/types';
 
 type Settings<T> = Omit<T, 'id' | 'object'>;
@@ -288,6 +291,55 @@ export function fapiSession(overrides: Partial<SessionJSON> & Pick<SessionJSON, 
     },
     created_at: createdAt,
     updated_at: createdAt,
+    ...overrides,
+  };
+}
+
+const verificationObjects: Record<string, string> = {
+  password: 'verification_password',
+  email_code: 'verification_otp',
+  phone_code: 'verification_otp',
+  totp: 'verification_totp',
+  backup_code: 'verification_backup_code',
+  passkey: 'verification_passkey',
+};
+
+export function fapiPasskeyRequestOptions(): PublicKeyCredentialRequestOptionsJSON {
+  return {
+    allowCredentials: [],
+    challenge: 'Y2hhbGxlbmdl',
+    rpId: 'clerk.abcef.12345.prod.lclclerk.com',
+    timeout: 60000,
+    userVerification: 'preferred',
+  };
+}
+
+export function fapiVerification(strategy: string, overrides: Partial<VerificationJSON> = {}): VerificationJSON {
+  return {
+    object: verificationObjects[strategy] ?? 'verification',
+    status: 'unverified',
+    strategy,
+    attempts: 0,
+    expire_at: farFuture,
+    ...(strategy === 'passkey' ? { nonce: JSON.stringify(fapiPasskeyRequestOptions()) } : {}),
+    ...overrides,
+  } as VerificationJSON;
+}
+
+export function fapiSessionVerification(
+  session: SessionJSON,
+  overrides: Partial<SessionVerificationJSON> = {},
+): SessionVerificationJSON {
+  return {
+    object: 'session_verification',
+    id: `sessverif_${session.id}`,
+    status: 'needs_first_factor',
+    level: 'first_factor',
+    session,
+    first_factor_verification: null,
+    second_factor_verification: null,
+    supported_first_factors: [],
+    supported_second_factors: [],
     ...overrides,
   };
 }
