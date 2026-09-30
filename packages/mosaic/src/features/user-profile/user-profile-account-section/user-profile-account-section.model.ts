@@ -149,10 +149,7 @@ function toManagedBy(account: EnterpriseAccountResource | undefined): UserProfil
     return undefined;
   }
   const connection = account.enterpriseConnection;
-  return {
-    name: connection?.name || account.provider.replace(/^(oauth_|saml_)/, ''),
-    iconUrl: connection?.logoPublicUrl ?? undefined,
-  };
+  return { name: connection?.name || account.provider.replace(/^(oauth_|saml_)/, '') };
 }
 
 function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameAttribute {

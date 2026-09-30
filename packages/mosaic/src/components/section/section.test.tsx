@@ -310,4 +310,26 @@ describe('Section', () => {
 
     expect(screen.getByTestId('note').querySelector('.cl-section-note-icon')).toBeNull();
   });
+
+  it('marks a wrapping item for its theme hook', () => {
+    render(
+      <Section.Root>
+        <Section.Group>
+          <Section.Row>
+            <Section.Item
+              data-testid='item'
+              wrap
+            >
+              <Section.Content>
+                <Section.Label>Delete account</Section.Label>
+              </Section.Content>
+              <Section.Actions>Control</Section.Actions>
+            </Section.Item>
+          </Section.Row>
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    expect(screen.getByTestId('item')).toHaveAttribute('data-wrap', '');
+  });
 });

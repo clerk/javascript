@@ -390,14 +390,14 @@ describe('useUserProfileAccountSectionModel', () => {
         enterpriseConnection: { name: 'Okta', logoPublicUrl: 'https://img.clerk.com/okta.svg' },
       });
       expect(ready()).toMatchObject({
-        nameManagedBy: { name: 'Okta', iconUrl: 'https://img.clerk.com/okta.svg' },
+        nameManagedBy: { name: 'Okta' },
         onSubmitName: undefined,
       });
     });
 
     it('falls back to the provider when the active account carries no connection', () => {
       user?.enterpriseAccounts.push({ active: true, provider: 'saml_okta', enterpriseConnection: null });
-      expect(ready().nameManagedBy).toEqual({ name: 'okta', iconUrl: undefined });
+      expect(ready().nameManagedBy).toEqual({ name: 'okta' });
     });
 
     it('passes the instance name attributes through for the row to hide itself', () => {
