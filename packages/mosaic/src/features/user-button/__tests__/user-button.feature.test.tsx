@@ -228,7 +228,7 @@ describe('UserButton', () => {
 
       expect(screen.queryByText('No organization selected')).toBeNull();
       expect(screen.queryByText('Personal account')).toBeNull();
-      expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
     });
 
     it('lists no organizations on an account-only surface', async () => {
@@ -703,11 +703,11 @@ describe('UserButton', () => {
       expect(screen.queryByRole('button', { name: 'Create organization' })).toBeNull();
     });
 
-    it('heads the surface with the account and its gear, and signs out at the foot', async () => {
+    it('heads the surface with the account and its settings, and signs out at the foot', async () => {
       await renderUserButton({ mode: 'user' });
       await open();
 
-      expect(within(requiredPopup()).getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
+      expect(within(requiredPopup()).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
       expect(reading('Switch account', 'Sign out')).toEqual(['Switch account', 'Sign out']);
       expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
     });
@@ -742,7 +742,7 @@ describe('UserButton', () => {
       await open();
 
       expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
-      expect(within(requiredPopup()).getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
+      expect(within(requiredPopup()).getByRole('button', { name: 'Settings' })).toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Invite' })).toBeNull();
     });
 
@@ -839,7 +839,7 @@ describe('UserButton', () => {
       await open();
 
       expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Manage account' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Settings' })).toBeInTheDocument();
       expect(screen.queryByText('Personal account')).toBeNull();
     });
   });
