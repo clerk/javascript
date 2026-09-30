@@ -103,10 +103,7 @@ export const banner = stylex.create({
       default: `${durationVars['--cl-duration-instant']}, calc(${durationVars['--cl-duration-slow']} - ${durationVars['--cl-duration-fast']})`,
       ':where([data-ending-style])': durationVars['--cl-duration-instant'],
     },
-    transitionDuration: {
-      default: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-fast']}`,
-      ':where([data-ending-style])': `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-fast']}`,
-    },
+    transitionDuration: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-fast']}`,
     transitionProperty: {
       default: 'grid-template-rows, mask-size',
       '@media (prefers-reduced-motion: reduce)': 'none',
