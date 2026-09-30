@@ -1368,22 +1368,26 @@ class SignInFuture implements SignInFutureResource {
       }
 
       if (strategy === 'enterprise_sso') {
-        await this.#resource.__internal_basePost(
-          {
-            body: {
-              ...routes,
-              oidcPrompt,
-              enterpriseConnectionId,
-              strategy: 'enterprise_sso',
+        const prepare = (options?: { resolveProtectCheck?: boolean }) =>
+          this.#resource.__internal_basePost(
+            {
+              body: {
+                ...routes,
+                oidcPrompt,
+                enterpriseConnectionId,
+                strategy: 'enterprise_sso',
+              },
+              action: 'prepare_first_factor',
+              coalesce: true,
             },
-            action: 'prepare_first_factor',
-            coalesce: true,
-          },
-          { resolveProtectCheck: false },
-        );
+            options,
+          );
+
+        await prepare({ resolveProtectCheck: false });
 
         if (isChallengePending() && !challengedCreateHandOff) {
           await resolveChallenge();
+          await prepare();
         }
       }
 

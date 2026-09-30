@@ -3805,6 +3805,36 @@ describe('SignIn protect_check gate', () => {
       expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
     });
 
+    it('prepares enterprise SSO again after a challenged prepare instead of following an older redirect', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce(challenged())
+        .mockResolvedValueOnce(cleared(handOff('https://idp.example/fresh')));
+      BaseResource._fetch = mockFetch;
+      const resolve = vi.mocked(ProtectCheckGate.prototype.resolve).mockImplementation(async (_clerk, resource) => {
+        (resource as SignIn).protectCheck = null;
+      });
+
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_first_factor',
+        first_factor_verification: handOff('https://idp.example/stale'),
+      } as any);
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'enterprise_sso',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockFetch.mock.calls.every(([init]) => init.path.endsWith('/prepare_first_factor'))).toBe(true);
+      expect(resolve.mock.invocationCallOrder[0]).toBeLessThan(mockFetch.mock.invocationCallOrder[1]);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/fresh'));
+      expect(windowNavigate).toHaveBeenCalledTimes(1);
+    });
+
     it('runs a challenge that is waiting when the popup returns', async () => {
       const popup = { location: { href: '' } } as Window;
       BaseResource._fetch = vi
