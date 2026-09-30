@@ -124,6 +124,7 @@ describe('UserProfilePasswordSectionView', () => {
     );
 
     expect(screen.getByText('Managed by Okta')).toBeVisible();
+    expect(screen.getByText('Okta')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /password/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });

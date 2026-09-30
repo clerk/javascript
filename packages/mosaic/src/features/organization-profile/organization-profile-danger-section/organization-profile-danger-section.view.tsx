@@ -79,7 +79,7 @@ function DangerRow({
 
   return (
     <Section.Row>
-      <Section.Item>
+      <Section.Item wrap>
         <Section.Content>
           <Section.Label>{label}</Section.Label>
           <Section.Description>{description}</Section.Description>
