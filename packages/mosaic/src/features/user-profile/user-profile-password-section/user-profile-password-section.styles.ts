@@ -2,6 +2,8 @@ import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, space } from '../../../tokens.stylex';
 
+const compact = '@container cl-section (width < 26rem)';
+
 export const styles = stylex.create({
   checkboxField: {
     gap: space['2'],
@@ -33,12 +35,13 @@ export const styles = stylex.create({
     alignItems: 'center',
     display: 'flex',
   },
-  managedByIcon: {
-    flexShrink: 0,
-    height: space['4'],
-    width: space['4'],
-  },
   managedByText: {
     color: colorVars['--cl-color-foreground-secondary'],
+  },
+  managedByFull: {
+    display: { [compact]: 'none', default: 'inline' },
+  },
+  managedByName: {
+    display: { [compact]: 'inline', default: 'none' },
   },
 });

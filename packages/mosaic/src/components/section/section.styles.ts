@@ -23,6 +23,8 @@ export const styles = stylex.create({
     borderWidth: '1px',
     overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-background'],
+    containerName: 'cl-section',
+    containerType: 'inline-size',
     width: '100%',
   },
   row: {

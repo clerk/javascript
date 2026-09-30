@@ -3,6 +3,7 @@ import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { fill, plural, useLocale, useMessages } from '../../../localization';
 import { useOrganizationProfileDangerActionController } from './organization-profile-danger-action.controller';
+import { styles } from './organization-profile-danger-section.styles';
 
 export interface OrganizationProfileDangerSectionViewProps {
   name: string;
@@ -79,12 +80,12 @@ function DangerRow({
 
   return (
     <Section.Row>
-      <Section.Item>
+      <Section.Item xstyle={styles.item}>
         <Section.Content>
           <Section.Label>{label}</Section.Label>
           <Section.Description>{description}</Section.Description>
         </Section.Content>
-        <Section.Actions>
+        <Section.Actions xstyle={styles.actions}>
           <Destructive
             open={isOpen}
             onOpenChange={onOpenChange}

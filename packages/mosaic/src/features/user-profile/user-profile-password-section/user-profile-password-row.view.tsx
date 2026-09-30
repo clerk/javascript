@@ -46,29 +46,22 @@ export function UserProfilePasswordRowView({
   );
 }
 
-function ManagedByLabel({ name, iconUrl }: UserProfilePasswordManagedBy) {
+function ManagedByLabel({ name }: UserProfilePasswordManagedBy) {
   const m = useMessages('userProfilePasswordSection');
   return (
     <div {...stylex.props(styles.managedBy)}>
-      {iconUrl ? (
-        <img
-          alt=''
-          src={iconUrl}
-          {...stylex.props(styles.managedByIcon)}
-        />
-      ) : (
-        <Icon
-          name='lock'
-          size='sm'
-          xstyle={styles.managedByText}
-        />
-      )}
+      <Icon
+        name='lock'
+        size='sm'
+        xstyle={styles.managedByText}
+      />
       <Text
         render={<span />}
         size='sm'
         xstyle={styles.managedByText}
       >
-        {fill(m.managedBy, { name })}
+        <span {...stylex.props(styles.managedByFull)}>{fill(m.managedBy, { name })}</span>
+        <span {...stylex.props(styles.managedByName)}>{name}</span>
       </Text>
     </div>
   );

@@ -3,6 +3,7 @@ import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
 import { useUserProfileDeleteSectionController } from './user-profile-delete-section.controller';
+import { styles } from './user-profile-delete-section.styles';
 
 export interface UserProfileDeleteSectionViewProps {
   /**
@@ -23,12 +24,12 @@ export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSect
       <Section.Title>{m.sectionTitle}</Section.Title>
       <Section.Group>
         <Section.Row>
-          <Section.Item>
+          <Section.Item xstyle={styles.item}>
             <Section.Content>
               <Section.Label>{m.sectionLabel}</Section.Label>
               <Section.Description>{m.sectionDescription}</Section.Description>
             </Section.Content>
-            <Section.Actions>
+            <Section.Actions xstyle={styles.actions}>
               <Destructive
                 open={isOpen}
                 onOpenChange={onOpenChange}
