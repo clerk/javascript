@@ -57,8 +57,8 @@ export const styles = stylex.create({
   triggerText: {
     display: 'flex',
     flexDirection: 'column',
-    minWidth: 0,
     textAlign: 'start',
+    minWidth: 0,
   },
 
   // Matches `UserButtonItemLabel`, so the trigger names a workspace the same way its row does. Capped,
