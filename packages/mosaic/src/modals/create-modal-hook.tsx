@@ -5,7 +5,6 @@ import { withoutUndefined } from '../utils/object';
 import type { ModalContentProps, ModalHandle, ModalSurface } from './modal.types';
 import type { ModalController } from './modal-controller';
 import { createModalController } from './modal-controller';
-import { ModalFallback } from './modal-fallback';
 import type { ModalRegistry, MosaicModalDefaults } from './modal-host';
 import { ModalDefaultsContext, ModalRegistryContext } from './modal-host';
 
@@ -49,7 +48,7 @@ export function createModalHook<Config extends object, Payload>(
         }}
       >
         <Dialog.Popup variant={surface.variant}>
-          <React.Suspense fallback={<ModalFallback />}>
+          <React.Suspense fallback='Loading…'>
             <Body
               key={state.openCount}
               config={config}
