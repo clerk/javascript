@@ -481,6 +481,8 @@ export interface SignUpFutureResource {
   /**
    * The current protect check challenge, if one is pending. Only populated when Protect mid-flow
    * challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it.
+   * When Clerk's UI is loaded, the sign-up methods resolve the challenge in a modal before they
+   * return. Otherwise, run the challenge yourself and submit its proof token with `submitProtectCheck()`.
    */
   readonly protectCheck: ProtectCheckResource | null;
 
@@ -535,7 +537,7 @@ export interface SignUpFutureResource {
   web3: (params: SignUpFutureWeb3Params) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively.
+   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively. Call it after running the challenge yourself when Clerk's UI isn't loaded. With the UI loaded, the other sign-up methods resolve the challenge in a modal before they return.
    */
   submitProtectCheck: (params: SignUpFutureSubmitProtectCheckParams) => Promise<{ error: ClerkError | null }>;
 
