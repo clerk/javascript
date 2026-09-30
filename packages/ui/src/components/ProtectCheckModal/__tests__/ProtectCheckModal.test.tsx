@@ -1,6 +1,7 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import { waitFor } from '@testing-library/react';
+import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
@@ -31,6 +32,27 @@ beforeEach(() => {
 });
 
 describe('ProtectCheckModal', () => {
+  it('calls onResolved once when it mounts for a resource whose gate is already clear', async () => {
+    const { wrapper, fixtures } = await createFixtures();
+    const onResolved = vi.fn();
+    expect(fixtures.signIn.protectCheck).toBeFalsy();
+
+    render(
+      <React.StrictMode>
+        <ProtectCheckModal
+          resource={fixtures.signIn}
+          onResolved={onResolved}
+          onFailed={vi.fn()}
+        />
+      </React.StrictMode>,
+      { wrapper },
+    );
+
+    await waitFor(() => expect(onResolved).toHaveBeenCalled());
+    expect(onResolved).toHaveBeenCalledTimes(1);
+    expect(mockExecute).not.toHaveBeenCalled();
+  });
+
   it('runs a chained challenge and only calls onResolved after the last gate clears', async () => {
     const { wrapper, fixtures } = await createFixtures(f => {
       f.startSignInWithProtectCheck();

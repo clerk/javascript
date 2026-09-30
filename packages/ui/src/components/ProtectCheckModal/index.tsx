@@ -1,4 +1,5 @@
 import type { __internal_ProtectCheckModalProps, SignInResource, SignUpResource } from '@clerk/shared/types';
+import { useEffect, useRef } from 'react';
 
 import { withCardStateProvider } from '@/ui/elements/contexts';
 
@@ -35,7 +36,22 @@ const ProtectCheckModalCard = withCardStateProvider(
   },
 );
 
-function ProtectCheckModal(props: __internal_ProtectCheckModalProps): JSX.Element {
+function ProtectCheckModal(props: __internal_ProtectCheckModalProps): JSX.Element | null {
+  const { resource, onResolved } = props;
+  const isClearOnMount = useRef(!resource.protectCheck).current;
+  const didReportClearRef = useRef(false);
+
+  useEffect(() => {
+    if (isClearOnMount && !didReportClearRef.current) {
+      didReportClearRef.current = true;
+      onResolved();
+    }
+  }, [isClearOnMount, onResolved]);
+
+  if (isClearOnMount) {
+    return null;
+  }
+
   return (
     <Route path='protect-check'>
       <div>
