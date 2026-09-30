@@ -42,9 +42,19 @@ const toError = (error: unknown): ToolResult => {
   };
 };
 
+const getStatus = (result: ToolResult) =>
+  typeof result.status === 'string' ? result.status : result.signedIn ? 'signed_in' : 'signed_out';
+
 const defineTool = (tool: WebMcpTool): WebMcpTool => ({
   ...tool,
-  execute: input => tool.execute(input ?? {}).catch(toError),
+  execute: async input => {
+    const result = await tool.execute(input ?? {}).catch(toError);
+    const strategy = typeof input?.method === 'string' ? { strategy: input.method } : {};
+    window.dispatchEvent(
+      new CustomEvent('clerk:webmcp', { detail: { tool: tool.name, status: getStatus(result), ...strategy } }),
+    );
+    return result;
+  },
 });
 
 const getAppName = (clerk: Clerk) => clerk.__internal_environment?.displayConfig.applicationName || 'this app';
