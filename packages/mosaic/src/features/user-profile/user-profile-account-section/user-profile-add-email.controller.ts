@@ -44,7 +44,7 @@ function missingDependency(): Promise<never> {
   return Promise.reject(new Error('Email verification is missing'));
 }
 
-const CODE_RESEND_SECONDS = 12;
+const CODE_RESEND_SECONDS = 30;
 const LINK_RESEND_SECONDS = 60;
 
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };

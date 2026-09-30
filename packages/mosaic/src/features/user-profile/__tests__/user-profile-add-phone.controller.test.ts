@@ -18,7 +18,7 @@ async function sendFirstCode() {
 }
 
 async function waitOutCountdown() {
-  for (let second = 0; second < 12; second++) {
+  for (let second = 0; second < 30; second++) {
     await act(async () => vi.advanceTimersByTimeAsync(1000));
   }
 }
@@ -33,9 +33,9 @@ describe('useUserProfileAddPhoneController', () => {
   it('counts the resend down once a code has been sent', async () => {
     const result = await sendFirstCode();
 
-    expect(result.current.resendSeconds).toBe(12);
+    expect(result.current.resendSeconds).toBe(30);
     await act(async () => vi.advanceTimersByTimeAsync(1000));
-    expect(result.current.resendSeconds).toBe(11);
+    expect(result.current.resendSeconds).toBe(29);
   });
 
   it('ignores a resend until the countdown runs out, then restarts it', async () => {
@@ -52,6 +52,6 @@ describe('useUserProfileAddPhoneController', () => {
       await vi.advanceTimersByTimeAsync(0);
     });
     expect(sendCode).toHaveBeenCalledTimes(2);
-    expect(result.current.resendSeconds).toBe(12);
+    expect(result.current.resendSeconds).toBe(30);
   });
 });

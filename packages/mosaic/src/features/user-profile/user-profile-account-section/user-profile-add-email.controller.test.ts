@@ -47,7 +47,7 @@ describe('useUserProfileAddEmailController', () => {
       await Promise.resolve();
     });
     act(() => result.current.onSubmit('123456'));
-    for (let second = 0; second < 12; second++) {
+    for (let second = 0; second < 30; second++) {
       await act(async () => vi.advanceTimersByTimeAsync(1000));
     }
     expect(result.current.resendSeconds).toBe(0);
@@ -111,10 +111,10 @@ describe('useUserProfileAddEmailController', () => {
       result.current.onSubmit();
       await vi.advanceTimersByTimeAsync(0);
     });
-    expect(result.current.resendSeconds).toBe(12);
+    expect(result.current.resendSeconds).toBe(30);
     act(() => result.current.onResend());
     expect(email.start).toHaveBeenCalledTimes(1);
-    for (let second = 0; second < 12; second++) {
+    for (let second = 0; second < 30; second++) {
       await act(async () => vi.advanceTimersByTimeAsync(1000));
     }
     expect(result.current.resendSeconds).toBe(0);
@@ -130,7 +130,7 @@ describe('useUserProfileAddEmailController', () => {
     expect(email.verifyCode).not.toHaveBeenCalled();
     expect(result.current.open).toBe(true);
     expect(result.current.code).toBe('');
-    expect(result.current.resendSeconds).toBe(12);
+    expect(result.current.resendSeconds).toBe(30);
   });
   it.each(['email', 'verify'] as const)('keeps the %s input after failure and allows retrying', async step => {
     const operation = vi.fn().mockRejectedValueOnce(saveError('Try again')).mockResolvedValue(verifier());
