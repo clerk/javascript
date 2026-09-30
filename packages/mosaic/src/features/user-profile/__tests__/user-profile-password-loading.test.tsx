@@ -2,7 +2,6 @@ import type * as SharedReact from '@clerk/shared/react';
 import { ClerkInstanceContext } from '@clerk/shared/react';
 import type { LoadedClerk } from '@clerk/shared/types';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
@@ -50,24 +49,19 @@ function tree() {
   return (
     <ClerkInstanceContext.Provider value={{ value: clerk as unknown as LoadedClerk }}>
       <MosaicProvider>
-        <UserProfilePasswordSection />
+        <UserProfilePasswordSection fallback={<div>Loading password section</div>} />
       </MosaicProvider>
     </ClerkInstanceContext.Provider>
   );
 }
 
-it('keeps the draft while session data briefly reloads', async () => {
+it('shows the fallback when session data starts loading after the section is ready', () => {
   isSessionLoaded = true;
   const { rerender } = render(tree());
-  const events = userEvent.setup();
-  await events.click(screen.getByRole('button', { name: 'Change password' }));
-  await events.type(screen.getByLabelText('New password'), 'new-password-123');
+  expect(screen.getByRole('button', { name: 'Change password' })).toBeInTheDocument();
 
   isSessionLoaded = false;
   rerender(tree());
-  expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
-
-  isSessionLoaded = true;
-  rerender(tree());
-  expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
+  expect(screen.getByText('Loading password section')).toBeInTheDocument();
+  expect(screen.queryByRole('button', { name: 'Change password' })).not.toBeInTheDocument();
 });

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 
 import { Button } from '../../../components/button';
 import type { FieldFeedback } from '../../../components/form';
@@ -20,12 +20,7 @@ export interface UserProfilePasswordSectionProps {
 }
 
 export function UserProfilePasswordSection({ fallback = null }: UserProfilePasswordSectionProps) {
-  const currentModel = useUserProfilePasswordModel();
-  const settledModel = useRef<UserProfilePasswordModel>(currentModel);
-  if (currentModel.status !== 'loading') {
-    settledModel.current = currentModel;
-  }
-  const model = currentModel.status === 'loading' ? settledModel.current : currentModel;
+  const model = useUserProfilePasswordModel();
   const m = useMessages('userProfilePasswordSection');
   if (model.status === 'loading') {
     return fallback;
