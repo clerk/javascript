@@ -305,7 +305,6 @@ function DestructiveHarness() {
         fieldLabel='Type “Delete account” below to continue'
         confirmationValue='Delete account'
         actionLabel='Delete account'
-        verificationSlot={<Reverification {...reverification} />}
       />
     </div>
   );

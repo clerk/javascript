@@ -150,27 +150,12 @@ describe('useDestructiveController', () => {
     expect(result.current.isDeleting).toBe(true);
   });
 
-  it('is on the confirm step without reverification', () => {
-    const { result } = renderHook(() => useDestructiveController({ onDelete: () => Promise.resolve() }));
-
-    expect(result.current.step).toBe('confirm');
-  });
-
-  it.each([
-    ['idle', 'confirm'],
-    ['loading', 'confirm'],
-    ['unavailable', 'verify'],
-    ['ready', 'verify'],
-    ['retrying', 'verify'],
-  ] as const)('reverification status %s uses the %s step', (status, step) => {
+  it('passes reverification through', () => {
     const { result } = renderHook(() =>
-      useDestructiveController({
-        onDelete: () => Promise.resolve(),
-        reverification: { status } as ReverificationController,
-      }),
+      useDestructiveController({ onDelete: () => Promise.resolve(), reverification: idleReverification }),
     );
 
-    expect(result.current.step).toBe(step);
+    expect(result.current.reverification).toBe(idleReverification);
   });
 
   it('cancels reverification when the dialog closes', () => {
@@ -190,22 +175,5 @@ describe('useDestructiveController', () => {
 
     expect(onCancel).toHaveBeenCalledOnce();
     expect(result.current.open).toBe(false);
-  });
-
-  it('does not cancel reverification when a close is ignored', () => {
-    const { result } = renderHook(() =>
-      useDestructiveController({
-        onDelete: () => new Promise(() => {}),
-        reverification: { status: 'retrying' } as ReverificationController,
-      }),
-    );
-    act(() => result.current.onOpenChange(true));
-    act(() => {
-      void result.current.onDelete();
-    });
-
-    act(() => result.current.onOpenChange(false));
-
-    expect(result.current.open).toBe(true);
   });
 });

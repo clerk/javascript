@@ -6,7 +6,7 @@ import type { DestructiveControlledProps } from './destructive';
 
 export type DestructiveController = Pick<
   DestructiveControlledProps,
-  'open' | 'isDeleting' | 'errorMessage' | 'onOpenChange' | 'step'
+  'open' | 'isDeleting' | 'errorMessage' | 'onOpenChange' | 'reverification'
 > & {
   onDelete: () => Promise<unknown>;
   openDestructiveDialog: () => void;
@@ -36,14 +36,12 @@ export function useDestructiveController({
   };
 
   const isDeleting = status === 'open-pending';
-  const step =
-    reverification && reverification.status !== 'idle' && reverification.status !== 'loading' ? 'verify' : 'confirm';
 
   return {
     open: status !== 'closed',
     isDeleting,
     errorMessage: status === 'open-error' ? destructiveState.errorMessage : undefined,
-    step,
+    reverification,
     openDestructiveDialog,
     onDelete: async () => {
       if (status === 'open-needs-confirmation' || status === 'open-error') {
