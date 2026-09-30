@@ -13,7 +13,6 @@ export default defineConfig(overrideOptions => {
       index: './src/index.ts',
       'preload/index': './src/preload/index.ts',
       'react/index': './src/react/index.tsx',
-      'react/legacy': './src/react/legacy.ts',
       'react/experimental': './src/react/experimental.ts',
       'storage/index': './src/storage/index.ts',
       'passkeys/index': './src/passkeys/index.ts',

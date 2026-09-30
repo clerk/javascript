@@ -64,16 +64,6 @@
         "default": "./dist/cjs/react/index.js"
       }
     },
-    "./react/legacy": {
-      "import": {
-        "types": "./dist/types/react/legacy.d.ts",
-        "default": "./dist/esm/react/legacy.js"
-      },
-      "require": {
-        "types": "./dist/types/react/legacy.d.ts",
-        "default": "./dist/cjs/react/legacy.js"
-      }
-    },
     "./react/experimental": {
       "import": {
         "types": "./dist/types/react/experimental.d.ts",
