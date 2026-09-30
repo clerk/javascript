@@ -72,6 +72,7 @@ test. Copy from it.
 | Authoring or debugging a state machine, or wiring one to React         | `references/machines.md` → in-tree `machine/README.md` |
 | Writing the view (rendering plain props)                               | `references/views.md`                                  |
 | Testing a feature (feature tests, unit tests)                          | `references/testing.md`                                |
+| Testing live flows against a configured staging application            | `references/local-mosaic-testing.md`                   |
 | Migrating a legacy component into Mosaic (the end-to-end workflow)     | `references/migration.md`                              |
 | Running the parity audit that guards a migration                       | `references/parity-audit.md`                           |
 
