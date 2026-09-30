@@ -138,6 +138,32 @@ async function expectBiometricApiError(operation: Promise<unknown>, cause: Clerk
   expect(error).toMatchObject({ code, message: `${code} long message`, cause });
 }
 
+function trustedDeviceVerification(challengeOverrides: Record<string, unknown> = {}) {
+  return {
+    strategy: 'trusted_device',
+    trustedDeviceChallenge: {
+      challenge: 'challenge',
+      challengeId: 'challenge_1',
+      trustedDeviceId: 'td_1',
+      clientData: 'reverification-client-data',
+      expiresAt: null as Date | null,
+      algorithm: 'ES256',
+      ...challengeOverrides,
+    },
+  };
+}
+
+function sessionVerification(status: string, overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'sessver_1',
+    status,
+    level: 'multi_factor',
+    firstFactorVerification: null as unknown,
+    secondFactorVerification: null as unknown,
+    ...overrides,
+  };
+}
+
 function createClerk() {
   const user = {
     id: 'user_1',
@@ -164,7 +190,22 @@ function createClerk() {
     attemptFirstFactor: asyncFn(() => completedSignIn),
   };
   const clientSignIn = { create: asyncFn(() => createdSignIn) };
-  const session = { id: 'sess_1', status: 'active', user };
+  const session = {
+    id: 'sess_1',
+    status: 'active',
+    user,
+    startVerification: asyncFn(() => sessionVerification('needs_first_factor')),
+    prepareFirstFactorVerification: asyncFn(() =>
+      sessionVerification('needs_first_factor', { firstFactorVerification: trustedDeviceVerification() }),
+    ),
+    attemptFirstFactorVerification: asyncFn(() => sessionVerification('complete')),
+    prepareSecondFactorVerification: asyncFn(() =>
+      sessionVerification('needs_second_factor', { secondFactorVerification: trustedDeviceVerification() }),
+    ),
+    attemptSecondFactorVerification: asyncFn(() => sessionVerification('complete')),
+    clearCache: vi.fn(),
+    getToken: asyncFn((): string | null => 'fresh-token'),
+  };
   return {
     user,
     session,
@@ -990,6 +1031,189 @@ describe('useBiometricCredentials', () => {
 
     await expect(biometricCredentials.enroll()).rejects.toThrow(
       'Biometric credentials are currently only available on iOS and Android.',
+    );
+  });
+});
+
+describe('reverify', () => {
+  beforeEach(() => {
+    signInClerkUser();
+  });
+
+  test('verifies the first factor with the biometric credential and refreshes the session token', async () => {
+    addLocalCredential();
+
+    const result = await renderBiometricCredentials().reverify({ reason: 'Confirm with Face ID.' });
+
+    expect(clerk.session.startVerification).toHaveBeenCalledWith({ level: 'first_factor' });
+    expect(clerk.session.prepareFirstFactorVerification).toHaveBeenCalledWith({
+      strategy: 'trusted_device',
+      trustedDeviceId: 'td_1',
+    });
+    expect(biometrics.sign).toHaveBeenCalledWith('key_1', 'reverification-client-data', 'Confirm with Face ID.');
+    expect(clerk.session.attemptFirstFactorVerification).toHaveBeenCalledWith({
+      strategy: 'trusted_device',
+      trustedDeviceId: 'td_1',
+      clientData: 'reverification-client-data',
+      signature: 'signature',
+      algorithm: 'ES256',
+    });
+    expect(clerk.session.clearCache).toHaveBeenCalled();
+    expect(clerk.session.getToken).toHaveBeenCalledWith({ skipCache: true });
+    expect(result).toEqual({ id: 'sessver_1', status: 'complete', level: 'multi_factor', session: clerk.session });
+    expect(clerk.session.prepareSecondFactorVerification).not.toHaveBeenCalled();
+    expect(mocks.idle).not.toHaveBeenCalled();
+    expect(mocks.pullFromNative).not.toHaveBeenCalled();
+  });
+
+  test('continues with the second factor when the first factor leaves one outstanding', async () => {
+    addLocalCredential();
+    clerk.session.attemptFirstFactorVerification.mockResolvedValueOnce(sessionVerification('needs_second_factor'));
+
+    const result = await renderBiometricCredentials().reverify({ level: 'multi_factor' });
+
+    expect(clerk.session.startVerification).toHaveBeenCalledWith({ level: 'multi_factor' });
+    expect(clerk.session.prepareSecondFactorVerification).toHaveBeenCalledWith({
+      strategy: 'trusted_device',
+      trustedDeviceId: 'td_1',
+    });
+    expect(clerk.session.attemptSecondFactorVerification).toHaveBeenCalledWith(
+      expect.objectContaining({ strategy: 'trusted_device', trustedDeviceId: 'td_1', signature: 'signature' }),
+    );
+    expect(biometrics.sign).toHaveBeenCalledTimes(2);
+    expect(result.status).toBe('complete');
+  });
+
+  test('verifies only the second factor when the verification starts there', async () => {
+    addLocalCredential();
+    clerk.session.startVerification.mockResolvedValueOnce(sessionVerification('needs_second_factor'));
+
+    await renderBiometricCredentials().reverify({ level: 'second_factor' });
+
+    expect(clerk.session.prepareFirstFactorVerification).not.toHaveBeenCalled();
+    expect(clerk.session.prepareSecondFactorVerification).toHaveBeenCalled();
+    expect(biometrics.sign).toHaveBeenCalledWith(
+      'key_1',
+      'reverification-client-data',
+      'Use biometrics to verify your identity.',
+    );
+  });
+
+  test('does not prompt when the verification is already complete', async () => {
+    addLocalCredential();
+    clerk.session.startVerification.mockResolvedValueOnce(sessionVerification('complete'));
+
+    const result = await renderBiometricCredentials().reverify();
+
+    expect(biometrics.sign).not.toHaveBeenCalled();
+    expect(clerk.session.getToken).toHaveBeenCalledWith({ skipCache: true });
+    expect(result.status).toBe('complete');
+  });
+
+  test('returns an incomplete verification without refreshing the session token', async () => {
+    addLocalCredential();
+    clerk.session.attemptFirstFactorVerification.mockResolvedValueOnce(sessionVerification('needs_first_factor'));
+
+    const result = await renderBiometricCredentials().reverify();
+
+    expect(result.status).toBe('needs_first_factor');
+    expect(clerk.session.clearCache).not.toHaveBeenCalled();
+    expect(clerk.session.getToken).not.toHaveBeenCalled();
+  });
+
+  test('rejects an invalid level before starting the verification', async () => {
+    addLocalCredential();
+
+    await expect(
+      renderBiometricCredentials().reverify({ level: 'everything' as 'first_factor' }),
+    ).rejects.toMatchObject({ code: 'invalid_reverification_level' });
+    expect(clerk.session.startVerification).not.toHaveBeenCalled();
+  });
+
+  test('requires a session with a user', async () => {
+    clerk.instance.session = null;
+
+    await expect(renderBiometricCredentials().reverify()).rejects.toMatchObject({
+      code: 'biometric_reverification_session_unavailable',
+    });
+  });
+
+  test('requires a local credential for the session user', async () => {
+    addLocalCredential({ userId: 'user_2' });
+
+    await expect(renderBiometricCredentials().reverify()).rejects.toMatchObject({
+      code: 'E_BIOMETRIC_REVERIFICATION_FAILED',
+      message: 'Biometric reverification is unavailable: no_local_credential.',
+    });
+    expect(clerk.session.startVerification).not.toHaveBeenCalled();
+  });
+
+  test('requires a credential bound to the current biometric set', async () => {
+    addLocalCredential({ policy: 'biometry_any' });
+
+    await expect(renderBiometricCredentials().reverify()).rejects.toMatchObject({
+      code: 'biometric_credential_policy_incompatible',
+    });
+    expect(clerk.session.startVerification).not.toHaveBeenCalled();
+  });
+
+  test('rejects a challenge issued for another credential without prompting', async () => {
+    addLocalCredential();
+    clerk.session.prepareFirstFactorVerification.mockResolvedValueOnce(
+      sessionVerification('needs_first_factor', {
+        firstFactorVerification: trustedDeviceVerification({ trustedDeviceId: 'td_other' }),
+      }),
+    );
+
+    await expect(renderBiometricCredentials().reverify()).rejects.toThrow(
+      'Biometric reverification did not return a matching challenge.',
+    );
+    expect(biometrics.sign).not.toHaveBeenCalled();
+  });
+
+  test('rejects an expired challenge without prompting', async () => {
+    addLocalCredential();
+    clerk.session.prepareFirstFactorVerification.mockResolvedValueOnce(
+      sessionVerification('needs_first_factor', {
+        firstFactorVerification: trustedDeviceVerification({ expiresAt: new Date(Date.now() - 1_000) }),
+      }),
+    );
+
+    await expect(renderBiometricCredentials().reverify()).rejects.toThrow(
+      'Biometric reverification challenge has expired.',
+    );
+    expect(biometrics.sign).not.toHaveBeenCalled();
+  });
+
+  test('forgets the local credential when its key was invalidated', async () => {
+    addLocalCredential();
+    biometrics.sign.mockRejectedValueOnce(moduleError('key_invalidated'));
+
+    await expect(renderBiometricCredentials().reverify()).rejects.toMatchObject({ code: 'key_invalidated' });
+    expect(biometrics.store.records).toEqual([]);
+  });
+
+  test('forgets the local credential when the server no longer has it', async () => {
+    addLocalCredential();
+    const cause = apiError('trusted_device_not_registered', 'trusted_device_id');
+    clerk.session.prepareFirstFactorVerification.mockRejectedValueOnce(cause);
+
+    await expectBiometricApiError(renderBiometricCredentials().reverify(), cause);
+    expect(biometrics.store.records).toEqual([]);
+  });
+
+  test('fails when the session token cannot be refreshed', async () => {
+    addLocalCredential();
+    clerk.session.getToken.mockResolvedValueOnce(null);
+
+    await expect(renderBiometricCredentials().reverify()).rejects.toThrow(
+      'Unable to refresh the session token after biometric reverification.',
+    );
+  });
+
+  test('rejects reverification on unsupported platforms', async () => {
+    await expect(renderBiometricCredentials(useBiometricCredentialsOnUnsupportedPlatform).reverify()).rejects.toThrow(
+      'only available on iOS and Android',
     );
   });
 });
