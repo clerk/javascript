@@ -91,32 +91,25 @@ export const banner = stylex.create({
       default: '1fr',
       ':where(:not([data-open]), [data-starting-style])': '0fr',
     },
-    // The fade sits one FADE below the box at rest, so it only shows while the track moves.
-    maskImage: `linear-gradient(to bottom, black calc(100% - ${FADE}), transparent)`,
-    maskPosition: 'top',
-    maskRepeat: 'no-repeat',
-    maskSize: {
-      default: `100% calc(100% + ${FADE})`,
-      ':where([data-starting-style], [data-ending-style])': '100% 100%',
-    },
-    transitionDelay: {
-      default: `${durationVars['--cl-duration-instant']}, calc(${durationVars['--cl-duration-slow']} - ${durationVars['--cl-duration-fast']})`,
-      ':where([data-ending-style])': durationVars['--cl-duration-instant'],
-    },
-    transitionDuration: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-fast']}`,
+    // The content rides the moving edge, so the clip lands under the header, where the banner's top
+    // margin gives a static fade room to sit without touching content at rest.
+    maskImage: `linear-gradient(to bottom, transparent, black ${FADE})`,
+    transitionDuration: durationVars['--cl-duration-slow'],
     transitionProperty: {
-      default: 'grid-template-rows, mask-size',
+      default: 'grid-template-rows',
       '@media (prefers-reduced-motion: reduce)': 'none',
     },
     transitionTimingFunction: {
       default: easingVars['--cl-ease-enter'],
-      ':where([data-ending-style])': `${easingVars['--cl-ease-in-out']}, ${easingVars['--cl-ease-enter']}`,
+      ':where([data-ending-style])': easingVars['--cl-ease-in-out'],
     },
   },
   // No padding here: it would be the 0fr track's minimum. Spanning into the implicit second row
   // keeps the item at the wrapper's height; a fractional fr track alone re-resolves against it.
   clip: {
     overflow: 'clip',
+    alignContent: 'end',
+    display: 'grid',
     gridRowEnd: 'span 2',
     gridRowStart: '1',
     minHeight: 0,

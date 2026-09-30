@@ -168,7 +168,9 @@ Two mechanisms, one per direction, measured on a 54px banner:
   ~85% open at 100ms; the surface waits one `fast` before its own entrance, so it
   arrives into a strip that has all but stopped. The first 100ms is the row moving
   alone, and that is fine: the strip is empty, so nothing is being clipped and it
-  reads as space being made.
+  reads as space being made. The content is anchored to the moving edge (below), so
+  what it does once visible is slide the last few pixels down into place rather
+  than be revealed by a line crossing it.
 - **Exit: let the curve stagger it.** The surface leaves at once at `fast`; the row
   collapses on `--cl-ease-in-out` at `slow` with no delay. The in-out's slow start
   holds the row within ~7px of rest for that 100ms, so the content has faded to
@@ -186,10 +188,10 @@ Both totals land at ~250ms; the asymmetry lives inside the sequence.
   not an exit" above.
 - **Surface: the popover recipe.** Opacity at `fast` on `--cl-ease-enter`, scale at
   `base` on `--cl-ease-default`, both at `fast` on `--cl-ease-exit` going out. Scale
-  from `0.96` about the **top** edge: the row grows downward from the header, so a
-  top origin keeps the surface's bottom edge furthest from the moving clip — one
-  more way the content, not the clip, is what moves. (Center was not tried; top
-  read right.)
+  from `0.96` about the **top** edge: the row grows downward from the header, and
+  with the content anchored to the moving edge a top origin pulls the surface's
+  bottom edge a pixel inside the clip rather than onto it. (Center was not tried;
+  top read right.)
 
 ### Durations
 
@@ -205,10 +207,18 @@ way; the dead-frame test still applies to a short collapse.
 ### Geometry
 
 ```text
-wrapper   display: grid; grid-template-rows: 0fr ↔ 1fr; carries the transition attrs
-clip      grid-row: 1 / span 2; min-height: 0; overflow: clip; NO padding
+wrapper   display: grid; grid-template-rows: 0fr ↔ 1fr; carries the transition attrs and the mask
+clip      grid-row: 1 / span 2; display: grid; align-content: end; min-height: 0; overflow: clip; NO padding
 content   spacing as its own margins
 ```
+
+- **Anchor the content to the moving edge** (`align-content: end`). Anchored to the
+  top, the content is revealed by the clip line crossing it, and the bottom border is
+  the last thing to appear — a hard edge at exactly the moment the row is crawling to
+  a stop. Anchored to the bottom, the content's own bottom edge _is_ the moving edge,
+  so nothing is ever cut there, and the clipping moves to the top, under the header,
+  where content sliding out from under something reads as natural and where there
+  is room for a fade (below).
 
 - **The clip layer spans into the implicit second row.** A fractional `fr` track is
   sized twice: the wrapper's height resolves to `f × content`, then the track
@@ -229,7 +239,7 @@ content   spacing as its own margins
 - Measure the height (`Field.Message`'s ResizeObserver) only when the content
   changes size _while open_; `0fr ↔ 1fr` covers open/closed on its own.
 
-### The fade on the moving edge
+### The fade on the clipped edge
 
 A mask on the wrapper, not an element: it needs no background color, works on any
 surface a consumer themes, and tracks the box for free because the wrapper's box _is_
@@ -237,34 +247,26 @@ the animating track (given the span above — without it the clip edge is somewh
 else).
 
 ```ts
-maskImage: `linear-gradient(to bottom, black calc(100% - ${FADE}), transparent)`,
-maskPosition: 'top',
-maskRepeat: 'no-repeat',
-maskSize: {
-  default: `100% calc(100% + ${FADE})`, // gradient pushed one FADE below the box
-  ':where([data-starting-style], [data-ending-style])': '100% 100%', // gradient inside the box
-},
-transitionProperty: 'grid-template-rows, mask-size',
+maskImage: `linear-gradient(to bottom, transparent, black ${FADE})`,
 ```
 
-The rule: **the fade exists whenever the clip edge is crossing content, and is never
-visible at rest.** At rest the box's bottom edge is the content's bottom edge, so the
-gradient is pushed one `FADE` below the box; while the track moves it is pulled back
-in. `mask-size` interpolates as a `calc()` length in Chromium and WebKit. It animates
-at all only so the two states meet smoothly — the shape of that animation is decided
-by the row's:
+That is the whole mask, and it is static. The rule — **the fade exists whenever the
+clip edge is crossing content, and is never visible at rest** — is met by geometry
+rather than animation: with the content anchored to the moving edge, the only edge
+that ever cuts it is the top one, and at rest the top `FADE` of the box is the
+content's own top margin. `FADE` is that margin, so the ramp ends exactly on the
+content's top border and never touches it while the row is still.
 
-- **Enter:** hold, then slide out over the last `fast` (`transition-delay:
-calc(slow - fast)`), so it is gone exactly as the row lands.
-- **Exit:** slide in over `fast` on `--cl-ease-enter`, no delay. On the row's own
-  in-out curve it lagged the edge and left a hard line for the first frames; on the
-  ease-out it is more than half in by the second frame, before the row has moved
-  2px.
+The earlier form of this — content anchored to the top, a bottom fade slid into the
+box on `mask-size` while the track moved and pushed below it at rest — also works,
+but it puts the fade on the edge that is crawling to a stop and has to animate the
+fade away at precisely the wrong moment. Prefer the static one; reach for the
+animated one only where the content cannot be anchored to the moving edge.
 
-A hard line at the end of the enter is not this fade's fault. Before reaching for
-a different dissolve, check the clip layer's height against the wrapper's per frame:
-if they differ, the item is sized to the re-resolved track and the fade is not on
-the edge (see the span rule above).
+A hard line at the moving edge is not a fade problem. Before touching the mask,
+check the clip layer's height against the wrapper's per frame: if they differ, the
+item is sized to the re-resolved track and nothing about the fade can be right (see
+the span rule above).
 
 ### Reduced motion
 
