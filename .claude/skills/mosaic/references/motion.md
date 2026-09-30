@@ -158,11 +158,20 @@ The reference is `Card.Banner` (`card.styles.ts`, `banner.collapse` / `clip` /
 ### The content's enter/exit leads; the row is a byproduct
 
 Played together, a row growing around a banner reads as the row: a cell squashing its
-content, with a hard clip line moving across it. The rule is that **the content and a
-fast-moving clip edge are never visible at the same time**, so what the eye attaches
-to is the content arriving and leaving, and the row is just the space it takes.
+content, with a hard clip line moving across it. Two rules take that apart, and they
+guarantee different things:
 
-Two mechanisms, one per direction, measured on a 54px banner:
+1. **No hard clip edge is ever visible.** The moving edge is the content's own edge
+   (it is anchored to it, see Geometry), so nothing is cut there; the stationary edge
+   is faded (see the mask). Clipping under the header is not a goal in itself — it is
+   what falls out of wanting a soft edge for the whole motion and nothing visible at
+   rest.
+2. **The row's fast motion happens while the content is invisible.** That is what
+   decides prominence: what the eye attaches to is the content arriving and
+   leaving, and the row is just the space it takes. Break it and the collapse gets
+   ahead of the content's exit, and one motion reads as two.
+
+Rule 2 is met by a different mechanism in each direction, measured on a 54px banner:
 
 - **Enter: delay the content.** The row opens on `--cl-ease-enter` at `slow` and is
   ~85% open at 100ms; the surface waits one `fast` before its own entrance, so it
@@ -185,7 +194,12 @@ Both totals land at ~250ms; the asymmetry lives inside the sequence.
   everything else that responds to a pointer; `--cl-ease-default` would carry the
   height past target and read as a bounce in the layout.
 - **Row closing: `--cl-ease-in-out`.** Not `--cl-ease-exit`, per "A layout settle is
-  not an exit" above.
+  not an exit" above. Not `--cl-ease-enter` either, tempting as one curve for both
+  directions is: its fast start moves the row 16px in the first frame while the
+  surface is still at 93% opacity, so the collapse gets ahead of the content's
+  ease-in exit and the two read as separate animations with the layout in front —
+  rule 2 inverted. The in-out's slow start is what keeps the row still until the
+  surface has gone.
 - **Surface: the popover recipe.** Opacity at `fast` on `--cl-ease-enter`, scale at
   `base` on `--cl-ease-default`, both at `fast` on `--cl-ease-exit` going out. Scale
   from `0.96` about the **top** edge: the row grows downward from the header, and
@@ -209,7 +223,7 @@ way; the dead-frame test still applies to a short collapse.
 ```text
 wrapper   display: grid; grid-template-rows: 0fr ↔ 1fr; carries the transition attrs and the mask
 clip      grid-row: 1 / span 2; display: grid; align-content: end; min-height: 0; overflow: clip; NO padding
-content   spacing as its own margins
+content   spacing as its own margins; the top one is the fade's length (one constant for both)
 ```
 
 - **Anchor the content to the moving edge** (`align-content: end`). Anchored to the
@@ -247,21 +261,24 @@ the animating track (given the span above — without it the clip edge is somewh
 else).
 
 ```ts
-maskImage: `linear-gradient(to bottom, transparent, black ${FADE})`,
+const INSET = space['4']; // the surface's top margin AND the fade's length
+maskImage: `linear-gradient(to bottom, transparent, black ${INSET})`,
 ```
 
 That is the whole mask, and it is static. The rule — **the fade exists whenever the
 clip edge is crossing content, and is never visible at rest** — is met by geometry
 rather than animation: with the content anchored to the moving edge, the only edge
-that ever cuts it is the top one, and at rest the top `FADE` of the box is the
-content's own top margin. `FADE` is that margin, so the ramp ends exactly on the
-content's top border and never touches it while the row is still.
+that ever cuts it is the top one, and at rest the top `INSET` of the box is the
+content's own top margin, so the ramp ends exactly on the content's top border and
+never touches it while the row is still. **The fade's length and the content's top
+margin are one constant** — drift between them either eats the border at rest or
+leaves a hard strip under the header.
 
-The earlier form of this — content anchored to the top, a bottom fade slid into the
-box on `mask-size` while the track moved and pushed below it at rest — also works,
-but it puts the fade on the edge that is crawling to a stop and has to animate the
-fade away at precisely the wrong moment. Prefer the static one; reach for the
-animated one only where the content cannot be anchored to the moving edge.
+A fade on the _moving_ edge instead (content anchored to the top, a bottom gradient
+slid in and out on `mask-size`) was built first and can be made to work, but it has
+to animate the fade away at exactly the moment the row is crawling to a stop, and
+every timing of that read as an artifact. Anchor the content instead; that variant
+is not a recipe.
 
 A hard line at the moving edge is not a fade problem. Before touching the mask,
 check the clip layer's height against the wrapper's per frame: if they differ, the
@@ -270,10 +287,10 @@ the span rule above).
 
 ### Reduced motion
 
-Row and mask take `transition-property: none` together so they snap in the same
-frame; the surface keeps its fade and pins the scale, per "Reduced motion" below.
-Its entrance delay goes to `instant` as well: it exists to wait for the row, and a
-row that has snapped open leaves nothing to wait for.
+The row takes `transition-property: none` and snaps; the mask is static and needs
+nothing. The surface keeps its fade and pins the scale, per "Reduced motion" below,
+and its entrance delay goes to `instant` as well: it exists to wait for the row, and
+a row that has snapped open leaves nothing to wait for.
 
 ## Color and state changes (hover, press)
 

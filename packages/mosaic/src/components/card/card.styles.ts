@@ -81,7 +81,8 @@ export const header = stylex.create({
   },
 });
 
-const FADE = space['4'];
+// The fade covers exactly the surface's top margin, so both read one value.
+const INSET = space['4'];
 
 export const banner = stylex.create({
   // A root flex item, not a content grid item: a grid track floors at 0 whatever the margin, so the gap would stay.
@@ -93,7 +94,7 @@ export const banner = stylex.create({
     },
     // The content rides the moving edge, so the clip lands under the header, where the banner's top
     // margin gives a static fade room to sit without touching content at rest.
-    maskImage: `linear-gradient(to bottom, transparent, black ${FADE})`,
+    maskImage: `linear-gradient(to bottom, transparent, black ${INSET})`,
     transitionDuration: durationVars['--cl-duration-slow'],
     transitionProperty: {
       default: 'grid-template-rows',
@@ -116,7 +117,7 @@ export const banner = stylex.create({
   },
   surface: {
     marginInline: space['5'],
-    marginBlockStart: space['4'],
+    marginBlockStart: INSET,
     opacity: {
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,
