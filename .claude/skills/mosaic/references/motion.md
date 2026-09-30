@@ -206,9 +206,19 @@ way; the dead-frame test still applies to a short collapse.
 
 ```text
 wrapper   display: grid; grid-template-rows: 0fr ↔ 1fr; carries the transition attrs
-clip      min-height: 0; overflow: clip; NO padding
+clip      grid-row: 1 / span 2; min-height: 0; overflow: clip; NO padding
 content   spacing as its own margins
 ```
+
+- **The clip layer spans into the implicit second row.** A fractional `fr` track is
+  sized twice: the wrapper's height resolves to `f × content`, then the track
+  re-resolves against that now-definite height and comes out at `f² × content`. An
+  item stretched to the track alone therefore lags the wrapper's edge — by 13px at
+  the midpoint of a 54px row — leaving empty space between the clipped content and
+  whatever follows, and putting any fade on the wrapper in the wrong place. Spanning
+  the implicit row hands the item the wrapper's full height. Measured in Chromium
+  and WebKit: `0.62fr` of 54px gives wrapper 33.5 / item 20.8 without the span,
+  33.5 / 33.5 with it.
 
 - Padding on the clip layer is the `0fr` track's minimum and holds it open, which is
   why the content's spacing is margins one level down.
@@ -223,58 +233,38 @@ content   spacing as its own margins
 
 A mask on the wrapper, not an element: it needs no background color, works on any
 surface a consumer themes, and tracks the box for free because the wrapper's box _is_
-the animating track.
-
-The rule: **the fade exists whenever the clip edge is crossing content, and is never
-visible at rest.** At rest the box's bottom edge is the content's bottom edge, so the
-gradient has to be taken away there. It animates at all only so the two states meet
-smoothly — and the two directions want it taken away differently, so the mask has
-two animated values:
+the animating track (given the span above — without it the clip edge is somewhere
+else).
 
 ```ts
-// card.vars.stylex.ts — registered, so the stop interpolates instead of snapping
-export const cardBannerVars = stylex.defineVars({
-  '--_cl-card-banner-fade': stylex.types.length('0px'),
-});
-
-// card.styles.ts
-'--_cl-card-banner-fade': {
-  default: '0px', // ramp length: none at rest
-  ':where([data-starting-style], [data-ending-style])': FADE,
-},
-maskImage: `linear-gradient(to bottom, black calc(100% - ${fade}), transparent)`,
+maskImage: `linear-gradient(to bottom, black calc(100% - ${FADE}), transparent)`,
 maskPosition: 'top',
 maskRepeat: 'no-repeat',
 maskSize: {
   default: `100% calc(100% + ${FADE})`, // gradient pushed one FADE below the box
   ':where([data-starting-style], [data-ending-style])': '100% 100%', // gradient inside the box
 },
-transitionProperty: 'grid-template-rows, --_cl-card-banner-fade, mask-size',
+transitionProperty: 'grid-template-rows, mask-size',
 ```
 
-- **Enter: shorten the ramp** (`--_cl-card-banner-fade` `FADE → 0`), holding, then
-  over the last `fast` on `--cl-ease-enter` (`transition-delay: calc(slow - fast)`).
-  Sliding the gradient out instead raises the alpha _at the edge_ as it goes, and
-  during the row's crawl — the last 100ms of `--cl-ease-enter`, with the edge inside
-  the banner's bottom padding — that read as a hard line where the border should be.
-  Shortening the ramp keeps the edge at zero alpha for the whole dissolve; only the
-  ramp above it gets shorter, and the content there is already opaque. Ease-out, not
-  the exit curve: the ramp loses most of its length early, while the row is still
-  moving, rather than collapsing after the eye has settled. `mask-size` waits out
-  the whole `slow` with a `0s` duration and then jumps, which is invisible with the
-  ramp already at zero.
-- **Exit: slide the gradient in** (`mask-size` `+FADE → 0`) over `fast` on
-  `--cl-ease-enter`, no delay, with the ramp set to `FADE` instantly while it is
-  still below the box. The alpha at the edge goes from one to zero rather than
-  starting at zero, so the border fades instead of vanishing on the first frame. On
-  the row's own in-out curve the slide lagged the edge and left a hard line for the
-  first frames; on the ease-out it is more than half in by the second frame, before
-  the row has moved 2px.
+The rule: **the fade exists whenever the clip edge is crossing content, and is never
+visible at rest.** At rest the box's bottom edge is the content's bottom edge, so the
+gradient is pushed one `FADE` below the box; while the track moves it is pulled back
+in. `mask-size` interpolates as a `calc()` length in Chromium and WebKit. It animates
+at all only so the two states meet smoothly — the shape of that animation is decided
+by the row's:
 
-The ramp is a registered `<length>` custom property (`stylex.types.length`, as
-ScrollArea does for its scroll progress) because an unregistered one cannot
-interpolate and flips at the midpoint. `mask-size` interpolates as a `calc()` length
-without registration. Both were measured in Chromium and WebKit.
+- **Enter:** hold, then slide out over the last `fast` (`transition-delay:
+calc(slow - fast)`), so it is gone exactly as the row lands.
+- **Exit:** slide in over `fast` on `--cl-ease-enter`, no delay. On the row's own
+  in-out curve it lagged the edge and left a hard line for the first frames; on the
+  ease-out it is more than half in by the second frame, before the row has moved
+  2px.
+
+A hard line at the end of the enter is not this fade's fault. Before reaching for
+a different dissolve, check the clip layer's height against the wrapper's per frame:
+if they differ, the item is sized to the re-resolved track and the fade is not on
+the edge (see the span rule above).
 
 ### Reduced motion
 

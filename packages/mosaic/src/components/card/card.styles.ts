@@ -11,7 +11,6 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 import { cardContentMarker } from './card.markers.stylex';
-import { cardBannerVars } from './card.vars.stylex';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
 
@@ -83,23 +82,17 @@ export const header = stylex.create({
 });
 
 const FADE = space['4'];
-const fade = cardBannerVars['--_cl-card-banner-fade'];
 
 export const banner = stylex.create({
   // A root flex item, not a content grid item: a grid track floors at 0 whatever the margin, so the gap would stay.
   collapse: {
-    // Two mechanisms: entering, the ramp shortens so the moving edge stays soft until it stops;
-    // leaving, the gradient slides up into the box so the edge fades rather than vanishing.
-    '--_cl-card-banner-fade': {
-      default: '0px',
-      ':where([data-starting-style], [data-ending-style])': FADE,
-    },
     display: 'grid',
     gridTemplateRows: {
       default: '1fr',
       ':where(:not([data-open]), [data-starting-style])': '0fr',
     },
-    maskImage: `linear-gradient(to bottom, black calc(100% - ${fade}), transparent)`,
+    // The fade sits one FADE below the box at rest, so it only shows while the track moves.
+    maskImage: `linear-gradient(to bottom, black calc(100% - ${FADE}), transparent)`,
     maskPosition: 'top',
     maskRepeat: 'no-repeat',
     maskSize: {
@@ -107,25 +100,25 @@ export const banner = stylex.create({
       ':where([data-starting-style], [data-ending-style])': '100% 100%',
     },
     transitionDelay: {
-      default: `${durationVars['--cl-duration-instant']}, calc(${durationVars['--cl-duration-slow']} - ${durationVars['--cl-duration-fast']}), ${durationVars['--cl-duration-slow']}`,
+      default: `${durationVars['--cl-duration-instant']}, calc(${durationVars['--cl-duration-slow']} - ${durationVars['--cl-duration-fast']})`,
       ':where([data-ending-style])': durationVars['--cl-duration-instant'],
     },
-    transitionDuration: {
-      default: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-instant']}`,
-      ':where([data-ending-style])': `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-instant']}, ${durationVars['--cl-duration-fast']}`,
-    },
+    transitionDuration: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-fast']}`,
     transitionProperty: {
-      default: 'grid-template-rows, --_cl-card-banner-fade, mask-size',
+      default: 'grid-template-rows, mask-size',
       '@media (prefers-reduced-motion: reduce)': 'none',
     },
     transitionTimingFunction: {
       default: easingVars['--cl-ease-enter'],
-      ':where([data-ending-style])': `${easingVars['--cl-ease-in-out']}, ${easingVars['--cl-ease-in-out']}, ${easingVars['--cl-ease-enter']}`,
+      ':where([data-ending-style])': `${easingVars['--cl-ease-in-out']}, ${easingVars['--cl-ease-enter']}`,
     },
   },
-  // No padding here: it would be the 0fr track's minimum.
+  // No padding here: it would be the 0fr track's minimum. Spanning into the implicit second row
+  // keeps the item at the wrapper's height; a fractional fr track alone re-resolves against it.
   clip: {
     overflow: 'clip',
+    gridRowEnd: 'span 2',
+    gridRowStart: '1',
     minHeight: 0,
   },
   surface: {
