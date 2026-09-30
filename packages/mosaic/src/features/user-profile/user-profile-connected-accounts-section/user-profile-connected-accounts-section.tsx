@@ -39,6 +39,8 @@ export function UserProfileConnectedAccountsSection({
   const router = useMosaicRouter();
   const transport = clerk.__internal_oauthTransport;
 
+  // TODO: Add session reverification for account connect, reconnect, and removal;
+  // surface API errors until then.
   const guard = async <Result,>(run: () => Promise<Result>): Promise<Result> => {
     try {
       return await run();
