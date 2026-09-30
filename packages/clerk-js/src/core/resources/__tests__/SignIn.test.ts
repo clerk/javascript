@@ -3714,4 +3714,120 @@ describe('SignIn protect_check gate', () => {
     expect(signIn.protectCheck?.token).toBe('challenge-token');
     expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
   });
+
+  describe('Future sso', () => {
+    let windowNavigate: ReturnType<typeof vi.fn>;
+
+    const handOff = (url: string) => ({ status: 'unverified', external_verification_redirect_url: url });
+    const challenged = (firstFactorVerification: ReturnType<typeof handOff> | null = null) => ({
+      client: null,
+      response: {
+        id: 'signin_123',
+        status: 'needs_protect_check',
+        first_factor_verification: firstFactorVerification,
+        protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
+      },
+    });
+    const cleared = (firstFactorVerification: ReturnType<typeof handOff>) => ({
+      client: null,
+      response: { id: 'signin_123', status: 'needs_first_factor', first_factor_verification: firstFactorVerification },
+    });
+
+    beforeEach(() => {
+      vi.stubGlobal('window', { location: { origin: 'https://example.com', href: 'https://example.com/sign-in' } });
+      windowNavigate = vi.fn();
+      SignIn.clerk = {
+        buildUrlWithAuth: vi.fn(url => url),
+        buildUrl: vi.fn(path => 'https://example.com' + path),
+        frontendApi: 'clerk.example.com',
+        __internal_windowNavigate: windowNavigate,
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.unstubAllGlobals();
+    });
+
+    it('goes to the provider when a challenged create carries a hand-off, leaving the challenge for the way back', async () => {
+      BaseResource._fetch = vi.fn().mockResolvedValue(challenged(handOff('https://accounts.google.example/auth')));
+
+      const signIn = new SignIn();
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://accounts.google.example/auth'));
+      expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
+    });
+
+    it('runs the challenge before going to the provider when a challenged create has no hand-off', async () => {
+      BaseResource._fetch = vi
+        .fn()
+        .mockResolvedValueOnce(challenged())
+        .mockResolvedValueOnce(cleared(handOff('https://accounts.google.example/auth')));
+      const resolve = vi.mocked(ProtectCheckGate.prototype.resolve).mockImplementation(async (_clerk, resource) => {
+        await resource.submitProtectCheck({ proofToken: 'proof' });
+      });
+
+      const signIn = new SignIn();
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(resolve).toHaveBeenCalledTimes(1);
+      expect(resolve.mock.calls[0][1]).toBe(signIn);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://accounts.google.example/auth'));
+      expect(resolve.mock.invocationCallOrder[0]).toBeLessThan(windowNavigate.mock.invocationCallOrder[0]);
+    });
+
+    it('follows the create hand-off when the enterprise SSO prepare after it hits the same pending challenge', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(challenged(handOff('https://idp.example/from-create')));
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'enterprise_sso',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/from-create'));
+      expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
+    });
+
+    it('runs a challenge that is waiting when the popup returns', async () => {
+      const popup = { location: { href: '' } } as Window;
+      BaseResource._fetch = vi
+        .fn()
+        .mockResolvedValueOnce(cleared(handOff('https://accounts.google.example/auth')))
+        .mockResolvedValueOnce(challenged());
+      vi.mocked(_futureAuthenticateWithPopup).mockResolvedValue(undefined);
+
+      const signIn = new SignIn();
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+        popup,
+      });
+
+      expect(error).toBeNull();
+      expect(_futureAuthenticateWithPopup).toHaveBeenCalledTimes(1);
+      expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(ProtectCheckGate.prototype.resolve).mock.calls[0][1]).toBe(signIn);
+      expect(vi.mocked(_futureAuthenticateWithPopup).mock.invocationCallOrder[0]).toBeLessThan(
+        vi.mocked(ProtectCheckGate.prototype.resolve).mock.invocationCallOrder[0],
+      );
+    });
+  });
 });

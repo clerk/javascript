@@ -70,7 +70,7 @@ import {
 } from '../errors';
 import { eventBus } from '../events';
 import { ProtectCheckGate } from '../protectCheckGate';
-import { BaseResource, SignUpVerifications } from './internal';
+import { type BaseMutateParams, BaseResource, SignUpVerifications } from './internal';
 
 declare global {
   interface Window {
@@ -143,9 +143,14 @@ export class SignUp extends BaseResource implements SignUpResource {
    * This property is used to provide access to underlying Client methods to `SignUpFuture`, which wraps an instance
    * of `SignUp`.
    */
-  __internal_basePost: typeof this._basePost = async params => {
+  __internal_basePost = async (
+    params?: BaseMutateParams,
+    { resolveProtectCheck = true }: { resolveProtectCheck?: boolean } = {},
+  ): Promise<this> => {
     await this._basePost(params);
-    await ProtectCheckGate.getInstance().resolve(SignUp.clerk, this, params?.action);
+    if (resolveProtectCheck) {
+      await ProtectCheckGate.getInstance().resolve(SignUp.clerk, this, params?.action);
+    }
     return this;
   };
 
@@ -155,9 +160,14 @@ export class SignUp extends BaseResource implements SignUpResource {
    * This property is used to provide access to underlying Client methods to `SignUpFuture`, which wraps an instance
    * of `SignUp`.
    */
-  __internal_basePatch: typeof this._basePatch = async params => {
+  __internal_basePatch = async (
+    params?: BaseMutateParams,
+    { resolveProtectCheck = true }: { resolveProtectCheck?: boolean } = {},
+  ): Promise<this> => {
     await this._basePatch(params);
-    await ProtectCheckGate.getInstance().resolve(SignUp.clerk, this, params?.action);
+    if (resolveProtectCheck) {
+      await ProtectCheckGate.getInstance().resolve(SignUp.clerk, this, params?.action);
+    }
     return this;
   };
 
@@ -1132,7 +1142,7 @@ class SignUpFuture implements SignUpFutureResource {
           locale,
         };
         if (this.#resource.id) {
-          return this.#resource.__internal_basePatch({ body });
+          return this.#resource.__internal_basePatch({ body }, { resolveProtectCheck: false });
         }
         // Inject browser locale and timezone only when creating the sign-up, so an existing
         // sign-up's values are not overwritten on update.
@@ -1141,7 +1151,10 @@ class SignUpFuture implements SignUpFutureResource {
         if (browserTimezone !== null) {
           body.timezone = browserTimezone;
         }
-        return this.#resource.__internal_basePost({ path: this.#resource.pathRoot, body });
+        return this.#resource.__internal_basePost(
+          { path: this.#resource.pathRoot, body },
+          { resolveProtectCheck: false },
+        );
       };
 
       await authenticateFn().catch(async e => {
@@ -1153,13 +1166,24 @@ class SignUpFuture implements SignUpFutureResource {
         throw e;
       });
 
-      const { status, externalVerificationRedirectURL } = this.#resource.verifications.externalAccount;
+      const pendingHandOff = () => {
+        const { status, externalVerificationRedirectURL } = this.#resource.verifications.externalAccount;
+        return status === 'unverified' ? externalVerificationRedirectURL : null;
+      };
+      const resolveChallenge = () => ProtectCheckGate.getInstance().resolve(SignUp.clerk, this.#resource);
 
-      if (status === 'unverified' && externalVerificationRedirectURL) {
+      if (this.#resource.protectCheck && !pendingHandOff()) {
+        await resolveChallenge();
+      }
+
+      const externalVerificationRedirectURL = pendingHandOff();
+
+      if (externalVerificationRedirectURL) {
         if (popup) {
           await _futureAuthenticateWithPopup(SignUp.clerk, { popup, externalVerificationRedirectURL });
           // Pick up the modified SignUp resource
           await this.#resource.reload();
+          await resolveChallenge();
         } else {
           SignUp.clerk.__internal_windowNavigate(externalVerificationRedirectURL);
         }

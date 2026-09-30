@@ -101,7 +101,7 @@ import {
 } from '../errors';
 import { eventBus } from '../events';
 import { ProtectCheckGate } from '../protectCheckGate';
-import { BaseResource, UserData, Verification } from './internal';
+import { type BaseMutateParams, BaseResource, UserData, Verification } from './internal';
 
 /**
  * Terminal states for email-link verification polling: `verified` (success), `expired`
@@ -169,9 +169,14 @@ export class SignIn extends BaseResource implements SignInResource {
    * This property is used to provide access to underlying Client methods to `SignInFuture`, which wraps an instance
    * of `SignIn`.
    */
-  __internal_basePost: typeof this._basePost = async params => {
+  __internal_basePost = async (
+    params?: BaseMutateParams,
+    { resolveProtectCheck = true }: { resolveProtectCheck?: boolean } = {},
+  ): Promise<this> => {
     await this._basePost(params);
-    await ProtectCheckGate.getInstance().resolve(SignIn.clerk, this, params?.action);
+    if (resolveProtectCheck) {
+      await ProtectCheckGate.getInstance().resolve(SignIn.clerk, this, params?.action);
+    }
     return this;
   };
 
@@ -181,9 +186,14 @@ export class SignIn extends BaseResource implements SignInResource {
    * This property is used to provide access to underlying Client methods to `SignInFuture`, which wraps an instance
    * of `SignIn`.
    */
-  __internal_basePatch: typeof this._basePatch = async params => {
+  __internal_basePatch = async (
+    params?: BaseMutateParams,
+    { resolveProtectCheck = true }: { resolveProtectCheck?: boolean } = {},
+  ): Promise<this> => {
     await this._basePatch(params);
-    await ProtectCheckGate.getInstance().resolve(SignIn.clerk, this, params?.action);
+    if (resolveProtectCheck) {
+      await ProtectCheckGate.getInstance().resolve(SignIn.clerk, this, params?.action);
+    }
     return this;
   };
 
@@ -1098,7 +1108,7 @@ class SignInFuture implements SignInFutureResource {
     return { captchaToken, captchaWidgetType, captchaError };
   }
 
-  private async _create(params: SignInFutureCreateParams): Promise<void> {
+  private async _create(params: SignInFutureCreateParams, options?: { resolveProtectCheck?: boolean }): Promise<void> {
     const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken(params);
     const timezone = params.timezone ?? getBrowserTimezone();
 
@@ -1111,10 +1121,13 @@ class SignInFuture implements SignInFutureResource {
       ...(timezone !== null ? { timezone } : {}),
     };
 
-    await this.#resource.__internal_basePost({
-      path: this.#resource.pathRoot,
-      body,
-    });
+    await this.#resource.__internal_basePost(
+      {
+        path: this.#resource.pathRoot,
+        body,
+      },
+      options,
+    );
   }
 
   async create(params: SignInFutureCreateParams): Promise<{ error: ClerkError | null }> {
@@ -1327,34 +1340,61 @@ class SignInFuture implements SignInFutureResource {
       const wouldReplayStaleRedirect = strategy !== 'enterprise_sso' && hasPendingRedirect;
       const shouldCreateSignIn = !this.#resource.id || wouldReplayStaleRedirect;
 
+      const isChallengePending = () => !!this.#resource.protectCheck || this.#resource.status === 'needs_protect_check';
+      const pendingHandOff = () => {
+        const { status, externalVerificationRedirectURL } = this.#resource.firstFactorVerification;
+        return status === 'unverified' ? externalVerificationRedirectURL : null;
+      };
+      const resolveChallenge = () => ProtectCheckGate.getInstance().resolve(SignIn.clerk, this.#resource);
+
+      let challengedCreateHandOff: URL | null = null;
+
       if (shouldCreateSignIn) {
-        await this._create({
-          strategy,
-          ...routes,
-          identifier,
-        });
+        await this._create(
+          {
+            strategy,
+            ...routes,
+            identifier,
+          },
+          { resolveProtectCheck: false },
+        );
+
+        if (isChallengePending()) {
+          challengedCreateHandOff = pendingHandOff();
+          if (!challengedCreateHandOff) {
+            await resolveChallenge();
+          }
+        }
       }
 
       if (strategy === 'enterprise_sso') {
-        await this.#resource.__internal_basePost({
-          body: {
-            ...routes,
-            oidcPrompt,
-            enterpriseConnectionId,
-            strategy: 'enterprise_sso',
+        await this.#resource.__internal_basePost(
+          {
+            body: {
+              ...routes,
+              oidcPrompt,
+              enterpriseConnectionId,
+              strategy: 'enterprise_sso',
+            },
+            action: 'prepare_first_factor',
+            coalesce: true,
           },
-          action: 'prepare_first_factor',
-          coalesce: true,
-        });
+          { resolveProtectCheck: false },
+        );
+
+        if (isChallengePending() && !challengedCreateHandOff) {
+          await resolveChallenge();
+        }
       }
 
-      const { status, externalVerificationRedirectURL } = this.#resource.firstFactorVerification;
+      const externalVerificationRedirectURL = challengedCreateHandOff ?? pendingHandOff();
 
-      if (status === 'unverified' && externalVerificationRedirectURL) {
+      if (externalVerificationRedirectURL) {
         if (popup) {
           await _futureAuthenticateWithPopup(SignIn.clerk, { popup, externalVerificationRedirectURL });
           // Pick up the modified SignIn resource
           await this.#resource.reload();
+          await resolveChallenge();
         } else {
           SignIn.clerk.__internal_windowNavigate(externalVerificationRedirectURL);
         }
