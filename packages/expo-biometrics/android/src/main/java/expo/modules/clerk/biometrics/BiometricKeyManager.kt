@@ -195,7 +195,6 @@ internal class BiometricKeyManager {
 
     fun secureKeyStorageAvailable(sdkInt: Int = Build.VERSION.SDK_INT): Boolean = sdkInt >= BiometricCredentialCoding.MIN_SDK
 
-    /** Contract v2 section 2: device credentials only for biometry_or_device_passcode, and only on API 30+. */
     fun promptAuthenticators(policy: BiometricCredentialPolicy, sdkInt: Int = Build.VERSION.SDK_INT): Int =
       if (policy == BiometricCredentialPolicy.BIOMETRY_OR_DEVICE_PASSCODE && sdkInt >= Build.VERSION_CODES.R) {
         Authenticators.BIOMETRIC_STRONG or Authenticators.DEVICE_CREDENTIAL
