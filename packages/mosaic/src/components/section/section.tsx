@@ -20,7 +20,7 @@ export type SectionTitleProps = Omit<HeadingProps, 'size'>;
 export type SectionGroupProps = MosaicComponentProps<'div'>;
 export type SectionRowProps = MosaicComponentProps<'div'>;
 export type SectionItemsProps = MosaicComponentProps<'div'>;
-export type SectionItemProps = MosaicComponentProps<'div'>;
+export type SectionItemProps = MosaicComponentProps<'div'> & { wrap?: boolean };
 export type SectionMediaSize = 'sm' | 'md' | 'lg' | 'xl';
 export type SectionMediaProps = MosaicComponentProps<'div'> & { size?: SectionMediaSize };
 export type SectionContentProps = MosaicComponentProps<'div'>;
@@ -38,6 +38,7 @@ const mediaSizes = {
 
 const SectionTitleContext = React.createContext<React.Dispatch<React.SetStateAction<string[]>> | null>(null);
 const SectionItemsContext = React.createContext(false);
+const SectionItemWrapContext = React.createContext(false);
 
 const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoot(
   { render, xstyle, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
@@ -134,17 +135,26 @@ const Row = React.forwardRef<HTMLDivElement, SectionRowProps>(function SectionRo
   });
 });
 
-const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function SectionItem({ render, xstyle, ...rest }, ref) {
+const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function SectionItem(
+  { wrap = false, render, xstyle, ...rest },
+  ref,
+) {
   const nested = React.useContext(SectionItemsContext);
 
-  return useRender({
+  const element = useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section-item', { nested }), stylex.props(reset.base, styles.item, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('section-item', { nested, wrap }),
+        stylex.props(reset.base, styles.item, wrap && styles.itemWrap, xstyle),
+        rest,
+      ),
     },
   });
+
+  return <SectionItemWrapContext.Provider value={wrap}>{element}</SectionItemWrapContext.Provider>;
 });
 
 const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function SectionMedia(
@@ -217,12 +227,18 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
   { render, xstyle, ...rest },
   ref,
 ) {
+  const wrap = React.useContext(SectionItemWrapContext);
+
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('section-actions'), stylex.props(reset.base, styles.actions, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('section-actions'),
+        stylex.props(reset.base, styles.actions, wrap && styles.actionsWrap, xstyle),
+        rest,
+      ),
     },
   });
 });

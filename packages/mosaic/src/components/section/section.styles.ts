@@ -3,6 +3,8 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 import { sectionItemsMarker } from './section.markers.stylex';
 
+const compact = '@container cl-section (width < 26rem)';
+
 /* eslint-disable @stylexjs/no-lookahead-selectors -- Mosaic's supported browsers include :has();
    the marker keeps this selector scoped to Section.Items. */
 export const styles = stylex.create({
@@ -79,6 +81,10 @@ export const styles = stylex.create({
     justifyContent: 'space-between',
     width: '100%',
   },
+  itemWrap: {
+    flexWrap: { [compact]: 'wrap', default: 'nowrap' },
+    rowGap: { [compact]: space['3'], default: null },
+  },
   mediaBase: {
     alignItems: 'center',
     alignSelf: 'center',
@@ -129,6 +135,10 @@ export const styles = stylex.create({
     display: 'flex',
     flexShrink: 0,
     justifyContent: 'flex-end',
+  },
+  actionsWrap: {
+    justifyContent: { [compact]: 'flex-start', default: 'flex-end' },
+    width: { [compact]: '100%', default: null },
   },
   // Sits under the row's item rather than inside its content, so a message never shifts the
   // media and actions off the center line they share.

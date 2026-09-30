@@ -24,7 +24,7 @@ import { Section } from '@clerk/mosaic/components/section';
 </Section.Root>
 ```
 
-`Section.Group` owns the outlined surface and is a query container named `cl-section`, so rows can adapt to the group's width. Its direct `Section.Row` children own separation and may stack one or more `Section.Item` entries. Each item lays out optional media, flexible content, and trailing actions. `Section.Media` accepts `sm`, `md`, `lg`, and `xl` sizes.
+`Section.Group` owns the outlined surface and is a query container named `cl-section`, so rows can adapt to the group's width. Its direct `Section.Row` children own separation and may stack one or more `Section.Item` entries. Each item lays out optional media, flexible content, and trailing actions. `Section.Media` accepts `sm`, `md`, `lg`, and `xl` sizes. `Section.Item` accepts `wrap`, which moves the actions under the content when the group is narrower than `26rem`.
 
 Use `Section.Items` for a nested value list beneath a row's header item. The row keeps a 12px header-to-list gap, and nested items stack without gaps with 4px vertical padding.
 
