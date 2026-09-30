@@ -403,6 +403,89 @@ Three limits on the rule:
   accept the spread; a component whose height genuinely varies by multiples wants
   a scale per size variant, not one constant.
 
+## Reordering a list: symmetric collapse and expand
+
+A row that changes position is not slid with a transform. It leaves as one element
+and arrives as another: `useReorderKeys` re-keys a moved item, `usePresenceList`
+keeps the outgoing element where it was until its exit finishes, and each row is a
+grid slot whose single track transitions `1fr ↔ 0fr` (the three-layer structure from
+"Expanding and collapsing a row"). Adding and removing a row is the same transition,
+so the list has one motion vocabulary. Rows that keep their order keep their elements
+and are simply pushed.
+
+**The height invariant.** A reorder plays a collapse and an expand at once, and the
+container must not notice. That holds only if the two tracks are mirror images every
+frame: same duration, same curve, no delay on either. `--cl-duration-slower` on
+In-Out Cubic both ways. The direction asymmetry that is right for a single entrance
+or exit ("Asymmetry, in three places") is wrong here, because the sum of the two
+tracks is what the user sees as the card's height. Measured on five rows: 359px on
+every frame with matched timing; an 8px dip when the outgoing row lost its action
+menu in the same commit, so keep every child of an outgoing copy mounted, inert. Any
+per-direction feel has to come from the content, which does not affect height.
+
+**Anchor the element the change is about.** The cheapest reorder moves the fewest
+rows (the longest common subsequence of the old and new order), which for "set as
+primary" moves the primary itself: it collapses at the bottom while a copy expands at
+the top. Anchoring it instead (`useReorderKeys(items, byId, isPrimary)`) keeps its
+element and takes the subsequence on each side of it, so the primary rides up on the
+collapsing tracks above it while the rows it passes swap sides. The row the user
+acted on is the one that visibly travels. Use the plain subsequence for everything
+else; a removal never moves the anchor, so it falls through to that.
+
+**Start both halves in the same style pass.** `useTransition` releases an entrance's
+`data-starting-style` from a passive effect one animation frame after commit, while
+an exit's `data-ending-style` is set at commit. Driven from those attributes, the
+collapse starts a frame before the expand and the sum dips by a few pixels at the
+curve's steepest point, more when the frame after a heavy commit runs late. Give the
+entering track its `0fr` through `@starting-style` instead (StyleX 0.19 compiles the
+key), and do not spread the hook's inline `transition: none` onto that element, or
+the starting style has nothing to transition. Both tracks then resolve in the same
+style pass with no scheduling in JS. Apply the `@starting-style` variant only to rows
+mounted after the list's first render, or the whole list expands from nothing on
+load.
+
+**Content timing under a symmetric in-out track.** The rule from the banner work
+still decides prominence: the row moves fast only while the content is invisible.
+With one shared In-Out Cubic, that means the content enter waits `--cl-duration-slow`
+(the track is 91% open at 250ms of 350) and then fades at `base` on `--cl-ease-enter`
+with a `scale(0.98 → 1)` on `--cl-ease-default` from the leading edge; the content
+exit starts at once and lands at `fast` on `--cl-ease-exit`, gone before the track has
+moved 10%. Delays live on the content only.
+
+**Borders belong on the row, not on what fades.** Opacity on the row element fades
+its border with the content, so the separator arrives late on enter. Put the fade
+and scale on the row's children (a marker on the row, `stylex.when.ancestor` on the
+children) and leave the row with its border. On enter the border is there from the
+first frame; on exit its color fades to transparent over `fast`, linear, with the
+content. Never step a border in with a delayed `0s` transition; a line that appears
+in one frame reads as a snap however it is timed.
+
+**Reduced motion is a cut, in one commit.** Zero every transition and hold every
+value at rest, and also hide an exiting row as soon as it carries `data-closed`
+(`display: none` under the media query). `useTransition` unmounts it a frame later,
+and without that rule the incoming row mounts one commit before the outgoing row is
+unmounted and the list shows both for a frame: the new primary's badge "flashes in"
+before the old row leaves. This is CSS only; no media query needs to be read in JS.
+
+## A loading wave for pending rows
+
+For a row-level pending state with no spinner, such as a set-primary request: mark
+the row busy at once, and once the request outlasts `useSpinDelay`'s 150ms, pulse
+every row's content in a wave and hold the reorder until the pulse has shown for its
+400ms minimum. The wave is one keyframe animation staggered by row index through a
+custom property (`animation-delay: calc(var(--_cl-contact-index) * 80ms)`):
+
+```ts
+const pulse = stylex.keyframes({ '0%': { opacity: 1 }, '20%': { opacity: 0.4 }, '40%': { opacity: 1 }, '100%': { opacity: 1 } });
+animationDuration: '1.4s',
+animationTimingFunction: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
+```
+
+The dip takes the first 40% of the cycle and the rest is a hold at full opacity,
+so the wave passes and settles rather than throbbing. The per-segment curve is
+In-Out Cubic, not `--cl-ease-pulse`: the gentler pulse curve read as linear on text.
+Off under reduced motion.
+
 ## Reduced motion
 
 Gate the **moving property**, not the duration — the signal is about vestibular
