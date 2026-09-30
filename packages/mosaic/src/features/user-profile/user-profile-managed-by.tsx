@@ -1,41 +1,26 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { Icon } from '../../components/icon';
-import { Section } from '../../components/section';
+import { Section, sectionCompactStyles } from '../../components/section';
 
 /** The enterprise connection a row's value comes from, which is why the row has nothing to edit. */
 export interface UserProfileManagedBy {
   name: string;
-  iconUrl?: string;
 }
 
-const styles = stylex.create({
-  logo: {
-    height: '100%',
-    width: '100%',
-  },
-});
-
-export function UserProfileManagedByLabel({ iconUrl, children }: { iconUrl?: string; children: string }) {
+export function UserProfileManagedByLabel({ managedBy, label }: { managedBy: UserProfileManagedBy; label: string }) {
   return (
     <Section.Note
       icon={
-        iconUrl ? (
-          <img
-            alt=''
-            src={iconUrl}
-            {...stylex.props(styles.logo)}
-          />
-        ) : (
-          <Icon
-            aria-hidden
-            name='lock'
-            size='sm'
-          />
-        )
+        <Icon
+          aria-hidden
+          name='lock'
+          size='sm'
+        />
       }
     >
-      {children}
+      <span {...stylex.props(sectionCompactStyles.hidden)}>{label}</span>
+      <span {...stylex.props(sectionCompactStyles.only)}>{managedBy.name}</span>
     </Section.Note>
   );
 }

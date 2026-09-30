@@ -24,9 +24,10 @@ export function UserProfilePasswordRowView({
           <Section.Description>{hasPassword ? m.masked : m.noPasswordSet}</Section.Description>
         </Section.Content>
         {managedBy ? (
-          <UserProfileManagedByLabel iconUrl={managedBy.iconUrl}>
-            {fill(m.managedBy, { name: managedBy.name })}
-          </UserProfileManagedByLabel>
+          <UserProfileManagedByLabel
+            managedBy={managedBy}
+            label={fill(m.managedBy, { name: managedBy.name })}
+          />
         ) : onSubmitPassword ? (
           <Section.Actions>
             <EditPassword

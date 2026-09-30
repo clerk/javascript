@@ -49,7 +49,7 @@ function AccountSection({
   failEmailVerification?: boolean;
   emailRemovalState?: 'pending' | 'error';
   phoneRemovalState?: 'pending' | 'error';
-  nameManagedBy?: { name: string; iconUrl?: string };
+  nameManagedBy?: { name: string };
 }) {
   const [phoneRemovalFailed, setPhoneRemovalFailed] = useState(false);
   const [emailRemovalFailed, setEmailRemovalFailed] = useState(false);
@@ -126,13 +126,13 @@ export function Default() {
 
 /**
  * An enterprise connection owns the name, so the row names who manages it in place of an edit
- * action. The connection's logo leads the label, or a generic lock when the IDP ships none.
+ * action.
  */
 export function NameManagedByConnection() {
   return (
     <AccountSection
       allowMultipleAccounts={false}
-      nameManagedBy={{ name: 'Okta', iconUrl: '/okta-placeholder.svg' }}
+      nameManagedBy={{ name: 'Okta' }}
     />
   );
 }

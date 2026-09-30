@@ -48,9 +48,10 @@ export function UserProfileNameRowView({
             />
           </Section.Actions>
         ) : managedBy ? (
-          <UserProfileManagedByLabel iconUrl={managedBy.iconUrl}>
-            {fill(m.name.managedBy, { name: managedBy.name })}
-          </UserProfileManagedByLabel>
+          <UserProfileManagedByLabel
+            managedBy={managedBy}
+            label={fill(m.name.managedBy, { name: managedBy.name })}
+          />
         ) : null}
       </Section.Item>
     </Section.Row>
