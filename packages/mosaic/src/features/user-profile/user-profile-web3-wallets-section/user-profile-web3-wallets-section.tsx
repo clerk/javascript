@@ -17,6 +17,8 @@ export interface UserProfileWeb3WalletsSectionProps {
   fallbackFocus?: () => HTMLElement | null;
 }
 
+// TODO: Adopt the shared localized error handling from #9844 once it lands on main,
+// preserving Clerk error codes for wallet-signature failures.
 function actionError(error: unknown, fallbackMessage: string): Error {
   if (isClerkAPIResponseError(error)) {
     const first = error.errors[0];
