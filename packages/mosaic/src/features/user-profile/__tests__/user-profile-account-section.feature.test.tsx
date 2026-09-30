@@ -1,4 +1,4 @@
-import type { EmailAddressJSON, PhoneNumberJSON } from '@clerk/shared/types';
+import type { EmailAddressJSON, EnterpriseAccountConnectionJSON, PhoneNumberJSON } from '@clerk/shared/types';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
@@ -17,6 +17,7 @@ import type { FapiAttributeOverrides } from '../../../__tests__/feature/fapi';
 import {
   fapiClient,
   fapiEmailAddress,
+  fapiEnterpriseAccount,
   fapiEnvironment,
   fapiPhoneNumber,
   fapiSession,
@@ -406,6 +407,53 @@ describe('a contact row the user cannot add to', () => {
 
     expect(screen.queryByRole('group', { name: 'Email' })).not.toBeInTheDocument();
     expect(screen.queryByRole('group', { name: 'Phone' })).not.toBeInTheDocument();
+  });
+});
+
+describe('a user signed in through an enterprise connection', () => {
+  function signedInThroughSso(connection: Partial<EnterpriseAccountConnectionJSON> = {}): FakeFapiSeed {
+    const user = fapiUser({
+      id: 'user_1',
+      first_name: 'Alice',
+      last_name: 'Smith',
+      email_addresses: [fapiEmailAddress({ id: 'idn_primary', email_address: 'alice@acme.co' })],
+      phone_numbers: [HOME],
+      primary_phone_number_id: HOME.id,
+      enterprise_accounts: [
+        fapiEnterpriseAccount({ id: 'eac_1', email_address: 'alice@acme.co' }, { name: 'Acme Corp', ...connection }),
+      ],
+    });
+    return {
+      environment: fapiEnvironment({
+        attributes: { phone_number: { enabled: true } },
+        user_settings: {
+          enterprise_sso: { enabled: true, self_serve_sso: false, self_serve_directory_sync: false },
+        },
+      }),
+      client: fapiClient([fapiSession({ id: 'sess_1', user })]),
+    };
+  }
+
+  it('hands the name to the connection instead of offering to edit it', async () => {
+    await renderSection(signedInThroughSso());
+
+    expect(await screen.findByText('Managed by Acme Corp')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Edit name' })).not.toBeInTheDocument();
+  });
+
+  it('stops the user adding contacts when the connection disables additional identifications', async () => {
+    await renderSection(signedInThroughSso({ disable_additional_identifications: true }));
+
+    expect(await screen.findByText('alice@acme.co')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Add email' })).not.toBeInTheDocument();
+    expect(within(row()).queryByRole('button', { name: 'Add phone number' })).not.toBeInTheDocument();
+  });
+
+  it('still lets the user add contacts when the connection allows them', async () => {
+    await renderSection(signedInThroughSso());
+
+    expect(await screen.findByRole('button', { name: 'Add email' })).toBeInTheDocument();
+    expect(within(row()).getByRole('button', { name: 'Add phone number' })).toBeInTheDocument();
   });
 });
 
