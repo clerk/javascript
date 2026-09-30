@@ -10,6 +10,7 @@ import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fa
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../localization';
 import { UserProfileActiveDevicesSection } from '../user-profile-active-devices-section';
+import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 const alice = fapiUser({ id: 'user_1' });
 
@@ -93,14 +94,16 @@ describe('Active devices', () => {
     expect(await screen.findByText('This device')).toBeVisible();
   });
 
-  it('shows signed-in sessions with metadata and signs out another device', async () => {
+  it('shows signed-in sessions and signs out another device inside the security panel', async () => {
     const devices = serveDevices([
       device('sess_other', 'active', { device_type: 'iPhone', is_mobile: true }),
       device('sess_current', 'active'),
       device('sess_pending', 'pending', { browser_name: undefined, device_type: undefined }),
       device('sess_expired', 'expired'),
     ]);
-    const { clerk } = await renderWithClerk(<UserProfileActiveDevicesSection />);
+    const { clerk } = await renderWithClerk(
+      <UserProfileSecurityPanelView activeDevicesSlot={<UserProfileActiveDevicesSection />} />,
+    );
 
     expect(await clerk.user?.getSessions()).toHaveLength(4);
 
