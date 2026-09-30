@@ -23,6 +23,20 @@ function renderPhone(overrides: Partial<UserProfileAccountSectionViewProps> = {}
 }
 
 describe('phone actions', () => {
+  it('lists the primary phone first', () => {
+    renderPhone({
+      phones: [
+        { id: 'phone_1', value: '+18015550200', isVerified: true },
+        { id: 'phone_2', value: '+18015550100', isDefault: true, isVerified: true },
+      ],
+      onRemovePhone: vi.fn(),
+    });
+
+    expect(
+      screen.getAllByRole('button', { name: /^Manage / }).map(button => button.getAttribute('aria-label')),
+    ).toEqual(['Manage +1 (801) 555-0100', 'Manage +1 (801) 555-0200']);
+  });
+
   it('ignores backdrop clicks and allows Escape to cancel removal', async () => {
     const user = userEvent.setup();
     const onRemovePhone = vi.fn();
