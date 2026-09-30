@@ -79,6 +79,10 @@ function byId<T extends { id: string }>(items: T[], id: string, kind: string): T
   hash when the host routes by path — Mosaic has no routing yet, so this always hashes onto the
   instance's profile URL and sends a path-routed host's user back to the wrong place. #9843 adds
   `MosaicRoutingProvider`; wire this to it once that lands.
+
+  Whatever base wins, nothing in Mosaic serves the `/verify` the link lands on: there is no route and
+  no equivalent of legacy's `VerificationSuccessPage`, so an opened link is handled by whatever
+  clerk-js already mounts there. That page has to come with the routing work, not after it.
 */
 function verifyRedirectUrl(userProfileUrl: string): string {
   return buildURL({ base: userProfileUrl, hashPath: '/verify' }, { stringify: true });
@@ -93,6 +97,12 @@ function startEmailVerification(
     const { startEnterpriseSSOLinkFlow, cancelEnterpriseSSOLinkFlow } = email.createEnterpriseSSOLinkFlow();
     return {
       method: 'sso',
+      /*
+        TODO: carry the mounting mode back from the IdP. Legacy appends `appendModalState` to this
+        redirect when the profile is mounted as a modal, so returning from the provider reopens the
+        modal on the step the user left. Mosaic has no modal mode to encode yet; whoever adds one has
+        to encode it here too, or the user comes back to a closed dialog and a lost flow.
+      */
       verified: save(() => startEnterpriseSSOLinkFlow({ redirectUrl: window.location.href })),
       cancel: cancelEnterpriseSSOLinkFlow,
       connect: () => {
