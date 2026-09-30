@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
-import { Section } from '../../../components/section';
+import { Section, sectionCompactStyles } from '../../../components/section';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
@@ -60,8 +60,8 @@ function ManagedByLabel({ name }: UserProfilePasswordManagedBy) {
         size='sm'
         xstyle={styles.managedByText}
       >
-        <span {...stylex.props(styles.managedByFull)}>{fill(m.managedBy, { name })}</span>
-        <span {...stylex.props(styles.managedByName)}>{name}</span>
+        <span {...stylex.props(sectionCompactStyles.hidden)}>{fill(m.managedBy, { name })}</span>
+        <span {...stylex.props(sectionCompactStyles.only)}>{name}</span>
       </Text>
     </div>
   );

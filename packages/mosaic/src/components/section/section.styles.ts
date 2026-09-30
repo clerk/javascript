@@ -147,3 +147,12 @@ export const styles = stylex.create({
   },
 });
 /* eslint-enable @stylexjs/no-lookahead-selectors */
+
+export const sectionCompactStyles = stylex.create({
+  hidden: {
+    display: { [compact]: 'none', default: null },
+  },
+  only: {
+    display: { [compact]: 'inline', default: 'none' },
+  },
+});
