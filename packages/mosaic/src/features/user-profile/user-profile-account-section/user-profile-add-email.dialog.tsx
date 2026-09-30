@@ -341,6 +341,13 @@ function VerifySsoStep(props: VerifySsoStepProps) {
             {props.errorMessage}
           </Text>
         ) : null}
+        {/*
+          TODO: show the connection the way the designs do — its logo, its name as the label, and
+          `{domain} · Enterprise SSO` as the description. `EmailAddressResource` carries only
+          `matchesSsoConnection`, so the domain here is split off the address and the name and logo
+          are not available at all. FAPI has to name the matching connection on the email address
+          first, the way `EnterpriseAccountResource` already carries `enterpriseConnection`.
+        */}
         <Item.Root xstyle={styles.ssoConnection}>
           <Item.Content>
             <Item.Label>{domain}</Item.Label>
