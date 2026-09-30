@@ -1,5 +1,14 @@
 # Change Log
 
+## 6.17.4
+
+### Patch Changes
+
+- Custom flows built with `useSignIn()` and `useSignUp()` now handle Clerk Protect challenges for you. When a sign-in or sign-up method gets a challenge, Clerk shows it in a modal and the method returns once the user passes it. For SSO, the challenge appears when the user comes back to `<HandleSSOCallback />`. Classic resource methods such as `clerk.client.signIn.create()`, and apps without Clerk's UI loaded, still return with `protectCheck` set, as before. ([#9950](https://github.com/clerk/javascript/pull/9950)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda)]:
+  - @clerk/shared@4.37.1
+
 ## 6.17.3
 
 ### Patch Changes
