@@ -159,6 +159,25 @@ describe('registerWebMcpTools', () => {
     expect(setup.clerk.setActive).toHaveBeenCalledWith({ session: 'sess_1' });
   });
 
+  it('dispatches a clerk:webmcp event for each tool call', async () => {
+    const { signIn, update } = setup;
+    const factor = { strategy: 'email_code', emailAddressId: 'idn_1', safeIdentifier: 'j***@acme.com' };
+    signIn.create.mockImplementation(update({ status: 'needs_first_factor', supportedFirstFactors: [factor] }));
+    const events: unknown[] = [];
+    const listener = (event: Event) => events.push((event as CustomEvent).detail);
+    window.addEventListener('clerk:webmcp', listener);
+    await register();
+
+    await call('clerk_get_auth_state');
+    await call('clerk_sign_in', { method: 'email_code', identifier: 'jane@acme.com' });
+    window.removeEventListener('clerk:webmcp', listener);
+
+    expect(events).toEqual([
+      { tool: 'clerk_get_auth_state', status: 'signed_out' },
+      { tool: 'clerk_sign_in', status: 'needs_code', strategy: 'email_code' },
+    ]);
+  });
+
   it('asks for an authenticator app code when the account has MFA', async () => {
     const { signIn, update } = setup;
     signIn.status = 'needs_first_factor';
