@@ -261,13 +261,13 @@ describe('the user profile email addresses', () => {
     expect(within(emailRow()).getByText('pending@example.com').parentElement).toHaveTextContent('Unverified');
   });
 
-  it('sends the user to the identity provider for an address that matches an SSO connection', async () => {
+  it('sends the user to the identity provider for an address that matches an SSO connection, even when the instance verifies by link', async () => {
     const sso = fapiEmailAddress({
       id: 'idn_sso',
       email_address: 'alice@acme.co',
       matches_sso_connection: true,
     });
-    const { actor, windowNavigate } = await renderSection(signedInWithEmails([PRIMARY, sso]));
+    const { actor, windowNavigate } = await renderSection(signedInWithEmails([PRIMARY, sso], verifiesByLink));
 
     await manageEmail(actor, 'alice@acme.co', 'Verify');
     const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });

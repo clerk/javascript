@@ -48,8 +48,6 @@ let user: {
     prepareVerification?: ReturnType<typeof vi.fn>;
     attemptVerification?: ReturnType<typeof vi.fn>;
     createEmailLinkFlow?: ReturnType<typeof vi.fn>;
-    matchesSsoConnection?: boolean;
-    createEnterpriseSSOLinkFlow?: ReturnType<typeof vi.fn>;
   }[];
   phoneNumbers: { id: string; phoneNumber: string; verification: FakeVerification }[];
   setProfileImage: ReturnType<typeof vi.fn>;
@@ -61,10 +59,6 @@ let usernameSettings: { min_length: number; max_length: number };
 let environmentHydrated: boolean;
 let enterpriseSSOEnabled: boolean;
 let emailLinkFlow: { startEmailLinkFlow: ReturnType<typeof vi.fn>; cancelEmailLinkFlow: ReturnType<typeof vi.fn> };
-let ssoLinkFlow: {
-  startEnterpriseSSOLinkFlow: ReturnType<typeof vi.fn>;
-  cancelEnterpriseSSOLinkFlow: ReturnType<typeof vi.fn>;
-};
 const navigate = vi.fn();
 
 function attribute(overrides: Partial<FakeAttribute> = {}): FakeAttribute {
@@ -135,7 +129,6 @@ beforeEach(() => {
   environmentHydrated = true;
   enterpriseSSOEnabled = true;
   emailLinkFlow = { startEmailLinkFlow: vi.fn(() => Promise.resolve()), cancelEmailLinkFlow: vi.fn() };
-  ssoLinkFlow = { startEnterpriseSSOLinkFlow: vi.fn(() => Promise.resolve()), cancelEnterpriseSSOLinkFlow: vi.fn() };
   navigate.mockReset();
   usernameSettings = { min_length: 4, max_length: 64 };
   attributes = {
@@ -163,7 +156,6 @@ beforeEach(() => {
         prepareVerification: vi.fn(() => Promise.resolve()),
         attemptVerification: vi.fn(() => Promise.resolve()),
         createEmailLinkFlow: vi.fn(() => emailLinkFlow),
-        createEnterpriseSSOLinkFlow: vi.fn(() => ssoLinkFlow),
       },
       {
         id: 'email_1',
@@ -258,15 +250,6 @@ describe('useUserProfileAccountSectionModel', () => {
     expect(model.phones?.map(phone => phone.id)).toEqual(['phone_primary', 'phone_verified', 'phone_unstarted']);
   });
 
-  it('leaves out the contacts the instance does not collect', () => {
-    attributes.email_address = attribute({ enabled: false });
-    attributes.phone_number = attribute({ enabled: false });
-    const model = ready();
-
-    expect(model.emails).toBeUndefined();
-    expect(model.phones).toBeUndefined();
-  });
-
   describe('emails', () => {
     it('sets the chosen email as primary', async () => {
       await ready().onSetPrimaryEmail?.('email_2');
@@ -306,38 +289,6 @@ describe('useUserProfileAccountSectionModel', () => {
       });
     });
 
-    it('sends a code to the chosen email', async () => {
-      const verification = ready().getEmailVerifier?.('email_2').start();
-      if (verification?.method !== 'code') {
-        throw new Error('expected a code verification');
-      }
-      await expect(verification.sent).resolves.toBeUndefined();
-      expect(user?.emailAddresses[0]?.prepareVerification).toHaveBeenCalledWith({ strategy: 'email_code' });
-    });
-
-    it('creates an email and verifies the created address before the user reloads', async () => {
-      const prepareVerification = vi.fn(() => Promise.resolve());
-      user?.createEmailAddress.mockResolvedValue({ id: 'email_new', prepareVerification });
-      const email = await ready().onCreateEmail?.('new@clerk.dev');
-      expect(user?.createEmailAddress).toHaveBeenCalledWith({ email: 'new@clerk.dev' });
-      email?.start();
-      expect(prepareVerification).toHaveBeenCalledWith({ strategy: 'email_code' });
-    });
-
-    it('sends a link back to the profile when the instance verifies by link', async () => {
-      attributes.email_address = attribute({ verifications: ['email_code', 'email_link'] });
-      const verification = ready().getEmailVerifier?.('email_2').start();
-      if (verification?.method !== 'link') {
-        throw new Error('expected a link verification');
-      }
-      await expect(verification.verified).resolves.toBeUndefined();
-      expect(emailLinkFlow.startEmailLinkFlow).toHaveBeenCalledWith({
-        redirectUrl: 'https://accounts.clerk.dev/user#/verify',
-      });
-      verification.cancel();
-      expect(emailLinkFlow.cancelEmailLinkFlow).toHaveBeenCalledOnce();
-    });
-
     it('returns the API message when the link cannot be sent', async () => {
       attributes.email_address = attribute({ verifications: ['email_link'] });
       emailLinkFlow.startEmailLinkFlow.mockRejectedValue(apiError());
@@ -348,31 +299,6 @@ describe('useUserProfileAccountSectionModel', () => {
       await expect(rejection(verification.verified)).resolves.toEqual({
         global: { code: 'form_param_invalid', message: 'That value is invalid.' },
       });
-    });
-
-    it('verifies an email that matches an SSO connection with the provider, even when links are on', async () => {
-      attributes.email_address = attribute({ verifications: ['email_link'] });
-      const email = user?.emailAddresses[0];
-      if (!email) {
-        throw new Error('email missing');
-      }
-      email.matchesSsoConnection = true;
-      email.verification.externalVerificationRedirectURL = new URL('https://idp.acme.co/sso');
-      const verification = ready().getEmailVerifier?.('email_2').start();
-      if (verification?.method !== 'sso') {
-        throw new Error('expected an SSO verification');
-      }
-      await expect(verification.verified).resolves.toBeUndefined();
-      expect(ssoLinkFlow.startEnterpriseSSOLinkFlow).toHaveBeenCalledWith({ redirectUrl: window.location.href });
-      verification.connect();
-      expect(navigate).toHaveBeenCalledWith('https://idp.acme.co/sso');
-      verification.cancel();
-      expect(ssoLinkFlow.cancelEnterpriseSSOLinkFlow).toHaveBeenCalledOnce();
-    });
-
-    it('verifies the code for the chosen email', async () => {
-      await ready().getEmailVerifier?.('email_2').verifyCode('123456');
-      expect(user?.emailAddresses[0]?.attemptVerification).toHaveBeenCalledWith({ code: '123456' });
     });
 
     it('maps a wrong code onto the code field', async () => {

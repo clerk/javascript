@@ -73,6 +73,13 @@ function byId<T extends { id: string }>(items: T[], id: string, kind: string): T
   return item;
 }
 
+/*
+  TODO: pick this base the way the routing mode says to. Legacy `buildVerificationRedirectUrl` only
+  falls back to `displayConfig.userProfileUrl` under virtual routing, and builds a path instead of a
+  hash when the host routes by path — Mosaic has no routing yet, so this always hashes onto the
+  instance's profile URL and sends a path-routed host's user back to the wrong place. #9843 adds
+  `MosaicRoutingProvider`; wire this to it once that lands.
+*/
 function verifyRedirectUrl(userProfileUrl: string): string {
   return buildURL({ base: userProfileUrl, hashPath: '/verify' }, { stringify: true });
 }
