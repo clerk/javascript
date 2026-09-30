@@ -48,6 +48,8 @@ export function UserProfileWeb3WalletsSection({ fallback, fallbackFocus }: UserP
         })
       : ({ status: 'hidden' } as const);
 
+  // TODO: Add session reverification for wallet connection, primary updates, and removal;
+  // surface API errors until then.
   const connect = async (strategy: string, walletName?: string) => {
     const provider = WEB3_PROVIDERS.find(candidate => candidate.strategy === strategy);
     const manager = clerk.__internal_moduleManager;
