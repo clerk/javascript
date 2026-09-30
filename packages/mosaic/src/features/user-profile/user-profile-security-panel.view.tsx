@@ -3,11 +3,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { Panel } from '../../components/panel';
 import { Section } from '../../components/section';
 import { themeProps } from '../../props';
-import type {
-  UserProfileActiveDevicesSectionViewProps,
-  UserProfileDevice,
-} from './user-profile-active-devices-section.view';
-import { UserProfileActiveDevicesSectionView } from './user-profile-active-devices-section.view';
+import type { UserProfileDevice } from './user-profile-active-devices-section.view';
 import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
@@ -16,14 +12,14 @@ import type { UserProfilePasswordSlot } from './user-profile-password-section/us
 
 export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMethod, UserProfilePasskey };
 
-export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiveDevicesSectionViewProps, 'devices'> {
+export interface UserProfileSecurityPanelViewProps {
   passwordSlot?: UserProfilePasswordSlot | null;
   passkeys?: UserProfilePasskey[];
   passkeysVisible?: boolean;
   mfaMethods?: UserProfileMfaMethod[];
   addableMfaMethods?: readonly UserProfileMfaAddableMethod[];
   mfaAddControl?: ReactNode;
-  devices?: UserProfileDevice[];
+  activeDevicesSlot?: ReactNode;
   onAddPasskey?: () => void;
   addPasskeyError?: string;
   onRenamePasskey?: (id: string, name: string) => void | Promise<void>;
@@ -43,7 +39,7 @@ export function UserProfileSecurityPanelView({
   mfaMethods,
   addableMfaMethods,
   mfaAddControl,
-  devices,
+  activeDevicesSlot,
   onAddPasskey,
   addPasskeyError,
   onRenamePasskey,
@@ -52,8 +48,6 @@ export function UserProfileSecurityPanelView({
   onRegenerateBackupCodes,
   onRemoveMfaMethod,
   onSetDefaultMfaMethod,
-  onSignOutDevice,
-  onSignOutAllOtherDevices,
   deleteAccountSlot,
 }: UserProfileSecurityPanelViewProps): ReactElement {
   const showPassword = Boolean(passwordSlot);
@@ -89,13 +83,7 @@ export function UserProfileSecurityPanelView({
             ) : null}
           </Section.Root>
         ) : null}
-        {devices ? (
-          <UserProfileActiveDevicesSectionView
-            devices={devices}
-            onSignOutAllOtherDevices={onSignOutAllOtherDevices}
-            onSignOutDevice={onSignOutDevice}
-          />
-        ) : null}
+        {activeDevicesSlot}
         {deleteAccountSlot}
       </Panel.Sections>
     </Panel.Root>

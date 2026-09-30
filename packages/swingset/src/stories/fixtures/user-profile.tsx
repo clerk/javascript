@@ -1,5 +1,6 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
@@ -160,12 +161,10 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       addPasskeyError: passkeys.addError,
       onRenamePasskey: passkeys.onRename,
       ...mfa.security,
-      devices: activeDevices.devices,
+      activeDevicesSlot: <UserProfileActiveDevicesSectionView {...activeDevices} />,
       onAddPasskey: passkeys.onAdd,
       deleteAccountSlot: <UserProfileDeleteAccountPreview />,
       onRemovePasskey: passkeys.onRemove,
-      onSignOutAllOtherDevices: activeDevices.onSignOutAllOtherDevices,
-      onSignOutDevice: activeDevices.onSignOutDevice,
     },
     billing: {
       subscription,

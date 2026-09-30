@@ -6,6 +6,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
+import type { UserProfileDevice } from '../user-profile-active-devices-section.view';
+import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section.view';
 import type { UserProfileSecurityPanelViewProps } from '../user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
@@ -13,6 +15,27 @@ function DeleteAccount({ onDelete = () => Promise.resolve() }: { onDelete?: () =
   const controller = useDestructiveController({ onDelete });
   return <UserProfileDeleteSectionView {...controller} />;
 }
+const devices: UserProfileDevice[] = [
+  {
+    id: 'current',
+    name: 'Safari on macOS',
+    description: 'Salt Lake City, UT, United States',
+    type: 'desktop',
+    isCurrent: true,
+  },
+  {
+    id: 'mobile',
+    name: 'Safari on iOS',
+    description: 'Last seen 2 weeks ago · Orem, UT, United States',
+    type: 'mobile',
+  },
+  {
+    id: 'desktop',
+    name: 'Clerk App on macOS',
+    description: 'Last seen May 14th, 2026 · San Francisco, CA, United States',
+    type: 'desktop',
+  },
+];
 
 const props: UserProfileSecurityPanelViewProps = {
   passkeys: [
@@ -28,27 +51,7 @@ const props: UserProfileSecurityPanelViewProps = {
     { id: 'totp_1', type: 'authenticator' },
     { id: 'backup_1', type: 'backup-codes' },
   ],
-  devices: [
-    {
-      id: 'current',
-      name: 'Safari on macOS',
-      description: 'Salt Lake City, UT, United States',
-      type: 'desktop',
-      isCurrent: true,
-    },
-    {
-      id: 'mobile',
-      name: 'Safari on iOS',
-      description: 'Last seen 2 weeks ago · Orem, UT, United States',
-      type: 'mobile',
-    },
-    {
-      id: 'desktop',
-      name: 'Clerk App on macOS',
-      description: 'Last seen May 14th, 2026 · San Francisco, CA, United States',
-      type: 'desktop',
-    },
-  ],
+  activeDevicesSlot: <UserProfileActiveDevicesSectionView devices={devices} />,
 };
 
 function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) {
@@ -84,6 +87,13 @@ describe('UserProfileSecurityPanelView', () => {
     ).toBeInTheDocument();
   });
 
+  it('omits active devices when no slot is supplied', () => {
+    renderView({ activeDevicesSlot: undefined });
+
+    expect(screen.queryByRole('heading', { name: 'Active devices' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Security' })).toBeInTheDocument();
+  });
+
   it('adds an available MFA method through the picker', async () => {
     const onAddMfaMethod = vi.fn();
     const user = userEvent.setup();
@@ -117,9 +127,14 @@ describe('UserProfileSecurityPanelView', () => {
       onAddPasskey,
       onRenamePasskey,
       onRemovePasskey,
-      onSignOutDevice,
-      onSignOutAllOtherDevices,
       deleteAccountSlot: <DeleteAccount onDelete={onDeleteAccount} />,
+      activeDevicesSlot: (
+        <UserProfileActiveDevicesSectionView
+          devices={devices}
+          onSignOutDevice={onSignOutDevice}
+          onSignOutAllOtherDevices={onSignOutAllOtherDevices}
+        />
+      ),
     });
 
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
@@ -168,7 +183,7 @@ describe('UserProfileSecurityPanelView', () => {
     renderView({
       passkeys: [],
       mfaMethods: [],
-      devices: [],
+      activeDevicesSlot: <UserProfileActiveDevicesSectionView devices={[]} />,
       onAddPasskey: vi.fn(),
       onAddMfaMethod: vi.fn(),
       addableMfaMethods: ['sms', 'authenticator'],
@@ -183,7 +198,14 @@ describe('UserProfileSecurityPanelView', () => {
 
   it('withholds sign out from the current device', async () => {
     const user = userEvent.setup();
-    renderView({ onSignOutDevice: vi.fn() });
+    renderView({
+      activeDevicesSlot: (
+        <UserProfileActiveDevicesSectionView
+          devices={devices}
+          onSignOutDevice={vi.fn()}
+        />
+      ),
+    });
 
     await user.click(screen.getByRole('button', { name: 'Manage Safari on macOS' }));
     expect(screen.getByRole('menuitem', { name: 'View details' })).toBeInTheDocument();
