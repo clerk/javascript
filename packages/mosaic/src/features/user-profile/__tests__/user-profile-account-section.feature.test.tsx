@@ -1,10 +1,17 @@
-import type { PhoneNumberJSON } from '@clerk/shared/types';
+import type { EmailAddressJSON, PhoneNumberJSON } from '@clerk/shared/types';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
-import { type FakeFapiSeed, fapiUrl, serveFapi, VERIFICATION_CODE, worker } from '../../../__tests__/feature/fake-fapi';
+import {
+  type FakeFapiSeed,
+  fapiUrl,
+  serveFapi,
+  VERIFICATION_CODE,
+  verifyEmailOutOfBand,
+  worker,
+} from '../../../__tests__/feature/fake-fapi';
 import type { FapiAttributeOverrides } from '../../../__tests__/feature/fapi';
 import {
   fapiClient,
@@ -164,6 +171,135 @@ describe('the user profile phone numbers', () => {
 
     expect(await screen.findByRole('menuitem', { name: 'Set as primary' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Remove phone number' })).not.toBeInTheDocument();
+  });
+});
+
+const VERIFIED = fapiVerification({ strategy: 'email_code' });
+const PRIMARY = fapiEmailAddress({ id: 'idn_primary', email_address: 'alice@example.com', verification: VERIFIED });
+
+function signedInWithEmails(emails: EmailAddressJSON[], environment = fapiEnvironment()): FakeFapiSeed {
+  const user = fapiUser({
+    id: 'user_1',
+    first_name: 'Alice',
+    last_name: 'Smith',
+    username: 'alicesmith',
+    email_addresses: emails,
+    primary_email_address_id: emails[0]?.id ?? null,
+  });
+  return { environment, client: fapiClient([fapiSession({ id: 'sess_1', user })]) };
+}
+
+const verifiesByLink = fapiEnvironment({ attributes: { email_address: { verifications: ['email_link'] } } });
+
+const emailRow = () => screen.getByRole('group', { name: 'Email' });
+const emailsListed = () =>
+  within(emailRow())
+    .queryAllByText(/@/)
+    .map(node => node.textContent);
+
+async function manageEmail(actor: Actor, label: string, action: string) {
+  await actor.click(within(emailRow()).getByRole('button', { name: `Manage ${label}` }));
+  await actor.click(await screen.findByRole('menuitem', { name: action }));
+}
+
+describe('the user profile email addresses', () => {
+  it('adds an address, verifies the code it was sent, and returns focus to the trigger', async () => {
+    const { actor } = await renderSection(signedInWithEmails([]));
+    const trigger = screen.getByRole('button', { name: 'Add email' });
+    expect(emailRow()).toHaveTextContent('No email addresses added');
+
+    await actor.click(trigger);
+    await actor.type(screen.getByRole('textbox', { name: 'Email' }), 'new@example.com');
+    await actor.click(screen.getByRole('button', { name: 'Continue' }));
+    await enterCode(actor, VERIFICATION_CODE);
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(emailsListed()).toEqual(['new@example.com']);
+    expect(emailRow()).not.toHaveTextContent('Unverified');
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
+  it('verifies an address left unverified and returns focus to its menu', async () => {
+    const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
+    const { actor } = await renderSection(signedInWithEmails([PRIMARY, pending]));
+    const trigger = within(emailRow()).getByRole('button', { name: 'Manage pending@example.com' });
+    expect(within(emailRow()).getByText('pending@example.com').parentElement).toHaveTextContent('Unverified');
+
+    await manageEmail(actor, 'pending@example.com', 'Verify');
+    await enterCode(actor, VERIFICATION_CODE);
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(within(emailRow()).getByText('pending@example.com').parentElement).not.toHaveTextContent('Unverified'),
+    );
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
+  it('waits for the emailed link when the instance verifies by link, then closes once it is opened', async () => {
+    const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
+    const { actor, fapi } = await renderSection(signedInWithEmails([PRIMARY, pending], verifiesByLink));
+
+    await manageEmail(actor, 'pending@example.com', 'Verify');
+    const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });
+    await waitFor(() => expect(dialog).toHaveTextContent('Open the link we sent to pending@example.com'));
+    expect(screen.queryByRole('textbox', { name: 'Verification code' })).not.toBeInTheDocument();
+
+    verifyEmailOutOfBand(fapi, 'idn_pending');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument(), { timeout: 5000 });
+  });
+
+  it('leaves the address unverified when the link dialog is dismissed', async () => {
+    const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
+    const { actor } = await renderSection(signedInWithEmails([PRIMARY, pending], verifiesByLink));
+
+    await manageEmail(actor, 'pending@example.com', 'Verify');
+    const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });
+    await actor.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(within(emailRow()).getByText('pending@example.com').parentElement).toHaveTextContent('Unverified');
+  });
+
+  it('sends the user to the identity provider for an address that matches an SSO connection', async () => {
+    const sso = fapiEmailAddress({
+      id: 'idn_sso',
+      email_address: 'alice@acme.co',
+      matches_sso_connection: true,
+    });
+    const { actor, windowNavigate } = await renderSection(signedInWithEmails([PRIMARY, sso]));
+
+    await manageEmail(actor, 'alice@acme.co', 'Verify');
+    const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });
+    await waitFor(() => expect(dialog).toHaveTextContent('acme.co'));
+    expect(screen.queryByRole('textbox', { name: 'Verification code' })).not.toBeInTheDocument();
+    await actor.click(within(dialog).getByRole('button', { name: 'Connect' }));
+
+    await waitFor(() => expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.acme.co/sso')));
+  });
+
+  it('does not offer to add the username as an address', async () => {
+    const { actor } = await renderSection(
+      signedInWithEmails([], fapiEnvironment({ attributes: { username: { enabled: true } } })),
+    );
+
+    await actor.click(screen.getByRole('button', { name: 'Add email' }));
+    await actor.type(screen.getByRole('textbox', { name: 'Email' }), 'alicesmith');
+
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+  });
+
+  it('hides the row when the instance does not collect email addresses', async () => {
+    await renderSection(
+      signedInWithEmails(
+        [],
+        fapiEnvironment({
+          attributes: { email_address: { enabled: false, used_for_first_factor: false, first_factors: [] } },
+        }),
+      ),
+    );
+
+    expect(screen.queryByRole('group', { name: 'Email' })).not.toBeInTheDocument();
   });
 });
 

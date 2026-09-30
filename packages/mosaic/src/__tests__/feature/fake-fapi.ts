@@ -1,5 +1,6 @@
 import type {
   ClientJSON,
+  EmailAddressJSON,
   OrganizationMembershipJSON,
   OrganizationSuggestionJSON,
   PhoneNumberJSON,
@@ -12,6 +13,7 @@ import { setupWorker } from 'msw/browser';
 
 import {
   fapiClient,
+  fapiEmailAddress,
   type FapiEnvironment,
   fapiEnvironment,
   fapiMembership,
@@ -132,6 +134,28 @@ function replacePhone(state: FakeFapiState, phone: PhoneNumberJSON) {
   }));
 }
 
+function findEmail(state: FakeFapiState, id: unknown): EmailAddressJSON | undefined {
+  return activeSession(state)?.user.email_addresses.find(email => email.id === id);
+}
+
+function replaceEmail(state: FakeFapiState, email: EmailAddressJSON) {
+  updateUser(state, user => ({
+    ...user,
+    email_addresses: user.email_addresses.map(e => (e.id === email.id ? email : e)),
+  }));
+}
+
+export function verifyEmailOutOfBand(state: FakeFapiState, id: string) {
+  const email = findEmail(state, id);
+  if (!email) {
+    throw new Error(`No email address ${id} to verify`);
+  }
+  replaceEmail(state, {
+    ...email,
+    verification: { ...(email.verification ?? fapiVerification()), status: 'verified' },
+  });
+}
+
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
   const state: FakeFapiState = {
     environment: fapiEnvironment(),
@@ -208,6 +232,68 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       const user = updateUser(state, user => ({ ...user, image_url: PROFILE_IMAGE_URL, has_image: true }));
       return user ? envelope({ id: 'img_1', name: file.name, public_url: PROFILE_IMAGE_URL }, state.client) : missing();
+    }),
+    http.post(fapiUrl('/v1/me/email_addresses'), async ({ request }) => {
+      const body = new URLSearchParams(await request.text());
+      const email = fapiEmailAddress({
+        id: `idn_${++identifications}`,
+        email_address: body.get('email_address') ?? '',
+      });
+      const user = updateUser(state, user => ({ ...user, email_addresses: [...user.email_addresses, email] }));
+      return user ? envelope(email, state.client) : missing();
+    }),
+    http.get(fapiUrl('/v1/me/email_addresses/:id'), ({ params }) => {
+      const email = findEmail(state, params.id);
+      return email ? envelope(email, state.client) : missing();
+    }),
+    http.post(fapiUrl('/v1/me/email_addresses/:id/prepare_verification'), async ({ params, request }) => {
+      const email = findEmail(state, params.id);
+      if (!email) {
+        return missing();
+      }
+      const strategy = new URLSearchParams(await request.text()).get('strategy');
+      if (strategy !== 'email_code' && strategy !== 'email_link' && strategy !== 'enterprise_sso') {
+        return rejected('strategy_invalid', `Unsupported strategy ${strategy}`);
+      }
+      const domain = email.email_address.split('@')[1] ?? 'acme.co';
+      const prepared: EmailAddressJSON = {
+        ...email,
+        verification: fapiVerification({
+          status: 'unverified',
+          strategy,
+          external_verification_redirect_url: strategy === 'enterprise_sso' ? `https://idp.${domain}/sso` : null,
+        }),
+      };
+      replaceEmail(state, prepared);
+      return envelope(prepared, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/email_addresses/:id/attempt_verification'), async ({ params, request }) => {
+      const email = findEmail(state, params.id);
+      if (!email) {
+        return missing();
+      }
+      const body = new URLSearchParams(await request.text());
+      if (body.get('code') !== VERIFICATION_CODE) {
+        return rejected('form_code_incorrect', 'Incorrect code');
+      }
+      const verified: EmailAddressJSON = { ...email, verification: fapiVerification({ strategy: 'email_code' }) };
+      replaceEmail(state, verified);
+      return envelope(verified, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/email_addresses/:id'), ({ params, request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
+        return undefined;
+      }
+      const email = findEmail(state, params.id);
+      if (!email) {
+        return missing();
+      }
+      updateUser(state, user => ({
+        ...user,
+        email_addresses: user.email_addresses.filter(e => e.id !== email.id),
+        primary_email_address_id: user.primary_email_address_id === email.id ? null : user.primary_email_address_id,
+      }));
+      return envelope({ object: 'email_address', id: email.id, deleted: true }, state.client);
     }),
     http.post(fapiUrl('/v1/me/phone_numbers'), async ({ request }) => {
       const body = new URLSearchParams(await request.text());
