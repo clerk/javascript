@@ -37,7 +37,7 @@ export interface TrustedDeviceChallengeResource {
   challenge: string;
   challengeId: string;
   /**
-   * The ID of the trusted device the challenge was issued for. Only present on sign-in challenges.
+   * The ID of the trusted device the challenge was issued for. Only present on sign-in and session reverification challenges.
    */
   trustedDeviceId: string | null;
   /**
