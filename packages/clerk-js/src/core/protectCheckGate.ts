@@ -22,7 +22,7 @@ export class ProtectCheckGate {
   }
 
   public async resolve(clerk: Clerk, resource: SignInResource | SignUpResource, action?: string): Promise<void> {
-    if (__BUILD_DISABLE_RHC__ || action === 'protect_check') {
+    if (__BUILD_DISABLE_RHC__ || action === 'protect_check' || !resource.protectCheck) {
       return;
     }
     while (this.inflight) {

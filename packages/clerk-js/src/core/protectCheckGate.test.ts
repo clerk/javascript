@@ -83,6 +83,23 @@ describe('ProtectCheckGate', () => {
     expect(open).toHaveBeenLastCalledWith({ resource: signUp });
   });
 
+  it('lets a call on a resource without a gate return while another resource holds the modal', async () => {
+    const deferred = createDeferredPromise();
+    const clerk = mockClerk({ __internal_openProtectCheckModal: vi.fn().mockReturnValue(deferred.promise) });
+
+    const outer = gate.resolve(clerk, gated('sia_1'));
+    let clearSettled = false;
+    const clear = gate.resolve(clerk, { id: 'sua_1', protectCheck: null } as any).then(() => {
+      clearSettled = true;
+    });
+    await Promise.resolve();
+    const settledWhileModalOpen = clearSettled;
+
+    deferred.resolve();
+    await Promise.all([outer, clear]);
+    expect(settledWhileModalOpen).toBe(true);
+  });
+
   it('releases the in-flight lock and rethrows when the modal cannot open', async () => {
     const clerk = mockClerk({ __internal_openProtectCheckModal: vi.fn().mockRejectedValue(new Error('no ui')) });
     await expect(gate.resolve(clerk, gated())).rejects.toThrow('no ui');
