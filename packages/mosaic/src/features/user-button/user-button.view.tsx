@@ -327,6 +327,8 @@ interface HeaderAction {
   icon: IconName;
   /** Inline, the button is square and shows the icon alone, labelling itself through `aria-label`. */
   iconOnly?: boolean;
+  /** Shows the icon ahead of the label even inline, where a labelled button otherwise has none. */
+  leadingIcon?: boolean;
   onClick?: () => void;
   /** Opens a menu of these rather than acting itself. */
   items?: HeaderMenuItem[];
@@ -340,6 +342,7 @@ function HeaderActionButton({
   label,
   icon,
   iconOnly,
+  leadingIcon,
   onClick,
   items,
   busyKey,
@@ -358,7 +361,7 @@ function HeaderActionButton({
     disabled,
   } as const;
   const leading =
-    stacked || compact ? (
+    stacked || compact || leadingIcon ? (
       <Icon
         name={icon}
         size='sm'
@@ -427,6 +430,7 @@ function Header() {
   const locale = useLocale();
   const data = useUserButtonContext();
   const layout = data.layout.headerLayout;
+  const userLed = data.layout.lead === 'user';
   const { identifier } = data.activeSession;
   const workspace = leadWorkspace(data, m);
   const { name } = workspace;
@@ -446,8 +450,9 @@ function Header() {
       actions.push({ id: action, label: m.manage.invite, icon: 'users-add-right', onClick: data.onInviteMembers });
     }
     // The gear manages the header's organization, named or badged, and the account wherever the
-    // account leads. With both to manage it opens a menu of the two. Inline it is the icon alone,
-    // named for what it manages; stacked it reads "Settings".
+    // account leads. With both to manage it opens a menu of the two. It reads "Settings" when
+    // stacked, or when the account leads on its own; otherwise inline it is the icon alone, named
+    // for what it manages.
     if (action === 'manageLead') {
       const settings: Array<HeaderMenuItem & { name: string }> = [];
       if (organization && data.onManageOrganization) {
@@ -472,9 +477,10 @@ function Header() {
       } else if (only) {
         actions.push({
           id: action,
-          label: layout === 'stacked' ? m.manage.settings : only.name,
+          label: layout === 'stacked' || userLed ? m.manage.settings : only.name,
           icon: 'cog-6-teeth',
-          iconOnly: true,
+          iconOnly: !userLed,
+          leadingIcon: userLed,
           onClick: only.onClick,
         });
       }
@@ -494,7 +500,7 @@ function Header() {
           name={workspace.name}
           imageUrl={workspace.imageUrl}
           shape={workspace.shape}
-          size='sm'
+          size='md'
           badge={workspace.kind === 'user' ? workspace.badge : undefined}
         />
       }
@@ -1123,6 +1129,7 @@ export function UserButtonPopup(): ReactElement {
     <Popover.Popup
       {...themeProps('user-button-popover')}
       aria-label={m.popup.label}
+      xstyle={styles.popup}
     >
       <Card.Root renderBranding={renderBranding}>
         <Header />
