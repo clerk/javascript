@@ -155,6 +155,18 @@ test.describe('protect check in custom flows @custom', () => {
         protectCheckRequests.push(request.url());
       }
     });
+    let createStatus: string | undefined;
+    await page.route(
+      url => url.pathname.endsWith('/v1/client/sign_ins'),
+      async route => {
+        if (route.request().method() !== 'POST') {
+          return route.fallback();
+        }
+        const response = await route.fetch();
+        createStatus = (await response.json()).response?.status;
+        await route.fulfill({ response });
+      },
+    );
 
     await u.page.goToRelative('/sign-in');
     await expect(u.page.getByText('Sign in', { exact: true })).toBeVisible();
@@ -169,6 +181,7 @@ test.describe('protect check in custom flows @custom', () => {
     });
 
     await providerRedirect;
+    expect(createStatus).toBe('needs_protect_check');
     expect(protectCheckRequests).toEqual([]);
   });
 });
