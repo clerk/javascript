@@ -261,7 +261,7 @@ jobs:
 
       - name: Generate notification payload
         id: notification
-        if: always() && steps.changesets.outputs.published == 'true'
+        if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' }}
         env:
           PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
           GH_ACTOR: ${{ github.actor }}
@@ -275,7 +275,7 @@ jobs:
 
       - name: Send commit log to Slack
         id: slack
-        if: always() && steps.changesets.outputs.published == 'true' && steps.notification.outcome == 'success'
+        if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' && steps.notification.outcome == 'success' }}
         uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
         with:
           payload: ${{ steps.notification.outputs.payload }}
