@@ -1,3 +1,4 @@
+import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import { useUser } from '@clerk/shared/react';
 import type {
@@ -73,9 +74,7 @@ function byId<T extends { id: string }>(items: T[], id: string, kind: string): T
 }
 
 function verifyRedirectUrl(userProfileUrl: string): string {
-  const url = new URL(userProfileUrl);
-  url.hash = '/verify';
-  return url.toString();
+  return buildURL({ base: userProfileUrl, hashPath: '/verify' }, { stringify: true });
 }
 
 function startEmailVerification(
