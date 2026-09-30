@@ -49,6 +49,7 @@ export interface SSOBypassAllowlistBulkCreateResult {
   errors: SSOBypassAllowlistBulkCreateError[];
 }
 
+/** @generateWithEmptyComment */
 export interface SSOBypassAllowlistResource {
   /**
    * Lists the members who may sign in with an email code when the organization's enterprise SSO is unavailable.
