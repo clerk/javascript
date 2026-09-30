@@ -12,6 +12,8 @@ export type {
   UseDataTableReturn,
 } from './use-data-table';
 export { useControllableState } from './use-controllable-state';
+export { type PresenceEntry, usePresenceList } from './use-presence-list';
+export { type KeyedItem, useReorderKeys } from './use-reorder-keys';
 export { useLayoutAnimation } from './use-layout-animation';
 export {
   type TransitionProps,

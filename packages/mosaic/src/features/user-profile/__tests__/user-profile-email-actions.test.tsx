@@ -24,6 +24,20 @@ function renderEmail(overrides: Partial<UserProfileAccountSectionViewProps> = {}
 }
 
 describe('email actions', () => {
+  it('lists the primary email first', () => {
+    renderEmail({
+      emails: [
+        { id: 'email_1', value: 'second@example.com', isVerified: true },
+        { id: 'email_2', value: 'first@example.com', isDefault: true, isVerified: true },
+      ],
+      onRemoveEmail: vi.fn(),
+    });
+
+    expect(
+      screen.getAllByRole('button', { name: /^Manage / }).map(button => button.getAttribute('aria-label')),
+    ).toEqual(['Manage first@example.com', 'Manage second@example.com']);
+  });
+
   it('returns focus to the email menu after opening with the keyboard and canceling with Escape', async () => {
     const user = userEvent.setup();
     const onRemoveEmail = vi.fn();
@@ -70,6 +84,64 @@ describe('email actions', () => {
     expect(screen.queryByRole('button', { name: 'Manage test@example.com' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add email' })).toBeEnabled();
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add email' })).toHaveFocus());
+  });
+
+  it('marks the email busy while it is being set as primary', async () => {
+    const user = userEvent.setup();
+    const request = createDeferredPromise();
+    const onSetPrimaryEmail = vi.fn().mockReturnValue(request.promise);
+    renderEmail({ onSetPrimaryEmail });
+    const row = screen.getByText('test@example.com').closest('.cl-section-item');
+
+    await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    expect(row).toHaveAttribute('aria-busy', 'true');
+    expect(row).toHaveAttribute('data-pending');
+
+    await act(async () => {
+      request.resolve();
+      await request.promise;
+    });
+    expect(row).not.toHaveAttribute('aria-busy');
+    expect(row).not.toHaveAttribute('data-pending');
+  });
+
+  it('holds the reorder while the pending pulse shows', async () => {
+    const user = userEvent.setup();
+    const order = () =>
+      screen.getAllByRole('button', { name: /^Manage / }).map(button => button.getAttribute('aria-label'));
+    function Example() {
+      const [emails, setEmails] = useState([
+        { id: 'email_1', value: 'first@example.com', isDefault: true, isVerified: true },
+        { id: 'email_2', value: 'second@example.com', isVerified: true },
+      ]);
+      return (
+        <MosaicProvider>
+          <UserProfileAccountSectionView
+            allowMultipleAccounts
+            name='Test'
+            username='test'
+            phones={[]}
+            emails={emails}
+            onRemoveEmail={vi.fn()}
+            onSetPrimaryEmail={async id => {
+              await new Promise(resolve => setTimeout(resolve, 200));
+              setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })));
+            }}
+          />
+        </MosaicProvider>
+      );
+    }
+    render(<Example />);
+    await user.click(screen.getByRole('button', { name: 'Manage second@example.com' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+
+    await act(() => new Promise(resolve => setTimeout(resolve, 250)));
+    expect(order()).toEqual(['Manage first@example.com', 'Manage second@example.com']);
+
+    await waitFor(() => expect(order()).toEqual(['Manage second@example.com', 'Manage first@example.com']), {
+      timeout: 1500,
+    });
   });
 
   it('shows a primary update error without opening a dialog', async () => {

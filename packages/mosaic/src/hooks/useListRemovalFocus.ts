@@ -12,12 +12,16 @@ export function useListRemovalFocus({
   const triggers = useRef(new Map<string, HTMLButtonElement>());
   const removed = useRef<{ id: string; index: number } | undefined>(undefined);
 
-  const registerTrigger = (id: string) => (element: HTMLButtonElement | null) => {
-    if (element) {
-      triggers.current.set(id, element);
-    } else {
-      triggers.current.delete(id);
-    }
+  const registerTrigger = (id: string) => {
+    let own: HTMLButtonElement | null = null;
+    return (element: HTMLButtonElement | null) => {
+      if (element) {
+        own = element;
+        triggers.current.set(id, element);
+      } else if (triggers.current.get(id) === own) {
+        triggers.current.delete(id);
+      }
+    };
   };
 
   const remove = async (id: string) => {

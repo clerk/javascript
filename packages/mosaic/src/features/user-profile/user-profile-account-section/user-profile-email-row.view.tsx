@@ -5,12 +5,13 @@ import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
 import { useListRemovalFocus } from '../../../hooks/useListRemovalFocus';
+import { useSpinDelay } from '../../../hooks/useSpinDelay';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfileEmail } from './user-profile-account-section.types';
 import type { UserProfileAddEmailControllerOptions } from './user-profile-add-email.controller';
 import { useUserProfileAddEmailController } from './user-profile-add-email.controller';
 import { UserProfileAddEmailDialog } from './user-profile-add-email.dialog';
-import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
+import { primaryFirst, UserProfileContactListRowView } from './user-profile-contact-list-row.view';
 import { UserProfileContactRowView } from './user-profile-contact-row.view';
 
 export interface UserProfileEmailRowViewProps {
@@ -38,10 +39,21 @@ export function UserProfileEmailRowView({
 }: UserProfileEmailRowViewProps) {
   const m = useMessages('userProfileAccountSection');
   const row = useRef<HTMLDivElement>(null);
+  const orderedEmails = useMemo(() => primaryFirst(emails), [emails]);
+  const [pendingPrimaryId, setPendingPrimaryId] = useState<string>();
+  const pulsing = useSpinDelay(pendingPrimaryId ?? null) !== null;
+  const [heldEmails, setHeldEmails] = useState(orderedEmails);
+  if (!pulsing && heldEmails !== orderedEmails) {
+    setHeldEmails(orderedEmails);
+  }
+  const shownEmails = pulsing ? heldEmails : orderedEmails;
   const removalFocus = useListRemovalFocus({
-    ids: emails.map(email => email.id),
+    ids: shownEmails.map(email => email.id),
     onRemove: onRemoveEmail,
-    fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
+    fallback: () =>
+      Array.from(row.current?.querySelectorAll<HTMLButtonElement>('button:not([disabled])') ?? []).find(
+        button => !button.closest('[aria-hidden="true"]'),
+      ) ?? row.current,
   });
   const addEmailAction =
     onSendEmailCode && onVerifyEmailCode ? (
@@ -68,7 +80,6 @@ export function UserProfileEmailRowView({
       </Button>
     ) : undefined;
   const removeEmailConfirmation = useMemo(() => Confirmation.createHandle<UserProfileEmail>(), []);
-  const [isSettingPrimary, setIsSettingPrimary] = useState(false);
   const [primaryError, setPrimaryError] = useState<string>();
   const settingPrimary = useRef(false);
 
@@ -78,7 +89,7 @@ export function UserProfileEmailRowView({
       return;
     }
     settingPrimary.current = true;
-    setIsSettingPrimary(true);
+    setPendingPrimaryId(id);
     setPrimaryError(undefined);
     try {
       await onSetPrimaryEmail(id);
@@ -86,7 +97,7 @@ export function UserProfileEmailRowView({
       setPrimaryError(error instanceof Error ? error.message : m.email.primaryError);
     } finally {
       settingPrimary.current = false;
-      setIsSettingPrimary(false);
+      setPendingPrimaryId(undefined);
     }
   };
 
@@ -100,7 +111,7 @@ export function UserProfileEmailRowView({
   if (!allowMultipleAccounts) {
     return (
       <UserProfileContactRowView
-        items={emails}
+        items={shownEmails}
         kind='email'
         label={m.email.label}
         addAction={addEmailAction}
@@ -114,12 +125,14 @@ export function UserProfileEmailRowView({
       <UserProfileContactListRowView
         rowRef={row}
         triggerRef={removalFocus.registerTrigger}
-        items={emails}
+        items={shownEmails}
         kind='email'
         label={m.email.label}
         addAction={addEmailAction}
         onRemove={onRemoveEmail ? removeEmail : undefined}
-        onSetPrimary={onSetPrimaryEmail && !isSettingPrimary ? id => void setPrimaryEmail(id) : undefined}
+        onSetPrimary={onSetPrimaryEmail && !pendingPrimaryId && !pulsing ? id => void setPrimaryEmail(id) : undefined}
+        pendingId={pendingPrimaryId}
+        pulsing={pulsing}
         onVerify={onVerifyEmail}
       />
       {primaryError ? (

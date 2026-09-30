@@ -23,7 +23,8 @@ Entering or pasting six digits submits automatically. Use `000000` to see an inc
 
 **Add email** opens email entry followed by a six-digit verification code. Resend is available after
 the countdown. In this preview, `000000` shows an incorrect-code error; another six-digit code adds
-the verified address.
+the verified address. **Set as primary** resolves after a short simulated request; when the request outlasts a
+short delay, the rows pulse in a wave and the reorder waits for the pulse to finish.
 
 <Story
   name='MultipleAccounts'
@@ -40,6 +41,20 @@ the verified address.
     { name: 'Otp', href: '/components/otp', layer: 'Components' },
   ]}
 />
+
+### Motion
+
+The primary email address or phone number is listed first. Each row sits in a grid slot whose track
+expands from `0fr` when the row is added and collapses to `0fr` when it is removed, with a fade on
+the row. A row that changes position collapses in its old slot and expands in its new one, through
+`useReorderKeys` and `usePresenceList` from the primitives; rows that keep their order stay put.
+
+## Set primary pending
+
+Setting a primary takes a few seconds here. The rows pulse in a wave once the request outlasts a
+short delay, and the reorder plays after the pulse ends.
+
+<Story name='SetPrimaryPending' storyModule={Stories} />
 
 ## Add phone failure
 
