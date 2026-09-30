@@ -38,7 +38,7 @@ import { acquireKeyboardInset, focusWithoutScroll } from './keyboard-inset';
 export type DialogVariant = keyof typeof variants;
 
 /**
- * Where the surface sits in the compact band — the dialog viewport under `48rem`. `center`
+ * Where the surface sits in the compact band — the dialog viewport under `40rem`. `center`
  * everywhere above it: there is no edge close enough for anchoring to mean anything at those
  * widths.
  */
@@ -66,6 +66,8 @@ export interface DialogContextValue {
   descriptionId: string;
   /** Which surface this is, and so the geometry it takes — see `DialogVariant`. */
   variant: DialogVariant;
+  /** Where the surface sits in the compact band, so it can square its bottom corners as a sheet. */
+  compactPlacement: DialogCompactPlacement;
   /**
    * The popup's ARIA role, for a surface that has to adapt to being an interruption: `Card.Header`
    * reads it and withholds its dismiss inside an `alertdialog`, where leaving without answering is
@@ -116,8 +118,8 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
   /** Which surface the dialog holds, and so the geometry it takes. @default 'card' */
   variant?: DialogVariant;
   /**
-   * Bottom-anchors the surface in the compact band — the dialog viewport under `48rem` — and
-   * slides it up as a sheet, instead of centering it. For a dialog that asks one thing and returns
+   * Bottom-anchors the surface in the compact band — the dialog viewport under `40rem` — flush to
+   * the sides and bottom edge, and slides it up as a sheet, instead of centering it. For a dialog that asks one thing and returns
    * — a confirmation, a single-field form — where the answer belongs within thumb's reach.
    * `card` only. @default 'center'
    */
@@ -352,8 +354,8 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
   useNestedVariantWarning(isNestedInDialog, variant);
 
   const surface = React.useMemo(
-    () => ({ labelId, descriptionId, variant, role }),
-    [labelId, descriptionId, variant, role],
+    () => ({ labelId, descriptionId, variant, compactPlacement, role }),
+    [labelId, descriptionId, variant, compactPlacement, role],
   );
   // Observed through state rather than a plain ref, because the warnings have to re-run when the
   // node arrives and a ref mutation does not re-render.

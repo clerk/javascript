@@ -46,6 +46,8 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
   { elevation = DEFAULT_ELEVATION, size = 'md', renderBranding = true, render, xstyle, children, ...rest },
   ref,
 ) {
+  const dialog = React.useContext(DialogContext);
+  const isSheet = isInDialog(dialog) && dialog.compactPlacement === 'sheet' && elevation !== 'flush';
   const element = useRender({
     defaultTagName: 'div',
     render,
@@ -53,7 +55,14 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
     props: {
       ...mergeStyleProps(
         themeProps('card-root', { elevation, size }),
-        stylex.props(reset.base, slots.root.base, slots.root[elevation], slots.sizes[size], xstyle),
+        stylex.props(
+          reset.base,
+          slots.root.base,
+          slots.root[elevation],
+          slots.sizes[size],
+          isSheet && slots.sheet.root,
+          xstyle,
+        ),
         rest,
       ),
       children: (

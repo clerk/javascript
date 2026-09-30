@@ -79,6 +79,7 @@ function DestructiveCard({
 
   return (
     <Dialog.Popup
+      compactPlacement='sheet'
       variant='card'
       finalFocus={finalFocus}
     >

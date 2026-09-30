@@ -54,6 +54,7 @@ export function UserProfileEditUsernameDialog({
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
+        compactPlacement='sheet'
         variant='card'
         initialFocus={usernameRef}
       >

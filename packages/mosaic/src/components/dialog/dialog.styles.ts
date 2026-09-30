@@ -36,6 +36,8 @@ const PHONE = '@container cl-dialog (width < 48rem)';
 const ABOVE_PHONE = '@container cl-dialog (width >= 48rem)';
 const DESK = '@container cl-dialog (48rem <= width < 90rem)';
 const WIDE = '@container cl-dialog (width >= 90rem)';
+// Narrower than `PHONE` so a portrait small tablet keeps the centered card. `card.styles.ts` repeats it.
+const SHEET = '@container cl-dialog (width < 40rem)';
 
 export const styles = stylex.create({
   // The scrim. Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
@@ -223,7 +225,7 @@ export const styles = stylex.create({
       // one gesture, and the phone band runs the transform at `slow`. Pinning the veil at `base`
       // there finishes the dim 100ms before the surface stops moving, in both directions.
       transitionDuration: {
-        [PHONE]: durationVars['--cl-duration-slow'],
+        [SHEET]: durationVars['--cl-duration-slow'],
         default: durationVars['--cl-duration-base'],
       },
       transitionProperty: 'opacity',
@@ -424,9 +426,14 @@ export const variants = stylex.create({
 export const compactPlacements = stylex.create({
   center: {},
   sheet: {
+    borderRadius: {
+      [SHEET]: `${radiusVars['--cl-radius-2xl']} ${radiusVars['--cl-radius-2xl']} 0 0`,
+      default: radiusVars['--cl-radius-xl'],
+    },
     // `align-self` on the grid item, not `align-items` on the viewport, because the viewport is
     // shared: bottom-aligning there would drag a centered dialog down with it.
-    alignSelf: { [PHONE]: 'end', default: null },
+    alignSelf: { [SHEET]: 'end', default: null },
+    width: { [SHEET]: '100%', default: 'fit-content' },
   },
 });
 
@@ -452,7 +459,13 @@ export const trackCompactPlacements = stylex.create({
     // scrolled, because the same rule that contains the slide also contains the overflow. A tall
     // surface on a phone wants the default `center`, which does not translate and so is not
     // clipped here.
-    overflow: { [PHONE]: 'clip', default: null },
+    overflow: { [SHEET]: 'clip', default: null },
+    // Flush to the sides and the bottom edge, so the keyboard's share is all that is left below.
+    paddingInline: { [ABOVE_PHONE]: 'var(--_cl-dialog-inset)', [SHEET]: 0, default: space['4'] },
+    paddingBlockEnd: {
+      [SHEET]: 'var(--_cl-keyboard-inset, 0px)',
+      default: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-inset, 0px))',
+    },
   },
 });
 
@@ -574,7 +587,7 @@ export const popupMotion = stylex.create({
       ':where([data-starting-style], [data-ending-style])': 0,
     },
     transform: {
-      [PHONE]: {
+      [SHEET]: {
         default: 'scale(1)',
         ':where([data-stack-base])': `scale(${STACK_SCALE}) translateY(${STACK_LIFT})`,
         ':where([data-starting-style], [data-ending-style])': 'scale(1)',
@@ -635,7 +648,7 @@ export const popupMotion = stylex.create({
     // plain `data-stacked` one, which would otherwise hand a stacked sheet the three-value entrance
     // list on its way out and slow its exit slide.
     transitionDuration: {
-      [PHONE]: {
+      [SHEET]: {
         default: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}`,
         ':where([data-ending-style])': durationVars['--cl-duration-base'],
         ':where([data-stacked])': `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-slow']}`,
@@ -662,11 +675,11 @@ export const popupMotion = stylex.create({
       ':where([data-ending-style])': `${easingVars['--cl-ease-exit']}, ${easingVars['--cl-ease-exit']}, ${SHEET_EXIT_EASE}`,
     },
     translate: {
-      [PHONE]: {
+      [SHEET]: {
         default: null,
         '@media (prefers-reduced-motion: no-preference)': {
           default: null,
-          ':where([data-starting-style], [data-ending-style])': '0 calc(100% + var(--_cl-dialog-inset))',
+          ':where([data-starting-style], [data-ending-style])': '0 100%',
         },
       },
       default: null,

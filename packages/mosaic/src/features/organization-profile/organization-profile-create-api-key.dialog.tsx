@@ -46,6 +46,7 @@ export function OrganizationProfileCreateAPIKeyDialog(props: OrganizationProfile
       }}
     >
       <Dialog.Popup
+        compactPlacement='sheet'
         initialFocus={props.secret ? undefined : nameInput}
         finalFocus={props.finalFocus}
       >
