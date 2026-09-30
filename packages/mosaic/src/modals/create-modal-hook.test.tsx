@@ -6,6 +6,7 @@ import type { UserProfileModalConfig } from '../features/user-profile/user-profi
 import { MosaicProvider } from '../MosaicProvider';
 import { createModalHook } from './create-modal-hook';
 import type { ModalContentProps, ModalHandle } from './modal.types';
+import { ModalHost } from './modal-host';
 
 afterEach(() => cleanup());
 
@@ -237,16 +238,18 @@ describe('createModalHook', () => {
     expect(readConfig()).toEqual({ label: 'caller', tone: 'neutral' });
   });
 
-  it('reads defaults from the MosaicProvider userProfile prop', async () => {
+  it.todo('reads defaults from a public MosaicProvider prop once the modal API is public');
+
+  it('reads defaults from the modal host', async () => {
     const { useStubModal } = createStubModal();
     let handle: ModalHandle<StubPayload> | undefined;
     render(
-      <MosaicProvider userProfile={{ pageOrder: ['security'] }}>
+      <ModalHost defaults={{ userProfile: { pageOrder: ['security'] } }}>
         <Caller
           useModal={useStubModal}
           onHandle={h => (handle = h)}
         />
-      </MosaicProvider>,
+      </ModalHost>,
     );
     await flush();
     act(() => handle?.open());
@@ -315,14 +318,42 @@ describe('createModalHook', () => {
     expect(screen.getByTestId('seeded')).toHaveTextContent('security');
   });
 
-  it('keeps a provider default when the caller leaves that key undefined', async () => {
+  it('keeps a host default when the caller leaves that key undefined', async () => {
     const { useStubModal } = createStubModal();
     let handle: ModalHandle<StubPayload> | undefined;
     render(
-      <MosaicProvider userProfile={{ pageOrder: ['security'] }}>
+      <ModalHost defaults={{ userProfile: { pageOrder: ['security'] } }}>
         <Caller
           useModal={useStubModal}
           config={{ pageOrder: undefined, label: 'caller' }}
+          onHandle={h => (handle = h)}
+        />
+      </ModalHost>,
+    );
+    await flush();
+
+    act(() => handle?.open());
+    await flush();
+
+    expect(readConfig()).toEqual({ pageOrder: ['security'], label: 'caller' });
+  });
+
+  it('shows a retry inside the dialog when the content fails to load', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    let failing = true;
+    const load = vi.fn(() =>
+      failing ? Promise.reject(new Error('chunk failed')) : Promise.resolve({ default: StubContent }),
+    );
+    const useFlakyModal = createModalHook(
+      { id: 'flaky', variant: 'card', load },
+      defaults => defaults.userProfile ?? {},
+    );
+    let handle: ModalHandle<StubPayload> | undefined;
+    render(
+      <MosaicProvider>
+        <p>App content</p>
+        <Caller
+          useModal={useFlakyModal}
           onHandle={h => (handle = h)}
         />
       </MosaicProvider>,
@@ -332,7 +363,43 @@ describe('createModalHook', () => {
     act(() => handle?.open());
     await flush();
 
-    expect(readConfig()).toEqual({ pageOrder: ['security'], label: 'caller' });
+    expect(screen.getByText('App content')).toBeInTheDocument();
+    expect(screen.queryByText('Stub modal')).not.toBeInTheDocument();
+
+    failing = false;
+    act(() => screen.getByRole('button', { name: 'Try again' }).click());
+    await flush();
+
+    expect(screen.getByText('Stub modal')).toBeInTheDocument();
+  });
+
+  it('loads the content on open after a failed preload', async () => {
+    let failing = true;
+    const load = vi.fn(() =>
+      failing ? Promise.reject(new Error('chunk failed')) : Promise.resolve({ default: StubContent }),
+    );
+    const useFlakyModal = createModalHook(
+      { id: 'flaky-preload', variant: 'card', load },
+      defaults => defaults.userProfile ?? {},
+    );
+    let handle: ModalHandle<StubPayload> | undefined;
+    render(
+      <MosaicProvider>
+        <Caller
+          useModal={useFlakyModal}
+          onHandle={h => (handle = h)}
+        />
+      </MosaicProvider>,
+    );
+    await flush();
+
+    act(() => handle?.preload());
+    await flush();
+    failing = false;
+    act(() => handle?.open());
+    await flush();
+
+    expect(screen.getByText('Stub modal')).toBeInTheDocument();
   });
 
   it('throws a clear error outside MosaicProvider', () => {

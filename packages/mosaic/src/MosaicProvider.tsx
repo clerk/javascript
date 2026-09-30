@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { ToastProvider } from './components/toast/toast';
-import type { UserProfileModalConfig } from './features/user-profile/user-profile.modal.types';
 import type { MosaicIconOverrides } from './icons/overrides';
 import { MosaicIconsProvider } from './icons/overrides';
 import type { MosaicLocalization } from './localization';
@@ -14,27 +13,20 @@ export interface MosaicProviderProps {
   icons?: MosaicIconOverrides;
   /** Locale and strings for everything Mosaic renders; see `MosaicLocalization`. */
   localization?: MosaicLocalization;
-  userProfile?: UserProfileModalConfig;
 }
 
 // Exported Mosaic components annotate a React return type on purpose. The package sets
 // `jsxImportSource: '@emotion/react'`, so an inferred return leaks Emotion's `JSX.Element` into the
 // published `.d.ts`, which React 19 consumers reject as a JSX element type.
-export function MosaicProvider({
-  children,
-  icons,
-  localization,
-  userProfile,
-}: MosaicProviderProps): React.ReactElement {
+export function MosaicProvider({ children, icons, localization }: MosaicProviderProps): React.ReactElement {
   const iconsValue = React.useMemo(() => icons ?? {}, [icons]);
   const localizationValue = React.useMemo(() => resolveLocalization(localization), [localization]);
-  const modalDefaults = React.useMemo(() => ({ userProfile }), [userProfile]);
 
   return (
     <MosaicIconsProvider value={iconsValue}>
       <MosaicLocalizationProvider value={localizationValue}>
         <ToastProvider>
-          <ModalHost defaults={modalDefaults}>{children}</ModalHost>
+          <ModalHost>{children}</ModalHost>
         </ToastProvider>
       </MosaicLocalizationProvider>
     </MosaicIconsProvider>
