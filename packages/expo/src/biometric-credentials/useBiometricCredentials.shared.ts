@@ -7,8 +7,7 @@ import type { UseBiometricCredentialsReturn } from './types';
 /**
  * Accesses biometric credential enrollment, sign-in, and session reverification on iOS and Android.
  *
- * Enrollment and sign-in require the `@clerk/expo-biometrics` package, which keeps the private key on the device.
- * Session reverification uses Clerk's native SDK and requires a development build.
+ * Requires the `@clerk/expo-biometrics` package, which keeps the private key on the device, in a development build.
  */
 export function useBiometricCredentials(): UseBiometricCredentialsReturn {
   const clerk = useClerk();
