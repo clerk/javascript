@@ -1,5 +1,3 @@
-import type { SessionVerificationLevel } from '@clerk/shared/types';
-
 import type { FlowDirection } from '../../components/flow';
 
 export type ReverificationStrategy = 'password' | 'passkey' | 'email_code' | 'phone_code' | 'totp' | 'backup_code';
@@ -41,11 +39,6 @@ type ReverificationViewFields = {
 export type ReverificationViewProps = ReverificationViewFields & {
   step: ReverificationStep;
 };
-
-export type ReverificationState =
-  | { phase: 'inactive' }
-  | { phase: 'active'; complete: () => void; cancel: () => void; level: SessionVerificationLevel | undefined }
-  | { phase: 'retrying' };
 
 export type ReverificationResult = {
   status: 'needs_first_factor' | 'needs_second_factor' | 'complete';

@@ -4,31 +4,27 @@ import { describe, expect, it, vi } from 'vitest';
 import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
 import { Flow } from '../../../components/flow';
+import { mockActor } from '../../../machine/createActor';
+import type { AnyActor } from '../../../machine/types';
 import { MosaicProvider } from '../../../MosaicProvider';
 import { Reverification } from '../reverification';
-import type { ReverificationController } from '../reverification.controller';
-import type { ReverificationViewProps } from '../reverification.types';
+import { reverificationMachine } from '../reverification.machine';
+import type { ReverificationMethod } from '../reverification.types';
 
-let controller: ReverificationController = { status: 'idle' };
+vi.mock('../../../hooks/useMosaicSupportEmail', () => ({
+  useMosaicSupportEmail: () => 'support@example.com',
+}));
 
-function surface(overrides: Partial<ReverificationViewProps> = {}): ReverificationController {
-  return {
-    status: 'ready',
-    step: 'password',
-    value: '',
-    onValueChange: vi.fn(),
-    isPending: false,
-    onSubmit: vi.fn(),
-    onShowMethods: vi.fn(),
-    onShowHelp: vi.fn(),
-    onBack: vi.fn(),
-    onEmailSupport: vi.fn(),
-    onResend: vi.fn(),
-    canResend: true,
-    methods: [],
-    onSelectMethod: vi.fn(),
-    ...overrides,
-  };
+const password: ReverificationMethod = { id: 'password', stage: 'first', strategy: 'password' };
+
+let actor: AnyActor | undefined;
+
+function at(value: string): AnyActor {
+  return mockActor(reverificationMachine, { value, context: { activeMethod: password, methods: [password] } });
+}
+
+function surface(): AnyActor {
+  return at('factor.editing.ready');
 }
 
 function Nested({ step }: { step: 'confirm' | 'verify' | 'finalizing' }) {
@@ -54,7 +50,7 @@ function Nested({ step }: { step: 'confirm' | 'verify' | 'finalizing' }) {
                     </Card.Header>
                   </Flow.Step>
                   <Flow.Step ids={['verify']}>
-                    <Reverification {...controller} />
+                    <Reverification actor={actor} />
                   </Flow.Step>
                   <Flow.Step ids={['finalizing']}>
                     <Card.Header>
@@ -74,7 +70,7 @@ function Nested({ step }: { step: 'confirm' | 'verify' | 'finalizing' }) {
 
 describe('reverification inside an outer flow', () => {
   it('keeps one dialog and one card, and nests a flow only while verifying', () => {
-    controller = { status: 'idle' };
+    actor = undefined;
     const { rerender } = render(<Nested step='confirm' />);
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
@@ -83,7 +79,7 @@ describe('reverification inside an outer flow', () => {
     expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'confirm');
     expect(screen.getByText('Confirm the mock delete.')).toBeInTheDocument();
 
-    controller = { status: 'loading' };
+    actor = mockActor(reverificationMachine, { value: 'starting' });
     rerender(<Nested step='verify' />);
 
     const flows = document.querySelectorAll('.cl-flow-root');
@@ -97,7 +93,7 @@ describe('reverification inside an outer flow', () => {
 
     const outerCard = document.querySelector('.cl-card-root');
     const outerFlow = flows[0];
-    controller = surface();
+    actor = surface();
     rerender(<Nested step='verify' />);
 
     const nextFlows = document.querySelectorAll('.cl-flow-root');
@@ -109,7 +105,7 @@ describe('reverification inside an outer flow', () => {
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
     expect(screen.queryByText('Confirm the mock delete.')).not.toBeInTheDocument();
 
-    controller = { status: 'idle' };
+    actor = undefined;
     rerender(<Nested step='finalizing' />);
 
     expect(screen.getAllByRole('dialog')).toHaveLength(1);
@@ -120,13 +116,13 @@ describe('reverification inside an outer flow', () => {
   });
 
   it('keeps the current step when the challenge goes inactive', () => {
-    controller = surface();
+    actor = surface();
     const { rerender } = render(<Nested step='verify' />);
 
     expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
 
-    controller = { status: 'idle' };
+    actor = undefined;
     rerender(<Nested step='verify' />);
 
     expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
@@ -135,7 +131,7 @@ describe('reverification inside an outer flow', () => {
   });
 
   it('does not mount an inner flow before verification starts', () => {
-    controller = surface();
+    actor = surface();
     const { rerender } = render(<Nested step='finalizing' />);
 
     expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
@@ -150,11 +146,11 @@ describe('reverification inside an outer flow', () => {
 
 describe('reverification card states', () => {
   it('keeps one card from the pending state through a factor', () => {
-    controller = { status: 'loading' };
+    actor = mockActor(reverificationMachine, { value: 'starting' });
     const { container, rerender } = render(
       <MosaicProvider>
         <Card.Root renderBranding={false}>
-          <Reverification {...controller} />
+          <Reverification actor={actor} />
         </Card.Root>
       </MosaicProvider>,
     );
@@ -168,11 +164,11 @@ describe('reverification card states', () => {
     expect(container.querySelector('[aria-busy="true"]')).toContainElement(spinner);
     expect(screen.queryByLabelText('Password')).not.toBeInTheDocument();
 
-    controller = surface();
+    actor = surface();
     rerender(
       <MosaicProvider>
         <Card.Root renderBranding={false}>
-          <Reverification {...controller} />
+          <Reverification actor={actor} />
         </Card.Root>
       </MosaicProvider>,
     );
@@ -184,13 +180,13 @@ describe('reverification card states', () => {
   });
 
   it('shows a dismiss button on the pending card inside a dialog', () => {
-    controller = { status: 'loading' };
+    actor = mockActor(reverificationMachine, { value: 'starting' });
     render(
       <MosaicProvider>
         <Dialog.Root open>
           <Dialog.Popup>
             <Card.Root renderBranding={false}>
-              <Reverification {...controller} />
+              <Reverification actor={actor} />
             </Card.Root>
           </Dialog.Popup>
         </Dialog.Root>
@@ -203,11 +199,11 @@ describe('reverification card states', () => {
   });
 
   it('renders unavailable outside the factor flow, then mounts that flow in the same card', () => {
-    controller = { status: 'unavailable' };
+    actor = at('unavailable');
     const { container, rerender } = render(
       <MosaicProvider>
         <Card.Root renderBranding={false}>
-          <Reverification {...controller} />
+          <Reverification actor={actor} />
         </Card.Root>
       </MosaicProvider>,
     );
@@ -220,11 +216,11 @@ describe('reverification card states', () => {
       screen.getByText('Cannot proceed with verification. No suitable authentication factor is configured.'),
     ).toBeInTheDocument();
 
-    controller = surface();
+    actor = surface();
     rerender(
       <MosaicProvider>
         <Card.Root renderBranding={false}>
-          <Reverification {...controller} />
+          <Reverification actor={actor} />
         </Card.Root>
       </MosaicProvider>,
     );

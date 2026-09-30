@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 
 import { createActor } from './createActor';
-import type { Actor, CreateActorOptions, EventObject, Snapshot, StateMachine } from './types';
+import type { Actor, CreateActorOptions, EventObject, ProvidedActors, Snapshot, StateMachine } from './types';
 
 export interface UseMachineOptions<TContext> extends CreateActorOptions<TContext> {
   /** Called once when the machine reaches a final state (`type: 'final'`). */
@@ -39,8 +39,9 @@ export function useMachine<TContext extends object, TEvent extends EventObject>(
   options?: UseMachineOptions<TContext>,
 ): [Snapshot<TContext>, Actor<TContext, TEvent>['send'], Actor<TContext, TEvent>] {
   const actorRef = useRef<Actor<TContext, TEvent> | null>(null);
+  const actorsRef = useRef<ProvidedActors>({});
   if (actorRef.current === null) {
-    actorRef.current = createActor(machine, options);
+    actorRef.current = createActor(machine, { ...options, actors: actorsRef.current });
   }
   const actor = actorRef.current;
 
@@ -49,12 +50,15 @@ export function useMachine<TContext extends object, TEvent extends EventObject>(
     return () => actor.stop();
   }, [actor]);
 
-  // Keep injected context (e.g. a function from props) current on every render.
+  // Keep injected context and actors (e.g. functions from props) current on every render.
   // useLayoutEffect with no deps runs synchronously after every render, before
   // paint — ensuring setContext fires before any user event triggers an invoke.
   useLayoutEffect(() => {
     if (options?.context) {
       actor.setContext(options.context);
+    }
+    if (options?.actors) {
+      Object.assign(actorsRef.current, options.actors);
     }
   });
 

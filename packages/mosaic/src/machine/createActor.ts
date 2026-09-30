@@ -3,14 +3,21 @@ import type {
   Actions,
   Actor,
   AfterEvent,
+  AnyActor,
   AnyEventObject,
+  AnyStateMachine,
   AssignAction,
   CreateActorOptions,
+  DoneInvokeEvent,
+  ErrorInvokeEvent,
   EventObject,
+  GuardMeta,
+  InvokeConfig,
   Snapshot,
   SnapshotListener,
   StateConfig,
   StateMachine,
+  Transition,
   TransitionConfig,
   TransitionFn,
   Unsubscribe,
@@ -21,6 +28,54 @@ const INIT_EVENT: AnyEventObject = { type: INIT };
 
 // Collapse toArray into single helper: returns empty array, original if array, or wrapped value
 const toArr = <T>(v: T | T[] | undefined): T[] => (!v ? [] : Array.isArray(v) ? v : [v]);
+
+interface StateNode<TContext> {
+  path: string;
+  parent: StateNode<TContext> | undefined;
+  config: StateConfig<TContext, EventObject>;
+  children: Record<string, StateNode<TContext>>;
+}
+
+interface Activity {
+  timers: ReturnType<typeof setTimeout>[];
+  childId: string | undefined;
+}
+
+const actorMachines = new WeakMap<object, AnyStateMachine>();
+
+function isMachine(src: unknown): src is AnyStateMachine {
+  return typeof src === 'object' && src !== null && 'states' in src;
+}
+
+function matchesValue(value: string, path: string): boolean {
+  return value === path || value.startsWith(`${path}.`);
+}
+
+function isAncestor<TContext>(ancestor: StateNode<TContext>, node: StateNode<TContext>): boolean {
+  for (let current = node.parent; current; current = current.parent) {
+    if (current === ancestor) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function descend<TContext>(node: StateNode<TContext> | undefined, path: string): StateNode<TContext> | undefined {
+  if (path === '') {
+    return node;
+  }
+  return path.split('.').reduce<StateNode<TContext> | undefined>((current, key) => current?.children[key], node);
+}
+
+export function childActor<TContext extends object, TEvent extends EventObject>(
+  child: AnyActor | undefined,
+  machine: StateMachine<TContext, TEvent>,
+): Actor<TContext, TEvent> | undefined {
+  if (child === undefined || actorMachines.get(child) !== machine) {
+    return undefined;
+  }
+  return child as unknown as Actor<TContext, TEvent>;
+}
 
 /**
  * Wrap a machine definition in a running instance (an "actor").
@@ -41,36 +96,95 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   options: CreateActorOptions<TContext> = {},
 ): Actor<TContext, TEvent> {
   const teleport = options.snapshot;
+  const actors = options.actors ?? {};
 
+  const ids = new Map<string, StateNode<TContext>>();
+  function buildNode(
+    config: StateConfig<TContext, EventObject>,
+    path: string,
+    parent: StateNode<TContext> | undefined,
+  ): StateNode<TContext> {
+    const node: StateNode<TContext> = { path, parent, config, children: {} };
+    if (config.id !== undefined) {
+      ids.set(config.id, node);
+    }
+    for (const [key, child] of Object.entries(config.states ?? {})) {
+      node.children[key] = buildNode(child, path === '' ? key : `${path}.${key}`, node);
+    }
+    return node;
+  }
   // Internally the actor operates on the broader `EventObject`: invoke done/error
   // events aren't part of the user's `TEvent` union, so the config is viewed
   // through an event-agnostic lens to keep the runtime helpers honestly typed.
-  const states = machine.states as unknown as Record<string, StateConfig<TContext, EventObject>>;
+  const root = buildNode(
+    { states: machine.states as unknown as Record<string, StateConfig<TContext, EventObject>> },
+    '',
+    undefined,
+  );
+  if (machine.id !== undefined) {
+    ids.set(machine.id, root);
+  }
 
   // Tracks the latest setContext patch so it survives a stop/start cycle.
   let liveContextPatch: Partial<TContext> = options.context ?? {};
   let context: TContext = { ...machine.context, ...liveContextPatch, ...teleport?.context };
   // `initial` may be derived from context (e.g. furthest-reachable step).
   const resolveInitial = () => (typeof machine.initial === 'function' ? machine.initial(context) : machine.initial);
-  let value = teleport?.value ?? resolveInitial();
+
+  function initialLeaf(node: StateNode<TContext>): StateNode<TContext> | undefined {
+    const self = node === root ? undefined : node;
+    if (Object.keys(node.children).length === 0) {
+      return self;
+    }
+    const key = node === root ? resolveInitial() : node.config.initial;
+    const next = key === undefined ? undefined : node.children[key];
+    return next ? initialLeaf(next) : self;
+  }
+
+  let leaf = teleport ? descend(root, teleport.value) : initialLeaf(root);
+  leaf = leaf && initialLeaf(leaf);
+  let fallbackValue = teleport?.value ?? resolveInitial();
 
   // A teleported actor is already "started" and inert: start() must not re-run
   // entry/always/invoke for the state it was dropped into.
   let started = teleport !== undefined;
-  let status: Snapshot<TContext>['status'] = states[value]?.type === 'final' ? 'done' : 'active';
+  let status: Snapshot<TContext>['status'] = leaf?.config.type === 'final' ? 'done' : 'active';
 
-  // Bumped whenever we leave an invoking state (or stop), so a stale promise
-  // resolving after the fact is ignored — no transition, no setState-after-stop.
-  let invocationToken = 0;
+  // Invokes and `after` timers of every active state node. Leaving a node (or
+  // stopping) drops its entry, so a stale promise or child resolving after the
+  // fact is ignored — no transition, no setState-after-stop.
+  const activities = new Map<StateNode<TContext>, Activity>();
+  let children: Record<string, AnyActor> = {};
 
-  // Pending `after` timer IDs — cleared when the state is exited or the actor stops.
-  let afterTimers: ReturnType<typeof setTimeout>[] = [];
+  const currentValue = () => leaf?.path ?? fallbackValue;
+  const guardMeta: GuardMeta = { matches: path => matchesValue(currentValue(), path) };
+
+  function makeSnapshot(): Snapshot<TContext> {
+    const value = currentValue();
+    return { value, context, status, children, matches: path => matchesValue(value, path) };
+  }
 
   // The snapshot is cached and only replaced on an actual change, so
   // getSnapshot() is referentially stable for useSyncExternalStore.
-  let snapshot: Snapshot<TContext> = { value, context, status };
+  let snapshot = makeSnapshot();
 
   const listeners: SnapshotListener<TContext>[] = [];
+
+  function activeNodes(): StateNode<TContext>[] {
+    const nodes: StateNode<TContext>[] = [];
+    for (let node = leaf; node && node !== root; node = node.parent) {
+      nodes.unshift(node);
+    }
+    return nodes;
+  }
+
+  function pathTo(node: StateNode<TContext>): StateNode<TContext>[] {
+    const nodes: StateNode<TContext>[] = [];
+    for (let current: StateNode<TContext> | undefined = node; current && current !== root; current = current.parent) {
+      nodes.unshift(current);
+    }
+    return nodes;
+  }
 
   /**
    * Normalise a raw `Transition` value into a `TransitionConfig[]` the runtime
@@ -117,135 +231,238 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     transitions: TransitionConfig<TContext, EventObject>[],
     event: EventObject,
   ): TransitionConfig<TContext, EventObject> | undefined {
-    return transitions.find(transition => !transition.guard || transition.guard(context, event));
+    return transitions.find(transition => !transition.guard || transition.guard(context, event, guardMeta));
   }
 
-  /** Whether a target state's entry guard currently permits landing on it. */
-  function canEnter(stateId: string, event: EventObject): boolean {
-    const guard = states[stateId]?.guard;
-    return !guard || guard(context, event);
+  /** Whether a state's entry guard currently permits landing on it. */
+  function canEnter(node: StateNode<TContext>, event: EventObject): boolean {
+    const guard = node.config.guard;
+    return !guard || guard(context, event, guardMeta);
+  }
+
+  function resolveTarget(source: StateNode<TContext>, target: string): StateNode<TContext> | undefined {
+    if (target.startsWith('#')) {
+      const [id = '', ...rest] = target.slice(1).split('.');
+      return descend(ids.get(id), rest.join('.'));
+    }
+    if (target.startsWith('.')) {
+      return descend(source, target.slice(1));
+    }
+    return descend(source.parent ?? root, target);
+  }
+
+  function plan(
+    source: StateNode<TContext>,
+    targetPath: string,
+    event: EventObject,
+  ): { nextLeaf: StateNode<TContext>; exiting: StateNode<TContext>[]; entering: StateNode<TContext>[] } | undefined {
+    const target = resolveTarget(source, targetPath);
+    const nextLeaf = target && initialLeaf(target);
+    if (!target || !nextLeaf) {
+      throw new Error(`Unknown transition target "${targetPath}" from "${source.path}"`);
+    }
+    let domain = isAncestor(source, target) ? source : (source.parent ?? root);
+    while (domain !== root && domain !== source && !isAncestor(domain, target)) {
+      domain = domain.parent ?? root;
+    }
+    const exiting = activeNodes()
+      .filter(node => domain === root || isAncestor(domain, node))
+      .reverse();
+    const entering = pathTo(nextLeaf).filter(node => domain === root || isAncestor(domain, node));
+    if (!entering.every(node => canEnter(node, event))) {
+      return undefined;
+    }
+    return { nextLeaf, exiting, entering };
   }
 
   /**
-   * Run a chosen transition: exit (if external) → actions → enter target.
-   * Returns `false` — a true no-op — when the target's entry guard blocks it, so
-   * the caller skips the commit and subscribers are never notified.
+   * Run a chosen transition: exit → actions → enter target.
+   * Returns `false` — a true no-op — when an entry guard blocks it, so the
+   * caller skips the commit and subscribers are never notified.
    */
-  function takeTransition(transition: TransitionConfig<TContext, EventObject>, event: EventObject): boolean {
-    const external = transition.target !== undefined;
-    if (external && !canEnter(transition.target as string, event)) {
-      return false; // entry guard blocks landing → snapshot unchanged, no notify
+  function takeTransition(
+    transition: TransitionConfig<TContext, EventObject>,
+    event: EventObject,
+    source: StateNode<TContext>,
+  ): boolean {
+    if (transition.target === undefined) {
+      runActions(transition.actions, event);
+      return true;
     }
-    if (external) {
-      runActions(states[value].exit, event);
-      invocationToken++; // abandon the invoke of the state we're leaving
-      clearAfterTimers();
+    const steps = plan(source, transition.target, event);
+    if (!steps) {
+      return false;
+    }
+    for (const node of steps.exiting) {
+      runActions(node.config.exit, event);
+      stopActivity(node);
     }
     runActions(transition.actions, event);
-    if (external) {
-      value = transition.target as string;
-      enterState(event);
+    leaf = steps.nextLeaf;
+    for (const node of steps.entering) {
+      runActions(node.config.entry, event);
     }
+    settle(event);
     return true;
   }
 
-  function startInvoke(event: EventObject): void {
-    const invoke = states[value].invoke;
+  function findTransition(
+    event: EventObject,
+  ): { transition: TransitionConfig<TContext, EventObject>; source: StateNode<TContext> } | undefined {
+    for (const source of activeNodes().reverse()) {
+      const transition = pickTransition(normalizeTransition(source.config.on?.[event.type], event), event);
+      if (transition) {
+        return { transition, source };
+      }
+    }
+    return undefined;
+  }
+
+  function takeAlways(event: EventObject): boolean {
+    for (const source of activeNodes().reverse()) {
+      const immediate = pickTransition(normalizeTransition(source.config.always, event), event);
+      if (immediate && immediate.target !== undefined && takeTransition(immediate, event, source)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function settle(event: EventObject): void {
+    if (leaf?.config.type === 'final' && leaf.parent === root) {
+      status = 'done';
+      stopAllActivities();
+      return;
+    }
+    if (takeAlways(event)) {
+      return;
+    }
+    for (const node of activeNodes()) {
+      if (!activities.has(node)) {
+        const activity: Activity = { timers: [], childId: undefined };
+        activities.set(node, activity);
+        startInvoke(node, activity, event);
+        startAfterTimers(node, activity);
+      }
+    }
+  }
+
+  function fire(node: StateNode<TContext>, activity: Activity, raw: unknown, event: EventObject): void {
+    if (status !== 'active' || activities.get(node) !== activity) {
+      return;
+    }
+    const transition = pickTransition(normalizeTransition(raw, event), event);
+    if (transition && takeTransition(transition, event, node)) {
+      commit();
+    }
+  }
+
+  function startInvoke(node: StateNode<TContext>, activity: Activity, event: EventObject): void {
+    const invoke = node.config.invoke;
     if (!invoke) {
       return;
     }
-    const token = ++invocationToken;
-    // SAFETY: startInvoke is called with the actor's internal EventObject, but
+    if (typeof invoke.src === 'string') {
+      const provided = actors[invoke.src];
+      if (provided === undefined) {
+        throw new Error(`Unknown actor "${invoke.src}" invoked from "${node.path}"`);
+      }
+      if (isMachine(provided)) {
+        startChild(node, activity, invoke, provided);
+      } else {
+        settlePromise(node, activity, invoke, provided(invoke.input?.(context)));
+      }
+      return;
+    }
+    if (isMachine(invoke.src)) {
+      startChild(node, activity, invoke, invoke.src);
+      return;
+    }
+    // SAFETY: an inline src receives the actor's internal EventObject, but
     // InvokeConfig.src is typed to accept (context, TEvent | DoneInvokeEvent | ErrorInvokeEvent).
-    // The cast suppresses that mismatch; src implementations receive the INIT event
-    // on state entry and typically ignore it. The runtime views events through an
-    // event-agnostic lens (line 57) for this reason.
-    Promise.resolve(invoke.src(context, event as never)).then(
+    // src implementations receive the INIT event on state entry and typically ignore it.
+    settlePromise(node, activity, invoke, invoke.src(context, event as never));
+  }
+
+  function settlePromise(
+    node: StateNode<TContext>,
+    activity: Activity,
+    invoke: InvokeConfig<TContext, EventObject>,
+    promise: Promise<unknown>,
+  ): void {
+    Promise.resolve(promise).then(
       output => {
-        if (status !== 'active' || token !== invocationToken) {
-          return;
-        }
-        const doneEvent = { type: INVOKE_DONE, output };
-        const transition = pickTransition(normalizeTransition(invoke.onDone, doneEvent), doneEvent);
-        if (!transition) {
-          return;
-        }
-        if (takeTransition(transition, doneEvent)) {
-          commit();
-        }
+        const done: DoneInvokeEvent = { type: INVOKE_DONE, output };
+        fire(node, activity, invoke.onDone, done);
       },
       (error: unknown) => {
-        if (status !== 'active' || token !== invocationToken) {
-          return;
-        }
-        const errorEvent = { type: INVOKE_ERROR, error };
-        const transition = pickTransition(normalizeTransition(invoke.onError, errorEvent), errorEvent);
-        if (!transition) {
-          return;
-        }
-        if (takeTransition(transition, errorEvent)) {
-          commit();
-        }
+        const failed: ErrorInvokeEvent = { type: INVOKE_ERROR, error };
+        fire(node, activity, invoke.onError, failed);
       },
     );
   }
 
-  function clearAfterTimers(): void {
-    for (const id of afterTimers) {
-      clearTimeout(id);
-    }
-    afterTimers = [];
+  function startChild(
+    node: StateNode<TContext>,
+    activity: Activity,
+    invoke: InvokeConfig<TContext, EventObject>,
+    logic: AnyStateMachine,
+  ): void {
+    const id = invoke.id ?? node.path;
+    const input = invoke.input?.(context);
+    const child = createActor(logic, { context: typeof input === 'object' && input !== null ? input : {}, actors });
+    activity.childId = id;
+    children = { ...children, [id]: child };
+    child.subscribe(childSnapshot => {
+      if (childSnapshot.status === 'done') {
+        const done: DoneInvokeEvent = { type: INVOKE_DONE, output: childSnapshot.context };
+        queueMicrotask(() => fire(node, activity, invoke.onDone, done));
+      }
+    });
+    child.start();
   }
 
-  function startAfterTimers(): void {
-    const afterConfig = states[value].after;
+  function startAfterTimers(node: StateNode<TContext>, activity: Activity): void {
+    const afterConfig = node.config.after;
     if (!afterConfig) {
       return;
     }
-    for (const [delayStr, raw] of Object.entries(afterConfig)) {
+    for (const [delayStr, raw] of Object.entries<Transition<TContext, AfterEvent>>(afterConfig)) {
       const delay = Number(delayStr);
       const id = setTimeout(() => {
-        afterTimers = afterTimers.filter(t => t !== id);
-        if (status !== 'active') {
-          return;
-        }
+        activity.timers = activity.timers.filter(t => t !== id);
         const afterEvent: AfterEvent = { type: AFTER, delay };
-        const transition = pickTransition(normalizeTransition(raw, afterEvent), afterEvent);
-        if (!transition) {
-          return;
-        }
-        if (takeTransition(transition, afterEvent)) {
-          commit();
-        }
+        fire(node, activity, raw, afterEvent);
       }, delay);
-      afterTimers.push(id);
+      activity.timers.push(id);
     }
   }
 
-  /** Entry side of a state: entry actions, then immediate/invoke resolution. */
-  function enterState(event: EventObject): void {
-    const stateConfig = states[value];
-    if (!stateConfig) {
-      return;
-    } // degenerate graph (e.g. empty wizard) — nothing to enter
-    runActions(stateConfig.entry, event);
-
-    if (stateConfig.type === 'final') {
-      status = 'done';
+  function stopActivity(node: StateNode<TContext>): void {
+    const activity = activities.get(node);
+    if (!activity) {
       return;
     }
-
-    const immediate = pickTransition(normalizeTransition(stateConfig.always, event), event);
-    if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
-      return;
+    activities.delete(node);
+    for (const id of activity.timers) {
+      clearTimeout(id);
     }
+    const { childId } = activity;
+    if (childId !== undefined) {
+      const { [childId]: child, ...rest } = children;
+      children = rest;
+      child?.stop();
+    }
+  }
 
-    startInvoke(event);
-    startAfterTimers();
+  function stopAllActivities(): void {
+    for (const node of [...activities.keys()]) {
+      stopActivity(node);
+    }
   }
 
   function commit(): void {
-    snapshot = { value, context, status };
+    snapshot = makeSnapshot();
     for (let i = listeners.length; i--; ) {
       listeners[i](snapshot);
     }
@@ -261,8 +478,12 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       // Reset state and context so a restart (e.g. after StrictMode stop/start)
       // begins from idle rather than re-entering and re-invoking a mid-flight state.
       context = { ...machine.context, ...liveContextPatch };
-      value = resolveInitial();
-      enterState(INIT_EVENT);
+      leaf = initialLeaf(root);
+      fallbackValue = resolveInitial();
+      for (const node of activeNodes()) {
+        runActions(node.config.entry, INIT_EVENT);
+      }
+      settle(INIT_EVENT);
       commit();
       return actor;
     },
@@ -273,9 +494,8 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       }
       started = false; // allow restart (e.g. StrictMode effect cleanup + remount)
       status = 'stopped';
-      invocationToken++; // abandon any in-flight invoke
-      clearAfterTimers();
-      snapshot = { value, context, status };
+      stopAllActivities();
+      snapshot = makeSnapshot();
       for (let i = listeners.length; i--; ) {
         listeners[i](snapshot);
       }
@@ -286,11 +506,11 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       if (!started || status !== 'active') {
         return;
       }
-      const transition = pickTransition(normalizeTransition(states[value]?.on?.[event.type], event), event);
-      if (!transition) {
+      const found = findTransition(event);
+      if (!found) {
         return;
       } // event not handled in this state → ignored
-      if (takeTransition(transition, event)) {
+      if (takeTransition(found.transition, event, found.source)) {
         commit();
       } // entry-blocked → no commit, no notify
     },
@@ -318,11 +538,12 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       if (!started || status !== 'active') {
         return false;
       }
-      const transition = pickTransition(normalizeTransition(states[value]?.on?.[event.type], event), event);
-      if (!transition) {
+      const found = findTransition(event);
+      if (!found) {
         return false;
       }
-      return transition.target === undefined || canEnter(transition.target, event);
+      const { transition, source } = found;
+      return transition.target === undefined || plan(source, transition.target, event) !== undefined;
     },
 
     setContext(patch: Partial<TContext>) {
@@ -341,26 +562,31 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       // resolved initial state — the same derivation used on start (e.g. the
       // Wizard's furthest-reachable step). `resolveInitial` always lands on an
       // enterable step, so this is provably one-shot and cannot loop.
-      if (!canEnter(value, event)) {
-        const reseated = resolveInitial();
-        if (reseated !== value) {
-          runActions(states[value]?.exit, event);
-          invocationToken++; // abandon the invoke of the state we're leaving
-          clearAfterTimers();
-          value = reseated;
-          enterState(event);
+      const active = activeNodes();
+      if (!active.every(node => canEnter(node, event))) {
+        const reseated = initialLeaf(root);
+        if (reseated && reseated !== leaf) {
+          for (const node of active.reverse()) {
+            runActions(node.config.exit, event);
+            stopActivity(node);
+          }
+          leaf = reseated;
+          for (const node of activeNodes()) {
+            runActions(node.config.entry, event);
+          }
+          settle(event);
           commit();
         }
         return;
       }
 
-      const immediate = pickTransition(normalizeTransition(states[value]?.always, event), event);
-      if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
+      if (takeAlways(event)) {
         commit(); // nothing applies → no commit, no notify
       }
     },
   };
 
+  actorMachines.set(actor, machine);
   return actor;
 }
 

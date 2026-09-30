@@ -1,12 +1,26 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { ReverificationController } from '../../features/reverification';
+import { reverificationMachine } from '../../features/reverification/reverification.machine';
 import { deferred } from '../../machines/__tests__/test-utils';
-import { useDestructiveController } from './destructive.controller';
+import { type DestructiveReverification, useDestructiveController } from './destructive.controller';
 
-const idleReverification = { status: 'idle' } as ReverificationController;
+const needsReverification = () =>
+  new ClerkAPIResponseError('reverify', {
+    data: [{ code: 'session_reverification_required', message: 'Reverify', long_message: 'Reverify' }],
+    status: 403,
+  });
+
+function reverification(sessionId: string | null | undefined = 'sess_1'): DestructiveReverification {
+  return {
+    sessionId,
+    actors: {
+      reverification: reverificationMachine,
+      startVerification: () => new Promise(() => {}),
+    },
+  };
+}
 
 describe('useDestructiveController', () => {
   it('starts closed and opens from the opener or from onOpenChange', () => {
@@ -28,9 +42,7 @@ describe('useDestructiveController', () => {
   it('ignores the opener once the dialog is already open', () => {
     const { result } = renderHook(() => useDestructiveController({ onDelete: () => Promise.resolve() }));
     act(() => result.current.onOpenChange(true));
-    act(() => {
-      void result.current.onDelete();
-    });
+    act(() => result.current.onDelete());
 
     act(() => result.current.openDestructiveDialog());
 
@@ -43,9 +55,7 @@ describe('useDestructiveController', () => {
     const { result } = renderHook(() => useDestructiveController({ onDelete }));
     act(() => result.current.onOpenChange(true));
 
-    act(() => {
-      void result.current.onDelete();
-    });
+    act(() => result.current.onDelete());
     expect(onDelete).toHaveBeenCalledOnce();
     expect(result.current.open).toBe(true);
     expect(result.current.isDeleting).toBe(true);
@@ -66,83 +76,20 @@ describe('useDestructiveController', () => {
     const { result } = renderHook(() => useDestructiveController({ onDelete }));
     act(() => result.current.onOpenChange(true));
 
-    await act(async () => {
-      await result.current.onDelete();
-    });
+    act(() => result.current.onDelete());
+    await waitFor(() => expect(result.current.errorMessage).toBe('Something went wrong'));
     expect(result.current.open).toBe(true);
     expect(result.current.isDeleting).toBe(false);
-    expect(result.current.errorMessage).toBe('Something went wrong');
 
-    await act(async () => {
-      await result.current.onDelete();
-    });
+    act(() => result.current.onDelete());
     await waitFor(() => expect(result.current.open).toBe(false));
     expect(onDelete).toHaveBeenCalledTimes(2);
   });
 
-  it('closes without a message when reverification is cancelled', async () => {
-    const onDelete = vi.fn(() =>
-      Promise.reject(new ClerkRuntimeError('cancelled', { code: 'reverification_cancelled' })),
-    );
-    const { result } = renderHook(() => useDestructiveController({ onDelete, reverification: idleReverification }));
+  it('ignores a close while the action is in flight', () => {
+    const { result } = renderHook(() => useDestructiveController({ onDelete: () => new Promise(() => {}) }));
     act(() => result.current.onOpenChange(true));
-
-    await act(async () => {
-      await result.current.onDelete();
-    });
-
-    expect(result.current.open).toBe(false);
-    expect(result.current.errorMessage).toBeUndefined();
-  });
-
-  it('ignores a close while the action is in flight, unless reverification is active', async () => {
-    const pending = deferred<void>();
-    const { result } = renderHook(() =>
-      useDestructiveController({ onDelete: () => pending.promise, reverification: idleReverification }),
-    );
-    act(() => result.current.onOpenChange(true));
-    act(() => {
-      void result.current.onDelete();
-    });
-
-    act(() => result.current.onOpenChange(false));
-    expect(result.current.open).toBe(true);
-    expect(result.current.isDeleting).toBe(true);
-
-    await act(async () => {
-      pending.resolve();
-      await pending.promise;
-    });
-  });
-
-  it('lets an active reverification close the dialog while the action is still pending', () => {
-    const { result } = renderHook(() =>
-      useDestructiveController({
-        onDelete: () => new Promise(() => {}),
-        reverification: { status: 'ready', onCancel: vi.fn() } as ReverificationController,
-      }),
-    );
-    act(() => result.current.onOpenChange(true));
-    act(() => {
-      void result.current.onDelete();
-    });
-
-    act(() => result.current.onOpenChange(false));
-
-    expect(result.current.open).toBe(false);
-  });
-
-  it('ignores a close while reverification is retrying the action', () => {
-    const { result } = renderHook(() =>
-      useDestructiveController({
-        onDelete: () => new Promise(() => {}),
-        reverification: { status: 'retrying' } as ReverificationController,
-      }),
-    );
-    act(() => result.current.onOpenChange(true));
-    act(() => {
-      void result.current.onDelete();
-    });
+    act(() => result.current.onDelete());
 
     act(() => result.current.onOpenChange(false));
 
@@ -150,62 +97,90 @@ describe('useDestructiveController', () => {
     expect(result.current.isDeleting).toBe(true);
   });
 
-  it('is on the confirm step without reverification', () => {
-    const { result } = renderHook(() => useDestructiveController({ onDelete: () => Promise.resolve() }));
+  it('moves to the verify step and exposes the reverification actor when reverification is required', async () => {
+    const { result } = renderHook(() =>
+      useDestructiveController({
+        onDelete: () => Promise.reject(needsReverification()),
+        reverification: reverification(),
+      }),
+    );
+    act(() => result.current.onOpenChange(true));
+    expect(result.current.step).toBe('confirm');
 
+    act(() => result.current.onDelete());
+
+    await waitFor(() => expect(result.current.step).toBe('verify'));
+    expect(result.current.verification).toBeDefined();
+    expect(result.current.isDeleting).toBe(false);
+  });
+
+  it('shows the error when reverification is required but not wired', async () => {
+    const { result } = renderHook(() =>
+      useDestructiveController({ onDelete: () => Promise.reject(needsReverification()) }),
+    );
+    act(() => result.current.onOpenChange(true));
+
+    act(() => result.current.onDelete());
+
+    await waitFor(() => expect(result.current.errorMessage).toBe('Something went wrong'));
     expect(result.current.step).toBe('confirm');
   });
 
-  it.each([
-    ['idle', 'confirm'],
-    ['loading', 'confirm'],
-    ['unavailable', 'verify'],
-    ['ready', 'verify'],
-    ['retrying', 'verify'],
-  ] as const)('reverification status %s uses the %s step', (status, step) => {
+  it('stops reverification when the dialog closes', async () => {
     const { result } = renderHook(() =>
       useDestructiveController({
-        onDelete: () => Promise.resolve(),
-        reverification: { status } as ReverificationController,
-      }),
-    );
-
-    expect(result.current.step).toBe(step);
-  });
-
-  it('cancels reverification when the dialog closes', () => {
-    const onCancel = vi.fn();
-    const { result } = renderHook(() =>
-      useDestructiveController({
-        onDelete: () => new Promise(() => {}),
-        reverification: { status: 'ready', onCancel } as ReverificationController,
+        onDelete: () => Promise.reject(needsReverification()),
+        reverification: reverification(),
       }),
     );
     act(() => result.current.onOpenChange(true));
-    act(() => {
-      void result.current.onDelete();
-    });
+    act(() => result.current.onDelete());
+    await waitFor(() => expect(result.current.verification).toBeDefined());
+    const child = result.current.verification;
 
     act(() => result.current.onOpenChange(false));
 
-    expect(onCancel).toHaveBeenCalledOnce();
+    expect(result.current.open).toBe(false);
+    expect(result.current.verification).toBeUndefined();
+    expect(child?.getSnapshot().status).toBe('stopped');
+  });
+
+  it('closes when the session changes during reverification', async () => {
+    const { result, rerender } = renderHook(
+      ({ sessionId }) =>
+        useDestructiveController({
+          onDelete: () => Promise.reject(needsReverification()),
+          reverification: reverification(sessionId),
+        }),
+      { initialProps: { sessionId: 'sess_1' } },
+    );
+    act(() => result.current.onOpenChange(true));
+    act(() => result.current.onDelete());
+    await waitFor(() => expect(result.current.step).toBe('verify'));
+
+    rerender({ sessionId: 'sess_2' });
+
     expect(result.current.open).toBe(false);
   });
 
-  it('does not cancel reverification when a close is ignored', () => {
-    const { result } = renderHook(() =>
-      useDestructiveController({
-        onDelete: () => new Promise(() => {}),
-        reverification: { status: 'retrying' } as ReverificationController,
-      }),
+  it('closes when the session is signed out during reverification, but not when it briefly unloads', async () => {
+    const { result, rerender } = renderHook(
+      ({ sessionId }: { sessionId: string | null | undefined }) =>
+        useDestructiveController({
+          onDelete: () => Promise.reject(needsReverification()),
+          reverification: reverification(sessionId),
+        }),
+      { initialProps: { sessionId: 'sess_1' } },
     );
     act(() => result.current.onOpenChange(true));
-    act(() => {
-      void result.current.onDelete();
-    });
+    act(() => result.current.onDelete());
+    await waitFor(() => expect(result.current.step).toBe('verify'));
 
-    act(() => result.current.onOpenChange(false));
+    rerender({ sessionId: undefined });
+    rerender({ sessionId: 'sess_1' });
+    expect(result.current.step).toBe('verify');
 
-    expect(result.current.open).toBe(true);
+    rerender({ sessionId: null });
+    expect(result.current.open).toBe(false);
   });
 });

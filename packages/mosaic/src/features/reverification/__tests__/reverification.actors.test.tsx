@@ -4,19 +4,7 @@ import type { PreferredSignInStrategy, SessionVerificationResource } from '@cler
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  type ReverificationActiveModel,
-  type ReverificationModel,
-  useReverificationModel,
-} from '../reverification.model';
-
-function active(model: ReverificationModel): ReverificationActiveModel {
-  expect(model.status).toBe('active');
-  if (model.status !== 'active') {
-    throw new Error('expected active');
-  }
-  return model;
-}
+import { useReverificationActors } from '../reverification.actors';
 
 let session:
   | {
@@ -32,7 +20,6 @@ let session:
   | undefined;
 let environmentHydrated: boolean;
 let preferredSignInStrategy: PreferredSignInStrategy;
-let supportEmail: string | undefined;
 let webAuthnSupported: boolean;
 let setActive: ReturnType<typeof vi.fn>;
 
@@ -53,10 +40,6 @@ vi.mock('../../../hooks/useMosaicEnvironment', () => ({
   useMosaicEnvironment: () => environment(),
 }));
 
-vi.mock('../../../hooks/useMosaicSupportEmail', () => ({
-  useMosaicSupportEmail: () => supportEmail,
-}));
-
 vi.mock('@clerk/shared/webauthn', () => ({
   isWebAuthnSupported: () => webAuthnSupported,
 }));
@@ -72,16 +55,7 @@ function resource(overrides: Partial<SessionVerificationResource> = {}): Session
   } as SessionVerificationResource;
 }
 
-function activeProps() {
-  return {
-    phase: 'active' as const,
-    complete: vi.fn(),
-    cancel: vi.fn(),
-    level: 'first_factor' as const,
-  };
-}
-
-describe('useReverificationModel', () => {
+describe('useReverificationActors', () => {
   beforeEach(() => {
     session = {
       id: 'sess_1',
@@ -94,52 +68,15 @@ describe('useReverificationModel', () => {
     };
     environmentHydrated = true;
     preferredSignInStrategy = 'password';
-    supportEmail = 'support@example.com';
     webAuthnSupported = true;
     setActive = vi.fn().mockResolvedValue(undefined);
   });
 
-  it('is loading until the session and environment are both present', () => {
-    session = null;
-    const cancel = vi.fn();
-    const { result } = renderHook(() => useReverificationModel({ ...activeProps(), cancel }));
-    expect(result.current.status).toBe('loading');
-    if (result.current.status === 'loading') {
-      result.current.cancel();
-    }
-    expect(cancel).toHaveBeenCalledOnce();
-  });
-
-  it('is loading until supportEmail is resolved', () => {
-    supportEmail = undefined;
-    const { result } = renderHook(() => useReverificationModel(activeProps()));
-    expect(result.current.status).toBe('loading');
-  });
-
-  it('is active when props are active', () => {
-    const { result } = renderHook(() => useReverificationModel(activeProps()));
-    expect(active(result.current).supportEmail).toBe('support@example.com');
-  });
-
-  it('is inactive when props are idle, regardless of hydration', () => {
-    session = null;
-    environmentHydrated = false;
-    const { result } = renderHook(() => useReverificationModel({ phase: 'inactive' }));
-    expect(result.current).toEqual({ status: 'inactive' });
-  });
-
-  it('is retrying when props are retrying, regardless of hydration', () => {
-    session = null;
-    environmentHydrated = false;
-    const { result } = renderHook(() => useReverificationModel({ phase: 'retrying' }));
-    expect(result.current).toEqual({ status: 'retrying' });
-  });
-
   it('defaults to second-factor verification when no level is provided', async () => {
     session?.startVerification.mockResolvedValue(resource());
-    const { result } = renderHook(() => useReverificationModel({ ...activeProps(), level: undefined }));
+    const { result } = renderHook(() => useReverificationActors());
 
-    await active(result.current).start();
+    await result.current.actors.startVerification(undefined);
 
     expect(session?.startVerification).toHaveBeenCalledWith({ level: 'second_factor' });
   });
@@ -162,8 +99,8 @@ describe('useReverificationModel', () => {
       }),
     );
 
-    const { result } = renderHook(() => useReverificationModel(activeProps()));
-    const started = await active(result.current).start();
+    const { result } = renderHook(() => useReverificationActors());
+    const started = await result.current.actors.startVerification('first_factor');
 
     expect(session?.startVerification).toHaveBeenCalledWith({ level: 'first_factor' });
     expect(started.methods.map(method => method.strategy)).toEqual(['password', 'email_code']);
@@ -184,8 +121,8 @@ describe('useReverificationModel', () => {
       }),
     );
 
-    const { result } = renderHook(() => useReverificationModel(activeProps()));
-    const started = await active(result.current).start();
+    const { result } = renderHook(() => useReverificationActors());
+    const started = await result.current.actors.startVerification('first_factor');
     expect(started.startingMethod?.strategy).toBe('passkey');
   });
 
@@ -202,8 +139,8 @@ describe('useReverificationModel', () => {
       }),
     );
 
-    const { result } = renderHook(() => useReverificationModel({ ...activeProps(), level: 'second_factor' }));
-    const started = await active(result.current).start();
+    const { result } = renderHook(() => useReverificationActors());
+    const started = await result.current.actors.startVerification('second_factor');
     expect(started.status).toBe('needs_second_factor');
     expect(started.startingMethod).toEqual({ id: 'totp', stage: 'second', strategy: 'totp' });
     expect(started.methods.find(method => method.strategy === 'phone_code')).toEqual({
@@ -220,9 +157,9 @@ describe('useReverificationModel', () => {
     session?.prepareFirstFactorVerification.mockResolvedValue(resource());
     session?.attemptFirstFactorVerification.mockResolvedValue(resource({ status: 'complete' }));
 
-    const { result } = renderHook(() => useReverificationModel(activeProps()));
-    await active(result.current).start();
-    await active(result.current).prepare({
+    const { result } = renderHook(() => useReverificationActors());
+    await result.current.actors.startVerification('first_factor');
+    await result.current.actors.prepareFactor({
       id: 'email_code:idn_1',
       stage: 'first',
       strategy: 'email_code',
@@ -234,13 +171,16 @@ describe('useReverificationModel', () => {
       emailAddressId: 'idn_1',
     });
 
-    await active(result.current).attempt({ id: 'password', stage: 'first', strategy: 'password' }, 'secret');
+    await result.current.actors.attemptFactor({
+      method: { id: 'password', stage: 'first', strategy: 'password' },
+      value: 'secret',
+    });
     expect(session?.attemptFirstFactorVerification).toHaveBeenCalledWith({
       strategy: 'password',
       password: 'secret',
     });
 
-    await active(result.current).prepare({
+    await result.current.actors.prepareFactor({
       id: 'phone_code:pn_1',
       stage: 'first',
       strategy: 'phone_code',
@@ -264,9 +204,9 @@ describe('useReverificationModel', () => {
     session?.prepareSecondFactorVerification.mockResolvedValue(resource({ status: 'needs_second_factor' }));
     session?.attemptSecondFactorVerification.mockResolvedValue(resource({ status: 'complete' }));
 
-    const { result } = renderHook(() => useReverificationModel({ ...activeProps(), level: 'second_factor' }));
-    await active(result.current).start();
-    await active(result.current).prepare({
+    const { result } = renderHook(() => useReverificationActors());
+    await result.current.actors.startVerification('second_factor');
+    await result.current.actors.prepareFactor({
       id: 'phone_code:pn_1',
       stage: 'second',
       strategy: 'phone_code',
@@ -278,15 +218,21 @@ describe('useReverificationModel', () => {
       phoneNumberId: 'pn_1',
     });
 
-    await active(result.current).attempt({ id: 'totp', stage: 'second', strategy: 'totp' }, '123456');
+    await result.current.actors.attemptFactor({
+      method: { id: 'totp', stage: 'second', strategy: 'totp' },
+      value: '123456',
+    });
     expect(session?.attemptSecondFactorVerification).toHaveBeenCalledWith({ strategy: 'totp', code: '123456' });
   });
 
   it('verifies a passkey', async () => {
     session?.verifyWithPasskey.mockResolvedValue(resource({ status: 'complete' }));
-    const { result } = renderHook(() => useReverificationModel(activeProps()));
+    const { result } = renderHook(() => useReverificationActors());
 
-    await active(result.current).attempt({ id: 'passkey', stage: 'first', strategy: 'passkey' }, '');
+    await result.current.actors.attemptFactor({
+      method: { id: 'passkey', stage: 'first', strategy: 'passkey' },
+      value: '',
+    });
     expect(session?.verifyWithPasskey).toHaveBeenCalledOnce();
   });
 
@@ -304,37 +250,44 @@ describe('useReverificationModel', () => {
       }),
     );
 
-    const { result } = renderHook(() => useReverificationModel(activeProps()));
+    const { result } = renderHook(() => useReverificationActors());
     await expect(
-      active(result.current).attempt({ id: 'password', stage: 'first', strategy: 'password' }, 'bad'),
+      result.current.actors.attemptFactor({
+        method: { id: 'password', stage: 'first', strategy: 'password' },
+        value: 'bad',
+      }),
     ).rejects.toMatchObject({ message: 'That password is incorrect.' });
   });
 
-  it('activates the verified session before complete', async () => {
-    session?.startVerification.mockResolvedValue(resource({ status: 'complete' }));
-    const order: string[] = [];
-    setActive.mockImplementation(() => {
-      order.push('setActive');
-    });
-    const props = activeProps();
-    props.complete.mockImplementation(() => {
-      order.push('complete');
-    });
-    const { result } = renderHook(() => useReverificationModel(props));
-    const started = await active(result.current).start();
-    expect(started).toEqual({ status: 'complete', methods: [], startingMethod: null });
-    await active(result.current).finish();
+  it('activates the verified session to finish', async () => {
+    const { result } = renderHook(() => useReverificationActors());
+
+    await result.current.actors.finishVerification();
+
     expect(setActive).toHaveBeenCalledWith({ session: 'sess_1' });
-    expect(order).toEqual(['setActive', 'complete']);
   });
 
-  it('does not call complete when setActive fails', async () => {
+  it('rewrites a failed setActive to a plain Error', async () => {
     setActive.mockRejectedValue(new Error('Session could not be activated.'));
-    const props = activeProps();
-    const { result } = renderHook(() => useReverificationModel(props));
+    const { result } = renderHook(() => useReverificationActors());
 
-    await expect(active(result.current).finish()).rejects.toMatchObject({ message: 'Session could not be activated.' });
-    expect(setActive).toHaveBeenCalledWith({ session: 'sess_1' });
-    expect(props.complete).not.toHaveBeenCalled();
+    await expect(result.current.actors.finishVerification()).rejects.toMatchObject({
+      message: 'Session could not be activated.',
+    });
+  });
+
+  it('fails verification when there is no session', async () => {
+    session = null;
+    const { result } = renderHook(() => useReverificationActors());
+
+    await expect(result.current.actors.startVerification(undefined)).rejects.toBeInstanceOf(Error);
+    expect(result.current.sessionId).toBeNull();
+  });
+
+  it('reports an unloaded session as undefined', () => {
+    session = undefined;
+    const { result } = renderHook(() => useReverificationActors());
+
+    expect(result.current.sessionId).toBeUndefined();
   });
 });

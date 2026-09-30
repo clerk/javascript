@@ -53,6 +53,32 @@ describe('useMachine — drives a flow from a component', () => {
     expect(screen.getByTestId('state')).toHaveTextContent('deleted');
   });
 
+  it('invokes the latest provided actor after a re-render', async () => {
+    const machine = createMachine<object, { type: 'RUN' }>({
+      initial: 'idle',
+      states: {
+        idle: { on: { RUN: 'running' } },
+        running: { invoke: { src: 'work', onDone: 'idle' } },
+      },
+    });
+    const first = vi.fn(() => Promise.resolve());
+    const second = vi.fn(() => Promise.resolve());
+
+    function Runner({ work }: { work: () => Promise<void> }) {
+      const [, send] = useMachine(machine, { actors: { work } });
+      return <button onClick={() => send({ type: 'RUN' })}>Run</button>;
+    }
+
+    const { rerender } = render(<Runner work={first} />);
+    rerender(<Runner work={second} />);
+    await act(async () => {
+      fireEvent.click(screen.getByText('Run'));
+    });
+
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledTimes(1);
+  });
+
   it('exposes the actor so components can ask whether a transition is available', () => {
     function DeleteOrg() {
       const [, send, actor] = useMachine(createDeleteOrgMachine(() => Promise.resolve()));

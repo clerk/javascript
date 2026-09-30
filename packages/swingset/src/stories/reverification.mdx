@@ -17,16 +17,14 @@ The example pauses briefly in each pending state. Enter `error` in password or b
 
 ## Usage
 
-The feature wrapper reads Clerk state and drives the reverification flow. It renders nothing while `status` is `idle`. While a challenge is still preparing, the parent card shows a verification header, a centered spinner, and a disabled continue button, then shows the factor without a step transition. Keep the same card around the component for a ready factor, a pending retry, or the unavailable state. Isolated panel stories below are for visual development only.
+Reverification runs as a child machine of the flow that needs it, such as `Destructive`. `Reverification` renders that child and renders nothing without one. While a challenge is still preparing, the parent card shows a verification header, a centered spinner, and a disabled continue button, then shows the factor without a step transition. Keep the same card around the component for a ready factor, a pending retry, or the unavailable state. Isolated panel stories below are for visual development only.
 
 ```tsx
 import { Card } from '@clerk/mosaic/components/card';
-import { Reverification, useReverificationFlow } from '@clerk/mosaic/features/reverification';
-
-const [runAction, reverification] = useReverificationFlow(action);
+import { Reverification } from '@clerk/mosaic/features/reverification';
 
 <Card.Root renderBranding={false}>
-  <Reverification {...reverification} />
+  <Reverification actor={destructive.verification} />
 </Card.Root>;
 ```
 

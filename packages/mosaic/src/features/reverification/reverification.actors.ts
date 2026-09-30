@@ -9,31 +9,9 @@ import type {
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 
 import { useMosaicEnvironment } from '../../hooks/useMosaicEnvironment';
-import { useMosaicSupportEmail } from '../../hooks/useMosaicSupportEmail';
-import type {
-  ReverificationMethod,
-  ReverificationPreparableMethod,
-  ReverificationResult,
-  ReverificationStage,
-  ReverificationState,
-} from './reverification.types';
+import { type ReverificationActors, reverificationMachine } from './reverification.machine';
+import type { ReverificationMethod, ReverificationResult, ReverificationStage } from './reverification.types';
 import { pickStartingMethod } from './reverification.utils';
-
-export type ReverificationActiveModel = {
-  status: 'active';
-  supportEmail: string;
-  start: () => Promise<ReverificationResult>;
-  prepare: (method: ReverificationPreparableMethod) => Promise<void>;
-  attempt: (method: ReverificationMethod, value: string) => Promise<ReverificationResult>;
-  finish: () => Promise<void>;
-  cancel: () => void;
-};
-
-export type ReverificationModel =
-  | { status: 'inactive' }
-  | { status: 'loading'; cancel: () => void }
-  | ReverificationActiveModel
-  | { status: 'retrying' };
 
 function toError(error: unknown): Error {
   if (isClerkAPIResponseError(error)) {
@@ -117,109 +95,91 @@ function toResult(
   };
 }
 
-export function useReverificationModel(reverificationState: ReverificationState): ReverificationModel {
+async function rethrow<T>(work: () => Promise<T>): Promise<T> {
+  try {
+    return await work();
+  } catch (error) {
+    throw toError(error);
+  }
+}
+
+export function useReverificationActors(): {
+  sessionId: string | null | undefined;
+  actors: ReverificationActors & { reverification: typeof reverificationMachine };
+} {
   const { session } = useSession();
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
-  const supportEmail = useMosaicSupportEmail();
 
-  if (reverificationState.phase === 'inactive') {
-    return { status: 'inactive' };
-  }
-
-  if (reverificationState.phase === 'retrying') {
-    return { status: 'retrying' };
-  }
-
-  const { level, cancel, complete } = reverificationState;
-
-  if (!session || !environment || supportEmail === undefined) {
-    return { status: 'loading', cancel };
-  }
-
-  const webAuthnSupported = isWebAuthnSupported();
-  const preferredSignInStrategy = environment.displayConfig.preferredSignInStrategy;
-
+  const verifiedSession = () => {
+    if (!session) {
+      throw new Error('Something went wrong. Please try again.');
+    }
+    return session;
+  };
   const handleResponse = (resource: SessionVerificationResource) =>
-    toResult(resource, preferredSignInStrategy, webAuthnSupported);
+    toResult(resource, environment?.displayConfig.preferredSignInStrategy, isWebAuthnSupported());
 
-  return {
-    status: 'active',
-    supportEmail,
-    start: async () => {
-      try {
-        return handleResponse(await session.startVerification({ level: level ?? 'second_factor' }));
-      } catch (error) {
-        throw toError(error);
-      }
-    },
-    cancel,
-    prepare: async method => {
-      try {
-        switch (method.strategy) {
-          case 'email_code':
-            await session.prepareFirstFactorVerification({
-              strategy: 'email_code',
-              emailAddressId: method.emailAddressId,
-            });
-            return;
-          case 'phone_code':
-            if (method.stage === 'second') {
-              await session.prepareSecondFactorVerification({
-                strategy: 'phone_code',
-                phoneNumberId: method.phoneNumberId,
-              });
-              return;
-            }
-            await session.prepareFirstFactorVerification({
-              strategy: 'phone_code',
-              phoneNumberId: method.phoneNumberId,
-            });
-            return;
+  const actors: ReverificationActors = {
+    startVerification: level =>
+      rethrow(async () =>
+        handleResponse(await verifiedSession().startVerification({ level: level ?? 'second_factor' })),
+      ),
+    prepareFactor: method =>
+      rethrow(async () => {
+        const current = verifiedSession();
+        if (method.strategy === 'email_code') {
+          await current.prepareFirstFactorVerification({
+            strategy: 'email_code',
+            emailAddressId: method.emailAddressId,
+          });
+        } else if (method.stage === 'second') {
+          await current.prepareSecondFactorVerification({
+            strategy: 'phone_code',
+            phoneNumberId: method.phoneNumberId,
+          });
+        } else {
+          await current.prepareFirstFactorVerification({ strategy: 'phone_code', phoneNumberId: method.phoneNumberId });
         }
-      } catch (error) {
-        throw toError(error);
-      }
-    },
-    attempt: async (method, value) => {
-      try {
+      }),
+    attemptFactor: ({ method, value }) =>
+      rethrow(async () => {
+        const current = verifiedSession();
         switch (method.strategy) {
           case 'password':
             return handleResponse(
-              await session.attemptFirstFactorVerification({ strategy: 'password', password: value }),
+              await current.attemptFirstFactorVerification({ strategy: 'password', password: value }),
             );
           case 'email_code':
             return handleResponse(
-              await session.attemptFirstFactorVerification({ strategy: 'email_code', code: value }),
+              await current.attemptFirstFactorVerification({ strategy: 'email_code', code: value }),
             );
           case 'phone_code':
             if (method.stage === 'second') {
               return handleResponse(
-                await session.attemptSecondFactorVerification({ strategy: 'phone_code', code: value }),
+                await current.attemptSecondFactorVerification({ strategy: 'phone_code', code: value }),
               );
             }
             return handleResponse(
-              await session.attemptFirstFactorVerification({ strategy: 'phone_code', code: value }),
+              await current.attemptFirstFactorVerification({ strategy: 'phone_code', code: value }),
             );
           case 'totp':
           case 'backup_code':
             return handleResponse(
-              await session.attemptSecondFactorVerification({ strategy: method.strategy, code: value }),
+              await current.attemptSecondFactorVerification({ strategy: method.strategy, code: value }),
             );
           case 'passkey':
-            return handleResponse(await session.verifyWithPasskey());
+            return handleResponse(await current.verifyWithPasskey());
         }
-      } catch (error) {
-        throw toError(error);
-      }
-    },
-    finish: async () => {
-      try {
-        await clerk.setActive({ session: session.id });
-        complete();
-      } catch (error) {
-        throw toError(error);
-      }
-    },
+      }),
+    finishVerification: () =>
+      rethrow(async () => {
+        await clerk.setActive({ session: verifiedSession().id });
+      }),
+  };
+
+  return {
+    sessionId: session === undefined ? undefined : (session?.id ?? null),
+    actors: { reverification: reverificationMachine, ...actors },
   };
 }

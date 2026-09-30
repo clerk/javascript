@@ -16,8 +16,16 @@ export interface AnyEventObject extends EventObject {
   [key: string]: unknown;
 }
 
+export interface GuardMeta {
+  matches: (path: string) => boolean;
+}
+
 /** Pure predicate that gates a transition. */
-export type Guard<TContext, TEvent extends EventObject> = (context: TContext, event: TEvent) => boolean;
+export type Guard<TContext, TEvent extends EventObject> = (
+  context: TContext,
+  event: TEvent,
+  meta: GuardMeta,
+) => boolean;
 
 /** A side-effecting action — runs for its effect, returns nothing. */
 export type ActionFunction<TContext, TEvent extends EventObject> = (context: TContext, event: TEvent) => void;
@@ -108,6 +116,17 @@ export interface AfterEvent extends EventObject {
   delay: number;
 }
 
+export type PromiseSrc<TContext, TEvent extends EventObject, TOutput> = (
+  context: TContext,
+  event: TEvent | DoneInvokeEvent | ErrorInvokeEvent,
+) => Promise<TOutput>;
+
+export type AnyStateMachine = StateMachine<any, any>;
+
+export type ProvidedActor = AnyStateMachine | ((input: any) => Promise<unknown>);
+
+export type ProvidedActors = Record<string, ProvidedActor>;
+
 /** Invoke a promise on state entry and branch on its settlement. */
 export interface InvokeConfig<
   TContext,
@@ -115,13 +134,17 @@ export interface InvokeConfig<
   TOutput = unknown,
   TStates extends string = string,
 > {
-  /** Started on entry. The resolved value lands on `onDone` events as `output`. */
-  src: (context: TContext, event: TEvent | DoneInvokeEvent | ErrorInvokeEvent) => Promise<TOutput>;
+  src: PromiseSrc<TContext, TEvent, TOutput> | AnyStateMachine | string;
+  id?: string;
+  input?: (context: TContext) => unknown;
   onDone?: Transition<TContext, DoneInvokeEvent<TOutput>, TStates>;
   onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
 }
 
 export interface StateConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
+  id?: string;
+  initial?: string;
+  states?: Record<string, StateConfig<TContext, TEvent, string>>;
   /**
    * Entry precondition — "may navigation LAND on this state right now?". Checked
    * uniformly by *every* transition (and the derived initial) that targets this
@@ -196,11 +219,15 @@ export interface StateMachine<TContext, TEvent extends EventObject> {
 
 export type ActorStatus = 'active' | 'done' | 'stopped';
 
+export type AnyActor = Actor<object, never>;
+
 /** A point-in-time view of a running actor. */
 export interface Snapshot<TContext> {
   value: string;
   context: TContext;
   status: ActorStatus;
+  children: Readonly<Record<string, AnyActor>>;
+  matches: (path: string) => boolean;
 }
 
 /** A subscriber receives the latest snapshot on every transition. */
@@ -256,4 +283,5 @@ export interface CreateActorOptions<TContext> {
    * actions, immediates, or invokes run for the teleported state).
    */
   snapshot?: { value: string; context?: Partial<TContext> };
+  actors?: ProvidedActors;
 }

@@ -1,84 +1,57 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
 
-import type { ReverificationController } from '../../features/reverification';
+import type { AnyActor, ProvidedActors } from '../../machine/types';
+import { useMachine } from '../../machine/useMachine';
 import type { DestructiveControlledProps } from './destructive';
+import { destructiveMachine } from './destructive.machine';
 
 export type DestructiveController = Pick<
   DestructiveControlledProps,
   'open' | 'isDeleting' | 'errorMessage' | 'onOpenChange' | 'step'
 > & {
-  onDelete: () => Promise<unknown>;
+  onDelete: () => void;
   openDestructiveDialog: () => void;
+  verification: AnyActor | undefined;
 };
 
-type DestructiveState =
-  | { status: 'closed' }
-  | { status: 'open-needs-confirmation' }
-  | { status: 'open-pending' }
-  | { status: 'open-error'; errorMessage: string };
+export interface DestructiveReverification {
+  actors: ProvidedActors;
+  sessionId: string | null | undefined;
+}
 
-/** Optional controller for use with Destructive block */
 export function useDestructiveController({
   onDelete,
   reverification,
 }: {
   onDelete: () => Promise<unknown>;
-  reverification?: ReverificationController;
+  reverification?: DestructiveReverification;
 }): DestructiveController {
-  const [destructiveState, setDestructiveState] = useState<DestructiveState>({ status: 'closed' });
-  const { status } = destructiveState;
+  const [snapshot, send] = useMachine(destructiveMachine, {
+    context: { reverifiable: reverification !== undefined },
+    actors: { ...reverification?.actors, action: onDelete },
+  });
 
-  const openDestructiveDialog = () => {
-    if (status === 'closed') {
-      setDestructiveState({ status: 'open-needs-confirmation' });
+  const sessionId = reverification?.sessionId;
+  const knownSessionId = useRef(sessionId);
+  useEffect(() => {
+    if (sessionId === undefined) {
+      return;
     }
-  };
-
-  const isDeleting = status === 'open-pending';
-  const step =
-    reverification && reverification.status !== 'idle' && reverification.status !== 'loading' ? 'verify' : 'confirm';
+    const previous = knownSessionId.current;
+    knownSessionId.current = sessionId;
+    if (previous !== undefined && previous !== sessionId) {
+      send({ type: 'SESSION_CHANGED' });
+    }
+  }, [sessionId, send]);
 
   return {
-    open: status !== 'closed',
-    isDeleting,
-    errorMessage: status === 'open-error' ? destructiveState.errorMessage : undefined,
-    step,
-    openDestructiveDialog,
-    onDelete: async () => {
-      if (status === 'open-needs-confirmation' || status === 'open-error') {
-        setDestructiveState({ status: 'open-pending' });
-        try {
-          await onDelete();
-          // TODO: It's possible this might give a flash of the confirm page after
-          //       reverification.
-          //       While we do stay on the current page throughout the retry, the
-          //       useReverificationWithState `.finally` runs first and sets phase
-          //       to inactive. That resets the reverification state and this
-          //       dialog could flash to the first screen. Unconfirmed.
-          setDestructiveState({ status: 'closed' });
-        } catch (error: unknown) {
-          if (isReverificationCancelledError(error)) {
-            setDestructiveState({ status: 'closed' });
-            return;
-          }
-          // TODO: Better error handling, localization
-          setDestructiveState({ status: 'open-error', errorMessage: 'Something went wrong' });
-        }
-      }
-    },
-    onOpenChange: nextIsOpen => {
-      const cancelReverification = reverification?.onCancel;
-      if (!nextIsOpen && isDeleting && !cancelReverification) {
-        return;
-      }
-
-      if (nextIsOpen) {
-        setDestructiveState({ status: 'open-needs-confirmation' });
-      } else {
-        cancelReverification?.();
-        setDestructiveState({ status: 'closed' });
-      }
-    },
+    open: snapshot.matches('open'),
+    isDeleting: snapshot.matches('open.running') || snapshot.matches('open.verifying.retrying'),
+    errorMessage: snapshot.matches('open.failed') ? snapshot.context.errorMessage : undefined,
+    step: snapshot.matches('open.verifying') ? 'verify' : 'confirm',
+    verification: snapshot.children.reverification,
+    openDestructiveDialog: () => send({ type: 'OPEN' }),
+    onDelete: () => send({ type: 'CONFIRM' }),
+    onOpenChange: nextIsOpen => send(nextIsOpen ? { type: 'OPEN' } : { type: 'CLOSE' }),
   };
 }
