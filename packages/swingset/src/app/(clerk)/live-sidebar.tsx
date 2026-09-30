@@ -23,6 +23,7 @@ const flows = [
   { title: 'API keys', href: '/live/api-keys' },
   { title: 'Password', href: '/live/password' },
   { title: 'Connected accounts', href: '/live/connected-accounts' },
+  { title: 'Enterprise accounts', href: '/live/enterprise-accounts' },
   { title: 'Delete account', href: '/live/delete-account' },
   { title: 'Reverification', href: '/live/reverification' },
 ];

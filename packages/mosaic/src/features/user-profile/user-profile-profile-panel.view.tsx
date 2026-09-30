@@ -19,6 +19,7 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
   titleRef?: Ref<HTMLDivElement>;
   connectedAccountsSlot?: ReactNode;
   web3WalletsSlot?: ReactNode;
+  enterpriseAccountsSlot?: ReactNode;
   deleteAccountSlot?: ReactNode;
 }
 
@@ -27,6 +28,7 @@ export function UserProfileProfilePanelView({
   titleRef,
   connectedAccountsSlot,
   web3WalletsSlot,
+  enterpriseAccountsSlot,
   deleteAccountSlot,
   ...account
 }: UserProfileProfilePanelViewProps): ReactElement {
@@ -45,6 +47,7 @@ export function UserProfileProfilePanelView({
         />
         {connectedAccountsSlot}
         {web3WalletsSlot}
+        {enterpriseAccountsSlot}
         {deleteAccountSlot}
       </Panel.Sections>
     </Panel.Root>

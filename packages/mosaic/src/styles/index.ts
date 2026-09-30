@@ -228,6 +228,7 @@ export { UserProfileMfaSectionView } from '../features/user-profile/user-profile
 export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-mfa-setup.view';
 
 export { APIKeysTableView } from '../features/api-keys/api-keys-table.view';
+export { UserProfileEnterpriseAccountsSectionView } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view';
 
 export { MembersTableTabView } from '../features/organization-profile/members-table-tab.view';
 export { InvitationsTableTabView } from '../features/organization-profile/invitations-table-tab.view';
