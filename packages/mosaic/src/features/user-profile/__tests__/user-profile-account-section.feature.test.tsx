@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import {
   type FakeFapiSeed,
   fapiUrl,
+  holdRequests,
   serveFapi,
   VERIFICATION_CODE,
   verifyEmailOutOfBand,
@@ -247,6 +248,25 @@ describe('the user profile email addresses', () => {
     verifyEmailOutOfBand(fapi, 'idn_pending');
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument(), { timeout: 5000 });
+  });
+
+  it('points the emailed link at the user profile on the host origin', async () => {
+    const pending = fapiEmailAddress({ id: 'idn_pending', email_address: 'pending@example.com' });
+    const { actor } = await renderSection(signedInWithEmails([PRIMARY, pending], verifiesByLink));
+    const prepare = holdRequests('post', '/v1/me/email_addresses/:id/prepare_verification');
+
+    await manageEmail(actor, 'pending@example.com', 'Verify');
+
+    await waitFor(() => expect(prepare.requests).toHaveLength(1));
+    const [request] = prepare.requests;
+    if (!request) {
+      throw new Error('expected a prepare_verification request');
+    }
+    const body = new URLSearchParams(await request.text());
+    expect(body.get('strategy')).toBe('email_link');
+    expect(body.get('redirect_url')).toBe(new URL('/user-profile#/verify', window.location.origin).href);
+
+    prepare.release();
   });
 
   it('leaves the address unverified when the link dialog is dismissed', async () => {
