@@ -286,6 +286,55 @@ describe('createModalHook', () => {
     expect(screen.getAllByText('Stub modal')).toHaveLength(1);
   });
 
+  it('re-seeds the content when opened again while open', async () => {
+    function SeededContent({ payload }: ModalContentProps<StubConfig, StubPayload>) {
+      const [page] = React.useState(payload?.page);
+      return <output data-testid='seeded'>{page}</output>;
+    }
+    const useSeededModal = createModalHook(
+      { id: 'seeded', variant: 'card', load: () => Promise.resolve({ default: SeededContent }) },
+      defaults => defaults.userProfile ?? {},
+    );
+    let handle: ModalHandle<StubPayload> | undefined;
+    render(
+      <MosaicProvider>
+        <Caller
+          useModal={useSeededModal}
+          onHandle={h => (handle = h)}
+        />
+      </MosaicProvider>,
+    );
+    await flush();
+
+    act(() => handle?.open({ page: 'account' }));
+    await flush();
+    expect(screen.getByTestId('seeded')).toHaveTextContent('account');
+
+    act(() => handle?.open({ page: 'security' }));
+    await flush();
+    expect(screen.getByTestId('seeded')).toHaveTextContent('security');
+  });
+
+  it('keeps a provider default when the caller leaves that key undefined', async () => {
+    const { useStubModal } = createStubModal();
+    let handle: ModalHandle<StubPayload> | undefined;
+    render(
+      <MosaicProvider userProfile={{ pageOrder: ['security'] }}>
+        <Caller
+          useModal={useStubModal}
+          config={{ pageOrder: undefined, label: 'caller' }}
+          onHandle={h => (handle = h)}
+        />
+      </MosaicProvider>,
+    );
+    await flush();
+
+    act(() => handle?.open());
+    await flush();
+
+    expect(readConfig()).toEqual({ pageOrder: ['security'], label: 'caller' });
+  });
+
   it('throws a clear error outside MosaicProvider', () => {
     const { useStubModal } = createStubModal();
     vi.spyOn(console, 'error').mockImplementation(() => undefined);

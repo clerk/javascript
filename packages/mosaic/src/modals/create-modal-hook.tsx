@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { Dialog } from '../components/dialog';
+import { withoutUndefined } from '../utils/object';
 import type { ModalContentProps, ModalHandle, ModalSurface } from './modal.types';
 import type { ModalController } from './modal-controller';
 import { createModalController } from './modal-controller';
@@ -36,7 +37,7 @@ export function createModalHook<Config extends object, Payload>(
   function Slot({ controller }: { controller: ModalController<Config, Payload> }) {
     const state = React.useSyncExternalStore(controller.subscribe, controller.getState, controller.getState);
     const base = selectDefaults(React.useContext(ModalDefaultsContext));
-    const config = state.config ? { ...base, ...state.config } : base;
+    const config = state.config ? { ...base, ...withoutUndefined(state.config) } : base;
 
     return (
       <Dialog.Root
@@ -50,6 +51,7 @@ export function createModalHook<Config extends object, Payload>(
         <Dialog.Popup variant={surface.variant}>
           <React.Suspense fallback={<ModalFallback />}>
             <Body
+              key={state.openCount}
               config={config}
               payload={state.payload}
             />

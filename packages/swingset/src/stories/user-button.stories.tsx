@@ -1,3 +1,4 @@
+import { Button } from '@clerk/mosaic/components/button';
 import { Icon } from '@clerk/mosaic/components/icon';
 import {
   userButtonBusyKeys,
@@ -8,6 +9,7 @@ import {
   type UserButtonSuggestion,
   UserButtonView,
 } from '@clerk/mosaic/features/user-button/user-button.view';
+import { useUserProfileModal } from '@clerk/mosaic/features/user-profile/user-profile.modal';
 import { useEffect, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
@@ -476,6 +478,44 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
       ]}
       menuItemOrder={['docs', 'addAccount', 'signOutAll', 'settings']}
     />
+  );
+}
+
+const integrationsPage = {
+  label: 'Integrations',
+  path: 'integrations',
+  content: <p>An app-provided page, passed to the profile modal as a custom page.</p>,
+};
+
+export function ProfileModal(_args: Record<string, unknown>) {
+  const prototype = usePrototype({ singleSession: true });
+  const userProfile = useUserProfileModal({ customPages: [integrationsPage] });
+
+  return (
+    <div className='flex flex-wrap items-center gap-2'>
+      <UserButtonView
+        {...prototype}
+        mode='user'
+        onManageAccount={() => {
+          prototype.onManageAccount?.();
+          userProfile.open();
+        }}
+      />
+      <Button
+        variant='outline'
+        onClick={() => userProfile.open({ page: 'security' })}
+        onPointerEnter={userProfile.preload}
+      >
+        Open security
+      </Button>
+      <Button
+        variant='outline'
+        onClick={() => userProfile.open({ page: 'integrations' })}
+        onPointerEnter={userProfile.preload}
+      >
+        Open integrations
+      </Button>
+    </div>
   );
 }
 

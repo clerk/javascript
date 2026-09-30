@@ -226,6 +226,17 @@ account**.
   storyModule={UserButtonStories}
 />
 
+## Profile modal
+
+`useUserProfileModal` opens the UserProfile in a modal that `MosaicProvider` mounts, so neither the
+button nor the app renders a dialog. **Manage account** calls `open()`, and the app's own buttons call
+`open({ page })` on the same modal. Hovering one preloads the profile, so it opens without a wait.
+
+<Story
+  name='ProfileModal'
+  storyModule={UserButtonStories}
+/>
+
 ## Menu items
 
 `customMenuItems` adds the app's own rows to the foot of the popup, ahead of Clerk's own. A row with

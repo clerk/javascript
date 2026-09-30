@@ -7,3 +7,8 @@ export function mapKeys<T extends object, U>(value: T, fn: (key: keyof T) => U):
 export function mapKeys(value: object, fn: (key: string) => unknown): Record<string, unknown> {
   return Object.fromEntries(Object.keys(value).map(key => [key, fn(key)]));
 }
+
+export function withoutUndefined<T extends object>(value: T): Partial<T>;
+export function withoutUndefined(value: object): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(value).filter(([, entry]) => entry !== undefined));
+}
