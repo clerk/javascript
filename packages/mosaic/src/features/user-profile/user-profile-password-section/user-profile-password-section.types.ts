@@ -15,7 +15,6 @@ export interface UserProfileEditPasswordValue {
 
 export interface UserProfilePasswordManagedBy {
   name: string;
-  iconUrl?: string;
 }
 
 export interface UserProfilePasswordSectionViewProps {

@@ -1,5 +1,16 @@
 # Change Log
 
+## 3.21.1
+
+### Patch Changes
+
+- Update the `allowedOrigins` JSDoc on `clerkClient.instances.update()` and the `Instance` resource to note that Electron apps using `@clerk/electron` also need the renderer's dev server origin, for example `http://localhost:5173`, during development. ([#9982](https://github.com/clerk/javascript/pull/9982)) by [@manovotny](https://github.com/manovotny)
+
+- Update the `lockUser()` JSDoc to link the Dashboard's current Protect rules page. ([#9976](https://github.com/clerk/javascript/pull/9976)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda)]:
+  - @clerk/shared@4.37.1
+
 ## 3.21.0
 
 ### Minor Changes

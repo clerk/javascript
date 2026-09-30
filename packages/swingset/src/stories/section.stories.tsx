@@ -382,7 +382,7 @@ export function Destructive() {
       <Section.Title>Danger zone</Section.Title>
       <Section.Group>
         <Section.Row>
-          <Section.Item>
+          <Section.Item wrap>
             <Section.Content>
               <Section.Label>Delete account</Section.Label>
               <Section.Description>
