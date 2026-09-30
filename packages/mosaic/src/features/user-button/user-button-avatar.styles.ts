@@ -77,19 +77,23 @@ export const styles = stylex.create({
 export const sizes = stylex.create({
   xs: { height: space['6'], width: space['6'] },
   sm: { height: space['8'], width: space['8'] },
+  md: { height: space['9.5'], width: space['9.5'] },
 });
 
 export const leadSizes = stylex.create({
   xs: lead(6, 3),
   sm: lead(8, 3.5),
+  md: lead(9.5, 4),
 });
 
 export const ringSizes = stylex.create({
   xs: ring(6),
   sm: ring(8),
+  md: ring(9.5),
 });
 
 export const badgeSizes = stylex.create({
   xs: badge(3),
   sm: badge(3.5),
+  md: badge(4),
 });
