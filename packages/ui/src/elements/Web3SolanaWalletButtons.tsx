@@ -31,13 +31,13 @@ const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
 const MAX_STRATEGIES_PER_ROW = 5;
 
-// Matches the wallets `getInjectedWeb3SolanaProviders` in @clerk/shared can sign in with, so every button works.
 const isSolanaSignInWallet = (wallet: Wallet) =>
-  wallet.chains.some(chain => chain.startsWith('solana:')) && 'solana:signMessage' in wallet.features;
+  wallet.chains.some(chain => chain.startsWith('solana:')) &&
+  'standard:connect' in wallet.features &&
+  'solana:signMessage' in wallet.features;
 
 const getRegisteredWallets = () => (typeof window === 'undefined' ? [] : getWallets().get());
 
-// Installed wallets announce themselves through the Wallet Standard, sometimes after this mounts.
 const useInstalledSolanaWallets = () => {
   const [wallets, setWallets] = useState<readonly Wallet[]>(getRegisteredWallets);
 
