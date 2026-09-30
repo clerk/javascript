@@ -142,6 +142,7 @@ jobs:
           - 'sessions:staging'
           - 'handshake:staging'
           - 'generic'
+          - 'composed'
           - 'cache-components'
           - 'express'
           - 'hono'
