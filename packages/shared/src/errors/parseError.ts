@@ -48,6 +48,7 @@ export function errorToJSON(error: ClerkAPIError | null): ClerkAPIErrorJSON {
       link_url: error?.meta?.linkUrl,
       link_text: error?.meta?.linkText,
       data: error?.meta?.data,
+      remaining_attempts: error?.meta?.remainingAttempts,
     },
   };
 }
