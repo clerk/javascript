@@ -11,6 +11,7 @@ import {
   typeScaleVars,
 } from '../../tokens.stylex';
 import { cardContentMarker } from './card.markers.stylex';
+import { cardBannerVars } from './card.vars.stylex';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
 
@@ -82,34 +83,33 @@ export const header = stylex.create({
 });
 
 const FADE = space['4'];
+const fade = cardBannerVars['--_cl-card-banner-fade'];
 
 export const banner = stylex.create({
   // A root flex item, not a content grid item: a grid track floors at 0 whatever the margin, so the gap would stay.
   collapse: {
+    // The ramp shortens rather than sliding out, so the moving edge stays fully soft until it stops.
+    '--_cl-card-banner-fade': {
+      default: '0px',
+      ':where([data-starting-style], [data-ending-style])': FADE,
+    },
     display: 'grid',
     gridTemplateRows: {
       default: '1fr',
       ':where(:not([data-open]), [data-starting-style])': '0fr',
     },
-    // The fade sits one FADE below the box at rest, so it only shows while the track moves.
-    maskImage: `linear-gradient(to bottom, black calc(100% - ${FADE}), transparent)`,
-    maskPosition: 'top',
-    maskRepeat: 'no-repeat',
-    maskSize: {
-      default: `100% calc(100% + ${FADE})`,
-      ':where([data-starting-style], [data-ending-style])': '100% 100%',
-    },
+    maskImage: `linear-gradient(to bottom, black calc(100% - ${fade}), transparent)`,
     transitionDelay: {
       default: `${durationVars['--cl-duration-instant']}, calc(${durationVars['--cl-duration-slow']} - ${durationVars['--cl-duration-fast']})`,
       ':where([data-ending-style])': durationVars['--cl-duration-instant'],
     },
     transitionDuration: `${durationVars['--cl-duration-slow']}, ${durationVars['--cl-duration-fast']}`,
     transitionProperty: {
-      default: 'grid-template-rows, mask-size',
+      default: 'grid-template-rows, --_cl-card-banner-fade',
       '@media (prefers-reduced-motion: reduce)': 'none',
     },
     transitionTimingFunction: {
-      default: easingVars['--cl-ease-enter'],
+      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-exit']}`,
       ':where([data-ending-style])': `${easingVars['--cl-ease-in-out']}, ${easingVars['--cl-ease-enter']}`,
     },
   },

@@ -226,24 +226,43 @@ surface a consumer themes, and tracks the box for free because the wrapper's box
 the animating track.
 
 ```ts
-maskImage: `linear-gradient(to bottom, black calc(100% - ${FADE}), transparent)`,
-maskPosition: 'top',
-maskRepeat: 'no-repeat',
-maskSize: {
-  default: `100% calc(100% + ${FADE})`, // fade pushed one FADE below the box
-  ':where([data-starting-style], [data-ending-style])': '100% 100%', // fade inside the box
+// card.vars.stylex.ts — registered, so the stop interpolates instead of snapping
+export const cardBannerVars = stylex.defineVars({
+  '--_cl-card-banner-fade': stylex.types.length('0px'),
+});
+
+// card.styles.ts
+'--_cl-card-banner-fade': {
+  default: '0px', // no ramp at rest
+  ':where([data-starting-style], [data-ending-style])': FADE, // ramp while the track moves
 },
+maskImage: `linear-gradient(to bottom, black calc(100% - ${fade}), transparent)`,
+transitionProperty: 'grid-template-rows, --_cl-card-banner-fade',
 ```
 
 The rule: **the fade exists whenever the clip edge is crossing content, and is never
 visible at rest.** At rest the box's bottom edge is the content's bottom edge, so the
-gradient is pushed one `FADE` below the box; while the track moves it is pulled back
-in. `mask-size` animates as a `calc()` length in Chromium and WebKit. It animates at
-all only so the two states meet smoothly — the shape of that animation is decided by
-the row's:
+ramp's length goes to zero there. It animates at all only so the two states meet
+smoothly.
+
+**Animate the stop, not `mask-size`.** Sliding the gradient out of the box also works
+in both engines, but it raises the alpha _at the edge_ as it goes: halfway through the
+dissolve the clip line is cut at 50%, and during an ease-out's crawl — the last 100ms
+of `--cl-ease-enter`, with the edge sitting inside the banner's bottom padding — that
+read as a hard line where the border should be. Moving the black stop instead keeps
+the edge at zero alpha for the whole dissolve; only the ramp above it gets shorter,
+and the content there is already opaque. The ramp is a registered `<length>` custom
+property (`stylex.types.length`, as ScrollArea does for its scroll progress) because
+an unregistered one cannot interpolate and flips at the midpoint.
+
+The shape of that animation is decided by the row's:
 
 - **Enter:** hold, then dissolve over the last `fast` (`transition-delay:
-calc(slow - fast)`), so it is gone exactly as the row lands.
+calc(slow - fast)`) on `--cl-ease-exit` — it is a departure, and the abrupt stop at
+  the end of an ease-in is invisible when what stops is a zero-length ramp. On the
+  ease-out it lost two thirds of its length in the first 30ms while the row was still
+  3px short. With In Quad it holds ~14px until the row is within 2px and is gone as
+  the row lands.
 - **Exit:** arrive over `fast` on `--cl-ease-enter`, no delay. On the row's own
   in-out curve it lagged the edge and left a hard line for the first frames; on the
   ease-out it is more than half in by the second frame, before the row has moved
