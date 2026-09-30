@@ -253,6 +253,8 @@ calc(slow - fast)`), so it is gone exactly as the row lands.
 
 Row and mask take `transition-property: none` together so they snap in the same
 frame; the surface keeps its fade and pins the scale, per "Reduced motion" below.
+Its entrance delay goes to `instant` as well: it exists to wait for the row, and a
+row that has snapped open leaves nothing to wait for.
 
 ## Color and state changes (hover, press)
 

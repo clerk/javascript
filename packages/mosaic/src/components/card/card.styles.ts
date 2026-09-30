@@ -134,9 +134,11 @@ export const banner = stylex.create({
       },
     },
     transformOrigin: 'top',
+    // Waits for a row that, under reduced motion, has already snapped open.
     transitionDelay: {
       default: durationVars['--cl-duration-fast'],
       ':where([data-ending-style])': durationVars['--cl-duration-instant'],
+      '@media (prefers-reduced-motion: reduce)': durationVars['--cl-duration-instant'],
     },
     transitionDuration: {
       default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
