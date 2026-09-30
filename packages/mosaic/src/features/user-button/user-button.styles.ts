@@ -54,6 +54,13 @@ export const styles = stylex.create({
     borderRadius: radiusVars['--cl-radius-full'],
   },
 
+  triggerText: {
+    display: 'flex',
+    flexDirection: 'column',
+    minWidth: 0,
+    textAlign: 'start',
+  },
+
   // Matches `UserButtonItemLabel`, so the trigger names a workspace the same way its row does. Capped,
   // because the trigger sits in a host app's chrome and a long workspace name would push it apart.
   triggerName: {
@@ -61,6 +68,13 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
+    maxWidth: '12rem',
+  },
+
+  triggerOrganization: {
+    color: colorVars['--cl-color-foreground-secondary'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
     maxWidth: '12rem',
   },
 

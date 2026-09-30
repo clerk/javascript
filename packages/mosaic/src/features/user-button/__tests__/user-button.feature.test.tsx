@@ -1151,6 +1151,19 @@ describe('UserButton', () => {
       expect(popup()).toBeNull();
     });
 
+    it('names the active organization beneath the account', async () => {
+      await renderUserButton();
+
+      expect(trigger()).toHaveAccessibleName('Open account menu for Alice Smith');
+      expect(within(trigger()).getByText('Acme')).toBeInTheDocument();
+    });
+
+    it('names no organization beneath the account in user mode', async () => {
+      await renderUserButton({ mode: 'user' });
+
+      expect(within(trigger()).queryByText('Acme')).toBeNull();
+    });
+
     it('still names the account in user mode where personal is hidden and none is active', async () => {
       await renderUserButton({ mode: 'user', hidePersonal: true }, signedIn({ client: fapiClient([personalSession]) }));
 

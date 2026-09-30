@@ -140,6 +140,14 @@ function leadWorkspace(
   };
 }
 
+/** The organization a workspace shows: the one it is, or the one badging the account. */
+function workspaceOrganization(workspace: ActiveWorkspace): UserButtonMembership | undefined {
+  if (workspace.kind === 'organization') {
+    return workspace.organization;
+  }
+  return workspace.kind === 'user' ? workspace.badge : undefined;
+}
+
 function joinDetails(...parts: Array<string | undefined>): string {
   return parts.filter(Boolean).join(' · ');
 }
@@ -422,12 +430,7 @@ function Header() {
   const { identifier } = data.activeSession;
   const workspace = leadWorkspace(data, m);
   const { name } = workspace;
-  const organization =
-    workspace.kind === 'organization'
-      ? workspace.organization
-      : workspace.kind === 'user'
-        ? workspace.badge
-        : undefined;
+  const organization = workspaceOrganization(workspace);
   // An account with no name is titled by its identifier, and repeating it underneath says nothing.
   // No selection is not the account, so it carries no identifier line either.
   const subtitle =
@@ -1044,14 +1047,14 @@ export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
 export interface UserButtonTriggerProps {
   /**
    * Names the active workspace beside its avatar — the organization wherever one heads the
-   * trigger, no selection when personal is hidden and none is active, the account otherwise.
-   * Turn it off for the avatar alone.
+   * trigger, no selection when personal is hidden and none is active, the account otherwise, with
+   * its active organization beneath it. Turn it off for the avatar alone.
    *
    * @default true
    */
   renderTriggerLabel?: boolean;
   /**
-   * Carries the active organization's plan beside its name. Part of the label, so it needs
+   * Carries the active organization's plan beside the label. Part of the label, so it needs
    * `renderTriggerLabel`: a plan badge with nothing to qualify says nothing.
    *
    * @default true
@@ -1068,8 +1071,7 @@ export function UserButtonTrigger({
   const data = useUserButtonContext();
   const workspace = leadWorkspace(data, m);
   const { name, shape } = workspace;
-  const planLabel =
-    renderTriggerBadge && workspace.kind === 'organization' ? workspace.organization.planLabel : undefined;
+  const planLabel = renderTriggerBadge ? workspaceOrganization(workspace)?.planLabel : undefined;
   const badge = workspace.kind === 'user' ? workspace.badge : undefined;
   const ringsAvatar = !renderTriggerLabel && badge !== undefined;
 
@@ -1088,13 +1090,18 @@ export function UserButtonTrigger({
         name={workspace.name}
         imageUrl={workspace.imageUrl}
         shape={workspace.shape}
-        size={renderTriggerLabel ? 'xs' : 'sm'}
+        size={renderTriggerLabel && !badge ? 'xs' : 'sm'}
         badge={badge}
         focusRing={ringsAvatar}
       />
       {renderTriggerLabel ? (
         <>
-          <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
+          <span {...stylex.props(styles.triggerText)}>
+            <span {...stylex.props(styles.triggerName, truncationStyles.singleLine)}>{name}</span>
+            {badge ? (
+              <span {...stylex.props(styles.triggerOrganization, truncationStyles.singleLine)}>{badge.name}</span>
+            ) : null}
+          </span>
           {planLabel ? <Badge color='neutral'>{planLabel}</Badge> : null}
           <Icon
             name='chevron-down'
