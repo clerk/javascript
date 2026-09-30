@@ -176,7 +176,7 @@ describe('UserProfileEditPasswordDialog', () => {
       },
     );
 
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert').textContent).toBe('');
     expect(currentPasswordField()).toHaveAttribute('aria-invalid', 'true');
     expect(currentPasswordField()).toHaveAccessibleDescription('Incorrect password.');
     expect(newPasswordField()).toHaveAttribute('aria-invalid', 'true');

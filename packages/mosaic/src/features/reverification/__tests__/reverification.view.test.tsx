@@ -122,8 +122,7 @@ describe('ReverificationView', () => {
     });
 
     const banner = screen.getByRole('alert');
-    expect(banner).toHaveClass('cl-banner-root');
-    expect(banner).toHaveAttribute('data-color', 'negative');
+    expect(banner.querySelector('.cl-banner-root')).toHaveAttribute('data-color', 'negative');
     expect(banner).toHaveTextContent('We couldn’t verify that passkey. Try again.');
   });
 });

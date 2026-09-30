@@ -3,7 +3,6 @@ import * as stylex from '@stylexjs/stylex';
 import type { RefObject } from 'react';
 import { useId, useRef, useState } from 'react';
 
-import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
@@ -60,6 +59,12 @@ export function UserProfileEditPasswordDialog({
           <Card.Header>
             <Card.Title>{hasPassword ? m.dialogTitle.change : m.dialogTitle.set}</Card.Title>
           </Card.Header>
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {form.error}
+          </Card.Banner>
           <Card.Content
             render={
               <form
@@ -68,14 +73,6 @@ export function UserProfileEditPasswordDialog({
               />
             }
           >
-            {form.error ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
-              >
-                <Banner.Label>{form.error}</Banner.Label>
-              </Banner.Root>
-            ) : null}
             {showCurrentPassword ? (
               <PasswordField
                 autoComplete='current-password'

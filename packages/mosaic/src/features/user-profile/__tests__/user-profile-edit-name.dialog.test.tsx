@@ -139,7 +139,7 @@ describe('UserProfileEditNameDialog', () => {
     });
 
     const banner = screen.getByRole('alert');
-    expect(banner).toHaveAttribute('data-color', 'negative');
+    expect(banner.querySelector('.cl-banner-root')).toHaveAttribute('data-color', 'negative');
     expect(banner).toHaveTextContent('Your name could not be updated.');
     expect(screen.getByText('Last name must be 64 characters or fewer.')).toBeInTheDocument();
     expect(lastNameField()).toHaveAttribute('aria-invalid', 'true');
@@ -149,7 +149,7 @@ describe('UserProfileEditNameDialog', () => {
   it('renders a field-scoped failure with no banner', () => {
     renderView({ error: { fields: { firstName: 'First name is required.' } } });
 
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert').textContent).toBe('');
     expect(firstNameField()).toHaveAttribute('aria-invalid', 'true');
   });
 
