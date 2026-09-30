@@ -57,7 +57,7 @@ internal class BiometricCredentialStore(
     fileStore.save(record)?.let { runCatching { deleteKey(it) } }
     if (!removeOtherRecordsForApp) return
 
-    // Contract v2 section 5.3: only the same user's other credentials; other users' are left for reconciliation.
+    // Only the same user's other credentials; other users' are left for reconciliation, as clerk-android does.
     val removable =
       fileStore
         .records()

@@ -30,8 +30,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * Pins clerk-android's biometric credential storage contract v2
- * (`source/api/docs/biometric-credential-storage-contract.md`) with the same literals and fixture as its
+ * Pins clerk-android's biometric credential storage contract v2 with the same literals and fixture as its
  * `BiometricCredentialStorageContractTest`. Update them only together with a contract version bump.
  */
 @RunWith(RobolectricTestRunner::class)

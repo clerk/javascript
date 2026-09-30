@@ -16,7 +16,6 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
-/** A decodable credential record with a known policy (contract v2, section 3.3). */
 internal data class BiometricCredentialLocalRecord(
   val id: String,
   val localKeyId: String,
