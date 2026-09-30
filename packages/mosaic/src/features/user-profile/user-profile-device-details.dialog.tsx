@@ -3,9 +3,9 @@ import { Card } from '../../components/card';
 import { DataList } from '../../components/data-list';
 import type { DialogFocusTarget, DialogHandle } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
-import { usePendingAction } from '../../hooks/use-pending-action';
 import { fill, useMessages } from '../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
+import { useUserProfileDeviceDetailsController } from './user-profile-device-details.controller';
 
 export interface UserProfileDeviceDetailsDialogProps {
   handle: DialogHandle<UserProfileDevice>;
@@ -14,8 +14,15 @@ export interface UserProfileDeviceDetailsDialogProps {
 }
 
 export function UserProfileDeviceDetailsDialog({ handle, finalFocus, onSignOut }: UserProfileDeviceDetailsDialogProps) {
+  const m = useMessages('userProfileActiveDevices');
+  const controller = useUserProfileDeviceDetailsController({ onSignOut, fallbackError: m.detailsDialog.signOutError });
+
   return (
-    <Dialog.Root handle={handle}>
+    <Dialog.Root
+      handle={handle}
+      open={controller.open}
+      onOpenChange={controller.onOpenChange}
+    >
       {({ payload: device }) =>
         device === undefined ? null : (
           <Dialog.Popup
@@ -24,8 +31,9 @@ export function UserProfileDeviceDetailsDialog({ handle, finalFocus, onSignOut }
           >
             <DeviceDetailsCard
               device={device}
-              handle={handle}
-              onSignOut={onSignOut}
+              onSignOut={controller.onSignOut}
+              isSigningOut={controller.isSigningOut}
+              errorMessage={controller.errorMessage}
             />
           </Dialog.Popup>
         )
@@ -36,16 +44,16 @@ export function UserProfileDeviceDetailsDialog({ handle, finalFocus, onSignOut }
 
 function DeviceDetailsCard({
   device,
-  handle,
   onSignOut,
+  isSigningOut,
+  errorMessage,
 }: {
   device: UserProfileDevice;
-  handle: DialogHandle<UserProfileDevice>;
-  onSignOut: UserProfileDeviceDetailsDialogProps['onSignOut'];
+  onSignOut?: (device: UserProfileDevice) => void;
+  isSigningOut: boolean;
+  errorMessage: string | undefined;
 }) {
   const m = useMessages('userProfileActiveDevices');
-  const signOut = usePendingAction({ errorFallback: m.detailsDialog.signOutError });
-
   const fields: { label: string; value: string | undefined }[] = [
     { label: m.detailsDialog.model, value: device.model },
     { label: m.detailsDialog.browser, value: device.browser },
@@ -70,7 +78,7 @@ function DeviceDetailsCard({
         role='alert'
         color='negative'
       >
-        {signOut.error}
+        {errorMessage}
       </Card.Banner>
       {details.length > 0 ? (
         <Card.Content>
@@ -89,13 +97,8 @@ function DeviceDetailsCard({
           <SubmitButton
             type='button'
             fullWidth
-            isPending={signOut.isPending}
-            onClick={() =>
-              void signOut.run('sign-out', async () => {
-                await onSignOut(device);
-                handle.close();
-              })
-            }
+            isPending={isSigningOut}
+            onClick={() => onSignOut(device)}
           >
             {m.detailsDialog.signOut}
           </SubmitButton>
