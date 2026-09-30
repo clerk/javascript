@@ -192,7 +192,7 @@ For a comprehensive guide on **authoring** JSDoc/Typedoc comments, see [this gui
 
 To review your changes locally, you can run `pnpm run typedoc:generate` to generate the docs. Afterwards, you can inspect the MDX files inside `.typedoc/docs`. But if you want to preview how the Typedoc output will look in Clerk Docs, there's a few things you need to do first:
 
-Create a PR that includes your changes to any Typedoc comments. Once the PR has been merged and a release is published, the release workflow automatically opens a PR in Clerk's docs repository with the Typedoc changes.
+Create a PR that includes your changes to any Typedoc comments. Once the PR has been merged and a release is published, the release workflow automatically opens a PR in `clerk/clerk` with the Typedoc changes.
 
 Typedoc output is embedded in `clerk-docs` files with the `<Typedoc />` component. For example, if you updated Typedoc comments for the `useAuth()` hook in `clerk/javascript`, you'll need to make sure that in `clerk-docs`, in the `/hooks/use-auth.mdx` file, there's a `<Typedoc />` component linked to the `./clerk-typedoc/react/use-auth.mdx` file, like:
 
@@ -200,7 +200,7 @@ Typedoc output is embedded in `clerk-docs` files with the `<Typedoc />` componen
 <Typedoc src='react/use-auth' />
 ```
 
-Read more about this in the [`clerk-docs` CONTRIBUTING.md](https://github.com/clerk/clerk-docs/blob/main/CONTRIBUTING.md#typedoc-).
+Read more about this in the [`clerk-docs` CONTRIBUTING.md](https://github.com/clerk/clerk-docs/blob/main/contributing/CONTRIBUTING.md#typedoc-).
 
 Then, to preview how the `<Typedoc />` component renders, that docs PR will have a Vercel preview. Or to get local previews set up, see the [section in `clerk/clerk` about setting up local docs](https://github.com/clerk/clerk?tab=readme-ov-file#5-optional-set-up-local-docs).
 
