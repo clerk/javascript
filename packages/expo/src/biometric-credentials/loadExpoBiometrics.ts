@@ -1,13 +1,8 @@
 import type * as ExpoBiometrics from '@clerk/expo-biometrics';
 
-export type ExpoBiometricsRecord = ExpoBiometrics.StoredBiometricCredentialRecord & {
-  identifierHintSha256?: string | null;
-};
+export type ExpoBiometricsRecord = ExpoBiometrics.StoredBiometricCredentialRecord;
 
-export type ExpoBiometricsModule = Omit<typeof ExpoBiometrics, 'listRecords'> & {
-  listRecords(): Promise<ExpoBiometricsRecord[]>;
-  hashIdentifierHint?: (identifierHint: string) => string | null;
-};
+export type ExpoBiometricsModule = typeof ExpoBiometrics;
 
 export function loadExpoBiometrics(): ExpoBiometricsModule | null {
   try {

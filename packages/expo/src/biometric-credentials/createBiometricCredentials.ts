@@ -71,7 +71,6 @@ const MODULE_ERROR_CODES: Record<string, BiometricCredentialErrorCode | undefine
   key_invalidated: 'key_invalidated',
   key_generation_failed: 'key_generation_failed',
   signing_failed: 'signing_failed',
-  not_implemented: 'unsupported_platform',
 };
 
 function biometricCredentialError(
@@ -133,16 +132,8 @@ async function identifierHintMatcher(
   if (!normalizedHint) {
     return () => true;
   }
-  const hash =
-    typeof biometrics.module.hashIdentifierHint === 'function'
-      ? await callModule(biometrics, module => module.hashIdentifierHint?.(normalizedHint) ?? null)
-      : null;
-  return record => {
-    if (hash && typeof record.identifierHintSha256 === 'string') {
-      return record.identifierHintSha256 === hash;
-    }
-    return normalizeIdentifierHint(record.identifierHint) === normalizedHint;
-  };
+  const hash = await callModule(biometrics, module => module.hashIdentifierHint(normalizedHint));
+  return record => record.identifierHintSha256 === hash;
 }
 
 function newestFirst(a: ExpoBiometricsRecord, b: ExpoBiometricsRecord): number {
@@ -248,17 +239,6 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     }
   }
 
-  async function hasKey(biometrics: Biometrics, record: ExpoBiometricsRecord): Promise<boolean> {
-    try {
-      return await biometrics.module.hasKey(record.localKeyId);
-    } catch (error) {
-      if (moduleErrorCode(error) === 'key_not_found') {
-        return false;
-      }
-      throw toBiometricCredentialError(error, biometrics.fallbackCode);
-    }
-  }
-
   async function localCredentialCandidates(
     biometrics: Biometrics,
     id: string | undefined,
@@ -270,8 +250,7 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     }
 
     const device = await callModule(biometrics, module => module.getAvailability());
-    // Older @clerk/expo-biometrics versions do not report secureKeyStorageAvailable.
-    if (device.secureKeyStorageAvailable === false) {
+    if (!device.secureKeyStorageAvailable) {
       return 'biometric_authentication_unavailable';
     }
 
@@ -290,7 +269,7 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
 
     const recordsWithKeys: ExpoBiometricsRecord[] = [];
     for (const record of records) {
-      if (await hasKey(biometrics, record)) {
+      if (await callModule(biometrics, module => module.hasKey(record.localKeyId))) {
         recordsWithKeys.push(record);
       } else {
         await deleteLocalCredential(biometrics, record);

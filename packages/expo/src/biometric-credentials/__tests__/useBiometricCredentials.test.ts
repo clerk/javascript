@@ -48,7 +48,7 @@ function localRecord(overrides: Partial<ExpoBiometricsRecord> = {}): ExpoBiometr
   };
 }
 
-function createExpoBiometrics({ withHash = true }: { withHash?: boolean } = {}) {
+function createExpoBiometrics() {
   const store = {
     records: [] as ExpoBiometricsRecord[],
     keys: new Set<string>(),
@@ -61,7 +61,7 @@ function createExpoBiometrics({ withHash = true }: { withHash?: boolean } = {}) 
       canEvaluateBiometrics: true,
       canEvaluateDeviceOwner: true,
       errorCode: null,
-      secureKeyStorageAvailable: true as boolean | undefined,
+      secureKeyStorageAvailable: true as boolean,
     })),
     createKey: asyncFn(() => {
       store.keys.add('key_new');
@@ -86,7 +86,7 @@ function createExpoBiometrics({ withHash = true }: { withHash?: boolean } = {}) 
       store.records = store.records.filter(record => record.localKeyId !== localKeyId);
     }),
     ensureInstallationMarker: asyncFn(() => ({ wiped: false })),
-    ...(withHash ? { hashIdentifierHint: vi.fn(hashHint) } : {}),
+    hashIdentifierHint: vi.fn(hashHint),
   };
   return module;
 }
@@ -285,22 +285,6 @@ describe('getAvailability', () => {
     expect(biometrics.store.records).toHaveLength(1);
   });
 
-  test('treats a module that does not report secure key storage as having it', async () => {
-    addLocalCredential();
-    biometrics.getAvailability.mockResolvedValue({
-      biometryType: 'faceID',
-      canEvaluateBiometrics: true,
-      canEvaluateDeviceOwner: true,
-      errorCode: null,
-      secureKeyStorageAvailable: undefined,
-    });
-
-    await expect(renderBiometricCredentials().getAvailability()).resolves.toEqual({
-      isAvailable: true,
-      unavailableReason: null,
-    });
-  });
-
   test('reports no local credential when the device has none for this app', async () => {
     addLocalCredential({ appIdentifier: 'com.example.other' });
 
@@ -345,21 +329,6 @@ describe('getAvailability', () => {
     });
   });
 
-  test('falls back to the raw identifier hint when the module cannot hash hints', async () => {
-    biometrics = createExpoBiometrics({ withHash: false });
-    const { identifierHintSha256: _, ...legacyRecord } = localRecord({ identifierHint: 'sean@example.com' });
-    biometrics.store.records.push(legacyRecord as ExpoBiometricsRecord);
-    biometrics.store.keys.add(legacyRecord.localKeyId);
-    const biometricCredentials = renderBiometricCredentials();
-
-    await expect(biometricCredentials.getAvailability({ identifierHint: 'SEAN@example.com' })).resolves.toMatchObject({
-      isAvailable: true,
-    });
-    await expect(biometricCredentials.getAvailability({ identifierHint: 'other@example.com' })).resolves.toMatchObject({
-      unavailableReason: 'no_local_credential',
-    });
-  });
-
   test('ignores a blank identifier hint', async () => {
     addLocalCredential({ identifierHintSha256: hashHint('sean@example.com') });
 
@@ -371,7 +340,6 @@ describe('getAvailability', () => {
 
   test('prunes local records whose key is missing', async () => {
     addLocalCredential({ id: 'td_orphan', localKeyId: 'key_orphan' }, { withKey: false });
-    biometrics.hasKey.mockRejectedValueOnce(moduleError('key_not_found'));
 
     await expect(renderBiometricCredentials().getAvailability()).resolves.toEqual({
       isAvailable: false,
