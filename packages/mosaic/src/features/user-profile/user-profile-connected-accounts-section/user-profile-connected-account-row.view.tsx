@@ -1,15 +1,15 @@
 import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
-import type { ActionMenuAction } from '../../components/action-menu';
-import { ActionMenu } from '../../components/action-menu';
-import { Badge } from '../../components/badge';
-import { SubmitButton } from '../../components/button';
-import { Icon, IconFrame } from '../../components/icon';
-import { Section } from '../../components/section';
-import { fill, useMessages } from '../../localization';
-import { styles } from './user-profile-connected-accounts.styles';
-import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
+import type { ActionMenuAction } from '../../../components/action-menu';
+import { ActionMenu } from '../../../components/action-menu';
+import { Badge } from '../../../components/badge';
+import { SubmitButton } from '../../../components/button';
+import { Icon, IconFrame } from '../../../components/icon';
+import { Section } from '../../../components/section';
+import { fill, useMessages } from '../../../localization';
+import { styles } from './user-profile-connected-accounts-section.styles';
+import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.types';
 
 export function UserProfileConnectedAccountRowView({
   account,

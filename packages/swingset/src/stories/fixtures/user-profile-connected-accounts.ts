@@ -1,7 +1,7 @@
 import type {
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
-} from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';

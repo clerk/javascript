@@ -1,14 +1,14 @@
 import type { ReactNode } from 'react';
 
 import { useMessages } from '../../../localization';
-import { UserProfileConnectedAccountsSectionView } from '../user-profile-connected-accounts-section.view';
-import { connectedAccountErrorMessage } from './user-profile-connected-accounts-errors';
 import { useUserProfileConnectedAccountsController } from './user-profile-connected-accounts-section.controller';
+import { connectedAccountErrorMessage } from './user-profile-connected-accounts-section.errors';
 import type {
   AdditionalOAuthScopes,
   UserProfileConnectedAccountsModel,
 } from './user-profile-connected-accounts-section.model';
 import { useUserProfileConnectedAccountsModel } from './user-profile-connected-accounts-section.model';
+import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
 
 export type UserProfileConnectedAccountsSectionProps = {
   additionalOAuthScopes?: AdditionalOAuthScopes;

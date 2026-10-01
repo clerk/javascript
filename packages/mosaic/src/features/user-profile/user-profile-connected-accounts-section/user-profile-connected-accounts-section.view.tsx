@@ -1,36 +1,20 @@
 import { useMemo, useRef } from 'react';
 
-import { Confirmation } from '../../blocks/confirmation';
-import { Section } from '../../components/section';
-import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
-import { fill, useMessages } from '../../localization';
+import { Confirmation } from '../../../blocks/confirmation';
+import { Section } from '../../../components/section';
+import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
+import { fill, useMessages } from '../../../localization';
 import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
+import type {
+  UserProfileConnectedAccount,
+  UserProfileConnectedAccountsSectionViewProps,
+} from './user-profile-connected-accounts-section.types';
 
-export interface UserProfileConnectionProvider {
-  id: string;
-  provider: string;
-  iconUrl?: string;
-  monochromeIcon?: boolean;
-  connectError?: string;
-}
-
-export interface UserProfileConnectedAccount extends UserProfileConnectionProvider {
-  identifier?: string;
-  canRemove?: boolean;
-  status?: 'connected' | 'reconnect' | 'error';
-  verificationError?: string;
-  reconnectError?: string;
-}
-
-export interface UserProfileConnectedAccountsSectionViewProps {
-  fallbackFocus?: () => HTMLElement | null;
-  accounts: UserProfileConnectedAccount[];
-  availableProviders?: UserProfileConnectionProvider[];
-  pendingId?: string;
-  onConnect?: (id: string) => void;
-  onReconnect?: (id: string) => void;
-  onRemove?: (id: string) => void | Promise<void>;
-}
+export type {
+  UserProfileConnectedAccount,
+  UserProfileConnectedAccountsSectionViewProps,
+  UserProfileConnectionProvider,
+} from './user-profile-connected-accounts-section.types';
 
 export function UserProfileConnectedAccountsSectionView({
   accounts,

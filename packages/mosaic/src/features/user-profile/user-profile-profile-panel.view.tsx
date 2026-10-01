@@ -8,7 +8,7 @@ import type {
   UserProfilePhone,
 } from './user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from './user-profile-account-section/user-profile-account-section.view';
-import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section.view';
+import type { UserProfileConnectedAccount } from './user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import type { UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
 
 export type { UserProfileConnectedAccount, UserProfileEmail, UserProfilePhone, UserProfileWeb3Wallet };

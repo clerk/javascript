@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import type {
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
-} from '../user-profile-connected-accounts-section.view';
+} from './user-profile-connected-accounts-section.types';
 
 export type ConnectedAccountActionResult = 'redirecting' | void;
 

@@ -15,11 +15,11 @@ import type {
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
 import { useMosaicRouter } from '../../../hooks/useMosaicRouter';
+import type { ConnectedAccountActionResult } from './user-profile-connected-accounts-section.controller';
 import type {
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
-} from '../user-profile-connected-accounts-section.view';
-import type { ConnectedAccountActionResult } from './user-profile-connected-accounts-section.controller';
+} from './user-profile-connected-accounts-section.types';
 
 export type AdditionalOAuthScopes = Partial<Record<OAuthProvider, OAuthScope[]>>;
 
