@@ -1,5 +1,8 @@
 export const userProfileApiKeysPanelMessages = {
   loading: 'Loading API keys',
+  loadError: 'Could not load API keys',
+  loadErrorDescription: 'Something went wrong. Please try again.',
+  retry: 'Try again',
   empty: 'No API keys found',
   emptyDescription: 'Your search for "{query}" did not return any results.',
   noKeys: 'No API Keys created',

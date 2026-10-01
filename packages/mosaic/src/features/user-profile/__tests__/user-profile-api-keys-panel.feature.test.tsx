@@ -1,9 +1,10 @@
 import type { ApiKeyJSON } from '@clerk/shared/types';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
-import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
+import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiApiKey,
   fapiClient,
@@ -113,6 +114,27 @@ describe('UserProfileApiKeysPanel', () => {
 
       expect(await screen.findByText('No API Keys created')).toBeVisible();
     });
+
+    it('explains a failed load instead of showing no keys, and loads again on retry', { timeout: 20_000 }, async () => {
+      let failing = true;
+      serveFapi(signedIn());
+      worker.use(
+        http.get(fapiUrl('/api_keys'), () =>
+          failing
+            ? HttpResponse.json({ errors: [{ code: 'internal_error', message: 'internal_error' }] }, { status: 400 })
+            : undefined,
+        ),
+      );
+      await renderWithClerk(<UserProfileApiKeysPanel />);
+      const user = userEvent.setup();
+
+      expect(await screen.findByText('Could not load API keys', undefined, { timeout: 15_000 })).toBeVisible();
+      expect(screen.queryByText('No API Keys created')).toBeNull();
+
+      failing = false;
+      await user.click(screen.getByRole('button', { name: 'Try again' }));
+      expect(await within(table()).findByText('Web app')).toBeVisible();
+    });
   });
 
   describe('searching', () => {
@@ -175,6 +197,21 @@ describe('UserProfileApiKeysPanel', () => {
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
       await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+      expect(await within(table()).findByText('Deploy')).toBeVisible();
+    });
+
+    it('shows the secret without waiting for the list to refresh', async () => {
+      const { fapi, user } = await renderPanel();
+      const dialog = await openCreate(user);
+      await fillCreate(user, dialog, 'Deploy', 'Never');
+      const refresh = holdRequests('get', '/api_keys');
+
+      await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
+
+      expect(await within(dialog).findByRole('textbox', { name: 'API key' })).toHaveValue(
+        `ak_secret_${fapi.apiKeys[0].id}`,
+      );
+      refresh.release();
       expect(await within(table()).findByText('Deploy')).toBeVisible();
     });
 

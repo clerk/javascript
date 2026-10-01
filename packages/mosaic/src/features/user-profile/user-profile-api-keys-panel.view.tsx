@@ -44,6 +44,8 @@ export function UserProfileApiKeysPanelView({
   onSortChange,
   isLoading,
   isFetching = false,
+  isError = false,
+  onRetry,
 }: UserProfileApiKeysPanelViewProps) {
   const m = useMessages('userProfileApiKeysPanel');
   const searchInput = useRef<HTMLInputElement>(null);
@@ -161,6 +163,25 @@ export function UserProfileApiKeysPanelView({
                   <Spinner />
                   <VisuallyHidden>{m.loading}</VisuallyHidden>
                 </span>
+              </Table.Empty>
+            ) : isError ? (
+              <Table.Empty colSpan={columnCount}>
+                <EmptyState.Root>
+                  <EmptyState.Icon name='exclamation-circle' />
+                  <EmptyState.Label>{m.loadError}</EmptyState.Label>
+                  <EmptyState.Description>{m.loadErrorDescription}</EmptyState.Description>
+                  {onRetry ? (
+                    <EmptyState.Actions>
+                      <Button
+                        variant='outline'
+                        color='neutral'
+                        onClick={onRetry}
+                      >
+                        {m.retry}
+                      </Button>
+                    </EmptyState.Actions>
+                  ) : null}
+                </EmptyState.Root>
               </Table.Empty>
             ) : table.rows.length === 0 ? (
               <Table.Empty colSpan={columnCount}>

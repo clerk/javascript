@@ -43,7 +43,7 @@ function useUserProfileApiKeysModel(query: string) {
           subject,
           secondsUntilExpiration: expiresAt ? Math.floor((expiresAt.getTime() - Date.now()) / 1000) : undefined,
         });
-        await apiKeys.revalidate();
+        void apiKeys.revalidate();
         return created.secret ?? '';
       } catch (error) {
         throw new Error(createErrorMessage(error, m));
@@ -143,6 +143,8 @@ export function UserProfileApiKeysPanel({ fallback }: UserProfileApiKeysPanelPro
       searchValue={search.searchValue}
       isLoading={model.isLoading}
       isFetching={model.isFetching}
+      isError={model.isError}
+      onRetry={() => void model.revalidate()}
       onPageChange={model.fetchPage}
       onSearchChange={search.onSearchChange}
       onCreate={create.onOpen}
