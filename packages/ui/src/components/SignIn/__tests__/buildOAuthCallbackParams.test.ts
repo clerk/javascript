@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  buildCombinedFlowOAuthCallbackParams,
   buildSignInOAuthCallbackParams,
   buildSignInOAuthTransportCallbackParams,
   buildSignUpOAuthCallbackParams,
@@ -151,6 +152,35 @@ describe('buildSignUpOAuthCallbackParams', () => {
   it('does not include navigateOnSetActive', () => {
     const ctx = { navigateOnSetActive: () => Promise.resolve() } as any;
     expect('navigateOnSetActive' in buildSignUpOAuthCallbackParams(ctx)).toBe(false);
+  });
+});
+
+describe('buildCombinedFlowOAuthCallbackParams', () => {
+  it('routes sign-in steps from the combined-flow create/sso-callback route back to the SignIn routes', () => {
+    const ctx = {
+      signUpUrl: '/sign-in#/create',
+      signInUrl: '/sign-in',
+      afterSignUpUrl: '/after-up',
+      afterSignInUrl: '/after-in',
+      secondFactorUrl: '/sign-in#/factor-two',
+      unsafeMetadata: { b: 2 },
+    } as any;
+
+    expect(buildCombinedFlowOAuthCallbackParams(ctx)).toEqual({
+      signUpUrl: '/sign-in#/create',
+      signInUrl: '/sign-in',
+      signUpForceRedirectUrl: '/after-up',
+      signInForceRedirectUrl: '/after-in',
+      firstFactorUrl: '../../factor-one',
+      secondFactorUrl: '../../factor-two',
+      resetPasswordUrl: '../../reset-password',
+      signInProtectCheckUrl: '../../protect-check',
+      continueSignUpUrl: '../continue',
+      verifyEmailAddressUrl: '../verify-email-address',
+      verifyPhoneNumberUrl: '../verify-phone-number',
+      signUpProtectCheckUrl: '../protect-check',
+      unsafeMetadata: { b: 2 },
+    });
   });
 });
 

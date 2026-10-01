@@ -63,6 +63,16 @@ export function buildSignUpOAuthCallbackParams(ctx: SignUpContextType): HandleOA
   };
 }
 
+export function buildCombinedFlowOAuthCallbackParams(ctx: SignUpContextType): HandleOAuthCallbackParams {
+  return {
+    ...buildSignUpOAuthCallbackParams(ctx),
+    firstFactorUrl: '../../factor-one',
+    secondFactorUrl: '../../factor-two',
+    resetPasswordUrl: '../../reset-password',
+    signInProtectCheckUrl: '../../protect-check',
+  };
+}
+
 export function buildSignUpOAuthTransportCallbackParams(ctx: SignUpContextType): HandleOAuthCallbackParams {
   return {
     ...buildSignUpOAuthCallbackParams(ctx),
