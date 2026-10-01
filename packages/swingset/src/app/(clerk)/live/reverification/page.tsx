@@ -109,7 +109,7 @@ function DialogHarness() {
   const nextStep: OuterStep | null =
     reverification.status === 'retrying' && presentation === 'replace'
       ? 'finalizing'
-      : reverification.status === 'ready' || reverification.status === 'unavailable'
+      : reverification.status === 'ready' || reverification.status === 'error'
         ? 'verify'
         : null;
 

@@ -17,7 +17,7 @@ The example pauses briefly in each pending state. Enter `error` in password or b
 
 ## Usage
 
-The feature wrapper reads Clerk state and drives the reverification flow. It renders nothing while `status` is `idle`. While a challenge is still preparing, the parent card shows a verification header, a centered spinner, and a disabled continue button, then shows the factor without a step transition. Keep the same card around the component for a ready factor, a pending retry, or the unavailable state. Isolated panel stories below are for visual development only.
+The feature wrapper reads Clerk state and drives the reverification flow. It renders nothing while `status` is `idle`. While a challenge is still preparing, the parent card shows a verification header, a centered spinner, and a disabled continue button, then shows the factor without a step transition. Keep the same card around the component for a ready factor, a pending retry, or the error state. Isolated panel stories below are for visual development only.
 
 ```tsx
 import { Card } from '@clerk/mosaic/components/card';
@@ -33,6 +33,24 @@ const [runAction, reverification] = useReverificationFlow(action);
 ## Panels
 
 These examples isolate the presentational views and their visual states. Product code should normally render the `Reverification` block shown above.
+
+### Pending
+
+This state is used while reverification is still loading/starting and we don't know the factor yet, it can be avoided entirely by not rendering `<Reverification>` while `reverification.status === 'loading'`.
+
+<Story name='Pending' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+### Error
+
+Most errors are shown inline on the factor page, but these states are for catastrophic errors outside of that.
+
+#### No factors available
+
+<Story name='ErrorNoFactors' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+#### Something went wrong
+
+<Story name='ErrorGeneric' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
 
 ### Password
 

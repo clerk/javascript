@@ -2,7 +2,11 @@ import { Button } from '@clerk/mosaic/components/button';
 import { Card } from '@clerk/mosaic/components/card';
 import type { ReverificationMethod, ReverificationStep } from '@clerk/mosaic/features/reverification';
 import { otpChannelFor } from '@clerk/mosaic/features/reverification/reverification.utils';
-import { ReverificationView } from '@clerk/mosaic/features/reverification/reverification.view';
+import {
+  ReverificationError,
+  ReverificationPending,
+  ReverificationView,
+} from '@clerk/mosaic/features/reverification/reverification.view';
 import { ReverificationBackupCode } from '@clerk/mosaic/features/reverification/steps/reverification-backup-code';
 import { ReverificationHelp } from '@clerk/mosaic/features/reverification/steps/reverification-help';
 import { ReverificationMethodPicker } from '@clerk/mosaic/features/reverification/steps/reverification-method-picker';
@@ -260,6 +264,30 @@ export function Default(): JSX.Element {
       key={runId}
       onComplete={() => setComplete(true)}
     />
+  );
+}
+
+export function Pending(): JSX.Element {
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationPending />
+    </Card.Root>
+  );
+}
+
+export function ErrorNoFactors(): JSX.Element {
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationError reason='noFactors' />
+    </Card.Root>
+  );
+}
+
+export function ErrorGeneric(): JSX.Element {
+  return (
+    <Card.Root renderBranding={false}>
+      <ReverificationError reason='generic' />
+    </Card.Root>
   );
 }
 
