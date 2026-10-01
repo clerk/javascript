@@ -24,15 +24,7 @@ const Root = React.forwardRef<HTMLDivElement, PanelRootProps>(function PanelRoot
   });
 });
 
-/**
- * A page's headline. Inside a profile that has gone compact the headline IS the way to the other
- * pages: the heading holds a button — the title, and a caret beside it — that opens the navigation
- * popover, or sheet on a phone. Anywhere else — the wide layout, or a page rendered on its own — it is the heading alone.
- *
- * The caret sits `vertical-align: middle`, which CSS defines as the box's midpoint on the parent's
- * baseline plus half its x-height: optically centered on the lowercase letters rather than on the
- * line box. That needs an inline formatting context, so the button is `display: inline`.
- */
+// In a compact profile the heading holds a button that opens the navigation.
 const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTitle(
   { children, render, xstyle, ...rest },
   ref,
@@ -42,7 +34,6 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
   const registerPageTitle = profile?.registerPageTitle;
   const page = panel?.value;
   const level = useHeadingLevel();
-  // The sheet's return-focus target. A no-op outside a profile's page, where there is no sheet.
   const registerTrigger = React.useCallback(
     (element: HTMLButtonElement | null) => {
       if (page !== undefined) {
@@ -105,9 +96,7 @@ const Sections = React.forwardRef<HTMLDivElement, PanelSectionsProps>(function P
 });
 
 /**
- * A page of content, composed through `Panel.Root`, `Panel.Title`, and `Panel.Sections`. The
- * sections sit one heading level below the title. Every part accepts the Mosaic `render` prop and
- * forwards its ref.
+ * A page of content. `Panel.Sections` sit one heading level below `Panel.Title`.
  *
  * ```tsx
  * <Panel.Root>

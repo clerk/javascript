@@ -11,45 +11,22 @@ import {
 } from '../../tokens.stylex';
 import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
 
-/**
- * The compact layout, queried against the nearest container rather than the window: the root
- * itself standalone or inline, so the same surface collapses in a narrow layout slot or an inline
- * dialog alike — and over the page the dialog's viewport, since the root stops being a container
- * there (`rootInDialog`). The popup floats inside an inset, so its content is always narrower than
- * the screen; measured on its own the profile would collapse a step before the dialog filled the
- * screen, and for that stretch stand frameless inside a floating popup. Reading the same box the
- * dialog reads, the two change together. Unnamed on purpose: a name would bind it to one of them.
- * A container cannot query itself, which is why the grid lives on an inner element: the root is
- * the container, the layout inside it is what the query reshapes.
- *
- * `48rem` is the dialog's phone band too (`PHONE` in `dialog.styles.ts`); the two must agree, and
- * a literal in each is what StyleX allows — a value shared through `defineConsts` reaches an
- * at-rule prelude as a placeholder that swingset's bundler does not always resolve.
- */
+// Unnamed so over the page it queries the dialog's viewport; must match `PHONE` in `dialog.styles.ts`.
+// A literal: `defineConsts` in an at-rule prelude breaks the swingset build.
 const compact = '@container (width < 48rem)';
 const phone = '@media (width < 40rem)';
 
-/** How far the content's clip edge — and the scrollbar with it — sits inside the frame's corners. */
 const SCROLL_INSET = space['1.5'];
 
 const NAV_WIDTH = `calc(${space['40']} + ${space['15']})`;
-/** The pages' reading width — see `contentBody`. */
 const CONTENT_MAX_WIDTH = '56rem';
 
 const NAV_GAP = space['0.5'];
 const HALF_GAP = `calc(-1 * ${NAV_GAP} / 2)`;
 
 export const styles = stylex.create({
-  /**
-   * The query container, and the flex column the frame fills. It paints NOTHING and carries no
-   * band of its own — an element is never its own query container, so every compact rule lives on
-   * `layout`, one level inside. It is also the containing block for the dismiss the root carries
-   * inside a dialog. A fixed `width` capped by `max-width`, so a `profile` dialog's popup, which
-   * sizes to its content, takes the full width rather than the width of the current page.
-   */
+  // A fixed width so a content-sized `profile` dialog popup still takes the full width.
   root: {
-    // Centered where the host is wider. The frame runs wide; the content inside is held to a
-    // reading width of its own, see `contentBody`.
     marginInline: 'auto',
     containerName: 'cl-profile',
     containerType: 'inline-size',
@@ -60,11 +37,6 @@ export const styles = stylex.create({
     width: '94.625rem',
   },
 
-  /**
-   * The compact query's answer, for `Profile.Root` to read: `1px` wide, `2px` once the query
-   * matches, `3px` on a phone's viewport as well. Inside the root because an element is never its own query container; out of flow,
-   * unpainted and untouchable, so it costs the layout nothing.
-   */
   sentinel: {
     blockSize: '1px',
     inlineSize: {
@@ -79,32 +51,14 @@ export const styles = stylex.create({
     visibility: 'hidden',
   },
 
-  /**
-   * Over the page the popup decides the height: the root grows to fill it (the popup is a column
-   * flex) and the frame inside follows. Not inline — an inline dialog is in flow and has no height
-   * of its own to hand down, so the frame keeps its fixed one.
-   */
   rootInDialog: {
-    // Not a container over the page: the compact query then reaches the dialog's viewport, and the
-    // profile collapses exactly when the dialog fills the screen — see `compact`.
+    // Not a container here, so `compact` reaches the dialog's viewport.
     containerType: 'normal',
     flexGrow: 1,
     minHeight: 0,
   },
 
-  /**
-   * The frame: border, radius and background, so the profile looks the same standalone and as the
-   * content of a `profile` dialog — that size paints nothing itself. Compact, the frame goes: the
-   * profile is the page there, flush with whatever holds it — a full-screen popup or an inline host.
-   *
-   * The height is FIXED, not content-driven: switching pages must never resize the surface or shift
-   * the page around it. Standalone and inline it is `45rem` — compact, the viewport's height —
-   * and a host with a definite slot overrides it with one rule. Over the page the popup decides
-   * instead; see `layoutInDialog`.
-   *
-   * The grid inside: a definite row is what lets the content column scroll instead of growing — an
-   * `auto` row sizes to its content and happily exceeds the container.
-   */
+  // A fixed height so switching pages never resizes the surface.
   layout: {
     borderColor: colorVars['--cl-color-border'],
     borderRadius: {
@@ -116,16 +70,13 @@ export const styles = stylex.create({
       [compact]: '0px',
       default: '1px',
     },
-    // `clip` rather than `hidden`: the surface must never become a scroll container itself, or
-    // focusing something in the content column would scroll the whole surface instead of the column.
+    // `clip`, not `hidden`: a scroll container here would scroll the surface instead of the column.
     overflow: 'clip',
     backgroundColor: colorVars['--cl-color-background'],
     blockSize: {
       [compact]: '100dvh',
       default: '45rem',
     },
-    // In a page — standalone or inline — the frame is its border alone, the way a card sits flat in
-    // content. The card's elevation belongs to the overlay; see `layoutInDialog`.
     boxShadow: 'none',
     color: colorVars['--cl-color-foreground'],
     display: 'grid',
@@ -137,10 +88,6 @@ export const styles = stylex.create({
     minHeight: 0,
   },
 
-  /**
-   * Inline, the profile is the page's own content: no frame, no background, no fixed height, and
-   * no scroll region of its own — the page scrolls. Flush with whatever holds it.
-   */
   layoutInline: {
     borderRadius: 0,
     borderWidth: '0px',
@@ -149,11 +96,9 @@ export const styles = stylex.create({
     backgroundColor: 'transparent',
     blockSize: 'auto',
     boxShadow: 'none',
-    // No frame to inset from, so neither column carries padding; a gap holds them apart.
     columnGap: space['10'],
     gridTemplateRows: 'auto',
-    // As wide as the navigation, the gap and the pages' reading column, centered in the host. The
-    // explicit width matters: auto margins on a column-flex item otherwise shrink it to its content.
+    // Explicit width: auto margins otherwise shrink a column-flex item to its content.
     inlineSize: '100%',
     maxWidth: `calc(${NAV_WIDTH} + ${space['10']} + ${CONTENT_MAX_WIDTH})`,
   },
@@ -161,8 +106,6 @@ export const styles = stylex.create({
   layoutInDialog: {
     borderWidth: '0px',
     blockSize: 'auto',
-    // Lifted off the page like a card in a dialog: the card's elevation, none compact, where the
-    // popup is the screen and there is nothing to lift off.
     boxShadow: {
       [compact]: 'none',
       default: shadowVars['--cl-shadow-lg'],
@@ -176,9 +119,7 @@ export const styles = stylex.create({
     borderInlineEndColor: colorVars['--cl-color-border'],
     borderInlineEndStyle: 'solid',
     borderInlineEndWidth: '1px',
-    // Until measured — before hydration — the column renders in place at any width, so compact
-    // CSS hides it rather than stack a tablist over the page. The sheet's copy is portalled out of
-    // the container and never matches.
+    // Hidden in CSS too, so the column never shows on a phone before measuring.
     display: {
       [compact]: 'none',
       default: 'flex',
@@ -188,10 +129,6 @@ export const styles = stylex.create({
     minWidth: 0,
   },
 
-  /**
-   * Nothing to inset from and no pages beside it to edge: inline there is no frame, and in the
-   * sheet the sheet's own content padding frames it.
-   */
   navFlush: {
     padding: 0,
     borderInlineEndWidth: '0px',
@@ -217,9 +154,7 @@ export const styles = stylex.create({
     gap: NAV_GAP,
     display: 'flex',
     flexDirection: 'column',
-    // Positioned, and a stacking context of its own, so a consumer can hang marks off it — an
-    // anchor-positioned highlight as `::before` / `::after` at `z-index: -1` lands under the items'
-    // text and above this surface's background. See the Profile docs' customisation example.
+    // Positioned and isolated as hooks for consumer highlight marks at `z-index: -1`.
     isolation: 'isolate',
     position: 'relative',
     minWidth: 0,
@@ -253,7 +188,6 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
-    // The containing block for the hit target below, and for nothing else.
     position: 'relative',
     textAlign: 'start',
     whiteSpace: 'nowrap',
@@ -262,8 +196,7 @@ export const styles = stylex.create({
       '@media (pointer: coarse)': targetVars['--cl-target-coarse'],
     },
     width: '100%',
-    // Spans half the gap to each neighbour, so the pointer never falls between destinations. The
-    // ends stay flush with the list.
+    // Spans half the gap each side so the pointer never falls between items.
     '::before': {
       insetInline: 0,
       content: '""',
@@ -297,13 +230,7 @@ export const styles = stylex.create({
     marginBlockStart: 'auto',
   },
 
-  // The content column is the scroll region — composed from the `ScrollArea` atoms, so the
-  // scrollbar and edge fade land on the column's edge and the padding scrolls with the content.
-  //
-  // The column, not the scroller, carries a little of the block padding: a scroll container clips
-  // at its padding edge, so padding on the scroller would not keep content out of the frame's
-  // rounded corners. Here the clip edge sits inside them, and the scroller gives the same amount
-  // back so the page's own padding reads unchanged.
+  // The clip edge sits inside the frame's corners; the scroller gives the padding back.
   content: {
     paddingBlock: {
       [compact]: 0,
@@ -311,18 +238,15 @@ export const styles = stylex.create({
     },
     minWidth: 0,
   },
-  /** Inline the column is not a scroll region, so it carries no inset for a clip edge. */
   contentInline: {
     paddingBlock: 0,
   },
 
-  /** Inline the pages carry no padding of their own: the headline starts level with the first destination. */
   contentViewportInline: {
     paddingBlock: 0,
     paddingInline: 0,
   },
 
-  /** Inline, the branding closes out the pages' column instead of the navigation's. */
   contentBranding: {
     marginBlockStart: space['8'],
   },
@@ -338,7 +262,6 @@ export const styles = stylex.create({
     },
   },
 
-  /** The pages' column: held to a reading width and centered, however wide the frame runs. */
   contentBody: {
     marginInline: 'auto',
     maxInlineSize: CONTENT_MAX_WIDTH,
@@ -346,5 +269,5 @@ export const styles = stylex.create({
 });
 
 export const contentScroll = scrollAreaRoot;
-// A held gutter: switching to a page that does not scroll must not reflow the one that did.
+// A stable gutter so a page that does not scroll does not reflow the one that did.
 export const contentViewportScroll = scrollAreaViewport('stable');

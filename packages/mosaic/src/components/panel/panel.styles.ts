@@ -12,10 +12,7 @@ export const styles = stylex.create({
     display: 'block',
   },
 
-  /**
-   * The headline as a button: the heading's own type, inline so the caret can align to its
-   * x-height, with a little room around it for the focus ring.
-   */
+  // Inline so the caret can align to the title's x-height.
   navTrigger: {
     font: 'inherit',
     borderRadius: radiusVars['--cl-radius-md'],

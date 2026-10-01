@@ -23,7 +23,7 @@ import { contentScroll, contentViewportScroll, styles } from './profile.styles';
 
 type NavLayout = 'column' | 'popover' | 'sheet';
 
-// Read off the sentinel's width (1/2/3px) so the breakpoints live in CSS alone; unmeasured is wide.
+// The sentinel's width (1/2/3px) carries the CSS breakpoints into JS; unmeasured is wide.
 function navLayoutFor(sentinelWidth: number): NavLayout {
   if (sentinelWidth >= 3) {
     return 'sheet';
@@ -42,45 +42,15 @@ function useProfileContext(part: string): ProfileContextValue {
 export type ProfileElevation = 'card' | 'flush';
 
 export interface ProfileRootProps extends Omit<MosaicComponentProps<'div'>, 'children'> {
-  /** The selected page, by the `value` of its `Profile.NavItem` and `Profile.ContentPanel`. */
   value: string;
   onValueChange?: (value: string) => void;
-  /**
-   * Arrow-key direction in the navigation. Vertical, since the navigation is a column; the compact
-   * row is a container query the keyboard model cannot see.
-   *
-   * @default 'vertical'
-   */
   orientation?: TabsProps['orientation'];
   activationMode?: TabsProps['activationMode'];
-  /**
-   * Signs the foot of the navigation with "Secured by Clerk". An instance that has paid the
-   * branding off carries none of it, so a connected surface passes `displayConfig.branded` here.
-   *
-   * @default true
-   */
   renderBranding?: boolean;
-  /**
-   * How the surface sits in its host, the way `Card`'s does. `card` is framed: border, radius, a
-   * fixed height with the pages scrolling inside. `flush` is the page's own content: no frame or
-   * background, the page scrolls, the columns a gap apart. Over the page, in a `profile` dialog,
-   * the popup decides the geometry.
-   *
-   * @default 'card'
-   */
   elevation?: ProfileElevation;
   children: React.ReactNode;
 }
 
-/**
- * A surface you navigate: a column of destinations beside the page each one opens. The account
- * profile and the organization profile are both one of these.
- *
- * Rendered as the content of a `profile` dialog's popup, it fills it and paints it — the dialog
- * positions, the profile paints, the way a `Card` does inside a `card` dialog. Like `Card`, it
- * reads `DialogContext` to name the dialog (through `Profile.Title`) and carry its dismiss, so the
- * composition needs nothing passed in; standalone it carries no dismiss.
- */
 const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function ProfileRoot(
   {
     value,
@@ -98,8 +68,6 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
 ) {
   const dialog = React.useContext(DialogContext);
   const inline = elevation === 'flush';
-  // Inside a dialog the title takes the id the popup points `aria-labelledby` at, so the surface
-  // names the dialog without knowing it is in one — the way `Card.Title` does.
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
   const [sentinel, setSentinel] = React.useState<HTMLSpanElement | null>(null);
@@ -120,7 +88,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     }
   }, []);
   const pageTitleFor = React.useCallback((page: string) => pageTitles.current.get(page) ?? null, []);
-  // Scoped to the layout it opened in, so a replacement sheet or popover never mounts open or reopens later.
+  // Scoped to a layout so the replacement sheet or popover never mounts open.
   const [navOpenIn, setNavOpenIn] = React.useState<NavLayout | null>(null);
   const navOpen = navOpenIn === navLayout;
   const openNav = React.useCallback(() => setNavOpenIn(navLayout), [navLayout]);
@@ -173,9 +141,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
             ref={setSentinel}
             {...mergeStyleProps(themeProps('profile-sentinel'), stylex.props(reset.base, styles.sentinel))}
           />
-          {/* First in the DOM, so it is the first tabbable element and takes the dialog's opening
-              focus — the same reason `Card.Header` renders its dismiss first. Only rendered
-              inside a standard dialog. */}
+          {/* First in the DOM so it takes the dialog's opening focus, as in `Card.Header`. */}
           {isInDialog(dialog) && dialog.role !== 'alertdialog' ? <Dialog.CloseButton /> : null}
           <div
             {...mergeStyleProps(
@@ -211,12 +177,6 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
 
 export type ProfileTitleProps = MosaicComponentProps<'h2'>;
 
-/**
- * What the surface is called — "User profile", "Organization" — as a visually hidden heading. The
- * navigation and the compact sheet take their accessible names from it, and inside a dialog it
- * names the dialog too, through the popup's `labelId`: the counterpart of `Card.Title`, for a
- * surface whose visible headings belong to its pages.
- */
 const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function ProfileTitle(
   { render, xstyle, ...rest },
   ref,
@@ -228,7 +188,6 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
       ref={ref as React.Ref<HTMLSpanElement>}
       render={render ?? <Tag />}
       {...mergeStyleProps(themeProps('profile-title'), stylex.props(xstyle), rest)}
-      // The ids the navigation and the dialog point at, so the caller's cannot displace it.
       id={titleId}
     />
   );
@@ -245,13 +204,8 @@ function NavBranding() {
 }
 
 /**
- * The navigation: the destinations, and the branding at their foot. Its children are
- * `Profile.NavItem`s; they render inside the tablist, so nothing else belongs among them.
- *
- * Beside the content it is a column. Compact, it renders nothing in place: the tablist moves into
- * a popover under a page's title (`Panel.Title`) — a sheet on a phone — that the title opens and a
- * choice closes. The branding stays behind, since neither is the surface. One tablist, wherever it lives — two would be
- * two sets of tabs for one set of pages.
+ * Children are `Profile.NavItem`s only; they render inside the tablist. Compact, the tablist moves
+ * into a popover (a sheet on a phone) opened from the page's `Panel.Title`.
  */
 const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   { children, render, xstyle, ...rest },
@@ -259,9 +213,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
 ) {
   const profile = useProfileContext('Profile.Nav');
   const { titleId, renderBranding, compact, navLayout, navOpen, closeNav, value, pageTitleFor, inline } = profile;
-  // The headline that opened the sheet belongs to the page a choice just left, so the sheet's own
-  // return-focus would land on nothing. The headline of the page now showing is the same control,
-  // on the destination — resolved when focus is restored, by which time `value` is that page's.
+  // The opener's page is hidden after a choice, so focus returns to the new page's title instead.
   const finalFocus = React.useCallback(() => pageTitleFor(value), [pageTitleFor, value]);
   const list = (
     <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
@@ -331,9 +283,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
 });
 
 export interface ProfileNavItemProps extends MosaicComponentProps<'button'> {
-  /** Matches the `value` of the `Profile.ContentPanel` this destination opens. */
   value: string;
-  /** Leads the label. Any node, so a page of the consumer's own can bring its own mark. */
   icon?: React.ReactNode;
   badge?: React.ReactNode;
   disabled?: boolean;
@@ -341,7 +291,6 @@ export interface ProfileNavItemProps extends MosaicComponentProps<'button'> {
 
 const navItemBadgeDefaults = { color: 'neutral' } as const;
 
-/** A destination. Selecting it shows the `Profile.ContentPanel` sharing its `value`. */
 const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(function ProfileNavItem(
   { value, icon, badge, disabled, children, render, xstyle, onClick, ...rest },
   ref,
@@ -355,7 +304,6 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
       render={render}
       onClick={event => {
         onClick?.(event);
-        // A choice in the sheet is the end of the visit; arrowing through the list is not.
         if (compact && !event.defaultPrevented && !disabled) {
           closeNav();
         }
@@ -386,12 +334,7 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
 
 export type ProfileContentProps = MosaicComponentProps<'div'>;
 
-/**
- * The column the pages render in. Standalone and over the page it is the surface's scroll region
- * — the navigation stays put while a long page scrolls; inline the page itself scrolls and the
- * branding closes the column out. A plain `div`: the profile is often the content of the host's
- * own `main`, or of a dialog, so it claims no landmark.
- */
+// A plain `div`, not `main`: the profile often renders inside the host's `main` or a dialog.
 const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function ProfileContent(
   { children, render, xstyle, ...rest },
   ref,
@@ -438,22 +381,11 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
 });
 
 export interface ProfileContentPanelProps extends MosaicComponentProps<'div'> {
-  /** Matches the `value` of the `Profile.NavItem` that opens this page. */
   value: string;
-  /**
-   * Keeps the page in the document while another is selected — `inert`, and carrying the tabs
-   * primitive's transition attributes — so a page transition can be styled. Off, an unselected
-   * page is `hidden`. Stack the pages yourself when on: they are all in flow.
-   */
+  /** Keeps unselected pages mounted (`inert`, in flow) so a page transition can be styled. */
   shouldForceMount?: boolean;
 }
 
-/**
- * One destination's content, shown while its `value` is selected and `hidden` otherwise. With
- * `shouldForceMount` it stays in the document and carries the tabs primitive's transition contract
- * — `data-open` / `data-closed`, `data-starting-style` / `data-ending-style`, and
- * `--cl-tab-transition-direction` — so a page transition is a styling change rather than a new part.
- */
 const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(function ProfileContentPanel(
   { value, shouldForceMount, xstyle, ...rest },
   ref,
@@ -468,9 +400,7 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
           ref={ref}
           value={value}
           shouldForceMount={shouldForceMount}
-          // Compact, the tab it would be named by exists only while the sheet is open, so the panel
-          // is named by its own title instead — `Panel.Title` takes this id. Spread only then:
-          // an explicit `undefined` would displace the primitive's own `aria-labelledby`.
+          // Compact, the naming tab is not mounted; an explicit `undefined` would drop the primitive's label.
           {...(compact ? { 'aria-labelledby': titleId } : null)}
           {...mergeStyleProps(themeProps('profile-content-panel', { value }), stylex.props(xstyle), rest)}
         />
@@ -480,9 +410,7 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
 });
 
 /**
- * A surface you navigate, composed through `Profile.Root`, `Profile.Title`, `Profile.Nav`,
- * `Profile.NavItem`, `Profile.Content`, and `Profile.ContentPanel`. Every part
- * accepts the Mosaic `render` prop and forwards its ref.
+ * A surface you navigate: a column of destinations beside the page each one opens.
  *
  * ```tsx
  * <Profile.Root value={page} onValueChange={setPage}>
