@@ -37,8 +37,7 @@ export const root = stylex.create({
 // Mirrors `SHEET` in `dialog.styles.ts`; the two must agree.
 const sheetBand = '@container cl-dialog (width < 40rem)' as const;
 
-// A card in a `compactPlacement='sheet'` dialog: drawer-shaped under the sheet band. `minWidth`
-// rather than `width` so it overrides the size's fixed width without restating it.
+// `minWidth` rather than `width`, so it beats the size's fixed width without restating it.
 export const sheet = stylex.create({
   root: {
     borderRadius: {
@@ -46,8 +45,12 @@ export const sheet = stylex.create({
       [sheetBand]: `${radiusVars['--cl-radius-2xl']} ${radiusVars['--cl-radius-2xl']} 0 0`,
     },
     boxShadow: { default: shadowVars['--cl-shadow-lg'], [sheetBand]: shadowVars['--cl-shadow-sm'] },
-    // Tops the rows' `space['4']` block padding up to the `space['5']` inline padding.
-    paddingBlockEnd: { default: null, [sheetBand]: `calc(${space['1']} + env(safe-area-inset-bottom, 0px))` },
+    flexShrink: { default: null, [sheetBand]: 0 },
+    // Tops the rows' `space['4']` block padding up to `space['5']`; the keyboard inset keeps the surface under the keyboard.
+    paddingBlockEnd: {
+      default: null,
+      [sheetBand]: `calc(${space['1']} + max(env(safe-area-inset-bottom, 0px), var(--_cl-keyboard-inset, 0px)))`,
+    },
     paddingBlockStart: { default: null, [sheetBand]: space['1'] },
     minWidth: { default: null, [sheetBand]: '100%' },
   },

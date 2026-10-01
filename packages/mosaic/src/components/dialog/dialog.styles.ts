@@ -430,9 +430,16 @@ export const compactPlacements = stylex.create({
       [SHEET]: `${radiusVars['--cl-radius-2xl']} ${radiusVars['--cl-radius-2xl']} 0 0`,
       default: radiusVars['--cl-radius-xl'],
     },
+    overscrollBehavior: { [SHEET]: 'contain', default: null },
     // `align-self` on the grid item, not `align-items` on the viewport, because the viewport is
     // shared: bottom-aligning there would drag a centered dialog down with it.
     alignSelf: { [SHEET]: 'end', default: null },
+    // Scrolls itself rather than the overlay, so the keyboard's padding never makes the page scroll.
+    maxHeight: {
+      [SHEET]: 'calc(100dvh - var(--_cl-dialog-inset))',
+      default: null,
+    },
+    overflowY: { [SHEET]: 'auto', default: null },
     width: { [SHEET]: '100%', default: 'fit-content' },
   },
 });
@@ -454,16 +461,11 @@ export const trackCompactPlacements = stylex.create({
     // measured as `scrollTop` 0 -> 136 -> 50 -> 8 -> 0. It read as the sheet flying too far up and
     // snapping back, the unwind stacking extra bounces on the real overshoot. `clip` never becomes
     // scrollable, so focus has nothing to scroll.
-    //
-    // The cost is real and accepted: a sheet taller than a phone screen is clipped rather than
-    // scrolled, because the same rule that contains the slide also contains the overflow. A tall
-    // surface on a phone wants the default `center`, which does not translate and so is not
-    // clipped here.
     overflow: { [SHEET]: 'clip', default: null },
-    // Flush to the sides and the bottom edge, so the keyboard's share is all that is left below.
+    // Flush to the sides and the bottom edge; the card pads for the keyboard, so its surface runs behind Safari's bar.
     paddingInline: { [ABOVE_PHONE]: 'var(--_cl-dialog-inset)', [SHEET]: 0, default: space['4'] },
     paddingBlockEnd: {
-      [SHEET]: 'var(--_cl-keyboard-inset, 0px)',
+      [SHEET]: 0,
       default: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-inset, 0px))',
     },
   },
@@ -583,6 +585,11 @@ export const popupMotion = stylex.create({
     // surface is still moving reads as a flash, which is what the original objection was
     // actually describing.
     opacity: {
+      [SHEET]: {
+        default: 1,
+        ':where([data-ending-style])': 0,
+        ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
+      },
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,
     },
@@ -679,7 +686,9 @@ export const popupMotion = stylex.create({
         default: null,
         '@media (prefers-reduced-motion: no-preference)': {
           default: null,
-          ':where([data-starting-style], [data-ending-style])': '0 100%',
+          ':where([data-ending-style])': '0 100%',
+          // Safari tints its bar once, at mount, from what sits on the bottom edge: leave the sheet there.
+          ':where([data-starting-style])': `0 calc(100% - ${space['2']})`,
         },
       },
       default: null,

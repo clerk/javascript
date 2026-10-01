@@ -119,8 +119,9 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
   variant?: DialogVariant;
   /**
    * Bottom-anchors the surface in the compact band — the dialog viewport under `40rem` — flush to
-   * the sides and bottom edge, and slides it up as a sheet, instead of centering it. For a dialog that asks one thing and returns
-   * — a confirmation, a single-field form — where the answer belongs within thumb's reach.
+   * the sides and bottom edge, and slides it up as a sheet, instead of centering it. For a dialog
+   * that asks one thing and returns — a confirmation, a form — where the answer belongs within
+   * thumb's reach.
    * `card` only. @default 'center'
    */
   compactPlacement?: DialogCompactPlacement;
