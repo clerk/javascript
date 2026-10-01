@@ -10,6 +10,7 @@ on:
       - 'integration/templates/expo-native/**'
       - 'integration/tests/expo-native/**'
       - 'packages/expo/**'
+      - 'packages/expo-biometrics/**'
       - 'packages/expo-google-signin/**'
   workflow_dispatch:
 
@@ -84,6 +85,7 @@ jobs:
               turbo.json \
               packages/clerk-js \
               packages/expo \
+              packages/expo-biometrics \
               packages/expo-google-signin \
               packages/react \
               packages/shared \
@@ -121,10 +123,11 @@ jobs:
       - name: Build and pack Clerk packages
         if: steps.native-build-cache.outputs.cache-hit != 'true'
         run: |
-          pnpm --filter @clerk/expo... build
+          pnpm --filter @clerk/expo... --filter @clerk/expo-biometrics build
           mkdir -p "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo pack --pack-destination "$SDK_PACK_DIR"
           pnpm --filter @clerk/expo-google-signin pack --pack-destination "$SDK_PACK_DIR"
+          pnpm --filter @clerk/expo-biometrics pack --pack-destination "$SDK_PACK_DIR"
 
       - name: Install fixture dependencies
         if: steps.native-build-cache.outputs.cache-hit != 'true'
@@ -138,7 +141,8 @@ jobs:
           # [0-9] keeps this glob off the clerk-expo-google-signin tarball.
           SDK_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-[0-9]*.tgz)"
           GOOGLE_SIGNIN_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-google-signin-*.tgz)"
-          pnpm add "$SDK_TARBALL" "$GOOGLE_SIGNIN_TARBALL" -w
+          BIOMETRICS_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-biometrics-*.tgz)"
+          pnpm add "$SDK_TARBALL" "$GOOGLE_SIGNIN_TARBALL" "$BIOMETRICS_TARBALL" -w
           # expo-dev-client makes even release builds boot into the dev
           # launcher (unreachable Metro in CI), which stalls every Maestro
           # flow on a blank screen. Skip it on e2e jobs only.
@@ -208,6 +212,15 @@ jobs:
         if: matrix.platform == 'android' && steps.native-build-cache.outputs.cache-hit != 'true'
         working-directory: ${{ env.FIXTURE_DIR }}
         run: pnpm build:android
+
+      # The module's Robolectric tests need an Expo host project for expo-modules-core, so they run in the fixture.
+      # The packed module leaves out its tests, so they are copied in from the repo.
+      - name: Test expo-biometrics Android module
+        if: matrix.platform == 'android' && steps.native-build-cache.outputs.cache-hit != 'true'
+        working-directory: ${{ env.FIXTURE_DIR }}/android
+        run: |
+          cp -R "$GITHUB_WORKSPACE/packages/expo-biometrics/android/src/test" "$(readlink -f ../node_modules/@clerk/expo-biometrics)/android/src/"
+          ./gradlew :clerk-expo-biometrics:testDebugUnitTest
 
       - name: Prebuild iOS fixture
         if: matrix.platform == 'ios' && steps.native-build-cache.outputs.cache-hit != 'true'
