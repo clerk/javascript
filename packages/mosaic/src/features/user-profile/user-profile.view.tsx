@@ -6,7 +6,6 @@ import { Profile } from '../../components/profile';
 import { useMessages } from '../../localization';
 import { getAvailableUserProfilePages, resolveUserProfilePages, USER_PROFILE_PAGE_ICONS } from './user-profile.layout';
 import type { CustomProfilePage, UserProfilePageId, UserProfilePages } from './user-profile.types';
-import { UserProfileApiKeysPanelView } from './user-profile-api-keys-panel.view';
 import { UserProfileBillingPanelView } from './user-profile-billing-panel.view';
 import { UserProfileProfilePanelView } from './user-profile-profile-panel.view';
 import { UserProfileSecurityPanelView } from './user-profile-security-panel.view';
@@ -27,7 +26,7 @@ export interface UserProfileViewProps extends Omit<ProfileRootProps, 'children' 
   onPageChange: (page: UserProfilePageId | (string & {})) => void;
 }
 
-function BuiltInPage({ id, pages }: { id: UserProfilePageId; pages: UserProfilePages }): React.ReactElement | null {
+function BuiltInPage({ id, pages }: { id: UserProfilePageId; pages: UserProfilePages }): React.ReactNode {
   switch (id) {
     case 'account':
       return <UserProfileProfilePanelView {...pages.account} />;
@@ -36,7 +35,7 @@ function BuiltInPage({ id, pages }: { id: UserProfilePageId; pages: UserProfileP
     case 'billing':
       return pages.billing ? <UserProfileBillingPanelView {...pages.billing} /> : null;
     case 'apiKeys':
-      return pages.apiKeys ? <UserProfileApiKeysPanelView {...pages.apiKeys} /> : null;
+      return pages.apiKeys;
   }
 }
 
