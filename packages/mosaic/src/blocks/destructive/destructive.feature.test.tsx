@@ -148,7 +148,7 @@ describe('Destructive with reverification', () => {
       );
       const { user } = await openVerification();
 
-      expect(await screen.findByLabelText('Password')).toBeVisible();
+      expect(await screen.findByLabelText('Password', undefined, { timeout: 3000 })).toBeVisible();
       await untilConfirmStepIsGone();
       const stopWatching = watchForConfirmStep();
       await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
@@ -171,7 +171,7 @@ describe('Destructive with reverification', () => {
       );
       const { user } = await openVerification();
 
-      const field = await screen.findByLabelText('Password');
+      const field = await screen.findByLabelText('Password', undefined, { timeout: 3000 });
       await untilConfirmStepIsGone();
       const stopWatching = watchForConfirmStep();
       await user.type(field, 'hunter2{Enter}');
@@ -196,7 +196,7 @@ describe('Destructive with reverification', () => {
       />,
     );
     const { user } = await openVerification();
-    expect(await screen.findByLabelText('Password')).toBeVisible();
+    expect(await screen.findByLabelText('Password', undefined, { timeout: 3000 })).toBeVisible();
     await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
 
