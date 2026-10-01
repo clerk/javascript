@@ -2711,15 +2711,15 @@ export class Clerk implements ClerkInterface {
     const signUpProtectCheckUrl =
       params.signUpProtectCheckUrl ||
       buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true });
+    const signInUrl = params.signInUrl || displayConfig.signInUrl;
+    const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
     const enterpriseConnectionsUrl = buildURL(
-      { base: displayConfig.signUpUrl, hashPath: '/enterprise-connections' },
+      { base: signUpUrl, hashPath: '/enterprise-connections' },
       { stringify: true },
     );
 
     const navigateToSignUpProtectCheck = makeNavigate(signUpProtectCheckUrl);
 
-    const signInUrl = params.signInUrl || displayConfig.signInUrl;
-    const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
     const internalNavigateOnSetActive = params.__internal_navigateOnSetActive;
 
     const setActiveNavigate = async ({

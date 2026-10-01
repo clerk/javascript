@@ -2932,6 +2932,47 @@ describe('Clerk singleton', () => {
       });
     });
 
+    it('builds the enterprise connections url from the signUpUrl param when provided', async () => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: {},
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+          signIn: new SignIn(null),
+          signUp: new SignUp({
+            status: 'missing_requirements',
+            missing_fields: ['enterprise_sso'],
+            verifications: {
+              external_account: {
+                status: 'verified',
+                strategy: 'oauth_google',
+                external_verification_redirect_url: '',
+                error: null,
+              },
+            },
+          } as any as SignUpJSON),
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await sut.handleRedirectCallback({ signUpUrl: '/custom-sign-up' });
+
+      await waitFor(() => {
+        expect(mockNavigate.mock.calls[0][0]).toBe('/custom-sign-up#/enterprise-connections');
+      });
+    });
+
     it('redirects user to the protect-check url before the enterprise connections url if the sign-up is protect-gated', async () => {
       mockEnvironmentFetch.mockReturnValue(
         Promise.resolve({
