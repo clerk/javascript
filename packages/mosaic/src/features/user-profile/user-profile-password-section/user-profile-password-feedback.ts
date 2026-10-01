@@ -82,10 +82,10 @@ export function passwordComplexityMessage(failures: string[], settings: Settings
 
 export function passwordFieldFeedback(
   { complexity, strength }: PasswordValidation,
-  settings: Settings,
+  settings: Settings & Pick<PasswordSettingsData, 'show_zxcvbn'>,
   messages: Messages,
   locale: string,
-): FieldFeedback {
+): FieldFeedback | undefined {
   const failures = Object.entries(complexity ?? {})
     .filter(([, failed]) => failed)
     .map(([code]) => code);
@@ -98,6 +98,9 @@ export function passwordFieldFeedback(
   }
   if (strength?.state === 'pass') {
     return { type: 'warning', message: messages.rules.stronger };
+  }
+  if (!strength && settings.show_zxcvbn) {
+    return undefined;
   }
   return { type: 'success', message: messages.rules.strong };
 }
