@@ -101,7 +101,7 @@ export function getRecovery(
     return { kind: 'reauthorize', additionalScopes };
   }
 
-  if (additionalScopes.length === 0 && !RECONNECT_ERROR_CODES.includes(account.verification?.error?.code ?? '')) {
+  if (!RECONNECT_ERROR_CODES.includes(account.verification?.error?.code ?? '')) {
     return null;
   }
 
