@@ -1,4 +1,5 @@
 import { Button } from '@clerk/mosaic/components/button';
+import { Checkbox } from '@clerk/mosaic/components/checkbox';
 import { Field } from '@clerk/mosaic/components/field';
 import { Input } from '@clerk/mosaic/components/input';
 import { Select } from '@clerk/mosaic/components/select';
@@ -22,6 +23,9 @@ const styles = stylex.create({
   stack: {
     display: 'grid',
     gap: 8,
+    maxWidth: 384,
+  },
+  horizontal: {
     maxWidth: 384,
   },
   errorStack: {
@@ -154,6 +158,24 @@ export function WithSelect() {
         <Select.Popup />
       </Select.Root>
       <Field.Description>Applies to new members of the organization.</Field.Description>
+    </Field.Root>
+  );
+}
+
+export function Horizontal() {
+  return (
+    <Field.Root
+      orientation='horizontal'
+      xstyle={styles.horizontal}
+    >
+      <Checkbox
+        name='signOutOfOtherSessions'
+        defaultChecked
+      />
+      <Field.Label>Sign out of all devices</Field.Label>
+      <Field.Description>
+        It is recommended to sign out of all other devices which may have used your old password.
+      </Field.Description>
     </Field.Root>
   );
 }

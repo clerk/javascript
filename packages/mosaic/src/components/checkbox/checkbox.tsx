@@ -5,6 +5,7 @@ import type { MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
+import { useOptionalFieldControlProps } from '../field/field.context';
 import { Icon } from '../icon';
 import { checkboxInputMarker } from './checkbox.markers.stylex';
 import { indicatorSizes, sizes, styles } from './checkbox.styles';
@@ -16,9 +17,29 @@ export interface CheckboxProps
 }
 
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(function MosaicCheckbox(
-  { size = 'md', indeterminate = false, disabled, xstyle, ...rest },
+  {
+    size = 'md',
+    indeterminate = false,
+    disabled: disabledProp,
+    required: requiredProp,
+    id,
+    'aria-invalid': ariaInvalid,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    xstyle,
+    ...rest
+  },
   ref,
 ) {
+  const fieldProps = useOptionalFieldControlProps({
+    id,
+    disabled: disabledProp,
+    required: requiredProp,
+    ariaInvalid,
+    ariaLabelledBy,
+    ariaDescribedBy,
+  });
+  const disabled = fieldProps?.disabled ?? disabledProp;
   const setInputRef = React.useCallback(
     (node: HTMLInputElement | null) => {
       if (node) {
@@ -44,6 +65,11 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
         ref={setInputRef}
         type='checkbox'
         disabled={disabled}
+        required={fieldProps?.required ?? requiredProp}
+        id={fieldProps?.id ?? id}
+        aria-invalid={fieldProps?.['aria-invalid'] ?? ariaInvalid}
+        aria-labelledby={fieldProps?.['aria-labelledby'] ?? ariaLabelledBy}
+        aria-describedby={fieldProps?.['aria-describedby'] ?? ariaDescribedBy}
         {...mergeStyleProps(
           themeProps('checkbox-input'),
           stylex.props(

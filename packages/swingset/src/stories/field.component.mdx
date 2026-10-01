@@ -79,11 +79,28 @@ through `aria-labelledby` rather than `htmlFor`. Description and error relations
 Explicit `htmlFor` still renders a native `label`. `Select.Trigger` opts in; `Input` and `OTP` keep
 the native label.
 
+### Horizontal
+
+<Story
+  name='Horizontal'
+  storyModule={FieldStories}
+/>
+
+Pass `orientation='horizontal'` to `Field.Root` to place the control beside its label, as with a `Checkbox`. The description and messages sit beneath the label, aligned with its text.
+
+```tsx
+<Field.Root orientation='horizontal'>
+  <Checkbox name='signOutOfOtherSessions' />
+  <Field.Label>Sign out of all devices</Field.Label>
+  <Field.Description>Recommended after changing your password.</Field.Description>
+</Field.Root>
+```
+
 ## Parts
 
 | Part                | Stable slot class       | Description                                                                                                                                          |
 | ------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Field.Root`        | `.cl-field-root`        | Unstyled `div` and field context provider.                                                                                                           |
+| `Field.Root`        | `.cl-field-root`        | `div` that stacks its parts, or places the control beside the label when horizontal, and provides the field context.                                 |
 | `Field.Label`       | `.cl-field-label`       | Native `label` associated with the field control; a `span` that focuses the control when it cannot be natively labelled, such as a `Select` trigger. |
 | `Field.Description` | `.cl-field-description` | Supporting `p` associated with the field control.                                                                                                    |
 | `Field.Message`     | `.cl-field-message`     | Height-animated live region for the messages below.                                                                                                  |
@@ -104,4 +121,4 @@ The Mosaic field is themed with **StyleX**. Each styled part carries the stable 
 }
 ```
 
-`Field.Root` ships no layout. Higher-level blocks own how its parts are arranged; for example, a settings row can provide the grid and alignment for a field. Customize an `Input` through its exposed tokens, `.cl-input`, `className`, and `style`; Field does not add control-specific styling.
+`Field.Root` only stacks its parts, or places them in two columns when horizontal; `data-orientation` reflects which. Higher-level blocks own any other arrangement; for example, a settings row can provide the grid and alignment for a field. Customize an `Input` through its exposed tokens, `.cl-input`, `className`, and `style`; Field does not add control-specific styling.

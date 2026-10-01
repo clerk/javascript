@@ -6,6 +6,7 @@ import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { Checkbox } from '../checkbox';
 import { Input } from '../input';
 import { Select } from '../select';
 import { Field } from './field';
@@ -173,6 +174,60 @@ describe('Mosaic Field', () => {
     }
     expect(inside).toHaveClass('cl-input');
     expect(inside).not.toHaveClass('cl-field-control');
+  });
+
+  it('associates a checkbox laid out beside its label', async () => {
+    render(
+      <Field.Root
+        orientation='horizontal'
+        data-testid='root'
+      >
+        <Checkbox />
+        <Field.Label>Sign out of all devices</Field.Label>
+        <Field.Description>Recommended after changing your password.</Field.Description>
+      </Field.Root>,
+    );
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Sign out of all devices' });
+    expect(screen.getByTestId('root')).toHaveAttribute('data-orientation', 'horizontal');
+    expect(checkbox).toHaveAttribute(
+      'aria-describedby',
+      screen.getByText('Recommended after changing your password.').id,
+    );
+    await userEvent.click(screen.getByText('Sign out of all devices'));
+    expect(checkbox).toBeChecked();
+  });
+
+  it('toggles a checkbox wrapped in its label', async () => {
+    render(
+      <Field.Root>
+        <Field.Label>
+          <Checkbox />
+          Stay signed in
+        </Field.Label>
+      </Field.Root>,
+    );
+
+    await userEvent.click(screen.getByText('Stay signed in'));
+    expect(screen.getByRole('checkbox', { name: 'Stay signed in' })).toBeChecked();
+  });
+
+  it('propagates semantic state to a checkbox', () => {
+    render(
+      <Field.Root
+        disabled
+        required
+        invalid
+      >
+        <Checkbox />
+      </Field.Root>,
+    );
+
+    const checkbox = screen.getByRole('checkbox');
+    expect(checkbox).toBeDisabled();
+    expect(checkbox).toBeRequired();
+    expect(checkbox).toHaveAttribute('aria-invalid', 'true');
+    expect(checkbox.parentElement).toHaveAttribute('data-disabled');
   });
 
   it('propagates semantic state while preserving explicit control props', () => {

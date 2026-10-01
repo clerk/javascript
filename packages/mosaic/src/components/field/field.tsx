@@ -11,6 +11,7 @@ import { feedbackHeight, feedbackStyles } from '../../utils/feedback.styles';
 import { reset } from '../../utils/reset.styles';
 import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import { visuallyHidden } from '../../utils/visually-hidden.styles';
+import type { FieldOrientation } from './field.context';
 import {
   FieldMessageProvider,
   FieldProvider,
@@ -19,6 +20,10 @@ import {
   useRegisterFieldPartId,
 } from './field.context';
 import { styles } from './field.styles';
+
+function contentPlacement(context: ReturnType<typeof useOptionalFieldContext>) {
+  return context?.orientation === 'horizontal' && styles.horizontalContent;
+}
 
 function useNativeLabelWarning(label: HTMLElement | null) {
   React.useEffect(() => {
@@ -30,13 +35,15 @@ function useNativeLabelWarning(label: HTMLElement | null) {
 
 /** Props for a field container that associates exactly one form control. */
 export interface FieldRootProps extends MosaicComponentProps<'div'> {
+  /** `horizontal` places the control beside the label, with supporting text beneath the label. */
+  orientation?: FieldOrientation;
   disabled?: boolean;
   required?: boolean;
   invalid?: boolean;
 }
 
 const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFieldRoot(
-  { render, xstyle, disabled = false, required = false, invalid = false, ...rest },
+  { render, xstyle, orientation = 'vertical', disabled = false, required = false, invalid = false, ...rest },
   ref,
 ) {
   const element = useRender({
@@ -44,12 +51,17 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base, styles.root, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('field-root', { orientation }),
+        stylex.props(reset.base, styles.root, orientation === 'horizontal' && styles.horizontal, xstyle),
+        rest,
+      ),
     },
   });
 
   return (
     <FieldProvider
+      orientation={orientation}
       disabled={disabled}
       required={required}
       invalid={invalid}
@@ -98,6 +110,7 @@ const Label = React.forwardRef<HTMLElement, FieldLabelProps>(function MosaicFiel
           typographyStyles.base,
           typographySizes.sm,
           styles.label,
+          contentPlacement(context),
           isVisuallyHidden && visuallyHidden.base,
           xstyle,
         ),
@@ -128,7 +141,15 @@ const Description = React.forwardRef<HTMLParagraphElement, FieldDescriptionProps
     props: {
       ...mergeStyleProps(
         themeProps('field-description'),
-        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, styles.message, styles.description, xstyle),
+        stylex.props(
+          reset.base,
+          typographyStyles.base,
+          typographySizes.xs,
+          styles.message,
+          styles.description,
+          contentPlacement(context),
+          xstyle,
+        ),
         rest,
       ),
       id,
@@ -143,6 +164,7 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
   { render, xstyle, children, ...rest },
   ref,
 ) {
+  const context = useOptionalFieldContext();
   const entries = React.useRef(new Map<symbol, HTMLElement>());
   const [active, setActive] = React.useState<HTMLElement | null>(null);
   const register = React.useCallback((key: symbol, element: HTMLElement | null) => {
@@ -163,7 +185,13 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
     props: {
       ...mergeStyleProps(
         themeProps('field-message'),
-        stylex.props(reset.base, feedbackStyles.collapse, feedbackHeight.measured(height), xstyle),
+        stylex.props(
+          reset.base,
+          feedbackStyles.collapse,
+          feedbackHeight.measured(height),
+          contentPlacement(context),
+          xstyle,
+        ),
         { role: 'status', ...transitionProps },
         rest,
       ),
@@ -207,7 +235,15 @@ const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>
     props: {
       ...mergeStyleProps(
         themeProps(slot),
-        stylex.props(reset.base, typographyStyles.base, typographySizes.xs, feedbackStyles.message, color, xstyle),
+        stylex.props(
+          reset.base,
+          typographyStyles.base,
+          typographySizes.xs,
+          feedbackStyles.message,
+          color,
+          contentPlacement(context),
+          xstyle,
+        ),
         { 'aria-hidden': open ? undefined : true, ...transitionProps },
         rest,
       ),

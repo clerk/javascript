@@ -8,6 +8,15 @@ export const styles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
   },
+  horizontal: {
+    gap: `${space['1']} ${space['3']}`,
+    alignItems: 'center',
+    display: 'grid',
+    gridTemplateColumns: 'auto 1fr',
+  },
+  horizontalContent: {
+    gridColumn: '2',
+  },
   label: {
     color: colorVars['--cl-color-brand'],
     fontWeight: fontWeightVars['--cl-font-medium'],
