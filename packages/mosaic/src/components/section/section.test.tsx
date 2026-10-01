@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
@@ -9,6 +9,7 @@ import { Section } from './section';
 const overrides = stylex.create({
   root: { containerType: 'inline-size' },
   group: { borderWidth: 2 },
+  body: { marginInline: 0 },
   item: { minHeight: 80 },
   label: { color: 'red' },
 });
@@ -17,35 +18,52 @@ const atoms = (style: stylex.StyleXStyles) =>
   (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
 
 describe('Section', () => {
-  it('renders an accessible section and every compound part', () => {
+  it('renders a card named by its heading, with every compound part', () => {
     render(
-      <Section.Root>
-        <Section.Title>Account</Section.Title>
+      <Section.Root data-testid='root'>
         <Section.Group data-testid='group'>
-          <Section.Row data-testid='row'>
-            <Section.Item data-testid='item'>
-              <Section.Media
-                size='lg'
-                data-testid='media'
-              >
-                Icon
-              </Section.Media>
-              <Section.Content data-testid='content'>
-                <Section.Label data-testid='label'>Name</Section.Label>
-                <Section.Description data-testid='description'>Shown throughout the application.</Section.Description>
-              </Section.Content>
-              <Section.Actions data-testid='actions'>Control</Section.Actions>
-            </Section.Item>
-          </Section.Row>
+          <Section.Header data-testid='header'>
+            <Section.Title>Account</Section.Title>
+            <Section.Description data-testid='header-description'>Who you are to the application.</Section.Description>
+            <Section.Actions data-testid='header-actions'>Add</Section.Actions>
+          </Section.Header>
+          <Section.Body data-testid='body'>
+            <Section.Row data-testid='row'>
+              <Section.Item data-testid='item'>
+                <Section.Media
+                  size='lg'
+                  data-testid='media'
+                >
+                  Icon
+                </Section.Media>
+                <Section.Content data-testid='content'>
+                  <Section.Label data-testid='label'>Name</Section.Label>
+                  <Section.Description data-testid='description'>Shown throughout the application.</Section.Description>
+                </Section.Content>
+                <Section.Actions data-testid='actions'>Control</Section.Actions>
+              </Section.Item>
+            </Section.Row>
+          </Section.Body>
         </Section.Group>
       </Section.Root>,
     );
 
-    expect(screen.getByRole('region', { name: 'Account' })).toHaveClass('cl-section');
+    const group = screen.getByRole('group', { name: 'Account' });
+    expect(group).toBe(screen.getByTestId('group'));
+    expect(group).toHaveClass('cl-section-group');
+    expect(group.tagName).toBe('DIV');
+    expect(screen.getByTestId('root')).toHaveClass('cl-section');
+    expect(screen.getByTestId('root').tagName).toBe('SECTION');
+    expect(screen.queryByRole('region')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toHaveClass('cl-section-title');
-    expect(screen.getByTestId('group')).toHaveClass('cl-section-group');
+    expect(screen.getByTestId('header')).toHaveClass('cl-section-header');
+    expect(screen.getByTestId('header')).toContainElement(screen.getByRole('heading', { name: 'Account' }));
+    expect(screen.getByTestId('header-description')).toHaveClass('cl-section-description');
+    expect(screen.getByTestId('header-actions')).toHaveClass('cl-section-actions');
+    expect(screen.getByTestId('body')).toHaveClass('cl-section-body');
     expect(screen.getByTestId('row')).toHaveClass('cl-section-row');
     expect(screen.getByTestId('item')).toHaveClass('cl-section-item');
+    expect(screen.getByTestId('item').tagName).toBe('DIV');
     expect(screen.getByTestId('media')).toHaveClass('cl-section-media');
     expect(screen.getByTestId('media')).toHaveAttribute('data-size', 'lg');
     expect(screen.getByTestId('content')).toHaveClass('cl-section-content');
@@ -54,11 +72,40 @@ describe('Section', () => {
     expect(screen.getByTestId('actions')).toHaveClass('cl-section-actions');
   });
 
+  it('names each card by its own title', () => {
+    render(
+      <Section.Root>
+        <Section.Group>
+          <Section.Header>
+            <Section.Title>Email</Section.Title>
+          </Section.Header>
+          <Section.Body />
+        </Section.Group>
+        <Section.Group>
+          <Section.Header>
+            <Section.Title>Phone</Section.Title>
+          </Section.Header>
+          <Section.Body />
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    const email = screen.getByRole('group', { name: 'Email' });
+    const phone = screen.getByRole('group', { name: 'Phone' });
+    expect(email).not.toBe(phone);
+    expect(email).toHaveAttribute('aria-labelledby', screen.getByRole('heading', { name: 'Email' }).id);
+    expect(phone).toHaveAttribute('aria-labelledby', screen.getByRole('heading', { name: 'Phone' }).id);
+  });
+
   it('takes its title level from an enclosing HeadingLevelProvider', () => {
     render(
       <HeadingLevelProvider level={5}>
         <Section.Root>
-          <Section.Title>Account</Section.Title>
+          <Section.Group>
+            <Section.Header>
+              <Section.Title>Account</Section.Title>
+            </Section.Header>
+          </Section.Group>
         </Section.Root>
       </HeadingLevelProvider>,
     );
@@ -68,84 +115,100 @@ describe('Section', () => {
 
   it('lets the render prop override the heading level', () => {
     render(
-      <Section.Root>
-        <Section.Title render={<h5 />}>Account</Section.Title>
-      </Section.Root>,
+      <Section.Group>
+        <Section.Header>
+          <Section.Title render={<h5 />}>Account</Section.Title>
+        </Section.Header>
+      </Section.Group>,
     );
 
     expect(screen.getByRole('heading', { level: 5, name: 'Account' })).toHaveClass('cl-section-title');
+    expect(screen.getByRole('group', { name: 'Account' })).toBeInTheDocument();
   });
 
-  it('supports an explicit accessible name', () => {
+  it('supports explicit accessible names on the section and on a card', () => {
     render(
       <Section.Root aria-label='Account preferences'>
-        <Section.Title>Account</Section.Title>
-        <Section.Group />
+        <Section.Group aria-label='Password'>
+          <Section.Body />
+        </Section.Group>
+        <Section.Group aria-label='Contact'>
+          <Section.Header>
+            <Section.Title>Email</Section.Title>
+          </Section.Header>
+        </Section.Group>
       </Section.Root>,
     );
 
     expect(screen.getByRole('region', { name: 'Account preferences' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Password' })).not.toHaveAttribute('aria-labelledby');
+    expect(screen.getByRole('group', { name: 'Contact' })).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Email' })).not.toBeInTheDocument();
   });
 
-  it('composes multiple items in one row', () => {
+  it('renders a list of values as a real list under the header', () => {
     render(
-      <Section.Root>
-        <Section.Title>Profile</Section.Title>
-        <Section.Group>
-          <Section.Row data-testid='row'>
+      <Section.Group>
+        <Section.Header data-testid='header'>
+          <Section.Title>Email</Section.Title>
+          <Section.Actions>Add</Section.Actions>
+        </Section.Header>
+        <Section.Body>
+          <Section.Items data-testid='items'>
+            <Section.Item data-testid='nested-item'>
+              <Section.Content data-testid='nested-content'>
+                <Section.Description>ada@example.com</Section.Description>
+              </Section.Content>
+              <Section.Actions>More</Section.Actions>
+            </Section.Item>
             <Section.Item>
               <Section.Content>
-                <Section.Label>Email</Section.Label>
+                <Section.Description>grace@example.com</Section.Description>
               </Section.Content>
-              <Section.Actions>Edit</Section.Actions>
             </Section.Item>
-            <Section.Items data-testid='items'>
-              <Section.Item data-testid='nested-item'>
-                <Section.Content data-testid='nested-content'>
-                  <Section.Description>ada@example.com</Section.Description>
-                </Section.Content>
-                <Section.Actions>More</Section.Actions>
-              </Section.Item>
-            </Section.Items>
-          </Section.Row>
-        </Section.Group>
-      </Section.Root>,
+          </Section.Items>
+        </Section.Body>
+      </Section.Group>,
     );
 
-    expect(screen.getByText('Email')).toBeInTheDocument();
-    expect(screen.getByText('ada@example.com')).toBeInTheDocument();
-    expect(screen.getAllByText(/Edit|More/)).toHaveLength(2);
-    expect(screen.getByTestId('items')).toHaveClass('cl-section-items');
-    expect(screen.getByTestId('row')).not.toHaveAttribute('data-variant');
-    expect(screen.getByTestId('items')).toHaveAttribute('data-nested');
+    const list = screen.getByRole('list');
+    expect(list).toBe(screen.getByTestId('items'));
+    expect(list).toHaveClass('cl-section-items');
+    expect(list.tagName).toBe('UL');
+    expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+    expect(screen.getByTestId('nested-item').tagName).toBe('LI');
     expect(screen.getByTestId('nested-item')).toHaveAttribute('data-nested');
     expect(screen.getByTestId('nested-content')).toHaveAttribute('data-nested');
+    expect(screen.getByTestId('header')).not.toHaveAttribute('data-nested');
+    expect(screen.getAllByText(/Add|More/)).toHaveLength(2);
   });
 
-  it('retains public nesting hooks while deriving layout from the item collection structure', () => {
+  it('marks only items inside Section.Items as nested', () => {
     render(
-      <Section.Root>
-        <Section.Group>
-          <Section.Row data-testid='row'>
-            <Section.Item>Email</Section.Item>
-            <Section.Items>
-              <Section.Item>one@example.com</Section.Item>
-              <Section.Item>two@example.com</Section.Item>
-            </Section.Items>
+      <Section.Group>
+        <Section.Body>
+          <Section.Row>
+            <Section.Item>Name</Section.Item>
           </Section.Row>
-        </Section.Group>
-      </Section.Root>,
+          <Section.Items>
+            <Section.Item>one@example.com</Section.Item>
+            <Section.Item>two@example.com</Section.Item>
+          </Section.Items>
+        </Section.Body>
+      </Section.Group>,
     );
 
-    expect(screen.getByTestId('row')).not.toHaveAttribute('data-variant');
+    expect(screen.getByText('Name')).not.toHaveAttribute('data-nested');
+    expect(screen.getByText('Name').tagName).toBe('DIV');
     expect(screen.getByText('one@example.com')).toHaveAttribute('data-nested');
     expect(screen.getByText('two@example.com')).toHaveAttribute('data-nested');
+    expect(screen.queryByRole('listitem', { name: 'Name' })).not.toBeInTheDocument();
   });
 
   it('applies xstyle on every part and forwards refs and custom elements', () => {
     const rootRef = React.createRef<HTMLElement>();
     const groupRef = React.createRef<HTMLDivElement>();
+    const bodyRef = React.createRef<HTMLDivElement>();
     const itemRef = React.createRef<HTMLDivElement>();
     const contentRef = React.createRef<HTMLDivElement>();
     const actionsRef = React.createRef<HTMLDivElement>();
@@ -156,22 +219,29 @@ describe('Section', () => {
         render={props => <article {...props} />}
         xstyle={overrides.root}
       >
-        <Section.Title>Account</Section.Title>
         <Section.Group
           ref={groupRef}
           xstyle={overrides.group}
         >
-          <Section.Row>
-            <Section.Item
-              ref={itemRef}
-              xstyle={overrides.item}
-            >
-              <Section.Content ref={contentRef}>
-                <Section.Label xstyle={overrides.label}>Name</Section.Label>
-              </Section.Content>
-              <Section.Actions ref={actionsRef} />
-            </Section.Item>
-          </Section.Row>
+          <Section.Header>
+            <Section.Title>Account</Section.Title>
+          </Section.Header>
+          <Section.Body
+            ref={bodyRef}
+            xstyle={overrides.body}
+          >
+            <Section.Row>
+              <Section.Item
+                ref={itemRef}
+                xstyle={overrides.item}
+              >
+                <Section.Content ref={contentRef}>
+                  <Section.Label xstyle={overrides.label}>Name</Section.Label>
+                </Section.Content>
+                <Section.Actions ref={actionsRef} />
+              </Section.Item>
+            </Section.Row>
+          </Section.Body>
         </Section.Group>
       </Section.Root>,
     );
@@ -179,6 +249,7 @@ describe('Section', () => {
     expect(rootRef.current?.tagName).toBe('ARTICLE');
     expect(rootRef.current).toHaveClass('cl-section', ...atoms(overrides.root));
     expect(groupRef.current).toHaveClass('cl-section-group', ...atoms(overrides.group));
+    expect(bodyRef.current).toHaveClass('cl-section-body', ...atoms(overrides.body));
     expect(itemRef.current).toHaveClass('cl-section-item', ...atoms(overrides.item));
     expect(contentRef.current).toHaveClass('cl-section-content');
     expect(screen.getByText('Name')).toHaveClass('cl-section-label', ...atoms(overrides.label));
@@ -187,20 +258,18 @@ describe('Section', () => {
 
   it('merges a render-sourced className instead of clobbering its own', () => {
     render(
-      <Section.Root>
-        <Section.Group render={<Section.Row />}>
-          <Section.Label>Name</Section.Label>
-        </Section.Group>
-      </Section.Root>,
+      <Section.Body render={<Section.Row />}>
+        <Section.Label>Name</Section.Label>
+      </Section.Body>,
     );
 
-    expect(screen.getByText('Name').parentElement).toHaveClass('cl-section-group', 'cl-section-row');
+    expect(screen.getByText('Name').parentElement).toHaveClass('cl-section-body', 'cl-section-row');
   });
 
   it('renders a row-level error as a sibling of the item, with the alert glyph', () => {
     render(
-      <Section.Root>
-        <Section.Group>
+      <Section.Group>
+        <Section.Body>
           <Section.Row data-testid='row'>
             <Section.Item data-testid='item'>
               <Section.Content>
@@ -209,8 +278,8 @@ describe('Section', () => {
             </Section.Item>
             <Section.Error data-testid='error'>File type not supported.</Section.Error>
           </Section.Row>
-        </Section.Group>
-      </Section.Root>,
+        </Section.Body>
+      </Section.Group>,
     );
 
     const error = screen.getByTestId('error');

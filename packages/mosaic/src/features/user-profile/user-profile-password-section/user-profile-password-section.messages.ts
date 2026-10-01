@@ -1,5 +1,4 @@
 export const userProfilePasswordSectionMessages = {
-  sectionTitle: 'Authentication',
   label: 'Password',
   masked: '••••••••••••••••••',
   noPasswordSet: 'No password set',
