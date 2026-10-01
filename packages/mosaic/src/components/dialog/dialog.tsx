@@ -25,9 +25,10 @@ import {
   trackCompactPlacements,
   trackVariants,
   variants,
+  viewportCompactPlacements,
   viewportVariants,
 } from './dialog.styles';
-import { acquireKeyboardInset, focusWithoutScroll } from './keyboard-inset';
+import { acquireKeyboardInset, focusWithoutScroll, preventViewportPan } from './keyboard-inset';
 
 /**
  * Which surface the dialog holds, and so the geometry it is given: `card` is a `Card` at the
@@ -245,14 +246,29 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
  * The scrim behind the dialog. Owns no scroll lock or positioning — that is the viewport.
  * Rendered by `Dialog.Popup`, which is also what decides the two things it varies on.
  */
-function Backdrop({ variant, stacked }: { variant: DialogVariant; stacked: boolean }) {
+function Backdrop({
+  variant,
+  stacked,
+  part = 'scrim',
+}: {
+  variant: DialogVariant;
+  stacked: boolean;
+  part?: 'scrim' | 'sheetScrim' | 'sheetEdge';
+}) {
   return (
     <Primitive.Backdrop
       {...mergeStyleProps(
         themeProps('dialog-backdrop'),
         // All in one `stylex.props` call so a later `backgroundColor` replaces the one in
         // `backdrop` outright — across two calls both would emit and the cascade would decide.
-        stylex.props(reset.base, styles.backdrop, stacked && styles.backdropStacked, backdropMotion[variant]),
+        stylex.props(
+          reset.base,
+          styles.backdrop,
+          part === 'sheetScrim' && styles.backdropSheet,
+          part === 'sheetEdge' && styles.backdropSheetEdge,
+          stacked && styles.backdropStacked,
+          backdropMotion[variant],
+        ),
       )}
     />
   );
@@ -276,13 +292,20 @@ function Viewport({
   children: React.ReactNode;
 }) {
   React.useEffect(() => acquireKeyboardInset(), []);
+  const [track, setTrack] = React.useState<HTMLDivElement | null>(null);
+  React.useEffect(() => (track ? preventViewportPan(track) : undefined), [track]);
   return (
     <Primitive.Viewport
       overlay
       lockScroll
       {...mergeStyleProps(
         themeProps('dialog-viewport', { variant }),
-        stylex.props(reset.base, styles.viewport, viewportVariants[variant]),
+        stylex.props(
+          reset.base,
+          styles.viewport,
+          viewportVariants[variant],
+          viewportCompactPlacements[compactPlacement],
+        ),
       )}
     >
       <div
@@ -290,6 +313,7 @@ function Viewport({
           themeProps('dialog-track', { variant }),
           stylex.props(reset.base, styles.track, trackVariants[variant], trackCompactPlacements[compactPlacement]),
         )}
+        ref={setTrack}
         onTouchEnd={focusWithoutScroll}
       >
         {children}
@@ -406,6 +430,11 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
     </DialogContext.Provider>
   );
 
+  // A card stacked on a card paints no scrim of its own — one serves the whole stack.
+  // Decided here rather than keyed on `data-stacked`, because whether this is a stack
+  // depends on the variant of the dialog beneath, which the headless layer has no notion of.
+  const isStackedOnCard = isNestedInDialog && host?.variant === 'card';
+
   const viewport = (
     <Viewport
       variant={variant}
@@ -413,12 +442,17 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
     >
       <Backdrop
         variant={variant}
-        // A card stacked on a card paints no scrim of its own — one serves the whole stack.
-        // Decided here rather than keyed on `data-stacked`, because whether this is a stack
-        // depends on the variant of the dialog beneath, which the headless layer has no notion of.
-        stacked={isNestedInDialog && host?.variant === 'card'}
+        stacked={isStackedOnCard}
+        part={compactPlacement === 'sheet' ? 'sheetScrim' : 'scrim'}
       />
       {popup}
+      {compactPlacement === 'sheet' ? (
+        <Backdrop
+          variant={variant}
+          stacked={isStackedOnCard}
+          part='sheetEdge'
+        />
+      ) : null}
     </Viewport>
   );
 

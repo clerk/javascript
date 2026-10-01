@@ -38,6 +38,7 @@ const DESK = '@container cl-dialog (48rem <= width < 90rem)';
 const WIDE = '@container cl-dialog (width >= 90rem)';
 // Narrower than `PHONE` so a portrait small tablet keeps the centered card. `card.styles.ts` repeats it.
 const SHEET = '@container cl-dialog (width < 40rem)';
+const SHEET_MEDIA = '@media (width < 40rem)';
 
 export const styles = stylex.create({
   // The scrim. Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
@@ -76,6 +77,16 @@ export const styles = stylex.create({
    */
   backdropStacked: {
     backgroundColor: 'transparent',
+  },
+
+  // Safari keeps a sticky header's status bar tint under a full-screen overlay; a top-edge strip of the scrim is sampled instead.
+  backdropSheet: {
+    insetBlockStart: { [SHEET]: space['3'], default: null },
+  },
+  backdropSheetEdge: {
+    blockSize: space['3'],
+    display: { [SHEET]: 'block', default: 'none' },
+    insetBlockEnd: 'auto',
   },
 
   /**
@@ -311,6 +322,18 @@ export const closeInsets = stylex.create({
  * instead: the padding travels with the content, and short dialogs still fill the overlay so the
  * track has something to center against.
  */
+/**
+ * Pins the box for a sheet, so `compactPlacements.sheet` can cap the popup at the overlay's own
+ * height. A media query because an element cannot query itself; the viewport is the window's width.
+ */
+export const viewportCompactPlacements = stylex.create({
+  center: {},
+  sheet: {
+    gridTemplateRows: { [SHEET_MEDIA]: 'minmax(0, 1fr)', default: null },
+    height: { [SHEET_MEDIA]: '100%', default: null },
+  },
+});
+
 export const viewportVariants = stylex.create({
   card: { minHeight: '100%' },
   profile: {
@@ -434,11 +457,11 @@ export const compactPlacements = stylex.create({
     // `align-self` on the grid item, not `align-items` on the viewport, because the viewport is
     // shared: bottom-aligning there would drag a centered dialog down with it.
     alignSelf: { [SHEET]: 'end', default: null },
+    // Safari tints the bottom bar from the first sticky ancestor's background; the card's own sits under the popup's veil.
+    backgroundColor: { [SHEET]: colorVars['--cl-color-background'], default: null },
+    position: { [SHEET]: 'sticky', default: 'relative' },
     // Scrolls itself rather than the overlay, so the keyboard's padding never makes the page scroll.
-    maxHeight: {
-      [SHEET]: 'calc(100dvh - var(--_cl-dialog-inset))',
-      default: null,
-    },
+    maxHeight: { [SHEET]: '100%', default: null },
     overflowY: { [SHEET]: 'auto', default: null },
     width: { [SHEET]: '100%', default: 'fit-content' },
   },
@@ -448,6 +471,9 @@ export const compactPlacements = stylex.create({
 export const trackCompactPlacements = stylex.create({
   center: {},
   sheet: {
+    overflow: { [SHEET]: 'clip', default: null },
+    // Flush to the sides and the bottom edge; the card pads for the keyboard, so its surface runs behind Safari's bar.
+    paddingInline: { [ABOVE_PHONE]: 'var(--_cl-dialog-inset)', [SHEET]: 0, default: space['4'] },
     // Clips the sheet while it is outside the box, and ONLY for the placement that translates. A
     // sheet enters from `translate: 0 100%` — a full height BELOW its resting place — and the
     // `FloatingOverlay` wrapping this is `overflow: auto`, so without clipping it treats that as
@@ -461,9 +487,7 @@ export const trackCompactPlacements = stylex.create({
     // measured as `scrollTop` 0 -> 136 -> 50 -> 8 -> 0. It read as the sheet flying too far up and
     // snapping back, the unwind stacking extra bounces on the real overshoot. `clip` never becomes
     // scrollable, so focus has nothing to scroll.
-    overflow: { [SHEET]: 'clip', default: null },
-    // Flush to the sides and the bottom edge; the card pads for the keyboard, so its surface runs behind Safari's bar.
-    paddingInline: { [ABOVE_PHONE]: 'var(--_cl-dialog-inset)', [SHEET]: 0, default: space['4'] },
+    gridTemplateRows: { [SHEET]: 'minmax(0, 1fr)', default: null },
     paddingBlockEnd: {
       [SHEET]: 0,
       default: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-inset, 0px))',
