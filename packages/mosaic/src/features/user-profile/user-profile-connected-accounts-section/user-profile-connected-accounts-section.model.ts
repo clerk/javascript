@@ -15,8 +15,8 @@ import type {
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
 import { useMosaicRouter } from '../../../hooks/useMosaicRouter';
-import type { ConnectedAccountActionResult } from './user-profile-connected-accounts-section.controller';
 import type {
+  ConnectedAccountActionResult,
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
 } from './user-profile-connected-accounts-section.types';

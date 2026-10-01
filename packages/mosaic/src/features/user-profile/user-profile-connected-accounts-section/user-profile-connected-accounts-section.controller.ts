@@ -1,11 +1,18 @@
 import { useRef, useState } from 'react';
 
 import type {
+  ConnectedAccountActionResult,
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
 } from './user-profile-connected-accounts-section.types';
 
-export type ConnectedAccountActionResult = 'redirecting' | void;
+export interface UserProfileConnectedAccountsControllerOptions {
+  accounts: UserProfileConnectedAccount[];
+  availableProviders: UserProfileConnectionProvider[];
+  onConnect: (id: string) => Promise<ConnectedAccountActionResult>;
+  onReconnect: (id: string) => Promise<ConnectedAccountActionResult>;
+  formatError: (error: unknown) => string;
+}
 
 export interface UserProfileConnectedAccountsController {
   accounts: UserProfileConnectedAccount[];
@@ -21,13 +28,7 @@ export function useUserProfileConnectedAccountsController({
   onConnect,
   onReconnect,
   formatError,
-}: {
-  accounts: UserProfileConnectedAccount[];
-  availableProviders: UserProfileConnectionProvider[];
-  onConnect: (id: string) => Promise<ConnectedAccountActionResult>;
-  onReconnect: (id: string) => Promise<ConnectedAccountActionResult>;
-  formatError: (error: unknown) => string;
-}): UserProfileConnectedAccountsController {
+}: UserProfileConnectedAccountsControllerOptions): UserProfileConnectedAccountsController {
   const [pendingId, setPendingId] = useState<string>();
   const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
   const [reconnectErrors, setReconnectErrors] = useState<Record<string, string>>({});

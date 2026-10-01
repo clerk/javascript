@@ -1,3 +1,5 @@
+export type ConnectedAccountActionResult = 'redirecting' | void;
+
 export interface UserProfileConnectionProvider {
   id: string;
   provider: string;
