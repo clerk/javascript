@@ -9,7 +9,7 @@ import java.security.MessageDigest
 import java.security.spec.ECGenParameterSpec
 import java.util.UUID
 
-// Implements clerk-android source/api/docs/biometric-credential-storage-contract.md (version 2). Any change here must
+// Mirrors clerk-android's storage contract v2, pinned by its BiometricCredentialStorageContractTest. Any change here must
 // stay compatible with clerk-android, which reads and writes the same Keystore aliases and metadata file.
 
 internal enum class BiometricCredentialPolicy(val value: String) {

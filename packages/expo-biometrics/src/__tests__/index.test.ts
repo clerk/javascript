@@ -212,7 +212,6 @@ describe('@clerk/expo-biometrics', () => {
       'key_generation_failed',
       'signing_failed',
       'storage_failed',
-      'not_implemented',
     ])('preserves the native %s code', async code => {
       native.sign.mockRejectedValueOnce(nativeError(code, 'details'));
       const biometrics = await load();
@@ -233,11 +232,11 @@ describe('@clerk/expo-biometrics', () => {
 
     test('wraps synchronous native errors', async () => {
       native.getAppIdentifier.mockImplementationOnce(() => {
-        throw nativeError('not_implemented');
+        throw nativeError('storage_failed');
       });
       const biometrics = await load();
 
-      expect(() => biometrics.getAppIdentifier()).toThrow(expect.objectContaining({ code: 'not_implemented' }));
+      expect(() => biometrics.getAppIdentifier()).toThrow(expect.objectContaining({ code: 'storage_failed' }));
     });
 
     test('isBiometricsErrorCode recognizes known codes', async () => {

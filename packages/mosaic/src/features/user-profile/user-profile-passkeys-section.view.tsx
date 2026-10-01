@@ -20,7 +20,6 @@ export interface UserProfilePasskey {
 
 export interface UserProfilePasskeysSectionViewProps {
   passkeys: UserProfilePasskey[];
-  sectionTitle?: string;
   onAdd?: () => void;
   addError?: string;
   onRename?: (id: string, name: string) => void | Promise<void>;
@@ -29,14 +28,13 @@ export interface UserProfilePasskeysSectionViewProps {
 
 export function UserProfilePasskeysSectionView({
   passkeys,
-  sectionTitle,
   onAdd,
   addError,
   onRename,
   onRemove,
 }: UserProfilePasskeysSectionViewProps) {
   const addButton = useRef<HTMLButtonElement>(null);
-  const section = useRef<HTMLElement>(null);
+  const section = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: passkeys.map(passkey => passkey.id),
     onRemove,
@@ -46,68 +44,60 @@ export function UserProfilePasskeysSectionView({
 
   return (
     <>
-      <Section.Root
+      <Section.Group
         ref={section}
         tabIndex={-1}
-        aria-label={sectionTitle ? undefined : m.label}
       >
-        {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
-        <Section.Group>
-          <Section.Row>
-            <Section.Item>
-              <Section.Content>
-                <Section.Label>{m.label}</Section.Label>
-              </Section.Content>
-              {onAdd ? (
-                <Section.Actions>
-                  <Button
-                    ref={addButton}
-                    aria-label={m.addLabel}
-                    color='neutral'
-                    size='sm'
-                    variant='outline'
-                    onClick={onAdd}
-                  >
-                    <Icon
-                      name='plus'
-                      placement='inline-start'
-                      size='sm'
-                    />
-                    {m.add}
-                  </Button>
-                </Section.Actions>
-              ) : null}
-            </Section.Item>
-            <Field.Message
-              role={addError ? 'alert' : 'status'}
-              xstyle={styles.addError}
-            >
-              <Field.Error>{addError}</Field.Error>
-            </Field.Message>
+        <Section.Header>
+          <Section.Title>{m.label}</Section.Title>
+          {onAdd ? (
+            <Section.Actions>
+              <Button
+                ref={addButton}
+                aria-label={m.addLabel}
+                color='neutral'
+                size='sm'
+                variant='outline'
+                onClick={onAdd}
+              >
+                <Icon
+                  name='plus'
+                  placement='inline-start'
+                  size='sm'
+                />
+                {m.add}
+              </Button>
+            </Section.Actions>
+          ) : null}
+          <Field.Message
+            role={addError ? 'alert' : 'status'}
+            xstyle={styles.addError}
+          >
+            <Field.Error>{addError}</Field.Error>
+          </Field.Message>
+        </Section.Header>
+        <Section.Body>
+          <Section.Items>
             {passkeys.length > 0 ? (
-              <Section.Items>
-                {passkeys.map(passkey => (
-                  <UserProfilePasskeyRowView
-                    key={passkey.id}
-                    passkey={passkey}
-                    triggerRef={removalFocus.registerTrigger(passkey.id)}
-                    onRename={onRename}
-                    onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
-                  />
-                ))}
-              </Section.Items>
+              passkeys.map(passkey => (
+                <UserProfilePasskeyRowView
+                  key={passkey.id}
+                  passkey={passkey}
+                  triggerRef={removalFocus.registerTrigger(passkey.id)}
+                  onRename={onRename}
+                  onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
+                />
+              ))
             ) : (
-              <Section.Items>
-                <Section.Item>
-                  <Section.Content>
-                    <Section.Description>{m.empty}</Section.Description>
-                  </Section.Content>
-                </Section.Item>
-              </Section.Items>
+              <Section.Item>
+                <Section.Content>
+                  <Section.Description>{m.empty}</Section.Description>
+                </Section.Content>
+              </Section.Item>
             )}
-          </Section.Row>
-        </Section.Group>
-      </Section.Root>
+          </Section.Items>
+        </Section.Body>
+      </Section.Group>
       {onRemove ? (
         <Confirmation
           handle={removePasskey}

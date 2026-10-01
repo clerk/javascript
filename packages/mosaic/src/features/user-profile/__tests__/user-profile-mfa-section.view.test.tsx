@@ -42,7 +42,6 @@ describe('MFA section', () => {
           <MosaicProvider>
             <UserProfileMfaSectionView
               methods={methods}
-              sectionTitle='Authentication'
               addableMethods={['sms', 'authenticator']}
               onAdd={add === 'picker' ? () => {} : undefined}
               addControl={add === 'custom' ? <button type='button'>Add custom method</button> : undefined}
@@ -61,7 +60,7 @@ describe('MFA section', () => {
       await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
       const fallback =
         add === 'none'
-          ? screen.getByRole('region', { name: 'Authentication' })
+          ? screen.getByRole('group', { name: '2-step verification' })
           : screen.getByRole('button', { name: add === 'picker' ? 'Add verification method' : 'Add custom method' });
       await waitFor(() => expect(fallback).toHaveFocus());
     },

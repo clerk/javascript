@@ -11,7 +11,6 @@ export function trustedDeviceChallengeFromJSON(
     challengeId: data.challenge_id,
     trustedDeviceId: data.trusted_device_id ?? null,
     clientData: data.client_data,
-    // FAPI returns this timestamp in seconds, unlike most resource timestamps.
     expiresAt: data.expires_at ? new Date(data.expires_at * 1000) : null,
     algorithm: data.algorithm,
   };

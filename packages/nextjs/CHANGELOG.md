@@ -1,5 +1,16 @@
 # Change Log
 
+## 7.9.9
+
+### Patch Changes
+
+- Removed the period from the end of the displayed error. Agents were trying to use the URL with period at the end and getting 404s ([#9985](https://github.com/clerk/javascript/pull/9985)) by [@royanger](https://github.com/royanger)
+
+- Updated dependencies [[`0fe89c2`](https://github.com/clerk/javascript/commit/0fe89c20379bea9484b65276905cfd90397ea890), [`e34a5cc`](https://github.com/clerk/javascript/commit/e34a5cc2622e05eea9a683651e0784ad23705bb2), [`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda)]:
+  - @clerk/backend@3.21.1
+  - @clerk/shared@4.37.1
+  - @clerk/react@6.17.4
+
 ## 7.9.8
 
 ### Patch Changes
