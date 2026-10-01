@@ -23,6 +23,7 @@ export function UserProfilePasswordSection({ fallback = null }: UserProfilePassw
   const model = useUserProfilePasswordModel();
   const m = useMessages('userProfilePasswordSection');
   if (model.status === 'loading') {
+    // TODO: Add a password section skeleton as the default loading fallback.
     return fallback;
   }
   if (model.status === 'readonly') {
