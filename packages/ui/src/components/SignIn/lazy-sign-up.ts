@@ -8,6 +8,9 @@ const LazySignUpStart = lazy(() => preloadSignUp().then(m => ({ default: m.SignU
 const LazySignUpSSOCallback = lazy(() => preloadSignUp().then(m => ({ default: m.SignUpSSOCallback })));
 const LazySignUpContinue = lazy(() => preloadSignUp().then(m => ({ default: m.SignUpContinue })));
 const LazySignUpProtectCheck = lazy(() => preloadSignUp().then(m => ({ default: m.SignUpProtectCheck })));
+const LazySignUpEnterpriseConnections = lazy(() =>
+  preloadSignUp().then(m => ({ default: m.SignUpEnterpriseConnections })),
+);
 
 const lazyCompleteSignUpFlow = () =>
   import(/* webpackChunkName: "signup" */ '../SignUp/util').then(m => m.completeSignUpFlow);
@@ -20,5 +23,6 @@ export {
   LazySignUpSSOCallback,
   LazySignUpContinue,
   LazySignUpProtectCheck,
+  LazySignUpEnterpriseConnections,
   lazyCompleteSignUpFlow,
 };

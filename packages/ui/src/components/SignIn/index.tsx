@@ -23,6 +23,7 @@ import { normalizeRoutingOptions } from '@/utils/normalizeRoutingOptions';
 import { buildSignInOAuthCallbackParams, buildSignUpOAuthCallbackParams } from './buildOAuthCallbackParams';
 import {
   LazySignUpContinue,
+  LazySignUpEnterpriseConnections,
   LazySignUpProtectCheck,
   LazySignUpSSOCallback,
   LazySignUpStart,
@@ -149,6 +150,9 @@ function SignInRoutes(): JSX.Element {
             </Route>
             <Route path='tasks'>
               <LazySessionTasks redirectUrlComplete={signInContext.afterSignUpUrl} />
+            </Route>
+            <Route path='enterprise-connections'>
+              <LazySignUpEnterpriseConnections />
             </Route>
             <Route index>
               <LazySignUpStart />
