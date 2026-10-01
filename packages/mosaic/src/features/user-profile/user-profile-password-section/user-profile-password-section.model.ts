@@ -9,7 +9,7 @@ import type {
   PasswordValidation,
   UserResource,
 } from '@clerk/shared/types';
-import { useCallback } from 'react';
+import { useMemo } from 'react';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
 import type { UserProfileEditPasswordValue } from './user-profile-password-section.types';
@@ -77,11 +77,11 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
   const environment = useMosaicEnvironment();
   const passwordSettings = environment?.userSettings.passwordSettings;
   const moduleManager = clerk.__internal_moduleManager;
-  const validatePassword = useCallback(
-    async (password: string): Promise<PasswordValidation> => {
-      if (!passwordSettings) {
-        return {};
-      }
+  const validatePassword = useMemo(() => {
+    if (!passwordSettings) {
+      return undefined;
+    }
+    return async (password: string): Promise<PasswordValidation> => {
       const complexity = validateComplexity(password, passwordSettings);
       if (Object.keys(complexity).length > 0 || !passwordSettings.show_zxcvbn || !moduleManager) {
         return { complexity };
@@ -89,11 +89,10 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
       const { loadZxcvbn } = createLoadZxcvbn(moduleManager);
       const strength = createValidatePasswordStrength(passwordSettings)(await loadZxcvbn())(password);
       return { complexity, strength };
-    },
-    [passwordSettings, moduleManager],
-  );
+    };
+  }, [passwordSettings, moduleManager]);
 
-  if (!isUserLoaded || !isSessionLoaded || !environment) {
+  if (!isUserLoaded || !isSessionLoaded || !environment || !validatePassword) {
     return { status: 'loading' };
   }
 
@@ -107,7 +106,6 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
 
   return {
     ...policy,
-    userId,
     sessionId,
     identifier: session?.publicUserData.identifier ?? '',
     passwordSettings: environment.userSettings.passwordSettings,
