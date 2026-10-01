@@ -13,6 +13,30 @@ function deferred<T = unknown>() {
 }
 
 describe('useUserProfileEditPasswordController timing', () => {
+  it('debounces changes and cancels pending validation when closed', async () => {
+    vi.useFakeTimers();
+    try {
+      const validatePassword = vi.fn(() => Promise.resolve(undefined));
+      const { result } = renderHook(() =>
+        useUserProfileEditPasswordController({ onSubmit: () => Promise.resolve(), validatePassword }),
+      );
+      act(() => result.current.onOpenChange(true));
+      act(() => result.current.form.setValue('newPassword', 'first password'));
+      await act(() => vi.advanceTimersByTimeAsync(200));
+      expect(validatePassword).not.toHaveBeenCalled();
+      act(() => result.current.form.setValue('newPassword', 'latest password'));
+      await act(() => vi.advanceTimersByTimeAsync(349));
+      expect(validatePassword).not.toHaveBeenCalled();
+      await act(() => vi.advanceTimersByTimeAsync(1));
+      expect(validatePassword).toHaveBeenCalledExactlyOnceWith('latest password');
+      act(() => result.current.form.setValue('newPassword', 'cancelled password'));
+      act(() => result.current.onOpenChange(false));
+      await act(() => vi.advanceTimersByTimeAsync(350));
+      expect(validatePassword).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
   it('ignores older password feedback and clears it when the editor closes', async () => {
     const older = deferred<FieldFeedback>();
     const newer = deferred<FieldFeedback>();
