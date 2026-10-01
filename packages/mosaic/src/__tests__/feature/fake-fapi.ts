@@ -10,6 +10,12 @@ import { http, HttpResponse, type JsonBodyType } from 'msw';
 import { setupWorker } from 'msw/browser';
 
 import {
+  createVerificationState,
+  type FakeVerificationSeed,
+  type FakeVerificationState,
+  verificationHandlers,
+} from './fake-fapi/verification';
+import {
   fapiApiKey,
   fapiClient,
   type FapiEnvironment,
@@ -32,9 +38,12 @@ export interface FakeFapiState {
   invitations: UserOrganizationInvitationJSON[];
   suggestions: OrganizationSuggestionJSON[];
   apiKeys: ApiKeyJSON[];
+  verification: FakeVerificationState;
 }
 
-export type FakeFapiSeed = Partial<FakeFapiState>;
+export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification'>> & {
+  verification?: FakeVerificationSeed;
+};
 
 const unhandled: string[] = [];
 
@@ -83,6 +92,7 @@ function missing() {
 }
 
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
+  const { verification, ...rest } = seed;
   const state: FakeFapiState = {
     environment: fapiEnvironment(),
     client: fapiClient(),
@@ -90,10 +100,12 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     invitations: [],
     suggestions: [],
     apiKeys: [],
-    ...seed,
+    ...rest,
+    verification: createVerificationState(verification),
   };
 
   worker.use(
+    ...verificationHandlers(state, fapiUrl),
     http.get(fapiUrl('/v1/environment'), () => HttpResponse.json(state.environment)),
     http.get(fapiUrl('/v1/client'), () => envelope(state.client, null)),
     http.post(fapiUrl('/v1/client/sessions/:id/tokens'), ({ params }) => {

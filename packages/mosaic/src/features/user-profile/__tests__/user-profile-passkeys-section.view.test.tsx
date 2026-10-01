@@ -29,10 +29,10 @@ function renderView(overrides: Partial<UserProfilePasskeysSectionViewProps> = {}
 
 describe('passkeys section', () => {
   it('shows existing passkeys without actions when their callbacks are unavailable', () => {
-    renderView({ onAdd: undefined, onRename: undefined, onRemove: undefined, sectionTitle: 'Authentication' });
+    renderView({ onAdd: undefined, onRename: undefined, onRemove: undefined });
 
-    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
-    expect(screen.getByText('Passkeys')).toBeVisible();
+    expect(screen.getByRole('group', { name: 'Passkeys' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Passkeys' })).toBeVisible();
     expect(screen.getByText('MacBook')).toBeVisible();
     expect(screen.getByText('iPhone')).toBeVisible();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
@@ -120,10 +120,10 @@ describe('passkeys section', () => {
   });
 
   it('keeps an empty section visible when Add is unavailable', () => {
-    renderView({ passkeys: [], onAdd: undefined, sectionTitle: 'Authentication' });
+    renderView({ passkeys: [], onAdd: undefined });
 
-    expect(screen.getByRole('heading', { name: 'Authentication' })).toBeVisible();
-    expect(screen.getByText('Passkeys')).toBeVisible();
+    expect(screen.getByRole('group', { name: 'Passkeys' })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Passkeys' })).toBeVisible();
     expect(screen.getByText('No passkeys added')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Add passkey' })).not.toBeInTheDocument();
   });
@@ -179,7 +179,7 @@ describe('passkeys section', () => {
       await user.click(screen.getByRole('button', { name: 'Add passkey' }));
       expect(screen.getByText('MacBook')).toBeVisible();
     } else {
-      expect(screen.getByRole('region', { name: 'Passkeys' })).toHaveFocus();
+      expect(screen.getByRole('group', { name: 'Passkeys' })).toHaveFocus();
     }
   });
 

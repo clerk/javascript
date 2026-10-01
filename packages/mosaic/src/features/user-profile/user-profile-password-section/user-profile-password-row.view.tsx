@@ -19,13 +19,12 @@ export function UserProfilePasswordRowView({
   requiresCurrentPassword = false,
   managedBy,
   onSubmitPassword,
-}: Omit<UserProfilePasswordSectionViewProps, 'sectionTitle'>) {
+}: UserProfilePasswordSectionViewProps) {
   const m = useMessages('userProfilePasswordSection');
   return (
-    <Section.Row>
+    <Section.Items>
       <Section.Item>
         <Section.Content>
-          <Section.Label>{m.label}</Section.Label>
           <Section.Description>{hasPassword ? m.masked : m.noPasswordSet}</Section.Description>
         </Section.Content>
         {managedBy ? (
@@ -42,7 +41,7 @@ export function UserProfilePasswordRowView({
           </Section.Actions>
         ) : null}
       </Section.Item>
-    </Section.Row>
+    </Section.Items>
   );
 }
 
