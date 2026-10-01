@@ -8,7 +8,7 @@ import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
-import type { UseFormResult } from '../../../components/form';
+import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
 import { Text } from '../../../components/text';
@@ -20,6 +20,8 @@ import type {
 } from './user-profile-password-section.types';
 
 export interface UserProfileEditPasswordDialogProps {
+  passwordFeedback?: FieldFeedback;
+  identifier?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   trigger?: DialogTriggerProps['render'];
@@ -29,6 +31,8 @@ export interface UserProfileEditPasswordDialogProps {
 }
 
 export function UserProfileEditPasswordDialog({
+  passwordFeedback,
+  identifier = '',
   open,
   onOpenChange,
   trigger,
@@ -73,6 +77,13 @@ export function UserProfileEditPasswordDialog({
               />
             }
           >
+            <input
+              readOnly
+              hidden
+              name='identifier'
+              autoComplete='username'
+              value={identifier}
+            />
             {showCurrentPassword ? (
               <PasswordField
                 autoComplete='current-password'
@@ -88,6 +99,7 @@ export function UserProfileEditPasswordDialog({
               inputRef={showCurrentPassword ? undefined : initialFocusRef}
               label={m.newPasswordLabel}
               name='newPassword'
+              advisoryFeedback={passwordFeedback}
             />
             <PasswordField
               autoComplete='new-password'
@@ -157,24 +169,29 @@ function PasswordField({
   form,
   inputRef,
   name,
+  advisoryFeedback,
 }: {
   label: string;
   autoComplete: 'current-password' | 'new-password';
   form: UseFormResult<UserProfileEditPasswordValues>;
   inputRef?: RefObject<HTMLInputElement>;
   name: UserProfileEditPasswordField;
+  advisoryFeedback?: FieldFeedback;
 }) {
   const m = useMessages('userProfilePasswordSection');
   const [visible, setVisible] = useState(false);
+  const [focused, setFocused] = useState(false);
   const { feedback } = form.fields[name];
-  const error = feedback?.type === 'error' ? feedback.message : undefined;
+  const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
+  const feedbackType = message?.type === 'info' && !focused ? 'error' : message?.type;
   const { ref, ...control } = form.register(name);
   const mergedRef = useMergeRefs([ref, inputRef]);
 
+  // TODO: Discuss enforcing the configured minimum length on the new password input or keeping the hint advisory and letting the server validate. https://github.com/clerk/javascript/pull/9930#discussion_r4151734254
   return (
     <Field.Root
       disabled={form.isSubmitting}
-      invalid={error !== undefined}
+      invalid={feedbackType === 'error'}
       required
     >
       <Field.Label>{label}</Field.Label>
@@ -184,6 +201,11 @@ function PasswordField({
           autoComplete={autoComplete}
           type={visible ? 'text' : 'password'}
           {...control}
+          onFocus={() => setFocused(true)}
+          onBlur={() => {
+            setFocused(false);
+            control.onBlur();
+          }}
         />
         <InputGroup.End>
           <Button
@@ -195,7 +217,7 @@ function PasswordField({
           </Button>
         </InputGroup.End>
       </InputGroup.Root>
-      {error ? <Field.Error>{error}</Field.Error> : null}
+      <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
     </Field.Root>
   );
 }
