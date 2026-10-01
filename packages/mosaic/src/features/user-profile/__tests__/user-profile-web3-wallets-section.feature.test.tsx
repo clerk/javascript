@@ -63,7 +63,7 @@ describe('Web3 wallets', () => {
           fapiWeb3Wallet({
             id: 'admin_wallet',
             web3_wallet: address,
-            verification: fapiVerification({ strategy: 'admin', status }),
+            verification: fapiVerification('admin', { status }),
           }),
         ],
       });
@@ -86,7 +86,7 @@ describe('Web3 wallets', () => {
         fapiWeb3Wallet({
           id: 'wallet_1',
           web3_wallet: '0x1234567890abcdef',
-          verification: fapiVerification({ strategy: 'web3_metamask_signature', status: 'unverified' }),
+          verification: fapiVerification('web3_metamask_signature', { status: 'unverified' }),
         }),
       ],
     });
