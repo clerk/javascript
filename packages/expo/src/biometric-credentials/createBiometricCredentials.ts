@@ -239,6 +239,34 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     }
   }
 
+  async function forgetLocalCredentialIfMissing(
+    biometrics: Biometrics,
+    record: ExpoBiometricsRecord,
+    error: unknown,
+  ): Promise<unknown> {
+    if (isMissingCredentialError(error)) {
+      await ignoreErrors(() => deleteLocalCredential(biometrics, record));
+    }
+    return toApiBiometricCredentialError(error, biometrics.fallbackCode);
+  }
+
+  async function signChallenge(
+    biometrics: Biometrics,
+    record: ExpoBiometricsRecord,
+    clientData: string,
+    reason: string,
+  ): Promise<string> {
+    try {
+      return await biometrics.module.sign(record.localKeyId, clientData, reason);
+    } catch (error) {
+      const biometricError = toBiometricCredentialError(error, biometrics.fallbackCode);
+      if (biometricError.code === 'key_invalidated' || biometricError.code === 'key_not_found') {
+        await ignoreErrors(() => deleteLocalCredential(biometrics, record));
+      }
+      throw biometricError;
+    }
+  }
+
   async function localCredentialCandidates(
     biometrics: Biometrics,
     id: string | undefined,
@@ -362,13 +390,6 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     factor: 'first' | 'second',
     reason: string,
   ): Promise<SessionVerificationResource> {
-    const forgetLocalCredentialIfMissing = async (error: unknown) => {
-      if (isMissingCredentialError(error)) {
-        await ignoreErrors(() => deleteLocalCredential(biometrics, record));
-      }
-      return toApiBiometricCredentialError(error, biometrics.fallbackCode);
-    };
-
     let prepared: SessionVerificationResource;
     try {
       const config = { strategy: 'trusted_device', trustedDeviceId: record.id } as const;
@@ -377,7 +398,7 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
           ? await session.prepareFirstFactorVerification(config)
           : await session.prepareSecondFactorVerification(config);
     } catch (error) {
-      throw await forgetLocalCredentialIfMissing(error);
+      throw await forgetLocalCredentialIfMissing(biometrics, record, error);
     }
 
     const verification = factor === 'first' ? prepared.firstFactorVerification : prepared.secondFactorVerification;
@@ -392,16 +413,7 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
       throw biometricCredentialError(biometrics.fallbackCode, 'Biometric reverification challenge has expired.');
     }
 
-    let signature: string;
-    try {
-      signature = await biometrics.module.sign(record.localKeyId, challenge.clientData, reason);
-    } catch (error) {
-      const biometricError = toBiometricCredentialError(error, biometrics.fallbackCode);
-      if (biometricError.code === 'key_invalidated' || biometricError.code === 'key_not_found') {
-        await ignoreErrors(() => deleteLocalCredential(biometrics, record));
-      }
-      throw biometricError;
-    }
+    const signature = await signChallenge(biometrics, record, challenge.clientData, reason);
 
     try {
       const attempt = {
@@ -415,7 +427,7 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
         ? await session.attemptFirstFactorVerification(attempt)
         : await session.attemptSecondFactorVerification(attempt);
     } catch (error) {
-      throw await forgetLocalCredentialIfMissing(error);
+      throw await forgetLocalCredentialIfMissing(biometrics, record, error);
     }
   }
 
@@ -543,18 +555,11 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
       }
       const record = selection.record;
 
-      const forgetLocalCredentialIfMissing = async (error: unknown) => {
-        if (isMissingCredentialError(error)) {
-          await ignoreErrors(() => deleteLocalCredential(biometrics, record));
-        }
-        return toApiBiometricCredentialError(error, biometrics.fallbackCode);
-      };
-
       let signIn: SignInResource;
       try {
         signIn = await clientSignIn.create({ strategy: 'trusted_device', trustedDeviceId: record.id });
       } catch (error) {
-        throw await forgetLocalCredentialIfMissing(error);
+        throw await forgetLocalCredentialIfMissing(biometrics, record, error);
       }
 
       const challenge = signIn.firstFactorVerification?.trustedDeviceChallenge;
@@ -562,20 +567,12 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
         throw biometricCredentialError(biometrics.fallbackCode, 'Biometric sign-in did not return a challenge.');
       }
 
-      let signature: string;
-      try {
-        signature = await biometrics.module.sign(
-          record.localKeyId,
-          challenge.clientData,
-          params?.reason ?? DEFAULT_SIGN_IN_REASON,
-        );
-      } catch (error) {
-        const biometricError = toBiometricCredentialError(error, biometrics.fallbackCode);
-        if (biometricError.code === 'key_invalidated' || biometricError.code === 'key_not_found') {
-          await ignoreErrors(() => deleteLocalCredential(biometrics, record));
-        }
-        throw biometricError;
-      }
+      const signature = await signChallenge(
+        biometrics,
+        record,
+        challenge.clientData,
+        params?.reason ?? DEFAULT_SIGN_IN_REASON,
+      );
 
       try {
         signIn = await signIn.attemptFirstFactor({
@@ -586,7 +583,7 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
           algorithm: 'ES256',
         });
       } catch (error) {
-        throw await forgetLocalCredentialIfMissing(error);
+        throw await forgetLocalCredentialIfMissing(biometrics, record, error);
       }
 
       if (!signIn.status) {
