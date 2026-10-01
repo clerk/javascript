@@ -3,6 +3,7 @@ import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStatePara
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type {
+  CustomOauthProvider,
   EnterpriseSSOSettings,
   ExternalAccountResource,
   OAuthProvider,
@@ -75,6 +76,15 @@ export function getEnabledOAuthStrategies(social: Partial<OAuthProviders>): OAut
     strategy => !KNOWN_OAUTH_STRATEGIES.includes(strategy) && strategy.startsWith('oauth_custom_'),
   );
   return [...known, ...custom];
+}
+
+function providerFor(strategy: OAuthStrategy): OAuthProvider {
+  const known = OAUTH_PROVIDERS.find(p => p.strategy === strategy);
+  if (known) {
+    return known.provider;
+  }
+  const custom: CustomOauthProvider = `custom_${strategy.slice('oauth_custom_'.length)}`;
+  return custom;
 }
 
 export function allowsIdentificationCreation(user: UserResource, enterpriseSSO: EnterpriseSSOSettings): boolean {
@@ -248,11 +258,17 @@ export function useUserProfileConnectedAccountsModel({
   return {
     ...projection,
     userId,
-    connect: async strategy => {
+    connect: async strategyId => {
       const current = currentUser();
-      const provider = strategy.replace('oauth_', '') as OAuthProvider;
+      const strategy = getEnabledOAuthStrategies(environment.userSettings.social).find(
+        candidate => candidate === strategyId,
+      );
+      if (!strategy) {
+        throw new ConnectedAccountActionError('unavailable');
+      }
+      const provider = providerFor(strategy);
       const response = await current.createExternalAccount({
-        strategy: strategy as OAuthStrategy,
+        strategy,
         redirectUrl: withModalState(await getRedirectUrl(), provider),
         additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider] : [],
       });

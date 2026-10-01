@@ -148,6 +148,13 @@ describe('useUserProfileConnectedAccountsModel', () => {
     await expect(model.connect('oauth_google')).rejects.toMatchObject({ code: 'missing_verification_url' });
   });
 
+  it('rejects a strategy that is not enabled', async () => {
+    const model = ready(renderHook(() => useUserProfileConnectedAccountsModel({})).result.current);
+
+    await expect(model.connect('oauth_facebook')).rejects.toMatchObject({ code: 'unavailable' });
+    expect(user?.createExternalAccount).not.toHaveBeenCalled();
+  });
+
   it('rejects removal of an account that no longer exists', async () => {
     const model = ready(renderHook(() => useUserProfileConnectedAccountsModel({})).result.current);
 
