@@ -291,17 +291,17 @@ importers:
         specifier: 0.17.1
         version: 0.17.1
       prettier:
-        specifier: ^3.8.3
-        version: 3.9.9
+        specifier: 3.8.3
+        version: 3.8.3
       prettier-plugin-astro:
         specifier: ^0.14.1
         version: 0.14.1
       prettier-plugin-packagejson:
         specifier: ^2.5.22
-        version: 2.5.22(prettier@3.9.9)
+        version: 2.5.22(prettier@3.8.3)
       prettier-plugin-tailwindcss:
         specifier: ^0.6.12
-        version: 0.6.14(prettier-plugin-astro@0.14.1)(prettier@3.9.9)
+        version: 0.6.14(prettier-plugin-astro@0.14.1)(prettier@3.8.3)
       publint:
         specifier: ^0.3.18
         version: 0.3.18
@@ -12764,6 +12764,11 @@ packages:
   prettier@2.8.8:
     resolution: {integrity: sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==}
     engines: {node: '>=10.13.0'}
+    hasBin: true
+
+  prettier@3.8.3:
+    resolution: {integrity: sha512-7igPTM53cGHMW8xWuVTydi2KO233VFiTNyF5hLJqpilHfmn8C8gPf+PS7dUT64YcXFbiMGZxS9pCSxL/Dxm/Jw==}
+    engines: {node: '>=14'}
     hasBin: true
 
   prettier@3.9.9:
@@ -29649,22 +29654,24 @@ snapshots:
   prettier-plugin-astro@0.14.1:
     dependencies:
       '@astrojs/compiler': 2.13.0
-      prettier: 3.9.9
+      prettier: 3.8.3
       sass-formatter: 0.7.9
 
-  prettier-plugin-packagejson@2.5.22(prettier@3.9.9):
+  prettier-plugin-packagejson@2.5.22(prettier@3.8.3):
     dependencies:
       sort-package-json: 3.6.0
     optionalDependencies:
-      prettier: 3.9.9
+      prettier: 3.8.3
 
-  prettier-plugin-tailwindcss@0.6.14(prettier-plugin-astro@0.14.1)(prettier@3.9.9):
+  prettier-plugin-tailwindcss@0.6.14(prettier-plugin-astro@0.14.1)(prettier@3.8.3):
     dependencies:
-      prettier: 3.9.9
+      prettier: 3.8.3
     optionalDependencies:
       prettier-plugin-astro: 0.14.1
 
   prettier@2.8.8: {}
+
+  prettier@3.8.3: {}
 
   prettier@3.9.9: {}
 
