@@ -1,6 +1,11 @@
 import { reverificationError } from '@clerk/shared/authorization-errors';
-import type { ReverificationConfig, SignInFirstFactorJSON, SignInSecondFactorJSON } from '@clerk/shared/types';
-import { screen, waitFor, within } from '@testing-library/react';
+import type {
+  PublicKeyCredentialWithAuthenticatorAssertionResponse,
+  ReverificationConfig,
+  SignInFirstFactorJSON,
+  SignInSecondFactorJSON,
+} from '@clerk/shared/types';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { useState } from 'react';
@@ -160,6 +165,42 @@ function pretendToBeARealBrowser() {
     Reflect.deleteProperty(navigator, 'webdriver');
   };
 }
+
+function pretendWebAuthnIsUnsupported() {
+  const restoreBrowser = pretendToBeARealBrowser();
+  const original = Object.getOwnPropertyDescriptor(window, 'PublicKeyCredential');
+  Object.defineProperty(window, 'PublicKeyCredential', { value: undefined, configurable: true, writable: true });
+  return () => {
+    restoreBrowser();
+    if (original) {
+      Object.defineProperty(window, 'PublicKeyCredential', original);
+    }
+  };
+}
+
+function fakeAssertion() {
+  const buffer = () => new Uint8Array([1, 2, 3]).buffer;
+  return {
+    type: 'public-key',
+    id: 'cred_1',
+    rawId: buffer(),
+    authenticatorAttachment: 'platform',
+    response: { clientDataJSON: buffer(), authenticatorData: buffer(), signature: buffer(), userHandle: null },
+  } as unknown as PublicKeyCredentialWithAuthenticatorAssertionResponse;
+}
+
+function captureNavigations() {
+  const navigation = (window as unknown as { navigation: EventTarget }).navigation;
+  const urls: string[] = [];
+  const onNavigate = (event: Event) => {
+    urls.push((event as Event & { destination: { url: string } }).destination.url);
+    event.preventDefault();
+  };
+  navigation.addEventListener('navigate', onNavigate);
+  return { urls, stop: () => navigation.removeEventListener('navigate', onNavigate) };
+}
+
+const settle = () => new Promise(resolve => setTimeout(resolve, 100));
 
 async function pasteCode(user: User, code: string) {
   await user.click(slots()[0]);
@@ -471,12 +512,46 @@ describe('Reverification', () => {
       expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled();
     });
 
-    // Unsure about test implementation: resend is locked for 30s after the first prepare, so every resend case needs fake timers, and mixing fake Date with MSW, Clerk and userEvent in Chromium is untested.
-    it.todo('resends a code once the cooldown has passed', () => {
-      // Resend is disabled and shows the countdown while the cooldown runs
-      // Resend is enabled again after the cooldown
-      // Resending sends a new code and clears the typed value
-      // A submit made while a resend is in flight is held and sent once the resend has been sent
+    it('resends a code once the cooldown has passed', async () => {
+      const { fapi } = await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }));
+      vi.useFakeTimers({ toFake: ['Date'] });
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+        await waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
+
+        // Resend is disabled and shows the countdown while the cooldown runs
+        const resend = await screen.findByRole('button', { name: /Resend \(\d+\)/ });
+        expect(resend).toBeDisabled();
+
+        // Resend is enabled again after the cooldown
+        vi.setSystemTime(Date.now() + 30_000);
+        await waitFor(() => expect(screen.getByRole('button', { name: /Resend/ })).toBeEnabled(), { timeout: 3000 });
+        expect(screen.getByRole('button', { name: /Resend/ }).textContent).not.toMatch(/\(\d+\)/);
+
+        // Resending sends a new code and clears the typed value
+        await user.click(slots()[0]);
+        await user.keyboard('123');
+        expect(slotValues()).toEqual(['1', '2', '3', '', '', '']);
+        const prepare = holdRequests('post', PREPARE_FIRST);
+        await user.click(screen.getByRole('button', { name: /Resend/ }));
+        await waitFor(() => expect(prepare.requests).toHaveLength(1));
+        expect(slotValues()).toEqual(['', '', '', '', '', '']);
+        expect(screen.getByRole('button', { name: /Resend \(\d+\)/ })).toBeDisabled();
+
+        // A submit made while a resend is in flight is held and sent once the resend has been sent
+        const attempt = holdRequests('post', ATTEMPT_FIRST);
+        await pasteCode(user, CODE);
+        await settle();
+        expect(attempt.requests).toHaveLength(0);
+        prepare.release();
+        await waitFor(() => expect(attempt.requests).toHaveLength(1));
+        attempt.release();
+        await untilResolved();
+      } finally {
+        vi.useRealTimers();
+      }
     });
   });
 
@@ -561,25 +636,73 @@ describe('Reverification', () => {
   });
 
   describe('passkey', () => {
-    // Unsure about test implementation: the fake needs clerk.__internal_getPublicCredentials stubbed to provide a credential.
     // Currently wrong: the banner shows the browser or clerk-js error message as is, which is not localized.
-    it.todo('completes the challenge with the passkey', () => {
-      // The passkey step opens
-      // A refused credential shows an error banner and stays on the step
-      // The button is disabled and shows the verifying label while the credential is being verified
-      // A second attempt with an accepted credential completes the challenge
+    it('completes the challenge with the passkey', async () => {
+      const { clerk } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }),
+      );
+      let acceptCredential: () => void = () => {};
+      const getCredential = vi
+        .fn()
+        .mockResolvedValueOnce({ publicKeyCredential: null, error: new Error('The operation was refused') })
+        .mockImplementationOnce(
+          () =>
+            new Promise(resolve => {
+              acceptCredential = () => resolve({ publicKeyCredential: fakeAssertion(), error: null });
+            }),
+        );
+      clerk.__internal_getPublicCredentials = getCredential;
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        // The passkey step opens
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
+
+        // A refused credential shows an error banner and stays on the step
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+        expect(await screen.findByRole('alert')).toHaveTextContent('The operation was refused');
+        expect(screen.getByText(STEP.passkey)).toBeVisible();
+
+        // The button is disabled and shows the verifying label while the credential is being verified
+        await user.click(screen.getByRole('button', { name: 'Continue' }));
+        await waitFor(() => expect(verifying()).toBeInTheDocument());
+        expect(screen.getByRole('button', { name: 'Use another method' })).toBeDisabled();
+
+        // A second attempt with an accepted credential completes the challenge
+        await waitFor(() => expect(getCredential).toHaveBeenCalledTimes(2));
+        acceptCredential();
+        await untilResolved();
+      } finally {
+        restore();
+      }
     });
 
-    // Unsure about test implementation: needs window.PublicKeyCredential stubbed out, and it is not certain isWebAuthnSupported() reacts to that in Chromium.
-    it.todo('does not offer a passkey when the browser does not support WebAuthn', () => {
-      // The passkey is not the starting method
-      // The passkey is not listed in the picker
+    it('does not offer a passkey when the browser does not support WebAuthn', async () => {
+      await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor, passkeyFactor, emailFactor] }),
+      );
+      const restore = pretendWebAuthnIsUnsupported();
+
+      try {
+        // The passkey is not the starting method
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.password)).toBeVisible();
+
+        // The passkey is not listed in the picker
+        await useAnotherMethod(user);
+        expect(await screen.findByRole('button', { name: 'Email code to alice@example.com' })).toBeVisible();
+        expect(screen.queryByRole('button', { name: 'Use your passkey' })).toBeNull();
+      } finally {
+        restore();
+      }
     });
   });
 
   describe('switching methods', () => {
     // Unsure about behavior: Back keeps the typed value while picking a method clears it. It is not clear whether keeping it on Back is intended.
-    // Unsure about test implementation: focus is not moved for the initially active step, only on transitions, so focus must not be asserted on the first step.
     it('walks through the picker and help steps', async () => {
       await renderReverification(
         guardedAction(),
@@ -700,14 +823,47 @@ describe('Reverification', () => {
       expect(await screen.findByText('form_param_invalid')).toBeInTheDocument();
     });
 
-    // Unsure about test implementation: the support email is only used in a mailto: link (window.location.assign), which can't be observed in a browser test. The help step doesn't render the address.
-    it.todo('shows the support email from the environment', () => {
-      // The help step shows the configured support email
+    it('emails the support address from the environment', async () => {
+      await renderReverification(
+        guardedAction(),
+        verificationSeed(
+          { firstFactors: [passwordFactor, emailFactor] },
+          { environment: fapiEnvironment({ display_config: { support_email: 'help@acme.test' } }) },
+        ),
+      );
+      const navigations = captureNavigations();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.password)).toBeVisible();
+        await useAnotherMethod(user);
+        await user.click(await screen.findByRole('button', { name: 'Get help' }));
+
+        // Email support opens a mail to the configured address
+        await user.click(await screen.findByRole('button', { name: 'Email support' }));
+        await waitFor(() => expect(navigations.urls).toEqual(['mailto:help@acme.test']));
+      } finally {
+        navigations.stop();
+      }
     });
 
-    // Unsure about test implementation: same as above, the default address is only used in the mailto: link.
-    it.todo('falls back to the default support email when the environment has none', () => {
-      // The help step shows the default support email
+    it('emails the default support address when the environment has none', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor, emailFactor] }));
+      const navigations = captureNavigations();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.password)).toBeVisible();
+        await useAnotherMethod(user);
+        await user.click(await screen.findByRole('button', { name: 'Get help' }));
+
+        // Email support opens a mail to support@ the Frontend API host
+        await user.click(await screen.findByRole('button', { name: 'Email support' }));
+        await waitFor(() => expect(navigations.urls).toHaveLength(1));
+        expect(navigations.urls[0]).toMatch(/^mailto:support@/);
+      } finally {
+        navigations.stop();
+      }
     });
   });
 
@@ -825,25 +981,85 @@ describe('Reverification', () => {
       prepare.release();
     });
 
-    // Unsure if this should be a test: the view has no dismiss button, so this only happens if the consumer keeps its own close control enabled during an attempt. Sign out mid attempt is the more realistic trigger.
-    // Unsure about test implementation: depends on the timing of the late response, which needs a held request to control.
-    it.todo('ignores a late failure from an attempt that was in flight when dismissed', () => {
+    it('ignores a late failure from an attempt that was in flight when dismissed', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      const attempt = holdRequests('post', ATTEMPT_FIRST);
+      const user = await startVerification();
+      await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+
       // The card closes and the action is rejected as cancelled
+      await dismiss(user);
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await untilClosed();
+
       // The late failure does not reopen the card or show an error
+      attempt.fail();
+      await settle();
+      expect(screen.queryByText(TITLE)).toBeNull();
+      expect(screen.queryByText('form_param_invalid')).toBeNull();
+      expect(outcome()).toBe('rejected: reverification_cancelled');
     });
 
-    // Unsure if this should be a test: same as the late failure case above.
-    // Unsure about test implementation: same as the late failure case above.
-    it.todo('ignores a late success from an attempt that was in flight when dismissed', () => {
+    it('ignores a late success from an attempt that was in flight when dismissed', async () => {
+      const { fapi, action } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor] }),
+      );
+      const attempt = holdRequests('post', ATTEMPT_FIRST);
+      const touch = holdRequests('post', TOUCH);
+      const user = await startVerification();
+      await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+
       // The card closes and the action is rejected as cancelled
+      await dismiss(user);
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await untilClosed();
+
       // The session is not activated
+      attempt.release();
+      await waitFor(() => expect(fapi.verification.status).toBe('complete'));
+      await settle();
+      expect(touch.requests).toHaveLength(0);
+      touch.release();
+
       // The action is not retried
+      expect(action).toHaveBeenCalledTimes(1);
+      expect(screen.queryByText(TITLE)).toBeNull();
     });
 
-    // Unsure about test implementation: depends on the timing of the dismissed attempt's late response, which needs a held request to control.
-    it.todo('starts a fresh challenge when the action is run again while a dismissed attempt is in flight', () => {
+    it('starts a fresh challenge when the action is run again while a dismissed attempt is in flight', async () => {
+      const action = vi
+        .fn()
+        .mockResolvedValueOnce(reverificationError())
+        .mockResolvedValueOnce(reverificationError())
+        .mockResolvedValue({ done: true });
+      await renderReverification(action, verificationSeed({ firstFactors: [passwordFactor] }));
+      const attempt = holdRequests('post', ATTEMPT_FIRST);
+      const touch = holdRequests('post', TOUCH);
+      const user = await startVerification();
+      await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      await dismiss(user);
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await untilClosed();
+
       // The new challenge opens from the first step with empty fields
+      await user.click(screen.getByRole('button', { name: 'Run action' }));
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+      expect(passwordField()).toHaveValue('');
+      expect(passwordField()).toBeEnabled();
+
       // The late response from the dismissed attempt has no effect
+      attempt.release();
+      await settle();
+      expect(passwordField()).toHaveValue('');
+      expect(passwordField()).toBeEnabled();
+      expect(screen.getByText(STEP.password)).toBeVisible();
+      expect(touch.requests).toHaveLength(0);
+      touch.release();
+      expect(action).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -863,10 +1079,21 @@ describe('Reverification', () => {
       expect(passwordField()).toHaveValue('typed');
     });
 
-    // Unsure about test implementation: needs the fake to support signing out mid challenge (clerk.signOut against the fake DELETE handler).
-    it.todo('cancels the challenge when the user signs out', () => {
+    it('cancels the challenge when the user signs out', async () => {
+      const { clerk } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor] }),
+      );
+      await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+
+      await act(() => clerk.signOut());
+
       // The card closes
+      await untilClosed();
+
       // The action is rejected as cancelled
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
     });
 
     it('passes through an error that is unrelated to reverification', async () => {
@@ -931,11 +1158,28 @@ describe('Reverification', () => {
       // The message follows the configured locale
     });
 
-    // Unsure about behavior: a network failure surfaces as a ClerkRuntimeError (an Error) with its own English message. Needs a decision on what the user should see for network failures.
-    // Unsure about test implementation: the generic fallback may only be reachable by throwing a non-Error.
-    it.todo('shows a message for a network failure', () => {
-      // The step stays open with an error
-      // The user can try again
+    // Currently wrong: the message is the raw clerk-js network error including the request URL, and the generic fallback is never used for it.
+    it('keeps the step open and lets the user try again after a network failure', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      worker.use(http.post(fapiUrl(ATTEMPT_FIRST), () => HttpResponse.error(), { once: true }));
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        const user = await startVerification();
+
+        // The step stays open with an error
+        await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
+        expect(await screen.findByText(/Network error/)).toBeInTheDocument();
+        expect(screen.getByText(STEP.password)).toBeVisible();
+        expect(passwordField()).toBeEnabled();
+        expect(passwordField()).toHaveValue(PASSWORD);
+
+        // The user can try again
+        await user.type(passwordField(), '{Enter}');
+        await untilResolved();
+      } finally {
+        restore();
+      }
     });
 
     // Unsure about behavior: a start failure ends in the unavailable card without the reason, and a session activation failure reuses the last step's field error. Neither has a dedicated error surface.
