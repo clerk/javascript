@@ -191,7 +191,10 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     values,
     fields,
     error: context.error?.message,
-    isSubmitting,
+    get isSubmitting() {
+      const current = actor.getSnapshot();
+      return current.value === 'submitting' || current.context.submitQueued;
+    },
     isDirty: keysOf(values).some(name => fields[name].isDirty),
     canSubmit: !isSubmitting && isValid(context),
     register,

@@ -9,7 +9,7 @@ import { UserProfileView } from '../user-profile.view';
 
 const pages: UserProfileViewProps['pages'] = {
   account: { name: 'Preston Booth', username: 'prestonxyz' },
-  security: { hasPassword: true },
+  security: {},
   billing: {
     subscription: {
       planName: 'Basic Plan',

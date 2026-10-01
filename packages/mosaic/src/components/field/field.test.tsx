@@ -7,6 +7,7 @@ import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Checkbox } from '../checkbox';
+import type { FieldFeedback } from '../form';
 import { Input } from '../input';
 import { Select } from '../select';
 import { Field } from './field';
@@ -37,6 +38,41 @@ function stubPrototype(target: object, name: string, descriptor: PropertyDescrip
 }
 
 describe('Mosaic Field', () => {
+  it.each<{ type: FieldFeedback['type']; slot: string }>([
+    { type: 'error', slot: 'cl-field-error' },
+    { type: 'success', slot: 'cl-field-success' },
+    { type: 'info', slot: 'cl-field-info' },
+    { type: 'warning', slot: 'cl-field-info' },
+  ])('associates $type feedback with its control', ({ type, slot }) => {
+    render(
+      <Field.Root>
+        <Field.Label>Password</Field.Label>
+        <Input />
+        <Field.Feedback feedback={{ type, message: 'Password feedback' }} />
+      </Field.Root>,
+    );
+    expect(screen.getByRole('textbox', { name: 'Password' })).toHaveAccessibleDescription('Password feedback');
+    expect(screen.getByText('Password feedback').closest('p')).toHaveClass(slot);
+    expect(screen.getByRole('status')).toHaveTextContent('Password feedback');
+  });
+  it('associates text-only info feedback with the control in a live region', () => {
+    render(
+      <Field.Root>
+        <Field.Label>Password</Field.Label>
+        <Input />
+        <Field.Message>
+          <Field.Hint>Try a longer password.</Field.Hint>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Password' })).toHaveAccessibleDescription('Try a longer password.');
+    expect(screen.getByRole('status')).toHaveTextContent('Try a longer password.');
+    const info = screen.getByText('Try a longer password.').closest('p');
+    expect(info).toHaveClass('cl-field-info');
+    expect(info?.querySelector('svg')).toBeNull();
+  });
+
   afterEach(() => {
     restores.splice(0).forEach(restore => restore());
   });

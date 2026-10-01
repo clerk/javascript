@@ -11,6 +11,7 @@ import { feedbackHeight, feedbackStyles } from '../../utils/feedback.styles';
 import { reset } from '../../utils/reset.styles';
 import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import { visuallyHidden } from '../../utils/visually-hidden.styles';
+import type { FieldFeedback as FormFieldFeedback } from '../form';
 import type { FieldOrientation } from './field.context';
 import {
   FieldMessageProvider,
@@ -202,18 +203,19 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
   return <FieldMessageProvider register={register}>{rendered}</FieldMessageProvider>;
 });
 
-type FieldFeedbackKind = 'error' | 'success';
+type FieldFeedbackKind = 'error' | 'success' | 'info';
 
-const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon: IconName; color: stylex.StyleXStyles }> = {
+const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon?: IconName; color: stylex.StyleXStyles }> = {
   error: { slot: 'field-error', icon: 'exclamation-circle', color: feedbackStyles.error },
   success: { slot: 'field-success', icon: 'checkmark', color: feedbackStyles.success },
+  info: { slot: 'field-info', color: feedbackStyles.info },
 };
 
-interface FieldFeedbackProps extends MosaicComponentProps<'p'> {
+interface FieldFeedbackPartProps extends MosaicComponentProps<'p'> {
   kind: FieldFeedbackKind;
 }
 
-const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>(function MosaicFieldFeedback(
+const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackPartProps>(function MosaicFieldFeedback(
   { render, xstyle, id: idProp, children, kind, ...rest },
   ref,
 ) {
@@ -240,7 +242,7 @@ const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>
         rest,
       ),
       id,
-      children: <FeedbackBody icon={icon}>{message}</FeedbackBody>,
+      children: icon ? <FeedbackBody icon={icon}>{message}</FeedbackBody> : message,
     },
   });
 });
@@ -271,5 +273,47 @@ const FieldSuccess = React.forwardRef<HTMLParagraphElement, FieldSuccessProps>(f
   );
 });
 
+export type FieldHintProps = MosaicComponentProps<'p'>;
+
+const FieldHint = React.forwardRef<HTMLParagraphElement, FieldHintProps>(function MosaicFieldHint(props, ref) {
+  return (
+    <FieldFeedback
+      ref={ref}
+      kind='info'
+      {...props}
+    />
+  );
+});
+
+export interface FieldFeedbackProps extends Omit<FieldMessageProps, 'children'> {
+  feedback?: FormFieldFeedback;
+}
+
+const Feedback = React.forwardRef<HTMLDivElement, FieldFeedbackProps>(function MosaicFieldFeedbackValue(
+  { feedback, ...props },
+  ref,
+) {
+  return (
+    <Message
+      ref={ref}
+      {...props}
+    >
+      <FieldError>{feedback?.type === 'error' ? feedback.message : null}</FieldError>
+      <FieldHint>{feedback?.type === 'info' || feedback?.type === 'warning' ? feedback.message : null}</FieldHint>
+      <FieldSuccess>{feedback?.type === 'success' ? feedback.message : null}</FieldSuccess>
+    </Message>
+  );
+});
+
 /** Styled parts for composing an automatically associated single-control field. */
-export const Field = { Root, Label, Content, Description, Message, Error: FieldError, Success: FieldSuccess };
+export const Field = {
+  Root,
+  Label,
+  Content,
+  Description,
+  Message,
+  Feedback,
+  Error: FieldError,
+  Success: FieldSuccess,
+  Hint: FieldHint,
+};
