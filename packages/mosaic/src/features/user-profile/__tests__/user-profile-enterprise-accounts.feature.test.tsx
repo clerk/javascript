@@ -83,8 +83,8 @@ describe('enterprise accounts', () => {
       id: 'enterprise_1',
       enterprise_connection_id: 'okta',
       email_address: 'linked@example.com',
-      verification: fapiVerification({
-        strategy: 'enterprise_sso',
+      verification: fapiVerification('enterprise_sso', {
+        status: 'verified',
         error: { code: 'enterprise_error', message: 'Fix this account', long_message: 'Fix this account' },
       }),
     });
@@ -173,7 +173,7 @@ describe('enterprise accounts', () => {
           response: fapiExternalAccount({
             id: 'idn_okta',
             provider: 'google',
-            verification: fapiVerification({ status: 'unverified', strategy: 'enterprise_sso' }),
+            verification: fapiVerification('enterprise_sso', { status: 'unverified' }),
           }),
           client: null,
         }),
