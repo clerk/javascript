@@ -131,16 +131,16 @@ describe('useUserProfilePasswordModel enterprise accounts', () => {
       status: 'readonly',
       mode: 'change',
       reason: 'enterprise_account',
-      managedBy: { name: 'Acme SSO', iconUrl: 'https://example.com/acme.png' },
+      managedBy: { name: 'Acme SSO' },
     });
   });
 
-  it('leaves a blank connection name and missing logo undefined', () => {
+  it('leaves a blank connection name undefined', () => {
     if (!user) {
       throw new Error('expected user');
     }
     user.enterpriseAccounts = [{ active: true, enterpriseConnection: { name: '', logoPublicUrl: null } }];
     const { result } = renderHook(() => useUserProfilePasswordModel());
-    expect(result.current).toMatchObject({ managedBy: { name: undefined, iconUrl: undefined } });
+    expect(result.current).toMatchObject({ managedBy: { name: undefined } });
   });
 });

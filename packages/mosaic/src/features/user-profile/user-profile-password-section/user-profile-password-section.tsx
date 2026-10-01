@@ -29,10 +29,7 @@ export function UserProfilePasswordSection({ fallback = null }: UserProfilePassw
     return (
       <UserProfilePasswordSectionView
         hasPassword={model.mode === 'change'}
-        managedBy={{
-          name: model.managedBy.name ?? m.enterpriseConnection,
-          iconUrl: model.managedBy.iconUrl,
-        }}
+        managedBy={{ name: model.managedBy.name ?? m.enterpriseConnection }}
       />
     );
   }
