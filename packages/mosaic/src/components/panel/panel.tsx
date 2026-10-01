@@ -2,6 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { useRender } from '../../primitives/utils';
+import { isKeyboardEvent } from '../../primitives/utils/interaction-modality';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
@@ -60,7 +61,9 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
               type='button'
               aria-haspopup='dialog'
               aria-expanded={profile.navOpen}
-              onClick={profile.navOpen ? profile.closeNav : profile.openNav}
+              onClick={event =>
+                profile.navOpen ? profile.closeNav() : profile.openNav(isKeyboardEvent(event.nativeEvent))
+              }
               {...mergeStyleProps(
                 themeProps('profile-nav-trigger'),
                 stylex.props(reset.base, styles.navTrigger, focusOutline.visible),

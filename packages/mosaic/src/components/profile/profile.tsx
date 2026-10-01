@@ -91,7 +91,14 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   // Scoped to a layout so the replacement sheet or popover never mounts open.
   const [navOpenIn, setNavOpenIn] = React.useState<NavLayout | null>(null);
   const navOpen = navOpenIn === navLayout;
-  const openNav = React.useCallback(() => setNavOpenIn(navLayout), [navLayout]);
+  const [navOpenedByKeyboard, setNavOpenedByKeyboard] = React.useState(false);
+  const openNav = React.useCallback(
+    (byKeyboard: boolean) => {
+      setNavOpenIn(navLayout);
+      setNavOpenedByKeyboard(byKeyboard);
+    },
+    [navLayout],
+  );
   const closeNav = React.useCallback(() => setNavOpenIn(null), []);
   React.useEffect(() => {
     setNavOpenIn(null);
@@ -103,6 +110,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       compact,
       navLayout,
       navOpen,
+      navOpenedByKeyboard,
       openNav,
       closeNav,
       value,
@@ -116,6 +124,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       compact,
       navLayout,
       navOpen,
+      navOpenedByKeyboard,
       openNav,
       closeNav,
       value,
@@ -212,7 +221,18 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   ref,
 ) {
   const profile = useProfileContext('Profile.Nav');
-  const { titleId, renderBranding, compact, navLayout, navOpen, closeNav, value, pageTitleFor, inline } = profile;
+  const {
+    titleId,
+    renderBranding,
+    compact,
+    navLayout,
+    navOpen,
+    navOpenedByKeyboard,
+    closeNav,
+    value,
+    pageTitleFor,
+    inline,
+  } = profile;
   // The opener's page is hidden after a choice, so focus returns to the new page's title instead.
   const finalFocus = React.useCallback(() => pageTitleFor(value), [pageTitleFor, value]);
   const list = (
@@ -254,6 +274,8 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
         open={navOpen}
         onOpenChange={onOpenChange}
         placement='bottom-start'
+        // The title opens the popover itself, so the popover cannot see a keyboard open.
+        initialFocus={navOpenedByKeyboard ? 'first' : 'auto'}
       >
         <Popover.Popup
           anchor={pageTitleFor(value)}

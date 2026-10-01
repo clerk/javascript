@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -335,6 +335,38 @@ describe('Profile', () => {
       await user.click(screen.getByRole('tab', { name: 'Security' }));
       expect(onValueChange).toHaveBeenCalledWith('security');
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('moves focus to the selected tab when the popover opens from the keyboard', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      renderSurface({ onValueChange });
+      act(() => observe?.(2));
+      const headline = screen.getByRole('button', { name: 'Account' });
+
+      // A keyboard-activated button click carries `detail: 0`, which userEvent does not send.
+      fireEvent.click(headline, { detail: 0 });
+      await waitFor(() => expect(screen.getByRole('tab', { name: 'Account' })).toHaveFocus());
+
+      await user.keyboard('{ArrowDown}');
+      expect(screen.getByRole('tab', { name: 'Security' })).toHaveFocus();
+      await user.keyboard('{Enter}');
+      expect(onValueChange).toHaveBeenCalledWith('security');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('returns focus to the page title when the popover is escaped', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(2));
+      const headline = screen.getByRole('button', { name: 'Account' });
+
+      fireEvent.click(headline, { detail: 0 });
+      await waitFor(() => expect(screen.getByRole('tab', { name: 'Account' })).toHaveFocus());
+      await user.keyboard('{Escape}');
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(headline).toHaveFocus();
     });
 
     it('closes the popover when the page title is pressed again', async () => {

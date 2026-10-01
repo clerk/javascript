@@ -6,7 +6,8 @@ export interface ProfileContextValue {
   compact: boolean;
   navLayout: 'column' | 'popover' | 'sheet';
   navOpen: boolean;
-  openNav: () => void;
+  navOpenedByKeyboard: boolean;
+  openNav: (byKeyboard: boolean) => void;
   closeNav: () => void;
   value: string;
   registerPageTitle: (value: string, element: HTMLElement | null) => void;
