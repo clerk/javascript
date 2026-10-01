@@ -32,17 +32,17 @@ export function useUserProfileConnectedAccountsController({
   const [pendingId, setPendingId] = useState<string>();
   const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
   const [reconnectErrors, setReconnectErrors] = useState<Record<string, string>>({});
-  const inFlight = useRef<string | undefined>(undefined);
+  const connecting = useRef(false);
 
   const run = async (
     id: string,
     action: (id: string) => Promise<ConnectedAccountActionResult>,
     setErrors: typeof setConnectErrors,
   ) => {
-    if (inFlight.current) {
+    if (connecting.current) {
       return;
     }
-    inFlight.current = id;
+    connecting.current = true;
     setPendingId(id);
     setErrors(({ [id]: _cleared, ...rest }) => rest);
 
@@ -52,10 +52,10 @@ export function useUserProfileConnectedAccountsController({
       }
     } catch (error) {
       setErrors(current => ({ ...current, [id]: formatError(error) }));
+    } finally {
+      connecting.current = false;
+      setPendingId(undefined);
     }
-
-    inFlight.current = undefined;
-    setPendingId(undefined);
   };
 
   return {
