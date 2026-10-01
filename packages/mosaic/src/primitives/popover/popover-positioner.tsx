@@ -75,7 +75,13 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       <FloatingFocusManager
         context={floatingContext}
         modal={modal}
-        initialFocus={initialFocus === 'first' || isKeyboardOpen(floatingContext) ? 0 : refs.floating}
+        initialFocus={
+          typeof initialFocus === 'object'
+            ? initialFocus
+            : initialFocus === 'first' || isKeyboardOpen(floatingContext)
+              ? 0
+              : refs.floating
+        }
         returnFocus={resolvedReturnFocus}
       >
         {element}

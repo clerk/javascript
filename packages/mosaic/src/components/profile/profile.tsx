@@ -174,9 +174,13 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     <ProfileContext.Provider value={context}>
       <Tabs.Root
         value={value}
-        onValueChange={onValueChange}
+        onValueChange={next => {
+          onValueChange?.(next);
+          closeNav();
+        }}
         orientation={orientation}
-        activationMode={activationMode}
+        // Compact, arrowing through the list must not switch the page behind it.
+        activationMode={compact ? 'manual' : activationMode}
       >
         {element}
       </Tabs.Root>
@@ -203,6 +207,15 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
 });
 
 export type ProfileNavProps = MosaicComponentProps<'nav'>;
+
+function focusListEdge(event: React.KeyboardEvent<HTMLElement>) {
+  if (event.target !== event.currentTarget || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) {
+    return;
+  }
+  event.preventDefault();
+  const tabs = event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]:not([aria-disabled="true"])');
+  (event.key === 'ArrowDown' ? tabs[0] : tabs[tabs.length - 1])?.focus();
+}
 
 function NavBranding() {
   return (
@@ -235,6 +248,8 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   } = profile;
   // The opener's page is hidden after a choice, so focus returns to the new page's title instead.
   const finalFocus = React.useCallback(() => pageTitleFor(value), [pageTitleFor, value]);
+  const navRef = React.useRef<HTMLElement | null>(null);
+  const inPopover = navLayout === 'popover';
   const list = (
     <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
       {children}
@@ -243,12 +258,20 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   const element = useRender({
     defaultTagName: 'nav',
     render,
-    ref,
+    ref: [navRef, ref],
     props: {
       'aria-labelledby': titleId,
+      // A pointer open focuses the nav, and the arrows move into the list, as in `Menu`.
+      ...(inPopover ? { tabIndex: -1, onKeyDown: focusListEdge } : null),
       ...mergeStyleProps(
         themeProps('profile-nav', { compact }),
-        stylex.props(reset.base, styles.nav, (inline || compact) && styles.navFlush, xstyle),
+        stylex.props(
+          reset.base,
+          styles.nav,
+          (inline || compact) && styles.navFlush,
+          inPopover && styles.navInPopover,
+          xstyle,
+        ),
         rest,
       ),
       children: (
@@ -268,14 +291,14 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
       closeNav();
     }
   };
-  if (navLayout === 'popover') {
+  if (inPopover) {
     return (
       <Popover.Root
         open={navOpen}
         onOpenChange={onOpenChange}
         placement='bottom-start'
         // The title opens the popover itself, so the popover cannot see a keyboard open.
-        initialFocus={navOpenedByKeyboard ? 'first' : 'auto'}
+        initialFocus={navOpenedByKeyboard ? 'first' : navRef}
       >
         <Popover.Popup
           anchor={pageTitleFor(value)}

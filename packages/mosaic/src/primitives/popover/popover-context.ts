@@ -8,6 +8,7 @@ import type {
 import { createContext, type CSSProperties, useContext } from 'react';
 
 import type { TransitionProps } from '../hooks/use-transition';
+import type { PopoverInitialFocus } from './popover-root';
 
 export interface PopoverContextValue {
   open: boolean;
@@ -21,7 +22,7 @@ export interface PopoverContextValue {
   popupRef: React.RefObject<HTMLDivElement | null>;
   arrowRef: React.MutableRefObject<SVGSVGElement | null>;
   modal: boolean;
-  initialFocus: 'auto' | 'first';
+  initialFocus: PopoverInitialFocus;
   /** Where focus goes when the popup closes, or `null` to leave focus alone. */
   returnFocusRef: React.MutableRefObject<HTMLElement | null>;
   labelId: string;

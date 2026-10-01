@@ -17,13 +17,15 @@ import {
   useInteractions,
   useRole,
 } from '@floating-ui/react';
-import { type ReactNode, useCallback, useId, useMemo, useRef, useState } from 'react';
+import { type ReactNode, type RefObject, useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import { useControllableState } from '../hooks/use-controllable-state';
 import { useReturnFocus } from '../hooks/use-return-focus';
 import { useTransition } from '../hooks/use-transition';
 import { cssVars } from '../utils/css-vars';
 import { PopoverContext, type PopoverContextValue } from './popover-context';
+
+export type PopoverInitialFocus = 'auto' | 'first' | RefObject<HTMLElement | null>;
 
 export interface PopoverProps {
   open?: boolean;
@@ -41,8 +43,9 @@ export interface PopoverProps {
    *   focus ring on a control the user did not navigate to.
    * - `'first'`: always the first tabbable element. Use it for popups whose content
    *   is meant to be typed into immediately, such as a combobox.
+   * - a ref: that element.
    */
-  initialFocus?: 'auto' | 'first';
+  initialFocus?: PopoverInitialFocus;
   children: ReactNode;
 }
 

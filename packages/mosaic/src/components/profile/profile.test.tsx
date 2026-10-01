@@ -350,9 +350,27 @@ describe('Profile', () => {
 
       await user.keyboard('{ArrowDown}');
       expect(screen.getByRole('tab', { name: 'Security' })).toHaveFocus();
+      expect(onValueChange).not.toHaveBeenCalled();
       await user.keyboard('{Enter}');
       expect(onValueChange).toHaveBeenCalledWith('security');
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('focuses the navigation on a pointer open, and the arrows move into the list', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(2));
+
+      await user.click(screen.getByRole('button', { name: 'Account' }));
+      const nav = screen.getByRole('navigation', { name: 'User profile' });
+      await waitFor(() => expect(nav).toHaveFocus());
+
+      await user.keyboard('{ArrowDown}');
+      expect(screen.getByRole('tab', { name: 'Account' })).toHaveFocus();
+
+      nav.focus();
+      await user.keyboard('{ArrowUp}');
+      expect(screen.getAllByRole('tab').at(-1)).toHaveFocus();
     });
 
     it('returns focus to the page title when the popover is escaped', async () => {

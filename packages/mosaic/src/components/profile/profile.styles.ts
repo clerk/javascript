@@ -150,6 +150,10 @@ export const styles = stylex.create({
     minBlockSize: 0,
   },
 
+  navInPopover: {
+    outline: 'none',
+  },
+
   navList: {
     gap: NAV_GAP,
     display: 'flex',
