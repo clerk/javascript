@@ -6,11 +6,7 @@ import type { FieldFeedback } from '../../../components/form';
 import { useErrorText, useLocale, useMessages } from '../../../localization';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
-import {
-  passwordComplexityMessage,
-  passwordFormError,
-  passwordStrengthMessage,
-} from './user-profile-password-feedback';
+import { passwordFieldFeedback, passwordFormError } from './user-profile-password-feedback';
 import type { UserProfilePasswordModel } from './user-profile-password-section.model';
 import { useUserProfilePasswordModel } from './user-profile-password-section.model';
 import { UserProfilePasswordSectionView } from './user-profile-password-section.view';
@@ -55,21 +51,8 @@ function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { 
   const { validatePassword, passwordSettings } = model;
   const feedback = useCallback(
     async (password: string): Promise<FieldFeedback | undefined> => {
-      const { complexity, strength } = await validatePassword(password);
-      const failures = Object.entries(complexity ?? {})
-        .filter(([, failed]) => failed)
-        .map(([code]) => code);
-      const message = passwordComplexityMessage(failures, passwordSettings, m, locale);
-      if (message) {
-        return { type: complexity?.min_length ? 'info' : 'error', message };
-      }
-      if (strength?.state === 'fail') {
-        return { type: 'error', message: passwordStrengthMessage(strength.result.feedback.suggestions, m) };
-      }
-      if (strength?.state === 'pass') {
-        return { type: 'warning', message: m.rules.stronger };
-      }
-      return { type: 'success', message: m.rules.strong };
+      const validation = await validatePassword(password);
+      return passwordFieldFeedback(validation, passwordSettings, m, locale);
     },
     [validatePassword, passwordSettings, m, locale],
   );

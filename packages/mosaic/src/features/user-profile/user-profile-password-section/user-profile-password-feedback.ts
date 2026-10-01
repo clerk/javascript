@@ -1,6 +1,7 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
-import type { ClerkAPIError, PasswordSettingsData } from '@clerk/shared/types';
+import type { ClerkAPIError, PasswordSettingsData, PasswordValidation } from '@clerk/shared/types';
 
+import type { FieldFeedback } from '../../../components/form';
 import { FormSubmitError } from '../../../components/form';
 import type { LocalizableError, MosaicMessages } from '../../../localization';
 import { fill } from '../../../localization';
@@ -77,6 +78,28 @@ export function passwordComplexityMessage(failures: string[], settings: Settings
       ? new Intl.ListFormat(locale, { style: 'long', type: 'conjunction' }).format(requirements)
       : requirements.join(', ');
   return fill(messages.complexity.sentence, { requirements: list });
+}
+
+export function passwordFieldFeedback(
+  { complexity, strength }: PasswordValidation,
+  settings: Settings,
+  messages: Messages,
+  locale: string,
+): FieldFeedback {
+  const failures = Object.entries(complexity ?? {})
+    .filter(([, failed]) => failed)
+    .map(([code]) => code);
+  const message = passwordComplexityMessage(failures, settings, messages, locale);
+  if (message) {
+    return { type: complexity?.min_length ? 'info' : 'error', message };
+  }
+  if (strength?.state === 'fail') {
+    return { type: 'error', message: passwordStrengthMessage(strength.result.feedback.suggestions, messages) };
+  }
+  if (strength?.state === 'pass') {
+    return { type: 'warning', message: messages.rules.stronger };
+  }
+  return { type: 'success', message: messages.rules.strong };
 }
 
 export function passwordFormError(

@@ -1,11 +1,12 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
+import type { PasswordStrength } from '@clerk/shared/types';
 import { renderHook } from '@testing-library/react';
 import { createElement, type ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { FormSubmitError } from '../../../components/form';
 import { MosaicLocalizationProvider, resolveLocalization, useErrorText } from '../../../localization';
-import { passwordFormError } from './user-profile-password-feedback';
+import { passwordFieldFeedback, passwordFormError } from './user-profile-password-feedback';
 import { UserProfilePasswordUpdateError } from './user-profile-password-section.types';
 
 const settings = { min_length: 12, max_length: 64 };
@@ -211,5 +212,53 @@ describe('password error feedback', () => {
     expect(translate('current_password_required')).toMatchObject({
       fields: { currentPassword: 'Current password is required.' },
     });
+  });
+});
+
+describe('password field feedback', () => {
+  const feedback = (validation: Parameters<typeof passwordFieldFeedback>[0]) =>
+    passwordFieldFeedback(validation, settings, messages, localization.locale);
+  const strength = (state: PasswordStrength['state'], suggestions: string[] = []): PasswordStrength => ({
+    state,
+    keys: [],
+    result: {
+      feedback: { warning: null, suggestions },
+      score: 0,
+      password: '',
+      guesses: 0,
+      guessesLog10: 0,
+      calcTime: 0,
+    },
+  });
+
+  it('prefers complexity feedback over strength feedback', () => {
+    expect(feedback({ complexity: { require_numbers: true }, strength: strength('fail') })).toEqual({
+      type: 'error',
+      message: 'Your password must contain a number.',
+    });
+  });
+
+  it('reports minimum length as info and other complexity failures as errors', () => {
+    expect(feedback({ complexity: { min_length: true, require_numbers: true } })).toEqual({
+      type: 'info',
+      message: 'Your password must contain 12 or more characters.',
+    });
+    expect(feedback({ complexity: { require_uppercase: true } })).toMatchObject({ type: 'error' });
+  });
+
+  it('maps strength results to error, warning, and success', () => {
+    expect(feedback({ complexity: {}, strength: strength('fail', ['anotherWord']) })).toEqual({
+      type: 'error',
+      message: 'Your password is not strong enough. Custom suggestion.',
+    });
+    expect(feedback({ complexity: {}, strength: strength('pass') })).toEqual({
+      type: 'warning',
+      message: messages.rules.stronger,
+    });
+    expect(feedback({ complexity: {}, strength: strength('excellent') })).toEqual({
+      type: 'success',
+      message: messages.rules.strong,
+    });
+    expect(feedback({ complexity: {} })).toMatchObject({ type: 'success' });
   });
 });
