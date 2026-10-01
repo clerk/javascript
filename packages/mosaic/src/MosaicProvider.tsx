@@ -5,6 +5,7 @@ import type { MosaicIconOverrides } from './icons/overrides';
 import { MosaicIconsProvider } from './icons/overrides';
 import type { MosaicLocalization } from './localization';
 import { MosaicLocalizationProvider, resolveLocalization } from './localization';
+import { ModalHost } from './modals/modal-host';
 
 export interface MosaicProviderProps {
   children: React.ReactNode;
@@ -24,7 +25,9 @@ export function MosaicProvider({ children, icons, localization }: MosaicProvider
   return (
     <MosaicIconsProvider value={iconsValue}>
       <MosaicLocalizationProvider value={localizationValue}>
-        <ToastProvider>{children}</ToastProvider>
+        <ToastProvider>
+          <ModalHost>{children}</ModalHost>
+        </ToastProvider>
       </MosaicLocalizationProvider>
     </MosaicIconsProvider>
   );
