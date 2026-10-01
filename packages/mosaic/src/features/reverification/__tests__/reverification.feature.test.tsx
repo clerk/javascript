@@ -16,6 +16,8 @@ import type { FakeVerificationSeed } from '../../../__tests__/feature/fake-fapi/
 import { fapiClient, fapiEmailAddress, fapiEnvironment, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { Card } from '../../../components/card';
+import type { MosaicLocalization } from '../../../localization';
+import { MosaicProvider } from '../../../MosaicProvider';
 import { Reverification, useReverificationFlow } from '../reverification';
 
 const alice = fapiUser({
@@ -136,9 +138,16 @@ function Host({ action }: { action: () => Promise<unknown> }) {
   );
 }
 
-function renderReverification(action = guardedAction(), seed: FakeFapiSeed = signedIn()) {
+function renderReverification(
+  action = guardedAction(),
+  seed: FakeFapiSeed = signedIn(),
+  localization?: MosaicLocalization,
+) {
   const fapi = serveFapi(seed);
-  return renderWithClerk(<Host action={action} />).then(view => ({ ...view, fapi, action }));
+  const host = <Host action={action} />;
+  return renderWithClerk(
+    localization ? <MosaicProvider localization={localization}>{host}</MosaicProvider> : host,
+  ).then(view => ({ ...view, fapi, action }));
 }
 
 type User = ReturnType<typeof userEvent.setup>;
@@ -291,16 +300,35 @@ describe('Reverification', () => {
       // The first step opens once Clerk is ready
     });
 
-    // Currently wrong: entering `unavailable` calls cancel(), which closes the challenge, so the card only flashes and then disappears. Needs a product decision (keep the card until dismissed, or assert only the rejection).
-    it.todo('shows the unavailable card when verification cannot be started', () => {
-      // The unavailable card is shown
-      // The action is rejected as cancelled
+    // Currently wrong: entering `unavailable` calls cancel(), which closes the challenge, so the unavailable card only flashes and the user is never told why. Needs a product decision (keep the card until dismissed, or assert only the rejection).
+    it('cancels the action when verification cannot be started', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      worker.use(
+        http.post(fapiUrl(VERIFY), () =>
+          HttpResponse.json({ errors: [{ code: 'some_new_error', message: 'Nope' }] }, { status: 400 }),
+        ),
+      );
+
+      await startVerification();
+
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await untilClosed();
     });
 
-    // Currently wrong: same flash as above. Enterprise SSO is dropped by the model mapping, which leaves no usable factor.
-    it.todo('shows the unavailable card when none of the factors are supported', () => {
-      // The unavailable card is shown when the only factor is enterprise SSO
-      // The action is rejected as cancelled
+    // Needs a product decision: keep the unavailable card until the user dismisses it, or cancel without showing it.
+    it.todo('keeps the unavailable card visible until it is dismissed', () => {
+      // The unavailable card stays on screen instead of flashing
+      // Dismissing it rejects the action as cancelled
+    });
+
+    // Currently wrong: same as above. Enterprise SSO is dropped by the model mapping, which leaves no usable factor.
+    it('cancels the action when none of the factors are supported', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [enterpriseSsoFactor] }));
+
+      await startVerification();
+
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      await untilClosed();
     });
   });
 
@@ -470,6 +498,24 @@ describe('Reverification', () => {
       expect(slotValues()).toEqual(['', '', '', '', '', '']);
       await pasteCode(user, CODE);
       await untilResolved();
+    });
+
+    it('resubmits the typed code with the Continue button', async () => {
+      const { fapi } = await renderReverification(guardedAction(), verificationSeed({ firstFactors: [emailFactor] }));
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.emailCode)).toBeVisible();
+      await waitFor(() => expect(fapi.verification.firstFactorVerification?.strategy).toBe('email_code'));
+      await pasteCode(user, WRONG_CODE);
+      expect(await screen.findByText('Incorrect code')).toBeInTheDocument();
+      await waitFor(() => expect(slots().every(slot => !slot.disabled)).toBe(true));
+
+      const attempt = holdRequests('post', ATTEMPT_FIRST);
+      await user.click(screen.getByRole('button', { name: 'Continue' }));
+
+      await waitFor(() => expect(attempt.requests).toHaveLength(1));
+      expect(verifying()).toBeInTheDocument();
+      attempt.release();
+      expect(await screen.findByText('Incorrect code')).toBeInTheDocument();
     });
 
     it('holds a submit made while a code is being sent', async () => {
@@ -679,6 +725,26 @@ describe('Reverification', () => {
       }
     });
 
+    it('offers the passkey from the picker when another method is showing', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor, passkeyFactor] }));
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        const user = await startVerification();
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
+        await useAnotherMethod(user);
+        await user.click(await screen.findByRole('button', { name: 'Continue with your password' }));
+        expect(await screen.findByText(STEP.password)).toBeVisible();
+
+        // The passkey is listed once the user is on another method
+        await useAnotherMethod(user);
+        await user.click(await screen.findByRole('button', { name: 'Use your passkey' }));
+        expect(await screen.findByText(STEP.passkey)).toBeVisible();
+      } finally {
+        restore();
+      }
+    });
+
     it('does not offer a passkey when the browser does not support WebAuthn', async () => {
       await renderReverification(
         guardedAction(),
@@ -868,11 +934,40 @@ describe('Reverification', () => {
   });
 
   describe('finishing', () => {
-    // Currently wrong: the server verification is already complete at this point, so resubmitting the same code fails with invalid_action_for_session_reverification and the user can't recover. Needs a product decision (retry finish, or restart the verification).
-    it.todo('returns to the last step with an error when the session cannot be activated', () => {
+    // Currently wrong: the server verification is already complete at this point, so resubmitting fails with invalid_action_for_session_reverification and the user can't recover. Needs a product decision (retry finish, or restart the verification).
+    it('returns to the last step with an error when the session cannot be activated', async () => {
+      const { action } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor] }),
+      );
+      const touch = holdRequests('post', TOUCH);
+      const user = await startVerification();
+      await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
+
       // The last step stays visible and pending while the session is being activated
+      await waitFor(() => expect(touch.requests).toHaveLength(1));
+      expect(passwordField()).toBeDisabled();
+      expect(verifying()).toBeInTheDocument();
+      touch.fail();
+
       // The error is shown on the last step
+      expect(await screen.findByText('form_param_invalid')).toBeInTheDocument();
+      expect(screen.getByText(STEP.password)).toBeVisible();
+      await waitFor(() => expect(passwordField()).toBeEnabled());
+
       // The action is not retried
+      expect(action).toHaveBeenCalledTimes(1);
+      expect(outcome()).toBe('');
+
+      // Submitting again fails because the server verification is already complete
+      await user.type(passwordField(), '{Enter}');
+      expect(await screen.findByText(/unable to attempt first factor/)).toBeInTheDocument();
+      expect(outcome()).toBe('');
+    });
+
+    // Needs a product decision: retry the activation on the same step, or restart the verification.
+    it.todo('lets the user recover when the session cannot be activated', () => {
+      // The user can reach a resolved action without leaving the card in a dead end
     });
 
     it('cannot be interrupted while the action is being retried', async () => {
@@ -1112,6 +1207,7 @@ describe('Reverification', () => {
 
   describe('errors', () => {
     // Currently wrong: the model keeps only the server's longMessage or message (toError drops the error code), so nothing downstream can localize it. Known codes such as form_password_incorrect, form_code_incorrect and verification_not_sent should map to localized messages the way the old UI does.
+    // Blocked: Mosaic has no message keys for error codes yet, so there is nothing a test can override.
     it.todo('shows a localized message for a wrong password', () => {
       // The message for form_password_incorrect follows the configured locale
     });
@@ -1153,12 +1249,41 @@ describe('Reverification', () => {
     });
 
     // Currently wrong: the generic message is hardcoded English in both the model and the controller, and the localizable unstable__errors__generic message is unused.
-    it.todo('shows a localized generic message when the failure is not a Clerk error', () => {
-      // The generic message is shown on the step
-      // The message follows the configured locale
+    it.fails('shows a localized generic message when the failure is not a Clerk error', async () => {
+      const { clerk } = await renderReverification(
+        guardedAction(),
+        verificationSeed({ firstFactors: [passwordFactor] }),
+        {
+          messages: { 'reverification.unstable__errors__generic': 'Something custom went wrong' },
+        },
+      );
+      const user = await startVerification();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+      vi.spyOn(clerk.session!, 'attemptFirstFactorVerification').mockRejectedValue('not an error');
+
+      await user.type(passwordField(), `${PASSWORD}{Enter}`);
+
+      expect(await screen.findByText('Something custom went wrong')).toBeInTheDocument();
     });
 
     // Currently wrong: the message is the raw clerk-js network error including the request URL, and the generic fallback is never used for it.
+    it.fails('does not show the request URL when there is a network failure', async () => {
+      await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
+      worker.use(http.post(fapiUrl(ATTEMPT_FIRST), () => HttpResponse.error(), { once: true }));
+      const restore = pretendToBeARealBrowser();
+
+      try {
+        const user = await startVerification();
+
+        await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
+
+        await waitFor(() => expect(passwordField()).toBeInvalid());
+        expect(document.body).not.toHaveTextContent(/https?:\/\//);
+      } finally {
+        restore();
+      }
+    });
+
     it('keeps the step open and lets the user try again after a network failure', async () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
       worker.use(http.post(fapiUrl(ATTEMPT_FIRST), () => HttpResponse.error(), { once: true }));
@@ -1169,7 +1294,7 @@ describe('Reverification', () => {
 
         // The step stays open with an error
         await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
-        expect(await screen.findByText(/Network error/)).toBeInTheDocument();
+        await waitFor(() => expect(passwordField()).toBeInvalid());
         expect(screen.getByText(STEP.password)).toBeVisible();
         expect(passwordField()).toBeEnabled();
         expect(passwordField()).toHaveValue(PASSWORD);
