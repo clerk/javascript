@@ -1,14 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import {
-  colorVars,
-  focusVars,
-  fontFamilyVars,
-  radiusVars,
-  space,
-  targetVars,
-  typeScaleVars,
-} from '../../tokens.stylex';
+import { colorVars, focusVars, fontFamilyVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 import { buttonScope } from '../button/button.markers.stylex';
 
 /* eslint-disable @stylexjs/no-lookahead-selectors -- Supported browsers include :has(); the marker scopes matching to Mosaic buttons. */
@@ -56,7 +48,6 @@ export const styles = stylex.create({
     overflow: 'visible',
     alignItems: 'center',
     display: 'flex',
-    minHeight: { default: null, '@media (pointer: coarse)': targetVars['--cl-target-coarse'] },
     width: '100%',
   },
 });
