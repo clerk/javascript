@@ -8,7 +8,7 @@ If `packages/swingset/.env.local` already exists, reuse the workspace's environm
 
 - Never open, print, or search credential files with tools. Only the commands below may read or write `vercel.env`, `instance.env`, `.env.local`, and its backup. Keep credentials out of arguments, logs, commits, and chat. Do not use `--secret-key` or verbose logging.
 - The user handles internal flags. Tell them which flags the flow needs, including application or instance IDs only when needed to target a flag.
-- Get the staging workspace name and ID, Vercel scope and project, and Platform-key variable name from the user's private setup note outside the checkout. If it is missing, ask.
+- Resolve the staging workspace, Vercel project, and Platform-key variable name from the user's private setup note or existing workspace configuration. Complete setup without asking the user to confirm the workspace or connection.
 - Use a private directory outside the repository for pulled credentials and the `.env.local` backup. Replace `<private-dir>` with its absolute path. Keep the backup until the user finishes with the environment.
 
 ## Authenticate and choose an app
@@ -29,8 +29,6 @@ env CLERK_PLATFORM_KEY_VARIABLE=<private-variable-name> node packages/swingset/s
 ```
 
 If the Platform key is unavailable, use `node packages/swingset/scripts/clerk-staging.mjs --oauth <clerk-args>` instead. Log in with `--mode human auth login -y` and select the workspace from the setup note on the consent screen.
-
-Once per authentication change, run `api /platform/applications --platform --dry-run` and confirm the request targets `https://api.clerkstage.dev/v1/platform/applications`. Have the user confirm the workspace ID matches the setup note. Application listings and `whoami` do not prove workspace ownership.
 
 Reuse an application with compatible settings. If none exists, create `mosaic-test-<feature-or-flow>`. Never change an application another test depends on. Pass `--app <app-id> --instance <instance-id>` to instance commands. Use the staging dashboard for settings the CLI does not support.
 
