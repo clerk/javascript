@@ -213,7 +213,7 @@ function focusListEdge(event: React.KeyboardEvent<HTMLElement>) {
     return;
   }
   event.preventDefault();
-  const tabs = event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]:not([aria-disabled="true"])');
+  const tabs = event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]:not([disabled])');
   (event.key === 'ArrowDown' ? tabs[0] : tabs[tabs.length - 1])?.focus();
 }
 
