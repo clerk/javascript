@@ -1579,6 +1579,11 @@ export const mnMN: LocalizationResource = {
       subtitle: undefined,
       title: undefined,
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: undefined,
       subtitle: undefined,
@@ -1729,6 +1734,10 @@ export const mnMN: LocalizationResource = {
       subtitle:
         'Passkey-ээ ашигласнаар таныг мөн болохыг баталгаажуулна. Таны төхөөрөмж хурууны хээ, нүүр эсвэл дэлгэцийн түгжээг асууж магадгүй.',
       title: 'Passkey ашиглана уу',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Өөр аргыг ашигла',

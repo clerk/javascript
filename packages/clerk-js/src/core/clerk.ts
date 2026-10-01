@@ -144,7 +144,7 @@ import type {
   WaitlistResource,
   Web3Provider,
 } from '@clerk/shared/types';
-import type { ClerkUI } from '@clerk/shared/ui';
+import type { ClerkUI, ClerkUICapability, ClerkUIConstructor } from '@clerk/shared/ui';
 import { addClerkPrefix, isAbsoluteUrl, stripScheme } from '@clerk/shared/url';
 import { allSettled, handleValueOrFn, noop, timeLimit } from '@clerk/shared/utils';
 import type { QueryClient } from '@tanstack/query-core';
@@ -273,6 +273,7 @@ export class Clerk implements ClerkInterface {
   #captchaHeartbeat?: CaptchaHeartbeat;
   #broadcastChannel: BroadcastChannel | null = null;
   #clerkUI?: Promise<ClerkUI>;
+  #resolvedClerkUICtor?: ClerkUIConstructor;
   //@ts-expect-error with being undefined even though it's not possible - related to issue with ts and error thrower
   #fapiClient: FapiClient;
   #instanceType?: InstanceType;
@@ -375,11 +376,23 @@ export class Clerk implements ClerkInterface {
   }
 
   get uiVersion(): string | undefined {
+    return this.#getClerkUICtor()?.version;
+  }
+
+  __internal_uiSupports(capability: ClerkUICapability): boolean {
+    const ctor = this.#getClerkUICtor();
+    if (!ctor) {
+      return !this.#options.ui?.ClerkUI;
+    }
+    return ctor.__internal_capabilities?.includes(capability) ?? false;
+  }
+
+  #getClerkUICtor(): ClerkUIConstructor | undefined {
     // `@clerk/ui` publishes its constructor (which carries its package version) on this global when hot-loaded
     // from the CDN; bundled (no-RHC) builds pass the constructor directly via `options.ui.ClerkUI` instead.
     const globalCtor = typeof window !== 'undefined' ? window.__internal_ClerkUICtor : undefined;
     const bundledCtor = this.#options.ui?.ClerkUI;
-    return globalCtor?.version ?? (bundledCtor instanceof Promise ? undefined : bundledCtor?.version);
+    return globalCtor ?? (bundledCtor instanceof Promise ? this.#resolvedClerkUICtor : bundledCtor);
   }
 
   set sdkMetadata(metadata: SDKMetadata) {
@@ -619,15 +632,15 @@ export class Clerk implements ClerkInterface {
 
     // Initialize ClerkUI if it was provided
     if (this.#options.ui?.ClerkUI) {
-      this.#clerkUI = Promise.resolve(this.#options.ui.ClerkUI).then(
-        ClerkUI =>
-          new ClerkUI(
-            () => this,
-            () => this.environment,
-            this.#options,
-            this.#moduleManager,
-          ),
-      );
+      this.#clerkUI = Promise.resolve(this.#options.ui.ClerkUI).then(ClerkUI => {
+        this.#resolvedClerkUICtor = ClerkUI;
+        return new ClerkUI(
+          () => this,
+          () => this.environment,
+          this.#options,
+          this.#moduleManager,
+        );
+      });
     }
 
     // In development mode, if custom router options are provided, warn if both routerPush and routerReplace are not provided

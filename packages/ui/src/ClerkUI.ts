@@ -4,7 +4,11 @@ import { ClerkRuntimeError } from '@clerk/shared/error';
 import { logger } from '@clerk/shared/logger';
 import type { ModuleManager } from '@clerk/shared/moduleManager';
 import type { Clerk, ClerkOptions, EnvironmentResource } from '@clerk/shared/types';
-import type { ClerkUIInstance, ComponentControls as SharedComponentControls } from '@clerk/shared/ui';
+import type {
+  ClerkUICapability,
+  ClerkUIInstance,
+  ComponentControls as SharedComponentControls,
+} from '@clerk/shared/ui';
 import { isVersionAtLeast, parseVersion } from '@clerk/shared/versionCheck';
 
 import { type MountComponentRenderer, mountComponentRenderer } from './Components';
@@ -26,6 +30,7 @@ import { MIN_CLERK_JS_VERSION } from './constants';
  */
 export class ClerkUI implements ClerkUIInstance {
   static version = PACKAGE_VERSION;
+  static __internal_capabilities: readonly ClerkUICapability[] = ['second_factor:passkey'];
   version = PACKAGE_VERSION;
 
   #componentRenderer: ReturnType<MountComponentRenderer>;

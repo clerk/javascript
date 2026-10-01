@@ -1588,6 +1588,11 @@ export const fiFI: LocalizationResource = {
         'Pääsyavaimen käyttö vahvistaa henkilöllisyytesi. Laitteesi saattaa pyytää sormenjälkeä, kasvoja tai näytön lukitusta.',
       title: 'Käytä pääsyavaintasi',
     },
+    passkeyMfa: {
+      blockButton__passkey: undefined,
+      subtitle: undefined,
+      title: undefined,
+    },
     password: {
       actionLink: 'Käytä toista menetelmää',
       subtitle: 'Syötä nykyinen salasanasi jatkaaksesi',
@@ -1738,6 +1743,10 @@ export const fiFI: LocalizationResource = {
       subtitle:
         'Käyttämällä pääsyavaintasi vahvistat, että olet se joka väität olevasi. Laite voi pyytää sormenjälkeäsi, kasvojasi tai näytön lukitusta.',
       title: 'Käytä pääsyavaintasi',
+    },
+    passkeyMfa: {
+      subtitle: undefined,
+      title: undefined,
     },
     password: {
       actionLink: 'Käytä toista tapaa',

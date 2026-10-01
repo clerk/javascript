@@ -89,6 +89,7 @@ import { _authenticateWithTransport } from '../../utils/authenticateWithTranspor
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { getBrowserTimezone } from '../../utils/timezone';
+import { filterSecondFactorsForLoadedUI } from '../../utils/uiCapabilities';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
@@ -120,7 +121,7 @@ export class SignIn extends BaseResource implements SignInResource {
   private _status: SignInStatus | null = null;
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedFirstFactors: SignInFirstFactor[] | null = [];
-  supportedSecondFactors: SignInSecondFactor[] | null = null;
+  private _supportedSecondFactors: SignInSecondFactor[] | null = null;
   ssoBypassFirstFactors: SignInFirstFactor[] | null = null;
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
@@ -154,6 +155,14 @@ export class SignIn extends BaseResource implements SignInResource {
     if (value && previousStatus !== value) {
       debugLogger.debug('SignIn.status', { id: this.id, from: previousStatus, to: value });
     }
+  }
+
+  get supportedSecondFactors(): SignInSecondFactor[] | null {
+    return filterSecondFactorsForLoadedUI(SignIn.clerk, this._supportedSecondFactors);
+  }
+
+  set supportedSecondFactors(value: SignInSecondFactor[] | null) {
+    this._supportedSecondFactors = value;
   }
 
   /**
@@ -402,8 +411,19 @@ export class SignIn extends BaseResource implements SignInResource {
 
   attemptSecondFactor = (params: AttemptSecondFactorParams): Promise<SignInResource> => {
     debugLogger.debug('SignIn.attemptSecondFactor', { id: this.id, strategy: params.strategy });
+    let config;
+    switch (params.strategy) {
+      case 'passkey':
+        config = {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(params.publicKeyCredential)),
+        };
+        break;
+      default:
+        config = { ...params };
+    }
+
     return this._basePost({
-      body: params,
+      body: { ...config, strategy: params.strategy },
       action: 'attempt_second_factor',
     });
   };
@@ -622,6 +642,25 @@ export class SignIn extends BaseResource implements SignInResource {
     });
   };
 
+  /**
+   * Authenticates the sign-in with a passkey.
+   *
+   * When called without `params.flow` while the sign-in status is `needs_second_factor` (or
+   * `needs_client_trust`) and the sign-in offers `passkey` among its `supportedSecondFactors`, the
+   * passkey acts as the second factor: the in-progress sign-in is reused via the discrete
+   * prepare/attempt second-factor flow.
+   *
+   * Otherwise the passkey verifies the first factor, with `params.flow` selecting how the ceremony
+   * starts: `'autofill'`/`'discoverable'` create a new sign-in and identify the user from the
+   * passkey itself, discarding any in-progress sign-in, while the default requires a sign-in
+   * created beforehand. A sign-in parked at a second-factor status that does NOT offer passkey (the
+   * backend advertises it only when the instance allows passkeys to satisfy the second factor, the
+   * user has one registered, and the client version supports it) also takes this path, matching
+   * clients that predate passkey second factors: the ceremony starts over instead of failing.
+   *
+   * Throws a `ClerkWebAuthnError` when WebAuthn is unsupported or the passkey ceremony fails.
+   * @returns The updated `SignIn` resource.
+   */
   public authenticateWithPasskey = async (params?: AuthenticateWithPasskeyParams): Promise<SignInResource> => {
     const { flow } = params || {};
 
@@ -638,6 +677,33 @@ export class SignIn extends BaseResource implements SignInResource {
     if (!isWebAuthnSupported()) {
       throw new ClerkWebAuthnError('Passkeys are not supported', {
         code: 'passkey_not_supported',
+      });
+    }
+
+    const isSecondFactor = this.status === 'needs_second_factor' || this.status === 'needs_client_trust';
+    const hasPasskeySecondFactor = (this.supportedSecondFactors || []).some(f => f.strategy === 'passkey');
+    if (!flow && isSecondFactor && hasPasskeySecondFactor) {
+      await this.prepareSecondFactor({ strategy: 'passkey' });
+
+      const { nonce: secondFactorNonce } = this.secondFactorVerification;
+      const secondFactorPublicKeyOptions = secondFactorNonce
+        ? convertJSONToPublicKeyRequestOptions(JSON.parse(secondFactorNonce))
+        : null;
+      if (!secondFactorPublicKeyOptions) {
+        clerkMissingWebAuthnPublicKeyOptions('get');
+      }
+
+      const { publicKeyCredential, error } = await webAuthnGetCredential({
+        publicKeyOptions: secondFactorPublicKeyOptions,
+        conditionalUI: false,
+      });
+      if (!publicKeyCredential) {
+        throw error;
+      }
+
+      return this.attemptSecondFactor({
+        publicKeyCredential,
+        strategy: 'passkey',
       });
     }
 
@@ -780,7 +846,7 @@ export class SignIn extends BaseResource implements SignInResource {
       status: this.status || null,
       supported_identifiers: this.supportedIdentifiers,
       supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
-      supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
+      supported_second_factors: deepCamelToSnake(this._supportedSecondFactors),
       sso_bypass_first_factors: deepCamelToSnake(this.ssoBypassFirstFactors) ?? undefined,
       first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
       second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),
@@ -864,6 +930,7 @@ class SignInFuture implements SignInFutureResource {
     verifyEmailCode: this.verifyMFAEmailCode.bind(this),
     verifyTOTP: this.verifyTOTP.bind(this),
     verifyBackupCode: this.verifyBackupCode.bind(this),
+    passkey: this.verifyMFAPasskey.bind(this),
   };
 
   #canBeDiscarded = false;
@@ -1638,6 +1705,55 @@ class SignInFuture implements SignInFutureResource {
     return runAsyncResourceTask(this.#resource, async () => {
       await this.#resource.__internal_basePost({
         body: { code, strategy: 'backup_code' },
+        action: 'attempt_second_factor',
+      });
+    });
+  }
+
+  async verifyMFAPasskey(): Promise<{ error: ClerkError | null }> {
+    /**
+     * The UI should always prevent from this method being called if WebAuthn is not supported.
+     * As a precaution we need to check if WebAuthn is supported.
+     */
+    const isWebAuthnSupported = SignIn.clerk.__internal_isWebAuthnSupported || isWebAuthnSupportedOnWindow;
+    const webAuthnGetCredential = SignIn.clerk.__internal_getPublicCredentials || webAuthnGetCredentialOnWindow;
+
+    if (!isWebAuthnSupported()) {
+      throw new ClerkWebAuthnError('Passkeys are not supported', {
+        code: 'passkey_not_supported',
+      });
+    }
+
+    return runAsyncResourceTask(this.#resource, async () => {
+      const passkeyFactor = this.#resource.supportedSecondFactors?.find(f => f.strategy === 'passkey');
+      if (!passkeyFactor) {
+        throw new ClerkRuntimeError('Passkey factor not found', { code: 'factor_not_found' });
+      }
+
+      await this.#resource.__internal_basePost({
+        body: { strategy: 'passkey' },
+        action: 'prepare_second_factor',
+      });
+
+      const { nonce } = this.#resource.secondFactorVerification;
+      const publicKeyOptions = nonce ? convertJSONToPublicKeyRequestOptions(JSON.parse(nonce)) : null;
+      if (!publicKeyOptions) {
+        throw new ClerkRuntimeError('Missing public key options', { code: 'missing_public_key_options' });
+      }
+
+      const { publicKeyCredential, error } = await webAuthnGetCredential({
+        publicKeyOptions,
+        conditionalUI: false,
+      });
+      if (!publicKeyCredential) {
+        throw new ClerkWebAuthnError(error.message, { code: 'passkey_retrieval_failed' });
+      }
+
+      await this.#resource.__internal_basePost({
+        body: {
+          publicKeyCredential: JSON.stringify(serializePublicKeyCredentialAssertion(publicKeyCredential)),
+          strategy: 'passkey',
+        },
         action: 'attempt_second_factor',
       });
     });

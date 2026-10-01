@@ -34,6 +34,7 @@ const STRATEGY_SORT_ORDER_ALL_STRATEGIES_BUTTONS = makeSortingOrderMap([
 ] as SignInStrategy[]);
 
 const STRATEGY_SORT_ORDER_BACKUP_CODE_PREF = makeSortingOrderMap([
+  'passkey',
   'totp',
   'phone_code',
   'backup_code',
