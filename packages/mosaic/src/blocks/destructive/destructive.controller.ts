@@ -47,6 +47,7 @@ export function useDestructiveController({
     openDestructiveDialog,
     onDelete: async () => {
       if (status === 'open-needs-confirmation' || status === 'open-error') {
+        reverification?.reset();
         setDestructiveState({ status: 'open-pending' });
         try {
           await onDelete();

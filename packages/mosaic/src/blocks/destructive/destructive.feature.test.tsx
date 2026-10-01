@@ -20,14 +20,19 @@ function Host({
   action,
   cleanupMs,
   settleMs,
+  beforeRunMs,
 }: {
   action: () => Promise<unknown>;
   cleanupMs?: number;
   settleMs?: number;
+  beforeRunMs?: number;
 }) {
   const [run, reverification] = useReverificationFlow(action);
   const controller = useDestructiveController({
     onDelete: async () => {
+      if (beforeRunMs !== undefined) {
+        await new Promise(resolve => setTimeout(resolve, beforeRunMs));
+      }
       try {
         const result = await run();
         if (settleMs !== undefined) {
@@ -176,4 +181,32 @@ describe('Destructive with reverification', () => {
       expect(screen.getByLabelText('Outcome')).toHaveTextContent('closed');
     });
   }
+
+  it('does not show the previous attempt again when the host starts the next run after a delay', async () => {
+    const action = vi
+      .fn()
+      .mockResolvedValueOnce(reverificationError())
+      .mockResolvedValueOnce(reverificationError())
+      .mockResolvedValue({ done: true });
+    serveFapi(passwordVerification);
+    await renderWithClerk(
+      <Host
+        action={action}
+        beforeRunMs={400}
+      />,
+    );
+    const { user } = await openVerification();
+    expect(await screen.findByLabelText('Password')).toBeVisible();
+    await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+
+    await user.click(screen.getByRole('button', { name: 'Open' }));
+    await user.type(await screen.findByRole('textbox'), 'Delete');
+    const stopWatching = watchForConfirmStep();
+    await user.click(screen.getByRole('button', { name: 'Delete account' }));
+    await new Promise(resolve => setTimeout(resolve, 150));
+    expect(screen.queryByLabelText('Password')).toBeNull();
+    expect(await screen.findByLabelText('Password', undefined, { timeout: 3000 })).toBeVisible();
+    expect(stopWatching()).toEqual([]);
+  });
 });
