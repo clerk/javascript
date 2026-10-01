@@ -88,8 +88,13 @@ export interface EnterpriseConnectionSamlParams {
   attributeMapping?: EnterpriseConnectionSamlAttributeMappingParams;
   /** Whether the SAML connection requires force authentication. */
   forceAuthn?: boolean;
-  /** The IdP certificate (PEM) for the SAML connection. */
+  /**
+   * The IdP certificate (PEM) for the SAML connection.
+   * @deprecated Use `idpCertificates` instead.
+   */
   idpCertificate?: string;
+  /** The IdP signing certificates (PEM) for the SAML connection, one per entry. Replaces every certificate the connection already trusts. */
+  idpCertificates?: string[];
   /** The IdP Entity ID for the SAML connection. */
   idpEntityId?: string;
   /** The raw IdP metadata XML for the SAML connection. */

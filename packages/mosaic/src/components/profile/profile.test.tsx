@@ -37,7 +37,11 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
             <Panel.Title>Account</Panel.Title>
             <Panel.Sections>
               <Section.Root>
-                <Section.Title>Email addresses</Section.Title>
+                <Section.Group>
+                  <Section.Header>
+                    <Section.Title>Email addresses</Section.Title>
+                  </Section.Header>
+                </Section.Group>
               </Section.Root>
             </Panel.Sections>
           </Panel.Root>

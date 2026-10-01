@@ -26,7 +26,6 @@ export interface UserProfileMfaSectionViewProps {
   addableMethods?: readonly UserProfileMfaAddableMethod[];
   addButtonRef?: Ref<HTMLButtonElement>;
   addControl?: ReactNode;
-  sectionTitle?: string;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
   onRemove?: (id: string) => void | Promise<void>;
@@ -38,14 +37,13 @@ export function UserProfileMfaSectionView({
   addableMethods,
   addButtonRef,
   addControl,
-  sectionTitle,
   onAdd,
   onRegenerateBackupCodes,
   onRemove,
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
-  const section = useRef<HTMLElement>(null);
+  const section = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: methods.map(method => method.id),
     onRemove,
@@ -107,7 +105,6 @@ export function UserProfileMfaSectionView({
         emptyLabel={m.empty}
         hasItems={methods.length > 0}
         label={m.label}
-        sectionTitle={sectionTitle}
       >
         {methods.map(method => (
           <UserProfileMfaRowView
