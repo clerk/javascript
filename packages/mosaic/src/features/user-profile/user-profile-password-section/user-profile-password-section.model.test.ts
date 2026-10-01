@@ -110,16 +110,10 @@ describe('useUserProfilePasswordModel context changes', () => {
     },
   );
 
-  it('rejects an update when a loaded user has no active session', async () => {
-    if (!user) {
-      throw new Error('expected user');
-    }
+  it('hides the section when a loaded user has no active session', () => {
     session = null;
     const { result } = renderHook(() => useUserProfilePasswordModel());
-    await expect(
-      ready(result.current).updatePassword({ newPassword: 'new password', signOutOfOtherSessions: true }),
-    ).rejects.toMatchObject({ code: 'unavailable' });
-    expect(user.updatePassword).not.toHaveBeenCalled();
+    expect(result.current).toEqual({ status: 'hidden', reason: 'no_user' });
   });
 });
 

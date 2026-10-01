@@ -28,7 +28,7 @@ export type UserProfilePasswordModel =
   | (EditablePasswordPolicy & {
       status: 'ready';
       userId: string;
-      sessionId: string | null;
+      sessionId: string;
       identifier: string;
       passwordSettings: PasswordSettingsData;
       validatePassword: (password: string) => Promise<PasswordValidation>;
@@ -94,18 +94,22 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     return { status: 'loading' };
   }
 
+  if (!session) {
+    return { status: 'hidden', reason: 'no_user' };
+  }
+
   const policy = getPasswordPolicy(user, environment);
   if (policy.status !== 'ready') {
     return policy;
   }
 
   const userId = policy.userId;
-  const sessionId = session?.id ?? null;
+  const sessionId = session.id;
 
   return {
     ...policy,
     sessionId,
-    identifier: session?.publicUserData.identifier ?? '',
+    identifier: session.publicUserData.identifier ?? '',
     passwordSettings: environment.userSettings.passwordSettings,
     validatePassword,
     // TODO: Add session reverification for password updates; surface API errors until then.
@@ -115,7 +119,6 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
       if (
         !currentUser ||
         currentUser.id !== userId ||
-        !sessionId ||
         clerk.session?.id !== sessionId ||
         currentPolicy.status !== 'ready' ||
         currentPolicy.mode !== policy.mode ||
