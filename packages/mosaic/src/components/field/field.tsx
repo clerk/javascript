@@ -11,6 +11,7 @@ import { feedbackHeight, feedbackStyles } from '../../utils/feedback.styles';
 import { reset } from '../../utils/reset.styles';
 import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import { visuallyHidden } from '../../utils/visually-hidden.styles';
+import type { FieldOrientation } from './field.context';
 import {
   FieldMessageProvider,
   FieldProvider,
@@ -30,13 +31,15 @@ function useNativeLabelWarning(label: HTMLElement | null) {
 
 /** Props for a field container that associates exactly one form control. */
 export interface FieldRootProps extends MosaicComponentProps<'div'> {
+  /** `horizontal` places the control beside a `Field.Content` that stacks the label and supporting text. */
+  orientation?: FieldOrientation;
   disabled?: boolean;
   required?: boolean;
   invalid?: boolean;
 }
 
 const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFieldRoot(
-  { render, xstyle, disabled = false, required = false, invalid = false, ...rest },
+  { render, xstyle, orientation = 'vertical', disabled = false, required = false, invalid = false, ...rest },
   ref,
 ) {
   const element = useRender({
@@ -44,12 +47,22 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base, styles.root, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('field-root', { orientation }),
+        stylex.props(
+          reset.base,
+          styles.root,
+          orientation === 'horizontal' && [typographySizes.sm, styles.horizontal],
+          xstyle,
+        ),
+        rest,
+      ),
     },
   });
 
   return (
     <FieldProvider
+      orientation={orientation}
       disabled={disabled}
       required={required}
       invalid={invalid}
@@ -107,6 +120,21 @@ const Label = React.forwardRef<HTMLElement, FieldLabelProps>(function MosaicFiel
       htmlFor,
       onClick: handleClick,
     },
+  });
+});
+
+/** Props for the container that stacks a horizontal field's label and supporting text. */
+export type FieldContentProps = MosaicComponentProps<'div'>;
+
+const Content = React.forwardRef<HTMLDivElement, FieldContentProps>(function MosaicFieldContent(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('field-content'), stylex.props(reset.base, styles.content, xstyle), rest),
   });
 });
 
@@ -244,4 +272,4 @@ const FieldSuccess = React.forwardRef<HTMLParagraphElement, FieldSuccessProps>(f
 });
 
 /** Styled parts for composing an automatically associated single-control field. */
-export const Field = { Root, Label, Description, Message, Error: FieldError, Success: FieldSuccess };
+export const Field = { Root, Label, Content, Description, Message, Error: FieldError, Success: FieldSuccess };
