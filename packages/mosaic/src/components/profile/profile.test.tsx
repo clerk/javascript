@@ -37,7 +37,11 @@ function Surface(rootProps: Partial<ProfileRootProps>) {
             <Panel.Title>Account</Panel.Title>
             <Panel.Sections>
               <Section.Root>
-                <Section.Title>Email addresses</Section.Title>
+                <Section.Group>
+                  <Section.Header>
+                    <Section.Title>Email addresses</Section.Title>
+                  </Section.Header>
+                </Section.Group>
               </Section.Root>
             </Panel.Sections>
           </Panel.Root>
@@ -92,13 +96,20 @@ describe('Profile', () => {
         <Profile.Nav>
           <Profile.NavItem
             value='account'
-            badge={<Badge>3</Badge>}
+            badge={<Badge data-testid='account-badge'>3</Badge>}
           >
             Account
           </Profile.NavItem>
           <Profile.NavItem
             value='security'
-            badge={<Badge color='warning'>1</Badge>}
+            badge={
+              <Badge
+                color='warning'
+                data-testid='security-badge'
+              >
+                1
+              </Badge>
+            }
           >
             Security
           </Profile.NavItem>
@@ -110,8 +121,8 @@ describe('Profile', () => {
       </Profile.Root>,
     );
 
-    expect(screen.getByText('3')).toHaveAttribute('data-color', 'neutral');
-    expect(screen.getByText('1')).toHaveAttribute('data-color', 'warning');
+    expect(screen.getByTestId('account-badge')).toHaveAttribute('data-color', 'neutral');
+    expect(screen.getByTestId('security-badge')).toHaveAttribute('data-color', 'warning');
   });
 
   it('is a labelled navigation of tabs beside the selected page', () => {

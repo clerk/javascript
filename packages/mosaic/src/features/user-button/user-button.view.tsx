@@ -4,8 +4,6 @@ import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 import React from 'react';
 
-import type { AvatarProps } from '../../components/avatar';
-import { Avatar } from '../../components/avatar';
 import { Badge } from '../../components/badge';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
@@ -39,6 +37,7 @@ import type {
   UserButtonModeProps,
   UserButtonSession,
 } from './user-button.types';
+import { RowAvatar, UserButtonAvatar } from './user-button-avatar.view';
 import { UserButtonHeader } from './user-button-header.view';
 import {
   UserButtonGroup,
@@ -107,7 +106,7 @@ type ActiveWorkspace =
       shape: 'square';
       organization: UserButtonMembership;
     }
-  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle' }
+  | { kind: 'user'; name: string; imageUrl?: string; shape: 'circle'; badge?: UserButtonMembership }
   | { kind: 'none'; name: string; imageUrl?: string; shape: 'square' };
 
 /**
@@ -137,6 +136,7 @@ function leadWorkspace(
     name: activeSession.name,
     imageUrl: activeSession.imageUrl,
     shape: 'circle',
+    badge: layout.lead === 'member' && activeOrganization ? activeOrganization : undefined,
   };
 }
 
@@ -150,41 +150,7 @@ function membershipSubtitle(membership: UserButtonMembership, m: Messages, local
   return joinDetails(membership.planLabel, members);
 }
 
-function initials(name: string): string {
-  const [first = '', second = ''] = name.trim().split(/\s+/);
-  return `${first.charAt(0)}${second.charAt(0)}`.toUpperCase() || '?';
-}
-
 // ─── Presentational leaves ──────────────────────────────────────────────────
-
-interface RowAvatarProps {
-  name: string;
-  imageUrl?: string;
-  shape: 'circle' | 'square';
-  size: AvatarProps['size'];
-  xstyle?: AvatarProps['xstyle'];
-}
-
-function RowAvatar({ name, imageUrl, shape, size, xstyle }: RowAvatarProps) {
-  return (
-    // Decorative: the same name is always in text alongside. Held at the root so the whole mark
-    // stays out of the accessible name however the image resolves.
-    <Avatar.Root
-      aria-hidden
-      size={size}
-      shape={shape}
-      xstyle={xstyle}
-    >
-      {imageUrl ? (
-        <Avatar.Image
-          src={imageUrl}
-          alt=''
-        />
-      ) : null}
-      <Avatar.Fallback>{initials(name)}</Avatar.Fallback>
-    </Avatar.Root>
-  );
-}
 
 /**
  * Renders `<button>` so a whole row is one click target. Rows with their own controls skip it.
@@ -417,7 +383,12 @@ function Header() {
   const { sessionId, identifier } = data.activeSession;
   const workspace = leadWorkspace(data, m);
   const { name } = workspace;
-  const organization = workspace.kind === 'organization' ? workspace.organization : undefined;
+  const organization =
+    workspace.kind === 'organization'
+      ? workspace.organization
+      : workspace.kind === 'user'
+        ? workspace.badge
+        : undefined;
   // An account with no name is titled by its identifier, and repeating it underneath says nothing.
   // No selection is not the account, so it carries no identifier line either.
   const subtitle =
@@ -442,7 +413,7 @@ function Header() {
         busyKey: userButtonBusyKeys.signOutSession(sessionId, 'header'),
       });
     }
-    // The gear manages whatever the header names, which is settled by the data rather than the mode.
+    // The gear manages the header's organization, named or badged, and otherwise the account.
     // Inline it is the icon alone, named for what it manages; stacked it reads "Settings".
     if (action === 'manageLead') {
       const manage = organization
@@ -469,11 +440,12 @@ function Header() {
     <UserButtonHeader
       layout={layout}
       avatar={
-        <RowAvatar
+        <UserButtonAvatar
           name={workspace.name}
           imageUrl={workspace.imageUrl}
           shape={workspace.shape}
           size='sm'
+          badge={workspace.kind === 'user' ? workspace.badge : undefined}
         />
       }
       title={name}
@@ -1112,10 +1084,20 @@ export interface UserButtonRootProps
  * the data through context.
  */
 export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
-  const { children, mode = 'combined', open, defaultOpen, onOpenChange, placement, sideOffset, ...data } = props;
+  const {
+    children,
+    mode = 'combined',
+    modePriority = 'organization',
+    open,
+    defaultOpen,
+    onOpenChange,
+    placement,
+    sideOffset,
+    ...data
+  } = props;
   // Resolved here so the sections below never read `mode` again: which affordance lands in which
   // slot is settled once, in one table, rather than re-derived by each part that renders one.
-  const layout = resolveUserButtonLayout(mode, data);
+  const layout = resolveUserButtonLayout(mode, modePriority, data);
 
   return (
     <Popover.Root
@@ -1159,23 +1141,27 @@ export function UserButtonTrigger({
   const { name, shape } = workspace;
   const planLabel =
     renderTriggerBadge && workspace.kind === 'organization' ? workspace.organization.planLabel : undefined;
+  const badge = workspace.kind === 'user' ? workspace.badge : undefined;
+  const ringsAvatar = !renderTriggerLabel && badge !== undefined;
 
   return (
     <Popover.Trigger
       {...themeProps('user-button-trigger')}
       aria-label={fill(m.trigger.open, { name })}
       xstyle={[
-        focusOutline.visible,
+        ringsAvatar ? styles.triggerRinglessAvatar : focusOutline.visible,
         styles.trigger,
         renderTriggerLabel ? styles.triggerLabelled : styles.triggerAvatarOnly,
         !renderTriggerLabel && shape === 'circle' ? styles.triggerRound : null,
       ]}
     >
-      <RowAvatar
+      <UserButtonAvatar
         name={workspace.name}
         imageUrl={workspace.imageUrl}
         shape={workspace.shape}
         size={renderTriggerLabel ? 'xs' : 'sm'}
+        badge={badge}
+        focusRing={ringsAvatar}
       />
       {renderTriggerLabel ? (
         <>

@@ -4,10 +4,7 @@ import { space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   countdown: {
-    display: 'inline-block',
     fontVariantNumeric: 'tabular-nums',
-    textAlign: 'center',
-    minWidth: '2ch',
   },
   contactValue: {
     gap: space['2'],

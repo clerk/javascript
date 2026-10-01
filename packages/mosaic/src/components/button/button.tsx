@@ -6,7 +6,7 @@ import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
-import { truncationStyles } from '../../utils/typography.styles';
+import { withTruncatableLabel } from '../../utils/truncatable-label';
 import { ButtonContext } from './button.context';
 import { buttonScope } from './button.markers.stylex';
 import { iconSizes, sizes, styles, variants } from './button.styles';
@@ -55,45 +55,6 @@ export interface ButtonProps extends MosaicElementProps<'button'> {
  * // Full-width ghost button
  * <Button variant='ghost' fullWidth>Continue</Button>
  */
-// Wrap the text children so they have a box of their own to truncate against — a bare text
-// child is laid out in an anonymous flex item that no selector can reach. A whole run of
-// adjacent text shares one box, or `Delete {name}` would split into two flex items with the
-// button's `gap` opening up mid-sentence. Element children (icons) pass through untouched,
-// so they stay direct flex items and `gap` still applies.
-export function withTruncatableLabel(children: React.ReactNode): React.ReactNode {
-  const result: React.ReactNode[] = [];
-  let run: React.ReactNode[] = [];
-
-  const flushRun = () => {
-    if (run.length === 0) {
-      return;
-    }
-    result.push(
-      <span
-        key={`label-${result.length}`}
-        {...stylex.props(reset.base, truncationStyles.singleLine, styles.label)}
-      >
-        {run}
-      </span>,
-    );
-    run = [];
-  };
-
-  // `toArray` rather than `forEach` so the elements it passes through carry the keys it
-  // assigns, and the array this returns doesn't warn about missing ones.
-  for (const child of React.Children.toArray(children)) {
-    if (typeof child === 'string' || typeof child === 'number') {
-      run.push(child);
-    } else {
-      flushRun();
-      result.push(child);
-    }
-  }
-  flushRun();
-
-  return result;
-}
-
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function MosaicButton(
   {
     color: colorProp,

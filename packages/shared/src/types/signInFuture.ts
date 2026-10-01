@@ -364,7 +364,7 @@ export interface SignInFutureResource {
    * <li>`'needs_first_factor'` - One of the following [first factor verification](!first-factor-verification) strategies is missing: `'email_link'`, `'email_code'`, `passkey`, `password`, `'phone_code'`, `'web3_base_signature'`, `'web3_metamask_signature'`, `'web3_coinbase_wallet_signature'`, `'web3_okx_wallet_signature'`, `'web3_solana_signature'`, [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#oauthstrategy), or `'enterprise_sso'`.</li>
    * <li>`'needs_second_factor'` - One of the following [second factor verification](!second-factor-verification) strategies is missing: `'phone_code'`, `'totp'`, `'backup_code'`, `'email_code'`, `'email_link'`, or `'passkey'`.</li>
    * <li>`'needs_new_password'` - The user needs to set a new password. See the [dedicated custom flow](/docs/guides/development/custom-flows/authentication/forgot-password) guide for more information.</li>
-   * <li>`'needs_protect_check'` - A Clerk Protect challenge must be resolved before the sign-in can continue. This status is only returned when Protect mid-flow challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it. Run the challenge described by `protectCheck` and resolve it via `submitProtectCheck()`. The pre-built components handle this automatically.</li>
+   * <li>`'needs_protect_check'` - A Clerk Protect challenge must be resolved before the sign-in can continue. This status is only returned when Protect mid-flow challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it. When Clerk's UI is loaded, the sign-in methods resolve the challenge in a modal before they return. Otherwise, run the challenge described by `protectCheck` and resolve it via `submitProtectCheck()`. When `sso()` redirects to the identity provider, the challenge runs on the way back through `<HandleSSOCallback />` instead. The pre-built components handle this automatically.</li>
    * </ul>
    */
   readonly status: SignInStatus;
@@ -423,6 +423,10 @@ export interface SignInFutureResource {
   /**
    * The current protect check challenge, if one is pending. Only populated when Protect mid-flow
    * challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it.
+   * When Clerk's UI is loaded, the sign-in methods resolve the challenge in a modal before they
+   * return. Otherwise, run the challenge yourself and submit its proof token with `submitProtectCheck()`.
+   * When `sso()` redirects to the identity provider, the challenge runs on the way back through
+   * `<HandleSSOCallback />` instead.
    */
   readonly protectCheck: ProtectCheckResource | null;
 
@@ -607,7 +611,7 @@ export interface SignInFutureResource {
   passkey: (params?: SignInFuturePasskeyParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively.
+   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively. Call it after running the challenge yourself when Clerk's UI isn't loaded. With the UI loaded, the other sign-in methods resolve the challenge in a modal before they return. When `sso()` redirects to the identity provider, the challenge runs on the way back through `<HandleSSOCallback />` instead.
    */
   submitProtectCheck: (params: SignInFutureSubmitProtectCheckParams) => Promise<{ error: ClerkError | null }>;
 

@@ -21,6 +21,8 @@ export const styles = stylex.create({
     cursor: 'pointer',
     display: 'inline-flex',
     transitionDuration: durationVars['--cl-duration-base'],
+    maxWidth: '100%',
+    minWidth: 0,
   },
 
   triggerLabelled: {
@@ -45,6 +47,10 @@ export const styles = stylex.create({
       },
     },
     transitionProperty: 'opacity',
+  },
+
+  triggerRinglessAvatar: {
+    outlineStyle: 'none',
   },
 
   triggerRound: {

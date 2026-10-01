@@ -13,10 +13,12 @@ import { waitFor } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { mockJwt } from '@/test/core-fixtures';
+import { restoreDocument, setDocumentVisibilityState } from '@/test/document-helpers';
 
 import { mockNativeRuntime } from '../../test/utils';
 import { Clerk } from '../clerk';
 import { eventBus, events } from '../events';
+import { ProtectCheckGate } from '../protectCheckGate';
 import type { DisplayConfig, Organization } from '../resources/internal';
 import { BaseResource, Client, Environment, SignIn, SignUp } from '../resources/internal';
 
@@ -124,6 +126,7 @@ describe('Clerk singleton', () => {
     };
 
     Object.defineProperty(global.window, 'addEventListener', {
+      configurable: true,
       value: mockAddEventListener,
     });
 
@@ -4003,6 +4006,107 @@ describe('Clerk singleton', () => {
     });
   });
 
+  describe('protect check modal', () => {
+    beforeEach(() => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => true,
+          isDevelopmentOrStaging: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+        }),
+      );
+    });
+
+    const gatedSignIn = () => ({
+      protectCheck: { status: 'pending', token: 'tok', sdkUrl: 'https://p.example.com/sdk.js' },
+    });
+
+    it('resolves at once when Clerk was loaded without UI components', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await expect(sut.__internal_openProtectCheckModal({ resource: gatedSignIn() as any })).resolves.toBeUndefined();
+    });
+
+    it('resolves at once and leaves the gate when the UI predates the Protect modal', async () => {
+      const openModal = vi.fn();
+      const mockClerkUICtor = vi.fn(function () {
+        return { ensureMounted: () => Promise.resolve({ openModal, closeModal: vi.fn() }) };
+      });
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      const resource = gatedSignIn() as any;
+
+      await expect(sut.__internal_openProtectCheckModal({ resource })).resolves.toBeUndefined();
+      expect(openModal).not.toHaveBeenCalled();
+      expect(resource.protectCheck).not.toBeNull();
+    });
+
+    it('closes the modal and rejects with the error the modal reports', async () => {
+      const openProtectCheckModal = vi.fn();
+      const closeModal = vi.fn();
+      const mockClerkUICtor = vi.fn(function () {
+        return { ensureMounted: () => Promise.resolve({ openProtectCheckModal, closeModal }) };
+      });
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      const blocked = new Error('blocked');
+
+      const pending = sut.__internal_openProtectCheckModal({ resource: gatedSignIn() as any });
+      await vi.waitFor(() => expect(openProtectCheckModal).toHaveBeenCalled());
+      openProtectCheckModal.mock.calls[0][0].onFailed(blocked);
+
+      await expect(pending).rejects.toBe(blocked);
+      expect(closeModal).toHaveBeenCalledWith('protectCheck');
+    });
+
+    const loadWithClient = async (client: { signIn: Record<string, unknown>; signUp: Record<string, unknown> }) => {
+      mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [], ...client }));
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      return sut;
+    };
+
+    it('resolves gates the client carries on its sign-in and sign-up', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = await loadWithClient({ signIn: gatedSignIn(), signUp: gatedSignIn() });
+
+      await sut.__internal_resolvePendingProtectCheck();
+
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signIn);
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signUp);
+      resolve.mockRestore();
+    });
+
+    it('leaves every gate alone once the sign-in is complete', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = await loadWithClient({ signIn: { status: 'complete' }, signUp: gatedSignIn() });
+
+      await sut.__internal_resolvePendingProtectCheck();
+
+      expect(resolve).not.toHaveBeenCalled();
+      resolve.mockRestore();
+    });
+
+    it('resolves only the sign-up gate when the callback is a sign-up', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = await loadWithClient({ signIn: gatedSignIn(), signUp: gatedSignIn() });
+
+      await sut.__internal_resolvePendingProtectCheck('signUp');
+
+      expect(resolve).toHaveBeenCalledTimes(1);
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signUp);
+      resolve.mockRestore();
+    });
+  });
+
   describe('ui.ClerkUI option', () => {
     beforeEach(() => {
       mockEnvironmentFetch.mockReturnValue(
@@ -4064,6 +4168,119 @@ describe('Clerk singleton', () => {
       } as any);
 
       expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+  });
+
+  describe('page focus session touch', () => {
+    const windowListeners = new Map<string, Array<(event: any) => void>>();
+
+    const firePageFocus = () => {
+      for (const listener of windowListeners.get('focus') ?? []) {
+        listener(new Event('focus'));
+      }
+    };
+
+    const mockSession = {
+      id: 'sess_1',
+      status: 'active',
+      user: {},
+      touch: vi.fn(() => Promise.resolve()),
+      getToken: vi.fn(),
+      lastActiveToken: { getRawString: () => 'mocked-token' },
+    };
+
+    beforeEach(() => {
+      windowListeners.clear();
+      const recordWindowListener = (type: string, callback: (e: any) => void) => {
+        const listeners = windowListeners.get(type) ?? [];
+        listeners.push(callback);
+        windowListeners.set(type, listeners);
+
+        if (type === 'message') {
+          callback({
+            origin: 'https://' + productionPublishableKey,
+            data: {
+              browserToken: 'hey',
+            },
+          });
+        }
+      };
+      Object.defineProperty(global.window, 'addEventListener', {
+        configurable: true,
+        value: recordWindowListener,
+      });
+
+      mockSession.touch.mockReset();
+      mockSession.touch.mockResolvedValue(undefined);
+      setDocumentVisibilityState('visible');
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: { singleSessionMode: true },
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => true,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [mockSession],
+          lastActiveSessionId: mockSession.id,
+        }),
+      );
+    });
+
+    afterEach(() => {
+      restoreDocument();
+    });
+
+    it('does not surface a failed focus touch as an unhandled rejection', async () => {
+      const unhandled: unknown[] = [];
+      const onUnhandledRejection = (reason: unknown) => {
+        unhandled.push(reason);
+      };
+      process.on('unhandledRejection', onUnhandledRejection);
+
+      try {
+        mockSession.touch.mockRejectedValue(
+          new Error(
+            'ClerkJS: Network error at "https://clerk.example.com/v1/client/sessions/sess_1/touch" - TypeError: NetworkError when attempting to fetch resource. Please try again.',
+          ),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        firePageFocus();
+
+        expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'focus' });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(unhandled).toEqual([]);
+      } finally {
+        process.off('unhandledRejection', onUnhandledRejection);
+      }
+    });
+
+    it('still handles an unauthenticated focus touch', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load();
+      const handleUnauthenticated = vi.spyOn(sut, 'handleUnauthenticated').mockResolvedValue(undefined);
+      mockSession.touch.mockRejectedValue({ status: 401 });
+
+      firePageFocus();
+
+      await waitFor(() => {
+        expect(handleUnauthenticated).toHaveBeenCalled();
+      });
+    });
+
+    it('does not touch the session on focus when touchSession is false', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ touchSession: false });
+
+      firePageFocus();
+
+      expect(mockSession.touch).not.toHaveBeenCalled();
     });
   });
 });

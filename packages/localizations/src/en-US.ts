@@ -1425,16 +1425,14 @@ export const enUS: LocalizationResource = {
       directorySyncSection: {
         badge__active: 'Active',
         badge__inactive: 'Inactive',
-        badge__ssoRequired: 'SSO Required',
-        badge__unconfigured: 'Unconfigured',
-        description:
-          "Automatically add, update, and remove organization members from your identity provider's directory. Requires an SSO connection.",
+        badge__ssoRequired: 'SSO required',
+        description: 'Keep organization members synced with your identity provider. Requires an SSO connection.',
         error__load: 'Could not load Directory Sync',
         menuAction__activate: 'Activate',
         menuAction__deactivate: 'Deactivate',
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
-        primaryButton__startConfiguration: 'Start configuration',
+        primaryButton__configure: 'Configure',
         removeDialog: {
           confirmButton: 'Remove Directory Sync',
           subtitle:
@@ -1510,6 +1508,7 @@ export const enUS: LocalizationResource = {
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
         primaryButton__addConnection: 'Add connection',
+        primaryButton__configure: 'Configure',
         primaryButton__continueConfiguration: 'Continue configuration',
         primaryButton__startConfiguration: 'Start configuration',
         title: 'SSO',
@@ -2176,6 +2175,8 @@ export const enUS: LocalizationResource = {
     ticket_expired_code: 'This link has expired. Please start again or request a new link.',
     ticket_invalid_code:
       'This link is no longer valid or has already been used. Please start again or request a new link.',
+    too_many_unverified_identifications:
+      'Too many verifications are pending on this account. Remove an unverified email address, phone number, or wallet you no longer need, or wait a few minutes for an incomplete passkey setup to expire, then try again.',
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
     web3_solana_signature_generation_failed:

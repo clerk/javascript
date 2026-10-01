@@ -116,7 +116,14 @@ export type UserButtonMode = 'combined' | 'organization' | 'user';
  */
 export type UserButtonHeaderLayout = 'inline' | 'stacked';
 
-/** Which switchers the surface carries. */
+/**
+ * Which of the two switchers a `combined` surface leads with: the one named in the trigger and
+ * headed in the popup. Both are still listed either way. The single-purpose modes have only one
+ * thing to lead with, so they ignore it.
+ */
+export type UserButtonModePriority = 'organization' | 'user';
+
+/** Which switchers the surface carries, and which one it leads with. */
 export interface UserButtonModeProps {
   /**
    * Which switchers the popup carries: both, organizations alone, or accounts alone.
@@ -124,6 +131,14 @@ export interface UserButtonModeProps {
    * @default 'combined'
    */
   mode?: UserButtonMode;
+  /**
+   * Which switcher a `combined` surface leads with in the trigger and the popup's header. Leading
+   * with the account while an organization is active badges the account's avatar with it. Ignored
+   * by the single-purpose modes, which have only one thing to lead with.
+   *
+   * @default 'organization'
+   */
+  modePriority?: UserButtonModePriority;
 }
 
 /** Whether the surface signs itself with Clerk's mark. */

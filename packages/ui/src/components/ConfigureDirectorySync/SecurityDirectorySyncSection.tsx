@@ -9,10 +9,11 @@ import { Card } from '@/ui/elements/Card';
 import { CardStateProvider, useCardState } from '@/ui/elements/contexts';
 import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
+import type { ThemableCssProp } from '@/ui/styledSystem';
 import { handleError } from '@/utils/errorHandler';
 
 import type { LocalizationKey } from '../../customizables';
-import { Badge, Button, Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
+import { Badge, Col, descriptors, Flex, localizationKeys, Spinner, Text } from '../../customizables';
 import { sortEnterpriseConnections } from '../ConfigureSSO/domain/organizationEnterpriseConnection';
 import { ResetConnectionDialog } from '../ConfigureSSO/ResetConnectionDialog';
 
@@ -25,19 +26,15 @@ type SecurityDirectorySyncSectionProps = {
 type DirectorySyncStatus = 'unconfigured' | 'active' | 'inactive';
 
 const STATUS_BADGES: Record<
-  DirectorySyncStatus,
+  Exclude<DirectorySyncStatus, 'unconfigured'>,
   { colorScheme: 'primary' | 'success' | 'warning'; label: LocalizationKey }
 > = {
-  unconfigured: {
-    colorScheme: 'primary',
-    label: localizationKeys('organizationProfile.securityPage.directorySyncSection.badge__unconfigured'),
-  },
   active: {
-    colorScheme: 'success',
+    colorScheme: 'primary',
     label: localizationKeys('organizationProfile.securityPage.directorySyncSection.badge__active'),
   },
   inactive: {
-    colorScheme: 'warning',
+    colorScheme: 'primary',
     label: localizationKeys('organizationProfile.securityPage.directorySyncSection.badge__inactive'),
   },
 };
@@ -71,24 +68,14 @@ export const SecurityDirectorySyncSection = ({
   // The hook maps a 404 (no directory yet) to `data: null`, so any error here is unexpected.
   const isLoading = isLoadingConnections || (Boolean(connection) && isLoadingDirectory);
   const error = connectionsError ?? directoryError;
-  const isSettled = !isLoading && !error;
 
   const status: DirectorySyncStatus = directory ? (directory.enabled ? 'active' : 'inactive') : 'unconfigured';
-  const badge = STATUS_BADGES[status];
 
   return (
     <ProfileSection.Root
       title={localizationKeys('organizationProfile.securityPage.directorySyncSection.title')}
       id='directorySync'
       centered={false}
-      badge={
-        isSettled ? (
-          <Badge
-            colorScheme={badge.colorScheme}
-            localizationKey={badge.label}
-          />
-        ) : undefined
-      }
     >
       {isLoading ? (
         <Flex
@@ -111,32 +98,27 @@ export const SecurityDirectorySyncSection = ({
       ) : status === 'unconfigured' ? (
         <Col
           align='start'
-          gap={4}
+          gap={2}
         >
-          <Description />
-          <Flex
-            align='center'
-            gap={2}
-          >
-            <Button
-              variant='bordered'
-              colorScheme='secondary'
-              size='sm'
+          {!hasSsoConnection && (
+            <Badge
+              colorScheme='primary'
+              localizationKey={localizationKeys(
+                'organizationProfile.securityPage.directorySyncSection.badge__ssoRequired',
+              )}
+            />
+          )}
+          <Col sx={{ width: '100%' }}>
+            <ProfileSection.ArrowButton
+              id='directorySync'
               isDisabled={!hasSsoConnection}
               onClick={onConfigure}
               localizationKey={localizationKeys(
-                'organizationProfile.securityPage.directorySyncSection.primaryButton__startConfiguration',
+                'organizationProfile.securityPage.directorySyncSection.primaryButton__configure',
               )}
             />
-            {!hasSsoConnection && (
-              <Badge
-                colorScheme='primary'
-                localizationKey={localizationKeys(
-                  'organizationProfile.securityPage.directorySyncSection.badge__ssoRequired',
-                )}
-              />
-            )}
-          </Flex>
+            <Description sx={t => ({ paddingInlineStart: `calc(${t.space.$2x5} + ${t.sizes.$4} + ${t.space.$2})` })} />
+          </Col>
         </Col>
       ) : (
         <CardStateProvider>
@@ -191,14 +173,19 @@ const ConfiguredContent = ({
     }
   };
 
+  const badge = STATUS_BADGES[isActive ? 'active' : 'inactive'];
+
   return (
     <Col gap={4}>
       <Flex
-        align='start'
+        align='center'
         justify='between'
         gap={3}
       >
-        <Description />
+        <Badge
+          colorScheme={badge.colorScheme}
+          localizationKey={badge.label}
+        />
 
         <ThreeDotsMenu
           elementId='directorySync'
@@ -247,10 +234,11 @@ const ConfiguredContent = ({
   );
 };
 
-const Description = (): JSX.Element => (
+const Description = ({ sx }: { sx?: ThemableCssProp }): JSX.Element => (
   <Text
     as='p'
     colorScheme='secondary'
+    sx={sx}
     localizationKey={localizationKeys('organizationProfile.securityPage.directorySyncSection.description')}
   />
 );
