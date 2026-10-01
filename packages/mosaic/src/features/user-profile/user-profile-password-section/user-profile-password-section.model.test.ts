@@ -7,7 +7,7 @@ import { useUserProfilePasswordModel } from './user-profile-password-section.mod
 type TestUser = {
   id: string;
   passwordEnabled: boolean;
-  enterpriseAccounts: { active: boolean }[];
+  enterpriseAccounts: { active: boolean; enterpriseConnection?: { name: string; logoPublicUrl: string | null } }[];
   updatePassword: ReturnType<typeof vi.fn>;
 };
 
@@ -120,5 +120,33 @@ describe('useUserProfilePasswordModel context changes', () => {
       ready(result.current).updatePassword({ newPassword: 'new password', signOutOfOtherSessions: true }),
     ).rejects.toMatchObject({ code: 'unavailable' });
     expect(user.updatePassword).not.toHaveBeenCalled();
+  });
+});
+
+describe('useUserProfilePasswordModel enterprise accounts', () => {
+  it('describes the managing connection as plain data', () => {
+    if (!user) {
+      throw new Error('expected user');
+    }
+    user.enterpriseAccounts = [
+      { active: false, enterpriseConnection: { name: 'Inactive', logoPublicUrl: null } },
+      { active: true, enterpriseConnection: { name: 'Acme SSO', logoPublicUrl: 'https://example.com/acme.png' } },
+    ];
+    const { result } = renderHook(() => useUserProfilePasswordModel());
+    expect(result.current).toEqual({
+      status: 'readonly',
+      mode: 'change',
+      reason: 'enterprise_account',
+      managedBy: { name: 'Acme SSO', iconUrl: 'https://example.com/acme.png' },
+    });
+  });
+
+  it('leaves a blank connection name and missing logo undefined', () => {
+    if (!user) {
+      throw new Error('expected user');
+    }
+    user.enterpriseAccounts = [{ active: true, enterpriseConnection: { name: '', logoPublicUrl: null } }];
+    const { result } = renderHook(() => useUserProfilePasswordModel());
+    expect(result.current).toMatchObject({ managedBy: { name: undefined, iconUrl: undefined } });
   });
 });
