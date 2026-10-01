@@ -510,6 +510,14 @@ describe('enroll', () => {
     signInClerkUser();
   });
 
+  test('rejects an unknown policy without creating a key', async () => {
+    await expect(renderBiometricCredentials().enroll({ policy: 'bogus' as never })).rejects.toMatchObject({
+      code: 'invalid_trusted_device_policy',
+    });
+    expect(biometrics.createKey).not.toHaveBeenCalled();
+    expect(clerk.user.__experimental_prepareBiometricCredential).not.toHaveBeenCalled();
+  });
+
   test('creates a key, completes the server enrollment and saves the local record', async () => {
     const credential = await renderBiometricCredentials().enroll({
       name: "Sean's iPhone",
@@ -1169,6 +1177,14 @@ describe('reverify', () => {
     await expect(renderBiometricCredentials().reverify()).rejects.toThrow(
       'Unable to refresh the session token after biometric reverification.',
     );
+  });
+
+  test('reports a failed session token refresh with its API code', async () => {
+    addLocalCredential();
+    const error = apiError('internal_clerk_error');
+    clerk.session.getToken.mockRejectedValueOnce(error);
+
+    await expectBiometricApiError(renderBiometricCredentials().reverify(), error);
   });
 
   test('rejects reverification on unsupported platforms', async () => {

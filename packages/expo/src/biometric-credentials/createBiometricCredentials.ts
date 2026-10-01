@@ -46,6 +46,11 @@ type LocalCredentialSelection =
   | { record?: never; unavailableReason: BiometricCredentialUnavailableReason };
 
 const DEFAULT_POLICY: BiometricCredentialPolicy = 'biometry_current_set';
+const POLICIES: ReadonlySet<string> = new Set<BiometricCredentialPolicy>([
+  'biometry_current_set',
+  'biometry_any',
+  'biometry_or_device_passcode',
+]);
 const DEFAULT_ENROLLMENT_REASON = 'Use biometrics to enroll this device.';
 const DEFAULT_SIGN_IN_REASON = 'Use biometrics to sign in.';
 const DEFAULT_REVERIFICATION_REASON = 'Use biometrics to verify your identity.';
@@ -466,6 +471,12 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
       }
 
       const policy = params?.policy ?? DEFAULT_POLICY;
+      if (!POLICIES.has(policy)) {
+        throw biometricCredentialError(
+          'invalid_trusted_device_policy',
+          `Invalid biometric-credential policy: ${policy}.`,
+        );
+      }
       const key = await callModule(biometrics, module => module.createKey(policy));
       const enrollment: PrepareBiometricCredentialParams = {
         platform: Platform.OS === 'android' ? 'android' : 'ios',
@@ -633,7 +644,7 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
 
       if (verification.status === 'complete') {
         session.clearCache();
-        const token = await session.getToken({ skipCache: true });
+        const token = await callApi(biometrics.fallbackCode, () => session.getToken({ skipCache: true }));
         if (!token) {
           throw biometricCredentialError(
             biometrics.fallbackCode,
