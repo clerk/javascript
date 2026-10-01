@@ -1,4 +1,4 @@
-import { useBiometricCredentials } from '@clerk/expo';
+import { useBiometricCredentials } from '@clerk/expo/biometrics';
 import { useState } from 'react';
 import { Button, Text } from 'react-native';
 
