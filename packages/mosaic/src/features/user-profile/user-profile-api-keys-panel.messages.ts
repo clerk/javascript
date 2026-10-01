@@ -1,5 +1,8 @@
 export const userProfileApiKeysPanelMessages = {
   loading: 'Loading API keys',
+  loadError: 'Could not load API keys',
+  loadErrorDescription: 'Something went wrong. Please try again.',
+  retry: 'Try again',
   empty: 'No API keys found',
   emptyDescription: 'Your search for "{query}" did not return any results.',
   noKeys: 'No API Keys created',
@@ -20,6 +23,8 @@ export const userProfileApiKeysPanelMessages = {
   search: 'Search API keys',
   create: 'Create API key',
   createError: 'Could not create the API key. Try again.',
+  nameTakenError: 'API Key name already exists.',
+  quotaExceededError: 'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
   createTitle: 'Add new API key',
   createDescription: 'Provide a name to generate a new key. You’ll be able to revoke it anytime.',
   nameLabel: 'Secret key name',
