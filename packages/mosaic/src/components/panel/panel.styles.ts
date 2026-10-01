@@ -27,12 +27,7 @@ export const styles = stylex.create({
     display: 'inline',
     textAlign: 'start',
   },
-  /**
-   * Beside the title, `vertical-align: middle`: the caret's midpoint on the baseline plus half the
-   * x-height, which centers it on the lowercase letters rather than the line box. The `sm` size every
-   * other caret takes; colored through the icon's own variable rather than `color`, which the icon
-   * sets itself.
-   */
+  // `vertical-align: middle` centers the caret on the title's x-height rather than the line box.
   caret: {
     '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
     marginInlineStart: space['1'],

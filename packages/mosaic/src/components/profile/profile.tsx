@@ -23,13 +23,7 @@ import { contentScroll, contentViewportScroll, styles } from './profile.styles';
 
 type NavLayout = 'column' | 'popover' | 'sheet';
 
-/**
- * Where the navigation renders, read off the sentinel `Profile.Root` renders: `1px` wide, `2px` once
- * the compact query in `profile.styles.ts` matches, `3px` when the viewport is a phone's too.
- * Measured because WHERE the navigation renders is a DOM decision CSS cannot make — one tablist, in
- * the column, a popover or a sheet, never two — and read this way so the breakpoints live in CSS
- * alone. Unmeasured is wide.
- */
+// Read off the sentinel's width (1/2/3px) so the breakpoints live in CSS alone; unmeasured is wide.
 function navLayoutFor(sentinelWidth: number): NavLayout {
   if (sentinelWidth >= 3) {
     return 'sheet';
@@ -126,12 +120,11 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     }
   }, []);
   const pageTitleFor = React.useCallback((page: string) => pageTitles.current.get(page) ?? null, []);
-  // Open in the layout it was opened in only, so the sheet or popover that replaces it never mounts open.
+  // Scoped to the layout it opened in, so a replacement sheet or popover never mounts open or reopens later.
   const [navOpenIn, setNavOpenIn] = React.useState<NavLayout | null>(null);
   const navOpen = navOpenIn === navLayout;
   const openNav = React.useCallback(() => setNavOpenIn(navLayout), [navLayout]);
   const closeNav = React.useCallback(() => setNavOpenIn(null), []);
-  // Cleared too, or the navigation would be back, unasked, the moment the layout returned.
   React.useEffect(() => {
     setNavOpenIn(null);
   }, [navLayout]);

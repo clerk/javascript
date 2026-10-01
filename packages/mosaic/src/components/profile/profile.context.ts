@@ -6,7 +6,6 @@ export interface ProfileContextValue {
   renderBranding: boolean;
   /** Under the compact query: the navigation is opened from a page's title. */
   compact: boolean;
-  /** Where the navigation renders: beside the pages, or, compact, in a popover or (on a phone) a sheet. */
   navLayout: 'column' | 'popover' | 'sheet';
   navOpen: boolean;
   openNav: () => void;

@@ -107,12 +107,8 @@ function Positioner({ children, ...rest }: React.ComponentPropsWithoutRef<typeof
 }
 
 export interface PopoverPopupProps extends MosaicComponentProps<'div'> {
-  /**
-   * Positions against this element instead of the trigger. With no `Popover.Trigger`, it stands in
-   * for one: a press on it is not an outside press, and focus returns to it on close.
-   */
+  /** Positions against this element instead of the trigger; with no trigger, it acts as one. */
   anchor?: HTMLElement | null;
-  /** Where focus returns when the popup closes. Default: the trigger. */
   finalFocus?: PopoverFocusTarget;
   /** Width of the floating box. */
   size?: PopoverSize;
