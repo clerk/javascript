@@ -2,13 +2,7 @@ import { validate as validateComplexity } from '@clerk/shared/internal/clerk-js/
 import { createLoadZxcvbn } from '@clerk/shared/internal/clerk-js/passwords/loadZxcvbn';
 import { createValidatePasswordStrength } from '@clerk/shared/internal/clerk-js/passwords/strength';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
-import type {
-  EnterpriseAccountResource,
-  EnvironmentResource,
-  PasswordSettingsData,
-  PasswordValidation,
-  UserResource,
-} from '@clerk/shared/types';
+import type { EnvironmentResource, PasswordSettingsData, PasswordValidation, UserResource } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
@@ -25,7 +19,7 @@ type UnavailablePasswordModel =
       status: 'readonly';
       mode: 'set' | 'change';
       reason: 'enterprise_account';
-      enterpriseConnection: EnterpriseAccountResource['enterpriseConnection'];
+      managedBy: { name?: string; iconUrl?: string };
     };
 
 export type UserProfilePasswordModel =
@@ -38,7 +32,7 @@ export type UserProfilePasswordModel =
       identifier: string;
       passwordSettings: PasswordSettingsData;
       validatePassword: (password: string) => Promise<PasswordValidation>;
-      updatePassword: (input: UserProfileEditPasswordValue) => Promise<UserResource>;
+      updatePassword: (input: UserProfileEditPasswordValue) => Promise<void>;
     });
 
 function getPasswordPolicy(
@@ -63,7 +57,10 @@ function getPasswordPolicy(
       status: 'readonly',
       mode: policy.mode,
       reason: 'enterprise_account',
-      enterpriseConnection: enterpriseAccount.enterpriseConnection,
+      managedBy: {
+        name: enterpriseAccount.enterpriseConnection?.name || undefined,
+        iconUrl: enterpriseAccount.enterpriseConnection?.logoPublicUrl ?? undefined,
+      },
     };
   }
 
@@ -130,7 +127,7 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
         throw new UserProfilePasswordUpdateError('current_password_required');
       }
 
-      return currentUser.updatePassword({
+      await currentUser.updatePassword({
         newPassword,
         signOutOfOtherSessions,
         ...(policy.requiresCurrentPassword ? { currentPassword } : {}),
