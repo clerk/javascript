@@ -967,6 +967,150 @@ describe('Session', () => {
     });
   });
 
+  describe('trusted device reverification', () => {
+    const sessionJSON = {
+      status: 'active',
+      id: 'session_1',
+      object: 'session',
+      user: createUser({}),
+      last_active_organization_id: null,
+      actor: null,
+      created_at: new Date().getTime(),
+      updated_at: new Date().getTime(),
+    } as SessionJSON;
+
+    const verificationResponse = (factor: 'first_factor_verification' | 'second_factor_verification') => ({
+      object: 'session_verification',
+      id: 'sessver_1',
+      status: factor === 'first_factor_verification' ? 'needs_first_factor' : 'needs_second_factor',
+      level: 'multi_factor',
+      session: sessionJSON,
+      first_factor_verification: null,
+      second_factor_verification: null,
+      supported_first_factors: null,
+      supported_second_factors: null,
+      [factor]: {
+        object: 'verification',
+        status: 'unverified',
+        strategy: 'trusted_device',
+        attempts: 0,
+        expire_at: 1666648310000,
+        trusted_device_challenge: {
+          object: 'trusted_device_challenge',
+          challenge: 'challenge',
+          challenge_id: 'tdch_1',
+          trusted_device_id: 'td_1',
+          client_data: 'client-data',
+          expires_at: 1666648310,
+          algorithm: 'ES256',
+        },
+      },
+    });
+
+    let requestSpy: Mock;
+
+    beforeEach(() => {
+      BaseResource.clerk = clerkMock();
+      requestSpy = BaseResource.clerk.getFapiClient().request as Mock;
+    });
+
+    afterEach(() => {
+      BaseResource.clerk = null as any;
+    });
+
+    it('prepares a first factor with the trusted device and parses its challenge', async () => {
+      requestSpy.mockResolvedValue({
+        payload: { response: verificationResponse('first_factor_verification') },
+        status: 200,
+      });
+      const session = new Session(sessionJSON);
+
+      const verification = await session.prepareFirstFactorVerification({
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_1',
+      });
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { strategy: 'trusted_device', trustedDeviceId: 'td_1' },
+          method: 'POST',
+          path: '/client/sessions/session_1/verify/prepare_first_factor',
+        }),
+        expect.anything(),
+      );
+      expect(verification.firstFactorVerification.trustedDeviceChallenge).toEqual({
+        challenge: 'challenge',
+        challengeId: 'tdch_1',
+        trustedDeviceId: 'td_1',
+        clientData: 'client-data',
+        expiresAt: new Date(1666648310 * 1000),
+        algorithm: 'ES256',
+      });
+    });
+
+    it('attempts a first factor with the signed challenge', async () => {
+      requestSpy.mockResolvedValue({
+        payload: { response: verificationResponse('first_factor_verification') },
+        status: 200,
+      });
+      const session = new Session(sessionJSON);
+      const attempt = {
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_1',
+        clientData: 'client-data',
+        signature: 'signature',
+        algorithm: 'ES256',
+      } as const;
+
+      await session.attemptFirstFactorVerification(attempt);
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: attempt,
+          path: '/client/sessions/session_1/verify/attempt_first_factor',
+        }),
+        expect.anything(),
+      );
+    });
+
+    it('prepares and attempts a second factor with the trusted device', async () => {
+      requestSpy.mockResolvedValue({
+        payload: { response: verificationResponse('second_factor_verification') },
+        status: 200,
+      });
+      const session = new Session(sessionJSON);
+      const attempt = {
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_1',
+        clientData: 'client-data',
+        signature: 'signature',
+        algorithm: 'ES256',
+      } as const;
+
+      const prepared = await session.prepareSecondFactorVerification({
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_1',
+      });
+      await session.attemptSecondFactorVerification(attempt);
+
+      expect(prepared.secondFactorVerification.trustedDeviceChallenge?.clientData).toBe('client-data');
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: { strategy: 'trusted_device', trustedDeviceId: 'td_1' },
+          path: '/client/sessions/session_1/verify/prepare_second_factor',
+        }),
+        expect.anything(),
+      );
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: attempt,
+          path: '/client/sessions/session_1/verify/attempt_second_factor',
+        }),
+        expect.anything(),
+      );
+    });
+  });
+
   describe('__internal_touch()', () => {
     const mockSessionData = {
       status: 'active',
