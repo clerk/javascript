@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
-import { Section } from '../../../components/section';
+import { Section, sectionCompactStyles } from '../../../components/section';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
@@ -46,29 +46,22 @@ export function UserProfilePasswordRowView({
   );
 }
 
-function ManagedByLabel({ name, iconUrl }: UserProfilePasswordManagedBy) {
+function ManagedByLabel({ name }: UserProfilePasswordManagedBy) {
   const m = useMessages('userProfilePasswordSection');
   return (
     <div {...stylex.props(styles.managedBy)}>
-      {iconUrl ? (
-        <img
-          alt=''
-          src={iconUrl}
-          {...stylex.props(styles.managedByIcon)}
-        />
-      ) : (
-        <Icon
-          name='lock'
-          size='sm'
-          xstyle={styles.managedByText}
-        />
-      )}
+      <Icon
+        name='lock'
+        size='sm'
+        xstyle={styles.managedByText}
+      />
       <Text
         render={<span />}
         size='sm'
         xstyle={styles.managedByText}
       >
-        {fill(m.managedBy, { name })}
+        <span {...stylex.props(sectionCompactStyles.hidden)}>{fill(m.managedBy, { name })}</span>
+        <span {...stylex.props(sectionCompactStyles.only)}>{name}</span>
       </Text>
     </div>
   );
