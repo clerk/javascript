@@ -8,6 +8,7 @@ import { useState } from 'react';
 import type { StoryMeta } from '@/lib/types';
 
 import { usePreviewImage } from './fixtures/use-preview-image';
+import { UserProfileDeleteAccountPreview } from './fixtures/user-profile';
 import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
 import { useConnectedAccountsFixture } from './fixtures/user-profile-connected-accounts';
@@ -64,7 +65,7 @@ export function Default(_args: Record<string, unknown>) {
         onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
       })}
       onConnectAccount={connections.onConnect}
-      onDeleteAccount={() => Promise.resolve()}
+      deleteAccountSlot={<UserProfileDeleteAccountPreview />}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
       onProfilePictureChange={showFile}

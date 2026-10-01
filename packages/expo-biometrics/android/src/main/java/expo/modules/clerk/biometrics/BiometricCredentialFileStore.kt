@@ -16,7 +16,6 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
-/** A decodable credential record with a known policy (contract v2, section 3.3). */
 internal data class BiometricCredentialLocalRecord(
   val id: String,
   val localKeyId: String,
@@ -96,7 +95,7 @@ internal class BiometricCredentialFileStore(
     }
   }
 
-  // Only a missing file is an empty store; other read errors must not let a writer replace it.
+  // A missing or malformed file is an empty store, as in the Clerk Android SDK. Another version must not be replaced.
   private fun readDocument(): StoreDocument {
     if (!dataFile.exists()) return StoreDocument(JSONObject(), writable = true)
     val text = dataFile.readText(Charsets.UTF_8)

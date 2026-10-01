@@ -4,6 +4,8 @@ import { colorVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   addError: {
+    gridColumnEnd: '-1',
+    gridColumnStart: '1',
     marginTop: {
       default: space['2'],
       ':where(:not([data-open]), [data-starting-style])': 0,

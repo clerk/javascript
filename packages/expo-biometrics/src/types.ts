@@ -105,6 +105,5 @@ export type BiometricsErrorCode =
   | 'signing_failed'
   | 'storage_failed'
   | 'invalid_argument'
-  | 'not_implemented'
   | 'native_module_unavailable'
   | 'unknown';

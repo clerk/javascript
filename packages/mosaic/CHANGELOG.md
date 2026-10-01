@@ -1,5 +1,16 @@
 # @clerk/mosaic
 
+## 0.1.4
+
+### Patch Changes
+
+- `Menu.Popup` now holds its contents while it animates closed. ([#9813](https://github.com/clerk/javascript/pull/9813)) by [@maxyinger](https://github.com/maxyinger)
+
+- Stop showing keyboard focus rings on menu items when a menu is opened and hovered with the mouse. Focus rings still appear when navigating the menu with the keyboard. ([#9986](https://github.com/clerk/javascript/pull/9986)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda)]:
+  - @clerk/shared@4.37.1
+
 ## 0.1.3
 
 ### Patch Changes
