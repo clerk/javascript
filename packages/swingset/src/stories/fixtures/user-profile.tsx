@@ -1,5 +1,6 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import { UserProfileApiKeysPanelView } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
@@ -201,7 +202,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onBillingHistoryPageSizeChange: setHistoryPageSize,
       onViewInvoice: () => undefined,
     },
-    apiKeys,
+    apiKeys: <UserProfileApiKeysPanelView {...apiKeys} />,
   };
 
   return { activePage, setActivePage, pages, addEmail, devices: activeDevices.devices };
