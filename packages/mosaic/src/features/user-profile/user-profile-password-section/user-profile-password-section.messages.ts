@@ -36,14 +36,6 @@ export const userProfilePasswordSectionMessages = {
     number: 'a number',
     special: 'a special character',
   },
-  passwordErrors: {
-    form_password_pwned:
-      'This password has been found as part of a breach and can not be used, please try another password instead.',
-    form_password_matches_identifier:
-      'Password cannot match your email address, phone number or username. For account safety, please use a different password.',
-    form_password_size_in_bytes_exceeded: '',
-    form_new_password_matches_current: 'New password cannot be the same as the current password.',
-  },
   suggestions: {
     allUppercase: 'Capitalize some, but not all letters.',
     anotherWord: 'Add more words that are less common.',

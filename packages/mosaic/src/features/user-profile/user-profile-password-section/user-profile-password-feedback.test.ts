@@ -1,8 +1,10 @@
 import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { renderHook } from '@testing-library/react';
+import { createElement, type ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { FormSubmitError } from '../../../components/form';
-import { resolveLocalization } from '../../../localization';
+import { MosaicLocalizationProvider, resolveLocalization, useErrorText } from '../../../localization';
 import { passwordFormError } from './user-profile-password-feedback';
 import { UserProfilePasswordUpdateError } from './user-profile-password-section.types';
 
@@ -10,13 +12,21 @@ const settings = { min_length: 12, max_length: 64 };
 const localization = resolveLocalization({
   locale: 'en',
   overrides: {
+    errors: {
+      form_password_size_in_bytes_exceeded: 'Custom byte error.',
+      form_password_incorrect__current_password: 'Le mot de passe actuel est incorrect.',
+    },
     userProfilePasswordSection: {
       suggestions: { anotherWord: 'Custom suggestion.' },
-      passwordErrors: { form_password_size_in_bytes_exceeded: 'Custom byte error.' },
     },
   },
 });
 const messages = localization.messages.userProfilePasswordSection;
+function resolver(value = localization) {
+  const wrapper = ({ children }: { children: ReactNode }) =>
+    createElement(MosaicLocalizationProvider, { value }, children);
+  return renderHook(() => useErrorText(), { wrapper }).result.current;
+}
 function format(data: ConstructorParameters<typeof ClerkAPIResponseError>[1]['data'], current = false) {
   const result = passwordFormError(
     new ClerkAPIResponseError('Invalid', { status: 422, data }),
@@ -24,6 +34,7 @@ function format(data: ConstructorParameters<typeof ClerkAPIResponseError>[1]['da
     settings,
     messages,
     localization.locale,
+    resolver(),
   );
   expect(result).toBeInstanceOf(FormSubmitError);
   if (!(result instanceof FormSubmitError)) {
@@ -33,6 +44,16 @@ function format(data: ConstructorParameters<typeof ClerkAPIResponseError>[1]['da
 }
 
 describe('password error feedback', () => {
+  it('keeps a breached-password error ahead of later complexity failures', () => {
+    expect(
+      format([
+        { code: 'form_password_pwned', message: 'raw', meta: { param_name: 'new_password' } },
+        { code: 'form_password_no_uppercase', message: 'raw', meta: { param_name: 'new_password' } },
+      ]).fields?.newPassword,
+    ).toBe(
+      'This password has been found as part of a breach and can not be used, please try another password instead.',
+    );
+  });
   it('combines recognized requirements in a localized list', () => {
     expect(
       format([
@@ -78,9 +99,25 @@ describe('password error feedback', () => {
     const errors = [
       { code: 'form_password_incorrect', message: 'Incorrect', meta: { param_name: 'current_password' } },
     ];
-    expect(format(errors, true).fields?.currentPassword).toBe('Incorrect');
-    expect(format(errors).banner).toBe('Incorrect');
+    expect(format(errors, true).fields?.currentPassword).toBe('Le mot de passe actuel est incorrect.');
+    expect(format(errors).banner).toBe('Le mot de passe actuel est incorrect.');
     expect(format([{ code: 'unknown', message: 'Other', meta: { param_name: 'unmapped' } }]).banner).toBe('Other');
+  });
+
+  it('retains the server fallback for unknown current-password errors', () => {
+    expect(
+      format(
+        [
+          {
+            code: 'future_error',
+            message: 'short',
+            long_message: 'Detailed error',
+            meta: { param_name: 'current_password' },
+          },
+        ],
+        true,
+      ).fields?.currentPassword,
+    ).toBe('Detailed error');
   });
 
   it('uses the configured maximum length', () => {
@@ -102,25 +139,42 @@ describe('password error feedback', () => {
     ).toBe('New password cannot be the same as the current password.');
   });
 
-  it('retains the server fallback for untranslated special codes', () => {
+  it.each([
+    {
+      code: 'form_password_size_in_bytes_exceeded',
+      paramName: 'new_password',
+      field: 'newPassword',
+      current: false,
+      message:
+        'Your password has exceeded the maximum number of bytes allowed, please shorten it or remove some special characters.',
+    },
+    {
+      code: 'form_password_validation_failed',
+      paramName: 'current_password',
+      field: 'currentPassword',
+      current: true,
+      message: 'Incorrect Password',
+    },
+  ])('uses the English catalog message for $code', ({ code, paramName, field, current, message }) => {
     const defaults = resolveLocalization({ locale: 'en' });
     const result = passwordFormError(
       new ClerkAPIResponseError('Invalid', {
         status: 422,
         data: [
           {
-            code: 'form_password_size_in_bytes_exceeded',
-            message: 'Password is too large',
-            meta: { param_name: 'new_password' },
+            code,
+            message: 'Server fallback',
+            meta: { param_name: paramName },
           },
         ],
       }),
-      false,
+      current,
       settings,
       defaults.messages.userProfilePasswordSection,
       defaults.locale,
+      resolver(defaults),
     );
-    expect(result).toMatchObject({ fields: { newPassword: 'Password is too large' } });
+    expect(result).toMatchObject({ fields: { [field]: message } });
   });
 
   it('handles missing and unrecognized suggestion metadata without leaking codes', () => {
@@ -144,7 +198,14 @@ describe('password error feedback', () => {
 
   it('localizes update errors raised before the request is sent', () => {
     const translate = (code: UserProfilePasswordUpdateError['code']) =>
-      passwordFormError(new UserProfilePasswordUpdateError(code), true, settings, messages, localization.locale);
+      passwordFormError(
+        new UserProfilePasswordUpdateError(code),
+        true,
+        settings,
+        messages,
+        localization.locale,
+        resolver(),
+      );
 
     expect(translate('unavailable')).toMatchObject({ banner: 'Password update is no longer available.' });
     expect(translate('current_password_required')).toMatchObject({
