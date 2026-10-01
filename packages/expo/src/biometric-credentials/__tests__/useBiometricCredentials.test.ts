@@ -830,7 +830,33 @@ describe('signIn', () => {
     addLocalCredential();
     clerk.createdSignIn.firstFactorVerification.trustedDeviceChallenge = undefined as never;
 
-    await expect(renderBiometricCredentials().signIn()).rejects.toThrow('did not return a challenge');
+    await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
+      'Biometric sign-in did not return a matching challenge.',
+    );
+    expect(biometrics.sign).not.toHaveBeenCalled();
+  });
+
+  test('rejects a challenge issued for another credential without prompting', async () => {
+    addLocalCredential();
+    clerk.createdSignIn.firstFactorVerification.trustedDeviceChallenge = {
+      clientData: 'sign-in-client-data',
+      trustedDeviceId: 'td_other',
+    } as never;
+
+    await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
+      'Biometric sign-in did not return a matching challenge.',
+    );
+    expect(biometrics.sign).not.toHaveBeenCalled();
+  });
+
+  test('rejects an expired challenge without prompting', async () => {
+    addLocalCredential();
+    clerk.createdSignIn.firstFactorVerification.trustedDeviceChallenge = {
+      clientData: 'sign-in-client-data',
+      expiresAt: new Date(Date.now() - 1_000),
+    } as never;
+
+    await expect(renderBiometricCredentials().signIn()).rejects.toThrow('Biometric sign-in challenge has expired.');
     expect(biometrics.sign).not.toHaveBeenCalled();
   });
 
@@ -1034,22 +1060,16 @@ describe('reverify', () => {
     expect(clerk.session.prepareSecondFactorVerification).not.toHaveBeenCalled();
   });
 
-  test('continues with the second factor when the first factor leaves one outstanding', async () => {
+  test('returns an outstanding second factor instead of signing with the same key again', async () => {
     addLocalCredential();
     clerk.session.attemptFirstFactorVerification.mockResolvedValueOnce(sessionVerification('needs_second_factor'));
 
     const result = await renderBiometricCredentials().reverify({ level: 'multi_factor' });
 
-    expect(clerk.session.startVerification).toHaveBeenCalledWith({ level: 'multi_factor' });
-    expect(clerk.session.prepareSecondFactorVerification).toHaveBeenCalledWith({
-      strategy: 'trusted_device',
-      trustedDeviceId: 'td_1',
-    });
-    expect(clerk.session.attemptSecondFactorVerification).toHaveBeenCalledWith(
-      expect.objectContaining({ strategy: 'trusted_device', trustedDeviceId: 'td_1', signature: 'signature' }),
-    );
-    expect(biometrics.sign).toHaveBeenCalledTimes(2);
-    expect(result.status).toBe('complete');
+    expect(clerk.session.prepareSecondFactorVerification).not.toHaveBeenCalled();
+    expect(biometrics.sign).toHaveBeenCalledTimes(1);
+    expect(clerk.session.getToken).not.toHaveBeenCalled();
+    expect(result.status).toBe('needs_second_factor');
   });
 
   test('verifies only the second factor when the verification starts there', async () => {

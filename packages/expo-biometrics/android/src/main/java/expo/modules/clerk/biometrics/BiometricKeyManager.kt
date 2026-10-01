@@ -62,7 +62,7 @@ internal class BiometricKeyManager {
         "Biometric credential keys require Android 9 (API 28) or later.",
       )
     }
-    val status = BiometricManager.from(context).canAuthenticate(promptAuthenticators(policy))
+    val status = BiometricManager.from(context).canAuthenticate(Authenticators.BIOMETRIC_STRONG)
     if (status != BiometricManager.BIOMETRIC_SUCCESS) {
       throw BiometricsError.forCanAuthenticate(status)
     }
@@ -194,13 +194,6 @@ internal class BiometricKeyManager {
     private const val ANDROID_KEY_STORE = "AndroidKeyStore"
 
     fun secureKeyStorageAvailable(sdkInt: Int = Build.VERSION.SDK_INT): Boolean = sdkInt >= BiometricCredentialCoding.MIN_SDK
-
-    fun promptAuthenticators(policy: BiometricCredentialPolicy, sdkInt: Int = Build.VERSION.SDK_INT): Int =
-      if (policy == BiometricCredentialPolicy.BIOMETRY_OR_DEVICE_PASSCODE && sdkInt >= Build.VERSION_CODES.R) {
-        Authenticators.BIOMETRIC_STRONG or Authenticators.DEVICE_CREDENTIAL
-      } else {
-        Authenticators.BIOMETRIC_STRONG
-      }
 
     /** Android does not report which biometric is Class 3, so any present strong biometric is `biometric`. */
     fun biometryType(canAuthenticateStrong: Int): String =

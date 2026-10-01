@@ -8,6 +8,7 @@ import type {
   SessionVerificationLevel,
   SessionVerificationResource,
   SignInResource,
+  TrustedDeviceChallengeResource,
   UserResource,
 } from '@clerk/shared/types';
 import { Platform } from 'react-native';
@@ -388,6 +389,21 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     return record;
   }
 
+  function usableChallenge(
+    biometrics: Biometrics,
+    record: ExpoBiometricsRecord,
+    challenge: TrustedDeviceChallengeResource | null | undefined,
+    flow: string,
+  ): TrustedDeviceChallengeResource {
+    if (!challenge || (challenge.trustedDeviceId && challenge.trustedDeviceId !== record.id)) {
+      throw biometricCredentialError(biometrics.fallbackCode, `${flow} did not return a matching challenge.`);
+    }
+    if (challenge.expiresAt && challenge.expiresAt.getTime() <= Date.now()) {
+      throw biometricCredentialError(biometrics.fallbackCode, `${flow} challenge has expired.`);
+    }
+    return challenge;
+  }
+
   async function verifySessionFactor(
     biometrics: Biometrics,
     session: SessionResource,
@@ -407,16 +423,12 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
     }
 
     const verification = factor === 'first' ? prepared.firstFactorVerification : prepared.secondFactorVerification;
-    const challenge = verification?.strategy === 'trusted_device' ? verification.trustedDeviceChallenge : null;
-    if (!challenge || (challenge.trustedDeviceId && challenge.trustedDeviceId !== record.id)) {
-      throw biometricCredentialError(
-        biometrics.fallbackCode,
-        'Biometric reverification did not return a matching challenge.',
-      );
-    }
-    if (challenge.expiresAt && challenge.expiresAt.getTime() <= Date.now()) {
-      throw biometricCredentialError(biometrics.fallbackCode, 'Biometric reverification challenge has expired.');
-    }
+    const challenge = usableChallenge(
+      biometrics,
+      record,
+      verification?.strategy === 'trusted_device' ? verification.trustedDeviceChallenge : null,
+      'Biometric reverification',
+    );
 
     const signature = await signChallenge(biometrics, record, challenge.clientData, reason);
 
@@ -573,10 +585,12 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
         throw await forgetLocalCredentialIfMissing(biometrics, record, error);
       }
 
-      const challenge = signIn.firstFactorVerification?.trustedDeviceChallenge;
-      if (!challenge) {
-        throw biometricCredentialError(biometrics.fallbackCode, 'Biometric sign-in did not return a challenge.');
-      }
+      const challenge = usableChallenge(
+        biometrics,
+        record,
+        signIn.firstFactorVerification?.trustedDeviceChallenge,
+        'Biometric sign-in',
+      );
 
       const signature = await signChallenge(
         biometrics,
@@ -630,9 +644,6 @@ export function createBiometricCredentials(clerk: Clerk): UseBiometricCredential
       let verification = await callApi(biometrics.fallbackCode, () => session.startVerification({ level }));
       if (verification.status === 'needs_first_factor') {
         verification = await verifySessionFactor(biometrics, session, record, 'first', reason);
-        if (verification.status === 'needs_second_factor') {
-          verification = await verifySessionFactor(biometrics, session, record, 'second', reason);
-        }
       } else if (verification.status === 'needs_second_factor') {
         verification = await verifySessionFactor(biometrics, session, record, 'second', reason);
       } else if (verification.status !== 'complete') {
