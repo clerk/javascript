@@ -44,6 +44,7 @@ export function useUserProfileEditPasswordController({
     initialValues,
     fields: {
       confirmPassword: {
+        // TODO: Discuss showing success feedback when the confirmation matches, as legacy does. https://github.com/clerk/javascript/pull/9930#discussion_r4150406791
         validate: (value, values) =>
           value !== values.newPassword ? { type: 'error', message: m.errors.mismatch } : undefined,
       },
@@ -58,6 +59,7 @@ export function useUserProfileEditPasswordController({
         newPassword: values.newPassword,
         signOutOfOtherSessions: values.signOutOfOtherSessions,
       });
+      // TODO: Discuss confirming the password was set or updated and other devices were signed out with a success page or toast. https://github.com/clerk/javascript/pull/9930#discussion_r4151641473
       setIsOpen(false);
     },
   });
@@ -65,6 +67,7 @@ export function useUserProfileEditPasswordController({
   const password = form.values.newPassword;
   const passwordLeft = form.fields.newPassword.touched;
   useEffect(() => {
+    // TODO: Discuss keeping the password hint hidden on open or showing it immediately when the field autofocuses. https://github.com/clerk/javascript/pull/9930#discussion_r4150863181
     if (!isOpen || (password === '' && !passwordLeft) || !validatePassword) {
       setPasswordFeedback(undefined);
       return;

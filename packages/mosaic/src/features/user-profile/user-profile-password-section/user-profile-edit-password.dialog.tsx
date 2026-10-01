@@ -190,6 +190,7 @@ function PasswordField({
   const { ref, ...control } = form.register(name);
   const mergedRef = useMergeRefs([ref, inputRef]);
 
+  // TODO: Discuss enforcing the configured minimum length on the new password input or keeping the hint advisory and letting the server validate. https://github.com/clerk/javascript/pull/9930#discussion_r4151734254
   return (
     <Field.Root
       disabled={form.isSubmitting}
