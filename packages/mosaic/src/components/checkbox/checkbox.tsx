@@ -5,10 +5,10 @@ import type { MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
-import { useOptionalFieldControlProps } from '../field/field.context';
+import { useOptionalFieldContext, useOptionalFieldControlProps } from '../field/field.context';
 import { Icon } from '../icon';
 import { checkboxInputMarker } from './checkbox.markers.stylex';
-import { indicatorSizes, sizes, styles } from './checkbox.styles';
+import { firstLine, indicatorSizes, sizes, styles } from './checkbox.styles';
 
 export interface CheckboxProps
   extends Omit<React.ComponentPropsWithoutRef<'input'>, 'type' | 'size' | 'className' | 'style'>, MosaicStyleProps {
@@ -31,6 +31,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
   },
   ref,
 ) {
+  const horizontalField = useOptionalFieldContext()?.orientation === 'horizontal';
   const fieldProps = useOptionalFieldControlProps({
     id,
     disabled: disabledProp,
@@ -58,7 +59,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
     <span
       {...mergeStyleProps(
         themeProps('checkbox', { size, disabled }),
-        stylex.props(reset.base, styles.root, sizes[size], indicatorSizes[size], xstyle),
+        stylex.props(reset.base, styles.root, sizes[size], horizontalField && firstLine[size], xstyle),
       )}
     >
       <input
@@ -77,6 +78,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
             focusOutline.visible,
             styles.input,
             styles.hitTarget,
+            horizontalField && styles.fieldHitTarget,
             sizes[size],
             checkboxInputMarker,
           ),
@@ -87,7 +89,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
         aria-hidden
         {...mergeStyleProps(
           themeProps('checkbox-indicator', { state: 'checked' }),
-          stylex.props(reset.base, styles.indicator, styles.checkedIndicator),
+          stylex.props(reset.base, styles.indicator, indicatorSizes[size], styles.checkedIndicator),
         )}
       >
         <Icon
@@ -99,7 +101,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
         aria-hidden
         {...mergeStyleProps(
           themeProps('checkbox-indicator', { state: 'indeterminate' }),
-          stylex.props(reset.base, styles.indicator, styles.indeterminateIndicator),
+          stylex.props(reset.base, styles.indicator, indicatorSizes[size], styles.indeterminateIndicator),
         )}
       >
         <Icon

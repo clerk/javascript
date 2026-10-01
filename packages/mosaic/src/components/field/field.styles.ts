@@ -9,13 +9,16 @@ export const styles = stylex.create({
     flexDirection: 'column',
   },
   horizontal: {
-    gap: `${space['1']} ${space['3']}`,
-    alignItems: 'center',
-    display: 'grid',
-    gridTemplateColumns: 'auto 1fr',
+    gap: space['2'],
+    alignItems: 'flex-start',
+    flexDirection: 'row',
   },
-  horizontalContent: {
-    gridColumn: '2',
+  content: {
+    gap: space['1'],
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    minWidth: 0,
   },
   label: {
     color: colorVars['--cl-color-brand'],

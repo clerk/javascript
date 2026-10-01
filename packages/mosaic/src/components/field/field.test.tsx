@@ -15,6 +15,7 @@ const overrides = stylex.create({
   root: { display: 'grid' },
   label: { fontWeight: 700 },
   description: { opacity: 0.8 },
+  content: { gap: '4px' },
   error: { fontWeight: 600 },
 });
 
@@ -183,13 +184,16 @@ describe('Mosaic Field', () => {
         data-testid='root'
       >
         <Checkbox />
-        <Field.Label>Sign out of all devices</Field.Label>
-        <Field.Description>Recommended after changing your password.</Field.Description>
+        <Field.Content data-testid='content'>
+          <Field.Label>Sign out of all devices</Field.Label>
+          <Field.Description>Recommended after changing your password.</Field.Description>
+        </Field.Content>
       </Field.Root>,
     );
 
     const checkbox = screen.getByRole('checkbox', { name: 'Sign out of all devices' });
     expect(screen.getByTestId('root')).toHaveAttribute('data-orientation', 'horizontal');
+    expect(screen.getByTestId('content')).toHaveClass('cl-field-content');
     expect(checkbox).toHaveAttribute(
       'aria-describedby',
       screen.getByText('Recommended after changing your password.').id,
@@ -340,6 +344,7 @@ describe('Mosaic Field', () => {
     const rootRef = React.createRef<HTMLDivElement>();
     const labelRef = React.createRef<HTMLLabelElement>();
     const descriptionRef = React.createRef<HTMLParagraphElement>();
+    const contentRef = React.createRef<HTMLDivElement>();
     const errorRef = React.createRef<HTMLParagraphElement>();
 
     render(
@@ -359,6 +364,10 @@ describe('Mosaic Field', () => {
         >
           Description
         </Field.Description>
+        <Field.Content
+          ref={contentRef}
+          data-content='field'
+        />
         <Field.Error
           ref={errorRef}
           role='status'
@@ -371,6 +380,7 @@ describe('Mosaic Field', () => {
     expect(rootRef.current).toHaveAttribute('data-root', 'field');
     expect(labelRef.current).toHaveAttribute('for', 'name');
     expect(descriptionRef.current).toHaveAttribute('title', 'Help');
+    expect(contentRef.current).toHaveAttribute('data-content', 'field');
     expect(errorRef.current).toHaveAttribute('role', 'status');
   });
 
@@ -382,11 +392,16 @@ describe('Mosaic Field', () => {
       >
         <Field.Label xstyle={overrides.label}>Email</Field.Label>
         <Field.Description xstyle={overrides.description}>Description</Field.Description>
+        <Field.Content
+          xstyle={overrides.content}
+          data-testid='content'
+        />
         <Field.Error xstyle={overrides.error}>Error</Field.Error>
       </Field.Root>,
     );
 
     expect(screen.getByTestId('root')).toHaveClass('cl-field-root', ...atoms(overrides.root));
+    expect(screen.getByTestId('content')).toHaveClass('cl-field-content', ...atoms(overrides.content));
     expect(screen.getByText('Email')).toHaveClass('cl-field-label', ...atoms(overrides.label));
     expect(screen.getByText('Description')).toHaveClass('cl-field-description', ...atoms(overrides.description));
     expect(screen.getByText('Error').closest('p')).toHaveClass('cl-field-error', ...atoms(overrides.error));
@@ -420,12 +435,14 @@ describe('Mosaic Field', () => {
       <Field.Root render={props => <section {...props} />}>
         <Field.Label render={props => <label {...props} />}>Biography</Field.Label>
         <Field.Description render={props => <div {...props} />}>Description</Field.Description>
+        <Field.Content render={props => <section {...props} />}>Content</Field.Content>
         <Field.Error render={props => <div {...props} />}>Error</Field.Error>
       </Field.Root>,
     );
 
     expect(screen.getByText('Biography').closest('section')).not.toBeNull();
     expect(screen.getByText('Description').tagName).toBe('DIV');
+    expect(screen.getByText('Content').tagName).toBe('SECTION');
     expect(screen.getByText('Error').closest('div')).toHaveClass('cl-field-error');
   });
 

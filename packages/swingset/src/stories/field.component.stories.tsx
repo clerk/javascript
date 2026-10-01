@@ -25,9 +25,6 @@ const styles = stylex.create({
     gap: 8,
     maxWidth: 384,
   },
-  horizontal: {
-    maxWidth: 384,
-  },
   errorStack: {
     display: 'grid',
     gap: 8,
@@ -164,18 +161,25 @@ export function WithSelect() {
 
 export function Horizontal() {
   return (
-    <Field.Root
-      orientation='horizontal'
-      xstyle={styles.horizontal}
-    >
-      <Checkbox
-        name='signOutOfOtherSessions'
-        defaultChecked
-      />
-      <Field.Label>Sign out of all devices</Field.Label>
-      <Field.Description>
-        It is recommended to sign out of all other devices which may have used your old password.
-      </Field.Description>
-    </Field.Root>
+    <div {...stylex.props(styles.stack)}>
+      <Field.Root orientation='horizontal'>
+        <Checkbox
+          name='signOutOfOtherSessions'
+          defaultChecked
+        />
+        <Field.Content>
+          <Field.Label>Sign out of all devices</Field.Label>
+          <Field.Description>
+            It is recommended to sign out of all other devices which may have used your old password.
+          </Field.Description>
+        </Field.Content>
+      </Field.Root>
+      <Field.Root orientation='horizontal'>
+        <Checkbox name='marketingEmails' />
+        <Field.Content>
+          <Field.Label>Send me product updates, feature announcements, and occasional offers by email</Field.Label>
+        </Field.Content>
+      </Field.Root>
+    </div>
   );
 }
