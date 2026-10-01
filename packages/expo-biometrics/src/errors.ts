@@ -16,7 +16,6 @@ const ERROR_CODES: ReadonlySet<string> = new Set<BiometricsErrorCode>([
   'signing_failed',
   'storage_failed',
   'invalid_argument',
-  'not_implemented',
   'native_module_unavailable',
   'unknown',
 ]);

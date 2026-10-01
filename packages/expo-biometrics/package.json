@@ -27,7 +27,9 @@
   "files": [
     "dist",
     "android",
+    "!android/src/test",
     "ios",
+    "!ios/Tests",
     "expo-module.config.json"
   ],
   "scripts": {

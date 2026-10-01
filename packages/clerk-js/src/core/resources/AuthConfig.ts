@@ -33,9 +33,7 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
     this.singleSessionMode = this.withDefault(data.single_session_mode, this.singleSessionMode);
     this.preferredChannels = this.withDefault(data.preferred_channels, this.preferredChannels);
     this.sessionMinter = this.withDefault(data.session_minter, this.sessionMinter);
-    if (data.native_settings !== undefined) {
-      this.nativeSettings = nativeSettingsFromJSON(data.native_settings);
-    }
+    this.nativeSettings = this.withDefault(nativeSettingsFromJSON(data.native_settings), this.nativeSettings);
     return this;
   }
 
@@ -52,15 +50,15 @@ export class AuthConfig extends BaseResource implements AuthConfigResource {
   }
 }
 
-function nativeSettingsFromJSON(data: NativeSettingsJSON | null): NativeSettingsResource | null {
+function nativeSettingsFromJSON(data: NativeSettingsJSON | null | undefined): NativeSettingsResource | null {
   if (!data) {
     return null;
   }
   return {
-    apiEnabled: !!data.api_enabled,
-    trustedDeviceSignInEnabled: !!data.trusted_device_sign_in_enabled,
-    trustedDeviceEnrollmentPromptAfterSignInEnabled: !!data.trusted_device_enrollment_prompt_after_sign_in_enabled,
-    trustedDeviceEnrollmentPromptAfterSignUpEnabled: !!data.trusted_device_enrollment_prompt_after_sign_up_enabled,
+    apiEnabled: data.api_enabled,
+    trustedDeviceSignInEnabled: data.trusted_device_sign_in_enabled,
+    trustedDeviceEnrollmentPromptAfterSignInEnabled: data.trusted_device_enrollment_prompt_after_sign_in_enabled,
+    trustedDeviceEnrollmentPromptAfterSignUpEnabled: data.trusted_device_enrollment_prompt_after_sign_up_enabled,
   };
 }
 

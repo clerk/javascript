@@ -33,11 +33,6 @@ export const styles = stylex.create({
     alignItems: 'center',
     display: 'flex',
   },
-  managedByIcon: {
-    flexShrink: 0,
-    height: space['4'],
-    width: space['4'],
-  },
   managedByText: {
     color: colorVars['--cl-color-foreground-secondary'],
   },

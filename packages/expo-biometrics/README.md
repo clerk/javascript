@@ -26,7 +26,7 @@
 </div>
 
 > [!NOTE]
-> Install this package to use `useBiometricCredentials()` from `@clerk/expo`. Its JavaScript API is used by `@clerk/expo` and isn't meant to be called directly.
+> Install this package to use `useBiometricCredentials()` from `@clerk/expo/biometrics`. Its JavaScript API is used by `@clerk/expo` and isn't meant to be called directly.
 
 The native building block for Clerk biometric credentials in Expo apps. It creates hardware-backed signing keys, signs challenges behind a Face ID / Touch ID or Android biometric prompt, and stores the on-device records that link each key to a Clerk credential. It does not talk to Clerk's API; `@clerk/expo` builds the sign-in and enrollment flows on top of it.
 
