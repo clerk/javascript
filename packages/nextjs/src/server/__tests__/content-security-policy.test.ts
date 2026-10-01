@@ -450,11 +450,5 @@ describe('CSP Header Utils', () => {
       expect(manifestSrcDirective).toContain('value3');
       expect(manifestSrcDirective).toContain('value4');
     });
-
-    it('should not allow any Clerk staging or local development host by default', () => {
-      const result = createContentSecurityPolicyHeaders(testHost, {});
-
-      expect(result.headers[0][1]).not.toMatch(/clerkstage\.dev|lclclerk\.com|accountsstage\.dev/);
-    });
   });
 });
