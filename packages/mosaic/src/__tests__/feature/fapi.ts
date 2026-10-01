@@ -252,22 +252,7 @@ export function fapiExternalAccount(
     phone_number: '',
     public_metadata: {},
     label: '',
-    verification: fapiVerification({ strategy: `oauth_${overrides.provider}` }),
-    ...overrides,
-  };
-}
-
-export function fapiVerification(
-  overrides: Partial<VerificationJSON> & Pick<VerificationJSON, 'strategy'>,
-): VerificationJSON {
-  return {
-    object: 'verification',
-    id: 'verification_1',
-    status: 'verified',
-    verified_at_client: '',
-    attempts: 0,
-    expire_at: Date.UTC(2100, 0, 1),
-    error: { code: '', message: '', long_message: '' },
+    verification: fapiVerification(`oauth_${overrides.provider}`, { status: 'verified' }),
     ...overrides,
   };
 }

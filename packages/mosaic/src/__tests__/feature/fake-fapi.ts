@@ -147,9 +147,8 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const account = fapiExternalAccount({
         id: `idn_${provider}`,
         provider,
-        verification: fapiVerification({
+        verification: fapiVerification(strategy, {
           status: 'unverified',
-          strategy,
           external_verification_redirect_url: 'https://accounts.example/authorize',
         }),
       });
@@ -164,9 +163,8 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         ? envelope(
             {
               ...account,
-              verification: fapiVerification({
+              verification: fapiVerification(`oauth_${account.provider}`, {
                 status: 'unverified',
-                strategy: `oauth_${account.provider}`,
                 external_verification_redirect_url: 'https://accounts.example/consent',
               }),
             },

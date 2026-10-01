@@ -23,9 +23,8 @@ const github = fapiExternalAccount({ id: 'idn_github', provider: 'github' });
 const disconnectedGoogle = fapiExternalAccount({
   id: 'idn_google',
   provider: 'google',
-  verification: fapiVerification({
+  verification: fapiVerification('google_one_tap', {
     status: 'unverified',
-    strategy: 'google_one_tap',
     error: { code: 'external_account_missing_refresh_token', message: 'Missing token', long_message: 'Missing token' },
   }),
 });
@@ -139,9 +138,8 @@ describe('connected accounts', () => {
     const failed = fapiExternalAccount({
       id: 'idn_google',
       provider: 'google',
-      verification: fapiVerification({
+      verification: fapiVerification('oauth_google', {
         status: 'unverified',
-        strategy: 'oauth_google',
         error: { code: 'provider_error', message: 'Provider error', long_message: 'Provider error' },
       }),
     });
@@ -154,9 +152,8 @@ describe('connected accounts', () => {
     const canceled = fapiExternalAccount({
       id: 'idn_google',
       provider: 'google',
-      verification: fapiVerification({
+      verification: fapiVerification('oauth_google', {
         status: 'unverified',
-        strategy: 'oauth_google',
         error: {
           code: 'oauth_access_denied',
           message: 'Access denied',
@@ -253,7 +250,7 @@ describe('connected accounts', () => {
           response: fapiExternalAccount({
             id: 'idn_github',
             provider: 'github',
-            verification: fapiVerification({ status: 'unverified', strategy: 'oauth_github' }),
+            verification: fapiVerification('oauth_github', { status: 'unverified' }),
           }),
           client: null,
         }),
