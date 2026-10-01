@@ -1,6 +1,7 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
+import { createRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
@@ -15,6 +16,7 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section/user-profile-connected-accounts-section';
+import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
 
 const google = fapiExternalAccount({ id: 'idn_google', provider: 'google', username: 'jdoe' });
 const github = fapiExternalAccount({ id: 'idn_github', provider: 'github' });
@@ -59,7 +61,13 @@ function signedIn(accounts = [google], overrides: FakeFapiSeed = {}) {
 
 async function renderSection(accounts = [google], overrides: FakeFapiSeed = {}) {
   const fapi = serveFapi(signedIn(accounts, overrides));
-  const view = await renderWithClerk(<UserProfileConnectedAccountsSection />);
+  const titleRef = createRef<HTMLDivElement>();
+  const view = await renderWithClerk(
+    <UserProfileProfilePanelView
+      titleRef={titleRef}
+      connectedAccountsSlot={<UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />}
+    />,
+  );
   return { ...view, fapi };
 }
 
@@ -85,6 +93,8 @@ describe('connected accounts', () => {
   it('shows connected accounts and offers remaining providers', async () => {
     await renderSection();
 
+    expect(screen.getByRole('heading', { name: 'Account', level: 2 })).toBeVisible();
+    expect(screen.getByRole('group', { name: 'Connected accounts' })).toBeVisible();
     expect(screen.getByRole('heading', { name: 'Connected accounts' })).toBeInTheDocument();
     expect(screen.getByText('jdoe')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Manage Google' })).toBeInTheDocument();
@@ -96,6 +106,14 @@ describe('connected accounts', () => {
   it('hides the section when no social provider is enabled', async () => {
     await renderSection([], { environment: fapiEnvironment() });
     expect(screen.queryByRole('heading', { name: 'Connected accounts' })).toBeNull();
+  });
+
+  it('offers enabled providers when no accounts are connected', async () => {
+    await renderSection([]);
+
+    expect(screen.getByRole('button', { name: 'Connect Google' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Connect GitHub' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: /^Manage/ })).toBeNull();
   });
 
   it('hides Connect when an enterprise connection blocks new identifications', async () => {
@@ -378,14 +396,21 @@ describe('connected accounts', () => {
 
   it('removes the selected account and closes the confirmation', async () => {
     const { fapi } = await renderSection([google, github]);
+    const request = holdRequests('post', '/v1/me/external_accounts/idn_github');
     const user = userEvent.setup();
     const dialog = await openRemoval(user, 'GitHub');
 
     expect(dialog).toHaveAccessibleName('Remove connected account');
     expect(screen.queryByRole('textbox')).toBeNull();
+    expect(request.requests).toHaveLength(0);
+    expect(fapi.client.sessions[0]?.user.external_accounts).toHaveLength(2);
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(request.requests).toHaveLength(1));
+    request.release();
 
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(screen.queryByRole('button', { name: 'Manage GitHub' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Manage Google' })).toBeVisible();
     expect(fapi.client.sessions[0]?.user.external_accounts.map(account => account.id)).toEqual(['idn_google']);
   });
 

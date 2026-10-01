@@ -6,7 +6,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../mosaic-provider';
-import { UserProfileConnectedAccountsSectionView } from '../user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
@@ -40,80 +39,6 @@ function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
 }
 
 describe('UserProfileProfilePanelView', () => {
-  it('renders account and wallet slots with a focus target at the panel title', () => {
-    const titleRef = createRef<HTMLDivElement>();
-
-    renderView({
-      titleRef,
-      connectedAccountsSlot: <div data-testid='connected-slot'>Connected</div>,
-      web3WalletsSlot: <div data-testid='wallet-slot'>Wallets</div>,
-    });
-
-    expect(screen.getByTestId('connected-slot')).toBeInTheDocument();
-    expect(screen.getByTestId('wallet-slot')).toBeInTheDocument();
-    expect(titleRef.current).toHaveTextContent(/^Account$/);
-  });
-
-  it('hides connected accounts when only providers without a connect callback are supplied', () => {
-    renderView({
-      connectedAccountsSlot: (
-        <UserProfileConnectedAccountsSectionView
-          accounts={[]}
-          availableProviders={[{ id: 'google', provider: 'Google' }]}
-        />
-      ),
-    });
-    expect(screen.queryByRole('region', { name: 'Connected accounts' })).not.toBeInTheDocument();
-  });
-
-  it('keeps the final account confirmation mounted until removal settles', async () => {
-    const user = userEvent.setup();
-    const titleRef = createRef<HTMLDivElement>();
-    const removal = createDeferredPromise();
-    const onRemoveConnectedAccount = vi.fn(async () => {
-      await removal.promise;
-    });
-    const { rerender } = renderView({
-      titleRef,
-      connectedAccountsSlot: (
-        <UserProfileConnectedAccountsSectionView
-          accounts={[{ id: 'github', provider: 'GitHub' }]}
-          fallbackFocus={() => titleRef.current}
-          onRemove={onRemoveConnectedAccount}
-        />
-      ),
-    });
-    await user.click(screen.getByRole('button', { name: 'Manage GitHub' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-
-    rerender(
-      <MosaicProvider>
-        <UserProfileProfilePanelView
-          {...props}
-          titleRef={titleRef}
-          connectedAccountsSlot={
-            <UserProfileConnectedAccountsSectionView
-              accounts={[]}
-              fallbackFocus={() => titleRef.current}
-              onRemove={onRemoveConnectedAccount}
-            />
-          }
-        />
-      </MosaicProvider>,
-    );
-    expect(screen.queryByRole('heading', { name: 'Connected accounts' })).not.toBeInTheDocument();
-    expect(screen.getByRole('alertdialog', { name: 'Remove connected account' })).toBeInTheDocument();
-
-    await act(async () => {
-      removal.resolve();
-      await removal.promise;
-    });
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(screen.getByRole('heading', { name: 'Account', level: 2 })).toBeVisible();
-    await waitFor(() => expect(document.activeElement).toHaveTextContent(/^Account$/));
-  });
-
   it('keeps the final wallet confirmation mounted until removal settles', async () => {
     const user = userEvent.setup();
     const titleRef = createRef<HTMLDivElement>();
@@ -157,20 +82,6 @@ describe('UserProfileProfilePanelView', () => {
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     await waitFor(() => expect(document.activeElement).toHaveTextContent(/^Account$/));
-  });
-
-  it('keeps available providers visible without connected accounts', () => {
-    const onConnectAccount = vi.fn();
-    renderView({
-      connectedAccountsSlot: (
-        <UserProfileConnectedAccountsSectionView
-          accounts={[]}
-          availableProviders={[{ id: 'google', provider: 'Google' }]}
-          onConnect={onConnectAccount}
-        />
-      ),
-    });
-    expect(screen.getByRole('button', { name: 'Connect Google' })).toBeVisible();
   });
 
   it.each([false, true])('formats normalized phone numbers with multiple accounts set to %s', allowMultipleAccounts => {
@@ -343,26 +254,11 @@ describe('UserProfileProfilePanelView', () => {
     expect(within(phoneSection).getByRole('button', { name: 'Add phone number' })).toBeInTheDocument();
   });
 
-  it('renders connected accounts and the danger zone when provided', () => {
+  it('renders the danger zone when provided', () => {
     renderView({
-      connectedAccountsSlot: (
-        <UserProfileConnectedAccountsSectionView
-          accounts={[
-            {
-              id: 'google',
-              provider: 'Google',
-              identifier: 'test@google.com',
-              iconUrl: 'https://example.com/google.svg',
-            },
-          ]}
-          onRemove={onRemoveConnectedAccount}
-        />
-      ),
-      onDeleteAccount,
+      deleteAccountSlot: <DeleteAccount />,
     });
 
-    expect(screen.getByRole('heading', { level: 3, name: 'Connected accounts' })).toBeInTheDocument();
-    expect(screen.getByText('Google')).toBeVisible();
     expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
     expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
@@ -370,13 +266,8 @@ describe('UserProfileProfilePanelView', () => {
     );
   });
 
-  it('renders connected provider and Web3 images inside icon frames', () => {
+  it('renders Web3 images inside icon frames', () => {
     const { container } = renderView({
-      connectedAccountsSlot: (
-        <UserProfileConnectedAccountsSectionView
-          accounts={[{ id: 'google', provider: 'Google', iconUrl: '/google.svg' }]}
-        />
-      ),
       web3WalletsSlot: (
         <UserProfileWeb3WalletsSectionView
           wallets={[
@@ -388,10 +279,9 @@ describe('UserProfileProfilePanelView', () => {
 
     const frames = container.querySelectorAll('.cl-icon-frame');
     const images = container.querySelectorAll('img');
-    expect(frames).toHaveLength(2);
-    expect(screen.queryByRole('img', { name: 'Google' })).not.toBeInTheDocument();
+    expect(frames).toHaveLength(1);
+    expect(screen.queryByRole('img', { name: 'MetaMask' })).not.toBeInTheDocument();
     expect(frames[0]).toContainElement(images[0]);
-    expect(frames[1]).toContainElement(images[1]);
     frames.forEach(frame => expect(frame.closest('.cl-section-media')).toHaveAttribute('data-size', 'lg'));
   });
 
@@ -498,14 +388,13 @@ describe('UserProfileProfilePanelView', () => {
     await waitFor(() => expect(screen.queryByRole('dialog', { name: 'Edit username' })).not.toBeInTheDocument());
   });
 
-  it('matches the existing conditional contact and connected-account actions', async () => {
+  it('matches the existing conditional contact actions', async () => {
     const onVerifyEmail = vi.fn();
     const onSetPrimaryEmail = vi.fn();
     const onRemoveEmail = vi.fn();
     const onVerifyPhone = vi.fn();
     const onSetPrimaryPhone = vi.fn();
     const onRemovePhone = vi.fn();
-    const onRemoveConnectedAccount = vi.fn();
     const user = userEvent.setup();
 
     renderView({
@@ -518,12 +407,6 @@ describe('UserProfileProfilePanelView', () => {
         { id: 'phone_unverified', value: '+1 801-555-0100', isVerified: false },
         { id: 'phone_secondary', value: '+1 801-555-0101', isVerified: true },
       ],
-      connectedAccountsSlot: (
-        <UserProfileConnectedAccountsSectionView
-          accounts={[{ id: 'github', provider: 'GitHub', identifier: 'prestonxyz' }]}
-          onRemove={onRemoveConnectedAccount}
-        />
-      ),
       onVerifyEmail,
       onSetPrimaryEmail,
       onRemoveEmail,
@@ -573,18 +456,6 @@ describe('UserProfileProfilePanelView', () => {
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0101' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryPhone).toHaveBeenCalledWith('phone_secondary');
-
-    await user.click(screen.getByRole('button', { name: 'Manage GitHub' }));
-    const removeConnectedAccount = screen.getByRole('menuitem', { name: 'Remove' });
-    expect(removeConnectedAccount).toHaveAttribute('data-color', 'negative');
-    await user.click(removeConnectedAccount);
-    expect(onRemoveConnectedAccount).not.toHaveBeenCalled();
-    await user.click(
-      within(screen.getByRole('alertdialog', { name: 'Remove connected account' })).getByRole('button', {
-        name: 'Remove',
-      }),
-    );
-    expect(onRemoveConnectedAccount).toHaveBeenCalledWith('github');
   });
 
   it('hides action triggers when immutable items have no available actions', () => {
@@ -599,18 +470,11 @@ describe('UserProfileProfilePanelView', () => {
         },
       ],
       phones: [],
-      connectedAccountsSlot: (
-        <UserProfileConnectedAccountsSectionView
-          accounts={[{ id: 'github', provider: 'GitHub', identifier: 'prestonxyz', canRemove: false }]}
-          onRemove={vi.fn()}
-        />
-      ),
       onVerifyEmail: vi.fn(),
       onSetPrimaryEmail: vi.fn(),
       onRemoveEmail: vi.fn(),
     });
 
     expect(screen.queryByRole('button', { name: 'Manage immutable@clerk.dev' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Manage GitHub' })).not.toBeInTheDocument();
   });
 });
