@@ -72,11 +72,12 @@ test. Copy from it.
 | Authoring or debugging a state machine, or wiring one to React         | `references/machines.md` → in-tree `machine/README.md` |
 | Writing the view (rendering plain props)                               | `references/views.md`                                  |
 | Testing a feature (feature tests, unit tests)                          | `references/testing.md`                                |
-| Preparing staging configurations for a migration or migration review   | `references/local-mosaic-testing.md`                   |
+| Preparing staging configurations for a Mosaic feature or flow        | `../mosaic-setup/SKILL.md`                           |
 | Migrating a legacy component into Mosaic (the end-to-end workflow)     | `references/migration.md`                              |
 | Running the parity audit that guards a migration                       | `references/parity-audit.md`                           |
 
-Before a migration or migration review, follow `references/local-mosaic-testing.md` to
+For setup alone, invoke `/mosaic-setup <feature-or-flow>`. Before a migration or
+migration review, follow `../mosaic-setup/SKILL.md` to
 identify existing configurations and append any missing ones to Swingset's local
 environment file. Leave the active configuration intact. The user selects a
 configuration and runs the live checks.

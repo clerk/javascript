@@ -1,8 +1,18 @@
+---
+name: mosaic-setup
+description: >-
+  Set up local staging configurations for a Mosaic feature or flow. Use when
+  asked to prepare a Mosaic environment, add staging configs to Swingset, or
+  invoke mosaic-setup directly. Also used during Mosaic migrations and reviews.
+  Reuse or create compatible staging apps and add missing configurations as
+  described, commented key pairs in .env.local for the user to activate manually.
+---
+
 # Set up local Mosaic staging configurations
 
-For a migration or migration review, identify the staging configurations the flow needs. Reuse compatible apps and prepare missing configurations so the user can run live checks. Run setup commands from the repository root.
+Use the feature or flow named in the request, or the scope of the current migration or review. Identify its required staging configurations, reuse compatible apps, and prepare missing configurations. Run setup commands from the repository root. The user selects a configuration and runs the live checks.
 
-Derive each configuration from the legacy behavior and the migration or review scope. Compare workspace setup metadata with staging application and instance settings through the CLI. An existing `.env.local` alone does not prove that an app has the required settings. Keep separate apps for variants with conflicting settings, and do not change an app another configuration depends on.
+Derive each configuration from the requested feature and its existing behavior. Compare workspace setup metadata with staging application and instance settings through the CLI. An existing `.env.local` alone does not prove that an app has the required settings. Keep separate apps for variants with conflicting settings, and do not change an app another configuration depends on.
 
 ## Prepare setup
 
