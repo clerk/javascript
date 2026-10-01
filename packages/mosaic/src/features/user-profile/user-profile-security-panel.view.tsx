@@ -1,14 +1,13 @@
-import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 
 import { Panel } from '../../components/panel';
+import { Section } from '../../components/section';
 import { themeProps } from '../../props';
 import type {
   UserProfileActiveDevicesSectionViewProps,
   UserProfileDevice,
 } from './user-profile-active-devices-section.view';
 import { UserProfileActiveDevicesSectionView } from './user-profile-active-devices-section.view';
-import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
 import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
@@ -19,7 +18,6 @@ import type {
   UserProfilePasswordSectionViewProps,
 } from './user-profile-password-section/user-profile-password-section.view';
 import { UserProfilePasswordSectionView } from './user-profile-password-section/user-profile-password-section.view';
-import { styles } from './user-profile-security-panel.styles';
 
 export type {
   UserProfileDevice,
@@ -51,8 +49,8 @@ export interface UserProfileSecurityPanelViewProps
   onRegenerateBackupCodes?: () => void;
   onRemoveMfaMethod?: (id: string) => void | Promise<void>;
   onSetDefaultMfaMethod?: (id: string) => void | Promise<void>;
-  /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
-  onDeleteAccount?: () => Promise<void>;
+  /** Danger zone. Omit to hide it. */
+  deleteAccountSlot?: ReactNode;
 }
 
 export function UserProfileSecurityPanelView({
@@ -76,7 +74,7 @@ export function UserProfileSecurityPanelView({
   onSetDefaultMfaMethod,
   onSignOutDevice,
   onSignOutAllOtherDevices,
-  onDeleteAccount,
+  deleteAccountSlot,
 }: UserProfileSecurityPanelViewProps): ReactElement {
   const showPassword = hasPassword || Boolean(onSubmitPassword) || Boolean(managedBy);
   const showPasskeys = passkeys !== undefined && passkeysVisible;
@@ -86,38 +84,38 @@ export function UserProfileSecurityPanelView({
     <Panel.Root render={<div {...themeProps('user-profile-security-panel')} />}>
       <Panel.Title>Security</Panel.Title>
       <Panel.Sections>
-        <div {...stylex.props(styles.sectionCards, !hasAuthentication && styles.emptySectionCards)}>
-          {showPassword ? (
-            <UserProfilePasswordSectionView
-              hasPassword={hasPassword}
-              managedBy={managedBy}
-              requiresCurrentPassword={requiresCurrentPassword}
-              onSubmitPassword={onSubmitPassword}
-            />
-          ) : null}
-          {showPasskeys ? (
-            <UserProfilePasskeysSectionView
-              passkeys={passkeys}
-              sectionTitle={showPassword ? undefined : 'Authentication'}
-              onAdd={onAddPasskey}
-              addError={addPasskeyError}
-              onRename={onRenamePasskey}
-              onRemove={onRemovePasskey}
-            />
-          ) : null}
-          {mfaMethods !== undefined ? (
-            <UserProfileMfaSectionView
-              methods={mfaMethods}
-              addableMethods={addableMfaMethods}
-              addControl={mfaAddControl}
-              sectionTitle={!showPassword && !showPasskeys ? 'Authentication' : undefined}
-              onAdd={onAddMfaMethod}
-              onRegenerateBackupCodes={onRegenerateBackupCodes}
-              onRemove={onRemoveMfaMethod}
-              onSetDefault={onSetDefaultMfaMethod}
-            />
-          ) : null}
-        </div>
+        {hasAuthentication ? (
+          <Section.Root aria-label='Authentication'>
+            {showPassword ? (
+              <UserProfilePasswordSectionView
+                hasPassword={hasPassword}
+                managedBy={managedBy}
+                requiresCurrentPassword={requiresCurrentPassword}
+                onSubmitPassword={onSubmitPassword}
+              />
+            ) : null}
+            {showPasskeys ? (
+              <UserProfilePasskeysSectionView
+                passkeys={passkeys}
+                onAdd={onAddPasskey}
+                addError={addPasskeyError}
+                onRename={onRenamePasskey}
+                onRemove={onRemovePasskey}
+              />
+            ) : null}
+            {mfaMethods !== undefined ? (
+              <UserProfileMfaSectionView
+                methods={mfaMethods}
+                addableMethods={addableMfaMethods}
+                addControl={mfaAddControl}
+                onAdd={onAddMfaMethod}
+                onRegenerateBackupCodes={onRegenerateBackupCodes}
+                onRemove={onRemoveMfaMethod}
+                onSetDefault={onSetDefaultMfaMethod}
+              />
+            ) : null}
+          </Section.Root>
+        ) : null}
         {devices ? (
           <UserProfileActiveDevicesSectionView
             devices={devices}
@@ -125,7 +123,7 @@ export function UserProfileSecurityPanelView({
             onSignOutDevice={onSignOutDevice}
           />
         ) : null}
-        {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
+        {deleteAccountSlot}
       </Panel.Sections>
     </Panel.Root>
   );

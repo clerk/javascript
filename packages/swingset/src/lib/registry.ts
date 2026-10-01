@@ -244,7 +244,6 @@ import {
   Destructive as SectionDestructive,
   IconFrameMedia as SectionIconFrameMedia,
   meta as sectionMeta,
-  MultipleEmailAndPhoneNumbers as SectionMultipleEmailAndPhoneNumbers,
 } from '../stories/section.stories';
 import {
   Controlled as SelectComponentControlled,
@@ -421,7 +420,6 @@ import type { StoryModule } from './types';
 const sectionModule: StoryModule = {
   meta: sectionMeta,
   Default: SectionDefault,
-  MultipleEmailAndPhoneNumbers: SectionMultipleEmailAndPhoneNumbers,
   ConnectedAccounts: SectionConnectedAccounts,
   IconFrameMedia: SectionIconFrameMedia,
   Destructive: SectionDestructive,
