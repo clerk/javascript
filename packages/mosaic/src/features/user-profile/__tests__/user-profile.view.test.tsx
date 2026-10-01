@@ -10,7 +10,7 @@ import { UserProfilePasswordSectionView } from '../user-profile-password-section
 
 const pages: UserProfileViewProps['pages'] = {
   account: { name: 'Preston Booth', username: 'prestonxyz' },
-  security: { passwordSlot: <UserProfilePasswordSectionView hasPassword /> },
+  security: { passwordSlot: { content: <UserProfilePasswordSectionView hasPassword /> } },
   billing: {
     subscription: {
       planName: 'Basic Plan',
@@ -21,15 +21,7 @@ const pages: UserProfileViewProps['pages'] = {
     paymentMethods: [],
     historyItems: [],
   },
-  apiKeys: {
-    apiKeys: [],
-    searchValue: '',
-    totalCount: 0,
-    page: 1,
-    isLoading: false,
-    onSearchChange: vi.fn(),
-    onPageChange: vi.fn(),
-  },
+  apiKeys: <p>API keys content</p>,
 };
 
 function renderView(overrides: Partial<UserProfileViewProps> = {}) {

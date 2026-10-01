@@ -12,6 +12,7 @@ export * from './BillingPaymentMethod';
 export * from './BillingPlan';
 export * from './BillingStatement';
 export * from './BillingSubscription';
+export * from './BiometricCredential';
 export * from './Client';
 export * from './CommerceSettings';
 export * from './DeletedObject';

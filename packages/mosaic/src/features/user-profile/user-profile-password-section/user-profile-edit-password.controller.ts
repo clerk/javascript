@@ -1,5 +1,5 @@
 import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { UseFormResult } from '../../../components/form';
 import { useForm } from '../../../components/form';
@@ -21,7 +21,6 @@ export interface UserProfileEditPasswordControllerOptions {
   requiresCurrentPassword?: boolean;
   onSubmit: (value: UserProfileEditPasswordValue) => Promise<unknown>;
   validatePassword?: (password: string) => Promise<FieldFeedback | undefined>;
-  formatError?: (error: unknown) => unknown;
 }
 
 export interface UserProfileEditPasswordController {
@@ -35,12 +34,11 @@ export function useUserProfileEditPasswordController({
   requiresCurrentPassword = false,
   onSubmit,
   validatePassword,
-  formatError = error => error,
 }: UserProfileEditPasswordControllerOptions): UserProfileEditPasswordController {
+  const validationError = useMessages('errors').generic;
   const m = useMessages('userProfilePasswordSection');
   const [isOpen, setIsOpen] = useState(false);
   const [passwordFeedback, setPasswordFeedback] = useState<FieldFeedback>();
-  const submitting = useRef(false);
 
   const form = useForm({
     initialValues,
@@ -55,27 +53,20 @@ export function useUserProfileEditPasswordController({
       values.confirmPassword === values.newPassword &&
       (!requiresCurrentPassword || values.currentPassword !== ''),
     onSubmit: async values => {
-      submitting.current = true;
-      try {
-        await onSubmit({
-          currentPassword: requiresCurrentPassword ? values.currentPassword : undefined,
-          newPassword: values.newPassword,
-          signOutOfOtherSessions: values.signOutOfOtherSessions,
-        });
-        setIsOpen(false);
-      } catch (error) {
-        throw formatError(error);
-      } finally {
-        submitting.current = false;
-      }
+      await onSubmit({
+        currentPassword: requiresCurrentPassword ? values.currentPassword : undefined,
+        newPassword: values.newPassword,
+        signOutOfOtherSessions: values.signOutOfOtherSessions,
+      });
+      setIsOpen(false);
     },
   });
 
   const password = form.values.newPassword;
   const passwordLeft = form.fields.newPassword.touched;
   useEffect(() => {
-    setPasswordFeedback(undefined);
     if (!isOpen || (password === '' && !passwordLeft) || !validatePassword) {
+      setPasswordFeedback(undefined);
       return;
     }
 
@@ -89,17 +80,21 @@ export function useUserProfileEditPasswordController({
               setPasswordFeedback(feedback);
             }
           },
-          () => {},
+          () => {
+            if (active) {
+              setPasswordFeedback({ type: 'error', message: validationError });
+            }
+          },
         );
     }, DEBOUNCE_MS);
     return () => {
       active = false;
       clearTimeout(timeout);
     };
-  }, [isOpen, password, passwordLeft, validatePassword]);
+  }, [isOpen, password, passwordLeft, validatePassword, validationError]);
 
   const onOpenChange = (open: boolean) => {
-    if (submitting.current || form.isSubmitting) {
+    if (form.isSubmitting) {
       return;
     }
     form.reset();

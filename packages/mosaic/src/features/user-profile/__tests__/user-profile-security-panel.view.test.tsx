@@ -3,13 +3,20 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../MosaicProvider';
+import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
 import { UserProfilePasswordSectionView } from '../user-profile-password-section/user-profile-password-section.view';
 import type { UserProfileSecurityPanelViewProps } from '../user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
+function DeleteAccount({ onDelete = () => Promise.resolve() }: { onDelete?: () => Promise<void> }) {
+  const controller = useDestructiveController({ onDelete });
+  return <UserProfileDeleteSectionView {...controller} />;
+}
+
 const props: UserProfileSecurityPanelViewProps = {
-  passwordSlot: <UserProfilePasswordSectionView hasPassword />,
+  passwordSlot: { content: <UserProfilePasswordSectionView hasPassword /> },
   passkeys: [
     {
       id: 'passkey_1',
@@ -59,7 +66,7 @@ function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) 
 
 describe('UserProfileSecurityPanelView', () => {
   it('composes authentication, active devices, and the danger zone', () => {
-    renderView({ onDeleteAccount: vi.fn(() => Promise.resolve()) });
+    renderView({ deleteAccountSlot: <DeleteAccount /> });
 
     expect(screen.getByRole('heading', { level: 2, name: 'Security' })).toBeInTheDocument();
     const authentication = screen.getByRole('region', { name: 'Authentication' });
@@ -116,7 +123,7 @@ describe('UserProfileSecurityPanelView', () => {
       onRemovePasskey,
       onSignOutDevice,
       onSignOutAllOtherDevices,
-      onDeleteAccount,
+      deleteAccountSlot: <DeleteAccount onDelete={onDeleteAccount} />,
     });
 
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));

@@ -14,12 +14,10 @@ export type {
 export function UserProfilePasswordSectionView({
   action,
   hasPassword = false,
-  requiresCurrentPassword = false,
   managedBy,
-  onSubmitPassword,
 }: UserProfilePasswordSectionViewProps) {
   const m = useMessages('userProfilePasswordSection');
-  if (!hasPassword && !managedBy && !onSubmitPassword && !action) {
+  if (!hasPassword && !managedBy && !action) {
     return null;
   }
 
@@ -32,9 +30,7 @@ export function UserProfilePasswordSectionView({
         <UserProfilePasswordRowView
           action={action}
           hasPassword={hasPassword}
-          requiresCurrentPassword={requiresCurrentPassword}
           managedBy={managedBy}
-          onSubmitPassword={onSubmitPassword}
         />
       </Section.Body>
     </Section.Group>

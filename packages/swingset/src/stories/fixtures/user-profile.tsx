@@ -1,8 +1,11 @@
+import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import { UserProfileApiKeysPanelView } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
 } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
+import { UserProfileDeleteSectionView } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.view';
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import type {
   UserProfileEmail,
@@ -25,6 +28,11 @@ import { useUserProfileEditUsernameFixture } from './user-profile-edit-username'
 import { useUserProfileMfaExample } from './user-profile-mfa-example';
 import { usePasskeysFixture } from './user-profile-passkeys';
 import { useWeb3WalletsFixture } from './user-profile-web3-wallets';
+
+export function UserProfileDeleteAccountPreview() {
+  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
+  return <UserProfileDeleteSectionView {...controller} />;
+}
 
 export interface UserProfileFixtureOptions {
   /** Replaces the default OTP flow, e.g. for a custom dialog example. */
@@ -127,7 +135,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       ...createUserProfileAddPhoneFixture({
         onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
       }),
-      onDeleteAccount: () => Promise.resolve(),
+      deleteAccountSlot: <UserProfileDeleteAccountPreview />,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
       onProfilePictureChange: showFile,
@@ -142,14 +150,14 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
         setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
     },
     security: {
-      passwordSlot: <UserProfilePasswordSectionView {...editPassword} />,
+      passwordSlot: { content: <UserProfilePasswordSectionView {...editPassword} /> },
       passkeys: passkeys.passkeys,
       addPasskeyError: passkeys.addError,
       onRenamePasskey: passkeys.onRename,
       ...mfa.security,
       devices: activeDevices.devices,
       onAddPasskey: passkeys.onAdd,
-      onDeleteAccount: () => Promise.resolve(),
+      deleteAccountSlot: <UserProfileDeleteAccountPreview />,
       onRemovePasskey: passkeys.onRemove,
       onSignOutAllOtherDevices: activeDevices.onSignOutAllOtherDevices,
       onSignOutDevice: activeDevices.onSignOutDevice,
@@ -195,7 +203,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onBillingHistoryPageSizeChange: setHistoryPageSize,
       onViewInvoice: () => undefined,
     },
-    apiKeys,
+    apiKeys: <UserProfileApiKeysPanelView {...apiKeys} />,
   };
 
   return { activePage, setActivePage, pages, addEmail, devices: activeDevices.devices };

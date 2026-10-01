@@ -2,23 +2,26 @@ import { validate as validateComplexity } from '@clerk/shared/internal/clerk-js/
 import { createLoadZxcvbn } from '@clerk/shared/internal/clerk-js/passwords/loadZxcvbn';
 import { createValidatePasswordStrength } from '@clerk/shared/internal/clerk-js/passwords/strength';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
-import type { EnvironmentResource, PasswordSettingsData, PasswordValidation, UserResource } from '@clerk/shared/types';
+import type { EnvironmentResource, UserResource } from '@clerk/shared/types';
 import { useMemo } from 'react';
 
+import type { FieldFeedback } from '../../../components/form';
+import { FormSubmitError } from '../../../components/form';
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
+import { useErrorText, useLocale, useMessages } from '../../../localization';
+import { passwordFormError } from './user-profile-password-errors';
+import { passwordFieldFeedback } from './user-profile-password-feedback';
 import type { UserProfileEditPasswordValue } from './user-profile-password-section.types';
-import { UserProfilePasswordUpdateError } from './user-profile-password-section.types';
 
 type EditablePasswordPolicy =
   | { mode: 'set'; requiresCurrentPassword: false }
   | { mode: 'change'; requiresCurrentPassword: boolean };
 
 type UnavailablePasswordModel =
-  | { status: 'hidden'; reason: 'no_user' | 'password_disabled' }
+  | { status: 'hidden' }
   | {
       status: 'readonly';
       mode: 'set' | 'change';
-      reason: 'enterprise_account';
       managedBy: { name?: string };
     };
 
@@ -30,8 +33,7 @@ export type UserProfilePasswordModel =
       userId: string;
       sessionId: string;
       identifier: string;
-      passwordSettings: PasswordSettingsData;
-      validatePassword: (password: string) => Promise<PasswordValidation>;
+      validatePassword: (password: string) => Promise<FieldFeedback | undefined>;
       updatePassword: (input: UserProfileEditPasswordValue) => Promise<void>;
     });
 
@@ -40,11 +42,11 @@ function getPasswordPolicy(
   environment: EnvironmentResource,
 ): UnavailablePasswordModel | (EditablePasswordPolicy & { status: 'ready'; userId: string }) {
   if (!user) {
-    return { status: 'hidden', reason: 'no_user' };
+    return { status: 'hidden' };
   }
 
   if (!environment.userSettings.instanceIsPasswordBased) {
-    return { status: 'hidden', reason: 'password_disabled' };
+    return { status: 'hidden' };
   }
 
   // TODO: When session reverification is supported, require the current password only when reverification is disabled.
@@ -57,7 +59,6 @@ function getPasswordPolicy(
     return {
       status: 'readonly',
       mode: policy.mode,
-      reason: 'enterprise_account',
       managedBy: { name: enterpriseAccount.enterpriseConnection?.name || undefined },
     };
   }
@@ -67,32 +68,41 @@ function getPasswordPolicy(
 
 export function useUserProfilePasswordModel(): UserProfilePasswordModel {
   const clerk = useClerk();
+  const m = useMessages('userProfilePasswordSection');
+  const locale = useLocale();
+  const errorText = useErrorText();
+  const errorMessages = useMessages('errors');
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
   const environment = useMosaicEnvironment();
   const passwordSettings = environment?.userSettings.passwordSettings;
   const moduleManager = clerk.__internal_moduleManager;
-  const validatePassword = useMemo(() => {
-    if (!passwordSettings) {
-      return undefined;
-    }
-    return async (password: string): Promise<PasswordValidation> => {
-      const complexity = validateComplexity(password, passwordSettings);
-      if (Object.keys(complexity).length > 0 || !passwordSettings.show_zxcvbn || !moduleManager) {
-        return { complexity };
-      }
-      const { loadZxcvbn } = createLoadZxcvbn(moduleManager);
-      const strength = createValidatePasswordStrength(passwordSettings)(await loadZxcvbn())(password);
-      return { complexity, strength };
-    };
-  }, [passwordSettings, moduleManager]);
+  const validatePassword = useMemo(
+    () =>
+      async (password: string): Promise<FieldFeedback | undefined> => {
+        if (!passwordSettings) {
+          throw new FormSubmitError({ message: m.errors.unavailable });
+        }
+        const complexity = validateComplexity(password, passwordSettings);
+        if (Object.keys(complexity).length > 0 || !passwordSettings.show_zxcvbn) {
+          return passwordFieldFeedback({ complexity }, passwordSettings, m, locale);
+        }
+        if (!moduleManager) {
+          throw new FormSubmitError({ message: errorMessages.generic });
+        }
+        const { loadZxcvbn } = createLoadZxcvbn(moduleManager);
+        const strength = createValidatePasswordStrength(passwordSettings)(await loadZxcvbn())(password);
+        return passwordFieldFeedback({ complexity, strength }, passwordSettings, m, locale);
+      },
+    [passwordSettings, moduleManager, m, locale, errorMessages],
+  );
 
-  if (!isUserLoaded || !isSessionLoaded || !environment || !validatePassword) {
+  if (!isUserLoaded || !isSessionLoaded || !environment) {
     return { status: 'loading' };
   }
 
   if (!session) {
-    return { status: 'hidden', reason: 'no_user' };
+    return { status: 'hidden' };
   }
 
   const policy = getPasswordPolicy(user, environment);
@@ -107,32 +117,37 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     ...policy,
     sessionId,
     identifier: session.publicUserData.identifier ?? '',
-    passwordSettings: environment.userSettings.passwordSettings,
     validatePassword,
     // TODO: Add session reverification for password updates; surface API errors until then.
     updatePassword: async ({ currentPassword, newPassword, signOutOfOtherSessions }) => {
       const currentUser = clerk.user;
-      const currentPolicy = getPasswordPolicy(currentUser, environment);
       if (
         !currentUser ||
         currentUser.id !== userId ||
         clerk.session?.id !== sessionId ||
-        currentPolicy.status !== 'ready' ||
-        currentPolicy.mode !== policy.mode ||
-        currentPolicy.requiresCurrentPassword !== policy.requiresCurrentPassword
+        !environment.userSettings.instanceIsPasswordBased ||
+        currentUser.enterpriseAccounts.some(account => account.active) ||
+        currentUser.passwordEnabled !== (policy.mode === 'change')
       ) {
-        throw new UserProfilePasswordUpdateError('unavailable');
+        throw new FormSubmitError({ message: m.errors.unavailable });
       }
 
-      if (policy.requiresCurrentPassword && !currentPassword) {
-        throw new UserProfilePasswordUpdateError('current_password_required');
+      try {
+        await currentUser.updatePassword({
+          newPassword,
+          signOutOfOtherSessions,
+          ...(policy.requiresCurrentPassword ? { currentPassword } : {}),
+        });
+      } catch (error) {
+        throw passwordFormError(
+          error,
+          policy.requiresCurrentPassword,
+          environment.userSettings.passwordSettings,
+          m,
+          locale,
+          errorText,
+        );
       }
-
-      await currentUser.updatePassword({
-        newPassword,
-        signOutOfOtherSessions,
-        ...(policy.requiresCurrentPassword ? { currentPassword } : {}),
-      });
     },
   };
 }

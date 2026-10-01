@@ -19,9 +19,15 @@ import {
 } from '@/components/ui/sidebar';
 
 const flows = [
+  { title: 'API keys', href: '/live/api-keys' },
   { title: 'Password', href: '/live/password' },
+  { title: 'Delete account', href: '/live/delete-account' },
   { title: 'Reverification', href: '/live/reverification' },
 ];
+
+function flowIsActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function LiveSidebar(props: ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
@@ -67,7 +73,7 @@ export function LiveSidebar(props: ComponentProps<typeof Sidebar>) {
                 <SidebarMenuItem key={flow.href}>
                   <SidebarMenuButton
                     className='h-auto py-1 text-xs'
-                    isActive={pathname.startsWith(flow.href)}
+                    isActive={flowIsActive(pathname, flow.href)}
                     render={<Link href={flow.href} />}
                   >
                     {flow.title}

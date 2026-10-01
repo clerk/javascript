@@ -13,6 +13,46 @@ function deferred<T = unknown>() {
 }
 
 describe('useUserProfileEditPasswordController timing', () => {
+  it('shows a validation failure instead of silently dropping it', async () => {
+    vi.useFakeTimers();
+    try {
+      const { result } = renderHook(() =>
+        useUserProfileEditPasswordController({
+          onSubmit: () => Promise.resolve(),
+          validatePassword: () => Promise.reject(new Error('Failed to load strength checker')),
+        }),
+      );
+      act(() => result.current.onOpenChange(true));
+      act(() => result.current.form.setValue('newPassword', 'new password'));
+      await act(() => vi.advanceTimersByTimeAsync(350));
+      expect(result.current.passwordFeedback).toMatchObject({ type: 'error', message: expect.any(String) });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it('holds feedback while the next password is being checked', async () => {
+    vi.useFakeTimers();
+    try {
+      const feedback: FieldFeedback = { type: 'warning', message: 'Could be stronger.' };
+      const validatePassword = vi.fn(() => Promise.resolve(feedback));
+      const { result } = renderHook(() =>
+        useUserProfileEditPasswordController({
+          onSubmit: () => Promise.resolve(),
+          validatePassword,
+        }),
+      );
+      act(() => result.current.onOpenChange(true));
+      act(() => result.current.form.setValue('newPassword', 'first password'));
+      await act(() => vi.advanceTimersByTimeAsync(350));
+      expect(result.current.passwordFeedback).toEqual(feedback);
+      act(() => result.current.form.setValue('newPassword', 'second password'));
+      expect(result.current.passwordFeedback).toEqual(feedback);
+      act(() => result.current.onOpenChange(false));
+      expect(result.current.passwordFeedback).toBeUndefined();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
   it('debounces changes and cancels pending validation when closed', async () => {
     vi.useFakeTimers();
     try {

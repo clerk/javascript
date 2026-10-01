@@ -1,9 +1,4 @@
-export class UserProfilePasswordUpdateError extends Error {
-  constructor(readonly code: 'unavailable' | 'current_password_required') {
-    super(code);
-    this.name = 'UserProfilePasswordUpdateError';
-  }
-}
+import type { ReactNode } from 'react';
 
 export type UserProfileEditPasswordField = 'currentPassword' | 'newPassword' | 'confirmPassword';
 
@@ -27,9 +22,10 @@ export interface UserProfilePasswordManagedBy {
 export interface UserProfilePasswordSectionViewProps {
   action?: ReactNode;
   hasPassword?: boolean;
-  requiresCurrentPassword?: boolean;
   /** Replaces the edit action with the enterprise provider’s name. */
   managedBy?: UserProfilePasswordManagedBy;
-  onSubmitPassword?: (value: UserProfileEditPasswordValue) => Promise<void>;
 }
-import type { ReactNode } from 'react';
+
+export interface UserProfilePasswordSlot {
+  content: ReactNode;
+}

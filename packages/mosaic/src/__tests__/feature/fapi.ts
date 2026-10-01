@@ -1,4 +1,6 @@
 import type {
+  ApiKeyJSON,
+  APIKeysSettingsJSON,
   AttributeDataJSON,
   AttributesJSON,
   AuthConfigJSON,
@@ -12,12 +14,15 @@ import type {
   OrganizationMembershipJSON,
   OrganizationSettingsJSON,
   OrganizationSuggestionJSON,
+  PublicKeyCredentialRequestOptionsJSON,
   PublicOrganizationDataJSON,
   SessionJSON,
+  SessionVerificationJSON,
   TokenJSON,
   UserJSON,
   UserOrganizationInvitationJSON,
   UserSettingsJSON,
+  VerificationJSON,
 } from '@clerk/shared/types';
 
 type Settings<T> = Omit<T, 'id' | 'object'>;
@@ -30,6 +35,7 @@ export type FapiEnvironment = Omit<EnvironmentJSON, 'user_settings' | 'organizat
 };
 
 export interface FapiEnvironmentOverrides {
+  api_keys_settings?: Partial<Settings<APIKeysSettingsJSON>>;
   auth_config?: Partial<AuthConfigJSON>;
   display_config?: Partial<DisplayConfigJSON>;
   organization_settings?: Partial<Settings<OrganizationSettingsJSON>>;
@@ -105,6 +111,7 @@ export function fapiEnvironment(overrides: FapiEnvironmentOverrides = {}): FapiE
       id: 'api_keys_settings_1',
       user_api_keys_enabled: false,
       orgs_api_keys_enabled: false,
+      ...overrides.api_keys_settings,
     },
     auth_config: {
       object: 'auth_config',
@@ -331,6 +338,55 @@ export function fapiSession(overrides: Partial<SessionJSON> & Pick<SessionJSON, 
   };
 }
 
+const verificationObjects: Record<string, string> = {
+  password: 'verification_password',
+  email_code: 'verification_otp',
+  phone_code: 'verification_otp',
+  totp: 'verification_totp',
+  backup_code: 'verification_backup_code',
+  passkey: 'verification_passkey',
+};
+
+export function fapiPasskeyRequestOptions(): PublicKeyCredentialRequestOptionsJSON {
+  return {
+    allowCredentials: [],
+    challenge: 'Y2hhbGxlbmdl',
+    rpId: 'clerk.abcef.12345.prod.lclclerk.com',
+    timeout: 60000,
+    userVerification: 'preferred',
+  };
+}
+
+export function fapiVerification(strategy: string, overrides: Partial<VerificationJSON> = {}): VerificationJSON {
+  return {
+    object: verificationObjects[strategy] ?? 'verification',
+    status: 'unverified',
+    strategy,
+    attempts: 0,
+    expire_at: farFuture,
+    ...(strategy === 'passkey' ? { nonce: JSON.stringify(fapiPasskeyRequestOptions()) } : {}),
+    ...overrides,
+  } as VerificationJSON;
+}
+
+export function fapiSessionVerification(
+  session: SessionJSON,
+  overrides: Partial<SessionVerificationJSON> = {},
+): SessionVerificationJSON {
+  return {
+    object: 'session_verification',
+    id: `sessverif_${session.id}`,
+    status: 'needs_first_factor',
+    level: 'first_factor',
+    session,
+    first_factor_verification: null,
+    second_factor_verification: null,
+    supported_first_factors: [],
+    supported_second_factors: [],
+    ...overrides,
+  };
+}
+
 export function fapiClient(sessions: SessionJSON[] = []): ClientJSON {
   return {
     object: 'client',
@@ -422,6 +478,25 @@ export function fapiSuggestion(
     id,
     public_organization_data: publicOrganizationData(organization),
     status: 'pending',
+    created_at: createdAt,
+    updated_at: createdAt,
+    ...overrides,
+  };
+}
+
+export function fapiApiKey(overrides: Partial<ApiKeyJSON> & Pick<ApiKeyJSON, 'id' | 'name' | 'subject'>): ApiKeyJSON {
+  return {
+    object: 'api_key',
+    type: 'api_key',
+    scopes: [],
+    claims: null,
+    revoked: false,
+    revocation_reason: null,
+    expired: false,
+    expiration: null,
+    created_by: null,
+    description: null,
+    last_used_at: null,
     created_at: createdAt,
     updated_at: createdAt,
     ...overrides,

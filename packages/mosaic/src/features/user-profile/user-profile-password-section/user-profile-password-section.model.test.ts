@@ -1,7 +1,9 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type { PasswordSettingsData } from '@clerk/shared/types';
 import { cleanup, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { FormSubmitError } from '../../../components/form';
 import { useUserProfilePasswordModel } from './user-profile-password-section.model';
 
 type TestUser = {
@@ -60,6 +62,48 @@ beforeEach(() => {
 
 afterEach(cleanup);
 
+describe('useUserProfilePasswordModel update errors', () => {
+  it('reports an unavailable strength checker instead of silently skipping it', async () => {
+    const { result } = renderHook(() => useUserProfilePasswordModel());
+    await expect(ready(result.current).validatePassword('long password with 123')).rejects.toBeInstanceOf(
+      FormSubmitError,
+    );
+  });
+  it('translates API errors into form field errors before leaving the model', async () => {
+    if (!user) {
+      throw new Error('expected user');
+    }
+    user.updatePassword.mockRejectedValue(
+      new ClerkAPIResponseError('Invalid', {
+        status: 422,
+        data: [{ code: 'form_password_incorrect', message: 'raw', meta: { param_name: 'current_password' } }],
+      }),
+    );
+    const { result } = renderHook(() => useUserProfilePasswordModel());
+    const action = ready(result.current).updatePassword;
+    const input = { currentPassword: 'wrong', newPassword: 'new password', signOutOfOtherSessions: true };
+    await expect(action(input)).rejects.toBeInstanceOf(FormSubmitError);
+    await expect(action(input)).rejects.toMatchObject({
+      fields: { currentPassword: 'Your current password is incorrect.' },
+    });
+  });
+
+  it('keeps unexpected failures behind the form error contract', async () => {
+    if (!user) {
+      throw new Error('expected user');
+    }
+    user.updatePassword.mockRejectedValue(new Error('Connection interrupted'));
+    const { result } = renderHook(() => useUserProfilePasswordModel());
+    await expect(
+      ready(result.current).updatePassword({
+        currentPassword: 'old password',
+        newPassword: 'new password',
+        signOutOfOtherSessions: true,
+      }),
+    ).rejects.toBeInstanceOf(FormSubmitError);
+  });
+});
+
 function ready(model: ReturnType<typeof useUserProfilePasswordModel>) {
   if (model.status !== 'ready') {
     throw new Error('expected ready model');
@@ -103,9 +147,9 @@ describe('useUserProfilePasswordModel context changes', () => {
       }
 
       const input = { currentPassword: 'old password', newPassword: 'new password', signOutOfOtherSessions: true };
-      await expect(action(input)).rejects.toMatchObject({ code: 'unavailable' });
+      await expect(action(input)).rejects.toMatchObject({ banner: 'Password update is no longer available.' });
       rerender();
-      await expect(action(input)).rejects.toMatchObject({ code: 'unavailable' });
+      await expect(action(input)).rejects.toMatchObject({ banner: 'Password update is no longer available.' });
       expect(updatePassword).not.toHaveBeenCalled();
     },
   );
@@ -113,7 +157,7 @@ describe('useUserProfilePasswordModel context changes', () => {
   it('hides the section when a loaded user has no active session', () => {
     session = null;
     const { result } = renderHook(() => useUserProfilePasswordModel());
-    expect(result.current).toEqual({ status: 'hidden', reason: 'no_user' });
+    expect(result.current).toEqual({ status: 'hidden' });
   });
 });
 
@@ -130,7 +174,6 @@ describe('useUserProfilePasswordModel enterprise accounts', () => {
     expect(result.current).toEqual({
       status: 'readonly',
       mode: 'change',
-      reason: 'enterprise_account',
       managedBy: { name: 'Acme SSO' },
     });
   });

@@ -6,8 +6,8 @@ import { describe, expect, it } from 'vitest';
 
 import { FormSubmitError } from '../../../components/form';
 import { MosaicLocalizationProvider, resolveLocalization, useErrorText } from '../../../localization';
-import { passwordFieldFeedback, passwordFormError } from './user-profile-password-feedback';
-import { UserProfilePasswordUpdateError } from './user-profile-password-section.types';
+import { passwordFormError } from './user-profile-password-errors';
+import { passwordFieldFeedback } from './user-profile-password-feedback';
 
 const settings = { min_length: 12, max_length: 64 };
 const localization = resolveLocalization({
@@ -197,21 +197,13 @@ describe('password error feedback', () => {
     ).toBe('Your password is not strong enough.');
   });
 
-  it('localizes update errors raised before the request is sent', () => {
-    const translate = (code: UserProfilePasswordUpdateError['code']) =>
-      passwordFormError(
-        new UserProfilePasswordUpdateError(code),
-        true,
-        settings,
-        messages,
-        localization.locale,
-        resolver(),
-      );
-
-    expect(translate('unavailable')).toMatchObject({ banner: 'Password update is no longer available.' });
-    expect(translate('current_password_required')).toMatchObject({
-      fields: { currentPassword: 'Current password is required.' },
-    });
+  it('returns form errors for unexpected failures', () => {
+    expect(
+      passwordFormError(new Error('Connection interrupted'), true, settings, messages, localization.locale, resolver()),
+    ).toMatchObject({ banner: 'Connection interrupted' });
+    expect(passwordFormError(undefined, true, settings, messages, localization.locale, resolver())).toBeInstanceOf(
+      FormSubmitError,
+    );
   });
 });
 

@@ -1,11 +1,14 @@
 import type * as SharedReact from '@clerk/shared/react';
-import { ClerkInstanceContext } from '@clerk/shared/react';
-import type { LoadedClerk } from '@clerk/shared/types';
 import { render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../MosaicProvider';
-import { UserProfilePasswordSection } from '../user-profile-password-section/user-profile-password-section';
+import {
+  UserProfilePasswordSection,
+  useUserProfilePasswordSlot,
+} from '../user-profile-password-section/user-profile-password-section';
+import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 const user = {
   id: 'user_1',
@@ -47,11 +50,9 @@ vi.mock('@clerk/shared/react', async importOriginal => {
 
 function tree() {
   return (
-    <ClerkInstanceContext.Provider value={{ value: clerk as unknown as LoadedClerk }}>
-      <MosaicProvider>
-        <UserProfilePasswordSection fallback={<div>Loading password section</div>} />
-      </MosaicProvider>
-    </ClerkInstanceContext.Provider>
+    <MosaicProvider>
+      <UserProfilePasswordSection fallback={<div>Loading password section</div>} />
+    </MosaicProvider>
   );
 }
 
@@ -64,4 +65,47 @@ it('shows the fallback when session data starts loading after the section is rea
   rerender(tree());
   expect(screen.getByText('Loading password section')).toBeInTheDocument();
   expect(screen.queryByRole('button', { name: 'Change password' })).not.toBeInTheDocument();
+});
+
+it('hides Authentication while its only method loads without a fallback', () => {
+  isSessionLoaded = false;
+  render(
+    <MosaicProvider>
+      <PasswordSecurityPanel />
+    </MosaicProvider>,
+  );
+  expect(screen.queryByRole('region', { name: 'Authentication' })).not.toBeInTheDocument();
+});
+
+function PasswordSecurityPanel({ fallback }: { fallback?: ReactNode }) {
+  const passwordSlot = useUserProfilePasswordSlot({ fallback });
+  return <UserProfileSecurityPanelView passwordSlot={passwordSlot} />;
+}
+
+it('keeps Authentication around a visible loading fallback', () => {
+  isSessionLoaded = false;
+  render(
+    <MosaicProvider>
+      <PasswordSecurityPanel fallback={<div>Loading password section</div>} />
+    </MosaicProvider>,
+  );
+  expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Loading password section');
+});
+
+it('removes Authentication when passwords become unavailable', () => {
+  isSessionLoaded = true;
+  const { rerender } = render(
+    <MosaicProvider>
+      <PasswordSecurityPanel />
+    </MosaicProvider>,
+  );
+  expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
+  clerk.__internal_environment.userSettings.instanceIsPasswordBased = false;
+  rerender(
+    <MosaicProvider>
+      <PasswordSecurityPanel />
+    </MosaicProvider>,
+  );
+  expect(screen.queryByRole('region', { name: 'Authentication' })).not.toBeInTheDocument();
+  clerk.__internal_environment.userSettings.instanceIsPasswordBased = true;
 });

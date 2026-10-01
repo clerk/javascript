@@ -12,10 +12,19 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfilePasswordSection } from '../user-profile-password-section/user-profile-password-section';
+import {
+  UserProfilePasswordSection,
+  useUserProfilePasswordSlot,
+} from '../user-profile-password-section/user-profile-password-section';
+import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 const email = fapiEmailAddress({ id: 'idn_1', email_address: 'person@example.com' });
 const alice = fapiUser({ id: 'user_1', email_addresses: [email] });
+
+function PasswordSecurityPanel() {
+  const passwordSlot = useUserProfilePasswordSlot();
+  return <UserProfileSecurityPanelView passwordSlot={passwordSlot} />;
+}
 
 async function renderPassword(user = alice, environment = fapiEnvironment()) {
   const fapi = serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
@@ -35,7 +44,7 @@ async function fillPassword() {
 describe('Changing a password', () => {
   it('shows no password action when nobody is signed in', async () => {
     serveFapi({ client: fapiClient() });
-    await renderWithClerk(<UserProfilePasswordSection />);
+    await renderWithClerk(<PasswordSecurityPanel />);
 
     expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
     expect(screen.queryByText('Password')).toBeNull();
@@ -128,6 +137,22 @@ describe('Changing a password', () => {
     await renderPassword(alice, environment);
 
     expect(screen.queryByRole('button', { name: 'Change password' })).toBeNull();
+  });
+
+  it.each(['disabled', 'editable', 'managed'])('resolves the Authentication section for %s passwords', async policy => {
+    const environment = fapiEnvironment();
+    environment.user_settings.attributes.password.enabled = policy !== 'disabled';
+    const user = fapiUser({
+      ...alice,
+      enterprise_accounts: policy === 'managed' ? [fapiEnterpriseAccount({ id: 'ent_1' })] : [],
+    });
+    serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
+    await renderWithClerk(<PasswordSecurityPanel />);
+    if (policy === 'disabled') {
+      expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
+    } else {
+      expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
+    }
   });
 
   it.each([true, false])('shows the managed view when passwordEnabled is %s', async passwordEnabled => {
