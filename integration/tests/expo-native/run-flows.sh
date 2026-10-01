@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Usage: PLATFORM=<ios|android> [MAESTRO_UDID=a,b] [MAESTRO_DEBUG_OUTPUT=dir] ./run-flows.sh
+# CLERK_TEST_EMAIL takes one email, or a comma-separated list with one per device.
 set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")"
 

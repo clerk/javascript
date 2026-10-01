@@ -254,39 +254,48 @@ jobs:
 
       # Provisioned as late as possible so live credentials exist for the
       # shortest window.
-      - name: Provision test user via BAPI
+      - name: Provision test users via BAPI
         id: user
         if: steps.keys.outputs.pk != ''
         continue-on-error: true
         env:
           CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
         run: |
-          email="ci-${GITHUB_RUN_ID}-${RANDOM}+clerk_test@clerkcookie.com"
-          username="ci_${GITHUB_RUN_ID}_${RANDOM}"
           password="ClerkCI!$(openssl rand -hex 8)Aa1"
-          http_code=$(curl -sS -o /tmp/bapi_response.json -w "%{http_code}" -X POST "$BAPI_URL/v1/users" \
-            -H "Authorization: Bearer $CLERK_SECRET_KEY" \
-            -H "Content-Type: application/json" \
-            -d "{\"email_address\":[\"$email\"],\"username\":\"$username\",\"password\":\"$password\"}")
-          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
-            echo "::error::BAPI user creation failed (HTTP $http_code)"
-            cat /tmp/bapi_response.json
-            exit 1
-          fi
-          user_id=$(jq -er '.id' /tmp/bapi_response.json)
           echo "::add-mask::$password"
+          emails=()
+          user_ids=()
+          for ((shard = 0; shard < MAESTRO_SHARDS; shard++)); do
+            email="ci-${GITHUB_RUN_ID}-${RANDOM}+clerk_test@clerkcookie.com"
+            username="ci_${GITHUB_RUN_ID}_${RANDOM}"
+            http_code=$(curl -sS -o /tmp/bapi_response.json -w "%{http_code}" -X POST "$BAPI_URL/v1/users" \
+              -H "Authorization: Bearer $CLERK_SECRET_KEY" \
+              -H "Content-Type: application/json" \
+              -d "{\"email_address\":[\"$email\"],\"username\":\"$username\",\"password\":\"$password\"}")
+            if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+              echo "::error::BAPI user creation failed (HTTP $http_code)"
+              cat /tmp/bapi_response.json
+              for user_id in ${user_ids[@]+"${user_ids[@]}"}; do
+                curl -fsS -X DELETE "$BAPI_URL/v1/users/$user_id" \
+                  -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
+              done
+              exit 1
+            fi
+            emails+=("$email")
+            user_ids+=("$(jq -er '.id' /tmp/bapi_response.json)")
+          done
           {
-            echo "email=$email"
+            echo "emails=$(IFS=,; echo "${emails[*]}")"
             echo "password=$password"
-            echo "user_id=$user_id"
+            echo "user_ids=${user_ids[*]}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Run iOS e2e (Maestro)
         id: run_e2e_ios
-        if: matrix.platform == 'ios' && steps.user.outputs.user_id != ''
+        if: matrix.platform == 'ios' && steps.user.outputs.user_ids != ''
         working-directory: ${{ env.FIXTURE_DIR }}
         env:
-          CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
+          CLERK_TEST_EMAIL: ${{ steps.user.outputs.emails }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
         run: |
           "$GITHUB_WORKSPACE/$E2E_DIR/boot-ios-simulators.sh" wait
@@ -304,7 +313,7 @@ jobs:
             "$GITHUB_WORKSPACE/$E2E_DIR/run-flows.sh"
 
       - name: Enable KVM
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
+        if: matrix.platform == 'android' && steps.user.outputs.user_ids != ''
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
@@ -312,7 +321,7 @@ jobs:
 
       - name: AVD cache
         id: avd-cache
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
+        if: matrix.platform == 'android' && steps.user.outputs.user_ids != ''
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: |
@@ -321,7 +330,7 @@ jobs:
           key: avd-34-google_apis-x86_64-v1
 
       - name: Create AVD snapshot
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != '' && steps.avd-cache.outputs.cache-hit != 'true'
+        if: matrix.platform == 'android' && steps.user.outputs.user_ids != '' && steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         with:
           api-level: 34
@@ -334,10 +343,10 @@ jobs:
 
       - name: Run Android e2e (Maestro)
         id: run_e2e_android
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
+        if: matrix.platform == 'android' && steps.user.outputs.user_ids != ''
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         env:
-          CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
+          CLERK_TEST_EMAIL: ${{ steps.user.outputs.emails }}
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
         with:
           api-level: 34
@@ -356,21 +365,23 @@ jobs:
 
       # Runs before the artifact upload so the credentials are already dead
       # by the time the debug files become downloadable.
-      - name: Cleanup test user
-        if: always() && steps.user.outputs.user_id != ''
+      - name: Cleanup test users
+        if: always() && steps.user.outputs.user_ids != ''
         env:
           CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
-          USER_ID: ${{ steps.user.outputs.user_id }}
+          USER_IDS: ${{ steps.user.outputs.user_ids }}
         run: |
-          curl -fsS -X DELETE "$BAPI_URL/v1/users/$USER_ID" \
-            -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
+          for user_id in $USER_IDS; do
+            curl -fsS -X DELETE "$BAPI_URL/v1/users/$user_id" \
+              -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
+          done
 
       # Test reports record flow env (and typed input) in plaintext;
       # add-mask only covers step logs, not artifact contents. Must run whenever
       # the upload does, or a passing run uploads the password.
       - name: Scrub test credentials from Maestro debug output
         id: scrub
-        if: always() && steps.user.outputs.user_id != ''
+        if: always() && steps.user.outputs.user_ids != ''
         env:
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
         run: |
@@ -391,7 +402,7 @@ jobs:
           retention-days: 7
 
       - name: Report e2e outcome
-        if: always() && steps.user.outputs.user_id != ''
+        if: always() && steps.user.outputs.user_ids != ''
         env:
           IOS_OUTCOME: ${{ steps.run_e2e_ios.outcome }}
           ANDROID_OUTCOME: ${{ steps.run_e2e_android.outcome }}
