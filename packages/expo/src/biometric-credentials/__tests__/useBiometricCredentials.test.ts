@@ -11,18 +11,11 @@ import { useBiometricCredentials as useBiometricCredentialsOnIos } from '../useB
 const mocks = vi.hoisted(() => ({
   useClerk: vi.fn(),
   loadExpoBiometrics: vi.fn(),
-  idle: vi.fn(),
-  pullFromNative: vi.fn(),
   platform: { OS: 'ios' },
 }));
 
 vi.mock('@clerk/react', () => ({ useClerk: mocks.useClerk }));
 vi.mock('../loadExpoBiometrics', () => ({ loadExpoBiometrics: mocks.loadExpoBiometrics }));
-vi.mock('../../provider/nativeClientSyncCoordinator', () => ({
-  waitForPendingJsToNativeSync: mocks.idle,
-  synchronizeNativeClientToJs: mocks.pullFromNative,
-}));
-vi.mock('../../utils/native-module', () => ({ ClerkExpoModule: null }));
 vi.mock('react-native', () => ({ Platform: mocks.platform }));
 
 const APP_IDENTIFIER = 'com.example.app';
@@ -48,7 +41,7 @@ function localRecord(overrides: Partial<ExpoBiometricsRecord> = {}): ExpoBiometr
   };
 }
 
-function createExpoBiometrics({ withHash = true }: { withHash?: boolean } = {}) {
+function createExpoBiometrics() {
   const store = {
     records: [] as ExpoBiometricsRecord[],
     keys: new Set<string>(),
@@ -61,7 +54,7 @@ function createExpoBiometrics({ withHash = true }: { withHash?: boolean } = {}) 
       canEvaluateBiometrics: true,
       canEvaluateDeviceOwner: true,
       errorCode: null,
-      secureKeyStorageAvailable: true as boolean | undefined,
+      secureKeyStorageAvailable: true as boolean,
     })),
     createKey: asyncFn(() => {
       store.keys.add('key_new');
@@ -86,7 +79,7 @@ function createExpoBiometrics({ withHash = true }: { withHash?: boolean } = {}) 
       store.records = store.records.filter(record => record.localKeyId !== localKeyId);
     }),
     ensureInstallationMarker: asyncFn(() => ({ wiped: false })),
-    ...(withHash ? { hashIdentifierHint: vi.fn(hashHint) } : {}),
+    hashIdentifierHint: vi.fn(hashHint),
   };
   return module;
 }
@@ -285,22 +278,6 @@ describe('getAvailability', () => {
     expect(biometrics.store.records).toHaveLength(1);
   });
 
-  test('treats a module that does not report secure key storage as having it', async () => {
-    addLocalCredential();
-    biometrics.getAvailability.mockResolvedValue({
-      biometryType: 'faceID',
-      canEvaluateBiometrics: true,
-      canEvaluateDeviceOwner: true,
-      errorCode: null,
-      secureKeyStorageAvailable: undefined,
-    });
-
-    await expect(renderBiometricCredentials().getAvailability()).resolves.toEqual({
-      isAvailable: true,
-      unavailableReason: null,
-    });
-  });
-
   test('reports no local credential when the device has none for this app', async () => {
     addLocalCredential({ appIdentifier: 'com.example.other' });
 
@@ -345,21 +322,6 @@ describe('getAvailability', () => {
     });
   });
 
-  test('falls back to the raw identifier hint when the module cannot hash hints', async () => {
-    biometrics = createExpoBiometrics({ withHash: false });
-    const { identifierHintSha256: _, ...legacyRecord } = localRecord({ identifierHint: 'sean@example.com' });
-    biometrics.store.records.push(legacyRecord as ExpoBiometricsRecord);
-    biometrics.store.keys.add(legacyRecord.localKeyId);
-    const biometricCredentials = renderBiometricCredentials();
-
-    await expect(biometricCredentials.getAvailability({ identifierHint: 'SEAN@example.com' })).resolves.toMatchObject({
-      isAvailable: true,
-    });
-    await expect(biometricCredentials.getAvailability({ identifierHint: 'other@example.com' })).resolves.toMatchObject({
-      unavailableReason: 'no_local_credential',
-    });
-  });
-
   test('ignores a blank identifier hint', async () => {
     addLocalCredential({ identifierHintSha256: hashHint('sean@example.com') });
 
@@ -371,7 +333,6 @@ describe('getAvailability', () => {
 
   test('prunes local records whose key is missing', async () => {
     addLocalCredential({ id: 'td_orphan', localKeyId: 'key_orphan' }, { withKey: false });
-    biometrics.hasKey.mockRejectedValueOnce(moduleError('key_not_found'));
 
     await expect(renderBiometricCredentials().getAvailability()).resolves.toEqual({
       isAvailable: false,
@@ -547,6 +508,14 @@ describe('list', () => {
 describe('enroll', () => {
   beforeEach(() => {
     signInClerkUser();
+  });
+
+  test('rejects an unknown policy without creating a key', async () => {
+    await expect(renderBiometricCredentials().enroll({ policy: 'bogus' as never })).rejects.toMatchObject({
+      code: 'invalid_trusted_device_policy',
+    });
+    expect(biometrics.createKey).not.toHaveBeenCalled();
+    expect(clerk.user.__experimental_prepareBiometricCredential).not.toHaveBeenCalled();
   });
 
   test('creates a key, completes the server enrollment and saves the local record', async () => {
@@ -784,8 +753,6 @@ describe('signIn', () => {
       setActive: clerk.instance.setActive,
     });
     expect(clerk.instance.setActive).not.toHaveBeenCalled();
-    expect(mocks.idle).not.toHaveBeenCalled();
-    expect(mocks.pullFromNative).not.toHaveBeenCalled();
   });
 
   test('uses the default prompt and the newest matching credential', async () => {
@@ -863,7 +830,33 @@ describe('signIn', () => {
     addLocalCredential();
     clerk.createdSignIn.firstFactorVerification.trustedDeviceChallenge = undefined as never;
 
-    await expect(renderBiometricCredentials().signIn()).rejects.toThrow('did not return a challenge');
+    await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
+      'Biometric sign-in did not return a matching challenge.',
+    );
+    expect(biometrics.sign).not.toHaveBeenCalled();
+  });
+
+  test('rejects a challenge issued for another credential without prompting', async () => {
+    addLocalCredential();
+    clerk.createdSignIn.firstFactorVerification.trustedDeviceChallenge = {
+      clientData: 'sign-in-client-data',
+      trustedDeviceId: 'td_other',
+    } as never;
+
+    await expect(renderBiometricCredentials().signIn()).rejects.toThrow(
+      'Biometric sign-in did not return a matching challenge.',
+    );
+    expect(biometrics.sign).not.toHaveBeenCalled();
+  });
+
+  test('rejects an expired challenge without prompting', async () => {
+    addLocalCredential();
+    clerk.createdSignIn.firstFactorVerification.trustedDeviceChallenge = {
+      clientData: 'sign-in-client-data',
+      expiresAt: new Date(Date.now() - 1_000),
+    } as never;
+
+    await expect(renderBiometricCredentials().signIn()).rejects.toThrow('Biometric sign-in challenge has expired.');
     expect(biometrics.sign).not.toHaveBeenCalled();
   });
 
@@ -1065,26 +1058,18 @@ describe('reverify', () => {
     expect(clerk.session.getToken).toHaveBeenCalledWith({ skipCache: true });
     expect(result).toEqual({ id: 'sessver_1', status: 'complete', level: 'multi_factor', session: clerk.session });
     expect(clerk.session.prepareSecondFactorVerification).not.toHaveBeenCalled();
-    expect(mocks.idle).not.toHaveBeenCalled();
-    expect(mocks.pullFromNative).not.toHaveBeenCalled();
   });
 
-  test('continues with the second factor when the first factor leaves one outstanding', async () => {
+  test('returns an outstanding second factor instead of signing with the same key again', async () => {
     addLocalCredential();
     clerk.session.attemptFirstFactorVerification.mockResolvedValueOnce(sessionVerification('needs_second_factor'));
 
     const result = await renderBiometricCredentials().reverify({ level: 'multi_factor' });
 
-    expect(clerk.session.startVerification).toHaveBeenCalledWith({ level: 'multi_factor' });
-    expect(clerk.session.prepareSecondFactorVerification).toHaveBeenCalledWith({
-      strategy: 'trusted_device',
-      trustedDeviceId: 'td_1',
-    });
-    expect(clerk.session.attemptSecondFactorVerification).toHaveBeenCalledWith(
-      expect.objectContaining({ strategy: 'trusted_device', trustedDeviceId: 'td_1', signature: 'signature' }),
-    );
-    expect(biometrics.sign).toHaveBeenCalledTimes(2);
-    expect(result.status).toBe('complete');
+    expect(clerk.session.prepareSecondFactorVerification).not.toHaveBeenCalled();
+    expect(biometrics.sign).toHaveBeenCalledTimes(1);
+    expect(clerk.session.getToken).not.toHaveBeenCalled();
+    expect(result.status).toBe('needs_second_factor');
   });
 
   test('verifies only the second factor when the verification starts there', async () => {
@@ -1212,6 +1197,14 @@ describe('reverify', () => {
     await expect(renderBiometricCredentials().reverify()).rejects.toThrow(
       'Unable to refresh the session token after biometric reverification.',
     );
+  });
+
+  test('reports a failed session token refresh with its API code', async () => {
+    addLocalCredential();
+    const error = apiError('internal_clerk_error');
+    clerk.session.getToken.mockRejectedValueOnce(error);
+
+    await expectBiometricApiError(renderBiometricCredentials().reverify(), error);
   });
 
   test('rejects reverification on unsupported platforms', async () => {

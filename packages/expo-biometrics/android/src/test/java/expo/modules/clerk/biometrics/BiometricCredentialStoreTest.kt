@@ -5,6 +5,9 @@ import expo.modules.clerk.biometrics.BiometricCredentialStorageContractTest.Comp
 import expo.modules.clerk.biometrics.BiometricCredentialStorageContractTest.Companion.parse
 import java.io.File
 import java.io.IOException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -102,6 +105,29 @@ class BiometricCredentialStoreTest {
       listOf("td_other_user", "td_other_app", "td_stuck", "td_new"),
       fileStore.records().map { it.record.id },
     )
+  }
+
+  @Test
+  fun `a save waits for another save to finish removing records`() {
+    val otherSaveDone = CountDownLatch(1)
+    var otherSaveFinishedDuringCleanup = true
+    val racingStore =
+      BiometricCredentialStore(fileStore) { localKeyId ->
+        if (localKeyId == "tdlk_old") {
+          thread {
+            store.save(input(id = "td_second", localKeyId = "tdlk_second"), removeOtherRecordsForApp = true)
+            otherSaveDone.countDown()
+          }
+          otherSaveFinishedDuringCleanup = otherSaveDone.await(300, TimeUnit.MILLISECONDS)
+        }
+      }
+    racingStore.save(input(id = "td_old", localKeyId = "tdlk_old"), removeOtherRecordsForApp = false)
+
+    racingStore.save(input(id = "td_first", localKeyId = "tdlk_first"), removeOtherRecordsForApp = true)
+
+    assertFalse(otherSaveFinishedDuringCleanup)
+    assertTrue(otherSaveDone.await(5, TimeUnit.SECONDS))
+    assertEquals(listOf("td_second"), fileStore.records().map { it.record.id })
   }
 
   @Test

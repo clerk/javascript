@@ -26,30 +26,34 @@ export function OrganizationProfileDangerSectionView({
 
   return (
     <Section.Root>
-      <Section.Title>{m.sectionTitle}</Section.Title>
       <Section.Group>
-        {onLeave ? (
-          <DangerRow
-            confirmationValue={name}
-            label={m.leave.label}
-            description={m.leave.description}
-            actionLabel={m.leave.actionLabel}
-            dialogTitle={m.leave.dialogTitle}
-            dialogDescription={m.leave.dialogDescription}
-            onRun={onLeave}
-          />
-        ) : null}
-        {onDelete ? (
-          <DangerRow
-            confirmationValue={name}
-            label={m.delete.label}
-            description={m.delete.description}
-            actionLabel={m.delete.actionLabel}
-            dialogTitle={m.delete.dialogTitle}
-            dialogDescription={plural(m.delete.dialogDescription, memberCount, locale, { name })}
-            onRun={onDelete}
-          />
-        ) : null}
+        <Section.Header>
+          <Section.Title>{m.sectionTitle}</Section.Title>
+        </Section.Header>
+        <Section.Body>
+          {onLeave ? (
+            <DangerRow
+              confirmationValue={name}
+              label={m.leave.label}
+              description={m.leave.description}
+              actionLabel={m.leave.actionLabel}
+              dialogTitle={m.leave.dialogTitle}
+              dialogDescription={m.leave.dialogDescription}
+              onRun={onLeave}
+            />
+          ) : null}
+          {onDelete ? (
+            <DangerRow
+              confirmationValue={name}
+              label={m.delete.label}
+              description={m.delete.description}
+              actionLabel={m.delete.actionLabel}
+              dialogTitle={m.delete.dialogTitle}
+              dialogDescription={plural(m.delete.dialogDescription, memberCount, locale, { name })}
+              onRun={onDelete}
+            />
+          ) : null}
+        </Section.Body>
       </Section.Group>
     </Section.Root>
   );
@@ -79,7 +83,7 @@ function DangerRow({
 
   return (
     <Section.Row>
-      <Section.Item>
+      <Section.Item wrap>
         <Section.Content>
           <Section.Label>{label}</Section.Label>
           <Section.Description>{description}</Section.Description>

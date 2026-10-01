@@ -1,7 +1,6 @@
 package expo.modules.clerk.biometrics
 
 import android.security.keystore.KeyProperties
-import androidx.biometric.BiometricManager.Authenticators
 import java.io.File
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -30,8 +29,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 /**
- * Pins clerk-android's biometric credential storage contract v2
- * (`source/api/docs/biometric-credential-storage-contract.md`) with the same literals and fixture as its
+ * Pins clerk-android's biometric credential storage contract v2 with the same literals and fixture as its
  * `BiometricCredentialStorageContractTest`. Update them only together with a contract version bump.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -286,20 +284,6 @@ class BiometricCredentialStorageContractTest {
       assertEquals(-1, spec.userAuthenticationValidityDurationSeconds)
       assertEquals(policy == BiometricCredentialPolicy.BIOMETRY_CURRENT_SET, spec.isInvalidatedByBiometricEnrollment)
     }
-  }
-
-  @Test
-  fun `prompt authenticators allow device credentials only for the passcode policy on Android 11 and later`() {
-    val strong = Authenticators.BIOMETRIC_STRONG
-    for (policy in BiometricCredentialPolicy.entries) {
-      assertEquals(strong, BiometricKeyManager.promptAuthenticators(policy, sdkInt = 29))
-    }
-    assertEquals(strong, BiometricKeyManager.promptAuthenticators(BiometricCredentialPolicy.BIOMETRY_CURRENT_SET, sdkInt = 30))
-    assertEquals(strong, BiometricKeyManager.promptAuthenticators(BiometricCredentialPolicy.BIOMETRY_ANY, sdkInt = 30))
-    assertEquals(
-      strong or Authenticators.DEVICE_CREDENTIAL,
-      BiometricKeyManager.promptAuthenticators(BiometricCredentialPolicy.BIOMETRY_OR_DEVICE_PASSCODE, sdkInt = 30),
-    )
   }
 
   @Test
