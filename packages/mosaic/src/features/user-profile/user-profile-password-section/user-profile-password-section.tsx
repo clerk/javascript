@@ -22,6 +22,9 @@ export function UserProfilePasswordSection({ fallback = null }: UserProfilePassw
     // TODO: Add a password section skeleton as the default loading fallback.
     return fallback;
   }
+  if (model.status === 'hidden') {
+    return null;
+  }
   if (model.status === 'readonly') {
     return (
       <UserProfilePasswordSectionView
@@ -32,9 +35,6 @@ export function UserProfilePasswordSection({ fallback = null }: UserProfilePassw
         }}
       />
     );
-  }
-  if (model.status === 'hidden') {
-    return null;
   }
   return (
     <PasswordEditor
