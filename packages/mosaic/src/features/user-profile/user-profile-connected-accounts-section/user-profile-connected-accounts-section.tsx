@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
 import { useMessages } from '../../../localization';
+import { connectedAccountErrorMessage } from './user-profile-connected-accounts-feedback';
 import { useUserProfileConnectedAccountsController } from './user-profile-connected-accounts-section.controller';
-import { connectedAccountErrorMessage } from './user-profile-connected-accounts-section.errors';
 import type {
   AdditionalOAuthScopes,
   UserProfileConnectedAccountsModel,

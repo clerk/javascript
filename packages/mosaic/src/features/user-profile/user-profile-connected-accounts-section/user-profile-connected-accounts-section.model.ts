@@ -20,6 +20,7 @@ import type {
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
 } from './user-profile-connected-accounts-section.types';
+import { ConnectedAccountActionError } from './user-profile-connected-accounts-section.types';
 
 export type AdditionalOAuthScopes = Partial<Record<OAuthProvider, OAuthScope[]>>;
 
@@ -169,13 +170,6 @@ export function projectConnectedAccounts({
           .map(strategy => ({ id: strategy, ...getProviderDisplay(strategy.replace('oauth_', ''), social) }))
       : [],
   };
-}
-
-export class ConnectedAccountActionError extends Error {
-  constructor(readonly code: 'unavailable' | 'missing_verification_url') {
-    super(code);
-    this.name = 'ConnectedAccountActionError';
-  }
 }
 
 export type UserProfileConnectedAccountsModel =

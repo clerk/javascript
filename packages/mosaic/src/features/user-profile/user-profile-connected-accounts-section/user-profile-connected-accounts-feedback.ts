@@ -1,7 +1,7 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 
 import type { MosaicMessages } from '../../../localization';
-import { ConnectedAccountActionError } from './user-profile-connected-accounts-section.model';
+import { ConnectedAccountActionError } from './user-profile-connected-accounts-section.types';
 
 type Messages = MosaicMessages['userProfileConnectedAccounts'];
 

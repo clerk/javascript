@@ -2,8 +2,8 @@ import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { describe, expect, it } from 'vitest';
 
 import { resolveLocalization } from '../../../localization';
-import { connectedAccountErrorMessage } from './user-profile-connected-accounts-section.errors';
-import { ConnectedAccountActionError } from './user-profile-connected-accounts-section.model';
+import { connectedAccountErrorMessage } from './user-profile-connected-accounts-feedback';
+import { ConnectedAccountActionError } from './user-profile-connected-accounts-section.types';
 
 const messages = resolveLocalization({ locale: 'en' }).messages.userProfileConnectedAccounts;
 
