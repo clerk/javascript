@@ -42,7 +42,7 @@ function CardHarness() {
   const [message, setMessage] = useState<string | null>(null);
   const [requestPending, setRequestPending] = useState(false);
   const [deleteAccount, reverification] = useReverificationFlow(() => mockDelete(false));
-  const busy = requestPending || reverification.status !== 'idle';
+  const busy = requestPending;
 
   return (
     <div className='flex flex-col gap-4'>
@@ -84,9 +84,11 @@ function CardHarness() {
           Delete account
         </Button>
       </div>
-      <Card.Root renderBranding={false}>
-        <Reverification {...reverification} />
-      </Card.Root>
+      {requestPending ? (
+        <Card.Root renderBranding={false}>
+          <Reverification {...reverification} />
+        </Card.Root>
+      ) : null}
       {message ? <p className={status === 'error' ? 'text-sm text-red-600' : 'text-sm'}>{message}</p> : null}
     </div>
   );
@@ -106,8 +108,9 @@ function DialogHarness() {
   const [step, setStep] = useState<OuterStep>('confirm');
   const runRef = useRef(false);
 
-  const nextStep: OuterStep | null =
-    reverification.status === 'retrying' && presentation === 'replace'
+  const nextStep: OuterStep | null = !requestPending
+    ? null
+    : reverification.status === 'retrying' && presentation === 'replace'
       ? 'finalizing'
       : reverification.status === 'ready' || reverification.status === 'error'
         ? 'verify'
@@ -119,7 +122,7 @@ function DialogHarness() {
   }
 
   const continueDelete = () => {
-    if (runRef.current || reverification.status !== 'idle') {
+    if (runRef.current) {
       return;
     }
     runRef.current = true;
@@ -177,12 +180,10 @@ function DialogHarness() {
           if (next) {
             return;
           }
-          if (requestPending && reverification.status === 'idle') {
+          if (requestPending && step === 'confirm') {
             return;
           }
-          if (reverification.status !== 'idle') {
-            reverification.onCancel?.();
-          }
+          reverification.onCancel?.();
           setOpen(false);
           if (reverification.status !== 'retrying') {
             setErrorMessage(null);

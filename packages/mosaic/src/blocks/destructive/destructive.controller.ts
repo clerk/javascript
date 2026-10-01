@@ -36,8 +36,7 @@ export function useDestructiveController({
   };
 
   const isDeleting = status === 'open-pending';
-  const step =
-    reverification && reverification.status !== 'idle' && reverification.status !== 'loading' ? 'verify' : 'confirm';
+  const step = isDeleting && reverification?.visible ? 'verify' : 'confirm';
 
   return {
     open: status !== 'closed',
@@ -51,12 +50,6 @@ export function useDestructiveController({
         setDestructiveState({ status: 'open-pending' });
         try {
           await onDelete();
-          // TODO: It's possible this might give a flash of the confirm page after
-          //       reverification.
-          //       While we do stay on the current page throughout the retry, the
-          //       useReverificationWithState `.finally` runs first and sets phase
-          //       to inactive. That resets the reverification state and this
-          //       dialog could flash to the first screen. Unconfirmed.
           setDestructiveState({ status: 'closed' });
         } catch (error: unknown) {
           if (isReverificationCancelledError(error)) {

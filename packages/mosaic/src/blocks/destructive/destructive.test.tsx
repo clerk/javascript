@@ -36,6 +36,8 @@ const confirmButton = () => screen.getByRole('button', { name: 'Delete account' 
 const startingReverification = {
   status: 'loading' as const,
   onCancel: vi.fn(),
+  visible: false,
+  reset: vi.fn(),
 };
 
 function readyReverification(status: 'ready' | 'retrying'): ReverificationController {
@@ -54,7 +56,9 @@ function readyReverification(status: 'ready' | 'retrying'): ReverificationContro
     methods: [],
     onSelectMethod: () => {},
   };
-  return status === 'retrying' ? { status, ...view } : { status, ...view };
+  return status === 'retrying'
+    ? { status, visible: true, reset: () => {}, ...view }
+    : { status, visible: true, reset: () => {}, ...view };
 }
 
 describe('Destructive', () => {
@@ -221,7 +225,7 @@ describe('Destructive', () => {
           {...props}
           errorMessage='Delete failed.'
           step='confirm'
-          reverification={{ status: 'idle' }}
+          reverification={{ status: 'idle', visible: false, reset: () => {} }}
         />
       </MosaicProvider>,
     );

@@ -9,6 +9,7 @@ export type ReverificationFetcher = (...args: any[]) => Promise<any> | undefined
 export type UseReverificationWithStateResult<F extends ReverificationFetcher = ReverificationFetcher> = readonly [
   ReturnType<typeof useReverification<F>>,
   ReverificationState,
+  () => void,
 ];
 
 type RuntimeOperation =
@@ -29,6 +30,10 @@ type Runtime = {
   sessionId: string | null;
 };
 
+function releaseSettled(state: ReverificationState): ReverificationState {
+  return state.phase === 'settled' ? { phase: 'inactive' } : state;
+}
+
 const REQUEST_ALREADY_IN_PROGRESS_CODE = 'request_already_in_progress';
 
 function requestAlreadyInProgressError(): ClerkRuntimeError {
@@ -40,7 +45,12 @@ function requestAlreadyInProgressError(): ClerkRuntimeError {
 /**
  * Wraps useReverification without the default UI. Returns [handler, state]: call handler
  * to run the action, and render your own UI from state.phase ('inactive' | 'active' |
- * 'retrying'). While 'active', state.complete and state.cancel end the challenge.
+ * 'retrying' | 'settled'). While 'active', state.complete and state.cancel end the challenge.
+ *
+ * A run that was interrupted by a reverification ends in 'settled', not 'inactive', so the
+ * UI that was showing can be held until the caller moves on. 'settled' ends when the handler
+ * is called again, or when the third return value, reset, is called. A run that was never
+ * interrupted stays 'inactive' throughout.
  *
  * The handler runs one call at a time. A call made while another is pending rejects with a
  * ClerkRuntimeError with code 'request_already_in_progress'.
@@ -83,7 +93,7 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
       return;
     }
     runtimeRef.current.operation = { status: 'cancelling', promise: operation.promise };
-    setReverificationState({ phase: 'inactive' });
+    setReverificationState({ phase: 'settled' });
     operation.cancel();
   }, []);
 
@@ -120,6 +130,8 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
         return Promise.reject(requestAlreadyInProgressError());
       }
 
+      setReverificationState(releaseSettled);
+
       const invocation = Promise.resolve().then(() => wrapped(...args));
       runtimeRef.current.operation = { status: 'requesting', promise: invocation };
       void invocation
@@ -129,7 +141,7 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
             return;
           }
           runtimeRef.current.operation = { status: 'idle' };
-          setReverificationState({ phase: 'inactive' });
+          setReverificationState({ phase: operation.status === 'requesting' ? 'inactive' : 'settled' });
         })
         // The original error is meant to be handled outside, but .finally() creates
         // a new promise that errors the same way, so we swallow that duplicate error silently
@@ -139,6 +151,13 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
     },
     [wrapped],
   ) as ReturnType<typeof useReverification<F>>;
+
+  const reset = useCallback(() => {
+    if (runtimeRef.current.operation.status !== 'idle') {
+      return;
+    }
+    setReverificationState(releaseSettled);
+  }, []);
 
   const phase = reverificationState.phase;
   useEffect(() => {
@@ -179,5 +198,5 @@ export function useReverificationWithState<F extends ReverificationFetcher>(
     };
   }, []);
 
-  return [singleFlight, reverificationState];
+  return [singleFlight, reverificationState, reset];
 }

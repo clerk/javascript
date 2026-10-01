@@ -90,7 +90,7 @@ describe('useReverificationWithState', () => {
     expect(result.current[1]).toEqual({ phase: 'inactive' });
   });
 
-  it('moves inactive → active → retrying → inactive when the retry succeeds', async () => {
+  it('moves inactive → active → retrying → settled when the retry succeeds', async () => {
     const retry = deferred<{ ok: true }>();
     const fetcher = vi
       .fn()
@@ -118,11 +118,11 @@ describe('useReverificationWithState', () => {
     await act(async () => {
       await expect(pending).resolves.toEqual({ ok: true });
     });
-    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'inactive' }));
+    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'settled' }));
     expect(challengeCancel).not.toHaveBeenCalled();
   });
 
-  it('returns to inactive when the delayed retry fails', async () => {
+  it('settles when the delayed retry fails', async () => {
     const retry = deferred<never>();
     const fetcher = vi
       .fn()
@@ -146,11 +146,11 @@ describe('useReverificationWithState', () => {
     await act(async () => {
       await expect(pending).rejects.toMatchObject({ message: 'Mock delete failed.' });
     });
-    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'inactive' }));
+    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'settled' }));
     expect(challengeCancel).not.toHaveBeenCalled();
   });
 
-  it('returns directly to inactive when the active challenge is cancelled', async () => {
+  it('settles immediately when the active challenge is cancelled', async () => {
     const fetcher = vi.fn().mockResolvedValue({ reverificationLevel: undefined } satisfies Hint);
     const { result } = renderHook(() => useReverificationWithState(fetcher));
 
@@ -164,14 +164,76 @@ describe('useReverificationWithState', () => {
       assertActive(result.current[1]);
       result.current[1].cancel();
     });
+    expect(result.current[1]).toEqual({ phase: 'settled' });
 
     await act(async () => {
       await expect(pending).rejects.toMatchObject({ code: 'reverification_cancelled' });
     });
     expect(isReverificationCancelledError(await pending.catch(error => error))).toBe(true);
-    expect(result.current[1]).toEqual({ phase: 'inactive' });
+    expect(result.current[1]).toEqual({ phase: 'settled' });
     expect(fetcher).toHaveBeenCalledOnce();
     expect(challengeCancel).toHaveBeenCalledOnce();
+  });
+
+  it('stays settled until the handler is called again', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce({ reverificationLevel: 'first_factor' } satisfies Hint)
+      .mockResolvedValueOnce({ reverificationLevel: 'first_factor' } satisfies Hint)
+      .mockResolvedValue('ok');
+    const { result } = renderHook(() => useReverificationWithState(fetcher));
+
+    let first!: Promise<unknown>;
+    act(() => {
+      first = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    act(() => {
+      assertActive(result.current[1]);
+      result.current[1].cancel();
+    });
+    await act(async () => {
+      await first.catch(() => undefined);
+    });
+    expect(result.current[1]).toEqual({ phase: 'settled' });
+
+    let second!: Promise<unknown>;
+    act(() => {
+      second = result.current[0]();
+    });
+    expect(result.current[1]).toEqual({ phase: 'inactive' });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    act(() => {
+      assertActive(result.current[1]);
+      result.current[1].cancel();
+    });
+    await act(async () => {
+      await second.catch(() => undefined);
+    });
+  });
+
+  it('releases a settled run with reset', async () => {
+    const fetcher = vi.fn().mockResolvedValue({ reverificationLevel: 'first_factor' } satisfies Hint);
+    const { result } = renderHook(() => useReverificationWithState(fetcher));
+
+    let first!: Promise<unknown>;
+    act(() => {
+      first = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    act(() => {
+      assertActive(result.current[1]);
+      result.current[1].cancel();
+    });
+
+    act(() => result.current[2]());
+    expect(result.current[1]).toEqual({ phase: 'settled' });
+
+    await act(async () => {
+      await first.catch(() => undefined);
+    });
+    act(() => result.current[2]());
+    expect(result.current[1]).toEqual({ phase: 'inactive' });
   });
 
   it('rejects a second call during the initial request without calling the fetcher again', async () => {
@@ -234,7 +296,7 @@ describe('useReverificationWithState', () => {
     await act(async () => {
       await expect(first).resolves.toBe('ok');
     });
-    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'inactive' }));
+    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'settled' }));
   });
 
   it('starts another challenge after the first invocation settles', async () => {
@@ -261,7 +323,7 @@ describe('useReverificationWithState', () => {
     await act(async () => {
       await expect(first).resolves.toBe('ok');
     });
-    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'inactive' }));
+    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'settled' }));
 
     act(() => {
       first = result.current[0]();
@@ -291,7 +353,7 @@ describe('useReverificationWithState', () => {
     session = { id: 'sess_2' };
     rerender();
     await settled;
-    expect(result.current[1]).toEqual({ phase: 'inactive' });
+    expect(result.current[1]).toEqual({ phase: 'settled' });
     expect(challengeCancel).toHaveBeenCalledOnce();
   });
 
@@ -336,7 +398,7 @@ describe('useReverificationWithState', () => {
     session = null;
     rerender();
     await settled;
-    expect(result.current[1]).toEqual({ phase: 'inactive' });
+    expect(result.current[1]).toEqual({ phase: 'settled' });
   });
 
   it('does not cancel a retry when the session changes', async () => {

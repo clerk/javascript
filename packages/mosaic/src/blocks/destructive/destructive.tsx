@@ -42,7 +42,9 @@ export interface DestructiveControlledProps {
   step?: 'confirm' | 'verify';
 }
 
-type DestructiveCardProps = Omit<DestructiveControlledProps, 'onOpenChange' | 'trigger'>;
+type DestructiveCardProps = Omit<DestructiveControlledProps, 'onOpenChange' | 'trigger'> & {
+  onClose?: () => void;
+};
 
 function DestructiveCard({
   open,
@@ -58,6 +60,7 @@ function DestructiveCard({
   errorMessage,
   reverification,
   step = 'confirm',
+  onClose,
 }: DestructiveCardProps) {
   const formId = useId();
   const [typedValue, setTypedValue] = useState('');
@@ -145,7 +148,16 @@ function DestructiveCard({
       {() => (
         <>
           <Flow.Step ids={['confirm']}>{confirmation}</Flow.Step>
-          <Flow.Step ids={['verify']}>{reverification ? <Reverification {...reverification} /> : null}</Flow.Step>
+          <Flow.Step ids={['verify']}>
+            {reverification ? (
+              <Reverification
+                {...reverification}
+                // This onClose isn't strictly necessary, but make sure we close as soon as possible
+                // instead of after the reverification has been reset
+                onClose={onClose}
+              />
+            ) : null}
+          </Flow.Step>
         </>
       )}
     </Flow.Root>
@@ -177,6 +189,7 @@ function ControlledDestructive({ open, onOpenChange, trigger, ...props }: Destru
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <DestructiveCard
         open={open}
+        onClose={() => onOpenChange(false, { trigger: null, triggerId: null, event: undefined })}
         {...props}
       />
     </Dialog.Root>

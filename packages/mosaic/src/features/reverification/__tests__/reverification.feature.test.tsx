@@ -9,7 +9,7 @@ import type {
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
@@ -111,6 +111,55 @@ function errorCode(error: unknown) {
 function Host({ action }: { action: () => Promise<unknown> }) {
   const [run, reverification] = useReverificationFlow(action);
   const [outcome, setOutcome] = useState('');
+  const [running, setRunning] = useState(false);
+  const inFlight = useRef(false);
+
+  return (
+    <>
+      <button
+        type='button'
+        onClick={() => {
+          const owner = !inFlight.current;
+          if (owner) {
+            inFlight.current = true;
+            setRunning(true);
+          }
+          void run()
+            .then(
+              () => setOutcome('resolved'),
+              (error: unknown) => setOutcome(`rejected: ${errorCode(error)}`),
+            )
+            .finally(() => {
+              if (owner) {
+                inFlight.current = false;
+                setRunning(false);
+              }
+            });
+        }}
+      >
+        Run action
+      </button>
+      <output aria-label='Outcome'>{outcome}</output>
+      {running ? (
+        <Card.Root renderBranding={false}>
+          <Reverification {...reverification} />
+          {reverification.onCancel ? (
+            <button
+              type='button'
+              onClick={reverification.onCancel}
+            >
+              Dismiss
+            </button>
+          ) : null}
+        </Card.Root>
+      ) : null}
+    </>
+  );
+}
+
+function HoldingHost({ action }: { action: () => Promise<unknown> }) {
+  const [run, reverification] = useReverificationFlow(action);
+  const [outcome, setOutcome] = useState('');
 
   return (
     <>
@@ -125,7 +174,14 @@ function Host({ action }: { action: () => Promise<unknown> }) {
       >
         Run action
       </button>
+      <button
+        type='button'
+        onClick={reverification.reset}
+      >
+        Reset
+      </button>
       <output aria-label='Outcome'>{outcome}</output>
+      <output aria-label='Visible'>{String(reverification.visible)}</output>
       <Card.Root renderBranding={false}>
         <Reverification {...reverification} />
         {reverification.onCancel ? (
@@ -1022,6 +1078,73 @@ describe('Reverification', () => {
       expect(await screen.findByText(STEP.password)).toBeVisible();
       expect(passwordField()).toHaveValue('');
       expect(passwordField()).toBeEnabled();
+    });
+  });
+
+  describe('after the action has ended', () => {
+    const renderHolding = (action: () => Promise<unknown>) => {
+      serveFapi(verificationSeed({ firstFactors: [passwordFactor] }));
+      return renderWithClerk(<HoldingHost action={action} />);
+    };
+
+    it('keeps the last card on screen, inert, after a dismissal until it is reset', async () => {
+      await renderHolding(guardedAction());
+      const user = await startVerification();
+      await user.type(await screen.findByLabelText('Password'), 'half-typed');
+
+      await dismiss(user);
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+
+      expect(screen.getByText(STEP.password)).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Dismiss' })).toBeNull();
+      expect(passwordField()).toBeDisabled();
+
+      await user.click(screen.getByRole('button', { name: 'Reset' }));
+      expect(screen.queryByText(STEP.password)).toBeNull();
+    });
+
+    it('keeps the last card on screen after the action completes until the next run', async () => {
+      await renderHolding(guardedAction());
+      const user = await startVerification();
+      await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
+      await untilResolved();
+
+      expect(screen.getByText(STEP.password)).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Dismiss' })).toBeNull();
+
+      await user.click(screen.getByRole('button', { name: 'Run action' }));
+      await waitFor(() => expect(screen.queryByText(STEP.password)).toBeNull());
+    });
+
+    it('is visible once there is a card of its own to show, until it is reset', async () => {
+      await renderHolding(guardedAction());
+      const start = holdRequests('post', VERIFY);
+      const visible = () => screen.getByLabelText('Visible').textContent;
+      expect(visible()).toBe('false');
+
+      const user = await startVerification();
+      await waitFor(() => expect(start.requests).toHaveLength(1));
+      expect(screen.getByText(TITLE)).toBeVisible();
+      expect(visible()).toBe('false');
+
+      start.release();
+      expect(await screen.findByText(STEP.password)).toBeVisible();
+      expect(visible()).toBe('true');
+
+      await dismiss(user);
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      expect(visible()).toBe('true');
+
+      await user.click(screen.getByRole('button', { name: 'Reset' }));
+      expect(visible()).toBe('false');
+    });
+
+    it('does not keep anything on screen when no reverification was needed', async () => {
+      await renderHolding(vi.fn().mockResolvedValue({ done: true }));
+      await startVerification();
+
+      await untilResolved();
+      expect(screen.queryByText(STEP.password)).toBeNull();
     });
   });
 

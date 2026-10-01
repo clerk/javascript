@@ -6,7 +6,7 @@ import type { ReverificationController } from '../../features/reverification';
 import { deferred } from '../../machines/__tests__/test-utils';
 import { useDestructiveController } from './destructive.controller';
 
-const idleReverification = { status: 'idle' } as ReverificationController;
+const idleReverification = { status: 'idle', visible: false } as ReverificationController;
 
 describe('useDestructiveController', () => {
   it('starts closed and opens from the opener or from onOpenChange', () => {
@@ -119,7 +119,7 @@ describe('useDestructiveController', () => {
     const { result } = renderHook(() =>
       useDestructiveController({
         onDelete: () => new Promise(() => {}),
-        reverification: { status: 'ready', onCancel: vi.fn() } as ReverificationController,
+        reverification: { status: 'ready', visible: true, onCancel: vi.fn() } as ReverificationController,
       }),
     );
     act(() => result.current.onOpenChange(true));
@@ -136,7 +136,7 @@ describe('useDestructiveController', () => {
     const { result } = renderHook(() =>
       useDestructiveController({
         onDelete: () => new Promise(() => {}),
-        reverification: { status: 'retrying' } as ReverificationController,
+        reverification: { status: 'retrying', visible: true } as ReverificationController,
       }),
     );
     act(() => result.current.onOpenChange(true));
@@ -165,20 +165,33 @@ describe('useDestructiveController', () => {
   });
 
   it.each([
-    ['idle', 'confirm'],
-    ['loading', 'confirm'],
-    ['error', 'verify'],
-    ['ready', 'verify'],
-    ['retrying', 'verify'],
-  ] as const)('reverification status %s uses the %s step', (status, step) => {
+    [false, 'confirm'],
+    [true, 'verify'],
+  ] as const)('while deleting, reverification visible=%s uses the %s step', (visible, step) => {
+    const { result } = renderHook(() =>
+      useDestructiveController({
+        onDelete: () => new Promise(() => {}),
+        reverification: { status: 'ready', visible } as ReverificationController,
+      }),
+    );
+    act(() => result.current.onOpenChange(true));
+    act(() => {
+      void result.current.onDelete();
+    });
+
+    expect(result.current.step).toBe(step);
+  });
+
+  it('stays on the confirm step when not deleting, whatever the reverification status', () => {
     const { result } = renderHook(() =>
       useDestructiveController({
         onDelete: () => Promise.resolve(),
-        reverification: { status } as ReverificationController,
+        reverification: { status: 'ready', visible: true, onCancel: vi.fn() } as ReverificationController,
       }),
     );
+    act(() => result.current.onOpenChange(true));
 
-    expect(result.current.step).toBe(step);
+    expect(result.current.step).toBe('confirm');
   });
 
   it('cancels reverification when the dialog closes', () => {
@@ -186,7 +199,7 @@ describe('useDestructiveController', () => {
     const { result } = renderHook(() =>
       useDestructiveController({
         onDelete: () => new Promise(() => {}),
-        reverification: { status: 'ready', onCancel } as ReverificationController,
+        reverification: { status: 'ready', visible: true, onCancel } as ReverificationController,
       }),
     );
     act(() => result.current.onOpenChange(true));

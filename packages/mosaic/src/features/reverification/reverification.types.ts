@@ -47,7 +47,8 @@ export type ReverificationViewProps = ReverificationViewFields & {
 export type ReverificationState =
   | { phase: 'inactive' }
   | { phase: 'active'; complete: () => void; cancel: () => void; level: SessionVerificationLevel | undefined }
-  | { phase: 'retrying' };
+  | { phase: 'retrying' }
+  | { phase: 'settled' };
 
 export type ReverificationResult = {
   status: 'needs_first_factor' | 'needs_second_factor' | 'complete';

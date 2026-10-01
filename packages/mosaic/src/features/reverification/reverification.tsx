@@ -15,14 +15,18 @@ export type UseReverificationFlowResult<F extends ReverificationFetcher = Reveri
 export function useReverificationFlow<F extends ReverificationFetcher = ReverificationFetcher>(
   fetcher: F,
 ): UseReverificationFlowResult<F> {
-  const [wrappedFetcher, reverificationState] = useReverificationWithState(fetcher);
+  const [wrappedFetcher, reverificationState, reset] = useReverificationWithState(fetcher);
   const model = useReverificationModel(reverificationState);
-  const controller = useReverificationController(model);
+  const controller = useReverificationController(model, reset);
 
   return [wrappedFetcher, controller];
 }
 
-export function Reverification(controller: ReverificationController) {
+export type ReverificationProps = ReverificationController & {
+  onClose?: () => void;
+};
+
+export function Reverification({ onClose, ...controller }: ReverificationProps) {
   if (controller.status === 'idle') {
     return null;
   }
@@ -33,7 +37,7 @@ export function Reverification(controller: ReverificationController) {
     return (
       <ReverificationError
         reason={controller.reason}
-        onClose={controller.onCancel}
+        onClose={controller.onCancel ? (onClose ?? controller.onCancel) : undefined}
       />
     );
   }

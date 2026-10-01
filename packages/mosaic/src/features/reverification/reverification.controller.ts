@@ -15,12 +15,22 @@ import type {
 } from './reverification.types';
 import { errorDetail, needsPrepare, otpChannelFor } from './reverification.utils';
 
-export type ReverificationController =
+type ReverificationControllerState =
   | { status: 'idle'; onCancel?: undefined }
   | { status: 'loading'; onCancel?: () => void }
   | { status: 'error'; reason: ReverificationErrorReason; onCancel?: () => void }
   | ({ status: 'ready'; onCancel?: () => void } & ReverificationViewProps)
   | ({ status: 'retrying'; onCancel?: undefined } & ReverificationViewProps);
+
+export type ReverificationController = ReverificationControllerState & {
+  /**
+   * Whether reverification has a card of its own to show: a factor or an error. The pending card
+   * shown before a factor exists is not counted, so a host can keep its own pending state on
+   * screen until this turns true. Stays true after the run ends until the next run or `reset`.
+   */
+  visible: boolean;
+  reset: () => void;
+};
 
 type OverlayFrom = 'factor' | 'method-picker';
 
@@ -41,11 +51,13 @@ interface ReverificationContext {
   frozenActiveMethodId: string | undefined;
   overlayFrom: OverlayFrom;
   supportEmail: string;
+  heldFrom: string;
   deps: ReverificationDeps;
 }
 
 type ReverificationEvent =
   | { type: 'START' }
+  | { type: 'SETTLE' }
   | { type: 'RESET' }
   | { type: 'TYPE'; value: string }
   | { type: 'SUBMIT' }
@@ -76,6 +88,13 @@ function lockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
 
 function unlockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
   return { resendAvailableAt: undefined };
+}
+
+function settleFrom(state: string) {
+  return {
+    target: 'settled' as const,
+    actions: assign(() => ({ heldFrom: state })),
+  };
 }
 
 function factorError(error: unknown): FactorError {
@@ -176,6 +195,7 @@ export const reverificationMachine = createMachine({
     frozenActiveMethodId: undefined,
     overlayFrom: 'factor',
     supportEmail: '',
+    heldFrom: '',
     deps: unseatedDeps,
   },
   states: {
@@ -190,7 +210,7 @@ export const reverificationMachine = createMachine({
     },
 
     starting: {
-      on: { RESET: 'inactive' },
+      on: { RESET: 'inactive', SETTLE: settleFrom('starting') },
       invoke: fromPromise(ctx => ctx.deps.start(), {
         onDone: afterResult,
         onError: 'failed',
@@ -206,6 +226,7 @@ export const reverificationMachine = createMachine({
     preparing: {
       on: {
         ...factorEvents,
+        SETTLE: settleFrom('preparing'),
         SUBMIT: {
           actions: assign(() => ({ submitRequested: true })),
         },
@@ -238,7 +259,7 @@ export const reverificationMachine = createMachine({
     */
     methodPickerPreparing: {
       entry: assign(() => lockResend()),
-      on: { RESET: 'inactive' },
+      on: { RESET: 'inactive', SETTLE: settleFrom('methodPickerPreparing') },
       invoke: fromPromise(prepareActive, {
         onDone: 'verifying',
         onError: {
@@ -252,6 +273,7 @@ export const reverificationMachine = createMachine({
       always: [{ guard: ctx => ctx.activeMethod === null, target: 'unavailable' }],
       on: {
         ...factorEvents,
+        SETTLE: settleFrom('verifying'),
         SUBMIT: 'submitting',
         RESEND: {
           target: 'preparing',
@@ -269,7 +291,7 @@ export const reverificationMachine = createMachine({
     },
 
     submitting: {
-      on: { RESET: 'inactive' },
+      on: { RESET: 'inactive', SETTLE: settleFrom('submitting') },
       invoke: fromPromise(submit, {
         onDone: afterResult,
         onError: {
@@ -281,6 +303,7 @@ export const reverificationMachine = createMachine({
 
     methodPicker: {
       on: {
+        SETTLE: settleFrom('methodPicker'),
         SELECT_METHOD: [
           {
             target: 'methodPickerPreparing',
@@ -303,6 +326,7 @@ export const reverificationMachine = createMachine({
 
     help: {
       on: {
+        SETTLE: settleFrom('help'),
         BACK: [
           {
             target: 'methodPicker',
@@ -316,15 +340,15 @@ export const reverificationMachine = createMachine({
     },
 
     unavailable: {
-      on: { RESET: 'inactive' },
+      on: { RESET: 'inactive', SETTLE: settleFrom('unavailable') },
     },
 
     failed: {
-      on: { RESET: 'inactive' },
+      on: { RESET: 'inactive', SETTLE: settleFrom('failed') },
     },
 
     finishing: {
-      on: { RESET: 'inactive' },
+      on: { RESET: 'inactive', SETTLE: settleFrom('finishing') },
       invoke: fromPromise(ctx => ctx.deps.finish(), {
         onDone: 'retrying',
         onError: 'failed',
@@ -332,9 +356,17 @@ export const reverificationMachine = createMachine({
     },
 
     // This means we are retrying the action after successful reverification
-    // This state is usually left by the model state going to 'inactive',
-    // which it does when the retry has completed
+    // This state is usually left by the model state going to 'settled' once the retry has completed
     retrying: {
+      on: { RESET: 'inactive', SETTLE: settleFrom('retrying') },
+    },
+
+    /*
+      The action has ended and the caller has not moved on yet. The machine keeps the last
+      frame (heldFrom) so the controller can keep rendering it, inert, until the model
+      leaves 'settled' and the machine is reset.
+    */
+    settled: {
       on: { RESET: 'inactive' },
     },
   },
@@ -391,8 +423,18 @@ function viewStep(value: string, method: ReverificationMethod | null): Reverific
  * 'retrying' is the point of no return: verification succeeded and the original action is being
  * retried, so it keeps the last factor pending and has no `onCancel`. The factor machine runs
  * while the model is active and resets when the model returns to inactive.
+ *
+ * When the run ends after reverification was shown (completed, failed or cancelled), the model is
+ * 'settled' and the controller keeps returning the last frame, pending and without `onCancel`,
+ * until the next run starts or `reset` is called. Hosts decide when to stop rendering it.
  */
-export function useReverificationController(model: ReverificationModel): ReverificationController {
+export function useReverificationController(model: ReverificationModel, reset: () => void): ReverificationController {
+  const state = useReverificationState(model);
+  const visible = state.status === 'ready' || state.status === 'retrying' || state.status === 'error';
+  return { ...state, visible, reset };
+}
+
+function useReverificationState(model: ReverificationModel): ReverificationControllerState {
   const m = useMessages('reverification');
   const active = model.status === 'active' ? model : null;
 
@@ -427,19 +469,24 @@ export function useReverificationController(model: ReverificationModel): Reverif
       : undefined;
   const onCancel = cancelModel
     ? () => {
-        send({ type: 'RESET' });
+        send({ type: 'SETTLE' });
         cancelModel();
       }
     : undefined;
+  const settled = model.status === 'settled';
   const needsStart = active !== null && snapshot.value === 'inactive';
-  const needsReset = model.status === 'inactive' && snapshot.value !== 'inactive';
+  const needsSettle = settled && snapshot.value !== 'inactive' && snapshot.value !== 'settled';
+  const needsReset =
+    (model.status === 'inactive' && snapshot.value !== 'inactive') || (!settled && snapshot.value === 'settled');
   useEffect(() => {
     if (needsStart) {
       send({ type: 'START' });
+    } else if (needsSettle) {
+      send({ type: 'SETTLE' });
     } else if (needsReset) {
       send({ type: 'RESET' });
     }
-  }, [needsStart, needsReset, send]);
+  }, [needsStart, needsSettle, needsReset, send]);
 
   if (model.status === 'inactive') {
     return { status: 'idle' };
@@ -447,16 +494,17 @@ export function useReverificationController(model: ReverificationModel): Reverif
 
   const { context } = snapshot;
   const activeMethod = context.activeMethod;
+  const state = settled && snapshot.value === 'settled' ? context.heldFrom : snapshot.value;
 
-  if (snapshot.value === 'unavailable') {
+  if (state === 'unavailable') {
     return { status: 'error', reason: 'noFactors', onCancel };
   }
 
-  if (snapshot.value === 'failed') {
+  if (state === 'failed') {
     return { status: 'error', reason: 'generic', onCancel };
   }
 
-  const step = viewStep(snapshot.value, activeMethod);
+  const step = viewStep(state, activeMethod);
 
   if (!step) {
     return { status: 'loading', onCancel };
@@ -464,9 +512,9 @@ export function useReverificationController(model: ReverificationModel): Reverif
 
   // If we are currently on the alternative methods screen and preparing a factor, activeMethod will
   // have transitioned to the factor we are now preparing, so the one we want to hide is the old one
-  const excludeId = snapshot.value === 'methodPickerPreparing' ? context.frozenActiveMethodId : activeMethod?.id;
+  const excludeId = state === 'methodPickerPreparing' ? context.frozenActiveMethodId : activeMethod?.id;
   const methods = context.methods.filter(method => method.id !== excludeId);
-  const pendingMethodId = snapshot.value === 'methodPickerPreparing' ? activeMethod?.id : undefined;
+  const pendingMethodId = state === 'methodPickerPreparing' ? activeMethod?.id : undefined;
 
   const view: ReverificationViewProps = {
     step,
@@ -474,7 +522,7 @@ export function useReverificationController(model: ReverificationModel): Reverif
     value: context.inputValue,
     onValueChange: (value: string) => send({ type: 'TYPE', value }),
     errorMessage: context.error ? (context.error.detail ?? m.unstable__errors__generic) : undefined,
-    isPending: pendingStates.has(snapshot.value),
+    isPending: settled || pendingStates.has(state),
     onSubmit: () => send({ type: 'SUBMIT' }),
     onShowMethods: () => send({ type: 'SHOW_METHODS' }),
     onShowHelp: () => send({ type: 'SHOW_HELP' }),
@@ -502,5 +550,5 @@ export function useReverificationController(model: ReverificationModel): Reverif
         : undefined,
   };
 
-  return snapshot.value === 'retrying' ? { status: 'retrying', ...view } : { status: 'ready', onCancel, ...view };
+  return state === 'retrying' ? { status: 'retrying', ...view } : { status: 'ready', onCancel, ...view };
 }
