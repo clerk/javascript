@@ -575,21 +575,43 @@ function PersonalRow() {
   );
 }
 
-/** The organizations the active account belongs to. Its own workspace is the row above. */
+/** The active organization, which leads the list whichever page of memberships it is on. */
+function ActiveMembershipRow() {
+  const data = useUserButtonContext();
+  const active = data.activeOrganization;
+  const selectOrganization = data.onSelectOrganization;
+
+  if (!active) {
+    return null;
+  }
+
+  return (
+    <MembershipRow
+      membership={active}
+      onSelect={selectOrganization ? () => selectOrganization(active.organizationId) : undefined}
+      active
+    />
+  );
+}
+
+/** The other organizations the active account belongs to. */
 function MembershipRows() {
   const data = useUserButtonContext();
   const selectOrganization = data.onSelectOrganization;
+  const activeId = data.activeOrganization?.organizationId;
 
   return (
     <>
-      {data.memberships.map(m => (
-        <MembershipRow
-          key={m.organizationId}
-          membership={m}
-          onSelect={selectOrganization ? () => selectOrganization(m.organizationId) : undefined}
-          active={m.organizationId === data.activeOrganization?.organizationId}
-        />
-      ))}
+      {data.memberships
+        .filter(m => m.organizationId !== activeId)
+        .map(m => (
+          <MembershipRow
+            key={m.organizationId}
+            membership={m}
+            onSelect={selectOrganization ? () => selectOrganization(m.organizationId) : undefined}
+            active={false}
+          />
+        ))}
     </>
   );
 }
@@ -913,6 +935,7 @@ function OrganizationSection() {
             <OrganizationListLoadingRow />
           ) : (
             <>
+              <ActiveMembershipRow />
               <PersonalRow />
               <MembershipRows />
               <PendingRows />
