@@ -11,6 +11,9 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
   },
+  body: {
+    marginInline: 0,
+  },
   cell: {
     paddingBlock: space['3'],
     paddingInline: space['4'],
@@ -93,15 +96,6 @@ export const styles = stylex.create({
     borderBlockStartColor: colorVars['--cl-color-border'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: '1px',
-  },
-  shell: {
-    borderColor: colorVars['--cl-color-border'],
-    borderRadius: radiusVars['--cl-radius-xl'],
-    borderStyle: 'solid',
-    borderWidth: '1px',
-    overflow: 'hidden',
-    backgroundColor: colorVars['--cl-color-background'],
-    width: '100%',
   },
   statusColumn: {
     width: '20%',

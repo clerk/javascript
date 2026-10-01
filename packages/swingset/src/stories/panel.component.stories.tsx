@@ -27,25 +27,29 @@ export function Default() {
       <Panel.Sections>
         {sections.map(section => (
           <Section.Root key={section.title}>
-            <Section.Title>{section.title}</Section.Title>
             <Section.Group>
-              <Section.Row>
-                <Section.Item>
-                  <Section.Content>
-                    <Section.Label>{section.label}</Section.Label>
-                    <Section.Description>{section.description}</Section.Description>
-                  </Section.Content>
-                  <Section.Actions>
-                    <Button
-                      color='neutral'
-                      size='sm'
-                      variant='outline'
-                    >
-                      Edit
-                    </Button>
-                  </Section.Actions>
-                </Section.Item>
-              </Section.Row>
+              <Section.Header>
+                <Section.Title>{section.title}</Section.Title>
+              </Section.Header>
+              <Section.Body>
+                <Section.Row>
+                  <Section.Item>
+                    <Section.Content>
+                      <Section.Label>{section.label}</Section.Label>
+                      <Section.Description>{section.description}</Section.Description>
+                    </Section.Content>
+                    <Section.Actions>
+                      <Button
+                        color='neutral'
+                        size='sm'
+                        variant='outline'
+                      >
+                        Edit
+                      </Button>
+                    </Section.Actions>
+                  </Section.Item>
+                </Section.Row>
+              </Section.Body>
             </Section.Group>
           </Section.Root>
         ))}

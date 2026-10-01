@@ -21,8 +21,8 @@ def clerkExpoVersion = rootProject.findProperty("clerkExpo.hostSdkVersion")?.toS
 // See: https://docs.gradle.org/current/userguide/version_catalogs.html for app-level version catalogs
 ext {
   kotlinxCoroutinesVersion = "1.7.3"
-  clerkAndroidApiVersion = "1.1.9"
-  clerkAndroidUiVersion = "1.1.9"
+  clerkAndroidApiVersion = "1.1.10"
+  clerkAndroidUiVersion = "1.1.10"
   okhttpVersion = "5.4.0"
   okhttpUrlConnectionVersion = "5.0.0-alpha.16"
   composeVersion = "1.7.0"
