@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
@@ -21,8 +22,8 @@ import { UserProfileSecurityPanelView } from '../user-profile-security-panel.vie
 const email = fapiEmailAddress({ id: 'idn_1', email_address: 'person@example.com' });
 const alice = fapiUser({ id: 'user_1', email_addresses: [email] });
 
-function PasswordSecurityPanel() {
-  const passwordSlot = useUserProfilePasswordSlot();
+function PasswordSecurityPanel({ fallback }: { fallback?: ReactNode }) {
+  const passwordSlot = useUserProfilePasswordSlot({ fallback });
   return <UserProfileSecurityPanelView passwordSlot={passwordSlot} />;
 }
 
@@ -42,6 +43,29 @@ async function fillPassword() {
 }
 
 describe('Changing a password', () => {
+  it('omits Authentication while the only method loads without a fallback', async () => {
+    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
+    const loading = renderWithClerk(<PasswordSecurityPanel />);
+    try {
+      expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
+    } finally {
+      await loading;
+    }
+    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
+  });
+
+  it('keeps Authentication around a visible loading fallback', async () => {
+    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
+    const loading = renderWithClerk(<PasswordSecurityPanel fallback={<div>Loading password section</div>} />);
+    try {
+      expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Loading password section');
+    } finally {
+      await loading;
+    }
+    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
+    expect(screen.queryByText('Loading password section')).toBeNull();
+  });
+
   it('shows no password action when nobody is signed in', async () => {
     serveFapi({ client: fapiClient() });
     await renderWithClerk(<PasswordSecurityPanel />);
