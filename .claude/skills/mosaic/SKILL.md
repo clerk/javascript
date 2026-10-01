@@ -72,12 +72,13 @@ test. Copy from it.
 | Authoring or debugging a state machine, or wiring one to React         | `references/machines.md` → in-tree `machine/README.md` |
 | Writing the view (rendering plain props)                               | `references/views.md`                                  |
 | Testing a feature (feature tests, unit tests)                          | `references/testing.md`                                |
-| Setting up a staging environment for a migration or migration review   | `references/local-mosaic-testing.md`                   |
+| Preparing staging configurations for a migration or migration review   | `references/local-mosaic-testing.md`                   |
 | Migrating a legacy component into Mosaic (the end-to-end workflow)     | `references/migration.md`                              |
 | Running the parity audit that guards a migration                       | `references/parity-audit.md`                           |
 
 Before a migration or migration review, follow `references/local-mosaic-testing.md` to
-prepare a missing workspace environment for the user. The user runs the live checks.
+identify existing configurations and prepare any additional ones the user needs.
+The user runs the live checks.
 
 The migration workflow (`migration.md`) ties the flow references together: it
 treats the legacy component as the spec and drives you through the model,

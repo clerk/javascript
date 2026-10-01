@@ -1,8 +1,8 @@
 # Set up a local Mosaic staging environment
 
-For a migration or migration review, prepare a missing Swingset environment so the user can run live checks. The user runs the flows and verifies the results. Run setup commands from the repository root.
+For a migration or migration review, determine which staging configurations the flow needs. Reuse compatible configurations and prepare any that are missing so the user can run live checks. The user runs the flows and verifies the results. Run setup commands from the repository root.
 
-If `packages/swingset/.env.local` already exists, reuse the workspace's environment. Do not replace its keys. If the flow needs different instance settings, tell the user what is missing before changing the environment.
+Derive the required configurations from the legacy behavior and migration or review scope. Compare them with existing workspace setup metadata and the staging application's instance settings through the CLI. An existing `.env.local` alone does not prove that setup is complete or compatible. Identify which configurations can be reused and which need to be added. Preserve an existing `.env.local` while preparing additional configurations.
 
 ## Prepare setup
 
@@ -30,28 +30,28 @@ env CLERK_PLATFORM_KEY_VARIABLE=<private-variable-name> node packages/swingset/s
 
 If the Platform key is unavailable, use `node packages/swingset/scripts/clerk-staging.mjs --oauth <clerk-args>` instead. Log in with `--mode human auth login -y` and select the workspace from the setup note on the consent screen.
 
-Reuse an application with compatible settings. If none exists, create `mosaic-test-<feature-or-flow>`. Never change an application another test depends on. Pass `--app <app-id> --instance <instance-id>` to instance commands. Use the staging dashboard for settings the CLI does not support.
+Use the CLI to list existing applications and inspect their instance settings. For each required configuration, reuse a compatible application and instance. If none exists, create `mosaic-test-<feature-or-flow>-<config>`. When configurations require conflicting settings, keep separate applications so the user can check each variant. Never change an application another configuration or test depends on. Configure supported settings through the CLI and use the staging dashboard for the rest. Pass `--app <app-id> --instance <instance-id>` to instance commands.
 
 ## Configure Swingset
 
-Pull the instance keys with your authentication method:
+For each configuration, use a separate `<private-dir>/<config>` directory. Pull its instance keys with your authentication method:
 
 ```sh
-sh -c 'umask 077 && CLERK_PLATFORM_KEY_VARIABLE=<private-variable-name> node packages/swingset/scripts/clerk-staging.mjs <private-dir>/vercel.env env pull --app <app-id> --instance <instance-id> --file <private-dir>/instance.env'
+sh -c 'umask 077 && mkdir -p <private-dir>/<config> && CLERK_PLATFORM_KEY_VARIABLE=<private-variable-name> node packages/swingset/scripts/clerk-staging.mjs <private-dir>/vercel.env env pull --app <app-id> --instance <instance-id> --file <private-dir>/<config>/instance.env'
 ```
 
 For OAuth, replace the Platform-key prefix and env-file argument with `node packages/swingset/scripts/clerk-staging.mjs --oauth`.
 
-Merge only `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` into `.env.local`:
+If Swingset has no configured environment, activate the first configuration by merging only `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` into `.env.local`. The user uses the same command to switch configurations:
 
 ```sh
-node packages/swingset/scripts/merge-instance-env.mjs <private-dir>/instance.env
+node packages/swingset/scripts/merge-instance-env.mjs <private-dir>/<config>/instance.env
 ```
 
-The script backs up existing config and prints the frontend API host without printing keys. Do not overwrite `.env.local` with the pulled file or edit credentials by hand. Delete the pulled files with `rm -f <private-dir>/vercel.env <private-dir>/instance.env` after setup, including on failure.
+The script backs up existing config in `<private-dir>/<config>` and prints the frontend API host without printing keys. Do not overwrite `.env.local` with the pulled file or edit credentials by hand. Delete `<private-dir>/vercel.env` after setup, including on failure. Keep each configuration's `instance.env` private and available for switching until the user finishes the migration or review.
 
 ## Hand off to the user
 
-Leave `.env.local` configured. Give the user the application and instance IDs, frontend API host, required flags or settings, and `pnpm run dev:swingset`. Point them to `http://localhost:6006/live`, `/sign-in`, or `/sign-up` for the flow. They start or restart Swingset and run the live checks.
+Give the user a configuration list with each variant's purpose, application and instance IDs, required flags, and exact merge command for switching. Mark each configuration as reused or created and identify the active one. Include `pnpm run dev:swingset` and the relevant `http://localhost:6006/live`, `/sign-in`, or `/sign-up` route. The user switches configurations, restarts Swingset, and runs the live checks.
 
-If setup fails after changing `.env.local`, restore `<private-dir>/env-local.backup`, or remove `.env.local` if `<private-dir>/env-local.absent` exists. On success, keep the environment for the user's migration or review.
+If setup fails after changing `.env.local`, restore `<private-dir>/<config>/env-local.backup`, or remove `.env.local` if `<private-dir>/<config>/env-local.absent` exists. On success, keep the prepared environments for the user's migration or review.
