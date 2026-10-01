@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { SignInFirstFactor } from '@/types';
 
-import { hasMultipleEnterpriseConnections } from '../enterpriseSSOFactors';
+import { getEnterpriseConnectionFactors, hasMultipleEnterpriseConnections } from '../enterpriseSSOFactors';
 
 const connectionA = {
   strategy: 'enterprise_sso',
@@ -33,4 +33,22 @@ describe('hasMultipleEnterpriseConnections', () => {
       expect(hasMultipleEnterpriseConnections(factors)).toBe(expected);
     },
   );
+});
+
+describe('getEnterpriseConnectionFactors', () => {
+  it('returns only the enterprise connections from a mixed factor list', () => {
+    expect(
+      getEnterpriseConnectionFactors([
+        { strategy: 'password' } as SignInFirstFactor,
+        bareEnterpriseSSO,
+        connectionA,
+        connectionB,
+      ]),
+    ).toEqual([connectionA, connectionB]);
+  });
+
+  it('returns an empty list when there are no factors', () => {
+    expect(getEnterpriseConnectionFactors(null)).toEqual([]);
+    expect(getEnterpriseConnectionFactors(undefined)).toEqual([]);
+  });
 });

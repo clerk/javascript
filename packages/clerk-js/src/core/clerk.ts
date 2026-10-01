@@ -2713,10 +2713,9 @@ export class Clerk implements ClerkInterface {
       buildURL({ base: displayConfig.signUpUrl, hashPath: '/protect-check' }, { stringify: true });
     const signInUrl = params.signInUrl || displayConfig.signInUrl;
     const signUpUrl = params.signUpUrl || displayConfig.signUpUrl;
-    const enterpriseConnectionsUrl = buildURL(
-      { base: signUpUrl, hashPath: '/enterprise-connections' },
-      { stringify: true },
-    );
+    const enterpriseConnectionsUrl =
+      params.enterpriseConnectionsUrl ||
+      buildURL({ base: signUpUrl, hashPath: '/enterprise-connections' }, { stringify: true });
 
     const navigateToSignUpProtectCheck = makeNavigate(signUpProtectCheckUrl);
 
@@ -2835,13 +2834,6 @@ export class Clerk implements ClerkInterface {
       return navigateToFactorOne();
     }
 
-    const userMustChooseEnterpriseConnection =
-      si.status === 'needs_first_factor' && hasMultipleEnterpriseConnections(signIn.supportedFirstFactors);
-
-    if (userMustChooseEnterpriseConnection) {
-      return navigateToFactorOne();
-    }
-
     const userNeedsNewPassword = si.status === 'needs_new_password';
 
     if (userNeedsNewPassword) {
@@ -2876,6 +2868,7 @@ export class Clerk implements ClerkInterface {
             verifyEmailAddressUrl,
             verifyPhoneNumberUrl,
             signUpProtectCheckUrl,
+            enterpriseConnectionsUrl,
             navigate,
           });
         default:
@@ -2948,6 +2941,15 @@ export class Clerk implements ClerkInterface {
         redirectUrl: this.buildAfterSignInUrl(),
       });
       return;
+    }
+
+    const userMustChooseEnterpriseConnection =
+      params.reloadResource !== 'signUp' &&
+      si.status === 'needs_first_factor' &&
+      hasMultipleEnterpriseConnections(signIn.supportedFirstFactors);
+
+    if (userMustChooseEnterpriseConnection) {
+      return navigateToFactorOne();
     }
 
     return navigateToSignIn();

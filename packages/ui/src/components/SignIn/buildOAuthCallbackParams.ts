@@ -19,6 +19,7 @@ export function buildSignInOAuthCallbackParams(ctx: SignInContextType): HandleOA
     // Absolute + combined-flow-aware (see SignIn context), so it stays correct regardless of the
     // callback route's depth.
     signUpProtectCheckUrl: ctx.signUpProtectCheckUrl,
+    enterpriseConnectionsUrl: ctx.signUpEnterpriseConnectionsUrl,
     unsafeMetadata: ctx.unsafeMetadata,
   };
 }
@@ -45,6 +46,7 @@ export function buildSignInOAuthTransportCallbackParams(ctx: SignInContextType):
     verifyEmailAddressUrl: signUpStepUrl('verify-email-address'),
     verifyPhoneNumberUrl: signUpStepUrl('verify-phone-number'),
     signUpProtectCheckUrl: signUpStepUrl('protect-check'),
+    enterpriseConnectionsUrl: signUpStepUrl('enterprise-connections'),
   };
 }
 
@@ -59,6 +61,7 @@ export function buildSignUpOAuthCallbackParams(ctx: SignUpContextType): HandleOA
     verifyEmailAddressUrl: '../verify-email-address',
     verifyPhoneNumberUrl: '../verify-phone-number',
     signUpProtectCheckUrl: '../protect-check',
+    enterpriseConnectionsUrl: '../enterprise-connections',
     unsafeMetadata: ctx.unsafeMetadata,
   };
 }
@@ -70,5 +73,6 @@ export function buildSignUpOAuthTransportCallbackParams(ctx: SignUpContextType):
     verifyEmailAddressUrl: 'verify-email-address',
     verifyPhoneNumberUrl: 'verify-phone-number',
     signUpProtectCheckUrl: 'protect-check',
+    enterpriseConnectionsUrl: 'enterprise-connections',
   };
 }

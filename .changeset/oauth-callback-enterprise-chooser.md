@@ -4,4 +4,4 @@
 '@clerk/ui': patch
 ---
 
-Route an OAuth callback to the enterprise connection chooser when the returned email matches more than one enterprise connection, instead of the sign-in start page or the sign-up continue page.
+Add an `enterpriseConnectionsUrl` option to `handleRedirectCallback()` and `<AuthenticateWithRedirectCallback />`. When the Clerk API asks an OAuth sign-up to choose between several enterprise connections for the same email domain, the callback navigates to this URL, which defaults to the `enterprise-connections` route of your sign-up page.

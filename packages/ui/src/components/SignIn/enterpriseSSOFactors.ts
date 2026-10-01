@@ -1,4 +1,7 @@
-import { hasMultipleEnterpriseConnections } from '@clerk/shared/internal/clerk-js/enterpriseSSOFactors';
+import {
+  getEnterpriseConnectionFactors,
+  hasMultipleEnterpriseConnections,
+} from '@clerk/shared/internal/clerk-js/enterpriseSSOFactors';
 import type { EmailCodeFactor, SignInResource } from '@clerk/shared/types';
 
 /**
@@ -52,6 +55,7 @@ function shouldHandOffUnidentifiedToEnterpriseConnection(signIn: SignInResource)
 }
 
 export {
+  getEnterpriseConnectionFactors,
   getSSOBypassFactor,
   hasMultipleEnterpriseConnections,
   hasOnlyEnterpriseSSOFirstFactors,
