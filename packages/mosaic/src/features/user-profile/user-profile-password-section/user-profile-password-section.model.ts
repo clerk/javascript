@@ -19,7 +19,7 @@ type UnavailablePasswordModel =
       status: 'readonly';
       mode: 'set' | 'change';
       reason: 'enterprise_account';
-      managedBy: { name?: string; iconUrl?: string };
+      managedBy: { name?: string };
     };
 
 export type UserProfilePasswordModel =
@@ -58,10 +58,7 @@ function getPasswordPolicy(
       status: 'readonly',
       mode: policy.mode,
       reason: 'enterprise_account',
-      managedBy: {
-        name: enterpriseAccount.enterpriseConnection?.name || undefined,
-        iconUrl: enterpriseAccount.enterpriseConnection?.logoPublicUrl ?? undefined,
-      },
+      managedBy: { name: enterpriseAccount.enterpriseConnection?.name || undefined },
     };
   }
 
