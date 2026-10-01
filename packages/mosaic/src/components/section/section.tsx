@@ -1,7 +1,9 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react';
+import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useSkeletonWave } from '../../hooks/useSkeletonWave';
 import { useTransition } from '../../primitives/hooks/use-transition';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
@@ -9,6 +11,7 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../../utils/feedback';
 import { feedbackHeight, feedbackStyles } from '../../utils/feedback.styles';
 import { reset } from '../../utils/reset.styles';
+import { skeletonStyles } from '../../utils/skeleton.styles';
 import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
@@ -16,18 +19,18 @@ import { sectionHeaderDescriptionMarker, sectionHeaderMarker, sectionNestedItemM
 import { styles } from './section.styles';
 
 export type SectionRootProps = Omit<MosaicComponentProps<'section'>, 'title'>;
-export type SectionGroupProps = MosaicComponentProps<'div'>;
+export type SectionGroupProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
 export type SectionHeaderProps = MosaicComponentProps<'div'>;
-export type SectionTitleProps = Omit<HeadingProps, 'size'>;
+export type SectionTitleProps = Omit<HeadingProps, 'size'> & { skeleton?: boolean };
 export type SectionBodyProps = MosaicComponentProps<'div'>;
 export type SectionRowProps = MosaicComponentProps<'div'>;
 export type SectionItemsProps = MosaicComponentProps<'ul'>;
 export type SectionItemProps = MosaicComponentProps<'div'> & { wrap?: boolean };
 export type SectionMediaSize = 'sm' | 'md' | 'lg' | 'xl';
-export type SectionMediaProps = MosaicComponentProps<'div'> & { size?: SectionMediaSize };
+export type SectionMediaProps = MosaicComponentProps<'div'> & { size?: SectionMediaSize; skeleton?: boolean };
 export type SectionContentProps = MosaicComponentProps<'div'>;
-export type SectionLabelProps = MosaicComponentProps<'div'>;
-export type SectionDescriptionProps = MosaicComponentProps<'div'>;
+export type SectionLabelProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
+export type SectionDescriptionProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
 export type SectionActionsProps = MosaicComponentProps<'div'>;
 export type SectionErrorProps = MosaicComponentProps<'p'>;
 
@@ -53,7 +56,7 @@ const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoo
 });
 
 const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function SectionGroup(
-  { render, xstyle, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
+  { skeleton = false, render, xstyle, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledBy, ...rest },
   ref,
 ) {
   const [titleId, setTitleId] = React.useState<string>();
@@ -62,12 +65,21 @@ const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function Secti
     defaultTagName: 'div',
     render,
     ref,
-    props: {
-      role: 'group',
-      ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group, xstyle), rest),
-      'aria-label': ariaLabel,
-      'aria-labelledby': ariaLabelledBy ?? (ariaLabel ? undefined : titleId),
-    },
+    props: skeleton
+      ? {
+          'aria-hidden': true,
+          ...mergeStyleProps(
+            themeProps('section-group', { skeleton }),
+            stylex.props(reset.base, styles.group, xstyle),
+            rest,
+          ),
+        }
+      : {
+          role: 'group',
+          ...mergeStyleProps(themeProps('section-group'), stylex.props(reset.base, styles.group, xstyle), rest),
+          'aria-label': ariaLabel,
+          'aria-labelledby': ariaLabelledBy ?? (ariaLabel ? undefined : titleId),
+        },
   });
 
   return <SectionGroupContext.Provider value={setTitleId}>{element}</SectionGroupContext.Provider>;
@@ -94,13 +106,15 @@ const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function Sec
 });
 
 const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function SectionTitle(
-  { id: idProp, xstyle, ...rest },
+  { id: idProp, skeleton = false, xstyle, ...rest },
   ref,
 ) {
   const setTitleId = React.useContext(SectionGroupContext);
   const generatedId = React.useId();
   const level = useHeadingLevel();
-  const id = idProp ?? (setTitleId ? `cl-section-${generatedId}-title` : undefined);
+  const wave = useSkeletonWave<HTMLHeadingElement>(skeleton);
+  const mergedRef = useMergeRefs([ref, wave]);
+  const id = skeleton ? undefined : (idProp ?? (setTitleId ? `cl-section-${generatedId}-title` : undefined));
 
   useSafeLayoutEffect(() => {
     if (!id || !setTitleId) {
@@ -113,12 +127,18 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
 
   return (
     <Heading
-      ref={ref}
+      ref={mergedRef}
       id={id}
       level={level}
       size='base'
-      xstyle={[styles.title, xstyle]}
-      {...mergeStyleProps(themeProps('section-title'), rest)}
+      xstyle={[
+        styles.title,
+        skeleton && skeletonStyles.bone,
+        skeleton && skeletonStyles.line,
+        skeleton && styles.titleSkeleton,
+        xstyle,
+      ]}
+      {...mergeStyleProps(themeProps('section-title', { skeleton }), rest)}
     />
   );
 });
@@ -183,16 +203,18 @@ const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function Section
 });
 
 const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function SectionMedia(
-  { size = 'md', render, xstyle, ...rest },
+  { size = 'md', skeleton = false, render, xstyle, ...rest },
   ref,
 ) {
+  const wave = useSkeletonWave<HTMLDivElement>(skeleton);
+
   return useRender({
     defaultTagName: 'div',
     render,
-    ref,
+    ref: [ref, wave],
     props: mergeStyleProps(
-      themeProps('section-media', { size }),
-      stylex.props(reset.base, styles.mediaBase, mediaSizes[size], xstyle),
+      themeProps('section-media', { size, skeleton }),
+      stylex.props(reset.base, styles.mediaBase, mediaSizes[size], skeleton && skeletonStyles.bone, xstyle),
       rest,
     ),
   });
@@ -217,34 +239,51 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
 });
 
 const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function SectionLabel(
-  { render, xstyle, ...rest },
+  { skeleton = false, render, xstyle, ...rest },
   ref,
 ) {
+  const wave = useSkeletonWave<HTMLDivElement>(skeleton);
+
   return useRender({
     defaultTagName: 'div',
     render,
-    ref,
-    props: mergeStyleProps(themeProps('section-label'), stylex.props(reset.base, styles.label, xstyle), rest),
+    ref: [ref, wave],
+    props: mergeStyleProps(
+      themeProps('section-label', { skeleton }),
+      stylex.props(
+        reset.base,
+        styles.label,
+        skeleton && skeletonStyles.bone,
+        skeleton && skeletonStyles.line,
+        skeleton && styles.labelSkeleton,
+        xstyle,
+      ),
+      rest,
+    ),
   });
 });
 
 const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(function SectionDescription(
-  { render, xstyle, ...rest },
+  { skeleton = false, render, xstyle, ...rest },
   ref,
 ) {
   const inHeader = React.useContext(SectionHeaderContext);
+  const wave = useSkeletonWave<HTMLDivElement>(skeleton);
 
   return useRender({
     defaultTagName: 'div',
     render,
-    ref,
+    ref: [ref, wave],
     props: mergeStyleProps(
-      themeProps('section-description'),
+      themeProps('section-description', { skeleton }),
       stylex.props(
         reset.base,
         styles.description,
         inHeader && styles.headerDescription,
         inHeader && sectionHeaderDescriptionMarker,
+        skeleton && skeletonStyles.bone,
+        skeleton && skeletonStyles.line,
+        skeleton && styles.descriptionSkeleton,
         xstyle,
       ),
       rest,

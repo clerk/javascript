@@ -46,6 +46,12 @@ and `xl` sizes.
 than `26rem`. `sectionCompactStyles.hidden` and `sectionCompactStyles.only` toggle inline content at
 the same width.
 
+`Section.Group`, `Section.Title`, `Section.Media`, `Section.Label`, and `Section.Description` take
+`skeleton` for a loading state. A skeleton part renders empty as a placeholder the size of the
+content it stands in for, and a skeleton group is hidden from assistive technology, so pair it with
+a visually hidden status message. Placeholders pulse in one wave that travels down the page, across
+every skeleton on it. When to show the skeleton, and for how long, is up to the caller.
+
 `Section.Title` renders at the level from the nearest `HeadingLevelProvider`, or `h2` outside one.
 On a page, put the sections in `Panel.Sections` so the card titles sit one level below the page
 title. See [Panel](/components/panel) and [Heading](/components/heading).
@@ -132,5 +138,12 @@ External CSS can move the card from `.cl-section-group` to `.cl-section-body`; t
 
 <Story
   name='Flat'
+  storyModule={SectionStories}
+/>
+
+### Loading
+
+<Story
+  name='Loading'
   storyModule={SectionStories}
 />

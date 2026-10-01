@@ -135,7 +135,6 @@ export const styles = stylex.create({
     flexDirection: 'column',
     flexGrow: 1,
     justifyContent: 'center',
-    rowGap: space['0.5'],
     minWidth: 0,
   },
   label: {
@@ -143,6 +142,15 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-medium'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
+  },
+  titleSkeleton: {
+    width: space['32'],
+  },
+  labelSkeleton: {
+    width: space['24'],
+  },
+  descriptionSkeleton: {
+    width: space['40'],
   },
   description: {
     color: colorVars['--cl-color-foreground-secondary'],

@@ -1,5 +1,6 @@
 export const userProfileActiveDevicesMessages = {
   title: 'Active devices',
+  loading: 'Loading active devices',
   emptyCurrent: 'No current device available',
   signOutAll: 'Sign out of all devices',
   signOutAllError: 'Something went wrong signing these devices out. Please try again.',

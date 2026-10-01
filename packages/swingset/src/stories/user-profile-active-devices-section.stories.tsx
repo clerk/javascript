@@ -1,4 +1,7 @@
-import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section.view';
+import {
+  UserProfileActiveDevicesSectionSkeleton,
+  UserProfileActiveDevicesSectionView,
+} from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -41,4 +44,8 @@ export function Impersonation() {
       onSignOutDevice={devices.onSignOutDevice}
     />
   );
+}
+
+export function Loading() {
+  return <UserProfileActiveDevicesSectionSkeleton />;
 }
