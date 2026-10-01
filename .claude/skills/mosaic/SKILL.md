@@ -77,8 +77,9 @@ test. Copy from it.
 | Running the parity audit that guards a migration                       | `references/parity-audit.md`                           |
 
 Before a migration or migration review, follow `references/local-mosaic-testing.md` to
-identify existing configurations and prepare any additional ones the user needs.
-The user runs the live checks.
+identify existing configurations and append any missing ones to Swingset's local
+environment file. Leave the active configuration intact. The user selects a
+configuration and runs the live checks.
 
 The migration workflow (`migration.md`) ties the flow references together: it
 treats the legacy component as the spec and drives you through the model,
