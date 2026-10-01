@@ -28,13 +28,13 @@ export function useUserProfileEnterpriseAccountsController({
 }: UserProfileEnterpriseAccountsControllerOptions): UserProfileEnterpriseAccountsController {
   const [pendingConnectionId, setPendingConnectionId] = useState<string>();
   const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
-  const inFlight = useRef<string | undefined>(undefined);
+  const connecting = useRef(false);
 
   const run = async (id: string) => {
-    if (inFlight.current) {
+    if (connecting.current) {
       return;
     }
-    inFlight.current = id;
+    connecting.current = true;
     setPendingConnectionId(id);
     setConnectErrors(({ [id]: _cleared, ...rest }) => rest);
 
@@ -44,10 +44,10 @@ export function useUserProfileEnterpriseAccountsController({
       }
     } catch (error) {
       setConnectErrors(current => ({ ...current, [id]: formatError(error) }));
+    } finally {
+      connecting.current = false;
+      setPendingConnectionId(undefined);
     }
-
-    inFlight.current = undefined;
-    setPendingConnectionId(undefined);
   };
 
   return {
