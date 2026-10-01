@@ -116,6 +116,20 @@ export function getRecovery(
     return null;
   }
 
+  return createRecovery(account, additionalScopes);
+}
+
+export function getRetry(
+  account: ExternalAccountResource,
+  scopes: AdditionalOAuthScopes | undefined,
+): ConnectedAccountRecovery | null {
+  if (!account.verification?.error) {
+    return null;
+  }
+  return createRecovery(account, findAdditionalScopes(account, scopes));
+}
+
+function createRecovery(account: ExternalAccountResource, additionalScopes: string[]): ConnectedAccountRecovery {
   const verificationStrategy = account.verification?.strategy;
   const strategy = (
     verificationStrategy === 'google_one_tap' ? 'oauth_google' : verificationStrategy || `oauth_${account.provider}`
@@ -159,14 +173,14 @@ export function projectConnectedAccounts({
     ...user.verifiedExternalAccounts,
     ...user.unverifiedExternalAccounts.filter(account => account.verification?.error),
   ];
-  const connectedStrategies = user.verifiedExternalAccounts.map(account => `oauth_${account.provider}`);
+  const shownStrategies = displayed.map(account => `oauth_${account.provider}`);
 
   return {
     status: 'ready',
     accounts: displayed.map(account => toAccountRow(account, social, additionalOAuthScopes)),
     availableProviders: allowCreation
       ? getEnabledOAuthStrategies(social)
-          .filter(strategy => !connectedStrategies.includes(strategy))
+          .filter(strategy => !shownStrategies.includes(strategy))
           .map(strategy => ({ id: strategy, ...getProviderDisplay(strategy.replace('oauth_', ''), social) }))
       : [],
   };
@@ -274,7 +288,7 @@ export function useUserProfileConnectedAccountsModel({
       if (!account) {
         throw new ConnectedAccountActionError('unavailable');
       }
-      const recovery = getRecovery(account, additionalOAuthScopes);
+      const recovery = getRecovery(account, additionalOAuthScopes) ?? getRetry(account, additionalOAuthScopes);
       if (!recovery) {
         return;
       }

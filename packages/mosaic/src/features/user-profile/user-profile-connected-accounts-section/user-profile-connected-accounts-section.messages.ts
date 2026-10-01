@@ -3,6 +3,7 @@ export const userProfileConnectedAccountsMessages = {
   connect: 'Connect',
   connectLabel: 'Connect {provider}',
   reconnect: 'Reconnect',
+  tryAgain: 'Try again',
   disconnected: 'Disconnected',
   manageLabel: 'Manage {provider}',
   remove: 'Remove',

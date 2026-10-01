@@ -31,8 +31,11 @@ export function UserProfileConnectedAccountRowView({
   const m = useMessages('userProfileConnectedAccounts');
   const iconUrl = account.iconUrl?.trim();
   const actions: ActionMenuAction[] = [];
-  if (account.status === 'reconnect' && onReconnect && !isDisabled) {
-    actions.push({ label: m.reconnect, onClick: () => onReconnect(account.id) });
+  if ((account.status === 'reconnect' || account.status === 'error') && onReconnect && !isDisabled) {
+    actions.push({
+      label: account.status === 'reconnect' ? m.reconnect : m.tryAgain,
+      onClick: () => onReconnect(account.id),
+    });
   }
   if (onRemove && account.canRemove !== false) {
     actions.push({ label: m.remove, color: 'negative', onClick: () => onRemove(account) });

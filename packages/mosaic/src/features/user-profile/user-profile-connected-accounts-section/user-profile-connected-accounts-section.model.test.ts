@@ -6,6 +6,7 @@ import {
   allowsIdentificationCreation,
   getEnabledOAuthStrategies,
   getRecovery,
+  getRetry,
   projectConnectedAccounts,
   useUserProfileConnectedAccountsModel,
 } from './user-profile-connected-accounts-section.model';
@@ -281,17 +282,17 @@ describe('projectConnectedAccounts', () => {
     ]);
   });
 
-  it('offers enabled providers without a verified account, keyed by strategy', () => {
+  it('offers enabled providers that have no account row, keyed by strategy', () => {
     const projection = projectConnectedAccounts({
       user: userWith([
         account({ id: 'idn_google', provider: 'google' }),
         account({ id: 'idn_github', provider: 'github', status: 'unverified', errorCode: 'oauth_access_denied' }),
+        account({ id: 'idn_acme', provider: 'custom_acme', status: 'unverified' }),
       ]),
       social: social('oauth_google', 'oauth_github', 'oauth_custom_acme'),
       allowCreation: true,
     });
     expect(projection.status === 'ready' && projection.availableProviders.map(p => p.id)).toEqual([
-      'oauth_github',
       'oauth_custom_acme',
     ]);
   });
@@ -433,5 +434,26 @@ describe('allowsIdentificationCreation', () => {
 
     const active = userWith([], [{ active: true, enterpriseConnection: { disableAdditionalIdentifications: true } }]);
     expect(allowsIdentificationCreation(active, { enabled: false } as EnterpriseSSOSettings)).toBe(true);
+  });
+});
+
+describe('getRetry', () => {
+  it('retries a failed connection with its strategy and missing scopes', () => {
+    expect(
+      getRetry(
+        account({
+          id: 'idn_1',
+          provider: 'google',
+          status: 'unverified',
+          errorCode: 'oauth_access_denied',
+          approvedScopes: '',
+        }),
+        { google: ['calendar'] },
+      ),
+    ).toEqual({ kind: 'create', strategy: 'oauth_google', additionalScopes: ['calendar'] });
+  });
+
+  it('does not retry an account without an error', () => {
+    expect(getRetry(account({ id: 'idn_1', provider: 'google' }), undefined)).toBeNull();
   });
 });

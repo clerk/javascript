@@ -132,6 +132,37 @@ describe('connected accounts', () => {
     expect(screen.getByText('Provider error')).toBeInTheDocument();
   });
 
+  it('retries a canceled connection from its row instead of offering Connect again', async () => {
+    const canceled = fapiExternalAccount({
+      id: 'idn_google',
+      provider: 'google',
+      verification: fapiVerification({
+        status: 'unverified',
+        strategy: 'oauth_google',
+        error: {
+          code: 'oauth_access_denied',
+          message: 'Access denied',
+          long_message: 'You did not grant access to your Google account',
+        },
+      }),
+    });
+    const { clerk } = await renderSection([canceled]);
+    const navigate = vi.spyOn(clerk, 'navigate').mockImplementation(() => Promise.resolve());
+    const request = holdRequests('post', '/v1/me/external_accounts');
+    const user = userEvent.setup();
+
+    expect(screen.getByText('You did not grant access to your Google account')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Connect Google' })).toBeNull();
+    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Try again' }));
+
+    await waitFor(() => expect(request.requests).toHaveLength(1));
+    const body = new URLSearchParams(await request.requests[0]?.text());
+    expect(body.get('strategy')).toBe('oauth_google');
+    request.release();
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
+  });
+
   it('sends requested scopes and the current URL to connect', async () => {
     serveFapi(signedIn([]));
     const { clerk } = await renderWithClerk(
