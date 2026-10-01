@@ -8,6 +8,15 @@ import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise
 
 const fallbackNavigate = vi.fn();
 
+const user = {
+  id: 'user_1',
+  enterpriseAccounts: [],
+  createExternalAccount: () =>
+    Promise.resolve({
+      verification: { externalVerificationRedirectURL: new URL('https://accounts.example/authorize') },
+    }),
+};
+
 vi.mock('@clerk/shared/internal/clerk-js/windowNavigate', () => ({
   windowNavigate: (url: URL | string) => fallbackNavigate(url),
 }));
@@ -18,19 +27,13 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useUser: () => ({
       isLoaded: true,
-      user: {
-        id: 'user_1',
-        enterpriseAccounts: [],
-        createExternalAccount: () =>
-          Promise.resolve({
-            verification: { externalVerificationRedirectURL: new URL('https://accounts.example/authorize') },
-          }),
-      },
+      user,
     }),
     __internal_useUserEnterpriseConnections: () => ({
       data: [{ id: 'okta', name: 'Acme Okta', allowOrganizationAccountLinking: true }],
     }),
     useClerk: () => ({
+      user,
       __internal_environment: { userSettings: { enterpriseSSO: { enabled: true } } },
       __internal_getOption: () => undefined,
     }),

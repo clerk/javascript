@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { useUserProfileEnterpriseAccountsController } from './user-profile-enterprise-accounts-section.controller';
@@ -18,6 +18,8 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
+const formatError = () => 'Something went wrong.';
+
 afterEach(() => vi.useRealTimers());
 
 describe('useUserProfileEnterpriseAccountsController', () => {
@@ -25,7 +27,7 @@ describe('useUserProfileEnterpriseAccountsController', () => {
     const operation = deferred<'redirecting'>();
     const onConnect = vi.fn(() => operation.promise);
     const { result } = renderHook(() =>
-      useUserProfileEnterpriseAccountsController({ status: 'ready', accounts: [], connections, onConnect }),
+      useUserProfileEnterpriseAccountsController({ accounts: [], connections, onConnect, formatError }),
     );
 
     act(() => {
@@ -47,7 +49,7 @@ describe('useUserProfileEnterpriseAccountsController', () => {
     vi.useFakeTimers();
     const onConnect = vi.fn().mockResolvedValue('redirecting');
     const { result } = renderHook(() =>
-      useUserProfileEnterpriseAccountsController({ status: 'ready', accounts: [], connections, onConnect }),
+      useUserProfileEnterpriseAccountsController({ accounts: [], connections, onConnect, formatError }),
     );
     await act(async () => {
       result.current.onConnect?.('okta');
@@ -55,9 +57,26 @@ describe('useUserProfileEnterpriseAccountsController', () => {
       await Promise.resolve();
     });
     expect(result.current.pendingConnectionId).toBe('okta');
-    act(() => {
-      vi.advanceTimersByTime(2000);
-    });
+    await act(() => vi.advanceTimersByTimeAsync(2000));
     expect(result.current.pendingConnectionId).toBeUndefined();
+  });
+
+  it('shows a formatted error on the failed connection and clears it on retry', async () => {
+    const onConnect = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('raw'))
+      .mockReturnValueOnce(new Promise(() => {}));
+    const format = vi.fn(() => 'Formatted error.');
+    const { result } = renderHook(() =>
+      useUserProfileEnterpriseAccountsController({ accounts: [], connections, onConnect, formatError: format }),
+    );
+
+    act(() => result.current.onConnect('okta'));
+    await waitFor(() => expect(result.current.connections[0].connectError).toBe('Formatted error.'));
+    expect(format).toHaveBeenCalledWith(expect.objectContaining({ message: 'raw' }));
+    expect(result.current.connections[1].connectError).toBeUndefined();
+
+    act(() => result.current.onConnect('okta'));
+    expect(result.current.connections[0].connectError).toBeUndefined();
   });
 });

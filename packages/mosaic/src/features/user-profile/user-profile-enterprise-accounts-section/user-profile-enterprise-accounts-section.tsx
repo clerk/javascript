@@ -1,26 +1,18 @@
 import type { ReactNode } from 'react';
 
+import { useMessages } from '../../../localization';
+import { enterpriseAccountErrorMessage } from './user-profile-enterprise-accounts-feedback';
 import { useUserProfileEnterpriseAccountsController } from './user-profile-enterprise-accounts-section.controller';
-import {
-  type UserProfileEnterpriseAccountsModel,
-  useUserProfileEnterpriseAccountsModel,
-} from './user-profile-enterprise-accounts-section.model';
+import type { UserProfileEnterpriseAccountsModel } from './user-profile-enterprise-accounts-section.model';
+import { useUserProfileEnterpriseAccountsModel } from './user-profile-enterprise-accounts-section.model';
 import { UserProfileEnterpriseAccountsSectionView } from './user-profile-enterprise-accounts-section.view';
 
-type Ready = Extract<UserProfileEnterpriseAccountsModel, { status: 'ready' }>;
-
-function ReadyEnterpriseAccountsSection({ model }: { model: Ready }) {
-  const controller = useUserProfileEnterpriseAccountsController(model);
-  return <UserProfileEnterpriseAccountsSectionView {...controller} />;
-}
-
-export function UserProfileEnterpriseAccountsSection({
-  fallback,
-  mode,
-}: {
+export type UserProfileEnterpriseAccountsSectionProps = {
   fallback?: ReactNode;
   mode?: 'modal' | 'mounted';
-}) {
+};
+
+export function UserProfileEnterpriseAccountsSection({ fallback, mode }: UserProfileEnterpriseAccountsSectionProps) {
   const model = useUserProfileEnterpriseAccountsModel({ mode });
   if (model.status === 'loading') {
     return fallback ?? null;
@@ -28,5 +20,22 @@ export function UserProfileEnterpriseAccountsSection({
   if (model.status === 'hidden') {
     return null;
   }
-  return <ReadyEnterpriseAccountsSection model={model} />;
+  return (
+    <EnterpriseAccounts
+      key={model.userId}
+      model={model}
+    />
+  );
+}
+
+function EnterpriseAccounts({ model }: { model: Extract<UserProfileEnterpriseAccountsModel, { status: 'ready' }> }) {
+  const m = useMessages('userProfileEnterpriseAccountsSection');
+  const controller = useUserProfileEnterpriseAccountsController({
+    accounts: model.accounts,
+    connections: model.connections,
+    onConnect: model.connect,
+    formatError: error => enterpriseAccountErrorMessage(error, m),
+  });
+
+  return <UserProfileEnterpriseAccountsSectionView {...controller} />;
 }

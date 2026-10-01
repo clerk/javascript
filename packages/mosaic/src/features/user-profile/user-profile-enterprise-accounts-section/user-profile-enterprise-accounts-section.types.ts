@@ -9,3 +9,12 @@ export interface UserProfileEnterpriseAccount extends UserProfileEnterpriseConne
   emailAddress?: string;
   requiresAction?: boolean;
 }
+
+export type EnterpriseAccountActionResult = 'redirecting' | void;
+
+export class EnterpriseAccountActionError extends Error {
+  constructor(readonly code: 'unavailable' | 'missing_verification_url') {
+    super(code);
+    this.name = 'EnterpriseAccountActionError';
+  }
+}

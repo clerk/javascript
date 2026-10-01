@@ -1,15 +1,15 @@
-import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
 import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { __internal_useUserEnterpriseConnections, useClerk, useUser } from '@clerk/shared/react';
 import type { EnterpriseAccountResource, EnterpriseConnectionResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
-import { useMessages } from '../../../localization';
 import type {
+  EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,
   UserProfileEnterpriseConnection,
 } from './user-profile-enterprise-accounts-section.types';
+import { EnterpriseAccountActionError } from './user-profile-enterprise-accounts-section.types';
 
 type Account = Pick<EnterpriseAccountResource, 'id' | 'emailAddress' | 'enterpriseConnectionId'> & {
   verification?: { error?: { longMessage?: string | null } | null } | null;
@@ -60,7 +60,20 @@ export function projectEnterpriseAccounts({
     : { status: 'hidden' };
 }
 
-export function useUserProfileEnterpriseAccountsModel({ mode }: { mode?: 'modal' | 'mounted' } = {}) {
+export type UserProfileEnterpriseAccountsModel =
+  | { status: 'loading' }
+  | { status: 'hidden'; reason: 'no_user' | 'unavailable' }
+  | {
+      status: 'ready';
+      userId: string;
+      accounts: UserProfileEnterpriseAccount[];
+      connections: UserProfileEnterpriseConnection[];
+      connect: (connectionId: string) => Promise<EnterpriseAccountActionResult>;
+    };
+
+export function useUserProfileEnterpriseAccountsModel({
+  mode,
+}: { mode?: 'modal' | 'mounted' } = {}): UserProfileEnterpriseAccountsModel {
   const clerk = useClerk();
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
@@ -68,13 +81,12 @@ export function useUserProfileEnterpriseAccountsModel({ mode }: { mode?: 'modal'
     withOrganizationAccountLinking: true,
     enabled: Boolean(isLoaded && user && environment?.userSettings.enterpriseSSO.enabled),
   });
-  const messages = useMessages('userProfileEnterpriseAccountsSection');
 
   if (!isLoaded || !environment) {
-    return { status: 'loading' } as const;
+    return { status: 'loading' };
   }
   if (!user) {
-    return { status: 'hidden' } as const;
+    return { status: 'hidden', reason: 'no_user' };
   }
 
   const projection = projectEnterpriseAccounts({
@@ -83,39 +95,41 @@ export function useUserProfileEnterpriseAccountsModel({ mode }: { mode?: 'modal'
     connections,
   });
   if (projection.status === 'hidden') {
-    return projection;
+    return { status: 'hidden', reason: 'unavailable' };
   }
 
-  // TODO: Add session reverification for enterprise account linking; surface API errors until then.
-  const connect = async (connectionId: string): Promise<'redirecting' | void> => {
-    if (!projection.connections.some(connection => connection.id === connectionId)) {
-      throw new Error(messages.errors.generic);
+  const userId = user.id;
+
+  const currentUser = () => {
+    const current = clerk.user;
+    if (!current || current.id !== userId) {
+      throw new EnterpriseAccountActionError('unavailable');
     }
-    const url = window.location.href;
-    const redirectUrl = mode === 'modal' ? appendModalState({ url, componentName: 'UserProfile' }) : url;
-    let account: Awaited<ReturnType<typeof user.createExternalAccount>>;
-    try {
-      account = await user.createExternalAccount({ enterpriseConnectionId: connectionId, redirectUrl });
-    } catch (error) {
-      if (isClerkAPIResponseError(error)) {
-        const first = error.errors[0];
-        throw new Error(first?.longMessage || first?.message || messages.errors.generic);
-      }
-      throw new Error(messages.errors.generic);
-    }
-    const redirect = account?.verification?.externalVerificationRedirectURL;
-    if (!redirect) {
-      throw new Error(messages.errors.missingRedirect);
-    }
-    if (typeof clerk.__internal_windowNavigate === 'function') {
-      clerk.__internal_windowNavigate(redirect);
-    } else {
-      windowNavigate(redirect);
-    }
-    return 'redirecting';
+    return current;
   };
 
-  return { ...projection, onConnect: connect };
+  return {
+    ...projection,
+    userId,
+    // TODO: Add session reverification for enterprise account linking; surface API errors until then.
+    connect: async connectionId => {
+      const current = currentUser();
+      if (!projection.connections.some(connection => connection.id === connectionId)) {
+        throw new EnterpriseAccountActionError('unavailable');
+      }
+      const url = window.location.href;
+      const redirectUrl = mode === 'modal' ? appendModalState({ url, componentName: 'UserProfile' }) : url;
+      const account = await current.createExternalAccount({ enterpriseConnectionId: connectionId, redirectUrl });
+      const redirect = account.verification?.externalVerificationRedirectURL;
+      if (!redirect) {
+        throw new EnterpriseAccountActionError('missing_verification_url');
+      }
+      if (typeof clerk.__internal_windowNavigate === 'function') {
+        clerk.__internal_windowNavigate(redirect);
+      } else {
+        windowNavigate(redirect);
+      }
+      return 'redirecting';
+    },
+  };
 }
-
-export type UserProfileEnterpriseAccountsModel = ReturnType<typeof useUserProfileEnterpriseAccountsModel>;
