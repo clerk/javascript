@@ -11,18 +11,11 @@ import { useBiometricCredentials as useBiometricCredentialsOnIos } from '../useB
 const mocks = vi.hoisted(() => ({
   useClerk: vi.fn(),
   loadExpoBiometrics: vi.fn(),
-  idle: vi.fn(),
-  pullFromNative: vi.fn(),
   platform: { OS: 'ios' },
 }));
 
 vi.mock('@clerk/react', () => ({ useClerk: mocks.useClerk }));
 vi.mock('../loadExpoBiometrics', () => ({ loadExpoBiometrics: mocks.loadExpoBiometrics }));
-vi.mock('../../provider/nativeClientSyncCoordinator', () => ({
-  waitForPendingJsToNativeSync: mocks.idle,
-  synchronizeNativeClientToJs: mocks.pullFromNative,
-}));
-vi.mock('../../utils/native-module', () => ({ ClerkExpoModule: null }));
 vi.mock('react-native', () => ({ Platform: mocks.platform }));
 
 const APP_IDENTIFIER = 'com.example.app';
@@ -752,8 +745,6 @@ describe('signIn', () => {
       setActive: clerk.instance.setActive,
     });
     expect(clerk.instance.setActive).not.toHaveBeenCalled();
-    expect(mocks.idle).not.toHaveBeenCalled();
-    expect(mocks.pullFromNative).not.toHaveBeenCalled();
   });
 
   test('uses the default prompt and the newest matching credential', async () => {
@@ -1033,8 +1024,6 @@ describe('reverify', () => {
     expect(clerk.session.getToken).toHaveBeenCalledWith({ skipCache: true });
     expect(result).toEqual({ id: 'sessver_1', status: 'complete', level: 'multi_factor', session: clerk.session });
     expect(clerk.session.prepareSecondFactorVerification).not.toHaveBeenCalled();
-    expect(mocks.idle).not.toHaveBeenCalled();
-    expect(mocks.pullFromNative).not.toHaveBeenCalled();
   });
 
   test('continues with the second factor when the first factor leaves one outstanding', async () => {
