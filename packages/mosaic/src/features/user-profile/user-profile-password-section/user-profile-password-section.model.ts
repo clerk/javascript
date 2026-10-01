@@ -47,6 +47,7 @@ function getPasswordPolicy(
     return { status: 'hidden', reason: 'password_disabled' };
   }
 
+  // TODO: When session reverification is supported, require the current password only when reverification is disabled.
   const policy: EditablePasswordPolicy = user.passwordEnabled
     ? { mode: 'change', requiresCurrentPassword: true }
     : { mode: 'set', requiresCurrentPassword: false };
