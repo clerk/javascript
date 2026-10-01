@@ -69,6 +69,18 @@ overrides:
 minimumReleaseAge: 2880
 minimumReleaseAgeExclude:
   - '@clerk/*'
+  - '@tanstack/react-router'
+  - '@tanstack/router-core'
+  - '@tanstack/router-generator'
+  - '@tanstack/router-plugin'
+  - '@tanstack/react-start'
+  - '@tanstack/react-start-client'
+  - '@tanstack/react-start-rsc'
+  - '@tanstack/react-start-server'
+  - '@tanstack/start-client-core'
+  - '@tanstack/start-plugin-core'
+  - '@tanstack/start-server-core'
+  - '@tanstack/start-storage-context'
   - 'pkglab'
   - 'pkglab-*'
 
