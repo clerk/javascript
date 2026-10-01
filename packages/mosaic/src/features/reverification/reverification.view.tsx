@@ -49,15 +49,30 @@ function methodLabel(method: ReverificationMethod, m: Messages): string {
 }
 
 // Lives here but is rendered by the wrapper parent
-export function ReverificationError({ reason }: { reason: ReverificationErrorReason }) {
+export function ReverificationError({ reason, onClose }: { reason: ReverificationErrorReason; onClose?: () => void }) {
   const m = useMessages('reverification');
   const copy = m.error[reason];
 
   return (
-    <Card.Header>
-      <Card.Title>{copy.title}</Card.Title>
-      <Card.Description>{copy.description}</Card.Description>
-    </Card.Header>
+    <>
+      <Card.Header>
+        <Card.Title>{copy.title}</Card.Title>
+        <Card.Description>{copy.description}</Card.Description>
+      </Card.Header>
+      {onClose ? (
+        <Card.Footer>
+          <Button
+            type='button'
+            variant='outline'
+            color='neutral'
+            fullWidth
+            onClick={onClose}
+          >
+            {m.error.closeButton}
+          </Button>
+        </Card.Footer>
+      ) : null}
+    </>
   );
 }
 

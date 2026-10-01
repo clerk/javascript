@@ -278,7 +278,10 @@ export function Pending(): JSX.Element {
 export function ErrorNoFactors(): JSX.Element {
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationError reason='noFactors' />
+      <ReverificationError
+        reason='noFactors'
+        onClose={() => undefined}
+      />
     </Card.Root>
   );
 }
@@ -286,7 +289,10 @@ export function ErrorNoFactors(): JSX.Element {
 export function ErrorGeneric(): JSX.Element {
   return (
     <Card.Root renderBranding={false}>
-      <ReverificationError reason='generic' />
+      <ReverificationError
+        reason='generic'
+        onClose={() => undefined}
+      />
     </Card.Root>
   );
 }

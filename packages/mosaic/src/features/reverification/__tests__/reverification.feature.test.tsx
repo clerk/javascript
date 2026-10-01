@@ -322,8 +322,8 @@ describe('Reverification', () => {
       expect(screen.getByText(GENERIC_ERROR_TITLE)).toBeVisible();
       expect(outcome()).toBe('');
 
-      // Dismissing it rejects the action as cancelled
-      await dismiss(user);
+      // Closing it rejects the action as cancelled
+      await user.click(screen.getByRole('button', { name: 'Close' }));
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
       await untilClosed();
       expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
@@ -341,7 +341,7 @@ describe('Reverification', () => {
       expect(screen.getByText(NO_FACTORS_TITLE)).toBeVisible();
       expect(outcome()).toBe('');
 
-      await dismiss(user);
+      await user.click(screen.getByRole('button', { name: 'Close' }));
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
       await untilClosed();
       expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();

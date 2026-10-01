@@ -30,7 +30,12 @@ export function Reverification(controller: ReverificationController) {
   if (controller.status === 'loading') {
     return <ReverificationPending />;
   } else if (controller.status === 'error') {
-    return <ReverificationError reason={controller.reason} />;
+    return (
+      <ReverificationError
+        reason={controller.reason}
+        onClose={controller.onCancel}
+      />
+    );
   }
 
   return <ReverificationView {...controller} />;

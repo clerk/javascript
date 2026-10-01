@@ -54,6 +54,7 @@ export const reverificationMessages = {
     title: 'Verification required',
   },
   error: {
+    closeButton: 'Close',
     generic: {
       description: 'Please try again.',
       title: 'Something went wrong',
