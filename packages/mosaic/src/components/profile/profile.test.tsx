@@ -266,7 +266,8 @@ describe('Profile', () => {
   });
 
   // Compact is measured, not styled: which box the tablist renders in is a DOM decision. The
-  // measurement is the root's sentinel — `1px` wide, `2px` once the compact query matches.
+  // measurement is the root's sentinel — `1px` wide, `2px` once the compact query matches, `3px`
+  // on a phone's viewport as well.
   describe('compact', () => {
     let observe: ((width: number) => void) | null = null;
     const original = globalThis.ResizeObserver;
@@ -279,6 +280,10 @@ describe('Profile', () => {
           this.callback = callback;
         }
         observe(target: Element) {
+          // The popover's positioning observes its anchor too; only the sentinel reports the layout.
+          if (!target.classList.contains('cl-profile-sentinel')) {
+            return;
+          }
           observe = width => {
             Object.defineProperty(target, 'offsetWidth', { configurable: true, value: width });
             Object.defineProperty(target, 'offsetHeight', { configurable: true, value: 600 });
@@ -299,7 +304,7 @@ describe('Profile', () => {
       const user = userEvent.setup();
       const onValueChange = vi.fn();
       renderSurface({ onValueChange });
-      act(() => observe?.(2));
+      act(() => observe?.(3));
 
       // Nothing in the column; the headline is the way in, and still a heading.
       expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
@@ -319,7 +324,43 @@ describe('Profile', () => {
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
 
-    it('hands focus to the headline of the page that is showing once the sheet closes', async () => {
+    it('moves the tablist into a popover under the page title off a phone', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      renderSurface({ onValueChange });
+      act(() => observe?.(2));
+
+      expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+      const headline = screen.getByRole('button', { name: 'Account' });
+      await user.click(headline);
+      const popover = screen.getByRole('dialog', { name: 'User profile' });
+      expect(popover).toHaveClass('cl-popover-positioner');
+      expect(popover).toContainElement(screen.getByRole('tablist'));
+      expect(document.querySelector('.cl-drawer-popup')).not.toBeInTheDocument();
+      expect(headline).toHaveAttribute('aria-expanded', 'true');
+
+      await user.click(screen.getByRole('tab', { name: 'Security' }));
+      expect(onValueChange).toHaveBeenCalledWith('security');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('closes the popover when the page title is pressed again', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(2));
+      const headline = screen.getByRole('button', { name: 'Account' });
+      await user.click(headline);
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      await user.click(headline);
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(headline).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it.each([
+      ['sheet', 3],
+      ['popover', 2],
+    ])('hands focus to the headline of the page that is showing once the %s closes', async (_, width) => {
       const user = userEvent.setup();
       function Controlled() {
         const [value, setValue] = React.useState('account');
@@ -349,7 +390,7 @@ describe('Profile', () => {
           <Controlled />
         </MosaicProvider>,
       );
-      act(() => observe?.(2));
+      act(() => observe?.(width));
 
       await user.click(screen.getByRole('button', { name: 'Account' }));
       await user.click(screen.getByRole('tab', { name: 'Security' }));
@@ -362,7 +403,7 @@ describe('Profile', () => {
     // panel is named by its own title.
     it('names the visible panel by its title while the tablist is away', () => {
       renderSurface();
-      act(() => observe?.(2));
+      act(() => observe?.(3));
       const panel = screen.getByRole('tabpanel');
       const title = screen.getByRole('heading', { level: 3, name: 'Account' });
       expect(panel).toHaveAttribute('aria-labelledby', title.id);
@@ -372,19 +413,30 @@ describe('Profile', () => {
     it('closes the sheet when the layout widens, and does not bring it back on narrowing', async () => {
       const user = userEvent.setup();
       renderSurface();
-      act(() => observe?.(2));
+      act(() => observe?.(3));
       await user.click(screen.getByRole('button', { name: 'Account' }));
       expect(screen.getByRole('dialog')).toBeInTheDocument();
 
       act(() => observe?.(1));
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-      act(() => observe?.(2));
+      act(() => observe?.(3));
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('closes the navigation when it moves between the sheet and the popover', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(2));
+      await user.click(screen.getByRole('button', { name: 'Account' }));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      act(() => observe?.(3));
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
 
     it('returns the tablist to the column when the width comes back', () => {
       renderSurface();
-      act(() => observe?.(2));
+      act(() => observe?.(3));
       expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
       act(() => observe?.(1));
       expect(screen.getByRole('navigation', { name: 'User profile' })).toContainElement(screen.getByRole('tablist'));

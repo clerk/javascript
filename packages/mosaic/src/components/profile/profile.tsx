@@ -15,19 +15,26 @@ import { Branding } from '../branding';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Drawer } from '../drawer';
 import { HeadingLevelProvider, useHeadingLevel } from '../heading';
+import { Popover } from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ProfileContextValue } from './profile.context';
 import { ContentPanelContext, ProfileContext } from './profile.context';
 import { contentScroll, contentViewportScroll, styles } from './profile.styles';
 
+type NavLayout = 'column' | 'popover' | 'sheet';
+
 /**
- * Whether the compact container query matches, read off the sentinel `Profile.Root` renders: `1px`
- * wide, `2px` once the query in `profile.styles.ts` matches. Measured because WHERE the navigation
- * renders is a DOM decision CSS cannot make — one tablist, in the column or in the sheet, never
- * both — and read this way so the breakpoint lives in CSS alone. Unmeasured is wide.
+ * Where the navigation renders, read off the sentinel `Profile.Root` renders: `1px` wide, `2px` once
+ * the compact query in `profile.styles.ts` matches, `3px` when the viewport is a phone's too.
+ * Measured because WHERE the navigation renders is a DOM decision CSS cannot make — one tablist, in
+ * the column, a popover or a sheet, never two — and read this way so the breakpoints live in CSS
+ * alone. Unmeasured is wide.
  */
-function isCompact(sentinelWidth: number): boolean {
-  return sentinelWidth >= 2;
+function navLayoutFor(sentinelWidth: number): NavLayout {
+  if (sentinelWidth >= 3) {
+    return 'sheet';
+  }
+  return sentinelWidth >= 2 ? 'popover' : 'column';
 }
 
 function useProfileContext(part: string): ProfileContextValue {
@@ -102,13 +109,14 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
   const [sentinel, setSentinel] = React.useState<HTMLSpanElement | null>(null);
-  const [compact, setCompact] = React.useState(false);
+  const [navLayout, setNavLayout] = React.useState<NavLayout>('column');
   useSafeLayoutEffect(() => {
     if (!sentinel) {
       return;
     }
-    return autoUpdate(sentinel, () => setCompact(isCompact(getDimensions(sentinel).width)));
+    return autoUpdate(sentinel, () => setNavLayout(navLayoutFor(getDimensions(sentinel).width)));
   }, [sentinel]);
+  const compact = navLayout !== 'column';
   const pageTitles = React.useRef(new Map<string, HTMLElement>());
   const registerPageTitle = React.useCallback((page: string, element: HTMLElement | null) => {
     if (element) {
@@ -118,21 +126,21 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     }
   }, []);
   const pageTitleFor = React.useCallback((page: string) => pageTitles.current.get(page) ?? null, []);
-  const [navOpen, setNavOpen] = React.useState(false);
-  const openNav = React.useCallback(() => setNavOpen(true), []);
-  const closeNav = React.useCallback(() => setNavOpen(false), []);
-  // Widening past the threshold unmounts the sheet; the state must go with it, or the sheet would
-  // be back the moment the layout narrowed again, unasked.
+  // Open in the layout it was opened in only, so the sheet or popover that replaces it never mounts open.
+  const [navOpenIn, setNavOpenIn] = React.useState<NavLayout | null>(null);
+  const navOpen = navOpenIn === navLayout;
+  const openNav = React.useCallback(() => setNavOpenIn(navLayout), [navLayout]);
+  const closeNav = React.useCallback(() => setNavOpenIn(null), []);
+  // Cleared too, or the navigation would be back, unasked, the moment the layout returned.
   React.useEffect(() => {
-    if (!compact) {
-      setNavOpen(false);
-    }
-  }, [compact]);
+    setNavOpenIn(null);
+  }, [navLayout]);
   const context = React.useMemo(
     () => ({
       titleId,
       renderBranding,
       compact,
+      navLayout,
       navOpen,
       openNav,
       closeNav,
@@ -141,7 +149,19 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       pageTitleFor,
       inline,
     }),
-    [titleId, renderBranding, compact, navOpen, openNav, closeNav, value, registerPageTitle, pageTitleFor, inline],
+    [
+      titleId,
+      renderBranding,
+      compact,
+      navLayout,
+      navOpen,
+      openNav,
+      closeNav,
+      value,
+      registerPageTitle,
+      pageTitleFor,
+      inline,
+    ],
   );
   const element = useRender({
     defaultTagName: 'div',
@@ -236,8 +256,8 @@ function NavBranding() {
  * `Profile.NavItem`s; they render inside the tablist, so nothing else belongs among them.
  *
  * Beside the content it is a column. Compact, it renders nothing in place: the tablist moves into
- * a sheet that a page's title opens (`Panel.Title`), and closes on a choice — the branding
- * stays behind, since a sheet is not the surface. One tablist, wherever it lives — two would be
+ * a popover under a page's title (`Panel.Title`) — a sheet on a phone — that the title opens and a
+ * choice closes. The branding stays behind, since neither is the surface. One tablist, wherever it lives — two would be
  * two sets of tabs for one set of pages.
  */
 const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
@@ -245,7 +265,7 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   ref,
 ) {
   const profile = useProfileContext('Profile.Nav');
-  const { titleId, renderBranding, compact, navOpen, closeNav, value, pageTitleFor, inline } = profile;
+  const { titleId, renderBranding, compact, navLayout, navOpen, closeNav, value, pageTitleFor, inline } = profile;
   // The headline that opened the sheet belongs to the page a choice just left, so the sheet's own
   // return-focus would land on nothing. The headline of the page now showing is the same control,
   // on the destination — resolved when focus is restored, by which time `value` is that page's.
@@ -278,18 +298,38 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   if (!compact) {
     return element;
   }
+  const onOpenChange = (open: boolean) => {
+    if (!open) {
+      closeNav();
+    }
+  };
+  if (navLayout === 'popover') {
+    return (
+      <Popover.Root
+        open={navOpen}
+        onOpenChange={onOpenChange}
+        placement='bottom-start'
+      >
+        <Popover.Popup
+          anchor={pageTitleFor(value)}
+          aria-labelledby={titleId}
+          finalFocus={finalFocus}
+          xstyle={styles.navPopover}
+        >
+          {element}
+        </Popover.Popup>
+      </Popover.Root>
+    );
+  }
   return (
     <Drawer.Root
       open={navOpen}
-      onOpenChange={open => {
-        if (!open) {
-          closeNav();
-        }
-      }}
+      onOpenChange={onOpenChange}
     >
       <Drawer.Popup
         aria-labelledby={titleId}
         finalFocus={finalFocus}
+        xstyle={styles.navSheet}
       >
         {element}
       </Drawer.Popup>

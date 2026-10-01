@@ -27,7 +27,7 @@ const Root = React.forwardRef<HTMLDivElement, PanelRootProps>(function PanelRoot
 /**
  * A page's headline. Inside a profile that has gone compact the headline IS the way to the other
  * pages: the heading holds a button — the title, and a caret beside it — that opens the navigation
- * sheet. Anywhere else — the wide layout, or a page rendered on its own — it is the heading alone.
+ * popover, or sheet on a phone. Anywhere else — the wide layout, or a page rendered on its own — it is the heading alone.
  *
  * The caret sits `vertical-align: middle`, which CSS defines as the box's midpoint on the parent's
  * baseline plus half its x-height: optically centered on the lowercase letters rather than on the
@@ -69,7 +69,7 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
               type='button'
               aria-haspopup='dialog'
               aria-expanded={profile.navOpen}
-              onClick={profile.openNav}
+              onClick={profile.navOpen ? profile.closeNav : profile.openNav}
               {...mergeStyleProps(
                 themeProps('profile-nav-trigger'),
                 stylex.props(reset.base, styles.navTrigger, focusOutline.visible),
@@ -78,7 +78,7 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
               {children}
               <Icon
                 name='chevron-down'
-                size='inherit'
+                size='sm'
                 {...mergeStyleProps(themeProps('profile-nav-trigger-caret'), stylex.props(styles.caret))}
               />
             </button>

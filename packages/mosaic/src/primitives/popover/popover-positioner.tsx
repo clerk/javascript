@@ -3,17 +3,23 @@
 import { FloatingFocusManager } from '@floating-ui/react';
 import React from 'react';
 
+import { type FocusTarget, useFinalFocus } from '../hooks/use-focus-target';
 import { type ComponentProps, type DefaultProps, isKeyboardOpen, mergeProps, useRender } from '../utils';
 import { usePopoverContext } from './popover-context';
 
 export interface PopoverPositionerProps extends ComponentProps<'div'> {
-  /** Positions against this element instead of the trigger. */
+  /**
+   * Positions against this element instead of the trigger. With no `Popover.Trigger`, it stands in
+   * for one: a press on it is not an outside press, and focus returns to it on close.
+   */
   anchor?: HTMLElement | null;
+  /** Where focus returns when the popup closes. Default: the trigger. */
+  finalFocus?: FocusTarget;
 }
 
 export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositionerProps>(
   function PopoverPositioner(props, ref) {
-    const { anchor, render, ...otherProps } = props;
+    const { anchor, finalFocus, render, ...otherProps } = props;
     const {
       mounted,
       floatingContext,
@@ -34,9 +40,15 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       if (!anchor) {
         return;
       }
+      if (!refs.domReference.current) {
+        refs.setReference(anchor);
+        return () => refs.setReference(null);
+      }
       refs.setPositionReference(anchor);
       return () => refs.setPositionReference(refs.domReference.current);
     }, [anchor, refs]);
+
+    const resolvedReturnFocus = useFinalFocus(finalFocus, returnFocusRef, floatingContext);
 
     const side = placement.split('-')[0];
 
@@ -70,7 +82,7 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
         context={floatingContext}
         modal={modal}
         initialFocus={initialFocus === 'first' || isKeyboardOpen(floatingContext) ? 0 : refs.floating}
-        returnFocus={returnFocusRef}
+        returnFocus={resolvedReturnFocus}
       >
         {element}
       </FloatingFocusManager>

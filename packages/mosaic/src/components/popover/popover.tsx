@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
-import type { PopoverProps as HeadlessPopoverProps } from '../../primitives/popover';
+import type { PopoverFocusTarget, PopoverProps as HeadlessPopoverProps } from '../../primitives/popover';
 import { Popover as Primitive } from '../../primitives/popover';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -107,8 +107,13 @@ function Positioner({ children, ...rest }: React.ComponentPropsWithoutRef<typeof
 }
 
 export interface PopoverPopupProps extends MosaicComponentProps<'div'> {
-  /** Positions against this element instead of the trigger. */
+  /**
+   * Positions against this element instead of the trigger. With no `Popover.Trigger`, it stands in
+   * for one: a press on it is not an outside press, and focus returns to it on close.
+   */
   anchor?: HTMLElement | null;
+  /** Where focus returns when the popup closes. Default: the trigger. */
+  finalFocus?: PopoverFocusTarget;
   /** Width of the floating box. */
   size?: PopoverSize;
   /**
@@ -125,7 +130,7 @@ export interface PopoverPopupProps extends MosaicComponentProps<'div'> {
  * `Popover.Trigger`; supply the surface inside it, usually a `Card`.
  */
 const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function PopoverPopup(
-  { anchor, xstyle, size = 'md', 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, ...rest },
+  { anchor, finalFocus, xstyle, size = 'md', 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, ...rest },
   ref,
 ) {
   return (
@@ -139,6 +144,7 @@ const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function Popov
       */}
       <Positioner
         anchor={anchor}
+        finalFocus={finalFocus}
         {...(ariaLabel == null ? {} : { 'aria-label': ariaLabel })}
         {...(ariaLabelledby == null ? {} : { 'aria-labelledby': ariaLabelledby })}
       >

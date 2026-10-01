@@ -29,14 +29,13 @@ export const styles = stylex.create({
   },
   /**
    * Beside the title, `vertical-align: middle`: the caret's midpoint on the baseline plus half the
-   * x-height, which centers it on the lowercase letters rather than the line box. Sized in `em`
-   * through the icon's `inherit` size, so it scales with the heading; coloured through the icon's
-   * own variable rather than `color`, which the icon sets itself.
+   * x-height, which centers it on the lowercase letters rather than the line box. The `sm` size every
+   * other caret takes; colored through the icon's own variable rather than `color`, which the icon
+   * sets itself.
    */
   caret: {
     '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
-    fontSize: '0.6em',
-    marginInlineStart: '0.25em',
+    marginInlineStart: space['1'],
     verticalAlign: 'middle',
   },
   sections: {

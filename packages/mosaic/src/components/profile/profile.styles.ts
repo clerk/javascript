@@ -27,6 +27,8 @@ import { scrollAreaRoot, scrollAreaViewport } from '../scroll-area';
  * at-rule prelude as a placeholder that swingset's bundler does not always resolve.
  */
 const compact = '@container (width < 48rem)';
+/** A phone's viewport, where a compact navigation takes a sheet rather than a popover. */
+const phone = '@media (width < 40rem)';
 
 /** How far the content's clip edge — and the scrollbar with it — sits inside the frame's corners. */
 const SCROLL_INSET = space['1.5'];
@@ -61,13 +63,16 @@ export const styles = stylex.create({
 
   /**
    * The compact query's answer, for `Profile.Root` to read: `1px` wide, `2px` once the query
-   * matches. Inside the root because an element is never its own query container; out of flow,
+   * matches, `3px` on a phone's viewport as well. Inside the root because an element is never its own query container; out of flow,
    * unpainted and untouchable, so it costs the layout nothing.
    */
   sentinel: {
     blockSize: '1px',
     inlineSize: {
-      [compact]: '2px',
+      [compact]: {
+        default: '2px',
+        [phone]: '3px',
+      },
       default: '1px',
     },
     pointerEvents: 'none',
@@ -191,6 +196,24 @@ export const styles = stylex.create({
   navFlush: {
     padding: 0,
     borderInlineEndWidth: '0px',
+  },
+
+  /** The compact navigation off a phone: a menu's surface under the page title, sized to the items. */
+  navPopover: {
+    padding: space['1'],
+    borderRadius: radiusVars['--cl-radius-lg'],
+    backgroundColor: colorVars['--cl-color-background'],
+    boxShadow: shadowVars['--cl-shadow-md'],
+    color: colorVars['--cl-color-foreground'],
+    maxHeight: 'var(--cl-available-height)',
+    minWidth: '12.5rem',
+    overflowY: 'auto',
+    width: 'max-content',
+  },
+
+  /** The phone's sheet holds a short list: as tall as the list, not a fixed share of the screen. */
+  navSheet: {
+    minBlockSize: 0,
   },
 
   navList: {

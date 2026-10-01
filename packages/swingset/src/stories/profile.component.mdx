@@ -58,7 +58,7 @@ height and the pages scrolling inside; `flush` is the page's own content — no 
 scrolls, the columns a gap apart, held to a reading width and centered. A
 `NavItem` and a `Page` pair by `value`. `icon` and `badge` take nodes, so a page can supply its own
 leading mark and trailing status. A `Badge` passed to `badge` is `neutral` unless it sets its own `color`. `Title` is a visually hidden heading: it names the navigation, the compact
-sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
+popover or sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 
 ## Parts
 
@@ -92,12 +92,11 @@ renders. `Panel.Sections` puts section titles one level below the page title. Se
 
 Below `48rem` of the profile's **own** width — or, over the page, the dialog's viewport's, so the
 profile collapses exactly when the dialog fills the screen — the frame goes: the profile is the page
-there, flush with whatever holds it, and the navigation leaves the column for a sheet: `Panel.Title`
-grows a caret that opens a `Drawer` holding the tablist, and a choice closes it. Where the tablist
-renders is a DOM decision — one tablist, in the column or in the sheet, never both — so the root
-reads the query's answer off a sentinel it renders, `1px` wide and `2px` once the query matches,
-rather than measuring itself: the breakpoint lives in CSS alone. The same surface collapses in a
-narrow layout slot, an inline dialog, or a phone alike.
+there, flush with whatever holds it, and the navigation leaves the column: `Panel.Title` grows a
+caret that opens the tablist, and a choice closes it. On a viewport of `40rem` or more the tablist
+opens in a `Popover` under the title; on a phone, in a `Drawer` as tall as its content. The root
+reads the layout off a sentinel it renders: `1px` wide, `2px` once the query matches, `3px` on a
+phone's viewport as well.
 
 ## Customising the marks
 
