@@ -18,6 +18,10 @@ describe('getAvailableUserProfilePages', () => {
       'billing',
     ]);
   });
+
+  it.each([null, false])('drops api keys given %s content', apiKeys => {
+    expect(getAvailableUserProfilePages({ account: {}, apiKeys } as UserProfilePages)).toEqual(['account']);
+  });
 });
 
 describe('resolveUserProfilePages', () => {

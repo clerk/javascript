@@ -1,0 +1,4 @@
+{
+  "main": "../dist/biometrics/index.js",
+  "types": "../dist/biometrics/index.d.ts"
+}

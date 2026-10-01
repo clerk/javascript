@@ -19,7 +19,10 @@ export type UserProfileNavEntry =
 
 /** The built-in pages this instance was given content for. `account` is always among them. */
 export function getAvailableUserProfilePages(pages: UserProfilePages): UserProfilePageId[] {
-  return USER_PROFILE_PAGE_IDS.filter(id => pages[id] !== undefined);
+  return USER_PROFILE_PAGE_IDS.filter(id => {
+    const content = pages[id];
+    return content !== undefined && content !== null && content !== false;
+  });
 }
 
 /**
