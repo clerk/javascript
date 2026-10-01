@@ -12,7 +12,7 @@ import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
 import { ProtectCheckCard } from '../ProtectCheck/ProtectCheckCard';
-import { buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
+import { buildSignInProtectCheckResumeParams } from './buildOAuthCallbackParams';
 import {
   isProtectCheckRequiredError,
   isSignInPendingOAuthTransfer,
@@ -102,7 +102,7 @@ function SignInProtectCheckInternal(): JSX.Element | null {
           typeof __internal_resumeAfterProtectCheck === 'function'
             ? __internal_resumeAfterProtectCheck(
                 {
-                  ...buildSignInOAuthCallbackParams(ctx),
+                  ...buildSignInProtectCheckResumeParams(ctx),
                   continuation: 'transfer_to_sign_up',
                   __internal_navigateOnSetActive: ctx.navigateOnSetActive,
                 },

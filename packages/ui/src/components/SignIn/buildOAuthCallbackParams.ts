@@ -23,6 +23,20 @@ export function buildSignInOAuthCallbackParams(ctx: SignInContextType): HandleOA
   };
 }
 
+export function buildSignInProtectCheckResumeParams(ctx: SignInContextType): HandleOAuthCallbackParams {
+  const params = buildSignInOAuthCallbackParams(ctx);
+  if (!ctx.isCombinedFlow) {
+    return params;
+  }
+  return {
+    ...params,
+    continueSignUpUrl: '../create/continue',
+    verifyEmailAddressUrl: '../create/verify-email-address',
+    verifyPhoneNumberUrl: '../create/verify-phone-number',
+    signUpProtectCheckUrl: '../create/protect-check',
+  };
+}
+
 export function buildSignInOAuthTransportCallbackParams(ctx: SignInContextType): HandleOAuthCallbackParams {
   // Path form, not `#/step`: the in-place component router matches on pathname only and would drop the hash.
   const signUpStepUrl = (step: string): string => {

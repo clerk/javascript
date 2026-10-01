@@ -4,6 +4,7 @@ import {
   buildCombinedFlowOAuthCallbackParams,
   buildSignInOAuthCallbackParams,
   buildSignInOAuthTransportCallbackParams,
+  buildSignInProtectCheckResumeParams,
   buildSignUpOAuthCallbackParams,
   buildSignUpOAuthTransportCallbackParams,
 } from '../buildOAuthCallbackParams';
@@ -40,6 +41,38 @@ describe('buildSignInOAuthCallbackParams', () => {
   it('does not include navigateOnSetActive', () => {
     const ctx = { navigateOnSetActive: () => Promise.resolve() } as any;
     expect('navigateOnSetActive' in buildSignInOAuthCallbackParams(ctx)).toBe(false);
+  });
+});
+
+describe('buildSignInProtectCheckResumeParams', () => {
+  it('keeps the sign-in callback params outside the combined flow', () => {
+    const ctx = {
+      signUpUrl: '/sign-up',
+      signInUrl: '/sign-in',
+      signUpContinueUrl: '/sign-up#/continue',
+      signUpProtectCheckUrl: '/sign-up#/protect-check',
+      isCombinedFlow: false,
+    } as any;
+
+    expect(buildSignInProtectCheckResumeParams(ctx)).toEqual(buildSignInOAuthCallbackParams(ctx));
+  });
+
+  it('routes a combined-flow transfer to the embedded create routes', () => {
+    const ctx = {
+      signUpUrl: '/sign-in#/create',
+      signInUrl: '/sign-in',
+      signUpContinueUrl: '/sign-in#/create/continue',
+      signUpProtectCheckUrl: '/sign-in#/create/protect-check',
+      isCombinedFlow: true,
+    } as any;
+
+    expect(buildSignInProtectCheckResumeParams(ctx)).toEqual({
+      ...buildSignInOAuthCallbackParams(ctx),
+      continueSignUpUrl: '../create/continue',
+      verifyEmailAddressUrl: '../create/verify-email-address',
+      verifyPhoneNumberUrl: '../create/verify-phone-number',
+      signUpProtectCheckUrl: '../create/protect-check',
+    });
   });
 });
 

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { PathRouter, Route, useRouter } from '../../../router';
+import { HashRouter, PathRouter, Route, useRouter } from '../../../router';
 import { buildCombinedFlowOAuthCallbackParams } from '../buildOAuthCallbackParams';
 
 const mockNavigate = vi.fn();
@@ -27,6 +27,14 @@ const params = buildCombinedFlowOAuthCallbackParams({
   signInUrl: '/sign-in',
 } as any);
 
+const destinations = [
+  ['signInProtectCheckUrl', params.signInProtectCheckUrl!, 'protect-check'],
+  ['firstFactorUrl', params.firstFactorUrl!, 'factor-one'],
+  ['secondFactorUrl', params.secondFactorUrl!, 'factor-two'],
+  ['resetPasswordUrl', params.resetPasswordUrl!, 'reset-password'],
+  ['continueSignUpUrl', params.continueSignUpUrl!, 'create/continue'],
+] as const;
+
 const NavigateButton = ({ to }: { to: string }) => {
   const router = useRouter();
   return (
@@ -39,39 +47,59 @@ const NavigateButton = ({ to }: { to: string }) => {
   );
 };
 
-const CombinedFlowSSOCallback = () => (
-  <PathRouter basePath='/sign-in'>
-    <Route path='create'>
-      <Route path='sso-callback'>
-        <NavigateButton to={params.signInProtectCheckUrl!} />
-        <NavigateButton to={params.firstFactorUrl!} />
-        <NavigateButton to={params.secondFactorUrl!} />
-        <NavigateButton to={params.resetPasswordUrl!} />
-        <NavigateButton to={params.continueSignUpUrl!} />
-      </Route>
+const CallbackRoute = () => (
+  <Route path='create'>
+    <Route path='sso-callback'>
+      {destinations.map(([name, to]) => (
+        <NavigateButton
+          key={name}
+          to={to}
+        />
+      ))}
     </Route>
-  </PathRouter>
+  </Route>
 );
 
 describe('combined-flow create/sso-callback route', () => {
   beforeEach(() => {
     mockNavigate.mockReset();
-    window.history.replaceState({}, '', '/sign-in/create/sso-callback');
   });
 
-  it.each([
-    [params.signInProtectCheckUrl!, '/sign-in/protect-check'],
-    [params.firstFactorUrl!, '/sign-in/factor-one'],
-    [params.secondFactorUrl!, '/sign-in/factor-two'],
-    [params.resetPasswordUrl!, '/sign-in/reset-password'],
-    [params.continueSignUpUrl!, '/sign-in/create/continue'],
-  ])('resolves %s to %s', async (to, expected) => {
-    render(<CombinedFlowSSOCallback />);
+  describe.each([
+    ['mounted at the root', '/sign-in', '/sign-in/create/sso-callback'],
+    ['mounted at a nested path', '/auth/sign-in', '/auth/sign-in/create/sso-callback'],
+    ['reached with a trailing slash', '/sign-in', '/sign-in/create/sso-callback/'],
+  ])('with path routing %s', (_, basePath, callbackPath) => {
+    it.each(destinations)('resolves %s to the %s step', async (_name, to, step) => {
+      window.history.replaceState({}, '', callbackPath);
+      render(
+        <PathRouter basePath={basePath}>
+          <CallbackRoute />
+        </PathRouter>,
+      );
 
-    await userEvent.click(screen.getByRole('button', { name: to }));
+      await userEvent.click(screen.getByRole('button', { name: to }));
 
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith(expected);
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith(`${basePath}/${step}`);
+      });
+    });
+  });
+
+  describe('with hash routing', () => {
+    it.each(destinations)('resolves %s to the %s step', async (_name, to, step) => {
+      window.history.replaceState({}, '', '/#/create/sso-callback');
+      render(
+        <HashRouter>
+          <CallbackRoute />
+        </HashRouter>,
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: to }));
+
+      await waitFor(() => {
+        expect(window.location.hash).toBe(`#/${step}`);
+      });
     });
   });
 });
