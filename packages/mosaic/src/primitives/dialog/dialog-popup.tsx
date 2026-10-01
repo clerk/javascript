@@ -21,15 +21,17 @@ export interface DialogPopupProps extends ComponentProps<'div'> {
 
 // iOS raises the keyboard only for focus taken inside the opening tap; the focus manager's lands a frame late.
 function GestureFocus({ target }: { target: number | React.MutableRefObject<HTMLElement | null> }) {
+  const openingTarget = React.useRef(target);
   React.useLayoutEffect(() => {
-    if (typeof target === 'number') {
+    const initial = openingTarget.current;
+    if (typeof initial === 'number') {
       return;
     }
-    const element = target.current;
+    const element = initial.current;
     if (element && isInput(element) && element !== element.ownerDocument.activeElement) {
       element.focus({ preventScroll: true });
     }
-  }, [target]);
+  }, []);
   return null;
 }
 
