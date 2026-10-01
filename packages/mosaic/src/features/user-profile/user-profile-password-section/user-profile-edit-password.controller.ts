@@ -1,3 +1,4 @@
+import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
 import { useEffect, useRef, useState } from 'react';
 
 import type { UseFormResult } from '../../../components/form';
@@ -79,18 +80,21 @@ export function useUserProfileEditPasswordController({
     }
 
     let active = true;
-    void Promise.resolve()
-      .then(() => validatePassword(password))
-      .then(
-        feedback => {
-          if (active) {
-            setPasswordFeedback(feedback);
-          }
-        },
-        () => {},
-      );
+    const timeout = setTimeout(() => {
+      void Promise.resolve()
+        .then(() => validatePassword(password))
+        .then(
+          feedback => {
+            if (active) {
+              setPasswordFeedback(feedback);
+            }
+          },
+          () => {},
+        );
+    }, DEBOUNCE_MS);
     return () => {
       active = false;
+      clearTimeout(timeout);
     };
   }, [isOpen, password, passwordLeft, validatePassword]);
 
