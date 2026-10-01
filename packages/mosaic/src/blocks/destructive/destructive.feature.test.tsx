@@ -70,10 +70,16 @@ function Host({
   );
 }
 
+async function typeConfirmation(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByRole('button', { name: 'Open' }));
+  const dialog = await screen.findByRole('dialog');
+  await waitFor(() => expect(dialog).toContainElement(document.activeElement as HTMLElement));
+  await user.type(screen.getByRole('textbox'), 'Delete');
+}
+
 async function openVerification() {
   const user = userEvent.setup();
-  await user.click(screen.getByRole('button', { name: 'Open' }));
-  await user.type(await screen.findByRole('textbox'), 'Delete');
+  await typeConfirmation(user);
   await user.click(screen.getByRole('button', { name: 'Delete account' }));
   return { user };
 }
@@ -148,7 +154,7 @@ describe('Destructive with reverification', () => {
       );
       const { user } = await openVerification();
 
-      expect(await screen.findByLabelText('Password', undefined, { timeout: 3000 })).toBeVisible();
+      expect(await screen.findByLabelText('Password')).toBeVisible();
       await untilConfirmStepIsGone();
       const stopWatching = watchForConfirmStep();
       await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
@@ -171,7 +177,7 @@ describe('Destructive with reverification', () => {
       );
       const { user } = await openVerification();
 
-      const field = await screen.findByLabelText('Password', undefined, { timeout: 3000 });
+      const field = await screen.findByLabelText('Password');
       await untilConfirmStepIsGone();
       const stopWatching = watchForConfirmStep();
       await user.type(field, 'hunter2{Enter}');
@@ -196,12 +202,11 @@ describe('Destructive with reverification', () => {
       />,
     );
     const { user } = await openVerification();
-    expect(await screen.findByLabelText('Password', undefined, { timeout: 3000 })).toBeVisible();
+    expect(await screen.findByLabelText('Password')).toBeVisible();
     await user.click(screen.getAllByRole('button', { name: 'Close' })[0]);
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
 
-    await user.click(screen.getByRole('button', { name: 'Open' }));
-    await user.type(await screen.findByRole('textbox'), 'Delete');
+    await typeConfirmation(user);
     const stopWatching = watchForConfirmStep();
     await user.click(screen.getByRole('button', { name: 'Delete account' }));
     await new Promise(resolve => setTimeout(resolve, 150));
