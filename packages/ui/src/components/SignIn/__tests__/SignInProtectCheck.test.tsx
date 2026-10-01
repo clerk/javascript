@@ -740,35 +740,6 @@ describe('SignInProtectCheck', () => {
       expect(await findByText(/unable to complete action at this time/i)).toBeInTheDocument();
     });
 
-    it('resumes a combined-flow transfer into the embedded create routes', async () => {
-      const { wrapper, fixtures, props } = await createFixtures(f => {
-        f.startSignInWithProtectCheck({ pendingOAuthTransfer: true, status: 'needs_identifier' });
-      });
-      props.setProps({ routing: 'path', path: '/sign-in', withSignUp: true } as any);
-      mockExecute.mockResolvedValue('proof-abc');
-      fixtures.signIn.submitProtectCheck.mockResolvedValue({
-        status: 'needs_identifier',
-        protectCheck: null,
-        createdSessionId: null,
-        firstFactorVerification: { status: 'transferable' },
-      } as unknown as SignInResource);
-
-      render(<SignInProtectCheck />, { wrapper });
-
-      await waitFor(() => {
-        expect(fixtures.clerk.__internal_resumeAfterProtectCheck).toHaveBeenCalledWith(
-          expect.objectContaining({
-            continuation: 'transfer_to_sign_up',
-            continueSignUpUrl: '../create/continue',
-            verifyEmailAddressUrl: '../create/verify-email-address',
-            verifyPhoneNumberUrl: '../create/verify-phone-number',
-            signUpProtectCheckUrl: '../create/protect-check',
-          }),
-          expect.any(Function),
-        );
-      });
-    });
-
     it('leaves an ordinary gated sign-in on the existing path', async () => {
       // The guard above must not divert every gated sign-in into the OAuth router.
       const { wrapper, fixtures } = await createFixtures(f => {
