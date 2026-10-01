@@ -5,10 +5,7 @@ import { expect, test } from '@playwright/test';
 
 import { appConfigs } from '../../presets';
 import { createTestUtils, testAgainstRunningApps } from '../../testUtils';
-
-// Self-signed certificate for the fake SAML IdP (required to activate enterprise connections)
-const FAKE_IDP_CERTIFICATE =
-  'MIIDNzCCAh+gAwIBAgIUEWQRRTEkpHDPMS2f0JS+4L8yD2YwDQYJKoZIhvcNAQELBQAwKzEpMCcGA1UEAwwgZmFrZS1pZHAuZTJlLWVudGVycHJpc2UtdGVzdC5kZXYwHhcNMjYwMzE2MjIwNzMyWhcNMjcwMzE2MjIwNzMyWjArMSkwJwYDVQQDDCBmYWtlLWlkcC5lMmUtZW50ZXJwcmlzZS10ZXN0LmRldjCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBANIQpOAr5IaiOfx31RRcvQkejoMHldBbxF1hi9boiqqjhlZ+xvuWabmho5JDX5nIJkg31eOkfpFl1TBbMc6IvjvGLgFYinNlPZDArH3/WEw2hRD5f+FhHEBfaqSF+Ol/K4GtZ55lKtyMWI1Xv4avvGhRGbx1kKnMQAXayulmet49azGziJ7B7QwteZOuf6c1XxcQ/VFnIiIYQtN9cngA62pbv/InoZx762504HrlGtmDYxsoCmmDkTw/TXGi2p1X5OHETZV5UXI63mHLFlHdBXqvZDON5mt78p1iTAC1Bnnyd5b8CI6GVEzaMjXnMecKEV67w3HPdO9OcBCuFTqy7dcCAwEAAaNTMFEwHQYDVR0OBBYEFNJxwtOoHamUx+PKBexfDbAaazyVMB8GA1UdIwQYMBaAFNJxwtOoHamUx+PKBexfDbAaazyVMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAG4PLtYjntt/cl3QitAAZBdygmp5sBkxvrS1lWVBBpgH/++hUZ9YEk8AeVi8bnpBKYUXMRTJvqzDoM+xxZEpmNtxm5rb5jp5Pz2mFmmORlD5nOGGB+xZI7BxLfqwjXdfb9zsB3b6nBdFkJKK85KpynNlsx1CfaEVyovTBxzELfW51o666DMCje07rdngckhQLwJ+Rxk3f2AGfjown/TSa/v6Cz7ZK51fpiQwAI+JIwElohmhB8pwghw45+nknSWV7rggbmejJM/RoAKZDNYGt48X3VrnvWSoGfOL9ny/xf1AJ+bdlEheOpigtMq9dE81b0EigWJ8luLHGT5wKaKrqtk=';
+import { createMockSamlIdp, mockSamlIdpAttributeMapping } from '../../testUtils/mockSamlIdp';
 
 /**
  * Helper to create and activate a SAML enterprise connection.
@@ -16,7 +13,7 @@ const FAKE_IDP_CERTIFICATE =
  */
 async function createActiveEnterpriseConnection(
   clerk: ReturnType<typeof createTestUtils>['services']['clerk'],
-  opts: { name: string; domain: string; idpEntityId: string; idpSsoUrl: string },
+  opts: { name: string; domain: string; idpEntityId: string; idpSsoUrl: string; idpCertificate: string },
 ): Promise<EnterpriseConnection> {
   const conn = await clerk.enterpriseConnections.createEnterpriseConnection({
     name: opts.name,
@@ -25,7 +22,9 @@ async function createActiveEnterpriseConnection(
     saml: {
       idpEntityId: opts.idpEntityId,
       idpSsoUrl: opts.idpSsoUrl,
-      idpCertificate: FAKE_IDP_CERTIFICATE,
+      idpCertificate: opts.idpCertificate,
+      allowIdpInitiated: true,
+      attributeMapping: mockSamlIdpAttributeMapping,
     },
   });
 
@@ -42,6 +41,8 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
     const runId = randomBytes(4).toString('hex');
     const testDomain = `e2e-enterprise-test-${runId}.dev`;
     const fakeIdpHost = `fake-idp.${testDomain}`;
+    const idp = createMockSamlIdp({ host: fakeIdpHost });
+    const ssoUserEmail = `testuser+${runId}@${testDomain}`;
     let enterpriseConnection: EnterpriseConnection | undefined;
 
     test.beforeAll(async () => {
@@ -49,8 +50,9 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
       enterpriseConnection = await createActiveEnterpriseConnection(u.services.clerk, {
         name: `E2E Test SAML Connection ${runId}`,
         domain: testDomain,
-        idpEntityId: `https://${fakeIdpHost}`,
-        idpSsoUrl: `https://${fakeIdpHost}/sso`,
+        idpEntityId: idp.entityId,
+        idpSsoUrl: idp.ssoUrl,
+        idpCertificate: idp.certificate,
       });
     });
 
@@ -61,6 +63,7 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
       if (enterpriseConnection) {
         await u.services.clerk.enterpriseConnections.deleteEnterpriseConnection(enterpriseConnection.id);
       }
+      await u.services.users.deleteIfExists({ email: ssoUserEmail });
       await app.teardown();
     });
 
@@ -77,6 +80,31 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withEnterpriseSso] })(
       // Verify the browser was redirected to the enterprise IdP
       const idpRequest = await idpRequestPromise;
       expect(idpRequest.url()).toContain(fakeIdpHost);
+    });
+
+    test('sign-in completes through the mock SAML IdP', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      await idp.signInWith(page, { email: ssoUserEmail, firstName: 'Sso', lastName: 'User' });
+
+      await u.po.signIn.goTo();
+      await u.po.signIn.setIdentifier(ssoUserEmail);
+      await u.po.signIn.continue();
+
+      await u.po.expect.toBeSignedIn();
+    });
+
+    test('IdP-initiated sign-in completes through the mock SAML IdP', async ({ page, context }) => {
+      const u = createTestUtils({ app, page, context });
+      const acsUrl = enterpriseConnection?.samlConnection?.acsUrl ?? '';
+      const audience = enterpriseConnection?.samlConnection?.spEntityId ?? '';
+      expect(acsUrl).not.toBe('');
+      expect(audience).not.toBe('');
+
+      await idp.postIdpInitiated(page, { acsUrl, audience, email: ssoUserEmail });
+      await page.waitForURL(url => !url.href.startsWith(acsUrl));
+
+      await u.page.goToAppHome();
+      await u.po.expect.toBeSignedIn();
     });
 
     test('non-managed domain email does not trigger SSO redirect', async ({ page, context }) => {
