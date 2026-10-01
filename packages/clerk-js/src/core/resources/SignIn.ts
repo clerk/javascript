@@ -89,6 +89,7 @@ import { _authenticateWithTransport } from '../../utils/authenticateWithTranspor
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
 import { getBrowserTimezone } from '../../utils/timezone';
+import { filterSecondFactorsForLoadedUI } from '../../utils/uiCapabilities';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
@@ -120,7 +121,7 @@ export class SignIn extends BaseResource implements SignInResource {
   private _status: SignInStatus | null = null;
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedFirstFactors: SignInFirstFactor[] | null = [];
-  supportedSecondFactors: SignInSecondFactor[] | null = null;
+  private _supportedSecondFactors: SignInSecondFactor[] | null = null;
   ssoBypassFirstFactors: SignInFirstFactor[] | null = null;
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
@@ -154,6 +155,14 @@ export class SignIn extends BaseResource implements SignInResource {
     if (value && previousStatus !== value) {
       debugLogger.debug('SignIn.status', { id: this.id, from: previousStatus, to: value });
     }
+  }
+
+  get supportedSecondFactors(): SignInSecondFactor[] | null {
+    return filterSecondFactorsForLoadedUI(SignIn.clerk, this._supportedSecondFactors);
+  }
+
+  set supportedSecondFactors(value: SignInSecondFactor[] | null) {
+    this._supportedSecondFactors = value;
   }
 
   /**
@@ -837,7 +846,7 @@ export class SignIn extends BaseResource implements SignInResource {
       status: this.status || null,
       supported_identifiers: this.supportedIdentifiers,
       supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
-      supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
+      supported_second_factors: deepCamelToSnake(this._supportedSecondFactors),
       sso_bypass_first_factors: deepCamelToSnake(this.ssoBypassFirstFactors) ?? undefined,
       first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
       second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),

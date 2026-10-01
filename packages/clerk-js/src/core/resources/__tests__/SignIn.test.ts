@@ -56,6 +56,61 @@ describe('SignIn', () => {
     expect(signIn.__internal_toSnapshot().timezone).toBeNull();
   });
 
+  describe('supportedSecondFactors', () => {
+    const originalClerk = SignIn.clerk;
+    const secondFactors = [{ strategy: 'passkey' }, { strategy: 'totp' }] as any;
+
+    afterEach(() => {
+      SignIn.clerk = originalClerk;
+    });
+
+    it('keeps the passkey second factor when the loaded UI supports it', () => {
+      SignIn.clerk = { __internal_uiSupports: () => true } as any;
+      const signIn = new SignIn({ id: 'signin_123', supported_second_factors: secondFactors } as any);
+
+      expect(signIn.supportedSecondFactors?.map(f => f.strategy)).toEqual(['passkey', 'totp']);
+    });
+
+    it('omits the passkey second factor when the loaded UI does not support it', () => {
+      SignIn.clerk = { __internal_uiSupports: () => false } as any;
+      const signIn = new SignIn({ id: 'signin_123', supported_second_factors: secondFactors } as any);
+
+      expect(signIn.supportedSecondFactors?.map(f => f.strategy)).toEqual(['totp']);
+      expect(signIn.supportedSecondFactors).toBe(signIn.supportedSecondFactors);
+      expect(signIn.__internal_future.supportedSecondFactors.map(f => f.strategy)).toEqual(['totp']);
+    });
+
+    it('keeps second factors that need no UI capability when the loaded UI declares none', () => {
+      SignIn.clerk = { __internal_uiSupports: () => false } as any;
+      const signIn = new SignIn({
+        id: 'signin_123',
+        supported_second_factors: [{ strategy: 'totp' }, { strategy: 'phone_code' }],
+      } as any);
+
+      expect(signIn.supportedSecondFactors?.map(f => f.strategy)).toEqual(['totp', 'phone_code']);
+    });
+
+    it('keeps the passkey second factor in the snapshot when the loaded UI does not support it', () => {
+      SignIn.clerk = { __internal_uiSupports: () => false } as any;
+      const signIn = new SignIn({ id: 'signin_123', supported_second_factors: secondFactors } as any);
+
+      expect(signIn.__internal_toSnapshot().supported_second_factors?.map(f => f.strategy)).toEqual([
+        'passkey',
+        'totp',
+      ]);
+    });
+
+    it('re-evaluates the filter when the loaded UI changes', () => {
+      let uiSupportsPasskey = false;
+      SignIn.clerk = { __internal_uiSupports: () => uiSupportsPasskey } as any;
+      const signIn = new SignIn({ id: 'signin_123', supported_second_factors: secondFactors } as any);
+
+      expect(signIn.supportedSecondFactors?.map(f => f.strategy)).toEqual(['totp']);
+      uiSupportsPasskey = true;
+      expect(signIn.supportedSecondFactors?.map(f => f.strategy)).toEqual(['passkey', 'totp']);
+    });
+  });
+
   describe('prepareSecondFactor', () => {
     afterEach(() => {
       vi.clearAllMocks();

@@ -53,3 +53,59 @@ describe('Clerk.uiVersion', () => {
     expect(clerk.uiVersion).not.toBe(clerk.version);
   });
 });
+
+describe('Clerk.__internal_uiSupports', () => {
+  let clerk: Clerk;
+
+  beforeEach(() => {
+    clerk = new Clerk(publishableKey);
+  });
+
+  afterEach(() => {
+    delete (window as any).__internal_ClerkUICtor;
+    vi.restoreAllMocks();
+  });
+
+  it('returns true when no @clerk/ui is configured', () => {
+    expect(clerk.__internal_uiSupports('second_factor:passkey')).toBe(true);
+  });
+
+  it('returns true when the loaded @clerk/ui declares the capability', () => {
+    (window as any).__internal_ClerkUICtor = { version: '1.39.0', __internal_capabilities: ['second_factor:passkey'] };
+    expect(clerk.__internal_uiSupports('second_factor:passkey')).toBe(true);
+  });
+
+  it('returns false when the loaded @clerk/ui predates capability declarations', () => {
+    (window as any).__internal_ClerkUICtor = { version: '1.38.0' };
+    expect(clerk.__internal_uiSupports('second_factor:passkey')).toBe(false);
+  });
+
+  it('returns false when the loaded @clerk/ui does not declare the capability', () => {
+    (window as any).__internal_ClerkUICtor = { version: '1.39.0', __internal_capabilities: [] };
+    expect(clerk.__internal_uiSupports('second_factor:passkey')).toBe(false);
+  });
+
+  it('checks the bundled @clerk/ui constructor', async () => {
+    const ClerkUI = vi.fn();
+    Object.assign(ClerkUI, { version: '1.38.0' });
+    await clerk.load({ ui: { ClerkUI: ClerkUI as any } }).catch(() => {});
+    expect(clerk.__internal_uiSupports('second_factor:passkey')).toBe(false);
+  });
+
+  it('returns false until a bundled @clerk/ui constructor promise resolves, then checks it', async () => {
+    let resolveCtor!: (ctor: any) => void;
+    const ctorPromise = new Promise(resolve => {
+      resolveCtor = resolve;
+    });
+    const loading = clerk.load({ ui: { ClerkUI: ctorPromise as any } }).catch(() => {});
+    expect(clerk.__internal_uiSupports('second_factor:passkey')).toBe(false);
+
+    const ClerkUI = vi.fn();
+    Object.assign(ClerkUI, { version: '1.39.0', __internal_capabilities: ['second_factor:passkey'] });
+    resolveCtor(ClerkUI);
+    await ctorPromise;
+    await loading;
+    expect(clerk.__internal_uiSupports('second_factor:passkey')).toBe(true);
+    expect(clerk.uiVersion).toBe('1.39.0');
+  });
+});

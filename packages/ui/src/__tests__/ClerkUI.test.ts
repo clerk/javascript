@@ -214,3 +214,9 @@ describe('ClerkUI version check', () => {
     });
   });
 });
+
+describe('ClerkUI capabilities', () => {
+  test('declares support for the passkey second factor', () => {
+    expect(ClerkUI.__internal_capabilities).toContain('second_factor:passkey');
+  });
+});
