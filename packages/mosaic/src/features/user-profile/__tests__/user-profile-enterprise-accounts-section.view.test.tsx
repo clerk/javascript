@@ -77,7 +77,8 @@ describe('UserProfileEnterpriseAccountsSectionView', () => {
         ]}
       />,
     );
-    expect(screen.getByRole('region', { name: 'Enterprise accounts' })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Enterprise accounts' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Enterprise accounts' })).toBeInTheDocument();
     expect(screen.getByText('Acme Okta')).toBeInTheDocument();
     expect(screen.getByText('test@acme.com')).toBeInTheDocument();
     expect(screen.getByText('Requires action')).toBeInTheDocument();

@@ -11,6 +11,8 @@ import androidx.biometric.BiometricManager.Authenticators
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
 import java.security.KeyStore
@@ -62,7 +64,7 @@ internal class BiometricKeyManager {
         "Biometric credential keys require Android 9 (API 28) or later.",
       )
     }
-    val status = BiometricManager.from(context).canAuthenticate(promptAuthenticators(policy))
+    val status = BiometricManager.from(context).canAuthenticate(Authenticators.BIOMETRIC_STRONG)
     if (status != BiometricManager.BIOMETRIC_SUCCESS) {
       throw BiometricsError.forCanAuthenticate(status)
     }
@@ -120,7 +122,15 @@ internal class BiometricKeyManager {
     val title = reason?.takeIf { it.isNotBlank() } ?: activity.applicationInfo.loadLabel(activity.packageManager).toString()
 
     val completed = AtomicBoolean(false)
-    val complete = { result: Result<String> -> if (completed.compareAndSet(false, true)) onResult(result) }
+    var prompt: BiometricPrompt? = null
+    var lifecycleObserver: LifecycleEventObserver? = null
+    // Every caller runs on the main thread, which removeObserver requires.
+    val complete = { result: Result<String> ->
+      if (completed.compareAndSet(false, true)) {
+        lifecycleObserver?.let { activity.lifecycle.removeObserver(it) }
+        onResult(result)
+      }
+    }
     val callback =
       object : BiometricPrompt.AuthenticationCallback() {
         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
@@ -142,6 +152,31 @@ internal class BiometricKeyManager {
       }
 
     activity.runOnUiThread {
+      // BiometricPrompt.authenticate() returns without calling back once state is saved, which would leave the promise
+      // pending forever.
+      if (!canShowPrompt(activity)) {
+        complete(
+          Result.failure(
+            BiometricsError(
+              BiometricsErrorCode.SYSTEM_CANCELED,
+              "The biometric prompt cannot be shown while the app is in the background.",
+            )
+          )
+        )
+        return@runOnUiThread
+      }
+      // A recreated activity does not reattach this callback, so settle the promise when this one is destroyed.
+      lifecycleObserver =
+        LifecycleEventObserver { _, event ->
+          if (event == Lifecycle.Event.ON_DESTROY) {
+            prompt?.cancelAuthentication()
+            complete(
+              Result.failure(
+                BiometricsError(BiometricsErrorCode.SYSTEM_CANCELED, "The activity showing the biometric prompt was destroyed.")
+              )
+            )
+          }
+        }.also { activity.lifecycle.addObserver(it) }
       try {
         val promptInfo =
           BiometricPrompt.PromptInfo.Builder().setTitle(title).apply {
@@ -152,8 +187,10 @@ internal class BiometricKeyManager {
               setNegativeButtonText(activity.getString(android.R.string.cancel))
             }
           }.build()
-        BiometricPrompt(activity, ContextCompat.getMainExecutor(activity), callback)
-          .authenticate(promptInfo, BiometricPrompt.CryptoObject(signature))
+        prompt =
+          BiometricPrompt(activity, ContextCompat.getMainExecutor(activity), callback).also {
+            it.authenticate(promptInfo, BiometricPrompt.CryptoObject(signature))
+          }
       } catch (e: Exception) {
         complete(
           Result.failure(
@@ -175,7 +212,10 @@ internal class BiometricKeyManager {
 
   private fun requireSupportedSdk() {
     if (Build.VERSION.SDK_INT < BiometricCredentialCoding.MIN_SDK) {
-      throw BiometricsError(BiometricsErrorCode.BIOMETRY_NOT_AVAILABLE, "Biometric credentials require Android 9 (API 28) or later.")
+      throw BiometricsError(
+        BiometricsErrorCode.SECURE_KEY_STORAGE_UNAVAILABLE,
+        "Biometric credential keys require Android 9 (API 28) or later.",
+      )
     }
   }
 
@@ -193,15 +233,11 @@ internal class BiometricKeyManager {
   companion object {
     private const val ANDROID_KEY_STORE = "AndroidKeyStore"
 
-    fun secureKeyStorageAvailable(sdkInt: Int = Build.VERSION.SDK_INT): Boolean = sdkInt >= BiometricCredentialCoding.MIN_SDK
+    /** Whether [activity] can still show a prompt: not finishing and not past `onSaveInstanceState`. */
+    fun canShowPrompt(activity: FragmentActivity): Boolean =
+      !activity.isFinishing && !activity.isDestroyed && !activity.supportFragmentManager.isStateSaved
 
-    /** Contract v2 section 2: device credentials only for biometry_or_device_passcode, and only on API 30+. */
-    fun promptAuthenticators(policy: BiometricCredentialPolicy, sdkInt: Int = Build.VERSION.SDK_INT): Int =
-      if (policy == BiometricCredentialPolicy.BIOMETRY_OR_DEVICE_PASSCODE && sdkInt >= Build.VERSION_CODES.R) {
-        Authenticators.BIOMETRIC_STRONG or Authenticators.DEVICE_CREDENTIAL
-      } else {
-        Authenticators.BIOMETRIC_STRONG
-      }
+    fun secureKeyStorageAvailable(sdkInt: Int = Build.VERSION.SDK_INT): Boolean = sdkInt >= BiometricCredentialCoding.MIN_SDK
 
     /** Android does not report which biometric is Class 3, so any present strong biometric is `biometric`. */
     fun biometryType(canAuthenticateStrong: Int): String =

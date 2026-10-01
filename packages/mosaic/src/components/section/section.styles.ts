@@ -1,32 +1,71 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { colorVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
-import { sectionItemsMarker } from './section.markers.stylex';
+import { sectionHeaderDescriptionMarker, sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
 
-/* eslint-disable @stylexjs/no-lookahead-selectors -- Mosaic's supported browsers include :has();
-   the marker keeps this selector scoped to Section.Items. */
+const compact = '@container cl-section (width < 26rem)';
+
 export const styles = stylex.create({
   root: {
     display: 'flex',
     flexDirection: 'column',
-    rowGap: space['3'],
+    rowGap: space['8'],
     width: '100%',
-  },
-  title: {
-    color: colorVars['--cl-color-foreground'],
-    fontWeight: fontWeightVars['--cl-font-medium'],
   },
   group: {
     borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-xl'],
     borderStyle: 'solid',
     borderWidth: '1px',
-    overflow: 'hidden',
     backgroundColor: colorVars['--cl-color-background'],
+    containerName: 'cl-section',
+    containerType: 'inline-size',
+    display: 'flex',
+    flexDirection: 'column',
     width: '100%',
   },
-  row: {
+  header: {
     marginInline: space['4'],
+    paddingBlock: space['3'],
+    alignContent: 'center',
+    alignItems: 'center',
+    columnGap: space['3'],
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 1fr) auto',
+    minHeight: space['13'],
+    width: 'auto',
+  },
+  title: {
+    gridColumn: '1',
+    color: colorVars['--cl-color-foreground'],
+    fontWeight: fontWeightVars['--cl-font-medium'],
+  },
+  headerDescription: {
+    gridColumn: '1',
+    marginTop: space['0.5'],
+  },
+  headerActions: {
+    gridColumn: '2',
+    gridRowEnd: {
+      default: 'auto',
+      [stylex.when.siblingBefore(':where(*)', sectionHeaderDescriptionMarker)]: 'span 2',
+    },
+    gridRowStart: '1',
+  },
+  body: {
+    marginInline: space['4'],
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: {
+      default: '0px',
+      [stylex.when.siblingBefore(':where(*)', sectionHeaderMarker)]: '1px',
+    },
+    display: 'flex',
+    flexDirection: 'column',
+    width: 'auto',
+  },
+  row: {
+    paddingBlock: space['4'],
     borderBlockStartColor: colorVars['--cl-color-border'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: {
@@ -35,47 +74,37 @@ export const styles = stylex.create({
     },
     display: 'flex',
     flexDirection: 'column',
-    paddingBlockEnd: {
-      default: space['4'],
-      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: 0,
-    },
-    paddingBlockStart: {
-      default: space['4'],
-      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: space['3'],
-    },
-    rowGap: {
-      default: space['2'],
-      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: 0,
-    },
-    minHeight: {
-      default: `calc(${space['18.5']} + 1px)`,
-      [stylex.when.descendant(':where(*)', sectionItemsMarker)]: 0,
-    },
-    width: 'auto',
+    justifyContent: 'center',
+    rowGap: space['2'],
+    minHeight: `calc(${space['18.5']} + 1px)`,
+    width: '100%',
   },
   items: {
+    listStyle: 'none',
     display: 'flex',
     flexDirection: 'column',
-    marginBlockStart: space['3'],
     width: '100%',
   },
   item: {
-    paddingBlock: {
-      default: null,
-      [stylex.when.ancestor(':where(*)', sectionItemsMarker)]: space['4'],
-    },
     alignItems: 'center',
-    borderBlockStartColor: colorVars['--cl-color-border'],
-    borderBlockStartStyle: 'solid',
-    borderBlockStartWidth: {
-      default: '0px',
-      [stylex.when.ancestor(':where(*)', sectionItemsMarker)]: '1px',
-    },
     columnGap: space['3'],
     display: 'flex',
     flexWrap: 'nowrap',
     justifyContent: 'space-between',
     width: '100%',
+  },
+  itemWrap: {
+    flexWrap: { [compact]: 'wrap', default: 'nowrap' },
+    rowGap: { [compact]: space['3'], default: null },
+  },
+  nestedItem: {
+    paddingBlock: space['4'],
+    borderBlockStartColor: colorVars['--cl-color-border'],
+    borderBlockStartStyle: 'solid',
+    borderBlockStartWidth: {
+      default: '0px',
+      [stylex.when.siblingBefore(':where(*)', sectionNestedItemMarker)]: '1px',
+    },
   },
   mediaBase: {
     alignItems: 'center',
@@ -128,10 +157,22 @@ export const styles = stylex.create({
     flexShrink: 0,
     justifyContent: 'flex-end',
   },
+  actionsWrap: {
+    justifyContent: { [compact]: 'flex-start', default: 'flex-end' },
+    width: { [compact]: '100%', default: null },
+  },
   // Sits under the row's item rather than inside its content, so a message never shifts the
   // media and actions off the center line they share.
   error: {
     width: '100%',
   },
 });
-/* eslint-enable @stylexjs/no-lookahead-selectors */
+
+export const sectionCompactStyles = stylex.create({
+  hidden: {
+    display: { [compact]: 'none', default: null },
+  },
+  only: {
+    display: { [compact]: 'inline', default: 'none' },
+  },
+});
