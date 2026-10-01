@@ -2,7 +2,7 @@
 
 For a migration or migration review, determine which staging configurations the flow needs. Reuse compatible configurations and prepare any that are missing so the user can run live checks. The user runs the flows and verifies the results. Run setup commands from the repository root.
 
-Derive the required configurations from the legacy behavior and migration or review scope. Compare them with existing workspace setup metadata and the staging application's instance settings through the CLI. An existing `.env.local` alone does not prove that setup is complete or compatible. Identify which configurations can be reused and which need to be added. Preserve an existing `.env.local` while preparing additional configurations.
+Derive the required configurations from the legacy behavior and migration or review scope. Compare them with existing workspace setup metadata and the staging application's instance settings through the CLI. An existing `.env.local` alone does not prove that setup is complete or compatible. Identify which configurations can be reused and which need to be added. Choose the primary configuration for the feature and reuse the active environment if it already matches. Otherwise, activate that configuration with the merge helper, which backs up the current `.env.local`.
 
 ## Prepare setup
 
@@ -42,7 +42,7 @@ sh -c 'umask 077 && mkdir -p <private-dir>/<config> && CLERK_PLATFORM_KEY_VARIAB
 
 For OAuth, replace the Platform-key prefix and env-file argument with `node packages/swingset/scripts/clerk-staging.mjs --oauth`.
 
-If Swingset has no configured environment, activate the first configuration by merging only `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` into `.env.local`. The user uses the same command to switch configurations:
+Activate the feature's primary configuration by merging only `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` into `.env.local`, unless the active environment already matches. Preserve unrelated local settings. The user uses the same command to switch configurations:
 
 ```sh
 node packages/swingset/scripts/merge-instance-env.mjs <private-dir>/<config>/instance.env
