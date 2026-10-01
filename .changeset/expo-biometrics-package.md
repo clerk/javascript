@@ -1,6 +1,6 @@
 ---
 '@clerk/expo': minor
-'@clerk/expo-biometrics': minor
+'@clerk/expo-biometrics': major
 ---
 
 Introduce `@clerk/expo-biometrics`, a new package that `useBiometricCredentials()` now requires. Install it and rebuild your app:
