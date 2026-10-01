@@ -217,7 +217,7 @@ describe('password error feedback', () => {
 
 describe('password field feedback', () => {
   const feedback = (validation: Parameters<typeof passwordFieldFeedback>[0]) =>
-    passwordFieldFeedback(validation, settings, messages, localization.locale);
+    passwordFieldFeedback(validation, { ...settings, show_zxcvbn: true }, messages, localization.locale);
   const strength = (state: PasswordStrength['state'], suggestions: string[] = []): PasswordStrength => ({
     state,
     keys: [],
@@ -259,6 +259,12 @@ describe('password field feedback', () => {
       type: 'success',
       message: messages.rules.strong,
     });
-    expect(feedback({ complexity: {} })).toMatchObject({ type: 'success' });
+  });
+
+  it('only reports a strong password when strength was checked or is disabled', () => {
+    expect(feedback({ complexity: {} })).toBeUndefined();
+    expect(
+      passwordFieldFeedback({ complexity: {} }, { ...settings, show_zxcvbn: false }, messages, localization.locale),
+    ).toEqual({ type: 'success', message: messages.rules.strong });
   });
 });
