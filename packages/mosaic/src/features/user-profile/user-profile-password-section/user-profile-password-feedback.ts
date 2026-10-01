@@ -2,7 +2,7 @@ import { isClerkAPIResponseError } from '@clerk/shared/error';
 import type { ClerkAPIError, PasswordSettingsData } from '@clerk/shared/types';
 
 import { FormSubmitError } from '../../../components/form';
-import type { MosaicMessages } from '../../../localization';
+import type { LocalizableError, MosaicMessages } from '../../../localization';
 import { fill } from '../../../localization';
 import { UserProfilePasswordUpdateError } from './user-profile-password-section.types';
 
@@ -17,14 +17,16 @@ export function passwordStrengthMessage(codes: string[], messages: Messages): st
   return [messages.rules.weak, ...codes.map(code => lookup(messages.suggestions, code))].filter(Boolean).join(' ');
 }
 
-function passwordError(errors: ClerkAPIError[], settings: Settings, messages: Messages, locale: string) {
+function passwordError(
+  errors: ClerkAPIError[],
+  settings: Settings,
+  messages: Messages,
+  locale: string,
+  errorText: (error: LocalizableError) => string,
+) {
   const first = errors[0];
   if (!first) {
     return undefined;
-  }
-  const known = lookup(messages.passwordErrors, first.code);
-  if (known !== undefined) {
-    return known || first.message;
   }
   if (first.code === 'form_password_not_strong_enough') {
     return passwordStrengthMessage(first.meta?.zxcvbn?.suggestions?.map(suggestion => suggestion.code) ?? [], messages);
@@ -37,11 +39,21 @@ function passwordError(errors: ClerkAPIError[], settings: Settings, messages: Me
     form_password_no_number: 'require_numbers',
     form_password_no_special_char: 'require_special_char',
   };
+  if (!lookup(codes, first.code)) {
+    return errorText({
+      code: first.code,
+      paramName: first.meta?.paramName,
+      message: first.longMessage || first.message,
+    });
+  }
   const failures = errors.flatMap(error => {
     const code = lookup(codes, error.code);
     return code ? [code] : [];
   });
-  return passwordComplexityMessage(failures, settings, messages, locale) || first.longMessage || first.message;
+  return (
+    passwordComplexityMessage(failures, settings, messages, locale) ||
+    errorText({ code: first.code, paramName: first.meta?.paramName, message: first.longMessage || first.message })
+  );
 }
 
 export function passwordComplexityMessage(failures: string[], settings: Settings, messages: Messages, locale: string) {
@@ -73,6 +85,7 @@ export function passwordFormError(
   settings: Settings,
   messages: Messages,
   locale: string,
+  errorText: (error: LocalizableError) => string,
 ): unknown {
   if (error instanceof UserProfilePasswordUpdateError) {
     return error.code === 'current_password_required'
@@ -86,7 +99,11 @@ export function passwordFormError(
   const passwordErrors: ClerkAPIError[] = [];
   let message: string | undefined;
   for (const item of error.errors) {
-    const text = item.longMessage || item.message;
+    const text = errorText({
+      code: item.code,
+      paramName: item.meta?.paramName,
+      message: item.longMessage || item.message,
+    });
     const name = item.meta?.paramName;
     if ((name === 'current_password' || name === 'currentPassword') && requiresCurrentPassword) {
       fields.currentPassword ??= text;
@@ -97,7 +114,7 @@ export function passwordFormError(
     }
   }
   if (passwordErrors.length) {
-    fields.newPassword = passwordError(passwordErrors, settings, messages, locale);
+    fields.newPassword = passwordError(passwordErrors, settings, messages, locale, errorText);
   }
   return new FormSubmitError({ message, fields });
 }

@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 
 import { Button } from '../../../components/button';
 import type { FieldFeedback } from '../../../components/form';
-import { useLocale, useMessages } from '../../../localization';
+import { useErrorText, useLocale, useMessages } from '../../../localization';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
 import {
@@ -50,6 +50,7 @@ export function UserProfilePasswordSection({ fallback = null }: UserProfilePassw
 function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { status: 'ready' }> }) {
   const m = useMessages('userProfilePasswordSection');
   const locale = useLocale();
+  const errorText = useErrorText();
   const { validatePassword, passwordSettings } = model;
   const feedback = useCallback(
     async (password: string): Promise<FieldFeedback | undefined> => {
@@ -75,7 +76,8 @@ function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { 
     validatePassword: feedback,
     requiresCurrentPassword: model.requiresCurrentPassword,
     onSubmit: model.updatePassword,
-    formatError: error => passwordFormError(error, model.requiresCurrentPassword, passwordSettings, m, locale),
+    formatError: error =>
+      passwordFormError(error, model.requiresCurrentPassword, passwordSettings, m, locale, errorText),
   });
 
   return (
