@@ -1,5 +1,43 @@
 # Change Log
 
+## 4.8.0
+
+### Minor Changes
+
+- Introduce `@clerk/expo-biometrics`, a new package that `useBiometricCredentials()` now requires. Install it and rebuild your app: ([#9989](https://github.com/clerk/javascript/pull/9989)) by [@mikepitre](https://github.com/mikepitre)
+
+  ```sh
+  npx expo install @clerk/expo-biometrics
+  ```
+
+  If it's missing, the hook throws an error with these same steps.
+
+  Import the hook from `@clerk/expo/biometrics`:
+
+  ```ts
+  import { useBiometricCredentials } from '@clerk/expo/biometrics';
+  ```
+
+  Importing it from `@clerk/expo` still works, but it logs a deprecation warning and will be removed in the next major version.
+
+### Patch Changes
+
+- Updated dependencies [[`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/clerk-js@6.37.0
+  - @clerk/shared@4.38.0
+  - @clerk/react@6.17.5
+
+## 4.7.3
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.9` to `1.1.10`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.10. ([#9999](https://github.com/clerk/javascript/pull/9999)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda), [`6dbf9a4`](https://github.com/clerk/javascript/commit/6dbf9a4f6c509698a79ab7123f988313a3975c6b)]:
+  - @clerk/clerk-js@6.36.0
+  - @clerk/shared@4.37.1
+  - @clerk/react@6.17.4
+
 ## 4.7.2
 
 ### Patch Changes

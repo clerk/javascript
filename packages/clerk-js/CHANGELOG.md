@@ -1,5 +1,29 @@
 # Change Log
 
+## 6.37.0
+
+### Minor Changes
+
+- Add experimental APIs for biometric sign-in in native apps. This includes the `trusted_device` strategy for sign-in and session reverification, `nativeSettings` on the auth config, and `__experimental_` methods on `User` for managing biometric credentials. These may change in minor releases. ([#9989](https://github.com/clerk/javascript/pull/9989)) by [@mikepitre](https://github.com/mikepitre)
+
+### Patch Changes
+
+- Updated dependencies [[`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/shared@4.38.0
+
+## 6.36.0
+
+### Minor Changes
+
+- Custom flows built with `useSignIn()` and `useSignUp()` now handle Clerk Protect challenges for you. When a sign-in or sign-up method gets a challenge, Clerk shows it in a modal and the method returns once the user passes it. For SSO, the challenge appears when the user comes back to `<HandleSSOCallback />`. Classic resource methods such as `clerk.client.signIn.create()`, and apps without Clerk's UI loaded, still return with `protectCheck` set, as before. ([#9950](https://github.com/clerk/javascript/pull/9950)) by [@wobsoriano](https://github.com/wobsoriano)
+
+### Patch Changes
+
+- The Solana wallet picker downloads about 2 KB instead of about 306 KB, and installing `@clerk/ui` or `@clerk/clerk-js` no longer pulls in React Native, Metro, and `@solana/web3.js`. The picker now lists only wallets that can complete Sign in with Solana, so the Mobile Wallet Adapter option that appeared on Android Chrome is gone. ([#9994](https://github.com/clerk/javascript/pull/9994)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda)]:
+  - @clerk/shared@4.37.1
+
 ## 6.35.0
 
 ### Minor Changes

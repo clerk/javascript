@@ -1,5 +1,27 @@
 # Change Log
 
+## 3.22.0
+
+### Minor Changes
+
+- SAML connections can trust several Identity Provider signing certificates at once. `SamlConnection` and `EnterpriseConnection.samlConnection` now include `idpCertificates`, every trusted certificate with its validity window, and `createSamlConnection()`, `updateSamlConnection()`, `createEnterpriseConnection()` and `updateEnterpriseConnection()` accept an `idpCertificates` array that replaces the connection's whole set. The single `idpCertificate` parameter is deprecated in favor of the array; it keeps working and still replaces the whole set. ([#9995](https://github.com/clerk/javascript/pull/9995)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Updated dependencies [[`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/shared@4.38.0
+
+## 3.21.1
+
+### Patch Changes
+
+- Update the `allowedOrigins` JSDoc on `clerkClient.instances.update()` and the `Instance` resource to note that Electron apps using `@clerk/electron` also need the renderer's dev server origin, for example `http://localhost:5173`, during development. ([#9982](https://github.com/clerk/javascript/pull/9982)) by [@manovotny](https://github.com/manovotny)
+
+- Update the `lockUser()` JSDoc to link the Dashboard's current Protect rules page. ([#9976](https://github.com/clerk/javascript/pull/9976)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda)]:
+  - @clerk/shared@4.37.1
+
 ## 3.21.0
 
 ### Minor Changes

@@ -3,6 +3,7 @@
 import {
   arrow,
   autoUpdate,
+  type ElementProps,
   flip,
   FloatingNode,
   FloatingTree,
@@ -112,8 +113,21 @@ function MenuInner(props: MenuProps) {
   const click = useClick(floatingContext, {
     event: 'mousedown',
     toggle: !isNested,
-    ignoreMouse: isNested,
+    ignoreMouse: true,
   });
+  const mousePress = useMemo<ElementProps>(
+    () => ({
+      reference: {
+        onPointerDown(event: React.PointerEvent) {
+          if (isNested || event.button !== 0 || (event.pointerType !== 'mouse' && event.pointerType !== 'pen')) {
+            return;
+          }
+          floatingContext.onOpenChange(!open, event.nativeEvent, 'click');
+        },
+      },
+    }),
+    [floatingContext, isNested, open],
+  );
   const baseRole = useRole(floatingContext, { role: 'menu' });
   // `useRole` decides submenu-ness from the floating tree alone, so a menu inside a popover gets
   // `role="menuitem"` on its trigger with no parent menu to be an item of. `isNested` is the real answer.
@@ -143,6 +157,7 @@ function MenuInner(props: MenuProps) {
   const { getReferenceProps, getFloatingProps, getItemProps } = useInteractions([
     hover,
     click,
+    mousePress,
     role,
     dismiss,
     listNavigation,

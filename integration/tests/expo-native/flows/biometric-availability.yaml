@@ -1,0 +1,9 @@
+appId: com.clerk.exponativebuildfixture
+name: useBiometricCredentials reaches the expo-biometrics native module
+---
+- runFlow: subflows/open-app.yaml
+- tapOn:
+    id: 'biometric-availability-button'
+- extendedWaitUntil:
+    visible: 'biometric availability: .*'
+    timeout: 15000

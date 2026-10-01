@@ -191,6 +191,7 @@ export const branding = stylex.create({
     borderBlockStartColor: colorVars['--cl-color-border'],
     borderBlockStartStyle: 'solid',
     borderBlockStartWidth: '1px',
-    textAlign: 'center',
+    display: 'flex',
+    justifyContent: 'center',
   },
 });

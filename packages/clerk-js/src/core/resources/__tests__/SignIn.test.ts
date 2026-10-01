@@ -1,7 +1,10 @@
+import { stringifyQueryParams } from '@clerk/shared/internal/clerk-js/querystring';
+import { camelToSnake } from '@clerk/shared/underscore';
 import { createDeferredPromise } from '@clerk/shared/utils';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { eventBus } from '../../events';
+import { ProtectCheckGate } from '../../protectCheckGate';
 import { signInErrorSignal, signInResourceSignal } from '../../signals';
 import { BaseResource } from '../internal';
 import { SignIn } from '../SignIn';
@@ -757,6 +760,89 @@ describe('SignIn', () => {
           }),
         }),
       );
+    });
+  });
+
+  describe('trusted_device strategy', () => {
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.unstubAllGlobals();
+    });
+
+    const toFormFields = (body: Record<string, unknown>) =>
+      Object.fromEntries(new URLSearchParams(stringifyQueryParams(body, { keyEncoder: camelToSnake })));
+
+    it('creates a sign-in with a trusted device id', async () => {
+      vi.stubGlobal('navigator', { language: '' });
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: {
+          id: 'signin_123',
+          status: 'needs_first_factor',
+          first_factor_verification: {
+            object: 'verification_trusted_device',
+            status: 'unverified',
+            strategy: 'trusted_device',
+            attempts: 0,
+            trusted_device_challenge: {
+              object: 'trusted_device_challenge',
+              challenge: 'challenge_value',
+              challenge_id: 'tdch_123',
+              trusted_device_id: 'td_123',
+              client_data: 'client_data_value',
+              expires_at: 1_700_000_300,
+              algorithm: 'ES256',
+            },
+          },
+        },
+      });
+      BaseResource._fetch = mockFetch;
+      SignIn.clerk = {
+        client: { captchaBypass: false },
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+
+      const signIn = new SignIn();
+      await signIn.create({ strategy: 'trusted_device', trustedDeviceId: 'td_123' });
+
+      const { path, method, body } = mockFetch.mock.calls[0][0];
+      expect({ path, method }).toEqual({ path: '/client/sign_ins', method: 'POST' });
+      expect(toFormFields(body)).toEqual({ strategy: 'trusted_device', trusted_device_id: 'td_123' });
+      expect(signIn.firstFactorVerification.trustedDeviceChallenge).toEqual({
+        challenge: 'challenge_value',
+        challengeId: 'tdch_123',
+        trustedDeviceId: 'td_123',
+        clientData: 'client_data_value',
+        expiresAt: new Date(1_700_000_300_000),
+        algorithm: 'ES256',
+      });
+    });
+
+    it('attempts the first factor with a signed challenge', async () => {
+      const mockFetch = vi.fn().mockResolvedValue({
+        client: null,
+        response: { id: 'signin_123', status: 'complete' },
+      });
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn({ id: 'signin_123' } as any);
+      await signIn.attemptFirstFactor({
+        strategy: 'trusted_device',
+        trustedDeviceId: 'td_123',
+        clientData: 'client_data_value',
+        signature: 'signature_value',
+        algorithm: 'ES256',
+      });
+
+      const { path, method, body } = mockFetch.mock.calls[0][0];
+      expect({ path, method }).toEqual({ path: '/client/sign_ins/signin_123/attempt_first_factor', method: 'POST' });
+      expect(toFormFields(body)).toEqual({
+        strategy: 'trusted_device',
+        trusted_device_id: 'td_123',
+        client_data: 'client_data_value',
+        signature: 'signature_value',
+        algorithm: 'ES256',
+      });
     });
   });
 
@@ -3671,6 +3757,192 @@ describe('SignIn', () => {
         { strategy: 'email_code', safe_identifier: 'user@corp.com', email_address_id: 'idn_hmac' },
       ]);
       expect(new SignIn(snapshot).ssoBypassFirstFactors).toEqual(signIn.ssoBypassFirstFactors);
+    });
+  });
+});
+
+describe('SignIn protect_check gate', () => {
+  let previousClerk: any;
+
+  beforeEach(() => {
+    previousClerk = SignIn.clerk;
+    SignIn.clerk = {} as any;
+    vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+    BaseResource._fetch = vi.fn().mockResolvedValue({
+      client: null,
+      response: {
+        id: 'signin_123',
+        status: 'needs_protect_check',
+        protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
+      },
+    });
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    SignIn.clerk = previousClerk;
+  });
+
+  it('hands the resource to the gate after a Future call', async () => {
+    const signIn = new SignIn();
+
+    await signIn.__internal_future.create({ identifier: 'user@example.com' });
+
+    expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledWith(SignIn.clerk, signIn, undefined);
+  });
+
+  it('returns a classic call with the gate still pending', async () => {
+    const signIn = new SignIn();
+
+    await signIn.create({ identifier: 'user@example.com' });
+
+    expect(signIn.protectCheck?.token).toBe('challenge-token');
+    expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
+  });
+
+  describe('Future sso', () => {
+    let windowNavigate: ReturnType<typeof vi.fn>;
+
+    const handOff = (url: string) => ({ status: 'unverified', external_verification_redirect_url: url });
+    const challenged = (firstFactorVerification: ReturnType<typeof handOff> | null = null) => ({
+      client: null,
+      response: {
+        id: 'signin_123',
+        status: 'needs_protect_check',
+        first_factor_verification: firstFactorVerification,
+        protect_check: { status: 'pending', token: 'challenge-token', sdk_url: 'https://protect.example.com/sdk.js' },
+      },
+    });
+    const cleared = (firstFactorVerification: ReturnType<typeof handOff>) => ({
+      client: null,
+      response: { id: 'signin_123', status: 'needs_first_factor', first_factor_verification: firstFactorVerification },
+    });
+
+    beforeEach(() => {
+      vi.stubGlobal('window', { location: { origin: 'https://example.com', href: 'https://example.com/sign-in' } });
+      windowNavigate = vi.fn();
+      SignIn.clerk = {
+        buildUrlWithAuth: vi.fn(url => url),
+        buildUrl: vi.fn(path => 'https://example.com' + path),
+        frontendApi: 'clerk.example.com',
+        __internal_windowNavigate: windowNavigate,
+        __internal_environment: { displayConfig: { captchaOauthBypass: [] } },
+      } as any;
+    });
+
+    afterEach(() => {
+      vi.clearAllMocks();
+      vi.unstubAllGlobals();
+    });
+
+    it('goes to the provider when a challenged create carries a hand-off, leaving the challenge for the way back', async () => {
+      BaseResource._fetch = vi.fn().mockResolvedValue(challenged(handOff('https://accounts.google.example/auth')));
+
+      const signIn = new SignIn();
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://accounts.google.example/auth'));
+      expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
+    });
+
+    it('runs the challenge before going to the provider when a challenged create has no hand-off', async () => {
+      BaseResource._fetch = vi
+        .fn()
+        .mockResolvedValueOnce(challenged())
+        .mockResolvedValueOnce(cleared(handOff('https://accounts.google.example/auth')));
+      const resolve = vi.mocked(ProtectCheckGate.prototype.resolve).mockImplementation(async (_clerk, resource) => {
+        await resource.submitProtectCheck({ proofToken: 'proof' });
+      });
+
+      const signIn = new SignIn();
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(resolve).toHaveBeenCalledTimes(1);
+      expect(resolve.mock.calls[0][1]).toBe(signIn);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://accounts.google.example/auth'));
+      expect(resolve.mock.invocationCallOrder[0]).toBeLessThan(windowNavigate.mock.invocationCallOrder[0]);
+    });
+
+    it('follows the create hand-off when the enterprise SSO prepare after it hits the same pending challenge', async () => {
+      const mockFetch = vi.fn().mockResolvedValue(challenged(handOff('https://idp.example/from-create')));
+      BaseResource._fetch = mockFetch;
+
+      const signIn = new SignIn();
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'enterprise_sso',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/from-create'));
+      expect(ProtectCheckGate.prototype.resolve).not.toHaveBeenCalled();
+    });
+
+    it('prepares enterprise SSO again after a challenged prepare instead of following an older redirect', async () => {
+      const mockFetch = vi
+        .fn()
+        .mockResolvedValueOnce(challenged())
+        .mockResolvedValueOnce(cleared(handOff('https://idp.example/fresh')));
+      BaseResource._fetch = mockFetch;
+      const resolve = vi.mocked(ProtectCheckGate.prototype.resolve).mockImplementation(async (_clerk, resource) => {
+        (resource as SignIn).protectCheck = null;
+      });
+
+      const signIn = new SignIn({
+        id: 'signin_123',
+        object: 'sign_in',
+        status: 'needs_first_factor',
+        first_factor_verification: handOff('https://idp.example/stale'),
+      } as any);
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'enterprise_sso',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+      });
+
+      expect(error).toBeNull();
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockFetch.mock.calls.every(([init]) => init.path.endsWith('/prepare_first_factor'))).toBe(true);
+      expect(resolve.mock.invocationCallOrder[0]).toBeLessThan(mockFetch.mock.invocationCallOrder[1]);
+      expect(windowNavigate).toHaveBeenCalledWith(new URL('https://idp.example/fresh'));
+      expect(windowNavigate).toHaveBeenCalledTimes(1);
+    });
+
+    it('runs a challenge that is waiting when the popup returns', async () => {
+      const popup = { location: { href: '' } } as Window;
+      BaseResource._fetch = vi
+        .fn()
+        .mockResolvedValueOnce(cleared(handOff('https://accounts.google.example/auth')))
+        .mockResolvedValueOnce(challenged());
+      vi.mocked(_futureAuthenticateWithPopup).mockResolvedValue(undefined);
+
+      const signIn = new SignIn();
+      const { error } = await signIn.__internal_future.sso({
+        strategy: 'oauth_google',
+        redirectUrl: 'https://example.com/protected',
+        redirectCallbackUrl: 'https://example.com/sso-callback',
+        popup,
+      });
+
+      expect(error).toBeNull();
+      expect(_futureAuthenticateWithPopup).toHaveBeenCalledTimes(1);
+      expect(ProtectCheckGate.prototype.resolve).toHaveBeenCalledTimes(1);
+      expect(vi.mocked(ProtectCheckGate.prototype.resolve).mock.calls[0][1]).toBe(signIn);
+      expect(vi.mocked(_futureAuthenticateWithPopup).mock.invocationCallOrder[0]).toBeLessThan(
+        vi.mocked(ProtectCheckGate.prototype.resolve).mock.invocationCallOrder[0],
+      );
     });
   });
 });

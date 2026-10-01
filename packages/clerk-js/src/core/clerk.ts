@@ -62,6 +62,7 @@ import type {
   __internal_EnableOrganizationsPromptProps,
   __internal_OAuthConsentProps,
   __internal_PlanDetailsProps,
+  __internal_ProtectCheckModalProps,
   __internal_SubscriptionDetailsProps,
   __internal_UserVerificationModalProps,
   APIKeysNamespace,
@@ -108,6 +109,7 @@ import type {
   OrganizationSwitcherProps,
   PricingTableProps,
   ProtectAssertion,
+  ProtectCheckFlow,
   PublicKeyCredentialCreationOptionsWithoutExtensions,
   PublicKeyCredentialRequestOptionsWithoutExtensions,
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
@@ -195,6 +197,7 @@ import { createCheckoutInstance } from './modules/checkout/instance';
 import { OAuthApplication } from './modules/oauthApplication';
 import { Protect } from './protect';
 import { protectAssertionParams } from './protectAssertion';
+import { ProtectCheckGate } from './protectCheckGate';
 import { BaseResource, Client, Environment, Organization, Waitlist } from './resources/internal';
 import { State } from './state';
 
@@ -989,6 +992,48 @@ export class Clerk implements ClerkInterface {
     void this.#clerkUI
       ?.then(ui => ui.ensureMounted())
       .then(controls => controls.closeModal('enableOrganizationsPrompt'));
+  };
+
+  public __internal_resolvePendingProtectCheck = async (flow?: ProtectCheckFlow): Promise<void> => {
+    const client = this.client;
+    if (!client || client.signIn.status === 'complete' || client.signUp.status === 'complete') {
+      return;
+    }
+    const gate = ProtectCheckGate.getInstance();
+    if (flow !== 'signUp') {
+      await gate.resolve(this, client.signIn);
+    }
+    if (flow !== 'signIn') {
+      await gate.resolve(this, client.signUp);
+    }
+  };
+
+  public __internal_openProtectCheckModal = (
+    props: Pick<__internal_ProtectCheckModalProps, 'resource'>,
+  ): Promise<void> => {
+    if (!this.#clerkUI) {
+      return Promise.resolve();
+    }
+    return this.#clerkUI
+      .then(ui => ui.ensureMounted())
+      .then(controls => {
+        if (!controls.openProtectCheckModal) {
+          return;
+        }
+        return new Promise<void>((resolve, reject) => {
+          controls.openProtectCheckModal?.({
+            ...props,
+            onResolved: () => {
+              controls.closeModal('protectCheck');
+              resolve();
+            },
+            onFailed: error => {
+              controls.closeModal('protectCheck');
+              reject(error);
+            },
+          });
+        });
+      });
   };
 
   public __internal_openBlankCaptchaModal = (): Promise<unknown> => {
