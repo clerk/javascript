@@ -43,8 +43,8 @@ describe('UserProfilePasswordSectionView', () => {
     const user = userEvent.setup();
     renderView({ hasPassword: false, onSubmitPassword });
 
-    expect(screen.getByRole('heading', { level: 2, name: 'Authentication' })).toBeInTheDocument();
-    expect(screen.getByText('Password')).toBeVisible();
+    expect(screen.getByRole('group', { name: 'Password' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Password' })).toHaveClass('cl-section-title');
     expect(screen.queryByText('••••••••••••••••••')).not.toBeInTheDocument();
     expect(screen.getByText('No password set')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Set password' }));
@@ -109,7 +109,7 @@ describe('UserProfilePasswordSectionView', () => {
       </MosaicProvider>,
     );
 
-    expect(screen.getByRole('region', { name: 'Authentication' })).toBeVisible();
+    expect(screen.getByRole('group', { name: 'Password' })).toBeVisible();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
@@ -124,6 +124,7 @@ describe('UserProfilePasswordSectionView', () => {
     );
 
     expect(screen.getByText('Managed by Okta')).toBeVisible();
+    expect(screen.getByText('Okta')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /password/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });

@@ -39,7 +39,7 @@ export function UserProfileConnectedAccountsSectionView({
   onRemove,
 }: UserProfileConnectedAccountsSectionViewProps) {
   const m = useMessages('userProfileConnectedAccounts');
-  const section = useRef<HTMLElement>(null);
+  const section = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({
     ids: accounts.map(account => account.id),
     onRemove,
@@ -55,30 +55,34 @@ export function UserProfileConnectedAccountsSectionView({
   return (
     <>
       {hasRows ? (
-        <Section.Root
-          ref={section}
-          tabIndex={-1}
-        >
-          <Section.Title>{m.title}</Section.Title>
-          <Section.Group>
-            {accounts.map(account => (
-              <UserProfileConnectedAccountRowView
-                key={account.id}
-                account={account}
-                triggerRef={removalFocus.registerTrigger(account.id)}
-                onReconnect={onReconnect}
-                onRemove={onRemove ? account => removeAccount.open(account) : undefined}
-              />
-            ))}
-            {onConnect
-              ? availableProviders.map(provider => (
-                  <UserProfileConnectedAccountRowView
-                    key={provider.id}
-                    account={provider}
-                    onConnect={onConnect}
-                  />
-                ))
-              : null}
+        <Section.Root>
+          <Section.Group
+            ref={section}
+            tabIndex={-1}
+          >
+            <Section.Header>
+              <Section.Title>{m.title}</Section.Title>
+            </Section.Header>
+            <Section.Body>
+              {accounts.map(account => (
+                <UserProfileConnectedAccountRowView
+                  key={account.id}
+                  account={account}
+                  triggerRef={removalFocus.registerTrigger(account.id)}
+                  onReconnect={onReconnect}
+                  onRemove={onRemove ? account => removeAccount.open(account) : undefined}
+                />
+              ))}
+              {onConnect
+                ? availableProviders.map(provider => (
+                    <UserProfileConnectedAccountRowView
+                      key={provider.id}
+                      account={provider}
+                      onConnect={onConnect}
+                    />
+                  ))
+                : null}
+            </Section.Body>
           </Section.Group>
         </Section.Root>
       ) : null}
