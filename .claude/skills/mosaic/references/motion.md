@@ -84,6 +84,20 @@ bones by hand. Any new skeleton must measure the same as the content it replaces
 `Section.Actions skeleton` exists because a 28px menu trigger outgrew a 20px line.
 Off under `prefers-reduced-motion: reduce`.
 
+**What to render as bones.** A bone stands in for content that is being fetched and
+not yet on screen. When a surface loads as one unit (a panel, a table on first
+load), render the whole thing as bones, including titles, card headings and column
+headers that are already known: one loading state reads cleaner, carries the wave,
+and swaps to content in one moment. Content that isn't being fetched keeps
+rendering. A section loaded by a later request shows bones beside sections that
+have already loaded, and a table moving to another page turns its rows into bones
+while its headers and controls stay. Whether a table's controls are bones on first
+load is still open.
+
+Each component defines its own bones (`skeleton` props, or `skeletonStyles.wave`
+for a component with its own shape), but every bone uses the shared wave and the
+same fill, `--cl-color-neutral-alpha-200`.
+
 ## A curve has a direction — don't run the entrance curve backwards
 
 The single most common motion bug in this codebase. `--cl-ease-default` is
