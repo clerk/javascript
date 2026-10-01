@@ -41,18 +41,18 @@ export function useEnterpriseAccountsFixture({
       connectError: index === 0 ? initialError : undefined,
     })),
   );
-  const [pendingConnectionId, setPendingConnectionId] = useState<string>();
+  const [pendingId, setPendingId] = useState<string>();
 
   return {
     accounts: linkedAccounts,
     connections: availableConnections,
-    pendingConnectionId,
+    pendingId,
     onConnect: (id: string) => {
       const connection = availableConnections.find(item => item.id === id);
-      if (!connection || pendingConnectionId) {
+      if (!connection || pendingId) {
         return;
       }
-      setPendingConnectionId(id);
+      setPendingId(id);
       setAvailableConnections(current => current.map(item => ({ ...item, connectError: undefined })));
       setTimeout(() => {
         setLinkedAccounts(current => [
@@ -60,7 +60,7 @@ export function useEnterpriseAccountsFixture({
           { id: `account_${id}`, name: connection.name, iconUrl: connection.iconUrl, emailAddress: 'alex@acme.com' },
         ]);
         setAvailableConnections(current => current.filter(item => item.id !== id));
-        setPendingConnectionId(undefined);
+        setPendingId(undefined);
       }, 1500);
     },
   };

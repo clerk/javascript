@@ -16,7 +16,7 @@ export interface UserProfileEnterpriseAccountsControllerOptions {
 export interface UserProfileEnterpriseAccountsController {
   accounts: UserProfileEnterpriseAccount[];
   connections: UserProfileEnterpriseConnection[];
-  pendingConnectionId: string | undefined;
+  pendingId: string | undefined;
   onConnect: (connectionId: string) => void;
 }
 
@@ -26,7 +26,7 @@ export function useUserProfileEnterpriseAccountsController({
   onConnect,
   formatError,
 }: UserProfileEnterpriseAccountsControllerOptions): UserProfileEnterpriseAccountsController {
-  const [pendingConnectionId, setPendingConnectionId] = useState<string>();
+  const [pendingId, setPendingId] = useState<string>();
   const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
   const connecting = useRef(false);
 
@@ -35,7 +35,7 @@ export function useUserProfileEnterpriseAccountsController({
       return;
     }
     connecting.current = true;
-    setPendingConnectionId(id);
+    setPendingId(id);
     setConnectErrors(({ [id]: _cleared, ...rest }) => rest);
 
     try {
@@ -46,7 +46,7 @@ export function useUserProfileEnterpriseAccountsController({
       setConnectErrors(current => ({ ...current, [id]: formatError(error) }));
     } finally {
       connecting.current = false;
-      setPendingConnectionId(undefined);
+      setPendingId(undefined);
     }
   };
 
@@ -55,7 +55,7 @@ export function useUserProfileEnterpriseAccountsController({
     connections: connections.map(connection =>
       connectErrors[connection.id] ? { ...connection, connectError: connectErrors[connection.id] } : connection,
     ),
-    pendingConnectionId,
+    pendingId,
     onConnect: id => void run(id),
   };
 }

@@ -36,13 +36,13 @@ describe('useUserProfileEnterpriseAccountsController', () => {
       result.current.onConnect?.('saml');
     });
     expect(onConnect).toHaveBeenCalledExactlyOnceWith('okta');
-    expect(result.current.pendingConnectionId).toBe('okta');
+    expect(result.current.pendingId).toBe('okta');
 
     await act(async () => {
       operation.resolve('redirecting');
       await operation.promise;
     });
-    expect(result.current.pendingConnectionId).toBe('okta');
+    expect(result.current.pendingId).toBe('okta');
   });
 
   it('releases redirect pending after two seconds', async () => {
@@ -56,9 +56,9 @@ describe('useUserProfileEnterpriseAccountsController', () => {
       await Promise.resolve();
       await Promise.resolve();
     });
-    expect(result.current.pendingConnectionId).toBe('okta');
+    expect(result.current.pendingId).toBe('okta');
     await act(() => vi.advanceTimersByTimeAsync(2000));
-    expect(result.current.pendingConnectionId).toBeUndefined();
+    expect(result.current.pendingId).toBeUndefined();
   });
 
   it('shows a formatted error on the failed connection and clears it on retry', async () => {
