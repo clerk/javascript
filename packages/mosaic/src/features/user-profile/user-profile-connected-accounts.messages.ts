@@ -15,5 +15,7 @@ export const userProfileConnectedAccountsMessages = {
   },
   errors: {
     generic: 'Something went wrong. Please try again.',
+    unavailable: 'This connected account is no longer available.',
+    missingVerificationUrl: 'OAuth flow did not receive a verification URL.',
   },
 } as const;

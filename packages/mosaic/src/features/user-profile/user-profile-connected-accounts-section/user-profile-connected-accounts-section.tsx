@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import { useMessages } from '../../../localization';
 import { UserProfileConnectedAccountsSectionView } from '../user-profile-connected-accounts-section.view';
+import { connectedAccountErrorMessage } from './user-profile-connected-accounts-errors';
 import { useUserProfileConnectedAccountsController } from './user-profile-connected-accounts-section.controller';
 import type {
   AdditionalOAuthScopes,
@@ -31,6 +32,7 @@ export function UserProfileConnectedAccountsSection({
   }
   return (
     <ConnectedAccounts
+      key={model.userId}
       model={model}
       fallbackFocus={fallbackFocus}
     />
@@ -50,14 +52,21 @@ function ConnectedAccounts({
     availableProviders: model.availableProviders,
     onConnect: model.connect,
     onReconnect: model.reconnect,
-    fallbackErrorMessage: m.errors.generic,
+    formatError: error => connectedAccountErrorMessage(error, m),
   });
+  const remove = async (accountId: string) => {
+    try {
+      await model.remove(accountId);
+    } catch (error) {
+      throw new Error(connectedAccountErrorMessage(error, m));
+    }
+  };
 
   return (
     <UserProfileConnectedAccountsSectionView
       {...controller}
       fallbackFocus={fallbackFocus}
-      onRemove={model.remove}
+      onRemove={remove}
     />
   );
 }

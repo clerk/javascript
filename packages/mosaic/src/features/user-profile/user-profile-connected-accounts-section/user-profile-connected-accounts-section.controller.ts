@@ -20,13 +20,13 @@ export function useUserProfileConnectedAccountsController({
   availableProviders,
   onConnect,
   onReconnect,
-  fallbackErrorMessage,
+  formatError,
 }: {
   accounts: UserProfileConnectedAccount[];
   availableProviders: UserProfileConnectionProvider[];
   onConnect: (id: string) => Promise<ConnectedAccountActionResult>;
   onReconnect: (id: string) => Promise<ConnectedAccountActionResult>;
-  fallbackErrorMessage: string;
+  formatError: (error: unknown) => string;
 }): UserProfileConnectedAccountsController {
   const [pendingId, setPendingId] = useState<string>();
   const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
@@ -50,8 +50,7 @@ export function useUserProfileConnectedAccountsController({
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
     } catch (error) {
-      const message = error instanceof Error && error.message ? error.message : fallbackErrorMessage;
-      setErrors(current => ({ ...current, [id]: message }));
+      setErrors(current => ({ ...current, [id]: formatError(error) }));
     }
 
     inFlight.current = undefined;

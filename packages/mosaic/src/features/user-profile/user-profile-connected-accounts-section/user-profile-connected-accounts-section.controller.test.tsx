@@ -11,7 +11,7 @@ it('releases pending actions when a redirect leaves the page mounted', async () 
       availableProviders: [],
       onConnect,
       onReconnect: onConnect,
-      fallbackErrorMessage: 'Something went wrong.',
+      formatError: () => 'Something went wrong.',
     }),
   );
 
