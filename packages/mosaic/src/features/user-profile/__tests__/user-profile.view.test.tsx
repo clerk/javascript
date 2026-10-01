@@ -20,15 +20,7 @@ const pages: UserProfileViewProps['pages'] = {
     paymentMethods: [],
     historyItems: [],
   },
-  apiKeys: {
-    apiKeys: [],
-    searchValue: '',
-    totalCount: 0,
-    page: 1,
-    isLoading: false,
-    onSearchChange: vi.fn(),
-    onPageChange: vi.fn(),
-  },
+  apiKeys: <p>API keys content</p>,
 };
 
 function renderView(overrides: Partial<UserProfileViewProps> = {}) {
