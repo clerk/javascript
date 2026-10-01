@@ -6,4 +6,12 @@
 '@clerk/react': minor
 ---
 
-Support passkeys as a second factor during sign-in and session reverification. When the instance allows passkeys to satisfy the second factor and the user has a registered passkey, FAPI advertises a `passkey` entry in `supported_second_factors`; `signIn.authenticateWithPasskey()` called without a `flow` now completes the second factor of an in-progress sign-in that offers it (and falls back to the first-factor flow when it doesn't, as on older clients), `session.verifyWithPasskey({ level: 'second_factor' })` completes a multi-factor reverification (any other `level` value is rejected), the `signIn.mfa.passkey()` future API is exposed through `@clerk/react`, and the prebuilt `<SignIn/>` and `<UserVerification/>` flows preselect the passkey ahead of the enrolled code-based second factors, which stay reachable under "Use another method".
+Support passkeys as a second factor during sign-in and session reverification.
+
+As with first factor, when a passkey is available, prebuilt `<SignIn/>` and
+`<UserVerification/>` flows preselect the passkey as the preferred second
+factor method. Other methods stay reachable under "Use another method".
+
+This feature is only enabled for instances which allow passkeys to satisfy
+second factor; this is true for any instances created after 2026-07-08, or can
+be toggled in the Dashboard for older instances.
