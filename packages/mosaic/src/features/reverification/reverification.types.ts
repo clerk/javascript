@@ -8,6 +8,8 @@ export type ReverificationStage = 'first' | 'second';
 
 export type ReverificationOtpChannel = 'email' | 'phone' | 'totp';
 
+export type ReverificationErrorReason = 'noFactors' | 'generic';
+
 export type ReverificationStep = 'password' | 'passkey' | 'otp' | 'backup-code' | 'method-picker' | 'help';
 
 export type ReverificationMethod =

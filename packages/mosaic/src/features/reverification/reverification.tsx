@@ -1,6 +1,6 @@
 import { type ReverificationController, useReverificationController } from './reverification.controller';
 import { useReverificationModel } from './reverification.model';
-import { ReverificationPending, ReverificationUnavailable, ReverificationView } from './reverification.view';
+import { ReverificationError, ReverificationPending, ReverificationView } from './reverification.view';
 import {
   type ReverificationFetcher,
   useReverificationWithState,
@@ -29,8 +29,8 @@ export function Reverification(controller: ReverificationController) {
 
   if (controller.status === 'loading') {
     return <ReverificationPending />;
-  } else if (controller.status === 'unavailable') {
-    return <ReverificationUnavailable />;
+  } else if (controller.status === 'error') {
+    return <ReverificationError reason={controller.reason} />;
   }
 
   return <ReverificationView {...controller} />;

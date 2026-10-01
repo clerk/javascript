@@ -6,7 +6,12 @@ import type { IconName } from '../../icons/registry';
 import type { MosaicMessages } from '../../localization';
 import { fill, useMessages } from '../../localization';
 import { styles } from './reverification.styles';
-import type { ReverificationMethod, ReverificationOtpChannel, ReverificationViewProps } from './reverification.types';
+import type {
+  ReverificationErrorReason,
+  ReverificationMethod,
+  ReverificationOtpChannel,
+  ReverificationViewProps,
+} from './reverification.types';
 import { ReverificationBackupCode } from './steps/reverification-backup-code';
 import { ReverificationHelp } from './steps/reverification-help';
 import { ReverificationMethodPicker } from './steps/reverification-method-picker';
@@ -44,13 +49,14 @@ function methodLabel(method: ReverificationMethod, m: Messages): string {
 }
 
 // Lives here but is rendered by the wrapper parent
-export function ReverificationUnavailable() {
+export function ReverificationError({ reason }: { reason: ReverificationErrorReason }) {
   const m = useMessages('reverification');
+  const copy = m.error[reason];
 
   return (
     <Card.Header>
-      <Card.Title>{m.unavailable.title}</Card.Title>
-      <Card.Description>{m.unavailable.description}</Card.Description>
+      <Card.Title>{copy.title}</Card.Title>
+      <Card.Description>{copy.description}</Card.Description>
     </Card.Header>
   );
 }

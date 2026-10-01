@@ -1,4 +1,5 @@
 import { reverificationError } from '@clerk/shared/authorization-errors';
+import { ClerkWebAuthnError } from '@clerk/shared/error';
 import type {
   PublicKeyCredentialWithAuthenticatorAssertionResponse,
   ReverificationConfig,
@@ -73,6 +74,8 @@ const secondPhoneFactor: SignInSecondFactorJSON = {
 };
 
 const TITLE = 'Verification required';
+const NO_FACTORS_TITLE = 'Cannot verify your account';
+const GENERIC_ERROR_TITLE = 'Something went wrong';
 const STEP = {
   password: 'Enter your current password to continue',
   emailCode: 'Enter the code sent to your email to continue',
@@ -300,8 +303,7 @@ describe('Reverification', () => {
       // The first step opens once Clerk is ready
     });
 
-    // Currently wrong: entering `unavailable` calls cancel(), which closes the challenge, so the unavailable card only flashes and the user is never told why. Needs a product decision (keep the card until dismissed, or assert only the rejection).
-    it('cancels the action when verification cannot be started', async () => {
+    it('keeps showing a generic error card until it is dismissed when verification cannot be started', async () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
       worker.use(
         http.post(fapiUrl(VERIFY), () =>
@@ -309,26 +311,40 @@ describe('Reverification', () => {
         ),
       );
 
-      await startVerification();
+      const user = await startVerification();
 
+      // The error card stays on screen without the server's message
+      expect(await screen.findByText(GENERIC_ERROR_TITLE)).toBeVisible();
+      expect(screen.getByText('Please try again.')).toBeVisible();
+      expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
+      expect(screen.queryByText('Nope')).toBeNull();
+      await settle();
+      expect(screen.getByText(GENERIC_ERROR_TITLE)).toBeVisible();
+      expect(outcome()).toBe('');
+
+      // Dismissing it rejects the action as cancelled
+      await dismiss(user);
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
       await untilClosed();
+      expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
     });
 
-    // Needs a product decision: keep the unavailable card until the user dismisses it, or cancel without showing it.
-    it.todo('keeps the unavailable card visible until it is dismissed', () => {
-      // The unavailable card stays on screen instead of flashing
-      // Dismissing it rejects the action as cancelled
-    });
-
-    // Currently wrong: same as above. Enterprise SSO is dropped by the model mapping, which leaves no usable factor.
-    it('cancels the action when none of the factors are supported', async () => {
+    it('keeps showing the no factors card until it is dismissed when none of the factors are supported', async () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [enterpriseSsoFactor] }));
 
-      await startVerification();
+      const user = await startVerification();
 
+      expect(await screen.findByText(NO_FACTORS_TITLE)).toBeVisible();
+      expect(screen.getByText(/No suitable authentication factor is configured/)).toBeVisible();
+      expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
+      await settle();
+      expect(screen.getByText(NO_FACTORS_TITLE)).toBeVisible();
+      expect(outcome()).toBe('');
+
+      await dismiss(user);
       await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
       await untilClosed();
+      expect(screen.queryByText(NO_FACTORS_TITLE)).toBeNull();
     });
   });
 
@@ -691,7 +707,10 @@ describe('Reverification', () => {
       let acceptCredential: () => void = () => {};
       const getCredential = vi
         .fn()
-        .mockResolvedValueOnce({ publicKeyCredential: null, error: new Error('The operation was refused') })
+        .mockResolvedValueOnce({
+          publicKeyCredential: null,
+          error: new ClerkWebAuthnError('The operation was refused', { code: 'passkey_retrieval_failed' }),
+        })
         .mockImplementationOnce(
           () =>
             new Promise(resolve => {
@@ -934,8 +953,7 @@ describe('Reverification', () => {
   });
 
   describe('finishing', () => {
-    // Currently wrong: the server verification is already complete at this point, so resubmitting fails with invalid_action_for_session_reverification and the user can't recover. Needs a product decision (retry finish, or restart the verification).
-    it('returns to the last step with an error when the session cannot be activated', async () => {
+    it('shows a generic error card when the session cannot be activated', async () => {
       const { action } = await renderReverification(
         guardedAction(),
         verificationSeed({ firstFactors: [passwordFactor] }),
@@ -950,24 +968,20 @@ describe('Reverification', () => {
       expect(verifying()).toBeInTheDocument();
       touch.fail();
 
-      // The error is shown on the last step
-      expect(await screen.findByText('form_param_invalid')).toBeInTheDocument();
-      expect(screen.getByText(STEP.password)).toBeVisible();
-      await waitFor(() => expect(passwordField()).toBeEnabled());
+      // The step is replaced by a generic error card without the server's message
+      expect(await screen.findByText(GENERIC_ERROR_TITLE)).toBeVisible();
+      expect(screen.getByText('Please try again.')).toBeVisible();
+      expect(screen.queryByText('form_param_invalid')).toBeNull();
+      expect(screen.queryByText(STEP.password)).toBeNull();
 
       // The action is not retried
       expect(action).toHaveBeenCalledTimes(1);
       expect(outcome()).toBe('');
 
-      // Submitting again fails because the server verification is already complete
-      await user.type(passwordField(), '{Enter}');
-      expect(await screen.findByText(/unable to attempt first factor/)).toBeInTheDocument();
-      expect(outcome()).toBe('');
-    });
-
-    // Needs a product decision: retry the activation on the same step, or restart the verification.
-    it.todo('lets the user recover when the session cannot be activated', () => {
-      // The user can reach a resolved action without leaving the card in a dead end
+      // Dismissing it rejects the action as cancelled
+      await dismiss(user);
+      await waitFor(() => expect(outcome()).toBe('rejected: reverification_cancelled'));
+      expect(screen.queryByText(GENERIC_ERROR_TITLE)).toBeNull();
     });
 
     it('cannot be interrupted while the action is being retried', async () => {
@@ -1206,7 +1220,7 @@ describe('Reverification', () => {
   });
 
   describe('errors', () => {
-    // Currently wrong: the model keeps only the server's longMessage or message (toError drops the error code), so nothing downstream can localize it. Known codes such as form_password_incorrect, form_code_incorrect and verification_not_sent should map to localized messages the way the old UI does.
+    // Currently wrong: the controller keeps only the server's longMessage or message (errorDetail drops the error code), so nothing downstream can localize it. Known codes such as form_password_incorrect, form_code_incorrect and verification_not_sent should map to localized messages the way the old UI does.
     // Blocked: Mosaic has no message keys for error codes yet, so there is nothing a test can override.
     it.todo('shows a localized message for a wrong password', () => {
       // The message for form_password_incorrect follows the configured locale
@@ -1248,8 +1262,7 @@ describe('Reverification', () => {
       expect(await screen.findByText('Short message')).toBeInTheDocument();
     });
 
-    // Currently wrong: the generic message is hardcoded English in both the model and the controller, and the localizable unstable__errors__generic message is unused.
-    it.fails('shows a localized generic message when the failure is not a Clerk error', async () => {
+    it('shows a localized generic message when the failure is not a Clerk error', async () => {
       const { clerk } = await renderReverification(
         guardedAction(),
         verificationSeed({ firstFactors: [passwordFactor] }),
@@ -1266,8 +1279,7 @@ describe('Reverification', () => {
       expect(await screen.findByText('Something custom went wrong')).toBeInTheDocument();
     });
 
-    // Currently wrong: the message is the raw clerk-js network error including the request URL, and the generic fallback is never used for it.
-    it.fails('does not show the request URL when there is a network failure', async () => {
+    it('shows the generic message instead of the request URL when there is a network failure', async () => {
       await renderReverification(guardedAction(), verificationSeed({ firstFactors: [passwordFactor] }));
       worker.use(http.post(fapiUrl(ATTEMPT_FIRST), () => HttpResponse.error(), { once: true }));
       const restore = pretendToBeARealBrowser();
@@ -1278,6 +1290,7 @@ describe('Reverification', () => {
         await user.type(await screen.findByLabelText('Password'), `${PASSWORD}{Enter}`);
 
         await waitFor(() => expect(passwordField()).toBeInvalid());
+        expect(screen.getByText('Something went wrong. Please try again.')).toBeInTheDocument();
         expect(document.body).not.toHaveTextContent(/https?:\/\//);
       } finally {
         restore();
@@ -1305,11 +1318,6 @@ describe('Reverification', () => {
       } finally {
         restore();
       }
-    });
-
-    // Unsure about behavior: a start failure ends in the unavailable card without the reason, and a session activation failure reuses the last step's field error. Neither has a dedicated error surface.
-    it.todo('explains why verification cannot continue when it cannot be started', () => {
-      // The reason is shown instead of only the unavailable message
     });
   });
 });

@@ -1,4 +1,3 @@
-import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useSession } from '@clerk/shared/react';
 import type {
   PreferredSignInStrategy,
@@ -34,14 +33,6 @@ export type ReverificationModel =
   | { status: 'loading'; cancel: () => void }
   | ReverificationActiveModel
   | { status: 'retrying' };
-
-function toError(error: unknown): Error {
-  if (isClerkAPIResponseError(error)) {
-    const first = error.errors[0];
-    return new Error(first?.longMessage || first?.message || error.message);
-  }
-  return error instanceof Error ? error : new Error('Something went wrong. Please try again.');
-}
 
 function toMethod(
   factor: SessionVerificationFirstFactor | SessionVerificationSecondFactor,
@@ -146,80 +137,58 @@ export function useReverificationModel(reverificationState: ReverificationState)
   return {
     status: 'active',
     supportEmail,
-    start: async () => {
-      try {
-        return handleResponse(await session.startVerification({ level: level ?? 'second_factor' }));
-      } catch (error) {
-        throw toError(error);
-      }
-    },
+    start: async () => handleResponse(await session.startVerification({ level: level ?? 'second_factor' })),
     cancel,
     prepare: async method => {
-      try {
-        switch (method.strategy) {
-          case 'email_code':
-            await session.prepareFirstFactorVerification({
-              strategy: 'email_code',
-              emailAddressId: method.emailAddressId,
-            });
-            return;
-          case 'phone_code':
-            if (method.stage === 'second') {
-              await session.prepareSecondFactorVerification({
-                strategy: 'phone_code',
-                phoneNumberId: method.phoneNumberId,
-              });
-              return;
-            }
-            await session.prepareFirstFactorVerification({
+      switch (method.strategy) {
+        case 'email_code':
+          await session.prepareFirstFactorVerification({
+            strategy: 'email_code',
+            emailAddressId: method.emailAddressId,
+          });
+          return;
+        case 'phone_code':
+          if (method.stage === 'second') {
+            await session.prepareSecondFactorVerification({
               strategy: 'phone_code',
               phoneNumberId: method.phoneNumberId,
             });
             return;
-        }
-      } catch (error) {
-        throw toError(error);
+          }
+          await session.prepareFirstFactorVerification({
+            strategy: 'phone_code',
+            phoneNumberId: method.phoneNumberId,
+          });
+          return;
       }
     },
     attempt: async (method, value) => {
-      try {
-        switch (method.strategy) {
-          case 'password':
+      switch (method.strategy) {
+        case 'password':
+          return handleResponse(
+            await session.attemptFirstFactorVerification({ strategy: 'password', password: value }),
+          );
+        case 'email_code':
+          return handleResponse(await session.attemptFirstFactorVerification({ strategy: 'email_code', code: value }));
+        case 'phone_code':
+          if (method.stage === 'second') {
             return handleResponse(
-              await session.attemptFirstFactorVerification({ strategy: 'password', password: value }),
+              await session.attemptSecondFactorVerification({ strategy: 'phone_code', code: value }),
             );
-          case 'email_code':
-            return handleResponse(
-              await session.attemptFirstFactorVerification({ strategy: 'email_code', code: value }),
-            );
-          case 'phone_code':
-            if (method.stage === 'second') {
-              return handleResponse(
-                await session.attemptSecondFactorVerification({ strategy: 'phone_code', code: value }),
-              );
-            }
-            return handleResponse(
-              await session.attemptFirstFactorVerification({ strategy: 'phone_code', code: value }),
-            );
-          case 'totp':
-          case 'backup_code':
-            return handleResponse(
-              await session.attemptSecondFactorVerification({ strategy: method.strategy, code: value }),
-            );
-          case 'passkey':
-            return handleResponse(await session.verifyWithPasskey());
-        }
-      } catch (error) {
-        throw toError(error);
+          }
+          return handleResponse(await session.attemptFirstFactorVerification({ strategy: 'phone_code', code: value }));
+        case 'totp':
+        case 'backup_code':
+          return handleResponse(
+            await session.attemptSecondFactorVerification({ strategy: method.strategy, code: value }),
+          );
+        case 'passkey':
+          return handleResponse(await session.verifyWithPasskey());
       }
     },
     finish: async () => {
-      try {
-        await clerk.setActive({ session: session.id });
-        complete();
-      } catch (error) {
-        throw toError(error);
-      }
+      await clerk.setActive({ session: session.id });
+      complete();
     },
   };
 }

@@ -167,7 +167,7 @@ describe('useDestructiveController', () => {
   it.each([
     ['idle', 'confirm'],
     ['loading', 'confirm'],
-    ['unavailable', 'verify'],
+    ['error', 'verify'],
     ['ready', 'verify'],
     ['retrying', 'verify'],
   ] as const)('reverification status %s uses the %s step', (status, step) => {

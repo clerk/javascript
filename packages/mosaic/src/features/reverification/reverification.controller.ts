@@ -1,32 +1,38 @@
 import { useEffect, useState } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
+import { useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent, StateConfig } from '../../machine/types';
 import { useMachine } from '../../machine/useMachine';
 import type { ReverificationActiveModel, ReverificationModel } from './reverification.model';
 import type {
+  ReverificationErrorReason,
   ReverificationMethod,
   ReverificationResult,
   ReverificationStep,
   ReverificationViewProps,
 } from './reverification.types';
-import { needsPrepare, otpChannelFor } from './reverification.utils';
+import { errorDetail, needsPrepare, otpChannelFor } from './reverification.utils';
 
 export type ReverificationController =
   | { status: 'idle'; onCancel?: undefined }
   | { status: 'loading'; onCancel?: () => void }
-  | { status: 'unavailable'; onCancel?: () => void }
+  | { status: 'error'; reason: ReverificationErrorReason; onCancel?: () => void }
   | ({ status: 'ready'; onCancel?: () => void } & ReverificationViewProps)
   | ({ status: 'retrying'; onCancel?: undefined } & ReverificationViewProps);
 
 type OverlayFrom = 'factor' | 'method-picker';
 
-export type ReverificationDeps = Pick<ReverificationActiveModel, 'start' | 'prepare' | 'attempt' | 'finish' | 'cancel'>;
+export type ReverificationDeps = Pick<ReverificationActiveModel, 'start' | 'prepare' | 'attempt' | 'finish'>;
+
+interface FactorError {
+  detail: string | undefined;
+}
 
 interface ReverificationContext {
   inputValue: string;
-  errorMessage: string | undefined;
+  error: FactorError | undefined;
   direction: FlowDirection;
   activeMethod: ReverificationMethod | null;
   methods: readonly ReverificationMethod[];
@@ -60,7 +66,6 @@ const unseatedDeps: ReverificationDeps = {
   prepare: notSeated,
   attempt: notSeated,
   finish: notSeated,
-  cancel: () => {},
 };
 
 export const RESEND_COOLDOWN_MS = 30_000;
@@ -73,15 +78,15 @@ function unlockResend(): Pick<ReverificationContext, 'resendAvailableAt'> {
   return { resendAvailableAt: undefined };
 }
 
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+function factorError(error: unknown): FactorError {
+  return { detail: errorDetail(error) };
 }
 
 function selectMethod(ctx: ReverificationContext, id: string): Partial<ReverificationContext> {
   return {
     activeMethod: ctx.methods.find(method => method.id === id) ?? ctx.activeMethod,
     inputValue: '',
-    errorMessage: undefined,
+    error: undefined,
     direction: 1,
     submitRequested: false,
   };
@@ -104,7 +109,7 @@ const applyResult = assign<DoneInvokeEvent<ReverificationResult>>((_, event) => 
   methods: event.output.methods,
   activeMethod: event.output.startingMethod,
   inputValue: '',
-  errorMessage: undefined,
+  error: undefined,
   ...unlockResend(),
   direction: 1,
 }));
@@ -134,7 +139,7 @@ const afterResult = [
 
 const factorEvents = {
   TYPE: {
-    actions: assign((_, event) => ({ inputValue: event.value, errorMessage: undefined })),
+    actions: assign((_, event) => ({ inputValue: event.value, error: undefined })),
   },
   SHOW_METHODS: {
     target: 'methodPicker',
@@ -162,7 +167,7 @@ export const reverificationMachine = createMachine({
   initial: 'inactive',
   context: {
     inputValue: '',
-    errorMessage: undefined,
+    error: undefined,
     direction: 1,
     activeMethod: null,
     methods: [],
@@ -177,7 +182,7 @@ export const reverificationMachine = createMachine({
     inactive: {
       entry: assign(() => ({
         inputValue: '',
-        errorMessage: undefined,
+        error: undefined,
         submitRequested: false,
         ...unlockResend(),
       })),
@@ -188,7 +193,7 @@ export const reverificationMachine = createMachine({
       on: { RESET: 'inactive' },
       invoke: fromPromise(ctx => ctx.deps.start(), {
         onDone: afterResult,
-        onError: 'unavailable',
+        onError: 'failed',
       }),
     },
 
@@ -217,7 +222,7 @@ export const reverificationMachine = createMachine({
         onError: {
           target: 'verifying',
           actions: assign((_, event) => ({
-            errorMessage: errorMessage(event.error),
+            error: factorError(event.error),
             submitRequested: false,
             ...unlockResend(),
           })),
@@ -238,7 +243,7 @@ export const reverificationMachine = createMachine({
         onDone: 'verifying',
         onError: {
           target: 'verifying',
-          actions: assign((_, event) => ({ errorMessage: errorMessage(event.error), ...unlockResend() })),
+          actions: assign((_, event) => ({ error: factorError(event.error), ...unlockResend() })),
         },
       }),
     },
@@ -256,7 +261,7 @@ export const reverificationMachine = createMachine({
           actions: assign(() => ({
             ...lockResend(),
             inputValue: '',
-            errorMessage: undefined,
+            error: undefined,
             submitRequested: false,
           })),
         },
@@ -269,7 +274,7 @@ export const reverificationMachine = createMachine({
         onDone: afterResult,
         onError: {
           target: 'verifying',
-          actions: assign((_, event) => ({ errorMessage: errorMessage(event.error) })),
+          actions: assign((_, event) => ({ error: factorError(event.error) })),
         },
       }),
     },
@@ -311,9 +316,10 @@ export const reverificationMachine = createMachine({
     },
 
     unavailable: {
-      entry: (ctx: ReverificationContext) => {
-        ctx.deps.cancel();
-      },
+      on: { RESET: 'inactive' },
+    },
+
+    failed: {
       on: { RESET: 'inactive' },
     },
 
@@ -321,10 +327,7 @@ export const reverificationMachine = createMachine({
       on: { RESET: 'inactive' },
       invoke: fromPromise(ctx => ctx.deps.finish(), {
         onDone: 'retrying',
-        onError: {
-          target: 'verifying',
-          actions: assign((_, event) => ({ errorMessage: errorMessage(event.error) })),
-        },
+        onError: 'failed',
       }),
     },
 
@@ -378,7 +381,7 @@ function viewStep(value: string, method: ReverificationMethod | null): Reverific
  * Machine - State internal to the controller, not all steps are exposed to the UI
  * Return 'ReverificationController' - The view state
  *   - status: 'idle' renders nothing
- *   - status: 'loading' | 'unavailable' carry no factor props
+ *   - status: 'loading' | 'error' carry no factor props
  *   - status: 'ready' | 'retrying' carry the factor view, including step
  *
  * There are two pending presentations.
@@ -390,6 +393,7 @@ function viewStep(value: string, method: ReverificationMethod | null): Reverific
  * while the model is active and resets when the model returns to inactive.
  */
 export function useReverificationController(model: ReverificationModel): ReverificationController {
+  const m = useMessages('reverification');
   const active = model.status === 'active' ? model : null;
 
   const [snapshot, send] = useMachine(
@@ -445,7 +449,11 @@ export function useReverificationController(model: ReverificationModel): Reverif
   const activeMethod = context.activeMethod;
 
   if (snapshot.value === 'unavailable') {
-    return { status: 'unavailable', onCancel };
+    return { status: 'error', reason: 'noFactors', onCancel };
+  }
+
+  if (snapshot.value === 'failed') {
+    return { status: 'error', reason: 'generic', onCancel };
   }
 
   const step = viewStep(snapshot.value, activeMethod);
@@ -465,7 +473,7 @@ export function useReverificationController(model: ReverificationModel): Reverif
     direction: context.direction,
     value: context.inputValue,
     onValueChange: (value: string) => send({ type: 'TYPE', value }),
-    errorMessage: context.errorMessage,
+    errorMessage: context.error ? (context.error.detail ?? m.unstable__errors__generic) : undefined,
     isPending: pendingStates.has(snapshot.value),
     onSubmit: () => send({ type: 'SUBMIT' }),
     onShowMethods: () => send({ type: 'SHOW_METHODS' }),
