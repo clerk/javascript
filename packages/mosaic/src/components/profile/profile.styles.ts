@@ -175,6 +175,7 @@ export const styles = stylex.create({
     alignItems: 'center',
     backgroundColor: {
       default: 'transparent',
+      ':focus-visible': colorVars['--cl-color-border-subtle'],
       ':where([data-selected])': colorVars['--cl-color-border-subtle'],
       ':active': colorVars['--cl-color-border-subtle'],
       '@media (hover: hover)': {
@@ -195,6 +196,8 @@ export const styles = stylex.create({
     position: 'relative',
     textAlign: 'start',
     whiteSpace: 'nowrap',
+    // Above the neighbors, so the selected item's fill cannot cover the ring.
+    zIndex: { default: null, ':focus-visible': 1 },
     minHeight: {
       default: null,
       '@media (pointer: coarse)': targetVars['--cl-target-coarse'],
