@@ -61,7 +61,6 @@ type VerificationRequest = { params: Record<string, unknown>; request: Request }
 
 const REVERIFICATION_LEVELS: readonly string[] = ['first_factor', 'second_factor', 'multi_factor'];
 const PREPARABLE_STRATEGIES: readonly string[] = ['email_code', 'phone_code', 'passkey'];
-const CODE_STRATEGIES: readonly string[] = ['email_code', 'phone_code', 'passkey'];
 
 function apiError(status: number, code: string, message: string, longMessage = message, paramName?: string) {
   return HttpResponse.json(
@@ -212,8 +211,11 @@ export function verificationHandlers(state: VerificationHost, url: (path: string
       }
       const prepared =
         stage === 'first' ? state.verification.firstFactorVerification : state.verification.secondFactorVerification;
-      if (CODE_STRATEGIES.includes(strategy) && prepared?.strategy !== strategy) {
+      if (PREPARABLE_STRATEGIES.includes(strategy) && prepared?.strategy !== strategy) {
         return verificationErrors.notSent();
+      }
+      if (strategy !== 'passkey' && state.verification.secrets[strategy as VerificationSecretStrategy] === undefined) {
+        throw new Error(`fake FAPI: no secret seeded for strategy "${strategy}"`);
       }
       if (strategy === 'password') {
         if (body.get('password') !== state.verification.secrets.password) {
