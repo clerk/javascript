@@ -31,7 +31,7 @@ export type SectionMediaProps = MosaicComponentProps<'div'> & { size?: SectionMe
 export type SectionContentProps = MosaicComponentProps<'div'>;
 export type SectionLabelProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
 export type SectionDescriptionProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
-export type SectionActionsProps = MosaicComponentProps<'div'>;
+export type SectionActionsProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
 export type SectionErrorProps = MosaicComponentProps<'p'>;
 
 const mediaSizes = {
@@ -134,6 +134,7 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
       xstyle={[
         styles.title,
         skeleton && skeletonStyles.bone,
+        skeleton && skeletonStyles.wave,
         skeleton && skeletonStyles.line,
         skeleton && styles.titleSkeleton,
         xstyle,
@@ -214,7 +215,14 @@ const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function Secti
     ref: [ref, wave],
     props: mergeStyleProps(
       themeProps('section-media', { size, skeleton }),
-      stylex.props(reset.base, styles.mediaBase, mediaSizes[size], skeleton && skeletonStyles.bone, xstyle),
+      stylex.props(
+        reset.base,
+        styles.mediaBase,
+        mediaSizes[size],
+        skeleton && skeletonStyles.bone,
+        skeleton && skeletonStyles.wave,
+        xstyle,
+      ),
       rest,
     ),
   });
@@ -254,6 +262,7 @@ const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function Secti
         reset.base,
         styles.label,
         skeleton && skeletonStyles.bone,
+        skeleton && skeletonStyles.wave,
         skeleton && skeletonStyles.line,
         skeleton && styles.labelSkeleton,
         xstyle,
@@ -282,6 +291,7 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
         inHeader && styles.headerDescription,
         inHeader && sectionHeaderDescriptionMarker,
         skeleton && skeletonStyles.bone,
+        skeleton && skeletonStyles.wave,
         skeleton && skeletonStyles.line,
         skeleton && styles.descriptionSkeleton,
         xstyle,
@@ -292,7 +302,7 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
 });
 
 const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function SectionActions(
-  { render, xstyle, ...rest },
+  { skeleton = false, render, xstyle, ...rest },
   ref,
 ) {
   const wrap = React.useContext(SectionItemWrapContext);
@@ -303,8 +313,15 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
     render,
     ref,
     props: mergeStyleProps(
-      themeProps('section-actions'),
-      stylex.props(reset.base, styles.actions, wrap && styles.actionsWrap, inHeader && styles.headerActions, xstyle),
+      themeProps('section-actions', { skeleton }),
+      stylex.props(
+        reset.base,
+        styles.actions,
+        wrap && styles.actionsWrap,
+        inHeader && styles.headerActions,
+        skeleton && styles.actionsSkeleton,
+        xstyle,
+      ),
       rest,
     ),
   });

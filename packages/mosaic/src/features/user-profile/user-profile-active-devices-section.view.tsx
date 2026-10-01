@@ -9,7 +9,6 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Section } from '../../components/section';
-import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import type { MosaicMessages } from '../../localization';
 import { fill, plural, useLocale, useMessages } from '../../localization';
@@ -171,41 +170,6 @@ export function UserProfileActiveDevicesSectionView({
           onConfirm={device => signOutDeviceAt?.(device)}
         />
       ) : null}
-    </div>
-  );
-}
-
-const SKELETON_ITEMS = [0, 1, 2];
-
-export function UserProfileActiveDevicesSectionSkeleton() {
-  const m = useMessages('userProfileActiveDevices');
-
-  return (
-    <div {...stylex.props(styles.sectionCards)}>
-      <VisuallyHidden role='status'>{m.loading}</VisuallyHidden>
-      <Section.Root>
-        <Section.Group skeleton>
-          <Section.Header>
-            <Section.Title skeleton />
-          </Section.Header>
-          <Section.Body>
-            <Section.Items>
-              {SKELETON_ITEMS.map(item => (
-                <Section.Item key={item}>
-                  <Section.Media
-                    size='lg'
-                    skeleton
-                  />
-                  <Section.Content>
-                    <Section.Label skeleton />
-                    <Section.Description skeleton />
-                  </Section.Content>
-                </Section.Item>
-              ))}
-            </Section.Items>
-          </Section.Body>
-        </Section.Group>
-      </Section.Root>
     </div>
   );
 }

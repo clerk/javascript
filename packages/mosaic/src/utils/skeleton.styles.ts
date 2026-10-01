@@ -1,19 +1,18 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars } from '../tokens.stylex';
+import { colorVars, easingVars, radiusVars } from '../tokens.stylex';
 
 const wave = stylex.keyframes({
   '0%': { opacity: 1 },
-  '37.5%': { opacity: 0.6 },
-  '75%': { opacity: 1 },
+  '28%': { opacity: 0.32 },
+  '56%': { opacity: 1 },
   '100%': { opacity: 1 },
 });
 
 export const skeletonStyles = stylex.create({
-  bone: {
-    borderRadius: radiusVars['--cl-radius-md'],
+  wave: {
     animationDelay: 'var(--_cl-skeleton-delay, 0ms)',
-    animationDuration: '1.2s',
+    animationDuration: '2s',
     animationFillMode: 'both',
     animationIterationCount: 'infinite',
     animationName: {
@@ -21,7 +20,10 @@ export const skeletonStyles = stylex.create({
       ':where([data-skeleton-wave])': wave,
       '@media (prefers-reduced-motion: reduce)': { default: 'none', ':where([data-skeleton-wave])': 'none' },
     },
-    animationTimingFunction: 'cubic-bezier(0.645, 0.045, 0.355, 1)',
+    animationTimingFunction: easingVars['--cl-ease-in-out'],
+  },
+  bone: {
+    borderRadius: radiusVars['--cl-radius-md'],
     backgroundColor: colorVars['--cl-color-neutral-alpha-200'],
     userSelect: 'none',
   },

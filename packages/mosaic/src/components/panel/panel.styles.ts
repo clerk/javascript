@@ -12,6 +12,9 @@ export const styles = stylex.create({
   title: {
     display: 'block',
   },
+  titleSkeleton: {
+    width: space['24'],
+  },
 
   /**
    * The headline as a button: the heading's own type, inline so the caret can align to its

@@ -1,8 +1,8 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import { useRef } from 'react';
 
-const PERIOD_MS = 1200;
-const MS_PER_PX = 2.5;
+const PERIOD_MS = 2000;
+const MS_PER_PX = 2.1;
 
 export function useSkeletonWave<T extends HTMLElement>(enabled: boolean) {
   const ref = useRef<T | null>(null);

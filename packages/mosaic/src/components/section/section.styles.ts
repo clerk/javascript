@@ -165,6 +165,9 @@ export const styles = stylex.create({
     flexShrink: 0,
     justifyContent: 'flex-end',
   },
+  actionsSkeleton: {
+    height: space['7'],
+  },
   actionsWrap: {
     justifyContent: { [compact]: 'flex-start', default: 'flex-end' },
     width: { [compact]: '100%', default: null },

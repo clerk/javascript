@@ -51,6 +51,8 @@ the same width.
 content it stands in for, and a skeleton group is hidden from assistive technology, so pair it with
 a visually hidden status message. Placeholders pulse in one wave that travels down the page, across
 every skeleton on it. When to show the skeleton, and for how long, is up to the caller.
+`Section.Actions skeleton` draws nothing and holds the height of a small control, for items whose
+actions would otherwise make them taller than their content.
 
 `Section.Title` renders at the level from the nearest `HeadingLevelProvider`, or `h2` outside one.
 On a page, put the sections in `Panel.Sections` so the card titles sit one level below the page

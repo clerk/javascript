@@ -6,9 +6,11 @@ import { Card } from '../../components/card';
 import { useFlowAutoFocus } from '../../components/flow';
 import { Icon } from '../../components/icon';
 import { Text } from '../../components/text';
+import { useSkeletonWave } from '../../hooks/useSkeletonWave';
 import { useMessages } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../utils/reset.styles';
+import { skeletonStyles } from '../../utils/skeleton.styles';
 import { styles } from './user-profile-backup-codes.styles';
 
 export interface UserProfileBackupCodesViewProps {
@@ -83,10 +85,7 @@ export function UserProfileBackupCodesView({
                 aria-hidden='true'
                 {...stylex.props(reset.base, styles.cell)}
               >
-                <Text
-                  render={<span />}
-                  xstyle={styles.skeleton}
-                />
+                <BackupCodeSkeleton />
               </div>
             ))}
           </div>
@@ -153,5 +152,17 @@ export function UserProfileBackupCodesView({
         )}
       </Card.Footer>
     </>
+  );
+}
+
+function BackupCodeSkeleton() {
+  const wave = useSkeletonWave<HTMLParagraphElement>(true);
+
+  return (
+    <Text
+      ref={wave}
+      render={<span />}
+      xstyle={[skeletonStyles.bone, skeletonStyles.wave, skeletonStyles.line, styles.skeleton]}
+    />
   );
 }

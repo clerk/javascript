@@ -1,4 +1,4 @@
-# Motion: entrances, exits, and pulses
+# Motion: entrances, exits, and loading
 
 Token semantics live in `packages/mosaic/src/tokens.stylex.ts`, above
 `durationDefaults` / `easingDefaults` — read those comments first. This file is the
@@ -15,7 +15,7 @@ rather than eyeball it.
 | `--cl-ease-default`     | `cubic-bezier(0.175, 0.885, 0.32, 1.1)` | things ARRIVING (Swift Out)      |
 | `--cl-ease-enter`       | `cubic-bezier(0, 0, 0.2, 1)`            | arrivals that must not overshoot |
 | `--cl-ease-exit`        | `cubic-bezier(0.55, 0.085, 0.68, 0.53)` | things LEAVING (In Quad)         |
-| `--cl-ease-pulse`       | `cubic-bezier(0.4, 0, 0.6, 1)`          | repeating opacity pulses         |
+| `--cl-ease-in-out`      | `cubic-bezier(0.645, 0.045, 0.355, 1)`  | pulses and swaps (In-Out Cubic)  |
 
 Named curves come from [easing.dev](https://www.easing.dev) (Lochie Axon's Easing
 Graphs). Take one from there rather than inventing a bezier, so the catalog stays
@@ -52,12 +52,37 @@ For entrances, opacity takes `--cl-ease-enter`: there is nothing
 past `1` to overshoot into, so the pass is clamped away and only its cost — the
 slower approach to full opacity — is left.
 
-## Repeating pulses
+## Loading skeletons: one wave down the page
 
-Use `--cl-ease-pulse` for repeating opacity fades such as loading skeletons. Its
-symmetric curve slows at both ends of each fade, keeping the reversal smooth.
-Keep the pulse duration on the component and disable the animation under
-`prefers-reduced-motion: reduce`.
+Every loading placeholder pulses through one shared wave, never a local pulse of its
+own. The pieces:
+
+- `skeletonStyles.bone` (fill and radius) and `skeletonStyles.line` (a bar `0.6lh`
+  tall with `0.2lh` margins, so it fills exactly one line of the text it replaces)
+  in `utils/skeleton.styles.ts`.
+- `skeletonStyles.wave`: the keyframes (opacity `1 → 0.32 → 1` over the first 56%
+  of a 2s cycle, then a hold), on `--cl-ease-in-out`. A component with its own
+  fill and shape, such as `Avatar.Fallback`, takes `wave` alone.
+- `useSkeletonWave(enabled)` in `hooks/`: before first paint it sets a negative
+  `animation-delay` from the element's page position, `-(now − y × 2.1ms/px) mod
+2000ms`, and marks it `data-skeleton-wave`. Every bone shares the document clock
+  and lags it by its height on the page, so skeletons that mount separately read
+  as a single wave, and two lines in one row sit on different parts of it.
+
+`wave` only animates once `data-skeleton-wave` is set. Without that gate, a
+server-rendered skeleton pulses in unison before hydration and then jumps into
+phase. The keyframe duration and `PERIOD_MS` in the hook must match.
+
+Tuning, all relative to each other: the hook's px rate sets how fast the wave
+travels; the cycle over that rate sets the spacing between crests (~950px, about
+one crest per panel); the keyframe's dip width sets how wide a crest is. Shorten
+the cycle alone and crests crowd together; widen the dip alone and the hold
+disappears.
+
+Use the `skeleton` prop on `Section` parts and `Panel.Title` rather than composing
+bones by hand. Any new skeleton must measure the same as the content it replaces:
+`Section.Actions skeleton` exists because a 28px menu trigger outgrew a 20px line.
+Off under `prefers-reduced-motion: reduce`.
 
 ## A curve has a direction — don't run the entrance curve backwards
 

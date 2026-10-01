@@ -1,7 +1,5 @@
-import {
-  UserProfileActiveDevicesSectionSkeleton,
-  UserProfileActiveDevicesSectionView,
-} from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section.view';
+import { UserProfileActiveDevicesSectionSkeleton } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section.skeleton';
+import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section.view';
 
 import type { StoryMeta } from '@/lib/types';
 

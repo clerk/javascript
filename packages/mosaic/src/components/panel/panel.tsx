@@ -1,18 +1,20 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useSkeletonWave } from '../../hooks/useSkeletonWave';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../utils/focus-outline.styles';
 import { reset } from '../../utils/reset.styles';
+import { skeletonStyles } from '../../utils/skeleton.styles';
 import { Heading, HeadingLevelProvider, useHeadingLevel } from '../heading';
 import { Icon } from '../icon';
 import { ContentPanelContext, ProfileContext } from '../profile/profile.context';
 import { styles } from './panel.styles';
 
 export type PanelRootProps = MosaicComponentProps<'div'>;
-export type PanelTitleProps = MosaicComponentProps<'div'>;
+export type PanelTitleProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
 export type PanelSectionsProps = MosaicComponentProps<'div'>;
 
 const Root = React.forwardRef<HTMLDivElement, PanelRootProps>(function PanelRoot({ render, xstyle, ...rest }, ref) {
@@ -34,9 +36,10 @@ const Root = React.forwardRef<HTMLDivElement, PanelRootProps>(function PanelRoot
  * line box. That needs an inline formatting context, so the button is `display: inline`.
  */
 const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTitle(
-  { children, render, xstyle, ...rest },
+  { skeleton = false, children, render, xstyle, ...rest },
   ref,
 ) {
+  const wave = useSkeletonWave<HTMLHeadingElement>(skeleton);
   const profile = React.useContext(ProfileContext);
   const panel = React.useContext(ContentPanelContext);
   const registerPageTitle = profile?.registerPageTitle;
@@ -56,8 +59,20 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('panel-title'), stylex.props(reset.base, styles.title, xstyle), rest),
-      children: (
+      ...mergeStyleProps(
+        themeProps('panel-title', { skeleton }),
+        stylex.props(reset.base, styles.title, xstyle),
+        skeleton ? { 'aria-hidden': true } : {},
+        rest,
+      ),
+      children: skeleton ? (
+        <Heading
+          ref={wave}
+          level={level}
+          size='2xl'
+          xstyle={[skeletonStyles.bone, skeletonStyles.wave, skeletonStyles.line, styles.titleSkeleton]}
+        />
+      ) : (
         <Heading
           id={panel?.titleId}
           level={level}
