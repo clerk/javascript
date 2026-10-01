@@ -932,7 +932,7 @@ describe('Reverification', () => {
 
       // The code step opens with an empty field and no error once the code is sent
       expect(await screen.findByText(STEP.emailCode)).toBeVisible();
-      expect(slotValues()).toEqual(['', '', '', '', '', '']);
+      await waitFor(() => expect(slotValues()).toEqual(['', '', '', '', '', '']));
       expect(screen.queryByText('Incorrect code')).toBeNull();
 
       // Picking a phone code sends the SMS code through the first factor endpoints
