@@ -7,7 +7,6 @@ export const userProfileAuthenticatorSetupMessages = {
   setupUri: 'Setup URI',
   copyKey: 'Copy setup key',
   copyUri: 'Copy setup URI',
-  copying: 'Copying…',
   copied: 'Copied',
   viewSetupKey: 'Can’t scan? View setup key',
   scanQrCode: 'Scan QR code instead',

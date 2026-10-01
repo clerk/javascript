@@ -7,8 +7,8 @@ public class ClerkExpoPasskeysModule: Module {
     public func definition() -> ModuleDefinition {
         Name("ClerkExpoPasskeys")
         
-        AsyncFunction("create") { (challenge: String, rpId:String, userId: String, displayName: String, promise: Promise) in
-            self.credentialManager.createPasskey(challengeBase64: challenge, rpId:rpId, displayName:displayName, userIdBase64: userId, promise: promise)
+        AsyncFunction("create") { (challenge: String, rpId:String, userId: String, displayName: String, excludeCredentialIds: [String], promise: Promise) in
+            self.credentialManager.createPasskey(challengeBase64: challenge, rpId:rpId, displayName:displayName, userIdBase64: userId, excludeCredentialIdsBase64: excludeCredentialIds, promise: promise)
         }
         
         AsyncFunction("get") { (challenge: String, rpId:String, promise: Promise) in

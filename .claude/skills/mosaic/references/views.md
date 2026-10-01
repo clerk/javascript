@@ -39,8 +39,8 @@ Two shapes, chosen by whether the slice fetches its own data:
 - A **wrapper composes** model + controller + view, and the view is a pure
   function of props (`user-button.tsx`).
 - A **leaf view owns its controller** and takes the effect as a prop
-  (`UserProfileDeleteSectionView` calls `useUserProfileDeleteSectionController`
-  with its `onDelete`). Still no Clerk — the effect arrives from above.
+  (`UserProfileUsernameRowView` calls `useUserProfileEditUsernameController`
+  with its `onSubmit`). Still no Clerk — the effect arrives from above.
 
 ## Where the strings live
 
@@ -124,9 +124,7 @@ every successful removal drops focus on the floor.
 
 ## Testing
 
-Render the view directly with **plain props and `vi.fn()` callbacks**. No Clerk
-providers, no fixtures, no machine. **Wrap in `<MosaicProvider>`** — it is not a
-Clerk provider; it supplies the icon-override context, and wrapping keeps the
-test tree matching production. See `testing.md`.
+The view's behavior (roles, labels, focus) is covered by the feature test. Its
+visual states are swingset stories with plain props. See `testing.md`.
 
 See `references/mosaic-architecture.md` → "Views" for the layer contract.

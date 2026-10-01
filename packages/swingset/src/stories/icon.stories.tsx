@@ -93,7 +93,6 @@ function IconGallery({ names }: { names: readonly IconProps['name'][] }) {
           <Icon
             name={name}
             size='lg'
-            aria-hidden
           />
           <code style={{ fontSize: 11, lineHeight: 1.5, overflowWrap: 'anywhere' }}>{name}</code>
         </div>

@@ -1,5 +1,54 @@
 # @clerk/tanstack-react-start
 
+## 1.6.4
+
+### Patch Changes
+
+- Updated dependencies [[`4eac21f`](https://github.com/clerk/javascript/commit/4eac21f68b6608d5e59dfb9d7660582d7bf0a148), [`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/backend@3.22.0
+  - @clerk/shared@4.38.0
+  - @clerk/react@6.17.5
+
+## 1.6.3
+
+### Patch Changes
+
+- Updated dependencies [[`0fe89c2`](https://github.com/clerk/javascript/commit/0fe89c20379bea9484b65276905cfd90397ea890), [`e34a5cc`](https://github.com/clerk/javascript/commit/e34a5cc2622e05eea9a683651e0784ad23705bb2), [`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda)]:
+  - @clerk/backend@3.21.1
+  - @clerk/shared@4.37.1
+  - @clerk/react@6.17.4
+
+## 1.6.2
+
+### Patch Changes
+
+- Updated dependencies [[`397fd72`](https://github.com/clerk/javascript/commit/397fd72fe8657540ad9cb4c1f20b1efc4f4fe26e), [`6a14691`](https://github.com/clerk/javascript/commit/6a14691f8d98dcafd3956e1ea97cb35d56a34864), [`0ee4ee2`](https://github.com/clerk/javascript/commit/0ee4ee2b49286a8cae5f251ec997f30c8a863205), [`7a3fcf5`](https://github.com/clerk/javascript/commit/7a3fcf5b2d536b4e444920a3e87c4f70da3487ba), [`69c1b9c`](https://github.com/clerk/javascript/commit/69c1b9c886ab0860a9af12872235b6e492b2b2d0), [`d9cf0f2`](https://github.com/clerk/javascript/commit/d9cf0f29ea2ef8388bbd5736007ca71f9411bf42), [`f8266be`](https://github.com/clerk/javascript/commit/f8266bebb6eab6d7358c03abca2860880319f460)]:
+  - @clerk/backend@3.21.0
+  - @clerk/shared@4.37.0
+  - @clerk/react@6.17.3
+
+## 1.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`645a532`](https://github.com/clerk/javascript/commit/645a5327d9c7cae8052e39958ec4d737457d179a), [`84ee588`](https://github.com/clerk/javascript/commit/84ee588a712ffa0bb2988531d7a2727c9e06ac37), [`4e538ac`](https://github.com/clerk/javascript/commit/4e538ac07ed412706516531d9be9696bbd31bf24)]:
+  - @clerk/shared@4.36.0
+  - @clerk/react@6.17.2
+  - @clerk/backend@3.20.1
+
+## 1.6.0
+
+### Minor Changes
+
+- In development, missing Clerk keys no longer activate keyless mode. When `VITE_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` are not set, the SDK now fails with an error directing you to run `npx clerk@latest init`, which provisions a Clerk application and writes the keys to `.env.local`. Keys that keyless mode stored in the `.clerk/` directory are no longer read, and `VITE_CLERK_KEYLESS_DISABLED` and `CLERK_KEYLESS_DISABLED` no longer have any effect. Existing apps with configured keys are unaffected. ([#9578](https://github.com/clerk/javascript/pull/9578)) by [@djgould](https://github.com/djgould)
+
+### Patch Changes
+
+- Updated dependencies [[`b3af79e`](https://github.com/clerk/javascript/commit/b3af79e946aaa403595b31e472b07b138db39dc6), [`cc6f11a`](https://github.com/clerk/javascript/commit/cc6f11af564b62daf186f9721594efd864ce093f), [`9d78a1f`](https://github.com/clerk/javascript/commit/9d78a1f42e83874ebac54b67d81d444b376350e5), [`d46b544`](https://github.com/clerk/javascript/commit/d46b5446e89f15c5532bfbbc09fdc05a0fbcbf8d), [`f50f48c`](https://github.com/clerk/javascript/commit/f50f48cf3c67807c8def30d4a6d29d6c7bf904d2)]:
+  - @clerk/shared@4.35.0
+  - @clerk/backend@3.20.0
+  - @clerk/react@6.17.1
+
 ## 1.5.16
 
 ### Patch Changes

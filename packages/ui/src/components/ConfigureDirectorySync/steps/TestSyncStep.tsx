@@ -1,5 +1,9 @@
-import { __internal_useOrganizationDirectorySyncUsers } from '@clerk/shared/react';
+import {
+  __internal_useOrganizationDirectorySyncStatus,
+  __internal_useOrganizationDirectorySyncUsers,
+} from '@clerk/shared/react';
 import type { DirectorySyncUserResource } from '@clerk/shared/types';
+import { useEffect, useState } from 'react';
 
 import {
   Badge,
@@ -18,6 +22,7 @@ import { Step } from '../../ConfigureSSO/elements/Step';
 import { useWizard } from '../../ConfigureSSO/elements/Wizard';
 import { useConfigureDirectorySync } from '../ConfigureDirectorySyncContext';
 import { DIRECTORY_SYNC_PROVIDERS } from '../providerMeta';
+import { SyncNowRow } from '../SyncNowRow';
 
 const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.Element => {
   const displayName = [user.firstName, user.lastName].filter(Boolean).join(' ');
@@ -85,14 +90,48 @@ const ProvisionedUserRow = ({ user }: { user: DirectorySyncUserResource }): JSX.
 
 export const TestSyncStep = (): JSX.Element => {
   const { goPrev } = useWizard();
-  const { providerMeta, directory, onExit } = useConfigureDirectorySync();
+  const { providerMeta, directory, onExit, syncDirectory } = useConfigureDirectorySync();
   const { t } = useLocalizations();
+  const isPull = providerMeta?.mode === 'pull';
   // The list doubles as a live feed while the admin pushes test users from the
   // IdP, so poll for as long as this step is mounted.
   const users = __internal_useOrganizationDirectorySyncUsers({ directory, poll: true });
+  // A pull directory has nothing to report until a run happens, and a run can
+  // be minutes away, so the status is only worth watching for those.
+  const syncStatus = __internal_useOrganizationDirectorySyncStatus({ directory, poll: isPull, enabled: isPull });
 
   const rows = users.data ?? [];
   const providerName = t((providerMeta ?? DIRECTORY_SYNC_PROVIDERS.custom).name);
+  const lastSyncStatus = syncStatus.data?.lastSyncStatus ?? null;
+  const lastSyncedAt = syncStatus.data?.lastSyncedAt ?? null;
+
+  // The two queries poll independently, so a finished run is reported while the
+  // list on screen still predates it. Refresh the list for every run, whoever
+  // started it, and keep waiting until that lands: otherwise the stale empty
+  // list reads as the run's result.
+  const [isRefreshingAfterSync, setIsRefreshingAfterSync] = useState(false);
+  const { revalidate: revalidateUsers } = users;
+  useEffect(() => {
+    if (!isPull || !lastSyncedAt) {
+      return;
+    }
+    setIsRefreshingAfterSync(true);
+    void revalidateUsers().finally(() => setIsRefreshingAfterSync(false));
+  }, [isPull, lastSyncedAt?.getTime(), revalidateUsers]);
+
+  // The run reports how many users it changed, and those users are provisioned
+  // after it finishes. A count above zero with nothing listed yet means they
+  // are still landing; zero is the settled answer that the run changed nobody.
+  // The count is absent on a backend that predates it, and then the refresh
+  // above is all there is to go on.
+  const changedUserCount = syncStatus.data?.lastSyncChangedUserCount ?? null;
+  const hasUsersStillLanding = changedUserCount !== null && changedUserCount > 0;
+
+  // A push directory is always waiting: the IdP provisions whenever it likes.
+  // A pull directory that has finished a run is not — an empty list is that
+  // run's result, and spinning implies work that will never happen.
+  const isWaitingForUsers =
+    !isPull || lastSyncStatus === null || lastSyncStatus === 'running' || hasUsersStillLanding || isRefreshingAfterSync;
 
   return (
     <>
@@ -106,8 +145,20 @@ export const TestSyncStep = (): JSX.Element => {
           <Text
             as='p'
             colorScheme='secondary'
-            localizationKey={localizationKeys('configureDirectorySync.testStep.description')}
+            localizationKey={localizationKeys(
+              isPull
+                ? 'configureDirectorySync.testStep.description__pull'
+                : 'configureDirectorySync.testStep.description',
+            )}
           />
+
+          {isPull && (
+            <SyncNowRow
+              status={syncStatus.data}
+              onSync={syncDirectory}
+              onSynced={() => void syncStatus.revalidate()}
+            />
+          )}
 
           <Text
             as='p'
@@ -146,15 +197,23 @@ export const TestSyncStep = (): JSX.Element => {
                 borderColor: t.colors.$borderAlpha150,
               })}
             >
-              <Spinner
-                elementDescriptor={descriptors.spinner}
-                size='xs'
-                colorScheme='neutral'
-              />
+              {isWaitingForUsers && (
+                <Spinner
+                  elementDescriptor={descriptors.spinner}
+                  size='xs'
+                  colorScheme='neutral'
+                />
+              )}
               <Text
                 as='span'
                 colorScheme='secondary'
-                localizationKey={localizationKeys('configureDirectorySync.testStep.empty__waitingForFirstUser')}
+                localizationKey={localizationKeys(
+                  !isWaitingForUsers
+                    ? 'configureDirectorySync.testStep.empty__noUsersProvisioned'
+                    : isPull
+                      ? 'configureDirectorySync.testStep.empty__waitingForFirstSync'
+                      : 'configureDirectorySync.testStep.empty__waitingForFirstUser',
+                )}
               />
             </Flex>
           ) : (

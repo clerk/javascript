@@ -1,8 +1,8 @@
-import * as stylex from '@stylexjs/stylex';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
+import { useRef } from 'react';
 
-import { panelStyles, Profile } from '../../components/profile';
-import { mergeStyleProps, themeProps } from '../../props';
+import { Panel } from '../../components/panel';
+import { themeProps } from '../../props';
 import type {
   UserProfileAccountSectionViewProps,
   UserProfileEmail,
@@ -14,7 +14,6 @@ import type {
   UserProfileConnectionProvider,
 } from './user-profile-connected-accounts-section.view';
 import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
-import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
@@ -36,8 +35,8 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
   onConnectWeb3Wallet?: (id: string) => void;
   onSetPrimaryWeb3Wallet?: (id: string) => void;
   onRemoveWeb3Wallet?: (id: string) => void | Promise<void>;
-  /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
-  onDeleteAccount?: () => Promise<void>;
+  /** Danger zone. Omit to hide it. */
+  deleteAccountSlot?: ReactNode;
 }
 
 export function UserProfileProfilePanelView({
@@ -80,12 +79,18 @@ export function UserProfileProfilePanelView({
   onConnectWeb3Wallet,
   onSetPrimaryWeb3Wallet,
   onRemoveWeb3Wallet,
-  onDeleteAccount,
+  deleteAccountSlot,
 }: UserProfileProfilePanelViewProps): ReactElement {
+  const pageTitle = useRef<HTMLDivElement>(null);
   return (
-    <div {...mergeStyleProps(themeProps('user-profile-profile-panel'), stylex.props(panelStyles.root))}>
-      <Profile.PageTitle>Account</Profile.PageTitle>
-      <div {...stylex.props(panelStyles.sections)}>
+    <Panel.Root render={<div {...themeProps('user-profile-profile-panel')} />}>
+      <Panel.Title
+        ref={pageTitle}
+        tabIndex={-1}
+      >
+        Account
+      </Panel.Title>
+      <Panel.Sections>
         <UserProfileAccountSectionView
           allowMultipleAccounts={allowMultipleAccounts}
           emails={emails}
@@ -118,6 +123,7 @@ export function UserProfileProfilePanelView({
           onSubmitUsername={onSubmitUsername}
         />
         <UserProfileConnectedAccountsSectionView
+          fallbackFocus={() => pageTitle.current}
           accounts={connectedAccounts}
           availableProviders={availableConnectionProviders}
           onReconnect={onReconnectAccount}
@@ -125,14 +131,15 @@ export function UserProfileProfilePanelView({
           onRemove={onRemoveConnectedAccount}
         />
         <UserProfileWeb3WalletsSectionView
+          fallbackFocus={() => pageTitle.current}
           wallets={web3Wallets}
           availableProviders={availableWeb3Providers}
           onConnect={onConnectWeb3Wallet}
           onRemove={onRemoveWeb3Wallet}
           onSetPrimary={onSetPrimaryWeb3Wallet}
         />
-        {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
-      </div>
-    </div>
+        {deleteAccountSlot}
+      </Panel.Sections>
+    </Panel.Root>
   );
 }

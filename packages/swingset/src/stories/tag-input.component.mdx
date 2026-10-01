@@ -89,3 +89,7 @@ Tags that fail `validate` are marked invalid.
 | Input      | `.cl-tag-input-input`      | The text input new entries are typed into.   |
 
 The root carries `data-disabled` and `data-invalid`, plus the primitive's `data-empty` when there are no tags. Each tag carries `data-disabled`, `data-invalid` when it fails `validate`, and `data-starting-style` / `data-ending-style` while it animates in and out.
+
+## Motion
+
+When a tag is added or removed, the other tags and the text input slide to their new positions and the root's height animates, using `useLayoutAnimation` from the primitives. The root sets `--cl-layout-duration` and `--cl-layout-easing`; override them with `xstyle` to change the timing. A removed tag is pinned in place with `data-layout-popped` while it fades out, and moving items carry `data-layout-animating`. Under `prefers-reduced-motion: reduce`, items snap.

@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Section } from '../../components/section';
+import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import { fill, useMessages } from '../../localization';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 import { UserProfileWeb3WalletRowView } from './user-profile-web3-wallet-row.view';
@@ -25,6 +26,7 @@ export interface UserProfileWeb3Wallet {
 }
 
 export interface UserProfileWeb3WalletsSectionViewProps {
+  fallbackFocus?: () => HTMLElement | null;
   wallets: UserProfileWeb3Wallet[];
   availableProviders?: UserProfileWeb3Provider[];
   onConnect?: (id: string) => void;
@@ -34,12 +36,23 @@ export interface UserProfileWeb3WalletsSectionViewProps {
 
 export function UserProfileWeb3WalletsSectionView({
   wallets,
+  fallbackFocus,
   availableProviders = [],
   onConnect,
   onSetPrimary,
   onRemove,
 }: UserProfileWeb3WalletsSectionViewProps) {
   const m = useMessages('userProfileWeb3Wallets');
+  const section = useRef<HTMLDivElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: wallets.map(wallet => wallet.id),
+    onRemove,
+    fallback: () =>
+      section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ??
+      section.current ??
+      fallbackFocus?.() ??
+      null,
+  });
   const removeWallet = useMemo(() => Confirmation.createHandle<UserProfileWeb3Wallet>(), []);
   const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
 
@@ -47,25 +60,33 @@ export function UserProfileWeb3WalletsSectionView({
     <>
       {hasRows ? (
         <Section.Root>
-          <Section.Title>{m.title}</Section.Title>
-          <Section.Group>
-            {wallets.map(wallet => (
-              <UserProfileWeb3WalletRowView
-                key={wallet.id}
-                wallet={wallet}
-                onSetPrimary={onSetPrimary}
-                onRemove={onRemove ? wallet => removeWallet.open(wallet) : undefined}
-              />
-            ))}
-            {onConnect
-              ? availableProviders.map(provider => (
-                  <UserProfileWeb3WalletRowView
-                    key={provider.id}
-                    wallet={provider}
-                    onConnect={onConnect}
-                  />
-                ))
-              : null}
+          <Section.Group
+            ref={section}
+            tabIndex={-1}
+          >
+            <Section.Header>
+              <Section.Title>{m.title}</Section.Title>
+            </Section.Header>
+            <Section.Body>
+              {wallets.map(wallet => (
+                <UserProfileWeb3WalletRowView
+                  key={wallet.id}
+                  wallet={wallet}
+                  triggerRef={removalFocus.registerTrigger(wallet.id)}
+                  onSetPrimary={onSetPrimary}
+                  onRemove={onRemove ? wallet => removeWallet.open(wallet) : undefined}
+                />
+              ))}
+              {onConnect
+                ? availableProviders.map(provider => (
+                    <UserProfileWeb3WalletRowView
+                      key={provider.id}
+                      wallet={provider}
+                      onConnect={onConnect}
+                    />
+                  ))
+                : null}
+            </Section.Body>
           </Section.Group>
         </Section.Root>
       ) : null}
@@ -80,7 +101,8 @@ export function UserProfileWeb3WalletsSectionView({
           }
           actionLabel={m.removeDialog.confirm}
           cancelLabel={m.removeDialog.cancel}
-          onConfirm={wallet => onRemove(wallet.id)}
+          finalFocus={removalFocus.finalFocus}
+          onConfirm={wallet => removalFocus.remove(wallet.id)}
         />
       ) : null}
     </>

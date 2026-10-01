@@ -4,6 +4,7 @@ import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
+import { useListRemovalFocus } from '../../../hooks/useListRemovalFocus';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfileEmail } from './user-profile-account-section.types';
 import type { UserProfileAddEmailControllerOptions } from './user-profile-add-email.controller';
@@ -36,6 +37,12 @@ export function UserProfileEmailRowView({
   onRemoveEmail,
 }: UserProfileEmailRowViewProps) {
   const m = useMessages('userProfileAccountSection');
+  const row = useRef<HTMLDivElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: emails.map(email => email.id),
+    onRemove: onRemoveEmail,
+    fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
+  });
   const addEmailAction =
     onSendEmailCode && onVerifyEmailCode ? (
       <AddEmail
@@ -105,6 +112,8 @@ export function UserProfileEmailRowView({
   return (
     <>
       <UserProfileContactListRowView
+        rowRef={row}
+        triggerRef={removalFocus.registerTrigger}
         items={emails}
         kind='email'
         label={m.email.label}
@@ -112,15 +121,16 @@ export function UserProfileEmailRowView({
         onRemove={onRemoveEmail ? removeEmail : undefined}
         onSetPrimary={onSetPrimaryEmail && !isSettingPrimary ? id => void setPrimaryEmail(id) : undefined}
         onVerify={onVerifyEmail}
-      />
-      {primaryError ? (
-        <Text
-          role='alert'
-          color='negative'
-        >
-          {primaryError}
-        </Text>
-      ) : null}
+      >
+        {primaryError ? (
+          <Text
+            role='alert'
+            color='negative'
+          >
+            {primaryError}
+          </Text>
+        ) : null}
+      </UserProfileContactListRowView>
       {onRemoveEmail ? (
         <Confirmation
           handle={removeEmailConfirmation}
@@ -128,7 +138,8 @@ export function UserProfileEmailRowView({
           description={email => fill(m.email.removeDialog.description, { emailAddress: email.value })}
           actionLabel={m.email.removeDialog.confirm}
           cancelLabel={m.email.removeDialog.cancel}
-          onConfirm={email => onRemoveEmail(email.id)}
+          finalFocus={removalFocus.finalFocus}
+          onConfirm={email => removalFocus.remove(email.id)}
         />
       ) : null}
     </>

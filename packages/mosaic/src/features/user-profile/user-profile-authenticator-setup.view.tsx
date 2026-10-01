@@ -4,31 +4,18 @@ import { useState } from 'react';
 
 import { Button } from '../../components/button';
 import { Card } from '../../components/card';
+import { CopyButton } from '../../components/copy-button';
 import { Field } from '../../components/field';
-import { Icon } from '../../components/icon';
 import { InputGroup } from '../../components/input-group';
-import { VisuallyHidden } from '../../components/visually-hidden';
 import { useMessages } from '../../localization';
 import { styles } from './user-profile-authenticator-setup.styles';
-
-export interface UserProfileAuthenticatorCopyProps {
-  onCopy: (value: string) => void;
-  state?: { status: 'pending' | 'success' } | { status: 'error'; message: string };
-}
 
 export interface UserProfileAuthenticatorSetupViewProps {
   secret: string;
   uri: string;
-  secretCopy?: UserProfileAuthenticatorCopyProps;
-  uriCopy?: UserProfileAuthenticatorCopyProps;
 }
 
-export function UserProfileAuthenticatorSetupView({
-  secret,
-  uri,
-  secretCopy,
-  uriCopy,
-}: UserProfileAuthenticatorSetupViewProps) {
+export function UserProfileAuthenticatorSetupView({ secret, uri }: UserProfileAuthenticatorSetupViewProps) {
   const m = useMessages('userProfileAuthenticatorSetup');
   const [showSetupKey, setShowSetupKey] = useState(false);
 
@@ -42,44 +29,26 @@ export function UserProfileAuthenticatorSetupView({
         {showSetupKey ? (
           <>
             {[
-              { label: m.setupKey, value: secret, copyLabel: m.copyKey, copy: secretCopy },
-              { label: m.setupUri, value: uri, copyLabel: m.copyUri, copy: uriCopy },
-            ].map(({ label, value, copyLabel, copy }) => {
-              const feedback = copy?.state;
-              return (
-                <Field.Root key={label}>
-                  <Field.Label>{label}</Field.Label>
-                  <InputGroup.Root>
-                    <InputGroup.Input
+              { label: m.setupKey, value: secret, copyLabel: m.copyKey },
+              { label: m.setupUri, value: uri, copyLabel: m.copyUri },
+            ].map(({ label, value, copyLabel }) => (
+              <Field.Root key={label}>
+                <Field.Label>{label}</Field.Label>
+                <InputGroup.Root>
+                  <InputGroup.Input
+                    value={value}
+                    readOnly
+                  />
+                  <InputGroup.End>
+                    <CopyButton
                       value={value}
-                      readOnly
+                      label={copyLabel}
+                      copiedLabel={m.copied}
                     />
-                    {copy ? (
-                      <InputGroup.End>
-                        <Button
-                          type='button'
-                          aria-label={copyLabel}
-                          disabled={feedback?.status === 'pending'}
-                          focusableWhenDisabled
-                          onClick={() => copy.onCopy(value)}
-                        >
-                          <Icon name={feedback?.status === 'success' ? 'checkmark' : 'clipboard'} />
-                        </Button>
-                      </InputGroup.End>
-                    ) : null}
-                  </InputGroup.Root>
-                  <Field.Message>
-                    <Field.Error>{feedback?.status === 'error' ? feedback.message : null}</Field.Error>
-                  </Field.Message>
-                  <VisuallyHidden
-                    role='status'
-                    aria-label={copyLabel}
-                  >
-                    {feedback?.status === 'pending' ? m.copying : feedback?.status === 'success' ? m.copied : null}
-                  </VisuallyHidden>
-                </Field.Root>
-              );
-            })}
+                  </InputGroup.End>
+                </InputGroup.Root>
+              </Field.Root>
+            ))}
           </>
         ) : (
           <div {...stylex.props(styles.qrCode)}>

@@ -4,11 +4,9 @@ import { useMemo, useRef, useState } from 'react';
 import { Destructive } from '../../blocks/destructive';
 import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
-import { Icon } from '../../components/icon';
-import { InputGroup } from '../../components/input-group';
 import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
-import { panelStyles, Profile } from '../../components/profile';
+import { Panel } from '../../components/panel';
 import { Spinner } from '../../components/spinner';
 import type { TableHeaderCellProps } from '../../components/table';
 import { Table } from '../../components/table';
@@ -17,7 +15,7 @@ import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import { fill, useMessages } from '../../localization';
 import { useDataTable } from '../../primitives/hooks';
-import { mergeStyleProps, themeProps } from '../../props';
+import { themeProps } from '../../props';
 import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
 import { styles } from './user-profile-api-keys-panel.styles';
 import type {
@@ -46,6 +44,8 @@ export function UserProfileApiKeysPanelView({
   onSortChange,
   isLoading,
   isFetching = false,
+  isError = false,
+  onRetry,
 }: UserProfileApiKeysPanelViewProps) {
   const m = useMessages('userProfileApiKeysPanel');
   const searchInput = useRef<HTMLInputElement>(null);
@@ -112,39 +112,16 @@ export function UserProfileApiKeysPanelView({
     : { label: m.noKeys, description: m.noKeysDescription };
   return (
     <>
-      <div {...mergeStyleProps(themeProps('user-profile-api-keys-panel'), stylex.props(panelStyles.root))}>
-        <Profile.PageTitle>{m.title}</Profile.PageTitle>
-        <div {...stylex.props(styles.toolbar)}>
-          <InputGroup.Root
-            size='md'
-            xstyle={styles.search}
-          >
-            <InputGroup.Start>
-              <Icon name='magnifying-glass' />
-            </InputGroup.Start>
-            <InputGroup.Input
-              ref={searchInput}
-              autoComplete='off'
-              type='search'
-              aria-label={m.search}
-              placeholder={m.search}
-              value={table.globalFilter}
-              onChange={event => table.setGlobalFilter(event.currentTarget.value)}
-            />
-            {table.globalFilter ? (
-              <InputGroup.End>
-                <Button
-                  aria-label={m.clearSearch}
-                  onClick={() => {
-                    table.setGlobalFilter('');
-                    searchInput.current?.focus();
-                  }}
-                >
-                  <Icon name='x' />
-                </Button>
-              </InputGroup.End>
-            ) : null}
-          </InputGroup.Root>
+      <Panel.Root render={<div {...themeProps('user-profile-api-keys-panel')} />}>
+        <Panel.Title>{m.title}</Panel.Title>
+        <Table.Toolbar>
+          <Table.Search
+            ref={searchInput}
+            label={m.search}
+            clearLabel={m.clearSearch}
+            value={table.globalFilter}
+            onValueChange={table.setGlobalFilter}
+          />
           {onCreate ? (
             <Button
               ref={createButton}
@@ -153,7 +130,7 @@ export function UserProfileApiKeysPanelView({
               {m.create}
             </Button>
           ) : null}
-        </div>
+        </Table.Toolbar>
         <Table.Root
           aria-label={m.title}
           aria-busy={isLoading || isFetching}
@@ -179,12 +156,32 @@ export function UserProfileApiKeysPanelView({
             </Table.Row>
           </Table.Header>
           <Table.Body>
+            {/* TODO: Replace with a shared Table.Loading built on a Mosaic Skeleton component (skeleton rows sized to the columns). */}
             {isLoading ? (
               <Table.Empty colSpan={columnCount}>
                 <span role='status'>
                   <Spinner />
                   <VisuallyHidden>{m.loading}</VisuallyHidden>
                 </span>
+              </Table.Empty>
+            ) : isError ? (
+              <Table.Empty colSpan={columnCount}>
+                <EmptyState.Root>
+                  <EmptyState.Icon name='exclamation-circle' />
+                  <EmptyState.Label>{m.loadError}</EmptyState.Label>
+                  <EmptyState.Description>{m.loadErrorDescription}</EmptyState.Description>
+                  {onRetry ? (
+                    <EmptyState.Actions>
+                      <Button
+                        variant='outline'
+                        color='neutral'
+                        onClick={onRetry}
+                      >
+                        {m.retry}
+                      </Button>
+                    </EmptyState.Actions>
+                  ) : null}
+                </EmptyState.Root>
               </Table.Empty>
             ) : table.rows.length === 0 ? (
               <Table.Empty colSpan={columnCount}>
@@ -229,10 +226,10 @@ export function UserProfileApiKeysPanelView({
                       </Text>
                     </div>
                   </Table.Cell>
-                  <Table.Cell xstyle={styles.dateCell}>
+                  <Table.Cell noWrap>
                     <Text>{row.original.createdAtLabel}</Text>
                   </Table.Cell>
-                  <Table.Cell xstyle={styles.dateCell}>
+                  <Table.Cell noWrap>
                     <Text>{row.original.lastUsedAtLabel ?? m.neverUsed}</Text>
                   </Table.Cell>
                   {onRevoke ? (
@@ -264,7 +261,7 @@ export function UserProfileApiKeysPanelView({
             onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
           />
         ) : null}
-      </div>
+      </Panel.Root>
       {createDialog ? <UserProfileCreateAPIKeyDialog {...createDialog} /> : null}
       {onRevoke ? (
         <Destructive

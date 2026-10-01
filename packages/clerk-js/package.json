@@ -1,6 +1,6 @@
 {
   "name": "@clerk/clerk-js",
-  "version": "6.33.0",
+  "version": "6.37.0",
   "description": "Clerk JS library",
   "keywords": [
     "clerk",
@@ -88,9 +88,6 @@
     "@base-org/account": "catalog:module-manager",
     "@clerk/shared": "workspace:^",
     "@coinbase/wallet-sdk": "catalog:module-manager",
-    "@solana/wallet-adapter-base": "catalog:module-manager",
-    "@solana/wallet-adapter-react": "catalog:module-manager",
-    "@solana/wallet-standard": "catalog:module-manager",
     "@stripe/stripe-js": "5.6.0",
     "@swc/helpers": "catalog:repo",
     "@tanstack/query-core": "catalog:repo",

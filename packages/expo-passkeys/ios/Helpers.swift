@@ -9,9 +9,13 @@ enum Errors: String, Error  {
     case notHandled = "The authorization request wasn't handled."
     case failed = "The authorization request failed."
     case unknownAuthorizationError = "An unknown authorization error occurred."
+    case matchedExcludedCredential = "A passkey already exists for this account on this device."
 }
 
 func handleAuthorizationError(_ error: ASAuthorizationError.Code) -> Errors {
+    if #available(iOS 18.0, *), error == .matchedExcludedCredential {
+        return Errors.matchedExcludedCredential
+    }
     switch error {
     case .unknown:
         return Errors.unknown

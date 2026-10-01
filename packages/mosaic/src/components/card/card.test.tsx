@@ -87,6 +87,21 @@ describe('Mosaic Card', () => {
     expect(screen.getByTestId('footer')).toHaveAttribute('data-elevation', 'overlay');
   });
 
+  it('reflects the size on the root', () => {
+    render(
+      <>
+        <Card.Root data-testid='md' />
+        <Card.Root
+          size='lg'
+          data-testid='lg'
+        />
+      </>,
+    );
+
+    expect(screen.getByTestId('md')).toHaveAttribute('data-size', 'md');
+    expect(screen.getByTestId('lg')).toHaveAttribute('data-size', 'lg');
+  });
+
   it('composes caller xstyle onto every slot', () => {
     render(
       <Card.Root

@@ -1,4 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
+import type { Ref } from 'react';
 
 import type { ActionMenuAction } from '../../components/action-menu';
 import { ActionMenu } from '../../components/action-menu';
@@ -12,11 +13,13 @@ import type { UserProfileConnectedAccount } from './user-profile-connected-accou
 
 export function UserProfileConnectedAccountRowView({
   account,
+  triggerRef,
   onConnect,
   onReconnect,
   onRemove,
 }: {
   account: UserProfileConnectedAccount;
+  triggerRef?: Ref<HTMLButtonElement>;
   onConnect?: (id: string) => void;
   onReconnect?: (id: string) => void;
   onRemove?: (account: UserProfileConnectedAccount) => void;
@@ -86,6 +89,7 @@ export function UserProfileConnectedAccountRowView({
         ) : actions.length > 0 ? (
           <Section.Actions>
             <ActionMenu
+              triggerRef={triggerRef}
               label={fill(m.manageLabel, { provider: account.provider })}
               actions={actions}
             />

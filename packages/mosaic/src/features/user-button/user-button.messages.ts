@@ -25,6 +25,7 @@ export const userButtonMessages = {
   },
   manage: {
     invite: 'Invite',
+    settings: 'Settings',
     account: 'Manage account',
     organization: 'Manage organization',
     createOrganization: 'Create organization',

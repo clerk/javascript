@@ -4,6 +4,9 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
 import { useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosText } from '@/lib/chaos';
+
 interface DemoWallet extends UserProfileWeb3Wallet {
   providerId?: string;
 }
@@ -43,8 +46,14 @@ export function useWeb3WalletsFixture({
   primaryError?: boolean;
   removalState?: 'pending' | 'error';
 } = {}) {
-  const [wallets, setWallets] = useState(initialWallets);
-  const [connectionProviders, setConnectionProviders] = useState(availableProviders);
+  const seedWallets = useChaosFixture(initialWallets, items =>
+    items.map(wallet => ({ ...wallet, provider: chaosText(wallet.provider) })),
+  );
+  const seedProviders = useChaosFixture(availableProviders, items =>
+    items.map(provider => ({ ...provider, provider: chaosText(provider.provider) })),
+  );
+  const [wallets, setWallets] = useState(seedWallets);
+  const [connectionProviders, setConnectionProviders] = useState(seedProviders);
   const [removalFailed, setRemovalFailed] = useState(false);
   const [primaryFailed, setPrimaryFailed] = useState(false);
 

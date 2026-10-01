@@ -1,5 +1,6 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
 import { isClerkAPIResponseError } from '@clerk/shared/error';
+import { inertProps } from '@clerk/shared/inert';
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { getClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
@@ -11,13 +12,14 @@ import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 import { handleError } from '@/ui/utils/errorHandler';
 import { createPasswordError } from '@/ui/utils/passwordUtils';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 import { createUsernameError } from '@/ui/utils/usernameUtils';
 
-import { withRedirectToAfterSignUp, withRedirectToSignUpTask } from '../../common';
+import { ActionBlockedCard, withRedirectToAfterSignUp, withRedirectToSignUpTask } from '../../common';
 import { SignInContext, useCoreSignUp, useEnvironment, useSignUpContext } from '../../contexts';
 import { descriptors, Flex, Flow, localizationKeys, useAppearance, useLocalizations } from '../../customizables';
 import { CaptchaElement } from '../../elements/CaptchaElement';
@@ -385,6 +387,11 @@ function SignUpStartInternal(): JSX.Element {
     setAlternativePhoneCodeProvider(phoneCodeProvider);
   };
 
+  const blockedDetails = actionBlockedDetailsFrom(card.rawError);
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
+  }
+
   if (mode !== SIGN_UP_MODES.PUBLIC && !(hasTicket || hasExistingSignUpWithTicket)) {
     return <SignUpRestrictedAccess />;
   }
@@ -415,8 +422,7 @@ function SignUpStartInternal(): JSX.Element {
               direction='col'
               elementDescriptor={descriptors.main}
               gap={6}
-              // @ts-ignore - `inert` is not yet in the installed React types
-              inert={captchaIsInteractive ? '' : undefined}
+              {...inertProps(captchaIsInteractive)}
               // `display:none` (not `visibility:hidden`) so the collapsed column leaves flex flow and
               // contributes no `gap` gutter to `Card.Content` — otherwise it injects empty space above
               // the spotlighted captcha. Subtree stays mounted (form state preserved); `inert` is then

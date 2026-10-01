@@ -1,5 +1,4 @@
 export const userProfilePasswordSectionMessages = {
-  sectionTitle: 'Authentication',
   label: 'Password',
   masked: '••••••••••••••••••',
   noPasswordSet: 'No password set',
@@ -24,6 +23,5 @@ export const userProfilePasswordSectionMessages = {
 
   errors: {
     mismatch: "Passwords don't match.",
-    generic: 'Something went wrong. Please try again.',
   },
 } as const;

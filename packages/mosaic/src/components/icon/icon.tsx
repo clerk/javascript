@@ -34,6 +34,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function MosaicIc
   // The placement axis reflects as `data-icon`, not `data-placement`, so a container selects the
   // child by what it is: `:has([data-icon='inline-end'])` can't match some other placed descendant.
   const props = mergeStyleProps(
+    { 'aria-hidden': true },
     themeProps('icon', { size, icon: placement }),
     stylex.props(reset.base, styles.base, sizes[size], iconScope, xstyle),
     rest,

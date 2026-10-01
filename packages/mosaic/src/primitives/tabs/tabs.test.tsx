@@ -464,6 +464,86 @@ describe('Tabs', () => {
         vi.unstubAllGlobals();
       }
     });
+
+    function setupObservedIndicator() {
+      const observers: Array<{ cb: ResizeObserverCallback }> = [];
+      class MockResizeObserver {
+        cb: ResizeObserverCallback;
+        constructor(cb: ResizeObserverCallback) {
+          this.cb = cb;
+          observers.push(this);
+        }
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      }
+      vi.stubGlobal('ResizeObserver', MockResizeObserver);
+
+      render(
+        <Tabs.Root defaultValue='tab1'>
+          <Tabs.List style={{ position: 'relative' }}>
+            <Tabs.Tab value='tab1'>Account</Tabs.Tab>
+            <Tabs.Tab value='tab2'>Settings</Tabs.Tab>
+            <Tabs.Indicator data-testid='indicator' />
+          </Tabs.List>
+          <Tabs.Panel value='tab1'>Account content</Tabs.Panel>
+          <Tabs.Panel value='tab2'>Settings content</Tabs.Panel>
+        </Tabs.Root>,
+      );
+
+      const rect = (left: number, width: number) =>
+        ({ left, top: 0, right: left + width, bottom: 20, width, height: 20, x: left, y: 0, toJSON() {} }) as DOMRect;
+      const setTabRects = (widths: number[]) => {
+        screen.getByRole('tablist').getBoundingClientRect = () => rect(0, 400);
+        let left = 0;
+        screen.getAllByRole('tab').forEach((tab, i) => {
+          const tabLeft = left;
+          tab.getBoundingClientRect = () => rect(tabLeft, widths[i]);
+          left += widths[i];
+        });
+      };
+      const fireResize = () =>
+        act(() => {
+          for (const o of observers) {
+            o.cb([], o as unknown as ResizeObserver);
+          }
+        });
+
+      return { indicator: screen.getByTestId('indicator'), setTabRects, fireResize };
+    }
+
+    it('does not animate when the active tab resizes after mount', () => {
+      try {
+        const { indicator, setTabRects, fireResize } = setupObservedIndicator();
+
+        setTabRects([100, 120]);
+        fireResize();
+
+        expect(indicator.style.getPropertyValue('--cl-tab-width')).toBe('100px');
+        expect(indicator.style.transition).toBe('none');
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    });
+
+    it('keeps animating a tab change when the observer reports the same size', async () => {
+      try {
+        const user = userEvent.setup();
+        const { indicator, setTabRects, fireResize } = setupObservedIndicator();
+
+        setTabRects([100, 120]);
+        await user.click(screen.getByText('Settings'));
+
+        expect(indicator.style.getPropertyValue('--cl-tab-left')).toBe('100px');
+        expect(indicator.style.transition).toBe('');
+
+        fireResize();
+
+        expect(indicator.style.transition).toBe('');
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    });
   });
 
   describe('panel visibility', () => {

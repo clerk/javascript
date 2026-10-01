@@ -32,49 +32,43 @@ wrap together, and the input grows to fill the rest of its row. Tags fade and sc
   storyModule={TagInputStories}
 />
 
-### View transitions
+### Layout animation
 
-The same field animated with view transitions instead, so the remaining tags slide into place when
-one is added or removed. The primitive stays unaware of it: the field is controlled, and
-`onValueChange` applies each update inside `document.startViewTransition` with `flushSync`. Render
-only tags where `present` is `true`, so a removed tag leaves the DOM in the same update and the
-browser animates its snapshot out. Each tag sets `view-transition-name: match-element` and
-`view-transition-class: tag`, and the enter and exit keyframes target `::view-transition-new(*.tag)`
-and `::view-transition-old(*.tag)`. The input gets its own `view-transition-class: tag-input` so it
-slides with the tags, and its snapshot uses `object-fit: none` so the width change doesn't stretch
-it. Browsers without view transitions apply the update without animating. Each change is computed
-from the current `value`, so an edit made before a pending transition applies its update starts from
-the previous value.
+The same field with `useLayoutAnimation`, so the remaining tags and the input slide into place
+while tags fade in and out through `data-starting-style` / `data-ending-style`. Pass the hook a ref to
+the root, and spread the `itemProps` it returns onto each tag and the input. The root must be
+`position: relative`, and it sets the timing with `--cl-layout-duration` and `--cl-layout-easing`.
+A removed tag is pinned where it was with `position: absolute` and `data-layout-popped` while it
+exits. Moving items carry `data-layout-animating` and animate `translate`, so tag styles must not
+set it. With no duration, or under `prefers-reduced-motion: reduce`, items snap.
 
 ```tsx
-const [value, setValue] = useState<string[]>([]);
+import { useLayoutAnimation } from '@clerk/mosaic/primitives/hooks';
+
+const rootRef = useRef<HTMLDivElement>(null);
+const { itemProps } = useLayoutAnimation(rootRef);
 
 <TagInput.Root
-  value={value}
-  onValueChange={next => {
-    if (typeof document.startViewTransition !== 'function') {
-      setValue(next);
-      return;
-    }
-    document.startViewTransition(() => {
-      flushSync(() => setValue(next));
-    });
-  }}
+  ref={rootRef}
+  className='relative [--cl-layout-duration:200ms] [--cl-layout-easing:ease-out]'
 >
+  <TagInput.List className='contents'>
+    {tags.map(tag => (
+      <TagInput.Tag
+        key={tag.value}
+        value={tag.value}
+        {...itemProps}
+      >
+        …
+      </TagInput.Tag>
+    ))}
+  </TagInput.List>
+  <TagInput.Input {...itemProps} />
+</TagInput.Root>;
 ```
 
 <Story
-  name='ViewTransition'
-  storyModule={TagInputStories}
-/>
-
-To opt out in CSS, set `view-transition-name: none` on the tags. At each change the field reads that
-name from a tag (or the input when there are no tags). When it is `none`, the field skips the view
-transition and keeps removed tags mounted, so `data-starting-style` / `data-ending-style` drive both
-enter and exit.
-
-<Story
-  name='ViewTransitionOptOut'
+  name='LayoutAnimation'
   storyModule={TagInputStories}
 />
 

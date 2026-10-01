@@ -12,6 +12,11 @@ import type {
   BillingSubscriptionPlanPeriod,
   BillingSubscriptionStatus,
 } from './billing';
+import type {
+  BiometricCredentialPlatform,
+  BiometricCredentialStatus,
+  TrustedDeviceAlgorithm,
+} from './biometricCredential';
 import type { CommerceSettingsJSON } from './commerceSettings';
 import type { DisplayConfigJSON } from './displayConfig';
 import type { EnterpriseProtocol, EnterpriseProvider } from './enterpriseAccount';
@@ -147,6 +152,7 @@ export interface SignUpJSON extends ClerkResourceJSON {
   abandon_at: number | null;
   legal_accepted_at: number | null;
   locale: string | null;
+  timezone: string | null;
   verifications: SignUpVerificationsJSON | null;
   protect_check?: ProtectCheckJSON | null;
 }
@@ -171,6 +177,8 @@ export interface ProtectCheckJSON {
 export interface SignUpEnterpriseConnectionJSON extends ClerkResourceJSON {
   id: string;
   name: string;
+  provider: string;
+  logo_public_url?: string | null;
 }
 
 export interface SessionJSON extends ClerkResourceJSON {
@@ -329,6 +337,7 @@ export interface UserJSON extends ClerkResourceJSON {
   create_organizations_limit: number | null;
   delete_self_enabled: boolean;
   legal_accepted_at: number | null;
+  timezone: string | null;
   updated_at: number;
   created_at: number;
 }
@@ -356,6 +365,54 @@ export interface AuthConfigJSON extends ClerkResourceJSON {
   reverification: boolean;
   preferred_channels?: Record<string, PhoneCodeChannel>;
   session_minter?: boolean;
+  /**
+   * @experimental
+   */
+  native_settings?: NativeSettingsJSON | null;
+}
+
+/**
+ * @experimental
+ */
+export interface NativeSettingsJSON {
+  object: 'native_settings';
+  api_enabled: boolean;
+  trusted_device_sign_in_enabled: boolean;
+  trusted_device_enrollment_prompt_after_sign_in_enabled: boolean;
+  trusted_device_enrollment_prompt_after_sign_up_enabled: boolean;
+}
+
+/**
+ * @experimental
+ */
+export interface TrustedDeviceChallengeJSON {
+  object: 'trusted_device_challenge';
+  challenge: string;
+  challenge_id: string;
+  trusted_device_id?: string;
+  client_data: string;
+  /**
+   * Unix timestamp in seconds.
+   */
+  expires_at: number;
+  algorithm: TrustedDeviceAlgorithm;
+}
+
+/**
+ * @experimental
+ */
+export interface BiometricCredentialJSON extends ClerkResourceJSON {
+  object: 'trusted_device';
+  id: string;
+  platform: BiometricCredentialPlatform;
+  app_identifier: string;
+  name: string | null;
+  algorithm: TrustedDeviceAlgorithm;
+  status: BiometricCredentialStatus;
+  created_at: number;
+  updated_at: number;
+  last_used_at: number | null;
+  revoked_at: number | null;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -369,6 +426,10 @@ export interface VerificationJSON extends ClerkResourceJSON {
   expire_at: number;
   channel?: PhoneCodeChannel;
   error: ClerkAPIErrorJSON;
+  /**
+   * @experimental
+   */
+  trusted_device_challenge?: TrustedDeviceChallengeJSON | null;
 }
 
 export interface SignUpVerificationsJSON {

@@ -1,6 +1,8 @@
 import { iconImageUrl } from '@clerk/shared/constants';
+import type { OAuthProvider } from '@clerk/shared/types';
 import React from 'react';
 
+import { ProviderIcon } from '@/common';
 import type { LocalizationKey } from '@/customizables';
 import {
   Box,
@@ -10,7 +12,6 @@ import {
   Grid,
   localizationKeys,
   RadioInput,
-  Span,
   Text,
   useLocalizations,
 } from '@/customizables';
@@ -25,8 +26,6 @@ import { PROVIDER_GROUPS, providerLabel, toProviderCard } from '../domain/provid
 import { Step } from '../elements/Step';
 import { useWizard } from '../elements/Wizard';
 import type { ProviderType } from '../types';
-
-const MONOCHROMATIC_PROVIDER_ICONS: ReadonlySet<string> = new Set(['okta']);
 
 export const SelectProviderStep = (): JSX.Element => {
   const {
@@ -274,31 +273,14 @@ const ProviderCard = ({ name, value, iconId, label, checked, onChange }: Provide
         sx={common.visuallyHidden()}
       />
 
-      <Span
+      <ProviderIcon
+        id={iconId as OAuthProvider}
+        iconUrl={iconImageUrl(iconId)}
+        name={labelText}
+        size='$8'
+        aria-hidden
         elementDescriptor={descriptors.configureSSOProviderCardIcon}
         elementId={descriptors.configureSSOProviderCardIcon.setId(value)}
-        aria-hidden
-        sx={theme => {
-          const isMonochromatic = MONOCHROMATIC_PROVIDER_ICONS.has(iconId);
-          const baseSize = { width: theme.sizes.$8, height: theme.sizes.$8 };
-          if (isMonochromatic) {
-            return {
-              ...baseSize,
-              backgroundColor: theme.colors.$colorForeground,
-              maskImage: `url(${iconImageUrl(iconId)})`,
-              maskSize: 'contain',
-              maskPosition: 'center',
-              maskRepeat: 'no-repeat',
-            };
-          }
-          return {
-            ...baseSize,
-            backgroundImage: `url(${iconImageUrl(iconId)})`,
-            backgroundSize: 'contain',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-          };
-        }}
       />
 
       <Text

@@ -3,9 +3,16 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
+import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../MosaicProvider';
+import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
+
+function DeleteAccount() {
+  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
+  return <UserProfileDeleteSectionView {...controller} />;
+}
 
 const props: UserProfileProfilePanelViewProps = {
   allowMultipleAccounts: true,
@@ -69,7 +76,8 @@ describe('UserProfileProfilePanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-    expect(screen.getByRole('heading', { name: 'Account', level: 3 })).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Account', level: 2 })).toBeVisible();
+    await waitFor(() => expect(document.activeElement).toHaveTextContent(/^Account$/));
   });
 
   it('keeps the final wallet confirmation mounted until removal settles', async () => {
@@ -101,6 +109,7 @@ describe('UserProfileProfilePanelView', () => {
       await removal.promise;
     });
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(document.activeElement).toHaveTextContent(/^Account$/));
   });
 
   it('keeps available providers visible without connected accounts', () => {
@@ -133,10 +142,11 @@ describe('UserProfileProfilePanelView', () => {
       onSubmitUsername: () => Promise.resolve(),
     });
 
-    expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Account' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: 'Account' })).toContainElement(
-      document.querySelector('.cl-section-group'),
+      screen.getByRole('group', { name: 'Profile' }),
     );
+    expect(screen.getByRole('heading', { level: 3, name: 'Profile' })).toHaveClass('cl-section-title');
     expect(screen.getByText('Name')).toHaveClass('cl-section-label');
     expect(screen.getByText('Username')).toHaveClass('cl-section-label');
     expect(screen.getByText('Preston Booth')).toHaveClass('cl-section-description');
@@ -149,8 +159,8 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.getByText('+1 (801) 888-8181')).toBeInTheDocument();
     expect(screen.getByText('Profile picture')).toHaveClass('cl-section-label');
     expect(screen.getByText('Recommend size 1:1, up to 10MB.')).toHaveClass('cl-section-description');
-    expect(screen.getByText('Email')).toHaveClass('cl-section-label');
-    expect(screen.getByText('Phone')).toHaveClass('cl-section-label');
+    expect(screen.getByRole('heading', { level: 3, name: 'Email' })).toHaveClass('cl-section-title');
+    expect(screen.getByRole('heading', { level: 3, name: 'Phone' })).toHaveClass('cl-section-title');
     expect(screen.getByText('item1@clerk.dev').closest('.cl-section-description')).not.toBeNull();
     expect(screen.getByRole('button', { name: 'Upload' })).toBeInTheDocument();
     const profilePicture = screen.getByText('Profile picture').closest('.cl-section-item');
@@ -211,7 +221,7 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
-  it('breaks out both contact types when multiple accounts are allowed', () => {
+  it('nests both contact types as groups inside Account when multiple accounts are allowed', () => {
     renderView({
       emails: [{ id: 'email_1', value: 'item1@clerk.dev', isDefault: true }],
       onAddEmail: vi.fn(),
@@ -220,12 +230,15 @@ describe('UserProfileProfilePanelView', () => {
     });
 
     const accountSection = screen.getByRole('region', { name: 'Account' });
-    const emailSection = screen.getByRole('region', { name: 'Email' });
-    const phoneSection = screen.getByRole('region', { name: 'Phone' });
+    const emailSection = within(accountSection).getByRole('group', { name: 'Email' });
+    const phoneSection = within(accountSection).getByRole('group', { name: 'Phone' });
 
-    expect(accountSection).not.toContainElement(emailSection);
-    expect(accountSection).not.toContainElement(phoneSection);
-    expect(emailSection).toHaveTextContent('item1@clerk.dev');
+    expect(screen.queryByRole('region', { name: 'Email' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Phone' })).not.toBeInTheDocument();
+    expect(within(emailSection).getByRole('heading', { level: 3, name: 'Email' })).toBeInTheDocument();
+    expect(emailSection.querySelector('.cl-section-header')).toHaveTextContent('Email');
+    expect(within(emailSection).getByRole('list')).toContainElement(screen.getByText('item1@clerk.dev'));
+    expect(within(emailSection).getAllByRole('listitem')).toHaveLength(1);
     expect(phoneSection).toHaveTextContent('+1 (801) 888-8181');
     expect(within(emailSection).getByRole('button', { name: 'Add email' })).toHaveTextContent('Add');
     expect(within(phoneSection).getByRole('button', { name: 'Add phone number' })).toHaveTextContent('Add');
@@ -245,8 +258,8 @@ describe('UserProfileProfilePanelView', () => {
     expect(accountSection).toHaveTextContent('+1 (801) 888-8181');
     expect(within(accountSection).getByRole('button', { name: 'Update email' })).toBeInTheDocument();
     expect(within(accountSection).getByRole('button', { name: 'Update phone number' })).toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: 'Email' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('region', { name: 'Phone' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Email' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Phone' })).not.toBeInTheDocument();
   });
 
   it('forwards inline contact update and add actions', async () => {
@@ -271,7 +284,7 @@ describe('UserProfileProfilePanelView', () => {
   it('renders an actionable empty state when no phone number exists', () => {
     renderView({ phones: [], onSendPhoneCode: () => Promise.resolve(), onVerifyPhoneCode: () => Promise.resolve() });
 
-    const phoneSection = screen.getByRole('region', { name: 'Phone' });
+    const phoneSection = screen.getByRole('group', { name: 'Phone' });
     const emptyState = within(phoneSection).getByText('No phone numbers added');
 
     expect(emptyState.closest('.cl-section-items')).not.toBeNull();
@@ -279,31 +292,21 @@ describe('UserProfileProfilePanelView', () => {
     expect(within(phoneSection).getByRole('button', { name: 'Add phone number' })).toBeInTheDocument();
   });
 
-  it('renders connected accounts and the danger zone when provided', async () => {
-    const onRemoveConnectedAccount = vi.fn();
-    const onDeleteAccount = vi.fn(() => Promise.resolve());
-    const user = userEvent.setup();
+  it('renders connected accounts and the danger zone when provided', () => {
     renderView({
       connectedAccounts: [
         { id: 'google', provider: 'Google', identifier: 'test@google.com', iconUrl: 'https://example.com/google.svg' },
       ],
-      onRemoveConnectedAccount,
-      onDeleteAccount,
+      deleteAccountSlot: <DeleteAccount />,
     });
 
-    expect(screen.getByRole('heading', { level: 4, name: 'Connected accounts' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Connected accounts' })).toBeInTheDocument();
     expect(screen.getByText('Google')).toBeVisible();
-    expect(screen.getByRole('heading', { level: 4, name: 'Danger zone' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
     expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
     );
-    await user.click(screen.getByRole('button', { name: 'Delete account' }));
-    const deleteDialog = screen.getByRole('dialog');
-    await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
-    await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
-
-    expect(onDeleteAccount).toHaveBeenCalledOnce();
   });
 
   it('renders connected provider and Web3 images inside icon frames', () => {
@@ -347,10 +350,10 @@ describe('UserProfileProfilePanelView', () => {
       onRemoveWeb3Wallet: vi.fn(),
     });
 
-    expect(screen.getByRole('heading', { level: 4, name: 'Web3 wallets' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Web3 wallets' })).toBeInTheDocument();
     expect(screen.getByText('MetaMask')).toBeInTheDocument();
     expect(screen.getByText('0x1234...5678')).toBeInTheDocument();
-    expect(within(screen.getByRole('region', { name: 'Web3 wallets' })).getByText('Primary')).toBeInTheDocument();
+    expect(within(screen.getByRole('group', { name: 'Web3 wallets' })).getByText('Primary')).toBeInTheDocument();
 
     expect(screen.getByRole('button', { name: 'Connect Coinbase Wallet' })).toBeVisible();
     expect(screen.getByRole('button', { name: 'Manage Coinbase Wallet' })).toBeVisible();

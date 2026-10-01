@@ -7,8 +7,8 @@ export interface SpinDelayOptions {
   minDuration?: number;
 }
 
-const DEFAULT_DELAY = 500;
-const DEFAULT_MIN_DURATION = 200;
+const DEFAULT_DELAY = 150;
+const DEFAULT_MIN_DURATION = 400;
 
 /**
  * Spin-delays a nullable value: returns `null` until `value` has stayed non-null longer than `delay`

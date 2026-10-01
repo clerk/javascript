@@ -1,5 +1,12 @@
 export type UserProfileEditPasswordField = 'currentPassword' | 'newPassword' | 'confirmPassword';
 
+export interface UserProfileEditPasswordValues {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+  signOutOfOtherSessions: boolean;
+}
+
 export interface UserProfileEditPasswordValue {
   currentPassword?: string;
   newPassword: string;
@@ -8,11 +15,9 @@ export interface UserProfileEditPasswordValue {
 
 export interface UserProfilePasswordManagedBy {
   name: string;
-  iconUrl?: string;
 }
 
 export interface UserProfilePasswordSectionViewProps {
-  sectionTitle?: string;
   hasPassword?: boolean;
   requiresCurrentPassword?: boolean;
   /** Replaces the edit action with the enterprise provider’s name. */

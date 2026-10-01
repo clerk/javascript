@@ -65,7 +65,7 @@ export function plural<F extends PluralForms>(
 ): string {
   const category = new Intl.PluralRules(locale).select(count);
   const template: string = own(forms, category) ?? forms.other;
-  return fill(template, { ...rest[0], count });
+  return fill(template, { ...rest[0], count: new Intl.NumberFormat(locale).format(count) });
 }
 
 type Token =

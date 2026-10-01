@@ -7,6 +7,11 @@ export type GoogleOneTapStrategy = 'google_one_tap';
 export type AppleIdTokenStrategy = 'oauth_token_apple';
 /** @inline */
 export type PasskeyStrategy = 'passkey';
+/**
+ * @experimental
+ * @inline
+ */
+export type TrustedDeviceStrategy = 'trusted_device';
 /** @inline */
 export type PasswordStrategy = 'password';
 /** @inline */

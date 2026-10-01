@@ -45,7 +45,6 @@ const Root = React.forwardRef<HTMLDivElement, BannerRootProps>(function MosaicBa
         <>
           <Icon
             name={ICONS[color]}
-            aria-hidden='true'
             xstyle={styles.icon}
             {...themeProps('banner-icon')}
           />

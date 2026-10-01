@@ -48,6 +48,7 @@ import type {
   OrganizationSwitcherProps,
   PricingTableProps,
   ProtectAssertion,
+  ProtectCheckFlow,
   RedirectOptions,
   Resources,
   ResumeAfterProtectCheckParams,
@@ -1647,6 +1648,10 @@ export class IsomorphicClerk implements IsomorphicLoadedClerk {
     } else {
       this.premountMethodCalls.set('handleRedirectCallback', callback);
     }
+  };
+
+  __internal_resolvePendingProtectCheck = async (flow?: ProtectCheckFlow): Promise<void> => {
+    await this.clerkjs?.__internal_resolvePendingProtectCheck?.(flow);
   };
 
   __internal_resumeAfterProtectCheck = async (

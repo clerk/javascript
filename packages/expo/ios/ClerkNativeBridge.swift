@@ -833,6 +833,71 @@ final class ClerkNativeBridge {
     }
   }
 
+  @MainActor
+  func reverifyWithBiometrics(sessionId: String, level: String, reason: String?) async throws -> [String: Any] {
+    try Self.requireBiometricCredentialEnvironment()
+    let requestedLevel = try Self.biometricReverificationLevel(level)
+    guard let session = Clerk.shared.client?.sessions.first(where: { $0.id == sessionId }) else {
+      throw ClerkExpoBiometricCredentialError(
+        code: "biometric_reverification_session_unavailable",
+        message: "The session to reverify is unavailable in the native Clerk client."
+      )
+    }
+
+    let started = try await session.startVerification(level: requestedLevel)
+    let verification = try await Self.verifyBiometricReverification(started) { level in
+      try await session.verifyWithBiometrics(reason: reason, level: level)
+    }
+    return Self.biometricReverificationPayload(verification, sessionId: sessionId)
+  }
+
+  @MainActor
+  static func verifyBiometricReverification(
+    _ started: SessionVerification,
+    verify: (Session.BiometricVerificationLevel) async throws -> SessionVerification
+  ) async throws -> SessionVerification {
+    switch started.status {
+    case .needsFirstFactor:
+      let verification = try await verify(.firstFactor)
+      if verification.status == .needsSecondFactor {
+        try Task.checkCancellation()
+        return try await verify(.secondFactor)
+      }
+      return verification
+    case .needsSecondFactor:
+      return try await verify(.secondFactor)
+    case .complete:
+      return started
+    case .unknown:
+      throw ClerkExpoBiometricCredentialError(
+        code: "E_BIOMETRIC_REVERIFICATION_FAILED",
+        message: "The server returned an unsupported reverification status."
+      )
+    }
+  }
+
+  static func biometricReverificationLevel(_ level: String) throws -> SessionVerification.Level {
+    switch level {
+    case "first_factor": .firstFactor
+    case "second_factor": .secondFactor
+    case "multi_factor": .multiFactor
+    default:
+      throw ClerkExpoBiometricCredentialError(
+        code: "invalid_reverification_level",
+        message: "Biometric reverification level must be first_factor, second_factor, or multi_factor."
+      )
+    }
+  }
+
+  static func biometricReverificationPayload(_ verification: SessionVerification, sessionId: String) -> [String: Any] {
+    [
+      "id": bridgeValue(verification.id),
+      "status": verification.status.rawValue,
+      "level": verification.level.rawValue,
+      "sessionId": verification.session?.id ?? sessionId,
+    ]
+  }
+
   private static func biometricCredentialPayload(_ biometricCredential: BiometricCredential) -> [String: Any] {
     [
       "id": biometricCredential.id,
@@ -865,6 +930,10 @@ final class ClerkNativeBridge {
 
     if let error = error as? ClerkAPIError {
       return ClerkNativeErrorDescriptor(code: error.code, message: error.localizedDescription)
+    }
+
+    if let error = error as? BiometricCredentialError {
+      return ClerkNativeErrorDescriptor(code: error.rawValue, message: error.localizedDescription)
     }
 
     if let error = error as? BiometricCredentialKeyManagerError {

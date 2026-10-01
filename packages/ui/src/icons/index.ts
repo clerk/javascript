@@ -66,4 +66,5 @@ export { default as Spinner } from './spinner.svg';
 export { default as ThreeDots } from './three-dots.svg';
 export { default as TriangleRight } from './triangle-right.svg';
 export { default as UserCircle } from './user-circle.svg';
+export { default as UserPlus } from './user-plus.svg';
 export { default as Users } from './users.svg';

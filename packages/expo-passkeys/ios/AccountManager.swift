@@ -15,7 +15,7 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
     private var authCallback: ((AuthorizationResponse?,ASAuthorizationError.Code?) -> Void)?
     var authController: ASAuthorizationController?
     
-    func createPasskey(challengeBase64: String, rpId: String, displayName: String, userIdBase64: String,  promise: Promise) {
+    func createPasskey(challengeBase64: String, rpId: String, displayName: String, userIdBase64: String, excludeCredentialIdsBase64: [String], promise: Promise) {
         let publicKeyCredentialProvider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: rpId)
         
         let challenge = dataFromBase64URL(base64urlString: challengeBase64)!
@@ -23,6 +23,11 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
         
         let registrationRequest = publicKeyCredentialProvider.createCredentialRegistrationRequest(challenge: challenge,
                                                                                                   name: displayName, userID: userId)
+        if #available(iOS 17.4, *) {
+            registrationRequest.excludedCredentials = excludeCredentialIdsBase64.compactMap { id in
+                dataFromBase64URL(base64urlString: id).map { ASAuthorizationPlatformPublicKeyCredentialDescriptor(credentialID: $0) }
+            }
+        }
         
         let authController = ASAuthorizationController(authorizationRequests: [ registrationRequest ] )
         authController.delegate = self
@@ -170,7 +175,7 @@ class AccountManager: NSObject, ASAuthorizationControllerPresentationContextProv
         } else {
             // Another ASAuthorization error.
             // Note: The userInfo dictionary contains useful information.
-            self.authCallback!(AuthorizationResponse(registration: nil),ASAuthorizationError.unknown)
+            self.authCallback!(AuthorizationResponse(registration: nil), authorizationError.code)
             logger.error("Error: \((error as NSError).userInfo)")
         }
     }

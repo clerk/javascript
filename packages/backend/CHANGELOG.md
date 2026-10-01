@@ -1,5 +1,60 @@
 # Change Log
 
+## 3.22.0
+
+### Minor Changes
+
+- SAML connections can trust several Identity Provider signing certificates at once. `SamlConnection` and `EnterpriseConnection.samlConnection` now include `idpCertificates`, every trusted certificate with its validity window, and `createSamlConnection()`, `updateSamlConnection()`, `createEnterpriseConnection()` and `updateEnterpriseConnection()` accept an `idpCertificates` array that replaces the connection's whole set. The single `idpCertificate` parameter is deprecated in favor of the array; it keeps working and still replaces the whole set. ([#9995](https://github.com/clerk/javascript/pull/9995)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Updated dependencies [[`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/shared@4.38.0
+
+## 3.21.1
+
+### Patch Changes
+
+- Update the `allowedOrigins` JSDoc on `clerkClient.instances.update()` and the `Instance` resource to note that Electron apps using `@clerk/electron` also need the renderer's dev server origin, for example `http://localhost:5173`, during development. ([#9982](https://github.com/clerk/javascript/pull/9982)) by [@manovotny](https://github.com/manovotny)
+
+- Update the `lockUser()` JSDoc to link the Dashboard's current Protect rules page. ([#9976](https://github.com/clerk/javascript/pull/9976)) by [@manovotny](https://github.com/manovotny)
+
+- Updated dependencies [[`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda)]:
+  - @clerk/shared@4.37.1
+
+## 3.21.0
+
+### Minor Changes
+
+- `verifyWebhook()` now returns the event's top-level `timestamp` (milliseconds since epoch when the event occurred) and `instance_id`, so webhook handlers can order events and identify the instance that sent them. ([#9906](https://github.com/clerk/javascript/pull/9906)) by [@manovotny](https://github.com/manovotny)
+
+### Patch Changes
+
+- Update the `allowedOrigins` JSDoc for Electron apps to describe the custom renderer scheme used by `@clerk/electron`. ([#9784](https://github.com/clerk/javascript/pull/9784)) by [@manovotny](https://github.com/manovotny)
+
+- Capture authentication timezones so Clerk emails can display timestamps in a stored user timezone. ([#9540](https://github.com/clerk/javascript/pull/9540)) by [@tmilewski](https://github.com/tmilewski)
+
+- Updated dependencies [[`6a14691`](https://github.com/clerk/javascript/commit/6a14691f8d98dcafd3956e1ea97cb35d56a34864), [`0ee4ee2`](https://github.com/clerk/javascript/commit/0ee4ee2b49286a8cae5f251ec997f30c8a863205), [`7a3fcf5`](https://github.com/clerk/javascript/commit/7a3fcf5b2d536b4e444920a3e87c4f70da3487ba), [`69c1b9c`](https://github.com/clerk/javascript/commit/69c1b9c886ab0860a9af12872235b6e492b2b2d0), [`d9cf0f2`](https://github.com/clerk/javascript/commit/d9cf0f29ea2ef8388bbd5736007ca71f9411bf42)]:
+  - @clerk/shared@4.37.0
+
+## 3.20.1
+
+### Patch Changes
+
+- Updated dependencies [[`645a532`](https://github.com/clerk/javascript/commit/645a5327d9c7cae8052e39958ec4d737457d179a), [`84ee588`](https://github.com/clerk/javascript/commit/84ee588a712ffa0bb2988531d7a2727c9e06ac37), [`4e538ac`](https://github.com/clerk/javascript/commit/4e538ac07ed412706516531d9be9696bbd31bf24)]:
+  - @clerk/shared@4.36.0
+
+## 3.20.0
+
+### Minor Changes
+
+- Add an optional `nameQuery` filter to `oauthApplications.list()` to search OAuth applications by name or exact client ID. ([#9904](https://github.com/clerk/javascript/pull/9904)) by [@austincalvelage](https://github.com/austincalvelage)
+
+### Patch Changes
+
+- Updated dependencies [[`b3af79e`](https://github.com/clerk/javascript/commit/b3af79e946aaa403595b31e472b07b138db39dc6), [`cc6f11a`](https://github.com/clerk/javascript/commit/cc6f11af564b62daf186f9721594efd864ce093f), [`d46b544`](https://github.com/clerk/javascript/commit/d46b5446e89f15c5532bfbbc09fdc05a0fbcbf8d), [`f50f48c`](https://github.com/clerk/javascript/commit/f50f48cf3c67807c8def30d4a6d29d6c7bf904d2)]:
+  - @clerk/shared@4.35.0
+
 ## 3.19.0
 
 ### Minor Changes

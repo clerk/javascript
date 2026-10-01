@@ -1,5 +1,11 @@
 import type { BackupCodeResource } from './backupCode';
 import type { BillingPayerMethods } from './billing';
+import type {
+  AttemptBiometricCredentialParams,
+  BiometricCredentialResource,
+  PrepareBiometricCredentialParams,
+  TrustedDeviceChallengeResource,
+} from './biometricCredential';
 import type { DeletedObjectResource } from './deletedObject';
 import type { EmailAddressResource } from './emailAddress';
 import type { EnterpriseAccountResource } from './enterpriseAccount';
@@ -200,6 +206,8 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    * The date and time when the user was created.
    */
   createdAt: Date | null;
+  /** The user's timezone. */
+  timezone: string | null;
 
   /**
    * Updates the user's attributes. Use this method to save information you collected about the user.
@@ -332,6 +340,30 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    * @returns A [`BackupCodeResource`](https://clerk.com/docs/reference/types/backup-code-resource) object.
    */
   createBackupCode: () => Promise<BackupCodeResource>;
+  /**
+   * Lists the biometric credentials (trusted devices) enrolled by the user.
+   * @experimental This is an experimental API for native apps and is subject to change.
+   */
+  __experimental_getBiometricCredentials: () => Promise<BiometricCredentialResource[]>;
+  /**
+   * Starts enrolling a biometric credential and returns the challenge the device must sign. Requires a recently verified session.
+   * @experimental This is an experimental API for native apps and is subject to change.
+   */
+  __experimental_prepareBiometricCredential: (
+    params: PrepareBiometricCredentialParams,
+  ) => Promise<TrustedDeviceChallengeResource>;
+  /**
+   * Completes enrolling a biometric credential with the signed challenge.
+   * @experimental This is an experimental API for native apps and is subject to change.
+   */
+  __experimental_attemptBiometricCredential: (
+    params: AttemptBiometricCredentialParams,
+  ) => Promise<BiometricCredentialResource>;
+  /**
+   * Revokes one of the user's biometric credentials. Requires a recently verified session.
+   * @experimental This is an experimental API for native apps and is subject to change.
+   */
+  __experimental_revokeBiometricCredential: (biometricCredentialId: string) => Promise<BiometricCredentialResource>;
 
   get verifiedExternalAccounts(): ExternalAccountResource[];
 

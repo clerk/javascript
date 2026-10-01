@@ -437,6 +437,27 @@ describe('useDataTable', () => {
       expect(result.current.rowSelection).toEqual(controlled);
     });
 
+    it('excludes non-selectable rows from direct, range, and select-all selection', () => {
+      const { result } = renderHook(() =>
+        useDataTable({
+          data: DATA,
+          getRowId: row => String(row.id),
+          isRowSelectable: row => row.role === 'Admin',
+        }),
+      );
+      act(() => result.current.rows[1].toggleSelected());
+      expect(result.current.rowSelection).toEqual({});
+      act(() => result.current.rows[0].toggleSelected());
+      expect(result.current.getIsSomeRowsSelected()).toBe(true);
+      act(() => result.current.rows[2].toggleSelected({ range: true }));
+      expect(result.current.rowSelection).toEqual({ '1': true, '3': true });
+      expect(result.current.getIsAllRowsSelected()).toBe(true);
+      act(() => result.current.toggleAllRowsSelected());
+      expect(result.current.rowSelection).toEqual({});
+      act(() => result.current.toggleAllRowsSelected());
+      expect(result.current.rowSelection).toEqual({ '1': true, '3': true });
+    });
+
     it('row.toggleSelected({ range: true }) selects every row between the last toggled row and this one', () => {
       const { result } = renderHook(() => useDataTable({ data: DATA }));
 

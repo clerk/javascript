@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Section } from '../../components/section';
+import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import { fill, useMessages } from '../../localization';
 import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
 
@@ -21,6 +22,7 @@ export interface UserProfileConnectedAccount extends UserProfileConnectionProvid
 }
 
 export interface UserProfileConnectedAccountsSectionViewProps {
+  fallbackFocus?: () => HTMLElement | null;
   accounts: UserProfileConnectedAccount[];
   availableProviders?: UserProfileConnectionProvider[];
   onConnect?: (id: string) => void;
@@ -30,12 +32,23 @@ export interface UserProfileConnectedAccountsSectionViewProps {
 
 export function UserProfileConnectedAccountsSectionView({
   accounts,
+  fallbackFocus,
   availableProviders = [],
   onConnect,
   onReconnect,
   onRemove,
 }: UserProfileConnectedAccountsSectionViewProps) {
   const m = useMessages('userProfileConnectedAccounts');
+  const section = useRef<HTMLDivElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: accounts.map(account => account.id),
+    onRemove,
+    fallback: () =>
+      section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ??
+      section.current ??
+      fallbackFocus?.() ??
+      null,
+  });
   const removeAccount = useMemo(() => Confirmation.createHandle<UserProfileConnectedAccount>(), []);
   const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
 
@@ -43,25 +56,33 @@ export function UserProfileConnectedAccountsSectionView({
     <>
       {hasRows ? (
         <Section.Root>
-          <Section.Title>{m.title}</Section.Title>
-          <Section.Group>
-            {accounts.map(account => (
-              <UserProfileConnectedAccountRowView
-                key={account.id}
-                account={account}
-                onReconnect={onReconnect}
-                onRemove={onRemove ? account => removeAccount.open(account) : undefined}
-              />
-            ))}
-            {onConnect
-              ? availableProviders.map(provider => (
-                  <UserProfileConnectedAccountRowView
-                    key={provider.id}
-                    account={provider}
-                    onConnect={onConnect}
-                  />
-                ))
-              : null}
+          <Section.Group
+            ref={section}
+            tabIndex={-1}
+          >
+            <Section.Header>
+              <Section.Title>{m.title}</Section.Title>
+            </Section.Header>
+            <Section.Body>
+              {accounts.map(account => (
+                <UserProfileConnectedAccountRowView
+                  key={account.id}
+                  account={account}
+                  triggerRef={removalFocus.registerTrigger(account.id)}
+                  onReconnect={onReconnect}
+                  onRemove={onRemove ? account => removeAccount.open(account) : undefined}
+                />
+              ))}
+              {onConnect
+                ? availableProviders.map(provider => (
+                    <UserProfileConnectedAccountRowView
+                      key={provider.id}
+                      account={provider}
+                      onConnect={onConnect}
+                    />
+                  ))
+                : null}
+            </Section.Body>
           </Section.Group>
         </Section.Root>
       ) : null}
@@ -72,7 +93,8 @@ export function UserProfileConnectedAccountsSectionView({
           description={account => fill(m.removeDialog.description, { provider: account.provider })}
           actionLabel={m.removeDialog.confirm}
           cancelLabel={m.removeDialog.cancel}
-          onConfirm={account => onRemove(account.id)}
+          finalFocus={removalFocus.finalFocus}
+          onConfirm={account => removalFocus.remove(account.id)}
         />
       ) : null}
     </>

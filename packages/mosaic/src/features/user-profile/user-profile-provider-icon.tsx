@@ -19,7 +19,6 @@ export function UserProfileProviderIcon(props: UserProfileProviderIconProps) {
           />
         ) : (
           <Icon
-            aria-hidden
             name={props.name}
             xstyle={styles.providerIcon}
           />

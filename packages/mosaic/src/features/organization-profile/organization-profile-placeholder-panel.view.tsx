@@ -1,5 +1,5 @@
 import { EmptyState } from '../../components/empty-state';
-import { Profile } from '../../components/profile';
+import { Panel } from '../../components/panel';
 import { fill, useMessages } from '../../localization';
 import type { OrganizationProfilePageId } from './organization-profile.types';
 
@@ -12,11 +12,11 @@ export function OrganizationProfilePlaceholderPanelView({ page }: OrganizationPr
   const title = m.pages[page];
 
   return (
-    <>
-      <Profile.PageTitle>{title}</Profile.PageTitle>
+    <Panel.Root>
+      <Panel.Title>{title}</Panel.Title>
       <EmptyState.Root>
         <EmptyState.Label>{fill(m.placeholder, { page: title })}</EmptyState.Label>
       </EmptyState.Root>
-    </>
+    </Panel.Root>
   );
 }

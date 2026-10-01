@@ -72,6 +72,7 @@ const LINK_REPLACEMENTS = [
   ['organization-membership-resource', '/docs/reference/types/organization-membership'],
   ['organization-suggestion-resource', '/docs/reference/types/organization-suggestion'],
   ['organization-resource', '/docs/reference/objects/organization'],
+  ['sso-bypass-allowlist-resource', '/docs/reference/types/sso-bypass-allowlist-resource'],
   ['organization-domain-resource', '/docs/reference/types/organization-domain-resource'],
   ['organization-invitation-resource', '/docs/reference/types/organization-invitation'],
   ['organization-membership-request-resource', '/docs/reference/types/organization-membership-request'],

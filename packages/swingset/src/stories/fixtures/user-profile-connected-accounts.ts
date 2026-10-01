@@ -4,6 +4,9 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section.view';
 import { useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosText } from '@/lib/chaos';
+
 export const connectedAccount = {
   id: 'google',
   provider: 'Google',
@@ -17,7 +20,7 @@ const connectionProviders: UserProfileConnectionProvider[] = [
 
 export function useConnectedAccountsFixture({
   initialAccounts = [connectedAccount],
-  providers = connectionProviders,
+  providers: initialProviders = connectionProviders,
   removalState,
 }: {
   initialAccounts?: UserProfileConnectedAccount[];
@@ -25,7 +28,17 @@ export function useConnectedAccountsFixture({
   removalState?: 'pending' | 'error';
 } = {}) {
   const [hasRemovalFailed, setHasRemovalFailed] = useState(false);
-  const [accounts, setAccounts] = useState(initialAccounts);
+  const seed = useChaosFixture(initialAccounts, items =>
+    items.map((account, index) => ({
+      ...account,
+      provider: chaosText(account.provider),
+      identifier: chaosEmail(index),
+    })),
+  );
+  const [accounts, setAccounts] = useState(seed);
+  const providers = useChaosFixture(initialProviders, items =>
+    items.map(provider => ({ ...provider, provider: chaosText(provider.provider) })),
+  );
   const availableProviders = providers.filter(provider => !accounts.some(account => account.id === provider.id));
 
   return {

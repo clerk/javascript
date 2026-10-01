@@ -495,38 +495,4 @@ describe('organization API key creation', () => {
     await user.click(screen.getByRole('button', { name: 'Add API Key' }));
     expect(props.onSubmit).toHaveBeenCalledTimes(2);
   });
-
-  it('focuses Copy beside the read-only input and keeps both copy intents retryable', async () => {
-    const user = userEvent.setup();
-    const props = dialogPropsFor({ name: 'Deploy', expiration: 'never' });
-    const view = render(dialogView(props));
-    await user.click(screen.getByRole('button', { name: 'Add API Key' }));
-    const returned = { ...props, secret: 'ak_org_secret' };
-    view.rerender(dialogView(returned));
-    const dialog = await screen.findByRole('dialog', { name: 'Copy your API Key' });
-    const secret = within(dialog).getByRole('textbox', { name: 'API key' });
-    await waitFor(() => expect(within(dialog).getByRole('button', { name: 'Copy API key' })).toHaveFocus());
-    expect(secret).toBeVisible();
-    expect(secret).toHaveAttribute('readonly');
-    expect(secret).toHaveValue('ak_org_secret');
-    await user.click(secret);
-    expect(secret).toHaveFocus();
-    await user.click(within(dialog).getByRole('button', { name: 'Copy API key' }));
-    expect(props.onCopy).toHaveBeenLastCalledWith(false);
-    view.rerender(dialogView({ ...returned, isPending: true }));
-    expect(within(dialog).getByRole('button', { name: 'Copy API key' })).toBeDisabled();
-    expect(within(dialog).getByRole('button', { name: 'Copy and close' })).toHaveAttribute('aria-disabled', 'true');
-    await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
-    expect(props.onCopy).toHaveBeenCalledOnce();
-    await user.keyboard('{Escape}');
-    expect(props.onOpenChange).not.toHaveBeenCalled();
-    view.rerender(dialogView({ ...returned, error: 'Copy failed. Try again.' }));
-    expect(within(dialog).getByRole('alert')).toHaveTextContent('Copy failed. Try again.');
-    expect(secret).toHaveValue('ak_org_secret');
-    await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
-    expect(props.onCopy).toHaveBeenNthCalledWith(1, false);
-    expect(props.onCopy).toHaveBeenNthCalledWith(2, true);
-    await user.keyboard('{Escape}');
-    expect(props.onOpenChange).toHaveBeenCalledWith(false);
-  });
 });

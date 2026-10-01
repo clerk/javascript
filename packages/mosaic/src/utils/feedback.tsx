@@ -38,7 +38,6 @@ export function FeedbackBody({ icon, children }: { icon: IconName; children: Rea
       <Icon
         name={icon}
         size='sm'
-        aria-hidden='true'
         xstyle={feedbackStyles.icon}
       />
       <span>{children}</span>

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import type { ActionMenuAction } from '../../../components/action-menu';
 import { ActionMenu } from '../../../components/action-menu';
@@ -10,6 +10,8 @@ import { fill, useMessages } from '../../../localization';
 import { styles } from '../user-profile-profile-panel.styles';
 
 export interface UserProfileContactListRowViewProps {
+  rowRef?: Ref<HTMLDivElement>;
+  triggerRef?: (id: string) => Ref<HTMLButtonElement>;
   addAction?: ReactNode;
   kind: 'email' | 'phone';
   label: string;
@@ -18,6 +20,7 @@ export interface UserProfileContactListRowViewProps {
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (id: string) => void;
+  children?: ReactNode;
 }
 
 export function UserProfileContactListRowView({
@@ -29,16 +32,20 @@ export function UserProfileContactListRowView({
   onSetPrimary,
   onRemove,
   addAction,
+  rowRef,
+  triggerRef,
+  children,
 }: UserProfileContactListRowViewProps) {
   const m = useMessages('userProfileAccountSection');
   const emptyDescription = m[kind].empty;
 
   return (
-    <Section.Row>
-      <Section.Item>
-        <Section.Content>
-          <Section.Label>{label}</Section.Label>
-        </Section.Content>
+    <Section.Group
+      ref={rowRef}
+      tabIndex={-1}
+    >
+      <Section.Header>
+        <Section.Title>{label}</Section.Title>
         {addAction ? (
           <Section.Actions>{addAction}</Section.Actions>
         ) : onAdd ? (
@@ -59,56 +66,60 @@ export function UserProfileContactListRowView({
             </Button>
           </Section.Actions>
         ) : null}
-      </Section.Item>
-      <Section.Items>
-        {items.length === 0 ? (
-          <Section.Item>
-            <Section.Content>
-              <Section.Description>{emptyDescription}</Section.Description>
-            </Section.Content>
-          </Section.Item>
-        ) : (
-          items.map(item => {
-            const actions: ActionMenuAction[] = [];
+      </Section.Header>
+      <Section.Body>
+        <Section.Items>
+          {items.length === 0 ? (
+            <Section.Item>
+              <Section.Content>
+                <Section.Description>{emptyDescription}</Section.Description>
+              </Section.Content>
+            </Section.Item>
+          ) : (
+            items.map(item => {
+              const actions: ActionMenuAction[] = [];
 
-            if (item.isVerified === false && onVerify) {
-              actions.push({
-                label: item.isDefault ? m.completeVerification : m[kind].verify,
-                onClick: () => onVerify(item.id),
-              });
-            } else if (!item.isDefault && item.isVerified === true && onSetPrimary) {
-              actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id) });
-            }
+              if (item.isVerified === false && onVerify) {
+                actions.push({
+                  label: item.isDefault ? m.completeVerification : m[kind].verify,
+                  onClick: () => onVerify(item.id),
+                });
+              } else if (!item.isDefault && item.isVerified === true && onSetPrimary) {
+                actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id) });
+              }
 
-            if (onRemove && item.canRemove !== false) {
-              actions.push({
-                label: m[kind].remove,
-                color: 'negative',
-                onClick: () => onRemove(item.id),
-              });
-            }
+              if (onRemove && item.canRemove !== false) {
+                actions.push({
+                  label: m[kind].remove,
+                  color: 'negative',
+                  onClick: () => onRemove(item.id),
+                });
+              }
 
-            return (
-              <Section.Item key={item.id}>
-                <Section.Content>
-                  <Section.Description xstyle={styles.contactValue}>
-                    <span>{item.value}</span>
-                    {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
-                  </Section.Description>
-                </Section.Content>
-                {actions.length > 0 ? (
-                  <Section.Actions>
-                    <ActionMenu
-                      actions={actions}
-                      label={fill(m.manageValue, { value: item.value })}
-                    />
-                  </Section.Actions>
-                ) : null}
-              </Section.Item>
-            );
-          })
-        )}
-      </Section.Items>
-    </Section.Row>
+              return (
+                <Section.Item key={item.id}>
+                  <Section.Content>
+                    <Section.Description xstyle={styles.contactValue}>
+                      <span>{item.value}</span>
+                      {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
+                    </Section.Description>
+                  </Section.Content>
+                  {actions.length > 0 ? (
+                    <Section.Actions>
+                      <ActionMenu
+                        triggerRef={triggerRef?.(item.id)}
+                        actions={actions}
+                        label={fill(m.manageValue, { value: item.value })}
+                      />
+                    </Section.Actions>
+                  ) : null}
+                </Section.Item>
+              );
+            })
+          )}
+        </Section.Items>
+        {children}
+      </Section.Body>
+    </Section.Group>
   );
 }

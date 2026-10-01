@@ -222,7 +222,6 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                 <Icon
                   name='chevron-down'
                   size='md'
-                  aria-hidden='true'
                 />
               </span>
             </Popover.Trigger>
@@ -255,7 +254,6 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(fu
                     <Icon
                       name='magnifying-glass'
                       size='sm'
-                      aria-hidden='true'
                     />
                   </InputGroup.Start>
                   <Combobox.Input

@@ -1,5 +1,11 @@
 // Import stories explicitly to control order and avoid type casting through unknown.
 import { meta as accordionMeta } from '../stories/accordion.stories';
+import {
+  Default as ActionBarDefault,
+  InDialog as ActionBarInDialog,
+  Inline as ActionBarInline,
+  meta as actionBarMeta,
+} from '../stories/action-bar.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
@@ -153,6 +159,12 @@ import {
   ReadOnly as OrganizationProfileGeneralPanelReadOnly,
 } from '../stories/organization-profile-general-panel.stories';
 import {
+  Empty as OrganizationProfileMembersPanelEmpty,
+  Legacy as OrganizationProfileMembersPanelLegacy,
+  meta as organizationProfileMembersPanelMeta,
+  Proposed as OrganizationProfileMembersPanelProposed,
+} from '../stories/organization-profile-members-panel.stories';
+import {
   Default as OrganizationProfileWorkspaceSectionDefault,
   meta as organizationProfileWorkspaceSectionMeta,
   SaveFails as OrganizationProfileWorkspaceSectionSaveFails,
@@ -173,6 +185,7 @@ import {
   Primary as PaginationPrimary,
   SinglePage as PaginationSinglePage,
 } from '../stories/pagination.stories';
+import { Default as PanelDefault, meta as panelMeta } from '../stories/panel.component.stories';
 import {
   Default as PhoneInputDefault,
   Disabled as PhoneInputDisabled,
@@ -231,7 +244,6 @@ import {
   Destructive as SectionDestructive,
   IconFrameMedia as SectionIconFrameMedia,
   meta as sectionMeta,
-  MultipleEmailAndPhoneNumbers as SectionMultipleEmailAndPhoneNumbers,
 } from '../stories/section.stories';
 import {
   Controlled as SelectComponentControlled,
@@ -248,6 +260,7 @@ import {
   Empty as TableEmpty,
   meta as tableMeta,
   Overflow as TableOverflow,
+  Search as TableSearch,
   Selection as TableSelection,
   Sorting as TableSorting,
 } from '../stories/table.stories';
@@ -277,6 +290,7 @@ import {
 } from '../stories/tooltip.component.stories';
 import { meta as tooltipMeta } from '../stories/tooltip.stories';
 import { meta as useDataTableMeta } from '../stories/use-data-table.stories';
+import { Default as UseFormDefault, meta as useFormMeta } from '../stories/use-form.stories';
 import {
   Combined as UserButtonCombined,
   meta as userButtonMeta,
@@ -406,7 +420,6 @@ import type { StoryModule } from './types';
 const sectionModule: StoryModule = {
   meta: sectionMeta,
   Default: SectionDefault,
-  MultipleEmailAndPhoneNumbers: SectionMultipleEmailAndPhoneNumbers,
   ConnectedAccounts: SectionConnectedAccounts,
   IconFrameMedia: SectionIconFrameMedia,
   Destructive: SectionDestructive,
@@ -470,6 +483,13 @@ const organizationProfileDangerSectionModule: StoryModule = {
   Default: OrganizationProfileDangerSectionDefault,
   WithError: OrganizationProfileDangerSectionWithError,
   LeaveOnly: OrganizationProfileDangerSectionLeaveOnly,
+};
+
+const actionBarModule: StoryModule = {
+  meta: actionBarMeta,
+  Default: ActionBarDefault,
+  InDialog: ActionBarInDialog,
+  Inline: ActionBarInline,
 };
 
 const avatarModule: StoryModule = {
@@ -539,6 +559,7 @@ const popoverComponentModule: StoryModule = {
   Placement: PopoverComponentPlacement,
   Alignment: PopoverComponentAlignment,
 };
+const panelModule: StoryModule = { meta: panelMeta, Default: PanelDefault };
 const profileComponentModule: StoryModule = {
   meta: profileComponentMeta,
   Default: ProfileDefault,
@@ -678,6 +699,8 @@ const scrollAreaModule: StoryModule = {
 
 const useDataTableModule: StoryModule = { meta: useDataTableMeta };
 
+const useFormModule: StoryModule = { meta: useFormMeta, Default: UseFormDefault };
+
 const localizationModule: StoryModule = {
   meta: localizationMeta,
   Overrides: LocalizationOverrides,
@@ -692,6 +715,7 @@ const tableModule: StoryModule = {
   meta: tableMeta,
   Default: TableDefault,
   Sorting: TableSorting,
+  Search: TableSearch,
   Selection: TableSelection,
   Empty: TableEmpty,
   Overflow: TableOverflow,
@@ -859,6 +883,13 @@ const organizationProfileApiKeysPanelModule: StoryModule = {
   Empty: OrganizationProfileApiKeysPanelEmpty,
 };
 
+const organizationProfileMembersPanelModule: StoryModule = {
+  meta: organizationProfileMembersPanelMeta,
+  Legacy: OrganizationProfileMembersPanelLegacy,
+  Proposed: OrganizationProfileMembersPanelProposed,
+  Empty: OrganizationProfileMembersPanelEmpty,
+};
+
 export const registry: StoryModule[] = [
   // User Button
   userButtonModule,
@@ -887,6 +918,7 @@ export const registry: StoryModule[] = [
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
   organizationProfileApiKeysPanelModule,
+  organizationProfileMembersPanelModule,
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
   organizationProfileDangerSectionModule,
@@ -896,6 +928,7 @@ export const registry: StoryModule[] = [
   confirmationModule,
   destructiveModule,
   // Components
+  actionBarModule,
   avatarModule,
   badgeModule,
   bannerModule,
@@ -919,6 +952,7 @@ export const registry: StoryModule[] = [
   menuComponentModule,
   otpComponentModule,
   paginationModule,
+  panelModule,
   popoverComponentModule,
   profileComponentModule,
   sectionModule,
@@ -952,6 +986,7 @@ export const registry: StoryModule[] = [
   scrollAreaModule,
   // Hooks
   useDataTableModule,
+  useFormModule,
   // Localization
   localizationModule,
 ];

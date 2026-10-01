@@ -22,5 +22,20 @@ export interface AuthConfigResource extends ClerkResource {
    */
   preferredChannels: Record<string, PhoneCodeChannel> | null;
   sessionMinter: boolean;
+  /**
+   * Native application settings, such as trusted device (biometric) sign-in.
+   * @experimental
+   */
+  nativeSettings: NativeSettingsResource | null;
   __internal_toSnapshot: () => AuthConfigJSONSnapshot;
+}
+
+/**
+ * @experimental
+ */
+export interface NativeSettingsResource {
+  apiEnabled: boolean;
+  trustedDeviceSignInEnabled: boolean;
+  trustedDeviceEnrollmentPromptAfterSignInEnabled: boolean;
+  trustedDeviceEnrollmentPromptAfterSignUpEnabled: boolean;
 }

@@ -1,9 +1,8 @@
-import * as stylex from '@stylexjs/stylex';
 import type { ReactElement } from 'react';
 
-import { panelStyles, Profile } from '../../components/profile';
+import { Panel } from '../../components/panel';
 import { useMessages } from '../../localization';
-import { mergeStyleProps, themeProps } from '../../props';
+import { themeProps } from '../../props';
 import type { OrganizationProfileDangerSectionViewProps } from './organization-profile-danger-section/organization-profile-danger-section.view';
 import { OrganizationProfileDangerSectionView } from './organization-profile-danger-section/organization-profile-danger-section.view';
 import type { OrganizationProfileWorkspaceSectionViewProps } from './organization-profile-workspace-section/organization-profile-workspace-section.view';
@@ -29,9 +28,9 @@ export function OrganizationProfileGeneralPanelView({
   const m = useMessages('organizationProfile');
 
   return (
-    <div {...mergeStyleProps(themeProps('organization-profile-general-panel'), stylex.props(panelStyles.root))}>
-      <Profile.PageTitle>{m.pages.general}</Profile.PageTitle>
-      <div {...stylex.props(panelStyles.sections)}>
+    <Panel.Root render={<div {...themeProps('organization-profile-general-panel')} />}>
+      <Panel.Title>{m.pages.general}</Panel.Title>
+      <Panel.Sections>
         <OrganizationProfileWorkspaceSectionView
           name={name}
           slug={slug}
@@ -49,7 +48,7 @@ export function OrganizationProfileGeneralPanelView({
           onLeave={onLeave}
           onDelete={onDelete}
         />
-      </div>
-    </div>
+      </Panel.Sections>
+    </Panel.Root>
   );
 }

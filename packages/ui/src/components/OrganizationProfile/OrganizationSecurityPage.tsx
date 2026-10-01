@@ -22,11 +22,9 @@ type OrganizationSecurityPageProps = {
   contentRef: React.RefObject<HTMLDivElement>;
 };
 
-type WizardReturnTo = { kind: 'overview' } | { kind: 'connection'; id: string };
-
 type SecurityPageView =
   | { kind: 'overview' }
-  | { kind: 'wizard'; forceInitialStep: boolean; returnTo: WizardReturnTo }
+  | { kind: 'wizard'; forceInitialStep: boolean }
   | { kind: 'connection'; id: string }
   | { kind: 'directorySync' }
   | { kind: 'ssoBypass' };
@@ -70,13 +68,9 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
 
   const exitToOverview = () => setRequestedView({ kind: 'overview' });
 
-  const openWizard = (
-    scope: ConnectionScope,
-    forceInitialStep = false,
-    returnTo: WizardReturnTo = { kind: 'overview' },
-  ) => {
+  const openWizard = (scope: ConnectionScope, forceInitialStep = false) => {
     selectConnection(scope);
-    setRequestedView({ kind: 'wizard', forceInitialStep, returnTo });
+    setRequestedView({ kind: 'wizard', forceInitialStep });
   };
 
   const openConnection = (id: string) => setRequestedView({ kind: 'connection', id });
@@ -133,28 +127,12 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
       <EnterpriseConnectionPage
         connection={openedConnection}
         enterpriseConnectionMutations={enterpriseConnectionMutations}
-        organizationName={organization?.name ?? ''}
-        contentRef={contentRef}
         onBack={exitToOverview}
-        onOpenWizard={() =>
-          openWizard({ kind: 'existing', id: openedConnection.id }, false, {
-            kind: 'connection',
-            id: openedConnection.id,
-          })
-        }
       />
     );
   }
 
   if (view.kind === 'wizard') {
-    const { returnTo } = view;
-    const exitWizard = () =>
-      setRequestedView(
-        returnTo.kind === 'connection' && enterpriseConnections.some(connection => connection.id === returnTo.id)
-          ? returnTo
-          : { kind: 'overview' },
-      );
-
     return (
       <ConfigureSSOWizard
         organizationEnterpriseConnection={organizationEnterpriseConnection}
@@ -168,8 +146,8 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
         organizationDomainMutations={organizationDomainMutations}
         organizationDomains={organizationDomains}
         forceInitialStep={view.forceInitialStep}
-        title={<SecurityBackControl onClick={exitWizard} />}
-        onExit={exitWizard}
+        title={<SecurityBackControl onClick={exitToOverview} />}
+        onExit={exitToOverview}
       />
     );
   }
@@ -178,6 +156,9 @@ const OrganizationSecurityPageContent = ({ contentRef }: OrganizationSecurityPag
     <SecurityPageOverview>
       <SecuritySsoSection
         enterpriseConnections={enterpriseConnections}
+        enterpriseConnectionMutations={enterpriseConnectionMutations}
+        organizationName={organization?.name ?? ''}
+        contentRef={contentRef}
         onConfigure={canManageConnections ? openWizard : undefined}
         onOpenConnection={canManageConnections ? openConnection : undefined}
       />

@@ -31,10 +31,6 @@ function PasswordSection({
   return <UserProfilePasswordSectionView {...editPassword} />;
 }
 
-// Stands in for the enterprise account's `logoPublicUrl`: a real hosted image URL, served from
-// swingset's `public/` the same way production serves the connection's logo.
-const oktaIcon = '/okta-placeholder.svg';
-
 export function Default() {
   return <PasswordSection />;
 }
@@ -51,15 +47,14 @@ export function WithoutCurrentPassword() {
 
 /**
  * An enterprise connection owns the password, so the row names who manages it in place of an edit
- * action and never opens the dialog. The connection's logo leads the label, or a generic lock when
- * a custom IDP ships none.
+ * action and never opens the dialog.
  */
 export function ManagedByEnterprise() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: '100%' }}>
       <UserProfilePasswordSectionView
         hasPassword
-        managedBy={{ name: 'Okta', iconUrl: oktaIcon }}
+        managedBy={{ name: 'Okta' }}
       />
       <UserProfilePasswordSectionView
         hasPassword

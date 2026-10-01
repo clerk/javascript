@@ -18,6 +18,9 @@ import com.clerk.api.biometriccredential.BiometricCredential
 import com.clerk.api.biometriccredential.BiometricCredentialAvailability
 import com.clerk.api.biometriccredential.BiometricCredentialKeyManagerException
 import com.clerk.api.biometriccredential.BiometricCredentialPolicy
+import com.clerk.api.session.SessionVerification
+import com.clerk.api.session.startVerification
+import com.clerk.api.session.verifyWithBiometrics
 import com.clerk.api.ui.ClerkColors
 import com.clerk.api.ui.ClerkDesign
 import com.clerk.api.ui.ClerkTheme
@@ -28,6 +31,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -101,6 +106,43 @@ internal fun biometricCredentialPolicy(policy: String): BiometricCredentialPolic
         "biometry_or_device_passcode" -> BiometricCredentialPolicy.BIOMETRY_OR_DEVICE_PASSCODE
         else -> null
     }
+}
+
+internal fun biometricReverificationLevel(level: String): SessionVerification.Level? = when (level) {
+    "first_factor" -> SessionVerification.Level.FIRST_FACTOR
+    "second_factor" -> SessionVerification.Level.SECOND_FACTOR
+    "multi_factor" -> SessionVerification.Level.MULTI_FACTOR
+    else -> null
+}
+
+internal fun biometricReverificationPayload(
+    verification: SessionVerification,
+    sessionId: String
+): Map<String, Any?> = mapOf(
+    "id" to verification.id,
+    "status" to verification.status.name.lowercase(),
+    "level" to verification.level.value,
+    "sessionId" to (verification.session?.id ?: sessionId)
+)
+
+internal suspend fun verifyBiometricReverification(
+    started: SessionVerification,
+    verify: suspend (SessionVerification.Level) -> ClerkResult<SessionVerification, ClerkErrorResponse>
+): ClerkResult<SessionVerification, ClerkErrorResponse> = when (started.status) {
+    SessionVerification.Status.NEEDS_FIRST_FACTOR -> {
+        val result = verify(SessionVerification.Level.FIRST_FACTOR)
+        if (result is ClerkResult.Success && result.value.status == SessionVerification.Status.NEEDS_SECOND_FACTOR) {
+            currentCoroutineContext().ensureActive()
+            verify(SessionVerification.Level.SECOND_FACTOR)
+        } else {
+            result
+        }
+    }
+    SessionVerification.Status.NEEDS_SECOND_FACTOR -> verify(SessionVerification.Level.SECOND_FACTOR)
+    SessionVerification.Status.COMPLETE -> ClerkResult.success(started)
+    SessionVerification.Status.UNKNOWN -> ClerkResult.unknownFailure(
+        IllegalStateException("The server returned an unsupported reverification status.")
+    )
 }
 
 internal data class BiometricCredentialBridgeError(
@@ -270,6 +312,14 @@ class ClerkExpoModule : Module() {
                 reason: String?,
                 promise: Promise ->
             signInWithBiometrics(id, identifierHint, reason, promise)
+        }
+
+        AsyncFunction("reverifyWithBiometrics") {
+                sessionId: String,
+                level: String,
+                reason: String?,
+                promise: Promise ->
+            reverifyWithBiometrics(sessionId, level, reason, promise)
         }
     }
 
@@ -752,6 +802,54 @@ class ClerkExpoModule : Module() {
                     fallbackMessage = "Unable to sign in with biometric credential",
                     exception = e
                 )
+            }
+        }
+    }
+
+    private fun reverifyWithBiometrics(
+        sessionId: String,
+        level: String,
+        reason: String?,
+        promise: Promise
+    ) {
+        if (!requireBiometricCredentialEnvironment(promise)) return
+        val requestedLevel = biometricReverificationLevel(level)
+        if (requestedLevel == null) {
+            promise.reject("invalid_reverification_level", "Invalid biometric reverification level: $level", null)
+            return
+        }
+        coroutineScope.launch {
+            try {
+                val session = Clerk.clientFlow.value?.sessions?.firstOrNull { it.id == sessionId }
+                if (session == null) {
+                    promise.reject(
+                        "biometric_reverification_session_unavailable",
+                        "The session to reverify is unavailable in the native Clerk client.",
+                        null
+                    )
+                    return@launch
+                }
+                if (!attachCurrentActivityForBiometricCredential(promise)) return@launch
+                val started = when (val result = session.startVerification(requestedLevel)) {
+                    is ClerkResult.Success -> result.value
+                    is ClerkResult.Failure -> {
+                        rejectBiometricCredentialFailure(promise, "E_BIOMETRIC_REVERIFICATION_FAILED",
+                            "Unable to start biometric reverification", result)
+                        return@launch
+                    }
+                }
+                val result = verifyBiometricReverification(started) { factor ->
+                    session.verifyWithBiometrics(promptSubtitle = reason, level = factor)
+                }
+                when (result) {
+                    is ClerkResult.Success -> promise.resolve(biometricReverificationPayload(result.value, sessionId))
+                    is ClerkResult.Failure -> rejectBiometricCredentialFailure(
+                        promise, "E_BIOMETRIC_REVERIFICATION_FAILED", "Unable to reverify with biometrics", result
+                    )
+                }
+            } catch (e: Exception) {
+                rejectBiometricCredentialException(promise, "E_BIOMETRIC_REVERIFICATION_FAILED",
+                    "Unable to reverify with biometrics", e)
             }
         }
     }

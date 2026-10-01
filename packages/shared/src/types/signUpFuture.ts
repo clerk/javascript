@@ -45,6 +45,8 @@ export interface SignUpFutureAdditionalParams {
 
 /** @generateWithEmptyComment */
 export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
+  /** The timezone to assign to the user. If omitted, defaults to the browser's timezone. */
+  timezone?: string;
   /**
    * The strategy to use for the sign-up. The following strategies are supported:
    * <ul>
@@ -474,10 +476,15 @@ export interface SignUpFutureResource {
    * The locale of the user in [BCP 47](https://developer.mozilla.org/en-US/docs/Glossary/BCP_47_language_tag) format (e.g., "en-US", "fr-FR"), or `null` if not set.
    */
   readonly locale: string | null;
+  readonly timezone: string | null;
 
   /**
    * The current protect check challenge, if one is pending. Only populated when Protect mid-flow
    * challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it.
+   * When Clerk's UI is loaded, the sign-up methods resolve the challenge in a modal before they
+   * return. Otherwise, run the challenge yourself and submit its proof token with `submitProtectCheck()`.
+   * When `sso()` redirects to the identity provider, the challenge runs on the way back through
+   * `<HandleSSOCallback />` instead.
    */
   readonly protectCheck: ProtectCheckResource | null;
 
@@ -532,7 +539,7 @@ export interface SignUpFutureResource {
   web3: (params: SignUpFutureWeb3Params) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively.
+   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively. Call it after running the challenge yourself when Clerk's UI isn't loaded. With the UI loaded, the other sign-up methods resolve the challenge in a modal before they return. When `sso()` redirects to the identity provider, the challenge runs on the way back through `<HandleSSOCallback />` instead.
    */
   submitProtectCheck: (params: SignUpFutureSubmitProtectCheckParams) => Promise<{ error: ClerkError | null }>;
 

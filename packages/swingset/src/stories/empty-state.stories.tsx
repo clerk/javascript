@@ -10,7 +10,7 @@ export { default as __source } from './empty-state.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
-  status: 'wip',
+  status: 'stable',
   title: 'EmptyState',
   source: 'packages/mosaic/src/components/empty-state/empty-state.tsx',
 };

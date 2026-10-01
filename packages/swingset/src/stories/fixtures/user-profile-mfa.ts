@@ -7,6 +7,9 @@ import type { UserProfileMfaSetupViewProps } from '@clerk/mosaic/features/user-p
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { useEffect, useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosRows } from '@/lib/chaos';
+
 import { authenticatorSetup } from './user-profile-authenticator';
 
 interface FixtureOptions {
@@ -57,6 +60,12 @@ export const mfaDemoOptions: FixtureOptions = {
   },
 };
 
+const examplePhones = [
+  { id: 'personal', phoneNumber: '+18015550100', verified: true, enrolled: true },
+  { id: 'work', phoneNumber: '+14165550100', verified: false, enrolled: false },
+  { id: 'other', phoneNumber: '+18015550200', verified: true, enrolled: false },
+];
+
 const pause = () => new Promise(resolve => setTimeout(resolve, 600));
 
 export function useUserProfileMfaFixture({
@@ -77,12 +86,9 @@ export function useUserProfileMfaFixture({
   sms: UserProfileMfaSetupViewProps['sms'];
   backupCodes: UserProfileMfaSetupViewProps['backupCodes'];
 } {
+  const phones = useChaosFixture(examplePhones, items => chaosRows(items, 12));
   const [account, setAccount] = useState({
-    phones: [
-      { id: 'personal', phoneNumber: '+18015550100', verified: true, enrolled: true },
-      { id: 'work', phoneNumber: '+14165550100', verified: false, enrolled: false },
-      { id: 'other', phoneNumber: '+18015550200', verified: true, enrolled: false },
-    ],
+    phones,
     authenticator: false,
     defaultPhoneId: 'personal',
     hasBackupCodes: initialFlow === 'backup-codes' && Boolean(enrollmentBackupCodes?.length),
@@ -327,7 +333,6 @@ export function useUserProfileMfaFixture({
     section: {
       methods,
       addableMethods,
-      sectionTitle: 'Authentication',
       onAdd: open,
       onRegenerateBackupCodes:
         account.hasBackupCodes && onGenerateBackupCodes ? () => void generateBackupCodes('regenerate') : undefined,

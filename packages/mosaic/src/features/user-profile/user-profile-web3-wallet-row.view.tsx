@@ -1,4 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
+import type { Ref } from 'react';
 
 import type { ActionMenuAction } from '../../components/action-menu';
 import { ActionMenu } from '../../components/action-menu';
@@ -12,11 +13,13 @@ import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-prof
 
 export function UserProfileWeb3WalletRowView({
   wallet,
+  triggerRef,
   onConnect,
   onSetPrimary,
   onRemove,
 }: {
   wallet: UserProfileWeb3Wallet | UserProfileWeb3Provider;
+  triggerRef?: Ref<HTMLButtonElement>;
   onConnect?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (wallet: UserProfileWeb3Wallet) => void;
@@ -94,6 +97,7 @@ export function UserProfileWeb3WalletRowView({
         ) : actions.length > 0 ? (
           <Section.Actions>
             <ActionMenu
+              triggerRef={triggerRef}
               actions={actions}
               label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
             />

@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
-import { Section } from '../../../components/section';
+import { Section, sectionCompactStyles } from '../../../components/section';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
@@ -19,13 +19,12 @@ export function UserProfilePasswordRowView({
   requiresCurrentPassword = false,
   managedBy,
   onSubmitPassword,
-}: Omit<UserProfilePasswordSectionViewProps, 'sectionTitle'>) {
+}: UserProfilePasswordSectionViewProps) {
   const m = useMessages('userProfilePasswordSection');
   return (
-    <Section.Row>
+    <Section.Items>
       <Section.Item>
         <Section.Content>
-          <Section.Label>{m.label}</Section.Label>
           <Section.Description>{hasPassword ? m.masked : m.noPasswordSet}</Section.Description>
         </Section.Content>
         {managedBy ? (
@@ -42,34 +41,26 @@ export function UserProfilePasswordRowView({
           </Section.Actions>
         ) : null}
       </Section.Item>
-    </Section.Row>
+    </Section.Items>
   );
 }
 
-function ManagedByLabel({ name, iconUrl }: UserProfilePasswordManagedBy) {
+function ManagedByLabel({ name }: UserProfilePasswordManagedBy) {
   const m = useMessages('userProfilePasswordSection');
   return (
     <div {...stylex.props(styles.managedBy)}>
-      {iconUrl ? (
-        <img
-          alt=''
-          src={iconUrl}
-          {...stylex.props(styles.managedByIcon)}
-        />
-      ) : (
-        <Icon
-          aria-hidden
-          name='lock'
-          size='sm'
-          xstyle={styles.managedByText}
-        />
-      )}
+      <Icon
+        name='lock'
+        size='sm'
+        xstyle={styles.managedByText}
+      />
       <Text
         render={<span />}
         size='sm'
         xstyle={styles.managedByText}
       >
-        {fill(m.managedBy, { name })}
+        <span {...stylex.props(sectionCompactStyles.hidden)}>{fill(m.managedBy, { name })}</span>
+        <span {...stylex.props(sectionCompactStyles.only)}>{name}</span>
       </Text>
     </div>
   );
@@ -92,9 +83,10 @@ function EditPassword({
 
   return (
     <UserProfileEditPasswordDialog
-      {...controller}
+      form={controller.form}
       hasPassword={hasPassword}
       open={controller.isOpen}
+      onOpenChange={controller.onOpenChange}
       requiresCurrentPassword={requiresCurrentPassword}
       trigger={
         <Button

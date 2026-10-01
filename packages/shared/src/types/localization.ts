@@ -141,6 +141,8 @@ export type __internal_LocalizationResource = {
   formFieldError__matchingPasswords: LocalizationValue;
   formFieldError__verificationLinkExpired: LocalizationValue;
   formFieldAction__forgotPassword: LocalizationValue;
+  formFieldAction__hidePassword: LocalizationValue;
+  formFieldAction__showPassword: LocalizationValue;
   formFieldHintText__optional: LocalizationValue;
   formFieldHintText__slug: LocalizationValue;
   formButtonPrimary: LocalizationValue;
@@ -1216,11 +1218,16 @@ export type __internal_LocalizationResource = {
         addForm: {
           title: LocalizationValue;
           subtitle: LocalizationValue;
-          memberLabel: LocalizationValue;
-          changeButton: LocalizationValue;
-          memberPlaceholder: LocalizationValue;
-          noResults: LocalizationValue;
+          modeLabel: LocalizationValue;
+          mode__email: LocalizationValue;
+          mode__role: LocalizationValue;
+          emailPlaceholder: LocalizationValue;
+          roleOption: LocalizationValue<'role' | 'count'>;
+          roleWarning: LocalizationValue;
           submitButton: LocalizationValue;
+          error__memberNotFound: LocalizationValue;
+          error__alreadyAdded: LocalizationValue;
+          error__allAlreadyAdded: LocalizationValue;
         };
         table: {
           header__user: LocalizationValue;
@@ -1228,6 +1235,17 @@ export type __internal_LocalizationResource = {
           emptyState: LocalizationValue;
           emptyState__search: LocalizationValue;
           menuAction__remove: LocalizationValue;
+        };
+        bulkResult: {
+          added: LocalizationValue<'count'>;
+          added__one: LocalizationValue;
+          addedMember: LocalizationValue;
+          domainNotServed: LocalizationValue<'count'>;
+          domainNotServed__one: LocalizationValue;
+          notMember: LocalizationValue<'count'>;
+          notMember__one: LocalizationValue;
+          unknown: LocalizationValue<'count'>;
+          unknown__one: LocalizationValue;
         };
       };
       ssoSection: {
@@ -1237,7 +1255,11 @@ export type __internal_LocalizationResource = {
         badge__active: LocalizationValue;
         badge__inactive: LocalizationValue;
         descriptionLine1: LocalizationValue;
+        /**
+         * @deprecated Use `primaryButton__configure` instead.
+         */
         primaryButton__startConfiguration: LocalizationValue;
+        primaryButton__configure: LocalizationValue;
         primaryButton__continueConfiguration: LocalizationValue;
         primaryButton__addConnection: LocalizationValue;
         domainLabel: LocalizationValue;
@@ -1314,13 +1336,12 @@ export type __internal_LocalizationResource = {
       };
       directorySyncSection: {
         title: LocalizationValue;
-        badge__unconfigured: LocalizationValue;
         badge__ssoRequired: LocalizationValue;
         badge__active: LocalizationValue;
         badge__inactive: LocalizationValue;
         description: LocalizationValue;
         error__load: LocalizationValue;
-        primaryButton__startConfiguration: LocalizationValue;
+        primaryButton__configure: LocalizationValue;
         menuAction__edit: LocalizationValue;
         menuAction__activate: LocalizationValue;
         menuAction__deactivate: LocalizationValue;
@@ -1585,11 +1606,16 @@ export type __internal_LocalizationResource = {
         title: LocalizationValue;
         subtitle: LocalizationValue;
       };
-      warning__googleUnsupported: {
-        title: LocalizationValue;
-        subtitle: LocalizationValue;
-      };
       warning__ssoInactive: LocalizationValue;
+      formFieldLabel__serviceAccountKey: LocalizationValue;
+      formFieldLabel__subjectEmail: LocalizationValue;
+      formFieldInputPlaceholder__subjectEmail: LocalizationValue;
+      formFieldHint__subjectEmail: LocalizationValue;
+      actionLabel__uploadKey: LocalizationValue;
+      actionLabel__replaceKey: LocalizationValue;
+      badge__credentialsConfigured: LocalizationValue;
+      badge__credentialsMissing: LocalizationValue;
+      error__invalidKeyFile: LocalizationValue;
       domainsLabel: LocalizationValue;
       instructions: {
         actionLabel__toggle: LocalizationValue;
@@ -1611,6 +1637,13 @@ export type __internal_LocalizationResource = {
           step3: LocalizationValue;
           step4: LocalizationValue;
         };
+        google: {
+          step1: LocalizationValue;
+          step2: LocalizationValue;
+          step3: LocalizationValue;
+          step4: LocalizationValue;
+          step5: LocalizationValue;
+        };
       };
       formFieldLabel__endpointUrl: LocalizationValue;
       formFieldLabel__token: LocalizationValue;
@@ -1631,9 +1664,23 @@ export type __internal_LocalizationResource = {
       title: LocalizationValue;
       subtitle: LocalizationValue<'provider'>;
       description: LocalizationValue;
+      description__pull: LocalizationValue;
       noteLabel: LocalizationValue;
       note: LocalizationValue;
       empty__waitingForFirstUser: LocalizationValue;
+      empty__waitingForFirstSync: LocalizationValue;
+      empty__noUsersProvisioned: LocalizationValue;
+      actionLabel__syncNow: LocalizationValue;
+      error__lastSyncFailed: LocalizationValue;
+      error__syncFailed: LocalizationValue;
+      syncStatus__running: LocalizationValue;
+      syncStatus__succeeded: LocalizationValue;
+      syncStatus__failed: LocalizationValue;
+      syncStatus__cancelled: LocalizationValue;
+      syncRow: {
+        title: LocalizationValue;
+        neverSynced: LocalizationValue;
+      };
       badge__active: LocalizationValue;
       badge__deprovisioned: LocalizationValue;
       error__loadUsers: LocalizationValue;
@@ -2222,6 +2269,20 @@ export type __internal_LocalizationResource = {
       doneButton: LocalizationValue;
     };
   };
+  /**
+   * The screen shown when a request is blocked and there is no way for the end
+   * user to retry. These are the fallbacks: an application can supply its own
+   * title and description, and when it does they are used instead.
+   */
+  actionBlocked: {
+    title: LocalizationValue;
+    subtitle: LocalizationValue;
+    /**
+     * Labels the short reference the end user can quote when contacting
+     * support.
+     */
+    traceIdLabel: LocalizationValue;
+  };
   apiKeys: {
     formTitle: LocalizationValue;
     formHint: LocalizationValue;
@@ -2392,6 +2453,7 @@ type UnstableErrors = WithParamName<{
   protect_check_execution_failed: LocalizationValue;
   protect_check_invalid_script: LocalizationValue;
   protect_check_invalid_sdk_url: LocalizationValue;
+  protect_check_required: LocalizationValue;
   protect_check_script_load_failed: LocalizationValue;
   protect_check_timed_out: LocalizationValue;
   protect_check_unsupported_environment: LocalizationValue;
@@ -2403,6 +2465,7 @@ type UnstableErrors = WithParamName<{
   passkey_retrieval_cancelled: LocalizationValue;
   passkey_registration_cancelled: LocalizationValue;
   passkey_already_exists: LocalizationValue;
+  too_many_unverified_identifications: LocalizationValue;
   web3_missing_identifier: LocalizationValue;
   web3_solana_signature_generation_failed: LocalizationValue;
   web3_signature_request_rejected: LocalizationValue;
@@ -2447,6 +2510,7 @@ type UnstableErrors = WithParamName<{
     requireSpecialCharacter: LocalizationValue;
   };
   session_exists: LocalizationValue;
+  sso_bypass_domain_not_served: LocalizationValue;
   ticket_expired_code: LocalizationValue;
   ticket_invalid_code: LocalizationValue;
   zxcvbn: {

@@ -1,11 +1,11 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import { Button } from '../../components/button';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
 
 export function UserProfileSecurityList({
-  sectionTitle,
+  sectionRef,
   label,
   addLabel,
   emptyLabel,
@@ -14,7 +14,7 @@ export function UserProfileSecurityList({
   addControl,
   children,
 }: {
-  sectionTitle?: string;
+  sectionRef?: Ref<HTMLDivElement>;
   label: string;
   addLabel: string;
   emptyLabel: string;
@@ -24,48 +24,46 @@ export function UserProfileSecurityList({
   children: ReactNode;
 }) {
   return (
-    <Section.Root aria-label={sectionTitle ? undefined : label}>
-      {sectionTitle ? <Section.Title>{sectionTitle}</Section.Title> : null}
-      <Section.Group>
-        <Section.Row>
-          <Section.Item>
-            <Section.Content>
-              <Section.Label>{label}</Section.Label>
-            </Section.Content>
-            {addControl ? (
-              <Section.Actions>{addControl}</Section.Actions>
-            ) : onAdd ? (
-              <Section.Actions>
-                <Button
-                  aria-label={addLabel}
-                  color='neutral'
-                  size='sm'
-                  variant='outline'
-                  onClick={onAdd}
-                >
-                  <Icon
-                    name='plus'
-                    placement='inline-start'
-                    size='sm'
-                  />
-                  Add
-                </Button>
-              </Section.Actions>
-            ) : null}
-          </Section.Item>
-          <Section.Items>
-            {hasItems ? (
-              children
-            ) : (
-              <Section.Item>
-                <Section.Content>
-                  <Section.Description>{emptyLabel}</Section.Description>
-                </Section.Content>
-              </Section.Item>
-            )}
-          </Section.Items>
-        </Section.Row>
-      </Section.Group>
-    </Section.Root>
+    <Section.Group
+      ref={sectionRef}
+      tabIndex={-1}
+    >
+      <Section.Header>
+        <Section.Title>{label}</Section.Title>
+        {addControl ? (
+          <Section.Actions>{addControl}</Section.Actions>
+        ) : onAdd ? (
+          <Section.Actions>
+            <Button
+              aria-label={addLabel}
+              color='neutral'
+              size='sm'
+              variant='outline'
+              onClick={onAdd}
+            >
+              <Icon
+                name='plus'
+                placement='inline-start'
+                size='sm'
+              />
+              Add
+            </Button>
+          </Section.Actions>
+        ) : null}
+      </Section.Header>
+      <Section.Body>
+        <Section.Items>
+          {hasItems ? (
+            children
+          ) : (
+            <Section.Item>
+              <Section.Content>
+                <Section.Description>{emptyLabel}</Section.Description>
+              </Section.Content>
+            </Section.Item>
+          )}
+        </Section.Items>
+      </Section.Body>
+    </Section.Group>
   );
 }

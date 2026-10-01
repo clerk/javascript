@@ -20,12 +20,14 @@ const biometricCredentials: UseBiometricCredentialsReturn = Object.freeze({
   enroll: rejectUnsupported,
   revoke: rejectUnsupported,
   signIn: rejectUnsupported,
+  reverify: rejectUnsupported,
 });
 
 /**
- * Accesses biometric credential enrollment and sign-in.
+ * Accesses biometric credential enrollment, sign-in, and session reverification.
  *
- * Biometric credentials are currently supported on iOS and Android.
+ * Biometric credentials are supported on iOS and Android. They require the `@clerk/expo-biometrics` package in a
+ * development build.
  */
 export function useBiometricCredentials(): UseBiometricCredentialsReturn {
   return biometricCredentials;

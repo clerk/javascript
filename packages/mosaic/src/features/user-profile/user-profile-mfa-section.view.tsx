@@ -2,6 +2,7 @@ import { type ReactNode, type Ref, useMemo, useRef, useState } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Text } from '../../components/text';
+import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
 import { fill, type MosaicMessages, useMessages } from '../../localization';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
@@ -25,7 +26,6 @@ export interface UserProfileMfaSectionViewProps {
   addableMethods?: readonly UserProfileMfaAddableMethod[];
   addButtonRef?: Ref<HTMLButtonElement>;
   addControl?: ReactNode;
-  sectionTitle?: string;
   onAdd?: (type: UserProfileMfaAddableMethod) => void;
   onRegenerateBackupCodes?: () => void;
   onRemove?: (id: string) => void | Promise<void>;
@@ -37,13 +37,18 @@ export function UserProfileMfaSectionView({
   addableMethods,
   addButtonRef,
   addControl,
-  sectionTitle,
   onAdd,
   onRegenerateBackupCodes,
   onRemove,
   onSetDefault,
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
+  const section = useRef<HTMLDivElement>(null);
+  const removalFocus = useListRemovalFocus({
+    ids: methods.map(method => method.id),
+    onRemove,
+    fallback: () => section.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? section.current,
+  });
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [isSettingDefault, setIsSettingDefault] = useState(false);
@@ -77,6 +82,7 @@ export function UserProfileMfaSectionView({
   return (
     <>
       <UserProfileSecurityList
+        sectionRef={section}
         addControl={
           addControl ??
           (onAdd && addableMethods?.length ? (
@@ -99,12 +105,12 @@ export function UserProfileMfaSectionView({
         emptyLabel={m.empty}
         hasItems={methods.length > 0}
         label={m.label}
-        sectionTitle={sectionTitle}
       >
         {methods.map(method => (
           <UserProfileMfaRowView
             key={method.id}
             method={method}
+            triggerRef={removalFocus.registerTrigger(method.id)}
             onRemove={onRemove ? () => removeMethod.open(method) : undefined}
             onSetDefault={onSetDefault && !isSettingDefault ? id => void setDefault(id) : undefined}
             onRegenerateBackupCodes={onRegenerateBackupCodes}
@@ -125,7 +131,8 @@ export function UserProfileMfaSectionView({
           title={method => (method.type === 'sms' ? m.removeDialog.smsTitle : m.removeDialog.authenticatorTitle)}
           description={method => describeMethodRemoval(method, m)}
           actionLabel={m.removeDialog.confirm}
-          onConfirm={method => onRemove(method.id)}
+          finalFocus={removalFocus.finalFocus}
+          onConfirm={method => removalFocus.remove(method.id)}
         />
       ) : null}
     </>
