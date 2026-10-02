@@ -6,6 +6,7 @@ import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import type { MessageValues } from '../../../localization';
 import { save, SaveError, UNEXPECTED_ERROR } from '../../../utils/form-error';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
+import { toManagedByProvider } from '../user-profile-managed-by.model';
 import type {
   UserProfileEmail,
   UserProfileNameAttribute,
@@ -50,7 +51,10 @@ function toManagedBy(account: EnterpriseAccountResource | undefined): UserProfil
     return undefined;
   }
   const connection = account.enterpriseConnection;
-  return { name: connection?.name || account.provider.replace(/^(oauth_|saml_)/, '') };
+  return {
+    name: connection?.name || account.provider.replace(/^(oauth_|saml_)/, ''),
+    provider: toManagedByProvider(account.provider),
+  };
 }
 
 function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameAttribute {

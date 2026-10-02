@@ -54,7 +54,7 @@ export function ManagedByEnterprise() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: '100%' }}>
       <UserProfilePasswordSectionView
         hasPassword
-        managedBy={{ name: 'Okta' }}
+        managedBy={{ name: 'Okta', provider: 'okta' }}
       />
       <UserProfilePasswordSectionView
         hasPassword

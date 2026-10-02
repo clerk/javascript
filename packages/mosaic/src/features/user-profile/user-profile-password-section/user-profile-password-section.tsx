@@ -34,7 +34,7 @@ export function useUserProfilePasswordSlot({
       content: (
         <UserProfilePasswordSectionView
           hasPassword={model.mode === 'change'}
-          managedBy={{ name: model.managedBy.name ?? m.enterpriseConnection }}
+          managedBy={{ name: model.managedBy.name ?? m.enterpriseConnection, provider: model.managedBy.provider }}
         />
       ),
     };
