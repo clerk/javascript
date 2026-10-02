@@ -15,7 +15,7 @@ import {
   fapiVerification,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileConnectedAccountsSection } from '../user-profile-connected-accounts-section/user-profile-connected-accounts-section';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
 

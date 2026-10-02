@@ -12,8 +12,8 @@ import type {
   OAuthStrategy,
 } from '@clerk/shared/types';
 
-import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
-import { useMosaicRouter } from '../../../hooks/useMosaicRouter';
+import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
+import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { useErrorText, useMessages } from '../../../localization';
 import { connectedAccountErrorMessage } from './user-profile-connected-accounts-feedback';
 import type {

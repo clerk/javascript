@@ -257,44 +257,6 @@ export function fapiExternalAccount(
   };
 }
 
-export function fapiEnterpriseAccount(
-  overrides: Partial<EnterpriseAccountJSON> & Pick<EnterpriseAccountJSON, 'id'>,
-): EnterpriseAccountJSON {
-  return {
-    object: 'enterprise_account',
-    active: true,
-    email_address: 'sso@example.com',
-    enterprise_connection: {
-      object: 'enterprise_connection',
-      id: 'sso_1',
-      active: true,
-      allow_idp_initiated: false,
-      allow_subdomains: false,
-      disable_additional_identifications: true,
-      domain: 'example.com',
-      logo_public_url: null,
-      name: 'Company SSO',
-      protocol: 'saml',
-      provider: 'saml_okta',
-      sync_user_attributes: false,
-      allow_organization_account_linking: false,
-      created_at: createdAt,
-      updated_at: createdAt,
-      enterprise_connection_id: 'sso_1',
-    },
-    first_name: null,
-    last_name: null,
-    protocol: 'saml',
-    provider: 'saml_okta',
-    provider_user_id: null,
-    public_metadata: {},
-    verification: null,
-    last_authenticated_at: null,
-    enterprise_connection_id: 'sso_1',
-    ...overrides,
-  };
-}
-
 export function fapiUser(overrides: Partial<UserJSON> & Pick<UserJSON, 'id'>): UserJSON {
   return {
     object: 'user',

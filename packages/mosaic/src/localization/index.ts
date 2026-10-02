@@ -6,5 +6,3 @@ export type { MosaicMessages } from './registry';
 export { mosaicMessages } from './registry';
 export type { MessageComponents, MessageValues, PluralForms, RichOptions } from './messages';
 export { fill, plural, rich } from './messages';
-export { useErrorText } from './errors';
-export type { LocalizableError } from './errors';
