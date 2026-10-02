@@ -1,4 +1,4 @@
-export { Profile, useProfilePageTitle } from './profile';
+export { Profile } from './profile';
 export type {
   ProfileContentProps,
   ProfileElevation,

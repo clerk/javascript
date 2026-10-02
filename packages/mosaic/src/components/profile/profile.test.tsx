@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../mosaic-provider';
 import { Badge } from '../badge';
 import { Card } from '../card';
 import { Dialog } from '../dialog';
@@ -13,7 +13,7 @@ import { Icon } from '../icon';
 import { Panel } from '../panel';
 import { Section } from '../section';
 import type { ProfileRootProps } from './profile';
-import { Profile, useProfilePageTitle } from './profile';
+import { Profile } from './profile';
 
 function Surface(rootProps: Partial<ProfileRootProps>) {
   return (
@@ -281,33 +281,6 @@ describe('Profile', () => {
       expect(document.querySelector('.cl-profile-content-body')).toContainElement(title);
       expect(title.compareDocumentPosition(screen.getByRole('tabpanel'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     });
-
-    it('is reachable from a page through useProfilePageTitle', () => {
-      const seen: { getTitle: (() => HTMLElement | null) | null } = { getTitle: null };
-      function Probe() {
-        seen.getTitle = useProfilePageTitle();
-        return null;
-      }
-      render(
-        <MosaicProvider>
-          <Probe />
-          <Profile.Root value='account'>
-            <Profile.Title>User profile</Profile.Title>
-            <Profile.Nav>
-              <Profile.NavItem value='account'>Account</Profile.NavItem>
-            </Profile.Nav>
-            <Profile.Content>
-              <Profile.ContentPanel value='account'>
-                <Probe />
-              </Profile.ContentPanel>
-            </Profile.Content>
-          </Profile.Root>
-        </MosaicProvider>,
-      );
-      const title = screen.getByRole('heading', { level: 3, name: 'Account' });
-      expect(seen.getTitle?.()).toBe(title);
-      expect(title).toHaveAttribute('tabindex', '-1');
-    });
   });
 
   // The sentinel reports 1px column, 2px select, 3px sheet.
@@ -524,6 +497,32 @@ describe('Profile', () => {
       act(() => observe?.(3));
       await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('keeps a page title ref on the page title across layouts', () => {
+      const titleRef = React.createRef<HTMLDivElement>();
+      render(
+        <MosaicProvider>
+          <Profile.Root value='account'>
+            <Profile.Title>User profile</Profile.Title>
+            <Profile.Nav>
+              <Profile.NavItem value='account'>Account</Profile.NavItem>
+            </Profile.Nav>
+            <Profile.Content>
+              <Profile.ContentPanel value='account'>
+                <Panel.Title ref={titleRef}>Account</Panel.Title>
+              </Profile.ContentPanel>
+            </Profile.Content>
+          </Profile.Root>
+        </MosaicProvider>,
+      );
+      const title = () => screen.getByRole('heading', { level: 3, name: 'Account' });
+      expect(titleRef.current).toBe(title());
+
+      act(() => observe?.(2));
+      expect(titleRef.current).toBe(title());
+      act(() => observe?.(3));
+      expect(titleRef.current).toBe(title());
     });
 
     it('returns the tablist to the column when the width comes back', () => {

@@ -61,8 +61,8 @@ leading mark and trailing status. A `Badge` passed to `badge` is `neutral` unles
 sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
 
 `Content` renders the page title above the pages: the selected `NavItem`'s label, as a heading that
-scrolls with the page and names it. `useProfilePageTitle()` returns a getter for that heading, for a
-page that needs somewhere to send focus.
+scrolls with the page and names it. A page's `Panel.Title` renders nothing there, and a ref on it
+reaches the page title instead.
 
 ## Parts
 

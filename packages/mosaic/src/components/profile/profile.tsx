@@ -9,8 +9,8 @@ import { useRender } from '../../primitives/utils';
 import { autoUpdate, getDimensions } from '../../primitives/utils/dom';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
-import { reset } from '../../utils/reset.styles';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { reset } from '../../styles/reset.styles';
 import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
@@ -536,9 +536,3 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
  * ```
  */
 export const Profile = { Root, Title, Nav, NavItem, Content, ContentPanel };
-
-/** The shared page title, for a page to send focus to; `null` outside a profile. */
-export function useProfilePageTitle(): (() => HTMLElement | null) | null {
-  const titleRef = React.useContext(ProfileContext)?.pageTitleRef;
-  return React.useMemo(() => (titleRef ? () => titleRef.current : null), [titleRef]);
-}

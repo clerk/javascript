@@ -6,6 +6,7 @@ export interface LocalizableError {
   code?: string;
   paramName?: string;
   message?: string;
+  /** Values for the `{placeholder}`s in whichever message the code resolves to. */
   params?: MessageValues;
 }
 

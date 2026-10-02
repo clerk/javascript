@@ -1,8 +1,8 @@
 import { useCallback, useId, useRef } from 'react';
 
-import { useMessages } from '../../localization';
+import { useErrorText, useMessages } from '../../localization';
 import type { StateMachine } from '../../machine/types';
-import { useMachine } from '../../machine/useMachine';
+import { useMachine } from '../../machine/use-machine';
 import { keysOf, mapKeys } from '../../utils/object';
 import type { FieldsConfig, FormContext, FormEvent } from './form.machine';
 import { createFormMachine, fieldFeedback, firstInvalid, initialOf, isValid } from './form.machine';
@@ -84,6 +84,7 @@ const always = () => true;
 export function useForm<TValues extends object>(options: UseFormOptions<TValues>): UseFormResult<TValues> {
   const id = useId();
   const m = useMessages('form');
+  const errorText = useErrorText();
   const elements = useRef(new Map<keyof TValues, HTMLElement>());
   const refs = useRef(new Map<keyof TValues, ElementRef>());
 
@@ -93,6 +94,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     onSubmit: options.onSubmit,
     canSubmit: options.canSubmit ?? always,
     fallbackMessage: m.error,
+    errorText,
   };
   const machineRef = useRef<StateMachine<FormContext<TValues>, FormEvent<TValues>> | null>(null);
   if (machineRef.current === null) {

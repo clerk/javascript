@@ -4,9 +4,9 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { Heading, HeadingLevelProvider, useHeadingLevel } from '../heading';
-import { ContentPanelContext } from '../profile/profile.context';
+import { ContentPanelContext, ProfileContext } from '../profile/profile.context';
 import { styles } from './panel.styles';
 
 export type PanelRootProps = MosaicComponentProps<'div'>;
@@ -22,17 +22,20 @@ const Root = React.forwardRef<HTMLDivElement, PanelRootProps>(function PanelRoot
   });
 });
 
-// Inside a profile page, the profile renders the page title.
+// Inside a profile page, the profile renders the page title, and the ref reaches that instead.
 const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTitle(
   { children, render, xstyle, ...rest },
   ref,
 ) {
   const inProfilePage = React.useContext(ContentPanelContext);
+  const profile = React.useContext(ProfileContext);
   const level = useHeadingLevel();
+  const pageTitleRef = inProfilePage ? profile?.pageTitleRef : undefined;
+  React.useImperativeHandle(pageTitleRef ? ref : null, () => pageTitleRef?.current as HTMLDivElement);
   return useRender({
     defaultTagName: 'div',
     render,
-    ref,
+    ref: pageTitleRef ? null : ref,
     enabled: !inProfilePage,
     props: {
       ...mergeStyleProps(themeProps('panel-title'), stylex.props(reset.base, styles.title, xstyle), rest),

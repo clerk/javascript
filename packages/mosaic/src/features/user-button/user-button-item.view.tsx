@@ -4,9 +4,9 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
-import { reset } from '../../utils/reset.styles';
-import { truncationStyles } from '../../utils/typography.styles';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { reset } from '../../styles/reset.styles';
+import { truncationStyles } from '../../styles/typography.styles';
 import { styles } from './user-button-item.styles';
 
 export const UserButtonItem = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function UserButtonItem(

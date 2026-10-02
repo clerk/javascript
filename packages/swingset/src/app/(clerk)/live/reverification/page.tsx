@@ -7,7 +7,7 @@ import { Card } from '@clerk/mosaic/components/card';
 import { Dialog } from '@clerk/mosaic/components/dialog';
 import { Flow, type FlowDirection } from '@clerk/mosaic/components/flow';
 import { Reverification, useReverificationFlow } from '@clerk/mosaic/features/reverification';
-import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
 import { isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
 import Link from 'next/link';

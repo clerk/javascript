@@ -2,8 +2,8 @@ import * as stylex from '@stylexjs/stylex';
 import type { ReactElement, ReactNode } from 'react';
 
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
-import { truncationStyles } from '../../utils/typography.styles';
+import { reset } from '../../styles/reset.styles';
+import { truncationStyles } from '../../styles/typography.styles';
 import type { UserButtonHeaderLayout } from './user-button.types';
 import { styles } from './user-button-header.styles';
 
