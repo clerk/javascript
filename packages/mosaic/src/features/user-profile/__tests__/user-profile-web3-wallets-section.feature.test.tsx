@@ -363,4 +363,13 @@ describe('Web3 wallets', () => {
       unregister.forEach(remove => remove());
     }
   });
+
+  // TODO(B24): Extract isSolanaSignInWallet and useInstalledSolanaWallets from PR #9994 into @clerk/shared,
+  // then use them in legacy UI and Mosaic: https://github.com/clerk/javascript/pull/9994.
+  // Require a solana: chain, standard:connect, and solana:signMessage.
+  // Preserve server-safe initial state, registry refresh, registration/unregistration subscriptions,
+  // subscription cleanup, and name/icon projection. Keep @wallet-standard/core dynamically imported in shared.
+  // Cover missing-feature combinations and registry registration/unregistration; retain this marker until it lands.
+  // Agreed follow-up: https://clerkinc.slack.com/archives/C064QJ37LUC/p1790779098886039.
+  it.todo('uses shared Solana sign-in eligibility and installed-wallet subscriptions in legacy UI and Mosaic');
 });
