@@ -22,7 +22,25 @@ describe('withRedirect', () => {
 
     render(<WithHOC />, { wrapper });
 
-    expect(fixtures.router.navigate).toHaveBeenCalledWith('/');
+    expect(fixtures.router.navigate).toHaveBeenCalledWith('/', undefined);
+  });
+
+  it('forwards the navigate options to the redirect', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.withUser({});
+    });
+
+    const WithHOC = withRedirect(
+      () => <></>,
+      () => true,
+      () => '/',
+      undefined,
+      { replace: true },
+    );
+
+    render(<WithHOC />, { wrapper });
+
+    expect(fixtures.router.navigate).toHaveBeenCalledWith('/', { replace: true });
   });
 
   it('does no redirects to the redirect url provided when the condition is not met', async () => {
@@ -39,6 +57,6 @@ describe('withRedirect', () => {
 
     render(<WithHOC />, { wrapper });
 
-    expect(fixtures.router.navigate).not.toHaveBeenCalledWith('/');
+    expect(fixtures.router.navigate).not.toHaveBeenCalled();
   });
 });
