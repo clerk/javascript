@@ -404,7 +404,19 @@ describe('Held passkey creation ownership', () => {
 describe('Replacing instance policy while editing', () => {
   it('rejects a rename after policy replacement disables passkeys', async () => {
     const fapi = serveAccounts();
-    const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
+    const { clerk } = await renderWithClerk(
+      <MosaicProvider
+        localization={{
+          locale: 'fr-FR',
+          messages: {
+            userProfilePasskeys: { accountUnavailableError: 'Ce compte ne permet plus cette action.' },
+            form: { error: 'Erreur générique du formulaire.' },
+          },
+        }}
+      >
+        <UserProfilePasskeysSection />
+      </MosaicProvider>,
+    );
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Alice laptop' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
@@ -419,9 +431,7 @@ describe('Replacing instance policy while editing', () => {
     expect(input).toHaveValue('Blocked rename');
     await user.click(screen.getByRole('button', { name: 'Save' }));
     rename.release();
-    await waitFor(() =>
-      expect(screen.getByRole('alert')).toHaveTextContent(/^Something went wrong\. Please try again\.$/),
-    );
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Ce compte ne permet plus cette action.'));
     expect(input).toHaveValue('Blocked rename');
     expect(rename.requests).toHaveLength(0);
     expect(clerk.user?.passkeys.find(passkey => passkey.id === 'pk_a')?.name).toBe('Alice laptop');
