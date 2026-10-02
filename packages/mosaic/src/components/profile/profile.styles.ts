@@ -231,6 +231,11 @@ export const styles = stylex.create({
     },
   },
 
+  // Flush, as `Select` options are, so the popup's scroll viewport does not crop the ring.
+  navItemOption: {
+    outlineOffset: 0,
+  },
+
   navItemIcon: {
     alignItems: 'center',
     display: 'inline-flex',

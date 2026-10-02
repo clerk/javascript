@@ -299,7 +299,7 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
   }
   const styleProps = mergeStyleProps(
     themeProps('profile-nav-item'),
-    stylex.props(reset.base, styles.navItem, focusOutline.visible, xstyle),
+    stylex.props(reset.base, styles.navItem, focusOutline.visible, mode === 'option' && styles.navItemOption, xstyle),
     rest,
   );
   const content = (
