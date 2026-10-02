@@ -9,7 +9,10 @@ import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../localization';
 import { UserProfilePasskeyRowView } from './user-profile-passkey-row.view';
 import { styles } from './user-profile-passkeys-section.styles';
-import type { UserProfilePasskey } from './user-profile-passkeys-section/user-profile-passkeys-section.types';
+import type {
+  UserProfilePasskey,
+  UserProfilePasskeyNameValidator,
+} from './user-profile-passkeys-section/user-profile-passkeys-section.types';
 
 export type { UserProfilePasskey } from './user-profile-passkeys-section/user-profile-passkeys-section.types';
 
@@ -19,6 +22,7 @@ export interface UserProfilePasskeysSectionViewProps {
   isAdding?: boolean;
   addError?: string;
   onRename?: (id: string, name: string) => void | Promise<void>;
+  validateName?: UserProfilePasskeyNameValidator;
   onRemove?: (id: string) => void | Promise<void>;
 }
 
@@ -28,6 +32,7 @@ export function UserProfilePasskeysSectionView({
   isAdding,
   addError,
   onRename,
+  validateName,
   onRemove,
 }: UserProfilePasskeysSectionViewProps) {
   const m = useMessages('userProfilePasskeys');
@@ -85,6 +90,7 @@ export function UserProfilePasskeysSectionView({
                   passkey={passkey}
                   triggerRef={removalFocus.registerTrigger(passkey.id)}
                   onRename={onRename}
+                  validateName={validateName}
                   onRemove={onRemove ? () => removePasskey.open(passkey) : undefined}
                 />
               ))

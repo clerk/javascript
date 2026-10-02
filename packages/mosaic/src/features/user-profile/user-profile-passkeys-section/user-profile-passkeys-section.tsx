@@ -27,7 +27,7 @@ export function useUserProfilePasskeysSlot({
   return {
     content: (
       <PasskeysEditor
-        key={`${model.userId}:${model.sessionId}`}
+        key={`passkeys:${model.userId}:${model.sessionId}`}
         model={model}
       />
     ),
@@ -41,6 +41,7 @@ function PasskeysEditor({ model }: { model: Extract<UserProfilePasskeysModel, { 
       passkeys={model.passkeys}
       {...controller}
       onRename={model.onRename}
+      validateName={model.validateName}
       onRemove={model.onRemove}
     />
   );

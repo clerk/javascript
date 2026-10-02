@@ -3,9 +3,14 @@ import { isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/erro
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, PasskeyResource, UserResource } from '@clerk/shared/types';
 
+import { FormSubmitError } from '../../../components/form';
 import { getMosaicEnvironment, useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { fill, useErrorText, useLocale, useMessages } from '../../../localization';
-import type { UserProfilePasskey } from './user-profile-passkeys-section.types';
+import type {
+  UserProfilePasskey,
+  UserProfilePasskeyNameValidator,
+  UserProfileRenamePasskeyValues,
+} from './user-profile-passkeys-section.types';
 
 type Passkey = Pick<PasskeyResource, 'id' | 'name' | 'createdAt' | 'lastUsedAt'>;
 
@@ -54,6 +59,7 @@ export type UserProfilePasskeysModel =
       passkeys: UserProfilePasskey[];
       onAdd?: () => Promise<void>;
       onRename: (id: string, name: string) => Promise<void>;
+      validateName: UserProfilePasskeyNameValidator;
       onRemove: (id: string) => Promise<void>;
     };
 
@@ -82,6 +88,8 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
   const locale = useLocale();
   const messages = useMessages('userProfilePasskeys');
   const errorText = useErrorText();
+  const validateName: UserProfilePasskeyNameValidator = name =>
+    new TextEncoder().encode(name).length > 256 ? { type: 'error', message: messages.nameTooLongError } : undefined;
 
   if (!isUserLoaded || !isSessionLoaded || !environment) {
     return { status: 'loading' };
@@ -149,6 +157,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
     status: 'ready',
     userId,
     sessionId,
+    validateName,
     passkeys: projection.passkeys.map(passkey => ({
       id: passkey.id,
       name: passkey.name,
@@ -175,10 +184,31 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
       if (!passkey) {
         throw new Error(messages.unavailableError);
       }
+      const feedback = validateName(name);
+      if (feedback) {
+        throw new FormSubmitError<UserProfileRenamePasskeyValues>({ fields: { name: feedback.message } });
+      }
       try {
         await passkey.update({ name });
       } catch (error) {
-        throw actionError(error);
+        if (!isClerkAPIResponseError(error)) {
+          throw new FormSubmitError({ message: actionError(error).message });
+        }
+        const fields: { name?: string } = {};
+        let message: string | undefined;
+        for (const item of error.errors) {
+          const text = errorText({
+            code: item.code,
+            paramName: item.meta?.paramName,
+            message: item.longMessage || item.message || messages.saveError,
+          });
+          if (item.meta?.paramName === 'name') {
+            fields.name ??= text;
+          } else {
+            message ??= text;
+          }
+        }
+        throw new FormSubmitError<UserProfileRenamePasskeyValues>({ message, fields });
       }
     },
     onRemove: async id => {

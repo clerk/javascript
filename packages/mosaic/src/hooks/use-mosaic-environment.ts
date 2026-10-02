@@ -1,5 +1,6 @@
 import { useClerk } from '@clerk/shared/react';
 import type { EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
+import { useEffect, useReducer } from 'react';
 
 /**
  * The single seam through which Mosaic reads the active Clerk environment.
@@ -9,17 +10,18 @@ import type { EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
  * the environment is `clerk.__internal_environment`. Quarantining that one private
  * access here keeps the `@ts-expect-error` out of every caller.
  *
- * This is a one-shot read off the Clerk singleton, NOT a reactive subscription: unlike
- * clerk-js's `EnvironmentProvider`, `useClerk()` does not re-render when the environment
- * mutates. So only read fields that are set once at hydration and never change at runtime
- * (e.g. static `displayConfig` URLs). Anything that can mutate post-hydration
- * (`authConfig.claimedAt`, live config toggles) will render stale through this hook and
- * needs a real reactive subscription instead (see `use-revalidate-environment.ts`).
- *
  * Returns `undefined` until the environment hydrates; callers should handle that.
  */
 export function useMosaicEnvironment(): EnvironmentResource | undefined {
   const clerk = useClerk();
+  const [, notify] = useReducer((revision: number) => revision + 1, 0);
+
+  useEffect(() => {
+    const unsubscribe = clerk.addListener(notify, { skipInitialEmit: true });
+    notify();
+    return unsubscribe;
+  }, [clerk]);
+
   return getMosaicEnvironment(clerk);
 }
 

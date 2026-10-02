@@ -220,7 +220,7 @@ describe('Adding a passkey', () => {
     await user.click(add);
     expect(creation.requests).toHaveLength(1);
     creation.release();
-    expect(await screen.findByText('New passkey')).toBeVisible();
+    expect(await screen.findByText('Chrome on macOS')).toBeVisible();
     expect(fapi.client.sessions[0]?.user.passkeys).toHaveLength(1);
     expect(authenticator).toHaveBeenCalledOnce();
     expect(add).toBeEnabled();
@@ -242,7 +242,7 @@ describe('Adding a passkey', () => {
       expect(creation.requests).toHaveLength(1);
       const retried = serveFapi(fapi);
       await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-      expect(await screen.findByText('New passkey')).toBeVisible();
+      expect(await screen.findByText('Chrome on macOS')).toBeVisible();
       expect(retried.client.sessions[0]?.user.passkeys).toHaveLength(1);
       expect(screen.queryByRole('alert')).toBeNull();
     },
@@ -285,7 +285,7 @@ describe('Adding a passkey', () => {
     expect(await screen.findByRole('alert')).toBeVisible();
     expect(screen.getByText('No passkeys added')).toBeVisible();
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
-    expect(await screen.findByText('New passkey')).toBeVisible();
+    expect(await screen.findByText('Chrome on macOS')).toBeVisible();
   });
 });
 
@@ -342,7 +342,9 @@ describe('Renaming a passkey', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     await user.type(screen.getByRole('textbox', { name: 'Passkey name' }), ' modifié');
     await user.click(screen.getByRole('button', { name: 'Save' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Ce nom est invalide.');
+    await waitFor(() => expect(screen.getByText('Ce nom est invalide.')).toBeVisible());
+    expect(screen.getByRole('textbox', { name: 'Passkey name' })).toHaveAttribute('aria-invalid', 'true');
+    expect(screen.getByRole('textbox', { name: 'Passkey name' })).toHaveAccessibleDescription('Ce nom est invalide.');
     expect(screen.getByRole('textbox', { name: 'Passkey name' })).toHaveValue('Laptop modifié');
   });
 

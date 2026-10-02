@@ -8,6 +8,26 @@ const passkeys = [
 ];
 
 describe('projectPasskeys', () => {
+  it.each([
+    { enabled: false, allowIdentificationCreation: true, isSatellite: false },
+    { enabled: true, allowIdentificationCreation: false, isSatellite: false },
+    { enabled: false, allowIdentificationCreation: false, isSatellite: true },
+    { enabled: false, allowIdentificationCreation: true, isSatellite: true },
+    { enabled: true, allowIdentificationCreation: false, isSatellite: true },
+  ])('hides unavailable passkeys for %j', policy => {
+    expect(projectPasskeys({ passkeys, ...policy })).toEqual({ status: 'hidden' });
+  });
+
+  it('keeps an empty eligible main-app section actionable', () => {
+    expect(
+      projectPasskeys({ passkeys: [], enabled: true, allowIdentificationCreation: true, isSatellite: false }),
+    ).toEqual({
+      status: 'ready',
+      passkeys: [],
+      canAdd: true,
+    });
+  });
+
   it('preserves order, names, and timestamps, and hides only Add on a satellite', () => {
     expect(projectPasskeys({ passkeys, enabled: true, allowIdentificationCreation: true, isSatellite: true })).toEqual({
       status: 'ready',

@@ -108,31 +108,17 @@ describe('UserProfileSecurityPanelView', () => {
   });
 
   it('forwards security actions', async () => {
-    const onAddPasskey = vi.fn();
-    const onRenamePasskey = vi.fn(() => Promise.resolve());
-    const onRemovePasskey = vi.fn();
     const onSignOutDevice = vi.fn();
     const onSignOutAllOtherDevices = vi.fn();
     const onDeleteAccount = vi.fn(() => Promise.resolve());
     const user = userEvent.setup();
 
     renderView({
-      passkeysSlot: {
-        content: (
-          <UserProfilePasskeysSectionView
-            passkeys={passkeys}
-            onAdd={onAddPasskey}
-            onRename={onRenamePasskey}
-            onRemove={onRemovePasskey}
-          />
-        ),
-      },
       onSignOutDevice,
       onSignOutAllOtherDevices,
       deleteAccountSlot: <DeleteAccount onDelete={onDeleteAccount} />,
     });
 
-    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
     const signOutAll = screen.getByRole('button', { name: 'Sign out of all devices' });
     expect(signOutAll).toHaveAttribute('data-variant', 'outline');
     expect(screen.getByRole('group', { name: 'Active devices' }).querySelector('.cl-section-header')).toContainElement(
@@ -140,18 +126,6 @@ describe('UserProfileSecurityPanelView', () => {
     );
     await user.click(signOutAll);
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
-
-    await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
-    const passkeyName = screen.getByRole('textbox', { name: 'Passkey name' });
-    await user.clear(passkeyName);
-    await user.type(passkeyName, 'Work laptop');
-    await user.click(screen.getByRole('button', { name: 'Save' }));
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove', exact: true }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
     const activeDevices = screen.getByRole('group', { name: 'Active devices' });
@@ -166,9 +140,6 @@ describe('UserProfileSecurityPanelView', () => {
     await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
     await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
 
-    expect(onAddPasskey).toHaveBeenCalledOnce();
-    expect(onRenamePasskey).toHaveBeenCalledWith('passkey_1', 'Work laptop');
-    expect(onRemovePasskey).toHaveBeenCalledWith('passkey_1');
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
     expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
     expect(onDeleteAccount).toHaveBeenCalledOnce();

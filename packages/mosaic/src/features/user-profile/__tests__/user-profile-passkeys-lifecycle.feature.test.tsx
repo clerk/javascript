@@ -138,7 +138,7 @@ describe('Changing the active passkey account', () => {
     await waitFor(() =>
       expect(
         fapi.client.sessions.find(session => session.id === 'sess_a')?.user.passkeys.map(passkey => passkey.name),
-      ).toContain('New passkey'),
+      ).toContain('Chrome on macOS'),
     );
     expect(
       fapi.client.sessions.find(session => session.id === 'sess_b')?.user.passkeys.map(passkey => passkey.name),
@@ -204,7 +204,9 @@ describe('Submitting passkey actions', () => {
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const user = clerk.user;
     expect(user).toBeDefined();
-    if (!user) {throw new Error('Missing user');}
+    if (!user) {
+      throw new Error('Missing user');
+    }
     await expect(user.createPasskey()).rejects.toBeDefined();
   });
 
@@ -242,7 +244,9 @@ describe('Passkey backend contract', () => {
     authenticator();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const current = clerk.user;
-    if (!current) {throw new Error('Missing user');}
+    if (!current) {
+      throw new Error('Missing user');
+    }
     await expect(current.createPasskey()).rejects.toMatchObject({ errors: [{ code: 'passkey_quota_exceeded' }] });
     expect(fapi.client.sessions.find(session => session.id === 'sess_a')?.user.passkeys).toHaveLength(10);
   });
@@ -259,7 +263,9 @@ describe('Passkey backend contract', () => {
     authenticator();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const current = clerk.user;
-    if (!current) {throw new Error('Missing user');}
+    if (!current) {
+      throw new Error('Missing user');
+    }
     await expect(current.createPasskey()).rejects.toMatchObject({
       errors: [{ code: 'enterprise_sso_additional_identifications_disabled' }],
     });
@@ -280,7 +286,9 @@ describe('Passkey backend contract', () => {
     authenticator();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const current = clerk.user;
-    if (!current) {throw new Error('Missing user');}
+    if (!current) {
+      throw new Error('Missing user');
+    }
     const passkey = await current.createPasskey();
     expect(passkey.verification).toMatchObject({ strategy: 'passkey', status: 'verified' });
     expect(passkey.lastUsedAt).toBeInstanceOf(Date);
@@ -291,7 +299,9 @@ describe('Passkey backend contract', () => {
     serveAccounts();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const passkey = clerk.user?.passkeys.find(candidate => candidate.id === 'pk_a');
-    if (!passkey) {throw new Error('Missing passkey');}
+    if (!passkey) {
+      throw new Error('Missing passkey');
+    }
     const name = '🔑'.repeat(count);
     if (count === 64) {
       const renamed = await passkey.update({ name });
@@ -309,7 +319,9 @@ describe('Passkey identity and policy at action time', () => {
   it('clears Add state when the same user changes sessions', async () => {
     const fapi = serveAccounts();
     const alice = fapi.client.sessions.find(session => session.id === 'sess_a')?.user;
-    if (!alice) {throw new Error('Missing user');}
+    if (!alice) {
+      throw new Error('Missing user');
+    }
     fapi.client = fapiClient([...fapi.client.sessions, fapiSession({ id: 'sess_a2', user: alice })]);
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const creation = holdRequests('post', '/v1/me/passkeys');
@@ -346,7 +358,9 @@ describe('Passkey identity and policy at action time', () => {
     await user.clear(input);
     await user.type(input, 'Blocked rename');
     const environment = clerk.__internal_environment;
-    if (!environment) {throw new Error('Missing environment');}
+    if (!environment) {
+      throw new Error('Missing environment');
+    }
     environment.userSettings.attributes.passkey.enabled = false;
     const rename = holdRequests('post', '/v1/me/passkeys/pk_a');
     await user.click(screen.getByRole('button', { name: 'Save' }));
@@ -357,29 +371,38 @@ describe('Passkey identity and policy at action time', () => {
   });
 });
 
-
 describe('Held passkey creation ownership', () => {
-  it('retains the requesting user when creation completes after an account switch', async () => {
+  it('rejects verification issued by a different account after a held creation', async () => {
     const fapi = serveAccounts();
     authenticator();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const creation = holdRequests('post', '/v1/me/passkeys');
-    const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Add passkey' }));
+    const verification = holdRequests('post', '/v1/me/passkeys/passkey_1/attempt_verification');
+    const alice = clerk.user;
+    if (!alice) {
+      throw new Error('Missing user');
+    }
+    const registration = alice.createPasskey();
+    const rejected = expect(registration).rejects.toMatchObject({ errors: [{ code: 'resource_forbidden' }] });
     await waitFor(() => expect(creation.requests).toHaveLength(1));
-    const request = creation.requests[0];
-    if (!request) {throw new Error('Missing creation request');}
-    expect(new URL(request.url).searchParams.get('_clerk_session_id')).toBe('sess_a');
+    expect(new URL(creation.requests[0]?.url ?? '').searchParams.get('_clerk_session_id')).toBe('sess_a');
     await act(() => clerk.setActive({ session: 'sess_b' }));
     creation.release();
-    await waitFor(() => expect(fapi.client.sessions.find(session => session.id === 'sess_a')?.user.passkeys.map(passkey => passkey.name)).toContain('New passkey'));
-    expect(fapi.client.sessions.find(session => session.id === 'sess_b')?.user.passkeys.map(passkey => passkey.name)).toEqual(['Bob phone']);
+    await waitFor(() => expect(verification.requests).toHaveLength(1));
+    expect(new URL(verification.requests[0]?.url ?? '').searchParams.get('_clerk_session_id')).toBe('sess_b');
+    verification.release();
+    await rejected;
+    expect(
+      fapi.client.sessions.find(session => session.id === 'sess_a')?.user.passkeys.map(passkey => passkey.name),
+    ).toEqual(['Alice laptop']);
+    expect(
+      fapi.client.sessions.find(session => session.id === 'sess_b')?.user.passkeys.map(passkey => passkey.name),
+    ).toEqual(['Bob phone']);
   });
 });
 
-
 describe('Replacing instance policy while editing', () => {
-  it('rechecks the current environment when Save follows a policy replacement', async () => {
+  it('closes editing without a mutation when policy replacement disables passkeys', async () => {
     const fapi = serveAccounts();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
@@ -391,12 +414,12 @@ describe('Replacing instance policy while editing', () => {
     const nextEnvironment = fapiEnvironment();
     nextEnvironment.user_settings.attributes.passkey.enabled = false;
     fapi.environment = nextEnvironment;
-    await clerk.__internal_setEnvironment(nextEnvironment);
     const rename = holdRequests('post', '/v1/me/passkeys/pk_a');
-    await user.click(screen.getByRole('button', { name: 'Save' }));
-    rename.release();
-    expect(await screen.findByRole('alert')).toBeVisible();
+    await act(() => clerk.__internal_setEnvironment(nextEnvironment));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(screen.queryByRole('group', { name: 'Passkeys' })).toBeNull();
     expect(rename.requests).toHaveLength(0);
+    rename.release();
     expect(clerk.user?.passkeys.find(passkey => passkey.id === 'pk_a')?.name).toBe('Alice laptop');
   });
 });
