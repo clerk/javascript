@@ -4,10 +4,9 @@ import { projectWeb3Wallets } from './user-profile-web3-wallets-section.model';
 
 const metamask = {
   id: 'wallet_metamask',
-  address: '0x1234567890abcdef',
-  strategy: 'web3_metamask_signature',
-  status: 'verified',
-};
+  web3Wallet: '0x1234567890abcdef',
+  verification: { strategy: 'web3_metamask_signature', status: 'verified', expireAt: null },
+} as const;
 
 describe('Web3 wallet projection', () => {
   it('WEB3-01 shows configured providers that do not have a verified wallet', () => {
@@ -26,7 +25,7 @@ describe('Web3 wallet projection', () => {
 
   it('WEB3-02 keeps unverified wallets and their provider available', () => {
     const result = projectWeb3Wallets({
-      wallets: [{ ...metamask, status: 'unverified' }],
+      wallets: [{ ...metamask, verification: { ...metamask.verification, status: 'unverified' } }],
       primaryId: null,
       enabledStrategies: ['web3_metamask_signature'],
       allowCreation: true,
@@ -40,8 +39,12 @@ describe('Web3 wallet projection', () => {
   it('WEB3-03 shows admin wallets without a provider and filters unknown strategies', () => {
     const result = projectWeb3Wallets({
       wallets: [
-        { id: 'admin', address: '0xadmin', strategy: 'admin', status: 'verified' },
-        { id: 'unknown', address: '0xunknown', strategy: 'unknown', status: 'verified' },
+        { id: 'admin', web3Wallet: '0xadmin', verification: { strategy: 'admin', status: 'verified', expireAt: null } },
+        {
+          id: 'unknown',
+          web3Wallet: '0xunknown',
+          verification: { strategy: 'unknown', status: 'verified', expireAt: null },
+        },
       ],
       primaryId: null,
       enabledStrategies: [],
@@ -56,7 +59,11 @@ describe('Web3 wallet projection', () => {
   it('WEB3-04 orders primary, verified, then unverified wallets', () => {
     const result = projectWeb3Wallets({
       wallets: [
-        { ...metamask, id: 'unverified', status: 'unverified', expireAt: new Date('2026-01-02') },
+        {
+          ...metamask,
+          id: 'unverified',
+          verification: { ...metamask.verification, status: 'unverified', expireAt: new Date('2026-01-02') },
+        },
         { ...metamask, id: 'verified_z' },
         { ...metamask, id: 'verified_a' },
         { ...metamask, id: 'primary' },
@@ -75,9 +82,17 @@ describe('Web3 wallet projection', () => {
   it('WEB3-04 keeps wallets without a verification status after expiring unverified wallets', () => {
     const result = projectWeb3Wallets({
       wallets: [
-        { ...metamask, id: 'missing', status: null },
-        { ...metamask, id: 'unverified_without_expiry', status: 'unverified' },
-        { ...metamask, id: 'unverified_with_expiry', status: 'unverified', expireAt: new Date('2026-01-02') },
+        { ...metamask, id: 'missing', verification: { ...metamask.verification, status: null } },
+        {
+          ...metamask,
+          id: 'unverified_without_expiry',
+          verification: { ...metamask.verification, status: 'unverified' },
+        },
+        {
+          ...metamask,
+          id: 'unverified_with_expiry',
+          verification: { ...metamask.verification, status: 'unverified', expireAt: new Date('2026-01-02') },
+        },
       ],
       primaryId: null,
       enabledStrategies: [],

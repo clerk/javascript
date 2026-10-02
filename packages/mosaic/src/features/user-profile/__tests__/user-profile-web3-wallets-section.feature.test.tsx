@@ -1,5 +1,5 @@
 import type { UserJSON } from '@clerk/shared/types';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { WindowAppReadyEventAPI } from '@wallet-standard/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -149,6 +149,91 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Connexion impossible.'));
   });
 
+  it('uses the canonical API-code translation for a wallet connection failure', async () => {
+    vi.stubGlobal('ethereum', { request: vi.fn(() => Promise.resolve(['0x1234567890abcdef'])) });
+    serveFapi({
+      environment: web3Environment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+    });
+    await renderWithClerk(
+      <MosaicProvider
+        localization={{ overrides: { 'errors.verification_invalid_strategy': 'Ce portefeuille est indisponible.' } }}
+      >
+        <UserProfileWeb3WalletsSection />
+      </MosaicProvider>,
+    );
+    const creation = holdRequests('post', '/v1/me/web3_wallets');
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Connect MetaMask' }));
+    await waitFor(() => expect(creation.requests).toHaveLength(1));
+    creation.fail('verification_invalid_strategy', 'Server copy');
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Ce portefeuille est indisponible.');
+    expect(screen.queryByText('Server copy')).toBeNull();
+  });
+
+  it.each(['switch', 'sign out'] as const)(
+    'aborts wallet creation after %s during the provider prompt',
+    async change => {
+      const accountRequest = Promise.withResolvers<string[]>();
+      const request = vi.fn(() => accountRequest.promise);
+      vi.stubGlobal('ethereum', { request });
+      serveFapi({
+        environment: web3Environment(),
+        client: fapiClient([
+          fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) }),
+          fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2' }) }),
+        ]),
+      });
+      const { clerk } = await renderWithClerk(<UserProfileWeb3WalletsSection />);
+      const original = clerk.user;
+      if (!original) {
+        throw new Error('Expected signed-in user');
+      }
+      const create = vi.spyOn(original, 'createWeb3Wallet');
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Connect MetaMask' }));
+      await waitFor(() => expect(request).toHaveBeenCalledOnce());
+      await act(() => (change === 'switch' ? clerk.setActive({ session: 'sess_2' }) : clerk.signOut()));
+      expect(clerk.user?.id).toBe(change === 'switch' ? 'user_2' : undefined);
+      if (change === 'switch') {
+        expect.soft(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
+      }
+
+      await act(async () => {
+        accountRequest.resolve(['0x1234567890abcdef']);
+        await accountRequest.promise;
+      });
+
+      expect(create).not.toHaveBeenCalled();
+      if (change === 'switch') {
+        expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
+        expect(screen.queryByRole('alert')).toBeNull();
+      }
+    },
+  );
+
+  it('clears the previous user’s provider error and open wallet picker on session change', async () => {
+    vi.stubGlobal('ethereum', { request: vi.fn(() => Promise.reject(new Error('First user wallet failure'))) });
+    serveFapi({
+      environment: web3Environment(),
+      client: fapiClient([
+        fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) }),
+        fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2' }) }),
+      ]),
+    });
+    const { clerk } = await renderWithClerk(<UserProfileWeb3WalletsSection />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeVisible());
+
+    await act(() => clerk.setActive({ session: 'sess_2' }));
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toBeEnabled();
+  });
+
   it('holds one provider pending and allows a manual retry after an API error', async () => {
     vi.stubGlobal('ethereum', {
       request: vi.fn(({ method }: { method: string }) =>
@@ -210,6 +295,7 @@ describe('Web3 wallets', () => {
     await user.click(await screen.findByRole('button', { name: 'Manage MetaMask' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await waitFor(() => expect(hold.requests).toHaveLength(1));
+    expect(screen.getByRole('button', { name: 'Manage MetaMask' })).toBeDisabled();
     hold.fail('primary_update_failed');
 
     expect(await screen.findByRole('alert')).toHaveTextContent('primary_update_failed');
@@ -285,6 +371,64 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Manage MetaMask' })).toHaveFocus());
   });
 
+  it('shows only eligible Solana wallets and refreshes when wallets register or unregister', async () => {
+    const wallet = {
+      version: '1.0.0' as const,
+      name: 'Eligible Solana',
+      icon: 'data:image/svg+xml;base64,' as const,
+      chains: ['solana:mainnet' as const],
+      accounts: [],
+      features: {
+        'standard:connect': { version: '1.0.0' as const, connect: () => Promise.resolve({ accounts: [] }) },
+        'solana:signMessage': { version: '1.0.0' as const, signMessage: () => Promise.resolve([]) },
+      },
+    };
+    const registries: WindowAppReadyEventAPI[] = [];
+    const unregister: Array<() => void> = [];
+    const register = (api: WindowAppReadyEventAPI) => {
+      registries.push(api);
+      unregister.push(
+        api.register(
+          {
+            ...wallet,
+            name: 'Cannot connect',
+            features: { 'solana:signMessage': wallet.features['solana:signMessage'] },
+          },
+          { ...wallet, name: 'Cannot sign', features: { 'standard:connect': wallet.features['standard:connect'] } },
+          { ...wallet, name: 'Wrong chain', chains: ['ethereum:mainnet'] },
+        ),
+      );
+    };
+    const onAppReady = (event: Event & { detail?: WindowAppReadyEventAPI }) => {
+      if (event.detail) {
+        register(event.detail);
+      }
+    };
+    window.addEventListener('wallet-standard:app-ready', onAppReady);
+    window.dispatchEvent(new CustomEvent('wallet-standard:register-wallet', { detail: register }));
+    let unregisterEligible: Array<() => void> = [];
+    try {
+      await renderWeb3();
+      await userEvent.setup().click(screen.getByRole('button', { name: 'Connect Solana' }));
+      expect(screen.queryByRole('button', { name: 'Cannot connect' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Cannot sign' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Wrong chain' })).toBeNull();
+      expect(screen.getByText('No Solana wallets are available.')).toBeInTheDocument();
+
+      act(() => {
+        unregisterEligible = registries.map(api => api.register(wallet));
+      });
+      expect(await screen.findByRole('button', { name: 'Eligible Solana' })).toBeEnabled();
+      act(() => unregisterEligible.forEach(remove => remove()));
+      await waitFor(() => expect(screen.queryByRole('button', { name: 'Eligible Solana' })).toBeNull());
+      expect(screen.getByText('No Solana wallets are available.')).toBeInTheDocument();
+    } finally {
+      window.removeEventListener('wallet-standard:app-ready', onAppReady);
+      unregister.forEach(remove => remove());
+      unregisterEligible.forEach(remove => remove());
+    }
+  });
+
   it('connects the chosen Solana wallet and verifies it through Clerk', async () => {
     const account = {
       address: 'SolanaAddress123',
@@ -341,11 +485,13 @@ describe('Web3 wallets', () => {
       await user.click(screen.getByRole('button', { name: 'Second Solana' }));
       await waitFor(() => expect(creation.requests).toHaveLength(1));
       expect(screen.getByRole('button', { name: 'Second Solana' })).toHaveAttribute('aria-busy', 'true');
+      expect(screen.getByRole('button', { name: 'Second Solana' })).toHaveFocus();
       expect(screen.getByRole('button', { name: 'Test Solana' })).toBeDisabled();
       await user.keyboard('{Escape}');
       expect(screen.getByRole('dialog')).toBeVisible();
       creation.fail('wallet_creation_failed');
       expect(await within(screen.getByRole('dialog')).findByRole('alert')).toHaveTextContent('wallet_creation_failed');
+      expect(screen.getAllByRole('alert', { hidden: true })).toHaveLength(1);
       const retryFapi = serveFapi(fapi);
       await user.click(screen.getByRole('button', { name: 'Second Solana' }));
       await waitFor(() =>
@@ -363,13 +509,6 @@ describe('Web3 wallets', () => {
       unregister.forEach(remove => remove());
     }
   });
-
-  // TODO(B24): Extract isSolanaSignInWallet and useInstalledSolanaWallets from PR #9994 into @clerk/shared,
-  // then use them in legacy UI and Mosaic: https://github.com/clerk/javascript/pull/9994.
-  // Require a solana: chain, standard:connect, and solana:signMessage.
-  // Preserve server-safe initial state, registry refresh, registration/unregistration subscriptions,
-  // subscription cleanup, and name/icon projection. Keep @wallet-standard/core dynamically imported in shared.
-  // Cover missing-feature combinations and registry registration/unregistration; retain this marker until it lands.
-  // Agreed follow-up: https://clerkinc.slack.com/archives/C064QJ37LUC/p1790779098886039.
-  it.todo('uses shared Solana sign-in eligibility and installed-wallet subscriptions in legacy UI and Mosaic');
+  // TODO: Add session reverification for wallet connection, primary updates, and removal;
+  // surface API errors until then.
 });

@@ -1,5 +1,6 @@
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/shared/types';
+import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils';
 import { Fragment } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -7,7 +8,6 @@ import { ProfileSection } from '@/ui/elements/Section';
 import { ThreeDotsMenu } from '@/ui/elements/ThreeDotsMenu';
 import { handleError } from '@/ui/utils/errorHandler';
 
-import { sortIdentificationBasedOnVerification } from '../../components/UserProfile/utils';
 import { Badge, Flex, localizationKeys, Text } from '../../customizables';
 import { Action } from '../../elements/Action';
 import { useActionContext } from '../../elements/Action/ActionRoot';

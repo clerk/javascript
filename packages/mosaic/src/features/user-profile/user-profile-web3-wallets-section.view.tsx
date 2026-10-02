@@ -1,3 +1,4 @@
+import type { Web3Strategy } from '@clerk/shared/types';
 import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
@@ -8,7 +9,8 @@ import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visib
 import { UserProfileWeb3WalletRowView } from './user-profile-web3-wallet-row.view';
 
 export interface UserProfileWeb3Provider {
-  id: string;
+  id: Web3Strategy;
+  walletPicker?: 'solana';
   provider: string;
   iconUrl?: string;
   connectError?: string;

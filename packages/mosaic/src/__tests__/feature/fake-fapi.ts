@@ -254,16 +254,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const wallet = fapiWeb3Wallet({
         id: `wallet_${user.web3_wallets.length + 1}`,
         web3_wallet: address,
-        verification: {
-          id: 'verification_1',
-          object: 'verification',
-          status: 'unverified',
-          verified_at_client: '',
-          strategy: '',
-          attempts: 0,
-          expire_at: 0,
-          error: { code: '', message: '' },
-        },
+        verification: fapiVerification('', { expire_at: 0 }),
       });
       updateUser(state, { ...user, web3_wallets: [...user.web3_wallets, wallet] });
       return envelope(wallet, state.client);
@@ -276,17 +267,10 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const body = new URLSearchParams(await request.text());
       const prepared = fapiWeb3Wallet({
         ...wallet,
-        verification: {
-          id: 'verification_1',
-          object: 'verification',
-          status: 'unverified',
-          verified_at_client: '',
-          strategy: body.get('strategy') ?? '',
+        verification: fapiVerification(body.get('strategy') ?? '', {
           message: 'Sign this wallet challenge',
-          attempts: 0,
           expire_at: 0,
-          error: { code: '', message: '' },
-        },
+        }),
       });
       updateWeb3Wallet(state, prepared);
       return envelope(prepared, state.client);
@@ -298,17 +282,12 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       const verified = fapiWeb3Wallet({
         ...wallet,
-        verification: {
-          id: 'verification_1',
-          object: 'verification',
+        verification: fapiVerification(wallet.verification?.strategy ?? '', {
           ...wallet.verification,
           status: 'verified',
           verified_at_client: '',
-          strategy: wallet.verification?.strategy ?? '',
           attempts: 1,
-          expire_at: 0,
-          error: { code: '', message: '' },
-        },
+        }),
       });
       updateWeb3Wallet(state, verified);
       return envelope(verified, state.client);
@@ -334,7 +313,20 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         return missing();
       }
       const body = new URLSearchParams(await request.text());
-      const updated = { ...user, primary_web3_wallet_id: body.get('primary_web3_wallet_id') };
+      const updated = { ...user };
+      const fields = [
+        'first_name',
+        'last_name',
+        'username',
+        'primary_email_address_id',
+        'primary_phone_number_id',
+        'primary_web3_wallet_id',
+      ] as const;
+      for (const field of fields) {
+        if (body.has(field)) {
+          updated[field] = body.get(field);
+        }
+      }
       updateUser(state, updated);
       return envelope(updated, state.client);
     }),

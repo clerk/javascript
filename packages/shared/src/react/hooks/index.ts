@@ -16,6 +16,8 @@ export { useSafeLayoutEffect } from './useSafeLayoutEffect';
 export { useSession } from './useSession';
 export { useSessionList } from './useSessionList';
 export { useUser } from './useUser';
+export { useInstalledSolanaWallets } from './useInstalledSolanaWallets';
+export type { InstalledSolanaWallet } from './useInstalledSolanaWallets';
 export { useClerk } from './useClerk';
 export { useDeepEqualMemo, isDeeplyEqual } from './useDeepEqualMemo';
 export { useReverification } from './useReverification';
