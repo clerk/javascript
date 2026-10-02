@@ -83,14 +83,18 @@ describe('useUserProfileEnterpriseAccountsModel', () => {
 
     user = change === 'signed out' ? null : createUser('user_2');
 
-    await expect(model.connect('okta')).rejects.toMatchObject({ code: 'unavailable' });
+    await expect(model.connect('okta')).rejects.toMatchObject({
+      message: 'This enterprise connection is no longer available.',
+    });
     expect(original?.createExternalAccount).not.toHaveBeenCalled();
   });
 
   it('rejects a connection that is not offered', async () => {
     const model = ready(renderHook(() => useUserProfileEnterpriseAccountsModel()).result.current);
 
-    await expect(model.connect('saml')).rejects.toMatchObject({ code: 'unavailable' });
+    await expect(model.connect('saml')).rejects.toMatchObject({
+      message: 'This enterprise connection is no longer available.',
+    });
     expect(user?.createExternalAccount).not.toHaveBeenCalled();
   });
 
@@ -98,7 +102,9 @@ describe('useUserProfileEnterpriseAccountsModel', () => {
     user?.createExternalAccount.mockResolvedValue({ verification: null });
     const model = ready(renderHook(() => useUserProfileEnterpriseAccountsModel()).result.current);
 
-    await expect(model.connect('okta')).rejects.toMatchObject({ code: 'missing_verification_url' });
+    await expect(model.connect('okta')).rejects.toMatchObject({
+      message: 'The connection could not start. Please try again.',
+    });
     expect(clerk.__internal_windowNavigate).not.toHaveBeenCalled();
   });
 });

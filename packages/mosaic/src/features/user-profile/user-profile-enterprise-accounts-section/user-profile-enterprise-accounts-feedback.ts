@@ -1,19 +1,19 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 
-import type { MosaicMessages } from '../../../localization';
-import { EnterpriseAccountActionError } from './user-profile-enterprise-accounts-section.types';
+import type { LocalizableError } from '../../../localization';
 
-type Messages = MosaicMessages['userProfileEnterpriseAccountsSection'];
-
-export function enterpriseAccountErrorMessage(error: unknown, messages: Messages): string {
-  if (error instanceof EnterpriseAccountActionError) {
-    return error.code === 'missing_verification_url'
-      ? messages.errors.missingVerificationUrl
-      : messages.errors.unavailable;
-  }
+export function enterpriseAccountErrorMessage(
+  error: unknown,
+  errorText: (error: LocalizableError) => string,
+  fallback: string,
+): string {
   if (isClerkAPIResponseError(error)) {
     const first = error.errors[0];
-    return first?.longMessage || first?.message || messages.errors.generic;
+    return errorText({
+      code: first?.code,
+      paramName: first?.meta?.paramName,
+      message: first?.longMessage || first?.message || fallback,
+    });
   }
-  return messages.errors.generic;
+  return fallback;
 }

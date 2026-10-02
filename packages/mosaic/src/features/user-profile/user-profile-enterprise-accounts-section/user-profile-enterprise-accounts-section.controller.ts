@@ -10,7 +10,7 @@ export interface UserProfileEnterpriseAccountsControllerOptions {
   accounts: UserProfileEnterpriseAccount[];
   connections: UserProfileEnterpriseConnection[];
   onConnect: (connectionId: string) => Promise<EnterpriseAccountActionResult>;
-  formatError: (error: unknown) => string;
+  errorMessage: string;
 }
 
 export interface UserProfileEnterpriseAccountsController {
@@ -24,7 +24,7 @@ export function useUserProfileEnterpriseAccountsController({
   accounts,
   connections,
   onConnect,
-  formatError,
+  errorMessage,
 }: UserProfileEnterpriseAccountsControllerOptions): UserProfileEnterpriseAccountsController {
   const [pendingId, setPendingId] = useState<string>();
   const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
@@ -43,7 +43,7 @@ export function useUserProfileEnterpriseAccountsController({
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
     } catch (error) {
-      setConnectErrors(current => ({ ...current, [id]: formatError(error) }));
+      setConnectErrors(current => ({ ...current, [id]: error instanceof Error ? error.message : errorMessage }));
     } finally {
       connecting.current = false;
       setPendingId(undefined);

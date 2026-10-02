@@ -4,12 +4,13 @@ import { __internal_useUserEnterpriseConnections, useClerk, useUser } from '@cle
 import type { EnterpriseAccountResource, EnterpriseConnectionResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
+import { useErrorText, useMessages } from '../../../localization';
+import { enterpriseAccountErrorMessage } from './user-profile-enterprise-accounts-feedback';
 import type {
   EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,
   UserProfileEnterpriseConnection,
 } from './user-profile-enterprise-accounts-section.types';
-import { EnterpriseAccountActionError } from './user-profile-enterprise-accounts-section.types';
 
 type Account = Pick<EnterpriseAccountResource, 'id' | 'emailAddress' | 'enterpriseConnectionId'> & {
   verification?: { error?: { longMessage?: string | null } | null } | null;
@@ -75,6 +76,8 @@ export function useUserProfileEnterpriseAccountsModel({
   mode,
 }: { mode?: 'modal' | 'mounted' } = {}): UserProfileEnterpriseAccountsModel {
   const clerk = useClerk();
+  const m = useMessages('userProfileEnterpriseAccountsSection');
+  const errorText = useErrorText();
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
   const { data: connections = [] } = __internal_useUserEnterpriseConnections({
@@ -104,7 +107,7 @@ export function useUserProfileEnterpriseAccountsModel({
   const currentUser = () => {
     const current = clerk.user;
     if (!current || current.id !== userId) {
-      throw new EnterpriseAccountActionError('unavailable');
+      throw new Error(m.errors.unavailable);
     }
     return current;
   };
@@ -116,15 +119,19 @@ export function useUserProfileEnterpriseAccountsModel({
     connect: async connectionId => {
       const current = currentUser();
       if (!projection.connections.some(connection => connection.id === connectionId)) {
-        throw new EnterpriseAccountActionError('unavailable');
+        throw new Error(m.errors.unavailable);
       }
       const url = window.location.href;
       const redirectUrl = mode === 'modal' ? appendModalState({ url, componentName: 'UserProfile' }) : url;
-      const account = await current.createExternalAccount({ enterpriseConnectionId: connectionId, redirectUrl });
+      const account = await current
+        .createExternalAccount({ enterpriseConnectionId: connectionId, redirectUrl })
+        .catch(error => {
+          throw new Error(enterpriseAccountErrorMessage(error, errorText, m.errors.generic));
+        });
       currentUser();
       const redirect = account.verification?.externalVerificationRedirectURL;
       if (!redirect) {
-        throw new EnterpriseAccountActionError('missing_verification_url');
+        throw new Error(m.errors.missingVerificationUrl);
       }
       if (typeof clerk.__internal_windowNavigate === 'function') {
         clerk.__internal_windowNavigate(redirect);

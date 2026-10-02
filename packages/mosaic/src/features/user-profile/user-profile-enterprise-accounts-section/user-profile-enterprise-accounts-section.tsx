@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 
 import { useMessages } from '../../../localization';
-import { enterpriseAccountErrorMessage } from './user-profile-enterprise-accounts-feedback';
 import { useUserProfileEnterpriseAccountsController } from './user-profile-enterprise-accounts-section.controller';
 import type { UserProfileEnterpriseAccountsModel } from './user-profile-enterprise-accounts-section.model';
 import { useUserProfileEnterpriseAccountsModel } from './user-profile-enterprise-accounts-section.model';
@@ -34,7 +33,7 @@ function EnterpriseAccounts({ model }: { model: Extract<UserProfileEnterpriseAcc
     accounts: model.accounts,
     connections: model.connections,
     onConnect: model.connect,
-    formatError: error => enterpriseAccountErrorMessage(error, m),
+    errorMessage: m.errors.generic,
   });
 
   return <UserProfileEnterpriseAccountsSectionView {...controller} />;

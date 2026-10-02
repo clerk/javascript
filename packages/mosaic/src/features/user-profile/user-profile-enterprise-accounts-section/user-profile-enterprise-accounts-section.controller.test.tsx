@@ -18,7 +18,7 @@ function deferred<T>() {
   return { promise, resolve, reject };
 }
 
-const formatError = () => 'Something went wrong.';
+const errorMessage = 'Something went wrong.';
 
 afterEach(() => vi.useRealTimers());
 
@@ -27,7 +27,7 @@ describe('useUserProfileEnterpriseAccountsController', () => {
     const operation = deferred<'redirecting'>();
     const onConnect = vi.fn(() => operation.promise);
     const { result } = renderHook(() =>
-      useUserProfileEnterpriseAccountsController({ accounts: [], connections, onConnect, formatError }),
+      useUserProfileEnterpriseAccountsController({ accounts: [], connections, onConnect, errorMessage }),
     );
 
     act(() => {
@@ -49,7 +49,7 @@ describe('useUserProfileEnterpriseAccountsController', () => {
     vi.useFakeTimers();
     const onConnect = vi.fn().mockResolvedValue('redirecting');
     const { result } = renderHook(() =>
-      useUserProfileEnterpriseAccountsController({ accounts: [], connections, onConnect, formatError }),
+      useUserProfileEnterpriseAccountsController({ accounts: [], connections, onConnect, errorMessage }),
     );
     await act(async () => {
       result.current.onConnect?.('okta');
@@ -64,16 +64,14 @@ describe('useUserProfileEnterpriseAccountsController', () => {
   it('shows a formatted error on the failed connection and clears it on retry', async () => {
     const onConnect = vi
       .fn()
-      .mockRejectedValueOnce(new Error('raw'))
+      .mockRejectedValueOnce(new Error('Formatted error.'))
       .mockReturnValueOnce(new Promise(() => {}));
-    const format = vi.fn(() => 'Formatted error.');
     const { result } = renderHook(() =>
-      useUserProfileEnterpriseAccountsController({ accounts: [], connections, onConnect, formatError: format }),
+      useUserProfileEnterpriseAccountsController({ accounts: [], connections, onConnect, errorMessage }),
     );
 
     act(() => result.current.onConnect('okta'));
     await waitFor(() => expect(result.current.connections[0].connectError).toBe('Formatted error.'));
-    expect(format).toHaveBeenCalledWith(expect.objectContaining({ message: 'raw' }));
     expect(result.current.connections[1].connectError).toBeUndefined();
 
     act(() => result.current.onConnect('okta'));
