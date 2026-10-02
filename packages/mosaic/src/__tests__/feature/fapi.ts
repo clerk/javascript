@@ -8,6 +8,7 @@ import type {
   DisplayConfigJSON,
   EmailAddressJSON,
   EnterpriseAccountJSON,
+  EnterpriseConnectionJSON,
   EnvironmentJSON,
   ExternalAccountJSON,
   OAuthProviders,
@@ -253,6 +254,26 @@ export function fapiExternalAccount(
     public_metadata: {},
     label: '',
     verification: fapiVerification(`oauth_${overrides.provider}`, { status: 'verified' }),
+    ...overrides,
+  };
+}
+
+export function fapiEnterpriseConnection(
+  overrides: Partial<EnterpriseConnectionJSON> & Pick<EnterpriseConnectionJSON, 'id'>,
+): EnterpriseConnectionJSON {
+  return {
+    object: 'enterprise_connection',
+    name: overrides.id,
+    active: true,
+    provider: 'saml_okta',
+    logo_public_url: null,
+    domains: [],
+    organization_id: null,
+    sync_user_attributes: false,
+    disable_additional_identifications: false,
+    allow_organization_account_linking: true,
+    created_at: createdAt,
+    updated_at: createdAt,
     ...overrides,
   };
 }
