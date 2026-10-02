@@ -45,6 +45,24 @@ function useEditPasswordForm(onSubmit: (values: EditPasswordValues) => Promise<v
 }
 
 describe('useForm: edit password', () => {
+  it('reports submission immediately within the submit event', async () => {
+    let finish = () => {};
+    const onSubmit = () =>
+      new Promise<void>(resolve => {
+        finish = resolve;
+      });
+    const { result } = renderHook(() => useForm({ initialValues: { password: 'secret' }, onSubmit }));
+    const form = result.current;
+    act(() => {
+      form.submit();
+      expect(form.isSubmitting).toBe(true);
+    });
+    await act(async () => {
+      finish();
+      await flush();
+    });
+    expect(form.isSubmitting).toBe(false);
+  });
   it('walks a user from a weak password to a saved one', async () => {
     const onSubmit = vi.fn(() => Promise.resolve());
     const { result } = renderHook(() => useEditPasswordForm(onSubmit));

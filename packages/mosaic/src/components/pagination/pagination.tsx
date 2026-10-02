@@ -106,46 +106,50 @@ export const Pagination = React.forwardRef<HTMLElement, PaginationProps>(functio
           <span {...mergeStyleProps(themeProps('pagination-range'), stylex.props(reset.base, styles.text))}>
             {fill(rangeLabel, { start, end, total: itemCount })}
           </span>
-          <span
-            aria-hidden
-            {...mergeStyleProps(themeProps('pagination-divider'), stylex.props(reset.base, styles.divider))}
-          />
-          <div {...mergeStyleProps(themeProps('pagination-page-size'), stylex.props(reset.base, styles.pageSize))}>
-            <span {...stylex.props(reset.base, styles.text, styles.pageSizeLabel)}>{pageSizeLabel}</span>
-            <span
-              aria-hidden
-              {...stylex.props(reset.base, styles.text, styles.pageSizeLabelCompact)}
-            >
-              {pageSizeLabelCompact}
-            </span>
-            <Select.Root
-              items={pageSizeItems}
-              value={String(itemsPerPage)}
-              onValueChange={value => onPageSizeChange?.(Number(value))}
-            >
-              <Select.Trigger
-                aria-label={pageSizeLabel}
-                disabled={disabled}
-                render={props => (
-                  <Button
-                    color='neutral'
-                    variant='outline'
-                    size='sm'
-                    {...props}
-                  />
-                )}
+          {onPageSizeChange ? (
+            <>
+              <span
+                aria-hidden
+                {...mergeStyleProps(themeProps('pagination-divider'), stylex.props(reset.base, styles.divider))}
               />
-              <Select.Popup>
-                {pageSizeItems.map(item => (
-                  <Select.Option
-                    key={item.value}
-                    xstyle={styles.pageSizeOption}
-                    {...item}
+              <div {...mergeStyleProps(themeProps('pagination-page-size'), stylex.props(reset.base, styles.pageSize))}>
+                <span {...stylex.props(reset.base, styles.text, styles.pageSizeLabel)}>{pageSizeLabel}</span>
+                <span
+                  aria-hidden
+                  {...stylex.props(reset.base, styles.text, styles.pageSizeLabelCompact)}
+                >
+                  {pageSizeLabelCompact}
+                </span>
+                <Select.Root
+                  items={pageSizeItems}
+                  value={String(itemsPerPage)}
+                  onValueChange={value => onPageSizeChange(Number(value))}
+                >
+                  <Select.Trigger
+                    aria-label={pageSizeLabel}
+                    disabled={disabled}
+                    render={props => (
+                      <Button
+                        color='neutral'
+                        variant='outline'
+                        size='sm'
+                        {...props}
+                      />
+                    )}
                   />
-                ))}
-              </Select.Popup>
-            </Select.Root>
-          </div>
+                  <Select.Popup>
+                    {pageSizeItems.map(item => (
+                      <Select.Option
+                        key={item.value}
+                        xstyle={styles.pageSizeOption}
+                        {...item}
+                      />
+                    ))}
+                  </Select.Popup>
+                </Select.Root>
+              </div>
+            </>
+          ) : null}
         </div>
 
         <div {...mergeStyleProps(themeProps('pagination-controls'), stylex.props(reset.base, styles.controls))}>

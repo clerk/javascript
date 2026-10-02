@@ -1,10 +1,12 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
+import { UserProfileApiKeysPanelView } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
 } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
 import { UserProfileDeleteSectionView } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.view';
+import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import type {
   UserProfileEmail,
   UserProfilePhone,
@@ -148,7 +150,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
         setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
     },
     security: {
-      ...editPassword,
+      passwordSlot: { content: <UserProfilePasswordSectionView {...editPassword} /> },
       passkeys: passkeys.passkeys,
       addPasskeyError: passkeys.addError,
       onRenamePasskey: passkeys.onRename,
@@ -201,7 +203,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onBillingHistoryPageSizeChange: setHistoryPageSize,
       onViewInvoice: () => undefined,
     },
-    apiKeys,
+    apiKeys: <UserProfileApiKeysPanelView {...apiKeys} />,
   };
 
   return { activePage, setActivePage, pages, addEmail, devices: activeDevices.devices };
