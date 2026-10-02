@@ -181,22 +181,19 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
 
   const userId = user.id;
 
+  const currentUser = (): UserResource => {
+    const current = clerk.user;
+    if (!current || current.id !== userId) {
+      throw new SaveError({ global: UNEXPECTED_ERROR });
+    }
+    return current;
+  };
+
   const saveAsUser = <TField extends string = never>(
     run: (current: UserResource) => Promise<unknown>,
     fields: readonly TField[] = [],
     params?: MessageValues,
-  ): Promise<void> =>
-    save(
-      () => {
-        const current = clerk.user;
-        if (!current || current.id !== userId) {
-          throw new SaveError({ global: UNEXPECTED_ERROR });
-        }
-        return run(current);
-      },
-      fields,
-      params,
-    );
+  ): Promise<void> => save(() => run(currentUser()), fields, params);
 
   const { attributes, usernameSettings, enterpriseSSO } = environment.userSettings;
   const usernameAttribute = attributes.username;
@@ -232,27 +229,31 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
       : undefined,
     onCreateEmail: emailAccess.canCreate
       ? async emailAddress => {
-          const request = user.createEmailAddress({ email: emailAddress });
+          const request = currentUser().createEmailAddress({ email: emailAddress });
           await save(() => request, ADD_EMAIL_FIELDS);
           return verifierFor(await request);
         }
       : undefined,
     getEmailVerifier: emailAccess.show ? id => verifierFor(byId(user.emailAddresses, id, 'email address')) : undefined,
-    onSetPrimaryEmail: emailAccess.show ? id => save(() => user.update({ primaryEmailAddressId: id })) : undefined,
+    onSetPrimaryEmail: emailAccess.show
+      ? id => saveAsUser(current => current.update({ primaryEmailAddressId: id }))
+      : undefined,
     onRemoveEmail: emailAccess.canRemove
-      ? id => save(() => byId(user.emailAddresses, id, 'email address').destroy())
+      ? id => saveAsUser(current => byId(current.emailAddresses, id, 'email address').destroy())
       : undefined,
     onCreatePhone: phoneAccess.canCreate
       ? async phoneNumber => {
-          const request = user.createPhoneNumber({ phoneNumber });
+          const request = currentUser().createPhoneNumber({ phoneNumber });
           await save(() => request, ADD_PHONE_FIELDS);
           return toPhoneVerifier(await request);
         }
       : undefined,
     getPhoneVerifier: phoneAccess.show ? id => toPhoneVerifier(byId(user.phoneNumbers, id, 'phone number')) : undefined,
-    onSetPrimaryPhone: phoneAccess.show ? id => save(() => user.update({ primaryPhoneNumberId: id })) : undefined,
+    onSetPrimaryPhone: phoneAccess.show
+      ? id => saveAsUser(current => current.update({ primaryPhoneNumberId: id }))
+      : undefined,
     onRemovePhone: phoneAccess.canRemove
-      ? id => save(() => byId(user.phoneNumbers, id, 'phone number').destroy())
+      ? id => saveAsUser(current => byId(current.phoneNumbers, id, 'phone number').destroy())
       : undefined,
     onProfilePictureChange: file => saveAsUser(current => current.setProfileImage({ file })),
     onRemoveProfilePicture: user.hasImage
