@@ -9,6 +9,7 @@ import type {
   EmailAddressJSON,
   EnterpriseAccountJSON,
   EnvironmentJSON,
+  ExternalAccountJSON,
   OAuthProviders,
   OrganizationJSON,
   OrganizationMembershipJSON,
@@ -231,6 +232,27 @@ export function fapiEmailAddress(
     verification: null,
     linked_to: [],
     matches_sso_connection: false,
+    ...overrides,
+  };
+}
+
+export function fapiExternalAccount(
+  overrides: Partial<ExternalAccountJSON> & Pick<ExternalAccountJSON, 'id' | 'provider'>,
+): ExternalAccountJSON {
+  return {
+    object: 'external_account',
+    identification_id: overrides.id,
+    provider_user_id: 'provider_user_1',
+    approved_scopes: 'email',
+    email_address: `${overrides.provider}@example.com`,
+    first_name: '',
+    last_name: '',
+    image_url: '',
+    username: '',
+    phone_number: '',
+    public_metadata: {},
+    label: '',
+    verification: fapiVerification(`oauth_${overrides.provider}`, { status: 'verified' }),
     ...overrides,
   };
 }
