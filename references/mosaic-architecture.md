@@ -243,9 +243,9 @@ wrapper resolves the model, hands it to the controller, and branches on `status`
 
 ```tsx
 export function UserButton(props: UserButtonProps = {}) {
-  const { renderTriggerLabel, mode, modePriority, fallback, ...options } = props;
+  const { renderTriggerLabel, mode, fallback, ...options } = props;
   const model = useUserButtonModel(options);
-  const controller = useUserButtonController(model, { mode, modePriority });
+  const controller = useUserButtonController(model, { mode });
 
   if (controller.status === 'loading') {
     return <>{fallback}</>;
