@@ -126,6 +126,7 @@ describe('Seeing passkeys', () => {
     const removal = screen.getByRole('alertdialog', { name: 'Supprimer la clé' });
     expect(removal).toHaveAccessibleDescription('Laptop sera supprimée de ce compte.');
     await waitFor(() => expect(within(removal).getByRole('button', { name: 'Supprimer' })).toBeVisible());
+    expect(within(removal).getByRole('button', { name: 'Annuler' })).toBeVisible();
   });
 
   it.each([

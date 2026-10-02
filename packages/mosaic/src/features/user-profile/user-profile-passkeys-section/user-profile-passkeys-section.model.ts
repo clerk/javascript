@@ -115,7 +115,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
       clerk.session?.id !== sessionId ||
       getPasskeysProjection(current, currentEnvironment, clerk.isSatellite).status === 'hidden'
     ) {
-      throw new Error(messages.accountUnavailableError);
+      throw new FormSubmitError({ message: messages.accountUnavailableError });
     }
     return current;
   };
@@ -182,7 +182,7 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
     onRename: async (id, name) => {
       const passkey = currentUser().passkeys.find(candidate => candidate.id === id);
       if (!passkey) {
-        throw new Error(messages.unavailableError);
+        throw new FormSubmitError({ message: messages.unavailableError });
       }
       const feedback = validateName(name);
       if (feedback) {

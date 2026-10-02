@@ -112,6 +112,7 @@ export function UserProfilePasskeysSectionView({
           title={m.removeTitle}
           description={passkey => fill(m.removeDescription, { name: passkey.name })}
           actionLabel={m.remove}
+          cancelLabel={m.cancel}
           finalFocus={removalFocus.finalFocus}
           onConfirm={passkey => removalFocus.remove(passkey.id)}
         />
