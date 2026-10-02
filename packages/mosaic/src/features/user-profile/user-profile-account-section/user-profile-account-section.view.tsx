@@ -1,10 +1,7 @@
-import * as stylex from '@stylexjs/stylex';
-
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
-import { styles } from './user-profile-account-section.styles';
 import type {
   UserProfileEmail,
   UserProfileNameAttribute,
@@ -120,10 +117,12 @@ export function UserProfileAccountSectionView({
   ) : null;
 
   return (
-    <div {...stylex.props(styles.sections)}>
-      <Section.Root aria-label={m.sectionLabel}>
-        <Section.Title>{m.sectionTitle}</Section.Title>
-        <Section.Group>
+    <Section.Root aria-label={m.sectionLabel}>
+      <Section.Group>
+        <Section.Header>
+          <Section.Title>{m.sectionTitle}</Section.Title>
+        </Section.Header>
+        <Section.Body>
           <UserProfilePictureRowView
             name={name}
             imageUrl={imageUrl}
@@ -151,18 +150,10 @@ export function UserProfileAccountSectionView({
           ) : null}
           {!allowMultipleAccounts ? emailRow : null}
           {!allowMultipleAccounts ? phoneRow : null}
-        </Section.Group>
-      </Section.Root>
-      {allowMultipleAccounts && emailRow ? (
-        <Section.Root aria-label={m.email.label}>
-          <Section.Group>{emailRow}</Section.Group>
-        </Section.Root>
-      ) : null}
-      {allowMultipleAccounts && phoneRow ? (
-        <Section.Root aria-label={m.phone.label}>
-          <Section.Group>{phoneRow}</Section.Group>
-        </Section.Root>
-      ) : null}
-    </div>
+        </Section.Body>
+      </Section.Group>
+      {allowMultipleAccounts ? emailRow : null}
+      {allowMultipleAccounts ? phoneRow : null}
+    </Section.Root>
   );
 }

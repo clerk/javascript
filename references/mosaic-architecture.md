@@ -269,10 +269,8 @@ export function UserButton(props: UserButtonProps = {}) {
 prop. There is no model: the Clerk call arrives from whoever renders it.
 
 ```tsx
-export function UserProfileDeleteSectionView({ onDelete }: UserProfileDeleteSectionViewProps) {
-  const { isOpen, onOpenChange, onConfirm, isDeleting, errorMessage } = useUserProfileDeleteSectionController({
-    onDelete,
-  });
+export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUsernameRowViewProps) {
+  const controller = useUserProfileEditUsernameController({ username, onSubmit });
   // …render…
 }
 ```

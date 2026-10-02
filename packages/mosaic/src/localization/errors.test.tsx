@@ -30,8 +30,8 @@ describe('useErrorText', () => {
   });
 
   it('ships English for known codes', () => {
-    expect(errorText()({ code: 'avatar_file_type_invalid', message: 'api text' })).toBe(
-      'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
+    expect(errorText()({ code: 'form_password_incorrect', message: 'api text' })).toBe(
+      'Your current password is incorrect.',
     );
   });
 
@@ -42,16 +42,17 @@ describe('useErrorText', () => {
   });
 
   it('fills the values the error carries into its message', () => {
-    expect(errorText()({ code: 'form_username_invalid_length', params: { min_length: 4, max_length: 64 } })).toBe(
-      'Your username must be between 4 and 64 characters long.',
+    const text = errorText({
+      'errors.test_length': 'Your value must be between {min_length} and {max_length} characters long.',
+    });
+    expect(text({ code: 'test_length', params: { min_length: 4, max_length: 64 } })).toBe(
+      'Your value must be between 4 and 64 characters long.',
     );
   });
 
   it('fills an override the same way', () => {
-    const text = errorText({ 'errors.form_username_invalid_length': 'Entre {min_length} y {max_length} caracteres.' });
-    expect(text({ code: 'form_username_invalid_length', params: { min_length: 4, max_length: 64 } })).toBe(
-      'Entre 4 y 64 caracteres.',
-    );
+    const text = errorText({ 'errors.test_length': 'Entre {min_length} y {max_length} caracteres.' });
+    expect(text({ code: 'test_length', params: { min_length: 4, max_length: 64 } })).toBe('Entre 4 y 64 caracteres.');
   });
 
   it('falls back to the generic message when there is nothing else', () => {

@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { useRef } from 'react';
 
 import { Panel } from '../../components/panel';
@@ -14,7 +14,6 @@ import type {
   UserProfileConnectionProvider,
 } from './user-profile-connected-accounts-section.view';
 import { UserProfileConnectedAccountsSectionView } from './user-profile-connected-accounts-section.view';
-import { UserProfileDeleteSectionView } from './user-profile-delete-section/user-profile-delete-section.view';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
 import { UserProfileWeb3WalletsSectionView } from './user-profile-web3-wallets-section.view';
 
@@ -33,8 +32,8 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
   onConnectWeb3Wallet?: (id: string) => void;
   onSetPrimaryWeb3Wallet?: (id: string) => void;
   onRemoveWeb3Wallet?: (id: string) => void | Promise<void>;
-  /** Resolve to close the danger zone's confirmation dialog, reject to show why it failed. */
-  onDeleteAccount?: () => Promise<void>;
+  /** Danger zone. Omit to hide it. */
+  deleteAccountSlot?: ReactNode;
 }
 
 export function UserProfileProfilePanelView({
@@ -77,7 +76,7 @@ export function UserProfileProfilePanelView({
   onConnectWeb3Wallet,
   onSetPrimaryWeb3Wallet,
   onRemoveWeb3Wallet,
-  onDeleteAccount,
+  deleteAccountSlot,
 }: UserProfileProfilePanelViewProps): ReactElement {
   const pageTitle = useRef<HTMLDivElement>(null);
   return (
@@ -136,7 +135,7 @@ export function UserProfileProfilePanelView({
           onRemove={onRemoveWeb3Wallet}
           onSetPrimary={onSetPrimaryWeb3Wallet}
         />
-        {onDeleteAccount ? <UserProfileDeleteSectionView onDelete={onDeleteAccount} /> : null}
+        {deleteAccountSlot}
       </Panel.Sections>
     </Panel.Root>
   );

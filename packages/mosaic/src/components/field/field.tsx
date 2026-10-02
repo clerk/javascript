@@ -11,6 +11,8 @@ import { feedbackHeight, feedbackStyles } from '../../utils/feedback.styles';
 import { reset } from '../../utils/reset.styles';
 import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import { visuallyHidden } from '../../utils/visually-hidden.styles';
+import type { FieldFeedback as FormFieldFeedback } from '../form';
+import type { FieldOrientation } from './field.context';
 import {
   FieldMessageProvider,
   FieldProvider,
@@ -30,13 +32,15 @@ function useNativeLabelWarning(label: HTMLElement | null) {
 
 /** Props for a field container that associates exactly one form control. */
 export interface FieldRootProps extends MosaicComponentProps<'div'> {
+  /** `horizontal` places the control beside a `Field.Content` that stacks the label and supporting text. */
+  orientation?: FieldOrientation;
   disabled?: boolean;
   required?: boolean;
   invalid?: boolean;
 }
 
 const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFieldRoot(
-  { render, xstyle, disabled = false, required = false, invalid = false, ...rest },
+  { render, xstyle, orientation = 'vertical', disabled = false, required = false, invalid = false, ...rest },
   ref,
 ) {
   const element = useRender({
@@ -44,12 +48,22 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
     render,
     ref,
     props: {
-      ...mergeStyleProps(themeProps('field-root'), stylex.props(reset.base, styles.root, xstyle), rest),
+      ...mergeStyleProps(
+        themeProps('field-root', { orientation }),
+        stylex.props(
+          reset.base,
+          styles.root,
+          orientation === 'horizontal' && [typographySizes.sm, styles.horizontal],
+          xstyle,
+        ),
+        rest,
+      ),
     },
   });
 
   return (
     <FieldProvider
+      orientation={orientation}
       disabled={disabled}
       required={required}
       invalid={invalid}
@@ -107,6 +121,21 @@ const Label = React.forwardRef<HTMLElement, FieldLabelProps>(function MosaicFiel
       htmlFor,
       onClick: handleClick,
     },
+  });
+});
+
+/** Props for the container that stacks a horizontal field's label and supporting text. */
+export type FieldContentProps = MosaicComponentProps<'div'>;
+
+const Content = React.forwardRef<HTMLDivElement, FieldContentProps>(function MosaicFieldContent(
+  { render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: mergeStyleProps(themeProps('field-content'), stylex.props(reset.base, styles.content, xstyle), rest),
   });
 });
 
@@ -174,18 +203,19 @@ const Message = React.forwardRef<HTMLDivElement, FieldMessageProps>(function Mos
   return <FieldMessageProvider register={register}>{rendered}</FieldMessageProvider>;
 });
 
-type FieldFeedbackKind = 'error' | 'success';
+type FieldFeedbackKind = 'error' | 'success' | 'info';
 
-const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon: IconName; color: stylex.StyleXStyles }> = {
+const FEEDBACK: Record<FieldFeedbackKind, { slot: string; icon?: IconName; color: stylex.StyleXStyles }> = {
   error: { slot: 'field-error', icon: 'exclamation-circle', color: feedbackStyles.error },
   success: { slot: 'field-success', icon: 'checkmark', color: feedbackStyles.success },
+  info: { slot: 'field-info', color: feedbackStyles.info },
 };
 
-interface FieldFeedbackProps extends MosaicComponentProps<'p'> {
+interface FieldFeedbackPartProps extends MosaicComponentProps<'p'> {
   kind: FieldFeedbackKind;
 }
 
-const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>(function MosaicFieldFeedback(
+const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackPartProps>(function MosaicFieldFeedback(
   { render, xstyle, id: idProp, children, kind, ...rest },
   ref,
 ) {
@@ -212,7 +242,7 @@ const FieldFeedback = React.forwardRef<HTMLParagraphElement, FieldFeedbackProps>
         rest,
       ),
       id,
-      children: <FeedbackBody icon={icon}>{message}</FeedbackBody>,
+      children: icon ? <FeedbackBody icon={icon}>{message}</FeedbackBody> : message,
     },
   });
 });
@@ -243,5 +273,47 @@ const FieldSuccess = React.forwardRef<HTMLParagraphElement, FieldSuccessProps>(f
   );
 });
 
+export type FieldHintProps = MosaicComponentProps<'p'>;
+
+const FieldHint = React.forwardRef<HTMLParagraphElement, FieldHintProps>(function MosaicFieldHint(props, ref) {
+  return (
+    <FieldFeedback
+      ref={ref}
+      kind='info'
+      {...props}
+    />
+  );
+});
+
+export interface FieldFeedbackProps extends Omit<FieldMessageProps, 'children'> {
+  feedback?: FormFieldFeedback;
+}
+
+const Feedback = React.forwardRef<HTMLDivElement, FieldFeedbackProps>(function MosaicFieldFeedbackValue(
+  { feedback, ...props },
+  ref,
+) {
+  return (
+    <Message
+      ref={ref}
+      {...props}
+    >
+      <FieldError>{feedback?.type === 'error' ? feedback.message : null}</FieldError>
+      <FieldHint>{feedback?.type === 'info' || feedback?.type === 'warning' ? feedback.message : null}</FieldHint>
+      <FieldSuccess>{feedback?.type === 'success' ? feedback.message : null}</FieldSuccess>
+    </Message>
+  );
+});
+
 /** Styled parts for composing an automatically associated single-control field. */
-export const Field = { Root, Label, Description, Message, Error: FieldError, Success: FieldSuccess };
+export const Field = {
+  Root,
+  Label,
+  Content,
+  Description,
+  Message,
+  Feedback,
+  Error: FieldError,
+  Success: FieldSuccess,
+  Hint: FieldHint,
+};

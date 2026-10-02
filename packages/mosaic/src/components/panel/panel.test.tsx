@@ -13,7 +13,11 @@ function Account() {
       <Panel.Title>Account</Panel.Title>
       <Panel.Sections data-testid='sections'>
         <Section.Root>
-          <Section.Title>Email addresses</Section.Title>
+          <Section.Group>
+            <Section.Header>
+              <Section.Title>Email addresses</Section.Title>
+            </Section.Header>
+          </Section.Group>
         </Section.Root>
       </Panel.Sections>
     </Panel.Root>

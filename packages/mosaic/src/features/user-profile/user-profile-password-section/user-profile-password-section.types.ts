@@ -1,21 +1,6 @@
-import { FormSubmitError } from '../../../components/form';
+import type { ReactNode } from 'react';
+
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
-
-/** Plain data, so nothing downstream of the view imports a Clerk error. */
-export interface UserProfileFormError<TField extends string = string> {
-  /** Rendered in the dialog's negative banner. */
-  message?: string;
-  /** Rendered under the named control, which is also marked invalid. */
-  fields?: Partial<Record<TField, string>>;
-}
-
-/** What a save rejects with to show its message and name the failing controls; anything else shows the generic error. */
-export class UserProfileSaveError<TField extends string = string> extends FormSubmitError<Record<TField, unknown>> {
-  constructor(message: string, fields?: Partial<Record<TField, string>>) {
-    super({ message, fields });
-    this.name = 'UserProfileSaveError';
-  }
-}
 
 export type UserProfileEditPasswordField = 'currentPassword' | 'newPassword' | 'confirmPassword';
 
@@ -33,10 +18,12 @@ export interface UserProfileEditPasswordValue {
 }
 
 export interface UserProfilePasswordSectionViewProps {
-  sectionTitle?: string;
+  action?: ReactNode;
   hasPassword?: boolean;
-  requiresCurrentPassword?: boolean;
   /** Replaces the edit action with the enterprise provider’s name. */
   managedBy?: UserProfileManagedBy;
-  onSubmitPassword?: (value: UserProfileEditPasswordValue) => Promise<void>;
+}
+
+export interface UserProfilePasswordSlot {
+  content: ReactNode;
 }

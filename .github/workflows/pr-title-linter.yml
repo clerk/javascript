@@ -34,5 +34,5 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           npm init --scope=clerk --yes
-          npm i --save-dev @commitlint/config-conventional @commitlint/cli globby --audit=false --fund=false
+          npm i --save-dev @commitlint/config-conventional @commitlint/cli --audit=false --fund=false
           echo "$PR_TITLE" | npm exec @commitlint/cli -- --config commitlint.config.ts
