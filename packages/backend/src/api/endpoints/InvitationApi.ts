@@ -143,7 +143,7 @@ export class InvitationAPI extends AbstractAPI {
    * @param invitationId - The ID of the invitation to delete.
    * @returns The [`DeletedObject`](https://clerk.com/docs/reference/backend/types/deleted-object) object.
    */
-  public async deleteInvitation(invitationId: string) {
+  public async deleteInvitation(invitationId: string): Promise<DeletedObject> {
     this.requireId(invitationId);
     return this.request<DeletedObject>({
       method: 'DELETE',
