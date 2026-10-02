@@ -1,7 +1,7 @@
 'use client';
 
 import { UserProfileWeb3WalletsSection } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section/user-profile-web3-wallets-section';
-import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 
