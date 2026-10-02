@@ -1,18 +1,30 @@
+import { buildURL } from '@clerk/shared/internal/clerk-js/url';
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useUser } from '@clerk/shared/react';
-import type { AttributeData, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
+import type {
+  AttributeData,
+  EmailAddressResource,
+  EnterpriseAccountResource,
+  PhoneNumberResource,
+  UserResource,
+} from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
+import type { MosaicRouter } from '../../../hooks/use-mosaic-router';
+import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import type { MessageValues } from '../../../localization';
 import { save, SaveError, UNEXPECTED_ERROR } from '../../../utils/form-error';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import type {
-  UserProfileEmail,
+  UserProfileEmailVerification,
+  UserProfileEmailVerifier,
   UserProfileNameAttribute,
-  UserProfilePhone,
+  UserProfilePhoneVerifier,
 } from './user-profile-account-section.types';
-import { isAttributeAvailable } from './user-profile-account-section.utils';
+import { isAttributeAvailable, toContactAccess, toContacts } from './user-profile-account-section.utils';
 import type { UserProfileAccountSectionViewProps } from './user-profile-account-section.view';
+import type { UserProfileAddEmailField } from './user-profile-add-email.controller';
+import type { UserProfileAddPhoneField } from './user-profile-add-phone.controller';
 import type { UserProfileEditNameField } from './user-profile-edit-name.dialog';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';
 
@@ -31,6 +43,14 @@ type UserProfileAccountSectionData = Pick<
   | 'usernameRequired'
   | 'emails'
   | 'phones'
+  | 'onCreateEmail'
+  | 'getEmailVerifier'
+  | 'onSetPrimaryEmail'
+  | 'onRemoveEmail'
+  | 'onCreatePhone'
+  | 'getPhoneVerifier'
+  | 'onSetPrimaryPhone'
+  | 'onRemovePhone'
   | 'onProfilePictureChange'
   | 'onRemoveProfilePicture'
   | 'onSubmitName'
@@ -44,6 +64,87 @@ export type UserProfileAccountSectionModel =
 
 const NAME_FIELDS: readonly UserProfileEditNameField[] = ['firstName', 'lastName'];
 const USERNAME_FIELDS: readonly UserProfileEditUsernameField[] = ['username'];
+const ADD_EMAIL_FIELDS: readonly UserProfileAddEmailField[] = ['emailAddress', 'code'];
+const ADD_PHONE_FIELDS: readonly UserProfileAddPhoneField[] = ['phoneNumber', 'code'];
+
+function byId<T extends { id: string }>(items: T[], id: string, kind: string): T {
+  const item = items.find(item => item.id === id);
+  if (!item) {
+    throw new Error(`No ${kind} with id ${id}`);
+  }
+  return item;
+}
+
+/*
+  TODO: pick this base the way the routing mode says to. Legacy `buildVerificationRedirectUrl` only
+  falls back to `displayConfig.userProfileUrl` under virtual routing, and builds a path instead of a
+  hash when the host routes by path — Mosaic has no routing yet, so this always hashes onto the
+  instance's profile URL and sends a path-routed host's user back to the wrong place. #9843 adds
+  `MosaicRoutingProvider`; wire this to it once that lands.
+
+  Whatever base wins, nothing in Mosaic serves the `/verify` the link lands on: there is no route and
+  no equivalent of legacy's `VerificationSuccessPage`, so an opened link is handled by whatever
+  clerk-js already mounts there. That page has to come with the routing work, not after it.
+*/
+function verifyRedirectUrl(userProfileUrl: string): string {
+  return buildURL({ base: userProfileUrl, hashPath: '/verify' }, { stringify: true });
+}
+
+function startEmailVerification(
+  email: EmailAddressResource,
+  linkRedirectUrl: string | undefined,
+  router: MosaicRouter,
+): UserProfileEmailVerification {
+  if (email.matchesSsoConnection) {
+    const { startEnterpriseSSOLinkFlow, cancelEnterpriseSSOLinkFlow } = email.createEnterpriseSSOLinkFlow();
+    return {
+      method: 'sso',
+      /*
+        TODO: carry the mounting mode back from the IdP. Legacy appends `appendModalState` to this
+        redirect when the profile is mounted as a modal, so returning from the provider reopens the
+        modal on the step the user left. Mosaic has no modal mode to encode yet; whoever adds one has
+        to encode it here too, or the user comes back to a closed dialog and a lost flow.
+      */
+      verified: save(() => startEnterpriseSSOLinkFlow({ redirectUrl: window.location.href })),
+      cancel: cancelEnterpriseSSOLinkFlow,
+      connect: () => {
+        const url = email.verification.externalVerificationRedirectURL;
+        if (url) {
+          void router.navigate(url.href);
+        }
+      },
+    };
+  }
+  if (linkRedirectUrl === undefined) {
+    return { method: 'code', sent: save(() => email.prepareVerification({ strategy: 'email_code' })) };
+  }
+  const { startEmailLinkFlow, cancelEmailLinkFlow } = email.createEmailLinkFlow();
+  return {
+    method: 'link',
+    verified: save(() => startEmailLinkFlow({ redirectUrl: linkRedirectUrl })),
+    cancel: cancelEmailLinkFlow,
+  };
+}
+
+function toEmailVerifier(
+  email: EmailAddressResource,
+  linkRedirectUrl: string | undefined,
+  router: MosaicRouter,
+): UserProfileEmailVerifier {
+  return {
+    start: () => startEmailVerification(email, linkRedirectUrl, router),
+    verifyCode: code => save(() => email.attemptVerification({ code }), ADD_EMAIL_FIELDS),
+  };
+}
+
+function canAddIdentifications(user: UserResource, enterpriseSSOEnabled: boolean): boolean {
+  return (
+    !enterpriseSSOEnabled ||
+    !user.enterpriseAccounts.some(
+      account => account.active && account.enterpriseConnection?.disableAdditionalIdentifications,
+    )
+  );
+}
 
 function toManagedBy(account: EnterpriseAccountResource | undefined): UserProfileManagedBy | undefined {
   if (!account) {
@@ -57,32 +158,18 @@ function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameA
   return { enabled: attribute?.enabled ?? false, required: attribute?.required ?? false };
 }
 
-function primaryFirst<T extends { id: string }>(items: T[], primaryId: string | null): T[] {
-  return [...items.filter(item => item.id === primaryId), ...items.filter(item => item.id !== primaryId)];
-}
-
-function toEmails(user: UserResource): UserProfileEmail[] {
-  return primaryFirst(user.emailAddresses, user.primaryEmailAddressId).map(email => ({
-    id: email.id,
-    value: email.emailAddress,
-    isDefault: email.id === user.primaryEmailAddressId,
-    isVerified: email.verification.status === 'verified',
-  }));
-}
-
-function toPhones(user: UserResource): UserProfilePhone[] {
-  return primaryFirst(user.phoneNumbers, user.primaryPhoneNumberId).map(phone => ({
-    id: phone.id,
-    value: phone.phoneNumber,
-    isDefault: phone.id === user.primaryPhoneNumberId,
-    isVerified: phone.verification.status === 'verified',
-  }));
+function toPhoneVerifier(phone: PhoneNumberResource): UserProfilePhoneVerifier {
+  return {
+    sendCode: () => save(() => phone.prepareVerification(), ADD_PHONE_FIELDS),
+    verifyCode: code => save(() => phone.attemptVerification({ code }), ADD_PHONE_FIELDS),
+  };
 }
 
 export function useUserProfileAccountSectionModel(): UserProfileAccountSectionModel {
   const { isLoaded, user } = useUser();
   const clerk = useClerk();
   const environment = useMosaicEnvironment();
+  const router = useMosaicRouter();
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -94,30 +181,31 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
 
   const userId = user.id;
 
+  const currentUser = (): UserResource => {
+    const current = clerk.user;
+    if (!current || current.id !== userId) {
+      throw new SaveError({ global: UNEXPECTED_ERROR });
+    }
+    return current;
+  };
+
   const saveAsUser = <TField extends string = never>(
     run: (current: UserResource) => Promise<unknown>,
     fields: readonly TField[] = [],
     params?: MessageValues,
-  ): Promise<void> =>
-    save(
-      () => {
-        const current = clerk.user;
-        if (!current || current.id !== userId) {
-          throw new SaveError({ global: UNEXPECTED_ERROR });
-        }
-        return run(current);
-      },
-      fields,
-      params,
-    );
+  ): Promise<void> => save(() => run(currentUser()), fields, params);
 
-  const { attributes, usernameSettings } = environment.userSettings;
+  const { attributes, usernameSettings, enterpriseSSO } = environment.userSettings;
   const usernameAttribute = attributes.username;
   const usernameImmutable = Boolean(usernameAttribute?.immutable);
   const showUsername = isAttributeAvailable(usernameAttribute) && !(usernameImmutable && !user.username);
   const nameManagedBy = toManagedBy(user.enterpriseAccounts.find(account => account.active));
-  const showEmails = isAttributeAvailable(attributes.email_address);
-  const showPhones = isAttributeAvailable(attributes.phone_number);
+  const canAddMore = canAddIdentifications(user, enterpriseSSO.enabled);
+  const emailAccess = toContactAccess(attributes.email_address, user.emailAddresses.length, canAddMore);
+  const phoneAccess = toContactAccess(attributes.phone_number, user.phoneNumbers.length, canAddMore);
+  const verifiesEmailByLink = Boolean(attributes.email_address?.verifications.includes('email_link'));
+  const linkRedirectUrl = verifiesEmailByLink ? verifyRedirectUrl(environment.displayConfig.userProfileUrl) : undefined;
+  const verifierFor = (email: EmailAddressResource) => toEmailVerifier(email, linkRedirectUrl, router);
 
   return {
     status: 'ready',
@@ -133,8 +221,40 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     hasImage: user.hasImage,
     username: showUsername ? (user.username ?? '') : undefined,
     usernameRequired: Boolean(usernameAttribute?.required),
-    emails: showEmails ? toEmails(user) : undefined,
-    phones: showPhones ? toPhones(user) : undefined,
+    emails: emailAccess.show
+      ? toContacts(user.emailAddresses, user.primaryEmailAddressId, email => email.emailAddress)
+      : undefined,
+    phones: phoneAccess.show
+      ? toContacts(user.phoneNumbers, user.primaryPhoneNumberId, phone => phone.phoneNumber)
+      : undefined,
+    onCreateEmail: emailAccess.canCreate
+      ? async emailAddress => {
+          const request = currentUser().createEmailAddress({ email: emailAddress });
+          await save(() => request, ADD_EMAIL_FIELDS);
+          return verifierFor(await request);
+        }
+      : undefined,
+    getEmailVerifier: emailAccess.show ? id => verifierFor(byId(user.emailAddresses, id, 'email address')) : undefined,
+    onSetPrimaryEmail: emailAccess.show
+      ? id => saveAsUser(current => current.update({ primaryEmailAddressId: id }))
+      : undefined,
+    onRemoveEmail: emailAccess.canRemove
+      ? id => saveAsUser(current => byId(current.emailAddresses, id, 'email address').destroy())
+      : undefined,
+    onCreatePhone: phoneAccess.canCreate
+      ? async phoneNumber => {
+          const request = currentUser().createPhoneNumber({ phoneNumber });
+          await save(() => request, ADD_PHONE_FIELDS);
+          return toPhoneVerifier(await request);
+        }
+      : undefined,
+    getPhoneVerifier: phoneAccess.show ? id => toPhoneVerifier(byId(user.phoneNumbers, id, 'phone number')) : undefined,
+    onSetPrimaryPhone: phoneAccess.show
+      ? id => saveAsUser(current => current.update({ primaryPhoneNumberId: id }))
+      : undefined,
+    onRemovePhone: phoneAccess.canRemove
+      ? id => saveAsUser(current => byId(current.phoneNumbers, id, 'phone number').destroy())
+      : undefined,
     onProfilePictureChange: file => saveAsUser(current => current.setProfileImage({ file })),
     onRemoveProfilePicture: user.hasImage
       ? () => saveAsUser(current => current.setProfileImage({ file: null }))

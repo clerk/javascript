@@ -1,10 +1,9 @@
 import * as stylex from '@stylexjs/stylex';
 
 import { Badge } from '../../../components/badge';
-import { Button } from '../../../components/button';
+import { SubmitButton } from '../../../components/button';
 import { Icon, IconFrame } from '../../../components/icon';
 import { Section } from '../../../components/section';
-import { Spinner } from '../../../components/spinner';
 import { fill, useMessages } from '../../../localization';
 import { styles } from './user-profile-enterprise-accounts-section.styles';
 import type { UserProfileEnterpriseAccount } from './user-profile-enterprise-accounts-section.types';
@@ -65,26 +64,24 @@ export function UserProfileEnterpriseAccountRowView({
         </Section.Content>
         {onConnect ? (
           <Section.Actions>
-            <Button
+            <SubmitButton
+              type='button'
               color='neutral'
               size='sm'
               variant='outline'
               aria-label={fill(m.connectProvider, { provider: account.name })}
-              aria-busy={isPending || undefined}
+              isPending={isPending}
+              pendingLabel={m.connecting}
               disabled={disabled}
               onClick={() => onConnect(account.id)}
             >
               {m.connect}
-              {isPending ? (
-                <Spinner size='sm' />
-              ) : (
-                <Icon
-                  name='arrow-up-right'
-                  placement='inline-end'
-                  size='sm'
-                />
-              )}
-            </Button>
+              <Icon
+                name='arrow-up-right'
+                placement='inline-end'
+                size='sm'
+              />
+            </SubmitButton>
           </Section.Actions>
         ) : null}
       </Section.Item>

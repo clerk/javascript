@@ -1,8 +1,5 @@
-import { useRef, useState } from 'react';
-
-import type { LocalizableError } from '../../../localization';
+import { useForm } from '../../../components/form';
 import { FileUpload } from '../../../primitives/file-upload';
-import { toFormError } from '../../../utils/form-error';
 
 export interface UserProfilePictureControllerOptions {
   onChange?: (file: File) => Promise<void>;
@@ -10,61 +7,38 @@ export interface UserProfilePictureControllerOptions {
 }
 
 export interface UserProfilePictureController {
-  onChange?: (file: File) => Promise<void>;
-  onRemove?: () => Promise<void>;
+  onChange?: (file: File) => void;
+  onRemove?: () => void;
   isPending: boolean;
   previewUrl: string | undefined;
-  error: LocalizableError | undefined;
+  error: string | undefined;
 }
 
 export function useUserProfilePictureController({
   onChange,
   onRemove,
 }: UserProfilePictureControllerOptions): UserProfilePictureController {
-  const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<LocalizableError>();
-  const [preview, setPreview] = useState<File>();
-  const previewUrl = FileUpload.useObjectUrl(preview);
-  const inFlight = useRef(false);
-
-  const run = async (action: () => Promise<void>, revert?: () => void) => {
-    if (inFlight.current) {
-      return;
-    }
-    inFlight.current = true;
-    setIsPending(true);
-    setError(undefined);
-    try {
-      await action();
-    } catch (cause) {
-      revert?.();
-      setError(toFormError(cause).global);
-    } finally {
-      inFlight.current = false;
-      setIsPending(false);
-    }
+  const form = useForm<{ file: File | undefined }>({
+    initialValues: { file: undefined },
+    onSubmit: async ({ file }) => {
+      if (file) {
+        await onChange?.(file);
+      } else {
+        await onRemove?.();
+      }
+    },
+  });
+  const previewUrl = FileUpload.useObjectUrl(form.error ? undefined : form.values.file);
+  const picked = (file: File | undefined) => {
+    form.setValue('file', file);
+    form.submit();
   };
 
   return {
-    onChange: onChange
-      ? file =>
-          run(
-            () => {
-              setPreview(file);
-              return onChange(file);
-            },
-            () => setPreview(undefined),
-          )
-      : undefined,
-    onRemove: onRemove
-      ? () =>
-          run(async () => {
-            await onRemove();
-            setPreview(undefined);
-          })
-      : undefined,
-    isPending,
+    onChange: onChange ? picked : undefined,
+    onRemove: onRemove ? () => picked(undefined) : undefined,
+    isPending: form.isSubmitting,
     previewUrl,
-    error,
+    error: form.error,
   };
 }

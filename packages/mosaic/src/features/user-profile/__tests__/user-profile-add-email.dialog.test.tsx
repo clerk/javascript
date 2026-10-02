@@ -18,6 +18,7 @@ function renderView(overrides: Partial<UserProfileAddEmailDialogProps> = {}) {
     onCodeChange: vi.fn(),
     onSubmit: vi.fn(),
     onResend: vi.fn(),
+    onConnect: vi.fn(),
     ...overrides,
   };
   return {
@@ -45,6 +46,7 @@ function VerificationExample({ onSubmit }: Pick<UserProfileAddEmailDialogProps, 
         onCodeChange={setCode}
         onSubmit={onSubmit}
         onResend={() => undefined}
+        onConnect={() => undefined}
       />
     </MosaicProvider>
   );
@@ -54,7 +56,7 @@ describe('UserProfileAddEmailDialog', () => {
   it.each(['', 'invalid-address'])('uses native email validation for %j', async emailAddress => {
     const user = userEvent.setup();
     const { props } = renderView({ emailAddress });
-    await user.click(screen.getByRole('button', { name: 'Send code' }));
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
     expect(props.onSubmit).not.toHaveBeenCalled();
     expect(screen.getByRole('textbox', { name: 'Email' })).toBeInvalid();
   });
@@ -63,8 +65,7 @@ describe('UserProfileAddEmailDialog', () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(<VerificationExample onSubmit={onSubmit} />);
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Close', exact: true })).toHaveFocus());
-    await user.click(screen.getByRole('textbox', { name: 'Verification code' }));
+    await waitFor(() => expect(screen.getByRole('textbox', { name: 'Verification code' })).toHaveFocus());
 
     if (method === 'typing') {
       await user.keyboard('12345');
@@ -77,7 +78,7 @@ describe('UserProfileAddEmailDialog', () => {
     expect(onSubmit).toHaveBeenCalledExactlyOnceWith('123456');
   });
 
-  it('focuses the email field and submits through the form or Send code', async () => {
+  it('focuses the email field and submits through the form or Continue', async () => {
     const user = userEvent.setup();
     const { props } = renderView();
 
@@ -91,7 +92,7 @@ describe('UserProfileAddEmailDialog', () => {
     emailForm.requestSubmit();
     expect(props.onSubmit).toHaveBeenCalledOnce();
 
-    await user.click(screen.getByRole('button', { name: 'Send code' }));
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
 
     expect(props.onSubmit).toHaveBeenCalledTimes(2);
   });
@@ -181,6 +182,57 @@ describe('UserProfileAddEmailDialog', () => {
         />
       </MosaicProvider>,
     );
-    expect(screen.getByRole('button', { name: 'Sending a new code…' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Sending code…' })).toBeDisabled();
+  });
+
+  it('asks the user to open the link, and lets them send a new one after the countdown', async () => {
+    const user = userEvent.setup();
+    const { props, rerender } = renderView({ step: 'link', resendSeconds: 60, errorMessage: 'Link expired' });
+    const dialog = screen.getByRole('dialog', { name: 'Verify your email' });
+    expect(dialog).toHaveTextContent('Open the link we sent to person@example.com');
+    expect(dialog).toHaveTextContent('Link expired');
+    expect(screen.queryByRole('textbox', { name: 'Verification code' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Didn’t receive a link? Resend (60)' }));
+    expect(props.onResend).not.toHaveBeenCalled();
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileAddEmailDialog
+          {...props}
+          resendSeconds={0}
+        />
+      </MosaicProvider>,
+    );
+    await user.click(screen.getByRole('button', { name: 'Didn’t receive a link? Resend' }));
+    expect(props.onResend).toHaveBeenCalledOnce();
+
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(props.onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+  });
+
+  it('asks the user to connect with the SSO provider for their email domain', async () => {
+    const user = userEvent.setup();
+    const { props } = renderView({
+      step: 'sso',
+      emailAddress: 'person@acme.co',
+      errorMessage: 'Unable to connect. Try again.',
+    });
+
+    expect(screen.getByRole('dialog', { name: 'Verify your email' })).toHaveAccessibleDescription(
+      'Connect below to verify person@acme.co',
+    );
+    expect(screen.getByText('acme.co')).toBeInTheDocument();
+    expect(screen.getByText('Enterprise SSO')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('Unable to connect. Try again.');
+
+    await user.click(screen.getByRole('button', { name: 'Connect' }));
+    expect(props.onConnect).toHaveBeenCalledOnce();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(props.onOpenChange).toHaveBeenCalledWith(false, expect.anything());
+  });
+
+  it('disables Continue when the email cannot be submitted', () => {
+    renderView({ canSubmitEmail: false });
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
   });
 });

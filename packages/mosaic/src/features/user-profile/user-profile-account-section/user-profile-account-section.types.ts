@@ -24,18 +24,28 @@ export class UserProfileSaveError<TField extends string = string> extends FormSu
   }
 }
 
-export interface UserProfilePhone {
+export interface UserProfileContact {
   id: string;
   value: string;
-  isDefault?: boolean;
-  isVerified?: boolean;
-  canRemove?: boolean;
+  isDefault: boolean;
+  isVerified: boolean;
 }
 
-export interface UserProfileEmail {
-  id: string;
-  value: string;
-  isDefault?: boolean;
-  isVerified?: boolean;
-  canRemove?: boolean;
+export type UserProfileEmail = UserProfileContact;
+
+export type UserProfilePhone = UserProfileContact;
+
+export type UserProfileEmailVerification =
+  | { method: 'code'; sent: Promise<void> }
+  | { method: 'link'; verified: Promise<void>; cancel: () => void }
+  | { method: 'sso'; verified: Promise<void>; cancel: () => void; connect: () => void };
+
+export interface UserProfileEmailVerifier {
+  start: () => UserProfileEmailVerification;
+  verifyCode: (code: string) => Promise<void>;
+}
+
+export interface UserProfilePhoneVerifier {
+  sendCode: () => Promise<void>;
+  verifyCode: (code: string) => Promise<void>;
 }

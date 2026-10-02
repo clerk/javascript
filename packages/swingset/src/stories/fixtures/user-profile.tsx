@@ -42,7 +42,7 @@ export interface UserProfileFixtureOptions {
 
 const exampleEmails: UserProfileEmail[] = [
   { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
-  { id: 'email_2', value: 'preston.booth@gmail.com', isVerified: true },
+  { id: 'email_2', value: 'preston.booth@gmail.com', isDefault: false, isVerified: true },
 ];
 
 const examplePhones: UserProfilePhone[] = [
@@ -107,9 +107,16 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const apiKeys = useAPIKeysTableFixture();
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const addEmail = (value: string) =>
-    setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: false }]);
+    setEmails(current => [...current, { id: `email_${Date.now()}`, value, isDefault: false, isVerified: false }]);
+  const phoneFlow = createUserProfileAddPhoneFixture({
+    onCreated: (id, value) => setPhones(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+    onVerified: id =>
+      setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
+  });
   const emailFlow = createUserProfileAddEmailFixture({
-    onVerified: value => setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: true }]),
+    onCreated: (id, value) => setEmails(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+    onVerified: id =>
+      setEmails(current => current.map(email => (email.id === id ? { ...email, isVerified: true } : email))),
   });
 
   const pages: UserProfileViewProps['pages'] = {
@@ -135,11 +142,9 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       emails,
       phones,
       onAddEmail,
-      onSendEmailCode: onAddEmail ? undefined : emailFlow.onSendEmailCode,
-      onVerifyEmailCode: onAddEmail ? undefined : emailFlow.onVerifyEmailCode,
-      ...createUserProfileAddPhoneFixture({
-        onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
-      }),
+      onCreateEmail: onAddEmail ? undefined : emailFlow.onCreateEmail,
+      getEmailVerifier: onAddEmail ? undefined : emailFlow.getEmailVerifier,
+      ...phoneFlow,
       deleteAccountSlot: <UserProfileDeleteAccountPreview />,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,

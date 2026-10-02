@@ -8,8 +8,7 @@ describe('UserProfileContactListRowView', () => {
   it.each(['email', 'phone'] as const)('hides the menu when no %s action applies', kind => {
     const onVerify = vi.fn();
     const onSetPrimary = vi.fn();
-    const onRemove = vi.fn();
-    const item = { id: 'contact_1', value: 'Contact', isDefault: true, isVerified: true, canRemove: false };
+    const item = { id: 'contact_1', value: 'Contact', isDefault: true, isVerified: true };
     render(
       <UserProfileContactListRowView
         kind={kind}
@@ -17,11 +16,26 @@ describe('UserProfileContactListRowView', () => {
         items={[item]}
         onVerify={onVerify}
         onSetPrimary={onSetPrimary}
-        onRemove={onRemove}
       />,
     );
 
     expect(screen.queryByRole('button', { name: 'Manage Contact' })).not.toBeInTheDocument();
+  });
+
+  it.each(['email', 'phone'] as const)('marks an unverified %s', kind => {
+    render(
+      <UserProfileContactListRowView
+        kind={kind}
+        label='Contacts'
+        items={[
+          { id: 'contact_1', value: 'Verified contact', isDefault: false, isVerified: true },
+          { id: 'contact_2', value: 'Pending contact', isDefault: false, isVerified: false },
+        ]}
+      />,
+    );
+
+    expect(screen.getAllByText('Unverified')).toHaveLength(1);
+    expect(screen.getByText('Pending contact').parentElement).toHaveTextContent('Unverified');
   });
 
   it('offers removal when it applies', async () => {
@@ -31,7 +45,7 @@ describe('UserProfileContactListRowView', () => {
       <UserProfileContactListRowView
         kind='phone'
         label='Phones'
-        items={[{ id: 'contact_1', value: 'Contact' }]}
+        items={[{ id: 'contact_1', value: 'Contact', isDefault: false, isVerified: true }]}
         onRemove={onRemove}
       />,
     );
