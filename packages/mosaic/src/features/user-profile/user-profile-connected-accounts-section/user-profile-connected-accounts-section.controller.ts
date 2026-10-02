@@ -22,6 +22,8 @@ export interface UserProfileConnectedAccountsController {
   onReconnect: (id: string) => void;
 }
 
+const OAUTH_REDIRECT_HOLD_MS = 2000;
+
 export function useUserProfileConnectedAccountsController({
   accounts,
   availableProviders,
@@ -30,15 +32,10 @@ export function useUserProfileConnectedAccountsController({
 }: UserProfileConnectedAccountsControllerOptions): UserProfileConnectedAccountsController {
   const messages = useMessages('userProfileConnectedAccounts');
   const [pendingId, setPendingId] = useState<string>();
-  const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
-  const [reconnectErrors, setReconnectErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const connecting = useRef(false);
 
-  const run = async (
-    id: string,
-    action: (id: string) => Promise<ConnectedAccountActionResult>,
-    setErrors: typeof setConnectErrors,
-  ) => {
+  const run = async (id: string, action: (id: string) => Promise<ConnectedAccountActionResult>) => {
     if (connecting.current) {
       return;
     }
@@ -48,7 +45,7 @@ export function useUserProfileConnectedAccountsController({
 
     try {
       if ((await action(id)) === 'redirecting') {
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, OAUTH_REDIRECT_HOLD_MS));
       }
     } catch (error) {
       setErrors(current => ({ ...current, [id]: error instanceof Error ? error.message : messages.errors.generic }));
@@ -60,13 +57,13 @@ export function useUserProfileConnectedAccountsController({
 
   return {
     accounts: accounts.map(account =>
-      reconnectErrors[account.id] ? { ...account, reconnectError: reconnectErrors[account.id] } : account,
+      errors[account.id] ? { ...account, reconnectError: errors[account.id] } : account,
     ),
     availableProviders: availableProviders.map(provider =>
-      connectErrors[provider.id] ? { ...provider, connectError: connectErrors[provider.id] } : provider,
+      errors[provider.id] ? { ...provider, connectError: errors[provider.id] } : provider,
     ),
     pendingId,
-    onConnect: id => void run(id, onConnect, setConnectErrors),
-    onReconnect: id => void run(id, onReconnect, setReconnectErrors),
+    onConnect: id => void run(id, onConnect),
+    onReconnect: id => void run(id, onReconnect),
   };
 }

@@ -3,10 +3,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
   allowsIdentificationCreation,
-  getEnabledOAuthStrategies,
-  getRecovery,
-  getRetry,
+  createProviderCatalog,
   projectConnectedAccounts,
+  recoveryFor,
 } from './user-profile-connected-accounts-section.model';
 
 type AccountInput = {
@@ -57,8 +56,8 @@ function userWith(
   };
 }
 
-function social(...strategies: string[]): Parameters<typeof getEnabledOAuthStrategies>[0] {
-  return Object.fromEntries(
+function social(...strategies: string[]) {
+  const settings = Object.fromEntries(
     strategies.map(strategy => [
       strategy,
       {
@@ -69,18 +68,58 @@ function social(...strategies: string[]): Parameters<typeof getEnabledOAuthStrat
       },
     ]),
   );
+  return createProviderCatalog(strategies.toSorted(), settings);
+}
+
+function recoveryPlan(input: ReturnType<typeof account>, scopes: Parameters<typeof recoveryFor>[1]) {
+  return recoveryFor(input, scopes, createProviderCatalog([], {}, [input])).plan;
 }
 
 describe('projectConnectedAccounts', () => {
+  it('keeps existing accounts visible when only an unsupported provider is enabled', () => {
+    const projection = projectConnectedAccounts({
+      user: userWith([account({ id: 'idn_google', provider: 'google' })]),
+      providers: social('oauth_future'),
+      socialEnabled: true,
+      allowCreation: true,
+    });
+    expect(projection).toMatchObject({
+      status: 'ready',
+      accounts: [{ id: 'idn_google' }],
+      availableProviders: [],
+    });
+  });
+
+  it('keeps custom and built-in providers in the settings strategy order', () => {
+    const projection = projectConnectedAccounts({
+      user: userWith([]),
+      providers: social('oauth_google', 'oauth_custom_acme', 'oauth_apple'),
+      socialEnabled: true,
+      allowCreation: true,
+    });
+    expect(projection.status === 'ready' && projection.availableProviders.map(provider => provider.id)).toEqual([
+      'oauth_apple',
+      'oauth_custom_acme',
+      'oauth_google',
+    ]);
+  });
+
   it('is hidden when no social provider is enabled', () => {
-    expect(projectConnectedAccounts({ user: userWith([]), social: {}, allowCreation: true })).toEqual({
+    expect(
+      projectConnectedAccounts({ user: userWith([]), providers: [], socialEnabled: false, allowCreation: true }),
+    ).toEqual({
       status: 'hidden',
     });
   });
 
   it('resolves empty rows when creation is disallowed and no accounts remain', () => {
     expect(
-      projectConnectedAccounts({ user: userWith([]), social: social('oauth_google'), allowCreation: false }),
+      projectConnectedAccounts({
+        user: userWith([]),
+        providers: social('oauth_google'),
+        socialEnabled: true,
+        allowCreation: false,
+      }),
     ).toEqual({
       status: 'ready',
       accounts: [],
@@ -91,7 +130,8 @@ describe('projectConnectedAccounts', () => {
   it('stays visible when creation is disallowed but a pending account exists', () => {
     const projection = projectConnectedAccounts({
       user: userWith([account({ id: 'idn_1', provider: 'google', status: 'unverified' })]),
-      social: social('oauth_google'),
+      providers: social('oauth_google'),
+      socialEnabled: true,
       allowCreation: false,
     });
     expect(projection).toEqual({ status: 'ready', accounts: [], availableProviders: [] });
@@ -104,7 +144,8 @@ describe('projectConnectedAccounts', () => {
         account({ id: 'idn_pending', provider: 'apple', status: 'unverified' }),
         account({ id: 'idn_verified', provider: 'google' }),
       ]),
-      social: social('oauth_google', 'oauth_github', 'oauth_apple'),
+      providers: social('oauth_google', 'oauth_github', 'oauth_apple'),
+      socialEnabled: true,
       allowCreation: true,
     });
     expect(projection.status === 'ready' && projection.accounts.map(a => a.id)).toEqual(['idn_verified', 'idn_failed']);
@@ -116,7 +157,8 @@ describe('projectConnectedAccounts', () => {
         account({ id: 'idn_1', provider: 'github', username: 'octo', emailAddress: 'octo@example.com' }),
         account({ id: 'idn_2', provider: 'google', emailAddress: 'g@example.com' }),
       ]),
-      social: social('oauth_google', 'oauth_github'),
+      providers: social('oauth_google', 'oauth_github'),
+      socialEnabled: true,
       allowCreation: true,
     });
     expect(projection.status === 'ready' && projection.accounts.map(a => a.identifier)).toEqual([
@@ -132,7 +174,8 @@ describe('projectConnectedAccounts', () => {
         account({ id: 'idn_github', provider: 'github', status: 'unverified', errorCode: 'oauth_access_denied' }),
         account({ id: 'idn_acme', provider: 'custom_acme', status: 'unverified' }),
       ]),
-      social: social('oauth_google', 'oauth_github', 'oauth_custom_acme'),
+      providers: social('oauth_google', 'oauth_github', 'oauth_custom_acme'),
+      socialEnabled: true,
       allowCreation: true,
     });
     expect(projection.status === 'ready' && projection.availableProviders.map(p => p.id)).toEqual([
@@ -143,7 +186,8 @@ describe('projectConnectedAccounts', () => {
   it('uses configured names and logos for custom providers', () => {
     const projection = projectConnectedAccounts({
       user: userWith([account({ id: 'idn_1', provider: 'custom_acme' })]),
-      social: social('oauth_custom_acme'),
+      providers: social('oauth_custom_acme'),
+      socialEnabled: true,
       allowCreation: true,
     });
     expect(projection.status === 'ready' && projection.accounts[0]).toMatchObject({
@@ -155,7 +199,8 @@ describe('projectConnectedAccounts', () => {
   it('marks monochrome provider logos', () => {
     const projection = projectConnectedAccounts({
       user: userWith([]),
-      social: social('oauth_github', 'oauth_google'),
+      providers: social('oauth_github', 'oauth_google'),
+      socialEnabled: true,
       allowCreation: true,
     });
     expect(
@@ -169,7 +214,8 @@ describe('projectConnectedAccounts', () => {
   it('offers no providers when creation is disallowed', () => {
     const projection = projectConnectedAccounts({
       user: userWith([account({ id: 'idn_1', provider: 'google' })]),
-      social: social('oauth_google', 'oauth_github'),
+      providers: social('oauth_google', 'oauth_github'),
+      socialEnabled: true,
       allowCreation: false,
     });
     expect(projection.status === 'ready' && projection.availableProviders).toEqual([]);
@@ -192,7 +238,8 @@ describe('projectConnectedAccounts', () => {
           longMessage: 'This account is already connected.',
         }),
       ]),
-      social: social('oauth_google', 'oauth_github'),
+      providers: social('oauth_google', 'oauth_github'),
+      socialEnabled: true,
       allowCreation: true,
     });
     expect(projection.status === 'ready' && projection.accounts).toMatchObject([
@@ -202,14 +249,23 @@ describe('projectConnectedAccounts', () => {
   });
 });
 
-describe('getRecovery', () => {
+describe('recoveryFor', () => {
+  it('does not retry an unsupported verification strategy', () => {
+    expect(
+      recoveryPlan(
+        account({ id: 'idn_1', provider: 'google', strategy: 'unknown', errorCode: 'oauth_fetch_user_error' }),
+        undefined,
+      ),
+    ).toBeNull();
+  });
+
   it.each([
     'external_account_missing_refresh_token',
     'oauth_fetch_user_error',
     'oauth_token_exchange_error',
     'external_account_email_address_verification_required',
   ])('recreates the account for %s', code => {
-    expect(getRecovery(account({ id: 'idn_1', provider: 'github', errorCode: code }), undefined)).toEqual({
+    expect(recoveryPlan(account({ id: 'idn_1', provider: 'github', errorCode: code }), undefined)).toEqual({
       kind: 'create',
       strategy: 'oauth_github',
       additionalScopes: [],
@@ -217,7 +273,7 @@ describe('getRecovery', () => {
   });
 
   it('normalizes google one tap to the google strategy', () => {
-    const recovery = getRecovery(
+    const recovery = recoveryPlan(
       account({ id: 'idn_1', provider: 'google', strategy: 'google_one_tap', errorCode: 'oauth_fetch_user_error' }),
       undefined,
     );
@@ -225,7 +281,7 @@ describe('getRecovery', () => {
   });
 
   it('reauthorizes with the full requested scope list when any scope is missing', () => {
-    const recovery = getRecovery(account({ id: 'idn_1', provider: 'google', approvedScopes: 'email profile' }), {
+    const recovery = recoveryPlan(account({ id: 'idn_1', provider: 'google', approvedScopes: 'email profile' }), {
       google: ['email', 'calendar'],
     });
     expect(recovery).toEqual({ kind: 'reauthorize', additionalScopes: ['email', 'calendar'] });
@@ -233,7 +289,7 @@ describe('getRecovery', () => {
 
   it('does not reauthorize when every requested scope is approved', () => {
     expect(
-      getRecovery(account({ id: 'idn_1', provider: 'google', approvedScopes: 'email calendar' }), {
+      recoveryPlan(account({ id: 'idn_1', provider: 'google', approvedScopes: 'email calendar' }), {
         google: ['calendar'],
       }),
     ).toBeNull();
@@ -241,22 +297,26 @@ describe('getRecovery', () => {
 
   it('does not offer recovery when scopes are missing and none were approved', () => {
     expect(
-      getRecovery(account({ id: 'idn_1', provider: 'google', approvedScopes: '' }), { google: ['calendar'] }),
+      recoveryPlan(account({ id: 'idn_1', provider: 'google', approvedScopes: '' }), { google: ['calendar'] }),
     ).toBeNull();
   });
 
-  it('ignores unrecognized verification errors', () => {
-    expect(getRecovery(account({ id: 'idn_1', provider: 'google', errorCode: 'oauth_access_denied' }), undefined)).toBe(
-      null,
-    );
+  it('keeps other verification errors on an error row with a retry plan', () => {
+    const input = account({ id: 'idn_1', provider: 'google', errorCode: 'oauth_access_denied' });
+    expect(recoveryFor(input, undefined, social('oauth_google'))).toEqual({
+      status: 'error',
+      plan: { kind: 'create', strategy: 'oauth_google', additionalScopes: [] },
+    });
   });
 });
 
-describe('getEnabledOAuthStrategies', () => {
-  it('sorts known strategies, appends custom ones, and drops unknown ones', () => {
+describe('createProviderCatalog', () => {
+  it('keeps canonical strategy order and drops unknown strategies', () => {
     expect(
-      getEnabledOAuthStrategies(social('oauth_github', 'oauth_custom_acme', 'oauth_future', 'oauth_apple')),
-    ).toEqual(['oauth_apple', 'oauth_github', 'oauth_custom_acme']);
+      social('oauth_github', 'oauth_custom_acme', 'oauth_future', 'oauth_apple')
+        .filter(provider => provider.enabled)
+        .map(provider => provider.strategy),
+    ).toEqual(['oauth_apple', 'oauth_custom_acme', 'oauth_github']);
   });
 });
 
@@ -280,10 +340,10 @@ describe('allowsIdentificationCreation', () => {
   });
 });
 
-describe('getRetry', () => {
+describe('recoveryFor retry', () => {
   it('retries a failed connection with its strategy and missing scopes', () => {
     expect(
-      getRetry(
+      recoveryPlan(
         account({
           id: 'idn_1',
           provider: 'google',
@@ -297,6 +357,6 @@ describe('getRetry', () => {
   });
 
   it('does not retry an account without an error', () => {
-    expect(getRetry(account({ id: 'idn_1', provider: 'google' }), undefined)).toBeNull();
+    expect(recoveryPlan(account({ id: 'idn_1', provider: 'google' }), undefined)).toBeNull();
   });
 });

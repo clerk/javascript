@@ -3,37 +3,40 @@ import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStatePara
 import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type {
+  ClerkAPIError,
   CustomOauthProvider,
+  EnterpriseAccountConnectionResource,
+  EnterpriseAccountResource,
   EnterpriseSSOSettings,
   ExternalAccountResource,
   OAuthProvider,
   OAuthProviders,
   OAuthScope,
   OAuthStrategy,
+  VerificationResource,
 } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { useErrorText, useMessages } from '../../../localization';
-import { connectedAccountErrorMessage } from './user-profile-connected-accounts-feedback';
+import { connectedAccountFeedback } from './user-profile-connected-accounts-feedback';
 import type {
   ConnectedAccountActionResult,
+  ConnectedAccountProviderDisplay,
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
 } from './user-profile-connected-accounts-section.types';
 import { ConnectedAccountActionError } from './user-profile-connected-accounts-section.types';
 
 type AccountData = Pick<ExternalAccountResource, 'id' | 'provider' | 'approvedScopes' | 'username' | 'emailAddress'> & {
-  verification: {
-    strategy: string | null;
-    error: { code: string; longMessage?: string } | null;
-  } | null;
+  verification:
+    | (Pick<VerificationResource, 'strategy'> & { error: Pick<ClerkAPIError, 'code' | 'longMessage'> | null })
+    | null;
 };
 type EnterpriseUser = {
-  enterpriseAccounts: {
-    active: boolean;
-    enterpriseConnection?: { disableAdditionalIdentifications: boolean } | null;
-  }[];
+  enterpriseAccounts: (Pick<EnterpriseAccountResource, 'active'> & {
+    enterpriseConnection?: Pick<EnterpriseAccountConnectionResource, 'disableAdditionalIdentifications'> | null;
+  })[];
 };
 type ProjectedUser = {
   verifiedExternalAccounts: AccountData[];
@@ -45,6 +48,18 @@ export type AdditionalOAuthScopes = Partial<Record<OAuthProvider, OAuthScope[]>>
 export type ConnectedAccountRecovery =
   | { kind: 'reauthorize'; additionalScopes: string[] }
   | { kind: 'create'; strategy: OAuthStrategy; additionalScopes: string[] };
+
+export interface ConnectedAccountProvider {
+  strategy: OAuthStrategy;
+  provider: OAuthProvider;
+  display: ConnectedAccountProviderDisplay;
+  enabled: boolean;
+}
+
+export interface ConnectedAccountRecoveryState {
+  status: UserProfileConnectedAccount['status'];
+  plan: ConnectedAccountRecovery | null;
+}
 
 export type ConnectedAccountsProjection =
   | { status: 'hidden' }
@@ -64,55 +79,52 @@ const RECONNECT_ERROR_CODES = [
 const MONOCHROME_PROVIDERS = ['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x'];
 
 type SocialSettings = Partial<
-  Record<string, Pick<OAuthProviders[OAuthStrategy], 'enabled' | 'name' | 'logo_url'> & { strategy: string }>
+  Record<string, Pick<OAuthProviders[OAuthStrategy], 'name' | 'logo_url'> & { strategy: string }>
 >;
 
-export function getProviderDisplay(
-  provider: string,
+export function createProviderCatalog(
+  enabledStrategies: readonly string[],
   social: SocialSettings,
-): Omit<UserProfileConnectionProvider, 'id'> {
-  const known = OAUTH_PROVIDERS.find(p => p.provider === provider);
-  if (known) {
-    return {
-      provider: known.name,
-      iconUrl: iconImageUrl(known.provider),
-      monochromeIcon: MONOCHROME_PROVIDERS.includes(known.provider),
-    };
-  }
-
-  const custom = Object.values(social).find(settings => settings?.strategy === `oauth_${provider}`);
-  if (custom) {
-    return { provider: custom.name || provider, iconUrl: custom.logo_url || undefined };
-  }
-
-  return { provider };
-}
-
-export function getEnabledOAuthStrategies(social: SocialSettings): OAuthStrategy[] {
-  const enabled = Object.values(social)
-    .flatMap(settings => (settings?.enabled ? [settings.strategy] : []))
-    .sort();
-  const known = enabled.flatMap(strategy => {
-    const provider = OAUTH_PROVIDERS.find(provider => provider.strategy === strategy);
-    return provider ? [provider.strategy] : [];
-  });
-  const custom = enabled.flatMap(strategy => {
-    if (!strategy.startsWith('oauth_custom_')) {
-      return [];
+  accounts: AccountData[] = [],
+): ConnectedAccountProvider[] {
+  const enabled = new Set(enabledStrategies);
+  const providers: ConnectedAccountProvider[] = OAUTH_PROVIDERS.map(({ strategy, provider, name }) => ({
+    strategy,
+    provider,
+    enabled: enabled.has(strategy),
+    display: {
+      provider: name,
+      iconUrl: iconImageUrl(provider),
+      monochromeIcon: MONOCHROME_PROVIDERS.includes(provider),
+    },
+  }));
+  const candidates = new Set([
+    ...enabledStrategies,
+    ...Object.values(social).flatMap(settings => (settings ? [settings.strategy] : [])),
+    ...accounts.flatMap(account => [`oauth_${account.provider}`, account.verification?.strategy ?? '']),
+  ]);
+  for (const candidate of candidates) {
+    if (!candidate.startsWith('oauth_custom_')) {
+      continue;
     }
-    const customStrategy: OAuthStrategy = `oauth_custom_${strategy.slice('oauth_custom_'.length)}`;
-    return [customStrategy];
-  });
-  return [...known, ...custom];
-}
-
-function providerFor(strategy: OAuthStrategy): OAuthProvider {
-  const known = OAUTH_PROVIDERS.find(p => p.strategy === strategy);
-  if (known) {
-    return known.provider;
+    const suffix = candidate.slice('oauth_custom_'.length);
+    const strategy: OAuthStrategy = `oauth_custom_${suffix}`;
+    const provider: CustomOauthProvider = `custom_${suffix}`;
+    const settings = social[strategy];
+    providers.push({
+      strategy,
+      provider,
+      enabled: enabled.has(strategy),
+      display: { provider: settings?.name || provider, iconUrl: settings?.logo_url || undefined },
+    });
   }
-  const custom: CustomOauthProvider = `custom_${strategy.slice('oauth_custom_'.length)}`;
-  return custom;
+  return [
+    ...enabledStrategies.flatMap(strategy => {
+      const provider = providers.find(provider => provider.strategy === strategy);
+      return provider ? [provider] : [];
+    }),
+    ...providers.filter(provider => !provider.enabled),
+  ];
 }
 
 export function allowsIdentificationCreation(
@@ -133,50 +145,42 @@ function findAdditionalScopes(account: AccountData, scopes: AdditionalOAuthScope
   return requested.some(scope => !approved.includes(scope)) ? requested : [];
 }
 
-export function getRecovery(
+export function recoveryFor(
   account: AccountData,
   scopes: AdditionalOAuthScopes | undefined,
-): ConnectedAccountRecovery | null {
+  providers: ConnectedAccountProvider[],
+): ConnectedAccountRecoveryState {
   const additionalScopes = findAdditionalScopes(account, scopes);
   if (additionalScopes.length > 0 && account.approvedScopes !== '') {
-    return { kind: 'reauthorize', additionalScopes };
+    return { status: 'reconnect', plan: { kind: 'reauthorize', additionalScopes } };
   }
-
-  if (!RECONNECT_ERROR_CODES.includes(account.verification?.error?.code ?? '')) {
-    return null;
+  const error = account.verification?.error;
+  if (!error) {
+    return { status: 'connected', plan: null };
   }
-
-  return createRecovery(account, additionalScopes);
-}
-
-export function getRetry(
-  account: AccountData,
-  scopes: AdditionalOAuthScopes | undefined,
-): ConnectedAccountRecovery | null {
-  if (!account.verification?.error) {
-    return null;
-  }
-  return createRecovery(account, findAdditionalScopes(account, scopes));
-}
-
-function createRecovery(account: AccountData, additionalScopes: string[]): ConnectedAccountRecovery {
   const verificationStrategy = account.verification?.strategy;
-  const strategy = (
-    verificationStrategy === 'google_one_tap' ? 'oauth_google' : verificationStrategy || `oauth_${account.provider}`
-  ) as OAuthStrategy;
-  return { kind: 'create', strategy, additionalScopes };
+  const provider = verificationStrategy
+    ? providers.find(
+        provider =>
+          provider.strategy === (verificationStrategy === 'google_one_tap' ? 'oauth_google' : verificationStrategy),
+      )
+    : providers.find(provider => provider.provider === account.provider);
+  return {
+    status: RECONNECT_ERROR_CODES.includes(error.code) ? 'reconnect' : 'error',
+    plan: provider ? { kind: 'create', strategy: provider.strategy, additionalScopes } : null,
+  };
 }
 
 function toAccountRow(
   account: AccountData,
-  social: SocialSettings,
+  providers: ConnectedAccountProvider[],
   scopes: AdditionalOAuthScopes | undefined,
 ): UserProfileConnectedAccount {
   const error = account.verification?.error;
-  const status = getRecovery(account, scopes) ? 'reconnect' : error?.code ? 'error' : 'connected';
+  const { status } = recoveryFor(account, scopes, providers);
   return {
     id: account.id,
-    ...getProviderDisplay(account.provider, social),
+    ...(providers.find(provider => provider.provider === account.provider)?.display ?? { provider: account.provider }),
     identifier: account.username || account.emailAddress || undefined,
     status,
     verificationError: status === 'error' ? error?.longMessage : undefined,
@@ -185,16 +189,17 @@ function toAccountRow(
 
 export function projectConnectedAccounts({
   user,
-  social,
+  providers,
+  socialEnabled,
   allowCreation,
   additionalOAuthScopes,
 }: {
   user: ProjectedUser;
-  social: SocialSettings;
+  providers: ConnectedAccountProvider[];
+  socialEnabled: boolean;
   allowCreation: boolean;
   additionalOAuthScopes?: AdditionalOAuthScopes;
 }): ConnectedAccountsProjection {
-  const socialEnabled = Object.values(social).some(settings => settings?.enabled);
   if (!socialEnabled) {
     return { status: 'hidden' };
   }
@@ -203,15 +208,15 @@ export function projectConnectedAccounts({
     ...user.verifiedExternalAccounts,
     ...user.unverifiedExternalAccounts.filter(account => account.verification?.error),
   ];
-  const shownStrategies = displayed.map(account => `oauth_${account.provider}`);
+  const shownProviders = new Set(displayed.map(account => account.provider));
 
   return {
     status: 'ready',
-    accounts: displayed.map(account => toAccountRow(account, social, additionalOAuthScopes)),
+    accounts: displayed.map(account => toAccountRow(account, providers, additionalOAuthScopes)),
     availableProviders: allowCreation
-      ? getEnabledOAuthStrategies(social)
-          .filter(strategy => !shownStrategies.includes(strategy))
-          .map(strategy => ({ id: strategy, ...getProviderDisplay(strategy.replace('oauth_', ''), social) }))
+      ? providers
+          .filter(provider => provider.enabled && !shownProviders.has(provider.provider))
+          .map(provider => ({ id: provider.strategy, ...provider.display }))
       : [],
   };
 }
@@ -250,9 +255,15 @@ export function useUserProfileConnectedAccountsModel({
     return { status: 'hidden', reason: 'no_user' };
   }
 
+  const providers = createProviderCatalog(
+    environment.userSettings.socialProviderStrategies,
+    environment.userSettings.social,
+    user.externalAccounts,
+  );
   const projection = projectConnectedAccounts({
     user,
-    social: environment.userSettings.social,
+    providers,
+    socialEnabled: environment.userSettings.socialProviderStrategies.length > 0,
     allowCreation: allowsIdentificationCreation(user, environment.userSettings.enterpriseSSO),
     additionalOAuthScopes,
   });
@@ -263,7 +274,7 @@ export function useUserProfileConnectedAccountsModel({
   const userId = user.id;
   const transport = clerk.__internal_oauthTransport;
 
-  const currentUser = () => {
+  const requireCurrentUser = () => {
     const current = clerk.user;
     if (!current || current.id !== userId) {
       throw new ConnectedAccountActionError('unavailable');
@@ -281,11 +292,11 @@ export function useUserProfileConnectedAccountsModel({
       throw new ConnectedAccountActionError('missing_verification_url');
     }
 
-    currentUser();
+    requireCurrentUser();
     if (transport) {
       const { callbackUrl } = await transport.open(url);
       const nonce = new URL(callbackUrl).searchParams.get('rotating_token_nonce');
-      const current = currentUser();
+      const current = requireCurrentUser();
       await (nonce ? current.reload({ rotatingTokenNonce: nonce }) : current.reload());
       return;
     }
@@ -294,41 +305,43 @@ export function useUserProfileConnectedAccountsModel({
     return 'redirecting';
   };
 
+  async function runAction<T>(action: () => Promise<T>): Promise<T> {
+    try {
+      return await action();
+    } catch (error) {
+      throw connectedAccountFeedback(error, messages, errorText);
+    }
+  }
+
   return {
     ...projection,
     userId,
-    connect: async strategyId => {
-      try {
-        const strategy = getEnabledOAuthStrategies(environment.userSettings.social).find(
-          candidate => candidate === strategyId,
-        );
-        if (!strategy) {
+    connect: strategyId =>
+      runAction(async () => {
+        const provider = providers.find(candidate => candidate.enabled && candidate.strategy === strategyId);
+        if (!provider) {
           throw new ConnectedAccountActionError('unavailable');
         }
-        const provider = providerFor(strategy);
         const redirectUrl = await getRedirectUrl();
-        const current = currentUser();
+        const current = requireCurrentUser();
         const response = await current.createExternalAccount({
-          strategy,
-          redirectUrl: withModalState(redirectUrl, provider),
-          additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider] : [],
+          strategy: provider.strategy,
+          redirectUrl: withModalState(redirectUrl, provider.provider),
+          additionalScopes: additionalOAuthScopes ? additionalOAuthScopes[provider.provider] : [],
         });
-        return await completeVerification(response);
-      } catch (error) {
-        throw new Error(connectedAccountErrorMessage(error, messages, errorText));
-      }
-    },
-    reconnect: async accountId => {
-      try {
+        return completeVerification(response);
+      }),
+    reconnect: accountId =>
+      runAction(async () => {
         const redirectUrl = await getRedirectUrl();
-        const current = currentUser();
+        const current = requireCurrentUser();
         const account = current.externalAccounts.find(candidate => candidate.id === accountId);
         if (!account) {
           throw new ConnectedAccountActionError('unavailable');
         }
-        const recovery = getRecovery(account, additionalOAuthScopes) ?? getRetry(account, additionalOAuthScopes);
+        const { plan: recovery } = recoveryFor(account, additionalOAuthScopes, providers);
         if (!recovery) {
-          return;
+          throw new ConnectedAccountActionError('unavailable');
         }
 
         const response =
@@ -342,21 +355,15 @@ export function useUserProfileConnectedAccountsModel({
                 redirectUrl: withModalState(redirectUrl),
                 additionalScopes: recovery.additionalScopes,
               });
-        return await completeVerification(response);
-      } catch (error) {
-        throw new Error(connectedAccountErrorMessage(error, messages, errorText));
-      }
-    },
-    remove: async accountId => {
-      try {
-        const account = currentUser().externalAccounts.find(candidate => candidate.id === accountId);
+        return completeVerification(response);
+      }),
+    remove: accountId =>
+      runAction(async () => {
+        const account = requireCurrentUser().externalAccounts.find(candidate => candidate.id === accountId);
         if (!account) {
           throw new ConnectedAccountActionError('unavailable');
         }
         await account.destroy();
-      } catch (error) {
-        throw new Error(connectedAccountErrorMessage(error, messages, errorText));
-      }
-    },
+      }),
   };
 }

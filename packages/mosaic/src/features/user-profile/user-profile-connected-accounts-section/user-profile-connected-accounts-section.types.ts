@@ -1,17 +1,20 @@
 export type ConnectedAccountActionResult = 'redirecting' | void;
 
-export interface UserProfileConnectionProvider {
-  id: string;
+export interface ConnectedAccountProviderDisplay {
   provider: string;
   iconUrl?: string;
   monochromeIcon?: boolean;
+}
+
+export interface UserProfileConnectionProvider extends ConnectedAccountProviderDisplay {
+  id: string;
   connectError?: string;
 }
 
-export interface UserProfileConnectedAccount extends UserProfileConnectionProvider {
+export interface UserProfileConnectedAccount extends ConnectedAccountProviderDisplay {
+  id: string;
   identifier?: string;
-  canRemove?: boolean;
-  status?: 'connected' | 'reconnect' | 'error';
+  status: 'connected' | 'reconnect' | 'error';
   verificationError?: string;
   reconnectError?: string;
 }
@@ -27,8 +30,12 @@ export interface UserProfileConnectedAccountsSectionViewProps {
 }
 
 export class ConnectedAccountActionError extends Error {
-  constructor(readonly code: 'unavailable' | 'missing_verification_url') {
-    super(code);
+  constructor(
+    readonly code: 'unavailable' | 'missing_verification_url',
+    message: string = code,
+    options?: ErrorOptions,
+  ) {
+    super(message, options);
     this.name = 'ConnectedAccountActionError';
   }
 }

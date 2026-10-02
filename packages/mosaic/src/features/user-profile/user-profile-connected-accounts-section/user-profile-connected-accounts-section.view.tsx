@@ -4,7 +4,10 @@ import { Confirmation } from '../../../blocks/confirmation';
 import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
-import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
+import {
+  UserProfileConnectedAccountRowView,
+  UserProfileConnectProviderRowView,
+} from './user-profile-connected-account-row.view';
 import type {
   UserProfileConnectedAccount,
   UserProfileConnectedAccountsSectionViewProps,
@@ -64,9 +67,9 @@ export function UserProfileConnectedAccountsSectionView({
               ))}
               {onConnect
                 ? availableProviders.map(provider => (
-                    <UserProfileConnectedAccountRowView
+                    <UserProfileConnectProviderRowView
                       key={provider.id}
-                      account={provider}
+                      provider={provider}
                       isPending={pendingId === provider.id}
                       isDisabled={isBusy}
                       onConnect={onConnect}

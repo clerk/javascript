@@ -329,6 +329,29 @@ describe('connected accounts', () => {
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('https://accounts.example/authorize'));
   });
 
+  it('reports an unavailable recovery when the account changes during redirect preparation', async () => {
+    serveFapi(signedIn([disconnectedGoogle]));
+    const redirect = deferred<string>();
+    const open = vi.fn(() => Promise.resolve({ callbackUrl: 'https://app.example/callback' }));
+    const { clerk } = await renderWithClerk(<UserProfileConnectedAccountsSection />, {
+      __internal_oauthTransport: { getRedirectUrl: () => redirect.promise, open },
+    });
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
+    const account = clerk.user?.externalAccounts[0];
+    if (!account) {
+      throw new Error('Expected Google account');
+    }
+    account.verification = null;
+    await act(async () => {
+      redirect.resolve('https://app.example/callback');
+      await redirect.promise;
+    });
+    expect(await screen.findByText('This connected account is no longer available.')).toBeInTheDocument();
+    expect(open).not.toHaveBeenCalled();
+  });
+
   it('shows a verification-required Reconnect error and permits another attempt', async () => {
     const { clerk } = await renderSection([disconnectedGoogle]);
     const navigate = vi.spyOn(clerk, 'navigate').mockImplementation(() => Promise.resolve());
