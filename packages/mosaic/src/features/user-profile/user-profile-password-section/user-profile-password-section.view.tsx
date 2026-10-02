@@ -3,11 +3,11 @@ import { useMessages } from '../../../localization';
 import { UserProfilePasswordRowView } from './user-profile-password-row.view';
 import type { UserProfilePasswordSectionViewProps } from './user-profile-password-section.types';
 
+export type { UserProfileManagedBy } from '../user-profile-managed-by';
 export type {
   UserProfileEditPasswordField,
   UserProfileEditPasswordValue,
   UserProfileEditPasswordValues,
-  UserProfilePasswordManagedBy,
   UserProfilePasswordSectionViewProps,
 } from './user-profile-password-section.types';
 

@@ -4,6 +4,7 @@ import type { APIKeyResource } from '@clerk/shared/types';
 import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
+import { FormSubmitError } from '../../components/form';
 import { useLocale, useMessages } from '../../localization';
 import { formatDate, formatRelativeTime } from './user-profile-api-keys.format';
 import type { UserProfileAPIKey } from './user-profile-api-keys-panel.types';
@@ -46,7 +47,7 @@ function useUserProfileApiKeysModel(query: string) {
         void apiKeys.revalidate();
         return created.secret ?? '';
       } catch (error) {
-        throw new Error(createErrorMessage(error, m));
+        throw new FormSubmitError({ message: createErrorMessage(error, m) });
       }
     },
     revoke: async (id: string) => {

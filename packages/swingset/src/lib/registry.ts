@@ -314,6 +314,7 @@ import {
   EmailSsoVerification as UserProfileAccountSectionEmailSsoVerification,
   meta as userProfileAccountSectionMeta,
   MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
+  NameManagedByConnection as UserProfileAccountSectionNameManagedByConnection,
   PhoneRemovalError as UserProfileAccountSectionPhoneRemovalError,
   PhoneRemovalPending as UserProfileAccountSectionPhoneRemovalPending,
 } from '../stories/user-profile-account-section.stories';
@@ -745,6 +746,7 @@ const userProfileAccountSectionModule: StoryModule = {
   meta: userProfileAccountSectionMeta,
   Default: UserProfileAccountSectionDefault,
   MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
+  NameManagedByConnection: UserProfileAccountSectionNameManagedByConnection,
   AddPhoneFails: UserProfileAccountSectionAddPhoneFails,
   AddEmailFails: UserProfileAccountSectionAddEmailFails,
   EmailLinkVerification: UserProfileAccountSectionEmailLinkVerification,

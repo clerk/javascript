@@ -39,6 +39,21 @@ function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
 }
 
 describe('UserProfileProfilePanelView', () => {
+  it('names the connection managing the name, as the section does on its own', () => {
+    renderView({ nameManagedBy: { name: 'Okta' }, onSubmitName: undefined });
+
+    expect(screen.getByText('Managed by Okta')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Edit name' })).not.toBeInTheDocument();
+  });
+
+  it('drops the rows the instance does not collect', () => {
+    renderView({ username: undefined, emails: undefined, phones: undefined });
+
+    expect(screen.queryByText('Username')).not.toBeInTheDocument();
+    expect(screen.queryByText('item1@clerk.dev')).not.toBeInTheDocument();
+    expect(screen.queryByText('+1 801-888-8181')).not.toBeInTheDocument();
+  });
+
   it('keeps the final wallet confirmation mounted until removal settles', async () => {
     const user = userEvent.setup();
     const titleRef = createRef<HTMLDivElement>();
@@ -99,7 +114,7 @@ describe('UserProfileProfilePanelView', () => {
 
   it('composes the profile content without profile navigation', () => {
     renderView({
-      onProfilePictureChange: vi.fn(),
+      onProfilePictureChange: vi.fn(() => Promise.resolve()),
       onSubmitName: () => Promise.resolve(),
       onSubmitUsername: () => Promise.resolve(),
     });
@@ -133,9 +148,12 @@ describe('UserProfileProfilePanelView', () => {
   });
 
   it('uploads the picked file when no profile picture is set', async () => {
-    const onProfilePictureChange = vi.fn();
+    const onProfilePictureChange = vi.fn(() => Promise.resolve());
     const user = userEvent.setup();
-    const { container } = renderView({ onProfilePictureChange, onRemoveProfilePicture: vi.fn() });
+    const { container } = renderView({
+      onProfilePictureChange,
+      onRemoveProfilePicture: vi.fn(() => Promise.resolve()),
+    });
 
     expect(screen.queryByRole('button', { name: 'Manage profile picture' })).toBeNull();
 
@@ -150,7 +168,7 @@ describe('UserProfileProfilePanelView', () => {
   });
 
   it('turns away a file past the size the row advertises', async () => {
-    const onProfilePictureChange = vi.fn();
+    const onProfilePictureChange = vi.fn(() => Promise.resolve());
     const onProfilePictureReject = vi.fn();
     const user = userEvent.setup();
     const { container } = renderView({ onProfilePictureChange, onProfilePictureReject });
@@ -170,7 +188,7 @@ describe('UserProfileProfilePanelView', () => {
 
   it('clears the rejection once an acceptable file is picked', async () => {
     const user = userEvent.setup();
-    const { container } = renderView({ onProfilePictureChange: vi.fn() });
+    const { container } = renderView({ onProfilePictureChange: vi.fn(() => Promise.resolve()) });
     const input = container.querySelector<HTMLInputElement>('input[type="file"]');
     if (!input) {
       throw new Error('File picker not found');
