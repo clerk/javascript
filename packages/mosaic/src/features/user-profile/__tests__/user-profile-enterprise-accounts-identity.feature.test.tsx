@@ -96,4 +96,37 @@ describe('enterprise account identity', () => {
       });
     }
   });
+
+  it.each(['switch', 'sign out'] as const)('rejects a captured click before rendering after %s', async change => {
+    serveUsers();
+    let requests = 0;
+    worker.use(
+      http.post(fapiUrl('/v1/me/external_accounts'), () => {
+        requests++;
+        return HttpResponse.json(
+          { errors: [{ code: 'unexpected_request', message: 'Unexpected request' }] },
+          { status: 400 },
+        );
+      }),
+    );
+    const { clerk } = await renderWithClerk(<UserProfileEnterpriseAccountsSection />);
+    const connect = await screen.findByRole('button', { name: 'Connect Acme Okta' });
+    if (!clerk.user) {
+      throw new Error('Expected signed-in user');
+    }
+    const create = vi.spyOn(clerk.user, 'createExternalAccount');
+    await act(async () => {
+      await (change === 'switch' ? clerk.setActive({ session: 'sess_2' }) : clerk.signOut());
+      expect(clerk.user?.id).toBe(change === 'switch' ? 'user_2' : undefined);
+      expect(connect.isConnected).toBe(true);
+      connect.click();
+      const operation = create.mock.results[0];
+      if (operation?.type === 'return') {
+        await operation.value.catch(() => undefined);
+      }
+    });
+    expect(create).not.toHaveBeenCalled();
+    expect(requests).toBe(0);
+    expect(screen.queryByRole('button', { name: 'Connect Acme Okta' })).toBeNull();
+  });
 });

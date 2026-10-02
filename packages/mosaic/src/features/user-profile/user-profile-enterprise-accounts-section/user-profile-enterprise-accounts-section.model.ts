@@ -115,7 +115,6 @@ export function useUserProfileEnterpriseAccountsModel({
   return {
     ...projection,
     userId,
-    // TODO: Add session reverification for enterprise account linking; surface API errors until then.
     connect: async connectionId => {
       const current = currentUser();
       if (!projection.connections.some(connection => connection.id === connectionId)) {

@@ -28,8 +28,6 @@ import { userProfilePasswordSectionMessages } from '../features/user-profile/use
 import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-profile-web3-wallets.messages';
 import { errorMessages } from './errors.messages';
 
-import { errorMessages } from './errors.messages';
-
 export const mosaicMessages = {
   apiKeysTable: apiKeysTableMessages,
   errors: errorMessages,

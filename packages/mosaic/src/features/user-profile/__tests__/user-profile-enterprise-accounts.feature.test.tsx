@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
@@ -258,4 +258,87 @@ describe('enterprise accounts', () => {
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
     expect(await screen.findByRole('alert')).toHaveTextContent(message);
   });
+
+  it('suppresses immediate duplicate and competing clicks, then clears feedback on retry', async () => {
+    await renderSection();
+    const request = holdRequests('post', '/v1/me/external_accounts');
+    const connect = await screen.findByRole('button', { name: 'Connect Acme Okta' });
+    const other = screen.getByRole('button', { name: 'Connect Custom SAML' });
+    act(() => {
+      connect.click();
+      connect.click();
+      other.click();
+    });
+    await waitFor(() => expect(request.requests).toHaveLength(1));
+    expect(connect).toHaveAttribute('aria-busy', 'true');
+    expect(other).toBeDisabled();
+    request.fail('enterprise_error', 'Retry this connection.');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Retry this connection.');
+    const retry = holdRequests('post', '/v1/me/external_accounts');
+    await userEvent.setup().click(connect);
+    await waitFor(() => expect(retry.requests).toHaveLength(1));
+    expect(screen.queryByRole('alert')).toBeNull();
+    retry.fail();
+  });
+
+  it('releases pending after the redirect grace period', async () => {
+    const { clerk } = await renderSection();
+    const navigate = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
+    const connect = await screen.findByRole('button', { name: 'Connect Acme Okta' });
+    await userEvent.setup().click(connect);
+    await waitFor(() => expect(navigate).toHaveBeenCalledOnce());
+    expect(connect).toHaveAttribute('aria-busy', 'true');
+    await waitFor(() => expect(connect).not.toHaveAttribute('aria-busy', 'true'), { timeout: 2500 });
+    expect(connect).toBeEnabled();
+  });
+
+  it('localizes a client-defined missing redirect error', async () => {
+    serveFapi(signedIn());
+    worker.use(
+      http.post(fapiUrl('/v1/me/external_accounts'), () =>
+        HttpResponse.json({
+          response: { object: 'external_account', verification: fapiVerification('saml', { status: 'unverified' }) },
+          client: null,
+        }),
+      ),
+    );
+    await renderWithClerk(
+      <MosaicProvider
+        localization={{
+          locale: 'fr-FR',
+          overrides: {
+            'userProfileEnterpriseAccountsSection.errors.missingVerificationUrl': 'La connexion ne peut pas démarrer.',
+          },
+        }}
+      >
+        <UserProfileEnterpriseAccountsSection />
+      </MosaicProvider>,
+    );
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('La connexion ne peut pas démarrer.');
+  });
+
+  it('preserves the section generic error override for empty API errors', async () => {
+    serveFapi(signedIn());
+    worker.use(
+      http.post(fapiUrl('/v1/me/external_accounts'), () => HttpResponse.json({ errors: [] }, { status: 400 })),
+    );
+    await renderWithClerk(
+      <MosaicProvider
+        localization={{
+          locale: 'fr-FR',
+          overrides: {
+            'errors.generic': 'Erreur globale.',
+            'userProfileEnterpriseAccountsSection.errors.generic': 'La connexion a échoué. Réessayez.',
+          },
+        }}
+      >
+        <UserProfileEnterpriseAccountsSection />
+      </MosaicProvider>,
+    );
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('La connexion a échoué. Réessayez.');
+  });
+
+  it.todo('challenges for session reverification before linking, resumes after success, and allows cancellation');
 });
