@@ -397,7 +397,6 @@ func userProfileCustomPageLabel(
 
 private let clerkNativeClientEventQueue = DispatchQueue(label: "com.clerk.expo.native-client-events")
 private var clerkNativeAuthFlowChangedEmitter: (([String: Any]?) -> Void)?
-private var clerkNativeClientChangedEmitter: (([String: Any]?) -> Void)?
 private var clerkNativeClientInvalidatedEmitter: (() -> Void)?
 
 struct ClerkNativeErrorDescriptor {
@@ -432,8 +431,6 @@ private struct ClerkExpoHeaderMiddleware: ClerkRequestMiddleware {
 final class ClerkNativeBridge {
   static let shared = ClerkNativeBridge()
 
-  private static let clerkLoadMaxAttempts = 30
-  private static let clerkLoadIntervalNs: UInt64 = 100_000_000
   private static var clerkConfigured = false
   private static var configuredPublishableKey: String?
 
@@ -441,12 +438,9 @@ final class ClerkNativeBridge {
   var lightTheme: ClerkTheme?
   var darkTheme: ClerkTheme?
 
-  private var clientObservationGeneration = 0
-  private var lastObservedClientState: ClientStateSnapshot?
   private var authFlowObservationGeneration = 0
   private var lastObservedAuthFlowState: AuthFlowStateSnapshot?
   private var configurationDepth = 0
-  private var jsOriginatedClientSyncDepth = 0
   private var clientInvalidationGeneration = 0
   private var clientInvalidationTracker: ClerkClientInvalidationTracker?
   private var pendingURL: URL?
@@ -454,21 +448,9 @@ final class ClerkNativeBridge {
 
   private init() {}
 
-  private struct ClientStateSnapshot: Equatable {
-    let client: Client?
-    let deviceToken: String?
-  }
-
   private struct AuthFlowStateSnapshot: Equatable {
     let isLoaded: Bool
     let isAuthFlowComplete: Bool
-  }
-
-  private struct ClientStateChanges {
-    let client: Bool
-    let deviceToken: Bool
-
-    static let all = ClientStateChanges(client: true, deviceToken: true)
   }
 
   /// Resolves the keychain service name, checking ClerkKeychainService in Info.plist first
@@ -482,7 +464,6 @@ final class ClerkNativeBridge {
 
   @MainActor
   private func endConfiguration() {
-    lastObservedClientState = Self.clerkConfigured ? Self.clientStateSnapshot() : nil
     let authFlowState = Self.authFlowStateSnapshot()
     lastObservedAuthFlowState = authFlowState
     configurationDepth = max(0, configurationDepth - 1)
@@ -494,55 +475,6 @@ final class ClerkNativeBridge {
       shouldFlushPendingURL = false
       flushPendingURL()
     }
-  }
-
-  @MainActor
-  func configure(publishableKey: String, bearerToken: String? = nil) async throws {
-    configurationDepth += 1
-    defer { endConfiguration() }
-
-    loadThemes()
-
-    if Self.shouldReconfigure(for: publishableKey) {
-      try await Clerk.reconfigure(publishableKey: publishableKey, options: Self.makeClerkOptions())
-      Self.clerkConfigured = true
-      Self.configuredPublishableKey = publishableKey
-      startClientObserver(reset: true)
-      startAuthFlowObserver(reset: true)
-
-      let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
-      await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
-      Self.postConfiguredNotification()
-      shouldFlushPendingURL = true
-      return
-    }
-
-    if Self.clerkConfigured {
-      startClientObserver()
-      startAuthFlowObserver()
-      let didUpdateDeviceToken = try await Self.syncTokenState(bearerToken: bearerToken)
-      if didUpdateDeviceToken {
-        await Self.waitForLoadedClient()
-      } else if let token = bearerToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty {
-        // A remounted JS runtime can have the same token while native client
-        // state is stale, so preserve one refresh in that case.
-        _ = try await Clerk.shared.refreshClient()
-        await Self.waitForLoadedClient()
-      }
-      shouldFlushPendingURL = true
-      return
-    }
-
-    Self.clerkConfigured = true
-    Self.configuredPublishableKey = publishableKey
-    Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
-    startClientObserver()
-    startAuthFlowObserver()
-
-    let shouldWaitForClient = try await Self.syncTokenState(bearerToken: bearerToken)
-    await Self.waitForLoadedClientIfNeeded(shouldWaitForClient)
-    Self.postConfiguredNotification()
-    shouldFlushPendingURL = true
   }
 
   /// Configures ClerkKit without waiting for the client to load. ClerkKit's stored device token
@@ -558,17 +490,14 @@ final class ClerkNativeBridge {
     if Self.shouldReconfigure(for: publishableKey) {
       try await Clerk.reconfigure(publishableKey: publishableKey, options: Self.makeClerkOptions())
       Self.configuredPublishableKey = publishableKey
-      startClientObserver(reset: true)
       startAuthFlowObserver(reset: true)
     } else if Self.clerkConfigured {
       didConfigure = false
-      startClientObserver()
       startAuthFlowObserver()
     } else {
       Self.clerkConfigured = true
       Self.configuredPublishableKey = publishableKey
       Clerk.configure(publishableKey: publishableKey, options: Self.makeClerkOptions())
-      startClientObserver()
       startAuthFlowObserver()
     }
 
@@ -669,7 +598,7 @@ final class ClerkNativeBridge {
   /// `AuthView` only reaches `Clerk.handle(_:)` from `.onOpenURL`, which never fires for a UIKit-hosted controller.
   @MainActor
   func handle(url: URL) {
-    // A cold launch delivers the callback before, or partway through, JS calling `configure`.
+    // A cold launch delivers the callback before, or partway through, JS calling `configureNative`.
     guard Self.clerkConfigured, configurationDepth == 0 else {
       pendingURL = url
       return
@@ -680,47 +609,6 @@ final class ClerkNativeBridge {
         try await Clerk.shared.handle(url)
       } catch {
         NSLog("[Clerk] Failed to handle callback URL: \(error.localizedDescription)")
-      }
-    }
-  }
-
-  @MainActor
-  private func startClientObserver(reset: Bool = false) {
-    guard reset || clientObservationGeneration == 0 else {
-      return
-    }
-
-    clientObservationGeneration += 1
-    let generation = clientObservationGeneration
-    lastObservedClientState = Self.clientStateSnapshot()
-    observeClient(generation: generation)
-  }
-
-  @MainActor
-  private func observeClient(generation: Int) {
-    withObservationTracking {
-      _ = Self.clientStateSnapshot()
-    } onChange: { [weak self] in
-      Task { @MainActor [weak self] in
-        await Task.yield()
-
-        guard let self, generation == self.clientObservationGeneration else { return }
-
-        let newClientState = Self.clientStateSnapshot()
-        if let previousClientState = self.lastObservedClientState, newClientState != previousClientState {
-          self.lastObservedClientState = newClientState
-          if self.configurationDepth == 0, self.jsOriginatedClientSyncDepth == 0 {
-            let payload = Self.clientChangedPayload(
-              changes: .init(
-                client: newClientState.client != previousClientState.client,
-                deviceToken: newClientState.deviceToken != previousClientState.deviceToken
-              )
-            )
-            Self.emitClientChanged(payload)
-          }
-        }
-
-        self.observeClient(generation: generation)
       }
     }
   }
@@ -779,46 +667,6 @@ final class ClerkNativeBridge {
     ]
   }
 
-  @MainActor
-  private static func clientStateSnapshot() -> ClientStateSnapshot {
-    let client = Clerk.shared.client
-
-    return ClientStateSnapshot(
-      client: client,
-      deviceToken: Clerk.shared.deviceToken
-    )
-  }
-
-  @MainActor
-  private static func clientChangedPayload(sourceId: String? = nil, changes: ClientStateChanges = .all) -> [String: Any] {
-    var payload: [String: Any] = [:]
-    payload["changed"] = [
-      "client": changes.client,
-      "deviceToken": changes.deviceToken,
-    ]
-    payload["deviceToken"] = Clerk.shared.deviceToken ?? NSNull()
-    if let sourceId, !sourceId.isEmpty {
-      payload["sourceId"] = sourceId
-    }
-
-    return payload
-  }
-
-  @MainActor
-  private static func syncTokenState(bearerToken: String?) async throws -> Bool {
-    await waitForLoadedClient()
-
-    guard let token = bearerToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty
-    else {
-      return false
-    }
-    guard Clerk.shared.deviceToken != token || Clerk.shared.client == nil else {
-      return false
-    }
-    _ = try await Clerk.shared.updateDeviceToken(token)
-    return true
-  }
-
   private static func shouldReconfigure(for publishableKey: String) -> Bool {
     guard clerkConfigured, let configuredPublishableKey else { return false }
     return configuredPublishableKey != publishableKey
@@ -830,30 +678,6 @@ final class ClerkNativeBridge {
       return .init(middleware: middleware)
     }
     return .init(keychainConfig: .init(service: service), middleware: middleware)
-  }
-
-  @MainActor
-  private static func waitForLoadedClient() async {
-    // Wait for Clerk to finish loading client state from cached data + API refresh.
-    // The bridge sync contract is device-token based, not session based.
-    for _ in 0..<clerkLoadMaxAttempts {
-      if Clerk.shared.isLoaded {
-        return
-      }
-      try? await Task.sleep(nanoseconds: clerkLoadIntervalNs)
-    }
-  }
-
-  @MainActor
-  private static func waitForLoadedClientIfNeeded(_ shouldWait: Bool) async {
-    guard shouldWait else { return }
-    await waitForLoadedClient()
-  }
-
-  @MainActor
-  func getClientToken() async -> String? {
-    guard Self.clerkConfigured else { return nil }
-    return Clerk.shared.deviceToken
   }
 
   @MainActor
@@ -1196,74 +1020,8 @@ final class ClerkNativeBridge {
     )
   }
 
-  @MainActor
-  func syncClientStateFromJs(
-    deviceToken: String?,
-    sourceId: String?,
-    didChangeClient: Bool,
-    didChangeDeviceToken: Bool
-  ) async throws {
-    guard Self.clerkConfigured else { return }
-
-    let previousClientState = Self.clientStateSnapshot()
-    var completedSuccessfully = false
-    jsOriginatedClientSyncDepth += 1
-    defer {
-      let finalClientState = Self.clientStateSnapshot()
-      lastObservedClientState = finalClientState
-      jsOriginatedClientSyncDepth = max(0, jsOriginatedClientSyncDepth - 1)
-
-      if !completedSuccessfully, finalClientState != previousClientState {
-        Self.emitClientChanged(
-          Self.clientChangedPayload(
-            changes: .init(
-              client: finalClientState.client != previousClientState.client,
-              deviceToken: finalClientState.deviceToken != previousClientState.deviceToken
-            )
-          )
-        )
-      }
-    }
-
-    var refreshedClientWhileUpdatingToken = false
-
-    if didChangeDeviceToken,
-      let token = deviceToken?.trimmingCharacters(in: .whitespacesAndNewlines), !token.isEmpty
-    {
-      if Clerk.shared.deviceToken != token {
-        _ = try await Clerk.shared.updateDeviceToken(token)
-        await Self.waitForLoadedClient()
-        refreshedClientWhileUpdatingToken = true
-      }
-    }
-
-    if !refreshedClientWhileUpdatingToken, didChangeClient || didChangeDeviceToken {
-      _ = try await Clerk.shared.refreshClient()
-      await Self.waitForLoadedClient()
-    }
-
-    let newClientState = Self.clientStateSnapshot()
-    lastObservedClientState = newClientState
-    Self.emitClientChanged(
-      Self.clientChangedPayload(
-        sourceId: sourceId,
-        changes: .init(
-          client: newClientState.client != previousClientState.client,
-          deviceToken: newClientState.deviceToken != previousClientState.deviceToken
-        )
-      )
-    )
-    completedSuccessfully = true
-  }
-
   private static func postConfiguredNotification() {
     NotificationCenter.default.post(name: .clerkNativeSDKDidConfigure, object: nil)
-  }
-
-  static func setClientChangedEmitter(_ emitter: (([String: Any]?) -> Void)?) {
-    clerkNativeClientEventQueue.sync {
-      clerkNativeClientChangedEmitter = emitter
-    }
   }
 
   static func setClientInvalidatedEmitter(_ emitter: (() -> Void)?) {
@@ -1288,14 +1046,6 @@ final class ClerkNativeBridge {
   static func emitAuthFlowChanged(_ body: [String: Any]? = nil) {
     let emitter = clerkNativeClientEventQueue.sync {
       clerkNativeAuthFlowChangedEmitter
-    }
-    emitter?(body)
-  }
-
-  /// Requests that ClerkProvider reload the JS client from native client state.
-  static func emitClientChanged(_ body: [String: Any]? = nil) {
-    let emitter = clerkNativeClientEventQueue.sync {
-      clerkNativeClientChangedEmitter
     }
     emitter?(body)
   }
