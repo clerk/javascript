@@ -19,6 +19,7 @@ import type {
   ExternalAccountResource,
   GetEnterpriseConnectionsParams,
   GetOrganizationMemberships,
+  GetSessionsParams,
   GetUserOrganizationInvitationsParams,
   GetUserOrganizationSuggestionsParams,
   ImageResource,
@@ -330,11 +331,11 @@ export class User extends BaseResource implements UserResource {
     });
   };
 
-  getSessions = async (): Promise<SessionWithActivities[]> => {
-    if (this.cachedSessionsWithActivities) {
+  getSessions = async (params?: GetSessionsParams): Promise<SessionWithActivities[]> => {
+    if (!params?.forceRefresh && this.cachedSessionsWithActivities) {
       return this.cachedSessionsWithActivities;
     }
-    const res = await SessionWithActivities.retrieve();
+    const res = await SessionWithActivities.retrieve(params);
     this.cachedSessionsWithActivities = res;
     return res;
   };
