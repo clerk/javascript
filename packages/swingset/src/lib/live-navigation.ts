@@ -13,6 +13,7 @@ const liveRoutes = new Map([
   ['/user-profile/user-profile-api-keys-panel', '/live/api-keys'],
   ['/user-profile/user-profile-account-section', '/live/account-section'],
   ['/user-profile/user-profile-password-section', '/live/password'],
+  ['/user-profile/user-profile-active-devices-section', '/live/active-devices'],
   ['/user-profile/user-profile-connected-accounts-section', '/live/connected-accounts'],
   ['/user-profile/user-profile-enterprise-accounts-section', '/live/enterprise-accounts'],
   ['/user-profile/user-profile-danger-section', '/live/user-danger'],
