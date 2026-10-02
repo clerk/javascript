@@ -15,6 +15,7 @@ import {
   fapiVerification,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../MosaicProvider';
 import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section';
 
 const okta = fapiEnterpriseConnection({ id: 'okta', name: 'Acme Okta' });
@@ -232,5 +233,35 @@ describe('enterprise accounts', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('The connection could not start. Please try again.');
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toBeEnabled();
+  });
+
+  it.each([
+    { meta: undefined, message: 'La connexion a échoué.' },
+    { meta: { param_name: 'enterprise_connection_id' }, message: 'Cette connexion est indisponible.' },
+  ])('localizes a coded API error with $meta', async ({ meta, message }) => {
+    serveFapi(signedIn());
+    worker.use(
+      http.post(fapiUrl('/v1/me/external_accounts'), () =>
+        HttpResponse.json(
+          { errors: [{ code: 'form_param_invalid', message: 'Server fallback', meta }] },
+          { status: 422 },
+        ),
+      ),
+    );
+    await renderWithClerk(
+      <MosaicProvider
+        localization={{
+          locale: 'fr-FR',
+          overrides: {
+            'errors.form_param_invalid': 'La connexion a échoué.',
+            'errors.form_param_invalid__enterprise_connection_id': 'Cette connexion est indisponible.',
+          },
+        }}
+      >
+        <UserProfileEnterpriseAccountsSection />
+      </MosaicProvider>,
+    );
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(message);
   });
 });
