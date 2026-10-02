@@ -6,28 +6,24 @@ import { Button } from '../../components/button';
 import { EmptyState } from '../../components/empty-state';
 import { Menu } from '../../components/menu';
 import { Pagination } from '../../components/pagination';
-import { Panel } from '../../components/panel';
 import { Spinner } from '../../components/spinner';
 import type { TableHeaderCellProps } from '../../components/table';
 import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
-import { fill, useMessages } from '../../localization';
+import { fill } from '../../localization';
 import { useDataTable } from '../../primitives/hooks';
-import { themeProps } from '../../props';
+import { mergeStyleProps, themeProps } from '../../props';
 import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visible';
-import { styles } from './organization-profile-api-keys-panel.styles';
-import type {
-  OrganizationProfileAPIKey,
-  OrganizationProfileAPIKeySort,
-  OrganizationProfileApiKeysPanelViewProps,
-} from './organization-profile-api-keys-panel.types';
-import { OrganizationProfileCreateAPIKeyDialog } from './organization-profile-create-api-key.dialog';
+import { styles } from './api-keys-table.styles';
+import type { APIKey, APIKeysTableMessages, APIKeysTableSort, APIKeysTableViewProps } from './api-keys-table.types';
+import { CreateAPIKeyDialog } from './create-api-key.dialog';
 
-const getRowId = (row: OrganizationProfileAPIKey) => row.id;
+const getRowId = (row: APIKey) => row.id;
 
-export function OrganizationProfileApiKeysPanelView({
+export function APIKeysTableView({
+  messages: m,
   apiKeys,
   totalCount,
   page,
@@ -44,8 +40,9 @@ export function OrganizationProfileApiKeysPanelView({
   onSortChange,
   isLoading,
   isFetching = false,
-}: OrganizationProfileApiKeysPanelViewProps) {
-  const m = useMessages('organizationProfileApiKeysPanel');
+  isError = false,
+  onRetry,
+}: APIKeysTableViewProps) {
   const searchInput = useRef<HTMLInputElement>(null);
   const createButton = useRef<HTMLButtonElement>(null);
   const removalFocus = useListRemovalFocus({
@@ -53,7 +50,7 @@ export function OrganizationProfileApiKeysPanelView({
     onRemove: onRevoke,
     fallback: () => createButton.current ?? searchInput.current,
   });
-  const revokeKey = useMemo(() => Destructive.createHandle<OrganizationProfileAPIKey>(), []);
+  const revokeKey = useMemo(() => Destructive.createHandle<APIKey>(), []);
   const pagination = { pageIndex: page - 1, pageSize };
   const table = useDataTable({
     data: apiKeys,
@@ -87,9 +84,7 @@ export function OrganizationProfileApiKeysPanelView({
       onSearchChange(typeof update === 'function' ? update(searchValue) : update);
     },
   });
-  const sortHeader = (
-    column: OrganizationProfileAPIKeySort['column'],
-  ): Pick<TableHeaderCellProps, 'sort' | 'onSort'> => {
+  const sortHeader = (column: APIKeysTableSort['column']): Pick<TableHeaderCellProps, 'sort' | 'onSort'> => {
     const active = table.sorting[0];
     return {
       sort: active?.id === column ? (active.desc ? 'descending' : 'ascending') : 'none',
@@ -112,8 +107,7 @@ export function OrganizationProfileApiKeysPanelView({
     : { label: m.noKeys, description: m.noKeysDescription };
   return (
     <>
-      <Panel.Root render={<div {...themeProps('organization-profile-api-keys-panel')} />}>
-        <Panel.Title>{m.title}</Panel.Title>
+      <div {...mergeStyleProps(themeProps('api-keys-table'), stylex.props(styles.root))}>
         <Table.Toolbar>
           <Table.Search
             ref={searchInput}
@@ -156,12 +150,32 @@ export function OrganizationProfileApiKeysPanelView({
             </Table.Row>
           </Table.Header>
           <Table.Body>
+            {/* TODO: Replace with a shared Table.Loading built on a Mosaic Skeleton component (skeleton rows sized to the columns). */}
             {isLoading ? (
               <Table.Empty colSpan={columnCount}>
                 <span role='status'>
                   <Spinner />
                   <VisuallyHidden>{m.loading}</VisuallyHidden>
                 </span>
+              </Table.Empty>
+            ) : isError ? (
+              <Table.Empty colSpan={columnCount}>
+                <EmptyState.Root>
+                  <EmptyState.Icon name='exclamation-circle' />
+                  <EmptyState.Label>{m.loadError}</EmptyState.Label>
+                  <EmptyState.Description>{m.loadErrorDescription}</EmptyState.Description>
+                  {onRetry ? (
+                    <EmptyState.Actions>
+                      <Button
+                        variant='outline'
+                        color='neutral'
+                        onClick={onRetry}
+                      >
+                        {m.retry}
+                      </Button>
+                    </EmptyState.Actions>
+                  ) : null}
+                </EmptyState.Root>
               </Table.Empty>
             ) : table.rows.length === 0 ? (
               <Table.Empty colSpan={columnCount}>
@@ -215,6 +229,7 @@ export function OrganizationProfileApiKeysPanelView({
                   {onRevoke ? (
                     <Table.Cell align='end'>
                       <APIKeyActions
+                        messages={m}
                         apiKey={row.original}
                         registerTrigger={removalFocus.registerTrigger}
                         onSelect={apiKey => revokeKey.open(apiKey)}
@@ -241,8 +256,8 @@ export function OrganizationProfileApiKeysPanelView({
             onChange={next => table.setPagination(current => ({ ...current, pageIndex: next - 1 }))}
           />
         ) : null}
-      </Panel.Root>
-      {createDialog ? <OrganizationProfileCreateAPIKeyDialog {...createDialog} /> : null}
+      </div>
+      {createDialog ? <CreateAPIKeyDialog {...createDialog} /> : null}
       {onRevoke ? (
         <Destructive
           handle={revokeKey}
@@ -267,15 +282,16 @@ export function OrganizationProfileApiKeysPanelView({
 }
 
 function APIKeyActions({
+  messages: m,
   apiKey,
   registerTrigger,
   onSelect,
 }: {
-  apiKey: OrganizationProfileAPIKey;
+  messages: APIKeysTableMessages;
+  apiKey: APIKey;
   registerTrigger: (id: string) => (element: HTMLButtonElement | null) => void;
-  onSelect: (key: OrganizationProfileAPIKey) => void;
+  onSelect: (key: APIKey) => void;
 }) {
-  const m = useMessages('organizationProfileApiKeysPanel');
   const [triggerRef] = useState(() => registerTrigger(apiKey.id));
   return (
     <Menu.Root placement='bottom-end'>

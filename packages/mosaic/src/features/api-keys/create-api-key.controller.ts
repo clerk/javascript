@@ -2,33 +2,32 @@ import type { MouseEventHandler } from 'react';
 import { useRef, useState } from 'react';
 
 import { useForm } from '../../components/form';
-import { useLocale, useMessages } from '../../localization';
-import { formatDate, getExpirationDate } from './user-profile-api-keys.format';
-import type {
-  UserProfileCreateAPIKeyDialogProps,
-  UserProfileCreateAPIKeyValues,
-} from './user-profile-create-api-key.dialog';
+import { useLocale } from '../../localization';
+import { formatDate, getExpirationDate } from './api-keys-table.format';
+import type { APIKeysTableMessages } from './api-keys-table.types';
+import type { CreateAPIKeyDialogProps, CreateAPIKeyValues } from './create-api-key.dialog';
 
-const initialValues: UserProfileCreateAPIKeyValues = { name: '', expiration: null };
+const initialValues: CreateAPIKeyValues = { name: '', expiration: null };
 
-export interface UserProfileCreateAPIKeyInput {
+export interface CreateAPIKeyInput {
   name: string;
   expiresAt: Date | null;
 }
 
-export interface UserProfileCreateAPIKeyControllerOptions {
-  onCreate: (input: UserProfileCreateAPIKeyInput) => Promise<string>;
+export interface CreateAPIKeyControllerOptions {
+  messages: APIKeysTableMessages;
+  onCreate: (input: CreateAPIKeyInput) => Promise<string>;
 }
 
-export interface UserProfileCreateAPIKeyController {
+export interface CreateAPIKeyController {
   onOpen: MouseEventHandler<HTMLButtonElement>;
-  dialog: UserProfileCreateAPIKeyDialogProps;
+  dialog: CreateAPIKeyDialogProps;
 }
 
-export function useUserProfileCreateAPIKeyController({
+export function useCreateAPIKeyController({
+  messages,
   onCreate,
-}: UserProfileCreateAPIKeyControllerOptions): UserProfileCreateAPIKeyController {
-  const m = useMessages('userProfileApiKeysPanel');
+}: CreateAPIKeyControllerOptions): CreateAPIKeyController {
   const locale = useLocale();
   const trigger = useRef<HTMLButtonElement | null>(null);
   const [open, setOpen] = useState(false);
@@ -58,6 +57,7 @@ export function useUserProfileCreateAPIKeyController({
       setOpen(true);
     },
     dialog: {
+      messages,
       open,
       onOpenChange: next => {
         if (!form.isSubmitting) {
@@ -73,7 +73,7 @@ export function useUserProfileCreateAPIKeyController({
         try {
           await navigator.clipboard.writeText(secret ?? '');
         } catch (error) {
-          setCopyError(m.copyError);
+          setCopyError(messages.copyError);
           if (!close) {
             throw error;
           }

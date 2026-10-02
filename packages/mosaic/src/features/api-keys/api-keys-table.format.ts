@@ -1,8 +1,8 @@
-import type { UserProfileAPIKeyExpiration } from './user-profile-create-api-key.dialog';
+import type { APIKeyExpiration } from './create-api-key.dialog';
 
 const DAY_SECONDS = 24 * 60 * 60;
 
-const expirationDays: Record<Exclude<UserProfileAPIKeyExpiration, 'never' | '1y'>, number> = {
+const expirationDays: Record<Exclude<APIKeyExpiration, 'never' | '1y'>, number> = {
   '1d': 1,
   '7d': 7,
   '30d': 30,
@@ -20,7 +20,7 @@ const relativeUnits = [
   ['minute', 60],
 ] as const;
 
-export function getExpirationDate(expiration: UserProfileAPIKeyExpiration, now: Date): Date | null {
+export function getExpirationDate(expiration: APIKeyExpiration, now: Date): Date | null {
   if (expiration === 'never') {
     return null;
   }

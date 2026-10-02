@@ -1,6 +1,5 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
-import { UserProfileApiKeysPanelView } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
@@ -18,11 +17,11 @@ import { useRef, useState } from 'react';
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
 
+import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { usePreviewImage } from './use-preview-image';
 import { useUserProfileActiveDevicesFixture } from './user-profile-active-devices';
 import { createUserProfileAddEmailFixture } from './user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
-import { useUserProfileAPIKeysFixture } from './user-profile-api-keys';
 import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';
@@ -105,7 +104,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const [subscription, setSubscription] = useState<UserProfileSubscription>(seedSubscription);
   const [paymentMethods, setPaymentMethods] = useState<UserProfilePaymentMethod[]>(seedPaymentMethods);
   const [historyPageSize, setHistoryPageSize] = useState(10);
-  const apiKeys = useUserProfileAPIKeysFixture();
+  const apiKeys = useAPIKeysTableFixture();
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const addEmail = (value: string) =>
     setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: false }]);
@@ -209,7 +208,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onBillingHistoryPageSizeChange: setHistoryPageSize,
       onViewInvoice: () => undefined,
     },
-    apiKeys: <UserProfileApiKeysPanelView {...apiKeys} />,
+    apiKeys: <APIKeysPanelExample {...apiKeys} />,
   };
 
   return { activePage, setActivePage, pages, addEmail, devices: activeDevices.devices };
