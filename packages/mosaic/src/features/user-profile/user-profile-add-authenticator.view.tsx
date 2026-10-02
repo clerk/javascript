@@ -1,6 +1,5 @@
 import { useId } from 'react';
 
-import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { Field } from '../../components/field';
@@ -54,23 +53,22 @@ export function UserProfileAddAuthenticatorView({
           <Card.Header>
             <Card.Title>{setupMessages.title}</Card.Title>
           </Card.Header>
-          <Card.Content>
-            {setupErrorMessage ? (
-              <Banner.Root
-                color='negative'
-                role='alert'
-              >
-                <Banner.Label>{setupErrorMessage}</Banner.Label>
-              </Banner.Root>
-            ) : (
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {setupErrorMessage}
+          </Card.Banner>
+          {setupErrorMessage ? null : (
+            <Card.Content>
               <Text
                 role='status'
                 aria-label={m.preparing}
               >
                 {m.preparing}
               </Text>
-            )}
-          </Card.Content>
+            </Card.Content>
+          )}
         </>
       )}
       {setup ? (

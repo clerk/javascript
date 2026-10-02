@@ -38,13 +38,13 @@ same fill, `--cl-color-neutral-alpha-200`.
 - **Fewest nodes:** one element per bone, no wrappers. A bone is the real part
   rendered empty, so it inherits that part's padding, type size and line height.
 - **A component with its own shape** (a part that needs a skeleton but isn't covered
-  above) composes the pieces in `utils/skeleton.styles.ts` itself:
+  above) composes the pieces in `styles/skeleton.styles.ts` itself:
   - `skeletonStyles.bone`: fill and radius, for media and blocks.
   - `skeletonStyles.line`: a `1lh` box holding one line of text, whose `::before`
     bar is `1cap` tall (`0.7em` fallback) on the baseline, square-cornered.
   - `skeletonStyles.wave`: the animation. `Avatar.Fallback`, which has its own fill
     and circle, takes `wave` alone.
-  - plus a `useSkeletonWave(enabled)` ref (`hooks/useSkeletonWave.ts`) on the same
+  - plus a `useSkeletonWave(enabled)` ref (`hooks/use-skeleton-wave.ts`) on the same
     element. Without it, `wave` never starts.
 
 ## Sizing

@@ -1,16 +1,15 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { useFlowAutoFocus } from '../../components/flow';
 import { Icon } from '../../components/icon';
 import { Text } from '../../components/text';
-import { useSkeletonWave } from '../../hooks/useSkeletonWave';
+import { useSkeletonWave } from '../../hooks/use-skeleton-wave';
 import { useMessages } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
-import { skeletonStyles } from '../../utils/skeleton.styles';
+import { reset } from '../../styles/reset.styles';
+import { skeletonStyles } from '../../styles/skeleton.styles';
 import { styles } from './user-profile-backup-codes.styles';
 
 export interface UserProfileBackupCodesViewProps {
@@ -44,15 +43,13 @@ export function UserProfileBackupCodesView({
         <Card.Title>{m.title}</Card.Title>
         <Card.Description>{m.description}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {errorMessage}
+      </Card.Banner>
       <Card.Content>
-        {errorMessage ? (
-          <Banner.Root
-            color='negative'
-            role='alert'
-          >
-            <Banner.Label>{errorMessage}</Banner.Label>
-          </Banner.Root>
-        ) : null}
         {hasCodes ? (
           <ul
             aria-label={m.codesLabel}

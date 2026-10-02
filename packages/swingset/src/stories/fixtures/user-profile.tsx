@@ -1,25 +1,27 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
-import { UserProfileApiKeysPanelView } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
 } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
+import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.view';
+import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import type {
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import { useState } from 'react';
+import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+import { useRef, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
 
+import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { usePreviewImage } from './use-preview-image';
 import { useUserProfileActiveDevicesFixture } from './user-profile-active-devices';
 import { createUserProfileAddEmailFixture } from './user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
-import { useUserProfileAPIKeysFixture } from './user-profile-api-keys';
 import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';
@@ -63,6 +65,7 @@ const examplePaymentMethods: UserProfilePaymentMethod[] = [
  * stories that need a realistic profile surface without being about it.
  */
 export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions = {}) {
+  const titleRef = useRef<HTMLDivElement>(null);
   const connections = useConnectedAccountsFixture();
   const wallets = useWeb3WalletsFixture();
   const editName = useUserProfileEditNameFixture();
@@ -101,7 +104,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const [subscription, setSubscription] = useState<UserProfileSubscription>(seedSubscription);
   const [paymentMethods, setPaymentMethods] = useState<UserProfilePaymentMethod[]>(seedPaymentMethods);
   const [historyPageSize, setHistoryPageSize] = useState(10);
-  const apiKeys = useUserProfileAPIKeysFixture();
+  const apiKeys = useAPIKeysTableFixture();
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const addEmail = (value: string) =>
     setEmails(current => [...current, { id: `email_${Date.now()}`, value, isVerified: false }]);
@@ -113,16 +116,19 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
     account: {
       ...editName,
       ...editUsername,
-      connectedAccounts: connections.accounts,
-      availableConnectionProviders: connections.availableProviders,
-      onConnectAccount: connections.onConnect,
-      onReconnectAccount: connections.onReconnect,
-      onRemoveConnectedAccount: connections.onRemove,
-      web3Wallets: wallets.wallets,
-      availableWeb3Providers: wallets.availableProviders,
-      onConnectWeb3Wallet: wallets.onConnect,
-      onSetPrimaryWeb3Wallet: wallets.onSetPrimary,
-      onRemoveWeb3Wallet: wallets.onRemove,
+      titleRef,
+      connectedAccountsSlot: (
+        <UserProfileConnectedAccountsSectionView
+          {...connections}
+          fallbackFocus={() => titleRef.current}
+        />
+      ),
+      web3WalletsSlot: (
+        <UserProfileWeb3WalletsSectionView
+          {...wallets}
+          fallbackFocus={() => titleRef.current}
+        />
+      ),
       allowMultipleAccounts: true,
       hasImage: Boolean(imageUrl),
       imageUrl,
@@ -149,7 +155,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
         setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
     },
     security: {
-      ...editPassword,
+      passwordSlot: { content: <UserProfilePasswordSectionView {...editPassword} /> },
       passkeys: passkeys.passkeys,
       addPasskeyError: passkeys.addError,
       onRenamePasskey: passkeys.onRename,
@@ -202,7 +208,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onBillingHistoryPageSizeChange: setHistoryPageSize,
       onViewInvoice: () => undefined,
     },
-    apiKeys: <UserProfileApiKeysPanelView {...apiKeys} />,
+    apiKeys: <APIKeysPanelExample {...apiKeys} />,
   };
 
   return { activePage, setActivePage, pages, addEmail, devices: activeDevices.devices };

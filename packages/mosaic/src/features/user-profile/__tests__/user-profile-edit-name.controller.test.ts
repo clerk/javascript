@@ -1,130 +1,93 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createActor } from '../../../machine/createActor';
-import { UserProfileSaveError } from '../user-profile-account-section/user-profile-account-section.types';
-import {
-  userProfileEditNameMachine,
-  useUserProfileEditNameController,
-} from '../user-profile-account-section/user-profile-edit-name.controller';
+import { SaveError } from '../../../utils/form-error';
+import { useUserProfileEditNameController } from '../user-profile-account-section/user-profile-edit-name.controller';
+import type { UserProfileEditNameValue } from '../user-profile-account-section/user-profile-edit-name.dialog';
 
-function start(saveName: () => Promise<void>, saved = { savedFirstName: 'Preston', savedLastName: 'Booth' }) {
-  const actor = createActor(userProfileEditNameMachine, { context: { saveName, ...saved } }).start();
-  actor.send({ type: 'OPEN' });
-  return actor;
+function deferred() {
+  let resolve: () => void = () => {};
+  const promise = new Promise<void>(r => {
+    resolve = r;
+  });
+  return { promise, resolve };
 }
 
-describe('userProfileEditNameMachine', () => {
-  it('seeds both fields from the saved name on open', () => {
-    const actor = start(() => Promise.resolve());
-
-    expect(actor.getSnapshot().value).toBe('editing');
-    expect(actor.getSnapshot().context.firstName).toBe('Preston');
-    expect(actor.getSnapshot().context.lastName).toBe('Booth');
-  });
-
-  it('returns to idle when the save lands, and can be opened again', async () => {
-    const actor = start(() => Promise.resolve());
-    actor.send({ type: 'TYPE', field: 'lastName', value: 'Barton' });
-    actor.send({ type: 'SAVE' });
-    expect(actor.getSnapshot().value).toBe('saving');
-
-    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('idle'));
-    expect(actor.getSnapshot().status).toBe('active');
-
-    actor.send({ type: 'OPEN' });
-    expect(actor.getSnapshot().value).toBe('editing');
-  });
-
-  it('re-seeds from the saved name on the next open, dropping what was typed', () => {
-    const actor = start(() => Promise.resolve());
-    actor.send({ type: 'TYPE', field: 'firstName', value: 'Ada' });
-    actor.send({ type: 'CANCEL' });
-
-    actor.send({ type: 'OPEN' });
-
-    expect(actor.getSnapshot().context.firstName).toBe('Preston');
-  });
-
-  it('keeps what was typed when the save fails, so it can be corrected', async () => {
-    const actor = start(() => Promise.reject(new Error('Your name could not be updated.')));
-    actor.send({ type: 'TYPE', field: 'lastName', value: 'Barton' });
-    actor.send({ type: 'SAVE' });
-
-    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('editing'));
-    expect(actor.getSnapshot().context.lastName).toBe('Barton');
-    expect(actor.getSnapshot().context.error).toEqual({
-      message: 'Your name could not be updated.',
-      fields: undefined,
-    });
-  });
-
-  it('carries field copy through when the rejection names a control', async () => {
-    const failure = new UserProfileSaveError('Your name could not be updated.', {
-      firstName: 'First name is required.',
-    });
-    const actor = start(() => Promise.reject(failure));
-    actor.send({ type: 'SAVE' });
-
-    await vi.waitFor(() =>
-      expect(actor.getSnapshot().context.error?.fields).toEqual({ firstName: 'First name is required.' }),
-    );
-  });
-
-  it('falls back to generic copy when the rejection is not an Error', async () => {
-    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors -- a non-Error rejection is the case under test
-    const actor = start(() => Promise.reject('nope'));
-    actor.send({ type: 'SAVE' });
-
-    await vi.waitFor(() =>
-      expect(actor.getSnapshot().context.error?.message).toBe('Something went wrong. Please try again.'),
-    );
-  });
-
-  it('drops the error when the dialog is cancelled', async () => {
-    const actor = start(() => Promise.reject(new Error('nope')));
-    actor.send({ type: 'SAVE' });
-    await vi.waitFor(() => expect(actor.getSnapshot().context.error?.message).toBe('nope'));
-
-    actor.send({ type: 'CANCEL' });
-
-    expect(actor.getSnapshot().value).toBe('idle');
-    expect(actor.getSnapshot().context.error).toBeUndefined();
-  });
-});
+function renderController(onSubmit: (value: UserProfileEditNameValue) => Promise<void> = () => Promise.resolve()) {
+  const { result } = renderHook(() =>
+    useUserProfileEditNameController({ firstName: 'Preston', lastName: 'Booth', onSubmit }),
+  );
+  act(() => result.current.onOpenChange(true));
+  return result;
+}
 
 describe('useUserProfileEditNameController', () => {
-  it('holds the dialog open across editing and saving, then closes on success', async () => {
+  it('opens on the saved name', () => {
     const { result } = renderHook(() =>
-      useUserProfileEditNameController({ firstName: 'Preston', lastName: 'Booth', onSubmit: () => Promise.resolve() }),
+      useUserProfileEditNameController({ firstName: 'Preston', lastName: 'Booth', onSubmit: vi.fn() }),
     );
     expect(result.current.isOpen).toBe(false);
 
     act(() => result.current.onOpenChange(true));
+
     expect(result.current.isOpen).toBe(true);
-    expect(result.current.firstName).toBe('Preston');
-    expect(result.current.isSaving).toBe(false);
+    expect(result.current.form.values).toEqual({ firstName: 'Preston', lastName: 'Booth' });
+  });
 
-    act(() => result.current.onLastNameChange('Barton'));
-    expect(result.current.lastName).toBe('Barton');
+  it('withholds the save while the name is unchanged', () => {
+    const result = renderController();
+    expect(result.current.form.canSubmit).toBe(false);
 
-    act(() => result.current.onSubmit());
+    act(() => result.current.form.setValue('lastName', 'Barton'));
+
+    expect(result.current.form.canSubmit).toBe(true);
+  });
+
+  it('saves the values it is holding, stays open while saving, then closes', async () => {
+    const request = deferred();
+    const onSubmit = vi.fn(() => request.promise);
+    const result = renderController(onSubmit);
+    act(() => result.current.form.setValue('firstName', 'Ada'));
+
+    act(() => result.current.form.submit());
+    act(() => result.current.onOpenChange(false));
+
+    expect(onSubmit).toHaveBeenCalledWith({ firstName: 'Ada', lastName: 'Booth' });
     expect(result.current.isOpen).toBe(true);
-    expect(result.current.isSaving).toBe(true);
-
+    expect(result.current.form.isSubmitting).toBe(true);
+    await act(async () => request.resolve());
     await waitFor(() => expect(result.current.isOpen).toBe(false));
   });
 
-  it('saves the values it is currently holding', async () => {
-    const onSubmit = vi.fn(() => Promise.resolve());
-    const { result } = renderHook(() =>
-      useUserProfileEditNameController({ firstName: 'Preston', lastName: 'Booth', onSubmit }),
+  it('keeps what was typed and shows why when the save fails', async () => {
+    const result = renderController(() =>
+      Promise.reject(
+        new SaveError({
+          global: { message: 'Your name could not be updated.' },
+          fields: { lastName: { message: 'Last name is too long.' } },
+        }),
+      ),
     );
+    act(() => result.current.form.setValue('lastName', 'Barton'));
 
+    act(() => result.current.form.submit());
+
+    await waitFor(() => expect(result.current.form.error).toBe('Your name could not be updated.'));
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.form.values.lastName).toBe('Barton');
+    expect(result.current.form.fields.lastName.feedback).toEqual({ type: 'error', message: 'Last name is too long.' });
+  });
+
+  it('re-seeds from the saved name and drops the error on the next open', async () => {
+    const result = renderController(() => Promise.reject(new SaveError({ global: { message: 'nope' } })));
+    act(() => result.current.form.setValue('firstName', 'Ada'));
+    act(() => result.current.form.submit());
+    await waitFor(() => expect(result.current.form.error).toBe('nope'));
+
+    act(() => result.current.onOpenChange(false));
     act(() => result.current.onOpenChange(true));
-    act(() => result.current.onFirstNameChange('Ada'));
-    act(() => result.current.onSubmit());
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({ firstName: 'Ada', lastName: 'Booth' }));
+    expect(result.current.form.values.firstName).toBe('Preston');
+    expect(result.current.form.error).toBeUndefined();
   });
 });

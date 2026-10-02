@@ -47,11 +47,15 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
     return u;
   }
 
-  async function runAccountAction(page: Page, label: 'Manage account' | 'Sign out') {
+  async function openProfileSettings(page: Page) {
     await popup(page)
-      .getByRole('button', { name: `Actions for ${fakeUser.email}` })
+      .getByRole('button', { name: /^(Settings|Manage account)$/ })
       .click();
-    await page.getByRole('menuitem', { name: label }).click();
+    const profileSettings = page.getByRole('menuitem', { name: 'Profile settings' });
+    await profileSettings.or(page.locator('.cl-userProfile-root')).first().waitFor();
+    if (await profileSettings.isVisible()) {
+      await profileSettings.click();
+    }
   }
 
   test('switches the active organization and keeps it across a reload', async ({ page, context }) => {
@@ -77,7 +81,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
     const u = await signIn({ page, context });
 
     await trigger(page).click();
-    await runAccountAction(page, 'Sign out');
+    await popup(page).getByRole('button', { name: 'Sign out', exact: true }).click();
 
     await u.po.expect.toBeSignedOut();
     await expect(trigger(page)).toHaveCount(0);
@@ -104,7 +108,7 @@ testAgainstRunningApps({ withPattern: ['next.appRouterMosaic.*'] })('Mosaic User
     const u = await signIn({ page, context }, '/custom');
 
     await trigger(page).click();
-    await runAccountAction(page, 'Manage account');
+    await openProfileSettings(page);
     await u.po.userProfile.waitForUserProfileModal();
 
     await page.locator('.cl-userProfile-root').getByText('Custom page').click();

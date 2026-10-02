@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../components/button';
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../mosaic-provider';
 import type { ConfirmationControlledProps, ConfirmationHandleProps } from './confirmation';
 import { Confirmation } from './confirmation';
 
@@ -203,7 +203,7 @@ describe('Confirmation with a handle', () => {
     });
 
     expect(screen.getByRole('alertdialog')).toBeInTheDocument();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert').textContent).toBe('');
   });
 
   it('closes through the handle', async () => {

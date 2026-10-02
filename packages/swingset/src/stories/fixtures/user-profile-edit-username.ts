@@ -1,5 +1,5 @@
-import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
-import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
+import type { FormError } from '@clerk/mosaic/utils/form-error';
+import { SaveError } from '@clerk/mosaic/utils/form-error';
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
@@ -8,7 +8,7 @@ import { chaosName } from '@/lib/chaos';
 export interface UserProfileEditUsernameFixtureOptions {
   username?: string;
   latency?: number;
-  failWith?: UserProfileFormError;
+  failWith?: FormError;
 }
 
 export function useUserProfileEditUsernameFixture({
@@ -24,7 +24,7 @@ export function useUserProfileEditUsernameFixture({
     onSubmitUsername: async (value: string) => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith) {
-        throw new UserProfileSaveError(failWith.message ?? 'Something went wrong.', failWith.fields);
+        throw new SaveError(failWith);
       }
       setUsername(value);
     },

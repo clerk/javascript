@@ -3,16 +3,16 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useSkeletonWave } from '../../hooks/useSkeletonWave';
+import { useSkeletonWave } from '../../hooks/use-skeleton-wave';
 import { useTransition } from '../../primitives/hooks/use-transition';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { feedbackHeight, feedbackStyles } from '../../styles/feedback.styles';
+import { reset } from '../../styles/reset.styles';
+import { skeletonStyles } from '../../styles/skeleton.styles';
+import { sizes as typographySizes, styles as typographyStyles } from '../../styles/typography.styles';
 import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../../utils/feedback';
-import { feedbackHeight, feedbackStyles } from '../../utils/feedback.styles';
-import { reset } from '../../utils/reset.styles';
-import { skeletonStyles } from '../../utils/skeleton.styles';
-import { sizes as typographySizes, styles as typographyStyles } from '../../utils/typography.styles';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
 import { sectionHeaderDescriptionMarker, sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
@@ -32,6 +32,7 @@ export type SectionContentProps = MosaicComponentProps<'div'>;
 export type SectionLabelProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
 export type SectionDescriptionProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
 export type SectionActionsProps = MosaicComponentProps<'div'> & { skeleton?: boolean };
+export type SectionNoteProps = MosaicComponentProps<'div'> & { icon?: React.ReactNode };
 export type SectionErrorProps = MosaicComponentProps<'p'>;
 
 const mediaSizes = {
@@ -330,6 +331,33 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
 });
 
 /**
+ * Static text that takes an action's place in a row, stating why it offers none. Sits directly in
+ * `Section.Item` where a `Section.Actions` would; it holds its own trailing position, so it does not
+ * need one. `icon` renders into a fixed leading slot, sized to the text, for a logo or a lock.
+ */
+const Note = React.forwardRef<HTMLDivElement, SectionNoteProps>(function SectionNote(
+  { icon, children, render, xstyle, ...rest },
+  ref,
+) {
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref,
+    props: {
+      ...mergeStyleProps(themeProps('section-note'), stylex.props(reset.base, styles.note, xstyle), rest),
+      children: (
+        <>
+          {icon ? (
+            <span {...mergeStyleProps(themeProps('section-note-icon'), stylex.props(styles.noteIcon))}>{icon}</span>
+          ) : null}
+          {children}
+        </>
+      ),
+    },
+  });
+});
+
+/**
  * A row-level message, mirroring `Field.Error` for a row that holds no form control. Place it as a
  * sibling of `Section.Item` inside `Section.Row`, not inside `Section.Content`: the item stays a
  * single centered line, so the media and actions hold their position whether or not it is showing.
@@ -404,5 +432,6 @@ export const Section = {
   Label,
   Description,
   Actions,
+  Note,
   Error: SectionError,
 };
