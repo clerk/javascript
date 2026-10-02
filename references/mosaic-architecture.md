@@ -77,7 +77,7 @@ State styling uses real class + attribute-selector specificity — no `&&` boost
 Mosaic components need no provider to render or to be styled — the stylesheet and the `--cl-*` tokens do that work. `MosaicProvider` exists for two things: per-name icon glyph overrides and localization.
 
 ```tsx
-import { MosaicProvider } from './MosaicProvider';
+import { MosaicProvider } from './mosaic-provider';
 
 <MosaicProvider icons={{ 'chevron-right': <MyChevron /> }}>{children}</MosaicProvider>;
 ```
@@ -125,7 +125,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
 
 A theme's CSS wins over the Mosaic sheet without any prop: the sheet is imported into a cascade layer (`@import '@clerk/mosaic/styles.css' layer(components)`) and an unlayered rule beats any layered one.
 
-`utils/reset.styles.ts` holds the per-element resets so a component does not re-declare UA-normalization; `utils/typography.styles.ts`, `utils/focus-outline.styles.ts` and `utils/rtl.styles.ts` do the same for the treatments several components share. `rtl.mirror` flips a direction-aware icon (a forward/back chevron, a pagination arrow) under a `dir="rtl"` ancestor; there are no mirrored twins in the icon registry.
+`styles/reset.styles.ts` holds the per-element resets so a component does not re-declare UA-normalization; `styles/typography.styles.ts`, `styles/focus-outline.styles.ts` and `styles/rtl.styles.ts` do the same for the treatments several components share. `rtl.mirror` flips a direction-aware icon (a forward/back chevron, a pagination arrow) under a `dir="rtl"` ancestor; there are no mirrored twins in the icon registry.
 
 For the full StyleX authoring rules (token usage, the local `s(n)` spacing helper, the CSS build), see the `mosaic` Claude Code skill's `references/stylex.md`.
 
@@ -485,31 +485,32 @@ The steps above cover the **styling** migration. For **flow** components — whe
 
 ## Files
 
-| File                                    | Purpose                                                                            |
-| --------------------------------------- | ---------------------------------------------------------------------------------- |
-| `src/tokens.stylex.ts`                  | `--cl-*` token groups declared with `stylex.defineVars`                            |
-| `src/props.ts`                          | `themeProps`, `mergeStyleProps`, `MosaicComponentProps`, `MosaicStyleProps`        |
-| `src/MosaicProvider.tsx`                | Provider for the `icons` and `localization` props                                  |
-| `src/icons/overrides.ts`                | `MosaicIconOverrides` type + `useMosaicIcons()` context                            |
-| `src/icons/registry.tsx`                | Built-in glyphs and the `IconName` union                                           |
-| `src/localization/`                     | Message registry, `MosaicCatalog` types, context hooks, and `fill`/`plural`/`rich` |
-| `src/components/`                       | One subdirectory per component, and nothing else                                   |
-| `src/blocks/`                           | View fragments that own one piece of state of their own (`destructive`)            |
-| `src/utils/*.styles.ts`                 | Atoms shared across components: `reset`, `typography`, `focus-outline`             |
-| `src/hooks/`                            | Mosaic-only hooks (`useMosaicEnvironment`, `useMosaicRouter`, …)                   |
-| `src/styles/index.ts`                   | StyleX-only barrel — the entry the CSS build walks                                 |
-| `src/machine/`                          | State-machine runtime (`createMachine`, `createActor`, `useMachine`)               |
-| `src/machines/`                         | Standalone machines and the shared `__tests__/test-utils.ts`                       |
-| `src/<feature>/*.model.tsx`             | Clerk adapter — the only file in a feature that may import Clerk                   |
-| `src/<feature>/*.controller.tsx`        | Local state and action wrapping; holds the feature's machine                       |
-| `src/<feature>/*.view.tsx`              | Clerk-free rendering from plain props                                              |
-| `src/<feature>/*.types.ts`              | The data contract the model and the view both agree on                             |
-| `src/<feature>/*.messages.ts`           | Every string the surface renders; its keys are the `localization` paths            |
-| `src/utils/reset.test.tsx`              | Reset specs                                                                        |
-| `src/__tests__/MosaicProvider.test.tsx` | Icon-override and localization context specs                                       |
-| `src/components/button/button.test.tsx` | Component-level slot/state/variant specs                                           |
-| `src/__tests__/feature/`                | FAPI builders, the fake FAPI, and `renderWithClerk` for feature tests              |
-| `src/features/user-button/__tests__/`   | `user-button.feature.test.tsx` is the feature test to copy from                    |
+| File                                     | Purpose                                                                            |
+| ---------------------------------------- | ---------------------------------------------------------------------------------- |
+| `src/tokens.stylex.ts`                   | `--cl-*` token groups declared with `stylex.defineVars`                            |
+| `src/props.ts`                           | `themeProps`, `mergeStyleProps`, `MosaicComponentProps`, `MosaicStyleProps`        |
+| `src/mosaic-provider.tsx`                | Provider for the `icons` and `localization` props                                  |
+| `src/icons/overrides.ts`                 | `MosaicIconOverrides` type + `useMosaicIcons()` context                            |
+| `src/icons/registry.tsx`                 | Built-in glyphs and the `IconName` union                                           |
+| `src/localization/`                      | Message registry, `MosaicCatalog` types, context hooks, and `fill`/`plural`/`rich` |
+| `src/components/`                        | One subdirectory per component, and nothing else                                   |
+| `src/blocks/`                            | View fragments that own one piece of state of their own (`destructive`)            |
+| `src/styles/*.styles.ts`                 | Atoms shared across components: `reset`, `typography`, `focus-outline`             |
+| `src/hooks/`                             | Mosaic-only hooks (`useMosaicEnvironment`, `useMosaicRouter`, …)                   |
+| `src/styles/index.ts`                    | StyleX-only barrel — the entry the CSS build walks                                 |
+| `src/machine/`                           | State-machine runtime (`createMachine`, `createActor`, `useMachine`)               |
+| `src/machines/`                          | Standalone machines written with the runtime                                       |
+| `src/<feature>/*.model.tsx`              | Clerk adapter — the only file in a feature that may import Clerk                   |
+| `src/<feature>/*.controller.tsx`         | Local state and action wrapping; holds the feature's machine                       |
+| `src/<feature>/*.view.tsx`               | Clerk-free rendering from plain props                                              |
+| `src/<feature>/*.types.ts`               | The data contract the model and the view both agree on                             |
+| `src/<feature>/*.messages.ts`            | Every string the surface renders; its keys are the `localization` paths            |
+| `src/styles/reset.test.tsx`              | Reset specs                                                                        |
+| `src/__tests__/mosaic-provider.test.tsx` | Icon-override and localization context specs                                       |
+| `src/components/button/button.test.tsx`  | Component-level slot/state/variant specs                                           |
+| `src/__tests__/feature/`                 | FAPI builders, the fake FAPI, and `renderWithClerk` for feature tests              |
+| `src/__tests__/async.ts`                 | `deferred`, `tick`, and `noop` for driving async flows in tests                    |
+| `src/features/user-button/__tests__/`    | `user-button.feature.test.tsx` is the feature test to copy from                    |
 
 `machine/` is the runtime; `machines/` is machines written with it. The one-letter
 difference is easy to misread — a feature's own machine belongs in its

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import type { MosaicIconOverrides } from '../icons/overrides';
 import { useMosaicIcons } from '../icons/overrides';
 import { useLocale, useMessages } from '../localization';
-import { MosaicProvider } from '../MosaicProvider';
+import { MosaicProvider } from '../mosaic-provider';
 
 describe('MosaicProvider icons', () => {
   it('exposes the icon overrides via useMosaicIcons', () => {

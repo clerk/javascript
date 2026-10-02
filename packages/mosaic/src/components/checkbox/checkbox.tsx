@@ -3,8 +3,8 @@ import React from 'react';
 
 import type { MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
-import { reset } from '../../utils/reset.styles';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { reset } from '../../styles/reset.styles';
 import { useOptionalFieldContext, useOptionalFieldControlProps } from '../field/field.context';
 import { Icon } from '../icon';
 import { checkboxInputMarker } from './checkbox.markers.stylex';
