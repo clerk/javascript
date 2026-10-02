@@ -146,8 +146,7 @@ describe('UserProfileEditNameDialog', () => {
   it('leaves the banner empty when only a field is blamed', async () => {
     const user = userEvent.setup();
     renderView({
-      onSubmit: () =>
-        Promise.reject(new SaveError({ fields: { firstName: { message: 'First name is required.' } } })),
+      onSubmit: () => Promise.reject(new SaveError({ fields: { firstName: { message: 'First name is required.' } } })),
     });
 
     await user.type(lastNameField(), 'x');
