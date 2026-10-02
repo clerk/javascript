@@ -152,8 +152,10 @@ frozen" in `headless.md` for which to use and the two ways to get it wrong.
 ## Expanding and collapsing a row
 
 The reference is `Card.Banner` (`card.styles.ts`, `banner.collapse` / `clip` /
-`surface`). It is the recipe to adopt wherever a row opens and closes around content —
-`Field.Message`, the `Collapsible` panel, swingset's `CodeFooter` — in follow-ups.
+`surface`). `Field.Message` and `Section.Error` share the measured-height variant in
+`utils/feedback.styles.ts` (see "Inline text", below). It is the recipe to adopt wherever
+a row opens and closes around content; the `Collapsible` panel and swingset's
+`CodeFooter` have not adopted it yet.
 
 ### The content's enter/exit leads; the row is a byproduct
 
@@ -206,6 +208,12 @@ Both totals land at ~250ms; the asymmetry lives inside the sequence.
   with the content anchored to the moving edge a top origin pulls the surface's
   bottom edge a pixel inside the clip rather than onto it. (Center was not tried;
   top read right.)
+- **Inline text: opacity only.** The scale belongs to content that arrives as a
+  **surface** — a filled, bordered box such as the banner, which reads as an object
+  and can grow into place. A line of text with no box around it (a field error, a
+  row-level message) is not an object; scaled, its glyphs visibly shrink and swell
+  in place. It takes the same opacity timing and the same entrance delay, and no
+  transform at all.
 
 ### Durations
 
@@ -216,7 +224,9 @@ collapse is a layout settle that follows it.
 These values were tuned on a ~54px row and are **soft guidance**. A row of a very
 different height — a one-line message, a whole section — may want a token either
 way, and a reviewer stepping it is not violating anything. Check it per frame either
-way; the dead-frame test still applies to a short collapse.
+way; the dead-frame test still applies to a short collapse. The one-line inline
+messages (`Field.Message`, `Section.Error`) were tried at `base` and read better at
+`slow`, so they keep it.
 
 ### Geometry
 
@@ -253,6 +263,33 @@ content   spacing as its own margins; the top one is the fade's length (one cons
 - Measure the height (`Field.Message`'s ResizeObserver) only when the content
   changes size _while open_; `0fr ↔ 1fr` covers open/closed on its own.
 
+### Inline text: the measured-height variant
+
+`Field.Message` swaps one message for another while open (an error becoming a success),
+and `0fr ↔ 1fr` cannot animate between two open heights. So the feedback row animates
+an explicit `height` from a measured var instead, and the rest of the recipe carries
+over: the wrapper is its own clip layer (no padding, `align-content: end`), the exiting
+message leaves the flow pinned to the **bottom** (`inset: auto 0 0`) so it rides the
+moving edge, and the mask is the same static top fade.
+
+The spacing that sits above a message is the parent's gap, which a closed row must not
+cost. The wrapper cancels it with a negative top margin and the message puts it back as
+its own top margin, inside the clip, so it can double as the fade's length:
+
+```ts
+const GAP = `var(--_cl-feedback-gap, ${space['2']})`; // the parent's gap, the message's margin, the fade
+wrapper: { marginTop: `calc(-1 * ${GAP})`, height: `calc(var(--_cl-feedback-height) + ${GAP})` }
+message: { marginTop: GAP }
+```
+
+A parent with a different gap sets `--_cl-feedback-gap` (`Field.Content` does, at
+`space['1']`). A parent with no gap, such as the section header grid, zeroes the
+wrapper's margin with `xstyle` and leaves the message's alone.
+
+A swap while open plays out-then-in rather than overlapping: the old message fades at
+`fast`, and the new one's entrance delay holds it until that is done, while the row
+eases between the two heights on `--cl-ease-enter`.
+
 ### The fade on the clipped edge
 
 A mask on the wrapper, not an element: it needs no background color, works on any
@@ -288,7 +325,7 @@ the span rule above).
 ### Reduced motion
 
 The row takes `transition-property: none` and snaps; the mask is static and needs
-nothing. The surface keeps its fade and pins the scale, per "Reduced motion" below,
+nothing. The surface keeps its fade and pins the scale (inline text has none to pin), per "Reduced motion" below,
 and its entrance delay goes to `instant` as well: it exists to wait for the row, and
 a row that has snapped open leaves nothing to wait for.
 
