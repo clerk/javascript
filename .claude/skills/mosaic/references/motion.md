@@ -57,8 +57,10 @@ slower approach to full opacity — is left.
 Every loading placeholder pulses through one shared wave, never a local pulse of its
 own. The pieces:
 
-- `skeletonStyles.bone` (fill and radius) and `skeletonStyles.line` (a bar `0.6lh`
-  tall with `0.2lh` margins, so it fills exactly one line of the text it replaces)
+- `skeletonStyles.bone` (fill and radius) and `skeletonStyles.line`: a `1lh` box,
+  so it holds exactly one line of the text it replaces, whose `::before` bar is
+  `1cap` tall (`0.7em` fallback) and sits on the baseline, covering the same band
+  as the text's capitals
   in `utils/skeleton.styles.ts`.
 - `skeletonStyles.wave`: the keyframes (opacity `1 → 0.32 → 1` over the first 56%
   of a 2s cycle, then a hold), on `--cl-ease-in-out`. A component with its own

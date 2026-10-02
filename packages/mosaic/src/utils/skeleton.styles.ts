@@ -28,10 +28,19 @@ export const skeletonStyles = stylex.create({
     userSelect: 'none',
   },
   line: {
-    borderRadius: radiusVars['--cl-radius-sm'],
-    marginBlock: '0.2lh',
+    borderRadius: 0,
+    backgroundColor: 'transparent',
     display: 'block',
-    height: '0.6lh',
+    height: '1lh',
     maxWidth: '100%',
+    '::before': {
+      borderRadius: radiusVars['--cl-radius-sm'],
+      backgroundColor: colorVars['--cl-color-neutral-alpha-200'],
+      content: "''",
+      display: 'inline-block',
+      verticalAlign: 'baseline',
+      height: stylex.firstThatWorks('1cap', '0.7em'),
+      width: '100%',
+    },
   },
 });
