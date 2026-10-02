@@ -1,7 +1,11 @@
 import { Platform } from 'react-native';
 
 import NativeClerkModule from '../specs/NativeClerkModule';
-import type { NativeAuthFlowModule, NativeBiometricCredentialModule } from '../specs/NativeClerkModule.types';
+import type {
+  NativeAuthFlowModule,
+  NativeBiometricCredentialModule,
+  NativeClientSyncModule,
+} from '../specs/NativeClerkModule.types';
 
 export const isNativeSupported = Platform.OS === 'ios' || Platform.OS === 'android';
 
@@ -15,7 +19,7 @@ export type ClerkExpoNativeModule = {
     didChangeClient: boolean,
     didChangeDeviceToken: boolean,
   ): Promise<void>;
-} & Partial<NativeAuthFlowModule & NativeBiometricCredentialModule>;
+} & Partial<NativeAuthFlowModule & NativeBiometricCredentialModule & NativeClientSyncModule>;
 
 function isClerkExpoModule(module: unknown): module is ClerkExpoNativeModule {
   if (!module || typeof module !== 'object') {
