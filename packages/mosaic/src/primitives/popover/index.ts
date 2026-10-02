@@ -11,4 +11,3 @@ export type {
   PopoverTitleProps,
   PopoverTriggerProps,
 } from './parts';
-export type { FocusTarget as PopoverFocusTarget } from '../hooks/use-focus-target';

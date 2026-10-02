@@ -2,6 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { useRef } from 'react';
 
 import { Panel } from '../../components/panel';
+import { useProfilePageTitle } from '../../components/profile';
 import { themeProps } from '../../props';
 import type {
   UserProfileAccountSectionViewProps,
@@ -82,6 +83,8 @@ export function UserProfileProfilePanelView({
   deleteAccountSlot,
 }: UserProfileProfilePanelViewProps): ReactElement {
   const pageTitle = useRef<HTMLDivElement>(null);
+  const profilePageTitle = useProfilePageTitle();
+  const fallbackFocus = () => profilePageTitle?.() ?? pageTitle.current;
   return (
     <Panel.Root render={<div {...themeProps('user-profile-profile-panel')} />}>
       <Panel.Title
@@ -123,7 +126,7 @@ export function UserProfileProfilePanelView({
           onSubmitUsername={onSubmitUsername}
         />
         <UserProfileConnectedAccountsSectionView
-          fallbackFocus={() => pageTitle.current}
+          fallbackFocus={fallbackFocus}
           accounts={connectedAccounts}
           availableProviders={availableConnectionProviders}
           onReconnect={onReconnectAccount}
@@ -131,7 +134,7 @@ export function UserProfileProfilePanelView({
           onRemove={onRemoveConnectedAccount}
         />
         <UserProfileWeb3WalletsSectionView
-          fallbackFocus={() => pageTitle.current}
+          fallbackFocus={fallbackFocus}
           wallets={web3Wallets}
           availableProviders={availableWeb3Providers}
           onConnect={onConnectWeb3Wallet}

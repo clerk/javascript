@@ -2,6 +2,7 @@ import { useSafeLayoutEffect } from '@clerk/shared/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { Select as SelectPrimitive } from '../../primitives/select';
 import type { TabsProps } from '../../primitives/tabs';
 import { Tabs } from '../../primitives/tabs';
 import { useRender } from '../../primitives/utils';
@@ -14,21 +15,20 @@ import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Drawer } from '../drawer';
-import { HeadingLevelProvider, useHeadingLevel } from '../heading';
-import { Popover } from '../popover';
+import { Heading, HeadingLevelProvider, useHeadingLevel } from '../heading';
+import { Icon } from '../icon';
+import { SelectPopup } from '../select';
 import { VisuallyHidden } from '../visually-hidden';
-import type { ProfileContextValue } from './profile.context';
+import type { ProfileContextValue, ProfileNavLayout } from './profile.context';
 import { ContentPanelContext, ProfileContext } from './profile.context';
 import { contentScroll, contentViewportScroll, styles } from './profile.styles';
 
-type NavLayout = 'column' | 'popover' | 'sheet';
-
 // The sentinel's width (1/2/3px) carries the CSS breakpoints into JS; unmeasured is wide.
-function navLayoutFor(sentinelWidth: number): NavLayout {
+function navLayoutFor(sentinelWidth: number): ProfileNavLayout {
   if (sentinelWidth >= 3) {
     return 'sheet';
   }
-  return sentinelWidth >= 2 ? 'popover' : 'column';
+  return sentinelWidth >= 2 ? 'select' : 'column';
 }
 
 function useProfileContext(part: string): ProfileContextValue {
@@ -71,7 +71,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   const generatedTitleId = React.useId();
   const titleId = dialog?.labelId ?? generatedTitleId;
   const [sentinel, setSentinel] = React.useState<HTMLSpanElement | null>(null);
-  const [navLayout, setNavLayout] = React.useState<NavLayout>('column');
+  const [navLayout, setNavLayout] = React.useState<ProfileNavLayout>('column');
   useSafeLayoutEffect(() => {
     if (!sentinel) {
       return;
@@ -79,30 +79,25 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     return autoUpdate(sentinel, () => setNavLayout(navLayoutFor(getDimensions(sentinel).width)));
   }, [sentinel]);
   const compact = navLayout !== 'column';
-  const pageTitles = React.useRef(new Map<string, HTMLElement>());
-  const registerPageTitle = React.useCallback((page: string, element: HTMLElement | null) => {
-    if (element) {
-      pageTitles.current.set(page, element);
-    } else {
-      pageTitles.current.delete(page);
-    }
-  }, []);
-  const pageTitleFor = React.useCallback((page: string) => pageTitles.current.get(page) ?? null, []);
-  // Scoped to a layout so the replacement sheet or popover never mounts open.
-  const [navOpenIn, setNavOpenIn] = React.useState<NavLayout | null>(null);
+  const pageTitleId = React.useId();
+  const pageTitleRef = React.useRef<HTMLHeadingElement | null>(null);
+  const navTriggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const [navItems, setNavItems] = React.useState<React.ReactNode>(null);
+  // Scoped to a layout so the replacement sheet never mounts open.
+  const [navOpenIn, setNavOpenIn] = React.useState<ProfileNavLayout | null>(null);
   const navOpen = navOpenIn === navLayout;
-  const [navOpenedByKeyboard, setNavOpenedByKeyboard] = React.useState(false);
-  const openNav = React.useCallback(
-    (byKeyboard: boolean) => {
-      setNavOpenIn(navLayout);
-      setNavOpenedByKeyboard(byKeyboard);
-    },
-    [navLayout],
-  );
+  const openNav = React.useCallback(() => setNavOpenIn(navLayout), [navLayout]);
   const closeNav = React.useCallback(() => setNavOpenIn(null), []);
   React.useEffect(() => {
     setNavOpenIn(null);
   }, [navLayout]);
+  const selectPage = React.useCallback(
+    (next: string) => {
+      onValueChange?.(next);
+      closeNav();
+    },
+    [onValueChange, closeNav],
+  );
   const context = React.useMemo(
     () => ({
       titleId,
@@ -110,12 +105,15 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       compact,
       navLayout,
       navOpen,
-      navOpenedByKeyboard,
       openNav,
       closeNav,
       value,
-      registerPageTitle,
-      pageTitleFor,
+      selectPage,
+      navItems,
+      setNavItems,
+      pageTitleId,
+      pageTitleRef,
+      navTriggerRef,
       inline,
     }),
     [
@@ -124,12 +122,12 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       compact,
       navLayout,
       navOpen,
-      navOpenedByKeyboard,
       openNav,
       closeNav,
       value,
-      registerPageTitle,
-      pageTitleFor,
+      selectPage,
+      navItems,
+      pageTitleId,
       inline,
     ],
   );
@@ -174,13 +172,10 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
     <ProfileContext.Provider value={context}>
       <Tabs.Root
         value={value}
-        onValueChange={next => {
-          onValueChange?.(next);
-          closeNav();
-        }}
+        onValueChange={selectPage}
         orientation={orientation}
-        // Compact, arrowing through the list must not switch the page behind it.
-        activationMode={compact ? 'manual' : activationMode}
+        // Arrowing through the sheet's list must not switch the page behind it.
+        activationMode={navLayout === 'sheet' ? 'manual' : activationMode}
       >
         {element}
       </Tabs.Root>
@@ -208,14 +203,10 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
 
 export type ProfileNavProps = MosaicComponentProps<'nav'>;
 
-function focusListEdge(event: React.KeyboardEvent<HTMLElement>) {
-  if (event.target !== event.currentTarget || (event.key !== 'ArrowDown' && event.key !== 'ArrowUp')) {
-    return;
-  }
-  event.preventDefault();
-  const tabs = event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]:not([disabled])');
-  (event.key === 'ArrowDown' ? tabs[0] : tabs[tabs.length - 1])?.focus();
-}
+type NavItemMode = 'tab' | 'option' | 'label';
+
+// `Profile.Nav` children render again as the page title's label and as the select's options.
+const NavItemModeContext = React.createContext<NavItemMode>('tab');
 
 function NavBranding() {
   return (
@@ -226,99 +217,60 @@ function NavBranding() {
 }
 
 /**
- * Children are `Profile.NavItem`s only; they render inside the tablist. Compact, the tablist moves
- * into a popover (a sheet on a phone) opened from the page's `Panel.Title`.
+ * Children are `Profile.NavItem`s only. Wide, they render as a tablist; compact, as the options of
+ * the page title's select, or a tablist in a sheet on a phone.
  */
 const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   { children, render, xstyle, ...rest },
   ref,
 ) {
-  const profile = useProfileContext('Profile.Nav');
-  const {
-    titleId,
-    renderBranding,
-    compact,
-    navLayout,
-    navOpen,
-    navOpenedByKeyboard,
-    closeNav,
-    value,
-    pageTitleFor,
-    inline,
-  } = profile;
-  // The opener's page is hidden after a choice, so focus returns to the new page's title instead.
-  const finalFocus = React.useCallback(() => pageTitleFor(value), [pageTitleFor, value]);
-  const navRef = React.useRef<HTMLElement | null>(null);
-  const inPopover = navLayout === 'popover';
-  const list = (
-    <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
-      {children}
-    </Tabs.List>
-  );
+  const { titleId, renderBranding, compact, navLayout, navOpen, closeNav, setNavItems, navTriggerRef, inline } =
+    useProfileContext('Profile.Nav');
+  useSafeLayoutEffect(() => {
+    setNavItems(children);
+  }, [children, setNavItems]);
+  useSafeLayoutEffect(() => () => setNavItems(null), [setNavItems]);
   const element = useRender({
     defaultTagName: 'nav',
     render,
-    ref: [navRef, ref],
+    ref,
     props: {
       'aria-labelledby': titleId,
-      // A pointer open focuses the nav, and the arrows move into the list, as in `Menu`.
-      ...(inPopover ? { tabIndex: -1, onKeyDown: focusListEdge } : null),
       ...mergeStyleProps(
         themeProps('profile-nav', { compact }),
-        stylex.props(
-          reset.base,
-          styles.nav,
-          (inline || compact) && styles.navFlush,
-          inPopover && styles.navInPopover,
-          xstyle,
-        ),
+        stylex.props(reset.base, styles.nav, (inline || compact) && styles.navFlush, xstyle),
         rest,
       ),
       children: (
         <>
-          {list}
+          <Tabs.List {...mergeStyleProps(themeProps('profile-nav-list'), stylex.props(reset.base, styles.navList))}>
+            {children}
+          </Tabs.List>
           {renderBranding && !compact && !inline ? <NavBranding /> : null}
         </>
       ),
     },
   });
 
-  if (!compact) {
+  if (navLayout === 'column') {
     return element;
   }
-  const onOpenChange = (open: boolean) => {
-    if (!open) {
-      closeNav();
-    }
-  };
-  if (inPopover) {
-    return (
-      <Popover.Root
-        open={navOpen}
-        onOpenChange={onOpenChange}
-        placement='bottom-start'
-        // The title opens the popover itself, so the popover cannot see a keyboard open.
-        initialFocus={navOpenedByKeyboard ? 'first' : navRef}
-      >
-        <Popover.Popup
-          anchor={pageTitleFor(value)}
-          aria-labelledby={titleId}
-          finalFocus={finalFocus}
-          xstyle={styles.navPopover}
-        >
-          {element}
-        </Popover.Popup>
-      </Popover.Root>
-    );
+  if (navLayout === 'select') {
+    return null;
   }
   return (
     <Drawer.Root
       open={navOpen}
-      onOpenChange={onOpenChange}
+      onOpenChange={open => {
+        if (!open) {
+          closeNav();
+        }
+      }}
     >
       <Drawer.Popup
         aria-labelledby={titleId}
-        finalFocus={finalFocus}
+        // The sheet has no trigger of its own to return focus to.
+        finalFocus={navTriggerRef}
         xstyle={styles.navSheet}
       >
         {element}
@@ -340,25 +292,18 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
   { value, icon, badge, disabled, children, render, xstyle, onClick, ...rest },
   ref,
 ) {
-  const { compact, closeNav } = useProfileContext('Profile.NavItem');
-  return (
-    <Tabs.Tab
-      ref={ref}
-      value={value}
-      disabled={disabled}
-      render={render}
-      onClick={event => {
-        onClick?.(event);
-        if (compact && !event.defaultPrevented && !disabled) {
-          closeNav();
-        }
-      }}
-      {...mergeStyleProps(
-        themeProps('profile-nav-item'),
-        stylex.props(reset.base, styles.navItem, focusOutline.visible, xstyle),
-        rest,
-      )}
-    >
+  const { compact, closeNav, value: selected } = useProfileContext('Profile.NavItem');
+  const mode = React.useContext(NavItemModeContext);
+  if (mode === 'label') {
+    return value === selected ? children : null;
+  }
+  const styleProps = mergeStyleProps(
+    themeProps('profile-nav-item'),
+    stylex.props(reset.base, styles.navItem, focusOutline.visible, xstyle),
+    rest,
+  );
+  const content = (
+    <>
       {icon ? (
         <span
           aria-hidden
@@ -373,9 +318,128 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
           <BadgeContext.Provider value={navItemBadgeDefaults}>{badge}</BadgeContext.Provider>
         </span>
       ) : null}
+    </>
+  );
+  if (mode === 'option') {
+    return (
+      <SelectPrimitive.Option
+        value={value}
+        label={typeof children === 'string' ? children : undefined}
+        disabled={disabled}
+        render={render}
+        // An explicit `undefined` would replace the option's own click handler.
+        {...(onClick ? { onClick } : null)}
+        {...styleProps}
+      >
+        {content}
+      </SelectPrimitive.Option>
+    );
+  }
+  return (
+    <Tabs.Tab
+      ref={ref}
+      value={value}
+      disabled={disabled}
+      render={render}
+      onClick={event => {
+        onClick?.(event);
+        if (compact && !event.defaultPrevented && !disabled) {
+          closeNav();
+        }
+      }}
+      {...styleProps}
+    >
+      {content}
     </Tabs.Tab>
   );
 });
+
+function PageTitle() {
+  const {
+    navLayout,
+    navOpen,
+    openNav,
+    closeNav,
+    value,
+    selectPage,
+    navItems,
+    pageTitleId,
+    pageTitleRef,
+    navTriggerRef,
+  } = useProfileContext('Profile.Content');
+  const level = useHeadingLevel();
+  const label = (
+    <span id={`${pageTitleId}-label`}>
+      <NavItemModeContext.Provider value='label'>{navItems}</NavItemModeContext.Provider>
+    </span>
+  );
+  const triggerProps = mergeStyleProps(
+    themeProps('profile-nav-trigger'),
+    stylex.props(reset.base, styles.navTrigger, focusOutline.visible),
+  );
+  const triggerContent = (
+    <>
+      {label}
+      <Icon
+        name='chevron-down'
+        size='sm'
+        {...mergeStyleProps(themeProps('profile-nav-trigger-caret'), stylex.props(styles.caret))}
+      />
+    </>
+  );
+  const heading = (children: React.ReactNode) => (
+    <Heading
+      ref={pageTitleRef}
+      id={pageTitleId}
+      level={level}
+      size='2xl'
+      tabIndex={-1}
+      xstyle={styles.pageTitle}
+      {...themeProps('profile-page-title')}
+    >
+      {children}
+    </Heading>
+  );
+
+  if (navLayout === 'column') {
+    return heading(label);
+  }
+  if (navLayout === 'sheet') {
+    return heading(
+      <button
+        ref={navTriggerRef}
+        type='button'
+        aria-haspopup='dialog'
+        aria-expanded={navOpen}
+        onClick={() => (navOpen ? closeNav() : openNav())}
+        {...triggerProps}
+      >
+        {triggerContent}
+      </button>,
+    );
+  }
+  return (
+    // A page title is not a form field: the list drops below it rather than covering it.
+    <SelectPrimitive.Root
+      value={value}
+      onValueChange={selectPage}
+      alignItemWithTrigger={false}
+    >
+      {heading(
+        <SelectPrimitive.Trigger
+          // A combobox takes no name from its content.
+          aria-labelledby={`${pageTitleId}-label`}
+          {...triggerProps}
+        >
+          {triggerContent}
+        </SelectPrimitive.Trigger>,
+      )}
+      <SelectPopup xstyle={styles.navPopup}>
+        <NavItemModeContext.Provider value='option'>{navItems}</NavItemModeContext.Provider>
+      </SelectPopup>
+    </SelectPrimitive.Root>
+  );
+}
 
 export type ProfileContentProps = MosaicComponentProps<'div'>;
 
@@ -407,6 +471,9 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
           )}
         >
           <div {...mergeStyleProps(themeProps('profile-content-body'), stylex.props(reset.base, styles.contentBody))}>
+            <HeadingLevelProvider>
+              <PageTitle />
+            </HeadingLevelProvider>
             {children}
             {inline && renderBranding && !compact ? (
               <div
@@ -435,18 +502,17 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
   { value, shouldForceMount, xstyle, ...rest },
   ref,
 ) {
-  const { compact } = useProfileContext('Profile.ContentPanel');
-  const titleId = React.useId();
-  const panel = React.useMemo(() => ({ titleId, value }), [titleId, value]);
+  const { compact, pageTitleId } = useProfileContext('Profile.ContentPanel');
   return (
-    <ContentPanelContext.Provider value={panel}>
+    <ContentPanelContext.Provider value>
       <HeadingLevelProvider>
         <Tabs.Panel
           ref={ref}
           value={value}
           shouldForceMount={shouldForceMount}
-          // Compact, the naming tab is not mounted; an explicit `undefined` would drop the primitive's label.
-          {...(compact ? { 'aria-labelledby': titleId } : null)}
+          aria-labelledby={`${pageTitleId}-label`}
+          // Compact, no tablist is showing, so the page is a plain group rather than an orphan tabpanel.
+          {...(compact ? { role: 'group', tabIndex: undefined } : null)}
           {...mergeStyleProps(themeProps('profile-content-panel', { value }), stylex.props(xstyle), rest)}
         />
       </HeadingLevelProvider>
@@ -470,3 +536,9 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
  * ```
  */
 export const Profile = { Root, Title, Nav, NavItem, Content, ContentPanel };
+
+/** The shared page title, for a page to send focus to; `null` outside a profile. */
+export function useProfilePageTitle(): (() => HTMLElement | null) | null {
+  const titleRef = React.useContext(ProfileContext)?.pageTitleRef;
+  return React.useMemo(() => (titleRef ? () => titleRef.current : null), [titleRef]);
+}

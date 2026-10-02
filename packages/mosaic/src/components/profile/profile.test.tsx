@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -13,7 +13,7 @@ import { Icon } from '../icon';
 import { Panel } from '../panel';
 import { Section } from '../section';
 import type { ProfileRootProps } from './profile';
-import { Profile } from './profile';
+import { Profile, useProfilePageTitle } from './profile';
 
 function Surface(rootProps: Partial<ProfileRootProps>) {
   return (
@@ -256,12 +256,61 @@ describe('Profile', () => {
   describe('page title', () => {
     it('is a plain heading while the navigation is beside the content', () => {
       renderSurface();
-      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toHaveClass('cl-profile-page-title');
       expect(screen.queryByRole('button', { name: 'Account' })).not.toBeInTheDocument();
+    });
+
+    it('is the only page title, follows the selection, and names the tabpanel', () => {
+      const { rerender } = renderSurface();
+      expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(1);
+      expect(screen.queryByText('Account', { selector: '.cl-panel-title *' })).not.toBeInTheDocument();
+      expect(screen.getByRole('tabpanel', { name: 'Account' })).toBeInTheDocument();
+
+      rerender(
+        <MosaicProvider>
+          <Surface value='security' />
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('heading', { level: 3, name: 'Security' })).toBeInTheDocument();
+      expect(screen.getByRole('tabpanel', { name: 'Security' })).toHaveTextContent('Security page');
+    });
+
+    it('sits in the scrolling content, above the pages', () => {
+      renderSurface();
+      const title = screen.getByRole('heading', { level: 3, name: 'Account' });
+      expect(document.querySelector('.cl-profile-content-body')).toContainElement(title);
+      expect(title.compareDocumentPosition(screen.getByRole('tabpanel'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+
+    it('is reachable from a page through useProfilePageTitle', () => {
+      const seen: { getTitle: (() => HTMLElement | null) | null } = { getTitle: null };
+      function Probe() {
+        seen.getTitle = useProfilePageTitle();
+        return null;
+      }
+      render(
+        <MosaicProvider>
+          <Probe />
+          <Profile.Root value='account'>
+            <Profile.Title>User profile</Profile.Title>
+            <Profile.Nav>
+              <Profile.NavItem value='account'>Account</Profile.NavItem>
+            </Profile.Nav>
+            <Profile.Content>
+              <Profile.ContentPanel value='account'>
+                <Probe />
+              </Profile.ContentPanel>
+            </Profile.Content>
+          </Profile.Root>
+        </MosaicProvider>,
+      );
+      const title = screen.getByRole('heading', { level: 3, name: 'Account' });
+      expect(seen.getTitle?.()).toBe(title);
+      expect(title).toHaveAttribute('tabindex', '-1');
     });
   });
 
-  // The sentinel reports 1px column, 2px popover, 3px sheet.
+  // The sentinel reports 1px column, 2px select, 3px sheet.
   describe('compact', () => {
     let observe: ((width: number) => void) | null = null;
     const original = globalThis.ResizeObserver;
@@ -274,7 +323,7 @@ describe('Profile', () => {
           this.callback = callback;
         }
         observe(target: Element) {
-          // The popover's positioning observes its anchor too; only the sentinel reports the layout.
+          // The select's positioning observes its trigger too; only the sentinel reports the layout.
           if (!target.classList.contains('cl-profile-sentinel')) {
             return;
           }
@@ -317,115 +366,38 @@ describe('Profile', () => {
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
 
-    it('moves the tablist into a popover under the page title off a phone', async () => {
+    it('picks the page from a listbox under the page title off a phone', async () => {
       const user = userEvent.setup();
       const onValueChange = vi.fn();
       renderSurface({ onValueChange });
       act(() => observe?.(2));
 
       expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
-      const headline = screen.getByRole('button', { name: 'Account' });
+      expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+      const headline = screen.getByRole('combobox', { name: 'Account' });
+      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toContainElement(headline);
       await user.click(headline);
-      const popover = screen.getByRole('dialog', { name: 'User profile' });
-      expect(popover).toHaveClass('cl-popover-positioner');
-      expect(popover).toContainElement(screen.getByRole('tablist'));
-      expect(document.querySelector('.cl-drawer-popup')).not.toBeInTheDocument();
+      const listbox = screen.getByRole('listbox');
       expect(headline).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByRole('option', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByRole('option', { name: 'Account' })).toHaveClass('cl-profile-nav-item');
+      expect(listbox).toContainElement(screen.getByRole('option', { name: 'Security' }));
+      expect(document.querySelector('.cl-drawer-popup')).not.toBeInTheDocument();
 
-      await user.click(screen.getByRole('tab', { name: 'Security' }));
+      await user.click(screen.getByRole('option', { name: 'Security' }));
       expect(onValueChange).toHaveBeenCalledWith('security');
-      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
     });
 
-    it('moves focus to the selected tab when the popover opens from the keyboard', async () => {
-      const user = userEvent.setup();
-      const onValueChange = vi.fn();
-      renderSurface({ onValueChange });
-      act(() => observe?.(2));
-      const headline = screen.getByRole('button', { name: 'Account' });
-
-      // A keyboard-activated button click carries `detail: 0`, which userEvent does not send.
-      fireEvent.click(headline, { detail: 0 });
-      await waitFor(() => expect(screen.getByRole('tab', { name: 'Account' })).toHaveFocus());
-
-      await user.keyboard('{ArrowDown}');
-      expect(screen.getByRole('tab', { name: 'Security' })).toHaveFocus();
-      expect(onValueChange).not.toHaveBeenCalled();
-      await user.keyboard('{Enter}');
-      expect(onValueChange).toHaveBeenCalledWith('security');
-      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    });
-
-    it('focuses the navigation on a pointer open, and the arrows move into the list', async () => {
-      const user = userEvent.setup();
-      renderSurface();
-      act(() => observe?.(2));
-
-      await user.click(screen.getByRole('button', { name: 'Account' }));
-      const nav = screen.getByRole('navigation', { name: 'User profile' });
-      await waitFor(() => expect(nav).toHaveFocus());
-
-      await user.keyboard('{ArrowDown}');
-      expect(screen.getByRole('tab', { name: 'Account' })).toHaveFocus();
-
-      nav.focus();
-      await user.keyboard('{ArrowUp}');
-      expect(screen.getAllByRole('tab').at(-1)).toHaveFocus();
-    });
-
-    it('returns focus to the page title when the popover is escaped', async () => {
-      const user = userEvent.setup();
-      renderSurface();
-      act(() => observe?.(2));
-      const headline = screen.getByRole('button', { name: 'Account' });
-
-      fireEvent.click(headline, { detail: 0 });
-      await waitFor(() => expect(screen.getByRole('tab', { name: 'Account' })).toHaveFocus());
-      await user.keyboard('{Escape}');
-
-      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-      expect(headline).toHaveFocus();
-    });
-
-    it('closes the popover when the page title is pressed again', async () => {
-      const user = userEvent.setup();
-      renderSurface();
-      act(() => observe?.(2));
-      const headline = screen.getByRole('button', { name: 'Account' });
-      await user.click(headline);
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-
-      await user.click(headline);
-      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-      expect(headline).toHaveAttribute('aria-expanded', 'false');
-    });
-
-    it.each([
-      ['sheet', 3],
-      ['popover', 2],
-    ])('hands focus to the headline of the page that is showing once the %s closes', async (_, width) => {
+    it('opens the listbox from the keyboard, picks with the arrows, and keeps focus on the title', async () => {
       const user = userEvent.setup();
       function Controlled() {
         const [value, setValue] = React.useState('account');
         return (
-          <Profile.Root
+          <Surface
             value={value}
             onValueChange={setValue}
-          >
-            <Profile.Title>User profile</Profile.Title>
-            <Profile.Nav>
-              <Profile.NavItem value='account'>Account</Profile.NavItem>
-              <Profile.NavItem value='security'>Security</Profile.NavItem>
-            </Profile.Nav>
-            <Profile.Content>
-              <Profile.ContentPanel value='account'>
-                <Panel.Title>Account</Panel.Title>
-              </Profile.ContentPanel>
-              <Profile.ContentPanel value='security'>
-                <Panel.Title>Security</Panel.Title>
-              </Profile.ContentPanel>
-            </Profile.Content>
-          </Profile.Root>
+          />
         );
       }
       render(
@@ -433,22 +405,100 @@ describe('Profile', () => {
           <Controlled />
         </MosaicProvider>,
       );
-      act(() => observe?.(width));
+      act(() => observe?.(2));
+      const headline = screen.getByRole('combobox', { name: 'Account' });
 
-      await user.click(screen.getByRole('button', { name: 'Account' }));
+      headline.focus();
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(screen.getByRole('option', { name: 'Account' })).toHaveFocus());
+      await user.keyboard('{ArrowDown}');
+      expect(screen.getByRole('option', { name: 'Security' })).toHaveFocus();
+      await user.keyboard('{Enter}');
+
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+      expect(headline).toHaveFocus();
+      expect(headline).toHaveAccessibleName('Security');
+      expect(screen.getByRole('group', { name: 'Security' })).toHaveTextContent('Security page');
+    });
+
+    it('returns focus to the page title when the listbox is escaped', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(2));
+      const headline = screen.getByRole('combobox', { name: 'Account' });
+
+      await user.click(headline);
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+      await user.keyboard('{Escape}');
+
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+      expect(headline).toHaveFocus();
+    });
+
+    it('closes the listbox when the page title is pressed again', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(2));
+      const headline = screen.getByRole('combobox', { name: 'Account' });
+      await user.click(headline);
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+      await user.click(headline);
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+      expect(headline).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('closes the sheet on Escape and returns focus to the page title', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(3));
+      const headline = screen.getByRole('button', { name: 'Account' });
+      headline.focus();
+      await user.keyboard('{Enter}');
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(headline).toHaveFocus();
+    });
+
+    it('hands focus back to the page title once the sheet closes on a choice', async () => {
+      const user = userEvent.setup();
+      function Controlled() {
+        const [value, setValue] = React.useState('account');
+        return (
+          <Surface
+            value={value}
+            onValueChange={setValue}
+          />
+        );
+      }
+      render(
+        <MosaicProvider>
+          <Controlled />
+        </MosaicProvider>,
+      );
+      act(() => observe?.(3));
+
+      const headline = screen.getByRole('button', { name: 'Account' });
+      await user.click(headline);
       await user.click(screen.getByRole('tab', { name: 'Security' }));
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
 
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Security' })).toHaveFocus());
+      await waitFor(() => expect(headline).toHaveFocus());
+      expect(headline).toHaveAccessibleName('Security');
     });
 
-    it('names the visible panel by its title while the tablist is away', () => {
+    it.each([
+      ['sheet', 3],
+      ['select', 2],
+    ])('shows the page as a group named by the page title in the %s layout', (_, width) => {
       renderSurface();
-      act(() => observe?.(3));
-      const panel = screen.getByRole('tabpanel');
-      const title = screen.getByRole('heading', { level: 3, name: 'Account' });
-      expect(panel).toHaveAttribute('aria-labelledby', title.id);
-      expect(panel).toHaveAccessibleName('Account');
+      act(() => observe?.(width));
+      expect(screen.queryByRole('tabpanel')).not.toBeInTheDocument();
+      const page = screen.getByRole('group', { name: 'Account' });
+      expect(page).toHaveTextContent('Email addresses');
+      expect(page).not.toHaveAttribute('tabindex');
     });
 
     it('closes the sheet when the layout widens, and does not bring it back on narrowing', async () => {
@@ -464,15 +514,16 @@ describe('Profile', () => {
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
-    it('closes the navigation when it moves between the sheet and the popover', async () => {
+    it('closes the navigation when it moves between the sheet and the select', async () => {
       const user = userEvent.setup();
       renderSurface();
       act(() => observe?.(2));
-      await user.click(screen.getByRole('button', { name: 'Account' }));
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      await user.click(screen.getByRole('combobox', { name: 'Account' }));
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
 
       act(() => observe?.(3));
-      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     });
 
     it('returns the tablist to the column when the width comes back', () => {

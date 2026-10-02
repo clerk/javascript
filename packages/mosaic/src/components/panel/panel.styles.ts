@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, radiusVars, space } from '../../tokens.stylex';
+import { space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   root: {
@@ -13,24 +13,6 @@ export const styles = stylex.create({
     display: 'block',
   },
 
-  // Inline so the caret can align to the title's x-height.
-  navTrigger: {
-    font: 'inherit',
-    borderRadius: radiusVars['--cl-radius-md'],
-    marginInline: `calc(-1 * ${space['1']})`,
-    paddingInline: space['1'],
-    backgroundColor: 'transparent',
-    color: 'inherit',
-    cursor: 'pointer',
-    display: 'inline',
-    textAlign: 'start',
-  },
-  // `vertical-align: middle` centers the caret on the title's x-height rather than the line box.
-  caret: {
-    '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
-    marginInlineStart: space['1'],
-    verticalAlign: 'middle',
-  },
   sections: {
     gap: space['8'],
     display: 'flex',

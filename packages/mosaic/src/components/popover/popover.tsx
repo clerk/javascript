@@ -2,7 +2,7 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
-import type { PopoverFocusTarget, PopoverProps as HeadlessPopoverProps } from '../../primitives/popover';
+import type { PopoverProps as HeadlessPopoverProps } from '../../primitives/popover';
 import { Popover as Primitive } from '../../primitives/popover';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -77,9 +77,8 @@ function Positioner({ children, ...rest }: React.ComponentPropsWithoutRef<typeof
 }
 
 export interface PopoverPopupProps extends MosaicComponentProps<'div'> {
-  /** Positions against this element instead of the trigger; with no trigger, it acts as one. */
+  /** Positions against this element instead of the trigger. */
   anchor?: HTMLElement | null;
-  finalFocus?: PopoverFocusTarget;
   size?: PopoverSize;
   /** Required unless the contents render a `Popover.Title`. */
   'aria-label'?: string;
@@ -88,7 +87,7 @@ export interface PopoverPopupProps extends MosaicComponentProps<'div'> {
 
 // Paints no surface of its own; supply one inside it, usually a `Card`.
 const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function PopoverPopup(
-  { anchor, finalFocus, xstyle, size = 'md', 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, ...rest },
+  { anchor, xstyle, size = 'md', 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, ...rest },
   ref,
 ) {
   return (
@@ -96,7 +95,6 @@ const Popup = React.forwardRef<HTMLDivElement, PopoverPopupProps>(function Popov
       {/* Spread conditionally: an explicit `undefined` would drop the `Popover.Title`'s label. */}
       <Positioner
         anchor={anchor}
-        finalFocus={finalFocus}
         {...(ariaLabel == null ? {} : { 'aria-label': ariaLabel })}
         {...(ariaLabelledby == null ? {} : { 'aria-labelledby': ariaLabelledby })}
       >

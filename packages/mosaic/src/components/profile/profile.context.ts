@@ -1,20 +1,25 @@
 import React from 'react';
 
+export type ProfileNavLayout = 'column' | 'select' | 'sheet';
+
 export interface ProfileContextValue {
   titleId: string;
   renderBranding: boolean;
   compact: boolean;
-  navLayout: 'column' | 'popover' | 'sheet';
+  navLayout: ProfileNavLayout;
   navOpen: boolean;
-  navOpenedByKeyboard: boolean;
-  openNav: (byKeyboard: boolean) => void;
+  openNav: () => void;
   closeNav: () => void;
   value: string;
-  registerPageTitle: (value: string, element: HTMLElement | null) => void;
-  pageTitleFor: (value: string) => HTMLElement | null;
+  selectPage: (value: string) => void;
+  navItems: React.ReactNode;
+  setNavItems: (items: React.ReactNode) => void;
+  pageTitleId: string;
+  pageTitleRef: React.MutableRefObject<HTMLHeadingElement | null>;
+  navTriggerRef: React.MutableRefObject<HTMLButtonElement | null>;
   inline: boolean;
 }
 
 export const ProfileContext = React.createContext<ProfileContextValue | null>(null);
 
-export const ContentPanelContext = React.createContext<{ titleId: string; value: string } | null>(null);
+export const ContentPanelContext = React.createContext(false);

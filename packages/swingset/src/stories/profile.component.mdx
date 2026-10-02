@@ -58,7 +58,11 @@ height and the pages scrolling inside; `flush` is the page's own content — no 
 scrolls, the columns a gap apart, held to a reading width and centered. A
 `NavItem` and a `Page` pair by `value`. `icon` and `badge` take nodes, so a page can supply its own
 leading mark and trailing status. A `Badge` passed to `badge` is `neutral` unless it sets its own `color`. `Title` is a visually hidden heading: it names the navigation, the compact
-popover or sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
+sheet, and — inside a dialog — the dialog itself, the way `Card.Title` does.
+
+`Content` renders the page title above the pages: the selected `NavItem`'s label, as a heading that
+scrolls with the page and names it. `useProfilePageTitle()` returns a getter for that heading, for a
+page that needs somewhere to send focus.
 
 ## Parts
 
@@ -70,31 +74,34 @@ popover or sheet, and — inside a dialog — the dialog itself, the way `Card.T
 | —                      | tablist                 | `cl-profile-nav-list`      |
 | `Profile.NavItem`      | `button[role=tab]`      | `cl-profile-nav-item`      |
 | `Profile.Content`      | `div` (scroll region)   | `cl-profile-content`       |
+| —                      | page title heading      | `cl-profile-page-title`    |
+| —                      | compact title `button`  | `cl-profile-nav-trigger`   |
 | `Profile.ContentPanel` | `div[role=tabpanel]`    | `cl-profile-content-panel` |
 
 `Content` is a plain `div`, not a `main`: the profile is usually the content of the host's own
-`main`, or of a dialog.
+`main`, or of a dialog. While compact, `ContentPanel` is a `div[role=group]` named by the page title.
 
 ## Heading levels
 
 The profile's headings follow the nearest `HeadingLevelProvider`. `Profile.Title` renders at the
-current level, and `Profile.ContentPanel` moves its page one level down, where `Panel.Title`
-renders. `Panel.Sections` puts section titles one level below the page title. See
+current level, and the page title and pages sit one level down. `Panel.Sections` puts section
+titles one level below the page title. See
 [Heading](/components/heading) and [Panel](/components/panel).
 
-| Usage                                           | `Profile.Title` | `Panel.Title` | `Section.Title` |
-| ----------------------------------------------- | --------------- | ------------- | --------------- |
-| Profile                                         | `h2`            | `h3`          | `h4`            |
-| Profile inside `HeadingLevelProvider level={3}` | `h3`            | `h4`          | `h5`            |
-| A page alone                                    | —               | `h2`          | `h3`            |
+| Usage                                           | `Profile.Title` | Page title | `Section.Title` |
+| ----------------------------------------------- | --------------- | ---------- | --------------- |
+| Profile                                         | `h2`            | `h3`       | `h4`            |
+| Profile inside `HeadingLevelProvider level={3}` | `h3`            | `h4`       | `h5`            |
+| A page alone (`Panel.Title`)                    | —               | `h2`       | `h3`            |
 
 ## Compact layout
 
 Below `48rem` of the profile's **own** width — or, over the page, the dialog's viewport's, so the
 profile collapses exactly when the dialog fills the screen — the frame goes: the profile is the page
-there, flush with whatever holds it, and the navigation leaves the column: `Panel.Title` grows a
-caret that opens the tablist, and a choice closes it. On a viewport of `40rem` or more the tablist
-opens in a `Popover` under the title; on a phone, in a `Drawer` as tall as its content. The root
+there, flush with whatever holds it, and the navigation leaves the column: the page title grows a
+caret and opens it. On a viewport of `40rem` or more the title is a `Select` trigger, and the
+`NavItem`s are its options in a listbox under the title; on a phone, the title opens a `Drawer` as
+tall as its content, holding the tablist. A choice closes either. The root
 reads the layout off a sentinel it renders: `1px` wide, `2px` once the query matches, `3px` on a
 phone's viewport as well.
 

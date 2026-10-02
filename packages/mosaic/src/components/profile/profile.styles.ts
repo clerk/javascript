@@ -134,24 +134,36 @@ export const styles = stylex.create({
     borderInlineEndWidth: '0px',
   },
 
-  navPopover: {
-    padding: space['1'],
-    borderRadius: radiusVars['--cl-radius-lg'],
-    backgroundColor: colorVars['--cl-color-background'],
-    boxShadow: shadowVars['--cl-shadow-md'],
-    color: colorVars['--cl-color-foreground'],
-    maxHeight: 'var(--cl-available-height)',
-    minWidth: '12.5rem',
-    overflowY: 'auto',
-    width: 'max-content',
+  navPopup: {
+    minWidth: 'max(12.5rem, var(--cl-anchor-width, 0px))',
   },
 
   navSheet: {
     minBlockSize: 0,
   },
 
-  navInPopover: {
-    outline: 'none',
+  pageTitle: {
+    marginBlockEnd: space['6'],
+  },
+
+  // Inline so the caret can align to the title's x-height.
+  navTrigger: {
+    font: 'inherit',
+    borderRadius: radiusVars['--cl-radius-md'],
+    marginInline: `calc(-1 * ${space['1']})`,
+    paddingInline: space['1'],
+    backgroundColor: 'transparent',
+    color: 'inherit',
+    cursor: 'pointer',
+    display: 'inline',
+    textAlign: 'start',
+  },
+
+  // `vertical-align: middle` centers the caret on the title's x-height rather than the line box.
+  caret: {
+    '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
+    marginInlineStart: space['1'],
+    verticalAlign: 'middle',
   },
 
   navList: {

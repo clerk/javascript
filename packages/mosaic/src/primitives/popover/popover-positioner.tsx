@@ -3,19 +3,17 @@
 import { FloatingFocusManager } from '@floating-ui/react';
 import React from 'react';
 
-import { type FocusTarget, useFinalFocus } from '../hooks/use-focus-target';
 import { type ComponentProps, type DefaultProps, isKeyboardOpen, mergeProps, useRender } from '../utils';
 import { usePopoverContext } from './popover-context';
 
 export interface PopoverPositionerProps extends ComponentProps<'div'> {
-  /** Positions against this element instead of the trigger; with no trigger, it acts as one. */
+  /** Positions against this element instead of the trigger. */
   anchor?: HTMLElement | null;
-  finalFocus?: FocusTarget;
 }
 
 export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositionerProps>(
   function PopoverPositioner(props, ref) {
-    const { anchor, finalFocus, render, ...otherProps } = props;
+    const { anchor, render, ...otherProps } = props;
     const {
       mounted,
       floatingContext,
@@ -36,15 +34,9 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       if (!anchor) {
         return;
       }
-      if (!refs.domReference.current) {
-        refs.setReference(anchor);
-        return () => refs.setReference(null);
-      }
       refs.setPositionReference(anchor);
       return () => refs.setPositionReference(refs.domReference.current);
     }, [anchor, refs]);
-
-    const resolvedReturnFocus = useFinalFocus(finalFocus, returnFocusRef, floatingContext);
 
     const side = placement.split('-')[0];
 
@@ -75,14 +67,8 @@ export const PopoverPositioner = React.forwardRef<HTMLDivElement, PopoverPositio
       <FloatingFocusManager
         context={floatingContext}
         modal={modal}
-        initialFocus={
-          typeof initialFocus === 'object'
-            ? initialFocus
-            : initialFocus === 'first' || isKeyboardOpen(floatingContext)
-              ? 0
-              : refs.floating
-        }
-        returnFocus={resolvedReturnFocus}
+        initialFocus={initialFocus === 'first' || isKeyboardOpen(floatingContext) ? 0 : refs.floating}
+        returnFocus={returnFocusRef}
       >
         {element}
       </FloatingFocusManager>

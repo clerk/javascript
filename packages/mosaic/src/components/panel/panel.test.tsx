@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { MosaicProvider } from '../../MosaicProvider';
 import { HeadingLevelProvider } from '../heading';
+import { Profile } from '../profile';
 import { Section } from '../section';
 import { Panel } from './panel';
 
@@ -60,5 +61,27 @@ describe('Panel', () => {
 
     expect(screen.getByRole('heading', { level: 4, name: 'Account' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 5, name: 'Email addresses' })).toBeInTheDocument();
+  });
+
+  it('leaves the title to the profile inside a profile page', () => {
+    render(
+      <MosaicProvider>
+        <Profile.Root value='account'>
+          <Profile.Title>User profile</Profile.Title>
+          <Profile.Nav>
+            <Profile.NavItem value='account'>Account</Profile.NavItem>
+          </Profile.Nav>
+          <Profile.Content>
+            <Profile.ContentPanel value='account'>
+              <Account />
+            </Profile.ContentPanel>
+          </Profile.Content>
+        </Profile.Root>
+      </MosaicProvider>,
+    );
+
+    expect(document.querySelector('.cl-panel-title')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { name: 'Account' })).toHaveLength(1);
+    expect(screen.getByRole('heading', { name: 'Account' })).toHaveClass('cl-profile-page-title');
   });
 });

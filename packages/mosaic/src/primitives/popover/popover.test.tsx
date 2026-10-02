@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React, { createRef } from 'react';
+import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { axe } from '../test-utils/axe';
@@ -109,75 +109,6 @@ describe('Popover', () => {
       await user.click(screen.getByRole('button', { name: 'Open popover' }));
 
       expect(document.querySelector('[data-testid="popover-positioner"]')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('anchor without a trigger', () => {
-    function AnchoredPopover({ finalFocus }: { finalFocus?: () => HTMLElement | null }) {
-      const [open, setOpen] = React.useState(false);
-      const [anchor, setAnchor] = React.useState<HTMLButtonElement | null>(null);
-      return (
-        <>
-          <button
-            ref={setAnchor}
-            type='button'
-            onClick={() => setOpen(o => !o)}
-          >
-            Anchor
-          </button>
-          <button type='button'>Elsewhere</button>
-          <Popover.Root
-            open={open}
-            onOpenChange={setOpen}
-          >
-            <Popover.Portal>
-              <Popover.Positioner
-                anchor={anchor}
-                finalFocus={finalFocus}
-                aria-label='Anchored'
-              >
-                <Popover.Popup>
-                  <button type='button'>Inside</button>
-                  <Popover.Close>Close</Popover.Close>
-                </Popover.Popup>
-              </Popover.Positioner>
-            </Popover.Portal>
-          </Popover.Root>
-        </>
-      );
-    }
-
-    it('treats a press on the anchor as its own, not an outside press', async () => {
-      const user = userEvent.setup();
-      render(<AnchoredPopover />);
-
-      const anchor = screen.getByRole('button', { name: 'Anchor' });
-      await user.click(anchor);
-      expect(screen.getByRole('dialog', { name: 'Anchored' })).toBeInTheDocument();
-
-      await user.click(anchor);
-      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    });
-
-    it('returns focus to the anchor on close', async () => {
-      const user = userEvent.setup();
-      render(<AnchoredPopover />);
-
-      const anchor = screen.getByRole('button', { name: 'Anchor' });
-      await user.click(anchor);
-      await user.click(screen.getByRole('button', { name: 'Close' }));
-
-      await waitFor(() => expect(anchor).toHaveFocus());
-    });
-
-    it('returns focus where finalFocus points', async () => {
-      const user = userEvent.setup();
-      render(<AnchoredPopover finalFocus={() => screen.getByRole('button', { name: 'Elsewhere' })} />);
-
-      await user.click(screen.getByRole('button', { name: 'Anchor' }));
-      await user.click(screen.getByRole('button', { name: 'Close' }));
-
-      await waitFor(() => expect(screen.getByRole('button', { name: 'Elsewhere' })).toHaveFocus());
     });
   });
 
