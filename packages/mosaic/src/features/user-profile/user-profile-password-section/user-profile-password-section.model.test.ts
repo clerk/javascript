@@ -37,6 +37,7 @@ let session: TestSession | null;
 let environment: ReturnType<typeof createEnvironment>;
 
 const clerk = {
+  addListener: vi.fn(() => vi.fn()),
   get user() {
     return user;
   },
