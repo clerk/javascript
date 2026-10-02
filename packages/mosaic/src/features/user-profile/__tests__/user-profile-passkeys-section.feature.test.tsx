@@ -490,6 +490,7 @@ describe('Passkey reverification', () => {
 });
 
 describe('Passkey follow-ups', () => {
+  it.todo('shows a localized duplicate-passkey message instead of the raw SDK error for passkey_already_exists');
   it.todo('rerenders passkey eligibility when a replaced or fetched environment changes policy');
   it.todo('focuses a surviving passkey row during React cleanup after removal');
 });
