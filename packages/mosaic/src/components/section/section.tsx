@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
 import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
@@ -46,6 +47,12 @@ const SectionGroupContext = React.createContext<React.Dispatch<React.SetStateAct
 const SectionHeaderContext = React.createContext(false);
 const SectionItemsContext = React.createContext(false);
 const SectionItemWrapContext = React.createContext(false);
+const SectionSkeletonContext = React.createContext(false);
+
+function useInheritedSkeleton(skeleton: boolean | undefined) {
+  const inherited = React.useContext(SectionSkeletonContext);
+  return skeleton ?? inherited;
+}
 
 const Root = React.forwardRef<HTMLElement, SectionRootProps>(function SectionRoot({ render, xstyle, ...rest }, ref) {
   return useRender({
@@ -69,6 +76,7 @@ const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function Secti
     props: skeleton
       ? {
           'aria-hidden': true,
+          ...inertProps(true),
           ...mergeStyleProps(
             themeProps('section-group', { skeleton }),
             stylex.props(reset.base, styles.group, xstyle),
@@ -83,7 +91,11 @@ const Group = React.forwardRef<HTMLDivElement, SectionGroupProps>(function Secti
         },
   });
 
-  return <SectionGroupContext.Provider value={setTitleId}>{element}</SectionGroupContext.Provider>;
+  return (
+    <SectionGroupContext.Provider value={setTitleId}>
+      <SectionSkeletonContext.Provider value={skeleton}>{element}</SectionSkeletonContext.Provider>
+    </SectionGroupContext.Provider>
+  );
 });
 
 const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function SectionHeader(
@@ -107,9 +119,10 @@ const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function Sec
 });
 
 const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function SectionTitle(
-  { id: idProp, skeleton = false, xstyle, children, ...rest },
+  { id: idProp, skeleton: skeletonProp, xstyle, children, ...rest },
   ref,
 ) {
+  const skeleton = useInheritedSkeleton(skeletonProp);
   const setTitleId = React.useContext(SectionGroupContext);
   const generatedId = React.useId();
   const level = useHeadingLevel();
@@ -207,9 +220,10 @@ const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function Section
 });
 
 const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function SectionMedia(
-  { size = 'md', skeleton = false, render, xstyle, children, ...rest },
+  { size = 'md', skeleton: skeletonProp, render, xstyle, children, ...rest },
   ref,
 ) {
+  const skeleton = useInheritedSkeleton(skeletonProp);
   const wave = useSkeletonWave<HTMLDivElement>(skeleton);
 
   return useRender({
@@ -250,9 +264,10 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
 });
 
 const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function SectionLabel(
-  { skeleton = false, render, xstyle, children, ...rest },
+  { skeleton: skeletonProp, render, xstyle, children, ...rest },
   ref,
 ) {
+  const skeleton = useInheritedSkeleton(skeletonProp);
   const wave = useSkeletonWave<HTMLDivElement>(skeleton);
 
   return useRender({
@@ -276,9 +291,10 @@ const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function Secti
 });
 
 const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(function SectionDescription(
-  { skeleton = false, render, xstyle, children, ...rest },
+  { skeleton: skeletonProp, render, xstyle, children, ...rest },
   ref,
 ) {
+  const skeleton = useInheritedSkeleton(skeletonProp);
   const inHeader = React.useContext(SectionHeaderContext);
   const wave = useSkeletonWave<HTMLDivElement>(skeleton);
 
@@ -305,9 +321,10 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
 });
 
 const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function SectionActions(
-  { skeleton = false, render, xstyle, children, ...rest },
+  { skeleton: skeletonProp, render, xstyle, children, ...rest },
   ref,
 ) {
+  const skeleton = useInheritedSkeleton(skeletonProp);
   const wrap = React.useContext(SectionItemWrapContext);
   const inHeader = React.useContext(SectionHeaderContext);
 

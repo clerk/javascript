@@ -16,19 +16,16 @@ export function UserProfileActiveDevicesSectionSkeleton() {
       <Section.Root>
         <Section.Group skeleton>
           <Section.Header>
-            <Section.Title skeleton />
+            <Section.Title />
           </Section.Header>
           <Section.Body>
             <Section.Items>
               {SKELETON_ITEMS.map(item => (
                 <Section.Item key={item}>
-                  <Section.Media
-                    size='lg'
-                    skeleton
-                  />
+                  <Section.Media size='lg' />
                   <Section.Content>
-                    <Section.Label skeleton />
-                    <Section.Description skeleton />
+                    <Section.Label />
+                    <Section.Description />
                   </Section.Content>
                 </Section.Item>
               ))}

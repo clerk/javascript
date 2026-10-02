@@ -24,10 +24,12 @@ the content beside it.
 Each component defines its own bones, but every bone uses the shared wave and the
 same fill, `--cl-color-neutral-alpha-200`.
 
-- **Use part props first.** `Section.Group`, `Section.Title`, `Section.Media`,
-  `Section.Label`, `Section.Description`, `Section.Actions`, and `Panel.Title` take
-  `skeleton`. A skeleton part renders empty (its children are dropped); a skeleton
-  group is `aria-hidden`.
+- **Use part props first.** `Section.Group skeleton` makes every Title, Media, Label,
+  Description, and Actions inside it a bone, so the parts need no prop of their own
+  (`skeleton={false}` opts one out). Parts also take `skeleton` standalone, as does
+  `Panel.Title`. A skeleton part renders empty (its children are dropped), so a
+  view's own markup can be reused with the group flipped; a skeleton group and
+  `Panel.Title` are `inert` and `aria-hidden`.
 - **Compose them in a `.skeleton.tsx`** next to the view it mirrors, e.g.
   `user-profile-active-devices-section.skeleton.tsx` exporting
   `UserProfileActiveDevicesSectionSkeleton`. A panel's skeleton composes its

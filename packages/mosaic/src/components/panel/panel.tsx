@@ -1,3 +1,4 @@
+import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
@@ -62,7 +63,7 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
       ...mergeStyleProps(
         themeProps('panel-title', { skeleton }),
         stylex.props(reset.base, styles.title, xstyle),
-        skeleton ? { 'aria-hidden': true } : {},
+        skeleton ? { 'aria-hidden': true, ...inertProps(true) } : {},
         rest,
       ),
       children: skeleton ? (
