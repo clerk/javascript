@@ -1,6 +1,6 @@
 import { vi } from 'vitest';
 
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileAddMfaDialog } from '../user-profile-add-mfa.dialog';
 import type { UserProfileMfaSetupViewProps } from '../user-profile-mfa-setup.view';
 import { UserProfileMfaSetupView } from '../user-profile-mfa-setup.view';

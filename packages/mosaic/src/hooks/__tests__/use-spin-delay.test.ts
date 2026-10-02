@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useSpinDelay } from '../useSpinDelay';
+import { useSpinDelay } from '../use-spin-delay';
 
 describe('useSpinDelay', () => {
   beforeEach(() => {

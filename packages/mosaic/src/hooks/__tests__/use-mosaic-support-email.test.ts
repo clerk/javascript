@@ -2,7 +2,7 @@ import type * as SharedReact from '@clerk/shared/react';
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { useMosaicSupportEmail } from '../useMosaicSupportEmail';
+import { useMosaicSupportEmail } from '../use-mosaic-support-email';
 
 let supportEmailFromOptions: string | undefined;
 let frontendApi: string;
@@ -24,7 +24,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
   };
 });
 
-vi.mock('../useMosaicEnvironment', () => ({
+vi.mock('../use-mosaic-environment', () => ({
   useMosaicEnvironment: () => environment(),
 }));
 

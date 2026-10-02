@@ -4,18 +4,17 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
 import type { UserProfileSecurityPanelViewProps } from '../user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
-function DeleteAccount() {
-  const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
+function DeleteAccount({ onDelete = () => Promise.resolve() }: { onDelete?: () => Promise<void> }) {
+  const controller = useDestructiveController({ onDelete });
   return <UserProfileDeleteSectionView {...controller} />;
 }
 
 const props: UserProfileSecurityPanelViewProps = {
-  hasPassword: true,
   passkeys: [
     {
       id: 'passkey_1',
@@ -72,8 +71,6 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.queryByRole('heading', { name: 'Authentication' })).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Active devices' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
-    expect(within(authentication).getByRole('heading', { level: 3, name: 'Password' })).toBeInTheDocument();
-    expect(within(authentication).getByRole('group', { name: 'Password' })).toBeInTheDocument();
     expect(within(authentication).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeInTheDocument();
     expect(within(authentication).getByRole('heading', { level: 3, name: '2-step verification' })).toBeInTheDocument();
     expect(within(authentication).getByRole('group', { name: 'Passkeys' })).toBeInTheDocument();
@@ -113,6 +110,7 @@ describe('UserProfileSecurityPanelView', () => {
     const onRemovePasskey = vi.fn();
     const onSignOutDevice = vi.fn();
     const onSignOutAllOtherDevices = vi.fn();
+    const onDeleteAccount = vi.fn(() => Promise.resolve());
     const user = userEvent.setup();
 
     renderView({
@@ -121,6 +119,7 @@ describe('UserProfileSecurityPanelView', () => {
       onRemovePasskey,
       onSignOutDevice,
       onSignOutAllOtherDevices,
+      deleteAccountSlot: <DeleteAccount onDelete={onDeleteAccount} />,
     });
 
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));
@@ -151,16 +150,22 @@ describe('UserProfileSecurityPanelView', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
 
+    // The danger zone confirms in a modal, so it goes last: nothing else is clickable while it is open.
+    await user.click(screen.getByRole('button', { name: 'Delete account' }));
+    const deleteDialog = screen.getByRole('dialog');
+    await user.type(within(deleteDialog).getByRole('textbox'), 'Delete account');
+    await user.click(within(deleteDialog).getByRole('button', { name: 'Delete account' }));
+
     expect(onAddPasskey).toHaveBeenCalledOnce();
     expect(onRenamePasskey).toHaveBeenCalledWith('passkey_1', 'Work laptop');
     expect(onRemovePasskey).toHaveBeenCalledWith('passkey_1');
     expect(onSignOutDevice).toHaveBeenCalledWith('mobile');
     expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
+    expect(onDeleteAccount).toHaveBeenCalledOnce();
   });
 
   it('keeps supported empty authentication methods actionable', () => {
     renderView({
-      hasPassword: false,
       passkeys: [],
       mfaMethods: [],
       devices: [],
@@ -174,7 +179,6 @@ describe('UserProfileSecurityPanelView', () => {
     expect(screen.getByRole('button', { name: 'Add passkey' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add verification method' })).toBeInTheDocument();
     expect(screen.getByText('No current device available')).toBeInTheDocument();
-    expect(screen.queryByText('Password')).not.toBeInTheDocument();
   });
 
   it('withholds sign out from the current device', async () => {
@@ -188,7 +192,6 @@ describe('UserProfileSecurityPanelView', () => {
 
   it('keeps the authentication section on MFA when existing passkeys are hidden', () => {
     renderView({
-      hasPassword: false,
       passkeysVisible: false,
       onAddPasskey: vi.fn(),
       onRenamePasskey: vi.fn(),
@@ -203,7 +206,7 @@ describe('UserProfileSecurityPanelView', () => {
   });
 
   it('keeps the passkeys card in the authentication section when passkeys are empty and Add is unavailable', () => {
-    renderView({ hasPassword: false, passkeys: [], onAddPasskey: undefined });
+    renderView({ passkeys: [], onAddPasskey: undefined });
 
     const section = screen.getByRole('region', { name: 'Authentication' });
     expect(within(section).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeVisible();
@@ -218,7 +221,7 @@ describe('UserProfileSecurityPanelView', () => {
     const onRemovePasskey = vi.fn(async () => {
       await removal.promise;
     });
-    const { rerender } = renderView({ hasPassword: false, mfaMethods: undefined, onRemovePasskey });
+    const { rerender } = renderView({ mfaMethods: undefined, onRemovePasskey });
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
