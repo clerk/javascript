@@ -80,7 +80,7 @@ describe('UserProfileAddAuthenticatorView', () => {
         authenticator={props}
       />,
     );
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert').textContent).toBe('');
     expect(screen.getByRole('status', { name: 'Preparing authenticator…' })).toBeVisible();
     expect(screen.getByRole('button', { name: /Preparing authenticator/ })).toHaveFocus();
 

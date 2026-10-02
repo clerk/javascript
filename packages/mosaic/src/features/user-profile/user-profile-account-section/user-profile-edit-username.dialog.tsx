@@ -1,7 +1,6 @@
 import type { FormEvent } from 'react';
 import { useId, useRef } from 'react';
 
-import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
@@ -65,6 +64,12 @@ export function UserProfileEditUsernameDialog({
             <Card.Title>{m.username.dialogTitle}</Card.Title>
           </Card.Header>
 
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {error?.message}
+          </Card.Banner>
           <Card.Content
             render={
               <form
@@ -73,14 +78,6 @@ export function UserProfileEditUsernameDialog({
               />
             }
           >
-            {error?.message ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
-              >
-                <Banner.Label>{error.message}</Banner.Label>
-              </Banner.Root>
-            ) : null}
             <Field.Root invalid={Boolean(error?.fields?.username)}>
               <Field.Label>{m.username.fieldLabel}</Field.Label>
               <Input

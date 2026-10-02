@@ -2,7 +2,6 @@ import { useMergeRefs } from '@floating-ui/react';
 import type { RefObject } from 'react';
 import { useRef, useState } from 'react';
 
-import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Checkbox } from '../../../components/checkbox';
@@ -60,6 +59,12 @@ export function UserProfileEditPasswordDialog({
           <Card.Header>
             <Card.Title>{hasPassword ? m.dialogTitle.change : m.dialogTitle.set}</Card.Title>
           </Card.Header>
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {form.error}
+          </Card.Banner>
           <Card.Content
             render={
               <form
@@ -75,14 +80,6 @@ export function UserProfileEditPasswordDialog({
               autoComplete='username'
               value={identifier}
             />
-            {form.error ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
-              >
-                <Banner.Label>{form.error}</Banner.Label>
-              </Banner.Root>
-            ) : null}
             {showCurrentPassword ? (
               <PasswordField
                 autoComplete='current-password'

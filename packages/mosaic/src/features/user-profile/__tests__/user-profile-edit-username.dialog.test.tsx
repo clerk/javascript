@@ -98,7 +98,7 @@ describe('UserProfileEditUsernameDialog', () => {
     renderView({ error: { message: 'Your username could not be updated.' } });
 
     const banner = screen.getByRole('alert');
-    expect(banner).toHaveAttribute('data-color', 'negative');
+    expect(banner.querySelector('.cl-banner-root')).toHaveAttribute('data-color', 'negative');
     expect(banner).toHaveTextContent('Your username could not be updated.');
     expect(usernameField()).not.toHaveAttribute('aria-invalid', 'true');
   });
@@ -106,7 +106,7 @@ describe('UserProfileEditUsernameDialog', () => {
   it('renders a field-scoped failure with no banner', () => {
     renderView({ error: { fields: { username: 'That username is taken.' } } });
 
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert').textContent).toBe('');
     expect(screen.getByText('That username is taken.')).toBeInTheDocument();
     expect(usernameField()).toHaveAttribute('aria-invalid', 'true');
   });
