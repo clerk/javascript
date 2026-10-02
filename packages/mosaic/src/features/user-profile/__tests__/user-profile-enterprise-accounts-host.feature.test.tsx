@@ -12,6 +12,9 @@ it('places the connected enterprise section before Web3 wallets in the profile h
   await renderWithClerk(
     <UserProfileProfilePanelView
       name='Jane Doe'
+      username=''
+      emails={[]}
+      phones={[]}
       enterpriseAccountsSlot={<UserProfileEnterpriseAccountsSection />}
       web3Wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
     />,

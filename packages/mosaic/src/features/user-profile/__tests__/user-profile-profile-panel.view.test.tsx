@@ -284,7 +284,7 @@ describe('UserProfileProfilePanelView', () => {
     );
   });
 
-  it('places enterprise accounts after Web3 wallets and before the danger zone', () => {
+  it('places enterprise accounts before Web3 wallets and the danger zone', () => {
     renderView({
       web3WalletsSlot: <UserProfileWeb3WalletsSectionView wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]} />,
       enterpriseAccountsSlot: <div data-testid='enterprise'>Enterprise accounts</div>,
@@ -294,7 +294,7 @@ describe('UserProfileProfilePanelView', () => {
     const wallets = screen.getByRole('group', { name: 'Web3 wallets' });
     const enterprise = screen.getByTestId('enterprise');
     const danger = screen.getByRole('heading', { name: 'Danger zone' });
-    expect(wallets.compareDocumentPosition(enterprise) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(enterprise.compareDocumentPosition(wallets) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(enterprise.compareDocumentPosition(danger) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 

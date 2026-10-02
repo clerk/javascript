@@ -46,8 +46,8 @@ export function UserProfileProfilePanelView({
           {...account}
         />
         {connectedAccountsSlot}
-        {web3WalletsSlot}
         {enterpriseAccountsSlot}
+        {web3WalletsSlot}
         {deleteAccountSlot}
       </Panel.Sections>
     </Panel.Root>
