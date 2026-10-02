@@ -18,6 +18,7 @@ export const userProfilePasskeysMessages = {
   renameTitle: 'Rename passkey',
   renameDescription: 'You can change the passkey name to make it easier to find.',
   nameLabel: 'Passkey name',
+  nameTooLongError: 'The passkey name must be 256 bytes or fewer.',
   save: 'Save',
   cancel: 'Cancel',
   unavailableError: 'This passkey is no longer available.',
