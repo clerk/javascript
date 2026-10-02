@@ -4,7 +4,7 @@ import type { FlowDirection } from '../../components/flow';
 import { useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import type { DoneInvokeEvent, StateConfig } from '../../machine/types';
-import { useMachine } from '../../machine/useMachine';
+import { useMachine } from '../../machine/use-machine';
 import type { ReverificationActiveModel, ReverificationModel } from './reverification.model';
 import type {
   ReverificationErrorReason,

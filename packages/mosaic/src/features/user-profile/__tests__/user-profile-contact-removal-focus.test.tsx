@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileEmailRowView } from '../user-profile-account-section/user-profile-email-row.view';
 import { UserProfilePhoneRowView } from '../user-profile-account-section/user-profile-phone-row.view';
 

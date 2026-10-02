@@ -4,10 +4,10 @@ import { act, render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../mosaic-provider';
 import { PUBLISHABLE_KEY } from './fake-fapi';
 
-export async function renderWithClerk(ui: ReactElement) {
+export async function renderWithClerk(ui: ReactElement, options?: Parameters<Clerk['load']>[0]) {
   const clerk = new Clerk(PUBLISHABLE_KEY);
   const navigate = vi.fn((_to: string) => Promise.resolve());
   const windowNavigate = vi.fn((_to: URL | string) => {});
@@ -23,7 +23,7 @@ export async function renderWithClerk(ui: ReactElement) {
   );
   let current = ui;
   const view = render(wrap(current));
-  await act(() => clerk.load({ routerPush: to => navigate(to), routerReplace: to => navigate(to) }));
+  await act(() => clerk.load({ routerPush: to => navigate(to), routerReplace: to => navigate(to), ...options }));
   view.rerender(wrap(current));
 
   return {

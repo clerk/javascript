@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useSyncExternalStore } from 'react';
 
-import { createActor } from './createActor';
+import { createActor } from './create-actor';
 import type { Actor, CreateActorOptions, EventObject, Snapshot, StateMachine } from './types';
 
 export interface UseMachineOptions<TContext> extends CreateActorOptions<TContext> {

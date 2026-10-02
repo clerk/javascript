@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../../components/button';
 import type { MosaicLocalization } from '../../../localization';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { SaveError } from '../../../utils/form-error';
 import { useUserProfileEditUsernameController } from '../user-profile-account-section/user-profile-edit-username.controller';
 import type { UserProfileEditUsernameDialogProps } from '../user-profile-account-section/user-profile-edit-username.dialog';
@@ -88,7 +88,7 @@ describe('UserProfileEditUsernameDialog', () => {
 
     await user.type(usernameField(), 'x');
     await user.click(saveButton());
-    await screen.findByRole('alert');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('no'));
     await user.type(usernameField(), '{Enter}');
 
     await waitFor(() => expect(props.onSubmit).toHaveBeenCalledTimes(2));
@@ -113,9 +113,9 @@ describe('UserProfileEditUsernameDialog', () => {
     await user.type(usernameField(), 'x');
     await user.click(saveButton());
 
-    const banner = await screen.findByRole('alert');
-    expect(banner).toHaveAttribute('data-color', 'negative');
-    expect(banner).toHaveTextContent('Your username could not be updated.');
+    const banner = screen.getByRole('alert');
+    await waitFor(() => expect(banner).toHaveTextContent('Your username could not be updated.'));
+    expect(banner.querySelector('.cl-banner-root')).toHaveAttribute('data-color', 'negative');
     expect(usernameField()).not.toHaveAttribute('aria-invalid', 'true');
   });
 
@@ -138,7 +138,7 @@ describe('UserProfileEditUsernameDialog', () => {
 
     await waitFor(() => expect(usernameField()).toHaveAccessibleDescription('Ese nombre de usuario ya existe.'));
     expect(usernameField()).toHaveAttribute('aria-invalid', 'true');
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert').textContent).toBe('');
   });
 
   it('stays inert while the save runs', async () => {

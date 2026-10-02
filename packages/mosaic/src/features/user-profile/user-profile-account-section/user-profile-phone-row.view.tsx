@@ -6,7 +6,7 @@ import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
 import { Text } from '../../../components/text';
-import { useListRemovalFocus } from '../../../hooks/useListRemovalFocus';
+import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfilePhone, UserProfilePhoneVerifier } from './user-profile-account-section.types';
 import { useUserProfileAddPhoneController } from './user-profile-add-phone.controller';

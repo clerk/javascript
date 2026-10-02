@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileUsernameRowView } from '../user-profile-account-section/user-profile-username-row.view';
 
 describe('UserProfileUsernameRowView', () => {

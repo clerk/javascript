@@ -5,13 +5,15 @@ import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
 } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
+import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.view';
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import type {
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import { useState } from 'react';
+import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+import { useRef, useState } from 'react';
 
 import { usePreviewImage } from './use-preview-image';
 import { useUserProfileActiveDevicesFixture } from './user-profile-active-devices';
@@ -41,6 +43,7 @@ export interface UserProfileFixtureOptions {
  * stories that need a realistic profile surface without being about it.
  */
 export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions = {}) {
+  const titleRef = useRef<HTMLDivElement>(null);
   const connections = useConnectedAccountsFixture();
   const wallets = useWeb3WalletsFixture();
   const editName = useUserProfileEditNameFixture();
@@ -87,16 +90,19 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
     account: {
       ...editName,
       ...editUsername,
-      connectedAccounts: connections.accounts,
-      availableConnectionProviders: connections.availableProviders,
-      onConnectAccount: connections.onConnect,
-      onReconnectAccount: connections.onReconnect,
-      onRemoveConnectedAccount: connections.onRemove,
-      web3Wallets: wallets.wallets,
-      availableWeb3Providers: wallets.availableProviders,
-      onConnectWeb3Wallet: wallets.onConnect,
-      onSetPrimaryWeb3Wallet: wallets.onSetPrimary,
-      onRemoveWeb3Wallet: wallets.onRemove,
+      titleRef,
+      connectedAccountsSlot: (
+        <UserProfileConnectedAccountsSectionView
+          {...connections}
+          fallbackFocus={() => titleRef.current}
+        />
+      ),
+      web3WalletsSlot: (
+        <UserProfileWeb3WalletsSectionView
+          {...wallets}
+          fallbackFocus={() => titleRef.current}
+        />
+      ),
       allowMultipleAccounts: true,
       hasImage: Boolean(imageUrl),
       imageUrl,

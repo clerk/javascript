@@ -16,7 +16,12 @@ import * as UserProfileProfilePanelStories from './user-profile-profile-panel.st
 ## Usage
 
 ```tsx
+import { useRef } from 'react';
 import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
+import { UserProfileConnectedAccountsSection } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section';
+import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+
+const titleRef = useRef<HTMLDivElement>(null);
 
 <UserProfileProfilePanelView
   allowMultipleAccounts={allowMultipleAccounts}
@@ -35,25 +40,9 @@ import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile
     isDefault: phone.id === user.primaryPhoneNumberId,
     isVerified: phone.verification.status === 'verified',
   }))}
-  connectedAccounts={user.externalAccounts.map(account => ({
-    id: account.id,
-    provider: account.provider,
-    identifier: account.emailAddress,
-    connected: true,
-  }))}
-  web3Wallets={supportedWeb3Wallets.map(provider => {
-    const wallet = user.web3Wallets.find(wallet => wallet.provider === provider.id);
-
-    return {
-      id: provider.id,
-      provider: provider.name,
-      iconUrl: provider.iconUrl,
-      address: wallet?.web3Wallet,
-      connected: Boolean(wallet),
-      isPrimary: wallet?.id === user.primaryWeb3WalletId,
-      isVerified: wallet ? wallet.verification.status === 'verified' : undefined,
-    };
-  })}
+  titleRef={titleRef}
+  connectedAccountsSlot={<UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />}
+  web3WalletsSlot={<UserProfileWeb3WalletsSectionView wallets={wallets} onRemove={removeWeb3Wallet} fallbackFocus={() => titleRef.current} />}
   onVerifyEmail={verifyEmail}
   onCreateEmail={createEmail}
   getEmailVerifier={getEmailVerifier}
@@ -62,9 +51,5 @@ import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile
   onVerifyPhone={verifyPhone}
   onSetPrimaryPhone={setPrimaryPhone}
   onRemovePhone={removePhone}
-  onRemoveConnectedAccount={removeConnectedAccount}
-  onConnectWeb3Wallet={connectWeb3Wallet}
-  onSetPrimaryWeb3Wallet={setPrimaryWeb3Wallet}
-  onRemoveWeb3Wallet={removeWeb3Wallet}
 />
 ```

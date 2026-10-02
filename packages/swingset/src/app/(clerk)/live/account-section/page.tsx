@@ -1,7 +1,7 @@
 'use client';
 
 import { UserProfileAccountSection } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section';
-import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 

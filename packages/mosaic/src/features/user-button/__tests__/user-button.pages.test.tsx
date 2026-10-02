@@ -22,7 +22,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
   };
 });
 
-vi.mock('../../../hooks/useMosaicEnvironment', () => ({
+vi.mock('../../../hooks/use-mosaic-environment', () => ({
   useMosaicEnvironment: () => environment,
 }));
 

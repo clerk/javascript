@@ -12,8 +12,10 @@ function deferred() {
   return { promise, resolve };
 }
 
-function renderController(onSubmit: (username: string) => Promise<void> = () => Promise.resolve()) {
-  const { result } = renderHook(() => useUserProfileEditUsernameController({ username: 'prestonxyz', onSubmit }));
+function renderController(onSubmit: (username: string) => Promise<void> = () => Promise.resolve(), required = false) {
+  const { result } = renderHook(() =>
+    useUserProfileEditUsernameController({ username: 'prestonxyz', required, onSubmit }),
+  );
   act(() => result.current.onOpenChange(true));
   return result;
 }
@@ -31,15 +33,28 @@ describe('useUserProfileEditUsernameController', () => {
     expect(result.current.form.values.username).toBe('prestonxyz');
   });
 
-  it('withholds the save until the value moves, and on an empty value', () => {
+  it('withholds the save until the value moves', () => {
     const result = renderController();
-    expect(result.current.form.canSubmit).toBe(false);
-
-    act(() => result.current.form.setValue('username', ''));
     expect(result.current.form.canSubmit).toBe(false);
 
     act(() => result.current.form.setValue('username', 'ada'));
     expect(result.current.form.canSubmit).toBe(true);
+  });
+
+  it('lets an optional username be cleared', () => {
+    const result = renderController();
+
+    act(() => result.current.form.setValue('username', ''));
+
+    expect(result.current.form.canSubmit).toBe(true);
+  });
+
+  it('withholds the save on an empty value when the instance requires a username', () => {
+    const result = renderController(() => Promise.resolve(), true);
+
+    act(() => result.current.form.setValue('username', ''));
+
+    expect(result.current.form.canSubmit).toBe(false);
   });
 
   it('saves the value it is holding, stays open while saving, then closes', async () => {

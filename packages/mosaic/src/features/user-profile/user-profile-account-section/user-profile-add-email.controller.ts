@@ -4,7 +4,7 @@ import { useForm } from '../../../components/form';
 import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import type { ErrorInvokeEvent } from '../../../machine/types';
-import { useMachine } from '../../../machine/useMachine';
+import { useMachine } from '../../../machine/use-machine';
 import type { FormError } from '../../../utils/form-error';
 import { toFormError } from '../../../utils/form-error';
 import type { UserProfileEmailVerification, UserProfileEmailVerifier } from './user-profile-account-section.types';

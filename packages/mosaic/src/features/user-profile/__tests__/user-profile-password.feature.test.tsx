@@ -113,7 +113,7 @@ describe('Changing a password', () => {
     await waitFor(() => expect(update.requests).toHaveLength(1));
     update.fail('session_reverification_required');
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('session_reverification_required');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('session_reverification_required'));
     expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
     expect(screen.queryByText('Verification required')).toBeNull();
     expect(update.requests).toHaveLength(1);
@@ -138,7 +138,7 @@ describe('Changing a password', () => {
       ),
     );
     expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
-    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.getByRole('alert').textContent).toBe('');
   });
 
   it('sets a first password without asking for the current one', async () => {
