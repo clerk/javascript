@@ -685,87 +685,7 @@ final class ClerkNativeBridge {
     Self.authFlowStatePayload(Self.authFlowStateSnapshot())
   }
 
-  // MARK: - Biometric credentials
-
-  @MainActor
-  func getBiometricCredentialAvailability(id: String?, identifierHint: String?) async throws -> [String: Any] {
-    guard Self.clerkConfigured else {
-      return [
-        "isAvailable": false,
-        "unavailableReason": "environment_unavailable",
-      ]
-    }
-
-    let availability = try await Clerk.shared.biometricCredentials.availability(
-      id: id,
-      identifierHint: identifierHint
-    )
-
-    return [
-      "isAvailable": availability.isAvailable,
-      "unavailableReason": availability.unavailableReason
-        .map(Self.biometricCredentialUnavailableReason) ?? NSNull(),
-    ]
-  }
-
-  @MainActor
-  func listBiometricCredentials() async throws -> [[String: Any]] {
-    try Self.requireBiometricCredentialEnvironment()
-    let biometricCredentials = try await Clerk.shared.biometricCredentials.list()
-    return biometricCredentials.map(Self.biometricCredentialPayload)
-  }
-
-  @MainActor
-  func enrollBiometricCredential(
-    deviceName: String?,
-    identifierHint: String?,
-    reason: String?,
-    policy: String
-  ) async throws -> [String: Any] {
-    try Self.requireBiometricCredentialEnvironment()
-
-    guard let biometricCredentialPolicy = BiometricCredentialPolicy(rawValue: policy) else {
-      throw ClerkExpoBiometricCredentialError(
-        code: "invalid_trusted_device_policy",
-        message: "Invalid biometric-credential policy: \(policy)."
-      )
-    }
-
-    let biometricCredential = try await Clerk.shared.biometricCredentials.enroll(
-      name: deviceName,
-      identifierHint: identifierHint,
-      reason: reason,
-      policy: biometricCredentialPolicy
-    )
-    return Self.biometricCredentialPayload(biometricCredential)
-  }
-
-  @MainActor
-  func revokeBiometricCredential(id: String) async throws -> [String: Any] {
-    try Self.requireBiometricCredentialEnvironment()
-    let biometricCredential = try await Clerk.shared.biometricCredentials.revoke(id: id)
-    return Self.biometricCredentialPayload(biometricCredential)
-  }
-
-  @MainActor
-  func signInWithBiometrics(
-    id: String?,
-    identifierHint: String?,
-    reason: String?
-  ) async throws -> [String: Any] {
-    try Self.requireBiometricCredentialEnvironment()
-    let signIn = try await Clerk.shared.auth.signInWithBiometrics(
-      id: id,
-      identifierHint: identifierHint,
-      reason: reason
-    )
-
-    return [
-      "id": signIn.id,
-      "status": signIn.status.rawValue,
-      "createdSessionId": Self.bridgeValue(signIn.createdSessionId),
-    ]
-  }
+  // MARK: - Biometric reverification
 
   @MainActor
   private static func requireBiometricCredentialEnvironment() throws {
@@ -842,28 +762,6 @@ final class ClerkNativeBridge {
     ]
   }
 
-  private static func biometricCredentialPayload(_ biometricCredential: BiometricCredential) -> [String: Any] {
-    [
-      "id": biometricCredential.id,
-      "object": biometricCredential.object,
-      "platform": biometricCredential.platform.rawValue,
-      "appIdentifier": biometricCredential.appIdentifier,
-      "name": bridgeValue(biometricCredential.name),
-      "algorithm": biometricCredential.algorithm.rawValue,
-      "status": biometricCredential.status.rawValue,
-      "createdAt": millisecondsSince1970(biometricCredential.createdAt),
-      "updatedAt": millisecondsSince1970(biometricCredential.updatedAt),
-      "lastUsedAt": optionalMillisecondsSince1970(biometricCredential.lastUsedAt),
-      "revokedAt": optionalMillisecondsSince1970(biometricCredential.revokedAt),
-    ]
-  }
-
-  private static func biometricCredentialUnavailableReason(
-    _ reason: BiometricCredentialAvailability.UnavailableReason
-  ) -> String {
-    snakeCase(reason.rawValue)
-  }
-
   static func biometricCredentialErrorDescriptor(
     _ error: Error,
     fallbackCode: String
@@ -919,30 +817,6 @@ final class ClerkNativeBridge {
     @unknown default:
       "trusted_device_key_manager_error"
     }
-  }
-
-  private static func snakeCase(_ value: String) -> String {
-    value
-      .replacingOccurrences(
-        of: "([A-Z]+)([A-Z][a-z])",
-        with: "$1_$2",
-        options: .regularExpression
-      )
-      .replacingOccurrences(
-        of: "([a-z0-9])([A-Z])",
-        with: "$1_$2",
-        options: .regularExpression
-      )
-      .lowercased()
-  }
-
-  private static func millisecondsSince1970(_ date: Date) -> Double {
-    date.timeIntervalSince1970 * 1_000
-  }
-
-  private static func optionalMillisecondsSince1970(_ date: Date?) -> Any {
-    guard let date else { return NSNull() }
-    return millisecondsSince1970(date)
   }
 
   private static func bridgeValue<Value>(_ value: Value?) -> Any {

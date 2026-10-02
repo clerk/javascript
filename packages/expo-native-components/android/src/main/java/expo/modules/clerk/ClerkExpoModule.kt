@@ -15,11 +15,7 @@ import com.clerk.api.network.model.client.Client
 import com.clerk.api.network.model.error.ClerkErrorResponse
 import com.clerk.api.network.model.error.firstMessage
 import com.clerk.api.network.serialization.ClerkResult
-import com.clerk.api.signin.SignIn
-import com.clerk.api.biometriccredential.BiometricCredential
-import com.clerk.api.biometriccredential.BiometricCredentialAvailability
 import com.clerk.api.biometriccredential.BiometricCredentialKeyManagerException
-import com.clerk.api.biometriccredential.BiometricCredentialPolicy
 import com.clerk.api.session.SessionVerification
 import com.clerk.api.session.startVerification
 import com.clerk.api.session.verifyWithBiometrics
@@ -50,61 +46,6 @@ private const val HOST_SDK = "expo"
 private fun debugLog(tag: String, message: String) {
     if (BuildConfig.DEBUG) {
         Log.d(tag, message)
-    }
-}
-
-internal fun biometricCredentialAvailabilityPayload(
-    availability: BiometricCredentialAvailability
-): Map<String, Any?> {
-    return mapOf(
-        "isAvailable" to availability.isAvailable,
-        "unavailableReason" to availability.unavailableReason?.name?.lowercase()
-    )
-}
-
-internal fun biometricCredentialEnvironmentAvailabilityPayload(
-    isInitialized: Boolean
-): Map<String, Any?>? {
-    if (isInitialized) {
-        return null
-    }
-
-    return mapOf(
-        "isAvailable" to false,
-        "unavailableReason" to "environment_unavailable"
-    )
-}
-
-internal fun biometricCredentialPayload(biometricCredential: BiometricCredential): Map<String, Any?> {
-    return mapOf(
-        "id" to biometricCredential.id,
-        "object" to "trusted_device",
-        "platform" to biometricCredential.platform.name.lowercase(),
-        "appIdentifier" to biometricCredential.appIdentifier,
-        "name" to biometricCredential.name,
-        "algorithm" to biometricCredential.algorithm,
-        "status" to biometricCredential.status.name.lowercase(),
-        "createdAt" to biometricCredential.createdAt,
-        "updatedAt" to biometricCredential.updatedAt,
-        "lastUsedAt" to biometricCredential.lastUsedAt,
-        "revokedAt" to biometricCredential.revokedAt
-    )
-}
-
-internal fun biometricSignInPayload(signIn: SignIn): Map<String, Any?> {
-    return mapOf(
-        "id" to signIn.id,
-        "status" to signIn.status.name.lowercase(),
-        "createdSessionId" to signIn.createdSessionId
-    )
-}
-
-internal fun biometricCredentialPolicy(policy: String): BiometricCredentialPolicy? {
-    return when (policy) {
-        "biometry_current_set" -> BiometricCredentialPolicy.BIOMETRY_CURRENT_SET
-        "biometry_any" -> BiometricCredentialPolicy.BIOMETRY_ANY
-        "biometry_or_device_passcode" -> BiometricCredentialPolicy.BIOMETRY_OR_DEVICE_PASSCODE
-        else -> null
     }
 }
 
@@ -248,38 +189,6 @@ class ClerkExpoModule : Module() {
 
         AsyncFunction("getAuthFlowState") { promise: Promise ->
             promise.resolve(authFlowStatePayload())
-        }
-
-        AsyncFunction("getTrustedDeviceAvailability") {
-                id: String?,
-                identifierHint: String?,
-                promise: Promise ->
-            getBiometricCredentialAvailability(id, identifierHint, promise)
-        }
-
-        AsyncFunction("listTrustedDevices") { promise: Promise ->
-            listBiometricCredentials(promise)
-        }
-
-        AsyncFunction("enrollTrustedDevice") {
-                deviceName: String?,
-                identifierHint: String?,
-                reason: String?,
-                policy: String,
-                promise: Promise ->
-            enrollBiometricCredential(deviceName, identifierHint, reason, policy, promise)
-        }
-
-        AsyncFunction("revokeTrustedDevice") { id: String, promise: Promise ->
-            revokeBiometricCredential(id, promise)
-        }
-
-        AsyncFunction("signInWithTrustedDevice") {
-                id: String?,
-                identifierHint: String?,
-                reason: String?,
-                promise: Promise ->
-            signInWithBiometrics(id, identifierHint, reason, promise)
         }
 
         AsyncFunction("reverifyWithBiometrics") {
@@ -481,181 +390,7 @@ class ClerkExpoModule : Module() {
         }
     }
 
-    // MARK: - biometric credentials
-
-    private fun getBiometricCredentialAvailability(
-        id: String?,
-        identifierHint: String?,
-        promise: Promise
-    ) {
-        val environmentAvailability = biometricCredentialEnvironmentAvailabilityPayload(Clerk.isInitialized.value)
-        if (environmentAvailability != null) {
-            promise.resolve(environmentAvailability)
-            return
-        }
-
-        coroutineScope.launch {
-            try {
-                val availability = Clerk.biometricCredentials.availability(id, identifierHint)
-                promise.resolve(biometricCredentialAvailabilityPayload(availability))
-            } catch (e: Exception) {
-                rejectBiometricCredentialException(
-                    promise = promise,
-                    fallbackCode = "E_TRUSTED_DEVICE_AVAILABILITY_FAILED",
-                    fallbackMessage = "Unable to determine biometric-credential availability",
-                    exception = e
-                )
-            }
-        }
-    }
-
-    private fun listBiometricCredentials(promise: Promise) {
-        if (!requireBiometricCredentialEnvironment(promise)) {
-            return
-        }
-
-        coroutineScope.launch {
-            try {
-                when (val result = Clerk.biometricCredentials.list()) {
-                    is ClerkResult.Success -> promise.resolve(result.value.map(::biometricCredentialPayload))
-                    is ClerkResult.Failure -> rejectBiometricCredentialFailure(
-                        promise,
-                        "E_TRUSTED_DEVICE_LIST_FAILED",
-                        "Unable to list biometric credentials",
-                        result
-                    )
-                }
-            } catch (e: Exception) {
-                rejectBiometricCredentialException(
-                    promise = promise,
-                    fallbackCode = "E_TRUSTED_DEVICE_LIST_FAILED",
-                    fallbackMessage = "Unable to list biometric credentials",
-                    exception = e
-                )
-            }
-        }
-    }
-
-    private fun enrollBiometricCredential(
-        deviceName: String?,
-        identifierHint: String?,
-        reason: String?,
-        policy: String,
-        promise: Promise
-    ) {
-        if (!requireBiometricCredentialEnvironment(promise)) {
-            return
-        }
-
-        val biometricCredentialPolicy = biometricCredentialPolicy(policy)
-        if (biometricCredentialPolicy == null) {
-            promise.reject(
-                "invalid_trusted_device_policy",
-                "Invalid biometric-credential policy: $policy",
-                null
-            )
-            return
-        }
-
-        coroutineScope.launch {
-            try {
-                if (!attachCurrentActivityForBiometricCredential(promise)) {
-                    return@launch
-                }
-                when (
-                    val result = Clerk.biometricCredentials.enroll(
-                        name = deviceName,
-                        identifierHint = identifierHint,
-                        policy = biometricCredentialPolicy,
-                        promptSubtitle = reason
-                    )
-                ) {
-                    is ClerkResult.Success -> promise.resolve(biometricCredentialPayload(result.value))
-                    is ClerkResult.Failure -> rejectBiometricCredentialFailure(
-                        promise,
-                        "E_TRUSTED_DEVICE_ENROLLMENT_FAILED",
-                        "Unable to enroll biometric credential",
-                        result
-                    )
-                }
-            } catch (e: Exception) {
-                rejectBiometricCredentialException(
-                    promise = promise,
-                    fallbackCode = "E_TRUSTED_DEVICE_ENROLLMENT_FAILED",
-                    fallbackMessage = "Unable to enroll biometric credential",
-                    exception = e
-                )
-            }
-        }
-    }
-
-    private fun revokeBiometricCredential(id: String, promise: Promise) {
-        if (!requireBiometricCredentialEnvironment(promise)) {
-            return
-        }
-
-        coroutineScope.launch {
-            try {
-                when (val result = Clerk.biometricCredentials.revoke(id)) {
-                    is ClerkResult.Success -> promise.resolve(biometricCredentialPayload(result.value))
-                    is ClerkResult.Failure -> rejectBiometricCredentialFailure(
-                        promise,
-                        "E_TRUSTED_DEVICE_REVOCATION_FAILED",
-                        "Unable to revoke biometric credential",
-                        result
-                    )
-                }
-            } catch (e: Exception) {
-                rejectBiometricCredentialException(
-                    promise = promise,
-                    fallbackCode = "E_TRUSTED_DEVICE_REVOCATION_FAILED",
-                    fallbackMessage = "Unable to revoke biometric credential",
-                    exception = e
-                )
-            }
-        }
-    }
-
-    private fun signInWithBiometrics(
-        id: String?,
-        identifierHint: String?,
-        reason: String?,
-        promise: Promise
-    ) {
-        if (!requireBiometricCredentialEnvironment(promise)) {
-            return
-        }
-
-        coroutineScope.launch {
-            try {
-                if (!attachCurrentActivityForBiometricCredential(promise)) {
-                    return@launch
-                }
-                when (
-                    val result = Clerk.biometricCredentials.signIn(
-                        id = id,
-                        identifierHint = identifierHint,
-                        promptSubtitle = reason
-                    )
-                ) {
-                    is ClerkResult.Success -> promise.resolve(biometricSignInPayload(result.value))
-                    is ClerkResult.Failure -> rejectBiometricCredentialFailure(
-                        promise,
-                        "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
-                        "Unable to sign in with biometric credential",
-                        result
-                    )
-                }
-            } catch (e: Exception) {
-                rejectBiometricCredentialException(
-                    promise = promise,
-                    fallbackCode = "E_TRUSTED_DEVICE_SIGN_IN_FAILED",
-                    fallbackMessage = "Unable to sign in with biometric credential",
-                    exception = e
-                )
-            }
-        }
-    }
+    // MARK: - biometric reverification
 
     private fun reverifyWithBiometrics(
         sessionId: String,
