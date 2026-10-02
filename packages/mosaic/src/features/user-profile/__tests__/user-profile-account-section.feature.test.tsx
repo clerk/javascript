@@ -1,5 +1,5 @@
 import type { EmailAddressJSON, EnterpriseAccountConnectionJSON, PhoneNumberJSON } from '@clerk/shared/types';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
@@ -458,10 +458,46 @@ describe('a user signed in through an enterprise connection', () => {
   });
 
   it('still lets the user add contacts when the connection allows them', async () => {
-    await renderSection(signedInThroughSso());
+    await renderSection(signedInThroughSso({ disable_additional_identifications: false }));
 
     expect(await screen.findByRole('button', { name: 'Add email' })).toBeInTheDocument();
     expect(within(row()).getByRole('button', { name: 'Add phone number' })).toBeInTheDocument();
+  });
+});
+
+describe('switching the active user', () => {
+  function signedInAsBoth(): FakeFapiSeed {
+    const alice = fapiUser({
+      id: 'user_1',
+      first_name: 'Alice',
+      last_name: 'Smith',
+      email_addresses: [fapiEmailAddress({ id: 'idn_alice' })],
+    });
+    const bob = fapiUser({
+      id: 'user_2',
+      first_name: 'Bob',
+      last_name: 'Jones',
+      email_addresses: [fapiEmailAddress({ id: 'idn_bob' })],
+    });
+    return {
+      environment: fapiEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: alice }), fapiSession({ id: 'sess_2', user: bob })]),
+    };
+  }
+
+  it('shows the newly active account and drops the draft the other one left open', async () => {
+    const { actor, clerk } = await renderSection(signedInAsBoth());
+
+    await actor.click(screen.getByRole('button', { name: 'Edit name' }));
+    const dialog = screen.getByRole('dialog', { name: 'Edit name' });
+    await actor.clear(within(dialog).getByLabelText('First name'));
+    await actor.type(within(dialog).getByLabelText('First name'), 'Alicia');
+
+    await act(() => clerk.setActive({ session: 'sess_2' }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(await screen.findByText('Bob Jones')).toBeInTheDocument();
+    expect(screen.queryByText(/Alic/)).not.toBeInTheDocument();
   });
 });
 

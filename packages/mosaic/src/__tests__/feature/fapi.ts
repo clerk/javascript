@@ -276,48 +276,6 @@ export function fapiPhoneNumber(
   };
 }
 
-export function fapiEnterpriseAccount(
-  overrides: Partial<EnterpriseAccountJSON> & Pick<EnterpriseAccountJSON, 'id'>,
-  connection: Partial<EnterpriseAccountConnectionJSON> = {},
-): EnterpriseAccountJSON {
-  const emailAddress = overrides.email_address ?? 'sso@example.com';
-  const domain = emailAddress.split('@')[1] ?? 'example.com';
-  return {
-    object: 'enterprise_account',
-    active: true,
-    email_address: emailAddress,
-    first_name: null,
-    last_name: null,
-    protocol: 'saml',
-    provider: 'saml_okta',
-    provider_user_id: null,
-    public_metadata: {},
-    verification: null,
-    last_authenticated_at: null,
-    enterprise_connection_id: `entc_${overrides.id}`,
-    enterprise_connection: {
-      object: 'enterprise_account_connection',
-      id: `entc_${overrides.id}`,
-      active: true,
-      allow_idp_initiated: false,
-      allow_subdomains: false,
-      disable_additional_identifications: false,
-      domain,
-      logo_public_url: null,
-      name: 'Company SSO',
-      protocol: 'saml',
-      provider: 'saml_okta',
-      sync_user_attributes: true,
-      allow_organization_account_linking: false,
-      created_at: createdAt,
-      updated_at: createdAt,
-      enterprise_connection_id: null,
-      ...connection,
-    },
-    ...overrides,
-  };
-}
-
 export function fapiUser(overrides: Partial<UserJSON> & Pick<UserJSON, 'id'>): UserJSON {
   return {
     object: 'user',
@@ -351,6 +309,46 @@ export function fapiUser(overrides: Partial<UserJSON> & Pick<UserJSON, 'id'>): U
     legal_accepted_at: null,
     created_at: createdAt,
     updated_at: createdAt,
+    ...overrides,
+  };
+}
+
+export function fapiEnterpriseAccount(
+  overrides: Partial<EnterpriseAccountJSON> & Pick<EnterpriseAccountJSON, 'id'>,
+  connection: Partial<EnterpriseAccountConnectionJSON> = {},
+): EnterpriseAccountJSON {
+  return {
+    object: 'enterprise_account',
+    active: true,
+    email_address: 'sso@example.com',
+    enterprise_connection: {
+      object: 'enterprise_connection',
+      id: 'sso_1',
+      active: true,
+      allow_idp_initiated: false,
+      allow_subdomains: false,
+      disable_additional_identifications: true,
+      domain: 'example.com',
+      logo_public_url: null,
+      name: 'Company SSO',
+      protocol: 'saml',
+      provider: 'saml_okta',
+      sync_user_attributes: false,
+      allow_organization_account_linking: false,
+      created_at: createdAt,
+      updated_at: createdAt,
+      enterprise_connection_id: 'sso_1',
+      ...connection,
+    },
+    first_name: null,
+    last_name: null,
+    protocol: 'saml',
+    provider: 'saml_okta',
+    provider_user_id: null,
+    public_metadata: {},
+    verification: null,
+    last_authenticated_at: null,
+    enterprise_connection_id: 'sso_1',
     ...overrides,
   };
 }
@@ -405,16 +403,13 @@ export function fapiPasskeyRequestOptions(): PublicKeyCredentialRequestOptionsJS
 export function fapiVerification(strategy: string, overrides: Partial<VerificationJSON> = {}): VerificationJSON {
   return {
     object: verificationObjects[strategy] ?? 'verification',
-    id: `ver_${strategy}`,
     status: 'unverified',
     strategy,
-    verified_at_client: '',
     attempts: 0,
     expire_at: farFuture,
-    error: { code: '', message: '' },
     ...(strategy === 'passkey' ? { nonce: JSON.stringify(fapiPasskeyRequestOptions()) } : {}),
     ...overrides,
-  };
+  } as VerificationJSON;
 }
 
 export function fapiSessionVerification(

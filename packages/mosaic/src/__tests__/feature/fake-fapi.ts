@@ -98,14 +98,7 @@ function error(code: string, status = 400) {
 }
 
 function activeUser(state: FakeFapiState): UserJSON | undefined {
-  return findSession(state, state.client.last_active_session_id)?.user;
-}
-
-function updateUser(state: FakeFapiState, user: UserJSON): void {
-  state.client = {
-    ...state.client,
-    sessions: state.client.sessions.map(session => (session.user.id === user.id ? { ...session, user } : session)),
-  };
+  return activeSession(state)?.user;
 }
 
 function missing() {
@@ -233,15 +226,15 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
           external_verification_redirect_url: 'https://accounts.example/authorize',
         }),
       });
-      updateUser(state, {
-        ...user,
+      updateUser(state, current => ({
+        ...current,
         external_accounts: [
-          ...user.external_accounts.filter(
+          ...current.external_accounts.filter(
             item => item.provider !== provider || item.verification?.status === 'verified',
           ),
           account,
         ],
-      });
+      }));
       return envelope(account, state.client);
     }),
     http.post(fapiUrl('/v1/me/external_accounts/:id/reauthorize'), ({ params, request }) => {
@@ -260,10 +253,10 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
           external_verification_redirect_url: 'https://accounts.example/consent',
         }),
       };
-      updateUser(state, {
-        ...user,
-        external_accounts: user.external_accounts.map(item => (item.id === pending.id ? pending : item)),
-      });
+      updateUser(state, current => ({
+        ...current,
+        external_accounts: current.external_accounts.map(item => (item.id === pending.id ? pending : item)),
+      }));
       return envelope(pending, state.client);
     }),
     http.post(fapiUrl('/v1/me/external_accounts/:id'), ({ params, request }) => {
@@ -275,7 +268,10 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       if (!user || !account) {
         return missing();
       }
-      updateUser(state, { ...user, external_accounts: user.external_accounts.filter(item => item.id !== account.id) });
+      updateUser(state, current => ({
+        ...current,
+        external_accounts: current.external_accounts.filter(item => item.id !== account.id),
+      }));
       return envelope({ ...account, object: 'external_account' }, state.client);
     }),
     http.post(fapiUrl('/v1/client/sessions/:id/tokens'), ({ params }) => {
