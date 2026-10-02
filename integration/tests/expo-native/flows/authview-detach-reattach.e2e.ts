@@ -1,31 +1,15 @@
 import { expect } from 'e2e';
 
-import { test } from './fixtures.ts';
-import {
-  assertSignedIn,
-  assertSignedOut,
-  openApp,
-  openAuthView,
-  signInEmailPassword,
-  tapUntilVisible,
-} from './subflows.ts';
+import { testWithUser as test } from '../fixtures.ts';
 
-test('AuthView survives detach and reattach', async fixtures => {
-  const { device, platform, screen } = fixtures;
-  await openApp(fixtures);
-  await openAuthView(fixtures);
+test('AuthView survives detach and reattach', async ({ po, screen, user }) => {
+  await po.app.reset();
+  await po.authView.open();
   await expect(screen.getByText('E2E Custom Logo')).toBeVisible({ timeout: 10_000 });
-  const openButton = screen.getByTestId('open-auth-view-button');
-  if (platform === 'android') {
-    await device.back();
-    await expect(openButton).toBeVisible({ timeout: 15_000 });
-  } else {
-    await tapUntilVisible(screen.getByRole('button', 'Close'), openButton);
-  }
-  await openAuthView(fixtures);
+  await po.authView.dismiss();
+  await po.authView.open();
   await expect(screen.getByText('E2E Custom Logo')).toBeVisible({ timeout: 15_000 });
-  await signInEmailPassword(fixtures);
-  await assertSignedIn(fixtures);
-  await screen.getByTestId('sign-out-button').tap();
-  await assertSignedOut(fixtures);
+  await po.authView.signIn(user);
+  await po.app.expectSignedIn();
+  await po.app.signOut();
 });

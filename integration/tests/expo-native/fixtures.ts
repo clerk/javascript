@@ -1,14 +1,10 @@
 import { randomBytes } from 'node:crypto';
 
-import type { Device } from '@e2e-dev/mobile';
 import { test as base } from '@e2e-dev/mobile';
-import type { TestFixtures } from 'e2e';
 
-export type TestUser = { email: string; password: string };
-
-export type DeviceFixtures = TestFixtures & { device: Device };
-
-export type Fixtures = DeviceFixtures & { user: TestUser };
+import type { PageObjects } from './page-objects/index.ts';
+import { createPageObjects } from './page-objects/index.ts';
+import type { TestUser } from './types.ts';
 
 function bapi(path: string, init: RequestInit) {
   return fetch(`${process.env.CLERK_API_URL ?? 'https://api.clerk.com'}/v1${path}`, {
@@ -17,8 +13,14 @@ function bapi(path: string, init: RequestInit) {
   });
 }
 
-export const test = base.extend<{ user: TestUser }>({
-  user: async (_fixtures, use) => {
+export const test = base.extend<{ po: PageObjects }>({
+  po: async (fixtures, provide) => {
+    await provide(createPageObjects(fixtures));
+  },
+});
+
+export const testWithUser = test.extend<{ user: TestUser }>({
+  user: async (_fixtures, provide) => {
     const suffix = randomBytes(4).toString('hex');
     const user = {
       email: `${suffix}+clerk_test@example.com`,
@@ -32,7 +34,7 @@ export const test = base.extend<{ user: TestUser }>({
       throw new Error(`BAPI user creation failed (HTTP ${response.status}): ${await response.text()}`);
     }
     const { id } = (await response.json()) as { id: string };
-    await use(user);
+    await provide(user);
     await bapi(`/users/${id}`, { method: 'DELETE' });
   },
 });

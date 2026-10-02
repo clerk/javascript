@@ -1,34 +1,18 @@
 import { expect } from 'e2e';
 
-import { test } from './fixtures.ts';
-import {
-  assertSignedIn,
-  assertSignedOut,
-  openApp,
-  openAuthView,
-  signInEmailPassword,
-  tapBack,
-  tapControl,
-  tapUntilVisible,
-} from './subflows.ts';
+import { testWithUser as test } from '../fixtures.ts';
 
-test('UserProfileView renders a custom page', async fixtures => {
-  const { device, platform, screen } = fixtures;
-  await openApp(fixtures);
-  await openAuthView(fixtures);
-  await signInEmailPassword(fixtures);
-  await assertSignedIn(fixtures);
-  await tapUntilVisible(screen.getByTestId('open-embedded-profile-button'), screen.getByText('E2E Custom Page'));
-  await tapControl(fixtures, screen.getByText('E2E Custom Page'));
+test('UserProfileView renders a custom page', async ({ po, screen, user }) => {
+  await po.app.reset();
+  await po.authView.open();
+  await po.authView.signIn(user);
+  await po.app.expectSignedIn();
+  await po.userProfile.open();
+  await po.userProfile.openRow('E2E Custom Page');
   await expect(screen.getByText('Rehosted RN body')).toBeVisible({ timeout: 15_000 });
-  if (platform === 'android') {
-    await device.back();
-  } else {
-    await tapBack(fixtures);
-  }
+  await po.userProfile.leaveCustomPage();
   await expect(screen.getByText('E2E Custom Page')).toBeVisible({ timeout: 15_000 });
-  await tapBack(fixtures);
-  await expect(screen.getByTestId('open-embedded-profile-button')).toBeVisible({ timeout: 15_000 });
-  await screen.getByTestId('sign-out-button').tap();
-  await assertSignedOut(fixtures);
+  await po.userProfile.back();
+  await po.userProfile.expectClosed();
+  await po.app.signOut();
 });
