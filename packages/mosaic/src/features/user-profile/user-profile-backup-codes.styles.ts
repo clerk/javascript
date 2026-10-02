@@ -1,24 +1,10 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, easingVars, radiusVars, space } from '../../tokens.stylex';
-
-const pulse = stylex.keyframes({
-  '50%': { opacity: 0.5 },
-});
+import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   skeleton: {
-    borderRadius: radiusVars['--cl-radius-sm'],
-    animationDuration: '2s',
-    animationIterationCount: 'infinite',
-    animationName: {
-      default: pulse,
-      '@media (prefers-reduced-motion: reduce)': 'none',
-    },
-    animationTimingFunction: easingVars['--cl-ease-pulse'],
-    backgroundColor: colorVars['--cl-color-neutral-alpha-200'],
-    height: '1lh',
-    width: space['16'],
+    width: '7ch',
   },
   codes: {
     borderColor: colorVars['--cl-color-border'],

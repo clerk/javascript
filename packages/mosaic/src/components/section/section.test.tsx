@@ -401,4 +401,51 @@ describe('Section', () => {
 
     expect(screen.getByTestId('item')).toHaveAttribute('data-wrap', '');
   });
+
+  it('turns a skeleton card into inert, empty placeholders', () => {
+    render(
+      <Section.Root>
+        <Section.Group
+          skeleton
+          data-testid='group'
+        >
+          <Section.Header>
+            <Section.Title>Account</Section.Title>
+          </Section.Header>
+          <Section.Body>
+            <Section.Items>
+              <Section.Item>
+                <Section.Media>media</Section.Media>
+                <Section.Content>
+                  <Section.Label>Name</Section.Label>
+                  <Section.Description>Description</Section.Description>
+                </Section.Content>
+                <Section.Actions>
+                  <button type='button'>Edit</button>
+                </Section.Actions>
+              </Section.Item>
+            </Section.Items>
+          </Section.Body>
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    const group = screen.getByTestId('group');
+    expect(group).toHaveAttribute('aria-hidden', 'true');
+    expect(group).toHaveAttribute('inert');
+    expect(group).not.toHaveAttribute('role');
+    expect(group).toHaveTextContent('');
+    expect(group.querySelector('button')).toBeNull();
+    expect(group.querySelectorAll('[data-skeleton]')).toHaveLength(5);
+  });
+
+  it('lets a part opt out of its card skeleton', () => {
+    render(
+      <Section.Group skeleton>
+        <Section.Label skeleton={false}>Name</Section.Label>
+      </Section.Group>,
+    );
+
+    expect(screen.getByText('Name')).not.toHaveAttribute('data-skeleton');
+  });
 });

@@ -50,6 +50,15 @@ fixed leading slot sized to the text, for a provider logo or a lock.
 than `26rem`. `sectionCompactStyles.hidden` and `sectionCompactStyles.only` toggle inline content at
 the same width.
 
+`Section.Group skeleton` turns a card into its loading state. The title, media, label,
+description, and actions inside it become placeholders, each the size of the content it stands in
+for, and their children are not rendered. A part can also take `skeleton` on its own, or
+`skeleton={false}` to stay as content inside a skeleton card. Skeleton actions draw nothing and hold
+the height of a small control. A skeleton card is inert and hidden from assistive technology, so
+pair it with a visually hidden status message. Placeholders pulse in one wave that travels down the
+page, across every skeleton on it. When to show the skeleton, and for how long, is up to the
+caller.
+
 `Section.Title` renders at the level from the nearest `HeadingLevelProvider`, or `h2` outside one.
 On a page, put the sections in `Panel.Sections` so the card titles sit one level below the page
 title. See [Panel](/components/panel) and [Heading](/components/heading).
@@ -136,5 +145,12 @@ External CSS can move the card from `.cl-section-group` to `.cl-section-body`; t
 
 <Story
   name='Flat'
+  storyModule={SectionStories}
+/>
+
+### Loading
+
+<Story
+  name='Loading'
   storyModule={SectionStories}
 />

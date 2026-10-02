@@ -409,7 +409,6 @@ const easingDefaults = {
   '--cl-ease-enter': 'cubic-bezier(0, 0, 0.2, 1)',
   '--cl-ease-exit': 'cubic-bezier(0.55, 0.085, 0.68, 0.53)',
   '--cl-ease-in-out': 'cubic-bezier(0.645, 0.045, 0.355, 1)',
-  '--cl-ease-pulse': 'cubic-bezier(0.4, 0, 0.6, 1)',
 } as const;
 
 export const easingVars = stylex.defineVars(easingDefaults);

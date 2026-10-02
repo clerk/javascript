@@ -1,22 +1,21 @@
-# Motion: entrances, exits, and pulses
+# Motion: entrances, exits, and loading
 
 Token semantics live in `packages/mosaic/src/tokens.stylex.ts`, above
 `durationDefaults` / `easingDefaults` — read those comments first. This file is the
 how-to layer: the rules that decide a transition's shape, and how to check one
 rather than eyeball it.
 
-| Token                   | Value                                   | For                                |
-| ----------------------- | --------------------------------------- | ---------------------------------- |
-| `--cl-duration-instant` | `0s`                                    | hover and press arrival            |
-| `--cl-duration-fast`    | `0.1s`                                  | exits                              |
-| `--cl-duration-base`    | `0.15s`                                 | entrances, hover exit              |
-| `--cl-duration-slow`    | `0.25s`                                 | larger surfaces                    |
-| `--cl-duration-slower`  | `0.35s`                                 | —                                  |
-| `--cl-ease-default`     | `cubic-bezier(0.175, 0.885, 0.32, 1.1)` | things ARRIVING (Swift Out)        |
-| `--cl-ease-enter`       | `cubic-bezier(0, 0, 0.2, 1)`            | arrivals that must not overshoot   |
-| `--cl-ease-exit`        | `cubic-bezier(0.55, 0.085, 0.68, 0.53)` | things LEAVING (In Quad)           |
-| `--cl-ease-in-out`      | `cubic-bezier(0.645, 0.045, 0.355, 1)`  | rest-to-rest layout (In Out Cubic) |
-| `--cl-ease-pulse`       | `cubic-bezier(0.4, 0, 0.6, 1)`          | repeating opacity pulses           |
+| Token                   | Value                                   | For                                        |
+| ----------------------- | --------------------------------------- | ------------------------------------------ |
+| `--cl-duration-instant` | `0s`                                    | hover and press arrival                    |
+| `--cl-duration-fast`    | `0.1s`                                  | exits                                      |
+| `--cl-duration-base`    | `0.15s`                                 | entrances, hover exit                      |
+| `--cl-duration-slow`    | `0.25s`                                 | larger surfaces                            |
+| `--cl-duration-slower`  | `0.35s`                                 | —                                          |
+| `--cl-ease-default`     | `cubic-bezier(0.175, 0.885, 0.32, 1.1)` | things ARRIVING (Swift Out)                |
+| `--cl-ease-enter`       | `cubic-bezier(0, 0, 0.2, 1)`            | arrivals that must not overshoot           |
+| `--cl-ease-exit`        | `cubic-bezier(0.55, 0.085, 0.68, 0.53)` | things LEAVING (In Quad)                   |
+| `--cl-ease-in-out`      | `cubic-bezier(0.645, 0.045, 0.355, 1)`  | rest-to-rest layout, pulses (In Out Cubic) |
 
 Named curves come from [easing.dev](https://www.easing.dev) (Lochie Axon's Easing
 Graphs). Take one from there rather than inventing a bezier, so the catalog stays
@@ -53,12 +52,10 @@ For entrances, opacity takes `--cl-ease-enter`: there is nothing
 past `1` to overshoot into, so the pass is clamped away and only its cost — the
 slower approach to full opacity — is left.
 
-## Repeating pulses
+## Loading skeletons
 
-Use `--cl-ease-pulse` for repeating opacity fades such as loading skeletons. Its
-symmetric curve slows at both ends of each fade, keeping the reversal smooth.
-Keep the pulse duration on the component and disable the animation under
-`prefers-reduced-motion: reduce`.
+Loading placeholders pulse in one shared wave on `--cl-ease-in-out`. How to build
+them, size them, and tune the wave is in `skeletons.md`.
 
 ## A curve has a direction — don't run the entrance curve backwards
 

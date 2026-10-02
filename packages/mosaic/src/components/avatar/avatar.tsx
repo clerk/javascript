@@ -1,12 +1,15 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react';
+import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useSkeletonWave } from '../../hooks/use-skeleton-wave';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
+import { skeletonStyles } from '../../styles/skeleton.styles';
 import { shapes, sizes, styles } from './avatar.styles';
 
 type ImageLoadingStatus = 'idle' | 'loading' | 'loaded' | 'error';
@@ -145,24 +148,20 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
     return () => clearTimeout(timer);
   }, [delayMs]);
 
+  const pending = canRender && status === 'loading';
+  const wave = useSkeletonWave<HTMLSpanElement>(pending);
+  const mergedRef = useMergeRefs([ref, wave]);
+
   if (!canRender || status === 'loaded') {
     return null;
   }
 
-  const pending = status === 'loading';
-
   return (
     <span
-      ref={ref}
+      ref={mergedRef}
       {...mergeStyleProps(
         themeProps('avatar-fallback', { pending }),
-        stylex.props(
-          reset.base,
-          styles.fallback,
-          bordered && styles.overlay,
-          pending && styles.fallbackPending,
-          xstyle,
-        ),
+        stylex.props(reset.base, styles.fallback, bordered && styles.overlay, pending && skeletonStyles.wave, xstyle),
         rest,
       )}
     >

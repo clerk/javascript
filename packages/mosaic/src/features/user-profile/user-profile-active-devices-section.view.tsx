@@ -9,6 +9,7 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Section } from '../../components/section';
+import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import type { MosaicMessages } from '../../localization';
 import { fill, plural, useLocale, useMessages } from '../../localization';
@@ -23,12 +24,14 @@ export interface UserProfileActiveDevicesSectionViewProps {
   devices: UserProfileDevice[];
   onSignOutDevice?: (id: string) => void | Promise<void>;
   onSignOutAllOtherDevices?: () => void | Promise<void>;
+  skeleton?: boolean;
 }
 
 export function UserProfileActiveDevicesSectionView({
   devices,
   onSignOutDevice,
   onSignOutAllOtherDevices,
+  skeleton = false,
 }: UserProfileActiveDevicesSectionViewProps) {
   const m = useMessages('userProfileActiveDevices');
   const locale = useLocale();
@@ -84,8 +87,9 @@ export function UserProfileActiveDevicesSectionView({
 
   return (
     <div {...stylex.props(styles.sectionCards)}>
+      {skeleton ? <VisuallyHidden role='status'>{m.loading}</VisuallyHidden> : null}
       <Section.Root>
-        <Section.Group>
+        <Section.Group skeleton={skeleton}>
           <Section.Header>
             <Section.Title>{m.title}</Section.Title>
             {onSignOutAllOtherDevices && otherDevices.length > 0 ? (
@@ -133,7 +137,7 @@ export function UserProfileActiveDevicesSectionView({
           </Section.Body>
         </Section.Group>
       </Section.Root>
-      {onSignOutAllOtherDevices ? (
+      {onSignOutAllOtherDevices && !skeleton ? (
         <Confirmation
           open={isSignOutAllOpen}
           onOpenChange={open => {
@@ -153,12 +157,14 @@ export function UserProfileActiveDevicesSectionView({
           errorMessage={signOutAllError}
         />
       ) : null}
-      <UserProfileDeviceDetailsDialog
-        handle={deviceDetails}
-        finalFocus={removalFocus.finalFocus}
-        onSignOut={signOutDeviceAt}
-      />
-      {onSignOutDevice ? (
+      {skeleton ? null : (
+        <UserProfileDeviceDetailsDialog
+          handle={deviceDetails}
+          finalFocus={removalFocus.finalFocus}
+          onSignOut={signOutDeviceAt}
+        />
+      )}
+      {onSignOutDevice && !skeleton ? (
         <Confirmation
           color='primary'
           handle={signOutDevice}
