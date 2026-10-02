@@ -24,17 +24,31 @@ the content beside it.
 Each component defines its own bones, but every bone uses the shared wave and the
 same fill, `--cl-color-neutral-alpha-200`.
 
-- **Use part props first.** `Section.Group`, `Section.Title`, `Section.Media`,
-  `Section.Label`, `Section.Description`, `Section.Actions`, and `Panel.Title` take
-  `skeleton`. A skeleton part renders empty (its children are dropped); a skeleton
-  group is `aria-hidden`.
-- **Compose them in a `.skeleton.tsx`** next to the view it mirrors, e.g.
-  `user-profile-active-devices-section.skeleton.tsx` exporting
-  `UserProfileActiveDevicesSectionSkeleton`. A panel's skeleton composes its
-  sections' skeletons. Don't add a `loading` prop to the view.
-- **Announce it.** The skeleton is hidden from assistive technology, so render a
-  `VisuallyHidden` `role='status'` message ("Loading active devices") beside it.
-- **Rows:** a typical count (2–3), not the page size.
+- **Render the real view with mock data.** The view takes `skeleton` and passes it
+  to its container (`<Section.Group skeleton={skeleton}>`). Every part inside
+  inherits it and becomes a bone (`skeleton={false}` opts one out), drops its
+  children, and the container turns `inert` and `aria-hidden`. Because the
+  skeleton is the view's own markup, it can't drift from it: change a row and the
+  skeleton changes with it. While `skeleton` is set, the view skips its dialogs and
+  confirmations.
+- **The `.skeleton.tsx` is one line** next to the view, rendering it with a
+  `PLACEHOLDER_*` constant:
+  `<UserProfileActiveDevicesSectionView skeleton devices={PLACEHOLDER_DEVICES} />`
+  (see `user-profile-active-devices-section.skeleton.tsx`). The mock values are
+  never shown; they only decide the shape. A panel's skeleton composes its
+  sections' skeletons.
+- **Mock data decides row count and shape.** Aim it at the most common loaded
+  shape: a typical count (2–3), every line present, and the branch real data
+  usually takes (a current device, not the empty state). When the count is known
+  before the fetch, use it instead: a table moving between pages with a known
+  total shows exactly `min(pageSize, total − offset)` rows, so nothing shifts. A
+  first load or a new search can't know, so it uses the typical count and accepts
+  a shift. The page size is a maximum, not a count.
+- **Announce it.** The skeleton is hidden from assistive technology, so the view
+  renders a `VisuallyHidden` `role='status'` message ("Loading active devices")
+  while `skeleton` is set.
+- **Parts also take `skeleton` standalone**, as does `Panel.Title`, for a bone
+  outside a skeleton container.
 - **Fewest nodes:** one element per bone, no wrappers. A bone is the real part
   rendered empty, so it inherits that part's padding, type size and line height.
 - **A component with its own shape** (a part that needs a skeleton but isn't covered

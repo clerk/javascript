@@ -50,13 +50,14 @@ fixed leading slot sized to the text, for a provider logo or a lock.
 than `26rem`. `sectionCompactStyles.hidden` and `sectionCompactStyles.only` toggle inline content at
 the same width.
 
-`Section.Group`, `Section.Title`, `Section.Media`, `Section.Label`, and `Section.Description` take
-`skeleton` for a loading state. A skeleton part renders empty as a placeholder the size of the
-content it stands in for, and a skeleton group is hidden from assistive technology, so pair it with
-a visually hidden status message. Placeholders pulse in one wave that travels down the page, across
-every skeleton on it. When to show the skeleton, and for how long, is up to the caller.
-`Section.Actions skeleton` draws nothing and holds the height of a small control, for items whose
-actions would otherwise make them taller than their content.
+`Section.Group skeleton` turns a card into its loading state. The title, media, label,
+description, and actions inside it become placeholders, each the size of the content it stands in
+for, and their children are not rendered. A part can also take `skeleton` on its own, or
+`skeleton={false}` to stay as content inside a skeleton card. Skeleton actions draw nothing and hold
+the height of a small control. A skeleton card is inert and hidden from assistive technology, so
+pair it with a visually hidden status message. Placeholders pulse in one wave that travels down the
+page, across every skeleton on it. When to show the skeleton, and for how long, is up to the
+caller.
 
 `Section.Title` renders at the level from the nearest `HeadingLevelProvider`, or `h2` outside one.
 On a page, put the sections in `Panel.Sections` so the card titles sit one level below the page

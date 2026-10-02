@@ -566,28 +566,23 @@ export function Loading() {
       <Section.Root>
         <Section.Group skeleton={loading}>
           <Section.Header>
-            <Section.Title skeleton={loading}>{loading ? null : 'Active devices'}</Section.Title>
+            <Section.Title>Active devices</Section.Title>
           </Section.Header>
           <Section.Body>
             <Section.Items>
               {loadingItems.map(item => (
                 <Section.Item key={item.label}>
-                  <Section.Media
-                    size='lg'
-                    skeleton={loading}
-                  >
-                    {loading ? null : (
-                      <IconFrame>
-                        <Icon
-                          name={item.icon}
-                          size='lg'
-                        />
-                      </IconFrame>
-                    )}
+                  <Section.Media size='lg'>
+                    <IconFrame>
+                      <Icon
+                        name={item.icon}
+                        size='lg'
+                      />
+                    </IconFrame>
                   </Section.Media>
                   <Section.Content>
-                    <Section.Label skeleton={loading}>{loading ? null : item.label}</Section.Label>
-                    <Section.Description skeleton={loading}>{loading ? null : item.description}</Section.Description>
+                    <Section.Label>{item.label}</Section.Label>
+                    <Section.Description>{item.description}</Section.Description>
                   </Section.Content>
                 </Section.Item>
               ))}
