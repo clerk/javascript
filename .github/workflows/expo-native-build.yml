@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - '.github/workflows/expo-native-build.yml'
+      - 'integration/e2e.expo-native.config.ts'
       - 'integration/templates/expo-native/**'
       - 'integration/tests/expo-native/**'
       - 'packages/expo/**'
@@ -37,6 +38,8 @@ jobs:
     name: Native ${{ matrix.run-e2e == true && 'E2E' || 'Build' }} (${{ matrix.platform }}, sdk ${{ matrix.expo-sdk }})
     runs-on: ${{ matrix.runner }}
     timeout-minutes: ${{ matrix.run-e2e == true && 60 || 45 }}
+    env:
+      CLERK_TEST_USERNAME_PREFIX: e2e_${{ github.run_id }}_${{ matrix.platform }}_
     strategy:
       fail-fast: false
       matrix:
@@ -319,6 +322,17 @@ jobs:
             adb install -r "$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk" &&
             (adb logcat -v threadtime > "$RUNNER_TEMP/e2e-device-logs/logcat.log" 2>&1 &) &&
             pnpm test:integration:expo-native:android --video=on-first-retry --reporter list,junit,markdown
+
+      - name: Delete leftover test users
+        if: always() && steps.keys.outputs.sk != ''
+        env:
+          CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
+        run: |
+          curl -fsS "$BAPI_URL/v1/users?limit=100&query=$CLERK_TEST_USERNAME_PREFIX" -H "Authorization: Bearer $CLERK_SECRET_KEY" |
+            jq -r '.[].id' |
+            while read -r user_id; do
+              curl -fsS -o /dev/null -X DELETE "$BAPI_URL/v1/users/$user_id" -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
+            done
 
       - name: Upload e2e artifacts
         if: always() && steps.keys.outputs.sk != ''

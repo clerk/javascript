@@ -10,14 +10,14 @@ function bapi(path: string, init: RequestInit) {
 }
 
 export async function createTestUser(): Promise<TestUser> {
-  const suffix = randomBytes(4).toString('hex');
-  const email = `${suffix}+clerk_test@example.com`;
+  const suffix = randomBytes(2).toString('hex');
+  const email = `${suffix}+clerk_test@clerkcookie.com`;
   const password = `ClerkCI!${randomBytes(8).toString('hex')}Aa1`;
   const response = await bapi('/users', {
     method: 'POST',
     body: JSON.stringify({
       email_address: [email],
-      username: `e2e_${suffix}`,
+      username: `${process.env.CLERK_TEST_USERNAME_PREFIX ?? 'e2e_local_'}${suffix}`,
       password,
       bypass_client_trust: true,
     }),

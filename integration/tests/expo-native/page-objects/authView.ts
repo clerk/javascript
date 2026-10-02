@@ -39,6 +39,7 @@ export const createAuthViewPageObject = ({ device, platform, screen }: DeviceFix
       } else {
         await tapUntilVisible(screen.getByRole('button', 'Close'), openButton);
       }
+      await expect(screen.getByText(welcome)).toBeHidden({ timeout: 15_000 });
     },
     setIdentifier: async (identifier: string) => {
       const label = screen.getByText(/^Enter your email( or username)?$/);
