@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { colors } from '../../utils/typography.styles';
+import { colors } from '../../styles/typography.styles';
 import { Text, TextContext } from './text';
 
 const atoms = stylex.create({

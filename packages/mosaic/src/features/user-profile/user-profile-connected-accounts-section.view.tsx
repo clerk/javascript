@@ -2,7 +2,7 @@ import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Section } from '../../components/section';
-import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
+import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../localization';
 import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
 

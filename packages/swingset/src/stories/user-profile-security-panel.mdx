@@ -2,6 +2,11 @@ import * as Stories from './user-profile-security-panel.stories';
 
 # UserProfileSecurityPanel
 
+The security panel groups the available authentication methods and active devices. For a live
+password section, pass `useUserProfilePasswordSlot()` as `passwordSlot`. The hook returns `null`
+when passwords are hidden or loading without a fallback, so the panel omits an empty Authentication
+section. Fixtures pass `{ content: <UserProfilePasswordSectionView {...props} /> }`.
+
 ## Example
 
 <Story

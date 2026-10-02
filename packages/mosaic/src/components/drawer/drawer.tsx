@@ -5,7 +5,7 @@ import type { DrawerFocusTarget, DrawerProps as HeadlessDrawerProps } from '../.
 import { Drawer as Primitive, registerDrawerCssVars } from '../../primitives/drawer';
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { DialogContext, isInDialog } from '../dialog';
 import { styles } from './drawer.styles';
 

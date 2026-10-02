@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Card } from '../../../components/card';
 import { Flow } from '../../../components/flow';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileAddSmsView } from '../user-profile-add-sms.view';
 
 describe('MFA cards', () => {
