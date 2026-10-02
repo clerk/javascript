@@ -36,9 +36,9 @@ const PHONE = '@container cl-dialog (width < 48rem)';
 const ABOVE_PHONE = '@container cl-dialog (width >= 48rem)';
 const DESK = '@container cl-dialog (48rem <= width < 90rem)';
 const WIDE = '@container cl-dialog (width >= 90rem)';
-// Narrower than `PHONE` so a portrait small tablet keeps the centered card. `card.styles.ts` repeats it.
-const SHEET = '@container cl-dialog (width < 40rem)';
-const SHEET_MEDIA = '@media (width < 40rem)';
+// Narrower than `PHONE` so a portrait small tablet keeps the centered card. A media query, so the
+// overlay's scrollbar cannot split the viewport and the popup across it. `card.styles.ts` repeats it.
+const SHEET = '@media (width < 40rem)';
 
 export const styles = stylex.create({
   // The scrim. Black in both schemes. A grey veil was tried for dark mode — lightening a dark page rather
@@ -322,15 +322,12 @@ export const closeInsets = stylex.create({
  * instead: the padding travels with the content, and short dialogs still fill the overlay so the
  * track has something to center against.
  */
-/**
- * Pins the box for a sheet, so `compactPlacements.sheet` can cap the popup at the overlay's own
- * height. A media query because an element cannot query itself; the viewport is the window's width.
- */
+/** Pins the box for a sheet, so `compactPlacements.sheet` can cap the popup at the overlay's own height. */
 export const viewportCompactPlacements = stylex.create({
   center: {},
   sheet: {
-    gridTemplateRows: { [SHEET_MEDIA]: 'minmax(0, 1fr)', default: null },
-    height: { [SHEET_MEDIA]: '100%', default: null },
+    gridTemplateRows: { [SHEET]: 'minmax(0, 1fr)', default: null },
+    height: { [SHEET]: '100%', default: null },
   },
 });
 

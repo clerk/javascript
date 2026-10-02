@@ -35,7 +35,7 @@ export const root = stylex.create({
 });
 
 // Mirrors `SHEET` in `dialog.styles.ts`; the two must agree.
-const sheetBand = '@container cl-dialog (width < 40rem)' as const;
+const sheetBand = '@media (width < 40rem)' as const;
 
 // `minWidth` rather than `width`, so it beats the size's fixed width without restating it.
 export const sheet = stylex.create({

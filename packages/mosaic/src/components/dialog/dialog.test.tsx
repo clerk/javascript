@@ -547,7 +547,7 @@ describe('compactPlacement', () => {
   // Written out rather than imported: an atom is named from its property, value AND condition, so
   // the probe only yields the popup's own atom if the query string matches `dialog.styles.ts`
   // exactly. A drift here shows up as a failing test rather than as a silently empty assertion.
-  const SHEET = '@container cl-dialog (width < 40rem)';
+  const SHEET = '@media (width < 40rem)';
   const probe = stylex.create({
     anchored: { alignSelf: { [SHEET]: 'end', default: null } },
     clipped: { overflow: { [SHEET]: 'clip', default: null } },

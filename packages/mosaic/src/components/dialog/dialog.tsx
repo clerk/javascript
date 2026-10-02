@@ -39,7 +39,7 @@ import { acquireKeyboardInset, focusWithoutScroll, preventViewportPan } from './
 export type DialogVariant = keyof typeof variants;
 
 /**
- * Where the surface sits in the compact band — the dialog viewport under `40rem`. `center`
+ * Where the surface sits in the compact band — a window under `40rem`. `center`
  * everywhere above it: there is no edge close enough for anchoring to mean anything at those
  * widths.
  */
@@ -119,7 +119,7 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
   /** Which surface the dialog holds, and so the geometry it takes. @default 'card' */
   variant?: DialogVariant;
   /**
-   * Bottom-anchors the surface in the compact band — the dialog viewport under `40rem` — flush to
+   * Bottom-anchors the surface in the compact band — a window under `40rem` — flush to
    * the sides and bottom edge, and slides it up as a sheet, instead of centering it. For a dialog
    * that asks one thing and returns — a confirmation, a form — where the answer belongs within
    * thumb's reach.
