@@ -13,6 +13,7 @@ import type {
 import { http, HttpResponse, type JsonBodyType } from 'msw';
 import { setupWorker } from 'msw/browser';
 
+import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/enterprise';
 import {
   createVerificationState,
   type FakeVerificationSeed,
@@ -47,10 +48,12 @@ export interface FakeFapiState {
   verification: FakeVerificationState;
   passwordUpdates: URLSearchParams[];
   enterpriseConnections: EnterpriseConnectionJSON[];
+  enterpriseLinking: FakeEnterpriseLinking;
 }
 
-export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification'>> & {
+export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpriseLinking'>> & {
   verification?: FakeVerificationSeed;
+  enterpriseLinking?: Partial<FakeEnterpriseLinking>;
 };
 
 const unhandled: string[] = [];
@@ -111,7 +114,7 @@ function missing() {
 }
 
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
-  const { verification, ...rest } = seed;
+  const { verification, enterpriseLinking, ...rest } = seed;
   const state: FakeFapiState = {
     environment: fapiEnvironment(),
     client: fapiClient(),
@@ -123,20 +126,14 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     enterpriseConnections: [],
     ...rest,
     verification: createVerificationState(verification),
+    enterpriseLinking: { enabled: false, preparations: {}, verifiedLinks: [], ...enterpriseLinking },
   };
 
   worker.use(
     ...verificationHandlers(state, fapiUrl),
+    ...enterpriseHandlers(state, fapiUrl),
     http.get(fapiUrl('/v1/environment'), () => HttpResponse.json(state.environment)),
     http.get(fapiUrl('/v1/client'), () => envelope(state.client, null)),
-    http.get(fapiUrl('/v1/me/enterprise_connections'), ({ request }) => {
-      const url = new URL(request.url);
-      const withLinking = url.searchParams.get('with_organization_account_linking') === 'true';
-      const connections = withLinking
-        ? state.enterpriseConnections.filter(connection => connection.allow_organization_account_linking)
-        : state.enterpriseConnections;
-      return envelope(connections, state.client);
-    }),
     http.get(fapiUrl('/v1/me'), () => {
       const user = activeUser(state);
       return user ? envelope(user, state.client) : missing();
@@ -147,24 +144,6 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         return missing();
       }
       const body = new URLSearchParams(await request.text());
-      const enterpriseConnectionId = body.get('enterprise_connection_id');
-      if (enterpriseConnectionId) {
-        const connection = state.enterpriseConnections.find(item => item.id === enterpriseConnectionId);
-        if (!connection) {
-          return missing();
-        }
-        return envelope(
-          fapiExternalAccount({
-            id: `idn_${connection.id}`,
-            provider: 'google',
-            verification: fapiVerification('enterprise_sso', {
-              status: 'unverified',
-              external_verification_redirect_url: 'https://accounts.example/enterprise-authorize',
-            }),
-          }),
-          state.client,
-        );
-      }
       const strategy = body.get('strategy');
       if (!strategy) {
         return missing();

@@ -4,30 +4,21 @@ import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
 import { fapiUrl, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
-import {
-  fapiClient,
-  fapiEnterpriseConnection,
-  fapiEnvironment,
-  fapiSession,
-  fapiUser,
-  fapiVerification,
-} from '../../../__tests__/feature/fapi';
+import { fapiClient, fapiSession, fapiUser, fapiVerification } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section';
-
-const okta = fapiEnterpriseConnection({ id: 'okta', name: 'Acme Okta' });
+import { enterpriseAccountSeed, enterpriseMember, okta } from './enterprise-accounts.fixtures';
 
 function serveUsers() {
-  return serveFapi({
-    client: fapiClient([
-      fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) }),
-      fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2' }) }),
-    ]),
-    environment: fapiEnvironment({
-      user_settings: { enterprise_sso: { enabled: true, self_serve_sso: false, self_serve_directory_sync: false } },
+  return serveFapi(
+    enterpriseAccountSeed({
+      client: fapiClient([
+        fapiSession({ id: 'sess_1', user: enterpriseMember() }),
+        fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2' }) }),
+      ]),
+      enterpriseConnections: [okta],
     }),
-    enterpriseConnections: [okta],
-  });
+  );
 }
 
 function deferred<T>() {

@@ -9,7 +9,6 @@ import {
   fapiEnterpriseAccount,
   fapiEnterpriseConnection,
   fapiEnvironment,
-  fapiExternalAccount,
   fapiSession,
   fapiUser,
   fapiVerification,
@@ -17,20 +16,7 @@ import {
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../MosaicProvider';
 import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section';
-
-const okta = fapiEnterpriseConnection({ id: 'okta', name: 'Acme Okta' });
-const custom = fapiEnterpriseConnection({ id: 'saml', name: 'Custom SAML' });
-
-function signedIn(overrides: FakeFapiSeed = {}) {
-  return {
-    client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
-    environment: fapiEnvironment({
-      user_settings: { enterprise_sso: { enabled: true, self_serve_sso: false, self_serve_directory_sync: false } },
-    }),
-    enterpriseConnections: [okta, custom],
-    ...overrides,
-  };
-}
+import { custom, enterpriseAccountSeed as signedIn, enterpriseMember, okta } from './enterprise-accounts.fixtures';
 
 async function renderSection(seed: FakeFapiSeed = signedIn()) {
   const fapi = serveFapi(seed);
@@ -84,7 +70,7 @@ describe('enterprise accounts', () => {
       id: 'enterprise_1',
       enterprise_connection_id: 'okta',
       email_address: 'linked@example.com',
-      verification: fapiVerification('enterprise_sso', {
+      verification: fapiVerification('saml', {
         status: 'verified',
         error: { code: 'enterprise_error', message: 'Fix this account', long_message: 'Fix this account' },
       }),
@@ -93,10 +79,19 @@ describe('enterprise accounts', () => {
       id: 'enterprise_inactive',
       enterprise_connection_id: 'inactive',
       email_address: 'inactive@example.com',
-      enterprise_connection: fapiEnterpriseConnection({ id: 'inactive', name: 'Inactive SAML', active: false }),
     });
+    if (!inactive.enterprise_connection) {
+      throw new Error('Expected enterprise connection fixture');
+    }
+    inactive.enterprise_connection = {
+      ...inactive.enterprise_connection,
+      id: 'inactive',
+      name: 'Inactive SAML',
+      active: false,
+      enterprise_connection_id: 'inactive',
+    };
     const client = fapiClient([
-      fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', enterprise_accounts: [linked, inactive] }) }),
+      fapiSession({ id: 'sess_1', user: fapiUser({ ...enterpriseMember(), enterprise_accounts: [linked, inactive] }) }),
     ]);
     await renderSection(
       signedIn({
@@ -116,7 +111,7 @@ describe('enterprise accounts', () => {
   it('keeps linked rows visible while connections load', async () => {
     const linked = fapiEnterpriseAccount({ id: 'enterprise_1', email_address: 'linked@example.com' });
     const client = fapiClient([
-      fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', enterprise_accounts: [linked] }) }),
+      fapiSession({ id: 'sess_1', user: fapiUser({ ...enterpriseMember(), enterprise_accounts: [linked] }) }),
     ]);
     serveFapi(signedIn({ client }));
     const connections = holdRequests('get', '/v1/me/enterprise_connections');
@@ -171,11 +166,10 @@ describe('enterprise accounts', () => {
     worker.use(
       http.post(fapiUrl('/v1/me/external_accounts'), () =>
         HttpResponse.json({
-          response: fapiExternalAccount({
-            id: 'idn_okta',
-            provider: 'google',
-            verification: fapiVerification('enterprise_sso', { status: 'unverified' }),
-          }),
+          response: {
+            object: 'external_account',
+            verification: fapiVerification('saml', { status: 'unverified' }),
+          },
           client: null,
         }),
       ),
