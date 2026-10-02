@@ -106,7 +106,7 @@ const Header = React.forwardRef<HTMLDivElement, SectionHeaderProps>(function Sec
 });
 
 const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function SectionTitle(
-  { id: idProp, skeleton = false, xstyle, ...rest },
+  { id: idProp, skeleton = false, xstyle, children, ...rest },
   ref,
 ) {
   const setTitleId = React.useContext(SectionGroupContext);
@@ -140,7 +140,9 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
         xstyle,
       ]}
       {...mergeStyleProps(themeProps('section-title', { skeleton }), rest)}
-    />
+    >
+      {skeleton ? undefined : children}
+    </Heading>
   );
 });
 
@@ -204,7 +206,7 @@ const Item = React.forwardRef<HTMLDivElement, SectionItemProps>(function Section
 });
 
 const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function SectionMedia(
-  { size = 'md', skeleton = false, render, xstyle, ...rest },
+  { size = 'md', skeleton = false, render, xstyle, children, ...rest },
   ref,
 ) {
   const wave = useSkeletonWave<HTMLDivElement>(skeleton);
@@ -223,7 +225,7 @@ const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function Secti
         skeleton && skeletonStyles.wave,
         xstyle,
       ),
-      rest,
+      { ...rest, children: skeleton ? undefined : children },
     ),
   });
 });
@@ -247,7 +249,7 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
 });
 
 const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function SectionLabel(
-  { skeleton = false, render, xstyle, ...rest },
+  { skeleton = false, render, xstyle, children, ...rest },
   ref,
 ) {
   const wave = useSkeletonWave<HTMLDivElement>(skeleton);
@@ -267,13 +269,13 @@ const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function Secti
         skeleton && styles.labelSkeleton,
         xstyle,
       ),
-      rest,
+      { ...rest, children: skeleton ? undefined : children },
     ),
   });
 });
 
 const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(function SectionDescription(
-  { skeleton = false, render, xstyle, ...rest },
+  { skeleton = false, render, xstyle, children, ...rest },
   ref,
 ) {
   const inHeader = React.useContext(SectionHeaderContext);
@@ -296,13 +298,13 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
         skeleton && styles.descriptionSkeleton,
         xstyle,
       ),
-      rest,
+      { ...rest, children: skeleton ? undefined : children },
     ),
   });
 });
 
 const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function SectionActions(
-  { skeleton = false, render, xstyle, ...rest },
+  { skeleton = false, render, xstyle, children, ...rest },
   ref,
 ) {
   const wrap = React.useContext(SectionItemWrapContext);
@@ -322,7 +324,7 @@ const Actions = React.forwardRef<HTMLDivElement, SectionActionsProps>(function S
         skeleton && styles.actionsSkeleton,
         xstyle,
       ),
-      rest,
+      { ...rest, children: skeleton ? undefined : children },
     ),
   });
 });

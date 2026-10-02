@@ -52,57 +52,10 @@ For entrances, opacity takes `--cl-ease-enter`: there is nothing
 past `1` to overshoot into, so the pass is clamped away and only its cost — the
 slower approach to full opacity — is left.
 
-## Loading skeletons: one wave down the page
+## Loading skeletons
 
-Every loading placeholder pulses through one shared wave, never a local pulse of its
-own. The pieces:
-
-- `skeletonStyles.bone` (fill and radius) and `skeletonStyles.line` in
-  `utils/skeleton.styles.ts`. `line` is a `1lh` box, so it holds exactly one line
-  of the text it replaces, and its `::before` bar is `1cap` tall (`0.7em`
-  fallback) and sits on the baseline, covering the same band as the text's
-  capitals. Text bars are square-cornered; only media bones take a radius.
-- Size a text bone's width in `ch` from the content it usually holds, at the short
-  end, so it reads like real text and shrinks with `maxWidth: 100%` on narrow
-  screens: a card or page title `6ch`, a label `12ch`, a description `20ch`, an
-  email `16ch`, a US phone number `15ch`, a backup code `7ch`.
-- `skeletonStyles.wave`: the keyframes (opacity `1 → 0.32 → 1` over the first 56%
-  of a 2s cycle, then a hold), on `--cl-ease-in-out`. A component with its own
-  fill and shape, such as `Avatar.Fallback`, takes `wave` alone.
-- `useSkeletonWave(enabled)` in `hooks/`: before first paint it sets a negative
-  `animation-delay` from the element's page position, `-(now − y × 2.1ms/px) mod
-2000ms`, and marks it `data-skeleton-wave`. Every bone shares the document clock
-  and lags it by its height on the page, so skeletons that mount separately read
-  as a single wave, and two lines in one row sit on different parts of it.
-
-`wave` only animates once `data-skeleton-wave` is set. Without that gate, a
-server-rendered skeleton pulses in unison before hydration and then jumps into
-phase. The keyframe duration and `PERIOD_MS` in the hook must match.
-
-Tuning, all relative to each other: the hook's px rate sets how fast the wave
-travels; the cycle over that rate sets the spacing between crests (~950px, about
-one crest per panel); the keyframe's dip width sets how wide a crest is. Shorten
-the cycle alone and crests crowd together; widen the dip alone and the hold
-disappears.
-
-Use the `skeleton` prop on `Section` parts and `Panel.Title` rather than composing
-bones by hand. Any new skeleton must measure the same as the content it replaces:
-`Section.Actions skeleton` exists because a 28px menu trigger outgrew a 20px line.
-Off under `prefers-reduced-motion: reduce`.
-
-**What to render as bones.** A bone stands in for content that is being fetched and
-not yet on screen. When a surface loads as one unit (a panel, a table on first
-load), render the whole thing as bones, including titles, card headings and column
-headers that are already known: one loading state reads cleaner, carries the wave,
-and swaps to content in one moment. Content that isn't being fetched keeps
-rendering. A section loaded by a later request shows bones beside sections that
-have already loaded, and a table moving to another page turns its rows into bones
-while its headers and controls stay. Whether a table's controls are bones on first
-load is still open.
-
-Each component defines its own bones (`skeleton` props, or `skeletonStyles.wave`
-for a component with its own shape), but every bone uses the shared wave and the
-same fill, `--cl-color-neutral-alpha-200`.
+Loading placeholders pulse in one shared wave on `--cl-ease-in-out`. How to build
+them, size them, and tune the wave is in `skeletons.md`.
 
 ## A curve has a direction — don't run the entrance curve backwards
 

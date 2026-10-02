@@ -361,4 +361,40 @@ describe('Section', () => {
 
     expect(screen.getByTestId('item')).toHaveAttribute('data-wrap', '');
   });
+
+  it('hides a skeleton card and renders its parts empty', () => {
+    render(
+      <Section.Root>
+        <Section.Group
+          skeleton
+          data-testid='group'
+        >
+          <Section.Header>
+            <Section.Title skeleton>Account</Section.Title>
+          </Section.Header>
+          <Section.Body>
+            <Section.Items>
+              <Section.Item>
+                <Section.Media skeleton>media</Section.Media>
+                <Section.Content>
+                  <Section.Label skeleton>Name</Section.Label>
+                  <Section.Description skeleton>Description</Section.Description>
+                </Section.Content>
+                <Section.Actions skeleton>
+                  <button type='button'>Edit</button>
+                </Section.Actions>
+              </Section.Item>
+            </Section.Items>
+          </Section.Body>
+        </Section.Group>
+      </Section.Root>,
+    );
+
+    const group = screen.getByTestId('group');
+    expect(group).toHaveAttribute('aria-hidden', 'true');
+    expect(group).not.toHaveAttribute('role');
+    expect(group).toHaveTextContent('');
+    expect(group.querySelector('button')).toBeNull();
+    expect(group.querySelectorAll('[data-skeleton]')).toHaveLength(5);
+  });
 });
