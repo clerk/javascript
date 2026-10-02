@@ -157,7 +157,7 @@ describe('createTokenExchange', () => {
 
   it.each([
     [400, 'rejected'],
-    [401, 'unavailable'],
+    [401, 'configuration'],
     [403, 'forbidden'],
     [404, 'unavailable'],
     [429, 'rate_limited'],
@@ -166,6 +166,36 @@ describe('createTokenExchange', () => {
     const request = vi.fn<typeof fetch>().mockResolvedValueOnce(new Response('{}', { status }));
 
     await expect(createExchange(request)({ subjectToken, resource })).rejects.toMatchObject({ code });
+  });
+
+  it('names the OAuth error and its description in the message', async () => {
+    const request = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        Response.json({ error: 'invalid_target', error_description: 'resource is not allowed' }, { status: 400 }),
+      )
+      .mockResolvedValueOnce(Response.json({ error: 'invalid_client' }, { status: 401 }));
+    const exchange = createExchange(request, { cache: false });
+
+    await expect(exchange({ subjectToken, resource })).rejects.toMatchObject({
+      code: 'rejected',
+      message: 'Token exchange failed with status 400 (invalid_target): resource is not allowed.',
+    });
+    await expect(exchange({ subjectToken, resource })).rejects.toMatchObject({
+      code: 'configuration',
+      message: 'Token exchange failed with status 401 (invalid_client).',
+    });
+  });
+
+  it('sends a string resource as written and a URL resource as its serialization', async () => {
+    const request = vi.fn<typeof fetch>().mockImplementation(() => Promise.resolve(oauthResponse()));
+    const exchange = createExchange(request, { cache: false });
+
+    await exchange({ subjectToken, resource: 'https://api.example.com' });
+    await exchange({ subjectToken, resource: new URL('https://api.example.com') });
+
+    expect(formBody(request, 0).get('resource')).toBe('https://api.example.com');
+    expect(formBody(request, 1).get('resource')).toBe('https://api.example.com/');
   });
 
   it('reports the token endpoint status to telemetry without the subject token', async () => {

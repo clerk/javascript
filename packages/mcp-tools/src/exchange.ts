@@ -52,12 +52,15 @@ function targetResource(resource: string | URL): string {
   if (url.hash || url.href.endsWith('#')) {
     throw new ClerkMcpError('configuration', 'Token exchange resource must not include a fragment.');
   }
-  return url.href;
+  return typeof resource === 'string' ? resource : url.href;
 }
 
 function exchangeErrorCode(status: number): ClerkMcpError['code'] {
   if (status === 400) {
     return 'rejected';
+  }
+  if (status === 401) {
+    return 'configuration';
   }
   if (status === 403) {
     return 'forbidden';
@@ -66,6 +69,17 @@ function exchangeErrorCode(status: number): ClerkMcpError['code'] {
     return 'rate_limited';
   }
   return 'unavailable';
+}
+
+async function exchangeErrorMessage(response: Response): Promise<string> {
+  const payload: unknown = await response.json().catch(() => undefined);
+  const body = typeof payload === 'object' && payload !== null ? (payload as Record<string, unknown>) : {};
+  if (typeof body.error !== 'string' || !body.error) {
+    return `Token exchange failed with status ${response.status}.`;
+  }
+  const description =
+    typeof body.error_description === 'string' && body.error_description ? `: ${body.error_description}` : '';
+  return `Token exchange failed with status ${response.status} (${body.error})${description}.`;
 }
 
 function parseTokenResponse(payload: unknown): { accessToken: string; expiresIn: number; scope?: string } | undefined {
@@ -155,11 +169,7 @@ export function createTokenExchange(options: TokenExchangeOptions): TokenExchang
     }
 
     if (!response.ok) {
-      throw fail(
-        exchangeErrorCode(response.status),
-        `Token exchange failed with status ${response.status}.`,
-        response.status,
-      );
+      throw fail(exchangeErrorCode(response.status), await exchangeErrorMessage(response), response.status);
     }
 
     const token = parseTokenResponse(await response.json().catch(() => undefined));

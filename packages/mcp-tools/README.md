@@ -224,7 +224,9 @@ clerkMcp.withScopes('list_notes', async (_args, ctx) => {
 });
 ```
 
-`exchangeToken()` refuses scopes the caller's token does not carry, and fails with a `ClerkMcpError` whose `code` is stable: `insufficient_scope`, `rejected`, `forbidden`, `rate_limited`, `unavailable` or `configuration`.
+Clerk only exchanges into resources registered on the instance. `resource` in `createClerkMcpAuth()` must be registered and owned by the `tokenExchange` client, and the downstream `resource` must be on that client's allowlist. A string `resource` is sent as written and must match the registered URI exactly, including the path and any trailing slash. A `URL` is sent as its serialization, which adds a trailing slash to a bare origin.
+
+`exchangeToken()` refuses scopes the caller's token does not carry, and fails with a `ClerkMcpError` whose `code` is stable: `insufficient_scope`, `rejected`, `forbidden`, `rate_limited`, `unavailable` or `configuration`. Invalid client credentials fail with `configuration`. The message names the token endpoint's OAuth error, such as `invalid_target` or `invalid_scope`.
 
 Exchanged tokens are cached per subject, resource and scope set until they near expiry, so a cached token outlives the revocation of the caller's token. Set `tokenExchange.cache` to `false` to exchange on every call.
 
