@@ -7,10 +7,7 @@ import { fill, tapUntilVisible } from './gestures.ts';
 const welcome = /^Welcome! Sign in to continue\.?$/;
 const iosPasswordPrompt = /^(Save Password|Strong Password|Use Strong Password|AutoFill Passwords)$/i;
 const androidPasswordPrompt = /Google Password Manager/;
-const afterPassword = new RegExp(
-  `^(Check your email|signed in)$|${iosPasswordPrompt.source}|${androidPasswordPrompt.source}`,
-  'i',
-);
+const afterPassword = new RegExp(`^signed in$|${iosPasswordPrompt.source}|${androidPasswordPrompt.source}`, 'i');
 
 export const createAuthViewPageObject = ({ device, platform, screen }: DeviceFixtures) => {
   const openButton = screen.getByTestId('open-auth-view-button');
@@ -59,11 +56,6 @@ export const createAuthViewPageObject = ({ device, platform, screen }: DeviceFix
     continue: () => {
       return screen.getByText('Continue').tap();
     },
-    enterEmailCode: async () => {
-      if (await screen.getByText('Check your email').isVisible()) {
-        await screen.getByRole('textbox').last().pressSequentially('424242');
-      }
-    },
     dismissPasswordPrompt: async () => {
       await dismissAndroidPasswordPrompt();
       await dismissIosPasswordPrompt();
@@ -72,16 +64,10 @@ export const createAuthViewPageObject = ({ device, platform, screen }: DeviceFix
       await expect(screen.getByText(welcome)).toBeVisible({ timeout: 25_000 });
       await self.setIdentifier(email);
       await self.continue();
-      await expect(screen.getByText(/^(Enter your password|Check your email)$/).first()).toBeVisible({
-        timeout: 15_000,
-      });
-      await self.enterEmailCode();
-      if (await screen.getByText('Enter your password').first().isVisible()) {
-        await self.setPassword(password);
-        await self.continue();
-        await expect(screen.getByText(afterPassword).first()).toBeVisible({ timeout: 15_000 });
-      }
-      await self.enterEmailCode();
+      await expect(screen.getByText('Enter your password').first()).toBeVisible({ timeout: 15_000 });
+      await self.setPassword(password);
+      await self.continue();
+      await expect(screen.getByText(afterPassword).first()).toBeVisible({ timeout: 15_000 });
       await self.dismissPasswordPrompt();
     },
   };
