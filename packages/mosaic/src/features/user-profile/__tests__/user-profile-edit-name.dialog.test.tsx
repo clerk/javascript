@@ -135,12 +135,27 @@ describe('UserProfileEditNameDialog', () => {
     await user.type(lastNameField(), 'x');
     await user.click(saveButton());
 
-    const banner = await screen.findByRole('alert');
-    expect(banner).toHaveAttribute('data-color', 'negative');
-    expect(banner).toHaveTextContent('Your name could not be updated.');
+    const banner = screen.getByRole('alert');
+    await waitFor(() => expect(banner).toHaveTextContent('Your name could not be updated.'));
+    expect(banner.querySelector('.cl-banner-root')).toHaveAttribute('data-color', 'negative');
     expect(lastNameField()).toHaveAccessibleDescription('Last name must be 64 characters or fewer.');
     expect(lastNameField()).toHaveAttribute('aria-invalid', 'true');
     expect(firstNameField()).not.toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('leaves the banner empty when only a field is blamed', async () => {
+    const user = userEvent.setup();
+    renderView({
+      onSubmit: () =>
+        Promise.reject(new SaveError({ fields: { firstName: { message: 'First name is required.' } } })),
+    });
+
+    await user.type(lastNameField(), 'x');
+    await user.click(saveButton());
+
+    await waitFor(() => expect(firstNameField()).toHaveAttribute('aria-invalid', 'true'));
+    expect(firstNameField()).toHaveAccessibleDescription('First name is required.');
+    expect(screen.getByRole('alert').textContent).toBe('');
   });
 
   it('stays inert while the save runs', async () => {

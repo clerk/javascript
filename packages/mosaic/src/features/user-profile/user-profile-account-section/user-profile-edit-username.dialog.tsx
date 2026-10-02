@@ -1,7 +1,6 @@
 import { useMergeRefs } from '@floating-ui/react';
 import { useRef } from 'react';
 
-import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
@@ -57,6 +56,12 @@ export function UserProfileEditUsernameDialog({
             <Card.Title>{title ?? m.username.dialogTitle}</Card.Title>
           </Card.Header>
 
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {form.error}
+          </Card.Banner>
           <Card.Content
             render={
               <form
@@ -65,14 +70,6 @@ export function UserProfileEditUsernameDialog({
               />
             }
           >
-            {form.error ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
-              >
-                <Banner.Label>{form.error}</Banner.Label>
-              </Banner.Root>
-            ) : null}
             <Field.Root
               disabled={form.isSubmitting}
               invalid={error !== undefined}
