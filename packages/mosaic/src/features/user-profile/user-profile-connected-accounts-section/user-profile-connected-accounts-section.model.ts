@@ -16,6 +16,7 @@ import type {
   VerificationResource,
 } from '@clerk/shared/types';
 
+import { isProviderLogoId } from '../../../components/provider-logo';
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { useErrorText, useMessages } from '../../../localization';
@@ -76,8 +77,6 @@ const RECONNECT_ERROR_CODES = [
   'external_account_email_address_verification_required',
 ];
 
-const MONOCHROME_PROVIDERS = ['agentid', 'apple', 'github', 'okx_wallet', 'vercel', 'x'];
-
 type SocialSettings = Partial<
   Record<string, Pick<OAuthProviders[OAuthStrategy], 'name' | 'logo_url'> & { strategy: string }>
 >;
@@ -92,11 +91,9 @@ export function createProviderCatalog(
     strategy,
     provider,
     enabled: enabled.has(strategy),
-    display: {
-      provider: name,
-      iconUrl: iconImageUrl(provider),
-      monochromeIcon: MONOCHROME_PROVIDERS.includes(provider),
-    },
+    display: isProviderLogoId(provider)
+      ? { provider: name, logo: provider }
+      : { provider: name, iconUrl: iconImageUrl(provider) },
   }));
   const candidates = new Set([
     ...enabledStrategies,

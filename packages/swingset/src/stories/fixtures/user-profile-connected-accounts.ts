@@ -11,12 +11,12 @@ export const connectedAccount: UserProfileConnectedAccount = {
   id: 'google',
   provider: 'Google',
   identifier: 'test@example.com',
-  iconUrl: 'https://img.clerk.com/static/google.svg',
+  logo: 'google',
   status: 'connected',
 };
 const connectionProviders: UserProfileConnectionProvider[] = [
-  { id: 'google', provider: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
-  { id: 'apple', provider: 'Apple', iconUrl: 'https://img.clerk.com/static/apple.svg' },
+  { id: 'google', provider: 'Google', logo: 'google' },
+  { id: 'apple', provider: 'Apple', logo: 'apple' },
 ];
 
 export function useConnectedAccountsFixture({
@@ -53,6 +53,7 @@ export function useConnectedAccountsFixture({
           {
             id: provider.id,
             provider: provider.provider,
+            logo: provider.logo,
             iconUrl: provider.iconUrl,
             identifier: 'test@example.com',
             status: 'connected',

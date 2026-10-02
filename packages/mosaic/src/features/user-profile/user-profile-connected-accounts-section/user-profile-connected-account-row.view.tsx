@@ -6,6 +6,7 @@ import { ActionMenu } from '../../../components/action-menu';
 import { Badge } from '../../../components/badge';
 import { SubmitButton } from '../../../components/button';
 import { Icon, IconFrame } from '../../../components/icon';
+import { ProviderLogo } from '../../../components/provider-logo';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
 import { styles } from './user-profile-connected-accounts-section.styles';
@@ -20,10 +21,10 @@ function ProviderMedia({ provider }: { provider: ConnectedAccountProviderDisplay
   return (
     <Section.Media size='lg'>
       <IconFrame>
-        {iconUrl && provider.monochromeIcon ? (
-          <span
-            aria-hidden
-            {...stylex.props(styles.maskedIcon, styles.maskImage(iconUrl))}
+        {provider.logo ? (
+          <ProviderLogo
+            provider={provider.logo}
+            xstyle={styles.icon}
           />
         ) : iconUrl ? (
           <img

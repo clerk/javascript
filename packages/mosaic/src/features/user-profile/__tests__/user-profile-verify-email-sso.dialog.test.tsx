@@ -41,6 +41,12 @@ describe('UserProfileVerifyEmailSsoDialog', () => {
     expect(props.onOpenChange).not.toHaveBeenCalled();
   });
 
+  it('shows the bundled logo for a known provider', () => {
+    renderView({ connection: { provider: 'Okta SSO', domain: 'acme.co', logo: 'okta' } });
+
+    expect(document.querySelector('.cl-provider-logo')).toHaveAttribute('data-provider', 'okta');
+  });
+
   it('prevents another connection attempt while connecting and still allows cancellation', async () => {
     const user = userEvent.setup();
     const { props } = renderView({ isConnecting: true });

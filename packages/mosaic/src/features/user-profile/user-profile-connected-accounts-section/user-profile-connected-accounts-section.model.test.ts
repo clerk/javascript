@@ -196,18 +196,16 @@ describe('projectConnectedAccounts', () => {
     });
   });
 
-  it('marks monochrome provider logos', () => {
+  it('uses bundled logos for built-in providers', () => {
     const projection = projectConnectedAccounts({
       user: userWith([]),
       providers: social('oauth_github', 'oauth_google'),
       socialEnabled: true,
       allowCreation: true,
     });
-    expect(
-      projection.status === 'ready' && projection.availableProviders.map(p => [p.id, Boolean(p.monochromeIcon)]),
-    ).toEqual([
-      ['oauth_github', true],
-      ['oauth_google', false],
+    expect(projection.status === 'ready' && projection.availableProviders.map(p => [p.id, p.logo, p.iconUrl])).toEqual([
+      ['oauth_github', 'github', undefined],
+      ['oauth_google', 'google', undefined],
     ]);
   });
 
