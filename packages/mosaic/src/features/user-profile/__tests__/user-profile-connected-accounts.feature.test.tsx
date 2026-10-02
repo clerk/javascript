@@ -883,15 +883,20 @@ describe('connected accounts', () => {
   it('uses canonical localized API errors instead of server copy', async () => {
     serveFapi(signedIn([]));
     await renderWithClerk(
-      <MosaicProvider localization={{ overrides: { 'errors.form_password_incorrect': 'Localized account error.' } }}>
+      <MosaicProvider
+        localization={{
+          locale: 'fr-FR',
+          overrides: { 'errors.verification_invalid_strategy': 'Cette connexion est indisponible.' },
+        }}
+      >
         <UserProfileConnectedAccountsSection />
       </MosaicProvider>,
     );
     const request = holdRequests('post', '/v1/me/external_accounts');
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
-    request.fail('form_password_incorrect', 'Server copy');
-    expect(await screen.findByText('Localized account error.')).toBeInTheDocument();
+    request.fail('verification_invalid_strategy', 'Server copy');
+    expect(await screen.findByText('Cette connexion est indisponible.')).toBeInTheDocument();
     expect(screen.queryByText('Server copy')).toBeNull();
   });
 
