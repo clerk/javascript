@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { fapiUrl, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
+import { type ActiveDeviceRecord, fapiUrl, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../localization';
@@ -14,11 +14,16 @@ import { UserProfileSecurityPanelView } from '../user-profile-security-panel.vie
 
 const alice = fapiUser({ id: 'user_1' });
 
-function device(id: string, status: string, activity: Partial<SessionWithActivitiesJSON['latest_activity']> = {}) {
+function device(
+  id: string,
+  status: SessionWithActivitiesJSON['status'],
+  activity: Partial<SessionWithActivitiesJSON['latest_activity']> = {},
+): ActiveDeviceRecord {
   const { user: _user, ...session } = fapiSession({ id, user: alice });
   return {
     ...session,
     user: null,
+    ownerUserId: alice.id,
     status,
     latest_activity: {
       object: 'session_activity',
@@ -31,18 +36,26 @@ function device(id: string, status: string, activity: Partial<SessionWithActivit
       ip_address: '192.0.2.1',
       ...activity,
     },
-  } satisfies SessionWithActivitiesJSON;
+  } satisfies ActiveDeviceRecord;
 }
 
 function serveDevices(
-  initialDevices: SessionWithActivitiesJSON[],
-  options: { currentActor?: ActClaim; failOnceId?: string; reverifyOnceId?: string } = {},
+  initialDevices: ActiveDeviceRecord[],
+  options: {
+    currentActor?: ActClaim;
+    deviceTrackingEnabled?: boolean;
+    failOnceId?: string;
+    reverifyOnceId?: string;
+  } = {},
 ) {
   const devices = [...initialDevices];
   let failed = false;
-  serveFapi({ client: fapiClient([fapiSession({ id: 'sess_current', user: alice, actor: options.currentActor })]) });
+  serveFapi({
+    client: fapiClient([fapiSession({ id: 'sess_current', user: alice, actor: options.currentActor })]),
+    activeDevices: devices,
+    deviceTrackingEnabled: options.deviceTrackingEnabled ?? true,
+  });
   worker.use(
-    http.get(fapiUrl('/v1/me/sessions/active'), () => HttpResponse.json(devices)),
     http.post(fapiUrl('/v1/me/sessions/:id/revoke'), ({ params }) => {
       if (params.id === options.failOnceId && !failed) {
         failed = true;
@@ -58,14 +71,7 @@ function serveDevices(
           { status: 400 },
         );
       }
-      const index = devices.findIndex(item => item.id === params.id);
-      const selected = devices[index];
-      if (!selected) {
-        return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
-      }
-      const revoked = { ...selected, status: 'revoked' };
-      devices[index] = revoked;
-      return HttpResponse.json({ response: revoked, client: null });
+      return undefined;
     }),
   );
   return devices;
@@ -98,21 +104,24 @@ describe('Active devices', () => {
     const devices = serveDevices([
       device('sess_other', 'active', { device_type: 'iPhone', is_mobile: true }),
       device('sess_current', 'active'),
-      device('sess_pending', 'pending', { browser_name: undefined, device_type: undefined }),
-      device('sess_expired', 'expired'),
+      {
+        ...device('sess_pending', 'active', { browser_name: undefined, device_type: undefined }),
+        tasks: [{ key: 'choose-organization' }],
+      },
+      { ...device('sess_expired', 'active', { device_type: 'Expired laptop' }), expire_at: 1 },
     ]);
     const { clerk } = await renderWithClerk(
       <UserProfileSecurityPanelView activeDevicesSlot={<UserProfileActiveDevicesSection />} />,
     );
 
-    expect(await clerk.user?.getSessions()).toHaveLength(4);
+    expect(await clerk.user?.getSessions()).toHaveLength(3);
 
     expect(await screen.findByRole('button', { name: 'Manage Safari on MacBook Pro' })).toBeInTheDocument();
     expect(screen.getByText('This device')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Sign out of all devices' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Manage Safari on iPhone' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Manage Web browser on Desktop device' })).toBeInTheDocument();
-    expect(screen.queryByText('sess_expired')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Manage Safari on Expired laptop' })).toBeNull();
 
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Safari on iPhone' }));
@@ -125,6 +134,38 @@ describe('Active devices', () => {
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull());
     expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked');
     expect(screen.getByRole('button', { name: 'Manage Safari on MacBook Pro' })).toBeInTheDocument();
+  });
+
+  it('filters an expired row even if a stale list response includes it', async () => {
+    const expired = device('sess_expired', 'expired', { device_type: 'Expired laptop' });
+    serveDevices([device('sess_current', 'active')]);
+    worker.use(
+      http.get(fapiUrl('/v1/me/sessions/active'), () => HttpResponse.json([device('sess_current', 'active'), expired])),
+    );
+
+    await renderWithClerk(<UserProfileActiveDevicesSection />);
+
+    expect(await screen.findByText('This device')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Manage Safari on Expired laptop' })).toBeNull();
+  });
+
+  it('shows a load error and retries after the device request recovers', async () => {
+    serveDevices([device('sess_current', 'active')]);
+    let failing = true;
+    worker.use(
+      http.get(fapiUrl('/v1/me/sessions/active'), () =>
+        failing
+          ? HttpResponse.json({ errors: [{ code: 'internal_clerk_error', message: 'Unavailable' }] }, { status: 500 })
+          : HttpResponse.json([device('sess_current', 'active')]),
+      ),
+    );
+
+    await renderWithClerk(<UserProfileActiveDevicesSection />);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not load active devices.');
+    failing = false;
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Try again' }));
+    expect(await screen.findByText('This device')).toBeVisible();
   });
 
   it('maps impersonation sessions to the distinct badges', async () => {
@@ -141,6 +182,72 @@ describe('Active devices', () => {
     expect(await screen.findByText('This device')).toBeInTheDocument();
     expect(screen.getByText("User's device")).toBeInTheDocument();
     expect(screen.getByText('Impersonation device')).toBeInTheDocument();
+  });
+
+  it('lists only eligible sessions owned by the requester', async () => {
+    const records = [
+      device('sess_current', 'active'),
+      {
+        ...device('sess_pending', 'active', { device_type: 'Pending phone' }),
+        tasks: [{ key: 'choose-organization' }],
+      },
+      { ...device('sess_foreign', 'active', { device_type: 'Foreign phone' }), ownerUserId: 'user_2' },
+      { ...device('sess_actor', 'active', { device_type: 'Actor phone' }), actor: { sub: 'admin_1' } },
+      device('sess_activation', 'pending_activation', { device_type: 'Activation phone' }),
+      { ...device('sess_replaced', 'active', { device_type: 'Replaced phone' }), replacementSessionId: 'sess_new' },
+      {
+        ...device('sess_idle', 'active', { device_type: 'Idle phone' }),
+        inactivityTimeoutSeconds: 300,
+        touchedAt: Date.now() - 301_000,
+      },
+    ] satisfies ActiveDeviceRecord[];
+    serveDevices(records);
+
+    await renderWithClerk(<UserProfileActiveDevicesSection />);
+
+    expect(await screen.findByRole('button', { name: 'Manage Safari on Pending phone' })).toBeVisible();
+    expect(screen.getByRole('button', { name: 'Manage Safari on MacBook Pro' })).toBeVisible();
+    for (const name of ['Foreign', 'Actor', 'Activation', 'Replaced', 'Idle']) {
+      expect(screen.queryByRole('button', { name: `Manage Safari on ${name} phone` })).toBeNull();
+    }
+  });
+
+  it('shows only the current session without activity when device tracking is disabled', async () => {
+    serveDevices([device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })], {
+      deviceTrackingEnabled: false,
+    });
+
+    await renderWithClerk(<UserProfileActiveDevicesSection />);
+
+    expect(await screen.findByRole('button', { name: 'Manage Web browser on Desktop device' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull();
+    expect(screen.queryByText('Paris, France')).toBeNull();
+  });
+
+  it('rejects backend-forbidden revokes through session resources', async () => {
+    const current = device('sess_current', 'active');
+    const foreign = { ...device('sess_foreign', 'active'), ownerUserId: 'user_2' };
+    const revoked = device('sess_revoked', 'revoked');
+    const unknown = device('sess_unknown', 'active');
+    serveDevices([current, foreign, revoked]);
+    worker.use(
+      http.get(fapiUrl('/v1/me/sessions/active'), () => HttpResponse.json([current, foreign, revoked, unknown])),
+    );
+    const { clerk } = await renderWithClerk(<UserProfileActiveDevicesSection />);
+    const sessions = await clerk.user?.getSessions();
+
+    for (const [id, code] of [
+      ['sess_current', 'invalid_action_for_session'],
+      ['sess_foreign', 'action_for_session_not_authorized'],
+      ['sess_revoked', 'invalid_action_for_session'],
+      ['sess_unknown', 'action_for_session_not_authorized'],
+    ]) {
+      const session = sessions?.find(item => item.id === id);
+      if (!session) {
+        throw new Error(`Missing session resource ${id}`);
+      }
+      await expect(session.revoke()).rejects.toMatchObject({ errors: [{ code }] });
+    }
   });
 
   it('keeps a device after a failed revoke and allows retrying', async () => {
@@ -165,63 +272,206 @@ describe('Active devices', () => {
     expect(devices.find(item => item.id === 'sess_current')?.status).toBe('active');
   });
 
-  it.each(['user', 'session'])('keeps the new %s view intact when an old revoke completes', async switchKind => {
+  it('translates a backend revoke code from the error catalog', async () => {
+    serveDevices([device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })]);
+    worker.use(
+      http.post(fapiUrl('/v1/me/sessions/sess_other/revoke'), () =>
+        HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'invalid_action_for_session',
+                message: 'Invalid action',
+                long_message: 'Unable to revoke session',
+              },
+            ],
+          },
+          { status: 400 },
+        ),
+      ),
+    );
+    const messages = {
+      userProfileActiveDevices: { signOutError: 'Erreur de déconnexion.' },
+      errors: { invalid_action_for_session: 'Cet appareil est indisponible.' },
+    };
+    await renderWithClerk(
+      <MosaicLocalizationProvider
+        value={resolveLocalization({
+          locale: 'fr-FR',
+          messages,
+        })}
+      >
+        <UserProfileActiveDevicesSection />
+      </MosaicLocalizationProvider>,
+    );
+
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Cet appareil est indisponible.');
+    expect(screen.getByRole('button', { name: 'Manage Safari on iPhone' })).toBeVisible();
+  });
+
+  it('ignores an old list response after switching users', async () => {
+    const nextUser = fapiUser({ id: 'user_2' });
+    serveFapi({
+      client: fapiClient([
+        fapiSession({ id: 'sess_current', user: alice }),
+        fapiSession({ id: 'sess_next', user: nextUser }),
+      ]),
+      activeDevices: [
+        device('sess_current', 'active'),
+        device('sess_other', 'active', { device_type: 'Old phone' }),
+        { ...device('sess_next', 'active', { device_type: 'Next laptop' }), ownerUserId: nextUser.id },
+      ],
+    });
+    const pending = createDeferredPromise();
+    let oldRequests = 0;
+    worker.use(
+      http.get(fapiUrl('/v1/me/sessions/active'), async ({ request }) => {
+        if (new URL(request.url).searchParams.get('_clerk_session_id') === 'sess_next') {
+          return undefined;
+        }
+        oldRequests += 1;
+        await pending.promise;
+        return HttpResponse.json([
+          device('sess_current', 'active'),
+          device('sess_other', 'active', { device_type: 'Old phone' }),
+        ]);
+      }),
+    );
+    const view = await renderWithClerk(<div />);
+    const currentUser = view.clerk.user;
+    if (!currentUser) {
+      throw new Error('Expected a signed-in user');
+    }
+    const reads = vi.spyOn(currentUser, 'getSessions');
+    view.rerender(<UserProfileActiveDevicesSection />);
+    try {
+      await waitFor(() => expect(oldRequests).toBe(1));
+      await act(() => view.clerk.setActive({ session: 'sess_next' }));
+      expect(await screen.findByRole('button', { name: 'Manage Safari on Next laptop' })).toBeVisible();
+      await act(async () => {
+        const oldRead = reads.mock.results[0];
+        if (!oldRead || oldRead.type !== 'return') {
+          throw new Error('Expected an in-flight session read');
+        }
+        pending.resolve();
+        await oldRead.value;
+      });
+      expect(screen.queryByRole('button', { name: 'Manage Safari on Old phone' })).toBeNull();
+      expect(screen.getByRole('button', { name: 'Manage Safari on Next laptop' })).toBeVisible();
+    } finally {
+      pending.resolve();
+    }
+  });
+
+  it('stays hidden after sign out while a device list is pending', async () => {
+    serveDevices([device('sess_current', 'active')]);
+    const pending = createDeferredPromise();
+    let requests = 0;
+    worker.use(
+      http.get(fapiUrl('/v1/me/sessions/active'), async () => {
+        requests += 1;
+        await pending.promise;
+        return HttpResponse.json([device('sess_current', 'active')]);
+      }),
+    );
+    const view = await renderWithClerk(<div />);
+    const currentUser = view.clerk.user;
+    if (!currentUser) {
+      throw new Error('Expected a signed-in user');
+    }
+    const reads = vi.spyOn(currentUser, 'getSessions');
+    view.rerender(<UserProfileActiveDevicesSection />);
+    try {
+      await waitFor(() => expect(requests).toBe(1));
+      await act(() => view.clerk.signOut());
+      expect(view.clerk.user).toBeNull();
+      expect(view.container).toBeEmptyDOMElement();
+      await act(async () => {
+        const oldRead = reads.mock.results[0];
+        if (!oldRead || oldRead.type !== 'return') {
+          throw new Error('Expected an in-flight session read');
+        }
+        pending.resolve();
+        await oldRead.value;
+      });
+      expect(view.container).toBeEmptyDOMElement();
+    } finally {
+      pending.resolve();
+    }
+  });
+
+  it.each(['user', 'session'])('ignores an old revoke completion after switching %s', async switchKind => {
     const nextUser = switchKind === 'user' ? fapiUser({ id: 'user_2' }) : alice;
+    const devices = [
+      device('sess_current', 'active'),
+      device('sess_other', 'active', { device_type: 'Old phone' }),
+      { ...device('sess_next', 'active', { device_type: 'Next laptop' }), ownerUserId: nextUser.id },
+    ];
     const fapi = serveFapi({
       client: fapiClient([
         fapiSession({ id: 'sess_current', user: alice }),
         fapiSession({ id: 'sess_next', user: nextUser }),
       ]),
+      activeDevices: devices,
     });
-    const devices = [
-      device('sess_current', 'active'),
-      device('sess_next', 'active', { device_type: 'Next laptop' }),
-      device('sess_other', 'active', { device_type: 'iPhone' }),
-    ];
-    const nextDevices = switchKind === 'user' ? devices.filter(item => item.id === 'sess_next') : devices;
-    const attempts: string[] = [];
-    const revokeStarted = createDeferredPromise();
-    const releaseRevoke = createDeferredPromise();
+    const pending = createDeferredPromise();
+    let requests = 0;
     worker.use(
       http.get(fapiUrl('/v1/me/sessions/active'), () =>
-        HttpResponse.json(fapi.client.last_active_session_id === 'sess_next' ? nextDevices : devices),
+        HttpResponse.json(
+          fapi.client.last_active_session_id === 'sess_next'
+            ? [device('sess_next', 'active', { device_type: 'Next laptop' })]
+            : [device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'Old phone' })],
+        ),
       ),
-      http.post(fapiUrl('/v1/me/sessions/:id/revoke'), async ({ params }) => {
-        attempts.push(String(params.id));
-        revokeStarted.resolve();
-        await releaseRevoke.promise;
-        const target = devices.find(item => item.id === params.id);
-        if (!target) {
-          return new HttpResponse(null, { status: 404 });
+      http.post(fapiUrl('/v1/me/sessions/sess_other/revoke'), async () => {
+        requests += 1;
+        await pending.promise;
+        const target = devices.find(item => item.id === 'sess_other');
+        if (target) {
+          target.status = 'revoked';
         }
-        target.status = 'revoked';
-        return HttpResponse.json({ response: target, client: null });
+        return HttpResponse.json({
+          response: fapiSession({ id: 'sess_other', user: alice, status: 'revoked' }),
+          client: null,
+        });
       }),
     );
-    const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
+    const view = await renderWithClerk(<div />);
+    const sdkRequests = vi.spyOn(view.clerk.getFapiClient(), 'request');
+    view.rerender(<UserProfileActiveDevicesSection />);
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
-    await revokeStarted.promise;
-
     try {
+      await user.click(await screen.findByRole('button', { name: 'Manage Safari on Old phone' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+      await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+      await waitFor(() => expect(requests).toBe(1));
       await act(() => view.clerk.setActive({ session: 'sess_next' }));
+      expect(await screen.findByRole('button', { name: 'Manage Safari on Next laptop' })).toBeVisible();
+      await act(async () => {
+        const index = sdkRequests.mock.calls.findIndex(
+          ([request]) => request.method === 'POST' && request.path === '/me/sessions/sess_other/revoke',
+        );
+        const response = sdkRequests.mock.results[index];
+        if (!response || response.type !== 'return') {
+          throw new Error('Expected an in-flight revoke request');
+        }
+        pending.resolve();
+        await response.value;
+      });
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+      expect(screen.queryByRole('button', { name: 'Manage Safari on Old phone' })).toBeNull();
+      expect(screen.getByRole('button', { name: 'Manage Safari on Next laptop' })).toBeVisible();
+      expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked');
+      expect(requests).toBe(1);
     } finally {
-      releaseRevoke.resolve();
+      pending.resolve();
     }
-    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
-    expect(view.clerk.session?.id).toBe('sess_next');
-    expect(fapi.client.last_active_session_id).toBe('sess_next');
-
-    await user.click(await screen.findByRole('button', { name: 'Manage Safari on Next laptop' }));
-    expect(screen.queryByRole('menuitem', { name: 'Sign out' })).toBeNull();
-    expect(attempts).toEqual(['sess_other']);
-    await waitFor(() => expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked'));
-    if (switchKind === 'user') {
-      expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull();
-    }
-    expect(screen.queryByRole('alert')).toBeNull();
   });
 
   it('localizes relative and formatted activity dates with surrounding text', async () => {
@@ -255,6 +505,44 @@ describe('Active devices', () => {
       screen.getByText(`Vu ${new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(older)} · Paris, France`),
     ).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: 'Manage Safari sur MacBook Pro' })).toHaveLength(3);
+  });
+
+  it('keeps device details open while the locale changes during a pending revoke', async () => {
+    serveDevices([device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })]);
+    const pending = createDeferredPromise();
+    worker.use(
+      http.post(fapiUrl('/v1/me/sessions/sess_other/revoke'), async () => {
+        await pending.promise;
+        return HttpResponse.json({
+          response: fapiSession({ id: 'sess_other', user: alice, status: 'revoked' }),
+          client: fapiClient([fapiSession({ id: 'sess_current', user: alice })]),
+        });
+      }),
+    );
+    const section = (locale: string) => (
+      <MosaicLocalizationProvider value={resolveLocalization({ locale })}>
+        <UserProfileActiveDevicesSection />
+      </MosaicLocalizationProvider>
+    );
+    const view = await renderWithClerk(section('en-US'));
+    const user = userEvent.setup();
+    try {
+      await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+      await user.click(screen.getByRole('menuitem', { name: 'View details' }));
+      const dialog = screen.getByRole('dialog');
+      await user.click(within(dialog).getByRole('button', { name: 'Sign out' }));
+      await waitFor(() =>
+        expect(within(dialog).getByRole('button', { name: 'Sign out' })).toHaveAttribute('aria-busy'),
+      );
+
+      view.rerender(section('fr-FR'));
+
+      expect(screen.getByRole('dialog')).toBe(dialog);
+      expect(within(dialog).getByRole('button', { name: 'Sign out' })).toHaveAttribute('aria-busy');
+    } finally {
+      pending.resolve();
+    }
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it.each(['confirmation', 'details'] as const)(
@@ -301,11 +589,13 @@ describe('Active devices', () => {
       await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
       await user.click(screen.getByRole('menuitem', { name: 'View details' }));
       const dialog = screen.getByRole('dialog');
-      await user.click(within(dialog).getByRole('button', { name: 'Sign out' }));
+      await user.dblClick(within(dialog).getByRole('button', { name: 'Sign out' }));
       await waitFor(() => expect(requests).toBe(1));
       await user.keyboard('{Escape}');
       expect(screen.getByRole('dialog')).toBe(dialog);
       await user.click(within(dialog).getByRole('button', { name: 'Close' }));
+      expect(screen.getByRole('dialog')).toBe(dialog);
+      await user.click(document.body);
       expect(screen.getByRole('dialog')).toBe(dialog);
       expect(within(dialog).getByRole('button', { name: 'Sign out' })).toHaveAttribute('aria-busy');
     } finally {
@@ -315,4 +605,81 @@ describe('Active devices', () => {
     expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull();
     expect(requests).toBe(1);
   });
+
+  it('allows details to close after a revoke fails', async () => {
+    serveDevices([device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })]);
+    worker.use(
+      http.post(fapiUrl('/v1/me/sessions/sess_other/revoke'), () =>
+        HttpResponse.json({ errors: [{ code: 'revoke_failed', message: 'Could not revoke device' }] }, { status: 400 }),
+      ),
+    );
+    await renderWithClerk(<UserProfileActiveDevicesSection />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+    await user.click(screen.getByRole('menuitem', { name: 'View details' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not revoke device');
+    await user.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(screen.getByRole('button', { name: 'Manage Safari on iPhone' })).toBeVisible();
+  });
+
+  it('stays hidden after sign out while a revoke is pending', async () => {
+    const devices = serveDevices([
+      device('sess_current', 'active'),
+      device('sess_other', 'active', { device_type: 'iPhone' }),
+    ]);
+    const pending = createDeferredPromise();
+    let requests = 0;
+    worker.use(
+      http.post(fapiUrl('/v1/me/sessions/sess_other/revoke'), async () => {
+        requests += 1;
+        await pending.promise;
+        const target = devices.find(item => item.id === 'sess_other');
+        if (target) {
+          target.status = 'revoked';
+        }
+        return HttpResponse.json({
+          response: fapiSession({ id: 'sess_other', user: alice, status: 'revoked' }),
+          client: fapiClient(),
+        });
+      }),
+    );
+    const view = await renderWithClerk(<UserProfileActiveDevicesSection />);
+    const user = userEvent.setup();
+    const settled = createDeferredPromise();
+    let removeListener: (() => void) | undefined;
+    try {
+      await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+      await user.click(screen.getByRole('menuitem', { name: 'View details' }));
+      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
+      await waitFor(() => expect(requests).toBe(1));
+      await act(() => view.clerk.signOut());
+      expect(view.clerk.user).toBeNull();
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(view.container).toBeEmptyDOMElement();
+      removeListener = view.clerk.addListener(
+        ({ session }) => {
+          if (!session) {
+            settled.resolve();
+          }
+        },
+        { skipInitialEmit: true },
+      );
+      await act(async () => {
+        pending.resolve();
+        await pending.promise;
+      });
+      await settled.promise;
+      await waitFor(() => expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked'));
+      expect(view.container).toBeEmptyDOMElement();
+    } finally {
+      pending.resolve();
+      removeListener?.();
+    }
+  });
+
+  it.todo('signs out every other eligible device after confirmation while preserving the current session');
+  it.todo('reverifies device revocation before retrying verification-required API errors');
 });

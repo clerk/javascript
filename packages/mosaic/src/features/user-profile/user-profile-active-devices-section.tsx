@@ -9,41 +9,30 @@ import { UserProfileActiveDevicesSectionView } from './user-profile-active-devic
 
 export function UserProfileActiveDevicesSection({ fallback = null }: { fallback?: ReactNode }) {
   const model = useUserProfileActiveDevicesModel();
+  const m = useMessages('userProfileActiveDevices');
   if (model.status === 'hidden') {
     return null;
   }
   if (model.status === 'loading') {
     return fallback;
   }
+  if (model.status === 'error') {
+    return (
+      <div role='alert'>
+        {model.message}
+        <Button onClick={model.retry}>{m.retry}</Button>
+      </div>
+    );
+  }
   return (
     <ActiveDevices
       key={model.identity}
       model={model}
-      fallback={fallback}
     />
   );
 }
 
-function ActiveDevices({
-  model,
-  fallback,
-}: {
-  model: Extract<UserProfileActiveDevicesModel, { status: 'ready' }>;
-  fallback: ReactNode;
-}) {
+function ActiveDevices({ model }: { model: Extract<UserProfileActiveDevicesModel, { status: 'ready' }> }) {
   const controller = useUserProfileActiveDevicesController(model);
-  const m = useMessages('userProfileActiveDevices');
-
-  if (controller.status === 'loading') {
-    return fallback;
-  }
-  if (controller.status === 'error') {
-    return (
-      <div role='alert'>
-        {m.loadError}
-        <Button onClick={controller.retry}>{m.retry}</Button>
-      </div>
-    );
-  }
   return <UserProfileActiveDevicesSectionView {...controller} />;
 }

@@ -1,5 +1,6 @@
 import type {
   ActClaim,
+  GetSessionsParams,
   SessionActivity,
   SessionActivityJSON,
   SessionWithActivitiesJSON,
@@ -36,10 +37,10 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
     this.fromJSON(data);
   }
 
-  static retrieve(): Promise<SessionWithActivities[]> {
+  static retrieve(params?: Pick<GetSessionsParams, 'throwOnError'>): Promise<SessionWithActivities[]> {
     const sessionId = BaseResource.clerk.session?.id;
 
-    return this.clerk
+    const request = this.clerk
       .getFapiClient()
       .request<SessionWithActivitiesJSON[]>({
         method: 'GET',
@@ -50,8 +51,8 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
         // https://www.notion.so/clerkdev/Align-SessionWithActivities-retrieval-with-the-rest-of-Client-API-a043f72f6b9d4344bd2f21dc1d3f79de
         const sessionWithActivitiesJSON = res.payload as unknown as SessionWithActivitiesJSON[];
         return sessionWithActivitiesJSON.map(sa => new SessionWithActivities(sa, '/me/sessions'));
-      })
-      .catch(() => []);
+      });
+    return params?.throwOnError ? request : request.catch(() => []);
   }
 
   revoke(): Promise<this> {
