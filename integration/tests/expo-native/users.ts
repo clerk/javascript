@@ -15,7 +15,12 @@ export async function createTestUser(): Promise<TestUser> {
   const password = `ClerkCI!${randomBytes(8).toString('hex')}Aa1`;
   const response = await bapi('/users', {
     method: 'POST',
-    body: JSON.stringify({ email_address: [email], username: `e2e_${suffix}`, password }),
+    body: JSON.stringify({
+      email_address: [email],
+      username: `e2e_${suffix}`,
+      password,
+      bypass_client_trust: true,
+    }),
   });
   if (!response.ok) {
     throw new Error(`BAPI user creation failed (HTTP ${response.status}): ${await response.text()}`);
