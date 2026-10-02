@@ -1,6 +1,6 @@
+import { useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
-import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 
 interface UserProfileRenamePasskeyContext {
   passkeyId: string;
@@ -8,6 +8,7 @@ interface UserProfileRenamePasskeyContext {
   name: string;
   onRename: ((id: string, name: string) => void | Promise<void>) | undefined;
   error: string | undefined;
+  fallbackErrorMessage: string;
 }
 
 type UserProfileRenamePasskeyEvent =
@@ -31,6 +32,7 @@ const userProfileRenamePasskeyMachine = createMachine({
     name: '',
     onRename: undefined,
     error: undefined,
+    fallbackErrorMessage: '',
   },
   states: {
     idle: {
@@ -53,7 +55,10 @@ const userProfileRenamePasskeyMachine = createMachine({
         onDone: { target: 'idle' },
         onError: {
           target: 'editing',
-          actions: assign((_, event) => ({ error: event.error instanceof Error ? event.error.message : m.saveError })),
+          actions: assign((context, event) => ({
+            error:
+              event.error instanceof Error && event.error.message ? event.error.message : context.fallbackErrorMessage,
+          })),
         },
       }),
     },
@@ -82,8 +87,9 @@ export function useUserProfileRenamePasskeyController({
   name,
   onRename,
 }: UserProfileRenamePasskeyControllerOptions): UserProfileRenamePasskeyController {
+  const messages = useMessages('userProfilePasskeys');
   const [snapshot, send] = useMachine(userProfileRenamePasskeyMachine, {
-    context: { passkeyId: id, savedName: name, onRename },
+    context: { passkeyId: id, savedName: name, onRename, fallbackErrorMessage: messages.saveError },
   });
 
   return {
