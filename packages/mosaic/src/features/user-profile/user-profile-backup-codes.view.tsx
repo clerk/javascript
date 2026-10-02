@@ -7,7 +7,7 @@ import { Icon } from '../../components/icon';
 import { Text } from '../../components/text';
 import { useMessages } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { styles } from './user-profile-backup-codes.styles';
 
 export interface UserProfileBackupCodesViewProps {

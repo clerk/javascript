@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../../../components/dialog';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileViewProps } from '../user-profile.view';
 import { UserProfileView } from '../user-profile.view';
 

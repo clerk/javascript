@@ -1,12 +1,12 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
+import { useAccessibleNameWarning } from '../../hooks/use-accessible-name-warning';
 import type { PopoverProps as HeadlessPopoverProps } from '../../primitives/popover';
 import { Popover as Primitive } from '../../primitives/popover';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { sizes, styles } from './popover.styles';
 
 export type PopoverSize = 'sm' | 'md' | 'lg' | 'anchor';

@@ -11,9 +11,9 @@ import type {
 } from '@clerk/shared/types';
 import { populateParamFromObject } from '@clerk/shared/url';
 
-import { useMosaicEnvironment } from '../../hooks/useMosaicEnvironment';
-import { useMosaicRouter } from '../../hooks/useMosaicRouter';
-import { useOrganizationListInView } from '../../hooks/useOrganizationListInView';
+import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
+import { useMosaicRouter } from '../../hooks/use-mosaic-router';
+import { useOrganizationListInView } from './use-organization-list-in-view';
 import type {
   UserButtonBrandingProps,
   UserButtonCallbacks,

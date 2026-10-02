@@ -12,11 +12,11 @@ import type { TableHeaderCellProps } from '../../components/table';
 import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
+import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../localization';
 import { useDataTable } from '../../primitives/hooks';
 import { themeProps } from '../../props';
-import { truncateWithEndVisible } from '../../utils/truncateTextWithEndVisible';
+import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visible';
 import { styles } from './organization-profile-api-keys-panel.styles';
 import type {
   OrganizationProfileAPIKey,

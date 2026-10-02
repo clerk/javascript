@@ -1,6 +1,6 @@
-import { useSpinDelay } from '../../hooks/useSpinDelay';
+import { useSpinDelay } from '../../hooks/use-spin-delay';
 import { setup } from '../../machine/setup';
-import { useMachine } from '../../machine/useMachine';
+import { useMachine } from '../../machine/use-machine';
 import type { UserButtonModel } from './user-button.model';
 import type { UserButtonMenuProps, UserButtonModeProps } from './user-button.types';
 import type { UserButtonProps as UserButtonViewProps, UserButtonTriggerProps } from './user-button.view';

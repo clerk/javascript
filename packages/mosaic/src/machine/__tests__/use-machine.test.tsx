@@ -2,20 +2,12 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../__tests__/async';
 import { assign } from '../assign';
-import { createActor, mockActor } from '../createActor';
-import { createMachine } from '../createMachine';
-import { useActor, useMachine, useSelector } from '../useMachine';
+import { createActor, mockActor } from '../create-actor';
+import { createMachine } from '../create-machine';
+import { useActor, useMachine, useSelector } from '../use-machine';
 import { createDeleteOrgMachine } from './delete-organization-machine';
-
-/** A promise whose resolution the test controls. */
-function deferred<T>() {
-  let resolve!: (value: T) => void;
-  const promise = new Promise<T>(res => {
-    resolve = res;
-  });
-  return { promise, resolve };
-}
 
 describe('useMachine — drives a flow from a component', () => {
   it('re-renders as send advances the machine through its states', async () => {

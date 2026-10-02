@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
-import { useMachine } from '../../../machine/useMachine';
+import { useMachine } from '../../../machine/use-machine';
 import type { UserProfileAddEmailDialogProps } from './user-profile-add-email.dialog';
 
 export interface UserProfileAddEmailControllerOptions {

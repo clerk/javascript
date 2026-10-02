@@ -18,7 +18,7 @@ import { fapiClient, fapiEmailAddress, fapiEnvironment, fapiSession, fapiUser } 
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { Card } from '../../../components/card';
 import type { MosaicLocalization } from '../../../localization';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { Reverification, useReverificationFlow } from '../reverification';
 
 const alice = fapiUser({

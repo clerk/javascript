@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileAPIKey, UserProfileApiKeysPanelViewProps } from '../user-profile-api-keys-panel.types';
 import { UserProfileApiKeysPanelView } from '../user-profile-api-keys-panel.view';
 

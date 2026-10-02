@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileAddPhoneDialogProps } from '../user-profile-account-section/user-profile-add-phone.dialog';
 import { UserProfileAddPhoneDialog } from '../user-profile-account-section/user-profile-add-phone.dialog';
 

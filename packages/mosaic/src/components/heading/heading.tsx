@@ -4,10 +4,10 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../styles/reset.styles';
+import type { TypographyColor, TypographySize } from '../../styles/typography.styles';
+import { colors, sizes, styles as typographyStyles } from '../../styles/typography.styles';
 import { useContextProps } from '../../utils/context';
-import { reset } from '../../utils/reset.styles';
-import type { TypographyColor, TypographySize } from '../../utils/typography.styles';
-import { colors, sizes, styles as typographyStyles } from '../../utils/typography.styles';
 import { styles as headingStyles } from './heading.styles';
 import type { HeadingLevel } from './heading-level';
 

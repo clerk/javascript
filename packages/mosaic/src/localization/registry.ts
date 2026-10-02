@@ -21,7 +21,7 @@ import { userProfileAddSmsMessages } from '../features/user-profile/user-profile
 import { userProfileApiKeysPanelMessages } from '../features/user-profile/user-profile-api-keys-panel.messages';
 import { userProfileAuthenticatorSetupMessages } from '../features/user-profile/user-profile-authenticator-setup.messages';
 import { userProfileBackupCodesMessages } from '../features/user-profile/user-profile-backup-codes.messages';
-import { userProfileConnectedAccountsMessages } from '../features/user-profile/user-profile-connected-accounts.messages';
+import { userProfileConnectedAccountsMessages } from '../features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.messages';
 import { userProfileDeleteSectionMessages } from '../features/user-profile/user-profile-delete-section/user-profile-delete-section.messages';
 import { userProfileEnterpriseAccountsMessages } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.messages';
 import { userProfileMfaMessages } from '../features/user-profile/user-profile-mfa-section.messages';
