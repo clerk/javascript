@@ -52,17 +52,17 @@ describe('enterprise accounts', () => {
 
   it('hides the section when SSO is disabled', async () => {
     await renderSection(signedIn({ environment: fapiEnvironment() }));
-    expect(screen.queryByRole('region', { name: 'Enterprise accounts' })).toBeNull();
+    expect(screen.queryByRole('group', { name: 'Enterprise accounts' })).toBeNull();
   });
 
   it('hides the section when the user is signed out', async () => {
     await renderSection(signedIn({ client: fapiClient() }));
-    expect(screen.queryByRole('region', { name: 'Enterprise accounts' })).toBeNull();
+    expect(screen.queryByRole('group', { name: 'Enterprise accounts' })).toBeNull();
   });
 
   it('hides an empty section', async () => {
     await renderSection(signedIn({ enterpriseConnections: [] }));
-    expect(screen.queryByRole('region', { name: 'Enterprise accounts' })).toBeNull();
+    expect(screen.queryByRole('group', { name: 'Enterprise accounts' })).toBeNull();
   });
 
   it('shows only unlinked, organization-linkable connections', async () => {
