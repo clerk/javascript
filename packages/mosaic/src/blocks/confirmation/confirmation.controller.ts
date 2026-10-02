@@ -1,5 +1,5 @@
 import { setup } from '../../machine/setup';
-import { useMachine } from '../../machine/useMachine';
+import { useMachine } from '../../machine/use-machine';
 
 export interface ConfirmationContext {
   run: () => Promise<void>;

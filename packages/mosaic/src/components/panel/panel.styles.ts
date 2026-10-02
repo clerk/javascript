@@ -7,6 +7,7 @@ export const styles = stylex.create({
     gap: space['6'],
     display: 'flex',
     flexDirection: 'column',
+    width: '100%',
   },
   title: {
     display: 'block',

@@ -1,5 +1,5 @@
 import { setup } from '../../machine/setup';
-import { useMachine } from '../../machine/useMachine';
+import { useMachine } from '../../machine/use-machine';
 import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 
 interface UserProfileRenamePasskeyContext {

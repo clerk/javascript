@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
-import { useMachine } from '../../../machine/useMachine';
+import { useMachine } from '../../../machine/use-machine';
 import type { UserProfileAddPhoneDialogProps } from './user-profile-add-phone.dialog';
 
 export interface UserProfileAddPhoneControllerOptions {

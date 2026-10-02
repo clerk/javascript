@@ -1,5 +1,5 @@
 import { setup } from '../../../machine/setup';
-import { useMachine } from '../../../machine/useMachine';
+import { useMachine } from '../../../machine/use-machine';
 import type { UserProfileFormError } from './user-profile-account-section.types';
 import { UserProfileSaveError } from './user-profile-account-section.types';
 import type { UserProfileEditUsernameField } from './user-profile-edit-username.dialog';

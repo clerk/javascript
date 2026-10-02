@@ -7,20 +7,9 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createActor } from '../createActor';
+import { deferred, tick } from '../../__tests__/async';
+import { createActor } from '../create-actor';
 import { setup } from '../setup';
-
-const tick = () => new Promise<void>(r => setTimeout(r, 0));
-
-function deferred<T>() {
-  let resolve!: (value: T) => void;
-  let reject!: (reason?: unknown) => void;
-  const promise = new Promise<T>((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
-}
 
 // ─── Pattern 1: Multiple competing entry points (replaces useLoadingStatus + useCardState) ──
 

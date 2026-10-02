@@ -1,24 +1,19 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section, sectionCompactStyles } from '../../../components/section';
 import { Text } from '../../../components/text';
 import { fill, useMessages } from '../../../localization';
-import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
-import { UserProfileEditPasswordDialog } from './user-profile-edit-password.dialog';
 import { styles } from './user-profile-password-section.styles';
 import type {
-  UserProfileEditPasswordValue,
   UserProfilePasswordManagedBy,
   UserProfilePasswordSectionViewProps,
 } from './user-profile-password-section.types';
 
 export function UserProfilePasswordRowView({
+  action,
   hasPassword = false,
-  requiresCurrentPassword = false,
   managedBy,
-  onSubmitPassword,
 }: UserProfilePasswordSectionViewProps) {
   const m = useMessages('userProfilePasswordSection');
   return (
@@ -27,17 +22,11 @@ export function UserProfilePasswordRowView({
         <Section.Content>
           <Section.Description>{hasPassword ? m.masked : m.noPasswordSet}</Section.Description>
         </Section.Content>
-        {managedBy ? (
+        {action ? (
+          <Section.Actions>{action}</Section.Actions>
+        ) : managedBy ? (
           <Section.Actions>
             <ManagedByLabel {...managedBy} />
-          </Section.Actions>
-        ) : onSubmitPassword ? (
-          <Section.Actions>
-            <EditPassword
-              hasPassword={hasPassword}
-              requiresCurrentPassword={requiresCurrentPassword}
-              onSubmit={onSubmitPassword}
-            />
           </Section.Actions>
         ) : null}
       </Section.Item>
@@ -63,40 +52,5 @@ function ManagedByLabel({ name }: UserProfilePasswordManagedBy) {
         <span {...stylex.props(sectionCompactStyles.only)}>{name}</span>
       </Text>
     </div>
-  );
-}
-
-function EditPassword({
-  hasPassword,
-  requiresCurrentPassword,
-  onSubmit,
-}: {
-  hasPassword: boolean;
-  requiresCurrentPassword: boolean;
-  onSubmit: (value: UserProfileEditPasswordValue) => Promise<void>;
-}) {
-  const m = useMessages('userProfilePasswordSection');
-  const controller = useUserProfileEditPasswordController({
-    requiresCurrentPassword: hasPassword && requiresCurrentPassword,
-    onSubmit,
-  });
-
-  return (
-    <UserProfileEditPasswordDialog
-      form={controller.form}
-      hasPassword={hasPassword}
-      open={controller.isOpen}
-      onOpenChange={controller.onOpenChange}
-      requiresCurrentPassword={requiresCurrentPassword}
-      trigger={
-        <Button
-          color='neutral'
-          size='sm'
-          variant='outline'
-        >
-          {hasPassword ? m.change : m.set}
-        </Button>
-      }
-    />
   );
 }
