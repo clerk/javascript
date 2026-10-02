@@ -286,7 +286,11 @@ describe('UserProfileProfilePanelView', () => {
 
   it('places enterprise accounts before Web3 wallets and the danger zone', () => {
     renderView({
-      web3WalletsSlot: <UserProfileWeb3WalletsSectionView wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]} />,
+      web3WalletsSlot: (
+        <UserProfileWeb3WalletsSectionView
+          wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
+        />
+      ),
       enterpriseAccountsSlot: <div data-testid='enterprise'>Enterprise accounts</div>,
       deleteAccountSlot: <DeleteAccount />,
     });

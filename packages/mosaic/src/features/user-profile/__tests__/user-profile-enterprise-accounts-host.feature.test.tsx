@@ -5,6 +5,7 @@ import { serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
+import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
 import { enterpriseAccountSeed } from './enterprise-accounts.fixtures';
 
 it('places the connected enterprise section before Web3 wallets in the profile host', async () => {
@@ -16,7 +17,11 @@ it('places the connected enterprise section before Web3 wallets in the profile h
       emails={[]}
       phones={[]}
       enterpriseAccountsSlot={<UserProfileEnterpriseAccountsSection />}
-      web3Wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
+      web3WalletsSlot={
+        <UserProfileWeb3WalletsSectionView
+          wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
+        />
+      }
     />,
   );
   const enterprise = await screen.findByRole('group', { name: 'Enterprise accounts' });

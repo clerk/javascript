@@ -52,7 +52,7 @@ export function enterpriseHandlers(state: FakeFapiState, url: (path: string) => 
       if (!user) {
         return rejected('resource_not_found');
       }
-      const body = new URLSearchParams(await request.text());
+      const body = new URLSearchParams(await request.clone().text());
       const connectionId = body.get('enterprise_connection_id');
       if (!connectionId) {
         return undefined;
