@@ -59,11 +59,23 @@ function signedIn(accounts = [google], overrides: FakeFapiSeed = {}) {
   };
 }
 
+function deferred<T>() {
+  let resolve: (value: T) => void = () => {};
+  const promise = new Promise<T>(fulfill => {
+    resolve = fulfill;
+  });
+  return { promise, resolve };
+}
+
 async function renderSection(accounts = [google], overrides: FakeFapiSeed = {}) {
   const fapi = serveFapi(signedIn(accounts, overrides));
   const titleRef = createRef<HTMLDivElement>();
   const view = await renderWithClerk(
     <UserProfileProfilePanelView
+      name='Jane Doe'
+      username=''
+      emails={[]}
+      phones={[]}
       titleRef={titleRef}
       connectedAccountsSlot={<UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />}
     />,
@@ -504,7 +516,7 @@ describe('connected accounts', () => {
   });
 
   it.each(['switch', 'sign out'] as const)('aborts Connect after %s during redirect preparation', async change => {
-    serveFapi(
+    const fapi = serveFapi(
       signedIn([], {
         client: fapiClient([
           fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', external_accounts: [] }) }),
@@ -512,23 +524,30 @@ describe('connected accounts', () => {
         ]),
       }),
     );
-    const redirect = Promise.withResolvers<string>();
+    const redirect = deferred<string>();
     const getRedirectUrl = vi.fn(() => redirect.promise);
     const open = vi.fn(() => Promise.resolve({ callbackUrl: 'https://app.example/callback' }));
     const { clerk } = await renderWithClerk(<UserProfileConnectedAccountsSection />, {
       __internal_oauthTransport: { getRedirectUrl, open },
     });
     const original = clerk.user;
-    if (!original) throw new Error('Expected signed-in user');
+    if (!original) {
+      throw new Error('Expected signed-in user');
+    }
     const create = vi.spyOn(original, 'createExternalAccount');
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
     expect(getRedirectUrl).toHaveBeenCalledOnce();
     await act(() => (change === 'switch' ? clerk.setActive({ session: 'sess_2' }) : clerk.signOut()));
+    expect(clerk.user?.id).toBe(change === 'switch' ? 'user_2' : undefined);
     await act(async () => {
       redirect.resolve('https://app.example/callback');
+      await redirect.promise;
     });
     expect(create).not.toHaveBeenCalled();
     expect(open).not.toHaveBeenCalled();
+    if (change === 'switch') {
+      expect(fapi.client.sessions[1]?.user.external_accounts).toEqual([]);
+    }
   });
 
   it('restores the profile title after removing the final enterprise-restricted account', async () => {
@@ -572,7 +591,7 @@ describe('connected accounts', () => {
         }),
       ]),
     );
-    const callback = Promise.withResolvers<{ callbackUrl: string }>();
+    const callback = deferred<{ callbackUrl: string }>();
     const open = vi.fn(() => callback.promise);
     const { clerk } = await renderWithClerk(<UserProfileConnectedAccountsSection />, {
       __internal_oauthTransport: { getRedirectUrl: () => 'https://app.example/callback', open },
@@ -580,6 +599,7 @@ describe('connected accounts', () => {
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
     await waitFor(() => expect(open).toHaveBeenCalledOnce());
     callback.resolve({ callbackUrl: 'https://app.example/callback' });
+    await callback.promise;
     await waitFor(() =>
       expect(screen.getByRole('button', { name: 'Connect GitHub' })).not.toHaveAttribute('aria-busy', 'true'),
     );
@@ -596,7 +616,7 @@ describe('connected accounts', () => {
 
   it('persists reauthorization without granting scopes before callback completion', async () => {
     const fapi = serveFapi(signedIn([google, github]));
-    const callback = Promise.withResolvers<{ callbackUrl: string }>();
+    const callback = deferred<{ callbackUrl: string }>();
     const open = vi.fn(() => callback.promise);
     const { clerk } = await renderWithClerk(
       <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['email', 'calendar'] }} />,
@@ -629,6 +649,7 @@ describe('connected accounts', () => {
     }));
     await act(async () => {
       callback.resolve({ callbackUrl: 'https://app.example/callback' });
+      await callback.promise;
     });
     await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Google' })).toBeInTheDocument());
     expect(clerk.user?.externalAccounts.find(item => item.id === google.id)?.approvedScopes).toBe('email calendar');
@@ -646,7 +667,7 @@ describe('connected accounts', () => {
         ]),
       }),
     );
-    const redirect = Promise.withResolvers<string>();
+    const redirect = deferred<string>();
     const getRedirectUrl = vi.fn(() => redirect.promise);
     const open = vi.fn(() => Promise.resolve({ callbackUrl: 'https://app.example/callback' }));
     const { clerk } = await renderWithClerk(
@@ -656,7 +677,9 @@ describe('connected accounts', () => {
       },
     );
     const original = clerk.user?.externalAccounts[0];
-    if (!original) throw new Error('Expected Google account');
+    if (!original) {
+      throw new Error('Expected Google account');
+    }
     const reauthorize = vi.spyOn(original, 'reauthorize');
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Google' }));
@@ -666,10 +689,13 @@ describe('connected accounts', () => {
     expect(clerk.user?.id).toBe(change === 'switch' ? 'user_2' : undefined);
     await act(async () => {
       redirect.resolve('https://app.example/callback');
+      await redirect.promise;
     });
     expect(reauthorize).not.toHaveBeenCalled();
     expect(open).not.toHaveBeenCalled();
-    if (change === 'switch') expect(fapi.client.sessions[1]?.user.external_accounts).toEqual([github]);
+    if (change === 'switch') {
+      expect(fapi.client.sessions[1]?.user.external_accounts).toEqual([github]);
+    }
   });
 
   it('does not open an OAuth response after the active user changes', async () => {
@@ -681,7 +707,7 @@ describe('connected accounts', () => {
         ]),
       }),
     );
-    const response = Promise.withResolvers<Response>();
+    const response = deferred<Response>();
     let received = false;
     worker.use(
       http.post(fapiUrl('/v1/me/external_accounts'), () => {
@@ -694,12 +720,15 @@ describe('connected accounts', () => {
       __internal_oauthTransport: { getRedirectUrl: () => 'https://app.example/callback', open },
     });
     const original = clerk.user;
-    if (!original) throw new Error('Expected original user');
+    if (!original) {
+      throw new Error('Expected original user');
+    }
     const create = vi.spyOn(original, 'createExternalAccount');
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
     await waitFor(() => expect(received).toBe(true));
     await act(() => clerk.setActive({ session: 'sess_2' }));
     const pending = fapiExternalAccount({
+      id: 'idn_response',
       provider: 'github',
       verification: fapiVerification('oauth_github', {
         status: 'unverified',
@@ -724,22 +753,27 @@ describe('connected accounts', () => {
         ]),
       }),
     );
-    const callback = Promise.withResolvers<{ callbackUrl: string }>();
+    const callback = deferred<{ callbackUrl: string }>();
     const open = vi.fn(() => callback.promise);
     const { clerk } = await renderWithClerk(<UserProfileConnectedAccountsSection />, {
       __internal_oauthTransport: { getRedirectUrl: () => 'https://app.example/callback', open },
     });
     const original = clerk.user;
-    if (!original) throw new Error('Expected original user');
+    if (!original) {
+      throw new Error('Expected original user');
+    }
     const reload = vi.spyOn(original, 'reload');
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
     await waitFor(() => expect(open).toHaveBeenCalledOnce());
     await act(() => clerk.setActive({ session: 'sess_2' }));
     const current = clerk.user;
-    if (!current) throw new Error('Expected current user');
+    if (!current) {
+      throw new Error('Expected current user');
+    }
     const currentReload = vi.spyOn(current, 'reload');
     await act(async () => {
       callback.resolve({ callbackUrl: 'https://app.example/callback' });
+      await callback.promise;
     });
     expect(reload).not.toHaveBeenCalled();
     expect(currentReload).not.toHaveBeenCalled();
@@ -748,7 +782,7 @@ describe('connected accounts', () => {
 
   it('shows the connected account after explicit provider callback completion', async () => {
     const fapi = serveFapi(signedIn([]));
-    const callback = Promise.withResolvers<{ callbackUrl: string }>();
+    const callback = deferred<{ callbackUrl: string }>();
     const open = vi.fn(() => callback.promise);
     const { clerk } = await renderWithClerk(
       <UserProfileConnectedAccountsSection additionalOAuthScopes={{ github: ['repo'] }} />,
@@ -772,6 +806,7 @@ describe('connected accounts', () => {
     }));
     await act(async () => {
       callback.resolve({ callbackUrl: 'https://app.example/callback' });
+      await callback.promise;
     });
     expect(await screen.findByRole('button', { name: 'Manage GitHub' })).toBeVisible();
     expect(screen.getByText('octocat')).toBeVisible();
@@ -858,6 +893,35 @@ describe('connected accounts', () => {
     request.fail('form_password_incorrect', 'Server copy');
     expect(await screen.findByText('Localized account error.')).toBeInTheDocument();
     expect(screen.queryByText('Server copy')).toBeNull();
+  });
+
+  it.each(['switch', 'sign out'] as const)('closes a stale removal confirmation after %s', async change => {
+    const fapi = serveFapi(
+      signedIn([google], {
+        client: fapiClient([
+          fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', external_accounts: [google] }) }),
+          fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2', external_accounts: [github] }) }),
+        ]),
+      }),
+    );
+    const { clerk } = await renderWithClerk(<UserProfileConnectedAccountsSection />);
+    const original = clerk.user?.externalAccounts[0];
+    if (!original) {
+      throw new Error('Expected original account');
+    }
+    const destroy = vi.spyOn(original, 'destroy');
+    await openRemoval(userEvent.setup(), 'Google');
+    await act(() => (change === 'switch' ? clerk.setActive({ session: 'sess_2' }) : clerk.signOut()));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(clerk.user?.id).toBe(change === 'switch' ? 'user_2' : undefined);
+    expect(destroy).not.toHaveBeenCalled();
+    if (change === 'switch') {
+      expect(fapi.client.sessions[0]?.user.external_accounts).toEqual([google]);
+      expect(fapi.client.sessions[1]?.user.external_accounts).toEqual([github]);
+      expect(screen.getByRole('button', { name: 'Manage GitHub' })).toBeInTheDocument();
+    } else {
+      expect(screen.queryByRole('group', { name: 'Connected accounts' })).toBeNull();
+    }
   });
 
   it.todo('challenges and resumes connect, reconnect, and removal when session reverification is required');
