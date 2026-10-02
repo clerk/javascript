@@ -13,21 +13,6 @@ let signedInSessions: { user?: { id: string } }[];
 let deleteUser: ReturnType<typeof vi.fn>;
 let setActive: ReturnType<typeof vi.fn>;
 
-const clerk = {
-  get setActive() {
-    return setActive;
-  },
-  client: {
-    get signedInSessions() {
-      return signedInSessions;
-    },
-  },
-  addListener: vi.fn(() => vi.fn()),
-  buildAfterSignOutUrl: () => '/signed-out',
-  buildAfterMultiSessionSingleSignOutUrl: () => '/one-session-left',
-  __internal_getOption: () => undefined,
-};
-
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof SharedReact>();
   return {
@@ -38,7 +23,13 @@ vi.mock('@clerk/shared/react', async importOriginal => {
       user: isLoaded ? { id: 'user_1', deleteSelfEnabled, delete: deleteUser } : undefined,
     }),
     useSession: () => ({ session: { id: 'sess_1' } }),
-    useClerk: () => clerk,
+    useClerk: () => ({
+      setActive,
+      client: { signedInSessions },
+      buildAfterSignOutUrl: () => '/signed-out',
+      buildAfterMultiSessionSingleSignOutUrl: () => '/one-session-left',
+      __internal_getOption: () => undefined,
+    }),
     useReverification: (fetcher: () => Promise<unknown>) => fetcher,
   };
 });
