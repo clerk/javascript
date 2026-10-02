@@ -5,13 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ComponentProps } from 'react';
 
-import { StatusDot } from '@/components/StatusDot';
+import { SidebarNavigation, type NavigationGroup } from '@/components/sidebar-navigation';
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -28,6 +27,19 @@ function pageIsActive(pathname: string, href: string) {
 
 export function LiveSidebar(props: ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const navigationGroups: NavigationGroup[] = groups.map(({ group, categories }) => ({
+    label: group,
+    categories: categories.map(({ category, components }) => ({
+      label: category,
+      items: components.map(({ mod, href }) => ({
+        href,
+        usage: `<${mod.meta.title} />`,
+        isActive: pageIsActive(pathname, href),
+        status: mod.meta.status,
+        substatus: mod.meta.substatus,
+      })),
+    })),
+  }));
 
   return (
     <Sidebar {...props}>
@@ -58,57 +70,9 @@ export function LiveSidebar(props: ComponentProps<typeof Sidebar>) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
-            <p className='text-muted-foreground px-2 pt-2 text-xs leading-relaxed'>
-              These are v1 wire-ups. They may still have bugs, even when they work.
-            </p>
           </SidebarGroupContent>
         </SidebarGroup>
-        {groups.map(({ group, categories }) => (
-          <SidebarGroup
-            key={group}
-            className='py-1'
-          >
-            <SidebarGroupLabel className='text-sidebar-foreground/50 h-auto px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'>
-              {group}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              {categories.map(({ category, components }) => (
-                <div key={category || group}>
-                  {category ? (
-                    <div className='text-sidebar-foreground/40 flex items-center gap-1 px-2 pb-0.5 pt-2 text-[9px] font-semibold uppercase tracking-wider'>
-                      <span
-                        aria-hidden='true'
-                        className='font-mono text-[10px] leading-none'
-                      >
-                        └
-                      </span>
-                      {category}
-                    </div>
-                  ) : null}
-                  <SidebarMenu className={category ? 'border-sidebar-border ml-3 w-auto border-l pl-1' : undefined}>
-                    {components.map(({ mod, href }) => (
-                      <SidebarMenuItem key={href}>
-                        <SidebarMenuButton
-                          className='h-auto py-1 text-xs'
-                          isActive={pageIsActive(pathname, href)}
-                          render={<Link href={href} />}
-                        >
-                          {mod.meta.status ? (
-                            <StatusDot
-                              status={mod.meta.status}
-                              substatus={mod.meta.substatus}
-                            />
-                          ) : null}
-                          <span className='truncate font-mono text-[10px] leading-relaxed'>{`<${mod.meta.title} />`}</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenu>
-                </div>
-              ))}
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+        <SidebarNavigation groups={navigationGroups} />
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
