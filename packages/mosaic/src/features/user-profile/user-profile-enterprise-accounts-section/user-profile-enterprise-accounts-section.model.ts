@@ -79,6 +79,7 @@ export function useUserProfileEnterpriseAccountsModel({
   const environment = useMosaicEnvironment();
   const { data: connections = [] } = __internal_useUserEnterpriseConnections({
     withOrganizationAccountLinking: true,
+    keepPreviousData: false,
     enabled: Boolean(isLoaded && user && environment?.userSettings.enterpriseSSO.enabled),
   });
 
@@ -120,6 +121,7 @@ export function useUserProfileEnterpriseAccountsModel({
       const url = window.location.href;
       const redirectUrl = mode === 'modal' ? appendModalState({ url, componentName: 'UserProfile' }) : url;
       const account = await current.createExternalAccount({ enterpriseConnectionId: connectionId, redirectUrl });
+      currentUser();
       const redirect = account.verification?.externalVerificationRedirectURL;
       if (!redirect) {
         throw new EnterpriseAccountActionError('missing_verification_url');
