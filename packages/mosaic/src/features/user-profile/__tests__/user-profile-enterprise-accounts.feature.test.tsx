@@ -16,6 +16,7 @@ import {
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section';
+import { useUserProfileEnterpriseAccountsModel } from '../user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.model';
 import { custom, enterpriseAccountSeed as signedIn, enterpriseMember, okta } from './enterprise-accounts.fixtures';
 
 async function renderSection(seed: FakeFapiSeed = signedIn()) {
@@ -25,6 +26,32 @@ async function renderSection(seed: FakeFapiSeed = signedIn()) {
 }
 
 describe('enterprise accounts', () => {
+  it('preserves the original cause when localizing a linking failure', async () => {
+    const feedback = vi.fn<(error: Error) => void>();
+    function Connect() {
+      const model = useUserProfileEnterpriseAccountsModel();
+      return model.status === 'ready' ? (
+        <button
+          type='button'
+          onClick={() => void model.connect('okta').catch(feedback)}
+        >
+          Connect
+        </button>
+      ) : null;
+    }
+    serveFapi(signedIn());
+    const { clerk } = await renderWithClerk(<Connect />);
+    const user = clerk.user;
+    if (!user) {
+      throw new Error('Expected a signed-in user');
+    }
+    const cause = new Error('Failed to fetch');
+    vi.spyOn(user, 'createExternalAccount').mockRejectedValue(cause);
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect' }));
+    await waitFor(() => expect(feedback).toHaveBeenCalledOnce());
+    expect(feedback.mock.calls[0]?.[0].cause).toBe(cause);
+  });
+
   it('shows the fallback while Clerk loads', async () => {
     serveFapi(signedIn());
     const client = holdRequests('get', '/v1/client');

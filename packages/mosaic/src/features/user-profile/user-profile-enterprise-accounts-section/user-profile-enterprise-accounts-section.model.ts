@@ -1,9 +1,9 @@
 import { appendModalState } from '@clerk/shared/internal/clerk-js/queryStateParams';
-import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { __internal_useUserEnterpriseConnections, useClerk, useUser } from '@clerk/shared/react';
 import type { EnterpriseAccountResource, EnterpriseConnectionResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
+import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
 import { useErrorText, useMessages } from '../../../localization';
 import { enterpriseAccountErrorMessage } from './user-profile-enterprise-accounts-feedback';
 import type {
@@ -76,6 +76,7 @@ export function useUserProfileEnterpriseAccountsModel({
   mode,
 }: { mode?: 'modal' | 'mounted' } = {}): UserProfileEnterpriseAccountsModel {
   const clerk = useClerk();
+  const router = useMosaicRouter();
   const m = useMessages('userProfileEnterpriseAccountsSection');
   const errorText = useErrorText();
   const { isLoaded, user } = useUser();
@@ -125,18 +126,14 @@ export function useUserProfileEnterpriseAccountsModel({
       const account = await current
         .createExternalAccount({ enterpriseConnectionId: connectionId, redirectUrl })
         .catch(error => {
-          throw new Error(enterpriseAccountErrorMessage(error, errorText, m.errors.generic));
+          throw new Error(enterpriseAccountErrorMessage(error, errorText, m.errors.generic), { cause: error });
         });
       currentUser();
       const redirect = account.verification?.externalVerificationRedirectURL;
       if (!redirect) {
         throw new Error(m.errors.missingVerificationUrl);
       }
-      if (typeof clerk.__internal_windowNavigate === 'function') {
-        clerk.__internal_windowNavigate(redirect);
-      } else {
-        windowNavigate(redirect);
-      }
+      router.windowNavigate(redirect);
       return 'redirecting';
     },
   };

@@ -40,4 +40,10 @@ describe('enterprise account error messages', () => {
       messages.errors.generic,
     );
   });
+
+  it('uses the section fallback for empty API messages', () => {
+    expect(
+      enterpriseAccountErrorMessage(apiError([{ code: 'unknown', message: '', long_message: '' }]), errorText, 'Retry'),
+    ).toBe('Retry');
+  });
 });
