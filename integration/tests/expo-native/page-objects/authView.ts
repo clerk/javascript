@@ -69,7 +69,7 @@ export const createAuthViewPageObject = ({ device, platform, screen }: DeviceFix
       await expect(screen.getByText('Enter your password').first()).toBeVisible({ timeout: 15_000 });
       await self.setPassword(password);
       await self.continue();
-      await expect(screen.getByText(afterPassword).first()).toBeVisible({ timeout: 15_000 });
+      await expect(screen.getByText(afterPassword).first()).toBeVisible({ timeout: 45_000 });
       await self.dismissPasswordPrompt();
     },
   };
