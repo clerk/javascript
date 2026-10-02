@@ -1,6 +1,6 @@
 import { expect } from 'e2e';
 
-import { testWithUser as test } from '../fixtures.ts';
+import { testWithUser as test } from './fixtures.ts';
 
 test('AuthView survives detach and reattach', async ({ po, screen, user }) => {
   await po.app.reset();

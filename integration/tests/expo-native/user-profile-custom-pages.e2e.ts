@@ -1,6 +1,6 @@
 import { expect } from 'e2e';
 
-import { testWithUser as test } from '../fixtures.ts';
+import { testWithUser as test } from './fixtures.ts';
 
 test('UserProfileView renders a custom page', async ({ po, screen, user }) => {
   await po.app.reset();

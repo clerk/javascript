@@ -1,4 +1,4 @@
-import { testWithUser as test } from '../fixtures.ts';
+import { testWithUser as test } from './fixtures.ts';
 
 test('UserButton native sign-out, then same-process re-sign-in', async ({ po, user }) => {
   await po.app.reset();

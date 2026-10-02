@@ -1,6 +1,6 @@
 import { expect } from 'e2e';
 
-import { testWithUser as test } from '../fixtures.ts';
+import { testWithUser as test } from './fixtures.ts';
 
 const internalPush = {
   android: { root: 'Edit profile', row: 'Manage account', detail: /^(EMAIL ADDRESSES|Add email address)$/ },

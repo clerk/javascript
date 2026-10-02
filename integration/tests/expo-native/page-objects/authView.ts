@@ -1,6 +1,7 @@
 import { expect } from 'e2e';
 
-import type { DeviceFixtures, TestUser } from '../types.ts';
+import type { DeviceFixtures } from '../types.ts';
+import type { TestUser } from '../users.ts';
 import { fill, tapUntilVisible } from './gestures.ts';
 
 const welcome = /^Welcome! Sign in to continue\.?$/;

@@ -1,4 +1,4 @@
-import { testWithUser as test } from '../fixtures.ts';
+import { testWithUser as test } from './fixtures.ts';
 
 test('Native AuthView sign-in syncs to JS and survives a restart', async ({ app, po, user }) => {
   await po.app.reset();

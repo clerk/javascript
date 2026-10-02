@@ -1,6 +1,6 @@
 import { expect } from 'e2e';
 
-import { test } from '../fixtures.ts';
+import { test } from './fixtures.ts';
 
 test('useSignInWithGoogle surfaces the missing-credentials error', async ({ po, screen }) => {
   await po.app.reset();

@@ -5,7 +5,7 @@ const app = { bundleId: 'com.clerk.exponativebuildfixture' };
 const devices = process.env.CLERK_TEST_DEVICES?.split(',');
 
 export default {
-  tests: 'tests/expo-native/flows/*.e2e.ts',
+  tests: 'tests/expo-native/*.e2e.ts',
   targets: [
     { name: 'ios', engine: mobile({ platform: 'ios', device: devices }), app },
     { name: 'android', engine: mobile({ platform: 'android', device: devices }), app },
