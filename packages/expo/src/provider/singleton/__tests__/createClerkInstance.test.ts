@@ -453,6 +453,33 @@ describe('createClerkInstance', () => {
     expect(latestTokenCache.saveToken).toHaveBeenCalledWith(CLERK_CLIENT_JWT_KEY, 'fresh-token');
   });
 
+  test('writes a rotated client token against the token each request was sent with', async () => {
+    const tokenCache = {
+      getToken: vi.fn().mockResolvedValueOnce('token-a').mockResolvedValueOnce('token-b'),
+      saveToken: vi.fn(() => Promise.resolve()),
+      saveClientToken: vi.fn(() => Promise.resolve()),
+    };
+
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const clerk = getClerkInstance({ publishableKey: 'pk_test_123', tokenCache }) as unknown as MockClerk;
+
+    const beforeRequest = clerk.__internal_onBeforeRequest.mock.calls[0][0];
+    const afterResponse = clerk.__internal_onAfterResponse.mock.calls[0][0];
+    const firstRequest = { headers: new Headers(), url: new URL('https://clerk.example.com/v1/client') };
+    const secondRequest = { headers: new Headers(), url: new URL('https://clerk.example.com/v1/me') };
+    await beforeRequest(firstRequest);
+    await beforeRequest(secondRequest);
+    await afterResponse(secondRequest, { headers: new Headers({ authorization: 'token-c' }), payload: null });
+    await afterResponse(firstRequest, { headers: new Headers({ authorization: 'token-d' }), payload: null });
+
+    expect(tokenCache.saveClientToken.mock.calls).toEqual([
+      ['token-c', 'token-b'],
+      ['token-d', 'token-a'],
+    ]);
+    expect(tokenCache.saveToken).not.toHaveBeenCalled();
+  });
+
   describe('initial resource recovery', () => {
     const setupUnavailableResources = async () => {
       const createClerkInstance = await loadCreateClerkInstance();
