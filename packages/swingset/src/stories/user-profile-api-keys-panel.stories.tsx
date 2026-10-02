@@ -62,7 +62,17 @@ export function Loading() {
       >
         Reload
       </Button>
-      {loading ? <UserProfileApiKeysPanelSkeleton pageSize={props.pageSize} /> : <APIKeysPanelExample {...props} />}
+      {loading ? <UserProfileApiKeysPanelSkeleton /> : <APIKeysPanelExample {...props} />}
     </div>
+  );
+}
+
+export function PageChange() {
+  const props = useAPIKeysTableFixture({ fetchDelay: 2000 });
+  return (
+    <APIKeysPanelExample
+      {...props}
+      refetchSkeleton
+    />
   );
 }

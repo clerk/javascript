@@ -12,7 +12,6 @@ export const styles = stylex.create({
   metadataSkeleton: {
     fontSize: typeScaleVars['--cl-text-xs-size'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
-    marginBlockStart: space['0.5'],
     width: '20ch',
   },
   actionsSkeleton: { width: `calc(${space['7']} + 2 * ${space['4']})` },

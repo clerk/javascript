@@ -321,4 +321,57 @@ describe('Mosaic Table', () => {
       expect(screen.getByRole('cell')).toHaveAttribute('colspan', '1000');
     });
   });
+
+  describe('skeleton', () => {
+    it('hides a skeleton table and turns its cells into placeholders', () => {
+      const { container } = render(
+        <Table.Root skeleton>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Name</Table.HeaderCell>
+              <Table.HeaderCell skeleton={false}>Actions</Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body>
+            <Table.Row>
+              <Table.Cell>Web app</Table.Cell>
+              <Table.Cell skeleton={false}>Menu</Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table.Root>,
+      );
+
+      const shell = container.querySelector('.cl-table-shell');
+      expect(shell).toHaveAttribute('aria-hidden', 'true');
+      expect(shell).toHaveAttribute('inert');
+      expect(shell).not.toHaveTextContent('Name');
+      expect(shell).not.toHaveTextContent('Web app');
+      expect(shell).toHaveTextContent('Actions');
+      expect(shell).toHaveTextContent('Menu');
+      expect(container.querySelectorAll('th[data-skeleton], td[data-skeleton]')).toHaveLength(2);
+    });
+
+    it('turns only the body into placeholders when the body is a skeleton', () => {
+      const { container } = render(
+        <Table.Root>
+          <Table.Header>
+            <Table.Row>
+              <Table.HeaderCell>Name</Table.HeaderCell>
+            </Table.Row>
+          </Table.Header>
+          <Table.Body skeleton>
+            <Table.Row>
+              <Table.Cell>Web app</Table.Cell>
+            </Table.Row>
+          </Table.Body>
+        </Table.Root>,
+      );
+
+      expect(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
+      const body = container.querySelector('tbody');
+      expect(body).toHaveAttribute('aria-hidden', 'true');
+      expect(body).toHaveAttribute('inert');
+      expect(body).not.toHaveTextContent('Web app');
+    });
+  });
 });
