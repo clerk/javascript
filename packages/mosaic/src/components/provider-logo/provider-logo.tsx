@@ -5,9 +5,9 @@ import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
 import { sizes } from '../icon/icon.styles';
+import { providerLogoGlyphs } from './provider-logo.glyphs.generated';
 import type { ProviderLogoId } from './provider-logo.ids.generated';
 import { providerLogoIds } from './provider-logo.ids.generated';
-import { useProviderLogoGlyphs } from './provider-logo.loader';
 import { styles } from './provider-logo.styles';
 
 export interface ProviderLogoProps extends MosaicElementProps<'svg'> {
@@ -23,7 +23,7 @@ export const ProviderLogo = React.forwardRef<SVGSVGElement, ProviderLogoProps>(f
   { provider, size = 'md', xstyle, ...rest },
   ref,
 ) {
-  const glyph = useProviderLogoGlyphs()?.[provider];
+  const glyph = providerLogoGlyphs[provider];
   const uid = React.useId().replace(/[^\w-]/g, '');
   const props = mergeStyleProps(
     { 'aria-hidden': true },
@@ -35,11 +35,11 @@ export const ProviderLogo = React.forwardRef<SVGSVGElement, ProviderLogoProps>(f
   return (
     <svg
       ref={ref}
-      viewBox={glyph?.viewBox}
+      viewBox={glyph.viewBox}
       xmlns='http://www.w3.org/2000/svg'
       {...props}
     >
-      {glyph?.render(uid)}
+      {glyph.render(uid)}
     </svg>
   );
 });

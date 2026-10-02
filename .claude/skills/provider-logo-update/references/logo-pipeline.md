@@ -11,8 +11,8 @@ All paths are under `packages/mosaic/`.
 | `src/components/provider-logo/logos/<id>.svg`                     | Source SVG per provider, as downloaded from the brand (hand-trimmed if needed)    |
 | `src/components/provider-logo/logos/manifest.json`                | Source of truth: order, treatment, color swaps, brand URL, provenance, last check |
 | `scripts/generate-provider-logos.mjs`                             | svgo + treatment + JSX codegen                                                    |
-| `src/components/provider-logo/provider-logo.ids.generated.ts`     | Generated id list and `ProviderLogoId` (main bundle)                              |
-| `src/components/provider-logo/provider-logo.glyphs.generated.tsx` | Generated glyphs (the lazy chunk)                                                 |
+| `src/components/provider-logo/provider-logo.ids.generated.ts`     | Generated id list and `ProviderLogoId`                                            |
+| `src/components/provider-logo/provider-logo.glyphs.generated.tsx` | Generated glyphs, imported statically by `ProviderLogo`                           |
 
 Never hand-edit a `*.generated.*` file. Edit the SVG or manifest, then run
 `pnpm --filter @clerk/mosaic generate:provider-logos`.
@@ -84,13 +84,36 @@ The generator throws on `<image>`, `<style>`, `<script>`, `<foreignObject>`, and
 ## Verifying
 
 1. `pnpm --filter @clerk/mosaic generate:provider-logos`. It prints the gzip size of all logos;
-   note the before/after. A single logo over ~1.5KB gzip deserves a second look, since every app
-   downloads the whole chunk.
+   note the before/after. A single logo over ~1.5KB gzip deserves a second look, since every bundle
+   that imports `ProviderLogo` carries every logo.
 2. `pnpm --filter @clerk/mosaic exec vitest run --project mosaic src/components/provider-logo`.
 3. Look at swingset `/components/provider-logo`: the Color schemes example shows every logo on
    light and dark. Check the changed logo at `sm`, `md`, and `lg` against its neighbors. Swingset
    runs on 6006 (`pnpm run dev:swingset`); use another port if a second worktree holds it. Ask the
    user before driving a browser for screenshots.
+
+## Bundle size
+
+`ProviderLogo` imports every glyph statically. With 37 logos that is ~22.5KB minified / ~7.9KB
+gzip, carried by whichever bundle imports `ProviderLogo`, whether or not the screen shows a logo.
+
+### Lazy loading later
+
+Moving the glyphs into a lazy chunk would take that ~7.9KB gzip out of the eager bundle for apps and
+screens that never show a provider logo (no social or enterprise sign-in, `UserButton`-only). It
+costs one round trip and an empty first frame unless the chunk is preloaded. Approaches:
+
+1. **One lazy chunk (built and verified in the first commit of PR #10044).** A module-level loader
+   `import()`s `provider-logo.glyphs.generated`, and `useSyncExternalStore` re-renders every
+   `ProviderLogo` when it resolves. The `<svg>` keeps its size with no `viewBox` until then, so
+   nothing shifts. Export a `preloadProviderLogos()` and call it once the environment shows social
+   or enterprise sign-in is enabled (sign-in/up), or when the `UserButton` menu opens (profile).
+   tsdown emits the chunk as its own file, and a consumer's bundler makes it its own async chunk.
+2. **One module per logo.** Generate a module per provider and `import()` by id, so a screen fetches
+   only the logos it shows. Smallest transfer, but one request per logo and more codegen; worth it
+   only if the set grows well past its current size.
+3. **Stay eager, trim outliers.** Hugging Face alone is ~1.5KB of the ~7.9KB gzip. Simplifying or
+   lazy-loading only the heaviest marks keeps the API synchronous.
 
 ## Changeset
 

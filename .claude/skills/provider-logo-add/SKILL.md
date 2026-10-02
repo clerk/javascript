@@ -2,7 +2,7 @@
 name: provider-logo-add
 description: >-
   Add a logo for a new OAuth, Web3, or phone-code provider to Mosaic's
-  `ProviderLogo` (the lazily loaded provider logo set). Use when a provider is
+  `ProviderLogo` (the bundled provider logo set). Use when a provider is
   added to Clerk, or when asked to add a logo for a provider that
   `ProviderLogo` does not support yet. To refresh an existing logo, use
   `provider-logo-update`.
@@ -29,6 +29,6 @@ changesets.
    - A manifest entry with `id`, `name`, `treatment`, `colors` if adaptive or recolored, `brand`,
      `source` if anything is non-obvious, and `checked` set to today. Place it next to providers
      from the same shared list, in that list's order.
-5. **Generate and verify** per the reference. Report the gzip size change, since every app loads
-   the whole chunk.
+5. **Generate and verify** per the reference. Report the gzip size change, since every bundle that
+   imports `ProviderLogo` carries every logo.
 6. **Changeset** per the reference.

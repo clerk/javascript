@@ -2,7 +2,7 @@ import * as ProviderLogoStories from './provider-logo.stories';
 
 # ProviderLogo
 
-ProviderLogo renders the logo for an OAuth, Web3, or phone-code provider. The logos load together in one lazy chunk on first render, and each logo adapts to the color scheme in scope: monochrome logos follow `currentColor`, and logos with distinct light and dark colors switch with `light-dark()`.
+ProviderLogo renders the logo for an OAuth, Web3, or phone-code provider. Each logo adapts to the color scheme in scope: monochrome logos follow `currentColor`, and logos with distinct light and dark colors switch with `light-dark()`.
 
 ## Playground
 
@@ -32,14 +32,6 @@ import { ProviderLogo } from '@clerk/mosaic/components/provider-logo';
 import { isProviderLogoId, ProviderLogo } from '@clerk/mosaic/components/provider-logo';
 
 isProviderLogoId(provider) ? <ProviderLogo provider={provider} /> : <img src={logoUrl} alt='' />;
-```
-
-`preloadProviderLogos()` starts loading the chunk ahead of the first render.
-
-```tsx
-import { preloadProviderLogos } from '@clerk/mosaic/components/provider-logo';
-
-preloadProviderLogos();
 ```
 
 ---
