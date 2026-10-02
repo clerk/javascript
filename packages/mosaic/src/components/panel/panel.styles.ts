@@ -11,7 +11,6 @@ export const styles = stylex.create({
   },
   title: {
     display: 'block',
-    overflowWrap: 'anywhere',
   },
 
   /**
