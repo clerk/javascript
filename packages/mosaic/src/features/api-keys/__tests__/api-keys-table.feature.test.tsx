@@ -434,6 +434,19 @@ describe('APIKeysTable', () => {
       expect(screen.queryByRole('button', { name: 'Manage Org key' })).toBeNull();
     });
 
+    it('lets a manager without permission to read keys create one', async () => {
+      const { fapi, user } = await renderTable(memberOfAcme([manageKeys]), { subject: acme.id });
+
+      expect(await screen.findByText('No API Keys created')).toBeVisible();
+      expect(within(table()).queryByText('Org key')).toBeNull();
+
+      const dialog = await openCreate(user);
+      await fillCreate(user, dialog, 'Deploy', 'Never');
+      await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
+      await within(dialog).findByRole('textbox', { name: 'API key' });
+      expect(fapi.apiKeys[0]).toMatchObject({ name: 'Deploy', subject: acme.id });
+    });
+
     it('lists nothing without permission to read keys', async () => {
       await renderTable(memberOfAcme([]), { subject: acme.id });
 
