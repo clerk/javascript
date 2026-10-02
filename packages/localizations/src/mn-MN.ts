@@ -898,6 +898,17 @@ export const mnMN: LocalizationResource = {
       title: 'Үйлчилгээ үзүүлэгчийг сонгох',
       warning: 'Үйлчилгээ үзүүлэгчийг сонгосны дараа тохиргоо дуустал өөрчлөх боломжгүй',
     },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
       subtitle: undefined,
@@ -1339,6 +1350,10 @@ export const mnMN: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
           clientSecret: {
             placeholder: undefined,
           },
