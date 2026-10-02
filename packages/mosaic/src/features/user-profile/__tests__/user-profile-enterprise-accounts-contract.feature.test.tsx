@@ -168,8 +168,28 @@ describe('enterprise linking server contract', () => {
       );
       const view = await renderWithClerk(<UserProfileEnterpriseAccountsSection />);
       const navigate = vi.spyOn(view.clerk, '__internal_windowNavigate').mockImplementation(() => {});
+      const responsePayload = new Promise<unknown>(resolve => {
+        const capture = ({ request, response }: { request: Request; response: Response }) => {
+          if (request.method === 'POST' && new URL(request.url).pathname === '/v1/me/external_accounts') {
+            worker.events.removeListener('response:mocked', capture);
+            resolve(response.clone().json());
+          }
+        };
+        worker.events.on('response:mocked', capture);
+      });
+
       await userEvent.setup().click(await screen.findByRole('button', { name: `Connect ${connection.name}` }));
       await waitFor(() => expect(navigate).toHaveBeenCalledOnce());
+      if (protocol === 'oidc') {
+        expect(await responsePayload).toMatchObject({
+          response: { provider: 'oauth_custom_mock', verification: { strategy: 'oauth_custom_mock' } },
+        });
+      } else {
+        expect(await responsePayload).toMatchObject({
+          response: { object: 'external_account', verification: { strategy: 'saml' } },
+        });
+      }
+
       expect(fapi.client.sessions[0]?.user.external_accounts).toEqual(protocol === 'oidc' ? [pending] : []);
       expect(fapi.client.sessions[0]?.user.enterprise_accounts).toEqual([]);
       const linked = fapiEnterpriseAccount({
@@ -216,4 +236,31 @@ describe('enterprise linking server contract', () => {
       expect(await view.clerk.user?.getEnterpriseConnections({ withOrganizationAccountLinking: true })).toEqual([]);
     },
   );
+
+  it('rejects a stale SAML offer after that connection has been claimed', async () => {
+    const fapi = serveMember();
+    const { clerk } = await renderWithClerk(<UserProfileEnterpriseAccountsSection />);
+    const navigate = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
+    const connect = await screen.findByRole('button', { name: 'Connect Acme Okta' });
+    fapi.enterpriseLinking.verifiedLinks = [{ userId: 'user_1', connectionId: okta.id }];
+    await userEvent.setup().click(connect);
+    expect(await screen.findByRole('alert')).toHaveTextContent('Already connected');
+    expect(navigate).not.toHaveBeenCalled();
+  });
+
+  it('rejects SAML linking when the primary email no longer exists', async () => {
+    const fapi = serveMember();
+    const { clerk } = await renderWithClerk(<UserProfileEnterpriseAccountsSection />);
+    const navigate = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
+    const connect = await screen.findByRole('button', { name: 'Connect Acme Okta' });
+    fapi.client = fapiClient([
+      fapiSession({
+        id: 'sess_1',
+        user: { ...enterpriseMember(), primary_email_address_id: null, email_addresses: [] },
+      }),
+    ]);
+    await userEvent.setup().click(connect);
+    expect(await screen.findByRole('alert')).toHaveTextContent('not found');
+    expect(navigate).not.toHaveBeenCalled();
+  });
 });
