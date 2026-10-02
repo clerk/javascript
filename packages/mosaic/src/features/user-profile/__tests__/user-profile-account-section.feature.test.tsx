@@ -2,7 +2,7 @@ import type { EmailAddressJSON, EnterpriseAccountConnectionJSON, PhoneNumberJSON
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import {
   type FakeFapiSeed,
@@ -131,7 +131,7 @@ describe('the user profile phone numbers', () => {
 
     await addPhone(actor, '8015550100');
 
-    expect(screen.getByRole('button', { name: /Didn’t receive a code\? Resend \(\d+\)/ })).toBeDisabled();
+    expect(await screen.findByRole('button', { name: /Didn’t receive a code\? Resend \(\d+\)/ })).toBeDisabled();
   });
 
   it('verifies a number that was left unverified', async () => {
@@ -296,7 +296,8 @@ describe('the user profile email addresses', () => {
       email_address: 'alice@acme.co',
       matches_sso_connection: true,
     });
-    const { actor, windowNavigate } = await renderSection(signedInWithEmails([PRIMARY, sso], verifiesByLink));
+    const { actor, clerk } = await renderSection(signedInWithEmails([PRIMARY, sso], verifiesByLink));
+    const windowNavigate = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
 
     await manageEmail(actor, 'alice@acme.co', 'Verify');
     const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });

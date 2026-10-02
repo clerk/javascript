@@ -42,7 +42,7 @@ export interface UserProfileFixtureOptions {
 
 const exampleEmails: UserProfileEmail[] = [
   { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
-  { id: 'email_2', value: 'preston.booth@gmail.com', isVerified: true },
+  { id: 'email_2', value: 'preston.booth@gmail.com', isDefault: false, isVerified: true },
 ];
 
 const examplePhones: UserProfilePhone[] = [

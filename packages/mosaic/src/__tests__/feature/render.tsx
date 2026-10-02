@@ -10,8 +10,6 @@ import { PUBLISHABLE_KEY } from './fake-fapi';
 export async function renderWithClerk(ui: ReactElement, options?: Parameters<Clerk['load']>[0]) {
   const clerk = new Clerk(PUBLISHABLE_KEY);
   const navigate = vi.fn((_to: string) => Promise.resolve());
-  const windowNavigate = vi.fn((_to: URL | string) => {});
-  clerk.__internal_windowNavigate = windowNavigate;
 
   const wrap = (element: ReactElement) => (
     <ClerkContextProvider
@@ -30,7 +28,6 @@ export async function renderWithClerk(ui: ReactElement, options?: Parameters<Cle
     ...view,
     clerk,
     navigate,
-    windowNavigate,
     rerender: (element: ReactElement) => {
       current = element;
       view.rerender(wrap(current));
