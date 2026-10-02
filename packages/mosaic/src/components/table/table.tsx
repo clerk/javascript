@@ -2,12 +2,12 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useSkeletonWave } from '../../hooks/useSkeletonWave';
+import { useSkeletonWave } from '../../hooks/use-skeleton-wave';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
-import { skeletonStyles } from '../../utils/skeleton.styles';
+import { reset } from '../../styles/reset.styles';
+import { skeletonStyles } from '../../styles/skeleton.styles';
 import { Button } from '../button';
 import type { CheckboxProps } from '../checkbox';
 import { Checkbox } from '../checkbox';

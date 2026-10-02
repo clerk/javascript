@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import React from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../mosaic-provider';
 import { HeadingLevelProvider } from '../heading';
 import { Section } from '../section';
 import { Panel } from './panel';

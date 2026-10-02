@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileAuthenticatorSetupView } from '../user-profile-authenticator-setup.view';
 
 const setup = {

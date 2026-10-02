@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { rtl } from '../../utils/rtl.styles';
+import { rtl } from '../../styles/rtl.styles';
 import { Pagination } from './pagination';
 import { styles } from './pagination.styles';
 

@@ -1,6 +1,8 @@
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
-import { useMessages } from '../../../localization';
+import { fill, useMessages } from '../../../localization';
+import type { UserProfileManagedBy } from '../user-profile-managed-by';
+import { UserProfileManagedByLabel } from '../user-profile-managed-by';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
 import { useUserProfileEditNameController } from './user-profile-edit-name.controller';
 import type { UserProfileEditNameValue } from './user-profile-edit-name.dialog';
@@ -12,6 +14,7 @@ export interface UserProfileNameRowViewProps {
   lastName?: string;
   firstNameAttribute?: UserProfileNameAttribute;
   lastNameAttribute?: UserProfileNameAttribute;
+  managedBy?: UserProfileManagedBy;
   onSubmit?: (value: UserProfileEditNameValue) => Promise<void>;
 }
 
@@ -21,19 +24,22 @@ export function UserProfileNameRowView({
   lastName,
   firstNameAttribute,
   lastNameAttribute,
+  managedBy,
   onSubmit,
 }: UserProfileNameRowViewProps) {
   const m = useMessages('userProfileAccountSection');
+
   return (
     <Section.Row>
       <Section.Item>
         <Section.Content>
           <Section.Label>{m.name.label}</Section.Label>
-          <Section.Description>{name}</Section.Description>
+          <Section.Description>{name || m.name.empty}</Section.Description>
         </Section.Content>
         {onSubmit ? (
           <Section.Actions>
             <EditName
+              isSet={Boolean(name)}
               firstName={firstName}
               lastName={lastName}
               firstNameAttribute={firstNameAttribute}
@@ -41,6 +47,11 @@ export function UserProfileNameRowView({
               onSubmit={onSubmit}
             />
           </Section.Actions>
+        ) : managedBy ? (
+          <UserProfileManagedByLabel
+            managedBy={managedBy}
+            label={fill(m.name.managedBy, { name: managedBy.name })}
+          />
         ) : null}
       </Section.Item>
     </Section.Row>
@@ -48,12 +59,14 @@ export function UserProfileNameRowView({
 }
 
 function EditName({
+  isSet,
   firstName,
   lastName,
   firstNameAttribute,
   lastNameAttribute,
   onSubmit,
 }: {
+  isSet: boolean;
   firstName?: string;
   lastName?: string;
   firstNameAttribute?: UserProfileNameAttribute;
@@ -65,17 +78,19 @@ function EditName({
 
   return (
     <UserProfileEditNameDialog
-      {...controller}
+      form={controller.form}
       firstNameAttribute={firstNameAttribute}
       lastNameAttribute={lastNameAttribute}
       open={controller.isOpen}
+      onOpenChange={controller.onOpenChange}
+      title={isSet ? m.name.dialogTitle : m.name.addDialogTitle}
       trigger={
         <Button
           color='neutral'
           size='sm'
           variant='outline'
         >
-          {m.name.edit}
+          {isSet ? m.name.edit : m.name.add}
         </Button>
       }
     />

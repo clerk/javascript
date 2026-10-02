@@ -1,7 +1,7 @@
 import { UserButtonView } from '@clerk/mosaic/features/user-button/user-button.view';
 import type { MosaicCatalog } from '@clerk/mosaic/localization';
 import { fill, plural, rich, useLocale, useMessages } from '@clerk/mosaic/localization';
-import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
@@ -35,7 +35,6 @@ const esES: MosaicCatalog = {
       pending: 'pendiente',
     },
     accounts: {
-      actionsFor: 'Acciones para {identifier}',
       switch: 'Cambiar de cuenta',
       add: 'Añadir cuenta',
       signOut: 'Cerrar sesión',
@@ -45,6 +44,8 @@ const esES: MosaicCatalog = {
       invite: 'Invitar',
       account: 'Gestionar cuenta',
       organization: 'Gestionar organización',
+      organizationSettings: 'Configuración de la organización',
+      profileSettings: 'Configuración del perfil',
       createOrganization: 'Crear organización',
     },
   },

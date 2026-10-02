@@ -168,6 +168,24 @@ export const styles = stylex.create({
   actionsSkeleton: {
     height: space['7'],
   },
+  note: {
+    alignItems: 'center',
+    color: colorVars['--cl-color-foreground-secondary'],
+    columnGap: space['1'],
+    display: 'flex',
+    flexShrink: 0,
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontWeight: fontWeightVars['--cl-font-normal'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+  },
+  noteIcon: {
+    alignItems: 'center',
+    display: 'flex',
+    flexShrink: 0,
+    justifyContent: 'center',
+    height: space['4'],
+    width: space['4'],
+  },
   actionsWrap: {
     justifyContent: { [compact]: 'flex-start', default: 'flex-end' },
     width: { [compact]: '100%', default: null },

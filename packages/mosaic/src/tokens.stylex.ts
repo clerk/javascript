@@ -399,6 +399,10 @@ export const durationVars = stylex.defineVars(durationDefaults);
 // `Dialog` takes it for that reason; a small element moving a short distance still wants
 // `--cl-ease-default`, where the settle is the whole point. Same property rule applies: it
 // belongs on things that MOVE, and opacity still takes `linear`.
+//
+// `--cl-ease-in-out` is In Out Cubic (https://www.easing.dev/in-out-cubic), for a layout
+// change that departs from rest and arrives at rest with nothing entering or leaving — a
+// collapsing track, where an exit curve would accelerate into the landing.
 
 const easingDefaults = {
   '--cl-ease-default': 'cubic-bezier(0.175, 0.885, 0.32, 1.1)',

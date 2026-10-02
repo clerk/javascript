@@ -23,7 +23,21 @@ import { Card } from '@clerk/mosaic/components/card';
     <Card.Title>Title</Card.Title>
     <Card.Description>Description</Card.Description>
   </Card.Header>
+  <Card.Banner role='alert' color='negative'>{errorMessage}</Card.Banner>
   <Card.Content>Body content.</Card.Content>
   <Card.Footer>Footer actions</Card.Footer>
 </Card.Root>
 ```
+
+`Card.Banner` sits between the header and the content and is always rendered. While its children hold a message, a `Banner` of the given `color` expands into it; once they are empty it collapses again. Give it `role='alert'` so the message is announced.
+
+---
+
+## Examples
+
+### Banner
+
+<Story
+  name='WithBanner'
+  storyModule={CardStories}
+/>

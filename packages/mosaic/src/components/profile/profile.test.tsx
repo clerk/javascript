@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../mosaic-provider';
 import { Badge } from '../badge';
 import { Card } from '../card';
 import { Dialog } from '../dialog';

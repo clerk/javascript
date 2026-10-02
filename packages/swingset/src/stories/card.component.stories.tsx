@@ -3,6 +3,7 @@ import type { CardProps } from '@clerk/mosaic/components/card';
 import { Card } from '@clerk/mosaic/components/card';
 import { Field } from '@clerk/mosaic/components/field';
 import { Input } from '@clerk/mosaic/components/input';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -48,6 +49,39 @@ export function Default(props: Record<string, unknown>) {
       </Card.Content>
       <Card.Footer>
         <Button fullWidth>Continue</Button>
+      </Card.Footer>
+    </Card.Root>
+  );
+}
+
+export function WithBanner() {
+  const [error, setError] = useState<string | undefined>();
+  return (
+    <Card.Root>
+      <Card.Header>
+        <Card.Title>Change password</Card.Title>
+        <Card.Description>Enter your current password and a new one.</Card.Description>
+      </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {error}
+      </Card.Banner>
+      <Card.Content>
+        <Field.Root>
+          <Field.Label>Current password</Field.Label>
+          <Input type='password' />
+        </Field.Root>
+      </Card.Content>
+      <Card.Footer>
+        <Button
+          variant='outline'
+          onClick={() => setError(undefined)}
+        >
+          Clear
+        </Button>
+        <Button onClick={() => setError('Incorrect password. Try again.')}>Fail</Button>
       </Card.Footer>
     </Card.Root>
   );

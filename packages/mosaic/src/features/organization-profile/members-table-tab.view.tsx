@@ -14,7 +14,7 @@ import { Select } from '../../components/select';
 import { Spinner } from '../../components/spinner';
 import { Table, type TableHeaderCellProps } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
+import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../localization';
 import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';

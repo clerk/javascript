@@ -1,13 +1,12 @@
 import { Button } from '@clerk/mosaic/components/button';
 import { UserProfileApiKeysPanelSkeleton } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.skeleton';
-import { UserProfileApiKeysPanelView } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import { space } from '@clerk/mosaic/tokens.stylex';
 import * as stylex from '@stylexjs/stylex';
 import { useEffect, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
-import { useUserProfileAPIKeysFixture } from './fixtures/user-profile-api-keys';
+import { APIKeysPanelExample, useAPIKeysTableFixture } from './fixtures/api-keys-table';
 
 export { default as __source } from './user-profile-api-keys-panel.stories?raw';
 
@@ -27,37 +26,21 @@ export const meta: StoryMeta = {
   title: 'UserProfileApiKeysPanel',
   label: 'API keys panel',
   navigation: { category: 'Panels' },
-  source: 'packages/mosaic/src/features/user-profile/user-profile-api-keys-panel.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-api-keys-panel.tsx',
 };
 
 export function Default() {
-  const props = useUserProfileAPIKeysFixture();
-  return <UserProfileApiKeysPanelView {...props} />;
+  const props = useAPIKeysTableFixture();
+  return <APIKeysPanelExample {...props} />;
 }
 
 export function Empty() {
-  const props = useUserProfileAPIKeysFixture({ initialKeys: [] });
-  return (
-    <UserProfileApiKeysPanelView
-      {...props}
-      onCreate={undefined}
-      onRevoke={undefined}
-    />
-  );
-}
-
-export function ProposedTable() {
-  const props = useUserProfileAPIKeysFixture({ enableSorting: true });
-  return (
-    <UserProfileApiKeysPanelView
-      {...props}
-      onBulkAction={() => undefined}
-    />
-  );
+  const props = useAPIKeysTableFixture({ initialKeys: [] });
+  return <APIKeysPanelExample {...props} />;
 }
 
 export function Loading() {
-  const props = useUserProfileAPIKeysFixture();
+  const props = useAPIKeysTableFixture();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -79,11 +62,7 @@ export function Loading() {
       >
         Reload
       </Button>
-      {loading ? (
-        <UserProfileApiKeysPanelSkeleton pageSize={props.pageSize} />
-      ) : (
-        <UserProfileApiKeysPanelView {...props} />
-      )}
+      {loading ? <UserProfileApiKeysPanelSkeleton pageSize={props.pageSize} /> : <APIKeysPanelExample {...props} />}
     </div>
   );
 }

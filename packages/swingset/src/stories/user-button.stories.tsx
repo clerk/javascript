@@ -290,42 +290,6 @@ export function CombinedSingleAccount(_args: Record<string, unknown>) {
   );
 }
 
-export function CombinedPersonalWorkspace(_args: Record<string, unknown>) {
-  const prototype = usePrototype({ workspaces: personalWorkspace, singleSession: true });
-
-  return (
-    <UserButtonView
-      {...prototype}
-      mode='combined'
-    />
-  );
-}
-
-export function CombinedUserPriority(_args: Record<string, unknown>) {
-  const prototype = usePrototype({ hidePersonal: true });
-
-  return (
-    <UserButtonView
-      {...prototype}
-      mode='combined'
-      modePriority='user'
-    />
-  );
-}
-
-export function CombinedUserPriorityAvatarTrigger(_args: Record<string, unknown>) {
-  const prototype = usePrototype({ hidePersonal: true });
-
-  return (
-    <UserButtonView
-      {...prototype}
-      mode='combined'
-      modePriority='user'
-      renderTriggerLabel={false}
-    />
-  );
-}
-
 // ─── Mode: Org only ─────────────────────────────────────────────────────────
 
 export function Organizations(_args: Record<string, unknown>) {
@@ -409,7 +373,7 @@ export function NoOrganizationSelected(_args: Record<string, unknown>) {
   return (
     <UserButtonView
       {...prototype}
-      mode='combined'
+      mode='organization'
     />
   );
 }
@@ -474,7 +438,7 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
           href: 'https://clerk.com/docs',
         },
       ]}
-      menuItemOrder={['docs', 'addAccount', 'signOutAll', 'settings']}
+      menuItemOrder={['docs', 'addAccount', 'signOut', 'settings']}
     />
   );
 }
