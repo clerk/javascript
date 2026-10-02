@@ -11,6 +11,7 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { focusOutline } from '../../styles/focus-outline.styles';
 import { reset } from '../../styles/reset.styles';
+import { truncationStyles } from '../../styles/typography.styles';
 import { BadgeContext } from '../badge/badge.context';
 import { Branding } from '../branding';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
@@ -312,7 +313,14 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
           {icon}
         </span>
       ) : null}
-      <span {...themeProps('profile-nav-item-label')}>{children}</span>
+      <span
+        {...mergeStyleProps(
+          themeProps('profile-nav-item-label'),
+          stylex.props(truncationStyles.singleLine, styles.navItemLabel),
+        )}
+      >
+        {children}
+      </span>
       {badge != null ? (
         <span {...mergeStyleProps(themeProps('profile-nav-item-badge'), stylex.props(reset.base, styles.navItemBadge))}>
           <BadgeContext.Provider value={navItemBadgeDefaults}>{badge}</BadgeContext.Provider>

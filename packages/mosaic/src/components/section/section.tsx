@@ -8,8 +8,9 @@ import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { feedbackHeight, feedbackStyles } from '../../styles/feedback.styles';
 import { reset } from '../../styles/reset.styles';
-import { sizes as typographySizes, styles as typographyStyles } from '../../styles/typography.styles';
+import { sizes as typographySizes, styles as typographyStyles, truncationStyles } from '../../styles/typography.styles';
 import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../../utils/feedback';
+import { withTruncatableLabel } from '../../utils/truncatable-label';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
 import { sectionHeaderDescriptionMarker, sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
@@ -118,7 +119,7 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
       id={id}
       level={level}
       size='base'
-      xstyle={[styles.title, xstyle]}
+      xstyle={[styles.title, truncationStyles.singleLine, xstyle]}
       {...mergeStyleProps(themeProps('section-title'), rest)}
     />
   );
@@ -218,14 +219,17 @@ const Content = React.forwardRef<HTMLDivElement, SectionContentProps>(function S
 });
 
 const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function SectionLabel(
-  { render, xstyle, ...rest },
+  { render, xstyle, children, ...rest },
   ref,
 ) {
   return useRender({
     defaultTagName: 'div',
     render,
     ref,
-    props: mergeStyleProps(themeProps('section-label'), stylex.props(reset.base, styles.label, xstyle), rest),
+    props: {
+      ...mergeStyleProps(themeProps('section-label'), stylex.props(reset.base, styles.label, xstyle), rest),
+      children: withTruncatableLabel(children),
+    },
   });
 });
 
@@ -292,7 +296,7 @@ const Note = React.forwardRef<HTMLDivElement, SectionNoteProps>(function Section
           {icon ? (
             <span {...mergeStyleProps(themeProps('section-note-icon'), stylex.props(styles.noteIcon))}>{icon}</span>
           ) : null}
-          {children}
+          <span {...stylex.props(truncationStyles.singleLine, styles.truncate)}>{children}</span>
         </>
       ),
     },
