@@ -1,7 +1,7 @@
 import { test } from '@e2e-dev/mobile';
 import { expect } from 'e2e';
 
-import { assertSignedIn, assertSignedOut, openApp, signInEmailPassword } from './subflows.ts';
+import { assertSignedIn, assertSignedOut, openApp, signInEmailPassword, tapControl } from './subflows.ts';
 
 test('UserButton native sign-out, then same-process re-sign-in', async fixtures => {
   const { screen } = fixtures;
@@ -11,7 +11,7 @@ test('UserButton native sign-out, then same-process re-sign-in', async fixtures 
   await assertSignedIn(fixtures);
   await screen.getByLabel(/^Open (account|user profile)$/).tap();
   await expect(screen.getByText('Manage account')).toBeVisible({ timeout: 15_000 });
-  await screen.getByText('Sign out').tap();
+  await tapControl(fixtures, screen.getByText('Sign out'));
   await assertSignedOut(fixtures);
   await screen.getByTestId('open-auth-view-button').tap();
   await signInEmailPassword(fixtures);

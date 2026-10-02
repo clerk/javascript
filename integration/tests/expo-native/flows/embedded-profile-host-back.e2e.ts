@@ -1,7 +1,7 @@
 import { test } from '@e2e-dev/mobile';
 import { expect } from 'e2e';
 
-import { assertSignedIn, assertSignedOut, openApp, signInEmailPassword, tapBack } from './subflows.ts';
+import { assertSignedIn, assertSignedOut, openApp, signInEmailPassword, tapBack, tapControl } from './subflows.ts';
 
 const internalPush = {
   android: { root: 'Edit profile', row: 'Manage account', detail: /^(EMAIL ADDRESSES|Add email address)$/ },
@@ -17,7 +17,7 @@ test('Embedded UserProfileView host back round trip', async fixtures => {
   await assertSignedIn(fixtures);
   await screen.getByTestId('open-embedded-profile-button').tap();
   await expect(screen.getByText(root)).toBeVisible({ timeout: 20_000 });
-  await screen.getByText(row).tap();
+  await tapControl(fixtures, screen.getByText(row));
   await expect(screen.getByText(detail).first()).toBeVisible({ timeout: 15_000 });
   await tapBack(fixtures);
   await expect(screen.getByText(root)).toBeVisible({ timeout: 15_000 });

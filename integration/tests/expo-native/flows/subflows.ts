@@ -26,14 +26,25 @@ export async function assertSignedOut({ screen }: Fixtures) {
   await expect(screen.getByText('signed out')).toBeVisible({ timeout: 20_000 });
 }
 
-export async function tapBack({ screen }: Fixtures) {
-  const back = screen.getByLabel('Back');
-  await expect(back).toBeVisible();
-  const box = await back.boundingBox();
+async function tapCenter({ screen }: Fixtures, control: Locator) {
+  await expect(control).toBeVisible();
+  const box = await control.boundingBox();
   if (!box) {
-    throw new Error('Back control has no bounding box');
+    throw new Error('Control has no bounding box');
   }
   await screen.tapAt({ x: box.x + box.width / 2, y: box.y + box.height / 2 });
+}
+
+export async function tapControl(fixtures: Fixtures, control: Locator) {
+  if (fixtures.platform === 'android') {
+    await tapCenter(fixtures, control);
+  } else {
+    await control.tap();
+  }
+}
+
+export async function tapBack(fixtures: Fixtures) {
+  await tapCenter(fixtures, fixtures.screen.getByLabel('Back').last());
 }
 
 async function fill(field: Locator, value: string) {
@@ -62,7 +73,7 @@ async function skipPasskeyFirstFactor({ platform, screen }: Fixtures) {
 
 async function enterEmailCode({ screen }: Fixtures) {
   if (await screen.getByText('Check your email').isVisible()) {
-    await fill(screen.getByRole('textbox'), '424242');
+    await screen.getByRole('textbox').last().pressSequentially('424242');
   }
 }
 
@@ -114,7 +125,7 @@ export async function signInEmailPassword(fixtures: Fixtures) {
   }
   await enterEmailCode(fixtures);
   if (await screen.getByText('Enter your password').first().isVisible()) {
-    await fill(screen.getByRole('textbox'), password);
+    await fill(screen.getByRole('textbox').last(), password);
     await screen.getByText('Continue').tap();
     await expect(screen.getByText(afterPassword).first()).toBeVisible({ timeout: 15_000 });
   }

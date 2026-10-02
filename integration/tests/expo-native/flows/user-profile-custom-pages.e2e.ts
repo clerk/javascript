@@ -1,7 +1,7 @@
 import { test } from '@e2e-dev/mobile';
 import { expect } from 'e2e';
 
-import { assertSignedIn, assertSignedOut, openApp, signInEmailPassword, tapBack } from './subflows.ts';
+import { assertSignedIn, assertSignedOut, openApp, signInEmailPassword, tapBack, tapControl } from './subflows.ts';
 
 test('UserProfileView renders a custom page', async fixtures => {
   const { device, platform, screen } = fixtures;
@@ -11,7 +11,7 @@ test('UserProfileView renders a custom page', async fixtures => {
   await assertSignedIn(fixtures);
   await screen.getByTestId('open-embedded-profile-button').tap();
   await expect(screen.getByText('E2E Custom Page')).toBeVisible({ timeout: 20_000 });
-  await screen.getByText('E2E Custom Page').tap();
+  await tapControl(fixtures, screen.getByText('E2E Custom Page'));
   await expect(screen.getByText('Rehosted RN body')).toBeVisible({ timeout: 15_000 });
   if (platform === 'android') {
     await device.back();
