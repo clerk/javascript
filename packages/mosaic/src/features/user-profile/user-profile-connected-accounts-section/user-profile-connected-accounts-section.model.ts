@@ -36,7 +36,6 @@ type EnterpriseUser = {
   }[];
 };
 type ProjectedUser = {
-  externalAccounts: AccountData[];
   verifiedExternalAccounts: AccountData[];
   unverifiedExternalAccounts: AccountData[];
 };
@@ -196,7 +195,7 @@ export function projectConnectedAccounts({
   additionalOAuthScopes?: AdditionalOAuthScopes;
 }): ConnectedAccountsProjection {
   const socialEnabled = Object.values(social).some(settings => settings?.enabled);
-  if (!socialEnabled || (!allowCreation && user.externalAccounts.length === 0)) {
+  if (!socialEnabled) {
     return { status: 'hidden' };
   }
 
