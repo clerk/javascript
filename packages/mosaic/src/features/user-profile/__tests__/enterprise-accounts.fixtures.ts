@@ -1,6 +1,7 @@
 import type { FakeFapiSeed } from '../../../__tests__/feature/fake-fapi';
 import {
   fapiClient,
+  fapiEmailAddress,
   fapiEnterpriseConnection,
   fapiEnvironment,
   fapiMembership,
@@ -16,6 +17,7 @@ export const custom = fapiEnterpriseConnection({ id: 'saml', name: 'Custom SAML'
 export function enterpriseMember(id = 'user_1') {
   return fapiUser({
     id,
+    email_addresses: [fapiEmailAddress({ id: `email_${id}`, email_address: `${id}@example.com` })],
     organization_memberships: [fapiMembership(fapiOrganization({ id: 'org_acme', name: 'Acme' }))],
   });
 }

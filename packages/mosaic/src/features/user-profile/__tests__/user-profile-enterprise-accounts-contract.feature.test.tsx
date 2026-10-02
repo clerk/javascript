@@ -132,14 +132,17 @@ describe('enterprise linking server contract', () => {
                 updated_at: 0,
               },
             });
-      const pending = fapiExternalAccount({
-        id: 'idn_oidc',
-        provider: 'custom_mock',
-        verification: fapiVerification('oauth_custom_mock', {
-          status: 'unverified',
-          external_verification_redirect_url: 'https://accounts.example/oidc-authorize',
+      const pending = {
+        ...fapiExternalAccount({
+          id: 'idn_oidc',
+          provider: 'custom_mock',
+          verification: fapiVerification('oauth_custom_mock', {
+            status: 'unverified',
+            external_verification_redirect_url: 'https://accounts.example/oidc-authorize',
+          }),
         }),
-      });
+        provider: 'oauth_custom_mock',
+      };
       const fapi = serveFapi(
         enterpriseAccountSeed({
           enterpriseConnections: [connection],
@@ -190,7 +193,10 @@ describe('enterprise linking server contract', () => {
         });
       }
 
-      expect(fapi.client.sessions[0]?.user.external_accounts).toEqual(protocol === 'oidc' ? [pending] : []);
+      expect(fapi.client.sessions[0]?.user.external_accounts).toEqual([]);
+      expect(fapi.enterpriseLinking.pendingExternalAccounts).toEqual(
+        protocol === 'oidc' ? [{ userId: 'user_1', connectionId: connection.id, account: pending }] : [],
+      );
       expect(fapi.client.sessions[0]?.user.enterprise_accounts).toEqual([]);
       const linked = fapiEnterpriseAccount({
         id: 'ent_linked',
@@ -214,13 +220,11 @@ describe('enterprise linking server contract', () => {
       const completed = fapiUser({
         ...enterpriseMember(),
         enterprise_accounts: [linked],
-        external_accounts:
-          protocol === 'oidc'
-            ? [{ ...pending, verification: fapiVerification('oauth_custom_mock', { status: 'verified' }) }]
-            : [],
+        external_accounts: [],
       });
       fapi.client = fapiClient([fapiSession({ id: 'sess_1', user: completed })]);
       fapi.enterpriseLinking.verifiedLinks = [{ userId: completed.id, connectionId: connection.id }];
+      fapi.enterpriseLinking.pendingExternalAccounts = [];
       await act(async () => {
         if (!view.clerk.client) {
           throw new Error('Expected loaded client');
@@ -244,7 +248,9 @@ describe('enterprise linking server contract', () => {
     const connect = await screen.findByRole('button', { name: 'Connect Acme Okta' });
     fapi.enterpriseLinking.verifiedLinks = [{ userId: 'user_1', connectionId: okta.id }];
     await userEvent.setup().click(connect);
-    expect(await screen.findByRole('alert')).toHaveTextContent('Already connected');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'An enterprise account is already connected for this connection email: user_1@example.com',
+    );
     expect(navigate).not.toHaveBeenCalled();
   });
 

@@ -3,14 +3,17 @@ import { http, HttpResponse } from 'msw';
 
 import type { FakeFapiState } from '../fake-fapi';
 
+export type EnterpriseExternalAccount = Omit<ExternalAccountJSON, 'provider'> & { provider: string };
+
 export type EnterprisePreparation =
   | { kind: 'saml'; verification: VerificationJSON }
-  | { kind: 'oidc'; account: ExternalAccountJSON };
+  | { kind: 'oidc'; account: EnterpriseExternalAccount };
 
 export interface FakeEnterpriseLinking {
   enabled: boolean;
   preparations: Record<string, EnterprisePreparation>;
   verifiedLinks: { userId: string; connectionId: string }[];
+  pendingExternalAccounts: { userId: string; connectionId: string; account: EnterpriseExternalAccount }[];
 }
 
 function rejected(code: 'resource_not_found' | 'feature_not_enabled') {
@@ -81,6 +84,28 @@ export function enterpriseHandlers(state: FakeFapiState, url: (path: string) => 
         ) {
           throw new Error(`Invalid SAML preparation for ${connection.id}`);
         }
+        const primaryEmail = user.email_addresses.find(email => email.id === user.primary_email_address_id);
+        if (!primaryEmail) {
+          return rejected('resource_not_found');
+        }
+        if (
+          state.enterpriseLinking.verifiedLinks.some(
+            link => link.userId === user.id && link.connectionId === connection.id,
+          )
+        ) {
+          return HttpResponse.json(
+            {
+              errors: [
+                {
+                  code: 'enterprise_sso_account_already_connected',
+                  message: 'Already connected',
+                  long_message: `An enterprise account is already connected for this connection email: ${primaryEmail.email_address}`,
+                },
+              ],
+            },
+            { status: 400 },
+          );
+        }
         return HttpResponse.json({
           response: { object: 'external_account', verification: preparation.verification },
           client: state.client,
@@ -89,28 +114,18 @@ export function enterpriseHandlers(state: FakeFapiState, url: (path: string) => 
       const account = preparation.account;
       if (
         !connection.provider.startsWith('oidc_') ||
-        account.verification?.strategy !== `oauth_${account.provider}` ||
+        !account.provider.startsWith('oauth_') ||
+        account.verification?.strategy !== account.provider ||
         account.verification.status !== 'unverified'
       ) {
         throw new Error(`Invalid OIDC preparation for ${connection.id}`);
       }
-      state.client = {
-        ...state.client,
-        sessions: state.client.sessions.map(session =>
-          session.user.id === user.id
-            ? {
-                ...session,
-                user: {
-                  ...session.user,
-                  external_accounts: [
-                    ...session.user.external_accounts.filter(item => item.id !== account.id),
-                    account,
-                  ],
-                },
-              }
-            : session,
+      state.enterpriseLinking.pendingExternalAccounts = [
+        ...state.enterpriseLinking.pendingExternalAccounts.filter(
+          item => item.userId !== user.id || item.account.id !== account.id,
         ),
-      };
+        { userId: user.id, connectionId: connection.id, account },
+      ];
       return HttpResponse.json({ response: account, client: state.client });
     }),
   ];

@@ -126,7 +126,13 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     enterpriseConnections: [],
     ...rest,
     verification: createVerificationState(verification),
-    enterpriseLinking: { enabled: false, preparations: {}, verifiedLinks: [], ...enterpriseLinking },
+    enterpriseLinking: {
+      enabled: false,
+      preparations: {},
+      verifiedLinks: [],
+      pendingExternalAccounts: [],
+      ...enterpriseLinking,
+    },
   };
 
   worker.use(
