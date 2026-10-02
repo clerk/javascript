@@ -372,6 +372,7 @@ jobs:
           include-hidden-files: true
           path: |
             integration/.e2e
+            !integration/.e2e/**/.video.*
             ${{ runner.temp }}/e2e-device-logs
           if-no-files-found: warn
           retention-days: 7

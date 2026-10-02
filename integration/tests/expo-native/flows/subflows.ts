@@ -97,10 +97,9 @@ const afterPassword =
 export async function signInEmailPassword(fixtures: Fixtures) {
   const { screen } = fixtures;
   await expect(screen.getByText(/^Welcome! Sign in to continue\.?$/)).toBeVisible({ timeout: 25_000 });
-  const identifierPlaceholder = screen.getByText(/^Enter your email( or username)?$/);
-  if (await identifierPlaceholder.isVisible()) {
-    await identifierPlaceholder.tap();
-  }
+  const identifierLabel = screen.getByText(/^Enter your email( or username)?$/);
+  await expect(identifierLabel).toBeVisible({ timeout: 25_000 });
+  await identifierLabel.tap();
   const identifier = screen.getByDisplayValue(email);
   if (!(await identifier.isVisible())) {
     await fill(screen.getByRole('textbox'), email);
