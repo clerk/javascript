@@ -2,6 +2,9 @@ import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useState } from 'react';
 
 import type { ReverificationController } from '../../features/reverification';
+import type { LocalizableError } from '../../localization';
+import { useErrorText } from '../../localization';
+import { toLocalizableError } from '../../utils/form-error';
 import type { DestructiveControlledProps } from './destructive';
 
 export type DestructiveController = Pick<
@@ -16,17 +19,21 @@ type DestructiveState =
   | { status: 'closed' }
   | { status: 'open-needs-confirmation' }
   | { status: 'open-pending' }
-  | { status: 'open-error'; errorMessage: string };
+  | { status: 'open-error'; error: LocalizableError };
 
 /** Optional controller for use with Destructive block */
 export function useDestructiveController({
   onDelete,
   reverification,
+  errorFallback,
 }: {
   onDelete: () => Promise<unknown>;
   reverification?: ReverificationController;
+  /** Copy shown when the action fails without an error Clerk can describe, such as a network or code fault (default: the generic error) */
+  errorFallback?: string;
 }): DestructiveController {
   const [destructiveState, setDestructiveState] = useState<DestructiveState>({ status: 'closed' });
+  const errorText = useErrorText();
   const { status } = destructiveState;
 
   const openDestructiveDialog = () => {
@@ -41,7 +48,8 @@ export function useDestructiveController({
   return {
     open: status !== 'closed',
     isDeleting,
-    errorMessage: status === 'open-error' ? destructiveState.errorMessage : undefined,
+    errorMessage:
+      destructiveState.status === 'open-error' ? errorText(destructiveState.error, errorFallback) : undefined,
     reverification,
     step,
     openDestructiveDialog,
@@ -57,8 +65,7 @@ export function useDestructiveController({
             setDestructiveState({ status: 'closed' });
             return;
           }
-          // TODO: Better error handling, localization
-          setDestructiveState({ status: 'open-error', errorMessage: 'Something went wrong' });
+          setDestructiveState({ status: 'open-error', error: toLocalizableError(error) });
         }
       }
     },

@@ -120,6 +120,25 @@ have a machine.
   }
   ```
 
+## Errors
+
+One path, so every error a user sees goes through the `errors.*` catalog:
+
+- **Owners map, nothing else does.** `toLocalizableError(cause)` is called only
+  by the hooks that own a failure: `useForm`, `useConfirmationController`,
+  `useDestructiveController` and `useAction` (inline row actions). Use one of
+  them instead of catching in a feature.
+- **Copy is resolved at render.** Owners store the `LocalizableError` and return
+  `errorMessage` from `useErrorText()`: the catalog entry for
+  `code__paramName`, then `code`, then Clerk's message, then the feature's
+  `errorFallback`, then the generic error.
+- **`errorFallback` is the feature's copy for faults Clerk cannot describe**
+  (network, code bugs). An unknown error is logged and its `.message` is never
+  shown.
+- In tests, reject with `clerkApiError(code, message)` from
+  `src/__tests__/clerk-errors.ts` to assert catalog copy. Reject with a plain
+  `Error` (silence `console.error`) to assert the fallback.
+
 ## Testing
 
 The feature test covers the controller by default. Hold the

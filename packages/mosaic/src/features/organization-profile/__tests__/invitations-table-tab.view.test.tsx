@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
 import { MosaicProvider } from '../../../mosaic-provider';
@@ -33,22 +33,30 @@ function renderView(overrides: Partial<InvitationsTableTabViewProps> = {}) {
 }
 
 describe('InvitationsTableTabView', () => {
-  it.each(['', '   '])('uses the localized revoke error when the rejection message is "%s"', async message => {
-    const user = userEvent.setup();
-    render(
-      <MosaicProvider
-        localization={{ overrides: { 'invitationsTableTab.revokeError': 'Could not revoke invitation.' } }}
-      >
-        <InvitationsTableTabView {...propsFor({ onRevoke: vi.fn().mockRejectedValue(new Error(message)) })} />
-      </MosaicProvider>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Manage ada@example.com' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
-    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
-
-    expect(await screen.findByRole('alert')).toHaveTextContent('Could not revoke invitation.');
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
+
+  it.each(['', 'Cannot read properties of undefined'])(
+    'shows the localized revoke error, never the message "%s" of an unexpected error',
+    async message => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      const user = userEvent.setup();
+      render(
+        <MosaicProvider
+          localization={{ overrides: { 'invitationsTableTab.revokeError': 'Could not revoke invitation.' } }}
+        >
+          <InvitationsTableTabView {...propsFor({ onRevoke: vi.fn().mockRejectedValue(new Error(message)) })} />
+        </MosaicProvider>,
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Manage ada@example.com' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
+      await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent('Could not revoke invitation.');
+    },
+  );
 
   it('distinguishes loading, an empty invitation list, and an empty search', () => {
     const { props, rerender } = renderView({ invitations: [], totalCount: 0, isLoading: true });

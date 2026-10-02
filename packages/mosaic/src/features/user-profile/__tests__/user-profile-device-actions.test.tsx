@@ -2,8 +2,9 @@ import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileDevice } from '../user-profile-active-devices.types';
 import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section.view';
@@ -43,6 +44,10 @@ function renderDevices(onSignOutDevice?: (id: string) => void | Promise<void>) {
 async function openMenu(user: ReturnType<typeof userEvent.setup>, device: UserProfileDevice) {
   await user.click(screen.getByRole('button', { name: `Manage ${device.name}` }));
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('active device details', () => {
   it('opens the details of the device the menu belongs to', async () => {
@@ -99,14 +104,20 @@ describe('active device sign out', () => {
   });
 
   it('shows a failure in the confirmation and allows retrying', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     const user = userEvent.setup();
-    const onSignOutDevice = vi.fn().mockRejectedValueOnce(new Error('Unable to sign out')).mockResolvedValue(undefined);
+    const onSignOutDevice = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('Cannot read properties of undefined'))
+      .mockResolvedValue(undefined);
     renderDevices(onSignOutDevice);
     await openMenu(user, mobile);
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to sign out');
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Something went wrong signing this device out. Please try again.',
+    );
 
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
@@ -157,7 +168,10 @@ describe('active device sign out', () => {
 
   it('keeps the details dialog open and explains a failed sign out', async () => {
     const user = userEvent.setup();
-    const onSignOutDevice = vi.fn().mockRejectedValueOnce(new Error('Unable to sign out')).mockResolvedValue(undefined);
+    const onSignOutDevice = vi
+      .fn()
+      .mockRejectedValueOnce(clerkApiError('session_not_found', 'Unable to sign out'))
+      .mockResolvedValue(undefined);
     renderDevices(onSignOutDevice);
     await openMenu(user, mobile);
     await user.click(screen.getByRole('menuitem', { name: 'View details' }));
@@ -213,16 +227,19 @@ describe('signing out of all other devices', () => {
   });
 
   it('holds the confirmation open and explains a failure', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     const user = userEvent.setup();
     const onSignOutAllOtherDevices = vi
       .fn()
-      .mockRejectedValueOnce(new Error('Unable to sign out of all devices'))
+      .mockRejectedValueOnce(new Error('Cannot read properties of undefined'))
       .mockResolvedValue(undefined);
     renderAll(onSignOutAllOtherDevices);
     await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
     await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
 
-    expect(await screen.findByText('Unable to sign out of all devices')).toBeInTheDocument();
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Something went wrong signing these devices out. Please try again.',
+    );
     expect(confirmation()).toBeInTheDocument();
 
     await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));

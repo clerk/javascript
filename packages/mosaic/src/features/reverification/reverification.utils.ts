@@ -8,6 +8,7 @@ import type {
   ReverificationStrategy,
 } from './reverification.types';
 
+// TODO: Return toLocalizableError(error) and render with errorText so Clerk errors are localized by code instead of shown raw.
 export function errorDetail(error: unknown): string | undefined {
   if (isClerkAPIResponseError(error)) {
     const first = error.errors[0];

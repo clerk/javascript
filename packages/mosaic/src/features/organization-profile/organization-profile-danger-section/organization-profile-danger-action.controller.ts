@@ -1,9 +1,12 @@
+import type { LocalizableError } from '../../../localization';
+import { useErrorText } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/use-machine';
+import { toLocalizableError } from '../../../utils/form-error';
 
 export interface OrganizationProfileDangerActionContext {
   run: () => Promise<void>;
-  errorMessage: string | undefined;
+  error: LocalizableError | undefined;
 }
 
 export type OrganizationProfileDangerActionEvent = { type: 'OPEN' } | { type: 'CONFIRM' } | { type: 'CANCEL' };
@@ -18,14 +21,14 @@ export const organizationProfileDangerActionMachine = createMachine({
   initial: 'idle',
   context: {
     run: async () => {},
-    errorMessage: undefined,
+    error: undefined,
   },
   states: {
     idle: { on: { OPEN: 'confirming' } },
     confirming: {
       on: {
         CONFIRM: 'running',
-        CANCEL: { target: 'idle', actions: assign(() => ({ errorMessage: undefined })) },
+        CANCEL: { target: 'idle', actions: assign(() => ({ error: undefined })) },
       },
     },
     running: {
@@ -33,10 +36,7 @@ export const organizationProfileDangerActionMachine = createMachine({
         onDone: 'done',
         onError: {
           target: 'confirming',
-          actions: assign((_, event) => ({
-            errorMessage:
-              event.error instanceof Error ? event.error.message : 'Something went wrong. Please try again.',
-          })),
+          actions: assign((_, event) => ({ error: toLocalizableError(event.error) })),
         },
       }),
     },
@@ -60,12 +60,14 @@ export function useOrganizationProfileDangerActionController({
   onRun,
 }: OrganizationProfileDangerActionControllerOptions): OrganizationProfileDangerActionController {
   const [snapshot, send] = useMachine(organizationProfileDangerActionMachine, { context: { run: onRun } });
+  const errorText = useErrorText();
+  const { error } = snapshot.context;
 
   return {
     isOpen: snapshot.value === 'confirming' || snapshot.value === 'running',
     onOpenChange: open => send({ type: open ? 'OPEN' : 'CANCEL' }),
     onConfirm: () => send({ type: 'CONFIRM' }),
     isRunning: snapshot.value === 'running',
-    errorMessage: snapshot.context.errorMessage,
+    errorMessage: error ? errorText(error) : undefined,
   };
 }

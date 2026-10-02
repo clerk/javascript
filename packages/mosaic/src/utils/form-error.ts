@@ -79,6 +79,19 @@ export async function save<TField extends string = never>(
   }
 }
 
+/**
+ * Reads what to tell the user about a failed action. Clerk errors keep their code so the catalog can
+ * localize them; anything else is logged and carries nothing, leaving the caller's fallback to show.
+ */
+export function toLocalizableError(cause: unknown): LocalizableError {
+  const formError = cause instanceof SaveError ? cause.formError : toClerkFormError(cause, [], undefined);
+  if (formError) {
+    return formError.global ?? Object.values(formError.fields ?? {}).find(error => error !== undefined) ?? {};
+  }
+  console.error(cause);
+  return {};
+}
+
 /** Reads what a rejected save left for the view. An unrecognized rejection is the generic error. */
 export function toFormError<TField extends string = string>(cause: unknown): FormError<TField> {
   if (cause instanceof SaveError) {

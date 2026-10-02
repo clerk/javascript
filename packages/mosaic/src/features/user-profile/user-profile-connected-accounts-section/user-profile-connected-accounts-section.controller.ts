@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 
-import { useMessages } from '../../../localization';
+import type { LocalizableError } from '../../../localization';
+import { useErrorText, useMessages } from '../../../localization';
+import { toLocalizableError } from '../../../utils/form-error';
 import type {
   ConnectedAccountActionResult,
   UserProfileConnectedAccount,
@@ -31,8 +33,9 @@ export function useUserProfileConnectedAccountsController({
   onReconnect,
 }: UserProfileConnectedAccountsControllerOptions): UserProfileConnectedAccountsController {
   const messages = useMessages('userProfileConnectedAccounts');
+  const errorText = useErrorText();
   const [pendingId, setPendingId] = useState<string>();
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, LocalizableError>>({});
   const connecting = useRef(false);
 
   const run = async (id: string, action: (id: string) => Promise<ConnectedAccountActionResult>) => {
@@ -48,20 +51,27 @@ export function useUserProfileConnectedAccountsController({
         await new Promise(resolve => setTimeout(resolve, OAUTH_REDIRECT_HOLD_MS));
       }
     } catch (error) {
-      setErrors(current => ({ ...current, [id]: error instanceof Error ? error.message : messages.errors.generic }));
+      setErrors(current => ({ ...current, [id]: toLocalizableError(error) }));
     } finally {
       connecting.current = false;
       setPendingId(undefined);
     }
   };
 
+  const errorFor = (id: string) => {
+    const error = errors[id];
+    return error ? errorText(error, messages.errors.generic) : undefined;
+  };
+
   return {
-    accounts: accounts.map(account =>
-      errors[account.id] ? { ...account, reconnectError: errors[account.id] } : account,
-    ),
-    availableProviders: availableProviders.map(provider =>
-      errors[provider.id] ? { ...provider, connectError: errors[provider.id] } : provider,
-    ),
+    accounts: accounts.map(account => {
+      const reconnectError = errorFor(account.id);
+      return reconnectError ? { ...account, reconnectError } : account;
+    }),
+    availableProviders: availableProviders.map(provider => {
+      const connectError = errorFor(provider.id);
+      return connectError ? { ...provider, connectError } : provider;
+    }),
     pendingId,
     onConnect: id => void run(id, onConnect),
     onReconnect: id => void run(id, onReconnect),
