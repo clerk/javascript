@@ -1,6 +1,6 @@
 import { useOrganizationList } from '@clerk/shared/react';
 
-import { useInView } from './useInView';
+import { useInView } from '../../hooks/use-in-view';
 
 const organizationListParams = {
   userMemberships: {

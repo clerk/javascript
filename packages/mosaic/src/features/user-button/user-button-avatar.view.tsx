@@ -4,7 +4,7 @@ import type { ReactElement } from 'react';
 import type { AvatarProps } from '../../components/avatar';
 import { Avatar } from '../../components/avatar';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { badgeSizes, leadSizes, ringSizes, sizes, styles } from './user-button-avatar.styles';
 
 function initials(name: string): string {

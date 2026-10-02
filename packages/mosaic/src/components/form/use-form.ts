@@ -2,7 +2,7 @@ import { useCallback, useId, useRef } from 'react';
 
 import { useMessages } from '../../localization';
 import type { StateMachine } from '../../machine/types';
-import { useMachine } from '../../machine/useMachine';
+import { useMachine } from '../../machine/use-machine';
 import { keysOf, mapKeys } from '../../utils/object';
 import type { FieldsConfig, FormContext, FormEvent } from './form.machine';
 import { createFormMachine, fieldFeedback, firstInvalid, initialOf, isValid } from './form.machine';
@@ -191,7 +191,10 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     values,
     fields,
     error: context.error?.message,
-    isSubmitting,
+    get isSubmitting() {
+      const current = actor.getSnapshot();
+      return current.value === 'submitting' || current.context.submitQueued;
+    },
     isDirty: keysOf(values).some(name => fields[name].isDirty),
     canSubmit: !isSubmitting && isValid(context),
     register,

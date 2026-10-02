@@ -1,7 +1,7 @@
 import { buildEmailAddress } from '@clerk/shared/internal/clerk-js/email';
 import { useClerk } from '@clerk/shared/react';
 
-import { useMosaicEnvironment } from './useMosaicEnvironment';
+import { useMosaicEnvironment } from './use-mosaic-environment';
 
 /**
  * Resolves the support email Mosaic flows show in "contact us" copy.
