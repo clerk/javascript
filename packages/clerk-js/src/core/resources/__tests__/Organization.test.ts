@@ -258,6 +258,7 @@ describe('Organization', () => {
         active: false,
         syncUserAttributes: true,
         organizationId: ORG_ID,
+        saml: { idpCertificates: ['cert_a', 'cert_b'] },
       });
 
       // @ts-ignore
@@ -268,6 +269,7 @@ describe('Organization', () => {
           name: 'Updated',
           active: false,
           sync_user_attributes: true,
+          saml_idp_certificates: ['cert_a', 'cert_b'],
         },
       });
 
