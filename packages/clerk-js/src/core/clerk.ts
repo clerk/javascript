@@ -3245,7 +3245,6 @@ export class Clerk implements ClerkInterface {
 
   public updateEnvironment(environment: EnvironmentResource): asserts this is { environment: EnvironmentResource } {
     this.environment = environment;
-    this.#emit();
   }
 
   __internal_setCountry = (country: string | null) => {
@@ -3324,7 +3323,7 @@ export class Clerk implements ClerkInterface {
   // TODO: Fix this properly
   // eslint-disable-next-line @typescript-eslint/require-await
   __internal_setEnvironment = async (env: EnvironmentJSON) => {
-    this.updateEnvironment(new Environment(env));
+    this.environment = new Environment(env);
 
     // TODO @nikos update
     // if (Clerk.mountComponentRenderer) {
@@ -3740,7 +3739,6 @@ export class Clerk implements ClerkInterface {
     });
 
     eventBus.on(events.EnvironmentUpdate, () => {
-      this.#emit();
       // Cache the environment snapshot for 24 hours
       SafeLocalStorage.setItem(
         CLERK_ENVIRONMENT_STORAGE_ENTRY,

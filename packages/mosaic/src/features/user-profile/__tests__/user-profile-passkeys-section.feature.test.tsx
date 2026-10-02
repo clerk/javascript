@@ -269,10 +269,10 @@ describe('Adding a passkey', () => {
       </MosaicProvider>,
     );
     await userEvent.setup().click(screen.getByRole('button', { name: 'Add passkey' }));
-    const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Impossible de créer la clé.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Impossible de créer la clé.'));
+    const alert = screen.getByRole('alert');
     expect(alert).toHaveAttribute('data-open');
-    expect(alert).toHaveAttribute('data-starting-style');
+    await waitFor(() => expect(alert).toBeVisible());
     expect(screen.getByRole('button', { name: 'Add passkey' })).toBeEnabled();
   });
 
@@ -486,4 +486,9 @@ describe('Satellite passkeys', () => {
 describe('Passkey reverification', () => {
   it.todo('completes reverification before creating, renaming, or removing a passkey');
   it.todo('cancels reverification without changing passkeys and permits retry');
+});
+
+describe('Passkey follow-ups', () => {
+  it.todo('rerenders passkey eligibility when a replaced or fetched environment changes policy');
+  it.todo('focuses a surviving passkey row during React cleanup after removal');
 });

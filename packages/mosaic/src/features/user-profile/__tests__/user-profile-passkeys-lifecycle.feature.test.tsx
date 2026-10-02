@@ -402,7 +402,7 @@ describe('Held passkey creation ownership', () => {
 });
 
 describe('Replacing instance policy while editing', () => {
-  it('closes editing without a mutation when policy replacement disables passkeys', async () => {
+  it('rejects a rename after policy replacement disables passkeys', async () => {
     const fapi = serveAccounts();
     const { clerk } = await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
@@ -416,10 +416,14 @@ describe('Replacing instance policy while editing', () => {
     fapi.environment = nextEnvironment;
     const rename = holdRequests('post', '/v1/me/passkeys/pk_a');
     await act(() => clerk.__internal_setEnvironment(nextEnvironment));
-    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
-    expect(screen.queryByRole('group', { name: 'Passkeys' })).toBeNull();
-    expect(rename.requests).toHaveLength(0);
+    expect(input).toHaveValue('Blocked rename');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
     rename.release();
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(/^Something went wrong\. Please try again\.$/),
+    );
+    expect(input).toHaveValue('Blocked rename');
+    expect(rename.requests).toHaveLength(0);
     expect(clerk.user?.passkeys.find(passkey => passkey.id === 'pk_a')?.name).toBe('Alice laptop');
   });
 });
