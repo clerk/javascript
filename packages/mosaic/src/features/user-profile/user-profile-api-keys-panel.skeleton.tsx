@@ -35,10 +35,14 @@ export function UserProfileApiKeysPanelSkeleton() {
           {SKELETON_ROWS.map(row => (
             <Table.Row key={row}>
               <Table.Cell>
-                <div {...stylex.props(styles.metadata)}>
-                  <Bone xstyle={[skeletonStyles.line, styles.nameSkeleton]} />
-                  <Bone xstyle={[skeletonStyles.line, styles.metadataSkeleton]} />
-                </div>
+                <Bone
+                  line
+                  xstyle={styles.nameSkeleton}
+                />
+                <Bone
+                  line
+                  xstyle={styles.metadataSkeleton}
+                />
               </Table.Cell>
               <Table.Cell skeleton />
               <Table.Cell skeleton />
@@ -51,13 +55,13 @@ export function UserProfileApiKeysPanelSkeleton() {
   );
 }
 
-function Bone({ xstyle }: { xstyle: stylex.StyleXStyles }) {
+function Bone({ line = false, xstyle }: { line?: boolean; xstyle: stylex.StyleXStyles }) {
   const wave = useSkeletonWave<HTMLSpanElement>(true);
 
   return (
     <span
       ref={wave}
-      {...stylex.props(skeletonStyles.bone, skeletonStyles.wave, xstyle)}
+      {...stylex.props(skeletonStyles.bone, skeletonStyles.wave, line && skeletonStyles.line, xstyle)}
     />
   );
 }

@@ -52,7 +52,7 @@ export const styles = stylex.create({
     whiteSpace: 'nowrap',
   },
   headerCellSkeleton: {
-    width: space['16'],
+    width: '8ch',
   },
   sortableHeaderCell: {
     paddingBlock: space['1.5'],
@@ -71,7 +71,7 @@ export const styles = stylex.create({
     verticalAlign: 'middle',
   },
   cellSkeleton: {
-    width: space['20'],
+    width: '11ch',
   },
   selectCell: {
     lineHeight: 0,
