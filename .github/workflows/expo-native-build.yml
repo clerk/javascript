@@ -27,7 +27,7 @@ env:
   SDK_PACK_DIR: /tmp/clerk-expo-pack
   E2E_INSTANCE_NAME: clerkstage-with-native-components
   BAPI_URL: https://api.clerkstage.dev
-  E2E_SHARDS: '2'
+  IOS_SIMULATORS: '2'
   E2E_TELEMETRY_DISABLED: '1'
 
 jobs:
@@ -226,7 +226,7 @@ jobs:
 
       - name: Boot iOS simulators
         if: matrix.platform == 'ios' && matrix.run-e2e == true && steps.keys.outputs.pk != ''
-        run: ${{ env.E2E_DIR }}/boot-ios-simulators.sh boot "$E2E_SHARDS"
+        run: ${{ env.E2E_DIR }}/boot-ios-simulators.sh boot "$IOS_SIMULATORS"
 
       - name: Cache iOS automation runner
         if: matrix.platform == 'ios' && steps.keys.outputs.pk != ''
@@ -236,58 +236,28 @@ jobs:
           key: agent-device-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: agent-device-${{ runner.os }}-
 
-      # Provisioned as late as possible so live credentials exist for the
-      # shortest window.
-      - name: Provision test user via BAPI
-        id: user
-        if: steps.keys.outputs.pk != ''
-        continue-on-error: true
-        env:
-          CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
-        run: |
-          email="ci-${GITHUB_RUN_ID}-${RANDOM}+clerk_test@clerkcookie.com"
-          username="ci_${GITHUB_RUN_ID}_${RANDOM}"
-          password="ClerkCI!$(openssl rand -hex 8)Aa1"
-          http_code=$(curl -sS -o /tmp/bapi_response.json -w "%{http_code}" -X POST "$BAPI_URL/v1/users" \
-            -H "Authorization: Bearer $CLERK_SECRET_KEY" \
-            -H "Content-Type: application/json" \
-            -d "{\"email_address\":[\"$email\"],\"username\":\"$username\",\"password\":\"$password\"}")
-          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
-            echo "::error::BAPI user creation failed (HTTP $http_code)"
-            cat /tmp/bapi_response.json
-            exit 1
-          fi
-          user_id=$(jq -er '.id' /tmp/bapi_response.json)
-          echo "::add-mask::$password"
-          {
-            echo "email=$email"
-            echo "password=$password"
-            echo "user_id=$user_id"
-          } >> "$GITHUB_OUTPUT"
-
       - name: Run iOS e2e
         id: run_e2e_ios
-        if: matrix.platform == 'ios' && steps.user.outputs.user_id != ''
-        working-directory: ${{ env.FIXTURE_DIR }}
+        if: matrix.platform == 'ios' && steps.keys.outputs.sk != ''
         env:
-          CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
-          CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
+          CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
+          CLERK_API_URL: ${{ env.BAPI_URL }}
         run: |
-          "$GITHUB_WORKSPACE/$E2E_DIR/boot-ios-simulators.sh" wait
+          "$E2E_DIR/boot-ios-simulators.sh" wait
           mkdir -p "$RUNNER_TEMP/e2e-device-logs"
           log_pids=()
           trap 'kill "${log_pids[@]}" 2>/dev/null || true; wait "${log_pids[@]}" 2>/dev/null || true' EXIT
           for udid in ${CLERK_TEST_DEVICES//,/ }; do
-            xcrun simctl install "$udid" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
+            xcrun simctl install "$udid" "$FIXTURE_DIR/ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app"
             xcrun simctl spawn "$udid" log stream --style compact \
               --predicate 'processImagePath CONTAINS "ClerkExpoNativeBuildFixture"' \
               > "$RUNNER_TEMP/e2e-device-logs/$udid-console.log" 2>&1 &
             log_pids+=($!)
           done
-          PLATFORM=ios "$GITHUB_WORKSPACE/$E2E_DIR/run-flows.sh"
+          pnpm test:integration:expo-native:ios --video=on-first-retry --reporter list,junit,markdown
 
       - name: Enable KVM
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
+        if: matrix.platform == 'android' && steps.keys.outputs.sk != ''
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
@@ -295,7 +265,7 @@ jobs:
 
       - name: AVD cache
         id: avd-cache
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
+        if: matrix.platform == 'android' && steps.keys.outputs.sk != ''
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
           path: |
@@ -304,7 +274,7 @@ jobs:
           key: avd-34-google_apis-x86_64-v1
 
       - name: Create AVD snapshot
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != '' && steps.avd-cache.outputs.cache-hit != 'true'
+        if: matrix.platform == 'android' && steps.keys.outputs.sk != '' && steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         with:
           api-level: 34
@@ -317,55 +287,28 @@ jobs:
 
       - name: Run Android e2e
         id: run_e2e_android
-        if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
+        if: matrix.platform == 'android' && steps.keys.outputs.sk != ''
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
         env:
-          CLERK_TEST_EMAIL: ${{ steps.user.outputs.email }}
-          CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
+          CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
+          CLERK_API_URL: ${{ env.BAPI_URL }}
         with:
           api-level: 34
           target: google_apis
           arch: x86_64
           force-avd-creation: false
-          # read-only: a writable instance holds a lock the shard emulators wait on forever
-          emulator-options: -read-only -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           # The action runs each script line in a separate sh -c; the folded
           # scalar (>-) plus && keeps everything in one shell invocation.
           script: >-
-            cd integration/tests/expo-native &&
-            E2E_DEVICE_LOGS="$RUNNER_TEMP/e2e-device-logs" ./run-android-flows.sh
-            "$GITHUB_WORKSPACE/$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk"
-
-      # Runs before the artifact upload so the credentials are already dead
-      # by the time the debug files become downloadable.
-      - name: Cleanup test user
-        if: always() && steps.user.outputs.user_id != ''
-        env:
-          CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
-          USER_ID: ${{ steps.user.outputs.user_id }}
-        run: |
-          curl -fsS -X DELETE "$BAPI_URL/v1/users/$USER_ID" \
-            -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
-
-      # Test reports record flow env (and typed input) in plaintext;
-      # add-mask only covers step logs, not artifact contents. Must run whenever
-      # the upload does, or a passing run uploads the password.
-      - name: Scrub test credentials from e2e output
-        id: scrub
-        if: always() && steps.user.outputs.user_id != ''
-        env:
-          CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
-        run: |
-          [ -n "$CLERK_TEST_PASSWORD" ] || exit 0
-          mkdir -p integration/.e2e "$RUNNER_TEMP/e2e-device-logs"
-          # shellcheck disable=SC2016
-          find integration/.e2e "$RUNNER_TEMP/e2e-device-logs" -type f \
-            \( -name '*.json' -o -name '*.log' -o -name '*.md' -o -name '*.txt' -o -name '*.xml' \) \
-            -exec perl -pi -e 's/\Q$ENV{CLERK_TEST_PASSWORD}\E/[REDACTED]/g' {} +
+            mkdir -p "$RUNNER_TEMP/e2e-device-logs" &&
+            adb install -r "$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk" &&
+            (adb logcat -v threadtime > "$RUNNER_TEMP/e2e-device-logs/logcat.log" 2>&1 &) &&
+            pnpm test:integration:expo-native:android --video=on-first-retry --reporter list,junit,markdown
 
       - name: Upload e2e artifacts
-        if: always() && steps.scrub.outcome == 'success'
+        if: always() && steps.keys.outputs.sk != ''
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: e2e-${{ matrix.platform }}
@@ -378,7 +321,7 @@ jobs:
           retention-days: 7
 
       - name: Report e2e outcome
-        if: always() && steps.user.outputs.user_id != ''
+        if: always() && steps.keys.outputs.sk != ''
         env:
           IOS_OUTCOME: ${{ steps.run_e2e_ios.outcome }}
           ANDROID_OUTCOME: ${{ steps.run_e2e_android.outcome }}
@@ -386,6 +329,14 @@ jobs:
           outcome="$IOS_OUTCOME"
           [ "$outcome" = "skipped" ] && outcome="$ANDROID_OUTCOME"
           echo "## Native e2e (${{ matrix.platform }}): $outcome" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f integration/.e2e/summary.md ]; then
+            cat integration/.e2e/summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
           if [ "$outcome" = "failure" ]; then
             echo "::error::Native e2e failed. See the e2e-${{ matrix.platform }} artifact."
+          fi
+          flaky=$(jq -r '[.run.results[] | select(.status == "flaky") | .file] | join(", ")' integration/.e2e/report.json 2>/dev/null || true)
+          if [ -n "$flaky" ]; then
+            echo "::error::Flaky flow(s), failed then passed on the retry: $flaky"
+            exit 1
           fi
