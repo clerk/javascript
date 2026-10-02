@@ -15,7 +15,7 @@ import { InputGroup } from '../../components/input-group';
 import { Select } from '../../components/select';
 import { Text } from '../../components/text';
 import { fill, useMessages } from '../../localization';
-import { truncationStyles } from '../../utils/typography.styles';
+import { truncationStyles } from '../../styles/typography.styles';
 
 const expirationValues = ['never', '1d', '7d', '30d', '60d', '90d', '180d', '1y'] as const;
 

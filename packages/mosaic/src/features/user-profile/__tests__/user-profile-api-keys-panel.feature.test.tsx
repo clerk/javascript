@@ -140,7 +140,8 @@ describe('UserProfileApiKeysPanel', () => {
   describe('searching', () => {
     it('lists only matching keys and explains when nothing matches', async () => {
       const { user } = await renderPanel();
-      const search = await screen.findByRole('searchbox', { name: 'Search API keys' });
+      await within(table()).findByText('CI pipeline');
+      const search = screen.getByRole('searchbox', { name: 'Search API keys' });
 
       await user.type(search, 'web');
       await waitFor(() => expect(within(table()).queryByText('CI pipeline')).toBeNull());

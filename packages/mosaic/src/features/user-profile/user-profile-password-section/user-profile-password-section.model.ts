@@ -7,7 +7,7 @@ import { useMemo } from 'react';
 
 import type { FieldFeedback } from '../../../components/form';
 import { FormSubmitError } from '../../../components/form';
-import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
+import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useErrorText, useLocale, useMessages } from '../../../localization';
 import { passwordFormError } from './user-profile-password-errors';
 import { passwordFieldFeedback } from './user-profile-password-feedback';

@@ -1,7 +1,7 @@
 'use client';
 
 import { UserProfileApiKeysPanel } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel';
-import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 

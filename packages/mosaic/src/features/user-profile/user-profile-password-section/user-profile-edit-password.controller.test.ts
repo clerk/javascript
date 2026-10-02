@@ -1,16 +1,9 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../../__tests__/async';
 import type { FieldFeedback } from '../../../components/form/form-submit-error';
 import { useUserProfileEditPasswordController } from './user-profile-edit-password.controller';
-
-function deferred<T = unknown>() {
-  let resolve: (result: T) => void = () => {};
-  const promise = new Promise<T>(r => {
-    resolve = r;
-  });
-  return { promise, resolve };
-}
 
 describe('useUserProfileEditPasswordController timing', () => {
   it('shows a validation failure instead of silently dropping it', async () => {
@@ -105,7 +98,7 @@ describe('useUserProfileEditPasswordController timing', () => {
   });
 
   it('ignores dismissal and duplicate saves in the same event as submission', async () => {
-    const save = deferred();
+    const save = deferred<void>();
     const onSubmit = vi.fn(() => save.promise);
     const { result } = renderHook(() =>
       useUserProfileEditPasswordController({ requiresCurrentPassword: true, onSubmit }),

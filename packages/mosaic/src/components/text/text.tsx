@@ -4,10 +4,10 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
+import { reset } from '../../styles/reset.styles';
+import type { TypographyColor, TypographySize } from '../../styles/typography.styles';
+import { colors, sizes, styles } from '../../styles/typography.styles';
 import { useContextProps } from '../../utils/context';
-import { reset } from '../../utils/reset.styles';
-import type { TypographyColor, TypographySize } from '../../utils/typography.styles';
-import { colors, sizes, styles } from '../../utils/typography.styles';
 
 export interface TextProps extends MosaicComponentProps<'p'> {
   size?: TypographySize;

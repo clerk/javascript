@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../../components/button';
 import type { MosaicLocalization } from '../../../localization';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { SaveError } from '../../../utils/form-error';
 import { useUserProfileEditUsernameController } from '../user-profile-account-section/user-profile-edit-username.controller';
 import type { UserProfileEditUsernameDialogProps } from '../user-profile-account-section/user-profile-edit-username.dialog';

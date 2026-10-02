@@ -2,7 +2,7 @@ import { useCallback, useId, useRef } from 'react';
 
 import { useErrorText, useMessages } from '../../localization';
 import type { StateMachine } from '../../machine/types';
-import { useMachine } from '../../machine/useMachine';
+import { useMachine } from '../../machine/use-machine';
 import { keysOf, mapKeys } from '../../utils/object';
 import type { FieldsConfig, FormContext, FormEvent } from './form.machine';
 import { createFormMachine, fieldFeedback, firstInvalid, initialOf, isValid } from './form.machine';

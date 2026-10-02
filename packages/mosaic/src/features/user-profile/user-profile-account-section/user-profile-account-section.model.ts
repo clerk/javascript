@@ -2,7 +2,7 @@ import { getFullName } from '@clerk/shared/internal/clerk-js/user';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type { AttributeData, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
 
-import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
+import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import type { MessageValues } from '../../../localization';
 import { save, SaveError, UNEXPECTED_ERROR } from '../../../utils/form-error';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
