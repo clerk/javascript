@@ -149,6 +149,11 @@ import {
   Overlay as OrganizationProfileOverlay,
 } from '../stories/organization-profile.stories';
 import {
+  Default as OrganizationProfileApiKeysPanelDefault,
+  Empty as OrganizationProfileApiKeysPanelEmpty,
+  meta as organizationProfileApiKeysPanelMeta,
+} from '../stories/organization-profile-api-keys-panel.stories';
+import {
   Default as OrganizationProfileDangerSectionDefault,
   LeaveOnly as OrganizationProfileDangerSectionLeaveOnly,
   meta as organizationProfileDangerSectionMeta,
@@ -325,6 +330,11 @@ import {
   meta as userProfileActiveDevicesSectionMeta,
   SignOutError as UserProfileActiveDevicesSectionSignOutError,
 } from '../stories/user-profile-active-devices-section.stories';
+import {
+  Default as UserProfileApiKeysPanelDefault,
+  Empty as UserProfileApiKeysPanelEmpty,
+  meta as userProfileApiKeysPanelMeta,
+} from '../stories/user-profile-api-keys-panel.stories';
 import {
   Default as UserProfileBillingHistorySectionDefault,
   Empty as UserProfileBillingHistorySectionEmpty,
@@ -725,6 +735,11 @@ const tabsComponentModule: StoryModule = {
 // Planned but not yet implemented; the entry reserves its sidebar slot with a todo dot.
 const toastModule: StoryModule = { meta: toastMeta, Default: ToastDefault, Anchored: ToastAnchored };
 
+const userProfileApiKeysPanelModule: StoryModule = {
+  meta: userProfileApiKeysPanelMeta,
+  Default: UserProfileApiKeysPanelDefault,
+  Empty: UserProfileApiKeysPanelEmpty,
+};
 const userProfileModule: StoryModule = {
   meta: userProfileMeta,
   Default: UserProfileDefault,
@@ -875,6 +890,12 @@ const reverificationModule: StoryModule = {
   MethodPickerPending: ReverificationMethodPickerPending,
   Help: ReverificationHelp,
 };
+const organizationProfileApiKeysPanelModule: StoryModule = {
+  meta: organizationProfileApiKeysPanelMeta,
+  Default: OrganizationProfileApiKeysPanelDefault,
+  Empty: OrganizationProfileApiKeysPanelEmpty,
+};
+
 const organizationProfileMembersPanelModule: StoryModule = {
   meta: organizationProfileMembersPanelMeta,
   Legacy: OrganizationProfileMembersPanelLegacy,
@@ -891,6 +912,7 @@ export const registry: StoryModule[] = [
   userProfileProfilePanelModule,
   userProfileSecurityPanelModule,
   userProfileBillingPanelModule,
+  userProfileApiKeysPanelModule,
   // User Profile · Sections
   userProfileAccountSectionModule,
   userProfilePasswordSectionModule,
@@ -908,6 +930,7 @@ export const registry: StoryModule[] = [
   organizationProfileModule,
   // Organization Profile · Panels
   organizationProfileGeneralPanelModule,
+  organizationProfileApiKeysPanelModule,
   organizationProfileMembersPanelModule,
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
