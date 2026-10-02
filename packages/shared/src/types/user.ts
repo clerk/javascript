@@ -30,6 +30,11 @@ import type { UserOrganizationInvitationResource } from './userOrganizationInvit
 import type { SnakeToCamel } from './utils';
 import type { Web3WalletResource } from './web3Wallet';
 
+export interface GetSessionsParams {
+  forceRefresh?: boolean;
+  throwOnError?: boolean;
+}
+
 declare global {
   /**
    * If you want to provide custom types for the user.publicMetadata object,
@@ -264,10 +269,11 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    */
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource | Web3WalletResource) => boolean;
   /**
-   * Gets all **active** sessions for this user. This method uses a cache so a network request will only be triggered only once.
+   * Gets all **active** sessions for this user. Results are cached unless `forceRefresh` is enabled.
+   * Failed requests resolve to an empty array unless `throwOnError` is enabled.
    * @returns An array of [`SessionWithActivities`](https://clerk.com/docs/reference/types/session-with-activities) objects.
    */
-  getSessions: () => Promise<SessionWithActivitiesResource[]>;
+  getSessions: (params?: GetSessionsParams) => Promise<SessionWithActivitiesResource[]>;
   /**
    * Adds the user's profile image or replaces it if one already exists. This method will upload an image and associate it with the user.
    */

@@ -6,7 +6,7 @@ export function useListRemovalFocus({
   fallback,
 }: {
   ids: string[];
-  onRemove?: (id: string) => void | Promise<void>;
+  onRemove?: (id: string) => void | boolean | Promise<void | boolean>;
   fallback: () => HTMLElement | null;
 }) {
   const triggers = useRef(new Map<string, HTMLButtonElement>());
@@ -25,8 +25,9 @@ export function useListRemovalFocus({
       return;
     }
     const index = ids.indexOf(id);
-    await onRemove(id);
-    removed.current = { id, index };
+    if ((await onRemove(id)) !== false) {
+      removed.current = { id, index };
+    }
   };
 
   const finalFocus = () => {
