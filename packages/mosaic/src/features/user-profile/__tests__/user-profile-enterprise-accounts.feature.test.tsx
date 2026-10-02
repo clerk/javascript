@@ -14,7 +14,7 @@ import {
   fapiVerification,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileEnterpriseAccountsSection } from '../user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section';
 import { custom, enterpriseAccountSeed as signedIn, enterpriseMember, okta } from './enterprise-accounts.fixtures';
 

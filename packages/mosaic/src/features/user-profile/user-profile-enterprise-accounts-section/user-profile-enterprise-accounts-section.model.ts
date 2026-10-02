@@ -3,7 +3,7 @@ import { windowNavigate } from '@clerk/shared/internal/clerk-js/windowNavigate';
 import { __internal_useUserEnterpriseConnections, useClerk, useUser } from '@clerk/shared/react';
 import type { EnterpriseAccountResource, EnterpriseConnectionResource } from '@clerk/shared/types';
 
-import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
+import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useErrorText, useMessages } from '../../../localization';
 import { enterpriseAccountErrorMessage } from './user-profile-enterprise-accounts-feedback';
 import type {
