@@ -6,6 +6,7 @@ import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { space } from '../../tokens.stylex';
 import { Checkbox } from '../checkbox';
 import type { FieldFeedback } from '../form';
 import { Input } from '../input';
@@ -495,11 +496,11 @@ describe('Mosaic Field', () => {
     const probe = stylex.create({
       message: {
         transitionProperty: {
-          default: 'height, margin-top',
+          default: 'height',
           '@media (prefers-reduced-motion: reduce)': 'none',
         },
         height: {
-          default: 'var(--_cl-feedback-height)',
+          default: `calc(var(--_cl-feedback-height) + var(--_cl-feedback-gap, ${space['2']}))`,
           ':where(:not([data-open]), [data-starting-style])': 0,
         },
       },
