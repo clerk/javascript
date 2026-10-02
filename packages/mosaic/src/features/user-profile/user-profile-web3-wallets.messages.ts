@@ -7,6 +7,21 @@ export const userProfileWeb3WalletsMessages = {
   setPrimary: 'Set as primary',
   primary: 'Primary',
   unverified: 'Unverified',
+  errors: {
+    generic: 'Something went wrong. Please try again.',
+    providerUnavailable: 'This wallet provider is unavailable.',
+    extensionUnavailable: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
+    creationFailed: 'The wallet could not be created.',
+    messageUnavailable: 'The wallet verification message is unavailable.',
+    signatureUnavailable: 'The wallet signature is unavailable.',
+  },
+  solanaDialog: {
+    title: 'Select a Solana wallet',
+    description: 'Choose an installed wallet to connect to your account.',
+    noneAvailable: 'No Solana wallets are available.',
+    findWallet: 'Find a Solana wallet',
+    cancel: 'Cancel',
+  },
   removeDialog: {
     title: 'Remove wallet?',
     description: '{wallet} will be removed from this account.',

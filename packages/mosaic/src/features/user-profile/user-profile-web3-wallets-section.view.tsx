@@ -1,3 +1,4 @@
+import type { Web3Strategy } from '@clerk/shared/types';
 import { useMemo, useRef } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
@@ -8,7 +9,8 @@ import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visib
 import { UserProfileWeb3WalletRowView } from './user-profile-web3-wallet-row.view';
 
 export interface UserProfileWeb3Provider {
-  id: string;
+  id: Web3Strategy;
+  walletPicker?: 'solana';
   provider: string;
   iconUrl?: string;
   connectError?: string;
@@ -29,6 +31,7 @@ export interface UserProfileWeb3WalletsSectionViewProps {
   fallbackFocus?: () => HTMLElement | null;
   wallets: UserProfileWeb3Wallet[];
   availableProviders?: UserProfileWeb3Provider[];
+  pendingId?: string;
   onConnect?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (id: string) => void | Promise<void>;
@@ -38,6 +41,7 @@ export function UserProfileWeb3WalletsSectionView({
   wallets,
   fallbackFocus,
   availableProviders = [],
+  pendingId,
   onConnect,
   onSetPrimary,
   onRemove,
@@ -55,6 +59,7 @@ export function UserProfileWeb3WalletsSectionView({
   });
   const removeWallet = useMemo(() => Confirmation.createHandle<UserProfileWeb3Wallet>(), []);
   const hasRows = wallets.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
+  const isBusy = pendingId !== undefined;
 
   return (
     <>
@@ -73,6 +78,7 @@ export function UserProfileWeb3WalletsSectionView({
                   key={wallet.id}
                   wallet={wallet}
                   triggerRef={removalFocus.registerTrigger(wallet.id)}
+                  isDisabled={isBusy}
                   onSetPrimary={onSetPrimary}
                   onRemove={onRemove ? wallet => removeWallet.open(wallet) : undefined}
                 />
@@ -82,6 +88,8 @@ export function UserProfileWeb3WalletsSectionView({
                     <UserProfileWeb3WalletRowView
                       key={provider.id}
                       wallet={provider}
+                      isPending={pendingId === provider.id}
+                      isDisabled={isBusy}
                       onConnect={onConnect}
                     />
                   ))

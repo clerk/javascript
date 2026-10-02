@@ -9,6 +9,7 @@ import type {
   SessionJSON,
   UserJSON,
   UserOrganizationInvitationJSON,
+  Web3WalletJSON,
 } from '@clerk/shared/types';
 import { http, HttpResponse, type JsonBodyType } from 'msw';
 import { setupWorker } from 'msw/browser';
@@ -31,6 +32,7 @@ import {
   fapiPage,
   fapiToken,
   fapiVerification,
+  fapiWeb3Wallet,
 } from './fapi';
 
 export const PUBLISHABLE_KEY = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
@@ -107,6 +109,20 @@ function updateUser(state: FakeFapiState, user: UserJSON): void {
     ...state.client,
     sessions: state.client.sessions.map(session => (session.user.id === user.id ? { ...session, user } : session)),
   };
+}
+
+function findWeb3Wallet(state: FakeFapiState, id: unknown): Web3WalletJSON | undefined {
+  return activeUser(state)?.web3_wallets.find(wallet => wallet.id === id);
+}
+
+function updateWeb3Wallet(state: FakeFapiState, wallet: Web3WalletJSON): void {
+  const user = activeUser(state);
+  if (user) {
+    updateUser(state, {
+      ...user,
+      web3_wallets: user.web3_wallets.map(current => (current.id === wallet.id ? wallet : current)),
+    });
+  }
 }
 
 function missing() {
@@ -211,6 +227,95 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       }
       updateUser(state, { ...user, external_accounts: user.external_accounts.filter(item => item.id !== account.id) });
       return envelope({ ...account, object: 'external_account' }, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/web3_wallets'), async ({ request }) => {
+      const user = activeUser(state);
+      if (!user) {
+        return missing();
+      }
+      const body = new URLSearchParams(await request.text());
+      const address = body.get('web3_wallet');
+      if (!address) {
+        return missing();
+      }
+      const wallet = fapiWeb3Wallet({
+        id: `wallet_${user.web3_wallets.length + 1}`,
+        web3_wallet: address,
+        verification: fapiVerification('', { expire_at: 0 }),
+      });
+      updateUser(state, { ...user, web3_wallets: [...user.web3_wallets, wallet] });
+      return envelope(wallet, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/web3_wallets/:id/prepare_verification'), async ({ params, request }) => {
+      const wallet = findWeb3Wallet(state, params.id);
+      if (!wallet) {
+        return missing();
+      }
+      const body = new URLSearchParams(await request.text());
+      const prepared = fapiWeb3Wallet({
+        ...wallet,
+        verification: fapiVerification(body.get('strategy') ?? '', {
+          message: 'Sign this wallet challenge',
+          expire_at: 0,
+        }),
+      });
+      updateWeb3Wallet(state, prepared);
+      return envelope(prepared, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/web3_wallets/:id/attempt_verification'), ({ params }) => {
+      const wallet = findWeb3Wallet(state, params.id);
+      if (!wallet) {
+        return missing();
+      }
+      const verified = fapiWeb3Wallet({
+        ...wallet,
+        verification: fapiVerification(wallet.verification?.strategy ?? '', {
+          ...wallet.verification,
+          status: 'verified',
+          verified_at_client: '',
+          attempts: 1,
+        }),
+      });
+      updateWeb3Wallet(state, verified);
+      return envelope(verified, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/web3_wallets/:id'), ({ params, request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
+        return undefined;
+      }
+      const user = activeUser(state);
+      const wallet = findWeb3Wallet(state, params.id);
+      if (!user || !wallet) {
+        return missing();
+      }
+      updateUser(state, { ...user, web3_wallets: user.web3_wallets.filter(current => current.id !== wallet.id) });
+      return envelope({ object: 'web3_wallet', id: wallet.id, deleted: true }, state.client);
+    }),
+    http.post(fapiUrl('/v1/me'), async ({ request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
+        return undefined;
+      }
+      const user = activeUser(state);
+      if (!user) {
+        return missing();
+      }
+      const body = new URLSearchParams(await request.text());
+      const updated = { ...user };
+      const fields = [
+        'first_name',
+        'last_name',
+        'username',
+        'primary_email_address_id',
+        'primary_phone_number_id',
+        'primary_web3_wallet_id',
+      ] as const;
+      for (const field of fields) {
+        if (body.has(field)) {
+          updated[field] = body.get(field);
+        }
+      }
+      updateUser(state, updated);
+      return envelope(updated, state.client);
     }),
     http.post(fapiUrl('/v1/client/sessions/:id/tokens'), ({ params }) => {
       const session = findSession(state, params.id);

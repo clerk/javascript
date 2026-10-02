@@ -1,6 +1,6 @@
-import { getWallets, type Wallet } from '@wallet-standard/core';
+import { useInstalledSolanaWallets } from '@clerk/shared/react';
 import type { Ref } from 'react';
-import React, { forwardRef, isValidElement, useEffect, useMemo, useState } from 'react';
+import React, { forwardRef, isValidElement } from 'react';
 
 import { WalletInitialIcon } from '@/ui/common/WalletInitialIcon';
 import {
@@ -31,34 +31,6 @@ const SOCIAL_BUTTON_BLOCK_THRESHOLD = 2;
 const SOCIAL_BUTTON_PRE_TEXT_THRESHOLD = 1;
 const MAX_STRATEGIES_PER_ROW = 5;
 
-const isSolanaSignInWallet = (wallet: Wallet) =>
-  wallet.chains.some(chain => chain.startsWith('solana:')) &&
-  'standard:connect' in wallet.features &&
-  'solana:signMessage' in wallet.features;
-
-const getRegisteredWallets = () => (typeof window === 'undefined' ? [] : getWallets().get());
-
-const useInstalledSolanaWallets = () => {
-  const [wallets, setWallets] = useState<readonly Wallet[]>(getRegisteredWallets);
-
-  useEffect(() => {
-    const registry = getWallets();
-    const update = () => setWallets(registry.get());
-    update();
-    const offRegister = registry.on('register', update);
-    const offUnregister = registry.on('unregister', update);
-    return () => {
-      offRegister();
-      offUnregister();
-    };
-  }, []);
-
-  return useMemo(
-    () => wallets.filter(isSolanaSignInWallet).map(wallet => ({ name: wallet.name, icon: wallet.icon })),
-    [wallets],
-  );
-};
-
 export const Web3SolanaWalletButtons = ({ web3AuthCallback }: Web3WalletButtonsProps) => {
   const card = useCardState();
   const installedWallets = useInstalledSolanaWallets();
@@ -75,7 +47,7 @@ export const Web3SolanaWalletButtons = ({ web3AuthCallback }: Web3WalletButtonsP
     }
   };
 
-  const { strategyRows } = distributeStrategiesIntoRows(installedWallets, MAX_STRATEGIES_PER_ROW, undefined);
+  const { strategyRows } = distributeStrategiesIntoRows([...installedWallets], MAX_STRATEGIES_PER_ROW, undefined);
   const strategyRowOneLength = strategyRows.at(0)?.length ?? 0;
   const shouldForceSingleColumnOnMobile = installedWallets.length === 2;
   const ButtonElement = installedWallets.length <= SOCIAL_BUTTON_BLOCK_THRESHOLD ? WalletButtonBlock : WalletButtonIcon;
