@@ -1,13 +1,9 @@
-import type { Device } from '@e2e-dev/mobile';
-import type { Locator, TestFixtures } from 'e2e';
+import type { Locator } from 'e2e';
 import { expect } from 'e2e';
 
-export type Fixtures = TestFixtures & { device: Device };
+import type { DeviceFixtures, Fixtures } from './fixtures.ts';
 
-const email = process.env.CLERK_TEST_EMAIL ?? '';
-const password = process.env.CLERK_TEST_PASSWORD ?? '';
-
-export async function openApp({ app, device, platform, screen }: Fixtures) {
+export async function openApp({ app, device, platform, screen }: DeviceFixtures) {
   await app.open();
   if (platform === 'ios') {
     await device.clearKeychain();
@@ -17,16 +13,37 @@ export async function openApp({ app, device, platform, screen }: Fixtures) {
   await expect(screen.getByText('signed out')).toBeVisible();
 }
 
-export async function assertSignedIn({ screen }: Fixtures) {
+export async function tapUntilVisible(control: Locator, outcome: Locator) {
+  await expect
+    .poll(
+      async () => {
+        if (!(await outcome.isVisible()) && (await control.isVisible())) {
+          await control.tap();
+        }
+        return outcome.isVisible();
+      },
+      { timeout: 30_000, interval: 1000 },
+    )
+    .toBe(true);
+}
+
+export async function openAuthView({ screen }: DeviceFixtures) {
+  await tapUntilVisible(
+    screen.getByTestId('open-auth-view-button'),
+    screen.getByText(/^Welcome! Sign in to continue\.?$/),
+  );
+}
+
+export async function assertSignedIn({ screen }: DeviceFixtures) {
   await expect(screen.getByText('signed in')).toBeVisible({ timeout: 30_000 });
   await expect(screen.getByTestId('user-id')).toBeVisible();
 }
 
-export async function assertSignedOut({ screen }: Fixtures) {
+export async function assertSignedOut({ screen }: DeviceFixtures) {
   await expect(screen.getByText('signed out')).toBeVisible({ timeout: 20_000 });
 }
 
-async function tapCenter({ screen }: Fixtures, control: Locator) {
+async function tapCenter({ screen }: DeviceFixtures, control: Locator) {
   await expect(control).toBeVisible();
   const box = await control.boundingBox();
   if (!box) {
@@ -35,7 +52,7 @@ async function tapCenter({ screen }: Fixtures, control: Locator) {
   await screen.tapAt({ x: box.x + box.width / 2, y: box.y + box.height / 2 });
 }
 
-export async function tapControl(fixtures: Fixtures, control: Locator) {
+export async function tapControl(fixtures: DeviceFixtures, control: Locator) {
   if (fixtures.platform === 'android') {
     await tapCenter(fixtures, control);
   } else {
@@ -43,11 +60,12 @@ export async function tapControl(fixtures: Fixtures, control: Locator) {
   }
 }
 
-export async function tapBack(fixtures: Fixtures) {
+export async function tapBack(fixtures: DeviceFixtures) {
   await tapCenter(fixtures, fixtures.screen.getByLabel('Back').last());
 }
 
 async function fill(field: Locator, value: string) {
+  await field.tap();
   await field.fill(value).catch((error: { code?: string }) => {
     if (error.code !== 'ENGINE_FAILURE') {
       throw error;
@@ -56,28 +74,13 @@ async function fill(field: Locator, value: string) {
   });
 }
 
-async function skipPasskeyFirstFactor({ platform, screen }: Fixtures) {
-  if (platform === 'ios') {
-    const error = screen.getByText('Whoops, something is wrong');
-    await expect(error).toBeVisible({ timeout: 10_000 });
-    for (let attempt = 0; attempt < 3 && (await error.isVisible()); attempt++) {
-      await screen.getByRole('button', 'Close').last().tap();
-      await expect(error)
-        .toBeHidden({ timeout: 3000 })
-        .catch(() => {});
-    }
-  }
-  await screen.getByText(/^Use (a different|another) method$/).tap();
-  await screen.getByText('Sign in with your password').tap();
-}
-
-async function enterEmailCode({ screen }: Fixtures) {
+async function enterEmailCode({ screen }: DeviceFixtures) {
   if (await screen.getByText('Check your email').isVisible()) {
     await screen.getByRole('textbox').last().pressSequentially('424242');
   }
 }
 
-async function dismissPasswordManager({ screen }: Fixtures) {
+async function dismissPasswordManager({ screen }: DeviceFixtures) {
   if (
     await screen
       .getByText(/Google Password Manager/)
@@ -106,26 +109,21 @@ const afterPassword =
   /^(Check your email|signed in|Save Password|Strong Password|Use Strong Password|AutoFill Passwords)$|Google Password Manager/i;
 
 export async function signInEmailPassword(fixtures: Fixtures) {
-  const { screen } = fixtures;
+  const { screen, user } = fixtures;
   await expect(screen.getByText(/^Welcome! Sign in to continue\.?$/)).toBeVisible({ timeout: 25_000 });
   const identifierLabel = screen.getByText(/^Enter your email( or username)?$/);
   await expect(identifierLabel).toBeVisible({ timeout: 25_000 });
-  await identifierLabel.tap();
-  const identifier = screen.getByDisplayValue(email);
+  await tapUntilVisible(identifierLabel, screen.getByRole('textbox'));
+  const identifier = screen.getByDisplayValue(user.email);
   if (!(await identifier.isVisible())) {
-    await fill(screen.getByRole('textbox'), email);
+    await fill(screen.getByRole('textbox'), user.email);
   }
   await expect(identifier).toBeVisible();
   await screen.getByText('Continue').tap();
-  const firstFactor = screen.getByText(/^(Enter your password|Check your email|Use your passkey)$/).first();
-  await expect(firstFactor).toBeVisible({ timeout: 15_000 });
-  if (await screen.getByText('Use your passkey').isVisible()) {
-    await skipPasskeyFirstFactor(fixtures);
-    await expect(screen.getByText('Enter your password').first()).toBeVisible({ timeout: 15_000 });
-  }
+  await expect(screen.getByText(/^(Enter your password|Check your email)$/).first()).toBeVisible({ timeout: 15_000 });
   await enterEmailCode(fixtures);
   if (await screen.getByText('Enter your password').first().isVisible()) {
-    await fill(screen.getByRole('textbox').last(), password);
+    await fill(screen.getByRole('textbox').last(), user.password);
     await screen.getByText('Continue').tap();
     await expect(screen.getByText(afterPassword).first()).toBeVisible({ timeout: 15_000 });
   }
