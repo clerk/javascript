@@ -7,8 +7,8 @@ import type {
 } from '@clerk/shared/types';
 import { isWebAuthnSupported } from '@clerk/shared/webauthn';
 
-import { useMosaicEnvironment } from '../../hooks/useMosaicEnvironment';
-import { useMosaicSupportEmail } from '../../hooks/useMosaicSupportEmail';
+import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
+import { useMosaicSupportEmail } from '../../hooks/use-mosaic-support-email';
 import type {
   ReverificationMethod,
   ReverificationPreparableMethod,

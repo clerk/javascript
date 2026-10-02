@@ -3,7 +3,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { mosaicMessages, resolveLocalization, useLocale, useMessages } from '../localization';
-import { MosaicProvider } from '../MosaicProvider';
+import { MosaicProvider } from '../mosaic-provider';
 
 describe('resolveLocalization', () => {
   it('returns the base messages untouched when nothing is overridden', () => {

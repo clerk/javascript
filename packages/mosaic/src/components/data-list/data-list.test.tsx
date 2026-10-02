@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../mosaic-provider';
 import { DataList } from './data-list';
 
 function renderList(props?: { divided?: boolean }) {

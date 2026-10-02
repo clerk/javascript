@@ -46,6 +46,9 @@ export const feedbackStyles = stylex.create({
   error: {
     color: colorVars['--cl-color-negative'],
   },
+  info: {
+    color: colorVars['--cl-color-foreground-secondary'],
+  },
   success: {
     color: colorVars['--cl-color-positive'],
   },

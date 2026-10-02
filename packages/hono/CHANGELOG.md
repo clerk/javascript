@@ -1,5 +1,13 @@
 # @clerk/hono
 
+## 0.1.85
+
+### Patch Changes
+
+- Updated dependencies [[`4eac21f`](https://github.com/clerk/javascript/commit/4eac21f68b6608d5e59dfb9d7660582d7bf0a148), [`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/backend@3.22.0
+  - @clerk/shared@4.38.0
+
 ## 0.1.84
 
 ### Patch Changes

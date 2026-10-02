@@ -3,13 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../../../components/dialog';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileViewProps } from '../user-profile.view';
 import { UserProfileView } from '../user-profile.view';
 
 const pages: UserProfileViewProps['pages'] = {
   account: { name: 'Preston Booth', username: 'prestonxyz' },
-  security: { hasPassword: true },
+  security: {},
   billing: {
     subscription: {
       planName: 'Basic Plan',
@@ -20,15 +20,7 @@ const pages: UserProfileViewProps['pages'] = {
     paymentMethods: [],
     historyItems: [],
   },
-  apiKeys: {
-    apiKeys: [],
-    searchValue: '',
-    totalCount: 0,
-    page: 1,
-    isLoading: false,
-    onSearchChange: vi.fn(),
-    onPageChange: vi.fn(),
-  },
+  apiKeys: <p>API keys content</p>,
 };
 
 function renderView(overrides: Partial<UserProfileViewProps> = {}) {

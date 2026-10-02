@@ -7,7 +7,7 @@ import React from 'react';
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-import { MosaicProvider } from '../MosaicProvider';
+import { MosaicProvider } from '../mosaic-provider';
 
 describe('MosaicProvider SSR', () => {
   it('renders on the server without throwing', () => {

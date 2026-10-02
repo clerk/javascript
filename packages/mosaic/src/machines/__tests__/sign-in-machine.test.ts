@@ -1,9 +1,9 @@
 import type { SignInResource } from '@clerk/shared/types';
 import { describe, expect, it, vi } from 'vitest';
 
-import { createActor } from '../../machine/createActor';
-import { createSignInMachine } from '../signInMachine';
-import { deferred, noop, tick } from './test-utils';
+import { deferred, noop, tick } from '../../__tests__/async';
+import { createActor } from '../../machine/create-actor';
+import { createSignInMachine } from '../sign-in-machine';
 
 const makeAttempt = (status: string) => vi.fn().mockResolvedValue({ status } as SignInResource);
 

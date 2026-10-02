@@ -2,9 +2,9 @@ import type {
   UserProfileAPIKeySort,
   UserProfileApiKeysPanelViewProps,
 } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.types';
-import type { UserProfileCreateAPIKeyDialogProps } from '@clerk/mosaic/features/user-profile/user-profile-create-api-key.dialog';
-import { useLocale, useMessages } from '@clerk/mosaic/localization';
-import { useEffect, useRef, useState } from 'react';
+import { useUserProfileCreateAPIKeyController } from '@clerk/mosaic/features/user-profile/user-profile-create-api-key.controller';
+import { useLocale } from '@clerk/mosaic/localization';
+import { useEffect, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosRows, chaosText } from '@/lib/chaos';
@@ -39,20 +39,6 @@ export const exampleAPIKeys: FixtureAPIKey[] = [
   expiresAt: index % 2 === 0 ? Date.UTC(2027, 11, 31) : null,
   lastUsedAt: index % 3 === 0 ? exampleTime - (index + 2) * 60_000 : null,
 }));
-
-function getExpirationDate(expiration: UserProfileCreateAPIKeyDialogProps['expiration'], now = new Date()) {
-  if (expiration === null || expiration === 'never') {
-    return null;
-  }
-  const date = new Date(now);
-  if (expiration === '1y') {
-    date.setFullYear(date.getFullYear() + 1);
-  } else {
-    const days = { '1d': 1, '7d': 7, '30d': 30, '60d': 60, '90d': 90, '180d': 180 };
-    date.setDate(date.getDate() + days[expiration]);
-  }
-  return date;
-}
 
 function sortAPIKeys(items: FixtureAPIKey[], sort: UserProfileAPIKeySort | null) {
   if (!sort) {
@@ -92,7 +78,6 @@ export function useUserProfileAPIKeysFixture({
   initialKeys?: FixtureAPIKey[];
   enableSorting?: boolean;
 } = {}): UserProfileApiKeysPanelViewProps {
-  const m = useMessages('userProfileApiKeysPanel');
   const locale = useLocale();
   const seed = useChaosFixture(initialKeys, items =>
     chaosRows(items).map(key => ({ ...key, name: chaosText(key.name) })),
@@ -102,13 +87,6 @@ export function useUserProfileAPIKeysFixture({
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
   const [sort, setSort] = useState<UserProfileAPIKeySort | null>(null);
-  const createTrigger = useRef<HTMLButtonElement | null>(null);
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [expiration, setExpiration] = useState<UserProfileCreateAPIKeyDialogProps['expiration']>(null);
-  const [secret, setSecret] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [pageSize, setPageSize] = useState(10);
   const dateLabel = (date: Date | number) =>
     new Intl.DateTimeFormat(locale, {
@@ -119,7 +97,22 @@ export function useUserProfileAPIKeysFixture({
     }).format(date);
   const relativeTime = new Intl.RelativeTimeFormat(locale);
 
-  const expirationDate = getExpirationDate(expiration);
+  const create = useUserProfileCreateAPIKeyController({
+    onCreate: async ({ name, expiresAt }) => {
+      const result = await createExampleAPIKey();
+      setItems(current => [
+        {
+          id: result.id,
+          name,
+          createdAt: Date.now(),
+          expiresAt: expiresAt?.getTime() ?? null,
+          lastUsedAt: null,
+        },
+        ...current,
+      ]);
+      return result.secret;
+    },
+  });
 
   useEffect(() => {
     const next = searchValue.trim();
@@ -158,74 +151,8 @@ export function useUserProfileAPIKeysFixture({
     pageSize,
     searchValue,
     isLoading: false,
-    onCreate: event => {
-      createTrigger.current = event.currentTarget;
-      setName('');
-      setExpiration(null);
-      setSecret(null);
-      setError(null);
-      setOpen(true);
-    },
-    createDialog: {
-      open,
-      onOpenChange: setOpen,
-      finalFocus: createTrigger,
-      name,
-      onNameChange: setName,
-      expiration,
-      expirationDateLabel: expirationDate ? dateLabel(expirationDate) : null,
-      onExpirationChange: setExpiration,
-      secret,
-      isPending,
-      error,
-      onSubmit: async () => {
-        if (!name.trim() || expiration === null || isPending) {
-          return;
-        }
-        setIsPending(true);
-        setError(null);
-        try {
-          const result = await createExampleAPIKey();
-          const createdAt = new Date();
-          const expiresAt = getExpirationDate(expiration, createdAt);
-          setItems(current => [
-            {
-              id: result.id,
-              name: name.trim(),
-              createdAt: createdAt.getTime(),
-              expiresAt: expiresAt?.getTime() ?? null,
-              lastUsedAt: null,
-            },
-            ...current,
-          ]);
-          setSecret(result.secret);
-        } catch (error) {
-          setError(error instanceof Error ? error.message : m.createError);
-        } finally {
-          setIsPending(false);
-        }
-      },
-      onCopy: async close => {
-        if (!secret || isPending) {
-          return;
-        }
-        setIsPending(true);
-        setError(null);
-        try {
-          await navigator.clipboard.writeText(secret);
-          if (close) {
-            setOpen(false);
-          }
-        } catch (error) {
-          setError(m.copyError);
-          if (!close) {
-            throw error;
-          }
-        } finally {
-          setIsPending(false);
-        }
-      },
-    },
+    onCreate: create.onOpen,
+    createDialog: create.dialog,
     onSearchChange: setSearchValue,
     onPageChange: setPage,
     onPageSizeChange: setPageSize,
