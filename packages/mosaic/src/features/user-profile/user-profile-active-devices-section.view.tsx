@@ -211,8 +211,8 @@ function DeviceItem({
     <Section.Item>
       <UserProfileSecurityIcon name={device.type} />
       <Section.Content>
-        <Section.Label xstyle={styles.deviceLabel}>
-          <span>{device.name}</span>
+        <Section.Label>
+          {device.name}
           {deviceBadges(device, m).map(label => (
             <Badge
               key={label}

@@ -12,8 +12,9 @@ import { mergeStyleProps, themeProps } from '../../props';
 import { feedbackHeight, feedbackStyles } from '../../styles/feedback.styles';
 import { reset } from '../../styles/reset.styles';
 import { skeletonStyles } from '../../styles/skeleton.styles';
-import { sizes as typographySizes, styles as typographyStyles } from '../../styles/typography.styles';
+import { sizes as typographySizes, styles as typographyStyles, truncationStyles } from '../../styles/typography.styles';
 import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../../utils/feedback';
+import { withTruncatableLabel } from '../../utils/truncatable-label';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
 import { sectionHeaderDescriptionMarker, sectionHeaderMarker, sectionNestedItemMarker } from './section.markers.stylex';
@@ -147,6 +148,7 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
       size='base'
       xstyle={[
         styles.title,
+        truncationStyles.singleLine,
         skeleton && skeletonStyles.bone,
         skeleton && skeletonStyles.wave,
         skeleton && skeletonStyles.line,
@@ -285,7 +287,7 @@ const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function Secti
         skeleton && styles.labelSkeleton,
         xstyle,
       ),
-      { ...rest, children: skeleton ? undefined : children },
+      { ...rest, children: skeleton ? undefined : withTruncatableLabel(children) },
     ),
   });
 });
@@ -367,7 +369,7 @@ const Note = React.forwardRef<HTMLDivElement, SectionNoteProps>(function Section
           {icon ? (
             <span {...mergeStyleProps(themeProps('section-note-icon'), stylex.props(styles.noteIcon))}>{icon}</span>
           ) : null}
-          {children}
+          <span {...stylex.props(truncationStyles.singleLine, styles.truncate)}>{children}</span>
         </>
       ),
     },
