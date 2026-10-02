@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
+import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
 import type { UserProfileSecurityPanelViewProps } from '../user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
@@ -14,15 +15,17 @@ function DeleteAccount({ onDelete = () => Promise.resolve() }: { onDelete?: () =
   return <UserProfileDangerSectionView {...controller} />;
 }
 
+const passkeys = [
+  {
+    id: 'passkey_1',
+    name: 'Passkey',
+    createdAtLabel: 'Created today at 10:12 PM',
+    lastUsedAtLabel: 'Last used 1h ago',
+  },
+];
+
 const props: UserProfileSecurityPanelViewProps = {
-  passkeys: [
-    {
-      id: 'passkey_1',
-      name: 'Passkey',
-      createdAtLabel: 'Created today at 10:12 PM',
-      lastUsedAtLabel: 'Last used 1h ago',
-    },
-  ],
+  passkeysSlot: { content: <UserProfilePasskeysSectionView passkeys={passkeys} /> },
   mfaMethods: [
     { id: 'sms_1', type: 'sms', description: '+1 801-888-8181' },
     { id: 'totp_1', type: 'authenticator' },
@@ -125,9 +128,16 @@ describe('UserProfileSecurityPanelView', () => {
     const user = userEvent.setup();
 
     renderView({
-      onAddPasskey,
-      onRenamePasskey,
-      onRemovePasskey,
+      passkeysSlot: {
+        content: (
+          <UserProfilePasskeysSectionView
+            passkeys={passkeys}
+            onAdd={onAddPasskey}
+            onRename={onRenamePasskey}
+            onRemove={onRemovePasskey}
+          />
+        ),
+      },
       onSignOutDevice,
       onSignOutAllOtherDevices,
       dangerSlot: <DeleteAccount onDelete={onDeleteAccount} />,
@@ -177,10 +187,16 @@ describe('UserProfileSecurityPanelView', () => {
 
   it('keeps supported empty authentication methods actionable', () => {
     renderView({
-      passkeys: [],
+      passkeysSlot: {
+        content: (
+          <UserProfilePasskeysSectionView
+            passkeys={[]}
+            onAdd={vi.fn()}
+          />
+        ),
+      },
       mfaMethods: [],
       devices: [],
-      onAddPasskey: vi.fn(),
       onAddMfaMethod: vi.fn(),
       addableMfaMethods: ['sms', 'authenticator'],
     });
@@ -203,10 +219,7 @@ describe('UserProfileSecurityPanelView', () => {
 
   it('keeps the authentication section on MFA when existing passkeys are hidden', () => {
     renderView({
-      passkeysVisible: false,
-      onAddPasskey: vi.fn(),
-      onRenamePasskey: vi.fn(),
-      onRemovePasskey: vi.fn(),
+      passkeysSlot: null,
     });
 
     expect(screen.queryByText('Passkeys')).not.toBeInTheDocument();
@@ -217,7 +230,7 @@ describe('UserProfileSecurityPanelView', () => {
   });
 
   it('keeps the passkeys card in the authentication section when passkeys are empty and Add is unavailable', () => {
-    renderView({ passkeys: [], onAddPasskey: undefined });
+    renderView({ passkeysSlot: { content: <UserProfilePasskeysSectionView passkeys={[]} /> } });
 
     const section = screen.getByRole('region', { name: 'Authentication' });
     expect(within(section).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeVisible();
@@ -232,7 +245,17 @@ describe('UserProfileSecurityPanelView', () => {
     const onRemovePasskey = vi.fn(async () => {
       await removal.promise;
     });
-    const { rerender } = renderView({ mfaMethods: undefined, onRemovePasskey });
+    const { rerender } = renderView({
+      mfaMethods: undefined,
+      passkeysSlot: {
+        content: (
+          <UserProfilePasskeysSectionView
+            passkeys={passkeys}
+            onRemove={onRemovePasskey}
+          />
+        ),
+      },
+    });
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
@@ -241,8 +264,14 @@ describe('UserProfileSecurityPanelView', () => {
     rerender(
       <MosaicProvider>
         <UserProfileSecurityPanelView
-          passkeys={[]}
-          onRemovePasskey={onRemovePasskey}
+          passkeysSlot={{
+            content: (
+              <UserProfilePasskeysSectionView
+                passkeys={[]}
+                onRemove={onRemovePasskey}
+              />
+            ),
+          }}
         />
       </MosaicProvider>,
     );

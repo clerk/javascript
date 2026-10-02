@@ -9,17 +9,14 @@ import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../localization';
 import { UserProfilePasskeyRowView } from './user-profile-passkey-row.view';
 import { styles } from './user-profile-passkeys-section.styles';
+import type { UserProfilePasskey } from './user-profile-passkeys-section/user-profile-passkeys-section.types';
 
-export interface UserProfilePasskey {
-  id: string;
-  name: string;
-  createdAtLabel?: string;
-  lastUsedAtLabel?: string;
-}
+export type { UserProfilePasskey } from './user-profile-passkeys-section/user-profile-passkeys-section.types';
 
 export interface UserProfilePasskeysSectionViewProps {
   passkeys: UserProfilePasskey[];
   onAdd?: () => void;
+  isAdding?: boolean;
   addError?: string;
   onRename?: (id: string, name: string) => void | Promise<void>;
   onRemove?: (id: string) => void | Promise<void>;
@@ -28,6 +25,7 @@ export interface UserProfilePasskeysSectionViewProps {
 export function UserProfilePasskeysSectionView({
   passkeys,
   onAdd,
+  isAdding,
   addError,
   onRename,
   onRemove,
@@ -66,6 +64,8 @@ export function UserProfilePasskeysSectionView({
                 color='neutral'
                 size='sm'
                 variant='outline'
+                disabled={isAdding}
+                aria-busy={isAdding}
                 onClick={onAdd}
               >
                 <Icon
