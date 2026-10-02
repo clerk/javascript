@@ -3,6 +3,7 @@ import type {
   ApiKeyJSON,
   ClientJSON,
   EmailAddressJSON,
+  EnterpriseConnectionJSON,
   OAuthProvider,
   OrganizationMembershipJSON,
   OrganizationSuggestionJSON,
@@ -14,6 +15,7 @@ import type {
 import { http, HttpResponse, type JsonBodyType } from 'msw';
 import { setupWorker } from 'msw/browser';
 
+import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/enterprise';
 import {
   createVerificationState,
   type FakeVerificationSeed,
@@ -49,10 +51,13 @@ export interface FakeFapiState {
   apiKeys: ApiKeyJSON[];
   verification: FakeVerificationState;
   passwordUpdates: URLSearchParams[];
+  enterpriseConnections: EnterpriseConnectionJSON[];
+  enterpriseLinking: FakeEnterpriseLinking;
 }
 
-export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification'>> & {
+export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpriseLinking'>> & {
   verification?: FakeVerificationSeed;
+  enterpriseLinking?: Partial<FakeEnterpriseLinking>;
 };
 
 const unhandled: string[] = [];
@@ -181,7 +186,7 @@ export function verifyEmailOutOfBand(state: FakeFapiState, id: string) {
 }
 
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
-  const { verification, ...rest } = seed;
+  const { verification, enterpriseLinking, ...rest } = seed;
   const state: FakeFapiState = {
     environment: fapiEnvironment(),
     client: fapiClient(),
@@ -190,13 +195,22 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     suggestions: [],
     apiKeys: [],
     passwordUpdates: [],
+    enterpriseConnections: [],
     ...rest,
     verification: createVerificationState(verification),
+    enterpriseLinking: {
+      enabled: false,
+      preparations: {},
+      verifiedLinks: [],
+      pendingExternalAccounts: [],
+      ...enterpriseLinking,
+    },
   };
   let identifications = 0;
 
   worker.use(
     ...verificationHandlers(state, fapiUrl),
+    ...enterpriseHandlers(state, fapiUrl),
     http.get(fapiUrl('/v1/environment'), () => HttpResponse.json(state.environment)),
     http.get(fapiUrl('/v1/client'), () => envelope(state.client, null)),
     http.get(fapiUrl('/v1/me'), () => {

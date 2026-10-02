@@ -65,4 +65,11 @@ describe('connected account error messages', () => {
       messages.errors.generic,
     );
   });
+
+  it('preserves an empty API message and its cause', () => {
+    const cause = apiError([{ code: 'unknown', message: '', long_message: '' }]);
+    const feedback = connectedAccountFeedback(cause, messages, errorText);
+    expect(feedback.message).toBe('');
+    expect(feedback.cause).toBe(cause);
+  });
 });

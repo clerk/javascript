@@ -1,9 +1,13 @@
+import { Panel } from '@clerk/mosaic/components/panel';
+import { resolveAPIKeysTableMessages } from '@clerk/mosaic/features/api-keys/api-keys-table.messages';
 import type {
-  UserProfileAPIKeySort,
-  UserProfileApiKeysPanelViewProps,
-} from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.types';
-import { useUserProfileCreateAPIKeyController } from '@clerk/mosaic/features/user-profile/user-profile-create-api-key.controller';
-import { useLocale } from '@clerk/mosaic/localization';
+  APIKeysTableSort,
+  APIKeysTableSubjectKind,
+  APIKeysTableViewProps,
+} from '@clerk/mosaic/features/api-keys/api-keys-table.types';
+import { APIKeysTableView } from '@clerk/mosaic/features/api-keys/api-keys-table.view';
+import { useCreateAPIKeyController } from '@clerk/mosaic/features/api-keys/create-api-key.controller';
+import { useLocale, useMessages } from '@clerk/mosaic/localization';
 import { useEffect, useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
@@ -40,7 +44,7 @@ export const exampleAPIKeys: FixtureAPIKey[] = [
   lastUsedAt: index % 3 === 0 ? exampleTime - (index + 2) * 60_000 : null,
 }));
 
-function sortAPIKeys(items: FixtureAPIKey[], sort: UserProfileAPIKeySort | null) {
+function sortAPIKeys(items: FixtureAPIKey[], sort: APIKeysTableSort | null) {
   if (!sort) {
     return items;
   }
@@ -71,14 +75,17 @@ async function revokeExampleAPIKey() {
   await new Promise<void>(resolve => setTimeout(resolve, 600));
 }
 
-export function useUserProfileAPIKeysFixture({
+export function useAPIKeysTableFixture({
   initialKeys = exampleAPIKeys,
   enableSorting = false,
+  subjectKind = 'user',
 }: {
   initialKeys?: FixtureAPIKey[];
   enableSorting?: boolean;
-} = {}): UserProfileApiKeysPanelViewProps {
+  subjectKind?: APIKeysTableSubjectKind;
+} = {}): APIKeysTableViewProps {
   const locale = useLocale();
+  const messages = resolveAPIKeysTableMessages(useMessages('apiKeysTable'), subjectKind);
   const seed = useChaosFixture(initialKeys, items =>
     chaosRows(items).map(key => ({ ...key, name: chaosText(key.name) })),
   );
@@ -86,7 +93,7 @@ export function useUserProfileAPIKeysFixture({
   const [searchValue, setSearchValue] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [sort, setSort] = useState<UserProfileAPIKeySort | null>(null);
+  const [sort, setSort] = useState<APIKeysTableSort | null>(null);
   const [pageSize, setPageSize] = useState(10);
   const dateLabel = (date: Date | number) =>
     new Intl.DateTimeFormat(locale, {
@@ -97,7 +104,8 @@ export function useUserProfileAPIKeysFixture({
     }).format(date);
   const relativeTime = new Intl.RelativeTimeFormat(locale);
 
-  const create = useUserProfileCreateAPIKeyController({
+  const create = useCreateAPIKeyController({
+    messages,
     onCreate: async ({ name, expiresAt }) => {
       const result = await createExampleAPIKey();
       setItems(current => [
@@ -136,6 +144,7 @@ export function useUserProfileAPIKeysFixture({
   }, [page, pageCount]);
 
   return {
+    messages,
     apiKeys: sorted.slice((page - 1) * pageSize, page * pageSize).map(item => ({
       id: item.id,
       name: item.name,
@@ -168,4 +177,13 @@ export function useUserProfileAPIKeysFixture({
       setItems(current => current.filter(item => item.id !== id));
     },
   };
+}
+
+export function APIKeysPanelExample(props: APIKeysTableViewProps) {
+  return (
+    <Panel.Root>
+      <Panel.Title>API Keys</Panel.Title>
+      <APIKeysTableView {...props} />
+    </Panel.Root>
+  );
 }

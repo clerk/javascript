@@ -1,6 +1,5 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
-import { UserProfileApiKeysPanelView } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,
@@ -15,11 +14,14 @@ import type {
 import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
 import { useRef, useState } from 'react';
 
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
+
+import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { usePreviewImage } from './use-preview-image';
 import { useUserProfileActiveDevicesFixture } from './user-profile-active-devices';
 import { createUserProfileAddEmailFixture } from './user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
-import { useUserProfileAPIKeysFixture } from './user-profile-api-keys';
 import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';
@@ -38,6 +40,26 @@ export interface UserProfileFixtureOptions {
   onAddEmail?: () => void;
 }
 
+const exampleEmails: UserProfileEmail[] = [
+  { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
+  { id: 'email_2', value: 'preston.booth@gmail.com', isVerified: true },
+];
+
+const examplePhones: UserProfilePhone[] = [
+  { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
+];
+
+const exampleSubscription: UserProfileSubscription = {
+  planName: 'Basic Plan',
+  priceLabel: '$12 / Month',
+  totalDueLabel: '$12.00',
+  renewsAtLabel: 'Renews Aug 26',
+};
+
+const examplePaymentMethods: UserProfilePaymentMethod[] = [
+  { id: 'visa', label: 'Visa •••• 0644', expiryLabel: 'Expires 02/2029', isDefault: true },
+];
+
 /**
  * Every page of the user profile, backed by local state so the actions on them do something. For
  * stories that need a realistic profile surface without being about it.
@@ -51,27 +73,38 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
   const editPassword = useUserProfileEditPasswordFixture();
   const mfa = useUserProfileMfaExample();
   const [activePage, setActivePage] = useState<UserProfileViewProps['activePage']>('account');
-  const [emails, setEmails] = useState<UserProfileEmail[]>([
-    { id: 'email_1', value: 'preston@clerk.dev', isDefault: true, isVerified: true },
-    { id: 'email_2', value: 'preston.booth@gmail.com', isDefault: false, isVerified: true },
-  ]);
-  const [phones, setPhones] = useState<UserProfilePhone[]>([
-    { id: 'phone_1', value: '+1 801-888-8181', isDefault: true, isVerified: true },
-  ]);
+  const seedEmails = useChaosFixture(exampleEmails, items =>
+    chaosRows(items, 8).map((email, index) => ({ ...email, value: chaosEmail(index), isDefault: index === 0 })),
+  );
+  const seedPhones = useChaosFixture(examplePhones, items =>
+    chaosRows(items, 6).map((phone, index) => ({
+      ...phone,
+      value: `${phone.value} ext. 1234567890`,
+      isDefault: index === 0,
+    })),
+  );
+  const [emails, setEmails] = useState(seedEmails);
+  const [phones, setPhones] = useState(seedPhones);
   const passkeys = usePasskeysFixture();
   const activeDevices = useUserProfileActiveDevicesFixture();
 
-  const [subscription, setSubscription] = useState<UserProfileSubscription>({
-    planName: 'Basic Plan',
-    priceLabel: '$12 / Month',
-    totalDueLabel: '$12.00',
-    renewsAtLabel: 'Renews Aug 26',
-  });
-  const [paymentMethods, setPaymentMethods] = useState<UserProfilePaymentMethod[]>([
-    { id: 'visa', label: 'Visa •••• 0644', expiryLabel: 'Expires 02/2029', isDefault: true },
-  ]);
+  const seedSubscription = useChaosFixture(exampleSubscription, subscription => ({
+    planName: chaosText(subscription.planName),
+    priceLabel: '$1,234,567.89 / Month',
+    totalDueLabel: '$1,234,567.89',
+    renewsAtLabel: chaosText(subscription.renewsAtLabel),
+  }));
+  const seedPaymentMethods = useChaosFixture(examplePaymentMethods, items =>
+    chaosRows(items, 8).map((method, index) => ({
+      ...method,
+      label: chaosText(method.label),
+      isDefault: index === 0,
+    })),
+  );
+  const [subscription, setSubscription] = useState<UserProfileSubscription>(seedSubscription);
+  const [paymentMethods, setPaymentMethods] = useState<UserProfilePaymentMethod[]>(seedPaymentMethods);
   const [historyPageSize, setHistoryPageSize] = useState(10);
-  const apiKeys = useUserProfileAPIKeysFixture();
+  const apiKeys = useAPIKeysTableFixture();
   const { imageUrl, showFile, clearImage } = usePreviewImage('https://avatars.githubusercontent.com/u/51144033?v=4');
   const addEmail = (value: string) =>
     setEmails(current => [...current, { id: `email_${Date.now()}`, value, isDefault: false, isVerified: false }]);
@@ -180,7 +213,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onBillingHistoryPageSizeChange: setHistoryPageSize,
       onViewInvoice: () => undefined,
     },
-    apiKeys: <UserProfileApiKeysPanelView {...apiKeys} />,
+    apiKeys: <APIKeysPanelExample {...apiKeys} />,
   };
 
   return { activePage, setActivePage, pages, addEmail, devices: activeDevices.devices };

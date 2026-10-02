@@ -1,6 +1,7 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 
 import type { LocalizableError, MosaicMessages } from '../../../localization';
+import { toLocalizableApiError } from '../../../localization';
 import { ConnectedAccountActionError } from './user-profile-connected-accounts-section.types';
 
 type Messages = MosaicMessages['userProfileConnectedAccounts'];
@@ -19,11 +20,7 @@ export function connectedAccountFeedback(
   if (isClerkAPIResponseError(error)) {
     const first = error.errors[0];
     if (first) {
-      message = errorText({
-        code: first.code,
-        paramName: first.meta?.paramName,
-        message: first.longMessage || first.message,
-      });
+      message = errorText(toLocalizableApiError(first));
     }
   }
   return new Error(message, { cause: error });

@@ -290,6 +290,24 @@ describe('UserProfileProfilePanelView', () => {
     );
   });
 
+  it('places enterprise accounts before Web3 wallets and the danger zone', () => {
+    renderView({
+      web3WalletsSlot: (
+        <UserProfileWeb3WalletsSectionView
+          wallets={[{ id: 'wallet_1', provider: 'MetaMask', address: '0x1234', isVerified: true }]}
+        />
+      ),
+      enterpriseAccountsSlot: <div data-testid='enterprise'>Enterprise accounts</div>,
+      deleteAccountSlot: <DeleteAccount />,
+    });
+
+    const wallets = screen.getByRole('group', { name: 'Web3 wallets' });
+    const enterprise = screen.getByTestId('enterprise');
+    const danger = screen.getByRole('heading', { name: 'Danger zone' });
+    expect(enterprise.compareDocumentPosition(wallets) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(enterprise.compareDocumentPosition(danger) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it('renders Web3 images inside icon frames', () => {
     const { container } = renderView({
       web3WalletsSlot: (

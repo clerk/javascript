@@ -1,3 +1,4 @@
+import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 import { useId, useRef } from 'react';
 
@@ -8,42 +9,44 @@ import type { DialogFocusTarget } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Flow, useFlowAutoFocus } from '../../components/flow';
+import type { UseFormResult } from '../../components/form';
 import { Input } from '../../components/input';
 import { InputGroup } from '../../components/input-group';
 import { Select } from '../../components/select';
 import { Text } from '../../components/text';
-import { fill, useMessages } from '../../localization';
+import { fill } from '../../localization';
 import { truncationStyles } from '../../styles/typography.styles';
+import type { APIKeysTableMessages } from './api-keys-table.types';
 
 const expirationValues = ['never', '1d', '7d', '30d', '60d', '90d', '180d', '1y'] as const;
 
-export interface OrganizationProfileCreateAPIKeyDialogProps {
+export type APIKeyExpiration = (typeof expirationValues)[number];
+
+export interface CreateAPIKeyValues {
+  name: string;
+  expiration: APIKeyExpiration | null;
+}
+
+export interface CreateAPIKeyDialogProps {
+  messages: APIKeysTableMessages;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   finalFocus?: DialogFocusTarget;
-  name: string;
-  onNameChange: (name: string) => void;
-  expiration: (typeof expirationValues)[number] | null;
+  form: UseFormResult<CreateAPIKeyValues>;
   expirationDateLabel: string | null;
-  onExpirationChange: (expiration: (typeof expirationValues)[number] | null) => void;
   secret: string | null;
-  isPending: boolean;
-  error: string | null;
-  onSubmit: () => void | Promise<void>;
+  copyError: string | null;
   onCopy: (close: boolean) => void | Promise<void>;
 }
 
-export function OrganizationProfileCreateAPIKeyDialog(props: OrganizationProfileCreateAPIKeyDialogProps) {
+export function CreateAPIKeyDialog(props: CreateAPIKeyDialogProps) {
   const nameInput = useRef<HTMLInputElement>(null);
 
   return (
     <Dialog.Root
+      role={props.secret ? 'alertdialog' : 'dialog'}
       open={props.open}
-      onOpenChange={open => {
-        if (!props.isPending) {
-          props.onOpenChange(open);
-        }
-      }}
+      onOpenChange={props.onOpenChange}
     >
       <Dialog.Popup
         initialFocus={props.secret ? undefined : nameInput}
@@ -77,9 +80,12 @@ export function OrganizationProfileCreateAPIKeyDialog(props: OrganizationProfile
   );
 }
 
-function CreateKeyStep(props: OrganizationProfileCreateAPIKeyDialogProps & { inputRef: Ref<HTMLInputElement> }) {
-  const m = useMessages('organizationProfileApiKeysPanel');
-  const formId = useId();
+function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInputElement> }) {
+  const m = props.messages;
+  const { form } = props;
+  const { ref, ...nameControl } = form.register('name');
+  const nameRef = useMergeRefs([ref, props.inputRef]);
+  const { expiration } = form.values;
 
   return (
     <>
@@ -90,66 +96,63 @@ function CreateKeyStep(props: OrganizationProfileCreateAPIKeyDialogProps & { inp
       <Card.Content
         render={
           <form
-            id={formId}
-            onSubmit={event => {
-              event.preventDefault();
-              if (!props.isPending && props.name.trim() && props.expiration !== null) {
-                void props.onSubmit();
-              }
-            }}
+            id={form.id}
+            onSubmit={form.handleSubmit}
           />
         }
       >
         <Field.Root
           required
-          disabled={props.isPending}
+          disabled={form.isSubmitting}
         >
           <Field.Label>{m.nameLabel}</Field.Label>
           <Input
-            ref={props.inputRef}
-            name='name'
+            ref={nameRef}
             autoComplete='off'
-            value={props.name}
-            onChange={event => props.onNameChange(event.target.value)}
+            {...nameControl}
           />
         </Field.Root>
         <Field.Root
           required
-          disabled={props.isPending}
+          disabled={form.isSubmitting}
         >
           <Field.Label>{m.expirationLabel}</Field.Label>
           <Select.Root
             items={expirationValues.map(value => ({ value, label: m.expirationOptions[value] }))}
-            value={props.expiration ?? undefined}
-            onValueChange={value => props.onExpirationChange(expirationValues.find(option => option === value) ?? null)}
+            value={expiration ?? undefined}
+            onValueChange={value =>
+              form.setValue('expiration', expirationValues.find(option => option === value) ?? null)
+            }
           >
             <Select.Trigger placeholder={m.expirationPlaceholder} />
             <Select.Popup />
           </Select.Root>
-          {props.expiration !== null ? (
-            <Field.Description>
-              {props.expirationDateLabel
-                ? fill(m.expirationCaption, { date: props.expirationDateLabel })
-                : m.noExpiration}
-            </Field.Description>
-          ) : null}
+          <Field.Message>
+            <Field.Hint>
+              {expiration === null
+                ? null
+                : props.expirationDateLabel
+                  ? fill(m.expirationCaption, { date: props.expirationDateLabel })
+                  : m.noExpiration}
+            </Field.Hint>
+          </Field.Message>
         </Field.Root>
 
-        {props.error ? (
+        {form.error ? (
           <Text
             role='alert'
             color='negative'
           >
-            {props.error}
+            {form.error}
           </Text>
         ) : null}
       </Card.Content>
       <Card.Footer>
         <SubmitButton
-          form={formId}
+          form={form.id}
           fullWidth
-          isPending={props.isPending}
-          disabled={!props.name.trim() || props.expiration === null}
+          isPending={form.isSubmitting}
+          disabled={!form.canSubmit}
         >
           {m.add}
         </SubmitButton>
@@ -158,8 +161,8 @@ function CreateKeyStep(props: OrganizationProfileCreateAPIKeyDialogProps & { inp
   );
 }
 
-function CopyKeyStep(props: OrganizationProfileCreateAPIKeyDialogProps) {
-  const m = useMessages('organizationProfileApiKeysPanel');
+function CopyKeyStep(props: CreateAPIKeyDialogProps) {
+  const m = props.messages;
   const formId = useId();
 
   return (
@@ -174,9 +177,7 @@ function CopyKeyStep(props: OrganizationProfileCreateAPIKeyDialogProps) {
             id={formId}
             onSubmit={event => {
               event.preventDefault();
-              if (!props.isPending) {
-                void props.onCopy(true);
-              }
+              void props.onCopy(true);
             }}
           />
         }
@@ -195,19 +196,18 @@ function CopyKeyStep(props: OrganizationProfileCreateAPIKeyDialogProps) {
                 value={props.secret ?? ''}
                 label={m.copy}
                 copiedLabel={m.copied}
-                disabled={props.isPending}
                 onCopy={() => props.onCopy(false)}
               />
             </InputGroup.End>
           </InputGroup.Root>
         </Field.Root>
 
-        {props.error ? (
+        {props.copyError ? (
           <Text
             role='alert'
             color='negative'
           >
-            {props.error}
+            {props.copyError}
           </Text>
         ) : null}
       </Card.Content>
@@ -215,7 +215,6 @@ function CopyKeyStep(props: OrganizationProfileCreateAPIKeyDialogProps) {
         <SubmitButton
           form={formId}
           fullWidth
-          isPending={props.isPending}
         >
           {m.copyAndClose}
         </SubmitButton>

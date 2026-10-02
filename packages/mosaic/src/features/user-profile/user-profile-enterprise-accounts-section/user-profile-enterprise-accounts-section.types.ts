@@ -9,3 +9,5 @@ export interface UserProfileEnterpriseAccount extends UserProfileEnterpriseConne
   emailAddress?: string;
   requiresAction?: boolean;
 }
+
+export type EnterpriseAccountActionResult = 'redirecting' | void;
