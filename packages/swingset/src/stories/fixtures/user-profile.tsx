@@ -17,11 +17,11 @@ import { useRef, useState } from 'react';
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosRows, chaosText } from '@/lib/chaos';
 
+import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { usePreviewImage } from './use-preview-image';
 import { useUserProfileActiveDevicesFixture } from './user-profile-active-devices';
 import { createUserProfileAddEmailFixture } from './user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './user-profile-add-phone';
-import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { useConnectedAccountsFixture } from './user-profile-connected-accounts';
 import { useUserProfileEditNameFixture } from './user-profile-edit-name';
 import { useUserProfileEditPasswordFixture } from './user-profile-edit-password';

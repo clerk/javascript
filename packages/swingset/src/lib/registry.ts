@@ -6,6 +6,13 @@ import {
   Inline as ActionBarInline,
   meta as actionBarMeta,
 } from '../stories/action-bar.stories';
+import {
+  Default as APIKeysTableDefault,
+  Empty as APIKeysTableEmpty,
+  meta as apiKeysTableMeta,
+  Organization as APIKeysTableOrganization,
+  ProposedTable as APIKeysTableProposedTable,
+} from '../stories/api-keys-table.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
@@ -318,13 +325,6 @@ import {
   meta as userProfileActiveDevicesSectionMeta,
   SignOutError as UserProfileActiveDevicesSectionSignOutError,
 } from '../stories/user-profile-active-devices-section.stories';
-import {
-  Default as APIKeysTableDefault,
-  Empty as APIKeysTableEmpty,
-  meta as apiKeysTableMeta,
-  Organization as APIKeysTableOrganization,
-  ProposedTable as APIKeysTableProposedTable,
-} from '../stories/api-keys-table.stories';
 import {
   Default as UserProfileBillingHistorySectionDefault,
   Empty as UserProfileBillingHistorySectionEmpty,

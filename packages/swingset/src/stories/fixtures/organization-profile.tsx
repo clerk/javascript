@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosName } from '@/lib/chaos';
 
+import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { useInvitationsTableFixture } from './invitations-table-tab';
 import { useMembersTableFixture } from './members-table-tab';
-import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { useInviteMembersFixture } from './organization-profile-invite-members';
 import { useRequestsTableFixture } from './requests-table-tab';
 import { usePreviewImage } from './use-preview-image';
