@@ -4,7 +4,7 @@ import type { SessionVerificationLevel } from '@clerk/shared/types';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { deferred, tick } from '../../../machines/__tests__/test-utils';
+import { deferred, tick } from '../../../__tests__/async';
 import type { ReverificationState } from '../reverification.types';
 import { useReverificationWithState } from '../use-reverification-with-state';
 

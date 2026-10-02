@@ -1,6 +1,10 @@
+import { Button } from '@clerk/mosaic/components/button';
 import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
+import { useUserProfileEditPasswordController } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-edit-password.controller';
+import { UserProfileEditPasswordDialog } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-edit-password.dialog';
 import type { UserProfileEditPasswordValue } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.types';
+import { useMessages } from '@clerk/mosaic/localization';
 import { useState } from 'react';
 
 export interface UserProfileEditPasswordFixtureOptions {
@@ -17,13 +21,12 @@ export function useUserProfileEditPasswordFixture({
   latency = 800,
   failWith,
 }: UserProfileEditPasswordFixtureOptions = {}) {
+  const m = useMessages('userProfilePasswordSection');
   const [hasPassword, setHasPassword] = useState(initialHasPassword);
   const [hasFailed, setHasFailed] = useState(false);
-
-  return {
-    hasPassword,
-    requiresCurrentPassword,
-    onSubmitPassword: async (_value: UserProfileEditPasswordValue) => {
+  const controller = useUserProfileEditPasswordController({
+    requiresCurrentPassword: hasPassword && requiresCurrentPassword,
+    onSubmit: async (_value: UserProfileEditPasswordValue) => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith && !hasFailed) {
         setHasFailed(true);
@@ -31,5 +34,27 @@ export function useUserProfileEditPasswordFixture({
       }
       setHasPassword(true);
     },
+  });
+
+  return {
+    hasPassword,
+    action: (
+      <UserProfileEditPasswordDialog
+        form={controller.form}
+        hasPassword={hasPassword}
+        open={controller.isOpen}
+        onOpenChange={controller.onOpenChange}
+        requiresCurrentPassword={requiresCurrentPassword}
+        trigger={
+          <Button
+            color='neutral'
+            size='sm'
+            variant='outline'
+          >
+            {hasPassword ? m.change : m.set}
+          </Button>
+        }
+      />
+    ),
   };
 }

@@ -115,7 +115,7 @@ Problems:
 ### After
 
 ```ts
-import { createMachine } from '@/mosaic/machine/createMachine';
+import { createMachine } from '@/mosaic/machine/create-machine';
 import { assign } from '@/mosaic/machine/assign';
 
 type Context = { error: string | null };

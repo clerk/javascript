@@ -2,7 +2,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { OrganizationProfileSaveError } from '../organization-profile.types';
 import type { OrganizationProfileGeneralPanelViewProps } from '../organization-profile-general-panel.view';
 import { OrganizationProfileGeneralPanelView } from '../organization-profile-general-panel.view';

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../../components/button';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileEditUsernameDialogProps } from '../user-profile-account-section/user-profile-edit-username.dialog';
 import { UserProfileEditUsernameDialog } from '../user-profile-account-section/user-profile-edit-username.dialog';
 
