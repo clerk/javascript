@@ -79,6 +79,14 @@ export async function save<TField extends string = never>(
   }
 }
 
+/** Reads what any rejection says, keeping a failed save's code so the copy stays localizable. */
+export function toLocalizableError(cause: unknown): LocalizableError {
+  if (cause instanceof SaveError) {
+    return cause.formError.global ?? UNEXPECTED_ERROR;
+  }
+  return cause instanceof Error ? { message: cause.message } : UNEXPECTED_ERROR;
+}
+
 /** Reads what a rejected save left for the view. An unrecognized rejection is the generic error. */
 export function toFormError<TField extends string = string>(cause: unknown): FormError<TField> {
   if (cause instanceof SaveError) {

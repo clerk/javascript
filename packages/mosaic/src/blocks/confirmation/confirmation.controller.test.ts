@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../machine/create-actor';
+import { SaveError, UNEXPECTED_ERROR } from '../../utils/form-error';
 import { confirmationMachine, useConfirmationController } from './confirmation.controller';
 
 function start() {
@@ -46,21 +47,29 @@ describe('confirmationMachine', () => {
     actor.send({ type: 'CONFIRM', run: () => Promise.reject(new Error('Google is your only way to sign in.')) });
 
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('confirming'));
-    expect(actor.getSnapshot().context.error).toBe('Google is your only way to sign in.');
+    expect(actor.getSnapshot().context.error).toEqual({ message: 'Google is your only way to sign in.' });
   });
 
-  it('falls back to generic copy when the rejection is not an Error', async () => {
+  it('keeps the code a failed save was refused with, so the copy can be looked up', async () => {
+    const actor = start();
+    const formError = { global: { code: 'action_blocked', message: 'Raw server sentence.' } };
+    actor.send({ type: 'CONFIRM', run: () => Promise.reject(new SaveError(formError)) });
+
+    await vi.waitFor(() => expect(actor.getSnapshot().context.error).toEqual(formError.global));
+  });
+
+  it('falls back to the generic error when the rejection is not an Error', async () => {
     const actor = start();
     // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors -- a non-Error rejection is the case under test
     actor.send({ type: 'CONFIRM', run: () => Promise.reject('nope') });
 
-    await vi.waitFor(() => expect(actor.getSnapshot().context.error).toBe('Something went wrong. Please try again.'));
+    await vi.waitFor(() => expect(actor.getSnapshot().context.error).toEqual(UNEXPECTED_ERROR));
   });
 
   it('drops the error when cancelled, so the next open starts clean', async () => {
     const actor = start();
     actor.send({ type: 'CONFIRM', run: () => Promise.reject(new Error('nope')) });
-    await vi.waitFor(() => expect(actor.getSnapshot().context.error).toBe('nope'));
+    await vi.waitFor(() => expect(actor.getSnapshot().context.error).toEqual({ message: 'nope' }));
 
     actor.send({ type: 'CANCEL' });
 
@@ -94,5 +103,19 @@ describe('useConfirmationController', () => {
     await waitFor(() => expect(result.current.errorMessage).toBe('nope'));
     expect(result.current.isOpen).toBe(true);
     expect(result.current.isConfirming).toBe(false);
+  });
+
+  it('shows the copy for the code a refused save carries, not the raw server sentence', async () => {
+    const { result } = renderHook(() => useConfirmationController());
+    act(() => result.current.onOpenChange(true));
+
+    act(() =>
+      result.current.onConfirm(() =>
+        Promise.reject(new SaveError({ global: { code: 'action_blocked', message: 'Raw server sentence.' } })),
+      ),
+    );
+
+    await waitFor(() => expect(result.current.errorMessage).toMatch(/contact support/));
+    expect(result.current.errorMessage).not.toBe('Raw server sentence.');
   });
 });

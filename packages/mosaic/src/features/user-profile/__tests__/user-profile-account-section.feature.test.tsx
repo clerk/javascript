@@ -175,6 +175,21 @@ describe('the user profile phone numbers', () => {
     await waitFor(() => expect(listed()).toEqual([HOME_LABEL]));
   });
 
+  it('explains a refused removal in the instance’s own copy', async () => {
+    const { actor } = await renderSection(signedIn([HOME, WORK]));
+    const destroy = holdRequests('post', '/v1/me/phone_numbers/:id');
+
+    await manage(actor, WORK_LABEL, 'Remove phone number');
+    const dialog = await screen.findByRole('alertdialog', { name: 'Remove phone number?' });
+    await actor.click(within(dialog).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(destroy.requests).toHaveLength(1));
+    destroy.fail('action_blocked', 'Raw server sentence.');
+
+    expect(await within(dialog).findByText(/Please try again later or contact support/)).toBeInTheDocument();
+    expect(dialog).not.toHaveTextContent('Raw server sentence.');
+    expect(listed()).toEqual([HOME_LABEL, WORK_LABEL]);
+  });
+
   it('hides the row when the instance does not collect phone numbers', async () => {
     await renderSection(withPhoneAttribute({ enabled: false }));
 
