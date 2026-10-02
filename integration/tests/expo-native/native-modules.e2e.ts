@@ -2,7 +2,7 @@ import { expect } from 'e2e';
 
 import { test } from './fixtures.ts';
 
-test.describe('native modules', () => {
+test.describe('@clerk/expo native modules', () => {
   test.beforeEach(({ po }) => po.app.reset());
 
   test('useSignInWithGoogle surfaces the missing-credentials error', async ({ screen }) => {

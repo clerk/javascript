@@ -7,7 +7,7 @@ const internalPush = {
   ios: { root: 'Security', row: 'Security', detail: /^(Password|Passkeys|Two-step verification|Active devices)$/i },
 };
 
-test.describe('UserProfileView', () => {
+test.describe('@clerk/expo <UserProfileView />', () => {
   test.beforeEach(async ({ po, user }) => {
     await po.app.reset();
     await po.authView.open();
@@ -16,7 +16,7 @@ test.describe('UserProfileView', () => {
     await po.userProfile.open();
   });
 
-  test('embedded host back round trip', async ({ platform, po, screen }) => {
+  test('onHostBack closes the embedded profile from JS after native navigation', async ({ platform, po, screen }) => {
     const { root, row, detail } = internalPush[platform as keyof typeof internalPush];
     await expect(screen.getByText(root)).toBeVisible({ timeout: 20_000 });
     await po.userProfile.openRow(row);
@@ -28,7 +28,7 @@ test.describe('UserProfileView', () => {
     await po.app.signOut();
   });
 
-  test('renders a custom page', async ({ po, screen }) => {
+  test('a custom page renders React Native content inside the native profile', async ({ po, screen }) => {
     await po.userProfile.openRow('E2E Custom Page');
     await expect(screen.getByText('Rehosted RN body')).toBeVisible({ timeout: 15_000 });
     await po.userProfile.leaveCustomPage();
