@@ -1,4 +1,7 @@
-export const userProfileApiKeysPanelMessages = {
+import type { MosaicMessages } from '../../localization';
+import type { APIKeysTableMessages, APIKeysTableSubjectKind } from './api-keys-table.types';
+
+export const apiKeysTableMessages = {
   loading: 'Loading API keys',
   loadError: 'Could not load API keys',
   loadErrorDescription: 'Something went wrong. Please try again.',
@@ -6,7 +9,10 @@ export const userProfileApiKeysPanelMessages = {
   empty: 'No API keys found',
   emptyDescription: 'Your search for "{query}" did not return any results.',
   noKeys: 'No API Keys created',
-  noKeysDescription: 'API keys allow apps and scripts to access your account without signing in.',
+  noKeysDescription: {
+    user: 'API keys allow apps and scripts to access your account without signing in.',
+    organization: 'API keys allow apps and scripts to access your organization without signing in.',
+  },
   clearSearch: 'Clear search',
   pagination: 'API keys pages',
   pageSize: 'Results per page',
@@ -60,3 +66,11 @@ export const userProfileApiKeysPanelMessages = {
   manage: 'Manage {name}',
   revoke: 'Revoke key',
 } as const;
+
+export function resolveAPIKeysTableMessages(
+  catalog: MosaicMessages['apiKeysTable'],
+  subjectKind: APIKeysTableSubjectKind,
+  overrides?: Partial<APIKeysTableMessages>,
+): APIKeysTableMessages {
+  return { ...catalog, noKeysDescription: catalog.noKeysDescription[subjectKind], ...overrides };
+}

@@ -7,7 +7,7 @@ import { chaosName } from '@/lib/chaos';
 
 import { useInvitationsTableFixture } from './invitations-table-tab';
 import { useMembersTableFixture } from './members-table-tab';
-import { useOrganizationProfileAPIKeysFixture } from './organization-profile-api-keys';
+import { APIKeysPanelExample, useAPIKeysTableFixture } from './api-keys-table';
 import { useInviteMembersFixture } from './organization-profile-invite-members';
 import { useRequestsTableFixture } from './requests-table-tab';
 import { usePreviewImage } from './use-preview-image';
@@ -31,7 +31,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
   const [name, setName] = useState(organization.name);
   const [slug, setSlug] = useState(organization.slug);
   const { imageUrl, showFile, clearImage } = usePreviewImage();
-  const apiKeys = useOrganizationProfileAPIKeysFixture();
+  const apiKeys = useAPIKeysTableFixture({ subjectKind: 'organization' });
   const members = useMembersTableFixture();
   const invitations = useInvitationsTableFixture();
   const requests = useRequestsTableFixture();
@@ -65,7 +65,7 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
     members: { members, invitations, requests, onInvite, inviteDialog },
     security: {},
     billing: {},
-    apiKeys,
+    apiKeys: <APIKeysPanelExample {...apiKeys} />,
   };
 
   return { activePage, setActivePage, pages, general, name };

@@ -4,15 +4,13 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
+import { useMessages } from '../../../localization';
 import { MosaicProvider } from '../../../mosaic-provider';
-import type {
-  OrganizationProfileAPIKey,
-  OrganizationProfileApiKeysPanelViewProps,
-} from '../organization-profile-api-keys-panel.types';
-import { OrganizationProfileApiKeysPanelView } from '../organization-profile-api-keys-panel.view';
-import type { OrganizationProfileCreateAPIKeyDialogProps } from '../organization-profile-create-api-key.dialog';
+import { resolveAPIKeysTableMessages } from '../api-keys-table.messages';
+import type { APIKey, APIKeysTableViewProps } from '../api-keys-table.types';
+import { APIKeysTableView } from '../api-keys-table.view';
 
-const apiKeys: OrganizationProfileAPIKey[] = [
+const apiKeys: APIKey[] = [
   {
     id: 'primary',
     name: 'Primary API Key',
@@ -23,9 +21,19 @@ const apiKeys: OrganizationProfileAPIKey[] = [
   { id: 'legacy', name: 'Legacy API Key', createdAtLabel: 'Jul 1, 2024', expiresAtLabel: null, lastUsedAtLabel: null },
 ];
 
-function propsFor(
-  overrides: Partial<OrganizationProfileApiKeysPanelViewProps> = {},
-): OrganizationProfileApiKeysPanelViewProps {
+type ViewProps = Omit<APIKeysTableViewProps, 'messages'>;
+
+function View(props: ViewProps) {
+  const messages = resolveAPIKeysTableMessages(useMessages('apiKeysTable'), 'organization');
+  return (
+    <APIKeysTableView
+      {...props}
+      messages={messages}
+    />
+  );
+}
+
+function propsFor(overrides: Partial<ViewProps> = {}): ViewProps {
   return {
     apiKeys,
     totalCount: 2,
@@ -40,24 +48,23 @@ function propsFor(
   };
 }
 
-function renderView(overrides: Partial<OrganizationProfileApiKeysPanelViewProps> = {}) {
+function renderView(overrides: Partial<ViewProps> = {}) {
   const props = propsFor(overrides);
   return {
     props,
     ...render(
       <MosaicProvider>
-        <OrganizationProfileApiKeysPanelView {...props} />
+        <View {...props} />
       </MosaicProvider>,
     ),
   };
 }
 
-describe('OrganizationProfileApiKeysPanelView', () => {
+describe('APIKeysTableView', () => {
   it('renders supplied metadata and only offers actions when callbacks are provided', async () => {
     const user = userEvent.setup();
     const { props, rerender } = renderView();
     const table = screen.getByRole('table', { name: 'API Keys' });
-    expect(screen.getByRole('heading', { name: 'API Keys' })).toBeVisible();
     expect(within(table).getByRole('cell', { name: 'Jan 5, 2026' })).toBeVisible();
     expect(within(table).getByRole('cell', { name: 'Jul 1, 2024' })).toBeVisible();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
@@ -84,7 +91,7 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     await user.keyboard('{Escape}');
     rerender(
       <MosaicProvider>
-        <OrganizationProfileApiKeysPanelView
+        <View
           {...props}
           onCreate={undefined}
           onRevoke={undefined}
@@ -118,15 +125,15 @@ describe('OrganizationProfileApiKeysPanelView', () => {
       <MosaicProvider
         localization={{
           overrides: {
-            'organizationProfileApiKeysPanel.revokeTitle': 'Retirer {name} ?',
-            'organizationProfileApiKeysPanel.revokeFieldLabel': 'Saisissez « {name} » pour continuer',
-            'organizationProfileApiKeysPanel.cancel': 'Annuler',
-            'organizationProfileApiKeysPanel.pageSize': 'Résultats par page',
-            'organizationProfileApiKeysPanel.revokeError': 'Impossible de révoquer cette clé.',
+            'apiKeysTable.revokeTitle': 'Retirer {name} ?',
+            'apiKeysTable.revokeFieldLabel': 'Saisissez « {name} » pour continuer',
+            'apiKeysTable.cancel': 'Annuler',
+            'apiKeysTable.pageSize': 'Résultats par page',
+            'apiKeysTable.revokeError': 'Impossible de révoquer cette clé.',
           },
         }}
       >
-        <OrganizationProfileApiKeysPanelView {...propsFor({ onRevoke, onPageSizeChange: vi.fn() })} />
+        <View {...propsFor({ onRevoke, onPageSizeChange: vi.fn() })} />
       </MosaicProvider>,
     );
     expect(screen.getByRole('combobox', { name: 'Résultats par page 10' })).toBeVisible();
@@ -153,12 +160,12 @@ describe('OrganizationProfileApiKeysPanelView', () => {
       <MosaicProvider
         localization={{
           overrides: {
-            'organizationProfileApiKeysPanel.expires': 'Expiration: {expiresDate}',
-            'organizationProfileApiKeysPanel.search': 'Find a key',
+            'apiKeysTable.expires': 'Expiration: {expiresDate}',
+            'apiKeysTable.search': 'Find a key',
           },
         }}
       >
-        <OrganizationProfileApiKeysPanelView
+        <View
           {...propsFor({
             searchValue: 'unmatched',
             apiKeys: [{ ...apiKeys[0], id: 'ak_1234567890FKWO', expiresAtLabel: 'Jul 1, 2025' }],
@@ -182,7 +189,7 @@ describe('OrganizationProfileApiKeysPanelView', () => {
         const [items, setItems] = useState([apiKeys[0]]);
         return (
           <MosaicProvider>
-            <OrganizationProfileApiKeysPanelView
+            <View
               {...propsFor({ onCreate: hasCreate ? vi.fn() : undefined })}
               apiKeys={items}
               totalCount={items.length}
@@ -250,7 +257,7 @@ describe('OrganizationProfileApiKeysPanelView', () => {
       const [items, setItems] = useState(apiKeys);
       return (
         <MosaicProvider>
-          <OrganizationProfileApiKeysPanelView
+          <View
             {...propsFor({ onCreate: undefined })}
             apiKeys={items}
             totalCount={items.length}
@@ -307,7 +314,7 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     expect(screen.getByRole('checkbox', { name: 'Select all API keys' })).toBeChecked();
     rerender(
       <MosaicProvider>
-        <OrganizationProfileApiKeysPanelView
+        <View
           {...props}
           apiKeys={[apiKeys[1]]}
           totalCount={1}
@@ -318,7 +325,7 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     expect(onBulkAction).not.toHaveBeenCalled();
     rerender(
       <MosaicProvider>
-        <OrganizationProfileApiKeysPanelView
+        <View
           {...props}
           onBulkAction={undefined}
         />
@@ -329,7 +336,7 @@ describe('OrganizationProfileApiKeysPanelView', () => {
   });
   it('navigates actual pages and clears controlled search without changing page size', async () => {
     const user = userEvent.setup();
-    const items: OrganizationProfileAPIKey[] = Array.from({ length: 11 }, (_, index) => ({
+    const items: APIKey[] = Array.from({ length: 11 }, (_, index) => ({
       ...apiKeys[0],
       id: `key-${index}`,
       name: `Key ${index + 1}`,
@@ -340,7 +347,7 @@ describe('OrganizationProfileApiKeysPanelView', () => {
       const filtered = items.filter(item => item.name.includes(searchValue));
       return (
         <MosaicProvider>
-          <OrganizationProfileApiKeysPanelView
+          <View
             {...propsFor()}
             apiKeys={filtered.slice((page - 1) * 10, page * 10)}
             totalCount={filtered.length}
@@ -377,14 +384,14 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     const props = propsFor({ apiKeys: [], totalCount: 0, isLoading: true, onCreate: undefined, onRevoke: undefined });
     const view = render(
       <MosaicProvider>
-        <OrganizationProfileApiKeysPanelView {...props} />
+        <View {...props} />
       </MosaicProvider>,
     );
     expect(screen.getByRole('status')).toHaveTextContent('Loading API keys');
     expect(screen.queryByText('No API Keys created')).not.toBeInTheDocument();
     view.rerender(
       <MosaicProvider>
-        <OrganizationProfileApiKeysPanelView
+        <View
           {...props}
           apiKeys={apiKeys}
           totalCount={2}
@@ -400,7 +407,7 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     expect(screen.queryByRole('button', { name: 'Create API key' })).not.toBeInTheDocument();
     view.rerender(
       <MosaicProvider>
-        <OrganizationProfileApiKeysPanelView
+        <View
           {...props}
           isLoading={false}
         />
@@ -409,90 +416,23 @@ describe('OrganizationProfileApiKeysPanelView', () => {
     expect(screen.getByText('No API Keys created')).toBeVisible();
     expect(screen.getAllByRole('columnheader')).toHaveLength(3);
   });
-});
 
-function dialogPropsFor(
-  overrides: Partial<OrganizationProfileCreateAPIKeyDialogProps> = {},
-): OrganizationProfileCreateAPIKeyDialogProps {
-  return {
-    open: true,
-    onOpenChange: vi.fn(),
-    name: '',
-    onNameChange: vi.fn(),
-    expiration: null,
-    expirationDateLabel: null,
-    onExpirationChange: vi.fn(),
-    secret: null,
-    isPending: false,
-    error: null,
-    onSubmit: vi.fn(),
-    onCopy: vi.fn(),
-    ...overrides,
-  };
-}
-
-function dialogView(createDialog: OrganizationProfileCreateAPIKeyDialogProps) {
-  return (
-    <MosaicProvider>
-      <OrganizationProfileApiKeysPanelView {...propsFor({ createDialog })} />
-    </MosaicProvider>
-  );
-}
-
-describe('organization API key creation', () => {
-  it('focuses the name and requires a trimmed name and explicit expiration before submitting', async () => {
+  it('changes the page size and returns to the first page', async () => {
     const user = userEvent.setup();
-    const props = dialogPropsFor();
-    const view = render(dialogView(props));
-    const dialog = screen.getByRole('dialog', { name: 'Add new API key' });
-    const submit = within(dialog).getByRole('button', { name: 'Add API Key' });
-    await waitFor(() => expect(within(dialog).getByRole('textbox', { name: 'Secret key name' })).toHaveFocus());
-    expect(submit).toBeDisabled();
-    expect(within(dialog).queryByText('This key will never expire')).not.toBeInTheDocument();
-    await user.type(within(dialog).getByRole('textbox', { name: 'Secret key name' }), 'A');
-    expect(props.onNameChange).toHaveBeenCalledWith('A');
-    view.rerender(dialogView({ ...props, name: 'A' }));
-    await user.keyboard('{Enter}');
-    expect(props.onSubmit).not.toHaveBeenCalled();
-    await user.click(within(dialog).getByRole('combobox', { name: /^Expiration/ }));
-    expect(screen.getAllByRole('option').map(option => option.textContent)).toEqual([
-      'Never',
-      '1 Day',
-      '7 Days',
-      '30 Days',
-      '60 Days',
-      '90 Days',
-      '180 Days',
-      '1 Year',
-    ]);
-    await user.click(screen.getByRole('option', { name: 'Never' }));
-    expect(props.onExpirationChange).toHaveBeenCalledWith('never');
-    view.rerender(dialogView({ ...props, name: '   ', expiration: 'never' }));
-    expect(submit).toBeDisabled();
-    view.rerender(dialogView({ ...props, name: 'A', expiration: 'never' }));
-    expect(within(dialog).getByText('This key will never expire')).toBeVisible();
-    await user.click(submit);
-    expect(props.onSubmit).toHaveBeenCalledOnce();
+    const { props } = renderView({ page: 2, totalCount: 25, onPageSizeChange: vi.fn() });
+    await user.click(screen.getByRole('combobox', { name: /Results per page/ }));
+    await user.click(screen.getByRole('option', { name: '20' }));
+    expect(props.onPageSizeChange).toHaveBeenCalledWith(20);
+    expect(props.onPageChange).toHaveBeenCalledWith(1);
   });
 
-  it('holds the form while pending and displays errors without losing input before retry', async () => {
+  it('shows a load error with retry instead of the empty state', async () => {
     const user = userEvent.setup();
-    const props = dialogPropsFor({ name: 'Deploy', expiration: '7d', expirationDateLabel: 'Sep 28, 2026' });
-    const view = render(dialogView(props));
-    expect(screen.getByText('This key will expire on Sep 28, 2026')).toBeVisible();
-    await user.click(screen.getByRole('button', { name: 'Add API Key' }));
-    view.rerender(dialogView({ ...props, isPending: true }));
-    expect(screen.getByRole('textbox', { name: 'Secret key name' })).toBeDisabled();
-    expect(screen.getByRole('combobox', { name: /^Expiration/ })).toBeDisabled();
-    expect(screen.getByRole('button', { name: 'Add API Key' })).toHaveAttribute('aria-disabled', 'true');
-    await user.click(screen.getByRole('button', { name: 'Add API Key' }));
-    expect(props.onSubmit).toHaveBeenCalledOnce();
-    await user.keyboard('{Escape}');
-    expect(props.onOpenChange).not.toHaveBeenCalled();
-    view.rerender(dialogView({ ...props, error: 'Creation failed. Try again.' }));
-    expect(screen.getByRole('alert')).toHaveTextContent('Creation failed. Try again.');
-    expect(screen.getByRole('textbox', { name: 'Secret key name' })).toHaveValue('Deploy');
-    await user.click(screen.getByRole('button', { name: 'Add API Key' }));
-    expect(props.onSubmit).toHaveBeenCalledTimes(2);
+    const onRetry = vi.fn();
+    renderView({ apiKeys: [], totalCount: 0, isError: true, onRetry });
+    expect(screen.getByText('Could not load API keys')).toBeVisible();
+    expect(screen.queryByText('No API Keys created')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Try again' }));
+    expect(onRetry).toHaveBeenCalledOnce();
   });
 });

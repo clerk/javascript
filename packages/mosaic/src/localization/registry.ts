@@ -1,8 +1,8 @@
 import { formMessages } from '../components/form/form.messages';
+import { apiKeysTableMessages } from '../features/api-keys/api-keys-table.messages';
 import { invitationsTableTabMessages } from '../features/organization-profile/invitations-table-tab.messages';
 import { membersTableTabMessages } from '../features/organization-profile/members-table-tab.messages';
 import { organizationProfileMessages } from '../features/organization-profile/organization-profile.messages';
-import { organizationProfileApiKeysPanelMessages } from '../features/organization-profile/organization-profile-api-keys-panel.messages';
 import { organizationProfileDangerSectionMessages } from '../features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.messages';
 import { organizationProfileInviteMembersMessages } from '../features/organization-profile/organization-profile-invite-members.messages';
 import { organizationProfileWorkspaceSectionMessages } from '../features/organization-profile/organization-profile-workspace-section/organization-profile-workspace-section.messages';
@@ -18,7 +18,6 @@ import { userProfileVerifyEmailSsoMessages } from '../features/user-profile/user
 import { userProfileActiveDevicesMessages } from '../features/user-profile/user-profile-active-devices.messages';
 import { userProfileAddAuthenticatorMessages } from '../features/user-profile/user-profile-add-authenticator.messages';
 import { userProfileAddSmsMessages } from '../features/user-profile/user-profile-add-sms.messages';
-import { userProfileApiKeysPanelMessages } from '../features/user-profile/user-profile-api-keys-panel.messages';
 import { userProfileAuthenticatorSetupMessages } from '../features/user-profile/user-profile-authenticator-setup.messages';
 import { userProfileBackupCodesMessages } from '../features/user-profile/user-profile-backup-codes.messages';
 import { userProfileConnectedAccountsMessages } from '../features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.messages';
@@ -30,6 +29,7 @@ import { userProfileWeb3WalletsMessages } from '../features/user-profile/user-pr
 import { errorMessages } from './errors.messages';
 
 export const mosaicMessages = {
+  apiKeysTable: apiKeysTableMessages,
   errors: errorMessages,
   form: formMessages,
   membersTableTab: membersTableTabMessages,
@@ -38,9 +38,7 @@ export const mosaicMessages = {
   organizationProfile: organizationProfileMessages,
   organizationProfileDangerSection: organizationProfileDangerSectionMessages,
   organizationProfileWorkspaceSection: organizationProfileWorkspaceSectionMessages,
-  organizationProfileApiKeysPanel: organizationProfileApiKeysPanelMessages,
   organizationProfileInviteMembers: organizationProfileInviteMembersMessages,
-  userProfileApiKeysPanel: userProfileApiKeysPanelMessages,
   reverification: reverificationMessages,
   userButton: userButtonMessages,
   userProfile: userProfileMessages,

@@ -1,8 +1,8 @@
-import * as Stories from './organization-profile-api-keys-panel.stories';
+import * as Stories from './api-keys-table.stories';
 
-# OrganizationProfileApiKeysPanel
+# APIKeysTable
 
-A controlled organization API keys table with search, page navigation, and confirmation before revocation. The caller supplies the current page and owns data updates; the panel requires typing the key's exact name before revoking it.
+A table of the API keys that belong to a user or an organization, with search, page navigation, creation, and revocation confirmed by typing the key name. `APIKeysTable` takes the `subject` whose keys it lists, reads them from Clerk, and offers creation and revocation only when the signed-in user may manage them. The user and organization profile API keys panels render it under their own title. Pass `messages` to replace any of its strings.
 
 ## Example
 
@@ -18,7 +18,6 @@ A controlled organization API keys table with search, page navigation, and confi
     { name: 'Button', href: '/components/button', layer: 'Components' },
     { name: 'Text', href: '/components/text', layer: 'Components' },
     { name: 'Spinner', href: '/components/spinner', layer: 'Components' },
-    { name: 'Profile', href: '/components/profile', layer: 'Components' },
     { name: 'Dialog', href: '/components/dialog', layer: 'Components' },
     { name: 'Flow', href: '/components/flow', layer: 'Components' },
     { name: 'Card', href: '/components/card', layer: 'Components' },
@@ -30,6 +29,12 @@ A controlled organization API keys table with search, page navigation, and confi
 />
 
 ## Examples
+
+### Organization
+
+An organization subject explains organization keys in its empty state.
+
+<Story name='Organization' storyModule={Stories} />
 
 ### Empty
 

@@ -17,7 +17,6 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'user-profile-profile-panel': dynamic(() => import('../stories/user-profile-profile-panel.mdx')),
     'user-profile-security-panel': dynamic(() => import('../stories/user-profile-security-panel.mdx')),
     'user-profile-billing-panel': dynamic(() => import('../stories/user-profile-billing-panel.mdx')),
-    'user-profile-api-keys-panel': dynamic(() => import('../stories/user-profile-api-keys-panel.mdx')),
     'user-profile-account-section': dynamic(() => import('../stories/user-profile-account-section.mdx')),
     'user-profile-password-section': dynamic(() => import('../stories/user-profile-password-section.mdx')),
     'user-profile-passkeys-section': dynamic(() => import('../stories/user-profile-passkeys-section.mdx')),
@@ -47,7 +46,9 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
       () => import('../stories/organization-profile-workspace-section.mdx'),
     ),
     'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
-    'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),
+  },
+  'api-keys': {
+    'api-keys-table': dynamic(() => import('../stories/api-keys-table.mdx')),
   },
   reverification: {
     reverification: dynamic(() => import('../stories/reverification.mdx')),

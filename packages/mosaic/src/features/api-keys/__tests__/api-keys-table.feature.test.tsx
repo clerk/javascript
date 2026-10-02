@@ -16,7 +16,8 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfileApiKeysPanel } from '../user-profile-api-keys-panel';
+import type { APIKeysTableProps } from '../api-keys-table';
+import { APIKeysTable } from '../api-keys-table';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -46,9 +47,14 @@ function signedIn(apiKeys: ApiKeyJSON[] = [webApp, ciPipeline], overrides: FakeF
   };
 }
 
-async function renderPanel(seed: FakeFapiSeed = signedIn()) {
+async function renderTable(seed: FakeFapiSeed = signedIn(), props: Partial<APIKeysTableProps> = {}) {
   const fapi = serveFapi(seed);
-  const view = await renderWithClerk(<UserProfileApiKeysPanel />);
+  const view = await renderWithClerk(
+    <APIKeysTable
+      subject={alice.id}
+      {...props}
+    />,
+  );
   return { ...view, fapi, user: userEvent.setup() };
 }
 
@@ -75,10 +81,10 @@ async function openRevoke(user: User, name: string) {
   return dialog;
 }
 
-describe('UserProfileApiKeysPanel', () => {
+describe('APIKeysTable', () => {
   describe('listing keys', () => {
     it("shows the user's own keys, not the active organization's", async () => {
-      await renderPanel(
+      await renderTable(
         signedIn([webApp, ciPipeline, fapiApiKey({ id: 'ak_org', name: 'Org key', subject: acme.id })]),
       );
 
@@ -88,7 +94,7 @@ describe('UserProfileApiKeysPanel', () => {
     });
 
     it('describes when each key was created, last used, and expires', async () => {
-      await renderPanel();
+      await renderTable();
 
       await within(table()).findByText('Web app');
       expect(within(table()).getAllByRole('cell', { name: 'Jan 5, 2026' })).toHaveLength(2);
@@ -101,7 +107,7 @@ describe('UserProfileApiKeysPanel', () => {
     it('shows loading until the first page arrives', async () => {
       serveFapi(signedIn());
       const list = holdRequests('get', '/api_keys');
-      await renderWithClerk(<UserProfileApiKeysPanel />);
+      await renderWithClerk(<APIKeysTable subject={alice.id} />);
 
       expect(await screen.findByRole('status')).toHaveTextContent('Loading API keys');
       list.release();
@@ -110,9 +116,18 @@ describe('UserProfileApiKeysPanel', () => {
     });
 
     it('explains when the user has no keys', async () => {
-      await renderPanel(signedIn([]));
+      await renderTable(signedIn([]));
 
       expect(await screen.findByText('No API Keys created')).toBeVisible();
+      expect(
+        screen.getByText('API keys allow apps and scripts to access your account without signing in.'),
+      ).toBeVisible();
+    });
+
+    it('uses the messages it is given over its own', async () => {
+      await renderTable(signedIn([]), { messages: { noKeys: 'Nothing here yet' } });
+
+      expect(await screen.findByText('Nothing here yet')).toBeVisible();
     });
 
     it('explains a failed load instead of showing no keys, and loads again on retry', { timeout: 20_000 }, async () => {
@@ -125,7 +140,7 @@ describe('UserProfileApiKeysPanel', () => {
             : undefined,
         ),
       );
-      await renderWithClerk(<UserProfileApiKeysPanel />);
+      await renderWithClerk(<APIKeysTable subject={alice.id} />);
       const user = userEvent.setup();
 
       expect(await screen.findByText('Could not load API keys', undefined, { timeout: 15_000 })).toBeVisible();
@@ -139,7 +154,7 @@ describe('UserProfileApiKeysPanel', () => {
 
   describe('searching', () => {
     it('lists only matching keys and explains when nothing matches', async () => {
-      const { user } = await renderPanel();
+      const { user } = await renderTable();
       await within(table()).findByText('CI pipeline');
       const search = screen.getByRole('searchbox', { name: 'Search API keys' });
 
@@ -153,7 +168,7 @@ describe('UserProfileApiKeysPanel', () => {
     });
 
     it('returns to the first page for a new search', async () => {
-      const { user } = await renderPanel(signedIn(manyKeys));
+      const { user } = await renderTable(signedIn(manyKeys));
 
       await user.click(await screen.findByRole('button', { name: 'Next API keys page' }));
       expect(await within(table()).findByText('Key 11')).toBeVisible();
@@ -166,7 +181,7 @@ describe('UserProfileApiKeysPanel', () => {
 
   describe('paging', () => {
     it('moves between pages of keys', async () => {
-      const { user } = await renderPanel(signedIn(manyKeys));
+      const { user } = await renderTable(signedIn(manyKeys));
 
       expect(await within(table()).findByText('Key 1')).toBeVisible();
       expect(screen.getByText('1/2')).toBeVisible();
@@ -184,7 +199,7 @@ describe('UserProfileApiKeysPanel', () => {
 
   describe('creating a key', () => {
     it('creates a key for the user, shows its secret once, and lists it', async () => {
-      const { fapi, user } = await renderPanel();
+      const { fapi, user } = await renderTable();
       const dialog = await openCreate(user);
 
       await fillCreate(user, dialog, 'Deploy', '7 Days');
@@ -202,7 +217,7 @@ describe('UserProfileApiKeysPanel', () => {
     });
 
     it('shows the secret without waiting for the list to refresh', async () => {
-      const { fapi, user } = await renderPanel();
+      const { fapi, user } = await renderTable();
       const dialog = await openCreate(user);
       await fillCreate(user, dialog, 'Deploy', 'Never');
       const refresh = holdRequests('get', '/api_keys');
@@ -218,7 +233,7 @@ describe('UserProfileApiKeysPanel', () => {
 
     it('copies the secret without closing the dialog', async () => {
       await navigator.clipboard.writeText('');
-      const { fapi, user } = await renderPanel();
+      const { fapi, user } = await renderTable();
       const dialog = await openCreate(user);
       await fillCreate(user, dialog, 'Deploy', 'Never');
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
@@ -230,7 +245,7 @@ describe('UserProfileApiKeysPanel', () => {
     });
 
     it('keeps the secret open on an outside click but closes it on Escape', async () => {
-      const { user } = await renderPanel();
+      const { user } = await renderTable();
       const dialog = await openCreate(user);
       await fillCreate(user, dialog, 'Deploy', 'Never');
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
@@ -249,7 +264,7 @@ describe('UserProfileApiKeysPanel', () => {
     });
 
     it('explains a failed copy', async () => {
-      const { user } = await renderPanel();
+      const { user } = await renderTable();
       const dialog = await openCreate(user);
       await fillCreate(user, dialog, 'Deploy', 'Never');
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
@@ -262,8 +277,34 @@ describe('UserProfileApiKeysPanel', () => {
       expect(dialog).toBeVisible();
     });
 
+    it('focuses the name and requires an expiration', async () => {
+      const { user } = await renderTable();
+      const dialog = await openCreate(user);
+      const name = within(dialog).getByRole('textbox', { name: 'Secret key name' });
+      const add = within(dialog).getByRole('button', { name: 'Add API Key' });
+
+      await waitFor(() => expect(name).toHaveFocus());
+      await user.type(name, 'Deploy');
+      expect(add).toBeDisabled();
+
+      await user.click(within(dialog).getByRole('combobox', { name: /^Expiration/ }));
+      expect(screen.getAllByRole('option').map(option => option.textContent)).toEqual([
+        'Never',
+        '1 Day',
+        '7 Days',
+        '30 Days',
+        '60 Days',
+        '90 Days',
+        '180 Days',
+        '1 Year',
+      ]);
+      await user.click(screen.getByRole('option', { name: 'Never' }));
+      expect(within(dialog).getByText('This key will never expire')).toBeVisible();
+      expect(add).toBeEnabled();
+    });
+
     it('requires a name longer than two characters', async () => {
-      const { user } = await renderPanel();
+      const { user } = await renderTable();
       const dialog = await openCreate(user);
       const add = within(dialog).getByRole('button', { name: 'Add API Key' });
 
@@ -275,7 +316,7 @@ describe('UserProfileApiKeysPanel', () => {
     });
 
     it('holds the form while the key is created', async () => {
-      const { user } = await renderPanel();
+      const { user } = await renderTable();
       const dialog = await openCreate(user);
       await fillCreate(user, dialog, 'Deploy', 'Never');
       const create = holdRequests('post', '/api_keys');
@@ -289,7 +330,7 @@ describe('UserProfileApiKeysPanel', () => {
     });
 
     it('explains a name that is already taken and keeps the form', async () => {
-      const { user } = await renderPanel();
+      const { user } = await renderTable();
       const dialog = await openCreate(user);
 
       await fillCreate(user, dialog, 'Web app', 'Never');
@@ -300,7 +341,7 @@ describe('UserProfileApiKeysPanel', () => {
     });
 
     it('explains when the usage limit is reached', async () => {
-      const { user } = await renderPanel();
+      const { user } = await renderTable();
       const dialog = await openCreate(user);
       await fillCreate(user, dialog, 'Deploy', 'Never');
       const create = holdRequests('post', '/api_keys');
@@ -318,7 +359,7 @@ describe('UserProfileApiKeysPanel', () => {
 
   describe('revoking a key', () => {
     it('revokes the key once its name is typed and removes it from the list', async () => {
-      const { fapi, user } = await renderPanel();
+      const { fapi, user } = await renderTable();
       const dialog = await openRevoke(user, 'Web app');
 
       await user.click(within(dialog).getByRole('button', { name: 'Revoke key' }));
@@ -330,7 +371,7 @@ describe('UserProfileApiKeysPanel', () => {
     });
 
     it('explains a failed revoke and keeps the dialog open', async () => {
-      const { user } = await renderPanel();
+      const { user } = await renderTable();
       const dialog = await openRevoke(user, 'Web app');
       const revoke = holdRequests('post', `/api_keys/${webApp.id}/revoke`);
 
@@ -344,7 +385,7 @@ describe('UserProfileApiKeysPanel', () => {
     });
 
     it('returns to the previous page when the last key on a page is revoked', async () => {
-      const { user } = await renderPanel(signedIn(manyKeys));
+      const { user } = await renderTable(signedIn(manyKeys));
       await user.click(await screen.findByRole('button', { name: 'Next API keys page' }));
       const dialog = await openRevoke(user, 'Key 11');
 
@@ -352,6 +393,78 @@ describe('UserProfileApiKeysPanel', () => {
 
       expect(await within(table()).findByText('Key 1')).toBeVisible();
       await waitFor(() => expect(screen.queryByRole('button', { name: 'Next API keys page' })).toBeNull());
+    });
+  });
+
+  describe('for an organization', () => {
+    const readKeys = 'org:sys_api_keys:read';
+    const manageKeys = 'org:sys_api_keys:manage';
+    const orgKey = fapiApiKey({
+      id: 'ak_org',
+      name: 'Org key',
+      subject: acme.id,
+      created_at: Date.UTC(2026, 0, 5, 12),
+    });
+
+    function memberOfAcme(permissions: string[], apiKeys: ApiKeyJSON[] = [orgKey, webApp]): FakeFapiSeed {
+      const member = fapiUser({ ...alice, organization_memberships: [fapiMembership(acme, { permissions })] });
+      return signedIn(apiKeys, {
+        client: fapiClient([fapiSession({ id: 'sess_1', user: member, last_active_organization_id: acme.id })]),
+      });
+    }
+
+    it("lists the organization's keys and lets a manager create one for it", async () => {
+      const { fapi, user } = await renderTable(memberOfAcme([readKeys, manageKeys]), { subject: acme.id });
+
+      expect(await within(table()).findByText('Org key')).toBeVisible();
+      expect(within(table()).queryByText('Web app')).toBeNull();
+
+      const dialog = await openCreate(user);
+      await fillCreate(user, dialog, 'Deploy', 'Never');
+      await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
+      await within(dialog).findByRole('textbox', { name: 'API key' });
+      expect(fapi.apiKeys[0]).toMatchObject({ name: 'Deploy', subject: acme.id });
+    });
+
+    it('is read-only without permission to manage keys', async () => {
+      await renderTable(memberOfAcme([readKeys]), { subject: acme.id });
+
+      expect(await within(table()).findByText('Org key')).toBeVisible();
+      expect(screen.queryByRole('button', { name: 'Create API key' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Manage Org key' })).toBeNull();
+    });
+
+    it('lists nothing without permission to read keys', async () => {
+      await renderTable(memberOfAcme([]), { subject: acme.id });
+
+      expect(await screen.findByText('No API Keys created')).toBeVisible();
+      expect(within(table()).queryByText('Org key')).toBeNull();
+    });
+
+    it('starts over on the first page with no search when the subject changes', async () => {
+      const orgKeys = Array.from({ length: 11 }, (_, index) =>
+        fapiApiKey({ id: `ak_org_${index + 1}`, name: `Org key ${index + 1}`, subject: acme.id }),
+      );
+      const { user, rerender } = await renderTable(memberOfAcme([readKeys], [...orgKeys, ...manyKeys]), {
+        subject: acme.id,
+      });
+      await user.click(await screen.findByRole('button', { name: 'Next API keys page' }));
+      expect(await within(table()).findByText('Org key 11')).toBeVisible();
+      await user.type(screen.getByRole('searchbox', { name: 'Search API keys' }), 'Org');
+
+      rerender(<APIKeysTable subject={alice.id} />);
+
+      expect(await within(table()).findByText('Key 1')).toBeVisible();
+      expect(screen.getByRole('searchbox', { name: 'Search API keys' })).toHaveValue('');
+      expect(screen.getByText('1/2')).toBeVisible();
+    });
+
+    it('explains what organization keys are for', async () => {
+      await renderTable(memberOfAcme([readKeys], []), { subject: acme.id });
+
+      expect(
+        await screen.findByText('API keys allow apps and scripts to access your organization without signing in.'),
+      ).toBeVisible();
     });
   });
 });
