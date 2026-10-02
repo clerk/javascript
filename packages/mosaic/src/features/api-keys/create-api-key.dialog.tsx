@@ -127,13 +127,15 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
             <Select.Trigger placeholder={m.expirationPlaceholder} />
             <Select.Popup />
           </Select.Root>
-          {expiration !== null ? (
-            <Field.Description>
-              {props.expirationDateLabel
-                ? fill(m.expirationCaption, { date: props.expirationDateLabel })
-                : m.noExpiration}
-            </Field.Description>
-          ) : null}
+          <Field.Message>
+            <Field.Hint>
+              {expiration === null
+                ? null
+                : props.expirationDateLabel
+                  ? fill(m.expirationCaption, { date: props.expirationDateLabel })
+                  : m.noExpiration}
+            </Field.Hint>
+          </Field.Message>
         </Field.Root>
 
         {form.error ? (

@@ -299,7 +299,7 @@ describe('APIKeysTable', () => {
         '1 Year',
       ]);
       await user.click(screen.getByRole('option', { name: 'Never' }));
-      expect(within(dialog).getByText('This key will never expire')).toBeVisible();
+      await waitFor(() => expect(within(dialog).getByText('This key will never expire')).toBeVisible());
       expect(add).toBeEnabled();
     });
 
