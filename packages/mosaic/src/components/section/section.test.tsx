@@ -252,7 +252,7 @@ describe('Section', () => {
     expect(bodyRef.current).toHaveClass('cl-section-body', ...atoms(overrides.body));
     expect(itemRef.current).toHaveClass('cl-section-item', ...atoms(overrides.item));
     expect(contentRef.current).toHaveClass('cl-section-content');
-    expect(screen.getByText('Name')).toHaveClass('cl-section-label', ...atoms(overrides.label));
+    expect(screen.getByText('Name').closest('.cl-section-label')).toHaveClass(...atoms(overrides.label));
     expect(actionsRef.current).toHaveClass('cl-section-actions');
   });
 
@@ -263,7 +263,7 @@ describe('Section', () => {
       </Section.Body>,
     );
 
-    expect(screen.getByText('Name').parentElement).toHaveClass('cl-section-body', 'cl-section-row');
+    expect(screen.getByText('Name').closest('.cl-section-body')).toHaveClass('cl-section-row');
   });
 
   it('renders a row-level error as a sibling of the item, with the alert glyph', () => {

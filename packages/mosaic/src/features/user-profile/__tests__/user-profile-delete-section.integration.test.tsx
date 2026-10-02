@@ -76,7 +76,7 @@ describe('UserProfileDeleteSection', () => {
     renderSection();
 
     expect(screen.getByRole('heading', { name: 'Danger zone' })).toBeInTheDocument();
-    expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
+    expect(screen.getByText('Delete account', { selector: '.cl-section-label > *' })).toBeInTheDocument();
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
     );

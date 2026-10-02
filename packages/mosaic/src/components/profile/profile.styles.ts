@@ -265,6 +265,10 @@ export const styles = stylex.create({
     flexShrink: 0,
   },
 
+  navItemLabel: {
+    minWidth: 0,
+  },
+
   navItemBadge: {
     alignItems: 'center',
     display: 'inline-flex',
