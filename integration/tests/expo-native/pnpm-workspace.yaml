@@ -1,0 +1,11 @@
+packages:
+  - '.'
+
+ignoredBuiltDependencies:
+  - esbuild
+
+minimumReleaseAge: 2880
+minimumReleaseAgeExclude:
+  - '@e2e-dev/mobile'
+  - agent-device
+  - e2e

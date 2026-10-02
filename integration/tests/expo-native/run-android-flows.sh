@@ -9,10 +9,10 @@ command -v adb >/dev/null 2>&1 || {
   exit 1
 }
 
-shards=${MAESTRO_SHARDS:-1}
+shards=${E2E_SHARDS:-1}
 devices=(emulator-5554)
 sdk=$(dirname "$(dirname "$(command -v adb)")")
-debug=${MAESTRO_DEBUG_OUTPUT:-${TMPDIR:-/tmp}/clerk-expo-maestro-runner}
+debug=${E2E_DEVICE_LOGS:-${TMPDIR:-/tmp}/clerk-expo-native-e2e}
 mkdir -p "$debug"
 
 for ((i = 1; i < shards; i++)); do
@@ -58,4 +58,4 @@ for device in "${devices[@]}"; do
   logcat_pids+=($!)
 done
 
-PLATFORM=android MAESTRO_UDID=$(IFS=,; echo "${devices[*]}") ./run-flows.sh
+PLATFORM=android CLERK_TEST_DEVICES=$(IFS=,; echo "${devices[*]}") ./run-flows.sh

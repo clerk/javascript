@@ -27,10 +27,8 @@ env:
   SDK_PACK_DIR: /tmp/clerk-expo-pack
   E2E_INSTANCE_NAME: clerkstage-with-native-components
   BAPI_URL: https://api.clerkstage.dev
-  MAESTRO_VERSION: '2.10.0'
-  MAESTRO_CLI_NO_ANALYTICS: '1'
-  MAESTRO_SHARDS: '2'
-  MAESTRO_DRIVER_STARTUP_TIMEOUT: '180000'
+  E2E_SHARDS: '2'
+  E2E_TELEMETRY_DISABLED: '1'
 
 jobs:
   native-build:
@@ -106,9 +104,9 @@ jobs:
           # Bump the version when native build commands change.
           key: expo-native-build-v1-${{ runner.os }}-${{ matrix.expo-sdk }}-${{ matrix.platform }}-${{ matrix.run-e2e == true && 'e2e' || 'build' }}-${{ env.E2E_INSTANCE_NAME }}-${{ steps.native-build-key.outputs.hash }}
 
-      - if: steps.native-build-cache.outputs.cache-hit != 'true'
+      - if: steps.native-build-cache.outputs.cache-hit != 'true' || matrix.run-e2e == true
         uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
-      - if: steps.native-build-cache.outputs.cache-hit != 'true'
+      - if: steps.native-build-cache.outputs.cache-hit != 'true' || matrix.run-e2e == true
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24.15.0
@@ -140,7 +138,7 @@ jobs:
           GOOGLE_SIGNIN_TARBALL="$(ls "$SDK_PACK_DIR"/clerk-expo-google-signin-*.tgz)"
           pnpm add "$SDK_TARBALL" "$GOOGLE_SIGNIN_TARBALL" -w
           # expo-dev-client makes even release builds boot into the dev
-          # launcher (unreachable Metro in CI), which stalls every Maestro
+          # launcher (unreachable Metro in CI), which stalls every e2e
           # flow on a blank screen. Skip it on e2e jobs only.
           DEV_CLIENT="expo-dev-client"
           if [ "$RUN_E2E" = "true" ]; then DEV_CLIENT=""; fi
@@ -228,29 +226,19 @@ jobs:
 
       - name: Boot iOS simulators
         if: matrix.platform == 'ios' && matrix.run-e2e == true && steps.keys.outputs.pk != ''
-        run: ${{ env.E2E_DIR }}/boot-ios-simulators.sh boot "$MAESTRO_SHARDS"
+        run: ${{ env.E2E_DIR }}/boot-ios-simulators.sh boot "$E2E_SHARDS"
 
-      - name: Cache maestro CLI
+      - name: Install e2e runner
         if: steps.keys.outputs.pk != ''
+        working-directory: ${{ env.E2E_DIR }}
+        run: pnpm install --frozen-lockfile
+
+      - name: Cache iOS automation runner
+        if: matrix.platform == 'ios' && steps.keys.outputs.pk != ''
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
-          path: ~/.maestro
-          key: maestro-${{ runner.os }}-${{ env.MAESTRO_VERSION }}
-
-      - name: Install maestro CLI
-        if: steps.keys.outputs.pk != ''
-        run: |
-          if [ -x "$HOME/.maestro/bin/maestro" ]; then
-            echo "Using cached Maestro"
-          else
-            archive="$RUNNER_TEMP/maestro.zip"
-            curl -fLs --retry 3 --retry-delay 5 -o "$archive" \
-              "https://github.com/mobile-dev-inc/Maestro/releases/download/cli-$MAESTRO_VERSION/maestro.zip"
-            unzip -q "$archive" -d "$RUNNER_TEMP/maestro-dist"
-            mv "$RUNNER_TEMP/maestro-dist/maestro" "$HOME/.maestro"
-          fi
-          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
-          test "$("$HOME/.maestro/bin/maestro" --version)" = "$MAESTRO_VERSION"
+          path: ~/.agent-device
+          key: agent-device-${{ runner.os }}-${{ hashFiles(format('{0}/pnpm-lock.yaml', env.E2E_DIR)) }}
 
       # Provisioned as late as possible so live credentials exist for the
       # shortest window.
@@ -281,7 +269,7 @@ jobs:
             echo "user_id=$user_id"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Run iOS e2e (Maestro)
+      - name: Run iOS e2e
         id: run_e2e_ios
         if: matrix.platform == 'ios' && steps.user.outputs.user_id != ''
         working-directory: ${{ env.FIXTURE_DIR }}
@@ -290,18 +278,17 @@ jobs:
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
         run: |
           "$GITHUB_WORKSPACE/$E2E_DIR/boot-ios-simulators.sh" wait
-          mkdir -p "$RUNNER_TEMP/maestro-debug"
+          mkdir -p "$RUNNER_TEMP/e2e-device-logs"
           log_pids=()
           trap 'kill "${log_pids[@]}" 2>/dev/null || true; wait "${log_pids[@]}" 2>/dev/null || true' EXIT
-          for udid in ${MAESTRO_UDID//,/ }; do
+          for udid in ${CLERK_TEST_DEVICES//,/ }; do
             xcrun simctl install "$udid" ios/build/Build/Products/Release-iphonesimulator/ClerkExpoNativeBuildFixture.app
             xcrun simctl spawn "$udid" log stream --style compact \
               --predicate 'processImagePath CONTAINS "ClerkExpoNativeBuildFixture"' \
-              > "$RUNNER_TEMP/maestro-debug/$udid-console.log" 2>&1 &
+              > "$RUNNER_TEMP/e2e-device-logs/$udid-console.log" 2>&1 &
             log_pids+=($!)
           done
-          PLATFORM=ios MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" \
-            "$GITHUB_WORKSPACE/$E2E_DIR/run-flows.sh"
+          PLATFORM=ios "$GITHUB_WORKSPACE/$E2E_DIR/run-flows.sh"
 
       - name: Enable KVM
         if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
@@ -332,7 +319,7 @@ jobs:
           disable-animations: false
           script: echo "Generated AVD snapshot for caching."
 
-      - name: Run Android e2e (Maestro)
+      - name: Run Android e2e
         id: run_e2e_android
         if: matrix.platform == 'android' && steps.user.outputs.user_id != ''
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2
@@ -351,7 +338,7 @@ jobs:
           # scalar (>-) plus && keeps everything in one shell invocation.
           script: >-
             cd integration/tests/expo-native &&
-            MAESTRO_DEBUG_OUTPUT="$RUNNER_TEMP/maestro-debug" ./run-android-flows.sh
+            E2E_DEVICE_LOGS="$RUNNER_TEMP/e2e-device-logs" ./run-android-flows.sh
             "$GITHUB_WORKSPACE/$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk"
 
       # Runs before the artifact upload so the credentials are already dead
@@ -368,25 +355,28 @@ jobs:
       # Test reports record flow env (and typed input) in plaintext;
       # add-mask only covers step logs, not artifact contents. Must run whenever
       # the upload does, or a passing run uploads the password.
-      - name: Scrub test credentials from Maestro debug output
+      - name: Scrub test credentials from e2e output
         id: scrub
         if: always() && steps.user.outputs.user_id != ''
         env:
           CLERK_TEST_PASSWORD: ${{ steps.user.outputs.password }}
         run: |
-          [ -d "$RUNNER_TEMP/maestro-debug" ] || exit 0
           [ -n "$CLERK_TEST_PASSWORD" ] || exit 0
+          mkdir -p "$E2E_DIR/.e2e" "$RUNNER_TEMP/e2e-device-logs"
           # shellcheck disable=SC2016
-          find "$RUNNER_TEMP/maestro-debug" -type f \
-            \( -name '*.html' -o -name '*.json' -o -name '*.log' -o -name '*.txt' -o -name '*.xml' -o -name '*.yaml' \) \
+          find "$E2E_DIR/.e2e" "$RUNNER_TEMP/e2e-device-logs" -type f \
+            \( -name '*.json' -o -name '*.log' -o -name '*.md' -o -name '*.txt' -o -name '*.xml' \) \
             -exec perl -pi -e 's/\Q$ENV{CLERK_TEST_PASSWORD}\E/[REDACTED]/g' {} +
 
-      - name: Upload Maestro artifacts
+      - name: Upload e2e artifacts
         if: always() && steps.scrub.outcome == 'success'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: maestro-${{ matrix.platform }}
-          path: ${{ runner.temp }}/maestro-debug
+          name: e2e-${{ matrix.platform }}
+          include-hidden-files: true
+          path: |
+            ${{ env.E2E_DIR }}/.e2e
+            ${{ runner.temp }}/e2e-device-logs
           if-no-files-found: warn
           retention-days: 7
 
@@ -398,7 +388,7 @@ jobs:
         run: |
           outcome="$IOS_OUTCOME"
           [ "$outcome" = "skipped" ] && outcome="$ANDROID_OUTCOME"
-          echo "## Maestro e2e (${{ matrix.platform }}): $outcome" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Native e2e (${{ matrix.platform }}): $outcome" >> "$GITHUB_STEP_SUMMARY"
           if [ "$outcome" = "failure" ]; then
-            echo "::error::Maestro e2e failed. See the maestro-${{ matrix.platform }} artifact."
+            echo "::error::Native e2e failed. See the e2e-${{ matrix.platform }} artifact."
           fi
