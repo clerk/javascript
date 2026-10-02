@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { setup } from '../../machine/setup';
-import { useMachine } from '../../machine/useMachine';
+import { useMachine } from '../../machine/use-machine';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 import type { UserProfileActiveDevicesModel } from './user-profile-active-devices-section.model';
 

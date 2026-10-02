@@ -330,7 +330,10 @@ export class User extends BaseResource implements UserResource {
     });
   };
 
-  getSessions = async (): Promise<SessionWithActivities[]> => {
+  getSessions = async (params?: { __internal_fresh?: boolean }): Promise<SessionWithActivities[]> => {
+    if (params?.__internal_fresh) {
+      return SessionWithActivities.retrieve({ throwOnError: true });
+    }
     if (this.cachedSessionsWithActivities) {
       return this.cachedSessionsWithActivities;
     }

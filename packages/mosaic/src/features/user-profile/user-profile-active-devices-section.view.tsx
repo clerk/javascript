@@ -22,7 +22,7 @@ export type { UserProfileDevice };
 
 export interface UserProfileActiveDevicesSectionViewProps {
   devices: UserProfileDevice[];
-  onSignOutDevice?: (id: string) => void | boolean | Promise<void | boolean>;
+  onSignOutDevice?: (id: string) => void | Promise<void>;
   // TODO: Connect bulk sign-out when the model and controller support it; keep its confirmation open while pending.
   onSignOutAllOtherDevices?: () => void | Promise<void>;
 }

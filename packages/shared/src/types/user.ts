@@ -264,10 +264,11 @@ export interface UserResource extends ClerkResource, BillingPayerMethods {
    */
   isPrimaryIdentification: (ident: EmailAddressResource | PhoneNumberResource | Web3WalletResource) => boolean;
   /**
-   * Gets all **active** sessions for this user. This method uses a cache so a network request will only be triggered only once.
+   * Gets all **active** sessions for this user. By default, only the first call makes a network request.
+   * With `__internal_fresh: true`, fetches a new snapshot and rejects failures without reading or replacing the default cache.
    * @returns An array of [`SessionWithActivities`](https://clerk.com/docs/reference/types/session-with-activities) objects.
    */
-  getSessions: () => Promise<SessionWithActivitiesResource[]>;
+  getSessions: (params?: { __internal_fresh?: boolean }) => Promise<SessionWithActivitiesResource[]>;
   /**
    * Adds the user's profile image or replaces it if one already exists. This method will upload an image and associate it with the user.
    */

@@ -1,4 +1,3 @@
-import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/shared/types';
 import { useCallback } from 'react';
@@ -37,6 +36,7 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
   const m = useMessages('userProfileActiveDevices');
   const userId = user?.id;
   const sessionId = session?.id;
+  const isImpersonating = Boolean(session?.actor);
 
   const toDevice = useCallback(
     (item: SessionWithActivitiesResource): UserProfileDevice => {
@@ -55,7 +55,7 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
         description,
         type: isMobile ? 'mobile' : 'desktop',
         isCurrent,
-        isUserDevice: Boolean(session?.actor && !item.actor && !isCurrent),
+        isUserDevice: Boolean(isImpersonating && !item.actor && !isCurrent),
         isImpersonationDevice: Boolean(item.actor && !isCurrent),
         lastActive,
         model: activity.deviceType || undefined,
@@ -64,19 +64,23 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
         location: location || undefined,
       };
     },
-    [sessionId, session?.actor, locale, m],
+    [sessionId, isImpersonating, locale, m],
   );
 
   const loadSessions = useCallback(async (): Promise<UserProfileDevice[]> => {
-    if (!user || !sessionId) {
+    const currentUser = clerk.user;
+    if (!currentUser || !sessionId || currentUser.id !== userId || clerk.session?.id !== sessionId) {
       return [];
     }
-    const items = await user.getSessions();
+    const items = await currentUser.getSessions({ __internal_fresh: true });
+    if (clerk.user?.id !== userId || clerk.session?.id !== sessionId) {
+      return [];
+    }
     return items
       .filter(item => item.status === 'active' || item.status === 'pending')
       .sort((a, b) => Number(b.id === sessionId) - Number(a.id === sessionId))
       .map(toDevice);
-  }, [user, sessionId, toDevice]);
+  }, [userId, sessionId, clerk, toDevice]);
 
   if (!isUserLoaded || !isSessionLoaded) {
     return { status: 'loading' };
@@ -92,24 +96,16 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
     // TODO: Add bulk revocation when a dedicated API is available, preserving the current session and reverification.
     // TODO: Add session reverification for device revocation; surface API errors until then.
     revoke: async id => {
-      try {
-        if (clerk.user?.id !== userId || clerk.session?.id !== sessionId || id === sessionId) {
-          throw new Error(m.signOutError);
-        }
-        const target = (await user.getSessions()).find(
-          item => item.id === id && (item.status === 'active' || item.status === 'pending'),
-        );
-        if (!target || clerk.user?.id !== userId || clerk.session?.id !== sessionId) {
-          throw new Error(m.signOutError);
-        }
-        await target.revoke();
-      } catch (error) {
-        if (isClerkAPIResponseError(error)) {
-          const first = error.errors[0];
-          throw new Error(first?.longMessage || first?.message || m.signOutError);
-        }
-        throw error;
+      if (clerk.user?.id !== userId || clerk.session?.id !== sessionId || id === sessionId) {
+        throw new Error(m.signOutError);
       }
+      const target = (await user.getSessions({ __internal_fresh: true })).find(
+        item => item.id === id && (item.status === 'active' || item.status === 'pending'),
+      );
+      if (!target || clerk.user?.id !== userId || clerk.session?.id !== sessionId) {
+        throw new Error(m.signOutError);
+      }
+      await target.revoke();
     },
   };
 }

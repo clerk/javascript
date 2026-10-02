@@ -36,8 +36,22 @@ export class SessionWithActivities extends BaseResource implements SessionWithAc
     this.fromJSON(data);
   }
 
-  static retrieve(): Promise<SessionWithActivities[]> {
+  static retrieve(options?: { throwOnError?: boolean }): Promise<SessionWithActivities[]> {
     const sessionId = BaseResource.clerk.session?.id;
+
+    if (options?.throwOnError) {
+      return this._fetch<SessionWithActivitiesJSON>({
+        method: 'GET',
+        path: '/me/sessions/active',
+        sessionId,
+      }).then(payload => {
+        if (!Array.isArray(payload)) {
+          throw new Error('Unable to retrieve active sessions.');
+        }
+        const sessions = payload as unknown as SessionWithActivitiesJSON[];
+        return sessions.map(item => new SessionWithActivities(item, '/me/sessions'));
+      });
+    }
 
     return this.clerk
       .getFapiClient()
