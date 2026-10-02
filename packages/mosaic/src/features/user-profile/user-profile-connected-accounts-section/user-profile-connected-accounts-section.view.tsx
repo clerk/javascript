@@ -1,39 +1,29 @@
 import { useMemo, useRef } from 'react';
 
-import { Confirmation } from '../../blocks/confirmation';
-import { Section } from '../../components/section';
-import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
-import { fill, useMessages } from '../../localization';
-import { UserProfileConnectedAccountRowView } from './user-profile-connected-account-row.view';
+import { Confirmation } from '../../../blocks/confirmation';
+import { Section } from '../../../components/section';
+import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
+import { fill, useMessages } from '../../../localization';
+import {
+  UserProfileConnectedAccountRowView,
+  UserProfileConnectProviderRowView,
+} from './user-profile-connected-account-row.view';
+import type {
+  UserProfileConnectedAccount,
+  UserProfileConnectedAccountsSectionViewProps,
+} from './user-profile-connected-accounts-section.types';
 
-export interface UserProfileConnectionProvider {
-  id: string;
-  provider: string;
-  iconUrl?: string;
-  connectError?: string;
-}
-
-export interface UserProfileConnectedAccount extends UserProfileConnectionProvider {
-  identifier?: string;
-  canRemove?: boolean;
-  status?: 'connected' | 'reconnect' | 'error';
-  verificationError?: string;
-  reconnectError?: string;
-}
-
-export interface UserProfileConnectedAccountsSectionViewProps {
-  fallbackFocus?: () => HTMLElement | null;
-  accounts: UserProfileConnectedAccount[];
-  availableProviders?: UserProfileConnectionProvider[];
-  onConnect?: (id: string) => void;
-  onReconnect?: (id: string) => void;
-  onRemove?: (id: string) => void | Promise<void>;
-}
+export type {
+  UserProfileConnectedAccount,
+  UserProfileConnectedAccountsSectionViewProps,
+  UserProfileConnectionProvider,
+} from './user-profile-connected-accounts-section.types';
 
 export function UserProfileConnectedAccountsSectionView({
   accounts,
   fallbackFocus,
   availableProviders = [],
+  pendingId,
   onConnect,
   onReconnect,
   onRemove,
@@ -51,6 +41,7 @@ export function UserProfileConnectedAccountsSectionView({
   });
   const removeAccount = useMemo(() => Confirmation.createHandle<UserProfileConnectedAccount>(), []);
   const hasRows = accounts.length > 0 || (availableProviders.length > 0 && Boolean(onConnect));
+  const isBusy = pendingId !== undefined;
 
   return (
     <>
@@ -69,15 +60,18 @@ export function UserProfileConnectedAccountsSectionView({
                   key={account.id}
                   account={account}
                   triggerRef={removalFocus.registerTrigger(account.id)}
+                  isDisabled={isBusy}
                   onReconnect={onReconnect}
                   onRemove={onRemove ? account => removeAccount.open(account) : undefined}
                 />
               ))}
               {onConnect
                 ? availableProviders.map(provider => (
-                    <UserProfileConnectedAccountRowView
+                    <UserProfileConnectProviderRowView
                       key={provider.id}
-                      account={provider}
+                      provider={provider}
+                      isPending={pendingId === provider.id}
+                      isDisabled={isBusy}
                       onConnect={onConnect}
                     />
                   ))
