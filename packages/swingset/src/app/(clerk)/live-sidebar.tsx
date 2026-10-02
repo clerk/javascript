@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ComponentProps } from 'react';
 
+import { StatusDot } from '@/components/StatusDot';
 import {
   Sidebar,
   SidebarContent,
@@ -17,18 +18,11 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar';
+import { getLiveSidebarGroups } from '@/lib/live-navigation';
 
-const flows = [
-  { title: 'Account section', href: '/live/account-section' },
-  { title: 'API keys', href: '/live/api-keys' },
-  { title: 'Password', href: '/live/password' },
-  { title: 'Connected accounts', href: '/live/connected-accounts' },
-  { title: 'Enterprise accounts', href: '/live/enterprise-accounts' },
-  { title: 'Delete account', href: '/live/delete-account' },
-  { title: 'Reverification', href: '/live/reverification' },
-];
+const groups = getLiveSidebarGroups();
 
-function flowIsActive(pathname: string, href: string) {
+function pageIsActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
@@ -64,28 +58,57 @@ export function LiveSidebar(props: ComponentProps<typeof Sidebar>) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
+            <p className='text-muted-foreground px-2 pt-2 text-xs leading-relaxed'>
+              These are v1 wire-ups. They may still have bugs, even when they work.
+            </p>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup className='py-1'>
-          <SidebarGroupLabel className='text-sidebar-foreground/50 h-auto px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'>
-            Flows
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {flows.map(flow => (
-                <SidebarMenuItem key={flow.href}>
-                  <SidebarMenuButton
-                    className='h-auto py-1 text-xs'
-                    isActive={flowIsActive(pathname, flow.href)}
-                    render={<Link href={flow.href} />}
-                  >
-                    {flow.title}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+        {groups.map(({ group, categories }) => (
+          <SidebarGroup
+            key={group}
+            className='py-1'
+          >
+            <SidebarGroupLabel className='text-sidebar-foreground/50 h-auto px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'>
+              {group}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              {categories.map(({ category, components }) => (
+                <div key={category || group}>
+                  {category ? (
+                    <div className='text-sidebar-foreground/40 flex items-center gap-1 px-2 pb-0.5 pt-2 text-[9px] font-semibold uppercase tracking-wider'>
+                      <span
+                        aria-hidden='true'
+                        className='font-mono text-[10px] leading-none'
+                      >
+                        └
+                      </span>
+                      {category}
+                    </div>
+                  ) : null}
+                  <SidebarMenu className={category ? 'border-sidebar-border ml-3 w-auto border-l pl-1' : undefined}>
+                    {components.map(({ mod, href }) => (
+                      <SidebarMenuItem key={href}>
+                        <SidebarMenuButton
+                          className='h-auto py-1 text-xs'
+                          isActive={pageIsActive(pathname, href)}
+                          render={<Link href={href} />}
+                        >
+                          {mod.meta.status ? (
+                            <StatusDot
+                              status={mod.meta.status}
+                              substatus={mod.meta.substatus}
+                            />
+                          ) : null}
+                          <span className='truncate font-mono text-[10px] leading-relaxed'>{`<${mod.meta.title} />`}</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenu>
+                </div>
               ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

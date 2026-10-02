@@ -23,29 +23,12 @@ import {
 } from '@/components/ui/sidebar';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { getSidebarGroups } from '@/lib/registry';
+import { getSidebarCategories, type SidebarEntry } from '@/lib/sidebar-navigation';
 import type { StoryStatus, WipSubstatus } from '@/lib/types';
 
 const groups = getSidebarGroups();
 
 const COLLAPSED_BY_DEFAULT = new Set(['Blocks', 'Primitives', 'Components', 'Styles', 'Hooks', 'Localization']);
-
-type SidebarEntry = ReturnType<typeof getSidebarGroups>[number]['components'][number];
-
-// Partitions a group's entries by `meta.navigation.category` into subheaded runs. Category and
-// entry order both follow first appearance in the registry; uncategorized entries get no subheading.
-function byCategory(components: SidebarEntry[]) {
-  const categories: { category: string; components: SidebarEntry[] }[] = [];
-  for (const component of components) {
-    const category = component.mod.meta.navigation?.category ?? '';
-    const bucket = categories.find(c => c.category === category);
-    if (bucket) {
-      bucket.components.push(component);
-    } else {
-      categories.push({ category, components: [component] });
-    }
-  }
-  return categories;
-}
 
 function SidebarUsageItem({
   usage,
@@ -208,7 +191,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarGroupLabel>
                 <CollapsibleContent>
                   <SidebarGroupContent>
-                    {byCategory(components).map(({ category, components }) =>
+                    {getSidebarCategories(components).map(({ category, components }) =>
                       category ? (
                         <Collapsible
                           key={category}

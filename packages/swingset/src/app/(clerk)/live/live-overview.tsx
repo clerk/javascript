@@ -30,7 +30,7 @@ export function LiveOverview({
       <div className='flex flex-col gap-1'>
         <h1 className='text-xl font-semibold'>Live Sandbox</h1>
         <p className='text-muted-foreground text-sm'>
-          Flows in this sandbox run against the real Clerk application configured in{' '}
+          These pages run v1 wire-ups against the real Clerk application configured in{' '}
           <code className='font-mono text-xs'>packages/swingset/.env.local</code>.
         </p>
       </div>
@@ -91,7 +91,7 @@ export function LiveOverview({
           <p className='text-muted-foreground text-sm'>Loading…</p>
         ) : isSignedIn ? (
           <p className='text-muted-foreground text-sm'>
-            Signed in as {user.primaryEmailAddress?.emailAddress ?? user.id}. Pick a flow from the sidebar.
+            Signed in as {user.primaryEmailAddress?.emailAddress ?? user.id}. Pick a page from the sidebar.
           </p>
         ) : (
           <p className='text-muted-foreground text-sm'>
@@ -102,7 +102,7 @@ export function LiveOverview({
             >
               Sign in
             </Link>{' '}
-            to run the flows.
+            to use the live pages.
           </p>
         )}
       </section>
