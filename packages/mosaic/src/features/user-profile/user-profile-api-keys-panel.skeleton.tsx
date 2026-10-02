@@ -8,10 +8,11 @@ import { useMessages } from '../../localization';
 import { themeProps } from '../../props';
 import { skeletonStyles } from '../../utils/skeleton.styles';
 import { styles } from './user-profile-api-keys-panel.styles';
+import type { UserProfileApiKeysPanelViewProps } from './user-profile-api-keys-panel.types';
 
-const SKELETON_ROWS = [0, 1, 2];
+export type UserProfileApiKeysPanelSkeletonProps = Pick<UserProfileApiKeysPanelViewProps, 'pageSize'>;
 
-export function UserProfileApiKeysPanelSkeleton() {
+export function UserProfileApiKeysPanelSkeleton({ pageSize = 10 }: UserProfileApiKeysPanelSkeletonProps) {
   const m = useMessages('userProfileApiKeysPanel');
 
   return (
@@ -32,7 +33,7 @@ export function UserProfileApiKeysPanelSkeleton() {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {SKELETON_ROWS.map(row => (
+          {Array.from({ length: pageSize }, (_, row) => (
             <Table.Row key={row}>
               <Table.Cell>
                 <Bone

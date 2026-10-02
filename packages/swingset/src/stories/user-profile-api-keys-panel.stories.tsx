@@ -79,7 +79,11 @@ export function Loading() {
       >
         Reload
       </Button>
-      {loading ? <UserProfileApiKeysPanelSkeleton /> : <UserProfileApiKeysPanelView {...props} />}
+      {loading ? (
+        <UserProfileApiKeysPanelSkeleton pageSize={props.pageSize} />
+      ) : (
+        <UserProfileApiKeysPanelView {...props} />
+      )}
     </div>
   );
 }
