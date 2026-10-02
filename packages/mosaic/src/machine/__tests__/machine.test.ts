@@ -1,8 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { deferred, tick } from '../../__tests__/async';
 import { assign, isAssignAction } from '../assign';
-import { createActor, mockActor } from '../createActor';
-import { createMachine } from '../createMachine';
+import { createActor, mockActor } from '../create-actor';
+import { createMachine } from '../create-machine';
 import type { DoneInvokeEvent } from '../types';
 import {
   createDeleteOrgMachine,
@@ -10,20 +11,6 @@ import {
   type DeleteOrgContext,
   type DeleteOrgEvent,
 } from './delete-organization-machine';
-
-/** Flush microtasks (and the macrotask queue) so invoked promises settle. */
-const tick = () => new Promise<void>(resolve => setTimeout(resolve, 0));
-
-/** A promise whose resolution is controlled by the test (for in-flight assertions). */
-function deferred<T>() {
-  let resolve!: (value: T) => void;
-  let reject!: (reason?: unknown) => void;
-  const promise = new Promise<T>((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
-}
 
 describe('createMachine — introspection (the swingset seam)', () => {
   it('exposes states, initial, context and id without running anything', () => {

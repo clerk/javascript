@@ -1,9 +1,9 @@
 import type { SignInFirstFactor, SignInResource } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createActor } from '../../machine/createActor';
-import { createFirstFactorMachine } from '../firstFactorMachine';
-import { deferred, noop, tick } from './test-utils';
+import { deferred, noop, tick } from '../../__tests__/async';
+import { createActor } from '../../machine/create-actor';
+import { createFirstFactorMachine } from '../first-factor-machine';
 
 const passwordFactor = { strategy: 'password' } as SignInFirstFactor;
 const emailCodeFactor = {

@@ -79,12 +79,32 @@ through `aria-labelledby` rather than `htmlFor`. Description and error relations
 Explicit `htmlFor` still renders a native `label`. `Select.Trigger` opts in; `Input` and `OTP` keep
 the native label.
 
+### Horizontal
+
+<Story
+  name='Horizontal'
+  storyModule={FieldStories}
+/>
+
+Pass `orientation='horizontal'` to `Field.Root` to place the control beside its label, as with a `Checkbox`. Wrap the label, description, and messages in `Field.Content` so they stack beside the control. A `Checkbox` aligns with the first line of the label.
+
+```tsx
+<Field.Root orientation='horizontal'>
+  <Checkbox name='signOutOfOtherSessions' />
+  <Field.Content>
+    <Field.Label>Sign out of all devices</Field.Label>
+    <Field.Description>Recommended after changing your password.</Field.Description>
+  </Field.Content>
+</Field.Root>
+```
+
 ## Parts
 
 | Part                | Stable slot class       | Description                                                                                                                                          |
 | ------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Field.Root`        | `.cl-field-root`        | Unstyled `div` and field context provider.                                                                                                           |
+| `Field.Root`        | `.cl-field-root`        | `div` that stacks its parts, or places the control beside `Field.Content` when horizontal, and provides the field context.                           |
 | `Field.Label`       | `.cl-field-label`       | Native `label` associated with the field control; a `span` that focuses the control when it cannot be natively labelled, such as a `Select` trigger. |
+| `Field.Content`     | `.cl-field-content`     | `div` that stacks the label, description, and messages beside the control in a horizontal field.                                                     |
 | `Field.Description` | `.cl-field-description` | Supporting `p` associated with the field control.                                                                                                    |
 | `Field.Message`     | `.cl-field-message`     | Height-animated live region for the messages below.                                                                                                  |
 | `Field.Error`       | `.cl-field-error`       | Associated error `p` with an alert icon.                                                                                                             |
@@ -104,4 +124,4 @@ The Mosaic field is themed with **StyleX**. Each styled part carries the stable 
 }
 ```
 
-`Field.Root` ships no layout. Higher-level blocks own how its parts are arranged; for example, a settings row can provide the grid and alignment for a field. Customize an `Input` through its exposed tokens, `.cl-input`, `className`, and `style`; Field does not add control-specific styling.
+`Field.Root` only stacks its parts, or places the control beside `Field.Content` when horizontal; `data-orientation` reflects which. Higher-level blocks own any other arrangement; for example, a settings row can provide the grid and alignment for a field. Customize an `Input` through its exposed tokens, `.cl-input`, `className`, and `style`; Field does not add control-specific styling.

@@ -54,7 +54,7 @@ rule reserves the `.stylex.ts` extension for StyleX define-primitives: **a
   `inputStatusBorder` / `inputStatusFocusWithin` set instead of redefining the
   border/focus treatment five times. Four exist today: `reset.styles.ts`,
   `typography.styles.ts`, `focus-outline.styles.ts` and `rtl.styles.ts`.
-- **DO** compose `rtl.mirror` from `utils/rtl.styles.ts` onto a direction-aware
+- **DO** compose `rtl.mirror` from `styles/rtl.styles.ts` onto a direction-aware
   icon — a chevron that means "forward"/"back", a pagination arrow, the
   log-out arrow leaving its frame — via its
   `xstyle`. It flips the glyph with `scaleX(-1)` only under an ancestor carrying
@@ -341,7 +341,7 @@ device, while touch devices look correct.
 Worked example: `packages/mosaic/src/components/button/button.styles.ts`.
 
 - **DON'T** write a focus ring by hand. Compose `focusOutline` from
-  `utils/focus-outline.styles.ts` into the element's `stylex.props(...)`:
+  `styles/focus-outline.styles.ts` into the element's `stylex.props(...)`:
   `focusOutline.visible` for the element's own keyboard focus, `focusOutline.within`
   for a **container** that should ring when a child is focused. The ring is one
   decision for the whole system — width, style, colour and offset all come from

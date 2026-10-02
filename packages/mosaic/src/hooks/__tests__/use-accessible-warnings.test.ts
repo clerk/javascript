@@ -1,8 +1,8 @@
 import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { useAccessibleDescriptionWarning } from '../useAccessibleDescriptionWarning';
-import { useAccessibleNameWarning } from '../useAccessibleNameWarning';
+import { useAccessibleDescriptionWarning } from '../use-accessible-description-warning';
+import { useAccessibleNameWarning } from '../use-accessible-name-warning';
 
 afterEach(() => {
   cleanup();

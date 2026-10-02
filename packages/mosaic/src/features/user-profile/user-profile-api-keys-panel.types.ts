@@ -23,6 +23,8 @@ export interface UserProfileApiKeysPanelViewProps {
   searchValue: string;
   isLoading: boolean;
   isFetching?: boolean;
+  isError?: boolean;
+  onRetry?: () => void;
   onPageChange: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   onSearchChange: (value: string) => void;

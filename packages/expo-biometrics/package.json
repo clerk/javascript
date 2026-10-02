@@ -1,6 +1,6 @@
 {
   "name": "@clerk/expo-biometrics",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Native biometric credential module to be used with Clerk for Expo",
   "keywords": [
     "react-native",
