@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { expect, it, vi } from 'vitest';
 
-import { MosaicProvider } from '../../../MosaicProvider';
+import { MosaicProvider } from '../../../mosaic-provider';
 import { OrganizationProfileView } from '../organization-profile.view';
 
 it('keeps the Members placeholder until a table is configured', () => {

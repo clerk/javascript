@@ -1,8 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useAccessibleDescriptionWarning } from '../../hooks/useAccessibleDescriptionWarning';
-import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
+import { useAccessibleDescriptionWarning } from '../../hooks/use-accessible-description-warning';
+import { useAccessibleNameWarning } from '../../hooks/use-accessible-name-warning';
 import type {
   DialogFocusTarget,
   DialogHandle,
@@ -12,7 +12,7 @@ import type {
 import { Dialog as Primitive, useDialogContext as useHeadlessDialogContext } from '../../primitives/dialog';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import { ToastProvider } from '../toast/toast';

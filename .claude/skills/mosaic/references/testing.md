@@ -182,5 +182,5 @@ Write unit tests for:
 - Timing that is slow to drive through the UI, such as a resend countdown. Use
   fake timers.
 
-`packages/mosaic/src/machines/__tests__/test-utils.ts` has `deferred<T>()`,
+`packages/mosaic/src/__tests__/async.ts` has `deferred<T>()`,
 `tick()`, and `noop`.
