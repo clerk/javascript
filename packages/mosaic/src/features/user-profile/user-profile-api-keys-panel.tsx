@@ -2,6 +2,7 @@ import { useUser } from '@clerk/shared/react';
 import type { ReactNode } from 'react';
 
 import { Panel } from '../../components/panel';
+import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useMessages } from '../../localization';
 import { themeProps } from '../../props';
 import { APIKeysTable } from '../api-keys/api-keys-table';
@@ -12,9 +13,10 @@ export interface UserProfileApiKeysPanelProps {
 
 export function UserProfileApiKeysPanel({ fallback }: UserProfileApiKeysPanelProps) {
   const { user } = useUser();
+  const enabled = useMosaicEnvironment()?.apiKeysSettings.user_api_keys_enabled;
   const m = useMessages('userProfile');
 
-  if (!user) {
+  if (!user || !enabled) {
     return fallback ?? null;
   }
 
