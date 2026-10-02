@@ -10,6 +10,7 @@ import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { useFlowAutoFocus } from '../../components/flow';
 import { Otp } from '../../components/otp';
+import type { CountryIso } from '../../components/phone-input';
 import { PhoneInput } from '../../components/phone-input';
 import { fill, rich, useMessages } from '../../localization';
 import { styles } from './user-profile-profile-panel.styles';
@@ -19,6 +20,7 @@ interface EnterPhoneStepProps {
   secondaryAction?: ReactNode;
   phoneNumber: string;
   onPhoneNumberChange: (value: string) => void;
+  defaultCountry?: CountryIso;
   onSubmit: () => void;
   isPending?: boolean;
   errorMessage?: string;
@@ -61,6 +63,7 @@ export function EnterPhoneStep(props: EnterPhoneStepProps) {
             name='phoneNumber'
             value={props.phoneNumber}
             onValueChange={props.onPhoneNumberChange}
+            defaultCountry={props.defaultCountry}
           />
           <Field.Message>
             <Field.Error>{props.errorMessage}</Field.Error>

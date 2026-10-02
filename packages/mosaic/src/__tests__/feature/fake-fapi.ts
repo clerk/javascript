@@ -45,6 +45,7 @@ export const fapiUrl = (path: string) => `${FAPI}${path}`;
 export interface FakeFapiState {
   environment: FapiEnvironment;
   client: ClientJSON;
+  country?: string;
   memberships: OrganizationMembershipJSON[];
   invitations: UserOrganizationInvitationJSON[];
   suggestions: OrganizationSuggestionJSON[];
@@ -211,7 +212,9 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
   worker.use(
     ...verificationHandlers(state, fapiUrl),
     ...enterpriseHandlers(state, fapiUrl),
-    http.get(fapiUrl('/v1/environment'), () => HttpResponse.json(state.environment)),
+    http.get(fapiUrl('/v1/environment'), () =>
+      HttpResponse.json(state.environment, state.country ? { headers: { 'x-country': state.country } } : undefined),
+    ),
     http.get(fapiUrl('/v1/client'), () => envelope(state.client, null)),
     http.get(fapiUrl('/v1/me'), () => {
       const user = activeUser(state);

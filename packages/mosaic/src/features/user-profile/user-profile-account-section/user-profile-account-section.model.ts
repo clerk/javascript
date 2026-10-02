@@ -9,6 +9,7 @@ import type {
   UserResource,
 } from '@clerk/shared/types';
 
+import { toCountryIso } from '../../../components/phone-input';
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import type { MosaicRouter } from '../../../hooks/use-mosaic-router';
 import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
@@ -43,6 +44,7 @@ type UserProfileAccountSectionData = Pick<
   | 'usernameRequired'
   | 'emails'
   | 'phones'
+  | 'defaultPhoneCountry'
   | 'onCreateEmail'
   | 'getEmailVerifier'
   | 'onSetPrimaryEmail'
@@ -227,6 +229,7 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     phones: phoneAccess.show
       ? toContacts(user.phoneNumbers, user.primaryPhoneNumberId, phone => phone.phoneNumber)
       : undefined,
+    defaultPhoneCountry: toCountryIso(clerk.__internal_country),
     onCreateEmail: emailAccess.canCreate
       ? async emailAddress => {
           const request = currentUser().createEmailAddress({ email: emailAddress });

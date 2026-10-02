@@ -1,3 +1,4 @@
+import type { CountryIso } from '../../../components/phone-input';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
@@ -39,6 +40,7 @@ export interface UserProfileAccountSectionViewProps {
   /** Left out when the instance does not collect the attribute, which drops the row. */
   emails?: UserProfileEmail[];
   phones?: UserProfilePhone[];
+  defaultPhoneCountry?: CountryIso;
   onProfilePictureChange?: (file: File) => Promise<void>;
   onProfilePictureReject?: (rejections: FileRejection[]) => void;
   onRemoveProfilePicture?: () => Promise<void>;
@@ -73,6 +75,7 @@ export function UserProfileAccountSectionView({
   nameManagedBy,
   emails,
   phones,
+  defaultPhoneCountry,
   onProfilePictureChange,
   onProfilePictureReject,
   onRemoveProfilePicture,
@@ -97,6 +100,7 @@ export function UserProfileAccountSectionView({
   const phoneRow = phones ? (
     <UserProfilePhoneRowView
       phones={phones}
+      defaultPhoneCountry={defaultPhoneCountry}
       allowMultipleAccounts={allowMultipleAccounts}
       onCreatePhone={onCreatePhone}
       getPhoneVerifier={getPhoneVerifier}

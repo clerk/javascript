@@ -35,6 +35,11 @@ function getCountry(iso: CountryIso | undefined): CountryEntry {
   return country ?? fallback;
 }
 
+export function toCountryIso(value: string | null | undefined): CountryIso | undefined {
+  const iso = value?.toLowerCase();
+  return iso ? countryOptions.find(country => country.iso === iso)?.iso : undefined;
+}
+
 function getInitialCountry(value: string | undefined, defaultCountry: CountryIso | undefined): CountryIso {
   return value ? parsePhoneString(value).iso : getCountry(defaultCountry).iso;
 }

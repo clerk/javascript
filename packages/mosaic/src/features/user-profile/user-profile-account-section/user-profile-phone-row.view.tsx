@@ -5,6 +5,7 @@ import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
+import type { CountryIso } from '../../../components/phone-input';
 import { Text } from '../../../components/text';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
@@ -17,6 +18,7 @@ import { useUserProfileSetPrimaryController } from './user-profile-set-primary.c
 
 export interface UserProfilePhoneRowViewProps {
   phones: UserProfilePhone[];
+  defaultPhoneCountry?: CountryIso;
   allowMultipleAccounts?: boolean;
   onCreatePhone?: (phoneNumber: string) => Promise<UserProfilePhoneVerifier>;
   getPhoneVerifier?: (id: string) => UserProfilePhoneVerifier;
@@ -28,6 +30,7 @@ export interface UserProfilePhoneRowViewProps {
 
 export function UserProfilePhoneRowView({
   phones,
+  defaultPhoneCountry,
   allowMultipleAccounts = false,
   onCreatePhone,
   getPhoneVerifier,
@@ -97,6 +100,7 @@ export function UserProfilePhoneRowView({
   const dialog = canVerify ? (
     <UserProfileAddPhoneDialog
       {...verification}
+      defaultCountry={defaultPhoneCountry}
       handle={verificationDialog}
       finalFocus={() => {
         const id = verifyingId.current;

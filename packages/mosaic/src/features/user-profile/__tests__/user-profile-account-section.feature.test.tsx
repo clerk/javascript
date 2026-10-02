@@ -116,6 +116,15 @@ describe('the user profile phone numbers', () => {
     expect(row()).not.toHaveTextContent('Unverified');
   });
 
+  it('starts the country on the one the instance located the user in', async () => {
+    const { actor } = await renderSection(signedIn([], { country: 'de' }));
+
+    await actor.click(screen.getByRole('button', { name: 'Add phone number' }));
+
+    expect(screen.getByRole('button', { name: 'Country, Germany' })).toBeInTheDocument();
+    expect(screen.getByText('+49')).toBeInTheDocument();
+  });
+
   it('keeps the dialog open and says the code was wrong', async () => {
     const { actor } = await renderSection();
 
