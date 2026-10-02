@@ -34,12 +34,20 @@ export async function tapControl(fixtures: DeviceFixtures, control: Locator) {
   }
 }
 
-export async function fill(field: Locator, value: string) {
-  await field.tap();
-  await field.fill(value).catch((error: { code?: string }) => {
+function retryEngineFailure<T>(action: () => Promise<T>) {
+  return action().catch((error: { code?: string }) => {
     if (error.code !== 'ENGINE_FAILURE') {
       throw error;
     }
-    return field.fill(value);
+    return action();
   });
+}
+
+export function focus(field: Locator) {
+  return retryEngineFailure(() => field.tap());
+}
+
+export async function fill(field: Locator, value: string) {
+  await focus(field);
+  await retryEngineFailure(() => field.fill(value));
 }

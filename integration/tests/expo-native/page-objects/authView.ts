@@ -2,7 +2,7 @@ import { expect } from 'e2e';
 
 import type { DeviceFixtures } from '../types.ts';
 import type { TestUser } from '../users.ts';
-import { fill, tapUntilVisible } from './gestures.ts';
+import { fill, focus, tapUntilVisible } from './gestures.ts';
 
 const welcome = /^Welcome! Sign in to continue\.?$/;
 const iosPasswordPrompt = /^(Save Password|Strong Password|Use Strong Password|AutoFill Passwords)$/i;
@@ -50,8 +50,10 @@ export const createAuthViewPageObject = ({ device, platform, screen }: DeviceFix
       }
       await expect(value).toBeVisible();
     },
-    setPassword: (password: string) => {
-      return fill(screen.getByRole('textbox').last(), password);
+    setPassword: async (password: string) => {
+      const field = screen.getByRole('textbox').last();
+      await focus(field);
+      await field.pressSequentially(password);
     },
     continue: () => {
       return screen.getByText('Continue').tap();
