@@ -1,84 +1,71 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
-import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from '../user-profile-web3-wallets-section.view';
+import { usePendingAction } from '../../../hooks/use-pending-action';
+import { useMessages } from '../../../localization';
+import type { UserProfileWeb3Provider } from '../user-profile-web3-wallets-section.view';
+import type { ReadyWeb3WalletsModel } from './user-profile-web3-wallets-section.types';
 
 export function useUserProfileWeb3WalletsController({
   wallets,
   availableProviders,
   connect,
   setPrimary,
-  fallbackErrorMessage,
-}: {
-  wallets: UserProfileWeb3Wallet[];
-  availableProviders: UserProfileWeb3Provider[];
-  connect: (strategy: string, walletName?: string) => Promise<unknown>;
-  setPrimary: (walletId: string) => Promise<unknown>;
-  fallbackErrorMessage: string;
-}) {
-  const [pendingId, setPendingId] = useState<string>();
-  const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
-  const [primaryErrors, setPrimaryErrors] = useState<Record<string, string>>({});
-  const [solanaPickerOpen, setSolanaPickerOpen] = useState(false);
-  const inFlight = useRef(false);
+}: Pick<ReadyWeb3WalletsModel, 'wallets' | 'availableProviders' | 'connect' | 'setPrimary'>) {
+  const messages = useMessages('userProfileWeb3Wallets');
+  const action = usePendingAction(messages.errors.generic);
+  const [picker, setPicker] = useState<UserProfileWeb3Provider | null>(null);
+  const [pendingWalletName, setPendingWalletName] = useState<string>();
 
-  const run = async (
-    id: string,
-    action: () => Promise<unknown>,
-    setErrors: typeof setConnectErrors,
-  ): Promise<boolean> => {
-    if (inFlight.current) {
-      return false;
-    }
-    inFlight.current = true;
-    setPendingId(id);
-    setErrors(({ [id]: _previous, ...rest }) => rest);
-    try {
-      await action();
-      return true;
-    } catch (error) {
-      const message = error instanceof Error && error.message ? error.message : fallbackErrorMessage;
-      setErrors(current => ({ ...current, [id]: message }));
-      return false;
-    } finally {
-      inFlight.current = false;
-      setPendingId(undefined);
-    }
-  };
-
-  const onConnect = (strategy: string) => {
-    if (inFlight.current) {
+  const onConnect = (id: string) => {
+    if (action.busy()) {
       return;
     }
-    if (strategy === 'web3_solana_signature') {
-      setSolanaPickerOpen(true);
+    const provider = availableProviders.find(candidate => candidate.id === id);
+    if (!provider) {
       return;
     }
-    return run(strategy, () => connect(strategy), setConnectErrors);
+    if (provider.walletPicker === 'solana') {
+      setPicker(provider);
+      return;
+    }
+    return action.run(provider.id, () => connect(provider.id));
   };
 
-  const connectSolana = async (walletName: string) => {
-    const succeeded = await run(
-      'web3_solana_signature',
-      () => connect('web3_solana_signature', walletName),
-      setConnectErrors,
-    );
-    if (succeeded) {
-      setSolanaPickerOpen(false);
+  const connectSolana = (walletName: string) => {
+    if (!picker) {
+      return;
     }
+    return action.run(picker.id, async () => {
+      setPendingWalletName(walletName);
+      try {
+        await connect(picker.id, walletName);
+        setPicker(null);
+      } finally {
+        setPendingWalletName(undefined);
+      }
+    });
   };
 
   return {
     wallets: wallets.map(wallet =>
-      primaryErrors[wallet.id] ? { ...wallet, primaryError: primaryErrors[wallet.id] } : wallet,
+      action.errors[wallet.id] ? { ...wallet, primaryError: action.errors[wallet.id] } : wallet,
     ),
     availableProviders: availableProviders.map(provider =>
-      connectErrors[provider.id] ? { ...provider, connectError: connectErrors[provider.id] } : provider,
+      action.errors[provider.id] && picker?.id !== provider.id
+        ? { ...provider, connectError: action.errors[provider.id] }
+        : provider,
     ),
-    pendingId,
-    solanaPickerOpen,
+    pendingId: action.pendingId,
+    solanaPickerOpen: picker !== null,
+    solanaPickerError: picker ? action.errors[picker.id] : undefined,
+    pendingWalletName,
     onConnect,
-    onSetPrimary: (walletId: string) => run(walletId, () => setPrimary(walletId), setPrimaryErrors),
+    onSetPrimary: (walletId: string) => action.run(walletId, () => setPrimary(walletId)),
     connectSolana,
-    closeSolanaPicker: () => setSolanaPickerOpen(false),
+    closeSolanaPicker: () => {
+      if (!action.busy()) {
+        setPicker(null);
+      }
+    },
   };
 }

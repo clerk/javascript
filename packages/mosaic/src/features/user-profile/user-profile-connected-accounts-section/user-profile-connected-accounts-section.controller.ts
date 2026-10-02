@@ -1,5 +1,4 @@
-import { useRef, useState } from 'react';
-
+import { usePendingAction } from '../../../hooks/use-pending-action';
 import { useMessages } from '../../../localization';
 import type {
   ConnectedAccountActionResult,
@@ -31,29 +30,14 @@ export function useUserProfileConnectedAccountsController({
   onReconnect,
 }: UserProfileConnectedAccountsControllerOptions): UserProfileConnectedAccountsController {
   const messages = useMessages('userProfileConnectedAccounts');
-  const [pendingId, setPendingId] = useState<string>();
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const connecting = useRef(false);
+  const { pendingId, errors, run } = usePendingAction(messages.errors.generic);
 
-  const run = async (id: string, action: (id: string) => Promise<ConnectedAccountActionResult>) => {
-    if (connecting.current) {
-      return;
-    }
-    connecting.current = true;
-    setPendingId(id);
-    setErrors(({ [id]: _cleared, ...rest }) => rest);
-
-    try {
+  const connect = (id: string, action: (id: string) => Promise<ConnectedAccountActionResult>) =>
+    run(id, async () => {
       if ((await action(id)) === 'redirecting') {
         await new Promise(resolve => setTimeout(resolve, OAUTH_REDIRECT_HOLD_MS));
       }
-    } catch (error) {
-      setErrors(current => ({ ...current, [id]: error instanceof Error ? error.message : messages.errors.generic }));
-    } finally {
-      connecting.current = false;
-      setPendingId(undefined);
-    }
-  };
+    });
 
   return {
     accounts: accounts.map(account =>
@@ -63,7 +47,7 @@ export function useUserProfileConnectedAccountsController({
       errors[provider.id] ? { ...provider, connectError: errors[provider.id] } : provider,
     ),
     pendingId,
-    onConnect: id => void run(id, onConnect),
-    onReconnect: id => void run(id, onReconnect),
+    onConnect: id => void connect(id, onConnect),
+    onReconnect: id => void connect(id, onReconnect),
   };
 }

@@ -367,16 +367,12 @@ export function fapiWeb3Wallet(
 ): Web3WalletJSON {
   return {
     object: 'web3_wallet',
-    verification: {
-      id: 'verification_1',
-      object: 'verification',
+    verification: fapiVerification('web3_metamask_signature', {
       status: 'verified',
       verified_at_client: '',
-      strategy: 'web3_metamask_signature',
       attempts: 1,
       expire_at: 0,
-      error: { code: '', message: '' },
-    },
+    }),
     ...overrides,
   };
 }

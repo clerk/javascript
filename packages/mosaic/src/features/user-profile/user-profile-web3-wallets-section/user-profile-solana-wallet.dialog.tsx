@@ -1,5 +1,4 @@
-import { getWallets } from '@wallet-standard/core';
-import { useEffect, useState } from 'react';
+import { useInstalledSolanaWallets } from '@clerk/shared/react';
 
 import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
@@ -7,42 +6,22 @@ import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
 import { useMessages } from '../../../localization';
 
-function installedSolanaWallets() {
-  return getWallets()
-    .get()
-    .filter(
-      wallet => wallet.chains.some(chain => chain.startsWith('solana:')) && 'solana:signMessage' in wallet.features,
-    );
-}
-
 export function UserProfileSolanaWalletDialog({
   open,
-  pending,
+  pendingWalletName,
   error,
   onOpenChange,
   onConnect,
 }: {
   open: boolean;
-  pending: boolean;
+  pendingWalletName?: string;
   error?: string;
   onOpenChange: (open: boolean) => void;
   onConnect: (walletName: string) => void;
 }) {
   const m = useMessages('userProfileWeb3Wallets');
-  const [wallets, setWallets] = useState(installedSolanaWallets);
-  const [selectedWalletName, setSelectedWalletName] = useState<string>();
-
-  useEffect(() => {
-    const registry = getWallets();
-    const update = () => setWallets(installedSolanaWallets());
-    const unregister = registry.on('register', update);
-    const unadvertise = registry.on('unregister', update);
-    update();
-    return () => {
-      unregister();
-      unadvertise();
-    };
-  }, []);
+  const wallets = useInstalledSolanaWallets();
+  const pending = pendingWalletName !== undefined;
 
   return (
     <Dialog.Root
@@ -91,12 +70,9 @@ export function UserProfileSolanaWalletDialog({
                 variant='outline'
                 color='neutral'
                 fullWidth
-                isPending={pending && selectedWalletName === wallet.name}
-                disabled={pending}
-                onClick={() => {
-                  setSelectedWalletName(wallet.name);
-                  onConnect(wallet.name);
-                }}
+                isPending={pendingWalletName === wallet.name}
+                disabled={pending && pendingWalletName !== wallet.name}
+                onClick={() => onConnect(wallet.name)}
               >
                 {wallet.icon ? (
                   <img
