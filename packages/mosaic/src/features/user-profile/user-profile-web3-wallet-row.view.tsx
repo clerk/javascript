@@ -36,7 +36,7 @@ export function UserProfileWeb3WalletRowView({
   const shortAddress = address && (address.length <= 10 ? address : `${address.slice(0, 6)}...${address.slice(-4)}`);
   const actions: ActionMenuAction[] = [];
 
-  if (linkedWallet && !linkedWallet.isPrimary && linkedWallet.isVerified && onSetPrimary && !isDisabled) {
+  if (linkedWallet && !linkedWallet.isPrimary && linkedWallet.isVerified && onSetPrimary) {
     actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(wallet.id) });
   }
   if (linkedWallet && onRemove && linkedWallet.canRemove !== false) {
@@ -111,6 +111,7 @@ export function UserProfileWeb3WalletRowView({
             <ActionMenu
               triggerRef={triggerRef}
               actions={actions}
+              disabled={isDisabled}
               label={fill(m.manageLabel, { wallet: wallet.provider || address || '' })}
             />
           </Section.Actions>
