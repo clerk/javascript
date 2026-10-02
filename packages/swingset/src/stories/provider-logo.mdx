@@ -1,0 +1,55 @@
+import * as ProviderLogoStories from './provider-logo.stories';
+
+# ProviderLogo
+
+ProviderLogo renders the logo for an OAuth, Web3, or phone-code provider. Each logo adapts to the color scheme in scope: monochrome logos follow `currentColor`, and logos with distinct light and dark colors switch with `light-dark()`.
+
+## Playground
+
+<Preview
+  name='Default'
+  storyModule={ProviderLogoStories}
+/>
+
+## Props
+
+<PropTable
+  meta={ProviderLogoStories.meta}
+  extra={[{ name: 'ref', type: 'Ref<SVGSVGElement>' }]}
+/>
+
+## Usage
+
+```tsx
+import { ProviderLogo } from '@clerk/mosaic/components/provider-logo';
+
+<ProviderLogo provider='google' />;
+```
+
+`isProviderLogoId` narrows a provider string from the environment before rendering. A provider without a logo, such as a custom OAuth provider, renders its own image instead.
+
+```tsx
+import { isProviderLogoId, ProviderLogo } from '@clerk/mosaic/components/provider-logo';
+
+isProviderLogoId(provider) ? <ProviderLogo provider={provider} /> : <img src={logoUrl} alt='' />;
+```
+
+---
+
+## Examples
+
+### Sizes
+
+<Story
+  name='Sizes'
+  storyModule={ProviderLogoStories}
+/>
+
+`sm`, `md`, and `lg` match the `Icon` sizes; `inherit` sizes the logo to the surrounding font.
+
+### Color schemes
+
+<Story
+  name='ColorSchemes'
+  storyModule={ProviderLogoStories}
+/>

@@ -9,7 +9,11 @@ import { useUserProfilePasswordModel } from './user-profile-password-section.mod
 type TestUser = {
   id: string;
   passwordEnabled: boolean;
-  enterpriseAccounts: { active: boolean; enterpriseConnection?: { name: string; logoPublicUrl: string | null } }[];
+  enterpriseAccounts: {
+    active: boolean;
+    provider?: string;
+    enterpriseConnection?: { name: string; logoPublicUrl: string | null };
+  }[];
   updatePassword: ReturnType<typeof vi.fn>;
 };
 
@@ -168,13 +172,17 @@ describe('useUserProfilePasswordModel enterprise accounts', () => {
     }
     user.enterpriseAccounts = [
       { active: false, enterpriseConnection: { name: 'Inactive', logoPublicUrl: null } },
-      { active: true, enterpriseConnection: { name: 'Acme SSO', logoPublicUrl: 'https://example.com/acme.png' } },
+      {
+        active: true,
+        provider: 'saml_okta',
+        enterpriseConnection: { name: 'Acme SSO', logoPublicUrl: 'https://example.com/acme.png' },
+      },
     ];
     const { result } = renderHook(() => useUserProfilePasswordModel());
     expect(result.current).toEqual({
       status: 'readonly',
       mode: 'change',
-      managedBy: { name: 'Acme SSO' },
+      managedBy: { name: 'Acme SSO', provider: 'okta' },
     });
   });
 

@@ -50,4 +50,16 @@ describe('UserProfileNameRowView', () => {
     expect(screen.getByText('Managed by Okta')).toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
+  it('shows the managing provider logo when one is bundled', () => {
+    const { container } = render(
+      <MosaicProvider>
+        <UserProfileNameRowView
+          name='Preston Booth'
+          managedBy={{ name: 'Okta', provider: 'okta' }}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(container.querySelector('.cl-provider-logo')).toHaveAttribute('data-provider', 'okta');
+  });
 });

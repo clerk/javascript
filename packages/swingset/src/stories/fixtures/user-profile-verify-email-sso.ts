@@ -6,7 +6,7 @@ import { chaosEmail, chaosText } from '@/lib/chaos';
 const exampleConnection = {
   provider: 'Okta SSO',
   domain: 'acme.co',
-  iconUrl: 'https://img.clerk.com/static/okta.svg',
+  logo: 'okta' as const,
 };
 
 export function useUserProfileVerifyEmailSsoFixture({ failConnect = false } = {}) {

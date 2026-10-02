@@ -45,7 +45,7 @@ export function ConnectionError() {
       {
         id: 'apple',
         provider: 'Apple',
-        iconUrl: 'https://img.clerk.com/static/apple.svg',
+        logo: 'apple',
         connectError: 'Unable to connect. Please try again.',
       },
     ],

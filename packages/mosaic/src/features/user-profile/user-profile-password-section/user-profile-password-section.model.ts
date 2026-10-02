@@ -7,8 +7,10 @@ import { useMemo } from 'react';
 
 import type { FieldFeedback } from '../../../components/form';
 import { FormSubmitError } from '../../../components/form';
+import type { ProviderLogoId } from '../../../components/provider-logo';
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useErrorText, useLocale, useMessages } from '../../../localization';
+import { toManagedByProvider } from '../user-profile-managed-by.model';
 import { passwordFormError } from './user-profile-password-errors';
 import { passwordFieldFeedback } from './user-profile-password-feedback';
 import type { UserProfileEditPasswordValue } from './user-profile-password-section.types';
@@ -22,7 +24,7 @@ type UnavailablePasswordModel =
   | {
       status: 'readonly';
       mode: 'set' | 'change';
-      managedBy: { name?: string };
+      managedBy: { name?: string; provider?: ProviderLogoId };
     };
 
 export type UserProfilePasswordModel =
@@ -59,7 +61,10 @@ function getPasswordPolicy(
     return {
       status: 'readonly',
       mode: policy.mode,
-      managedBy: { name: enterpriseAccount.enterpriseConnection?.name || undefined },
+      managedBy: {
+        name: enterpriseAccount.enterpriseConnection?.name || undefined,
+        provider: toManagedByProvider(enterpriseAccount.provider),
+      },
     };
   }
 

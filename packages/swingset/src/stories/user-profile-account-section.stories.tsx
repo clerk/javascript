@@ -1,5 +1,6 @@
 import { Button } from '@clerk/mosaic/components/button';
 import type {
+  UserProfileAccountSectionViewProps,
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.view';
@@ -49,7 +50,7 @@ function AccountSection({
   failEmailVerification?: boolean;
   emailRemovalState?: 'pending' | 'error';
   phoneRemovalState?: 'pending' | 'error';
-  nameManagedBy?: { name: string };
+  nameManagedBy?: UserProfileAccountSectionViewProps['nameManagedBy'];
 }) {
   const [phoneRemovalFailed, setPhoneRemovalFailed] = useState(false);
   const [emailRemovalFailed, setEmailRemovalFailed] = useState(false);
@@ -132,7 +133,7 @@ export function NameManagedByConnection() {
   return (
     <AccountSection
       allowMultipleAccounts={false}
-      nameManagedBy={{ name: 'Okta' }}
+      nameManagedBy={{ name: 'Okta', provider: 'okta' }}
     />
   );
 }
