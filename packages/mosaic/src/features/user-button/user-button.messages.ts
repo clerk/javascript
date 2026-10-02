@@ -17,7 +17,6 @@ export const userButtonMessages = {
     pending: 'pending',
   },
   accounts: {
-    actionsFor: 'Actions for {identifier}',
     switch: 'Switch account',
     add: 'Add account',
     signOut: 'Sign out',
@@ -26,6 +25,8 @@ export const userButtonMessages = {
   manage: {
     invite: 'Invite',
     settings: 'Settings',
+    organizationSettings: 'Organization settings',
+    profileSettings: 'Profile settings',
     account: 'Manage account',
     organization: 'Manage organization',
     createOrganization: 'Create organization',
