@@ -4,7 +4,7 @@ import { useClerk, useUser } from '@clerk/shared/react';
 import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 import type { ReactNode } from 'react';
 
-import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
+import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useMessages } from '../../../localization';
 import { allowsIdentificationCreation } from '../user-profile-connected-accounts-section/user-profile-connected-accounts-section.model';
 import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
