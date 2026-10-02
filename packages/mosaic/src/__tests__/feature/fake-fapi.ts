@@ -145,12 +145,22 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         return missing();
       }
       const account = fapiExternalAccount({
-        id: `idn_${provider}`,
+        id: `idn_${crypto.randomUUID()}`,
+        approved_scopes: '',
         provider,
         verification: fapiVerification(strategy, {
           status: 'unverified',
           external_verification_redirect_url: 'https://accounts.example/authorize',
         }),
+      });
+      updateUser(state, {
+        ...user,
+        external_accounts: [
+          ...user.external_accounts.filter(
+            item => item.provider !== provider || item.verification?.status === 'verified',
+          ),
+          account,
+        ],
       });
       return envelope(account, state.client);
     }),
@@ -158,19 +168,23 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
         return undefined;
       }
-      const account = activeUser(state)?.external_accounts.find(item => item.id === params.id);
-      return account
-        ? envelope(
-            {
-              ...account,
-              verification: fapiVerification(`oauth_${account.provider}`, {
-                status: 'unverified',
-                external_verification_redirect_url: 'https://accounts.example/consent',
-              }),
-            },
-            state.client,
-          )
-        : missing();
+      const user = activeUser(state);
+      const account = user?.external_accounts.find(item => item.id === params.id);
+      if (!user || !account) {
+        return missing();
+      }
+      const pending = {
+        ...account,
+        verification: fapiVerification(`oauth_${account.provider}`, {
+          status: 'unverified',
+          external_verification_redirect_url: 'https://accounts.example/consent',
+        }),
+      };
+      updateUser(state, {
+        ...user,
+        external_accounts: user.external_accounts.map(item => (item.id === pending.id ? pending : item)),
+      });
+      return envelope(pending, state.client);
     }),
     http.post(fapiUrl('/v1/me/external_accounts/:id'), ({ params, request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
