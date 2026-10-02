@@ -361,7 +361,7 @@ describe('Renaming a passkey', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(rename.requests).toHaveLength(1));
     rename.fail();
-    expect(await screen.findByRole('alert')).toHaveTextContent('form_param_invalid');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('form_param_invalid'));
     expect(input).toHaveValue('Work laptop');
     await user.type(input, ' updated');
     const retried = serveFapi(fapi);
@@ -439,7 +439,7 @@ describe('Removing a passkey', () => {
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(removal.requests).toHaveLength(1));
     removal.fail('session_reverification_required');
-    expect(await screen.findByRole('alert')).toHaveTextContent('session_reverification_required');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('session_reverification_required'));
     expect(screen.getByRole('alertdialog')).toBeVisible();
     expect(screen.queryByLabelText('Password')).toBeNull();
     expect(removal.requests).toHaveLength(1);

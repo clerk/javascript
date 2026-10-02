@@ -84,7 +84,7 @@ describe('Passkey interactions across resource changes', () => {
     );
     await user.type(input, ' edited');
     await user.click(screen.getByRole('button', { name: 'Save' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Cette clé a été supprimée.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Cette clé a été supprimée.'));
     expect(input).toHaveValue('Alice laptop edited');
   });
 
