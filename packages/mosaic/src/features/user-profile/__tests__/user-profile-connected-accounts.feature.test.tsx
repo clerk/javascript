@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { createRef } from 'react';
@@ -500,5 +500,116 @@ describe('connected accounts', () => {
     const second = await openRemoval(user, 'GitHub');
     await user.click(within(second).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.getByRole('button', { name: 'Connect GitHub' })).toHaveFocus());
+  });
+
+  it.each(['switch', 'sign out'] as const)('aborts Connect after %s during redirect preparation', async change => {
+    serveFapi(
+      signedIn([], {
+        client: fapiClient([
+          fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', external_accounts: [] }) }),
+          fapiSession({ id: 'sess_2', user: fapiUser({ id: 'user_2', external_accounts: [] }) }),
+        ]),
+      }),
+    );
+    const redirect = Promise.withResolvers<string>();
+    const getRedirectUrl = vi.fn(() => redirect.promise);
+    const open = vi.fn(() => Promise.resolve({ callbackUrl: 'https://app.example/callback' }));
+    const { clerk } = await renderWithClerk(<UserProfileConnectedAccountsSection />, {
+      __internal_oauthTransport: { getRedirectUrl, open },
+    });
+    const original = clerk.user;
+    if (!original) throw new Error('Expected signed-in user');
+    const create = vi.spyOn(original, 'createExternalAccount');
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    expect(getRedirectUrl).toHaveBeenCalledOnce();
+    await act(() => (change === 'switch' ? clerk.setActive({ session: 'sess_2' }) : clerk.signOut()));
+    await act(async () => {
+      redirect.resolve('https://app.example/callback');
+    });
+    expect(create).not.toHaveBeenCalled();
+    expect(open).not.toHaveBeenCalled();
+  });
+
+  it('restores the profile title after removing the final enterprise-restricted account', async () => {
+    const environment = signedIn().environment;
+    await renderSection([google], {
+      client: fapiClient([
+        fapiSession({
+          id: 'sess_1',
+          user: fapiUser({
+            id: 'user_1',
+            external_accounts: [google],
+            enterprise_accounts: [fapiEnterpriseAccount({ id: 'sso_1' })],
+          }),
+        }),
+      ]),
+      environment: {
+        ...environment,
+        user_settings: {
+          ...environment.user_settings,
+          enterprise_sso: { enabled: true, self_serve_sso: false, self_serve_directory_sync: false },
+        },
+      },
+    });
+    const user = userEvent.setup();
+    const dialog = await openRemoval(user, 'Google');
+    await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
+    expect(screen.queryByRole('group', { name: 'Connected accounts' })).toBeNull();
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Account', level: 2 })).toHaveFocus());
+  });
+
+  it('persists pending Connect and replaces a superseded provider attempt', async () => {
+    const fapi = serveFapi(
+      signedIn([
+        google,
+        fapiExternalAccount({
+          id: 'idn_pending',
+          provider: 'github',
+          approved_scopes: '',
+          verification: fapiVerification('oauth_github', { status: 'unverified' }),
+        }),
+      ]),
+    );
+    const callback = Promise.withResolvers<{ callbackUrl: string }>();
+    const open = vi.fn(() => callback.promise);
+    const { clerk } = await renderWithClerk(<UserProfileConnectedAccountsSection />, {
+      __internal_oauthTransport: { getRedirectUrl: () => 'https://app.example/callback', open },
+    });
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    await waitFor(() => expect(open).toHaveBeenCalledOnce());
+    callback.resolve({ callbackUrl: 'https://app.example/callback' });
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Connect GitHub' })).not.toHaveAttribute('aria-busy', 'true'),
+    );
+    const accounts = fapi.client.sessions[0]?.user.external_accounts;
+    expect(accounts).toHaveLength(2);
+    expect(accounts?.find(account => account.provider === 'github')).toMatchObject({
+      approved_scopes: '',
+      verification: { status: 'unverified' },
+    });
+    expect(accounts?.map(account => account.id)).not.toContain('idn_pending');
+    expect(clerk.user?.externalAccounts.find(account => account.provider === 'github')?.id).not.toBe('idn_pending');
+    expect(screen.getByRole('button', { name: 'Manage Google' })).toBeVisible();
+  });
+
+  it('persists reauthorization without granting scopes before callback completion', async () => {
+    const fapi = serveFapi(signedIn([google, github]));
+    const callback = Promise.withResolvers<{ callbackUrl: string }>();
+    const open = vi.fn(() => callback.promise);
+    await renderWithClerk(
+      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['email', 'calendar'] }} />,
+      {
+        __internal_oauthTransport: { getRedirectUrl: () => 'https://app.example/callback', open },
+      },
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
+    await waitFor(() => expect(open).toHaveBeenCalledOnce());
+    const account = fapi.client.sessions[0]?.user.external_accounts.find(account => account.id === google.id);
+    callback.resolve({ callbackUrl: 'https://app.example/callback' });
+    expect(account).toMatchObject({ approved_scopes: google.approved_scopes, verification: { status: 'unverified' } });
+    expect(fapi.client.sessions[0]?.user.external_accounts.find(account => account.id === github.id)).toEqual(github);
   });
 });
