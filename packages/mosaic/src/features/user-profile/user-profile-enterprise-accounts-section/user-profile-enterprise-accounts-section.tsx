@@ -33,7 +33,7 @@ function EnterpriseAccounts({ model }: { model: Extract<UserProfileEnterpriseAcc
     accounts: model.accounts,
     connections: model.connections,
     onConnect: model.connect,
-    errorMessage: m.errors.generic,
+    errorFallback: m.errors.generic,
   });
 
   return <UserProfileEnterpriseAccountsSectionView {...controller} />;
