@@ -282,6 +282,7 @@ export function useUserProfileConnectedAccountsModel({
       throw new ConnectedAccountActionError('missing_verification_url');
     }
 
+    currentUser();
     if (transport) {
       const { callbackUrl } = await transport.open(url);
       const nonce = new URL(callbackUrl).searchParams.get('rotating_token_nonce');
@@ -299,7 +300,6 @@ export function useUserProfileConnectedAccountsModel({
     userId,
     connect: async strategyId => {
       try {
-        const current = currentUser();
         const strategy = getEnabledOAuthStrategies(environment.userSettings.social).find(
           candidate => candidate === strategyId,
         );
@@ -308,6 +308,7 @@ export function useUserProfileConnectedAccountsModel({
         }
         const provider = providerFor(strategy);
         const redirectUrl = await getRedirectUrl();
+        const current = currentUser();
         const response = await current.createExternalAccount({
           strategy,
           redirectUrl: withModalState(redirectUrl, provider),
@@ -320,6 +321,7 @@ export function useUserProfileConnectedAccountsModel({
     },
     reconnect: async accountId => {
       try {
+        const redirectUrl = await getRedirectUrl();
         const current = currentUser();
         const account = current.externalAccounts.find(candidate => candidate.id === accountId);
         if (!account) {
@@ -330,7 +332,6 @@ export function useUserProfileConnectedAccountsModel({
           return;
         }
 
-        const redirectUrl = await getRedirectUrl();
         const response =
           recovery.kind === 'reauthorize'
             ? await account.reauthorize({
