@@ -21,6 +21,7 @@ export interface UserProfileContactListRowViewProps {
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
   onRemove?: (id: string) => void;
+  children?: ReactNode;
 }
 
 export function UserProfileContactListRowView({
@@ -34,21 +35,18 @@ export function UserProfileContactListRowView({
   addAction,
   rowRef,
   triggerRef,
+  children,
 }: UserProfileContactListRowViewProps) {
   const m = useMessages('userProfileAccountSection');
   const emptyDescription = m[kind].empty;
 
   return (
-    <Section.Row
+    <Section.Group
       ref={rowRef}
-      role='group'
       tabIndex={-1}
-      aria-label={label}
     >
-      <Section.Item>
-        <Section.Content>
-          <Section.Label>{label}</Section.Label>
-        </Section.Content>
+      <Section.Header>
+        <Section.Title>{label}</Section.Title>
         {addAction ? (
           <Section.Actions>{addAction}</Section.Actions>
         ) : onAdd ? (
@@ -69,58 +67,61 @@ export function UserProfileContactListRowView({
             </Button>
           </Section.Actions>
         ) : null}
-      </Section.Item>
-      <Section.Items>
-        {items.length === 0 ? (
-          <Section.Item>
-            <Section.Content>
-              <Section.Description>{emptyDescription}</Section.Description>
-            </Section.Content>
-          </Section.Item>
-        ) : (
-          items.map(item => {
-            const actions: ActionMenuAction[] = [];
+      </Section.Header>
+      <Section.Body>
+        <Section.Items>
+          {items.length === 0 ? (
+            <Section.Item>
+              <Section.Content>
+                <Section.Description>{emptyDescription}</Section.Description>
+              </Section.Content>
+            </Section.Item>
+          ) : (
+            items.map(item => {
+              const actions: ActionMenuAction[] = [];
 
-            if (!item.isVerified && onVerify) {
-              actions.push({
-                label: item.isDefault ? m.completeVerification : m[kind].verify,
-                onClick: () => onVerify(item.id),
-              });
-            } else if (item.isVerified && !item.isDefault && onSetPrimary) {
-              actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id) });
-            }
+              if (!item.isVerified && onVerify) {
+                actions.push({
+                  label: item.isDefault ? m.completeVerification : m[kind].verify,
+                  onClick: () => onVerify(item.id),
+                });
+              } else if (item.isVerified && !item.isDefault && onSetPrimary) {
+                actions.push({ label: m.setPrimary, onClick: () => onSetPrimary(item.id) });
+              }
 
-            if (onRemove) {
-              actions.push({
-                label: m[kind].remove,
-                color: 'negative',
-                onClick: () => onRemove(item.id),
-              });
-            }
+              if (onRemove) {
+                actions.push({
+                  label: m[kind].remove,
+                  color: 'negative',
+                  onClick: () => onRemove(item.id),
+                });
+              }
 
-            return (
-              <Section.Item key={item.id}>
-                <Section.Content>
-                  <Section.Description xstyle={styles.contactValue}>
-                    <span>{item.value}</span>
-                    {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
-                    {!item.isVerified ? <Badge color='warning'>{m.unverified}</Badge> : null}
-                  </Section.Description>
-                </Section.Content>
-                {actions.length > 0 ? (
-                  <Section.Actions>
-                    <ActionMenu
-                      triggerRef={triggerRef?.(item.id)}
-                      actions={actions}
-                      label={fill(m.manageValue, { value: item.value })}
-                    />
-                  </Section.Actions>
-                ) : null}
-              </Section.Item>
-            );
-          })
-        )}
-      </Section.Items>
-    </Section.Row>
+              return (
+                <Section.Item key={item.id}>
+                  <Section.Content>
+                    <Section.Description xstyle={styles.contactValue}>
+                      <span>{item.value}</span>
+                      {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
+                      {item.isVerified ? null : <Badge color='warning'>{m.unverified}</Badge>}
+                    </Section.Description>
+                  </Section.Content>
+                  {actions.length > 0 ? (
+                    <Section.Actions>
+                      <ActionMenu
+                        triggerRef={triggerRef?.(item.id)}
+                        actions={actions}
+                        label={fill(m.manageValue, { value: item.value })}
+                      />
+                    </Section.Actions>
+                  ) : null}
+                </Section.Item>
+              );
+            })
+          )}
+        </Section.Items>
+        {children}
+      </Section.Body>
+    </Section.Group>
   );
 }

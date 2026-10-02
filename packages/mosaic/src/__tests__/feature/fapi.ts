@@ -1,4 +1,6 @@
 import type {
+  ApiKeyJSON,
+  APIKeysSettingsJSON,
   AttributeDataJSON,
   AttributesJSON,
   AuthConfigJSON,
@@ -13,12 +15,15 @@ import type {
   OrganizationMembershipJSON,
   OrganizationSettingsJSON,
   OrganizationSuggestionJSON,
+  PublicKeyCredentialRequestOptionsJSON,
   PublicOrganizationDataJSON,
   SessionJSON,
+  SessionVerificationJSON,
   TokenJSON,
   UserJSON,
   UserOrganizationInvitationJSON,
   UserSettingsJSON,
+  VerificationJSON,
 } from '@clerk/shared/types';
 
 type Settings<T> = Omit<T, 'id' | 'object'>;
@@ -33,6 +38,7 @@ export type FapiEnvironment = Omit<EnvironmentJSON, 'user_settings' | 'organizat
 export type FapiAttributeOverrides = Partial<Record<keyof AttributesJSON, Partial<AttributeDataJSON>>>;
 
 export interface FapiEnvironmentOverrides {
+  api_keys_settings?: Partial<Settings<APIKeysSettingsJSON>>;
   attributes?: FapiAttributeOverrides;
   auth_config?: Partial<AuthConfigJSON>;
   display_config?: Partial<DisplayConfigJSON>;
@@ -110,6 +116,7 @@ export function fapiEnvironment(overrides: FapiEnvironmentOverrides = {}): FapiE
       id: 'api_keys_settings_1',
       user_api_keys_enabled: false,
       orgs_api_keys_enabled: false,
+      ...overrides.api_keys_settings,
     },
     auth_config: {
       object: 'auth_config',
@@ -233,20 +240,6 @@ export function fapiEmailAddress(
   };
 }
 
-export function fapiVerification(overrides: Partial<VerificationJSON> = {}): VerificationJSON {
-  return {
-    object: 'verification',
-    id: 'ver_1',
-    status: 'verified',
-    strategy: 'phone_code',
-    verified_at_client: '',
-    attempts: 0,
-    expire_at: farFuture,
-    error: { code: '', message: '' },
-    ...overrides,
-  };
-}
-
 export function fapiPhoneNumber(
   overrides: Partial<PhoneNumberJSON> & Pick<PhoneNumberJSON, 'id' | 'phone_number'>,
 ): PhoneNumberJSON {
@@ -261,13 +254,15 @@ export function fapiPhoneNumber(
 }
 
 export function fapiEnterpriseAccount(
-  overrides: Partial<EnterpriseAccountJSON> & Pick<EnterpriseAccountJSON, 'id' | 'email_address'>,
+  overrides: Partial<EnterpriseAccountJSON> & Pick<EnterpriseAccountJSON, 'id'>,
   connection: Partial<EnterpriseAccountConnectionJSON> = {},
 ): EnterpriseAccountJSON {
-  const domain = overrides.email_address.split('@')[1] ?? 'acme.co';
+  const emailAddress = overrides.email_address ?? 'sso@example.com';
+  const domain = emailAddress.split('@')[1] ?? 'example.com';
   return {
     object: 'enterprise_account',
     active: true,
+    email_address: emailAddress,
     first_name: null,
     last_name: null,
     protocol: 'saml',
@@ -286,7 +281,7 @@ export function fapiEnterpriseAccount(
       disable_additional_identifications: false,
       domain,
       logo_public_url: null,
-      name: domain,
+      name: 'Company SSO',
       protocol: 'saml',
       provider: 'saml_okta',
       sync_user_attributes: true,
@@ -361,6 +356,58 @@ export function fapiSession(overrides: Partial<SessionJSON> & Pick<SessionJSON, 
     },
     created_at: createdAt,
     updated_at: createdAt,
+    ...overrides,
+  };
+}
+
+const verificationObjects: Record<string, string> = {
+  password: 'verification_password',
+  email_code: 'verification_otp',
+  phone_code: 'verification_otp',
+  totp: 'verification_totp',
+  backup_code: 'verification_backup_code',
+  passkey: 'verification_passkey',
+};
+
+export function fapiPasskeyRequestOptions(): PublicKeyCredentialRequestOptionsJSON {
+  return {
+    allowCredentials: [],
+    challenge: 'Y2hhbGxlbmdl',
+    rpId: 'clerk.abcef.12345.prod.lclclerk.com',
+    timeout: 60000,
+    userVerification: 'preferred',
+  };
+}
+
+export function fapiVerification(strategy: string, overrides: Partial<VerificationJSON> = {}): VerificationJSON {
+  return {
+    object: verificationObjects[strategy] ?? 'verification',
+    id: `ver_${strategy}`,
+    status: 'unverified',
+    strategy,
+    verified_at_client: '',
+    attempts: 0,
+    expire_at: farFuture,
+    error: { code: '', message: '' },
+    ...(strategy === 'passkey' ? { nonce: JSON.stringify(fapiPasskeyRequestOptions()) } : {}),
+    ...overrides,
+  };
+}
+
+export function fapiSessionVerification(
+  session: SessionJSON,
+  overrides: Partial<SessionVerificationJSON> = {},
+): SessionVerificationJSON {
+  return {
+    object: 'session_verification',
+    id: `sessverif_${session.id}`,
+    status: 'needs_first_factor',
+    level: 'first_factor',
+    session,
+    first_factor_verification: null,
+    second_factor_verification: null,
+    supported_first_factors: [],
+    supported_second_factors: [],
     ...overrides,
   };
 }
@@ -456,6 +503,25 @@ export function fapiSuggestion(
     id,
     public_organization_data: publicOrganizationData(organization),
     status: 'pending',
+    created_at: createdAt,
+    updated_at: createdAt,
+    ...overrides,
+  };
+}
+
+export function fapiApiKey(overrides: Partial<ApiKeyJSON> & Pick<ApiKeyJSON, 'id' | 'name' | 'subject'>): ApiKeyJSON {
+  return {
+    object: 'api_key',
+    type: 'api_key',
+    scopes: [],
+    claims: null,
+    revoked: false,
+    revocation_reason: null,
+    expired: false,
+    expiration: null,
+    created_by: null,
+    description: null,
+    last_used_at: null,
     created_at: createdAt,
     updated_at: createdAt,
     ...overrides,

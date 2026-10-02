@@ -12,29 +12,27 @@ export type {
 } from './user-profile-password-section.types';
 
 export function UserProfilePasswordSectionView({
-  sectionTitle,
+  action,
   hasPassword = false,
-  requiresCurrentPassword = false,
   managedBy,
-  onSubmitPassword,
 }: UserProfilePasswordSectionViewProps) {
   const m = useMessages('userProfilePasswordSection');
-  const title = sectionTitle ?? m.sectionTitle;
-  if (!hasPassword && !managedBy && !onSubmitPassword) {
+  if (!hasPassword && !managedBy && !action) {
     return null;
   }
 
   return (
-    <Section.Root aria-label={title ? undefined : m.label}>
-      {title ? <Section.Title>{title}</Section.Title> : null}
-      <Section.Group>
+    <Section.Group>
+      <Section.Header>
+        <Section.Title>{m.label}</Section.Title>
+      </Section.Header>
+      <Section.Body>
         <UserProfilePasswordRowView
+          action={action}
           hasPassword={hasPassword}
-          requiresCurrentPassword={requiresCurrentPassword}
           managedBy={managedBy}
-          onSubmitPassword={onSubmitPassword}
         />
-      </Section.Group>
-    </Section.Root>
+      </Section.Body>
+    </Section.Group>
   );
 }

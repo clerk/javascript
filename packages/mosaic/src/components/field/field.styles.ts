@@ -8,6 +8,18 @@ export const styles = stylex.create({
     display: 'flex',
     flexDirection: 'column',
   },
+  horizontal: {
+    gap: space['2'],
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+  },
+  content: {
+    gap: space['1'],
+    display: 'flex',
+    flexDirection: 'column',
+    flexGrow: 1,
+    minWidth: 0,
+  },
   label: {
     color: colorVars['--cl-color-brand'],
     fontWeight: fontWeightVars['--cl-font-medium'],

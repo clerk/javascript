@@ -130,7 +130,6 @@ jobs:
 
       - name: Trigger workflows on related repos
         if: steps.changesets.outputs.published == 'true'
-        continue-on-error: true
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           result-encoding: string
@@ -148,17 +147,25 @@ jobs:
               const targets = [
                 { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
                 { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
-                { repo: 'clerk-docs', workflow_id: 'typedoc.yml' },
+                { repo: 'clerk', workflow_id: 'docs-typedoc.yml', inputs: { javascript_ref: context.sha }, critical: true },
               ];
               const results = await Promise.allSettled(
-                targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
+                targets.map(({ repo, workflow_id, inputs }) =>
+                  github.rest.actions.createWorkflowDispatch({ owner: 'clerk', repo, workflow_id, ref: 'main', inputs })
+                )
               );
               const failures = results
                 .map((r, i) => r.status === 'rejected' ? { target: targets[i], reason: r.reason } : null)
                 .filter(Boolean);
               if (failures.length) {
-                failures.forEach(f => core.error(`Dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`));
-                core.setFailed(`${failures.length} downstream dispatch(es) failed`);
+                failures.forEach(f => {
+                  const message = `Dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`;
+                  if (f.target.critical) {
+                    core.setFailed(message);
+                  } else {
+                    core.warning(message);
+                  }
+                });
               }
             } else{
               core.warning("Changeset in pre-mode should not prepare a ClerkJS production release")
@@ -171,7 +178,6 @@ jobs:
       # if the packages are already live.
       - name: Recover downstream notifications
         if: always() && steps.changesets.conclusion == 'failure'
-        continue-on-error: true
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           result-encoding: string
@@ -230,24 +236,32 @@ jobs:
             const targets = [
               { repo: 'sdk-infra-workers', workflow_id: 'update-pkg-versions.yml', inputs: { clerkjsVersion, clerkUiVersion } },
               { repo: 'dashboard', workflow_id: 'prepare-nextjs-sdk-update.yml', inputs: { version: nextjsVersion } },
-              { repo: 'clerk-docs', workflow_id: 'typedoc.yml' },
+              { repo: 'clerk', workflow_id: 'docs-typedoc.yml', inputs: { javascript_ref: context.sha }, critical: true },
             ];
             const results = await Promise.allSettled(
-              targets.map(t => github.rest.actions.createWorkflowDispatch({ owner: 'clerk', ref: 'main', ...t }))
+              targets.map(({ repo, workflow_id, inputs }) =>
+                github.rest.actions.createWorkflowDispatch({ owner: 'clerk', repo, workflow_id, ref: 'main', inputs })
+              )
             );
             const failures = results
               .map((r, i) => r.status === 'rejected' ? { target: targets[i], reason: r.reason } : null)
               .filter(Boolean);
             if (failures.length) {
-              failures.forEach(f => core.error(`Recovery dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`));
-              core.setFailed(`${failures.length} recovery dispatch(es) failed`);
+              failures.forEach(f => {
+                const message = `Recovery dispatch to ${f.target.repo}/${f.target.workflow_id} failed: ${f.reason?.message ?? f.reason}`;
+                if (f.target.critical) {
+                  core.setFailed(message);
+                } else {
+                  core.warning(message);
+                }
+              });
             } else {
               core.notice('Recovery dispatch completed successfully');
             }
 
       - name: Generate notification payload
         id: notification
-        if: steps.changesets.outputs.published == 'true'
+        if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' }}
         env:
           PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
           GH_ACTOR: ${{ github.actor }}
@@ -261,7 +275,7 @@ jobs:
 
       - name: Send commit log to Slack
         id: slack
-        if: steps.changesets.outputs.published == 'true'
+        if: ${{ !cancelled() && steps.changesets.outputs.published == 'true' && steps.notification.outcome == 'success' }}
         uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3 # v1.27.1
         with:
           payload: ${{ steps.notification.outputs.payload }}

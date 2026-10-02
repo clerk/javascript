@@ -27,8 +27,16 @@ import {
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { UserProfileAccountSection } from '../user-profile-account-section/user-profile-account-section';
 
-const HOME = fapiPhoneNumber({ id: 'idn_home', phone_number: '+18015550100', verification: fapiVerification() });
-const WORK = fapiPhoneNumber({ id: 'idn_work', phone_number: '+18015550199', verification: fapiVerification() });
+const HOME = fapiPhoneNumber({
+  id: 'idn_home',
+  phone_number: '+18015550100',
+  verification: fapiVerification('phone_code', { status: 'verified' }),
+});
+const WORK = fapiPhoneNumber({
+  id: 'idn_work',
+  phone_number: '+18015550199',
+  verification: fapiVerification('phone_code', { status: 'verified' }),
+});
 const HOME_LABEL = '+1 (801) 555-0100';
 const WORK_LABEL = '+1 (801) 555-0199';
 
@@ -176,7 +184,7 @@ describe('the user profile phone numbers', () => {
   });
 });
 
-const VERIFIED = fapiVerification({ strategy: 'email_code' });
+const VERIFIED = fapiVerification('email_code', { status: 'verified' });
 const PRIMARY = fapiEmailAddress({ id: 'idn_primary', email_address: 'alice@example.com', verification: VERIFIED });
 
 function signedInWithEmails(emails: EmailAddressJSON[], environment = fapiEnvironment()): FakeFapiSeed {

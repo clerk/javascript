@@ -133,16 +133,17 @@ export function UserProfilePhoneRowView({
         onRemove={onRemovePhone ? removePhone : undefined}
         onSetPrimary={primary.onSetPrimary}
         onVerify={canVerify ? verifyPhone : onVerifyPhone}
-      />
+      >
+        {primary.error ? (
+          <Text
+            role='alert'
+            color='negative'
+          >
+            {primary.error}
+          </Text>
+        ) : null}
+      </UserProfileContactListRowView>
       {dialog}
-      {primary.error ? (
-        <Text
-          role='alert'
-          color='negative'
-        >
-          {primary.error}
-        </Text>
-      ) : null}
       {onRemovePhone ? (
         <Confirmation
           handle={removePhoneConfirmation}

@@ -5,6 +5,7 @@ import type { LoadedClerk } from '@clerk/shared/types';
 import type { SignInContextType } from '../../contexts';
 import type { RouteContextValue } from '../../router/RouteContext';
 import { clerkWindowNavigate } from '../../utils/windowNavigate';
+import { signUpStepUrls } from './buildOAuthCallbackParams';
 
 type HandleSignUpIfMissingTransferProps = {
   clerk: LoadedClerk;
@@ -68,10 +69,7 @@ export async function handleSignUpIfMissingTransfer({
       // email/phone identifications to their verify pages.
       return navigateToNextStepSignUp({
         signUp: res,
-        continueSignUpUrl: '../create/continue',
-        verifyEmailAddressUrl: '../create/verify-email-address',
-        verifyPhoneNumberUrl: '../create/verify-phone-number',
-        signUpProtectCheckUrl: '../create/protect-check',
+        ...signUpStepUrls('../create/'),
         navigate,
       });
     default:

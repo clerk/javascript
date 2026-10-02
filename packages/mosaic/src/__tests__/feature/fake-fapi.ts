@@ -1,4 +1,5 @@
 import type {
+  ApiKeyJSON,
   ClientJSON,
   EmailAddressJSON,
   OrganizationMembershipJSON,
@@ -12,6 +13,13 @@ import { http, HttpResponse, type JsonBodyType } from 'msw';
 import { setupWorker } from 'msw/browser';
 
 import {
+  createVerificationState,
+  type FakeVerificationSeed,
+  type FakeVerificationState,
+  verificationHandlers,
+} from './fake-fapi/verification';
+import {
+  fapiApiKey,
   fapiClient,
   fapiEmailAddress,
   type FapiEnvironment,
@@ -35,9 +43,14 @@ export interface FakeFapiState {
   memberships: OrganizationMembershipJSON[];
   invitations: UserOrganizationInvitationJSON[];
   suggestions: OrganizationSuggestionJSON[];
+  apiKeys: ApiKeyJSON[];
+  verification: FakeVerificationState;
+  passwordUpdates: URLSearchParams[];
 }
 
-export type FakeFapiSeed = Partial<FakeFapiState>;
+export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification'>> & {
+  verification?: FakeVerificationSeed;
+};
 
 const unhandled: string[] = [];
 
@@ -75,6 +88,10 @@ function withStatus<T extends { status: string }>(items: T[], url: URL): T[] {
 
 function findSession(state: FakeFapiState, id: unknown): SessionJSON | undefined {
   return state.client.sessions.find(session => session.id === id);
+}
+
+function error(code: string, status = 400) {
+  return HttpResponse.json({ errors: [{ code, message: code, long_message: code }] }, { status });
 }
 
 function missing() {
@@ -152,22 +169,27 @@ export function verifyEmailOutOfBand(state: FakeFapiState, id: string) {
   }
   replaceEmail(state, {
     ...email,
-    verification: { ...(email.verification ?? fapiVerification()), status: 'verified' },
+    verification: { ...(email.verification ?? fapiVerification('email_code')), status: 'verified' },
   });
 }
 
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
+  const { verification, ...rest } = seed;
   const state: FakeFapiState = {
     environment: fapiEnvironment(),
     client: fapiClient(),
     memberships: [],
     invitations: [],
     suggestions: [],
-    ...seed,
+    apiKeys: [],
+    passwordUpdates: [],
+    ...rest,
+    verification: createVerificationState(verification),
   };
   let identifications = 0;
 
   worker.use(
+    ...verificationHandlers(state, fapiUrl),
     http.get(fapiUrl('/v1/environment'), () => HttpResponse.json(state.environment)),
     http.get(fapiUrl('/v1/client'), () => envelope(state.client, null)),
     http.post(fapiUrl('/v1/client/sessions/:id/tokens'), ({ params }) => {
@@ -205,6 +227,19 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const sessions = state.client.sessions.filter(s => s.id !== session.id);
       state.client = { ...state.client, sessions, last_active_session_id: sessions[0]?.id ?? null };
       return envelope({ ...session, status: 'removed' }, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/change_password'), async ({ request }) => {
+      const session = findSession(state, state.client.last_active_session_id);
+      if (!session) {
+        return missing();
+      }
+      state.passwordUpdates.push(new URLSearchParams(await request.text()));
+      const updatedUser = { ...session.user, password_enabled: true };
+      state.client = {
+        ...state.client,
+        sessions: state.client.sessions.map(item => (item.id === session.id ? { ...item, user: updatedUser } : item)),
+      };
+      return envelope(updatedUser, state.client);
     }),
     http.post(fapiUrl('/v1/client/sessions'), ({ request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
@@ -258,10 +293,8 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const domain = email.email_address.split('@')[1] ?? 'acme.co';
       const prepared: EmailAddressJSON = {
         ...email,
-        verification: fapiVerification({
-          status: 'unverified',
-          strategy,
-          external_verification_redirect_url: strategy === 'enterprise_sso' ? `https://idp.${domain}/sso` : null,
+        verification: fapiVerification(strategy, {
+          external_verification_redirect_url: strategy === 'enterprise_sso' ? `https://idp.${domain}/sso` : undefined,
         }),
       };
       replaceEmail(state, prepared);
@@ -276,7 +309,10 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       if (body.get('code') !== VERIFICATION_CODE) {
         return rejected('form_code_incorrect', 'Incorrect code');
       }
-      const verified: EmailAddressJSON = { ...email, verification: fapiVerification({ strategy: 'email_code' }) };
+      const verified: EmailAddressJSON = {
+        ...email,
+        verification: fapiVerification('email_code', { status: 'verified' }),
+      };
       replaceEmail(state, verified);
       return envelope(verified, state.client);
     }),
@@ -306,7 +342,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       if (!phone) {
         return missing();
       }
-      const prepared = { ...phone, verification: fapiVerification({ status: 'unverified' }) };
+      const prepared = { ...phone, verification: fapiVerification('phone_code') };
       replacePhone(state, prepared);
       return envelope(prepared, state.client);
     }),
@@ -319,7 +355,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       if (body.get('code') !== VERIFICATION_CODE) {
         return rejected('form_code_incorrect', 'Incorrect code');
       }
-      const verified = { ...phone, verification: fapiVerification() };
+      const verified = { ...phone, verification: fapiVerification('phone_code', { status: 'verified' }) };
       replacePhone(state, verified);
       return envelope(verified, state.client);
     }),
@@ -368,6 +404,41 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       state.suggestions = state.suggestions.map(s => (s.id === accepted.id ? accepted : s));
       return envelope(accepted, state.client);
     }),
+    http.get(fapiUrl('/api_keys'), ({ request }) => {
+      const url = new URL(request.url);
+      const subject = url.searchParams.get('subject');
+      const query = (url.searchParams.get('query') ?? '').toLowerCase();
+      const keys = state.apiKeys.filter(
+        key => !key.revoked && key.subject === subject && key.name.toLowerCase().includes(query),
+      );
+      return HttpResponse.json(page(keys, url));
+    }),
+    http.post(fapiUrl('/api_keys'), async ({ request }) => {
+      const body: { name: string; subject: string; seconds_until_expiration?: number } = await request.json();
+      if (state.apiKeys.some(key => !key.revoked && key.subject === body.subject && key.name === body.name)) {
+        return error('token_creation_conflict', 409);
+      }
+      const now = Date.now();
+      const created = fapiApiKey({
+        id: `ak_${state.apiKeys.length + 1}`,
+        name: body.name,
+        subject: body.subject,
+        expiration: body.seconds_until_expiration ? now + body.seconds_until_expiration * 1000 : null,
+        created_at: now,
+        updated_at: now,
+      });
+      state.apiKeys = [created, ...state.apiKeys];
+      return HttpResponse.json({ ...created, secret: `ak_secret_${created.id}` });
+    }),
+    http.post(fapiUrl('/api_keys/:id/revoke'), ({ params }) => {
+      const key = state.apiKeys.find(k => k.id === params.id);
+      if (!key) {
+        return missing();
+      }
+      const revoked = { ...key, revoked: true };
+      state.apiKeys = state.apiKeys.map(k => (k.id === revoked.id ? revoked : k));
+      return HttpResponse.json(revoked);
+    }),
   );
 
   return state;
@@ -376,7 +447,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
 export interface HeldRequests {
   requests: Request[];
   release: () => void;
-  fail: (code?: string) => void;
+  fail: (code?: string, longMessage?: string, paramName?: string) => void;
 }
 
 interface Hold {
@@ -418,7 +489,21 @@ export function holdRequests(method: 'get' | 'post', path: string): HeldRequests
   return {
     requests,
     release: () => settle(undefined),
-    fail: (code = 'form_param_invalid') =>
-      settle(HttpResponse.json({ errors: [{ code, message: code, long_message: code }] }, { status: 400 })),
+    fail: (code = 'form_param_invalid', longMessage = code, paramName?: string) =>
+      settle(
+        HttpResponse.json(
+          {
+            errors: [
+              {
+                code,
+                message: code,
+                long_message: longMessage,
+                ...(paramName ? { meta: { param_name: paramName } } : {}),
+              },
+            ],
+          },
+          { status: 400 },
+        ),
+      ),
   };
 }
