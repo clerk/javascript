@@ -44,5 +44,6 @@ describe('OrganizationProfileApiKeysPanel', () => {
 
     expect(await screen.findByText('Unavailable')).toBeVisible();
     expect(screen.queryByRole('table', { name: 'API Keys' })).toBeNull();
+    expect(screen.queryByText('API Keys')).toBeNull();
   });
 });

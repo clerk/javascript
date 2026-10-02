@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import { FormSubmitError } from '../../components/form';
+import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { useLocale, useMessages } from '../../localization';
 import { formatDate, formatRelativeTime } from './api-keys-table.format';
 import { resolveAPIKeysTableMessages } from './api-keys-table.messages';
@@ -27,23 +28,38 @@ export interface APIKeysTableProps {
 
 // -- Model --
 
-function useAPIKeysTableModel(subject: string, query: string, messages: APIKeysTableMessages) {
-  const clerk = useClerk();
+export function useAPIKeysAccess(subject: string | undefined) {
   const { isLoaded, session } = useSession();
-  const isOrganization = isOrganizationId(subject);
+  const settings = useMosaicEnvironment()?.apiKeysSettings;
+  const isOrganization = subject !== undefined && isOrganizationId(subject);
   const can = (permission: string) => !isOrganization || (session?.checkAuthorization({ permission }) ?? false);
   const canRead = can(READ_PERMISSION);
   const canManage = can(MANAGE_PERMISSION);
+  const isAvailable =
+    subject !== undefined &&
+    (isOrganization
+      ? session?.lastActiveOrganizationId === subject &&
+        Boolean(settings?.orgs_api_keys_enabled) &&
+        (canRead || canManage)
+      : session?.user.id === subject && Boolean(settings?.user_api_keys_enabled));
+
+  return { isLoaded, isAvailable, canRead, canManage };
+}
+
+function useAPIKeysTableModel(subject: string, query: string, messages: APIKeysTableMessages) {
+  const clerk = useClerk();
+  const { isLoaded, isAvailable, canRead, canManage } = useAPIKeysAccess(subject);
   const apiKeys = useAPIKeys({
     subject,
     query,
     pageSize: PAGE_SIZE,
     keepPreviousData: true,
-    enabled: Boolean(session) && canRead,
+    enabled: isAvailable && canRead,
   });
 
   return {
     isLoaded,
+    isAvailable,
     ...apiKeys,
     canManage,
     create: async ({ name, expiresAt }: CreateAPIKeyInput) => {
@@ -154,7 +170,7 @@ function SubjectAPIKeysTable({ subject, messages: overrides, fallback }: APIKeys
     }
   }, [isFetching, page, pageCount, fetchPage]);
 
-  if (!model.isLoaded) {
+  if (!model.isLoaded || !model.isAvailable) {
     return fallback ?? null;
   }
 

@@ -16,6 +16,7 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { MosaicProvider } from '../../../mosaic-provider';
 import type { APIKeysTableProps } from '../api-keys-table';
 import { APIKeysTable } from '../api-keys-table';
 
@@ -33,14 +34,14 @@ const alice = fapiUser({
 const userKey = (id: string, name: string, overrides: Partial<ApiKeyJSON> = {}) =>
   fapiApiKey({ id, name, subject: alice.id, created_at: Date.UTC(2026, 0, 5, 12), ...overrides });
 
-const webApp = userKey('ak_1', 'Web app', { expiration: Date.UTC(2027, 11, 31, 12) });
+const webApp = userKey('ak_1234567890FKWO', 'Web app', { expiration: Date.UTC(2027, 11, 31, 12) });
 const ciPipeline = userKey('ak_2', 'CI pipeline', { last_used_at: Date.now() - 2 * 60_000 });
 
 const manyKeys = Array.from({ length: 11 }, (_, index) => userKey(`ak_${index + 1}`, `Key ${index + 1}`));
 
 function signedIn(apiKeys: ApiKeyJSON[] = [webApp, ciPipeline], overrides: FakeFapiSeed = {}): FakeFapiSeed {
   return {
-    environment: fapiEnvironment({ api_keys_settings: { user_api_keys_enabled: true } }),
+    environment: fapiEnvironment({ api_keys_settings: { user_api_keys_enabled: true, orgs_api_keys_enabled: true } }),
     client: fapiClient([fapiSession({ id: 'sess_1', user: alice, last_active_organization_id: acme.id })]),
     apiKeys,
     ...overrides,
@@ -62,6 +63,14 @@ type User = ReturnType<typeof userEvent.setup>;
 
 const table = () => screen.getByRole('table', { name: 'API Keys' });
 
+async function expectFallback(seed: FakeFapiSeed, props: Partial<APIKeysTableProps> = {}) {
+  await renderTable(seed, { fallback: <p>Unavailable</p>, ...props });
+
+  expect(await screen.findByText('Unavailable')).toBeVisible();
+  expect(screen.queryByRole('table', { name: 'API Keys' })).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Create API key' })).toBeNull();
+}
+
 async function openCreate(user: User) {
   await user.click(await screen.findByRole('button', { name: 'Create API key' }));
   return screen.findByRole('dialog', { name: 'Add new API key' });
@@ -73,12 +82,38 @@ async function fillCreate(user: User, dialog: HTMLElement, name: string, expirat
   await user.click(await screen.findByRole('option', { name: expiration }));
 }
 
-async function openRevoke(user: User, name: string) {
+async function startRevoke(user: User, name: string) {
   await user.click(await screen.findByRole('button', { name: `Manage ${name}` }));
   await user.click(await screen.findByRole('menuitem', { name: 'Revoke key' }));
-  const dialog = await screen.findByRole('dialog', { name: `Revoke ${name}?` });
+  return screen.findByRole('dialog', { name: `Revoke ${name}?` });
+}
+
+async function openRevoke(user: User, name: string) {
+  const dialog = await startRevoke(user, name);
   await user.type(within(dialog).getByRole('textbox'), name);
   return dialog;
+}
+
+function failRevokeOnce(id: string) {
+  worker.use(
+    http.post(
+      fapiUrl(`/api_keys/${id}/revoke`),
+      () =>
+        HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'api_key_revoke_failed',
+                message: 'api_key_revoke_failed',
+                long_message: 'api_key_revoke_failed',
+              },
+            ],
+          },
+          { status: 400 },
+        ),
+      { once: true },
+    ),
+  );
 }
 
 describe('APIKeysTable', () => {
@@ -102,6 +137,7 @@ describe('APIKeysTable', () => {
       expect(within(table()).getByText('Never expires')).toBeVisible();
       expect(within(table()).getByRole('cell', { name: '2 minutes ago' })).toBeVisible();
       expect(within(table()).getByRole('cell', { name: '-' })).toBeVisible();
+      expect(within(table()).getByText('ak_...FKWO', { exact: false })).toBeVisible();
     });
 
     it('shows loading until the first page arrives', async () => {
@@ -124,10 +160,45 @@ describe('APIKeysTable', () => {
       ).toBeVisible();
     });
 
+    it('treats a blank search as no search', async () => {
+      const { user } = await renderTable(signedIn([]));
+      await screen.findByText('No API Keys created');
+
+      await user.type(screen.getByRole('searchbox', { name: 'Search API keys' }), '   ');
+
+      expect(screen.getByText('No API Keys created')).toBeVisible();
+      expect(screen.queryByText(/did not return any results/)).toBeNull();
+    });
+
     it('uses the messages it is given over its own', async () => {
       await renderTable(signedIn([]), { messages: { noKeys: 'Nothing here yet' } });
 
       expect(await screen.findByText('Nothing here yet')).toBeVisible();
+    });
+
+    it('uses the localization of its provider', async () => {
+      serveFapi(signedIn());
+      await renderWithClerk(
+        <MosaicProvider
+          localization={{
+            overrides: {
+              'apiKeysTable.search': 'Find a key',
+              'apiKeysTable.expires': 'Expiration: {expiresDate}',
+              'apiKeysTable.revokeTitle': 'Retirer {name} ?',
+            },
+          }}
+        >
+          <APIKeysTable subject={alice.id} />
+        </MosaicProvider>,
+      );
+      const user = userEvent.setup();
+
+      expect(await within(table()).findByText('Expiration: Dec 31, 2027')).toBeVisible();
+      expect(screen.getByRole('searchbox', { name: 'Find a key' })).toBeVisible();
+      await user.click(screen.getByRole('button', { name: 'Manage Web app' }));
+      await user.click(await screen.findByRole('menuitem', { name: 'Revoke key' }));
+      const dialog = await screen.findByRole('dialog', { name: 'Retirer Web app ?' });
+      await waitFor(() => expect(dialog).toBeVisible());
     });
 
     it('explains a failed load instead of showing no keys, and loads again on retry', { timeout: 20_000 }, async () => {
@@ -152,6 +223,22 @@ describe('APIKeysTable', () => {
     });
   });
 
+  describe('availability', () => {
+    it('renders the fallback when signed out', async () => {
+      await expectFallback(signedIn([], { client: fapiClient([]) }));
+    });
+
+    it('renders the fallback when user API keys are disabled', async () => {
+      await expectFallback(
+        signedIn([], { environment: fapiEnvironment({ api_keys_settings: { orgs_api_keys_enabled: true } }) }),
+      );
+    });
+
+    it('renders the fallback for a user other than the signed-in one', async () => {
+      await expectFallback(signedIn(), { subject: 'user_2' });
+    });
+  });
+
   describe('searching', () => {
     it('lists only matching keys and explains when nothing matches', async () => {
       const { user } = await renderTable();
@@ -165,6 +252,20 @@ describe('APIKeysTable', () => {
       await user.clear(search);
       await user.type(search, 'nothing');
       expect(await screen.findByText('Your search for "nothing" did not return any results.')).toBeVisible();
+    });
+
+    it('clears the search and keeps focus in it', async () => {
+      const { user } = await renderTable();
+      await within(table()).findByText('CI pipeline');
+      const search = screen.getByRole('searchbox', { name: 'Search API keys' });
+      await user.type(search, 'web');
+      await waitFor(() => expect(within(table()).queryByText('CI pipeline')).toBeNull());
+
+      await user.click(screen.getByRole('button', { name: 'Clear search' }));
+
+      expect(search).toHaveValue('');
+      expect(search).toHaveFocus();
+      expect(await within(table()).findByText('CI pipeline')).toBeVisible();
     });
 
     it('returns to the first page for a new search', async () => {
@@ -186,7 +287,11 @@ describe('APIKeysTable', () => {
       expect(await within(table()).findByText('Key 1')).toBeVisible();
       expect(screen.getByText('1/2')).toBeVisible();
 
+      const next = holdRequests('get', '/api_keys');
       await user.click(screen.getByRole('button', { name: 'Next API keys page' }));
+      await waitFor(() => expect(table()).toHaveAttribute('aria-busy', 'true'));
+      expect(within(table()).getByText('Key 1')).toBeVisible();
+      next.release();
       expect(await within(table()).findByText('Key 11')).toBeVisible();
       expect(within(table()).queryByText('Key 1')).toBeNull();
 
@@ -370,18 +475,77 @@ describe('APIKeysTable', () => {
       expect(fapi.apiKeys.find(key => key.id === webApp.id)?.revoked).toBe(true);
     });
 
-    it('explains a failed revoke and keeps the dialog open', async () => {
+    it('revokes only once the exact name is typed, and returns focus on cancel', async () => {
+      const { fapi, user } = await renderTable();
+      const dialog = await startRevoke(user, 'Web app');
+
+      await user.type(
+        within(dialog).getByRole('textbox', { name: 'Type “Web app” below to continue' }),
+        'web app{Enter}',
+      );
+      expect(within(dialog).getByRole('button', { name: 'Revoke key' })).toHaveAttribute('aria-disabled', 'true');
+
+      await user.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Web app' })).toHaveFocus());
+      expect(fapi.apiKeys.find(key => key.id === webApp.id)?.revoked).toBeFalsy();
+    });
+
+    it('holds the dialog while the key is revoked', async () => {
       const { user } = await renderTable();
       const dialog = await openRevoke(user, 'Web app');
       const revoke = holdRequests('post', `/api_keys/${webApp.id}/revoke`);
 
       await user.click(within(dialog).getByRole('button', { name: 'Revoke key' }));
-      revoke.fail('api_key_revoke_failed');
+      await waitFor(() => expect(within(dialog).getByRole('textbox')).toBeDisabled());
+      expect(within(dialog).getByRole('button', { name: 'Revoke key' })).toHaveAttribute('aria-busy', 'true');
+
+      revoke.release();
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    });
+
+    it('explains a failed revoke, keeps the dialog open, and revokes on retry', async () => {
+      const { fapi, user } = await renderTable();
+      const dialog = await openRevoke(user, 'Web app');
+      failRevokeOnce(webApp.id);
+
+      await user.click(within(dialog).getByRole('button', { name: 'Revoke key' }));
 
       await waitFor(() =>
         expect(within(dialog).getByRole('textbox')).toHaveAccessibleDescription('api_key_revoke_failed'),
       );
-      expect(screen.getByRole('dialog', { name: 'Revoke Web app?' })).toBeVisible();
+      expect(within(dialog).getByRole('textbox')).toHaveValue('Web app');
+
+      await user.click(within(dialog).getByRole('button', { name: 'Revoke key' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(fapi.apiKeys.find(key => key.id === webApp.id)?.revoked).toBe(true);
+    });
+
+    it('starts each revoke without the previous failure', async () => {
+      const { user } = await renderTable();
+      const first = await openRevoke(user, 'Web app');
+      failRevokeOnce(webApp.id);
+      await user.click(within(first).getByRole('button', { name: 'Revoke key' }));
+      await waitFor(() =>
+        expect(within(first).getByRole('textbox')).toHaveAccessibleDescription('api_key_revoke_failed'),
+      );
+      await user.click(within(first).getByRole('button', { name: 'Cancel' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+
+      const second = await startRevoke(user, 'CI pipeline');
+
+      expect(within(second).getByRole('textbox')).toHaveValue('');
+      expect(within(second).getByRole('textbox')).not.toHaveAccessibleDescription('api_key_revoke_failed');
+    });
+
+    it('moves focus to the next key, then to create once no keys are left', async () => {
+      const { user } = await renderTable();
+
+      await user.click(within(await openRevoke(user, 'Web app')).getByRole('button', { name: 'Revoke key' }));
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Manage CI pipeline' })).toHaveFocus());
+
+      await user.click(within(await openRevoke(user, 'CI pipeline')).getByRole('button', { name: 'Revoke key' }));
+      expect(await screen.findByText('No API Keys created')).toBeVisible();
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Create API key' })).toHaveFocus());
     });
 
     it('returns to the previous page when the last key on a page is revoked', async () => {
@@ -432,6 +596,7 @@ describe('APIKeysTable', () => {
       expect(await within(table()).findByText('Org key')).toBeVisible();
       expect(screen.queryByRole('button', { name: 'Create API key' })).toBeNull();
       expect(screen.queryByRole('button', { name: 'Manage Org key' })).toBeNull();
+      expect(screen.queryByRole('columnheader', { name: 'Actions' })).toBeNull();
     });
 
     it('lets a manager without permission to read keys create one', async () => {
@@ -447,11 +612,22 @@ describe('APIKeysTable', () => {
       expect(fapi.apiKeys[0]).toMatchObject({ name: 'Deploy', subject: acme.id });
     });
 
-    it('lists nothing without permission to read keys', async () => {
-      await renderTable(memberOfAcme([]), { subject: acme.id });
+    it('renders the fallback without permission to read or manage keys', async () => {
+      await expectFallback(memberOfAcme([]), { subject: acme.id });
+    });
 
-      expect(await screen.findByText('No API Keys created')).toBeVisible();
-      expect(within(table()).queryByText('Org key')).toBeNull();
+    it('renders the fallback for an organization other than the active one', async () => {
+      await expectFallback(memberOfAcme([readKeys, manageKeys]), { subject: 'org_2' });
+    });
+
+    it('renders the fallback when organization API keys are disabled', async () => {
+      await expectFallback(
+        {
+          ...memberOfAcme([readKeys, manageKeys]),
+          environment: fapiEnvironment({ api_keys_settings: { user_api_keys_enabled: true } }),
+        },
+        { subject: acme.id },
+      );
     });
 
     it('starts over on the first page with no search when the subject changes', async () => {
