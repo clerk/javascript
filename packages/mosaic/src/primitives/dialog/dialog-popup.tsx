@@ -3,6 +3,7 @@
 import { FloatingFocusManager } from '@floating-ui/react';
 import React from 'react';
 
+import { isInput } from '../drawer/helpers';
 import { type FocusTarget, useFinalFocus, useInitialFocus } from '../hooks/use-focus-target';
 import { type ComponentProps, type DefaultProps, Freeze, mergeProps, useRender } from '../utils';
 import { useDialogContext } from './dialog-context';
@@ -16,6 +17,22 @@ export interface DialogPopupProps extends ComponentProps<'div'> {
   initialFocus?: DialogFocusTarget;
   /** Where focus returns when the dialog closes. Default: the trigger, via `useReturnFocus`. */
   finalFocus?: DialogFocusTarget;
+}
+
+// iOS raises the keyboard only for focus taken inside the opening tap; the focus manager's lands a frame late.
+function GestureFocus({ target }: { target: number | React.MutableRefObject<HTMLElement | null> }) {
+  const openingTarget = React.useRef(target);
+  React.useLayoutEffect(() => {
+    const initial = openingTarget.current;
+    if (typeof initial === 'number') {
+      return;
+    }
+    const element = initial.current;
+    if (element && isInput(element) && element !== element.ownerDocument.activeElement) {
+      element.focus({ preventScroll: true });
+    }
+  }, []);
+  return null;
 }
 
 /** The dialog content container. Manages focus trapping via `FloatingFocusManager` and wires ARIA attributes from `Dialog.Title` and `Dialog.Description`. */
@@ -60,7 +77,12 @@ export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(fu
     // usually reset the state behind it — a machine returning to `idle`, a form clearing. The
     // contents hold their last frame on the way out instead of snapping back under the fade. The
     // popup element itself stays live, so `data-closed` / `data-ending-style` still land.
-    children: <Freeze frozen={!open}>{children}</Freeze>,
+    children: (
+      <>
+        <Freeze frozen={!open}>{children}</Freeze>
+        {open ? <GestureFocus target={resolvedInitialFocus} /> : null}
+      </>
+    ),
   };
 
   const element = useRender({

@@ -113,3 +113,37 @@ export function focusWithoutScroll(event: React.TouchEvent): void {
   event.preventDefault();
   target.focus({ preventScroll: true });
 }
+
+function canScroll(element: Element, deltaY: number): boolean {
+  if (!/(auto|scroll)/.test(getComputedStyle(element).overflowY) || element.scrollHeight <= element.clientHeight) {
+    return false;
+  }
+  return deltaY > 0 ? element.scrollTop > 0 : element.scrollTop + element.clientHeight < element.scrollHeight - 1;
+}
+
+// With the keyboard up iOS pans the visual viewport over the page; only a drag something can scroll goes through.
+export function preventViewportPan(element: HTMLElement): () => void {
+  let startY = 0;
+  const onTouchStart = (event: TouchEvent) => {
+    startY = event.touches[0]?.clientY ?? 0;
+  };
+  const onTouchMove = (event: TouchEvent) => {
+    const touch = event.touches[0];
+    if (event.touches.length > 1 || !touch || !event.cancelable) {
+      return;
+    }
+    const deltaY = touch.clientY - startY;
+    for (let node = event.target instanceof Element ? event.target : null; node; node = node.parentElement) {
+      if ((node instanceof HTMLInputElement && node.type === 'range') || canScroll(node, deltaY)) {
+        return;
+      }
+    }
+    event.preventDefault();
+  };
+  element.addEventListener('touchstart', onTouchStart, { passive: true });
+  element.addEventListener('touchmove', onTouchMove, { passive: false });
+  return () => {
+    element.removeEventListener('touchstart', onTouchStart);
+    element.removeEventListener('touchmove', onTouchMove);
+  };
+}

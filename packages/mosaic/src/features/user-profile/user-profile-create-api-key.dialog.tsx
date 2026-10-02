@@ -47,6 +47,7 @@ export function UserProfileCreateAPIKeyDialog(props: UserProfileCreateAPIKeyDial
       onOpenChange={props.onOpenChange}
     >
       <Dialog.Popup
+        compactPlacement='sheet'
         initialFocus={props.secret ? undefined : nameInput}
         finalFocus={props.finalFocus}
       >

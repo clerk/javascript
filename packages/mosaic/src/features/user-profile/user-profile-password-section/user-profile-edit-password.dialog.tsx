@@ -54,6 +54,7 @@ export function UserProfileEditPasswordDialog({
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
       <Dialog.Popup
+        compactPlacement='sheet'
         variant='card'
         initialFocus={initialFocusRef}
       >

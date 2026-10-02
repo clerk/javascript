@@ -50,6 +50,7 @@ export function UserProfileAddMfaDialog({
         {m.add}
       </Dialog.Trigger>
       <Dialog.Popup
+        compactPlacement='sheet'
         variant='card'
         finalFocus={addButtonRef}
       >

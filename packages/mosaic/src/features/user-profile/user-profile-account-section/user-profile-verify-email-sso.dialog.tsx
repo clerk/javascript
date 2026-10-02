@@ -42,7 +42,10 @@ export function UserProfileVerifyEmailSsoDialog({
       onOpenChange={onOpenChange}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
-      <Dialog.Popup variant='card'>
+      <Dialog.Popup
+        compactPlacement='sheet'
+        variant='card'
+      >
         <Card.Root
           elevation='overlay'
           renderBranding={false}

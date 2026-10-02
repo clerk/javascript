@@ -1,5 +1,5 @@
 import type { FormEvent, ReactNode } from 'react';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
@@ -78,6 +78,8 @@ function DestructiveCard({
   // That is what makes Enter in the field submit. Both guards are re-checked here because
   // neither spelling stops a native submit: `focusableWhenDisabled` only marks the button
   // `aria-disabled`, and `isPending` only cancels the press.
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isConfirmed && !isDeleting) {
@@ -100,6 +102,7 @@ function DestructiveCard({
           <Field.Root invalid={Boolean(errorMessage)}>
             <Field.Label>{fieldLabel}</Field.Label>
             <Input
+              ref={inputRef}
               // Not a credential, so 1Password is told to leave it alone rather than
               // cover it with an autofill overlay.
               data-1p-ignore
@@ -167,7 +170,9 @@ function DestructiveCard({
 
   return (
     <Dialog.Popup
+      compactPlacement='sheet'
       variant='card'
+      initialFocus={inputRef}
       finalFocus={finalFocus}
     >
       <Card.Root

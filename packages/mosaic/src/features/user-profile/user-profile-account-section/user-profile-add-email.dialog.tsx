@@ -40,6 +40,7 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
     >
       {props.trigger ? <Dialog.Trigger render={props.trigger} /> : null}
       <Dialog.Popup
+        compactPlacement='sheet'
         variant='card'
         initialFocus={props.step === 'email' ? emailRef : undefined}
       >

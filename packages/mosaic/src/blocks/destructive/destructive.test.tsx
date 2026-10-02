@@ -68,6 +68,12 @@ describe('Destructive', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
+  it('focuses the confirmation field on open', async () => {
+    renderBlock();
+
+    await waitFor(() => expect(screen.getByRole('textbox')).toHaveFocus());
+  });
+
   it('asks to open from the trigger', async () => {
     const onOpenChange = vi.fn();
     const user = userEvent.setup();
