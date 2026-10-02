@@ -54,6 +54,7 @@
     "dev": "tsdown --config tsdown.config.mts --watch",
     "format": "node ../../scripts/format-package.mjs",
     "format:check": "node ../../scripts/format-package.mjs --check",
+    "generate:provider-logos": "node ./scripts/generate-provider-logos.mjs",
     "lint": "eslint src",
     "lint:attw": "attw --pack . --exclude-entrypoints styles.css --profile esm-only",
     "lint:publint": "publint",
@@ -86,6 +87,7 @@
     "qrcode.react": "4.2.0",
     "react": "catalog:react",
     "react-dom": "catalog:react",
+    "svgo": "^3.3.5",
     "tsdown": "catalog:repo",
     "vitest-axe": "^0.1.0"
   },

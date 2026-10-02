@@ -41,7 +41,9 @@ Skills are Claude Code specific. Cursor does not read this directory; it uses `.
 
 ## Skills in this repo
 
-| Skill            | Use it for                                                                                                                              |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `clerk-monorepo` | Day-to-day work in the monorepo: setup, build/test loops, the package map, changesets, commits, PRs, breaking-change checks.            |
-| `mosaic`         | Mosaic flow UI: authoring machines, controllers, and views, and migrating a legacy component into the split (with parity verification). |
+| Skill                  | Use it for                                                                                                                              |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `clerk-monorepo`       | Day-to-day work in the monorepo: setup, build/test loops, the package map, changesets, commits, PRs, breaking-change checks.            |
+| `mosaic`               | Mosaic flow UI: authoring machines, controllers, and views, and migrating a legacy component into the split (with parity verification). |
+| `provider-logo-add`    | Adding a logo for a new provider to Mosaic's `ProviderLogo`.                                                                            |
+| `provider-logo-update` | Checking provider logos against each brand's official assets and refreshing outdated ones.                                              |
