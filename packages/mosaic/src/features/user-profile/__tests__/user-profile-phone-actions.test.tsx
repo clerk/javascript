@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileAccountSectionViewProps } from '../user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '../user-profile-account-section/user-profile-account-section.view';
@@ -185,7 +186,7 @@ describe('phone actions', () => {
     const user = userEvent.setup();
     const onRemovePhone = vi
       .fn()
-      .mockRejectedValueOnce(new Error('Cannot remove this phone.'))
+      .mockRejectedValueOnce(clerkApiError('phone_number_in_use', 'Cannot remove this phone.'))
       .mockResolvedValue(undefined);
     renderPhone({ onRemovePhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));

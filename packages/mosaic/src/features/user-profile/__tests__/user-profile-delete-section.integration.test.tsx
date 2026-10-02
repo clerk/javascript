@@ -4,6 +4,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileDeleteSection } from '../user-profile-delete-section/user-profile-delete-section';
 
@@ -119,7 +120,9 @@ describe('UserProfileDeleteSection', () => {
   });
 
   it('keeps the dialog up with a message when the delete fails', async () => {
-    deleteUser = vi.fn(() => Promise.reject(new Error('Your subscription is still active.')));
+    deleteUser = vi.fn(() =>
+      Promise.reject(clerkApiError('subscription_active', 'Your subscription is still active.')),
+    );
     const user = userEvent.setup();
     renderSection();
     const dialog = await openDialog(user);
@@ -127,7 +130,7 @@ describe('UserProfileDeleteSection', () => {
     await user.type(within(dialog).getByRole('textbox'), 'Delete account');
     await user.click(within(dialog).getByRole('button', { name: 'Delete account' }));
 
-    expect(await screen.findByText('Something went wrong')).toBeInTheDocument();
+    expect(await screen.findByText('Your subscription is still active.')).toBeInTheDocument();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(setActive).not.toHaveBeenCalled();
   });

@@ -1,8 +1,15 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../machine/create-actor';
+import { SaveError } from '../../utils/form-error';
 import { confirmationMachine, useConfirmationController } from './confirmation.controller';
+
+const blocked = new SaveError({ global: { code: 'action_blocked', message: 'Raw server sentence.' } });
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 function start() {
   const actor = createActor(confirmationMachine).start();
@@ -43,24 +50,25 @@ describe('confirmationMachine', () => {
 
   it('lands back on confirming with the reason when the action fails', async () => {
     const actor = start();
-    actor.send({ type: 'CONFIRM', run: () => Promise.reject(new Error('Google is your only way to sign in.')) });
+    actor.send({ type: 'CONFIRM', run: () => Promise.reject(blocked) });
 
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('confirming'));
-    expect(actor.getSnapshot().context.error).toBe('Google is your only way to sign in.');
+    expect(actor.getSnapshot().context.error).toEqual(blocked.formError.global);
   });
 
-  it('falls back to generic copy when the rejection is not an Error', async () => {
+  it('holds nothing of an unexpected error, never its message', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     const actor = start();
-    // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors -- a non-Error rejection is the case under test
-    actor.send({ type: 'CONFIRM', run: () => Promise.reject('nope') });
+    actor.send({ type: 'CONFIRM', run: () => Promise.reject(new Error('Cannot read properties of undefined')) });
 
-    await vi.waitFor(() => expect(actor.getSnapshot().context.error).toBe('Something went wrong. Please try again.'));
+    await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('confirming'));
+    expect(actor.getSnapshot().context.error).toEqual({});
   });
 
   it('drops the error when cancelled, so the next open starts clean', async () => {
     const actor = start();
-    actor.send({ type: 'CONFIRM', run: () => Promise.reject(new Error('nope')) });
-    await vi.waitFor(() => expect(actor.getSnapshot().context.error).toBe('nope'));
+    actor.send({ type: 'CONFIRM', run: () => Promise.reject(blocked) });
+    await vi.waitFor(() => expect(actor.getSnapshot().context.error).toBeDefined());
 
     actor.send({ type: 'CANCEL' });
 
@@ -85,14 +93,24 @@ describe('useConfirmationController', () => {
     await waitFor(() => expect(result.current.isOpen).toBe(false));
   });
 
-  it('surfaces a failure as the error message and stays open', async () => {
+  it('surfaces a failure as the localized copy for its code and stays open', async () => {
     const { result } = renderHook(() => useConfirmationController());
     act(() => result.current.onOpenChange(true));
 
-    act(() => result.current.onConfirm(() => Promise.reject(new Error('nope'))));
+    act(() => result.current.onConfirm(() => Promise.reject(blocked)));
 
-    await waitFor(() => expect(result.current.errorMessage).toBe('nope'));
+    await waitFor(() => expect(result.current.errorMessage).toMatch(/contact support/));
     expect(result.current.isOpen).toBe(true);
     expect(result.current.isConfirming).toBe(false);
+  });
+
+  it('surfaces the fallback it was given for an unexpected error', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { result } = renderHook(() => useConfirmationController({ errorFallback: 'Unable to remove this member.' }));
+    act(() => result.current.onOpenChange(true));
+
+    act(() => result.current.onConfirm(() => Promise.reject(new Error('internal'))));
+
+    await waitFor(() => expect(result.current.errorMessage).toBe('Unable to remove this member.'));
   });
 });

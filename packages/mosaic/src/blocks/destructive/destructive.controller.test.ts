@@ -1,12 +1,17 @@
 import { ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../__tests__/async';
 import type { ReverificationController } from '../../features/reverification';
+import { SaveError } from '../../utils/form-error';
 import { useDestructiveController } from './destructive.controller';
 
 const idleReverification = { status: 'idle', visible: false, reset: vi.fn() } as ReverificationController;
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('useDestructiveController', () => {
   it('starts closed and opens from the opener or from onOpenChange', () => {
@@ -37,6 +42,21 @@ describe('useDestructiveController', () => {
     expect(result.current.isDeleting).toBe(true);
   });
 
+  it('shows the fallback, never the message, of an unexpected error', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const onDelete = () => Promise.reject(new Error('Cannot read properties of undefined'));
+    const { result } = renderHook(() =>
+      useDestructiveController({ onDelete, errorFallback: 'Unable to delete this account.' }),
+    );
+    act(() => result.current.onOpenChange(true));
+
+    await act(async () => {
+      await result.current.onDelete();
+    });
+
+    expect(result.current.errorMessage).toBe('Unable to delete this account.');
+  });
+
   it('stays open and pending until the action resolves, then closes', async () => {
     const pending = deferred<void>();
     const onDelete = vi.fn(() => pending.promise);
@@ -61,7 +81,7 @@ describe('useDestructiveController', () => {
   it('stays open with a message when the action rejects, and a retry can succeed', async () => {
     const onDelete = vi
       .fn<() => Promise<unknown>>()
-      .mockRejectedValueOnce(new Error('Your subscription is still active.'))
+      .mockRejectedValueOnce(new SaveError({ global: { code: 'action_blocked', message: 'Raw server sentence.' } }))
       .mockResolvedValueOnce(undefined);
     const { result } = renderHook(() => useDestructiveController({ onDelete }));
     act(() => result.current.onOpenChange(true));
@@ -71,7 +91,7 @@ describe('useDestructiveController', () => {
     });
     expect(result.current.open).toBe(true);
     expect(result.current.isDeleting).toBe(false);
-    expect(result.current.errorMessage).toBe('Something went wrong');
+    expect(result.current.errorMessage).toMatch(/contact support/);
 
     await act(async () => {
       await result.current.onDelete();

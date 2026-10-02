@@ -60,6 +60,21 @@ describe('useErrorText', () => {
     expect(errorText({ 'errors.generic': 'Algo salió mal.' })({})).toBe('Algo salió mal.');
     expect(errorText()({ code: 'toString' })).toBe('Something went wrong. Please try again.');
   });
+
+  it('uses the fallback it is given ahead of the generic message', () => {
+    expect(errorText()({}, 'Unable to sign out.')).toBe('Unable to sign out.');
+  });
+
+  it('prefers the copy for the code and the message Clerk sent over the fallback', () => {
+    const text = errorText({ 'errors.form_identifier_exists': 'Ya existe.' });
+    expect(text({ code: 'form_identifier_exists', message: 'Taken' }, 'Unable to save.')).toBe('Ya existe.');
+    expect(text({ code: 'unknown', message: 'Taken' }, 'Unable to save.')).toBe('Taken');
+  });
+
+  it('never shows an empty message', () => {
+    expect(errorText()({ code: 'unknown', message: '' }, 'Unable to save.')).toBe('Unable to save.');
+    expect(errorText()({ code: 'unknown', message: '' })).toBe('Something went wrong. Please try again.');
+  });
 });
 
 describe('Clerk API error localization', () => {
@@ -90,10 +105,8 @@ describe('Clerk API error localization', () => {
     expect(text(toLocalizableApiError(firstError([{ code: 'unknown', message: 'Short' }])))).toBe('Short');
   });
 
-  it('preserves an empty message unless the feature provides a fallback', () => {
+  it('uses the feature fallback for an empty message', () => {
     const error = firstError([{ code: 'unknown', message: '', long_message: '' }]);
-    const text = errorText();
-    expect(text(toLocalizableApiError(error))).toBe('');
-    expect(text(toLocalizableApiError(error, 'Retry'))).toBe('Retry');
+    expect(errorText()(toLocalizableApiError(error, 'Retry'))).toBe('Retry');
   });
 });

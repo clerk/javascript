@@ -1,5 +1,8 @@
 import { useRef, useState } from 'react';
 
+import type { LocalizableError } from '../../../localization';
+import { useErrorText } from '../../../localization';
+import { toLocalizableError } from '../../../utils/form-error';
 import type {
   EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,
@@ -10,7 +13,7 @@ export interface UserProfileEnterpriseAccountsControllerOptions {
   accounts: UserProfileEnterpriseAccount[];
   connections: UserProfileEnterpriseConnection[];
   onConnect: (connectionId: string) => Promise<EnterpriseAccountActionResult>;
-  errorMessage: string;
+  errorFallback: string;
 }
 
 export interface UserProfileEnterpriseAccountsController {
@@ -24,10 +27,11 @@ export function useUserProfileEnterpriseAccountsController({
   accounts,
   connections,
   onConnect,
-  errorMessage,
+  errorFallback,
 }: UserProfileEnterpriseAccountsControllerOptions): UserProfileEnterpriseAccountsController {
   const [pendingId, setPendingId] = useState<string>();
-  const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
+  const errorText = useErrorText();
+  const [connectErrors, setConnectErrors] = useState<Record<string, LocalizableError>>({});
   const connecting = useRef(false);
 
   const run = async (id: string) => {
@@ -43,7 +47,7 @@ export function useUserProfileEnterpriseAccountsController({
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
     } catch (error) {
-      setConnectErrors(current => ({ ...current, [id]: error instanceof Error ? error.message : errorMessage }));
+      setConnectErrors(current => ({ ...current, [id]: toLocalizableError(error) }));
     } finally {
       connecting.current = false;
       setPendingId(undefined);
@@ -52,9 +56,10 @@ export function useUserProfileEnterpriseAccountsController({
 
   return {
     accounts,
-    connections: connections.map(connection =>
-      connectErrors[connection.id] ? { ...connection, connectError: connectErrors[connection.id] } : connection,
-    ),
+    connections: connections.map(connection => {
+      const error = connectErrors[connection.id];
+      return error ? { ...connection, connectError: errorText(error, errorFallback) } : connection;
+    }),
     pendingId,
     onConnect: id => void run(id),
   };

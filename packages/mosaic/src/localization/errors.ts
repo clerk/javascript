@@ -21,12 +21,18 @@ export function toLocalizableApiError(error: ClerkAPIError, fallback?: string): 
   };
 }
 
-export function useErrorText(): (error: LocalizableError) => string {
+/**
+ * Turns an error into copy: the catalog entry for its code on that field, then for its code, then the
+ * message Clerk sent, then `fallback`, then the generic error.
+ */
+export function useErrorText(): (error: LocalizableError, fallback?: string) => string {
   const messages = useMessages('errors');
   const lookup = (key: string | undefined) => (key && Object.hasOwn(messages, key) ? messages[key] : undefined);
-  return ({ code, paramName, message, params }) => {
+  return ({ code, paramName, message, params }, fallback) => {
     const template =
-      lookup(code && paramName ? `${code}__${paramName}` : undefined) ?? lookup(code) ?? message ?? messages.generic;
+      lookup(code && paramName ? `${code}__${paramName}` : undefined) ??
+      lookup(code) ??
+      (message || fallback || messages.generic);
     return params ? fill(template, params) : template;
   };
 }

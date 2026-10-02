@@ -52,6 +52,7 @@ function passwordError(
   );
 }
 
+// TODO: Move onto save() and toLocalizableError so an unknown error never shows its message, then drop toLocalizableApiError.
 export function passwordFormError(
   error: unknown,
   requiresCurrentPassword: boolean,
