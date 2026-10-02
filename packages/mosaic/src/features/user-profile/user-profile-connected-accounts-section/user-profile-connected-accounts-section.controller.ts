@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 
+import { useMessages } from '../../../localization';
 import type {
   ConnectedAccountActionResult,
   UserProfileConnectedAccount,
@@ -11,7 +12,6 @@ export interface UserProfileConnectedAccountsControllerOptions {
   availableProviders: UserProfileConnectionProvider[];
   onConnect: (id: string) => Promise<ConnectedAccountActionResult>;
   onReconnect: (id: string) => Promise<ConnectedAccountActionResult>;
-  formatError: (error: unknown) => string;
 }
 
 export interface UserProfileConnectedAccountsController {
@@ -27,8 +27,8 @@ export function useUserProfileConnectedAccountsController({
   availableProviders,
   onConnect,
   onReconnect,
-  formatError,
 }: UserProfileConnectedAccountsControllerOptions): UserProfileConnectedAccountsController {
+  const messages = useMessages('userProfileConnectedAccounts');
   const [pendingId, setPendingId] = useState<string>();
   const [connectErrors, setConnectErrors] = useState<Record<string, string>>({});
   const [reconnectErrors, setReconnectErrors] = useState<Record<string, string>>({});
@@ -51,7 +51,7 @@ export function useUserProfileConnectedAccountsController({
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
     } catch (error) {
-      setErrors(current => ({ ...current, [id]: formatError(error) }));
+      setErrors(current => ({ ...current, [id]: error instanceof Error ? error.message : messages.errors.generic }));
     } finally {
       connecting.current = false;
       setPendingId(undefined);

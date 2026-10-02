@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react';
 
-import { useMessages } from '../../../localization';
-import { connectedAccountErrorMessage } from './user-profile-connected-accounts-feedback';
 import { useUserProfileConnectedAccountsController } from './user-profile-connected-accounts-section.controller';
 import type {
   AdditionalOAuthScopes,
@@ -46,27 +44,18 @@ function ConnectedAccounts({
   model: Extract<UserProfileConnectedAccountsModel, { status: 'ready' }>;
   fallbackFocus?: () => HTMLElement | null;
 }) {
-  const m = useMessages('userProfileConnectedAccounts');
   const controller = useUserProfileConnectedAccountsController({
     accounts: model.accounts,
     availableProviders: model.availableProviders,
     onConnect: model.connect,
     onReconnect: model.reconnect,
-    formatError: error => connectedAccountErrorMessage(error, m),
   });
-  const remove = async (accountId: string) => {
-    try {
-      await model.remove(accountId);
-    } catch (error) {
-      throw new Error(connectedAccountErrorMessage(error, m));
-    }
-  };
 
   return (
     <UserProfileConnectedAccountsSectionView
       {...controller}
       fallbackFocus={fallbackFocus}
-      onRemove={remove}
+      onRemove={model.remove}
     />
   );
 }

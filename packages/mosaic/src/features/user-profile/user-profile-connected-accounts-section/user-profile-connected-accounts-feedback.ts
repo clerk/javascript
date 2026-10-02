@@ -1,11 +1,15 @@
 import { isClerkAPIResponseError } from '@clerk/shared/error';
 
-import type { MosaicMessages } from '../../../localization';
+import type { LocalizableError, MosaicMessages } from '../../../localization';
 import { ConnectedAccountActionError } from './user-profile-connected-accounts-section.types';
 
 type Messages = MosaicMessages['userProfileConnectedAccounts'];
 
-export function connectedAccountErrorMessage(error: unknown, messages: Messages): string {
+export function connectedAccountErrorMessage(
+  error: unknown,
+  messages: Messages,
+  errorText: (error: LocalizableError) => string,
+): string {
   if (error instanceof ConnectedAccountActionError) {
     return error.code === 'missing_verification_url'
       ? messages.errors.missingVerificationUrl
@@ -13,7 +17,9 @@ export function connectedAccountErrorMessage(error: unknown, messages: Messages)
   }
   if (isClerkAPIResponseError(error)) {
     const first = error.errors[0];
-    return first?.longMessage || first?.message || messages.errors.generic;
+    return first
+      ? errorText({ code: first.code, paramName: first.meta?.paramName, message: first.longMessage || first.message })
+      : messages.errors.generic;
   }
   return messages.errors.generic;
 }
