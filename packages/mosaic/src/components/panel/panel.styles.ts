@@ -13,7 +13,7 @@ export const styles = stylex.create({
     display: 'block',
   },
   titleSkeleton: {
-    width: space['24'],
+    width: '6ch',
   },
 
   /**

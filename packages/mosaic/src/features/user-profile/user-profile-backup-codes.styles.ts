@@ -4,7 +4,7 @@ import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   skeleton: {
-    width: space['16'],
+    width: '7ch',
   },
   codes: {
     borderColor: colorVars['--cl-color-border'],

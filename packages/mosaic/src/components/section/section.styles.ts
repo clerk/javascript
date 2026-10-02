@@ -144,13 +144,13 @@ export const styles = stylex.create({
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
   },
   titleSkeleton: {
-    width: space['32'],
+    width: '6ch',
   },
   labelSkeleton: {
-    width: space['24'],
+    width: '12ch',
   },
   descriptionSkeleton: {
-    width: space['40'],
+    width: '20ch',
   },
   description: {
     color: colorVars['--cl-color-foreground-secondary'],

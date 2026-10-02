@@ -57,11 +57,15 @@ slower approach to full opacity — is left.
 Every loading placeholder pulses through one shared wave, never a local pulse of its
 own. The pieces:
 
-- `skeletonStyles.bone` (fill and radius) and `skeletonStyles.line`: a `1lh` box,
-  so it holds exactly one line of the text it replaces, whose `::before` bar is
-  `1cap` tall (`0.7em` fallback) and sits on the baseline, covering the same band
-  as the text's capitals
-  in `utils/skeleton.styles.ts`.
+- `skeletonStyles.bone` (fill and radius) and `skeletonStyles.line` in
+  `utils/skeleton.styles.ts`. `line` is a `1lh` box, so it holds exactly one line
+  of the text it replaces, and its `::before` bar is `1cap` tall (`0.7em`
+  fallback) and sits on the baseline, covering the same band as the text's
+  capitals. Text bars are square-cornered; only media bones take a radius.
+- Size a text bone's width in `ch` from the content it usually holds, at the short
+  end, so it reads like real text and shrinks with `maxWidth: 100%` on narrow
+  screens: a card or page title `6ch`, a label `12ch`, a description `20ch`, an
+  email `16ch`, a US phone number `15ch`, a backup code `7ch`.
 - `skeletonStyles.wave`: the keyframes (opacity `1 → 0.32 → 1` over the first 56%
   of a 2s cycle, then a hold), on `--cl-ease-in-out`. A component with its own
   fill and shape, such as `Avatar.Fallback`, takes `wave` alone.

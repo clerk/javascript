@@ -34,7 +34,6 @@ export const skeletonStyles = stylex.create({
     height: '1lh',
     maxWidth: '100%',
     '::before': {
-      borderRadius: radiusVars['--cl-radius-sm'],
       backgroundColor: colorVars['--cl-color-neutral-alpha-200'],
       content: "''",
       display: 'inline-block',
