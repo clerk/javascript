@@ -6,10 +6,11 @@ import { UserProfileEditUsernameDialog } from './user-profile-edit-username.dial
 
 export interface UserProfileUsernameRowViewProps {
   username: string;
+  required?: boolean;
   onSubmit?: (username: string) => Promise<void>;
 }
 
-export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUsernameRowViewProps) {
+export function UserProfileUsernameRowView({ username, required = false, onSubmit }: UserProfileUsernameRowViewProps) {
   const m = useMessages('userProfileAccountSection');
   return (
     <Section.Row>
@@ -22,6 +23,7 @@ export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUs
           <Section.Actions>
             <EditUsername
               username={username}
+              required={required}
               onSubmit={onSubmit}
             />
           </Section.Actions>
@@ -31,9 +33,17 @@ export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUs
   );
 }
 
-function EditUsername({ username, onSubmit }: { username: string; onSubmit: (username: string) => Promise<void> }) {
+function EditUsername({
+  username,
+  required,
+  onSubmit,
+}: {
+  username: string;
+  required: boolean;
+  onSubmit: (username: string) => Promise<void>;
+}) {
   const m = useMessages('userProfileAccountSection');
-  const controller = useUserProfileEditUsernameController({ username, onSubmit });
+  const controller = useUserProfileEditUsernameController({ username, required, onSubmit });
   const isSet = Boolean(username);
 
   return (

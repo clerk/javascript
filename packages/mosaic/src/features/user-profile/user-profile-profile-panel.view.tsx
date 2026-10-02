@@ -37,46 +37,19 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
 }
 
 export function UserProfileProfilePanelView({
-  allowMultipleAccounts,
-  imageUrl,
-  hasImage,
   name = '',
-  username = '',
-  firstName,
-  lastName,
-  firstNameAttribute,
-  lastNameAttribute,
-  emails = [],
-  phones = [],
   connectedAccounts = [],
   availableConnectionProviders = [],
   onReconnectAccount,
   web3Wallets = [],
   availableWeb3Providers = [],
-  onProfilePictureChange,
-  onProfilePictureReject,
-  onRemoveProfilePicture,
-  onSubmitName,
-  onSubmitUsername,
-  onAddEmail,
-  onSendEmailCode,
-  onVerifyEmailCode,
-  onManageEmail,
-  onVerifyEmail,
-  onSetPrimaryEmail,
-  onRemoveEmail,
-  onSendPhoneCode,
-  onVerifyPhoneCode,
-  onManagePhone,
-  onVerifyPhone,
-  onSetPrimaryPhone,
-  onRemovePhone,
   onConnectAccount,
   onRemoveConnectedAccount,
   onConnectWeb3Wallet,
   onSetPrimaryWeb3Wallet,
   onRemoveWeb3Wallet,
   deleteAccountSlot,
+  ...account
 }: UserProfileProfilePanelViewProps): ReactElement {
   const pageTitle = useRef<HTMLDivElement>(null);
   return (
@@ -89,35 +62,8 @@ export function UserProfileProfilePanelView({
       </Panel.Title>
       <Panel.Sections>
         <UserProfileAccountSectionView
-          allowMultipleAccounts={allowMultipleAccounts}
-          emails={emails}
-          firstName={firstName}
-          firstNameAttribute={firstNameAttribute}
-          hasImage={hasImage}
-          imageUrl={imageUrl}
-          lastName={lastName}
-          lastNameAttribute={lastNameAttribute}
           name={name}
-          phones={phones}
-          username={username}
-          onAddEmail={onAddEmail}
-          onSendPhoneCode={onSendPhoneCode}
-          onVerifyPhoneCode={onVerifyPhoneCode}
-          onSendEmailCode={onSendEmailCode}
-          onVerifyEmailCode={onVerifyEmailCode}
-          onManageEmail={onManageEmail}
-          onManagePhone={onManagePhone}
-          onProfilePictureChange={onProfilePictureChange}
-          onProfilePictureReject={onProfilePictureReject}
-          onRemoveEmail={onRemoveEmail}
-          onRemovePhone={onRemovePhone}
-          onRemoveProfilePicture={onRemoveProfilePicture}
-          onSetPrimaryEmail={onSetPrimaryEmail}
-          onSetPrimaryPhone={onSetPrimaryPhone}
-          onVerifyEmail={onVerifyEmail}
-          onVerifyPhone={onVerifyPhone}
-          onSubmitName={onSubmitName}
-          onSubmitUsername={onSubmitUsername}
+          {...account}
         />
         <UserProfileConnectedAccountsSectionView
           fallbackFocus={() => pageTitle.current}

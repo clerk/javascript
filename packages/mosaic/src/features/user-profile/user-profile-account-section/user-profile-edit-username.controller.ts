@@ -6,6 +6,7 @@ import type { UserProfileEditUsernameValue } from './user-profile-edit-username.
 
 export interface UserProfileEditUsernameControllerOptions {
   username?: string;
+  required?: boolean;
   onSubmit: (username: string) => Promise<void>;
 }
 
@@ -17,12 +18,13 @@ export interface UserProfileEditUsernameController {
 
 export function useUserProfileEditUsernameController({
   username = '',
+  required = false,
   onSubmit,
 }: UserProfileEditUsernameControllerOptions): UserProfileEditUsernameController {
   const [isOpen, setIsOpen] = useState(false);
   const form = useForm({
     initialValues: { username },
-    canSubmit: values => values.username !== username && values.username !== '',
+    canSubmit: values => values.username !== username && (!required || values.username !== ''),
     onSubmit: async values => {
       await onSubmit(values.username);
       setIsOpen(false);

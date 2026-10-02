@@ -8,7 +8,12 @@ export function UserProfileAccountSection() {
     return null;
   }
 
-  const { status: _status, ...viewProps } = model;
+  const { status: _status, userId, ...viewProps } = model;
 
-  return <UserProfileAccountSectionView {...viewProps} />;
+  return (
+    <UserProfileAccountSectionView
+      key={userId}
+      {...viewProps}
+    />
+  );
 }

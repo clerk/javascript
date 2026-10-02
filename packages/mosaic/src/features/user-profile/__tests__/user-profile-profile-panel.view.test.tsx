@@ -37,6 +37,21 @@ function renderView(overrides: Partial<UserProfileProfilePanelViewProps> = {}) {
 }
 
 describe('UserProfileProfilePanelView', () => {
+  it('names the connection managing the name, as the section does on its own', () => {
+    renderView({ nameManagedBy: { name: 'Okta' }, onSubmitName: undefined });
+
+    expect(screen.getByText('Managed by Okta')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Edit name' })).not.toBeInTheDocument();
+  });
+
+  it('drops the rows the instance does not collect', () => {
+    renderView({ username: undefined, emails: undefined, phones: undefined });
+
+    expect(screen.queryByText('Username')).not.toBeInTheDocument();
+    expect(screen.queryByText('item1@clerk.dev')).not.toBeInTheDocument();
+    expect(screen.queryByText('+1 801-888-8181')).not.toBeInTheDocument();
+  });
+
   it('hides connected accounts when only providers without a connect callback are supplied', () => {
     renderView({
       connectedAccounts: [],

@@ -17,6 +17,7 @@ interface FakeAttribute {
 
 let isUserLoaded: boolean;
 let user: {
+  id: string;
   firstName: string | null;
   lastName: string | null;
   username: string | null;
@@ -34,6 +35,7 @@ let user: {
   setProfileImage: ReturnType<typeof vi.fn>;
   update: ReturnType<typeof vi.fn>;
 } | null;
+let activeUser: typeof user;
 let attributes: Record<'first_name' | 'last_name' | 'username' | 'email_address' | 'phone_number', FakeAttribute>;
 let usernameSettings: { min_length: number; max_length: number };
 let environmentHydrated: boolean;
@@ -48,6 +50,9 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useUser: () => ({ isLoaded: isUserLoaded, user }),
     useClerk: () => ({
+      get user() {
+        return activeUser;
+      },
       __internal_environment: environmentHydrated ? { userSettings: { attributes, usernameSettings } } : null,
     }),
   };
@@ -100,6 +105,7 @@ beforeEach(() => {
     phone_number: attribute(),
   };
   user = {
+    id: 'user_1',
     firstName: 'Preston',
     lastName: 'Booth',
     username: 'prestonxyz',
@@ -116,6 +122,7 @@ beforeEach(() => {
     setProfileImage: vi.fn(() => Promise.resolve({})),
     update: vi.fn(() => Promise.resolve(user)),
   };
+  activeUser = user;
 });
 
 describe('useUserProfileAccountSectionModel', () => {
@@ -131,6 +138,39 @@ describe('useUserProfileAccountSectionModel', () => {
   it('is hidden when nobody is signed in', () => {
     user = null;
     expect(renderModel()).toEqual({ status: 'hidden' });
+  });
+
+  describe('the user it was rendered for', () => {
+    const saves: [string, (model: ReturnType<typeof ready>) => Promise<void> | undefined][] = [
+      ['the picture upload', model => model.onProfilePictureChange?.(new File(['x'], 'me.png', { type: 'image/png' }))],
+      ['the picture removal', model => model.onRemoveProfilePicture?.()],
+      ['the name', model => model.onSubmitName?.({ firstName: 'Pres', lastName: 'B' })],
+      ['the username', model => model.onSubmitUsername?.('ada')],
+    ];
+
+    it('is named, so the surface holding a draft can be scoped to it', () => {
+      expect(ready().userId).toBe('user_1');
+    });
+
+    it.each(saves)('refuses %s once someone else is active', async (_name, runSave) => {
+      const model = ready();
+      activeUser = user && { ...user, id: 'user_2', update: vi.fn(), setProfileImage: vi.fn() };
+
+      await expect(rejection(runSave(model))).resolves.toEqual({ global: { code: 'generic' } });
+      expect(user?.update).not.toHaveBeenCalled();
+      expect(user?.setProfileImage).not.toHaveBeenCalled();
+      expect(activeUser?.update).not.toHaveBeenCalled();
+      expect(activeUser?.setProfileImage).not.toHaveBeenCalled();
+    });
+
+    it.each(saves)('refuses %s once nobody is signed in', async (_name, runSave) => {
+      const model = ready();
+      activeUser = null;
+
+      await expect(rejection(runSave(model))).resolves.toEqual({ global: { code: 'generic' } });
+      expect(user?.update).not.toHaveBeenCalled();
+      expect(user?.setProfileImage).not.toHaveBeenCalled();
+    });
   });
 
   it('maps the user to plain row data', () => {
@@ -262,6 +302,13 @@ describe('useUserProfileAccountSectionModel', () => {
           },
         },
       });
+    });
+
+    it('passes on whether the instance requires one, so an optional username can be cleared', () => {
+      expect(ready().usernameRequired).toBe(false);
+
+      attributes.username = attribute({ required: true });
+      expect(ready().usernameRequired).toBe(true);
     });
 
     it('is hidden when the instance does not use usernames', () => {

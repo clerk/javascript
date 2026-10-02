@@ -8,6 +8,7 @@ import { MosaicProvider } from '../../../MosaicProvider';
 import { UserProfileAccountSection } from '../user-profile-account-section/user-profile-account-section';
 
 let user: {
+  id: string;
   firstName: string;
   lastName: string;
   username: string;
@@ -28,6 +29,9 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useUser: () => ({ isLoaded: true, user }),
     useClerk: () => ({
+      get user() {
+        return user;
+      },
       __internal_environment: {
         userSettings: {
           attributes: {
@@ -52,6 +56,7 @@ function renderSection() {
 
 beforeEach(() => {
   user = {
+    id: 'user_1',
     firstName: 'Preston',
     lastName: 'Booth',
     username: 'prestonxyz',

@@ -1,9 +1,10 @@
 import { getFullName } from '@clerk/shared/internal/clerk-js/user';
-import { useUser } from '@clerk/shared/react';
+import { useClerk, useUser } from '@clerk/shared/react';
 import type { AttributeData, EnterpriseAccountResource, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/useMosaicEnvironment';
-import { save } from '../../../utils/form-error';
+import type { MessageValues } from '../../../localization';
+import { save, SaveError, UNEXPECTED_ERROR } from '../../../utils/form-error';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import type {
   UserProfileEmail,
@@ -27,6 +28,7 @@ type UserProfileAccountSectionData = Pick<
   | 'lastNameAttribute'
   | 'nameManagedBy'
   | 'username'
+  | 'usernameRequired'
   | 'emails'
   | 'phones'
   | 'onProfilePictureChange'
@@ -38,7 +40,7 @@ type UserProfileAccountSectionData = Pick<
 export type UserProfileAccountSectionModel =
   | { status: 'loading' }
   | { status: 'hidden' }
-  | (UserProfileAccountSectionData & { status: 'ready' });
+  | (UserProfileAccountSectionData & { status: 'ready'; userId: string });
 
 const NAME_FIELDS: readonly UserProfileEditNameField[] = ['firstName', 'lastName'];
 const USERNAME_FIELDS: readonly UserProfileEditUsernameField[] = ['username'];
@@ -79,6 +81,7 @@ function toPhones(user: UserResource): UserProfilePhone[] {
 
 export function useUserProfileAccountSectionModel(): UserProfileAccountSectionModel {
   const { isLoaded, user } = useUser();
+  const clerk = useClerk();
   const environment = useMosaicEnvironment();
 
   if (!isLoaded || !environment) {
@@ -88,6 +91,25 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
   if (!user) {
     return { status: 'hidden' };
   }
+
+  const userId = user.id;
+
+  const saveAsUser = <TField extends string = never>(
+    run: (current: UserResource) => Promise<unknown>,
+    fields: readonly TField[] = [],
+    params?: MessageValues,
+  ): Promise<void> =>
+    save(
+      () => {
+        const current = clerk.user;
+        if (!current || current.id !== userId) {
+          throw new SaveError({ global: UNEXPECTED_ERROR });
+        }
+        return run(current);
+      },
+      fields,
+      params,
+    );
 
   const { attributes, usernameSettings } = environment.userSettings;
   const usernameAttribute = attributes.username;
@@ -99,6 +121,7 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
 
   return {
     status: 'ready',
+    userId,
     allowMultipleAccounts: true,
     name: getFullName(user),
     firstName: user.firstName ?? '',
@@ -109,17 +132,21 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     imageUrl: user.imageUrl,
     hasImage: user.hasImage,
     username: showUsername ? (user.username ?? '') : undefined,
+    usernameRequired: Boolean(usernameAttribute?.required),
     emails: showEmails ? toEmails(user) : undefined,
     phones: showPhones ? toPhones(user) : undefined,
-    onProfilePictureChange: file => save(() => user.setProfileImage({ file })),
-    onRemoveProfilePicture: user.hasImage ? () => save(() => user.setProfileImage({ file: null })) : undefined,
+    onProfilePictureChange: file => saveAsUser(current => current.setProfileImage({ file })),
+    onRemoveProfilePicture: user.hasImage
+      ? () => saveAsUser(current => current.setProfileImage({ file: null }))
+      : undefined,
     onSubmitName: nameManagedBy
       ? undefined
-      : value => save(() => user.update({ firstName: value.firstName, lastName: value.lastName }), NAME_FIELDS),
+      : value =>
+          saveAsUser(current => current.update({ firstName: value.firstName, lastName: value.lastName }), NAME_FIELDS),
     onSubmitUsername:
       showUsername && !usernameImmutable
         ? username =>
-            save(() => user.update({ username }), USERNAME_FIELDS, {
+            saveAsUser(current => current.update({ username }), USERNAME_FIELDS, {
               min_length: usernameSettings.min_length,
               max_length: usernameSettings.max_length,
             })

@@ -27,6 +27,7 @@ export interface UserProfileAccountSectionViewProps {
   hasImage?: boolean;
   name: string;
   username?: string;
+  usernameRequired?: boolean;
   /** Passed alongside `name`, which cannot be split back into its two halves. */
   firstName?: string;
   lastName?: string;
@@ -62,6 +63,7 @@ export function UserProfileAccountSectionView({
   hasImage = false,
   name,
   username,
+  usernameRequired = false,
   firstName,
   lastName,
   firstNameAttribute,
@@ -145,6 +147,7 @@ export function UserProfileAccountSectionView({
           {username !== undefined ? (
             <UserProfileUsernameRowView
               username={username}
+              required={usernameRequired}
               onSubmit={onSubmitUsername}
             />
           ) : null}
