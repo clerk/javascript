@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ComponentProps } from 'react';
 
-import { SidebarNavigation, type NavigationGroup } from '@/components/sidebar-navigation';
+import { type NavigationGroup, SidebarNavigation } from '@/components/sidebar-navigation';
 import {
   Sidebar,
   SidebarContent,
