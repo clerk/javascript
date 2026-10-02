@@ -8,7 +8,7 @@ import { Icon, IconFrame } from '../../../components/icon';
 import { Item } from '../../../components/item';
 import { Spinner } from '../../../components/spinner';
 import { Text } from '../../../components/text';
-import { rtl } from '../../../utils/rtl.styles';
+import { rtl } from '../../../styles/rtl.styles';
 
 const styles = stylex.create({
   helpText: {

@@ -4,7 +4,7 @@ import { act, render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { vi } from 'vitest';
 
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../mosaic-provider';
 import { PUBLISHABLE_KEY } from './fake-fapi';
 
 export async function renderWithClerk(ui: ReactElement) {

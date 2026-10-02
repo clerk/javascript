@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { deferred } from '../../../machines/__tests__/test-utils';
-import { MosaicProvider } from '../../../MosaicProvider';
+import { deferred } from '../../../__tests__/async';
+import { MosaicProvider } from '../../../mosaic-provider';
 import type { MembersTableTabViewProps } from '../members-table-tab.types';
 import { MembersTableTabView } from '../members-table-tab.view';
 

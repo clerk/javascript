@@ -6,7 +6,7 @@ import type { IconName } from '../../icons/registry';
 import { iconRegistry } from '../../icons/registry';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { iconScope } from './icon.markers.stylex';
 import { sizes, styles } from './icon.styles';
 

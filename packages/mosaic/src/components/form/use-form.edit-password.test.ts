@@ -1,11 +1,10 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { tick } from '../../__tests__/async';
 import type { FieldFeedback } from './form-submit-error';
 import { FormSubmitError } from './form-submit-error';
 import { useForm } from './use-form';
-
-const flush = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 
 interface EditPasswordValues {
   currentPassword: string;
@@ -59,7 +58,7 @@ describe('useForm: edit password', () => {
     });
     await act(async () => {
       finish();
-      await flush();
+      await tick();
     });
     expect(form.isSubmitting).toBe(false);
   });
@@ -69,7 +68,7 @@ describe('useForm: edit password', () => {
 
     act(() => result.current.setValue('currentPassword', 'old-secret'));
     act(() => result.current.setValue('newPassword', 'short'));
-    await act(flush);
+    await act(tick);
     expect(result.current.fields.newPassword.feedback).toBeUndefined();
     expect(result.current.canSubmit).toBe(false);
 
@@ -81,14 +80,14 @@ describe('useForm: edit password', () => {
 
     act(() => result.current.setValue('newPassword', 'longenough'));
     expect(result.current.fields.newPassword.isValidating).toBe(true);
-    await act(flush);
+    await act(tick);
     expect(result.current.fields.newPassword.feedback).toEqual({
       type: 'warning',
       message: 'Your password works, but could be stronger.',
     });
 
     act(() => result.current.setValue('newPassword', 'longenough1'));
-    await act(flush);
+    await act(tick);
     expect(result.current.fields.newPassword.feedback).toEqual({
       type: 'success',
       message: 'Your password meets all the necessary requirements.',
@@ -134,11 +133,11 @@ describe('useForm: edit password', () => {
     const { result } = renderHook(() => useEditPasswordForm(onSubmit));
     act(() => result.current.setValue('currentPassword', 'wrong'));
     act(() => result.current.setValue('newPassword', 'longenough1'));
-    await act(flush);
+    await act(tick);
     act(() => result.current.setValue('confirmPassword', 'longenough1'));
     await act(async () => {
       result.current.submit();
-      await flush();
+      await tick();
     });
     expect(result.current.error).toBe('Password could not be changed.');
     expect(result.current.fields.currentPassword.feedback).toEqual({ type: 'error', message: 'Incorrect password.' });

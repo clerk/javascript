@@ -1,7 +1,7 @@
 import type { IconProps } from '@clerk/mosaic/components/icon';
 import { Icon } from '@clerk/mosaic/components/icon';
 import { iconRegistry } from '@clerk/mosaic/icons/registry';
-import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 
 import type { StoryMeta } from '@/lib/types';
 
