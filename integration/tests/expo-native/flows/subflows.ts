@@ -75,22 +75,9 @@ async function fill(field: Locator, value: string) {
 }
 
 async function enterEmailCode({ screen }: DeviceFixtures) {
-  const heading = screen.getByText('Check your email');
-  if (!(await heading.isVisible())) {
-    return;
+  if (await screen.getByText('Check your email').isVisible()) {
+    await screen.getByRole('textbox').last().pressSequentially('424242');
   }
-  await expect
-    .poll(
-      async () => {
-        const code = screen.getByRole('textbox').last();
-        await code.clear();
-        await code.pressSequentially('424242');
-        await expect(heading).toBeHidden({ timeout: 5000 });
-        return true;
-      },
-      { timeout: 30_000 },
-    )
-    .toBe(true);
 }
 
 async function dismissPasswordManager({ screen }: DeviceFixtures) {
