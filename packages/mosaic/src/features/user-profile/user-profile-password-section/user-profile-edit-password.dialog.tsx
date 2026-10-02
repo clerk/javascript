@@ -1,20 +1,18 @@
 import { useMergeRefs } from '@floating-ui/react';
-import * as stylex from '@stylexjs/stylex';
 import type { RefObject } from 'react';
-import { useId, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
+import { Checkbox } from '../../../components/checkbox';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
 import type { FieldFeedback, UseFormResult } from '../../../components/form';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
-import { Text } from '../../../components/text';
 import { useMessages } from '../../../localization';
-import { styles } from './user-profile-password-section.styles';
 import type {
   UserProfileEditPasswordField,
   UserProfileEditPasswordValues,
@@ -42,8 +40,6 @@ export function UserProfileEditPasswordDialog({
   form,
 }: UserProfileEditPasswordDialogProps) {
   const m = useMessages('userProfilePasswordSection');
-  const signOutId = useId();
-  const signOutDescriptionId = useId();
   const initialFocusRef = useRef<HTMLInputElement>(null);
   const showCurrentPassword = hasPassword && requiresCurrentPassword;
 
@@ -110,33 +106,19 @@ export function UserProfileEditPasswordDialog({
               label={m.confirmPasswordLabel}
               name='confirmPassword'
             />
-            <div {...stylex.props(styles.checkboxField)}>
-              <input
-                aria-describedby={signOutDescriptionId}
+            <Field.Root
+              orientation='horizontal'
+              disabled={form.isSubmitting}
+            >
+              <Checkbox
                 checked={form.values.signOutOfOtherSessions}
-                disabled={form.isSubmitting}
-                id={signOutId}
-                type='checkbox'
-                {...stylex.props(styles.checkbox)}
                 onChange={event => form.setValue('signOutOfOtherSessions', event.target.checked)}
               />
-              <div {...stylex.props(styles.checkboxCopy)}>
-                <Text
-                  render={<label htmlFor={signOutId} />}
-                  size='sm'
-                  xstyle={styles.checkboxLabel}
-                >
-                  {m.signOutOfOtherSessionsLabel}
-                </Text>
-                <Text
-                  id={signOutDescriptionId}
-                  size='xs'
-                  xstyle={styles.checkboxDescription}
-                >
-                  {m.signOutOfOtherSessionsDescription}
-                </Text>
-              </div>
-            </div>
+              <Field.Content>
+                <Field.Label>{m.signOutOfOtherSessionsLabel}</Field.Label>
+                <Field.Description>{m.signOutOfOtherSessionsDescription}</Field.Description>
+              </Field.Content>
+            </Field.Root>
           </Card.Content>
           <Card.Footer>
             <Dialog.Close
