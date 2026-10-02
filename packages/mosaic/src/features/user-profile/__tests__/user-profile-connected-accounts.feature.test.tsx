@@ -930,4 +930,5 @@ describe('connected accounts', () => {
   });
 
   it.todo('challenges and resumes connect, reconnect, and removal when session reverification is required');
+  it.todo('keeps the provider visibly pending when Try again replaces its failed account with a Connect row');
 });
