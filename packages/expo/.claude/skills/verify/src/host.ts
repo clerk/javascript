@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { isAlive, isRunning, run, sleep, type ProcessRef } from './core/exec.ts';
@@ -165,6 +165,20 @@ async function ensureWatch(progress: (line: string) => void): Promise<RuntimePro
   return started;
 }
 
+function newestMtime(dir: string): number {
+  if (!existsSync(dir)) return 0;
+  return readdirSync(dir, { withFileTypes: true }).reduce((newest, entry) => {
+    const path = join(dir, entry.name);
+    return Math.max(newest, entry.isDirectory() ? newestMtime(path) : statSync(path).mtimeMs);
+  }, 0);
+}
+
+async function waitForWatchToCatchUp(): Promise<void> {
+  const src = join(EXPO_PACKAGE, 'src');
+  const dist = join(EXPO_PACKAGE, 'dist');
+  await waitFor('the @clerk/expo watch build to pick up the latest edit', async () => newestMtime(dist) >= newestMtime(src), 60_000, 'watch');
+}
+
 async function metroAnswers(port: number): Promise<boolean> {
   try {
     const response = await fetch(`http://127.0.0.1:${port}/status`, { signal: AbortSignal.timeout(2000) });
@@ -263,6 +277,7 @@ export const host: HostAdapter<ExpoHostScreen> = {
     const progress = (line: string) => process.stderr.write(`${line}\n`);
     const port = metroPort(lease);
     const watch = await ensureWatch(progress);
+    await waitForWatchToCatchUp();
     const metro = await ensureMetro(port, progress);
     if (lease.platform === 'android') {
       const adb = sdkTool('adb');
