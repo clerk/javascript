@@ -40,7 +40,7 @@ export type UserProfileMfaModel =
       phones: readonly MfaPhone[];
       reverification: ReverificationState;
       resetReverification: () => void;
-      createPhone?: (phoneNumber: string) => Promise<MfaPhone>;
+      findOrCreatePhone?: (phoneNumber: string) => Promise<MfaPhone>;
       enrollSms?: (phoneId: string, code?: string) => Promise<SmsEnrollmentResult>;
       resendSms?: (phoneId: string) => Promise<void>;
       createAuthenticator?: () => Promise<{ secret: string; uri: string }>;

@@ -217,11 +217,14 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     phones: user.phoneNumbers.filter(phone => !phone.reservedForSecondFactor).map(summarizePhone),
     reverification,
     resetReverification,
-    createPhone: smsEnabled
+    findOrCreatePhone: smsEnabled
       ? async phoneNumber => {
           try {
-            const created = await requireIdentity(userId, sessionId).createPhoneNumber({ phoneNumber });
-            return summarizePhone(created);
+            const current = requireIdentity(userId, sessionId);
+            const existing = current.phoneNumbers.find(
+              phone => !phone.reservedForSecondFactor && phone.phoneNumber === phoneNumber,
+            );
+            return summarizePhone(existing ?? (await current.createPhoneNumber({ phoneNumber })));
           } catch (error) {
             throw errorMessage(error, localize);
           }

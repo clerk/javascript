@@ -47,7 +47,7 @@ type MfaEvent =
   | { type: 'EDIT_PHONE_ID'; value: string }
   | { type: 'EDIT_PHONE_NUMBER'; value: string }
   | { type: 'EDIT_CODE'; value: string }
-  | { type: 'PHONE_CREATED'; id: string; phoneNumber: string }
+  | { type: 'PHONE_RESOLVED'; id: string; phoneNumber: string }
   | { type: 'PRINT_FAILED'; message: string }
   | { type: 'RUN'; key: string; run: () => Promise<MfaFlow>; resolve: () => void; reject: (error: unknown) => void };
 
@@ -150,7 +150,7 @@ const mfaMachine = createMachine({
     },
     busy: {
       on: {
-        PHONE_CREATED: {
+        PHONE_RESOLVED: {
           actions: assign((context, event) => ({
             flow:
               context.flow.kind === 'sms'
@@ -304,12 +304,12 @@ export function useUserProfileMfaController(model: ReadyModel) {
     void run('sms', async () => {
       let phoneId = current.phoneId ?? current.selectedPhoneId;
       if (current.step === 'phone' && !phoneId) {
-        const created = await model.createPhone?.(current.phoneNumber);
-        if (!created) {
+        const phone = await model.findOrCreatePhone?.(current.phoneNumber);
+        if (!phone) {
           return current;
         }
-        phoneId = created.id;
-        send({ type: 'PHONE_CREATED', id: created.id, phoneNumber: created.phoneNumber });
+        phoneId = phone.id;
+        send({ type: 'PHONE_RESOLVED', id: phone.id, phoneNumber: phone.phoneNumber });
       }
       const result = await model.enrollSms?.(phoneId, code ?? (current.step === 'verify' ? current.code : undefined));
       if (result?.status === 'needsVerification') {
