@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
-import { useMessages } from '../../localization';
+import { useErrorText, useMessages } from '../../localization';
+import { toLocalizableError } from '../../utils/errors';
 import { MfaCancelledError, type UserProfileMfaMethod } from './user-profile-mfa-section.types';
 import type { UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
 
@@ -18,6 +19,7 @@ export function useUserProfileMfaSectionLeafController({
 }: UserProfileMfaSectionViewProps) {
   const m = useMessages('userProfileMfa');
   const errors = useMessages('errors');
+  const errorText = useErrorText();
   const sectionRef = useRef<HTMLDivElement>(null);
   const triggers = useRef(new Map<string, HTMLButtonElement>());
   const lastRemovalId = useRef<string>();
@@ -48,7 +50,7 @@ export function useUserProfileMfaSectionLeafController({
       await onSetDefault(id);
       setState({ kind: 'idle' });
     } catch (error) {
-      setState({ kind: 'idle', defaultError: error instanceof Error ? error.message : m.setDefaultError });
+      setState({ kind: 'idle', defaultError: errorText(toLocalizableError(error), m.setDefaultError) });
     } finally {
       operation.current = 'idle';
     }
@@ -68,7 +70,7 @@ export function useUserProfileMfaSectionLeafController({
       if (error instanceof MfaCancelledError) {
         setState({ kind: 'idle' });
       } else {
-        setState({ kind: 'confirmingRemoval', method, error: error instanceof Error ? error.message : errors.generic });
+        setState({ kind: 'confirmingRemoval', method, error: errorText(toLocalizableError(error), errors.generic) });
       }
     } finally {
       operation.current = 'idle';
