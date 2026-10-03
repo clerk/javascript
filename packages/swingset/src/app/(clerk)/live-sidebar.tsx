@@ -25,6 +25,7 @@ const flows = [
   { title: 'Connected accounts', href: '/live/connected-accounts' },
   { title: 'Enterprise accounts', href: '/live/enterprise-accounts' },
   { title: 'Delete account', href: '/live/delete-account' },
+  { title: 'Passkeys', href: '/live/passkeys' },
   { title: 'Reverification', href: '/live/reverification' },
 ];
 

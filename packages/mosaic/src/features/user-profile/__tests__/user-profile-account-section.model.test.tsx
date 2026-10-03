@@ -280,8 +280,9 @@ describe('useUserProfileAccountSectionModel', () => {
   });
 
   it('rethrows a failure that is not from Clerk', async () => {
-    user?.update.mockRejectedValue(new TypeError('boom'));
-    await expect(ready().onSubmitName?.({ firstName: 'Pres', lastName: 'B' })).rejects.toThrow('boom');
+    const error = new TypeError('boom');
+    user?.update.mockRejectedValue(error);
+    await expect(ready().onSubmitName?.({ firstName: 'Pres', lastName: 'B' })).rejects.toBe(error);
   });
 
   describe('username', () => {

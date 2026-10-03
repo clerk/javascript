@@ -6,6 +6,7 @@ import type {
 } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
 import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import { UserProfileDeleteSectionView } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.view';
+import { UserProfilePasskeysSectionView } from '@clerk/mosaic/features/user-profile/user-profile-passkeys-section.view';
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import type {
   UserProfileEmail,
@@ -156,14 +157,10 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
     },
     security: {
       passwordSlot: { content: <UserProfilePasswordSectionView {...editPassword} /> },
-      passkeys: passkeys.passkeys,
-      addPasskeyError: passkeys.addError,
-      onRenamePasskey: passkeys.onRename,
+      passkeysSlot: { content: <UserProfilePasskeysSectionView {...passkeys} /> },
       ...mfa.security,
       devices: activeDevices.devices,
-      onAddPasskey: passkeys.onAdd,
       deleteAccountSlot: <UserProfileDeleteAccountPreview />,
-      onRemovePasskey: passkeys.onRemove,
       onSignOutAllOtherDevices: activeDevices.onSignOutAllOtherDevices,
       onSignOutDevice: activeDevices.onSignOutDevice,
     },
