@@ -196,6 +196,7 @@ describe('User profile MFA', () => {
     await user.click(screen.getByRole('button', { name: 'Add verification method' }));
     await user.click(screen.getByRole('button', { name: /SMS verification/ }));
     await user.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
     expect(fapi.mfa.phonePreparations).toEqual(['phone_1']);
     expect(fapi.mfa.phoneUpdates).toEqual([]);
     await user.type(await screen.findByRole('textbox', { name: 'Verification code' }), '123456');
@@ -361,6 +362,7 @@ describe('User profile MFA', () => {
     await user.type(number, '5555550404');
     await user.click(screen.getByRole('button', { name: 'Send code' }));
     await waitFor(() => expect(fapi.mfa.phoneCreations).toHaveLength(2));
+    expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
     expect(fapi.mfa.phoneCreations).toEqual(['+15555550303', '+15555550404']);
   });
 
