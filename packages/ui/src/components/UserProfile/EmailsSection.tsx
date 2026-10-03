@@ -1,6 +1,6 @@
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { EmailAddressResource } from '@clerk/shared/types';
-import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils';
+import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils/sortIdentificationBasedOnVerification';
 import { Fragment } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';

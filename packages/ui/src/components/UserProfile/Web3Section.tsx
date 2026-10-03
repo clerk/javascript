@@ -1,5 +1,5 @@
 import { useReverification, useUser } from '@clerk/shared/react';
-import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils';
+import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils/sortIdentificationBasedOnVerification';
 import { Fragment, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';

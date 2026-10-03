@@ -2,7 +2,7 @@ import { iconImageUrl } from '@clerk/shared/constants';
 import { createWeb3 } from '@clerk/shared/internal/clerk-js/web3';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type { VerificationResource, Web3WalletResource } from '@clerk/shared/types';
-import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils';
+import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils/sortIdentificationBasedOnVerification';
 import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';

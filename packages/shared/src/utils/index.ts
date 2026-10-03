@@ -8,4 +8,3 @@ export { handleValueOrFn } from './handleValueOrFn';
 export { runIfFunctionOrReturn } from './runIfFunctionOrReturn';
 export { fastDeepMergeAndReplace, fastDeepMergeAndKeep } from './fastDeepMerge';
 export { timeLimit } from './timeLimit';
-export { sortIdentificationBasedOnVerification } from './sortIdentificationBasedOnVerification';

@@ -1,4 +1,4 @@
-import { useInstalledSolanaWallets } from '@clerk/shared/react';
+import { useInstalledSolanaWallets } from '@clerk/shared/react/hooks/useInstalledSolanaWallets';
 
 import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
