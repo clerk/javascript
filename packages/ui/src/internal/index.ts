@@ -58,6 +58,7 @@ export type {
   AlphaColorScale,
   Appearance,
   APIKeysTheme,
+  AgentActionApprovalTheme,
   BaseTheme,
   CaptchaAppearanceOptions,
   CheckoutTheme,

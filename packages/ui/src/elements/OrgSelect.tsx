@@ -1,6 +1,5 @@
-import { useRef } from 'react';
-
 import { Box, Icon, Image, Text } from '@/ui/customizables';
+import { OrganizationAvatar } from '@/ui/elements/OrganizationAvatar';
 import { Select, SelectButton, SelectOptionList } from '@/ui/elements/Select';
 import { Checkmark } from '@/ui/icons';
 import { common } from '@/ui/styledSystem';
@@ -8,17 +7,17 @@ import { common } from '@/ui/styledSystem';
 export type OrgOption = {
   value: string;
   label: string;
-  logoUrl: string;
+  logoUrl?: string;
 };
 
 type OrgSelectProps = {
+  id?: string;
   options: OrgOption[];
   value: string | null;
   onChange: (value: string) => void;
 };
 
-export function OrgSelect({ options, value, onChange }: OrgSelectProps) {
-  const buttonRef = useRef<HTMLButtonElement>(null);
+export function OrgSelect({ id, options, value, onChange }: OrgSelectProps) {
   const selected = options.find(option => option.value === value);
 
   return (
@@ -26,7 +25,6 @@ export function OrgSelect({ options, value, onChange }: OrgSelectProps) {
       options={options}
       value={value}
       onChange={option => onChange(option.value)}
-      referenceElement={buttonRef}
       renderOption={(option, _index, isSelected) => (
         <Box
           as='span'
@@ -45,17 +43,24 @@ export function OrgSelect({ options, value, onChange }: OrgSelectProps) {
             },
           })}
         >
-          <Image
-            src={option.logoUrl}
-            alt={option.label}
-            sx={theme => ({
-              width: theme.sizes.$5,
-              height: theme.sizes.$5,
-              objectFit: 'contain',
-              flexShrink: 0,
-              borderRadius: theme.radii.$md,
-            })}
-          />
+          {option.logoUrl ? (
+            <Image
+              src={option.logoUrl}
+              alt={option.label}
+              sx={theme => ({
+                width: theme.sizes.$5,
+                height: theme.sizes.$5,
+                objectFit: 'contain',
+                flexShrink: 0,
+                borderRadius: theme.radii.$md,
+              })}
+            />
+          ) : (
+            <OrganizationAvatar
+              name={option.label}
+              size={theme => theme.sizes.$5}
+            />
+          )}
           <Text
             sx={{ flex: 1, textAlign: 'start', minWidth: 0, maxInlineSize: '200px' }}
             truncate
@@ -74,23 +79,30 @@ export function OrgSelect({ options, value, onChange }: OrgSelectProps) {
       )}
     >
       <SelectButton
-        ref={buttonRef}
+        id={id}
         aria-haspopup='listbox'
         sx={theme => ({
           paddingInline: theme.space.$3,
         })}
       >
-        <Image
-          src={selected?.logoUrl || ''}
-          alt={selected?.label || ''}
-          sx={theme => ({
-            width: theme.sizes.$5,
-            height: theme.sizes.$5,
-            borderRadius: theme.radii.$md,
-            objectFit: 'contain',
-            flexShrink: 0,
-          })}
-        />
+        {selected?.logoUrl ? (
+          <Image
+            src={selected.logoUrl}
+            alt={selected.label}
+            sx={theme => ({
+              width: theme.sizes.$5,
+              height: theme.sizes.$5,
+              borderRadius: theme.radii.$md,
+              objectFit: 'contain',
+              flexShrink: 0,
+            })}
+          />
+        ) : (
+          <OrganizationAvatar
+            name={selected?.label}
+            size={theme => theme.sizes.$5}
+          />
+        )}
         <Text
           colorScheme='body'
           as='span'
