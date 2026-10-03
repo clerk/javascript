@@ -5,17 +5,17 @@ description: Drive @clerk/expo in the expo-native fixture app (native AuthView, 
 
 # verify-clerk-expo
 
-`bin/verify` is a control CLI over [e2e](https://github.com/tester-army/e2e) 0.15.2 and `@e2e-dev/mobile` 0.9.0. It builds the `expo-native` fixture in `integration/templates/expo-native` as a Debug dev client, leases a lane simulator or emulator, serves `packages/expo` to it through a watch build and Metro, seeds `+clerk_test` users, runs specs, and keeps the evidence. Run every command from `.cursor/skills/verify-clerk-expo/`. Every verb takes `--json` and then prints one `{ "ok": ... }` object. Exit codes are 0 for ok, 1 for spec failures, 2 for usage errors, and 3 for a failed precondition. Every error carries a `fix`.
+`.cursor/skills/verify-clerk-expo/bin/control-clerk-expo` is a control CLI over [e2e](https://github.com/tester-army/e2e) 0.15.2 and `@e2e-dev/mobile` 0.9.0. It builds the `expo-native` fixture in `integration/templates/expo-native` as a Debug dev client, leases a lane simulator or emulator, serves `packages/expo` to it through a watch build and Metro, seeds `+clerk_test` users, runs specs, and keeps the evidence. Run commands from the repo root; they work from any directory. Add `.cursor/skills/verify-clerk-expo/bin` to `PATH` to type `control-clerk-expo` instead of the full path. Paths in this document that start with `.verify/`, `specs/`, `features/`, `src/`, or `test/` are inside the skill directory. Every verb takes `--json` and then prints one `{ "ok": ... }` object. Exit codes are 0 for ok, 1 for spec failures, 2 for usage errors, and 3 for a failed precondition. Every error carries a `fix`.
 
-The rule: no change to `@clerk/expo` UI or auth behavior is done until a `bin/verify run` on the real host shows the changed behavior, on each platform the change touches.
+The rule: no change to `@clerk/expo` UI or auth behavior is done until a `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run` on the real host shows the changed behavior, on each platform the change touches.
 
 ## Launch
 
 ```console
 $ pnpm install                                 # once, at the repo root
-$ npm ci                                       # once per worktree, in this directory
-$ bin/verify doctor --platform ios             # exits 3 until the first up, because build is the one failing check
-$ bin/verify up --platform ios                 # build the dev client, lease verify-ios-<n>, install, start the watch build and Metro
+$ (cd .cursor/skills/verify-clerk-expo && npm ci)   # once per worktree
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo doctor --platform ios             # exits 3 until the first up, because build is the one failing check
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo up --platform ios                 # build the dev client, lease verify-ios-<n>, install, start the watch build and Metro
 build   ios-842c8600ed7b  local  building...
 build   turbo build @clerk/expo, @clerk/expo-biometrics, @clerk/expo-google-signin
 build   expo prebuild --clean --platform ios
@@ -52,7 +52,7 @@ Never run `pnpm --filter @clerk/expo build`, or a build of any package above, yo
 
 Fast Refresh stays on. When you save a JS change while an app from an earlier run is still open, Metro hot-reloads it into that app first, so the change's console lines appear once under the earlier run, then again when this run's launch loads the bundle. To prove a JS change, read the run's whole window in the Metro log: from the bundle load that precedes this run's first `[verify]` state line with this run's `runId`, through the line before the next run's first state line. Module-level logs print before the first state line, and logs from taps print after the last one. A match before that window belongs to an earlier run.
 
-`up` is idempotent, and `run` calls it itself, so `up` exists to start the slow part early. `bin/verify up &` followed by `bin/verify run ...` is fine: `run` waits for the `up` to finish and uses its lease.
+`up` is idempotent, and `run` calls it itself, so `up` exists to start the slow part early. `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo up &` followed by `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run ...` is fine: `run` waits for the `up` to finish and uses its lease.
 
 Devices:
 
@@ -60,15 +60,15 @@ Devices:
 - **Android.** The lane emulator boots `Clerk_Verify_Pixel` with `-read-only -no-window` on port 5558 + 2n, so its serial is `emulator-5560` or `emulator-5562`, and pins the `en-US` locale. `-read-only` lets two lanes share the AVD and throws away their writes. After boot, the lane is marked with the system property `debug.verify.lane`, set to the claim's nonce. `down` and `up` kill or drive only an emulator that carries its own claim's marker. Any other emulator on a lane port is foreign: verify lists it and never kills it.
 - Never drive `iPhone Air`, the template, a physical device, or a device another worktree holds. The Mac holds at most four iOS and two Android lanes, across all agents. When all are taken, `up` and `run` fail with `POOL_FULL`. Pass `--wait <seconds>` to wait for a lane.
 
-Each worktree runs its own agent-device daemon from its own `node_modules`, with state under `.verify/agent-device/`. If you call `agent-device` yourself, set `AGENT_DEVICE_STATE_DIR=.verify/agent-device` and use `node_modules/.bin/agent-device`. To find the daemon's pid, run `bin/verify down --dry-run`. Never print `.verify/agent-device/daemon.json`: it holds the daemon's auth token.
+Each worktree runs its own agent-device daemon from its own `node_modules`, with state under `.verify/agent-device/`. If you call `agent-device` yourself, set `AGENT_DEVICE_STATE_DIR=.verify/agent-device` and use `node_modules/.bin/agent-device`. To find the daemon's pid, run `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo down --dry-run`. Never print `.verify/agent-device/daemon.json`: it holds the daemon's auth token.
 
-Teardown is `bin/verify down` (see Cleanup).
+Teardown is `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo down` (see Cleanup).
 
 ## Doctor
 
 ```console
-$ bin/verify doctor --platform ios --json
-$ bin/verify doctor --platform android --json
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo doctor --platform ios --json
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo doctor --platform android --json
 ```
 
 Run it first, and again whenever anything looks off. It is read-only. It checks:
@@ -80,20 +80,20 @@ Run it first, and again whenever anything looks off. It is read-only. It checks:
 - `gh pr comment --attach` support, stale device claims, drift in `src/core/`, a dead agent-device daemon, and whether every feature in the Feature Map has its feature file and a golden spec.
 - On Android, `lane-ports`: whether an emulator that verify did not boot sits on a lane port (5560 or 5562) and takes a lane from every worktree. The fix names the `adb emu kill` command, to run only for an emulator you own.
 
-A failing check prints the command that fixes it, and `doctor` exits 3. Before the first `up`, `build` fails with fix `bin/verify up`. Any other failing check is about this Mac, not this worktree; `lane-ports` can fail while another session's emulator is up.
+A failing check prints the command that fixes it, and `doctor` exits 3. Before the first `up`, `build` fails with fix `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo up`. Any other failing check is about this Mac, not this worktree; `lane-ports` can fail while another session's emulator is up.
 
 ## Drive
 
 Input only goes through specs. A spec is a TypeScript file that uses the `host` fixture from `specs/fixtures.ts` and e2e's `screen` locators.
 
 ```console
-$ bin/verify run native-auth-view --platform ios          # one feature (specs/golden/native-auth-view/)
-$ bin/verify run user-button-and-profile --platform android
-$ bin/verify run custom-flow-sign-in/request-code          # one spec, iOS by default
-$ bin/verify run specs/explored/new-label.e2e.ts           # a spec you wrote
-$ bin/verify run --all --skip form-entry --platform ios    # every golden spec except form entry
-$ bin/verify screen --platform ios                         # current UI tree with testIds and VerifyState
-$ bin/verify screen --png                                  # plus a screenshot in scratch
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo run native-auth-view --platform ios          # one feature (specs/golden/native-auth-view/)
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo run user-button-and-profile --platform android
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo run custom-flow-sign-in/request-code          # one spec, iOS by default
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo run specs/explored/new-label.e2e.ts           # a spec you wrote
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo run --all --skip form-entry --platform ios    # every golden spec except form entry
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo screen --platform ios                         # current UI tree with testIds and VerifyState
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo screen --png                                  # plus a screenshot in scratch
 ```
 
 `run` flags are `--platform ios|android`, `--skip form-entry`, `--include known-bug`, `--grep <regex>`, `--no-video`, and `--wait <seconds>` (how long to wait for a free lane or for another verb in this worktree that holds the device).
@@ -125,7 +125,7 @@ test('profile shows the seeded user', async ({ host, screen }) => {
 There are two ways to check work.
 
 1. **Golden specs** under `specs/golden/<feature>/` are committed, cover the Feature Map in `features/`, and run unchanged as regression. Run the features your change touches, on both platforms when the change is not platform-specific.
-2. **New work.** Write a spec under `specs/explored/` (gitignored), run it, and read the end state with `bin/verify screen`. Fix locators from the `screen` output until it passes. The PR commits that spec into `specs/golden/<feature>/` and updates the feature file when the change adds or changes a user-facing behavior. Otherwise the spec stays with the run evidence (`runs/<id>/specs/` keeps a copy of every spec a run used).
+2. **New work.** Write a spec under `specs/explored/` (gitignored), run it, and read the end state with `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo screen`. Fix locators from the `screen` output until it passes. The PR commits that spec into `specs/golden/<feature>/` and updates the feature file when the change adds or changes a user-facing behavior. Otherwise the spec stays with the run evidence (`runs/<id>/specs/` keeps a copy of every spec a run used).
 
 An explored spec sits one level below `specs/`, so it imports the fixture as `../fixtures.ts`, where a golden spec uses `../../fixtures.ts`:
 
@@ -133,7 +133,7 @@ An explored spec sits one level below `specs/`, so it imports the fixture as `..
 import { test, expect } from '../fixtures.ts';
 ```
 
-For a JS change, edit the source, then `bin/verify run` the spec. The watch build and the relaunch carry the change, with no `up` in between. For a native change, the same `run` rebuilds the dev client first.
+For a JS change, edit the source, then `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run` the spec. The watch build and the relaunch carry the change, with no `up` in between. For a native change, the same `run` rebuilds the dev client first.
 
 A failing spec prints `FAIL`, the first assertion message, and the path of its failure page, and `run` exits 1. The failure page (`runs/<id>/e2e/failures/*.md`) lists every step, the screen tree at the failure, and a screenshot. `next` points at it.
 
@@ -195,9 +195,9 @@ Rules:
 
 - Type only `+clerk_test` emails, 555-0100 to 0199 phones, and `424242`. Never a real person's address, number, or password. The repo is public, and every video lands on a PR.
 - Use ticket sign-in (`host.launch({ signedInAs })`) only to reach signed-in screens for features that are not about authentication. A change to an auth method gets a spec that drives the real form.
-- Tag every spec that types a code `form-entry`. Those specs run by default. An agent runtime that refuses to type codes into an app that talks to hosted Clerk runs `bin/verify run --skip form-entry`, which reports them as `skipped by --skip form-entry`, and says so in the PR. Each auth feature has a `request-code` spec that proves the flow up to its code screen without typing a code. CI runs the skipped specs.
-- The form-entry specs, one command each: `bin/verify run native-auth-view/complete`, `bin/verify run custom-flow-sign-in/complete`, and `bin/verify run custom-flow-sign-up/complete`.
-- `bin/verify down` deletes every user the run created, including users created through the sign-up form, by their test email.
+- Tag every spec that types a code `form-entry`. Those specs run by default. An agent runtime that refuses to type codes into an app that talks to hosted Clerk runs `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run --skip form-entry`, which reports them as `skipped by --skip form-entry`, and says so in the PR. Each auth feature has a `request-code` spec that proves the flow up to its code screen without typing a code. CI runs the skipped specs.
+- The form-entry specs, one command each: `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run native-auth-view/complete`, `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run custom-flow-sign-in/complete`, and `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run custom-flow-sign-up/complete`.
+- `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo down` deletes every user the run created, including users created through the sign-up form, by their test email.
 
 ## Evidence
 
@@ -220,8 +220,8 @@ Proof standards: drive the real user path, capture the action and the resulting 
 After a run, sealing searches the run directory for every secret the run used (secret keys, tickets). A hit marks the file tainted in `run.json`, and a tainted run cannot be attached.
 
 ```console
-$ bin/verify attach <run-id> --pr <n>                       # video and every screenshot
-$ bin/verify attach <run-id> --pr <n> --screenshot profile  # video and one screenshot
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo attach <run-id> --pr <n>                       # video and every screenshot
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo attach <run-id> --pr <n> --screenshot profile  # video and one screenshot
 ```
 
 `attach` posts once per run with `gh pr comment --repo clerk/javascript --attach`. It refuses a run that is tainted, failed, or shows a user id the run did not create.
@@ -229,10 +229,10 @@ $ bin/verify attach <run-id> --pr <n> --screenshot profile  # video and one scre
 ## Cleanup
 
 ```console
-$ bin/verify down --dry-run                 # what it would release, delete, and stop
-$ bin/verify down                           # both platforms: release the lanes, delete run users, stop Metro, the watch build, recorders, and the agent-device daemon
-$ bin/verify down --platform android        # one platform's lane, but the whole runtime (see below)
-$ bin/verify down --stale                   # also finish cleanup left by a crashed run in this worktree
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo down --dry-run                 # what it would release, delete, and stop
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo down                           # both platforms: release the lanes, delete run users, stop Metro, the watch build, recorders, and the agent-device daemon
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo down --platform android        # one platform's lane, but the whole runtime (see below)
+$ .cursor/skills/verify-clerk-expo/bin/control-clerk-expo down --stale                   # also finish cleanup left by a crashed run in this worktree
 ```
 
 `down --platform <p>` releases only that platform's lane, but it still stops every Metro and the watch build this worktree started, because the ledger does not record which platform a process serves. Never run `down --platform ios` while an Android run in the same worktree is in flight, or the other way around. The next `up` or `run` starts the runtime again.
@@ -245,11 +245,11 @@ Evidence lives inside the worktree, so `git worktree remove` deletes `.verify/ru
 
 ## Helpers
 
-- `bin/verify` is the only helper. It is executable. Every invocation is shown above.
-- `e2e.config.ts` composes the e2e config from the CLI's run context. `npx e2e list` works from this directory while a lease is held.
+- `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo` is the only helper. It is executable. Every invocation is shown above.
+- `e2e.config.ts` composes the e2e config from the CLI's run context. `npx e2e list` works from the skill directory while a lease is held.
 - `specs/fixtures.ts` is the `host` fixture, the same file as in clerk-ios and clerk-android. `specs/native.ts` holds this repo's per-platform locators for native views.
 - `src/host.ts` is the only Expo-specific module: the fixture build, the native-input list, Metro ports, and the dev-client entry. `src/core/` and `src/platform/` are shared with clerk-ios and clerk-android. Change `src/core/` in clerk-ios first, then copy it here.
-- `npm test` runs the CLI's unit tests (`node --test test/*.test.ts`), with no network, keys, or devices. `testing/` holds helper processes those tests spawn. `npm run typecheck` runs `tsc`.
+- `npm test`, run in the skill directory, runs the CLI's unit tests (`node --test test/*.test.ts`), with no network, keys, or devices. `testing/` holds helper processes those tests spawn. `npm run typecheck` runs `tsc`.
 - `features/` is the Feature Map. Start with `features/README.md`.
 
-Keep the map honest with pstack's `maintain-verification-skill`, which finds this skill at `.cursor/skills/verify-clerk-expo/`.
+The skill lives at `.cursor/skills/verify-clerk-expo/`. `.claude/skills/verify-clerk-expo` is a symlink to it, so Claude Code finds the same files; edit only the `.cursor` copy. Keep the map honest with pstack's `maintain-verification-skill`.

@@ -13,12 +13,12 @@ Clerk's JavaScript SDK and library monorepo.
 
 ## Verifying changes
 
-Prove a change to `@clerk/expo` UI or auth behavior on a real simulator or emulator before calling it done. The skill is `.cursor/skills/verify-clerk-expo/`: read its `SKILL.md` and `features/README.md` first, and run every command from that directory.
+Prove a change to `@clerk/expo` UI or auth behavior on a real simulator or emulator before calling it done. The skill is `.cursor/skills/verify-clerk-expo/`: read its `SKILL.md` and `features/README.md` first. Run the commands below from the repo root, after `npm ci` once in the skill directory.
 
-1. `bin/verify doctor --platform ios` (or `android`) checks the machine. Fix what it names.
-2. `bin/verify up --platform ios` builds the dev client, leases a lane device, and starts Metro.
-3. `bin/verify run <feature> --platform ios` runs that feature's golden specs and keeps video, screenshots, and state under `.verify/runs/`.
-4. `bin/verify down` releases the device, deletes the test users the run created, and keeps the evidence.
+1. `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo doctor --platform ios` (or `android`) checks the machine. Fix what it names.
+2. `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo up --platform ios` builds the dev client, leases a lane device, and starts Metro.
+3. `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run <feature> --platform ios` runs that feature's golden specs and keeps video, screenshots, and state under `.verify/runs/`.
+4. `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo down` releases the device, deletes the test users the run created, and keeps the evidence.
 
 Use only test users: `+clerk_test` emails, phone numbers 555-0100 to 555-0199, and the code `424242`. Never type real credentials.
 

@@ -18,7 +18,7 @@ Preconditions:
 
 - The spec seeds a `+clerk_test` user on `with-email-codes` and signs in with a ticket (`host.launch({ signedInAs })`).
 
-- **Profile.** Run `bin/verify run user-button-and-profile --platform ios`, and again with `--platform android`. The first test launches `screen: 'userProfile'`, checks `userId` and `sessionStatus` `active`, expects `Manage account`, taps it, and expects the user's email. Screenshot `profile`.
+- **Profile.** Run `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run user-button-and-profile --platform ios`, and again with `--platform android`. The first test launches `screen: 'userProfile'`, checks `userId` and `sessionStatus` `active`, expects `Manage account`, taps it, and expects the user's email. Screenshot `profile`.
 - **User button.** The second test launches `screen: 'userButton'`, taps the UserButton, and expects `Manage account`. Both tests pass on iOS and Android. Screenshot `user-button-profile`.
 - **Proof.** `states.jsonl` holds the seeded user's id for each test, and `screenshots/profile.png` shows the email.
 
