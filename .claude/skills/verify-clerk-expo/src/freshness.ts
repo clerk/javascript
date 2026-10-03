@@ -66,20 +66,69 @@ export function isExpoModule(pkg: WorkspacePackage): boolean {
   return existsSync(join(pkg.dir, 'expo-module.config.json'));
 }
 
-const builtFrom = (pkg: WorkspacePackage) => listFiles(join(pkg.dir, 'src'), '', isPackageSource);
 const builtTo = (pkg: WorkspacePackage) => listFiles(join(pkg.dir, 'dist'), '', isBundledOutput);
 const hasBuild = (pkg: WorkspacePackage) => existsSync(join(pkg.dir, 'src')) && existsSync(join(pkg.dir, 'dist'));
 
-export function staleInScope(worktree: string, expoDir: string): readonly WorkspacePackage[] {
-  return workspaceDependencies(worktree, expoDir).filter((pkg) => isExpoModule(pkg) && hasBuild(pkg) && isStale(builtFrom(pkg), builtTo(pkg)));
+export interface BuiltRecord {
+  readonly sources: string;
+  readonly dist: string;
+}
+export type BuiltRecords = Readonly<Record<string, BuiltRecord>>;
+
+function contentDigest(files: readonly SourceFile[]): string {
+  const hash = createHash('sha256');
+  for (const file of [...files].sort((a, b) => a.rel.localeCompare(b.rel))) {
+    hash.update(`${file.rel}\0`).update(readFileSync(file.rel)).update('\0');
+  }
+  return hash.digest('hex');
 }
 
-export function staleOutOfScope(worktree: string, expoDir: string): readonly WorkspacePackage[] {
-  return workspaceDependencies(worktree, expoDir).filter((pkg) => {
-    if (isExpoModule(pkg) || !hasBuild(pkg)) return false;
-    const sources = [pkg, ...workspaceDependencies(worktree, pkg.dir).filter(hasBuild)].flatMap(builtFrom);
-    return isStale(sources, builtTo(pkg));
-  });
+function outputSignature(files: readonly SourceFile[]): string {
+  return [...files].sort((a, b) => a.rel.localeCompare(b.rel)).map((f) => `${f.rel}:${f.mtime}`).join('|');
+}
+
+interface Judged {
+  readonly stale: boolean;
+  readonly record: BuiltRecord | null;
+}
+
+function judgeBuilt(pkg: WorkspacePackage, sourcePackages: readonly WorkspacePackage[], previous: BuiltRecord | undefined): Judged {
+  const sources = sourcePackages.flatMap((p) => listFiles(join(p.dir, 'src'), `${p.dir}/src/`, isPackageSource));
+  const dist = builtTo(pkg);
+  const signature = outputSignature(dist);
+  if (!isStale(sources, dist)) return { stale: false, record: { sources: contentDigest(sources), dist: signature } };
+  if (previous === undefined || previous.dist !== signature) return { stale: true, record: null };
+  const unchanged = previous.sources === contentDigest(sources);
+  return { stale: !unchanged, record: unchanged ? previous : null };
+}
+
+export interface ScopeCheck {
+  readonly stale: readonly WorkspacePackage[];
+  readonly records: BuiltRecords;
+}
+
+function check(worktree: string, expoDir: string, records: BuiltRecords, inScope: boolean): ScopeCheck {
+  const next: Record<string, BuiltRecord> = { ...records };
+  const stale: WorkspacePackage[] = [];
+  for (const pkg of workspaceDependencies(worktree, expoDir)) {
+    if (isExpoModule(pkg) !== inScope || !hasBuild(pkg)) continue;
+    const sourcePackages = inScope ? [pkg] : [pkg, ...workspaceDependencies(worktree, pkg.dir).filter(hasBuild)];
+    const judged = judgeBuilt(pkg, sourcePackages, records[pkg.name]);
+    if (judged.stale) {
+      stale.push(pkg);
+    } else if (judged.record !== null) {
+      next[pkg.name] = judged.record;
+    }
+  }
+  return { stale, records: next };
+}
+
+export function staleInScope(worktree: string, expoDir: string, records: BuiltRecords = {}): ScopeCheck {
+  return check(worktree, expoDir, records, true);
+}
+
+export function staleOutOfScope(worktree: string, expoDir: string, records: BuiltRecords = {}): ScopeCheck {
+  return check(worktree, expoDir, records, false);
 }
 
 export function isStale(srcFiles: readonly SourceFile[], distFiles: readonly SourceFile[]): boolean {
@@ -187,6 +236,7 @@ export interface GateOptions {
   readonly timeoutMs: number;
   readonly nudgeAfterMs: number;
   readonly maxRestarts: number;
+  readonly settledFailureMs: number;
 }
 
 export type GateResult =
@@ -199,7 +249,7 @@ export async function confirmServed(io: GateIO, start: GateMemory, options: Gate
   let memory = start;
   let current = memory.outputs;
   let candidate: { readonly revId: string; readonly outputs: Fingerprint } | null = null;
-  let failure: { readonly message: string; readonly outputs: Fingerprint; readonly rels: string } | null = null;
+  let failure: { readonly message: string; readonly outputs: Fingerprint; readonly rels: string; readonly since: number } | null = null;
   let lastError = '';
   let staleSince: number | null = null;
   let restarts = 0;
@@ -218,9 +268,10 @@ export async function confirmServed(io: GateIO, start: GateMemory, options: Gate
       const key = rels.join('\n');
       if (!bundle.transient && settled) {
         if (failure !== null && failure.message === bundle.message && failure.rels === key && sameContent(failure.outputs, after)) {
-          return { ok: false, kind: 'bundle-error', message: bundle.message };
+          if (io.now() - failure.since >= options.settledFailureMs) return { ok: false, kind: 'bundle-error', message: bundle.message };
+        } else {
+          failure = { message: bundle.message, outputs: after, rels: key, since: io.now() };
         }
-        failure = { message: bundle.message, outputs: after, rels: key };
       } else {
         failure = null;
       }
@@ -241,8 +292,9 @@ export async function confirmServed(io: GateIO, start: GateMemory, options: Gate
       if (restarts >= options.maxRestarts) return { ok: false, kind: 'timeout', message: 'Metro kept serving a bundle that predates the current dist' };
       restarts += 1;
       io.progress('metro   restarting Metro, because dist changed after it started and its first bundle cannot be dated');
+      const spawn = io.fingerprint(io.list(), after);
       const pid = await io.restart();
-      memory = { metroPid: pid, spawn: io.fingerprint(io.list(), after), seen: {}, outputs: memory.outputs };
+      memory = { metroPid: pid, spawn, seen: {}, outputs: memory.outputs };
       candidate = null;
       continue;
     }

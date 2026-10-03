@@ -15,6 +15,7 @@ import {
   staleInScope,
   staleOutOfScope,
   workspaceDependencies,
+  type BuiltRecords,
   type BundleView,
   type Fetched,
   type Fingerprint,
@@ -226,24 +227,38 @@ async function waitForWatchToCatchUp(): Promise<void> {
   );
 }
 
+const recordsFile = () => join(RUNTIME_DIR, 'built-dependencies.json');
+
+function readRecords(): BuiltRecords {
+  return existsSync(recordsFile()) ? (JSON.parse(readFileSync(recordsFile(), 'utf8')) as BuiltRecords) : {};
+}
+
+function writeRecords(records: BuiltRecords): void {
+  mkdirSync(RUNTIME_DIR, { recursive: true });
+  writeFileSync(recordsFile(), JSON.stringify(records));
+}
+
 function refuseOutOfScope(): void {
-  const stale = staleOutOfScope(WORKTREE, EXPO_PACKAGE);
+  const { stale, records } = staleOutOfScope(WORKTREE, EXPO_PACKAGE, readRecords());
+  writeRecords(records);
   if (stale.length === 0) return;
-  const names = stale.map((pkg) => pkg.name).join(', ');
+  const names = stale.map((pkg) => pkg.name);
   throw new VerifyFailure(
     'NOT_READY',
-    `${names} ${stale.length === 1 ? 'has' : 'have'} source newer than ${stale.length === 1 ? 'its dist' : 'their dist'}. This skill rebuilds only @clerk/expo and its Expo-module siblings; it verifies other workspace dependencies after you build them, and it will not launch on their stale dist`,
-    '{cli} down, then pnpm turbo build --filter=@clerk/expo^..., then rerun',
+    `${names.join(', ')} ${stale.length === 1 ? 'has' : 'have'} source newer than ${stale.length === 1 ? 'its dist' : 'their dist'}, with content that dist was not built from. This skill rebuilds only @clerk/expo and its Expo-module siblings; it verifies other workspace dependencies after you build them, and it will not launch on their stale dist`,
+    `{cli} down, then pnpm turbo build --force ${names.map((n) => `--filter=${n}`).join(' ')}, then rerun`,
   );
 }
 
 async function rebuildStaleSiblings(progress: (line: string) => void): Promise<void> {
-  const stale = staleInScope(WORKTREE, EXPO_PACKAGE);
+  const { stale, records } = staleInScope(WORKTREE, EXPO_PACKAGE, readRecords());
+  writeRecords(records);
   if (stale.length === 0) return;
   const names = stale.map((pkg) => pkg.name);
-  progress(`build   ${names.join(', ')} src is newer than dist; stopping this worktree's Metro and watch build, then pnpm turbo build ${names.map((n) => `--filter=${n}`).join(' ')}`);
+  progress(`build   ${names.join(', ')} src changed since dist was built; stopping this worktree's Metro and watch build, then pnpm turbo build --force ${names.map((n) => `--filter=${n}`).join(' ')}`);
   stopRuntime();
-  await mustStep(`turbo build ${names.join(' ')}`, 'pnpm', ['turbo', 'build', ...names.map((n) => `--filter=${n}`)], WORKTREE);
+  await mustStep(`turbo build ${names.join(' ')}`, 'pnpm', ['turbo', 'build', '--force', ...names.map((n) => `--filter=${n}`)], WORKTREE);
+  writeRecords(staleInScope(WORKTREE, EXPO_PACKAGE, readRecords()).records);
 }
 
 function servedOutputs(): readonly string[] {
@@ -374,7 +389,7 @@ async function ensureServed(metro: Metro, port: number, platform: Platform, prog
       progress: (line) => progress(line.replace(/^metro {3}/, `metro   :${port}  `)),
     },
     memory,
-    { timeoutMs: 300_000, nudgeAfterMs: 5_000, maxRestarts: 2 },
+    { timeoutMs: 300_000, nudgeAfterMs: 5_000, maxRestarts: 2, settledFailureMs: 3_000 },
   );
   if (!result.ok) {
     if (result.kind === 'bundle-error') {

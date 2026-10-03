@@ -192,7 +192,7 @@ describe('confirmServed', () => {
     return { io, touched: () => touched, restarts: () => restarts, calls: () => call };
   };
   const ok = (revId: string, lastModified: number): Fetched<BundleView> => ({ ok: true, value: { revId, lastModified, body } });
-  const options = { timeoutMs: 20_000, nudgeAfterMs: 5_000, maxRestarts: 2 };
+  const options = { timeoutMs: 20_000, nudgeAfterMs: 5_000, maxRestarts: 2, settledFailureMs: 3_000 };
 
   it('confirms after two matching reads of a fresh revision', async () => {
     const h = harness([{ files: { [rel]: 'a' }, response: ok('r1', 0) }]);
@@ -216,12 +216,24 @@ describe('confirmServed', () => {
     assert.equal(result.ok, true, JSON.stringify(result));
   });
 
-  it('fails a 500 only after two reads over the same settled outputs', async () => {
+  it('fails a 500 only once it has persisted over settled outputs for the settle window', async () => {
     const error: Fetched<BundleView> = { ok: false, transient: false, message: 'bundle 500: SyntaxError' };
     const h = harness([{ files: { [rel]: 'a' }, response: error }]);
     const result = await confirmServed(h.io, { metroPid: 1, spawn: null, seen: { r0: 'x' }, outputs: {} }, options);
     assert.deepEqual(result, { ok: false, kind: 'bundle-error', message: 'bundle 500: SyntaxError' });
-    assert.equal(h.calls(), 2);
+    assert.ok(h.io.now() >= 3_000, `failed after ${h.io.now()}ms`);
+    assert.ok(h.calls() >= 3);
+  });
+
+  it('confirms when a 500 clears within the settle window', async () => {
+    const error: Fetched<BundleView> = { ok: false, transient: false, message: 'bundle 500: UnableToResolveError' };
+    const h = harness([
+      { files: { [rel]: 'a' }, response: error },
+      { files: { [rel]: 'a' }, response: error },
+      { files: { [rel]: 'a' }, response: ok('r1', 0) },
+    ]);
+    const memory: GateMemory = { metroPid: 1, spawn: { [rel]: { mtime: 0, size: 1, hash: 'a', since: 0 } }, seen: {}, outputs: {} };
+    assert.equal((await confirmServed(h.io, memory, options)).ok, true);
   });
 
   it('does not confirm a lagging revision after a second edit, and touches the changed file', async () => {
@@ -270,28 +282,74 @@ describe('scope', () => {
 
   it('finds nothing stale on a fresh build', () => {
     const w = workspace();
-    assert.deepEqual(staleOutOfScope(w.root, w.expo), []);
-    assert.deepEqual(staleInScope(w.root, w.expo), []);
+    assert.deepEqual(staleOutOfScope(w.root, w.expo).stale, []);
+    assert.deepEqual(staleInScope(w.root, w.expo).stale, []);
   });
 
   it('refuses an out-of-scope dependency edit, including packages that bundle it', () => {
     const w = workspace();
     w.touch('shared/src/index.ts', 300);
-    assert.deepEqual(staleOutOfScope(w.root, w.expo).map((p) => p.name).sort(), ['@clerk/clerk-js', '@clerk/shared']);
-    assert.deepEqual(staleInScope(w.root, w.expo), []);
+    assert.deepEqual(staleOutOfScope(w.root, w.expo).stale.map((p) => p.name).sort(), ['@clerk/clerk-js', '@clerk/shared']);
+    assert.deepEqual(staleInScope(w.root, w.expo).stale, []);
   });
 
   it('still refuses @clerk/clerk-js when only @clerk/shared was rebuilt', () => {
     const w = workspace();
     w.touch('shared/src/index.ts', 300);
     w.touch('shared/dist/index.cjs', 400);
-    assert.deepEqual(staleOutOfScope(w.root, w.expo).map((p) => p.name), ['@clerk/clerk-js']);
+    assert.deepEqual(staleOutOfScope(w.root, w.expo).stale.map((p) => p.name), ['@clerk/clerk-js']);
+  });
+
+  it('clears a content-neutral touch once it has seen the package built', () => {
+    const w = workspace();
+    const { records } = staleOutOfScope(w.root, w.expo);
+    w.touch('shared/src/index.ts', 300);
+    const after = staleOutOfScope(w.root, w.expo, records);
+    assert.deepEqual(after.stale, []);
+    assert.deepEqual(after.records, records);
+  });
+
+  it('still refuses a real edit that a record has seen built from other content', () => {
+    const w = workspace();
+    const { records } = staleOutOfScope(w.root, w.expo);
+    writeFileSync(join(w.root, 'packages', 'shared', 'src', 'index.ts'), 'changed');
+    w.touch('shared/src/index.ts', 300);
+    assert.deepEqual(staleOutOfScope(w.root, w.expo, records).stale.map((p) => p.name).sort(), ['@clerk/clerk-js', '@clerk/shared']);
+  });
+
+  it('accepts a revert of an unbuilt edit, because dist was built from the restored content', () => {
+    const w = workspace();
+    const { records } = staleOutOfScope(w.root, w.expo);
+    const file = join(w.root, 'packages', 'shared', 'src', 'index.ts');
+    writeFileSync(file, 'edited');
+    w.touch('shared/src/index.ts', 300);
+    const refused = staleOutOfScope(w.root, w.expo, records);
+    assert.ok(refused.stale.length > 0);
+    writeFileSync(file, 'src/index.ts');
+    w.touch('shared/src/index.ts', 310);
+    assert.deepEqual(staleOutOfScope(w.root, w.expo, refused.records).stale, []);
+  });
+
+  it('refuses a touch it has no record for, until the build rewrites dist', () => {
+    const w = workspace();
+    w.touch('shared/src/index.ts', 300);
+    assert.ok(staleOutOfScope(w.root, w.expo).stale.length > 0);
+    w.touch('shared/dist/index.cjs', 400);
+    w.touch('clerk-js/dist/clerk.js', 400);
+    assert.deepEqual(staleOutOfScope(w.root, w.expo).stale, []);
+  });
+
+  it('does not rebuild an in-scope sibling again after a content-neutral touch', () => {
+    const w = workspace();
+    const { records } = staleInScope(w.root, w.expo);
+    w.touch('expo-passkeys/src/index.ts', 300);
+    assert.deepEqual(staleInScope(w.root, w.expo, records).stale, []);
   });
 
   it('rebuilds an in-scope Expo module sibling instead of refusing it', () => {
     const w = workspace();
     w.touch('expo-passkeys/src/index.ts', 300);
-    assert.deepEqual(staleInScope(w.root, w.expo).map((p) => p.name), ['@clerk/expo-passkeys']);
-    assert.deepEqual(staleOutOfScope(w.root, w.expo), []);
+    assert.deepEqual(staleInScope(w.root, w.expo).stale.map((p) => p.name), ['@clerk/expo-passkeys']);
+    assert.deepEqual(staleOutOfScope(w.root, w.expo).stale, []);
   });
 });

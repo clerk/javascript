@@ -20,7 +20,7 @@ Prove a change to `@clerk/expo` UI or auth behavior on a real simulator or emula
 3. `.claude/skills/verify-clerk-expo/bin/control-clerk-expo run <feature> --platform ios` runs that feature's golden specs and keeps video, screenshots, and state under `.verify/runs/`.
 4. `.claude/skills/verify-clerk-expo/bin/control-clerk-expo down` releases the device, deletes the test users the run created, and keeps the evidence.
 
-The skill rebuilds `@clerk/expo` and its Expo-module siblings itself. Changes to other workspace dependencies, such as `@clerk/clerk-js` or `@clerk/shared`, are verified after one build step you run: the skill refuses to launch on their stale `dist` and prints the command.
+The skill rebuilds `@clerk/expo` and its Expo-module siblings itself. Changes to other workspace dependencies, such as `@clerk/clerk-js` or `@clerk/shared`, are verified after one build step you run: the skill refuses to launch on a `dist` built from other source content and prints the command.
 
 Use only test users: `+clerk_test` emails, phone numbers 555-0100 to 555-0199, and the code `424242`. Never type real credentials.
 
