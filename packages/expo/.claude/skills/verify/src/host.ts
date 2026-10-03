@@ -1,10 +1,26 @@
 import { spawn } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 import { isAlive, isRunning, run, sleep, type ProcessRef } from './core/exec.ts';
 import { LOCAL_POOL, VerifyFailure, type HostAdapter, type HostEntry, type Platform, type ScratchPath } from './core/types.ts';
-import { bundleIsFresh, changedSince, isBundledOutput, isTsdownSource, isTsupSource, listFiles, newest, type ServedState, type SourceFile } from './freshness.ts';
+import {
+  bundleIsFresh,
+  changedFiles,
+  fingerprint,
+  inBundle,
+  isBundledOutput,
+  isPackageSource,
+  isStale,
+  isTsdownSource,
+  listFiles,
+  newest,
+  sameContent,
+  workspaceDependencies,
+  type Fingerprint,
+  type ServedState,
+  type WorkspacePackage,
+} from './freshness.ts';
 import { localAndroidBackend } from './platform/android/local.ts';
 import { resolveJavaHome, sdkRoot, sdkTool } from './platform/android/sdk.ts';
 import { localIosBackend } from './platform/ios/local.ts';
@@ -19,7 +35,6 @@ const WORKTREE = new URL('../../../../../../', import.meta.url).pathname;
 const FIXTURE = join(WORKTREE, 'integration', 'templates', 'expo-native');
 const EXPO_PACKAGE = join(WORKTREE, 'packages', 'expo');
 const RUNTIME_DIR = new URL('../.verify/runtime/', import.meta.url).pathname;
-const BIOMETRICS_PACKAGE = join(WORKTREE, 'packages', 'expo-biometrics');
 
 type ExpoHostScreen = 'home' | 'auth' | 'nativeAuth' | 'userButton' | 'userProfile' | 'customSignIn' | 'customSignUp' | 'sso' | 'tokenCache';
 
@@ -123,6 +138,7 @@ interface RuntimeProcess extends ProcessRef {
 }
 
 const pidFile = (name: string) => join(RUNTIME_DIR, `${name}.json`);
+const runtimeLog = (name: string) => join(RUNTIME_DIR, `${name}.log`);
 
 function readRuntime(name: string): RuntimeProcess | null {
   if (!existsSync(pidFile(name))) return null;
@@ -130,9 +146,13 @@ function readRuntime(name: string): RuntimeProcess | null {
   return isRunning(ref) ? ref : null;
 }
 
-function stopRuntime(): void {
-  const lanes = (['ios', 'android'] as const).flatMap((platform) => Array.from({ length: LOCAL_POOL[platform] }, (_, i) => metroPort({ platform, slot: i + 1 })));
-  for (const name of ['watch', ...lanes.map((port) => `metro-${port}`)]) {
+const allRuntimeNames = (): readonly string[] => [
+  'watch',
+  ...(['ios', 'android'] as const).flatMap((platform) => Array.from({ length: LOCAL_POOL[platform] }, (_, i) => `metro-${metroPort({ platform, slot: i + 1 })}`)),
+];
+
+function stopRuntime(names: readonly string[] = allRuntimeNames()): void {
+  for (const name of names) {
     const ref = readRuntime(name);
     if (ref !== null) process.kill(ref.pid, 'SIGTERM');
     rmSync(pidFile(name), { force: true });
@@ -141,51 +161,80 @@ function stopRuntime(): void {
 
 function startDetached(name: string, what: RuntimeProcess['what'], args: readonly string[], cwd: string): RuntimeProcess {
   mkdirSync(RUNTIME_DIR, { recursive: true });
-  const log = openSync(join(RUNTIME_DIR, `${name}.log`), 'w');
+  const log = openSync(runtimeLog(name), 'w');
   const { CI: _ci, ...env } = process.env;
-  const child = spawn(process.execPath, [...args], { cwd, detached: true, stdio: ['ignore', log, log], env: { ...env, LANG: 'en_US.UTF-8', EXPO_NO_TELEMETRY: '1' } });
+  const child = spawn(process.execPath, [...args], { cwd, detached: true, stdio: ['ignore', log, log], env: { ...env, LANG: 'en_US.UTF-8', EXPO_NO_TELEMETRY: '1', EXPO_OFFLINE: '1' } });
   child.unref();
   const ref: RuntimeProcess = { what, pid: child.pid ?? 0, startedAt: Date.now() };
   writeFileSync(pidFile(name), JSON.stringify(ref));
   return ref;
 }
 
-async function waitFor(what: string, ready: () => Promise<boolean>, timeoutMs: number, logName: string): Promise<void> {
+async function waitFor(what: string, ready: () => Promise<boolean>, timeoutMs: number, logName: string, fix?: string): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     if (await ready()) return;
     await sleep(500);
   }
-  throw new VerifyFailure('NOT_READY', `${what} was not ready within ${timeoutMs / 1000}s`, `read ${join(RUNTIME_DIR, `${logName}.log`)}`);
+  throw new VerifyFailure('NOT_READY', `${what} was not ready within ${timeoutMs / 1000}s`, fix ?? `read ${runtimeLog(logName)}`);
 }
 
-async function ensureWatch(progress: (line: string) => void): Promise<RuntimeProcess> {
+interface Started {
+  readonly names: string[];
+}
+
+async function ensureWatch(started: Started, progress: (line: string) => void): Promise<RuntimeProcess> {
   const running = readRuntime('watch');
   if (running !== null) return running;
   const tsdown = createRequire(join(EXPO_PACKAGE, 'package.json')).resolve('tsdown/package.json');
-  const started = startDetached('watch', 'watch', [join(tsdown, '..', 'dist', 'run.mjs'), '--watch'], EXPO_PACKAGE);
-  progress(`watch   packages/expo  tsdown --watch (pid ${started.pid})`);
-  const log = join(RUNTIME_DIR, 'watch.log');
-  await waitFor('the @clerk/expo watch build', async () => existsSync(log) && /Build complete|built in|Rebuilt/i.test(readFileSync(log, 'utf8')), 180_000, 'watch');
-  return started;
+  const ref = startDetached('watch', 'watch', [join(tsdown, '..', 'dist', 'run.mjs'), '--watch'], EXPO_PACKAGE);
+  started.names.push('watch');
+  progress(`watch   packages/expo  tsdown --watch (pid ${ref.pid})`);
+  await waitFor('the @clerk/expo watch build', async () => existsSync(runtimeLog('watch')) && /Build complete|built in|Rebuilt/i.test(readFileSync(runtimeLog('watch'), 'utf8')), 180_000, 'watch');
+  return ref;
 }
 
 const expoOutputs = () => listFiles(join(EXPO_PACKAGE, 'dist'), 'packages/expo/dist/', isBundledOutput);
-const biometricsOutputs = () => listFiles(join(BIOMETRICS_PACKAGE, 'dist'), 'packages/expo-biometrics/dist/', isBundledOutput);
 
 async function waitForWatchToCatchUp(): Promise<void> {
+  let previous = '';
   await waitFor(
     'the @clerk/expo watch build to pick up the latest edit',
-    async () => newest(expoOutputs()) >= newest(listFiles(join(EXPO_PACKAGE, 'src'), 'packages/expo/src/', isTsdownSource)),
+    async () => {
+      const outputs = expoOutputs();
+      const signature = outputs.map((f) => `${f.rel}:${f.mtime}`).join('|');
+      const settled = signature === previous;
+      previous = signature;
+      return settled && newest(outputs) >= newest(listFiles(join(EXPO_PACKAGE, 'src'), 'packages/expo/src/', isTsdownSource));
+    },
     60_000,
     'watch',
   );
 }
 
-async function ensureBiometricsBuilt(progress: (line: string) => void): Promise<void> {
-  if (newest(biometricsOutputs()) >= newest(listFiles(join(BIOMETRICS_PACKAGE, 'src'), 'packages/expo-biometrics/src/', isTsupSource))) return;
-  progress('build   packages/expo-biometrics/src is newer than its dist; pnpm --filter @clerk/expo-biometrics build');
-  await mustStep('pnpm --filter @clerk/expo-biometrics build', 'pnpm', ['--filter', '@clerk/expo-biometrics', 'build'], WORKTREE);
+function siblingPackages(): readonly WorkspacePackage[] {
+  return workspaceDependencies(WORKTREE, EXPO_PACKAGE).filter((pkg) => existsSync(join(pkg.dir, 'src')) && existsSync(join(pkg.dir, 'dist')));
+}
+
+function staleSiblings(): readonly WorkspacePackage[] {
+  return siblingPackages().filter((pkg) => isStale(listFiles(join(pkg.dir, 'src'), '', isPackageSource), listFiles(join(pkg.dir, 'dist'), '', isBundledOutput)));
+}
+
+async function rebuildStaleSiblings(progress: (line: string) => void): Promise<void> {
+  const stale = staleSiblings();
+  if (stale.length === 0) return;
+  const names = stale.map((pkg) => pkg.name);
+  progress(`build   ${names.join(', ')} src is newer than dist; stopping this worktree's Metro and watch build, then pnpm turbo build ${names.map((n) => `--filter=${n}`).join(' ')}`);
+  stopRuntime();
+  await mustStep(`turbo build ${names.join(' ')}`, 'pnpm', ['turbo', 'build', ...names.map((n) => `--filter=${n}`)], WORKTREE);
+}
+
+function servedOutputs(): readonly string[] {
+  const roots = [{ name: '@clerk/expo', dir: EXPO_PACKAGE }, ...siblingPackages()];
+  return roots.flatMap((pkg) => {
+    const prefix = `${relative(WORKTREE, pkg.dir)}/dist/`;
+    return listFiles(join(pkg.dir, 'dist'), prefix, isBundledOutput).map((f) => f.rel);
+  });
 }
 
 async function metroAnswers(port: number): Promise<boolean> {
@@ -197,11 +246,11 @@ async function metroAnswers(port: number): Promise<boolean> {
   }
 }
 
-async function ensureMetro(port: number, progress: (line: string) => void): Promise<RuntimeProcess> {
+async function ensureMetro(started: Started, port: number, progress: (line: string) => void): Promise<RuntimeProcess> {
   const name = `metro-${port}`;
   const running = readRuntime(name);
   if (running !== null) {
-    await waitFor(`Metro pid ${running.pid} on port ${port} to answer`, () => metroAnswers(port), 30_000, name);
+    await waitFor(`Metro pid ${running.pid} on port ${port} to answer`, () => metroAnswers(port), 120_000, name, `bin/verify down, then retry; read ${runtimeLog(name)}`);
     return running;
   }
   if (await metroAnswers(port)) {
@@ -209,70 +258,120 @@ async function ensureMetro(port: number, progress: (line: string) => void): Prom
   }
   const cli = join(FIXTURE, 'node_modules', 'expo', 'bin', 'cli');
   if (!existsSync(cli)) throw new VerifyFailure('NOT_READY', 'the expo-native fixture has no node_modules', 'bin/verify up');
-  const started = startDetached(name, 'metro', [cli, 'start', '--port', String(port), '--dev-client'], FIXTURE);
-  progress(`metro   :${port}  expo start (pid ${started.pid})`);
+  const ref = startDetached(name, 'metro', [cli, 'start', '--port', String(port), '--dev-client'], FIXTURE);
+  started.names.push(name);
+  progress(`metro   :${port}  expo start (pid ${ref.pid})`);
   await waitFor(`Metro on port ${port}`, () => metroAnswers(port), 120_000, name);
-  return started;
+  return ref;
 }
 
-async function launchAssetUrl(port: number, platform: Platform): Promise<string> {
-  const response = await fetch(`http://127.0.0.1:${port}/`, {
-    headers: { 'expo-platform': platform, accept: 'application/expo+json,application/json' },
-    signal: AbortSignal.timeout(30_000),
-  });
-  const manifest = (await response.json()) as { launchAsset?: { url?: string } };
-  const url = manifest.launchAsset?.url;
-  if (url === undefined) throw new VerifyFailure('NOT_READY', `Metro on port ${port} returned no launch asset for ${platform}`, `read ${join(RUNTIME_DIR, `metro-${port}.log`)}`);
-  return url;
+type Fetched<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly transient: boolean; readonly message: string };
+
+async function fetchManifest(port: number, platform: Platform): Promise<Fetched<string>> {
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/`, {
+      headers: { 'expo-platform': platform, accept: 'application/expo+json,application/json' },
+      signal: AbortSignal.timeout(30_000),
+    });
+    const text = await response.text();
+    const url = response.ok ? (JSON.parse(text) as { launchAsset?: { url?: string } }).launchAsset?.url : undefined;
+    return url === undefined ? { ok: false, transient: true, message: `manifest ${response.status}: ${text.slice(0, 200)}` } : { ok: true, value: url };
+  } catch (error) {
+    return { ok: false, transient: true, message: (error as Error).message };
+  }
 }
 
-async function fetchBundle(url: string): Promise<{ revId: string; lastModified: number; body: string } | null> {
+interface Bundle {
+  readonly revId: string;
+  readonly body: string;
+}
+
+async function fetchBundle(url: string): Promise<Fetched<Bundle>> {
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(300_000) });
-    if (response.status !== 200) return null;
-    return { revId: response.headers.get('x-metro-delta-id') ?? '', lastModified: Date.parse(response.headers.get('last-modified') ?? ''), body: await response.text() };
-  } catch {
-    return null;
+    const body = await response.text();
+    if (response.status === 200) return { ok: true, value: { revId: response.headers.get('x-metro-delta-id') ?? '', body } };
+    let message = body.slice(0, 300);
+    try {
+      const parsed = JSON.parse(body) as { type?: string; message?: string };
+      message = `${parsed.type ?? 'error'}: ${(parsed.message ?? '').split('\n')[0]}`;
+    } catch {}
+    return { ok: false, transient: response.status !== 500, message: `bundle ${response.status}: ${message}` };
+  } catch (error) {
+    return { ok: false, transient: true, message: (error as Error).message };
   }
 }
 
 async function ensureServed(metro: RuntimeProcess, port: number, platform: Platform, progress: (line: string) => void): Promise<void> {
+  const name = `metro-${port}`;
   const stateFile = join(RUNTIME_DIR, `served-${port}-${platform}.json`);
-  const saved = existsSync(stateFile) ? (JSON.parse(readFileSync(stateFile, 'utf8')) as ServedState) : null;
-  const state = saved !== null && saved.metroPid === metro.pid ? saved : null;
-  const outputs: readonly SourceFile[] = [...expoOutputs(), ...biometricsOutputs()];
-  const changed = changedSince(state, outputs);
-  const url = await launchAssetUrl(port, platform);
-  if (state === null) progress(`metro   :${port}  bundling ${platform} once so the first launch does not wait on Metro`);
-  else if (changed.length > 0) progress(`metro   :${port}  waiting until the ${platform} bundle includes ${changed.length} changed dist file(s)`);
-  let previous: string | null = null;
-  let nudgedAt = Date.now();
-  let rewroteAt = 0;
-  await waitFor(
-    `Metro on port ${port} to serve the latest ${platform} bundle`,
-    async () => {
-      const bundle = await fetchBundle(url);
-      if (bundle === null || !bundleIsFresh(state, changed, bundle)) {
-        previous = null;
-        if (bundle !== null && Date.now() - nudgedAt > 5_000) {
-          const missed = changed.filter((f) => bundle.body.includes(`${f.rel}"`));
-          progress(`metro   :${port}  still serving the old ${platform} bundle; rewriting ${missed.length} changed dist file(s) so Metro's watcher sees them`);
-          for (const file of missed) writeFileSync(join(WORKTREE, file.rel), readFileSync(join(WORKTREE, file.rel)));
-          nudgedAt = Date.now();
-          rewroteAt = nudgedAt;
-        }
-        return false;
-      }
-      if (previous !== bundle.revId) {
-        previous = bundle.revId;
-        return false;
-      }
-      return true;
-    },
-    300_000,
-    `metro-${port}`,
+  const saved = existsSync(stateFile) ? (JSON.parse(readFileSync(stateFile, 'utf8')) as Partial<ServedState>) : null;
+  const state = saved !== null && saved.metroPid === metro.pid && saved.outputs !== undefined ? (saved as ServedState) : null;
+  const rels = servedOutputs();
+  let current = fingerprint(WORKTREE, rels, state?.outputs ?? null);
+  const pending = state === null ? [] : changedFiles(state.outputs, current);
+  progress(
+    state === null
+      ? `metro   :${port}  bundling ${platform} once so the first launch does not wait on Metro`
+      : pending.length > 0
+        ? `metro   :${port}  ${pending.length} served file(s) changed since the last launch; waiting until Metro's ${platform} bundle has the new code`
+        : `metro   :${port}  no served file changed since the last launch`,
   );
-  const served: ServedState = { metroPid: metro.pid, revId: previous ?? '', confirmedAt: Math.max(newest(outputs), rewroteAt) };
+  const fix = `retry bin/verify up --platform ${platform}; if it fails again, read ${runtimeLog(name)}`;
+  const url = await (async () => {
+    let last = '';
+    let delay = 500;
+    const deadline = Date.now() + 120_000;
+    while (Date.now() < deadline) {
+      const manifest = await fetchManifest(port, platform);
+      if (manifest.ok) return manifest.value;
+      last = manifest.message;
+      await sleep(delay);
+      delay = Math.min(delay * 2, 8_000);
+    }
+    throw new VerifyFailure('NOT_READY', `Metro on port ${port} returned no ${platform} launch asset within 120s (${last})`, fix);
+  })();
+  let confirmed: { readonly revId: string; readonly outputs: Fingerprint } | null = null;
+  let previous: { readonly revId: string; readonly outputs: Fingerprint } | null = null;
+  let nudgedAt = Date.now();
+  let delay = 500;
+  let lastError = '';
+  const deadline = Date.now() + 300_000;
+  while (confirmed === null) {
+    if (Date.now() >= deadline) {
+      throw new VerifyFailure('NOT_READY', `Metro on port ${port} did not serve the latest ${platform} bundle within 300s${lastError === '' ? '' : ` (${lastError})`}`, fix);
+    }
+    const before = fingerprint(WORKTREE, rels, current);
+    const bundle = await fetchBundle(url);
+    const after = fingerprint(WORKTREE, rels, before);
+    current = after;
+    if (!bundle.ok) {
+      if (!bundle.transient) throw new VerifyFailure('NOT_READY', `Metro on port ${port} could not bundle ${platform}: ${bundle.message}`, `fix the bundling error, then rerun; read ${runtimeLog(name)}`);
+      lastError = bundle.message;
+      previous = null;
+      await sleep(delay);
+      delay = Math.min(delay * 2, 8_000);
+      continue;
+    }
+    delay = 500;
+    const settled = sameContent(before, after);
+    if (!settled || !bundleIsFresh(state, after, bundle.value)) {
+      previous = null;
+      if (settled && state !== null && Date.now() - nudgedAt > 5_000) {
+        const missed = inBundle(bundle.value.body, changedFiles(state.outputs, after));
+        progress(`metro   :${port}  still serving the old ${platform} bundle; touching ${missed.length} changed file(s) so Metro's watcher sees them`);
+        const now = new Date();
+        for (const rel of missed) utimesSync(join(WORKTREE, rel), now, now);
+        nudgedAt = Date.now();
+      }
+      await sleep(500);
+      continue;
+    }
+    if (previous !== null && previous.revId === bundle.value.revId && sameContent(previous.outputs, after)) confirmed = previous;
+    else previous = { revId: bundle.value.revId, outputs: after };
+    if (confirmed === null) await sleep(500);
+  }
+  const served: ServedState = { metroPid: metro.pid, revId: confirmed.revId, outputs: confirmed.outputs };
   writeFileSync(stateFile, JSON.stringify(served));
 }
 
@@ -350,20 +449,29 @@ export const host: HostAdapter<ExpoHostScreen> = {
     if (lease.backend !== 'local') throw new VerifyFailure('UNSUPPORTED', 'the Expo host serves JS from local Metro only', 'run locally; EAS arrives with CLOUD-EXPO');
     const progress = (line: string) => process.stderr.write(`${line}\n`);
     const port = metroPort(lease);
-    const watch = await ensureWatch(progress);
-    await waitForWatchToCatchUp();
-    await ensureBiometricsBuilt(progress);
-    const metro = await ensureMetro(port, progress);
-    await ensureServed(metro, port, lease.platform, progress);
-    if (lease.platform === 'android') {
-      const adb = sdkTool('adb');
-      const reverse = await run(adb, ['-s', lease.deviceId, 'reverse', `tcp:${port}`, `tcp:${port}`]);
-      if (reverse.code !== 0) throw new VerifyFailure('NOT_READY', `adb reverse tcp:${port} failed: ${reverse.stderr.trim()}`, 'bin/verify down --platform android, then bin/verify up --platform android');
-      await run(adb, ['-s', lease.deviceId, 'shell', 'am', 'force-stop', APP_ID]);
-      const prefs = await run(adb, ['-s', lease.deviceId, 'shell', `run-as ${APP_ID} sh -c 'mkdir -p shared_prefs && cat > shared_prefs/expo.modules.devmenu.sharedpreferences.xml'`], { input: ANDROID_DEV_MENU_PREFS });
-      if (prefs.code !== 0) throw new VerifyFailure('NOT_READY', `could not turn off the dev menu onboarding: ${prefs.stderr.trim()}`, 'bin/verify down --platform android, then bin/verify up --platform android');
+    const started: Started = { names: [] };
+    try {
+      await rebuildStaleSiblings(progress);
+      const watch = await ensureWatch(started, progress);
+      await waitForWatchToCatchUp();
+      const metro = await ensureMetro(started, port, progress);
+      await ensureServed(metro, port, lease.platform, progress);
+      if (lease.platform === 'android') {
+        const adb = sdkTool('adb');
+        const reverse = await run(adb, ['-s', lease.deviceId, 'reverse', `tcp:${port}`, `tcp:${port}`]);
+        if (reverse.code !== 0) throw new VerifyFailure('NOT_READY', `adb reverse tcp:${port} failed: ${reverse.stderr.trim()}`, 'bin/verify down --platform android, then bin/verify up --platform android');
+        await run(adb, ['-s', lease.deviceId, 'shell', 'am', 'force-stop', APP_ID]);
+        const prefs = await run(adb, ['-s', lease.deviceId, 'shell', `run-as ${APP_ID} sh -c 'mkdir -p shared_prefs && cat > shared_prefs/expo.modules.devmenu.sharedpreferences.xml'`], { input: ANDROID_DEV_MENU_PREFS });
+        if (prefs.code !== 0) throw new VerifyFailure('NOT_READY', `could not turn off the dev menu onboarding: ${prefs.stderr.trim()}`, 'bin/verify down --platform android, then bin/verify up --platform android');
+      }
+      return { entry: devClientEntry(lease.platform, port), processes: [watch, metro] };
+    } catch (error) {
+      if (started.names.length > 0) {
+        progress(`stop    ${started.names.join(', ')} (started by this call, which failed)`);
+        stopRuntime(started.names);
+      }
+      throw error;
     }
-    return { entry: devClientEntry(lease.platform, port), processes: [watch, metro] };
   },
   entry: (platform) => devClientEntry(platform, 8081),
   logPredicates: { ios: `process == "${IOS_PRODUCT}" AND senderImagePath CONTAINS "${IOS_PRODUCT}"` },

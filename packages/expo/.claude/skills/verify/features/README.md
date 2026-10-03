@@ -56,7 +56,7 @@ Rules:
 
 ## Proof and skip reporting
 
-- A proof is a passing `bin/verify run` whose run directory holds `video.mp4`, `screenshots/`, `states.jsonl`, `state.json`, `app.log`, and `e2e/report.json`. `states.jsonl` is the state proof on both platforms. On Android `app.log` also carries the `[verify]` console lines. On iOS it carries only the app's native log lines, and the JS console lines, a JS change's own log lines included, are in `.verify/runtime/metro-<port>.log`, after this run's first state line.
+- A proof is a passing `bin/verify run` whose run directory holds `video.mp4`, `screenshots/`, `states.jsonl`, `state.json`, `app.log`, and `e2e/report.json`. `states.jsonl` is the state proof on both platforms. On Android `app.log` also carries the `[verify]` console lines. On iOS it carries only the app's native log lines, and the JS console lines, a JS change's own log lines included, are in `.verify/runtime/metro-<port>.log`. Read the run's whole window there by `runId`, as SKILL.md describes: module-level lines print before the run's first state line.
 - Name the run id, the platform, and the specs in the PR. Attach with `bin/verify attach <run-id> --pr <n>`.
 - Report a skipped `form-entry` spec as skipped with the reason. The CLI prints `skipped by --skip form-entry`. Never report it as verified through a ticket launch.
 - A runtime that skips form entry proves each auth flow up to its code screen with the `request-code` spec, and reports the `complete` spec as skipped.
