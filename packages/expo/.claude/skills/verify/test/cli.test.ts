@@ -143,3 +143,30 @@ describe('doctor feature-map check', () => {
     assert.equal(featureMapCheck(join(import.meta.dirname, '..'), host.features).ok, true);
   });
 });
+
+describe('down output', () => {
+  const render = (stoppedProcesses: readonly string[]) => {
+    let out = '';
+    createOutput(false, '/tmp', { write: (t: string) => (out += t) }, { write: () => true }).result({
+      verb: 'down',
+      dryRun: false,
+      released: [],
+      deletedUsers: 1,
+      deletedOrganizations: 1,
+      stoppedProcesses,
+      keptRuns: [],
+    });
+    return out;
+  };
+
+  it('says a ledgered daemon had already exited instead of claiming none ran', () => {
+    const out = render(['agent-device 4242 had already exited']);
+    assert.match(out, /stopped   agent-device 4242 had already exited/);
+    assert.doesNotMatch(out, /no agent-device daemon running/);
+    assert.match(out, /deleted   1 user, 1 organization/);
+  });
+
+  it('says no daemon ran when the ledger had none', () => {
+    assert.match(render([]), /stopped   nothing; no agent-device daemon running/);
+  });
+});

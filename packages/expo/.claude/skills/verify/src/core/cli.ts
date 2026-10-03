@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { run as defaultRunner } from './exec.ts';
 import { redact } from './secret.ts';
 import { leaseLine } from './devices.ts';
-import { describeState } from './state.ts';
+import { count, describeState } from './state.ts';
 import { defaultClerk, verbs, type Deps } from './verbs.ts';
 import { openWorkspace, parseRunId } from './workspace.ts';
 import {
@@ -186,7 +186,7 @@ function rel(skillDir: string, path: string): string {
 
 function renderRun(result: RunResult, skillDir: string): string[] {
   const r = result.record;
-  const lines = [`run ${r.run}  ${r.platform}  ${r.backend} ${r.device}  build ${r.build}`];
+  const lines: string[] = [];
   const width = Math.max(0, ...r.results.map((x) => x.spec.path.replace(/^specs\/(golden\/)?/, '').length));
   for (const x of r.results) {
     const label = { passed: 'pass', failed: 'FAIL', skipped: 'skip', flaky: 'flaky', interrupted: 'INTR' }[x.status];
@@ -196,6 +196,7 @@ function renderRun(result: RunResult, skillDir: string): string[] {
     if (x.error !== null) lines.push(`        ${x.error}`);
     if (x.status === 'passed' && x.tags.includes(KNOWN_BUG_TAG)) lines.push('        passed with --include known-bug: the bug may be fixed; drop the tag');
     if (x.failurePage !== null) lines.push(`        failure page  ${rel(skillDir, x.failurePage)}`);
+    if (x.failureScreenshot !== null) lines.push(`        screenshot    ${rel(skillDir, x.failureScreenshot)}`);
   }
   lines.push(`evidence  ${rel(process.cwd(), result.dir)}`);
   if (r.videos.length > 0) lines.push(`  video        ${r.videos.map((v) => basename(v)).join(', ')}`);
@@ -240,13 +241,13 @@ function render(value: VerbResult, skillDir: string): string[] {
           ? [
               'dry run: nothing was changed',
               `would release  ${value.wouldRelease.map((l) => l.device).join(', ') || 'nothing'}`,
-              `would delete   ${value.wouldDelete.filter((t) => t.kind === 'user').length} users, ${value.wouldDelete.filter((t) => t.kind === 'organization').length} organizations`,
+              `would delete   ${count(value.wouldDelete.filter((t) => t.kind === 'user').length, 'user')}, ${count(value.wouldDelete.filter((t) => t.kind === 'organization').length, 'organization')}`,
               ...value.wouldDelete.map((t) => (t.kind === 'user' ? `  user          ${t.instance}  ${t.id}  ${t.email}` : `  organization  ${t.instance}  ${t.id}  ${t.name}`)),
               stoppedLine('would stop', value.wouldStop),
             ]
           : [
               `released  ${value.released.map((l) => l.device).join(', ') || 'nothing'}`,
-              `deleted   ${value.deletedUsers} users, ${value.deletedOrganizations} organizations`,
+              `deleted   ${count(value.deletedUsers, 'user')}, ${count(value.deletedOrganizations, 'organization')}`,
               stoppedLine('stopped', value.stoppedProcesses),
             ]),
         `kept      ${value.keptRuns.length} runs in .verify/runs/`,

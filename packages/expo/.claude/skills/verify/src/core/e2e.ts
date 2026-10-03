@@ -141,6 +141,7 @@ export function planE2E(
     ...(command.grep === undefined ? [] : ['--grep', command.grep]),
     ...(context.e2eVideo ? ['--video=on'] : []),
   ];
+  if (excludedTagNames(command).length > 0) args.push('--pass-with-no-tests');
   return { args, env: { VERIFY_CONTEXT: contextFile(context), AGENT_DEVICE_STATE_DIR: agentDeviceStateDir(context.workspace), E2E_TELEMETRY_DISABLED: '1' } };
 }
 
@@ -201,7 +202,7 @@ interface WireAttempt {
   readonly durationMs?: number;
   readonly error?: WireError;
   /** Artifact id of the screen text at failure. */
-  readonly failure?: { readonly screen?: string };
+  readonly failure?: { readonly screen?: string; readonly screenshot?: string };
   readonly artifacts?: readonly WireArtifact[];
   readonly steps?: readonly WireStep[];
 }
@@ -253,8 +254,11 @@ export function parseE2EReport(reportJson: unknown, specs: readonly SpecRef[], r
       const notRun = r.status === 'skipped' && r.skip?.cause !== 'filtered' && r.skip?.cause !== 'platform-unavailable';
       const status = notRun ? 'failed' : (STATUS[r.status ?? ''] ?? 'failed');
       const page = r.id === undefined ? undefined : pages.find((p) => p.endsWith(`-${r.id!.slice(0, 8)}.md`));
-      const screenArtifact = last?.artifacts?.find((a) => a.id !== undefined && a.id === last.failure?.screen)?.path;
-      const screenPath = screenArtifact === undefined ? null : join(runDir, 'e2e', 'artifacts', screenArtifact);
+      const artifactPath = (id: string | undefined): EvidencePath | null => {
+        const path = id === undefined ? undefined : last?.artifacts?.find((a) => a.id === id)?.path;
+        return path === undefined ? null : (join(runDir, 'e2e', 'artifacts', path) as EvidencePath);
+      };
+      const screenPath = artifactPath(last?.failure?.screen);
       const excludedBy = (tag: OptInTag) => excluded.includes(tag) && (r.tags ?? []).includes(tag);
       let skipReason: string | null = null;
       if (status === 'skipped') {
@@ -279,6 +283,7 @@ export function parseE2EReport(reportJson: unknown, specs: readonly SpecRef[], r
         tags: r.tags ?? [],
         failurePage: page === undefined ? null : (join(failuresDir, page) as EvidencePath),
         failureScreen: screenPath !== null && existsSync(screenPath) ? (screenPath as EvidencePath) : null,
+        failureScreenshot: artifactPath(last?.failure?.screenshot),
       };
     });
 }

@@ -135,7 +135,7 @@ export class VerifyFailure extends Error {
 
 export type DoctorCheckId =
   | 'node' | 'xcode' | 'jdk' | 'e2e-pins' | 'agent-device-global' | 'template' | 'proxy-trust' | 'keys'
-  | `instance:${string}` | 'build' | 'eas' | 'kvm' | 'gh-attach' | 'core-drift' | 'stale-claims' | 'feature-map' | 'agent-device-daemon';
+  | `instance:${string}` | 'build' | 'eas' | 'kvm' | 'gh-attach' | 'core-drift' | 'stale-claims' | 'feature-map' | 'agent-device-daemon' | 'lane-ports';
 
 export interface DoctorCheck {
   readonly id: DoctorCheckId;
@@ -304,6 +304,7 @@ export interface SpecResult {
   readonly tags: readonly string[];
   readonly failurePage: EvidencePath | null;
   readonly failureScreen: EvidencePath | null;
+  readonly failureScreenshot: EvidencePath | null;
 }
 
 export interface EvidenceRecord {
@@ -426,10 +427,19 @@ export interface BrokerLaunchResponse {
   readonly launchArguments: readonly string[];
 }
 
+/** How long a verb waits for the device lock, and the fix it prints when it gives up. The fix names only flags that verb takes. */
+export interface DeviceWait {
+  readonly seconds: number;
+  readonly busyFix: string;
+  readonly onWait?: (owner: ProcessRef) => void;
+}
+
 export interface AcquireRequest {
   readonly platform: Platform;
   readonly worktree: string;
   readonly waitSeconds: number;
+  /** The calling verb's own command with a wait flag, for the POOL_FULL fix. */
+  readonly retryWith: string;
   readonly progress: (line: string) => void;
 }
 

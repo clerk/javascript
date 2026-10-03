@@ -22,6 +22,12 @@ export const LOCALE = 'en-US';
 export const RECORD_SIZE = '720x1608';
 export const LOG_FILTER = ['ClerkVerify:V', 'ClerkLog:V', 'OkHttp:V', 'ReactNativeJS:V', 'AndroidRuntime:E', '*:S'];
 const BOOT_TIMEOUT_MS = 240_000;
+const STILL_WAITING_MS = 60_000;
+/**
+ * Names the claim a lane was booted for, so verify only ever kills or drives its own lanes. Set with `setprop` after
+ * boot: emulator 36.3 drops `-prop` names outside `qemu.*`, and its `qemu.*` names never reach getprop.
+ */
+export const LANE_PROPERTY = 'debug.verify.lane';
 
 export const lanePort = (slot: number): number => 5558 + 2 * slot;
 export const laneSerial = (slot: number): string => `emulator-${lanePort(slot)}`;
@@ -52,14 +58,16 @@ const listsAvd = (stdout: string) => stdout.split('\n').some((line) => line.trim
 
 export interface LocalAndroidOptions {
   readonly claimsDir?: string;
+  readonly adbBin?: string;
+  readonly emulatorBin?: string;
 }
 
 export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBackend<LocalLease> {
   const claimsDir = options.claimsDir ?? defaultClaimsDir();
   const exec = run;
   const emulatorLogDir = join(homedir(), '.verify', 'emulators');
-  const adbBin = sdkTool('adb');
-  const emulatorBin = sdkTool('emulator');
+  const adbBin = options.adbBin ?? sdkTool('adb');
+  const emulatorBin = options.emulatorBin ?? sdkTool('emulator');
 
   const adb = (serial: string, args: readonly string[]) => exec(adbBin, ['-s', serial, ...args]);
   const shell = async (serial: string, command: string) => (await adb(serial, ['shell', command])).stdout.trim();
@@ -75,8 +83,17 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     return result.code === 0 ? (result.stdout.split('\n')[0]?.trim() ?? null) : null;
   }
 
-  async function killEmulator(serial: string): Promise<void> {
-    if (!(await devices()).has(serial)) return;
+  /** Our lane: the template AVD, booted for this claim. Anything else on a lane port belongs to someone else. */
+  async function isLane(serial: string, nonce: string): Promise<boolean> {
+    return (await avdName(serial)) === AVD_NAME && (await shell(serial, `getprop ${LANE_PROPERTY}`)) === nonce;
+  }
+
+  async function describeForeign(serial: string): Promise<string> {
+    return `${serial} (${(await avdName(serial)) ?? 'unknown AVD'}, not a verify lane)`;
+  }
+
+  async function killEmulator(serial: string, nonce: string): Promise<void> {
+    if (!(await devices()).has(serial) || !(await isLane(serial, nonce))) return;
     await adb(serial, ['emu', 'kill']);
     const deadline = Date.now() + 30_000;
     while ((await devices()).has(serial)) {
@@ -111,17 +128,41 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     }
   }
 
+  async function lanePortsCheck(): Promise<DoctorCheck> {
+    const running = await devices();
+    const live = readClaims(claimsDir, 'android').filter((c) => !isOrphaned(c));
+    const foreign: string[] = [];
+    for (let slot = 1; slot <= LOCAL_POOL.android; slot += 1) {
+      const serial = laneSerial(slot);
+      if (!running.has(serial)) continue;
+      const claim = live.find((c) => c.slot === slot);
+      if (claim === undefined || !(await isLane(serial, claim.nonce))) foreign.push(serial);
+    }
+    if (foreign.length === 0) return { id: 'lane-ports', ok: true, detail: `ports ${lanePort(1)} to ${lanePort(LOCAL_POOL.android)} hold only verify lanes` };
+    return {
+      id: 'lane-ports',
+      ok: false,
+      detail: `${(await Promise.all(foreign.map(describeForeign))).join(', ')} sits on a lane port and takes a lane from every worktree`,
+      fix: `${foreign.map((serial) => `adb -s ${serial} emu kill`).join('; ')}, but only if that emulator is yours; verify never kills it`,
+    };
+  }
+
   async function claimSlot(request: AcquireRequest): Promise<Claim> {
-    const deadline = Date.now() + request.waitSeconds * 1000;
+    const startedWaiting = Date.now();
+    const deadline = startedWaiting + request.waitSeconds * 1000;
     let lastWait = '';
+    let lastPrinted = 0;
     for (;;) {
       const running = await devices();
-      const claims = readClaims(claimsDir, 'android');
-      const live = claims.filter((c) => !isOrphaned(c));
+      const live = readClaims(claimsDir, 'android').filter((c) => !isOrphaned(c));
       const foreign = Array.from({ length: LOCAL_POOL.android }, (_, i) => i + 1).filter(
-        (slot) => running.has(laneSerial(slot)) && !claims.some((c) => c.slot === slot),
+        (slot) => running.has(laneSerial(slot)) && !live.some((c) => c.slot === slot),
       );
-      const inUse = [...live.map((c) => c.deviceName), ...foreign.map((slot) => `${laneSerial(slot)} (unclaimed)`)].sort();
+      const inUse = [
+        ...live.map((c) => `${c.deviceName} (held by ${c.worktree})`),
+        ...(await Promise.all(foreign.map((slot) => describeForeign(laneSerial(slot))))),
+      ].sort();
+      const foreignFix = foreign.length === 0 ? '' : `; ${foreign.map((slot) => `\`adb -s ${laneSerial(slot)} emu kill\``).join(' or ')} frees a lane, but only if that emulator is yours`;
       if (inUse.length < LOCAL_POOL.android) {
         for (let slot = 1; slot <= LOCAL_POOL.android; slot += 1) {
           if (foreign.includes(slot)) continue;
@@ -135,11 +176,14 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
         throw new VerifyFailure(
           'POOL_FULL',
           `${inUse.length} of ${LOCAL_POOL.android} Android lanes are in use on this Mac (${inUse.join(', ')})`,
-          'wait and retry with `--wait 300`, or run `bin/verify down` in a worktree that no longer needs its lane',
+          `rerun with a longer --wait than ${request.waitSeconds}s, for example ${request.retryWith.replace('<seconds>', String(Math.max(600, request.waitSeconds * 2)))}, or run bin/verify down in a worktree that no longer needs its lane${foreignFix}`,
         );
       }
       const waiting = `wait    all ${LOCAL_POOL.android} Android lanes are in use (${inUse.join(', ')}); waiting up to ${request.waitSeconds}s for one to free`;
-      if (waiting !== lastWait) request.progress(waiting);
+      if (waiting !== lastWait || Date.now() - lastPrinted >= STILL_WAITING_MS) {
+        request.progress(waiting === lastWait ? `wait    still waiting after ${Math.round((Date.now() - startedWaiting) / 1000)}s (${inUse.join(', ')})` : waiting);
+        lastPrinted = Date.now();
+      }
       lastWait = waiting;
       await sleep(5000);
     }
@@ -148,11 +192,11 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
   async function clearSlot(claim: Claim, worktree: string): Promise<void> {
     const reaper = takeSlot(claimsDir, 'android', claim.slot, claim.gen, worktree, true);
     if (reaper === null) return;
-    await killEmulator(laneSerial(claim.slot));
+    await killEmulator(laneSerial(claim.slot), claim.nonce);
     freeSlot(claimsDir, reaper);
   }
 
-  function bootEmulator(slot: number): { readonly exited: () => string | null } {
+  function bootEmulator(slot: number): { readonly exited: () => string | null; readonly stop: () => void } {
     mkdirSync(emulatorLogDir, { recursive: true });
     const logFile = join(emulatorLogDir, `android-${slot}.log`);
     const out = openSync(logFile, 'w');
@@ -169,7 +213,12 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
       exit = `exit ${code}${tail ? `: ${tail}` : ''}`;
     });
     child.unref();
-    return { exited: () => exit };
+    return {
+      exited: () => exit,
+      stop: () => {
+        if (exit === null && child.pid !== undefined) process.kill(child.pid, 'SIGTERM');
+      },
+    };
   }
 
   const backend: DeviceBackend<LocalLease> = {
@@ -184,16 +233,22 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
       }
       const claim = await claimSlot(request);
       const serial = laneSerial(claim.slot);
+      let boot: ReturnType<typeof bootEmulator> | null = null;
       try {
-        await killEmulator(serial);
+        if ((await devices()).has(serial)) {
+          throw new VerifyFailure('POOL_FULL', `${await describeForeign(serial)} took the lane port while it was being claimed`, request.retryWith.replace('<seconds>', '300'));
+        }
         request.progress(`device  ${claim.deviceName}  booting ${AVD_NAME} -read-only on port ${lanePort(claim.slot)}`);
-        const boot = bootEmulator(claim.slot);
+        boot = bootEmulator(claim.slot);
         await waitForBoot(serial, boot.exited);
-        if ((await avdName(serial)) !== AVD_NAME) {
-          throw new VerifyFailure('NOT_READY', `${serial} is not running ${AVD_NAME}`, `adb -s ${serial} emu kill, then bin/verify up`);
+        await shell(serial, `setprop ${LANE_PROPERTY} ${claim.nonce}`);
+        if (!(await isLane(serial, claim.nonce))) {
+          const marker = (await shell(serial, 'getprop')).split('\n').filter((line) => line.includes('verify.lane')).join(' ') || 'no verify.lane property';
+          throw new VerifyFailure('NOT_READY', `${serial} is not the ${AVD_NAME} lane this claim booted (${marker})`, request.retryWith.replace('<seconds>', '300'));
         }
         await pinLocale(serial, request.progress);
       } catch (error) {
+        boot?.stop();
         await clearSlot(claim, request.worktree).catch(() => undefined);
         throw error;
       }
@@ -212,7 +267,7 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     async check(lease) {
       if (readClaim(claimsDir, 'android', lease.slot).claim?.nonce !== lease.claimNonce) return 'lost';
       if ((await devices()).get(lease.deviceId) !== 'device') return 'lost';
-      if ((await avdName(lease.deviceId)) !== AVD_NAME) return 'lost';
+      if (!(await isLane(lease.deviceId, lease.claimNonce))) return 'lost';
       return (await shell(lease.deviceId, 'getprop sys.boot_completed')) === '1' ? 'held' : 'lost';
     },
 
@@ -268,6 +323,7 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
       } else {
         device.push({ id: 'template', ok: true, detail: `${AVD_NAME}; lanes boot it -read-only on ports ${lanePort(1)} to ${lanePort(LOCAL_POOL.android)}` });
       }
+      device.push(await lanePortsCheck());
       return { toolchain: [jdkCheck()], device };
     },
   };
@@ -311,8 +367,11 @@ export async function startScreenrecord(options: ScreenrecordOptions): Promise<R
       while ((await shell('pidof screenrecord')) !== '' && Date.now() < stopDeadline) await sleep(500);
       await Promise.race([done, sleep(5000)]);
       const video = join(into, 'video.mp4') as EvidencePath;
-      await exec(adbBin, ['-s', serial, 'pull', remote, video]);
+      const pulled = await exec(adbBin, ['-s', serial, 'pull', remote, video]);
       await shell(`rm -f ${remote}`);
+      if (pulled.code !== 0 || !existsSync(video)) {
+        throw new VerifyFailure('NOT_READY', `adb pull of the recording from ${serial} failed: ${(pulled.stderr || pulled.stdout).trim()}`, 'rerun the spec, or rerun with --no-video');
+      }
       return video;
     },
   };

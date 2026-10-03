@@ -7,6 +7,7 @@ import { compareAndSwapSlot, readSlot } from './slot.ts';
 import {
   VerifyFailure,
   type AcquireLock,
+  type DeviceWait,
   type EvidencePath,
   type Lease,
   type LedgerEntry,
@@ -43,13 +44,13 @@ export interface Workspace {
   entries(): readonly LedgerEntry[];
   unclosedEntries(): readonly LedgerEntry[];
   withAcquireLock<T>(platform: Platform, fn: (lock: AcquireLock) => Promise<T>, onWait?: (owner: ProcessRef) => void): Promise<T>;
-  withDevice<T>(platform: Platform, waitSeconds: number, fn: () => Promise<T>, onWait?: (owner: ProcessRef) => void): Promise<T>;
+  withDevice<T>(platform: Platform, wait: DeviceWait, fn: () => Promise<T>): Promise<T>;
   withAcquireThenDevice<A, T>(
     platform: Platform,
-    waitSeconds: number,
+    deviceWait: DeviceWait,
     prepare: (lock: AcquireLock) => Promise<A>,
     drive: (prepared: A) => Promise<T>,
-    onWait?: { readonly acquire: (owner: ProcessRef) => void; readonly device: (owner: ProcessRef) => void },
+    onAcquireWait?: (owner: ProcessRef) => void,
   ): Promise<T>;
   removeScratch(path: ScratchPath): void;
 }
@@ -131,8 +132,8 @@ async function withSlotLock<T>(dir: string, timeoutMs: number, onTimeout: () => 
   }
 }
 
-const deviceBusy = (platform: Platform) =>
-  new VerifyFailure('DEVICE_BUSY', `another verify process in this worktree is driving the ${platform} device`, 'wait for it to finish, or pass --wait <seconds>');
+const deviceBusy = (platform: Platform, fix: string) =>
+  new VerifyFailure('DEVICE_BUSY', `another verify process in this worktree is driving the ${platform} device`, fix);
 
 export function openWorkspace(options: WorkspaceOptions): Workspace {
   const root = join(options.skillDir, '.verify');
@@ -199,16 +200,16 @@ export function openWorkspace(options: WorkspaceOptions): Workspace {
     withAcquireLock(platform, fn, onWait) {
       return withSlotLock(acquireDir(platform), Number.POSITIVE_INFINITY, unreachable, () => fn({ platform } as AcquireLock), onWait);
     },
-    withDevice(platform, waitSeconds, fn, onWait) {
-      return withSlotLock(join(dir('locks'), `device-${platform}`), waitSeconds * 1000, () => deviceBusy(platform), fn, onWait);
+    withDevice(platform, wait, fn) {
+      return withSlotLock(join(dir('locks'), `device-${platform}`), wait.seconds * 1000, () => deviceBusy(platform, wait.busyFix), fn, wait.onWait);
     },
-    async withAcquireThenDevice(platform, waitSeconds, prepare, drive, onWait) {
-      const releaseAcquire = await takeSlotLock(acquireDir(platform), Number.POSITIVE_INFINITY, unreachable, onWait?.acquire);
+    async withAcquireThenDevice(platform, deviceWait, prepare, drive, onAcquireWait) {
+      const releaseAcquire = await takeSlotLock(acquireDir(platform), Number.POSITIVE_INFINITY, unreachable, onAcquireWait);
       let prepared;
       let releaseDevice;
       try {
         prepared = await prepare({ platform } as AcquireLock);
-        releaseDevice = await takeSlotLock(join(dir('locks'), `device-${platform}`), waitSeconds * 1000, () => deviceBusy(platform), onWait?.device);
+        releaseDevice = await takeSlotLock(join(dir('locks'), `device-${platform}`), deviceWait.seconds * 1000, () => deviceBusy(platform, deviceWait.busyFix), deviceWait.onWait);
       } finally {
         releaseAcquire();
       }

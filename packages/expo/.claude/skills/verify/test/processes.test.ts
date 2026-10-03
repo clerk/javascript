@@ -36,7 +36,7 @@ describe('stopProcesses', () => {
     workspace.append({ id: newEntryId(), kind: 'process', what: 'recorder', pid: recorder.pid!, startedAt: new Date(startedAt(recorder.pid!)).toISOString() });
     workspace.append({ id: newEntryId(), kind: 'process', what: 'agent-device', pid: reused.pid!, startedAt: new Date(startedAt(reused.pid!) - 3_600_000).toISOString() });
     const stopped = stopProcesses(workspace);
-    assert.deepEqual(stopped, [`recorder ${recorder.pid}`]);
+    assert.deepEqual(stopped, [`recorder ${recorder.pid}`, `agent-device ${reused.pid} had already exited`]);
     assert.equal(await exited(recorder, 2000), true, 'the ledgered recorder was signalled');
     assert.equal(isAlive(reused.pid!), true, 'a pid whose start time does not match is left alone');
     assert.deepEqual(workspace.unclosedEntries(), []);

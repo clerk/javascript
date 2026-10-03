@@ -25,6 +25,7 @@ import {
   type Command,
   type DeletionTarget,
   type DeviceBackend,
+  type ProcessRef,
   type Recording,
   type DoctorCheck,
   type DoctorReport,
@@ -277,7 +278,7 @@ function targetOf(deps: Deps, outcome: RuntimeOutcome): RunContext['targets'][nu
 export async function up(deps: Deps, command: Extract<Command, { verb: 'up' }>): Promise<UpResult> {
   const platform = platformOf(deps.host, command.platform);
   return deps.workspace.withAcquireLock(platform, async (lock) => {
-    const leased = await ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, clerk: deps.clerk });
+    const leased = await ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, clerk: deps.clerk, retryWith: 'bin/verify up --wait <seconds>' });
     const outcome = { ...leased, entry: await startRuntime(deps, leased.lease) };
     writeStandingContext(deps, outcome);
     return { verb: 'up', leases: [outcome.view], builds: [outcome.build] };
@@ -342,21 +343,24 @@ export async function endRun(
 
 export async function leaseForRun<T>(deps: Deps, platform: Platform, command: Extract<Command, { verb: 'run' }>, drive: (outcome: RuntimeOutcome) => Promise<T>): Promise<T> {
   const key = await computeBuildKey(deps.host, platform, deps.workspace.worktree);
+  const retryWith = `bin/verify run ${'all' in command.selection ? '--all' : command.selection.selectors.join(' ')} --wait <seconds>`;
+  const deviceWait = {
+    seconds: command.waitSeconds,
+    busyFix: `let the other run in this worktree finish, or rerun with a wait: ${retryWith}`,
+    onWait: (owner: ProcessRef) => deps.progress(`wait    another bin/verify run in this worktree (pid ${owner.pid}) is driving the device; waiting up to ${command.waitSeconds}s`),
+  };
   return deps.workspace.withAcquireThenDevice(
     platform,
-    command.waitSeconds,
+    deviceWait,
     async (lock) => {
-      const leased = await ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, clerk: deps.clerk });
+      const leased = await ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, clerk: deps.clerk, retryWith });
       const outcome: RuntimeOutcome = { ...leased, entry: await startRuntime(deps, leased.lease) };
       writeStandingContext(deps, outcome);
       deps.progress(leaseLine(outcome.view));
       return outcome;
     },
     drive,
-    {
-      acquire: (owner) => deps.progress(`wait    another bin/verify in this worktree (pid ${owner.pid}) is building ${key} or leasing the device; waiting for it, with no time limit`),
-      device: (owner) => deps.progress(`wait    another bin/verify run in this worktree (pid ${owner.pid}) is driving the device; waiting up to ${command.waitSeconds}s`),
-    },
+    (owner) => deps.progress(`wait    another bin/verify in this worktree (pid ${owner.pid}) is building ${key} or leasing the device; waiting for it, with no time limit`),
   );
 }
 
@@ -503,7 +507,8 @@ export async function screen(deps: Deps, command: Extract<Command, { verb: 'scre
   const { CLERK_TEST_KEYS_JSON: _keys, ...env } = deps.env;
   const agentDevice = (args: readonly string[]) =>
     deps.runner(join(deps.workspace.skillDir, 'node_modules', '.bin', 'agent-device'), args, { env: { ...env, AGENT_DEVICE_STATE_DIR: deps.workspace.agentDeviceDir } });
-  return deps.workspace.withDevice(platform, 10, async () => {
+  const screenWait = { seconds: 10, busyFix: 'let the run in this worktree finish, then rerun bin/verify screen' };
+  return deps.workspace.withDevice(platform, screenWait, async () => {
     const target = backend.agentDeviceTarget(lease);
     const selector = platform === 'ios' ? ['--platform', 'ios', '--udid', target.deviceId] : ['--platform', 'android', '--serial', target.deviceId];
     const session = ['--session', `${agentDeviceSession(deps.workspace, platform)}-screen`];
@@ -589,7 +594,16 @@ export function down(deps: Deps, command: Extract<Command, { verb: 'down' }>): P
     (inner, platform) => () =>
       deps.workspace.withAcquireLock(
         platform,
-        () => deps.workspace.withDevice(platform, 0, inner),
+        () =>
+          deps.workspace.withDevice(
+            platform,
+            {
+              seconds: Number.POSITIVE_INFINITY,
+              busyFix: '',
+              onWait: (owner) => deps.progress(`wait    another bin/verify run in this worktree (pid ${owner.pid}) is driving the device; down waits for it, with no time limit`),
+            },
+            inner,
+          ),
         (owner) => deps.progress(`wait    another bin/verify in this worktree (pid ${owner.pid}) is building or leasing the device; down waits for it, with no time limit`),
       ),
     () => downUnlocked(deps, command),

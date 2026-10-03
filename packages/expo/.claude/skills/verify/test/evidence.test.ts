@@ -34,7 +34,7 @@ function partialRecord(dir: EvidencePath, run: RunId): Omit<EvidenceRecord, 'sea
     device: 'verify-ios-1',
     build: 'ios-000000000000' as BuildKey,
     results: [
-      { spec: { kind: 'explored', path: 'specs/explored/a.e2e.ts', feature: null }, title: 'a', platform: 'ios', status: 'passed', seconds: 1, error: null, skipReason: null, tags: [], failurePage: null, failureScreen: null },
+      { spec: { kind: 'explored', path: 'specs/explored/a.e2e.ts', feature: null }, title: 'a', platform: 'ios', status: 'passed', seconds: 1, error: null, skipReason: null, tags: [], failurePage: null, failureScreen: null, failureScreenshot: null },
     ],
     videos: [join(dir, 'video.mp4') as EvidencePath],
     screenshots: [{ label: 'profile', path: join(dir, 'screenshots', 'profile.png') as EvidencePath }],

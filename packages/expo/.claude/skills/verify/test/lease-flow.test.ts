@@ -5,9 +5,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
 import type { ClerkBackend } from '../src/core/clerk.ts';
-import { leaseForRun, up, type Deps } from '../src/core/verbs.ts';
+import { down, leaseForRun, up, type Deps } from '../src/core/verbs.ts';
 import { openWorkspace } from '../src/core/workspace.ts';
-import type { BuildKey, Command, DeviceBackend, HostAdapter, HostEntry, LocalLease, RunContext, ScratchPath } from '../src/core/types.ts';
+import { VerifyFailure, type BuildKey, type Command, type DeviceBackend, type HostAdapter, type HostEntry, type LocalLease, type RunContext, type ScratchPath } from '../src/core/types.ts';
 
 function setup(buildMs: number, runtime?: HostAdapter['runtime']) {
   const dir = mkdtempSync(join(tmpdir(), 'verify-flow-'));
@@ -28,6 +28,7 @@ function setup(buildMs: number, runtime?: HostAdapter['runtime']) {
       return { backend: 'local', platform: 'ios', slot: leases, deviceName: `verify-ios-${leases}`, deviceId: `UDID-${leases}`, claimNonce: `c${leases}`, acquiredAt: '', installedBuild: null };
     },
     install: async () => void events.push('install'),
+    release: async () => void events.push('release'),
     describe: (lease: LocalLease) => lease.deviceName,
   } as unknown as DeviceBackend;
   const host = {
@@ -54,7 +55,7 @@ function setup(buildMs: number, runtime?: HostAdapter['runtime']) {
     runner: async () => ({ code: 0, stdout: '', stderr: '' }),
     env: {},
     progress: (line: string) => void progress.push(line),
-    clerk: () => ({}) as ClerkBackend,
+    clerk: () => ({ deleteByEmail: async () => ({ users: 0, organizations: 0 }) }) as Partial<ClerkBackend> as ClerkBackend,
   };
   return { deps, events, progress };
 }
@@ -84,7 +85,11 @@ describe('lease flow', () => {
   it('holds the device lock for the run, so a second run reports DEVICE_BUSY', async () => {
     const { deps } = setup(0);
     await leaseForRun(deps, 'ios', runCommand, async () => {
-      await assert.rejects(leaseForRun(deps, 'ios', runCommand, async () => undefined), { code: 'DEVICE_BUSY' });
+      await assert.rejects(leaseForRun(deps, 'ios', runCommand, async () => undefined), (error: VerifyFailure) => {
+        assert.equal(error.code, 'DEVICE_BUSY');
+        assert.match(error.fix, /bin\/verify run --all --wait <seconds>/, 'the fix names run, the verb that takes --wait');
+        return true;
+      });
     });
     await leaseForRun(deps, 'ios', runCommand, async () => undefined);
   });
@@ -111,5 +116,26 @@ describe('lease flow', () => {
   it('keeps the binary entry for hosts without a runtime', async () => {
     const { deps } = setup(0);
     assert.deepEqual(await leaseForRun(deps, 'ios', runCommand, async (outcome) => outcome.entry), { kind: 'binary' });
+  });
+
+  it('makes down wait for a run that holds the device, with one wait line, instead of failing DEVICE_BUSY', async () => {
+    const { deps, progress } = setup(0);
+    let downFinished = false;
+    let releaseRun: () => void = () => undefined;
+    const running = leaseForRun(deps, 'ios', runCommand, () => new Promise<void>((resolve) => (releaseRun = resolve)));
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    progress.length = 0;
+    const downing = down(deps, { verb: 'down', stale: false, dryRun: false }).then((result) => {
+      downFinished = true;
+      return result;
+    });
+    await new Promise((resolve) => setTimeout(resolve, 600));
+    assert.equal(downFinished, false, 'down is still waiting while the run holds the device');
+    releaseRun();
+    await running;
+    const result = await downing;
+    assert.equal(result.dryRun, false);
+    assert.equal(progress.filter((l) => l.startsWith('wait')).length, 1);
+    assert.match(progress.find((l) => l.startsWith('wait')) ?? '', /driving the device; down waits for it, with no time limit/);
   });
 });

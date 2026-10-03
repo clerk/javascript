@@ -100,6 +100,8 @@ export function parseVerifyState(text: string): VerifyState {
   };
 }
 
+export const count = (n: number, noun: string): string => `${n} ${noun}${n === 1 ? '' : 's'}`;
+
 export function describeState(state: VerifyState): string {
   const parts = [`screen=${state.screen}`, `signedIn=${state.signedIn}`, `userId=${state.userId ?? 'null'}`];
   if (state.sessionStatus) parts.push(`session=${state.sessionStatus}`);

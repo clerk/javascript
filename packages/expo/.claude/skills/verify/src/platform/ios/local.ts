@@ -83,7 +83,7 @@ export function localIosBackend(options: LocalIosOptions = {}): DeviceBackend<Lo
         throw new VerifyFailure(
           'POOL_FULL',
           `${inUse.size} of ${LOCAL_POOL.ios} iOS lanes are in use on this Mac (${[...inUse].sort().join(', ')})`,
-          'pass --wait 300 to wait for a lane (`bin/verify up --wait 300` or `bin/verify run <spec> --wait 300`), or run `bin/verify down` in a worktree that no longer needs its lane',
+          `rerun with a longer --wait than ${request.waitSeconds}s, for example ${request.retryWith.replace('<seconds>', String(Math.max(600, request.waitSeconds * 2)))}, or run bin/verify down in a worktree that no longer needs its lane`,
         );
       }
       const changing = LOCAL_POOL.ios - inUse.size;
@@ -242,6 +242,7 @@ export function localIosBackend(options: LocalIosOptions = {}): DeviceBackend<Lo
             ? { id: 'template', ok: true, detail: `${TEMPLATE_NAME} (${template.runtime.replace(/^.*SimRuntime\./, '')})` }
             : { id: 'template', ok: false, detail: `${TEMPLATE_NAME} is ${template.state}; lanes clone it only while it is shut down`, fix: `xcrun simctl shutdown "${TEMPLATE_NAME}"` },
         await proxyTrustCheck(template),
+        await lanePortsCheck(),
       ];
       return { toolchain, device };
     },
@@ -266,4 +267,20 @@ async function proxyTrustCheck(template: Simulator | undefined): Promise<DoctorC
   return rows.code === 0 && count >= 1
     ? { id: 'proxy-trust', ok: true, detail: `${TEMPLATE_NAME} trusts ${count} custom CA${count === 1 ? '' : 's'} (proxy ${proxyName})` }
     : { id: 'proxy-trust', ok: false, detail: `HTTPS proxy ${proxyName} is on and ${TEMPLATE_NAME} trusts no custom CA`, fix: `boot ${TEMPLATE_NAME}, install and trust the proxy CA, then shut it down` };
+}
+
+async function lanePortsCheck(): Promise<DoctorCheck> {
+  const claimed = new Set(
+    readClaims(defaultClaimsDir(), 'ios')
+      .filter((c) => !isOrphaned(c))
+      .map((c) => c.deviceName as string),
+  );
+  const foreign = (await listSimulators()).filter((d) => d.state === 'Booted' && LANE_NAME.test(d.name) && !claimed.has(d.name));
+  if (foreign.length === 0) return { id: 'lane-ports', ok: true, detail: 'every booted verify-ios-<n> lane has a live claim' };
+  return {
+    id: 'lane-ports',
+    ok: false,
+    detail: `booted with no live claim: ${foreign.map((d) => `${d.name} (${d.udid})`).join(', ')}`,
+    fix: `if it is yours, ${foreign.map((d) => `xcrun simctl shutdown ${d.udid} && xcrun simctl delete ${d.udid}`).join('; ')}`,
+  };
 }

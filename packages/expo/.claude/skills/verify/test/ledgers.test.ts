@@ -70,7 +70,7 @@ describe('up finishes ledgers of deleted worktrees', () => {
     const deleted: string[] = [];
     const { host, clerk } = fakes(deleted);
     const workspace = openWorkspace({ skillDir: live, worktree: live, home });
-    const options = { waitSeconds: 0, progress: () => undefined, clerk: () => clerk };
+    const options = { waitSeconds: 0, progress: () => undefined, clerk: () => clerk, retryWith: 'bin/verify up --wait <seconds>' };
     await workspace.withAcquireLock('ios', (lock) => ensureLease(lock, undefined, workspace, host, options));
 
     assert.deepEqual(deleted.sort(), [newTestEmail(run, 1), newTestEmail(run, 2)].sort());
@@ -93,7 +93,7 @@ describe('up finishes ledgers of deleted worktrees', () => {
     const failing = { deleteByEmail: async () => assert.fail('BAPI is down') } as Partial<ClerkBackend> as ClerkBackend;
     const lines: string[] = [];
     const workspace = openWorkspace({ skillDir: live, worktree: live, home });
-    await workspace.withAcquireLock('ios', (lock) => ensureLease(lock, undefined, workspace, host, { waitSeconds: 0, progress: (l) => lines.push(l), clerk: () => failing }));
+    await workspace.withAcquireLock('ios', (lock) => ensureLease(lock, undefined, workspace, host, { waitSeconds: 0, progress: (l) => lines.push(l), clerk: () => failing, retryWith: 'bin/verify up --wait <seconds>' }));
     assert.equal(openWorkspace({ skillDir: gone, worktree: gone, home }).unclosedEntries().length, 1);
     assert.ok(lines.some((l) => l.includes('left open')));
   });
