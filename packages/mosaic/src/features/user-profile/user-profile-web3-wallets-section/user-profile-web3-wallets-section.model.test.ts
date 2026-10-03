@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { projectWeb3Wallets } from './user-profile-web3-wallets-section.model';
+import { normalizedWeb3Wallet, projectWeb3Wallets } from './user-profile-web3-wallets-section.model';
 
 const metamask = {
   id: 'wallet_metamask',
@@ -9,6 +9,12 @@ const metamask = {
 } as const;
 
 describe('Web3 wallet projection', () => {
+  it('matches the backend wallet sanitizer without folding Solana address case', () => {
+    expect(normalizedWeb3Wallet(' 0XAbCd ')).toBe('0xabcd');
+    expect(normalizedWeb3Wallet(' SolanaAbCd ')).toBe('SolanaAbCd');
+    expect(normalizedWeb3Wallet(' Solanaabcd ')).toBe('Solanaabcd');
+  });
+
   it('WEB3-01 shows configured providers that do not have a verified wallet', () => {
     expect(
       projectWeb3Wallets({

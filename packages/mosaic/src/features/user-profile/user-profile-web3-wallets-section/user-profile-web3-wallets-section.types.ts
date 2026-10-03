@@ -12,7 +12,7 @@ export type UserProfileWeb3WalletsModel =
       availableProviders: UserProfileWeb3Provider[];
       connect: (strategy: Web3Strategy, walletName?: string) => Promise<void>;
       setPrimary: (walletId: string) => Promise<void>;
-      remove: (walletId: string) => Promise<void>;
+      remove?: (walletId: string) => Promise<void>;
     };
 
 export type ReadyWeb3WalletsModel = Extract<UserProfileWeb3WalletsModel, { status: 'ready' }>;
