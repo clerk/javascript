@@ -110,7 +110,7 @@ export function UserProfileAddAuthenticatorView({
           variant='outline'
           color='neutral'
           fullWidth
-          disabled={Boolean(setup) && isPending}
+          disabled={isPending}
           onClick={onBack}
         >
           {m.back}

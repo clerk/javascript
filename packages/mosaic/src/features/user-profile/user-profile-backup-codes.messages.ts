@@ -3,6 +3,8 @@ export const userProfileBackupCodesMessages = {
   description: 'Save these somewhere safe. Each code can be used once if you lose access to your verification method.',
   codesLabel: 'Backup codes',
   download: 'Download',
+  print: 'Print',
+  printUnavailable: 'Printing is unavailable in this browser.',
   copyAndClose: 'Copy and close',
   cancel: 'Cancel',
   back: 'Back',
