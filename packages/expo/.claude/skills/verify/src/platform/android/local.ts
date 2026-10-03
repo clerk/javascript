@@ -1,9 +1,9 @@
-import { spawn } from 'node:child_process';
-import { closeSync, existsSync, mkdirSync, openSync, readFileSync } from 'node:fs';
+import { execFileSync, spawn } from 'node:child_process';
+import { closeSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { basename, join } from 'node:path';
 import { defaultClaimsDir, freeSlot, isOrphaned, readClaim, readClaims, takeSlot, type Claim } from '../../core/claims.ts';
-import { run, sleep, type Runner } from '../../core/exec.ts';
+import { isRunning, run, sleep, type ProcessRef, type Runner } from '../../core/exec.ts';
 import {
   LOCAL_POOL,
   VerifyFailure,
@@ -60,12 +60,32 @@ export interface LocalAndroidOptions {
   readonly claimsDir?: string;
   readonly adbBin?: string;
   readonly emulatorBin?: string;
+  readonly emulatorsDir?: string;
+}
+
+/** The emulator process verify spawned for a claim, written before boot so an interrupted or wedged boot can still be reclaimed. */
+interface LaneProcess extends ProcessRef {
+  readonly nonce: string;
+}
+
+function commandOf(pid: number): string {
+  try {
+    return execFileSync('ps', ['-o', 'command=', '-p', String(pid)], { encoding: 'utf8' }).trim();
+  } catch {
+    return '';
+  }
+}
+
+const hasArgument = (command: string, flag: string, value: string) => new RegExp(`(^|\\s)${flag} ${value}(\\s|$)`).test(command);
+
+function retryFix(request: AcquireRequest): string {
+  return request.retryWith.replace('<seconds>', String(Math.max(600, request.waitSeconds * 2)));
 }
 
 export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBackend<LocalLease> {
   const claimsDir = options.claimsDir ?? defaultClaimsDir();
   const exec = run;
-  const emulatorLogDir = join(homedir(), '.verify', 'emulators');
+  const emulatorLogDir = options.emulatorsDir ?? join(homedir(), '.verify', 'emulators');
   const adbBin = options.adbBin ?? sdkTool('adb');
   const emulatorBin = options.emulatorBin ?? sdkTool('emulator');
 
@@ -92,16 +112,49 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     return `${serial} (${(await avdName(serial)) ?? 'unknown AVD'}, not a verify lane)`;
   }
 
-  async function killEmulator(serial: string, nonce: string): Promise<void> {
-    if (!(await devices()).has(serial) || !(await isLane(serial, nonce))) return;
-    await adb(serial, ['emu', 'kill']);
+  const pidFile = (slot: number) => join(emulatorLogDir, `android-${slot}.pid`);
+
+  /** The process this claim spawned, still alive with the same start time and still an emulator of this AVD on this lane's port. */
+  function ownedProcess(slot: number, nonce: string): LaneProcess | null {
+    let recorded: LaneProcess;
+    try {
+      recorded = JSON.parse(readFileSync(pidFile(slot), 'utf8')) as LaneProcess;
+    } catch {
+      return null;
+    }
+    if (recorded.nonce !== nonce || !isRunning(recorded)) return null;
+    const command = commandOf(recorded.pid);
+    return hasArgument(command, '-avd', AVD_NAME) && hasArgument(command, '-port', String(lanePort(slot))) ? recorded : null;
+  }
+
+  function forgetProcess(slot: number, nonce: string): void {
+    try {
+      if ((JSON.parse(readFileSync(pidFile(slot), 'utf8')) as LaneProcess).nonce === nonce) rmSync(pidFile(slot), { force: true });
+    } catch {
+      return;
+    }
+  }
+
+  /** Kills the lane only when it carries this claim's marker or is the process this claim spawned. Never anything else on the port. */
+  async function killEmulator(slot: number, nonce: string): Promise<void> {
+    const serial = laneSerial(slot);
+    const marked = (await devices()).has(serial) && (await isLane(serial, nonce));
+    const owned = ownedProcess(slot, nonce);
+    if (marked) await adb(serial, ['emu', 'kill']);
+    else if (owned !== null) process.kill(-owned.pid, 'SIGTERM');
+    else {
+      forgetProcess(slot, nonce);
+      return;
+    }
     const deadline = Date.now() + 30_000;
-    while ((await devices()).has(serial)) {
+    while ((await devices()).has(serial) || (owned !== null && isRunning(owned))) {
       if (Date.now() >= deadline) {
-        throw new VerifyFailure('NOT_READY', `${serial} did not exit after \`adb emu kill\``, `adb -s ${serial} emu kill, then rerun the verb`);
+        if (owned === null) throw new VerifyFailure('NOT_READY', `${serial} did not exit after \`adb emu kill\``, `adb -s ${serial} emu kill, then rerun the verb`);
+        process.kill(-owned.pid, 'SIGKILL');
       }
       await sleep(1000);
     }
+    forgetProcess(slot, nonce);
   }
 
   async function waitForBoot(serial: string, exited: () => string | null): Promise<void> {
@@ -136,7 +189,8 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
       const serial = laneSerial(slot);
       if (!running.has(serial)) continue;
       const claim = live.find((c) => c.slot === slot);
-      if (claim === undefined || !(await isLane(serial, claim.nonce))) foreign.push(serial);
+      const booting = claim !== undefined && ownedProcess(slot, claim.nonce) !== null;
+      if (claim === undefined || (!booting && !(await isLane(serial, claim.nonce)))) foreign.push(serial);
     }
     if (foreign.length === 0) return { id: 'lane-ports', ok: true, detail: `ports ${lanePort(1)} to ${lanePort(LOCAL_POOL.android)} hold only verify lanes` };
     return {
@@ -176,7 +230,7 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
         throw new VerifyFailure(
           'POOL_FULL',
           `${inUse.length} of ${LOCAL_POOL.android} Android lanes are in use on this Mac (${inUse.join(', ')})`,
-          `rerun with a longer --wait than ${request.waitSeconds}s, for example ${request.retryWith.replace('<seconds>', String(Math.max(600, request.waitSeconds * 2)))}, or run bin/verify down in a worktree that no longer needs its lane${foreignFix}`,
+          `rerun with a longer --wait than ${request.waitSeconds}s, for example ${retryFix(request)}, or run bin/verify down in a worktree that no longer needs its lane${foreignFix}`,
         );
       }
       const waiting = `wait    all ${LOCAL_POOL.android} Android lanes are in use (${inUse.join(', ')}); waiting up to ${request.waitSeconds}s for one to free`;
@@ -192,11 +246,11 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
   async function clearSlot(claim: Claim, worktree: string): Promise<void> {
     const reaper = takeSlot(claimsDir, 'android', claim.slot, claim.gen, worktree, true);
     if (reaper === null) return;
-    await killEmulator(laneSerial(claim.slot), claim.nonce);
+    await killEmulator(claim.slot, claim.nonce);
     freeSlot(claimsDir, reaper);
   }
 
-  function bootEmulator(slot: number): { readonly exited: () => string | null; readonly stop: () => void } {
+  function bootEmulator(slot: number, nonce: string): { readonly pid: number | undefined; readonly exited: () => string | null; readonly stop: () => void } {
     mkdirSync(emulatorLogDir, { recursive: true });
     const logFile = join(emulatorLogDir, `android-${slot}.log`);
     const out = openSync(logFile, 'w');
@@ -206,6 +260,10 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
       { detached: true, stdio: ['ignore', out, out] },
     );
     closeSync(out);
+    if (child.pid !== undefined) {
+      const spawned: LaneProcess = { nonce, pid: child.pid, startedAt: Date.now() };
+      writeFileSync(pidFile(slot), JSON.stringify(spawned));
+    }
     let exit: string | null = null;
     child.on('error', (error) => (exit = error.message));
     child.on('exit', (code) => {
@@ -214,9 +272,10 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     });
     child.unref();
     return {
+      pid: child.pid,
       exited: () => exit,
       stop: () => {
-        if (exit === null && child.pid !== undefined) process.kill(child.pid, 'SIGTERM');
+        if (exit === null && child.pid !== undefined) process.kill(-child.pid, 'SIGTERM');
       },
     };
   }
@@ -234,23 +293,41 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
       const claim = await claimSlot(request);
       const serial = laneSerial(claim.slot);
       let boot: ReturnType<typeof bootEmulator> | null = null;
+      const interrupted = (signal: NodeJS.Signals) => {
+        if (boot !== null) {
+          boot.stop();
+          request.progress(`device  boot cancelled; stopped emulator ${boot.pid} on ${serial}`);
+        }
+        process.removeListener('SIGINT', interrupted);
+        process.removeListener('SIGTERM', interrupted);
+        process.kill(process.pid, signal);
+      };
+      process.once('SIGINT', interrupted);
+      process.once('SIGTERM', interrupted);
       try {
         if ((await devices()).has(serial)) {
-          throw new VerifyFailure('POOL_FULL', `${await describeForeign(serial)} took the lane port while it was being claimed`, request.retryWith.replace('<seconds>', '300'));
+          throw new VerifyFailure('POOL_FULL', `${await describeForeign(serial)} took the lane port while it was being claimed`, retryFix(request));
         }
         request.progress(`device  ${claim.deviceName}  booting ${AVD_NAME} -read-only on port ${lanePort(claim.slot)}`);
-        boot = bootEmulator(claim.slot);
+        boot = bootEmulator(claim.slot, claim.nonce);
         await waitForBoot(serial, boot.exited);
+        const died = boot.exited();
+        if (died !== null) {
+          throw new VerifyFailure('NOT_READY', `the ${AVD_NAME} emulator verify started exited (${died}), so ${serial} is someone else's`, retryFix(request));
+        }
         await shell(serial, `setprop ${LANE_PROPERTY} ${claim.nonce}`);
         if (!(await isLane(serial, claim.nonce))) {
           const marker = (await shell(serial, 'getprop')).split('\n').filter((line) => line.includes('verify.lane')).join(' ') || 'no verify.lane property';
-          throw new VerifyFailure('NOT_READY', `${serial} is not the ${AVD_NAME} lane this claim booted (${marker})`, request.retryWith.replace('<seconds>', '300'));
+          throw new VerifyFailure('NOT_READY', `${serial} is not the ${AVD_NAME} lane this claim booted (${marker})`, retryFix(request));
         }
         await pinLocale(serial, request.progress);
       } catch (error) {
         boot?.stop();
         await clearSlot(claim, request.worktree).catch(() => undefined);
         throw error;
+      } finally {
+        process.removeListener('SIGINT', interrupted);
+        process.removeListener('SIGTERM', interrupted);
       }
       return {
         backend: 'local',
@@ -310,7 +387,7 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     },
 
     agentDeviceTarget: (lease) => ({ daemon: 'local', deviceId: lease.deviceId }),
-    describe: (lease) => lease.deviceName,
+    describe: (lease) => `${lease.deviceName} (${lease.deviceId})`,
 
     async doctorChecks() {
       const device: DoctorCheck[] = [];

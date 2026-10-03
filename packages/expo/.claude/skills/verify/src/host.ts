@@ -1,9 +1,10 @@
 import { spawn } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { isAlive, isRunning, run, sleep, type ProcessRef } from './core/exec.ts';
 import { LOCAL_POOL, VerifyFailure, type HostAdapter, type HostEntry, type Platform, type ScratchPath } from './core/types.ts';
+import { bundleIsFresh, changedSince, isBundledOutput, isTsdownSource, isTsupSource, listFiles, newest, type ServedState, type SourceFile } from './freshness.ts';
 import { localAndroidBackend } from './platform/android/local.ts';
 import { resolveJavaHome, sdkRoot, sdkTool } from './platform/android/sdk.ts';
 import { localIosBackend } from './platform/ios/local.ts';
@@ -18,6 +19,7 @@ const WORKTREE = new URL('../../../../../../', import.meta.url).pathname;
 const FIXTURE = join(WORKTREE, 'integration', 'templates', 'expo-native');
 const EXPO_PACKAGE = join(WORKTREE, 'packages', 'expo');
 const RUNTIME_DIR = new URL('../.verify/runtime/', import.meta.url).pathname;
+const BIOMETRICS_PACKAGE = join(WORKTREE, 'packages', 'expo-biometrics');
 
 type ExpoHostScreen = 'home' | 'auth' | 'nativeAuth' | 'userButton' | 'userProfile' | 'customSignIn' | 'customSignUp' | 'sso' | 'tokenCache';
 
@@ -29,10 +31,13 @@ const SHARED_NATIVE_INPUTS = [
   'packages/expo/package.json',
   'packages/expo-google-signin/app.plugin.js',
   'packages/expo-google-signin/expo-module.config.json',
+  'packages/expo-google-signin/package.json',
   'packages/expo-biometrics/expo-module.config.json',
+  'packages/expo-biometrics/package.json',
   'integration/templates/expo-native/app.json',
   'integration/templates/expo-native/app.config.js',
   'integration/templates/expo-native/package.sdk-57.json',
+  'integration/templates/expo-native/pnpm-workspace.yaml',
   'integration/templates/expo-native/modules',
 ] as const;
 
@@ -165,18 +170,22 @@ async function ensureWatch(progress: (line: string) => void): Promise<RuntimePro
   return started;
 }
 
-function newestMtime(dir: string): number {
-  if (!existsSync(dir)) return 0;
-  return readdirSync(dir, { withFileTypes: true }).reduce((newest, entry) => {
-    const path = join(dir, entry.name);
-    return Math.max(newest, entry.isDirectory() ? newestMtime(path) : statSync(path).mtimeMs);
-  }, 0);
-}
+const expoOutputs = () => listFiles(join(EXPO_PACKAGE, 'dist'), 'packages/expo/dist/', isBundledOutput);
+const biometricsOutputs = () => listFiles(join(BIOMETRICS_PACKAGE, 'dist'), 'packages/expo-biometrics/dist/', isBundledOutput);
 
 async function waitForWatchToCatchUp(): Promise<void> {
-  const src = join(EXPO_PACKAGE, 'src');
-  const dist = join(EXPO_PACKAGE, 'dist');
-  await waitFor('the @clerk/expo watch build to pick up the latest edit', async () => newestMtime(dist) >= newestMtime(src), 60_000, 'watch');
+  await waitFor(
+    'the @clerk/expo watch build to pick up the latest edit',
+    async () => newest(expoOutputs()) >= newest(listFiles(join(EXPO_PACKAGE, 'src'), 'packages/expo/src/', isTsdownSource)),
+    60_000,
+    'watch',
+  );
+}
+
+async function ensureBiometricsBuilt(progress: (line: string) => void): Promise<void> {
+  if (newest(biometricsOutputs()) >= newest(listFiles(join(BIOMETRICS_PACKAGE, 'src'), 'packages/expo-biometrics/src/', isTsupSource))) return;
+  progress('build   packages/expo-biometrics/src is newer than its dist; pnpm --filter @clerk/expo-biometrics build');
+  await mustStep('pnpm --filter @clerk/expo-biometrics build', 'pnpm', ['--filter', '@clerk/expo-biometrics', 'build'], WORKTREE);
 }
 
 async function metroAnswers(port: number): Promise<boolean> {
@@ -191,8 +200,11 @@ async function metroAnswers(port: number): Promise<boolean> {
 async function ensureMetro(port: number, progress: (line: string) => void): Promise<RuntimeProcess> {
   const name = `metro-${port}`;
   const running = readRuntime(name);
-  if (running !== null && (await metroAnswers(port))) return running;
-  if (running === null && (await metroAnswers(port))) {
+  if (running !== null) {
+    await waitFor(`Metro pid ${running.pid} on port ${port} to answer`, () => metroAnswers(port), 30_000, name);
+    return running;
+  }
+  if (await metroAnswers(port)) {
     throw new VerifyFailure('NOT_READY', `port ${port} already serves a Metro that this worktree did not start`, `stop the process listening on ${port} (lsof -nP -iTCP:${port} -sTCP:LISTEN)`);
   }
   const cli = join(FIXTURE, 'node_modules', 'expo', 'bin', 'cli');
@@ -203,12 +215,74 @@ async function ensureMetro(port: number, progress: (line: string) => void): Prom
   return started;
 }
 
+async function launchAssetUrl(port: number, platform: Platform): Promise<string> {
+  const response = await fetch(`http://127.0.0.1:${port}/`, {
+    headers: { 'expo-platform': platform, accept: 'application/expo+json,application/json' },
+    signal: AbortSignal.timeout(30_000),
+  });
+  const manifest = (await response.json()) as { launchAsset?: { url?: string } };
+  const url = manifest.launchAsset?.url;
+  if (url === undefined) throw new VerifyFailure('NOT_READY', `Metro on port ${port} returned no launch asset for ${platform}`, `read ${join(RUNTIME_DIR, `metro-${port}.log`)}`);
+  return url;
+}
+
+async function fetchBundle(url: string): Promise<{ revId: string; lastModified: number; body: string } | null> {
+  try {
+    const response = await fetch(url, { signal: AbortSignal.timeout(300_000) });
+    if (response.status !== 200) return null;
+    return { revId: response.headers.get('x-metro-delta-id') ?? '', lastModified: Date.parse(response.headers.get('last-modified') ?? ''), body: await response.text() };
+  } catch {
+    return null;
+  }
+}
+
+async function ensureServed(metro: RuntimeProcess, port: number, platform: Platform, progress: (line: string) => void): Promise<void> {
+  const stateFile = join(RUNTIME_DIR, `served-${port}-${platform}.json`);
+  const saved = existsSync(stateFile) ? (JSON.parse(readFileSync(stateFile, 'utf8')) as ServedState) : null;
+  const state = saved !== null && saved.metroPid === metro.pid ? saved : null;
+  const outputs: readonly SourceFile[] = [...expoOutputs(), ...biometricsOutputs()];
+  const changed = changedSince(state, outputs);
+  const url = await launchAssetUrl(port, platform);
+  if (state === null) progress(`metro   :${port}  bundling ${platform} once so the first launch does not wait on Metro`);
+  else if (changed.length > 0) progress(`metro   :${port}  waiting until the ${platform} bundle includes ${changed.length} changed dist file(s)`);
+  let previous: string | null = null;
+  let nudgedAt = Date.now();
+  let rewroteAt = 0;
+  await waitFor(
+    `Metro on port ${port} to serve the latest ${platform} bundle`,
+    async () => {
+      const bundle = await fetchBundle(url);
+      if (bundle === null || !bundleIsFresh(state, changed, bundle)) {
+        previous = null;
+        if (bundle !== null && Date.now() - nudgedAt > 5_000) {
+          const missed = changed.filter((f) => bundle.body.includes(`${f.rel}"`));
+          progress(`metro   :${port}  still serving the old ${platform} bundle; rewriting ${missed.length} changed dist file(s) so Metro's watcher sees them`);
+          for (const file of missed) writeFileSync(join(WORKTREE, file.rel), readFileSync(join(WORKTREE, file.rel)));
+          nudgedAt = Date.now();
+          rewroteAt = nudgedAt;
+        }
+        return false;
+      }
+      if (previous !== bundle.revId) {
+        previous = bundle.revId;
+        return false;
+      }
+      return true;
+    },
+    300_000,
+    `metro-${port}`,
+  );
+  const served: ServedState = { metroPid: metro.pid, revId: previous ?? '', confirmedAt: Math.max(newest(outputs), rewroteAt) };
+  writeFileSync(stateFile, JSON.stringify(served));
+}
+
 async function prepareFixture(progress: (line: string) => void): Promise<void> {
   if (!existsSync(join(WORKTREE, 'node_modules'))) {
     throw new VerifyFailure('NOT_READY', 'the monorepo has no node_modules', `cd ${WORKTREE} && pnpm install`);
   }
   if (readRuntime('watch') === null) {
     stopRuntime();
+    progress('build   turbo build @clerk/expo, @clerk/expo-biometrics, @clerk/expo-google-signin');
     await mustStep('turbo build', 'pnpm', ['turbo', 'build', '--filter=@clerk/expo...', '--filter=@clerk/expo-biometrics...', '--filter=@clerk/expo-google-signin...'], WORKTREE);
   } else {
     progress('build   the running watch build keeps packages/expo/dist current, so turbo build is skipped');
@@ -278,7 +352,9 @@ export const host: HostAdapter<ExpoHostScreen> = {
     const port = metroPort(lease);
     const watch = await ensureWatch(progress);
     await waitForWatchToCatchUp();
+    await ensureBiometricsBuilt(progress);
     const metro = await ensureMetro(port, progress);
+    await ensureServed(metro, port, lease.platform, progress);
     if (lease.platform === 'android') {
       const adb = sdkTool('adb');
       const reverse = await run(adb, ['-s', lease.deviceId, 'reverse', `tcp:${port}`, `tcp:${port}`]);
@@ -290,6 +366,7 @@ export const host: HostAdapter<ExpoHostScreen> = {
     return { entry: devClientEntry(lease.platform, port), processes: [watch, metro] };
   },
   entry: (platform) => devClientEntry(platform, 8081),
+  logPredicates: { ios: `process == "${IOS_PRODUCT}" AND senderImagePath CONTAINS "${IOS_PRODUCT}"` },
   features: ['native-auth-view', 'user-button-and-profile', 'custom-flow-sign-in', 'custom-flow-sign-up', 'token-cache-persistence', 'native-js-sync'],
   backends: [localIosBackend(), localAndroidBackend()],
 };

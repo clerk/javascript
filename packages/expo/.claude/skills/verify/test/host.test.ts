@@ -13,6 +13,9 @@ describe('needsNativeRebuild', () => {
       'packages/expo/src/specs/NativeClerkModule.ts',
       'packages/expo/package.json',
       'integration/templates/expo-native/app.json',
+      'integration/templates/expo-native/pnpm-workspace.yaml',
+      'packages/expo-google-signin/package.json',
+      'packages/expo-biometrics/package.json',
       'integration/templates/expo-native/modules/verify-launch-config/ios/VerifyLaunchConfigModule.swift',
     ]) {
       assert.equal(needsNativeRebuild('ios', path), true, path);

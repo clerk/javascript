@@ -18,7 +18,7 @@ Preconditions:
 - The spec seeds a `+clerk_test` user and signs in with a ticket.
 
 - **Native sign-out.** Run `bin/verify run native-js-sync --platform ios`. The spec launches `screen: 'userProfile'`, taps `Sign out`, and waits for `signedIn` false with `userId` and `sessionId` null. Those fields come from the JS hooks. Screenshots `before-sign-out` and `signed-out`.
-- **Proof.** `states.jsonl` shows the seeded `userId` then `signedIn` false in the same launch.
+- **Proof.** `states.jsonl` shows the seeded `userId` then `signedIn` false in the same launch. After the native sign-out the `userProfile` screen is blank apart from the `verify.state` footer, because the profile has no user to show. The blank screen is expected; the state line is the proof.
 
 ## Gotchas
 

@@ -116,7 +116,3 @@ CLAUDE.local.md
 .worktrees
 # Claude Code creates agent worktrees here
 .claude/worktrees
-
-# verify skill state, evidence, and explored specs
-.verify/
-packages/expo/.claude/skills/verify/specs/explored/

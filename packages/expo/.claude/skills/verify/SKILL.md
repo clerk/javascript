@@ -17,6 +17,7 @@ $ npm ci                                       # once per worktree, in this dire
 $ bin/verify doctor --platform ios             # exits 3 until the first up, because build is the one failing check
 $ bin/verify up --platform ios                 # build the dev client, lease verify-ios-<n>, install, start the watch build and Metro
 build   ios-842c8600ed7b  local  building...
+build   turbo build @clerk/expo, @clerk/expo-biometrics, @clerk/expo-google-signin
 build   expo prebuild --clean --platform ios
 build   xcodebuild Debug (dev client)
 device  verify-ios-1  cloning Clerk Verify Template iOS
@@ -24,6 +25,7 @@ install ios-842c8600ed7b  on verify-ios-1
 build   ios-842c8600ed7b  local  built in 113s
 watch   packages/expo  tsdown --watch (pid 19319)
 metro   :8082  expo start (pid 19320)
+metro   :8082  bundling ios once so the first launch does not wait on Metro
 device  verify-ios-1  local  leased by this worktree  installed ios-842c8600ed7b
 ```
 
@@ -31,26 +33,34 @@ device  verify-ios-1  local  leased by this worktree  installed ios-842c8600ed7b
 
 `up` does four things, each only when needed:
 
-1. **Build.** The build key hashes only the native inputs for that platform: `packages/expo/ios` or `android`, `app.plugin.js`, `src/specs/`, `expo-module.config.json`, `package.json`, the sibling `expo-google-signin` and `expo-biometrics` native code, and the fixture's `app.json`, `app.config.js`, `package.sdk-57.json`, and `modules/`. When the key changes, `up` runs `turbo build` for the three packages (skipped while the watch build runs, which keeps `dist` current; otherwise it stops this worktree's Metro first), installs the fixture's dependencies with `@clerk/expo` linked to this worktree, runs `expo prebuild --clean`, and builds the dev client with `xcodebuild` or `gradlew assembleDebug` (Java 21 from Android Studio). A change anywhere else, such as `packages/expo/src/hooks/useSSO.ts` or a fixture screen, reuses the build: `up` prints `build <key> local reused`. A native rebuild takes about two minutes, and a JS-only `run` of one spec about eight seconds.
+1. **Build.** The build key hashes only the native inputs for that platform: `packages/expo/ios` or `android`, `app.plugin.js`, `src/specs/`, `expo-module.config.json`, `package.json`, the sibling `expo-google-signin` and `expo-biometrics` native code and `package.json` files, and the fixture's `app.json`, `app.config.js`, `package.sdk-57.json`, `pnpm-workspace.yaml`, and `modules/`. When the key changes, `up` runs `turbo build` for the three packages and prints a `build   turbo build ...` line. While this worktree's watch build runs, it prints `turbo build is skipped` instead, because the watch keeps `dist` current. Then it installs the fixture's dependencies with `@clerk/expo` linked to this worktree, runs `expo prebuild --clean`, and builds the dev client with `xcodebuild` or `gradlew assembleDebug` (Java 21 from Android Studio). A change anywhere else, such as `packages/expo/src/hooks/useSSO.ts` or a fixture screen, reuses the build: `up` prints `build <key> local reused`. A native rebuild takes from about two minutes on a warm, idle Mac to seven minutes on a cold or loaded one (110 to 425 seconds measured), and a JS-only `run` of one spec takes 8 to 30 seconds. Builds are kept by key, so reverting a native change reinstalls the cached build for the old key instead of rebuilding. That is expected.
 2. **Lease.** It claims a lane after the build, because a build needs no device.
 3. **Install.** It installs the dev client when the lane does not have this build.
-4. **Runtime.** It starts `tsdown --watch` in `packages/expo` (one per worktree) and `expo start` on the lane's Metro port. On Android it also runs `adb reverse` for that port and marks the dev menu onboarding finished, which a `-read-only` emulator forgets on every boot. Both processes are ledgered and `down` stops them. Before each launch, `run` waits until the watch build has caught up with your latest edit in `packages/expo/src`.
+4. **Runtime.** It starts `tsdown --watch` in `packages/expo` (one per worktree) and `expo start` on the lane's Metro port. On Android it also runs `adb reverse` for that port and marks the dev menu onboarding finished, which a `-read-only` emulator forgets on every boot. Both processes are ledgered and `down` stops them. Then it fetches the app's bundle from Metro once, so the first launch after an install never races a cold Metro.
 
 The lane is ready when `up` prints its last line, `device <name> local leased by this worktree installed <build key>`.
 
 Metro ports are fixed per lane, so no two lanes on the Mac collide. iOS lanes 1 to 4 use 8082 to 8085. Android lanes 1 and 2 use 8086 and 8087. Logs for the watch build and each Metro are in `.verify/runtime/`.
 
-A JS change reaches the app with no build. The watch build rewrites `packages/expo/dist`, Metro sees it, and the next `host.launch` relaunches the dev client, which fetches a fresh bundle. Never run `pnpm --filter @clerk/expo build` yourself while Metro runs. It deletes `dist`, and Metro can crash or stop seeing changes. `up` stops the runtime before its own builds.
+A JS change reaches the app with no build. Before every launch, `run` checks three things, in order:
+
+1. The watch build has caught up: `packages/expo/dist` is newer than every file tsdown builds from `packages/expo/src`. Test files and editor files do not count.
+2. `@clerk/expo-biometrics`, which `@clerk/expo` imports from its `dist`, is current. When its `src` is newer, `run` runs `pnpm --filter @clerk/expo-biometrics build` and says so. `@clerk/expo-google-signin` ships no JS.
+3. Metro serves the new code. `run` fetches the app's bundle URL until Metro reports a new revision that includes the changed `dist` files, and it prints `metro ... waiting until the <platform> bundle includes <n> changed dist file(s)`. Metro's file watcher sometimes misses a `dist` write. When the bundle stays old for 5 seconds, `run` rewrites those files with the same content so the watcher sees them, and prints `still serving the old <platform> bundle; rewriting ...`. If Metro never catches up, `run` fails `NOT_READY` and names the Metro log instead of running specs on old code.
+
+Never run `pnpm --filter @clerk/expo build` yourself while Metro runs. It deletes `dist`, and Metro can crash or stop seeing changes. `up` stops the runtime before its own builds.
+
+Fast Refresh stays on. When you save a JS change while an app from an earlier run is still open, Metro hot-reloads it into that app first, so the change's console lines appear once under the earlier run, then again when this run's launch loads the bundle. To prove a JS change, read the lines that follow this run's first `[verify]` state line (the one with this run's `runId`), not the first match in the Metro log.
 
 `up` is idempotent, and `run` calls it itself, so `up` exists to start the slow part early. `bin/verify up &` followed by `bin/verify run ...` is fine: `run` waits for the `up` to finish and uses its lease.
 
 Devices:
 
-- **iOS.** The lane simulator is a clone of `Clerk Verify Template iOS`, which trusts this Mac's proxy CA. The clone is deleted and re-cloned when a lease is lost or released, so `verify-ios-<n>` can map to a different UDID from one lease to the next. Read the UDID from `.verify/leases/ios.json`.
+- **iOS.** The lane simulator is a clone of `Clerk Verify Template iOS`, which trusts this Mac's proxy CA. The clone is deleted and re-cloned when a lease is lost or released, so `verify-ios-<n>` can map to a different UDID from one lease to the next. Read the UDID from the `deviceId` field of `.verify/leases/ios.json`.
 - **Android.** The lane emulator boots `Clerk_Verify_Pixel` with `-read-only -no-window` on port 5558 + 2n, so its serial is `emulator-5560` or `emulator-5562`, and pins the `en-US` locale. `-read-only` lets two lanes share the AVD and throws away their writes.
 - Never drive `iPhone Air`, the template, a physical device, or a device another worktree holds. The Mac holds at most four iOS and two Android lanes, across all agents. When all are taken, `up` and `run` fail with `POOL_FULL`. Pass `--wait <seconds>` to wait for a lane.
 
-Each worktree runs its own agent-device daemon from its own `node_modules`, with state under `.verify/agent-device/`. If you call `agent-device` yourself, set `AGENT_DEVICE_STATE_DIR=.verify/agent-device` and use `node_modules/.bin/agent-device`.
+Each worktree runs its own agent-device daemon from its own `node_modules`, with state under `.verify/agent-device/`. If you call `agent-device` yourself, set `AGENT_DEVICE_STATE_DIR=.verify/agent-device` and use `node_modules/.bin/agent-device`. To find the daemon's pid, run `bin/verify down --dry-run`. Never print `.verify/agent-device/daemon.json`: it holds the daemon's auth token.
 
 Teardown is `bin/verify down` (see Cleanup).
 
@@ -192,17 +202,17 @@ Rules:
 
 Every `run` writes `.verify/runs/<run-id>/` and prints its path:
 
-| File                      | What it is                                                                                                                                                                                                                                                      |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run.json`                | The sealed record: `results` per spec, `platform`, `gitHead`, `dirty`, `build` (the build key), `device`, `identities`, and `tainted` files                                                                                                                     |
-| `video.mp4`               | `simctl io recordVideo` on iOS, or `adb shell screenrecord --size 720x1608` on Android, of the whole run                                                                                                                                                        |
-| `screenshots/<label>.png` | Every `host.screenshot(label)`                                                                                                                                                                                                                                  |
-| `states.jsonl`            | Every `VerifyState` the fixture read, in order, across every test in the run                                                                                                                                                                                    |
-| `state.json`              | Only the last state of the whole run. With several tests, read per-test states from `states.jsonl` by `launchId`                                                                                                                                                |
-| `app.log`                 | Device log lines from the run. On Android it includes the `[verify]` and `[verify:network]` console lines (logcat tag `ReactNativeJS`). On iOS a Debug dev client sends the JS console to Metro only, so read those lines in `.verify/runtime/metro-<port>.log` |
-| `e2e/`                    | e2e's `report.json`, failure pages, and `screen.txt` for failed steps                                                                                                                                                                                           |
-| `e2e.log`                 | e2e's console output                                                                                                                                                                                                                                            |
-| `specs/`                  | A copy of every spec the run used                                                                                                                                                                                                                               |
+| File                      | What it is                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run.json`                | The sealed record: `results` per spec, `platform`, `gitHead`, `dirty` (git status; gitignored `specs/explored/` never makes a run dirty), `build` (the build key), `device`, `identities`, and `tainted` files                                                                                                                                                    |
+| `video.mp4`               | `simctl io recordVideo` on iOS, or `adb shell screenrecord --size 720x1608` on Android, of the whole run                                                                                                                                                                                                                                                          |
+| `screenshots/<label>.png` | Every `host.screenshot(label)`                                                                                                                                                                                                                                                                                                                                    |
+| `states.jsonl`            | Every `VerifyState` the fixture read, in order, across every test in the run                                                                                                                                                                                                                                                                                      |
+| `state.json`              | Only the last state of the whole run. With several tests, read per-test states from `states.jsonl` by `launchId`                                                                                                                                                                                                                                                  |
+| `app.log`                 | Device log lines from the run. On Android it includes the `[verify]` and `[verify:network]` console lines (logcat tag `ReactNativeJS`). On iOS it holds the fixture process's native lines (React Native, the Clerk SDK, the Expo modules); a Debug dev client sends the JS console to Metro only, so read `[verify]` lines in `.verify/runtime/metro-<port>.log` |
+| `e2e/`                    | e2e's `report.json`, failure pages, and `screen.txt` for failed steps                                                                                                                                                                                                                                                                                             |
+| `e2e.log`                 | e2e's console output                                                                                                                                                                                                                                                                                                                                              |
+| `specs/`                  | A copy of every spec the run used                                                                                                                                                                                                                                                                                                                                 |
 
 Proof standards: drive the real user path, capture the action and the resulting state (the video plus `states.jsonl`), and check side effects in `states.jsonl` (`userId`, `sessionId`, `signInStatus`), not only the final screen.
 
@@ -220,9 +230,11 @@ $ bin/verify attach <run-id> --pr <n> --screenshot profile  # video and one scre
 ```console
 $ bin/verify down --dry-run                 # what it would release, delete, and stop
 $ bin/verify down                           # both platforms: release the lanes, delete run users, stop Metro, the watch build, recorders, and the agent-device daemon
-$ bin/verify down --platform android        # one platform's lane only
+$ bin/verify down --platform android        # one platform's lane, but the whole runtime (see below)
 $ bin/verify down --stale                   # also finish cleanup left by a crashed run in this worktree
 ```
+
+`down --platform <p>` releases only that platform's lane, but it still stops every Metro and the watch build this worktree started, because the ledger does not record which platform a process serves. Never run `down --platform ios` while an Android run in the same worktree is in flight, or the other way around. The next `up` or `run` starts the runtime again.
 
 `down` deletes only what this worktree created: its lane devices, the users in its ledger, and the processes in its ledger. Ledgers live at `~/.verify/ledgers/<id>.jsonl`, where `<id>` is a hash of the worktree path. It never deletes `.verify/runs/`. Evidence survives teardown at `packages/expo/.claude/skills/verify/.verify/runs/<run-id>/`, and `down` lists the kept runs. Run `down` after a failed iteration too, so no device or Metro is stranded.
 
