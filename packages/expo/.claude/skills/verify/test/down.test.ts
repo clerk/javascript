@@ -27,7 +27,12 @@ function setup() {
       deleted.push(email);
       return { users: 1, organizations: 0 };
     },
-    previewDeleteByEmail: async (instance) => ({ users: 1, organizations: instance === 'with-email-codes' ? 2 : 0 }),
+    previewDeleteByEmail: async (instance, email) => [
+      { kind: 'user' as const, instance, id: `user_${instance}`, email },
+      ...(instance === 'with-email-codes'
+        ? [{ kind: 'organization' as const, instance, id: 'org_1', name: 'Verify one' }, { kind: 'organization' as const, instance, id: 'org_2', name: 'Verify two' }]
+        : []),
+    ],
   } as Partial<ClerkBackend> as ClerkBackend;
   const deps: Deps = { host, workspace, runner: async () => assert.fail('down runs no commands'), env: {}, progress: () => undefined, clerk: () => clerk };
 
@@ -49,7 +54,17 @@ describe('down', () => {
     assert.equal(result.dryRun, true);
     assert.deepEqual(result.released.map((l) => l.device), ['verify-ios-2']);
     assert.equal(result.deletedUsers, 2);
-    assert.equal(result.deletedOrganizations, 2, 'dry run lists the organizations down would delete');
+    assert.equal(result.deletedOrganizations, 2);
+    assert.deepEqual(
+      (result.dryRun ? result.wouldDelete : []).map((t) => (t.kind === 'user' ? `${t.instance} ${t.id} ${t.email}` : `${t.instance} ${t.id} ${t.name}`)),
+      [
+        `with-email-codes user_with-email-codes ${newTestEmail(run, 1)}`,
+        'with-email-codes org_1 Verify one',
+        'with-email-codes org_2 Verify two',
+        `with-session-tasks user_with-session-tasks ${newTestEmail(run, 2)}`,
+      ],
+      'dry run names each user and organization with its instance',
+    );
     assert.deepEqual(result.keptRuns, [run]);
     assert.deepEqual(released, []);
     assert.deepEqual(deleted, []);

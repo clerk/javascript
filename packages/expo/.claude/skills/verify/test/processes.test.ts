@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawn, type ChildProcess } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
@@ -45,26 +45,33 @@ describe('stopProcesses', () => {
 });
 
 describe('agent-device daemon doctor check', () => {
-  it('fails when the daemon runs from an install that was removed', async () => {
-    const dir = mkdtempSync(join(tmpdir(), 'verify-daemon-'));
-    const script = join(dir, 'daemon.js');
-    writeFileSync(script, 'setInterval(() => {}, 1000);');
-    const daemon = spawn(process.execPath, [script], { stdio: 'ignore' });
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    const lstart = execFileSync('ps', ['-o', 'lstart=', '-p', String(daemon.pid)], { encoding: 'utf8' }).trim();
-    const state = join(dir, 'state');
-    execFileSync('mkdir', ['-p', state]);
-    writeFileSync(join(state, 'daemon.json'), JSON.stringify({ pid: daemon.pid, processStartTime: lstart }));
-    try {
-      assert.equal(agentDeviceDaemonCheck([state]).ok, true);
-      rmSync(script);
-      const check = agentDeviceDaemonCheck([state]);
-      assert.equal(check.ok, false);
-      assert.match(check.fix ?? '', new RegExp(`kill ${daemon.pid}`));
-      assert.equal(agentDeviceDaemonCheck([join(dir, 'none')]).ok, true, 'no daemon is fine');
-      assert.ok(readFileSync(join(state, 'daemon.json'), 'utf8').length > 0);
-    } finally {
-      daemon.kill();
-    }
-  });
+  for (const folder of ['plain', 'with space']) {
+    it(`fails only once the daemon's install is removed (${folder} path)`, async () => {
+      const dir = join(mkdtempSync(join(tmpdir(), 'verify-daemon-')), folder);
+      execFileSync('mkdir', ['-p', dir]);
+      const script = join(dir, 'daemon.js');
+      writeFileSync(script, 'setInterval(() => {}, 1000);');
+      const daemon = spawn(process.execPath, [script], { stdio: 'ignore' });
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      const lstart = execFileSync('ps', ['-o', 'lstart=', '-p', String(daemon.pid)], { encoding: 'utf8' }).trim();
+      const state = join(dir, 'state');
+      execFileSync('mkdir', ['-p', state]);
+      writeFileSync(join(state, 'daemon.json'), JSON.stringify({ pid: daemon.pid, processStartTime: lstart }));
+      const dirs = [
+        { label: 'shared', dir: join(dir, 'none') },
+        { label: 'worktree', dir: state },
+      ];
+      try {
+        const healthy = agentDeviceDaemonCheck(dirs);
+        assert.equal(healthy.ok, true, healthy.detail);
+        assert.match(healthy.detail, /^shared: no daemon running; worktree: pid \d+ from /);
+        rmSync(script);
+        const check = agentDeviceDaemonCheck(dirs);
+        assert.equal(check.ok, false);
+        assert.match(check.fix ?? '', new RegExp(`kill ${daemon.pid}`));
+      } finally {
+        daemon.kill();
+      }
+    });
+  }
 });

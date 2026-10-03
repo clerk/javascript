@@ -29,7 +29,6 @@ function javaMajor(home: string): number | null {
 
 export type JavaHome = { readonly ok: true; readonly home: string; readonly detail: string } | { readonly ok: false; readonly detail: string; readonly fix: string };
 
-/** The JDK `bin/verify up` builds with. The Android Gradle builds reject Java 17, so JAVA_HOME wins only at 21 or newer. */
 export function resolveJavaHome(env: Readonly<Record<string, string | undefined>> = process.env, studioJbr: string = STUDIO_JBR): JavaHome {
   const studio = javaMajor(studioJbr);
   const fix =

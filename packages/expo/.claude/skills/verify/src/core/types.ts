@@ -203,15 +203,21 @@ export interface AttachResult {
   readonly alreadyPosted: boolean;
 }
 
-export interface DownResult {
+interface DownResultBase {
   readonly verb: 'down';
-  readonly dryRun: boolean;
   readonly released: readonly LeaseView[];
   readonly deletedUsers: number;
   readonly deletedOrganizations: number;
   readonly stoppedProcesses: readonly string[];
   readonly keptRuns: readonly RunId[];
 }
+export type DownResult =
+  | (DownResultBase & { readonly dryRun: true; readonly wouldDelete: readonly DeletionTarget[] })
+  | (DownResultBase & { readonly dryRun: false });
+
+export type DeletionTarget =
+  | { readonly kind: 'user'; readonly instance: InstanceName; readonly id: string; readonly email: TestEmail }
+  | { readonly kind: 'organization'; readonly instance: InstanceName; readonly id: string; readonly name: string };
 
 export type VerbResult = DoctorReport | UpResult | RunResult | ScreenResult | AttachResult | DownResult;
 
@@ -273,7 +279,7 @@ export type LedgerEntry =
   | { readonly id: string; readonly kind: 'lease-held'; readonly platform: Platform; readonly backend: BackendKind; readonly sessionId: string | null; readonly deviceId: string | null }
   | { readonly id: string; readonly kind: 'identity'; readonly run: RunId; readonly instance: InstanceName; readonly email: TestEmail }
   | { readonly id: string; readonly kind: 'user'; readonly run: RunId; readonly instance: InstanceName; readonly userId: string; readonly email: TestEmail }
-  | { readonly id: string; readonly kind: 'process'; readonly what: 'metro' | 'recorder' | 'agent-device'; readonly pid: number; readonly startedAt: string }
+  | { readonly id: string; readonly kind: 'process'; readonly what: 'metro' | 'watch' | 'recorder' | 'agent-device'; readonly pid: number; readonly startedAt: string }
   | { readonly id: string; readonly kind: 'done'; readonly ref: string };
 
 export type SpecStatus = 'passed' | 'failed' | 'skipped' | 'flaky' | 'interrupted';
@@ -349,7 +355,24 @@ export const CLERK_TEST_CODE = '424242' as const;
 
 export type HostEntry =
   | { readonly kind: 'binary' }
-  | { readonly kind: 'dev-client'; readonly launchArguments: readonly string[]; readonly openLink: string | null };
+  | {
+      readonly kind: 'dev-client';
+      readonly launchArguments: readonly string[];
+      readonly openLink: string | null;
+      /** The activity `am start -n` targets on Android, because the launcher intent agent-device sends crashes expo-dev-launcher. */
+      readonly androidActivity: string | null;
+    };
+
+export interface RuntimeProcess {
+  readonly what: 'metro' | 'watch';
+  readonly pid: number;
+  readonly startedAt: number;
+}
+
+export interface HostRuntime {
+  readonly entry: HostEntry;
+  readonly processes: readonly RuntimeProcess[];
+}
 
 export interface RunTarget {
   readonly platform: Platform;
@@ -428,11 +451,13 @@ export interface DeviceBackend<L extends Lease = Lease> {
    */
   reapable(owner?: string): Promise<readonly L[]>;
   startRecording(lease: L, into: EvidencePath): Promise<Recording | 'e2e-records'>;
-  logs(lease: L, since: Date): Promise<string>;
+  logs(lease: L, since: Date, extraPredicate?: string): Promise<string>;
   agentDeviceTarget(lease: L): AgentDeviceTarget;
   describe(lease: L): string;
-  /** Read-only readiness checks. */
-  doctorChecks(): Promise<readonly DoctorCheck[]>;
+  /** What the machine needs for this backend, for fix text, e.g. 'a Mac with Xcode'. */
+  readonly requirement: string;
+  /** Read-only readiness checks. `toolchain` checks print right after Node; `device` checks after the agent-device versions. */
+  doctorChecks(): Promise<{ readonly toolchain: readonly DoctorCheck[]; readonly device: readonly DoctorCheck[] }>;
 }
 
 export const LOCAL_POOL: Readonly<Record<Platform, number>> = { ios: 4, android: 2 };
@@ -448,6 +473,13 @@ export interface HostAdapter<S extends string = string> {
   buildSources(platform: Platform, os: NodeJS.Platform): readonly BuildSource[];
   build(platform: Platform, source: BuildSource, key: BuildKey, into: ScratchPath, progress: (line: string) => void): Promise<BuiltApp>;
   entry(platform: Platform): HostEntry;
+  /**
+   * Starts or reuses what the host needs beside the app while a lease is held, such as Metro for an Expo dev client.
+   * Must be idempotent: called on every up and run, it reuses a live process instead of starting a second one.
+   */
+  runtime?(lease: Lease): Promise<HostRuntime>;
+  /** Extra log filter clauses ORed into the backend's own, such as the subsystem React Native logs under on iOS. */
+  readonly logPredicates?: Readonly<Partial<Record<Platform, string>>>;
   readonly features: readonly string[];
   readonly backends: readonly DeviceBackend[];
 }

@@ -1,19 +1,20 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
 import type { ClerkBackend } from '../src/core/clerk.ts';
 import { leaseForRun, up, type Deps } from '../src/core/verbs.ts';
 import { openWorkspace } from '../src/core/workspace.ts';
-import type { BuildKey, Command, DeviceBackend, HostAdapter, LocalLease, ScratchPath } from '../src/core/types.ts';
+import type { BuildKey, Command, DeviceBackend, HostAdapter, HostEntry, LocalLease, RunContext, ScratchPath } from '../src/core/types.ts';
 
-function setup(buildMs: number) {
+function setup(buildMs: number, runtime?: HostAdapter['runtime']) {
   const dir = mkdtempSync(join(tmpdir(), 'verify-flow-'));
   execFileSync('git', ['init', '-q'], { cwd: dir });
   writeFileSync(join(dir, 'app.swift'), 'app');
   const events: string[] = [];
+  const progress: string[] = [];
   let leases = 0;
   const backend = {
     kind: 'local',
@@ -21,8 +22,8 @@ function setup(buildMs: number) {
     supports: () => true,
     reapable: async () => [],
     check: async () => 'held',
-    async acquire(): Promise<LocalLease> {
-      events.push('acquire');
+    async acquire(request: { waitSeconds: number }): Promise<LocalLease> {
+      events.push(`acquire wait=${request.waitSeconds}`);
       leases += 1;
       return { backend: 'local', platform: 'ios', slot: leases, deviceName: `verify-ios-${leases}`, deviceId: `UDID-${leases}`, claimNonce: `c${leases}`, acquiredAt: '', installedBuild: null };
     },
@@ -37,6 +38,7 @@ function setup(buildMs: number) {
     entry: () => ({ kind: 'binary' }),
     buildInputs: () => ['app.swift'],
     buildSources: () => ['local'],
+    ...(runtime === undefined ? {} : { runtime }),
     async build(platform: 'ios', source: 'local', key: BuildKey, into: ScratchPath) {
       events.push('build');
       await new Promise((resolve) => setTimeout(resolve, buildMs));
@@ -51,10 +53,10 @@ function setup(buildMs: number) {
     workspace,
     runner: async () => ({ code: 0, stdout: '', stderr: '' }),
     env: {},
-    progress: () => undefined,
+    progress: (line: string) => void progress.push(line),
     clerk: () => ({}) as ClerkBackend,
   };
-  return { deps, events };
+  return { deps, events, progress };
 }
 
 const runCommand: Extract<Command, { verb: 'run' }> = { verb: 'run', selection: { all: true }, skip: [], video: false, waitSeconds: 0 };
@@ -63,17 +65,20 @@ describe('lease flow', () => {
   it('builds before it claims a lane', async () => {
     const { deps, events } = setup(0);
     await up(deps, { verb: 'up', waitSeconds: 0 });
-    assert.deepEqual(events, ['build', 'acquire', 'install']);
+    assert.deepEqual(events, ['build', 'acquire wait=0', 'install']);
   });
 
   it('lets run join an up that is still building instead of failing DEVICE_BUSY', async () => {
-    const { deps, events } = setup(400);
+    const { deps, events, progress } = setup(400);
     const building = up(deps, { verb: 'up', waitSeconds: 0 });
     await new Promise((resolve) => setTimeout(resolve, 50));
+    progress.length = 0;
     const device = await leaseForRun(deps, 'ios', runCommand, async (outcome) => outcome.lease.backend === 'local' && outcome.lease.deviceName);
     await building;
     assert.equal(device, 'verify-ios-1');
-    assert.deepEqual(events, ['build', 'acquire', 'install'], 'run reused the lease up made');
+    assert.equal(progress.filter((l) => l.startsWith('wait')).length, 1, 'one wait line while up holds the lock');
+    assert.match(progress.find((l) => l.startsWith('wait')) ?? '', /is building ios-[0-9a-f]{12} or leasing the device/);
+    assert.deepEqual(events, ['build', 'acquire wait=0', 'install'], 'run reused the lease up made');
   });
 
   it('holds the device lock for the run, so a second run reports DEVICE_BUSY', async () => {
@@ -82,5 +87,29 @@ describe('lease flow', () => {
       await assert.rejects(leaseForRun(deps, 'ios', runCommand, async () => undefined), { code: 'DEVICE_BUSY' });
     });
     await leaseForRun(deps, 'ios', runCommand, async () => undefined);
+  });
+
+  it('passes run --wait to the lane claim', async () => {
+    const { deps, events } = setup(0);
+    await leaseForRun(deps, 'ios', { ...runCommand, waitSeconds: 300 }, async () => undefined);
+    assert.ok(events.includes('acquire wait=300'));
+  });
+
+  it('serves the entry a host runtime returns and ledgers its processes once', async () => {
+    const devClient: HostEntry = { kind: 'dev-client', launchArguments: ['-EXDevMenuIsOnboardingFinished', 'YES'], openLink: 'exp+app://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8082', androidActivity: '.MainActivity' };
+    const metro = { what: 'metro' as const, pid: 4242, startedAt: Date.parse('2026-10-03T00:00:00Z') };
+    const { deps } = setup(0, async () => ({ entry: devClient, processes: [metro] }));
+    await up(deps, { verb: 'up', waitSeconds: 0 });
+    const entry = await leaseForRun(deps, 'ios', runCommand, async (outcome) => outcome.entry);
+    assert.deepEqual(entry, devClient);
+    const context = JSON.parse(readFileSync(join(deps.workspace.root, 'context.json'), 'utf8')) as RunContext;
+    assert.deepEqual(context.targets[0]!.entry, devClient);
+    const metros = deps.workspace.unclosedEntries().filter((e) => e.kind === 'process' && e.what === 'metro');
+    assert.equal(metros.length, 1, 'a reused Metro is ledgered once');
+  });
+
+  it('keeps the binary entry for hosts without a runtime', async () => {
+    const { deps } = setup(0);
+    assert.deepEqual(await leaseForRun(deps, 'ios', runCommand, async (outcome) => outcome.entry), { kind: 'binary' });
   });
 });

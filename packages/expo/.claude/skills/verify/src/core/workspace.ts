@@ -42,9 +42,15 @@ export interface Workspace {
   append(entry: LedgerEntry): void;
   entries(): readonly LedgerEntry[];
   unclosedEntries(): readonly LedgerEntry[];
-  withAcquireLock<T>(platform: Platform, fn: (lock: AcquireLock) => Promise<T>): Promise<T>;
+  withAcquireLock<T>(platform: Platform, fn: (lock: AcquireLock) => Promise<T>, onWait?: (owner: ProcessRef) => void): Promise<T>;
   withDevice<T>(platform: Platform, waitSeconds: number, fn: () => Promise<T>): Promise<T>;
-  withAcquireThenDevice<A, T>(platform: Platform, waitSeconds: number, prepare: (lock: AcquireLock) => Promise<A>, drive: (prepared: A) => Promise<T>): Promise<T>;
+  withAcquireThenDevice<A, T>(
+    platform: Platform,
+    waitSeconds: number,
+    prepare: (lock: AcquireLock) => Promise<A>,
+    drive: (prepared: A) => Promise<T>,
+    onWait?: { readonly acquire: (owner: ProcessRef) => void; readonly device: (owner: ProcessRef) => void },
+  ): Promise<T>;
   removeScratch(path: ScratchPath): void;
 }
 
@@ -96,9 +102,10 @@ function writePrivate(file: string, text: string): void {
   writeFileSync(file, text, { mode: 0o600 });
 }
 
-export async function takeSlotLock(dir: string, timeoutMs: number, onTimeout: () => VerifyFailure): Promise<() => void> {
+export async function takeSlotLock(dir: string, timeoutMs: number, onTimeout: () => VerifyFailure, onWait?: (owner: ProcessRef) => void): Promise<() => void> {
   const deadline = Date.now() + timeoutMs;
   const me = currentProcess();
+  let announced = false;
   for (;;) {
     const state = readSlot(dir);
     const running = state.value !== null && isRunning(JSON.parse(state.value) as ProcessRef);
@@ -108,13 +115,15 @@ export async function takeSlotLock(dir: string, timeoutMs: number, onTimeout: ()
     }
     if (running) {
       if (Date.now() >= deadline) throw onTimeout();
+      if (!announced && onWait !== undefined) onWait(JSON.parse(state.value!) as ProcessRef);
+      announced = true;
       await sleep(250);
     }
   }
 }
 
-async function withSlotLock<T>(dir: string, timeoutMs: number, onTimeout: () => VerifyFailure, fn: () => Promise<T>): Promise<T> {
-  const release = await takeSlotLock(dir, timeoutMs, onTimeout);
+async function withSlotLock<T>(dir: string, timeoutMs: number, onTimeout: () => VerifyFailure, fn: () => Promise<T>, onWait?: (owner: ProcessRef) => void): Promise<T> {
+  const release = await takeSlotLock(dir, timeoutMs, onTimeout, onWait);
   try {
     return await fn();
   } finally {
@@ -187,19 +196,19 @@ export function openWorkspace(options: WorkspaceOptions): Workspace {
       const closed = new Set(entries.flatMap((e) => (e.kind === 'done' ? [e.ref] : [])));
       return entries.filter((e) => e.kind !== 'done' && !closed.has(e.id));
     },
-    withAcquireLock(platform, fn) {
-      return withSlotLock(acquireDir(platform), Number.POSITIVE_INFINITY, unreachable, () => fn({ platform } as AcquireLock));
+    withAcquireLock(platform, fn, onWait) {
+      return withSlotLock(acquireDir(platform), Number.POSITIVE_INFINITY, unreachable, () => fn({ platform } as AcquireLock), onWait);
     },
     withDevice(platform, waitSeconds, fn) {
       return withSlotLock(join(dir('locks'), `device-${platform}`), waitSeconds * 1000, () => deviceBusy(platform), fn);
     },
-    async withAcquireThenDevice(platform, waitSeconds, prepare, drive) {
-      const releaseAcquire = await takeSlotLock(acquireDir(platform), Number.POSITIVE_INFINITY, unreachable);
+    async withAcquireThenDevice(platform, waitSeconds, prepare, drive, onWait) {
+      const releaseAcquire = await takeSlotLock(acquireDir(platform), Number.POSITIVE_INFINITY, unreachable, onWait?.acquire);
       let prepared;
       let releaseDevice;
       try {
         prepared = await prepare({ platform } as AcquireLock);
-        releaseDevice = await takeSlotLock(join(dir('locks'), `device-${platform}`), waitSeconds * 1000, () => deviceBusy(platform));
+        releaseDevice = await takeSlotLock(join(dir('locks'), `device-${platform}`), waitSeconds * 1000, () => deviceBusy(platform), onWait?.device);
       } finally {
         releaseAcquire();
       }

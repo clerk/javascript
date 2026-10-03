@@ -20,7 +20,6 @@ export const AVD_NAME = 'Clerk_Verify_Pixel';
 export const LOCALE = 'en-US';
 /** The default size fails on this AVD's 1280x2856 panel. */
 export const RECORD_SIZE = '720x1608';
-/** Logcat tags kept in app.log: host state, the SDK, its network logger (with debugLogs), the React Native console, and crashes. */
 export const LOG_FILTER = ['ClerkVerify:V', 'ClerkLog:V', 'OkHttp:V', 'ReactNativeJS:V', 'AndroidRuntime:E', '*:S'];
 const BOOT_TIMEOUT_MS = 240_000;
 
@@ -42,20 +41,19 @@ export function logcatSince(since: Date): string {
   return (since.getTime() / 1000).toFixed(3);
 }
 
+const AVD_FIX = `create ${AVD_NAME} in Android Studio's Device Manager (Pixel 9 Pro, API 36, Google APIs), boot it once without a PIN, and set the locale to ${LOCALE}`;
+const listsAvd = (stdout: string) => stdout.split('\n').some((line) => line.trim() === AVD_NAME);
+
 export interface LocalAndroidOptions {
   readonly claimsDir?: string;
-  readonly runner?: Runner;
-  readonly emulatorLogDir?: string;
-  readonly env?: Readonly<Record<string, string | undefined>>;
 }
 
 export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBackend<LocalLease> {
   const claimsDir = options.claimsDir ?? defaultClaimsDir();
-  const exec = options.runner ?? run;
-  const env = options.env ?? process.env;
-  const emulatorLogDir = options.emulatorLogDir ?? join(homedir(), '.verify', 'emulators');
-  const adbBin = sdkTool('adb', env);
-  const emulatorBin = sdkTool('emulator', env);
+  const exec = run;
+  const emulatorLogDir = join(homedir(), '.verify', 'emulators');
+  const adbBin = sdkTool('adb');
+  const emulatorBin = sdkTool('emulator');
 
   const adb = (serial: string, args: readonly string[]) => exec(adbBin, ['-s', serial, ...args]);
   const shell = async (serial: string, command: string) => (await adb(serial, ['shell', command])).stdout.trim();
@@ -114,10 +112,10 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
       const running = await devices();
       const claims = readClaims(claimsDir, 'android');
       const live = claims.filter((c) => !isOrphaned(c));
-      const foreign = [...Array(LOCAL_POOL.android).keys()]
-        .map((i) => i + 1)
-        .filter((slot) => running.has(laneSerial(slot)) && !claims.some((c) => c.slot === slot));
-      const inUse = [...new Set([...live.map((c) => c.deviceName as string), ...foreign.map((slot) => `${laneSerial(slot)} (unclaimed)`)])].sort();
+      const foreign = Array.from({ length: LOCAL_POOL.android }, (_, i) => i + 1).filter(
+        (slot) => running.has(laneSerial(slot)) && !claims.some((c) => c.slot === slot),
+      );
+      const inUse = [...live.map((c) => c.deviceName), ...foreign.map((slot) => `${laneSerial(slot)} (unclaimed)`)].sort();
       if (inUse.length < LOCAL_POOL.android) {
         for (let slot = 1; slot <= LOCAL_POOL.android; slot += 1) {
           if (foreign.includes(slot)) continue;
@@ -174,9 +172,8 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     supports: (os) => os === 'darwin' || os === 'linux',
 
     async acquire(request) {
-      const avds = await exec(emulatorBin, ['-list-avds']);
-      if (!avds.stdout.split('\n').map((l) => l.trim()).includes(AVD_NAME)) {
-        throw new VerifyFailure('NOT_READY', `no Android Virtual Device named ${AVD_NAME}`, `create ${AVD_NAME} in Android Studio's Device Manager (Pixel 9 Pro, API 36, Google APIs), boot it once without a PIN, and set the locale to ${LOCALE}`);
+      if (!listsAvd((await exec(emulatorBin, ['-list-avds'])).stdout)) {
+        throw new VerifyFailure('NOT_READY', `no Android Virtual Device named ${AVD_NAME}`, AVD_FIX);
       }
       const claim = await claimSlot(request);
       const serial = laneSerial(claim.slot);
@@ -254,13 +251,13 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     describe: (lease) => lease.deviceName,
 
     async doctorChecks() {
-      const checks: DoctorCheck[] = [jdkCheck(env)];
+      const checks: DoctorCheck[] = [jdkCheck()];
       const avds = await exec(emulatorBin, ['-list-avds']);
       const adbVersion = await exec(adbBin, ['version']);
       if (avds.code !== 0 || adbVersion.code !== 0) {
         checks.push({ id: 'template', ok: false, detail: 'the Android SDK emulator or adb is not installed', fix: 'install the Android SDK (Android Studio) and set ANDROID_HOME' });
-      } else if (!avds.stdout.split('\n').map((l) => l.trim()).includes(AVD_NAME)) {
-        checks.push({ id: 'template', ok: false, detail: `no Android Virtual Device named ${AVD_NAME}`, fix: `create ${AVD_NAME} in Android Studio's Device Manager (Pixel 9 Pro, API 36, Google APIs), boot it once without a PIN, and set the locale to ${LOCALE}` });
+      } else if (!listsAvd(avds.stdout)) {
+        checks.push({ id: 'template', ok: false, detail: `no Android Virtual Device named ${AVD_NAME}`, fix: AVD_FIX });
       } else {
         checks.push({ id: 'template', ok: true, detail: `${AVD_NAME}; lanes boot it -read-only on ports ${lanePort(1)} to ${lanePort(LOCAL_POOL.android)}` });
       }

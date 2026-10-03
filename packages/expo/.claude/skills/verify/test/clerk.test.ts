@@ -51,4 +51,19 @@ describe('deleteByEmail', () => {
     });
     await assert.rejects(backend.deleteByEmail('with-email-codes', email), /answered 500/);
   });
+
+  it('previews the same users and organizations without deleting anything', async () => {
+    const { calls, backend } = fakeBapi({
+      'GET /users': { status: 200, body: [{ id: 'user_1' }] },
+      'GET /users/user_1/organization_memberships': {
+        status: 200,
+        body: { data: [{ organization: { id: 'org_own', name: 'Verify r1', created_by: 'user_1' } }, { organization: { id: 'org_other', name: 'Other', created_by: 'user_2' } }] },
+      },
+    });
+    assert.deepEqual(await backend.previewDeleteByEmail('with-email-codes', email), [
+      { kind: 'user', instance: 'with-email-codes', id: 'user_1', email },
+      { kind: 'organization', instance: 'with-email-codes', id: 'org_own', name: 'Verify r1' },
+    ]);
+    assert.equal(calls.some((c) => c.startsWith('DELETE')), false);
+  });
 });

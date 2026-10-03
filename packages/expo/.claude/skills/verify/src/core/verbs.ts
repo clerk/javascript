@@ -23,12 +23,14 @@ import {
   type ActiveRunContext,
   type AttachResult,
   type Command,
+  type DeletionTarget,
   type DeviceBackend,
   type DoctorCheck,
   type DoctorReport,
   type DownResult,
   type EvidencePath,
   type HostAdapter,
+  type HostEntry,
   type InstanceName,
   type Lease,
   type LeaseView,
@@ -75,26 +77,43 @@ function readJson(file: string): Record<string, unknown> | null {
   return existsSync(file) ? (JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>) : null;
 }
 
-export function agentDeviceDaemonCheck(stateDirs: readonly string[]): DoctorCheck {
-  const broken: string[] = [];
-  const healthy: string[] = [];
-  for (const dir of stateDirs) {
+/** ps joins argv with spaces, so every '/' after a space is a possible start of the script path. */
+export function daemonScriptCandidates(command: string): readonly string[] {
+  const end = command.lastIndexOf('daemon.js');
+  if (end < 0) return [];
+  const stop = end + 'daemon.js'.length;
+  const starts = [...command.matchAll(/(?:^| )\//g)].map((m) => (m.index ?? 0) + (m[0].startsWith(' ') ? 1 : 0)).filter((i) => i < end);
+  return starts.map((i) => command.slice(i, stop));
+}
+
+export function agentDeviceDaemonCheck(stateDirs: readonly { readonly label: string; readonly dir: string }[]): DoctorCheck {
+  const broken: { readonly pid: number; readonly text: string }[] = [];
+  const details: string[] = [];
+  for (const { label, dir } of stateDirs) {
     const daemon = readDaemonInfo(dir);
-    if (daemon === null || !isRunning(daemon)) continue;
+    if (daemon === null || !isRunning(daemon)) {
+      details.push(`${label}: no daemon running`);
+      continue;
+    }
     let command = '';
     try {
       command = execFileSync('ps', ['-o', 'command=', '-p', String(daemon.pid)], { encoding: 'utf8' }).trim();
     } catch {
+      details.push(`${label}: no daemon running`);
       continue;
     }
-    const script = command.split(/\s+/).find((part) => part.endsWith('daemon.js'));
-    if (script === undefined) continue;
-    (existsSync(script) ? healthy : broken).push(`${daemon.pid} from ${script} (${dir})`);
+    const candidates = daemonScriptCandidates(command);
+    const script = candidates.find((path) => existsSync(path));
+    if (candidates.length > 0 && script === undefined) {
+      broken.push({ pid: daemon.pid, text: `${label}: pid ${daemon.pid} runs ${candidates[0]}, which no longer exists` });
+    } else {
+      details.push(`${label}: pid ${daemon.pid} from ${script ?? command}`);
+    }
   }
   if (broken.length > 0) {
-    return check('agent-device-daemon', false, `daemon runs from a removed install: ${broken.join('; ')}`, `kill ${broken.map((b) => b.split(' ')[0]).join(' ')}; agent-device starts a new daemon on the next command`);
+    return check('agent-device-daemon', false, [...broken.map((b) => b.text), ...details].join('; '), `kill ${broken.map((b) => b.pid).join(' ')}; agent-device starts a new daemon on the next command`);
   }
-  return check('agent-device-daemon', true, healthy.length === 0 ? 'no daemon running' : healthy.join('; '), '');
+  return check('agent-device-daemon', true, details.join('; '), '');
 }
 
 export function featureMapCheck(skillDir: string, features: readonly string[]): DoctorCheck {
@@ -123,7 +142,7 @@ export async function doctor(deps: Deps, command: Extract<Command, { verb: 'doct
   const node = process.versions.node;
   checks.push(check('node', node.startsWith('24.'), node, 'install Node 24 (nvm install 24)'));
   const backendChecks = await backend.doctorChecks();
-  checks.push(...backendChecks.filter((c) => c.id === 'xcode'));
+  checks.push(...backendChecks.toolchain);
 
   const pkg = readJson(join(skill, 'package.json'));
   const pins = (pkg?.devDependencies ?? {}) as Record<string, string>;
@@ -149,7 +168,7 @@ export async function doctor(deps: Deps, command: Extract<Command, { verb: 'doct
       `npm i -g agent-device@${wantAgentDevice ?? '<version>'}`,
     ),
   );
-  checks.push(...backendChecks.filter((c) => c.id !== 'xcode'));
+  checks.push(...backendChecks.device);
 
   let keyed: readonly InstanceName[] = [];
   try {
@@ -200,7 +219,12 @@ export async function doctor(deps: Deps, command: Extract<Command, { verb: 'doct
   const stale = readClaims(workspace.claimsDir, platform).filter(isOrphaned);
   checks.push(check('stale-claims', stale.length === 0, stale.length === 0 ? 'none' : `${stale.map((c) => c.deviceName).join(', ')} belong to deleted worktrees`, 'bin/verify down --stale'));
 
-  checks.push(agentDeviceDaemonCheck([join(homedir(), '.agent-device'), workspace.agentDeviceDir]));
+  checks.push(
+    agentDeviceDaemonCheck([
+      { label: 'machine-wide ~/.agent-device', dir: join(homedir(), '.agent-device') },
+      { label: 'this worktree .verify/agent-device', dir: workspace.agentDeviceDir },
+    ]),
+  );
   checks.push(featureMapCheck(skill, host.features));
 
   const drift = manifestDrift();
@@ -209,7 +233,20 @@ export async function doctor(deps: Deps, command: Extract<Command, { verb: 'doct
   return { verb: 'doctor', ok: checks.every((c) => c.ok), backend: { [platform]: backend.kind }, checks };
 }
 
-function writeStandingContext(deps: Deps, outcome: LeaseOutcome): void {
+type RuntimeOutcome = LeaseOutcome & { readonly entry: HostEntry };
+
+async function startRuntime(deps: Deps, lease: Lease): Promise<HostEntry> {
+  if (deps.host.runtime === undefined) return deps.host.entry(lease.platform);
+  const runtime = await deps.host.runtime(lease);
+  const open = deps.workspace.unclosedEntries();
+  for (const process of runtime.processes) {
+    if (open.some((e) => e.kind === 'process' && e.what === process.what && e.pid === process.pid)) continue;
+    deps.workspace.append({ id: newEntryId(), kind: 'process', what: process.what, pid: process.pid, startedAt: new Date(process.startedAt).toISOString() });
+  }
+  return runtime.entry;
+}
+
+function writeStandingContext(deps: Deps, outcome: RuntimeOutcome): void {
   const context: RunContext = {
     v: 1,
     run: null,
@@ -224,7 +261,7 @@ function writeStandingContext(deps: Deps, outcome: LeaseOutcome): void {
 
 const agentDeviceSession = (workspace: Workspace, platform: Platform) => `verify-${platform}-${workspace.worktreeId}`;
 
-function targetOf(deps: Deps, outcome: LeaseOutcome): RunContext['targets'][number] {
+function targetOf(deps: Deps, outcome: RuntimeOutcome): RunContext['targets'][number] {
   const platform = outcome.lease.platform;
   return {
     platform,
@@ -232,17 +269,18 @@ function targetOf(deps: Deps, outcome: LeaseOutcome): RunContext['targets'][numb
     appPath: outcome.app.path,
     buildKey: outcome.app.key,
     leaseFile: deps.workspace.leaseFile(platform),
-    entry: deps.host.entry(platform),
+    entry: outcome.entry,
   };
 }
 
 export async function up(deps: Deps, command: Extract<Command, { verb: 'up' }>): Promise<UpResult> {
   const platform = platformOf(deps.host, command.platform);
   return deps.workspace.withAcquireLock(platform, async (lock) => {
-    const outcome = await ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, clerk: deps.clerk });
+    const leased = await ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, clerk: deps.clerk });
+    const outcome = { ...leased, entry: await startRuntime(deps, leased.lease) };
     writeStandingContext(deps, outcome);
     return { verb: 'up', leases: [outcome.view], builds: [outcome.build] };
-  });
+  }, (owner) => deps.progress(`wait    another bin/verify in this worktree (pid ${owner.pid}) is leasing the device; waiting for it, with no time limit`));
 }
 
 async function gitFacts(runner: Runner, worktree: string): Promise<{ head: string; dirty: boolean }> {
@@ -271,16 +309,22 @@ function lastState(dir: EvidencePath): VerifyState | null {
   }
 }
 
-export function leaseForRun<T>(deps: Deps, platform: Platform, command: Extract<Command, { verb: 'run' }>, drive: (outcome: LeaseOutcome) => Promise<T>): Promise<T> {
+export async function leaseForRun<T>(deps: Deps, platform: Platform, command: Extract<Command, { verb: 'run' }>, drive: (outcome: RuntimeOutcome) => Promise<T>): Promise<T> {
+  const key = await computeBuildKey(deps.host, platform, deps.workspace.worktree);
   return deps.workspace.withAcquireThenDevice(
     platform,
     command.waitSeconds,
     async (lock) => {
-      const outcome = await ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, clerk: deps.clerk });
+      const leased = await ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, clerk: deps.clerk });
+      const outcome: RuntimeOutcome = { ...leased, entry: await startRuntime(deps, leased.lease) };
       writeStandingContext(deps, outcome);
       return outcome;
     },
     drive,
+    {
+      acquire: (owner) => deps.progress(`wait    another bin/verify in this worktree (pid ${owner.pid}) is building ${key} or leasing the device; waiting for it, with no time limit`),
+      device: (owner) => deps.progress(`wait    another bin/verify run in this worktree (pid ${owner.pid}) is driving the device; waiting up to ${command.waitSeconds}s`),
+    },
   );
 }
 
@@ -337,7 +381,7 @@ export async function runVerb(deps: Deps, command: Extract<Command, { verb: 'run
       }
 
       const appLog = join(dir, 'app.log') as EvidencePath;
-      writeFileSync(appLog, redact(await backend.logs(lease, startedAt)));
+      writeFileSync(appLog, redact(await backend.logs(lease, startedAt, host.logPredicates?.[platform])));
       const state = lastState(dir);
       if (state !== null) writeFileSync(join(dir, 'state.json'), `${JSON.stringify(state, null, 2)}\n`);
 
@@ -529,19 +573,15 @@ async function downUnlocked(deps: Deps, command: Extract<Command, { verb: 'down'
   if (!command.dryRun) ledgerAgentDeviceDaemon(workspace);
   const plan = await planDown(deps, command);
   if (command.dryRun) {
-    let users = 0;
-    let organizations = 0;
-    for (const identity of plan.identities) {
-      const owned = await deps.clerk().previewDeleteByEmail(identity.instance, identity.email);
-      users += owned.users;
-      organizations += owned.organizations;
-    }
+    const wouldDelete: DeletionTarget[] = [];
+    for (const identity of plan.identities) wouldDelete.push(...(await deps.clerk().previewDeleteByEmail(identity.instance, identity.email)));
     return {
       verb: 'down',
       dryRun: true,
       released: plan.leases.map((l) => l.view),
-      deletedUsers: users,
-      deletedOrganizations: organizations,
+      deletedUsers: wouldDelete.filter((t) => t.kind === 'user').length,
+      deletedOrganizations: wouldDelete.filter((t) => t.kind === 'organization').length,
+      wouldDelete,
       stoppedProcesses: [...new Set([...plan.processes.filter((p) => isRunning({ pid: p.pid, startedAt: Date.parse(p.startedAt) })).map((p) => `${p.what} ${p.pid}`), ...runningDaemon(workspace)])],
       keptRuns: workspace.runs(),
     };

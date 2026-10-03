@@ -83,7 +83,7 @@ export function localIosBackend(options: LocalIosOptions = {}): DeviceBackend<Lo
         throw new VerifyFailure(
           'POOL_FULL',
           `${inUse.size} of ${LOCAL_POOL.ios} iOS lanes are in use on this Mac (${[...inUse].sort().join(', ')})`,
-          'wait and retry with `bin/verify up --wait 300`, or run `bin/verify down` in a worktree that no longer needs its lane',
+          'pass --wait 300 to wait for a lane (`bin/verify up --wait 300` or `bin/verify run <spec> --wait 300`), or run `bin/verify down` in a worktree that no longer needs its lane',
         );
       }
       const waiting = `wait    all ${LOCAL_POOL.ios} iOS lanes are in use (${[...inUse].sort().join(', ')}); waiting up to ${request.waitSeconds}s for one to free`;
@@ -104,6 +104,7 @@ export function localIosBackend(options: LocalIosOptions = {}): DeviceBackend<Lo
     kind: 'local',
     platform: 'ios',
     supports: (os) => os === 'darwin',
+    requirement: 'a Mac with Xcode',
 
     async acquire(request) {
       const template = (await listSimulators()).find((d) => d.name === TEMPLATE_NAME);
@@ -215,8 +216,9 @@ export function localIosBackend(options: LocalIosOptions = {}): DeviceBackend<Lo
       return recording;
     },
 
-    async logs(lease, since) {
-      const result = await run('xcrun', ['simctl', 'spawn', lease.deviceId, 'log', 'show', '--style', 'compact', '--start', localTime(since), '--predicate', LOG_PREDICATE]);
+    async logs(lease, since, extraPredicate) {
+      const predicate = extraPredicate === undefined ? LOG_PREDICATE : `${LOG_PREDICATE} OR (${extraPredicate})`;
+      const result = await run('xcrun', ['simctl', 'spawn', lease.deviceId, 'log', 'show', '--style', 'compact', '--start', localTime(since), '--predicate', predicate]);
       return result.stdout;
     },
 
@@ -224,23 +226,22 @@ export function localIosBackend(options: LocalIosOptions = {}): DeviceBackend<Lo
     describe: (lease) => lease.deviceName,
 
     async doctorChecks() {
-      const checks: DoctorCheck[] = [];
       const xcode = await run('xcodebuild', ['-version']);
-      checks.push(
+      const toolchain: DoctorCheck[] = [
         xcode.code === 0
           ? { id: 'xcode', ok: true, detail: xcode.stdout.split('\n')[0]?.replace('Xcode ', '') ?? '' }
           : { id: 'xcode', ok: false, detail: 'xcodebuild is not available', fix: 'install Xcode and run `sudo xcode-select -s /Applications/Xcode.app`' },
-      );
+      ];
       const template = xcode.code === 0 ? (await listSimulators()).find((d) => d.name === TEMPLATE_NAME) : undefined;
-      checks.push(
+      const device: DoctorCheck[] = [
         template === undefined
           ? { id: 'template', ok: false, detail: `no simulator named ${TEMPLATE_NAME}`, fix: `xcrun simctl clone "iPhone Air" "${TEMPLATE_NAME}", then boot it once, trust your proxy CA, and shut it down` }
           : template.state === 'Shutdown'
             ? { id: 'template', ok: true, detail: `${TEMPLATE_NAME} (${template.runtime.replace(/^.*SimRuntime\./, '')})` }
             : { id: 'template', ok: false, detail: `${TEMPLATE_NAME} is ${template.state}; lanes clone it only while it is shut down`, fix: `xcrun simctl shutdown "${TEMPLATE_NAME}"` },
-      );
-      checks.push(await proxyTrustCheck(template));
-      return checks;
+        await proxyTrustCheck(template),
+      ];
+      return { toolchain, device };
     },
   };
   return backend;

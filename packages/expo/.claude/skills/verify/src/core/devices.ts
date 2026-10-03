@@ -31,7 +31,8 @@ export interface LeaseOutcome {
 export function backendFor(host: HostAdapter, platform: Platform, kind: BackendKind): DeviceBackend {
   const backend = host.backends.find((b) => b.platform === platform && b.kind === kind);
   if (backend === undefined) {
-    const fix = kind === 'eas' ? 'run locally on a Mac; the EAS backend arrives with CLOUD-IOS' : `use --backend ${host.backends.find((b) => b.platform === platform)?.kind ?? 'local'}`;
+    const others = host.backends.filter((b) => b.platform === platform);
+    const fix = others.length === 0 ? `${host.repo} has no ${platform} backend` : `use ${others.map((b) => `--backend ${b.kind} (needs ${b.requirement})`).join(' or ')}`;
     throw new VerifyFailure('UNSUPPORTED', `${host.repo} has no ${kind} backend for ${platform}`, fix);
   }
   return backend;
@@ -42,7 +43,8 @@ export function selectBackend(host: HostAdapter, platform: Platform, requested: 
   if (held !== null) return backendFor(host, platform, held.backend);
   const backend = host.backends.find((b) => b.platform === platform && b.supports(os));
   if (backend === undefined) {
-    throw new VerifyFailure('UNSUPPORTED', `no ${platform} backend runs on ${os}`, 'run on a Mac with Xcode; the EAS backend arrives with CLOUD-IOS');
+    const needs = host.backends.filter((b) => b.platform === platform).map((b) => b.requirement);
+    throw new VerifyFailure('UNSUPPORTED', `no ${platform} backend runs on ${os}`, needs.length === 0 ? `${host.repo} has no ${platform} backend` : `run on ${needs.join(' or ')}`);
   }
   return backend;
 }
@@ -90,7 +92,7 @@ async function ensureBuild(host: HostAdapter, platform: Platform, workspace: Wor
   if (existing !== null) return { app: existing, view: { platform, key, source: existing.source, reused: true, seconds: 0 } };
   const source = host.buildSources(platform, process.platform)[0];
   if (source !== 'local') {
-    throw new VerifyFailure('UNSUPPORTED', `${host.repo} cannot build ${platform} on ${process.platform} yet`, 'run bin/verify up on a Mac with Xcode; remote builds arrive with CLOUD-IOS');
+    throw new VerifyFailure('UNSUPPORTED', `${host.repo} cannot build ${platform} on ${process.platform} yet (build sources here: ${host.buildSources(platform, process.platform).join(', ') || 'none'})`, `run bin/verify up on a machine where ${host.repo} builds ${platform} locally`);
   }
   const started = Date.now();
   progress(`build   ${key}  ${source}  building...`);
@@ -133,6 +135,7 @@ export async function ensureLease(
   await finishOrphanLedgers(workspace.home, resolve(workspace.worktree), options.clerk, options.progress);
 
   const { app, view: build } = await ensureBuild(host, platform, workspace, options.progress);
+  options.progress(`build   ${build.key}  ${build.source}  ${build.reused ? 'reused' : `built in ${build.seconds}s`}`);
 
   let lease: Lease | null = held;
   let renewed = false;

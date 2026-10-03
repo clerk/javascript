@@ -40,6 +40,7 @@ describe('parseArgv', () => {
       video: false,
       waitSeconds: 0,
     });
+    assert.equal((parseArgv(['run', 'auth-start', '--wait', '300']).command as { waitSeconds: number }).waitSeconds, 300);
     assert.deepEqual(parseArgv(['screen', '--png']).command, { verb: 'screen', png: true });
     assert.deepEqual(parseArgv(['attach', 'r20261002-141210-7c1e', '--pr', '412', '--screenshot', 'a', '--screenshot=b']).command, {
       verb: 'attach',

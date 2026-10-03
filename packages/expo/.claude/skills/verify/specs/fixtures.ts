@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 import { test as base } from '@e2e-dev/mobile';
 import { expect } from 'e2e';
 import { ASSERTION_TIMEOUT_MS, loadRunContext } from '../src/core/e2e-config.ts';
-import { describeState, parseVerifyState } from '../src/core/state.ts';
+import { appStart, describeState, parseVerifyState } from '../src/core/state.ts';
 import { agentDeviceStateDir } from '../src/core/workspace.ts';
 import type { host as hostAdapter } from '../src/host.ts';
 
@@ -32,6 +32,16 @@ const LAUNCH_TIMEOUT_MS = 60_000;
 const POLL_MS = 400;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function adb(target: RunTarget, args: readonly string[]): Promise<void> {
+  const lease = JSON.parse(readFileSync(target.leaseFile, 'utf8')) as { deviceId: string };
+  return new Promise((resolve, reject) => {
+    execFile('adb', ['-s', lease.deviceId, ...args], (error, _stdout, stderr) => {
+      if (error === null) resolve();
+      else reject(new Error(`adb ${args[0]} failed: ${stderr.trim() || error.message}`));
+    });
+  });
+}
 
 /** e2e names the worker's agent-device session `<session>-<slot>`, and verify runs one worker, so slot 0. */
 function typeIntoFocused(context: RunContext, target: RunTarget, text: string): Promise<void> {
@@ -122,7 +132,9 @@ export const test = base.extend<{ host: HostFixture<HostScreen> }>({
         };
         const launch = await call<BrokerLaunchResponse>('/launch', request);
         lastScope = launch.storageScope;
-        await device.openApp(target.appId, { relaunch: true, launchArguments: launch.launchArguments });
+        const start = appStart(target.platform, target.appId, target.entry, launch.launchArguments);
+        if (start.kind === 'open-app') await device.openApp(target.appId, { relaunch: true, launchArguments: start.launchArguments });
+        else for (const command of start.commands) await adb(target, command);
         const ready = (s: VerifyState) =>
           s.launchId === launch.launchId &&
           (s.lastError !== null || (s.environmentLoaded && (user === null || s.ticket === 'succeeded' || s.ticket === 'failed')));

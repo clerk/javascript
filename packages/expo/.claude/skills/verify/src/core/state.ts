@@ -3,6 +3,7 @@ import {
   HOST_CONTRACT_VERSION,
   STATE_TEXT_PREFIX,
   VerifyFailure,
+  type HostEntry,
   type HostLaunch,
   type LaunchId,
   type Platform,
@@ -102,6 +103,7 @@ export function parseVerifyState(text: string): VerifyState {
 export function describeState(state: VerifyState): string {
   const parts = [`screen=${state.screen}`, `signedIn=${state.signedIn}`];
   if (state.sessionStatus) parts.push(`session=${state.sessionStatus}`);
+  parts.push(`orgId=${state.orgId ?? 'null'}`);
   if (state.pendingTasks.length > 0) parts.push(`tasks=${state.pendingTasks.join(',')}`);
   if (state.signInStatus) parts.push(`signInStatus=${state.signInStatus}`);
   if (state.signUpStatus) parts.push(`signUpStatus=${state.signUpStatus}`);
@@ -152,4 +154,29 @@ export function encodeLaunchArguments(platform: Platform, launch: HostLaunch<str
       }
     }
   });
+}
+
+export type AppStart =
+  | { readonly kind: 'open-app'; readonly launchArguments: readonly string[] }
+  | { readonly kind: 'adb'; readonly commands: readonly (readonly string[])[] };
+
+function shellQuote(value: string): string {
+  return `'${value.replaceAll("'", `'\\''`)}'`;
+}
+
+export function appStart(platform: Platform, appId: string, entry: HostEntry, launchArguments: readonly string[]): AppStart {
+  if (entry.kind === 'binary') return { kind: 'open-app', launchArguments };
+  const all = [...entry.launchArguments, ...launchArguments];
+  if (platform === 'ios') return { kind: 'open-app', launchArguments: all };
+  if (entry.androidActivity === null) {
+    throw new VerifyFailure('NOT_READY', 'a dev-client entry on Android needs androidActivity', 'set androidActivity in the entry src/host.ts returns');
+  }
+  const start = ['am', 'start', '-W', '-n', `${appId}/${entry.androidActivity}`, ...(entry.openLink === null ? [] : ['-d', entry.openLink]), ...all];
+  return {
+    kind: 'adb',
+    commands: [
+      ['shell', `am force-stop ${shellQuote(appId)}`],
+      ['shell', start.map(shellQuote).join(' ')],
+    ],
+  };
 }

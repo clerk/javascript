@@ -40,7 +40,7 @@ type FlagSpec = Readonly<Record<string, 'value' | 'bool' | 'list'>>;
 const FLAGS: Readonly<Record<Verb, FlagSpec>> = {
   doctor: { platform: 'value', backend: 'value' },
   up: { platform: 'value', backend: 'value', wait: 'value' },
-  run: { platform: 'value', backend: 'value', all: 'bool', skip: 'list', grep: 'value', 'no-video': 'bool' },
+  run: { platform: 'value', backend: 'value', all: 'bool', skip: 'list', grep: 'value', 'no-video': 'bool', wait: 'value' },
   screen: { platform: 'value', png: 'bool' },
   attach: { pr: 'value', screenshot: 'list' },
   down: { platform: 'value', stale: 'bool', 'dry-run': 'bool' },
@@ -193,7 +193,7 @@ function renderRun(result: RunResult, skillDir: string): string[] {
   lines.push(`evidence  ${rel(process.cwd(), result.dir)}`);
   if (r.videos.length > 0) lines.push(`  video        ${r.videos.map((v) => basename(v)).join(', ')}`);
   if (r.screenshots.length > 0) lines.push(`  screenshots  ${r.screenshots.map((s) => basename(s.path)).join(', ')}`);
-  if (r.lastState !== null) lines.push(`  last state   ${describeState(r.lastState)}`);
+  if (r.lastState !== null) lines.push(`  last state   ${describeState(r.lastState)}  (the last test only; every state is in states.jsonl)`);
   if (r.appLog !== null) lines.push(`  app log      ${basename(r.appLog)}`);
   if (r.tainted.length > 0) lines.push(`  TAINTED      ${r.tainted.map((t) => rel(result.dir, t)).join(', ')} (attach is blocked)`);
   lines.push(`next  ${result.next.startsWith('bin/verify ') ? result.next : rel(process.cwd(), result.next)}`);
@@ -208,7 +208,6 @@ function render(value: VerbResult, skillDir: string): string[] {
     }
     case 'up':
       return [
-        ...value.builds.map((b) => `build   ${b.key}  ${b.source}  ${b.reused ? 'reused' : `${b.seconds}s`}`),
         ...value.leases.map((l) => `device  ${l.device}  ${l.backend}  ${l.renewed ? 'renewed' : 'leased by this worktree'}  installed ${l.installedBuild ?? 'nothing'}`),
       ];
     case 'run':
@@ -233,7 +232,8 @@ function render(value: VerbResult, skillDir: string): string[] {
         ...(value.dryRun ? ['dry run: nothing was changed'] : []),
         `${value.dryRun ? 'would release' : 'released'}  ${value.released.map((l) => l.device).join(', ') || 'nothing'}`,
         `${value.dryRun ? 'would delete' : 'deleted'}   ${value.deletedUsers} users, ${value.deletedOrganizations} organizations`,
-        ...(value.stoppedProcesses.length > 0 ? [`${value.dryRun ? 'would stop' : 'stopped'}   ${value.stoppedProcesses.join(', ')}`] : []),
+        ...(value.dryRun ? value.wouldDelete : []).map((t) => (t.kind === 'user' ? `  user          ${t.instance}  ${t.id}  ${t.email}` : `  organization  ${t.instance}  ${t.id}  ${t.name}`)),
+        `${value.dryRun ? 'would stop' : 'stopped'}   ${value.stoppedProcesses.join(', ') || 'nothing'}${value.stoppedProcesses.some((p) => p.startsWith('agent-device ')) ? '' : '; no agent-device daemon running'}`,
         `kept      ${value.keptRuns.length} runs in .verify/runs/`,
       ];
     default: {

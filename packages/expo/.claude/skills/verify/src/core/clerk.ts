@@ -2,6 +2,7 @@ import { Secret } from './secret.ts';
 import type { InstanceKeys } from './keys.ts';
 import {
   VerifyFailure,
+  type DeletionTarget,
   type InstanceName,
   type PublishableKey,
   type RunId,
@@ -52,7 +53,7 @@ export interface ClerkBackend {
   createUser(instance: InstanceName, email: TestEmail, phone: TestPhone | null): Promise<SeededUser>;
   mintTicket(user: SeededUser, expiresInSeconds: number): Promise<Secret<'ticket'>>;
   deleteByEmail(instance: InstanceName, email: TestEmail): Promise<{ readonly users: number; readonly organizations: number }>;
-  previewDeleteByEmail(instance: InstanceName, email: TestEmail): Promise<{ readonly users: number; readonly organizations: number }>;
+  previewDeleteByEmail(instance: InstanceName, email: TestEmail): Promise<readonly DeletionTarget[]>;
   findUserId(instance: InstanceName, email: TestEmail): Promise<string | null>;
   settings(instance: InstanceName): Promise<InstanceSettings>;
 }
@@ -88,12 +89,14 @@ export function createClerkBackend(keysFor: (instance: InstanceName) => Instance
     return json;
   }
 
-  async function ownedOrganizations(instance: InstanceName, userId: string): Promise<readonly string[]> {
+  async function ownedOrganizations(instance: InstanceName, userId: string): Promise<readonly { readonly id: string; readonly name: string }[]> {
     const memberships = (await bapi(instance, 'GET', `/users/${userId}/organization_memberships?limit=100`).catch((error: unknown) => {
       if (error instanceof ClerkHttpError && error.codes.includes('organization_not_enabled_in_instance')) return { data: [] };
       throw error;
-    })) as { data?: { organization?: { id?: string; created_by?: string } }[] };
-    return (memberships.data ?? []).flatMap((m) => (typeof m.organization?.id === 'string' && m.organization.created_by === userId ? [m.organization.id] : []));
+    })) as { data?: { organization?: { id?: string; name?: string; created_by?: string } }[] };
+    return (memberships.data ?? []).flatMap(({ organization: org }) =>
+      typeof org?.id === 'string' && org.created_by === userId ? [{ id: org.id, name: org.name ?? '' }] : [],
+    );
   }
 
   async function usersByEmail(instance: InstanceName, email: TestEmail): Promise<readonly { id: string }[]> {
@@ -120,10 +123,12 @@ export function createClerkBackend(keysFor: (instance: InstanceName) => Instance
       return (await usersByEmail(instance, email))[0]?.id ?? null;
     },
     async previewDeleteByEmail(instance, email) {
-      let organizations = 0;
-      const users = await usersByEmail(instance, email);
-      for (const user of users) organizations += (await ownedOrganizations(instance, user.id)).length;
-      return { users: users.length, organizations };
+      const targets: DeletionTarget[] = [];
+      for (const user of await usersByEmail(instance, email)) {
+        targets.push({ kind: 'user', instance, id: user.id, email });
+        for (const org of await ownedOrganizations(instance, user.id)) targets.push({ kind: 'organization', instance, ...org });
+      }
+      return targets;
     },
     async deleteByEmail(instance, email) {
       let users = 0;
@@ -131,7 +136,7 @@ export function createClerkBackend(keysFor: (instance: InstanceName) => Instance
       for (const user of await usersByEmail(instance, email)) {
         for (const org of await ownedOrganizations(instance, user.id)) {
           try {
-            await bapi(instance, 'DELETE', `/organizations/${org}`);
+            await bapi(instance, 'DELETE', `/organizations/${org.id}`);
             organizations += 1;
           } catch (error) {
             if (!(error instanceof ClerkHttpError && error.status === 404)) throw error;
