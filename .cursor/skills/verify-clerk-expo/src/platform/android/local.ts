@@ -161,9 +161,9 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     const deadline = Date.now() + BOOT_TIMEOUT_MS;
     for (;;) {
       const failure = exited();
-      if (failure !== null) throw new VerifyFailure('NOT_READY', `the ${AVD_NAME} emulator exited before it booted: ${failure}`, 'run `bin/verify doctor`, then `bin/verify up` again');
+      if (failure !== null) throw new VerifyFailure('NOT_READY', `the ${AVD_NAME} emulator exited before it booted: ${failure}`, 'run `{cli} doctor`, then `{cli} up` again');
       if ((await shell(serial, 'getprop sys.boot_completed')) === '1' && (await shell(serial, 'getprop init.svc.bootanim')) !== 'running') return;
-      if (Date.now() >= deadline) throw new VerifyFailure('NOT_READY', `${serial} did not finish booting in ${BOOT_TIMEOUT_MS / 1000}s`, 'bin/verify down, then bin/verify up');
+      if (Date.now() >= deadline) throw new VerifyFailure('NOT_READY', `${serial} did not finish booting in ${BOOT_TIMEOUT_MS / 1000}s`, '{cli} down, then {cli} up');
       await sleep(2000);
     }
   }
@@ -176,7 +176,7 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     await sleep(3000);
     const deadline = Date.now() + 120_000;
     while ((await shell(serial, 'getprop init.svc.zygote')) !== 'running' || !(await shell(serial, 'pm path android')).startsWith('package:')) {
-      if (Date.now() >= deadline) throw new VerifyFailure('NOT_READY', `${serial} did not come back after the locale change`, 'bin/verify down, then bin/verify up');
+      if (Date.now() >= deadline) throw new VerifyFailure('NOT_READY', `${serial} did not come back after the locale change`, '{cli} down, then {cli} up');
       await sleep(2000);
     }
   }
@@ -230,7 +230,7 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
         throw new VerifyFailure(
           'POOL_FULL',
           `${inUse.length} of ${LOCAL_POOL.android} Android lanes are in use on this Mac (${inUse.join(', ')})`,
-          `rerun with a longer --wait than ${request.waitSeconds}s, for example ${retryFix(request)}, or run bin/verify down in a worktree that no longer needs its lane${foreignFix}`,
+          `rerun with a longer --wait than ${request.waitSeconds}s, for example ${retryFix(request)}, or run {cli} down in a worktree that no longer needs its lane${foreignFix}`,
         );
       }
       const waiting = `wait    all ${LOCAL_POOL.android} Android lanes are in use (${inUse.join(', ')}); waiting up to ${request.waitSeconds}s for one to free`;
@@ -351,7 +351,7 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     async install(lease, app) {
       const result = await adb(lease.deviceId, ['install', '-r', '-t', app.path]);
       if (result.code !== 0 || !/Success/.test(result.stdout)) {
-        throw new VerifyFailure('NOT_READY', `adb install on ${lease.deviceName} failed: ${(result.stderr || result.stdout).trim()}`, 'bin/verify down, then bin/verify up');
+        throw new VerifyFailure('NOT_READY', `adb install on ${lease.deviceName} failed: ${(result.stderr || result.stdout).trim()}`, '{cli} down, then {cli} up');
       }
     },
 
@@ -433,7 +433,7 @@ export async function startScreenrecord(options: ScreenrecordOptions): Promise<R
     const exited = await Promise.race([done, sleep(500).then(() => null)]);
     if (exited !== null || Date.now() >= deadline) {
       child.kill();
-      throw new VerifyFailure('NOT_READY', `screenrecord did not start on ${serial}: ${output.trim() || `exit ${exited}`}`, 'rerun with --no-video, or `bin/verify down` and `bin/verify up`');
+      throw new VerifyFailure('NOT_READY', `screenrecord did not start on ${serial}: ${output.trim() || `exit ${exited}`}`, 'rerun with --no-video, or `{cli} down` and `{cli} up`');
     }
   }
   return {
