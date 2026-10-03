@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     color: '#6B6B76',
     fontFamily: Platform.select({ ios: 'Menlo', default: 'monospace' }),
     fontSize: 9,
-    paddingBottom: Platform.select({ ios: 28, default: 12 }),
+    paddingBottom: 28,
     paddingHorizontal: 12,
     paddingTop: 6,
   },

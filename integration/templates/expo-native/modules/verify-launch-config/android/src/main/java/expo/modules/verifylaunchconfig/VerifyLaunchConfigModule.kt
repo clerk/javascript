@@ -3,10 +3,10 @@ package expo.modules.verifylaunchconfig
 import android.content.Context
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import java.io.File
 
 private const val PREFERENCES = "verify_launch_config"
 private const val STORAGE_SCOPE_KEY = "storageScope"
+private val CLERK_STORAGE = listOf("clerk_preferences", "SecureStore")
 
 class VerifyLaunchConfigModule : Module() {
   override fun definition() = ModuleDefinition {
@@ -27,10 +27,7 @@ class VerifyLaunchConfigModule : Module() {
         return@Function
       }
 
-      File(context.applicationInfo.dataDir, "shared_prefs").listFiles()
-        ?.map { it.nameWithoutExtension }
-        ?.filter { it != PREFERENCES }
-        ?.forEach { context.deleteSharedPreferences(it) }
+      CLERK_STORAGE.forEach { context.deleteSharedPreferences(it) }
       preferences.edit().putString(STORAGE_SCOPE_KEY, scope).commit()
     }
   }
