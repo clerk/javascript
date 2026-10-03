@@ -23,11 +23,12 @@ Edits to a `SKILL.md` take effect immediately, including in already-running sess
 
 ## Scope
 
-Skills here are Claude Code specific, with one exception. `verify-clerk-expo` is a symlink to
-`.cursor/skills/verify-clerk-expo/`, the agent-neutral skill that drives `@clerk/expo` on a
-simulator or emulator. Edit it there, not through the symlink. Cursor does not read this directory;
-it uses `.cursor/rules/`, `.cursor/skills/`, and `AGENTS.md`. When a repo rule changes, update `AGENTS.md` first, then mirror the change here and in
-`.cursor/rules/` where relevant.
+Skills here are Claude Code specific, except `verify-clerk-expo`, the agent-neutral skill that drives
+`@clerk/expo` on a simulator or emulator. Its files live here, and `.cursor/skills/verify-clerk-expo`
+is a symlink to this directory so Cursor reads the same skill. Edit it here, not through the
+symlink. For the other skills, Cursor uses `.cursor/rules/` and `AGENTS.md`. When a repo rule
+changes, update `AGENTS.md` first, then mirror the change here and in `.cursor/rules/` where
+relevant.
 
 ## Maintaining a skill
 

@@ -4,8 +4,8 @@ This directory is the maintained source for verifying the user-facing behavior o
 
 ## Baseline preconditions
 
-- Run commands from the root of a clerk/javascript worktree. Run `pnpm install` once there and `npm ci` once in `.cursor/skills/verify-clerk-expo/`. Paths that start with `.verify/` or `specs/` are inside the skill directory.
-- Run `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo doctor --platform ios` (or `android`) first. Every check is `ok` except `build` before the first `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo up`.
+- Run commands from the root of a clerk/javascript worktree. Run `pnpm install` and `npm ci --prefix .claude/skills/verify-clerk-expo` once there. Paths that start with `.verify/` or `specs/` are inside the skill directory.
+- Run `.claude/skills/verify-clerk-expo/bin/control-clerk-expo doctor --platform ios` (or `android`) first. Every check is `ok` except `build` before the first `.claude/skills/verify-clerk-expo/bin/control-clerk-expo up`.
 - `integration/.keys.json` in the main clerk/javascript checkout (not a linked worktree) holds `pk` and `sk` for `with-email-codes`, `with-session-tasks`, and `with-session-tasks-setup-mfa`. Only the CLI reads it. Agents cannot read it, and the CLI never prints a key.
 - The CLI drives only its own lane devices. On iOS that is `verify-ios-<n>`, cloned from `Clerk Verify Template iOS`. On Android it is `Clerk_Verify_Pixel` booted `-read-only` as `emulator-5560` or `emulator-5562`. Never drive `iPhone Air`, a physical device, or a device another worktree holds.
 - Every launch gets a new `verifyStorageScope`, so no spec inherits a session from another spec.
@@ -43,12 +43,12 @@ Rules:
 
 - Type only `+clerk_test` emails, 555-0100 to 0199 phones, and `424242`. The repo is public and every video can land on a PR.
 - Use ticket sign-in (`host.launch({ signedInAs })`) only to reach signed-in screens for features that are not about authentication. A change to an auth method gets a spec that drives the real form.
-- Tag every spec that types a code `form-entry`. Those specs run by default. A runtime that refuses to type codes into an app that talks to hosted Clerk runs `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run --skip form-entry` and says so in the PR.
-- `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo down` deletes every user the run created, including users created through the sign-up form, by their test email.
+- Tag every spec that types a code `form-entry`. Those specs run by default. A runtime that refuses to type codes into an app that talks to hosted Clerk runs `.claude/skills/verify-clerk-expo/bin/control-clerk-expo run --skip form-entry` and says so in the PR.
+- `.claude/skills/verify-clerk-expo/bin/control-clerk-expo down` deletes every user the run created, including users created through the sign-up form, by their test email.
 
 ## Driving conventions
 
-- Input only goes through specs. To look at any state past launch, write a spec, `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run` it, then `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo screen`.
+- Input only goes through specs. To look at any state past launch, write a spec, `.claude/skills/verify-clerk-expo/bin/control-clerk-expo run` it, then `.claude/skills/verify-clerk-expo/bin/control-clerk-expo screen`.
 - `verifyScreen` routes the host: `home` (the fixture's own screen), `auth` (inline AuthView), `nativeAuth` (dismissible AuthView), `userButton`, `userProfile`, `customSignIn`, `customSignUp`, `sso`, and `tokenCache`. `state.screen` reports what is on screen: `launching` during a ticket sign-in, `error` for a rejected key.
 - Prefer SDK identifiers on iOS and fixture testIDs everywhere. `specs/native.ts` holds the per-platform locators for native views that have no Android tag yet.
 - Inside native SwiftUI views, act with `host.tap(locator)` and `host.fill(locator, text)`. agent-device reports SwiftUI views inside the React Native host as covered, and refuses `locator.tap()` and `locator.fill()` on them.
@@ -56,8 +56,8 @@ Rules:
 
 ## Proof and skip reporting
 
-- A proof is a passing `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run` whose run directory holds `video.mp4`, `screenshots/`, `states.jsonl`, `state.json`, `app.log`, and `e2e/report.json`. `states.jsonl` is the state proof on both platforms. On Android `app.log` also carries the `[verify]` console lines. On iOS it carries only the app's native log lines, and the JS console lines, a JS change's own log lines included, are in `.verify/runtime/metro-<port>.log`. Read the run's whole window there by `runId`, as SKILL.md describes: module-level lines print before the run's first state line.
-- Name the run id, the platform, and the specs in the PR. Attach with `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo attach <run-id> --pr <n>`.
+- A proof is a passing `.claude/skills/verify-clerk-expo/bin/control-clerk-expo run` whose run directory holds `video.mp4`, `screenshots/`, `states.jsonl`, `state.json`, `app.log`, and `e2e/report.json`. `states.jsonl` is the state proof on both platforms. On Android `app.log` also carries the `[verify]` console lines. On iOS it carries only the app's native log lines, and the JS console lines, a JS change's own log lines included, are in `.verify/runtime/metro-<port>.log`. Read the run's whole window there by `runId`, as SKILL.md describes: module-level lines print before the run's first state line.
+- Name the run id, the platform, and the specs in the PR. Attach with `.claude/skills/verify-clerk-expo/bin/control-clerk-expo attach <run-id> --pr <n>`.
 - Report a skipped `form-entry` spec as skipped with the reason. The CLI prints `skipped by --skip form-entry`. Never report it as verified through a ticket launch.
 - A runtime that skips form entry proves each auth flow up to its code screen with the `request-code` spec, and reports the `complete` spec as skipped.
 - A spec limited to one platform reports as skipped on the other. Say which platform each proof ran on.

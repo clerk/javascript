@@ -428,7 +428,7 @@ async function buildAndroid(into: string): Promise<string> {
 
 export const host: HostAdapter<ExpoHostScreen> = {
   repo: 'clerk-expo',
-  cli: '.cursor/skills/verify-clerk-expo/bin/control-clerk-expo',
+  cli: '.claude/skills/verify-clerk-expo/bin/control-clerk-expo',
   platforms: ['ios', 'android'],
   screens: ['home', 'auth', 'nativeAuth', 'userButton', 'userProfile', 'customSignIn', 'customSignUp', 'sso', 'tokenCache'],
   keysFile: 'integration/.keys.json',

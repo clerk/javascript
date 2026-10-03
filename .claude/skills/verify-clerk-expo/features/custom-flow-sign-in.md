@@ -15,11 +15,11 @@ An app that builds its own sign-in screen on `useSignIn` sends an email code to 
 
 Preconditions:
 
-- `with-email-codes` has the `email_code` strategy on. `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo doctor` checks it.
+- `with-email-codes` has the `email_code` strategy on. `.claude/skills/verify-clerk-expo/bin/control-clerk-expo doctor` checks it.
 - The spec seeds its own `+clerk_test` user.
 
-- **Request the code.** Run `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run custom-flow-sign-in/request-code`. The spec fills `verify.customSignIn.emailAddress`, taps `verify.customSignIn.sendCode`, expects `verify.customSignIn.code`, and waits for `signInStatus` `needs_first_factor`. Screenshot `custom-code`.
-- **Enter the code.** Run `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run custom-flow-sign-in/complete` (tag `form-entry`). It types `CLERK_TEST_CODE`, taps `verify.customSignIn.verifyCode`, and waits for `signedIn` true with the seeded `userId`. Screenshots `custom-code` and `custom-signed-in`.
+- **Request the code.** Run `.claude/skills/verify-clerk-expo/bin/control-clerk-expo run custom-flow-sign-in/request-code`. The spec fills `verify.customSignIn.emailAddress`, taps `verify.customSignIn.sendCode`, expects `verify.customSignIn.code`, and waits for `signInStatus` `needs_first_factor`. Screenshot `custom-code`.
+- **Enter the code.** Run `.claude/skills/verify-clerk-expo/bin/control-clerk-expo run custom-flow-sign-in/complete` (tag `form-entry`). It types `CLERK_TEST_CODE`, taps `verify.customSignIn.verifyCode`, and waits for `signedIn` true with the seeded `userId`. Screenshots `custom-code` and `custom-signed-in`.
 - **Proof.** Both specs pass on the platform you changed. A runtime that must use `--skip form-entry` proves `request-code` only and reports `complete` as skipped.
 
 ## Gotchas

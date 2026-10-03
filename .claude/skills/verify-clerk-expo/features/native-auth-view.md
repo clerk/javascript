@@ -18,13 +18,13 @@ A signed-out user sees the native AuthView (SwiftUI from clerk-ios on iOS, Compo
 
 Preconditions:
 
-- `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo doctor --platform <ios|android>` passes apart from `build`.
+- `.claude/skills/verify-clerk-expo/bin/control-clerk-expo doctor --platform <ios|android>` passes apart from `build`.
 - `with-email-codes` keys are present. The sign-in specs seed their own `+clerk_test` user.
 
-- **Opens.** Run `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run native-auth-view/opens --platform ios`, and again with `--platform android`. The first test launches `screen: 'nativeAuth'`, expects the identifier field, and waits for `extra.authViewLoaded` true with `lastError` null. Screenshot `native-auth`.
+- **Opens.** Run `.claude/skills/verify-clerk-expo/bin/control-clerk-expo run native-auth-view/opens --platform ios`, and again with `--platform android`. The first test launches `screen: 'nativeAuth'`, expects the identifier field, and waits for `extra.authViewLoaded` true with `lastError` null. Screenshot `native-auth`.
 - **Dismiss.** The second test in `opens.e2e.ts` (iOS only, tag `known-bug`) taps `clerk.dismissButton` and waits for `state.screen` `home` and the `open-auth-view-button` testID. Screenshot `dismissed-home`. It fails today: see Gotchas.
-- **Request the code.** Run `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run native-auth-view/request-code`. It launches `screen: 'auth'`, the inline AuthView with no close button, so nothing can dismiss the form mid-spec; `opens` covers the dismissible `nativeAuth` screen. The spec fills `clerk.auth.start.identifier`, taps `clerk.auth.start.continue`, waits for `signInStatus` `needs_first_factor`, taps `Use another method` and `clerk.auth.signIn.alternativeMethod.email_code`, and expects `clerk.auth.signIn.code`. Screenshot `code-screen`.
-- **Enter the code.** Run `.cursor/skills/verify-clerk-expo/bin/control-clerk-expo run native-auth-view/complete` (tag `form-entry`). It types `CLERK_TEST_CODE` and waits for `signedIn` true, `sessionStatus` `active`, and the seeded `userId`. Screenshots `code-screen` and `signed-in`.
+- **Request the code.** Run `.claude/skills/verify-clerk-expo/bin/control-clerk-expo run native-auth-view/request-code`. It launches `screen: 'auth'`, the inline AuthView with no close button, so nothing can dismiss the form mid-spec; `opens` covers the dismissible `nativeAuth` screen. The spec fills `clerk.auth.start.identifier`, taps `clerk.auth.start.continue`, waits for `signInStatus` `needs_first_factor`, taps `Use another method` and `clerk.auth.signIn.alternativeMethod.email_code`, and expects `clerk.auth.signIn.code`. Screenshot `code-screen`.
+- **Enter the code.** Run `.claude/skills/verify-clerk-expo/bin/control-clerk-expo run native-auth-view/complete` (tag `form-entry`). It types `CLERK_TEST_CODE` and waits for `signedIn` true, `sessionStatus` `active`, and the seeded `userId`. Screenshots `code-screen` and `signed-in`.
 - **Proof.** The run directory holds `video.mp4`, `screenshots/native-auth.png`, and `states.jsonl` with `screen` `nativeAuth` and `extra.authViewLoaded` true.
 
 ## Gotchas
