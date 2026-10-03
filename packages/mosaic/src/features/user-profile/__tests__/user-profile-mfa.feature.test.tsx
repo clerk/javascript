@@ -363,4 +363,65 @@ describe('User profile MFA', () => {
     await waitFor(() => expect(fapi.mfa.phoneCreations).toHaveLength(2));
     expect(fapi.mfa.phoneCreations).toEqual(['+15555550303', '+15555550404']);
   });
+
+  it.each([
+    { country: 'United States', input: '+15555550303', changed: '+15555550404', canonical: '+15555550303' },
+    { country: 'United Kingdom', input: '+447400123456', changed: '+447400123457', canonical: '+447400123456' },
+  ])(
+    'reuses the original $country phone after editing and restoring a failed SMS setup',
+    async ({ input, changed, canonical }) => {
+      const fapi = await renderMfa(fapiUser({ id: 'user_1' }));
+      const user = userEvent.setup();
+      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+      await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+      const number = screen.getByRole('textbox', { name: 'Phone' });
+      await user.click(number);
+      await user.paste(input);
+      const prepare = holdRequests('post', '/v1/me/phone_numbers/phone_1/prepare_verification');
+      await user.click(screen.getByRole('button', { name: 'Send code' }));
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      prepare.fail('phone_number_invalid', 'Unable to send a code.');
+      await waitFor(() => expect(screen.getByText('Unable to send a code.')).toBeVisible());
+      serveFapi(fapi);
+      await user.clear(number);
+      await user.paste(changed);
+      await user.clear(number);
+      await user.click(number);
+      await user.paste(input);
+      await user.click(screen.getByRole('button', { name: 'Send code' }));
+      expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
+      expect(fapi.mfa.phoneCreations).toEqual([canonical]);
+      expect(fapi.mfa.phonePreparations).toEqual(['phone_1']);
+    },
+  );
+
+  it('reuses the original phone after two different SMS preparations fail', async () => {
+    const fapi = await renderMfa(fapiUser({ id: 'user_1' }));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+    await user.click(screen.getByRole('button', { name: /SMS verification/ }));
+    const number = screen.getByRole('textbox', { name: 'Phone' });
+    for (const [input, id] of [
+      ['5555550303', 'phone_1'],
+      ['5555550404', 'phone_2'],
+    ] as const) {
+      await user.clear(number);
+      await user.type(number, input);
+      const prepare = holdRequests('post', `/v1/me/phone_numbers/${id}/prepare_verification`);
+      await user.click(screen.getByRole('button', { name: 'Send code' }));
+      await waitFor(() => expect(prepare.requests).toHaveLength(1));
+      prepare.fail('phone_number_invalid', 'Unable to send a code.');
+      await waitFor(() => expect(screen.getByText('Unable to send a code.')).toBeVisible());
+      serveFapi(fapi);
+    }
+    await user.clear(number);
+    await user.type(number, '5555550303');
+    await user.click(screen.getByRole('button', { name: 'Send code' }));
+    expect(await screen.findByRole('textbox', { name: 'Verification code' })).toBeVisible();
+    expect(fapi.mfa.phoneCreations).toEqual(['+15555550303', '+15555550404']);
+    expect(fapi.mfa.phonePreparations).toEqual(['phone_1']);
+    await user.type(screen.getByRole('textbox', { name: 'Verification code' }), '123456');
+    expect(await screen.findByText('CODE0001')).toBeVisible();
+    expect(fapi.mfa.phoneUpdates).toEqual([{ id: 'phone_1', reserved: true, default: undefined }]);
+  });
 });

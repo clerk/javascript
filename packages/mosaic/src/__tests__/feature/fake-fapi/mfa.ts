@@ -172,6 +172,21 @@ export function mfaHandlers(
     http.post(fapiUrl('/v1/me/phone_numbers/'), async ({ request }) => {
       const number = new URLSearchParams(await request.text()).get('phone_number') ?? '';
       state.mfa.phoneCreations.push(number);
+      if (active()?.user.phone_numbers.some(phone => phone.phone_number === number)) {
+        return HttpResponse.json(
+          {
+            errors: [
+              {
+                code: 'form_identifier_exists',
+                message: 'This phone number already exists.',
+                long_message: 'This phone number already exists.',
+                meta: { param_name: 'phone_number' },
+              },
+            ],
+          },
+          { status: 422 },
+        );
+      }
       const existingIds = new Set(active()?.user.phone_numbers.map(phone => phone.id));
       let nextPhoneNumber = state.mfa.phoneCreations.length;
       while (existingIds.has(`phone_${nextPhoneNumber}`)) {
