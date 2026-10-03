@@ -58,11 +58,13 @@ export const ToastPositioner = React.forwardRef<HTMLDivElement, ToastPositionerP
       [floatingContext, placement],
     );
 
+    const anchorHidden = middlewareData.hide?.referenceHidden;
+
     const defaultProps = {
       'data-side': placedSide,
       'data-align': placedAlign,
-      ...(middlewareData.hide?.referenceHidden && { 'data-anchor-hidden': '' }),
-      style: floatingStyles,
+      ...(anchorHidden && { 'data-anchor-hidden': '' }),
+      style: { ...floatingStyles, ...(anchorHidden && { visibility: 'hidden' }) },
     } satisfies DefaultProps<'div'>;
 
     return (
