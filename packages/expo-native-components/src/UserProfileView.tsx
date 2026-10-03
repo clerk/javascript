@@ -3,9 +3,8 @@ import { useCallback, useMemo, useRef } from 'react';
 import type { NativeSyntheticEvent, StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet, Text, View } from 'react-native';
 
-import NativeClerkUserProfileView from '../specs/NativeClerkUserProfileView';
-import { isNativeSupported } from '../utils/native-module';
 import type { EmbeddedNavigationProps } from './EmbeddedNavigation.types';
+import NativeClerkUserProfileView from './specs/NativeClerkUserProfileView';
 import type {
   NativeUserProfileNavigationHandle,
   UserProfileCustomDestination,
@@ -17,6 +16,7 @@ import {
   UserProfileCustomPageHosts,
   useUserProfileCustomPages,
 } from './UserProfileCustomPages';
+import { isNativeSupported } from './utils/native-module';
 
 type CustomizableNativeUserProfileProps = ComponentProps<NonNullable<typeof NativeClerkUserProfileView>> & {
   customPages?: string;
@@ -75,7 +75,7 @@ export interface UserProfileViewProps extends EmbeddedNavigationProps {
  *
  * @example
  * ```tsx
- * import { UserProfileView } from '@clerk/expo/native';
+ * import { UserProfileView } from '@clerk/expo-native-components';
  * import { useAuth } from '@clerk/expo';
  *
  * export default function ProfileScreen() {
@@ -128,7 +128,7 @@ export function UserProfileView({
         <Text style={styles.text}>
           {!isNativeSupported
             ? 'Native UserProfileView is only available on iOS and Android'
-            : 'Native UserProfileView requires the @clerk/expo plugin. Add "@clerk/expo" to your app.json plugins array.'}
+            : 'Native UserProfileView requires a development build with the @clerk/expo-native-components config plugin. Add "@clerk/expo-native-components" to your app.json plugins array and rebuild your native app.'}
         </Text>
       </View>
     );

@@ -3,8 +3,7 @@ import { useMemo, useRef } from 'react';
 import type { NativeSyntheticEvent } from 'react-native';
 import { StyleSheet, useWindowDimensions } from 'react-native';
 
-import NativeClerkUserButtonView from '../specs/NativeClerkUserButtonView';
-import { isNativeSupported } from '../utils/native-module';
+import NativeClerkUserButtonView from './specs/NativeClerkUserButtonView';
 import type {
   NativeUserProfileNavigationHandle,
   UserProfileCustomDestination,
@@ -16,6 +15,7 @@ import {
   UserProfileCustomPageHosts,
   useUserProfileCustomPages,
 } from './UserProfileCustomPages';
+import { isNativeSupported } from './utils/native-module';
 
 type CustomizableNativeUserButtonProps = ComponentProps<NonNullable<typeof NativeClerkUserButtonView>> & {
   customPages?: string;
@@ -47,7 +47,7 @@ export interface UserButtonProps {
  *
  * @example
  * ```tsx
- * import { UserButton } from '@clerk/expo/native';
+ * import { UserButton } from '@clerk/expo-native-components';
  *
  * export default function Home() {
  *   return (

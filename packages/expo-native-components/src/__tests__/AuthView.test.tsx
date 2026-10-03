@@ -10,13 +10,13 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock('../../specs/NativeClerkAuthView', () => {
+vi.mock('../specs/NativeClerkAuthView', () => {
   return {
     default: mocks.NativeClerkAuthView,
   };
 });
 
-vi.mock('../../utils/native-module', () => {
+vi.mock('../utils/native-module', () => {
   return {
     isNativeSupported: true,
   };

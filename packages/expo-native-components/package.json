@@ -1,0 +1,82 @@
+{
+  "name": "@clerk/expo-native-components",
+  "version": "0.0.1",
+  "description": "Native Clerk components and native SDK integration for Expo, powered by clerk-ios and clerk-android",
+  "keywords": [
+    "react",
+    "react-native",
+    "expo",
+    "clerk",
+    "auth",
+    "authentication",
+    "native"
+  ],
+  "homepage": "https://clerk.com/",
+  "bugs": {
+    "url": "https://github.com/clerk/javascript/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clerk/javascript.git",
+    "directory": "packages/expo-native-components"
+  },
+  "license": "MIT",
+  "author": "Clerk",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./app.plugin.js": "./app.plugin.js",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "source": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "android",
+    "ios",
+    "src/specs",
+    "expo-module.config.json",
+    "react-native.config.js",
+    "app.plugin.js",
+    "app.plugin.d.ts"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "build:declarations": "tsc -p tsconfig.declarations.json",
+    "clean": "rimraf ./dist",
+    "dev": "tsdown --watch",
+    "dev:pub": "pnpm dev -- --env.publish",
+    "format": "node ../../scripts/format-package.mjs",
+    "format:check": "node ../../scripts/format-package.mjs --check",
+    "lint": "eslint src",
+    "test": "vitest run",
+    "test:watch": "vitest watch"
+  },
+  "dependencies": {
+    "@clerk/react": "workspace:^",
+    "tslib": "catalog:repo"
+  },
+  "devDependencies": {
+    "@expo/config-plugins": "^54.0.4",
+    "react-native": "^0.86.0"
+  },
+  "peerDependencies": {
+    "expo": "catalog:peer-expo",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-native": ">=0.75"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "codegenConfig": {
+    "name": "ClerkExpoSpec",
+    "type": "all",
+    "jsSrcsDir": "src/specs"
+  }
+}
