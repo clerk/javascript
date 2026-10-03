@@ -29,7 +29,7 @@ function javaMajor(home: string): number | null {
 
 export type JavaHome = { readonly ok: true; readonly home: string; readonly detail: string } | { readonly ok: false; readonly detail: string; readonly fix: string };
 
-/** The JDK `bin/verify up` builds with. `main` rejects Java 17, so JAVA_HOME wins only at 21 or newer. */
+/** The JDK `bin/verify up` builds with. The Android Gradle builds reject Java 17, so JAVA_HOME wins only at 21 or newer. */
 export function resolveJavaHome(env: Readonly<Record<string, string | undefined>> = process.env, studioJbr: string = STUDIO_JBR): JavaHome {
   const studio = javaMajor(studioJbr);
   const fix =
@@ -40,7 +40,7 @@ export function resolveJavaHome(env: Readonly<Record<string, string | undefined>
   if (requested !== undefined && requested !== '') {
     const major = javaMajor(requested);
     if (major !== null && major >= MIN_JAVA) return { ok: true, home: requested, detail: `Java ${major} from JAVA_HOME (${requested})` };
-    return { ok: false, detail: `JAVA_HOME is ${major === null ? 'not a JDK' : `Java ${major}`} (${requested}); clerk-android needs Java ${MIN_JAVA}`, fix };
+    return { ok: false, detail: `JAVA_HOME is ${major === null ? 'not a JDK' : `Java ${major}`} (${requested}); the Android build needs Java ${MIN_JAVA}`, fix };
   }
   if (studio !== null && studio >= MIN_JAVA) return { ok: true, home: studioJbr, detail: `Java ${studio} from the Android Studio JBR` };
   return { ok: false, detail: `JAVA_HOME is unset and there is no Java ${MIN_JAVA} Android Studio JBR`, fix };

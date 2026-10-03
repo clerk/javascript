@@ -20,8 +20,8 @@ export const AVD_NAME = 'Clerk_Verify_Pixel';
 export const LOCALE = 'en-US';
 /** The default size fails on this AVD's 1280x2856 panel. */
 export const RECORD_SIZE = '720x1608';
-/** Logcat tags kept in app.log: host state, the SDK, its network logger (with debugLogs), and crashes. */
-export const LOG_FILTER = ['ClerkVerify:V', 'ClerkLog:V', 'OkHttp:V', 'AndroidRuntime:E', '*:S'];
+/** Logcat tags kept in app.log: host state, the SDK, its network logger (with debugLogs), the React Native console, and crashes. */
+export const LOG_FILTER = ['ClerkVerify:V', 'ClerkLog:V', 'OkHttp:V', 'ReactNativeJS:V', 'AndroidRuntime:E', '*:S'];
 const BOOT_TIMEOUT_MS = 240_000;
 
 export const lanePort = (slot: number): number => 5558 + 2 * slot;
