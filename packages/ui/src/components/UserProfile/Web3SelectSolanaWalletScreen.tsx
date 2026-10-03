@@ -11,7 +11,7 @@ import { FormContainer } from '@/ui/elements/FormContainer';
 import { handleError } from '@/utils/errorHandler';
 
 const Web3SolanaWalletButtons = lazy(() =>
-  import(/* webpackChunkName: "web3-solana-wallet-buttons" */ '@/ui/elements/Web3SolanaWalletButtons').then(m => ({
+  import(/* webpackChunkName: "web3-solana-wallet-buttons" */ '@/ui/components/Web3SolanaWalletButtons').then(m => ({
     default: m.Web3SolanaWalletButtons,
   })),
 );

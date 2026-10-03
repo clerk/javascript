@@ -1,4 +1,4 @@
-import { useInstalledSolanaWallets } from '@clerk/shared/react';
+import { useInstalledSolanaWallets } from '@clerk/shared/react/hooks/useInstalledSolanaWallets';
 import type { Ref } from 'react';
 import React, { forwardRef, isValidElement } from 'react';
 

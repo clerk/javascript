@@ -1,5 +1,5 @@
 import type { VerificationResource } from '@clerk/shared/types';
-import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils';
+import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils/sortIdentificationBasedOnVerification';
 import { describe, expect, it } from 'vitest';
 
 const identification = (id: string, status: VerificationResource['status'], expireAtMs = 0) => ({
