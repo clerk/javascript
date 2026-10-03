@@ -232,7 +232,7 @@ function refuseOutOfScope(): void {
   const names = stale.map((pkg) => pkg.name).join(', ');
   throw new VerifyFailure(
     'NOT_READY',
-    `${names} ${stale.length === 1 ? 'has' : 'have'} source newer than ${stale.length === 1 ? 'its dist' : 'their dist'}. This skill verifies @clerk/expo only, and it does not rebuild @clerk/expo's other workspace dependencies, so it will not launch on stale code`,
+    `${names} ${stale.length === 1 ? 'has' : 'have'} source newer than ${stale.length === 1 ? 'its dist' : 'their dist'}. This skill rebuilds only @clerk/expo and its Expo-module siblings; it verifies other workspace dependencies after you build them, and it will not launch on their stale dist`,
     '{cli} down, then pnpm turbo build --filter=@clerk/expo^..., then rerun',
   );
 }
