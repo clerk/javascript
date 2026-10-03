@@ -1,26 +1,24 @@
 import { spawn } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
+import { appendFileSync, cpSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isAlive, isRunning, run, sleep, type ProcessRef } from './core/exec.ts';
 import { LOCAL_POOL, VerifyFailure, type HostAdapter, type HostEntry, type Platform, type ScratchPath } from './core/types.ts';
 import {
-  bundleIsFresh,
-  changedFiles,
+  confirmServed,
   fingerprint,
-  inBundle,
   isBundledOutput,
-  isPackageSource,
-  isStale,
   isTsdownSource,
   listFiles,
   newest,
-  sameContent,
+  staleInScope,
+  staleOutOfScope,
   workspaceDependencies,
+  type BundleView,
+  type Fetched,
   type Fingerprint,
-  type ServedState,
-  type WorkspacePackage,
+  type GateMemory,
 } from './freshness.ts';
 import { localAndroidBackend } from './platform/android/local.ts';
 import { resolveJavaHome, sdkRoot, sdkTool } from './platform/android/sdk.ts';
@@ -162,7 +160,8 @@ function stopRuntime(names: readonly string[] = allRuntimeNames()): void {
 
 function startDetached(name: string, what: RuntimeProcess['what'], args: readonly string[], cwd: string): RuntimeProcess {
   mkdirSync(RUNTIME_DIR, { recursive: true });
-  const log = openSync(runtimeLog(name), 'w');
+  const log = openSync(runtimeLog(name), 'a');
+  appendFileSync(log, `\n==== ${name} started ${new Date().toISOString()}\n`);
   const { CI: _ci, ...env } = process.env;
   const child = spawn(process.execPath, [...args], { cwd, detached: true, stdio: ['ignore', log, log], env: { ...env, LANG: 'en_US.UTF-8', EXPO_NO_TELEMETRY: '1', EXPO_OFFLINE: '1' } });
   child.unref();
@@ -180,18 +179,32 @@ async function waitFor(what: string, ready: () => Promise<boolean>, timeoutMs: n
   throw new VerifyFailure('NOT_READY', `${what} was not ready within ${timeoutMs / 1000}s`, fix ?? `read ${runtimeLog(logName)}`);
 }
 
-interface Started {
+export interface Started {
   readonly names: string[];
+}
+
+export async function withCleanup<T>(stop: (names: readonly string[]) => void, fn: (started: Started) => Promise<T>, progress: (line: string) => void): Promise<T> {
+  const started: Started = { names: [] };
+  try {
+    return await fn(started);
+  } catch (error) {
+    if (started.names.length > 0) {
+      progress(`stop    ${started.names.join(', ')} (started by this call, which failed)`);
+      stop(started.names);
+    }
+    throw error;
+  }
 }
 
 async function ensureWatch(started: Started, progress: (line: string) => void): Promise<RuntimeProcess> {
   const running = readRuntime('watch');
   if (running !== null) return running;
   const tsdown = createRequire(join(EXPO_PACKAGE, 'package.json')).resolve('tsdown/package.json');
+  const offset = existsSync(runtimeLog('watch')) ? readFileSync(runtimeLog('watch')).length : 0;
   const ref = startDetached('watch', 'watch', [join(tsdown, '..', 'dist', 'run.mjs'), '--watch'], EXPO_PACKAGE);
   started.names.push('watch');
   progress(`watch   packages/expo  tsdown --watch (pid ${ref.pid})`);
-  await waitFor('the @clerk/expo watch build', async () => existsSync(runtimeLog('watch')) && /Build complete|built in|Rebuilt/i.test(readFileSync(runtimeLog('watch'), 'utf8')), 180_000, 'watch');
+  await waitFor('the @clerk/expo watch build', async () => /Build complete|built in|Rebuilt/i.test(readFileSync(runtimeLog('watch')).subarray(offset).toString()), 180_000, 'watch');
   return ref;
 }
 
@@ -213,16 +226,19 @@ async function waitForWatchToCatchUp(): Promise<void> {
   );
 }
 
-function siblingPackages(): readonly WorkspacePackage[] {
-  return workspaceDependencies(WORKTREE, EXPO_PACKAGE).filter((pkg) => existsSync(join(pkg.dir, 'src')) && existsSync(join(pkg.dir, 'dist')));
-}
-
-function staleSiblings(): readonly WorkspacePackage[] {
-  return siblingPackages().filter((pkg) => isStale(listFiles(join(pkg.dir, 'src'), '', isPackageSource), listFiles(join(pkg.dir, 'dist'), '', isBundledOutput)));
+function refuseOutOfScope(): void {
+  const stale = staleOutOfScope(WORKTREE, EXPO_PACKAGE);
+  if (stale.length === 0) return;
+  const names = stale.map((pkg) => pkg.name).join(', ');
+  throw new VerifyFailure(
+    'NOT_READY',
+    `${names} ${stale.length === 1 ? 'has' : 'have'} source newer than ${stale.length === 1 ? 'its dist' : 'their dist'}. This skill verifies @clerk/expo only, and it does not rebuild @clerk/expo's other workspace dependencies, so it will not launch on stale code`,
+    '{cli} down, then pnpm turbo build --filter=@clerk/expo^..., then rerun',
+  );
 }
 
 async function rebuildStaleSiblings(progress: (line: string) => void): Promise<void> {
-  const stale = staleSiblings();
+  const stale = staleInScope(WORKTREE, EXPO_PACKAGE);
   if (stale.length === 0) return;
   const names = stale.map((pkg) => pkg.name);
   progress(`build   ${names.join(', ')} src is newer than dist; stopping this worktree's Metro and watch build, then pnpm turbo build ${names.map((n) => `--filter=${n}`).join(' ')}`);
@@ -231,7 +247,7 @@ async function rebuildStaleSiblings(progress: (line: string) => void): Promise<v
 }
 
 function servedOutputs(): readonly string[] {
-  const roots = [{ name: '@clerk/expo', dir: EXPO_PACKAGE }, ...siblingPackages()];
+  const roots = [{ name: '@clerk/expo', dir: EXPO_PACKAGE }, ...workspaceDependencies(WORKTREE, EXPO_PACKAGE)];
   return roots.flatMap((pkg) => {
     const prefix = `${relative(WORKTREE, pkg.dir)}/dist/`;
     return listFiles(join(pkg.dir, 'dist'), prefix, isBundledOutput).map((f) => f.rel);
@@ -247,26 +263,32 @@ async function metroAnswers(port: number): Promise<boolean> {
   }
 }
 
-async function ensureMetro(started: Started, port: number, progress: (line: string) => void): Promise<RuntimeProcess> {
+interface Metro {
+  readonly ref: RuntimeProcess;
+  readonly spawnOutputs: Fingerprint | null;
+  readonly started: Started;
+}
+
+const metroCli = () => join(FIXTURE, 'node_modules', 'expo', 'bin', 'cli');
+
+async function ensureMetro(started: Started, port: number, progress: (line: string) => void): Promise<Metro> {
   const name = `metro-${port}`;
   const running = readRuntime(name);
   if (running !== null) {
     await waitFor(`Metro pid ${running.pid} on port ${port} to answer`, () => metroAnswers(port), 120_000, name, `{cli} down, then retry; read ${runtimeLog(name)}`);
-    return running;
+    return { ref: running, spawnOutputs: null, started };
   }
   if (await metroAnswers(port)) {
     throw new VerifyFailure('NOT_READY', `port ${port} already serves a Metro that this worktree did not start`, `stop the process listening on ${port} (lsof -nP -iTCP:${port} -sTCP:LISTEN)`);
   }
-  const cli = join(FIXTURE, 'node_modules', 'expo', 'bin', 'cli');
-  if (!existsSync(cli)) throw new VerifyFailure('NOT_READY', 'the expo-native fixture has no node_modules', '{cli} up');
-  const ref = startDetached(name, 'metro', [cli, 'start', '--port', String(port), '--dev-client'], FIXTURE);
+  if (!existsSync(metroCli())) throw new VerifyFailure('NOT_READY', 'the expo-native fixture has no node_modules', '{cli} up');
+  const spawnOutputs = fingerprint(WORKTREE, servedOutputs(), null);
+  const ref = startDetached(name, 'metro', [metroCli(), 'start', '--port', String(port), '--dev-client'], FIXTURE);
   started.names.push(name);
   progress(`metro   :${port}  expo start (pid ${ref.pid})`);
   await waitFor(`Metro on port ${port}`, () => metroAnswers(port), 120_000, name);
-  return ref;
+  return { ref, spawnOutputs, started };
 }
-
-type Fetched<T> = { readonly ok: true; readonly value: T } | { readonly ok: false; readonly transient: boolean; readonly message: string };
 
 async function fetchManifest(port: number, platform: Platform): Promise<Fetched<string>> {
   try {
@@ -282,16 +304,11 @@ async function fetchManifest(port: number, platform: Platform): Promise<Fetched<
   }
 }
 
-interface Bundle {
-  readonly revId: string;
-  readonly body: string;
-}
-
-async function fetchBundle(url: string): Promise<Fetched<Bundle>> {
+async function fetchBundle(url: string): Promise<Fetched<BundleView>> {
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(300_000) });
     const body = await response.text();
-    if (response.status === 200) return { ok: true, value: { revId: response.headers.get('x-metro-delta-id') ?? '', body } };
+    if (response.status === 200) return { ok: true, value: { revId: response.headers.get('x-metro-delta-id') ?? '', lastModified: Date.parse(response.headers.get('last-modified') ?? '') || 0, body } };
     let message = body.slice(0, 300);
     try {
       const parsed = JSON.parse(body) as { type?: string; message?: string };
@@ -303,16 +320,18 @@ async function fetchBundle(url: string): Promise<Fetched<Bundle>> {
   }
 }
 
-async function ensureServed(metro: RuntimeProcess, port: number, platform: Platform, progress: (line: string) => void): Promise<void> {
+async function ensureServed(metro: Metro, port: number, platform: Platform, progress: (line: string) => void): Promise<RuntimeProcess> {
   const name = `metro-${port}`;
   const stateFile = join(RUNTIME_DIR, `served-${port}-${platform}.json`);
-  const saved = existsSync(stateFile) ? (JSON.parse(readFileSync(stateFile, 'utf8')) as Partial<ServedState>) : null;
-  const state = saved !== null && saved.metroPid === metro.pid && saved.outputs !== undefined ? (saved as ServedState) : null;
-  const rels = servedOutputs();
-  let current = fingerprint(WORKTREE, rels, state?.outputs ?? null);
-  const pending = state === null ? [] : changedFiles(state.outputs, current);
+  const saved = existsSync(stateFile) ? (JSON.parse(readFileSync(stateFile, 'utf8')) as Partial<GateMemory>) : null;
+  let current = metro.ref;
+  const memory: GateMemory =
+    saved !== null && saved.metroPid === current.pid && saved.seen !== undefined && saved.outputs !== undefined
+      ? (saved as GateMemory)
+      : { metroPid: current.pid, spawn: metro.spawnOutputs, seen: {}, outputs: metro.spawnOutputs ?? {} };
+  const pending = Object.keys(memory.seen).length === 0 ? [] : servedOutputs().filter((rel) => fingerprint(WORKTREE, [rel], memory.outputs)[rel]?.hash !== memory.outputs[rel]?.hash);
   progress(
-    state === null
+    Object.keys(memory.seen).length === 0
       ? `metro   :${port}  bundling ${platform} once so the first launch does not wait on Metro`
       : pending.length > 0
         ? `metro   :${port}  ${pending.length} served file(s) changed since the last launch; waiting until Metro's ${platform} bundle has the new code`
@@ -332,48 +351,39 @@ async function ensureServed(metro: RuntimeProcess, port: number, platform: Platf
     }
     throw new VerifyFailure('NOT_READY', `Metro on port ${port} returned no ${platform} launch asset within 120s (${last})`, fix);
   })();
-  let confirmed: { readonly revId: string; readonly outputs: Fingerprint } | null = null;
-  let previous: { readonly revId: string; readonly outputs: Fingerprint } | null = null;
-  let nudgedAt = Date.now();
-  let delay = 500;
-  let lastError = '';
-  const deadline = Date.now() + 300_000;
-  while (confirmed === null) {
-    if (Date.now() >= deadline) {
-      throw new VerifyFailure('NOT_READY', `Metro on port ${port} did not serve the latest ${platform} bundle within 300s${lastError === '' ? '' : ` (${lastError})`}`, fix);
-    }
-    const before = fingerprint(WORKTREE, rels, current);
-    const bundle = await fetchBundle(url);
-    const after = fingerprint(WORKTREE, rels, before);
-    current = after;
-    if (!bundle.ok) {
-      if (!bundle.transient) throw new VerifyFailure('NOT_READY', `Metro on port ${port} could not bundle ${platform}: ${bundle.message}`, `fix the bundling error, then rerun; read ${runtimeLog(name)}`);
-      lastError = bundle.message;
-      previous = null;
-      await sleep(delay);
-      delay = Math.min(delay * 2, 8_000);
-      continue;
-    }
-    delay = 500;
-    const settled = sameContent(before, after);
-    if (!settled || !bundleIsFresh(state, after, bundle.value)) {
-      previous = null;
-      if (settled && state !== null && Date.now() - nudgedAt > 5_000) {
-        const missed = inBundle(bundle.value.body, changedFiles(state.outputs, after));
-        progress(`metro   :${port}  still serving the old ${platform} bundle; touching ${missed.length} changed file(s) so Metro's watcher sees them`);
+  const result = await confirmServed(
+    {
+      list: servedOutputs,
+      fingerprint: (rels, previous) => fingerprint(WORKTREE, rels, previous),
+      fetch: () => fetchBundle(url),
+      touch: (rels) => {
         const now = new Date();
-        for (const rel of missed) utimesSync(join(WORKTREE, rel), now, now);
-        nudgedAt = Date.now();
-      }
-      await sleep(500);
-      continue;
+        for (const rel of rels) utimesSync(join(WORKTREE, rel), now, now);
+      },
+      restart: async () => {
+        if (isRunning(current)) process.kill(current.pid, 'SIGTERM');
+        await waitFor(`Metro pid ${current.pid} to exit`, async () => !(await metroAnswers(port)), 30_000, name);
+        current = startDetached(name, 'metro', [metroCli(), 'start', '--port', String(port), '--dev-client'], FIXTURE);
+        metro.started.names.includes(name) || metro.started.names.push(name);
+        progress(`metro   :${port}  expo start (pid ${current.pid})`);
+        await waitFor(`Metro on port ${port}`, () => metroAnswers(port), 120_000, name);
+        return current.pid;
+      },
+      now: Date.now,
+      sleep,
+      progress: (line) => progress(line.replace(/^metro {3}/, `metro   :${port}  `)),
+    },
+    memory,
+    { timeoutMs: 300_000, nudgeAfterMs: 5_000, maxRestarts: 2 },
+  );
+  if (!result.ok) {
+    if (result.kind === 'bundle-error') {
+      throw new VerifyFailure('NOT_READY', `Metro on port ${port} could not bundle ${platform}: ${result.message}`, `fix the bundling error, then rerun; read ${runtimeLog(name)}`);
     }
-    if (previous !== null && previous.revId === bundle.value.revId && sameContent(previous.outputs, after)) confirmed = previous;
-    else previous = { revId: bundle.value.revId, outputs: after };
-    if (confirmed === null) await sleep(500);
+    throw new VerifyFailure('NOT_READY', `Metro on port ${port} did not serve the latest ${platform} bundle within 300s${result.message === '' ? '' : ` (${result.message})`}`, fix);
   }
-  const served: ServedState = { metroPid: metro.pid, revId: confirmed.revId, outputs: confirmed.outputs };
-  writeFileSync(stateFile, JSON.stringify(served));
+  writeFileSync(stateFile, JSON.stringify(result.memory));
+  return current;
 }
 
 async function prepareFixture(progress: (line: string) => void): Promise<void> {
@@ -451,13 +461,12 @@ export const host: HostAdapter<ExpoHostScreen> = {
     if (lease.backend !== 'local') throw new VerifyFailure('UNSUPPORTED', 'the Expo host serves JS from local Metro only', 'run locally; EAS arrives with CLOUD-EXPO');
     const progress = (line: string) => process.stderr.write(`${line}\n`);
     const port = metroPort(lease);
-    const started: Started = { names: [] };
-    try {
+    return withCleanup(stopRuntime, async (started) => {
+      refuseOutOfScope();
       await rebuildStaleSiblings(progress);
       const watch = await ensureWatch(started, progress);
       await waitForWatchToCatchUp();
-      const metro = await ensureMetro(started, port, progress);
-      await ensureServed(metro, port, lease.platform, progress);
+      const metro = await ensureServed(await ensureMetro(started, port, progress), port, lease.platform, progress);
       if (lease.platform === 'android') {
         const adb = sdkTool('adb');
         const reverse = await run(adb, ['-s', lease.deviceId, 'reverse', `tcp:${port}`, `tcp:${port}`]);
@@ -467,13 +476,7 @@ export const host: HostAdapter<ExpoHostScreen> = {
         if (prefs.code !== 0) throw new VerifyFailure('NOT_READY', `could not turn off the dev menu onboarding: ${prefs.stderr.trim()}`, '{cli} down --platform android, then {cli} up --platform android');
       }
       return { entry: devClientEntry(lease.platform, port), processes: [watch, metro] };
-    } catch (error) {
-      if (started.names.length > 0) {
-        progress(`stop    ${started.names.join(', ')} (started by this call, which failed)`);
-        stopRuntime(started.names);
-      }
-      throw error;
-    }
+    }, progress);
   },
   entry: (platform) => devClientEntry(platform, 8081),
   logPredicates: { ios: `process == "${IOS_PRODUCT}" AND senderImagePath CONTAINS "${IOS_PRODUCT}"` },

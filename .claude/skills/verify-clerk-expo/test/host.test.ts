@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { devClientEntry, metroPort, nativeInputs, needsNativeRebuild } from '../src/host.ts';
+import { devClientEntry, metroPort, nativeInputs, needsNativeRebuild, withCleanup } from '../src/host.ts';
 import { encodeLaunchArguments } from '../src/core/state.ts';
 import type { LaunchId, PublishableKey, RunId, StorageScope } from '../src/core/types.ts';
 
@@ -84,5 +84,31 @@ describe('devClientEntry', () => {
     if (entry.kind !== 'dev-client') return assert.fail('not a dev client');
     const keys = new Set([...entry.launchArguments, ...verify].filter((arg) => arg.startsWith('-')));
     assert.equal(keys.size, entry.launchArguments.filter((a) => a.startsWith('-')).length + verify.filter((a) => a.startsWith('-')).length);
+  });
+});
+
+describe('withCleanup', () => {
+  it('stops exactly what the failed call started, then rethrows', async () => {
+    const stopped: string[][] = [];
+    await assert.rejects(
+      withCleanup((names) => stopped.push([...names]), async (started) => {
+        started.names.push('watch', 'metro-8082');
+        throw new Error('warm-up failed');
+      }, () => undefined),
+      /warm-up failed/,
+    );
+    assert.deepEqual(stopped, [['watch', 'metro-8082']]);
+  });
+
+  it('stops nothing when the call succeeds or started nothing', async () => {
+    const stopped: string[][] = [];
+    assert.equal(await withCleanup((names) => stopped.push([...names]), async (started) => {
+      started.names.push('watch');
+      return 7;
+    }, () => undefined), 7);
+    await assert.rejects(withCleanup((names) => stopped.push([...names]), async () => {
+      throw new Error('refused');
+    }, () => undefined));
+    assert.deepEqual(stopped, []);
   });
 });
