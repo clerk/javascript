@@ -309,6 +309,10 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
         }),
       });
       updateWeb3Wallet(state, verified);
+      const user = activeUser(state);
+      if (user && !user.primary_web3_wallet_id) {
+        updateUser(state, { ...user, primary_web3_wallet_id: verified.id });
+      }
       return envelope(verified, state.client);
     }),
     http.post(fapiUrl('/v1/me/web3_wallets/:id'), ({ params, request }) => {
@@ -320,7 +324,15 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       if (!user || !wallet) {
         return missing();
       }
-      updateUser(state, { ...user, web3_wallets: user.web3_wallets.filter(current => current.id !== wallet.id) });
+      const remainingWallets = user.web3_wallets.filter(current => current.id !== wallet.id);
+      updateUser(state, {
+        ...user,
+        web3_wallets: remainingWallets,
+        primary_web3_wallet_id:
+          user.primary_web3_wallet_id === wallet.id
+            ? (remainingWallets.find(current => current.verification?.status === 'verified')?.id ?? null)
+            : user.primary_web3_wallet_id,
+      });
       return envelope({ object: 'web3_wallet', id: wallet.id, deleted: true }, state.client);
     }),
     http.post(fapiUrl('/v1/me'), async ({ request }) => {
