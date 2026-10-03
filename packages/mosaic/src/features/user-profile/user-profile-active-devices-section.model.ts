@@ -126,8 +126,6 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
       .filter(isActiveDevice)
       .sort((a, b) => Number(b.id === sessionId) - Number(a.id === sessionId))
       .map(toDevice),
-    // TODO: Add bulk revocation when a dedicated API is available, preserving the current session and reverification.
-    // TODO: Add session reverification for device revocation; surface API errors until then.
     revoke: async id => {
       try {
         const currentUser = clerk.user;

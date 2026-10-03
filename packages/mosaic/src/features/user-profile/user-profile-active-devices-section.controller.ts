@@ -16,6 +16,5 @@ export function useUserProfileActiveDevicesController(
       }
       return removed;
     },
-    // TODO: Wire the model's future bulk action to onSignOutAllOtherDevices and refresh the device list after it settles.
   };
 }
