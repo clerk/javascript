@@ -9,7 +9,6 @@ export { default as __source } from './user-profile-web3-wallets-section.stories
 export const meta: StoryMeta = {
   group: 'User Profile',
   status: 'wip',
-  substatus: 'needs wire-up',
   title: 'UserProfileWeb3WalletsSection',
   label: 'Web3 wallets',
   navigation: { category: 'Sections' },
@@ -34,7 +33,7 @@ export function ConnectOnly() {
 export function UnverifiedWallet() {
   const fixture = useWeb3WalletsFixture({
     initialWallets: [{ ...primaryWallet, isPrimary: false, isVerified: false }],
-    availableProviders: [{ id: 'metamask', provider: 'MetaMask', iconUrl: primaryWallet.iconUrl }],
+    availableProviders: [{ id: 'web3_metamask_signature', provider: 'MetaMask', iconUrl: primaryWallet.iconUrl }],
   });
   return (
     <UserProfileWeb3WalletsSectionView
@@ -49,7 +48,7 @@ export function ConnectionError() {
     initialWallets: [],
     availableProviders: [
       {
-        id: 'metamask',
+        id: 'web3_metamask_signature',
         provider: 'MetaMask',
         iconUrl: primaryWallet.iconUrl,
         connectError: 'Wallet extension not found. Check your wallet and try again.',
