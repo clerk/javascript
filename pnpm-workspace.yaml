@@ -60,7 +60,7 @@ overrides:
   'semver@<7.7.3': 7.7.4
   'smol-toml@<1.6.1': 1.6.1
   'socket.io-parser@>=4.0.0 <4.2.7': 4.2.7
-  'svgo@>=3.0.0 <3.3.3': 4.0.2
+  'svgo@>=3.0.0 <3.3.3': 4.1.0
   'tar@<7.5.21': 7.5.21
   'tmp@<0.2.7': 0.2.7
   'undici-types@<7.16.0': 7.24.8
@@ -83,6 +83,8 @@ minimumReleaseAgeExclude:
   - '@tanstack/start-storage-context@1.167.36'
   - 'pkglab'
   - 'pkglab-*'
+  # Renovate security update: svgo@4.1.0
+  - svgo@4.1.0
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
