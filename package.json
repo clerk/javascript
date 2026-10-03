@@ -87,7 +87,7 @@
     "@commitlint/config-conventional": "^20.5.0",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "9.31.0",
-    "@faker-js/faker": "^9.9.0",
+    "@faker-js/faker": "^10.0.0",
     "@octokit/rest": "^20.1.2",
     "@playwright/test": "^1.62.1",
     "@stylexjs/eslint-plugin": "0.19.0",
