@@ -328,8 +328,8 @@ jobs:
         env:
           CLERK_SECRET_KEY: ${{ steps.keys.outputs.sk }}
         run: |
-          curl -fsS "$BAPI_URL/v1/users?limit=100&query=$CLERK_TEST_USERNAME_PREFIX" -H "Authorization: Bearer $CLERK_SECRET_KEY" |
-            jq -r '.[].id' |
+          curl -fsS -G "$BAPI_URL/v1/users" --data-urlencode "limit=100" --data-urlencode "query=$CLERK_TEST_USERNAME_PREFIX" -H "Authorization: Bearer $CLERK_SECRET_KEY" |
+            jq -r --arg p "$CLERK_TEST_USERNAME_PREFIX" '.[] | select((.username // "") | startswith($p)) | .id' |
             while read -r user_id; do
               curl -fsS -o /dev/null -X DELETE "$BAPI_URL/v1/users/$user_id" -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
             done

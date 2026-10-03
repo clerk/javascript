@@ -30,5 +30,8 @@ export async function createTestUser(): Promise<TestUser> {
 }
 
 export async function deleteTestUser({ id }: TestUser) {
-  await bapi(`/users/${id}`, { method: 'DELETE' });
+  const response = await bapi(`/users/${id}`, { method: 'DELETE' });
+  if (!response.ok && response.status !== 404) {
+    console.warn(`BAPI user deletion failed for ${id} (HTTP ${response.status}): ${await response.text()}`);
+  }
 }
