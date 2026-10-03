@@ -83,6 +83,8 @@ minimumReleaseAgeExclude:
   - '@tanstack/start-storage-context@1.167.36'
   - 'pkglab'
   - 'pkglab-*'
+  # Renovate security update: next@15.5.24
+  - next@15.5.24
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
