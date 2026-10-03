@@ -21,6 +21,11 @@ export type Web3WalletsProjection =
   | { status: 'hidden' }
   | { status: 'ready'; wallets: UserProfileWeb3Wallet[]; availableProviders: UserProfileWeb3Provider[] };
 
+export function normalizedWeb3Wallet(identifier: string): string {
+  const trimmed = identifier.trim();
+  return /^0x/i.test(trimmed) ? trimmed.toLowerCase() : trimmed;
+}
+
 export function projectWeb3Wallets({
   wallets,
   primaryId,
@@ -87,11 +92,13 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
   if (!user || !environment.userSettings.attributes.web3_wallet?.enabled) {
     return { status: 'hidden' };
   }
+  const web3Attribute = environment.userSettings.attributes.web3_wallet;
   const projection = projectWeb3Wallets({
     wallets: user.web3Wallets,
     primaryId: user.primaryWeb3WalletId,
     enabledStrategies: environment.userSettings.web3FirstFactors,
-    allowCreation: allowsIdentificationCreation(user, environment.userSettings.enterpriseSSO),
+    allowCreation:
+      !web3Attribute.immutable && allowsIdentificationCreation(user, environment.userSettings.enterpriseSSO),
   });
   if (projection.status === 'hidden') {
     return projection;
@@ -129,7 +136,29 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
         if (!identifier) {
           throw new Web3WalletActionError('extensionUnavailable');
         }
-        const wallet = await requireCurrentUser().createWeb3Wallet({ web3Wallet: identifier });
+        const current = requireCurrentUser();
+        const currentProjection = projectWeb3Wallets({
+          wallets: current.web3Wallets,
+          primaryId: current.primaryWeb3WalletId,
+          enabledStrategies: environment.userSettings.web3FirstFactors,
+          allowCreation:
+            Boolean(environment.userSettings.attributes.web3_wallet?.enabled) &&
+            !environment.userSettings.attributes.web3_wallet?.immutable &&
+            allowsIdentificationCreation(current, environment.userSettings.enterpriseSSO),
+        });
+        if (
+          currentProjection.status !== 'ready' ||
+          !currentProjection.availableProviders.some(candidate => candidate.id === strategy)
+        ) {
+          throw new Web3WalletActionError('providerUnavailable');
+        }
+        const normalizedIdentifier = normalizedWeb3Wallet(identifier);
+        const existing = current.web3Wallets.find(
+          wallet =>
+            wallet.verification.status !== 'verified' &&
+            normalizedWeb3Wallet(wallet.web3Wallet) === normalizedIdentifier,
+        );
+        const wallet = existing ?? (await current.createWeb3Wallet({ web3Wallet: identifier }));
         requireCurrentUser();
         if (!wallet) {
           throw new Web3WalletActionError('creationFailed');
@@ -160,13 +189,18 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
         }
         await current.update({ primaryWeb3WalletId: walletId });
       }),
-    remove: walletId =>
-      runAction(async () => {
-        const wallet = requireCurrentUser().web3Wallets.find(wallet => wallet.id === walletId);
-        if (!wallet) {
-          throw new Web3WalletActionError('providerUnavailable');
-        }
-        await wallet.destroy();
-      }),
+    remove: web3Attribute.immutable
+      ? undefined
+      : walletId =>
+          runAction(async () => {
+            if (environment.userSettings.attributes.web3_wallet?.immutable) {
+              throw new Web3WalletActionError('providerUnavailable');
+            }
+            const wallet = requireCurrentUser().web3Wallets.find(wallet => wallet.id === walletId);
+            if (!wallet) {
+              throw new Web3WalletActionError('providerUnavailable');
+            }
+            await wallet.destroy();
+          }),
   };
 }
