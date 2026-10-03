@@ -16,16 +16,25 @@ $ pnpm install                                 # once, at the repo root
 $ npm ci                                       # once per worktree, in this directory
 $ bin/verify doctor --platform ios             # exits 3 until the first up, because build is the one failing check
 $ bin/verify up --platform ios                 # build the dev client, lease verify-ios-<n>, install, start the watch build and Metro
+build   ios-842c8600ed7b  local  building...
+build   expo prebuild --clean --platform ios
+build   xcodebuild Debug (dev client)
+device  verify-ios-1  cloning Clerk Verify Template iOS
+install ios-842c8600ed7b  on verify-ios-1
+build   ios-842c8600ed7b  local  built in 113s
+watch   packages/expo  tsdown --watch (pid 19319)
+metro   :8082  expo start (pid 19320)
+device  verify-ios-1  local  leased by this worktree  installed ios-842c8600ed7b
 ```
 
 `--platform` is `ios` (the default) or `android`. Each platform has its own build, lease, and Metro, so a worktree can hold one of each and run them at the same time.
 
 `up` does four things, each only when needed:
 
-1. **Build.** The build key hashes only the native inputs for that platform: `packages/expo/ios` or `android`, `app.plugin.js`, `src/specs/`, `expo-module.config.json`, `package.json`, the sibling `expo-google-signin` and `expo-biometrics` native code, and the fixture's `app.json`, `app.config.js`, `package.sdk-57.json`, and `modules/`. When the key changes, `up` stops this worktree's watch build and Metro, runs `turbo build` for the three packages, installs the fixture's dependencies with `@clerk/expo` linked to this worktree, runs `expo prebuild --clean`, and builds the dev client with `xcodebuild` or `gradlew assembleDebug` (Java 21 from Android Studio). A change anywhere else, such as `packages/expo/src/hooks/useSSO.ts` or a fixture screen, reuses the build: `up` prints `build <key> local reused`.
+1. **Build.** The build key hashes only the native inputs for that platform: `packages/expo/ios` or `android`, `app.plugin.js`, `src/specs/`, `expo-module.config.json`, `package.json`, the sibling `expo-google-signin` and `expo-biometrics` native code, and the fixture's `app.json`, `app.config.js`, `package.sdk-57.json`, and `modules/`. When the key changes, `up` runs `turbo build` for the three packages (skipped while the watch build runs, which keeps `dist` current; otherwise it stops this worktree's Metro first), installs the fixture's dependencies with `@clerk/expo` linked to this worktree, runs `expo prebuild --clean`, and builds the dev client with `xcodebuild` or `gradlew assembleDebug` (Java 21 from Android Studio). A change anywhere else, such as `packages/expo/src/hooks/useSSO.ts` or a fixture screen, reuses the build: `up` prints `build <key> local reused`. A native rebuild takes about two minutes, and a JS-only `run` of one spec about eight seconds.
 2. **Lease.** It claims a lane after the build, because a build needs no device.
 3. **Install.** It installs the dev client when the lane does not have this build.
-4. **Runtime.** It starts `tsdown --watch` in `packages/expo` (one per worktree) and `expo start` on the lane's Metro port, and on Android runs `adb reverse` for that port. Both are ledgered and `down` stops them.
+4. **Runtime.** It starts `tsdown --watch` in `packages/expo` (one per worktree) and `expo start` on the lane's Metro port. On Android it also runs `adb reverse` for that port and marks the dev menu onboarding finished, which a `-read-only` emulator forgets on every boot. Both processes are ledgered and `down` stops them. Before each launch, `run` waits until the watch build has caught up with your latest edit in `packages/expo/src`.
 
 The lane is ready when `up` prints its last line, `device <name> local leased by this worktree installed <build key>`.
 
@@ -76,7 +85,7 @@ $ bin/verify screen --platform ios                         # current UI tree wit
 $ bin/verify screen --png                                  # plus a screenshot in scratch
 ```
 
-`run` flags are `--platform ios|android`, `--skip form-entry`, `--grep <regex>`, `--no-video`, and `--wait <seconds>` (how long to wait for a free lane or for another verb in this worktree that holds the device).
+`run` flags are `--platform ios|android`, `--skip form-entry`, `--include known-bug`, `--grep <regex>`, `--no-video`, and `--wait <seconds>` (how long to wait for a free lane or for another verb in this worktree that holds the device).
 
 The `host` fixture:
 
@@ -100,6 +109,7 @@ test('profile shows the seeded user', async ({ host, screen }) => {
 - The footer `verify.state` holds `verify ` plus one line of JSON: `screen`, `environmentLoaded`, `signedIn`, `userId`, `sessionId`, `sessionStatus`, `pendingTasks`, `orgId`, `signInStatus`, `signUpStatus`, `ticket`, `lastError`, `runId`, `launchId`, and `extra` with `authViewLoaded` and `authFlowComplete`. The values come from the JS hooks (`useAuth`, `useUser`, `useSession`, `useAuthViewState`). `screen` is what is on screen, not what was asked for. `signedIn` is true for a pending session, so read `sessionStatus`.
 - Locate native iOS views with SDK identifiers, `screen.getByTestId('clerk.auth.start.identifier')`. Android native views have no tags in the pinned clerk-android release, so `specs/native.ts` finds them by text. Fixture views use their `testID`s (`verify.customSignIn.*`, `open-auth-view-button`, `auth-state`, `user-id`).
 - Limit a spec to one platform with `test(title, { platforms: ['ios'] }, fn)`. It reports as skipped on the other.
+- A spec tagged `known-bug` proves a defect that is not fixed yet. `run` skips it (`skipped: known-bug`) unless you pass `--include known-bug`. The fix PR removes the tag. Today that is the inline AuthView dismiss test in `native-auth-view/opens`.
 
 There are two ways to check work.
 
@@ -182,17 +192,17 @@ Rules:
 
 Every `run` writes `.verify/runs/<run-id>/` and prints its path:
 
-| File                      | What it is                                                                                                                                  |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `run.json`                | The sealed record: `results` per spec, `platform`, `gitHead`, `dirty`, `build` (the build key), `device`, `identities`, and `tainted` files |
-| `video.mp4`               | `simctl io recordVideo` on iOS, or `adb shell screenrecord --size 720x1608` on Android, of the whole run                                    |
-| `screenshots/<label>.png` | Every `host.screenshot(label)`                                                                                                              |
-| `states.jsonl`            | Every `VerifyState` the fixture read, in order, across every test in the run                                                                |
-| `state.json`              | Only the last state of the whole run. With several tests, read per-test states from `states.jsonl` by `launchId`                            |
-| `app.log`                 | The app's log lines from the run: the `[verify]` state lines, plus `[verify:network]` request lines with `debugLogs: true`                  |
-| `e2e/`                    | e2e's `report.json`, failure pages, and `screen.txt` for failed steps                                                                       |
-| `e2e.log`                 | e2e's console output                                                                                                                        |
-| `specs/`                  | A copy of every spec the run used                                                                                                           |
+| File                      | What it is                                                                                                                                                                                           |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `run.json`                | The sealed record: `results` per spec, `platform`, `gitHead`, `dirty`, `build` (the build key), `device`, `identities`, and `tainted` files                                                          |
+| `video.mp4`               | `simctl io recordVideo` on iOS, or `adb shell screenrecord --size 720x1608` on Android, of the whole run                                                                                             |
+| `screenshots/<label>.png` | Every `host.screenshot(label)`                                                                                                                                                                       |
+| `states.jsonl`            | Every `VerifyState` the fixture read, in order, across every test in the run                                                                                                                         |
+| `state.json`              | Only the last state of the whole run. With several tests, read per-test states from `states.jsonl` by `launchId`                                                                                     |
+| `app.log`                 | Native log lines from the device for the run. In a Debug dev client the JS console goes to Metro, so the `[verify]` and `[verify:network]` lines are in `.verify/runtime/metro-<port>.log`, not here |
+| `e2e/`                    | e2e's `report.json`, failure pages, and `screen.txt` for failed steps                                                                                                                                |
+| `e2e.log`                 | e2e's console output                                                                                                                                                                                 |
+| `specs/`                  | A copy of every spec the run used                                                                                                                                                                    |
 
 Proof standards: drive the real user path, capture the action and the resulting state (the video plus `states.jsonl`), and check side effects in `states.jsonl` (`userId`, `sessionId`, `signInStatus`), not only the final screen.
 

@@ -28,3 +28,4 @@ renovate.json5
 CLAUDE.md
 # verify skill sources are shared byte for byte with clerk-ios and clerk-android
 packages/expo/.claude/skills/verify/**/*.ts
+packages/expo/.claude/skills/verify/.verify/

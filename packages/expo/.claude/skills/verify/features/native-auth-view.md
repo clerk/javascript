@@ -30,7 +30,7 @@ Preconditions:
 ## Gotchas
 
 - Known bug: on iOS, the close button of an inline dismissible AuthView does nothing, and `onDismiss` never fires. clerk-ios's close button calls SwiftUI's `dismiss`, which has no effect when the view is not presented. The `dismiss` test carries the `known-bug` tag until `@clerk/expo` fixes it. Remove the tag in the fix PR.
-- AuthView remembers the last identifier typed on the device, across storage scopes, because clerk-ios keeps it outside the keychain. A spec that types into `clerk.auth.start.identifier` appends to whatever is there, so seed a user and fill the field only on a fresh lane, or clear it first.
+- clerk-ios AuthView remembers the last identifier in UserDefaults. The host clears it on every new storage scope, so the field starts empty. A prefilled field shows as two `clerk.auth.start.identifier` nodes (label and textbox) and fails a locator with `LOCATOR_AMBIGUOUS`. If that happens, the host's scope clearing regressed.
 
 - `@clerk/expo` ships the clerk-ios release pinned in `packages/expo/ios/ClerkExpo.podspec`, so iOS has the `clerk.auth.*` identifiers. The clerk-android release it pins has no test tags yet, so Android specs find AuthView by its text (`Enter your email or username`, `Continue`). Replace them with `getByTestId` after a clerk-android release with tags lands in `@clerk/expo`.
 - The `verify.state` footer stays readable under AuthView because the RN host renders it below the native view.
