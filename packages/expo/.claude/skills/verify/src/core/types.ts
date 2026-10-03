@@ -72,8 +72,10 @@ export interface SecretLike {
 export type SecretSink = 'bapi-authorization' | 'launch-argument' | 'agent-device-daemon' | 'e2e-provider-lease';
 
 export type BackendKind = 'local' | 'eas';
-export type OptInTag = 'form-entry';
-export const FORM_ENTRY_TAG: OptInTag = 'form-entry';
+export type OptInTag = 'form-entry' | 'known-bug';
+export const FORM_ENTRY_TAG = 'form-entry' satisfies OptInTag;
+/** Marks a spec that reproduces an open SDK bug. Excluded unless `run --include known-bug`, because e2e has no expected-failure status. */
+export const KNOWN_BUG_TAG = 'known-bug' satisfies OptInTag;
 
 export type SpecSelection = { readonly all: true } | { readonly selectors: readonly string[] };
 
@@ -86,6 +88,7 @@ export type Command =
       readonly platform?: Platform;
       readonly backend?: BackendKind;
       readonly skip: readonly OptInTag[];
+      readonly include: readonly OptInTag[];
       readonly grep?: string;
       readonly video: boolean;
       readonly waitSeconds: number;

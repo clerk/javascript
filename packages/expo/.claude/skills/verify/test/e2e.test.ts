@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
-import { collectScreenshots, parseE2EReport, planE2E, resolveSpecs } from '../src/core/e2e.ts';
+import { collectScreenshots, excludedTags, parseE2EReport, planE2E, resolveSpecs } from '../src/core/e2e.ts';
 import { manifestDrift } from '../src/core/manifest.ts';
 import type { ActiveRunContext, EvidencePath, RunId } from '../src/core/types.ts';
 
@@ -41,14 +41,21 @@ describe('planE2E', () => {
       targets: [],
       e2eVideo: false,
     };
-    const plan = planE2E(context, [{ kind: 'golden', path: 'specs/golden/a/b.e2e.ts', feature: null }], { verb: 'run', selection: { all: true }, skip: ['form-entry'], grep: 'x', video: true, waitSeconds: 0 }, 'ios', '/skill');
+    const plan = planE2E(context, [{ kind: 'golden', path: 'specs/golden/a/b.e2e.ts', feature: null }], { verb: 'run', selection: { all: true }, skip: ['form-entry'], include: [], grep: 'x', video: true, waitSeconds: 0 }, 'ios', '/skill');
     assert.deepEqual(plan.args, [
       'run', 'specs/golden/a/b.e2e.ts', '--config', 'e2e.config.ts', '--target', 'ios',
       '--output', '.verify/runs/r20261002-141210-7c1e/e2e', '--reporter', 'list,markdown',
-      '--exclude-tag', 'form-entry', '--grep', 'x',
+      '--exclude-tag', 'form-entry,known-bug', '--grep', 'x',
     ]);
     assert.equal(plan.env.VERIFY_CONTEXT, '/skill/.verify/scratch/r20261002-141210-7c1e/context.json');
     assert.equal(plan.env.E2E_TELEMETRY_DISABLED, '1');
+  });
+
+  it('excludes known-bug specs by default and keeps them with --include known-bug', () => {
+    assert.deepEqual(excludedTags({ skip: [], include: [] }), ['--exclude-tag', 'known-bug']);
+    assert.deepEqual(excludedTags({ skip: ['form-entry'], include: [] }), ['--exclude-tag', 'form-entry,known-bug']);
+    assert.deepEqual(excludedTags({ skip: [], include: ['known-bug'] }), []);
+    assert.deepEqual(excludedTags({ skip: ['form-entry'], include: ['known-bug'] }), ['--exclude-tag', 'form-entry']);
   });
 });
 
@@ -64,6 +71,10 @@ describe('parseE2EReport', () => {
         {
           id: 'bbbbbbbb22', kind: 'test', titlePath: ['completes'], file: 'specs/golden/sign-up/complete.e2e.ts', platform: 'ios', tags: ['form-entry'], status: 'skipped',
           skip: { cause: 'filtered', reason: 'excluded by --exclude-tag form-entry' }, attempts: [],
+        },
+        {
+          id: 'eeeeeeee55', kind: 'test', titlePath: ['email code sign-in drops the session'], file: 'specs/golden/sign-up/request-code.e2e.ts', platform: 'ios', tags: ['known-bug', 'form-entry'], status: 'skipped',
+          skip: { cause: 'filtered', reason: 'carries an excluded tag' }, attempts: [],
         },
         {
           id: 'dddddddd44', kind: 'test', titlePath: ['never ran'], file: 'specs/golden/auth-start/opens.e2e.ts', platform: 'ios', tags: [], status: 'skipped',
@@ -84,16 +95,18 @@ describe('parseE2EReport', () => {
     mkdirSync(join(dir, 'e2e', 'artifacts', 'ios/p/attempt-0'), { recursive: true });
     writeFileSync(join(dir, 'e2e', 'artifacts', 'ios/p/attempt-0/screen.txt'), '');
     const results = parseE2EReport(report, [], dir);
-    assert.deepEqual(results.map((r) => r.status), ['passed', 'skipped', 'failed', 'failed']);
-    assert.equal(results[2]!.error, 'not run: infrastructure-unavailable the device could not be opened');
+    assert.deepEqual(results.map((r) => r.status), ['passed', 'skipped', 'skipped', 'failed', 'failed']);
+    assert.equal(results[3]!.error, 'not run: infrastructure-unavailable the device could not be opened');
     assert.equal(results[0]!.seconds, 9.1);
     assert.equal(results[0]!.spec.feature, null);
     assert.equal(results[1]!.skipReason, 'skipped by --skip form-entry');
-    assert.equal(results[3]!.error, 'expect.toBeVisible failed; observed: no node');
-    assert.equal(results[3]!.failureScreen, join(dir, 'e2e', 'artifacts', 'ios/p/attempt-0/screen.txt'));
+    assert.equal(results[2]!.skipReason, 'skipped: known-bug', 'known-bug wins over form-entry');
+    assert.equal(results[2]!.title, 'email code sign-in drops the session');
+    assert.equal(results[4]!.error, 'expect.toBeVisible failed; observed: no node');
+    assert.equal(results[4]!.failureScreen, join(dir, 'e2e', 'artifacts', 'ios/p/attempt-0/screen.txt'));
     const selected = parseE2EReport(report, [{ kind: 'golden', path: 'specs/golden/auth-start/opens.e2e.ts', feature: null }], dir);
     assert.deepEqual(selected.map((r) => r.spec.path), ['specs/golden/auth-start/opens.e2e.ts', 'specs/golden/auth-start/opens.e2e.ts'], 'files e2e lists but the run did not select are dropped');
-    assert.equal(results[3]!.failurePage, join(dir, 'e2e', 'failures', 'specs_explored_probe-fails-cccccccc.md'));
+    assert.equal(results[4]!.failurePage, join(dir, 'e2e', 'failures', 'specs_explored_probe-fails-cccccccc.md'));
   });
 
   it('refuses a report of another schema', () => {

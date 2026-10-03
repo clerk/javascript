@@ -8,6 +8,7 @@ import { defaultClerk, verbs, type Deps } from './verbs.ts';
 import { openWorkspace, parseRunId } from './workspace.ts';
 import {
   FORM_ENTRY_TAG,
+  KNOWN_BUG_TAG,
   RETRYABLE,
   VerifyFailure,
   type BackendKind,
@@ -26,7 +27,7 @@ const VERBS: readonly Verb[] = ['doctor', 'up', 'run', 'screen', 'attach', 'down
 const USAGE_FIX = [
   'bin/verify doctor [--platform p] [--backend b]',
   'bin/verify up [--platform p] [--backend b] [--wait <seconds>]',
-  'bin/verify run <feature|feature/spec|path.e2e.ts>... | --all [--platform p] [--skip form-entry] [--grep re] [--no-video] [--wait <seconds>]',
+  'bin/verify run <feature|feature/spec|path.e2e.ts>... | --all [--platform p] [--skip form-entry] [--include known-bug] [--grep re] [--no-video] [--wait <seconds>]',
   'bin/verify screen [--platform p] [--png]',
   'bin/verify attach <run-id> --pr <n> [--screenshot label]...',
   'bin/verify down [--platform p] [--stale] [--dry-run]',
@@ -40,7 +41,7 @@ type FlagSpec = Readonly<Record<string, 'value' | 'bool' | 'list'>>;
 const FLAGS: Readonly<Record<Verb, FlagSpec>> = {
   doctor: { platform: 'value', backend: 'value' },
   up: { platform: 'value', backend: 'value', wait: 'value' },
-  run: { platform: 'value', backend: 'value', all: 'bool', skip: 'list', grep: 'value', 'no-video': 'bool', wait: 'value' },
+  run: { platform: 'value', backend: 'value', all: 'bool', skip: 'list', include: 'list', grep: 'value', 'no-video': 'bool', wait: 'value' },
   screen: { platform: 'value', png: 'bool' },
   attach: { pr: 'value', screenshot: 'list' },
   down: { platform: 'value', stale: 'bool', 'dry-run': 'bool' },
@@ -124,16 +125,20 @@ export function parseArgv(argv: readonly string[]): Invocation {
       const all = bools.has('all');
       if (all && positionals.length > 0) throw usage('pass selectors or --all, not both');
       if (!all && positionals.length === 0) throw usage('bin/verify run needs a feature, feature/spec, path.e2e.ts, or --all');
-      const skip = (lists.get('skip') ?? []).map((tag): OptInTag => {
-        if (tag !== FORM_ENTRY_TAG) throw usage(`--skip takes ${FORM_ENTRY_TAG}, not ${tag}`);
-        return tag;
-      });
+      const tags = (flag: string, allowed: OptInTag) =>
+        (lists.get(flag) ?? []).map((tag): OptInTag => {
+          if (tag !== allowed) throw usage(`--${flag} takes ${allowed}, not ${tag}`);
+          return tag;
+        });
+      const skip = tags('skip', FORM_ENTRY_TAG);
+      const include = tags('include', KNOWN_BUG_TAG);
       const grep = values.get('grep');
       command = {
         verb,
         ...base,
         selection: all ? { all: true } : { selectors: positionals },
         skip,
+        include,
         ...(grep === undefined ? {} : { grep }),
         video: !bools.has('no-video'),
         waitSeconds: positiveInt('wait', values.get('wait'), 0),

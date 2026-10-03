@@ -12,6 +12,7 @@ const APP_ID = 'com.clerk.exponativebuildfixture';
 const ANDROID_ACTIVITY = '.MainActivity';
 const DEV_CLIENT_SCHEME = 'exp+clerk-expo-native-build-fixture';
 const IOS_PRODUCT = 'ClerkExpoNativeBuildFixture';
+const ANDROID_DEV_MENU_PREFS = `<?xml version='1.0' encoding='utf-8' standalone='yes' ?><map><boolean name="isOnboardingFinished" value="true" /><boolean name="showsAtLaunch" value="false" /><boolean name="showFab" value="false" /></map>`;
 
 const WORKTREE = new URL('../../../../../../', import.meta.url).pathname;
 const FIXTURE = join(WORKTREE, 'integration', 'templates', 'expo-native');
@@ -192,9 +193,12 @@ async function prepareFixture(progress: (line: string) => void): Promise<void> {
   if (!existsSync(join(WORKTREE, 'node_modules'))) {
     throw new VerifyFailure('NOT_READY', 'the monorepo has no node_modules', `cd ${WORKTREE} && pnpm install`);
   }
-  progress('build   stopping this worktree\'s watch build and Metro while packages rebuild');
-  stopRuntime();
-  await mustStep('turbo build', 'pnpm', ['turbo', 'build', '--filter=@clerk/expo...', '--filter=@clerk/expo-biometrics...', '--filter=@clerk/expo-google-signin...'], WORKTREE);
+  if (readRuntime('watch') === null) {
+    stopRuntime();
+    await mustStep('turbo build', 'pnpm', ['turbo', 'build', '--filter=@clerk/expo...', '--filter=@clerk/expo-biometrics...', '--filter=@clerk/expo-google-signin...'], WORKTREE);
+  } else {
+    progress('build   the running watch build keeps packages/expo/dist current, so turbo build is skipped');
+  }
   cpSync(join(FIXTURE, 'package.sdk-57.json'), join(FIXTURE, 'package.json'));
   await mustStep(
     'pnpm add the workspace packages',
@@ -261,8 +265,12 @@ export const host: HostAdapter<ExpoHostScreen> = {
     const watch = await ensureWatch(progress);
     const metro = await ensureMetro(port, progress);
     if (lease.platform === 'android') {
-      const reverse = await run(sdkTool('adb'), ['-s', lease.deviceId, 'reverse', `tcp:${port}`, `tcp:${port}`]);
+      const adb = sdkTool('adb');
+      const reverse = await run(adb, ['-s', lease.deviceId, 'reverse', `tcp:${port}`, `tcp:${port}`]);
       if (reverse.code !== 0) throw new VerifyFailure('NOT_READY', `adb reverse tcp:${port} failed: ${reverse.stderr.trim()}`, 'bin/verify down --platform android, then bin/verify up --platform android');
+      await run(adb, ['-s', lease.deviceId, 'shell', 'am', 'force-stop', APP_ID]);
+      const prefs = await run(adb, ['-s', lease.deviceId, 'shell', `run-as ${APP_ID} sh -c 'mkdir -p shared_prefs && cat > shared_prefs/expo.modules.devmenu.sharedpreferences.xml'`], { input: ANDROID_DEV_MENU_PREFS });
+      if (prefs.code !== 0) throw new VerifyFailure('NOT_READY', `could not turn off the dev menu onboarding: ${prefs.stderr.trim()}`, 'bin/verify down --platform android, then bin/verify up --platform android');
     }
     return { entry: devClientEntry(lease.platform, port), processes: [watch, metro] };
   },

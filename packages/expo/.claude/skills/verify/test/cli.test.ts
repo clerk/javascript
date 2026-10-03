@@ -7,7 +7,7 @@ import { createOutput, exitCodeFor, parseArgv } from '../src/core/cli.ts';
 import { Secret } from '../src/core/secret.ts';
 import { featureMapCheck } from '../src/core/verbs.ts';
 import { host } from '../src/host.ts';
-import { VerifyFailure, type DoctorReport } from '../src/core/types.ts';
+import { VerifyFailure, type Command, type DoctorReport } from '../src/core/types.ts';
 
 function usageError(argv: readonly string[]): VerifyFailure {
   try {
@@ -29,6 +29,7 @@ describe('parseArgv', () => {
       verb: 'run',
       selection: { selectors: ['auth-start', 'sign-up/request-code'] },
       skip: [],
+      include: [],
       video: true,
       waitSeconds: 0,
     });
@@ -36,11 +37,14 @@ describe('parseArgv', () => {
       verb: 'run',
       selection: { all: true },
       skip: [],
+      include: [],
       grep: 'profile',
       video: false,
       waitSeconds: 0,
     });
     assert.equal((parseArgv(['run', 'auth-start', '--wait', '300']).command as { waitSeconds: number }).waitSeconds, 300);
+    assert.deepEqual((parseArgv(['run', 'auth-start', '--include', 'known-bug']).command as Extract<Command, { verb: 'run' }>).include, ['known-bug']);
+    assert.throws(() => parseArgv(['run', 'auth-start', '--include', 'form-entry']), { code: 'USAGE' });
     assert.deepEqual(parseArgv(['screen', '--png']).command, { verb: 'screen', png: true });
     assert.deepEqual(parseArgv(['attach', 'r20261002-141210-7c1e', '--pr', '412', '--screenshot', 'a', '--screenshot=b']).command, {
       verb: 'attach',

@@ -5,6 +5,8 @@ import { redact } from './secret.ts';
 import { agentDeviceStateDir } from './workspace.ts';
 import {
   FORM_ENTRY_TAG,
+  KNOWN_BUG_TAG,
+  type OptInTag,
   VerifyFailure,
   type ActiveRunContext,
   type E2EInvocation,
@@ -107,6 +109,11 @@ export function e2eOutputDir(skillDir: string, runDir: EvidencePath): string {
   return toPosix(relative(skillDir, join(runDir, 'e2e')));
 }
 
+export function excludedTags(command: Pick<RunCommand, 'skip' | 'include'>): readonly string[] {
+  const tags = [...new Set<OptInTag>([...command.skip, KNOWN_BUG_TAG])].filter((tag) => !command.include.includes(tag));
+  return tags.length === 0 ? [] : ['--exclude-tag', tags.join(',')];
+}
+
 export function planE2E(
   context: ActiveRunContext,
   specs: readonly SpecRef[],
@@ -126,7 +133,7 @@ export function planE2E(
     output,
     '--reporter',
     'list,markdown',
-    ...(command.skip.includes(FORM_ENTRY_TAG) ? ['--exclude-tag', FORM_ENTRY_TAG] : []),
+    ...excludedTags(command),
     ...(command.grep === undefined ? [] : ['--grep', command.grep]),
     ...(context.e2eVideo ? ['--video=on'] : []),
   ];
@@ -241,7 +248,12 @@ export function parseE2EReport(reportJson: unknown, specs: readonly SpecRef[], r
       const screenPath = screenArtifact === undefined ? null : join(runDir, 'e2e', 'artifacts', screenArtifact);
       let skipReason: string | null = null;
       if (status === 'skipped') {
-        skipReason = r.tags?.includes(FORM_ENTRY_TAG) && r.skip?.cause === 'filtered' ? `skipped by --skip ${FORM_ENTRY_TAG}` : `${r.skip?.cause ?? 'skipped'}: ${r.skip?.reason ?? ''}`.trim();
+        skipReason =
+          r.skip?.cause === 'filtered' && r.tags?.includes(KNOWN_BUG_TAG)
+            ? `skipped: ${KNOWN_BUG_TAG}`
+            : r.skip?.cause === 'filtered' && r.tags?.includes(FORM_ENTRY_TAG)
+              ? `skipped by --skip ${FORM_ENTRY_TAG}`
+              : `${r.skip?.cause ?? 'skipped'}: ${r.skip?.reason ?? ''}`.trim();
       }
       const message = notRun ? `not run: ${r.skip?.cause ?? 'skipped'} ${r.skip?.reason ?? ''}`.trim() : last?.error?.message;
       return {

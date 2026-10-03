@@ -36,7 +36,7 @@ export function composeE2EConfig(context: RunContext): E2EConfig {
   const targets = context.targets.map((target) => {
     const lease = JSON.parse(readFileSync(target.leaseFile, 'utf8')) as Lease;
     if (lease.backend !== 'local') {
-      throw new VerifyFailure('UNSUPPORTED', 'only local leases drive e2e for now', 'the EAS backend arrives with CLOUD-IOS');
+      throw new VerifyFailure('UNSUPPORTED', 'only local leases drive e2e for now', `run ${target.platform} on a local backend; the EAS backend is not built yet`);
     }
     return {
       name: target.platform,

@@ -59,7 +59,7 @@ function setup(buildMs: number, runtime?: HostAdapter['runtime']) {
   return { deps, events, progress };
 }
 
-const runCommand: Extract<Command, { verb: 'run' }> = { verb: 'run', selection: { all: true }, skip: [], video: false, waitSeconds: 0 };
+const runCommand: Extract<Command, { verb: 'run' }> = { verb: 'run', selection: { all: true }, skip: [], include: [], video: false, waitSeconds: 0 };
 
 describe('lease flow', () => {
   it('builds before it claims a lane', async () => {
