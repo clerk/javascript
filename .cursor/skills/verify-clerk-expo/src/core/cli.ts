@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { basename, dirname, join, relative } from 'node:path';
+import { basename, dirname, isAbsolute, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { run as defaultRunner } from './exec.ts';
 import { redact } from './secret.ts';
@@ -204,7 +204,7 @@ function renderRun(result: RunResult, skillDir: string): string[] {
   if (r.lastState !== null) lines.push(`  last state   ${describeState(r.lastState)}  (the last test only; every state is in states.jsonl)`);
   if (r.appLog !== null) lines.push(`  app log      ${basename(r.appLog)}`);
   if (r.tainted.length > 0) lines.push(`  TAINTED      ${r.tainted.map((t) => rel(result.dir, t)).join(', ')} (attach is blocked)`);
-  lines.push(`next  ${result.next.startsWith('bin/verify ') ? result.next : rel(process.cwd(), result.next)}`);
+  lines.push(`next  ${isAbsolute(result.next) ? rel(process.cwd(), result.next) : result.next}`);
   return lines;
 }
 
@@ -250,7 +250,7 @@ function render(value: VerbResult, skillDir: string): string[] {
               `deleted   ${count(value.deletedUsers, 'user')}, ${count(value.deletedOrganizations, 'organization')}`,
               stoppedLine('stopped', value.stoppedProcesses),
             ]),
-        `kept      ${value.keptRuns.length} runs in .verify/runs/`,
+        `kept      ${count(value.keptRuns.length, 'run')} in .verify/runs/`,
       ];
     default: {
       const exhaustive: never = value;

@@ -27,5 +27,4 @@ renovate.json5
 .typedoc/__tests__/__snapshots__/
 CLAUDE.md
 # verify skill sources are shared byte for byte with clerk-ios and clerk-android
-packages/expo/.claude/skills/verify/**/*.ts
-packages/expo/.claude/skills/verify/.verify/
+.cursor/skills/verify-clerk-expo/**/*.ts

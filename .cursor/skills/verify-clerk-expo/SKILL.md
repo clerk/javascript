@@ -1,11 +1,11 @@
 ---
-name: verify
+name: verify-clerk-expo
 description: Drive @clerk/expo in the expo-native fixture app (native AuthView, UserButton, UserProfileView, custom useSignIn and useSignUp flows, token cache) on a lane iOS simulator or Android emulator against a real Clerk dev instance, and capture video, screenshots, and host state as evidence. Use it to prove any change to packages/expo or the fixture works before calling it done, to reproduce a UI bug, or to run the golden regression specs.
 ---
 
-# verify
+# verify-clerk-expo
 
-`bin/verify` is a control CLI over [e2e](https://github.com/tester-army/e2e) 0.15.2 and `@e2e-dev/mobile` 0.9.0. It builds the `expo-native` fixture in `integration/templates/expo-native` as a Debug dev client, leases a lane simulator or emulator, serves `packages/expo` to it through a watch build and Metro, seeds `+clerk_test` users, runs specs, and keeps the evidence. Run every command from `packages/expo/.claude/skills/verify/`. Every verb takes `--json` and then prints one `{ "ok": ... }` object. Exit codes are 0 for ok, 1 for spec failures, 2 for usage errors, and 3 for a failed precondition. Every error carries a `fix`.
+`bin/verify` is a control CLI over [e2e](https://github.com/tester-army/e2e) 0.15.2 and `@e2e-dev/mobile` 0.9.0. It builds the `expo-native` fixture in `integration/templates/expo-native` as a Debug dev client, leases a lane simulator or emulator, serves `packages/expo` to it through a watch build and Metro, seeds `+clerk_test` users, runs specs, and keeps the evidence. Run every command from `.cursor/skills/verify-clerk-expo/`. Every verb takes `--json` and then prints one `{ "ok": ... }` object. Exit codes are 0 for ok, 1 for spec failures, 2 for usage errors, and 3 for a failed precondition. Every error carries a `fix`.
 
 The rule: no change to `@clerk/expo` UI or auth behavior is done until a `bin/verify run` on the real host shows the changed behavior, on each platform the change touches.
 
@@ -237,7 +237,7 @@ $ bin/verify down --stale                   # also finish cleanup left by a cras
 
 `down --platform <p>` releases only that platform's lane, but it still stops every Metro and the watch build this worktree started, because the ledger does not record which platform a process serves. Never run `down --platform ios` while an Android run in the same worktree is in flight, or the other way around. The next `up` or `run` starts the runtime again.
 
-`down` deletes only what this worktree created: its lane devices, the users in its ledger, and the processes in its ledger. Ledgers live at `~/.verify/ledgers/<id>.jsonl`, where `<id>` is a hash of the worktree path. It never deletes `.verify/runs/`. Evidence survives teardown at `packages/expo/.claude/skills/verify/.verify/runs/<run-id>/`, and `down` lists the kept runs. Run `down` after a failed iteration too, so no device or Metro is stranded.
+`down` deletes only what this worktree created: its lane devices, the users in its ledger, and the processes in its ledger. Ledgers live at `~/.verify/ledgers/<id>.jsonl`, where `<id>` is a hash of the worktree path. It never deletes `.verify/runs/`. Evidence survives teardown at `.cursor/skills/verify-clerk-expo/.verify/runs/<run-id>/`, and `down` lists the kept runs. Run `down` after a failed iteration too, so no device or Metro is stranded.
 
 `down` leaves the fixture's generated files (`package.json`, `node_modules/`, `ios/`, `android/` in `integration/templates/expo-native`) in place, so the next `up` reuses them. They are gitignored.
 
@@ -252,4 +252,4 @@ Evidence lives inside the worktree, so `git worktree remove` deletes `.verify/ru
 - `npm test` runs the CLI's unit tests (`node --test test/*.test.ts`), with no network, keys, or devices. `testing/` holds helper processes those tests spawn. `npm run typecheck` runs `tsc`.
 - `features/` is the Feature Map. Start with `features/README.md`.
 
-Keep the map honest with `/maintain-verification-skill`.
+Keep the map honest with pstack's `maintain-verification-skill`, which finds this skill at `.cursor/skills/verify-clerk-expo/`.

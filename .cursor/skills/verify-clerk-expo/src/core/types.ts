@@ -301,6 +301,8 @@ export interface SpecResult {
   readonly seconds: number;
   readonly error: string | null;
   readonly skipReason: string | null;
+  /** Why a skipped spec was left out on purpose: an opt-in tag the run excluded, or a platform the spec does not declare. */
+  readonly skippedBy: 'tag' | 'platform' | null;
   readonly tags: readonly string[];
   readonly failurePage: EvidencePath | null;
   readonly failureScreen: EvidencePath | null;

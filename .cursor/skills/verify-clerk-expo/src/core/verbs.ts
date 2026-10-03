@@ -6,7 +6,7 @@ import { isOrphaned, readClaims } from './claims.ts';
 import { INSTANCE_REQUIREMENTS, createClerkBackend, type ClerkBackend } from './clerk.ts';
 import { instancesWithKeys, loadInstanceKeys } from './keys.ts';
 import { backendFor, computeBuildKey, ensureLease, leaseLine, leaseView, readBuiltApp, releaseLease, selectBackend, type LeaseOutcome } from './devices.ts';
-import { collectScreenshots, contextFile, excludedTagNames, invokeE2E, parseE2EReport, planE2E, resolveSpecs, writeRunContext } from './e2e.ts';
+import { assertSomethingRan, collectScreenshots, contextFile, excludedTagNames, invokeE2E, parseE2EReport, planE2E, resolveSpecs, writeRunContext } from './e2e.ts';
 import { startBroker } from './broker.ts';
 import { assertPublishable, readRecord, readStates, sealEvidence } from './evidence.ts';
 import { isRunning, type Runner } from './exec.ts';
@@ -44,6 +44,7 @@ import {
   type ScratchPath,
   type ScreenNode,
   type ScreenResult,
+  type SpecResult,
   type TestEmail,
   type UpResult,
   type VerifyState,
@@ -341,6 +342,14 @@ export async function endRun(
   if (errors.length > 0) throw errors[0];
 }
 
+export function nextStep(run: RunId, dir: EvidencePath, results: readonly SpecResult[], selection: string): string {
+  const ran = assertSomethingRan(results, selection);
+  const failed = results.filter((r) => r.status === 'failed' || r.status === 'interrupted');
+  if (failed.length > 0) return failed[0]?.failurePage ?? join(dir, 'e2e.log');
+  if (ran === 'all-left-out') return 'nothing ran: every selected spec was left out by tag or platform, so the run proves nothing to post';
+  return `bin/verify attach ${run} --pr <n>`;
+}
+
 export async function leaseForRun<T>(deps: Deps, platform: Platform, command: Extract<Command, { verb: 'run' }>, drive: (outcome: RuntimeOutcome) => Promise<T>): Promise<T> {
   const key = await computeBuildKey(deps.host, platform, deps.workspace.worktree);
   const retryWith = `bin/verify run ${'all' in command.selection ? '--all' : command.selection.selectors.join(' ')} --wait <seconds>`;
@@ -456,11 +465,7 @@ export async function runVerb(deps: Deps, command: Extract<Command, { verb: 'run
       if (report === null) {
         throw new VerifyFailure('E2E_CRASHED', `e2e exited ${exitCode} before writing a report`, `read ${join(dir, 'e2e.log')}`);
       }
-      const failed = results.filter((r) => r.status === 'failed' || r.status === 'interrupted');
-      const next =
-        failed.length === 0
-          ? `bin/verify attach ${run} --pr <n>`
-          : (failed[0]?.failurePage ?? join(dir, 'e2e.log'));
+      const next = nextStep(run, dir, results, 'all' in command.selection ? '--all' : command.selection.selectors.join(' '));
       return { verb: 'run', dir, record, next };
     } finally {
       ledgerAgentDeviceDaemon(workspace);

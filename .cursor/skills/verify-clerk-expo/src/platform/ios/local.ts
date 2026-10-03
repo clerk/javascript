@@ -242,7 +242,7 @@ export function localIosBackend(options: LocalIosOptions = {}): DeviceBackend<Lo
             ? { id: 'template', ok: true, detail: `${TEMPLATE_NAME} (${template.runtime.replace(/^.*SimRuntime\./, '')})` }
             : { id: 'template', ok: false, detail: `${TEMPLATE_NAME} is ${template.state}; lanes clone it only while it is shut down`, fix: `xcrun simctl shutdown "${TEMPLATE_NAME}"` },
         await proxyTrustCheck(template),
-        await lanePortsCheck(),
+        await lanePortsCheck(claimsDir),
       ];
       return { toolchain, device };
     },
@@ -269,13 +269,14 @@ async function proxyTrustCheck(template: Simulator | undefined): Promise<DoctorC
     : { id: 'proxy-trust', ok: false, detail: `HTTPS proxy ${proxyName} is on and ${TEMPLATE_NAME} trusts no custom CA`, fix: `boot ${TEMPLATE_NAME}, install and trust the proxy CA, then shut it down` };
 }
 
-async function lanePortsCheck(): Promise<DoctorCheck> {
+async function lanePortsCheck(claimsDir: string): Promise<DoctorCheck> {
+  const booted = (await listSimulators()).filter((d) => d.state === 'Booted' && LANE_NAME.test(d.name));
   const claimed = new Set(
-    readClaims(defaultClaimsDir(), 'ios')
+    readClaims(claimsDir, 'ios')
       .filter((c) => !isOrphaned(c))
       .map((c) => c.deviceName as string),
   );
-  const foreign = (await listSimulators()).filter((d) => d.state === 'Booted' && LANE_NAME.test(d.name) && !claimed.has(d.name));
+  const foreign = booted.filter((d) => !claimed.has(d.name));
   if (foreign.length === 0) return { id: 'lane-ports', ok: true, detail: 'every booted verify-ios-<n> lane has a live claim' };
   return {
     id: 'lane-ports',

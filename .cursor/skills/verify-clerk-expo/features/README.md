@@ -4,7 +4,7 @@ This directory is the maintained source for verifying the user-facing behavior o
 
 ## Baseline preconditions
 
-- Run every command from `packages/expo/.claude/skills/verify/` in a worktree of clerk/javascript. Run `pnpm install` once at the repo root and `npm ci` once in the skill directory.
+- Run every command from `.cursor/skills/verify-clerk-expo/` in a worktree of clerk/javascript. Run `pnpm install` once at the repo root and `npm ci` once in the skill directory.
 - Run `bin/verify doctor --platform ios` (or `android`) first. Every check is `ok` except `build` before the first `bin/verify up`.
 - `integration/.keys.json` in the main clerk/javascript checkout (not a linked worktree) holds `pk` and `sk` for `with-email-codes`, `with-session-tasks`, and `with-session-tasks-setup-mfa`. Only the CLI reads it. Agents cannot read it, and the CLI never prints a key.
 - The CLI drives only its own lane devices. On iOS that is `verify-ios-<n>`, cloned from `Clerk Verify Template iOS`. On Android it is `Clerk_Verify_Pixel` booted `-read-only` as `emulator-5560` or `emulator-5562`. Never drive `iPhone Air`, a physical device, or a device another worktree holds.

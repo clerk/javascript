@@ -1,5 +1,5 @@
 {
-  "name": "clerk-expo-verify",
+  "name": "verify-clerk-expo",
   "private": true,
   "type": "module",
   "scripts": {

@@ -261,7 +261,10 @@ export function parseE2EReport(reportJson: unknown, specs: readonly SpecRef[], r
       const screenPath = artifactPath(last?.failure?.screen);
       const excludedBy = (tag: OptInTag) => excluded.includes(tag) && (r.tags ?? []).includes(tag);
       let skipReason: string | null = null;
+      let skippedBy: SpecResult['skippedBy'] = null;
       if (status === 'skipped') {
+        if (r.skip?.cause === 'platform-unavailable') skippedBy = 'platform';
+        else if (r.skip?.cause === 'filtered' && (excludedBy(KNOWN_BUG_TAG) || excludedBy(FORM_ENTRY_TAG))) skippedBy = 'tag';
         skipReason =
           r.skip?.cause === 'platform-unavailable'
             ? platformSkip(r.skip.reason)
@@ -280,6 +283,7 @@ export function parseE2EReport(reportJson: unknown, specs: readonly SpecRef[], r
         seconds: Math.round(attempts.reduce((sum, a) => sum + (a.durationMs ?? 0), 0) / 100) / 10,
         error: message === undefined ? null : redact(message.split('\n').filter((line) => line.trim().length > 0).join('; ')),
         skipReason,
+        skippedBy,
         tags: r.tags ?? [],
         failurePage: page === undefined ? null : (join(failuresDir, page) as EvidencePath),
         failureScreen: screenPath !== null && existsSync(screenPath) ? (screenPath as EvidencePath) : null,
@@ -309,4 +313,19 @@ export function collectScreenshots(reportJson: unknown, runDir: EvidencePath): r
     }
   }
   return [...out].map(([label, path]) => ({ label, path }));
+}
+
+/**
+ * Refuses a run in which no spec executed and none was left out on purpose: a --grep typo, a file that registers no
+ * tests, or e2e filtering everything for another reason. Without this, --pass-with-no-tests would make it a pass.
+ */
+export function assertSomethingRan(results: readonly SpecResult[], selection: string): 'ran' | 'all-left-out' {
+  if (results.some((r) => r.status !== 'skipped')) return 'ran';
+  if (results.some((r) => r.skippedBy !== null)) return 'all-left-out';
+  const reasons = [...new Set(results.map((r) => r.skipReason).filter((x): x is string => x !== null))];
+  throw new VerifyFailure(
+    'NO_SPECS',
+    `no test ran for ${selection}${reasons.length === 0 ? ': the selection registered no tests' : `: ${reasons.join('; ')}`}`,
+    'check the --grep pattern and the spec files; bin/verify run <feature> runs every test in it',
+  );
 }

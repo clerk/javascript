@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, openSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { isAlive, isRunning, run, sleep, type ProcessRef } from './core/exec.ts';
 import { LOCAL_POOL, VerifyFailure, type HostAdapter, type HostEntry, type Platform, type ScratchPath } from './core/types.ts';
 import {
@@ -31,10 +32,10 @@ const DEV_CLIENT_SCHEME = 'exp+clerk-expo-native-build-fixture';
 const IOS_PRODUCT = 'ClerkExpoNativeBuildFixture';
 const ANDROID_DEV_MENU_PREFS = `<?xml version='1.0' encoding='utf-8' standalone='yes' ?><map><boolean name="isOnboardingFinished" value="true" /><boolean name="showsAtLaunch" value="false" /><boolean name="showFab" value="false" /></map>`;
 
-const WORKTREE = new URL('../../../../../../', import.meta.url).pathname;
+const WORKTREE = fileURLToPath(new URL('../../../../', import.meta.url));
 const FIXTURE = join(WORKTREE, 'integration', 'templates', 'expo-native');
 const EXPO_PACKAGE = join(WORKTREE, 'packages', 'expo');
-const RUNTIME_DIR = new URL('../.verify/runtime/', import.meta.url).pathname;
+const RUNTIME_DIR = fileURLToPath(new URL('../.verify/runtime/', import.meta.url));
 
 type ExpoHostScreen = 'home' | 'auth' | 'nativeAuth' | 'userButton' | 'userProfile' | 'customSignIn' | 'customSignUp' | 'sso' | 'tokenCache';
 
