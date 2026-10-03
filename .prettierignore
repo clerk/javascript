@@ -26,3 +26,5 @@ renovate.json5
 # Frozen snapshots of TypeDoc-generated MDX; must match raw `extract-methods.mjs` output.
 .typedoc/__tests__/__snapshots__/
 CLAUDE.md
+# verify skill sources are shared byte for byte with clerk-ios and clerk-android
+packages/expo/.claude/skills/verify/**/*.ts

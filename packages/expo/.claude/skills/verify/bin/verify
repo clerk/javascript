@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+import { main } from '../src/core/cli.ts';
+import { host } from '../src/host.ts';
+
+process.exitCode = await main(process.argv.slice(2), host);
