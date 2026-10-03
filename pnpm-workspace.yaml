@@ -58,7 +58,7 @@ overrides:
   react-dom: 'catalog:react'
   rolldown: 'catalog:repo'
   'semver@<7.7.3': 7.7.4
-  'smol-toml@<1.6.1': 1.6.1
+  'smol-toml@<1.6.1': 1.7.1
   'socket.io-parser@>=4.0.0 <4.2.7': 4.2.7
   'svgo@>=3.0.0 <3.3.3': 4.0.2
   'tar@<7.5.21': 7.5.21
@@ -83,6 +83,8 @@ minimumReleaseAgeExclude:
   - '@tanstack/start-storage-context@1.167.36'
   - 'pkglab'
   - 'pkglab-*'
+  # Renovate security update: smol-toml@1.7.1
+  - smol-toml@1.7.1
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
