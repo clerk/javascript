@@ -162,7 +162,7 @@ function NameField({
         autoComplete={autoComplete}
         {...control}
       />
-      {error ? <Field.Error>{error}</Field.Error> : null}
+      <Field.Feedback feedback={feedback} />
     </Field.Root>
   );
 }
