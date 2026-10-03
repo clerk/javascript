@@ -11,6 +11,19 @@ Clerk's JavaScript SDK and library monorepo.
 - Every PR needs a changeset. `pnpm changeset` for package changes, `pnpm changeset:empty` for tooling/repo-only. Empty changesets are two `---` delimiters with no body. A changeset is a changelog entry for users upgrading the package, not a summary of the work done in the PR. Describe the user-facing change (what changed for someone consuming the library and how it affects them) rather than the implementation details of the diff. If a change has no user-facing impact, use an empty changeset.
 - PR descriptions follow `.github/PULL_REQUEST_TEMPLATE.md` and add no sections of their own. Never add a "Testing" (or "Test plan" / "How to test") section summarizing the tests written or the checks run; the Checklist covers that and reviewers read the diff. Describe the change, not the work done on it.
 
+## Verifying changes
+
+Prove a change to `@clerk/expo` UI or auth behavior on a real simulator or emulator before calling it done. The skill is `.claude/skills/verify-clerk-expo/`: read its `SKILL.md` and `features/README.md` first. Run the commands below from the repo root, after `pnpm install` and `npm ci --prefix .claude/skills/verify-clerk-expo` once per worktree. Cursor reads the same skill through the `.cursor/skills/verify-clerk-expo` symlink.
+
+1. `.claude/skills/verify-clerk-expo/bin/control-clerk-expo doctor --platform ios` (or `android`) checks the machine. Fix what it names.
+2. `.claude/skills/verify-clerk-expo/bin/control-clerk-expo up --platform ios` builds the dev client, leases a lane device, and starts Metro.
+3. `.claude/skills/verify-clerk-expo/bin/control-clerk-expo run <feature> --platform ios` runs that feature's golden specs and keeps video, screenshots, and state under `.verify/runs/`.
+4. `.claude/skills/verify-clerk-expo/bin/control-clerk-expo down` releases the device, deletes the test users the run created, and keeps the evidence.
+
+The skill rebuilds `@clerk/expo` and its Expo-module siblings itself. Changes to other workspace dependencies, such as `@clerk/clerk-js` or `@clerk/shared`, are verified after one build step you run: the skill refuses to launch on a `dist` built from other source content and prints the command.
+
+Use only test users: `+clerk_test` emails, phone numbers 555-0100 to 555-0199, and the code `424242`. Never type real credentials.
+
 ## References
 
 - For questions about theming, appearance customization, or the styled system, see `references/theming-architecture.md`.
