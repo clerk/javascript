@@ -83,6 +83,8 @@ minimumReleaseAgeExclude:
   - '@tanstack/start-storage-context@1.167.36'
   - 'pkglab'
   - 'pkglab-*'
+  # Renovate security update: electron@41.10.6
+  - electron@41.10.6
 
 trustPolicy: no-downgrade
 trustPolicyExclude:
