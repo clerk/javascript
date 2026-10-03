@@ -624,9 +624,8 @@ describe('Web3 wallets', () => {
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
       await user.click(screen.getByRole('button', { name: 'Connect Solana' }));
       const creation = holdRequests('post', '/v1/me/web3_wallets');
-      screen.getByRole('button', { name: 'Second Solana' }).focus();
+      await user.click(screen.getByRole('button', { name: 'Second Solana' }));
       act(() => {
-        fireEvent.click(screen.getByRole('button', { name: 'Second Solana' }));
         fireEvent.click(screen.getByRole('button', { name: 'Second Solana' }));
       });
       await waitFor(() => expect(creation.requests).toHaveLength(1));
