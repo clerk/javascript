@@ -4,7 +4,7 @@ import { dirname, join } from 'node:path';
 import { test as base } from '@e2e-dev/mobile';
 import { expect } from 'e2e';
 import { ASSERTION_TIMEOUT_MS, loadRunContext } from '../src/core/e2e-config.ts';
-import { appStart, describeState, parseVerifyState } from '../src/core/state.ts';
+import { appStart, describeState, parseVerifyState, performAppStart } from '../src/core/state.ts';
 import { agentDeviceStateDir } from '../src/core/workspace.ts';
 import type { host as hostAdapter } from '../src/host.ts';
 
@@ -133,8 +133,10 @@ export const test = base.extend<{ host: HostFixture<HostScreen> }>({
         const launch = await call<BrokerLaunchResponse>('/launch', request);
         lastScope = launch.storageScope;
         const start = appStart(target.platform, target.appId, target.entry, launch.launchArguments);
-        if (start.kind === 'open-app') await device.openApp(target.appId, { relaunch: true, launchArguments: start.launchArguments });
-        else for (const command of start.commands) await adb(target, command);
+        await performAppStart(start, target.appId, {
+          openApp: (appId, options) => (options === undefined ? device.openApp(appId) : device.openApp(appId, { relaunch: true, launchArguments: [...options.launchArguments] })),
+          adb: (args) => adb(target, args),
+        });
         const ready = (s: VerifyState) =>
           s.launchId === launch.launchId &&
           (s.lastError !== null || (s.environmentLoaded && (user === null || s.ticket === 'succeeded' || s.ticket === 'failed')));

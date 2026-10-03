@@ -90,10 +90,10 @@ export async function finishOrphanLedgers(
     const ledger = openWorkspace({ skillDir: join(worktree, '.claude', 'skills', 'verify'), worktree, home });
     if (ledger.unclosedEntries().length === 0) continue;
     try {
-      stopProcesses(ledger);
+      const stopped = stopProcesses(ledger);
       const deleted = await deleteIdentities(ledger, clerk());
       for (const entry of ledger.unclosedEntries()) ledger.append({ id: newEntryId(), kind: 'done', ref: entry.id });
-      progress(`reap    ledger of ${worktree}  (worktree is gone)  deleted ${deleted.users} users, ${deleted.organizations} organizations`);
+      progress(`reap    ledger of ${worktree}  (worktree is gone)  deleted ${deleted.users} users, ${deleted.organizations} organizations, stopped ${stopped.join(', ') || 'nothing'}`);
     } catch (error) {
       progress(`reap    ledger of ${worktree} left open: ${(error as Error).message}`);
     }

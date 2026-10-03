@@ -5,8 +5,8 @@ import { dirname, join } from 'node:path';
 import { isOrphaned, readClaims } from './claims.ts';
 import { INSTANCE_REQUIREMENTS, createClerkBackend, type ClerkBackend } from './clerk.ts';
 import { instancesWithKeys, loadInstanceKeys } from './keys.ts';
-import { backendFor, computeBuildKey, ensureLease, leaseView, readBuiltApp, releaseLease, selectBackend, type LeaseOutcome } from './devices.ts';
-import { collectScreenshots, contextFile, invokeE2E, parseE2EReport, planE2E, resolveSpecs, writeRunContext } from './e2e.ts';
+import { backendFor, computeBuildKey, ensureLease, leaseLine, leaseView, readBuiltApp, releaseLease, selectBackend, type LeaseOutcome } from './devices.ts';
+import { collectScreenshots, contextFile, excludedTagNames, invokeE2E, parseE2EReport, planE2E, resolveSpecs, writeRunContext } from './e2e.ts';
 import { startBroker } from './broker.ts';
 import { assertPublishable, readRecord, readStates, sealEvidence } from './evidence.ts';
 import { isRunning, type Runner } from './exec.ts';
@@ -25,6 +25,7 @@ import {
   type Command,
   type DeletionTarget,
   type DeviceBackend,
+  type Recording,
   type DoctorCheck,
   type DoctorReport,
   type DownResult,
@@ -309,6 +310,36 @@ function lastState(dir: EvidencePath): VerifyState | null {
   }
 }
 
+export async function endRun(
+  workspace: Workspace,
+  run: {
+    readonly recording: Recording | 'e2e-records' | null;
+    readonly recorderEntry: string | null;
+    readonly broker: { stop(): Promise<void> };
+    readonly scratch: ScratchPath;
+  },
+): Promise<void> {
+  const steps: (() => unknown)[] = [
+    async () => {
+      if (run.recording !== null && run.recording !== 'e2e-records') await run.recording.stop();
+    },
+    () => {
+      if (run.recorderEntry !== null) workspace.append({ id: newEntryId(), kind: 'done', ref: run.recorderEntry });
+    },
+    () => run.broker.stop(),
+    () => workspace.removeScratch(run.scratch),
+  ];
+  const errors: unknown[] = [];
+  for (const step of steps) {
+    try {
+      await step();
+    } catch (error) {
+      errors.push(error);
+    }
+  }
+  if (errors.length > 0) throw errors[0];
+}
+
 export async function leaseForRun<T>(deps: Deps, platform: Platform, command: Extract<Command, { verb: 'run' }>, drive: (outcome: RuntimeOutcome) => Promise<T>): Promise<T> {
   const key = await computeBuildKey(deps.host, platform, deps.workspace.worktree);
   return deps.workspace.withAcquireThenDevice(
@@ -318,6 +349,7 @@ export async function leaseForRun<T>(deps: Deps, platform: Platform, command: Ex
       const leased = await ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, clerk: deps.clerk });
       const outcome: RuntimeOutcome = { ...leased, entry: await startRuntime(deps, leased.lease) };
       writeStandingContext(deps, outcome);
+      deps.progress(leaseLine(outcome.view));
       return outcome;
     },
     drive,
@@ -374,10 +406,7 @@ export async function runVerb(deps: Deps, command: Extract<Command, { verb: 'run
         const invocation = planE2E(context, specs, command, platform, workspace.skillDir);
         ({ exitCode } = await invokeE2E(invocation, join(dir, 'e2e.log') as EvidencePath, workspace.skillDir, deps.progress));
       } finally {
-        if (recording !== null && recording !== 'e2e-records') await recording.stop();
-        if (recorderEntry !== null) workspace.append({ id: newEntryId(), kind: 'done', ref: recorderEntry });
-        await broker.stop();
-        workspace.removeScratch(scratch);
+        await endRun(workspace, { recording, recorderEntry, broker, scratch });
       }
 
       const appLog = join(dir, 'app.log') as EvidencePath;
@@ -392,7 +421,7 @@ export async function runVerb(deps: Deps, command: Extract<Command, { verb: 'run
       let unreadable: VerifyFailure | null = null;
       try {
         report = existsSync(reportFile) ? JSON.parse(readFileSync(reportFile, 'utf8')) : null;
-        results = report === null ? [] : parseE2EReport(report, specs, dir);
+        results = report === null ? [] : parseE2EReport(report, specs, dir, excludedTagNames(command));
         screenshots = report === null ? [] : collectScreenshots(report, dir);
       } catch (error) {
         unreadable = error instanceof VerifyFailure ? error : new VerifyFailure('E2E_CRASHED', `e2e's report could not be read: ${(error as Error).message}`, `read ${reportFile}`);
@@ -557,7 +586,12 @@ export function down(deps: Deps, command: Extract<Command, { verb: 'down' }>): P
   if (command.dryRun) return downUnlocked(deps, command);
   const platforms = command.platform === undefined ? deps.host.platforms : [platformOf(deps.host, command.platform)];
   const locked = platforms.reduce<() => Promise<DownResult>>(
-    (inner, platform) => () => deps.workspace.withAcquireLock(platform, () => deps.workspace.withDevice(platform, 0, inner)),
+    (inner, platform) => () =>
+      deps.workspace.withAcquireLock(
+        platform,
+        () => deps.workspace.withDevice(platform, 0, inner),
+        (owner) => deps.progress(`wait    another bin/verify in this worktree (pid ${owner.pid}) is building or leasing the device; down waits for it, with no time limit`),
+      ),
     () => downUnlocked(deps, command),
   );
   return locked();
@@ -578,11 +612,9 @@ async function downUnlocked(deps: Deps, command: Extract<Command, { verb: 'down'
     return {
       verb: 'down',
       dryRun: true,
-      released: plan.leases.map((l) => l.view),
-      deletedUsers: wouldDelete.filter((t) => t.kind === 'user').length,
-      deletedOrganizations: wouldDelete.filter((t) => t.kind === 'organization').length,
+      wouldRelease: plan.leases.map((l) => l.view),
       wouldDelete,
-      stoppedProcesses: [...new Set([...plan.processes.filter((p) => isRunning({ pid: p.pid, startedAt: Date.parse(p.startedAt) })).map((p) => `${p.what} ${p.pid}`), ...runningDaemon(workspace)])],
+      wouldStop: [...new Set([...plan.processes.filter((p) => isRunning({ pid: p.pid, startedAt: Date.parse(p.startedAt) })).map((p) => `${p.what} ${p.pid}`), ...runningDaemon(workspace)])],
       keptRuns: workspace.runs(),
     };
   }

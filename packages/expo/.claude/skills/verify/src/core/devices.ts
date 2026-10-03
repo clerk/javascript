@@ -60,6 +60,10 @@ export function leaseView(backend: DeviceBackend, lease: Lease, renewed: boolean
   };
 }
 
+export function leaseLine(view: LeaseView): string {
+  return `device  ${view.device}  ${view.backend}  ${view.renewed ? 'renewed' : 'leased by this worktree'}  installed ${view.installedBuild ?? 'nothing'}`;
+}
+
 const BUILD_DENYLIST = [/\.md$/i, /(^|\/)\.claude\//, /(^|\/)docs\//, /(^|\/)\.verify\//];
 
 export async function computeBuildKey(host: HostAdapter, platform: Platform, worktree: string): Promise<BuildKey> {
@@ -169,7 +173,9 @@ export async function ensureLease(
   if (lease.installedBuild !== app.key) {
     const target = lease;
     options.progress(`install ${app.key}  on ${backend.describe(target)}`);
-    await workspace.withDevice(platform, options.waitSeconds, () => backend.install(target, app));
+    await workspace.withDevice(platform, options.waitSeconds, () => backend.install(target, app), (owner) =>
+      options.progress(`wait    another bin/verify run in this worktree (pid ${owner.pid}) is driving the device; waiting up to ${options.waitSeconds}s to install`),
+    );
     lease = { ...target, installedBuild: app.key };
     workspace.writeLease(lease);
   }

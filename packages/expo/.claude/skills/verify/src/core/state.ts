@@ -101,7 +101,7 @@ export function parseVerifyState(text: string): VerifyState {
 }
 
 export function describeState(state: VerifyState): string {
-  const parts = [`screen=${state.screen}`, `signedIn=${state.signedIn}`];
+  const parts = [`screen=${state.screen}`, `signedIn=${state.signedIn}`, `userId=${state.userId ?? 'null'}`];
   if (state.sessionStatus) parts.push(`session=${state.sessionStatus}`);
   parts.push(`orgId=${state.orgId ?? 'null'}`);
   if (state.pendingTasks.length > 0) parts.push(`tasks=${state.pendingTasks.join(',')}`);
@@ -167,7 +167,12 @@ function shellQuote(value: string): string {
 export function appStart(platform: Platform, appId: string, entry: HostEntry, launchArguments: readonly string[]): AppStart {
   if (entry.kind === 'binary') return { kind: 'open-app', launchArguments };
   const all = [...entry.launchArguments, ...launchArguments];
-  if (platform === 'ios') return { kind: 'open-app', launchArguments: all };
+  if (platform === 'ios') {
+    if (entry.openLink !== null) {
+      throw new VerifyFailure('NOT_READY', 'a dev-client entry on iOS cannot use openLink yet', 'pass the URL as a launch argument in entry.launchArguments, such as --initialUrl <url>');
+    }
+    return { kind: 'open-app', launchArguments: all };
+  }
   if (entry.androidActivity === null) {
     throw new VerifyFailure('NOT_READY', 'a dev-client entry on Android needs androidActivity', 'set androidActivity in the entry src/host.ts returns');
   }
@@ -179,4 +184,19 @@ export function appStart(platform: Platform, appId: string, entry: HostEntry, la
       ['shell', start.map(shellQuote).join(' ')],
     ],
   };
+}
+
+export interface AppStartDriver {
+  openApp(appId: string, options?: { readonly relaunch: true; readonly launchArguments: readonly string[] }): Promise<void>;
+  adb(args: readonly string[]): Promise<void>;
+}
+
+/** After `am start`, a plain openApp binds the worker's agent-device session to the device without relaunching the app. */
+export async function performAppStart(start: AppStart, appId: string, driver: AppStartDriver): Promise<void> {
+  if (start.kind === 'open-app') {
+    await driver.openApp(appId, { relaunch: true, launchArguments: start.launchArguments });
+    return;
+  }
+  for (const command of start.commands) await driver.adb(command);
+  await driver.openApp(appId);
 }

@@ -86,7 +86,9 @@ export function localIosBackend(options: LocalIosOptions = {}): DeviceBackend<Lo
           'pass --wait 300 to wait for a lane (`bin/verify up --wait 300` or `bin/verify run <spec> --wait 300`), or run `bin/verify down` in a worktree that no longer needs its lane',
         );
       }
-      const waiting = `wait    all ${LOCAL_POOL.ios} iOS lanes are in use (${[...inUse].sort().join(', ')}); waiting up to ${request.waitSeconds}s for one to free`;
+      const changing = LOCAL_POOL.ios - inUse.size;
+      const names = `${[...inUse].sort().join(', ')}${changing > 0 ? `, and ${changing} changing hands` : ''}`;
+      const waiting = `wait    no free iOS lane of ${LOCAL_POOL.ios} (${names}); waiting up to ${request.waitSeconds}s for one`;
       if (waiting !== lastWait) request.progress(waiting);
       lastWait = waiting;
       await sleep(5000);

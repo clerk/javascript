@@ -109,8 +109,12 @@ export function e2eOutputDir(skillDir: string, runDir: EvidencePath): string {
   return toPosix(relative(skillDir, join(runDir, 'e2e')));
 }
 
+export function excludedTagNames(command: Pick<RunCommand, 'skip' | 'include'>): readonly OptInTag[] {
+  return [...new Set<OptInTag>([...command.skip, KNOWN_BUG_TAG])].filter((tag) => !command.include.includes(tag));
+}
+
 export function excludedTags(command: Pick<RunCommand, 'skip' | 'include'>): readonly string[] {
-  const tags = [...new Set<OptInTag>([...command.skip, KNOWN_BUG_TAG])].filter((tag) => !command.include.includes(tag));
+  const tags = excludedTagNames(command);
   return tags.length === 0 ? [] : ['--exclude-tag', tags.join(',')];
 }
 
@@ -230,7 +234,12 @@ const STATUS: Readonly<Record<string, SpecStatus>> = {
   skipped: 'skipped',
 };
 
-export function parseE2EReport(reportJson: unknown, specs: readonly SpecRef[], runDir: EvidencePath): readonly SpecResult[] {
+function platformSkip(reason: string | undefined): string {
+  const declared = /platforms \[([^\]]*)\]/.exec(reason ?? '')?.[1];
+  return declared === undefined ? `skipped: ${reason ?? 'other platform'}` : `skipped: ${declared.split(/,\s*/).join(' and ')} only`;
+}
+
+export function parseE2EReport(reportJson: unknown, specs: readonly SpecRef[], runDir: EvidencePath, excluded: readonly OptInTag[] = [KNOWN_BUG_TAG]): readonly SpecResult[] {
   const failuresDir = join(runDir, 'e2e', 'failures');
   const pages = existsSync(failuresDir) ? readdirSync(failuresDir) : [];
   const selected = new Set(specs.map((s) => s.path));
@@ -241,19 +250,22 @@ export function parseE2EReport(reportJson: unknown, specs: readonly SpecRef[], r
       const spec = specs.find((s) => s.path === file) ?? { kind: 'explored', path: file, feature: null };
       const attempts = r.attempts ?? [];
       const last = attempts.at(-1);
-      const notRun = r.status === 'skipped' && r.skip?.cause !== 'filtered';
+      const notRun = r.status === 'skipped' && r.skip?.cause !== 'filtered' && r.skip?.cause !== 'platform-unavailable';
       const status = notRun ? 'failed' : (STATUS[r.status ?? ''] ?? 'failed');
       const page = r.id === undefined ? undefined : pages.find((p) => p.endsWith(`-${r.id!.slice(0, 8)}.md`));
       const screenArtifact = last?.artifacts?.find((a) => a.id !== undefined && a.id === last.failure?.screen)?.path;
       const screenPath = screenArtifact === undefined ? null : join(runDir, 'e2e', 'artifacts', screenArtifact);
+      const excludedBy = (tag: OptInTag) => excluded.includes(tag) && (r.tags ?? []).includes(tag);
       let skipReason: string | null = null;
       if (status === 'skipped') {
         skipReason =
-          r.skip?.cause === 'filtered' && r.tags?.includes(KNOWN_BUG_TAG)
-            ? `skipped: ${KNOWN_BUG_TAG}`
-            : r.skip?.cause === 'filtered' && r.tags?.includes(FORM_ENTRY_TAG)
-              ? `skipped by --skip ${FORM_ENTRY_TAG}`
-              : `${r.skip?.cause ?? 'skipped'}: ${r.skip?.reason ?? ''}`.trim();
+          r.skip?.cause === 'platform-unavailable'
+            ? platformSkip(r.skip.reason)
+            : r.skip?.cause === 'filtered' && excludedBy(KNOWN_BUG_TAG)
+              ? `skipped: ${KNOWN_BUG_TAG}`
+              : r.skip?.cause === 'filtered' && excludedBy(FORM_ENTRY_TAG)
+                ? `skipped by --skip ${FORM_ENTRY_TAG}`
+                : `${r.skip?.cause ?? 'skipped'}: ${r.skip?.reason ?? ''}`.trim();
       }
       const message = notRun ? `not run: ${r.skip?.cause ?? 'skipped'} ${r.skip?.reason ?? ''}`.trim() : last?.error?.message;
       return {
@@ -264,6 +276,7 @@ export function parseE2EReport(reportJson: unknown, specs: readonly SpecRef[], r
         seconds: Math.round(attempts.reduce((sum, a) => sum + (a.durationMs ?? 0), 0) / 100) / 10,
         error: message === undefined ? null : redact(message.split('\n').filter((line) => line.trim().length > 0).join('; ')),
         skipReason,
+        tags: r.tags ?? [],
         failurePage: page === undefined ? null : (join(failuresDir, page) as EvidencePath),
         failureScreen: screenPath !== null && existsSync(screenPath) ? (screenPath as EvidencePath) : null,
       };

@@ -51,12 +51,11 @@ describe('down', () => {
     const { deps, workspace, released, deleted, run } = setup();
     const ledgerBefore = readFileSync(workspace.ledgerFile, 'utf8');
     const result = await down(deps, { verb: 'down', stale: false, dryRun: true });
-    assert.equal(result.dryRun, true);
-    assert.deepEqual(result.released.map((l) => l.device), ['verify-ios-2']);
-    assert.equal(result.deletedUsers, 2);
-    assert.equal(result.deletedOrganizations, 2);
+    assert.ok(result.dryRun);
+    assert.equal('deletedUsers' in result, false, 'a dry run reports nothing in the past tense');
+    assert.deepEqual(result.wouldRelease.map((l) => l.device), ['verify-ios-2']);
     assert.deepEqual(
-      (result.dryRun ? result.wouldDelete : []).map((t) => (t.kind === 'user' ? `${t.instance} ${t.id} ${t.email}` : `${t.instance} ${t.id} ${t.name}`)),
+      result.wouldDelete.map((t) => (t.kind === 'user' ? `${t.instance} ${t.id} ${t.email}` : `${t.instance} ${t.id} ${t.name}`)),
       [
         `with-email-codes user_with-email-codes ${newTestEmail(run, 1)}`,
         'with-email-codes org_1 Verify one',
@@ -75,6 +74,7 @@ describe('down', () => {
   it('releases the lease, deletes each identity once, tombstones, and keeps runs', async () => {
     const { deps, workspace, released, deleted, run } = setup();
     const result = await down(deps, { verb: 'down', stale: false, dryRun: false });
+    assert.ok(!result.dryRun);
     assert.deepEqual(released, ['UDID-2']);
     assert.equal(deleted.length, 2);
     assert.equal(result.deletedUsers, 2);
@@ -82,6 +82,7 @@ describe('down', () => {
     assert.deepEqual(workspace.unclosedEntries(), []);
     assert.ok(existsSync(workspace.runDir(run)), 'evidence survives');
     const again = await down(deps, { verb: 'down', stale: false, dryRun: false });
+    assert.ok(!again.dryRun);
     assert.equal(again.deletedUsers, 0);
     assert.deepEqual(again.released, []);
   });

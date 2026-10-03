@@ -3,6 +3,7 @@ import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { run as defaultRunner } from './exec.ts';
 import { redact } from './secret.ts';
+import { leaseLine } from './devices.ts';
 import { describeState } from './state.ts';
 import { defaultClerk, verbs, type Deps } from './verbs.ts';
 import { openWorkspace, parseRunId } from './workspace.ts';
@@ -193,6 +194,7 @@ function renderRun(result: RunResult, skillDir: string): string[] {
     const tail = x.status === 'skipped' ? (x.skipReason ?? '') : `${x.seconds}s`;
     lines.push(`  ${pad(label, 5)} ${pad(name, width)}  ${x.title}  ${tail}`);
     if (x.error !== null) lines.push(`        ${x.error}`);
+    if (x.status === 'passed' && x.tags.includes(KNOWN_BUG_TAG)) lines.push('        passed with --include known-bug: the bug may be fixed; drop the tag');
     if (x.failurePage !== null) lines.push(`        failure page  ${rel(skillDir, x.failurePage)}`);
   }
   lines.push(`evidence  ${rel(process.cwd(), result.dir)}`);
@@ -213,7 +215,7 @@ function render(value: VerbResult, skillDir: string): string[] {
     }
     case 'up':
       return [
-        ...value.leases.map((l) => `device  ${l.device}  ${l.backend}  ${l.renewed ? 'renewed' : 'leased by this worktree'}  installed ${l.installedBuild ?? 'nothing'}`),
+        ...value.leases.map(leaseLine),
       ];
     case 'run':
       return renderRun(value, skillDir);
@@ -234,11 +236,19 @@ function render(value: VerbResult, skillDir: string): string[] {
       return [`${value.alreadyPosted ? 'already posted' : 'posted'}  ${value.posted.map((p) => basename(p)).join(', ')}  ${value.commentUrl}`];
     case 'down':
       return [
-        ...(value.dryRun ? ['dry run: nothing was changed'] : []),
-        `${value.dryRun ? 'would release' : 'released'}  ${value.released.map((l) => l.device).join(', ') || 'nothing'}`,
-        `${value.dryRun ? 'would delete' : 'deleted'}   ${value.deletedUsers} users, ${value.deletedOrganizations} organizations`,
-        ...(value.dryRun ? value.wouldDelete : []).map((t) => (t.kind === 'user' ? `  user          ${t.instance}  ${t.id}  ${t.email}` : `  organization  ${t.instance}  ${t.id}  ${t.name}`)),
-        `${value.dryRun ? 'would stop' : 'stopped'}   ${value.stoppedProcesses.join(', ') || 'nothing'}${value.stoppedProcesses.some((p) => p.startsWith('agent-device ')) ? '' : '; no agent-device daemon running'}`,
+        ...(value.dryRun
+          ? [
+              'dry run: nothing was changed',
+              `would release  ${value.wouldRelease.map((l) => l.device).join(', ') || 'nothing'}`,
+              `would delete   ${value.wouldDelete.filter((t) => t.kind === 'user').length} users, ${value.wouldDelete.filter((t) => t.kind === 'organization').length} organizations`,
+              ...value.wouldDelete.map((t) => (t.kind === 'user' ? `  user          ${t.instance}  ${t.id}  ${t.email}` : `  organization  ${t.instance}  ${t.id}  ${t.name}`)),
+              stoppedLine('would stop', value.wouldStop),
+            ]
+          : [
+              `released  ${value.released.map((l) => l.device).join(', ') || 'nothing'}`,
+              `deleted   ${value.deletedUsers} users, ${value.deletedOrganizations} organizations`,
+              stoppedLine('stopped', value.stoppedProcesses),
+            ]),
         `kept      ${value.keptRuns.length} runs in .verify/runs/`,
       ];
     default: {
@@ -263,6 +273,11 @@ export function createOutput(json: boolean, skillDir: string, stdout: Sink = pro
       if (!json) stderr.write(`${redact(line)}\n`);
     },
   };
+}
+
+function stoppedLine(label: string, processes: readonly string[]): string {
+  const daemon = processes.some((p) => p.startsWith('agent-device ')) ? '' : '; no agent-device daemon running';
+  return `${label}   ${processes.join(', ') || 'nothing'}${daemon}`;
 }
 
 export function exitCodeFor(value: VerbResult): number {

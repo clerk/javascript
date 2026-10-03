@@ -43,7 +43,7 @@ export interface Workspace {
   entries(): readonly LedgerEntry[];
   unclosedEntries(): readonly LedgerEntry[];
   withAcquireLock<T>(platform: Platform, fn: (lock: AcquireLock) => Promise<T>, onWait?: (owner: ProcessRef) => void): Promise<T>;
-  withDevice<T>(platform: Platform, waitSeconds: number, fn: () => Promise<T>): Promise<T>;
+  withDevice<T>(platform: Platform, waitSeconds: number, fn: () => Promise<T>, onWait?: (owner: ProcessRef) => void): Promise<T>;
   withAcquireThenDevice<A, T>(
     platform: Platform,
     waitSeconds: number,
@@ -199,8 +199,8 @@ export function openWorkspace(options: WorkspaceOptions): Workspace {
     withAcquireLock(platform, fn, onWait) {
       return withSlotLock(acquireDir(platform), Number.POSITIVE_INFINITY, unreachable, () => fn({ platform } as AcquireLock), onWait);
     },
-    withDevice(platform, waitSeconds, fn) {
-      return withSlotLock(join(dir('locks'), `device-${platform}`), waitSeconds * 1000, () => deviceBusy(platform), fn);
+    withDevice(platform, waitSeconds, fn, onWait) {
+      return withSlotLock(join(dir('locks'), `device-${platform}`), waitSeconds * 1000, () => deviceBusy(platform), fn, onWait);
     },
     async withAcquireThenDevice(platform, waitSeconds, prepare, drive, onWait) {
       const releaseAcquire = await takeSlotLock(acquireDir(platform), Number.POSITIVE_INFINITY, unreachable, onWait?.acquire);
