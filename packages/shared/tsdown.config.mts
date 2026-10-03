@@ -62,10 +62,12 @@ export default defineConfig(({ watch, env }) => {
         const { chunkFileNames } = options;
         return {
           ...options,
-          chunkFileNames:
-            typeof chunkFileNames === 'function'
-              ? info => `_chunks/${chunkFileNames(info)}`
-              : `_chunks/${chunkFileNames ?? '[name]-[hash].js'}`,
+          chunkFileNames: info => {
+            const pattern =
+              typeof chunkFileNames === 'function' ? chunkFileNames(info) : (chunkFileNames ?? '[name]-[hash].js');
+            const isWalletCore = info.moduleIds.some(id => /[\\/]@wallet-standard[\\/]/.test(id));
+            return `_chunks/${isWalletCore ? 'wallet-standard-core-' : ''}${pattern}`;
+          },
         };
       },
     },

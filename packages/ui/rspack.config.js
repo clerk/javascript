@@ -18,6 +18,8 @@ const isProduction = mode => mode === 'production';
 const isDevelopment = mode => !isProduction(mode);
 
 const SHARED_REACT_MODULES = ['react', 'react-dom', 'react-dom/client', 'react/jsx-runtime'];
+const LAZY_WALLET_SHARED_MODULE =
+  /[\\/]shared[\\/]dist[\\/](?:react[\\/]hooks[\\/]useInstalledSolanaWallets|_chunks[\\/]wallet-standard-core-[^\\/]+)\.(?:mjs|js)$/;
 
 /**
  * Externals handler for the shared variant that reads React from globalThis.__clerkSharedModules.
@@ -106,6 +108,7 @@ const common = ({ mode, variant }) => {
               !!(
                 module instanceof rspack.NormalModule &&
                 module.resource &&
+                !LAZY_WALLET_SHARED_MODULE.test(module.resource) &&
                 !module.resource.includes('/components') &&
                 !module.resource.includes('node_modules')
               ),
