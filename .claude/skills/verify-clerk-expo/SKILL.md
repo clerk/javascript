@@ -230,6 +230,8 @@ $ .claude/skills/verify-clerk-expo/bin/control-clerk-expo attach <run-id> --pr <
 
 `attach` posts once per run with `gh pr comment --repo clerk/javascript --attach`. It refuses a run that is tainted, failed, or shows a user id the run did not create.
 
+Attach the focused run, not the regression run. Run your new or changed spec on its own (`.claude/skills/verify-clerk-expo/bin/control-clerk-expo run specs/explored/<name>.e2e.ts`, or `.claude/skills/verify-clerk-expo/bin/control-clerk-expo run <feature>/<spec>` once it is golden) and attach that run, so the PR video shows only the behavior the change is about. Run the golden specs for every feature you touched in a separate `run`, cite its run id in the PR as regression evidence, and leave its video in `.verify/runs/`.
+
 ## Cleanup
 
 ```console
