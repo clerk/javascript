@@ -11,7 +11,7 @@ import {
 import { AuthView, UserButton, UserProfileView, useAuthViewState } from '@clerk/expo/native';
 import { tokenCache } from '@clerk/expo/token-cache';
 import { type ReactNode, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { ActivityIndicator, Modal, Platform, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, Text, View } from 'react-native';
 
 import { CustomSignIn } from '../screens/CustomSignIn';
 import { CustomSignUp } from '../screens/CustomSignUp';
@@ -183,20 +183,10 @@ function Screen({ screen, launch, home, onShowHome }: HostProps & { screen: Veri
       );
     case 'nativeAuth':
       return (
-        <>
-          {home}
-          <Modal
-            animationType='slide'
-            visible
-            presentationStyle='pageSheet'
-            onRequestClose={onShowHome}
-          >
-            <AuthView
-              mode={launch.authMode}
-              onDismiss={onShowHome}
-            />
-          </Modal>
-        </>
+        <AuthView
+          mode={launch.authMode}
+          onDismiss={onShowHome}
+        />
       );
     case 'userButton':
       return <UserButtonScreen />;
