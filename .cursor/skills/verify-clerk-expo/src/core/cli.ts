@@ -10,6 +10,7 @@ import { openWorkspace, parseRunId } from './workspace.ts';
 import {
   FORM_ENTRY_TAG,
   KNOWN_BUG_TAG,
+  CLI_PLACEHOLDER,
   RETRYABLE,
   VerifyFailure,
   type BackendKind,
@@ -26,12 +27,12 @@ import {
 const VERBS: readonly Verb[] = ['doctor', 'up', 'run', 'screen', 'attach', 'down'];
 
 const USAGE_FIX = [
-  'bin/verify doctor [--platform p] [--backend b]',
-  'bin/verify up [--platform p] [--backend b] [--wait <seconds>]',
-  'bin/verify run <feature|feature/spec|path.e2e.ts>... | --all [--platform p] [--skip form-entry] [--include known-bug] [--grep re] [--no-video] [--wait <seconds>]',
-  'bin/verify screen [--platform p] [--png]',
-  'bin/verify attach <run-id> --pr <n> [--screenshot label]...',
-  'bin/verify down [--platform p] [--stale] [--dry-run]',
+  '{cli} doctor [--platform p] [--backend b]',
+  '{cli} up [--platform p] [--backend b] [--wait <seconds>]',
+  '{cli} run <feature|feature/spec|path.e2e.ts>... | --all [--platform p] [--skip form-entry] [--include known-bug] [--grep re] [--no-video] [--wait <seconds>]',
+  '{cli} screen [--platform p] [--png]',
+  '{cli} attach <run-id> --pr <n> [--screenshot label]...',
+  '{cli} down [--platform p] [--stale] [--dry-run]',
   'every verb takes --json',
 ].join('; ');
 
@@ -125,7 +126,7 @@ export function parseArgv(argv: readonly string[]): Invocation {
     case 'run': {
       const all = bools.has('all');
       if (all && positionals.length > 0) throw usage('pass selectors or --all, not both');
-      if (!all && positionals.length === 0) throw usage('bin/verify run needs a feature, feature/spec, path.e2e.ts, or --all');
+      if (!all && positionals.length === 0) throw usage('{cli} run needs a feature, feature/spec, path.e2e.ts, or --all');
       const tags = (flag: string, allowed: OptInTag) =>
         (lists.get(flag) ?? []).map((tag): OptInTag => {
           if (tag !== allowed) throw usage(`--${flag} takes ${allowed}, not ${tag}`);
@@ -151,7 +152,7 @@ export function parseArgv(argv: readonly string[]): Invocation {
       command = { verb, ...(platform === undefined ? {} : { platform }), png: bools.has('png') };
       break;
     case 'attach': {
-      if (positionals.length !== 1) throw usage('bin/verify attach takes exactly one run id');
+      if (positionals.length !== 1) throw usage('{cli} attach takes exactly one run id');
       const shots = lists.get('screenshot');
       command = { verb, run: parseRunId(positionals[0]!), pr: positiveInt('pr', values.get('pr'), undefined), screenshots: shots ?? 'all' };
       break;
@@ -259,19 +260,21 @@ function render(value: VerbResult, skillDir: string): string[] {
   }
 }
 
-export function createOutput(json: boolean, skillDir: string, stdout: Sink = process.stdout, stderr: Sink = process.stderr): Output {
+/** Every line passes the redactor, and every CLI_PLACEHOLDER becomes the command as the host says to type it. */
+export function createOutput(json: boolean, skillDir: string, cli: string, stdout: Sink = process.stdout, stderr: Sink = process.stderr): Output {
+  const text = (value: string) => redact(value).replaceAll(CLI_PLACEHOLDER, cli);
   return {
     result(value) {
-      if (json) stdout.write(`${redact(JSON.stringify({ ok: true, ...value }))}\n`);
-      else stdout.write(`${redact(render(value, skillDir).join('\n'))}\n`);
+      if (json) stdout.write(`${text(JSON.stringify({ ok: true, ...value }))}\n`);
+      else stdout.write(`${text(render(value, skillDir).join('\n'))}\n`);
     },
     failure(error) {
       const body = { code: error.code, message: error.message, fix: error.fix, retryable: RETRYABLE.has(error.code) };
-      if (json) stdout.write(`${redact(JSON.stringify({ ok: false, error: body }))}\n`);
-      else stderr.write(`${redact(`error  ${error.code}  ${error.message}\n      fix: ${error.fix}`)}\n`);
+      if (json) stdout.write(`${text(JSON.stringify({ ok: false, error: body }))}\n`);
+      else stderr.write(`${text(`error  ${error.code}  ${error.message}\n      fix: ${error.fix}`)}\n`);
     },
     progress(line) {
-      if (!json) stderr.write(`${redact(line)}\n`);
+      if (!json) stderr.write(`${text(line)}\n`);
     },
   };
 }
@@ -295,10 +298,10 @@ export async function main(argv: readonly string[], host: HostAdapter): Promise<
     invocation = parseArgv(argv);
   } catch (error) {
     const failure = error instanceof VerifyFailure ? error : usage(String(error));
-    createOutput(argv.includes('--json'), SKILL_DIR).failure(failure);
+    createOutput(argv.includes('--json'), SKILL_DIR, host.cli).failure(failure);
     return 2;
   }
-  const out = createOutput(invocation.json, SKILL_DIR);
+  const out = createOutput(invocation.json, SKILL_DIR, host.cli);
   try {
     const worktree = execFileSync('git', ['rev-parse', '--show-toplevel'], { cwd: SKILL_DIR, encoding: 'utf8' }).trim();
     const workspace = openWorkspace({ skillDir: SKILL_DIR, worktree });
@@ -340,7 +343,7 @@ export async function main(argv: readonly string[], host: HostAdapter): Promise<
     return exitCodeFor(result);
   } catch (error) {
     const failure =
-      error instanceof VerifyFailure ? error : new VerifyFailure('NOT_READY', (error as Error).message ?? String(error), 'run `bin/verify doctor`, then retry');
+      error instanceof VerifyFailure ? error : new VerifyFailure('NOT_READY', (error as Error).message ?? String(error), 'run `{cli} doctor`, then retry');
     out.failure(failure);
     return failure.code === 'USAGE' ? 2 : 3;
   }

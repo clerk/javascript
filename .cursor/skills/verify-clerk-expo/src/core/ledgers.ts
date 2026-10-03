@@ -89,9 +89,9 @@ export async function finishOrphanLedgers(
   const dir = join(home, 'ledgers');
   if (!existsSync(dir)) return;
   for (const name of readdirSync(dir).filter((n) => n.endsWith('.owner'))) {
-    const worktree = readFileSync(join(dir, name), 'utf8').trim();
+    const [worktree = '', skillDir] = readFileSync(join(dir, name), 'utf8').trim().split('\n');
     if (worktree === self || existsSync(worktree)) continue;
-    const ledger = openWorkspace({ skillDir: join(worktree, '.claude', 'skills', 'verify'), worktree, home });
+    const ledger = openWorkspace({ skillDir: skillDir ?? worktree, worktree, home });
     if (ledger.unclosedEntries().length === 0) continue;
     try {
       const stopped = stopProcesses(ledger);

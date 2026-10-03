@@ -111,7 +111,7 @@ function step(command: string, args: readonly string[], cwd: string, env: Readon
 
 async function mustStep(what: string, command: string, args: readonly string[], cwd: string, env?: Readonly<Record<string, string>>): Promise<void> {
   const result = await step(command, args, cwd, env);
-  if (result.code !== 0) throw new VerifyFailure('BUILD_FAILED', `${what} exited ${result.code}:\n${result.tail}`, 'fix the error above, then rerun bin/verify up');
+  if (result.code !== 0) throw new VerifyFailure('BUILD_FAILED', `${what} exited ${result.code}:\n${result.tail}`, 'fix the error above, then rerun {cli} up');
 }
 
 async function withFixtureLock<T>(fn: () => Promise<T>): Promise<T> {
@@ -251,14 +251,14 @@ async function ensureMetro(started: Started, port: number, progress: (line: stri
   const name = `metro-${port}`;
   const running = readRuntime(name);
   if (running !== null) {
-    await waitFor(`Metro pid ${running.pid} on port ${port} to answer`, () => metroAnswers(port), 120_000, name, `bin/verify down, then retry; read ${runtimeLog(name)}`);
+    await waitFor(`Metro pid ${running.pid} on port ${port} to answer`, () => metroAnswers(port), 120_000, name, `{cli} down, then retry; read ${runtimeLog(name)}`);
     return running;
   }
   if (await metroAnswers(port)) {
     throw new VerifyFailure('NOT_READY', `port ${port} already serves a Metro that this worktree did not start`, `stop the process listening on ${port} (lsof -nP -iTCP:${port} -sTCP:LISTEN)`);
   }
   const cli = join(FIXTURE, 'node_modules', 'expo', 'bin', 'cli');
-  if (!existsSync(cli)) throw new VerifyFailure('NOT_READY', 'the expo-native fixture has no node_modules', 'bin/verify up');
+  if (!existsSync(cli)) throw new VerifyFailure('NOT_READY', 'the expo-native fixture has no node_modules', '{cli} up');
   const ref = startDetached(name, 'metro', [cli, 'start', '--port', String(port), '--dev-client'], FIXTURE);
   started.names.push(name);
   progress(`metro   :${port}  expo start (pid ${ref.pid})`);
@@ -318,7 +318,7 @@ async function ensureServed(metro: RuntimeProcess, port: number, platform: Platf
         ? `metro   :${port}  ${pending.length} served file(s) changed since the last launch; waiting until Metro's ${platform} bundle has the new code`
         : `metro   :${port}  no served file changed since the last launch`,
   );
-  const fix = `retry bin/verify up --platform ${platform}; if it fails again, read ${runtimeLog(name)}`;
+  const fix = `retry {cli} up --platform ${platform}; if it fails again, read ${runtimeLog(name)}`;
   const url = await (async () => {
     let last = '';
     let delay = 500;
@@ -428,6 +428,7 @@ async function buildAndroid(into: string): Promise<string> {
 
 export const host: HostAdapter<ExpoHostScreen> = {
   repo: 'clerk-expo',
+  cli: '.cursor/skills/verify-clerk-expo/bin/control-clerk-expo',
   platforms: ['ios', 'android'],
   screens: ['home', 'auth', 'nativeAuth', 'userButton', 'userProfile', 'customSignIn', 'customSignUp', 'sso', 'tokenCache'],
   keysFile: 'integration/.keys.json',
@@ -436,7 +437,7 @@ export const host: HostAdapter<ExpoHostScreen> = {
   buildInputs: nativeInputs,
   buildSources: (_platform, os) => (os === 'darwin' ? ['local'] : ['eas-build']),
   async build(platform, source, key, into, progress) {
-    if (source !== 'local') throw new VerifyFailure('UNSUPPORTED', `the Expo host builds only locally for now (asked for ${source})`, 'run bin/verify up on a Mac with Xcode and Android Studio');
+    if (source !== 'local') throw new VerifyFailure('UNSUPPORTED', `the Expo host builds only locally for now (asked for ${source})`, 'run {cli} up on a Mac with Xcode and Android Studio');
     const path = await withFixtureLock(async () => {
       await prepareFixture(progress);
       progress(`build   expo prebuild --clean --platform ${platform}`);
@@ -460,10 +461,10 @@ export const host: HostAdapter<ExpoHostScreen> = {
       if (lease.platform === 'android') {
         const adb = sdkTool('adb');
         const reverse = await run(adb, ['-s', lease.deviceId, 'reverse', `tcp:${port}`, `tcp:${port}`]);
-        if (reverse.code !== 0) throw new VerifyFailure('NOT_READY', `adb reverse tcp:${port} failed: ${reverse.stderr.trim()}`, 'bin/verify down --platform android, then bin/verify up --platform android');
+        if (reverse.code !== 0) throw new VerifyFailure('NOT_READY', `adb reverse tcp:${port} failed: ${reverse.stderr.trim()}`, '{cli} down --platform android, then {cli} up --platform android');
         await run(adb, ['-s', lease.deviceId, 'shell', 'am', 'force-stop', APP_ID]);
         const prefs = await run(adb, ['-s', lease.deviceId, 'shell', `run-as ${APP_ID} sh -c 'mkdir -p shared_prefs && cat > shared_prefs/expo.modules.devmenu.sharedpreferences.xml'`], { input: ANDROID_DEV_MENU_PREFS });
-        if (prefs.code !== 0) throw new VerifyFailure('NOT_READY', `could not turn off the dev menu onboarding: ${prefs.stderr.trim()}`, 'bin/verify down --platform android, then bin/verify up --platform android');
+        if (prefs.code !== 0) throw new VerifyFailure('NOT_READY', `could not turn off the dev menu onboarding: ${prefs.stderr.trim()}`, '{cli} down --platform android, then {cli} up --platform android');
       }
       return { entry: devClientEntry(lease.platform, port), processes: [watch, metro] };
     } catch (error) {

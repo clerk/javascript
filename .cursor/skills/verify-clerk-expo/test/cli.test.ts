@@ -99,10 +99,10 @@ describe('Output', () => {
     sk.use('bapi-authorization', () => undefined);
     let written = '';
     const sink = { write: (text: string) => (written += text) };
-    const human = createOutput(false, '/tmp', sink, sink);
+    const human = createOutput(false, '/tmp', 'bin/control-x', sink, sink);
     human.progress('calling with sk_test_unitTestValue123456 now');
     human.failure(new VerifyFailure('NOT_READY', 'header was Bearer sk_test_unitTestValue123456', 'retry'));
-    const json = createOutput(true, '/tmp', sink, sink);
+    const json = createOutput(true, '/tmp', 'bin/control-x', sink, sink);
     json.failure(new VerifyFailure('NOT_READY', 'sk_test_unitTestValue123456', 'retry'));
     assert.ok(!written.includes('sk_test_unitTestValue123456'), written);
     assert.equal(written.match(/<redacted>/g)?.length, 3);
@@ -113,7 +113,7 @@ describe('Output', () => {
   it('prints one Outcome envelope under --json and keeps progress off stdout', () => {
     let out = '';
     let err = '';
-    const output = createOutput(true, '/tmp', { write: (t: string) => (out += t) }, { write: (t: string) => (err += t) });
+    const output = createOutput(true, '/tmp', 'bin/control-x', { write: (t: string) => (out += t) }, { write: (t: string) => (err += t) });
     const report: DoctorReport = { verb: 'doctor', ok: false, backend: { ios: 'local' }, checks: [{ id: 'build', ok: false, detail: 'none', fix: 'verify up' }] };
     output.progress('building');
     output.result(report);
@@ -147,7 +147,7 @@ describe('doctor feature-map check', () => {
 describe('down output', () => {
   const render = (stoppedProcesses: readonly string[]) => {
     let out = '';
-    createOutput(false, '/tmp', { write: (t: string) => (out += t) }, { write: () => true }).result({
+    createOutput(false, '/tmp', 'bin/control-x', { write: (t: string) => (out += t) }, { write: () => true }).result({
       verb: 'down',
       dryRun: false,
       released: [],
@@ -168,5 +168,23 @@ describe('down output', () => {
 
   it('says no daemon ran when the ledger had none', () => {
     assert.match(render([]), /stopped   nothing; no agent-device daemon running/);
+  });
+});
+
+describe('the CLI name', () => {
+  it('prints fixes, usage, and next hints with the host command, never a built-in name', () => {
+    let out = '';
+    const sink = { write: (t: string) => (out += t) };
+    const output = createOutput(false, '/tmp', 'tools/bin/control-acme', sink, sink);
+    output.failure(usageError(['run']));
+    output.failure(new VerifyFailure('NOT_READY', 'no device is leased', '{cli} up'));
+    output.progress('wait    another {cli} run in this worktree is driving the device');
+    assert.match(out, /fix: tools\/bin\/control-acme up/);
+    assert.match(out, /tools\/bin\/control-acme run <feature/);
+    assert.match(out, /another tools\/bin\/control-acme run in this worktree/);
+    assert.doesNotMatch(out, /\{cli\}|bin\/verify/);
+    let json = '';
+    createOutput(true, '/tmp', 'control-acme', { write: (t: string) => (json += t) }, sink).failure(new VerifyFailure('NOT_READY', 'x', '{cli} doctor'));
+    assert.equal((JSON.parse(json) as { error: { fix: string } }).error.fix, 'control-acme doctor');
   });
 });

@@ -24,10 +24,10 @@ export function loadRunContext(env: Readonly<Record<string, string | undefined>>
   const named = env.VERIFY_CONTEXT;
   if (named !== undefined && named !== '') return parseContext(readFileSync(named, 'utf8'), named);
   if (!existsSync(STANDING_CONTEXT)) {
-    throw new VerifyFailure('NOT_READY', 'no device is leased for this worktree', 'bin/verify up');
+    throw new VerifyFailure('NOT_READY', 'no device is leased for this worktree', '{cli} up');
   }
   const context = parseContext(readFileSync(STANDING_CONTEXT, 'utf8'), STANDING_CONTEXT);
-  if (!context.targets.every((t) => existsSync(t.leaseFile))) throw new VerifyFailure('NOT_READY', 'the lease this context names was released', 'bin/verify up');
+  if (!context.targets.every((t) => existsSync(t.leaseFile))) throw new VerifyFailure('NOT_READY', 'the lease this context names was released', '{cli} up');
   return context;
 }
 

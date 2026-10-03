@@ -35,7 +35,7 @@ export async function listSimulators(): Promise<readonly Simulator[]> {
 
 async function simctl(args: readonly string[], what: string): Promise<string> {
   const result = await run('xcrun', ['simctl', ...args]);
-  if (result.code !== 0) throw new VerifyFailure('NOT_READY', `${what} failed: ${result.stderr.trim() || result.stdout.trim()}`, 'run `bin/verify doctor`');
+  if (result.code !== 0) throw new VerifyFailure('NOT_READY', `${what} failed: ${result.stderr.trim() || result.stdout.trim()}`, 'run `{cli} doctor`');
   return result.stdout;
 }
 
@@ -83,7 +83,7 @@ export function localIosBackend(options: LocalIosOptions = {}): DeviceBackend<Lo
         throw new VerifyFailure(
           'POOL_FULL',
           `${inUse.size} of ${LOCAL_POOL.ios} iOS lanes are in use on this Mac (${[...inUse].sort().join(', ')})`,
-          `rerun with a longer --wait than ${request.waitSeconds}s, for example ${request.retryWith.replace('<seconds>', String(Math.max(600, request.waitSeconds * 2)))}, or run bin/verify down in a worktree that no longer needs its lane`,
+          `rerun with a longer --wait than ${request.waitSeconds}s, for example ${request.retryWith.replace('<seconds>', String(Math.max(600, request.waitSeconds * 2)))}, or run {cli} down in a worktree that no longer needs its lane`,
         );
       }
       const changing = LOCAL_POOL.ios - inUse.size;
@@ -198,7 +198,7 @@ export function localIosBackend(options: LocalIosOptions = {}): DeviceBackend<Lo
         child.stderr.on('data', onData);
         child.on('close', (code) => {
           clearTimeout(timer);
-          reject(new VerifyFailure('NOT_READY', `simctl recordVideo exited ${code}: ${seen.trim()}`, 'rerun with --no-video, or `bin/verify down` and `bin/verify up`'));
+          reject(new VerifyFailure('NOT_READY', `simctl recordVideo exited ${code}: ${seen.trim()}`, 'rerun with --no-video, or `{cli} down` and `{cli} up`'));
         });
       });
       const recording: Recording = {

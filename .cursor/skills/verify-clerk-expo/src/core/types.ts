@@ -5,6 +5,9 @@ export type Brand<T, B extends string> = T & { readonly [brand]: B };
 
 export const HOST_CONTRACT_VERSION = 1 as const;
 
+/** Core messages name the CLI with this token. Output swaps in HostAdapter.cli, so no CLI name is hard-coded in core. */
+export const CLI_PLACEHOLDER = '{cli}';
+
 export type Platform = 'ios' | 'android';
 
 /** Proof that the caller holds the per-platform acquire lock. Only Workspace.withAcquireLock mints one. */
@@ -487,6 +490,8 @@ export const LOCAL_POOL: Readonly<Record<Platform, number>> = { ios: 4, android:
 
 export interface HostAdapter<S extends string = string> {
   readonly repo: 'clerk-ios' | 'clerk-android' | 'clerk-expo';
+  /** The CLI as a user types it from the repo root, e.g. '.cursor/skills/verify-clerk-ios/bin/control-clerk-ios'. */
+  readonly cli: string;
   readonly platforms: readonly Platform[];
   readonly screens: readonly S[];
   readonly keysFile: string;

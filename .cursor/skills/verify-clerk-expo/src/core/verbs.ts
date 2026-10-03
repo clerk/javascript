@@ -214,13 +214,13 @@ export async function doctor(deps: Deps, command: Extract<Command, { verb: 'doct
 
   const key = await computeBuildKey(host, platform, workspace.worktree);
   const built = readBuiltApp(workspace, key);
-  checks.push(check('build', built !== null, built === null ? `no ${host.appId(platform)} build for ${key}` : `${key} at ${built.path}`, 'bin/verify up'));
+  checks.push(check('build', built !== null, built === null ? `no ${host.appId(platform)} build for ${key}` : `${key} at ${built.path}`, '{cli} up'));
 
   const gh = await runner('gh', ['pr', 'comment', '--help']);
   checks.push(check('gh-attach', gh.code === 0 && gh.stdout.includes('--attach'), gh.code === 0 ? (gh.stdout.includes('--attach') ? 'gh pr comment supports --attach' : 'gh pr comment has no --attach') : 'gh is not installed', 'install a gh build with `gh pr comment --attach`'));
 
   const stale = readClaims(workspace.claimsDir, platform).filter(isOrphaned);
-  checks.push(check('stale-claims', stale.length === 0, stale.length === 0 ? 'none' : `${stale.map((c) => c.deviceName).join(', ')} belong to deleted worktrees`, 'bin/verify down --stale'));
+  checks.push(check('stale-claims', stale.length === 0, stale.length === 0 ? 'none' : `${stale.map((c) => c.deviceName).join(', ')} belong to deleted worktrees`, '{cli} down --stale'));
 
   checks.push(
     agentDeviceDaemonCheck([
@@ -279,11 +279,11 @@ function targetOf(deps: Deps, outcome: RuntimeOutcome): RunContext['targets'][nu
 export async function up(deps: Deps, command: Extract<Command, { verb: 'up' }>): Promise<UpResult> {
   const platform = platformOf(deps.host, command.platform);
   return deps.workspace.withAcquireLock(platform, async (lock) => {
-    const leased = await ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, clerk: deps.clerk, retryWith: 'bin/verify up --wait <seconds>' });
+    const leased = await ensureLease(lock, command.backend, deps.workspace, deps.host, { waitSeconds: command.waitSeconds, progress: deps.progress, clerk: deps.clerk, retryWith: '{cli} up --wait <seconds>' });
     const outcome = { ...leased, entry: await startRuntime(deps, leased.lease) };
     writeStandingContext(deps, outcome);
     return { verb: 'up', leases: [outcome.view], builds: [outcome.build] };
-  }, (owner) => deps.progress(`wait    another bin/verify in this worktree (pid ${owner.pid}) is leasing the device; waiting for it, with no time limit`));
+  }, (owner) => deps.progress(`wait    another {cli} in this worktree (pid ${owner.pid}) is leasing the device; waiting for it, with no time limit`));
 }
 
 async function gitFacts(runner: Runner, worktree: string): Promise<{ head: string; dirty: boolean }> {
@@ -347,16 +347,16 @@ export function nextStep(run: RunId, dir: EvidencePath, results: readonly SpecRe
   const failed = results.filter((r) => r.status === 'failed' || r.status === 'interrupted');
   if (failed.length > 0) return failed[0]?.failurePage ?? join(dir, 'e2e.log');
   if (ran === 'all-left-out') return 'nothing ran: every selected spec was left out by tag or platform, so the run proves nothing to post';
-  return `bin/verify attach ${run} --pr <n>`;
+  return `{cli} attach ${run} --pr <n>`;
 }
 
 export async function leaseForRun<T>(deps: Deps, platform: Platform, command: Extract<Command, { verb: 'run' }>, drive: (outcome: RuntimeOutcome) => Promise<T>): Promise<T> {
   const key = await computeBuildKey(deps.host, platform, deps.workspace.worktree);
-  const retryWith = `bin/verify run ${'all' in command.selection ? '--all' : command.selection.selectors.join(' ')} --wait <seconds>`;
+  const retryWith = `{cli} run ${'all' in command.selection ? '--all' : command.selection.selectors.join(' ')} --wait <seconds>`;
   const deviceWait = {
     seconds: command.waitSeconds,
     busyFix: `let the other run in this worktree finish, or rerun with a wait: ${retryWith}`,
-    onWait: (owner: ProcessRef) => deps.progress(`wait    another bin/verify run in this worktree (pid ${owner.pid}) is driving the device; waiting up to ${command.waitSeconds}s`),
+    onWait: (owner: ProcessRef) => deps.progress(`wait    another {cli} run in this worktree (pid ${owner.pid}) is driving the device; waiting up to ${command.waitSeconds}s`),
   };
   return deps.workspace.withAcquireThenDevice(
     platform,
@@ -369,7 +369,7 @@ export async function leaseForRun<T>(deps: Deps, platform: Platform, command: Ex
       return outcome;
     },
     drive,
-    (owner) => deps.progress(`wait    another bin/verify in this worktree (pid ${owner.pid}) is building ${key} or leasing the device; waiting for it, with no time limit`),
+    (owner) => deps.progress(`wait    another {cli} in this worktree (pid ${owner.pid}) is building ${key} or leasing the device; waiting for it, with no time limit`),
   );
 }
 
@@ -484,7 +484,7 @@ interface SnapshotNode {
 
 function heldLease(deps: Deps, platform: Platform): { lease: Lease; backend: DeviceBackend } {
   const lease = deps.workspace.readLease(platform);
-  if (lease === null) throw new VerifyFailure('NOT_READY', `this worktree holds no ${platform} device`, 'bin/verify up');
+  if (lease === null) throw new VerifyFailure('NOT_READY', `this worktree holds no ${platform} device`, '{cli} up');
   return { lease, backend: backendFor(deps.host, platform, lease.backend) };
 }
 
@@ -508,18 +508,18 @@ export function screenNodes(snapshot: readonly SnapshotNode[]): readonly ScreenN
 export async function screen(deps: Deps, command: Extract<Command, { verb: 'screen' }>): Promise<ScreenResult> {
   const platform = platformOf(deps.host, command.platform);
   const { lease, backend } = heldLease(deps, platform);
-  if ((await backend.check(lease)) !== 'held') throw new VerifyFailure('LEASE_LOST', `${backend.describe(lease)} is gone`, 'bin/verify up');
+  if ((await backend.check(lease)) !== 'held') throw new VerifyFailure('LEASE_LOST', `${backend.describe(lease)} is gone`, '{cli} up');
   const { CLERK_TEST_KEYS_JSON: _keys, ...env } = deps.env;
   const agentDevice = (args: readonly string[]) =>
     deps.runner(join(deps.workspace.skillDir, 'node_modules', '.bin', 'agent-device'), args, { env: { ...env, AGENT_DEVICE_STATE_DIR: deps.workspace.agentDeviceDir } });
-  const screenWait = { seconds: 10, busyFix: 'let the run in this worktree finish, then rerun bin/verify screen' };
+  const screenWait = { seconds: 10, busyFix: 'let the run in this worktree finish, then rerun {cli} screen' };
   return deps.workspace.withDevice(platform, screenWait, async () => {
     const target = backend.agentDeviceTarget(lease);
     const selector = platform === 'ios' ? ['--platform', 'ios', '--udid', target.deviceId] : ['--platform', 'android', '--serial', target.deviceId];
     const session = ['--session', `${agentDeviceSession(deps.workspace, platform)}-screen`];
     // Without --relaunch, open attaches the session to the running app process instead of restarting it.
     const opened = await agentDevice(['open', deps.host.appId(platform), '--json', ...selector, ...session]);
-    if (opened.code !== 0) throw new VerifyFailure('NOT_READY', `agent-device open failed: ${redact(opened.stdout.trim() || opened.stderr.trim())}`, 'bin/verify up, then retry');
+    if (opened.code !== 0) throw new VerifyFailure('NOT_READY', `agent-device open failed: ${redact(opened.stdout.trim() || opened.stderr.trim())}`, '{cli} up, then retry');
     const snap = await agentDevice(['snapshot', '--json', ...selector, ...session]);
     if (snap.code !== 0) throw new VerifyFailure('NOT_READY', `agent-device snapshot failed: ${redact(snap.stderr.trim() || snap.stdout.trim())}`, 'run a spec first so the app is open, then retry');
     const parsed = JSON.parse(snap.stdout) as { data?: { nodes?: SnapshotNode[] } };
@@ -540,7 +540,7 @@ export async function screen(deps: Deps, command: Extract<Command, { verb: 'scre
       mkdirSync(dir, { recursive: true });
       png = join(dir, `${new Date().toISOString().replace(/[:.]/g, '-')}.png`) as ScratchPath;
       const shot = await agentDevice(['screenshot', png, ...selector, ...session]);
-      if (shot.code !== 0) throw new VerifyFailure('NOT_READY', `agent-device screenshot failed: ${redact(shot.stderr.trim())}`, 'retry, or check `bin/verify doctor`');
+      if (shot.code !== 0) throw new VerifyFailure('NOT_READY', `agent-device screenshot failed: ${redact(shot.stderr.trim())}`, 'retry, or check `{cli} doctor`');
     }
     await agentDevice(['close', ...selector, ...session]);
     ledgerAgentDeviceDaemon(deps.workspace);
@@ -551,7 +551,7 @@ export async function screen(deps: Deps, command: Extract<Command, { verb: 'scre
 export async function attach(deps: Deps, command: Extract<Command, { verb: 'attach' }>): Promise<AttachResult> {
   const run = parseRunId(command.run);
   const dir = deps.workspace.runDir(run);
-  if (!existsSync(dir)) throw new VerifyFailure('USAGE', `no run ${run} in ${deps.workspace.root}/runs`, 'pass a run id that `bin/verify run` printed');
+  if (!existsSync(dir)) throw new VerifyFailure('USAGE', `no run ${run} in ${deps.workspace.root}/runs`, 'pass a run id that `{cli} run` printed');
   const record = readRecord(dir);
   const publishable = assertPublishable(record, readStates(dir));
   return postToPullRequest(publishable, dir, deps.host, command.pr, command.screenshots, deps.runner);
@@ -605,11 +605,11 @@ export function down(deps: Deps, command: Extract<Command, { verb: 'down' }>): P
             {
               seconds: Number.POSITIVE_INFINITY,
               busyFix: '',
-              onWait: (owner) => deps.progress(`wait    another bin/verify run in this worktree (pid ${owner.pid}) is driving the device; down waits for it, with no time limit`),
+              onWait: (owner) => deps.progress(`wait    another {cli} run in this worktree (pid ${owner.pid}) is driving the device; down waits for it, with no time limit`),
             },
             inner,
           ),
-        (owner) => deps.progress(`wait    another bin/verify in this worktree (pid ${owner.pid}) is building or leasing the device; down waits for it, with no time limit`),
+        (owner) => deps.progress(`wait    another {cli} in this worktree (pid ${owner.pid}) is building or leasing the device; down waits for it, with no time limit`),
       ),
     () => downUnlocked(deps, command),
   );

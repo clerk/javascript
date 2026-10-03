@@ -97,7 +97,7 @@ async function ensureBuild(host: HostAdapter, platform: Platform, workspace: Wor
   if (existing !== null) return { app: existing, view: { platform, key, source: existing.source, reused: true, seconds: 0 } };
   const source = host.buildSources(platform, process.platform)[0];
   if (source !== 'local') {
-    throw new VerifyFailure('UNSUPPORTED', `${host.repo} cannot build ${platform} on ${process.platform} yet (build sources here: ${host.buildSources(platform, process.platform).join(', ') || 'none'})`, `run bin/verify up on a machine where ${host.repo} builds ${platform} locally`);
+    throw new VerifyFailure('UNSUPPORTED', `${host.repo} cannot build ${platform} on ${process.platform} yet (build sources here: ${host.buildSources(platform, process.platform).join(', ') || 'none'})`, `run {cli} up on a machine where ${host.repo} builds ${platform} locally`);
   }
   const started = Date.now();
   progress(`build   ${key}  ${source}  building...`);
@@ -130,7 +130,7 @@ export async function ensureLease(
   const { platform } = lock;
   const held = workspace.readLease(platform);
   if (held !== null && requested !== undefined && held.backend !== requested) {
-    throw new VerifyFailure('NOT_READY', `this worktree holds a ${held.backend} ${platform} lease, not ${requested}`, 'bin/verify down');
+    throw new VerifyFailure('NOT_READY', `this worktree holds a ${held.backend} ${platform} lease, not ${requested}`, '{cli} down');
   }
   const backend = selectBackend(host, platform, requested, held);
   for (const stale of await backend.reapable()) {
@@ -178,7 +178,7 @@ export async function ensureLease(
       seconds: options.waitSeconds,
       busyFix: `let the run in this worktree finish, or rerun with a wait: ${options.retryWith}`,
       onWait: (owner: ProcessRef) =>
-        options.progress(`wait    another bin/verify run in this worktree (pid ${owner.pid}) is driving the device; waiting up to ${options.waitSeconds}s to install`),
+        options.progress(`wait    another {cli} run in this worktree (pid ${owner.pid}) is driving the device; waiting up to ${options.waitSeconds}s to install`),
     };
     await workspace.withDevice(platform, wait, () => backend.install(target, app));
     lease = { ...target, installedBuild: app.key };

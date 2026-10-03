@@ -35,7 +35,7 @@ export function sealEvidence(
 
 export function readRecord(dir: EvidencePath): EvidenceRecord {
   const file = join(dir, 'run.json');
-  if (!existsSync(file)) throw new VerifyFailure('EVIDENCE_UNSAFE', `${dir} has no run.json, so it was never sealed`, 'run the specs again with `bin/verify run`');
+  if (!existsSync(file)) throw new VerifyFailure('EVIDENCE_UNSAFE', `${dir} has no run.json, so it was never sealed`, 'run the specs again with `{cli} run`');
   return JSON.parse(readFileSync(file, 'utf8')) as EvidenceRecord;
 }
 
@@ -54,7 +54,7 @@ export function assertPublishable(record: EvidenceRecord, states: readonly Verif
   const refuse = (message: string, fix: string): never => {
     throw new VerifyFailure('EVIDENCE_UNSAFE', message, fix);
   };
-  if (record.sealed !== true) refuse(`run ${record.run} is not sealed`, 'run the specs again with `bin/verify run`');
+  if (record.sealed !== true) refuse(`run ${record.run} is not sealed`, 'run the specs again with `{cli} run`');
   if (record.tainted.length > 0) refuse(`run ${record.run} has secret values in ${record.tainted.join(', ')}`, 'do not attach this run; rerun and attach the new run');
   const failed = record.results.filter((r) => r.status === 'failed' || r.status === 'interrupted');
   if (failed.length > 0) refuse(`run ${record.run} has ${failed.length} failing spec(s)`, 'fix the failures and attach a passing run');

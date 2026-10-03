@@ -221,7 +221,7 @@ interface WireResult {
 function wireResults(reportJson: unknown): readonly WireResult[] {
   const report = reportJson as { schemaVersion?: unknown; run?: { results?: unknown } } | null;
   if (report?.schemaVersion !== 'report-1' || !Array.isArray(report.run?.results)) {
-    throw new VerifyFailure('E2E_CRASHED', 'e2e wrote a report this skill cannot read (expected schemaVersion report-1)', 'check e2e-pins with `bin/verify doctor`');
+    throw new VerifyFailure('E2E_CRASHED', 'e2e wrote a report this skill cannot read (expected schemaVersion report-1)', 'check e2e-pins with `{cli} doctor`');
   }
   return report.run.results as WireResult[];
 }
@@ -326,6 +326,6 @@ export function assertSomethingRan(results: readonly SpecResult[], selection: st
   throw new VerifyFailure(
     'NO_SPECS',
     `no test ran for ${selection}${reasons.length === 0 ? ': the selection registered no tests' : `: ${reasons.join('; ')}`}`,
-    'check the --grep pattern and the spec files; bin/verify run <feature> runs every test in it',
+    'check the --grep pattern and the spec files; {cli} run <feature> runs every test in it',
   );
 }

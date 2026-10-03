@@ -18,7 +18,7 @@ function malformed(detail: string): VerifyFailure {
   return new VerifyFailure(
     'HOST_CONTRACT_MISMATCH',
     `verify.state is not a VerifyState: ${detail}`,
-    'rebuild the host with `bin/verify up` so it matches this skill',
+    'rebuild the host with `{cli} up` so it matches this skill',
   );
 }
 
@@ -47,7 +47,7 @@ export function parseVerifyState(text: string): VerifyState {
     throw new VerifyFailure(
       'HOST_CONTRACT_MISMATCH',
       `host reports contract v${String(raw.v)}, this skill speaks v${HOST_CONTRACT_VERSION}`,
-      'rebuild the host from this worktree with `bin/verify up`, or update the skill',
+      'rebuild the host from this worktree with `{cli} up`, or update the skill',
     );
   }
   if (typeof raw.screen !== 'string') throw malformed('screen is not a string');

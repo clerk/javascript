@@ -72,7 +72,7 @@ export function newRunId(now: Date = new Date()): RunId {
 
 const RUN_ID = /^r\d{8}-\d{6}-[0-9a-f]{4}$/;
 export function parseRunId(value: string): RunId {
-  if (!RUN_ID.test(value)) throw new VerifyFailure('USAGE', `${value} is not a run id`, 'pass an id like r20261002-141210-7c1e from `bin/verify run`');
+  if (!RUN_ID.test(value)) throw new VerifyFailure('USAGE', `${value} is not a run id`, 'pass an id like r20261002-141210-7c1e from `{cli} run`');
   return value as RunId;
 }
 
@@ -82,7 +82,7 @@ function isPlatform(value: unknown): value is Platform {
 
 function parseLease(text: string, file: string): Lease {
   const raw: unknown = JSON.parse(text);
-  const bad = () => new VerifyFailure('LEASE_LOST', `${file} is not a lease`, 'bin/verify down, then bin/verify up');
+  const bad = () => new VerifyFailure('LEASE_LOST', `${file} is not a lease`, '{cli} down, then {cli} up');
   if (typeof raw !== 'object' || raw === null) throw bad();
   const r = raw as Record<string, unknown>;
   if (!isPlatform(r.platform) || typeof r.acquiredAt !== 'string') throw bad();
@@ -188,7 +188,7 @@ export function openWorkspace(options: WorkspaceOptions): Workspace {
     append(entry) {
       mkdirSync(join(home, 'ledgers'), { recursive: true });
       const owner = join(home, 'ledgers', `${worktreeId}.owner`);
-      if (!existsSync(owner)) writePrivate(owner, `${resolve(options.worktree)}\n`);
+      if (!existsSync(owner)) writePrivate(owner, `${resolve(options.worktree)}\n${resolve(options.skillDir)}\n`);
       appendFileSync(ledgerFile, `${JSON.stringify(entry)}\n`, { mode: 0o600, flag: 'a' });
     },
     entries: readEntries,

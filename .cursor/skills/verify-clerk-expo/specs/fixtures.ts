@@ -62,14 +62,14 @@ export const test = base.extend<{ host: HostFixture<HostScreen> }>({
   host: async ({ app, device, screen, platform }, use) => {
     const context = loadRunContext();
     const target = context.targets.find((t) => t.platform === platform);
-    if (target === undefined) throw new VerifyFailure('NOT_READY', `the run context has no ${platform} target`, 'bin/verify up');
+    if (target === undefined) throw new VerifyFailure('NOT_READY', `the run context has no ${platform} target`, '{cli} up');
     const statesFile = context.run === null ? null : join(context.workspace, 'runs', context.run, 'states.jsonl');
     let lastText: string | null = null;
     let lastScope: StorageScope | null = null;
 
     async function call<T>(path: string, body: unknown): Promise<T> {
       if (context.broker === null) {
-        throw new VerifyFailure('NOT_READY', 'host needs the broker that `bin/verify run` starts', 'run this spec with `bin/verify run <path>`');
+        throw new VerifyFailure('NOT_READY', 'host needs the broker that `{cli} run` starts', 'run this spec with `{cli} run <path>`');
       }
       const token = readFileSync(context.broker.tokenFile, 'utf8');
       const response = await fetch(`${context.broker.url}${path}`, {

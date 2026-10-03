@@ -87,7 +87,7 @@ describe('lease flow', () => {
     await leaseForRun(deps, 'ios', runCommand, async () => {
       await assert.rejects(leaseForRun(deps, 'ios', runCommand, async () => undefined), (error: VerifyFailure) => {
         assert.equal(error.code, 'DEVICE_BUSY');
-        assert.match(error.fix, /bin\/verify run --all --wait <seconds>/, 'the fix names run, the verb that takes --wait');
+        assert.match(error.fix, /\{cli\} run --all --wait <seconds>/, 'the fix names run, the verb that takes --wait');
         return true;
       });
     });

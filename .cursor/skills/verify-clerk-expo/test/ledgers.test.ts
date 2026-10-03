@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, it } from 'node:test';
@@ -70,7 +70,7 @@ describe('up finishes ledgers of deleted worktrees', () => {
     const deleted: string[] = [];
     const { host, clerk } = fakes(deleted);
     const workspace = openWorkspace({ skillDir: live, worktree: live, home });
-    const options = { waitSeconds: 0, progress: () => undefined, clerk: () => clerk, retryWith: 'bin/verify up --wait <seconds>' };
+    const options = { waitSeconds: 0, progress: () => undefined, clerk: () => clerk, retryWith: '{cli} up --wait <seconds>' };
     await workspace.withAcquireLock('ios', (lock) => ensureLease(lock, undefined, workspace, host, options));
 
     assert.deepEqual(deleted.sort(), [newTestEmail(run, 1), newTestEmail(run, 2)].sort());
@@ -93,8 +93,30 @@ describe('up finishes ledgers of deleted worktrees', () => {
     const failing = { deleteByEmail: async () => assert.fail('BAPI is down') } as Partial<ClerkBackend> as ClerkBackend;
     const lines: string[] = [];
     const workspace = openWorkspace({ skillDir: live, worktree: live, home });
-    await workspace.withAcquireLock('ios', (lock) => ensureLease(lock, undefined, workspace, host, { waitSeconds: 0, progress: (l) => lines.push(l), clerk: () => failing, retryWith: 'bin/verify up --wait <seconds>' }));
+    await workspace.withAcquireLock('ios', (lock) => ensureLease(lock, undefined, workspace, host, { waitSeconds: 0, progress: (l) => lines.push(l), clerk: () => failing, retryWith: '{cli} up --wait <seconds>' }));
     assert.equal(openWorkspace({ skillDir: gone, worktree: gone, home }).unclosedEntries().length, 1);
     assert.ok(lines.some((l) => l.includes('left open')));
+  });
+
+  it('reaps a removed worktree whose skill lived at a non-default path, using the path its ledger recorded', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'verify-ledgers-'));
+    const home = join(root, 'home');
+    const live = worktree(root, 'live');
+    const gone = worktree(root, 'gone');
+    const skillDir = join(gone, '.cursor', 'skills', 'verify-acme');
+    const run = newRunId();
+    const goneLedger = openWorkspace({ skillDir, worktree: gone, home });
+    goneLedger.append({ id: newEntryId(), kind: 'identity', run, instance: 'with-email-codes', email: newTestEmail(run, 1) });
+    const owner = readFileSync(goneLedger.ledgerFile.replace(/\.jsonl$/, '.owner'), 'utf8').trim().split('\n');
+    assert.deepEqual(owner, [gone, skillDir], 'the ledger records its worktree and its skill directory');
+    rmSync(gone, { recursive: true });
+    const deleted: string[] = [];
+    const { host, clerk } = fakes(deleted);
+    const workspace = openWorkspace({ skillDir: live, worktree: live, home });
+    await workspace.withAcquireLock('ios', (lock) =>
+      ensureLease(lock, undefined, workspace, host, { waitSeconds: 0, progress: () => undefined, clerk: () => clerk, retryWith: '{cli} up --wait <seconds>' }),
+    );
+    assert.deepEqual(deleted, [newTestEmail(run, 1)]);
+    assert.deepEqual(openWorkspace({ skillDir, worktree: gone, home }).unclosedEntries(), []);
   });
 });

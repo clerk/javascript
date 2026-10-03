@@ -46,6 +46,6 @@ describe('a run in which nothing executed', () => {
   });
 
   it('suggests attach after a run with a passing spec', () => {
-    assert.match(nextStep(run, dir, results([{ status: 'passed' }], ['known-bug']), 'auth-start'), /^bin\/verify attach r20261003-000000-abcd/);
+    assert.match(nextStep(run, dir, results([{ status: 'passed' }], ['known-bug']), 'auth-start'), /^\{cli\} attach r20261003-000000-abcd/);
   });
 });
