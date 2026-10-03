@@ -808,9 +808,6 @@ importers:
       '@clerk/clerk-js':
         specifier: workspace:^
         version: link:../clerk-js
-      '@clerk/localizations':
-        specifier: workspace:^
-        version: link:../localizations
       '@stylexjs/eslint-plugin':
         specifier: 0.19.0
         version: 0.19.0
