@@ -412,6 +412,7 @@ describe('User profile MFA', () => {
       await waitFor(() => expect(prepare.requests).toHaveLength(1));
       prepare.fail('phone_number_invalid', 'Unable to send a code.');
       await waitFor(() => expect(screen.getByText('Unable to send a code.')).toBeVisible());
+      await waitFor(() => expect(number).toBeEnabled());
       serveFapi(fapi);
     }
     await user.clear(number);
