@@ -267,7 +267,6 @@ export const host: HostAdapter<ExpoHostScreen> = {
     return { entry: devClientEntry(lease.platform, port), processes: [watch, metro] };
   },
   entry: (platform) => devClientEntry(platform, 8081),
-  logPredicates: { ios: 'subsystem == "com.facebook.react.log"' },
   features: ['native-auth-view', 'user-button-and-profile', 'custom-flow-sign-in', 'custom-flow-sign-up', 'token-cache-persistence', 'native-js-sync'],
   backends: [localIosBackend(), localAndroidBackend()],
 };

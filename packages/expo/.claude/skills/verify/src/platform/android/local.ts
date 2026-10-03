@@ -37,6 +37,12 @@ export function parseAdbDevices(stdout: string): ReadonlyMap<string, string> {
   );
 }
 
+/** Logcat filter specs (`Tag:Level`, space separated) from HostAdapter.logPredicates go before the final `*:S`. */
+export function logFilter(extraPredicate?: string): readonly string[] {
+  const extra = extraPredicate?.split(/\s+/).filter((spec) => spec.length > 0) ?? [];
+  return [...LOG_FILTER.slice(0, -1), ...extra, '*:S'];
+}
+
 export function logcatSince(since: Date): string {
   return (since.getTime() / 1000).toFixed(3);
 }
@@ -170,6 +176,7 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     kind: 'local',
     platform: 'android',
     supports: (os) => os === 'darwin' || os === 'linux',
+    requirement: 'the Android SDK emulator and adb, with the Clerk_Verify_Pixel AVD',
 
     async acquire(request) {
       if (!listsAvd((await exec(emulatorBin, ['-list-avds'])).stdout)) {
@@ -242,8 +249,8 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
       return startScreenrecord({ adbBin, serial: lease.deviceId, into, exec });
     },
 
-    async logs(lease, since) {
-      const result = await adb(lease.deviceId, ['logcat', '-d', '-v', 'threadtime', '-T', logcatSince(since), ...LOG_FILTER]);
+    async logs(lease, since, extraPredicate) {
+      const result = await adb(lease.deviceId, ['logcat', '-d', '-v', 'threadtime', '-T', logcatSince(since), ...logFilter(extraPredicate)]);
       return result.stdout;
     },
 
@@ -251,17 +258,17 @@ export function localAndroidBackend(options: LocalAndroidOptions = {}): DeviceBa
     describe: (lease) => lease.deviceName,
 
     async doctorChecks() {
-      const checks: DoctorCheck[] = [jdkCheck()];
+      const device: DoctorCheck[] = [];
       const avds = await exec(emulatorBin, ['-list-avds']);
       const adbVersion = await exec(adbBin, ['version']);
       if (avds.code !== 0 || adbVersion.code !== 0) {
-        checks.push({ id: 'template', ok: false, detail: 'the Android SDK emulator or adb is not installed', fix: 'install the Android SDK (Android Studio) and set ANDROID_HOME' });
+        device.push({ id: 'template', ok: false, detail: 'the Android SDK emulator or adb is not installed', fix: 'install the Android SDK (Android Studio) and set ANDROID_HOME' });
       } else if (!listsAvd(avds.stdout)) {
-        checks.push({ id: 'template', ok: false, detail: `no Android Virtual Device named ${AVD_NAME}`, fix: AVD_FIX });
+        device.push({ id: 'template', ok: false, detail: `no Android Virtual Device named ${AVD_NAME}`, fix: AVD_FIX });
       } else {
-        checks.push({ id: 'template', ok: true, detail: `${AVD_NAME}; lanes boot it -read-only on ports ${lanePort(1)} to ${lanePort(LOCAL_POOL.android)}` });
+        device.push({ id: 'template', ok: true, detail: `${AVD_NAME}; lanes boot it -read-only on ports ${lanePort(1)} to ${lanePort(LOCAL_POOL.android)}` });
       }
-      return checks;
+      return { toolchain: [jdkCheck()], device };
     },
   };
   return backend;

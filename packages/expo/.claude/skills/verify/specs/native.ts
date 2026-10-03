@@ -19,3 +19,8 @@ export function nativeProfile(screen: Screen) {
     signOut: screen.getByText('Sign out'),
   };
 }
+
+export async function closeStrongPasswordSheet(screen: Screen & { getByText(text: string): Locator }, tap: (target: Locator) => Promise<void>): Promise<void> {
+  const sheet = screen.getByText('Use Strong Password?');
+  if (await sheet.isVisible().catch(() => false)) await tap(screen.getByTestId('xmark'));
+}

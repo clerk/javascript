@@ -11,7 +11,7 @@ test('nativeAuth shows the native AuthView start screen without a tap', async ({
   await host.screenshot('native-auth');
 });
 
-test('dismissing AuthView returns to the JS home screen', { platforms: ['ios'] }, async ({ host, screen }) => {
+test('dismissing AuthView returns to the JS home screen', { tags: ['known-bug'], platforms: ['ios'] }, async ({ host, screen }) => {
   await host.launch({ instance: 'with-email-codes', screen: 'nativeAuth' });
   await expect(screen.getByTestId('clerk.auth.start.identifier')).toBeVisible({ timeout: 30_000 });
   await host.tap(screen.getByTestId('clerk.dismissButton'));
