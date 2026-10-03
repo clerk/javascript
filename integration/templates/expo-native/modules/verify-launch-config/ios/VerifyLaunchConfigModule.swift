@@ -3,6 +3,12 @@ import Security
 
 public class VerifyLaunchConfigModule: Module {
   private static let storageScopeKey = "VerifyLaunchConfig.storageScope"
+  private static let clerkDefaultsKeys = [
+    "authStartIdentifier",
+    "authStartPhoneNumber",
+    "authStartPhoneNumberFieldIsActive",
+    "clerk_last_used_identifier_type",
+  ]
 
   public func definition() -> ModuleDefinition {
     Name("VerifyLaunchConfig")
@@ -21,6 +27,7 @@ public class VerifyLaunchConfigModule: Module {
       }
 
       SecItemDelete([kSecClass: kSecClassGenericPassword] as CFDictionary)
+      Self.clerkDefaultsKeys.forEach(defaults.removeObject(forKey:))
       defaults.set(scope, forKey: Self.storageScopeKey)
     }
   }
