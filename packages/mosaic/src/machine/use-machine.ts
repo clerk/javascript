@@ -56,6 +56,7 @@ export function useMachine<TContext extends object, TEvent extends EventObject>(
     if (options?.context) {
       actor.setContext(options.context);
     }
+    actor.logic.implementations = machine.implementations;
   });
 
   const snapshot = useSyncExternalStore(actor.subscribe, actor.getSnapshot, actor.getSnapshot);

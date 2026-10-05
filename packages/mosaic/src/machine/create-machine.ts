@@ -1,4 +1,11 @@
-import type { EventObject, MachineConfig, StateMachine } from './types';
+import type {
+  EventObject,
+  ImplementationRefs,
+  MachineConfig,
+  MachineImplementations,
+  NoImplementationRefs,
+  StateMachine,
+} from './types';
 
 /**
  * Create a state-machine definition from a config object.
@@ -24,7 +31,11 @@ export function createMachine<
   TContext extends object = Record<string, never>,
   TEvent extends EventObject = EventObject,
   TStates extends string = string,
->(config: MachineConfig<TContext, TEvent, TStates>): StateMachine<TContext, TEvent> {
+  TRefs extends ImplementationRefs = NoImplementationRefs,
+>(
+  config: MachineConfig<TContext, TEvent, TStates, TRefs>,
+  implementations: MachineImplementations<TContext, TEvent> = { guards: {}, actions: {}, actors: {} },
+): StateMachine<TContext, TEvent, TRefs> {
   return {
     id: config.id,
     initial: config.initial,
@@ -34,5 +45,12 @@ export function createMachine<
     context: config.context ?? ({} as TContext),
     states: config.states,
     config,
+    implementations,
+    provide: provided =>
+      createMachine(config, {
+        guards: { ...implementations.guards, ...provided.guards },
+        actions: { ...implementations.actions, ...provided.actions },
+        actors: { ...implementations.actors, ...provided.actors },
+      }),
   };
 }

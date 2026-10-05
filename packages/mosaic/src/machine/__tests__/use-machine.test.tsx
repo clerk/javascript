@@ -6,6 +6,7 @@ import { deferred } from '../../__tests__/async';
 import { assign } from '../assign';
 import { createActor, mockActor } from '../create-actor';
 import { createMachine } from '../create-machine';
+import { setup } from '../setup';
 import { useActor, useMachine, useSelector } from '../use-machine';
 import { createDeleteOrgMachine } from './delete-organization-machine';
 
@@ -323,5 +324,69 @@ describe('useMachine — live context keeps injected functions current', () => {
 
     expect(freshFn).toHaveBeenCalledTimes(1);
     expect(staleFn).not.toHaveBeenCalled();
+  });
+});
+
+describe('useMachine — provided implementations stay current', () => {
+  type Ctx = Record<string, never>;
+  type Ev = { type: 'GO' };
+  const { createMachine: createRunnerMachine } = setup<Ctx, Ev>().extend({
+    actors: { run: () => Promise.resolve() },
+  });
+  const runnerMachine = createRunnerMachine({
+    initial: 'idle',
+    context: {},
+    states: {
+      idle: { on: { GO: 'running' } },
+      running: { invoke: { src: 'run', onDone: 'done', onError: 'done' } },
+      done: { type: 'final' },
+    },
+  });
+
+  it('invokes the implementation provided on the latest render', async () => {
+    const gate = deferred<void>();
+    const staleFn = vi.fn(() => gate.promise);
+    const freshFn = vi.fn(() => gate.promise);
+    const actors: unknown[] = [];
+
+    function Runner({ run }: { run: () => Promise<void> }) {
+      const [snapshot, send, actor] = useMachine(runnerMachine.provide({ actors: { run } }));
+      actors.push(actor);
+      return (
+        <div>
+          <output data-testid='state'>{snapshot.value}</output>
+          <button onClick={() => send({ type: 'GO' })}>Go</button>
+        </div>
+      );
+    }
+
+    const { rerender } = render(<Runner run={staleFn} />);
+    rerender(<Runner run={freshFn} />);
+
+    fireEvent.click(screen.getByText('Go'));
+    expect(screen.getByTestId('state')).toHaveTextContent('running');
+
+    await act(async () => gate.resolve());
+    expect(screen.getByTestId('state')).toHaveTextContent('done');
+
+    expect(freshFn).toHaveBeenCalledTimes(1);
+    expect(staleFn).not.toHaveBeenCalled();
+    expect(new Set(actors).size).toBe(1);
+  });
+
+  it('does not re-render when only the provided implementations change', () => {
+    let renders = 0;
+
+    function Runner({ run }: { run: () => Promise<void> }) {
+      renders++;
+      useMachine(runnerMachine.provide({ actors: { run } }));
+      return null;
+    }
+
+    const { rerender } = render(<Runner run={() => Promise.resolve()} />);
+    const afterMount = renders;
+    rerender(<Runner run={() => Promise.resolve()} />);
+
+    expect(renders).toBe(afterMount + 1);
   });
 });

@@ -1,15 +1,57 @@
 import { assign as _assign } from './assign';
 import { createMachine as _createMachine } from './create-machine';
 import type {
+  Action,
+  ActorSrc,
   AssignAction,
   DoneInvokeEvent,
   ErrorInvokeEvent,
   EventObject,
+  Guard,
+  ImplementationRefs,
   InvokeConfig,
   MachineConfig,
+  MachineImplementations,
+  NoImplementationRefs,
   StateMachine,
   Transition,
 } from './types';
+
+/** The refs of a setup after `extend` adds more named implementations. */
+type ExtendedRefs<TRefs extends ImplementationRefs, TGuards, TActions, TActors> = {
+  guards: TRefs['guards'] | (keyof TGuards & string);
+  actions: TRefs['actions'] | (keyof TActions & string);
+  actors: TRefs['actors'] | (keyof TActors & string);
+  actionParams: Omit<TRefs['actionParams'], keyof TActions> & TActions;
+  actorOutputs: Omit<TRefs['actorOutputs'], keyof TActors> & TActors;
+};
+
+export interface Setup<TContext extends object, TEvent extends EventObject, TRefs extends ImplementationRefs> {
+  createMachine: (config: MachineConfig<TContext, TEvent, string, TRefs>) => StateMachine<TContext, TEvent, TRefs>;
+  assign: <TEvt extends EventObject = EventObject, TParams = undefined>(
+    fn: (context: TContext, event: TEvt, params: TParams) => Partial<TContext>,
+  ) => AssignAction<TContext, TEvt, TParams>;
+  fromPromise: <TOutput, TStates extends string = string>(
+    fn: (context: TContext) => Promise<TOutput>,
+    config?: {
+      onDone?: Transition<TContext, DoneInvokeEvent<TOutput>, TStates, TRefs>;
+      onError?: Transition<TContext, ErrorInvokeEvent, TStates, TRefs>;
+    },
+  ) => InvokeConfig<TContext, TEvent, TOutput, TStates, TRefs>;
+  /**
+   * Register default implementations that the config can reference by name.
+   * Mirrors XState v5's `setup(...).extend(...)`.
+   */
+  extend: <
+    TGuards extends Record<string, unknown> = Record<never, never>,
+    TActions extends Record<string, unknown> = Record<never, never>,
+    TActors extends Record<string, unknown> = Record<never, never>,
+  >(implementations: {
+    guards?: { [K in keyof TGuards]: Guard<TContext, TEvent> };
+    actions?: { [K in keyof TActions]: Action<TContext, TEvent, TActions[K]> };
+    actors?: { [K in keyof TActors]: ActorSrc<TContext, TEvent, TActors[K]> };
+  }) => Setup<TContext, TEvent, ExtendedRefs<TRefs, TGuards, TActions, TActors>>;
+}
 
 /**
  * Pre-bind `TContext` and `TEvent` once per machine file, returning factory
@@ -38,14 +80,21 @@ import type {
  * `onError`, or `after` — eliminating the need to write
  * `assign<Ctx, Extract<Event, { type: 'X' }>>` by hand.
  */
-export function setup<TContext extends object, TEvent extends EventObject>() {
-  return {
-    createMachine: (config: MachineConfig<TContext, TEvent>): StateMachine<TContext, TEvent> =>
-      _createMachine<TContext, TEvent>(config),
+export function setup<TContext extends object, TEvent extends EventObject>(): Setup<
+  TContext,
+  TEvent,
+  NoImplementationRefs
+> {
+  return withImplementations({ guards: {}, actions: {}, actors: {} });
+}
 
-    assign: <TEvt extends EventObject = EventObject>(
-      fn: (context: TContext, event: TEvt) => Partial<TContext>,
-    ): AssignAction<TContext, TEvt> => _assign<TContext, TEvt>(fn),
+function withImplementations<TContext extends object, TEvent extends EventObject, TRefs extends ImplementationRefs>(
+  defaults: MachineImplementations<TContext, TEvent>,
+): Setup<TContext, TEvent, TRefs> {
+  return {
+    createMachine: config => _createMachine(config, defaults),
+
+    assign: fn => _assign(fn),
 
     /**
      * Wraps an async function so its resolved type flows into `onDone.actions`.
@@ -71,15 +120,22 @@ export function setup<TContext extends object, TEvent extends EventObject>() {
     fromPromise: <TOutput, TStates extends string = string>(
       fn: (context: TContext) => Promise<TOutput>,
       config?: {
-        onDone?: Transition<TContext, DoneInvokeEvent<TOutput>, TStates>;
-        onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
+        onDone?: Transition<TContext, DoneInvokeEvent<TOutput>, TStates, TRefs>;
+        onError?: Transition<TContext, ErrorInvokeEvent, TStates, TRefs>;
       },
-    ): InvokeConfig<TContext, TEvent, TOutput, TStates> => ({
+    ): InvokeConfig<TContext, TEvent, TOutput, TStates, TRefs> => ({
       // SAFETY: fn only uses context (no event param), but InvokeConfig.src accepts
       // (context, event) for parity with state-entry event access. The extra event
       // parameter is unused; callers receive only context at runtime.
-      src: fn as unknown as InvokeConfig<TContext, TEvent, TOutput, TStates>['src'],
+      src: fn as unknown as InvokeConfig<TContext, TEvent, TOutput, TStates, TRefs>['src'],
       ...config,
     }),
+
+    extend: implementations =>
+      withImplementations({
+        guards: { ...defaults.guards, ...implementations.guards },
+        actions: { ...defaults.actions, ...implementations.actions },
+        actors: { ...defaults.actors, ...implementations.actors },
+      }),
   };
 }

@@ -609,7 +609,7 @@ describe('pure helpers (testable without an actor)', () => {
     expect(isAssignAction(action)).toBe(true);
     // The updater itself is pure and unit-testable in isolation.
     expect(
-      action.assignment({ name: 'Acme Inc', confirmValue: '', error: null }, { type: 'TYPE', value: 'hi' }),
+      action.assignment({ name: 'Acme Inc', confirmValue: '', error: null }, { type: 'TYPE', value: 'hi' }, undefined),
     ).toEqual({ confirmValue: 'hi' });
   });
 
