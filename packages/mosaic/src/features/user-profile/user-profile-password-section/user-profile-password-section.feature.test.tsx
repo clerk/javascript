@@ -12,7 +12,7 @@ import {
   fapiUser,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfilePasswordSection } from '../user-profile-password-section/user-profile-password-section';
+import { UserProfilePasswordSection } from './user-profile-password-section';
 import { UserProfileSecurityPanel } from '../user-profile-security-panel';
 
 const email = fapiEmailAddress({ id: 'idn_1', email_address: 'person@example.com' });
