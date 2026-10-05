@@ -98,7 +98,7 @@ function useBusy(key?: string): { busy: boolean; disabled: boolean } {
   return { busy: pendingKey === key, disabled: pendingKey !== key };
 }
 
-type ActiveWorkspace =
+type LeadSelection =
   | {
       kind: 'organization';
       name: string;
@@ -111,14 +111,14 @@ type ActiveWorkspace =
 
 /**
  * What the surface leads with: named in the trigger and headed in the popup, so the two always
- * agree. An organization-led surface with no org and no personal workspace is no selection.
+ * agree. An organization-led surface with no org and no personal account is no selection.
  */
 type Messages = MosaicMessages['userButton'];
 
-function leadWorkspace(
+function leadSelection(
   { layout, activeOrganization, activeSession }: UserButtonContextValue,
   m: Messages,
-): ActiveWorkspace {
+): LeadSelection {
   if (layout.lead === 'organization' && activeOrganization) {
     return {
       kind: 'organization',
@@ -129,7 +129,7 @@ function leadWorkspace(
     };
   }
   if (layout.lead === 'none') {
-    return { kind: 'none', name: m.workspaces.notSelected, shape: 'square' };
+    return { kind: 'none', name: m.organizations.notSelected, shape: 'square' };
   }
   return {
     kind: 'user',
@@ -140,12 +140,12 @@ function leadWorkspace(
   };
 }
 
-/** The organization a workspace shows: the one it is, or the one badging the account. */
-function workspaceOrganization(workspace: ActiveWorkspace): UserButtonMembership | undefined {
-  if (workspace.kind === 'organization') {
-    return workspace.organization;
+/** The organization a lead shows: the one it is, or the one badging the account. */
+function leadOrganization(lead: LeadSelection): UserButtonMembership | undefined {
+  if (lead.kind === 'organization') {
+    return lead.organization;
   }
-  return workspace.kind === 'user' ? workspace.badge : undefined;
+  return lead.kind === 'user' ? lead.badge : undefined;
 }
 
 function joinDetails(...parts: Array<string | undefined>): string {
@@ -154,7 +154,9 @@ function joinDetails(...parts: Array<string | undefined>): string {
 
 function membershipSubtitle(membership: UserButtonMembership, m: Messages, locale: string): string {
   const members =
-    membership.membersCount === undefined ? undefined : plural(m.workspaces.members, membership.membersCount, locale);
+    membership.membersCount === undefined
+      ? undefined
+      : plural(m.organizations.members, membership.membersCount, locale);
   return joinDetails(membership.planLabel, members);
 }
 
@@ -188,7 +190,7 @@ function PendingSpinner() {
     <Spinner
       role='progressbar'
       aria-hidden={undefined}
-      aria-label={m.workspaces.pending}
+      aria-label={m.organizations.pending}
       size='sm'
     />
   );
@@ -205,7 +207,7 @@ interface SwitcherRowProps {
   avatarName?: string;
   imageUrl?: string;
   shape: 'circle' | 'square';
-  /** Names the title element, for a control in the row that has to point at the workspace it acts on. */
+  /** Names the title element, for a control in the row that has to point at the organization it acts on. */
   labelId?: string;
   active?: boolean;
   onSelect?: () => void;
@@ -415,7 +417,7 @@ function HeaderActionButton({
       onClick={onClick}
       type='button'
       isPending={busy}
-      pendingLabel={m.workspaces.pending}
+      pendingLabel={m.organizations.pending}
       spinDelay={{ delay: 0 }}
     >
       {leading}
@@ -424,7 +426,7 @@ function HeaderActionButton({
   );
 }
 
-/** The active workspace: who you are signed in as, and what you can do about it. */
+/** The lead: who you are signed in as, and what you can do about it. */
 function Header() {
   const m = useMessages('userButton');
   const locale = useLocale();
@@ -432,15 +434,15 @@ function Header() {
   const layout = data.layout.headerLayout;
   const userLed = data.layout.lead === 'user';
   const { identifier } = data.activeSession;
-  const workspace = leadWorkspace(data, m);
-  const { name } = workspace;
-  const organization = workspaceOrganization(workspace);
+  const lead = leadSelection(data, m);
+  const { name } = lead;
+  const organization = leadOrganization(lead);
   // An account with no name is titled by its identifier, and repeating it underneath says nothing.
   // No selection is not the account, so it carries no identifier line either.
   const subtitle =
-    workspace.kind === 'organization'
-      ? membershipSubtitle(workspace.organization, m, locale)
-      : workspace.kind === 'user' && identifier !== name
+    lead.kind === 'organization'
+      ? membershipSubtitle(lead.organization, m, locale)
+      : lead.kind === 'user' && identifier !== name
         ? identifier
         : '';
 
@@ -463,7 +465,7 @@ function Header() {
           onClick: data.onManageOrganization,
         });
       }
-      if (workspace.kind !== 'organization' && data.onManageAccount) {
+      if (lead.kind !== 'organization' && data.onManageAccount) {
         settings.push({
           name: m.manage.account,
           label: m.manage.profileSettings,
@@ -497,11 +499,11 @@ function Header() {
       layout={layout}
       avatar={
         <UserButtonAvatar
-          name={workspace.name}
-          imageUrl={workspace.imageUrl}
-          shape={workspace.shape}
+          name={lead.name}
+          imageUrl={lead.imageUrl}
+          shape={lead.shape}
           size='md'
-          badge={workspace.kind === 'user' ? workspace.badge : undefined}
+          badge={lead.kind === 'user' ? lead.badge : undefined}
         />
       }
       title={name}
@@ -545,7 +547,7 @@ function MembershipRow({ membership, active, onSelect }: MembershipRowProps) {
 }
 
 /**
- * The account's own workspace, which is what "no active organization" is. Listed alongside the
+ * The personal account, which is what "no active organization" is. Listed alongside the
  * organizations so switching into one is not a one-way door: `null` is how you leave.
  *
  * Named for what it is among organizations rather than for the account, the way the existing
@@ -564,7 +566,7 @@ function PersonalRow() {
 
   return (
     <SwitcherRow
-      name={m.workspaces.personal}
+      name={m.organizations.personal}
       imageUrl={data.activeSession.imageUrl}
       shape='circle'
       active={!data.activeOrganization}
@@ -626,11 +628,11 @@ interface PendingRowProps {
   note?: string;
 }
 
-/** A workspace on offer: joined from its own trailing button rather than by clicking the row. */
+/** An organization on offer: joined from its own trailing button rather than by clicking the row. */
 function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: PendingRowProps) {
   const m = useMessages('userButton');
   const { busy, disabled } = useBusy(busyKey);
-  // The button reads the same on every offer and the workspace it acts on is the label beside it,
+  // The button reads the same on every offer and the organization it acts on is the label beside it,
   // so pressing tab through the list gives no way to tell them apart without this.
   const labelId = React.useId();
 
@@ -654,7 +656,7 @@ function PendingRow({ busyKey, name, imageUrl, actionLabel, onAccept, note }: Pe
             color='neutral'
             size='sm'
             isPending={busy}
-            pendingLabel={m.workspaces.pending}
+            pendingLabel={m.organizations.pending}
             spinDelay={{ delay: 0 }}
             disabled={disabled}
             aria-describedby={labelId}
@@ -676,7 +678,7 @@ function PendingRows() {
   const acceptInvitation = data.onAcceptInvitation;
   const selectOrganization = data.onSelectOrganization;
 
-  // Accepting an invitation joins the organization, so an accepted one is a workspace the surface
+  // Accepting an invitation joins the organization, so an accepted one is an organization the surface
   // may already be showing. It stays listed only for as long as the membership list has yet to
   // catch up with it, which is what keeps it reachable in the meantime.
   const listed = new Set(data.memberships.map(m => m.organizationId));
@@ -690,7 +692,7 @@ function PendingRows() {
       {/* Invitations first: one is addressed to this account and joins on accept, where a
           suggestion only files a request. Same order as the existing OrganizationSwitcher. */}
       {invitations.map(i =>
-        // Already joined, so it is a workspace like any other: click the row to switch to it.
+        // Already joined, so it is an organization like any other: click the row to switch to it.
         i.status === 'accepted' ? (
           <MembershipRow
             key={i.id}
@@ -709,7 +711,7 @@ function PendingRows() {
             busyKey={userButtonBusyKeys.acceptInvitation(i.id)}
             name={i.organizationName}
             imageUrl={i.imageUrl}
-            actionLabel={m.workspaces.accept}
+            actionLabel={m.organizations.accept}
             onAccept={acceptInvitation ? () => acceptInvitation(i.id) : undefined}
           />
         ),
@@ -720,9 +722,9 @@ function PendingRows() {
           busyKey={userButtonBusyKeys.acceptSuggestion(s.id)}
           name={s.name}
           imageUrl={s.imageUrl}
-          actionLabel={m.workspaces.join}
+          actionLabel={m.organizations.join}
           // An accepted suggestion is waiting on an admin, so it reports rather than re-offers.
-          note={s.status === 'accepted' ? m.workspaces.requested : undefined}
+          note={s.status === 'accepted' ? m.organizations.requested : undefined}
           onAccept={acceptSuggestion ? () => acceptSuggestion(s.id) : undefined}
         />
       ))}
@@ -732,7 +734,7 @@ function PendingRows() {
 
 /**
  * A signed-in account inside the accounts flyout: a menu item you pick to switch to, checked where
- * it is already the active one. Its workspaces cannot be listed here — they are scoped to the
+ * it is already the active one. Its organizations cannot be listed here — they are scoped to the
  * session that fetches them — so switching is all it offers.
  */
 function SessionMenuItem({ session, active }: { session: UserButtonSession; active: boolean }) {
@@ -885,13 +887,13 @@ function OrganizationListLoadingRow() {
         <Spinner size='sm' />
       </UserButtonItemMedia>
       <UserButtonItemContent>
-        <UserButtonItemDescription>{m.workspaces.loading}</UserButtonItemDescription>
+        <UserButtonItemDescription>{m.organizations.loading}</UserButtonItemDescription>
       </UserButtonItemContent>
     </UserButtonItem>
   );
 }
 
-/** The workspaces the active account can switch between. This is the group that scrolls. */
+/** The organizations the active account can switch between. This is the group that scrolls. */
 function OrganizationSection() {
   const m = useMessages('userButton');
   const data = useUserButtonContext();
@@ -943,7 +945,7 @@ function OrganizationSection() {
             </>
           ))}
         {/* Trails the rows rather than sitting at the foot of the surface: what it offers is one
-            more of the workspaces above it, not an action on the account. */}
+            more of the organizations above it, not an action on the account. */}
         {actions}
       </UserButtonGroup>
     </>
@@ -1075,7 +1077,7 @@ export function UserButtonRoot(props: UserButtonRootProps): ReactElement {
 
 export interface UserButtonTriggerProps {
   /**
-   * Names the active workspace beside its avatar — the organization wherever one heads the
+   * Names the lead beside its avatar — the organization wherever one heads the
    * trigger, no selection when personal is hidden and none is active, the account otherwise, with
    * its active organization beneath it. Turn it off for the avatar alone.
    *
@@ -1091,17 +1093,17 @@ export interface UserButtonTriggerProps {
   renderTriggerBadge?: boolean;
 }
 
-/** The trigger: the active workspace's avatar, and what it is called. */
+/** The trigger: the lead's avatar, and what it is called. */
 export function UserButtonTrigger({
   renderTriggerLabel = true,
   renderTriggerBadge = true,
 }: UserButtonTriggerProps = {}): ReactElement {
   const m = useMessages('userButton');
   const data = useUserButtonContext();
-  const workspace = leadWorkspace(data, m);
-  const { name, shape } = workspace;
-  const planLabel = renderTriggerBadge ? workspaceOrganization(workspace)?.planLabel : undefined;
-  const badge = workspace.kind === 'user' ? workspace.badge : undefined;
+  const lead = leadSelection(data, m);
+  const { name, shape } = lead;
+  const planLabel = renderTriggerBadge ? leadOrganization(lead)?.planLabel : undefined;
+  const badge = lead.kind === 'user' ? lead.badge : undefined;
   const ringsAvatar = !renderTriggerLabel && badge !== undefined;
 
   return (
@@ -1116,9 +1118,9 @@ export function UserButtonTrigger({
       ]}
     >
       <UserButtonAvatar
-        name={workspace.name}
-        imageUrl={workspace.imageUrl}
-        shape={workspace.shape}
+        name={lead.name}
+        imageUrl={lead.imageUrl}
+        shape={lead.shape}
         size={renderTriggerLabel && !badge ? 'xs' : 'sm'}
         badge={badge}
         focusRing={ringsAvatar}
