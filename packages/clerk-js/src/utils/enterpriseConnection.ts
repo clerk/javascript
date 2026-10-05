@@ -66,6 +66,7 @@ export function toEnterpriseConnectionBody(
     setIfDefined(body, 'saml_idp_entity_id', params.saml.idpEntityId);
     setIfDefined(body, 'saml_idp_sso_url', params.saml.idpSsoUrl);
     setIfDefined(body, 'saml_idp_certificate', params.saml.idpCertificate);
+    setIfDefined(body, 'saml_idp_certificates', params.saml.idpCertificates);
     setIfDefined(body, 'saml_idp_metadata_url', params.saml.idpMetadataUrl);
     setIfDefined(body, 'saml_idp_metadata', params.saml.idpMetadata);
     setIfDefined(body, 'saml_attribute_mapping', params.saml.attributeMapping);

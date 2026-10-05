@@ -227,10 +227,8 @@ export { mergeStyleProps, themeProps } from '../props';
 export { UserProfileMfaSectionView } from '../features/user-profile/user-profile-mfa-section.view';
 export { UserProfileMfaSetupView } from '../features/user-profile/user-profile-mfa-setup.view';
 
-export { UserProfileApiKeysPanelView } from '../features/user-profile/user-profile-api-keys-panel.view';
-
-export { OrganizationProfileApiKeysPanelView } from '../features/organization-profile/organization-profile-api-keys-panel.view';
-export { OrganizationProfileCreateAPIKeyDialog } from '../features/organization-profile/organization-profile-create-api-key.dialog';
+export { APIKeysTableView } from '../features/api-keys/api-keys-table.view';
+export { UserProfileEnterpriseAccountsSectionView } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.view';
 
 export { MembersTableTabView } from '../features/organization-profile/members-table-tab.view';
 export { InvitationsTableTabView } from '../features/organization-profile/invitations-table-tab.view';

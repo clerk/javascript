@@ -114,8 +114,9 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
   const { isLoaded, signIn } = useSignIn();
   const { publishableKey } = useClerk();
 
-  const key = `__clerk_local_auth_${publishableKey}_identifier`;
-  const pkey = `__clerk_local_auth_${publishableKey}_password`;
+  const storeKeyBase = publishableKey.split('=').join('');
+  const key = `__clerk_local_auth_${storeKeyBase}_identifier`;
+  const pkey = `__clerk_local_auth_${storeKeyBase}_password`;
   const [hasLocalAuthCredentials, setHasLocalAuthCredentials] = useState(!!getItem(key));
   const [userOwnsCredentials, setUserOwnsCredentials] = useUserOwnsCredentials({ storeKey: key });
   const hasEnrolledBiometric = useEnrolledBiometric();

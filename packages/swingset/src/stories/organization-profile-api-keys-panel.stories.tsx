@@ -1,8 +1,6 @@
-import { OrganizationProfileApiKeysPanelView } from '@clerk/mosaic/features/organization-profile/organization-profile-api-keys-panel.view';
-
 import type { StoryMeta } from '@/lib/types';
 
-import { useOrganizationProfileAPIKeysFixture } from './fixtures/organization-profile-api-keys';
+import { APIKeysPanelExample, useAPIKeysTableFixture } from './fixtures/api-keys-table';
 
 export { default as __source } from './organization-profile-api-keys-panel.stories?raw';
 
@@ -12,31 +10,15 @@ export const meta: StoryMeta = {
   title: 'OrganizationProfileApiKeysPanel',
   label: 'API keys panel',
   navigation: { category: 'Panels' },
-  source: 'packages/mosaic/src/features/organization-profile/organization-profile-api-keys-panel.view.tsx',
+  source: 'packages/mosaic/src/features/organization-profile/organization-profile-api-keys-panel.tsx',
 };
 
 export function Default() {
-  const props = useOrganizationProfileAPIKeysFixture();
-  return <OrganizationProfileApiKeysPanelView {...props} />;
+  const props = useAPIKeysTableFixture({ subjectKind: 'organization' });
+  return <APIKeysPanelExample {...props} />;
 }
 
 export function Empty() {
-  const props = useOrganizationProfileAPIKeysFixture({ initialKeys: [] });
-  return (
-    <OrganizationProfileApiKeysPanelView
-      {...props}
-      onCreate={undefined}
-      onRevoke={undefined}
-    />
-  );
-}
-
-export function ProposedTable() {
-  const props = useOrganizationProfileAPIKeysFixture({ enableSorting: true });
-  return (
-    <OrganizationProfileApiKeysPanelView
-      {...props}
-      onBulkAction={() => undefined}
-    />
-  );
+  const props = useAPIKeysTableFixture({ subjectKind: 'organization', initialKeys: [] });
+  return <APIKeysPanelExample {...props} />;
 }

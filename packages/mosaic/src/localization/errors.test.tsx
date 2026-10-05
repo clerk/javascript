@@ -1,10 +1,11 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import type { MosaicCatalog } from './catalog';
 import { MosaicLocalizationProvider, resolveLocalization } from './context';
-import { useErrorText } from './errors';
+import { toLocalizableApiError, useErrorText } from './errors';
 
 function errorText(overrides?: MosaicCatalog) {
   const wrapper = ({ children }: { children: ReactNode }) => (
@@ -58,5 +59,41 @@ describe('useErrorText', () => {
   it('falls back to the generic message when there is nothing else', () => {
     expect(errorText({ 'errors.generic': 'Algo salió mal.' })({})).toBe('Algo salió mal.');
     expect(errorText()({ code: 'toString' })).toBe('Something went wrong. Please try again.');
+  });
+});
+
+describe('Clerk API error localization', () => {
+  function firstError(data: ConstructorParameters<typeof ClerkAPIResponseError>[1]['data']) {
+    const error = new ClerkAPIResponseError('Invalid', { status: 422, data }).errors[0];
+    if (!error) {
+      throw new Error('Expected an API error');
+    }
+    return error;
+  }
+
+  it('localizes the API code and parameter before server text', () => {
+    const error = firstError([
+      { code: 'form_param_invalid', message: 'Short', long_message: 'Long', meta: { param_name: 'username' } },
+    ]);
+    const text = errorText({
+      'errors.form_param_invalid': 'Invalid value',
+      'errors.form_param_invalid__username': 'Invalid username',
+    });
+    expect(text(toLocalizableApiError(error, 'Retry'))).toBe('Invalid username');
+  });
+
+  it('prefers the API long message, then its short message', () => {
+    const text = errorText();
+    expect(text(toLocalizableApiError(firstError([{ code: 'unknown', message: 'Short', long_message: 'Long' }])))).toBe(
+      'Long',
+    );
+    expect(text(toLocalizableApiError(firstError([{ code: 'unknown', message: 'Short' }])))).toBe('Short');
+  });
+
+  it('preserves an empty message unless the feature provides a fallback', () => {
+    const error = firstError([{ code: 'unknown', message: '', long_message: '' }]);
+    const text = errorText();
+    expect(text(toLocalizableApiError(error))).toBe('');
+    expect(text(toLocalizableApiError(error, 'Retry'))).toBe('Retry');
   });
 });

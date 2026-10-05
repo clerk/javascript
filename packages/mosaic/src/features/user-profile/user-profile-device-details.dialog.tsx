@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 
-import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { DataList } from '../../components/data-list';
@@ -88,26 +87,22 @@ function DeviceDetailsCard({
           <Card.Description>{fill(m.detailsDialog.lastActive, { lastActive: device.lastActive })}</Card.Description>
         ) : null}
       </Card.Header>
-      {errorMessage || details.length > 0 ? (
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {errorMessage}
+      </Card.Banner>
+      {details.length > 0 ? (
         <Card.Content>
-          {errorMessage ? (
-            <Banner.Root
-              role='alert'
-              color='negative'
-            >
-              <Banner.Label>{errorMessage}</Banner.Label>
-            </Banner.Root>
-          ) : null}
-          {details.length > 0 ? (
-            <DataList.Root>
-              {details.map(detail => (
-                <DataList.Item key={detail.label}>
-                  <DataList.Label>{detail.label}</DataList.Label>
-                  <DataList.Value title={detail.value}>{detail.value}</DataList.Value>
-                </DataList.Item>
-              ))}
-            </DataList.Root>
-          ) : null}
+          <DataList.Root>
+            {details.map(detail => (
+              <DataList.Item key={detail.label}>
+                <DataList.Label>{detail.label}</DataList.Label>
+                <DataList.Value title={detail.value}>{detail.value}</DataList.Value>
+              </DataList.Item>
+            ))}
+          </DataList.Root>
         </Card.Content>
       ) : null}
       <Card.Footer>

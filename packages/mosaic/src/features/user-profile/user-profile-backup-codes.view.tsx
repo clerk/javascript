@@ -1,6 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import { useFlowAutoFocus } from '../../components/flow';
@@ -42,15 +41,13 @@ export function UserProfileBackupCodesView({
         <Card.Title>{m.title}</Card.Title>
         <Card.Description>{m.description}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {errorMessage}
+      </Card.Banner>
       <Card.Content>
-        {errorMessage ? (
-          <Banner.Root
-            color='negative'
-            role='alert'
-          >
-            <Banner.Label>{errorMessage}</Banner.Label>
-          </Banner.Root>
-        ) : null}
         {hasCodes ? (
           <ul
             aria-label={m.codesLabel}
