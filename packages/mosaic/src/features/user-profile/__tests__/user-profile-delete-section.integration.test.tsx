@@ -127,7 +127,7 @@ describe('UserProfileDeleteSection', () => {
     await user.type(within(dialog).getByRole('textbox'), 'Delete account');
     await user.click(within(dialog).getByRole('button', { name: 'Delete account' }));
 
-    expect(await screen.findByText('Something went wrong')).toBeInTheDocument();
+    expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(setActive).not.toHaveBeenCalled();
   });

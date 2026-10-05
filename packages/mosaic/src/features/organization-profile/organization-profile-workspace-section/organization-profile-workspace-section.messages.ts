@@ -1,5 +1,5 @@
 export const organizationProfileWorkspaceSectionMessages = {
-  sectionTitle: 'Workspace details',
+  sectionTitle: 'Organization details',
   logo: {
     label: 'Logo',
     description: 'Recommended size 1:1, up to 10MB.',
@@ -30,7 +30,7 @@ export const organizationProfileWorkspaceSectionMessages = {
     copied: 'Copied',
 
     dialogTitle: 'Edit slug',
-    dialogDescription: 'A unique identifier used in workspace URLs. Changing it may break existing links.',
+    dialogDescription: 'A unique identifier used in organization URLs. Changing it may break existing links.',
     fieldLabel: 'Slug',
     cancel: 'Cancel',
     save: 'Save changes',

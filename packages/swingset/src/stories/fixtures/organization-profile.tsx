@@ -1,3 +1,5 @@
+import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
+import { OrganizationProfileDangerSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.view';
 import { OrganizationProfileSaveError } from '@clerk/mosaic/features/organization-profile/organization-profile.types';
 import type { OrganizationProfileViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
 import { useState } from 'react';
@@ -15,6 +17,19 @@ import { usePreviewImage } from './use-preview-image';
 const exampleOrganization = { name: 'Clerk', slug: 'clerkWorkspace-177654156132154', memberCount: 20 };
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+
+export function OrganizationProfileDangerPreview({ name, memberCount }: { name: string; memberCount: number }) {
+  const leave = useDestructiveController({ onDelete: () => settleAfter(1200) });
+  const destroy = useDestructiveController({ onDelete: () => settleAfter(1200) });
+  return (
+    <OrganizationProfileDangerSectionView
+      name={name}
+      memberCount={memberCount}
+      leave={leave}
+      destroy={destroy}
+    />
+  );
+}
 
 export interface OrganizationProfileFixtureOptions {
   /** Rejects that field's save with this message, scoped to the field so it renders under it. */
@@ -49,15 +64,18 @@ export function useOrganizationProfileFixture({ failWith }: OrganizationProfileF
   const general: OrganizationProfileViewProps['pages']['general'] = {
     name,
     slug,
-    memberCount: organization.memberCount,
     imageUrl,
     hasImage: Boolean(imageUrl),
     onLogoChange: showFile,
     onRemoveLogo: clearImage,
     onSubmitName: async next => save('name', () => setName(next)),
     onSubmitSlug: async next => save('slug', () => setSlug(next)),
-    onLeave: () => settleAfter(1200),
-    onDelete: () => settleAfter(1200),
+    dangerSlot: (
+      <OrganizationProfileDangerPreview
+        name={name}
+        memberCount={organization.memberCount}
+      />
+    ),
   };
 
   const pages: OrganizationProfileViewProps['pages'] = {

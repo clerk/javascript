@@ -11,7 +11,7 @@ export const meta: StoryMeta = {
   status: 'wip',
   substatus: 'needs wire-up',
   title: 'OrganizationProfileWorkspaceSection',
-  label: 'Workspace details',
+  label: 'Organization details',
   navigation: { category: 'Sections' },
   source:
     'packages/mosaic/src/features/organization-profile/organization-profile-workspace-section/organization-profile-workspace-section.view.tsx',
