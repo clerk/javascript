@@ -95,6 +95,44 @@ describe('Changing a password', () => {
     },
   );
 
+  it.each(['password mode', 'enterprise management'] as const)(
+    'rejects saving an open dialog after the %s changes',
+    async change => {
+      const fapi = serveFapi({
+        client: fapiClient([
+          fapiSession({
+            id: 'sess_1',
+            user: fapiUser({
+              ...alice,
+              enterprise_accounts: [fapiEnterpriseAccount({ id: 'ent_1', active: false })],
+            }),
+          }),
+        ]),
+      });
+      const { clerk } = await renderWithClerk(<UserProfilePasswordSection />);
+      const user = await fillPassword();
+      const dialog = screen.getByRole('dialog');
+      const currentUser = clerk.user;
+      const account = currentUser?.enterpriseAccounts[0];
+      if (!currentUser || !account) {
+        throw new Error('Expected a signed-in user with an enterprise account');
+      }
+      if (change === 'password mode') {
+        currentUser.passwordEnabled = false;
+      } else {
+        account.active = true;
+      }
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Password update is no longer available.'),
+      );
+      expect(screen.getByRole('dialog')).toBe(dialog);
+      expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
+      expect(fapi.passwordUpdates).toHaveLength(0);
+    },
+  );
+
   it('shows an unexpected update failure in the dialog and keeps the draft', async () => {
     serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
     const { clerk } = await renderWithClerk(<UserProfilePasswordSection />);
