@@ -87,7 +87,9 @@ async function addPhone(actor: Actor, digits: string) {
 }
 
 async function enterCode(actor: Actor, code: string) {
-  await actor.click(await screen.findByRole('textbox', { name: 'Verification code' }));
+  const input = await screen.findByRole('textbox', { name: 'Verification code' });
+  await waitFor(() => expect(input).toBeEnabled());
+  await actor.click(input);
   await actor.keyboard(code);
 }
 
