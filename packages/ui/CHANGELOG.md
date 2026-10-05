@@ -1,5 +1,29 @@
 # @clerk/ui
 
+## 1.39.0
+
+### Minor Changes
+
+- The self-serve SSO configuration (`<OrganizationProfile />` enterprise connection page and the `ConfigureSSO` SAML steps) now shows every IdP signing certificate a SAML connection trusts, with its expiry, and lets an admin add certificates from a file (a PEM bundle adds several) or remove one, so an IdP key rotation no longer needs a replacement timed with the IdP. Saving sends the whole list and only when it changed. The list holds at most five certificates. New `configureSSOCertificateList*` and `configureSSOCertificatePrimaryBadge` appearance element descriptors cover the list, and new `configureSSO.signingCertificates.*` localization keys hold its strings. ([#10012](https://github.com/clerk/javascript/pull/10012)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+### Patch Changes
+
+- Fixed `<SignIn />` in the combined sign-in-or-up flow sending users back to the start after an OAuth or SAML redirect when the sign-in still needed a step, such as a Clerk Protect check, a second factor, or a password reset. Sign-ups created from an OAuth sign-in, including after a Protect check, now continue to their remaining steps inside the component. ([#10014](https://github.com/clerk/javascript/pull/10014)) by [@mwickett](https://github.com/mwickett)
+
+- Fix the "Set as default" action for SMS second factors in `<UserProfile />`. It now prompts for reverification when required instead of showing a raw error, and it's no longer offered while an authenticator app is enrolled, since the authenticator app is always the default in that case. ([#10042](https://github.com/clerk/javascript/pull/10042)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260), [`a989859`](https://github.com/clerk/javascript/commit/a989859201b5b5dbdbda083740c516090b23e759)]:
+  - @clerk/shared@4.39.0
+  - @clerk/localizations@4.22.0
+
+## 1.38.1
+
+### Patch Changes
+
+- Updated dependencies [[`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/shared@4.38.0
+  - @clerk/localizations@4.21.2
+
 ## 1.38.0
 
 ### Minor Changes

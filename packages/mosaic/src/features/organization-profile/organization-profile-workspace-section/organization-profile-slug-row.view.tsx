@@ -4,7 +4,7 @@ import { Button } from '../../../components/button';
 import { CopyButton } from '../../../components/copy-button';
 import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
-import { truncationStyles } from '../../../utils/typography.styles';
+import { truncationStyles } from '../../../styles/typography.styles';
 import { useOrganizationProfileEditFieldController } from './organization-profile-edit-field.controller';
 import { OrganizationProfileEditFieldDialog } from './organization-profile-edit-field.dialog';
 import { styles } from './organization-profile-workspace-section.styles';

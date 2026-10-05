@@ -1,5 +1,5 @@
 import { assign as _assign } from './assign';
-import { createMachine as _createMachine } from './createMachine';
+import { createMachine as _createMachine } from './create-machine';
 import type {
   AssignAction,
   DoneInvokeEvent,

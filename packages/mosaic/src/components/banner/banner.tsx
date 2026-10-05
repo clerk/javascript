@@ -5,7 +5,7 @@ import type { IconName } from '../../icons/registry';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { Icon } from '../icon';
 import { descriptionColors, rootColors, styles } from './banner.styles';
 

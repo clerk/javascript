@@ -5,7 +5,7 @@ import React from 'react';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
 import type { CheckboxProps } from '../checkbox';
 import { Checkbox } from '../checkbox';

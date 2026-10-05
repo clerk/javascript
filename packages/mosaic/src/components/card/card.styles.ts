@@ -1,6 +1,15 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, fontWeightVars, radiusVars, shadowVars, space, typeScaleVars } from '../../tokens.stylex';
+import {
+  colorVars,
+  durationVars,
+  easingVars,
+  fontWeightVars,
+  radiusVars,
+  shadowVars,
+  space,
+  typeScaleVars,
+} from '../../tokens.stylex';
 import { cardContentMarker } from './card.markers.stylex';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
@@ -91,6 +100,72 @@ export const header = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     textWrap: 'pretty',
+  },
+});
+
+const INSET = space['4'];
+
+export const banner = stylex.create({
+  // A root flex item, not a content grid item: a grid track floors at 0 whatever the margin, so the gap would stay.
+  collapse: {
+    display: 'grid',
+    gridTemplateRows: {
+      default: '1fr',
+      ':where(:not([data-open]), [data-starting-style])': '0fr',
+    },
+    maskImage: `linear-gradient(to bottom, transparent, black ${INSET})`,
+    transitionDuration: durationVars['--cl-duration-slow'],
+    transitionProperty: {
+      default: 'grid-template-rows',
+      '@media (prefers-reduced-motion: reduce)': 'none',
+    },
+    transitionTimingFunction: {
+      default: easingVars['--cl-ease-enter'],
+      ':where([data-ending-style])': easingVars['--cl-ease-in-out'],
+    },
+  },
+  // No padding (it is the 0fr track's minimum); the span sizes the item to the wrapper, not the re-resolved track.
+  clip: {
+    overflow: 'clip',
+    alignContent: 'end',
+    display: 'grid',
+    gridRowEnd: 'span 2',
+    gridRowStart: '1',
+    minHeight: 0,
+  },
+  surface: {
+    marginInline: space['5'],
+    marginBlockStart: INSET,
+    opacity: {
+      default: 1,
+      ':where([data-starting-style], [data-ending-style])': 0,
+    },
+    transform: {
+      default: 'scale(1)',
+      ':where([data-starting-style], [data-ending-style])': 'scale(0.96)',
+      '@media (prefers-reduced-motion: reduce)': {
+        default: 'scale(1)',
+        ':where([data-starting-style], [data-ending-style])': 'scale(1)',
+      },
+    },
+    transformOrigin: 'top',
+    transitionDelay: {
+      default: durationVars['--cl-duration-fast'],
+      ':where([data-ending-style])': durationVars['--cl-duration-instant'],
+      '@media (prefers-reduced-motion: reduce)': durationVars['--cl-duration-instant'],
+    },
+    transitionDuration: {
+      default: `${durationVars['--cl-duration-fast']}, ${durationVars['--cl-duration-base']}`,
+      ':where([data-ending-style])': durationVars['--cl-duration-fast'],
+    },
+    transitionProperty: {
+      default: 'opacity, transform',
+      '@media (prefers-reduced-motion: reduce)': 'opacity',
+    },
+    transitionTimingFunction: {
+      default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
+      ':where([data-ending-style])': easingVars['--cl-ease-exit'],
+    },
   },
 });
 

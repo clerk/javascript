@@ -1,6 +1,5 @@
 import { useId, useRef } from 'react';
 
-import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import type { DialogHandle } from '../../components/dialog';
@@ -52,6 +51,12 @@ export function UserProfileRenamePasskeyDialog({
             <Card.Title>{m.renameTitle}</Card.Title>
             <Card.Description>{m.renameDescription}</Card.Description>
           </Card.Header>
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {error}
+          </Card.Banner>
           <Card.Content
             render={
               <form
@@ -65,14 +70,6 @@ export function UserProfileRenamePasskeyDialog({
               />
             }
           >
-            {error ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
-              >
-                <Banner.Label>{error}</Banner.Label>
-              </Banner.Root>
-            ) : null}
             <Field.Root
               required
               disabled={isSaving}

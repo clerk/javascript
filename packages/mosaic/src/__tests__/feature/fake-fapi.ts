@@ -1,13 +1,19 @@
+import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type {
+  ApiKeyJSON,
   ClientJSON,
+  EnterpriseConnectionJSON,
+  OAuthProvider,
   OrganizationMembershipJSON,
   OrganizationSuggestionJSON,
   SessionJSON,
+  UserJSON,
   UserOrganizationInvitationJSON,
 } from '@clerk/shared/types';
 import { http, HttpResponse, type JsonBodyType } from 'msw';
 import { setupWorker } from 'msw/browser';
 
+import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/enterprise';
 import {
   createVerificationState,
   type FakeVerificationSeed,
@@ -15,13 +21,16 @@ import {
   verificationHandlers,
 } from './fake-fapi/verification';
 import {
+  fapiApiKey,
   fapiClient,
   type FapiEnvironment,
   fapiEnvironment,
+  fapiExternalAccount,
   fapiMembership,
   fapiOrganization,
   fapiPage,
   fapiToken,
+  fapiVerification,
 } from './fapi';
 
 export const PUBLISHABLE_KEY = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
@@ -35,11 +44,16 @@ export interface FakeFapiState {
   memberships: OrganizationMembershipJSON[];
   invitations: UserOrganizationInvitationJSON[];
   suggestions: OrganizationSuggestionJSON[];
+  apiKeys: ApiKeyJSON[];
   verification: FakeVerificationState;
+  passwordUpdates: URLSearchParams[];
+  enterpriseConnections: EnterpriseConnectionJSON[];
+  enterpriseLinking: FakeEnterpriseLinking;
 }
 
-export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification'>> & {
+export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpriseLinking'>> & {
   verification?: FakeVerificationSeed;
+  enterpriseLinking?: Partial<FakeEnterpriseLinking>;
 };
 
 const unhandled: string[] = [];
@@ -80,26 +94,124 @@ function findSession(state: FakeFapiState, id: unknown): SessionJSON | undefined
   return state.client.sessions.find(session => session.id === id);
 }
 
+function error(code: string, status = 400) {
+  return HttpResponse.json({ errors: [{ code, message: code, long_message: code }] }, { status });
+}
+
+function activeUser(state: FakeFapiState): UserJSON | undefined {
+  return findSession(state, state.client.last_active_session_id)?.user;
+}
+
+function updateUser(state: FakeFapiState, user: UserJSON): void {
+  state.client = {
+    ...state.client,
+    sessions: state.client.sessions.map(session => (session.user.id === user.id ? { ...session, user } : session)),
+  };
+}
+
 function missing() {
   return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
 }
 
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
-  const { verification, ...rest } = seed;
+  const { verification, enterpriseLinking, ...rest } = seed;
   const state: FakeFapiState = {
     environment: fapiEnvironment(),
     client: fapiClient(),
     memberships: [],
     invitations: [],
     suggestions: [],
+    apiKeys: [],
+    passwordUpdates: [],
+    enterpriseConnections: [],
     ...rest,
     verification: createVerificationState(verification),
+    enterpriseLinking: {
+      enabled: false,
+      preparations: {},
+      verifiedLinks: [],
+      pendingExternalAccounts: [],
+      ...enterpriseLinking,
+    },
   };
 
   worker.use(
     ...verificationHandlers(state, fapiUrl),
+    ...enterpriseHandlers(state, fapiUrl),
     http.get(fapiUrl('/v1/environment'), () => HttpResponse.json(state.environment)),
     http.get(fapiUrl('/v1/client'), () => envelope(state.client, null)),
+    http.get(fapiUrl('/v1/me'), () => {
+      const user = activeUser(state);
+      return user ? envelope(user, state.client) : missing();
+    }),
+    http.post(fapiUrl('/v1/me/external_accounts'), async ({ request }) => {
+      const user = activeUser(state);
+      if (!user) {
+        return missing();
+      }
+      const body = new URLSearchParams(await request.text());
+      const strategy = body.get('strategy');
+      if (!strategy) {
+        return missing();
+      }
+      const provider: OAuthProvider | undefined = OAUTH_PROVIDERS.find(item => item.strategy === strategy)?.provider;
+      if (!provider) {
+        return missing();
+      }
+      const account = fapiExternalAccount({
+        id: `idn_${crypto.randomUUID()}`,
+        approved_scopes: '',
+        provider,
+        verification: fapiVerification(strategy, {
+          status: 'unverified',
+          external_verification_redirect_url: 'https://accounts.example/authorize',
+        }),
+      });
+      updateUser(state, {
+        ...user,
+        external_accounts: [
+          ...user.external_accounts.filter(
+            item => item.provider !== provider || item.verification?.status === 'verified',
+          ),
+          account,
+        ],
+      });
+      return envelope(account, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/external_accounts/:id/reauthorize'), ({ params, request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
+        return undefined;
+      }
+      const user = activeUser(state);
+      const account = user?.external_accounts.find(item => item.id === params.id);
+      if (!user || !account) {
+        return missing();
+      }
+      const pending = {
+        ...account,
+        verification: fapiVerification(`oauth_${account.provider}`, {
+          status: 'unverified',
+          external_verification_redirect_url: 'https://accounts.example/consent',
+        }),
+      };
+      updateUser(state, {
+        ...user,
+        external_accounts: user.external_accounts.map(item => (item.id === pending.id ? pending : item)),
+      });
+      return envelope(pending, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/external_accounts/:id'), ({ params, request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
+        return undefined;
+      }
+      const user = activeUser(state);
+      const account = user?.external_accounts.find(item => item.id === params.id);
+      if (!user || !account) {
+        return missing();
+      }
+      updateUser(state, { ...user, external_accounts: user.external_accounts.filter(item => item.id !== account.id) });
+      return envelope({ ...account, object: 'external_account' }, state.client);
+    }),
     http.post(fapiUrl('/v1/client/sessions/:id/tokens'), ({ params }) => {
       const session = findSession(state, params.id);
       return session
@@ -135,6 +247,19 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       const sessions = state.client.sessions.filter(s => s.id !== session.id);
       state.client = { ...state.client, sessions, last_active_session_id: sessions[0]?.id ?? null };
       return envelope({ ...session, status: 'removed' }, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/change_password'), async ({ request }) => {
+      const session = findSession(state, state.client.last_active_session_id);
+      if (!session) {
+        return missing();
+      }
+      state.passwordUpdates.push(new URLSearchParams(await request.text()));
+      const updatedUser = { ...session.user, password_enabled: true };
+      state.client = {
+        ...state.client,
+        sessions: state.client.sessions.map(item => (item.id === session.id ? { ...item, user: updatedUser } : item)),
+      };
+      return envelope(updatedUser, state.client);
     }),
     http.post(fapiUrl('/v1/client/sessions'), ({ request }) => {
       if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
@@ -173,6 +298,41 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       state.suggestions = state.suggestions.map(s => (s.id === accepted.id ? accepted : s));
       return envelope(accepted, state.client);
     }),
+    http.get(fapiUrl('/api_keys'), ({ request }) => {
+      const url = new URL(request.url);
+      const subject = url.searchParams.get('subject');
+      const query = (url.searchParams.get('query') ?? '').toLowerCase();
+      const keys = state.apiKeys.filter(
+        key => !key.revoked && key.subject === subject && key.name.toLowerCase().includes(query),
+      );
+      return HttpResponse.json(page(keys, url));
+    }),
+    http.post(fapiUrl('/api_keys'), async ({ request }) => {
+      const body: { name: string; subject: string; seconds_until_expiration?: number } = await request.json();
+      if (state.apiKeys.some(key => !key.revoked && key.subject === body.subject && key.name === body.name)) {
+        return error('token_creation_conflict', 409);
+      }
+      const now = Date.now();
+      const created = fapiApiKey({
+        id: `ak_${state.apiKeys.length + 1}`,
+        name: body.name,
+        subject: body.subject,
+        expiration: body.seconds_until_expiration ? now + body.seconds_until_expiration * 1000 : null,
+        created_at: now,
+        updated_at: now,
+      });
+      state.apiKeys = [created, ...state.apiKeys];
+      return HttpResponse.json({ ...created, secret: `ak_secret_${created.id}` });
+    }),
+    http.post(fapiUrl('/api_keys/:id/revoke'), ({ params }) => {
+      const key = state.apiKeys.find(k => k.id === params.id);
+      if (!key) {
+        return missing();
+      }
+      const revoked = { ...key, revoked: true };
+      state.apiKeys = state.apiKeys.map(k => (k.id === revoked.id ? revoked : k));
+      return HttpResponse.json(revoked);
+    }),
   );
 
   return state;
@@ -181,7 +341,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
 export interface HeldRequests {
   requests: Request[];
   release: () => void;
-  fail: (code?: string) => void;
+  fail: (code?: string, longMessage?: string, paramName?: string) => void;
 }
 
 interface Hold {
@@ -223,7 +383,21 @@ export function holdRequests(method: 'get' | 'post', path: string): HeldRequests
   return {
     requests,
     release: () => settle(undefined),
-    fail: (code = 'form_param_invalid') =>
-      settle(HttpResponse.json({ errors: [{ code, message: code, long_message: code }] }, { status: 400 })),
+    fail: (code = 'form_param_invalid', longMessage = code, paramName?: string) =>
+      settle(
+        HttpResponse.json(
+          {
+            errors: [
+              {
+                code,
+                message: code,
+                long_message: longMessage,
+                ...(paramName ? { meta: { param_name: paramName } } : {}),
+              },
+            ],
+          },
+          { status: 400 },
+        ),
+      ),
   };
 }

@@ -13,8 +13,8 @@ import { Tabs as Primitive } from '../../primitives/tabs';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { focusOutline } from '../../utils/focus-outline.styles';
-import { reset } from '../../utils/reset.styles';
+import { focusOutline } from '../../styles/focus-outline.styles';
+import { reset } from '../../styles/reset.styles';
 import { styles } from './tabs.styles';
 
 type StyledProps<Props> = Omit<Props, 'className' | 'style'> & MosaicStyleProps;

@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { Button } from '../../components/button';
 import { Menu } from '../../components/menu';
 import type { ReverificationController } from '../../features/reverification';
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../mosaic-provider';
 import type { DestructiveControlledProps, DestructiveHandleProps } from './destructive';
 import { Destructive } from './destructive';
 

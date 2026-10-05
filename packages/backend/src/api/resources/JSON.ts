@@ -976,6 +976,13 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   created_at: number;
   updated_at: number;
   aud?: string[];
+  act?: IdPOAuthAccessTokenActorJSON;
+}
+
+export interface IdPOAuthAccessTokenActorJSON {
+  iss?: string;
+  sub: string;
+  act?: IdPOAuthAccessTokenActorJSON;
 }
 
 export interface BillingPayerJSON extends ClerkResourceJSON {

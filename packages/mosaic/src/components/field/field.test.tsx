@@ -6,6 +6,9 @@ import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { space } from '../../tokens.stylex';
+import { Checkbox } from '../checkbox';
+import type { FieldFeedback } from '../form';
 import { Input } from '../input';
 import { Select } from '../select';
 import { Field } from './field';
@@ -14,6 +17,7 @@ const overrides = stylex.create({
   root: { display: 'grid' },
   label: { fontWeight: 700 },
   description: { opacity: 0.8 },
+  content: { gap: '4px' },
   error: { fontWeight: 600 },
 });
 
@@ -35,6 +39,41 @@ function stubPrototype(target: object, name: string, descriptor: PropertyDescrip
 }
 
 describe('Mosaic Field', () => {
+  it.each<{ type: FieldFeedback['type']; slot: string }>([
+    { type: 'error', slot: 'cl-field-error' },
+    { type: 'success', slot: 'cl-field-success' },
+    { type: 'info', slot: 'cl-field-info' },
+    { type: 'warning', slot: 'cl-field-info' },
+  ])('associates $type feedback with its control', ({ type, slot }) => {
+    render(
+      <Field.Root>
+        <Field.Label>Password</Field.Label>
+        <Input />
+        <Field.Feedback feedback={{ type, message: 'Password feedback' }} />
+      </Field.Root>,
+    );
+    expect(screen.getByRole('textbox', { name: 'Password' })).toHaveAccessibleDescription('Password feedback');
+    expect(screen.getByText('Password feedback').closest('p')).toHaveClass(slot);
+    expect(screen.getByRole('status')).toHaveTextContent('Password feedback');
+  });
+  it('associates text-only info feedback with the control in a live region', () => {
+    render(
+      <Field.Root>
+        <Field.Label>Password</Field.Label>
+        <Input />
+        <Field.Message>
+          <Field.Hint>Try a longer password.</Field.Hint>
+        </Field.Message>
+      </Field.Root>,
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Password' })).toHaveAccessibleDescription('Try a longer password.');
+    expect(screen.getByRole('status')).toHaveTextContent('Try a longer password.');
+    const info = screen.getByText('Try a longer password.').closest('p');
+    expect(info).toHaveClass('cl-field-info');
+    expect(info?.querySelector('svg')).toBeNull();
+  });
+
   afterEach(() => {
     restores.splice(0).forEach(restore => restore());
   });
@@ -175,6 +214,63 @@ describe('Mosaic Field', () => {
     expect(inside).not.toHaveClass('cl-field-control');
   });
 
+  it('associates a checkbox laid out beside its label', async () => {
+    render(
+      <Field.Root
+        orientation='horizontal'
+        data-testid='root'
+      >
+        <Checkbox />
+        <Field.Content data-testid='content'>
+          <Field.Label>Sign out of all devices</Field.Label>
+          <Field.Description>Recommended after changing your password.</Field.Description>
+        </Field.Content>
+      </Field.Root>,
+    );
+
+    const checkbox = screen.getByRole('checkbox', { name: 'Sign out of all devices' });
+    expect(screen.getByTestId('root')).toHaveAttribute('data-orientation', 'horizontal');
+    expect(screen.getByTestId('content')).toHaveClass('cl-field-content');
+    expect(checkbox).toHaveAttribute(
+      'aria-describedby',
+      screen.getByText('Recommended after changing your password.').id,
+    );
+    await userEvent.click(screen.getByText('Sign out of all devices'));
+    expect(checkbox).toBeChecked();
+  });
+
+  it('toggles a checkbox wrapped in its label', async () => {
+    render(
+      <Field.Root>
+        <Field.Label>
+          <Checkbox />
+          Stay signed in
+        </Field.Label>
+      </Field.Root>,
+    );
+
+    await userEvent.click(screen.getByText('Stay signed in'));
+    expect(screen.getByRole('checkbox', { name: 'Stay signed in' })).toBeChecked();
+  });
+
+  it('propagates semantic state to a checkbox', () => {
+    render(
+      <Field.Root
+        disabled
+        required
+        invalid
+      >
+        <Checkbox />
+      </Field.Root>,
+    );
+
+    const checkbox = screen.getByRole('checkbox');
+    expect(checkbox).toBeDisabled();
+    expect(checkbox).toBeRequired();
+    expect(checkbox).toHaveAttribute('aria-invalid', 'true');
+    expect(checkbox.parentElement).toHaveAttribute('data-disabled');
+  });
+
   it('propagates semantic state while preserving explicit control props', () => {
     render(
       <>
@@ -285,6 +381,7 @@ describe('Mosaic Field', () => {
     const rootRef = React.createRef<HTMLDivElement>();
     const labelRef = React.createRef<HTMLLabelElement>();
     const descriptionRef = React.createRef<HTMLParagraphElement>();
+    const contentRef = React.createRef<HTMLDivElement>();
     const errorRef = React.createRef<HTMLParagraphElement>();
 
     render(
@@ -304,6 +401,10 @@ describe('Mosaic Field', () => {
         >
           Description
         </Field.Description>
+        <Field.Content
+          ref={contentRef}
+          data-content='field'
+        />
         <Field.Error
           ref={errorRef}
           role='status'
@@ -316,6 +417,7 @@ describe('Mosaic Field', () => {
     expect(rootRef.current).toHaveAttribute('data-root', 'field');
     expect(labelRef.current).toHaveAttribute('for', 'name');
     expect(descriptionRef.current).toHaveAttribute('title', 'Help');
+    expect(contentRef.current).toHaveAttribute('data-content', 'field');
     expect(errorRef.current).toHaveAttribute('role', 'status');
   });
 
@@ -327,11 +429,16 @@ describe('Mosaic Field', () => {
       >
         <Field.Label xstyle={overrides.label}>Email</Field.Label>
         <Field.Description xstyle={overrides.description}>Description</Field.Description>
+        <Field.Content
+          xstyle={overrides.content}
+          data-testid='content'
+        />
         <Field.Error xstyle={overrides.error}>Error</Field.Error>
       </Field.Root>,
     );
 
     expect(screen.getByTestId('root')).toHaveClass('cl-field-root', ...atoms(overrides.root));
+    expect(screen.getByTestId('content')).toHaveClass('cl-field-content', ...atoms(overrides.content));
     expect(screen.getByText('Email')).toHaveClass('cl-field-label', ...atoms(overrides.label));
     expect(screen.getByText('Description')).toHaveClass('cl-field-description', ...atoms(overrides.description));
     expect(screen.getByText('Error').closest('p')).toHaveClass('cl-field-error', ...atoms(overrides.error));
@@ -365,12 +472,14 @@ describe('Mosaic Field', () => {
       <Field.Root render={props => <section {...props} />}>
         <Field.Label render={props => <label {...props} />}>Biography</Field.Label>
         <Field.Description render={props => <div {...props} />}>Description</Field.Description>
+        <Field.Content render={props => <section {...props} />}>Content</Field.Content>
         <Field.Error render={props => <div {...props} />}>Error</Field.Error>
       </Field.Root>,
     );
 
     expect(screen.getByText('Biography').closest('section')).not.toBeNull();
     expect(screen.getByText('Description').tagName).toBe('DIV');
+    expect(screen.getByText('Content').tagName).toBe('SECTION');
     expect(screen.getByText('Error').closest('div')).toHaveClass('cl-field-error');
   });
 
@@ -387,11 +496,11 @@ describe('Mosaic Field', () => {
     const probe = stylex.create({
       message: {
         transitionProperty: {
-          default: 'height, margin-top',
+          default: 'height',
           '@media (prefers-reduced-motion: reduce)': 'none',
         },
         height: {
-          default: 'var(--_cl-feedback-height)',
+          default: `calc(var(--_cl-feedback-height) + var(--_cl-feedback-gap, ${space['2']}))`,
           ':where(:not([data-open]), [data-starting-style])': 0,
         },
       },

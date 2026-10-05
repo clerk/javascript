@@ -1,10 +1,14 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
+import { useTransition } from '../../primitives/hooks';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
+import { hasMessage, useHeldMessage } from '../../utils/feedback';
+import type { BannerRootProps } from '../banner';
+import { Banner } from '../banner';
 import { Branding } from '../branding';
 import { Button } from '../button';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
@@ -171,6 +175,48 @@ const Description = React.forwardRef<HTMLParagraphElement, MosaicComponentProps<
   });
 });
 
+export interface CardBannerProps extends MosaicComponentProps<'div'> {
+  /** Semantic color of the banner. @default 'neutral' */
+  color?: BannerRootProps['color'];
+}
+
+const CardBanner = React.forwardRef<HTMLDivElement, CardBannerProps>(function CardBanner(
+  { color, render, xstyle, children, ...rest },
+  ref,
+) {
+  const open = hasMessage(children);
+  const element = React.useRef<HTMLElement | null>(null);
+  const { mounted, transitionProps } = useTransition({ open, ref: element });
+  const message = useHeldMessage(children, open);
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    ref: [ref, element],
+    props: {
+      ...mergeStyleProps(
+        themeProps('card-banner'),
+        stylex.props(reset.base, slots.banner.collapse, xstyle),
+        { ...transitionProps },
+        rest,
+      ),
+      children: (
+        <div {...stylex.props(reset.base, slots.banner.clip)}>
+          {mounted ? (
+            <Banner.Root
+              color={color}
+              xstyle={slots.banner.surface}
+              aria-hidden={open ? undefined : true}
+              {...transitionProps}
+            >
+              <Banner.Label>{message}</Banner.Label>
+            </Banner.Root>
+          ) : null}
+        </div>
+      ),
+    },
+  });
+});
+
 const Content = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(function CardContent(
   { render, xstyle, ...rest },
   ref,
@@ -210,10 +256,14 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
 
 /**
  * A styled surface composed through `Card.Root`, `Card.Header`, `Card.Title`, `Card.Description`,
- * `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic `render` prop and forwards its
- * ref.
+ * `Card.Banner`, `Card.Content`, and `Card.Footer`. Every part accepts the Mosaic `render` prop and
+ * forwards its ref.
+ *
+ * `Card.Banner` is a message slot between the header and the content. It is always rendered, and
+ * a `Banner` expands into it while its children hold a message, collapsing again once they are
+ * empty, so the slot takes `role='alert'` and stays a live region across both.
  *
  * Rendered as the content of a `Dialog.Popup`, the card reads that surface from `DialogContext`:
  * the title and description take the popup's ARIA ids, and the header carries the dismiss button.
  */
-export const Card = { Root, Header, Title, Description, Content, Footer };
+export const Card = { Root, Header, Title, Description, Banner: CardBanner, Content, Footer };

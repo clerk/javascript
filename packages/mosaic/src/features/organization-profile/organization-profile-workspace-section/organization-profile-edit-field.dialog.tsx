@@ -1,7 +1,6 @@
 import type { FormEvent } from 'react';
 import { useId, useRef } from 'react';
 
-import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
@@ -73,6 +72,12 @@ export function OrganizationProfileEditFieldDialog({
             {description ? <Card.Description>{description}</Card.Description> : null}
           </Card.Header>
 
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {error?.message && !error.field ? error.message : null}
+          </Card.Banner>
           <Card.Content
             render={
               <form
@@ -81,14 +86,6 @@ export function OrganizationProfileEditFieldDialog({
               />
             }
           >
-            {error?.message && !error.field ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
-              >
-                <Banner.Label>{error.message}</Banner.Label>
-              </Banner.Root>
-            ) : null}
             <Field.Root invalid={Boolean(error?.field)}>
               <Field.Label visuallyHidden>{fieldLabel}</Field.Label>
               <Input

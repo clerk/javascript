@@ -9,7 +9,7 @@ import { Badge } from '../../components/badge';
 import { Button } from '../../components/button';
 import { Dialog } from '../../components/dialog';
 import { Section } from '../../components/section';
-import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
+import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import type { MosaicMessages } from '../../localization';
 import { fill, plural, useLocale, useMessages } from '../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
@@ -205,8 +205,8 @@ function DeviceItem({
     <Section.Item>
       <UserProfileSecurityIcon name={device.type} />
       <Section.Content>
-        <Section.Label xstyle={styles.deviceLabel}>
-          <span>{device.name}</span>
+        <Section.Label>
+          {device.name}
           {deviceBadges(device, m).map(label => (
             <Badge
               key={label}

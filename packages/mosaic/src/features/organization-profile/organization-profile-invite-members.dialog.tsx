@@ -1,7 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 import { useId, useRef } from 'react';
 
-import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import type { DialogFocusTarget } from '../../components/dialog';
@@ -73,6 +72,12 @@ export function OrganizationProfileInviteMembersDialog({
           <Card.Header>
             <Card.Title>{m.title}</Card.Title>
           </Card.Header>
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {error}
+          </Card.Banner>
           <Card.Content
             render={
               <form
@@ -86,14 +91,6 @@ export function OrganizationProfileInviteMembersDialog({
               />
             }
           >
-            {error ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
-              >
-                <Banner.Label>{error}</Banner.Label>
-              </Banner.Root>
-            ) : null}
             <Field.Root
               required
               invalid={hasInvalid}

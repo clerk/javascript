@@ -1,6 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { Banner } from '../../../components/banner';
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
@@ -50,15 +49,13 @@ export function UserProfileVerifyEmailLinkDialog({
           <Card.Header>
             <Card.Title>{m.title}</Card.Title>
           </Card.Header>
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {errorMessage}
+          </Card.Banner>
           <Card.Content xstyle={styles.content}>
-            {errorMessage ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
-              >
-                <Banner.Label>{errorMessage}</Banner.Label>
-              </Banner.Root>
-            ) : null}
             <div
               role='status'
               {...stylex.props(styles.status)}
