@@ -12,12 +12,12 @@ import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-p
 import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from './user-profile-passkeys-section.view';
-import type { UserProfilePasswordSlot } from './user-profile-password-section/user-profile-password-section.types';
 
 export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMethod, UserProfilePasskey };
 
 export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiveDevicesSectionViewProps, 'devices'> {
-  passwordSlot?: UserProfilePasswordSlot | null;
+  passwordSlot?: ReactNode;
+  passwordVisible?: boolean;
   passkeys?: UserProfilePasskey[];
   passkeysVisible?: boolean;
   mfaMethods?: UserProfileMfaMethod[];
@@ -38,6 +38,7 @@ export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiv
 
 export function UserProfileSecurityPanelView({
   passwordSlot,
+  passwordVisible = false,
   passkeys,
   passkeysVisible = true,
   mfaMethods,
@@ -56,9 +57,8 @@ export function UserProfileSecurityPanelView({
   onSignOutAllOtherDevices,
   dangerSlot,
 }: UserProfileSecurityPanelViewProps): ReactElement {
-  const showPassword = Boolean(passwordSlot);
   const showPasskeys = passkeys !== undefined && passkeysVisible;
-  const hasAuthentication = showPassword || showPasskeys || mfaMethods !== undefined;
+  const hasAuthentication = passwordVisible || showPasskeys || mfaMethods !== undefined;
 
   return (
     <Panel.Root render={<div {...themeProps('user-profile-security-panel')} />}>
@@ -66,7 +66,7 @@ export function UserProfileSecurityPanelView({
       <Panel.Sections>
         {hasAuthentication ? (
           <Section.Root aria-label='Authentication'>
-            {passwordSlot?.content}
+            {passwordVisible ? passwordSlot : null}
             {showPasskeys ? (
               <UserProfilePasskeysSectionView
                 passkeys={passkeys}

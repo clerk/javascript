@@ -23,7 +23,3 @@ export interface UserProfilePasswordSectionViewProps {
   /** Replaces the edit action with the enterprise provider’s name. */
   managedBy?: UserProfileManagedBy;
 }
-
-export interface UserProfilePasswordSlot {
-  content: ReactNode;
-}
