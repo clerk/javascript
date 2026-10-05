@@ -898,6 +898,17 @@ export const srRS: LocalizationResource = {
       title: 'Izaberite provajdera',
       warning: 'Kada se provajder izabere, ne možete ga ponovo menjati dok se konfiguracija ne završi',
     },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
       subtitle: undefined,
@@ -1337,6 +1348,10 @@ export const srRS: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
           clientSecret: {
             placeholder: undefined,
           },

@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 
-import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import type { DialogFocusTarget, DialogHandle, DialogTriggerProps } from '../../components/dialog';
@@ -47,16 +46,12 @@ function ConfirmationCard({
           <Card.Title>{title}</Card.Title>
           <Card.Description>{description}</Card.Description>
         </Card.Header>
-        {errorMessage ? (
-          <Card.Content>
-            <Banner.Root
-              role='alert'
-              color='negative'
-            >
-              <Banner.Label>{errorMessage}</Banner.Label>
-            </Banner.Root>
-          </Card.Content>
-        ) : null}
+        <Card.Banner
+          role='alert'
+          color='negative'
+        >
+          {errorMessage}
+        </Card.Banner>
         <Card.Footer>
           <Dialog.Close
             render={

@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import type { ReactNode, Ref } from 'react';
 
 import type { ActionMenuAction } from '../../../components/action-menu';
@@ -7,6 +8,7 @@ import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
+import { truncationStyles } from '../../../styles/typography.styles';
 import { styles } from '../user-profile-profile-panel.styles';
 
 export interface UserProfileContactListRowViewProps {
@@ -100,7 +102,7 @@ export function UserProfileContactListRowView({
                 <Section.Item key={item.id}>
                   <Section.Content>
                     <Section.Description xstyle={styles.contactValue}>
-                      <span>{item.value}</span>
+                      <span {...stylex.props(truncationStyles.singleLine, styles.contactText)}>{item.value}</span>
                       {item.isDefault ? <Badge color='neutral'>{m.primary}</Badge> : null}
                     </Section.Description>
                   </Section.Content>

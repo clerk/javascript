@@ -904,6 +904,17 @@ export const hiIN: LocalizationResource = {
       title: 'प्रदाता चुनें',
       warning: 'एक बार प्रदाता का चयन करने के बाद आप कॉन्फ़िगरेशन समाप्त होने तक इसे बदल नहीं सकते',
     },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
       subtitle: undefined,
@@ -1345,6 +1356,10 @@ export const hiIN: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
           clientSecret: {
             placeholder: undefined,
           },

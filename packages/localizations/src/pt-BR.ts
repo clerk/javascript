@@ -905,6 +905,17 @@ export const ptBR: LocalizationResource = {
       warning:
         'Depois que um provedor for selecionado, você não poderá alterá-lo até que a configuração seja concluída',
     },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
       subtitle: undefined,
@@ -1347,6 +1358,10 @@ export const ptBR: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
           clientSecret: {
             placeholder: undefined,
           },

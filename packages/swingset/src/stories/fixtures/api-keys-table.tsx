@@ -1,0 +1,189 @@
+import { Panel } from '@clerk/mosaic/components/panel';
+import { resolveAPIKeysTableMessages } from '@clerk/mosaic/features/api-keys/api-keys-table.messages';
+import type {
+  APIKeysTableSort,
+  APIKeysTableSubjectKind,
+  APIKeysTableViewProps,
+} from '@clerk/mosaic/features/api-keys/api-keys-table.types';
+import { APIKeysTableView } from '@clerk/mosaic/features/api-keys/api-keys-table.view';
+import { useCreateAPIKeyController } from '@clerk/mosaic/features/api-keys/create-api-key.controller';
+import { useLocale, useMessages } from '@clerk/mosaic/localization';
+import { useEffect, useState } from 'react';
+
+import { useChaosFixture } from '@/components/ChaosProvider';
+import { chaosRows, chaosText } from '@/lib/chaos';
+
+interface FixtureAPIKey {
+  id: string;
+  name: string;
+  createdAt: number;
+  expiresAt: number | null;
+  lastUsedAt: number | null;
+}
+
+const exampleTime = Date.now();
+
+export const exampleAPIKeys: FixtureAPIKey[] = [
+  'Web app',
+  'Mobile app',
+  'CI pipeline',
+  'Analytics',
+  'Billing service',
+  'Integrations',
+  'Reports',
+  'Support tools',
+  'Monitoring',
+  'Backups',
+  'Staging',
+  'Local development',
+].map((name, index) => ({
+  id: `ak_example${String(index + 1).padStart(16, '0')}`,
+  name,
+  createdAt: Date.UTC(2026, 0, index + 5),
+  expiresAt: index % 2 === 0 ? Date.UTC(2027, 11, 31) : null,
+  lastUsedAt: index % 3 === 0 ? exampleTime - (index + 2) * 60_000 : null,
+}));
+
+function sortAPIKeys(items: FixtureAPIKey[], sort: APIKeysTableSort | null) {
+  if (!sort) {
+    return items;
+  }
+  const direction = sort.direction === 'ascending' ? 1 : -1;
+  return [...items].sort((a, b) => {
+    if (sort.column === 'name') {
+      return direction * a.name.localeCompare(b.name);
+    }
+    if (sort.column === 'createdAt') {
+      return direction * (a.createdAt - b.createdAt);
+    }
+    if (a.lastUsedAt === null) {
+      return b.lastUsedAt === null ? 0 : 1;
+    }
+    if (b.lastUsedAt === null) {
+      return -1;
+    }
+    return direction * (a.lastUsedAt - b.lastUsedAt);
+  });
+}
+
+async function createExampleAPIKey() {
+  await new Promise<void>(resolve => setTimeout(resolve, 600));
+  return { id: `ak_demo_${crypto.randomUUID()}`, secret: `ak_demo_${crypto.randomUUID()}` };
+}
+
+async function revokeExampleAPIKey() {
+  await new Promise<void>(resolve => setTimeout(resolve, 600));
+}
+
+export function useAPIKeysTableFixture({
+  initialKeys = exampleAPIKeys,
+  enableSorting = false,
+  subjectKind = 'user',
+}: {
+  initialKeys?: FixtureAPIKey[];
+  enableSorting?: boolean;
+  subjectKind?: APIKeysTableSubjectKind;
+} = {}): APIKeysTableViewProps {
+  const locale = useLocale();
+  const messages = resolveAPIKeysTableMessages(useMessages('apiKeysTable'), subjectKind);
+  const seed = useChaosFixture(initialKeys, items =>
+    chaosRows(items).map(key => ({ ...key, name: chaosText(key.name) })),
+  );
+  const [items, setItems] = useState(seed);
+  const [searchValue, setSearchValue] = useState('');
+  const [query, setQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState<APIKeysTableSort | null>(null);
+  const [pageSize, setPageSize] = useState(10);
+  const dateLabel = (date: Date | number) =>
+    new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(date);
+  const relativeTime = new Intl.RelativeTimeFormat(locale);
+
+  const create = useCreateAPIKeyController({
+    messages,
+    onCreate: async ({ name, expiresAt }) => {
+      const result = await createExampleAPIKey();
+      setItems(current => [
+        {
+          id: result.id,
+          name,
+          createdAt: Date.now(),
+          expiresAt: expiresAt?.getTime() ?? null,
+          lastUsedAt: null,
+        },
+        ...current,
+      ]);
+      return result.secret;
+    },
+  });
+
+  useEffect(() => {
+    const next = searchValue.trim();
+    if (next === query) {
+      return;
+    }
+    const timer = setTimeout(() => {
+      setQuery(next);
+      setPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchValue, query]);
+
+  const filtered = items.filter(item => item.name.toLowerCase().includes(query.toLowerCase()));
+  const sorted = sortAPIKeys(filtered, sort);
+  const pageCount = Math.ceil(filtered.length / pageSize);
+  useEffect(() => {
+    if (page > Math.max(1, pageCount)) {
+      setPage(Math.max(1, pageCount));
+    }
+  }, [page, pageCount]);
+
+  return {
+    messages,
+    apiKeys: sorted.slice((page - 1) * pageSize, page * pageSize).map(item => ({
+      id: item.id,
+      name: item.name,
+      createdAtLabel: dateLabel(item.createdAt),
+      expiresAtLabel: item.expiresAt === null ? null : dateLabel(item.expiresAt),
+      lastUsedAtLabel:
+        item.lastUsedAt === null
+          ? null
+          : relativeTime.format(Math.round((item.lastUsedAt - exampleTime) / 60_000), 'minute'),
+    })),
+    totalCount: filtered.length,
+    page,
+    pageSize,
+    searchValue,
+    isLoading: false,
+    onCreate: create.onOpen,
+    createDialog: create.dialog,
+    onSearchChange: setSearchValue,
+    onPageChange: setPage,
+    onPageSizeChange: setPageSize,
+    sort: enableSorting ? sort : undefined,
+    onSortChange: enableSorting
+      ? next => {
+          setSort(next);
+          setPage(1);
+        }
+      : undefined,
+    onRevoke: async id => {
+      await revokeExampleAPIKey();
+      setItems(current => current.filter(item => item.id !== id));
+    },
+  };
+}
+
+export function APIKeysPanelExample(props: APIKeysTableViewProps) {
+  return (
+    <Panel.Root>
+      <Panel.Title>API Keys</Panel.Title>
+      <APIKeysTableView {...props} />
+    </Panel.Root>
+  );
+}

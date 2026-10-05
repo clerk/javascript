@@ -906,6 +906,17 @@ export const ptPT: LocalizationResource = {
       title: 'Selecionar fornecedor',
       warning: 'Depois de um fornecedor ser selecionado não pode ser alterado até que a configuração esteja terminada',
     },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
       subtitle: undefined,
@@ -1347,6 +1358,10 @@ export const ptPT: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
           clientSecret: {
             placeholder: undefined,
           },

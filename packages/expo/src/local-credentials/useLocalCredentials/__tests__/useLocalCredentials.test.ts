@@ -33,15 +33,29 @@ vi.mock('expo-local-authentication', () => ({
   supportedAuthenticationTypesAsync: () => Promise.resolve([]),
 }));
 
+const assertValidKey = (key: string) => {
+  if (!/^[\w.-]+$/.test(key)) {
+    throw new Error('Invalid key provided to SecureStore.');
+  }
+};
+
 vi.mock('expo-secure-store', () => ({
   WHEN_PASSCODE_SET_THIS_DEVICE_ONLY: 0,
-  getItem: (key: string) => mocks.store.get(key) ?? null,
-  getItemAsync: (key: string) => Promise.resolve(mocks.store.get(key) ?? null),
+  getItem: (key: string) => {
+    assertValidKey(key);
+    return mocks.store.get(key) ?? null;
+  },
+  getItemAsync: (key: string) => {
+    assertValidKey(key);
+    return Promise.resolve(mocks.store.get(key) ?? null);
+  },
   deleteItemAsync: (key: string) => {
+    assertValidKey(key);
     mocks.store.delete(key);
     return Promise.resolve();
   },
   setItemAsync: (key: string, value: string, options?: { requireAuthentication?: boolean }) => {
+    assertValidKey(key);
     if (options?.requireAuthentication && mocks.rejectProtectedWrites) {
       return Promise.reject(new Error('User canceled the authentication'));
     }
@@ -54,11 +68,25 @@ const identifierKey = `__clerk_local_auth_${mocks.publishableKey}_identifier`;
 const passwordKey = `__clerk_local_auth_${mocks.publishableKey}_password`;
 
 beforeEach(() => {
+  mocks.publishableKey = 'pk_test_Zm9vLmNsZXJrLmFjY291bnRzLmRldiQ';
   mocks.store.clear();
   mocks.rejectProtectedWrites = false;
 });
 
 describe('useLocalCredentials', () => {
+  test('stores credentials when the publishable key has base64 padding', async () => {
+    mocks.publishableKey = `pk_test_${btoa('ab.clerk.accounts.dev$')}`;
+    expect(mocks.publishableKey.endsWith('=')).toBe(true);
+
+    const { result } = renderHook(() => useLocalCredentials());
+    await act(() => result.current.setCredentials({ identifier: 'user@example.com', password: 'hunter2' }));
+
+    expect(result.current.hasCredentials).toBe(true);
+    for (const storedKey of mocks.store.keys()) {
+      expect(storedKey).toMatch(/^[\w.-]+$/);
+    }
+  });
+
   test('reports credentials once both writes succeed', async () => {
     const { result } = renderHook(() => useLocalCredentials());
 

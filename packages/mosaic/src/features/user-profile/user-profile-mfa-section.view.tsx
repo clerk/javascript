@@ -1,7 +1,7 @@
 import { type ReactNode, type Ref, useMemo, useRef, useState } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
-import { Text } from '../../components/text';
+import { Section } from '../../components/section';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { fill, type MosaicMessages, useMessages } from '../../localization';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
@@ -117,14 +117,7 @@ export function UserProfileMfaSectionView({
           />
         ))}
       </UserProfileSecurityList>
-      {defaultError ? (
-        <Text
-          role='alert'
-          color='negative'
-        >
-          {defaultError}
-        </Text>
-      ) : null}
+      <Section.Error>{defaultError}</Section.Error>
       {onRemove ? (
         <Confirmation
           handle={removeMethod}
