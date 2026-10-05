@@ -321,7 +321,11 @@ const getSubmitCodeTool = (clerk: Clerk) =>
       }
 
       if (signIn.status === 'needs_second_factor' || signIn.status === 'needs_client_trust') {
-        const strategy = signIn.secondFactorVerification.strategy ?? getSecondFactor(signIn)?.strategy;
+        const isBackupCode =
+          !/^\d{6}$/.test(code) && signIn.supportedSecondFactors?.some(factor => factor.strategy === 'backup_code');
+        const strategy = isBackupCode
+          ? 'backup_code'
+          : (signIn.secondFactorVerification.strategy ?? getSecondFactor(signIn)?.strategy);
         if (
           strategy === 'totp' ||
           strategy === 'phone_code' ||

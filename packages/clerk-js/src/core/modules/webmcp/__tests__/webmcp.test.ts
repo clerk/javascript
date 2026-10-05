@@ -202,6 +202,18 @@ describe('registerWebMcpTools', () => {
     expect(signIn.attemptSecondFactor).toHaveBeenCalledWith({ strategy: 'totp', code: '123456' });
   });
 
+  it('accepts a backup code instead of an authenticator app code', async () => {
+    const { signIn, update } = setup;
+    signIn.status = 'needs_second_factor';
+    signIn.supportedSecondFactors = [{ strategy: 'totp' }, { strategy: 'backup_code' }];
+    signIn.secondFactorVerification.strategy = 'totp';
+    signIn.attemptSecondFactor.mockImplementation(update({ status: 'complete', createdSessionId: 'sess_1' }));
+    await register();
+
+    await expect(call('clerk_submit_code', { code: 'a1b2c3d4' })).resolves.toEqual({ status: 'signed_in' });
+    expect(signIn.attemptSecondFactor).toHaveBeenCalledWith({ strategy: 'backup_code', code: 'a1b2c3d4' });
+  });
+
   it('sends a code when the sign-in needs a new-device check', async () => {
     const { signIn, update } = setup;
     const factor = { strategy: 'email_code', emailAddressId: 'idn_1', safeIdentifier: 'j***@acme.com' };
