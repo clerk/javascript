@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { UseFormResult } from '../../../components/form';
 import { useForm } from '../../../components/form';
 import type { FieldFeedback } from '../../../components/form/form-submit-error';
+import { useDebouncedAsync } from '../../../hooks/use-debounced-async';
 import { useMessages } from '../../../localization';
 import type {
   UserProfileEditPasswordValue,
@@ -27,6 +28,7 @@ export interface UserProfileEditPasswordController {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   form: UseFormResult<UserProfileEditPasswordValues>;
+  passwordFeedback: FieldFeedback | undefined;
 }
 
 export function useUserProfileEditPasswordController({
@@ -34,16 +36,13 @@ export function useUserProfileEditPasswordController({
   onSubmit,
   validatePassword,
 }: UserProfileEditPasswordControllerOptions): UserProfileEditPasswordController {
+  const validationError = useMessages('errors').generic;
   const m = useMessages('userProfilePasswordSection');
   const [isOpen, setIsOpen] = useState(false);
 
   const form = useForm({
     initialValues,
     fields: {
-      newPassword: validatePassword && {
-        validateAsync: password => validatePassword(password),
-        debounceMs: DEBOUNCE_MS,
-      },
       confirmPassword: {
         // TODO: Discuss showing success feedback when the confirmation matches, as legacy does. https://github.com/clerk/javascript/pull/9930#discussion_r4150406791
         validate: (value, values) =>
@@ -65,6 +64,17 @@ export function useUserProfileEditPasswordController({
     },
   });
 
+  const password = form.values.newPassword;
+  const passwordLeft = form.fields.newPassword.touched;
+  // TODO: Discuss keeping the password hint hidden on open or showing it immediately when the field autofocuses. https://github.com/clerk/javascript/pull/9930#discussion_r4150863181
+  const strength = useDebouncedAsync(
+    password,
+    value => (validatePassword ? validatePassword(value) : Promise.resolve(undefined)),
+    { delayMs: DEBOUNCE_MS, enabled: isOpen && (password !== '' || passwordLeft) && validatePassword !== undefined },
+  );
+  const passwordFeedback: FieldFeedback | undefined =
+    strength.error === undefined ? strength.data : { type: 'error', message: validationError };
+
   const onOpenChange = (open: boolean) => {
     if (form.isSubmitting) {
       return;
@@ -73,5 +83,5 @@ export function useUserProfileEditPasswordController({
     setIsOpen(open);
   };
 
-  return { isOpen, onOpenChange, form };
+  return { isOpen, onOpenChange, form, passwordFeedback };
 }

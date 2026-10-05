@@ -69,11 +69,14 @@ describe('useForm: edit password', () => {
     act(() => result.current.setValue('currentPassword', 'old-secret'));
     act(() => result.current.setValue('newPassword', 'short'));
     await act(tick);
+    expect(result.current.fields.newPassword.feedback).toBeUndefined();
+    expect(result.current.canSubmit).toBe(false);
+
+    act(() => result.current.touch('newPassword'));
     expect(result.current.fields.newPassword.feedback).toEqual({
       type: 'error',
       message: 'Your password must contain 8 or more characters.',
     });
-    expect(result.current.canSubmit).toBe(true);
 
     act(() => result.current.setValue('newPassword', 'longenough'));
     expect(result.current.fields.newPassword.isValidating).toBe(true);
