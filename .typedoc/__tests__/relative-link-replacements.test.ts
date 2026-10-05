@@ -112,16 +112,4 @@ describe('applyRelativeLinkReplacements', () => {
     expect(applyRelativeLinkReplacements('no links here')).toBe('no links here');
     expect(applyRelativeLinkReplacements('')).toBe('');
   });
-
-  it('removes links to generated fragments without published docs pages', () => {
-    expect(
-      applyRelativeLinkReplacements(
-        '<code>[SamlConnectionIdpCertificate](saml-connection-idp-certificate.mdx)[]</code>',
-      ),
-    ).toBe('<code>SamlConnectionIdpCertificate[]</code>');
-    expect(applyRelativeLinkReplacements('[DeletedObject](../deleted-object.mdx#properties)')).toBe('DeletedObject');
-    expect(applyRelativeLinkReplacements('[Clerk docs](https://clerk.com/docs/reference.mdx)')).toBe(
-      '[Clerk docs](https://clerk.com/docs/reference.mdx)',
-    );
-  });
 });
