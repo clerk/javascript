@@ -4,8 +4,8 @@ import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
 
-export function UserProfileDeleteSectionView(destructiveProps: DestructiveController) {
-  const m = useMessages('userProfileDeleteSection');
+export function UserProfileDangerSectionView(destructiveProps: DestructiveController) {
+  const m = useMessages('userProfileDangerSection');
 
   return (
     <Section.Root>

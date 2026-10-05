@@ -33,7 +33,7 @@ export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiv
   onRemoveMfaMethod?: (id: string) => void | Promise<void>;
   onSetDefaultMfaMethod?: (id: string) => void | Promise<void>;
   /** Danger zone. Omit to hide it. */
-  deleteAccountSlot?: ReactNode;
+  dangerSlot?: ReactNode;
 }
 
 export function UserProfileSecurityPanelView({
@@ -54,7 +54,7 @@ export function UserProfileSecurityPanelView({
   onSetDefaultMfaMethod,
   onSignOutDevice,
   onSignOutAllOtherDevices,
-  deleteAccountSlot,
+  dangerSlot,
 }: UserProfileSecurityPanelViewProps): ReactElement {
   const showPassword = Boolean(passwordSlot);
   const showPasskeys = passkeys !== undefined && passkeysVisible;
@@ -96,7 +96,7 @@ export function UserProfileSecurityPanelView({
             onSignOutDevice={onSignOutDevice}
           />
         ) : null}
-        {deleteAccountSlot}
+        {dangerSlot}
       </Panel.Sections>
     </Panel.Root>
   );
