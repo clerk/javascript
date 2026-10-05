@@ -4,6 +4,7 @@ import React from 'react';
 import type { MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
+import type { IconProps } from '../icon';
 import { sizes } from '../icon/icon.styles';
 import { providerLogoGlyphs } from './provider-logo.glyphs.generated';
 import type { ProviderLogoId } from './provider-logo.ids.generated';
@@ -12,11 +13,13 @@ import { styles } from './provider-logo.styles';
 
 export interface ProviderLogoProps extends MosaicElementProps<'svg'> {
   provider: ProviderLogoId;
-  size?: 'sm' | 'md' | 'lg' | 'inherit';
+  size?: IconProps['size'];
 }
 
+const providerLogoIdSet: ReadonlySet<string> = new Set(providerLogoIds);
+
 export function isProviderLogoId(value: string): value is ProviderLogoId {
-  return (providerLogoIds as readonly string[]).includes(value);
+  return providerLogoIdSet.has(value);
 }
 
 export const ProviderLogo = React.forwardRef<SVGSVGElement, ProviderLogoProps>(function MosaicProviderLogo(

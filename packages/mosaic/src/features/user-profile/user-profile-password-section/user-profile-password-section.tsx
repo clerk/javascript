@@ -21,7 +21,6 @@ export function useUserProfilePasswordSlot({
   fallback = null,
 }: UserProfilePasswordSectionProps = {}): UserProfilePasswordSlot | null {
   const model = useUserProfilePasswordModel();
-  const m = useMessages('userProfilePasswordSection');
   if (model.status === 'loading') {
     // TODO: Add a password section skeleton as the default loading fallback.
     return fallback ? { content: fallback } : null;
@@ -34,7 +33,7 @@ export function useUserProfilePasswordSlot({
       content: (
         <UserProfilePasswordSectionView
           hasPassword={model.mode === 'change'}
-          managedBy={{ name: model.managedBy.name ?? m.enterpriseConnection, provider: model.managedBy.provider }}
+          managedBy={model.managedBy}
         />
       ),
     };

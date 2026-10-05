@@ -41,8 +41,8 @@ describe('Mosaic ProviderLogo', () => {
     expect(ids.length).toBeGreaterThan(1);
     expect(new Set(ids).size).toBe(ids.length);
     for (const node of container.querySelectorAll('[clip-path]')) {
-      const ref = node.getAttribute('clip-path')!.match(/#([^)]+)/)![1];
-      expect(node.closest('svg')!.querySelector(`[id="${ref}"]`)).not.toBeNull();
+      const ref = node.getAttribute('clip-path')?.match(/#([^)]+)/)?.[1];
+      expect(ref && node.closest('svg')?.querySelector(`[id="${ref}"]`)).toBeTruthy();
     }
   });
 

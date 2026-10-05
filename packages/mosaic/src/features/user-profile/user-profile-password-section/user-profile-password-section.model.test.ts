@@ -11,7 +11,7 @@ type TestUser = {
   passwordEnabled: boolean;
   enterpriseAccounts: {
     active: boolean;
-    provider?: string;
+    provider: string;
     enterpriseConnection?: { name: string; logoPublicUrl: string | null };
   }[];
   updatePassword: ReturnType<typeof vi.fn>;
@@ -143,7 +143,7 @@ describe('useUserProfilePasswordModel context changes', () => {
           environment.userSettings.instanceIsPasswordBased = false;
           break;
         case 'enterprise':
-          user.enterpriseAccounts = [{ active: true }];
+          user.enterpriseAccounts = [{ active: true, provider: 'saml_okta' }];
           break;
         case 'mode':
           user.passwordEnabled = false;
@@ -171,7 +171,7 @@ describe('useUserProfilePasswordModel enterprise accounts', () => {
       throw new Error('expected user');
     }
     user.enterpriseAccounts = [
-      { active: false, enterpriseConnection: { name: 'Inactive', logoPublicUrl: null } },
+      { active: false, provider: 'saml_custom', enterpriseConnection: { name: 'Inactive', logoPublicUrl: null } },
       {
         active: true,
         provider: 'saml_okta',
@@ -186,12 +186,14 @@ describe('useUserProfilePasswordModel enterprise accounts', () => {
     });
   });
 
-  it('leaves a blank connection name undefined', () => {
+  it('falls back to the provider when the connection has no name', () => {
     if (!user) {
       throw new Error('expected user');
     }
-    user.enterpriseAccounts = [{ active: true, enterpriseConnection: { name: '', logoPublicUrl: null } }];
+    user.enterpriseAccounts = [
+      { active: true, provider: 'saml_custom', enterpriseConnection: { name: '', logoPublicUrl: null } },
+    ];
     const { result } = renderHook(() => useUserProfilePasswordModel());
-    expect(result.current).toMatchObject({ managedBy: { name: undefined } });
+    expect(result.current).toMatchObject({ managedBy: { name: 'custom' } });
   });
 });

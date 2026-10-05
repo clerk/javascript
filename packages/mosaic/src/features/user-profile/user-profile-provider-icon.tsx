@@ -7,29 +7,53 @@ import { Section } from '../../components/section';
 import type { IconName } from '../../icons/registry';
 import { styles } from './user-profile-profile-panel.styles';
 
-type UserProfileProviderIconProps = { iconUrl: string } | { name: IconName } | { logo: ProviderLogoId };
+export type UserProfileProviderIconProps =
+  | { logo: ProviderLogoId }
+  | { iconUrl: string }
+  | { name: IconName }
+  | { initial: string };
+
+function ProviderIconContent(props: UserProfileProviderIconProps) {
+  if ('logo' in props) {
+    return (
+      <ProviderLogo
+        provider={props.logo}
+        xstyle={styles.providerIcon}
+      />
+    );
+  }
+  if ('iconUrl' in props) {
+    return (
+      <img
+        alt=''
+        src={props.iconUrl}
+        {...stylex.props(styles.providerIcon)}
+      />
+    );
+  }
+  if ('name' in props) {
+    return (
+      <Icon
+        name={props.name}
+        xstyle={styles.providerIcon}
+      />
+    );
+  }
+  return (
+    <span
+      aria-hidden
+      {...stylex.props(styles.providerIcon, styles.providerInitial)}
+    >
+      {props.initial}
+    </span>
+  );
+}
 
 export function UserProfileProviderIcon(props: UserProfileProviderIconProps) {
   return (
     <Section.Media size='lg'>
       <IconFrame>
-        {'logo' in props ? (
-          <ProviderLogo
-            provider={props.logo}
-            xstyle={styles.providerIcon}
-          />
-        ) : 'iconUrl' in props ? (
-          <img
-            alt=''
-            src={props.iconUrl}
-            {...stylex.props(styles.providerIcon)}
-          />
-        ) : (
-          <Icon
-            name={props.name}
-            xstyle={styles.providerIcon}
-          />
-        )}
+        <ProviderIconContent {...props} />
       </IconFrame>
     </Section.Media>
   );

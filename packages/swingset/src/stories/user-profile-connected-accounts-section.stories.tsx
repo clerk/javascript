@@ -45,7 +45,7 @@ export function ConnectionError() {
       {
         id: 'apple',
         provider: 'Apple',
-        logo: 'apple',
+        icon: { logo: 'apple' },
         connectError: 'Unable to connect. Please try again.',
       },
     ],

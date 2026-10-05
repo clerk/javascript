@@ -1,11 +1,10 @@
-import type { ProviderLogoId } from '../../../components/provider-logo';
+import type { UserProfileProviderIconProps } from '../user-profile-provider-icon';
 
 export type ConnectedAccountActionResult = 'redirecting' | void;
 
 export interface ConnectedAccountProviderDisplay {
   provider: string;
-  logo?: ProviderLogoId;
-  iconUrl?: string;
+  icon: UserProfileProviderIconProps;
 }
 
 export interface UserProfileConnectionProvider extends ConnectedAccountProviderDisplay {

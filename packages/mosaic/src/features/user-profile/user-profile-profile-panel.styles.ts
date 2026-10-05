@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { space } from '../../tokens.stylex';
+import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
   countdown: {
@@ -14,7 +14,17 @@ export const styles = stylex.create({
   },
   providerIcon: {
     display: 'block',
+    objectFit: 'contain',
     height: space['5'],
     width: space['5'],
+  },
+  providerInitial: {
+    borderRadius: radiusVars['--cl-radius-sm'],
+    alignItems: 'center',
+    backgroundColor: `color-mix(in oklab, ${colorVars['--cl-color-neutral']} 8%, transparent)`,
+    color: colorVars['--cl-color-neutral'],
+    display: 'inline-flex',
+    fontSize: '0.625rem',
+    justifyContent: 'center',
   },
 });

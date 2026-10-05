@@ -42,7 +42,7 @@ describe('UserProfileVerifyEmailSsoDialog', () => {
   });
 
   it('shows the bundled logo for a known provider', () => {
-    renderView({ connection: { provider: 'Okta SSO', domain: 'acme.co', logo: 'okta' } });
+    renderView({ connection: { provider: 'Okta SSO', domain: 'acme.co', icon: { logo: 'okta' } } });
 
     expect(document.querySelector('.cl-provider-logo')).toHaveAttribute('data-provider', 'okta');
   });

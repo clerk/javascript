@@ -192,7 +192,7 @@ describe('projectConnectedAccounts', () => {
     });
     expect(projection.status === 'ready' && projection.accounts[0]).toMatchObject({
       provider: 'Custom Provider',
-      iconUrl: 'https://img.example/custom.png',
+      icon: { iconUrl: 'https://img.example/custom.png' },
     });
   });
 
@@ -203,9 +203,9 @@ describe('projectConnectedAccounts', () => {
       socialEnabled: true,
       allowCreation: true,
     });
-    expect(projection.status === 'ready' && projection.availableProviders.map(p => [p.id, p.logo, p.iconUrl])).toEqual([
-      ['oauth_github', 'github', undefined],
-      ['oauth_google', 'google', undefined],
+    expect(projection.status === 'ready' && projection.availableProviders.map(p => [p.id, p.icon])).toEqual([
+      ['oauth_github', { logo: 'github' }],
+      ['oauth_google', { logo: 'google' }],
     ]);
   });
 

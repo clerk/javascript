@@ -24,87 +24,75 @@ function optimizeSvg(id, source) {
   }).data;
 }
 
-function parse(markup) {
-  const root = { children: [] };
-  const stack = [root];
-  const tag = /<(\/?)([a-zA-Z][\w:-]*)((?:\s+[\w:-]+="[^"]*")*)\s*(\/?)>|([^<]+)/g;
-  for (const [, closing, name, attrs, selfClosing, text] of markup.matchAll(tag)) {
-    if (text !== undefined) {
-      if (text.trim()) {
-        throw new Error(`Unexpected text content: ${text.slice(0, 40)}`);
-      }
-      continue;
-    }
-    if (closing) {
-      stack.pop();
-      continue;
-    }
-    if (name === 'style' || name === 'script' || name === 'foreignObject' || name === 'image') {
-      throw new Error(`Unsupported <${name}> element`);
-    }
-    const node = {
-      name,
-      attrs: Object.fromEntries([...attrs.matchAll(/([\w:-]+)="([^"]*)"/g)].map(([, k, v]) => [k, v])),
-      children: [],
-    };
-    stack.at(-1).children.push(node);
-    if (!selfClosing) {
-      stack.push(node);
-    }
-  }
-  return root.children[0];
-}
+const UNSUPPORTED = new Set(['style', 'script', 'foreignObject', 'image']);
+const PAINT = new Set(['fill', 'fill-rule', 'clip-rule', 'stroke']);
+const UNPAINTED = new Set(['clipPath', 'mask']);
 
 const camel = value => value.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 
-function applyTreatment(entry, svg) {
-  const paint = Object.fromEntries(
-    Object.entries(svg.attrs).filter(([k]) => ['fill', 'fill-rule', 'clip-rule', 'stroke'].includes(k)),
-  );
-  const visit = (node, fn) => {
-    fn(node);
-    node.children.forEach(child => visit(child, fn));
-  };
-
-  if (entry.treatment === 'mono') {
-    paint.fill = 'currentColor';
-    svg.children.forEach(child =>
-      visit(child, node => {
-        if (node.name === 'clipPath' || node.name === 'mask') {
-          return;
-        }
-        if (node.attrs.fill && node.attrs.fill !== 'none') {
-          node.attrs.fill = 'currentColor';
-        }
-      }),
-    );
-  }
-
+function treat(entry, optimized) {
   const unused = new Set(Object.keys(entry.colors ?? {}));
   const swap = value => {
     for (const [from, to] of Object.entries(entry.colors ?? {})) {
-      if (value?.toLowerCase() === from.toLowerCase()) {
+      if (value.toLowerCase() === from.toLowerCase()) {
         unused.delete(from);
         return to;
       }
     }
     return value;
   };
-  if (paint.fill) {
-    paint.fill = swap(paint.fill);
-  }
-  svg.children.forEach(child =>
-    visit(child, node => {
-      if (node.attrs.fill) {
-        node.attrs.fill = swap(node.attrs.fill);
-      }
-    }),
-  );
+
+  let svg;
+  let unpaintedDepth = 0;
+  optimize(optimized, {
+    plugins: [
+      {
+        name: 'providerLogoTreatment',
+        fn: root => {
+          svg = root.children.find(child => child.type === 'element');
+          return {
+            element: {
+              enter: node => {
+                if (UNSUPPORTED.has(node.name)) {
+                  throw new Error(`${entry.id}: unsupported <${node.name}> element`);
+                }
+                if (UNPAINTED.has(node.name)) {
+                  unpaintedDepth += 1;
+                }
+                const { fill } = node.attributes;
+                if (entry.treatment === 'mono' && unpaintedDepth === 0 && (node === svg || (fill && fill !== 'none'))) {
+                  node.attributes.fill = 'currentColor';
+                }
+                if (node.attributes.fill) {
+                  node.attributes.fill = swap(node.attributes.fill);
+                }
+              },
+              exit: node => {
+                if (UNPAINTED.has(node.name)) {
+                  unpaintedDepth -= 1;
+                }
+              },
+            },
+            text: {
+              enter: node => {
+                if (node.value.trim()) {
+                  throw new Error(`${entry.id}: unexpected text content: ${node.value.slice(0, 40)}`);
+                }
+              },
+            },
+          };
+        },
+      },
+    ],
+  });
+
   if (unused.size > 0) {
     throw new Error(`${entry.id}: colors not found in the optimized SVG: ${[...unused].join(', ')}`);
   }
-  return paint;
+  return svg;
 }
+
+const elements = node => node.children.filter(child => child.type === 'element');
 
 function attrsToJsx(attrs, ids) {
   return Object.entries(attrs)
@@ -132,12 +120,13 @@ function attrsToJsx(attrs, ids) {
 }
 
 function toJsx(node, ids) {
-  const attrs = attrsToJsx(node.attrs, ids);
+  const attrs = attrsToJsx(node.attributes, ids);
   const open = attrs ? `<${node.name} ${attrs}` : `<${node.name}`;
-  if (node.children.length === 0) {
+  const children = elements(node);
+  if (children.length === 0) {
     return `${open} />`;
   }
-  return `${open}>${node.children.map(child => toJsx(child, ids)).join('')}</${node.name}>`;
+  return `${open}>${children.map(child => toJsx(child, ids)).join('')}</${node.name}>`;
 }
 
 function squareViewBox(viewBox) {
@@ -166,26 +155,28 @@ for (const entry of providers) {
 
   const optimized = optimizeSvg(entry.id, readFileSync(resolve(dir, `logos/${entry.id}.svg`), 'utf8'));
   rawBytes += optimized;
-  const svg = parse(optimized);
-  if (!svg.attrs.viewBox) {
+  const svg = treat(entry, optimized);
+  if (!svg.attributes.viewBox) {
     throw new Error(`${entry.id}: the SVG has no viewBox`);
   }
-  const paint = applyTreatment(entry, svg);
+  const paint = Object.fromEntries(Object.entries(svg.attributes).filter(([k]) => PAINT.has(k)));
 
   const ids = new Set();
   const collect = node => {
-    if (node.attrs.id) {
-      ids.add(node.attrs.id);
+    if (node.attributes.id) {
+      ids.add(node.attributes.id);
     }
-    node.children.forEach(collect);
+    elements(node).forEach(collect);
   };
   collect(svg);
 
-  let body = svg.children.map(child => toJsx(child, ids)).join('');
+  let body = elements(svg)
+    .map(child => toJsx(child, ids))
+    .join('');
   const paintAttrs = attrsToJsx(paint, ids);
   if (paintAttrs) {
     body = `<g ${paintAttrs}>${body}</g>`;
-  } else if (svg.children.length > 1) {
+  } else if (elements(svg).length > 1) {
     body = `<>${body}</>`;
   }
   if (entry.treatment === 'adaptive' && !body.includes('light-dark(')) {
@@ -194,7 +185,7 @@ for (const entry of providers) {
 
   const key = /^[a-z_$][\w$]*$/i.test(entry.id) ? entry.id : `'${entry.id}'`;
   glyphs.push(`  ${key}: {
-    viewBox: '${squareViewBox(svg.attrs.viewBox)}',
+    viewBox: '${squareViewBox(svg.attributes.viewBox)}',
     render: (${ids.size > 0 ? 'uid' : ''}) => (${body}),
   },`);
 }

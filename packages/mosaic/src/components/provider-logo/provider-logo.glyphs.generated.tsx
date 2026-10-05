@@ -96,7 +96,7 @@ export const providerLogoGlyphs: Record<ProviderLogoId, ProviderLogoGlyph> = {
         <defs>
           <clipPath id={`cl-logo-twitter-a-${uid}`}>
             <path
-              fill='currentColor'
+              fill='#fff'
               d='M0 0h20v20H0z'
             />
           </clipPath>
@@ -175,7 +175,7 @@ export const providerLogoGlyphs: Record<ProviderLogoId, ProviderLogoGlyph> = {
         <defs>
           <clipPath id={`cl-logo-github-a-${uid}`}>
             <path
-              fill='currentColor'
+              fill='#fff'
               d='M0 0h98v96H0z'
             />
           </clipPath>
@@ -433,7 +433,7 @@ export const providerLogoGlyphs: Record<ProviderLogoId, ProviderLogoGlyph> = {
         <defs>
           <clipPath id={`cl-logo-x-a-${uid}`}>
             <path
-              fill='currentColor'
+              fill='#fff'
               d='M0 0h20v20H0z'
             />
           </clipPath>

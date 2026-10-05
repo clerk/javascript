@@ -1,7 +1,16 @@
-import type { ProviderLogoId } from '../../components/provider-logo';
-import { isProviderLogoId } from '../../components/provider-logo';
+import type { EnterpriseAccountResource } from '@clerk/shared/types';
 
-export function toManagedByProvider(provider: string | undefined): ProviderLogoId | undefined {
-  const id = provider?.replace(/^(oauth_|saml_)/, '');
-  return id && isProviderLogoId(id) ? id : undefined;
+import type { UserProfileManagedBy } from './user-profile-managed-by';
+import { stripProviderPrefix, toProviderLogoId } from './user-profile-provider-icon.model';
+
+type ManagingAccount = Pick<EnterpriseAccountResource, 'provider'> & {
+  enterpriseConnection?: { name?: string | null } | null;
+};
+
+export function toManagedBy(account: ManagingAccount): UserProfileManagedBy {
+  const provider = toProviderLogoId(account.provider);
+  return {
+    name: account.enterpriseConnection?.name || stripProviderPrefix(account.provider),
+    ...(provider ? { provider } : {}),
+  };
 }
