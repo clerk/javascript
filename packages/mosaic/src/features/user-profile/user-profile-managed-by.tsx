@@ -4,14 +4,23 @@ import { Icon } from '../../components/icon';
 import type { ProviderLogoId } from '../../components/provider-logo';
 import { ProviderLogo } from '../../components/provider-logo';
 import { Section, sectionCompactStyles } from '../../components/section';
+import { fill, useMessages } from '../../localization';
 
 /** The enterprise connection a row's value comes from, which is why the row has nothing to edit. */
 export interface UserProfileManagedBy {
-  name: string;
+  name?: string;
   provider?: ProviderLogoId;
 }
 
-export function UserProfileManagedByLabel({ managedBy, label }: { managedBy: UserProfileManagedBy; label: string }) {
+export function UserProfileManagedByLabel({
+  managedBy,
+  template,
+}: {
+  managedBy: UserProfileManagedBy;
+  template: string;
+}) {
+  const m = useMessages('userProfile');
+  const name = managedBy.name || m.enterpriseConnection;
   return (
     <Section.Note
       icon={
@@ -29,8 +38,8 @@ export function UserProfileManagedByLabel({ managedBy, label }: { managedBy: Use
         )
       }
     >
-      <span {...stylex.props(sectionCompactStyles.hidden)}>{label}</span>
-      <span {...stylex.props(sectionCompactStyles.only)}>{managedBy.name}</span>
+      <span {...stylex.props(sectionCompactStyles.hidden)}>{fill(template, { name })}</span>
+      <span {...stylex.props(sectionCompactStyles.only)}>{name}</span>
     </Section.Note>
   );
 }

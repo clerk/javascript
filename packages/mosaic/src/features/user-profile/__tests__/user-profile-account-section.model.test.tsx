@@ -257,9 +257,9 @@ describe('useUserProfileAccountSectionModel', () => {
       });
     });
 
-    it('falls back to the provider when the active account carries no connection', () => {
+    it('leaves the name to the label when the active account carries no connection', () => {
       user?.enterpriseAccounts.push({ active: true, provider: 'saml_okta', enterpriseConnection: null });
-      expect(ready().nameManagedBy).toEqual({ name: 'okta', provider: 'okta' });
+      expect(ready().nameManagedBy).toEqual({ provider: 'okta' });
     });
 
     it('leaves the provider out for a connection without a bundled logo', () => {

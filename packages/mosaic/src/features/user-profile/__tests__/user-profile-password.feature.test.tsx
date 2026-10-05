@@ -207,7 +207,7 @@ describe('Changing a password', () => {
       }),
     );
 
-    expect(screen.getByText('Managed by okta')).toBeInTheDocument();
+    expect(screen.getByText('Managed by your enterprise connection')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Change password' })).toBeNull();
   });
 

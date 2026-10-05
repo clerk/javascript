@@ -186,7 +186,7 @@ describe('useUserProfilePasswordModel enterprise accounts', () => {
     });
   });
 
-  it('falls back to the provider when the connection has no name', () => {
+  it('leaves the name to the label when the connection has no name', () => {
     if (!user) {
       throw new Error('expected user');
     }
@@ -194,6 +194,7 @@ describe('useUserProfilePasswordModel enterprise accounts', () => {
       { active: true, provider: 'saml_custom', enterpriseConnection: { name: '', logoPublicUrl: null } },
     ];
     const { result } = renderHook(() => useUserProfilePasswordModel());
-    expect(result.current).toMatchObject({ managedBy: { name: 'custom' } });
+    expect(result.current).toMatchObject({ managedBy: {} });
+    expect(result.current).not.toHaveProperty('managedBy.name');
   });
 });

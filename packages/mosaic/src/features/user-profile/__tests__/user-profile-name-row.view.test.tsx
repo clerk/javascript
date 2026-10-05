@@ -50,6 +50,18 @@ describe('UserProfileNameRowView', () => {
     expect(screen.getByText('Managed by Okta')).toBeInTheDocument();
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
+  it('names a generic enterprise connection when the connection has no name', () => {
+    render(
+      <MosaicProvider>
+        <UserProfileNameRowView
+          name='Preston Booth'
+          managedBy={{}}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByText('Managed by your enterprise connection')).toBeInTheDocument();
+  });
   it('shows the managing provider logo when one is bundled', () => {
     const { container } = render(
       <MosaicProvider>

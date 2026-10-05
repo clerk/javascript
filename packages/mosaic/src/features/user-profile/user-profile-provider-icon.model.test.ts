@@ -29,7 +29,7 @@ describe('toManagedBy', () => {
     });
   });
 
-  it('falls back to the provider id and omits a logo it does not bundle', () => {
-    expect(toManagedBy({ provider: 'saml_custom', enterpriseConnection: null })).toEqual({ name: 'custom' });
+  it('leaves out a missing name and a logo it does not bundle', () => {
+    expect(toManagedBy({ provider: 'saml_custom', enterpriseConnection: null })).toEqual({});
   });
 });

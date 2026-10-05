@@ -1,6 +1,6 @@
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
-import { fill, useMessages } from '../../../localization';
+import { useMessages } from '../../../localization';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import { UserProfileManagedByLabel } from '../user-profile-managed-by';
 import type { UserProfileNameAttribute } from './user-profile-account-section.types';
@@ -50,7 +50,7 @@ export function UserProfileNameRowView({
         ) : managedBy ? (
           <UserProfileManagedByLabel
             managedBy={managedBy}
-            label={fill(m.name.managedBy, { name: managedBy.name })}
+            template={m.name.managedBy}
           />
         ) : null}
       </Section.Item>

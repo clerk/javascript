@@ -2,7 +2,7 @@ import type { ProviderLogoId } from '../../components/provider-logo';
 import { isProviderLogoId } from '../../components/provider-logo';
 import type { UserProfileProviderIconProps } from './user-profile-provider-icon';
 
-export function stripProviderPrefix(provider: string): string {
+function stripProviderPrefix(provider: string): string {
   return provider.replace(/^(oauth_|saml_|oidc_)/, '');
 }
 
