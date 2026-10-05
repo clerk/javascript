@@ -239,7 +239,7 @@ const useRoleMapping = (
     : null;
 
   return {
-    isLoading: isLoadingMappings || isLoadingRoles,
+    isLoading: isLoadingMappings || Boolean(isLoadingRoles),
     error,
     enabled,
     setEnabled: setDraftEnabled,
