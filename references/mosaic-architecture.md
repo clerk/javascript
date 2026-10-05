@@ -378,6 +378,12 @@ export function useUserButtonController(model: UserButtonModel, options = {}): U
 The controller passes the model's `status` through, so the wrapper has one thing to
 branch on rather than two.
 
+Pass model values needed by the view through the controller, even when they need
+no transformation. When composing a view with a controller, read those values from
+the controller result instead of mixing model and controller values in view props.
+This gives the view one interface. Swingset can mock the controller's inputs and
+pass its result to the same view.
+
 A controller whose interaction is a single boolean with no async and no second
 value to keep in step is the same layer with `useState` inside it — still no
 Clerk, still returning plain props:

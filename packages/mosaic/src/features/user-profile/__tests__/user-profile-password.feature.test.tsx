@@ -1,7 +1,7 @@
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
@@ -74,6 +74,79 @@ describe('Changing a password', () => {
     expect(screen.queryByText('Password')).toBeNull();
   });
 
+  it.each(['sign out', 'switch user', 'switch session'] as const)(
+    'discards the password draft after %s',
+    async change => {
+      const fapi = serveFapi({
+        client: fapiClient([
+          fapiSession({ id: 'sess_1', user: alice }),
+          fapiSession({ id: 'sess_2', user: change === 'switch user' ? fapiUser({ id: 'user_2' }) : alice }),
+        ]),
+      });
+      const { clerk } = await renderWithClerk(<UserProfilePasswordSection />);
+      const user = await fillPassword();
+
+      await act(() => (change === 'sign out' ? clerk.signOut() : clerk.setActive({ session: 'sess_2' })));
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(fapi.passwordUpdates).toHaveLength(0);
+      if (change === 'sign out') {
+        expect(screen.queryByText('Password')).toBeNull();
+      } else {
+        expect(clerk.session?.id).toBe('sess_2');
+        await user.click(screen.getByRole('button', { name: 'Change password' }));
+        expect(screen.getByLabelText('Current password')).toHaveValue('');
+        expect(screen.getByLabelText('New password')).toHaveValue('');
+        expect(screen.getByLabelText('Confirm password')).toHaveValue('');
+      }
+    },
+  );
+
+  it('shows an unexpected update failure in the dialog and keeps the draft', async () => {
+    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
+    const { clerk } = await renderWithClerk(<UserProfilePasswordSection />);
+    if (!clerk.user) {
+      throw new Error('Expected a signed-in user');
+    }
+    const update = vi.spyOn(clerk.user, 'updatePassword').mockRejectedValue(new Error('Connection interrupted'));
+    try {
+      const user = await fillPassword();
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Connection interrupted'));
+      expect(screen.getByLabelText('Current password')).toHaveValue('old-secret');
+      expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
+      expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
+    } finally {
+      update.mockRestore();
+    }
+  });
+
+  it('shows feedback when the password strength checker cannot load', async () => {
+    const environment = fapiEnvironment();
+    environment.user_settings.password_settings.show_zxcvbn = true;
+    serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
+    const { clerk } = await renderWithClerk(<UserProfilePasswordSection />);
+    const modules = clerk.__internal_moduleManager;
+    if (!modules) {
+      throw new Error('Expected a module manager');
+    }
+    const load = vi.spyOn(modules, 'import').mockRejectedValue(new Error('Failed to load password strength checker'));
+    try {
+      const user = userEvent.setup();
+      await user.click(screen.getByRole('button', { name: 'Change password' }));
+      await user.type(screen.getByLabelText('New password'), 'new-password-123');
+
+      await waitFor(() =>
+        expect(screen.getByLabelText('New password')).toHaveAccessibleDescription(
+          'Something went wrong. Please try again.',
+        ),
+      );
+    } finally {
+      load.mockRestore();
+    }
+  });
+
   it('sends the update to Clerk and closes after it succeeds', async () => {
     const fapi = await renderPassword();
     const user = await fillPassword();
@@ -137,6 +210,26 @@ describe('Changing a password', () => {
         'This password has been found as part of a breach and can not be used, please try another password instead.',
       ),
     );
+    expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
+    expect(screen.getByRole('alert').textContent).toBe('');
+  });
+
+  it('shows an incorrect current password error at the field and keeps the draft', async () => {
+    await renderPassword();
+    const user = await fillPassword();
+    const update = holdRequests('post', '/v1/me/change_password');
+
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+    await waitFor(() => expect(update.requests).toHaveLength(1));
+    update.fail('form_password_incorrect', undefined, 'current_password');
+
+    await waitFor(() =>
+      expect(screen.getByLabelText('Current password')).toHaveAccessibleDescription(
+        'Your current password is incorrect.',
+      ),
+    );
+    expect(screen.getByLabelText('Current password')).toHaveValue('old-secret');
+    expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
     expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
     expect(screen.getByRole('alert').textContent).toBe('');
   });
@@ -209,6 +302,19 @@ describe('Changing a password', () => {
 
     expect(screen.getByText('Managed by your enterprise connection')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Change password' })).toBeNull();
+  });
+
+  it('shows the generic provider label when the enterprise connection name is blank', async () => {
+    const account = fapiEnterpriseAccount({ id: 'ent_1' });
+    if (!account.enterprise_connection) {
+      throw new Error('Expected an enterprise connection');
+    }
+    account.enterprise_connection.name = '';
+    await renderPassword(fapiUser({ ...alice, enterprise_accounts: [account] }));
+
+    expect(screen.getByText('Managed by your enterprise connection')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Change password' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Set password' })).toBeNull();
   });
 
   it('focuses the current password and clears the draft after cancellation', async () => {

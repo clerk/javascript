@@ -120,6 +120,10 @@ have a machine.
 
 ## Rules
 
+- **Pass through model values the view needs.** Return them alongside interaction
+  state and actions. Compose view props from the controller result, without mixing
+  in model values directly. See `references/mosaic-architecture.md` for the layer
+  contract and Swingset reuse.
 - **No Clerk imports.** If a controller needs a Clerk fact, the model supplies it
   as data.
 - **No machine snapshot in the return value.** Return the plain props the view
