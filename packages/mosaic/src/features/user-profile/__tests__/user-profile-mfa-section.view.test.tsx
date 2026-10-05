@@ -188,7 +188,7 @@ describe('MFA section', () => {
     await user.click(selected);
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(message);
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     expect(screen.getAllByText('Default')).toHaveLength(1);
     await user.click(selected);

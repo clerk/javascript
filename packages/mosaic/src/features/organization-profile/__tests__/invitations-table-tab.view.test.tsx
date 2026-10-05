@@ -47,7 +47,7 @@ describe('InvitationsTableTabView', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Revoke invitation' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Revoke invitation' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Could not revoke invitation.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Could not revoke invitation.'));
   });
 
   it('distinguishes loading, an empty invitation list, and an empty search', () => {

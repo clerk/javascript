@@ -29,7 +29,7 @@ describe('UserProfilePictureRowView', () => {
     await user.click(screen.getByRole('button', { name: 'Manage profile picture' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove avatar' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent("This action couldn't be completed.");
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent("This action couldn't be completed."));
   });
 
   it('replaces a rejected pick with the result of a removal', async () => {
