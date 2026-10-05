@@ -270,7 +270,7 @@ jobs:
               > "$RUNNER_TEMP/e2e-device-logs/$udid-console.log" 2>&1 &
             log_pids+=($!)
           done
-          pnpm test:integration:expo-native:ios --video=on-first-retry --reporter list,junit,markdown
+          pnpm test:integration:expo-native:ios --reporter list,junit,markdown
 
       - name: Enable KVM
         if: matrix.platform == 'android' && steps.keys.outputs.sk != ''
@@ -321,7 +321,7 @@ jobs:
             mkdir -p "$RUNNER_TEMP/e2e-device-logs" &&
             adb install -r "$FIXTURE_DIR/android/app/build/outputs/apk/release/app-release.apk" &&
             (adb logcat -v threadtime > "$RUNNER_TEMP/e2e-device-logs/logcat.log" 2>&1 &) &&
-            pnpm test:integration:expo-native:android --video=on-first-retry --reporter list,junit,markdown
+            pnpm test:integration:expo-native:android --reporter list,junit,markdown
 
       - name: Delete leftover test users
         if: always() && steps.keys.outputs.sk != ''
@@ -343,7 +343,6 @@ jobs:
           include-hidden-files: true
           path: |
             integration/.e2e
-            !integration/.e2e/**/.video.*
             ${{ runner.temp }}/e2e-device-logs
           if-no-files-found: warn
           retention-days: 7
