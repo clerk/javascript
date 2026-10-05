@@ -7,7 +7,7 @@ import { useMessages } from '../../../localization';
 import { truncationStyles } from '../../../styles/typography.styles';
 import { useOrganizationProfileEditFieldController } from './organization-profile-edit-field.controller';
 import { OrganizationProfileEditFieldDialog } from './organization-profile-edit-field.dialog';
-import { styles } from './organization-profile-workspace-section.styles';
+import { styles } from './organization-profile-profile-section.styles';
 
 export interface OrganizationProfileSlugRowViewProps {
   slug: string;
@@ -15,7 +15,7 @@ export interface OrganizationProfileSlugRowViewProps {
 }
 
 export function OrganizationProfileSlugRowView({ slug, onSubmit }: OrganizationProfileSlugRowViewProps) {
-  const m = useMessages('organizationProfileWorkspaceSection');
+  const m = useMessages('organizationProfileProfileSection');
   return (
     <Section.Row>
       <Section.Item>
@@ -50,7 +50,7 @@ export function OrganizationProfileSlugRowView({ slug, onSubmit }: OrganizationP
 }
 
 function EditSlug({ slug, onSubmit }: { slug: string; onSubmit: (slug: string) => Promise<void> }) {
-  const m = useMessages('organizationProfileWorkspaceSection');
+  const m = useMessages('organizationProfileProfileSection');
   const controller = useOrganizationProfileEditFieldController({ value: slug, onSubmit });
 
   return (

@@ -10,7 +10,7 @@ import { OrganizationProfileGeneralPanelView } from '../organization-profile-gen
 function renderPanel(overrides: Partial<OrganizationProfileGeneralPanelViewProps> = {}) {
   const props: OrganizationProfileGeneralPanelViewProps = {
     name: 'Clerk',
-    slug: 'clerkWorkspace-177654156132154',
+    slug: 'clerk-177654156132154',
     ...overrides,
   };
   return render(
@@ -26,7 +26,7 @@ describe('organization profile general panel', () => {
 
     expect(screen.getByRole('heading', { name: 'Organization details' })).toBeVisible();
     expect(screen.getByText('Clerk')).toBeVisible();
-    expect(screen.getByText('clerkWorkspace-177654156132154')).toBeVisible();
+    expect(screen.getByText('clerk-177654156132154')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Edit name' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Upload' })).not.toBeInTheDocument();
   });

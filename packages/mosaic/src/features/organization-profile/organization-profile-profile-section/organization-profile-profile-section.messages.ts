@@ -1,4 +1,4 @@
-export const organizationProfileWorkspaceSectionMessages = {
+export const organizationProfileProfileSectionMessages = {
   sectionTitle: 'Organization details',
   logo: {
     label: 'Logo',

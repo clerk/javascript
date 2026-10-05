@@ -31,7 +31,7 @@ export function OrganizationProfileLogoRowView({
   onReject,
   onRemove,
 }: OrganizationProfileLogoRowViewProps) {
-  const m = useMessages('organizationProfileWorkspaceSection');
+  const m = useMessages('organizationProfileProfileSection');
   const [rejectionError, setRejectionError] = useState<string>();
   const displayedError = errorMessage ?? rejectionError;
   const initials = name
@@ -96,7 +96,7 @@ function LogoActions({
   canChange: boolean;
   onRemove?: () => void;
 }) {
-  const m = useMessages('organizationProfileWorkspaceSection');
+  const m = useMessages('organizationProfileProfileSection');
   const { openFilePicker } = FileUpload.useFileUpload();
   const actions: ActionMenuAction[] = [];
 

@@ -3,10 +3,10 @@ import type { ReactElement, ReactNode } from 'react';
 import { Panel } from '../../components/panel';
 import { useMessages } from '../../localization';
 import { themeProps } from '../../props';
-import type { OrganizationProfileWorkspaceSectionViewProps } from './organization-profile-workspace-section/organization-profile-workspace-section.view';
-import { OrganizationProfileWorkspaceSectionView } from './organization-profile-workspace-section/organization-profile-workspace-section.view';
+import type { OrganizationProfileProfileSectionViewProps } from './organization-profile-profile-section/organization-profile-profile-section.view';
+import { OrganizationProfileProfileSectionView } from './organization-profile-profile-section/organization-profile-profile-section.view';
 
-export interface OrganizationProfileGeneralPanelViewProps extends OrganizationProfileWorkspaceSectionViewProps {
+export interface OrganizationProfileGeneralPanelViewProps extends OrganizationProfileProfileSectionViewProps {
   dangerSlot?: ReactNode;
 }
 
@@ -28,7 +28,7 @@ export function OrganizationProfileGeneralPanelView({
     <Panel.Root render={<div {...themeProps('organization-profile-general-panel')} />}>
       <Panel.Title>{m.pages.general}</Panel.Title>
       <Panel.Sections>
-        <OrganizationProfileWorkspaceSectionView
+        <OrganizationProfileProfileSectionView
           name={name}
           slug={slug}
           imageUrl={imageUrl}

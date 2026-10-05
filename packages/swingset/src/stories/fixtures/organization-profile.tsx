@@ -14,7 +14,7 @@ import { useInviteMembersFixture } from './organization-profile-invite-members';
 import { useRequestsTableFixture } from './requests-table-tab';
 import { usePreviewImage } from './use-preview-image';
 
-const exampleOrganization = { name: 'Clerk', slug: 'clerkWorkspace-177654156132154', memberCount: 20 };
+const exampleOrganization = { name: 'Clerk', slug: 'clerk-177654156132154', memberCount: 20 };
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
 

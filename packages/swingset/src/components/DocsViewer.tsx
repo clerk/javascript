@@ -43,8 +43,8 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
     'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),
     'organization-profile': dynamic(() => import('../stories/organization-profile.mdx')),
     'organization-profile-general-panel': dynamic(() => import('../stories/organization-profile-general-panel.mdx')),
-    'organization-profile-workspace-section': dynamic(
-      () => import('../stories/organization-profile-workspace-section.mdx'),
+    'organization-profile-profile-section': dynamic(
+      () => import('../stories/organization-profile-profile-section.mdx'),
     ),
     'organization-profile-danger-section': dynamic(() => import('../stories/organization-profile-danger-section.mdx')),
     'organization-profile-api-keys-panel': dynamic(() => import('../stories/organization-profile-api-keys-panel.mdx')),

@@ -171,10 +171,10 @@ import {
   Proposed as OrganizationProfileMembersPanelProposed,
 } from '../stories/organization-profile-members-panel.stories';
 import {
-  Default as OrganizationProfileWorkspaceSectionDefault,
-  meta as organizationProfileWorkspaceSectionMeta,
-  SaveFails as OrganizationProfileWorkspaceSectionSaveFails,
-} from '../stories/organization-profile-workspace-section.stories';
+  Default as OrganizationProfileProfileSectionDefault,
+  meta as organizationProfileProfileSectionMeta,
+  SaveFails as OrganizationProfileProfileSectionSaveFails,
+} from '../stories/organization-profile-profile-section.stories';
 import {
   Default as OtpComponentDefault,
   Disabled as OtpComponentDisabled,
@@ -478,10 +478,10 @@ const organizationProfileGeneralPanelModule: StoryModule = {
   ReadOnly: OrganizationProfileGeneralPanelReadOnly,
 };
 
-const organizationProfileWorkspaceSectionModule: StoryModule = {
-  meta: organizationProfileWorkspaceSectionMeta,
-  Default: OrganizationProfileWorkspaceSectionDefault,
-  SaveFails: OrganizationProfileWorkspaceSectionSaveFails,
+const organizationProfileProfileSectionModule: StoryModule = {
+  meta: organizationProfileProfileSectionMeta,
+  Default: OrganizationProfileProfileSectionDefault,
+  SaveFails: OrganizationProfileProfileSectionSaveFails,
 };
 
 const organizationProfileDangerSectionModule: StoryModule = {
@@ -933,7 +933,7 @@ export const registry: StoryModule[] = [
   organizationProfileApiKeysPanelModule,
   organizationProfileMembersPanelModule,
   // Organization Profile · Sections
-  organizationProfileWorkspaceSectionModule,
+  organizationProfileProfileSectionModule,
   organizationProfileDangerSectionModule,
   // API Keys
   apiKeysTableModule,
