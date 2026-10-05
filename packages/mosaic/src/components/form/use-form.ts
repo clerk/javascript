@@ -1,4 +1,4 @@
-import { useCallback, useId, useRef } from 'react';
+import { useCallback, useEffect, useId, useRef } from 'react';
 
 import { useErrorText, useMessages } from '../../localization';
 import type { StateMachine } from '../../machine/types';
@@ -79,6 +79,11 @@ export interface UseFormResult<TValues extends object> {
 
 type ElementRef = (element: HTMLElement | null) => void;
 
+interface Check {
+  controller: AbortController;
+  flush: () => void;
+}
+
 const always = () => true;
 
 export function useForm<TValues extends object>(options: UseFormOptions<TValues>): UseFormResult<TValues> {
@@ -87,6 +92,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
   const errorText = useErrorText();
   const elements = useRef(new Map<keyof TValues, HTMLElement>());
   const refs = useRef(new Map<keyof TValues, ElementRef>());
+  const checks = useRef(new Map<keyof TValues, Check>());
 
   const deps = {
     initialValues: options.initialValues,
@@ -110,28 +116,95 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
       elements.current.get(invalid)?.focus();
     }
   }, [actor]);
-  const setValue = useCallback(
-    <K extends keyof TValues>(name: K, value: TValues[K]) => {
-      send({ type: 'CHANGE', name, value });
-      const { async, fields, values: next } = actor.getSnapshot().context;
+  const cancelCheck = useCallback((name: keyof TValues) => {
+    const check = checks.current.get(name);
+    checks.current.delete(name);
+    check?.controller.abort();
+    check?.flush();
+  }, []);
+  const cancelChecks = useCallback(() => {
+    for (const name of checks.current.keys()) {
+      cancelCheck(name);
+    }
+  }, [cancelCheck]);
+  useEffect(() => cancelChecks, [cancelChecks]);
+
+  const startCheck = useCallback(
+    (name: keyof TValues, debounceMs: number) => {
+      const { async, fields, values: current, fallbackMessage } = actor.getSnapshot().context;
       const validateAsync = fields?.[name]?.validateAsync;
-      if (validateAsync === undefined || async[name]?.pending !== true || async[name].value !== value) {
+      if (validateAsync === undefined || async[name]?.pending !== true) {
         return;
       }
-      const settle = (feedback: FieldFeedback | undefined) => {
-        const { submitQueued } = actor.getSnapshot().context;
-        send({ type: 'VALIDATED', name, value, feedback });
-        if (submitQueued) {
-          focusFirstInvalid();
+      const value = current[name];
+      const controller = new AbortController();
+      const failure: FieldFeedback = { type: 'error', message: fallbackMessage };
+      const checked = new Promise<FieldFeedback | undefined>(resolve => {
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        let started = false;
+        const flush = () => {
+          clearTimeout(timer);
+          if (started) {
+            return;
+          }
+          started = true;
+          if (controller.signal.aborted) {
+            resolve(undefined);
+            return;
+          }
+          try {
+            resolve(validateAsync(value, current, { signal: controller.signal }));
+          } catch {
+            resolve(failure);
+          }
+        };
+        checks.current.set(name, { controller, flush });
+        if (debounceMs > 0) {
+          timer = setTimeout(flush, debounceMs);
+        } else {
+          flush();
         }
+      });
+      const settle = (feedback: FieldFeedback | undefined) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+        checks.current.delete(name);
+        send({ type: 'VALIDATED', name, value, feedback });
       };
-      void new Promise<FieldFeedback | undefined>(resolve => resolve(validateAsync(value, next))).then(settle, () =>
-        settle(undefined),
-      );
+      void checked.then(settle, () => settle(failure));
     },
-    [actor, focusFirstInvalid, send],
+    [actor, send],
   );
-  const touch = useCallback((name: keyof TValues) => send({ type: 'TOUCH', name }), [send]);
+  const followCheck = useCallback(
+    (name: keyof TValues, previous: unknown, debounceMs: number) => {
+      if (actor.getSnapshot().context.async[name] === previous) {
+        return false;
+      }
+      cancelCheck(name);
+      startCheck(name, debounceMs);
+      return true;
+    },
+    [actor, cancelCheck, startCheck],
+  );
+  const setValue = useCallback(
+    <K extends keyof TValues>(name: K, value: TValues[K]) => {
+      const { async, fields } = actor.getSnapshot().context;
+      send({ type: 'CHANGE', name, value });
+      followCheck(name, async[name], fields?.[name]?.debounceMs ?? 0);
+    },
+    [actor, followCheck, send],
+  );
+  const touch = useCallback(
+    (name: keyof TValues) => {
+      const previous = actor.getSnapshot().context.async[name];
+      send({ type: 'TOUCH', name });
+      if (!followCheck(name, previous, 0)) {
+        checks.current.get(name)?.flush();
+      }
+    },
+    [actor, followCheck, send],
+  );
   const refFor = useCallback((name: keyof TValues): ElementRef => {
     const existing = refs.current.get(name);
     if (existing !== undefined) {
@@ -158,7 +231,13 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     },
     [submit],
   );
-  const reset = useCallback((nextValues?: TValues) => send({ type: 'RESET', values: nextValues }), [send]);
+  const reset = useCallback(
+    (nextValues?: TValues) => {
+      cancelChecks();
+      send({ type: 'RESET', values: nextValues });
+    },
+    [cancelChecks, send],
+  );
 
   const register = <K extends TextFieldName<TValues>>(name: K): RegisteredField<TValues, K> => ({
     name,
@@ -175,15 +254,13 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     ref: refFor(name),
   });
 
-  const isSubmitting = snapshot.value === 'submitting' || context.submitQueued;
+  const isSubmitting = snapshot.value === 'submitting';
   const initial = initialOf(context);
   const fields = mapKeys(values, (name): FormField => {
-    const feedback = fieldFeedback(context, name);
-    const touched = context.touched[name] === true;
     return {
-      feedback: feedback?.type === 'error' && !touched ? undefined : feedback,
+      feedback: fieldFeedback(context, name),
       isValidating: context.async[name]?.pending === true,
-      touched,
+      touched: context.touched[name] === true,
       isDirty: !Object.is(values[name], initial[name]),
     };
   });
@@ -194,8 +271,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     fields,
     error: context.error?.message,
     get isSubmitting() {
-      const current = actor.getSnapshot();
-      return current.value === 'submitting' || current.context.submitQueued;
+      return actor.getSnapshot().value === 'submitting';
     },
     isDirty: keysOf(values).some(name => fields[name].isDirty),
     canSubmit: !isSubmitting && isValid(context),

@@ -8,7 +8,7 @@ import { Checkbox } from '../../../components/checkbox';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
-import type { FieldFeedback, UseFormResult } from '../../../components/form';
+import type { UseFormResult } from '../../../components/form';
 import { Icon } from '../../../components/icon';
 import { InputGroup } from '../../../components/input-group';
 import { useMessages } from '../../../localization';
@@ -18,7 +18,6 @@ import type {
 } from './user-profile-password-section.types';
 
 export interface UserProfileEditPasswordDialogProps {
-  passwordFeedback?: FieldFeedback;
   identifier?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -29,7 +28,6 @@ export interface UserProfileEditPasswordDialogProps {
 }
 
 export function UserProfileEditPasswordDialog({
-  passwordFeedback,
   identifier = '',
   open,
   onOpenChange,
@@ -95,7 +93,6 @@ export function UserProfileEditPasswordDialog({
               inputRef={showCurrentPassword ? undefined : initialFocusRef}
               label={m.newPasswordLabel}
               name='newPassword'
-              advisoryFeedback={passwordFeedback}
             />
             <PasswordField
               autoComplete='new-password'
@@ -151,21 +148,18 @@ function PasswordField({
   form,
   inputRef,
   name,
-  advisoryFeedback,
 }: {
   label: string;
   autoComplete: 'current-password' | 'new-password';
   form: UseFormResult<UserProfileEditPasswordValues>;
   inputRef?: RefObject<HTMLInputElement>;
   name: UserProfileEditPasswordField;
-  advisoryFeedback?: FieldFeedback;
 }) {
   const m = useMessages('userProfilePasswordSection');
   const [visible, setVisible] = useState(false);
   const [focused, setFocused] = useState(false);
   const { feedback } = form.fields[name];
-  const message = feedback?.type === 'error' ? feedback : advisoryFeedback;
-  const feedbackType = message?.type === 'info' && !focused ? 'error' : message?.type;
+  const feedbackType = feedback?.type === 'info' && !focused ? 'error' : feedback?.type;
   const { ref, ...control } = form.register(name);
   const mergedRef = useMergeRefs([ref, inputRef]);
 
@@ -199,7 +193,7 @@ function PasswordField({
           </Button>
         </InputGroup.End>
       </InputGroup.Root>
-      <Field.Feedback feedback={message && feedbackType ? { ...message, type: feedbackType } : undefined} />
+      <Field.Feedback feedback={feedback && feedbackType ? { ...feedback, type: feedbackType } : undefined} />
     </Field.Root>
   );
 }

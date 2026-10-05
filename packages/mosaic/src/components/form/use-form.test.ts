@@ -337,9 +337,8 @@ describe('useForm', () => {
     expect(result.current.fields.password.feedback).toEqual({ type: 'success', message: 'Strong' });
   });
 
-  it('keeps the last async feedback while the next check runs and lets a stale error queue a submit', async () => {
+  it('keeps the last async feedback while the next check runs', async () => {
     const checks = new Map<string, ReturnType<typeof deferred<FieldFeedback | undefined>>>();
-    const onSubmit = vi.fn(resolved);
     const { result } = renderHook(() =>
       useForm({
         initialValues: { username: '' },
@@ -352,7 +351,7 @@ describe('useForm', () => {
             },
           },
         },
-        onSubmit,
+        onSubmit: resolved,
       }),
     );
     act(() => result.current.setValue('username', 'ab'));
@@ -363,147 +362,189 @@ describe('useForm', () => {
     act(() => result.current.setValue('username', 'abc'));
     expect(result.current.fields.username.isValidating).toBe(true);
     expect(result.current.fields.username.feedback).toEqual({ type: 'success', message: 'Available' });
-    await act(async () => {
-      checks.get('abc')?.resolve({ type: 'error', message: 'Taken' });
-      await tick();
-    });
-    act(() => result.current.touch('username'));
-    expect(result.current.fields.username.feedback).toEqual({ type: 'error', message: 'Taken' });
-    act(() => result.current.setValue('username', 'abcd'));
-    expect(result.current.fields.username.feedback).toEqual({ type: 'error', message: 'Taken' });
-    expect(result.current.canSubmit).toBe(true);
-    act(() => result.current.submit());
-    expect(result.current.isSubmitting).toBe(true);
-    await act(async () => {
-      checks.get('abcd')?.resolve(undefined);
-      await tick();
-    });
-    expect(onSubmit).toHaveBeenCalledWith({ username: 'abcd' });
-    expect(result.current.fields.username.feedback).toBeUndefined();
   });
 
-  it('queues a submit while async validation is pending and runs it once the field validates', async () => {
-    const check = deferred<FieldFeedback | undefined>();
+  it('shows async errors before the field is touched without blocking or delaying submit', async () => {
+    const checks = new Map<string, ReturnType<typeof deferred<FieldFeedback | undefined>>>();
     const onSubmit = vi.fn(resolved);
     const { result } = renderHook(() =>
       useForm({
         initialValues: { password: '' },
-        fields: { password: { validateAsync: () => check.promise } },
+        fields: {
+          password: {
+            validateAsync: (value: string) => {
+              const check = deferred<FieldFeedback | undefined>();
+              checks.set(value, check);
+              return check.promise;
+            },
+          },
+        },
         onSubmit,
       }),
-    );
-    act(() => result.current.setValue('password', 'ab'));
-    expect(result.current.canSubmit).toBe(true);
-    act(() => result.current.submit());
-    expect(onSubmit).not.toHaveBeenCalled();
-    expect(result.current.isSubmitting).toBe(true);
-    expect(result.current.canSubmit).toBe(false);
-    await act(async () => {
-      check.resolve(undefined);
-      await tick();
-    });
-    expect(onSubmit).toHaveBeenCalledTimes(1);
-    expect(onSubmit).toHaveBeenCalledWith({ password: 'ab' });
-    expect(result.current.isSubmitting).toBe(false);
-  });
-
-  it('focuses the first registered control in error when a queued submit is rejected by its check', async () => {
-    const check = deferred<FieldFeedback | undefined>();
-    const onSubmit = vi.fn(resolved);
-    const { result } = renderHook(() =>
-      useForm({
-        initialValues: { username: '' },
-        fields: { username: { validateAsync: () => check.promise } },
-        onSubmit,
-      }),
-    );
-    const input = document.body.appendChild(document.createElement('input'));
-    result.current.register('username').ref(input);
-    act(() => result.current.setValue('username', 'ab'));
-    act(() => result.current.submit());
-    expect(result.current.isSubmitting).toBe(true);
-    await act(async () => {
-      check.resolve({ type: 'error', message: 'Taken' });
-      await tick();
-    });
-    expect(onSubmit).not.toHaveBeenCalled();
-    expect(result.current.isSubmitting).toBe(false);
-    expect(result.current.fields.username.feedback).toEqual({ type: 'error', message: 'Taken' });
-    expect(document.activeElement).toBe(input);
-    input.remove();
-  });
-
-  it('drops a queued submit when the field changes or its validation fails', async () => {
-    const checks = new Map<string, ReturnType<typeof deferred<FieldFeedback | undefined>>>();
-    const validateAsync = (value: string) => {
-      const check = deferred<FieldFeedback | undefined>();
-      checks.set(value, check);
-      return check.promise;
-    };
-    const onSubmit = vi.fn(resolved);
-    const { result } = renderHook(() =>
-      useForm({ initialValues: { password: '' }, fields: { password: { validateAsync } }, onSubmit }),
     );
     act(() => result.current.setValue('password', 'a'));
-    act(() => result.current.submit());
-    expect(result.current.isSubmitting).toBe(true);
-    act(() => result.current.setValue('password', 'ab'));
-    expect(result.current.isSubmitting).toBe(false);
-    act(() => result.current.submit());
     await act(async () => {
-      checks.get('ab')?.resolve({ type: 'error', message: 'Weak' });
+      checks.get('a')?.resolve({ type: 'error', message: 'Weak' });
       await tick();
     });
-    expect(onSubmit).not.toHaveBeenCalled();
-    expect(result.current.isSubmitting).toBe(false);
+    expect(result.current.fields.password.touched).toBe(false);
     expect(result.current.fields.password.feedback).toEqual({ type: 'error', message: 'Weak' });
+    expect(result.current.canSubmit).toBe(true);
+
+    act(() => result.current.setValue('password', 'ab'));
+    expect(result.current.fields.password.isValidating).toBe(true);
+    await act(async () => {
+      result.current.submit();
+      await tick();
+    });
+    expect(onSubmit).toHaveBeenCalledExactlyOnceWith({ password: 'ab' });
   });
 
-  it('treats a rejected async validator as no feedback', async () => {
-    const validateAsync = vi.fn(() => Promise.reject(new Error('Network')));
+  it.each([
+    ['rejects', () => Promise.reject(new Error('Network'))],
+    [
+      'throws synchronously',
+      () => {
+        throw new Error('Nope');
+      },
+    ],
+  ])('shows the generic message when an async validator %s', async (_, validateAsync) => {
     const { result } = renderHook(() =>
       useForm({ initialValues: { password: '' }, fields: { password: { validateAsync } }, onSubmit: resolved }),
     );
     act(() => result.current.setValue('password', 'ab'));
     await act(tick);
     expect(result.current.fields.password.isValidating).toBe(false);
-    expect(result.current.fields.password.feedback).toBeUndefined();
+    expect(result.current.fields.password.feedback).toEqual({
+      type: 'error',
+      message: 'Something went wrong. Please try again.',
+    });
     expect(result.current.canSubmit).toBe(true);
   });
 
-  it('treats an async validator that throws synchronously as no feedback', async () => {
-    const { result } = renderHook(() =>
-      useForm({
-        initialValues: { password: '' },
-        fields: {
-          password: {
-            validateAsync: () => {
-              throw new Error('Nope');
-            },
-          },
-        },
-        onSubmit: resolved,
-      }),
-    );
-    await act(async () => {
-      result.current.setValue('password', 'a');
-      await tick();
-    });
-    expect(result.current.fields.password.isValidating).toBe(false);
-    expect(result.current.fields.password.feedback).toBeUndefined();
-  });
-
-  it('skips async validation when the value returns to its initial value', async () => {
-    const validateAsync = vi.fn(() => Promise.resolve(undefined));
+  it('skips the initial value until the field is touched, then checks every value', async () => {
+    const validateAsync = vi.fn((value: string) => Promise.resolve<FieldFeedback>({ type: 'info', message: value }));
     const { result } = renderHook(() =>
       useForm({ initialValues: { username: 'alex' }, fields: { username: { validateAsync } }, onSubmit: resolved }),
     );
     act(() => result.current.setValue('username', 'alexc'));
-    expect(validateAsync).toHaveBeenCalledTimes(1);
+    await act(tick);
+    expect(result.current.fields.username.feedback).toEqual({ type: 'info', message: 'alexc' });
     act(() => result.current.setValue('username', 'alex'));
     await act(tick);
     expect(validateAsync).toHaveBeenCalledTimes(1);
+    expect(result.current.fields.username.feedback).toBeUndefined();
     expect(result.current.fields.username.isValidating).toBe(false);
+
+    act(() => result.current.touch('username'));
+    await act(tick);
+    expect(validateAsync).toHaveBeenLastCalledWith('alex', { username: 'alex' }, { signal: expect.any(AbortSignal) });
+    expect(result.current.fields.username.feedback).toEqual({ type: 'info', message: 'alex' });
+
+    act(() => result.current.setValue('username', 'alexc'));
+    act(() => result.current.setValue('username', 'alex'));
+    await act(tick);
+    expect(validateAsync).toHaveBeenCalledTimes(4);
+    expect(result.current.fields.username.feedback).toEqual({ type: 'info', message: 'alex' });
+  });
+
+  it('does not check again on touch when the current value is already checked', async () => {
+    const validateAsync = vi.fn(() => Promise.resolve(undefined));
+    const { result } = renderHook(() =>
+      useForm({ initialValues: { password: '' }, fields: { password: { validateAsync } }, onSubmit: resolved }),
+    );
+    act(() => result.current.setValue('password', 'ab'));
+    await act(tick);
+    act(() => result.current.touch('password'));
+    await act(tick);
+    expect(validateAsync).toHaveBeenCalledTimes(1);
+  });
+
+  it('debounces checks on change and runs a waiting one at once on touch', async () => {
+    vi.useFakeTimers();
+    try {
+      const validateAsync = vi.fn((value: string) => Promise.resolve<FieldFeedback>({ type: 'info', message: value }));
+      const { result } = renderHook(() =>
+        useForm({
+          initialValues: { password: '' },
+          fields: { password: { validateAsync, debounceMs: 300 } },
+          onSubmit: resolved,
+        }),
+      );
+      act(() => result.current.setValue('password', 'a'));
+      await act(() => vi.advanceTimersByTimeAsync(200));
+      act(() => result.current.setValue('password', 'ab'));
+      await act(() => vi.advanceTimersByTimeAsync(299));
+      expect(validateAsync).not.toHaveBeenCalled();
+      expect(result.current.fields.password.isValidating).toBe(true);
+      await act(() => vi.advanceTimersByTimeAsync(1));
+      expect(validateAsync).toHaveBeenCalledExactlyOnceWith(
+        'ab',
+        { password: 'ab' },
+        { signal: expect.any(AbortSignal) },
+      );
+      expect(result.current.fields.password.feedback).toEqual({ type: 'info', message: 'ab' });
+
+      act(() => result.current.setValue('password', 'abc'));
+      act(() => result.current.touch('password'));
+      await act(() => vi.advanceTimersByTimeAsync(0));
+      expect(validateAsync).toHaveBeenCalledTimes(2);
+      expect(result.current.fields.password.feedback).toEqual({ type: 'info', message: 'abc' });
+      expect(vi.getTimerCount()).toBe(0);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('aborts a running check and ignores its result when the value changes, on reset and on unmount', async () => {
+    const checks: { signal: AbortSignal; check: ReturnType<typeof deferred<FieldFeedback | undefined>> }[] = [];
+    const validateAsync = (_value: string, _values: unknown, { signal }: { signal: AbortSignal }) => {
+      const check = deferred<FieldFeedback | undefined>();
+      checks.push({ signal, check });
+      return check.promise;
+    };
+    const { result, unmount } = renderHook(() =>
+      useForm({ initialValues: { password: '' }, fields: { password: { validateAsync } }, onSubmit: resolved }),
+    );
+    act(() => result.current.setValue('password', 'a'));
+    act(() => result.current.setValue('password', 'ab'));
+    expect(checks.map(({ signal }) => signal.aborted)).toEqual([true, false]);
+
+    act(() => result.current.reset());
+    expect(checks[1]?.signal.aborted).toBe(true);
+    await act(async () => {
+      checks[1]?.check.resolve({ type: 'error', message: 'Weak' });
+      await tick();
+    });
+    expect(result.current.fields.password.feedback).toBeUndefined();
+
+    act(() => result.current.setValue('password', 'abc'));
+    unmount();
+    expect(checks[2]?.signal.aborted).toBe(true);
+  });
+
+  it('cancels a waiting debounce on reset and unmount', () => {
+    vi.useFakeTimers();
+    try {
+      const validateAsync = vi.fn(() => Promise.resolve(undefined));
+      const { result, unmount } = renderHook(() =>
+        useForm({
+          initialValues: { password: '' },
+          fields: { password: { validateAsync, debounceMs: 300 } },
+          onSubmit: resolved,
+        }),
+      );
+      act(() => result.current.setValue('password', 'a'));
+      act(() => result.current.reset());
+      expect(vi.getTimerCount()).toBe(0);
+      expect(result.current.fields.password.isValidating).toBe(false);
+      act(() => result.current.setValue('password', 'b'));
+      unmount();
+      expect(vi.getTimerCount()).toBe(0);
+      expect(validateAsync).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('prefers a sync validator result over the async one for the same field', async () => {

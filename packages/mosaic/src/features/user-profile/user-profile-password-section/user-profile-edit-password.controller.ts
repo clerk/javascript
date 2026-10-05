@@ -1,5 +1,5 @@
 import { DEBOUNCE_MS } from '@clerk/shared/internal/clerk-js/constants';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import type { UseFormResult } from '../../../components/form';
 import { useForm } from '../../../components/form';
@@ -27,7 +27,6 @@ export interface UserProfileEditPasswordController {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   form: UseFormResult<UserProfileEditPasswordValues>;
-  passwordFeedback: FieldFeedback | undefined;
 }
 
 export function useUserProfileEditPasswordController({
@@ -35,14 +34,16 @@ export function useUserProfileEditPasswordController({
   onSubmit,
   validatePassword,
 }: UserProfileEditPasswordControllerOptions): UserProfileEditPasswordController {
-  const validationError = useMessages('errors').generic;
   const m = useMessages('userProfilePasswordSection');
   const [isOpen, setIsOpen] = useState(false);
-  const [passwordFeedback, setPasswordFeedback] = useState<FieldFeedback>();
 
   const form = useForm({
     initialValues,
     fields: {
+      newPassword: validatePassword && {
+        validateAsync: password => validatePassword(password),
+        debounceMs: DEBOUNCE_MS,
+      },
       confirmPassword: {
         // TODO: Discuss showing success feedback when the confirmation matches, as legacy does. https://github.com/clerk/javascript/pull/9930#discussion_r4150406791
         validate: (value, values) =>
@@ -64,38 +65,6 @@ export function useUserProfileEditPasswordController({
     },
   });
 
-  const password = form.values.newPassword;
-  const passwordLeft = form.fields.newPassword.touched;
-  useEffect(() => {
-    // TODO: Discuss keeping the password hint hidden on open or showing it immediately when the field autofocuses. https://github.com/clerk/javascript/pull/9930#discussion_r4150863181
-    if (!isOpen || (password === '' && !passwordLeft) || !validatePassword) {
-      setPasswordFeedback(undefined);
-      return;
-    }
-
-    let active = true;
-    const timeout = setTimeout(() => {
-      void Promise.resolve()
-        .then(() => validatePassword(password))
-        .then(
-          feedback => {
-            if (active) {
-              setPasswordFeedback(feedback);
-            }
-          },
-          () => {
-            if (active) {
-              setPasswordFeedback({ type: 'error', message: validationError });
-            }
-          },
-        );
-    }, DEBOUNCE_MS);
-    return () => {
-      active = false;
-      clearTimeout(timeout);
-    };
-  }, [isOpen, password, passwordLeft, validatePassword, validationError]);
-
   const onOpenChange = (open: boolean) => {
     if (form.isSubmitting) {
       return;
@@ -104,5 +73,5 @@ export function useUserProfileEditPasswordController({
     setIsOpen(open);
   };
 
-  return { isOpen, onOpenChange, form, passwordFeedback };
+  return { isOpen, onOpenChange, form };
 }

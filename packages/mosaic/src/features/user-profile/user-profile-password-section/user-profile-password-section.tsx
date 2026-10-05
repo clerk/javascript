@@ -63,7 +63,6 @@ function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { 
       action={
         <UserProfileEditPasswordDialog
           form={controller.form}
-          passwordFeedback={controller.passwordFeedback}
           identifier={model.identifier}
           open={controller.isOpen}
           onOpenChange={controller.onOpenChange}

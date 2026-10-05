@@ -18,7 +18,10 @@ describe('useUserProfileEditPasswordController timing', () => {
       act(() => result.current.onOpenChange(true));
       act(() => result.current.form.setValue('newPassword', 'new password'));
       await act(() => vi.advanceTimersByTimeAsync(350));
-      expect(result.current.passwordFeedback).toMatchObject({ type: 'error', message: expect.any(String) });
+      expect(result.current.form.fields.newPassword.feedback).toMatchObject({
+        type: 'error',
+        message: expect.any(String),
+      });
     } finally {
       vi.useRealTimers();
     }
@@ -37,11 +40,11 @@ describe('useUserProfileEditPasswordController timing', () => {
       act(() => result.current.onOpenChange(true));
       act(() => result.current.form.setValue('newPassword', 'first password'));
       await act(() => vi.advanceTimersByTimeAsync(350));
-      expect(result.current.passwordFeedback).toEqual(feedback);
+      expect(result.current.form.fields.newPassword.feedback).toEqual(feedback);
       act(() => result.current.form.setValue('newPassword', 'second password'));
-      expect(result.current.passwordFeedback).toEqual(feedback);
+      expect(result.current.form.fields.newPassword.feedback).toEqual(feedback);
       act(() => result.current.onOpenChange(false));
-      expect(result.current.passwordFeedback).toBeUndefined();
+      expect(result.current.form.fields.newPassword.feedback).toBeUndefined();
     } finally {
       vi.useRealTimers();
     }
@@ -92,9 +95,9 @@ describe('useUserProfileEditPasswordController timing', () => {
       await older.promise;
     });
 
-    expect(result.current.passwordFeedback).toEqual({ type: 'success', message: 'Strong password.' });
+    expect(result.current.form.fields.newPassword.feedback).toEqual({ type: 'success', message: 'Strong password.' });
     act(() => result.current.onOpenChange(false));
-    expect(result.current.passwordFeedback).toBeUndefined();
+    expect(result.current.form.fields.newPassword.feedback).toBeUndefined();
   });
 
   it('ignores dismissal and duplicate saves in the same event as submission', async () => {
