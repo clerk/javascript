@@ -4,6 +4,7 @@ import { snakeToCamel } from '@clerk/shared/underscore';
 
 import { FormSubmitError } from '../../../components/form';
 import type { LocalizableError, MosaicMessages } from '../../../localization';
+import { toLocalizableApiError } from '../../../localization';
 import { passwordComplexityMessage, passwordStrengthMessage } from './user-profile-password-feedback';
 import type { UserProfileEditPasswordValues } from './user-profile-password-section.types';
 
@@ -47,8 +48,7 @@ function passwordError(
   return (
     (passwordComplexityCodes.has(first.code)
       ? passwordComplexityMessage(failures, settings, messages, locale)
-      : undefined) ||
-    errorText({ code: first.code, paramName: first.meta?.paramName, message: first.longMessage || first.message })
+      : undefined) || errorText(toLocalizableApiError(first))
   );
 }
 
@@ -67,11 +67,7 @@ export function passwordFormError(
   const passwordErrors: ClerkAPIError[] = [];
   let message: string | undefined;
   for (const item of error.errors) {
-    const text = errorText({
-      code: item.code,
-      paramName: item.meta?.paramName,
-      message: item.longMessage || item.message,
-    });
+    const text = errorText(toLocalizableApiError(item));
     const name = snakeToCamel(item.meta?.paramName);
     if (name === 'currentPassword' && requiresCurrentPassword) {
       fields.currentPassword ??= text;

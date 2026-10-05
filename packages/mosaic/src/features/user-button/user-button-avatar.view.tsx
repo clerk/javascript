@@ -45,7 +45,7 @@ export interface UserButtonAvatarProps {
   name: string;
   imageUrl?: string;
   shape: 'circle' | 'square';
-  size: 'xs' | 'sm';
+  size: 'xs' | 'sm' | 'md';
   badge?: { name: string; imageUrl?: string };
   focusRing?: boolean;
 }

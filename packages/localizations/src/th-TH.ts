@@ -901,6 +901,17 @@ export const thTH: LocalizationResource = {
       title: 'เลือกผู้ให้บริการ',
       warning: 'เมื่อเลือกผู้ให้บริการแล้วคุณไม่สามารถเปลี่ยนได้อีกจนกว่าการกำหนดค่าจะเสร็จสิ้น',
     },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
       subtitle: undefined,
@@ -1338,6 +1349,10 @@ export const thTH: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
           clientSecret: {
             placeholder: undefined,
           },

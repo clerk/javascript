@@ -1098,11 +1098,17 @@ describe('Toast', () => {
       );
     }
 
+    const inView = new DOMRect(100, 100, 40, 20);
+
+    function layOutAnchor(rect: DOMRect) {
+      vi.spyOn(screen.getByRole('button', { name: 'Copy' }), 'getBoundingClientRect').mockReturnValue(rect);
+    }
+
     function renderAnchored(
       listProps: Partial<React.ComponentProps<typeof Toast.Positioner>> = {},
       positionerProps?: ToastObject['positionerProps'],
     ) {
-      return render(
+      const result = render(
         <Toast.Provider>
           <AnchoredTrigger positionerProps={positionerProps} />
           <Toast.Portal>
@@ -1112,6 +1118,10 @@ describe('Toast', () => {
           </Toast.Portal>
         </Toast.Provider>,
       );
+      vi.spyOn(document.documentElement, 'clientWidth', 'get').mockReturnValue(1024);
+      vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(768);
+      layOutAnchor(inView);
+      return result;
     }
 
     it('wraps the toast in a positioned element that defaults to top center', async () => {
@@ -1154,6 +1164,27 @@ describe('Toast', () => {
       await user.click(screen.getByRole('button', { name: 'Copy' }));
 
       expect(screen.getByTestId('arrow')).toHaveAttribute('data-side', 'bottom');
+    });
+
+    it('hides the toast while its anchor is not rendered and shows it again once it is', async () => {
+      const user = userEvent.setup();
+      renderAnchored();
+
+      await user.click(screen.getByRole('button', { name: 'Copy' }));
+      const positioner = screen.getByTestId('positioner');
+      await waitFor(() => expect(positioner.style.transform).not.toBe(''));
+      expect(positioner).not.toHaveAttribute('data-anchor-hidden');
+      expect(screen.getByRole('dialog', { name: 'Copied' })).toBeVisible();
+
+      layOutAnchor(new DOMRect(0, 0, 0, 0));
+      fireEvent(window, new Event('resize'));
+      await waitFor(() => expect(positioner).toHaveAttribute('data-anchor-hidden'));
+      expect(positioner.style.visibility).toBe('hidden');
+
+      layOutAnchor(inView);
+      fireEvent(window, new Event('resize'));
+      await waitFor(() => expect(positioner).not.toHaveAttribute('data-anchor-hidden'));
+      expect(screen.getByRole('dialog', { name: 'Copied' })).toBeVisible();
     });
 
     it('unmounts the positioner once the toast is removed', async () => {

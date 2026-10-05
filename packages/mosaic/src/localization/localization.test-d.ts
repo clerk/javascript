@@ -24,6 +24,14 @@ describe('MosaicCatalog', () => {
     void value;
   });
 
+  test('accepts text for any error code Clerk may return', () => {
+    const value: MosaicCatalog = {
+      'errors.form_identifier_exists__username': 'Nombre de usuario en uso.',
+      errors: { generic: 'Algo salió mal.', form_param_nil: 'Obligatorio.' },
+    };
+    void value;
+  });
+
   test('rejects unknown keys and paths', () => {
     const value: MosaicCatalog = {
       // @ts-expect-error typo in the path
