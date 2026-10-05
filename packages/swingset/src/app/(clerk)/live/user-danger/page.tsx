@@ -1,6 +1,6 @@
 'use client';
 
-import { UserProfileDeleteSection } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section';
+import { UserProfileDangerSection } from '@clerk/mosaic/features/user-profile/user-profile-danger-section/user-profile-danger-section';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
@@ -29,7 +29,7 @@ export default function DeleteAccountLivePage() {
             to delete this account.
           </p>
         ) : null}
-        {isLoaded && isSignedIn ? <UserProfileDeleteSection /> : null}
+        {isLoaded && isSignedIn ? <UserProfileDangerSection /> : null}
       </div>
     </MosaicProvider>
   );

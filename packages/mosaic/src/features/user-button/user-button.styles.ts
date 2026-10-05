@@ -61,8 +61,8 @@ export const styles = stylex.create({
     minWidth: 0,
   },
 
-  // Matches `UserButtonItemLabel`, so the trigger names a workspace the same way its row does. Capped,
-  // because the trigger sits in a host app's chrome and a long workspace name would push it apart.
+  // Matches `UserButtonItemLabel`, so the trigger names an organization the same way its row does. Capped,
+  // because the trigger sits in a host app's chrome and a long organization name would push it apart.
   triggerName: {
     color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
@@ -83,7 +83,7 @@ export const styles = stylex.create({
     marginInlineEnd: space['1'],
   },
 
-  // The workspace list scrolls; the header and footer stay put. The scroll area carries the
+  // The organization list scrolls; the header and footer stay put. The scroll area carries the
   // overflow, the edge fades, the scrollbar and the scroll padding they need, so only the cap
   // is ours.
   scroll: {
