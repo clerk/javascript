@@ -196,7 +196,7 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Cannot remove this phone.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Cannot remove this phone.'));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
     expect(onRemovePhone).toHaveBeenCalledTimes(2);
@@ -218,7 +218,7 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryPhone).toHaveBeenCalledExactlyOnceWith('phone_1');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Not verified yet.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Not verified yet.'));
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 
@@ -230,7 +230,7 @@ describe('phone actions', () => {
     renderPhone({ onSetPrimaryPhone });
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
     expect(log).toHaveBeenCalledWith(failure);
     log.mockRestore();
   });

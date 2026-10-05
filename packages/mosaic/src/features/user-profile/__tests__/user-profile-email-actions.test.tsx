@@ -87,7 +87,7 @@ describe('email actions', () => {
     await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryEmail).toHaveBeenCalledExactlyOnceWith('email_1');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Not verified yet.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Not verified yet.'));
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 
@@ -99,7 +99,7 @@ describe('email actions', () => {
     renderEmail({ onSetPrimaryEmail });
     await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'));
     expect(log).toHaveBeenCalledWith(failure);
     log.mockRestore();
   });
