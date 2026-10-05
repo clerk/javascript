@@ -422,14 +422,14 @@ describe('Mosaic Card', () => {
     expect(link).toHaveAttribute('data-interactive');
   });
 
-  const expectScale = (element: HTMLElement, scale: number) => {
+  const expectScale = (element: HTMLElement, scale: number): void => {
     const { style } = stylex.props(slots.image.scale(scale));
     for (const [property, value] of Object.entries(style ?? {})) {
       expect(element.style.getPropertyValue(property)).toBe(String(value));
     }
   };
 
-  const loadLogo = (image: HTMLImageElement, naturalWidth: number, naturalHeight: number) => {
+  const loadLogo = (image: HTMLImageElement, naturalWidth: number, naturalHeight: number): void => {
     Object.defineProperty(image, 'naturalWidth', { configurable: true, value: naturalWidth });
     Object.defineProperty(image, 'naturalHeight', { configurable: true, value: naturalHeight });
     act(() => {
@@ -510,7 +510,7 @@ describe('Mosaic Card', () => {
       </>,
     );
 
-    const atoms = (style: stylex.StyleXStyles) =>
+    const atoms = (style: stylex.StyleXStyles): string[] =>
       (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
 
     expect(screen.getByTestId('start')).toHaveAttribute('data-align', 'start');

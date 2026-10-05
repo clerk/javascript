@@ -115,7 +115,7 @@ export interface CardHeaderProps extends MosaicComponentProps<'div'> {
 const Header = React.forwardRef<HTMLDivElement, CardHeaderProps>(function CardHeader(
   { align = 'start', render, xstyle, children, ...rest },
   ref,
-) {
+): React.ReactElement {
   const dialog = React.useContext(DialogContext);
   const centered = align === 'center';
   const hasCloseButton = isInDialog(dialog) && dialog.role !== 'alertdialog';
@@ -194,7 +194,7 @@ function imageScale(image: HTMLImageElement): number {
 const Image = React.forwardRef<HTMLElement, CardImageProps>(function CardImage(
   { src, alt, href, render, xstyle, ...rest },
   ref,
-) {
+): React.ReactElement | null {
   const [scale, setScale] = React.useState(1);
   const img = React.useRef<HTMLImageElement>(null);
   const interactive = Boolean(href || render);

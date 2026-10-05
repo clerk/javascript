@@ -3,6 +3,7 @@ import type { CardProps } from '@clerk/mosaic/components/card';
 import { Card } from '@clerk/mosaic/components/card';
 import { Field } from '@clerk/mosaic/components/field';
 import { Input } from '@clerk/mosaic/components/input';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -58,7 +59,7 @@ const image = `data:image/svg+xml;utf8,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#6c47ff"/><text x="16" y="22" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="600" fill="#fff">A</text></svg>',
 )}`;
 
-export function WithImage() {
+export function WithImage(): ReactElement {
   return (
     <Card.Root>
       <Card.Header align='center'>
