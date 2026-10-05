@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { clerkApiError } from '../../../__tests__/clerk-errors';
+import type { MosaicLocalization } from '../../../localization';
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfilePasskey, UserProfilePasskeysSectionViewProps } from '../user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
@@ -17,7 +18,7 @@ const passkeys: UserProfilePasskey[] = [
   { id: 'phone', name: 'iPhone' },
 ];
 
-function renderView(overrides: Partial<UserProfilePasskeysSectionViewProps> = {}) {
+function renderView(overrides: Partial<UserProfilePasskeysSectionViewProps> = {}, localization?: MosaicLocalization) {
   const props: UserProfilePasskeysSectionViewProps = {
     passkeys,
     onAdd: vi.fn(),
@@ -26,7 +27,7 @@ function renderView(overrides: Partial<UserProfilePasskeysSectionViewProps> = {}
     ...overrides,
   };
   return render(
-    <MosaicProvider>
+    <MosaicProvider localization={localization}>
       <UserProfilePasskeysSectionView {...props} />
     </MosaicProvider>,
   );
@@ -130,12 +131,15 @@ describe('passkeys section', () => {
   it('shows the rename fallback, never the message, when renaming fails unexpectedly', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const user = userEvent.setup();
-    renderView({ onRename: vi.fn().mockRejectedValue(new Error('Cannot read properties of undefined')) });
+    renderView(
+      { onRename: vi.fn().mockRejectedValue(new Error('Cannot read properties of undefined')) },
+      { overrides: { 'userProfilePasskeys.saveError': 'Could not rename this passkey.' } },
+    );
     await user.click(screen.getByRole('button', { name: 'Manage MacBook' }));
     await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
     await user.type(screen.getByRole('textbox', { name: 'Passkey name' }), ' Pro');
     await user.click(screen.getByRole('button', { name: 'Save' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Something went wrong. Please try again.');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not rename this passkey.');
   });
 
   it('keeps an empty section visible when Add is unavailable', () => {

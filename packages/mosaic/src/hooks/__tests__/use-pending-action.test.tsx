@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { deferred } from '../../__tests__/async';
 import { clerkApiError } from '../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../mosaic-provider';
-import { useAction } from '../use-action';
+import { usePendingAction } from '../use-pending-action';
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -15,9 +15,9 @@ function blocked() {
   return clerkApiError('action_blocked', 'Raw server sentence.');
 }
 
-describe('useAction', () => {
+describe('usePendingAction', () => {
   it('reports success and leaves no error', async () => {
-    const { result } = renderHook(() => useAction(() => Promise.resolve()));
+    const { result } = renderHook(() => usePendingAction(() => Promise.resolve()));
 
     let succeeded: boolean | undefined;
     await act(async () => {
@@ -31,7 +31,7 @@ describe('useAction', () => {
   it('is pending while the action runs and ignores a second run until it settles', async () => {
     const pending = deferred<void>();
     const action = vi.fn(() => pending.promise);
-    const { result } = renderHook(() => useAction(action));
+    const { result } = renderHook(() => usePendingAction(action));
 
     act(() => {
       void result.current.run();
@@ -49,7 +49,7 @@ describe('useAction', () => {
 
   it('passes its arguments to the action', async () => {
     const action = vi.fn((_id: string) => Promise.resolve());
-    const { result } = renderHook(() => useAction(action));
+    const { result } = renderHook(() => usePendingAction(action));
 
     await act(() => result.current.run('phone_1'));
 
@@ -62,7 +62,7 @@ describe('useAction', () => {
         {children}
       </MosaicProvider>
     );
-    const { result } = renderHook(() => useAction(() => Promise.reject(blocked())), { wrapper });
+    const { result } = renderHook(() => usePendingAction(() => Promise.reject(blocked())), { wrapper });
 
     let succeeded: boolean | undefined;
     await act(async () => {
@@ -77,7 +77,7 @@ describe('useAction', () => {
   it('shows the fallback, never the message, of an unexpected error', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const { result } = renderHook(() =>
-      useAction(() => Promise.reject(new Error('Cannot read properties of undefined')), {
+      usePendingAction(() => Promise.reject(new Error('Cannot read properties of undefined')), {
         errorFallback: 'Unable to sign out.',
       }),
     );
@@ -89,7 +89,7 @@ describe('useAction', () => {
 
   it('clears the last error when run again and when reset', async () => {
     const action = vi.fn<() => Promise<void>>().mockRejectedValueOnce(blocked()).mockResolvedValueOnce(undefined);
-    const { result } = renderHook(() => useAction(action));
+    const { result } = renderHook(() => usePendingAction(action));
     await act(() => result.current.run());
     expect(result.current.errorMessage).toBeDefined();
 

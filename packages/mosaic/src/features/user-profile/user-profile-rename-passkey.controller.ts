@@ -1,9 +1,8 @@
 import type { LocalizableError } from '../../localization';
-import { useErrorText } from '../../localization';
+import { useErrorText, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
 import { toLocalizableError } from '../../utils/form-error';
-import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 
 interface UserProfileRenamePasskeyContext {
   passkeyId: string;
@@ -85,6 +84,7 @@ export function useUserProfileRenamePasskeyController({
   name,
   onRename,
 }: UserProfileRenamePasskeyControllerOptions): UserProfileRenamePasskeyController {
+  const m = useMessages('userProfilePasskeys');
   const errorText = useErrorText();
   const [snapshot, send] = useMachine(userProfileRenamePasskeyMachine, {
     context: { passkeyId: id, savedName: name, onRename },

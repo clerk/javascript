@@ -28,6 +28,20 @@ complexity calls for:
 | Is a boolean or a controlled value, no async, nothing else depends on it | `useState`                  |
 | Has an async lifecycle, or two values that must change together          | A machine, same file        |
 | Has a coordinated async core plus some UI-only flags beside it           | Both — machine for the core |
+| Is one async action from a button, needing only pending and an error     | `usePendingAction`          |
+
+`usePendingAction(fn, { errorFallback })` covers row actions: set default, sign
+out, accept or decline. It ignores clicks while one is in flight, owns the error
+(see "Errors") and returns `{ run, isPending, errorMessage, reset }`. `run`
+resolves `true` on success, so the caller can close a dialog or move focus. It
+is not for:
+
+- a form → `useForm`
+- a confirm step → `Confirmation` / `Destructive`
+- an action whose result drives other state → a machine
+- per-row pending across a list, or holding pending through a redirect → the
+  connected and enterprise accounts controllers, until `usePendingAction` takes
+  a key
 
 `useUserProfileDeleteSectionController` earns a machine on three counts: the
 delete is async, a failure must land back on the previous step with a reason,
@@ -126,12 +140,16 @@ One path, so every error a user sees goes through the `errors.*` catalog:
 
 - **Owners map, nothing else does.** `toLocalizableError(cause)` is called only
   by the hooks that own a failure: `useForm`, `useConfirmationController`,
-  `useDestructiveController` and `useAction` (inline row actions). Use one of
+  `useDestructiveController` and `usePendingAction` (inline row actions). Use one of
   them instead of catching in a feature.
-- **Copy is resolved at render.** Owners store the `LocalizableError` and return
-  `errorMessage` from `useErrorText()`: the catalog entry for
-  `code__paramName`, then `code`, then Clerk's message, then the feature's
-  `errorFallback`, then the generic error.
+- **Owners resolve copy at render; views get a string.** Owners store the
+  `LocalizableError` and return `errorMessage` from `useErrorText()`: the
+  catalog entry for `code__paramName`, then `code`, then Clerk's message, then
+  the feature's `errorFallback`, then the generic error. Views never call
+  `useErrorText` on an error they did not create themselves.
+- Not there yet, each with a follow-up: `useForm` resolves when the save fails
+  and falls back to `form.error` instead of taking an `errorFallback`, and the
+  profile picture row resolves its controller's error in the view.
 - **`errorFallback` is the feature's copy for faults Clerk cannot describe**
   (network, code bugs). An unknown error is logged and its `.message` is never
   shown.

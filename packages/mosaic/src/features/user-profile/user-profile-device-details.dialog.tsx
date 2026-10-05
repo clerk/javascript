@@ -3,7 +3,7 @@ import { Card } from '../../components/card';
 import { DataList } from '../../components/data-list';
 import type { DialogFocusTarget, DialogHandle } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
-import { useAction } from '../../hooks/use-action';
+import { usePendingAction } from '../../hooks/use-pending-action';
 import { fill, useMessages } from '../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
@@ -44,7 +44,7 @@ function DeviceDetailsCard({
   onSignOut: UserProfileDeviceDetailsDialogProps['onSignOut'];
 }) {
   const m = useMessages('userProfileActiveDevices');
-  const signOut = useAction(
+  const signOut = usePendingAction(
     async () => {
       await onSignOut?.(device);
       handle.close();

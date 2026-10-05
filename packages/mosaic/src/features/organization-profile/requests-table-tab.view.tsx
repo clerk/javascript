@@ -11,8 +11,8 @@ import { Section } from '../../components/section';
 import { Spinner } from '../../components/spinner';
 import { Table, type TableHeaderCellProps } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { type Action, useAction } from '../../hooks/use-action';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
+import { type PendingAction, usePendingAction } from '../../hooks/use-pending-action';
 import { fill, useMessages } from '../../localization';
 import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -274,12 +274,12 @@ function RequestActions({
   const m = useMessages('requestsTableTab');
   const [acceptRef] = useState(() => registerAcceptTrigger(request.id));
   const [declineRef] = useState(() => registerDeclineTrigger(request.id));
-  const accept = useAction(() => onAccept?.(), { errorFallback: m.acceptError });
-  const decline = useAction(() => onDecline?.(), { errorFallback: m.declineError });
+  const accept = usePendingAction(() => onAccept?.(), { errorFallback: m.acceptError });
+  const decline = usePendingAction(() => onDecline?.(), { errorFallback: m.declineError });
   const pendingAction =
     request.pendingAction ?? (accept.isPending ? 'accept' : decline.isPending ? 'decline' : undefined);
   const error = accept.errorMessage ?? decline.errorMessage;
-  const decide = (action: Action<[]>, other: Action<[]>) => {
+  const decide = (action: PendingAction<[]>, other: PendingAction<[]>) => {
     if (pendingAction) {
       return;
     }

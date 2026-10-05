@@ -48,6 +48,10 @@ deleting: {
 }
 ```
 
+A machine whose surface shows no error yet still logs it, so a failure is never
+silent: `onError: { target: 'idle', actions: [assign(() => settled), (_, event) => console.error(event.error)] }`
+(`user-button.controller.tsx`).
+
 Context holds the `LocalizableError`, never copy. The controller turns it into
 text at render with `errorText(error, errorFallback)`, so locale changes and
 overrides still apply (see `controllers.md` → "Errors").

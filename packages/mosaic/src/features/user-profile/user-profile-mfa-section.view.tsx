@@ -2,8 +2,8 @@ import { type ReactNode, type Ref, useMemo, useRef, useState } from 'react';
 
 import { Confirmation } from '../../blocks/confirmation';
 import { Section } from '../../components/section';
-import { useAction } from '../../hooks/use-action';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
+import { usePendingAction } from '../../hooks/use-pending-action';
 import { fill, type MosaicMessages, useMessages } from '../../localization';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
@@ -52,7 +52,7 @@ export function UserProfileMfaSectionView({
   });
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const setDefault = useAction((id: string) => onSetDefault?.(id), { errorFallback: m.setDefaultError });
+  const setDefault = usePendingAction((id: string) => onSetDefault?.(id), { errorFallback: m.setDefaultError });
   const canSetDefault = (id: string) => {
     const method = methods.find(method => method.id === id);
     return method?.type === 'sms' && method.canSetDefault && !method.isDefault;
