@@ -79,7 +79,7 @@ describe('email actions', () => {
     await user.click(screen.getByRole('button', { name: 'Manage test@example.com' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     expect(onSetPrimaryEmail).toHaveBeenCalledExactlyOnceWith('email_1');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to update primary email.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Unable to update primary email.'));
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
   });
 

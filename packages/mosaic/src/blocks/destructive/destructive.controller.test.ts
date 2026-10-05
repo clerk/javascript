@@ -1,4 +1,4 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -71,13 +71,41 @@ describe('useDestructiveController', () => {
     });
     expect(result.current.open).toBe(true);
     expect(result.current.isDeleting).toBe(false);
-    expect(result.current.errorMessage).toBe('Something went wrong');
+    expect(result.current.errorMessage).toBe('Something went wrong. Please try again.');
 
     await act(async () => {
       await result.current.onDelete();
     });
     await waitFor(() => expect(result.current.open).toBe(false));
     expect(onDelete).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows the API error when the action is rejected by Clerk', async () => {
+    const onDelete = vi.fn(() =>
+      Promise.reject(
+        new ClerkAPIResponseError('Forbidden', {
+          status: 403,
+          data: [
+            {
+              code: 'organization_minimum_permissions_needed',
+              message: 'Short',
+              long_message: 'There has to be at least one organization member with the minimum required permissions.',
+            },
+          ],
+        }),
+      ),
+    );
+    const { result } = renderHook(() => useDestructiveController({ onDelete }));
+    act(() => result.current.onOpenChange(true));
+
+    await act(async () => {
+      await result.current.onDelete();
+    });
+
+    expect(result.current.open).toBe(true);
+    expect(result.current.errorMessage).toBe(
+      'There has to be at least one organization member with the minimum required permissions.',
+    );
   });
 
   it('closes without a message when reverification is cancelled', async () => {

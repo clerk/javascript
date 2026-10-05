@@ -3,15 +3,15 @@ import * as UserButtonStories from './user-button.stories';
 # UserButton
 
 The account & organization switcher behind the user avatar. The account heads the surface, badged
-with the active organization, carrying **Settings** and **Invite**. The account's workspaces sit under it: every organization, plus
+with the active organization, carrying **Settings** and **Invite**. The account's organizations sit under it: every one it belongs to, plus
 **suggested** and **invited** ones it can Join. **Switch account** at the foot opens the signed-in
-accounts as a flyout — the active one checked — so an account never reads as a workspace. The
+accounts as a flyout — the active one checked — so an account never reads as an organization. The
 flyout also adds an account and signs out of all of them. With nobody to switch to, that row is
 **Add account** instead. The foot signs out of the active account. `mode` narrows all of it;
 see [Modes](#modes).
 
 Only the active account's organizations are listed. Not a design choice: org requests are scoped to
-the session that makes them, so another account's workspaces are unknowable until it _is_ active.
+the session that makes them, so another account's organizations are unknowable until it _is_ active.
 Hence `additionalSessions` carries sessions alone, and `onSelectOrganization` takes no session.
 
 Composed from `Popover`, `Card`, `Item`, `Avatar`, and `Menu`, so behavior, focus, and ARIA come from
@@ -21,7 +21,7 @@ it with `useUserButtonController()` and needs no props.
 ## Example
 
 A working prototype over mock accounts — try it. Nothing is instant: the clicked row spins, the rest
-stand down, and the surface stays open so you land on the result. Only picking a workspace closes it.
+stand down, and the surface stays open so you land on the result. Only picking an organization closes it.
 `pendingKey` drives that, and the connected `UserButton` sets it from the action in flight. Actions
 that would navigate (Manage, Invite, Create organization, Add account) only close the popover here.
 
@@ -97,7 +97,7 @@ fully to match it; see [User only](#user-only).
 The header names whatever leads and carries what you can do about it, stacked under it as
 full-width labelled buttons. An organization is described by its plan and member count, and carries
 **Settings** with **Invite**. An account is described by its identifier. Where **Settings** is the only
-action, as it is for an account, it trails the workspace inline.
+action, as it is for an account, it trails the account inline.
 
 With an organization active in `combined`, **Settings** opens a menu of **Organization settings** and
 **Profile settings**. Where only one of them is available, **Settings** opens it directly.
@@ -117,7 +117,7 @@ What a mode leads with is named in the trigger and heads the popup — the two a
 
 ### Combined
 
-The account heads it, badged with the active org, with **Settings** and **Invite**. The workspaces
+The account heads it, badged with the active org, with **Settings** and **Invite**. The organizations
 sit under it, with **Create organization** at their foot. **Switch account** opens the signed-in
 accounts, with **Add account** and **Sign out of all accounts**, and **Sign out** at the foot signs
 out of the active account.
@@ -141,7 +141,7 @@ With one account signed in, the foot is **Add account** and **Sign out**.
 
 ### Org only
 
-The org heads it, with **Settings** and **Invite**. **Create organization** trails the workspaces, and
+The org heads it, with **Settings** and **Invite**. **Create organization** trails the organizations, and
 nothing else is on offer, so the popup ends there.
 
 <Story
@@ -156,7 +156,7 @@ nothing else is on offer, so the popup ends there.
 
 ### User only
 
-The account heads it, with **Settings** inline. No workspaces are listed, so **Switch account** and
+The account heads it, with **Settings** inline. No organizations are listed, so **Switch account** and
 **Sign out** at the foot are the whole of it.
 
 <Story
@@ -179,7 +179,7 @@ With one account signed in, the foot is **Add account** and **Sign out**.
 ## Loading
 
 Memberships, invitations and suggestions are three separate requests, and the popup opens before any
-of them land. `organizationsLoading` holds the workspace list's place until the last one is in — one
+of them land. `organizationsLoading` holds the organization list's place until the last one is in — one
 placeholder for all three, so the list does not walk itself in a row at a time. The header is
 already known, so it renders throughout.
 
@@ -204,7 +204,7 @@ all accounts**. The foot keeps **Sign out**.
 
 ## No organization selected
 
-`hidePersonal` withholds the personal workspace — the instance does this when it forces an
+`hidePersonal` withholds the personal account — the instance does this when it forces an
 organization, or the app does it itself. In `organization` mode with no org active either, trigger and
 header say **No organization selected**, the mark is square, and the gear is **Manage account**.
 
@@ -222,7 +222,7 @@ without one still holds the column, so labels stay in line.
 
 `menuItemOrder` names the foot's rows by id, and whatever it leaves out follows what it named. The
 ids it knows are `switchAccount`, `addAccount`, `signOut`, and each custom item's `id`.
-Those are the only actions the foot lists as rows; the rest live in the header or with the workspaces, where there is no list for an order to run in.
+Those are the only actions the foot lists as rows; the rest live in the header or with the organizations, where there is no list for an order to run in.
 
 In `combined`, the accounts row is `switchAccount` where there is somebody to switch to and
 `addAccount` where there is not. Name both ids to place a row whichever way it resolves. An id the surface has not got
@@ -235,11 +235,11 @@ is ignored rather than an error, so one order can cover every mode.
 
 ## Parts
 
-| Part                | Description                                                                  |
-| ------------------- | ---------------------------------------------------------------------------- |
-| `UserButtonRoot`    | Owns the data, callbacks, and `mode`; forwards open state to `Popover.Root`. |
-| `UserButtonTrigger` | The trigger: the active workspace's avatar, and what it is called.           |
-| `UserButtonPopup`   | The popover surface: header, workspace list, footer.                         |
+| Part                | Description                                                                      |
+| ------------------- | -------------------------------------------------------------------------------- |
+| `UserButtonRoot`    | Owns the data, callbacks, and `mode`; forwards open state to `Popover.Root`.     |
+| `UserButtonTrigger` | The trigger: the active account or organization's avatar, and what it is called. |
+| `UserButtonPopup`   | The popover surface: header, organization list, footer.                          |
 
 ## Styling
 

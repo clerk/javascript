@@ -67,6 +67,7 @@ packages/*/examples/*/package-lock.json
 packages/*/examples/*/yarn.lock
 /test-results/
 /playwright-report/
+/integration/.e2e/
 /playwright/.cache/
 
 # integration testing

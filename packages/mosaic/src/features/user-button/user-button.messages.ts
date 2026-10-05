@@ -5,7 +5,7 @@ export const userButtonMessages = {
   popup: {
     label: 'Account',
   },
-  workspaces: {
+  organizations: {
     personal: 'Personal account',
     notSelected: 'No organization selected',
     loading: 'Loading organizations…',

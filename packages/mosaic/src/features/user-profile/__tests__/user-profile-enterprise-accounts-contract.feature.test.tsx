@@ -58,8 +58,10 @@ describe('enterprise linking server contract', () => {
         fapi.enterpriseLinking.enabled = false;
       }
       await userEvent.setup().click(connect);
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        change === 'linking disabled' || change === 'feature disabled' ? 'Feature not enabled' : 'not found',
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent(
+          change === 'linking disabled' || change === 'feature disabled' ? 'Feature not enabled' : 'not found',
+        ),
       );
       expect(navigate).not.toHaveBeenCalled();
       expect(connect).toBeEnabled();
@@ -90,7 +92,7 @@ describe('enterprise linking server contract', () => {
     const { clerk } = await renderWithClerk(<UserProfileEnterpriseAccountsSection />);
     const navigate = vi.spyOn(clerk, '__internal_windowNavigate').mockImplementation(() => {});
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Feature not enabled');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Feature not enabled'));
     expect(navigate).not.toHaveBeenCalled();
   });
 
@@ -248,8 +250,10 @@ describe('enterprise linking server contract', () => {
     const connect = await screen.findByRole('button', { name: 'Connect Acme Okta' });
     fapi.enterpriseLinking.verifiedLinks = [{ userId: 'user_1', connectionId: okta.id }];
     await userEvent.setup().click(connect);
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'An enterprise account is already connected for this connection email: user_1@example.com',
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'An enterprise account is already connected for this connection email: user_1@example.com',
+      ),
     );
     expect(navigate).not.toHaveBeenCalled();
   });
@@ -266,7 +270,7 @@ describe('enterprise linking server contract', () => {
       }),
     ]);
     await userEvent.setup().click(connect);
-    expect(await screen.findByRole('alert')).toHaveTextContent('not found');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('not found'));
     expect(navigate).not.toHaveBeenCalled();
   });
 });

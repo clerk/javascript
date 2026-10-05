@@ -20,7 +20,7 @@ export interface UserProfileProfilePanelViewProps extends UserProfileAccountSect
   connectedAccountsSlot?: ReactNode;
   web3WalletsSlot?: ReactNode;
   enterpriseAccountsSlot?: ReactNode;
-  deleteAccountSlot?: ReactNode;
+  dangerSlot?: ReactNode;
 }
 
 export function UserProfileProfilePanelView({
@@ -29,7 +29,7 @@ export function UserProfileProfilePanelView({
   connectedAccountsSlot,
   web3WalletsSlot,
   enterpriseAccountsSlot,
-  deleteAccountSlot,
+  dangerSlot,
   ...account
 }: UserProfileProfilePanelViewProps): ReactElement {
   return (
@@ -48,7 +48,7 @@ export function UserProfileProfilePanelView({
         {connectedAccountsSlot}
         {enterpriseAccountsSlot}
         {web3WalletsSlot}
-        {deleteAccountSlot}
+        {dangerSlot}
       </Panel.Sections>
     </Panel.Root>
   );
