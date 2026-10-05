@@ -17,7 +17,6 @@ export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMeth
 
 export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiveDevicesSectionViewProps, 'devices'> {
   passwordSlot?: ReactNode;
-  passwordVisible?: boolean;
   passkeys?: UserProfilePasskey[];
   passkeysVisible?: boolean;
   mfaMethods?: UserProfileMfaMethod[];
@@ -38,7 +37,6 @@ export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiv
 
 export function UserProfileSecurityPanelView({
   passwordSlot,
-  passwordVisible = false,
   passkeys,
   passkeysVisible = true,
   mfaMethods,
@@ -58,7 +56,7 @@ export function UserProfileSecurityPanelView({
   dangerSlot,
 }: UserProfileSecurityPanelViewProps): ReactElement {
   const showPasskeys = passkeys !== undefined && passkeysVisible;
-  const hasAuthentication = passwordVisible || showPasskeys || mfaMethods !== undefined;
+  const hasAuthentication = passwordSlot != null || showPasskeys || mfaMethods !== undefined;
 
   return (
     <Panel.Root render={<div {...themeProps('user-profile-security-panel')} />}>
@@ -66,7 +64,7 @@ export function UserProfileSecurityPanelView({
       <Panel.Sections>
         {hasAuthentication ? (
           <Section.Root aria-label='Authentication'>
-            {passwordVisible ? passwordSlot : null}
+            {passwordSlot}
             {showPasskeys ? (
               <UserProfilePasskeysSectionView
                 passkeys={passkeys}

@@ -24,4 +24,6 @@ export interface UserProfilePasswordSectionViewProps {
   managedBy?: UserProfileManagedBy;
 }
 
-export type UserProfilePasswordPolicy = { mode: 'set' } | { mode: 'change'; requiresCurrentPassword: boolean };
+export type UserProfilePasswordPolicy =
+  | { mode: 'set'; requiresCurrentPassword: false }
+  | { mode: 'change'; requiresCurrentPassword: boolean };

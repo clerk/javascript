@@ -63,16 +63,15 @@ function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) 
 }
 
 describe('UserProfileSecurityPanelView', () => {
-  it('omits Authentication when supplied password content is explicitly hidden', () => {
+  it('renders supplied password content without a separate visibility flag', () => {
     renderView({
       passwordSlot: <div>Password</div>,
-      passwordVisible: false,
       passkeys: undefined,
       mfaMethods: undefined,
     });
 
-    expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
-    expect(screen.queryByText('Password')).toBeNull();
+    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
+    expect(screen.getByText('Password')).toBeVisible();
   });
 
   it('composes authentication, active devices, and the danger zone', () => {

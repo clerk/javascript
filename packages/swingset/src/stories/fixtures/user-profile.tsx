@@ -155,7 +155,6 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
         setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
     },
     security: {
-      passwordVisible: true,
       passwordSlot: <UserProfilePasswordSectionView {...editPassword} />,
       passkeys: passkeys.passkeys,
       addPasskeyError: passkeys.addError,

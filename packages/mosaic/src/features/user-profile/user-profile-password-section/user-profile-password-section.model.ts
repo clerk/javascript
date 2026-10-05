@@ -18,7 +18,7 @@ type UnavailablePasswordModel =
   | {
       status: 'readonly';
       mode: 'set' | 'change';
-      managedBy: { name?: string };
+      managedBy: { name: string };
     };
 
 export type UserProfilePasswordModel =
@@ -36,6 +36,7 @@ export type UserProfilePasswordModel =
 function getPasswordPolicy(
   user: UserResource | null | undefined,
   environment: EnvironmentResource,
+  enterpriseConnectionName: string,
 ): UnavailablePasswordModel | (UserProfilePasswordPolicy & { status: 'ready'; userId: string }) {
   if (!user) {
     return { status: 'hidden' };
@@ -48,14 +49,14 @@ function getPasswordPolicy(
   // TODO: When session reverification is supported, require the current password only when reverification is disabled.
   const policy: UserProfilePasswordPolicy = user.passwordEnabled
     ? { mode: 'change', requiresCurrentPassword: true }
-    : { mode: 'set' };
+    : { mode: 'set', requiresCurrentPassword: false };
 
   const enterpriseAccount = user.enterpriseAccounts.find(account => account.active);
   if (enterpriseAccount) {
     return {
       status: 'readonly',
       mode: policy.mode,
-      managedBy: { name: enterpriseAccount.enterpriseConnection?.name || undefined },
+      managedBy: { name: enterpriseAccount.enterpriseConnection?.name || enterpriseConnectionName },
     };
   }
 
@@ -101,7 +102,7 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     return { status: 'hidden' };
   }
 
-  const policy = getPasswordPolicy(user, environment);
+  const policy = getPasswordPolicy(user, environment, m.enterpriseConnection);
   if (policy.status !== 'ready') {
     return policy;
   }
@@ -132,12 +133,12 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
         await currentUser.updatePassword({
           newPassword,
           signOutOfOtherSessions,
-          ...(policy.mode === 'change' && policy.requiresCurrentPassword ? { currentPassword } : {}),
+          ...(policy.requiresCurrentPassword ? { currentPassword } : {}),
         });
       } catch (error) {
         throw passwordFormError(
           error,
-          policy.mode === 'change' && policy.requiresCurrentPassword,
+          policy.requiresCurrentPassword,
           environment.userSettings.passwordSettings,
           m,
           locale,

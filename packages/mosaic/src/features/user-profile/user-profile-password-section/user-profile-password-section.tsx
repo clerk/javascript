@@ -17,27 +17,19 @@ export function UserProfilePasswordSection({ fallback = null }: UserProfilePassw
   return passwordSectionNode(model, fallback);
 }
 
-export function passwordSectionNode(model: UserProfilePasswordModel, fallback: ReactNode = null): ReactNode {
+export function passwordSectionNode(model: UserProfilePasswordModel, fallback: ReactNode): ReactNode {
   if (model.status === 'loading') {
+    // TODO: After https://github.com/clerk/javascript/pull/10029 lands, add the password skeleton using the shared section primitives. Keep loading timing in the connected security panel and omit the section when passwords are unavailable.
     return fallback;
   }
   if (model.status === 'hidden') {
     return null;
   }
-  return <UserProfilePasswordSectionContent model={model} />;
-}
-
-function UserProfilePasswordSectionContent({
-  model,
-}: {
-  model: Extract<UserProfilePasswordModel, { status: 'ready' | 'readonly' }>;
-}) {
-  const m = useMessages('userProfilePasswordSection');
   if (model.status === 'readonly') {
     return (
       <UserProfilePasswordSectionView
         hasPassword={model.mode === 'change'}
-        managedBy={{ name: model.managedBy.name ?? m.enterpriseConnection }}
+        managedBy={model.managedBy}
       />
     );
   }

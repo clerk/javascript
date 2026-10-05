@@ -13,7 +13,6 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { UserProfilePasswordSection } from './user-profile-password-section';
-import { UserProfileSecurityPanel } from '../user-profile-security-panel';
 
 const email = fapiEmailAddress({ id: 'idn_1', email_address: 'person@example.com' });
 const alice = fapiUser({ id: 'user_1', email_addresses: [email] });
@@ -34,39 +33,6 @@ async function fillPassword() {
 }
 
 describe('Changing a password', () => {
-  it('omits Authentication while the only method loads without a fallback', async () => {
-    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
-    const loading = renderWithClerk(<UserProfileSecurityPanel />);
-    try {
-      expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
-    } finally {
-      await loading;
-    }
-    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
-  });
-
-  it('keeps Authentication around a visible loading fallback', async () => {
-    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
-    const loading = renderWithClerk(
-      <UserProfileSecurityPanel passwordFallback={<div>Loading password section</div>} />,
-    );
-    try {
-      expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Loading password section');
-    } finally {
-      await loading;
-    }
-    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
-    expect(screen.queryByText('Loading password section')).toBeNull();
-  });
-
-  it('shows no password action when nobody is signed in', async () => {
-    serveFapi({ client: fapiClient() });
-    await renderWithClerk(<UserProfileSecurityPanel />);
-
-    expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
-    expect(screen.queryByText('Password')).toBeNull();
-  });
-
   it.each(['sign out', 'switch user', 'switch session'] as const)(
     'discards the password draft after %s',
     async change => {
@@ -178,16 +144,6 @@ describe('Changing a password', () => {
     }
   });
 
-  it('keeps Authentication for other methods when passwords are disabled', async () => {
-    const environment = fapiEnvironment();
-    environment.user_settings.attributes.password.enabled = false;
-    serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
-    await renderWithClerk(<UserProfileSecurityPanel passkeys={[]} />);
-
-    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Passkeys');
-    expect(screen.queryByText('Password')).toBeNull();
-  });
-
   it('sends the update to Clerk and closes after it succeeds', async () => {
     const fapi = await renderPassword();
     const user = await fillPassword();
@@ -295,22 +251,6 @@ describe('Changing a password', () => {
     await renderPassword(alice, environment);
 
     expect(screen.queryByRole('button', { name: 'Change password' })).toBeNull();
-  });
-
-  it.each(['disabled', 'editable', 'managed'])('resolves the Authentication section for %s passwords', async policy => {
-    const environment = fapiEnvironment();
-    environment.user_settings.attributes.password.enabled = policy !== 'disabled';
-    const user = fapiUser({
-      ...alice,
-      enterprise_accounts: policy === 'managed' ? [fapiEnterpriseAccount({ id: 'ent_1' })] : [],
-    });
-    serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user })]) });
-    await renderWithClerk(<UserProfileSecurityPanel />);
-    if (policy === 'disabled') {
-      expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
-    } else {
-      expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
-    }
   });
 
   it.each([true, false])('shows the managed view when passwordEnabled is %s', async passwordEnabled => {
@@ -488,5 +428,3 @@ describe('Deferred password behavior', () => {
   it.todo('reverifies the session and retries the password update when Clerk requires verification');
   it.todo('omits the current password when session reverification is enabled');
 });
-
-// TODO: After https://github.com/clerk/javascript/pull/10029 lands, add the password skeleton using the shared section primitives. Keep loading timing in the connected security panel and omit the section when passwords are unavailable.

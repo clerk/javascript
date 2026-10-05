@@ -11,7 +11,7 @@ describe('useUserProfileEditPasswordController timing', () => {
     try {
       const { result } = renderHook(() =>
         useUserProfileEditPasswordController({
-          policy: { mode: 'set' },
+          policy: { mode: 'set', requiresCurrentPassword: false },
           identifier: '',
           onSubmit: () => Promise.resolve(),
           validatePassword: () => Promise.reject(new Error('Failed to load strength checker')),
@@ -32,7 +32,7 @@ describe('useUserProfileEditPasswordController timing', () => {
       const validatePassword = vi.fn(() => Promise.resolve(feedback));
       const { result } = renderHook(() =>
         useUserProfileEditPasswordController({
-          policy: { mode: 'set' },
+          policy: { mode: 'set', requiresCurrentPassword: false },
           identifier: '',
           onSubmit: () => Promise.resolve(),
           validatePassword,
@@ -56,7 +56,7 @@ describe('useUserProfileEditPasswordController timing', () => {
       const validatePassword = vi.fn(() => Promise.resolve(undefined));
       const { result } = renderHook(() =>
         useUserProfileEditPasswordController({
-          policy: { mode: 'set' },
+          policy: { mode: 'set', requiresCurrentPassword: false },
           identifier: '',
           onSubmit: () => Promise.resolve(),
           validatePassword,
@@ -85,7 +85,7 @@ describe('useUserProfileEditPasswordController timing', () => {
     const validatePassword = vi.fn().mockReturnValueOnce(older.promise).mockReturnValueOnce(newer.promise);
     const { result } = renderHook(() =>
       useUserProfileEditPasswordController({
-        policy: { mode: 'set' },
+        policy: { mode: 'set', requiresCurrentPassword: false },
         identifier: '',
         onSubmit: () => Promise.resolve(),
         validatePassword,

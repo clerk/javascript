@@ -25,7 +25,7 @@ export function useUserProfileEditPasswordFixture({
   const [hasPassword, setHasPassword] = useState(initialHasPassword);
   const [hasFailed, setHasFailed] = useState(false);
   const controller = useUserProfileEditPasswordController({
-    policy: hasPassword ? { mode: 'change', requiresCurrentPassword } : { mode: 'set' },
+    policy: hasPassword ? { mode: 'change', requiresCurrentPassword } : { mode: 'set', requiresCurrentPassword: false },
     identifier: '',
     onSubmit: async (_value: UserProfileEditPasswordValue) => {
       await new Promise(resolve => setTimeout(resolve, latency));
@@ -42,6 +42,8 @@ export function useUserProfileEditPasswordFixture({
     action: (
       <UserProfileEditPasswordDialog
         form={controller.form}
+        identifier={controller.identifier}
+        passwordFeedback={controller.passwordFeedback}
         hasPassword={controller.hasPassword}
         open={controller.isOpen}
         onOpenChange={controller.onOpenChange}
