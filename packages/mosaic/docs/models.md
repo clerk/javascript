@@ -81,6 +81,17 @@ drops the fallback instead of holding the space open. Keep the two apart.
 
 - Return **plain data and plain functions**. A callback takes ids (`sessionId`,
   `organizationId`), never a resource.
+- Derive plain data types from `@clerk/shared/types` before writing a shape by
+  hand. Search it first; when a field mirrors a resource, `Pick` it so the type
+  cannot drift from Clerk's:
+
+  ```ts
+  export type APIKeyRecord = Pick<APIKeyResource, 'id' | 'name' | 'createdAt' | 'expiration' | 'lastUsedAt'>;
+  ```
+
+  Write a type by hand only for what Clerk has no type for, such as a
+  formatted label or a UI-only flag.
+
 - An async callback returns its promise — the controller drives pending state off
   it. Navigation callbacks stay fire-and-forget.
 - Never format an error. Let Clerk errors propagate untouched. For a failure
@@ -94,7 +105,12 @@ drops the fallback instead of holding the space open. Keep the two apart.
   (`user-profile-account-section.model.ts`).
 - No local UI state. What is open and what is in flight belong to the controller.
 - No React state machinery beyond the Clerk hooks themselves; the model is a
-  derivation of what Clerk currently says.
+  derivation of what Clerk currently says. The exception is what to fetch: a
+  search query, page, or sort the Clerk hook takes as input lives in the model
+  beside the page the hook already holds, and the model exposes a callback to
+  change it (`search(query)` sets the query and returns to page 1). The
+  controller keeps the interaction around it, such as the input's value and
+  the debounce, and calls that callback.
 
 ## Time-dependent display data
 
