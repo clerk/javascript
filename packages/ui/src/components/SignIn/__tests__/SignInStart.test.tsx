@@ -472,6 +472,251 @@ describe('SignInStart', () => {
   });
 
   describe('Enterprise SSO', () => {
+    it('submits an autofilled password only after identifier creation allows password sign-in', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+        f.withEnterpriseSso();
+      });
+      fixtures.signIn.create.mockResolvedValueOnce({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [{ strategy: 'password' }],
+        attemptFirstFactor: fixtures.signIn.attemptFirstFactor,
+      } as unknown as SignInResource);
+      fixtures.signIn.attemptFirstFactor.mockResolvedValueOnce({
+        status: 'complete',
+        createdSessionId: 'sess_password',
+      } as SignInResource);
+
+      const { userEvent, container } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      fireEvent.change(container.querySelector('#password-field') as Element, {
+        target: { value: 'some-password' },
+      });
+      fireEvent.submit(container.querySelector('form') as Element);
+
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).toHaveBeenCalledWith({
+          session: 'sess_password',
+          navigate: expect.any(Function),
+        });
+      });
+      expect(fixtures.signIn.create).toHaveBeenCalledExactlyOnceWith({ identifier: 'hello@clerk.com' });
+      expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalledExactlyOnceWith({
+        strategy: 'password',
+        password: 'some-password',
+      });
+    });
+
+    it('does not retry when the password attempt itself is locked', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+        f.withEnterpriseSso();
+      });
+      fixtures.signIn.create.mockResolvedValueOnce({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [{ strategy: 'password' }],
+        attemptFirstFactor: fixtures.signIn.attemptFirstFactor,
+      } as unknown as SignInResource);
+      fixtures.signIn.attemptFirstFactor.mockRejectedValueOnce(
+        new ClerkAPIResponseError('Locked', {
+          data: [{ code: 'user_locked', message: 'Locked', long_message: 'Locked' }],
+          status: 403,
+        }),
+      );
+
+      const { userEvent, container } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      fireEvent.change(container.querySelector('#password-field') as Element, {
+        target: { value: 'some-password' },
+      });
+      fireEvent.submit(container.querySelector('form') as Element);
+
+      await screen.findByText('Locked');
+      expect(fixtures.signIn.create).toHaveBeenCalledTimes(1);
+      expect(fixtures.signIn.attemptFirstFactor).toHaveBeenCalledExactlyOnceWith({
+        strategy: 'password',
+        password: 'some-password',
+      });
+      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+    });
+
+    it('retries a locked identifier with the supplied password and activates the authenticated session', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+        f.withEnterpriseSso();
+      });
+      fixtures.signIn.create
+        .mockRejectedValueOnce(
+          new ClerkAPIResponseError('Locked', {
+            data: [{ code: 'user_locked', message: 'Locked', long_message: 'Locked' }],
+            status: 403,
+          }),
+        )
+        .mockResolvedValueOnce({ status: 'complete', createdSessionId: 'sess_password' } as SignInResource);
+
+      const { userEvent, container } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      fireEvent.change(container.querySelector('#password-field') as Element, {
+        target: { value: 'some-password' },
+      });
+      fireEvent.submit(container.querySelector('form') as Element);
+
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).toHaveBeenCalledWith({
+          session: 'sess_password',
+          navigate: expect.any(Function),
+        });
+      });
+      expect(fixtures.signIn.create).toHaveBeenCalledTimes(2);
+      expect(fixtures.signIn.create).toHaveBeenNthCalledWith(1, { identifier: 'hello@clerk.com' });
+      expect(fixtures.signIn.create).toHaveBeenNthCalledWith(2, {
+        identifier: 'hello@clerk.com',
+        password: 'some-password',
+        strategy: 'password',
+      });
+      expect(fixtures.signIn.attemptFirstFactor).not.toHaveBeenCalled();
+    });
+
+    it('reveals the password field after identifier lockout so the owner can retry manually', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+        f.withEnterpriseSso();
+      });
+      const lockedError = new ClerkAPIResponseError('Locked', {
+        data: [{ code: 'user_locked', message: 'Locked', long_message: 'Locked' }],
+        status: 403,
+      });
+      fixtures.signIn.create
+        .mockRejectedValueOnce(lockedError)
+        .mockRejectedValueOnce(lockedError)
+        .mockResolvedValueOnce({ status: 'complete', createdSessionId: 'sess_password' } as SignInResource);
+
+      const { userEvent, container } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      await userEvent.click(screen.getByText('Continue'));
+
+      await screen.findByText('Locked');
+      expect(fixtures.signIn.create).toHaveBeenCalledTimes(1);
+      const passwordField = container.querySelector('#password-field') as HTMLElement;
+      expect(passwordField.closest('[class*="formFieldRow"]')).not.toHaveAttribute('aria-hidden');
+      expect(passwordField).toBeVisible();
+      await userEvent.type(passwordField, 'some-password');
+      await userEvent.click(screen.getByText('Continue'));
+
+      await waitFor(() => {
+        expect(fixtures.clerk.setActive).toHaveBeenCalledWith({
+          session: 'sess_password',
+          navigate: expect.any(Function),
+        });
+      });
+      expect(fixtures.signIn.create).toHaveBeenCalledTimes(3);
+      expect(fixtures.signIn.create).toHaveBeenNthCalledWith(2, { identifier: 'hello@clerk.com' });
+      expect(fixtures.signIn.create).toHaveBeenNthCalledWith(3, {
+        identifier: 'hello@clerk.com',
+        password: 'some-password',
+        strategy: 'password',
+      });
+      expect(fixtures.signIn.attemptFirstFactor).not.toHaveBeenCalled();
+    });
+
+    it('does not retry a rejected password fallback again', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+        f.withEnterpriseSso();
+      });
+      fixtures.signIn.create.mockRejectedValue(
+        new ClerkAPIResponseError('Locked', {
+          data: [{ code: 'user_locked', message: 'Locked', long_message: 'Locked' }],
+          status: 403,
+        }),
+      );
+
+      const { userEvent, container } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      fireEvent.change(container.querySelector('#password-field') as Element, {
+        target: { value: 'wrong-password' },
+      });
+      fireEvent.submit(container.querySelector('form') as Element);
+
+      await screen.findByText('Locked');
+      expect(fixtures.signIn.create).toHaveBeenCalledTimes(2);
+      expect(fixtures.signIn.attemptFirstFactor).not.toHaveBeenCalled();
+      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      { enterpriseSSO: true, password: '', code: 'user_locked' },
+      { enterpriseSSO: false, password: 'some-password', code: 'user_locked' },
+      { enterpriseSSO: true, password: 'some-password', code: 'user_banned' },
+    ])(
+      'does not retry creation for $code with enterpriseSSO=$enterpriseSSO and password="$password"',
+      async testCase => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword({ required: true });
+          if (testCase.enterpriseSSO) {
+            f.withEnterpriseSso();
+          }
+        });
+        fixtures.signIn.create.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Denied', {
+            data: [{ code: testCase.code, message: 'Denied', long_message: 'Denied' }],
+            status: 403,
+          }),
+        );
+
+        const { userEvent, container } = render(<SignInStart />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+        if (testCase.password) {
+          fireEvent.change(container.querySelector('#password-field') as Element, {
+            target: { value: testCase.password },
+          });
+        }
+        fireEvent.submit(container.querySelector('form') as Element);
+
+        await screen.findByText('Denied');
+        expect(fixtures.signIn.create).toHaveBeenCalledTimes(1);
+        expect(fixtures.signIn.attemptFirstFactor).not.toHaveBeenCalled();
+        expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+      },
+    );
+
+    it('hands off to enterprise SSO without attempting an autofilled password', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress();
+        f.withPassword({ required: true });
+        f.withEnterpriseSso();
+      });
+      fixtures.signIn.create.mockResolvedValueOnce({
+        status: 'needs_first_factor',
+        supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+      } as unknown as SignInResource);
+
+      const { userEvent, container } = render(<SignInStart />, { wrapper });
+      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+      fireEvent.change(container.querySelector('#password-field') as Element, {
+        target: { value: 'some-password' },
+      });
+      fireEvent.submit(container.querySelector('form') as Element);
+
+      await waitFor(() => {
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
+          strategy: 'enterprise_sso',
+          redirectUrl: 'http://localhost:3000/#/sso-callback',
+          redirectUrlComplete: '/',
+          continueSignIn: true,
+        });
+      });
+      expect(fixtures.signIn.create).toHaveBeenCalledExactlyOnceWith({ identifier: 'hello@clerk.com' });
+      expect(fixtures.signIn.attemptFirstFactor).not.toHaveBeenCalled();
+      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+    });
+
     it('initiates a Enterprise SSO flow if enterprise_sso is listed as the only supported first factor', async () => {
       const { wrapper, fixtures } = await createFixtures(f => {
         f.withEmailAddress();

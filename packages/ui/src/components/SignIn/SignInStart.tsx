@@ -1,4 +1,5 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { isUserLockedError } from '@clerk/shared/error';
 import { inertProps } from '@clerk/shared/inert';
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
@@ -140,6 +141,7 @@ function SignInStartInternal(): JSX.Element {
     label: localizationKeys('formFieldLabel__password'),
     placeholder: localizationKeys('formFieldInputPlaceholder__password') as any,
   });
+  const [showInstantPasswordField, setShowInstantPasswordField] = useState(false);
 
   const [alternativePhoneCodeProvider, setAlternativePhoneCodeProvider] = useState<PhoneCodeChannelData | null>(null);
 
@@ -351,19 +353,36 @@ function SignInStartInternal(): JSX.Element {
     signInCreatePromise: Promise<SignInResource>,
     fields: Array<FormControlState<string>>,
   ) => {
-    return signInCreatePromise.then(signInResource => {
-      if (!userSettings.enterpriseSSO.enabled) {
-        return signInResource;
-      }
-      /**
-       * For instances with Enterprise SSO enabled, perform sign in with password only when it is allowed for the identified user.
-       */
-      const passwordField = fields.find(f => f.name === 'password')?.value;
-      if (!passwordField || signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
-        return signInResource;
-      }
-      return signInResource.attemptFirstFactor({ strategy: 'password', password: passwordField });
-    });
+    return signInCreatePromise.then(
+      signInResource => {
+        if (!userSettings.enterpriseSSO.enabled) {
+          return signInResource;
+        }
+        /**
+         * For instances with Enterprise SSO enabled, perform sign in with password only when it is allowed for the identified user.
+         */
+        const passwordField = fields.find(f => f.name === 'password')?.value;
+        if (!passwordField || signInResource.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
+          return signInResource;
+        }
+        return signInResource.attemptFirstFactor({ strategy: 'password', password: passwordField });
+      },
+      error => {
+        const passwordField = fields.find(f => f.name === 'password')?.value;
+        if (!userSettings.enterpriseSSO.enabled || !isUserLockedError(error)) {
+          throw error;
+        }
+        if (!passwordField) {
+          setShowInstantPasswordField(true);
+          throw error;
+        }
+        return signIn.create({
+          identifier: buildRequest(fields).identifier,
+          password: passwordField,
+          strategy: 'password',
+        });
+      },
+    );
   };
 
   const signInWithFields = async (
@@ -679,6 +698,7 @@ function SignInStartInternal(): JSX.Element {
                       </Form.ControlRow>
                       <InstantPasswordRow
                         field={passwordBasedInstance ? instantPasswordField : undefined}
+                        forceVisible={showInstantPasswordField}
                         onForgotPasswordClick={handleForgotPasswordClick}
                       />
                     </Col>
@@ -740,14 +760,16 @@ function SignInStartInternal(): JSX.Element {
 
 const InstantPasswordRow = ({
   field,
+  forceVisible = false,
   onForgotPasswordClick,
 }: {
   field?: FormControlState<'password'>;
+  forceVisible?: boolean;
   onForgotPasswordClick?: React.MouseEventHandler;
 }) => {
   const [autofilled, setAutofilled] = useState(false);
   const ref = useRef<HTMLInputElement>(null);
-  const show = !!(autofilled || field?.value);
+  const show = !!(forceVisible || autofilled || field?.value);
 
   // show password if it's autofilled by the browser
   useLayoutEffect(() => {
