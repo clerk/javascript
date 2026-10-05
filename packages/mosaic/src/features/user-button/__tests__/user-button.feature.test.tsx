@@ -180,7 +180,7 @@ describe('UserButton', () => {
     expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
   });
 
-  describe('switching workspace', () => {
+  describe('switching organization', () => {
     it('makes the selected organization active and closes', async () => {
       const { navigate } = await renderUserButton();
       const user = await open();
@@ -194,7 +194,7 @@ describe('UserButton', () => {
       expect(navigate).not.toHaveBeenCalled();
     });
 
-    it('leaves the active organization for the personal workspace', async () => {
+    it('leaves the active organization for the personal account', async () => {
       await renderUserButton();
       const user = await open();
 
@@ -206,7 +206,7 @@ describe('UserButton', () => {
       expect(screen.queryByRole('button', { name: 'Personal account' })).toBeNull();
     });
 
-    it('drops the personal workspace where the app hides it', async () => {
+    it('drops the personal account where the app hides it', async () => {
       await renderUserButton({ hidePersonal: true });
       await open();
 
@@ -214,7 +214,7 @@ describe('UserButton', () => {
       expect(screen.queryByText('Personal account')).toBeNull();
     });
 
-    it('leads with the account, and lists no personal workspace, when the instance forces an organization and none is active', async () => {
+    it('leads with the account, and lists no personal account, when the instance forces an organization and none is active', async () => {
       await renderUserButton(
         {},
         signedIn({
@@ -708,7 +708,7 @@ describe('UserButton', () => {
       expect(within(requiredPopup()).getAllByText('alice')).toHaveLength(1);
     });
 
-    it('lists no workspaces and offers no way to make one', async () => {
+    it('lists no organizations and offers no way to make one', async () => {
       await renderUserButton({ mode: 'user' });
       await open();
 
@@ -774,7 +774,7 @@ describe('UserButton', () => {
       expect(screen.queryByRole('button', { name: 'Manage organization' })).toBeNull();
     });
 
-    it('carries no account rows, and trails the workspaces with create-organization', async () => {
+    it('carries no account rows, and trails the organizations with create-organization', async () => {
       await renderUserButton({ mode: 'organization' }, noOffers());
       await openWithList();
 
@@ -815,7 +815,7 @@ describe('UserButton', () => {
       ]);
     });
 
-    it('trails the workspaces with create-organization', async () => {
+    it('trails the organizations with create-organization', async () => {
       await renderUserButton({}, noOffers());
       await openWithList();
 
@@ -902,8 +902,8 @@ describe('UserButton', () => {
     });
   });
 
-  describe('the workspace list', () => {
-    it('lists the active workspace first, then the rest held, then the invitations, then the suggestions', async () => {
+  describe('the organization list', () => {
+    it('lists the active organization first, then the rest held, then the invitations, then the suggestions', async () => {
       await renderUserButton();
       await openWithList();
 
@@ -916,14 +916,14 @@ describe('UserButton', () => {
       ]);
     });
 
-    it('names the active workspace as the current one', async () => {
+    it('names the active organization as the current one', async () => {
       await renderUserButton();
       await openWithList();
 
       expect(current()).toEqual([expect.stringContaining('Acme')]);
     });
 
-    it('checks the personal workspace, and offers no switch to it, where it is active', async () => {
+    it('checks the personal account, and offers no switch to it, where it is active', async () => {
       await renderUserButton({}, signedIn({ client: fapiClient([personalSession, bobSession]) }));
       await openWithList();
 
@@ -931,7 +931,7 @@ describe('UserButton', () => {
       expect(screen.queryByRole('button', { name: 'Personal account' })).toBeNull();
     });
 
-    it('describes each offer by the workspace it acts on', async () => {
+    it('describes each offer by the organization it acts on', async () => {
       await renderUserButton();
       await openWithList();
 
@@ -982,7 +982,7 @@ describe('UserButton', () => {
       expect(reading('Beta', 'Requested')).toEqual(['Beta', 'Requested']);
     });
 
-    it('lists an accepted invitation once, as a workspace to switch to', async () => {
+    it('lists an accepted invitation once, as an organization to switch to', async () => {
       await renderUserButton({}, noOffers({ invitations: [fapiInvitation('inv_1', gamma)] }));
       const user = await openWithList();
 

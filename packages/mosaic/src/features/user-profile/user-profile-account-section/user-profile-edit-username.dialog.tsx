@@ -80,7 +80,7 @@ export function UserProfileEditUsernameDialog({
                 autoComplete='username'
                 {...control}
               />
-              {error ? <Field.Error>{error}</Field.Error> : null}
+              <Field.Feedback feedback={feedback} />
             </Field.Root>
           </Card.Content>
           <Card.Footer>

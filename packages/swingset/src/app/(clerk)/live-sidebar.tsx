@@ -5,35 +5,41 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ComponentProps } from 'react';
 
+import { type NavigationGroup, SidebarNavigation } from '@/components/sidebar-navigation';
 import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar';
+import { getLiveSidebarGroups } from '@/lib/live-navigation';
 
-const flows = [
-  { title: 'Account section', href: '/live/account-section' },
-  { title: 'API keys', href: '/live/api-keys' },
-  { title: 'Password', href: '/live/password' },
-  { title: 'Connected accounts', href: '/live/connected-accounts' },
-  { title: 'Enterprise accounts', href: '/live/enterprise-accounts' },
-  { title: 'Delete account', href: '/live/delete-account' },
-  { title: 'Reverification', href: '/live/reverification' },
-];
+const groups = getLiveSidebarGroups();
 
-function flowIsActive(pathname: string, href: string) {
+function pageIsActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 export function LiveSidebar(props: ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const navigationGroups: NavigationGroup[] = groups.map(({ group, categories }) => ({
+    label: group,
+    categories: categories.map(({ category, components }) => ({
+      label: category,
+      items: components.map(({ mod, href }) => ({
+        href,
+        usage: `<${mod.meta.title} />`,
+        isActive: pageIsActive(pathname, href),
+        status: mod.meta.status,
+        substatus: mod.meta.substatus,
+      })),
+    })),
+  }));
 
   return (
     <Sidebar {...props}>
@@ -66,26 +72,7 @@ export function LiveSidebar(props: ComponentProps<typeof Sidebar>) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup className='py-1'>
-          <SidebarGroupLabel className='text-sidebar-foreground/50 h-auto px-2 pb-1 pt-3 text-[10px] font-semibold uppercase tracking-wider'>
-            Flows
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {flows.map(flow => (
-                <SidebarMenuItem key={flow.href}>
-                  <SidebarMenuButton
-                    className='h-auto py-1 text-xs'
-                    isActive={flowIsActive(pathname, flow.href)}
-                    render={<Link href={flow.href} />}
-                  >
-                    {flow.title}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        <SidebarNavigation groups={navigationGroups} />
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
