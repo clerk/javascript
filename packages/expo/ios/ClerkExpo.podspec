@@ -44,7 +44,7 @@ Pod::Spec.new do |s|
     spm_dependency(
       s,
       url: clerk_ios_repo,
-      requirement: { :kind => 'exactVersion', :version => clerk_ios_version },
+      requirement: { :kind => 'revision', :revision => 'd491c4845e3fe28db0572ffb2e60761126b165ef' },
       products: ['ClerkKit', 'ClerkKitUI']
     )
   else
