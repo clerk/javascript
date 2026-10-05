@@ -25,7 +25,6 @@ import { AFTER, ASSIGN, INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types
 
 const INIT_EVENT: AnyEventObject = { type: INIT };
 
-// Collapse toArray into single helper: returns empty array, original if array, or wrapped value
 const toArr = <T>(v: T | T[] | undefined): T[] => (!v ? [] : Array.isArray(v) ? v : [v]);
 
 /**
@@ -58,18 +57,13 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 ): Actor<TContext, TEvent> {
   const teleport = options.snapshot;
 
-  // Internally the actor operates on the broader `EventObject`: invoke done/error
-  // events aren't part of the user's `TEvent` union, so the config is viewed
-  // through an event-agnostic lens to keep the runtime helpers honestly typed.
+  // Invoke done/error events aren't in `TEvent`, so the runtime reads the config with `EventObject`.
   const states = machine.states as unknown as Record<
     string,
     StateConfig<TContext, EventObject, string, AnyImplementationRefs>
   >;
 
   function implementations(): RuntimeImplementations<TContext> {
-    // SAFETY: same event-agnostic lens as `states` above, applied to the swappable implementations.
-    // Action params are `unknown` here because each one comes from the ref naming that action,
-    // which `ParameterizedActionRef` types against the same implementation.
     return actor.logic.implementations as unknown as RuntimeImplementations<TContext>;
   }
 
@@ -117,7 +111,6 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   const seed: Partial<TContext> = options.context ?? {};
   let context: TContext = { ...machine.context, ...seed, ...teleport?.context };
-  // `initial` may be derived from context (e.g. furthest-reachable step).
   const resolveInitial = () => (typeof machine.initial === 'function' ? machine.initial(context) : machine.initial);
   let value = teleport?.value ?? resolveInitial();
 
@@ -130,7 +123,6 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // resolving after the fact is ignored — no transition, no setState-after-stop.
   let invocationToken = 0;
 
-  // Pending `after` timer IDs — cleared when the state is exited or the actor stops.
   let afterTimers: ReturnType<typeof setTimeout>[] = [];
 
   // The snapshot is cached and only replaced on an actual change, so
@@ -139,22 +131,11 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   const listeners: SnapshotListener<TContext>[] = [];
 
-  /**
-   * Normalise a raw `Transition` value into a `TransitionConfig[]` the runtime
-   * can process uniformly. Handles all four arms of the `Transition` union:
-   * - string → `{ target: string }`
-   * - `TransitionConfig` → as-is
-   * - `TransitionConfig[]` → as-is
-   * - `TransitionFn` → called immediately; `undefined` return → `[]` (unhandled)
-   */
   function normalizeTransition(
     raw: unknown,
     event: EventObject,
   ): TransitionConfig<TContext, EventObject, string, AnyImplementationRefs>[] {
     if (typeof raw === 'function') {
-      // SAFETY: raw is a TransitionFn — (args: {context, event}) => TransitionResult | undefined.
-      // The cast is required because the generic TStates parameter is erased at this internal
-      // boundary; callers have already narrowed the event type via StateConfig.on[K].
       const result = (raw as TransitionFn<TContext, EventObject>)({ context, event });
       if (result === undefined) {
         return [];
@@ -162,8 +143,6 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       const cfg: TransitionConfig<TContext, EventObject, string, AnyImplementationRefs> = { target: result.target };
       if (result.context !== undefined) {
         const patch = result.context;
-        // SAFETY: Constructing AssignAction inline avoids importing the assign() helper here.
-        // The ASSIGN symbol is the exact tag isAssignAction checks in runActions.
         cfg.actions = { type: ASSIGN, assignment: () => patch } as AssignAction<TContext, EventObject>;
       }
       return [cfg];
@@ -197,7 +176,6 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     return transitions.find(transition => !transition.guard || resolveGuard(transition.guard)(context, event));
   }
 
-  /** Whether a target state's entry guard currently permits landing on it. */
   function canEnter(stateId: string, event: EventObject): boolean {
     const guard = states[stateId]?.guard;
     return !guard || resolveGuard(guard)(context, event);
@@ -214,11 +192,11 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   ): boolean {
     const external = transition.target !== undefined;
     if (external && !canEnter(transition.target as string, event)) {
-      return false; // entry guard blocks landing → snapshot unchanged, no notify
+      return false;
     }
     if (external) {
       runActions(states[value].exit, event);
-      invocationToken++; // abandon the invoke of the state we're leaving
+      invocationToken++;
       clearAfterTimers();
     }
     runActions(transition.actions, event);
@@ -301,7 +279,6 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     }
   }
 
-  /** Entry side of a state: entry actions, then immediate/invoke resolution. */
   function enterState(event: EventObject): void {
     const stateConfig = states[value];
     if (!stateConfig) {
@@ -354,7 +331,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       }
       started = false; // allow restart (e.g. StrictMode effect cleanup + remount)
       status = 'stopped';
-      invocationToken++; // abandon any in-flight invoke
+      invocationToken++;
       clearAfterTimers();
       snapshot = { value, context, status };
       for (let i = listeners.length; i--; ) {
@@ -370,21 +347,16 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       const transition = pickTransition(normalizeTransition(states[value]?.on?.[event.type], event), event);
       if (!transition) {
         return;
-      } // event not handled in this state → ignored
+      }
       if (takeTransition(transition, event)) {
         commit();
-      } // entry-blocked → no commit, no notify
+      }
     },
 
     getSnapshot() {
       return snapshot;
     },
 
-    // Standard observable contract: `subscribe(cb)` returns an unsubscribe fn.
-    // This is deliberately the same shape as a nanostores atom's `subscribe`, so
-    // if nanostores is adopted repo-wide later a `toAtom(actor)` adapter is a
-    // trivial, non-breaking wrapper over `subscribe` + `getSnapshot` — no need to
-    // pull the dependency in now.
     subscribe(listener: SnapshotListener<TContext>): Unsubscribe {
       listeners.push(listener);
       return () => {
@@ -412,16 +384,11 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       }
       const event = { type: RECHECK };
 
-      // Self-correct first: if live external data has made the *current* state
-      // unenterable (its entry guard no longer holds), re-seat to the freshly
-      // resolved initial state — the same derivation used on start (e.g. the
-      // Wizard's furthest-reachable step). `resolveInitial` always lands on an
-      // enterable step, so this is provably one-shot and cannot loop.
       if (!canEnter(value, event)) {
         const reseated = resolveInitial();
         if (reseated !== value) {
           runActions(states[value]?.exit, event);
-          invocationToken++; // abandon the invoke of the state we're leaving
+          invocationToken++;
           clearAfterTimers();
           value = reseated;
           enterState(event);
@@ -432,7 +399,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
       const immediate = pickTransition(normalizeTransition(states[value]?.always, event), event);
       if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
-        commit(); // nothing applies → no commit, no notify
+        commit();
       }
     },
   };

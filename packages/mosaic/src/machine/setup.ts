@@ -124,9 +124,6 @@ function withImplementations<TContext extends object, TEvent extends EventObject
         onError?: Transition<TContext, ErrorInvokeEvent, TStates, TRefs>;
       },
     ): InvokeConfig<TContext, TEvent, TOutput, TStates, TRefs> => ({
-      // SAFETY: fn only uses context (no event param), but InvokeConfig.src accepts
-      // (context, event) for parity with state-entry event access. The extra event
-      // parameter is unused; callers receive only context at runtime.
       src: fn as unknown as InvokeConfig<TContext, TEvent, TOutput, TStates, TRefs>['src'],
       ...config,
     }),

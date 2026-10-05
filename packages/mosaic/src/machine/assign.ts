@@ -18,7 +18,6 @@ export function assign<TContext, TEvent extends EventObject = EventObject, TPara
   return { type: ASSIGN, assignment };
 }
 
-/** Type guard distinguishing an `assign` action from a plain side-effect action. */
 export function isAssignAction<TContext, TEvent extends EventObject, TParams = undefined>(
   action: unknown,
 ): action is AssignAction<TContext, TEvent, TParams> {
