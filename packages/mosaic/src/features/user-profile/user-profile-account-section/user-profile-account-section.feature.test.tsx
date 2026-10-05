@@ -25,7 +25,7 @@ import {
   fapiVerification,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfileAccountSection } from '../user-profile-account-section/user-profile-account-section';
+import { UserProfileAccountSection } from './user-profile-account-section';
 
 const HOME = fapiPhoneNumber({
   id: 'idn_home',
