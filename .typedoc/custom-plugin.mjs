@@ -213,7 +213,7 @@ export function applyRelativeLinkReplacements(contents) {
     // @ts-ignore — string | function
     out = out.replace(pattern, replace);
   }
-  return out;
+  return out.replace(/(?<!!)\[([^\]]+)\]\((?!\/|https?:\/\/|#)[^()\s]+\.mdx(?:#[^)]*)?\)/g, '$1');
 }
 
 function getCatchAllReplacements() {
