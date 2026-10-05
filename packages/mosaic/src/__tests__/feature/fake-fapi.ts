@@ -109,19 +109,31 @@ function updateUser(state: FakeFapiState, user: UserJSON): void {
   };
 }
 
-function removeOrganization(state: FakeFapiState, organizationId: string): void {
+function withoutOrganization(session: SessionJSON, organizationId: string): SessionJSON {
+  return {
+    ...session,
+    user: {
+      ...session.user,
+      organization_memberships: session.user.organization_memberships.filter(m => m.organization.id !== organizationId),
+    },
+  };
+}
+
+function leaveOrganization(state: FakeFapiState, organizationId: string, userId: string): void {
   state.memberships = state.memberships.filter(m => m.organization.id !== organizationId);
   state.client = {
     ...state.client,
-    sessions: state.client.sessions.map(session => ({
-      ...session,
-      user: {
-        ...session.user,
-        organization_memberships: session.user.organization_memberships.filter(
-          m => m.organization.id !== organizationId,
-        ),
-      },
-    })),
+    sessions: state.client.sessions.map(session =>
+      session.user.id === userId ? withoutOrganization(session, organizationId) : session,
+    ),
+  };
+}
+
+function deleteOrganization(state: FakeFapiState, organizationId: string): void {
+  state.memberships = state.memberships.filter(m => m.organization.id !== organizationId);
+  state.client = {
+    ...state.client,
+    sessions: state.client.sessions.map(session => withoutOrganization(session, organizationId)),
   };
 }
 
@@ -299,11 +311,12 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
         return undefined;
       }
+      const user = activeUser(state);
       const membership = state.memberships.find(m => m.organization.id === params.organizationId);
-      if (!membership) {
+      if (!user || !membership) {
         return missing();
       }
-      removeOrganization(state, membership.organization.id);
+      leaveOrganization(state, membership.organization.id, user.id);
       return envelope({ object: 'organization_membership', id: membership.id, deleted: true }, state.client);
     }),
     http.post(fapiUrl('/v1/organizations/:organizationId'), ({ params, request }) => {
@@ -314,7 +327,7 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
       if (!membership) {
         return missing();
       }
-      removeOrganization(state, membership.organization.id);
+      deleteOrganization(state, membership.organization.id);
       return envelope({ object: 'organization', id: membership.organization.id, deleted: true }, state.client);
     }),
     http.post(fapiUrl('/v1/me/organization_invitations/:id/accept'), ({ params }) => {
