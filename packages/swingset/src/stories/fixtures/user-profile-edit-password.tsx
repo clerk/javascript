@@ -25,8 +25,8 @@ export function useUserProfileEditPasswordFixture({
   const [hasPassword, setHasPassword] = useState(initialHasPassword);
   const [hasFailed, setHasFailed] = useState(false);
   const controller = useUserProfileEditPasswordController({
-    hasPassword,
-    requiresCurrentPassword: hasPassword && requiresCurrentPassword,
+    policy: hasPassword ? { mode: 'change', requiresCurrentPassword } : { mode: 'set' },
+    identifier: '',
     onSubmit: async (_value: UserProfileEditPasswordValue) => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith && !hasFailed) {

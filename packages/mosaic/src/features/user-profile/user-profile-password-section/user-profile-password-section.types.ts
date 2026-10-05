@@ -23,3 +23,5 @@ export interface UserProfilePasswordSectionViewProps {
   /** Replaces the edit action with the enterprise provider’s name. */
   managedBy?: UserProfileManagedBy;
 }
+
+export type UserProfilePasswordPolicy = { mode: 'set' } | { mode: 'change'; requiresCurrentPassword: boolean };

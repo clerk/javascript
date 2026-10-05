@@ -9,6 +9,7 @@ import { useMessages } from '../../../localization';
 import type {
   UserProfileEditPasswordValue,
   UserProfileEditPasswordValues,
+  UserProfilePasswordPolicy,
 } from './user-profile-password-section.types';
 
 const initialValues: UserProfileEditPasswordValues = {
@@ -19,9 +20,8 @@ const initialValues: UserProfileEditPasswordValues = {
 };
 
 export interface UserProfileEditPasswordControllerOptions {
-  hasPassword?: boolean;
-  identifier?: string;
-  requiresCurrentPassword?: boolean;
+  policy: UserProfilePasswordPolicy;
+  identifier: string;
   onSubmit: (value: UserProfileEditPasswordValue) => Promise<unknown>;
   validatePassword?: (password: string) => Promise<FieldFeedback | undefined>;
 }
@@ -37,12 +37,13 @@ export interface UserProfileEditPasswordController {
 }
 
 export function useUserProfileEditPasswordController({
-  hasPassword = false,
-  identifier = '',
-  requiresCurrentPassword = false,
+  policy,
+  identifier,
   onSubmit,
   validatePassword,
 }: UserProfileEditPasswordControllerOptions): UserProfileEditPasswordController {
+  const hasPassword = policy.mode === 'change';
+  const requiresCurrentPassword = policy.mode === 'change' && policy.requiresCurrentPassword;
   const validationError = useMessages('errors').generic;
   const m = useMessages('userProfilePasswordSection');
   const [isOpen, setIsOpen] = useState(false);

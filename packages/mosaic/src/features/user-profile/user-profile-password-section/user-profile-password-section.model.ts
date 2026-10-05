@@ -11,11 +11,7 @@ import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useErrorText, useLocale, useMessages } from '../../../localization';
 import { passwordFormError } from './user-profile-password-errors';
 import { passwordFieldFeedback } from './user-profile-password-feedback';
-import type { UserProfileEditPasswordValue } from './user-profile-password-section.types';
-
-type EditablePasswordPolicy =
-  | { mode: 'set'; requiresCurrentPassword: false }
-  | { mode: 'change'; requiresCurrentPassword: boolean };
+import type { UserProfileEditPasswordValue, UserProfilePasswordPolicy } from './user-profile-password-section.types';
 
 type UnavailablePasswordModel =
   | { status: 'hidden' }
@@ -28,7 +24,7 @@ type UnavailablePasswordModel =
 export type UserProfilePasswordModel =
   | { status: 'loading' }
   | UnavailablePasswordModel
-  | (EditablePasswordPolicy & {
+  | (UserProfilePasswordPolicy & {
       status: 'ready';
       userId: string;
       sessionId: string;
@@ -40,7 +36,7 @@ export type UserProfilePasswordModel =
 function getPasswordPolicy(
   user: UserResource | null | undefined,
   environment: EnvironmentResource,
-): UnavailablePasswordModel | (EditablePasswordPolicy & { status: 'ready'; userId: string }) {
+): UnavailablePasswordModel | (UserProfilePasswordPolicy & { status: 'ready'; userId: string }) {
   if (!user) {
     return { status: 'hidden' };
   }
@@ -50,9 +46,9 @@ function getPasswordPolicy(
   }
 
   // TODO: When session reverification is supported, require the current password only when reverification is disabled.
-  const policy: EditablePasswordPolicy = user.passwordEnabled
+  const policy: UserProfilePasswordPolicy = user.passwordEnabled
     ? { mode: 'change', requiresCurrentPassword: true }
-    : { mode: 'set', requiresCurrentPassword: false };
+    : { mode: 'set' };
 
   const enterpriseAccount = user.enterpriseAccounts.find(account => account.active);
   if (enterpriseAccount) {
@@ -136,12 +132,12 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
         await currentUser.updatePassword({
           newPassword,
           signOutOfOtherSessions,
-          ...(policy.requiresCurrentPassword ? { currentPassword } : {}),
+          ...(policy.mode === 'change' && policy.requiresCurrentPassword ? { currentPassword } : {}),
         });
       } catch (error) {
         throw passwordFormError(
           error,
-          policy.requiresCurrentPassword,
+          policy.mode === 'change' && policy.requiresCurrentPassword,
           environment.userSettings.passwordSettings,
           m,
           locale,

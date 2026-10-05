@@ -52,8 +52,7 @@ function UserProfilePasswordSectionContent({
 function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { status: 'ready' }> }) {
   const m = useMessages('userProfilePasswordSection');
   const controller = useUserProfileEditPasswordController({
-    hasPassword: model.mode === 'change',
-    requiresCurrentPassword: model.requiresCurrentPassword,
+    policy: model,
     identifier: model.identifier,
     validatePassword: model.validatePassword,
     onSubmit: model.updatePassword,
