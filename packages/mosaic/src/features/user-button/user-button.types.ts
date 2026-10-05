@@ -39,7 +39,7 @@ export interface UserButtonInvitation {
   organizationId: string;
   organizationName: string;
   imageUrl?: string;
-  /** `accepted` is already a workspace, so it lists as one rather than offering to be accepted. */
+  /** `accepted` is already a membership, so it lists as one rather than offering to be accepted. */
   status: 'pending' | 'accepted';
 }
 
@@ -54,22 +54,22 @@ export interface UserButtonData {
   /**
    * The active organization, described whole rather than found in `memberships`, so the surface
    * names it while the list it belongs to is still loading. `null` means none is active: the
-   * personal workspace when one exists, and no selection otherwise.
+   * personal account when one exists, and no selection otherwise.
    */
   activeOrganization: UserButtonMembership | null;
   /**
    * Explicit; do not derive from `memberships.length`. Answered before the lists are fetched, so
-   * the surface knows whether to carry a workspace section at all without waiting on them.
+   * the surface knows whether to carry an organization section at all without waiting on them.
    */
   hasOrganizations: boolean;
   /**
-   * The account has no workspace of its own to return to, so the organizations are all there is.
+   * There is no personal account to return to, so the organizations are all there is.
    * Withholds the personal row rather than standing it down: this is not a switch that is
-   * momentarily unavailable, it is a workspace that does not exist here.
+   * momentarily unavailable, it is a personal account that does not exist here.
    */
   hidePersonal?: boolean;
   /**
-   * A first page is still in flight, so the workspace rows stand in as one placeholder rather than
+   * A first page is still in flight, so the organization rows stand in as one placeholder rather than
    * appearing a list at a time.
    */
   organizationsLoading?: boolean;
@@ -88,7 +88,7 @@ export interface UserButtonData {
 export interface UserButtonCallbacks {
   /**
    * Acts on the active account; another account's organizations are unreachable until you switch.
-   * `null` selects the personal workspace, which is how an account leaves an organization.
+   * `null` selects the personal account, which is how an account leaves an organization.
    */
   onSelectOrganization?: (organizationId: string | null) => void;
   onAcceptSuggestion?: (suggestionId: string) => void;
@@ -111,7 +111,7 @@ export interface UserButtonCallbacks {
 export type UserButtonMode = 'combined' | 'organization' | 'user';
 
 /**
- * How the header carries its actions: `inline` trails the workspace with them, the gear as an icon;
+ * How the header carries its actions: `inline` trails the lead with them, the gear as an icon;
  * `stacked` runs them under it as full-width labelled buttons.
  */
 export type UserButtonHeaderLayout = 'inline' | 'stacked';
