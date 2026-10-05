@@ -11,7 +11,7 @@ import { useNow } from '../../hooks/use-now';
 import { useLocale, useMessages } from '../../localization';
 import { formatDate, formatRelativeTime } from './api-keys-table.format';
 import { resolveAPIKeysTableMessages } from './api-keys-table.messages';
-import type { APIKey, APIKeysTableMessages } from './api-keys-table.types';
+import type { APIKey, APIKeyRecord, APIKeysTableMessages } from './api-keys-table.types';
 import { APIKeysTableView } from './api-keys-table.view';
 import type { CreateAPIKeyInput } from './create-api-key.controller';
 import { useCreateAPIKeyController } from './create-api-key.controller';
@@ -47,8 +47,9 @@ export function useAPIKeysAccess(subject: string | undefined) {
   return { isLoaded, isAvailable, canRead, canManage };
 }
 
-function useAPIKeysTableModel(subject: string, query: string, messages: APIKeysTableMessages) {
+function useAPIKeysTableModel(subject: string, messages: APIKeysTableMessages) {
   const clerk = useClerk();
+  const [query, setQuery] = useState('');
   const { isLoaded, isAvailable, canRead, canManage } = useAPIKeysAccess(subject);
   const apiKeys = useAPIKeys({
     subject,
@@ -62,7 +63,12 @@ function useAPIKeysTableModel(subject: string, query: string, messages: APIKeysT
     isLoaded,
     isAvailable,
     ...apiKeys,
+    data: apiKeys.data.map(toAPIKeyRecord),
     canManage,
+    search: (nextQuery: string) => {
+      setQuery(nextQuery);
+      apiKeys.fetchPage(1);
+    },
     create: async ({ name, expiresAt }: CreateAPIKeyInput) => {
       try {
         const created = await clerk.apiKeys.create({
@@ -83,6 +89,16 @@ function useAPIKeysTableModel(subject: string, query: string, messages: APIKeysT
   };
 }
 
+function toAPIKeyRecord(key: APIKeyResource): APIKeyRecord {
+  return {
+    id: key.id,
+    name: key.name,
+    createdAt: key.createdAt,
+    expiration: key.expiration,
+    lastUsedAt: key.lastUsedAt,
+  };
+}
+
 function createErrorMessage(
   error: unknown,
   m: { createError: string; nameTakenError: string; quotaExceededError: string },
@@ -100,39 +116,62 @@ function createErrorMessage(
   return error instanceof Error ? error.message : m.createError;
 }
 
-// -- Controllers --
+// -- Controller --
 
-function useDebouncedSearch() {
+type APIKeysTableModel = ReturnType<typeof useAPIKeysTableModel>;
+
+function useAPIKeysTableController(model: APIKeysTableModel, messages: APIKeysTableMessages) {
+  const locale = useLocale();
+  const now = useNow({ updateInterval: 60_000 });
   const [searchValue, setSearchValue] = useState('');
-  const [query, setQuery] = useState('');
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const create = useCreateAPIKeyController({ messages, onCreate: model.create });
 
   useEffect(() => () => clearTimeout(timer.current), []);
 
   return {
+    isLoaded: model.isLoaded,
+    isAvailable: model.isAvailable,
+    apiKeys: model.data.map(key => toAPIKey(key, locale, now)),
+    totalCount: model.count,
+    page: model.page,
     searchValue,
-    query,
+    isLoading: model.isLoading,
+    isFetching: model.isFetching,
+    isError: model.isError,
+    onRetry: () => void model.revalidate(),
+    onPageChange: model.fetchPage,
     onSearchChange: (value: string) => {
       setSearchValue(value);
       clearTimeout(timer.current);
       timer.current = setTimeout(() => {
-        setQuery(value.trim());
+        model.search(value.trim());
       }, SEARCH_DEBOUNCE_MS);
     },
+    manage: model.canManage
+      ? {
+          onCreate: create.onOpen,
+          createDialog: create.dialog,
+          onRevoke: async (id: string) => {
+            const emptiesPage = model.page > 1 && model.data.length === 1;
+            await model.revoke(id);
+            if (emptiesPage) {
+              model.fetchPage(model.page - 1);
+            }
+          },
+        }
+      : undefined,
   };
 }
 
-function useApiKeyLabels(apiKeys: APIKeyResource[]): APIKey[] {
-  const locale = useLocale();
-  const now = useNow({ updateInterval: 60_000 });
-
-  return apiKeys.map(key => ({
+function toAPIKey(key: APIKeyRecord, locale: string, now: Date): APIKey {
+  return {
     id: key.id,
     name: key.name,
     createdAtLabel: formatDate(key.createdAt, locale),
     expiresAtLabel: key.expiration ? formatDate(key.expiration, locale) : null,
     lastUsedAtLabel: key.lastUsedAt ? formatRelativeTime(key.lastUsedAt, locale, now) : null,
-  }));
+  };
 }
 
 // -- View --
@@ -152,48 +191,18 @@ function SubjectAPIKeysTable({ subject, messages: overrides, fallback }: APIKeys
     isOrganizationId(subject) ? 'organization' : 'user',
     overrides,
   );
-  const search = useDebouncedSearch();
-  const model = useAPIKeysTableModel(subject, search.query, messages);
-  const create = useCreateAPIKeyController({ messages, onCreate: model.create });
-  const apiKeys = useApiKeyLabels(model.data);
-  const { isFetching, page, pageCount, fetchPage } = model;
-  const searchedQuery = useRef(search.query);
+  const model = useAPIKeysTableModel(subject, messages);
+  const { isLoaded, isAvailable, manage, ...controller } = useAPIKeysTableController(model, messages);
 
-  useEffect(() => {
-    if (searchedQuery.current !== search.query) {
-      searchedQuery.current = search.query;
-      fetchPage(1);
-    }
-  }, [search.query, fetchPage]);
-
-  useEffect(() => {
-    if (!isFetching && pageCount > 0 && page > pageCount) {
-      fetchPage(pageCount);
-    }
-  }, [isFetching, page, pageCount, fetchPage]);
-
-  if (!model.isLoaded || !model.isAvailable) {
+  if (!isLoaded || !isAvailable) {
     return fallback ?? null;
   }
-
-  const manage = model.canManage
-    ? { onCreate: create.onOpen, createDialog: create.dialog, onRevoke: model.revoke }
-    : undefined;
 
   return (
     <APIKeysTableView
       messages={messages}
-      apiKeys={apiKeys}
-      totalCount={model.count}
-      page={model.page}
       pageSize={PAGE_SIZE}
-      searchValue={search.searchValue}
-      isLoading={model.isLoading}
-      isFetching={model.isFetching}
-      isError={model.isError}
-      onRetry={() => void model.revalidate()}
-      onPageChange={model.fetchPage}
-      onSearchChange={search.onSearchChange}
+      {...controller}
       {...manage}
     />
   );
