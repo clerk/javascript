@@ -1,5 +1,14 @@
 # @clerk/mosaic
 
+## 0.1.6
+
+### Patch Changes
+
+- Update `UserButton` to the latest designs. Combined mode always leads with the account, and the `modePriority` prop is removed. **Settings** opens organization and profile settings, and **Sign out of all accounts** moves into the **Switch account** menu. ([#10002](https://github.com/clerk/javascript/pull/10002)) by [@alexcarpenter](https://github.com/alexcarpenter)
+
+- Updated dependencies [[`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260)]:
+  - @clerk/shared@4.39.0
+
 ## 0.1.5
 
 ### Patch Changes
