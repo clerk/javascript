@@ -66,6 +66,10 @@ export const header = stylex.create({
     flexGrow: '1',
     rowGap: space['0.5'],
   },
+  centered: {
+    alignItems: 'center',
+    textAlign: 'center',
+  },
   title: {
     color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-base-size'],
@@ -78,6 +82,31 @@ export const header = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     textWrap: 'pretty',
+  },
+});
+
+export const image = stylex.create({
+  base: {
+    alignSelf: 'flex-start',
+    display: 'inline-flex',
+    marginBlockEnd: space['3.5'],
+    maxWidth: '100%',
+  },
+  centered: {
+    alignSelf: 'center',
+  },
+  interactive: {
+    borderRadius: radiusVars['--cl-radius-sm'],
+    textDecoration: 'none',
+    color: 'inherit',
+  },
+  scale: (scale: number) => ({ height: `calc(${space['6']} * ${scale})` }),
+  image: {
+    display: 'block',
+    objectFit: 'contain',
+    height: '100%',
+    maxWidth: '100%',
+    width: 'auto',
   },
 });
 

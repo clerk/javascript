@@ -54,6 +54,35 @@ export function Default(props: Record<string, unknown>) {
   );
 }
 
+const image = `data:image/svg+xml;utf8,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#6c47ff"/><text x="16" y="22" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="600" fill="#fff">A</text></svg>',
+)}`;
+
+export function WithImage() {
+  return (
+    <Card.Root>
+      <Card.Header align='center'>
+        <Card.Image
+          src={image}
+          alt='Acme'
+          href='#'
+        />
+        <Card.Title>Sign in to Acme</Card.Title>
+        <Card.Description>Welcome back! Please sign in to continue</Card.Description>
+      </Card.Header>
+      <Card.Content>
+        <Field.Root>
+          <Field.Label>Email address</Field.Label>
+          <Input />
+        </Field.Root>
+      </Card.Content>
+      <Card.Footer>
+        <Button fullWidth>Continue</Button>
+      </Card.Footer>
+    </Card.Root>
+  );
+}
+
 export function WithBanner() {
   const [error, setError] = useState<string | undefined>();
   return (

@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../dialog';
 import { Card } from './card';
+import * as slots from './card.styles';
 
 const compactCard = '@container card (max-width: 20rem)' as const;
 
@@ -345,6 +346,183 @@ describe('Mosaic Card', () => {
 
     expect(screen.queryByText('Secured by')).toBeNull();
     expect(screen.queryByRole('link', { name: 'Clerk' })).toBeNull();
+  });
+
+  it('places the application logo in the header, named by its alt text', () => {
+    render(
+      <Card.Root>
+        <Card.Header data-testid='header'>
+          <Card.Image
+            data-testid='logo'
+            src='https://example.com/logo.png'
+            alt='Acme'
+          />
+          <Card.Title>Sign in to Acme</Card.Title>
+        </Card.Header>
+      </Card.Root>,
+    );
+
+    const logo = screen.getByTestId('logo');
+    expect(logo.tagName).toBe('SPAN');
+    expect(logo).toHaveClass('cl-card-image');
+    expect(logo).not.toHaveAttribute('data-interactive');
+    expect(screen.getByTestId('header')).toContainElement(logo);
+    expect(logo.nextElementSibling).toHaveClass('cl-card-title');
+
+    const image = screen.getByRole('img', { name: 'Acme' });
+    expect(logo).toContainElement(image);
+    expect(image).toHaveClass('cl-card-image-img');
+    expect(image).toHaveAttribute('src', 'https://example.com/logo.png');
+    expect(screen.queryByRole('link', { name: 'Acme' })).toBeNull();
+  });
+
+  it('links the logo home when given an href', () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Image
+            src='https://example.com/logo.png'
+            alt='Acme'
+            href='https://acme.example'
+          />
+        </Card.Header>
+      </Card.Root>,
+    );
+
+    const link = screen.getByRole('link', { name: 'Acme' });
+    expect(link).toHaveClass('cl-card-image');
+    expect(link).toHaveAttribute('href', 'https://acme.example');
+    expect(link).toHaveAttribute('data-interactive');
+  });
+
+  it('routes the logo through a render source', () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Image
+            src='https://example.com/logo.png'
+            alt='Acme'
+            render={({ children, ...props }) => (
+              <a
+                {...props}
+                href='/home'
+              >
+                {children}
+              </a>
+            )}
+          />
+        </Card.Header>
+      </Card.Root>,
+    );
+
+    const link = screen.getByRole('link', { name: 'Acme' });
+    expect(link).toHaveClass('cl-card-image');
+    expect(link).toHaveAttribute('href', '/home');
+    expect(link).toHaveAttribute('data-interactive');
+  });
+
+  const expectScale = (element: HTMLElement, scale: number) => {
+    const { style } = stylex.props(slots.image.scale(scale));
+    for (const [property, value] of Object.entries(style ?? {})) {
+      expect(element.style.getPropertyValue(property)).toBe(String(value));
+    }
+  };
+
+  const loadLogo = (image: HTMLImageElement, naturalWidth: number, naturalHeight: number) => {
+    Object.defineProperty(image, 'naturalWidth', { configurable: true, value: naturalWidth });
+    Object.defineProperty(image, 'naturalHeight', { configurable: true, value: naturalHeight });
+    act(() => {
+      image.dispatchEvent(new Event('load'));
+    });
+  };
+
+  it('sizes the logo from the proportions of its image', () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Image
+            data-testid='logo'
+            src='https://example.com/logo.png'
+            alt='Acme'
+          />
+        </Card.Header>
+      </Card.Root>,
+    );
+
+    const logo = screen.getByTestId('logo');
+    const image = screen.getByRole('img', { name: 'Acme' });
+    expectScale(logo, 1);
+
+    loadLogo(image, 600, 200);
+    expectScale(logo, 1);
+
+    loadLogo(image, 300, 200);
+    expectScale(logo, 2 / 1.5);
+
+    loadLogo(image, 200, 200);
+    expectScale(logo, 2);
+
+    loadLogo(image, 100, 200);
+    expectScale(logo, 2);
+  });
+
+  it('sizes an already-loaded logo without waiting for a load event', () => {
+    stubPrototype(HTMLImageElement.prototype, 'complete', { get: () => true });
+    stubPrototype(HTMLImageElement.prototype, 'naturalWidth', { get: () => 200 });
+    stubPrototype(HTMLImageElement.prototype, 'naturalHeight', { get: () => 200 });
+
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Image
+            data-testid='logo'
+            src='https://example.com/logo.png'
+            alt='Acme'
+          />
+        </Card.Header>
+      </Card.Root>,
+    );
+
+    expectScale(screen.getByTestId('logo'), 2);
+  });
+
+  it('reflects the header alignment, and centers the image with it', () => {
+    render(
+      <>
+        <Card.Header data-testid='start'>
+          <Card.Image
+            data-testid='start-image'
+            src='https://example.com/logo.png'
+            alt='Acme'
+          />
+        </Card.Header>
+        <Card.Header
+          align='center'
+          data-testid='center'
+        >
+          <Card.Image
+            data-testid='center-image'
+            src='https://example.com/logo.png'
+            alt='Acme'
+          />
+        </Card.Header>
+      </>,
+    );
+
+    const atoms = (style: stylex.StyleXStyles) =>
+      (stylex.props(style).className ?? '').split(' ').filter(name => /^x[a-z0-9]+$/.test(name));
+
+    expect(screen.getByTestId('start')).toHaveAttribute('data-align', 'start');
+    expect(screen.getByTestId('start').querySelector('.cl-card-header-content')).not.toHaveClass(
+      ...atoms(slots.header.centered),
+    );
+    expect(screen.getByTestId('start-image')).not.toHaveClass(...atoms(slots.image.centered));
+
+    expect(screen.getByTestId('center')).toHaveAttribute('data-align', 'center');
+    expect(screen.getByTestId('center').querySelector('.cl-card-header-content')).toHaveClass(
+      ...atoms(slots.header.centered),
+    );
+    expect(screen.getByTestId('center-image')).toHaveClass(...atoms(slots.image.centered));
   });
 
   it('renders the title and description slots', () => {
