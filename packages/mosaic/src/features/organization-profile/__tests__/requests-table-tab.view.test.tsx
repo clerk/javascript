@@ -55,10 +55,12 @@ describe('RequestsTableTabView', () => {
       expect(onOtherDecision).not.toHaveBeenCalled();
 
       await act(() => attempt.reject(new Error()));
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        action === 'Accept'
-          ? 'Unable to accept this request. Please try again.'
-          : 'Unable to decline this request. Please try again.',
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent(
+          action === 'Accept'
+            ? 'Unable to accept this request. Please try again.'
+            : 'Unable to decline this request. Please try again.',
+        ),
       );
       await user.click(screen.getByRole('button', { name: `${action} Ada Lovelace` }));
       expect(onDecision).toHaveBeenCalledTimes(2);
