@@ -1,4 +1,4 @@
-export const userProfileDeleteSectionMessages = {
+export const userProfileDangerSectionMessages = {
   sectionTitle: 'Danger zone',
   sectionLabel: 'Delete account',
   sectionDescription: 'Permanently delete this account and all its data. This cannot be undone.',
