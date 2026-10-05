@@ -1,7 +1,9 @@
-import { isReverificationCancelledError } from '@clerk/shared/error';
+import { isClerkAPIResponseError, isReverificationCancelledError } from '@clerk/shared/error';
 import { useState } from 'react';
 
 import type { ReverificationController } from '../../features/reverification';
+import type { LocalizableError } from '../../localization';
+import { toLocalizableApiError, useErrorText } from '../../localization';
 import type { DestructiveControlledProps } from './destructive';
 
 export type DestructiveController = Pick<
@@ -27,6 +29,7 @@ export function useDestructiveController({
   reverification?: ReverificationController;
 }): DestructiveController {
   const [destructiveState, setDestructiveState] = useState<DestructiveState>({ status: 'closed' });
+  const errorText = useErrorText();
   const { status } = destructiveState;
 
   const openDestructiveDialog = () => {
@@ -57,8 +60,7 @@ export function useDestructiveController({
             setDestructiveState({ status: 'closed' });
             return;
           }
-          // TODO: Better error handling, localization
-          setDestructiveState({ status: 'open-error', errorMessage: 'Something went wrong' });
+          setDestructiveState({ status: 'open-error', errorMessage: errorText(toLocalizableError(error)) });
         }
       }
     },
@@ -76,4 +78,9 @@ export function useDestructiveController({
       }
     },
   };
+}
+
+function toLocalizableError(error: unknown): LocalizableError {
+  const apiError = isClerkAPIResponseError(error) ? error.errors[0] : undefined;
+  return apiError ? toLocalizableApiError(apiError) : {};
 }

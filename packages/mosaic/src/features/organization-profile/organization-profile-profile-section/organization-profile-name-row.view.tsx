@@ -10,7 +10,7 @@ export interface OrganizationProfileNameRowViewProps {
 }
 
 export function OrganizationProfileNameRowView({ name, onSubmit }: OrganizationProfileNameRowViewProps) {
-  const m = useMessages('organizationProfileWorkspaceSection');
+  const m = useMessages('organizationProfileProfileSection');
   return (
     <Section.Row>
       <Section.Item>
@@ -32,7 +32,7 @@ export function OrganizationProfileNameRowView({ name, onSubmit }: OrganizationP
 }
 
 function EditName({ name, onSubmit }: { name: string; onSubmit: (name: string) => Promise<void> }) {
-  const m = useMessages('organizationProfileWorkspaceSection');
+  const m = useMessages('organizationProfileProfileSection');
   const controller = useOrganizationProfileEditFieldController({ value: name, onSubmit });
 
   return (

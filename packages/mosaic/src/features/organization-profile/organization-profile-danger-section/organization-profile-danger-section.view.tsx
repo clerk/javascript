@@ -1,26 +1,26 @@
 import { Destructive } from '../../../blocks/destructive';
+import type { DestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { Button } from '../../../components/button';
 import { Section } from '../../../components/section';
 import { fill, plural, useLocale, useMessages } from '../../../localization';
-import { useOrganizationProfileDangerActionController } from './organization-profile-danger-action.controller';
 
 export interface OrganizationProfileDangerSectionViewProps {
   name: string;
   memberCount: number;
-  onLeave?: () => Promise<void>;
-  onDelete?: () => Promise<void>;
+  leave?: DestructiveController;
+  destroy?: DestructiveController;
 }
 
 export function OrganizationProfileDangerSectionView({
   name,
   memberCount,
-  onLeave,
-  onDelete,
+  leave,
+  destroy,
 }: OrganizationProfileDangerSectionViewProps) {
   const m = useMessages('organizationProfileDangerSection');
   const locale = useLocale();
 
-  if (!onLeave && !onDelete) {
+  if (!leave && !destroy) {
     return null;
   }
 
@@ -31,26 +31,26 @@ export function OrganizationProfileDangerSectionView({
           <Section.Title>{m.sectionTitle}</Section.Title>
         </Section.Header>
         <Section.Body>
-          {onLeave ? (
+          {leave ? (
             <DangerRow
+              controller={leave}
               confirmationValue={name}
               label={m.leave.label}
               description={m.leave.description}
               actionLabel={m.leave.actionLabel}
               dialogTitle={m.leave.dialogTitle}
               dialogDescription={m.leave.dialogDescription}
-              onRun={onLeave}
             />
           ) : null}
-          {onDelete ? (
+          {destroy ? (
             <DangerRow
+              controller={destroy}
               confirmationValue={name}
               label={m.delete.label}
               description={m.delete.description}
               actionLabel={m.delete.actionLabel}
               dialogTitle={m.delete.dialogTitle}
               dialogDescription={plural(m.delete.dialogDescription, memberCount, locale, { name })}
-              onRun={onDelete}
             />
           ) : null}
         </Section.Body>
@@ -60,26 +60,23 @@ export function OrganizationProfileDangerSectionView({
 }
 
 function DangerRow({
+  controller,
   confirmationValue,
   label,
   description,
   actionLabel,
   dialogTitle,
   dialogDescription,
-  onRun,
 }: {
+  controller: DestructiveController;
   confirmationValue: string;
   label: string;
   description: string;
   actionLabel: string;
   dialogTitle: string;
   dialogDescription: string;
-  onRun: () => Promise<void>;
 }) {
   const m = useMessages('organizationProfileDangerSection');
-  const { isOpen, onOpenChange, onConfirm, isRunning, errorMessage } = useOrganizationProfileDangerActionController({
-    onRun,
-  });
 
   return (
     <Section.Row>
@@ -90,8 +87,7 @@ function DangerRow({
         </Section.Content>
         <Section.Actions>
           <Destructive
-            open={isOpen}
-            onOpenChange={onOpenChange}
+            {...controller}
             trigger={
               <Button
                 color='negative'
@@ -107,9 +103,6 @@ function DangerRow({
             confirmationValue={confirmationValue}
             actionLabel={actionLabel}
             cancelLabel={m.cancelLabel}
-            onDelete={onConfirm}
-            isDeleting={isRunning}
-            errorMessage={errorMessage}
           />
         </Section.Actions>
       </Section.Item>
