@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`@clerk/mcp-tools public exports > should not include a breaking change 1`] = `
+[
+  "ClerkMcpError",
+  "createClerkMcpAuth",
+  "createClerkOAuthTokenVerifier",
+]
+`;
