@@ -1,14 +1,7 @@
-import { useOrganization, useOrganizationList, useSession, useUser } from '@clerk/shared/react';
-
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
-import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
-import { useMosaicRouter } from '../../../hooks/use-mosaic-router';
+import type { OrganizationProfileDangerSectionModel } from './organization-profile-danger-section.model';
+import { useOrganizationProfileDangerSectionModel } from './organization-profile-danger-section.model';
 import { OrganizationProfileDangerSectionView } from './organization-profile-danger-section.view';
-
-const organizationListParams = {
-  userMemberships: { infinite: true },
-  userInvitations: { infinite: true },
-} satisfies Parameters<typeof useOrganizationList>[0];
 
 export type OrganizationProfileDangerSectionProps = {
   afterLeaveOrganizationUrl?: string;
@@ -16,63 +9,38 @@ export type OrganizationProfileDangerSectionProps = {
 };
 
 export function OrganizationProfileDangerSection(props: OrganizationProfileDangerSectionProps) {
-  // -- Model --
-  const { isLoaded, organization, membership } = useOrganization();
-  const { user } = useUser();
-  const { session } = useSession();
-  const { userMemberships, userInvitations } = useOrganizationList(organizationListParams);
-  const environment = useMosaicEnvironment();
-  const router = useMosaicRouter();
+  const model = useOrganizationProfileDangerSectionModel(props);
 
-  const canDelete =
-    Boolean(membership) &&
-    Boolean(organization?.adminDeleteEnabled) &&
-    (session?.checkAuthorization({ permission: 'org:sys_profile:delete' }) ?? false);
-
-  const afterLeave = () => {
-    void userMemberships.revalidate?.();
-    void userInvitations.revalidate?.();
-    const url = props.afterLeaveOrganizationUrl || environment?.displayConfig.afterLeaveOrganizationUrl;
-    if (url) {
-      void router.navigate(url);
-    }
-  };
-
-  const leaveOrganization = async () => {
-    if (!organization || !user) {
-      return;
-    }
-    await user.leaveOrganization(organization.id);
-    afterLeave();
-  };
-
-  const deleteOrganization = async () => {
-    if (!organization) {
-      return;
-    }
-    await organization.destroy();
-    afterLeave();
-  };
-
-  // -- Controllers --
-  const leave = useDestructiveController({ onDelete: leaveOrganization });
-  const destroy = useDestructiveController({ onDelete: deleteOrganization });
-
-  // -- View --
-  if (!isLoaded) {
+  if (model.status === 'loading') {
     return props.fallback ?? null;
   }
 
-  if (!organization || !user) {
+  if (model.status === 'hidden') {
     return null;
   }
 
   return (
+    <OrganizationDangerZone
+      key={model.organizationId}
+      model={model}
+    />
+  );
+}
+
+function OrganizationDangerZone({
+  model,
+}: {
+  model: Extract<OrganizationProfileDangerSectionModel, { status: 'ready' }>;
+}) {
+  const leave = useDestructiveController({ onDelete: model.leaveOrganization });
+  const destroy = useDestructiveController({ onDelete: async () => model.deleteOrganization?.() });
+
+  return (
     <OrganizationProfileDangerSectionView
-      name={organization.name}
-      memberCount={organization.membersCount}
+      name={model.name}
+      memberCount={model.memberCount}
       leave={leave}
-      destroy={canDelete ? destroy : undefined}
+      destroy={model.deleteOrganization ? destroy : undefined}
     />
   );
 }
