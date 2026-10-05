@@ -3,23 +3,23 @@ export const organizationProfileDangerSectionMessages = {
   fieldLabel: 'Type “{phrase}” below to continue',
   cancelLabel: 'Cancel',
   leave: {
-    label: 'Leave Workspace',
-    description: 'You will lose access to this Workspace and its applications.',
-    actionLabel: 'Leave Workspace',
-    dialogTitle: 'Leave Workspace',
+    label: 'Leave organization',
+    description: 'You will lose access to this organization and its applications.',
+    actionLabel: 'Leave organization',
+    dialogTitle: 'Leave organization',
     dialogDescription:
-      'Are you sure you want to leave this Workspace? You will lose access to this workspace and its applications.',
+      'Are you sure you want to leave this organization? You will lose access to this organization and its applications.',
   },
   delete: {
-    label: 'Delete Workspace',
+    label: 'Delete organization',
     description:
-      'Permanently delete this workspace and all its data. This cannot be undone. All members will lose access.',
-    actionLabel: 'Delete Workspace',
-    dialogTitle: 'Delete Workspace',
+      'Permanently delete this organization and all its data. This cannot be undone. All members will lose access.',
+    actionLabel: 'Delete organization',
+    dialogTitle: 'Delete organization',
     dialogDescription: {
-      one: 'Are you sure you want to delete {name}? This removes {count} member and permanently deletes all Workspace data. This can’t be undone.',
+      one: 'Are you sure you want to delete {name}? This removes {count} member and permanently deletes all organization data. This can’t be undone.',
       other:
-        'Are you sure you want to delete {name}? This removes {count} members and permanently deletes all Workspace data. This can’t be undone.',
+        'Are you sure you want to delete {name}? This removes {count} members and permanently deletes all organization data. This can’t be undone.',
     },
   },
 } as const;

@@ -171,10 +171,10 @@ import {
   Proposed as OrganizationProfileMembersPanelProposed,
 } from '../stories/organization-profile-members-panel.stories';
 import {
-  Default as OrganizationProfileWorkspaceSectionDefault,
-  meta as organizationProfileWorkspaceSectionMeta,
-  SaveFails as OrganizationProfileWorkspaceSectionSaveFails,
-} from '../stories/organization-profile-workspace-section.stories';
+  Default as OrganizationProfileProfileSectionDefault,
+  meta as organizationProfileProfileSectionMeta,
+  SaveFails as OrganizationProfileProfileSectionSaveFails,
+} from '../stories/organization-profile-profile-section.stories';
 import {
   Default as OtpComponentDefault,
   Disabled as OtpComponentDisabled,
@@ -356,10 +356,10 @@ import {
   VerificationError as ConnectedAccountsVerificationError,
 } from '../stories/user-profile-connected-accounts-section.stories';
 import {
-  Default as UserProfileDeleteSectionDefault,
-  meta as userProfileDeleteSectionMeta,
-  WithError as UserProfileDeleteSectionWithError,
-} from '../stories/user-profile-delete-section.stories';
+  Default as UserProfileDangerSectionDefault,
+  meta as userProfileDangerSectionMeta,
+  WithError as UserProfileDangerSectionWithError,
+} from '../stories/user-profile-danger-section.stories';
 import {
   ConnectionError as UserProfileEnterpriseAccountsSectionConnectionError,
   ConnectOnly as UserProfileEnterpriseAccountsSectionConnectOnly,
@@ -478,10 +478,10 @@ const organizationProfileGeneralPanelModule: StoryModule = {
   ReadOnly: OrganizationProfileGeneralPanelReadOnly,
 };
 
-const organizationProfileWorkspaceSectionModule: StoryModule = {
-  meta: organizationProfileWorkspaceSectionMeta,
-  Default: OrganizationProfileWorkspaceSectionDefault,
-  SaveFails: OrganizationProfileWorkspaceSectionSaveFails,
+const organizationProfileProfileSectionModule: StoryModule = {
+  meta: organizationProfileProfileSectionMeta,
+  Default: OrganizationProfileProfileSectionDefault,
+  SaveFails: OrganizationProfileProfileSectionSaveFails,
 };
 
 const organizationProfileDangerSectionModule: StoryModule = {
@@ -843,10 +843,10 @@ const userProfileWeb3WalletsSectionModule: StoryModule = {
   RemovalError: UserProfileWeb3WalletsSectionRemovalError,
   UnverifiedWallet: UserProfileWeb3WalletsSectionUnverifiedWallet,
 };
-const userProfileDeleteSectionModule: StoryModule = {
-  meta: userProfileDeleteSectionMeta,
-  Default: UserProfileDeleteSectionDefault,
-  WithError: UserProfileDeleteSectionWithError,
+const userProfileDangerSectionModule: StoryModule = {
+  meta: userProfileDangerSectionMeta,
+  Default: UserProfileDangerSectionDefault,
+  WithError: UserProfileDangerSectionWithError,
 };
 
 const confirmationModule: StoryModule = {
@@ -925,7 +925,7 @@ export const registry: StoryModule[] = [
   userProfileConnectedAccountsSectionModule,
   userProfileEnterpriseAccountsSectionModule,
   userProfileWeb3WalletsSectionModule,
-  userProfileDeleteSectionModule,
+  userProfileDangerSectionModule,
   // Organization Profile
   organizationProfileModule,
   // Organization Profile · Panels
@@ -933,7 +933,7 @@ export const registry: StoryModule[] = [
   organizationProfileApiKeysPanelModule,
   organizationProfileMembersPanelModule,
   // Organization Profile · Sections
-  organizationProfileWorkspaceSectionModule,
+  organizationProfileProfileSectionModule,
   organizationProfileDangerSectionModule,
   // API Keys
   apiKeysTableModule,
