@@ -11,16 +11,31 @@ import {
   Flex,
   Icon,
   type LocalizationKey,
+  localizationKeys,
+  Span,
   Text,
   useLocalizations,
 } from '@/customizables';
 import type { useCardState } from '@/elements/contexts';
 import { Field } from '@/elements/FieldControl';
 import { Form } from '@/elements/Form';
-import { ArrowUpTray, Close } from '@/icons';
+import { Tooltip } from '@/elements/Tooltip';
+import { ArrowUpTray, Close, ExclamationTriangle } from '@/icons';
+import { formatDate } from '@/ui/utils/formatDate';
 import type { FormControlState } from '@/ui/utils/useFormControl';
 import { handleError } from '@/utils/errorHandler';
 
+import {
+  addCertificates,
+  areCertificateBodies,
+  getIdpCertificateStatus,
+  haveCertificatesChanged,
+  type IdpCertificateEntry,
+  MAX_IDP_CERTIFICATES,
+  parseCertificateFile,
+  removeCertificate,
+  toIdpCertificatesParam,
+} from '../../../../domain/idpCertificates';
 import type { SamlIdpConfigurationMode } from '../../shared/IdentityProviderConfigurationModes';
 
 type CardState = ReturnType<typeof useCardState>;
@@ -56,9 +71,9 @@ type ManualConfigurationForm = {
   signOnUrlField: FormControl;
   issuerField: FormControl;
   certificateField: FormControl;
-  certFile: File | null;
-  onCertFileChange: (file: File | null) => void;
-  existingCertPresent?: boolean;
+  certificates: IdpCertificateEntry[];
+  onCertificatesChange: React.Dispatch<React.SetStateAction<IdpCertificateEntry[]>>;
+  initialCertificates: IdpCertificateEntry[];
 };
 
 type ManualConfigurationLabels = {
@@ -158,13 +173,11 @@ const ManualPanel = ({ form, labels }: ManualPanelProps): JSX.Element => (
       <Form.PlainInput {...form.issuerField.props} />
     </Form.ControlRow>
 
-    <FileUploadField
+    <CertificateListField
       field={form.certificateField}
-      file={form.certFile}
-      onFileChange={form.onCertFileChange}
-      existingFilePresent={Boolean(form.existingCertPresent)}
+      certificates={form.certificates}
+      onCertificatesChange={form.onCertificatesChange}
       labels={labels}
-      accept='.pem,.key,.crt,.cer,.cert'
     />
   </>
 );
@@ -176,7 +189,8 @@ type BuildSamlPayloadParams = {
   manual?: {
     signOnUrl: string;
     issuer: string;
-    certFile: File | null;
+    certificates: IdpCertificateEntry[];
+    initialCertificates: IdpCertificateEntry[];
   };
 };
 
@@ -213,8 +227,8 @@ export const buildSamlConfigurationPayload = async ({
     idpEntityId: manual.issuer.trim(),
   };
 
-  if (manual.certFile !== null) {
-    payload.idpCertificate = await manual.certFile.text();
+  if (haveCertificatesChanged(manual.certificates, manual.initialCertificates)) {
+    payload.idpCertificates = toIdpCertificatesParam(manual.certificates);
   }
 
   return payload;
@@ -348,5 +362,219 @@ const FileUploadField = ({
         <Field.Feedback />
       </Field.Root>
     </Box>
+  );
+};
+
+type CertificateListFieldProps = {
+  field: FormControl;
+  certificates: IdpCertificateEntry[];
+  onCertificatesChange: React.Dispatch<React.SetStateAction<IdpCertificateEntry[]>>;
+  labels: FileUploadLabels;
+};
+
+const CERTIFICATE_FILE_TYPES = '.pem,.key,.crt,.cer,.cert';
+
+const CertificateListField = ({
+  field,
+  certificates,
+  onCertificatesChange,
+  labels,
+}: CertificateListFieldProps): JSX.Element => {
+  const { t } = useLocalizations();
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const canRemove = certificates.length > 1;
+  const canAdd = certificates.length < MAX_IDP_CERTIFICATES;
+
+  const onFileSelected = async (file: File | null): Promise<void> => {
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+    if (!file) {
+      return;
+    }
+
+    let text: string;
+    try {
+      text = await file.text();
+    } catch {
+      field.setError(t(localizationKeys('configureSSO.signingCertificates.fileUnreadable')));
+      return;
+    }
+
+    const bodies = parseCertificateFile(text);
+    if (!areCertificateBodies(bodies)) {
+      field.setError(t(localizationKeys('configureSSO.signingCertificates.notACertificate')));
+      return;
+    }
+
+    field.clearFeedback();
+    onCertificatesChange(current => addCertificates(current, bodies));
+  };
+
+  return (
+    <Box>
+      <Field.Root {...field.props}>
+        <Col gap={2}>
+          <Field.LabelRow>
+            <Field.Label />
+          </Field.LabelRow>
+
+          <input
+            ref={inputRef}
+            type='file'
+            accept={CERTIFICATE_FILE_TYPES}
+            multiple={false}
+            style={{ display: 'none' }}
+            onChange={e => void onFileSelected(e.target.files?.[0] ?? null)}
+          />
+
+          {certificates.length > 0 && (
+            <Col
+              elementDescriptor={descriptors.configureSSOCertificateList}
+              gap={2}
+            >
+              {certificates.map((entry, index) => (
+                <Flex
+                  key={entry.certificate}
+                  elementDescriptor={descriptors.configureSSOCertificateListItem}
+                  align='center'
+                  gap={2}
+                  sx={theme => ({
+                    padding: theme.space.$2,
+                    borderRadius: theme.radii.$md,
+                    borderWidth: theme.borderWidths.$normal,
+                    borderStyle: theme.borderStyles.$solid,
+                    borderColor: theme.colors.$borderAlpha100,
+                  })}
+                >
+                  <Col
+                    gap={1}
+                    sx={{ minWidth: 0, flex: 1 }}
+                  >
+                    <Flex
+                      align='center'
+                      gap={2}
+                      sx={{ minWidth: 0 }}
+                    >
+                      <Text
+                        elementDescriptor={descriptors.configureSSOCertificateListItemBody}
+                        as='span'
+                        colorScheme='secondary'
+                        variant='buttonSmall'
+                        sx={{
+                          fontFamily: 'monospace',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {entry.certificate}
+                      </Text>
+                      {index === 0 && (
+                        <Tooltip.Root>
+                          <Tooltip.Trigger>
+                            <Span
+                              tabIndex={0}
+                              sx={theme => ({ display: 'inline-flex', borderRadius: theme.radii.$sm })}
+                            >
+                              <Badge
+                                elementDescriptor={descriptors.configureSSOCertificatePrimaryBadge}
+                                localizationKey={localizationKeys('configureSSO.signingCertificates.primary')}
+                              />
+                            </Span>
+                          </Tooltip.Trigger>
+                          <Tooltip.Content text={localizationKeys('configureSSO.signingCertificates.primaryTooltip')} />
+                        </Tooltip.Root>
+                      )}
+                    </Flex>
+                    <CertificateExpiry entry={entry} />
+                  </Col>
+
+                  <Button
+                    elementDescriptor={descriptors.configureSSOCertificateListItemRemoveButton}
+                    variant='ghost'
+                    colorScheme='neutral'
+                    aria-label={t(localizationKeys('configureSSO.signingCertificates.removeCertificate'))}
+                    isDisabled={!canRemove}
+                    onClick={() => {
+                      field.clearFeedback();
+                      onCertificatesChange(current => removeCertificate(current, entry.certificate));
+                    }}
+                    sx={theme => ({ padding: theme.space.$1 })}
+                  >
+                    <Icon
+                      icon={Close}
+                      size='xs'
+                    />
+                  </Button>
+                </Flex>
+              ))}
+            </Col>
+          )}
+
+          <Button
+            elementDescriptor={descriptors.configureSSOCertificateUploadButton}
+            size='xs'
+            variant='outline'
+            onClick={() => inputRef.current?.click()}
+            isDisabled={!canAdd}
+            sx={{ alignSelf: 'flex-start' }}
+          >
+            <Icon
+              icon={ArrowUpTray}
+              size='sm'
+              colorScheme='neutral'
+              sx={theme => ({ marginInlineEnd: theme.space.$1 })}
+            />
+            <Text
+              as='span'
+              localizationKey={
+                certificates.length > 0
+                  ? localizationKeys('configureSSO.signingCertificates.addCertificate')
+                  : labels.uploadFile
+              }
+            />
+          </Button>
+        </Col>
+        <Field.Feedback />
+      </Field.Root>
+    </Box>
+  );
+};
+
+const CertificateExpiry = ({ entry }: { entry: IdpCertificateEntry }): JSX.Element => {
+  const status = getIdpCertificateStatus(entry);
+  const showsAlert = status === 'expired' || status === 'expiring';
+  const colorScheme = status === 'expired' ? 'danger' : status === 'expiring' ? 'warning' : 'secondary';
+
+  return (
+    <Flex
+      elementDescriptor={descriptors.configureSSOCertificateListItemExpiry}
+      align='center'
+      gap={1}
+    >
+      {showsAlert && (
+        <Icon
+          icon={ExclamationTriangle}
+          size='sm'
+          colorScheme={status === 'expired' ? 'danger' : 'warning'}
+        />
+      )}
+      <Text
+        as='span'
+        colorScheme={colorScheme}
+        variant='caption'
+        localizationKey={
+          entry.expiresAt === null
+            ? localizationKeys('configureSSO.signingCertificates.expiryAfterSave')
+            : localizationKeys(
+                status === 'expired'
+                  ? 'configureSSO.signingCertificates.expired'
+                  : 'configureSSO.signingCertificates.expires',
+                { date: formatDate(new Date(entry.expiresAt)) },
+              )
+        }
+      />
+    </Flex>
   );
 };

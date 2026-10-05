@@ -79,7 +79,7 @@ const mergedRef = useMergeRefs([ref, initialFocusRef]);
 <InputGroup.Input ref={mergedRef} {...control} />;
 ```
 
-A model reports a failed save by rejecting `onSubmit` with `FormSubmitError`. `message` lands on `form.error` and each `fields` entry on that field's feedback. Either part may be omitted: fields alone show only under the fields with no banner. A plain `Error` shows only its message, and anything else shows the localized generic message.
+A model reports a failed save by rejecting `onSubmit` with `FormSubmitError`. `message` lands on `form.error` and each `fields` entry on that field's feedback. Either part may be omitted: fields alone show only under the fields with no banner. Anything else shows the localized generic message and is logged with `console.error`.
 
 ```ts
 throw new FormSubmitError<ProfileValues>({

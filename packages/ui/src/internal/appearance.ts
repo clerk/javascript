@@ -769,6 +769,12 @@ export type ElementsConfig = {
   configureSSOCertificateFileBadge: WithOptions;
   configureSSOCertificateFileName: WithOptions;
   configureSSOCertificateRemoveButton: WithOptions;
+  configureSSOCertificateList: WithOptions;
+  configureSSOCertificateListItem: WithOptions;
+  configureSSOCertificateListItemBody: WithOptions;
+  configureSSOCertificateListItemExpiry: WithOptions;
+  configureSSOCertificateListItemRemoveButton: WithOptions;
+  configureSSOCertificatePrimaryBadge: WithOptions;
 
   configureSSOTestUrlOpenButton: WithOptions;
   configureSSOTestRefreshButton: WithOptions;

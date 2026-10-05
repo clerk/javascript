@@ -783,7 +783,7 @@ describe('Reverification', () => {
 
         // A refused credential shows an error banner and stays on the step
         await user.click(screen.getByRole('button', { name: 'Continue' }));
-        expect(await screen.findByRole('alert')).toHaveTextContent('The operation was refused');
+        await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('The operation was refused'));
         expect(screen.getByText(STEP.passkey)).toBeVisible();
 
         // The button is disabled and shows the verifying label while the credential is being verified
