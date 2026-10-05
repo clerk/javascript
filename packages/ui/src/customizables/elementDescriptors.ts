@@ -633,6 +633,12 @@ export const APPEARANCE_KEYS = containsAllElementsConfigKeys([
   'configureSSOCertificateFileBadge',
   'configureSSOCertificateFileName',
   'configureSSOCertificateRemoveButton',
+  'configureSSOCertificateList',
+  'configureSSOCertificateListItem',
+  'configureSSOCertificateListItemBody',
+  'configureSSOCertificateListItemExpiry',
+  'configureSSOCertificateListItemRemoveButton',
+  'configureSSOCertificatePrimaryBadge',
 
   'configureSSOTestUrlOpenButton',
   'configureSSOTestRefreshButton',

@@ -6,6 +6,13 @@ import {
   Inline as ActionBarInline,
   meta as actionBarMeta,
 } from '../stories/action-bar.stories';
+import {
+  Default as APIKeysTableDefault,
+  Empty as APIKeysTableEmpty,
+  meta as apiKeysTableMeta,
+  Organization as APIKeysTableOrganization,
+  ProposedTable as APIKeysTableProposedTable,
+} from '../stories/api-keys-table.stories';
 import { meta as autocompleteMeta } from '../stories/autocomplete.stories';
 import {
   Fallback as AvatarFallbackStory,
@@ -145,7 +152,6 @@ import {
   Default as OrganizationProfileApiKeysPanelDefault,
   Empty as OrganizationProfileApiKeysPanelEmpty,
   meta as organizationProfileApiKeysPanelMeta,
-  ProposedTable as OrganizationProfileApiKeysPanelProposedTable,
 } from '../stories/organization-profile-api-keys-panel.stories';
 import {
   Default as OrganizationProfileDangerSectionDefault,
@@ -314,6 +320,7 @@ import {
   EmailSsoVerification as UserProfileAccountSectionEmailSsoVerification,
   meta as userProfileAccountSectionMeta,
   MultipleAccounts as UserProfileAccountSectionMultipleAccounts,
+  NameManagedByConnection as UserProfileAccountSectionNameManagedByConnection,
   PhoneRemovalError as UserProfileAccountSectionPhoneRemovalError,
   PhoneRemovalPending as UserProfileAccountSectionPhoneRemovalPending,
 } from '../stories/user-profile-account-section.stories';
@@ -327,7 +334,6 @@ import {
   Default as UserProfileApiKeysPanelDefault,
   Empty as UserProfileApiKeysPanelEmpty,
   meta as userProfileApiKeysPanelMeta,
-  ProposedTable as UserProfileApiKeysPanelProposedTable,
 } from '../stories/user-profile-api-keys-panel.stories';
 import {
   Default as UserProfileBillingHistorySectionDefault,
@@ -732,7 +738,6 @@ const toastModule: StoryModule = { meta: toastMeta, Default: ToastDefault, Ancho
 const userProfileApiKeysPanelModule: StoryModule = {
   meta: userProfileApiKeysPanelMeta,
   Default: UserProfileApiKeysPanelDefault,
-  ProposedTable: UserProfileApiKeysPanelProposedTable,
   Empty: UserProfileApiKeysPanelEmpty,
 };
 const userProfileModule: StoryModule = {
@@ -745,6 +750,7 @@ const userProfileAccountSectionModule: StoryModule = {
   meta: userProfileAccountSectionMeta,
   Default: UserProfileAccountSectionDefault,
   MultipleAccounts: UserProfileAccountSectionMultipleAccounts,
+  NameManagedByConnection: UserProfileAccountSectionNameManagedByConnection,
   AddPhoneFails: UserProfileAccountSectionAddPhoneFails,
   AddEmailFails: UserProfileAccountSectionAddEmailFails,
   EmailLinkVerification: UserProfileAccountSectionEmailLinkVerification,
@@ -855,6 +861,14 @@ const destructiveModule: StoryModule = {
   WithError: DestructiveWithError,
 };
 
+const apiKeysTableModule: StoryModule = {
+  meta: apiKeysTableMeta,
+  Default: APIKeysTableDefault,
+  Organization: APIKeysTableOrganization,
+  ProposedTable: APIKeysTableProposedTable,
+  Empty: APIKeysTableEmpty,
+};
+
 const reverificationModule: StoryModule = {
   meta: reverificationMeta,
   Default: ReverificationDefault,
@@ -879,7 +893,6 @@ const reverificationModule: StoryModule = {
 const organizationProfileApiKeysPanelModule: StoryModule = {
   meta: organizationProfileApiKeysPanelMeta,
   Default: OrganizationProfileApiKeysPanelDefault,
-  ProposedTable: OrganizationProfileApiKeysPanelProposedTable,
   Empty: OrganizationProfileApiKeysPanelEmpty,
 };
 
@@ -922,6 +935,8 @@ export const registry: StoryModule[] = [
   // Organization Profile · Sections
   organizationProfileWorkspaceSectionModule,
   organizationProfileDangerSectionModule,
+  // API Keys
+  apiKeysTableModule,
   // Reverification
   reverificationModule,
   // Blocks — flows assembled from components, wired by the caller's machine.

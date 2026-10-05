@@ -8,6 +8,7 @@ import { Button } from '../../components/button';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
 import { fill, useMessages } from '../../localization';
+import { truncationStyles } from '../../styles/typography.styles';
 import { styles } from './user-profile-web3-wallets.styles';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from './user-profile-web3-wallets-section.view';
 
@@ -63,14 +64,19 @@ export function UserProfileWeb3WalletRowView({
           </Section.Media>
         ) : null}
         <Section.Content>
-          <Section.Label xstyle={styles.label}>
-            <span title={wallet.provider || address}>{wallet.provider || shortAddress}</span>
+          <Section.Label>
+            <span
+              title={wallet.provider || address}
+              {...stylex.props(truncationStyles.singleLine, styles.text)}
+            >
+              {wallet.provider || shortAddress}
+            </span>
             {linkedWallet?.isPrimary ? <Badge color='neutral'>{m.primary}</Badge> : null}
             {linkedWallet && !linkedWallet.isVerified ? <Badge color='warning'>{m.unverified}</Badge> : null}
           </Section.Label>
           {wallet.provider && address ? (
             <Section.Description
-              xstyle={styles.text}
+              xstyle={truncationStyles.singleLine}
               title={address}
             >
               {shortAddress}

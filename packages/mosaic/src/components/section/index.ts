@@ -12,6 +12,7 @@ export type {
   SectionLabelProps,
   SectionMediaProps,
   SectionMediaSize,
+  SectionNoteProps,
   SectionRootProps,
   SectionRowProps,
   SectionTitleProps,

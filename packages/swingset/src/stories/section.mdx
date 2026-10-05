@@ -41,6 +41,10 @@ list of values, one `Section.Item` per entry, and each item becomes a list item.
 optional media, flexible content, and trailing actions. `Section.Media` accepts `sm`, `md`, `lg`,
 and `xl` sizes.
 
+When a row offers no action, `Section.Note` takes the place of its `Section.Actions` to say why — it
+sits directly in `Section.Item` and holds the trailing slot itself. Its `icon` prop renders into a
+fixed leading slot sized to the text, for a provider logo or a lock.
+
 `Section.Group` is a query container named `cl-section`, so rows can adapt to the card's width.
 `Section.Item` accepts `wrap`, which moves the actions under the content when the card is narrower
 than `26rem`. `sectionCompactStyles.hidden` and `sectionCompactStyles.only` toggle inline content at

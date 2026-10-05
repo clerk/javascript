@@ -904,6 +904,17 @@ export const bnIN: LocalizationResource = {
       title: 'প্রদানকারী নির্বাচন করুন',
       warning: 'একবার প্রদানকারী নির্বাচন করার পরে, কনফিগারেশন শেষ না হওয়া পর্যন্ত আপনি আবার পরিবর্তন করতে পারবেন না',
     },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
       subtitle: undefined,
@@ -1345,6 +1356,10 @@ export const bnIN: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
           clientSecret: {
             placeholder: undefined,
           },

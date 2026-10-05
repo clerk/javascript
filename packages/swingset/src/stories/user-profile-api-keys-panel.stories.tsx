@@ -1,8 +1,6 @@
-import { UserProfileApiKeysPanelView } from '@clerk/mosaic/features/user-profile/user-profile-api-keys-panel.view';
-
 import type { StoryMeta } from '@/lib/types';
 
-import { useUserProfileAPIKeysFixture } from './fixtures/user-profile-api-keys';
+import { APIKeysPanelExample, useAPIKeysTableFixture } from './fixtures/api-keys-table';
 
 export { default as __source } from './user-profile-api-keys-panel.stories?raw';
 
@@ -12,31 +10,15 @@ export const meta: StoryMeta = {
   title: 'UserProfileApiKeysPanel',
   label: 'API keys panel',
   navigation: { category: 'Panels' },
-  source: 'packages/mosaic/src/features/user-profile/user-profile-api-keys-panel.view.tsx',
+  source: 'packages/mosaic/src/features/user-profile/user-profile-api-keys-panel.tsx',
 };
 
 export function Default() {
-  const props = useUserProfileAPIKeysFixture();
-  return <UserProfileApiKeysPanelView {...props} />;
+  const props = useAPIKeysTableFixture();
+  return <APIKeysPanelExample {...props} />;
 }
 
 export function Empty() {
-  const props = useUserProfileAPIKeysFixture({ initialKeys: [] });
-  return (
-    <UserProfileApiKeysPanelView
-      {...props}
-      onCreate={undefined}
-      onRevoke={undefined}
-    />
-  );
-}
-
-export function ProposedTable() {
-  const props = useUserProfileAPIKeysFixture({ enableSorting: true });
-  return (
-    <UserProfileApiKeysPanelView
-      {...props}
-      onBulkAction={() => undefined}
-    />
-  );
+  const props = useAPIKeysTableFixture({ initialKeys: [] });
+  return <APIKeysPanelExample {...props} />;
 }

@@ -62,18 +62,18 @@ test. Copy from it.
 
 ## Which reference to read
 
-| You are…                                                               | Read                                                   |
-| ---------------------------------------------------------------------- | ------------------------------------------------------ |
-| Building on / authoring a headless primitive (`src/primitives/`)       | `references/headless.md`                               |
-| Styling a component (tokens, `stylex.create`, `themeProps`, CSS build) | `references/stylex.md`                                 |
-| Building an enter/exit transition, or any motion that reads as wrong   | `references/motion.md`                                 |
-| Writing the model (the Clerk adapter, `status`, permissions)           | `references/models.md`                                 |
-| Writing the controller (local state, pending, action wrapping)         | `references/controllers.md`                            |
-| Authoring or debugging a state machine, or wiring one to React         | `references/machines.md` → in-tree `machine/README.md` |
-| Writing the view (rendering plain props)                               | `references/views.md`                                  |
-| Testing a feature (feature tests, unit tests)                          | `references/testing.md`                                |
-| Migrating a legacy component into Mosaic (the end-to-end workflow)     | `references/migration.md`                              |
-| Running the parity audit that guards a migration                       | `references/parity-audit.md`                           |
+| You are…                                                                                               | Read                                                   |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ |
+| Building on / authoring a headless primitive (`src/primitives/`)                                       | `references/headless.md`                               |
+| Styling a component (tokens, `stylex.create`, `themeProps`, CSS build)                                 | `references/stylex.md`                                 |
+| Building an enter/exit transition, a row that expands and collapses, or any motion that reads as wrong | `references/motion.md`                                 |
+| Writing the model (the Clerk adapter, `status`, permissions)                                           | `references/models.md`                                 |
+| Writing the controller (local state, pending, action wrapping)                                         | `references/controllers.md`                            |
+| Authoring or debugging a state machine, or wiring one to React                                         | `references/machines.md` → in-tree `machine/README.md` |
+| Writing the view (rendering plain props)                                                               | `references/views.md`                                  |
+| Testing a feature (feature tests, unit tests)                                                          | `references/testing.md`                                |
+| Migrating a legacy component into Mosaic (the end-to-end workflow)                                     | `references/migration.md`                              |
+| Running the parity audit that guards a migration                                                       | `references/parity-audit.md`                           |
 
 The migration workflow (`migration.md`) ties the flow references together: it
 treats the legacy component as the spec and drives you through the model,
