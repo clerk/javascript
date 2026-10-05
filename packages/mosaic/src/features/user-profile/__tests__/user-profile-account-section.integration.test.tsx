@@ -130,8 +130,10 @@ describe('UserProfileAccountSection', () => {
     }
     await actor.upload(input, file);
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
+      ),
     );
     expect(user.setProfileImage).toHaveBeenCalledExactlyOnceWith({ file });
   });

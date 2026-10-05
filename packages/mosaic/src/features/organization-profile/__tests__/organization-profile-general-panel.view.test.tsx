@@ -103,7 +103,7 @@ describe('organization profile general panel', () => {
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     const dialog = await screen.findByRole('dialog');
-    expect(await within(dialog).findByRole('alert')).toHaveTextContent('Something went wrong.');
+    await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Something went wrong.'));
     expect(within(dialog).getByRole('textbox', { name: 'Name' })).toBeValid();
   });
 
