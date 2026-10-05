@@ -1,14 +1,7 @@
-import * as stylex from '@stylexjs/stylex';
-
-import { Icon } from '../../../components/icon';
-import { Section, sectionCompactStyles } from '../../../components/section';
-import { Text } from '../../../components/text';
+import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
-import { styles } from './user-profile-password-section.styles';
-import type {
-  UserProfilePasswordManagedBy,
-  UserProfilePasswordSectionViewProps,
-} from './user-profile-password-section.types';
+import { UserProfileManagedByLabel } from '../user-profile-managed-by';
+import type { UserProfilePasswordSectionViewProps } from './user-profile-password-section.types';
 
 export function UserProfilePasswordRowView({
   action,
@@ -25,32 +18,12 @@ export function UserProfilePasswordRowView({
         {action ? (
           <Section.Actions>{action}</Section.Actions>
         ) : managedBy ? (
-          <Section.Actions>
-            <ManagedByLabel {...managedBy} />
-          </Section.Actions>
+          <UserProfileManagedByLabel
+            managedBy={managedBy}
+            label={fill(m.managedBy, { name: managedBy.name })}
+          />
         ) : null}
       </Section.Item>
     </Section.Items>
-  );
-}
-
-function ManagedByLabel({ name }: UserProfilePasswordManagedBy) {
-  const m = useMessages('userProfilePasswordSection');
-  return (
-    <div {...stylex.props(styles.managedBy)}>
-      <Icon
-        name='lock'
-        size='sm'
-        xstyle={styles.managedByText}
-      />
-      <Text
-        render={<span />}
-        size='sm'
-        xstyle={styles.managedByText}
-      >
-        <span {...stylex.props(sectionCompactStyles.hidden)}>{fill(m.managedBy, { name })}</span>
-        <span {...stylex.props(sectionCompactStyles.only)}>{name}</span>
-      </Text>
-    </div>
   );
 }

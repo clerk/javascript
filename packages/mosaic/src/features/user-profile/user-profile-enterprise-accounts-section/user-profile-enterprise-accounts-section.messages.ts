@@ -3,4 +3,9 @@ export const userProfileEnterpriseAccountsMessages = {
   connect: 'Connect',
   connectProvider: 'Connect {provider}',
   requiresAction: 'Requires action',
+  errors: {
+    generic: 'Something went wrong. Please try again.',
+    unavailable: 'This enterprise connection is no longer available.',
+    missingVerificationUrl: 'The connection could not start. Please try again.',
+  },
 } as const;

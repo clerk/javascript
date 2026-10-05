@@ -14,6 +14,7 @@ export const styles = stylex.create({
     flexDirection: 'row',
   },
   content: {
+    '--_cl-feedback-gap': space['1'],
     gap: space['1'],
     display: 'flex',
     flexDirection: 'column',

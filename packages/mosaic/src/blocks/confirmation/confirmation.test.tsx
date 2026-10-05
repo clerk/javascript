@@ -203,7 +203,7 @@ describe('Confirmation with a handle', () => {
     });
 
     expect(screen.getByRole('alertdialog')).toBeInTheDocument();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert').textContent).toBe('');
   });
 
   it('closes through the handle', async () => {

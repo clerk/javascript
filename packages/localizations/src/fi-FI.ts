@@ -904,6 +904,17 @@ export const fiFI: LocalizationResource = {
       title: 'Valitse palveluntarjoaja',
       warning: 'Kun palveluntarjoaja on valittu, et voi vaihtaa sitä ennen kuin määritys on valmis',
     },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
       subtitle: undefined,
@@ -1346,6 +1357,10 @@ export const fiFI: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
           clientSecret: {
             placeholder: undefined,
           },

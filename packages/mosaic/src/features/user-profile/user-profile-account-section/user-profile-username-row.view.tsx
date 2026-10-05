@@ -6,22 +6,24 @@ import { UserProfileEditUsernameDialog } from './user-profile-edit-username.dial
 
 export interface UserProfileUsernameRowViewProps {
   username: string;
+  required?: boolean;
   onSubmit?: (username: string) => Promise<void>;
 }
 
-export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUsernameRowViewProps) {
+export function UserProfileUsernameRowView({ username, required = false, onSubmit }: UserProfileUsernameRowViewProps) {
   const m = useMessages('userProfileAccountSection');
   return (
     <Section.Row>
       <Section.Item>
         <Section.Content>
           <Section.Label>{m.username.label}</Section.Label>
-          <Section.Description>{username}</Section.Description>
+          <Section.Description>{username || m.username.empty}</Section.Description>
         </Section.Content>
         {onSubmit ? (
           <Section.Actions>
             <EditUsername
               username={username}
+              required={required}
               onSubmit={onSubmit}
             />
           </Section.Actions>
@@ -31,21 +33,32 @@ export function UserProfileUsernameRowView({ username, onSubmit }: UserProfileUs
   );
 }
 
-function EditUsername({ username, onSubmit }: { username: string; onSubmit: (username: string) => Promise<void> }) {
+function EditUsername({
+  username,
+  required,
+  onSubmit,
+}: {
+  username: string;
+  required: boolean;
+  onSubmit: (username: string) => Promise<void>;
+}) {
   const m = useMessages('userProfileAccountSection');
-  const controller = useUserProfileEditUsernameController({ username, onSubmit });
+  const controller = useUserProfileEditUsernameController({ username, required, onSubmit });
+  const isSet = Boolean(username);
 
   return (
     <UserProfileEditUsernameDialog
-      {...controller}
+      form={controller.form}
       open={controller.isOpen}
+      onOpenChange={controller.onOpenChange}
+      title={isSet ? m.username.dialogTitle : m.username.addDialogTitle}
       trigger={
         <Button
           color='neutral'
           size='sm'
           variant='outline'
         >
-          {m.username.edit}
+          {isSet ? m.username.edit : m.username.add}
         </Button>
       }
     />

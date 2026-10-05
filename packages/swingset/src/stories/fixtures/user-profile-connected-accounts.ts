@@ -1,17 +1,18 @@
 import type {
   UserProfileConnectedAccount,
   UserProfileConnectionProvider,
-} from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosEmail, chaosText } from '@/lib/chaos';
 
-export const connectedAccount = {
+export const connectedAccount: UserProfileConnectedAccount = {
   id: 'google',
   provider: 'Google',
   identifier: 'test@example.com',
   iconUrl: 'https://img.clerk.com/static/google.svg',
+  status: 'connected',
 };
 const connectionProviders: UserProfileConnectionProvider[] = [
   { id: 'google', provider: 'Google', iconUrl: 'https://img.clerk.com/static/google.svg' },
@@ -49,7 +50,13 @@ export function useConnectedAccountsFixture({
       if (provider) {
         setAccounts(current => [
           ...current,
-          { id: provider.id, provider: provider.provider, iconUrl: provider.iconUrl, identifier: 'test@example.com' },
+          {
+            id: provider.id,
+            provider: provider.provider,
+            iconUrl: provider.iconUrl,
+            identifier: 'test@example.com',
+            status: 'connected',
+          },
         ]);
       }
     },

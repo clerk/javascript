@@ -14,7 +14,6 @@ import type {
   OrganizationProfilePageId,
   OrganizationProfilePages,
 } from './organization-profile.types';
-import { OrganizationProfileApiKeysPanelView } from './organization-profile-api-keys-panel.view';
 import { OrganizationProfileGeneralPanelView } from './organization-profile-general-panel.view';
 import { OrganizationProfileMembersPanelView } from './organization-profile-members-panel.view';
 import { OrganizationProfilePlaceholderPanelView } from './organization-profile-placeholder-panel.view';
@@ -34,12 +33,12 @@ function BuiltInPage({
 }: {
   id: OrganizationProfilePageId;
   pages: OrganizationProfilePages;
-}): React.ReactElement | null {
+}): React.ReactNode {
   if (id === 'general') {
     return <OrganizationProfileGeneralPanelView {...pages.general} />;
   }
   if (id === 'apiKeys') {
-    return pages.apiKeys ? <OrganizationProfileApiKeysPanelView {...pages.apiKeys} /> : null;
+    return pages.apiKeys;
   }
   if (id === 'members') {
     return pages.members?.members || pages.members?.invitations || pages.members?.requests ? (

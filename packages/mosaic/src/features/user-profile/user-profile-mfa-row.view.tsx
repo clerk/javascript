@@ -5,7 +5,6 @@ import { ActionMenu } from '../../components/action-menu';
 import { Badge } from '../../components/badge';
 import { Section } from '../../components/section';
 import { fill, useMessages } from '../../localization';
-import { styles } from './user-profile-mfa-section.styles';
 import type { UserProfileMfaMethod, UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
 import { UserProfileSecurityIcon } from './user-profile-security-icon';
 
@@ -45,7 +44,7 @@ export function UserProfileMfaRowView({
     <Section.Item>
       <UserProfileSecurityIcon name={method.type} />
       <Section.Content>
-        <Section.Label xstyle={styles.label}>
+        <Section.Label>
           {label}
           {method.isDefault ? <Badge color='neutral'>{m.default}</Badge> : null}
         </Section.Label>

@@ -1,3 +1,4 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import type {
   BackupCodeResource,
   DeletedObjectResource,
@@ -574,6 +575,95 @@ describe('MfaPage', () => {
         ?.children[1];
 
       expect(itemButton).toBeDefined();
+    });
+  });
+
+  describe('Set as default', () => {
+    it('triggers reverification and retries when making a phone the default second factor', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
+        f.withUser({
+          phone_numbers: [
+            {
+              phone_number: '+306911111111',
+              id: 'id',
+              reserved_for_second_factor: true,
+              verification: { status: 'verified', strategy: 'phone_code' } as VerificationJSON,
+            },
+          ],
+          two_factor_enabled: true,
+        });
+      });
+
+      const makeDefaultSecondFactor = fixtures.clerk.user?.phoneNumbers[0].makeDefaultSecondFactor;
+      makeDefaultSecondFactor
+        ?.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Reverification required', {
+            status: 403,
+            data: [{ code: 'session_reverification_required', message: 'Reverification required' }],
+          }),
+        )
+        .mockResolvedValueOnce({} as PhoneNumberResource);
+      const openReverification = vi.spyOn(fixtures.clerk, '__internal_openReverification').mockImplementation(() => {});
+
+      const { findByText, findByRole, userEvent, queryByText } = render(
+        <CardStateProvider>
+          <MfaSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const itemButton = (await findByText(/\+30 691 1111111/i))?.parentElement?.parentElement?.parentElement
+        ?.children[1];
+      await act(async () => {
+        await userEvent.click(itemButton as Element);
+      });
+      await userEvent.click(await findByRole('menuitem', { name: /set as default/i }));
+
+      await waitFor(() => expect(openReverification).toHaveBeenCalledTimes(1));
+      expect(makeDefaultSecondFactor).toHaveBeenCalledTimes(1);
+      expect(queryByText(/reverification required/i)).not.toBeInTheDocument();
+
+      await act(() => {
+        openReverification.mock.calls[0][0]?.afterVerification?.();
+      });
+
+      await waitFor(() => expect(makeDefaultSecondFactor).toHaveBeenCalledTimes(2));
+    });
+
+    it('does not offer set as default on SMS while an authenticator app is enrolled', async () => {
+      const { wrapper } = await createFixtures(f => {
+        f.withPhoneNumber({ second_factors: ['phone_code'], used_for_second_factor: true });
+        f.withAuthenticatorApp();
+        f.withUser({
+          phone_numbers: [
+            {
+              phone_number: '+306911111111',
+              id: 'id',
+              reserved_for_second_factor: true,
+              verification: { status: 'verified', strategy: 'phone_code' } as VerificationJSON,
+            },
+          ],
+          two_factor_enabled: true,
+          totp_enabled: true,
+        });
+      });
+
+      const { findByText, findByRole, queryByRole, userEvent } = render(
+        <CardStateProvider>
+          <MfaSection />
+        </CardStateProvider>,
+        { wrapper },
+      );
+
+      const itemButton = (await findByText(/\+30 691 1111111/i))?.parentElement?.parentElement?.parentElement
+        ?.children[1];
+      await act(async () => {
+        await userEvent.click(itemButton as Element);
+      });
+
+      await findByRole('menuitem', { name: /^remove$/i });
+      expect(queryByRole('menuitem', { name: /set as default/i })).not.toBeInTheDocument();
     });
   });
 });

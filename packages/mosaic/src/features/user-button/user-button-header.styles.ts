@@ -28,9 +28,9 @@ export const styles = stylex.create({
 
   description: {
     color: colorVars['--cl-color-foreground-secondary'],
-    fontSize: typeScaleVars['--cl-text-xs-size'],
+    fontSize: typeScaleVars['--cl-text-sm-size'],
     fontWeight: fontWeightVars['--cl-font-normal'],
-    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    lineHeight: typeScaleVars['--cl-text-sm-leading'],
   },
 
   actions: {

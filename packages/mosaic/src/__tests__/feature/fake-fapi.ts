@@ -1,14 +1,19 @@
+import { OAUTH_PROVIDERS } from '@clerk/shared/oauth';
 import type {
   ApiKeyJSON,
   ClientJSON,
+  EnterpriseConnectionJSON,
+  OAuthProvider,
   OrganizationMembershipJSON,
   OrganizationSuggestionJSON,
   SessionJSON,
+  UserJSON,
   UserOrganizationInvitationJSON,
 } from '@clerk/shared/types';
 import { http, HttpResponse, type JsonBodyType } from 'msw';
 import { setupWorker } from 'msw/browser';
 
+import { enterpriseHandlers, type FakeEnterpriseLinking } from './fake-fapi/enterprise';
 import {
   createVerificationState,
   type FakeVerificationSeed,
@@ -20,10 +25,12 @@ import {
   fapiClient,
   type FapiEnvironment,
   fapiEnvironment,
+  fapiExternalAccount,
   fapiMembership,
   fapiOrganization,
   fapiPage,
   fapiToken,
+  fapiVerification,
 } from './fapi';
 
 export const PUBLISHABLE_KEY = 'pk_live_Y2xlcmsuYWJjZWYuMTIzNDUucHJvZC5sY2xjbGVyay5jb20k';
@@ -40,10 +47,13 @@ export interface FakeFapiState {
   apiKeys: ApiKeyJSON[];
   verification: FakeVerificationState;
   passwordUpdates: URLSearchParams[];
+  enterpriseConnections: EnterpriseConnectionJSON[];
+  enterpriseLinking: FakeEnterpriseLinking;
 }
 
-export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification'>> & {
+export type FakeFapiSeed = Partial<Omit<FakeFapiState, 'verification' | 'enterpriseLinking'>> & {
   verification?: FakeVerificationSeed;
+  enterpriseLinking?: Partial<FakeEnterpriseLinking>;
 };
 
 const unhandled: string[] = [];
@@ -88,12 +98,23 @@ function error(code: string, status = 400) {
   return HttpResponse.json({ errors: [{ code, message: code, long_message: code }] }, { status });
 }
 
+function activeUser(state: FakeFapiState): UserJSON | undefined {
+  return findSession(state, state.client.last_active_session_id)?.user;
+}
+
+function updateUser(state: FakeFapiState, user: UserJSON): void {
+  state.client = {
+    ...state.client,
+    sessions: state.client.sessions.map(session => (session.user.id === user.id ? { ...session, user } : session)),
+  };
+}
+
 function missing() {
   return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
 }
 
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
-  const { verification, ...rest } = seed;
+  const { verification, enterpriseLinking, ...rest } = seed;
   const state: FakeFapiState = {
     environment: fapiEnvironment(),
     client: fapiClient(),
@@ -102,14 +123,95 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     suggestions: [],
     apiKeys: [],
     passwordUpdates: [],
+    enterpriseConnections: [],
     ...rest,
     verification: createVerificationState(verification),
+    enterpriseLinking: {
+      enabled: false,
+      preparations: {},
+      verifiedLinks: [],
+      pendingExternalAccounts: [],
+      ...enterpriseLinking,
+    },
   };
 
   worker.use(
     ...verificationHandlers(state, fapiUrl),
+    ...enterpriseHandlers(state, fapiUrl),
     http.get(fapiUrl('/v1/environment'), () => HttpResponse.json(state.environment)),
     http.get(fapiUrl('/v1/client'), () => envelope(state.client, null)),
+    http.get(fapiUrl('/v1/me'), () => {
+      const user = activeUser(state);
+      return user ? envelope(user, state.client) : missing();
+    }),
+    http.post(fapiUrl('/v1/me/external_accounts'), async ({ request }) => {
+      const user = activeUser(state);
+      if (!user) {
+        return missing();
+      }
+      const body = new URLSearchParams(await request.text());
+      const strategy = body.get('strategy');
+      if (!strategy) {
+        return missing();
+      }
+      const provider: OAuthProvider | undefined = OAUTH_PROVIDERS.find(item => item.strategy === strategy)?.provider;
+      if (!provider) {
+        return missing();
+      }
+      const account = fapiExternalAccount({
+        id: `idn_${crypto.randomUUID()}`,
+        approved_scopes: '',
+        provider,
+        verification: fapiVerification(strategy, {
+          status: 'unverified',
+          external_verification_redirect_url: 'https://accounts.example/authorize',
+        }),
+      });
+      updateUser(state, {
+        ...user,
+        external_accounts: [
+          ...user.external_accounts.filter(
+            item => item.provider !== provider || item.verification?.status === 'verified',
+          ),
+          account,
+        ],
+      });
+      return envelope(account, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/external_accounts/:id/reauthorize'), ({ params, request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
+        return undefined;
+      }
+      const user = activeUser(state);
+      const account = user?.external_accounts.find(item => item.id === params.id);
+      if (!user || !account) {
+        return missing();
+      }
+      const pending = {
+        ...account,
+        verification: fapiVerification(`oauth_${account.provider}`, {
+          status: 'unverified',
+          external_verification_redirect_url: 'https://accounts.example/consent',
+        }),
+      };
+      updateUser(state, {
+        ...user,
+        external_accounts: user.external_accounts.map(item => (item.id === pending.id ? pending : item)),
+      });
+      return envelope(pending, state.client);
+    }),
+    http.post(fapiUrl('/v1/me/external_accounts/:id'), ({ params, request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
+        return undefined;
+      }
+      const user = activeUser(state);
+      const account = user?.external_accounts.find(item => item.id === params.id);
+      if (!user || !account) {
+        return missing();
+      }
+      updateUser(state, { ...user, external_accounts: user.external_accounts.filter(item => item.id !== account.id) });
+      return envelope({ ...account, object: 'external_account' }, state.client);
+    }),
     http.post(fapiUrl('/v1/client/sessions/:id/tokens'), ({ params }) => {
       const session = findSession(state, params.id);
       return session
