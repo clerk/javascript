@@ -1,4 +1,6 @@
+import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import { OrganizationProfileDangerSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.view';
+import { ClerkAPIResponseError } from '@clerk/shared/error';
 import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
@@ -8,15 +10,41 @@ export { default as __source } from './organization-profile-danger-section.stori
 export const meta: StoryMeta = {
   group: 'Organization Profile',
   status: 'wip',
-  substatus: 'needs wire-up',
   title: 'OrganizationProfileDangerSection',
   label: 'Danger zone',
   navigation: { category: 'Sections' },
   source:
-    'packages/mosaic/src/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.view.tsx',
+    'packages/mosaic/src/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.tsx',
 };
 
 const settleAfter = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+
+const apiError = (longMessage: string) =>
+  new ClerkAPIResponseError(longMessage, {
+    status: 403,
+    data: [{ code: 'forbidden', message: longMessage, long_message: longMessage }],
+  });
+
+function DangerSectionHarness({
+  memberCount = 20,
+  onLeave,
+  onDelete,
+}: {
+  memberCount?: number;
+  onLeave: () => Promise<void>;
+  onDelete?: () => Promise<void>;
+}) {
+  const leave = useDestructiveController({ onDelete: onLeave });
+  const destroy = useDestructiveController({ onDelete: onDelete ?? (() => Promise.resolve()) });
+  return (
+    <OrganizationProfileDangerSectionView
+      name='Clerk'
+      memberCount={memberCount}
+      leave={leave}
+      destroy={onDelete ? destroy : undefined}
+    />
+  );
+}
 
 export function Default() {
   const [runId, setRunId] = useState(0);
@@ -28,10 +56,8 @@ export function Default() {
   };
 
   return (
-    <OrganizationProfileDangerSectionView
+    <DangerSectionHarness
       key={runId}
-      name='Clerk'
-      memberCount={20}
       onLeave={settle}
       onDelete={settle}
     />
@@ -40,16 +66,14 @@ export function Default() {
 
 export function WithError() {
   return (
-    <OrganizationProfileDangerSectionView
-      name='Clerk'
-      memberCount={20}
+    <DangerSectionHarness
       onLeave={async () => {
         await settleAfter(1500);
-        throw new Error('You are the last admin. Promote another member before you leave.');
+        throw apiError('You are the last admin. Promote another member before you leave.');
       }}
       onDelete={async () => {
         await settleAfter(1500);
-        throw new Error('This workspace has an active subscription. Cancel it before you delete.');
+        throw apiError('This organization has an active subscription. Cancel it before you delete.');
       }}
     />
   );
@@ -57,8 +81,7 @@ export function WithError() {
 
 export function LeaveOnly() {
   return (
-    <OrganizationProfileDangerSectionView
-      name='Clerk'
+    <DangerSectionHarness
       memberCount={1}
       onLeave={() => settleAfter(1500)}
     />

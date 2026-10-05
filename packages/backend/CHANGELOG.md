@@ -1,5 +1,18 @@
 # Change Log
 
+## 3.23.0
+
+### Minor Changes
+
+- Add `clerkClient.invitations.deleteInvitation(invitationId)`, which permanently deletes an instance invitation and the stored copies of its invitation email. Unlike `revokeInvitation`, this removes the invitation record itself, so it can be used to honor a data erasure request from someone who was invited but never signed up. ([#10034](https://github.com/clerk/javascript/pull/10034)) by [@dominic-clerk](https://github.com/dominic-clerk)
+
+- Verified OAuth access tokens now expose `act`, the RFC 8693 actor chain, when the token was issued by an OAuth 2.0 Token Exchange. It is available on the `IdPOAuthAccessToken` returned for both opaque and JWT access tokens. ([#9929](https://github.com/clerk/javascript/pull/9929)) by [@wyattjoh](https://github.com/wyattjoh)
+
+### Patch Changes
+
+- Updated dependencies [[`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260)]:
+  - @clerk/shared@4.39.0
+
 ## 3.22.0
 
 ### Minor Changes
