@@ -29,12 +29,12 @@ export function OrganizationProfileDangerSection(props: OrganizationProfileDange
     Boolean(organization?.adminDeleteEnabled) &&
     (session?.checkAuthorization({ permission: 'org:sys_profile:delete' }) ?? false);
 
-  const afterLeave = async () => {
+  const afterLeave = () => {
     void userMemberships.revalidate?.();
     void userInvitations.revalidate?.();
     const url = props.afterLeaveOrganizationUrl || environment?.displayConfig.afterLeaveOrganizationUrl;
     if (url) {
-      await router.navigate(url);
+      void router.navigate(url);
     }
   };
 
@@ -43,7 +43,7 @@ export function OrganizationProfileDangerSection(props: OrganizationProfileDange
       return;
     }
     await user.leaveOrganization(organization.id);
-    await afterLeave();
+    afterLeave();
   };
 
   const deleteOrganization = async () => {
@@ -51,7 +51,7 @@ export function OrganizationProfileDangerSection(props: OrganizationProfileDange
       return;
     }
     await organization.destroy();
-    await afterLeave();
+    afterLeave();
   };
 
   // -- Controllers --

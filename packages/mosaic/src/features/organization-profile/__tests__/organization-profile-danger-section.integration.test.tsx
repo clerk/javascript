@@ -153,6 +153,19 @@ describe('OrganizationProfileDangerSection', () => {
     expect(navigate).toHaveBeenCalledWith('/organizations');
   });
 
+  it('closes the dialog once the organization is deleted, without waiting for navigation', async () => {
+    navigate = vi.fn(() => new Promise(() => {}));
+    const user = userEvent.setup();
+    renderSection();
+    const dialog = await openDialog(user, 'Delete organization');
+
+    await confirm(user, dialog, 'Delete organization');
+
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(navigate).toHaveBeenCalledWith('/after-leave');
+    expect(destroy).toHaveBeenCalledOnce();
+  });
+
   it('names a single remaining member in the delete warning', async () => {
     membersCount = 1;
     const user = userEvent.setup();
