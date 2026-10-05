@@ -6,14 +6,14 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../mosaic-provider';
-import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
+import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
 import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
 
 function DeleteAccount() {
   const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
-  return <UserProfileDeleteSectionView {...controller} />;
+  return <UserProfileDangerSectionView {...controller} />;
 }
 
 const props: UserProfileProfilePanelViewProps = {
@@ -124,8 +124,8 @@ describe('UserProfileProfilePanelView', () => {
       screen.getByRole('group', { name: 'Profile' }),
     );
     expect(screen.getByRole('heading', { level: 3, name: 'Profile' })).toHaveClass('cl-section-title');
-    expect(screen.getByText('Name')).toHaveClass('cl-section-label');
-    expect(screen.getByText('Username')).toHaveClass('cl-section-label');
+    expect(screen.getByText('Name', { selector: '.cl-section-label > *' })).toBeInTheDocument();
+    expect(screen.getByText('Username', { selector: '.cl-section-label > *' })).toBeInTheDocument();
     expect(screen.getByText('Preston Booth')).toHaveClass('cl-section-description');
     expect(screen.getByText('prestonxyz')).toHaveClass('cl-section-description');
     expect(screen.getByRole('button', { name: 'Edit name' })).toBeInTheDocument();
@@ -134,7 +134,7 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.getByText('item1@clerk.dev')).toBeInTheDocument();
     expect(screen.getByText('item1@clerk.dev').closest('.cl-section-item')).toHaveTextContent('Primary');
     expect(screen.getByText('+1 (801) 888-8181')).toBeInTheDocument();
-    expect(screen.getByText('Profile picture')).toHaveClass('cl-section-label');
+    expect(screen.getByText('Profile picture', { selector: '.cl-section-label > *' })).toBeInTheDocument();
     expect(screen.getByText('Recommend size 1:1, up to 10MB.')).toHaveClass('cl-section-description');
     expect(screen.getByRole('heading', { level: 3, name: 'Email' })).toHaveClass('cl-section-title');
     expect(screen.getByRole('heading', { level: 3, name: 'Phone' })).toHaveClass('cl-section-title');
@@ -274,11 +274,11 @@ describe('UserProfileProfilePanelView', () => {
 
   it('renders the danger zone when provided', () => {
     renderView({
-      deleteAccountSlot: <DeleteAccount />,
+      dangerSlot: <DeleteAccount />,
     });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
-    expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
+    expect(screen.getByText('Delete account', { selector: '.cl-section-label > *' })).toBeInTheDocument();
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
     );
@@ -292,7 +292,7 @@ describe('UserProfileProfilePanelView', () => {
         />
       ),
       enterpriseAccountsSlot: <div data-testid='enterprise'>Enterprise accounts</div>,
-      deleteAccountSlot: <DeleteAccount />,
+      dangerSlot: <DeleteAccount />,
     });
 
     const wallets = screen.getByRole('group', { name: 'Web3 wallets' });

@@ -12,6 +12,9 @@ export const styles = stylex.create({
     display: 'flex',
     minWidth: 0,
   },
+  contactText: {
+    minWidth: 0,
+  },
   providerIcon: {
     display: 'block',
     objectFit: 'contain',

@@ -13,7 +13,6 @@ import type { UseFormResult } from '../../components/form';
 import { Input } from '../../components/input';
 import { InputGroup } from '../../components/input-group';
 import { Select } from '../../components/select';
-import { Text } from '../../components/text';
 import { fill } from '../../localization';
 import { truncationStyles } from '../../styles/typography.styles';
 import type { APIKeysTableMessages } from './api-keys-table.types';
@@ -93,6 +92,12 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
         <Card.Title>{m.createTitle}</Card.Title>
         <Card.Description>{m.createDescription}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {form.error}
+      </Card.Banner>
       <Card.Content
         render={
           <form
@@ -137,15 +142,6 @@ function CreateKeyStep(props: CreateAPIKeyDialogProps & { inputRef: Ref<HTMLInpu
             </Field.Hint>
           </Field.Message>
         </Field.Root>
-
-        {form.error ? (
-          <Text
-            role='alert'
-            color='negative'
-          >
-            {form.error}
-          </Text>
-        ) : null}
       </Card.Content>
       <Card.Footer>
         <SubmitButton
@@ -171,6 +167,12 @@ function CopyKeyStep(props: CreateAPIKeyDialogProps) {
         <Card.Title>{m.copyTitle}</Card.Title>
         <Card.Description>{m.copyDescription}</Card.Description>
       </Card.Header>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {props.copyError}
+      </Card.Banner>
       <Card.Content
         render={
           <form
@@ -201,15 +203,6 @@ function CopyKeyStep(props: CreateAPIKeyDialogProps) {
             </InputGroup.End>
           </InputGroup.Root>
         </Field.Root>
-
-        {props.copyError ? (
-          <Text
-            role='alert'
-            color='negative'
-          >
-            {props.copyError}
-          </Text>
-        ) : null}
       </Card.Content>
       <Card.Footer>
         <SubmitButton

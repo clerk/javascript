@@ -1,3 +1,4 @@
+import * as stylex from '@stylexjs/stylex';
 import type { Ref } from 'react';
 
 import type { ActionMenuAction } from '../../../components/action-menu';
@@ -7,6 +8,7 @@ import { SubmitButton } from '../../../components/button';
 import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { fill, useMessages } from '../../../localization';
+import { truncationStyles } from '../../../styles/typography.styles';
 import { UserProfileProviderIcon } from '../user-profile-provider-icon';
 import { styles } from './user-profile-connected-accounts-section.styles';
 import type {
@@ -31,8 +33,13 @@ export function UserProfileConnectProviderRowView({
       <Section.Item>
         <UserProfileProviderIcon {...provider.icon} />
         <Section.Content>
-          <Section.Label xstyle={styles.label}>
-            <span title={provider.provider}>{provider.provider}</span>
+          <Section.Label>
+            <span
+              title={provider.provider}
+              {...stylex.props(truncationStyles.singleLine, styles.text)}
+            >
+              {provider.provider}
+            </span>
           </Section.Label>
         </Section.Content>
         <Section.Actions>
@@ -89,13 +96,18 @@ export function UserProfileConnectedAccountRowView({
       <Section.Item>
         <UserProfileProviderIcon {...account.icon} />
         <Section.Content>
-          <Section.Label xstyle={styles.label}>
-            <span title={account.provider}>{account.provider}</span>
+          <Section.Label>
+            <span
+              title={account.provider}
+              {...stylex.props(truncationStyles.singleLine, styles.text)}
+            >
+              {account.provider}
+            </span>
             {account.status === 'reconnect' ? <Badge color='warning'>{m.disconnected}</Badge> : null}
           </Section.Label>
           {account.identifier ? (
             <Section.Description
-              xstyle={styles.text}
+              xstyle={truncationStyles.singleLine}
               title={account.identifier}
             >
               {account.identifier}

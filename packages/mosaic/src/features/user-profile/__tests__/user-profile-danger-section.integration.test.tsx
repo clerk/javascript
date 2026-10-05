@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../mosaic-provider';
-import { UserProfileDeleteSection } from '../user-profile-delete-section/user-profile-delete-section';
+import { UserProfileDangerSection } from '../user-profile-danger-section/user-profile-danger-section';
 
 let isLoaded: boolean;
 let deleteSelfEnabled: boolean;
@@ -37,7 +37,7 @@ vi.mock('@clerk/shared/react', async importOriginal => {
 function renderSection(fallback?: React.ReactNode) {
   return render(
     <MosaicProvider>
-      <UserProfileDeleteSection fallback={fallback} />
+      <UserProfileDangerSection fallback={fallback} />
     </MosaicProvider>,
   );
 }
@@ -47,7 +47,7 @@ async function openDialog(user: ReturnType<typeof userEvent.setup>) {
   return screen.getByRole('dialog');
 }
 
-describe('UserProfileDeleteSection', () => {
+describe('UserProfileDangerSection', () => {
   beforeEach(() => {
     isLoaded = true;
     deleteSelfEnabled = true;
@@ -76,7 +76,7 @@ describe('UserProfileDeleteSection', () => {
     renderSection();
 
     expect(screen.getByRole('heading', { name: 'Danger zone' })).toBeInTheDocument();
-    expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
+    expect(screen.getByText('Delete account', { selector: '.cl-section-label > *' })).toBeInTheDocument();
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
     );

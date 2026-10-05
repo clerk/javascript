@@ -55,6 +55,21 @@ export interface EnterpriseConnectionResource extends ClerkResource {
   __internal_toSnapshot: () => EnterpriseConnectionJSONSnapshot;
 }
 
+export interface EnterpriseSamlIdpCertificateJSON {
+  certificate: string;
+  issued_at: number | null;
+  expires_at: number | null;
+}
+
+export interface EnterpriseSamlIdpCertificateResource {
+  /** The X.509 certificate, as base64-encoded DER without PEM armor. */
+  certificate: string;
+  /** Unix timestamp (milliseconds) of the start of the certificate validity window (X.509 NotBefore), or `null` if unknown. */
+  issuedAt: number | null;
+  /** Unix timestamp (milliseconds) of the end of the certificate validity window (X.509 NotAfter), or `null` if unknown. */
+  expiresAt: number | null;
+}
+
 export interface EnterpriseSamlConnectionNestedJSON {
   id: string;
   name: string;
@@ -64,6 +79,7 @@ export interface EnterpriseSamlConnectionNestedJSON {
   idp_certificate: string;
   idp_certificate_issued_at: number;
   idp_certificate_expires_at: number;
+  idp_certificates?: EnterpriseSamlIdpCertificateJSON[];
   idp_metadata_url: string;
   idp_metadata: string;
   acs_url: string;
@@ -85,6 +101,8 @@ export interface EnterpriseSamlConnectionNestedResource {
   idpCertificateIssuedAt: number;
   /** Unix timestamp (milliseconds) of the end of the IdP certificate validity window (X.509 NotAfter). */
   idpCertificateExpiresAt: number;
+  /** Every IdP signing certificate the connection trusts. The first entry is the primary, also returned as `idpCertificate`. */
+  idpCertificates: EnterpriseSamlIdpCertificateResource[];
   idpMetadataUrl: string;
   idpMetadata: string;
   acsUrl: string;
@@ -142,7 +160,10 @@ export type MeEnterpriseConnectionProvider = OrganizationEnterpriseConnectionPro
 export type OrganizationEnterpriseConnectionSamlInput = {
   idpEntityId?: string | null;
   idpSsoUrl?: string | null;
+  /** @deprecated Use `idpCertificates` instead. */
   idpCertificate?: string | null;
+  /** The IdP signing certificates (PEM), one per entry. Replaces every certificate the connection already trusts. */
+  idpCertificates?: string[];
   idpMetadataUrl?: string | null;
   idpMetadata?: string | null;
   attributeMapping?: Record<string, unknown> | null;

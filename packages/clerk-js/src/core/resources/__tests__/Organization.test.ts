@@ -90,6 +90,10 @@ describe('Organization', () => {
             idp_certificate: 'MIICertificatePlaceholder',
             idp_certificate_issued_at: 1672531200000,
             idp_certificate_expires_at: 1704067200000,
+            idp_certificates: [
+              { certificate: 'MIICertificatePlaceholder', issued_at: 1672531200000, expires_at: 1704067200000 },
+              { certificate: 'MIINextCertificatePlaceholder', issued_at: null, expires_at: null },
+            ],
             idp_metadata_url: 'https://idp.acme.com/metadata',
             idp_metadata: '',
             acs_url: 'https://clerk.example.com/v1/saml/acs',
@@ -120,6 +124,13 @@ describe('Organization', () => {
       expect(connections).toHaveLength(1);
       expect(connections[0].name).toBe('Acme Corp SSO');
       expect(connections[0].allowOrganizationAccountLinking).toBe(true);
+      expect(connections[0].samlConnection?.idpCertificates).toEqual([
+        { certificate: 'MIICertificatePlaceholder', issuedAt: 1672531200000, expiresAt: 1704067200000 },
+        { certificate: 'MIINextCertificatePlaceholder', issuedAt: null, expiresAt: null },
+      ]);
+      expect(connections[0].__internal_toSnapshot().saml_connection?.idp_certificates).toEqual(
+        enterpriseConnectionsJSON[0].saml_connection?.idp_certificates,
+      );
     });
 
     it('creates an enterprise connection without forwarding organization_id in the body', async () => {
@@ -157,7 +168,7 @@ describe('Organization', () => {
         // Even though callers may still pass this for convenience, the SDK
         // must not include it in the body — the org URL is authoritative.
         organizationId: ORG_ID,
-        saml: { idpEntityId: 'https://idp.example.com' },
+        saml: { idpEntityId: 'https://idp.example.com', idpCertificates: ['cert_a', 'cert_b'] },
       });
 
       // @ts-ignore
@@ -169,6 +180,7 @@ describe('Organization', () => {
           name: 'New SSO',
           domains: ['acme.com'],
           saml_idp_entity_id: 'https://idp.example.com',
+          saml_idp_certificates: ['cert_a', 'cert_b'],
         },
       });
 
@@ -246,6 +258,7 @@ describe('Organization', () => {
         active: false,
         syncUserAttributes: true,
         organizationId: ORG_ID,
+        saml: { idpCertificates: ['cert_a', 'cert_b'] },
       });
 
       // @ts-ignore
@@ -256,6 +269,7 @@ describe('Organization', () => {
           name: 'Updated',
           active: false,
           sync_user_attributes: true,
+          saml_idp_certificates: ['cert_a', 'cert_b'],
         },
       });
 

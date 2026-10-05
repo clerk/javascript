@@ -37,7 +37,7 @@ const docModules: Record<string, Record<string, React.ComponentType>> = {
       () => import('../stories/user-profile-connected-accounts-section.mdx'),
     ),
     'user-profile-web3wallets-section': dynamic(() => import('../stories/user-profile-web3-wallets-section.mdx')),
-    'user-profile-delete-section': dynamic(() => import('../stories/user-profile-delete-section.mdx')),
+    'user-profile-danger-section': dynamic(() => import('../stories/user-profile-danger-section.mdx')),
   },
   'organization-profile': {
     'organization-profile-members-panel': dynamic(() => import('../stories/organization-profile-members-panel.mdx')),

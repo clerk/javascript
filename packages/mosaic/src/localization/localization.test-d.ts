@@ -10,7 +10,7 @@ import type { MosaicMessages } from './registry';
 describe('MosaicCatalog', () => {
   test('accepts nested overrides', () => {
     const value: MosaicCatalog = {
-      userButton: { trigger: { open: 'Menü für {name}' }, workspaces: { members: { few: '{count} Mitglieder' } } },
+      userButton: { trigger: { open: 'Menü für {name}' }, organizations: { members: { few: '{count} Mitglieder' } } },
     };
     void value;
   });
@@ -18,7 +18,7 @@ describe('MosaicCatalog', () => {
   test('accepts dot paths, mixed with nested', () => {
     const value: MosaicCatalog = {
       'userButton.popup.label': 'Konto',
-      'userButton.workspaces.members': { many: '{count} членов' },
+      'userButton.organizations.members': { many: '{count} членов' },
       userProfile: { label: 'Profil' },
     };
     void value;
@@ -53,7 +53,7 @@ describe('MosaicCatalog', () => {
     };
     const nested: MosaicCatalog = {
       // @ts-expect-error plural forms cannot become a string
-      userButton: { workspaces: { members: 'x' } },
+      userButton: { organizations: { members: 'x' } },
     };
     void [value, nested];
   });

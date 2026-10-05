@@ -6,6 +6,7 @@ import { Icon } from '../../../components/icon';
 import { Section } from '../../../components/section';
 import { Spinner } from '../../../components/spinner';
 import { fill, useMessages } from '../../../localization';
+import { truncationStyles } from '../../../styles/typography.styles';
 import { UserProfileProviderIcon } from '../user-profile-provider-icon';
 import { styles } from './user-profile-enterprise-accounts-section.styles';
 import type { UserProfileEnterpriseAccount } from './user-profile-enterprise-accounts-section.types';
@@ -27,10 +28,10 @@ export function UserProfileEnterpriseAccountRowView({
       <Section.Item>
         <UserProfileProviderIcon {...account.icon} />
         <Section.Content>
-          <Section.Label xstyle={styles.label}>
+          <Section.Label>
             <span
               title={account.name}
-              {...stylex.props(styles.text)}
+              {...stylex.props(truncationStyles.singleLine, styles.text)}
             >
               {account.name}
             </span>
@@ -39,7 +40,7 @@ export function UserProfileEnterpriseAccountRowView({
           {account.emailAddress ? (
             <Section.Description
               title={account.emailAddress}
-              xstyle={styles.text}
+              xstyle={truncationStyles.singleLine}
             >
               {account.emailAddress}
             </Section.Description>

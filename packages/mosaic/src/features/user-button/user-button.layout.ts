@@ -17,9 +17,9 @@ import type { UserButtonData, UserButtonHeaderLayout, UserButtonMode } from './u
  *  │ ⤴ Sign out                 │ │                          │ │ ⤴ Sign out                 │ ┘ footer
  *  └────────────────────────────┘ └──────────────────────────┘ └────────────────────────────┘
  *
- * The organizations are listed on the surface, since they are the workspaces the active account can
+ * The organizations are listed on the surface, since they are what the active account can
  * switch between. The other signed-in accounts are not: they are one row at the foot that opens a
- * flyout of them, so the surface stays about the workspace it is on.
+ * flyout of them, so the surface stays about the organization it is on.
  *
  * The header is about whatever leads, not the mode: an organization is managed and invited to, an
  * account is managed, and signed out of at the foot. A combined surface always leads with the account. With an
@@ -43,7 +43,7 @@ export type UserButtonAction =
 /**
  * What the trigger names and the header leads with. `member` is the account, badged with the
  * organization it is active in. `none` is an organization-led surface with no organization active
- * and no personal workspace to fall back to.
+ * and no personal account to fall back to.
  */
 export type UserButtonLead = 'organization' | 'member' | 'user' | 'none';
 
@@ -57,9 +57,9 @@ const headers = {
 /** One mode's whole surface below the header, top to bottom. */
 interface ModeLayout {
   /**
-   * The workspaces the active account switches between: its own, plus the organizations it is in.
+   * The organizations the active account switches between: its personal account, plus the organizations it is in.
    * `false` is a list the mode does not carry at all. `footer` trails the rows, inside the list,
-   * since what it offers is one more workspace.
+   * since what it offers is one more organization.
    */
   organizations: { footer: readonly UserButtonAction[] } | false;
   /**
@@ -79,7 +79,7 @@ const modes = {
     organizations: { footer: ['createOrganization'] },
     footer: { multiSession: [], singleSession: [] },
   },
-  // No workspaces at all, so the foot is the whole of it.
+  // No organizations at all, so the foot is the whole of it.
   user: {
     organizations: false,
     footer: { multiSession: ['switchAccount', 'signOut'], singleSession: ['addAccount', 'signOut'] },
@@ -92,7 +92,7 @@ const modes = {
  */
 export interface UserButtonLayout {
   lead: UserButtonLead;
-  /** The organization rows: their own workspace, the organizations, and what is on offer. */
+  /** The organization rows: the personal account, the organizations, and what is on offer. */
   showOrganizations: boolean;
   headerLayout: UserButtonHeaderLayout;
   /** What each slot carries, in the order it renders. */
