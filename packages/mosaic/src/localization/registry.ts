@@ -19,7 +19,7 @@ import { userProfileAddSmsMessages } from '../features/user-profile/user-profile
 import { userProfileAuthenticatorSetupMessages } from '../features/user-profile/user-profile-authenticator-setup.messages';
 import { userProfileBackupCodesMessages } from '../features/user-profile/user-profile-backup-codes.messages';
 import { userProfileConnectedAccountsMessages } from '../features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.messages';
-import { userProfileDeleteSectionMessages } from '../features/user-profile/user-profile-delete-section/user-profile-delete-section.messages';
+import { userProfileDangerSectionMessages } from '../features/user-profile/user-profile-danger-section/user-profile-danger-section.messages';
 import { userProfileEnterpriseAccountsMessages } from '../features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.messages';
 import { userProfileMfaMessages } from '../features/user-profile/user-profile-mfa-section.messages';
 import { userProfilePasswordSectionMessages } from '../features/user-profile/user-profile-password-section/user-profile-password-section.messages';
@@ -49,7 +49,7 @@ export const mosaicMessages = {
   userProfileAuthenticatorSetup: userProfileAuthenticatorSetupMessages,
   userProfileBackupCodes: userProfileBackupCodesMessages,
   userProfileConnectedAccounts: userProfileConnectedAccountsMessages,
-  userProfileDeleteSection: userProfileDeleteSectionMessages,
+  userProfileDangerSection: userProfileDangerSectionMessages,
   userProfileEnterpriseAccountsSection: userProfileEnterpriseAccountsMessages,
   userProfileMfa: userProfileMfaMessages,
   userProfilePasswordSection: userProfilePasswordSectionMessages,

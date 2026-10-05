@@ -5,7 +5,7 @@ import type {
   UserProfileSubscription,
 } from '@clerk/mosaic/features/user-profile/user-profile-billing-panel.view';
 import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
-import { UserProfileDeleteSectionView } from '@clerk/mosaic/features/user-profile/user-profile-delete-section/user-profile-delete-section.view';
+import { UserProfileDangerSectionView } from '@clerk/mosaic/features/user-profile/user-profile-danger-section/user-profile-danger-section.view';
 import { UserProfilePasswordSectionView } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.view';
 import type {
   UserProfileEmail,
@@ -30,9 +30,9 @@ import { useUserProfileMfaExample } from './user-profile-mfa-example';
 import { usePasskeysFixture } from './user-profile-passkeys';
 import { useWeb3WalletsFixture } from './user-profile-web3-wallets';
 
-export function UserProfileDeleteAccountPreview() {
+export function UserProfileDangerPreview() {
   const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
-  return <UserProfileDeleteSectionView {...controller} />;
+  return <UserProfileDangerSectionView {...controller} />;
 }
 
 export interface UserProfileFixtureOptions {
@@ -145,7 +145,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       onCreateEmail: onAddEmail ? undefined : emailFlow.onCreateEmail,
       getEmailVerifier: onAddEmail ? undefined : emailFlow.getEmailVerifier,
       ...phoneFlow,
-      deleteAccountSlot: <UserProfileDeleteAccountPreview />,
+      dangerSlot: <UserProfileDangerPreview />,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
       onProfilePictureChange: showFile,
@@ -167,7 +167,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       ...mfa.security,
       devices: activeDevices.devices,
       onAddPasskey: passkeys.onAdd,
-      deleteAccountSlot: <UserProfileDeleteAccountPreview />,
+      dangerSlot: <UserProfileDangerPreview />,
       onRemovePasskey: passkeys.onRemove,
       onSignOutAllOtherDevices: activeDevices.onSignOutAllOtherDevices,
       onSignOutDevice: activeDevices.onSignOutDevice,

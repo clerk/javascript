@@ -6,14 +6,14 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../mosaic-provider';
-import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
+import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
 import type { UserProfileProfilePanelViewProps } from '../user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '../user-profile-profile-panel.view';
 import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
 
 function DeleteAccount() {
   const controller = useDestructiveController({ onDelete: () => Promise.resolve() });
-  return <UserProfileDeleteSectionView {...controller} />;
+  return <UserProfileDangerSectionView {...controller} />;
 }
 
 const props: UserProfileProfilePanelViewProps = {
@@ -280,7 +280,7 @@ describe('UserProfileProfilePanelView', () => {
 
   it('renders the danger zone when provided', () => {
     renderView({
-      deleteAccountSlot: <DeleteAccount />,
+      dangerSlot: <DeleteAccount />,
     });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
@@ -298,7 +298,7 @@ describe('UserProfileProfilePanelView', () => {
         />
       ),
       enterpriseAccountsSlot: <div data-testid='enterprise'>Enterprise accounts</div>,
-      deleteAccountSlot: <DeleteAccount />,
+      dangerSlot: <DeleteAccount />,
     });
 
     const wallets = screen.getByRole('group', { name: 'Web3 wallets' });
