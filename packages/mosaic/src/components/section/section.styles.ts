@@ -160,6 +160,7 @@ export const styles = stylex.create({
   actions: {
     alignItems: 'center',
     display: 'grid',
+    flexShrink: 0,
     gridAutoColumns: 'minmax(0, max-content)',
     gridAutoFlow: 'column',
     justifyContent: 'end',
@@ -171,6 +172,7 @@ export const styles = stylex.create({
     color: colorVars['--cl-color-foreground-secondary'],
     columnGap: space['1'],
     display: 'flex',
+    flexShrink: 0,
     fontSize: typeScaleVars['--cl-text-xs-size'],
     fontWeight: fontWeightVars['--cl-font-normal'],
     lineHeight: typeScaleVars['--cl-text-xs-leading'],
@@ -190,7 +192,7 @@ export const styles = stylex.create({
   },
   actionsWrap: {
     justifyContent: { [compact]: 'start', default: 'end' },
-    maxWidth: { [compact]: '100%', default: null },
+    maxWidth: { [compact]: '100%', default: '50%' },
     width: { [compact]: '100%', default: null },
   },
   // Sits under the row's item rather than inside its content, so a message never shifts the
