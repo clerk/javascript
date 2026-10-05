@@ -11,7 +11,7 @@ export interface UserProfileAddPhoneControllerOptions {
   onVerify: (phoneNumber: string, code: string) => Promise<void>;
 }
 
-interface Context extends UserProfileAddPhoneControllerOptions {
+interface Context {
   phoneNumber: string;
   code: string;
   error: unknown;
@@ -27,9 +27,10 @@ type Event =
   | { type: 'TYPE_CODE'; value: string }
   | { type: 'SUBMIT'; code?: string };
 
-const { createMachine, assign, fromPromise } = setup<Context, Event>();
+const base = setup<Context, Event>();
+const { assign } = base;
 
-function missingDependency(): Promise<never> {
+function missingDependency(): Promise<void> {
   return Promise.reject(new Error('Add phone callbacks are missing'));
 }
 
@@ -40,14 +41,26 @@ function errorMessage(cause: unknown, fallback: string): string | undefined {
   return cause instanceof Error ? cause.message : fallback;
 }
 
+function openDialog(initialPhoneNumber: string | undefined) {
+  return assign(() => ({
+    phoneNumber: initialPhoneNumber ?? '',
+    code: '',
+    error: undefined,
+    resendSeconds: 0,
+  }));
+}
+
+const { createMachine } = base.extend({
+  actions: { open: openDialog(undefined) },
+  actors: { send: missingDependency, verify: missingDependency },
+});
+
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 
 const machine = createMachine({
   id: 'addPhone',
   initial: 'idle',
   context: {
-    onSend: missingDependency,
-    onVerify: missingDependency,
     phoneNumber: '',
     code: '',
     error: undefined,
@@ -58,12 +71,7 @@ const machine = createMachine({
       on: {
         OPEN: {
           target: 'phone',
-          actions: assign(context => ({
-            phoneNumber: context.initialPhoneNumber ?? '',
-            code: '',
-            error: undefined,
-            resendSeconds: 0,
-          })),
+          actions: 'open',
         },
       },
     },
@@ -75,13 +83,14 @@ const machine = createMachine({
       },
     },
     sending: {
-      invoke: fromPromise(context => context.onSend(context.phoneNumber), {
+      invoke: {
+        src: 'send',
         onDone: { target: 'verify', actions: assign(() => ({ code: '', resendSeconds: 12 })) },
         onError: {
           target: 'phone',
           actions: assign((_, event) => ({ error: event.error })),
         },
-      }),
+      },
     },
     verify: {
       on: {
@@ -100,23 +109,25 @@ const machine = createMachine({
       },
     },
     resending: {
-      invoke: fromPromise(context => context.onSend(context.phoneNumber), {
+      invoke: {
+        src: 'send',
         onDone: { target: 'verify', actions: assign(() => ({ code: '', resendSeconds: 12 })) },
         onError: {
           target: 'verify',
           actions: assign((_, event) => ({ error: event.error })),
         },
-      }),
+      },
     },
     verifying: {
       on: { TICK: tick },
-      invoke: fromPromise(context => context.onVerify(context.phoneNumber, context.code), {
+      invoke: {
+        src: 'verify',
         onDone: 'idle',
         onError: {
           target: 'verify',
           actions: assign((_, event) => ({ error: event.error })),
         },
-      }),
+      },
     },
   },
 });
@@ -125,7 +136,15 @@ export function useUserProfileAddPhoneController(
   options: UserProfileAddPhoneControllerOptions,
 ): UserProfileAddPhoneDialogProps {
   const m = useMessages('userProfileAddPhone');
-  const [snapshot, send] = useMachine(machine, { context: options });
+  const [snapshot, send] = useMachine(
+    machine.provide({
+      actions: { open: openDialog(options.initialPhoneNumber) },
+      actors: {
+        send: context => options.onSend(context.phoneNumber),
+        verify: context => options.onVerify(context.phoneNumber, context.code),
+      },
+    }),
+  );
   const { resendSeconds } = snapshot.context;
   const open = snapshot.value !== 'idle';
   useEffect(() => {
