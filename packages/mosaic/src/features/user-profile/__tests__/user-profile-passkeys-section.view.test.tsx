@@ -109,7 +109,7 @@ describe('passkeys section', () => {
     await user.clear(input);
     await user.type(input, 'Work laptop');
     await user.click(screen.getByRole('button', { name: 'Save' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Try again');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Try again'));
     expect(input).toHaveValue('Work laptop');
     await user.type(input, ' updated');
     expect(screen.getByRole('alert')).toHaveTextContent('Try again');
@@ -197,7 +197,7 @@ describe('passkeys section', () => {
     await user.click(screen.getByRole('button', { name: 'Manage iPhone' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Removal failed');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Removal failed'));
     await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
     expect(onRemove.mock.calls).toEqual([['phone'], ['phone']]);
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());

@@ -106,7 +106,7 @@ describe('active device sign out', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to sign out');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Unable to sign out'));
 
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
@@ -163,7 +163,7 @@ describe('active device sign out', () => {
     await user.click(screen.getByRole('menuitem', { name: 'View details' }));
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to sign out');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Unable to sign out'));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
 
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));

@@ -206,7 +206,9 @@ describe('enterprise accounts', () => {
     const user = userEvent.setup();
 
     await user.click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('The connection could not start. Please try again.');
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent('The connection could not start. Please try again.'),
+    );
     expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toBeEnabled();
     serveFapi(signedIn());
     await user.click(screen.getByRole('button', { name: 'Connect Acme Okta' }));
@@ -224,7 +226,7 @@ describe('enterprise accounts', () => {
     await user.click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
     request.fail('enterprise_error', 'Acme is unavailable.');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Acme is unavailable.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Acme is unavailable.'));
     expect(navigate).not.toHaveBeenCalled();
     serveFapi(signedIn());
     await user.click(screen.getByRole('button', { name: 'Connect Acme Okta' }));
@@ -240,7 +242,7 @@ describe('enterprise accounts', () => {
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
     request.fail('session_reverification_required', 'Verify your session.');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Verify your session.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Verify your session.'));
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toBeEnabled();
   });
@@ -251,7 +253,9 @@ describe('enterprise accounts', () => {
     await renderWithClerk(<UserProfileEnterpriseAccountsSection />);
 
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('The connection could not start. Please try again.');
+    await waitFor(() =>
+      expect(screen.getByRole('alert')).toHaveTextContent('The connection could not start. Please try again.'),
+    );
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.getByRole('button', { name: 'Connect Acme Okta' })).toBeEnabled();
   });
@@ -283,7 +287,7 @@ describe('enterprise accounts', () => {
       </MosaicProvider>,
     );
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent(message);
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
   });
 
   it('suppresses immediate duplicate and competing clicks, then clears feedback on retry', async () => {
@@ -300,7 +304,7 @@ describe('enterprise accounts', () => {
     expect(connect).toHaveAttribute('aria-busy', 'true');
     expect(other).toBeDisabled();
     request.fail('enterprise_error', 'Retry this connection.');
-    expect(await screen.findByRole('alert')).toHaveTextContent('Retry this connection.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Retry this connection.'));
     const retry = holdRequests('post', '/v1/me/external_accounts');
     await userEvent.setup().click(connect);
     await waitFor(() => expect(retry.requests).toHaveLength(1));
@@ -342,7 +346,7 @@ describe('enterprise accounts', () => {
       </MosaicProvider>,
     );
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('La connexion ne peut pas démarrer.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('La connexion ne peut pas démarrer.'));
   });
 
   it('preserves the section generic error override for empty API errors', async () => {
@@ -364,7 +368,7 @@ describe('enterprise accounts', () => {
       </MosaicProvider>,
     );
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect Acme Okta' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('La connexion a échoué. Réessayez.');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('La connexion a échoué. Réessayez.'));
   });
 
   it.todo('challenges for session reverification before linking, resumes after success, and allows cancellation');
