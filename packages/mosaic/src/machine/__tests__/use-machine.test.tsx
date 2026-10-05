@@ -284,49 +284,6 @@ describe('useMachine — onDone', () => {
   });
 });
 
-describe('useMachine — live context keeps injected functions current', () => {
-  it('invokes the latest fn from options.context even when the prop changes between renders', async () => {
-    const gate = deferred<void>();
-    const staleFn = vi.fn(() => gate.promise);
-    const freshFn = vi.fn(() => gate.promise);
-
-    type Ctx = { fn: () => Promise<void> };
-    type Ev = { type: 'GO' };
-    const machine = createMachine<Ctx, Ev>({
-      initial: 'idle',
-      context: { fn: async () => {} },
-      states: {
-        idle: { on: { GO: 'running' } },
-        running: { invoke: { src: (ctx: Ctx) => ctx.fn(), onDone: 'done', onError: 'done' } },
-        done: { type: 'final' },
-      },
-    });
-
-    function Runner({ run }: { run: () => Promise<void> }) {
-      // No refs — options.context is synced into the actor on every render.
-      const [snapshot, send] = useMachine(machine, { context: { fn: run } });
-      return (
-        <div>
-          <output data-testid='state'>{snapshot.value}</output>
-          <button onClick={() => send({ type: 'GO' })}>Go</button>
-        </div>
-      );
-    }
-
-    const { rerender } = render(<Runner run={staleFn} />);
-    rerender(<Runner run={freshFn} />);
-
-    fireEvent.click(screen.getByText('Go'));
-    expect(screen.getByTestId('state')).toHaveTextContent('running');
-
-    await act(async () => gate.resolve());
-    expect(screen.getByTestId('state')).toHaveTextContent('done');
-
-    expect(freshFn).toHaveBeenCalledTimes(1);
-    expect(staleFn).not.toHaveBeenCalled();
-  });
-});
-
 describe('useMachine — provided implementations stay current', () => {
   type Ctx = Record<string, never>;
   type Ev = { type: 'GO' };

@@ -115,9 +115,8 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     return resolved;
   }
 
-  // Tracks the latest setContext patch so it survives a stop/start cycle.
-  let liveContextPatch: Partial<TContext> = options.context ?? {};
-  let context: TContext = { ...machine.context, ...liveContextPatch, ...teleport?.context };
+  const seed: Partial<TContext> = options.context ?? {};
+  let context: TContext = { ...machine.context, ...seed, ...teleport?.context };
   // `initial` may be derived from context (e.g. furthest-reachable step).
   const resolveInitial = () => (typeof machine.initial === 'function' ? machine.initial(context) : machine.initial);
   let value = teleport?.value ?? resolveInitial();
@@ -342,7 +341,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       status = 'active';
       // Reset state and context so a restart (e.g. after StrictMode stop/start)
       // begins from idle rather than re-entering and re-invoking a mid-flight state.
-      context = { ...machine.context, ...liveContextPatch };
+      context = { ...machine.context, ...seed };
       value = resolveInitial();
       enterState(INIT_EVENT);
       commit();
@@ -405,11 +404,6 @@ export function createActor<TContext extends object, TEvent extends EventObject>
         return false;
       }
       return transition.target === undefined || canEnter(transition.target, event);
-    },
-
-    setContext(patch: Partial<TContext>) {
-      liveContextPatch = { ...liveContextPatch, ...patch };
-      context = { ...context, ...patch };
     },
 
     recheck() {

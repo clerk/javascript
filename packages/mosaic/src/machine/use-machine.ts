@@ -49,13 +49,7 @@ export function useMachine<TContext extends object, TEvent extends EventObject>(
     return () => actor.stop();
   }, [actor]);
 
-  // Keep injected context (e.g. a function from props) current on every render.
-  // useLayoutEffect with no deps runs synchronously after every render, before
-  // paint — ensuring setContext fires before any user event triggers an invoke.
   useLayoutEffect(() => {
-    if (options?.context) {
-      actor.setContext(options.context);
-    }
     actor.logic.implementations = machine.implementations;
   });
 

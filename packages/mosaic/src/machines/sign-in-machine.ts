@@ -31,10 +31,10 @@ const { createMachine, assign, fromPromise } = setup<SignInContext, SignInEvent>
  * one object with no hidden boolean flags.
  *
  * Component usage:
- *   const [snapshot, send] = useMachine(machine, {
- *     context: { createAttemptFn: id => signIn.create({ identifier: id }), resetPasswordFn: signIn.resetPassword },
- *     onDone: () => setActive({ session: signIn.createdSessionId }).then(() => router.navigate(afterSignInUrl)),
- *   });
+ *   const [snapshot, send] = useMachine(
+ *     createSignInMachine({ createAttemptFn: id => signIn.create({ identifier: id }), resetPasswordFn: signIn.resetPassword }),
+ *     { onDone: () => setActive({ session: signIn.createdSessionId }).then(() => router.navigate(afterSignInUrl)) },
+ *   );
  *
  * Child factor components signal completion by calling:
  *   send({ type: 'FACTOR_COMPLETE', nextStatus: signIn.status })
