@@ -274,7 +274,7 @@ describe('UserProfileProfilePanelView', () => {
 
   it('renders the danger zone when provided', () => {
     renderView({
-      deleteAccountSlot: <DeleteAccount />,
+      dangerSlot: <DeleteAccount />,
     });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
@@ -292,7 +292,7 @@ describe('UserProfileProfilePanelView', () => {
         />
       ),
       enterpriseAccountsSlot: <div data-testid='enterprise'>Enterprise accounts</div>,
-      deleteAccountSlot: <DeleteAccount />,
+      dangerSlot: <DeleteAccount />,
     });
 
     const wallets = screen.getByRole('group', { name: 'Web3 wallets' });

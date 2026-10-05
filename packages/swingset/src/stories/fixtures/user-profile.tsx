@@ -140,7 +140,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       ...createUserProfileAddPhoneFixture({
         onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
       }),
-      deleteAccountSlot: <UserProfileDangerPreview />,
+      dangerSlot: <UserProfileDangerPreview />,
       onManageEmail: () => undefined,
       onManagePhone: () => undefined,
       onProfilePictureChange: showFile,
@@ -162,7 +162,7 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       ...mfa.security,
       devices: activeDevices.devices,
       onAddPasskey: passkeys.onAdd,
-      deleteAccountSlot: <UserProfileDangerPreview />,
+      dangerSlot: <UserProfileDangerPreview />,
       onRemovePasskey: passkeys.onRemove,
       onSignOutAllOtherDevices: activeDevices.onSignOutAllOtherDevices,
       onSignOutDevice: activeDevices.onSignOutDevice,

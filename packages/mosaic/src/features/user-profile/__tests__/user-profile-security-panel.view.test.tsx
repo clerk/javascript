@@ -64,7 +64,7 @@ function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) 
 
 describe('UserProfileSecurityPanelView', () => {
   it('composes authentication, active devices, and the danger zone', () => {
-    renderView({ deleteAccountSlot: <DeleteAccount /> });
+    renderView({ dangerSlot: <DeleteAccount /> });
 
     expect(screen.getByRole('heading', { level: 2, name: 'Security' })).toBeInTheDocument();
     const authentication = screen.getByRole('region', { name: 'Authentication' });
@@ -119,7 +119,7 @@ describe('UserProfileSecurityPanelView', () => {
       onRemovePasskey,
       onSignOutDevice,
       onSignOutAllOtherDevices,
-      deleteAccountSlot: <DeleteAccount onDelete={onDeleteAccount} />,
+      dangerSlot: <DeleteAccount onDelete={onDeleteAccount} />,
     });
 
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));

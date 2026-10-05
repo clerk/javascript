@@ -75,7 +75,7 @@ export function Default(_args: Record<string, unknown>) {
       {...createUserProfileAddPhoneFixture({
         onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
       })}
-      deleteAccountSlot={<UserProfileDangerPreview />}
+      dangerSlot={<UserProfileDangerPreview />}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
       onProfilePictureChange={showFile}
