@@ -331,7 +331,8 @@ jobs:
           curl -fsS -G "$BAPI_URL/v1/users" --data-urlencode "limit=100" --data-urlencode "query=$CLERK_TEST_USERNAME_PREFIX" -H "Authorization: Bearer $CLERK_SECRET_KEY" |
             jq -r --arg p "$CLERK_TEST_USERNAME_PREFIX" '.[] | select((.username // "") | startswith($p)) | .id' |
             while read -r user_id; do
-              curl -fsS -o /dev/null -X DELETE "$BAPI_URL/v1/users/$user_id" -H "Authorization: Bearer $CLERK_SECRET_KEY" || true
+              curl -fsS --retry 3 --retry-delay 1 -o /dev/null -X DELETE "$BAPI_URL/v1/users/$user_id" -H "Authorization: Bearer $CLERK_SECRET_KEY" ||
+                echo "::warning::Could not delete leftover test user $user_id"
             done
 
       - name: Upload e2e artifacts
