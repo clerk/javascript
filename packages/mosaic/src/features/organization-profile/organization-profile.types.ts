@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 
-import type { OrganizationProfileApiKeysPanelViewProps } from './organization-profile-api-keys-panel.types';
 import type { OrganizationProfileGeneralPanelViewProps } from './organization-profile-general-panel.view';
 import type { OrganizationProfileMembersPanelViewProps } from './organization-profile-members-panel.view';
 
@@ -11,7 +10,7 @@ export interface OrganizationProfilePages {
   members?: OrganizationProfileMembersPanelViewProps;
   security?: Record<string, never>;
   billing?: Record<string, never>;
-  apiKeys?: OrganizationProfileApiKeysPanelViewProps;
+  apiKeys?: ReactNode;
 }
 
 export interface CustomOrganizationProfilePage {
