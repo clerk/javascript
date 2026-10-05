@@ -376,11 +376,17 @@ function SignInStartInternal(): JSX.Element {
           setShowInstantPasswordField(true);
           throw error;
         }
-        return signIn.create({
-          identifier: buildRequest(fields).identifier,
-          password: passwordField,
-          strategy: 'password',
-        });
+        return signIn
+          .create({
+            identifier: buildRequest(fields).identifier,
+            password: passwordField,
+            strategy: 'password',
+          })
+          .catch(fallbackError => {
+            setShowInstantPasswordField(true);
+            handleError(fallbackError, [identifierField, instantPasswordField], card.setError);
+            throw new Error('password_fallback_failed');
+          });
       },
     );
   };

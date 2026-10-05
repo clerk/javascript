@@ -235,11 +235,11 @@ export type CreateUserParams = {
   externalId?: string;
   /** The email addresses to assign to the user. Each address must be unique across your instance. The first email address becomes the user's primary email address. Addresses are created as verified by default; use `emailAddressIdentificationStatus` to create reserved addresses. */
   emailAddress?: string[];
-  /** Sets the creation status of each email address. Entries correspond by index to `emailAddress`, and the array must contain exactly one entry per email address. If omitted, every email address is created as `'verified'`. Use `'reserved'` to create an unverified address that can still be used for sign-in and cannot be claimed by another user. */
+  /** Sets the creation status of each email address. Entries correspond by index to `emailAddress`, and the array must contain exactly one entry per email address. If omitted, every email address is created as `'verified'`. Use `'reserved'` to create an unverified address that can identify this user for password sign-in when no verified owner exists. It cannot authenticate this user through email verification; a verified owner can claim it on a separate account. */
   emailAddressIdentificationStatus?: ('verified' | 'reserved')[];
   /** The phone numbers to assign to the user. Each number must be unique across your instance. The first phone number becomes the user's primary phone number. Numbers are created as verified by default; use `phoneNumberIdentificationStatus` to create reserved numbers. */
   phoneNumber?: string[];
-  /** Sets the creation status of each phone number. Entries correspond by index to `phoneNumber`, and the array must contain exactly one entry per phone number. If omitted, every phone number is created as `'verified'`. Use `'reserved'` to create an unverified number that can still be used for sign-in and cannot be claimed by another user. */
+  /** Sets the creation status of each phone number. Entries correspond by index to `phoneNumber`, and the array must contain exactly one entry per phone number. If omitted, every phone number is created as `'verified'`. Use `'reserved'` to create an unverified number that can identify this user for password sign-in when no verified owner exists. It cannot authenticate this user through phone verification; a verified owner can claim it on a separate account. */
   phoneNumberIdentificationStatus?: ('verified' | 'reserved')[];
   /** The username to assign to the user. Must be unique across your instance. */
   username?: string;
@@ -467,7 +467,7 @@ export class UserAPI extends AbstractAPI {
    *
    * Your settings in the [Clerk Dashboard](https://dashboard.clerk.com) determine how you should setup your user model. Anything **Required** will need to be provided when creating a user. Trying to add a field that isn't enabled will result in an error.
    *
-   * By default, email addresses and phone numbers created using this method are verified automatically. Use `emailAddressIdentificationStatus` and `phoneNumberIdentificationStatus` to create any of them as reserved. Reserved identifiers are unverified, but they can still be used for sign-in and cannot be claimed by another user.
+   * By default, email addresses and phone numbers created using this method are verified automatically. Use `emailAddressIdentificationStatus` and `phoneNumberIdentificationStatus` to create any of them as reserved. Reserved identifiers are unverified. They can identify this user for password sign-in, but email or phone verification cannot authenticate this user. A verified owner can claim the contact on a separate account.
    *
    * > [!CAUTION]
    * >

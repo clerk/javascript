@@ -623,31 +623,53 @@ describe('SignInStart', () => {
       expect(fixtures.signIn.attemptFirstFactor).not.toHaveBeenCalled();
     });
 
-    it('does not retry a rejected password fallback again', async () => {
-      const { wrapper, fixtures } = await createFixtures(f => {
-        f.withEmailAddress();
-        f.withPassword({ required: true });
-        f.withEnterpriseSso();
-      });
-      fixtures.signIn.create.mockRejectedValue(
-        new ClerkAPIResponseError('Locked', {
-          data: [{ code: 'user_locked', message: 'Locked', long_message: 'Locked' }],
-          status: 403,
-        }),
-      );
+    it.each(['user_locked', 'form_password_incorrect', 'form_password_pwned', 'strategy_for_user_invalid'])(
+      'shows %s from a rejected password fallback without an identifier-only retry',
+      async code => {
+        const { wrapper, fixtures } = await createFixtures(f => {
+          f.withEmailAddress();
+          f.withPassword({ required: true });
+          f.withEnterpriseSso();
+        });
+        fixtures.signIn.create.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Locked', {
+            data: [{ code: 'user_locked', message: 'Locked', long_message: 'Locked' }],
+            status: 403,
+          }),
+        );
+        fixtures.signIn.create.mockRejectedValueOnce(
+          new ClerkAPIResponseError('Password rejected', {
+            data: [
+              {
+                code,
+                message: 'Password rejected',
+                long_message: 'Password rejected',
+                meta: { param_name: 'password' },
+              },
+            ],
+            status: 422,
+          }),
+        );
 
-      const { userEvent, container } = render(<SignInStart />, { wrapper });
-      await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
-      fireEvent.change(container.querySelector('#password-field') as Element, {
-        target: { value: 'wrong-password' },
-      });
-      fireEvent.submit(container.querySelector('form') as Element);
+        const { userEvent, container } = render(<SignInStart />, { wrapper });
+        await userEvent.type(screen.getByLabelText(/email address/i), 'hello@clerk.com');
+        fireEvent.change(container.querySelector('#password-field') as Element, {
+          target: { value: 'wrong-password' },
+        });
+        fireEvent.submit(container.querySelector('form') as Element);
 
-      await screen.findByText('Locked');
-      expect(fixtures.signIn.create).toHaveBeenCalledTimes(2);
-      expect(fixtures.signIn.attemptFirstFactor).not.toHaveBeenCalled();
-      expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
-    });
+        await waitFor(() => expect(fixtures.signIn.create).toHaveBeenCalledTimes(2));
+        await waitFor(() => {
+          expect(container.querySelector('.cl-formFieldErrorText__password')).toHaveTextContent(
+            code === 'form_password_pwned' ? /breach/ : 'Password rejected',
+          );
+        });
+        expect(container.querySelector('#password-field')).toBeVisible();
+        expect(fixtures.signIn.create).toHaveBeenCalledTimes(2);
+        expect(fixtures.signIn.attemptFirstFactor).not.toHaveBeenCalled();
+        expect(fixtures.clerk.setActive).not.toHaveBeenCalled();
+      },
+    );
 
     it.each([
       { enterpriseSSO: true, password: '', code: 'user_locked' },
