@@ -2,6 +2,7 @@
 
 import { type PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from 'react';
 
+import { canScrollToward } from '../utils';
 import {
   CLOSE_THRESHOLD,
   MIN_SAMPLE_MS,
@@ -44,11 +45,6 @@ export interface UseDrawerDragReturn {
   onPointerUp: (e: ReactPointerEvent<HTMLElement>) => void;
   onPointerCancel: (e: ReactPointerEvent<HTMLElement>) => void;
   isDragging: boolean;
-}
-
-function scrolls(el: HTMLElement): boolean {
-  const { overflowY } = getComputedStyle(el);
-  return overflowY === 'auto' || overflowY === 'scroll';
 }
 
 /**
@@ -181,14 +177,11 @@ export function useDrawerDrag(opts: UseDrawerDragOptions): UseDrawerDragReturn {
     for (let el: HTMLElement | null = target; el; el = el.parentElement) {
       // Only a box that can scroll is inner content: a clipped or overflowing one has the same
       // geometry and none of the behaviour, and would swallow every upward drag at rest.
-      if (el.scrollHeight > el.clientHeight && scrolls(el)) {
-        const room = down ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight - 1;
-        if (room) {
-          if (down) {
-            lastScrollAt.current = clock();
-          }
-          return false;
+      if (canScrollToward(el, 0, down ? 1 : -1)) {
+        if (down) {
+          lastScrollAt.current = clock();
         }
+        return false;
       }
       if (el === sheet) {
         break;

@@ -7,35 +7,19 @@
  * would make the browser handle it, but iOS Safari does not implement it and the viewport meta
  * belongs to the host app regardless. So the inset is measured here instead.
  *
- * The value is consumed as extra bottom padding on `Dialog.Viewport`, which is why one number
- * serves all three sizes without any per-size branching:
+ * Two places consume it:
  *
- * - `prompt` is `align-self: end`, so it rises to sit exactly on top of the keyboard.
- * - `card` is centered, so it re-centers in the space that is left — it moves up, and its height is
- *   still driven by its content, so nothing is squashed.
- * - `profile` is `align-self: stretch`, so it shrinks — which is right for the one surface that
- *   already composes its own scroll region.
- *
- * And `place-items: safe center` on the viewport means a card taller than the remaining space
- * aligns to its top rather than having its head cut off.
+ * - The track pads its bottom edge by it, so a centered `card` re-centers in the space that is left
+ *   and a `profile`, which stretches, shrinks into its own scroll region.
+ * - A sheet stays flush to the bottom edge and pads its popup by it instead, so its surface runs on
+ *   under Safari's floating address bar, which `visualViewport` counts as part of the keyboard.
  */
 
 import type React from 'react';
 
-const PROPERTY = '--_cl-keyboard-inset';
+import { opensKeyboard } from '../../primitives/utils';
 
-const NON_TEXT_INPUT_TYPES = new Set([
-  'button',
-  'checkbox',
-  'color',
-  'file',
-  'hidden',
-  'image',
-  'radio',
-  'range',
-  'reset',
-  'submit',
-]);
+const PROPERTY = '--_cl-keyboard-inset';
 
 let listeners = 0;
 let detach: (() => void) | null = null;
@@ -96,14 +80,6 @@ export function acquireKeyboardInset(): () => void {
   };
 }
 
-function opensKeyboard(element: EventTarget | null): element is HTMLElement {
-  return (
-    (element instanceof HTMLInputElement && !NON_TEXT_INPUT_TYPES.has(element.type)) ||
-    element instanceof HTMLTextAreaElement ||
-    (element instanceof HTMLElement && element.isContentEditable)
-  );
-}
-
 // iOS's reveal pan stops at the end of the locked page, leaving the canvas under the keyboard; the inset lifts the dialog instead.
 export function focusWithoutScroll(event: React.TouchEvent): void {
   const target = event.target;
@@ -112,52 +88,4 @@ export function focusWithoutScroll(event: React.TouchEvent): void {
   }
   event.preventDefault();
   target.focus({ preventScroll: true });
-}
-
-function canScroll(element: Element, deltaX: number, deltaY: number): boolean {
-  const style = getComputedStyle(element);
-  if (Math.abs(deltaX) > Math.abs(deltaY)) {
-    if (!/(auto|scroll)/.test(style.overflowX) || element.scrollWidth <= element.clientWidth) {
-      return false;
-    }
-    const scrollLeft = Math.abs(element.scrollLeft);
-    const atStart = scrollLeft <= 0;
-    const atEnd = scrollLeft + element.clientWidth >= element.scrollWidth - 1;
-    const towardStart = style.direction === 'rtl' ? deltaX < 0 : deltaX > 0;
-    return towardStart ? !atStart : !atEnd;
-  }
-  if (!/(auto|scroll)/.test(style.overflowY) || element.scrollHeight <= element.clientHeight) {
-    return false;
-  }
-  return deltaY > 0 ? element.scrollTop > 0 : element.scrollTop + element.clientHeight < element.scrollHeight - 1;
-}
-
-// With the keyboard up iOS pans the visual viewport over the page; only a drag something can scroll goes through.
-export function preventViewportPan(element: HTMLElement): () => void {
-  let startX = 0;
-  let startY = 0;
-  const onTouchStart = (event: TouchEvent) => {
-    startX = event.touches[0]?.clientX ?? 0;
-    startY = event.touches[0]?.clientY ?? 0;
-  };
-  const onTouchMove = (event: TouchEvent) => {
-    const touch = event.touches[0];
-    if (event.touches.length > 1 || !touch || !event.cancelable) {
-      return;
-    }
-    const deltaX = touch.clientX - startX;
-    const deltaY = touch.clientY - startY;
-    for (let node = event.target instanceof Element ? event.target : null; node; node = node.parentElement) {
-      if ((node instanceof HTMLInputElement && node.type === 'range') || canScroll(node, deltaX, deltaY)) {
-        return;
-      }
-    }
-    event.preventDefault();
-  };
-  element.addEventListener('touchstart', onTouchStart, { passive: true });
-  element.addEventListener('touchmove', onTouchMove, { passive: false });
-  return () => {
-    element.removeEventListener('touchstart', onTouchStart);
-    element.removeEventListener('touchmove', onTouchMove);
-  };
 }

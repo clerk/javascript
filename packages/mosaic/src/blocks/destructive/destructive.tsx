@@ -73,13 +73,12 @@ function DestructiveCard({
     }
   }, [open]);
 
+  const inputRef = useRef<HTMLInputElement>(null);
   const isConfirmed = typedValue === confirmationValue;
   // The action sits in the footer, outside the form, so `form={formId}` associates the two.
   // That is what makes Enter in the field submit. Both guards are re-checked here because
   // neither spelling stops a native submit: `focusableWhenDisabled` only marks the button
   // `aria-disabled`, and `isPending` only cancels the press.
-  const inputRef = useRef<HTMLInputElement>(null);
-
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (isConfirmed && !isDeleting) {

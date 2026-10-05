@@ -3,9 +3,8 @@
 import { FloatingFocusManager } from '@floating-ui/react';
 import React from 'react';
 
-import { isInput } from '../drawer/helpers';
 import { type FocusTarget, useFinalFocus, useInitialFocus } from '../hooks/use-focus-target';
-import { type ComponentProps, type DefaultProps, Freeze, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, Freeze, mergeProps, opensKeyboard, useRender } from '../utils';
 import { useDialogContext } from './dialog-context';
 
 /** Where a popup's focus goes on open (`initialFocus`) or close (`finalFocus`); see `useFocusTarget`. */
@@ -13,13 +12,17 @@ export type DialogFocusTarget = FocusTarget;
 
 /** Props for {@link DialogPopup}. */
 export interface DialogPopupProps extends ComponentProps<'div'> {
-  /** Where focus moves when the dialog opens. Default: the first tabbable element inside it. */
+  /**
+   * Where focus moves when the dialog opens. Default: the first tabbable element inside it. A ref to a
+   * text field is focused within the opening tap, so on iOS the keyboard opens with the dialog.
+   */
   initialFocus?: DialogFocusTarget;
   /** Where focus returns when the dialog closes. Default: the trigger, via `useReturnFocus`. */
   finalFocus?: DialogFocusTarget;
 }
 
-// iOS raises the keyboard only for focus taken inside the opening tap; the focus manager's lands a frame late.
+// iOS raises the keyboard only for focus taken inside the opening tap, and the focus manager's lands a
+// frame late. A child, so this layout effect runs before the focus manager's and it finds focus inside.
 function GestureFocus({ target }: { target: number | React.MutableRefObject<HTMLElement | null> }) {
   const openingTarget = React.useRef(target);
   React.useLayoutEffect(() => {
@@ -28,7 +31,7 @@ function GestureFocus({ target }: { target: number | React.MutableRefObject<HTML
       return;
     }
     const element = initial.current;
-    if (element && isInput(element) && element !== element.ownerDocument.activeElement) {
+    if (element && opensKeyboard(element) && element !== element.ownerDocument.activeElement) {
       element.focus({ preventScroll: true });
     }
   }, []);

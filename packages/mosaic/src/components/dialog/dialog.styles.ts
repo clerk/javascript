@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { colorVars, durationVars, easingVars, radiusVars, space } from '../../tokens.stylex';
+import { colorVars, durationVars, easingVars, radiusVars, shadowVars, space } from '../../tokens.stylex';
 
 // How far the contents of a surface beneath a stacked dialog are veiled toward its own background.
 // Declared up here rather than beside `STACK_SCALE` further down because `variants` reads it, and
@@ -14,6 +14,8 @@ const BASE_SCRIM = 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)';
 
 // Safari 26 samples the bar color once, at mount, and skips layers under ~0.15 opacity.
 const SCRIM_ENTER_OPACITY = 0.2;
+// The same sampling floor, for a sheet entering at the bottom edge.
+const SHEET_ENTER_OPACITY = 0.2;
 
 /**
  * The width bands, queried against the VIEWPORT ELEMENT rather than the window — it is a
@@ -80,10 +82,7 @@ export const styles = stylex.create({
   },
 
   // Safari keeps a sticky header's status bar tint under a full-screen overlay; a top-edge strip of the scrim is sampled instead.
-  backdropSheet: {
-    insetBlockStart: { [SHEET]: space['3'], default: null },
-  },
-  backdropSheetEdge: {
+  backdropEdge: {
     blockSize: space['3'],
     display: { [SHEET]: 'block', default: 'none' },
     insetBlockEnd: 'auto',
@@ -322,15 +321,6 @@ export const closeInsets = stylex.create({
  * instead: the padding travels with the content, and short dialogs still fill the overlay so the
  * track has something to center against.
  */
-/** Pins the box for a sheet, so `compactPlacements.sheet` can cap the popup at the overlay's own height. */
-export const viewportCompactPlacements = stylex.create({
-  center: {},
-  sheet: {
-    gridTemplateRows: { [SHEET]: 'minmax(0, 1fr)', default: null },
-    height: { [SHEET]: '100%', default: null },
-  },
-});
-
 export const viewportVariants = stylex.create({
   card: { minHeight: '100%' },
   profile: {
@@ -348,6 +338,15 @@ export const viewportVariants = stylex.create({
     // bottom-anchored sheet aligns to. They genuinely do diverge: on an emulated iPhone the
     // overlay measures 1251px while `100dvh` reports 844.
     height: '100%',
+  },
+});
+
+/** Pins the box for a sheet, so `compactPlacements.sheet` can cap the popup at the overlay's own height. */
+export const viewportCompactPlacements = stylex.create({
+  center: {},
+  sheet: {
+    gridTemplateRows: { [SHEET]: 'minmax(0, 1fr)', default: null },
+    height: { [SHEET]: '100%', default: null },
   },
 });
 
@@ -437,8 +436,9 @@ export const variants = stylex.create({
  *
  * Only that band differs. Above it a sheet is a centered dialog like any other — there is no screen
  * edge close enough for anchoring to mean anything — so `center` is genuinely empty and `sheet`
- * resolves back to the same geometry. Named `compact` rather than for a device because the band is
- * a width, and because `Profile` already calls the identical `48rem` query that.
+ * resolves back to the same geometry. The band is `SHEET`, a window under `40rem`: narrower than the
+ * `48rem` `PHONE` band the track and `Profile` step on, so between the two a sheet still renders as a
+ * centered card, with the phone band's tighter side inset.
  *
  * Applied for `card` alone (see `Dialog.Popup`): a profile has its own compact treatment and never
  * takes a placement.
@@ -454,10 +454,22 @@ export const compactPlacements = stylex.create({
     // `align-self` on the grid item, not `align-items` on the viewport, because the viewport is
     // shared: bottom-aligning there would drag a centered dialog down with it.
     alignSelf: { [SHEET]: 'end', default: null },
-    // Safari tints the bottom bar from the first sticky ancestor's background; the card's own sits under the popup's veil.
+    // With `position: sticky` below, Safari tints its bottom bar from this; the card's own sits under the popup's veil.
     backgroundColor: { [SHEET]: colorVars['--cl-color-background'], default: null },
-    position: { [SHEET]: 'sticky', default: 'relative' },
+    // No drop shadow on the screen edge, only the hairline ring, as on `Drawer`.
+    boxShadow: { [SHEET]: shadowVars['--cl-shadow-sm'], default: null },
     // Scrolls itself rather than the overlay, so the keyboard's padding never makes the page scroll.
+    // A block box, not the flex column: WebKit leaves a flex container's end padding out of its
+    // scroll range, which would strand the bottom of a tall sheet under the keyboard.
+    display: { [SHEET]: 'block', default: 'flex' },
+    // Tops the card rows' `space['4']` block padding up to their `space['5']` inline padding. The
+    // keyboard inset runs the surface on under Safari's floating address bar.
+    paddingBlockEnd: {
+      [SHEET]: `calc(${space['1']} + max(env(safe-area-inset-bottom, 0px), var(--_cl-keyboard-inset, 0px)))`,
+      default: null,
+    },
+    paddingBlockStart: { [SHEET]: space['1'], default: null },
+    position: { [SHEET]: 'sticky', default: 'relative' },
     maxHeight: { [SHEET]: '100%', default: null },
     overflowY: { [SHEET]: 'auto', default: null },
     width: { [SHEET]: '100%', default: 'fit-content' },
@@ -468,9 +480,6 @@ export const compactPlacements = stylex.create({
 export const trackCompactPlacements = stylex.create({
   center: {},
   sheet: {
-    overflow: { [SHEET]: 'clip', default: null },
-    // Flush to the sides and the bottom edge; the card pads for the keyboard, so its surface runs behind Safari's bar.
-    paddingInline: { [ABOVE_PHONE]: 'var(--_cl-dialog-inset)', [SHEET]: 0, default: space['4'] },
     // Clips the sheet while it is outside the box, and ONLY for the placement that translates. A
     // sheet enters from `translate: 0 100%` — a full height BELOW its resting place — and the
     // `FloatingOverlay` wrapping this is `overflow: auto`, so without clipping it treats that as
@@ -484,11 +493,22 @@ export const trackCompactPlacements = stylex.create({
     // measured as `scrollTop` 0 -> 136 -> 50 -> 8 -> 0. It read as the sheet flying too far up and
     // snapping back, the unwind stacking extra bounces on the real overshoot. `clip` never becomes
     // scrollable, so focus has nothing to scroll.
+    overflow: { [SHEET]: 'clip', default: null },
+    // Flush to the sides and the bottom edge; the popup pads for the keyboard, so its surface runs behind Safari's bar.
+    paddingInline: { [ABOVE_PHONE]: 'var(--_cl-dialog-inset)', [SHEET]: 0, default: space['4'] },
     gridTemplateRows: { [SHEET]: 'minmax(0, 1fr)', default: null },
     paddingBlockEnd: {
       [SHEET]: 0,
       default: 'calc(var(--_cl-dialog-inset) + var(--_cl-keyboard-inset, 0px))',
     },
+  },
+});
+
+/** The scrim stops short of `styles.backdropEdge`, so the two never double up. */
+export const backdropCompactPlacements = stylex.create({
+  center: {},
+  sheet: {
+    insetBlockStart: { [SHEET]: space['3'], default: null },
   },
 });
 
@@ -513,7 +533,14 @@ export const trackCompactPlacements = stylex.create({
  */
 export const backdropMotion = stylex.create({
   card: {
+    // Safari re-tints its bars when the scrim mounts and unmounts, with a ~100ms linear crossfade.
+    // The entrance matches it; on a phone the exit holds until unmount, when the bar moves too.
     opacity: {
+      [SHEET]: {
+        default: 1,
+        ':where([data-ending-style])': 1,
+        ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
+      },
       default: 1,
       ':where([data-ending-style])': 0,
       ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
@@ -538,6 +565,11 @@ export const backdropMotion = stylex.create({
   /** Identical to `card` — the popup it accompanies fades on the same clock, it just does not scale. */
   profile: {
     opacity: {
+      [SHEET]: {
+        default: 1,
+        ':where([data-ending-style])': 1,
+        ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
+      },
       default: 1,
       ':where([data-ending-style])': 0,
       ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
@@ -598,7 +630,8 @@ export const popupMotion = stylex.create({
    * with it. Each cell is therefore self-contained and reads straight against the design matrix.
    */
   cardSheet: {
-    // One fade at every width, including the sheet. An earlier version pinned the sheet at
+    // A fade at every width, including the sheet, which starts it at `SHEET_ENTER_OPACITY` rather
+    // than 0 so Safari can sample it. An earlier version pinned the sheet at
     // opacity 1 on the theory that a pure slide reads more like a native sheet — compared
     // side by side it did not; the fade gives the travel somewhere to resolve into rather than
     // washing it out, provided it runs the length of the slide rather than finishing early.
@@ -609,7 +642,7 @@ export const popupMotion = stylex.create({
       [SHEET]: {
         default: 1,
         ':where([data-ending-style])': 0,
-        ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
+        ':where([data-starting-style])': SHEET_ENTER_OPACITY,
       },
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,

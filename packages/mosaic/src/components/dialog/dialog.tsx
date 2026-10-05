@@ -17,6 +17,7 @@ import { Button } from '../button';
 import { Icon } from '../icon';
 import { ToastProvider } from '../toast/toast';
 import {
+  backdropCompactPlacements,
   backdropMotion,
   closeInsets,
   compactPlacements,
@@ -28,7 +29,9 @@ import {
   viewportCompactPlacements,
   viewportVariants,
 } from './dialog.styles';
-import { acquireKeyboardInset, focusWithoutScroll, preventViewportPan } from './keyboard-inset';
+import { acquireKeyboardInset, focusWithoutScroll } from './keyboard-inset';
+import { useScrimAfterglow } from './scrim-afterglow';
+import { preventViewportPan } from './viewport-pan';
 
 /**
  * Which surface the dialog holds, and so the geometry it is given: `card` is a `Card` at the
@@ -126,7 +129,10 @@ export interface DialogPopupProps extends MosaicComponentProps<'div'> {
    * `card` only. @default 'center'
    */
   compactPlacement?: DialogCompactPlacement;
-  /** Where focus moves when the dialog opens. Default: the first tabbable element inside it. */
+  /**
+   * Where focus moves when the dialog opens. Default: the first tabbable element inside it. A ref to a
+   * text field is focused within the opening tap, so on iOS the keyboard opens with the dialog.
+   */
   initialFocus?: DialogFocusTarget;
   /** Where focus returns when the dialog closes. Default: the trigger. */
   finalFocus?: DialogFocusTarget;
@@ -244,19 +250,22 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
 
 /**
  * The scrim behind the dialog. Owns no scroll lock or positioning — that is the viewport.
- * Rendered by `Dialog.Popup`, which is also what decides the two things it varies on.
+ * Rendered by `Dialog.Popup`, which is also what decides the things it varies on.
  */
 function Backdrop({
   variant,
+  compactPlacement,
   stacked,
-  part = 'scrim',
 }: {
   variant: DialogVariant;
+  compactPlacement: DialogCompactPlacement;
   stacked: boolean;
-  part?: 'scrim' | 'sheetScrim' | 'sheetEdge';
 }) {
-  return (
+  const scrimRef = React.useRef<HTMLDivElement>(null);
+  useScrimAfterglow(scrimRef, !stacked);
+  const scrim = (edge: boolean) => (
     <Primitive.Backdrop
+      ref={edge ? undefined : scrimRef}
       {...mergeStyleProps(
         themeProps('dialog-backdrop'),
         // All in one `stylex.props` call so a later `backgroundColor` replaces the one in
@@ -264,13 +273,18 @@ function Backdrop({
         stylex.props(
           reset.base,
           styles.backdrop,
-          part === 'sheetScrim' && styles.backdropSheet,
-          part === 'sheetEdge' && styles.backdropSheetEdge,
+          edge ? styles.backdropEdge : backdropCompactPlacements[compactPlacement],
           stacked && styles.backdropStacked,
           backdropMotion[variant],
         ),
       )}
     />
+  );
+  return (
+    <>
+      {scrim(false)}
+      {compactPlacement === 'sheet' ? scrim(true) : null}
+    </>
   );
 }
 
@@ -291,9 +305,9 @@ function Viewport({
   compactPlacement: DialogCompactPlacement;
   children: React.ReactNode;
 }) {
+  const trackRef = React.useRef<HTMLDivElement>(null);
   React.useEffect(() => acquireKeyboardInset(), []);
-  const [track, setTrack] = React.useState<HTMLDivElement | null>(null);
-  React.useEffect(() => (track ? preventViewportPan(track) : undefined), [track]);
+  React.useEffect(() => (trackRef.current ? preventViewportPan(trackRef.current) : undefined), []);
   return (
     <Primitive.Viewport
       overlay
@@ -313,7 +327,7 @@ function Viewport({
           themeProps('dialog-track', { variant }),
           stylex.props(reset.base, styles.track, trackVariants[variant], trackCompactPlacements[compactPlacement]),
         )}
-        ref={setTrack}
+        ref={trackRef}
         onTouchEnd={focusWithoutScroll}
       >
         {children}
@@ -442,17 +456,10 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
     >
       <Backdrop
         variant={variant}
+        compactPlacement={compactPlacement}
         stacked={isStackedOnCard}
-        part={compactPlacement === 'sheet' ? 'sheetScrim' : 'scrim'}
       />
       {popup}
-      {compactPlacement === 'sheet' ? (
-        <Backdrop
-          variant={variant}
-          stacked={isStackedOnCard}
-          part='sheetEdge'
-        />
-      ) : null}
     </Viewport>
   );
 
