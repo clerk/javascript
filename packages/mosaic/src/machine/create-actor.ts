@@ -160,34 +160,37 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     // The cast suppresses that mismatch; src implementations receive the INIT event
     // on state entry and typically ignore it. The runtime views events through an
     // event-agnostic lens (line 57) for this reason.
-    Promise.resolve(invoke.src(context, event as never)).then(
-      output => {
-        if (status !== 'active' || token !== invocationToken) {
-          return;
-        }
-        const doneEvent = { type: INVOKE_DONE, output };
-        const transition = pickTransition(normalizeTransition(invoke.onDone, doneEvent), doneEvent);
-        if (!transition) {
-          return;
-        }
-        if (takeTransition(transition, doneEvent)) {
-          commit();
-        }
-      },
-      (error: unknown) => {
-        if (status !== 'active' || token !== invocationToken) {
-          return;
-        }
-        const errorEvent = { type: INVOKE_ERROR, error };
-        const transition = pickTransition(normalizeTransition(invoke.onError, errorEvent), errorEvent);
-        if (!transition) {
-          return;
-        }
-        if (takeTransition(transition, errorEvent)) {
-          commit();
-        }
-      },
-    );
+    const onDone = (output: unknown) => {
+      if (status !== 'active' || token !== invocationToken) {
+        return;
+      }
+      const doneEvent = { type: INVOKE_DONE, output };
+      const transition = pickTransition(normalizeTransition(invoke.onDone, doneEvent), doneEvent);
+      if (!transition) {
+        return;
+      }
+      if (takeTransition(transition, doneEvent)) {
+        commit();
+      }
+    };
+    const onError = (error: unknown) => {
+      if (status !== 'active' || token !== invocationToken) {
+        return;
+      }
+      const errorEvent = { type: INVOKE_ERROR, error };
+      const transition = pickTransition(normalizeTransition(invoke.onError, errorEvent), errorEvent);
+      if (!transition) {
+        return;
+      }
+      if (takeTransition(transition, errorEvent)) {
+        commit();
+      }
+    };
+    try {
+      Promise.resolve(invoke.src(context, event as never)).then(onDone, onError);
+    } catch (error) {
+      queueMicrotask(() => onError(error));
+    }
   }
 
   function clearAfterTimers(): void {
