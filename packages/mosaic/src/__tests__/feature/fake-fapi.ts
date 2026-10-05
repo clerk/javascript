@@ -175,7 +175,7 @@ function replaceEmail(state: FakeFapiState, email: EmailAddressJSON) {
   }));
 }
 
-export function verifyEmailOutOfBand(state: FakeFapiState, id: string) {
+export function verifyEmailOutOfBand(state: FakeFapiState, id: string): void {
   const email = findEmail(state, id);
   if (!email) {
     throw new Error(`No email address ${id} to verify`);

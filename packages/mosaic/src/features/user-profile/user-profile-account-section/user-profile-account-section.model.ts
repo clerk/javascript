@@ -169,7 +169,7 @@ function toNameAttribute(attribute: AttributeData | undefined): UserProfileNameA
 
 function toPhoneVerifier(phone: PhoneNumberResource): UserProfilePhoneVerifier {
   return {
-    sendCode: () => save(() => phone.prepareVerification(), ADD_PHONE_FIELDS),
+    sendCode: () => save(() => phone.prepareVerification()),
     verifyCode: code => save(() => phone.attemptVerification({ code }), ADD_PHONE_FIELDS),
   };
 }

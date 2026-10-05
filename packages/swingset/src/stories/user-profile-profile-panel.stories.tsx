@@ -75,8 +75,10 @@ export function Default(_args: Record<string, unknown>) {
       imageUrl={imageUrl}
       phones={phones}
       {...createUserProfileAddPhoneFixture({
-        onVerified: value =>
-          setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isDefault: false, isVerified: true }]),
+        onCreated: (id, value) =>
+          setPhones(current => [...current, { id, value, isDefault: false, isVerified: false }]),
+        onVerified: id =>
+          setPhones(current => current.map(phone => (phone.id === id ? { ...phone, isVerified: true } : phone))),
       })}
       dangerSlot={<UserProfileDangerPreview />}
       onManageEmail={() => undefined}
