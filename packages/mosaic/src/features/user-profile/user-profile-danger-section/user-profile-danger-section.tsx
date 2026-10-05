@@ -2,13 +2,13 @@ import { useClerk, useUser } from '@clerk/shared/react';
 
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { useReverificationFlow } from '../../reverification';
-import { UserProfileDeleteSectionView } from './user-profile-delete-section.view';
+import { UserProfileDangerSectionView } from './user-profile-danger-section.view';
 
-export type UserProfileDeleteSectionProps = {
+export type UserProfileDangerSectionProps = {
   fallback?: React.ReactNode;
 };
 
-export function UserProfileDeleteSection(props: UserProfileDeleteSectionProps) {
+export function UserProfileDangerSection(props: UserProfileDangerSectionProps) {
   // -- Model --
   const clerk = useClerk();
   const { setActive, client } = clerk;
@@ -51,5 +51,5 @@ export function UserProfileDeleteSection(props: UserProfileDeleteSectionProps) {
     return null;
   }
 
-  return <UserProfileDeleteSectionView {...destructiveController} />;
+  return <UserProfileDangerSectionView {...destructiveController} />;
 }

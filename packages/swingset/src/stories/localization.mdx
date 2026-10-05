@@ -86,7 +86,7 @@ is left unused, and a placeholder the values do not cover is rendered literally.
 {
   "userButton": {
     "trigger": { "open": "Abrir el menú de la cuenta de {name}" },
-    "workspaces": {
+    "organizations": {
       "members": { "one": "{count} miembro", "other": "{count} miembros" }
     }
   },
@@ -167,7 +167,7 @@ function Trigger({ name, count }: { name: string; count: number }) {
   const locale = useLocale();
   return (
     <button aria-label={fill(m.trigger.open, { name })}>
-      {plural(m.workspaces.members, count, locale)}
+      {plural(m.organizations.members, count, locale)}
     </button>
   );
 }
