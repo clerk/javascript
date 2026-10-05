@@ -378,7 +378,9 @@ describe('APIKeysTable', () => {
       onTestFinished(() => writeText.mockRestore());
 
       await user.click(within(dialog).getByRole('button', { name: 'Copy and close' }));
-      expect(await within(dialog).findByRole('alert')).toHaveTextContent('Could not copy the API key. Try again.');
+      await waitFor(() =>
+        expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not copy the API key. Try again.'),
+      );
       expect(dialog).toBeVisible();
     });
 
@@ -441,7 +443,7 @@ describe('APIKeysTable', () => {
       await fillCreate(user, dialog, 'Web app', 'Never');
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
 
-      expect(await within(dialog).findByRole('alert')).toHaveTextContent('API Key name already exists.');
+      await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('API Key name already exists.'));
       expect(within(dialog).getByRole('textbox', { name: 'Secret key name' })).toHaveValue('Web app');
     });
 
@@ -454,8 +456,10 @@ describe('APIKeysTable', () => {
       await user.click(within(dialog).getByRole('button', { name: 'Add API Key' }));
       create.fail('token_quota_exceeded');
 
-      expect(await within(dialog).findByRole('alert')).toHaveTextContent(
-        'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
+      await waitFor(() =>
+        expect(within(dialog).getByRole('alert')).toHaveTextContent(
+          'You have reached your usage limit. You can remove the limit by upgrading to a paid plan.',
+        ),
       );
     });
 

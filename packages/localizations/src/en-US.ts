@@ -500,7 +500,7 @@ export const enUS: LocalizationResource = {
             },
             signingCertificate: {
               fileUploaded: 'File uploaded',
-              label: 'Signing certificate',
+              label: 'Signing certificates',
               removeFile: 'Remove file',
               replaceFile: 'Replace file',
               uploadFile: 'Upload file',
@@ -583,7 +583,7 @@ export const enUS: LocalizationResource = {
             },
             signingCertificate: {
               fileUploaded: 'File uploaded',
-              label: 'Signing certificate',
+              label: 'Signing certificates',
               removeFile: 'Remove file',
               replaceFile: 'Replace file',
               uploadFile: 'Upload file',
@@ -700,7 +700,7 @@ export const enUS: LocalizationResource = {
             },
             signingCertificate: {
               fileUploaded: 'File uploaded',
-              label: 'Signing certificate',
+              label: 'Signing certificates',
               removeFile: 'Remove file',
               replaceFile: 'Replace file',
               uploadFile: 'Upload file',
@@ -822,7 +822,7 @@ export const enUS: LocalizationResource = {
             },
             signingCertificate: {
               fileUploaded: 'File uploaded',
-              label: 'Signing certificate',
+              label: 'Signing certificates',
               removeFile: 'Remove file',
               replaceFile: 'Replace file',
               uploadFile: 'Upload file',
@@ -925,6 +925,17 @@ export const enUS: LocalizationResource = {
       subtitle: "You'll configure the connection details in the next step",
       title: 'Select your identity provider',
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
+    },
+    signingCertificates: {
+      addCertificate: 'Add certificate',
+      expired: 'Expired {{date}}',
+      expires: 'Expires {{date}}',
+      expiryAfterSave: 'Expiry shows after you save.',
+      fileUnreadable: 'The file could not be read. Try again.',
+      notACertificate: 'One of the uploaded files is not a certificate.',
+      primary: 'Primary',
+      primaryTooltip: 'Checked first when verifying a sign-in. Every certificate in this list is trusted.',
+      removeCertificate: 'Remove certificate',
     },
     testConfigurationStep: {
       error__noSuccessfulTestRun:
@@ -1375,6 +1386,10 @@ export const enUS: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: 'Certificate expires',
+          certificates: 'Certificates',
+          certificatesCount: '{{count}} certificates',
+          certificatesSummary: '{{count}} certificates, earliest expires {{date}}',
+          certificatesSummaryExpired: '{{count}} certificates, one expired {{date}}',
           clientSecret: {
             placeholder: 'Leave empty to keep the current secret',
           },

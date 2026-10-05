@@ -4,7 +4,7 @@ import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
-import { Text } from '../../../components/text';
+import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfileEmail, UserProfileEmailVerifier } from './user-profile-account-section.types';
@@ -151,14 +151,7 @@ export function UserProfileEmailRowView({
         onSetPrimary={primary.onSetPrimary}
         onVerify={canVerify ? verifyEmail : onVerifyEmail}
       >
-        {primary.error ? (
-          <Text
-            role='alert'
-            color='negative'
-          >
-            {primary.error}
-          </Text>
-        ) : null}
+        <Section.Error>{primary.error}</Section.Error>
       </UserProfileContactListRowView>
       {dialog}
       {onRemoveEmail ? (

@@ -1302,6 +1302,10 @@ export type __internal_LocalizationResource = {
         identityProvider: {
           title: LocalizationValue;
           certificateExpires: LocalizationValue;
+          certificates: LocalizationValue;
+          certificatesCount: LocalizationValue<'count'>;
+          certificatesSummary: LocalizationValue<'count' | 'date'>;
+          certificatesSummaryExpired: LocalizationValue<'count' | 'date'>;
           editButton: LocalizationValue;
           form: {
             title: LocalizationValue;
@@ -2258,6 +2262,17 @@ export type __internal_LocalizationResource = {
           };
         };
       };
+    };
+    signingCertificates: {
+      addCertificate: LocalizationValue;
+      expired: LocalizationValue<'date'>;
+      expires: LocalizationValue<'date'>;
+      expiryAfterSave: LocalizationValue;
+      fileUnreadable: LocalizationValue;
+      notACertificate: LocalizationValue;
+      primary: LocalizationValue;
+      primaryTooltip: LocalizationValue;
+      removeCertificate: LocalizationValue;
     };
     activate: {
       title: LocalizationValue;

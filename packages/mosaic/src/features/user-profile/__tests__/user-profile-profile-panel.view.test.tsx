@@ -126,8 +126,8 @@ describe('UserProfileProfilePanelView', () => {
       screen.getByRole('group', { name: 'Profile' }),
     );
     expect(screen.getByRole('heading', { level: 3, name: 'Profile' })).toHaveClass('cl-section-title');
-    expect(screen.getByText('Name')).toHaveClass('cl-section-label');
-    expect(screen.getByText('Username')).toHaveClass('cl-section-label');
+    expect(screen.getByText('Name', { selector: '.cl-section-label > *' })).toBeInTheDocument();
+    expect(screen.getByText('Username', { selector: '.cl-section-label > *' })).toBeInTheDocument();
     expect(screen.getByText('Preston Booth')).toHaveClass('cl-section-description');
     expect(screen.getByText('prestonxyz')).toHaveClass('cl-section-description');
     expect(screen.getByRole('button', { name: 'Edit name' })).toBeInTheDocument();
@@ -136,7 +136,7 @@ describe('UserProfileProfilePanelView', () => {
     expect(screen.getByText('item1@clerk.dev')).toBeInTheDocument();
     expect(screen.getByText('item1@clerk.dev').closest('.cl-section-item')).toHaveTextContent('Primary');
     expect(screen.getByText('+1 (801) 888-8181')).toBeInTheDocument();
-    expect(screen.getByText('Profile picture')).toHaveClass('cl-section-label');
+    expect(screen.getByText('Profile picture', { selector: '.cl-section-label > *' })).toBeInTheDocument();
     expect(screen.getByText('Recommend size 1:1, up to 10MB.')).toHaveClass('cl-section-description');
     expect(screen.getByRole('heading', { level: 3, name: 'Email' })).toHaveClass('cl-section-title');
     expect(screen.getByRole('heading', { level: 3, name: 'Phone' })).toHaveClass('cl-section-title');
@@ -284,7 +284,7 @@ describe('UserProfileProfilePanelView', () => {
     });
 
     expect(screen.getByRole('heading', { level: 3, name: 'Danger zone' })).toBeInTheDocument();
-    expect(screen.getByText('Delete account', { selector: '.cl-section-label' })).toBeInTheDocument();
+    expect(screen.getByText('Delete account', { selector: '.cl-section-label > *' })).toBeInTheDocument();
     expect(screen.getByText('Permanently delete this account and all its data. This cannot be undone.')).toHaveClass(
       'cl-section-description',
     );

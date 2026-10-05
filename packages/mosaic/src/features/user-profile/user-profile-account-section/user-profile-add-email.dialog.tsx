@@ -165,7 +165,9 @@ function EnterEmailStep(props: EnterEmailStepProps) {
             value={props.emailAddress}
             onChange={event => props.onEmailAddressChange(event.target.value)}
           />
-          {props.errorMessage ? <Field.Error>{props.errorMessage}</Field.Error> : null}
+          <Field.Message>
+            <Field.Error>{props.errorMessage}</Field.Error>
+          </Field.Message>
         </Field.Root>
       </Card.Content>
       <Card.Footer>
@@ -233,7 +235,9 @@ function VerifyEmailStep(props: VerifyEmailStepProps) {
             onValueChange={props.onCodeChange}
             onComplete={props.onSubmit}
           />
-          {props.errorMessage ? <Field.Error>{props.errorMessage}</Field.Error> : null}
+          <Field.Message>
+            <Field.Error>{props.errorMessage}</Field.Error>
+          </Field.Message>
           <ResendButton
             labels={m.verify}
             onResend={props.onResend}

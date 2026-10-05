@@ -6,7 +6,7 @@ import { Button } from '../../../components/button';
 import { Dialog } from '../../../components/dialog';
 import { Icon } from '../../../components/icon';
 import type { CountryIso } from '../../../components/phone-input';
-import { Text } from '../../../components/text';
+import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfilePhone, UserProfilePhoneVerifier } from './user-profile-account-section.types';
@@ -138,14 +138,7 @@ export function UserProfilePhoneRowView({
         onSetPrimary={primary.onSetPrimary}
         onVerify={canVerify ? verifyPhone : onVerifyPhone}
       >
-        {primary.error ? (
-          <Text
-            role='alert'
-            color='negative'
-          >
-            {primary.error}
-          </Text>
-        ) : null}
+        <Section.Error>{primary.error}</Section.Error>
       </UserProfileContactListRowView>
       {dialog}
       {onRemovePhone ? (
