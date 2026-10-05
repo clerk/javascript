@@ -5,13 +5,13 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { useDestructiveController } from '../../../blocks/destructive/destructive.controller';
 import { MosaicProvider } from '../../../mosaic-provider';
-import { UserProfileDeleteSectionView } from '../user-profile-delete-section/user-profile-delete-section.view';
+import { UserProfileDangerSectionView } from '../user-profile-danger-section/user-profile-danger-section.view';
 import type { UserProfileSecurityPanelViewProps } from '../user-profile-security-panel.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 function DeleteAccount({ onDelete = () => Promise.resolve() }: { onDelete?: () => Promise<void> }) {
   const controller = useDestructiveController({ onDelete });
-  return <UserProfileDeleteSectionView {...controller} />;
+  return <UserProfileDangerSectionView {...controller} />;
 }
 
 const props: UserProfileSecurityPanelViewProps = {
@@ -64,7 +64,7 @@ function renderView(overrides: Partial<UserProfileSecurityPanelViewProps> = {}) 
 
 describe('UserProfileSecurityPanelView', () => {
   it('composes authentication, active devices, and the danger zone', () => {
-    renderView({ deleteAccountSlot: <DeleteAccount /> });
+    renderView({ dangerSlot: <DeleteAccount /> });
 
     expect(screen.getByRole('heading', { level: 2, name: 'Security' })).toBeInTheDocument();
     const authentication = screen.getByRole('region', { name: 'Authentication' });
@@ -119,7 +119,7 @@ describe('UserProfileSecurityPanelView', () => {
       onRemovePasskey,
       onSignOutDevice,
       onSignOutAllOtherDevices,
-      deleteAccountSlot: <DeleteAccount onDelete={onDeleteAccount} />,
+      dangerSlot: <DeleteAccount onDelete={onDeleteAccount} />,
     });
 
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));

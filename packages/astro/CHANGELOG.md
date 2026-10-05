@@ -1,5 +1,13 @@
 # @clerk/astro
 
+## 4.1.10
+
+### Patch Changes
+
+- Updated dependencies [[`2302140`](https://github.com/clerk/javascript/commit/23021401d3ab66bf920ba07be1d7500c4d98a5a9), [`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260), [`dee649c`](https://github.com/clerk/javascript/commit/dee649c2d6cad6ba543a2433e65707a0d93686df)]:
+  - @clerk/backend@3.23.0
+  - @clerk/shared@4.39.0
+
 ## 4.1.9
 
 ### Patch Changes

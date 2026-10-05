@@ -241,7 +241,7 @@ export function useUserButtonModel(options?: UserButtonModelOptions, modals?: Us
       : [],
   );
 
-  // Organization requests are scoped to the active session, so another account's workspaces are unknowable.
+  // Organization requests are scoped to the active session, so another account's organizations are unknowable.
   const additionalSessions: UserButtonSession[] = (clerk.client?.signedInSessions ?? []).flatMap(s => {
     const sessionUser = s.user;
     if (!sessionUser || s.id === session.id) {
