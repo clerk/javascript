@@ -274,7 +274,8 @@ export const noRawInvoke = {
     type: 'problem',
     schema: [],
     messages: {
-      useFromPromise: 'Write invoke with fromPromise from setup(), so onDone sees the typed output instead of any.',
+      useFromPromise:
+        'Write invoke with fromPromise from setup(), or name an actor from setup().extend({ actors }), so onDone sees the typed output instead of any.',
     },
   },
   create(context) {
@@ -284,12 +285,13 @@ export const noRawInvoke = {
           return;
         }
         const invoke = unwrapExpression(node.value);
-        if (
-          invoke.type === 'ObjectExpression' &&
-          invoke.properties.some(
-            property => property.type === 'Property' && propertyName(property.key, property.computed) === 'src',
-          )
-        ) {
+        if (invoke.type !== 'ObjectExpression') {
+          return;
+        }
+        const src = invoke.properties.find(
+          property => property.type === 'Property' && propertyName(property.key, property.computed) === 'src',
+        );
+        if (src && !isActorName(unwrapExpression(src.value))) {
           context.report({ node: invoke, messageId: 'useFromPromise' });
         }
       },
@@ -402,4 +404,11 @@ function functionName(fn) {
     return fn.id.name;
   }
   return fn.parent.type === 'VariableDeclarator' && fn.parent.id.type === 'Identifier' ? fn.parent.id.name : undefined;
+}
+
+function isActorName(node) {
+  return (
+    (node.type === 'Literal' && typeof node.value === 'string') ||
+    (node.type === 'TemplateLiteral' && node.expressions.length === 0)
+  );
 }

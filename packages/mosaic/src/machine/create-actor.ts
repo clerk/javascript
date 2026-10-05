@@ -4,11 +4,14 @@ import { isAssignAction } from './assign';
 import type {
   Actions,
   Actor,
+  ActorSrc,
   AfterEvent,
   AnyEventObject,
+  AnyImplementationRefs,
   AssignAction,
   CreateActorOptions,
   EventObject,
+  MachineImplementations,
   Snapshot,
   SnapshotListener,
   StateConfig,
@@ -54,9 +57,12 @@ export function createActor<TContext extends object, TEvent extends EventObject,
   // events aren't part of the user's `TEvent` union, so the config is viewed
   // through an event-agnostic lens to keep the runtime helpers honestly typed.
   // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
-  const states = machine.states as unknown as Record<string, StateConfig<TContext, EventObject, TStates>>;
-  const emptyState: StateConfig<TContext, EventObject, TStates> = {};
-  const stateOf = (id: string): StateConfig<TContext, EventObject, TStates> => {
+  const states = machine.states as unknown as Record<
+    string,
+    StateConfig<TContext, EventObject, TStates, AnyImplementationRefs>
+  >;
+  const emptyState: StateConfig<TContext, EventObject, TStates, AnyImplementationRefs> = {};
+  const stateOf = (id: string): StateConfig<TContext, EventObject, TStates, AnyImplementationRefs> => {
     const state = states[id];
     if (state) {
       return state;
@@ -66,6 +72,23 @@ export function createActor<TContext extends object, TEvent extends EventObject,
     }
     return emptyState;
   };
+
+  function implementations(): MachineImplementations<TContext, EventObject> {
+    // SAFETY: same event-agnostic lens as `states` above, applied to the swappable implementations.
+    // eslint-disable-next-line typescript/consistent-type-assertions -- The machine runtime erases state and event types; its public generics enforce their relationship.
+    return actor.logic.implementations as unknown as MachineImplementations<TContext, EventObject>;
+  }
+
+  function resolveSrc(src: ActorSrc<TContext, EventObject> | string): ActorSrc<TContext, EventObject> {
+    if (typeof src !== 'string') {
+      return src;
+    }
+    const resolved = implementations().actors[src];
+    if (resolved === undefined) {
+      throw new Error(`Actor '${src}' is not implemented.`);
+    }
+    return resolved;
+  }
 
   // Tracks the latest setContext patch so it survives a stop/start cycle.
   let liveContextPatch: Partial<TContext> = options.context ?? {};
@@ -180,6 +203,7 @@ export function createActor<TContext extends object, TEvent extends EventObject,
     if (!invoke) {
       return;
     }
+    const src = resolveSrc(invoke.src);
     const token = ++invocationToken;
     const settle = (transitionConfig: unknown, settledEvent: AnyEventObject) => {
       if (token !== invocationToken) {
@@ -196,7 +220,7 @@ export function createActor<TContext extends object, TEvent extends EventObject,
     const onDone = (output: unknown) => settle(invoke.onDone, { type: INVOKE_DONE, output });
     const onError = (error: unknown) => settle(invoke.onError, { type: INVOKE_ERROR, error });
     try {
-      Promise.resolve(invoke.src(context, event)).then(onDone, onError);
+      Promise.resolve(src(context, event)).then(onDone, onError);
     } catch (error) {
       queueMicrotask(() => onError(error));
     }
@@ -305,6 +329,8 @@ export function createActor<TContext extends object, TEvent extends EventObject,
   }
 
   const actor: Actor<TContext, TEvent, TStates> = {
+    logic: machine,
+
     start() {
       if (started) {
         return actor;

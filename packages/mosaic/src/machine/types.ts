@@ -39,6 +39,28 @@ export type Action<TContext, TEvent extends EventObject> =
   | ActionFunction<TContext, TEvent>
   | AssignAction<TContext, TEvent>;
 
+/**
+ * The names a machine's config may reference, keyed by implementation kind.
+ * `actorOutputs` maps each actor name to the value its promise resolves with.
+ */
+export interface ImplementationRefs {
+  actors: string;
+  actorOutputs: Record<string, unknown>;
+}
+
+/** No named implementations: only inline `src` functions are accepted. */
+export interface NoImplementationRefs {
+  actors: never;
+  actorOutputs: Record<never, never>;
+}
+
+/** Any named implementations. The default for {@link StateMachine}, so every machine is assignable to it. */
+export interface AnyImplementationRefs {
+  actors: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Each named actor declares its own output type; `unknown` would reject every typed `onDone` handler when widened to this shape.
+  actorOutputs: Record<string, any>;
+}
+
 export type Actions<TContext, TEvent extends EventObject> = Action<TContext, TEvent> | Action<TContext, TEvent>[];
 
 /** The long form of a transition. */
@@ -108,6 +130,12 @@ export interface AfterEvent extends EventObject {
   delay: number;
 }
 
+/** A promise-returning function started when a state is entered. */
+export type ActorSrc<TContext, TEvent extends EventObject, TOutput = unknown> = (
+  context: TContext,
+  event: TEvent | DoneInvokeEvent | ErrorInvokeEvent,
+) => Promise<TOutput>;
+
 /** Invoke a promise on state entry and branch on its settlement. */
 export interface InvokeConfig<
   TContext,
@@ -116,12 +144,32 @@ export interface InvokeConfig<
   TStates extends string = string,
 > {
   /** Started on entry. The resolved value lands on `onDone` events as `output`. */
-  src: (context: TContext, event: TEvent | DoneInvokeEvent | ErrorInvokeEvent) => Promise<TOutput>;
+  src: ActorSrc<TContext, TEvent, TOutput>;
   onDone?: Transition<TContext, DoneInvokeEvent<TOutput>, TStates>;
   onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
 }
 
-export interface StateConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
+/** Invoke an actor by name. `onDone` sees the output type that actor was registered with. */
+export type NamedInvokeConfig<
+  TContext,
+  TStates extends string = string,
+  TRefs extends ImplementationRefs = NoImplementationRefs,
+> = {
+  [K in TRefs['actors']]: {
+    src: K;
+    onDone?: Transition<TContext, DoneInvokeEvent<ResolvedOutput<TRefs['actorOutputs'][K]>>, TStates>;
+    onError?: Transition<TContext, ErrorInvokeEvent, TStates>;
+  };
+}[TRefs['actors']];
+
+type ResolvedOutput<TOutput> = [TOutput] extends [never] ? unknown : TOutput;
+
+export interface StateConfig<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TRefs extends ImplementationRefs = NoImplementationRefs,
+> {
   /**
    * Entry precondition — "may navigation LAND on this state right now?". Checked
    * uniformly by *every* transition (and the derived initial) that targets this
@@ -157,11 +205,14 @@ export interface StateConfig<TContext, TEvent extends EventObject, TStates exten
   /**
    * A promise to invoke on entry. Use {@link PromiseSrc} (created by
    * `setup().fromPromise`) to carry the resolved type to `onDone.actions`.
+   * A name from `setup().extend({ actors })` also carries its output type.
    * A raw `src` function is also accepted — `e.output` is `any` in that case, so
    * `mosaic/no-raw-invoke` rejects it outside tests.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Each state invokes its own output type, and TypeScript cannot express that per-state type here; `unknown` would reject typed `onDone` handlers.
-  invoke?: InvokeConfig<TContext, TEvent, any, TStates>;
+  invoke?:
+    | NamedInvokeConfig<TContext, TStates, TRefs>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Each state invokes its own output type, and TypeScript cannot express that per-state type here; `unknown` would reject typed `onDone` handlers.
+    | InvokeConfig<TContext, TEvent, any, TStates>;
   /** Actions run when the state is entered. */
   entry?: Actions<TContext, TEvent>;
   /** Actions run when the state is exited. */
@@ -176,11 +227,24 @@ export interface StateConfig<TContext, TEvent extends EventObject, TStates exten
  */
 export type InitialResolver<TContext, TStates extends string = string> = (context: TContext) => TStates;
 
-export interface MachineConfig<TContext, TEvent extends EventObject, TStates extends string = string> {
+export interface MachineConfig<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TRefs extends ImplementationRefs = NoImplementationRefs,
+> {
   id?: string;
   initial: NoInfer<TStates> | InitialResolver<TContext, NoInfer<TStates>>;
   context?: TContext;
-  states: Record<TStates, StateConfig<TContext, TEvent, NoInfer<TStates>>>;
+  states: Record<TStates, StateConfig<TContext, TEvent, NoInfer<TStates>, TRefs>>;
+}
+
+/**
+ * The implementations a machine resolves named references against at
+ * evaluation time. Every kind is partial: a missing name throws when used.
+ */
+export interface MachineImplementations<TContext, TEvent extends EventObject> {
+  actors: Partial<Record<string, ActorSrc<TContext, TEvent>>>;
 }
 
 /**
@@ -188,12 +252,18 @@ export interface MachineConfig<TContext, TEvent extends EventObject, TStates ext
  * {@link createMachine}. `states` is exposed so docs/tests can enumerate every
  * step without running anything.
  */
-export interface StateMachine<TContext, TEvent extends EventObject, TStates extends string = string> {
+export interface StateMachine<
+  TContext,
+  TEvent extends EventObject,
+  TStates extends string = string,
+  TRefs extends ImplementationRefs = AnyImplementationRefs,
+> {
   id: string | undefined;
   initial: TStates | InitialResolver<TContext, TStates>;
   context: TContext;
-  states: Record<TStates, StateConfig<TContext, TEvent, TStates>>;
-  config: MachineConfig<TContext, TEvent, TStates>;
+  states: Record<TStates, StateConfig<TContext, TEvent, TStates, TRefs>>;
+  config: MachineConfig<TContext, TEvent, TStates, TRefs>;
+  implementations: MachineImplementations<TContext, TEvent>;
 }
 
 export type ActorStatus = 'active' | 'done' | 'stopped';
@@ -214,6 +284,8 @@ export type SnapshotListener<TContext, TStates extends string = string> = (
 export type Unsubscribe = () => void;
 
 export interface Actor<TContext, TEvent extends EventObject, TStates extends string = string> {
+  /** The machine this actor runs. A named `src` resolves through its `implementations` when used. */
+  logic: StateMachine<TContext, TEvent, TStates>;
   /**
    * Run entry actions / immediate transitions / invokes of the initial state,
    * then apply the events sent before this first start, in order. After a `stop()`, resume in the current state instead: re-arm its `after`

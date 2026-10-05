@@ -418,7 +418,9 @@ describe('Mosaic machines', { timeout: 30_000 }, () => {
         `${featureDir}/sample.controller.ts`,
         'export const state = { invoke: { src: () => Promise.resolve(1), onDone: { target: "idle" } } };',
       ),
-    ).toEqual(['Write invoke with fromPromise from setup(), so onDone sees the typed output instead of any.']);
+    ).toEqual([
+      'Write invoke with fromPromise from setup(), or name an actor from setup().extend({ actors }), so onDone sees the typed output instead of any.',
+    ]);
   });
 
   test.each([
@@ -435,6 +437,15 @@ describe('Mosaic machines', { timeout: 30_000 }, () => {
       await rawInvokeMessages(
         `${featureDir}/sample.controller.ts`,
         'declare const fromPromise: (run: () => Promise<number>) => object;\nexport const state = { invoke: fromPromise(() => Promise.resolve(1)) };',
+      ),
+    ).toEqual([]);
+  });
+
+  test('allows an invoke of a named actor', async () => {
+    expect(
+      await rawInvokeMessages(
+        `${featureDir}/sample.controller.ts`,
+        'export const state = { invoke: { src: "save", onDone: { target: "idle" } } };',
       ),
     ).toEqual([]);
   });

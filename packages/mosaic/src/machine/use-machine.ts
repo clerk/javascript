@@ -62,6 +62,7 @@ export function useMachine<TContext extends object, TEvent extends EventObject, 
     if (options?.context) {
       actor.setContext(options.context);
     }
+    actor.logic.implementations = machine.implementations;
   });
 
   const onDoneRef = useRef(options?.onDone);
