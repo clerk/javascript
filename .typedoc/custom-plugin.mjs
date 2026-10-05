@@ -110,6 +110,7 @@ const LINK_REPLACEMENTS = [
     'enterprise-connection-saml-connection-login-hint',
     '/docs/reference/backend/types/backend-enterprise-connection-saml-connection-login-hint',
   ],
+  ['saml-connection-idp-certificate', '/docs/reference/backend/types/backend-saml-connection-idp-certificate'],
   ['external-account', '/docs/reference/backend/types/backend-external-account'],
   ['phone-number', '/docs/reference/backend/types/backend-phone-number'],
   ['protect-check-resource', '/docs/reference/types/protect-check-resource'],
