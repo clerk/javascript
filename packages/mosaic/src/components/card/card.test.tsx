@@ -391,6 +391,7 @@ describe('Mosaic Card', () => {
 
     const link = screen.getByRole('link', { name: 'Acme' });
     expect(link).toHaveClass('cl-card-image');
+    expect(link).toHaveClass(stylex.props(slots.image.touchTarget).className ?? '');
     expect(link).toHaveAttribute('href', 'https://acme.example');
     expect(link).toHaveAttribute('data-interactive');
   });
@@ -523,6 +524,23 @@ describe('Mosaic Card', () => {
       ...atoms(slots.header.centered),
     );
     expect(screen.getByTestId('center-image')).toHaveClass(...atoms(slots.image.centered));
+  });
+
+  it('keeps centered header content centered when a dialog adds its close button', () => {
+    render(
+      <Dialog.Root defaultOpen>
+        <Dialog.Popup>
+          <Card.Root>
+            <Card.Header align='center'>
+              <Card.Title>Sign in</Card.Title>
+            </Card.Header>
+          </Card.Root>
+        </Dialog.Popup>
+      </Dialog.Root>,
+    );
+
+    const content = screen.getByRole('dialog').querySelector('.cl-card-header-content');
+    expect(content).toHaveClass(stylex.props(slots.header.centeredWithClose).className ?? '');
   });
 
   it('renders the title and description slots', () => {

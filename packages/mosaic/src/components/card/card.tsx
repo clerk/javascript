@@ -101,6 +101,7 @@ function HeaderCloseButton() {
   );
 }
 
+/** Props for the card header, including alignment and native `div` props. */
 export interface CardHeaderProps extends MosaicComponentProps<'div'> {
   /**
    * How the header's parts line up. `center` stacks the image, title, and description down the
@@ -117,6 +118,7 @@ const Header = React.forwardRef<HTMLDivElement, CardHeaderProps>(function CardHe
 ) {
   const dialog = React.useContext(DialogContext);
   const centered = align === 'center';
+  const hasCloseButton = isInDialog(dialog) && dialog.role !== 'alertdialog';
   const element = useRender({
     defaultTagName: 'div',
     render,
@@ -134,11 +136,16 @@ const Header = React.forwardRef<HTMLDivElement, CardHeaderProps>(function CardHe
               Not outside a dialog, where there is nothing to close, and not in an alert dialog. */}
           {/* An alert dialog interrupts to ask for a decision, and a corner X is a way out
               without answering one. The cancel action in the footer is the way out. */}
-          {isInDialog(dialog) && dialog.role !== 'alertdialog' ? <HeaderCloseButton /> : null}
+          {hasCloseButton ? <HeaderCloseButton /> : null}
           <div
             {...mergeStyleProps(
               themeProps('card-header-content'),
-              stylex.props(reset.base, slots.header.content, centered && slots.header.centered),
+              stylex.props(
+                reset.base,
+                slots.header.content,
+                centered && slots.header.centered,
+                centered && hasCloseButton && slots.header.centeredWithClose,
+              ),
             )}
           >
             {children}
@@ -151,6 +158,7 @@ const Header = React.forwardRef<HTMLDivElement, CardHeaderProps>(function CardHe
   return <CardHeaderAlignContext.Provider value={align}>{element}</CardHeaderAlignContext.Provider>;
 });
 
+/** Props for the application-logo slot and optional home link. */
 export interface CardImageProps extends Omit<MosaicComponentProps<'a'>, 'children'> {
   /** The URL of the logo image. */
   src: string;
@@ -212,6 +220,7 @@ const Image = React.forwardRef<HTMLElement, CardImageProps>(function CardImage(
           slots.image.scale(scale),
           centered && slots.image.centered,
           interactive && slots.image.interactive,
+          interactive && slots.image.touchTarget,
           interactive && focusOutline.visible,
           xstyle,
         ),

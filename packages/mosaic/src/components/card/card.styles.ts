@@ -8,6 +8,7 @@ import {
   radiusVars,
   shadowVars,
   space,
+  targetVars,
   typeScaleVars,
 } from '../../tokens.stylex';
 import { cardContentMarker } from './card.markers.stylex';
@@ -70,6 +71,9 @@ export const header = stylex.create({
     alignItems: 'center',
     textAlign: 'center',
   },
+  centeredWithClose: {
+    marginInlineStart: `calc(${space['7']} + ${space['1']})`,
+  },
   title: {
     color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-base-size'],
@@ -99,6 +103,15 @@ export const image = stylex.create({
     borderRadius: radiusVars['--cl-radius-sm'],
     textDecoration: 'none',
     color: 'inherit',
+  },
+  touchTarget: {
+    position: { default: null, '@media (pointer: coarse)': 'relative' },
+    '::after': {
+      insetBlock: `min(0px, (100% - ${targetVars['--cl-target-coarse']}) / 2)`,
+      insetInline: `min(0px, (100% - ${targetVars['--cl-target-coarse']}) / 2)`,
+      content: { default: null, '@media (pointer: coarse)': '""' },
+      position: 'absolute',
+    },
   },
   scale: (scale: number) => ({ height: `calc(${space['6']} * ${scale})` }),
   image: {
