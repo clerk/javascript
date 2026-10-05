@@ -32,22 +32,16 @@ export function createUserProfileAddEmailFixture({
     return { method: 'link', verified, cancel: () => (cancelled = true) };
   };
 
-  const startSso = (id: string): UserProfileEmailVerification => {
-    let connect = () => undefined;
-    const verified = new Promise<void>((resolve, reject) => {
-      connect = () => {
-        void delay(1200).then(() => {
-          if (fail === 'verify') {
-            reject(new Error('Unable to connect. Try again.'));
-            return;
-          }
-          onVerified?.(id);
-          resolve();
-        });
-      };
-    });
-    return { method: 'sso', verified, cancel: () => undefined, connect: () => connect() };
-  };
+  const startSso = (id: string): UserProfileEmailVerification => ({
+    method: 'sso',
+    connect: async () => {
+      await delay(1200);
+      if (fail === 'verify') {
+        throw new Error('Unable to connect. Try again.');
+      }
+      onVerified?.(id);
+    },
+  });
 
   const verifier = (id: string): UserProfileEmailVerifier => ({
     start: () => {

@@ -35,6 +35,7 @@ type Event =
   | { type: 'START'; emailAddress: string; verifier: UserProfileEmailVerifier }
   | { type: 'VERIFIED' }
   | { type: 'CANCEL' }
+  | { type: 'CONNECT' }
   | { type: 'RESEND' }
   | { type: 'TICK' };
 
@@ -94,13 +95,14 @@ const machine = createMachine({
         error: undefined,
       })),
       always: ({ context }) => {
-        if (context.verification?.method === 'code') {
+        const method = context.verification?.method;
+        if (method === 'code') {
           return { target: 'sending' };
         }
-        return {
-          target: 'waiting',
-          context: { resendSeconds: context.verification?.method === 'link' ? LINK_RESEND_SECONDS : 0 },
-        };
+        if (method === 'sso') {
+          return { target: 'connecting' };
+        }
+        return { target: 'waiting', context: { resendSeconds: method === 'link' ? LINK_RESEND_SECONDS : 0 } };
       },
     },
     sending: {
@@ -115,13 +117,22 @@ const machine = createMachine({
     waiting: {
       on: { CANCEL: 'idle', TICK: tick, RESEND: resend },
       invoke: fromPromise(
-        context =>
-          context.verification && context.verification.method !== 'code'
-            ? context.verification.verified
-            : missingDependency(),
+        context => (context.verification?.method === 'link' ? context.verification.verified : missingDependency()),
         {
           onDone: 'idle',
           onError: { actions: fail },
+        },
+      ),
+    },
+    connecting: {
+      on: { CANCEL: 'idle', CONNECT: 'redirecting' },
+    },
+    redirecting: {
+      invoke: fromPromise(
+        context => (context.verification?.method === 'sso' ? context.verification.connect() : missingDependency()),
+        {
+          onDone: 'connecting',
+          onError: { target: 'connecting', actions: fail },
         },
       ),
     },
@@ -160,7 +171,7 @@ export function useUserProfileAddEmailController({
   });
   const state = snapshot.value;
   const open = state !== 'idle';
-  const waitingFor = state === 'waiting' && verification?.method !== 'code' ? verification : undefined;
+  const waitingFor = state === 'waiting' && verification?.method === 'link' ? verification : undefined;
   useEffect(() => waitingFor?.cancel, [waitingFor]);
   useEffect(() => {
     if (!open || resendSeconds === 0) {
@@ -184,7 +195,7 @@ export function useUserProfileAddEmailController({
     canSubmitEmail: emailForm.canSubmit || emailForm.isSubmitting,
     code: codeForm.values.code,
     errorMessage: formError?.message ?? form.error ?? machineError,
-    isPending: form.isSubmitting,
+    isPending: form.isSubmitting || state === 'redirecting',
     onOpenChange: open => {
       if (form.isSubmitting) {
         return;
@@ -216,11 +227,7 @@ export function useUserProfileAddEmailController({
         send({ type: 'RESEND' });
       }
     },
-    onConnect: () => {
-      if (verification?.method === 'sso') {
-        verification.connect();
-      }
-    },
+    onConnect: () => send({ type: 'CONNECT' }),
     onVerifyEmail: (emailAddress, verifier) => {
       codeForm.reset();
       send({ type: 'START', emailAddress, verifier });

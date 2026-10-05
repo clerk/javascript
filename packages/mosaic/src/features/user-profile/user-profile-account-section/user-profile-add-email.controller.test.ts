@@ -265,33 +265,24 @@ describe('useUserProfileAddEmailController', () => {
     expect(result.current.open).toBe(true);
   });
 
-  it('connects through the SSO provider, closes once verified, and stops waiting when closed', async () => {
-    const verified = createDeferredPromise();
-    const cancel = vi.fn();
-    const connect = vi.fn();
-    const email = verifier(() => ({
-      method: 'sso',
-      verified: verified.promise.then(() => undefined),
-      cancel,
-      connect,
-    }));
+  it('connects once per click and stays on the SSO step when connecting fails', async () => {
+    const connect = vi.fn(() => Promise.reject(saveError('Connection unavailable')));
+    const email = verifier(() => ({ method: 'sso', connect }));
     const { result } = renderHook(() => useUserProfileAddEmailController({}));
 
     act(() => result.current.onVerifyEmail('person@acme.co', email));
     expect(result.current.step).toBe('sso');
     expect(result.current.resendSeconds).toBe(0);
-    result.current.onConnect();
-    expect(connect).toHaveBeenCalledOnce();
-    act(() => result.current.onOpenChange(false));
-    expect(cancel).toHaveBeenCalledOnce();
 
-    act(() => result.current.onVerifyEmail('person@acme.co', email));
-    await waitFor(() => expect(result.current.step).toBe('sso'));
-    await act(async () => {
-      verified.resolve();
-      await verified.promise;
+    act(() => {
+      result.current.onConnect();
+      result.current.onConnect();
     });
-    expect(result.current.open).toBe(false);
+    expect(connect).toHaveBeenCalledOnce();
+
+    await waitFor(() => expect(result.current.errorMessage).toBe('Connection unavailable'));
+    expect(result.current.step).toBe('sso');
+    expect(result.current.open).toBe(true);
   });
 
   it('moves from the email step straight to the step for the verification method', async () => {

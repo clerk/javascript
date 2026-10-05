@@ -327,7 +327,7 @@ describe('the user profile email addresses', () => {
 
     await manageEmail(actor, 'alice@acme.co', 'Verify');
     const dialog = await screen.findByRole('dialog', { name: 'Verify your email' });
-    await waitFor(() => expect(dialog).toHaveTextContent('acme.co'));
+    expect(dialog).toHaveTextContent('acme.co');
     expect(screen.queryByRole('textbox', { name: 'Verification code' })).not.toBeInTheDocument();
     await actor.click(within(dialog).getByRole('button', { name: 'Connect' }));
 

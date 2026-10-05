@@ -38,7 +38,7 @@ export type UserProfilePhone = UserProfileContact;
 export type UserProfileEmailVerification =
   | { method: 'code'; sent: Promise<void> }
   | { method: 'link'; verified: Promise<void>; cancel: () => void }
-  | { method: 'sso'; verified: Promise<void>; cancel: () => void; connect: () => void };
+  | { method: 'sso'; connect: () => Promise<void> };
 
 export interface UserProfileEmailVerifier {
   start: () => UserProfileEmailVerification;

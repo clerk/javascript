@@ -91,6 +91,7 @@ export function UserProfileAddEmailDialog(props: UserProfileAddEmailDialogProps)
                   <VerifySsoStep
                     emailAddress={current.emailAddress}
                     onConnect={current.onConnect}
+                    isPending={current.isPending}
                     errorMessage={current.errorMessage}
                   />
                 </Flow.Step>
@@ -319,6 +320,7 @@ function VerifyLinkStep(props: VerifyLinkStepProps) {
 interface VerifySsoStepProps {
   emailAddress: string;
   onConnect: () => void;
+  isPending?: boolean;
   errorMessage?: string;
 }
 
@@ -359,6 +361,7 @@ function VerifySsoStep(props: VerifySsoStepProps) {
             <Button
               type='button'
               size='sm'
+              disabled={props.isPending}
               onClick={props.onConnect}
             >
               {m.sso.connect}

@@ -98,23 +98,30 @@ function startEmailVerification(
   router: MosaicRouter,
 ): UserProfileEmailVerification {
   if (email.matchesSsoConnection) {
-    const { startEnterpriseSSOLinkFlow, cancelEnterpriseSSOLinkFlow } = email.createEnterpriseSSOLinkFlow();
     return {
       method: 'sso',
       /*
+        Prepared on the click rather than on entering the step, so the redirect URL the server
+        answers with is in hand by the time we navigate. Preparing on entry leaves the button live
+        before the response lands, and an early click has nowhere to go.
+
         TODO: carry the mounting mode back from the IdP. Legacy appends `appendModalState` to this
         redirect when the profile is mounted as a modal, so returning from the provider reopens the
         modal on the step the user left. Mosaic has no modal mode to encode yet; whoever adds one has
         to encode it here too, or the user comes back to a closed dialog and a lost flow.
       */
-      verified: save(() => startEnterpriseSSOLinkFlow({ redirectUrl: window.location.href })),
-      cancel: cancelEnterpriseSSOLinkFlow,
-      connect: () => {
-        const url = email.verification.externalVerificationRedirectURL;
-        if (url) {
-          void router.navigate(url.href);
-        }
-      },
+      connect: () =>
+        save(async () => {
+          const prepared = await email.prepareVerification({
+            strategy: 'enterprise_sso',
+            redirectUrl: window.location.href,
+          });
+          const url = prepared.verification.externalVerificationRedirectURL;
+          if (!url) {
+            throw new Error('Enterprise SSO verification did not return a redirect URL');
+          }
+          await router.navigate(url.href);
+        }),
     };
   }
   if (linkRedirectUrl === undefined) {
