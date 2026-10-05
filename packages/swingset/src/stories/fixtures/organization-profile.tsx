@@ -1,7 +1,7 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
-import { OrganizationProfileDangerSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.view';
 import { OrganizationProfileSaveError } from '@clerk/mosaic/features/organization-profile/organization-profile.types';
 import type { OrganizationProfileViewProps } from '@clerk/mosaic/features/organization-profile/organization-profile.view';
+import { OrganizationProfileDangerSectionView } from '@clerk/mosaic/features/organization-profile/organization-profile-danger-section/organization-profile-danger-section.view';
 import { useState } from 'react';
 
 import { useChaosFixture } from '@/components/ChaosProvider';
