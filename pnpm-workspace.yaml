@@ -69,6 +69,9 @@ overrides:
 minimumReleaseAge: 2880
 minimumReleaseAgeExclude:
   - '@clerk/*'
+  - '@e2e-dev/mobile@0.8.1'
+  - 'agent-device@0.21.18'
+  - 'e2e@0.15.1'
   - '@tanstack/react-router@1.170.41'
   - '@tanstack/router-core@1.171.34'
   - '@tanstack/router-generator@1.167.40'
