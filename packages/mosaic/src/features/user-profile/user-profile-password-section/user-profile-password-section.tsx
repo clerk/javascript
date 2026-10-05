@@ -52,6 +52,8 @@ export function useUserProfilePasswordSlot({
 function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { status: 'ready' }> }) {
   const m = useMessages('userProfilePasswordSection');
   const controller = useUserProfileEditPasswordController({
+    hasPassword: model.mode === 'change',
+    identifier: model.identifier,
     validatePassword: model.validatePassword,
     requiresCurrentPassword: model.requiresCurrentPassword,
     onSubmit: model.updatePassword,
@@ -59,23 +61,23 @@ function PasswordEditor({ model }: { model: Extract<UserProfilePasswordModel, { 
 
   return (
     <UserProfilePasswordSectionView
-      hasPassword={model.mode === 'change'}
+      hasPassword={controller.hasPassword}
       action={
         <UserProfileEditPasswordDialog
           form={controller.form}
           passwordFeedback={controller.passwordFeedback}
-          identifier={model.identifier}
+          identifier={controller.identifier}
           open={controller.isOpen}
           onOpenChange={controller.onOpenChange}
-          hasPassword={model.mode === 'change'}
-          requiresCurrentPassword={model.requiresCurrentPassword}
+          hasPassword={controller.hasPassword}
+          requiresCurrentPassword={controller.requiresCurrentPassword}
           trigger={
             <Button
               color='neutral'
               size='sm'
               variant='outline'
             >
-              {model.mode === 'change' ? m.change : m.set}
+              {controller.hasPassword ? m.change : m.set}
             </Button>
           }
         />

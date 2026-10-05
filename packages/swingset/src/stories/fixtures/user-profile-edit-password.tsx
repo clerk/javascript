@@ -25,6 +25,7 @@ export function useUserProfileEditPasswordFixture({
   const [hasPassword, setHasPassword] = useState(initialHasPassword);
   const [hasFailed, setHasFailed] = useState(false);
   const controller = useUserProfileEditPasswordController({
+    hasPassword,
     requiresCurrentPassword: hasPassword && requiresCurrentPassword,
     onSubmit: async (_value: UserProfileEditPasswordValue) => {
       await new Promise(resolve => setTimeout(resolve, latency));
@@ -37,21 +38,21 @@ export function useUserProfileEditPasswordFixture({
   });
 
   return {
-    hasPassword,
+    hasPassword: controller.hasPassword,
     action: (
       <UserProfileEditPasswordDialog
         form={controller.form}
-        hasPassword={hasPassword}
+        hasPassword={controller.hasPassword}
         open={controller.isOpen}
         onOpenChange={controller.onOpenChange}
-        requiresCurrentPassword={requiresCurrentPassword}
+        requiresCurrentPassword={controller.requiresCurrentPassword}
         trigger={
           <Button
             color='neutral'
             size='sm'
             variant='outline'
           >
-            {hasPassword ? m.change : m.set}
+            {controller.hasPassword ? m.change : m.set}
           </Button>
         }
       />

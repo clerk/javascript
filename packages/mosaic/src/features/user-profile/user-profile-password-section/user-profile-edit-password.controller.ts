@@ -19,12 +19,17 @@ const initialValues: UserProfileEditPasswordValues = {
 };
 
 export interface UserProfileEditPasswordControllerOptions {
+  hasPassword?: boolean;
+  identifier?: string;
   requiresCurrentPassword?: boolean;
   onSubmit: (value: UserProfileEditPasswordValue) => Promise<unknown>;
   validatePassword?: (password: string) => Promise<FieldFeedback | undefined>;
 }
 
 export interface UserProfileEditPasswordController {
+  hasPassword: boolean;
+  identifier: string;
+  requiresCurrentPassword: boolean;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   form: UseFormResult<UserProfileEditPasswordValues>;
@@ -32,6 +37,8 @@ export interface UserProfileEditPasswordController {
 }
 
 export function useUserProfileEditPasswordController({
+  hasPassword = false,
+  identifier = '',
   requiresCurrentPassword = false,
   onSubmit,
   validatePassword,
@@ -84,5 +91,5 @@ export function useUserProfileEditPasswordController({
     setIsOpen(open);
   };
 
-  return { isOpen, onOpenChange, form, passwordFeedback };
+  return { hasPassword, identifier, requiresCurrentPassword, isOpen, onOpenChange, form, passwordFeedback };
 }
