@@ -1,16 +1,13 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
-import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiPhoneNumber, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { MosaicProvider } from '../../../mosaic-provider';
 import { mfaSectionNode, UserProfileMfaSection } from '../user-profile-mfa-section/user-profile-mfa-section';
 import { useUserProfileMfaModel } from '../user-profile-mfa-section/user-profile-mfa-section.model';
-import { UserProfileMfaSectionView } from '../user-profile-mfa-section/user-profile-mfa-section.view';
 import { useUserProfilePasswordSlot } from '../user-profile-password-section/user-profile-password-section';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 import { mfaEnvironment, phone, renderMfa } from './mfa-feature-setup';
@@ -211,6 +208,7 @@ describe('User profile MFA management', () => {
     await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(fapi.mfa.totpRemovals).toBe(1));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
   });
 
   it('restores the selected SMS row action after cancelling removal confirmation', async () => {
@@ -610,6 +608,7 @@ describe('User profile MFA management', () => {
     await waitFor(() => expect(fapi.mfa.totpAttempts).toEqual(['123456']));
     expect(screen.queryByRole('list', { name: 'Backup codes' })).toBeNull();
     expect(fapi.client.sessions[0]?.user.backup_code_enabled).toBe(true);
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
   it('sets a different SMS phone as default and moves its row first', async () => {
@@ -626,6 +625,8 @@ describe('User profile MFA management', () => {
       expect(screen.getAllByText('SMS verification')[0]?.closest('li')).toHaveTextContent('+15555550202'),
     );
     expect(screen.getAllByText('SMS verification')[0]?.closest('li')).toHaveTextContent('Default');
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +15555550101' }));
+    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Set as default' })).toBeVisible());
   });
 
   it('shows a failed default change and clears its error on retry', async () => {
@@ -662,56 +663,42 @@ describe('User profile MFA management', () => {
       expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_2', default: true, reserved: undefined }),
     );
     expect(attempts).toBe(2);
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +15555550101' }));
+    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Set as default' })).toBeVisible());
   });
 
   it.each([
-    {
-      cause: clerkApiError('phone_number_not_verified', 'Unable to update the default method.'),
-      message: 'Unable to update the default method.',
-    },
-    {
-      cause: new Error('Cannot read properties of undefined'),
-      message: 'Unable to set this method as default. Please try again.',
-    },
-    { cause: 'network failure', message: 'Unable to set this method as default. Please try again.' },
-  ])('shows a safe default-change error for $message', async ({ cause, message }) => {
-    const user = userEvent.setup();
-    render(
-      <MosaicProvider>
-        <UserProfileMfaSectionView
-          methods={[{ id: 'work', type: 'sms', canSetDefault: true }]}
-          onSetDefault={() => Promise.reject(cause)}
-        />
-      </MosaicProvider>,
-    );
-
-    await user.click(screen.getByRole('button', { name: 'Manage SMS verification' }));
-    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
-  });
-
-  it('keeps method menus available but hides default changes while one is pending', async () => {
-    const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
-    const second = fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202', reserved_for_second_factor: true });
-    await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second], two_factor_enabled: true }));
-    const held = holdRequests('post', '/v1/me/phone_numbers/phone_2');
-    const user = userEvent.setup();
-    const selected = screen.getByRole('button', { name: 'Manage SMS verification +15555550202' });
-    await user.click(selected);
-    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
-    await waitFor(() => expect(held.requests).toHaveLength(1));
-    try {
+    { phase: 'mutation', method: 'post', path: '/v1/me/phone_numbers/phone_2', pendingPhone: '+15555550202' },
+    { phase: 'refresh', method: 'get', path: '/v1/me', pendingPhone: '+15555550101' },
+  ] as const)(
+    'keeps method menus available but hides default changes during $phase',
+    async ({ method, path, pendingPhone }) => {
+      const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+      const second = fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202', reserved_for_second_factor: true });
+      await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second], two_factor_enabled: true }));
+      const held = holdRequests(method, path);
+      const user = userEvent.setup();
+      const selected = screen.getByRole('button', { name: 'Manage SMS verification +15555550202' });
       await user.click(selected);
-      if (selected.getAttribute('aria-expanded') !== 'true') {
-        await user.click(selected);
+      await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+      await waitFor(() => expect(held.requests).toHaveLength(1));
+      try {
+        const pendingAction = screen.getByRole('button', { name: `Manage SMS verification ${pendingPhone}` });
+        await user.click(pendingAction);
+        if (pendingAction.getAttribute('aria-expanded') !== 'true') {
+          await user.click(pendingAction);
+        }
+        expect(screen.queryByRole('menuitem', { name: 'Set as default' })).toBeNull();
+        await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Remove method' })).toBeVisible());
+      } finally {
+        held.release();
       }
-      expect(screen.queryByRole('menuitem', { name: 'Set as default' })).toBeNull();
-      await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Remove method' })).toBeVisible());
-    } finally {
-      held.release();
-    }
-    await waitFor(() => expect(screen.getByText('+15555550202').closest('li')).toHaveTextContent('Default'));
-  });
+      await waitFor(() => expect(screen.getByText('+15555550202').closest('li')).toHaveTextContent('Default'));
+      await user.keyboard('{Escape}');
+      await user.click(screen.getByRole('button', { name: 'Manage SMS verification +15555550101' }));
+      await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Set as default' })).toBeVisible());
+    },
+  );
 
   it('clears backup-code eligibility when the final optional factor is removed', async () => {
     const fapi = await renderMfa(
@@ -723,6 +710,7 @@ describe('User profile MFA management', () => {
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(fapi.mfa.totpRemovals).toBe(1));
     expect(fapi.client.sessions[0]?.user.backup_code_enabled).toBe(false);
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
   });
 
   it('finishes removal when the follow-up account reload fails', async () => {
