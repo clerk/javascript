@@ -1,9 +1,12 @@
+// TODO: Seed this catalog from the unstable__errors entries in @clerk/localizations so existing copy and translations carry over.
 export const errorMessages: { readonly generic: string } & Readonly<Record<string, string>> = {
   generic: 'Something went wrong. Please try again.',
   action_blocked: "This action couldn't be completed. Please try again later or contact support if this persists.",
   avatar_file_count_exceeded: 'Only one file can be uploaded at a time.',
   avatar_file_size_exceeded: 'File size exceeds the maximum limit of 10MB. Please choose a smaller file.',
   avatar_file_type_invalid: 'File type not supported. Please upload a JPG, PNG, GIF, or WEBP image.',
+  connected_account_unavailable: 'This connected account is no longer available.',
+  enterprise_connection_unavailable: 'This enterprise connection is no longer available.',
   form_new_password_matches_current: 'New password cannot be the same as the current password.',
   form_password_incorrect: 'Your current password is incorrect.',
   form_password_length_too_short: 'Your password is too short. It must be at least 8 characters long.',
@@ -17,4 +20,6 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   form_password_validation_failed: 'Incorrect Password',
   form_username_invalid_length: 'Your username must be between {min_length} and {max_length} characters long.',
   form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
+  network_error: 'Unable to reach the server. Check your connection and try again.',
+  oauth_missing_verification_url: 'The connection could not start. Please try again.',
 };

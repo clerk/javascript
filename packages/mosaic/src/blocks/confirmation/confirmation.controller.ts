@@ -1,9 +1,12 @@
+import type { ErrorDescription } from '../../localization';
+import { useErrorText } from '../../localization';
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
+import { toLocalizableError } from '../../utils/errors';
 
 export interface ConfirmationContext {
   run: () => Promise<void>;
-  error: string | undefined;
+  error: ErrorDescription | undefined;
 }
 
 export type ConfirmationEvent = { type: 'OPEN' } | { type: 'CONFIRM'; run: () => Promise<void> } | { type: 'CANCEL' };
@@ -12,10 +15,6 @@ const { createMachine, assign, fromPromise } = setup<ConfirmationContext, Confir
 
 function notSeated(): Promise<never> {
   return Promise.reject(new Error('confirmation run is not seated'));
-}
-
-function toMessage(cause: unknown): string {
-  return cause instanceof Error ? cause.message : 'Something went wrong. Please try again.';
 }
 
 export const confirmationMachine = createMachine({
@@ -42,7 +41,7 @@ export const confirmationMachine = createMachine({
         onDone: { target: 'idle', actions: assign(() => ({ error: undefined })) },
         onError: {
           target: 'confirming',
-          actions: assign((_, event) => ({ error: toMessage(event.error) })),
+          actions: assign((_, event) => ({ error: toLocalizableError(event.error) })),
         },
       }),
     },
@@ -57,14 +56,23 @@ export interface ConfirmationController {
   errorMessage: string | undefined;
 }
 
-export function useConfirmationController(): ConfirmationController {
+export interface ConfirmationControllerOptions {
+  /** Copy shown when the action fails without an error Clerk can describe, such as a network or code fault (default: the generic error) */
+  errorFallback?: string;
+}
+
+export function useConfirmationController({
+  errorFallback,
+}: ConfirmationControllerOptions = {}): ConfirmationController {
   const [snapshot, send] = useMachine(confirmationMachine);
+  const errorText = useErrorText();
+  const { error } = snapshot.context;
 
   return {
     isOpen: snapshot.value === 'confirming' || snapshot.value === 'pending',
     onOpenChange: open => send({ type: open ? 'OPEN' : 'CANCEL' }),
     onConfirm: run => send({ type: 'CONFIRM', run }),
     isConfirming: snapshot.value === 'pending',
-    errorMessage: snapshot.context.error,
+    errorMessage: error ? errorText(error, errorFallback) : undefined,
   };
 }

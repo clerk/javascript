@@ -95,6 +95,7 @@ function createErrorMessage(
       return m.nameTakenError;
     }
   }
+  // TODO: Move the token_quota_exceeded and token_creation_conflict copy into the errors catalog, let the model propagate Clerk errors, and give useForm an errorFallback so m.createError replaces the raw message.
   return error instanceof Error ? error.message : m.createError;
 }
 

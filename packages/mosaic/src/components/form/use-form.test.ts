@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
 import { deferred, tick } from '../../__tests__/async';
-import { SaveError } from '../../utils/form-error';
+import { SaveError } from '../../utils/errors';
 import type { FieldFeedback } from './form-submit-error';
 import { FormSubmitError } from './form-submit-error';
 import { useForm } from './use-form';
@@ -146,7 +146,7 @@ describe('useForm', () => {
         await tick();
       });
       expect(result.current.error).toBe('Something went wrong. Please try again.');
-      expect(log).toHaveBeenCalledWith(cause);
+      expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', cause);
     }
     log.mockRestore();
   });
