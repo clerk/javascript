@@ -1,13 +1,15 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { fapiUrl, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnvironment, fapiPasskey, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfilePasskeysSection } from '../user-profile-passkeys-section/user-profile-passkeys-section';
+
+afterEach(() => vi.restoreAllMocks());
 
 function servePasskeys() {
   const environment = fapiEnvironment();
@@ -21,6 +23,31 @@ function servePasskeys() {
 }
 
 describe('Validating a passkey name', () => {
+  it('uses the localized Form fallback for an unknown rename failure and preserves the draft', async () => {
+    servePasskeys();
+    const { clerk } = await renderWithClerk(
+      <MosaicProvider localization={{ messages: { form: { error: 'Impossible de sauvegarder.' } } }}>
+        <UserProfilePasskeysSection />
+      </MosaicProvider>,
+    );
+    const passkey = clerk.user?.passkeys[0];
+    if (!passkey) {
+      throw new Error('Expected the signed-in passkey');
+    }
+    vi.spyOn(passkey, 'update').mockRejectedValue(new Error('Private native failure'));
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
+    const input = screen.getByRole('textbox', { name: 'Passkey name' });
+    await user.type(input, ' renamed');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Impossible de sauvegarder.'));
+    expect(screen.queryByText('Private native failure')).toBeNull();
+    expect(input).toHaveValue('Laptop renamed');
+    expect(screen.getByRole('dialog')).toBeVisible();
+    expect(input).not.toHaveAttribute('aria-invalid', 'true');
+  });
+
   it('marks localized server name errors on the field and clears them when the draft changes', async () => {
     servePasskeys();
     worker.use(

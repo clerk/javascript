@@ -422,9 +422,17 @@ describe('Removing a passkey', () => {
     expect(fapi.client.sessions[0]?.user.passkeys).toEqual([]);
   });
 
-  it('keeps confirmation open on verification-required errors and retries manually', async () => {
+  it('keeps confirmation open on localized verification-required errors and retries manually', async () => {
     const fapi = servePasskeys();
-    await renderWithClerk(<UserProfilePasskeysSection />);
+    await renderWithClerk(
+      <MosaicProvider
+        localization={{
+          messages: { errors: { session_reverification_required: 'Veuillez confirmer votre identité.' } },
+        }}
+      >
+        <UserProfilePasskeysSection />
+      </MosaicProvider>,
+    );
     const removal = holdRequests('post', '/v1/me/passkeys/pk_1');
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Manage Laptop' }));
@@ -432,7 +440,7 @@ describe('Removing a passkey', () => {
     await user.click(screen.getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(removal.requests).toHaveLength(1));
     removal.fail('session_reverification_required');
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('session_reverification_required'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Veuillez confirmer votre identité.'));
     expect(screen.getByRole('alertdialog')).toBeVisible();
     expect(screen.queryByLabelText('Password')).toBeNull();
     expect(removal.requests).toHaveLength(1);

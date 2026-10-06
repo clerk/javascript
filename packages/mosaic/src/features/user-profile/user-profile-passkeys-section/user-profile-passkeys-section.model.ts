@@ -1,11 +1,11 @@
 import { formatRelative } from '@clerk/shared/date';
-import { isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, PasskeyResource, UserResource } from '@clerk/shared/types';
 
 import { FormSubmitError } from '../../../components/form';
 import { getMosaicEnvironment, useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
-import { fill, useErrorText, useLocale, useMessages } from '../../../localization';
+import { fill, useLocale, useMessages } from '../../../localization';
+import { save, SaveError } from '../../../utils/errors';
 import type {
   UserProfilePasskey,
   UserProfilePasskeyNameValidator,
@@ -87,7 +87,6 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
   const environment = useMosaicEnvironment();
   const locale = useLocale();
   const messages = useMessages('userProfilePasskeys');
-  const errorText = useErrorText();
   const validateName: UserProfilePasskeyNameValidator = name =>
     new TextEncoder().encode(name).length > 256 ? { type: 'error', message: messages.nameTooLongError } : undefined;
 
@@ -115,29 +114,12 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
       clerk.session?.id !== sessionId ||
       getPasskeysProjection(current, currentEnvironment, clerk.isSatellite).status === 'hidden'
     ) {
-      throw new FormSubmitError({ message: messages.accountUnavailableError });
+      throw new SaveError({
+        global: { code: 'passkey_account_unavailable', message: messages.accountUnavailableError },
+      });
     }
     return current;
   };
-
-  function actionError(error: unknown): Error {
-    if (isClerkAPIResponseError(error)) {
-      const first = error.errors[0];
-      return new Error(
-        errorText({
-          code: first?.code,
-          paramName: first?.meta?.paramName,
-          message: first?.longMessage || first?.message || messages.saveError,
-        }),
-      );
-    }
-    return new Error(
-      errorText({
-        code: isClerkRuntimeError(error) ? error.code : undefined,
-        message: error instanceof Error && error.message ? error.message : messages.saveError,
-      }),
-    );
-  }
 
   function formatPasskeyDate(date: Date): string {
     const relative = formatRelative({ date, relativeTo: new Date() });
@@ -170,13 +152,11 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
       ? async () => {
           const current = currentUser();
           if (clerk.isSatellite) {
-            throw new Error(messages.accountUnavailableError);
+            throw new SaveError({
+              global: { code: 'passkey_account_unavailable', message: messages.accountUnavailableError },
+            });
           }
-          try {
-            await current.createPasskey();
-          } catch (error) {
-            throw actionError(error);
-          }
+          await save(() => current.createPasskey());
         }
       : undefined,
     onRename: async (id, name) => {
@@ -188,39 +168,14 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
       if (feedback) {
         throw new FormSubmitError<UserProfileRenamePasskeyValues>({ fields: { name: feedback.message } });
       }
-      try {
-        await passkey.update({ name });
-      } catch (error) {
-        if (!isClerkAPIResponseError(error)) {
-          throw new FormSubmitError({ message: actionError(error).message });
-        }
-        const fields: { name?: string } = {};
-        let message: string | undefined;
-        for (const item of error.errors) {
-          const text = errorText({
-            code: item.code,
-            paramName: item.meta?.paramName,
-            message: item.longMessage || item.message || messages.saveError,
-          });
-          if (item.meta?.paramName === 'name') {
-            fields.name ??= text;
-          } else {
-            message ??= text;
-          }
-        }
-        throw new FormSubmitError<UserProfileRenamePasskeyValues>({ message, fields });
-      }
+      await save(() => passkey.update({ name }), ['name']);
     },
     onRemove: async id => {
       const passkey = currentUser().passkeys.find(candidate => candidate.id === id);
       if (!passkey) {
-        throw new Error(messages.unavailableError);
+        throw new SaveError({ global: { code: 'passkey_unavailable', message: messages.unavailableError } });
       }
-      try {
-        await passkey.delete();
-      } catch (error) {
-        throw actionError(error);
-      }
+      await save(() => passkey.delete());
     },
   };
 }

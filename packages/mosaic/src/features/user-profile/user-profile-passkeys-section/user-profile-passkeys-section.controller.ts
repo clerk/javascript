@@ -1,6 +1,8 @@
-import { useMessages } from '../../../localization';
+import type { ErrorDescription } from '../../../localization';
+import { useErrorText, useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/use-machine';
+import { toLocalizableError } from '../../../utils/errors';
 import type { UserProfilePasskeysModel } from './user-profile-passkeys-section.model';
 
 type PasskeysControllerInput = Pick<
@@ -10,18 +12,17 @@ type PasskeysControllerInput = Pick<
 
 interface Context {
   run: () => Promise<unknown>;
-  error: string | undefined;
-  fallbackErrorMessage: string;
+  error: ErrorDescription | undefined;
 }
 
-type Event = { type: 'ADD'; run: () => Promise<unknown>; fallbackErrorMessage: string };
+type Event = { type: 'ADD'; run: () => Promise<unknown> };
 
 const { createMachine, assign, fromPromise } = setup<Context, Event>();
 
 const machine = createMachine({
   id: 'createPasskey',
   initial: 'idle',
-  context: { run: () => Promise.resolve(), error: undefined, fallbackErrorMessage: '' },
+  context: { run: () => Promise.resolve(), error: undefined },
   states: {
     idle: {
       on: {
@@ -30,7 +31,6 @@ const machine = createMachine({
           actions: assign((_, event) => ({
             run: event.run,
             error: undefined,
-            fallbackErrorMessage: event.fallbackErrorMessage,
           })),
         },
       },
@@ -40,10 +40,7 @@ const machine = createMachine({
         onDone: { target: 'idle' },
         onError: {
           target: 'idle',
-          actions: assign((context, event) => ({
-            error:
-              event.error instanceof Error && event.error.message ? event.error.message : context.fallbackErrorMessage,
-          })),
+          actions: assign((_, event) => ({ error: toLocalizableError(event.error) })),
         },
       }),
     },
@@ -58,12 +55,13 @@ export function useUserProfilePasskeysSectionController({
   onRemove,
 }: PasskeysControllerInput) {
   const messages = useMessages('userProfilePasskeys');
+  const errorText = useErrorText();
   const [snapshot, send] = useMachine(machine);
   return {
     passkeys,
     isAdding: snapshot.value === 'creating',
-    addError: snapshot.context.error,
-    onAdd: onAdd ? () => send({ type: 'ADD', run: onAdd, fallbackErrorMessage: messages.saveError }) : undefined,
+    addError: snapshot.context.error ? errorText(snapshot.context.error, messages.saveError) : undefined,
+    onAdd: onAdd ? () => send({ type: 'ADD', run: onAdd }) : undefined,
     onRename,
     validateName,
     onRemove,

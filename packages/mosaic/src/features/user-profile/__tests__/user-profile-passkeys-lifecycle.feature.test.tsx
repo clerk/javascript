@@ -69,6 +69,35 @@ function authenticator() {
   });
 }
 
+describe('Passkey action errors', () => {
+  it('hides an unknown Add failure and updates the fallback when localization changes', async () => {
+    serveAccounts();
+    const view = await renderWithClerk(
+      <MosaicProvider
+        localization={{ messages: { userProfilePasskeys: { saveError: 'Could not add this passkey.' } } }}
+      >
+        <UserProfilePasskeysSection />
+      </MosaicProvider>,
+    );
+    const current = view.clerk.user;
+    if (!current) {
+      throw new Error('Expected the signed-in user');
+    }
+    vi.spyOn(current, 'createPasskey').mockRejectedValue(new Error('Private authenticator details'));
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Add passkey' }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Could not add this passkey.'));
+    expect(screen.queryByText('Private authenticator details')).toBeNull();
+    view.rerender(
+      <MosaicProvider
+        localization={{ messages: { userProfilePasskeys: { saveError: 'Impossible de créer cette clé.' } } }}
+      >
+        <UserProfilePasskeysSection />
+      </MosaicProvider>,
+    );
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Impossible de créer cette clé.'));
+  });
+});
+
 describe('Changing the active passkey account', () => {
   it('clears the previous account Add error after a user switch', async () => {
     serveAccounts();
