@@ -998,4 +998,7 @@ describe('connected accounts', () => {
   // TODO: Revisit sharing connected-account scope and reconnect helpers with the legacy UI.
   // TODO: Replace the OAuth redirect timeout once routing can reliably signal when navigation completes or stops.
   // Revisit awaiting Mosaic navigation as part of that routing work.
+  // TODO: Restore the UserProfile modal after OAuth returns. `mode` currently only preserves
+  // legacy callback URL state. When the Mosaic modal host is wired up, consider replacing
+  // `mode` with an optional host callback that prepares the redirect URL.
 });
