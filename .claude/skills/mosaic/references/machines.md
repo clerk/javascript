@@ -42,13 +42,19 @@ deleting: {
     onDone: 'deleted',
     onError: {
       target: 'confirming',
-      actions: assign((_, event) => ({
-        errorMessage: event.error instanceof Error ? event.error.message : 'Something went wrong.',
-      })),
+      actions: assign((_, event) => ({ error: toLocalizableError(event.error) })),
     },
   }),
 }
 ```
+
+A machine whose surface shows no error yet still logs it, so a failure is never
+silent: `onError: { target: 'idle', actions: [assign(() => settled), (_, event) => console.error('[Clerk] User button action failed', event.error)] }`
+(`user-button.controller.tsx`).
+
+Context holds the `ErrorDescription`, never copy. The controller turns it into
+text at render with `errorText(error, errorFallback)`, so locale changes and
+overrides still apply (see `controllers.md` → "Errors").
 
 To wire it to Clerk data see `models.md`; to render its state see `views.md`; to
 test it see `testing.md`; to migrate a legacy component into this pattern see

@@ -25,7 +25,7 @@ import { styles } from './field.styles';
 function useNativeLabelWarning(label: HTMLElement | null) {
   React.useEffect(() => {
     if (process.env.NODE_ENV !== 'production' && label && label.tagName !== 'LABEL') {
-      console.warn('[clerk] <Field.Label> must render a native `<label>` element.');
+      console.warn('[Clerk] <Field.Label> must render a native `<label>` element.');
     }
   }, [label]);
 }
