@@ -68,14 +68,18 @@ same fill, `--cl-color-neutral-alpha-200`.
   `Section.Actions skeleton` exists because a 28px `sm` menu trigger outgrew a 20px
   line.
 - **Width and wrapping come from the mock text.** Each line's band is as wide as
-  that line of mock text and as tall as the font's text box (ascender to
-  descender), whatever font is in use. Nothing is measured.
+  that line of mock text. Nothing is measured.
+- **Band height:** 75% of the font's text box (ascender to descender), centered on
+  each line, so stacked lines keep a visible gap. A pill radius on the span softens
+  the ends; CSS can't shrink an inline box itself, and `clip-path` clips the whole
+  span rather than each line, so a sized background layer is the only per-line
+  option.
 
 ## The shimmer
 
 Modeled on React Spectrum's `Skeleton`, with no JavaScript: a highlight one bone wide,
 peaking in the middle, sweeps left to right across two bone widths, over 1.6s
-`ease-in-out`, repeating. Off under `prefers-reduced-motion: reduce`, leaving the
+`--cl-ease-in-out`, repeating. Off under `prefers-reduced-motion: reduce`, leaving the
 plain fill.
 
 - **Blocks** (media, the avatar) move an `::after` overlay with `transform`
