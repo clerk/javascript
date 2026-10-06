@@ -1,5 +1,4 @@
 import { useClerk } from '@clerk/shared/react';
-import React from 'react';
 
 import { withCardStateProvider } from '@/ui/elements/contexts';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
@@ -14,6 +13,7 @@ import { SignInFactorTwoEmailLinkCard } from './SignInFactorTwoEmailLinkCard';
 import { SignInFactorTwoPhoneCodeCard } from './SignInFactorTwoPhoneCodeCard';
 import { SignInFactorTwoTOTPCard } from './SignInFactorTwoTOTPCard';
 import { useSecondFactorSelection } from './useSecondFactorSelection';
+import { useSignInStepGuard } from './useSignInStepGuard';
 
 function SignInFactorTwoInternal(): JSX.Element {
   const clerk = useClerk();
@@ -31,25 +31,22 @@ function SignInFactorTwoInternal(): JSX.Element {
   const onShowAlternativeMethodsClicked =
     signIn.supportedSecondFactors && signIn.supportedSecondFactors.length > 1 ? toggleAllStrategies : undefined;
 
-  React.useEffect(() => {
-    if (clerk.__internal_setActiveInProgress) {
-      return;
+  const leaveFactorTwo = () => {
+    // If the user is already signed in (e.g. multi-session app, page reload after
+    // successful verification), redirect forward to afterSignInUrl instead of
+    // back to sign-in start.
+    if (clerk.isSignedIn) {
+      void router.navigate(afterSignInUrl);
+    } else {
+      void router.navigate('../');
     }
+  };
 
-    // If the sign-in doesn't need second factor verification, redirect away.
-    // Don't redirect for 'complete' status - setActive will handle navigation.
-    if (signIn.status === null || signIn.status === 'needs_identifier' || signIn.status === 'needs_first_factor') {
-      // If the user is already signed in (e.g. multi-session app, page reload after
-      // successful verification), redirect forward to afterSignInUrl instead of
-      // back to sign-in start.
-      if (clerk.isSignedIn) {
-        void router.navigate(afterSignInUrl);
-      } else {
-        void router.navigate('../');
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run on mount and when setActiveInProgress changes
-  }, [clerk.__internal_setActiveInProgress]);
+  // Leave if the sign-in no longer needs second-factor verification.
+  useSignInStepGuard({
+    redirectStatuses: ['needs_identifier', 'needs_first_factor'],
+    onLeave: leaveFactorTwo,
+  });
 
   if (!currentFactor) {
     return <LoadingCard />;
