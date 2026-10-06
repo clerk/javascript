@@ -83,7 +83,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   const pageTitleId = React.useId();
   const pageTitleRef = React.useRef<HTMLHeadingElement | null>(null);
   const navTriggerRef = React.useRef<HTMLButtonElement | null>(null);
-  const navItems = navItemsOf(children);
+  const [navItems, setNavItems] = React.useState<React.ReactNode>(null);
   // Scoped to a layout so the replacement sheet never mounts open.
   const [navOpenIn, setNavOpenIn] = React.useState<ProfileNavLayout | null>(null);
   const navOpen = navOpenIn === navLayout;
@@ -111,6 +111,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       value,
       selectPage,
       navItems,
+      setNavItems,
       pageTitleId,
       pageTitleRef,
       navTriggerRef,
@@ -203,9 +204,9 @@ const Title = React.forwardRef<HTMLHeadingElement, ProfileTitleProps>(function P
 
 export type ProfileNavProps = MosaicComponentProps<'nav'>;
 
-type NavItemMode = 'tab' | 'option' | 'label';
+type NavItemMode = 'tab' | 'option';
 
-// `Profile.Nav` children render again as the page title's label and as the select's options.
+// `Profile.Nav` children render again as the select's options.
 const NavItemModeContext = React.createContext<NavItemMode>('tab');
 
 function NavBranding() {
@@ -217,16 +218,19 @@ function NavBranding() {
 }
 
 /**
- * A direct child of `Profile.Root`, with `Profile.NavItem`s as its only children. Wide, they render
- * as a tablist; compact, as the options of the page title's select, or a tablist in a sheet on a
- * phone.
+ * Children are `Profile.NavItem`s only. Wide, they render as a tablist; compact, as the options of
+ * the page title's select, or a tablist in a sheet on a phone.
  */
 const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   { children, render, xstyle, ...rest },
   ref,
 ) {
-  const { titleId, renderBranding, compact, navLayout, navOpen, closeNav, navTriggerRef, inline } =
+  const { titleId, renderBranding, compact, navLayout, navOpen, closeNav, setNavItems, navTriggerRef, inline } =
     useProfileContext('Profile.Nav');
+  useSafeLayoutEffect(() => {
+    setNavItems(children);
+  }, [children, setNavItems]);
+  useSafeLayoutEffect(() => () => setNavItems(null), [setNavItems]);
   const element = useRender({
     defaultTagName: 'nav',
     render,
@@ -276,24 +280,6 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   );
 });
 
-function navItemsOf(children: React.ReactNode): React.ReactNode {
-  for (const child of React.Children.toArray(children)) {
-    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) {
-      continue;
-    }
-    if (child.type === Nav) {
-      return child.props.children;
-    }
-    if (child.type === React.Fragment) {
-      const items = navItemsOf(child.props.children);
-      if (items !== null) {
-        return items;
-      }
-    }
-  }
-  return null;
-}
-
 export interface ProfileNavItemProps extends MosaicComponentProps<'button'> {
   value: string;
   icon?: React.ReactNode;
@@ -307,11 +293,8 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
   { value, icon, badge, disabled, children, render, xstyle, onClick, ...rest },
   ref,
 ) {
-  const { compact, closeNav, value: selected } = useProfileContext('Profile.NavItem');
+  const { compact, closeNav } = useProfileContext('Profile.NavItem');
   const mode = React.useContext(NavItemModeContext);
-  if (mode === 'label') {
-    return value === selected ? children : null;
-  }
   const styleProps = mergeStyleProps(
     themeProps('profile-nav-item'),
     stylex.props(reset.base, styles.navItem, focusOutline.visible, mode === 'option' && styles.navItemOption, xstyle),
@@ -376,7 +359,7 @@ const NavItem = React.forwardRef<HTMLButtonElement, ProfileNavItemProps>(functio
   );
 });
 
-function PageTitle() {
+function PageTitle({ title }: { title: React.ReactNode }) {
   const {
     navLayout,
     navOpen,
@@ -390,11 +373,7 @@ function PageTitle() {
     navTriggerRef,
   } = useProfileContext('Profile.Content');
   const level = useHeadingLevel();
-  const label = (
-    <span id={`${pageTitleId}-label`}>
-      <NavItemModeContext.Provider value='label'>{navItems}</NavItemModeContext.Provider>
-    </span>
-  );
+  const label = <span id={`${pageTitleId}-label`}>{title}</span>;
   const triggerProps = mergeStyleProps(
     themeProps('profile-nav-trigger'),
     stylex.props(reset.base, styles.navTrigger, focusOutline.visible),
@@ -463,11 +442,14 @@ function PageTitle() {
   );
 }
 
-export type ProfileContentProps = MosaicComponentProps<'div'>;
+export interface ProfileContentProps extends MosaicComponentProps<'div'> {
+  /** The selected page's name, shown as the page title. */
+  pageTitle: React.ReactNode;
+}
 
 // A plain `div`, not `main`: the profile often renders inside the host's `main` or a dialog.
 const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function ProfileContent(
-  { children, render, xstyle, ...rest },
+  { pageTitle, children, render, xstyle, ...rest },
   ref,
 ) {
   const { inline, compact, renderBranding } = useProfileContext('Profile.Content');
@@ -494,7 +476,7 @@ const Content = React.forwardRef<HTMLDivElement, ProfileContentProps>(function P
         >
           <div {...mergeStyleProps(themeProps('profile-content-body'), stylex.props(reset.base, styles.contentBody))}>
             <HeadingLevelProvider>
-              <PageTitle />
+              <PageTitle title={pageTitle} />
             </HeadingLevelProvider>
             {children}
             {inline && renderBranding && !compact ? (
@@ -551,7 +533,7 @@ const ContentPanel = React.forwardRef<HTMLDivElement, ProfileContentPanelProps>(
  *   <Profile.Nav>
  *     <Profile.NavItem value='account' icon={<Icon name='user-circle' size='sm' />}>Account</Profile.NavItem>
  *   </Profile.Nav>
- *   <Profile.Content>
+ *   <Profile.Content pageTitle='Account'>
  *     <Profile.ContentPanel value='account'>…</Profile.ContentPanel>
  *   </Profile.Content>
  * </Profile.Root>

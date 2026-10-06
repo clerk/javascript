@@ -17,7 +17,7 @@ describe('Profile SSR', () => {
             <Profile.NavItem value='account'>Account</Profile.NavItem>
             <Profile.NavItem value='security'>Security</Profile.NavItem>
           </Profile.Nav>
-          <Profile.Content>
+          <Profile.Content pageTitle='Security'>
             <Profile.ContentPanel value='account'>Account page</Profile.ContentPanel>
             <Profile.ContentPanel value='security'>Security page</Profile.ContentPanel>
           </Profile.Content>

@@ -181,7 +181,7 @@ function Surface({
           </Profile.NavItem>
         ))}
       </Profile.Nav>
-      <Profile.Content>
+      <Profile.Content pageTitle={pages.find(item => item.id === page)?.label}>
         {pages.map(item => (
           <Profile.ContentPanel
             key={item.id}

@@ -13,6 +13,7 @@ export interface ProfileContextValue {
   value: string;
   selectPage: (value: string) => void;
   navItems: React.ReactNode;
+  setNavItems: (items: React.ReactNode) => void;
   pageTitleId: string;
   pageTitleRef: React.MutableRefObject<HTMLHeadingElement | null>;
   navTriggerRef: React.MutableRefObject<HTMLButtonElement | null>;

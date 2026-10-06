@@ -51,7 +51,8 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
 ) {
   const m = useMessages('userProfile');
   const entries = resolveUserProfilePages(getAvailableUserProfilePages(pages), customPages, pageOrder);
-  const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : entries[0].id;
+  const resolvedEntry = entries.find(entry => entry.id === activePage) ?? entries[0];
+  const resolvedPage = resolvedEntry.id;
 
   return (
     <Profile.Root
@@ -81,7 +82,7 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
           </Profile.NavItem>
         ))}
       </Profile.Nav>
-      <Profile.Content>
+      <Profile.Content pageTitle={resolvedEntry.custom ? resolvedEntry.custom.label : m.pages[resolvedEntry.id]}>
         {entries.map(entry => (
           <Profile.ContentPanel
             key={entry.id}
