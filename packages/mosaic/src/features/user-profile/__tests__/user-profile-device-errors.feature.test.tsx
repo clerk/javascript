@@ -32,10 +32,11 @@ describe.each(['confirmation', 'details'] as const)('device %s errors', surface 
     await user.click(screen.getByRole('button', { name: 'Manage Phone' }));
     await user.click(screen.getByRole('menuitem', { name: surface === 'details' ? 'View details' : 'Sign out' }));
     const dialog = screen.getByRole(surface === 'details' ? 'dialog' : 'alertdialog');
+    await waitFor(() => expect(dialog).toBeVisible());
     await user.click(within(dialog).getByRole('button', { name: 'Sign out' }));
     const expected = kind === 'clerk' ? 'Cet appareil est indisponible.' : 'Déconnexion impossible.';
     await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent(expected));
-    expect(dialog).toBeVisible();
+    await waitFor(() => expect(dialog).toBeVisible());
     expect(screen.queryByText('Private implementation details')).toBeNull();
     expect(within(dialog).getByRole('button', { name: 'Sign out' })).not.toHaveAttribute('aria-busy', 'true');
     view.unmount();
