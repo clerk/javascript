@@ -27,7 +27,6 @@ export function ReadOnly() {
     <OrganizationProfileGeneralPanelView
       name={general.name}
       slug={general.slug}
-      memberCount={general.memberCount}
       imageUrl={general.imageUrl}
       hasImage={general.hasImage}
     />

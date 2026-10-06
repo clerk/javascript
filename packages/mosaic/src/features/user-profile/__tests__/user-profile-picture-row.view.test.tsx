@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../mosaic-provider';
-import { SaveError } from '../../../utils/form-error';
+import { SaveError } from '../../../utils/errors';
 import type { UserProfilePictureRowViewProps } from '../user-profile-account-section/user-profile-picture-row.view';
 import { UserProfilePictureRowView } from '../user-profile-account-section/user-profile-picture-row.view';
 
@@ -29,7 +29,7 @@ describe('UserProfilePictureRowView', () => {
     await user.click(screen.getByRole('button', { name: 'Manage profile picture' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove avatar' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent("This action couldn't be completed.");
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent("This action couldn't be completed."));
   });
 
   it('replaces a rejected pick with the result of a removal', async () => {

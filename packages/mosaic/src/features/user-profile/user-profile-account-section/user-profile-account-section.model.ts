@@ -4,7 +4,7 @@ import type { AttributeData, EnterpriseAccountResource, UserResource } from '@cl
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import type { MessageValues } from '../../../localization';
-import { save, SaveError, UNEXPECTED_ERROR } from '../../../utils/form-error';
+import { save, SaveError, UNEXPECTED_ERROR } from '../../../utils/errors';
 import type { UserProfileManagedBy } from '../user-profile-managed-by';
 import type {
   UserProfileEmail,
