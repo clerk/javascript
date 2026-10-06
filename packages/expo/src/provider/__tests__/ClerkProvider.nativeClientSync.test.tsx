@@ -511,6 +511,54 @@ describe('ClerkProvider native client sync', () => {
     expect(mocks.configureWithOptions).toHaveBeenCalledTimes(2);
   });
 
+  test('reconfigures native when the proxyUrl changes or is removed', async () => {
+    const { rerender } = render(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        proxyUrl='https://example.com/api/__clerk'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(mocks.configureWithOptions).toHaveBeenLastCalledWith('pk_test_123', {
+        bearerToken: null,
+        proxyUrl: 'https://example.com/api/__clerk',
+      }),
+    );
+
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        proxyUrl='https://other.example.com/api/__clerk'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(mocks.configureWithOptions).toHaveBeenLastCalledWith('pk_test_123', {
+        bearerToken: null,
+        proxyUrl: 'https://other.example.com/api/__clerk',
+      }),
+    );
+
+    rerender(
+      <ClerkProvider
+        publishableKey='pk_test_123'
+        tokenCache={mocks.tokenCache}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(mocks.configureWithOptions).toHaveBeenLastCalledWith('pk_test_123', {
+        bearerToken: null,
+        proxyUrl: null,
+      }),
+    );
+    await expect(waitForPendingJsToNativeSync()).resolves.toBeUndefined();
+    expect(mocks.configureWithOptions).toHaveBeenCalledTimes(3);
+  });
+
   test('does not wait for an active native refresh after switching publishable keys', async () => {
     const obsoleteRefresh = rejectableDeferred();
     const obsoleteRefreshError = new Error('obsolete native refresh failed');
