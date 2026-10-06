@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileAccountSectionViewProps } from '../user-profile-account-section/user-profile-account-section.view';
 import { UserProfileAccountSectionView } from '../user-profile-account-section/user-profile-account-section.view';
@@ -96,7 +97,7 @@ describe('email actions', () => {
     expect(within(dialog).getByRole('button', { name: 'Remove' })).toHaveAttribute('aria-busy', 'true');
 
     await act(async () => {
-      removal.reject(new Error('Unable to remove email.'));
+      removal.reject(clerkApiError('email_address_in_use', 'Unable to remove email.'));
       await removal.promise.catch(() => undefined);
     });
     expect(within(dialog).getByRole('alert')).toHaveTextContent('Unable to remove email.');
