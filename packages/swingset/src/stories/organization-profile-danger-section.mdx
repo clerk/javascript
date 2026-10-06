@@ -2,8 +2,10 @@ import * as Stories from './organization-profile-danger-section.stories';
 
 # OrganizationProfileDangerSection
 
-Leaving and deleting the workspace. Both ask for the workspace's name to be typed out, as the
-legacy organization profile does.
+Leaving and deleting the active organization. Both ask for the organization's name to be typed out.
+Leaving is offered to every member. Deleting needs the `org:sys_profile:delete` permission and admin
+delete turned on for the instance. After either one, the section refreshes the user's organization
+lists and navigates to `afterLeaveOrganizationUrl`, falling back to the instance's setting.
 
 Below `26rem` of group width, through `Section.Item`'s `wrap`, each action wraps under its description.
 
@@ -18,7 +20,7 @@ Below `26rem` of group width, through `Section.Item`'s `wrap`, each action wraps
 
 ## A failed action
 
-The dialog stays up and renders the reason under the confirmation field.
+The dialog stays up and renders the API error under the confirmation field.
 
 <Story
   name='WithError'
@@ -27,8 +29,8 @@ The dialog stays up and renders the reason under the confirmation field.
 
 ## One action only
 
-A row appears only when its callback is given, so a member who cannot delete the workspace is left
-with leaving it.
+A row appears only when its controller is given, so a member who cannot delete the organization is
+left with leaving it.
 
 <Story
   name='LeaveOnly'

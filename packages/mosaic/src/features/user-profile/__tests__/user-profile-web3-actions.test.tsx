@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
 
@@ -86,7 +87,7 @@ describe('Web3 wallet removal', () => {
     await user.click(remove);
     expect(onRemove).toHaveBeenCalledOnce();
     await act(async () => {
-      removal.reject(new Error('Unable to remove wallet'));
+      removal.reject(clerkApiError('web3_wallet_in_use', 'Unable to remove wallet'));
       await removal.promise.catch(() => undefined);
     });
     expect(within(dialog).getByRole('alert')).toHaveTextContent('Unable to remove wallet');

@@ -1,9 +1,10 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
+import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfileMfaMethod, UserProfileMfaSectionViewProps } from '../user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from '../user-profile-mfa-section.view';
@@ -27,6 +28,10 @@ function renderView(overrides: Partial<UserProfileMfaSectionViewProps> = {}) {
     ),
   };
 }
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('MFA section', () => {
   it.each(['picker', 'custom', 'none'] as const)(
@@ -170,9 +175,17 @@ describe('MFA section', () => {
   });
 
   it.each([
-    { cause: new Error('Unable to update the default method.'), message: 'Unable to update the default method.' },
+    {
+      cause: clerkApiError('phone_number_not_verified', 'Unable to update the default method.'),
+      message: 'Unable to update the default method.',
+    },
+    {
+      cause: new Error('Cannot read properties of undefined'),
+      message: 'Unable to set this method as default. Please try again.',
+    },
     { cause: 'network failure', message: 'Unable to set this method as default. Please try again.' },
   ])('shows a default-change error and clears it on retry: $message', async ({ cause, message }) => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     const user = userEvent.setup();
     const retry = deferred<void>();
     const onSetDefault = vi.fn().mockRejectedValueOnce(cause).mockReturnValueOnce(retry.promise);
@@ -188,7 +201,7 @@ describe('MFA section', () => {
     await user.click(selected);
     await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(message);
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
     expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
     expect(screen.getAllByText('Default')).toHaveLength(1);
     await user.click(selected);

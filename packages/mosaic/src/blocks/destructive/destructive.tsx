@@ -217,6 +217,8 @@ export interface DestructiveHandleProps<Payload> {
   actionLabel: FromPayload<Payload, string>;
   cancelLabel?: string;
   onDelete: (payload: Payload) => Promise<void> | void;
+  /** Copy shown when the action fails without an error Clerk can describe, such as a network or code fault (default: the generic error) */
+  errorFallback?: string;
 }
 
 function HandleDestructive<Payload>({
@@ -229,8 +231,9 @@ function HandleDestructive<Payload>({
   actionLabel,
   cancelLabel,
   onDelete,
+  errorFallback,
 }: DestructiveHandleProps<Payload>) {
-  const controller = useConfirmationController();
+  const controller = useConfirmationController({ errorFallback });
 
   return (
     <Dialog.Root
