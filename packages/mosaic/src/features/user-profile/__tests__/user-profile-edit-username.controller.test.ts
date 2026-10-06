@@ -1,7 +1,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import { SaveError } from '../../../utils/form-error';
+import { SaveError } from '../../../utils/errors';
 import { useUserProfileEditUsernameController } from '../user-profile-account-section/user-profile-edit-username.controller';
 
 function deferred() {

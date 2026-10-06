@@ -275,6 +275,183 @@
     },
     {
       groupName: "[DEV] minor & patch dependencies",
+      groupSlug: "electron-dev-minor",
+      matchFileNames: [
+        "packages/electron/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      automerge: true,
+      semanticCommitScope: "electron",
+    },
+    {
+      groupName: "[DEV] major dependencies",
+      groupSlug: "electron-dev-major",
+      matchFileNames: [
+        "packages/electron/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "electron",
+    },
+    {
+      groupName: "minor & patch dependencies",
+      groupSlug: "electron-prod-minor",
+      matchFileNames: [
+        "packages/electron/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      semanticCommitScope: "electron",
+    },
+    {
+      groupName: "major dependencies",
+      groupSlug: "electron-prod-major",
+      matchFileNames: [
+        "packages/electron/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "electron",
+    },
+    {
+      groupName: "[DEV] minor & patch dependencies",
+      groupSlug: "electron-passkeys-dev-minor",
+      matchFileNames: [
+        "packages/electron-passkeys/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      automerge: true,
+      semanticCommitScope: "electron-passkeys",
+    },
+    {
+      groupName: "[DEV] major dependencies",
+      groupSlug: "electron-passkeys-dev-major",
+      matchFileNames: [
+        "packages/electron-passkeys/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "electron-passkeys",
+    },
+    {
+      groupName: "minor & patch dependencies",
+      groupSlug: "electron-passkeys-prod-minor",
+      matchFileNames: [
+        "packages/electron-passkeys/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      semanticCommitScope: "electron-passkeys",
+    },
+    {
+      groupName: "major dependencies",
+      groupSlug: "electron-passkeys-prod-major",
+      matchFileNames: [
+        "packages/electron-passkeys/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "electron-passkeys",
+    },
+    {
+      groupName: "[DEV] minor & patch dependencies",
+      groupSlug: "eslint-plugin-dev-minor",
+      matchFileNames: [
+        "packages/eslint-plugin/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      automerge: true,
+      semanticCommitScope: "eslint-plugin",
+    },
+    {
+      groupName: "[DEV] major dependencies",
+      groupSlug: "eslint-plugin-dev-major",
+      matchFileNames: [
+        "packages/eslint-plugin/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "eslint-plugin",
+    },
+    {
+      groupName: "minor & patch dependencies",
+      groupSlug: "eslint-plugin-prod-minor",
+      matchFileNames: [
+        "packages/eslint-plugin/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      semanticCommitScope: "eslint-plugin",
+    },
+    {
+      groupName: "major dependencies",
+      groupSlug: "eslint-plugin-prod-major",
+      matchFileNames: [
+        "packages/eslint-plugin/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "eslint-plugin",
+    },
+    {
+      groupName: "[DEV] minor & patch dependencies",
       groupSlug: "expo-dev-minor",
       matchFileNames: [
         "packages/expo/package.json",
@@ -331,6 +508,124 @@
         "major",
       ],
       semanticCommitScope: "expo",
+    },
+    {
+      groupName: "[DEV] minor & patch dependencies",
+      groupSlug: "expo-biometrics-dev-minor",
+      matchFileNames: [
+        "packages/expo-biometrics/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      automerge: true,
+      semanticCommitScope: "expo-biometrics",
+    },
+    {
+      groupName: "[DEV] major dependencies",
+      groupSlug: "expo-biometrics-dev-major",
+      matchFileNames: [
+        "packages/expo-biometrics/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "expo-biometrics",
+    },
+    {
+      groupName: "minor & patch dependencies",
+      groupSlug: "expo-biometrics-prod-minor",
+      matchFileNames: [
+        "packages/expo-biometrics/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      semanticCommitScope: "expo-biometrics",
+    },
+    {
+      groupName: "major dependencies",
+      groupSlug: "expo-biometrics-prod-major",
+      matchFileNames: [
+        "packages/expo-biometrics/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "expo-biometrics",
+    },
+    {
+      groupName: "[DEV] minor & patch dependencies",
+      groupSlug: "expo-google-signin-dev-minor",
+      matchFileNames: [
+        "packages/expo-google-signin/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      automerge: true,
+      semanticCommitScope: "expo-google-signin",
+    },
+    {
+      groupName: "[DEV] major dependencies",
+      groupSlug: "expo-google-signin-dev-major",
+      matchFileNames: [
+        "packages/expo-google-signin/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "expo-google-signin",
+    },
+    {
+      groupName: "minor & patch dependencies",
+      groupSlug: "expo-google-signin-prod-minor",
+      matchFileNames: [
+        "packages/expo-google-signin/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      semanticCommitScope: "expo-google-signin",
+    },
+    {
+      groupName: "major dependencies",
+      groupSlug: "expo-google-signin-prod-major",
+      matchFileNames: [
+        "packages/expo-google-signin/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "expo-google-signin",
     },
     {
       groupName: "[DEV] minor & patch dependencies",
@@ -626,6 +921,65 @@
         "major",
       ],
       semanticCommitScope: "localizations",
+    },
+    {
+      groupName: "[DEV] minor & patch dependencies",
+      groupSlug: "mosaic-dev-minor",
+      matchFileNames: [
+        "packages/mosaic/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      automerge: true,
+      semanticCommitScope: "mosaic",
+    },
+    {
+      groupName: "[DEV] major dependencies",
+      groupSlug: "mosaic-dev-major",
+      matchFileNames: [
+        "packages/mosaic/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "mosaic",
+    },
+    {
+      groupName: "minor & patch dependencies",
+      groupSlug: "mosaic-prod-minor",
+      matchFileNames: [
+        "packages/mosaic/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      semanticCommitScope: "mosaic",
+    },
+    {
+      groupName: "major dependencies",
+      groupSlug: "mosaic-prod-major",
+      matchFileNames: [
+        "packages/mosaic/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "mosaic",
     },
     {
       groupName: "[DEV] minor & patch dependencies",
@@ -980,6 +1334,65 @@
         "major",
       ],
       semanticCommitScope: "shared",
+    },
+    {
+      groupName: "[DEV] minor & patch dependencies",
+      groupSlug: "swingset-dev-minor",
+      matchFileNames: [
+        "packages/swingset/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      automerge: true,
+      semanticCommitScope: "swingset",
+    },
+    {
+      groupName: "[DEV] major dependencies",
+      groupSlug: "swingset-dev-major",
+      matchFileNames: [
+        "packages/swingset/package.json",
+      ],
+      matchDepTypes: [
+        "devDependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "swingset",
+    },
+    {
+      groupName: "minor & patch dependencies",
+      groupSlug: "swingset-prod-minor",
+      matchFileNames: [
+        "packages/swingset/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "patch",
+        "minor",
+      ],
+      semanticCommitScope: "swingset",
+    },
+    {
+      groupName: "major dependencies",
+      groupSlug: "swingset-prod-major",
+      matchFileNames: [
+        "packages/swingset/package.json",
+      ],
+      matchDepTypes: [
+        "dependencies",
+      ],
+      matchUpdateTypes: [
+        "major",
+      ],
+      semanticCommitScope: "swingset",
     },
     {
       groupName: "[DEV] minor & patch dependencies",
@@ -1349,6 +1762,8 @@
         "should{/,}**",
         "sinon{/,}**",
         "@playwright{/,}**",
+        "e2e",
+        "@e2e-dev{/,}**",
       ],
     },
     {
