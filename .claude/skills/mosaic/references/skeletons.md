@@ -54,8 +54,8 @@ same fill, `--cl-color-neutral-alpha-200`.
   filled block; Actions render nothing and hold a small control's height.
 - **A component with its own shape** composes the pieces in
   `styles/skeleton.styles.ts` itself:
-  - `SkeletonText` (`utils/skeleton-text.tsx`) around mock text: one inline span
-    whose text is transparent and whose background draws each wrapped line.
+  - `SkeletonText` (`utils/skeleton-text.tsx`) around mock text: one span, one
+    line, as wide as its transparent text, drawing a bar with its `::before`.
   - `skeletonStyles.bone`: fill and radius, for media and blocks.
   - `skeletonStyles.shimmer`: the moving highlight for a block, as an `::after`
     overlay. `Avatar.Fallback`, which has its own fill and circle, takes `shimmer`
@@ -67,27 +67,32 @@ same fill, `--cl-color-neutral-alpha-200`.
   rows match by construction. Watch anything taller than its text:
   `Section.Actions skeleton` exists because a 28px `sm` menu trigger outgrew a 20px
   line.
-- **Width and wrapping come from the mock text.** Each line's band is as wide as
-  that line of mock text. Nothing is measured.
-- **Band height:** 75% of the font's text box (ascender to descender), centered on
-  each line, so stacked lines keep a visible gap. A pill radius on the span softens
-  the ends; CSS can't shrink an inline box itself, and `clip-path` clips the whole
-  span rather than each line, so a sized background layer is the only per-line
-  option.
+- **The bar is cap height on the baseline.** `SkeletonText` is one line of the
+  part's own type (`1lh` tall, so heights match), and its `::before` bar is `1cap`
+  tall (`0.7em` fallback), sitting on the baseline with a pill radius. It covers
+  the same band as the text's capitals in any font, with nothing measured, and
+  stacked lines keep a natural gap.
+- **Width comes from the mock text.** The span is `width: fit-content` around its
+  transparent mock text, and the bar fills it (a `-100%` end margin keeps the bar
+  from taking space in the line, so it shares the text's baseline). So each bar is
+  exactly as long as the text it stands in for. Mock text is held to one line
+  (`nowrap`, clipped at the part's width), so a long placeholder can't wrap and
+  shift the layout; keep placeholders to one line of real content. With no mock
+  text, the bar falls back to `12ch`.
 
 ## The shimmer
 
 Modeled on React Spectrum's `Skeleton`, with no JavaScript: a highlight one bone wide,
 peaking in the middle, sweeps left to right across two bone widths, over 1.6s
-`--cl-ease-in-out`, repeating. Off under `prefers-reduced-motion: reduce`, leaving the
-plain fill.
+`ease-in-out` (the CSS keyword, not a token), repeating. Off under
+`prefers-reduced-motion: reduce`, leaving the plain fill.
 
 - **Blocks** (media, the avatar) move an `::after` overlay with `transform`
   (`translateX(-100%)` → `translateX(100%)`), clipped by `overflow: hidden`.
-- **Text** moves its own background, since an overlay can't follow wrapped lines:
-  a gradient `300%` wide (transparent, highlight, transparent at 33% / 50% / 66%)
-  over the fill, from `background-position: 100%` to `0%`, cloned per line with
-  `box-decoration-break`. Same geometry and timing as the overlay.
+- **Text bars** are themselves a pseudo-element, so they move their own
+  background instead: a gradient `300%` wide (transparent, highlight, transparent
+  at 33% / 50% / 66%) over the fill, from `background-position: 100%` to `0%`.
+  Same geometry and timing as the overlay.
 - **The highlight** is a wash over the fill, one value in both techniques:
   background-tinted in light mode, neutral-tinted in dark.
 - **No sync.** Bones that mount together sweep together; a section mounting later
