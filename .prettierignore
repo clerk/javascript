@@ -26,3 +26,13 @@ renovate.json5
 # Frozen snapshots of TypeDoc-generated MDX; must match raw `extract-methods.mjs` output.
 .typedoc/__tests__/__snapshots__/
 CLAUDE.md
+# Copied byte for byte from another repo; do not reformat.
+.claude/skills/verify-clerk-expo/src/core/
+.claude/skills/verify-clerk-expo/src/platform/
+.claude/skills/verify-clerk-expo/specs/fixtures.ts
+.claude/skills/verify-clerk-expo/testing/
+.claude/skills/verify-clerk-expo/e2e.config.ts
+.claude/skills/verify-clerk-expo/test/*.ts
+!.claude/skills/verify-clerk-expo/test/freshness.test.ts
+!.claude/skills/verify-clerk-expo/test/host.test.ts
+.claude/skills/verify-clerk-expo/.verify/
