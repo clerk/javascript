@@ -15,7 +15,7 @@ import { userProfileAddEmailMessages } from '../features/user-profile/user-profi
 import { userProfileAddPhoneMessages } from '../features/user-profile/user-profile-account-section/user-profile-add-phone.messages';
 import { userProfileVerifyEmailLinkMessages } from '../features/user-profile/user-profile-account-section/user-profile-verify-email-link.messages';
 import { userProfileVerifyEmailSsoMessages } from '../features/user-profile/user-profile-account-section/user-profile-verify-email-sso.messages';
-import { userProfileActiveDevicesMessages } from '../features/user-profile/user-profile-active-devices.messages';
+import { userProfileActiveDevicesMessages } from '../features/user-profile/user-profile-active-devices-section/user-profile-active-devices.messages';
 import { userProfileAddAuthenticatorMessages } from '../features/user-profile/user-profile-add-authenticator.messages';
 import { userProfileAddSmsMessages } from '../features/user-profile/user-profile-add-sms.messages';
 import { userProfileAuthenticatorSetupMessages } from '../features/user-profile/user-profile-authenticator-setup.messages';

@@ -1,6 +1,6 @@
 'use client';
 
-import { UserProfileActiveDevicesSection } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section';
+import { UserProfileActiveDevicesSection } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';

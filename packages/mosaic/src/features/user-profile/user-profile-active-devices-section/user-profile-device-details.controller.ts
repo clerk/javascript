@@ -1,5 +1,5 @@
-import { setup } from '../../machine/setup';
-import { useMachine } from '../../machine/use-machine';
+import { setup } from '../../../machine/setup';
+import { useMachine } from '../../../machine/use-machine';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
 interface Context {

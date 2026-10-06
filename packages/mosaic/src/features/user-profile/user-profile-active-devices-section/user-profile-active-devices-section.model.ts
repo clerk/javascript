@@ -4,7 +4,7 @@ import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/shared/types';
 import { useEffect, useRef, useState } from 'react';
 
-import { fill, toLocalizableApiError, useErrorText, useLocale, useMessages } from '../../localization';
+import { fill, toLocalizableApiError, useErrorText, useLocale, useMessages } from '../../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
 export type UserProfileActiveDevicesModel =

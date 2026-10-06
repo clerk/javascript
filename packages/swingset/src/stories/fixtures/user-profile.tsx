@@ -1,6 +1,6 @@
 import { useDestructiveController } from '@clerk/mosaic/blocks/destructive/destructive.controller';
 import type { UserProfileViewProps } from '@clerk/mosaic/features/user-profile/user-profile.view';
-import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section.view';
+import { UserProfileActiveDevicesSectionView } from '@clerk/mosaic/features/user-profile/user-profile-active-devices-section/user-profile-active-devices-section.view';
 import type {
   UserProfilePaymentMethod,
   UserProfileSubscription,

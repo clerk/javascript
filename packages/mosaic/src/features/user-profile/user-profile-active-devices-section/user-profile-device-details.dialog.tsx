@@ -1,9 +1,9 @@
-import { Button, SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
-import { DataList } from '../../components/data-list';
-import type { DialogFocusTarget, DialogHandle } from '../../components/dialog';
-import { Dialog } from '../../components/dialog';
-import { fill, useMessages } from '../../localization';
+import { Button, SubmitButton } from '../../../components/button';
+import { Card } from '../../../components/card';
+import { DataList } from '../../../components/data-list';
+import type { DialogFocusTarget, DialogHandle } from '../../../components/dialog';
+import { Dialog } from '../../../components/dialog';
+import { fill, useMessages } from '../../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 import { useUserProfileDeviceDetailsController } from './user-profile-device-details.controller';
 

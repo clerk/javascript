@@ -9,7 +9,7 @@ import { type ActiveDeviceRecord, fapiUrl, serveFapi, worker } from '../../../__
 import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../localization';
-import { UserProfileActiveDevicesSection } from '../user-profile-active-devices-section';
+import { UserProfileActiveDevicesSection } from '../user-profile-active-devices-section/user-profile-active-devices-section';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 const alice = fapiUser({ id: 'user_1' });

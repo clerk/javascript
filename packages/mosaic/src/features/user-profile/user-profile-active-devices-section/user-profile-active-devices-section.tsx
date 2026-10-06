@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { Button } from '../../components/button';
-import { useMessages } from '../../localization';
+import { Button } from '../../../components/button';
+import { useMessages } from '../../../localization';
 import { useUserProfileActiveDevicesController } from './user-profile-active-devices-section.controller';
 import type { UserProfileActiveDevicesModel } from './user-profile-active-devices-section.model';
 import { useUserProfileActiveDevicesModel } from './user-profile-active-devices-section.model';
