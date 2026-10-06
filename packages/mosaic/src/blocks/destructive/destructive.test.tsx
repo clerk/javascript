@@ -5,9 +5,15 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { Button } from '../../components/button';
 import { Menu } from '../../components/menu';
-import { MosaicProvider } from '../../MosaicProvider';
+import type { ReverificationController } from '../../features/reverification';
+import { MosaicProvider } from '../../mosaic-provider';
+import { SaveError } from '../../utils/errors';
 import type { DestructiveControlledProps, DestructiveHandleProps } from './destructive';
 import { Destructive } from './destructive';
+
+vi.mock('../../features/reverification', () => ({
+  Reverification: ({ status }: { status: string }) => <output data-testid='reverification'>{status}</output>,
+}));
 
 function renderBlock(overrides: Partial<DestructiveControlledProps> = {}) {
   return render(
@@ -28,6 +34,33 @@ function renderBlock(overrides: Partial<DestructiveControlledProps> = {}) {
 }
 
 const confirmButton = () => screen.getByRole('button', { name: 'Delete account' });
+const startingReverification = {
+  status: 'loading' as const,
+  onCancel: vi.fn(),
+  visible: false,
+  reset: vi.fn(),
+};
+
+function readyReverification(status: 'ready' | 'retrying'): ReverificationController {
+  const view = {
+    step: 'password' as const,
+    value: '',
+    onValueChange: () => {},
+    isPending: status === 'retrying',
+    onSubmit: () => {},
+    onShowMethods: () => {},
+    onShowHelp: () => {},
+    onBack: () => {},
+    onEmailSupport: () => {},
+    onResend: () => {},
+    canResend: false,
+    methods: [],
+    onSelectMethod: () => {},
+  };
+  return status === 'retrying'
+    ? { status, visible: true, reset: () => {}, ...view }
+    : { status, visible: true, reset: () => {}, ...view };
+}
 
 describe('Destructive', () => {
   it('renders nothing until the caller opens it', () => {
@@ -143,6 +176,64 @@ describe('Destructive', () => {
     await user.click(confirmButton());
     expect(onDelete).not.toHaveBeenCalled();
   });
+
+  it('keeps the delete confirmation pending while verification is starting', () => {
+    renderBlock({ isDeleting: true, reverification: startingReverification });
+
+    expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'confirm');
+    expect(screen.getByRole('textbox')).toBeDisabled();
+    expect(confirmButton()).toHaveAttribute('aria-busy', 'true');
+    expect(screen.queryByTestId('reverification')).not.toBeInTheDocument();
+  });
+
+  it('shows reverification in the same dialog and card', () => {
+    renderBlock({ isDeleting: true, step: 'verify', reverification: readyReverification('ready') });
+
+    expect(screen.getAllByRole('dialog')).toHaveLength(1);
+    expect(document.querySelectorAll('.cl-card-root')).toHaveLength(1);
+    expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
+    expect(screen.getByTestId('reverification')).toHaveTextContent('ready');
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+  });
+
+  it('keeps the retrying factor visible until the hook becomes inactive', () => {
+    const props = {
+      open: true,
+      onOpenChange: vi.fn(),
+      title: 'Delete account?',
+      description: 'All of your data will be permanently deleted.',
+      fieldLabel: 'Type “Delete account” below to continue',
+      confirmationValue: 'Delete account',
+      actionLabel: 'Delete account',
+      onDelete: vi.fn(),
+    };
+    const { rerender } = render(
+      <MosaicProvider>
+        <Destructive
+          {...props}
+          isDeleting
+          step='verify'
+          reverification={readyReverification('retrying')}
+        />
+      </MosaicProvider>,
+    );
+    expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'verify');
+    expect(screen.getByTestId('reverification')).toHaveTextContent('retrying');
+
+    rerender(
+      <MosaicProvider>
+        <Destructive
+          {...props}
+          errorMessage='Delete failed.'
+          step='confirm'
+          reverification={{ status: 'idle', visible: false, reset: () => {} }}
+        />
+      </MosaicProvider>,
+    );
+    expect(document.querySelector('.cl-flow-root')).toHaveAttribute('data-value', 'confirm');
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(screen.getByText('Delete failed.')).toBeInTheDocument();
+  });
 });
 
 function renderWithHandle(onDelete: DestructiveHandleProps<string>['onDelete']) {
@@ -255,7 +346,9 @@ describe('Destructive with a handle', () => {
   it('shows a deletion failure, clears it on reopening, and allows retrying', async () => {
     const onDelete = vi
       .fn<DestructiveHandleProps<string>['onDelete']>()
-      .mockRejectedValueOnce(new Error('The account still has active projects.'))
+      .mockRejectedValueOnce(
+        new SaveError({ global: { code: 'account_has_projects', message: 'The account still has active projects.' } }),
+      )
       .mockResolvedValueOnce(undefined);
     const user = userEvent.setup();
     const handle = renderWithHandle(onDelete);

@@ -3,9 +3,6 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, durationVars, fontWeightVars, radiusVars, space, typeScaleVars } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  accountIdentifier: {
-    fontWeight: fontWeightVars['--cl-font-medium'],
-  },
   rowAvatar: {
     '--_cl-avatar-radius': radiusVars['--cl-radius-sm'],
     fontSize: '0.5rem',
@@ -57,8 +54,15 @@ export const styles = stylex.create({
     borderRadius: radiusVars['--cl-radius-full'],
   },
 
-  // Matches `UserButtonItemLabel`, so the trigger names a workspace the same way its row does. Capped,
-  // because the trigger sits in a host app's chrome and a long workspace name would push it apart.
+  triggerText: {
+    display: 'flex',
+    flexDirection: 'column',
+    textAlign: 'start',
+    minWidth: 0,
+  },
+
+  // Matches `UserButtonItemLabel`, so the trigger names an organization the same way its row does. Capped,
+  // because the trigger sits in a host app's chrome and a long organization name would push it apart.
   triggerName: {
     color: colorVars['--cl-color-foreground'],
     fontSize: typeScaleVars['--cl-text-sm-size'],
@@ -67,15 +71,26 @@ export const styles = stylex.create({
     maxWidth: '12rem',
   },
 
+  triggerOrganization: {
+    color: colorVars['--cl-color-foreground-secondary'],
+    fontSize: typeScaleVars['--cl-text-xs-size'],
+    lineHeight: typeScaleVars['--cl-text-xs-leading'],
+    maxWidth: '12rem',
+  },
+
   triggerCaret: {
     '--_cl-icon-color': colorVars['--cl-color-foreground-secondary'],
     marginInlineEnd: space['1'],
   },
 
-  // The workspace list scrolls; the header and footer stay put. The scroll area carries the
+  // The organization list scrolls; the header and footer stay put. The scroll area carries the
   // overflow, the edge fades, the scrollbar and the scroll padding they need, so only the cap
   // is ours.
   scroll: {
     maxHeight: '18rem',
+  },
+
+  popup: {
+    width: 'min(21.875rem, calc(100vw - 2rem))',
   },
 });

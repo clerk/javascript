@@ -1,8 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useAccessibleDescriptionWarning } from '../../hooks/useAccessibleDescriptionWarning';
-import { useAccessibleNameWarning } from '../../hooks/useAccessibleNameWarning';
+import { useAccessibleDescriptionWarning } from '../../hooks/use-accessible-description-warning';
+import { useAccessibleNameWarning } from '../../hooks/use-accessible-name-warning';
 import type {
   DialogFocusTarget,
   DialogHandle,
@@ -12,7 +12,7 @@ import type {
 import { Dialog as Primitive, useDialogContext as useHeadlessDialogContext } from '../../primitives/dialog';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../utils/reset.styles';
+import { reset } from '../../styles/reset.styles';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import { ToastProvider } from '../toast/toast';
@@ -195,7 +195,7 @@ function useCloseButtonWarning(isAlert: boolean) {
       return;
     }
     console.warn(
-      '[clerk] <Dialog.CloseButton> is rendered inside an alert dialog. A corner X is a way out without answering; the cancel action in the surface is the way out.',
+      '[Clerk] <Dialog.CloseButton> is rendered inside an alert dialog. A corner X is a way out without answering; the cancel action in the surface is the way out.',
     );
   }, [isAlert]);
 }
@@ -309,7 +309,7 @@ function useNestedVariantWarning(isNestedInDialog: boolean, variant: DialogVaria
       return;
     }
     console.warn(
-      '[clerk] a variant="profile" Dialog opened inside another Dialog. A profile is a root-level surface that hosts what opens over it; open a card instead.',
+      '[Clerk] a variant="profile" Dialog opened inside another Dialog. A profile is a root-level surface that hosts what opens over it; open a card instead.',
     );
   }, [isNestedInDialog, variant]);
 }
@@ -326,7 +326,7 @@ function useCompactPlacementWarning(variant: DialogVariant, placement: DialogCom
       return;
     }
     console.warn(
-      `[clerk] <Dialog.Popup variant="profile" compactPlacement="${placement}"> — a profile fills the compact band and takes no placement. It was ignored.`,
+      `[Clerk] <Dialog.Popup variant="profile" compactPlacement="${placement}"> — a profile fills the compact band and takes no placement. It was ignored.`,
     );
   }, [variant, placement]);
 }

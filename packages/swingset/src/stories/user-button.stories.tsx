@@ -27,7 +27,7 @@ export const meta: StoryMeta = {
 };
 
 // The data behind the design frames: one account, Cameron Walker, signed in three times over, and
-// the workspaces each frame lists. Only the flagship workspaces carry the Clerk mark; the rest wear
+// the organizations each frame lists. Only the flagship organizations carry the Clerk mark; the rest wear
 // the generated mark Clerk gives an organization that has not uploaded a logo.
 const clerkLogo = 'https://avatars.githubusercontent.com/u/49538330?v=4';
 const defaultOrgLogo =
@@ -82,10 +82,10 @@ interface Account {
   invitations: UserButtonInvitation[];
 }
 
-type Workspaces = Omit<Account, 'session'>;
+type AccountOrganizations = Omit<Account, 'session'>;
 
 /** The multi-account frames: NestLabs Creative active, beside Acme, with Clerk on offer. */
-const nestLabsWithSuggestion: Workspaces = {
+const nestLabsWithSuggestion: AccountOrganizations = {
   activeOrganizationId: nestLabs.organizationId,
   memberships: [nestLabs, acme],
   suggestions: [clerkSuggestion],
@@ -93,25 +93,25 @@ const nestLabsWithSuggestion: Workspaces = {
 };
 
 /** The single-account and organization-only frames: NestLabs Creative active, beside Clerk App and Acme. */
-const nestLabsWithClerkApp: Workspaces = {
+const nestLabsWithClerkApp: AccountOrganizations = {
   activeOrganizationId: nestLabs.organizationId,
   memberships: [nestLabs, clerkApp, acme],
   suggestions: [],
   invitations: [],
 };
 
-/** The personal-workspace frame: no organization active, Clerk App and Acme to switch to. */
-const personalWorkspace: Workspaces = {
+/** The personal-account frame: no organization active, Clerk App and Acme to switch to. */
+const personalAccount: AccountOrganizations = {
   activeOrganizationId: null,
   memberships: [clerkApp, acme],
   suggestions: [],
   invitations: [],
 };
 
-// The other two sign-ins' workspaces, reached only by switching to them.
+// The other two sign-ins' organizations, reached only by switching to them.
 const otherAccounts: Account[] = [
   { session: cameron('sess_cameron_2'), ...nestLabsWithClerkApp },
-  { session: cameron('sess_cameron_3'), ...personalWorkspace },
+  { session: cameron('sess_cameron_3'), ...personalAccount },
 ];
 
 function chaosAccounts(accounts: Account[]): Account[] {
@@ -129,7 +129,7 @@ function chaosAccounts(accounts: Account[]): Account[] {
   }));
 }
 
-/** Joining is what turns a suggestion or an invitation into a workspace you can switch to. */
+/** Joining is what turns a suggestion or an invitation into an organization you can switch to. */
 function join(account: Account, organizationId: string, name: string, imageUrl?: string): Account {
   return {
     ...account,
@@ -144,26 +144,26 @@ function join(account: Account, organizationId: string, name: string, imageUrl?:
 const LATENCY_MS = 800;
 
 /**
- * The examples are prototypes, not screenshots: every row is wired to state, so picking a workspace
- * or an account really switches to it, and Join turns a suggestion into a workspace. None of it is
+ * The examples are prototypes, not screenshots: every row is wired to state, so picking an organization
+ * or an account really switches to it, and Join turns a suggestion into an organization. None of it is
  * instant — each action is a network round trip against Clerk, so the prototype fakes one: the
  * clicked row spins, the rest stand down, and the surface stays open so you land back on the result.
- * Only picking a workspace closes it, because that is the one action the surface exists to perform.
+ * Only picking an organization closes it, because that is the one action the surface exists to perform.
  * The actions that would navigate somewhere in a real app (Manage, Invite, Create organization, Add
  * account) have nowhere to go here, so they only close the popover.
  */
 function usePrototype({
-  workspaces = nestLabsWithSuggestion,
+  organizations = nestLabsWithSuggestion,
   singleSession = false,
   hidePersonal = false,
 }: {
-  workspaces?: Workspaces;
+  organizations?: AccountOrganizations;
   singleSession?: boolean;
   hidePersonal?: boolean;
 } = {}): Omit<UserButtonProps, 'mode'> {
   const [open, setOpen] = useState(false);
   const seed = useChaosFixture(
-    [{ session: cameron('sess_cameron_1'), ...workspaces }, ...(singleSession ? [] : otherAccounts)],
+    [{ session: cameron('sess_cameron_1'), ...organizations }, ...(singleSession ? [] : otherAccounts)],
     chaosAccounts,
   );
   const [accounts, setAccounts] = useState(seed);
@@ -280,48 +280,12 @@ export function CombinedIconTrigger(_args: Record<string, unknown>) {
 }
 
 export function CombinedSingleAccount(_args: Record<string, unknown>) {
-  const prototype = usePrototype({ workspaces: nestLabsWithClerkApp, singleSession: true, hidePersonal: true });
+  const prototype = usePrototype({ organizations: nestLabsWithClerkApp, singleSession: true, hidePersonal: true });
 
   return (
     <UserButtonView
       {...prototype}
       mode='combined'
-    />
-  );
-}
-
-export function CombinedPersonalWorkspace(_args: Record<string, unknown>) {
-  const prototype = usePrototype({ workspaces: personalWorkspace, singleSession: true });
-
-  return (
-    <UserButtonView
-      {...prototype}
-      mode='combined'
-    />
-  );
-}
-
-export function CombinedUserPriority(_args: Record<string, unknown>) {
-  const prototype = usePrototype({ hidePersonal: true });
-
-  return (
-    <UserButtonView
-      {...prototype}
-      mode='combined'
-      modePriority='user'
-    />
-  );
-}
-
-export function CombinedUserPriorityAvatarTrigger(_args: Record<string, unknown>) {
-  const prototype = usePrototype({ hidePersonal: true });
-
-  return (
-    <UserButtonView
-      {...prototype}
-      mode='combined'
-      modePriority='user'
-      renderTriggerLabel={false}
     />
   );
 }
@@ -329,7 +293,7 @@ export function CombinedUserPriorityAvatarTrigger(_args: Record<string, unknown>
 // ─── Mode: Org only ─────────────────────────────────────────────────────────
 
 export function Organizations(_args: Record<string, unknown>) {
-  const prototype = usePrototype({ workspaces: nestLabsWithClerkApp, hidePersonal: true });
+  const prototype = usePrototype({ organizations: nestLabsWithClerkApp, hidePersonal: true });
 
   return (
     <UserButtonView
@@ -340,7 +304,7 @@ export function Organizations(_args: Record<string, unknown>) {
 }
 
 export function OrganizationsIconTrigger(_args: Record<string, unknown>) {
-  const prototype = usePrototype({ workspaces: nestLabsWithClerkApp, hidePersonal: true });
+  const prototype = usePrototype({ organizations: nestLabsWithClerkApp, hidePersonal: true });
 
   return (
     <UserButtonView
@@ -402,14 +366,14 @@ export function WithoutTriggerBadge(_args: Record<string, unknown>) {
 }
 
 export function NoOrganizationSelected(_args: Record<string, unknown>) {
-  const prototype = usePrototype({ workspaces: personalWorkspace, hidePersonal: true });
+  const prototype = usePrototype({ organizations: personalAccount, hidePersonal: true });
 
   // Personal is withheld and nothing is active, so the lead is no selection — not the account.
   // Picking an organization leaves it.
   return (
     <UserButtonView
       {...prototype}
-      mode='combined'
+      mode='organization'
     />
   );
 }
@@ -474,7 +438,7 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
           href: 'https://clerk.com/docs',
         },
       ]}
-      menuItemOrder={['docs', 'addAccount', 'signOutAll', 'settings']}
+      menuItemOrder={['docs', 'addAccount', 'signOut', 'settings']}
     />
   );
 }
@@ -483,7 +447,7 @@ export function CustomMenuItems(_args: Record<string, unknown>) {
 const ORGANIZATIONS_LATENCY_MS = 2500;
 
 /**
- * The workspace list's first page landing under a popup that is already open. The other examples
+ * The organization list's first page landing under a popup that is already open. The other examples
  * are handed their organizations on the first render, so the placeholder they would show has
  * nothing to show it. The wait restarts on every open, so it can be watched more than once.
  */

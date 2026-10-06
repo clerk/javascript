@@ -79,7 +79,7 @@ export const styles = stylex.create({
       default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
       ':where([data-ending-style])': easingVars['--cl-ease-exit'],
     },
-    maxHeight: 'min(80dvh, 36rem)',
+    maxHeight: 'min(var(--cl-available-height, 80dvh), 36rem)',
     maxWidth: 'calc(100vw - 2rem)',
     minHeight: 0,
   },

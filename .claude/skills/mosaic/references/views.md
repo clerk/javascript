@@ -39,19 +39,24 @@ Two shapes, chosen by whether the slice fetches its own data:
 - A **wrapper composes** model + controller + view, and the view is a pure
   function of props (`user-button.tsx`).
 - A **leaf view owns its controller** and takes the effect as a prop
-  (`UserProfileDeleteSectionView` calls `useUserProfileDeleteSectionController`
-  with its `onDelete`). Still no Clerk — the effect arrives from above.
+  (`UserProfileUsernameRowView` calls `useUserProfileEditUsernameController`
+  with its `onSubmit`). Still no Clerk — the effect arrives from above.
 
 ## Where the strings live
 
 Every string a view renders comes from the feature's `*.messages.ts`, shaped the
-way `@clerk/i18n` takes a base definition, so localizing is registering a
-namespace rather than hunting literals down first. A plural message is its forms;
-a parameterized one is its template. Import it as `m` and read through it:
+way `@clerk/i18n` takes a base definition. A plural message is its forms; a
+parameterized one is its template.
+
+Register the file as a namespace in `src/localization/registry.ts`, then read it
+with `useMessages` in the view or controller that renders it:
 
 ```tsx
-import { fill, plural, userButtonBase as m } from './user-button.messages';
+const m = useMessages('userButton');
 ```
+
+Never import a `*.messages.ts` directly. A direct import skips the customer's
+locale and overrides, so the copy can't be localized.
 
 ## Blocks
 

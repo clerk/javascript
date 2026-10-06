@@ -5,8 +5,8 @@ import type { OtpProps as PrimitiveOtpProps } from '../../primitives/otp';
 import { Otp as Primitive } from '../../primitives/otp';
 import type { MosaicStyleProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
-import { inputStyles } from '../../utils/input.styles';
-import { reset } from '../../utils/reset.styles';
+import { inputStyles } from '../../styles/input.styles';
+import { reset } from '../../styles/reset.styles';
 import { useOptionalFieldControlProps } from '../field/field.context';
 import { styles } from './otp.styles';
 

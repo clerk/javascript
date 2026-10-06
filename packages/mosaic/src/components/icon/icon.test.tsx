@@ -4,7 +4,7 @@ import React from 'react';
 import { describe, expect, it } from 'vitest';
 
 import type { MosaicIconOverrides } from '../../icons/overrides';
-import { MosaicProvider } from '../../MosaicProvider';
+import { MosaicProvider } from '../../mosaic-provider';
 import { space } from '../../tokens.stylex';
 import { Banner } from '../banner';
 import { Icon } from './icon';

@@ -5,10 +5,9 @@ import { Button } from '../../components/button';
 import { Field } from '../../components/field';
 import { Icon } from '../../components/icon';
 import { Section } from '../../components/section';
-import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
-import { fill } from '../../localization/messages';
+import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
+import { fill, useMessages } from '../../localization';
 import { UserProfilePasskeyRowView } from './user-profile-passkey-row.view';
-import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 import { styles } from './user-profile-passkeys-section.styles';
 
 export interface UserProfilePasskey {
@@ -33,6 +32,7 @@ export function UserProfilePasskeysSectionView({
   onRename,
   onRemove,
 }: UserProfilePasskeysSectionViewProps) {
+  const m = useMessages('userProfilePasskeys');
   const addButton = useRef<HTMLButtonElement>(null);
   const section = useRef<HTMLDivElement>(null);
   const removalFocus = useListRemovalFocus({

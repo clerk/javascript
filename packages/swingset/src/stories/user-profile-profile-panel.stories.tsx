@@ -1,13 +1,16 @@
+import { UserProfileConnectedAccountsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section.view';
 import type {
   UserProfileEmail,
   UserProfilePhone,
 } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
 import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
-import { useState } from 'react';
+import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+import { useRef, useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
 import { usePreviewImage } from './fixtures/use-preview-image';
+import { UserProfileDangerPreview } from './fixtures/user-profile';
 import { createUserProfileAddEmailFixture } from './fixtures/user-profile-add-email';
 import { createUserProfileAddPhoneFixture } from './fixtures/user-profile-add-phone';
 import { useConnectedAccountsFixture } from './fixtures/user-profile-connected-accounts';
@@ -29,6 +32,7 @@ export const meta: StoryMeta = {
 };
 
 export function Default(_args: Record<string, unknown>) {
+  const titleRef = useRef<HTMLDivElement>(null);
   const [emails, setEmails] = useState<UserProfileEmail[]>([
     { id: 'email_1', value: 'item1@clerk.dev', isDefault: true, isVerified: true },
     { id: 'email_2', value: 'item2@clerk.dev', isVerified: true },
@@ -52,29 +56,32 @@ export function Default(_args: Record<string, unknown>) {
       {...emailFlow}
       allowMultipleAccounts
       emails={emails}
-      connectedAccounts={connections.accounts}
-      availableConnectionProviders={connections.availableProviders}
-      onReconnectAccount={connections.onReconnect}
-      web3Wallets={wallets.wallets}
-      availableWeb3Providers={wallets.availableProviders}
+      titleRef={titleRef}
+      connectedAccountsSlot={
+        <UserProfileConnectedAccountsSectionView
+          {...connections}
+          fallbackFocus={() => titleRef.current}
+        />
+      }
+      web3WalletsSlot={
+        <UserProfileWeb3WalletsSectionView
+          {...wallets}
+          fallbackFocus={() => titleRef.current}
+        />
+      }
       hasImage={Boolean(imageUrl)}
       imageUrl={imageUrl}
       phones={phones}
       {...createUserProfileAddPhoneFixture({
         onVerified: value => setPhones(current => [...current, { id: `phone_${Date.now()}`, value, isVerified: true }]),
       })}
-      onConnectAccount={connections.onConnect}
-      onDeleteAccount={() => Promise.resolve()}
+      dangerSlot={<UserProfileDangerPreview />}
       onManageEmail={() => undefined}
       onManagePhone={() => undefined}
       onProfilePictureChange={showFile}
-      onRemoveConnectedAccount={connections.onRemove}
       onRemoveProfilePicture={clearImage}
       onRemoveEmail={id => setEmails(current => current.filter(email => email.id !== id))}
       onRemovePhone={id => setPhones(current => current.filter(phone => phone.id !== id))}
-      onConnectWeb3Wallet={wallets.onConnect}
-      onRemoveWeb3Wallet={wallets.onRemove}
-      onSetPrimaryWeb3Wallet={wallets.onSetPrimary}
       onSetPrimaryEmail={id => setEmails(current => current.map(email => ({ ...email, isDefault: email.id === id })))}
       onSetPrimaryPhone={id => setPhones(current => current.map(phone => ({ ...phone, isDefault: phone.id === id })))}
       onVerifyEmail={() => undefined}

@@ -7,11 +7,12 @@ import { EmptyState } from '../../components/empty-state';
 import { Icon } from '../../components/icon';
 import { Item } from '../../components/item';
 import { Pagination } from '../../components/pagination';
+import { Section } from '../../components/section';
 import { Spinner } from '../../components/spinner';
 import { Table, type TableHeaderCellProps } from '../../components/table';
-import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
+import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
+import { type PendingAction, usePendingAction } from '../../hooks/use-pending-action';
 import { fill, useMessages } from '../../localization';
 import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -273,28 +274,17 @@ function RequestActions({
   const m = useMessages('requestsTableTab');
   const [acceptRef] = useState(() => registerAcceptTrigger(request.id));
   const [declineRef] = useState(() => registerDeclineTrigger(request.id));
-  const [runningAction, setRunningAction] = useState<OrganizationProfileRequest['pendingAction']>();
-  const [error, setError] = useState<string>();
-  const pendingAction = request.pendingAction ?? runningAction;
-  const runAction = async (action: 'accept' | 'decline', run: () => void | Promise<void>) => {
+  const accept = usePendingAction(() => onAccept?.(), { errorFallback: m.acceptError });
+  const decline = usePendingAction(() => onDecline?.(), { errorFallback: m.declineError });
+  const pendingAction =
+    request.pendingAction ?? (accept.isPending ? 'accept' : decline.isPending ? 'decline' : undefined);
+  const error = accept.errorMessage ?? decline.errorMessage;
+  const decide = (action: PendingAction<[]>, other: PendingAction<[]>) => {
     if (pendingAction) {
       return;
     }
-    setRunningAction(action);
-    setError(undefined);
-    try {
-      await run();
-    } catch (cause) {
-      setError(
-        cause instanceof Error && cause.message.trim()
-          ? cause.message
-          : action === 'accept'
-            ? m.acceptError
-            : m.declineError,
-      );
-    } finally {
-      setRunningAction(undefined);
-    }
+    other.reset();
+    void action.run();
   };
   return (
     <>
@@ -310,7 +300,7 @@ function RequestActions({
             variant='outline'
             color='neutral'
             aria-label={fill(m.declineRequest, { name: request.name ?? request.email })}
-            onClick={() => void runAction('decline', onDecline)}
+            onClick={() => decide(decline, accept)}
           >
             {m.decline}
           </SubmitButton>
@@ -324,20 +314,13 @@ function RequestActions({
             isPending={pendingAction === 'accept'}
             pendingLabel={m.accepting}
             aria-label={fill(m.acceptRequest, { name: request.name ?? request.email })}
-            onClick={() => void runAction('accept', onAccept)}
+            onClick={() => decide(accept, decline)}
           >
             {m.accept}
           </SubmitButton>
         ) : null}
       </div>
-      {error ? (
-        <Text
-          role='alert'
-          color='negative'
-        >
-          {error}
-        </Text>
-      ) : null}
+      <Section.Error>{error}</Section.Error>
     </>
   );
 }

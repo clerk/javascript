@@ -1,8 +1,11 @@
+import { ClerkRuntimeError, isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
 import type * as SharedReact from '@clerk/shared/react';
 import type { SessionVerificationLevel } from '@clerk/shared/types';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { deferred, tick } from '../../../__tests__/async';
+import type { ReverificationState } from '../reverification.types';
 import { useReverificationWithState } from '../use-reverification-with-state';
 
 type NeedsReverificationParameters = {
@@ -11,9 +14,16 @@ type NeedsReverificationParameters = {
   level: SessionVerificationLevel | undefined;
 };
 
-let capturedOnNeeds: ((params: NeedsReverificationParameters) => void) | undefined;
+type Hint = { reverificationLevel: SessionVerificationLevel | undefined };
+
+const IN_PROGRESS = 'request_already_in_progress';
+
 let session: { id: string } | null | undefined = { id: 'sess_1' };
-const wrapped = vi.fn();
+let challengeCancel: ReturnType<typeof vi.fn>;
+
+function isHint(value: unknown): value is Hint {
+  return Boolean(value && typeof value === 'object' && 'reverificationLevel' in value);
+}
 
 vi.mock('@clerk/shared/react', async importOriginal => {
   const actual = await importOriginal<typeof SharedReact>();
@@ -21,203 +31,492 @@ vi.mock('@clerk/shared/react', async importOriginal => {
     ...actual,
     useSession: () => ({ session }),
     useReverification: (
-      _fetcher: unknown,
+      fetcher: (...args: unknown[]) => Promise<unknown> | undefined,
       options?: { onNeedsReverification?: (params: NeedsReverificationParameters) => void },
     ) => {
-      capturedOnNeeds = options?.onNeedsReverification;
-      return wrapped;
+      return async (...args: unknown[]) => {
+        const result = await fetcher(...args);
+        if (!isHint(result)) {
+          return result;
+        }
+        await new Promise<void>((resolve, reject) => {
+          options?.onNeedsReverification?.({
+            level: result.reverificationLevel,
+            complete: () => resolve(),
+            cancel: () => {
+              challengeCancel();
+              reject(
+                new ClerkRuntimeError('User cancelled attempted verification', {
+                  code: 'reverification_cancelled',
+                }),
+              );
+            },
+          });
+        });
+        return fetcher(...args);
+      };
     },
   };
 });
 
-const fetcher = async (id: string) => id;
+function assertActive(state: ReverificationState): asserts state is Extract<ReverificationState, { phase: 'active' }> {
+  expect(state.phase).toBe('active');
+  if (state.phase !== 'active') {
+    throw new Error('expected active reverification');
+  }
+}
 
 describe('useReverificationWithState', () => {
   beforeEach(() => {
-    capturedOnNeeds = undefined;
     session = { id: 'sess_1' };
-    wrapped.mockReset();
+    challengeCancel = vi.fn();
   });
 
-  it('returns the enhanced fetcher and is idle until reverification is needed', () => {
+  it('returns the enhanced fetcher and stays inactive until reverification is needed', async () => {
+    const fetcher = vi.fn((id: string) => Promise.resolve(id));
     const { result } = renderHook(() => useReverificationWithState(fetcher));
-    const [callback, state] = result.current;
 
-    expect(callback).toBe(wrapped);
-    expect(state.isActive).toBe(false);
-    expect(state.complete).toBeUndefined();
-    expect(state.cancel).toBeUndefined();
-    expect(state.level).toBeUndefined();
+    expect(typeof result.current[0]).toBe('function');
+    expect(result.current[1]).toEqual({ phase: 'inactive' });
+
+    let value: string | undefined;
+    await act(async () => {
+      value = await result.current[0]('user');
+    });
+
+    expect(value).toBe('user');
+    expect(fetcher).toHaveBeenCalledOnce();
+    expect(fetcher).toHaveBeenCalledWith('user');
+    expect(result.current[1]).toEqual({ phase: 'inactive' });
   });
 
-  it('surfaces complete, cancel, and level when useReverification needs reverification', () => {
+  it('moves inactive → active → retrying → settled when the retry succeeds', async () => {
+    const retry = deferred<{ ok: true }>();
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce({ reverificationLevel: 'first_factor' } satisfies Hint)
+      .mockImplementationOnce(() => retry.promise);
     const { result } = renderHook(() => useReverificationWithState(fetcher));
-    const complete = vi.fn();
-    const cancel = vi.fn();
+
+    let pending!: Promise<unknown>;
+    act(() => {
+      pending = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    assertActive(result.current[1]);
+    expect(result.current[1].level).toBe('first_factor');
+    expect(fetcher).toHaveBeenCalledOnce();
 
     act(() => {
-      capturedOnNeeds?.({ complete, cancel, level: 'first_factor' });
+      assertActive(result.current[1]);
+      result.current[1].complete();
     });
+    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'retrying' }));
+    expect(fetcher).toHaveBeenCalledTimes(2);
 
-    const [, state] = result.current;
-    expect(state.isActive).toBe(true);
-    if (!state.isActive) {
-      throw new Error('expected active reverification state');
-    }
-    expect(state.level).toBe('first_factor');
-
-    act(() => {
-      state.complete();
+    retry.resolve({ ok: true });
+    await act(async () => {
+      await expect(pending).resolves.toEqual({ ok: true });
     });
-
-    expect(complete).toHaveBeenCalledOnce();
-    expect(result.current[1].isActive).toBe(false);
+    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'settled' }));
+    expect(challengeCancel).not.toHaveBeenCalled();
   });
 
-  it('returns to idle after cancel and calls the state cancel', () => {
+  it('settles when the delayed retry fails', async () => {
+    const retry = deferred<never>();
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce({ reverificationLevel: 'multi_factor' } satisfies Hint)
+      .mockImplementationOnce(() => retry.promise);
     const { result } = renderHook(() => useReverificationWithState(fetcher));
-    const complete = vi.fn();
-    const cancel = vi.fn();
+
+    let pending!: Promise<unknown>;
+    act(() => {
+      pending = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
 
     act(() => {
-      capturedOnNeeds?.({ complete, cancel, level: undefined });
+      assertActive(result.current[1]);
+      result.current[1].complete();
     });
+    await waitFor(() => expect(result.current[1].phase).toBe('retrying'));
 
-    act(() => {
-      const [, state] = result.current;
-      if (state.isActive) {
-        state.cancel();
-      }
+    retry.reject(new Error('Mock delete failed.'));
+    await act(async () => {
+      await expect(pending).rejects.toMatchObject({ message: 'Mock delete failed.' });
     });
-
-    expect(cancel).toHaveBeenCalledOnce();
-    expect(complete).not.toHaveBeenCalled();
-    expect(result.current[1].isActive).toBe(false);
+    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'settled' }));
+    expect(challengeCancel).not.toHaveBeenCalled();
   });
 
-  it('cancels an overlapping challenge and preserves the active challenge', () => {
+  it('settles immediately when the active challenge is cancelled', async () => {
+    const fetcher = vi.fn().mockResolvedValue({ reverificationLevel: undefined } satisfies Hint);
     const { result } = renderHook(() => useReverificationWithState(fetcher));
-    const firstComplete = vi.fn();
-    const firstCancel = vi.fn();
-    const secondComplete = vi.fn();
-    const secondCancel = vi.fn();
+
+    let pending!: Promise<unknown>;
+    act(() => {
+      pending = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
 
     act(() => {
-      capturedOnNeeds?.({ complete: firstComplete, cancel: firstCancel, level: 'first_factor' });
-      capturedOnNeeds?.({ complete: secondComplete, cancel: secondCancel, level: 'multi_factor' });
+      assertActive(result.current[1]);
+      result.current[1].cancel();
     });
+    expect(result.current[1]).toEqual({ phase: 'settled' });
 
-    expect(secondCancel).toHaveBeenCalledOnce();
-    expect(result.current[1]).toMatchObject({ isActive: true, level: 'first_factor' });
-
-    act(() => {
-      const [, state] = result.current;
-      if (state.isActive) {
-        state.complete();
-      }
+    await act(async () => {
+      await expect(pending).rejects.toMatchObject({ code: 'reverification_cancelled' });
     });
-
-    expect(firstComplete).toHaveBeenCalledOnce();
-    expect(firstCancel).not.toHaveBeenCalled();
-    expect(secondComplete).not.toHaveBeenCalled();
+    expect(isReverificationCancelledError(await pending.catch(error => error))).toBe(true);
+    expect(result.current[1]).toEqual({ phase: 'settled' });
+    expect(fetcher).toHaveBeenCalledOnce();
+    expect(challengeCancel).toHaveBeenCalledOnce();
   });
 
-  it('allows another challenge after the active challenge settles', () => {
+  it('stays settled until the handler is called again', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce({ reverificationLevel: 'first_factor' } satisfies Hint)
+      .mockResolvedValueOnce({ reverificationLevel: 'first_factor' } satisfies Hint)
+      .mockResolvedValue('ok');
     const { result } = renderHook(() => useReverificationWithState(fetcher));
-    const firstComplete = vi.fn();
-    const secondCancel = vi.fn();
 
+    let first!: Promise<unknown>;
     act(() => {
-      capturedOnNeeds?.({ complete: firstComplete, cancel: vi.fn(), level: 'first_factor' });
+      first = result.current[0]();
     });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
     act(() => {
-      const [, state] = result.current;
-      if (state.isActive) {
-        state.complete();
-      }
+      assertActive(result.current[1]);
+      result.current[1].cancel();
     });
-    act(() => {
-      capturedOnNeeds?.({ complete: vi.fn(), cancel: secondCancel, level: 'multi_factor' });
+    await act(async () => {
+      await first.catch(() => undefined);
     });
+    expect(result.current[1]).toEqual({ phase: 'settled' });
 
-    expect(firstComplete).toHaveBeenCalledOnce();
-    expect(secondCancel).not.toHaveBeenCalled();
-    expect(result.current[1]).toMatchObject({ isActive: true, level: 'multi_factor' });
+    let second!: Promise<unknown>;
+    act(() => {
+      second = result.current[0]();
+    });
+    expect(result.current[1]).toEqual({ phase: 'inactive' });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    act(() => {
+      assertActive(result.current[1]);
+      result.current[1].cancel();
+    });
+    await act(async () => {
+      await second.catch(() => undefined);
+    });
   });
 
-  it('cancels when the session changes after reverification opens', async () => {
+  it('releases a settled run with reset', async () => {
+    const fetcher = vi.fn().mockResolvedValue({ reverificationLevel: 'first_factor' } satisfies Hint);
+    const { result } = renderHook(() => useReverificationWithState(fetcher));
+
+    let first!: Promise<unknown>;
+    act(() => {
+      first = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    act(() => {
+      assertActive(result.current[1]);
+      result.current[1].cancel();
+    });
+
+    act(() => result.current[2]());
+    expect(result.current[1]).toEqual({ phase: 'settled' });
+
+    await act(async () => {
+      await first.catch(() => undefined);
+    });
+    act(() => result.current[2]());
+    expect(result.current[1]).toEqual({ phase: 'inactive' });
+  });
+
+  it('rejects a second call during the initial request without calling the fetcher again', async () => {
+    const gate = deferred<string>();
+    const fetcher = vi.fn(() => gate.promise);
+    const { result } = renderHook(() => useReverificationWithState(fetcher));
+
+    let first!: Promise<unknown>;
+    act(() => {
+      first = result.current[0]('first');
+    });
+    await waitFor(() => expect(fetcher).toHaveBeenCalledOnce());
+
+    await expect(result.current[0]('second')).rejects.toMatchObject({ code: IN_PROGRESS });
+    expect(fetcher).toHaveBeenCalledOnce();
+    expect(fetcher).toHaveBeenCalledWith('first');
+
+    gate.resolve('done');
+    await act(async () => {
+      await expect(first).resolves.toBe('done');
+    });
+  });
+
+  it('rejects a second call during verification and retry without calling the fetcher', async () => {
+    const retry = deferred<string>();
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce({ reverificationLevel: 'first_factor' } satisfies Hint)
+      .mockImplementationOnce(() => retry.promise);
+    const { result } = renderHook(() => useReverificationWithState(fetcher));
+
+    let first!: Promise<unknown>;
+    act(() => {
+      first = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    expect(fetcher).toHaveBeenCalledOnce();
+
+    const duringVerification = await result.current[0]().then(
+      () => {
+        throw new Error('expected rejection');
+      },
+      error => error,
+    );
+    expect(isReverificationCancelledError(duringVerification)).toBe(false);
+    expect(isClerkRuntimeError(duringVerification) && duringVerification.code).toBe(IN_PROGRESS);
+    expect(fetcher).toHaveBeenCalledOnce();
+
+    act(() => {
+      assertActive(result.current[1]);
+      result.current[1].complete();
+    });
+    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'retrying' }));
+    expect(fetcher).toHaveBeenCalledTimes(2);
+
+    await expect(result.current[0]()).rejects.toMatchObject({ code: IN_PROGRESS });
+    expect(fetcher).toHaveBeenCalledTimes(2);
+
+    retry.resolve('ok');
+    await act(async () => {
+      await expect(first).resolves.toBe('ok');
+    });
+    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'settled' }));
+  });
+
+  it('starts another challenge after the first invocation settles', async () => {
+    const retry = deferred<string>();
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce({ reverificationLevel: 'first_factor' } satisfies Hint)
+      .mockImplementationOnce(() => retry.promise)
+      .mockResolvedValueOnce({ reverificationLevel: 'multi_factor' } satisfies Hint);
+    const { result } = renderHook(() => useReverificationWithState(fetcher));
+
+    let first!: Promise<unknown>;
+    act(() => {
+      first = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    act(() => {
+      assertActive(result.current[1]);
+      result.current[1].complete();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('retrying'));
+
+    retry.resolve('ok');
+    await act(async () => {
+      await expect(first).resolves.toBe('ok');
+    });
+    await waitFor(() => expect(result.current[1]).toEqual({ phase: 'settled' }));
+
+    act(() => {
+      first = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    expect(result.current[1]).toMatchObject({ phase: 'active', level: 'multi_factor' });
+    act(() => {
+      assertActive(result.current[1]);
+      result.current[1].cancel();
+    });
+    await act(async () => {
+      await first.catch(() => undefined);
+    });
+  });
+
+  it('cancels when the session changes while the challenge is active', async () => {
+    const fetcher = vi.fn().mockResolvedValue({ reverificationLevel: 'first_factor' } satisfies Hint);
     const { result, rerender } = renderHook(() => useReverificationWithState(fetcher));
-    const cancel = vi.fn();
 
+    let first!: Promise<unknown>;
     act(() => {
-      capturedOnNeeds?.({ complete: vi.fn(), cancel, level: 'first_factor' });
+      first = result.current[0]();
     });
-    expect(result.current[1].isActive).toBe(true);
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
 
+    const settled = expect(first).rejects.toMatchObject({ code: 'reverification_cancelled' });
     session = { id: 'sess_2' };
     rerender();
-    await waitFor(() => expect(cancel).toHaveBeenCalledOnce());
-    expect(result.current[1].isActive).toBe(false);
+    await settled;
+    expect(result.current[1]).toEqual({ phase: 'settled' });
+    expect(challengeCancel).toHaveBeenCalledOnce();
   });
 
   it('does not cancel when the session is briefly unloaded', async () => {
-    const { rerender } = renderHook(() => useReverificationWithState(fetcher));
-    const cancel = vi.fn();
+    const fetcher = vi.fn().mockResolvedValue({ reverificationLevel: 'first_factor' } satisfies Hint);
+    const { result, rerender } = renderHook(() => useReverificationWithState(fetcher));
 
+    let first!: Promise<unknown>;
     act(() => {
-      capturedOnNeeds?.({ complete: vi.fn(), cancel, level: 'first_factor' });
+      first = result.current[0]();
     });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
 
     const previous = session;
     session = undefined;
     rerender();
     session = previous;
     rerender();
-    expect(cancel).not.toHaveBeenCalled();
-  });
-
-  it('cancels when the session is signed out', async () => {
-    const { result, rerender } = renderHook(() => useReverificationWithState(fetcher));
-    const cancel = vi.fn();
+    expect(challengeCancel).not.toHaveBeenCalled();
+    expect(result.current[1].phase).toBe('active');
 
     act(() => {
-      capturedOnNeeds?.({ complete: vi.fn(), cancel, level: 'first_factor' });
+      assertActive(result.current[1]);
+      result.current[1].cancel();
     });
+    await act(async () => {
+      await first.catch(() => undefined);
+    });
+  });
+
+  it('cancels when the session is signed out during the challenge', async () => {
+    const fetcher = vi.fn().mockResolvedValue({ reverificationLevel: 'first_factor' } satisfies Hint);
+    const { result, rerender } = renderHook(() => useReverificationWithState(fetcher));
+
+    let first!: Promise<unknown>;
+    act(() => {
+      first = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+
+    const settled = expect(first).rejects.toMatchObject({ code: 'reverification_cancelled' });
+    session = null;
+    rerender();
+    await settled;
+    expect(result.current[1]).toEqual({ phase: 'settled' });
+  });
+
+  it('does not cancel a retry when the session changes', async () => {
+    const retry = deferred<string>();
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce({ reverificationLevel: 'first_factor' } satisfies Hint)
+      .mockImplementationOnce(() => retry.promise);
+    const { result, rerender } = renderHook(() => useReverificationWithState(fetcher));
+
+    let first!: Promise<unknown>;
+    act(() => {
+      first = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    act(() => {
+      assertActive(result.current[1]);
+      result.current[1].complete();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('retrying'));
+
+    session = { id: 'sess_2' };
+    rerender();
+    await tick();
+    expect(challengeCancel).not.toHaveBeenCalled();
+    expect(result.current[1]).toEqual({ phase: 'retrying' });
 
     session = null;
     rerender();
-    await waitFor(() => expect(cancel).toHaveBeenCalledOnce());
-    expect(result.current[1].isActive).toBe(false);
-  });
+    await tick();
+    expect(challengeCancel).not.toHaveBeenCalled();
+    expect(result.current[1]).toEqual({ phase: 'retrying' });
 
-  it('cancels when the owner unmounts mid-flow', () => {
-    const { unmount } = renderHook(() => useReverificationWithState(fetcher));
-    const cancel = vi.fn();
-
-    act(() => {
-      capturedOnNeeds?.({ complete: vi.fn(), cancel, level: 'first_factor' });
+    retry.resolve('ok');
+    await act(async () => {
+      await expect(first).resolves.toBe('ok');
     });
-
-    unmount();
-    expect(cancel).toHaveBeenCalledOnce();
   });
 
-  it('does not cancel again on unmount after the flow already settled', () => {
+  it('cancels when the owner unmounts during the challenge', async () => {
+    const fetcher = vi.fn().mockResolvedValue({ reverificationLevel: 'first_factor' } satisfies Hint);
     const { result, unmount } = renderHook(() => useReverificationWithState(fetcher));
-    const cancel = vi.fn();
 
+    let first!: Promise<unknown>;
     act(() => {
-      capturedOnNeeds?.({ complete: vi.fn(), cancel, level: 'first_factor' });
+      first = result.current[0]();
     });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+
+    const settled = expect(first).rejects.toMatchObject({ code: 'reverification_cancelled' });
+    unmount();
+    await settled;
+    expect(challengeCancel).toHaveBeenCalledOnce();
+  });
+
+  it('cancels the challenge when the owner unmounts before reverification is needed', async () => {
+    const response = deferred<Hint>();
+    const fetcher = vi.fn().mockImplementationOnce(() => response.promise);
+    const { result, unmount } = renderHook(() => useReverificationWithState(fetcher));
+
+    let pending!: Promise<unknown>;
     act(() => {
-      const [, state] = result.current;
-      if (state.isActive) {
-        state.cancel();
-      }
+      pending = result.current[0]();
     });
-    expect(cancel).toHaveBeenCalledOnce();
+    unmount();
+
+    const settled = expect(pending).rejects.toMatchObject({ code: 'reverification_cancelled' });
+    response.resolve({ reverificationLevel: 'first_factor' });
+    await settled;
+    expect(challengeCancel).toHaveBeenCalledOnce();
+  });
+
+  it('does not cancel when the owner unmounts during retry', async () => {
+    const retry = deferred<string>();
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce({ reverificationLevel: 'first_factor' } satisfies Hint)
+      .mockImplementationOnce(() => retry.promise);
+    const { result, unmount } = renderHook(() => useReverificationWithState(fetcher));
+
+    let first!: Promise<unknown>;
+    act(() => {
+      first = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    act(() => {
+      assertActive(result.current[1]);
+      result.current[1].complete();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('retrying'));
 
     unmount();
-    expect(cancel).toHaveBeenCalledOnce();
+    await tick();
+    expect(challengeCancel).not.toHaveBeenCalled();
+
+    retry.resolve('ok');
+    await expect(first).resolves.toBe('ok');
+  });
+
+  it('does not cancel again on unmount after the flow already settled', async () => {
+    const fetcher = vi.fn().mockResolvedValue({ reverificationLevel: 'first_factor' } satisfies Hint);
+    const { result, unmount } = renderHook(() => useReverificationWithState(fetcher));
+
+    let first!: Promise<unknown>;
+    act(() => {
+      first = result.current[0]();
+    });
+    await waitFor(() => expect(result.current[1].phase).toBe('active'));
+    act(() => {
+      assertActive(result.current[1]);
+      result.current[1].cancel();
+    });
+    await act(async () => {
+      await first.catch(() => undefined);
+    });
+    expect(challengeCancel).toHaveBeenCalledOnce();
+
+    unmount();
+    expect(challengeCancel).toHaveBeenCalledOnce();
   });
 });

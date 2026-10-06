@@ -1,13 +1,41 @@
 import { __resetClerkQueryClientForTest } from '@clerk/shared/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from 'vitest';
 
 import { startWorker, takeUnhandledRequests, takeUnsettledHolds, worker } from './src/__tests__/feature/fake-fapi';
 
 expect.extend(matchers);
 
+configure({ asyncUtilTimeout: 3000 });
+
+const NativeBroadcastChannel = window.BroadcastChannel;
+const channelNamespace = crypto.randomUUID();
+const openChannels = new Set<IsolatedBroadcastChannel>();
+
+class IsolatedBroadcastChannel extends NativeBroadcastChannel {
+  private isClosed = false;
+
+  constructor(name: string) {
+    super(`${channelNamespace}:${name}`);
+    openChannels.add(this);
+  }
+
+  override postMessage(message: unknown) {
+    if (!this.isClosed) {
+      super.postMessage(message);
+    }
+  }
+
+  override close() {
+    this.isClosed = true;
+    openChannels.delete(this);
+    super.close();
+  }
+}
+
 beforeAll(async () => {
+  window.BroadcastChannel = IsolatedBroadcastChannel;
   await startWorker();
 });
 
@@ -18,6 +46,14 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   __resetClerkQueryClientForTest();
+  for (const channel of [...openChannels]) {
+    channel.close();
+  }
+  for (const cookie of document.cookie.split('; ').filter(Boolean)) {
+    document.cookie = `${cookie.split('=')[0]}=; max-age=0; path=/`;
+  }
+  localStorage.clear();
+  sessionStorage.clear();
   worker.resetHandlers();
   const unhandled = takeUnhandledRequests();
   const unsettled = takeUnsettledHolds();
@@ -26,5 +62,6 @@ afterEach(() => {
 });
 
 afterAll(() => {
+  window.BroadcastChannel = NativeBroadcastChannel;
   worker.stop();
 });

@@ -100,12 +100,21 @@ it('makes the selected organization active and closes', async () => {
 `packages/mosaic/src/features/user-button/__tests__/user-button.feature.test.tsx`
 is the worked example.
 
+Put a feature test next to the component it renders, and name it after that
+component. `<UserProfilePasswordSection />` is tested by
+`user-profile-password-section/user-profile-password-section.feature.test.tsx`.
+Vitest finds feature tests by the `.feature.test.tsx` suffix, so a shared
+`__tests__/` folder buys nothing and makes a section's tests harder to find.
+Existing tests in `__tests__/` folders, the worked example included, move when
+their feature next changes.
+
 ### The toolkit (`src/__tests__/feature/`)
 
 - **`fapi.ts`**: typed builders for FAPI JSON (`fapiEnvironment`, `fapiUser`,
   `fapiSession`, `fapiClient`, `fapiOrganization`, `fapiMembership`,
-  `fapiInvitation`, `fapiSuggestion`, `fapiToken`). They return the wire shapes
-  from `@clerk/shared/types`, so a fixture can't invent a field.
+  `fapiInvitation`, `fapiSuggestion`, `fapiToken`, `fapiSessionVerification`,
+  `fapiVerification`). They return the wire shapes from `@clerk/shared/types`,
+  so a fixture can't invent a field.
   `fapiEnvironment(overrides)` shallow-merges per section, for example
   `{ organization_settings: { enabled: false } }`.
 - **`fake-fapi.ts`**:
@@ -115,6 +124,18 @@ is the worked example.
   - `holdRequests(method, path)` holds matching requests open. Assert the
     in-flight UI, then `release()` to let them through to `serveFapi`, or
     `fail(code)` to answer with a 400 Clerk error.
+- **`fake-fapi/`**: fakes for larger endpoint families, kept out of
+  `fake-fapi.ts` and registered by `serveFapi`.
+  - `verification.ts` fakes session reverification (`/verify` and its
+    prepare and attempt endpoints). Seed it with
+    `serveFapi({ verification: { firstFactors, secondFactors, secrets } })`:
+    the factors the user has, and the password or code each strategy accepts.
+    The fake follows the server: level `second_factor` starts on the second
+    factor, `multi_factor` goes first factor then second, and a user with no
+    second factor is downgraded to `first_factor`. It rejects calls the server
+    rejects: before start, in the wrong status, with a strategy the user
+    doesn't have, and an email, phone, or passkey attempt that wasn't
+    prepared. Wrong passwords and codes answer 422.
 - **`render.tsx`**: `renderWithClerk(ui)` renders inside `ClerkContextProvider`
   and `MosaicProvider`, loads Clerk, and returns `{ clerk, navigate, ... }`.
   `navigate` is the router Clerk was loaded with, called with the path.
@@ -149,8 +170,11 @@ click.
 
 - `setActive` only touches the session when the document has focus. The setup
   focuses the window, so don't blur it by accident.
-- clerk-js treats a **422** as "unauthenticated" and refetches the client. Use
-  400s for ordinary failures, which is what `holdRequests(...).fail()` sends.
+- clerk-js treats a **422** from a session touch (`setActive`, focus) or a token
+  request as "unauthenticated" and refetches the client. Answer those with
+  400s, which is what `holdRequests(...).fail()` sends. Form errors on other
+  endpoints are real 422s, for example a wrong password or code, and are
+  handled as ordinary errors.
 - After a touch, `getToken` is served from the token the touch returned, so
   there is no tokens request to hold during an organization switch. To observe
   Clerk's transitive state, route the action through navigation and make
@@ -166,5 +190,5 @@ Write unit tests for:
 - Timing that is slow to drive through the UI, such as a resend countdown. Use
   fake timers.
 
-`packages/mosaic/src/machines/__tests__/test-utils.ts` has `deferred<T>()`,
+`packages/mosaic/src/__tests__/async.ts` has `deferred<T>()`,
 `tick()`, and `noop`.

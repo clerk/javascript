@@ -1,7 +1,7 @@
 import { UserButtonView } from '@clerk/mosaic/features/user-button/user-button.view';
 import type { MosaicCatalog } from '@clerk/mosaic/localization';
 import { fill, plural, rich, useLocale, useMessages } from '@clerk/mosaic/localization';
-import { MosaicProvider } from '@clerk/mosaic/MosaicProvider';
+import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 
@@ -24,7 +24,7 @@ const esES: MosaicCatalog = {
   userButton: {
     trigger: { open: 'Abrir el menú de la cuenta de {name}' },
     popup: { label: 'Cuenta' },
-    workspaces: {
+    organizations: {
       personal: 'Cuenta personal',
       notSelected: 'Ninguna organización seleccionada',
       loading: 'Cargando organizaciones…',
@@ -35,7 +35,6 @@ const esES: MosaicCatalog = {
       pending: 'pendiente',
     },
     accounts: {
-      actionsFor: 'Acciones para {identifier}',
       switch: 'Cambiar de cuenta',
       add: 'Añadir cuenta',
       signOut: 'Cerrar sesión',
@@ -45,6 +44,8 @@ const esES: MosaicCatalog = {
       invite: 'Invitar',
       account: 'Gestionar cuenta',
       organization: 'Gestionar organización',
+      organizationSettings: 'Configuración de la organización',
+      profileSettings: 'Configuración del perfil',
       createOrganization: 'Crear organización',
     },
   },
@@ -82,7 +83,7 @@ const clerkCloud = {
 
 // A static user button: every string it renders comes from the `userButton` namespace, so it
 // shows a catalog or an override the moment the popup opens.
-function Workspace() {
+function OrganizationUserButton() {
   const [open, setOpen] = useState(false);
   return (
     <UserButtonView
@@ -133,8 +134,8 @@ function Strings() {
     <Rows
       rows={[
         ['fill', fill(m.trigger.open, { name: 'Colin' })],
-        ['plural · 1', plural(m.workspaces.members, 1, locale)],
-        ['plural · 5', plural(m.workspaces.members, 5, locale)],
+        ['plural · 1', plural(m.organizations.members, 1, locale)],
+        ['plural · 5', plural(m.organizations.members, 5, locale)],
         ['rich', rich(link.resendCountdown, { values: { seconds: <strong>30</strong> } })],
       ]}
     />
@@ -144,7 +145,7 @@ function Strings() {
 function Counts({ counts }: { counts: number[] }) {
   const m = useMessages('userButton');
   const locale = useLocale();
-  return <Rows rows={counts.map(count => [String(count), plural(m.workspaces.members, count, locale)])} />;
+  return <Rows rows={counts.map(count => [String(count), plural(m.organizations.members, count, locale)])} />;
 }
 
 export function Overrides() {
@@ -157,7 +158,7 @@ export function Overrides() {
         },
       }}
     >
-      <Workspace />
+      <OrganizationUserButton />
     </MosaicProvider>
   );
 }
@@ -165,7 +166,7 @@ export function Overrides() {
 export function Catalog() {
   return (
     <MosaicProvider localization={{ locale: 'es-ES', messages: esES }}>
-      <Workspace />
+      <OrganizationUserButton />
     </MosaicProvider>
   );
 }
@@ -179,7 +180,7 @@ export function CatalogWithOverrides() {
         overrides: { userButton: { manage: { invite: 'Invitar al equipo' } } },
       }}
     >
-      <Workspace />
+      <OrganizationUserButton />
     </MosaicProvider>
   );
 }
@@ -202,7 +203,7 @@ export function PluralRules() {
       localization={{
         locale: 'ru',
         overrides: {
-          'userButton.workspaces.members': {
+          'userButton.organizations.members': {
             one: '{count} участник',
             few: '{count} участника',
             many: '{count} участников',

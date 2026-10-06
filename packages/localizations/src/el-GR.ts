@@ -898,6 +898,17 @@ export const elGR: LocalizationResource = {
       title: 'Επιλέξτε πάροχο',
       warning: 'Μόλις επιλεγεί ένας πάροχος δεν μπορείτε να τον αλλάξετε μέχρι να ολοκληρωθεί η ρύθμιση',
     },
+    signingCertificates: {
+      addCertificate: undefined,
+      expired: undefined,
+      expires: undefined,
+      expiryAfterSave: undefined,
+      fileUnreadable: undefined,
+      notACertificate: undefined,
+      primary: undefined,
+      primaryTooltip: undefined,
+      removeCertificate: undefined,
+    },
     testConfigurationStep: {
       error__noSuccessfulTestRun: undefined,
       subtitle: undefined,
@@ -1341,6 +1352,10 @@ export const elGR: LocalizationResource = {
         },
         identityProvider: {
           certificateExpires: undefined,
+          certificates: undefined,
+          certificatesCount: undefined,
+          certificatesSummary: undefined,
+          certificatesSummaryExpired: undefined,
           clientSecret: {
             placeholder: undefined,
           },

@@ -1,3 +1,7 @@
+import type { ReactNode } from 'react';
+
+import type { UserProfileManagedBy } from '../user-profile-managed-by';
+
 export type UserProfileEditPasswordField = 'currentPassword' | 'newPassword' | 'confirmPassword';
 
 export interface UserProfileEditPasswordValues {
@@ -13,14 +17,13 @@ export interface UserProfileEditPasswordValue {
   signOutOfOtherSessions: boolean;
 }
 
-export interface UserProfilePasswordManagedBy {
-  name: string;
+export interface UserProfilePasswordSectionViewProps {
+  action?: ReactNode;
+  hasPassword?: boolean;
+  /** Replaces the edit action with the enterprise provider’s name. */
+  managedBy?: UserProfileManagedBy;
 }
 
-export interface UserProfilePasswordSectionViewProps {
-  hasPassword?: boolean;
-  requiresCurrentPassword?: boolean;
-  /** Replaces the edit action with the enterprise provider’s name. */
-  managedBy?: UserProfilePasswordManagedBy;
-  onSubmitPassword?: (value: UserProfileEditPasswordValue) => Promise<void>;
+export interface UserProfilePasswordSlot {
+  content: ReactNode;
 }

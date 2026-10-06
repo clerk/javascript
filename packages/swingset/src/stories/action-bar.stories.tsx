@@ -156,7 +156,7 @@ function MembersProfile({
       value='members'
       {...props}
     >
-      <Profile.Title>Workspace</Profile.Title>
+      <Profile.Title>Organization</Profile.Title>
       <Profile.Nav>
         <Profile.NavItem
           value='members'
@@ -190,7 +190,7 @@ export function InDialog() {
   const [popup, setPopup] = useState<HTMLDivElement | null>(null);
   return (
     <Dialog.Root>
-      <Dialog.Trigger render={<Button />}>Manage workspace</Dialog.Trigger>
+      <Dialog.Trigger render={<Button />}>Manage organization</Dialog.Trigger>
       <Dialog.Popup
         ref={setPopup}
         variant='profile'

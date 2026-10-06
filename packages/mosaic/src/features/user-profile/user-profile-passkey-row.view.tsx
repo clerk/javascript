@@ -6,8 +6,7 @@ import { ActionMenu } from '../../components/action-menu';
 import { Dialog } from '../../components/dialog';
 import { Icon, IconFrame } from '../../components/icon';
 import { Section } from '../../components/section';
-import { fill } from '../../localization/messages';
-import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
+import { fill, useMessages } from '../../localization';
 import { styles } from './user-profile-passkeys-section.styles';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 import { useUserProfileRenamePasskeyController } from './user-profile-rename-passkey.controller';
@@ -24,6 +23,7 @@ export function UserProfilePasskeyRowView({
   onRename?: (id: string, name: string) => void | Promise<void>;
   onRemove?: () => void;
 }) {
+  const m = useMessages('userProfilePasskeys');
   const renameDialog = useMemo(() => Dialog.createHandle(), []);
   const controller = useUserProfileRenamePasskeyController({ id: passkey.id, name: passkey.name, onRename });
   const description =
