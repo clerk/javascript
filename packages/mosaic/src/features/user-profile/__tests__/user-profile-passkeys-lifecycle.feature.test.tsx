@@ -14,9 +14,10 @@ import {
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../mosaic-provider';
 import {
+  passkeysSectionNode,
   UserProfilePasskeysSection,
-  useUserProfilePasskeysSlot,
 } from '../user-profile-passkeys-section/user-profile-passkeys-section';
+import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section/user-profile-passkeys-section.model';
 import {
   UserProfileSecurityPanelView,
   type UserProfileSecurityPanelViewProps,
@@ -25,7 +26,7 @@ import {
 afterEach(() => vi.restoreAllMocks());
 
 function SecurityHost(props: Pick<UserProfileSecurityPanelViewProps, 'mfaMethods' | 'devices'> = {}) {
-  const passkeysSlot = useUserProfilePasskeysSlot();
+  const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
   return (
     <UserProfileSecurityPanelView
       {...props}

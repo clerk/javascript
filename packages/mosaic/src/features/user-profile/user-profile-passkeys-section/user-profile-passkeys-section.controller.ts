@@ -1,6 +1,12 @@
 import { useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/use-machine';
+import type { UserProfilePasskeysModel } from './user-profile-passkeys-section.model';
+
+type PasskeysControllerInput = Pick<
+  Extract<UserProfilePasskeysModel, { status: 'ready' }>,
+  'passkeys' | 'onAdd' | 'onRename' | 'validateName' | 'onRemove'
+>;
 
 interface Context {
   run: () => Promise<unknown>;
@@ -44,12 +50,22 @@ const machine = createMachine({
   },
 });
 
-export function useUserProfilePasskeysSectionController({ onAdd }: { onAdd?: () => Promise<unknown> }) {
+export function useUserProfilePasskeysSectionController({
+  passkeys,
+  onAdd,
+  onRename,
+  validateName,
+  onRemove,
+}: PasskeysControllerInput) {
   const messages = useMessages('userProfilePasskeys');
   const [snapshot, send] = useMachine(machine);
   return {
+    passkeys,
     isAdding: snapshot.value === 'creating',
     addError: snapshot.context.error,
     onAdd: onAdd ? () => send({ type: 'ADD', run: onAdd, fallbackErrorMessage: messages.saveError }) : undefined,
+    onRename,
+    validateName,
+    onRemove,
   };
 }

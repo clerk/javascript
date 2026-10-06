@@ -4,45 +4,32 @@ import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section
 import { useUserProfilePasskeysSectionController } from './user-profile-passkeys-section.controller';
 import type { UserProfilePasskeysModel } from './user-profile-passkeys-section.model';
 import { useUserProfilePasskeysModel } from './user-profile-passkeys-section.model';
-import type { UserProfilePasskeysSlot } from './user-profile-passkeys-section.types';
 
 export interface UserProfilePasskeysSectionProps {
   fallback?: ReactNode;
 }
 
 export function UserProfilePasskeysSection(props: UserProfilePasskeysSectionProps = {}) {
-  return useUserProfilePasskeysSlot(props)?.content ?? null;
+  const model = useUserProfilePasskeysModel();
+  return passkeysSectionNode(model, props.fallback);
 }
 
-export function useUserProfilePasskeysSlot({
-  fallback = null,
-}: UserProfilePasskeysSectionProps = {}): UserProfilePasskeysSlot | null {
-  const model = useUserProfilePasskeysModel();
+export function passkeysSectionNode(model: UserProfilePasskeysModel, fallback: ReactNode = null): ReactNode {
   if (model.status === 'loading') {
-    return fallback ? { content: fallback } : null;
+    return fallback || null;
   }
   if (model.status === 'hidden') {
     return null;
   }
-  return {
-    content: (
-      <PasskeysEditor
-        key={`passkeys:${model.userId}:${model.sessionId}`}
-        model={model}
-      />
-    ),
-  };
+  return (
+    <PasskeysEditor
+      key={`passkeys:${model.userId}:${model.sessionId}`}
+      model={model}
+    />
+  );
 }
 
 function PasskeysEditor({ model }: { model: Extract<UserProfilePasskeysModel, { status: 'ready' }> }) {
-  const controller = useUserProfilePasskeysSectionController({ onAdd: model.onAdd });
-  return (
-    <UserProfilePasskeysSectionView
-      passkeys={model.passkeys}
-      {...controller}
-      onRename={model.onRename}
-      validateName={model.validateName}
-      onRemove={model.onRemove}
-    />
-  );
+  const controller = useUserProfilePasskeysSectionController(model);
+  return <UserProfilePasskeysSectionView {...controller} />;
 }

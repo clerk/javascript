@@ -17,8 +17,8 @@ import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../mosaic-provider';
 import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
 import {
+  passkeysSectionNode,
   UserProfilePasskeysSection,
-  useUserProfilePasskeysSlot,
 } from '../user-profile-passkeys-section/user-profile-passkeys-section';
 import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section/user-profile-passkeys-section.model';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
@@ -29,7 +29,7 @@ function ReadonlyPasskeys() {
 }
 
 function SecurityPanel() {
-  const passkeysSlot = useUserProfilePasskeysSlot();
+  const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
   return <UserProfileSecurityPanelView passkeysSlot={passkeysSlot} />;
 }
 
@@ -71,14 +71,6 @@ describe('Seeing passkeys', () => {
     expect(screen.getByText('Laptop')).toBeVisible();
     expect(screen.getByText('Phone')).toBeVisible();
     expect(screen.queryByRole('button')).toBeNull();
-  });
-
-  it('renders within the authentication section supplied by its parent', async () => {
-    servePasskeys();
-    await renderWithClerk(<SecurityPanel />);
-
-    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Passkeys');
-    expect(screen.getByRole('group', { name: 'Passkeys' })).toBeVisible();
   });
 
   it('localizes the passkey section, row actions, and dialogs', async () => {

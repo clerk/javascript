@@ -5,7 +5,9 @@ import { serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnvironment, fapiPasskey, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { UserProfileView } from '../user-profile.view';
-import { useUserProfilePasskeysSlot } from '../user-profile-passkeys-section/user-profile-passkeys-section';
+import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
+import { passkeysSectionNode } from '../user-profile-passkeys-section/user-profile-passkeys-section';
+import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section/user-profile-passkeys-section.model';
 import { useUserProfilePasswordSlot } from '../user-profile-password-section/user-profile-password-section';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
@@ -32,7 +34,7 @@ function serveAccounts() {
 
 function SecurityHost() {
   const passwordSlot = useUserProfilePasswordSlot();
-  const passkeysSlot = useUserProfilePasskeysSlot();
+  const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
   return (
     <UserProfileSecurityPanelView
       passwordSlot={passwordSlot}
@@ -45,7 +47,7 @@ function SecurityHost() {
 
 function ProfileHost() {
   const passwordSlot = useUserProfilePasswordSlot();
-  const passkeysSlot = useUserProfilePasskeysSlot();
+  const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
   return (
     <UserProfileView
       activePage='security'
@@ -56,6 +58,24 @@ function ProfileHost() {
 }
 
 describe('Composing connected authentication sections', () => {
+  it('renders a plain passkeys section node inside Authentication', async () => {
+    serveAccounts();
+    await renderWithClerk(
+      <UserProfileSecurityPanelView
+        passkeysSlot={
+          <UserProfilePasskeysSectionView
+            passkeys={[]}
+            onAdd={vi.fn()}
+          />
+        }
+      />,
+    );
+
+    const authentication = screen.getByRole('region', { name: 'Authentication' });
+    expect(within(authentication).getByText('No passkeys added')).toBeVisible();
+    expect(within(authentication).getByRole('button', { name: 'Add passkey' })).toBeVisible();
+  });
+
   it.each([
     { name: 'Security', Host: SecurityHost },
     { name: 'UserProfile', Host: ProfileHost },

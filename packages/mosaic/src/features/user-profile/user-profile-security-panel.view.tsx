@@ -11,13 +11,12 @@ import { UserProfileActiveDevicesSectionView } from './user-profile-active-devic
 import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.view';
 import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
-import type { UserProfilePasskeysSlot } from './user-profile-passkeys-section/user-profile-passkeys-section.types';
 
 export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMethod, UserProfilePasskey };
 
 export interface UserProfileSecurityPanelViewProps extends Omit<UserProfileActiveDevicesSectionViewProps, 'devices'> {
   passwordSlot?: ReactNode;
-  passkeysSlot?: UserProfilePasskeysSlot | null;
+  passkeysSlot?: ReactNode;
   mfaMethods?: UserProfileMfaMethod[];
   addableMfaMethods?: readonly UserProfileMfaAddableMethod[];
   mfaAddControl?: ReactNode;
@@ -54,7 +53,7 @@ export function UserProfileSecurityPanelView({
         {hasAuthentication ? (
           <Section.Root aria-label='Authentication'>
             {passwordSlot}
-            {passkeysSlot?.content}
+            {passkeysSlot}
             {mfaMethods !== undefined ? (
               <UserProfileMfaSectionView
                 methods={mfaMethods}

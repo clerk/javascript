@@ -93,12 +93,6 @@ function activeUser(state: FakeFapiState): UserJSON | undefined {
   return findSession(state, state.client.last_active_session_id)?.user;
 }
 
-function requestUser(state: FakeFapiState, request: Request): UserJSON | undefined {
-  const sessionId = new URL(request.url).searchParams.get('_clerk_session_id') ?? state.client.last_active_session_id;
-  return findSession(state, sessionId)?.user;
-}
-
-
 function withoutOrganization(session: SessionJSON, organizationId: string): SessionJSON {
   return {
     ...session,
@@ -126,7 +120,6 @@ function deleteOrganization(state: FakeFapiState, organizationId: string): void 
     sessions: state.client.sessions.map(session => withoutOrganization(session, organizationId)),
   };
 }
-
 
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
   const { verification, enterpriseLinking, passkeys, ...rest } = seed;

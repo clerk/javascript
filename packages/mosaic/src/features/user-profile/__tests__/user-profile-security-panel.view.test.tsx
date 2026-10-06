@@ -25,7 +25,7 @@ const passkeys = [
 ];
 
 const props: UserProfileSecurityPanelViewProps = {
-  passkeysSlot: { content: <UserProfilePasskeysSectionView passkeys={passkeys} /> },
+  passkeysSlot: <UserProfilePasskeysSectionView passkeys={passkeys} />,
   mfaMethods: [
     { id: 'sms_1', type: 'sms', description: '+1 801-888-8181' },
     { id: 'totp_1', type: 'authenticator' },
@@ -156,25 +156,21 @@ describe('UserProfileSecurityPanelView', () => {
     expect(onDeleteAccount).toHaveBeenCalledOnce();
   });
 
-  it('keeps supported empty authentication methods actionable', () => {
+  it('keeps supported empty MFA methods and devices actionable', () => {
     renderView({
-      passkeysSlot: {
-        content: (
-          <UserProfilePasskeysSectionView
-            passkeys={[]}
-            onAdd={vi.fn()}
-          />
-        ),
-      },
+      passkeysSlot: (
+        <UserProfilePasskeysSectionView
+          passkeys={[]}
+          onAdd={vi.fn()}
+        />
+      ),
       mfaMethods: [],
       devices: [],
       onAddMfaMethod: vi.fn(),
       addableMfaMethods: ['sms', 'authenticator'],
     });
 
-    expect(screen.getByText('No passkeys added')).toBeInTheDocument();
     expect(screen.getByText('No verification methods added')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Add passkey' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add verification method' })).toBeInTheDocument();
     expect(screen.getByText('No current device available')).toBeInTheDocument();
   });
@@ -201,7 +197,7 @@ describe('UserProfileSecurityPanelView', () => {
   });
 
   it('keeps the passkeys card in the authentication section when passkeys are empty and Add is unavailable', () => {
-    renderView({ passkeysSlot: { content: <UserProfilePasskeysSectionView passkeys={[]} /> } });
+    renderView({ passkeysSlot: <UserProfilePasskeysSectionView passkeys={[]} /> });
 
     const section = screen.getByRole('region', { name: 'Authentication' });
     expect(within(section).getByRole('heading', { level: 3, name: 'Passkeys' })).toBeVisible();
@@ -218,14 +214,12 @@ describe('UserProfileSecurityPanelView', () => {
     });
     const { rerender } = renderView({
       mfaMethods: undefined,
-      passkeysSlot: {
-        content: (
-          <UserProfilePasskeysSectionView
-            passkeys={passkeys}
-            onRemove={onRemovePasskey}
-          />
-        ),
-      },
+      passkeysSlot: (
+        <UserProfilePasskeysSectionView
+          passkeys={passkeys}
+          onRemove={onRemovePasskey}
+        />
+      ),
     });
 
     await user.click(screen.getByRole('button', { name: 'Manage Passkey' }));
@@ -235,14 +229,12 @@ describe('UserProfileSecurityPanelView', () => {
     rerender(
       <MosaicProvider>
         <UserProfileSecurityPanelView
-          passkeysSlot={{
-            content: (
-              <UserProfilePasskeysSectionView
-                passkeys={[]}
-                onRemove={onRemovePasskey}
-              />
-            ),
-          }}
+          passkeysSlot={
+            <UserProfilePasskeysSectionView
+              passkeys={[]}
+              onRemove={onRemovePasskey}
+            />
+          }
         />
       </MosaicProvider>,
     );
