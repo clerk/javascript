@@ -16,6 +16,54 @@ import { UserProfileSecurityPanelView } from '../user-profile-security-panel.vie
 import { mfaEnvironment, phone, renderMfa } from './mfa-feature-setup';
 
 describe('User profile MFA management', () => {
+  it('shows a safe message when authenticator setup throws an unexpected error', async () => {
+    serveFapi({
+      environment: mfaEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+    });
+    const { clerk } = await renderWithClerk(<UserProfileMfaSection />);
+    if (!clerk.user) {
+      throw new Error('Expected the signed-in user');
+    }
+    const create = vi.spyOn(clerk.user, 'createTOTP').mockRejectedValue(new Error('Internal authenticator failure'));
+    try {
+      const user = userEvent.setup();
+      await user.click(screen.getByRole('button', { name: 'Add verification method' }));
+      await user.click(screen.getByRole('button', { name: /Authenticator app/ }));
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
+      );
+      expect(screen.queryByText('Internal authenticator failure')).toBeNull();
+    } finally {
+      create.mockRestore();
+    }
+  });
+
+  it('keeps localized Clerk errors when removing an authenticator fails', async () => {
+    serveFapi({
+      environment: mfaEnvironment(),
+      client: fapiClient([
+        fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', totp_enabled: true, two_factor_enabled: true }) }),
+      ]),
+    });
+    await renderWithClerk(<UserProfileMfaSection />, undefined, {
+      overrides: { 'errors.action_blocked': 'This authenticator must remain enabled.' },
+    });
+    worker.use(
+      http.post(fapiUrl('/v1/me/totp'), ({ request }) =>
+        new URL(request.url).searchParams.get('_method') === 'DELETE'
+          ? HttpResponse.json({ errors: [{ code: 'action_blocked', message: 'Action blocked' }] }, { status: 403 })
+          : undefined,
+      ),
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Manage Authenticator app' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('This authenticator must remain enabled.'));
+    expect(screen.getByText('Authenticator app')).toBeVisible();
+  });
+
   it('renders a plain MFA node in Authentication over legacy methods', async () => {
     serveFapi({
       environment: mfaEnvironment(),

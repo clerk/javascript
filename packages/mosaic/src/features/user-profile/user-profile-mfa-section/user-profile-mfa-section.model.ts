@@ -1,10 +1,10 @@
-import { isClerkAPIResponseError, isReverificationCancelledError } from '@clerk/shared/error';
+import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, PhoneNumberResource, UserResource } from '@clerk/shared/types';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
-import { useErrorText, useMessages } from '../../../localization';
-import { SaveError } from '../../../utils/errors';
+import { isLocalizableError, useErrorText, useMessages } from '../../../localization';
+import { SaveError, toLocalizableError } from '../../../utils/errors';
 import { useReverificationWithState } from '../../reverification/use-reverification-with-state';
 import {
   MfaCancelledError,
@@ -52,15 +52,13 @@ function errorMessage(error: unknown, localize: ReturnType<typeof useErrorText>)
   if (error instanceof MfaCancelledError) {
     return error;
   }
-  if (isClerkAPIResponseError(error)) {
-    const first = error.errors[0];
-    if (first) {
-      return new Error(
-        localize({ code: first.code, paramName: first.meta?.paramName, message: first.longMessage || first.message }),
-      );
-    }
-  }
-  return new Error(localize({ message: error instanceof Error ? error.message : undefined }));
+  const description = toLocalizableError(error);
+  return new SaveError({
+    global: {
+      ...(isLocalizableError(description) ? description : { code: 'generic' }),
+      message: localize(description),
+    },
+  });
 }
 
 export function useUserProfileMfaModel(): UserProfileMfaModel {
@@ -86,7 +84,9 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
       switch (operation.kind) {
         case 'createAuthenticator': {
           if (current.totpEnabled || !currentSecondFactors.includes('totp')) {
-            throw new Error(m.errors.authenticatorUnavailable);
+            throw new SaveError({
+              global: { code: 'mfa_authenticator_unavailable', message: m.errors.authenticatorUnavailable },
+            });
           }
           const result = await current.createTOTP();
           return { kind: 'authenticatorSetup', secret: result.secret ?? '', uri: result.uri ?? '' } as const;
@@ -99,7 +99,7 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
             phone.reservedForSecondFactor ||
             !currentSecondFactors.includes('phone_code')
           ) {
-            throw new Error(m.errors.phoneUnavailable);
+            throw new SaveError({ global: { code: 'mfa_phone_unavailable', message: m.errors.phoneUnavailable } });
           }
           const result = await phone.setReservedForSecondFactor({ reserved: true });
           return { kind: 'enrollment', backupCodes: result.backupCodes ?? [] } as const;
@@ -107,7 +107,7 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
         case 'removeAuthenticator': {
           const usableCount = usableFactorCount(current, currentSecondFactors);
           if (!current.totpEnabled || (environment?.userSettings.signUp.mfa?.required && usableCount <= 1)) {
-            throw new Error(m.errors.methodCannotRemove);
+            throw new SaveError({ global: { code: 'mfa_method_cannot_remove', message: m.errors.methodCannotRemove } });
           }
           await current.disableTOTP();
           return { kind: 'done' } as const;
@@ -120,14 +120,14 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
             phone.verification.status !== 'verified' ||
             (environment?.userSettings.signUp.mfa?.required && usableCount <= 1)
           ) {
-            throw new Error(m.errors.methodCannotRemove);
+            throw new SaveError({ global: { code: 'mfa_method_cannot_remove', message: m.errors.methodCannotRemove } });
           }
           await phone.setReservedForSecondFactor({ reserved: false });
           return { kind: 'done' } as const;
         }
         case 'generateBackupCodes': {
           if (!currentSecondFactors.includes('backup_code') || usableFactorCount(current, currentSecondFactors) === 0) {
-            throw new Error(m.errors.setupFactorFirst);
+            throw new SaveError({ global: { code: 'mfa_setup_factor_first', message: m.errors.setupFactorFirst } });
           }
           const result = await current.createBackupCode();
           return { kind: 'backupCodes', codes: result.codes } as const;
@@ -245,7 +245,9 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
             }
             const result = await runProtected({ kind: 'reservePhone', userId, sessionId, phoneId });
             if (result.kind !== 'enrollment') {
-              throw new Error(m.errors.unexpectedResponse);
+              throw new SaveError({
+                global: { code: 'mfa_unexpected_response', message: m.errors.unexpectedResponse },
+              });
             }
             await refresh().catch(() => undefined);
             return { status: 'complete', backupCodes: result.backupCodes };
@@ -267,7 +269,7 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
       ? async () => {
           const result = await runProtected({ kind: 'createAuthenticator', userId, sessionId });
           if (result.kind !== 'authenticatorSetup') {
-            throw new Error(m.errors.unexpectedResponse);
+            throw new SaveError({ global: { code: 'mfa_unexpected_response', message: m.errors.unexpectedResponse } });
           }
           return { secret: result.secret, uri: result.uri };
         }
@@ -289,7 +291,9 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
         ? async () => {
             const result = await runProtected({ kind: 'generateBackupCodes', userId, sessionId });
             if (result.kind !== 'backupCodes') {
-              throw new Error(m.errors.unexpectedResponse);
+              throw new SaveError({
+                global: { code: 'mfa_unexpected_response', message: m.errors.unexpectedResponse },
+              });
             }
             await refresh().catch(() => undefined);
             return result.codes;
