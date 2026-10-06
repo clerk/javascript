@@ -80,9 +80,14 @@ describe('useDebouncedAsync', () => {
   });
 
   it('reports a failure even when the check rejects without a reason', async () => {
-    const check = deferred<string>();
-    check.reject();
-    const { result } = setup(() => check.promise, { value: 'a' });
+    const { result } = setup(
+      () => {
+        const check = deferred<string>();
+        check.reject();
+        return check.promise;
+      },
+      { value: 'a' },
+    );
     await act(() => vi.advanceTimersByTimeAsync(DELAY));
     expect(result.current.isError).toBe(true);
   });
