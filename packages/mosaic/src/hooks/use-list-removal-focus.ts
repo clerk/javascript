@@ -9,15 +9,24 @@ export function useListRemovalFocus({
   onRemove?: (id: string) => void | boolean | Promise<void | boolean>;
   fallback: () => HTMLElement | null;
 }) {
-  const triggers = useRef(new Map<string, HTMLButtonElement>());
+  const triggers = useRef(
+    new Map<string, { element: HTMLButtonElement; ref: (element: HTMLButtonElement | null) => void }>(),
+  );
   const removed = useRef<{ id: string; index: number } | undefined>(undefined);
 
-  const registerTrigger = (id: string) => (element: HTMLButtonElement | null) => {
-    if (element) {
-      triggers.current.set(id, element);
-    } else {
-      triggers.current.delete(id);
+  const registerTrigger = (id: string) => {
+    const trigger = triggers.current.get(id);
+    if (trigger) {
+      return trigger.ref;
     }
+    const ref = (element: HTMLButtonElement | null) => {
+      if (element) {
+        triggers.current.set(id, { element, ref });
+      } else {
+        triggers.current.delete(id);
+      }
+    };
+    return ref;
   };
 
   const remove = async (id: string) => {
@@ -38,7 +47,7 @@ export function useListRemovalFocus({
     }
     const remaining = ids.filter(id => id !== item.id);
     const next = remaining[Math.min(item.index, remaining.length - 1)];
-    return (next ? triggers.current.get(next) : undefined) ?? fallback();
+    return (next ? triggers.current.get(next)?.element : undefined) ?? fallback();
   };
 
   return { registerTrigger, remove, finalFocus };
