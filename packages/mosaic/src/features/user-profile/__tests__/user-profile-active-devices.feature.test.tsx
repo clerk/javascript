@@ -3,13 +3,16 @@ import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
+import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { type ActiveDeviceRecord, fapiUrl, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../localization';
+import type { UserProfileDevice } from '../user-profile-active-devices-section/user-profile-active-devices.types';
 import { UserProfileActiveDevicesSection } from '../user-profile-active-devices-section/user-profile-active-devices-section';
+import { UserProfileActiveDevicesSectionView } from '../user-profile-active-devices-section/user-profile-active-devices-section.view';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 const alice = fapiUser({ id: 'user_1' });
@@ -124,12 +127,18 @@ describe('Active devices', () => {
     expect(screen.queryByRole('button', { name: 'Manage Safari on Expired laptop' })).toBeNull();
 
     const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Manage Safari on MacBook Pro' }));
+    await user.click(screen.getByRole('menuitem', { name: 'View details' }));
+    expect(within(screen.getByRole('dialog')).queryByRole('button', { name: 'Sign out' })).toBeNull();
+    await user.click(within(screen.getByRole('dialog')).getByText('Close'));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     await user.click(screen.getByRole('button', { name: 'Manage Safari on iPhone' }));
     await user.click(screen.getByRole('menuitem', { name: 'View details' }));
     expect(within(screen.getByRole('dialog')).getByText('192.0.2.1')).toBeInTheDocument();
     expect(within(screen.getByRole('dialog')).getByText('Paris, France')).toBeInTheDocument();
     expect(within(screen.getByRole('dialog')).queryByText('Original sign in')).toBeNull();
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Sign out' }));
+    expect(screen.queryByRole('alertdialog')).toBeNull();
 
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull());
     expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked');
@@ -259,6 +268,10 @@ describe('Active devices', () => {
     const user = userEvent.setup();
     await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
     await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+    expect(
+      within(screen.getByRole('alertdialog')).getByText(/Safari on iPhone will be signed out/),
+    ).toBeInTheDocument();
+    expect(devices.find(item => item.id === 'sess_other')?.status).toBe('active');
     await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
 
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Could not revoke device'));
@@ -606,6 +619,36 @@ describe('Active devices', () => {
     expect(requests).toBe(1);
   });
 
+  it('keeps device details open after a failed revoke and allows retrying', async () => {
+    const devices = serveDevices(
+      [device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })],
+      { failOnceId: 'sess_other' },
+    );
+    let requests = 0;
+    worker.use(
+      http.post(fapiUrl('/v1/me/sessions/sess_other/revoke'), () => {
+        requests += 1;
+      }),
+    );
+    await renderWithClerk(<UserProfileActiveDevicesSection />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+    await user.click(screen.getByRole('menuitem', { name: 'View details' }));
+    const dialog = screen.getByRole('dialog');
+    await user.click(within(dialog).getByRole('button', { name: 'Sign out' }));
+
+    await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Could not revoke device'));
+    expect(dialog).toBeInTheDocument();
+    expect(devices.find(item => item.id === 'sess_other')?.status).toBe('active');
+    expect(requests).toBe(1);
+
+    await user.click(within(dialog).getByRole('button', { name: 'Sign out' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(devices.find(item => item.id === 'sess_other')?.status).toBe('revoked');
+    expect(requests).toBe(2);
+    expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull();
+  });
+
   it('allows details to close after a revoke fails', async () => {
     serveDevices([device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })]);
     worker.use(
@@ -682,4 +725,254 @@ describe('Active devices', () => {
 
   it.todo('signs out every other eligible device after confirmation while preserving the current session');
   it.todo('reverifies device revocation before retrying verification-required API errors');
+});
+
+const currentViewDevice: UserProfileDevice = {
+  id: 'current',
+  name: 'Safari on macOS',
+  description: 'Salt Lake City, UT, United States',
+  type: 'desktop',
+  isCurrent: true,
+};
+
+const mobileViewDevice: UserProfileDevice = {
+  id: 'mobile',
+  name: 'Safari on iOS',
+  description: 'Last seen 2 weeks ago · Orem, UT, United States',
+  type: 'mobile',
+  lastActive: '4 days ago',
+  model: 'iPhone 16 Pro',
+  browser: 'Safari 18.4',
+  ipAddress: '2600:100e:b10b:787b:e8ae:6e75',
+  location: 'Orem, UT, United States',
+  signedInAt: 'July 5th, 2026',
+};
+
+async function renderDevices(onSignOutDevice?: (id: string) => void | Promise<void>) {
+  serveDevices([device('sess_current', 'active')]);
+  return renderWithClerk(
+    <UserProfileActiveDevicesSectionView
+      devices={[currentViewDevice, mobileViewDevice]}
+      onSignOutDevice={onSignOutDevice}
+    />,
+  );
+}
+
+async function openMenu(user: ReturnType<typeof userEvent.setup>, item: UserProfileDevice) {
+  await user.click(screen.getByRole('button', { name: `Manage ${item.name}` }));
+}
+
+describe('active devices view contract', () => {
+  it('renders every provided device detail field', async () => {
+    const user = userEvent.setup();
+    await renderDevices();
+    await openMenu(user, mobileViewDevice);
+    await user.click(screen.getByRole('menuitem', { name: 'View details' }));
+
+    const dialog = screen.getByRole('dialog');
+    expect(within(dialog).getByRole('heading', { name: 'Safari on iOS' })).toBeInTheDocument();
+    expect(within(dialog).getByText('Last active 4 days ago')).toBeInTheDocument();
+    expect(within(dialog).getByText('iPhone 16 Pro')).toBeInTheDocument();
+    expect(within(dialog).getByText('2600:100e:b10b:787b:e8ae:6e75')).toBeInTheDocument();
+    expect(within(dialog).getByText('July 5th, 2026')).toBeInTheDocument();
+  });
+
+  it('omits the rows a device has no detail for', async () => {
+    const user = userEvent.setup();
+    await renderDevices();
+    await openMenu(user, currentViewDevice);
+    await user.click(screen.getByRole('menuitem', { name: 'View details' }));
+
+    expect(within(screen.getByRole('dialog')).queryByText('Browser')).not.toBeInTheDocument();
+  });
+
+  describe('signing out of all other devices', () => {
+    async function renderAll(
+      onSignOutAllOtherDevices: () => void | Promise<void>,
+      devices = [currentViewDevice, mobileViewDevice],
+    ) {
+      serveDevices([device('sess_current', 'active')]);
+      return renderWithClerk(
+        <UserProfileActiveDevicesSectionView
+          devices={devices}
+          onSignOutAllOtherDevices={onSignOutAllOtherDevices}
+        />,
+      );
+    }
+
+    const confirmation = () => screen.getByRole('alertdialog');
+
+    it('confirms first, naming how many devices it covers', async () => {
+      const user = userEvent.setup();
+      const onSignOutAllOtherDevices = vi.fn();
+      await renderAll(onSignOutAllOtherDevices, [
+        currentViewDevice,
+        mobileViewDevice,
+        { id: 'desktop', name: 'Clerk App', type: 'desktop' },
+      ]);
+      await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+
+      expect(within(confirmation()).getByText(/2 other devices will be signed out/)).toBeInTheDocument();
+      expect(onSignOutAllOtherDevices).not.toHaveBeenCalled();
+
+      await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
+      expect(onSignOutAllOtherDevices).toHaveBeenCalledOnce();
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    });
+
+    it('leaves the devices alone when the confirmation is cancelled', async () => {
+      const user = userEvent.setup();
+      const onSignOutAllOtherDevices = vi.fn();
+      await renderAll(onSignOutAllOtherDevices);
+      await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+      await user.click(within(confirmation()).getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+      expect(onSignOutAllOtherDevices).not.toHaveBeenCalled();
+      expect(screen.getByRole('button', { name: 'Sign out of all devices' })).toHaveFocus();
+    });
+
+    it('holds the confirmation open and explains a failure', async () => {
+      const user = userEvent.setup();
+      const onSignOutAllOtherDevices = vi
+        .fn()
+        .mockRejectedValueOnce(new Error('Unable to sign out of all devices'))
+        .mockResolvedValue(undefined);
+      await renderAll(onSignOutAllOtherDevices);
+      await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+      await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
+
+      expect(await screen.findByText('Unable to sign out of all devices')).toBeInTheDocument();
+      expect(confirmation()).toBeInTheDocument();
+
+      await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+      expect(onSignOutAllOtherDevices).toHaveBeenCalledTimes(2);
+    });
+
+    it('ignores a second press while one is in flight', async () => {
+      const user = userEvent.setup();
+      const signOutAll = createDeferredPromise();
+      const onSignOutAllOtherDevices = vi.fn(() => signOutAll.promise);
+      await renderAll(onSignOutAllOtherDevices);
+      await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+      const confirm = within(confirmation()).getByRole('button', { name: 'Sign out' });
+      await user.click(confirm);
+      await waitFor(() => expect(confirm).toHaveAttribute('aria-busy'));
+      expect(confirm).toHaveAttribute('aria-disabled', 'true');
+      act(() => confirm.click());
+      expect(onSignOutAllOtherDevices).toHaveBeenCalledTimes(1);
+
+      await act(async () => {
+        signOutAll.resolve();
+        await signOutAll.promise;
+      });
+      await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
+    });
+
+    it('hands focus to the current device once the others are gone', async () => {
+      const user = userEvent.setup();
+      function Example() {
+        const [devices, setDevices] = useState([currentViewDevice, mobileViewDevice]);
+        return (
+          <UserProfileActiveDevicesSectionView
+            devices={devices}
+            onSignOutAllOtherDevices={() => setDevices(list => list.filter(device => device.isCurrent))}
+          />
+        );
+      }
+      serveDevices([device('sess_current', 'active')]);
+      await renderWithClerk(<Example />);
+      await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
+      await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
+
+      await waitFor(() =>
+        expect(screen.queryByRole('button', { name: 'Sign out of all devices' })).not.toBeInTheDocument(),
+      );
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on macOS' })).toHaveFocus());
+    });
+  });
+
+  describe('focus after a delayed row update', () => {
+    const desktop: UserProfileDevice = { id: 'desktop', name: 'Clerk App on macOS', type: 'desktop' };
+    it('skips the signed-out row when the list only catches up later', async () => {
+      const user = userEvent.setup();
+      const catchUp = createDeferredPromise();
+      function LateExample() {
+        const [devices, setDevices] = useState([currentViewDevice, mobileViewDevice, desktop]);
+        return (
+          <UserProfileActiveDevicesSectionView
+            devices={devices}
+            onSignOutDevice={id => {
+              void catchUp.promise.then(() => setDevices(list => list.filter(device => device.id !== id)));
+              return Promise.resolve();
+            }}
+          />
+        );
+      }
+      serveDevices([device('sess_current', 'active')]);
+      await renderWithClerk(<LateExample />);
+      await openMenu(user, mobileViewDevice);
+      await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+      await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Clerk App on macOS' })).toHaveFocus());
+
+      await act(async () => {
+        catchUp.resolve();
+        await catchUp.promise;
+      });
+      expect(screen.queryByRole('button', { name: 'Manage Safari on iOS' })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Manage Clerk App on macOS' })).toHaveFocus();
+    });
+  });
+});
+
+describe('active devices focus after connected revocation', () => {
+  it.each(['confirmation', 'details'])('hands focus to the next row after signing out from %s', async surface => {
+    serveDevices([
+      device('sess_current', 'active'),
+      device('sess_other', 'active', { device_type: 'iPhone' }),
+      device('sess_next', 'active', { device_type: 'Next laptop' }),
+    ]);
+    await renderWithClerk(<UserProfileActiveDevicesSection />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+    await user.click(screen.getByRole('menuitem', { name: surface === 'details' ? 'View details' : 'Sign out' }));
+    const dialog = screen.getByRole(surface === 'details' ? 'dialog' : 'alertdialog');
+    await user.click(within(dialog).getByRole('button', { name: 'Sign out' }));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on Next laptop' })).toHaveFocus());
+    expect(screen.queryByRole('button', { name: 'Manage Safari on iPhone' })).toBeNull();
+  });
+
+  it('falls back to the previous row, then the current device', async () => {
+    serveDevices([
+      device('sess_current', 'active'),
+      device('sess_other', 'active', { device_type: 'iPhone' }),
+      device('sess_last', 'active', { device_type: 'Last laptop' }),
+    ]);
+    await renderWithClerk(<UserProfileActiveDevicesSection />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Manage Safari on Last laptop' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on iPhone' })).toHaveFocus());
+
+    await user.click(screen.getByRole('button', { name: 'Manage Safari on iPhone' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Sign out' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on MacBook Pro' })).toHaveFocus());
+  });
+
+  it('returns focus to the same row when sign out is cancelled', async () => {
+    serveDevices([device('sess_current', 'active'), device('sess_other', 'active', { device_type: 'iPhone' })]);
+    await renderWithClerk(<UserProfileActiveDevicesSection />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole('button', { name: 'Manage Safari on iPhone' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Sign out' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancel' }));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Manage Safari on iPhone' })).toHaveFocus());
+  });
 });
