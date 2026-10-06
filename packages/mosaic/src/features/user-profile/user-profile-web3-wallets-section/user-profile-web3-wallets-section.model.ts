@@ -6,7 +6,7 @@ import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils/sortI
 import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
-import { useErrorText, useMessages } from '../../../localization';
+import { useMessages } from '../../../localization';
 import { allowsIdentificationCreation } from '../user-profile-connected-accounts-section/user-profile-connected-accounts-section.model';
 import type { UserProfileWeb3Provider, UserProfileWeb3Wallet } from '../user-profile-web3-wallets-section.view';
 import { web3WalletFeedback } from './user-profile-web3-wallets-feedback';
@@ -84,7 +84,6 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
   const { isLoaded, user } = useUser();
   const environment = useMosaicEnvironment();
   const messages = useMessages('userProfileWeb3Wallets');
-  const errorText = useErrorText();
 
   if (!isLoaded || !environment) {
     return { status: 'loading' };
@@ -115,7 +114,7 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
     try {
       await action();
     } catch (error) {
-      throw web3WalletFeedback(error, messages, errorText);
+      throw web3WalletFeedback(error, messages);
     }
   };
 

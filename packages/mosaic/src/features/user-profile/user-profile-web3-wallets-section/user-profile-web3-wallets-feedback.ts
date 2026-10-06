@@ -1,23 +1,10 @@
-import { isClerkAPIResponseError } from '@clerk/shared/error';
-
-import type { LocalizableError, MosaicMessages } from '../../../localization';
-import { toLocalizableApiError } from '../../../localization';
+import type { MosaicMessages } from '../../../localization';
+import { SaveError } from '../../../utils/errors';
 import { Web3WalletActionError } from './user-profile-web3-wallets-section.types';
 
-export function web3WalletFeedback(
-  error: unknown,
-  messages: MosaicMessages['userProfileWeb3Wallets'],
-  errorText: (error: LocalizableError) => string,
-): Error {
+export function web3WalletFeedback(error: unknown, messages: MosaicMessages['userProfileWeb3Wallets']): unknown {
   if (error instanceof Web3WalletActionError) {
-    return new Web3WalletActionError(error.code, messages.errors[error.code], { cause: error });
+    return new SaveError({ global: { code: error.code, message: messages.errors[error.code] } });
   }
-  let message: string = messages.errors.generic;
-  if (isClerkAPIResponseError(error)) {
-    const first = error.errors[0];
-    if (first) {
-      message = errorText(toLocalizableApiError(first, messages.errors.generic));
-    }
-  }
-  return new Error(message, { cause: error });
+  return error;
 }
