@@ -26,6 +26,10 @@ interface Settled<TValue, TData> {
  * The previous result stays visible while the next one is pending. A new value, disabling or
  * unmounting aborts the `signal` and drops any result that arrives afterwards.
  *
+ * `value` is compared with `Object.is`, so it must be referentially stable across renders. An
+ * object or array created during render (such as an un-memoized `[]` or `{}`) counts as a new
+ * value every render and restarts the debounce. Pass a primitive or memoize it.
+ *
  * @example
  * const strength = useDebouncedAsync(password, (value, { signal }) => checkStrength(value, { signal }), {
  *   delayMs: 300,
