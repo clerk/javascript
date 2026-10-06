@@ -29,6 +29,8 @@ export function usePendingActionById(fallbackMessage: string) {
     }
   };
 
-  const messages = Object.fromEntries(Object.entries(errors).map(([id, error]) => [id, errorText(error, fallbackMessage)]));
+  const messages = Object.fromEntries(
+    Object.entries(errors).map(([id, error]) => [id, errorText(error, fallbackMessage)]),
+  );
   return { pendingId, errors: messages, busy: () => inFlight.current, run };
 }
