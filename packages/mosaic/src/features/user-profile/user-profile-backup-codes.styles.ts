@@ -3,9 +3,6 @@ import * as stylex from '@stylexjs/stylex';
 import { colorVars, radiusVars, space } from '../../tokens.stylex';
 
 export const styles = stylex.create({
-  skeleton: {
-    width: '7ch',
-  },
   codes: {
     borderColor: colorVars['--cl-color-border'],
     borderRadius: radiusVars['--cl-radius-md'],

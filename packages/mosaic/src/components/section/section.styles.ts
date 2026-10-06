@@ -148,15 +148,6 @@ export const styles = stylex.create({
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     minWidth: 0,
   },
-  titleSkeleton: {
-    width: '6ch',
-  },
-  labelSkeleton: {
-    width: '12ch',
-  },
-  descriptionSkeleton: {
-    width: '20ch',
-  },
   description: {
     color: colorVars['--cl-color-foreground-secondary'],
     fontSize: typeScaleVars['--cl-text-sm-size'],

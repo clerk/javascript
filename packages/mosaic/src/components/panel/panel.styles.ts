@@ -12,9 +12,6 @@ export const styles = stylex.create({
   title: {
     display: 'block',
   },
-  titleSkeleton: {
-    width: '6ch',
-  },
 
   sections: {
     gap: space['8'],

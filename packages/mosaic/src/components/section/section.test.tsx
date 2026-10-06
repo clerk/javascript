@@ -402,7 +402,7 @@ describe('Section', () => {
     expect(screen.getByTestId('item')).toHaveAttribute('data-wrap', '');
   });
 
-  it('turns a skeleton card into inert, empty placeholders', () => {
+  it('turns a skeleton card into inert placeholders', () => {
     render(
       <Section.Root>
         <Section.Group
@@ -434,8 +434,9 @@ describe('Section', () => {
     expect(group).toHaveAttribute('aria-hidden', 'true');
     expect(group).toHaveAttribute('inert');
     expect(group).not.toHaveAttribute('role');
-    expect(group).toHaveTextContent('');
     expect(group.querySelector('button')).toBeNull();
+    expect(screen.getByText('Name')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('Description')).toHaveAttribute('aria-hidden', 'true');
     expect(group.querySelectorAll('[data-skeleton]')).toHaveLength(5);
   });
 

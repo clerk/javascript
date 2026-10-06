@@ -26,78 +26,71 @@ same fill, `--cl-color-neutral-alpha-200`.
 
 - **Render the real view with mock data.** The view takes `skeleton` and passes it
   to its container (`<Section.Group skeleton={skeleton}>`). Every part inside
-  inherits it and becomes a bone (`skeleton={false}` opts one out), drops its
-  children, and the container turns `inert` and `aria-hidden`. Because the
-  skeleton is the view's own markup, it can't drift from it: change a row and the
-  skeleton changes with it. While `skeleton` is set, the view skips its dialogs and
-  confirmations.
+  inherits it and becomes a bone (`skeleton={false}` opts one out), and the
+  container turns `inert` and `aria-hidden`. Because the skeleton is the view's own
+  markup, it can't drift from it: change a row and the skeleton changes with it.
+  While `skeleton` is set, the view skips its dialogs and confirmations.
 - **The `.skeleton.tsx` is one line** next to the view, rendering it with a
   `PLACEHOLDER_*` constant:
   `<UserProfileActiveDevicesSectionView skeleton devices={PLACEHOLDER_DEVICES} />`
-  (see `user-profile-active-devices-section.skeleton.tsx`). The mock values are
-  never shown; they only decide the shape. A panel's skeleton composes its
-  sections' skeletons.
-- **Mock data decides row count and shape.** Aim it at the most common loaded
-  shape: a typical count (2–3), every line present, and the branch real data
-  usually takes (a current device, not the empty state). When the count is known
-  before the fetch, use it instead: a table moving between pages with a known
-  total shows exactly `min(pageSize, total − offset)` rows, so nothing shifts. A
-  first load or a new search can't know, so it uses the typical count and accepts
-  a shift. The page size is a maximum, not a count.
+  (see `user-profile-active-devices-section.skeleton.tsx`). A panel's skeleton
+  composes its sections' skeletons.
+- **Mock data decides row count, shape, and text length.** Text bones are drawn
+  from the mock strings, so write them at a typical length: a placeholder that
+  wraps to two lines where real text takes one shifts the layout. Aim at the most
+  common loaded shape: a typical count (2–3), every line present, and the branch
+  real data usually takes (a current device, not the empty state). When the count
+  is known before the fetch, use it instead: a table moving between pages with a
+  known total shows exactly `min(pageSize, total − offset)` rows. A first load or a
+  new search can't know, so it uses the typical count and accepts a shift. The page
+  size is a maximum, not a count.
 - **Announce it.** The skeleton is hidden from assistive technology, so the view
   renders a `VisuallyHidden` `role='status'` message ("Loading active devices")
   while `skeleton` is set.
 - **Parts also take `skeleton` standalone**, as does `Panel.Title`, for a bone
   outside a skeleton container.
-- **Fewest nodes:** one element per bone, no wrappers. A bone is the real part
-  rendered empty, so it inherits that part's padding, type size and line height.
-- **A component with its own shape** (a part that needs a skeleton but isn't covered
-  above) composes the pieces in `styles/skeleton.styles.ts` itself:
-  - `skeletonStyles.shimmer`: the gradient fill and its animation. Media and
-    blocks take it on the element; `Avatar.Fallback`, which has its own circle,
-    takes `shimmer` alone.
-  - `skeletonStyles.bone`: radius, for media and blocks (with `shimmer`).
-  - `skeletonStyles.line`: a `1lh` box holding one line of text, whose `::before`
-    bar is `1cap` tall (`0.7em` fallback) on the baseline, square-cornered. It
-    moves the shimmer from the element onto the bar.
-  - plus a `useSkeletonShimmer(enabled)` ref (`hooks/use-skeleton-shimmer.ts`) on
-    the same element. Without it, the shimmer stays paused.
+- **What each part does:** text parts (Title, Label, Description, `Panel.Title`)
+  keep their mock text and wrap it in `SkeletonText`; Media renders empty as a
+  filled block; Actions render nothing and hold a small control's height.
+- **A component with its own shape** composes the pieces in
+  `styles/skeleton.styles.ts` itself:
+  - `SkeletonText` (`utils/skeleton-text.tsx`) around mock text: one inline span
+    whose text is transparent and whose background draws each wrapped line.
+  - `skeletonStyles.bone`: fill and radius, for media and blocks.
+  - `skeletonStyles.shimmer`: the moving highlight for a block, as an `::after`
+    overlay. `Avatar.Fallback`, which has its own fill and circle, takes `shimmer`
+    alone.
 
 ## Sizing
 
-- **Height must match exactly.** Line bones fill one line of the part's own type, so
-  text rows match by construction. Watch anything taller than a line:
+- **Height must match exactly.** Text bones are the text's own line boxes, so text
+  rows match by construction. Watch anything taller than its text:
   `Section.Actions skeleton` exists because a 28px `sm` menu trigger outgrew a 20px
-  line. `Panel.Title skeleton` puts the bone on the inner heading because the outer
-  `div` has a smaller line height.
-- **Width in `ch`**, from the content the bone usually holds, at the short end, so it
-  reads like real text and shrinks with `maxWidth: 100%` on narrow screens: a card or
-  page title `6ch`, a label `12ch`, a description `20ch`, an email `16ch`, a US phone
-  number `15ch`, a backup code `7ch`. Override a part's default with `xstyle`.
-- **Uniform across rows.** Every row uses the same widths; within a row, lines
-  differ.
+  line.
+- **Width and wrapping come from the mock text.** Each line's band is as wide as
+  that line of mock text and as tall as the font's text box (ascender to
+  descender), whatever font is in use. Nothing is measured.
 
 ## The shimmer
 
-Modeled on React Spectrum's `Skeleton`: a highlight sweeps left to right across every
-bone, and every bone on the page sweeps in step.
+Modeled on React Spectrum's `Skeleton`, with no JavaScript: a highlight one bone wide,
+peaking in the middle, sweeps left to right across two bone widths, over 1.6s
+`ease-in-out`, repeating. Off under `prefers-reduced-motion: reduce`, leaving the
+plain fill.
 
-- The surface is a `linear-gradient` (fill, highlight, fill at 33% / 50% / 66%)
-  sized to `300%` of the bone, and the keyframes move its `background-position`
-  from `100%` to `0%`, so the highlight crosses once per cycle: 2s on
-  `--cl-ease-in-out`, repeating. The highlight is lighter than the fill in both
-  schemes. Off under `prefers-reduced-motion: reduce`, leaving the plain fill.
-- Text bones animate their `::before` bar, so the highlight stays inside the cap
-  band; media animate the element.
-- `useSkeletonShimmer` locks every bone to the document clock: before first paint
-  it sets the private `--_cl-skeleton-state` variable (`styles/skeleton.stylex.ts`)
-  to `running` and sets each of the element's animations (pseudo-elements
-  included) to `startTime = 0`. Bones that mount at different times sweep
-  together.
-- The animation is `paused` until the hook runs, so a server-rendered skeleton
-  holds a static fill until hydration instead of sweeping out of step and jumping.
+- **Blocks** (media, the avatar) move an `::after` overlay with `transform`
+  (`translateX(-100%)` → `translateX(100%)`), clipped by `overflow: hidden`.
+- **Text** moves its own background, since an overlay can't follow wrapped lines:
+  a gradient `300%` wide (transparent, highlight, transparent at 33% / 50% / 66%)
+  over the fill, from `background-position: 100%` to `0%`, cloned per line with
+  `box-decoration-break`. Same geometry and timing as the overlay.
+- **The highlight** is a wash over the fill, one value in both techniques:
+  background-tinted in light mode, neutral-tinted in dark.
+- **No sync.** Bones that mount together sweep together; a section mounting later
+  runs out of step. CSS animations keep running through hydration, so a
+  server-rendered skeleton doesn't jump.
 - The sweep is relative to each bone's width, so a wide bar's highlight moves
-  faster than a narrow one's, as in Spectrum.
+  faster than a narrow one's.
 
 ## When to show it
 

@@ -8,8 +8,8 @@ children, `Panel.Title` renders the page's heading, and `Panel.Sections` stacks 
 [Profile](/components/profile) page, `Panel.Title` renders nothing: the profile renders the page title,
 and a ref on `Panel.Title` reaches it.
 
-`Panel.Title` takes `skeleton` for a loading state: the heading renders empty as a placeholder that
-shimmers in step with [Section](/components/section) skeletons, and is hidden from assistive technology.
+`Panel.Title` takes `skeleton` for a loading state: its text renders as a placeholder bar, like
+[Section](/components/section) skeletons, and is hidden from assistive technology.
 Inside a profile page it has no effect, since the profile's title stays as it is.
 
 ## Example

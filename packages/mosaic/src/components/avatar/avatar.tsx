@@ -1,9 +1,7 @@
 import { useSafeLayoutEffect } from '@clerk/shared/react';
-import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useSkeletonShimmer } from '../../hooks/use-skeleton-shimmer';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -149,8 +147,6 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
   }, [delayMs]);
 
   const pending = canRender && status === 'loading';
-  const shimmer = useSkeletonShimmer<HTMLSpanElement>(pending);
-  const mergedRef = useMergeRefs([ref, shimmer]);
 
   if (!canRender || status === 'loaded') {
     return null;
@@ -158,7 +154,7 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
 
   return (
     <span
-      ref={mergedRef}
+      ref={ref}
       {...mergeStyleProps(
         themeProps('avatar-fallback', { pending }),
         stylex.props(

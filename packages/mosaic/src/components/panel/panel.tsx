@@ -2,12 +2,11 @@ import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useSkeletonShimmer } from '../../hooks/use-skeleton-shimmer';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { skeletonStyles } from '../../styles/skeleton.styles';
+import { SkeletonText } from '../../utils/skeleton-text';
 import { Heading, HeadingLevelProvider, useHeadingLevel } from '../heading';
 import { ContentPanelContext, ProfileContext } from '../profile/profile.context';
 import { styles } from './panel.styles';
@@ -31,7 +30,6 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
   ref,
 ) {
   const inProfilePage = React.useContext(ContentPanelContext);
-  const shimmer = useSkeletonShimmer<HTMLHeadingElement>(skeleton && !inProfilePage);
   const profile = React.useContext(ProfileContext);
   const level = useHeadingLevel();
   const pageTitleRef = inProfilePage ? profile?.pageTitleRef : undefined;
@@ -48,19 +46,12 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
         skeleton ? { 'aria-hidden': true, ...inertProps(true) } : {},
         rest,
       ),
-      children: skeleton ? (
-        <Heading
-          ref={shimmer}
-          level={level}
-          size='2xl'
-          xstyle={[skeletonStyles.bone, skeletonStyles.shimmer, skeletonStyles.line, styles.titleSkeleton]}
-        />
-      ) : (
+      children: (
         <Heading
           level={level}
           size='2xl'
         >
-          {children}
+          {skeleton ? <SkeletonText>{children}</SkeletonText> : children}
         </Heading>
       ),
     },

@@ -1,10 +1,8 @@
 import { inertProps } from '@clerk/shared/inert';
 import { useSafeLayoutEffect } from '@clerk/shared/react';
-import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useSkeletonShimmer } from '../../hooks/use-skeleton-shimmer';
 import { useTransition } from '../../primitives/hooks/use-transition';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
@@ -14,6 +12,7 @@ import { reset } from '../../styles/reset.styles';
 import { skeletonStyles } from '../../styles/skeleton.styles';
 import { sizes as typographySizes, styles as typographyStyles, truncationStyles } from '../../styles/typography.styles';
 import { FeedbackBody, hasMessage, useHeldMessage, useMessageHeight } from '../../utils/feedback';
+import { SkeletonText } from '../../utils/skeleton-text';
 import { withTruncatableLabel } from '../../utils/truncatable-label';
 import type { HeadingProps } from '../heading';
 import { Heading, useHeadingLevel } from '../heading';
@@ -127,8 +126,6 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
   const setTitleId = React.useContext(SectionGroupContext);
   const generatedId = React.useId();
   const level = useHeadingLevel();
-  const shimmer = useSkeletonShimmer<HTMLHeadingElement>(skeleton);
-  const mergedRef = useMergeRefs([ref, shimmer]);
   const id = skeleton ? undefined : (idProp ?? (setTitleId ? `cl-section-${generatedId}-title` : undefined));
 
   useSafeLayoutEffect(() => {
@@ -142,22 +139,14 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
 
   return (
     <Heading
-      ref={mergedRef}
+      ref={ref}
       id={id}
       level={level}
       size='base'
-      xstyle={[
-        styles.title,
-        truncationStyles.singleLine,
-        skeleton && skeletonStyles.bone,
-        skeleton && skeletonStyles.shimmer,
-        skeleton && skeletonStyles.line,
-        skeleton && styles.titleSkeleton,
-        xstyle,
-      ]}
+      xstyle={[styles.title, truncationStyles.singleLine, xstyle]}
       {...mergeStyleProps(themeProps('section-title', { skeleton }), rest)}
     >
-      {skeleton ? undefined : children}
+      {skeleton ? <SkeletonText>{children}</SkeletonText> : children}
     </Heading>
   );
 });
@@ -226,12 +215,10 @@ const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function Secti
   ref,
 ) {
   const skeleton = useInheritedSkeleton(skeletonProp);
-  const shimmer = useSkeletonShimmer<HTMLDivElement>(skeleton);
-
   return useRender({
     defaultTagName: 'div',
     render,
-    ref: [ref, shimmer],
+    ref,
     props: mergeStyleProps(
       themeProps('section-media', { size, skeleton }),
       stylex.props(
@@ -270,25 +257,14 @@ const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function Secti
   ref,
 ) {
   const skeleton = useInheritedSkeleton(skeletonProp);
-  const shimmer = useSkeletonShimmer<HTMLDivElement>(skeleton);
-
   return useRender({
     defaultTagName: 'div',
     render,
-    ref: [ref, shimmer],
-    props: mergeStyleProps(
-      themeProps('section-label', { skeleton }),
-      stylex.props(
-        reset.base,
-        styles.label,
-        skeleton && skeletonStyles.bone,
-        skeleton && skeletonStyles.shimmer,
-        skeleton && skeletonStyles.line,
-        skeleton && styles.labelSkeleton,
-        xstyle,
-      ),
-      { ...rest, children: skeleton ? undefined : withTruncatableLabel(children) },
-    ),
+    ref,
+    props: mergeStyleProps(themeProps('section-label', { skeleton }), stylex.props(reset.base, styles.label, xstyle), {
+      ...rest,
+      children: skeleton ? <SkeletonText>{children}</SkeletonText> : withTruncatableLabel(children),
+    }),
   });
 });
 
@@ -298,12 +274,10 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
 ) {
   const skeleton = useInheritedSkeleton(skeletonProp);
   const inHeader = React.useContext(SectionHeaderContext);
-  const shimmer = useSkeletonShimmer<HTMLDivElement>(skeleton);
-
   return useRender({
     defaultTagName: 'div',
     render,
-    ref: [ref, shimmer],
+    ref,
     props: mergeStyleProps(
       themeProps('section-description', { skeleton }),
       stylex.props(
@@ -311,13 +285,9 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
         styles.description,
         inHeader && styles.headerDescription,
         inHeader && sectionHeaderDescriptionMarker,
-        skeleton && skeletonStyles.bone,
-        skeleton && skeletonStyles.shimmer,
-        skeleton && skeletonStyles.line,
-        skeleton && styles.descriptionSkeleton,
         xstyle,
       ),
-      { ...rest, children: skeleton ? undefined : children },
+      { ...rest, children: skeleton ? <SkeletonText>{children}</SkeletonText> : children },
     ),
   });
 });

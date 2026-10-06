@@ -5,12 +5,13 @@ import { Card } from '../../components/card';
 import { useFlowAutoFocus } from '../../components/flow';
 import { Icon } from '../../components/icon';
 import { Text } from '../../components/text';
-import { useSkeletonShimmer } from '../../hooks/use-skeleton-shimmer';
 import { useMessages } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { skeletonStyles } from '../../styles/skeleton.styles';
+import { SkeletonText } from '../../utils/skeleton-text';
 import { styles } from './user-profile-backup-codes.styles';
+
+const PLACEHOLDER_CODE = 'xxxxxxxx';
 
 export interface UserProfileBackupCodesViewProps {
   onCancel: () => void;
@@ -153,13 +154,9 @@ export function UserProfileBackupCodesView({
 }
 
 function BackupCodeSkeleton() {
-  const shimmer = useSkeletonShimmer<HTMLParagraphElement>(true);
-
   return (
-    <Text
-      ref={shimmer}
-      render={<span />}
-      xstyle={[skeletonStyles.bone, skeletonStyles.shimmer, skeletonStyles.line, styles.skeleton]}
-    />
+    <Text render={<span />}>
+      <SkeletonText>{PLACEHOLDER_CODE}</SkeletonText>
+    </Text>
   );
 }
