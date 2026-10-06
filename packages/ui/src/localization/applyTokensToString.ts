@@ -85,7 +85,7 @@ const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens
 
 const assertKnownModifier = (s: any): s is Modifier => Object.prototype.hasOwnProperty.call(MODIFIERS, s);
 
-const PARAM_REGEX = /"([^"]*)"|'([^']*)'|([^,]+)/g;
+const PARAM_REGEX = /\s*(?:"([^"]*)"|'([^']*)'|([^,]+))/g;
 
 const getModifierWithParams = (modifierExpression: string) => {
   const open = modifierExpression.indexOf('(');

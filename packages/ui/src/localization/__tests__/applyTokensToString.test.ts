@@ -138,6 +138,8 @@ describe('applyTokensToString', function () {
           [`{{ url | link('Say "hi"') }}`, `[Say "hi"](https://example.com)`],
           [`{{ url | link("Terms, Conditions") }}`, `[Terms, Conditions](https://example.com)`],
           [`{{ url | link("Terms (EU)") }}`, `[Terms (EU)](https://example.com)`],
+          [`{{ url | link( "Terms, Conditions" ) }}`, `[Terms, Conditions](https://example.com)`],
+          [`{{ url | link( "Conditions d'utilisation" ) }}`, `[Conditions d'utilisation](https://example.com)`],
           [`{{ date | weekday('en-US','long') }}`, 'Friday'],
           [`{{ date | weekday ( "en-US" , "short" ) }}`, 'Fri'],
           [`{{ date | weekday('en-US",) }}`, 'Friday'],
