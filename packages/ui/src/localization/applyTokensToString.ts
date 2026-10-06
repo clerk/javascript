@@ -100,7 +100,7 @@ const getModifierWithParams = (modifierExpression: string) => {
       if (quoted !== undefined) {
         return [quoted];
       }
-      const value = unquoted.trim().replace(/['"]+/g, '');
+      const value = unquoted.trim().replace(/^['"]+|['"]+$/g, '');
       return value ? [value] : [];
     },
   );

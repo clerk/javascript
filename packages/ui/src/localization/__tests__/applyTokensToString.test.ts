@@ -143,6 +143,8 @@ describe('applyTokensToString', function () {
           [`{{ date | weekday('en-US','long') }}`, 'Friday'],
           [`{{ date | weekday ( "en-US" , "short" ) }}`, 'Fri'],
           [`{{ date | weekday('en-US",) }}`, 'Friday'],
+          [`{{ url | link(Conditions d'utilisation) }}`, `[Conditions d'utilisation](https://example.com)`],
+          [`{{ url | link("Terms) }}`, `[Terms](https://example.com)`],
           [`{{ date | weekday(en-US, narrow) }}`, 'F'],
           [`{{ date | weekday('', 'short') }}`, 'Fri'],
           [`{{ url || link("Terms") }}`, `[Terms](https://example.com)`],
