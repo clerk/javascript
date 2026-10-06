@@ -21,6 +21,7 @@ export function UserProfileDeviceDetailsDialog({ handle, finalFocus, onSignOut }
         device === undefined ? null : (
           <Dialog.Popup
             variant='card'
+            compactPlacement='center'
             finalFocus={finalFocus}
           >
             <DeviceDetailsCard

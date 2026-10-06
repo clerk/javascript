@@ -3,7 +3,7 @@
 import { FloatingFocusManager } from '@floating-ui/react';
 import React from 'react';
 
-import { type FocusTarget, useFinalFocus, useInitialFocus } from '../hooks/use-focus-target';
+import { type FocusTarget, type ResolvedInitialFocus, useFinalFocus, useInitialFocus } from '../hooks/use-focus-target';
 import { type ComponentProps, type DefaultProps, Freeze, mergeProps, opensKeyboard, useRender } from '../utils';
 import { useDialogContext } from './dialog-context';
 
@@ -21,20 +21,16 @@ export interface DialogPopupProps extends ComponentProps<'div'> {
   finalFocus?: DialogFocusTarget;
 }
 
-// iOS raises the keyboard only for focus taken inside the opening tap, and the focus manager's lands a
-// frame late. A child, so this layout effect runs before the focus manager's and it finds focus inside.
-function GestureFocus({ target }: { target: number | React.MutableRefObject<HTMLElement | null> }) {
-  const openingTarget = React.useRef(target);
+// Focuses a text-field `initialFocus` inside the opening tap, the only focus iOS raises the keyboard for.
+// A child, not a hook: React runs child layout effects first, so this lands before the focus manager's.
+function OpeningFocus({ target }: { target: ResolvedInitialFocus }) {
+  const [openingTarget] = React.useState(target);
   React.useLayoutEffect(() => {
-    const initial = openingTarget.current;
-    if (typeof initial === 'number') {
-      return;
-    }
-    const element = initial.current;
+    const element = typeof openingTarget === 'number' ? null : openingTarget.current;
     if (element && opensKeyboard(element) && element !== element.ownerDocument.activeElement) {
       element.focus({ preventScroll: true });
     }
-  }, []);
+  }, [openingTarget]);
   return null;
 }
 
@@ -83,7 +79,7 @@ export const DialogPopup = React.forwardRef<HTMLDivElement, DialogPopupProps>(fu
     children: (
       <>
         <Freeze frozen={!open}>{children}</Freeze>
-        {open ? <GestureFocus target={resolvedInitialFocus} /> : null}
+        {open ? <OpeningFocus target={resolvedInitialFocus} /> : null}
       </>
     ),
   };

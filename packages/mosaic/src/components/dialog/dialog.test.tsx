@@ -553,7 +553,7 @@ describe('compactPlacement', () => {
     clipped: { overflow: { [SHEET]: 'clip', default: null } },
   });
 
-  const renderPlacement = (compactPlacement: 'center' | 'sheet', variant: DialogVariant = 'card') =>
+  const renderPlacement = (compactPlacement: 'center' | 'sheet' | undefined, variant: DialogVariant = 'card') =>
     render(
       <Dialog.Root defaultOpen>
         <Dialog.Popup
@@ -565,7 +565,13 @@ describe('compactPlacement', () => {
       </Dialog.Root>,
     );
 
-  it('centers by default, anchoring nothing to the bottom edge', () => {
+  it('makes a card a sheet by default', () => {
+    renderPlacement(undefined);
+
+    expect(classesOf('.cl-dialog-popup')).toEqual(expect.arrayContaining(atomFor(probe.anchored)));
+  });
+
+  it('centers when asked, anchoring nothing to the bottom edge', () => {
     renderPlacement('center');
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
@@ -586,6 +592,15 @@ describe('compactPlacement', () => {
 
     expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
+    warn.mockRestore();
+  });
+
+  it('keeps a profile centered by default without warning', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    renderPlacement(undefined, 'profile');
+
+    expect(classesOf('.cl-dialog-popup')).not.toEqual(expect.arrayContaining(atomFor(probe.anchored)));
+    expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('takes no placement'));
     warn.mockRestore();
   });
 });

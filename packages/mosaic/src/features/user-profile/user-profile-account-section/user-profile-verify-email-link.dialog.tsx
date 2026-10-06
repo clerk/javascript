@@ -38,10 +38,7 @@ export function UserProfileVerifyEmailLinkDialog({
       onOpenChange={onOpenChange}
     >
       {trigger ? <Dialog.Trigger render={trigger} /> : null}
-      <Dialog.Popup
-        compactPlacement='sheet'
-        variant='card'
-      >
+      <Dialog.Popup variant='card'>
         <Card.Root
           elevation='overlay'
           renderBranding={false}

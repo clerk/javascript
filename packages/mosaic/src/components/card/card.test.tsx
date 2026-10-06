@@ -544,3 +544,28 @@ describe('Mosaic Card', () => {
     expect(screen.getByText('Header').closest('section')).toHaveClass('cl-card-root');
   });
 });
+
+describe('Card surface', () => {
+  // Written out rather than imported, so a drift from `card.styles.ts` fails here instead of passing silently.
+  const probe = stylex.create({
+    surface: { minWidth: 'var(--_cl-surface-min-width, auto)' },
+  });
+  const surfaceAtom = () =>
+    stylex
+      .props(probe.surface)
+      .className!.split(' ')
+      .filter(name => !name.includes('__'));
+
+  it('lets only the outermost card take what a sheet publishes', () => {
+    render(
+      <Card.Root data-testid='outer'>
+        <Card.Content>
+          <Card.Root data-testid='inner' />
+        </Card.Content>
+      </Card.Root>,
+    );
+
+    expect(Array.from(screen.getByTestId('outer').classList)).toEqual(expect.arrayContaining(surfaceAtom()));
+    expect(Array.from(screen.getByTestId('inner').classList)).not.toEqual(expect.arrayContaining(surfaceAtom()));
+  });
+});

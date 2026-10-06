@@ -436,7 +436,11 @@ export const variants = stylex.create({
  */
 export const compactPlacements = stylex.create({
   center: {},
+  // A `default` restates the base value where `null` would drop it: within one `stylex.props` call
+  // a later `null` removes the earlier atom outright.
   sheet: {
+    '--_cl-surface-min-width': { [SHEET]: '100%', default: null },
+    '--_cl-surface-shadow': { [SHEET]: 'none', default: null },
     borderRadius: {
       [SHEET]: `${radiusVars['--cl-radius-2xl']} ${radiusVars['--cl-radius-2xl']} 0 0`,
       default: radiusVars['--cl-radius-xl'],
@@ -447,14 +451,15 @@ export const compactPlacements = stylex.create({
     alignSelf: { [SHEET]: 'end', default: null },
     // The sheet's surface, so it runs on through the keyboard padding below; the card only fills it.
     backgroundColor: { [SHEET]: colorVars['--cl-color-background'], default: null },
-    // No drop shadow on the screen edge, only the hairline ring, as on `Drawer`.
+    // No drop shadow on the screen edge, only the hairline ring, as on `Drawer`. The card inside
+    // reads the two variables and drops its own shadow and fixed width.
     boxShadow: { [SHEET]: shadowVars['--cl-shadow-sm'], default: null },
     // Scrolls itself rather than the overlay, so the keyboard's padding never makes the page scroll.
     // A block box, not the flex column: WebKit leaves a flex container's end padding out of its
     // scroll range, which would strand the bottom of a tall sheet under the keyboard.
     display: { [SHEET]: 'block', default: 'flex' },
     // Tops the card rows' `space['4']` block padding up to their `space['5']` inline padding. The
-    // keyboard inset runs the surface on under Safari's floating address bar.
+    // keyboard inset carries the sheet down to the keyboard, address bar included.
     paddingBlockEnd: {
       [SHEET]: `calc(${space['1']} + max(env(safe-area-inset-bottom, 0px), var(--_cl-keyboard-inset, 0px)))`,
       default: null,
@@ -482,9 +487,10 @@ export const trackCompactPlacements = stylex.create({
     // and dragged the sheet part-way up the screen, then unwound as the translate resolved:
     // measured as `scrollTop` 0 -> 136 -> 50 -> 8 -> 0. It read as the sheet flying too far up and
     // snapping back, the unwind stacking extra bounces on the real overshoot. `clip` never becomes
-    // scrollable, so focus has nothing to scroll.
+    // scrollable, so focus has nothing to scroll. A sheet taller than the box scrolls inside its
+    // popup instead, so the clip never hides any of it.
     overflow: { [SHEET]: 'clip', default: null },
-    // Flush to the sides and the bottom edge; the popup pads for the keyboard, so its surface runs behind Safari's bar.
+    // Flush to the sides and the bottom edge; the popup pads itself for the keyboard.
     paddingInline: { [ABOVE_PHONE]: 'var(--_cl-dialog-inset)', [SHEET]: 0, default: space['4'] },
     gridTemplateRows: { [SHEET]: 'minmax(0, 1fr)', default: null },
     paddingBlockEnd: {

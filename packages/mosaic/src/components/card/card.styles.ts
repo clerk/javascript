@@ -43,15 +43,12 @@ export const root = stylex.create({
   },
 });
 
-// Mirrors `SHEET` in `dialog.styles.ts`; the two must agree.
-const sheetBand = '@media (width < 40rem)' as const;
-
-// The sheet's popup paints the shape; the card only fills it. `minWidth` rather than `width`, so it
-// beats the size's fixed width without restating it.
-export const sheet = stylex.create({
+// The outermost card takes what the box around it publishes: a sheet's popup paints the shape and
+// has the card only fill it. `minWidth` rather than `width`, so it beats the size's fixed width.
+export const surface = stylex.create({
   root: {
-    boxShadow: { default: shadowVars['--cl-shadow-lg'], [sheetBand]: 'none' },
-    minWidth: { default: null, [sheetBand]: '100%' },
+    boxShadow: `var(--_cl-surface-shadow, ${shadowVars['--cl-shadow-lg']})`,
+    minWidth: 'var(--_cl-surface-min-width, auto)',
   },
 });
 

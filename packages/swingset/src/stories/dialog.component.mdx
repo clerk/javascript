@@ -107,18 +107,18 @@ import { UserProfileView } from '@clerk/mosaic/features/user-profile/user-profil
 
 ### Compact placement
 
-`compactPlacement='sheet'` bottom-anchors the surface in the compact container query and slides it up from the
-edge instead of centering it.
+In the compact band, a window under `40rem`, a card is a bottom sheet: flush to the sides and the
+bottom edge, sliding up from it. `compactPlacement='center'` keeps it centered there instead.
 
 <Story
   name='Sheet'
   storyModule={DialogStories}
 />
 
-| Value    | Compact band (`< 48rem`)   | Above it |
-| -------- | -------------------------- | -------- |
-| `center` | Centered (default)         | Centered |
-| `sheet`  | Bottom-anchored, slides up | Centered |
+| Value    | Compact band (`< 40rem`)             | Above it |
+| -------- | ------------------------------------ | -------- |
+| `sheet`  | Bottom-anchored, slides up (default) | Centered |
+| `center` | Centered                             | Centered |
 
 A `profile` takes no placement and warns in dev if given one.
 
@@ -159,10 +159,9 @@ The gap to the screen edge is a fixed inset, not a percentage:
 | `48rem–90rem` | `2rem`       | `2rem` |
 | `>= 90rem`    | `3rem`       | `3rem` |
 
-The bands are **container queries** against the dialog's viewport element (named `cl-dialog`), not
-media queries.
-
-Below `48rem` a `compactPlacement='sheet'` dialog pins to the bottom and slides up.
+The inset bands are **container queries** against the dialog's viewport element (named
+`cl-dialog`). The compact placement band is a media query: below `40rem` a card dialog pins to the
+bottom and slides up, unless `compactPlacement='center'`.
 
 ### Close button
 

@@ -22,7 +22,8 @@ export type CardSize = keyof typeof slots.sizes;
 
 const DEFAULT_ELEVATION: CardElevation = 'card';
 
-const CardElevationContext = React.createContext<CardElevation>(DEFAULT_ELEVATION);
+// `null` outside any card, which is how a card knows it is the outermost one.
+const CardElevationContext = React.createContext<CardElevation | null>(null);
 
 function CardBranding() {
   return (
@@ -50,8 +51,7 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
   { elevation = DEFAULT_ELEVATION, size = 'md', renderBranding = true, render, xstyle, children, ...rest },
   ref,
 ) {
-  const dialog = React.useContext(DialogContext);
-  const isSheet = isInDialog(dialog) && dialog.compactPlacement === 'sheet' && elevation !== 'flush';
+  const isSurface = React.useContext(CardElevationContext) === null && elevation !== 'flush';
   const element = useRender({
     defaultTagName: 'div',
     render,
@@ -64,7 +64,7 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
           slots.root.base,
           slots.root[elevation],
           slots.sizes[size],
-          isSheet && slots.sheet.root,
+          isSurface && slots.surface.root,
           xstyle,
         ),
         rest,
@@ -239,7 +239,7 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
   { render, xstyle, ...rest },
   ref,
 ) {
-  const elevation = React.useContext(CardElevationContext);
+  const elevation = React.useContext(CardElevationContext) ?? DEFAULT_ELEVATION;
   return useRender({
     defaultTagName: 'div',
     render,

@@ -33,7 +33,6 @@ export function UserProfileAddPhoneDialog(props: UserProfileAddPhoneDialogProps)
     >
       {props.trigger ? <Dialog.Trigger render={props.trigger} /> : null}
       <Dialog.Popup
-        compactPlacement='sheet'
         variant='card'
         initialFocus={props.step === 'phone' ? phoneRef : undefined}
       >

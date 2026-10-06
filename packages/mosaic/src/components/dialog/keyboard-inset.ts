@@ -11,13 +11,10 @@
  *
  * - The track pads its bottom edge by it, so a centered `card` re-centers in the space that is left
  *   and a `profile`, which stretches, shrinks into its own scroll region.
- * - A sheet stays flush to the bottom edge and pads its popup by it instead, so its surface runs on
- *   under Safari's floating address bar, which `visualViewport` counts as part of the keyboard.
+ * - A sheet stays flush to the bottom edge and pads its popup by it instead, so the sheet reaches
+ *   down to the keyboard with no gap where iOS floats its address bar, which `visualViewport`
+ *   counts as part of the keyboard.
  */
-
-import type React from 'react';
-
-import { opensKeyboard } from '../../primitives/utils';
 
 const PROPERTY = '--_cl-keyboard-inset';
 
@@ -78,14 +75,4 @@ export function acquireKeyboardInset(): () => void {
       detach = null;
     }
   };
-}
-
-// iOS's reveal pan stops at the end of the locked page, leaving the canvas under the keyboard; the inset lifts the dialog instead.
-export function focusWithoutScroll(event: React.TouchEvent): void {
-  const target = event.target;
-  if (!opensKeyboard(target) || target === document.activeElement || target.matches(':disabled')) {
-    return;
-  }
-  event.preventDefault();
-  target.focus({ preventScroll: true });
 }

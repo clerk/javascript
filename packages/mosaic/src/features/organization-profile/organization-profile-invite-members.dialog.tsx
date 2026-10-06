@@ -60,7 +60,6 @@ export function OrganizationProfileInviteMembersDialog({
       }}
     >
       <Dialog.Popup
-        compactPlacement='sheet'
         initialFocus={emailInput}
         finalFocus={finalFocus}
       >

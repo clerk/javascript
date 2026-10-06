@@ -39,10 +39,7 @@ export function UserProfileRenamePasskeyDialog({
       open={open}
       onOpenChange={onOpenChange}
     >
-      <Dialog.Popup
-        compactPlacement='sheet'
-        initialFocus={inputRef}
-      >
+      <Dialog.Popup initialFocus={inputRef}>
         <Card.Root
           elevation='overlay'
           renderBranding={false}
