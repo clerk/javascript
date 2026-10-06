@@ -3,12 +3,11 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useSkeletonWave } from '../../hooks/use-skeleton-wave';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
-import { skeletonStyles } from '../../styles/skeleton.styles';
+import { SkeletonText } from '../../utils/skeleton-text';
 import { Button } from '../button';
 import type { CheckboxProps } from '../checkbox';
 import { Checkbox } from '../checkbox';
@@ -213,7 +212,6 @@ const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
   ref,
 ) {
   const skeleton = useInheritedSkeleton(skeletonProp);
-  const wave = useSkeletonWave<HTMLSpanElement>(skeleton);
   const sortable = onSort !== undefined && !skeleton;
   return useRender({
     defaultTagName: 'th',
@@ -233,10 +231,7 @@ const HeaderCell = React.forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
         rest,
       ),
       children: skeleton ? (
-        <span
-          ref={wave}
-          {...stylex.props(skeletonStyles.bone, skeletonStyles.wave, skeletonStyles.line, styles.headerCellSkeleton)}
-        />
+        <SkeletonText>{children}</SkeletonText>
       ) : sortable ? (
         <Button
           variant='ghost'
@@ -270,7 +265,6 @@ const Cell = React.forwardRef<HTMLTableCellElement, TableCellProps>(function Mos
   ref,
 ) {
   const skeleton = useInheritedSkeleton(skeletonProp);
-  const wave = useSkeletonWave<HTMLSpanElement>(skeleton);
   return useRender({
     defaultTagName: 'td',
     render,
@@ -281,14 +275,7 @@ const Cell = React.forwardRef<HTMLTableCellElement, TableCellProps>(function Mos
         stylex.props(reset.base, styles.cell, aligns[align], noWrap && styles.noWrap, xstyle),
         rest,
       ),
-      children: skeleton ? (
-        <span
-          ref={wave}
-          {...stylex.props(skeletonStyles.bone, skeletonStyles.wave, skeletonStyles.line, styles.cellSkeleton)}
-        />
-      ) : (
-        children
-      ),
+      children: skeleton ? <SkeletonText>{children}</SkeletonText> : children,
     },
   });
 });

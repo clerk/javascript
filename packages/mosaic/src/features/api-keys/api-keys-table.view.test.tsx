@@ -2,10 +2,10 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
-import { apiKeysTableMessages, resolveAPIKeysTableMessages } from '../api-keys-table.messages';
-import { APIKeysTableSkeleton } from '../api-keys-table.skeleton';
-import type { APIKey, APIKeysTableViewProps } from '../api-keys-table.types';
-import { APIKeysTableView } from '../api-keys-table.view';
+import { apiKeysTableMessages, resolveAPIKeysTableMessages } from './api-keys-table.messages';
+import { APIKeysTableSkeleton } from './api-keys-table.skeleton';
+import type { APIKey, APIKeysTableViewProps } from './api-keys-table.types';
+import { APIKeysTableView } from './api-keys-table.view';
 
 const messages = resolveAPIKeysTableMessages(apiKeysTableMessages, 'user');
 
@@ -44,7 +44,6 @@ describe('APIKeysTableView skeleton', () => {
     expect(screen.queryByRole('searchbox')).toBeNull();
     expect(screen.queryByRole('button')).toBeNull();
     expect(bodyRows(container)).toHaveLength(3);
-    expect(container.querySelector('tbody')).not.toHaveTextContent('API key');
   });
 
   it('shows exactly the rows of the next page while it loads', async () => {

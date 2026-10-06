@@ -1,4 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
+import type { ReactNode } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
 import { Destructive } from '../../blocks/destructive';
@@ -12,11 +13,11 @@ import { Table } from '../../components/table';
 import { Text } from '../../components/text';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
-import { useSkeletonWave } from '../../hooks/use-skeleton-wave';
 import { fill } from '../../localization';
 import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
 import { skeletonStyles } from '../../styles/skeleton.styles';
+import { SkeletonText } from '../../utils/skeleton-text';
 import { truncateWithEndVisible } from '../../utils/truncate-text-with-end-visible';
 import { styles } from './api-keys-table.styles';
 import type { APIKey, APIKeysTableMessages, APIKeysTableSort, APIKeysTableViewProps } from './api-keys-table.types';
@@ -26,13 +27,15 @@ const getRowId = (row: APIKey) => row.id;
 
 const PLACEHOLDER_ROW_COUNT = 3;
 
+const PLACEHOLDER_NAMES = ['Production server', 'CI pipeline', 'Analytics'];
+
 export function placeholderAPIKeys(count: number): APIKey[] {
   return Array.from({ length: count }, (_, index) => ({
-    id: `placeholder_${index}`,
-    name: 'API key',
-    createdAtLabel: '',
+    id: `ak_placeholder${index}`,
+    name: PLACEHOLDER_NAMES[index % PLACEHOLDER_NAMES.length],
+    createdAtLabel: 'Jan 5, 2026',
     expiresAtLabel: null,
-    lastUsedAtLabel: null,
+    lastUsedAtLabel: '2 minutes ago',
   }));
 }
 
@@ -128,6 +131,7 @@ export function APIKeysTableView({
   );
   const query = searchValue.trim();
   const bones = skeleton || rowsSkeleton;
+  const text = (content: ReactNode) => (bones ? <SkeletonText>{content}</SkeletonText> : content);
   const renderRow = (apiKey: APIKey, row?: (typeof table.rows)[number]) => (
     <Table.Row
       key={apiKey.id}
@@ -142,24 +146,13 @@ export function APIKeysTableView({
       ) : null}
       <Table.Cell skeleton={false}>
         <div {...stylex.props(styles.metadata)}>
-          {bones ? (
-            <>
-              <Bone
-                line
-                xstyle={styles.nameSkeleton}
-              />
-              <Bone
-                line
-                xstyle={styles.metadataSkeleton}
-              />
-            </>
-          ) : (
-            <>
-              <Text xstyle={styles.name}>{apiKey.name}</Text>
-              <Text
-                size='xs'
-                color='foreground-secondary'
-              >
+          <Text xstyle={styles.name}>{text(apiKey.name)}</Text>
+          <Text
+            size='xs'
+            color='foreground-secondary'
+          >
+            {text(
+              <>
                 {truncateWithEndVisible(apiKey.id, 10, 4)} ·{' '}
                 <Text
                   render={<span />}
@@ -172,17 +165,13 @@ export function APIKeysTableView({
                         expiresDate: apiKey.expiresAtLabel,
                       })}
                 </Text>
-              </Text>
-            </>
-          )}
+              </>,
+            )}
+          </Text>
         </div>
       </Table.Cell>
-      <Table.Cell noWrap>
-        <Text>{apiKey.createdAtLabel}</Text>
-      </Table.Cell>
-      <Table.Cell noWrap>
-        <Text>{apiKey.lastUsedAtLabel ?? m.neverUsed}</Text>
-      </Table.Cell>
+      <Table.Cell noWrap>{apiKey.createdAtLabel}</Table.Cell>
+      <Table.Cell noWrap>{apiKey.lastUsedAtLabel ?? m.neverUsed}</Table.Cell>
       {onRevoke ? (
         <Table.Cell
           align='end'
@@ -337,15 +326,8 @@ export function APIKeysTableView({
   );
 }
 
-function Bone({ line = false, xstyle }: { line?: boolean; xstyle: stylex.StyleXStyles }) {
-  const wave = useSkeletonWave<HTMLSpanElement>(true);
-
-  return (
-    <span
-      ref={wave}
-      {...stylex.props(skeletonStyles.bone, skeletonStyles.wave, line && skeletonStyles.line, xstyle)}
-    />
-  );
+function Bone({ xstyle }: { xstyle: stylex.StyleXStyles }) {
+  return <span {...stylex.props(skeletonStyles.bone, skeletonStyles.shimmer, xstyle)} />;
 }
 
 function APIKeyActions({

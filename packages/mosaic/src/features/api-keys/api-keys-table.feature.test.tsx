@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, onTestFinished, vi } from 'vitest';
 
-import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
+import { type FakeFapiSeed, fapiUrl, holdRequests, serveFapi, worker } from '../../__tests__/feature/fake-fapi';
 import {
   fapiApiKey,
   fapiClient,
@@ -14,11 +14,11 @@ import {
   fapiOrganization,
   fapiSession,
   fapiUser,
-} from '../../../__tests__/feature/fapi';
-import { renderWithClerk } from '../../../__tests__/feature/render';
-import { MosaicProvider } from '../../../mosaic-provider';
-import type { APIKeysTableProps } from '../api-keys-table';
-import { APIKeysTable } from '../api-keys-table';
+} from '../../__tests__/feature/fapi';
+import { renderWithClerk } from '../../__tests__/feature/render';
+import { MosaicProvider } from '../../mosaic-provider';
+import type { APIKeysTableProps } from './api-keys-table';
+import { APIKeysTable } from './api-keys-table';
 
 const DAY = 24 * 60 * 60 * 1000;
 

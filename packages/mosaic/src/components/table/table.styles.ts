@@ -51,9 +51,6 @@ export const styles = stylex.create({
     verticalAlign: 'middle',
     whiteSpace: 'nowrap',
   },
-  headerCellSkeleton: {
-    width: '8ch',
-  },
   sortableHeaderCell: {
     paddingBlock: space['1.5'],
     paddingInline: space['2'],
@@ -69,9 +66,6 @@ export const styles = stylex.create({
     fontSize: typeScaleVars['--cl-text-sm-size'],
     lineHeight: typeScaleVars['--cl-text-sm-leading'],
     verticalAlign: 'middle',
-  },
-  cellSkeleton: {
-    width: '11ch',
   },
   selectCell: {
     lineHeight: 0,

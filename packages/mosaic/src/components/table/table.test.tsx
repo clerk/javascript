@@ -344,10 +344,10 @@ describe('Mosaic Table', () => {
       const shell = container.querySelector('.cl-table-shell');
       expect(shell).toHaveAttribute('aria-hidden', 'true');
       expect(shell).toHaveAttribute('inert');
-      expect(shell).not.toHaveTextContent('Name');
-      expect(shell).not.toHaveTextContent('Web app');
-      expect(shell).toHaveTextContent('Actions');
-      expect(shell).toHaveTextContent('Menu');
+      expect(screen.getByText('Name')).toHaveAttribute('aria-hidden', 'true');
+      expect(screen.getByText('Web app')).toHaveAttribute('aria-hidden', 'true');
+      expect(screen.getByText('Actions')).not.toHaveAttribute('aria-hidden');
+      expect(screen.getByText('Menu')).not.toHaveAttribute('aria-hidden');
       expect(container.querySelectorAll('th[data-skeleton], td[data-skeleton]')).toHaveLength(2);
     });
 
@@ -371,7 +371,8 @@ describe('Mosaic Table', () => {
       const body = container.querySelector('tbody');
       expect(body).toHaveAttribute('aria-hidden', 'true');
       expect(body).toHaveAttribute('inert');
-      expect(body).not.toHaveTextContent('Web app');
+      expect(screen.getByText('Web app')).toHaveAttribute('aria-hidden', 'true');
+      expect(screen.getByText('Name')).not.toHaveAttribute('aria-hidden');
     });
   });
 });
