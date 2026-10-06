@@ -2,13 +2,13 @@
 
 A skeleton stands in for content that is being fetched and is not yet on screen. It
 has the exact size of that content, so the swap never shifts layout, and every bone
-on the page pulses in one shared wave.
+on the page shimmers in sync.
 
 ## What to render as bones
 
 When a surface loads as one unit (a panel, a table on first load), render the whole
 thing as bones, including titles, card headings and column headers that are already
-known: one loading state reads cleaner, carries the wave, and swaps to content in one
+known: one loading state reads cleaner, shimmers as one surface, and swaps to content in one
 moment. A unit is what the user sees appear at once, however many requests feed it.
 
 Content that isn't being fetched keeps rendering. A section loaded by a later request
@@ -21,7 +21,7 @@ the content beside it.
 
 ## Building one
 
-Each component defines its own bones, but every bone uses the shared wave and the
+Each component defines its own bones, but every bone uses the shared shimmer and the
 same fill, `--cl-color-neutral-alpha-200`.
 
 - **Render the real view with mock data.** The view takes `skeleton` and passes it
@@ -53,13 +53,15 @@ same fill, `--cl-color-neutral-alpha-200`.
   rendered empty, so it inherits that part's padding, type size and line height.
 - **A component with its own shape** (a part that needs a skeleton but isn't covered
   above) composes the pieces in `styles/skeleton.styles.ts` itself:
-  - `skeletonStyles.bone`: fill and radius, for media and blocks.
+  - `skeletonStyles.shimmer`: the gradient fill and its animation. Media and
+    blocks take it on the element; `Avatar.Fallback`, which has its own circle,
+    takes `shimmer` alone.
+  - `skeletonStyles.bone`: radius, for media and blocks (with `shimmer`).
   - `skeletonStyles.line`: a `1lh` box holding one line of text, whose `::before`
-    bar is `1cap` tall (`0.7em` fallback) on the baseline, square-cornered.
-  - `skeletonStyles.wave`: the animation. `Avatar.Fallback`, which has its own fill
-    and circle, takes `wave` alone.
-  - plus a `useSkeletonWave(enabled)` ref (`hooks/use-skeleton-wave.ts`) on the same
-    element. Without it, `wave` never starts.
+    bar is `1cap` tall (`0.7em` fallback) on the baseline, square-cornered. It
+    moves the shimmer from the element onto the bar.
+  - plus a `useSkeletonShimmer(enabled)` ref (`hooks/use-skeleton-shimmer.ts`) on
+    the same element. Without it, the shimmer stays paused.
 
 ## Sizing
 
@@ -75,22 +77,27 @@ same fill, `--cl-color-neutral-alpha-200`.
 - **Uniform across rows.** Every row uses the same widths; within a row, lines
   differ.
 
-## The wave
+## The shimmer
 
-- `skeletonStyles.wave`: opacity `1 → 0.32 → 1` over the first 56% of a 2s cycle,
-  then a hold, on `--cl-ease-in-out`. Off under `prefers-reduced-motion: reduce`.
-- `useSkeletonWave` sets a negative `animation-delay` before first paint, from the
-  element's page position: `-(now − y × 2.1ms/px) mod 2000ms`. Every bone shares
-  the document clock and lags it by its height on the page, so skeletons that mount
-  separately read as one wave moving down the page, and two lines in one row sit on
-  different parts of it.
-- `wave` only animates once the hook sets `data-skeleton-wave`. Without that gate, a
-  server-rendered skeleton pulses in unison before hydration, then jumps into phase.
-- The keyframe duration and the hook's `PERIOD_MS` must match.
-- Tuning, all relative: the px rate sets how fast the wave travels; the cycle over
-  that rate sets the spacing between crests (~950px, about one per panel); the dip's
-  share of the cycle sets how wide a crest is. Shorten the cycle alone and crests
-  crowd together; widen the dip alone and the hold disappears.
+Modeled on React Spectrum's `Skeleton`: a highlight sweeps left to right across every
+bone, and every bone on the page sweeps in step.
+
+- The surface is a `linear-gradient` (fill, highlight, fill at 33% / 50% / 66%)
+  sized to `300%` of the bone, and the keyframes move its `background-position`
+  from `100%` to `0%`, so the highlight crosses once per cycle: 2s on
+  `--cl-ease-in-out`, repeating. The highlight is lighter than the fill in both
+  schemes. Off under `prefers-reduced-motion: reduce`, leaving the plain fill.
+- Text bones animate their `::before` bar, so the highlight stays inside the cap
+  band; media animate the element.
+- `useSkeletonShimmer` locks every bone to the document clock: before first paint
+  it sets the private `--_cl-skeleton-state` variable (`styles/skeleton.stylex.ts`)
+  to `running` and sets each of the element's animations (pseudo-elements
+  included) to `startTime = 0`. Bones that mount at different times sweep
+  together.
+- The animation is `paused` until the hook runs, so a server-rendered skeleton
+  holds a static fill until hydration instead of sweeping out of step and jumping.
+- The sweep is relative to each bone's width, so a wide bar's highlight moves
+  faster than a narrow one's, as in Spectrum.
 
 ## When to show it
 

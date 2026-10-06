@@ -67,7 +67,7 @@ test. Copy from it.
 | Building on / authoring a headless primitive (`src/primitives/`)                                       | `references/headless.md`                               |
 | Styling a component (tokens, `stylex.create`, `themeProps`, CSS build)                                 | `references/stylex.md`                                 |
 | Building an enter/exit transition, a row that expands and collapses, or any motion that reads as wrong | `references/motion.md`                                 |
-| Building a loading skeleton (bones, sizing, the wave)                                                  | `references/skeletons.md`                              |
+| Building a loading skeleton (bones, sizing, the shimmer)                                               | `references/skeletons.md`                              |
 | Writing the model (the Clerk adapter, `status`, permissions)                                           | `references/models.md`                                 |
 | Writing the controller (local state, pending, action wrapping)                                         | `references/controllers.md`                            |
 | Authoring or debugging a state machine, or wiring one to React                                         | `references/machines.md` → in-tree `machine/README.md` |

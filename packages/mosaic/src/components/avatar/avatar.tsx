@@ -3,7 +3,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useSkeletonWave } from '../../hooks/use-skeleton-wave';
+import { useSkeletonShimmer } from '../../hooks/use-skeleton-shimmer';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps, MosaicElementProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -149,8 +149,8 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
   }, [delayMs]);
 
   const pending = canRender && status === 'loading';
-  const wave = useSkeletonWave<HTMLSpanElement>(pending);
-  const mergedRef = useMergeRefs([ref, wave]);
+  const shimmer = useSkeletonShimmer<HTMLSpanElement>(pending);
+  const mergedRef = useMergeRefs([ref, shimmer]);
 
   if (!canRender || status === 'loaded') {
     return null;
@@ -161,7 +161,13 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, AvatarFallbackProps>(fu
       ref={mergedRef}
       {...mergeStyleProps(
         themeProps('avatar-fallback', { pending }),
-        stylex.props(reset.base, styles.fallback, bordered && styles.overlay, pending && skeletonStyles.wave, xstyle),
+        stylex.props(
+          reset.base,
+          styles.fallback,
+          bordered && styles.overlay,
+          pending && skeletonStyles.shimmer,
+          xstyle,
+        ),
         rest,
       )}
     >
@@ -192,7 +198,7 @@ const AvatarIcon = React.forwardRef<HTMLSpanElement, AvatarIconProps>(function M
 /**
  * Compound avatar. `Avatar.Root` positions and sizes the box; `Avatar.Image` renders
  * once its source loads; `Avatar.Fallback` holds the space until then, as a blank
- * placeholder that pulses only while an image is actually on its way; `Avatar.Icon`
+ * placeholder that shimmers only while an image is actually on its way; `Avatar.Icon`
  * adds an optional corner affordance.
  */
 export const Avatar = {

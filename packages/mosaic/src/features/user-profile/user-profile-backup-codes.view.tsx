@@ -5,7 +5,7 @@ import { Card } from '../../components/card';
 import { useFlowAutoFocus } from '../../components/flow';
 import { Icon } from '../../components/icon';
 import { Text } from '../../components/text';
-import { useSkeletonWave } from '../../hooks/use-skeleton-wave';
+import { useSkeletonShimmer } from '../../hooks/use-skeleton-shimmer';
 import { useMessages } from '../../localization';
 import { mergeStyleProps, themeProps } from '../../props';
 import { reset } from '../../styles/reset.styles';
@@ -153,13 +153,13 @@ export function UserProfileBackupCodesView({
 }
 
 function BackupCodeSkeleton() {
-  const wave = useSkeletonWave<HTMLParagraphElement>(true);
+  const shimmer = useSkeletonShimmer<HTMLParagraphElement>(true);
 
   return (
     <Text
-      ref={wave}
+      ref={shimmer}
       render={<span />}
-      xstyle={[skeletonStyles.bone, skeletonStyles.wave, skeletonStyles.line, styles.skeleton]}
+      xstyle={[skeletonStyles.bone, skeletonStyles.shimmer, skeletonStyles.line, styles.skeleton]}
     />
   );
 }

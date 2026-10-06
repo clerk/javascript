@@ -2,7 +2,7 @@ import { inertProps } from '@clerk/shared/inert';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useSkeletonWave } from '../../hooks/use-skeleton-wave';
+import { useSkeletonShimmer } from '../../hooks/use-skeleton-shimmer';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -31,7 +31,7 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
   ref,
 ) {
   const inProfilePage = React.useContext(ContentPanelContext);
-  const wave = useSkeletonWave<HTMLHeadingElement>(skeleton && !inProfilePage);
+  const shimmer = useSkeletonShimmer<HTMLHeadingElement>(skeleton && !inProfilePage);
   const profile = React.useContext(ProfileContext);
   const level = useHeadingLevel();
   const pageTitleRef = inProfilePage ? profile?.pageTitleRef : undefined;
@@ -50,10 +50,10 @@ const Title = React.forwardRef<HTMLDivElement, PanelTitleProps>(function PanelTi
       ),
       children: skeleton ? (
         <Heading
-          ref={wave}
+          ref={shimmer}
           level={level}
           size='2xl'
-          xstyle={[skeletonStyles.bone, skeletonStyles.wave, skeletonStyles.line, styles.titleSkeleton]}
+          xstyle={[skeletonStyles.bone, skeletonStyles.shimmer, skeletonStyles.line, styles.titleSkeleton]}
         />
       ) : (
         <Heading

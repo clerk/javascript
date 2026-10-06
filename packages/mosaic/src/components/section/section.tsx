@@ -4,7 +4,7 @@ import { useMergeRefs } from '@floating-ui/react';
 import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
-import { useSkeletonWave } from '../../hooks/use-skeleton-wave';
+import { useSkeletonShimmer } from '../../hooks/use-skeleton-shimmer';
 import { useTransition } from '../../primitives/hooks/use-transition';
 import { useRender } from '../../primitives/utils';
 import type { MosaicComponentProps } from '../../props';
@@ -127,8 +127,8 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
   const setTitleId = React.useContext(SectionGroupContext);
   const generatedId = React.useId();
   const level = useHeadingLevel();
-  const wave = useSkeletonWave<HTMLHeadingElement>(skeleton);
-  const mergedRef = useMergeRefs([ref, wave]);
+  const shimmer = useSkeletonShimmer<HTMLHeadingElement>(skeleton);
+  const mergedRef = useMergeRefs([ref, shimmer]);
   const id = skeleton ? undefined : (idProp ?? (setTitleId ? `cl-section-${generatedId}-title` : undefined));
 
   useSafeLayoutEffect(() => {
@@ -150,7 +150,7 @@ const Title = React.forwardRef<HTMLHeadingElement, SectionTitleProps>(function S
         styles.title,
         truncationStyles.singleLine,
         skeleton && skeletonStyles.bone,
-        skeleton && skeletonStyles.wave,
+        skeleton && skeletonStyles.shimmer,
         skeleton && skeletonStyles.line,
         skeleton && styles.titleSkeleton,
         xstyle,
@@ -226,12 +226,12 @@ const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function Secti
   ref,
 ) {
   const skeleton = useInheritedSkeleton(skeletonProp);
-  const wave = useSkeletonWave<HTMLDivElement>(skeleton);
+  const shimmer = useSkeletonShimmer<HTMLDivElement>(skeleton);
 
   return useRender({
     defaultTagName: 'div',
     render,
-    ref: [ref, wave],
+    ref: [ref, shimmer],
     props: mergeStyleProps(
       themeProps('section-media', { size, skeleton }),
       stylex.props(
@@ -239,7 +239,7 @@ const Media = React.forwardRef<HTMLDivElement, SectionMediaProps>(function Secti
         styles.mediaBase,
         mediaSizes[size],
         skeleton && skeletonStyles.bone,
-        skeleton && skeletonStyles.wave,
+        skeleton && skeletonStyles.shimmer,
         xstyle,
       ),
       { ...rest, children: skeleton ? undefined : children },
@@ -270,19 +270,19 @@ const Label = React.forwardRef<HTMLDivElement, SectionLabelProps>(function Secti
   ref,
 ) {
   const skeleton = useInheritedSkeleton(skeletonProp);
-  const wave = useSkeletonWave<HTMLDivElement>(skeleton);
+  const shimmer = useSkeletonShimmer<HTMLDivElement>(skeleton);
 
   return useRender({
     defaultTagName: 'div',
     render,
-    ref: [ref, wave],
+    ref: [ref, shimmer],
     props: mergeStyleProps(
       themeProps('section-label', { skeleton }),
       stylex.props(
         reset.base,
         styles.label,
         skeleton && skeletonStyles.bone,
-        skeleton && skeletonStyles.wave,
+        skeleton && skeletonStyles.shimmer,
         skeleton && skeletonStyles.line,
         skeleton && styles.labelSkeleton,
         xstyle,
@@ -298,12 +298,12 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
 ) {
   const skeleton = useInheritedSkeleton(skeletonProp);
   const inHeader = React.useContext(SectionHeaderContext);
-  const wave = useSkeletonWave<HTMLDivElement>(skeleton);
+  const shimmer = useSkeletonShimmer<HTMLDivElement>(skeleton);
 
   return useRender({
     defaultTagName: 'div',
     render,
-    ref: [ref, wave],
+    ref: [ref, shimmer],
     props: mergeStyleProps(
       themeProps('section-description', { skeleton }),
       stylex.props(
@@ -312,7 +312,7 @@ const Description = React.forwardRef<HTMLDivElement, SectionDescriptionProps>(fu
         inHeader && styles.headerDescription,
         inHeader && sectionHeaderDescriptionMarker,
         skeleton && skeletonStyles.bone,
-        skeleton && skeletonStyles.wave,
+        skeleton && skeletonStyles.shimmer,
         skeleton && skeletonStyles.line,
         skeleton && styles.descriptionSkeleton,
         xstyle,
