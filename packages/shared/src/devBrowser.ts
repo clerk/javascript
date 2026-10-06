@@ -46,6 +46,14 @@ const removeDevBrowserFromURLSearchParams = (_url: URL) => {
   return url;
 };
 
+const decodeURISafely = (value: string) => {
+  try {
+    return decodeURI(value);
+  } catch {
+    return value;
+  }
+};
+
 /**
  * Removes the __clerk_db_jwt dev browser from the URL hash, as well as
  * the legacy __dev_session from the URL searchParams
@@ -62,7 +70,7 @@ const removeLegacyDevBrowser = (_url: URL) => {
   const DEV_BROWSER_LEGACY_KEY = '__dev_session';
   const url = new URL(_url);
   url.searchParams.delete(DEV_BROWSER_LEGACY_KEY);
-  url.hash = decodeURI(url.hash).replace(DEV_BROWSER_MARKER_REGEXP, '');
+  url.hash = decodeURISafely(url.hash).replace(DEV_BROWSER_MARKER_REGEXP, '');
   if (url.href.endsWith('#')) {
     url.hash = '';
   }
