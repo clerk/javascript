@@ -272,7 +272,7 @@ describe('connected accounts', () => {
     await renderWithClerk(<UserProfileConnectedAccountsSection />);
 
     await userEvent.setup().click(screen.getByRole('button', { name: 'Connect GitHub' }));
-    expect(await screen.findByText('OAuth flow did not receive a verification URL.')).toBeInTheDocument();
+    expect(await screen.findByText('The connection could not start. Please try again.')).toBeInTheDocument();
   });
 
   it('preserves modal state when connecting', async () => {
@@ -486,7 +486,9 @@ describe('connected accounts', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));
     await waitFor(() => expect(request.requests).toHaveLength(1));
     request.fail('last_identification', 'You cannot remove your last sign-in method.');
-    expect(await within(dialog).findByRole('alert')).toHaveTextContent('You cannot remove your last sign-in method.');
+    await waitFor(() =>
+      expect(within(dialog).getByRole('alert')).toHaveTextContent('You cannot remove your last sign-in method.'),
+    );
 
     serveFapi(signedIn([google]));
     await user.click(within(dialog).getByRole('button', { name: 'Remove' }));

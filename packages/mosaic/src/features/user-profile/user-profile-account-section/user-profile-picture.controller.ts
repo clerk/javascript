@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 
 import type { LocalizableError } from '../../../localization';
 import { FileUpload } from '../../../primitives/file-upload';
-import { toFormError } from '../../../utils/form-error';
+import { toFormError } from '../../../utils/errors';
 
 export interface UserProfilePictureControllerOptions {
   onChange?: (file: File) => Promise<void>;

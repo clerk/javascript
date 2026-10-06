@@ -292,13 +292,8 @@ export function MembersTableTabView({
           description={m.removeDescription}
           actionLabel={m.remove}
           cancelLabel={m.cancel}
-          onConfirm={async member => {
-            try {
-              await removalFocus.remove(member.id);
-            } catch (error) {
-              throw error instanceof Error ? error : new Error(m.removeError);
-            }
-          }}
+          onConfirm={member => removalFocus.remove(member.id)}
+          errorFallback={m.removeError}
           finalFocus={removalFocus.finalFocus}
         />
       ) : null}

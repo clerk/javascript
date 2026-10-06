@@ -109,6 +109,34 @@ function updateUser(state: FakeFapiState, user: UserJSON): void {
   };
 }
 
+function withoutOrganization(session: SessionJSON, organizationId: string): SessionJSON {
+  return {
+    ...session,
+    user: {
+      ...session.user,
+      organization_memberships: session.user.organization_memberships.filter(m => m.organization.id !== organizationId),
+    },
+  };
+}
+
+function leaveOrganization(state: FakeFapiState, organizationId: string, userId: string): void {
+  state.memberships = state.memberships.filter(m => m.organization.id !== organizationId);
+  state.client = {
+    ...state.client,
+    sessions: state.client.sessions.map(session =>
+      session.user.id === userId ? withoutOrganization(session, organizationId) : session,
+    ),
+  };
+}
+
+function deleteOrganization(state: FakeFapiState, organizationId: string): void {
+  state.memberships = state.memberships.filter(m => m.organization.id !== organizationId);
+  state.client = {
+    ...state.client,
+    sessions: state.client.sessions.map(session => withoutOrganization(session, organizationId)),
+  };
+}
+
 function missing() {
   return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
 }
@@ -278,6 +306,29 @@ export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
     http.get(fapiUrl('/v1/me/organization_suggestions'), ({ request }) => {
       const url = new URL(request.url);
       return envelope(page(withStatus(state.suggestions, url), url), null);
+    }),
+    http.post(fapiUrl('/v1/me/organization_memberships/:organizationId'), ({ params, request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
+        return undefined;
+      }
+      const user = activeUser(state);
+      const membership = state.memberships.find(m => m.organization.id === params.organizationId);
+      if (!user || !membership) {
+        return missing();
+      }
+      leaveOrganization(state, membership.organization.id, user.id);
+      return envelope({ object: 'organization_membership', id: membership.id, deleted: true }, state.client);
+    }),
+    http.post(fapiUrl('/v1/organizations/:organizationId'), ({ params, request }) => {
+      if (new URL(request.url).searchParams.get('_method') !== 'DELETE') {
+        return undefined;
+      }
+      const membership = state.memberships.find(m => m.organization.id === params.organizationId);
+      if (!membership) {
+        return missing();
+      }
+      deleteOrganization(state, membership.organization.id);
+      return envelope({ object: 'organization', id: membership.organization.id, deleted: true }, state.client);
     }),
     http.post(fapiUrl('/v1/me/organization_invitations/:id/accept'), ({ params }) => {
       const invitation = state.invitations.find(i => i.id === params.id);

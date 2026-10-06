@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
 import { MosaicProvider } from '../../../mosaic-provider';
@@ -33,9 +33,14 @@ function renderView(overrides: Partial<RequestsTableTabViewProps> = {}) {
 }
 
 describe('RequestsTableTabView', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it.each(['Accept', 'Decline'] as const)(
     'holds the row while %s is pending and allows retry after failure',
     async action => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
       const user = userEvent.setup();
       const attempt = deferred<void>();
       const onDecision = vi
@@ -54,11 +59,13 @@ describe('RequestsTableTabView', () => {
       expect(onDecision).toHaveBeenCalledExactlyOnceWith('request-1');
       expect(onOtherDecision).not.toHaveBeenCalled();
 
-      await act(() => attempt.reject(new Error()));
-      expect(await screen.findByRole('alert')).toHaveTextContent(
-        action === 'Accept'
-          ? 'Unable to accept this request. Please try again.'
-          : 'Unable to decline this request. Please try again.',
+      await act(() => attempt.reject(new Error('Cannot read properties of undefined')));
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent(
+          action === 'Accept'
+            ? 'Unable to accept this request. Please try again.'
+            : 'Unable to decline this request. Please try again.',
+        ),
       );
       await user.click(screen.getByRole('button', { name: `${action} Ada Lovelace` }));
       expect(onDecision).toHaveBeenCalledTimes(2);

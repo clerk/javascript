@@ -1,18 +1,24 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { clerkApiError } from '../../../__tests__/clerk-errors';
+import type { MosaicLocalization } from '../../../localization';
 import { MosaicProvider } from '../../../mosaic-provider';
 import type { UserProfilePasskey, UserProfilePasskeysSectionViewProps } from '../user-profile-passkeys-section.view';
 import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 const passkeys: UserProfilePasskey[] = [
   { id: 'laptop', name: 'MacBook' },
   { id: 'phone', name: 'iPhone' },
 ];
 
-function renderView(overrides: Partial<UserProfilePasskeysSectionViewProps> = {}) {
+function renderView(overrides: Partial<UserProfilePasskeysSectionViewProps> = {}, localization?: MosaicLocalization) {
   const props: UserProfilePasskeysSectionViewProps = {
     passkeys,
     onAdd: vi.fn(),
@@ -21,7 +27,7 @@ function renderView(overrides: Partial<UserProfilePasskeysSectionViewProps> = {}
     ...overrides,
   };
   return render(
-    <MosaicProvider>
+    <MosaicProvider localization={localization}>
       <UserProfilePasskeysSectionView {...props} />
     </MosaicProvider>,
   );
@@ -91,7 +97,10 @@ describe('passkeys section', () => {
 
   it('renames through a prefilled form, preserves the draft after failure, and retries', async () => {
     const user = userEvent.setup();
-    const onRename = vi.fn().mockRejectedValueOnce(new Error('Try again')).mockResolvedValueOnce(undefined);
+    const onRename = vi
+      .fn()
+      .mockRejectedValueOnce(clerkApiError('passkey_rename_failed', 'Try again'))
+      .mockResolvedValueOnce(undefined);
     render(
       <MosaicProvider>
         <UserProfilePasskeysSectionView
@@ -109,7 +118,7 @@ describe('passkeys section', () => {
     await user.clear(input);
     await user.type(input, 'Work laptop');
     await user.click(screen.getByRole('button', { name: 'Save' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Try again');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Try again'));
     expect(input).toHaveValue('Work laptop');
     await user.type(input, ' updated');
     expect(screen.getByRole('alert')).toHaveTextContent('Try again');
@@ -117,6 +126,20 @@ describe('passkeys section', () => {
     await user.click(screen.getByRole('button', { name: 'Save' }));
     expect(onRename).toHaveBeenLastCalledWith('laptop', 'Work laptop updated');
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
+
+  it('shows the rename fallback, never the message, when renaming fails unexpectedly', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+    renderView(
+      { onRename: vi.fn().mockRejectedValue(new Error('Cannot read properties of undefined')) },
+      { overrides: { 'userProfilePasskeys.saveError': 'Could not rename this passkey.' } },
+    );
+    await user.click(screen.getByRole('button', { name: 'Manage MacBook' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Rename' }));
+    await user.type(screen.getByRole('textbox', { name: 'Passkey name' }), ' Pro');
+    await user.click(screen.getByRole('button', { name: 'Save' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not rename this passkey.');
   });
 
   it('keeps an empty section visible when Add is unavailable', () => {
@@ -185,7 +208,10 @@ describe('passkeys section', () => {
 
   it('retries removal for the same passkey after a failure', async () => {
     const user = userEvent.setup();
-    const onRemove = vi.fn().mockRejectedValueOnce(new Error('Removal failed')).mockResolvedValueOnce(undefined);
+    const onRemove = vi
+      .fn()
+      .mockRejectedValueOnce(clerkApiError('passkey_not_found', 'Removal failed'))
+      .mockResolvedValueOnce(undefined);
     render(
       <MosaicProvider>
         <UserProfilePasskeysSectionView
@@ -197,7 +223,7 @@ describe('passkeys section', () => {
     await user.click(screen.getByRole('button', { name: 'Manage iPhone' }));
     await user.click(screen.getByRole('menuitem', { name: 'Remove passkey' }));
     await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Removal failed');
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Removal failed'));
     await user.click(screen.getByRole('button', { name: 'Remove', exact: true }));
     expect(onRemove.mock.calls).toEqual([['phone'], ['phone']]);
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
