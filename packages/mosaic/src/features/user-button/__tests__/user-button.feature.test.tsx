@@ -110,6 +110,7 @@ function requiredPopup() {
 const reading = (...names: string[]) =>
   within(requiredPopup())
     .queryAllByText(new RegExp(`^(${names.join('|')})$`))
+    .filter(node => !node.closest('.cl-user-button-header'))
     .map(node => node.textContent);
 
 const current = () =>
@@ -789,7 +790,6 @@ describe('UserButton', () => {
 
       expect(reading('Personal account', 'Acme', 'Other', 'Create organization')).toEqual([
         'Acme',
-        'Acme',
         'Personal account',
         'Other',
         'Create organization',
@@ -809,6 +809,7 @@ describe('UserButton', () => {
       const user = await open();
 
       expect(within(requiredPopup()).getByText('Alice Smith')).toBeInTheDocument();
+      expect(requiredPopup().querySelector('.cl-user-button-header-description')).toHaveTextContent('Acme');
       expect(within(requiredPopup()).getByRole('button', { name: 'Invite' })).toBeInTheDocument();
       await openSettings(user, 'Organization settings');
       expect(openOrganizationProfile).toHaveBeenCalled();
