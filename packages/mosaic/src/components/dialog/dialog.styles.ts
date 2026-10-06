@@ -14,8 +14,6 @@ const BASE_SCRIM = 'color-mix(in oklab, oklch(0 0 0) 40%, transparent)';
 
 // Safari 26 samples the bar color once, at mount, and skips layers under ~0.15 opacity.
 const SCRIM_ENTER_OPACITY = 0.2;
-// The same sampling floor, for a sheet entering at the bottom edge.
-const SHEET_ENTER_OPACITY = 0.2;
 
 /**
  * The width bands, queried against the VIEWPORT ELEMENT rather than the window — it is a
@@ -79,13 +77,6 @@ export const styles = stylex.create({
    */
   backdropStacked: {
     backgroundColor: 'transparent',
-  },
-
-  // Safari keeps a sticky header's status bar tint under a full-screen overlay; a top-edge strip of the scrim is sampled instead.
-  backdropEdge: {
-    blockSize: space['3'],
-    display: { [SHEET]: 'block', default: 'none' },
-    insetBlockEnd: 'auto',
   },
 
   /**
@@ -454,7 +445,7 @@ export const compactPlacements = stylex.create({
     // `align-self` on the grid item, not `align-items` on the viewport, because the viewport is
     // shared: bottom-aligning there would drag a centered dialog down with it.
     alignSelf: { [SHEET]: 'end', default: null },
-    // With `position: sticky` below, Safari tints its bottom bar from this; the card's own sits under the popup's veil.
+    // The sheet's surface, so it runs on through the keyboard padding below; the card only fills it.
     backgroundColor: { [SHEET]: colorVars['--cl-color-background'], default: null },
     // No drop shadow on the screen edge, only the hairline ring, as on `Drawer`.
     boxShadow: { [SHEET]: shadowVars['--cl-shadow-sm'], default: null },
@@ -469,7 +460,6 @@ export const compactPlacements = stylex.create({
       default: null,
     },
     paddingBlockStart: { [SHEET]: space['1'], default: null },
-    position: { [SHEET]: 'sticky', default: 'relative' },
     maxHeight: { [SHEET]: '100%', default: null },
     overflowY: { [SHEET]: 'auto', default: null },
     width: { [SHEET]: '100%', default: 'fit-content' },
@@ -504,14 +494,6 @@ export const trackCompactPlacements = stylex.create({
   },
 });
 
-/** The scrim stops short of `styles.backdropEdge`, so the two never double up. */
-export const backdropCompactPlacements = stylex.create({
-  center: {},
-  sheet: {
-    insetBlockStart: { [SHEET]: space['3'], default: null },
-  },
-});
-
 /**
  * Enter/exit motion, keyed by size, because the two surfaces want opposite things.
  *
@@ -533,14 +515,7 @@ export const backdropCompactPlacements = stylex.create({
  */
 export const backdropMotion = stylex.create({
   card: {
-    // Safari re-tints its bars when the scrim mounts and unmounts, with a ~100ms linear crossfade.
-    // The entrance matches it; on a phone the exit holds until unmount, when the bar moves too.
     opacity: {
-      [SHEET]: {
-        default: 1,
-        ':where([data-ending-style])': 1,
-        ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
-      },
       default: 1,
       ':where([data-ending-style])': 0,
       ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
@@ -565,11 +540,6 @@ export const backdropMotion = stylex.create({
   /** Identical to `card` — the popup it accompanies fades on the same clock, it just does not scale. */
   profile: {
     opacity: {
-      [SHEET]: {
-        default: 1,
-        ':where([data-ending-style])': 1,
-        ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
-      },
       default: 1,
       ':where([data-ending-style])': 0,
       ':where([data-starting-style])': SCRIM_ENTER_OPACITY,
@@ -630,8 +600,7 @@ export const popupMotion = stylex.create({
    * with it. Each cell is therefore self-contained and reads straight against the design matrix.
    */
   cardSheet: {
-    // A fade at every width, including the sheet, which starts it at `SHEET_ENTER_OPACITY` rather
-    // than 0 so Safari can sample it. An earlier version pinned the sheet at
+    // One fade at every width, including the sheet. An earlier version pinned the sheet at
     // opacity 1 on the theory that a pure slide reads more like a native sheet — compared
     // side by side it did not; the fade gives the travel somewhere to resolve into rather than
     // washing it out, provided it runs the length of the slide rather than finishing early.
@@ -639,11 +608,6 @@ export const popupMotion = stylex.create({
     // surface is still moving reads as a flash, which is what the original objection was
     // actually describing.
     opacity: {
-      [SHEET]: {
-        default: 1,
-        ':where([data-ending-style])': 0,
-        ':where([data-starting-style])': SHEET_ENTER_OPACITY,
-      },
       default: 1,
       ':where([data-starting-style], [data-ending-style])': 0,
     },
@@ -740,9 +704,7 @@ export const popupMotion = stylex.create({
         default: null,
         '@media (prefers-reduced-motion: no-preference)': {
           default: null,
-          ':where([data-ending-style])': '0 100%',
-          // Safari tints its bar once, at mount, from what sits on the bottom edge: leave the sheet there.
-          ':where([data-starting-style])': `0 calc(100% - ${space['2']})`,
+          ':where([data-starting-style], [data-ending-style])': '0 100%',
         },
       },
       default: null,

@@ -52,16 +52,6 @@ export const styles = stylex.create({
     backgroundColor: NESTED_SCRIM,
   },
 
-  // Safari keeps a sticky header's status bar tint under a full-screen overlay; a top-edge strip of
-  // the scrim is sampled instead, and the scrim stops short of it so the two never double up.
-  backdropScrim: {
-    insetBlockStart: space['3'],
-  },
-  backdropEdge: {
-    blockSize: space['3'],
-    insetBlockEnd: 'auto',
-  },
-
   /**
    * The fixed box the sheet is aligned in: bottom edge, full width. The headless viewport is the
    * `FloatingOverlay` that owns the scroll lock; this only lays the popup out inside it.

@@ -17,7 +17,6 @@ import { Button } from '../button';
 import { Icon } from '../icon';
 import { ToastProvider } from '../toast/toast';
 import {
-  backdropCompactPlacements,
   backdropMotion,
   closeInsets,
   compactPlacements,
@@ -30,7 +29,6 @@ import {
   viewportVariants,
 } from './dialog.styles';
 import { acquireKeyboardInset, focusWithoutScroll } from './keyboard-inset';
-import { useScrimAfterglow } from './scrim-afterglow';
 import { preventViewportPan } from './viewport-pan';
 
 /**
@@ -70,7 +68,7 @@ export interface DialogContextValue {
   descriptionId: string;
   /** Which surface this is, and so the geometry it takes — see `DialogVariant`. */
   variant: DialogVariant;
-  /** Where the surface sits in the compact band, so it can square its bottom corners as a sheet. */
+  /** Where the surface sits in the compact band, so a surface can fill it as a sheet. */
   compactPlacement: DialogCompactPlacement;
   /**
    * The popup's ARIA role, for a surface that has to adapt to being an interruption: `Card.Header`
@@ -250,41 +248,18 @@ const CloseButton = React.forwardRef<HTMLButtonElement, DialogCloseButtonProps>(
 
 /**
  * The scrim behind the dialog. Owns no scroll lock or positioning — that is the viewport.
- * Rendered by `Dialog.Popup`, which is also what decides the things it varies on.
+ * Rendered by `Dialog.Popup`, which is also what decides the two things it varies on.
  */
-function Backdrop({
-  variant,
-  compactPlacement,
-  stacked,
-}: {
-  variant: DialogVariant;
-  compactPlacement: DialogCompactPlacement;
-  stacked: boolean;
-}) {
-  const scrimRef = React.useRef<HTMLDivElement>(null);
-  useScrimAfterglow(scrimRef, !stacked);
-  const scrim = (edge: boolean) => (
+function Backdrop({ variant, stacked }: { variant: DialogVariant; stacked: boolean }) {
+  return (
     <Primitive.Backdrop
-      ref={edge ? undefined : scrimRef}
       {...mergeStyleProps(
         themeProps('dialog-backdrop'),
         // All in one `stylex.props` call so a later `backgroundColor` replaces the one in
         // `backdrop` outright — across two calls both would emit and the cascade would decide.
-        stylex.props(
-          reset.base,
-          styles.backdrop,
-          edge ? styles.backdropEdge : backdropCompactPlacements[compactPlacement],
-          stacked && styles.backdropStacked,
-          backdropMotion[variant],
-        ),
+        stylex.props(reset.base, styles.backdrop, stacked && styles.backdropStacked, backdropMotion[variant]),
       )}
     />
-  );
-  return (
-    <>
-      {scrim(false)}
-      {compactPlacement === 'sheet' ? scrim(true) : null}
-    </>
   );
 }
 
@@ -456,7 +431,6 @@ const Popup = React.forwardRef<HTMLDivElement, DialogPopupProps>(function Dialog
     >
       <Backdrop
         variant={variant}
-        compactPlacement={compactPlacement}
         stacked={isStackedOnCard}
       />
       {popup}
