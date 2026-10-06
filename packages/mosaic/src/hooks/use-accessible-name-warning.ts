@@ -42,7 +42,7 @@ export function useAccessibleNameWarning(node: HTMLElement | null, component: st
         return;
       }
       console.warn(
-        `[clerk] <${component}.Popup> renders a dialog with no accessible name. Pass \`aria-label\`, or render a \`<${titlePart ?? `${component}.Title`}>\` inside it.`,
+        `[Clerk] <${component}.Popup> renders a dialog with no accessible name. Pass \`aria-label\`, or render a \`<${titlePart ?? `${component}.Title`}>\` inside it.`,
       );
     }, 0);
 

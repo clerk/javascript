@@ -1,7 +1,7 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../../__tests__/async';
 import { MosaicProvider } from '../../../mosaic-provider';
@@ -56,6 +56,28 @@ function renderView(overrides: Partial<MembersTableTabViewProps> = {}) {
 }
 
 describe('MembersTableTabView', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('shows the localized remove error, never the message of an unexpected error', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+    render(
+      <MosaicProvider localization={{ overrides: { 'membersTableTab.removeError': 'Could not remove member.' } }}>
+        <MembersTableTabView
+          {...propsFor({ onRemove: vi.fn().mockRejectedValue(new Error('Cannot read properties of undefined')) })}
+        />
+      </MosaicProvider>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Manage Grace Hopper' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove from organization' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove from organization' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not remove member.');
+  });
+
   it('chooses loading, retained rows, and filtered empty results from the supplied state', () => {
     const { props, rerender } = renderView({ members: [], totalCount: 0, isLoading: true });
     expect(screen.getByRole('status')).toHaveTextContent('Loading members');

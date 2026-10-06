@@ -7,6 +7,7 @@ import { Button } from '../../components/button';
 import { Menu } from '../../components/menu';
 import type { ReverificationController } from '../../features/reverification';
 import { MosaicProvider } from '../../mosaic-provider';
+import { SaveError } from '../../utils/errors';
 import type { DestructiveControlledProps, DestructiveHandleProps } from './destructive';
 import { Destructive } from './destructive';
 
@@ -345,7 +346,9 @@ describe('Destructive with a handle', () => {
   it('shows a deletion failure, clears it on reopening, and allows retrying', async () => {
     const onDelete = vi
       .fn<DestructiveHandleProps<string>['onDelete']>()
-      .mockRejectedValueOnce(new Error('The account still has active projects.'))
+      .mockRejectedValueOnce(
+        new SaveError({ global: { code: 'account_has_projects', message: 'The account still has active projects.' } }),
+      )
       .mockResolvedValueOnce(undefined);
     const user = userEvent.setup();
     const handle = renderWithHandle(onDelete);
