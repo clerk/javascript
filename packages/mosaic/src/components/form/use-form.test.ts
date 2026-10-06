@@ -146,7 +146,7 @@ describe('useForm', () => {
         await tick();
       });
       expect(result.current.error).toBe('Something went wrong. Please try again.');
-      expect(log).toHaveBeenCalledWith(cause);
+      expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', cause);
     }
     log.mockRestore();
   });

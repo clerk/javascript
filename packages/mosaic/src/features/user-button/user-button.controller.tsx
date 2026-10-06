@@ -86,7 +86,10 @@ const userButtonMachine = createMachine({
         // Leave `open` as the user left it. The error surface is a later change.
         onError: {
           target: 'idle',
-          actions: [assign(() => settled), (_, event) => console.error(event.error)],
+          actions: [
+            assign(() => settled),
+            (_, event) => console.error('[Clerk] User button action failed', event.error),
+          ],
         },
       }),
     },

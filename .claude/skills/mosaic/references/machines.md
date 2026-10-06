@@ -49,7 +49,7 @@ deleting: {
 ```
 
 A machine whose surface shows no error yet still logs it, so a failure is never
-silent: `onError: { target: 'idle', actions: [assign(() => settled), (_, event) => console.error(event.error)] }`
+silent: `onError: { target: 'idle', actions: [assign(() => settled), (_, event) => console.error('[Clerk] User button action failed', event.error)] }`
 (`user-button.controller.tsx`).
 
 Context holds the `ErrorDescription`, never copy. The controller turns it into

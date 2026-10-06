@@ -608,6 +608,7 @@ describe('UserButton', () => {
       expect(popup()).toBeInTheDocument();
       expect(signOut()).toBeEnabled();
       expect(log).toHaveBeenCalledWith(
+        '[Clerk] User button action failed',
         expect.objectContaining({ errors: [expect.objectContaining({ code: 'session_touch_failed' })] }),
       );
     });

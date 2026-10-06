@@ -149,7 +149,7 @@ function savedFieldErrors<TValues extends object>(
 
 function toFormError<TValues extends object>(cause: unknown, context: FormContext<TValues>): FormError<TValues> {
   if (!(cause instanceof FormSubmitError) && !(cause instanceof SaveError)) {
-    console.error(cause);
+    console.error('[Clerk] Could not localize error', cause);
     return { message: context.fallbackMessage };
   }
   const error: FormError<TValues> =

@@ -88,7 +88,7 @@ describe('useUserProfilePictureController', () => {
 
     await act(async () => result.current.onChange?.(file));
     expect(result.current.error).toEqual({ code: 'generic' });
-    expect(log).toHaveBeenCalledWith(failure);
+    expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', failure);
     log.mockRestore();
   });
 

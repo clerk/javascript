@@ -147,7 +147,7 @@ One path, so every error a user sees goes through the `errors.*` catalog:
 - **Owners hold an `ErrorDescription`.** It is either a `LocalizableError`
   (Clerk gave a `code`) or an `UnlocalizableError` (`{ cause }`, the original
   failure). `toLocalizableError` logs the second as
-  `[Mosaic] Could not localize error`. Branch with `isLocalizableError` only
+  `[Clerk] Could not localize error`. Branch with `isLocalizableError` only
   when a feature handles the two differently.
 - **Owners resolve copy at render; views get a string.** Owners return
   `errorMessage` from `useErrorText()`: the

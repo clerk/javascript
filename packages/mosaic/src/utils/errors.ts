@@ -104,7 +104,7 @@ export function toLocalizableError(cause: unknown): ErrorDescription {
   if (error) {
     return error;
   }
-  console.error('[Mosaic] Could not localize error', cause);
+  console.error('[Clerk] Could not localize error', cause);
   return { cause };
 }
 
@@ -113,6 +113,6 @@ export function toFormError<TField extends string = string>(cause: unknown): For
   if (cause instanceof SaveError) {
     return cause.formError;
   }
-  console.error(cause);
+  console.error('[Clerk] Could not localize error', cause);
   return { global: UNEXPECTED_ERROR };
 }

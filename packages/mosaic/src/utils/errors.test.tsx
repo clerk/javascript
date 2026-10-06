@@ -65,7 +65,7 @@ describe('toLocalizableError', () => {
     expect(error).toEqual({ cause });
     expect(isLocalizableError(error)).toBe(false);
     expect(errorText()(error, 'Unable to save.')).toBe('Unable to save.');
-    expect(log).toHaveBeenCalledWith('[Mosaic] Could not localize error', cause);
+    expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', cause);
   });
 
   it('keeps the cause of something that is not an error at all', () => {
