@@ -3,10 +3,7 @@ import { useMachine } from '../../machine/use-machine';
 import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
 
 interface UserProfileRenamePasskeyContext {
-  passkeyId: string;
-  savedName: string;
   name: string;
-  onRename: ((id: string, name: string) => void | Promise<void>) | undefined;
   error: string | undefined;
 }
 
@@ -16,46 +13,54 @@ type UserProfileRenamePasskeyEvent =
   | { type: 'SAVE' }
   | { type: 'CANCEL' };
 
-const { createMachine, assign, fromPromise } = setup<UserProfileRenamePasskeyContext, UserProfileRenamePasskeyEvent>();
+type RenameHandler = (id: string, name: string) => void | Promise<void>;
 
-function isSaveable(context: UserProfileRenamePasskeyContext): boolean {
-  return Boolean(context.onRename) && context.name.length > 1 && context.name !== context.savedName;
+const base = setup<UserProfileRenamePasskeyContext, UserProfileRenamePasskeyEvent>();
+const { assign } = base;
+
+function isSaveable(name: string, savedName: string, onRename: RenameHandler | undefined): boolean {
+  return Boolean(onRename) && name.length > 1 && name !== savedName;
 }
+
+function openEditor(savedName: string) {
+  return assign(() => ({ name: savedName, error: undefined }));
+}
+
+const { createMachine } = base.extend({
+  guards: { isSaveable: () => false },
+  actions: { openEditor: openEditor('') },
+  actors: { rename: (): Promise<void> => Promise.resolve() },
+});
 
 const userProfileRenamePasskeyMachine = createMachine({
   id: 'renamePasskey',
   initial: 'idle',
   context: {
-    passkeyId: '',
-    savedName: '',
     name: '',
-    onRename: undefined,
     error: undefined,
   },
   states: {
     idle: {
       on: {
-        OPEN: {
-          target: 'editing',
-          actions: assign(context => ({ name: context.savedName, error: undefined })),
-        },
+        OPEN: { target: 'editing', actions: 'openEditor' },
       },
     },
     editing: {
       on: {
         TYPE: { actions: assign((_, event) => ({ name: event.value })) },
-        SAVE: { target: 'saving', guard: isSaveable, actions: assign(() => ({ error: undefined })) },
+        SAVE: { target: 'saving', guard: 'isSaveable', actions: assign(() => ({ error: undefined })) },
         CANCEL: { target: 'idle', actions: assign(() => ({ error: undefined })) },
       },
     },
     saving: {
-      invoke: fromPromise(async context => context.onRename?.(context.passkeyId, context.name), {
+      invoke: {
+        src: 'rename',
         onDone: { target: 'idle' },
         onError: {
           target: 'editing',
           actions: assign((_, event) => ({ error: event.error instanceof Error ? event.error.message : m.saveError })),
         },
-      }),
+      },
     },
   },
 });
@@ -82,9 +87,13 @@ export function useUserProfileRenamePasskeyController({
   name,
   onRename,
 }: UserProfileRenamePasskeyControllerOptions): UserProfileRenamePasskeyController {
-  const [snapshot, send] = useMachine(userProfileRenamePasskeyMachine, {
-    context: { passkeyId: id, savedName: name, onRename },
-  });
+  const [snapshot, send] = useMachine(
+    userProfileRenamePasskeyMachine.provide({
+      guards: { isSaveable: context => isSaveable(context.name, name, onRename) },
+      actions: { openEditor: openEditor(name) },
+      actors: { rename: async context => onRename?.(id, context.name) },
+    }),
+  );
 
   return {
     isOpen: snapshot.value === 'editing' || snapshot.value === 'saving',
@@ -92,7 +101,7 @@ export function useUserProfileRenamePasskeyController({
     name: snapshot.context.name,
     onNameChange: value => send({ type: 'TYPE', value }),
     onSubmit: () => send({ type: 'SAVE' }),
-    canSave: isSaveable(snapshot.context),
+    canSave: isSaveable(snapshot.context.name, name, onRename),
     isSaving: snapshot.value === 'saving',
     error: snapshot.context.error,
   };

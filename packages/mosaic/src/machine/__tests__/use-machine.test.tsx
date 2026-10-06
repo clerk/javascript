@@ -6,6 +6,7 @@ import { deferred } from '../../__tests__/async';
 import { assign } from '../assign';
 import { createActor, mockActor } from '../create-actor';
 import { createMachine } from '../create-machine';
+import { setup } from '../setup';
 import { useActor, useMachine, useSelector } from '../use-machine';
 import { createDeleteOrgMachine } from './delete-organization-machine';
 
@@ -83,6 +84,43 @@ describe('useMachine — context init option', () => {
 
     render(<Comp />);
     expect(screen.getByText('runtime')).toBeInTheDocument();
+  });
+
+  it('only seeds context, so state the machine assigns survives a re-render', async () => {
+    type Ctx = { name: string };
+    const save = vi.fn((_name: string) => Promise.resolve());
+    const machine = createMachine<Ctx, { type: 'TYPE'; value: string } | { type: 'SAVE' }>({
+      initial: 'editing',
+      context: { name: '' },
+      states: {
+        editing: {
+          on: {
+            TYPE: { actions: assign((_, e) => ({ name: e.value })) },
+            SAVE: 'saving',
+          },
+        },
+        saving: { invoke: { src: ctx => save(ctx.name), onDone: 'editing' } },
+      },
+    });
+
+    function Comp({ savedName }: { savedName: string }) {
+      const [, send] = useMachine(machine, { context: { name: savedName } });
+      return (
+        <div>
+          <button onClick={() => send({ type: 'TYPE', value: 'Acme Inc' })}>Type</button>
+          <button onClick={() => send({ type: 'SAVE' })}>Save</button>
+        </div>
+      );
+    }
+
+    const { rerender } = render(<Comp savedName='Acme' />);
+    fireEvent.click(screen.getByText('Type'));
+    rerender(<Comp savedName='Acme' />);
+    await act(async () => {
+      fireEvent.click(screen.getByText('Save'));
+    });
+
+    expect(save).toHaveBeenCalledWith('Acme Inc');
   });
 });
 
@@ -283,27 +321,31 @@ describe('useMachine — onDone', () => {
   });
 });
 
-describe('useMachine — live context keeps injected functions current', () => {
-  it('invokes the latest fn from options.context even when the prop changes between renders', async () => {
+describe('useMachine — provided implementations stay current', () => {
+  type Ctx = Record<string, never>;
+  type Ev = { type: 'GO' };
+  const { createMachine: createRunnerMachine } = setup<Ctx, Ev>().extend({
+    actors: { run: () => Promise.resolve() },
+  });
+  const runnerMachine = createRunnerMachine({
+    initial: 'idle',
+    context: {},
+    states: {
+      idle: { on: { GO: 'running' } },
+      running: { invoke: { src: 'run', onDone: 'done', onError: 'done' } },
+      done: { type: 'final' },
+    },
+  });
+
+  it('invokes the implementation provided on the latest render', async () => {
     const gate = deferred<void>();
     const staleFn = vi.fn(() => gate.promise);
     const freshFn = vi.fn(() => gate.promise);
-
-    type Ctx = { fn: () => Promise<void> };
-    type Ev = { type: 'GO' };
-    const machine = createMachine<Ctx, Ev>({
-      initial: 'idle',
-      context: { fn: async () => {} },
-      states: {
-        idle: { on: { GO: 'running' } },
-        running: { invoke: { src: (ctx: Ctx) => ctx.fn(), onDone: 'done', onError: 'done' } },
-        done: { type: 'final' },
-      },
-    });
+    const actors: unknown[] = [];
 
     function Runner({ run }: { run: () => Promise<void> }) {
-      // No refs — options.context is synced into the actor on every render.
-      const [snapshot, send] = useMachine(machine, { context: { fn: run } });
+      const [snapshot, send, actor] = useMachine(runnerMachine.provide({ actors: { run } }));
+      actors.push(actor);
       return (
         <div>
           <output data-testid='state'>{snapshot.value}</output>
@@ -323,5 +365,22 @@ describe('useMachine — live context keeps injected functions current', () => {
 
     expect(freshFn).toHaveBeenCalledTimes(1);
     expect(staleFn).not.toHaveBeenCalled();
+    expect(new Set(actors).size).toBe(1);
+  });
+
+  it('does not re-render when only the provided implementations change', () => {
+    let renders = 0;
+
+    function Runner({ run }: { run: () => Promise<void> }) {
+      renders++;
+      useMachine(runnerMachine.provide({ actors: { run } }));
+      return null;
+    }
+
+    const { rerender } = render(<Runner run={() => Promise.resolve()} />);
+    const afterMount = renders;
+    rerender(<Runner run={() => Promise.resolve()} />);
+
+    expect(renders).toBe(afterMount + 1);
   });
 });

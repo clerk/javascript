@@ -202,14 +202,20 @@ describe('useForm', () => {
   });
 
   it('reads canSubmit and validators from the current render', () => {
+    const onSubmit = vi.fn(resolved);
     const { result, rerender } = renderHook(
       ({ enabled }: { enabled: boolean }) =>
-        useForm({ initialValues: { username: '' }, onSubmit: resolved, canSubmit: () => enabled }),
+        useForm({ initialValues: { username: '' }, onSubmit, canSubmit: () => enabled }),
       { initialProps: { enabled: true } },
     );
     expect(result.current.canSubmit).toBe(true);
     rerender({ enabled: false });
     expect(result.current.canSubmit).toBe(false);
+    act(() => result.current.submit());
+    expect(onSubmit).not.toHaveBeenCalled();
+    rerender({ enabled: true });
+    act(() => result.current.submit());
+    expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 
   it('clears the message on the next submit', async () => {

@@ -226,6 +226,21 @@ describe('createActor — invoke (async)', () => {
     expect(actor.getSnapshot().context.error).toContain('boom');
   });
 
+  it('routes a synchronous throw from src to onError', async () => {
+    const actor = createActor(
+      createLoaderMachine(() => {
+        throw new Error('boom');
+      }),
+    );
+    actor.start();
+    actor.send({ type: 'FETCH' });
+    expect(actor.getSnapshot().value).toBe('loading');
+
+    await tick();
+    expect(actor.getSnapshot().value).toBe('failure');
+    expect(actor.getSnapshot().context.error).toContain('boom');
+  });
+
   it('passes the resolved value to onDone as event.output', async () => {
     const onDone = vi.fn();
     const machine = createMachine<{ out: string | null }, { type: 'GO' }>({
@@ -594,7 +609,7 @@ describe('pure helpers (testable without an actor)', () => {
     expect(isAssignAction(action)).toBe(true);
     // The updater itself is pure and unit-testable in isolation.
     expect(
-      action.assignment({ name: 'Acme Inc', confirmValue: '', error: null }, { type: 'TYPE', value: 'hi' }),
+      action.assignment({ name: 'Acme Inc', confirmValue: '', error: null }, { type: 'TYPE', value: 'hi' }, undefined),
     ).toEqual({ confirmValue: 'hi' });
   });
 

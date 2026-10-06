@@ -4,8 +4,6 @@ import type { OrganizationProfileFormError } from '../organization-profile.types
 import { OrganizationProfileSaveError } from '../organization-profile.types';
 
 export interface OrganizationProfileEditFieldContext {
-  save: (value: string) => Promise<void>;
-  savedValue: string;
   value: string;
   error: OrganizationProfileFormError | undefined;
 }
@@ -16,18 +14,26 @@ export type OrganizationProfileEditFieldEvent =
   | { type: 'SAVE' }
   | { type: 'CANCEL' };
 
-const { createMachine, assign, fromPromise } = setup<
-  OrganizationProfileEditFieldContext,
-  OrganizationProfileEditFieldEvent
->();
+const base = setup<OrganizationProfileEditFieldContext, OrganizationProfileEditFieldEvent>();
+const { assign } = base;
 
-function notSeated(): Promise<never> {
+function notSeated(): Promise<void> {
   return Promise.reject(new Error('edit-field deps are not seated'));
 }
 
-function isSaveable(context: OrganizationProfileEditFieldContext): boolean {
-  return context.value !== context.savedValue && context.value !== '';
+function isSaveable(value: string, savedValue: string): boolean {
+  return value !== savedValue && value !== '';
 }
+
+function openEditor(savedValue: string) {
+  return assign(() => ({ value: savedValue, error: undefined }));
+}
+
+const { createMachine } = base.extend({
+  guards: { isSaveable: context => isSaveable(context.value, '') },
+  actions: { openEditor: openEditor('') },
+  actors: { save: notSeated },
+});
 
 function toFormError(cause: unknown): OrganizationProfileFormError {
   if (cause instanceof OrganizationProfileSaveError) {
@@ -43,35 +49,31 @@ export const organizationProfileEditFieldMachine = createMachine({
   id: 'editOrganizationField',
   initial: 'idle',
   context: {
-    save: notSeated,
-    savedValue: '',
     value: '',
     error: undefined,
   },
   states: {
     idle: {
       on: {
-        OPEN: {
-          target: 'editing',
-          actions: assign(context => ({ value: context.savedValue, error: undefined })),
-        },
+        OPEN: { target: 'editing', actions: 'openEditor' },
       },
     },
     editing: {
       on: {
         TYPE: { actions: assign((_, event) => ({ value: event.value })) },
-        SAVE: { target: 'saving', guard: isSaveable },
+        SAVE: { target: 'saving', guard: 'isSaveable' },
         CANCEL: { target: 'idle', actions: assign(() => ({ error: undefined })) },
       },
     },
     saving: {
-      invoke: fromPromise(context => context.save(context.value), {
+      invoke: {
+        src: 'save',
         onDone: { target: 'idle', actions: assign(() => ({ error: undefined })) },
         onError: {
           target: 'editing',
           actions: assign((_, event) => ({ error: toFormError(event.error) })),
         },
-      }),
+      },
     },
   },
 });
@@ -96,9 +98,13 @@ export function useOrganizationProfileEditFieldController({
   value = '',
   onSubmit,
 }: OrganizationProfileEditFieldControllerOptions): OrganizationProfileEditFieldController {
-  const [snapshot, send] = useMachine(organizationProfileEditFieldMachine, {
-    context: { save: onSubmit, savedValue: value },
-  });
+  const [snapshot, send] = useMachine(
+    organizationProfileEditFieldMachine.provide({
+      guards: { isSaveable: context => isSaveable(context.value, value) },
+      actions: { openEditor: openEditor(value) },
+      actors: { save: context => onSubmit(context.value) },
+    }),
+  );
 
   return {
     isOpen: snapshot.value === 'editing' || snapshot.value === 'saving',
@@ -106,7 +112,7 @@ export function useOrganizationProfileEditFieldController({
     value: snapshot.context.value,
     onValueChange: next => send({ type: 'TYPE', value: next }),
     onSubmit: () => send({ type: 'SAVE' }),
-    canSave: isSaveable(snapshot.context),
+    canSave: isSaveable(snapshot.context.value, value),
     isSaving: snapshot.value === 'saving',
     error: snapshot.context.error,
   };

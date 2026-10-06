@@ -1,12 +1,18 @@
 import { isAssignAction } from './assign';
 import type {
+  Action,
   Actions,
   Actor,
+  ActorSrc,
   AfterEvent,
   AnyEventObject,
+  AnyImplementationRefs,
   AssignAction,
   CreateActorOptions,
   EventObject,
+  Guard,
+  GuardRef,
+  MachineImplementations,
   Snapshot,
   SnapshotListener,
   StateConfig,
@@ -19,7 +25,6 @@ import { AFTER, ASSIGN, INIT, INVOKE_DONE, INVOKE_ERROR, RECHECK } from './types
 
 const INIT_EVENT: AnyEventObject = { type: INIT };
 
-// Collapse toArray into single helper: returns empty array, original if array, or wrapped value
 const toArr = <T>(v: T | T[] | undefined): T[] => (!v ? [] : Array.isArray(v) ? v : [v]);
 
 /**
@@ -36,21 +41,76 @@ const toArr = <T>(v: T | T[] | undefined): T[] => (!v ? [] : Array.isArray(v) ? 
  * actor.send({ type: 'TOGGLE' });
  * ```
  */
+interface RuntimeImplementations<TContext> {
+  guards: MachineImplementations<TContext, EventObject>['guards'];
+  actions: Partial<Record<string, Action<TContext, EventObject, unknown>>>;
+  actors: MachineImplementations<TContext, EventObject>['actors'];
+}
+
+function isParamsResolver<TContext>(params: unknown): params is (context: TContext, event: EventObject) => unknown {
+  return typeof params === 'function';
+}
+
 export function createActor<TContext extends object, TEvent extends EventObject>(
   machine: StateMachine<TContext, TEvent>,
   options: CreateActorOptions<TContext> = {},
 ): Actor<TContext, TEvent> {
   const teleport = options.snapshot;
 
-  // Internally the actor operates on the broader `EventObject`: invoke done/error
-  // events aren't part of the user's `TEvent` union, so the config is viewed
-  // through an event-agnostic lens to keep the runtime helpers honestly typed.
-  const states = machine.states as unknown as Record<string, StateConfig<TContext, EventObject>>;
+  // Invoke done/error events aren't in `TEvent`, so the runtime reads the config with `EventObject`.
+  const states = machine.states as unknown as Record<
+    string,
+    StateConfig<TContext, EventObject, string, AnyImplementationRefs>
+  >;
 
-  // Tracks the latest setContext patch so it survives a stop/start cycle.
-  let liveContextPatch: Partial<TContext> = options.context ?? {};
-  let context: TContext = { ...machine.context, ...liveContextPatch, ...teleport?.context };
-  // `initial` may be derived from context (e.g. furthest-reachable step).
+  function implementations(): RuntimeImplementations<TContext> {
+    return actor.logic.implementations as unknown as RuntimeImplementations<TContext>;
+  }
+
+  function resolveGuard(guard: GuardRef<TContext, EventObject, AnyImplementationRefs>): Guard<TContext, EventObject> {
+    if (typeof guard !== 'string') {
+      return guard;
+    }
+    const resolved = implementations().guards[guard];
+    if (resolved === undefined) {
+      throw new Error(`Guard '${guard}' is not implemented.`);
+    }
+    return resolved;
+  }
+
+  function namedAction(name: string): Action<TContext, EventObject, unknown> {
+    const resolved = implementations().actions[name];
+    if (resolved === undefined) {
+      throw new Error(`Action '${name}' is not implemented.`);
+    }
+    return resolved;
+  }
+
+  function runAction<TParams>(
+    action: Action<TContext, EventObject, TParams>,
+    event: EventObject,
+    params: TParams,
+  ): void {
+    if (isAssignAction<TContext, EventObject, TParams>(action)) {
+      context = { ...context, ...action.assignment(context, event, params) };
+    } else {
+      action(context, event, params);
+    }
+  }
+
+  function resolveSrc(src: ActorSrc<TContext, EventObject> | string): ActorSrc<TContext, EventObject> {
+    if (typeof src !== 'string') {
+      return src;
+    }
+    const resolved = implementations().actors[src];
+    if (resolved === undefined) {
+      throw new Error(`Actor '${src}' is not implemented.`);
+    }
+    return resolved;
+  }
+
+  const seed: Partial<TContext> = options.context ?? {};
+  let context: TContext = { ...machine.context, ...seed, ...teleport?.context };
   const resolveInitial = () => (typeof machine.initial === 'function' ? machine.initial(context) : machine.initial);
   let value = teleport?.value ?? resolveInitial();
 
@@ -63,7 +123,6 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   // resolving after the fact is ignored — no transition, no setState-after-stop.
   let invocationToken = 0;
 
-  // Pending `after` timer IDs — cleared when the state is exited or the actor stops.
   let afterTimers: ReturnType<typeof setTimeout>[] = [];
 
   // The snapshot is cached and only replaced on an actual change, so
@@ -72,58 +131,54 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
   const listeners: SnapshotListener<TContext>[] = [];
 
-  /**
-   * Normalise a raw `Transition` value into a `TransitionConfig[]` the runtime
-   * can process uniformly. Handles all four arms of the `Transition` union:
-   * - string → `{ target: string }`
-   * - `TransitionConfig` → as-is
-   * - `TransitionConfig[]` → as-is
-   * - `TransitionFn` → called immediately; `undefined` return → `[]` (unhandled)
-   */
-  function normalizeTransition(raw: unknown, event: EventObject): TransitionConfig<TContext, EventObject>[] {
+  function normalizeTransition(
+    raw: unknown,
+    event: EventObject,
+  ): TransitionConfig<TContext, EventObject, string, AnyImplementationRefs>[] {
     if (typeof raw === 'function') {
-      // SAFETY: raw is a TransitionFn — (args: {context, event}) => TransitionResult | undefined.
-      // The cast is required because the generic TStates parameter is erased at this internal
-      // boundary; callers have already narrowed the event type via StateConfig.on[K].
       const result = (raw as TransitionFn<TContext, EventObject>)({ context, event });
       if (result === undefined) {
         return [];
       }
-      const cfg: TransitionConfig<TContext, EventObject> = { target: result.target };
+      const cfg: TransitionConfig<TContext, EventObject, string, AnyImplementationRefs> = { target: result.target };
       if (result.context !== undefined) {
         const patch = result.context;
-        // SAFETY: Constructing AssignAction inline avoids importing the assign() helper here.
-        // The ASSIGN symbol is the exact tag isAssignAction checks in runActions.
         cfg.actions = { type: ASSIGN, assignment: () => patch } as AssignAction<TContext, EventObject>;
       }
       return [cfg];
     }
     return toArr(raw as any).map(e =>
-      typeof e === 'string' ? { target: e } : (e as TransitionConfig<TContext, EventObject>),
+      typeof e === 'string'
+        ? { target: e }
+        : (e as TransitionConfig<TContext, EventObject, string, AnyImplementationRefs>),
     );
   }
 
-  function runActions(actions: Actions<TContext, EventObject> | undefined, event: EventObject): void {
-    for (const action of toArr(actions)) {
-      if (isAssignAction<TContext, EventObject>(action)) {
-        context = { ...context, ...action.assignment(context, event) };
+  function runActions(
+    actions: Actions<TContext, EventObject, AnyImplementationRefs> | undefined,
+    event: EventObject,
+  ): void {
+    for (const ref of toArr(actions)) {
+      if (typeof ref === 'function' || isAssignAction<TContext, EventObject>(ref)) {
+        runAction(ref, event, undefined);
+      } else if (typeof ref === 'string') {
+        runAction(namedAction(ref), event, undefined);
       } else {
-        action(context, event);
+        runAction(namedAction(ref.type), event, isParamsResolver(ref.params) ? ref.params(context, event) : ref.params);
       }
     }
   }
 
   function pickTransition(
-    transitions: TransitionConfig<TContext, EventObject>[],
+    transitions: TransitionConfig<TContext, EventObject, string, AnyImplementationRefs>[],
     event: EventObject,
-  ): TransitionConfig<TContext, EventObject> | undefined {
-    return transitions.find(transition => !transition.guard || transition.guard(context, event));
+  ): TransitionConfig<TContext, EventObject, string, AnyImplementationRefs> | undefined {
+    return transitions.find(transition => !transition.guard || resolveGuard(transition.guard)(context, event));
   }
 
-  /** Whether a target state's entry guard currently permits landing on it. */
   function canEnter(stateId: string, event: EventObject): boolean {
     const guard = states[stateId]?.guard;
-    return !guard || guard(context, event);
+    return !guard || resolveGuard(guard)(context, event);
   }
 
   /**
@@ -131,14 +186,17 @@ export function createActor<TContext extends object, TEvent extends EventObject>
    * Returns `false` — a true no-op — when the target's entry guard blocks it, so
    * the caller skips the commit and subscribers are never notified.
    */
-  function takeTransition(transition: TransitionConfig<TContext, EventObject>, event: EventObject): boolean {
+  function takeTransition(
+    transition: TransitionConfig<TContext, EventObject, string, AnyImplementationRefs>,
+    event: EventObject,
+  ): boolean {
     const external = transition.target !== undefined;
     if (external && !canEnter(transition.target as string, event)) {
-      return false; // entry guard blocks landing → snapshot unchanged, no notify
+      return false;
     }
     if (external) {
       runActions(states[value].exit, event);
-      invocationToken++; // abandon the invoke of the state we're leaving
+      invocationToken++;
       clearAfterTimers();
     }
     runActions(transition.actions, event);
@@ -154,40 +212,39 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     if (!invoke) {
       return;
     }
+    const src = resolveSrc(invoke.src);
     const token = ++invocationToken;
-    // SAFETY: startInvoke is called with the actor's internal EventObject, but
-    // InvokeConfig.src is typed to accept (context, TEvent | DoneInvokeEvent | ErrorInvokeEvent).
-    // The cast suppresses that mismatch; src implementations receive the INIT event
-    // on state entry and typically ignore it. The runtime views events through an
-    // event-agnostic lens (line 57) for this reason.
-    Promise.resolve(invoke.src(context, event as never)).then(
-      output => {
-        if (status !== 'active' || token !== invocationToken) {
-          return;
-        }
-        const doneEvent = { type: INVOKE_DONE, output };
-        const transition = pickTransition(normalizeTransition(invoke.onDone, doneEvent), doneEvent);
-        if (!transition) {
-          return;
-        }
-        if (takeTransition(transition, doneEvent)) {
-          commit();
-        }
-      },
-      (error: unknown) => {
-        if (status !== 'active' || token !== invocationToken) {
-          return;
-        }
-        const errorEvent = { type: INVOKE_ERROR, error };
-        const transition = pickTransition(normalizeTransition(invoke.onError, errorEvent), errorEvent);
-        if (!transition) {
-          return;
-        }
-        if (takeTransition(transition, errorEvent)) {
-          commit();
-        }
-      },
-    );
+    const onDone = (output: unknown) => {
+      if (status !== 'active' || token !== invocationToken) {
+        return;
+      }
+      const doneEvent = { type: INVOKE_DONE, output };
+      const transition = pickTransition(normalizeTransition(invoke.onDone, doneEvent), doneEvent);
+      if (!transition) {
+        return;
+      }
+      if (takeTransition(transition, doneEvent)) {
+        commit();
+      }
+    };
+    const onError = (error: unknown) => {
+      if (status !== 'active' || token !== invocationToken) {
+        return;
+      }
+      const errorEvent = { type: INVOKE_ERROR, error };
+      const transition = pickTransition(normalizeTransition(invoke.onError, errorEvent), errorEvent);
+      if (!transition) {
+        return;
+      }
+      if (takeTransition(transition, errorEvent)) {
+        commit();
+      }
+    };
+    try {
+      Promise.resolve(src(context, event)).then(onDone, onError);
+    } catch (error) {
+      queueMicrotask(() => onError(error));
+    }
   }
 
   function clearAfterTimers(): void {
@@ -222,7 +279,6 @@ export function createActor<TContext extends object, TEvent extends EventObject>
     }
   }
 
-  /** Entry side of a state: entry actions, then immediate/invoke resolution. */
   function enterState(event: EventObject): void {
     const stateConfig = states[value];
     if (!stateConfig) {
@@ -252,6 +308,8 @@ export function createActor<TContext extends object, TEvent extends EventObject>
   }
 
   const actor: Actor<TContext, TEvent> = {
+    logic: machine,
+
     start() {
       if (started) {
         return actor;
@@ -260,7 +318,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       status = 'active';
       // Reset state and context so a restart (e.g. after StrictMode stop/start)
       // begins from idle rather than re-entering and re-invoking a mid-flight state.
-      context = { ...machine.context, ...liveContextPatch };
+      context = { ...machine.context, ...seed };
       value = resolveInitial();
       enterState(INIT_EVENT);
       commit();
@@ -273,7 +331,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       }
       started = false; // allow restart (e.g. StrictMode effect cleanup + remount)
       status = 'stopped';
-      invocationToken++; // abandon any in-flight invoke
+      invocationToken++;
       clearAfterTimers();
       snapshot = { value, context, status };
       for (let i = listeners.length; i--; ) {
@@ -289,21 +347,16 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       const transition = pickTransition(normalizeTransition(states[value]?.on?.[event.type], event), event);
       if (!transition) {
         return;
-      } // event not handled in this state → ignored
+      }
       if (takeTransition(transition, event)) {
         commit();
-      } // entry-blocked → no commit, no notify
+      }
     },
 
     getSnapshot() {
       return snapshot;
     },
 
-    // Standard observable contract: `subscribe(cb)` returns an unsubscribe fn.
-    // This is deliberately the same shape as a nanostores atom's `subscribe`, so
-    // if nanostores is adopted repo-wide later a `toAtom(actor)` adapter is a
-    // trivial, non-breaking wrapper over `subscribe` + `getSnapshot` — no need to
-    // pull the dependency in now.
     subscribe(listener: SnapshotListener<TContext>): Unsubscribe {
       listeners.push(listener);
       return () => {
@@ -325,27 +378,17 @@ export function createActor<TContext extends object, TEvent extends EventObject>
       return transition.target === undefined || canEnter(transition.target, event);
     },
 
-    setContext(patch: Partial<TContext>) {
-      liveContextPatch = { ...liveContextPatch, ...patch };
-      context = { ...context, ...patch };
-    },
-
     recheck() {
       if (status !== 'active') {
         return;
       }
       const event = { type: RECHECK };
 
-      // Self-correct first: if live external data has made the *current* state
-      // unenterable (its entry guard no longer holds), re-seat to the freshly
-      // resolved initial state — the same derivation used on start (e.g. the
-      // Wizard's furthest-reachable step). `resolveInitial` always lands on an
-      // enterable step, so this is provably one-shot and cannot loop.
       if (!canEnter(value, event)) {
         const reseated = resolveInitial();
         if (reseated !== value) {
           runActions(states[value]?.exit, event);
-          invocationToken++; // abandon the invoke of the state we're leaving
+          invocationToken++;
           clearAfterTimers();
           value = reseated;
           enterState(event);
@@ -356,7 +399,7 @@ export function createActor<TContext extends object, TEvent extends EventObject>
 
       const immediate = pickTransition(normalizeTransition(states[value]?.always, event), event);
       if (immediate && immediate.target !== undefined && takeTransition(immediate, event)) {
-        commit(); // nothing applies → no commit, no notify
+        commit();
       }
     },
   };

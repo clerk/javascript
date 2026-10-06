@@ -1,11 +1,17 @@
 import { useCallback, useId, useRef } from 'react';
 
 import { useErrorText, useMessages } from '../../localization';
-import type { StateMachine } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import { keysOf, mapKeys } from '../../utils/object';
-import type { FieldsConfig, FormContext, FormEvent } from './form.machine';
-import { createFormMachine, fieldFeedback, firstInvalid, initialOf, isValid } from './form.machine';
+import type { FieldsConfig, FormDeps, FormMachine } from './form.machine';
+import {
+  createFormMachine,
+  fieldFeedback,
+  firstInvalid,
+  formImplementations,
+  initialOf,
+  isValid,
+} from './form.machine';
 import type { FieldFeedback } from './form-submit-error';
 
 export interface UseFormOptions<TValues extends object> {
@@ -88,33 +94,38 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
   const elements = useRef(new Map<keyof TValues, HTMLElement>());
   const refs = useRef(new Map<keyof TValues, ElementRef>());
 
-  const deps = {
+  const canSubmit = options.canSubmit ?? always;
+  const deps: FormDeps<TValues> = {
     initialValues: options.initialValues,
     fields: options.fields,
     onSubmit: options.onSubmit,
-    canSubmit: options.canSubmit ?? always,
+    canSubmit,
     fallbackMessage: m.error,
     errorText,
   };
-  const machineRef = useRef<StateMachine<FormContext<TValues>, FormEvent<TValues>> | null>(null);
+  const machineRef = useRef<FormMachine<TValues> | null>(null);
   if (machineRef.current === null) {
     machineRef.current = createFormMachine(deps);
   }
-  const [snapshot, send, actor] = useMachine(machineRef.current, { context: deps });
-  const context = { ...snapshot.context, ...deps };
+  const [snapshot, send, actor] = useMachine(machineRef.current.provide(formImplementations(deps)));
+  const { context } = snapshot;
   const { values } = context;
 
   const focusFirstInvalid = useCallback(() => {
-    const invalid = firstInvalid(actor.getSnapshot().context);
+    const invalid = firstInvalid(actor.getSnapshot().context, options.fields);
     if (invalid !== undefined) {
       elements.current.get(invalid)?.focus();
     }
-  }, [actor]);
+  }, [actor, options.fields]);
+  const submit = useCallback(() => {
+    send({ type: 'SUBMIT' });
+    focusFirstInvalid();
+  }, [focusFirstInvalid, send]);
   const setValue = useCallback(
     <K extends keyof TValues>(name: K, value: TValues[K]) => {
       send({ type: 'CHANGE', name, value });
-      const { async, fields, values: next } = actor.getSnapshot().context;
-      const validateAsync = fields?.[name]?.validateAsync;
+      const { async, values: next } = actor.getSnapshot().context;
+      const validateAsync = options.fields?.[name]?.validateAsync;
       if (validateAsync === undefined || async[name]?.pending !== true || async[name].value !== value) {
         return;
       }
@@ -122,14 +133,14 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
         const { submitQueued } = actor.getSnapshot().context;
         send({ type: 'VALIDATED', name, value, feedback });
         if (submitQueued) {
-          focusFirstInvalid();
+          submit();
         }
       };
       void new Promise<FieldFeedback | undefined>(resolve => resolve(validateAsync(value, next))).then(settle, () =>
         settle(undefined),
       );
     },
-    [actor, focusFirstInvalid, send],
+    [actor, options.fields, send, submit],
   );
   const touch = useCallback((name: keyof TValues) => send({ type: 'TOUCH', name }), [send]);
   const refFor = useCallback((name: keyof TValues): ElementRef => {
@@ -147,10 +158,6 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     refs.current.set(name, ref);
     return ref;
   }, []);
-  const submit = useCallback(() => {
-    send({ type: 'SUBMIT' });
-    focusFirstInvalid();
-  }, [focusFirstInvalid, send]);
   const handleSubmit = useCallback(
     (event: { preventDefault: () => void }) => {
       event.preventDefault();
@@ -176,9 +183,9 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
   });
 
   const isSubmitting = snapshot.value === 'submitting' || context.submitQueued;
-  const initial = initialOf(context);
+  const initial = initialOf(context, options.initialValues);
   const fields = mapKeys(values, (name): FormField => {
-    const feedback = fieldFeedback(context, name);
+    const feedback = fieldFeedback(context, options.fields, name);
     const touched = context.touched[name] === true;
     return {
       feedback: feedback?.type === 'error' && !touched ? undefined : feedback,
@@ -198,7 +205,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
       return current.value === 'submitting' || current.context.submitQueued;
     },
     isDirty: keysOf(values).some(name => fields[name].isDirty),
-    canSubmit: !isSubmitting && isValid(context),
+    canSubmit: !isSubmitting && isValid(context, options.fields, canSubmit),
     register,
     registerValue,
     setValue,

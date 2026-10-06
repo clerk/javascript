@@ -11,7 +11,7 @@ export interface UserProfileAddEmailControllerOptions {
   onVerify: (emailAddress: string, code: string) => Promise<void>;
 }
 
-interface Context extends UserProfileAddEmailControllerOptions {
+interface Context {
   emailAddress: string;
   code: string;
   error: unknown;
@@ -27,9 +27,10 @@ type Event =
   | { type: 'TYPE_CODE'; value: string }
   | { type: 'SUBMIT'; code?: string };
 
-const { createMachine, assign, fromPromise } = setup<Context, Event>();
+const base = setup<Context, Event>();
+const { assign } = base;
 
-function missingDependency(): Promise<never> {
+function missingDependency(): Promise<void> {
   return Promise.reject(new Error('Add email callbacks are missing'));
 }
 
@@ -40,14 +41,26 @@ function errorMessage(cause: unknown, fallback: string): string | undefined {
   return cause instanceof Error ? cause.message : fallback;
 }
 
+function openDialog(initialEmailAddress: string | undefined) {
+  return assign(() => ({
+    emailAddress: initialEmailAddress ?? '',
+    code: '',
+    error: undefined,
+    resendSeconds: 0,
+  }));
+}
+
+const { createMachine } = base.extend({
+  actions: { open: openDialog(undefined) },
+  actors: { send: missingDependency, verify: missingDependency },
+});
+
 const tick = { actions: assign(context => ({ resendSeconds: Math.max(0, context.resendSeconds - 1) })) };
 
 const machine = createMachine({
   id: 'addEmail',
   initial: 'idle',
   context: {
-    onSend: missingDependency,
-    onVerify: missingDependency,
     emailAddress: '',
     code: '',
     error: undefined,
@@ -58,12 +71,7 @@ const machine = createMachine({
       on: {
         OPEN: {
           target: 'email',
-          actions: assign(context => ({
-            emailAddress: context.initialEmailAddress ?? '',
-            code: '',
-            error: undefined,
-            resendSeconds: 0,
-          })),
+          actions: 'open',
         },
       },
     },
@@ -75,13 +83,14 @@ const machine = createMachine({
       },
     },
     sending: {
-      invoke: fromPromise(context => context.onSend(context.emailAddress), {
+      invoke: {
+        src: 'send',
         onDone: { target: 'verify', actions: assign(() => ({ code: '', resendSeconds: 12 })) },
         onError: {
           target: 'email',
           actions: assign((_, event) => ({ error: event.error })),
         },
-      }),
+      },
     },
     verify: {
       on: {
@@ -100,23 +109,25 @@ const machine = createMachine({
       },
     },
     resending: {
-      invoke: fromPromise(context => context.onSend(context.emailAddress), {
+      invoke: {
+        src: 'send',
         onDone: { target: 'verify', actions: assign(() => ({ code: '', resendSeconds: 12 })) },
         onError: {
           target: 'verify',
           actions: assign((_, event) => ({ error: event.error })),
         },
-      }),
+      },
     },
     verifying: {
       on: { TICK: tick },
-      invoke: fromPromise(context => context.onVerify(context.emailAddress, context.code), {
+      invoke: {
+        src: 'verify',
         onDone: 'idle',
         onError: {
           target: 'verify',
           actions: assign((_, event) => ({ error: event.error })),
         },
-      }),
+      },
     },
   },
 });
@@ -125,7 +136,15 @@ export function useUserProfileAddEmailController(
   options: UserProfileAddEmailControllerOptions,
 ): UserProfileAddEmailDialogProps {
   const m = useMessages('userProfileAddEmail');
-  const [snapshot, send] = useMachine(machine, { context: options });
+  const [snapshot, send] = useMachine(
+    machine.provide({
+      actions: { open: openDialog(options.initialEmailAddress) },
+      actors: {
+        send: context => options.onSend(context.emailAddress),
+        verify: context => options.onVerify(context.emailAddress, context.code),
+      },
+    }),
+  );
   const { resendSeconds } = snapshot.context;
   const open = snapshot.value !== 'idle';
   useEffect(() => {

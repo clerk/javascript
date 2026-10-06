@@ -1,6 +1,5 @@
 import type { LocalizableError } from '../../localization';
 import { setup } from '../../machine/setup';
-import type { TransitionResult } from '../../machine/types';
 import { SaveError } from '../../utils/form-error';
 import { keysOf, mapKeys } from '../../utils/object';
 import type { FieldFeedback, FormError, FormFieldErrors } from './form-submit-error';
@@ -38,7 +37,7 @@ export interface FormDeps<TValues extends object> {
   errorText: (error: LocalizableError) => string;
 }
 
-export interface FormContext<TValues extends object> extends FormDeps<TValues> {
+export interface FormContext<TValues extends object> {
   values: TValues;
   baseline: TValues | undefined;
   touched: Partial<Record<keyof TValues, true>>;
@@ -54,15 +53,16 @@ export type FormEvent<TValues extends object> =
   | { type: 'SUBMIT' }
   | { type: 'RESET'; values?: TValues };
 
-export function initialOf<TValues extends object>(context: FormContext<TValues>): TValues {
-  return context.baseline ?? context.initialValues;
+export function initialOf<TValues extends object>(context: FormContext<TValues>, initialValues: TValues): TValues {
+  return context.baseline ?? initialValues;
 }
 
 function syncFeedback<TValues extends object>(
   context: FormContext<TValues>,
+  fields: FieldsConfig<TValues> | undefined,
   name: keyof TValues,
 ): FieldFeedback | undefined {
-  return context.fields?.[name]?.validate?.(context.values[name], context.values);
+  return fields?.[name]?.validate?.(context.values[name], context.values);
 }
 
 function settledAsyncFeedback<TValues extends object>(
@@ -75,45 +75,40 @@ function settledAsyncFeedback<TValues extends object>(
 
 export function validatorFeedback<TValues extends object>(
   context: FormContext<TValues>,
+  fields: FieldsConfig<TValues> | undefined,
   name: keyof TValues,
 ): FieldFeedback | undefined {
-  return syncFeedback(context, name) ?? context.async[name]?.feedback;
+  return syncFeedback(context, fields, name) ?? context.async[name]?.feedback;
 }
 
 export function fieldFeedback<TValues extends object>(
   context: FormContext<TValues>,
+  fields: FieldsConfig<TValues> | undefined,
   name: keyof TValues,
 ): FieldFeedback | undefined {
   const submitError = context.error?.fields?.[name];
-  return submitError === undefined ? validatorFeedback(context, name) : { type: 'error', message: submitError };
+  return submitError === undefined ? validatorFeedback(context, fields, name) : { type: 'error', message: submitError };
 }
 
-export function firstInvalid<TValues extends object>(context: FormContext<TValues>): keyof TValues | undefined {
+export function firstInvalid<TValues extends object>(
+  context: FormContext<TValues>,
+  fields: FieldsConfig<TValues> | undefined,
+): keyof TValues | undefined {
   return keysOf(context.values).find(
-    name => (syncFeedback(context, name) ?? settledAsyncFeedback(context, name))?.type === 'error',
+    name => (syncFeedback(context, fields, name) ?? settledAsyncFeedback(context, name))?.type === 'error',
   );
 }
 
-export function isValid<TValues extends object>(context: FormContext<TValues>): boolean {
-  return context.canSubmit(context.values) && firstInvalid(context) === undefined;
+export function isValid<TValues extends object>(
+  context: FormContext<TValues>,
+  fields: FieldsConfig<TValues> | undefined,
+  canSubmit: (values: TValues) => boolean,
+): boolean {
+  return canSubmit(context.values) && firstInvalid(context, fields) === undefined;
 }
 
 function isValidating<TValues extends object>(context: FormContext<TValues>): boolean {
   return keysOf(context.values).some(name => context.async[name]?.pending === true);
-}
-
-function submitOrStay<TValues extends object>(
-  context: FormContext<TValues>,
-  patch: Partial<FormContext<TValues>>,
-): TransitionResult<FormContext<TValues>, FormState> {
-  const next = { ...context, ...patch };
-  if (!isValid(next)) {
-    return { context: { ...patch, submitQueued: false } };
-  }
-  if (isValidating(next)) {
-    return { context: { ...patch, submitQueued: true } };
-  }
-  return { target: 'submitting', context: { ...patch, submitQueued: false, error: undefined } };
 }
 
 function displayableFields<TValues extends object>(
@@ -136,31 +131,36 @@ function displayableFields<TValues extends object>(
 function savedFieldErrors<TValues extends object>(
   context: FormContext<TValues>,
   fields: Partial<Record<string, LocalizableError>> | undefined,
+  errorText: (error: LocalizableError) => string,
 ): FormFieldErrors<TValues> {
   const result: FormFieldErrors<TValues> = {};
   for (const name of keysOf(context.values)) {
     const error = typeof name === 'string' ? fields?.[name] : undefined;
     if (error !== undefined) {
-      result[name] = context.errorText(error);
+      result[name] = errorText(error);
     }
   }
   return result;
 }
 
-function toFormError<TValues extends object>(cause: unknown, context: FormContext<TValues>): FormError<TValues> {
+function toFormError<TValues extends object>(
+  cause: unknown,
+  context: FormContext<TValues>,
+  deps: FormDeps<TValues>,
+): FormError<TValues> {
   if (!(cause instanceof FormSubmitError) && !(cause instanceof SaveError)) {
     console.error(cause);
-    return { message: context.fallbackMessage };
+    return { message: deps.fallbackMessage };
   }
   const error: FormError<TValues> =
     cause instanceof FormSubmitError
       ? { message: cause.banner, fields: displayableFields(context, cause.fields) }
       : {
-          message: cause.formError.global ? context.errorText(cause.formError.global) : undefined,
-          fields: savedFieldErrors(context, cause.formError.fields),
+          message: cause.formError.global ? deps.errorText(cause.formError.global) : undefined,
+          fields: savedFieldErrors(context, cause.formError.fields, deps.errorText),
         };
   const visible = (error.message ?? '') !== '' || keysOf(error.fields ?? {}).length > 0;
-  return visible ? error : { ...error, message: context.fallbackMessage };
+  return visible ? error : { ...error, message: deps.fallbackMessage };
 }
 
 function withoutField<TValues extends object>(
@@ -177,25 +177,58 @@ function withoutField<TValues extends object>(
 
 function asyncStateFor<TValues extends object>(
   context: FormContext<TValues>,
+  deps: FormDeps<TValues>,
   name: keyof TValues,
   value: TValues[keyof TValues],
 ): AsyncFieldState | undefined {
-  if (context.fields?.[name]?.validateAsync === undefined || value === initialOf(context)[name]) {
+  if (deps.fields?.[name]?.validateAsync === undefined || value === initialOf(context, deps.initialValues)[name]) {
     return undefined;
   }
   return { value, feedback: context.async[name]?.feedback, pending: true };
 }
 
-type FormState = 'editing' | 'submitting';
+export function formImplementations<TValues extends object>(deps: FormDeps<TValues>) {
+  const { assign } = setup<FormContext<TValues>, FormEvent<TValues>>();
+
+  return {
+    guards: {
+      invalid: (context: FormContext<TValues>) => !isValid(context, deps.fields, deps.canSubmit),
+    },
+    actions: {
+      change: assign((context, _event, { name, value }: { name: keyof TValues; value: TValues[keyof TValues] }) => ({
+        values: { ...context.values, [name]: value },
+        async: { ...context.async, [name]: asyncStateFor(context, deps, name, value) },
+        error: withoutField(context.error, name),
+        submitQueued: false,
+      })),
+      reset: assign((_context, _event, { values }: { values: TValues | undefined }) => ({
+        values: values ?? deps.initialValues,
+        baseline: values,
+        touched: {},
+        async: {},
+        error: undefined,
+        submitQueued: false,
+      })),
+      setError: assign((context, _event, { cause }: { cause: unknown }) => ({
+        error: toFormError(cause, context, deps),
+      })),
+    },
+    actors: {
+      submit: (context: FormContext<TValues>) => deps.onSubmit(context.values),
+    },
+  };
+}
 
 export function createFormMachine<TValues extends object>(deps: FormDeps<TValues>) {
-  const { createMachine, assign, fromPromise } = setup<FormContext<TValues>, FormEvent<TValues>>();
+  const base = setup<FormContext<TValues>, FormEvent<TValues>>();
+  const { assign } = base;
+  const { createMachine } = base.extend(formImplementations(deps));
+  const touchAll = (context: FormContext<TValues>) => mapKeys(context.values, (): true => true);
 
   return createMachine({
     id: 'form',
     initial: 'editing',
     context: {
-      ...deps,
       values: deps.initialValues,
       baseline: undefined,
       touched: {},
@@ -206,47 +239,46 @@ export function createFormMachine<TValues extends object>(deps: FormDeps<TValues
     states: {
       editing: {
         on: {
-          CHANGE: ({ context, event }) => ({
-            context: {
-              values: { ...context.values, [event.name]: event.value },
-              async: { ...context.async, [event.name]: asyncStateFor(context, event.name, event.value) },
-              error: withoutField(context.error, event.name),
-              submitQueued: false,
-            },
-          }),
-          TOUCH: ({ context, event }) => ({ context: { touched: { ...context.touched, [event.name]: true } } }),
-          VALIDATED: ({ context, event }) => {
-            if (context.async[event.name]?.value !== event.value) {
-              return undefined;
-            }
-            const async = {
-              ...context.async,
-              [event.name]: { value: event.value, feedback: event.feedback, pending: false },
-            };
-            return context.submitQueued ? submitOrStay(context, { async }) : { context: { async } };
+          CHANGE: { actions: { type: 'change', params: (_, event) => ({ name: event.name, value: event.value }) } },
+          TOUCH: { actions: assign((context, event) => ({ touched: { ...context.touched, [event.name]: true } })) },
+          VALIDATED: {
+            guard: (context, event) => context.async[event.name]?.value === event.value,
+            actions: assign((context, event) => ({
+              async: {
+                ...context.async,
+                [event.name]: { value: event.value, feedback: event.feedback, pending: false },
+              },
+            })),
           },
-          SUBMIT: ({ context }) => submitOrStay(context, { touched: mapKeys(context.values, (): true => true) }),
-          RESET: ({ context, event }) => ({
-            context: {
-              values: event.values ?? context.initialValues,
-              baseline: event.values,
-              touched: {},
-              async: {},
-              error: undefined,
-              submitQueued: false,
+          SUBMIT: [
+            {
+              guard: 'invalid',
+              actions: assign(context => ({ touched: touchAll(context), submitQueued: false })),
             },
-          }),
+            {
+              guard: context => isValidating(context),
+              actions: assign(context => ({ touched: touchAll(context), submitQueued: true })),
+            },
+            {
+              target: 'submitting',
+              actions: assign(context => ({ touched: touchAll(context), submitQueued: false, error: undefined })),
+            },
+          ],
+          RESET: { actions: { type: 'reset', params: (_, event) => ({ values: event.values }) } },
         },
       },
       submitting: {
-        invoke: fromPromise(async ctx => ctx.onSubmit(ctx.values), {
+        invoke: {
+          src: 'submit',
           onDone: 'editing',
           onError: {
             target: 'editing',
-            actions: assign((ctx, e) => ({ error: toFormError(e.error, ctx) })),
+            actions: { type: 'setError', params: (_, event) => ({ cause: event.error }) },
           },
-        }),
+        },
       },
     },
   });
 }
+
+export type FormMachine<TValues extends object> = ReturnType<typeof createFormMachine<TValues>>;

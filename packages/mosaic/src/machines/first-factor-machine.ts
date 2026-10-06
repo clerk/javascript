@@ -67,8 +67,10 @@ function buildAttemptParams(factor: SignInFirstFactor, value: string): AttemptFi
  * On completion, `context.completionStatus` carries the signIn.status so the
  * parent machine can route to secondFactor, resetPassword, or complete:
  *
- *   const [snapshot, send] = useMachine(firstFactorMachine, {
- *     context: { factor, attemptFn: signIn.attemptFirstFactor, prepareFn: signIn.prepareFirstFactor },
+ *   const [machine] = useState(() =>
+ *     createFirstFactorMachine({ factor, attemptFn: signIn.attemptFirstFactor, prepareFn: signIn.prepareFirstFactor }),
+ *   );
+ *   const [snapshot, send] = useMachine(machine, {
  *     onDone: () => parentSend({ type: 'FACTOR_COMPLETE', nextStatus: snapshot.context.completionStatus }),
  *   });
  */

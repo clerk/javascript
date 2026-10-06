@@ -12,15 +12,14 @@ import { ASSIGN } from './types';
  * The updater is a pure `(context, event) => Partial<context>` function, so it
  * can be unit-tested on its own without an actor.
  */
-export function assign<TContext, TEvent extends EventObject = EventObject>(
-  assignment: (context: TContext, event: TEvent) => Partial<TContext>,
-): AssignAction<TContext, TEvent> {
+export function assign<TContext, TEvent extends EventObject = EventObject, TParams = undefined>(
+  assignment: (context: TContext, event: TEvent, params: TParams) => Partial<TContext>,
+): AssignAction<TContext, TEvent, TParams> {
   return { type: ASSIGN, assignment };
 }
 
-/** Type guard distinguishing an `assign` action from a plain side-effect action. */
-export function isAssignAction<TContext, TEvent extends EventObject>(
+export function isAssignAction<TContext, TEvent extends EventObject, TParams = undefined>(
   action: unknown,
-): action is AssignAction<TContext, TEvent> {
+): action is AssignAction<TContext, TEvent, TParams> {
   return typeof action === 'object' && action !== null && (action as { type?: unknown }).type === ASSIGN;
 }

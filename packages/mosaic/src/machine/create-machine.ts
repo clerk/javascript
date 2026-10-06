@@ -1,4 +1,11 @@
-import type { EventObject, MachineConfig, StateMachine } from './types';
+import type {
+  EventObject,
+  ImplementationRefs,
+  MachineConfig,
+  MachineImplementations,
+  NoImplementationRefs,
+  StateMachine,
+} from './types';
 
 /**
  * Create a state-machine definition from a config object.
@@ -24,15 +31,23 @@ export function createMachine<
   TContext extends object = Record<string, never>,
   TEvent extends EventObject = EventObject,
   TStates extends string = string,
->(config: MachineConfig<TContext, TEvent, TStates>): StateMachine<TContext, TEvent> {
+  TRefs extends ImplementationRefs = NoImplementationRefs,
+>(
+  config: MachineConfig<TContext, TEvent, TStates, TRefs>,
+  implementations: MachineImplementations<TContext, TEvent> = { guards: {}, actions: {}, actors: {} },
+): StateMachine<TContext, TEvent, TRefs> {
   return {
     id: config.id,
     initial: config.initial,
-    // SAFETY: config.context is optional; when omitted the machine has no context.
-    // The empty object satisfies any TContext at runtime — callers that omit context
-    // also use Record<string, never> as TContext so no fields are accessed.
     context: config.context ?? ({} as TContext),
     states: config.states,
     config,
+    implementations,
+    provide: provided =>
+      createMachine(config, {
+        guards: { ...implementations.guards, ...provided.guards },
+        actions: { ...implementations.actions, ...provided.actions },
+        actors: { ...implementations.actors, ...provided.actors },
+      }),
   };
 }

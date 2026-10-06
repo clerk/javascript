@@ -8,7 +8,7 @@ export interface SignInContext {
   pendingSignOutOfOtherSessions: boolean;
   pendingStatus: string;
   error: string | null;
-  // Injected deps — passed via useMachine options.context so they're always current.
+  // Injected deps — seeded by createSignInMachine and not updated after the actor starts.
   createAttemptFn: (identifier: string) => Promise<SignInResource>;
   resetPasswordFn: (params: ResetPasswordParams) => Promise<SignInResource>;
 }
@@ -31,8 +31,10 @@ const { createMachine, assign, fromPromise } = setup<SignInContext, SignInEvent>
  * one object with no hidden boolean flags.
  *
  * Component usage:
+ *   const [machine] = useState(() =>
+ *     createSignInMachine({ createAttemptFn: id => signIn.create({ identifier: id }), resetPasswordFn: signIn.resetPassword }),
+ *   );
  *   const [snapshot, send] = useMachine(machine, {
- *     context: { createAttemptFn: id => signIn.create({ identifier: id }), resetPasswordFn: signIn.resetPassword },
  *     onDone: () => setActive({ session: signIn.createdSessionId }).then(() => router.navigate(afterSignInUrl)),
  *   });
  *

@@ -159,7 +159,7 @@ const deriveStepper = (machine: StateMachine<WizardContext, WizardEvent>, curren
       isCompleted: currentIndex >= 0 && i < currentIndex,
       // Same predicate the reducer's `guardHolds` / the stepper's `isReachable`
       // bind to. The guards are nullary closures, so the args are inert.
-      isReachable: guard ? guard({ direction: 0, hasNavigated: false }, { type: 'NEXT' }) : true,
+      isReachable: typeof guard === 'function' ? guard({ direction: 0, hasNavigated: false }, { type: 'NEXT' }) : true,
     };
   });
 };

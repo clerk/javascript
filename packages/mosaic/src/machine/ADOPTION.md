@@ -513,7 +513,6 @@ interface SignInStartContext {
   activeStrategy: OAuthStrategy | 'email' | null;
   identifier: string;
   error: string | null;
-  signInFn: (params: SignInCreateParams) => Promise<SignInResource>;
 }
 
 type SignInStartEvent =
@@ -521,57 +520,66 @@ type SignInStartEvent =
   | { type: 'TYPE_IDENTIFIER'; value: string }
   | { type: 'SUBMIT_IDENTIFIER' };
 
-const { createMachine, assign } = setup<SignInStartContext, SignInStartEvent>();
+const base = setup<SignInStartContext, SignInStartEvent>();
+const { assign } = base;
 
-export function createSignInStartMachine(deps: { signInFn: SignInStartContext['signInFn'] }) {
-  return createMachine({
-    initial: 'idle',
-    context: { activeStrategy: null, identifier: '', error: null, signInFn: deps.signInFn },
-    states: {
-      idle: {
-        on: {
-          CLICK_SOCIAL: {
-            target: 'submitting',
-            actions: assign((_, e) => ({ activeStrategy: e.strategy })),
-          },
-          TYPE_IDENTIFIER: {
-            actions: assign((_, e) => ({ identifier: e.value, error: null })),
-          },
-          SUBMIT_IDENTIFIER: {
-            target: 'submitting',
-            actions: assign(() => ({ activeStrategy: 'email' as const })),
-          },
+const { createMachine } = base.extend({
+  actors: {
+    signIn: (_ctx: SignInStartContext): Promise<SignInResource> => Promise.reject(new Error('signIn not provided')),
+  },
+});
+
+export const signInStartMachine = createMachine({
+  initial: 'idle',
+  context: { activeStrategy: null, identifier: '', error: null },
+  states: {
+    idle: {
+      on: {
+        CLICK_SOCIAL: {
+          target: 'submitting',
+          actions: assign((_, e) => ({ activeStrategy: e.strategy })),
+        },
+        TYPE_IDENTIFIER: {
+          actions: assign((_, e) => ({ identifier: e.value, error: null })),
+        },
+        SUBMIT_IDENTIFIER: {
+          target: 'submitting',
+          actions: assign(() => ({ activeStrategy: 'email' as const })),
         },
       },
-      submitting: {
-        // Both entry points converge here. idle's on-handlers are inactive,
-        // so a second CLICK_SOCIAL while already submitting is dropped automatically.
-        invoke: {
-          src: ctx =>
-            ctx.activeStrategy === 'email'
-              ? ctx.signInFn({ identifier: ctx.identifier })
-              : ctx.signInFn({ strategy: ctx.activeStrategy! }),
-          onDone: 'success',
-          onError: {
-            target: 'idle',
-            actions: assign((_, e) => ({ error: String(e.error), activeStrategy: null })),
-          },
-        },
-      },
-      success: { type: 'final' },
     },
-  });
-}
+    submitting: {
+      // Both entry points converge here. idle's on-handlers are inactive,
+      // so a second CLICK_SOCIAL while already submitting is dropped automatically.
+      invoke: {
+        src: 'signIn',
+        onDone: 'success',
+        onError: {
+          target: 'idle',
+          actions: assign((_, e) => ({ error: String(e.error), activeStrategy: null })),
+        },
+      },
+    },
+    success: { type: 'final' },
+  },
+});
 ```
 
 In React, `isLocked` replaces `card.setLoading()` and `activeStrategy`
 replaces the per-button `status.isLoading` check:
 
 ```tsx
-const [snapshot, send] = useMachine(signInStartMachine, {
-  context: { signInFn: params => signIn.create(params) },
-  onDone: () => setActive({ session: signIn.createdSessionId }),
-});
+const [snapshot, send] = useMachine(
+  signInStartMachine.provide({
+    actors: {
+      signIn: ctx =>
+        ctx.activeStrategy === 'email'
+          ? signIn.create({ identifier: ctx.identifier })
+          : signIn.create({ strategy: ctx.activeStrategy }),
+    },
+  }),
+  { onDone: () => setActive({ session: signIn.createdSessionId }) },
+);
 
 const isLocked = snapshot.value === 'submitting';
 const active = snapshot.context.activeStrategy;
@@ -708,10 +716,9 @@ createMachine({
   },
 });
 
-// At creation, pass the external error in:
-const machine = createSignInStartMachine({
-  signInFn: ...,
-  oauthError: signIn.firstFactorVerification?.error ?? null,
+// At creation, seed the external error in:
+useMachine(signInStartMachine.provide({ actors: { signIn: ... } }), {
+  context: { oauthError: signIn.firstFactorVerification?.error ?? null },
 });
 ```
 

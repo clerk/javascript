@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import type { FlowDirection } from '../../components/flow';
 import { useMessages } from '../../localization';
@@ -50,9 +50,7 @@ interface ReverificationContext {
   submitRequested: boolean;
   frozenActiveMethodId: string | undefined;
   overlayFrom: OverlayFrom;
-  supportEmail: string;
   heldFrom: string;
-  deps: ReverificationDeps;
 }
 
 type ReverificationEvent =
@@ -67,18 +65,21 @@ type ReverificationEvent =
   | { type: 'BACK' }
   | { type: 'RESEND' };
 
-const { createMachine, assign, fromPromise } = setup<ReverificationContext, ReverificationEvent>();
+const base = setup<ReverificationContext, ReverificationEvent>();
+const { assign } = base;
 
 function notSeated(): Promise<never> {
   return Promise.reject(new Error('reverification deps are not seated'));
 }
 
-const unseatedDeps: ReverificationDeps = {
-  start: notSeated,
-  prepare: notSeated,
-  attempt: notSeated,
-  finish: notSeated,
-};
+const { createMachine } = base.extend({
+  actors: {
+    start: (): Promise<ReverificationResult> => notSeated(),
+    prepare: (): Promise<void> => notSeated(),
+    submit: (): Promise<ReverificationResult> => notSeated(),
+    finish: (): Promise<void> => notSeated(),
+  },
+});
 
 export const RESEND_COOLDOWN_MS = 30_000;
 
@@ -111,17 +112,17 @@ function selectMethod(ctx: ReverificationContext, id: string): Partial<Reverific
   };
 }
 
-function prepareActive(ctx: ReverificationContext) {
+function prepareActive(ctx: ReverificationContext, deps: ReverificationDeps): Promise<void> {
   const method = ctx.activeMethod;
-  return method && needsPrepare(method) ? ctx.deps.prepare(method) : Promise.resolve();
+  return method && needsPrepare(method) ? deps.prepare(method) : Promise.resolve();
 }
 
-function submit(ctx: ReverificationContext): Promise<ReverificationResult> {
+function submit(ctx: ReverificationContext, deps: ReverificationDeps): Promise<ReverificationResult> {
   const method = ctx.activeMethod;
   if (!method) {
     return Promise.reject(new Error('No active method'));
   }
-  return ctx.deps.attempt(method, ctx.inputValue);
+  return deps.attempt(method, ctx.inputValue);
 }
 
 const applyResult = assign<DoneInvokeEvent<ReverificationResult>>((_, event) => ({
@@ -194,9 +195,7 @@ export const reverificationMachine = createMachine({
     submitRequested: false,
     frozenActiveMethodId: undefined,
     overlayFrom: 'factor',
-    supportEmail: '',
     heldFrom: '',
-    deps: unseatedDeps,
   },
   states: {
     inactive: {
@@ -211,10 +210,11 @@ export const reverificationMachine = createMachine({
 
     starting: {
       on: { RESET: 'inactive', SETTLE: settleFrom('starting') },
-      invoke: fromPromise(ctx => ctx.deps.start(), {
+      invoke: {
+        src: 'start',
         onDone: afterResult,
         onError: 'failed',
-      }),
+      },
     },
 
     /*
@@ -231,7 +231,8 @@ export const reverificationMachine = createMachine({
           actions: assign(() => ({ submitRequested: true })),
         },
       },
-      invoke: fromPromise(prepareActive, {
+      invoke: {
+        src: 'prepare',
         onDone: [
           {
             guard: (ctx: ReverificationContext) => ctx.submitRequested,
@@ -248,7 +249,7 @@ export const reverificationMachine = createMachine({
             ...unlockResend(),
           })),
         },
-      }),
+      },
     },
 
     /*
@@ -260,13 +261,14 @@ export const reverificationMachine = createMachine({
     methodPickerPreparing: {
       entry: assign(() => lockResend()),
       on: { RESET: 'inactive', SETTLE: settleFrom('methodPickerPreparing') },
-      invoke: fromPromise(prepareActive, {
+      invoke: {
+        src: 'prepare',
         onDone: 'verifying',
         onError: {
           target: 'verifying',
           actions: assign((_, event) => ({ error: factorError(event.error), ...unlockResend() })),
         },
-      }),
+      },
     },
 
     verifying: {
@@ -292,13 +294,14 @@ export const reverificationMachine = createMachine({
 
     submitting: {
       on: { RESET: 'inactive', SETTLE: settleFrom('submitting') },
-      invoke: fromPromise(submit, {
+      invoke: {
+        src: 'submit',
         onDone: afterResult,
         onError: {
           target: 'verifying',
           actions: assign((_, event) => ({ error: factorError(event.error) })),
         },
-      }),
+      },
     },
 
     methodPicker: {
@@ -349,10 +352,11 @@ export const reverificationMachine = createMachine({
 
     finishing: {
       on: { RESET: 'inactive', SETTLE: settleFrom('finishing') },
-      invoke: fromPromise(ctx => ctx.deps.finish(), {
+      invoke: {
+        src: 'finish',
         onDone: 'retrying',
         onError: 'failed',
-      }),
+      },
     },
 
     // This means we are retrying the action after successful reverification
@@ -371,6 +375,13 @@ export const reverificationMachine = createMachine({
     },
   },
 });
+
+function seated(deps: ReverificationDeps | null): ReverificationDeps {
+  if (!deps) {
+    throw new Error('reverification deps are not seated');
+  }
+  return deps;
+}
 
 const pendingStates = new Set(['submitting', 'finishing', 'retrying']);
 
@@ -438,16 +449,22 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
   const m = useMessages('reverification');
   const active = model.status === 'active' ? model : null;
 
+  const lastActive = useRef(active);
+  useLayoutEffect(() => {
+    if (active) {
+      lastActive.current = active;
+    }
+  });
+
   const [snapshot, send] = useMachine(
-    reverificationMachine,
-    active
-      ? {
-          context: {
-            supportEmail: active.supportEmail,
-            deps: active,
-          },
-        }
-      : undefined,
+    reverificationMachine.provide({
+      actors: {
+        start: () => seated(lastActive.current).start(),
+        prepare: ctx => prepareActive(ctx, seated(lastActive.current)),
+        submit: ctx => submit(ctx, seated(lastActive.current)),
+        finish: () => seated(lastActive.current).finish(),
+      },
+    }),
   );
 
   const [now, setNow] = useState(() => Date.now());
@@ -528,8 +545,9 @@ function useReverificationState(model: ReverificationModel): ReverificationContr
     onShowHelp: () => send({ type: 'SHOW_HELP' }),
     onBack: () => send({ type: 'BACK' }),
     onEmailSupport: () => {
-      if (context.supportEmail) {
-        window.location.assign(`mailto:${context.supportEmail}`);
+      const supportEmail = lastActive.current?.supportEmail;
+      if (supportEmail) {
+        window.location.assign(`mailto:${supportEmail}`);
       }
     },
     methods,
