@@ -9,49 +9,58 @@ export interface PendingActionOptions {
   errorFallback?: string;
 }
 
-export interface PendingAction<TArgs extends unknown[]> {
-  run: (...args: TArgs) => Promise<boolean>;
+export interface PendingAction<TKey extends string> {
+  run: (key: TKey, action: () => Promise<unknown> | void, options?: PendingActionOptions) => Promise<boolean>;
+  pendingKey: TKey | undefined;
   isPending: boolean;
-  errorMessage: string | undefined;
+  error: string | undefined;
+  errorKey: TKey | undefined;
   reset: () => void;
 }
 
+interface PendingActionFailure<TKey extends string> {
+  key: TKey;
+  error: ErrorDescription;
+  errorFallback: string | undefined;
+}
+
 /**
- * Runs an inline action, such as a row button, and tracks whether it is pending and why it failed.
- * `run` resolves `true` on success and `false` on failure, and ignores calls while one is in flight.
+ * Runs inline actions, such as row buttons, under one lock and tracks which key is pending and which key last failed.
+ * `run` resolves `true` on success and `false` on failure, ignores calls while any run is in flight, and clears the last error when it starts.
  */
-export function usePendingAction<TArgs extends unknown[]>(
-  action: (...args: TArgs) => Promise<unknown> | void,
-  { errorFallback }: PendingActionOptions = {},
-): PendingAction<TArgs> {
+export function usePendingAction<TKey extends string = string>({
+  errorFallback,
+}: PendingActionOptions = {}): PendingAction<TKey> {
   const errorText = useErrorText();
-  const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<ErrorDescription>();
+  const [pendingKey, setPendingKey] = useState<TKey>();
+  const [failure, setFailure] = useState<PendingActionFailure<TKey>>();
   const running = useRef(false);
 
-  const run = async (...args: TArgs) => {
+  const run = async (key: TKey, action: () => Promise<unknown> | void, options: PendingActionOptions = {}) => {
     if (running.current) {
       return false;
     }
     running.current = true;
-    setIsPending(true);
-    setError(undefined);
+    setPendingKey(key);
+    setFailure(undefined);
     try {
-      await action(...args);
+      await action();
       return true;
     } catch (cause) {
-      setError(toLocalizableError(cause));
+      setFailure({ key, error: toLocalizableError(cause), errorFallback: options.errorFallback ?? errorFallback });
       return false;
     } finally {
       running.current = false;
-      setIsPending(false);
+      setPendingKey(undefined);
     }
   };
 
   return {
     run,
-    isPending,
-    errorMessage: error ? errorText(error, errorFallback) : undefined,
-    reset: () => setError(undefined),
+    pendingKey,
+    isPending: pendingKey !== undefined,
+    error: failure ? errorText(failure.error, failure.errorFallback) : undefined,
+    errorKey: failure?.key,
+    reset: () => setFailure(undefined),
   };
 }
