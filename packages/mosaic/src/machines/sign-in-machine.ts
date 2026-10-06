@@ -8,7 +8,7 @@ export interface SignInContext {
   pendingSignOutOfOtherSessions: boolean;
   pendingStatus: string;
   error: string | null;
-  // Injected deps — passed via useMachine options.context so they're always current.
+  // Injected deps — seeded by createSignInMachine and not updated after the actor starts.
   createAttemptFn: (identifier: string) => Promise<SignInResource>;
   resetPasswordFn: (params: ResetPasswordParams) => Promise<SignInResource>;
 }
@@ -31,10 +31,12 @@ const { createMachine, assign, fromPromise } = setup<SignInContext, SignInEvent>
  * one object with no hidden boolean flags.
  *
  * Component usage:
- *   const [snapshot, send] = useMachine(
+ *   const [machine] = useState(() =>
  *     createSignInMachine({ createAttemptFn: id => signIn.create({ identifier: id }), resetPasswordFn: signIn.resetPassword }),
- *     { onDone: () => setActive({ session: signIn.createdSessionId }).then(() => router.navigate(afterSignInUrl)) },
  *   );
+ *   const [snapshot, send] = useMachine(machine, {
+ *     onDone: () => setActive({ session: signIn.createdSessionId }).then(() => router.navigate(afterSignInUrl)),
+ *   });
  *
  * Child factor components signal completion by calling:
  *   send({ type: 'FACTOR_COMPLETE', nextStatus: signIn.status })
