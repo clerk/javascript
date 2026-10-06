@@ -100,20 +100,29 @@ describe('Changing a password', () => {
   );
 
   it('shows an unexpected update failure in the dialog and keeps the draft', async () => {
-    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
+    const fapi = serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
     const { clerk } = await renderWithClerk(<UserProfilePasswordSection />);
     if (!clerk.user) {
       throw new Error('Expected a signed-in user');
     }
-    const update = vi.spyOn(clerk.user, 'updatePassword').mockRejectedValue(new Error('Connection interrupted'));
+    const update = vi.spyOn(clerk.user, 'updatePassword').mockRejectedValueOnce(new Error('Connection interrupted'));
     try {
       const user = await fillPassword();
+      const dialog = screen.getByRole('dialog');
       await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
-      await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Connection interrupted'));
+      await waitFor(() =>
+        expect(screen.getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
+      );
+      expect(dialog).not.toHaveTextContent('Connection interrupted');
       expect(screen.getByLabelText('Current password')).toHaveValue('old-secret');
       expect(screen.getByLabelText('New password')).toHaveValue('new-password-123');
       expect(screen.getByLabelText('Confirm password')).toHaveValue('new-password-123');
+      expect(fapi.passwordUpdates).toHaveLength(0);
+
+      await user.click(screen.getByRole('button', { name: 'Save changes' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+      expect(fapi.passwordUpdates).toHaveLength(1);
     } finally {
       update.mockRestore();
     }
