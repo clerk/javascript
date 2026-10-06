@@ -69,6 +69,7 @@ export function CustomSignUp() {
             onChangeText={setPassword}
             placeholder='Password'
             secureTextEntry
+            textContentType='oneTimeCode'
           />
           <Button
             testID='verify.customSignUp.sendCode'

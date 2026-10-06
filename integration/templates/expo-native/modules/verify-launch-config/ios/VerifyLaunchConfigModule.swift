@@ -13,11 +13,14 @@ public class VerifyLaunchConfigModule: Module {
   public func definition() -> ModuleDefinition {
     Name("VerifyLaunchConfig")
 
+    OnCreate {
+      if Self.launchInputs()["verifyLaunchId"] != nil {
+        Self.keepPasswordAutoFillOffNativeClerkViews()
+      }
+    }
+
     Function("readLaunchInputs") { () -> [String: String] in
-      UserDefaults.standard
-        .volatileDomain(forName: UserDefaults.argumentDomain)
-        .filter { $0.key.hasPrefix("verify") }
-        .compactMapValues { $0 as? String }
+      Self.launchInputs()
     }
 
     Function("applyStorageScope") { (scope: String) in
@@ -30,5 +33,16 @@ public class VerifyLaunchConfigModule: Module {
       Self.clerkDefaultsKeys.forEach(defaults.removeObject(forKey:))
       defaults.set(scope, forKey: Self.storageScopeKey)
     }
+  }
+
+  private static func launchInputs() -> [String: String] {
+    UserDefaults.standard
+      .volatileDomain(forName: UserDefaults.argumentDomain)
+      .filter { $0.key.hasPrefix("verify") }
+      .compactMapValues { $0 as? String }
+  }
+
+  private static func keepPasswordAutoFillOffNativeClerkViews() {
+    setenv("CLERK_E2E_MODE", "1", 1)
   }
 }
