@@ -12,7 +12,7 @@ import { Spinner } from '../../components/spinner';
 import { Table, type TableHeaderCellProps } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
 import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
-import { type PendingAction, usePendingAction } from '../../hooks/use-pending-action';
+import { usePendingAction } from '../../hooks/use-pending-action';
 import { fill, useMessages } from '../../localization';
 import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -274,17 +274,13 @@ function RequestActions({
   const m = useMessages('requestsTableTab');
   const [acceptRef] = useState(() => registerAcceptTrigger(request.id));
   const [declineRef] = useState(() => registerDeclineTrigger(request.id));
-  const accept = usePendingAction(() => onAccept?.(), { errorFallback: m.acceptError });
-  const decline = usePendingAction(() => onDecline?.(), { errorFallback: m.declineError });
-  const pendingAction =
-    request.pendingAction ?? (accept.isPending ? 'accept' : decline.isPending ? 'decline' : undefined);
-  const error = accept.errorMessage ?? decline.errorMessage;
-  const decide = (action: PendingAction<[]>, other: PendingAction<[]>) => {
+  const actions = usePendingAction<'accept' | 'decline'>();
+  const pendingAction = request.pendingAction ?? actions.pendingKey;
+  const decide = (key: 'accept' | 'decline', action: () => void | Promise<void>, errorFallback: string) => {
     if (pendingAction) {
       return;
     }
-    other.reset();
-    void action.run();
+    void actions.run(key, action, { errorFallback });
   };
   return (
     <>
@@ -300,7 +296,7 @@ function RequestActions({
             variant='outline'
             color='neutral'
             aria-label={fill(m.declineRequest, { name: request.name ?? request.email })}
-            onClick={() => decide(decline, accept)}
+            onClick={() => decide('decline', () => onDecline?.(), m.declineError)}
           >
             {m.decline}
           </SubmitButton>
@@ -314,13 +310,13 @@ function RequestActions({
             isPending={pendingAction === 'accept'}
             pendingLabel={m.accepting}
             aria-label={fill(m.acceptRequest, { name: request.name ?? request.email })}
-            onClick={() => decide(accept, decline)}
+            onClick={() => decide('accept', () => onAccept?.(), m.acceptError)}
           >
             {m.accept}
           </SubmitButton>
         ) : null}
       </div>
-      <Section.Error>{error}</Section.Error>
+      <Section.Error>{actions.error}</Section.Error>
     </>
   );
 }
