@@ -150,9 +150,8 @@ export const useSignInContext = (): SignInContextType => {
   }
 
   const signUpContinueUrl = buildURL({ base: signUpUrl, hashPath: '/continue' }, { stringify: true });
-  // Built off `signUpUrl`, which is rewritten to `<signInUrl>#/create` in the combined flow, so this
-  // resolves to the embedded `…/create/protect-check` route there and the standalone sign-up route
-  // otherwise — keeping a Protect-gated sign-up inside whichever component is mounted.
+  // Built off `signUpUrl`, which is `<signInUrl>#/create` in the combined flow. That hash form only reaches
+  // the embedded route on a fresh page load; navigation inside the mounted component uses relative `create/*` paths.
   const signUpProtectCheckUrl = buildURL({ base: signUpUrl, hashPath: '/protect-check' }, { stringify: true });
   const signUpEnterpriseConnectionsUrl = buildURL(
     { base: signUpUrl, hashPath: '/enterprise-connections' },

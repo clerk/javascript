@@ -4,8 +4,8 @@ import { useMemo, useRef, useState } from 'react';
 import { Confirmation } from '../../../blocks/confirmation';
 import { Button } from '../../../components/button';
 import { Icon } from '../../../components/icon';
-import { Text } from '../../../components/text';
-import { useListRemovalFocus } from '../../../hooks/useListRemovalFocus';
+import { Section } from '../../../components/section';
+import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfilePhone } from './user-profile-account-section.types';
 import type { UserProfileAddPhoneControllerOptions } from './user-profile-add-phone.controller';
@@ -108,14 +108,7 @@ export function UserProfilePhoneRowView({
         onSetPrimary={onSetPrimaryPhone && !isSettingPrimary ? id => void setPrimaryPhone(id) : undefined}
         onVerify={onVerifyPhone}
       >
-        {primaryError ? (
-          <Text
-            role='alert'
-            color='negative'
-          >
-            {primaryError}
-          </Text>
-        ) : null}
+        <Section.Error>{primaryError}</Section.Error>
       </UserProfileContactListRowView>
       {onRemovePhone ? (
         <Confirmation

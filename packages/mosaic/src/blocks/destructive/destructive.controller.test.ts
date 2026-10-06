@@ -1,12 +1,17 @@
-import { ClerkRuntimeError } from '@clerk/shared/error';
+import { ClerkAPIResponseError, ClerkRuntimeError } from '@clerk/shared/error';
 import { act, renderHook, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { deferred } from '../../__tests__/async';
 import type { ReverificationController } from '../../features/reverification';
-import { deferred } from '../../machines/__tests__/test-utils';
+import { SaveError } from '../../utils/errors';
 import { useDestructiveController } from './destructive.controller';
 
 const idleReverification = { status: 'idle', visible: false, reset: vi.fn() } as ReverificationController;
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('useDestructiveController', () => {
   it('starts closed and opens from the opener or from onOpenChange', () => {
@@ -37,6 +42,21 @@ describe('useDestructiveController', () => {
     expect(result.current.isDeleting).toBe(true);
   });
 
+  it('shows the fallback, never the message, of an unexpected error', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const onDelete = () => Promise.reject(new Error('Cannot read properties of undefined'));
+    const { result } = renderHook(() =>
+      useDestructiveController({ onDelete, errorFallback: 'Unable to delete this account.' }),
+    );
+    act(() => result.current.onOpenChange(true));
+
+    await act(async () => {
+      await result.current.onDelete();
+    });
+
+    expect(result.current.errorMessage).toBe('Unable to delete this account.');
+  });
+
   it('stays open and pending until the action resolves, then closes', async () => {
     const pending = deferred<void>();
     const onDelete = vi.fn(() => pending.promise);
@@ -61,7 +81,7 @@ describe('useDestructiveController', () => {
   it('stays open with a message when the action rejects, and a retry can succeed', async () => {
     const onDelete = vi
       .fn<() => Promise<unknown>>()
-      .mockRejectedValueOnce(new Error('Your subscription is still active.'))
+      .mockRejectedValueOnce(new SaveError({ global: { code: 'action_blocked', message: 'Raw server sentence.' } }))
       .mockResolvedValueOnce(undefined);
     const { result } = renderHook(() => useDestructiveController({ onDelete }));
     act(() => result.current.onOpenChange(true));
@@ -71,13 +91,41 @@ describe('useDestructiveController', () => {
     });
     expect(result.current.open).toBe(true);
     expect(result.current.isDeleting).toBe(false);
-    expect(result.current.errorMessage).toBe('Something went wrong');
+    expect(result.current.errorMessage).toMatch(/contact support/);
 
     await act(async () => {
       await result.current.onDelete();
     });
     await waitFor(() => expect(result.current.open).toBe(false));
     expect(onDelete).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows the API error when the action is rejected by Clerk', async () => {
+    const onDelete = vi.fn(() =>
+      Promise.reject(
+        new ClerkAPIResponseError('Forbidden', {
+          status: 403,
+          data: [
+            {
+              code: 'organization_minimum_permissions_needed',
+              message: 'Short',
+              long_message: 'There has to be at least one organization member with the minimum required permissions.',
+            },
+          ],
+        }),
+      ),
+    );
+    const { result } = renderHook(() => useDestructiveController({ onDelete }));
+    act(() => result.current.onOpenChange(true));
+
+    await act(async () => {
+      await result.current.onDelete();
+    });
+
+    expect(result.current.open).toBe(true);
+    expect(result.current.errorMessage).toBe(
+      'There has to be at least one organization member with the minimum required permissions.',
+    );
   });
 
   it('closes without a message when reverification is cancelled', async () => {

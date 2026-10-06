@@ -1,4 +1,3 @@
-import { Banner } from '../../../components/banner';
 import { Button } from '../../../components/button';
 import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
@@ -51,15 +50,13 @@ export function UserProfileVerifyEmailSsoDialog({
             <Card.Title>{m.title}</Card.Title>
             <Card.Description>{fill(m.description, { emailAddress })}</Card.Description>
           </Card.Header>
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {errorMessage}
+          </Card.Banner>
           <Card.Content>
-            {errorMessage ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
-              >
-                <Banner.Label>{errorMessage}</Banner.Label>
-              </Banner.Root>
-            ) : null}
             <Item.Root xstyle={styles.connection}>
               {connection.iconUrl ? <UserProfileProviderIcon iconUrl={connection.iconUrl} /> : null}
               <Item.Content>

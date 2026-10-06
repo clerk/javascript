@@ -27,7 +27,10 @@ export type OrganizationProfileNavEntry =
   | { id: string; custom: CustomOrganizationProfilePage };
 
 export function getAvailableOrganizationProfilePages(pages: OrganizationProfilePages): OrganizationProfilePageId[] {
-  return ORGANIZATION_PROFILE_PAGE_IDS.filter(id => pages[id] !== undefined);
+  return ORGANIZATION_PROFILE_PAGE_IDS.filter(id => {
+    const content = pages[id];
+    return content !== undefined && content !== null && content !== false;
+  });
 }
 
 export function resolveOrganizationProfilePages(

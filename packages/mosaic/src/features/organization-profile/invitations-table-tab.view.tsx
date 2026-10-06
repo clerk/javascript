@@ -12,7 +12,7 @@ import { Pagination } from '../../components/pagination';
 import { Spinner } from '../../components/spinner';
 import { Table, type TableHeaderCellProps } from '../../components/table';
 import { VisuallyHidden } from '../../components/visually-hidden';
-import { useListRemovalFocus } from '../../hooks/useListRemovalFocus';
+import { useListRemovalFocus } from '../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../localization';
 import { useDataTable } from '../../primitives/hooks';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -244,13 +244,8 @@ export function InvitationsTableTabView({
           description={m.revokeDescription}
           actionLabel={m.revoke}
           cancelLabel={m.cancel}
-          onConfirm={async invitation => {
-            try {
-              await removalFocus.remove(invitation.id);
-            } catch (error) {
-              throw error instanceof Error && error.message.trim() ? error : new Error(m.revokeError);
-            }
-          }}
+          onConfirm={invitation => removalFocus.remove(invitation.id)}
+          errorFallback={m.revokeError}
           finalFocus={removalFocus.finalFocus}
         />
       ) : null}

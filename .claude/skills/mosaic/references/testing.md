@@ -100,6 +100,14 @@ it('makes the selected organization active and closes', async () => {
 `packages/mosaic/src/features/user-button/__tests__/user-button.feature.test.tsx`
 is the worked example.
 
+Put a feature test next to the component it renders, and name it after that
+component. `<UserProfilePasswordSection />` is tested by
+`user-profile-password-section/user-profile-password-section.feature.test.tsx`.
+Vitest finds feature tests by the `.feature.test.tsx` suffix, so a shared
+`__tests__/` folder buys nothing and makes a section's tests harder to find.
+Existing tests in `__tests__/` folders, the worked example included, move when
+their feature next changes.
+
 ### The toolkit (`src/__tests__/feature/`)
 
 - **`fapi.ts`**: typed builders for FAPI JSON (`fapiEnvironment`, `fapiUser`,
@@ -182,5 +190,5 @@ Write unit tests for:
 - Timing that is slow to drive through the UI, such as a resend countdown. Use
   fake timers.
 
-`packages/mosaic/src/machines/__tests__/test-utils.ts` has `deferred<T>()`,
+`packages/mosaic/src/__tests__/async.ts` has `deferred<T>()`,
 `tick()`, and `noop`.

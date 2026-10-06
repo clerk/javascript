@@ -1,5 +1,47 @@
 # Change Log
 
+## 4.8.1
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.10` to `1.1.11`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.11. ([#10028](https://github.com/clerk/javascript/pull/10028)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.5.7` to `1.5.8`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.8. ([#10027](https://github.com/clerk/javascript/pull/10027)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Fix `useLocalCredentials` throwing "Invalid key provided to SecureStore" when the publishable key ends with base64 padding (`=`). ([#10035](https://github.com/clerk/javascript/pull/10035)) by [@RaphaelFakhri](https://github.com/RaphaelFakhri)
+
+- Updated dependencies [[`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260)]:
+  - @clerk/shared@4.39.0
+  - @clerk/clerk-js@6.38.0
+  - @clerk/react@6.17.6
+
+## 4.8.0
+
+### Minor Changes
+
+- Introduce `@clerk/expo-biometrics`, a new package that `useBiometricCredentials()` now requires. Install it and rebuild your app: ([#9989](https://github.com/clerk/javascript/pull/9989)) by [@mikepitre](https://github.com/mikepitre)
+
+  ```sh
+  npx expo install @clerk/expo-biometrics
+  ```
+
+  If it's missing, the hook throws an error with these same steps.
+
+  Import the hook from `@clerk/expo/biometrics`:
+
+  ```ts
+  import { useBiometricCredentials } from '@clerk/expo/biometrics';
+  ```
+
+  Importing it from `@clerk/expo` still works, but it logs a deprecation warning and will be removed in the next major version.
+
+### Patch Changes
+
+- Updated dependencies [[`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/clerk-js@6.37.0
+  - @clerk/shared@4.38.0
+  - @clerk/react@6.17.5
+
 ## 4.7.3
 
 ### Patch Changes

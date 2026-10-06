@@ -1,13 +1,12 @@
 import { useId, useRef } from 'react';
 
-import { Banner } from '../../components/banner';
 import { Button, SubmitButton } from '../../components/button';
 import { Card } from '../../components/card';
 import type { DialogHandle } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
-import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
+import { useMessages } from '../../localization';
 
 export interface UserProfileRenamePasskeyDialogProps {
   handle: DialogHandle;
@@ -32,6 +31,7 @@ export function UserProfileRenamePasskeyDialog({
   error,
   onSubmit,
 }: UserProfileRenamePasskeyDialogProps) {
+  const m = useMessages('userProfilePasskeys');
   const formId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   return (
@@ -49,6 +49,12 @@ export function UserProfileRenamePasskeyDialog({
             <Card.Title>{m.renameTitle}</Card.Title>
             <Card.Description>{m.renameDescription}</Card.Description>
           </Card.Header>
+          <Card.Banner
+            role='alert'
+            color='negative'
+          >
+            {error}
+          </Card.Banner>
           <Card.Content
             render={
               <form
@@ -62,14 +68,6 @@ export function UserProfileRenamePasskeyDialog({
               />
             }
           >
-            {error ? (
-              <Banner.Root
-                role='alert'
-                color='negative'
-              >
-                <Banner.Label>{error}</Banner.Label>
-              </Banner.Root>
-            ) : null}
             <Field.Root
               required
               disabled={isSaving}

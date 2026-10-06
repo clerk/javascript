@@ -1,8 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { Dialog } from '../dialog';
 import { Card } from './card';
@@ -27,7 +27,25 @@ const responsiveLayout = stylex.create({
   },
 });
 
+const restores: Array<() => void> = [];
+
+function stubPrototype(target: object, name: string, descriptor: PropertyDescriptor) {
+  const original = Object.getOwnPropertyDescriptor(target, name);
+  Object.defineProperty(target, name, { configurable: true, ...descriptor });
+  restores.push(() => {
+    if (original) {
+      Object.defineProperty(target, name, original);
+    } else {
+      Reflect.deleteProperty(target, name);
+    }
+  });
+}
+
 describe('Mosaic Card', () => {
+  afterEach(() => {
+    restores.splice(0).forEach(restore => restore());
+  });
+
   it('renders each compound slot with its stable class', () => {
     render(
       <Card.Root data-testid='root'>
@@ -199,6 +217,103 @@ describe('Mosaic Card', () => {
     expect(content).toHaveClass('cl-card-content');
     expect(content).toHaveTextContent('First');
     expect(content).toHaveTextContent('Second');
+  });
+
+  it('keeps the banner slot in the document while it holds no message', () => {
+    const { container } = render(
+      <Card.Root>
+        <Card.Banner role='alert'>{undefined}</Card.Banner>
+      </Card.Root>,
+    );
+    const slot = screen.getByRole('alert');
+    expect(slot).toHaveClass('cl-card-banner');
+    expect(slot).not.toHaveAttribute('data-open');
+    expect(slot.textContent).toBe('');
+    expect(container.querySelector('.cl-banner-root')).toBeNull();
+  });
+
+  it('expands a banner into the slot while it holds a message', async () => {
+    render(
+      <Card.Root>
+        <Card.Header>
+          <Card.Title>Title</Card.Title>
+        </Card.Header>
+        <Card.Banner
+          role='alert'
+          color='negative'
+        >
+          Something went wrong.
+        </Card.Banner>
+        <Card.Content>Body</Card.Content>
+      </Card.Root>,
+    );
+    const slot = screen.getByRole('alert');
+    expect(slot).toHaveAttribute('data-open');
+    expect(slot).toHaveAttribute('data-starting-style');
+    expect(slot.previousElementSibling).toHaveClass('cl-card-header');
+    expect(slot.nextElementSibling).toHaveClass('cl-card-content');
+    const banner = slot.querySelector('.cl-banner-root');
+    expect(banner).toHaveAttribute('data-color', 'negative');
+    expect(banner).toHaveAttribute('data-starting-style');
+    expect(screen.getByText('Something went wrong.')).toHaveClass('cl-banner-label');
+
+    await act(async () => {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    });
+    expect(slot).not.toHaveAttribute('data-starting-style');
+    expect(banner).not.toHaveAttribute('data-starting-style');
+    expect(banner).not.toHaveAttribute('aria-hidden');
+  });
+
+  it('defaults the banner to the neutral color', () => {
+    render(
+      <Card.Root>
+        <Card.Banner>Heads up.</Card.Banner>
+      </Card.Root>,
+    );
+    expect(document.querySelector('.cl-banner-root')).toHaveAttribute('data-color', 'neutral');
+  });
+
+  it('holds the last message through the exit, then unmounts the banner', async () => {
+    let finish = () => undefined as void;
+    const finished = new Promise<void>(resolve => {
+      finish = resolve;
+    });
+    const getAnimations = vi.fn(() => [{ finished }]);
+    stubPrototype(Element.prototype, 'getAnimations', { value: getAnimations });
+
+    const { rerender } = render(
+      <Card.Root>
+        <Card.Banner role='alert'>Something went wrong.</Card.Banner>
+      </Card.Root>,
+    );
+    await act(async () => {
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    });
+
+    rerender(
+      <Card.Root>
+        <Card.Banner role='alert'>{null}</Card.Banner>
+      </Card.Root>,
+    );
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    const slot = screen.getByRole('alert');
+    expect(slot).not.toHaveAttribute('data-open');
+    expect(slot).toHaveAttribute('data-ending-style');
+    const banner = slot.querySelector('.cl-banner-root');
+    expect(banner).toHaveAttribute('data-ending-style');
+    expect(banner).toHaveAttribute('aria-hidden', 'true');
+    expect(banner).toHaveTextContent('Something went wrong.');
+
+    getAnimations.mockReturnValue([]);
+    await act(async () => {
+      finish();
+      await new Promise(resolve => setTimeout(resolve, 0));
+    });
+    expect(slot.querySelector('.cl-banner-root')).toBeNull();
+    expect(slot).toBeInTheDocument();
   });
 
   it('signs the card with Clerk, in a tab of its own', () => {

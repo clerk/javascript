@@ -11,9 +11,9 @@ import type {
 } from '@clerk/shared/types';
 import { populateParamFromObject } from '@clerk/shared/url';
 
-import { useMosaicEnvironment } from '../../hooks/useMosaicEnvironment';
-import { useMosaicRouter } from '../../hooks/useMosaicRouter';
-import { useOrganizationListInView } from '../../hooks/useOrganizationListInView';
+import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
+import { useMosaicRouter } from '../../hooks/use-mosaic-router';
+import { useOrganizationListInView } from './use-organization-list-in-view';
 import type {
   UserButtonBrandingProps,
   UserButtonCallbacks,
@@ -241,7 +241,7 @@ export function useUserButtonModel(options?: UserButtonModelOptions, modals?: Us
       : [],
   );
 
-  // Organization requests are scoped to the active session, so another account's workspaces are unknowable.
+  // Organization requests are scoped to the active session, so another account's organizations are unknowable.
   const additionalSessions: UserButtonSession[] = (clerk.client?.signedInSessions ?? []).flatMap(s => {
     const sessionUser = s.user;
     if (!sessionUser || s.id === session.id) {

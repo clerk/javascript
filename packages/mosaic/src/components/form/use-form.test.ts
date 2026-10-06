@@ -1,20 +1,13 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, expectTypeOf, it, vi } from 'vitest';
 
+import { deferred, tick } from '../../__tests__/async';
+import { SaveError } from '../../utils/errors';
 import type { FieldFeedback } from './form-submit-error';
 import { FormSubmitError } from './form-submit-error';
 import { useForm } from './use-form';
 
-const flush = () => new Promise<void>(resolve => setTimeout(resolve, 0));
 const resolved = () => Promise.resolve();
-
-function deferred<T>() {
-  let resolve: (value: T) => void = () => undefined;
-  const promise = new Promise<T>(res => {
-    resolve = res;
-  });
-  return { promise, resolve };
-}
 
 describe('useForm', () => {
   it('starts from initialValues and updates one value at a time', () => {
@@ -66,7 +59,7 @@ describe('useForm', () => {
     expect(onSubmit).toHaveBeenCalledWith({ username: 'alexc' });
     await act(async () => {
       request.resolve();
-      await flush();
+      await tick();
     });
     expect(result.current.isSubmitting).toBe(false);
     expect(result.current.error).toBeUndefined();
@@ -92,13 +85,32 @@ describe('useForm', () => {
     );
     await act(async () => {
       result.current.submit();
-      await flush();
+      await tick();
     });
     expect(result.current.error).toBe('Could not save');
     expect(result.current.fields.username.feedback).toEqual({ type: 'error', message: 'Taken' });
     act(() => result.current.setValue('username', 'alexc'));
     expect(result.current.error).toBe('Could not save');
     expect(result.current.fields.username.feedback).toBeUndefined();
+  });
+
+  it('localizes a SaveError onto the form message and field feedback', async () => {
+    const failure = new SaveError<'username'>({
+      global: { code: 'unknown_code', message: 'Could not save' },
+      fields: { username: { code: 'generic' } },
+    });
+    const { result } = renderHook(() =>
+      useForm({ initialValues: { username: 'alex' }, onSubmit: () => Promise.reject(failure) }),
+    );
+    await act(async () => {
+      result.current.submit();
+      await tick();
+    });
+    expect(result.current.error).toBe('Could not save');
+    expect(result.current.fields.username.feedback).toEqual({
+      type: 'error',
+      message: 'Something went wrong. Please try again.',
+    });
   });
 
   it('maps a fields-only FormSubmitError onto field feedback with no form message', async () => {
@@ -109,47 +121,43 @@ describe('useForm', () => {
     );
     await act(async () => {
       result.current.submit();
-      await flush();
+      await tick();
     });
     expect(result.current.error).toBeUndefined();
     expect(result.current.fields.username.feedback).toEqual({ type: 'error', message: 'Taken' });
     expect(result.current.fields.bio.feedback).toEqual({ type: 'error', message: 'Too long' });
   });
 
-  it('shows only the message for a plain Error and a generic message otherwise', async () => {
-    const plain = renderHook(() =>
-      useForm({ initialValues: { username: '' }, onSubmit: () => Promise.reject(new Error('Nope')) }),
-    );
-    await act(async () => {
-      plain.result.current.submit();
-      await flush();
-    });
-    expect(plain.result.current.error).toBe('Nope');
-
-    const cause: unknown = 'boom';
-    const unknown = renderHook(() =>
-      useForm({
-        initialValues: { username: '' },
-        onSubmit: async () => {
-          await Promise.resolve();
-          throw cause;
-        },
-      }),
-    );
-    await act(async () => {
-      unknown.result.current.submit();
-      await flush();
-    });
-    expect(unknown.result.current.error).toBe('Something went wrong. Please try again.');
+  it('shows the generic message and logs the cause for an unrecognized rejection', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const causes: unknown[] = [new Error('Nope'), 'boom'];
+    for (const cause of causes) {
+      const { result } = renderHook(() =>
+        useForm({
+          initialValues: { username: '' },
+          onSubmit: async () => {
+            await Promise.resolve();
+            throw cause;
+          },
+        }),
+      );
+      await act(async () => {
+        result.current.submit();
+        await tick();
+      });
+      expect(result.current.error).toBe('Something went wrong. Please try again.');
+      expect(log).toHaveBeenCalledWith('[Clerk] Could not localize error', cause);
+    }
+    log.mockRestore();
   });
 
   it('falls back to the generic message when a submit error has nothing to show', async () => {
     const empty = renderHook(() =>
-      useForm({ initialValues: { username: '' }, onSubmit: () => Promise.reject(new Error()) }),
+      useForm({ initialValues: { username: '' }, onSubmit: () => Promise.reject(new SaveError({})) }),
     );
     await act(async () => {
       empty.result.current.submit();
-      await flush();
+      await tick();
     });
     expect(empty.result.current.error).toBe('Something went wrong. Please try again.');
 
@@ -158,7 +166,7 @@ describe('useForm', () => {
     );
     await act(async () => {
       blank.result.current.submit();
-      await flush();
+      await tick();
     });
     expect(blank.result.current.error).toBe('Something went wrong. Please try again.');
 
@@ -170,7 +178,7 @@ describe('useForm', () => {
     );
     await act(async () => {
       undisplayable.result.current.submit();
-      await flush();
+      await tick();
     });
     expect(undisplayable.result.current.error).toBe('Something went wrong. Please try again.');
     expect(undisplayable.result.current.fields.username.feedback).toBeUndefined();
@@ -181,13 +189,13 @@ describe('useForm', () => {
       useForm({
         initialValues: { username: '' },
         onSubmit: () => {
-          throw new Error('Nope');
+          throw new FormSubmitError({ message: 'Nope' });
         },
       }),
     );
     await act(async () => {
       result.current.submit();
-      await flush();
+      await tick();
     });
     expect(result.current.isSubmitting).toBe(false);
     expect(result.current.error).toBe('Nope');
@@ -209,12 +217,12 @@ describe('useForm', () => {
     const { result } = renderHook(() =>
       useForm({
         initialValues: { username: '' },
-        onSubmit: () => (fail ? Promise.reject(new Error('Nope')) : Promise.resolve()),
+        onSubmit: () => (fail ? Promise.reject(new FormSubmitError({ message: 'Nope' })) : Promise.resolve()),
       }),
     );
     await act(async () => {
       result.current.submit();
-      await flush();
+      await tick();
     });
     expect(result.current.error).toBe('Nope');
     fail = false;
@@ -317,14 +325,14 @@ describe('useForm', () => {
     expect(result.current.fields.password.isValidating).toBe(true);
     await act(async () => {
       checks.get('ab')?.resolve({ type: 'success', message: 'Strong' });
-      await flush();
+      await tick();
     });
     expect(result.current.fields.password.feedback).toEqual({ type: 'success', message: 'Strong' });
     expect(result.current.fields.password.isValidating).toBe(false);
     expect(result.current.canSubmit).toBe(true);
     await act(async () => {
       checks.get('a')?.resolve({ type: 'error', message: 'Weak' });
-      await flush();
+      await tick();
     });
     expect(result.current.fields.password.feedback).toEqual({ type: 'success', message: 'Strong' });
   });
@@ -350,14 +358,14 @@ describe('useForm', () => {
     act(() => result.current.setValue('username', 'ab'));
     await act(async () => {
       checks.get('ab')?.resolve({ type: 'success', message: 'Available' });
-      await flush();
+      await tick();
     });
     act(() => result.current.setValue('username', 'abc'));
     expect(result.current.fields.username.isValidating).toBe(true);
     expect(result.current.fields.username.feedback).toEqual({ type: 'success', message: 'Available' });
     await act(async () => {
       checks.get('abc')?.resolve({ type: 'error', message: 'Taken' });
-      await flush();
+      await tick();
     });
     act(() => result.current.touch('username'));
     expect(result.current.fields.username.feedback).toEqual({ type: 'error', message: 'Taken' });
@@ -368,7 +376,7 @@ describe('useForm', () => {
     expect(result.current.isSubmitting).toBe(true);
     await act(async () => {
       checks.get('abcd')?.resolve(undefined);
-      await flush();
+      await tick();
     });
     expect(onSubmit).toHaveBeenCalledWith({ username: 'abcd' });
     expect(result.current.fields.username.feedback).toBeUndefined();
@@ -392,7 +400,7 @@ describe('useForm', () => {
     expect(result.current.canSubmit).toBe(false);
     await act(async () => {
       check.resolve(undefined);
-      await flush();
+      await tick();
     });
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(onSubmit).toHaveBeenCalledWith({ password: 'ab' });
@@ -416,7 +424,7 @@ describe('useForm', () => {
     expect(result.current.isSubmitting).toBe(true);
     await act(async () => {
       check.resolve({ type: 'error', message: 'Taken' });
-      await flush();
+      await tick();
     });
     expect(onSubmit).not.toHaveBeenCalled();
     expect(result.current.isSubmitting).toBe(false);
@@ -444,7 +452,7 @@ describe('useForm', () => {
     act(() => result.current.submit());
     await act(async () => {
       checks.get('ab')?.resolve({ type: 'error', message: 'Weak' });
-      await flush();
+      await tick();
     });
     expect(onSubmit).not.toHaveBeenCalled();
     expect(result.current.isSubmitting).toBe(false);
@@ -457,7 +465,7 @@ describe('useForm', () => {
       useForm({ initialValues: { password: '' }, fields: { password: { validateAsync } }, onSubmit: resolved }),
     );
     act(() => result.current.setValue('password', 'ab'));
-    await act(flush);
+    await act(tick);
     expect(result.current.fields.password.isValidating).toBe(false);
     expect(result.current.fields.password.feedback).toBeUndefined();
     expect(result.current.canSubmit).toBe(true);
@@ -479,7 +487,7 @@ describe('useForm', () => {
     );
     await act(async () => {
       result.current.setValue('password', 'a');
-      await flush();
+      await tick();
     });
     expect(result.current.fields.password.isValidating).toBe(false);
     expect(result.current.fields.password.feedback).toBeUndefined();
@@ -493,7 +501,7 @@ describe('useForm', () => {
     act(() => result.current.setValue('username', 'alexc'));
     expect(validateAsync).toHaveBeenCalledTimes(1);
     act(() => result.current.setValue('username', 'alex'));
-    await act(flush);
+    await act(tick);
     expect(validateAsync).toHaveBeenCalledTimes(1);
     expect(result.current.fields.username.isValidating).toBe(false);
   });
@@ -513,10 +521,10 @@ describe('useForm', () => {
       }),
     );
     act(() => result.current.setValue('password', 'ab'));
-    await act(flush);
+    await act(tick);
     expect(result.current.fields.password.feedback).toEqual({ type: 'info', message: 'Keep going' });
     act(() => result.current.setValue('password', 'abc'));
-    await act(flush);
+    await act(tick);
     expect(result.current.fields.password.feedback).toEqual({ type: 'success', message: 'Strong' });
   });
 
@@ -533,7 +541,7 @@ describe('useForm', () => {
     act(() => result.current.setValue('username', 'draft'));
     await act(async () => {
       result.current.submit();
-      await flush();
+      await tick();
     });
     expect(result.current.fields.username.touched).toBe(true);
     expect(result.current.fields.username.feedback).toEqual({ type: 'error', message: 'Bad' });
@@ -564,7 +572,7 @@ describe('useForm', () => {
     expect(result.current.isSubmitting).toBe(true);
     await act(async () => {
       request.resolve();
-      await flush();
+      await tick();
     });
     expect(result.current.isSubmitting).toBe(false);
   });

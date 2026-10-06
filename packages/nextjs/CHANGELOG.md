@@ -1,5 +1,25 @@
 # Change Log
 
+## 7.9.11
+
+### Patch Changes
+
+- Remove `https://images.clerkstage.dev` from the default `connect-src` Content Security Policy directive. It is a Clerk-internal storage host that no application connects to. Organization logos are served from `https://img.clerk.com`, which stays in the default. ([#9898](https://github.com/clerk/javascript/pull/9898)) by [@Grundlefleck](https://github.com/Grundlefleck)
+
+- Updated dependencies [[`2302140`](https://github.com/clerk/javascript/commit/23021401d3ab66bf920ba07be1d7500c4d98a5a9), [`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260), [`dee649c`](https://github.com/clerk/javascript/commit/dee649c2d6cad6ba543a2433e65707a0d93686df)]:
+  - @clerk/backend@3.23.0
+  - @clerk/shared@4.39.0
+  - @clerk/react@6.17.6
+
+## 7.9.10
+
+### Patch Changes
+
+- Updated dependencies [[`4eac21f`](https://github.com/clerk/javascript/commit/4eac21f68b6608d5e59dfb9d7660582d7bf0a148), [`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/backend@3.22.0
+  - @clerk/shared@4.38.0
+  - @clerk/react@6.17.5
+
 ## 7.9.9
 
 ### Patch Changes

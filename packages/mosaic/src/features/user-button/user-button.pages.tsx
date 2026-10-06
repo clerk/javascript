@@ -11,7 +11,7 @@ import type { ReactNode } from 'react';
 import { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { useMosaicEnvironment } from '../../hooks/useMosaicEnvironment';
+import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
 import { applyOrder } from '../../utils/apply-order';
 import { USER_PROFILE_PAGE_IDS } from '../user-profile/user-profile.layout';
 import type { CustomProfileItem, CustomProfileLink, UserProfilePageId } from '../user-profile/user-profile.types';

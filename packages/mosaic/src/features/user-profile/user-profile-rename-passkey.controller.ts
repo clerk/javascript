@@ -1,13 +1,15 @@
+import type { ErrorDescription } from '../../localization';
+import { useErrorText, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
-import { useMachine } from '../../machine/useMachine';
-import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
+import { useMachine } from '../../machine/use-machine';
+import { toLocalizableError } from '../../utils/errors';
 
 interface UserProfileRenamePasskeyContext {
   passkeyId: string;
   savedName: string;
   name: string;
   onRename: ((id: string, name: string) => void | Promise<void>) | undefined;
-  error: string | undefined;
+  error: ErrorDescription | undefined;
 }
 
 type UserProfileRenamePasskeyEvent =
@@ -53,7 +55,7 @@ const userProfileRenamePasskeyMachine = createMachine({
         onDone: { target: 'idle' },
         onError: {
           target: 'editing',
-          actions: assign((_, event) => ({ error: event.error instanceof Error ? event.error.message : m.saveError })),
+          actions: assign((_, event) => ({ error: toLocalizableError(event.error) })),
         },
       }),
     },
@@ -82,6 +84,8 @@ export function useUserProfileRenamePasskeyController({
   name,
   onRename,
 }: UserProfileRenamePasskeyControllerOptions): UserProfileRenamePasskeyController {
+  const m = useMessages('userProfilePasskeys');
+  const errorText = useErrorText();
   const [snapshot, send] = useMachine(userProfileRenamePasskeyMachine, {
     context: { passkeyId: id, savedName: name, onRename },
   });
@@ -94,6 +98,6 @@ export function useUserProfileRenamePasskeyController({
     onSubmit: () => send({ type: 'SAVE' }),
     canSave: isSaveable(snapshot.context),
     isSaving: snapshot.value === 'saving',
-    error: snapshot.context.error,
+    error: snapshot.context.error ? errorText(snapshot.context.error, m.saveError) : undefined,
   };
 }

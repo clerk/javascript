@@ -16,6 +16,5 @@ export const styles = stylex.create({
     height: space['6'],
     width: space['6'],
   },
-  label: { gap: space['2'], alignItems: 'center', display: 'flex', flexWrap: 'wrap' },
-  text: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 },
+  text: { minWidth: 0 },
 });

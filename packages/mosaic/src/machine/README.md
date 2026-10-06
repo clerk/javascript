@@ -62,7 +62,7 @@ run it.
 ## Your first machine
 
 ```ts
-import { createMachine } from '@/mosaic/machine/createMachine';
+import { createMachine } from '@/mosaic/machine/create-machine';
 import { assign } from '@/mosaic/machine/assign';
 
 const loader = createMachine({
@@ -164,7 +164,7 @@ A machine on its own does nothing — it's just a description. To run it you wra
 it in an **actor** (the running instance):
 
 ```ts
-import { createActor } from '@/mosaic/machine/createActor';
+import { createActor } from '@/mosaic/machine/create-actor';
 
 const actor = createActor(loader);
 
@@ -185,7 +185,7 @@ time. `value` is the state name; `context` is the riding data.
 `useMachine` does the create + start + subscribe for you:
 
 ```tsx
-import { useMachine } from '@/mosaic/machine/useMachine';
+import { useMachine } from '@/mosaic/machine/use-machine';
 
 function Loader() {
   const [snapshot, send] = useMachine(loader);
