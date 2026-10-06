@@ -85,16 +85,24 @@ const applyTokenExpressions = (s: string, expressions: TokenExpression[], tokens
 
 const assertKnownModifier = (s: any): s is Modifier => Object.prototype.hasOwnProperty.call(MODIFIERS, s);
 
+const PARAM_REGEX = /"([^"]*)"|'([^']*)'|([^,]+)/g;
+
 const getModifierWithParams = (modifierExpression: string) => {
-  const parts = modifierExpression
-    .split(/[(,)]/g)
-    .map(m => m.trim())
-    .filter(m => !!m);
-  if (parts.length === 1) {
-    const [modifierName] = parts;
-    return { modifierName, params: [] };
-  } else {
-    const [modifierName, ...params] = parts;
-    return { modifierName, params: params.map(p => p.replace(/['"]+/g, '')) };
+  const open = modifierExpression.indexOf('(');
+  if (open === -1) {
+    return { modifierName: modifierExpression.trim(), params: [] };
   }
+  const close = modifierExpression.lastIndexOf(')');
+  const paramsExpression = modifierExpression.slice(open + 1, close > open ? close : undefined);
+  const params = [...paramsExpression.matchAll(PARAM_REGEX)].flatMap(
+    ([, doubleQuoted, singleQuoted, unquoted = '']) => {
+      const quoted = doubleQuoted ?? singleQuoted;
+      if (quoted !== undefined) {
+        return [quoted];
+      }
+      const value = unquoted.trim().replace(/['"]+/g, '');
+      return value ? [value] : [];
+    },
+  );
+  return { modifierName: modifierExpression.slice(0, open).trim(), params };
 };
