@@ -83,7 +83,7 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
   const pageTitleId = React.useId();
   const pageTitleRef = React.useRef<HTMLHeadingElement | null>(null);
   const navTriggerRef = React.useRef<HTMLButtonElement | null>(null);
-  const [navItems, setNavItems] = React.useState<React.ReactNode>(null);
+  const navItems = navItemsOf(children);
   // Scoped to a layout so the replacement sheet never mounts open.
   const [navOpenIn, setNavOpenIn] = React.useState<ProfileNavLayout | null>(null);
   const navOpen = navOpenIn === navLayout;
@@ -111,7 +111,6 @@ const Root = React.forwardRef<HTMLDivElement, ProfileRootProps>(function Profile
       value,
       selectPage,
       navItems,
-      setNavItems,
       pageTitleId,
       pageTitleRef,
       navTriggerRef,
@@ -218,19 +217,16 @@ function NavBranding() {
 }
 
 /**
- * Children are `Profile.NavItem`s only. Wide, they render as a tablist; compact, as the options of
- * the page title's select, or a tablist in a sheet on a phone.
+ * A direct child of `Profile.Root`, with `Profile.NavItem`s as its only children. Wide, they render
+ * as a tablist; compact, as the options of the page title's select, or a tablist in a sheet on a
+ * phone.
  */
 const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
   { children, render, xstyle, ...rest },
   ref,
 ) {
-  const { titleId, renderBranding, compact, navLayout, navOpen, closeNav, setNavItems, navTriggerRef, inline } =
+  const { titleId, renderBranding, compact, navLayout, navOpen, closeNav, navTriggerRef, inline } =
     useProfileContext('Profile.Nav');
-  useSafeLayoutEffect(() => {
-    setNavItems(children);
-  }, [children, setNavItems]);
-  useSafeLayoutEffect(() => () => setNavItems(null), [setNavItems]);
   const element = useRender({
     defaultTagName: 'nav',
     render,
@@ -279,6 +275,24 @@ const Nav = React.forwardRef<HTMLElement, ProfileNavProps>(function ProfileNav(
     </Drawer.Root>
   );
 });
+
+function navItemsOf(children: React.ReactNode): React.ReactNode {
+  for (const child of React.Children.toArray(children)) {
+    if (!React.isValidElement<{ children?: React.ReactNode }>(child)) {
+      continue;
+    }
+    if (child.type === Nav) {
+      return child.props.children;
+    }
+    if (child.type === React.Fragment) {
+      const items = navItemsOf(child.props.children);
+      if (items !== null) {
+        return items;
+      }
+    }
+  }
+  return null;
+}
 
 export interface ProfileNavItemProps extends MosaicComponentProps<'button'> {
   value: string;
