@@ -85,6 +85,43 @@ describe('useMachine — context init option', () => {
     render(<Comp />);
     expect(screen.getByText('runtime')).toBeInTheDocument();
   });
+
+  it('only seeds context, so state the machine assigns survives a re-render', async () => {
+    type Ctx = { name: string };
+    const save = vi.fn((_name: string) => Promise.resolve());
+    const machine = createMachine<Ctx, { type: 'TYPE'; value: string } | { type: 'SAVE' }>({
+      initial: 'editing',
+      context: { name: '' },
+      states: {
+        editing: {
+          on: {
+            TYPE: { actions: assign((_, e) => ({ name: e.value })) },
+            SAVE: 'saving',
+          },
+        },
+        saving: { invoke: { src: ctx => save(ctx.name), onDone: 'editing' } },
+      },
+    });
+
+    function Comp({ savedName }: { savedName: string }) {
+      const [, send] = useMachine(machine, { context: { name: savedName } });
+      return (
+        <div>
+          <button onClick={() => send({ type: 'TYPE', value: 'Acme Inc' })}>Type</button>
+          <button onClick={() => send({ type: 'SAVE' })}>Save</button>
+        </div>
+      );
+    }
+
+    const { rerender } = render(<Comp savedName='Acme' />);
+    fireEvent.click(screen.getByText('Type'));
+    rerender(<Comp savedName='Acme' />);
+    await act(async () => {
+      fireEvent.click(screen.getByText('Save'));
+    });
+
+    expect(save).toHaveBeenCalledWith('Acme Inc');
+  });
 });
 
 describe('useActor + mockActor — render a teleported step', () => {
