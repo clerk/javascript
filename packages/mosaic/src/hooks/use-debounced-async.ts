@@ -10,6 +10,7 @@ export interface DebouncedAsyncOptions {
 export interface DebouncedAsyncResult<TData> {
   data: TData | undefined;
   error: unknown;
+  isError: boolean;
   isPending: boolean;
 }
 
@@ -17,6 +18,7 @@ interface Settled<TValue, TData> {
   value: TValue;
   data: TData | undefined;
   error: unknown;
+  isError: boolean;
 }
 
 /**
@@ -57,8 +59,8 @@ export function useDebouncedAsync<TValue, TData>(
       void Promise.resolve()
         .then(() => runRef.current(value, { signal: controller.signal }))
         .then(
-          data => settle({ data, error: undefined }),
-          (error: unknown) => settle({ data: undefined, error }),
+          data => settle({ data, error: undefined, isError: false }),
+          (error: unknown) => settle({ data: undefined, error, isError: true }),
         );
     }, delayMs);
     return () => {
@@ -68,11 +70,12 @@ export function useDebouncedAsync<TValue, TData>(
   }, [value, enabled, delayMs]);
 
   if (!enabled) {
-    return { data: undefined, error: undefined, isPending: false };
+    return { data: undefined, error: undefined, isError: false, isPending: false };
   }
   return {
     data: settled?.data,
     error: settled?.error,
+    isError: settled?.isError === true,
     isPending: settled === undefined || !Object.is(settled.value, value),
   };
 }

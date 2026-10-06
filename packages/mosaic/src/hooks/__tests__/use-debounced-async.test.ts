@@ -35,7 +35,7 @@ describe('useDebouncedAsync', () => {
     expect(result.current.isPending).toBe(true);
     await act(() => vi.advanceTimersByTimeAsync(1));
     expect(run).toHaveBeenCalledExactlyOnceWith('ab', { signal: expect.any(AbortSignal) });
-    expect(result.current).toEqual({ data: 'checked ab', error: undefined, isPending: false });
+    expect(result.current).toEqual({ data: 'checked ab', error: undefined, isError: false, isPending: false });
   });
 
   it('keeps the last result while the next value is checked', async () => {
@@ -43,7 +43,7 @@ describe('useDebouncedAsync', () => {
     const { result, rerender } = setup(run, { value: 'a' });
     await act(() => vi.advanceTimersByTimeAsync(DELAY));
     rerender({ value: 'b' });
-    expect(result.current).toEqual({ data: 'checked a', error: undefined, isPending: true });
+    expect(result.current).toEqual({ data: 'checked a', error: undefined, isError: false, isPending: true });
   });
 
   it('aborts and ignores a check that is overtaken by a new value', async () => {
@@ -76,7 +76,15 @@ describe('useDebouncedAsync', () => {
   ])('reports an error when the check %s', async (_, run) => {
     const { result } = setup(run, { value: 'a' });
     await act(() => vi.advanceTimersByTimeAsync(DELAY));
-    expect(result.current).toEqual({ data: undefined, error: new Error('down'), isPending: false });
+    expect(result.current).toEqual({ data: undefined, error: new Error('down'), isError: true, isPending: false });
+  });
+
+  it('reports a failure even when the check rejects without a reason', async () => {
+    const check = deferred<string>();
+    check.reject();
+    const { result } = setup(() => check.promise, { value: 'a' });
+    await act(() => vi.advanceTimersByTimeAsync(DELAY));
+    expect(result.current.isError).toBe(true);
   });
 
   it('clears the result and cancels pending work when disabled', async () => {
@@ -84,7 +92,7 @@ describe('useDebouncedAsync', () => {
     const { result, rerender } = setup(run, { value: 'a' });
     await act(() => vi.advanceTimersByTimeAsync(DELAY));
     rerender({ value: 'b', enabled: false });
-    expect(result.current).toEqual({ data: undefined, error: undefined, isPending: false });
+    expect(result.current).toEqual({ data: undefined, error: undefined, isError: false, isPending: false });
     await act(() => vi.advanceTimersByTimeAsync(DELAY));
     expect(run).toHaveBeenCalledTimes(1);
   });

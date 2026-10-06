@@ -72,8 +72,9 @@ export function useUserProfileEditPasswordController({
     value => (validatePassword ? validatePassword(value) : Promise.resolve(undefined)),
     { delayMs: DEBOUNCE_MS, enabled: isOpen && (password !== '' || passwordLeft) && validatePassword !== undefined },
   );
-  const passwordFeedback: FieldFeedback | undefined =
-    strength.error === undefined ? strength.data : { type: 'error', message: validationError };
+  const passwordFeedback: FieldFeedback | undefined = strength.isError
+    ? { type: 'error', message: validationError }
+    : strength.data;
 
   const onOpenChange = (open: boolean) => {
     if (form.isSubmitting) {
