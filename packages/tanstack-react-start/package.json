@@ -91,7 +91,7 @@
   },
   "peerDependencies": {
     "@tanstack/react-router": "^1.168.10",
-    "@tanstack/react-start": "^1.167.17",
+    "@tanstack/react-start": "^1.168.0",
     "react": "catalog:peer-react",
     "react-dom": "catalog:peer-react"
   },
