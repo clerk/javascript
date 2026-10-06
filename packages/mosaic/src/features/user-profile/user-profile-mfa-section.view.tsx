@@ -52,7 +52,7 @@ export function UserProfileMfaSectionView({
   });
   const removeMethod = useMemo(() => Confirmation.createHandle<UserProfileMfaMethod>(), []);
   const [pickerOpen, setPickerOpen] = useState(false);
-  const setDefault = usePendingAction((id: string) => onSetDefault?.(id), { errorFallback: m.setDefaultError });
+  const setDefault = usePendingAction({ errorFallback: m.setDefaultError });
   const canSetDefault = (id: string) => {
     const method = methods.find(method => method.id === id);
     return method?.type === 'sms' && method.canSetDefault && !method.isDefault;
@@ -95,7 +95,7 @@ export function UserProfileMfaSectionView({
               onSetDefault && !setDefault.isPending
                 ? id => {
                     if (canSetDefault(id)) {
-                      void setDefault.run(id);
+                      void setDefault.run('set-default', () => onSetDefault(id));
                     }
                   }
                 : undefined
@@ -104,7 +104,7 @@ export function UserProfileMfaSectionView({
           />
         ))}
       </UserProfileSecurityList>
-      <Section.Error>{setDefault.errorMessage}</Section.Error>
+      <Section.Error>{setDefault.error}</Section.Error>
       {onRemove ? (
         <Confirmation
           handle={removeMethod}
