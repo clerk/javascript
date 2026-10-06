@@ -4,6 +4,7 @@ import type { EnvironmentResource, PhoneNumberResource, UserResource } from '@cl
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useErrorText, useMessages } from '../../../localization';
+import { SaveError } from '../../../utils/errors';
 import { useReverificationWithState } from '../../reverification/use-reverification-with-state';
 import {
   MfaCancelledError,
@@ -73,7 +74,7 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
   const requireIdentity = (userId: string, sessionId: string): UserResource => {
     const current = clerk.user;
     if (!current || current.id !== userId || clerk.session?.id !== sessionId) {
-      throw new Error(m.errors.accountChanged);
+      throw new SaveError({ global: { code: 'mfa_account_changed', message: m.errors.accountChanged } });
     }
     return current;
   };
@@ -203,7 +204,7 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     const current = requireIdentity(userId, sessionId);
     const phone = current.phoneNumbers.find(item => item.id === phoneId);
     if (!phone) {
-      throw new Error(m.errors.phoneUnavailable);
+      throw new SaveError({ global: { code: 'mfa_phone_unavailable', message: m.errors.phoneUnavailable } });
     }
     return phone;
   };
@@ -304,16 +305,12 @@ export function useUserProfileMfaModel(): UserProfileMfaModel {
     },
     setDefault: smsEnabled
       ? async phoneId => {
-          try {
-            const phone = currentPhone(phoneId);
-            if (phone.verification.status !== 'verified' || !phone.reservedForSecondFactor) {
-              throw new Error(m.errors.phoneUnavailable);
-            }
-            await phone.makeDefaultSecondFactor();
-            await refresh().catch(() => undefined);
-          } catch (error) {
-            throw errorMessage(error, localize);
+          const phone = currentPhone(phoneId);
+          if (phone.verification.status !== 'verified' || !phone.reservedForSecondFactor) {
+            throw new SaveError({ global: { code: 'mfa_phone_unavailable', message: m.errors.phoneUnavailable } });
           }
+          await phone.makeDefaultSecondFactor();
+          await refresh().catch(() => undefined);
         }
       : undefined,
   };

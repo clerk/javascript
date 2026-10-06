@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useMessages } from '../../../localization';
 import { setup } from '../../../machine/setup';
 import { useMachine } from '../../../machine/use-machine';
+import { useReverificationController } from '../../reverification/reverification.controller';
+import type { ReverificationModel } from '../../reverification/reverification.model';
 import {
   MfaCancelledError,
   type UserProfileMfaAddableMethod,
@@ -212,8 +214,9 @@ const mfaMachine = createMachine({
   },
 });
 
-export function useUserProfileMfaController(model: ReadyModel) {
+export function useUserProfileMfaController(model: ReadyModel, reverificationModel: ReverificationModel) {
   const m = useMessages('userProfileMfa');
+  const reverificationProps = useReverificationController(reverificationModel, model.resetReverification);
   const [{ context, value }, send] = useMachine(mfaMachine);
   const locked = useRef(false);
   const [now, setNow] = useState(() => Date.now());
@@ -457,9 +460,22 @@ export function useUserProfileMfaController(model: ReadyModel) {
     onSetDefault: setDefault,
   };
 
+  const dialogOpen = flow.kind !== 'closed';
+  const showAddTrigger = model.addableMethods.length > 0;
+  const showReverification = model.reverification.phase === 'active' || model.reverification.phase === 'retrying';
+
   return {
-    dialogOpen: flow.kind !== 'closed',
-    showAddTrigger: model.addableMethods.length > 0,
+    dialogOpen,
+    showAddTrigger,
+    showAddControl: showAddTrigger || dialogOpen,
+    showReverification,
+    separateReverificationOpen: !dialogOpen && showReverification,
+    onSeparateReverificationOpenChange: (open: boolean) => {
+      if (!open && model.reverification.phase === 'active') {
+        model.reverification.cancel();
+      }
+    },
+    reverificationProps,
     onDialogOpenChange: (open: boolean) => {
       if (!open && model.reverification.phase === 'active') {
         model.reverification.cancel();

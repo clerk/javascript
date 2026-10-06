@@ -1,17 +1,53 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
+import { clerkApiError } from '../../../__tests__/clerk-errors';
 import { fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiPhoneNumber, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfileMfaSection, useUserProfileMfaSlot } from '../user-profile-mfa-section/user-profile-mfa-section';
+import { MosaicProvider } from '../../../mosaic-provider';
+import { mfaSectionNode, UserProfileMfaSection } from '../user-profile-mfa-section/user-profile-mfa-section';
+import { useUserProfileMfaModel } from '../user-profile-mfa-section/user-profile-mfa-section.model';
+import { UserProfileMfaSectionView } from '../user-profile-mfa-section/user-profile-mfa-section.view';
 import { useUserProfilePasswordSlot } from '../user-profile-password-section/user-profile-password-section';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 import { mfaEnvironment, phone, renderMfa } from './mfa-feature-setup';
 
 describe('User profile MFA management', () => {
+  it('renders a plain MFA node in Authentication over legacy methods', async () => {
+    serveFapi({
+      environment: mfaEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+    });
+    await renderWithClerk(
+      <UserProfileSecurityPanelView
+        mfaSlot={<div>Connected MFA</div>}
+        mfaMethods={[{ id: 'injected', type: 'authenticator' }]}
+      />,
+    );
+
+    const authentication = screen.getByRole('region', { name: 'Authentication' });
+    expect(within(authentication).getByText('Connected MFA')).toBeVisible();
+    expect(within(authentication).queryByRole('heading', { name: '2-step verification' })).toBeNull();
+  });
+
+  it('suppresses injected MFA when the slot is explicitly null', async () => {
+    serveFapi({
+      environment: mfaEnvironment(),
+      client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1' }) })]),
+    });
+    await renderWithClerk(
+      <UserProfileSecurityPanelView
+        mfaSlot={null}
+        mfaMethods={[{ id: 'injected', type: 'authenticator' }]}
+      />,
+    );
+
+    expect(screen.queryByRole('region', { name: 'Authentication' })).toBeNull();
+  });
+
   it('removes SMS MFA while retaining the phone number', async () => {
     const reserved = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
     const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [reserved], two_factor_enabled: true }));
@@ -26,6 +62,26 @@ describe('User profile MFA management', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Add verification method' })).toHaveFocus());
     expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_1', reserved: false, default: undefined });
     expect(fapi.client.sessions[0]?.user.phone_numbers).toHaveLength(1);
+  });
+
+  it('moves focus through remaining MFA rows and then to Add after sequential removals', async () => {
+    const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    const second = fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202', reserved_for_second_factor: true });
+    const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second], two_factor_enabled: true }));
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification +15555550101' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    const remaining = await screen.findByRole('button', { name: 'Manage SMS verification +15555550202' });
+    await waitFor(() => expect(remaining).toHaveFocus());
+
+    await user.keyboard('{Enter}');
+    await user.click(screen.getByRole('menuitem', { name: 'Remove method' }));
+    await user.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remove' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Add verification method' })).toHaveFocus());
+    expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_1', reserved: false, default: undefined });
+    expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_2', reserved: false, default: undefined });
   });
 
   it('shows second-factor reverification for removal with no addable methods', async () => {
@@ -123,7 +179,7 @@ describe('User profile MFA management', () => {
 
   it('places a connected MFA slot after password in the security panel', async () => {
     function Panel() {
-      const mfaSlot = useUserProfileMfaSlot();
+      const mfaSlot = mfaSectionNode(useUserProfileMfaModel());
       const passwordSlot = useUserProfilePasswordSlot();
       return (
         <UserProfileSecurityPanelView
@@ -147,7 +203,7 @@ describe('User profile MFA management', () => {
 
   it('uses the connected slot instead of duplicate injected MFA props', async () => {
     function Panel() {
-      const mfaSlot = useUserProfileMfaSlot();
+      const mfaSlot = mfaSectionNode(useUserProfileMfaModel());
       return (
         <UserProfileSecurityPanelView
           mfaSlot={mfaSlot}
@@ -166,7 +222,7 @@ describe('User profile MFA management', () => {
 
   it('suppresses injected MFA when the connected slot is hidden', async () => {
     function Panel() {
-      const mfaSlot = useUserProfileMfaSlot();
+      const mfaSlot = mfaSectionNode(useUserProfileMfaModel());
       return (
         <UserProfileSecurityPanelView
           mfaSlot={mfaSlot}
@@ -522,6 +578,68 @@ describe('User profile MFA management', () => {
       expect(screen.getAllByText('SMS verification')[0]?.closest('li')).toHaveTextContent('+15555550202'),
     );
     expect(screen.getAllByText('SMS verification')[0]?.closest('li')).toHaveTextContent('Default');
+  });
+
+  it('shows a failed default change and clears its error on retry', async () => {
+    const first = fapiPhoneNumber({ ...phone, reserved_for_second_factor: true, default_second_factor: true });
+    const second = fapiPhoneNumber({ id: 'phone_2', phone_number: '+15555550202', reserved_for_second_factor: true });
+    const fapi = await renderMfa(fapiUser({ id: 'user_1', phone_numbers: [first, second], two_factor_enabled: true }));
+    let attempts = 0;
+    worker.use(
+      http.post(fapiUrl('/v1/me/phone_numbers/phone_2'), ({ request }) => {
+        if (new URL(request.url).searchParams.get('_method') !== 'PATCH') {
+          return undefined;
+        }
+        attempts += 1;
+        return attempts === 1
+          ? HttpResponse.json(
+              { errors: [{ code: 'unexpected_error', message: 'Unable to update default method.' }] },
+              { status: 503 },
+            )
+          : undefined;
+      }),
+    );
+    const user = userEvent.setup();
+    const selected = screen.getByRole('button', { name: 'Manage SMS verification +15555550202' });
+
+    await user.click(selected);
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Unable to update default method.'));
+    expect(screen.getAllByText('Default')).toHaveLength(1);
+
+    await user.click(selected);
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+    await waitFor(() =>
+      expect(fapi.mfa.phoneUpdates).toContainEqual({ id: 'phone_2', default: true, reserved: undefined }),
+    );
+    expect(attempts).toBe(2);
+  });
+
+  it.each([
+    {
+      cause: clerkApiError('phone_number_not_verified', 'Unable to update the default method.'),
+      message: 'Unable to update the default method.',
+    },
+    {
+      cause: new Error('Cannot read properties of undefined'),
+      message: 'Unable to set this method as default. Please try again.',
+    },
+    { cause: 'network failure', message: 'Unable to set this method as default. Please try again.' },
+  ])('shows a safe default-change error for $message', async ({ cause, message }) => {
+    const user = userEvent.setup();
+    render(
+      <MosaicProvider>
+        <UserProfileMfaSectionView
+          methods={[{ id: 'work', type: 'sms', canSetDefault: true }]}
+          onSetDefault={() => Promise.reject(cause)}
+        />
+      </MosaicProvider>,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Manage SMS verification' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as default' }));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(message));
   });
 
   it('keeps method menus available but hides default changes while one is pending', async () => {
