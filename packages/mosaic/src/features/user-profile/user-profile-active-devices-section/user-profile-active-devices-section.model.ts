@@ -1,10 +1,9 @@
 import { differenceInCalendarDays } from '@clerk/shared/date';
-import { isClerkAPIResponseError } from '@clerk/shared/error';
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/shared/types';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { fill, toLocalizableApiError, useErrorText, useLocale, useMessages } from '../../../localization';
+import { fill, useLocale, useMessages } from '../../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
 export type UserProfileActiveDevicesModel =
@@ -45,9 +44,6 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
   const sessionId = session?.id;
 
   const identity = userId && sessionId ? `${userId}:${sessionId}` : undefined;
-  const errorText = useErrorText();
-  const translation = useRef({ m, errorText });
-  translation.current = { m, errorText };
   const [query, setQuery] = useState<SessionsQuery>({ status: 'loading', identity });
   const [attempt, setAttempt] = useState(0);
 
@@ -127,29 +123,23 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
       .sort((a, b) => Number(b.id === sessionId) - Number(a.id === sessionId))
       .map(toDevice),
     revoke: async id => {
-      try {
-        const currentUser = clerk.user;
-        if (
-          !currentUser ||
-          !sessionId ||
-          currentUser.id !== userId ||
-          clerk.session?.id !== sessionId ||
-          id === sessionId
-        ) {
-          throw new Error(translation.current.m.signOutError);
-        }
-        const sessions = await currentUser.getSessions({ forceRefresh: true, throwOnError: true });
-        const target = sessions.find(item => item.id === id && isActiveDevice(item));
-        if (!target || clerk.user?.id !== userId || clerk.session?.id !== sessionId) {
-          throw new Error(translation.current.m.signOutError);
-        }
-        await target.revoke();
-        return clerk.user?.id === userId && clerk.session?.id === sessionId;
-      } catch (error) {
-        const { m: messages, errorText: translate } = translation.current;
-        const first = isClerkAPIResponseError(error) ? error.errors[0] : undefined;
-        throw new Error(first ? translate(toLocalizableApiError(first, messages.signOutError)) : messages.signOutError);
+      const currentUser = clerk.user;
+      if (
+        !currentUser ||
+        !sessionId ||
+        currentUser.id !== userId ||
+        clerk.session?.id !== sessionId ||
+        id === sessionId
+      ) {
+        throw new Error(m.signOutError);
       }
+      const sessions = await currentUser.getSessions({ forceRefresh: true, throwOnError: true });
+      const target = sessions.find(item => item.id === id && isActiveDevice(item));
+      if (!target || clerk.user?.id !== userId || clerk.session?.id !== sessionId) {
+        throw new Error(m.signOutError);
+      }
+      await target.revoke();
+      return clerk.user?.id === userId && clerk.session?.id === sessionId;
     },
   };
 }

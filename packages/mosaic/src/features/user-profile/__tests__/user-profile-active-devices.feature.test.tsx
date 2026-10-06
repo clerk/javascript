@@ -842,7 +842,9 @@ describe('active devices view contract', () => {
       await user.click(screen.getByRole('button', { name: 'Sign out of all devices' }));
       await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
 
-      expect(await screen.findByText('Unable to sign out of all devices')).toBeInTheDocument();
+      expect(
+        await screen.findByText('Something went wrong signing these devices out. Please try again.'),
+      ).toBeInTheDocument();
       expect(confirmation()).toBeInTheDocument();
 
       await user.click(within(confirmation()).getByRole('button', { name: 'Sign out' }));
