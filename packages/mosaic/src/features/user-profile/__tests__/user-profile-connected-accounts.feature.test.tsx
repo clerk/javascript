@@ -839,18 +839,57 @@ describe('connected accounts', () => {
     expect(clerk.user?.externalAccounts[0]?.approvedScopes).toBe('email repo');
   });
 
-  it('releases the redirect hold and permits another connection', async () => {
-    const { clerk } = await renderSection([]);
-    const navigate = vi.spyOn(clerk, 'navigate').mockResolvedValue(undefined);
-    const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
-    await waitFor(() => expect(navigate).toHaveBeenCalledOnce());
-    expect(screen.getByRole('button', { name: 'Connect GitHub' })).toHaveAttribute('aria-busy', 'true');
-    await waitFor(
-      () => expect(screen.getByRole('button', { name: 'Connect GitHub' })).not.toHaveAttribute('aria-busy', 'true'),
-      { timeout: 2500 },
+  it.each(['connect', 'reconnect'] as const)(
+    'releases %s pending when a redirect leaves the section mounted',
+    async action => {
+      serveFapi(signedIn(action === 'connect' ? [] : [disconnectedGoogle]));
+      const { clerk } = await renderWithClerk(<UserProfileConnectedAccountsSection />);
+      const navigate = vi.spyOn(clerk, 'navigate').mockResolvedValue(undefined);
+      const user = userEvent.setup();
+      if (action === 'connect') {
+        await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+      } else {
+        await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+        await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
+      }
+      await waitFor(() => expect(navigate).toHaveBeenCalledOnce());
+      if (action === 'connect') {
+        expect(screen.getByRole('button', { name: 'Connect GitHub' })).toHaveAttribute('aria-busy', 'true');
+      }
+      const otherProvider = screen.getByRole('button', {
+        name: action === 'connect' ? 'Connect Google' : 'Connect GitHub',
+      });
+      expect(otherProvider).toBeDisabled();
+      await waitFor(() => expect(otherProvider).toBeEnabled(), { timeout: 2500 });
+      if (action === 'connect') {
+        expect(screen.getByRole('button', { name: 'Connect GitHub' })).not.toHaveAttribute('aria-busy', 'true');
+      }
+      await user.click(otherProvider);
+      await waitFor(() => expect(navigate).toHaveBeenCalledTimes(2));
+    },
+  );
+
+  it.each(['connect', 'reconnect'] as const)('allows another connection when %s navigation fails', async action => {
+    serveFapi(signedIn(action === 'connect' ? [] : [google]));
+    const { clerk } = await renderWithClerk(
+      <UserProfileConnectedAccountsSection additionalOAuthScopes={{ google: ['calendar'] }} />,
     );
-    await user.click(screen.getByRole('button', { name: 'Connect Google' }));
+    const navigate = vi.spyOn(clerk, 'navigate').mockRejectedValueOnce(new Error('Navigation failed'));
+    const user = userEvent.setup();
+    if (action === 'connect') {
+      await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    } else {
+      await user.click(screen.getByRole('button', { name: 'Manage Google' }));
+      await user.click(screen.getByRole('menuitem', { name: 'Reconnect' }));
+    }
+
+    await waitFor(() => expect(navigate).toHaveBeenCalledOnce());
+    if (action === 'connect') {
+      expect(await screen.findByText('Something went wrong. Please try again.')).toBeInTheDocument();
+    }
+    expect(screen.getByRole('button', { name: 'Connect GitHub' })).toBeEnabled();
+    navigate.mockResolvedValue(undefined);
+    await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
     await waitFor(() => expect(navigate).toHaveBeenCalledTimes(2));
   });
 
