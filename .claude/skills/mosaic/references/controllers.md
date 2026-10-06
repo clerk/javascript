@@ -30,8 +30,9 @@ complexity calls for:
 | Has a coordinated async core plus some UI-only flags beside it           | Both — machine for the core |
 | Is one async action from a button, needing only pending and an error     | `usePendingAction`          |
 
-`usePendingAction(fn, { errorFallback })` covers row actions: set default, sign
-out, accept or decline. It ignores clicks while one is in flight, owns the error
+`usePendingAction(fn, { errorFallback })` covers any single async action a
+button starts: set a default, sign out a device, accept or decline a request. It
+ignores clicks while one is in flight, owns the error
 (see "Errors") and returns `{ run, isPending, errorMessage, reset }`. `run`
 resolves `true` on success, so the caller can close a dialog or move focus. It
 is not for:
