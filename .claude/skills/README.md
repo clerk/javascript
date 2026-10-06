@@ -23,9 +23,12 @@ Edits to a `SKILL.md` take effect immediately, including in already-running sess
 
 ## Scope
 
-Skills are Claude Code specific. Cursor does not read this directory; it uses `.cursor/rules/` and
-`AGENTS.md`. When a repo rule changes, update `AGENTS.md` first, then mirror the change here and in
-`.cursor/rules/` where relevant.
+Skills here are Claude Code specific, except `verify-clerk-expo`, the agent-neutral skill that drives
+`@clerk/expo` on a simulator or emulator. Its files live here, and `.cursor/skills/verify-clerk-expo`
+is a symlink to this directory so Cursor reads the same skill. Edit it here, not through the
+symlink. For the other skills, Cursor uses `.cursor/rules/` and `AGENTS.md`. When a repo rule
+changes, update `AGENTS.md` first, then mirror the change here and in `.cursor/rules/` where
+relevant.
 
 ## Maintaining a skill
 
@@ -41,7 +44,8 @@ Skills are Claude Code specific. Cursor does not read this directory; it uses `.
 
 ## Skills in this repo
 
-| Skill            | Use it for                                                                                                                              |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `clerk-monorepo` | Day-to-day work in the monorepo: setup, build/test loops, the package map, changesets, commits, PRs, breaking-change checks.            |
-| `mosaic`         | Mosaic flow UI: authoring machines, controllers, and views, and migrating a legacy component into the split (with parity verification). |
+| Skill               | Use it for                                                                                                                              |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `clerk-monorepo`    | Day-to-day work in the monorepo: setup, build/test loops, the package map, changesets, commits, PRs, breaking-change checks.            |
+| `mosaic`            | Mosaic flow UI: authoring machines, controllers, and views, and migrating a legacy component into the split (with parity verification). |
+| `verify-clerk-expo` | Proving a `@clerk/expo` change on an iOS simulator or Android emulator, with video and app state as evidence.                           |
