@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../mosaic-provider';
-import { SaveError } from '../../../utils/form-error';
+import { SaveError } from '../../../utils/errors';
 import type { UserProfilePictureRowViewProps } from '../user-profile-account-section/user-profile-picture-row.view';
 import { UserProfilePictureRowView } from '../user-profile-account-section/user-profile-picture-row.view';
 

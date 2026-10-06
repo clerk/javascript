@@ -174,8 +174,10 @@ export interface ConfirmationHandleProps<Payload> {
   actionLabel: FromPayload<Payload, string>;
   /** Text of the cancel button (default: "Cancel") */
   cancelLabel?: string;
-  /** Runs the action for the payload. Resolve to close the dialog; reject with an `Error` to keep it open showing why */
+  /** Runs the action for the payload. Resolve to close the dialog; reject to keep it open showing why */
   onConfirm: (payload: Payload) => Promise<void> | void;
+  /** Copy shown when the action fails without an error Clerk can describe, such as a network or code fault (default: the generic error) */
+  errorFallback?: string;
 }
 
 function HandleConfirmation<Payload>({
@@ -187,8 +189,9 @@ function HandleConfirmation<Payload>({
   actionLabel,
   cancelLabel = 'Cancel',
   onConfirm,
+  errorFallback,
 }: ConfirmationHandleProps<Payload>) {
-  const controller = useConfirmationController();
+  const controller = useConfirmationController({ errorFallback });
 
   return (
     <Dialog.Root

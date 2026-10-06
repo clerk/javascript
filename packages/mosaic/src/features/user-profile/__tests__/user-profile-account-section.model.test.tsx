@@ -3,8 +3,8 @@ import type * as SharedReact from '@clerk/shared/react';
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { FormError } from '../../../utils/form-error';
-import { SaveError } from '../../../utils/form-error';
+import type { FormError } from '../../../utils/errors';
+import { SaveError } from '../../../utils/errors';
 import { useUserProfileAccountSectionModel } from '../user-profile-account-section/user-profile-account-section.model';
 
 interface FakeAttribute {

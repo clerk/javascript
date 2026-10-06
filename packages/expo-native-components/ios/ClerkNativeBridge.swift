@@ -837,18 +837,21 @@ final class ClerkNativeBridge {
   ) -> UIViewController? {
     guard Self.clerkConfigured else { return nil }
 
+    let onDismiss: (() -> Void)? = dismissible ? { onEvent(.dismissed, [:]) } : nil
+
     return makeHostingController(
       rootView: ClerkInlineAuthWrapperView(
         mode: Self.authMode(from: mode),
         dismissible: dismissible,
         hostBackAction: hostBackAction.map(ClerkHostBackAction.init),
+        hostDismissAction: onDismiss.map(ClerkHostDismissAction.init),
         lightTheme: lightTheme,
         darkTheme: darkTheme,
         logoState: logoState,
         logoMaxHeight: logoMaxHeight,
         onAuthComplete: { onEvent(.dismissed, [:]) }
       ),
-      onDismiss: dismissible ? { onEvent(.dismissed, [:]) } : nil
+      onDismiss: onDismiss
     )
   }
 
@@ -1083,6 +1086,7 @@ struct ClerkInlineAuthWrapperView: View {
   let mode: AuthView.Mode
   let dismissible: Bool
   let hostBackAction: ClerkHostBackAction?
+  let hostDismissAction: ClerkHostDismissAction?
   let lightTheme: ClerkTheme?
   let darkTheme: ClerkTheme?
   let logoState: ClerkInlineAuthLogoState
@@ -1099,6 +1103,7 @@ struct ClerkInlineAuthWrapperView: View {
     )
       .environment(Clerk.shared)
       .environment(\.clerkHostBackAction, hostBackAction)
+      .environment(\.clerkHostDismissAction, hostDismissAction)
     let theme = colorScheme == .dark ? (darkTheme ?? lightTheme) : lightTheme
     let themedView = Group {
       if let theme {

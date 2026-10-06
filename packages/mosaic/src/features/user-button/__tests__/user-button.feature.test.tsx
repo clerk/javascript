@@ -2,7 +2,7 @@ import { UNSAFE_PortalProvider as PortalProvider } from '@clerk/shared/react';
 import type { CustomPage, PhoneNumberJSON, UserJSON, Web3WalletJSON } from '@clerk/shared/types';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { type FakeFapiSeed, holdRequests, serveFapi } from '../../../__tests__/feature/fake-fapi';
 import {
@@ -19,6 +19,10 @@ import {
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import type { UserButtonProps } from '../user-button';
 import { UserButton } from '../user-button';
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 const acme = fapiOrganization({ id: 'org_1', name: 'Acme', members_count: 3 });
 const other = fapiOrganization({ id: 'org_9', name: 'Other' });
@@ -588,7 +592,8 @@ describe('UserButton', () => {
       await waitFor(() => expect(popup()).toBeNull());
     });
 
-    it('stays open and clears busy state when the switch fails', async () => {
+    it('stays open, clears busy state and logs the failure when the switch fails', async () => {
+      const log = vi.spyOn(console, 'error').mockImplementation(() => {});
       await renderUserButton();
       const user = await open();
       await screen.findByRole('button', { name: 'Other' });
@@ -597,11 +602,15 @@ describe('UserButton', () => {
       await user.click(screen.getByRole('button', { name: 'Other' }));
       expect(waiting()).toBe(true);
 
-      touch.fail();
+      touch.fail('session_touch_failed');
 
       await waitFor(() => expect(waiting()).toBe(false), { timeout: 2000 });
       expect(popup()).toBeInTheDocument();
       expect(signOut()).toBeEnabled();
+      expect(log).toHaveBeenCalledWith(
+        '[Clerk] User button action failed',
+        expect.objectContaining({ errors: [expect.objectContaining({ code: 'session_touch_failed' })] }),
+      );
     });
 
     it('still shows the action when reopened before it settles, and starts no second one', async () => {
