@@ -49,7 +49,7 @@ function Web3Wallets({
         onSetPrimary={id => {
           void controller.onSetPrimary(id);
         }}
-        onRemove={model.remove}
+        onRemove={controller.onRemove}
       />
       <UserProfileSolanaWalletDialog
         open={controller.solanaPickerOpen}
