@@ -381,6 +381,7 @@ describe('Web3 wallets', () => {
       fireEvent.click(metamaskButton);
       fireEvent.click(screen.getByRole('button', { name: 'Connect Solana' }));
     });
+    expect(screen.queryByRole('dialog')).toBeNull();
     await waitFor(() => expect(hold.requests).toHaveLength(1));
     expect(screen.getByRole('button', { name: 'Connect MetaMask' })).toHaveAttribute('aria-busy', 'true');
     expect(screen.getByRole('button', { name: 'Connect Solana' })).toBeDisabled();
@@ -395,6 +396,39 @@ describe('Web3 wallets', () => {
     );
     expect(await screen.findByRole('button', { name: 'Manage MetaMask' })).toBeInTheDocument();
     expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('clears a provider failure when a wallet action starts', async () => {
+    vi.stubGlobal('ethereum', {
+      request: vi.fn(() => Promise.resolve(['0x1234567890abcdef'])),
+    });
+    await renderWeb3({
+      web3_wallets: [
+        fapiWeb3Wallet({
+          id: 'solana_wallet',
+          web3_wallet: 'SolanaAddress123',
+          verification: fapiVerification('web3_solana_signature', { status: 'verified' }),
+        }),
+      ],
+    });
+    const creation = holdRequests('post', '/v1/me/web3_wallets');
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole('button', { name: 'Connect MetaMask' }));
+    await waitFor(() => expect(creation.requests).toHaveLength(1));
+    creation.fail('wallet_creation_failed');
+    expect(await screen.findByRole('alert')).toHaveTextContent('wallet_creation_failed');
+
+    const primary = holdRequests('post', '/v1/me');
+    await user.click(screen.getByRole('button', { name: 'Manage Solana' }));
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+    await waitFor(() => expect(primary.requests).toHaveLength(1));
+    try {
+      expect(screen.queryByRole('alert')).toBeNull();
+    } finally {
+      primary.release();
+    }
+    await waitFor(() => expect(screen.getByText('Primary')).toBeInTheDocument());
   });
 
   it('sets a verified wallet as primary through Clerk', async () => {
