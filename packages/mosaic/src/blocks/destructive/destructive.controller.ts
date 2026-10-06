@@ -2,9 +2,9 @@ import { isReverificationCancelledError } from '@clerk/shared/error';
 import { useState } from 'react';
 
 import type { ReverificationController } from '../../features/reverification';
-import type { LocalizableError } from '../../localization';
+import type { ErrorDescription } from '../../localization';
 import { useErrorText } from '../../localization';
-import { toLocalizableError } from '../../utils/form-error';
+import { toLocalizableError } from '../../utils/errors';
 import type { DestructiveControlledProps } from './destructive';
 
 export type DestructiveController = Pick<
@@ -19,7 +19,7 @@ type DestructiveState =
   | { status: 'closed' }
   | { status: 'open-needs-confirmation' }
   | { status: 'open-pending' }
-  | { status: 'open-error'; error: LocalizableError };
+  | { status: 'open-error'; error: ErrorDescription };
 
 /** Optional controller for use with Destructive block */
 export function useDestructiveController({

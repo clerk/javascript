@@ -57,12 +57,12 @@ describe('useErrorText', () => {
   });
 
   it('falls back to the generic message when there is nothing else', () => {
-    expect(errorText({ 'errors.generic': 'Algo salió mal.' })({})).toBe('Algo salió mal.');
+    expect(errorText({ 'errors.generic': 'Algo salió mal.' })({ cause: new Error('boom') })).toBe('Algo salió mal.');
     expect(errorText()({ code: 'toString' })).toBe('Something went wrong. Please try again.');
   });
 
   it('uses the fallback it is given ahead of the generic message', () => {
-    expect(errorText()({}, 'Unable to sign out.')).toBe('Unable to sign out.');
+    expect(errorText()({ cause: new Error('boom') }, 'Unable to sign out.')).toBe('Unable to sign out.');
   });
 
   it('prefers the copy for the code and the message Clerk sent over the fallback', () => {

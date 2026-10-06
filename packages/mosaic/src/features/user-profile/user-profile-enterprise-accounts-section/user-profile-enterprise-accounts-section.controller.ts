@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
 
-import type { LocalizableError } from '../../../localization';
+import type { ErrorDescription } from '../../../localization';
 import { useErrorText } from '../../../localization';
-import { toLocalizableError } from '../../../utils/form-error';
+import { toLocalizableError } from '../../../utils/errors';
 import type {
   EnterpriseAccountActionResult,
   UserProfileEnterpriseAccount,
@@ -31,7 +31,7 @@ export function useUserProfileEnterpriseAccountsController({
 }: UserProfileEnterpriseAccountsControllerOptions): UserProfileEnterpriseAccountsController {
   const [pendingId, setPendingId] = useState<string>();
   const errorText = useErrorText();
-  const [connectErrors, setConnectErrors] = useState<Record<string, LocalizableError>>({});
+  const [connectErrors, setConnectErrors] = useState<Record<string, ErrorDescription>>({});
   const connecting = useRef(false);
 
   const run = async (id: string) => {

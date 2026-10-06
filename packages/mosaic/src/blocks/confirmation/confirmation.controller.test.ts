@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { createActor } from '../../machine/create-actor';
-import { SaveError } from '../../utils/form-error';
+import { SaveError } from '../../utils/errors';
 import { confirmationMachine, useConfirmationController } from './confirmation.controller';
 
 const blocked = new SaveError({ global: { code: 'action_blocked', message: 'Raw server sentence.' } });
@@ -56,13 +56,14 @@ describe('confirmationMachine', () => {
     expect(actor.getSnapshot().context.error).toEqual(blocked.formError.global);
   });
 
-  it('holds nothing of an unexpected error, never its message', async () => {
+  it('keeps the cause of an unexpected error, never its message', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
+    const cause = new Error('Cannot read properties of undefined');
     const actor = start();
-    actor.send({ type: 'CONFIRM', run: () => Promise.reject(new Error('Cannot read properties of undefined')) });
+    actor.send({ type: 'CONFIRM', run: () => Promise.reject(cause) });
 
     await vi.waitFor(() => expect(actor.getSnapshot().value).toBe('confirming'));
-    expect(actor.getSnapshot().context.error).toEqual({});
+    expect(actor.getSnapshot().context.error).toEqual({ cause });
   });
 
   it('drops the error when cancelled, so the next open starts clean', async () => {

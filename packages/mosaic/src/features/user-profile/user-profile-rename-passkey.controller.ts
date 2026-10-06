@@ -1,15 +1,15 @@
-import type { LocalizableError } from '../../localization';
+import type { ErrorDescription } from '../../localization';
 import { useErrorText, useMessages } from '../../localization';
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
-import { toLocalizableError } from '../../utils/form-error';
+import { toLocalizableError } from '../../utils/errors';
 
 interface UserProfileRenamePasskeyContext {
   passkeyId: string;
   savedName: string;
   name: string;
   onRename: ((id: string, name: string) => void | Promise<void>) | undefined;
-  error: LocalizableError | undefined;
+  error: ErrorDescription | undefined;
 }
 
 type UserProfileRenamePasskeyEvent =

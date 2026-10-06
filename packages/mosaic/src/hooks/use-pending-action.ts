@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
 
-import type { LocalizableError } from '../localization';
+import type { ErrorDescription } from '../localization';
 import { useErrorText } from '../localization';
-import { toLocalizableError } from '../utils/form-error';
+import { toLocalizableError } from '../utils/errors';
 
 export interface PendingActionOptions {
   /** Copy shown when the action fails without an error Clerk can describe, such as a network or code fault (default: the generic error) */
@@ -26,7 +26,7 @@ export function usePendingAction<TArgs extends unknown[]>(
 ): PendingAction<TArgs> {
   const errorText = useErrorText();
   const [isPending, setIsPending] = useState(false);
-  const [error, setError] = useState<LocalizableError>();
+  const [error, setError] = useState<ErrorDescription>();
   const running = useRef(false);
 
   const run = async (...args: TArgs) => {

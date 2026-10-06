@@ -3,8 +3,9 @@ import type { ClerkAPIError, PasswordSettingsData } from '@clerk/shared/types';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
 import { FormSubmitError } from '../../../components/form';
-import type { LocalizableError, MosaicMessages } from '../../../localization';
+import type { ErrorDescription, MosaicMessages } from '../../../localization';
 import { toLocalizableApiError } from '../../../localization';
+import { toLocalizableError } from '../../../utils/errors';
 import { passwordComplexityMessage, passwordStrengthMessage } from './user-profile-password-feedback';
 import type { UserProfileEditPasswordValues } from './user-profile-password-section.types';
 
@@ -32,7 +33,7 @@ function passwordError(
   settings: Settings,
   messages: Messages,
   locale: string,
-  errorText: (error: LocalizableError) => string,
+  errorText: (error: ErrorDescription) => string,
 ) {
   const first = errors[0];
   if (!first) {
@@ -52,17 +53,17 @@ function passwordError(
   );
 }
 
-// TODO: Move onto save() and toLocalizableError so an unknown error never shows its message, then drop toLocalizableApiError.
+// TODO: Move onto save() and drop toLocalizableApiError.
 export function passwordFormError(
   error: unknown,
   requiresCurrentPassword: boolean,
   settings: Settings,
   messages: Messages,
   locale: string,
-  errorText: (error: LocalizableError) => string,
+  errorText: (error: ErrorDescription) => string,
 ): FormSubmitError<UserProfileEditPasswordValues> {
   if (typeof error !== 'object' || error === null || !isClerkAPIResponseError(error)) {
-    return new FormSubmitError({ message: errorText({ message: error instanceof Error ? error.message : undefined }) });
+    return new FormSubmitError({ message: errorText(toLocalizableError(error)) });
   }
   const fields: { currentPassword?: string; newPassword?: string } = {};
   const passwordErrors: ClerkAPIError[] = [];

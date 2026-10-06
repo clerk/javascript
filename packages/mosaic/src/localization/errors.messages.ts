@@ -20,5 +20,6 @@ export const errorMessages: { readonly generic: string } & Readonly<Record<strin
   form_password_validation_failed: 'Incorrect Password',
   form_username_invalid_length: 'Your username must be between {min_length} and {max_length} characters long.',
   form_username_needs_non_number_char: 'Your username must contain at least one non-numeric character.',
+  network_error: 'Unable to reach the server. Check your connection and try again.',
   oauth_missing_verification_url: 'The connection could not start. Please try again.',
 };

@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
 
-import type { LocalizableError } from '../../../localization';
+import type { ErrorDescription } from '../../../localization';
 import { useErrorText, useMessages } from '../../../localization';
-import { toLocalizableError } from '../../../utils/form-error';
+import { toLocalizableError } from '../../../utils/errors';
 import type {
   ConnectedAccountActionResult,
   UserProfileConnectedAccount,
@@ -35,7 +35,7 @@ export function useUserProfileConnectedAccountsController({
   const messages = useMessages('userProfileConnectedAccounts');
   const errorText = useErrorText();
   const [pendingId, setPendingId] = useState<string>();
-  const [errors, setErrors] = useState<Record<string, LocalizableError>>({});
+  const [errors, setErrors] = useState<Record<string, ErrorDescription>>({});
   const connecting = useRef(false);
 
   const run = async (id: string, action: (id: string) => Promise<ConnectedAccountActionResult>) => {

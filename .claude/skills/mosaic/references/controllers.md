@@ -139,12 +139,18 @@ have a machine.
 
 One path, so every error a user sees goes through the `errors.*` catalog:
 
-- **Owners map, nothing else does.** `toLocalizableError(cause)` is called only
-  by the hooks that own a failure: `useForm`, `useConfirmationController`,
-  `useDestructiveController` and `usePendingAction` (inline row actions). Use one of
-  them instead of catching in a feature.
-- **Owners resolve copy at render; views get a string.** Owners store the
-  `LocalizableError` and return `errorMessage` from `useErrorText()`: the
+- **Owners map, nothing else does.** `toLocalizableError(cause)` from
+  `utils/errors.ts` is called only by the hooks that own a failure: `useForm`,
+  `useConfirmationController`, `useDestructiveController` and
+  `usePendingAction` (inline row actions). Use one of them instead of catching
+  in a feature.
+- **Owners hold an `ErrorDescription`.** It is either a `LocalizableError`
+  (Clerk gave a `code`) or an `UnlocalizableError` (`{ cause }`, the original
+  failure). `toLocalizableError` logs the second as
+  `[Mosaic] Could not localize error`. Branch with `isLocalizableError` only
+  when a feature handles the two differently.
+- **Owners resolve copy at render; views get a string.** Owners return
+  `errorMessage` from `useErrorText()`: the
   catalog entry for `code__paramName`, then `code`, then Clerk's message, then
   the feature's `errorFallback`, then the generic error. Views never call
   `useErrorText` on an error they did not create themselves.
@@ -152,8 +158,9 @@ One path, so every error a user sees goes through the `errors.*` catalog:
   and falls back to `form.error` instead of taking an `errorFallback`, and the
   profile picture row resolves its controller's error in the view.
 - **`errorFallback` is the feature's copy for faults Clerk cannot describe**
-  (network, code bugs). An unknown error is logged and its `.message` is never
-  shown.
+  (code bugs, non-Clerk errors). An `UnlocalizableError` renders the fallback,
+  never its cause's `.message`. A network failure has its own catalog entry,
+  `network_error`.
 - In tests, reject with `clerkApiError(code, message)` from
   `src/__tests__/clerk-errors.ts` to assert catalog copy. Reject with a plain
   `Error` (silence `console.error`) to assert the fallback.

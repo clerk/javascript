@@ -1,7 +1,7 @@
 import { isClerkAPIResponseError, isClerkRuntimeError } from '@clerk/shared/error';
 import { snakeToCamel } from '@clerk/shared/underscore';
 
-import type { LocalizableError, MessageValues } from '../localization';
+import type { ErrorDescription, LocalizableError, MessageValues } from '../localization';
 
 export interface FormError<TField extends string = string> {
   global?: LocalizableError;
@@ -21,40 +21,53 @@ export class SaveError<TField extends string = string> extends Error {
   }
 }
 
+/** Reads every error a Clerk failure carries, or `undefined` when the cause is not from Clerk. */
+function toClerkErrors(cause: unknown, params?: MessageValues): LocalizableError[] | undefined {
+  if (!(cause instanceof Error)) {
+    return undefined;
+  }
+  if (isClerkRuntimeError(cause)) {
+    return [
+      {
+        code: cause.code,
+        ...(cause.longMessage ? { message: cause.longMessage } : {}),
+        ...(params ? { params } : {}),
+      },
+    ];
+  }
+  if (!isClerkAPIResponseError(cause)) {
+    return undefined;
+  }
+  return cause.errors.map(error => {
+    const paramName = error.meta?.paramName;
+    return {
+      code: error.code,
+      ...(paramName ? { paramName } : {}),
+      message: error.longMessage || error.message,
+      ...(params ? { params } : {}),
+    };
+  });
+}
+
 function toClerkFormError<TField extends string>(
   cause: unknown,
   fields: readonly TField[],
   params: MessageValues | undefined,
 ): FormError<TField> | undefined {
-  if (isClerkRuntimeError(cause)) {
-    return {
-      global: {
-        code: cause.code,
-        ...(cause.longMessage ? { message: cause.longMessage } : {}),
-        ...(params ? { params } : {}),
-      },
-    };
-  }
-  if (!isClerkAPIResponseError(cause)) {
+  const errors = toClerkErrors(cause, params);
+  if (!errors) {
     return undefined;
   }
-  const error: FormError<TField> = {};
-  for (const apiError of cause.errors) {
-    const paramName = apiError.meta?.paramName;
-    const localizable: LocalizableError = {
-      code: apiError.code,
-      ...(paramName ? { paramName } : {}),
-      message: apiError.longMessage || apiError.message,
-      ...(params ? { params } : {}),
-    };
-    const field = fields.find(f => paramName && snakeToCamel(paramName) === f);
+  const formError: FormError<TField> = {};
+  for (const error of errors) {
+    const field = fields.find(f => error.paramName && snakeToCamel(error.paramName) === f);
     if (field) {
-      error.fields = { ...error.fields, [field]: error.fields?.[field] ?? localizable };
+      formError.fields = { ...formError.fields, [field]: formError.fields?.[field] ?? error };
     } else {
-      error.global ??= localizable;
+      formError.global ??= error;
     }
   }
-  return error;
+  return formError;
 }
 
 /**
@@ -80,16 +93,19 @@ export async function save<TField extends string = never>(
 }
 
 /**
- * Reads what to tell the user about a failed action. Clerk errors keep their code so the catalog can
- * localize them; anything else is logged and carries nothing, leaving the caller's fallback to show.
+ * Reads what to tell the user about a failed action. A Clerk error keeps its code so the catalog can
+ * localize it; anything else keeps its cause, is logged, and renders as the caller's fallback.
  */
-export function toLocalizableError(cause: unknown): LocalizableError {
-  const formError = cause instanceof SaveError ? cause.formError : toClerkFormError(cause, [], undefined);
-  if (formError) {
-    return formError.global ?? Object.values(formError.fields ?? {}).find(error => error !== undefined) ?? {};
+export function toLocalizableError(cause: unknown): ErrorDescription {
+  const error =
+    cause instanceof SaveError
+      ? (cause.formError.global ?? Object.values(cause.formError.fields ?? {}).find(field => field !== undefined))
+      : toClerkErrors(cause)?.[0];
+  if (error) {
+    return error;
   }
-  console.error(cause);
-  return {};
+  console.error('[Mosaic] Could not localize error', cause);
+  return { cause };
 }
 
 /** Reads what a rejected save left for the view. An unrecognized rejection is the generic error. */

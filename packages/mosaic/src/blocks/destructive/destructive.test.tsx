@@ -7,7 +7,7 @@ import { Button } from '../../components/button';
 import { Menu } from '../../components/menu';
 import type { ReverificationController } from '../../features/reverification';
 import { MosaicProvider } from '../../mosaic-provider';
-import { SaveError } from '../../utils/form-error';
+import { SaveError } from '../../utils/errors';
 import type { DestructiveControlledProps, DestructiveHandleProps } from './destructive';
 import { Destructive } from './destructive';
 

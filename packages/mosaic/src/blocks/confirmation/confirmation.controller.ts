@@ -1,12 +1,12 @@
-import type { LocalizableError } from '../../localization';
+import type { ErrorDescription } from '../../localization';
 import { useErrorText } from '../../localization';
 import { setup } from '../../machine/setup';
 import { useMachine } from '../../machine/use-machine';
-import { toLocalizableError } from '../../utils/form-error';
+import { toLocalizableError } from '../../utils/errors';
 
 export interface ConfirmationContext {
   run: () => Promise<void>;
-  error: LocalizableError | undefined;
+  error: ErrorDescription | undefined;
 }
 
 export type ConfirmationEvent = { type: 'OPEN' } | { type: 'CONFIRM'; run: () => Promise<void> } | { type: 'CANCEL' };

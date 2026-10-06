@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { deferred } from '../../__tests__/async';
 import type { ReverificationController } from '../../features/reverification';
-import { SaveError } from '../../utils/form-error';
+import { SaveError } from '../../utils/errors';
 import { useDestructiveController } from './destructive.controller';
 
 const idleReverification = { status: 'idle', visible: false, reset: vi.fn() } as ReverificationController;
