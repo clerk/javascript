@@ -56,7 +56,11 @@ const NextClientClerkProvider = <TUi extends Ui = Ui>(props: NextClerkProviderPr
         if ((nextVersion.startsWith('15') || nextVersion.startsWith('16')) && intent === 'sign-out') {
           resolve(); // noop
         } else {
-          void invalidateCacheAction().then(() => resolve());
+          // Resolve even if the action rejects (for example, after a redeploy), so `setActive` and `signOut` do not hang.
+          void invalidateCacheAction().then(
+            () => resolve(),
+            () => resolve(),
+          );
         }
       });
     };
