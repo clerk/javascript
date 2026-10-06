@@ -1,9 +1,9 @@
-import { Select } from '@clerk/headless/select';
+import { Select } from '@clerk/mosaic/primitives/select';
 
 import type { StoryMeta } from '@/lib/types';
 
 // Headless primitives ship no styles. This single demo renders the primitive raw —
-// unstyled — so it faithfully reflects what `@clerk/headless` provides: behavior, state,
+// unstyled — so it faithfully reflects what the primitive provides: behavior, state,
 // positioning, keyboard navigation, and ARIA wiring via the `data-*` attributes each
 // part emits, with zero appearance. It is embedded once into the overview via `<Story>`
 // in the MDX (the one thing prose can't convey: that it opens and selecting updates the
@@ -11,8 +11,9 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Select',
-  source: 'packages/headless/src/primitives/select/index.ts',
+  source: 'packages/mosaic/src/primitives/select/index.ts',
 };
 
 export function Default() {

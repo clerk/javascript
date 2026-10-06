@@ -5,6 +5,7 @@
 # Environment files
 .env
 .env.*
+!.env.example
 
 # Secrets directory
 secrets/

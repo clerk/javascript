@@ -45,13 +45,15 @@ export interface SignUpFutureAdditionalParams {
 
 /** @generateWithEmptyComment */
 export interface SignUpFutureCreateParams extends SignUpFutureAdditionalParams {
+  /** The timezone to assign to the user. If omitted, defaults to the browser's timezone. */
+  timezone?: string;
   /**
    * The strategy to use for the sign-up. The following strategies are supported:
    * <ul>
    * <li>`'oauth_<provider>'`: The user will be authenticated with their [social connection account](https://clerk.com/docs/guides/configure/auth-strategies/social-connections/overview). See a list of [supported values for `<provider>`](https://clerk.com/docs/reference/types/sso).</li>
    * <li>`'enterprise_sso'`: The user will be authenticated either through SAML or OIDC depending on the configuration of their [enterprise SSO account](https://clerk.com/docs/guides/configure/auth-strategies/enterprise-connections/overview).</li>
    * <li>`'ticket'`: The user will be authenticated via the ticket _or token_ generated from the Backend API.</li>
-   * <li>`'google_one_tap'`: The user will be authenticated with the Google One Tap UI. It's recommended to use [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/components/authentication/google-one-tap#authenticate-with-google-one-tap) instead, as it will also set the user's current session as active for you.</li>
+   * <li>`'google_one_tap'`: The user will be authenticated with the Google One Tap UI. It's recommended to use [`authenticateWithGoogleOneTap()`](https://clerk.com/docs/reference/components/authentication/google-one-tap#authenticatewithgoogleonetap) instead, as it will also set the user's current session as active for you.</li>
    * <li>`'oauth_token_apple'`: The user will be authenticated using a native [Sign in with Apple](https://clerk.com/docs/guides/configure/auth-strategies/sign-in-with-apple) identity token.</li>
    * <li>`'phone_code'`: The user will receive a one-time code via SMS to verify their phone number.</li>
    * </ul>
@@ -217,7 +219,7 @@ export interface SignUpFuturePhoneCodeVerifyParams {
 /** @generateWithEmptyComment */
 export interface SignUpFutureSSOParams extends SignUpFutureAdditionalParams {
   /**
-   * The strategy to use for authentication. Either [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#o-auth-strategy) or [`EnterpriseSSOStrategy`](https://clerk.com/docs/reference/types/sso#enterprise-sso-strategy).
+   * The strategy to use for authentication. Either [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#oauthstrategy) or [`EnterpriseSSOStrategy`](https://clerk.com/docs/reference/types/sso#enterprisessostrategy).
    */
   strategy: string;
   /**
@@ -336,7 +338,7 @@ export interface SignUpFutureVerifications {
   sendEmailCode: () => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Verifies a code sent with the [`verifications.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-send-email-code) method.
+   * Verifies a code sent with the [`verifications.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-sendemailcode) method.
    */
   verifyEmailCode: (params: SignUpFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -346,7 +348,7 @@ export interface SignUpFutureVerifications {
   sendEmailLink: (params: SignUpFutureEmailLinkSendParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Will wait for email link verification to complete or expire after calling [`verifications.sendEmailLink()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-send-email-link).
+   * Will wait for email link verification to complete or expire after calling [`verifications.sendEmailLink()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-sendemaillink).
    */
   waitForEmailLinkVerification: () => Promise<{ error: ClerkError | null }>;
 
@@ -356,7 +358,7 @@ export interface SignUpFutureVerifications {
   sendPhoneCode: (params?: SignUpFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Verifies a code sent with the [`verifications.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-send-phone-code) method.
+   * Verifies a code sent with the [`verifications.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-up-future#verifications-sendphonecode) method.
    */
   verifyPhoneCode: (params: SignUpFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 }
@@ -474,10 +476,15 @@ export interface SignUpFutureResource {
    * The locale of the user in [BCP 47](https://developer.mozilla.org/en-US/docs/Glossary/BCP_47_language_tag) format (e.g., "en-US", "fr-FR"), or `null` if not set.
    */
   readonly locale: string | null;
+  readonly timezone: string | null;
 
   /**
    * The current protect check challenge, if one is pending. Only populated when Protect mid-flow
    * challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it.
+   * When Clerk's UI is loaded, the sign-up methods resolve the challenge in a modal before they
+   * return. Otherwise, run the challenge yourself and submit its proof token with `submitProtectCheck()`.
+   * When `sso()` redirects to the identity provider, the challenge runs on the way back through
+   * `<HandleSSOCallback />` instead.
    */
   readonly protectCheck: ProtectCheckResource | null;
 
@@ -532,7 +539,7 @@ export interface SignUpFutureResource {
   web3: (params: SignUpFutureWeb3Params) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively.
+   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively. Call it after running the challenge yourself when Clerk's UI isn't loaded. With the UI loaded, the other sign-up methods resolve the challenge in a modal before they return. When `sso()` redirects to the identity provider, the challenge runs on the way back through `<HandleSSOCallback />` instead.
    */
   submitProtectCheck: (params: SignUpFutureSubmitProtectCheckParams) => Promise<{ error: ClerkError | null }>;
 

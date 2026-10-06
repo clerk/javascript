@@ -1,4 +1,5 @@
 import { getAlternativePhoneCodeProviderData } from '@clerk/shared/alternativePhoneCode';
+import { inertProps } from '@clerk/shared/inert';
 import { ERROR_CODES, SIGN_UP_MODES } from '@clerk/shared/internal/clerk-js/constants';
 import { clerkInvalidFAPIResponse } from '@clerk/shared/internal/clerk-js/errors';
 import { getClerkQueryParam, removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
@@ -19,6 +20,7 @@ import { Form } from '@/ui/elements/Form';
 import { Header } from '@/ui/elements/Header';
 import { LoadingCard } from '@/ui/elements/LoadingCard';
 import { SocialButtonsReversibleContainerWithDivider } from '@/ui/elements/ReversibleContainer';
+import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 import { handleError } from '@/ui/utils/errorHandler';
 import { isMobileDevice } from '@/ui/utils/isMobileDevice';
 import type { FormControlState } from '@/ui/utils/useFormControl';
@@ -26,6 +28,7 @@ import { buildRequest, useFormControl } from '@/ui/utils/useFormControl';
 
 import type { SignInStartIdentifier } from '../../common';
 import {
+  ActionBlockedCard,
   getIdentifierControlDisplayValues,
   groupIdentifiers,
   withRedirectToAfterSignIn,
@@ -38,13 +41,14 @@ import { useLoadingStatus } from '../../hooks';
 import { useSupportEmail } from '../../hooks/useSupportEmail';
 import { useTotalEnabledAuthMethods } from '../../hooks/useTotalEnabledAuthMethods';
 import { useRouter } from '../../router';
-import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
-import { navigateOnSignInProtectGate } from './handleProtectCheck';
 import {
-  hasMultipleEnterpriseConnections,
-  SIGN_IN_RESET_PASSWORD_INTENT_PARAM,
-  useHandleAuthenticateWithPasskey,
-} from './shared';
+  hasOnlyEnterpriseSSOFirstFactors,
+  shouldHandOffToEnterpriseConnection,
+  shouldHandOffUnidentifiedToEnterpriseConnection,
+} from './enterpriseSSOFactors';
+import { handleCombinedFlowTransfer } from './handleCombinedFlowTransfer';
+import { isProtectCheckRequiredError, navigateOnSignInProtectGate } from './handleProtectCheck';
+import { SIGN_IN_RESET_PASSWORD_INTENT_PARAM, useHandleAuthenticateWithPasskey } from './shared';
 import { SignInAlternativePhoneCodePhoneNumberCard } from './SignInAlternativePhoneCodePhoneNumberCard';
 import { SignInSocialButtons } from './SignInSocialButtons';
 import {
@@ -60,10 +64,12 @@ const useAutoFillPasskey = () => {
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
   const { userSettings } = useEnvironment();
   const { passkeySettings, attributes } = userSettings;
+  // @ts-expect-error - This is not a public API
+  const { __internal_isWebAuthnAutofillSupported } = useClerk();
 
   useEffect(() => {
     async function runAutofillPasskey() {
-      const _isSupported = await isWebAuthnAutofillSupported();
+      const _isSupported = await (__internal_isWebAuthnAutofillSupported ?? isWebAuthnAutofillSupported)();
       setIsSupported(_isSupported);
       if (!_isSupported) {
         return;
@@ -105,7 +111,9 @@ function SignInStartInternal(): JSX.Element {
   const { isWebAuthnAutofillSupported } = useAutoFillPasskey();
   const onSecondFactor = () => navigate('factor-two');
   const authenticateWithPasskey = useHandleAuthenticateWithPasskey(onSecondFactor, 'protect-check');
-  const isWebSupported = isWebAuthnSupported();
+  // @ts-expect-error - This is not a public API
+  const { __internal_isWebAuthnSupported } = clerk;
+  const isWebSupported = (__internal_isWebAuthnSupported ?? isWebAuthnSupported)();
 
   const onlyPhoneNumberInitialValueExists =
     !!ctx.initialValues?.phoneNumber && !(ctx.initialValues.emailAddress || ctx.initialValues.username);
@@ -237,7 +245,7 @@ function SignInStartInternal(): JSX.Element {
         }
         switch (res.status) {
           case 'needs_first_factor': {
-            if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+            if (!shouldHandOffToEnterpriseConnection(res)) {
               return navigate('factor-one');
             }
 
@@ -409,12 +417,12 @@ function SignInStartInternal(): JSX.Element {
       switch (res.status) {
         case 'needs_identifier':
           // Check if we need to initiate an enterprise sso flow
-          if (res.supportedFirstFactors?.some(ff => ff.strategy === 'enterprise_sso')) {
+          if (shouldHandOffUnidentifiedToEnterpriseConnection(res)) {
             await authenticateWithEnterpriseSSO();
           }
           break;
         case 'needs_first_factor': {
-          if (!hasOnlyEnterpriseSSOFirstFactors(res) || hasMultipleEnterpriseConnections(res.supportedFirstFactors)) {
+          if (!shouldHandOffToEnterpriseConnection(res)) {
             if (options?.resetPasswordIntent) {
               return navigate('factor-one', {
                 searchParams: new URLSearchParams({ [SIGN_IN_RESET_PASSWORD_INTENT_PARAM]: 'true' }),
@@ -423,7 +431,8 @@ function SignInStartInternal(): JSX.Element {
             return navigate('factor-one');
           }
 
-          return authenticateWithEnterpriseSSO();
+          // Awaited so a failed hand-off reaches the catch below instead of escaping this try.
+          return await authenticateWithEnterpriseSSO();
         }
         case 'needs_second_factor':
           return navigate('factor-two');
@@ -450,13 +459,23 @@ function SignInStartInternal(): JSX.Element {
     const redirectUrl = ctx.ssoCallbackUrl;
     const redirectUrlComplete = ctx.afterSignInUrl || '/';
 
-    return signIn.authenticateWithRedirect({
-      strategy: 'enterprise_sso',
-      redirectUrl,
-      redirectUrlComplete,
-      oidcPrompt: ctx.oidcPrompt,
-      continueSignIn: true,
-    });
+    try {
+      await signIn.authenticateWithRedirect({
+        strategy: 'enterprise_sso',
+        redirectUrl,
+        redirectUrlComplete,
+        oidcPrompt: ctx.oidcPrompt,
+        continueSignIn: true,
+      });
+    } catch (err) {
+      // Preparing the hand-off can itself raise a challenge. No redirect was issued and the sign-in
+      // is sitting on the gate instead. Handled here because the callers' recovery path drops
+      // errors that didn't come from the API.
+      if (isProtectCheckRequiredError(err) && navigateOnSignInProtectGate(signIn, navigate, 'protect-check')) {
+        return;
+      }
+      throw err;
+    }
   };
 
   const attemptToRecoverFromSignInError = async (e: any) => {
@@ -531,6 +550,7 @@ function SignInStartInternal(): JSX.Element {
         signUpMode: userSettings.signUp.mode,
         redirectUrl,
         redirectUrlComplete,
+        oidcPrompt: ctx.oidcPrompt,
         navigateOnSetActive,
         passwordEnabled: userSettings.attributes.password?.required ?? false,
         alternativePhoneCodeChannel:
@@ -589,6 +609,11 @@ function SignInStartInternal(): JSX.Element {
       ? validLastAuthenticationStrategies?.has(lastAuthenticationStrategy)
       : false;
 
+  const blockedDetails = actionBlockedDetailsFrom(card.rawError);
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
+  }
+
   return (
     <Flow.Part part='start'>
       {!alternativePhoneCodeProvider ? (
@@ -620,8 +645,7 @@ function SignInStartInternal(): JSX.Element {
             <Col
               elementDescriptor={descriptors.main}
               gap={6}
-              // @ts-ignore - `inert` is not yet in the installed React types
-              inert={captchaIsInteractive ? '' : undefined}
+              {...inertProps(captchaIsInteractive)}
               // `display:none` (not `visibility:hidden`) so the collapsed column leaves flex flow and
               // contributes no `gap` gutter to `Card.Content` — otherwise it injects empty space above
               // the spotlighted captcha. Subtree stays mounted (form state preserved); `inert` is then
@@ -713,14 +737,6 @@ function SignInStartInternal(): JSX.Element {
     </Flow.Part>
   );
 }
-
-const hasOnlyEnterpriseSSOFirstFactors = (signIn: SignInResource): boolean => {
-  if (!signIn.supportedFirstFactors?.length) {
-    return false;
-  }
-
-  return signIn.supportedFirstFactors.every(ff => ff.strategy === 'enterprise_sso');
-};
 
 const InstantPasswordRow = ({
   field,

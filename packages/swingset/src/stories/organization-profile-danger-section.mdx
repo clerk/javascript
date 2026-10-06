@@ -1,0 +1,38 @@
+import * as Stories from './organization-profile-danger-section.stories';
+
+# OrganizationProfileDangerSection
+
+Leaving and deleting the active organization. Both ask for the organization's name to be typed out.
+Leaving is offered to every member. Deleting needs the `org:sys_profile:delete` permission and admin
+delete turned on for the instance. After either one, the section refreshes the user's organization
+lists and navigates to `afterLeaveOrganizationUrl`, falling back to the instance's setting.
+
+Below `26rem` of group width, through `Section.Item`'s `wrap`, each action wraps under its description.
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Destructive', href: '/blocks/destructive', layer: 'Blocks' },
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+  ]}
+/>
+
+## A failed action
+
+The dialog stays up and renders the API error under the confirmation field.
+
+<Story
+  name='WithError'
+  storyModule={Stories}
+/>
+
+## One action only
+
+A row appears only when its controller is given, so a member who cannot delete the organization is
+left with leaving it.
+
+<Story
+  name='LeaveOnly'
+  storyModule={Stories}
+/>

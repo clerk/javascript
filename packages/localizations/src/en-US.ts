@@ -2,6 +2,11 @@ import type { LocalizationResource } from '@clerk/shared/types';
 
 export const enUS: LocalizationResource = {
   locale: 'en-US',
+  actionBlocked: {
+    subtitle: 'For your security, this request could not be completed.',
+    title: "We couldn't complete this request",
+    traceIdLabel: 'Reference',
+  },
   apiKeys: {
     action__add: 'Add new key',
     action__search: 'Search keys',
@@ -221,6 +226,117 @@ export const enUS: LocalizationResource = {
     yearPerUnit: 'Year per {{unitName}}',
     years: 'Years',
   },
+  configureDirectorySync: {
+    attributeMappingStep: {
+      columns: {
+        clerkAttribute: 'User attributes',
+        directoryAttribute: 'Directory attributes',
+      },
+      subtitle: 'Standard directory attributes are pre-configured. Attributes not listed here are ignored.',
+      title: 'Attribute review',
+    },
+    configureStep: {
+      actionLabel__generateToken: 'Generate new token',
+      actionLabel__replaceKey: 'Replace JSON key',
+      actionLabel__retry: 'Try again',
+      actionLabel__uploadKey: 'Upload JSON key',
+      badge__credentialsConfigured: 'Configured',
+      badge__credentialsMissing: 'Not configured',
+      domainsLabel: 'Domains:',
+      error__invalidKeyFile: 'That file is not valid JSON. Upload the key file downloaded from Google.',
+      error__ssoRequired: {
+        subtitle:
+          'Directory Sync requires an SSO connection. Configure and verify your SSO connection first, then return here to set up provisioning.',
+        title: 'Single Sign-On is not configured yet',
+      },
+      formFieldHint__subjectEmail: 'The directory is read as this admin. They must be an active Workspace admin.',
+      formFieldInputPlaceholder__subjectEmail: 'admin@yourcompany.com',
+      formFieldInputPlaceholder__token: 'Generate a new token to reveal it',
+      formFieldLabel__endpointUrl: 'SCIM endpoint URL',
+      formFieldLabel__serviceAccountKey: 'Service account key',
+      formFieldLabel__subjectEmail: 'Google Workspace admin email',
+      formFieldLabel__token: 'Bearer token',
+      instructions: {
+        actionLabel__toggle: 'View instructions',
+        custom: {
+          step1: 'Create a SCIM 2.0 provisioning integration in your identity provider.',
+          step2: 'Paste the SCIM endpoint URL as the base URL for the integration.',
+          step3: 'Configure the integration to authenticate with the bearer token below.',
+          step4: 'Enable provisioning for user create, update, and deactivate events.',
+        },
+        entra: {
+          step1:
+            'In the Microsoft Entra admin center, open Enterprise applications and select the application used for your SSO connection.',
+          step2:
+            'Under Connectivity, paste the SCIM endpoint URL as the Tenant URL and the bearer token as the Secret Token, then select Test Connection.',
+          step3: 'Select Provisioning and set the provisioning mode to Automatic.',
+          step4: 'Assign the users and groups to provision, then turn provisioning On.',
+        },
+        google: {
+          step1:
+            'In the Google Cloud console, create a project and a service account, then create a JSON key for it and download the file.',
+          step2: 'Enable the Admin SDK API for that project.',
+          step3:
+            'In the Google Admin console, open Security, then API controls, then Domain-wide delegation, and add the service account using its client ID.',
+          step4:
+            'Grant it the read-only directory scopes: https://www.googleapis.com/auth/admin.directory.user.readonly and https://www.googleapis.com/auth/admin.directory.group.readonly.',
+          step5: 'Upload the JSON key below and enter the email of a Google Workspace admin to read the directory as.',
+        },
+        okta: {
+          step1: 'In the Okta Admin Console, open the application used for your SSO connection.',
+          step2: 'Open the Provisioning tab and select the Integration setting.',
+          step3: 'Paste the SCIM endpoint URL and bearer token found below.',
+          step4: 'For provisioning actions, enable pushing of New Users, Profile Updates, and Groups.',
+        },
+      },
+      notice__tokenShownOnce: 'This token is only shown once. Generate a new token if you lose it.',
+      subtitle: 'Add these credentials to your identity provider to configure Directory Sync',
+      title: 'Configure',
+      warning__ssoInactive:
+        "This SSO connection is configured but not yet active. You can provision members, but they won't be able to sign in until it's active.",
+    },
+    navbar: {
+      title: 'Configure Directory Sync',
+    },
+    providers: {
+      custom: 'Custom SCIM provider',
+      entra: 'Microsoft Entra ID',
+      google: 'Google Workspace',
+      okta: 'Okta Workforce',
+    },
+    stepper: {
+      attributes: 'Attributes',
+      configure: 'Configure',
+      test: 'Test',
+    },
+    testStep: {
+      actionLabel__complete: 'Complete',
+      actionLabel__syncNow: 'Sync now',
+      badge__active: 'Active',
+      badge__deprovisioned: 'Deprovisioned',
+      description: 'Users appear here as your identity provider provisions them, most recent activity first.',
+      description__pull:
+        'Your directory is read on a schedule. Start a sync to pull users now, most recent activity first.',
+      empty__noUsersProvisioned: 'No users have been provisioned yet.',
+      empty__waitingForFirstSync: 'Waiting for the first sync to finish…',
+      empty__waitingForFirstUser: 'Waiting for the first provisioned user…',
+      error__lastSyncFailed: 'The last sync failed',
+      error__loadUsers: 'Could not load provisioned users',
+      error__syncFailed: 'Could not start the sync. Check your connection and try again.',
+      note: 'only users with an email address from a configured domain will be processed.',
+      noteLabel: 'Note:',
+      subtitle: 'Assign or push a test user from {{provider}} to verify provisioning.',
+      syncRow: {
+        neverSynced: 'Not synced yet',
+        title: 'Directory sync',
+      },
+      syncStatus__cancelled: 'Cancelled',
+      syncStatus__failed: 'Failed',
+      syncStatus__running: 'Running',
+      syncStatus__succeeded: 'Succeeded',
+      title: 'Test provisioning',
+    },
+  },
   configureSSO: {
     activate: {
       activateButton: 'Activate SSO',
@@ -235,7 +351,8 @@ export const enUS: LocalizationResource = {
     changeProviderDialog: {
       cancelButton: 'Cancel',
       confirmButton: 'Change provider',
-      subtitle: 'Switching to {{provider}} will remove your {{currentProvider}} connection and require a new setup.',
+      subtitle:
+        'Switching to {{provider}} will remove the {{currentProvider}} connection "{{name}}" and require a new setup.',
       title: 'Change provider to {{provider}}',
     },
     configureStep: {
@@ -383,7 +500,7 @@ export const enUS: LocalizationResource = {
             },
             signingCertificate: {
               fileUploaded: 'File uploaded',
-              label: 'Signing certificate',
+              label: 'Signing certificates',
               removeFile: 'Remove file',
               replaceFile: 'Replace file',
               uploadFile: 'Upload file',
@@ -466,7 +583,7 @@ export const enUS: LocalizationResource = {
             },
             signingCertificate: {
               fileUploaded: 'File uploaded',
-              label: 'Signing certificate',
+              label: 'Signing certificates',
               removeFile: 'Remove file',
               replaceFile: 'Replace file',
               uploadFile: 'Upload file',
@@ -583,7 +700,7 @@ export const enUS: LocalizationResource = {
             },
             signingCertificate: {
               fileUploaded: 'File uploaded',
-              label: 'Signing certificate',
+              label: 'Signing certificates',
               removeFile: 'Remove file',
               replaceFile: 'Replace file',
               uploadFile: 'Upload file',
@@ -705,7 +822,7 @@ export const enUS: LocalizationResource = {
             },
             signingCertificate: {
               fileUploaded: 'File uploaded',
-              label: 'Signing certificate',
+              label: 'Signing certificates',
               removeFile: 'Remove file',
               replaceFile: 'Replace file',
               uploadFile: 'Upload file',
@@ -731,6 +848,12 @@ export const enUS: LocalizationResource = {
         title: 'Unsupported provider',
       },
     },
+    connectionScopeBanner: {
+      subtitle__adding: 'This organization already has {{count}} SSO connections.',
+      subtitle__editing: 'This organization has {{count}} SSO connections. Changes here apply only to this connection.',
+      title__adding: 'Adding a new SSO connection',
+      title__editing: 'Editing "{{name}}"',
+    },
     missingManageEnterpriseConnectionsPermission: {
       subtitle: "Contact your organization's administrator to upgrade your permissions.",
       title: 'You do not have permission to manage Single Sign-on (SSO)',
@@ -740,9 +863,11 @@ export const enUS: LocalizationResource = {
     },
     organizationDomainsStep: {
       domainCard: {
+        badge__claimed: 'Used by another connection',
         badge__expired: 'Expired',
         badge__unverified: 'Unverified',
         badge__verified: 'Verified',
+        checkboxLabel: 'Use {{domain}} for this connection',
         expiredAtLabel:
           "Domain verification expired on {{ date | shortDate('en-US') }}. Verify again to generate a new DNS record.",
         expiredLabel: 'Domain verification expired. Verify again to generate a new DNS record.',
@@ -772,7 +897,8 @@ export const enUS: LocalizationResource = {
         subtitle__inactive: "You're about to remove {{domain}} from this enterprise connection.",
         title: 'Removing domain',
       },
-      subtitle: 'Add and verify ownership of the domains your organization uses to sign in.',
+      subtitle:
+        'Add and verify ownership of the domains your organization uses to sign in, then pick the ones this connection covers.',
       title: 'Add SSO domains',
     },
     resetConnectionDialog: {
@@ -781,7 +907,7 @@ export const enUS: LocalizationResource = {
       confirmationFieldPlaceholder: '{{name}}',
       resetButton: 'Reset connection',
       subtitle:
-        'Are you sure you want to reset the connection? This action is irreversible and you will have to configure all steps again',
+        'Are you sure you want to reset the connection "{{name}}"? This action is irreversible and you will have to configure all steps again',
       title: 'Reset connection',
     },
     selectProviderStep: {
@@ -799,6 +925,17 @@ export const enUS: LocalizationResource = {
       subtitle: "You'll configure the connection details in the next step",
       title: 'Select your identity provider',
       warning: 'Once a provider is selected you cannot change again until the configuration is over',
+    },
+    signingCertificates: {
+      addCertificate: 'Add certificate',
+      expired: 'Expired {{date}}',
+      expires: 'Expires {{date}}',
+      expiryAfterSave: 'Expiry shows after you save.',
+      fileUnreadable: 'The file could not be read. Try again.',
+      notACertificate: 'One of the uploaded files is not a certificate.',
+      primary: 'Primary',
+      primaryTooltip: 'Checked first when verifying a sign-in. Every certificate in this list is trusted.',
+      removeCertificate: 'Remove certificate',
     },
     testConfigurationStep: {
       error__noSuccessfulTestRun:
@@ -895,6 +1032,8 @@ export const enUS: LocalizationResource = {
   formButtonPrimary: 'Continue',
   formButtonPrimary__verify: 'Verify',
   formFieldAction__forgotPassword: 'Forgot password?',
+  formFieldAction__hidePassword: 'Hide password',
+  formFieldAction__showPassword: 'Show password',
   formFieldError__matchingPasswords: 'Passwords match.',
   formFieldError__notMatchingPasswords: "Passwords don't match.",
   formFieldError__verificationLinkExpired: 'The verification link expired. Please request a new link.',
@@ -977,6 +1116,47 @@ export const enUS: LocalizationResource = {
     viewFullUrl: 'View full URL',
     warning:
       'Make sure that you trust {{applicationName}} ({{domainAction}}). You may be sharing sensitive data with this site or app.',
+  },
+  oauthDeviceVerification: {
+    action__tryAnotherCode: 'Enter another code',
+    confirmation: {
+      action__approve: 'Approve',
+      action__deny: 'Deny',
+      scopeListTitle: 'This will allow {{applicationName}} access to:',
+      subtitle: 'Confirm this request for {{identifier}}',
+      title: 'Allow {{applicationName}} to access your account?',
+      warning: 'Only approve this request if you started it on your other device.',
+    },
+    error: {
+      expiredSubtitle: 'Start over on your device.',
+      expiredTitle: 'This code expired',
+      genericSubtitle: 'Check your connection and try again.',
+      genericTitle: 'We could not verify this code',
+      invalidCode: 'Enter a valid 8-character code.',
+      rateLimitedSubtitle: 'Wait before trying another code.',
+      rateLimitedTitle: 'Too many attempts',
+      unknownCode: "We couldn't find that code. Check it and try again.",
+    },
+    start: {
+      action__continue: 'Continue',
+      subtitle: 'Enter the code shown on the device or app you want to authorize.',
+      title: 'Verify a device',
+      userCodeLabel: 'Device code',
+    },
+    status: {
+      alreadyApprovedSubtitle: 'Return to your device to continue.',
+      alreadyApprovedTitle: "You've approved this",
+      alreadyDecidedSubtitle: 'It was decided elsewhere. Return to your device.',
+      alreadyDecidedTitle: 'This request was already completed',
+      alreadyDeniedSubtitle: 'Start over on your device if you want to try again.',
+      alreadyDeniedTitle: 'This request was denied',
+      approvedSubtitle: 'You approved this request. Return to your device to continue.',
+      approvedTitle: 'Device approved',
+      consumedSubtitle: 'Your device is authorized. You can close this window.',
+      consumedTitle: 'This code has already been used',
+      deniedSubtitle: 'You denied this request. Return to your device.',
+      deniedTitle: 'Access denied',
+    },
   },
   organizationList: {
     action__createOrganization: 'Create organization',
@@ -1191,11 +1371,144 @@ export const enUS: LocalizationResource = {
       title: 'Remove domain',
     },
     securityPage: {
+      connectionPage: {
+        actions: {
+          activate: 'Activate',
+          continueSetup: 'Continue setup',
+        },
+        dangerZone: {
+          deactivateButton: 'Deactivate connection',
+          removeButton: 'Remove connection',
+          title: 'Danger zone',
+        },
+        domains: {
+          title: 'Domains',
+        },
+        identityProvider: {
+          certificateExpires: 'Certificate expires',
+          certificates: 'Certificates',
+          certificatesCount: '{{count}} certificates',
+          certificatesSummary: '{{count}} certificates, earliest expires {{date}}',
+          certificatesSummaryExpired: '{{count}} certificates, one expired {{date}}',
+          clientSecret: {
+            placeholder: 'Leave empty to keep the current secret',
+          },
+          editButton: 'Edit',
+          form: {
+            title: 'Edit identity provider',
+          },
+          title: 'Identity provider',
+        },
+        name: {
+          editButton: 'Edit',
+          form: {
+            title: 'Rename connection',
+          },
+          title: 'Name',
+        },
+        serviceProvider: {
+          acsUrl: 'Assertion consumer service (ACS) URL',
+          entityId: 'Entity ID',
+          metadataUrl: 'Metadata URL',
+          redirectUri: 'Redirect URI',
+          title: 'Service provider',
+        },
+        settings: {
+          allowAdditionalIdentifiers: {
+            description: 'Members may keep other sign-in methods.',
+            label: 'Allow additional identifiers',
+          },
+          allowIdpInitiated: {
+            description: 'Sign-in may start from the identity provider.',
+            label: 'Allow IdP-initiated flow',
+          },
+          allowSubdomains: {
+            description: "Also match subdomains of the connection's domains.",
+            label: 'Allow subdomains',
+          },
+          forceAuthn: {
+            description: 'Re-authenticate at the identity provider on every sign-in.',
+            label: 'Force re-authentication',
+          },
+          syncUserAttributes: {
+            description: 'Refresh name and email from the identity provider on each sign-in.',
+            label: 'Sync user attributes',
+          },
+          title: 'Settings',
+        },
+      },
+      directorySyncSection: {
+        badge__active: 'Active',
+        badge__inactive: 'Inactive',
+        badge__ssoRequired: 'SSO required',
+        description: 'Keep organization members synced with your identity provider. Requires an SSO connection.',
+        error__load: 'Could not load Directory Sync',
+        menuAction__activate: 'Activate',
+        menuAction__deactivate: 'Deactivate',
+        menuAction__edit: 'Edit',
+        menuAction__remove: 'Remove',
+        primaryButton__configure: 'Configure',
+        removeDialog: {
+          confirmButton: 'Remove Directory Sync',
+          subtitle:
+            'Are you sure you want to remove Directory Sync? This action is irreversible: the directory and its bearer token are deleted and your identity provider will no longer be able to provision members. Existing members keep their memberships.',
+          title: 'Remove Directory Sync',
+        },
+        title: 'Directory Sync',
+      },
       removeDialog: {
         confirmButton: 'Remove connection',
         subtitle:
-          'Are you sure you want to remove the connection? This action is irreversible and deletes the connection and all of its configuration.',
+          'Are you sure you want to remove the connection "{{name}}"? This action is irreversible and deletes the connection and all of its configuration.',
         title: 'Remove SSO connection',
+      },
+      ssoBypassPage: {
+        action__add: 'Add',
+        action__search: 'Search users',
+        addForm: {
+          emailPlaceholder: "Enter the member's email address",
+          error__allAlreadyAdded: 'Everyone with that role is already on the allow list.',
+          error__alreadyAdded: 'This member is already on the allow list.',
+          error__memberNotFound: 'No member of this organization has that email address.',
+          modeLabel: 'Add by',
+          mode__email: 'Email',
+          mode__role: 'Role',
+          roleOption: '{{role}} ({{count}})',
+          roleWarning: 'This list does not sync, members are managed manually.',
+          submitButton: 'Add members',
+          subtitle: 'Members on this list can sign in with an email code when SSO is unavailable.',
+          title: 'Add members',
+        },
+        bulkResult: {
+          added: 'Added {{count}} members',
+          addedMember: 'Added member successfully',
+          added__one: 'Added 1 member',
+          domainNotServed:
+            '{{count}} members could not be added because their email address is not served by a connection.',
+          domainNotServed__one:
+            '1 member could not be added because their email address is not served by a connection.',
+          notMember: '{{count}} members could not be added because they are no longer in the organization.',
+          notMember__one: '1 member could not be added because they are no longer in the organization.',
+          unknown: '{{count}} members could not be added.',
+          unknown__one: '1 member could not be added.',
+        },
+        table: {
+          emptyState: 'No members on the allow list',
+          emptyState__search: 'No members match your search',
+          header__actions: 'Actions',
+          header__user: 'User',
+          menuAction__remove: 'Remove',
+        },
+        title: 'SSO bypass',
+      },
+      ssoBypassSection: {
+        allowlistCount: '{{count}} members',
+        allowlistCount__one: '1 member',
+        allowlistLabel: 'Allow list:',
+        description: 'Members on this list can sign in with an email code when SSO is unavailable.',
+        error__load: 'Could not load the SSO allow list',
+        menuAction__manage: 'Manage',
+        title: 'SSO bypass',
       },
       ssoSection: {
         badge__active: 'Active',
@@ -1205,9 +1518,12 @@ export const enUS: LocalizationResource = {
         descriptionLine1: 'Require members with a matching email domain to sign in through your identity provider.',
         domainLabel: 'Domains:',
         menuAction__activate: 'Activate',
+        menuAction__continue: 'Continue configuration',
         menuAction__deactivate: 'Deactivate',
         menuAction__edit: 'Edit',
         menuAction__remove: 'Remove',
+        primaryButton__addConnection: 'Add connection',
+        primaryButton__configure: 'Configure',
         primaryButton__continueConfiguration: 'Continue configuration',
         primaryButton__startConfiguration: 'Start configuration',
         title: 'SSO',
@@ -1441,8 +1757,11 @@ export const enUS: LocalizationResource = {
       title: 'Check your email',
     },
     enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
+      subtitle: 'Select an enterprise account to continue.',
+      title: 'Choose an account',
+    },
+    enterpriseSSO: {
+      formButtonPrimary: 'Continue with SSO',
     },
     forgotPassword: {
       formTitle: 'Reset password code',
@@ -1508,6 +1827,15 @@ export const enUS: LocalizationResource = {
     },
     resetPasswordMfa: {
       detailsLabel: 'We need to verify your identity before resetting your password.',
+    },
+    ssoBypass: {
+      actionLink: "Can't use SSO?",
+      code: {
+        resendButton: "Didn't receive a code? Resend",
+        subtitle: 'to continue to {{applicationName}}',
+        title: 'Check your email',
+      },
+      notice: 'Your organization requires single sign-on. Continuing without it is recorded.',
     },
     start: {
       actionLink: 'Sign up',
@@ -1584,8 +1912,8 @@ export const enUS: LocalizationResource = {
       },
     },
     enterpriseConnections: {
-      subtitle: 'Select the enterprise account with which you wish to continue.',
-      title: 'Choose your enterprise account',
+      subtitle: 'Select an enterprise account to continue.',
+      title: 'Choose an account',
     },
     legalConsent: {
       checkbox: {
@@ -1839,12 +2167,21 @@ export const enUS: LocalizationResource = {
     protect_check_execution_failed: "Verification didn't complete. Please try again.",
     protect_check_invalid_script: "Couldn't load verification. Please contact support if this persists.",
     protect_check_invalid_sdk_url: "Verification couldn't start. Please contact support.",
+    protect_check_required:
+      "This sign-in needs an extra verification step that can't be shown here. Please try again or use a different sign-in method.",
     protect_check_script_load_failed:
       "Couldn't load verification. This may be caused by a network issue or a Content Security Policy that blocks the verification script. Please try again or contact support.",
     protect_check_timed_out: "Verification didn't complete in time. Please try again.",
     protect_check_unsupported_environment:
       "Verification isn't supported in this environment. Please continue in a standard browser or contact support.",
     session_exists: undefined,
+    sso_bypass_domain_not_served:
+      'This member could not be added because their email address is not served by a connection.',
+    ticket_expired_code: 'This link has expired. Please start again or request a new link.',
+    ticket_invalid_code:
+      'This link is no longer valid or has already been used. Please start again or request a new link.',
+    too_many_unverified_identifications:
+      'Too many verifications are pending on this account. Remove an unverified email address, phone number, or wallet you no longer need, or wait a few minutes for an incomplete passkey setup to expire, then try again.',
     web3_missing_identifier: 'A Web3 Wallet extension cannot be found. Please install one to continue.',
     web3_signature_request_rejected: 'You have rejected the signature request. Please try again to continue.',
     web3_solana_signature_generation_failed:

@@ -28,7 +28,7 @@ describe('redirect(redirectAdapter)', () => {
       } as any);
 
       expect(() => redirectToSignIn({ returnBackUrl })).toThrowError(
-        '@clerk/backend: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
+        '@clerk/backend: Clerk keys are missing from your environment.\n\nTo create a new Clerk app, run:\nnpx clerk@latest init',
       );
     });
   });
@@ -258,7 +258,7 @@ describe('redirect(redirectAdapter)', () => {
       });
 
       expect(() => redirectToSignUp({ returnBackUrl })).toThrowError(
-        '@clerk/backend: Missing publishableKey. You can get your key at https://dashboard.clerk.com/last-active?path=api-keys.',
+        '@clerk/backend: Clerk keys are missing from your environment.\n\nTo create a new Clerk app, run:\nnpx clerk@latest init',
       );
     });
 

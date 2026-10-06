@@ -114,8 +114,9 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
   const { isLoaded, signIn } = useSignIn();
   const { publishableKey } = useClerk();
 
-  const key = `__clerk_local_auth_${publishableKey}_identifier`;
-  const pkey = `__clerk_local_auth_${publishableKey}_password`;
+  const storeKeyBase = publishableKey.split('=').join('');
+  const key = `__clerk_local_auth_${storeKeyBase}_identifier`;
+  const pkey = `__clerk_local_auth_${storeKeyBase}_password`;
   const [hasLocalAuthCredentials, setHasLocalAuthCredentials] = useState(!!getItem(key));
   const [userOwnsCredentials, setUserOwnsCredentials] = useUserOwnsCredentials({ storeKey: key });
   const hasEnrolledBiometric = useEnrolledBiometric();
@@ -134,23 +135,24 @@ export const useLocalCredentials = (): LocalCredentialsReturn => {
       );
     }
 
-    if (creds.identifier) {
-      await setItemAsync(key, creds.identifier);
-    }
+    const identifier = creds.identifier ?? (await getItemAsync(key).catch(() => null));
 
-    const storedIdentifier = await getItemAsync(key).catch(() => null);
-
-    if (!storedIdentifier) {
+    if (!identifier) {
       return errorThrower.throw(
         `useLocalCredentials: setCredentials() an identifier should already be set in order to update its password.`,
       );
     }
 
-    setHasLocalAuthCredentials(true);
     await setItemAsync(pkey, creds.password, {
       keychainAccessible: WHEN_PASSCODE_SET_THIS_DEVICE_ONLY,
       requireAuthentication: true,
     });
+
+    if (creds.identifier) {
+      await setItemAsync(key, creds.identifier);
+    }
+
+    setHasLocalAuthCredentials(true);
   };
 
   const clearCredentials = async () => {

@@ -1,4 +1,4 @@
-import { renderHook } from '@testing-library/react';
+import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // The umbrella hook composes several `@clerk/shared/react` hooks. We mock the
@@ -11,8 +11,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 // `samlConnection.idpSsoUrl` + `idpEntityId`, and the active path reads `active`.
 type MockConnection = {
   id: string;
+  name?: string;
+  domains?: string[];
   provider: string;
   active?: boolean;
+  createdAt?: Date;
   samlConnection?: { idpSsoUrl?: string; idpEntityId?: string } | null;
 };
 
@@ -49,9 +52,11 @@ const mutationSpies = vi.hoisted(() => ({
 }));
 
 const domainsState = vi.hoisted(() => ({
-  data: undefined as Array<{ name: string }> | undefined,
+  data: undefined as Array<{ name: string; ownershipVerification?: { status: string } }> | undefined,
   isLoading: false,
 }));
+
+const verifiedDomain = (name: string) => ({ name, ownershipVerification: { status: 'verified' } });
 
 vi.mock('@clerk/shared/react', () => ({
   __internal_useOrganizationEnterpriseConnections: () => ({
@@ -187,24 +192,39 @@ describe('useOrganizationEnterpriseConnection — test-runs gating', () => {
 });
 
 describe('useOrganizationEnterpriseConnection — mutations', () => {
-  it('createConnection forwards the provider and the organization domains', async () => {
-    domainsState.data = [{ name: 'acme.com' }, { name: 'example.com' }];
+  it('createConnection forwards the provider and the verified organization domains', async () => {
+    domainsState.data = [verifiedDomain('acme.com'), verifiedDomain('example.com'), { name: 'pending.com' }];
 
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
 
     await result.current.enterpriseConnectionMutations.createConnection('saml_okta');
 
     expect(mutationSpies.create).toHaveBeenCalledTimes(1);
-    // `name` is derived by FAPI, so it is not sent from the client; `domains`
-    // are the verified organization domains passed straight through by the
-    // caller.
+    // `name` is derived by FAPI, so it is not sent from the client; an
+    // unverified domain never reaches the create.
     expect(mutationSpies.create).toHaveBeenCalledWith({
       provider: 'saml_okta',
       domains: ['acme.com', 'example.com'],
     });
   });
 
-  it('createConnection forwards undefined domains when the organization has none', async () => {
+  it('createConnection leaves out a domain another connection already authenticates', async () => {
+    connectionsState.data = [{ ...configuredConnection('ent_other'), name: 'Other', domains: ['acme.com'] }];
+    domainsState.data = [verifiedDomain('acme.com'), verifiedDomain('example.com')];
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    act(() => result.current.selectConnection({ kind: 'new' }));
+
+    expect(result.current.claimedDomains.get('acme.com')).toBe('Other');
+    expect(result.current.connectionDomains).toEqual(['example.com']);
+
+    await result.current.enterpriseConnectionMutations.createConnection('saml_okta');
+
+    expect(mutationSpies.create).toHaveBeenCalledWith({ provider: 'saml_okta', domains: ['example.com'] });
+  });
+
+  it('createConnection forwards an empty domain list when the organization has none', async () => {
     domainsState.data = undefined;
 
     const { result } = renderHook(() => useOrganizationEnterpriseConnection());
@@ -214,8 +234,32 @@ describe('useOrganizationEnterpriseConnection — mutations', () => {
     expect(mutationSpies.create).toHaveBeenCalledTimes(1);
     expect(mutationSpies.create).toHaveBeenCalledWith({
       provider: 'saml_okta',
-      domains: undefined,
+      domains: [],
     });
+  });
+
+  it('setConnectionDomains edits the draft for a new scope and updates an existing connection', async () => {
+    domainsState.data = [verifiedDomain('acme.com'), verifiedDomain('example.com')];
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    await act(() => result.current.setConnectionDomains(['example.com']));
+
+    expect(mutationSpies.update).not.toHaveBeenCalled();
+    expect(result.current.connectionDomains).toEqual(['example.com']);
+
+    await result.current.enterpriseConnectionMutations.createConnection('saml_okta');
+
+    expect(mutationSpies.create).toHaveBeenCalledWith({ provider: 'saml_okta', domains: ['example.com'] });
+
+    connectionsState.data = [{ ...configuredConnection('ent_1'), domains: ['acme.com'] }];
+    const existing = renderHook(() => useOrganizationEnterpriseConnection());
+
+    expect(existing.result.current.connectionDomains).toEqual(['acme.com']);
+
+    await act(() => existing.result.current.setConnectionDomains(['acme.com', 'example.com']));
+
+    expect(mutationSpies.update).toHaveBeenCalledWith('ent_1', { domains: ['acme.com', 'example.com'] });
   });
 
   it('setConnectionActive forwards only the active flag to update', async () => {
@@ -224,5 +268,73 @@ describe('useOrganizationEnterpriseConnection — mutations', () => {
     await result.current.enterpriseConnectionMutations.setConnectionActive('ent_1', true);
 
     expect(mutationSpies.update).toHaveBeenCalledWith('ent_1', { active: true });
+  });
+
+  it('changeProvider deletes the connection it is given, not the first one in the list', async () => {
+    connectionsState.data = [configuredConnection('ent_1'), configuredConnection('ent_2')];
+    const callOrder: string[] = [];
+    mutationSpies.delete.mockImplementation(() => {
+      callOrder.push('delete');
+      return Promise.resolve({});
+    });
+    mutationSpies.create.mockImplementation(() => {
+      callOrder.push('create');
+      return Promise.resolve({ id: 'ent_3' });
+    });
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    await act(async () => {
+      await result.current.enterpriseConnectionMutations.changeProvider('ent_2', 'saml_google');
+    });
+
+    expect(mutationSpies.delete).toHaveBeenCalledWith('ent_2');
+    expect(callOrder).toEqual(['delete', 'create']);
+    expect(result.current.connectionScope).toEqual({ kind: 'existing', id: 'ent_3' });
+  });
+
+  it('deleting the scoped connection resets the scope to new rather than falling back to another one', async () => {
+    connectionsState.data = [configuredConnection('ent_1'), configuredConnection('ent_2')];
+    mutationSpies.delete.mockResolvedValue({});
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    expect(result.current.connectionScope).toEqual({ kind: 'existing', id: 'ent_1' });
+
+    await act(async () => {
+      await result.current.enterpriseConnectionMutations.deleteConnection('ent_1');
+    });
+
+    expect(result.current.connectionScope).toEqual({ kind: 'new' });
+    expect(result.current.enterpriseConnection).toBeUndefined();
+  });
+});
+
+describe('useOrganizationEnterpriseConnection — connection scope', () => {
+  it('orders the connections by createdAt and scopes to the first one', () => {
+    connectionsState.data = [
+      { ...configuredConnection('ent_b'), createdAt: new Date('2024-02-01T00:00:00Z') },
+      { ...configuredConnection('ent_a'), createdAt: new Date('2024-01-01T00:00:00Z') },
+    ];
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    expect(result.current.enterpriseConnections.map(connection => connection.id)).toEqual(['ent_a', 'ent_b']);
+    expect(result.current.connectionScope).toEqual({ kind: 'existing', id: 'ent_a' });
+    expect(result.current.enterpriseConnection?.id).toBe('ent_a');
+  });
+
+  it('selectConnection pins the wizard to an explicit connection', () => {
+    connectionsState.data = [configuredConnection('ent_1'), configuredConnection('ent_2')];
+
+    const { result } = renderHook(() => useOrganizationEnterpriseConnection());
+
+    act(() => result.current.selectConnection({ kind: 'existing', id: 'ent_2' }));
+
+    expect(result.current.enterpriseConnection?.id).toBe('ent_2');
+
+    act(() => result.current.selectConnection({ kind: 'new' }));
+
+    expect(result.current.enterpriseConnection).toBeUndefined();
   });
 });

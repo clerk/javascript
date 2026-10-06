@@ -1,0 +1,174 @@
+import * as Stories from './reverification.stories';
+
+# Reverification
+
+The example pauses briefly in each pending state. Enter `error` in password or backup code fields, or `000000` for OTP, to render an attempt error.
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={Stories}
+  composition={[
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Flow', href: '/components/flow', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+The feature wrapper reads Clerk state and drives the reverification flow. It renders nothing while `status` is `idle`. While a challenge is still preparing, the parent card shows a verification header, a centered spinner, and a disabled continue button, then shows the factor without a step transition. Keep the same card around the component for a ready factor, a pending retry, or the error state. Isolated panel stories below are for visual development only.
+
+```tsx
+import { Card } from '@clerk/mosaic/components/card';
+import { Reverification, useReverificationFlow } from '@clerk/mosaic/features/reverification';
+
+const [runAction, reverification] = useReverificationFlow(action);
+
+<Card.Root renderBranding={false}>
+  <Reverification {...reverification} />
+</Card.Root>;
+```
+
+## Composing with a parent flow
+
+Reverification is usually one step inside a larger flow, like a confirmation dialog that deletes something. The parent owns the action and decides what is on screen. Reverification only reports whether it has something to show.
+
+### Reading `visible`
+
+`reverification.visible` is true when reverification has a card of its own: a factor, a pending retry, or an error. It is false when idle and while the pending card is showing before a factor is known. A parent that wants to handle pending itself, for example by keeping its own spinner up, can switch to the verification step on `visible` and never render the pending card.
+
+A parent should decide its layout from its own state and `visible`, not from `status`. `status` describes the card, and it changes while the action is still running.
+
+```tsx
+const step = isRunning && reverification.visible ? 'verify' : 'confirm';
+```
+
+### When the run ends
+
+The reverification card does not disappear when the action settles. If the user was shown a card during the run, the run ends in a settled state, whether it succeeded, failed, or was cancelled. The controller keeps returning the last card, inert: it is pending and has no `onCancel`. `visible` stays true unless the last thing shown was the pending card.
+
+This lets the parent finish its own work after the action returns, such as refetching or closing a dialog, without the screen falling back to an earlier step in between. The parent leaves the card by unmounting `<Reverification>` or changing its own step when it is done.
+
+A run that never asked for reverification never settles in this way. `status` stays `idle`, and `visible` stays false for the whole run.
+
+The settled card is released by whichever happens first.
+
+- The action is run again.
+- `reverification.reset()` is called.
+
+Call `reset()` when a parent leaves the flow without running the action again and wants a clean state, so the next render does not show a stale card.
+
+### Cancelling
+
+`reverification.onCancel` is a request. It is undefined when the user cannot cancel, which is the case while the action is being retried and once the run has settled. Calling it rejects the action with a `reverification_cancelled` error and settles the card.
+
+The parent decides what cancelling means for its own flow. Pass `onClose` to `<Reverification>` to run that instead of `onCancel` when the user presses the Close button on the error card. The parent is then responsible for calling `onCancel` itself, as `Destructive` does when its dialog closes. This lets the parent close or leave the step at the moment of the click, instead of waiting for its own action to unwind.
+
+```tsx
+<Reverification
+  {...reverification}
+  onClose={() => closeDialog()}
+/>
+```
+
+### Outcomes
+
+The promise returned by the wrapped action is the outcome. It resolves when the action succeeds, rejects with `reverification_cancelled` when the user cancels, and rejects with the action's own error otherwise. Calling the action while another call is pending rejects with `request_already_in_progress`.
+
+## Panels
+
+These examples isolate the presentational views and their visual states. Product code should normally render the `Reverification` block shown above.
+
+### Pending
+
+This state is used while reverification is still loading/starting and we don't know the factor yet, it can be avoided entirely by not rendering `<Reverification>` until `reverification.visible` is true.
+
+<Story name='Pending' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+### Error
+
+Most errors are shown inline on the factor page, but these states are for catastrophic errors outside of that.
+
+#### No factors available
+
+<Story name='ErrorNoFactors' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+#### Something went wrong
+
+<Story name='ErrorGeneric' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+### Password
+
+<Story name='Password' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+#### Pending
+
+<Story name='PasswordPending' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+#### Error
+
+<Story name='PasswordError' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+### Passkey
+
+<Story name='Passkey' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+#### Pending
+
+<Story name='PasskeyPending' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+#### Error
+
+<Story
+  name='PasskeyError'
+  storyModule={Stories}
+  composition={[
+    { name: 'Card', href: '/components/card', layer: 'Components' },
+    { name: 'Banner', href: '/components/banner', layer: 'Components' },
+  ]}
+/>
+
+### OTP
+
+<Story name='OTP' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+### Authenticator OTP
+
+<Story name='AuthenticatorOTP' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+#### Pending
+
+<Story name='OTPPending' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+#### Error
+
+<Story name='OTPError' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+#### Resending
+
+<Story name='OTPResending' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+### Backup code
+
+<Story name='BackupCode' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+#### Pending
+
+<Story name='BackupCodePending' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+#### Error
+
+<Story name='BackupCodeError' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+### Method picker
+
+<Story name='MethodPicker' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+#### Pending
+
+<Story name='MethodPickerPending' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />
+
+### Help
+
+<Story name='Help' storyModule={Stories} composition={[{ name: 'Card', href: '/components/card', layer: 'Components' }]} />

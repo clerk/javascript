@@ -2,8 +2,8 @@ import * as TabsStories from './tabs.stories';
 
 # Tabs
 
-A set of layered sections where one panel is shown at a time, selected from a row of tabs,
-from `@clerk/headless`. It is a **headless** primitive: it supplies behavior, active-tab
+A set of layered sections where one panel is shown at a time, selected from a row of tabs.
+It is a **headless** primitive: it supplies behavior, active-tab
 state, roving-tabindex keyboard navigation, an optional position-tracking indicator, and
 ARIA wiring, but ships **no styles** — you bring your own CSS by targeting the `data-*`
 attributes each part emits.
@@ -22,7 +22,7 @@ visible panel.
 ## Usage
 
 ```tsx
-import { Tabs } from '@clerk/headless/tabs';
+import { Tabs } from '@clerk/mosaic/primitives/tabs';
 
 <Tabs.Root defaultValue='tab1'>
   <Tabs.List>

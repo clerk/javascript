@@ -197,6 +197,7 @@ export interface EmailJSON extends ClerkResourceJSON {
   status?: string;
   data?: Record<string, any> | null;
   delivered_by_clerk: boolean;
+  suppression_reason?: string | null;
 }
 
 export interface EmailAddressJSON extends ClerkResourceJSON {
@@ -706,6 +707,10 @@ export interface UserJSON extends ClerkResourceJSON {
    * The locale of the user in BCP-47 format.
    */
   locale: string | null;
+  /**
+   * The timezone of the user.
+   */
+  timezone: string | null;
 }
 
 export interface VerificationJSON extends ClerkResourceJSON {
@@ -773,6 +778,12 @@ export interface EnterpriseConnectionCustomAttributeJSON {
   multi_valued: boolean;
 }
 
+export interface SamlConnectionIdpCertificateJSON {
+  certificate: string;
+  issued_at: number | null;
+  expires_at: number | null;
+}
+
 export interface EnterpriseConnectionSamlConnectionJSON {
   id: string;
   name: string;
@@ -781,6 +792,7 @@ export interface EnterpriseConnectionSamlConnectionJSON {
   idp_certificate?: string;
   idp_certificate_issued_at?: number;
   idp_certificate_expires_at?: number;
+  idp_certificates?: SamlConnectionIdpCertificateJSON[];
   idp_metadata_url?: string;
   /** @deprecated The Backend API does not return this field. */
   idp_metadata?: string;
@@ -843,6 +855,7 @@ export interface SamlConnectionJSON extends ClerkResourceJSON {
   idp_certificate: string;
   idp_certificate_issued_at: number;
   idp_certificate_expires_at: number;
+  idp_certificates: SamlConnectionIdpCertificateJSON[];
   idp_metadata_url: string;
   idp_metadata: string;
   acs_url: string;
@@ -962,6 +975,14 @@ export interface IdPOAuthAccessTokenJSON extends ClerkResourceJSON {
   expiration: number | null;
   created_at: number;
   updated_at: number;
+  aud?: string[];
+  act?: IdPOAuthAccessTokenActorJSON;
+}
+
+export interface IdPOAuthAccessTokenActorJSON {
+  iss?: string;
+  sub: string;
+  act?: IdPOAuthAccessTokenActorJSON;
 }
 
 export interface BillingPayerJSON extends ClerkResourceJSON {

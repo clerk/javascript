@@ -11,6 +11,7 @@ export class ProtectConfig extends BaseResource implements ProtectConfigResource
   id: string = '';
   loaders?: ProtectLoader[];
   tokens_invalid_before?: number;
+  challenge_load_timeout_ms?: number;
   rollout?: number;
 
   public constructor(data: ProtectConfigJSON | ProtectConfigJSONSnapshot | null = null) {
@@ -27,6 +28,7 @@ export class ProtectConfig extends BaseResource implements ProtectConfigResource
     this.id = this.withDefault(data.id, this.id);
     this.loaders = this.withDefault(data.loaders, this.loaders);
     this.tokens_invalid_before = this.withDefault(data.tokens_invalid_before, this.tokens_invalid_before);
+    this.challenge_load_timeout_ms = this.withDefault(data.challenge_load_timeout_ms, this.challenge_load_timeout_ms);
 
     return this;
   }
@@ -37,6 +39,7 @@ export class ProtectConfig extends BaseResource implements ProtectConfigResource
       id: this.id,
       loaders: this.loaders,
       tokens_invalid_before: this.tokens_invalid_before,
+      challenge_load_timeout_ms: this.challenge_load_timeout_ms,
     };
   }
 }

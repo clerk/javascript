@@ -1,5 +1,189 @@
 # Change Log
 
+## 4.39.0
+
+### Minor Changes
+
+- SAML enterprise connections can trust several Identity Provider signing certificates at once. `EnterpriseConnection.samlConnection` now includes `idpCertificates`, every trusted certificate with its validity window, and `organization.createEnterpriseConnection()` and `organization.updateEnterpriseConnection()` accept `saml.idpCertificates`, an array that replaces the connection's whole set. The single `saml.idpCertificate` input is deprecated in favor of the array; it keeps working and still replaces the whole set. ([#9996](https://github.com/clerk/javascript/pull/9996)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+## 4.38.0
+
+### Minor Changes
+
+- Add experimental APIs for biometric sign-in in native apps. This includes the `trusted_device` strategy for sign-in and session reverification, `nativeSettings` on the auth config, and `__experimental_` methods on `User` for managing biometric credentials. These may change in minor releases. ([#9989](https://github.com/clerk/javascript/pull/9989)) by [@mikepitre](https://github.com/mikepitre)
+
+## 4.37.1
+
+### Patch Changes
+
+- Custom flows built with `useSignIn()` and `useSignUp()` now handle Clerk Protect challenges for you. When a sign-in or sign-up method gets a challenge, Clerk shows it in a modal and the method returns once the user passes it. For SSO, the challenge appears when the user comes back to `<HandleSSOCallback />`. Classic resource methods such as `clerk.client.signIn.create()`, and apps without Clerk's UI loaded, still return with `protectCheck` set, as before. ([#9950](https://github.com/clerk/javascript/pull/9950)) by [@wobsoriano](https://github.com/wobsoriano)
+
+## 4.37.0
+
+### Minor Changes
+
+- Support Google Workspace directories in Directory Sync. Organization admins can upload a service account key and delegated admin email from the setup flow, start a sync on demand, and see the result of the last one. `DirectorySync` gains `setCredentials()`, `sync()`, `getSyncStatus()`, and `credentialsConfigured`. ([#9722](https://github.com/clerk/javascript/pull/9722)) by [@gabrielmeloc22](https://github.com/gabrielmeloc22)
+
+- Update the SSO and Directory Sync sections of the `<OrganizationProfile />` Security page to the latest designs. Both sections now show a "Configure" button until something is set up (SSO then shows "Add connection"), and SSO connection rows show the identity provider's logo and an actions menu (Edit, Continue configuration, Activate/Deactivate, Remove). These actions have been removed from the SSO connection page, and status badges are no longer color-coded. Okta logos now follow the theme's foreground color, so they stay visible in dark mode, including on the enterprise connection chooser and in `<UserProfile />`. ([#9940](https://github.com/clerk/javascript/pull/9940)) by [@kalafut](https://github.com/kalafut)
+
+  The SSO button uses the new `ssoSection.primaryButton__configure` localization key; `ssoSection.primaryButton__startConfiguration` is deprecated and no longer used. In `directorySyncSection`, `primaryButton__startConfiguration` is renamed to `primaryButton__configure` and `badge__unconfigured` is removed.
+
+### Patch Changes
+
+- Capture authentication timezones so Clerk emails can display timestamps in a stored user timezone. ([#9540](https://github.com/clerk/javascript/pull/9540)) by [@tmilewski](https://github.com/tmilewski)
+
+- Fix publishable-key generation for production instances in local Clerk environments. ([#9633](https://github.com/clerk/javascript/pull/9633)) by [@brkalow](https://github.com/brkalow)
+
+- Add a localized message for the `too_many_unverified_identifications` error, shown when adding an email address or phone number is blocked by pending verifications or an incomplete passkey setup. ([#9812](https://github.com/clerk/javascript/pull/9812)) by [@brunol95](https://github.com/brunol95)
+
+## 4.36.0
+
+### Minor Changes
+
+- `<SignIn />` and `<SignUp />` show a dedicated screen when a request is blocked, with a reference the user can quote to support. ([#9600](https://github.com/clerk/javascript/pull/9600)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+  `action_blocked` errors now expose `traceId`, `title`, `description`, `linkUrl`, `linkText`, `kind` and `data` on `meta`.
+
+### Patch Changes
+
+- Fix enterprise SSO sign-ins erroring instead of showing a verification challenge raised while handing off to the identity provider. ([#9619](https://github.com/clerk/javascript/pull/9619)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+  If you use the prebuilt `<SignIn />` component, there is nothing to do. If you have Clerk Protect enabled and call `signIn.authenticateWithRedirect()` or `signIn.authenticateWithPopup()` from a custom sign-in flow, catch a `ClerkRuntimeError` with code `protect_check_required` and show the verification challenge, to avoid a stalled sign-in.
+
+  That error means a verification challenge has to be completed before the sign-in can redirect. It replaces the generic "not supported" error these methods threw before. When it is thrown, the sign-in is gated: `signIn.protectCheck` is set, or its status is `needs_protect_check`. For enterprise SSO, run the challenge and then call `authenticateWithRedirect()` again with `continueSignIn: true`. If the server has already prepared the redirect, the sign-in continues to the identity provider and the challenge runs when it returns, so no error is thrown.
+
+- Run a sign-up's verification challenge before handing off to an enterprise connection, matching the order used elsewhere in the flow. ([#9622](https://github.com/clerk/javascript/pull/9622)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+## 4.35.0
+
+### Minor Changes
+
+- The "Add members" card on the SSO allow list page of `<OrganizationProfile />` now offers two ways to add people: by email address, or every member with a given role at once. Members whose email address is not served by one of the organization's enterprise connections are skipped. When nothing could be added the card stays open and says why, and when some were added it moves to a success step that reports how many were skipped. ([#9826](https://github.com/clerk/javascript/pull/9826)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+  For custom flows, `organization.ssoBypassAllowlist` gains `addUsers({ userIds })`, which calls the new bulk endpoint in batches of 100 and returns the added entries together with the users that could not be added and why.
+
+  Inputs marked to be ignored by password managers now also carry the Bitwarden, LastPass and Dashlane opt-out attributes, so those extensions stop offering to fill fields such as the allow list email address.
+
+  The member picker that the "Add member" card shipped with in 4.18.0 is gone, and so are its localization keys under `organizationProfile.securityPage.ssoBypassPage.addForm`: `memberLabel`, `memberPlaceholder`, `changeButton` and `noResults`. The feature was never enabled on any instance, so no application depends on them.
+
+  New customization handles: the `organizationProfileSecuritySsoBypassEmailInput`, `organizationProfileSecuritySsoBypassRoleWarning`, `organizationProfileSecuritySsoBypassFailure` and `organizationProfileSecuritySsoBypassBulkResult` appearance elements.
+
+- Localize icon-only social sign-in button names using `socialButtonsBlockButton` and exclude decorative provider icons from the accessibility tree. Add `formFieldAction__showPassword` and `formFieldAction__hidePassword` localization keys for password visibility controls, with translations for every supported locale and English fallback for older localization resources. ([#9897](https://github.com/clerk/javascript/pull/9897)) by [@jigar-clerk](https://github.com/jigar-clerk)
+
+### Patch Changes
+
+- Show the provider logo next to each connection name on the enterprise account chooser. ([#9895](https://github.com/clerk/javascript/pull/9895)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+- Missing and invalid key errors now list the Clerk CLI commands that fix them: `npx clerk@latest init` for a new app, `npx clerk@latest link` and `npx clerk@latest env pull` for an existing one, and `npx clerk@latest env pull --instance prod` for production keys. The missing secret key error skips `init`, since the publishable key already points to an existing app. ([#9848](https://github.com/clerk/javascript/pull/9848)) by [@eatmorespinach](https://github.com/eatmorespinach)
+
+## 4.34.0
+
+### Minor Changes
+
+- Add `@clerk/shared/phone` with Clerk's country metadata and phone-number parsing, formatting, and detection helpers. ([#9763](https://github.com/clerk/javascript/pull/9763)) by [@Ephem](https://github.com/Ephem)
+
+- Rename the SSO fallback sign-in flow to SSO bypass, matching the name the feature ships under. The sign-in resource's `ssoFallbackFirstFactors` is now `ssoBypassFirstFactors` and reads the `sso_bypass_first_factors` field from the API, the `signIn.ssoFallback` localization keys are now `signIn.ssoBypass`, and the `ssoFallback` card action element id is now `ssoBypass`. The flow has not been enabled on any instance, so no application is affected by the old names going away. ([#9822](https://github.com/clerk/javascript/pull/9822)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+- Add the ability for Organization admins to manage the SSO bypass allowlist from the Security page of `<OrganizationProfile />`. ([#9809](https://github.com/clerk/javascript/pull/9809)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+  For custom flows, `organization.ssoBypassAllowlist` exposes `getUsers()`, `addUser({ userId })` and `removeUser(userId)`.
+
+- Add `createDynamicParamParser` and `populateParamFromObject` to `@clerk/shared/url` for resolving `:property` placeholders in URL templates. ([#9761](https://github.com/clerk/javascript/pull/9761)) by [@Ephem](https://github.com/Ephem)
+
+### Patch Changes
+
+- Each enterprise connection listed on the organization Security page now opens its own page. It lists the connection name and domains, the service provider values to copy into the identity provider, the identity provider configuration behind an Edit form, and the connection settings as a form you save. The header carries one action, either Activate or Continue setup, and deactivating or removing the connection lives in a Danger zone section at the bottom of the page. The row menu is gone; click the row instead. ([#9748](https://github.com/clerk/javascript/pull/9748)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+  The setup wizard's domains step now shows a checkbox per verified domain, so an admin picks which domains a connection covers. A domain another connection of the organization already authenticates is disabled and labelled with that connection's name, and an error from creating the connection is shown on the provider step instead of being dropped.
+
+  New customization handles ship with it: the `organizationProfileSecuritySsoConnectionRow` and `organizationProfileSecuritySsoConnectionPage` appearance elements, the `configureSSOVerifyDomainCardCheckbox` element, the `claimed` badge id, the new `FieldId` values for the connection settings, and the `ssoConnectionName`, `ssoConnectionDomains`, `ssoConnectionServiceProvider`, `ssoConnectionIdentityProvider`, `ssoConnectionSettings` and `ssoConnectionDangerZone` `ProfileSectionId` values.
+
+## 4.33.0
+
+### Minor Changes
+
+- Add `agentid` to `OAuthProvider` and `OAUTH_PROVIDERS` to support the "Continue with AgentID" OAuth flow. Instances with the connection enabled now render a "Continue with AgentID" button, with the AgentID mark tinted to match the theme's foreground color so it stays legible in dark mode. ([#9735](https://github.com/clerk/javascript/pull/9735)) by [@wyattjoh](https://github.com/wyattjoh)
+
+### Patch Changes
+
+- The organization Security page now lists every enterprise SSO connection of the organization, each with its own status, domains, and actions. The SSO wizard edits one explicit connection, and a banner names it when the organization has more than one. Changing a provider or removing a connection now targets that connection instead of the first one returned by the API. ([#9729](https://github.com/clerk/javascript/pull/9729)) by [@NicolasLopes7](https://github.com/NicolasLopes7)
+
+## 4.32.0
+
+### Minor Changes
+
+- Introduce self-serve Directory Sync (SCIM) capabilities and related functionality. ([#9590](https://github.com/clerk/javascript/pull/9590)) by [@kalafut](https://github.com/kalafut)
+
+- Add the SSO fallback sign-in flow to `<SignIn />`, for enterprise users the instance has allowlisted to sign in with an email code when they cannot reach their identity provider. ([#9685](https://github.com/clerk/javascript/pull/9685)) by [@mauricioabreu](https://github.com/mauricioabreu)
+
+  For such a user the sign-in no longer redirects straight to the identity provider. It shows the SSO action — or the connection picker, when several connections serve the address — alongside a "Can't use SSO?" link leading to the standard email code step, which carries a notice that the organization requires single sign-on and that the attempt is recorded. Users without a fallback, and instances without the feature, are unaffected.
+
+  Custom flows can read the same factor from the new `ssoFallbackFirstFactors` property on the sign-in resource. The flow adds the `signIn.enterpriseSSO` and `signIn.ssoFallback` localization keys and the `ssoFallback` card action element id.
+
+### Patch Changes
+
+- Update docs deep links in JSDoc comments to match clerk.com's new heading anchors (`#get-token` is now `#gettoken`, `#o-auth-strategy` is now `#oauthstrategy`, and so on). ([#9520](https://github.com/clerk/javascript/pull/9520)) by [@manovotny](https://github.com/manovotny)
+
+## 4.31.1
+
+### Patch Changes
+
+- Update the `@tanstack/query-core` dependency range to `^5.101.4`. ([#8577](https://github.com/clerk/javascript/pull/8577)) by [@renovate](https://github.com/apps/renovate)
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- `useSSO()` now accepts `oidcPrompt` and `oidcLoginHint` and forwards them to the sign-in request. ([#9688](https://github.com/clerk/javascript/pull/9688)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Document the public fields, actions, and parameter types for OAuth device verification flows. ([#9678](https://github.com/clerk/javascript/pull/9678)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Update the `js-cookie` dependency to 3.0.8. ([#9086](https://github.com/clerk/javascript/pull/9086)) by [@renovate](https://github.com/apps/renovate)
+
+## 4.31.0
+
+### Minor Changes
+
+- Add an authenticated OAuth device verification component and workflow hook for approving or denying OAuth Device Authorization Grant requests. ([#9518](https://github.com/clerk/javascript/pull/9518)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+## 4.30.2
+
+### Patch Changes
+
+- Display a proper message when a sign-in or invitation link is invalid or has expired. Previously these errors rendered the raw API copy "This ticket is invalid. Make sure you're using a valid ticket generated by Clerk.", which refers to Clerk implementation details that are meaningless to the end user signing in. The new messages are available under the `unstable__errors.ticket_invalid_code` and `unstable__errors.ticket_expired_code` localization keys. ([#9601](https://github.com/clerk/javascript/pull/9601)) by [@dmoerner](https://github.com/dmoerner)
+
+## 4.30.1
+
+### Patch Changes
+
+- Fix an issue where a verification that was still progressing normally could be cancelled and reported to the user as having timed out. ([#9527](https://github.com/clerk/javascript/pull/9527)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+## 4.30.0
+
+### Minor Changes
+
+- Fixes an issue where OAuth account transfers that needed additional verification were returned to the beginning of sign-in. ([#9497](https://github.com/clerk/javascript/pull/9497)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+### Patch Changes
+
+- Keep Clerk's navigation inside the renderer. `ClerkProvider` now always supplies `routerPush`/`routerReplace`, so Clerk routes through your application's router when you provide one, and never navigates the window to an internal `/CLERK-ROUTER/VIRTUAL/...` path — which no custom protocol handler can serve, and which reloaded the renderer and dropped the user out of sign-in. ([#9530](https://github.com/clerk/javascript/pull/9530)) by [@jeremy-clerk](https://github.com/jeremy-clerk)
+
+  Applications that worked around this by passing no-op router functions, or by filtering `CLERK-ROUTER/VIRTUAL` out themselves, can remove those workarounds.
+
+- Polish the missing/invalid key error copy: drop the two-space indent before the `npx clerk@latest init` command (it rendered as a stray space in browser error overlays), start the follow-up sentence with the command name instead of "It" so the sentence stands on its own, and reword "Requires no Clerk account or login" to "No Clerk account or login required". ([#9531](https://github.com/clerk/javascript/pull/9531)) by [@eatmorespinach](https://github.com/eatmorespinach)
+
+- Fix an issue where sign-ups that used an enterprise SSO connection did not correctly forward redirect URLs. ([#9449](https://github.com/clerk/javascript/pull/9449)) by [@zourzouvillys](https://github.com/zourzouvillys)
+
+## 4.29.3
+
+### Patch Changes
+
+- Update missing and invalid key error messages to recommend the Clerk CLI: `npx clerk@latest init` (non-interactive, no Clerk account required) to create an application, `npx clerk@latest env pull` to fetch the keys of an existing one, and `npx clerk@latest deploy` / `npx clerk@latest env pull --instance prod` for production. This covers both the `errorThrower` messages and the errors thrown by `parsePublishableKey(key, { fatal: true })`, which previously surfaced server-side as a bare `Publishable key not valid.` The Dashboard link is kept for manual key copying. ([#9491](https://github.com/clerk/javascript/pull/9491)) by [@djgould](https://github.com/djgould)
+
+## 4.29.2
+
+### Patch Changes
+
+- Display a proper message when a password is rejected for matching one of the account's identifiers. Previously this error rendered as the incomplete sentence "Your password must contain ." on sign-up, reset password, and the user profile password form. The new message is available under the `unstable__errors.form_password_matches_identifier` localization key, and any password error the UI does not recognize now falls back to the message returned by the API instead of an empty sentence. ([#9453](https://github.com/clerk/javascript/pull/9453)) by [@dmoerner](https://github.com/dmoerner)
+
 ## 4.29.1
 
 ### Patch Changes

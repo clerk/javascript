@@ -37,6 +37,32 @@ describe('SignUpEmailLinkFlowComplete', () => {
       await waitFor(() => expect(fixtures.clerk.handleEmailLinkVerification).toHaveBeenCalled());
       screen.getByText(/success/i);
     });
+
+    it('preserves the OIDC prompt when continuing through enterprise SSO', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.withEmailAddress({ required: true });
+      });
+      fixtures.signUp.status = 'missing_requirements';
+      fixtures.signUp.missingFields = ['enterprise_sso'];
+
+      render(
+        <SignUpEmailLinkFlowComplete
+          redirectUrlComplete='https://example.com/complete'
+          ssoCallbackUrl='https://example.com/sso-callback'
+          oidcPrompt='select_account'
+        />,
+        { wrapper },
+      );
+
+      await waitFor(() => expect(fixtures.signUp.authenticateWithRedirect).toHaveBeenCalled(), { timeout: 3_000 });
+      expect(fixtures.signUp.authenticateWithRedirect).toHaveBeenCalledWith({
+        strategy: 'enterprise_sso',
+        redirectUrl: 'https://example.com/sso-callback',
+        redirectUrlComplete: 'https://example.com/complete',
+        continueSignUp: true,
+        oidcPrompt: 'select_account',
+      });
+    });
   });
 
   describe('Error messages', () => {

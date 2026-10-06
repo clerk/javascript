@@ -1,3 +1,4 @@
+import type { PropsWithChildren } from 'react';
 import { useState } from 'react';
 
 import type { LocalizationKey } from '@/ui/customizables';
@@ -7,11 +8,13 @@ import { useCardState } from '@/ui/elements/contexts';
 import { Header } from '@/ui/elements/Header';
 import type { InternalTheme, PropsOfComponent } from '@/ui/styledSystem';
 
+import { getEnterpriseProviderIconId, ProviderIcon } from './ProviderIcon';
+
 type ChooseEnterpriseConnectionCardProps = {
   title: LocalizationKey;
   subtitle: LocalizationKey;
   onClick: (id: string) => Promise<void>;
-  enterpriseConnections: Array<{ id: string; name: string }>;
+  enterpriseConnections: Array<{ id: string; name: string; logoPublicUrl?: string | null; provider?: string }>;
 };
 
 /**
@@ -22,7 +25,8 @@ export const ChooseEnterpriseConnectionCard = ({
   subtitle,
   onClick,
   enterpriseConnections,
-}: ChooseEnterpriseConnectionCardProps) => {
+  children,
+}: PropsWithChildren<ChooseEnterpriseConnectionCardProps>) => {
   const card = useCardState();
 
   return (
@@ -38,15 +42,19 @@ export const ChooseEnterpriseConnectionCard = ({
           elementDescriptor={descriptors.enterpriseConnectionsRoot}
           gap={2}
         >
-          {enterpriseConnections?.map(({ id, name }) => (
+          {enterpriseConnections?.map(({ id, name, logoPublicUrl, provider }) => (
             <ChooseEnterpriseConnectionButton
               key={id}
               id={id}
               label={name}
+              logoPublicUrl={logoPublicUrl}
+              provider={provider}
               onClick={onClick}
             />
           ))}
         </Grid>
+
+        {children}
       </Card.Content>
 
       <Card.Footer />
@@ -56,12 +64,15 @@ export const ChooseEnterpriseConnectionCard = ({
 
 type ChooseEnterpriseConnectionButtonProps = Omit<PropsOfComponent<typeof SimpleButton>, 'onClick'> & {
   id: string;
-  label?: string;
+  label: string;
+  logoPublicUrl?: string | null;
+  provider?: string;
   onClick: (id: string) => Promise<void>;
 };
 
 const ChooseEnterpriseConnectionButton = (props: ChooseEnterpriseConnectionButtonProps): JSX.Element => {
-  const { label, onClick, ...rest } = props;
+  const { label, logoPublicUrl, provider, onClick, ...rest } = props;
+  const providerIconId = provider ? getEnterpriseProviderIconId(provider) : undefined;
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = () => {
@@ -97,18 +108,27 @@ const ChooseEnterpriseConnectionButton = (props: ChooseEnterpriseConnectionButto
           overflow: 'hidden',
         }}
       >
-        {isLoading && (
-          <Flex
-            as='span'
-            center
-            sx={(theme: InternalTheme) => ({ flex: `0 0 ${theme.space.$4}` })}
-          >
+        <Flex
+          as='span'
+          center
+          sx={(theme: InternalTheme) => ({ flex: `0 0 ${theme.space.$4}` })}
+        >
+          {isLoading ? (
             <Spinner
               size='sm'
               elementDescriptor={descriptors.spinner}
             />
-          </Flex>
-        )}
+          ) : (
+            <ProviderIcon
+              id={providerIconId}
+              iconUrl={logoPublicUrl}
+              name={label}
+              alt={`${label}'s icon`}
+              elementDescriptor={[descriptors.providerIcon, descriptors.enterpriseButtonsProviderIcon]}
+              elementId={descriptors.providerIcon.setId(providerIconId)}
+            />
+          )}
+        </Flex>
         <Text
           elementDescriptor={descriptors.enterpriseConnectionButtonText}
           as='span'

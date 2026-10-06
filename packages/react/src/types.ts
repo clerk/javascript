@@ -53,7 +53,8 @@ export type ClerkProviderProps<TUi extends Ui = Ui> = Omit<
   children: React.ReactNode;
   /**
    * The Clerk Publishable Key for your instance. When omitted, `@clerk/react` reads the key from
-   * `VITE_CLERK_PUBLISHABLE_KEY` or `CLERK_PUBLISHABLE_KEY`.
+   * `VITE_CLERK_PUBLISHABLE_KEY` or `CLERK_PUBLISHABLE_KEY`. Required by `@clerk/electron/react`,
+   * which creates the Clerk instance for you.
    */
   publishableKey?: string;
   /**

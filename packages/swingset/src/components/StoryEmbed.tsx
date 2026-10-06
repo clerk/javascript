@@ -1,6 +1,5 @@
 'use client';
 
-import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
 import { Layers2Icon } from 'lucide-react';
 import type React from 'react';
 import { useState } from 'react';
@@ -11,6 +10,7 @@ import { extractStorySource } from '@/lib/extractStorySource';
 import { generateKnobs, initKnobValues } from '@/lib/generateKnobs';
 import type { StoryModule } from '@/lib/types';
 
+import { StoryMosaicProvider } from './ChaosProvider';
 import { CodeFooter } from './CodeFooter';
 import type { CompositionPiece } from './Composition';
 import { CompositionPanel } from './Composition';
@@ -18,6 +18,8 @@ import { CompositionPanel } from './Composition';
 interface StoryEmbedProps {
   name: string;
   storyModule: StoryModule;
+  /** Whether to show the story's source footer. */
+  showCode?: boolean;
   /** When provided, a collapsible "Composition" footer is attached to the example card. */
   composition?: CompositionPiece[];
 }
@@ -44,7 +46,7 @@ function CompositionFooter({ composition }: { composition: CompositionPiece[] })
   );
 }
 
-export function StoryEmbed({ name, storyModule, composition }: StoryEmbedProps) {
+export function StoryEmbed({ name, storyModule, showCode = true, composition }: StoryEmbedProps) {
   const StoryComp = storyModule[name] as React.ComponentType<Record<string, unknown>>;
 
   if (!StoryComp) {
@@ -56,14 +58,14 @@ export function StoryEmbed({ name, storyModule, composition }: StoryEmbedProps) 
   // Present only for modules that expose `__source` (see `StoryModule.__source`). The raw
   // story function is a knob harness, so reduce it to a clean usage snippet for the footer.
   const rawSource = extractStorySource(storyModule.__source, name);
-  const source = rawSource ? toUsageSnippet(rawSource) : null;
+  const source = showCode && rawSource ? toUsageSnippet(rawSource) : null;
 
   return (
     <div className='not-prose border-border bg-background my-4 overflow-hidden rounded-lg border'>
-      <div className='flex min-h-20 items-center justify-center p-6'>
-        <MosaicProvider>
+      <div className='flex min-h-20 items-center justify-center p-2.5 sm:p-6'>
+        <StoryMosaicProvider>
           <StoryComp {...defaultValues} />
-        </MosaicProvider>
+        </StoryMosaicProvider>
       </div>
 
       {source ? <CodeFooter source={source} /> : null}

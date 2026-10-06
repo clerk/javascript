@@ -1,5 +1,5 @@
 import { default as _chalk } from 'chalk';
-import * as _fs from 'fs-extra';
+import _fs from 'fs-extra';
 import _getPort from 'get-port';
 
 export const getPort = _getPort;

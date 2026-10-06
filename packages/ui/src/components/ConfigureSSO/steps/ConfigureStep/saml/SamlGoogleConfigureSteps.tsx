@@ -9,9 +9,11 @@ import { localizationKeys } from '@/localization';
 import { useFormControl } from '@/ui/utils/useFormControl';
 
 import { useConfigureSSO } from '../../../ConfigureSSOContext';
+import { type IdpCertificateEntry, toIdpCertificateEntries } from '../../../domain/idpCertificates';
 import { Step } from '../../../elements/Step';
 import { useWizard, Wizard, type WizardStepConfig } from '../../../elements/Wizard';
 import { InnerStepCounter } from '../../../elements/Wizard/InnerStepCounter';
+import { ActiveConnectionAlert } from '../shared/ActiveConnectionAlert';
 import {
   IdentityProviderConfigurationModes,
   type SamlIdpConfigurationMode,
@@ -157,12 +159,12 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
   const hasExistingManualConfig = Boolean(
     samlConnection?.idpSsoUrl || samlConnection?.idpEntityId || samlConnection?.idpCertificate,
   );
-  const existingCertPresent = Boolean(samlConnection?.idpCertificate);
+  const initialCertificates = toIdpCertificateEntries(samlConnection);
   const existingMetadataPresent = Boolean(samlConnection?.idpMetadata);
 
   const [mode, setMode] = React.useState<SamlIdpConfigurationMode>(hasExistingManualConfig ? 'manual' : 'metadataFile');
   const [metadataFile, setMetadataFile] = React.useState<File | null>(null);
-  const [certFile, setCertFile] = React.useState<File | null>(null);
+  const [certificates, setCertificates] = React.useState<IdpCertificateEntry[]>(initialCertificates);
   // Step-LOCAL submit state for the Continue button. `goNext` bubbles to the
   // parent (this is the terminal nested step) and the parent DEFERS the
   // configure→test advance until the updateConnection revalidate lands. Keeping
@@ -207,7 +209,7 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
 
   const trimmedSignOnUrl = signOnUrlField.value.trim();
   const trimmedIssuer = issuerField.value.trim();
-  const hasCert = certFile !== null || existingCertPresent;
+  const hasCert = certificates.length > 0;
   const hasMetadataFile = metadataFile !== null || existingMetadataPresent;
 
   const isValid =
@@ -249,9 +251,9 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
             signOnUrlField,
             issuerField,
             certificateField,
-            certFile,
-            onCertFileChange: setCertFile,
-            existingCertPresent,
+            certificates,
+            onCertificatesChange: setCertificates,
+            initialCertificates,
           },
           labels: {
             description: localizationKeys(
@@ -284,7 +286,7 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
       const saml = await buildSamlConfigurationPayload({
         mode,
         metadataFile: { file: metadataFile },
-        manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certFile },
+        manual: { signOnUrl: signOnUrlField.value, issuer: issuerField.value, certificates, initialCertificates },
       });
 
       await updateConnection(enterpriseConnection.id, { saml });
@@ -339,6 +341,7 @@ const SamlGoogleIdentityProviderMetadataStep = (): JSX.Element => {
             }}
           />
           <IdentityProviderConfigurationForm {...formProps} />
+          <ActiveConnectionAlert />
         </Step.Section>
       </Step.Body>
 

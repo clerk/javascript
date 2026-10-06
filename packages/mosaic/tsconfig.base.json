@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "verbatimModuleSyntax": true,
+    "target": "es2022",
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "preserveWatchOutput": true,
+    "noUnusedLocals": true,
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "module": "preserve",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true
+  }
+}

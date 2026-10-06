@@ -1,0 +1,34 @@
+import { errorThrower } from '../utils/errors';
+import type { UseBiometricCredentialsReturn } from './types';
+
+const unsupportedAvailability = {
+  isAvailable: false,
+  unavailableReason: 'unsupported_platform',
+} as const;
+
+function unsupported(): never {
+  return errorThrower.throw('Biometric credentials are currently only available on iOS and Android.');
+}
+
+function rejectUnsupported(): Promise<never> {
+  return Promise.resolve().then(unsupported);
+}
+
+const biometricCredentials: UseBiometricCredentialsReturn = Object.freeze({
+  getAvailability: () => Promise.resolve(unsupportedAvailability),
+  list: rejectUnsupported,
+  enroll: rejectUnsupported,
+  revoke: rejectUnsupported,
+  signIn: rejectUnsupported,
+  reverify: rejectUnsupported,
+});
+
+/**
+ * Accesses biometric credential enrollment, sign-in, and session reverification.
+ *
+ * Biometric credentials are supported on iOS and Android. They require the `@clerk/expo-biometrics` package in a
+ * development build.
+ */
+export function useBiometricCredentials(): UseBiometricCredentialsReturn {
+  return biometricCredentials;
+}

@@ -1,29 +1,15 @@
-import { useClerk } from '@clerk/shared/react';
 import type { SignUpProps, SignUpResource } from '@clerk/shared/types';
 import { type ComponentType, useEffect, useRef, useState } from 'react';
 
-import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { Header } from '@/ui/elements/Header';
+import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 
-import { withRedirectToAfterSignUp } from '../../common';
-import { useCoreSignUp, useSignUpContext } from '../../contexts';
-import {
-  Box,
-  Button,
-  Col,
-  descriptors,
-  Flex,
-  Flow,
-  localizationKeys,
-  Spinner,
-  useLocalizations,
-} from '../../customizables';
-import { useSpinDelay } from '../../hooks';
+import { ActionBlockedCard, withRedirectToAfterSignUp } from '../../common';
+import { useCoreSignUp } from '../../contexts';
 import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
-import { useRouter } from '../../router';
-import { completeSignUpFlow } from './util';
+import { ProtectCheckCard } from '../ProtectCheck/ProtectCheckCard';
+import { useCompleteSignUpFlow } from './useCompleteSignUpFlow';
 
 /**
  * Continuation paths default to the standalone `/sign-up/protect-check` mount. When the card is
@@ -46,12 +32,9 @@ function SignUpProtectCheckInternal({
   protectCheckPath = '.',
 }: SignUpProtectCheckProps = {}): JSX.Element | null {
   const card = useCardState();
-  const { t } = useLocalizations();
   const signUp = useCoreSignUp();
-  const { navigate } = useRouter();
   const { navigateToFlowStart } = useNavigateToFlowStart();
-  const { setActive } = useClerk();
-  const { afterSignUpUrl, navigateOnSetActive } = useSignUpContext();
+  const completeSignUpFlow = useCompleteSignUpFlow();
   // Latches that a protect check existed at some point, so the resolution race
   // (submitProtectCheck clearing protectCheck mid-navigation) isn't mistaken for
   // a stale visit. State adjusted during render (guarded) rather than a ref
@@ -70,7 +53,7 @@ function SignUpProtectCheckInternal({
     }
   }, [everSawProtectCheck, navigateToFlowStart, signUp.protectCheck]);
 
-  const { containerRef, isRunning, isWidgetVisible, hasError, retry } = useProtectCheckRunner<SignUpResource>({
+  const runner = useProtectCheckRunner<SignUpResource>({
     getProtectCheck: () => signUp.protectCheck,
     getResource: () => signUp,
     reload: () => signUp.reload(),
@@ -89,24 +72,9 @@ function SignUpProtectCheckInternal({
         verifyPhonePath,
         protectCheckPath, // Defaults to '.' so a chained challenge re-runs this same route
         continuePath,
-        handleComplete: () =>
-          setActive({
-            session: updatedSignUp.createdSessionId,
-            navigate: async ({ session, decorateUrl }) => {
-              await navigateOnSetActive({ session, redirectUrl: afterSignUpUrl, decorateUrl });
-            },
-          }),
-        navigate,
       });
     },
   });
-
-  // Debounce the spinner's entrance so a near-instant check (or a script that signals its
-  // widget immediately) never flashes it — the card header alone carries the first ~300ms.
-  // The error and widget-visibility gates stay OUTSIDE the delay hook (in the JSX below): its
-  // minimum visible duration must never outrank the handshake's "spinner is gone when the
-  // promise resolves" guarantee, nor keep a spinner next to the retry button.
-  const showSpinner = useSpinDelay(isRunning, { delay: 300 });
 
   // Stale/direct visit that never had a check: render nothing while the
   // flow-start redirect scheduled above kicks in, instead of flashing the card
@@ -115,48 +83,16 @@ function SignUpProtectCheckInternal({
     return null;
   }
 
+  const blockedDetails = actionBlockedDetailsFrom(card.rawError);
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
+  }
+
   return (
-    <Flow.Part part='protectCheck'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signUp.protectCheck.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signUp.protectCheck.subtitle')} />
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Col
-            elementDescriptor={descriptors.main}
-            gap={6}
-          >
-            <Box
-              ref={containerRef}
-              id='clerk-protect-check'
-              aria-busy={isRunning}
-              // Out of flow while empty so the collapsed container adds no reserved height or flex-gap
-              // gutter above the spinner (same idiom as CaptchaElement's `gapless` mode).
-              style={{ display: 'block', alignSelf: 'center', position: isWidgetVisible ? 'static' : 'absolute' }}
-            />
-            {showSpinner && !hasError && !isWidgetVisible ? (
-              <Flex center>
-                <Spinner
-                  size='lg'
-                  colorScheme='primary'
-                  elementDescriptor={descriptors.spinner}
-                  aria-label={t(localizationKeys('signUp.protectCheck.loading'))}
-                />
-              </Flex>
-            ) : null}
-            {hasError ? (
-              <Button
-                onClick={retry}
-                localizationKey={localizationKeys('signUp.protectCheck.retryButton')}
-              />
-            ) : null}
-          </Col>
-        </Card.Content>
-        <Card.Footer />
-      </Card.Root>
-    </Flow.Part>
+    <ProtectCheckCard
+      flow='signUp'
+      runner={runner}
+    />
   );
 }
 

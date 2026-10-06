@@ -1,0 +1,76 @@
+import stylex from '@stylexjs/unplugin/vite';
+import { playwright } from '@vitest/browser-playwright';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'node:path';
+import { defineConfig } from 'vitest/config';
+
+const mosaicPath = resolve(import.meta.dirname, 'src');
+const featureTests = 'src/**/*.feature.test.tsx';
+
+export default defineConfig({
+  plugins: [
+    stylex({ dev: true, unstable_moduleResolution: { type: 'commonJS', rootDir: mosaicPath } }),
+    react({ jsxRuntime: 'automatic' }),
+  ],
+  test: {
+    watch: false,
+    environment: 'jsdom',
+    environmentOptions: {
+      jsdom: {
+        resources: 'usable',
+      },
+    },
+    globals: false,
+    exclude: ['node_modules/**', 'dist/**'],
+    testTimeout: 5000,
+    // Primitives ran as their own package on happy-dom with no setup beyond matchers, so they
+    // never picked up the requestAnimationFrame mock in the Mosaic setup (it changes floating-ui's
+    // focus-on-open timing). Keeping them on their own project here, instead of folding them into
+    // the jsdom project, preserves that behavior post-move.
+    projects: [
+      {
+        extends: true,
+        test: {
+          name: 'primitives',
+          environment: 'happy-dom',
+          include: ['src/primitives/**/*.test.?(c|m)[jt]s?(x)', 'src/primitives/**/*.spec.?(c|m)[jt]s?(x)'],
+          setupFiles: ['./src/primitives/test-utils/vitest.setup.ts'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'mosaic',
+          include: ['**/*.test.?(c|m)[jt]s?(x)', '**/*.spec.?(c|m)[jt]s?(x)'],
+          exclude: ['src/primitives/**', featureTests],
+          setupFiles: [resolve(import.meta.dirname, 'vitest.setup.mts')],
+        },
+      },
+      {
+        extends: true,
+        publicDir: 'test/public',
+        optimizeDeps: {
+          include: [
+            '@clerk/clerk-js',
+            '@testing-library/jest-dom/matchers',
+            '@testing-library/react',
+            '@testing-library/user-event',
+            'msw',
+            'msw/browser',
+          ],
+        },
+        test: {
+          name: 'feature',
+          include: [featureTests],
+          setupFiles: [resolve(import.meta.dirname, 'vitest.setup.browser.mts')],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: [{ browser: 'chromium' }],
+          },
+        },
+      },
+    ],
+  },
+});

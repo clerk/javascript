@@ -19,6 +19,10 @@ export type StartSSOFlowParams = {
    * Defaults to an Expo AuthSession URL with the `sso-callback` path.
    */
   redirectUrl?: string;
+  /** Space-separated OIDC prompt values, such as `select_account` or `consent`. */
+  oidcPrompt?: string;
+  /** Identifier to suggest to the identity provider for sign-in. */
+  oidcLoginHint?: string;
   /**
    * Metadata to attach to the user when the SSO flow creates a new account.
    */
@@ -116,7 +120,7 @@ export function useSSO(): UseSSOReturn {
 
     const { AuthSession, WebBrowser: WebBrowserModule } = loadSSODependencies();
 
-    const { strategy, unsafeMetadata, authSessionOptions } = startSSOFlowParams ?? {};
+    const { strategy, oidcPrompt, oidcLoginHint, unsafeMetadata, authSessionOptions } = startSSOFlowParams ?? {};
 
     /**
      * Creates a redirect URL based on the application platform
@@ -133,6 +137,8 @@ export function useSSO(): UseSSOReturn {
     const { error: signInError } = await signIn.create({
       strategy,
       redirectUrl,
+      oidcPrompt,
+      oidcLoginHint,
       ...(startSSOFlowParams.strategy === 'enterprise_sso' ? { identifier: startSSOFlowParams.identifier } : {}),
     });
     if (signInError) {

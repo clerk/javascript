@@ -1,5 +1,6 @@
 import type { Clerk } from '@clerk/clerk-js';
 import { ClerkRuntimeError } from '@clerk/shared/error';
+import type { PublicKeyCredentialRequestOptionsWithoutExtensions } from '@clerk/shared/types';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { DUMMY_CLERK_CLIENT_RESOURCE, DUMMY_CLERK_ENVIRONMENT_RESOURCE } from '../../../cache';
@@ -139,6 +140,39 @@ describe('createClerkInstance', () => {
 
     expect(first).toBe(second);
     expect(mocks.constructorSpy).toHaveBeenCalledTimes(1);
+  });
+
+  test('routes passkey assertion requests for sign-in and reverification through the native adapter', async () => {
+    const createClerkInstance = await loadCreateClerkInstance();
+    const getClerkInstance = createClerkInstance(MockClerk as unknown as typeof Clerk);
+    const get = vi.fn().mockResolvedValue({ publicKeyCredential: null, error: null });
+    const clerk = getClerkInstance({
+      publishableKey: 'pk_test_123',
+      __experimental_passkeys: {
+        get,
+        create: vi.fn(),
+        isSupported: vi.fn(() => true),
+        isAutoFillSupported: vi.fn(() => Promise.resolve(false)),
+      },
+    }) as unknown as MockClerk & {
+      __internal_getPublicCredentials: (params: {
+        publicKeyOptions: PublicKeyCredentialRequestOptionsWithoutExtensions;
+      }) => Promise<unknown>;
+    };
+    const signInSecondFactorOptions = {
+      challenge: new Uint8Array([1]).buffer,
+      rpId: 'example.com',
+    } as PublicKeyCredentialRequestOptionsWithoutExtensions;
+    const sessionSecondFactorOptions = {
+      challenge: new Uint8Array([2]).buffer,
+      rpId: 'example.com',
+    } as PublicKeyCredentialRequestOptionsWithoutExtensions;
+
+    await clerk.__internal_getPublicCredentials({ publicKeyOptions: signInSecondFactorOptions });
+    await clerk.__internal_getPublicCredentials({ publicKeyOptions: sessionSecondFactorOptions });
+
+    expect(get).toHaveBeenNthCalledWith(1, { publicKeyOptions: signInSecondFactorOptions });
+    expect(get).toHaveBeenNthCalledWith(2, { publicKeyOptions: sessionSecondFactorOptions });
   });
 
   test('recreates the singleton when proxyUrl changes', async () => {

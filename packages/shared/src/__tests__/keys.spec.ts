@@ -19,6 +19,8 @@ describe('buildPublishableKey(frontendApi)', () => {
     ['foo-bar-13.clerk.accounts.dev', 'pk_test_Zm9vLWJhci0xMy5jbGVyay5hY2NvdW50cy5kZXYk'],
     ['clerk.boring.sawfly-91.lcl.dev', 'pk_test_Y2xlcmsuYm9yaW5nLnNhd2ZseS05MS5sY2wuZGV2JA'],
     ['clerk.boring.sawfly-91.lclclerk.com', 'pk_test_Y2xlcmsuYm9yaW5nLnNhd2ZseS05MS5sY2xjbGVyay5jb20k'],
+    ['clerk.prod.lclclerk.com', 'pk_live_Y2xlcmsucHJvZC5sY2xjbGVyay5jb20k'],
+    ['clerk.example.prod.lclclerk.com', 'pk_live_Y2xlcmsuZXhhbXBsZS5wcm9kLmxjbGNsZXJrLmNvbSQ'],
   ];
 
   test.each(cases)(
@@ -60,7 +62,7 @@ describe('parsePublishableKey(key)', () => {
   it('throws an error for keys with extra characters after $ when fatal: true', () => {
     expect(() =>
       parsePublishableKey('pk_live_ZmFrZS1jbGVyay1tYWxmb3JtZWQuY2xlcmsuYWNjb3VudHMuZGV2JGV4dHJh', { fatal: true }),
-    ).toThrowError('Publishable key not valid.');
+    ).toThrowError('Publishable key not valid');
   });
 
   it('returns null for keys with multiple $ characters', () => {
@@ -72,18 +74,16 @@ describe('parsePublishableKey(key)', () => {
   });
 
   it('throws an error if the key cannot be decoded when fatal: true', () => {
-    expect(() => parsePublishableKey('pk_live_invalid!@#$', { fatal: true })).toThrowError(
-      'Publishable key not valid.',
-    );
+    expect(() => parsePublishableKey('pk_live_invalid!@#$', { fatal: true })).toThrowError('Publishable key not valid');
   });
 
   it('throws an error if the key is not a valid publishable key, when fatal: true', () => {
-    expect(() => parsePublishableKey('fake_pk', { fatal: true })).toThrowError('Publishable key not valid.');
+    expect(() => parsePublishableKey('fake_pk', { fatal: true })).toThrowError('Publishable key not valid');
   });
 
   it('throws an error if the publishable key is missing, when fatal: true', () => {
     expect(() => parsePublishableKey(undefined, { fatal: true })).toThrowError(
-      'Publishable key is missing. Ensure that your publishable key is correctly configured. Double-check your environment configuration for your keys, or access them here: https://dashboard.clerk.com/last-active?path=api-keys',
+      'Publishable key is missing.\n\nTo create a new Clerk app, run:\nnpx clerk@latest init',
     );
   });
 

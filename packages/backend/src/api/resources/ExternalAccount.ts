@@ -32,7 +32,7 @@ export class ExternalAccount {
     readonly username: string | null,
     /** The phone number related to this specific external account. */
     readonly phoneNumber: string | null,
-    /** Metadata that can be read from the Frontend API and Backend API and can be set only from the [Backend API](https://clerk.com/docs/reference/backend-api). */
+    /** Metadata that can be read from the Frontend API and Backend API and can be set only from the [Backend API](https://clerk.com/docs/reference/backend-api){{ target: '_blank' }}. */
     readonly publicMetadata: Record<string, unknown> | null = {},
     /** A descriptive label to differentiate multiple external accounts of the same user for the same provider. */
     readonly label: string | null,

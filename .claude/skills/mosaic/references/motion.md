@@ -1,23 +1,64 @@
-# Motion: entrances and exits
+# Motion: entrances, exits, and pulses
 
-Token semantics live in `packages/ui/src/mosaic/tokens.stylex.ts`, above
+Token semantics live in `packages/mosaic/src/tokens.stylex.ts`, above
 `durationDefaults` / `easingDefaults` — read those comments first. This file is the
 how-to layer: the rules that decide a transition's shape, and how to check one
 rather than eyeball it.
 
-| Token                   | Value                                   | For                         |
-| ----------------------- | --------------------------------------- | --------------------------- |
-| `--cl-duration-instant` | `0s`                                    | hover and press arrival     |
-| `--cl-duration-fast`    | `0.1s`                                  | exits                       |
-| `--cl-duration-base`    | `0.15s`                                 | entrances, hover exit       |
-| `--cl-duration-slow`    | `0.25s`                                 | larger surfaces             |
-| `--cl-duration-slower`  | `0.35s`                                 | —                           |
-| `--cl-ease-default`     | `cubic-bezier(0.175, 0.885, 0.32, 1.1)` | things ARRIVING (Swift Out) |
-| `--cl-ease-exit`        | `cubic-bezier(0.55, 0.085, 0.68, 0.53)` | things LEAVING (In Quad)    |
+| Token                   | Value                                   | For                                |
+| ----------------------- | --------------------------------------- | ---------------------------------- |
+| `--cl-duration-instant` | `0s`                                    | hover and press arrival            |
+| `--cl-duration-fast`    | `0.1s`                                  | exits                              |
+| `--cl-duration-base`    | `0.15s`                                 | entrances, hover exit              |
+| `--cl-duration-slow`    | `0.25s`                                 | larger surfaces                    |
+| `--cl-duration-slower`  | `0.35s`                                 | —                                  |
+| `--cl-ease-default`     | `cubic-bezier(0.175, 0.885, 0.32, 1.1)` | things ARRIVING (Swift Out)        |
+| `--cl-ease-enter`       | `cubic-bezier(0, 0, 0.2, 1)`            | arrivals that must not overshoot   |
+| `--cl-ease-exit`        | `cubic-bezier(0.55, 0.085, 0.68, 0.53)` | things LEAVING (In Quad)           |
+| `--cl-ease-in-out`      | `cubic-bezier(0.645, 0.045, 0.355, 1)`  | rest-to-rest layout (In Out Cubic) |
+| `--cl-ease-pulse`       | `cubic-bezier(0.4, 0, 0.6, 1)`          | repeating opacity pulses           |
 
 Named curves come from [easing.dev](https://www.easing.dev) (Lochie Axon's Easing
 Graphs). Take one from there rather than inventing a bezier, so the catalog stays
 the shared vocabulary.
+
+## `--cl-ease-default` vs `--cl-ease-enter`: count the overshoot in pixels
+
+`--cl-ease-default` is the default, and should stay that way — its ~2% pass past
+the target is what makes a surface feel snappy rather than merely fast. What
+decides whether that pass is charm or play is how far it actually travels in
+pixels, and the arithmetic is worth doing rather than eyeballing: the overshoot is
+2% of the **delta**, not of the element.
+
+| what moves                              | travel | overshoot |
+| --------------------------------------- | ------ | --------- |
+| popover, `scale(0.94 → 1)` at 320px     | 19px   | 0.4px     |
+| dialog card, `scale(0.98 → 1)` at 600px | 12px   | 0.3px     |
+| sheet, `translate` its own 640px height | 640px  | 15px      |
+
+A scale delta is a few percent of the element, so the pass reaches a whole pixel
+only on something far larger than it is applied to: ~725px of width at a 6% delta,
+~2,175px at 2%. Menu, Select and Combobox cap at `18rem`, and a Popover would have
+to be stretched most of the way across the viewport, so `--cl-ease-default` is
+right for all of them. It is travel-based motion that crosses the threshold: a
+sheet passes its inset by ~15px and visibly corrects. That is where
+`--cl-ease-enter` came from, and the dialog surfaces now take it for their scale
+too, as a house choice at that size rather than because the arithmetic demands it.
+
+So the axis is not the element's type but the size of its overshoot. Work out what
+2% of the travel actually is; once it is enough pixels to notice as a bounce, take
+`--cl-ease-enter`, which decelerates the same way without the pass-through.
+
+For entrances, opacity takes `--cl-ease-enter`: there is nothing
+past `1` to overshoot into, so the pass is clamped away and only its cost — the
+slower approach to full opacity — is left.
+
+## Repeating pulses
+
+Use `--cl-ease-pulse` for repeating opacity fades such as loading skeletons. Its
+symmetric curve slows at both ends of each fade, keeping the reversal smooth.
+Keep the pulse duration on the component and disable the animation under
+`prefers-reduced-motion: reduce`.
 
 ## A curve has a direction — don't run the entrance curve backwards
 
@@ -63,12 +104,26 @@ transitionDuration: {
   ':where([data-ending-style])': durationVars['--cl-duration-fast'],
 },
 transitionTimingFunction: {
-  default: `linear, ${easingVars['--cl-ease-default']}`,
-  ':where([data-ending-style])': `linear, ${easingVars['--cl-ease-exit']}`,
+  default: `${easingVars['--cl-ease-enter']}, ${easingVars['--cl-ease-default']}`,
+  ':where([data-ending-style])': easingVars['--cl-ease-exit'],
 },
 ```
 
-Both lists are **positional against `transitionProperty`** (`opacity, transform`).
+The entrance list is **positional against `transitionProperty`** (`opacity,
+transform`) — the fade on `--cl-ease-enter`, the geometry on the overshoot. The
+exit collapses to one value because both properties want the same curve; write the
+list out only when a slot genuinely differs, as the dialog's sheet does for its
+slide.
+
+### A layout settle is not an exit
+
+`--cl-ease-exit` is for content that is _leaving_: it accelerates away and the abrupt
+stop at the end is never seen, because the surface has faded to nothing by then. A
+row that collapses behind that content is still there at the end, so the same curve
+stops it dead against the content below. That is what `--cl-ease-in-out` is for: the
+row starts from rest and returns to rest, matching the content's ease-in at the top
+of the curve and easing into the landing at the bottom. See "Expanding and
+collapsing a row".
 
 ## Asymmetry, in three places
 
@@ -85,10 +140,203 @@ opacity-at-overshoot-peak from 0.78 to 1.00.
 **Exits land together.** Do _not_ split them going out. Matching durations are
 what stop an exit reading as a lingering ghost.
 
+## An exit must not show new content
+
+An element that animates out is still mounted, and by then the thing that closed
+it has usually changed the data underneath — so the subtree re-renders and the
+exit plays over the _next_ screen's content. It reads as a flash. Whatever you
+animate out, hold its last frame for the length of the exit: `Freeze` around the
+children, or a snapshot of the outgoing content. See "Exiting content must be
+frozen" in `headless.md` for which to use and the two ways to get it wrong.
+
+## Expanding and collapsing a row
+
+The reference is `Card.Banner` (`card.styles.ts`, `banner.collapse` / `clip` /
+`surface`). `Field.Message` and `Section.Error` share the measured-height variant in
+`utils/feedback.styles.ts` (see "Inline text", below). It is the recipe to adopt wherever
+a row opens and closes around content; the `Collapsible` panel and swingset's
+`CodeFooter` have not adopted it yet.
+
+### The content's enter/exit leads; the row is a byproduct
+
+Played together, a row growing around a banner reads as the row: a cell squashing its
+content, with a hard clip line moving across it. Two rules take that apart, and they
+guarantee different things:
+
+1. **No hard clip edge is ever visible.** The moving edge is the content's own edge
+   (it is anchored to it, see Geometry), so nothing is cut there; the stationary edge
+   is faded (see the mask). Clipping under the header is not a goal in itself — it is
+   what falls out of wanting a soft edge for the whole motion and nothing visible at
+   rest.
+2. **The row's fast motion happens while the content is invisible.** That is what
+   decides prominence: what the eye attaches to is the content arriving and
+   leaving, and the row is just the space it takes. Break it and the collapse gets
+   ahead of the content's exit, and one motion reads as two.
+
+Rule 2 is met by a different mechanism in each direction, measured on a 54px banner:
+
+- **Enter: delay the content.** The row opens on `--cl-ease-enter` at `slow` and is
+  ~85% open at 100ms; the surface waits one `fast` before its own entrance, so it
+  arrives into a strip that has all but stopped. The first 100ms is the row moving
+  alone, and that is fine: the strip is empty, so nothing is being clipped and it
+  reads as space being made. The content is anchored to the moving edge (below), so
+  what it does once visible is slide the last few pixels down into place rather
+  than be revealed by a line crossing it.
+- **Exit: let the curve stagger it.** The surface leaves at once at `fast`; the row
+  collapses on `--cl-ease-in-out` at `slow` with no delay. The in-out's slow start
+  holds the row within ~7px of rest for that 100ms, so the content has faded to
+  nothing by the time the row is moving fast. No delay is needed, and a delayed
+  collapse reads as two events.
+
+Both totals land at ~250ms; the asymmetry lives inside the sequence.
+
+### Curves
+
+- **Row opening: `--cl-ease-enter`.** It answers input, so it departs at once like
+  everything else that responds to a pointer; `--cl-ease-default` would carry the
+  height past target and read as a bounce in the layout.
+- **Row closing: `--cl-ease-in-out`.** Not `--cl-ease-exit`, per "A layout settle is
+  not an exit" above. Not `--cl-ease-enter` either, tempting as one curve for both
+  directions is: its fast start moves the row 16px in the first frame while the
+  surface is still at 93% opacity, so the collapse gets ahead of the content's
+  ease-in exit and the two read as separate animations with the layout in front —
+  rule 2 inverted. The in-out's slow start is what keeps the row still until the
+  surface has gone.
+- **Surface: the popover recipe.** Opacity at `fast` on `--cl-ease-enter`, scale at
+  `base` on `--cl-ease-default`, both at `fast` on `--cl-ease-exit` going out. Scale
+  from `0.96` about the **top** edge: the row grows downward from the header, and
+  with the content anchored to the moving edge a top origin pulls the surface's
+  bottom edge a pixel inside the clip rather than onto it. (Center was not tried;
+  top read right.)
+- **Inline text: opacity only.** The scale belongs to content that arrives as a
+  **surface** — a filled, bordered box such as the banner, which reads as an object
+  and can grow into place. A line of text with no box around it (a field error, a
+  row-level message) is not an object; scaled, its glyphs visibly shrink and swell
+  in place. It takes the same opacity timing and the same entrance delay, and no
+  transform at all.
+
+### Durations
+
+The row takes `slow` in both directions. That is not the exception to "exits are
+shorter" it looks like: the departure is the surface's `fast` fade, and the row's
+collapse is a layout settle that follows it.
+
+These values were tuned on a ~54px row and are **soft guidance**. A row of a very
+different height — a one-line message, a whole section — may want a token either
+way, and a reviewer stepping it is not violating anything. Check it per frame either
+way; the dead-frame test still applies to a short collapse. The one-line inline
+messages (`Field.Message`, `Section.Error`) were tried at `base` and read better at
+`slow`, so they keep it.
+
+### Geometry
+
+```text
+wrapper   display: grid; grid-template-rows: 0fr ↔ 1fr; carries the transition attrs and the mask
+clip      grid-row: 1 / span 2; display: grid; align-content: end; min-height: 0; overflow: clip; NO padding
+content   spacing as its own margins; the top one is the fade's length (one constant for both)
+```
+
+- **Anchor the content to the moving edge** (`align-content: end`). Anchored to the
+  top, the content is revealed by the clip line crossing it, and the bottom border is
+  the last thing to appear — a hard edge at exactly the moment the row is crawling to
+  a stop. Anchored to the bottom, the content's own bottom edge _is_ the moving edge,
+  so nothing is ever cut there, and the clipping moves to the top, under the header,
+  where content sliding out from under something reads as natural and where there
+  is room for a fade (below).
+
+- **The clip layer spans into the implicit second row.** A fractional `fr` track is
+  sized twice: the wrapper's height resolves to `f × content`, then the track
+  re-resolves against that now-definite height and comes out at `f² × content`. An
+  item stretched to the track alone therefore lags the wrapper's edge — by 13px at
+  the midpoint of a 54px row — leaving empty space between the clipped content and
+  whatever follows, and putting any fade on the wrapper in the wrong place. Spanning
+  the implicit row hands the item the wrapper's full height. Measured in Chromium
+  and WebKit: `0.62fr` of 54px gives wrapper 33.5 / item 20.8 without the span,
+  33.5 / 33.5 with it.
+
+- Padding on the clip layer is the `0fr` track's minimum and holds it open, which is
+  why the content's spacing is margins one level down.
+- The wrapper cannot sit in a grid parent with a gap: a grid track floors at zero
+  no matter how negative an item's margin, so a closed row still costs one gap.
+  Give it a flex or gapless parent (`Card.Banner` sits between the header and the
+  content grid for exactly this reason). Measured in Chromium and WebKit.
+- Measure the height (`Field.Message`'s ResizeObserver) only when the content
+  changes size _while open_; `0fr ↔ 1fr` covers open/closed on its own.
+
+### Inline text: the measured-height variant
+
+`Field.Message` swaps one message for another while open (an error becoming a success),
+and `0fr ↔ 1fr` cannot animate between two open heights. So the feedback row animates
+an explicit `height` from a measured var instead, and the rest of the recipe carries
+over: the wrapper is its own clip layer (no padding, `align-content: end`), the exiting
+message leaves the flow pinned to the **bottom** (`inset: auto 0 0`) so it rides the
+moving edge, and the mask is the same static top fade.
+
+The spacing that sits above a message is the parent's gap, which a closed row must not
+cost. The wrapper cancels it with a negative top margin and the message puts it back as
+its own top margin, inside the clip, so it can double as the fade's length:
+
+```ts
+const GAP = `var(--_cl-feedback-gap, ${space['2']})`; // the parent's gap, the message's margin, the fade
+wrapper: { marginTop: `calc(-1 * ${GAP})`, height: `calc(var(--_cl-feedback-height) + ${GAP})` }
+message: { marginTop: GAP }
+```
+
+A parent with a different gap sets `--_cl-feedback-gap` (`Field.Content` does, at
+`space['1']`). A parent with no gap, such as the section header grid, zeroes the
+wrapper's margin with `xstyle` and leaves the message's alone.
+
+A swap while open plays out-then-in rather than overlapping: the old message fades at
+`fast`, and the new one's entrance delay holds it until that is done, while the row
+eases between the two heights on `--cl-ease-enter`.
+
+### The fade on the clipped edge
+
+A mask on the wrapper, not an element: it needs no background color, works on any
+surface a consumer themes, and tracks the box for free because the wrapper's box _is_
+the animating track (given the span above — without it the clip edge is somewhere
+else).
+
+```ts
+const INSET = space['4']; // the surface's top margin AND the fade's length
+maskImage: `linear-gradient(to bottom, transparent, black ${INSET})`,
+```
+
+That is the whole mask, and it is static. The rule — **the fade exists whenever the
+clip edge is crossing content, and is never visible at rest** — is met by geometry
+rather than animation: with the content anchored to the moving edge, the only edge
+that ever cuts it is the top one, and at rest the top `INSET` of the box is the
+content's own top margin, so the ramp ends exactly on the content's top border and
+never touches it while the row is still. **The fade's length and the content's top
+margin are one constant** — drift between them either eats the border at rest or
+leaves a hard strip under the header.
+
+A fade on the _moving_ edge instead (content anchored to the top, a bottom gradient
+slid in and out on `mask-size`) was built first and can be made to work, but it has
+to animate the fade away at exactly the moment the row is crawling to a stop, and
+every timing of that read as an artifact. Anchor the content instead; that variant
+is not a recipe.
+
+A hard line at the moving edge is not a fade problem. Before touching the mask,
+check the clip layer's height against the wrapper's per frame: if they differ, the
+item is sized to the re-resolved track and nothing about the fade can be right (see
+the span rule above).
+
+### Reduced motion
+
+The row takes `transition-property: none` and snaps; the mask is static and needs
+nothing. The surface keeps its fade and pins the scale (inline text has none to pin), per "Reduced motion" below,
+and its entrance delay goes to `instant` as well: it exists to wait for the row, and
+a row that has snapped open leaves nothing to wait for.
+
 ## Color and state changes (hover, press)
 
-A state change that only recolors — background, border, text, opacity — takes
-**`linear`, always**. Nothing moves, so there is nothing for an ease to sell:
+A state change on an element that is already there and stays there — background,
+border, text, or an opacity that only dims it — takes **`linear`, always**. This is
+the counterpart to the section above, not an exception to it: a fade that carries a
+surface into or out of existence is an entrance, and takes the entrance and exit
+curves. A hover is not, and neither is a scrim, which dims the page rather than
+arriving on it. Nothing moves, so there is nothing for an ease to sell:
 color interpolation is already perceptually non-uniform, an ease on top just drags
 the midpoint, and `--cl-ease-default`'s overshoot would extrapolate past the target
 color. Reserve the curves for geometry.
@@ -269,7 +517,7 @@ delta — don't stretch it.
 
 For anything anchored to a trigger, scale about the **trigger**, not the element's
 own center, so it reads as emerging from what opened it. `cssVars` in
-`packages/headless/src/utils/css-vars.ts` emits two origins on the floating
+`packages/mosaic/src/primitives/utils/css-vars.ts` emits two origins on the floating
 element; custom properties inherit, so a popup one level down reads them directly.
 
 | var                     | meaning                                                        |

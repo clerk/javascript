@@ -95,7 +95,11 @@ export function UserVerificationFactorTwoComponent(): JSX.Element {
         />
       );
     case 'backup_code':
-      return <UVFactorTwoBackupCodeCard onShowAlternativeMethodsClicked={toggleAllStrategies} />;
+      return (
+        <UVFactorTwoBackupCodeCard
+          onShowAlternativeMethodsClicked={hasAlternativeStrategies ? toggleAllStrategies : undefined}
+        />
+      );
     default:
       return <LoadingCard />;
   }

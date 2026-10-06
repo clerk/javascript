@@ -4,7 +4,7 @@ import { act, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
-import { fireEvent, render } from '@/test/utils';
+import { fireEvent, render, screen } from '@/test/utils';
 
 import { SignInProtectCheck } from '../SignInProtectCheck';
 
@@ -23,6 +23,167 @@ beforeEach(() => {
 });
 
 describe('SignInProtectCheck', () => {
+  it('clears the invitation ticket when the sign-in completes on the challenge', async () => {
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignInWithProtectCheck();
+    });
+    const url = new URL(window.location.href);
+    url.searchParams.set('__clerk_ticket', 'tkt_abc');
+    window.history.replaceState({}, '', url.toString());
+
+    mockExecute.mockResolvedValue('proof-abc');
+    fixtures.signIn.submitProtectCheck.mockResolvedValue({
+      status: 'complete',
+      protectCheck: null,
+      createdSessionId: 'sess_1',
+    } as unknown as SignInResource);
+
+    render(<SignInProtectCheck />, { wrapper });
+
+    await waitFor(() => {
+      expect(fixtures.clerk.setActive).toHaveBeenCalled();
+    });
+    expect(new URL(window.location.href).searchParams.get('__clerk_ticket')).toBeNull();
+  });
+
+  describe('enterprise SSO', () => {
+    const enterpriseSSOSignIn = (supportedFirstFactors: unknown[]) =>
+      ({
+        status: 'needs_first_factor',
+        protectCheck: null,
+        createdSessionId: null,
+        supportedFirstFactors,
+      }) as unknown as SignInResource;
+
+    it('hands off to the connection once the challenge resolves', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue(enterpriseSSOSignIn([{ strategy: 'enterprise_sso' }]));
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledWith({
+          strategy: 'enterprise_sso',
+          redirectUrl: 'http://localhost:3000/#/sso-callback',
+          redirectUrlComplete: '/',
+          oidcPrompt: undefined,
+          continueSignIn: true,
+        });
+      });
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('../factor-one');
+    });
+
+    it('stays on the challenge when preparing the hand-off raises another one', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue(enterpriseSSOSignIn([{ strategy: 'enterprise_sso' }]));
+      fixtures.signIn.authenticateWithRedirect.mockImplementationOnce(() => {
+        (fixtures.signIn as any).protectCheck = { status: 'pending', token: 'challenge-token-2' };
+        throw new ClerkRuntimeError('challenge required', { code: 'protect_check_required' });
+      });
+
+      const { rerender } = render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('.');
+      });
+
+      // The router mock doesn't navigate, so re-render as the resource update would, and check the
+      // second challenge actually runs rather than just that we stayed on the route.
+      rerender(<SignInProtectCheck />);
+      await waitFor(() => {
+        expect(mockExecute).toHaveBeenCalledTimes(2);
+      });
+      expect(mockExecute.mock.calls[1][0]).toMatchObject({ token: 'challenge-token-2' });
+    });
+
+    it('shows a failed hand-off and lets the user retry it, after clearing the challenge cancelled the run', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      // As in production, the submit clears the challenge on the live resource itself, so the next
+      // render drops the challenge token and cancels the run that is still continuing the flow.
+      fixtures.signIn.submitProtectCheck.mockImplementation(() => {
+        Object.assign(fixtures.signIn as any, {
+          protectCheck: null,
+          status: 'needs_first_factor',
+          supportedFirstFactors: [{ strategy: 'enterprise_sso' }],
+        });
+        return Promise.resolve(fixtures.signIn as unknown as SignInResource);
+      });
+      let failHandOff: (err: Error) => void = () => {};
+      fixtures.signIn.authenticateWithRedirect
+        .mockImplementationOnce(
+          () =>
+            new Promise<void>((_, reject) => {
+              failHandOff = reject;
+            }),
+        )
+        .mockResolvedValueOnce(undefined);
+
+      const { rerender, userEvent } = render(<SignInProtectCheck />, { wrapper });
+      await waitFor(() => {
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledTimes(1);
+      });
+      rerender(<SignInProtectCheck />);
+      act(() => {
+        failHandOff(new Error('network down'));
+      });
+
+      // The failure is reported rather than swallowed, and the spinner gives way to a retry.
+      const retryButton = await screen.findByRole('button', { name: /try again/i });
+      await userEvent.click(retryButton);
+      await waitFor(() => {
+        expect(fixtures.signIn.authenticateWithRedirect).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    it('routes to factor one when there is more than one connection to choose from', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue(
+        enterpriseSSOSignIn([
+          { strategy: 'enterprise_sso', enterpriseConnectionId: 'ent_1', enterpriseConnectionName: 'Okta' },
+          { strategy: 'enterprise_sso', enterpriseConnectionId: 'ent_2', enterpriseConnectionName: 'Entra' },
+        ]),
+      );
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-one');
+      });
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+    });
+
+    it('routes to factor one when the user has an SSO bypass to choose instead', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        ...enterpriseSSOSignIn([{ strategy: 'enterprise_sso' }]),
+        ssoBypassFirstFactors: [{ strategy: 'email_code', safeIdentifier: 'hello@clerk.com', emailAddressId: 'idn_1' }],
+      } as unknown as SignInResource);
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      // The start page shows the bypass card rather than redirecting, and the resume has to agree.
+      await waitFor(() => {
+        expect(fixtures.router.navigate).toHaveBeenCalledWith('../factor-one');
+      });
+      expect(fixtures.signIn.authenticateWithRedirect).not.toHaveBeenCalled();
+    });
+  });
+
   it('renders verification UI', async () => {
     const { wrapper } = await createFixtures(f => {
       f.startSignInWithProtectCheck();
@@ -466,5 +627,155 @@ describe('SignInProtectCheck', () => {
       expect(mockExecute).toHaveBeenCalledTimes(2);
       expect(fixtures.signIn.submitProtectCheck).toHaveBeenCalledWith({ proofToken: 'proof-retry' });
     });
+  });
+
+  describe('a sign-in that is pending an OAuth account transfer', () => {
+    // An OAuth sign-in for an identity with no account yet comes back as `needs_identifier`
+    // with a transferable first-factor verification: the server has recorded the transfer and
+    // the client is expected to complete it as a sign-up. None of the interactive sign-in
+    // steps apply, so before this the status fell to the default arm and returned to the
+    // start form — which renders the transfer's error and then resets the attempt, discarding
+    // the transfer for good.
+
+    it('resumes the callback continuation instead of returning to the start form', async () => {
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck({ pendingOAuthTransfer: true, status: 'needs_identifier' });
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_identifier',
+        protectCheck: null,
+        createdSessionId: null,
+        firstFactorVerification: { status: 'transferable' },
+      } as unknown as SignInResource);
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.clerk.__internal_resumeAfterProtectCheck).toHaveBeenCalledWith(
+          expect.objectContaining({ continuation: 'transfer_to_sign_up' }),
+          expect.any(Function),
+        );
+      });
+      // Dropping this param routes a completed transfer whose session has a pending task with
+      // the component's base URL rather than its mounted route.
+      expect(vi.mocked(fixtures.clerk.__internal_resumeAfterProtectCheck).mock.calls[0][0]).toHaveProperty(
+        '__internal_navigateOnSetActive',
+      );
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('..');
+    });
+
+    it('resumes even when the resolved sign-in no longer carries the transferable marker', async () => {
+      // `SignIn.fromJSON` replaces `firstFactorVerification` wholesale on every write, so the
+      // marker that routed us here is not guaranteed to survive `submitProtectCheck`. The
+      // component latches it at mount for exactly this case; re-reading it afterwards would
+      // silently fall back to the broken path.
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck({ pendingOAuthTransfer: true, status: 'needs_identifier' });
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_identifier',
+        protectCheck: null,
+        createdSessionId: null,
+        firstFactorVerification: { status: null },
+      } as unknown as SignInResource);
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => {
+        expect(fixtures.clerk.__internal_resumeAfterProtectCheck).toHaveBeenCalledWith(
+          expect.objectContaining({ continuation: 'transfer_to_sign_up' }),
+          expect.any(Function),
+        );
+      });
+      // Dropping this param routes a completed transfer whose session has a pending task with
+      // the component's base URL rather than its mounted route.
+      expect(vi.mocked(fixtures.clerk.__internal_resumeAfterProtectCheck).mock.calls[0][0]).toHaveProperty(
+        '__internal_navigateOnSetActive',
+      );
+      expect(fixtures.router.navigate).not.toHaveBeenCalledWith('..');
+    });
+
+    it('degrades to the pre-existing destination when the runtime predates the resume method', async () => {
+      // @clerk/ui reaches apps independently of clerk-js, so a newer card can meet a runtime
+      // that has no `__internal_resumeAfterProtectCheck`. An unconditional call throws there and
+      // strands the very transfer this card exists to resume, so the call is feature-detected.
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck({ pendingOAuthTransfer: true, status: 'needs_identifier' });
+      });
+      (fixtures.clerk as unknown as Record<string, unknown>).__internal_resumeAfterProtectCheck = undefined;
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_identifier',
+        protectCheck: null,
+        createdSessionId: null,
+        firstFactorVerification: { status: 'transferable' },
+      } as unknown as SignInResource);
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('..'));
+    });
+
+    it('surfaces a message when the resumed continuation fails with a non-Clerk error', async () => {
+      // `handleError` re-throws what it does not recognise, and the continuation can raise a plain
+      // Error (a transient fetch failure, or a callback that did not complete). That throw escaped
+      // the void-invoked challenge run, leaving the card with no spinner, no message and no retry --
+      // stranding the user on the very flow this card exists to resume.
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck({ pendingOAuthTransfer: true, status: 'needs_identifier' });
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_identifier',
+        protectCheck: null,
+        createdSessionId: null,
+        firstFactorVerification: { status: 'transferable' },
+      } as unknown as SignInResource);
+      vi.mocked(fixtures.clerk.__internal_resumeAfterProtectCheck).mockRejectedValue(new Error('Failed to fetch'));
+
+      const { findByText } = render(<SignInProtectCheck />, { wrapper });
+
+      expect(await findByText(/unable to complete action at this time/i)).toBeInTheDocument();
+    });
+
+    it('leaves an ordinary gated sign-in on the existing path', async () => {
+      // The guard above must not divert every gated sign-in into the OAuth router.
+      const { wrapper, fixtures } = await createFixtures(f => {
+        f.startSignInWithProtectCheck();
+      });
+      mockExecute.mockResolvedValue('proof-abc');
+      fixtures.signIn.submitProtectCheck.mockResolvedValue({
+        status: 'needs_identifier',
+        protectCheck: null,
+        createdSessionId: null,
+        firstFactorVerification: { status: null },
+      } as unknown as SignInResource);
+
+      render(<SignInProtectCheck />, { wrapper });
+
+      await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('..'));
+      expect(fixtures.clerk.__internal_resumeAfterProtectCheck).not.toHaveBeenCalled();
+    });
+  });
+
+  it('routes stale standalone protect-check visits back to the flow start', async () => {
+    // The sign-up card has had this guard since it shipped; without it this card renders an
+    // empty shell forever on a back-button or a bookmarked URL.
+    const { wrapper, fixtures } = await createFixtures(f => {
+      f.startSignInWithEmailAddress();
+    });
+    fixtures.router.currentPath = '/sign-in/protect-check';
+    fixtures.router.fullPath = '/sign-in';
+    fixtures.router.indexPath = '/sign-in';
+
+    const { queryByText } = render(<SignInProtectCheck />, { wrapper });
+
+    // The card shell must not flash while the redirect below kicks in.
+    expect(queryByText(/verifying your request/i)).not.toBeInTheDocument();
+
+    await waitFor(() => expect(fixtures.router.navigate).toHaveBeenCalledWith('/sign-in'));
+    expect(mockExecute).not.toHaveBeenCalled();
   });
 });

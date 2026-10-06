@@ -73,10 +73,9 @@ Private packages never appear in a changeset. In this repo the private ones are:
 | ----------------- | ---------------------------- |
 | `@clerk/swingset` | private, component workbench |
 | `@clerk/msw`      | private, test mocks          |
-| `@clerk/headless` | private                      |
 
 Everything else under `packages/*` is published, **including `@clerk/ui` and `@clerk/clerk-js`**.
-You do not need to check the `private` field; if it is not one of the three above, it publishes.
+You do not need to check the `private` field; if it is not one of the two above, it publishes.
 
 If a change touches only private packages, that is an empty changeset.
 

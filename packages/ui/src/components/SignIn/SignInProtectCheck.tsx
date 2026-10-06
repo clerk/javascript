@@ -1,70 +1,54 @@
+import { removeClerkQueryParam } from '@clerk/shared/internal/clerk-js/queryParams';
 import { useClerk } from '@clerk/shared/react';
 import type { SignInResource } from '@clerk/shared/types';
+import { useEffect, useRef, useState } from 'react';
 
-import { Card } from '@/ui/elements/Card';
 import { useCardState, withCardStateProvider } from '@/ui/elements/contexts';
-import { Header } from '@/ui/elements/Header';
+import { actionBlockedDetailsFrom } from '@/ui/utils/actionBlocked';
 
-import { withRedirectToAfterSignIn } from '../../common';
+import { ActionBlockedCard, withRedirectToAfterSignIn } from '../../common';
 import { useCoreSignIn, useSignInContext } from '../../contexts';
-import {
-  Box,
-  Button,
-  Col,
-  descriptors,
-  Flex,
-  Flow,
-  localizationKeys,
-  Spinner,
-  useLocalizations,
-} from '../../customizables';
-import { useSpinDelay } from '../../hooks';
+import { useNavigateToFlowStart } from '../../hooks/useNavigateToFlowStart';
 import { useProtectCheckRunner } from '../../hooks/useProtectCheckRunner';
 import { useRouter } from '../../router';
+import { ProtectCheckCard } from '../ProtectCheck/ProtectCheckCard';
+import { buildSignInOAuthCallbackParams } from './buildOAuthCallbackParams';
+import {
+  isProtectCheckRequiredError,
+  isSignInPendingOAuthTransfer,
+  isSignInProtectGated,
+  resumeSignInAfterProtectCheck,
+} from './handleProtectCheck';
 
-/**
- * Routes the user to the next step after a protect check has been resolved (or short-circuits
- * to the same route to handle a chained challenge).
- *
- * After the gate clears, the client should retry the operation that was gated.
- * For most steps (factor-one/factor-two cards), the underlying card uses `useFetch` to call
- * `prepareFirstFactor`/`prepareSecondFactor` on mount, so navigating back is sufficient to
- * re-trigger the gated work.
- */
-function navigateNext(signIn: SignInResource, navigate: (to: string) => Promise<unknown>): Promise<unknown> {
-  // Chained challenge — stay here and re-run the new challenge on next render. Both
-  // signals are checked: `protectCheck` is the authoritative field, and
-  // `'needs_protect_check'` is the SDK-version-gated status.
-  if (signIn.protectCheck || signIn.status === 'needs_protect_check') {
-    return navigate('.');
-  }
-
-  switch (signIn.status) {
-    case 'needs_first_factor':
-      return navigate('../factor-one');
-    case 'needs_second_factor':
-      return navigate('../factor-two');
-    case 'needs_client_trust':
-      return navigate('../client-trust');
-    case 'needs_new_password':
-      return navigate('../reset-password');
-    case 'complete':
-      // Finalization is handled by the caller via setActive; just bounce to index.
-      return navigate('..');
-    default:
-      return navigate('..');
-  }
-}
-
-function SignInProtectCheckInternal(): JSX.Element {
+function SignInProtectCheckInternal(): JSX.Element | null {
   const card = useCardState();
-  const { t } = useLocalizations();
   const signIn = useCoreSignIn();
   const { navigate } = useRouter();
-  const { setActive } = useClerk();
-  const { afterSignInUrl, navigateOnSetActive } = useSignInContext();
+  const { navigateToFlowStart } = useNavigateToFlowStart();
+  const clerk = useClerk();
+  const { setActive, __internal_resumeAfterProtectCheck } = clerk;
+  const ctx = useSignInContext();
+  const { afterSignInUrl, navigateOnSetActive } = ctx;
 
-  const { containerRef, isRunning, isWidgetVisible, hasError, retry } = useProtectCheckRunner<SignInResource>({
+  // persist the original status of whether the sign-in is pending an OAuth transfer
+  const startedAsOAuthTransfer = useRef(isSignInPendingOAuthTransfer(signIn));
+
+  // persist that a protect check existed at some point
+  const [everSawProtectCheck, setEverSawProtectCheck] = useState(!!signIn.protectCheck);
+  const didStartNoCheckFallbackRef = useRef(false);
+
+  if (signIn.protectCheck && !everSawProtectCheck) {
+    setEverSawProtectCheck(true);
+  }
+
+  useEffect(() => {
+    if (!signIn.protectCheck && !everSawProtectCheck && !didStartNoCheckFallbackRef.current) {
+      didStartNoCheckFallbackRef.current = true;
+      void navigateToFlowStart();
+    }
+  }, [everSawProtectCheck, navigateToFlowStart, signIn.protectCheck]);
+
+  const runner = useProtectCheckRunner<SignInResource>({
     getProtectCheck: () => signIn.protectCheck,
     getResource: () => signIn,
     reload: () => signIn.reload(),
@@ -77,6 +61,9 @@ function SignInProtectCheckInternal(): JSX.Element {
         return;
       }
       if (updatedSignIn.status === 'complete' && updatedSignIn.createdSessionId) {
+        // A ticket sign-in that would have completed on the start page is completing here
+        // instead, so the ticket has to be cleared here too — otherwise it stays in the URL.
+        removeClerkQueryParam('__clerk_ticket');
         await setActive({
           session: updatedSignIn.createdSessionId,
           navigate: async ({ session, decorateUrl }) => {
@@ -85,59 +72,64 @@ function SignInProtectCheckInternal(): JSX.Element {
         });
         return;
       }
-      await navigateNext(updatedSignIn, navigate);
+      await resumeSignInAfterProtectCheck(updatedSignIn, {
+        navigate,
+        // No `enterpriseConnectionId` is passed: this runs only under
+        // `shouldHandOffToEnterpriseConnection`, which requires a single connection, so the server
+        // has exactly one to prepare. If that guard is ever loosened to resume a connection the
+        // user chose, the id has to be carried across the challenge and passed here.
+        resumeEnterpriseSSO: async () => {
+          try {
+            await signIn.authenticateWithRedirect({
+              strategy: 'enterprise_sso',
+              redirectUrl: ctx.ssoCallbackUrl,
+              redirectUrlComplete: afterSignInUrl || '/',
+              oidcPrompt: ctx.oidcPrompt,
+              continueSignIn: true,
+            });
+          } catch (err) {
+            // Preparing the hand-off can raise a further challenge, in which case no redirect was
+            // issued: stay here and run it on the next render.
+            if (isProtectCheckRequiredError(err) && isSignInProtectGated(signIn)) {
+              await navigate('.');
+              return;
+            }
+            throw err;
+          }
+        },
+        startedAsOAuthTransfer: startedAsOAuthTransfer.current,
+        resumeOAuthContinuation: () =>
+          typeof __internal_resumeAfterProtectCheck === 'function'
+            ? __internal_resumeAfterProtectCheck(
+                {
+                  ...buildSignInOAuthCallbackParams(ctx),
+                  continuation: 'transfer_to_sign_up',
+                  __internal_navigateOnSetActive: ctx.navigateOnSetActive,
+                },
+                navigate,
+              )
+            : navigate('..'),
+      });
     },
   });
 
-  // Debounce the spinner's entrance so a near-instant check (or a script that signals its
-  // widget immediately) never flashes it — the card header alone carries the first ~300ms.
-  // The error and widget-visibility gates stay OUTSIDE the delay hook below: its minimum
-  // visible duration must never outrank the handshake's "spinner is gone when the promise
-  // resolves" guarantee, nor keep a spinner next to the retry button.
-  const showSpinner = useSpinDelay(isRunning, { delay: 300 });
+  // Stale/direct visit that never had a check: render nothing while the flow-start redirect
+  // scheduled above kicks in, instead of flashing the card shell for one paint. Must stay
+  // below every hook call.
+  if (!signIn.protectCheck && !everSawProtectCheck) {
+    return null;
+  }
+
+  const blockedDetails = actionBlockedDetailsFrom(card.rawError);
+  if (blockedDetails) {
+    return <ActionBlockedCard details={blockedDetails} />;
+  }
 
   return (
-    <Flow.Part part='protectCheck'>
-      <Card.Root>
-        <Card.Content>
-          <Header.Root showLogo>
-            <Header.Title localizationKey={localizationKeys('signIn.protectCheck.title')} />
-            <Header.Subtitle localizationKey={localizationKeys('signIn.protectCheck.subtitle')} />
-          </Header.Root>
-          <Card.Alert>{card.error}</Card.Alert>
-          <Col
-            elementDescriptor={descriptors.main}
-            gap={6}
-          >
-            <Box
-              ref={containerRef}
-              id='clerk-protect-check'
-              aria-busy={isRunning}
-              // Out of flow while empty so the collapsed container adds no reserved height or flex-gap
-              // gutter above the spinner (same idiom as CaptchaElement's `gapless` mode).
-              style={{ display: 'block', alignSelf: 'center', position: isWidgetVisible ? 'static' : 'absolute' }}
-            />
-            {showSpinner && !hasError && !isWidgetVisible ? (
-              <Flex center>
-                <Spinner
-                  size='lg'
-                  colorScheme='primary'
-                  elementDescriptor={descriptors.spinner}
-                  aria-label={t(localizationKeys('signIn.protectCheck.loading'))}
-                />
-              </Flex>
-            ) : null}
-            {hasError ? (
-              <Button
-                onClick={retry}
-                localizationKey={localizationKeys('signIn.protectCheck.retryButton')}
-              />
-            ) : null}
-          </Col>
-        </Card.Content>
-        <Card.Footer />
-      </Card.Root>
-    </Flow.Part>
+    <ProtectCheckCard
+      flow='signIn'
+      runner={runner}
+    />
   );
 }
 

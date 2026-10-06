@@ -1,11 +1,11 @@
 # useDataTable
 
-State manager for data tables from `@clerk/headless`. Tracks pagination, sorting, column filters, global filter, and row selection. Each state slice supports the controlled/uncontrolled pattern. Designed for server-side data: you supply the already-fetched page of rows, and the hook tracks which page, sort, and filters to request next.
+State manager for data tables. Tracks pagination, sorting, column filters, global filter, and row selection. Each state slice supports the controlled/uncontrolled pattern. Designed for server-side data: you supply the already-fetched page of rows, and the hook tracks which page, sort, and filters to request next.
 
 ## Usage
 
 ```tsx
-import { useDataTable } from '@clerk/headless/hooks';
+import { useDataTable } from '@clerk/mosaic/primitives/hooks';
 
 const {
   rows,
@@ -59,12 +59,12 @@ const {
 
 Each `DataTableRow` has:
 
-| Field              | Type            | Description                   |
-| ------------------ | --------------- | ----------------------------- |
-| `id`               | `string`        | Stable row identifier         |
-| `original`         | `TData`         | Original data item            |
-| `getIsSelected()`  | `() => boolean` | Whether this row is selected  |
-| `toggleSelected()` | `() => void`    | Toggle selection for this row |
+| Field                      | Type                                      | Description                                                                                                          |
+| -------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `id`                       | `string`                                  | Stable row identifier                                                                                                |
+| `original`                 | `TData`                                   | Original data item                                                                                                   |
+| `getIsSelected()`          | `() => boolean`                           | Whether this row is selected                                                                                         |
+| `toggleSelected(options?)` | `(options?: { range?: boolean }) => void` | Toggle selection for this row; with `range`, apply the toggle to every row between the last toggled row and this one |
 
 ### Pagination
 

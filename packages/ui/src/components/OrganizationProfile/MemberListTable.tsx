@@ -155,8 +155,19 @@ export const RoleSelect = (props: {
   triggerSx?: ThemableCssProp;
   optionListSx?: ThemableCssProp;
   prefixLocalizationKey?: LocalizationKey | string;
+  formatLabel?: (label: string, role: { label: string; value: string }) => string;
 }) => {
-  const { value, fallbackLabel, roles, onChange, isDisabled, triggerSx, optionListSx, prefixLocalizationKey } = props;
+  const {
+    value,
+    fallbackLabel,
+    roles,
+    onChange,
+    isDisabled,
+    triggerSx,
+    optionListSx,
+    prefixLocalizationKey,
+    formatLabel = label => label,
+  } = props;
 
   const { localizeCustomRole } = useLocalizeCustomRoles();
 
@@ -169,9 +180,9 @@ export const RoleSelect = (props: {
     () =>
       fetchedRoles.map(role => ({
         value: role.value,
-        label: localizeCustomRole(role.value) || role.label,
+        label: formatLabel(localizeCustomRole(role.value) || role.label, role),
       })),
-    [fetchedRoles, localizeCustomRole],
+    [fetchedRoles, localizeCustomRole, formatLabel],
   );
 
   return (
@@ -221,7 +232,7 @@ export const RoleSelect = (props: {
               as='span'
               colorScheme='body'
             >
-              {localizeCustomRole(selectedRole?.value) || selectedRole?.label}
+              {selectedRole && formatLabel(localizeCustomRole(selectedRole.value) || selectedRole.label, selectedRole)}
             </Text>
           </Flex>
         ) : fallbackLabel ? (

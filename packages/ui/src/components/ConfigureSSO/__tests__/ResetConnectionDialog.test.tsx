@@ -32,7 +32,9 @@ const renderDialog = (
         onDelete={() => deleteConnection('idn_connection_1')}
         contentRef={{ current: null }}
         title={props.title}
-        subtitle={props.subtitle}
+        subtitle={
+          props.subtitle ?? localizationKeys('configureSSO.resetConnectionDialog.subtitle', { name: 'Acme SSO' })
+        }
         confirmButtonLabel={props.confirmButtonLabel}
       />
     </CardStateProvider>,
@@ -65,7 +67,7 @@ describe('ResetConnectionDialog', () => {
     expect(screen.getByRole('heading', { name: 'Reset connection' })).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Are you sure you want to reset the connection\? This action is irreversible and you will have to configure all steps again/i,
+        /Are you sure you want to reset the connection "Acme SSO"\? This action is irreversible and you will have to configure all steps again/i,
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Reset connection' })).toBeInTheDocument();
@@ -78,13 +80,13 @@ describe('ResetConnectionDialog', () => {
     renderDialog(wrapper, {
       confirmationValue: 'Acme Inc',
       title: localizationKeys('organizationProfile.securityPage.removeDialog.title'),
-      subtitle: localizationKeys('organizationProfile.securityPage.removeDialog.subtitle'),
+      subtitle: localizationKeys('organizationProfile.securityPage.removeDialog.subtitle', { name: 'Acme SSO' }),
       confirmButtonLabel: localizationKeys('organizationProfile.securityPage.removeDialog.confirmButton'),
     });
 
     expect(screen.getByRole('heading', { name: 'Remove SSO connection' })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Reset connection' })).not.toBeInTheDocument();
-    expect(screen.getByText(/Are you sure you want to remove the connection\?/i)).toBeInTheDocument();
+    expect(screen.getByText(/Are you sure you want to remove the connection "Acme SSO"\?/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Remove connection' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Reset connection' })).not.toBeInTheDocument();
     // Type-to-confirm is unchanged by the override.

@@ -1,0 +1,634 @@
+import * as stylex from '@stylexjs/stylex';
+import { act, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { MosaicProvider } from '../../mosaic-provider';
+import { Badge } from '../badge';
+import { Card } from '../card';
+import { Dialog } from '../dialog';
+import { HeadingLevelProvider } from '../heading';
+import { Icon } from '../icon';
+import { Panel } from '../panel';
+import { Section } from '../section';
+import type { ProfileRootProps } from './profile';
+import { Profile } from './profile';
+
+function Surface(rootProps: Partial<ProfileRootProps>) {
+  return (
+    <Profile.Root
+      value='account'
+      {...rootProps}
+    >
+      <Profile.Title>User profile</Profile.Title>
+      <Profile.Nav>
+        <Profile.NavItem
+          value='account'
+          icon={<Icon name='user-circle' />}
+        >
+          Account
+        </Profile.NavItem>
+        <Profile.NavItem value='security'>Security</Profile.NavItem>
+      </Profile.Nav>
+      <Profile.Content>
+        <Profile.ContentPanel value='account'>
+          <Panel.Root>
+            <Panel.Title>Account</Panel.Title>
+            <Panel.Sections>
+              <Section.Root>
+                <Section.Group>
+                  <Section.Header>
+                    <Section.Title>Email addresses</Section.Title>
+                  </Section.Header>
+                </Section.Group>
+              </Section.Root>
+            </Panel.Sections>
+          </Panel.Root>
+        </Profile.ContentPanel>
+        <Profile.ContentPanel value='security'>Security page</Profile.ContentPanel>
+      </Profile.Content>
+    </Profile.Root>
+  );
+}
+
+function renderSurface(props: Partial<ProfileRootProps> = {}) {
+  return render(
+    <MosaicProvider>
+      <Surface {...props} />
+    </MosaicProvider>,
+  );
+}
+
+function atomsOf(style: stylex.StyleXStyles): string[] {
+  return stylex
+    .props(style)
+    .className!.split(' ')
+    .filter(name => !name.includes('__'));
+}
+
+describe('Profile', () => {
+  it('renders trailing badge content in a navigation item', () => {
+    render(
+      <Profile.Root value='account'>
+        <Profile.Title>Settings</Profile.Title>
+        <Profile.Nav>
+          <Profile.NavItem
+            value='account'
+            badge={<Badge>3</Badge>}
+          >
+            Account
+          </Profile.NavItem>
+        </Profile.Nav>
+        <Profile.Content>
+          <Profile.ContentPanel value='account'>Account content</Profile.ContentPanel>
+        </Profile.Content>
+      </Profile.Root>,
+    );
+
+    expect(screen.getByText('3').closest('.cl-profile-nav-item-badge')).toBeInTheDocument();
+  });
+
+  it('defaults a navigation item badge to the neutral color', () => {
+    render(
+      <Profile.Root value='account'>
+        <Profile.Title>Settings</Profile.Title>
+        <Profile.Nav>
+          <Profile.NavItem
+            value='account'
+            badge={<Badge data-testid='account-badge'>3</Badge>}
+          >
+            Account
+          </Profile.NavItem>
+          <Profile.NavItem
+            value='security'
+            badge={
+              <Badge
+                color='warning'
+                data-testid='security-badge'
+              >
+                1
+              </Badge>
+            }
+          >
+            Security
+          </Profile.NavItem>
+        </Profile.Nav>
+        <Profile.Content>
+          <Profile.ContentPanel value='account'>Account content</Profile.ContentPanel>
+          <Profile.ContentPanel value='security'>Security content</Profile.ContentPanel>
+        </Profile.Content>
+      </Profile.Root>,
+    );
+
+    expect(screen.getByTestId('account-badge')).toHaveAttribute('data-color', 'neutral');
+    expect(screen.getByTestId('security-badge')).toHaveAttribute('data-color', 'warning');
+  });
+
+  it('is a labelled navigation of tabs beside the selected page', () => {
+    renderSurface();
+
+    const title = screen.getByRole('heading', { level: 2, name: 'User profile' });
+    expect(title).toHaveClass('cl-profile-title', 'cl-visually-hidden');
+    expect(screen.getByRole('navigation', { name: 'User profile' })).toHaveAttribute('aria-labelledby', title.id);
+    expect(screen.getByRole('tablist')).toHaveAttribute('aria-orientation', 'vertical');
+    const account = screen.getByRole('tab', { name: 'Account' });
+    const page = screen.getByRole('tabpanel');
+    expect(account).toHaveAttribute('aria-selected', 'true');
+    expect(account).toHaveAttribute('aria-controls', page.id);
+    expect(page).toHaveTextContent('Email addresses');
+    expect(screen.getByText('Security page')).not.toBeVisible();
+  });
+
+  it('reports a selection, and moves it with the arrow keys', async () => {
+    const onValueChange = vi.fn();
+    const user = userEvent.setup();
+    renderSurface({ onValueChange });
+
+    await user.click(screen.getByRole('tab', { name: 'Security' }));
+    expect(onValueChange).toHaveBeenCalledWith('security');
+
+    screen.getByRole('tab', { name: 'Account' }).focus();
+    await user.keyboard('{ArrowDown}');
+    expect(screen.getByRole('tab', { name: 'Security' })).toHaveFocus();
+  });
+
+  it('exposes its parts through stable slots and state attributes', () => {
+    const probe = stylex.create({ root: { maxWidth: '900px' } });
+    const { container } = renderSurface({ value: 'security', xstyle: probe.root });
+
+    expect(container.firstChild).toHaveClass('cl-profile');
+    expect(Array.from(container.firstChild instanceof Element ? container.firstChild.classList : [])).toEqual(
+      expect.arrayContaining(atomsOf(probe.root)),
+    );
+    expect(screen.getByRole('navigation')).toHaveClass('cl-profile-nav');
+    expect(screen.getByRole('tablist')).toHaveClass('cl-profile-nav-list');
+    const security = screen.getByRole('tab', { name: 'Security' });
+    expect(security).toHaveClass('cl-profile-nav-item');
+    expect(security).toHaveAttribute('data-selected');
+    expect(screen.getByRole('tab', { name: 'Account' })).not.toHaveAttribute('data-selected');
+    expect(screen.getByRole('tabpanel')).toHaveClass('cl-profile-content-panel');
+    expect(screen.getByRole('tabpanel')).toHaveAttribute('data-value', 'security');
+    expect(container.querySelector('.cl-profile-content')).toContainElement(screen.getByRole('tabpanel'));
+  });
+
+  it('merges the className a render source hands the root', () => {
+    const { container } = renderSurface({ render: <section className='from-render' /> });
+
+    expect(container.firstChild).toHaveClass('cl-profile', 'from-render');
+  });
+
+  it('claims no main landmark', () => {
+    renderSurface();
+
+    expect(screen.queryByRole('main')).not.toBeInTheDocument();
+  });
+
+  it('hides a destination icon from assistive tech', () => {
+    renderSurface();
+
+    const icon = screen.getByRole('tab', { name: 'Account' }).querySelector('.cl-profile-nav-item-icon');
+    expect(icon).toHaveAttribute('aria-hidden', 'true');
+    expect(icon).toContainElement(document.querySelector('.cl-icon'));
+  });
+
+  it('signs the navigation with Clerk unless told not to', () => {
+    const branded = renderSurface();
+    expect(screen.getByRole('navigation')).toContainElement(screen.getByText(/Secured by/));
+    expect(screen.getByRole('link', { name: 'Clerk' })).toBeInTheDocument();
+    branded.unmount();
+
+    renderSurface({ renderBranding: false });
+    expect(screen.queryByText(/Secured by/)).not.toBeInTheDocument();
+  });
+
+  it('is the named container its compact layout queries', () => {
+    const probe = stylex.create({ container: { containerName: 'cl-profile', containerType: 'inline-size' } });
+    const { container } = renderSurface();
+
+    expect(Array.from((container.firstChild as HTMLElement).classList)).toEqual(
+      expect.arrayContaining(atomsOf(probe.container)),
+    );
+  });
+
+  it('hides the in-place navigation under the compact query', () => {
+    const probe = stylex.create({
+      hidden: { display: { default: 'flex', '@container (width < 48rem)': 'none' } },
+    });
+    renderSurface();
+
+    expect(Array.from(screen.getByRole('navigation').classList)).toEqual(expect.arrayContaining(atomsOf(probe.hidden)));
+  });
+
+  describe('heading levels', () => {
+    it('nests the title, page title, and section titles one level apart', () => {
+      renderSurface();
+      expect(screen.getByRole('heading', { level: 2, name: 'User profile' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 4, name: 'Email addresses' })).toBeInTheDocument();
+    });
+
+    it('starts from the level of an enclosing HeadingLevelProvider', () => {
+      render(
+        <MosaicProvider>
+          <HeadingLevelProvider level={3}>
+            <Surface />
+          </HeadingLevelProvider>
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('heading', { level: 3, name: 'User profile' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 4, name: 'Account' })).toBeInTheDocument();
+      expect(screen.getByRole('heading', { level: 5, name: 'Email addresses' })).toBeInTheDocument();
+    });
+
+    it('lets the render prop override the title level', () => {
+      render(
+        <MosaicProvider>
+          <Profile.Root value='account'>
+            <Profile.Title render={<h1 />}>User profile</Profile.Title>
+          </Profile.Root>
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('heading', { level: 1, name: 'User profile' })).toHaveClass('cl-profile-title');
+    });
+  });
+
+  describe('page title', () => {
+    it('is a plain heading while the navigation is beside the content', () => {
+      renderSurface();
+      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toHaveClass('cl-profile-page-title');
+      expect(screen.queryByRole('button', { name: 'Account' })).not.toBeInTheDocument();
+    });
+
+    it('is the only page title, follows the selection, and names the tabpanel', () => {
+      const { rerender } = renderSurface();
+      expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(1);
+      expect(screen.queryByText('Account', { selector: '.cl-panel-title *' })).not.toBeInTheDocument();
+      expect(screen.getByRole('tabpanel', { name: 'Account' })).toBeInTheDocument();
+
+      rerender(
+        <MosaicProvider>
+          <Surface value='security' />
+        </MosaicProvider>,
+      );
+      expect(screen.getByRole('heading', { level: 3, name: 'Security' })).toBeInTheDocument();
+      expect(screen.getByRole('tabpanel', { name: 'Security' })).toHaveTextContent('Security page');
+    });
+
+    it('sits in the scrolling content, above the pages', () => {
+      renderSurface();
+      const title = screen.getByRole('heading', { level: 3, name: 'Account' });
+      expect(document.querySelector('.cl-profile-content-body')).toContainElement(title);
+      expect(title.compareDocumentPosition(screen.getByRole('tabpanel'))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+  });
+
+  // The sentinel reports 1px column, 2px select, 3px sheet.
+  describe('compact', () => {
+    let observe: ((width: number) => void) | null = null;
+    const original = globalThis.ResizeObserver;
+
+    beforeEach(() => {
+      observe = null;
+      class FakeResizeObserver {
+        private readonly callback: ResizeObserverCallback;
+        constructor(callback: ResizeObserverCallback) {
+          this.callback = callback;
+        }
+        observe(target: Element) {
+          // The select's positioning observes its trigger too; only the sentinel reports the layout.
+          if (!target.classList.contains('cl-profile-sentinel')) {
+            return;
+          }
+          observe = width => {
+            Object.defineProperty(target, 'offsetWidth', { configurable: true, value: width });
+            Object.defineProperty(target, 'offsetHeight', { configurable: true, value: 600 });
+            this.callback([], this as unknown as ResizeObserver);
+          };
+        }
+        disconnect() {}
+        unobserve() {}
+      }
+      globalThis.ResizeObserver = FakeResizeObserver as unknown as typeof ResizeObserver;
+    });
+
+    afterEach(() => {
+      globalThis.ResizeObserver = original;
+    });
+
+    it('moves the tablist into a sheet the page title opens, and closes it on a choice', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      renderSurface({ onValueChange });
+      act(() => observe?.(3));
+
+      expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+      const headline = screen.getByRole('button', { name: 'Account' });
+      expect(headline).toHaveAttribute('aria-expanded', 'false');
+      expect(headline).toHaveAttribute('aria-haspopup', 'dialog');
+      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toContainElement(headline);
+
+      await user.click(headline);
+      const sheet = screen.getByRole('dialog', { name: 'User profile' });
+      expect(sheet).toHaveClass('cl-drawer-popup');
+      expect(sheet).toContainElement(screen.getByRole('tablist'));
+      expect(screen.queryByText(/Secured by/)).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('tab', { name: 'Security' }));
+      expect(onValueChange).toHaveBeenCalledWith('security');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('picks the page from a listbox under the page title off a phone', async () => {
+      const user = userEvent.setup();
+      const onValueChange = vi.fn();
+      renderSurface({ onValueChange });
+      act(() => observe?.(2));
+
+      expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+      expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+      const headline = screen.getByRole('combobox', { name: 'Account' });
+      expect(screen.getByRole('heading', { level: 3, name: 'Account' })).toContainElement(headline);
+      await user.click(headline);
+      const listbox = screen.getByRole('listbox');
+      expect(headline).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByRole('option', { name: 'Account' })).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByRole('option', { name: 'Account' })).toHaveClass('cl-profile-nav-item');
+      expect(listbox).toContainElement(screen.getByRole('option', { name: 'Security' }));
+      expect(document.querySelector('.cl-drawer-popup')).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('option', { name: 'Security' }));
+      expect(onValueChange).toHaveBeenCalledWith('security');
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+    });
+
+    it('opens the listbox from the keyboard, picks with the arrows, and keeps focus on the title', async () => {
+      const user = userEvent.setup();
+      function Controlled() {
+        const [value, setValue] = React.useState('account');
+        return (
+          <Surface
+            value={value}
+            onValueChange={setValue}
+          />
+        );
+      }
+      render(
+        <MosaicProvider>
+          <Controlled />
+        </MosaicProvider>,
+      );
+      act(() => observe?.(2));
+      const headline = screen.getByRole('combobox', { name: 'Account' });
+
+      headline.focus();
+      await user.keyboard('{Enter}');
+      await waitFor(() => expect(screen.getByRole('option', { name: 'Account' })).toHaveFocus());
+      await user.keyboard('{ArrowDown}');
+      expect(screen.getByRole('option', { name: 'Security' })).toHaveFocus();
+      await user.keyboard('{Enter}');
+
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+      expect(headline).toHaveFocus();
+      expect(headline).toHaveAccessibleName('Security');
+      expect(screen.getByRole('group', { name: 'Security' })).toHaveTextContent('Security page');
+    });
+
+    it('returns focus to the page title when the listbox is escaped', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(2));
+      const headline = screen.getByRole('combobox', { name: 'Account' });
+
+      await user.click(headline);
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+      await user.keyboard('{Escape}');
+
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+      expect(headline).toHaveFocus();
+    });
+
+    it('closes the listbox when the page title is pressed again', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(2));
+      const headline = screen.getByRole('combobox', { name: 'Account' });
+      await user.click(headline);
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+      await user.click(headline);
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+      expect(headline).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('closes the sheet on Escape and returns focus to the page title', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(3));
+      const headline = screen.getByRole('button', { name: 'Account' });
+      headline.focus();
+      await user.keyboard('{Enter}');
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      await user.keyboard('{Escape}');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      expect(headline).toHaveFocus();
+    });
+
+    it('hands focus back to the page title once the sheet closes on a choice', async () => {
+      const user = userEvent.setup();
+      function Controlled() {
+        const [value, setValue] = React.useState('account');
+        return (
+          <Surface
+            value={value}
+            onValueChange={setValue}
+          />
+        );
+      }
+      render(
+        <MosaicProvider>
+          <Controlled />
+        </MosaicProvider>,
+      );
+      act(() => observe?.(3));
+
+      const headline = screen.getByRole('button', { name: 'Account' });
+      await user.click(headline);
+      await user.click(screen.getByRole('tab', { name: 'Security' }));
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+      await waitFor(() => expect(headline).toHaveFocus());
+      expect(headline).toHaveAccessibleName('Security');
+    });
+
+    it.each([
+      ['sheet', 3],
+      ['select', 2],
+    ])('shows the page as a group named by the page title in the %s layout', (_, width) => {
+      renderSurface();
+      act(() => observe?.(width));
+      expect(screen.queryByRole('tabpanel')).not.toBeInTheDocument();
+      const page = screen.getByRole('group', { name: 'Account' });
+      expect(page).toHaveTextContent('Email addresses');
+      expect(page).not.toHaveAttribute('tabindex');
+    });
+
+    it('closes the sheet when the layout widens, and does not bring it back on narrowing', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(3));
+      await user.click(screen.getByRole('button', { name: 'Account' }));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+      act(() => observe?.(1));
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+      act(() => observe?.(3));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('closes the navigation when it moves between the sheet and the select', async () => {
+      const user = userEvent.setup();
+      renderSurface();
+      act(() => observe?.(2));
+      await user.click(screen.getByRole('combobox', { name: 'Account' }));
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+
+      act(() => observe?.(3));
+      await waitFor(() => expect(screen.queryByRole('listbox')).not.toBeInTheDocument());
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+
+    it('keeps a page title ref on the page title across layouts', () => {
+      const titleRef = React.createRef<HTMLDivElement>();
+      render(
+        <MosaicProvider>
+          <Profile.Root value='account'>
+            <Profile.Title>User profile</Profile.Title>
+            <Profile.Nav>
+              <Profile.NavItem value='account'>Account</Profile.NavItem>
+            </Profile.Nav>
+            <Profile.Content>
+              <Profile.ContentPanel value='account'>
+                <Panel.Title ref={titleRef}>Account</Panel.Title>
+              </Profile.ContentPanel>
+            </Profile.Content>
+          </Profile.Root>
+        </MosaicProvider>,
+      );
+      const title = () => screen.getByRole('heading', { level: 3, name: 'Account' });
+      expect(titleRef.current).toBe(title());
+
+      act(() => observe?.(2));
+      expect(titleRef.current).toBe(title());
+      act(() => observe?.(3));
+      expect(titleRef.current).toBe(title());
+    });
+
+    it('returns the tablist to the column when the width comes back', () => {
+      renderSurface();
+      act(() => observe?.(3));
+      expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+      act(() => observe?.(1));
+      expect(screen.getByRole('navigation', { name: 'User profile' })).toContainElement(screen.getByRole('tablist'));
+    });
+  });
+
+  it('takes the flush presentation from its elevation prop', () => {
+    const probe = stylex.create({ frameless: { borderWidth: '0px', backgroundColor: 'transparent' } });
+    const flush = renderSurface({ elevation: 'flush' });
+    expect(flush.container.querySelector('.cl-profile')).toHaveAttribute('data-elevation', 'flush');
+    expect(Array.from(flush.container.querySelector('.cl-profile-layout')!.classList)).toEqual(
+      expect.arrayContaining(atomsOf(probe.frameless)),
+    );
+    expect(flush.container.querySelector('.cl-profile-content')).toHaveAttribute('data-inline');
+    expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    flush.unmount();
+
+    const framed = renderSurface();
+    expect(framed.container.querySelector('.cl-profile')).toHaveAttribute('data-elevation', 'card');
+  });
+
+  describe('inside a dialog', () => {
+    function renderInDialog() {
+      return render(
+        <MosaicProvider>
+          <Dialog.Root defaultOpen>
+            <Dialog.Popup variant='profile'>
+              <Surface />
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
+    }
+
+    it('names the dialog and carries its dismiss', () => {
+      renderInDialog();
+
+      const popup = screen.getByRole('dialog', { name: 'User profile' });
+      expect(popup).toContainElement(document.querySelector('.cl-profile'));
+      expect(popup).toContainElement(screen.getByRole('button', { name: 'Close' }));
+      expect(popup).toContainElement(screen.getByRole('tab', { name: 'Security' }));
+    });
+
+    it('withholds the corner dismiss inside an alert dialog', () => {
+      render(
+        <MosaicProvider>
+          <Dialog.Root
+            defaultOpen
+            role='alertdialog'
+          >
+            <Dialog.Popup variant='profile'>
+              <Surface />
+              <Card.Description>Review your profile before continuing.</Card.Description>
+              <Dialog.Close>Cancel</Dialog.Close>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </MosaicProvider>,
+      );
+
+      expect(screen.getByRole('alertdialog', { name: 'User profile' })).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Close', exact: true })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+    });
+
+    it('carries no dismiss standalone', () => {
+      renderSurface();
+
+      expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument();
+    });
+
+    it('holds a fixed height standalone, and hands it to the popup over the page', () => {
+      const probe = stylex.create({ fixed: { blockSize: '45rem' }, handed: { blockSize: 'auto' } });
+      const fixed = atomsOf(probe.fixed);
+      const handed = atomsOf(probe.handed);
+
+      const frame = () => Array.from(document.querySelector('.cl-profile-layout')!.classList);
+
+      const standalone = renderSurface();
+      expect(frame()).toEqual(expect.arrayContaining(fixed));
+      standalone.unmount();
+
+      renderInDialog();
+      expect(frame()).toEqual(expect.arrayContaining(handed));
+    });
+
+    it('is flush and unframed at that elevation, and scrolls with the page', () => {
+      const probe = stylex.create({
+        frameless: { borderWidth: '0px', overflow: 'visible', backgroundColor: 'transparent', blockSize: 'auto' },
+        scroller: { overflowY: 'auto' },
+      });
+      renderSurface({ elevation: 'flush' });
+
+      const frame = document.querySelector('.cl-profile-layout')!;
+      expect(Array.from(frame.classList)).toEqual(expect.arrayContaining(atomsOf(probe.frameless)));
+      const viewport = document.querySelector('.cl-profile-content-viewport')!;
+      expect(Array.from(viewport.classList)).not.toEqual(expect.arrayContaining(atomsOf(probe.scroller)));
+      expect(document.querySelector('.cl-profile-content')).toHaveAttribute('data-inline');
+
+      const branding = screen.getByText(/Secured by/);
+      expect(document.querySelector('.cl-profile-content-body')).toContainElement(branding);
+      expect(screen.getByRole('navigation')).not.toContainElement(branding);
+    });
+  });
+});

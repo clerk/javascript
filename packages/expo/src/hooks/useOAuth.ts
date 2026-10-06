@@ -76,9 +76,11 @@ export function useOAuth(useOAuthParams: UseOAuthFlowParams) {
     await signIn.create({ strategy, redirectUrl: oauthRedirectUrl });
 
     const { externalVerificationRedirectURL } = signIn.firstFactorVerification;
+    if (!externalVerificationRedirectURL) {
+      return errorThrower.throw('Missing external verification redirect URL for OAuth flow');
+    }
 
     const authSessionResult = await WebBrowserModule.openAuthSessionAsync(
-      // @ts-ignore
       externalVerificationRedirectURL.toString(),
       oauthRedirectUrl,
     );

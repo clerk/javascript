@@ -9,6 +9,8 @@ import type { Web3Provider } from './web3';
 
 /** @generateWithEmptyComment */
 export interface SignInFutureCreateParams {
+  /** The timezone to assign to the user. If omitted, defaults to the browser's timezone. */
+  timezone?: string;
   /**
    * The authentication identifier for the sign-in. This can be the value of the user's email address, phone number, username, or Web3 wallet address.
    */
@@ -25,6 +27,14 @@ export interface SignInFutureCreateParams {
    * The full URL or path that the OAuth provider should redirect to after successful authorization on their part.
    */
   redirectUrl?: string;
+  /**
+   * The value to pass to the [OIDC `prompt` parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=prompt,reauthentication%20and%20consent.) in the generated OAuth redirect URL.
+   */
+  oidcPrompt?: string;
+  /**
+   * The value to pass to the [OIDC `login_hint` parameter](https://openid.net/specs/openid-connect-core-1_0.html#:~:text=login_hint,in%20\(if%20necessary\).) in the generated OAuth redirect URL.
+   */
+  oidcLoginHint?: string;
   /**
    * The URL that the user will be redirected to, after successful authorization from the OAuth provider and Clerk sign-in.
    */
@@ -50,6 +60,8 @@ export type SignInFuturePasswordParams = {
    * [password](https://clerk.com/docs/guides/configure/auth-strategies/sign-up-sign-in-options#password) is enabled.
    */
   password: string;
+  /** The timezone to assign to the new sign-in attempt. If omitted, reuses the current sign-in's timezone, then defaults to the browser's timezone. */
+  timezone?: string;
 } & (
   | {
       /**
@@ -339,15 +351,20 @@ export interface SignInFutureResource {
   readonly supportedSecondFactors: SignInSecondFactor[];
 
   /**
+   * Factors an enterprise SSO user may verify instead of reaching their identity provider. Empty unless the instance has allowlisted this user to bypass SSO.
+   */
+  readonly ssoBypassFirstFactors: SignInFirstFactor[];
+
+  /**
    * The current status of the sign-in.
    * <ul>
    * <li>`'complete'` - The sign-in process has been completed successfully.</li>
    * <li>`'needs_client_trust'` - The user is signing in from a new device and must complete a [second factor verification](!second-factor-verification) to establish [Device Trust](https://clerk.com/docs/guides/secure/device-trust). See the [Device Trust custom flow guide](https://clerk.com/docs/guides/development/custom-flows/authentication/device-trust) for more information.</li>
    * <li>`'needs_identifier'` - The user's identifier (e.g., email address, phone number, username) hasn't been provided.</li>
-   * <li>`'needs_first_factor'` - One of the following [first factor verification](!first-factor-verification) strategies is missing: `'email_link'`, `'email_code'`, `passkey`, `password`, `'phone_code'`, `'web3_base_signature'`, `'web3_metamask_signature'`, `'web3_coinbase_wallet_signature'`, `'web3_okx_wallet_signature'`, `'web3_solana_signature'`, [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#o-auth-strategy), or `'enterprise_sso'`.</li>
+   * <li>`'needs_first_factor'` - One of the following [first factor verification](!first-factor-verification) strategies is missing: `'email_link'`, `'email_code'`, `passkey`, `password`, `'phone_code'`, `'web3_base_signature'`, `'web3_metamask_signature'`, `'web3_coinbase_wallet_signature'`, `'web3_okx_wallet_signature'`, `'web3_solana_signature'`, [`OAuthStrategy`](https://clerk.com/docs/reference/types/sso#oauthstrategy), or `'enterprise_sso'`.</li>
    * <li>`'needs_second_factor'` - One of the following [second factor verification](!second-factor-verification) strategies is missing: `'phone_code'`, `'totp'`, `'backup_code'`, `'email_code'`, or `'email_link'`.</li>
    * <li>`'needs_new_password'` - The user needs to set a new password. See the [dedicated custom flow](/docs/guides/development/custom-flows/authentication/forgot-password) guide for more information.</li>
-   * <li>`'needs_protect_check'` - A Clerk Protect challenge must be resolved before the sign-in can continue. This status is only returned when Protect mid-flow challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it. Run the challenge described by `protectCheck` and resolve it via `submitProtectCheck()`. The pre-built components handle this automatically.</li>
+   * <li>`'needs_protect_check'` - A Clerk Protect challenge must be resolved before the sign-in can continue. This status is only returned when Protect mid-flow challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it. When Clerk's UI is loaded, the sign-in methods resolve the challenge in a modal before they return. Otherwise, run the challenge described by `protectCheck` and resolve it via `submitProtectCheck()`. When `sso()` redirects to the identity provider, the challenge runs on the way back through `<HandleSSOCallback />` instead. The pre-built components handle this automatically.</li>
    * </ul>
    */
   readonly status: SignInStatus;
@@ -383,6 +400,11 @@ export interface SignInFutureResource {
   readonly identifier: string | null;
 
   /**
+   * The timezone associated with the current sign-in, or `null` if not set.
+   */
+  readonly timezone: string | null;
+
+  /**
    * The ID of the session that was created upon completion of the current sign-in. The value of this property is `null` if the sign-in status is not `'complete'`.
    */
   readonly createdSessionId: string | null;
@@ -401,6 +423,10 @@ export interface SignInFutureResource {
   /**
    * The current protect check challenge, if one is pending. Only populated when Protect mid-flow
    * challenges are explicitly enabled for the instance; upgrading the SDK alone does not enable it.
+   * When Clerk's UI is loaded, the sign-in methods resolve the challenge in a modal before they
+   * return. Otherwise, run the challenge yourself and submit its proof token with `submitProtectCheck()`.
+   * When `sso()` redirects to the identity provider, the challenge runs on the way back through
+   * `<HandleSSOCallback />` instead.
    */
   readonly protectCheck: ProtectCheckResource | null;
 
@@ -436,7 +462,7 @@ export interface SignInFutureResource {
     sendCode: (params?: SignInFutureEmailCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a code sent with the [`emailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#email-code-send-code) method.
+     * Verifies a code sent with the [`emailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#emailcode-sendcode) method.
      */
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
   };
@@ -482,7 +508,7 @@ export interface SignInFutureResource {
     sendCode: (params?: SignInFuturePhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a code sent with the [`phoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#phone-code-send-code) method.
+     * Verifies a code sent with the [`phoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#phonecode-sendcode) method.
      */
     verifyCode: (params: SignInFuturePhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
   };
@@ -495,7 +521,7 @@ export interface SignInFutureResource {
     sendCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a password reset code sent with the [`resetPasswordEmailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordEmailCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-email-code-submit-password) method to complete the password reset flow.
+     * Verifies a password reset code sent with the [`resetPasswordEmailCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#resetpasswordemailcode-sendcode) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordEmailCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#resetpasswordemailcode-submitpassword) method to complete the password reset flow.
      */
     verifyCode: (params: SignInFutureEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -513,7 +539,7 @@ export interface SignInFutureResource {
     sendCode: (params?: SignInFutureResetPasswordPhoneCodeSendParams) => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a password reset code sent with the [`resetPasswordPhoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-send-code) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordPhoneCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#reset-password-phone-code-submit-password) method to complete the password reset flow.
+     * Verifies a password reset code sent with the [`resetPasswordPhoneCode.sendCode()`](https://clerk.com/docs/reference/objects/sign-in-future#resetpasswordphonecode-sendcode) method. Will cause `signIn.status` to become `'needs_new_password'`. This is when you will call the [`resetPasswordPhoneCode.submitPassword()`](https://clerk.com/docs/reference/objects/sign-in-future#resetpasswordphonecode-submitpassword) method to complete the password reset flow.
      */
     verifyCode: (params: SignInFutureResetPasswordPhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -536,7 +562,7 @@ export interface SignInFutureResource {
     sendPhoneCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies a phone code sent with the [`mfa.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-phone-code) method.
+     * Verifies a phone code sent with the [`mfa.sendPhoneCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-sendphonecode) method.
      */
     verifyPhoneCode: (params: SignInFutureMFAPhoneCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -546,7 +572,7 @@ export interface SignInFutureResource {
     sendEmailCode: () => Promise<{ error: ClerkError | null }>;
 
     /**
-     * Verifies an email code sent with the [`mfa.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-send-email-code) method.
+     * Verifies an email code sent with the [`mfa.sendEmailCode()`](https://clerk.com/docs/reference/objects/sign-in-future#mfa-sendemailcode) method.
      */
     verifyEmailCode: (params: SignInFutureMFAEmailCodeVerifyParams) => Promise<{ error: ClerkError | null }>;
 
@@ -577,7 +603,7 @@ export interface SignInFutureResource {
   passkey: (params?: SignInFuturePasskeyParams) => Promise<{ error: ClerkError | null }>;
 
   /**
-   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively.
+   * Submits a proof token to resolve a pending protect check challenge. The response may contain another `protectCheck` (a chained challenge) which must be resolved iteratively. Call it after running the challenge yourself when Clerk's UI isn't loaded. With the UI loaded, the other sign-in methods resolve the challenge in a modal before they return. When `sso()` redirects to the identity provider, the challenge runs on the way back through `<HandleSSOCallback />` instead.
    */
   submitProtectCheck: (params: SignInFutureSubmitProtectCheckParams) => Promise<{ error: ClerkError | null }>;
 

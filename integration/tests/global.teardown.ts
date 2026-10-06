@@ -3,6 +3,7 @@ import { test as setup } from '@playwright/test';
 import { constants } from '../constants';
 import { stateFile } from '../models/stateFile';
 import { appConfigs } from '../presets';
+import { removePlatformApplicationCache } from '../presets/envs';
 import { killClerkJsHttpServer, killClerkUiHttpServer, parseEnvOptions } from '../scripts';
 import { printRetrySummary } from '../testUtils/retryableClerkClient';
 
@@ -12,6 +13,7 @@ setup('teardown long running apps', async () => {
   const { appUrl } = parseEnvOptions();
   await killClerkJsHttpServer();
   await killClerkUiHttpServer();
+  await removePlatformApplicationCache();
 
   if (appUrl || !constants.E2E_CLEANUP) {
     // if appUrl is provided, it means that the user is running an app manually

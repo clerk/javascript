@@ -1,9 +1,9 @@
-import { Popover } from '@clerk/headless/popover';
+import { Popover } from '@clerk/mosaic/primitives/popover';
 
 import type { StoryMeta } from '@/lib/types';
 
 // Headless primitives ship no styles. This single demo renders the primitive raw —
-// unstyled — so it faithfully reflects what `@clerk/headless` provides: behavior, state,
+// unstyled — so it faithfully reflects what the primitive provides: behavior, state,
 // positioning, and ARIA wiring via the `data-*` attributes each part emits, with zero
 // appearance. It is embedded once into the overview via `<Story>` in the MDX (the one
 // thing prose can't convey: that it anchors to the trigger and dismisses). There is no
@@ -11,8 +11,9 @@ import type { StoryMeta } from '@/lib/types';
 
 export const meta: StoryMeta = {
   group: 'Primitives',
+  status: 'stable',
   title: 'Popover',
-  source: 'packages/headless/src/primitives/popover/index.ts',
+  source: 'packages/mosaic/src/primitives/popover/index.ts',
 };
 
 export function Default() {

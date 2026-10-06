@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.clerk.api.Clerk
 import com.clerk.api.FrameworkIntegrationApi
 import com.clerk.ui.R
@@ -40,19 +42,49 @@ private fun debugLog(tag: String, message: String) {
   }
 }
 
-internal fun parseUserProfileCustomPages(customPagesJson: String, customPageCount: Int): List<UserProfileCustomRow> {
+internal data class ClerkUserProfileCustomPageConfig(
+  val routeKey: String,
+  val title: String,
+  val icon: Int,
+  val placement: UserProfileCustomRowPlacement,
+  val showAsRow: Boolean,
+) {
+  val nativeRow: UserProfileCustomRow
+    get() =
+      UserProfileCustomRow(
+        routeKey = routeKey,
+        title = title,
+        icon = UserProfileRowIcon.Resource(icon),
+        placement = placement,
+      )
+}
+
+internal fun parseUserProfileCustomPages(
+  customPagesJson: String,
+  customPageCount: Int,
+): List<ClerkUserProfileCustomPageConfig> {
   val pages = JSONArray(customPagesJson)
   return buildList {
     for (index in 0 until minOf(pages.length(), customPageCount)) {
       val page = pages.getJSONObject(index)
       add(
-        UserProfileCustomRow(
+        ClerkUserProfileCustomPageConfig(
           routeKey = page.getString("path"),
           title = page.getString("label"),
-          icon = UserProfileRowIcon.Resource(userProfileCustomRowIcon(page.optString("icon"))),
+          icon = userProfileCustomRowIcon(page.optString("icon")),
           placement = userProfileCustomRowPlacement(page.optJSONObject("placement")),
+          showAsRow = page.optBoolean("showAsRow", true),
         ),
       )
+    }
+  }
+}
+
+internal fun userProfileCustomPagePaths(customPagesJson: String): Set<String> {
+  val pages = JSONArray(customPagesJson)
+  return buildSet {
+    for (index in 0 until pages.length()) {
+      add(pages.getJSONObject(index).getString("path"))
     }
   }
 }
@@ -100,16 +132,20 @@ private fun userProfileRow(row: String): UserProfileRow =
     else -> UserProfileRow.ManageAccount
   }
 
-class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : ClerkComposeNativeViewHost(context, appContext) {
+class ClerkUserProfileNativeView(context: Context, appContext: AppContext) :
+  ClerkComposeNativeViewHost(context, appContext, retainCompositionOnDetach = true) {
   // clerk-android UserProfileView dismissibility is controlled by its onDismiss callback.
   var isDismissible: Boolean = true
   var hostBackButton: Boolean = false
-  var customPagesJson: String = "[]"
+  private var customPagesJson: String = "[]"
   private val customPageViews = mutableListOf<View>()
-  private var customNavigator: com.clerk.ui.userprofile.custom.UserProfileCustomNavigator? = null
   private val onProfileEvent by EventDispatcher()
   private val onCustomPageEvent by EventDispatcher()
   private val onHostBack by EventDispatcher()
+  private val customPageState =
+    ClerkUserProfileCustomPageState { type, path ->
+      onCustomPageEvent(mapOf("type" to type, "path" to path))
+    }
 
   private val viewModelStoreOwner = object : ViewModelStoreOwner {
     private val store = ViewModelStore()
@@ -118,7 +154,7 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
 
   override fun localViewModelStoreOwner(): ViewModelStoreOwner = viewModelStoreOwner
 
-  override fun onHostDetachedFromWindow() {
+  override fun onHostDestroyed() {
     viewModelStoreOwner.viewModelStore.clear()
   }
 
@@ -135,6 +171,10 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
 
   @Composable
   private fun ProfileView() {
+    val user by Clerk.userFlow.collectAsStateWithLifecycle()
+
+    LaunchedEffect(user?.id) { customPageState.userDidChange(user?.id) }
+
     UserProfileView(
       clerkTheme = Clerk.customTheme,
       customRows = customRows(),
@@ -165,26 +205,41 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
 
   fun customPageCount(): Int = customPageViews.size
 
+  fun setCustomPages(customPages: String) {
+    if (customPagesJson == customPages) return
+    val validPaths = runCatching { userProfileCustomPagePaths(customPages) }.getOrDefault(emptySet())
+    customPageState.reconcileCustomPagePaths(validPaths)
+    customPagesJson = customPages
+  }
+
   fun navigateCustomPage(action: String, routeKey: String?) {
-    when (action) {
-      "back" -> customNavigator?.navigateBack()
-      "popToRoot" -> customNavigator?.popToRoot()
-      "push" -> routeKey?.let { customNavigator?.push(it) }
-    }
+    customPageState.navigate(action, routeKey)
   }
 
   @Composable
   private fun CustomPageDestination(routeKey: String) {
-    customNavigator = LocalUserProfileCustomNavigator.current
-    val rows = customRows()
-    val view = customPageViews.getOrNull(rows.indexOfFirst { it.routeKey == routeKey }) ?: return
+    val customNavigator = LocalUserProfileCustomNavigator.current
+    val pages = customPages()
+    val view = customPageViews.getOrNull(pages.indexOfFirst { it.routeKey == routeKey })
 
-    LaunchedEffect(routeKey) {
+    LaunchedEffect(routeKey, customNavigator, view) {
+      customPageState.configureNavigation(
+        navigateBack = customNavigator::navigateBack,
+        popToRoot = customNavigator::popToRoot,
+        push = customNavigator::push,
+      )
+      if (view == null) {
+        customNavigator.popToRoot()
+        return@LaunchedEffect
+      }
       layoutAndroidViewHandler(view)
-      sendCustomPageEvent("presented", routeKey)
+      customPageState.pageDidPresent(routeKey)
     }
+
+    if (view == null) return
+
     DisposableEffect(routeKey) {
-      onDispose { sendCustomPageEvent("dismissed", routeKey) }
+      onDispose { customPageState.pageDidDismiss(routeKey) }
     }
 
     AndroidView(
@@ -197,6 +252,10 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
   }
 
   private fun customRows(): List<UserProfileCustomRow> {
+    return customPages().filter { it.showAsRow }.map { it.nativeRow }
+  }
+
+  private fun customPages(): List<ClerkUserProfileCustomPageConfig> {
     return runCatching {
         parseUserProfileCustomPages(customPagesJson, customPageViews.size)
       }
@@ -208,10 +267,6 @@ class ClerkUserProfileNativeView(context: Context, appContext: AppContext) : Cle
 
   private fun sendEvent(type: String) {
     onProfileEvent(mapOf("type" to type))
-  }
-
-  private fun sendCustomPageEvent(type: String, path: String) {
-    onCustomPageEvent(mapOf("type" to type, "path" to path))
   }
 }
 
@@ -239,7 +294,7 @@ class ClerkUserProfileViewModule : Module() {
       }
 
       Prop("customPages") { view: ClerkUserProfileNativeView, customPages: String ->
-        view.customPagesJson = customPages
+        view.setCustomPages(customPages)
       }
 
       AsyncFunction("navigateCustomPage") {
@@ -250,6 +305,10 @@ class ClerkUserProfileViewModule : Module() {
 
       OnViewDidUpdateProps { view: ClerkUserProfileNativeView ->
         view.setupView()
+      }
+
+      OnViewDestroys { view: ClerkUserProfileNativeView ->
+        view.destroyHost()
       }
     }
   }

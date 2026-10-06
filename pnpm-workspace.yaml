@@ -3,6 +3,8 @@ packages:
   - packages/electron-passkeys/npm/*
 
 catalogs:
+  peer-expo:
+    expo: '>=54 <58'
   peer-react:
     react: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
     react-dom: ^18.0.0 || ~19.0.3 || ~19.1.4 || ~19.2.3 || ~19.3.0-0
@@ -12,9 +14,9 @@ catalogs:
     react: 18.3.1
     react-dom: 18.3.1
   repo:
-    '@floating-ui/react': 0.27.12
+    '@floating-ui/react': 0.27.20
     '@swc/helpers': 0.5.21
-    '@tanstack/query-core': ^5.100.6
+    '@tanstack/query-core': ^5.101.4
     core-js: 3.47.0
     rolldown: 1.1.0
     tsdown: 0.22.2
@@ -38,19 +40,37 @@ catalogs:
     '@zxcvbn-ts/core': 3.0.4
     '@zxcvbn-ts/language-common': 3.0.4
 
+overrides:
+  '@astrojs/compiler': 2.13.0
+  '@babel/plugin-transform-modules-systemjs@<=7.29.3': 7.29.8
+  'axios@<0.33.0': 0.33.0
+  'chokidar@<5.0.0': 5.0.0
+  'fast-uri@<3.1.6': 3.1.6
+  'flatted@<=3.4.1': 3.4.2
+  'follow-redirects@<=1.15.11': 1.16.0
+  'ip-address@<10.3.1': 10.3.1
+  'jws@<3.2.3': 3.2.3
+  'minimatch@>=9.0.0 <9.0.7': 9.0.7
+  'picomatch@>=3.0.0 <3.0.2': 3.0.2
+  'picomatch@<2.3.2': 2.3.2
+  'preact@>=10.27.0 <10.27.3': 10.27.3
+  react: 'catalog:react'
+  react-dom: 'catalog:react'
+  rolldown: 'catalog:repo'
+  'semver@<7.7.3': 7.7.4
+  'smol-toml@<1.6.1': 1.6.1
+  'socket.io-parser@>=4.0.0 <4.2.7': 4.2.7
+  'svgo@>=3.0.0 <3.3.3': 4.0.2
+  'tar@<7.5.21': 7.5.21
+  'tmp@<0.2.7': 0.2.7
+  'undici-types@<7.16.0': 7.24.8
+  utf-8-validate: 5.0.10
+
 minimumReleaseAge: 2880
 minimumReleaseAgeExclude:
   - '@clerk/*'
   - 'pkglab'
   - 'pkglab-*'
-  # Renovate security update: @modelcontextprotocol/sdk@1.26.0
-  - '@modelcontextprotocol/sdk@1.26.0'
-  # Renovate security update: esbuild@0.25.0
-  - esbuild@0.25.0
-  # Renovate security update: astro@6.1.6
-  - astro@6.1.6
-  # Renovate security update: vite@6.4.2
-  - vite@6.4.2
 
 trustPolicy: no-downgrade
 trustPolicyExclude:

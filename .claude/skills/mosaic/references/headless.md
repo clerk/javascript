@@ -1,26 +1,29 @@
 # Headless primitives
 
-`@clerk/headless` (`packages/headless/`) is the unstyled, accessible primitive
-layer under Mosaic: Accordion, Autocomplete, Collapsible, Dialog, Drawer,
-FileUpload, Menu, OTP, Popover, Select, Tabs, Tooltip. Every part emits **zero
+`packages/mosaic/src/primitives/` is the unstyled, accessible primitive layer
+inside Mosaic: Accordion, Autocomplete, Collapsible, Dialog, Drawer,
+FileUpload, Menu, OTP, Popover, Select, Tabs, TagInput, Toast, Tooltip. Every part emits **zero
 styles** — positioning, keyboard nav, focus management, dismiss, and ARIA are
 delegated to `@floating-ui/react`; all appearance is applied externally via
 `data-*` selectors and consumer classNames.
 
-The package is `private: true` and consumed by `@clerk/ui`. It's a separate
-package because `@clerk/ui` sets `jsxImportSource: '@emotion/react'`, which
-conflicts with the standard `react-jsx` transform these primitives need.
+This is a folder inside `@clerk/mosaic`, not a separate package (it used to be
+`@clerk/headless`, which was merged into Mosaic). Mosaic's styled
+`src/components/*` wrap these primitives via plain relative imports; there is
+no subpath export for them, so nothing outside `@clerk/mosaic` can import a
+primitive directly today.
 
 ## Read this for the _what_
 
 Per-primitive API docs (parts, props, keyboard, data attributes, ARIA) live
 **next to the code** and are the source of truth:
 
-- **`packages/headless/src/primitives/<name>/README.md`** — one per primitive.
-- **`packages/headless/README.md`** — package overview, the primitive table, and
-  the full **consuming-from-`@clerk/ui`** guide (the `makeCustomizable` wrapper,
-  the TS2742 annotation requirement, pass-through parts, the `render` escape
-  hatch).
+- **`packages/mosaic/src/primitives/<name>/README.md`** — one per primitive.
+- **`packages/mosaic/src/primitives/README.md`** — primitives overview, the
+  primitive table, and the full **consuming-from-`@clerk/ui`** guide (the
+  `makeCustomizable` wrapper, the TS2742 annotation requirement, pass-through
+  parts, the `render` escape hatch — aspirational: `@clerk/ui` does not
+  currently import these).
 
 This file is the _how-to_ for the shared conventions — what every primitive has
 in common, so you can author a new one or a new part without re-deriving the
@@ -28,11 +31,11 @@ pattern.
 
 ## Consuming a primitive
 
-Every primitive is a compound component exported as a namespace. Import from the
-subpath; render `Root` + parts:
+Every primitive is a compound component exported as a namespace. From inside
+`@clerk/mosaic`, import it by relative path; render `Root` + parts:
 
 ```tsx
-import { Select } from '@clerk/headless/select';
+import { Select } from '../../primitives/select';
 
 <Select.Root>
   <Select.Trigger>
@@ -60,7 +63,7 @@ import { Select } from '@clerk/headless/select';
   and refs merged in.
 - **From `@clerk/ui`**, wrap element-rendering parts with `makeCustomizable` to
   get the theme-aware `sx` prop; pass-through parts (`Root`, `Portal`) are used
-  directly. See `packages/headless/README.md`.
+  directly. See `packages/mosaic/src/primitives/README.md`.
 
 ## Authoring a part: the useRender contract
 
@@ -150,7 +153,7 @@ Every `primitives/<name>/` folder follows the same shape:
 | `<name>-context.ts` | Context type + `createContext` + guard hook (below).                                           |
 | `parts.ts`          | Re-exports each part under its short alias.                                                    |
 | `index.ts`          | Public entry: namespace + prop-type re-exports.                                                |
-| `<name>.test.tsx`   | Tests (real Chromium via vitest browser mode, not jsdom).                                      |
+| `<name>.test.tsx`   | Tests (jsdom, via Mosaic's vitest config).                                                     |
 | `README.md`         | The primitive's API docs.                                                                      |
 
 **Context + guard hook** — the pattern that makes "used outside Root" a clear error:
@@ -211,6 +214,57 @@ attributes and drive unmount off the Web Animations API. Root spreads
 Consumer CSS keys off these: `[data-starting-style] { opacity: 0 }`,
 `[data-open] { animation: … }`, `[data-ending-style] { opacity: 0 }`.
 
+### Exiting content must be frozen
+
+Anything that animates out outlives `open` by the length of its exit, and
+whatever closed it has usually already changed the data behind it — picking a
+menu item, selecting an option, switching account, a machine returning to `idle`,
+a form clearing. The subtree re-renders with the new data and swaps visibly under
+the exit, which reads as a flash of the next screen. This applies to **every part
+with an exit transition**, not only popups: a sheet, a panel, a step, an inline
+region that fades out all have the same window.
+
+Two ways to hold the old frame, depending on whether the part re-renders for
+reasons of its own while closed:
+
+**`Freeze`** — wrap the children, keep the animating element live:
+
+```tsx
+const { render, children, ...otherProps } = props;
+const { open, popupRef, transitionProps } = useMenuContext();
+
+const defaultProps = {
+  ...transitionProps,
+  children: <Freeze frozen={!open}>{children}</Freeze>,
+};
+```
+
+**A held snapshot** — keep the last open `children` in a ref and render those
+while closed. `FlowStep` does this: its `children` prop genuinely changes when the
+step value moves on, so there is a correct old value to render rather than a frame
+to hold.
+
+```tsx
+if (open) activeChildrenRef.current = children;
+// ...
+children: open ? children : activeChildrenRef.current,
+```
+
+Reach for `Freeze` by default; reach for the snapshot when the outgoing content is
+a distinct element you still have.
+
+Two things to get right either way:
+
+- Gate on **`!open`**, never `!mounted`. `mounted` stays true through the whole
+  exit — that is precisely the window this covers, so `!mounted` freezes nothing.
+- Freeze the **children**, not the animating element. It has to stay live for
+  `data-closed` / `data-ending-style` to land on it and for the animation to run.
+
+In place today: Popover, Select, Combobox, Menu, Dialog (`Freeze`), Flow
+(snapshot). Not yet: Drawer, Autocomplete, Tooltip, and the Accordion /
+Collapsible / Tabs panels. Any new part with an exit transition needs one of the
+two.
+
 **Positioners** gate the floating layer on `mounted` via `useRender`'s
 `enabled`, so the positioned DOM doesn't exist until the first frame:
 
@@ -219,7 +273,7 @@ const element = useRender({ defaultTagName: 'div', render, enabled: mounted, ref
 if (!element) return null;
 ```
 
-## Shared hooks (`@clerk/headless/hooks`)
+## Shared hooks (`primitives/hooks`)
 
 | Hook                    | Signature (abridged)                                                | Purpose                                                                |
 | ----------------------- | ------------------------------------------------------------------- | ---------------------------------------------------------------------- |
@@ -229,9 +283,13 @@ if (!element) return null;
 | `useAnimationsFinished` | `(ref, open) => (cb) => void`                                       | Runs `cb` once all CSS animations finish; aborts on rapid toggles.     |
 | `useDataTable`          | `(opts) => { rows, sorting, pagination, rowSelection, … }`          | Table state (sort/filter/paginate/select), controlled or uncontrolled. |
 
-## Shared utils (`@clerk/headless/utils`)
+## Shared utils (`primitives/utils`)
 
 - **`useRender`, `mergeProps`, `ComponentProps<Tag>`, `DefaultProps<Tag>`, `RenderProp`** — the part-authoring primitives (above).
+- **`Freeze({ frozen, children })`** — holds its subtree's DOM at the last
+  committed frame while `frozen` (a suspended boundary whose `display: none` is
+  undone in an insertion effect). Wrap a transitioning popup's children in it so
+  they don't swap under the exit animation; see above.
 - **`cssVars({ sideOffset? }): Middleware`** — floating-ui middleware setting
   `--cl-anchor-width/height`, `--cl-available-width/height`, `--cl-transform-origin`
   on the floating element. Place it **after** `arrow()`.
@@ -241,7 +299,8 @@ if (!element) return null;
 
 ## Testing
 
-Tests run in **real Chromium** (vitest browser mode), not jsdom, and include
-`axe` accessibility assertions. `pnpm test` in `packages/headless`. See
-`testing.md` for the Mosaic flow-layer testing model (a different concern — that
-covers machines/controllers/views, not these primitives).
+Tests run under **jsdom**, via Mosaic's own `vitest.config.mts`, and include
+`axe` accessibility assertions (`vitest-axe`'s `toHaveNoViolations`, registered
+in `src/primitives/test-utils/vitest.setup.ts`). `pnpm --filter @clerk/mosaic
+test`. See `testing.md` for the Mosaic flow-layer testing model (a different
+concern — that covers models/controllers/views, not these primitives).

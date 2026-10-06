@@ -1,4 +1,8 @@
 import { webAuthnCreateCredential, webAuthnGetCredential } from '@clerk/shared/internal/clerk-js/passkeys';
+import type {
+  PublicKeyCredentialCreationOptionsWithoutExtensions,
+  PublicKeyCredentialRequestOptionsWithoutExtensions,
+} from '@clerk/shared/types';
 import { isWebAuthnAutofillSupported } from '@clerk/shared/webauthn';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -22,7 +26,7 @@ vi.mock('@clerk/shared/webauthn', () => ({
 
 const HELLO_B64URL = 'aGVsbG8';
 
-const creationOptions = () =>
+const creationOptions = (): PublicKeyCredentialCreationOptionsWithoutExtensions =>
   ({
     rp: { id: 'example.com', name: 'Example' },
     user: { id: new Uint8Array([1]).buffer, name: 'jdoe', displayName: 'J Doe' },
@@ -37,28 +41,26 @@ const creationOptions = () =>
     },
     attestation: 'none',
     excludeCredentials: [],
-  }) as never;
+  }) as PublicKeyCredentialCreationOptionsWithoutExtensions;
 
-const requestOptions = () =>
+const requestOptions = (): PublicKeyCredentialRequestOptionsWithoutExtensions =>
   ({
     challenge: new Uint8Array([1, 2, 3]).buffer,
     rpId: 'example.com',
     timeout: 60_000,
     userVerification: 'required',
     allowCredentials: [],
-  }) as never;
+  }) as PublicKeyCredentialRequestOptionsWithoutExtensions;
 
-const creationOptionsForRpId = (rpId: string) =>
-  ({
-    ...creationOptions(),
-    rp: { id: rpId, name: 'Example' },
-  }) as never;
+const creationOptionsForRpId = (rpId: string): PublicKeyCredentialCreationOptionsWithoutExtensions => ({
+  ...creationOptions(),
+  rp: { id: rpId, name: 'Example' },
+});
 
-const requestOptionsForRpId = (rpId: string) =>
-  ({
-    ...requestOptions(),
-    rpId,
-  }) as never;
+const requestOptionsForRpId = (rpId: string): PublicKeyCredentialRequestOptionsWithoutExtensions => ({
+  ...requestOptions(),
+  rpId,
+});
 
 const registrationJSON = {
   id: HELLO_B64URL,
@@ -294,6 +296,60 @@ describe('createPasskeys', () => {
       expect(bridge.get).toHaveBeenCalled();
       expect(result.error).toBeNull();
     });
+
+    it('forwards conditional UI to the renderer path', async () => {
+      stubEnvironment({ bridge: makeBridge() });
+      const rendererResult = { publicKeyCredential: {} as never, error: null };
+      vi.mocked(webAuthnGetCredential).mockResolvedValue(rendererResult);
+
+      const result = await createPasskeys().get({ publicKeyOptions: requestOptions(), conditionalUI: true });
+
+      expect(webAuthnGetCredential).toHaveBeenCalledWith({
+        publicKeyOptions: expect.anything(),
+        conditionalUI: true,
+      });
+      expect(result).toBe(rendererResult);
+    });
+
+    it('aborts a conditional request instead of prompting through the native path', async () => {
+      const bridge = makeBridge();
+      stubEnvironment({ protocol: 'clerk:', hostname: 'app', bridge });
+
+      const result = await createPasskeys().get({ publicKeyOptions: requestOptions(), conditionalUI: true });
+
+      expect(bridge.get).not.toHaveBeenCalled();
+      expect(webAuthnGetCredential).not.toHaveBeenCalled();
+      expect(result.publicKeyCredential).toBeNull();
+      expect(result.error).toMatchObject({ code: 'passkey_operation_aborted' });
+    });
+
+    it('aborts a conditional request rather than reporting it as unsupported', async () => {
+      stubEnvironment({ protocol: 'clerk:', hostname: 'app' });
+
+      const result = await createPasskeys().get({ publicKeyOptions: requestOptions(), conditionalUI: true });
+
+      expect(result.error).toMatchObject({ code: 'passkey_operation_aborted' });
+    });
+
+    it('does not retry natively when a conditional renderer request fails', async () => {
+      const bridge = makeBridge();
+      stubEnvironment({ protocol: 'http:', hostname: 'localhost', bridge });
+      const rendererResult = {
+        publicKeyCredential: null,
+        error: Object.assign(new Error('The user agent does not support public key credentials.'), {
+          name: 'NotSupportedError',
+        }),
+      };
+      vi.mocked(webAuthnGetCredential).mockResolvedValue(rendererResult as never);
+
+      const result = await createPasskeys().get({
+        publicKeyOptions: requestOptionsForRpId('localhost'),
+        conditionalUI: true,
+      });
+
+      expect(bridge.get).not.toHaveBeenCalled();
+      expect(result).toBe(rendererResult);
+    });
   });
 
   describe('capability checks', () => {
@@ -308,12 +364,30 @@ describe('createPasskeys', () => {
       expect(createPasskeys().isSupported()).toBe(true);
     });
 
+    it('isSupported is false when every request would resolve to unsupported', () => {
+      stubEnvironment({ protocol: 'clerk:', hostname: 'app' });
+      expect(createPasskeys().isSupported()).toBe(false);
+
+      stubEnvironment({ protocol: 'clerk:', hostname: 'app', bridge: makeBridge() });
+      expect(createPasskeys().isSupported()).toBe(true);
+    });
+
     it('isAutoFillSupported is false in native mode', async () => {
       stubEnvironment({ bridge: makeBridge() });
 
       await expect(createPasskeys({ mode: 'native' }).isAutoFillSupported()).resolves.toBe(false);
       await expect(createPasskeys().isAutoFillSupported()).resolves.toBe(true);
       expect(isWebAuthnAutofillSupported).toHaveBeenCalledTimes(1);
+    });
+
+    it('isAutoFillSupported is false when requests cannot take the renderer path', async () => {
+      stubEnvironment({ protocol: 'clerk:', hostname: 'app', bridge: makeBridge() });
+      await expect(createPasskeys().isAutoFillSupported()).resolves.toBe(false);
+
+      stubEnvironment({ bridge: makeBridge({ electronMajor: 39 }) });
+      await expect(createPasskeys().isAutoFillSupported()).resolves.toBe(false);
+
+      expect(isWebAuthnAutofillSupported).not.toHaveBeenCalled();
     });
 
     it('isPlatformAuthenticatorSupported prefers native capabilities when available', async () => {

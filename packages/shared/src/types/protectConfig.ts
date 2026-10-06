@@ -37,12 +37,35 @@ export interface ProtectLoader {
    * 5000 and is capped at 10000 by the SDK, so this cannot stall a sign-in.
    */
   token_timeout_ms?: number;
+  /**
+   * Overrides {@link ProtectConfigJSON.challenge_load_timeout_ms} for browsers that got this
+   * loader.
+   *
+   * Per loader because loaders roll out gradually: while a new one ramps, two are live for the
+   * same instance at once, and the new one may need a different value from the one it replaces.
+   *
+   * Precedence is across the APPLIED SET, not per loader: the first applied loader with a finite,
+   * positive value wins, and the instance-wide value applies only when no applied loader specifies
+   * such a value. An instance running two loaders at once should therefore either set this on both
+   * or on neither — setting it on one makes it apply to browsers that got the other, which is rarely
+   * what is meant.
+   */
+  challenge_load_timeout_ms?: number;
 }
 
 export interface ProtectConfigJSON {
   object: 'protect_config';
   id: string;
   loaders?: ProtectLoader[];
+  /**
+   * How long to wait for a verification module to LOAD before giving up, in milliseconds. Absent
+   * means "use the SDK default".
+   *
+   * It bounds only the load. Once a verification module is running it governs its own duration,
+   * so this is not a bound on how long verification may take — the two are deliberately separate
+   * budgets, and only the first is the SDK's to set.
+   */
+  challenge_load_timeout_ms?: number;
   /**
    * Unix seconds. A session token acquired while an older value was configured is discarded and
    * re-acquired, so raising this makes every browser fetch a fresh one as its environment
@@ -61,6 +84,8 @@ export interface ProtectConfigResource extends ClerkResource {
   loaders?: ProtectLoader[];
   /** See {@link ProtectConfigJSON.tokens_invalid_before}. */
   tokens_invalid_before?: number;
+  /** See {@link ProtectConfigJSON.challenge_load_timeout_ms}. */
+  challenge_load_timeout_ms?: number;
   __internal_toSnapshot: () => ProtectConfigJSONSnapshot;
 }
 

@@ -1,5 +1,321 @@
 # Change Log
 
+## 4.8.1
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.10` to `1.1.11`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.11. ([#10028](https://github.com/clerk/javascript/pull/10028)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.5.7` to `1.5.8`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.8. ([#10027](https://github.com/clerk/javascript/pull/10027)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Fix `useLocalCredentials` throwing "Invalid key provided to SecureStore" when the publishable key ends with base64 padding (`=`). ([#10035](https://github.com/clerk/javascript/pull/10035)) by [@RaphaelFakhri](https://github.com/RaphaelFakhri)
+
+- Updated dependencies [[`2654caa`](https://github.com/clerk/javascript/commit/2654caaecb9f59d3bd4103a1e12425bc04760260)]:
+  - @clerk/shared@4.39.0
+  - @clerk/clerk-js@6.38.0
+  - @clerk/react@6.17.6
+
+## 4.8.0
+
+### Minor Changes
+
+- Introduce `@clerk/expo-biometrics`, a new package that `useBiometricCredentials()` now requires. Install it and rebuild your app: ([#9989](https://github.com/clerk/javascript/pull/9989)) by [@mikepitre](https://github.com/mikepitre)
+
+  ```sh
+  npx expo install @clerk/expo-biometrics
+  ```
+
+  If it's missing, the hook throws an error with these same steps.
+
+  Import the hook from `@clerk/expo/biometrics`:
+
+  ```ts
+  import { useBiometricCredentials } from '@clerk/expo/biometrics';
+  ```
+
+  Importing it from `@clerk/expo` still works, but it logs a deprecation warning and will be removed in the next major version.
+
+### Patch Changes
+
+- Updated dependencies [[`f6937c8`](https://github.com/clerk/javascript/commit/f6937c84e5fc02b520e12908df804f62e9970e2c)]:
+  - @clerk/clerk-js@6.37.0
+  - @clerk/shared@4.38.0
+  - @clerk/react@6.17.5
+
+## 4.7.3
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.9` to `1.1.10`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.10. ([#9999](https://github.com/clerk/javascript/pull/9999)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`c8eb8d5`](https://github.com/clerk/javascript/commit/c8eb8d5beb6b85b7ca056191c8ae60a296065cda), [`6dbf9a4`](https://github.com/clerk/javascript/commit/6dbf9a4f6c509698a79ab7123f988313a3975c6b)]:
+  - @clerk/clerk-js@6.36.0
+  - @clerk/shared@4.37.1
+  - @clerk/react@6.17.4
+
+## 4.7.2
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.8` to `1.1.9`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.9. ([#9932](https://github.com/clerk/javascript/pull/9932)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.5.6` to `1.5.7`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.7. ([#9952](https://github.com/clerk/javascript/pull/9952)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`6a14691`](https://github.com/clerk/javascript/commit/6a14691f8d98dcafd3956e1ea97cb35d56a34864), [`0ee4ee2`](https://github.com/clerk/javascript/commit/0ee4ee2b49286a8cae5f251ec997f30c8a863205), [`7a3fcf5`](https://github.com/clerk/javascript/commit/7a3fcf5b2d536b4e444920a3e87c4f70da3487ba), [`69c1b9c`](https://github.com/clerk/javascript/commit/69c1b9c886ab0860a9af12872235b6e492b2b2d0), [`69c1b9c`](https://github.com/clerk/javascript/commit/69c1b9c886ab0860a9af12872235b6e492b2b2d0), [`d9cf0f2`](https://github.com/clerk/javascript/commit/d9cf0f29ea2ef8388bbd5736007ca71f9411bf42), [`d4617ce`](https://github.com/clerk/javascript/commit/d4617ce3382a4fa045e80c5e867123ccc345dd07)]:
+  - @clerk/clerk-js@6.35.0
+  - @clerk/shared@4.37.0
+  - @clerk/react@6.17.3
+
+## 4.7.1
+
+### Patch Changes
+
+- Updated dependencies [[`645a532`](https://github.com/clerk/javascript/commit/645a5327d9c7cae8052e39958ec4d737457d179a), [`84ee588`](https://github.com/clerk/javascript/commit/84ee588a712ffa0bb2988531d7a2727c9e06ac37), [`4e538ac`](https://github.com/clerk/javascript/commit/4e538ac07ed412706516531d9be9696bbd31bf24)]:
+  - @clerk/shared@4.36.0
+  - @clerk/clerk-js@6.34.1
+  - @clerk/react@6.17.2
+
+## 4.7.0
+
+### Minor Changes
+
+- Add `useBiometricCredentials().reverify()` for first-, second-, and multi-factor verification of the active session on iOS and Android. If the first factor still requires a second factor, reverification continues the same attempt automatically. Successful verification refreshes the JavaScript session token without creating a new session. ([#9829](https://github.com/clerk/javascript/pull/9829)) by [@seanperez29](https://github.com/seanperez29)
+
+  New biometric enrollments default to `biometry_current_set`, requiring biometrics without device-passcode fallback. Existing credentials keep their original policy; reverification on iOS and Android requires the stronger policy and returns `biometric_credential_policy_incompatible` for older, weaker credentials. Apps should offer another verification method in that case. Reverification requires an updated native development build.
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.5.5` to `1.5.6`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.6. ([#9892](https://github.com/clerk/javascript/pull/9892)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`b3af79e`](https://github.com/clerk/javascript/commit/b3af79e946aaa403595b31e472b07b138db39dc6), [`cc6f11a`](https://github.com/clerk/javascript/commit/cc6f11af564b62daf186f9721594efd864ce093f), [`ee136a9`](https://github.com/clerk/javascript/commit/ee136a9ca41c3f3223eea516c7f3d2e7053ba2e8), [`d46b544`](https://github.com/clerk/javascript/commit/d46b5446e89f15c5532bfbbc09fdc05a0fbcbf8d), [`f50f48c`](https://github.com/clerk/javascript/commit/f50f48cf3c67807c8def30d4a6d29d6c7bf904d2)]:
+  - @clerk/clerk-js@6.34.0
+  - @clerk/shared@4.35.0
+  - @clerk/react@6.17.1
+
+## 4.6.9
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.7` to `1.1.8`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.8. ([#9830](https://github.com/clerk/javascript/pull/9830)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.5.4` to `1.5.5`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.5. ([#9810](https://github.com/clerk/javascript/pull/9810)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Fix `useLocalCredentials()` reporting `hasCredentials` as `true` after the biometric prompt is cancelled during `setCredentials()`. A cancelled prompt now leaves the stored credentials unchanged, so `authenticate()` no longer fails with a missing password. ([#9869](https://github.com/clerk/javascript/pull/9869)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix the offline resource cache so an app that switches Clerk instances no longer starts offline with the previous instance's cached user and session. ([#9870](https://github.com/clerk/javascript/pull/9870)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Fix the deprecated `useOAuth()` hook crashing when the sign-in attempt has no external verification redirect URL. It now throws a Clerk error, matching `useSSO()`. ([#9874](https://github.com/clerk/javascript/pull/9874)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`804d3db`](https://github.com/clerk/javascript/commit/804d3db182746d3b403411025b5dccc5aeafc719), [`64c8e3e`](https://github.com/clerk/javascript/commit/64c8e3ec55e79a2ccc79ae27cbadaeef9481f3d9), [`f56a14b`](https://github.com/clerk/javascript/commit/f56a14b3281578c76c4ebd8f50ac41156c437feb), [`07b4c2b`](https://github.com/clerk/javascript/commit/07b4c2b3c8bfa394f4331efcc363ee4064336f9d), [`4e36687`](https://github.com/clerk/javascript/commit/4e366874c5c4348750d43073cd8ec7aa4564e476), [`9e7485c`](https://github.com/clerk/javascript/commit/9e7485c8efc33e9458643372ce133b229347c03d)]:
+  - @clerk/shared@4.34.0
+  - @clerk/react@6.17.0
+  - @clerk/clerk-js@6.33.0
+
+## 4.6.8
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.6` to `1.1.7`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.7. ([#9774](https://github.com/clerk/javascript/pull/9774)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`855c24f`](https://github.com/clerk/javascript/commit/855c24f451314c6b8a586daf422b8463638f1f37), [`cb6a376`](https://github.com/clerk/javascript/commit/cb6a376c5e34fa7869821f554c73f2968019776f)]:
+  - @clerk/shared@4.33.0
+  - @clerk/clerk-js@6.32.1
+  - @clerk/react@6.16.1
+
+## 4.6.7
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.5` to `1.1.6`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.6. ([#9733](https://github.com/clerk/javascript/pull/9733)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`b5a3abe`](https://github.com/clerk/javascript/commit/b5a3abe19629dc00839fecf03b364dff1b4e2e2e), [`ddf9afc`](https://github.com/clerk/javascript/commit/ddf9afc6dc82528d28223ba9b775f8aa6647bbd7), [`39782e3`](https://github.com/clerk/javascript/commit/39782e3abf25363053866dae1996eaaaf5e91b42)]:
+  - @clerk/clerk-js@6.32.0
+  - @clerk/react@6.16.0
+  - @clerk/shared@4.32.0
+
+## 4.6.6
+
+### Patch Changes
+
+- Update Clerk Dashboard links in option descriptions, error messages, and READMEs to use the active-instance shortcut (`https://dashboard.clerk.com/~/…`) instead of the legacy `/last-active?path=…` URL. ([#9653](https://github.com/clerk/javascript/pull/9653)) by [@SarahSoutoul](https://github.com/SarahSoutoul)
+
+- Bump the bundled `clerk-ios` SDK from `1.5.2` to `1.5.3`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.3. ([#9666](https://github.com/clerk/javascript/pull/9666)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.5.3` to `1.5.4`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.4. ([#9670](https://github.com/clerk/javascript/pull/9670)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- `useSSO()` now accepts `oidcPrompt` and `oidcLoginHint` and forwards them to the sign-in request. ([#9688](https://github.com/clerk/javascript/pull/9688)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`452107a`](https://github.com/clerk/javascript/commit/452107a4cfe06ce5d72b008ddaf670ea604e857d), [`f4bc807`](https://github.com/clerk/javascript/commit/f4bc8071823625d6f1f5e5411d6af4719aae7d33), [`7ea009f`](https://github.com/clerk/javascript/commit/7ea009fda71c052ac6e4d712830baa856f347954), [`06be25f`](https://github.com/clerk/javascript/commit/06be25fadde3d068f7686b565848a02d832f6211), [`c47e9cb`](https://github.com/clerk/javascript/commit/c47e9cb5e74de91bdec17111ba7b01d3e2ea459a), [`1601100`](https://github.com/clerk/javascript/commit/16011007218787509fd8457081ed5640e61bec48)]:
+  - @clerk/clerk-js@6.31.1
+  - @clerk/shared@4.31.1
+  - @clerk/react@6.15.2
+
+## 4.6.5
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.4` to `1.1.5`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.5. ([#9648](https://github.com/clerk/javascript/pull/9648)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`2b3341f`](https://github.com/clerk/javascript/commit/2b3341fd5f666ab86ac13c2dabbab06345cd39b4)]:
+  - @clerk/react@6.15.1
+
+## 4.6.4
+
+### Patch Changes
+
+- Keep post-authentication prompts open in the native `AuthView` when the Clerk iOS SDK configuration refreshes. ([#9644](https://github.com/clerk/javascript/pull/9644)) by [@seanperez29](https://github.com/seanperez29)
+
+- Updated dependencies []:
+  - @clerk/react@6.15.0
+
+## 4.6.3
+
+### Patch Changes
+
+- Fix the Android `<AuthView>` rendering no sign-in form when it is opened within a couple of seconds of `isLoaded` turning true. The native view now recreates itself once the Clerk Android SDK finishes loading instead of staying empty until it is dismissed and reopened. ([#9618](https://github.com/clerk/javascript/pull/9618)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`25d8633`](https://github.com/clerk/javascript/commit/25d863340673c3a8127b343dbbe69b638aefc241)]:
+  - @clerk/clerk-js@6.31.0
+  - @clerk/react@6.15.0
+  - @clerk/shared@4.31.0
+
+## 4.6.2
+
+### Patch Changes
+
+- Bump the bundled `clerk-ios` SDK from `1.5.0` to `1.5.1`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.1. ([#9617](https://github.com/clerk/javascript/pull/9617)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.5.1` to `1.5.2`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.5.2. ([#9631](https://github.com/clerk/javascript/pull/9631)) by [@seanperez29](https://github.com/seanperez29)
+
+- Updated dependencies [[`0f70a63`](https://github.com/clerk/javascript/commit/0f70a633af154f9bc6cb9eaa53a5c5b39dc1c2b6)]:
+  - @clerk/clerk-js@6.30.3
+
+## 4.6.1
+
+### Patch Changes
+
+- Updated dependencies [[`5a74f4c`](https://github.com/clerk/javascript/commit/5a74f4c455961af3ec97d8c8997902dde607a980), [`0d224f2`](https://github.com/clerk/javascript/commit/0d224f20bd9d818a1ceb83f6a56ba53f384e2b52)]:
+  - @clerk/clerk-js@6.30.2
+  - @clerk/shared@4.30.2
+  - @clerk/react@6.14.8
+
+## 4.6.0
+
+### Minor Changes
+
+- Add `useBiometricCredentials()` and biometric credential types for enrollment, management, and biometric sign-in, backed by [`clerk-ios` 1.5.0](https://github.com/clerk/clerk-ios/releases/tag/1.5.0) and [`clerk-android` 1.1.4](https://github.com/clerk/clerk-android/releases/tag/v1.1.4). The previous trusted-device exports, including `useTrustedDevices()`, remain available as deprecated aliases and will be removed in the next major release. ([#9519](https://github.com/clerk/javascript/pull/9519)) by [@seanperez29](https://github.com/seanperez29)
+
+## 4.5.4
+
+### Patch Changes
+
+- Updated dependencies [[`dbaa95a`](https://github.com/clerk/javascript/commit/dbaa95a4e9e2ebd0a6b7fdb266024490a35b7caf)]:
+  - @clerk/clerk-js@6.30.1
+  - @clerk/react@6.14.7
+  - @clerk/shared@4.30.1
+
+## 4.5.3
+
+### Patch Changes
+
+- Updated dependencies [[`28b77ac`](https://github.com/clerk/javascript/commit/28b77ac2bd52462b65aebbdfcbe557cd03f6e322), [`46bf7ce`](https://github.com/clerk/javascript/commit/46bf7ce152fe3c1e38c0a6ae55ecece34b0093f6), [`8bc1c9f`](https://github.com/clerk/javascript/commit/8bc1c9f4cb323a2d224b2f7f87e190afe6128cb7), [`17b865b`](https://github.com/clerk/javascript/commit/17b865b66ce592d773073fa35c7d3d932f90c251)]:
+  - @clerk/shared@4.30.0
+  - @clerk/clerk-js@6.30.0
+  - @clerk/react@6.14.6
+
+## 4.5.2
+
+### Patch Changes
+
+- Fix `AuthView`'s `onDismiss` never firing on iOS when `isDismissible` is `false`. The callback now runs once the auth flow completes, matching Android, so an app-owned modal or screen wrapping the view can close after sign-in. ([#9501](https://github.com/clerk/javascript/pull/9501)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Bump the bundled `clerk-ios` SDK from `1.4.0` to `1.4.1`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.4.1. ([#9513](https://github.com/clerk/javascript/pull/9513)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Updated dependencies [[`ea8cb05`](https://github.com/clerk/javascript/commit/ea8cb055cecd986425f75b2f2da9cfec8a4b2ff4)]:
+  - @clerk/shared@4.29.3
+  - @clerk/clerk-js@6.29.3
+  - @clerk/react@6.14.5
+
+## 4.5.1
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/react@6.14.4
+  - @clerk/clerk-js@6.29.2
+
+## 4.5.0
+
+### Minor Changes
+
+- Add iOS and Android APIs for biometric trusted-device enrollment, sign-in, availability, listing, and revocation, including structured native error codes. Trusted-device sign-in synchronizes the JS client before resolving and returns the JS sign-in resource and `setActive()` so apps can continue second-factor, new-password, or client-trust steps. Add `useAuthViewState()` for keeping a non-dismissible root `<AuthView />` mounted through an optional trusted-device enrollment prompt, and support configuring the Face ID permission message through the Expo config plugin. ([#9257](https://github.com/clerk/javascript/pull/9257)) by [@seanperez29](https://github.com/seanperez29)
+
+  ```tsx
+  import { useTrustedDevices } from '@clerk/expo';
+
+  export function useBiometricSignIn(identifierHint: string) {
+    const { enroll, getAvailability, signIn } = useTrustedDevices();
+
+    // Call after the user completes a normal sign-in.
+    const enableBiometricSignIn = () =>
+      enroll({
+        identifierHint,
+        reason: 'Use biometrics to sign in next time.',
+      });
+
+    // Call when the user returns to sign in.
+    const signInWithBiometrics = async () => {
+      const { isAvailable } = await getAvailability({ identifierHint });
+
+      if (!isAvailable) {
+        return null;
+      }
+
+      const result = await signIn({
+        identifierHint,
+        reason: 'Use biometrics to sign in.',
+      });
+
+      // Continue any remaining steps through result.signIn.
+      return result;
+    };
+
+    return { enableBiometricSignIn, signInWithBiometrics };
+  }
+  ```
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @clerk/clerk-js@6.29.2
+
+## 4.4.0
+
+### Minor Changes
+
+- Surface Android Google Sign-In provider failures instead of silently treating them as a cancelled sign-in. ([#9464](https://github.com/clerk/javascript/pull/9464)) by [@wobsoriano](https://github.com/wobsoriano)
+
+  Android's Credential Manager reports failures such as an unregistered OAuth client through the same cancellation exception it uses for a dismissed account chooser, so `startGoogleAuthenticationFlow()` resolved with no session and no error. Those failures now reject with a `GOOGLE_SIGN_IN_ERROR`, while dismissing the chooser still resolves with `createdSessionId: null`.
+
+  If you call `startGoogleAuthenticationFlow()` without a `try`/`catch`, add one to handle the rejection.
+
+- Add push-only `customDestinations` to the native `UserProfileView` and `UserButton`, allowing custom profile pages to navigate forward without adding another row to the profile root. ([#9463](https://github.com/clerk/javascript/pull/9463)) by [@seanperez29](https://github.com/seanperez29)
+
+### Patch Changes
+
+- Bump the bundled `clerk-android` SDK (`clerk-android-api` and `clerk-android-ui`) from `1.1.2` to `1.1.3`. See the Clerk Android release: https://github.com/clerk/clerk-android/releases/tag/v1.1.3. ([#9472](https://github.com/clerk/javascript/pull/9472)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Bump the bundled `clerk-ios` SDK from `1.3.9` to `1.4.0`. See the Clerk iOS release: https://github.com/clerk/clerk-ios/releases/tag/1.4.0. ([#9473](https://github.com/clerk/javascript/pull/9473)) by [@clerk-cookie](https://github.com/clerk-cookie)
+
+- Preserve native user profile custom pages across tab switches and display their labels as native navigation titles on iOS. ([#9463](https://github.com/clerk/javascript/pull/9463)) by [@seanperez29](https://github.com/seanperez29)
+
+- Fix email link sign-in never completing on iOS. Callback URLs opened by the "Return to App" button are now forwarded to the native SDK, including on a cold launch, so a flow started from `<AuthView />` signs the user in instead of leaving them signed out with no error. ([#9470](https://github.com/clerk/javascript/pull/9470)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`b815047`](https://github.com/clerk/javascript/commit/b815047b2e58a2ef2b32dd42306e3b163cfbc0da)]:
+  - @clerk/shared@4.29.2
+  - @clerk/react@6.14.4
+  - @clerk/clerk-js@6.29.2
+
 ## 4.3.0
 
 ### Minor Changes

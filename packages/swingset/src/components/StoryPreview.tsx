@@ -1,6 +1,5 @@
 'use client';
 
-import { MosaicProvider } from '@clerk/ui/mosaic/MosaicProvider';
 import { RotateCcwIcon } from 'lucide-react';
 import type React from 'react';
 import { useEffect, useState } from 'react';
@@ -8,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { generateKnobs, initKnobValues } from '@/lib/generateKnobs';
 import type { StoryModule } from '@/lib/types';
 
+import { StoryMosaicProvider } from './ChaosProvider';
 import { usePlayground } from './PlaygroundContext';
 
 interface StoryPreviewProps {
@@ -51,9 +51,9 @@ export function StoryPreview({ name, storyModule }: StoryPreviewProps) {
 
       <div className='flex min-h-40 items-center justify-center p-10'>
         {mounted && (
-          <MosaicProvider>
+          <StoryMosaicProvider>
             <StoryComp {...values} />
-          </MosaicProvider>
+          </StoryMosaicProvider>
         )}
       </div>
     </div>

@@ -1,0 +1,194 @@
+import type { ReactNode } from 'react';
+
+import type { UserButtonSlot } from './user-button.layout';
+
+// ─── Data contract ──────────────────────────────────────────────────────────
+// Session-backed, discriminated resource rows. 1:1 with `useUserButtonModel()`'s output, so the
+// model and the view agree on a shape neither one owns.
+
+export interface UserButtonSession {
+  sessionId: string;
+  name: string;
+  /** Whatever the account is addressed by: username, email, phone, or wallet. */
+  identifier: string;
+  imageUrl?: string;
+}
+
+export interface UserButtonMembership {
+  kind: 'membership';
+  organizationId: string;
+  name: string;
+  imageUrl?: string;
+  membersCount?: number;
+  planLabel?: string;
+}
+
+export interface UserButtonSuggestion {
+  kind: 'suggestion';
+  id: string;
+  organizationId: string;
+  name: string;
+  imageUrl?: string;
+  /** `accepted` is awaiting approval, so it lists but cannot be joined again. */
+  status: 'pending' | 'accepted';
+}
+
+export interface UserButtonInvitation {
+  kind: 'invitation';
+  id: string;
+  organizationId: string;
+  organizationName: string;
+  imageUrl?: string;
+  /** `accepted` is already a membership, so it lists as one rather than offering to be accepted. */
+  status: 'pending' | 'accepted';
+}
+
+/** Feeds one more page into a list as its foot scrolls into view. */
+export interface UserButtonPaging {
+  ref: (element: HTMLElement | null) => void;
+  hasMore: boolean;
+}
+
+export interface UserButtonData {
+  activeSession: UserButtonSession;
+  /**
+   * The active organization, described whole rather than found in `memberships`, so the surface
+   * names it while the list it belongs to is still loading. `null` means none is active: the
+   * personal account when one exists, and no selection otherwise.
+   */
+  activeOrganization: UserButtonMembership | null;
+  /**
+   * Explicit; do not derive from `memberships.length`. Answered before the lists are fetched, so
+   * the surface knows whether to carry an organization section at all without waiting on them.
+   */
+  hasOrganizations: boolean;
+  /**
+   * There is no personal account to return to, so the organizations are all there is.
+   * Withholds the personal row rather than standing it down: this is not a switch that is
+   * momentarily unavailable, it is a personal account that does not exist here.
+   */
+  hidePersonal?: boolean;
+  /**
+   * A first page is still in flight, so the organization rows stand in as one placeholder rather than
+   * appearing a list at a time.
+   */
+  organizationsLoading?: boolean;
+  memberships: UserButtonMembership[];
+  suggestions: UserButtonSuggestion[];
+  invitations: UserButtonInvitation[];
+  paging?: UserButtonPaging;
+  /**
+   * The other signed-in accounts. Only sessions: an account's organizations are scoped to the
+   * session that fetches them, so they are unknowable until it is the active one.
+   */
+  additionalSessions: UserButtonSession[];
+}
+
+/** All optional. An unhandled action hides (or de-activates) the affordance it drives. */
+export interface UserButtonCallbacks {
+  /**
+   * Acts on the active account; another account's organizations are unreachable until you switch.
+   * `null` selects the personal account, which is how an account leaves an organization.
+   */
+  onSelectOrganization?: (organizationId: string | null) => void;
+  onAcceptSuggestion?: (suggestionId: string) => void;
+  onAcceptInvitation?: (invitationId: string) => void;
+  onSwitchSession?: (sessionId: string) => void;
+  onSignOutSession?: (sessionId: string, from: UserButtonSlot) => void;
+  onSignOutAll?: () => void;
+  onManageOrganization?: () => void;
+  onInviteMembers?: () => void;
+  onManageAccount?: () => void;
+  onCreateOrganization?: () => void;
+  onAddAccount?: () => void;
+}
+
+/**
+ * Which switchers the surface carries. `combined` is both; `organization` is an organization
+ * switcher with no account rows; `user` is an account switcher that never shows an organization,
+ * even when one is active.
+ */
+export type UserButtonMode = 'combined' | 'organization' | 'user';
+
+/**
+ * How the header carries its actions: `inline` trails the lead with them, the gear as an icon;
+ * `stacked` runs them under it as full-width labelled buttons.
+ */
+export type UserButtonHeaderLayout = 'inline' | 'stacked';
+
+/** Which switchers the surface carries. */
+export interface UserButtonModeProps {
+  /**
+   * Which switchers the popup carries: both, organizations alone, or accounts alone.
+   *
+   * @default 'combined'
+   */
+  mode?: UserButtonMode;
+}
+
+/** Whether the surface signs itself with Clerk's mark. */
+export interface UserButtonBrandingProps {
+  /**
+   * Signs the foot of the popup with "Secured by Clerk". An instance that has paid the branding off
+   * carries none of it, so this follows `displayConfig.branded` rather than being on for everyone.
+   *
+   * @default true
+   */
+  renderBranding?: boolean;
+}
+
+export interface UserButtonBusyState {
+  /**
+   * Key of the single in-flight action (see `userButtonBusyKeys`), or `null`/absent when idle. The
+   * affordance that owns it spins; every other one is disabled so a second action cannot start.
+   */
+  pendingKey?: string | null;
+}
+
+// ─── Menu items ─────────────────────────────────────────────────────────────
+
+/**
+ * A built-in action the foot of the popup lists as a row of its own, named by the id `menuItemOrder`
+ * knows it by. The surface's other actions live in its header, where there is no list for an order
+ * to run in.
+ *
+ * `switchAccount` and `addAccount` share a slot: the foot carries the flyout of signed-in accounts
+ * where there is more than one, and the row it would have opened onto where there is not. Name both
+ * to place that slot whichever way it resolves. `signOut` signs out of the active account.
+ */
+export type UserButtonMenuItemId = 'switchAccount' | 'addAccount' | 'signOut';
+
+interface UserButtonMenuItemBase {
+  /** Identifies the row, for ordering. */
+  id: string;
+  /** Names the row. */
+  label: string;
+  icon?: ReactNode;
+}
+
+/** An action of your own at the foot of the popup. */
+export interface UserButtonMenuAction extends UserButtonMenuItemBase {
+  onClick: () => void;
+  href?: never;
+}
+
+/** A row at the foot of the popup that leaves for somewhere else. */
+export interface UserButtonMenuLink extends UserButtonMenuItemBase {
+  /** Where the row goes. */
+  href: string;
+  onClick?: never;
+}
+
+export type UserButtonMenuItem = UserButtonMenuAction | UserButtonMenuLink;
+
+/** The app's own actions at the foot of the popup, and the order the foot's rows run in. */
+export interface UserButtonMenuProps {
+  /** Actions and links of your own, added to the foot of the popup ahead of Clerk's own rows. */
+  customMenuItems?: UserButtonMenuItem[];
+  /**
+   * The order the foot's rows run in, by id: a built-in row's id, or a custom item's `id`. Anything
+   * left out follows the rows named here. An id the surface does not carry as a row is ignored,
+   * since which rows the foot has depends on its mode.
+   */
+  menuItemOrder?: (UserButtonMenuItemId | (string & {}))[];
+}

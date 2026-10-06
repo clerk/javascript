@@ -16,12 +16,6 @@
     "declarationDir": "dist/types",
     "rootDir": "./src"
   },
-  "include": [
-    "src/index.ts",
-    "src/playwright/index.ts",
-    "src/playwright/unstable/index.ts",
-    "src/cypress/index.ts",
-    "src/global.d.ts"
-  ],
+  "include": ["src"],
   "exclude": ["node_modules"]
 }

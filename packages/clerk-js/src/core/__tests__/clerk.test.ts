@@ -1,4 +1,4 @@
-import { ClerkOfflineError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
+import { ClerkOfflineError, ClerkRuntimeError, EmailLinkErrorCodeStatus } from '@clerk/shared/error';
 import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import type {
   ActiveSessionResource,
@@ -13,11 +13,12 @@ import { waitFor } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, test, vi } from 'vitest';
 
 import { mockJwt } from '@/test/core-fixtures';
+import { restoreDocument, setDocumentVisibilityState } from '@/test/document-helpers';
 
 import { mockNativeRuntime } from '../../test/utils';
-import type { DevBrowser } from '../auth/devBrowser';
 import { Clerk } from '../clerk';
 import { eventBus, events } from '../events';
+import { ProtectCheckGate } from '../protectCheckGate';
 import type { DisplayConfig, Organization } from '../resources/internal';
 import { BaseResource, Client, Environment, SignIn, SignUp } from '../resources/internal';
 
@@ -30,15 +31,19 @@ vi.mock('../resources/Environment');
 const { mockCreateClientFromJwt } = vi.hoisted(() => ({ mockCreateClientFromJwt: vi.fn() }));
 vi.mock('../jwt-client', () => ({ createClientFromJwt: mockCreateClientFromJwt }));
 
-vi.mock('../auth/devBrowser', () => ({
-  createDevBrowser: (): DevBrowser => ({
+const { mockDevBrowser } = vi.hoisted(() => ({
+  mockDevBrowser: {
     clear: vi.fn(),
     setup: vi.fn(),
     getDevBrowser: vi.fn(() => 'deadbeef'),
     setDevBrowser: vi.fn(),
     removeDevBrowser: vi.fn(),
     refreshCookies: vi.fn(),
-  }),
+  },
+}));
+
+vi.mock('../auth/devBrowser', () => ({
+  createDevBrowser: () => mockDevBrowser,
 }));
 
 Client.getOrCreateInstance = vi.fn().mockImplementation(() => {
@@ -121,6 +126,7 @@ describe('Clerk singleton', () => {
     };
 
     Object.defineProperty(global.window, 'addEventListener', {
+      configurable: true,
       value: mockAddEventListener,
     });
 
@@ -248,6 +254,32 @@ describe('Clerk singleton', () => {
         await sut.load();
         await sut.setActive({ session: mockSession as any as ActiveSessionResource });
         expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'select_session' });
+      });
+
+      it('mounts OAuthConsent when mounted while navigating to redirectUrl', async () => {
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({ signedInSessions: [mockSession], isEligibleForTouch: () => false }),
+        );
+        const mountComponent = vi.fn();
+        const mockClerkUICtor = vi.fn(function () {
+          return { ensureMounted: () => Promise.resolve({ mountComponent }) };
+        });
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load({ ui: { ClerkUI: mockClerkUICtor } });
+        const node = document.createElement('div');
+        sut.navigate = vi.fn(async () => {
+          sut.mountOAuthConsent(node);
+        });
+
+        await sut.setActive({
+          session: mockSession as any as ActiveSessionResource,
+          redirectUrl: '/oauth-consent',
+        });
+
+        await waitFor(() => {
+          expect(mountComponent).toHaveBeenCalledWith(expect.objectContaining({ name: 'OAuthConsent', node }));
+        });
       });
 
       describe('with `touchSession` set to false', () => {
@@ -762,6 +794,41 @@ describe('Clerk singleton', () => {
   });
 
   describe('.load()', () => {
+    it('clears the stale dev browser before retrying the initial resources', async () => {
+      const callLog: string[] = [];
+      const devBrowserError = Object.assign(new Error('dev browser unauthenticated'), {
+        errors: [{ code: 'dev_browser_unauthenticated' }],
+        status: 401,
+      });
+
+      mockDevBrowser.clear.mockImplementationOnce(() => void callLog.push('clearDevBrowser'));
+      mockEnvironmentFetch
+        .mockImplementationOnce(() => {
+          callLog.push('environment');
+          return Promise.reject(devBrowserError);
+        })
+        .mockImplementation(() => {
+          callLog.push('environment');
+          return Promise.resolve({
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+          });
+        });
+      mockClientFetch.mockImplementation(() => {
+        callLog.push('client');
+        return Promise.resolve({ signedInSessions: [] });
+      });
+
+      const sut = new Clerk(developmentPublishableKey);
+      await sut.load({ unsafe_disableDevelopmentModeConsoleWarning: true });
+
+      expect(callLog).toEqual(['environment', 'client', 'clearDevBrowser', 'environment', 'client']);
+      expect(sut.status).toBe('ready');
+    });
+
     describe.each(['active', 'pending'] satisfies Array<SignedInSessionResource['status']>)(
       'when session has %s status',
       status => {
@@ -1251,6 +1318,53 @@ describe('Clerk singleton', () => {
         });
       },
     );
+
+    it('completes local sign-out when removing sessions fails with an offline network error', async () => {
+      mockClientRemoveSessions.mockRejectedValue(
+        new ClerkRuntimeError('Network request failed.', { code: 'network_error' }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          ...clientTouchDefaults,
+          signedInSessions: [mockSession1],
+          sessions: [mockSession1],
+          destroy: mockClientDestroy,
+          removeSessions: mockClientRemoveSessions,
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.navigate = vi.fn();
+      await sut.load();
+
+      await expect(sut.signOut()).resolves.toBeUndefined();
+
+      expect(sut.session).toBeNull();
+      expect(sut.navigate).toHaveBeenCalledWith('/');
+    });
+
+    it('rethrows non-network errors when removing sessions during sign-out', async () => {
+      const error = new ClerkRuntimeError('Request failed.', { code: 'unexpected_error' });
+      mockClientRemoveSessions.mockRejectedValue(error);
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          ...clientTouchDefaults,
+          signedInSessions: [mockSession1],
+          sessions: [mockSession1],
+          destroy: mockClientDestroy,
+          removeSessions: mockClientRemoveSessions,
+        }),
+      );
+
+      const sut = new Clerk(productionPublishableKey);
+      sut.navigate = vi.fn();
+      await sut.load();
+
+      await expect(sut.signOut()).rejects.toBe(error);
+
+      expect(sut.session).toBeUndefined();
+      expect(sut.navigate).not.toHaveBeenCalled();
+    });
 
     it('only removes the session that corresponds to the passed sessionId if it is not the current', async () => {
       mockClientFetch.mockReturnValue(
@@ -1848,6 +1962,220 @@ describe('Clerk singleton', () => {
         expect(internalNavigate).toHaveBeenCalledWith('continue');
       });
       expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    describe('__internal_resumeAfterProtectCheck', () => {
+      // A verification challenge can interrupt an OAuth callback partway through routing. The
+      // challenge card clears it and hands control back here, from a page that is no longer
+      // the callback route, so the remaining routing has to run rather than start over.
+
+      const gatedTransferableSignIn = (extra: Record<string, unknown> = {}) =>
+        new SignIn({
+          status: 'needs_identifier',
+          first_factor_verification: {
+            status: 'transferable',
+            strategy: 'oauth_google',
+            external_verification_redirect_url: '',
+            error: {
+              code: 'external_account_not_found',
+              long_message: 'The External Account was not found.',
+              message: 'Invalid external account',
+            },
+          },
+          second_factor_verification: null,
+          identifier: '',
+          user_data: null,
+          created_session_id: null,
+          created_user_id: null,
+          ...extra,
+        } as any as SignInJSON);
+
+      const loadEnvironment = () =>
+        mockEnvironmentFetch.mockReturnValue(
+          Promise.resolve({
+            authConfig: {},
+            userSettings: mockUserSettings,
+            displayConfig: mockDisplayConfig,
+            isSingleSession: () => false,
+            isProduction: () => false,
+            isDevelopmentOrStaging: () => true,
+            onWindowLocationHost: () => false,
+          }),
+        );
+
+      it('completes the transfer as a SIGN-UP and activates the created session', async () => {
+        loadEnvironment();
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: gatedTransferableSignIn(),
+            signUp: new SignUp(null),
+          }),
+        );
+
+        const mockSetActive = vi.fn();
+        const mockSignUpCreate = vi
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = mockSetActive;
+
+        await sut.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' });
+
+        await waitFor(() => {
+          expect(mockSignUpCreate).toHaveBeenCalledTimes(1);
+          expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined });
+          expect(mockSetActive).toHaveBeenCalledWith(expect.objectContaining({ session: '123' }));
+        });
+      });
+
+      it('completes the transfer even when the cleared response dropped the transferable marker', async () => {
+        // `SignIn.fromJSON` replaces `firstFactorVerification` wholesale on every write, so the
+        // caller latches the continuation before running the challenge and passes it explicitly.
+        // Re-reading it here would silently fall back to returning the user to sign-in.
+        loadEnvironment();
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: new SignIn({
+              status: 'needs_identifier',
+              first_factor_verification: null,
+              second_factor_verification: null,
+              identifier: '',
+              user_data: null,
+              created_session_id: null,
+              created_user_id: null,
+            } as any as SignInJSON),
+            signUp: new SignUp(null),
+          }),
+        );
+
+        const mockSignUpCreate = vi
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = vi.fn();
+
+        await sut.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' });
+
+        await waitFor(() =>
+          expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined }),
+        );
+      });
+
+      it('does not divert to the sign-up card when a stale gate is on the sign-up resource', async () => {
+        // The sign-in variant below covers the first short-circuit; `resuming` skips a second one
+        // keyed on the SIGN-UP resource, and that is the arm that sends the user to a different
+        // card entirely rather than back to this one.
+        loadEnvironment();
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: gatedTransferableSignIn(),
+            signUp: new SignUp({
+              protect_check: { status: 'pending', token: 'stale-signup-token', sdk_url: 'https://example.com/sdk.js' },
+            } as any),
+          }),
+        );
+
+        const mockSignUpCreate = vi
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = vi.fn();
+
+        await sut.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' });
+
+        await waitFor(() =>
+          expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined }),
+        );
+        expect(mockNavigate.mock.calls.some(([to]) => typeof to === 'string' && to.includes('protect-check'))).toBe(
+          false,
+        );
+      });
+
+      it('does not bounce back into the challenge when a stale gate is still on the resource', async () => {
+        // This is the test that proves `resuming` is load-bearing rather than decorative. The
+        // caller IS the challenge card; re-checking the gate here would hand control straight
+        // back to it, or — through the sign-up arm — to the wrong card entirely.
+        loadEnvironment();
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: gatedTransferableSignIn({
+              protect_check: { status: 'pending', token: 'stale-token', sdk_url: 'https://example.com/sdk.js' },
+            }),
+            signUp: new SignUp(null),
+          }),
+        );
+
+        const mockSignUpCreate = vi
+          .fn()
+          .mockReturnValue(Promise.resolve({ status: 'complete', createdSessionId: '123' }));
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = vi.fn();
+
+        await sut.__internal_resumeAfterProtectCheck({ continuation: 'transfer_to_sign_up' });
+
+        await waitFor(() =>
+          expect(mockSignUpCreate).toHaveBeenCalledWith({ transfer: true, unsafeMetadata: undefined }),
+        );
+        expect(mockNavigate.mock.calls.some(([to]) => typeof to === 'string' && to.includes('protect-check'))).toBe(
+          false,
+        );
+      });
+
+      it('still honours transferable: false', async () => {
+        loadEnvironment();
+        mockClientFetch.mockReturnValue(
+          Promise.resolve({
+            signedInSessions: [],
+            signIn: gatedTransferableSignIn(),
+            signUp: new SignUp(null),
+          }),
+        );
+
+        const mockSignUpCreate = vi.fn();
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load(mockedLoadOptions);
+        if (!sut.client) {
+          fail('we should always have a client');
+        }
+        sut.client.signUp.create = mockSignUpCreate;
+        sut.setActive = vi.fn();
+
+        await sut.__internal_resumeAfterProtectCheck({
+          continuation: 'transfer_to_sign_up',
+          transferable: false,
+        });
+
+        await waitFor(() => expect(mockSignUpCreate).not.toHaveBeenCalled());
+      });
     });
 
     it('does not initiate the transfer flow when transferable: false is passed', async () => {
@@ -3678,6 +4006,107 @@ describe('Clerk singleton', () => {
     });
   });
 
+  describe('protect check modal', () => {
+    beforeEach(() => {
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => false,
+          isProduction: () => true,
+          isDevelopmentOrStaging: () => false,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [],
+        }),
+      );
+    });
+
+    const gatedSignIn = () => ({
+      protectCheck: { status: 'pending', token: 'tok', sdkUrl: 'https://p.example.com/sdk.js' },
+    });
+
+    it('resolves at once when Clerk was loaded without UI components', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+
+      await expect(sut.__internal_openProtectCheckModal({ resource: gatedSignIn() as any })).resolves.toBeUndefined();
+    });
+
+    it('resolves at once and leaves the gate when the UI predates the Protect modal', async () => {
+      const openModal = vi.fn();
+      const mockClerkUICtor = vi.fn(function () {
+        return { ensureMounted: () => Promise.resolve({ openModal, closeModal: vi.fn() }) };
+      });
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      const resource = gatedSignIn() as any;
+
+      await expect(sut.__internal_openProtectCheckModal({ resource })).resolves.toBeUndefined();
+      expect(openModal).not.toHaveBeenCalled();
+      expect(resource.protectCheck).not.toBeNull();
+    });
+
+    it('closes the modal and rejects with the error the modal reports', async () => {
+      const openProtectCheckModal = vi.fn();
+      const closeModal = vi.fn();
+      const mockClerkUICtor = vi.fn(function () {
+        return { ensureMounted: () => Promise.resolve({ openProtectCheckModal, closeModal }) };
+      });
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ ...mockedLoadOptions, ui: { ClerkUI: mockClerkUICtor } });
+      const blocked = new Error('blocked');
+
+      const pending = sut.__internal_openProtectCheckModal({ resource: gatedSignIn() as any });
+      await vi.waitFor(() => expect(openProtectCheckModal).toHaveBeenCalled());
+      openProtectCheckModal.mock.calls[0][0].onFailed(blocked);
+
+      await expect(pending).rejects.toBe(blocked);
+      expect(closeModal).toHaveBeenCalledWith('protectCheck');
+    });
+
+    const loadWithClient = async (client: { signIn: Record<string, unknown>; signUp: Record<string, unknown> }) => {
+      mockClientFetch.mockReturnValue(Promise.resolve({ signedInSessions: [], ...client }));
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load(mockedLoadOptions);
+      return sut;
+    };
+
+    it('resolves gates the client carries on its sign-in and sign-up', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = await loadWithClient({ signIn: gatedSignIn(), signUp: gatedSignIn() });
+
+      await sut.__internal_resolvePendingProtectCheck();
+
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signIn);
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signUp);
+      resolve.mockRestore();
+    });
+
+    it('leaves every gate alone once the sign-in is complete', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = await loadWithClient({ signIn: { status: 'complete' }, signUp: gatedSignIn() });
+
+      await sut.__internal_resolvePendingProtectCheck();
+
+      expect(resolve).not.toHaveBeenCalled();
+      resolve.mockRestore();
+    });
+
+    it('resolves only the sign-up gate when the callback is a sign-up', async () => {
+      const resolve = vi.spyOn(ProtectCheckGate.prototype, 'resolve').mockResolvedValue(undefined);
+      const sut = await loadWithClient({ signIn: gatedSignIn(), signUp: gatedSignIn() });
+
+      await sut.__internal_resolvePendingProtectCheck('signUp');
+
+      expect(resolve).toHaveBeenCalledTimes(1);
+      expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signUp);
+      resolve.mockRestore();
+    });
+  });
+
   describe('ui.ClerkUI option', () => {
     beforeEach(() => {
       mockEnvironmentFetch.mockReturnValue(
@@ -3739,6 +4168,119 @@ describe('Clerk singleton', () => {
       } as any);
 
       expect(mockClerkUICtor).toHaveBeenCalled();
+    });
+  });
+
+  describe('page focus session touch', () => {
+    const windowListeners = new Map<string, Array<(event: any) => void>>();
+
+    const firePageFocus = () => {
+      for (const listener of windowListeners.get('focus') ?? []) {
+        listener(new Event('focus'));
+      }
+    };
+
+    const mockSession = {
+      id: 'sess_1',
+      status: 'active',
+      user: {},
+      touch: vi.fn(() => Promise.resolve()),
+      getToken: vi.fn(),
+      lastActiveToken: { getRawString: () => 'mocked-token' },
+    };
+
+    beforeEach(() => {
+      windowListeners.clear();
+      const recordWindowListener = (type: string, callback: (e: any) => void) => {
+        const listeners = windowListeners.get(type) ?? [];
+        listeners.push(callback);
+        windowListeners.set(type, listeners);
+
+        if (type === 'message') {
+          callback({
+            origin: 'https://' + productionPublishableKey,
+            data: {
+              browserToken: 'hey',
+            },
+          });
+        }
+      };
+      Object.defineProperty(global.window, 'addEventListener', {
+        configurable: true,
+        value: recordWindowListener,
+      });
+
+      mockSession.touch.mockReset();
+      mockSession.touch.mockResolvedValue(undefined);
+      setDocumentVisibilityState('visible');
+      mockEnvironmentFetch.mockReturnValue(
+        Promise.resolve({
+          authConfig: { singleSessionMode: true },
+          userSettings: mockUserSettings,
+          displayConfig: mockDisplayConfig,
+          isSingleSession: () => true,
+          isProduction: () => false,
+          isDevelopmentOrStaging: () => true,
+        }),
+      );
+      mockClientFetch.mockReturnValue(
+        Promise.resolve({
+          signedInSessions: [mockSession],
+          lastActiveSessionId: mockSession.id,
+        }),
+      );
+    });
+
+    afterEach(() => {
+      restoreDocument();
+    });
+
+    it('does not surface a failed focus touch as an unhandled rejection', async () => {
+      const unhandled: unknown[] = [];
+      const onUnhandledRejection = (reason: unknown) => {
+        unhandled.push(reason);
+      };
+      process.on('unhandledRejection', onUnhandledRejection);
+
+      try {
+        mockSession.touch.mockRejectedValue(
+          new Error(
+            'ClerkJS: Network error at "https://clerk.example.com/v1/client/sessions/sess_1/touch" - TypeError: NetworkError when attempting to fetch resource. Please try again.',
+          ),
+        );
+
+        const sut = new Clerk(productionPublishableKey);
+        await sut.load();
+        firePageFocus();
+
+        expect(mockSession.touch).toHaveBeenCalledWith({ intent: 'focus' });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(unhandled).toEqual([]);
+      } finally {
+        process.off('unhandledRejection', onUnhandledRejection);
+      }
+    });
+
+    it('still handles an unauthenticated focus touch', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load();
+      const handleUnauthenticated = vi.spyOn(sut, 'handleUnauthenticated').mockResolvedValue(undefined);
+      mockSession.touch.mockRejectedValue({ status: 401 });
+
+      firePageFocus();
+
+      await waitFor(() => {
+        expect(handleUnauthenticated).toHaveBeenCalled();
+      });
+    });
+
+    it('does not touch the session on focus when touchSession is false', async () => {
+      const sut = new Clerk(productionPublishableKey);
+      await sut.load({ touchSession: false });
+
+      firePageFocus();
+
+      expect(mockSession.touch).not.toHaveBeenCalled();
     });
   });
 });

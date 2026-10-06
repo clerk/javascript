@@ -64,12 +64,12 @@ jobs:
             }
             core.setOutput('number', raw);
       - name: Check out trusted labeler config
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           sparse-checkout: .github/labeler.yml
           sparse-checkout-cone-mode: false
           persist-credentials: false
-      - uses: actions/labeler@f27b608878404679385c85cfa523b85ccb86e213 # v6
+      - uses: actions/labeler@b8dd2d9be0f68b860e7dae5dae7d772984eacd6d # v6
         with:
           pr-number: ${{ steps.pr.outputs.number }}
           configuration-path: .github/labeler.yml

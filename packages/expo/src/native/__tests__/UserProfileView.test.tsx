@@ -1,7 +1,9 @@
-import { act, render, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import React from 'react';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
+import type { UserProfileCustomPageNavigation } from '../UserProfileCustomPages';
+import { useUserProfileCustomPageNavigation } from '../UserProfileCustomPages';
 import { UserProfileView } from '../UserProfileView';
 
 const mocks = vi.hoisted(() => {
@@ -41,11 +43,55 @@ function lastNativeProps() {
   return mocks.nativeProps.mock.calls.at(-1)?.[0];
 }
 
+function BillingPage() {
+  const { push } = useUserProfileCustomPageNavigation();
+
+  return (
+    <button
+      type='button'
+      onClick={() => void push('invoice-details')}
+    >
+      View invoice
+    </button>
+  );
+}
+
+function InvoiceDetailsPage() {
+  const { popToRoot } = useUserProfileCustomPageNavigation();
+
+  return (
+    <button
+      type='button'
+      onClick={() => void popToRoot()}
+    >
+      Done
+    </button>
+  );
+}
+
+let latestNavigation: UserProfileCustomPageNavigation | null = null;
+
+function NavigationCapture() {
+  latestNavigation = useUserProfileCustomPageNavigation();
+  return null;
+}
+
+function getLatestNavigation(): UserProfileCustomPageNavigation {
+  if (!latestNavigation) {
+    throw new Error('Expected custom page navigation to be available.');
+  }
+
+  return latestNavigation;
+}
+
 describe('UserProfileView', () => {
+  afterEach(cleanup);
+
   beforeEach(() => {
     mocks.navigateCustomPage.mockClear();
     mocks.nativeProps.mockClear();
     mocks.openURL.mockClear();
+    latestNavigation = null;
   });
 
   test('calls onDismiss when the native profile view emits dismissed', () => {
@@ -119,6 +165,90 @@ describe('UserProfileView', () => {
       lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'dismissed', path: 'api-keys' } });
     });
     expect(result.queryByText('API keys page')).toBeNull();
+  });
+
+  test('pushes a destination that is not exposed as a profile row', () => {
+    const result = render(
+      <UserProfileView
+        customPages={[{ path: 'billing', label: 'Billing', content: <BillingPage /> }]}
+        customDestinations={[
+          { path: 'invoice-details', label: 'Invoice details', content: <div>Invoice details page</div> },
+        ]}
+      />,
+    );
+
+    expect(JSON.parse(lastNativeProps().customPages)[1]).toMatchObject({
+      path: 'invoice-details',
+      showAsRow: false,
+    });
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'presented', path: 'billing' } });
+    });
+    fireEvent.click(result.getByText('View invoice'));
+    expect(mocks.navigateCustomPage).toHaveBeenCalledWith('push', 'invoice-details');
+    expect(result.getByText('Invoice details page')).toBeDefined();
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'dismissed', path: 'billing' } });
+    });
+    expect(result.getByText('View invoice')).toBeDefined();
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'presented', path: 'invoice-details' } });
+    });
+    expect(result.getByText('Invoice details page')).toBeDefined();
+    expect(result.getByText('View invoice')).toBeDefined();
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'dismissed', path: 'invoice-details' } });
+    });
+    expect(result.queryByText('Invoice details page')).toBeNull();
+    expect(result.getByText('View invoice')).toBeDefined();
+  });
+
+  test('rejects pushing a path that is already in the active stack', async () => {
+    render(
+      <UserProfileView
+        customPages={[{ path: 'billing', label: 'Billing', content: <NavigationCapture /> }]}
+        customDestinations={[{ path: 'invoice-details', label: 'Invoice details', content: <NavigationCapture /> }]}
+      />,
+    );
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'presented', path: 'billing' } });
+    });
+
+    await act(async () => {
+      await getLatestNavigation().push('invoice-details');
+    });
+
+    await expect(getLatestNavigation().push('billing')).rejects.toThrow(
+      'Custom user profile page or destination "billing" is already in the navigation stack.',
+    );
+    expect(mocks.navigateCustomPage).toHaveBeenCalledTimes(1);
+    expect(mocks.navigateCustomPage).toHaveBeenCalledWith('push', 'invoice-details');
+  });
+
+  test('unmounts the retained custom page stack after returning to the profile root', () => {
+    const result = render(
+      <UserProfileView
+        customPages={[{ path: 'billing', label: 'Billing', content: <BillingPage /> }]}
+        customDestinations={[{ path: 'invoice-details', label: 'Invoice details', content: <InvoiceDetailsPage /> }]}
+      />,
+    );
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'presented', path: 'billing' } });
+    });
+    fireEvent.click(result.getByText('View invoice'));
+    fireEvent.click(result.getByText('Done'));
+    expect(mocks.navigateCustomPage).toHaveBeenLastCalledWith('popToRoot');
+
+    act(() => {
+      lastNativeProps().onCustomPageEvent({ nativeEvent: { type: 'dismissed', path: 'invoice-details' } });
+    });
+    expect(result.queryByText('View invoice')).toBeNull();
+    expect(result.queryByText('Done')).toBeNull();
   });
 
   test('opens href pages externally and returns to the profile root', async () => {

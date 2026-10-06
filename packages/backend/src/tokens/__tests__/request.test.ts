@@ -21,6 +21,7 @@ import { signJwt } from '../../jwt/signJwt';
 import { server } from '../../mock-server';
 import type { AuthReason } from '../authStatus';
 import { AuthErrorReason, AuthStatus } from '../authStatus';
+import { JWT_CATEGORY_JWT_TEMPLATE } from '../jwtCategories';
 import { OrganizationMatcher } from '../organizationMatcher';
 import { authenticateRequest, RefreshTokenErrorReason } from '../request';
 import { type MachineTokenType, TokenType } from '../tokenTypes';
@@ -42,8 +43,8 @@ interface CustomMatchers<R = unknown> {
 }
 
 declare module 'vitest' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  interface Assertion<T = any> extends CustomMatchers<T> {}
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unused-vars
+  interface Assertion<R, T> extends CustomMatchers<R> {}
   // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface AsymmetricMatchersContaining extends CustomMatchers {}
 }
@@ -1306,6 +1307,45 @@ describe('tokens.authenticateRequest(options)', () => {
     expect(requestState.toAuth()).toBeSignedOutToAuth();
   });
 
+  // Regression tests for SEC-340. A JWT-template token is signed by the same instance key and
+  // passes verifyToken(), but carries no `sid`, so it outlives revocation of the session that
+  // minted it and must not authenticate one.
+  const templateInHeader = (jwt: string) => mockRequestWithHeaderAuth({ authorization: jwt });
+  describe.each([
+    ['headerToken', templateInHeader, {}],
+    [
+      'cookieToken',
+      (jwt: string) =>
+        mockRequestWithCookies(
+          {},
+          { __clerk_db_jwt: 'deadbeef', __client_uat: `${mockJwtPayload.iat - 10}`, __session: jwt },
+        ),
+      {},
+    ],
+    ['headerToken, acceptsToken: any', templateInHeader, { acceptsToken: 'any' as const }],
+    [
+      'headerToken, acceptsToken: [session_token, m2m_token]',
+      templateInHeader,
+      { acceptsToken: ['session_token', 'm2m_token'] as const },
+    ],
+  ])('%s: JWT-template token presented as a session token (SEC-340)', (_label, buildRequest, options) => {
+    test('returns signed out', async () => {
+      const { sid: _sid, ...payloadWithoutSid } = mockJwtPayload;
+      const { data: templateJwt } = await signJwt(payloadWithoutSid, signingJwks, {
+        algorithm: 'RS256',
+        header: { typ: 'JWT', kid: 'ins_2GIoQhbUpy0hX7B2cVkuTMinXoD', cat: JWT_CATEGORY_JWT_TEMPLATE },
+      });
+
+      const requestState = await authenticateRequest(buildRequest(templateJwt!), mockOptions(options));
+
+      expect(requestState).toBeSignedOut({
+        reason: AuthErrorReason.TokenTypeMismatch,
+        message: '',
+      });
+      expect(requestState.toAuth()).toBeSignedOutToAuth();
+    });
+  });
+
   // todo(
   //   'cookieToken: returns signed in when cookieToken.iat >= clientUat and expired token and ssrToken [10y.2n.1y]',
   //   assert => {
@@ -1556,6 +1596,68 @@ describe('tokens.authenticateRequest(options)', () => {
           isAuthenticated: false,
         });
       });
+    });
+
+    test.each(['oauth_token', 'any'] as const)(
+      'rejects an opaque OAuth audience mismatch when acceptsToken is %s',
+      async acceptsToken => {
+        server.use(
+          http.post(mockMachineAuthResponses.oauth_token.endpoint, () => {
+            return HttpResponse.json({
+              ...mockVerificationResults.oauth_token,
+              aud: 'https://other.example.com',
+            });
+          }),
+        );
+
+        const request = mockRequest({ authorization: `Bearer ${mockTokens.oauth_token}` });
+        const requestState = await authenticateRequest(
+          request,
+          mockOptions({ acceptsToken, audience: 'https://resource.example.com' }),
+        );
+
+        expect(requestState).toBeMachineUnauthenticated({
+          tokenType: 'oauth_token',
+          reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+          message:
+            'OAuth audience mismatch. Verification expected audience ["https://resource.example.com"], but incoming token has aud "https://other.example.com". (code=token-verification-failed, status=n/a)',
+        });
+        expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
+          tokenType: 'oauth_token',
+          isAuthenticated: false,
+        });
+      },
+    );
+
+    describe.each(['opaque', 'JWT'] as const)('%s OAuth token without aud', format => {
+      test.each(['oauth_token', 'any'] as const)(
+        'rejects a configured audience when acceptsToken is %s',
+        async acceptsToken => {
+          server.use(
+            http.post(mockMachineAuthResponses.oauth_token.endpoint, () => {
+              return HttpResponse.json(mockVerificationResults.oauth_token);
+            }),
+            http.get('https://api.clerk.test/v1/jwks', () => HttpResponse.json(mockJwks)),
+          );
+          const token = format === 'opaque' ? mockTokens.oauth_token : mockSignedOAuthAccessTokenJwt;
+          const request = mockRequest({ authorization: `Bearer ${token}` });
+          const requestState = await authenticateRequest(
+            request,
+            mockOptions({ acceptsToken, audience: 'https://resource.example.com' }),
+          );
+
+          expect(requestState).toBeMachineUnauthenticated({
+            tokenType: 'oauth_token',
+            reason: MachineTokenVerificationErrorCode.TokenVerificationFailed,
+            message:
+              'Invalid OAuth audience claim (aud) undefined. Expected a non-empty string or a non-empty array of non-empty strings. (code=token-verification-failed, status=n/a)',
+          });
+          expect(requestState.toAuth()).toBeMachineUnauthenticatedToAuth({
+            tokenType: 'oauth_token',
+            isAuthenticated: false,
+          });
+        },
+      );
     });
 
     test('accepts machine secret when verifying machine-to-machine token', async () => {

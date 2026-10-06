@@ -1,5 +1,6 @@
 import { inBrowser } from '@clerk/shared/browser';
 import { type ClerkError, ClerkRuntimeError, ClerkWebAuthnError } from '@clerk/shared/error';
+import { ERROR_CODES } from '@clerk/shared/internal/clerk-js/constants';
 import {
   convertJSONToPublicKeyRequestOptions,
   serializePublicKeyCredentialAssertion,
@@ -87,6 +88,7 @@ import {
 import { _authenticateWithTransport } from '../../utils/authenticateWithTransport';
 import { CaptchaChallenge } from '../../utils/captcha/CaptchaChallenge';
 import { runAsyncResourceTask } from '../../utils/runAsyncResourceTask';
+import { getBrowserTimezone } from '../../utils/timezone';
 import { loadZxcvbn } from '../../utils/zxcvbn';
 import {
   clerkInvalidFAPIResponse,
@@ -98,7 +100,8 @@ import {
   clerkVerifyWeb3WalletCalledBeforeCreate,
 } from '../errors';
 import { eventBus } from '../events';
-import { BaseResource, UserData, Verification } from './internal';
+import { ProtectCheckGate } from '../protectCheckGate';
+import { type BaseMutateParams, BaseResource, UserData, Verification } from './internal';
 
 /**
  * Terminal states for email-link verification polling: `verified` (success), `expired`
@@ -118,6 +121,7 @@ export class SignIn extends BaseResource implements SignInResource {
   supportedIdentifiers: SignInIdentifier[] = [];
   supportedFirstFactors: SignInFirstFactor[] | null = [];
   supportedSecondFactors: SignInSecondFactor[] | null = null;
+  ssoBypassFirstFactors: SignInFirstFactor[] | null = null;
   firstFactorVerification: VerificationResource = new Verification(null);
   secondFactorVerification: VerificationResource = new Verification(null);
   identifier: string | null = null;
@@ -125,6 +129,7 @@ export class SignIn extends BaseResource implements SignInResource {
   userData: UserData = new UserData(null);
   clientTrustState?: ClientTrustState;
   protectCheck: ProtectCheckResource | null = null;
+  timezone: string | null = null;
 
   /**
    * The current status of the sign-in process.
@@ -164,7 +169,16 @@ export class SignIn extends BaseResource implements SignInResource {
    * This property is used to provide access to underlying Client methods to `SignInFuture`, which wraps an instance
    * of `SignIn`.
    */
-  __internal_basePost = this._basePost.bind(this);
+  __internal_basePost = async (
+    params?: BaseMutateParams,
+    { resolveProtectCheck = true }: { resolveProtectCheck?: boolean } = {},
+  ): Promise<this> => {
+    await this._basePost(params);
+    if (resolveProtectCheck) {
+      await ProtectCheckGate.getInstance().resolve(SignIn.clerk, this, params?.action);
+    }
+    return this;
+  };
 
   /**
    * @internal Only used for internal purposes, and is not intended to be used directly.
@@ -172,7 +186,16 @@ export class SignIn extends BaseResource implements SignInResource {
    * This property is used to provide access to underlying Client methods to `SignInFuture`, which wraps an instance
    * of `SignIn`.
    */
-  __internal_basePatch = this._basePatch.bind(this);
+  __internal_basePatch = async (
+    params?: BaseMutateParams,
+    { resolveProtectCheck = true }: { resolveProtectCheck?: boolean } = {},
+  ): Promise<this> => {
+    await this._basePatch(params);
+    if (resolveProtectCheck) {
+      await ProtectCheckGate.getInstance().resolve(SignIn.clerk, this, params?.action);
+    }
+    return this;
+  };
 
   /**
    * @internal Only used for internal purposes, and is not intended to be used directly.
@@ -196,6 +219,13 @@ export class SignIn extends BaseResource implements SignInResource {
     const browserLocale = getBrowserLocale();
     if (browserLocale) {
       body.locale = browserLocale;
+    }
+
+    if (body.timezone === undefined) {
+      const browserTimezone = getBrowserTimezone();
+      if (browserTimezone) {
+        body.timezone = browserTimezone;
+      }
     }
 
     if (
@@ -388,6 +418,27 @@ export class SignIn extends BaseResource implements SignInResource {
 
     const redirectUrl = SignIn.clerk.buildUrlWithAuth(params.redirectUrl);
 
+    const isChallengePending = () => !!this.protectCheck || this.status === 'needs_protect_check';
+    const pendingHandOff = () => {
+      const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
+      return status === 'unverified' ? externalVerificationRedirectURL : null;
+    };
+
+    // A pending challenge with nowhere to navigate to. Throw rather than return, so the method still
+    // either navigates or throws: a caller that doesn't handle challenges gets an error it can
+    // recognise instead of a silent success. A caller that does runs the challenge and calls back
+    // in with `continueSignIn`.
+    const throwChallengeRequired = (): never => {
+      throw new ClerkRuntimeError('A verification challenge must be completed before this sign-in can continue.', {
+        code: ERROR_CODES.PROTECT_CHECK_REQUIRED,
+      });
+    };
+
+    // The hand-off a challenged create built, if any. The server builds it before deciding, so a
+    // challenge on create can arrive with a usable redirect: that means "go to the identity
+    // provider first" and the challenge runs on the way back, where the callback routes to it.
+    let challengedCreateHandOff: URL | null = null;
+
     if (!this.id || !continueSignIn) {
       await this.create({
         strategy,
@@ -395,6 +446,13 @@ export class SignIn extends BaseResource implements SignInResource {
         redirectUrl,
         actionCompleteRedirectUrl,
       });
+
+      if (isChallengePending()) {
+        challengedCreateHandOff = pendingHandOff();
+        if (!challengedCreateHandOff) {
+          throwChallengeRequired();
+        }
+      }
     }
 
     if (strategy === 'enterprise_sso') {
@@ -405,6 +463,17 @@ export class SignIn extends BaseResource implements SignInResource {
         oidcPrompt,
         enterpriseConnectionId,
       });
+
+      // A challenged prepare builds no verification, so any redirect left on the sign-in is from an
+      // earlier attempt and may be for another connection. Only this call's create hand-off is safe
+      // to follow.
+      if (isChallengePending()) {
+        if (challengedCreateHandOff) {
+          navigateCallback(challengedCreateHandOff);
+          return;
+        }
+        throwChallengeRequired();
+      }
     }
 
     const { status, externalVerificationRedirectURL } = this.firstFactorVerification;
@@ -639,6 +708,9 @@ export class SignIn extends BaseResource implements SignInResource {
       this.identifier = data.identifier;
       this.supportedFirstFactors = deepSnakeToCamel(data.supported_first_factors) as SignInFirstFactor[] | null;
       this.supportedSecondFactors = deepSnakeToCamel(data.supported_second_factors) as SignInSecondFactor[] | null;
+      this.ssoBypassFirstFactors = deepSnakeToCamel(data.sso_bypass_first_factors ?? null) as
+        | SignInFirstFactor[]
+        | null;
       this.firstFactorVerification = new Verification(data.first_factor_verification);
       this.secondFactorVerification = new Verification(data.second_factor_verification);
       this.createdSessionId = data.created_session_id;
@@ -653,6 +725,7 @@ export class SignIn extends BaseResource implements SignInResource {
             uiHints: data.protect_check.ui_hints,
           }
         : null;
+      this.timezone = data.timezone ?? null;
     }
 
     eventBus.emit('resource:update', { resource: this });
@@ -708,11 +781,13 @@ export class SignIn extends BaseResource implements SignInResource {
       supported_identifiers: this.supportedIdentifiers,
       supported_first_factors: deepCamelToSnake(this.supportedFirstFactors),
       supported_second_factors: deepCamelToSnake(this.supportedSecondFactors),
+      sso_bypass_first_factors: deepCamelToSnake(this.ssoBypassFirstFactors) ?? undefined,
       first_factor_verification: this.firstFactorVerification.__internal_toSnapshot(),
       second_factor_verification: this.secondFactorVerification.__internal_toSnapshot(),
       identifier: this.identifier,
       created_session_id: this.createdSessionId,
       user_data: this.userData.__internal_toSnapshot(),
+      timezone: this.timezone,
       protect_check: this.protectCheck
         ? {
             status: this.protectCheck.status,
@@ -806,6 +881,10 @@ class SignInFuture implements SignInFutureResource {
     return this.#resource.identifier;
   }
 
+  get timezone() {
+    return this.#resource.timezone;
+  }
+
   get createdSessionId() {
     return this.#resource.createdSessionId;
   }
@@ -825,6 +904,10 @@ class SignInFuture implements SignInFutureResource {
 
   get supportedSecondFactors() {
     return this.#resource.supportedSecondFactors ?? [];
+  }
+
+  get ssoBypassFirstFactors() {
+    return this.#resource.ssoBypassFirstFactors ?? [];
   }
 
   get isTransferable() {
@@ -1025,8 +1108,9 @@ class SignInFuture implements SignInFutureResource {
     return { captchaToken, captchaWidgetType, captchaError };
   }
 
-  private async _create(params: SignInFutureCreateParams): Promise<void> {
+  private async _create(params: SignInFutureCreateParams, options?: { resolveProtectCheck?: boolean }): Promise<void> {
     const { captchaToken, captchaWidgetType, captchaError } = await this.getCaptchaToken(params);
+    const timezone = params.timezone ?? getBrowserTimezone();
 
     const body: Record<string, unknown> = {
       ...params,
@@ -1034,12 +1118,16 @@ class SignInFuture implements SignInFutureResource {
       captchaWidgetType,
       captchaError,
       locale: getBrowserLocale() || undefined,
+      ...(timezone !== null ? { timezone } : {}),
     };
 
-    await this.#resource.__internal_basePost({
-      path: this.#resource.pathRoot,
-      body,
-    });
+    await this.#resource.__internal_basePost(
+      {
+        path: this.#resource.pathRoot,
+        body,
+      },
+      options,
+    );
   }
 
   async create(params: SignInFutureCreateParams): Promise<{ error: ClerkError | null }> {
@@ -1058,12 +1146,14 @@ class SignInFuture implements SignInFutureResource {
       const identifier = params.identifier || params.emailAddress || params.phoneNumber;
       const previousIdentifier = this.#resource.identifier;
       const locale = getBrowserLocale();
+      const timezone = params.timezone ?? this.#resource.timezone ?? getBrowserTimezone();
       await this.#resource.__internal_basePost({
         path: this.#resource.pathRoot,
         body: {
           identifier: identifier || previousIdentifier,
           password: params.password,
           ...(locale ? { locale } : {}),
+          ...(timezone !== null ? { timezone } : {}),
         },
       });
     });
@@ -1250,34 +1340,65 @@ class SignInFuture implements SignInFutureResource {
       const wouldReplayStaleRedirect = strategy !== 'enterprise_sso' && hasPendingRedirect;
       const shouldCreateSignIn = !this.#resource.id || wouldReplayStaleRedirect;
 
+      const isChallengePending = () => !!this.#resource.protectCheck || this.#resource.status === 'needs_protect_check';
+      const pendingHandOff = () => {
+        const { status, externalVerificationRedirectURL } = this.#resource.firstFactorVerification;
+        return status === 'unverified' ? externalVerificationRedirectURL : null;
+      };
+      const resolveChallenge = () => ProtectCheckGate.getInstance().resolve(SignIn.clerk, this.#resource);
+
+      let challengedCreateHandOff: URL | null = null;
+
       if (shouldCreateSignIn) {
-        await this._create({
-          strategy,
-          ...routes,
-          identifier,
-        });
+        await this._create(
+          {
+            strategy,
+            ...routes,
+            identifier,
+          },
+          { resolveProtectCheck: false },
+        );
+
+        if (isChallengePending()) {
+          challengedCreateHandOff = pendingHandOff();
+          if (!challengedCreateHandOff) {
+            await resolveChallenge();
+          }
+        }
       }
 
       if (strategy === 'enterprise_sso') {
-        await this.#resource.__internal_basePost({
-          body: {
-            ...routes,
-            oidcPrompt,
-            enterpriseConnectionId,
-            strategy: 'enterprise_sso',
-          },
-          action: 'prepare_first_factor',
-          coalesce: true,
-        });
+        const prepare = (options?: { resolveProtectCheck?: boolean }) =>
+          this.#resource.__internal_basePost(
+            {
+              body: {
+                ...routes,
+                oidcPrompt,
+                enterpriseConnectionId,
+                strategy: 'enterprise_sso',
+              },
+              action: 'prepare_first_factor',
+              coalesce: true,
+            },
+            options,
+          );
+
+        await prepare({ resolveProtectCheck: false });
+
+        if (isChallengePending() && !challengedCreateHandOff) {
+          await resolveChallenge();
+          await prepare();
+        }
       }
 
-      const { status, externalVerificationRedirectURL } = this.#resource.firstFactorVerification;
+      const externalVerificationRedirectURL = challengedCreateHandOff ?? pendingHandOff();
 
-      if (status === 'unverified' && externalVerificationRedirectURL) {
+      if (externalVerificationRedirectURL) {
         if (popup) {
           await _futureAuthenticateWithPopup(SignIn.clerk, { popup, externalVerificationRedirectURL });
           // Pick up the modified SignIn resource
           await this.#resource.reload();
+          await resolveChallenge();
         } else {
           SignIn.clerk.__internal_windowNavigate(externalVerificationRedirectURL);
         }

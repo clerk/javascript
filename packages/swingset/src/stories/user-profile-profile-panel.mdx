@@ -1,0 +1,55 @@
+import * as UserProfileProfilePanelStories from './user-profile-profile-panel.stories';
+
+# UserProfileProfilePanel
+
+## Example
+
+<Story
+  name='Default'
+  storyModule={UserProfileProfilePanelStories}
+  composition={[
+    { name: 'Section', href: '/components/section', layer: 'Components' },
+    { name: 'Avatar', href: '/components/avatar', layer: 'Components' },
+  ]}
+/>
+
+## Usage
+
+```tsx
+import { useRef } from 'react';
+import { UserProfileProfilePanelView } from '@clerk/mosaic/features/user-profile/user-profile-profile-panel.view';
+import { UserProfileConnectedAccountsSection } from '@clerk/mosaic/features/user-profile/user-profile-connected-accounts-section/user-profile-connected-accounts-section';
+import { UserProfileWeb3WalletsSectionView } from '@clerk/mosaic/features/user-profile/user-profile-web3-wallets-section.view';
+
+const titleRef = useRef<HTMLDivElement>(null);
+
+<UserProfileProfilePanelView
+  allowMultipleAccounts={allowMultipleAccounts}
+  imageUrl={user.imageUrl}
+  name={user.fullName ?? ''}
+  username={user.username ?? ''}
+  emails={user.emailAddresses.map(email => ({
+    id: email.id,
+    value: email.emailAddress,
+    isDefault: email.id === user.primaryEmailAddressId,
+    isVerified: email.verification.status === 'verified',
+  }))}
+  phones={user.phoneNumbers.map(phone => ({
+    id: phone.id,
+    value: phone.phoneNumber,
+    isDefault: phone.id === user.primaryPhoneNumberId,
+    isVerified: phone.verification.status === 'verified',
+  }))}
+  titleRef={titleRef}
+  connectedAccountsSlot={<UserProfileConnectedAccountsSection fallbackFocus={() => titleRef.current} />}
+  web3WalletsSlot={<UserProfileWeb3WalletsSectionView wallets={wallets} onRemove={removeWeb3Wallet} fallbackFocus={() => titleRef.current} />}
+  onVerifyEmail={verifyEmail}
+  onSendEmailCode={sendEmailCode}
+  onVerifyEmailCode={verifyEmailCode}
+  onSetPrimaryEmail={setPrimaryEmail}
+  onRemoveEmail={removeEmail}
+  onVerifyPhone={verifyPhone}
+  onSetPrimaryPhone={setPrimaryPhone}
+  onRemovePhone={removePhone}
+/>
+```

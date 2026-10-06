@@ -76,6 +76,10 @@ types:
   - changed-files:
       - any-glob-to-any-file: packages/types/**
 
+mosaic:
+  - changed-files:
+      - any-glob-to-any-file: packages/mosaic/**
+
 ui:
   - changed-files:
       - any-glob-to-any-file: packages/ui/**

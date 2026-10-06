@@ -446,7 +446,51 @@ function hasDefaultValuesForParameters(parameters) {
 }
 
 /**
- * Object shape for a parameter: inline `{ … }`, optional-wrapped, or reference to a type alias / interface.
+ * Collects string literal members from a type used as `Pick`'s key argument.
+ *
+ * @param {import('typedoc').Type | undefined} t
+ * @returns {string[] | undefined}
+ */
+function getPickPropertyNames(t) {
+  const unwrapped = unwrapOptional(t);
+  if (!unwrapped || typeof unwrapped !== 'object') {
+    return undefined;
+  }
+  if (unwrapped.type === 'literal') {
+    const literal = /** @type {import('typedoc').LiteralType} */ (unwrapped);
+    if (typeof literal.value === 'string') {
+      return [literal.value];
+    }
+    return undefined;
+  }
+  if (!isUnionTypeDoc(unwrapped)) {
+    return undefined;
+  }
+  const names = [];
+  const union = /** @type {import('typedoc').UnionType} */ (unwrapped);
+  for (const type of union.types) {
+    const nestedNames = getPickPropertyNames(type);
+    if (!nestedNames) {
+      return undefined;
+    }
+    names.push(...nestedNames);
+  }
+  return names;
+}
+
+/**
+ * @param {import('typedoc').Type | undefined} t
+ * @returns {boolean}
+ */
+function isPickReferenceType(t) {
+  if (!isReferenceTypeDoc(t)) {
+    return false;
+  }
+  return t.name === 'Pick' && t.package === 'typescript' && t.typeArguments?.length === 2;
+}
+
+/**
+ * Object shape for a parameter: inline `{ … }`, optional-wrapped, reference to a type alias / interface, or `Pick<T, K>` with literal keys.
  *
  * @param {import('typedoc').Type | undefined} t
  * @returns {import('typedoc').DeclarationReflection | undefined}
@@ -470,6 +514,40 @@ function getParameterObjectShapeDeclaration(t) {
   }
   if (o.type === 'reference') {
     const ref = /** @type {import('typedoc').ReferenceType} */ (t);
+    if (isPickReferenceType(ref)) {
+      const [sourceType, keysType] = /** @type {[import('typedoc').Type, import('typedoc').Type]} */ (
+        ref.typeArguments
+      );
+      if (sourceType.type === 'reference' && sourceType.typeArguments?.length) {
+        return undefined;
+      }
+      const propertyNames = getPickPropertyNames(keysType);
+      if (!propertyNames?.length) {
+        return undefined;
+      }
+      const sourceDecl = getParameterObjectShapeDeclaration(sourceType);
+      const sourceRef = sourceType.type === 'reference' ? sourceType.reflection : undefined;
+      const sourceWithChildren =
+        sourceDecl ??
+        (sourceRef &&
+        (sourceRef.kind === ReflectionKind.TypeAlias || sourceRef.kind === ReflectionKind.Interface) &&
+        'children' in sourceRef
+          ? /** @type {import('typedoc').DeclarationReflection} */ (sourceRef)
+          : undefined);
+      if (!sourceWithChildren?.children?.length) {
+        return undefined;
+      }
+      const selected = new Set(propertyNames);
+      const children = sourceWithChildren.children.filter(child => selected.has(child.name));
+      if (children.length !== selected.size) {
+        return undefined;
+      }
+      return /** @type {import('typedoc').DeclarationReflection} */ ({
+        ...sourceWithChildren,
+        kind: ReflectionKind.TypeLiteral,
+        children,
+      });
+    }
     const sym = ref.reflection;
     if (!sym) {
       return undefined;
@@ -502,6 +580,27 @@ function shouldFlattenInlineObjectParameter(decl) {
   }
   const only = decl.children[0];
   return Boolean(only?.comment?.hasVisibleComponent());
+}
+
+/**
+ * Whether a parameter is a built-in `Pick<T, K>` that will be flattened into nested rows. Its source type should not
+ * link to the full unpicked declaration, which documents properties the parameter does not accept.
+ *
+ * @param {import('typedoc').Type | undefined} t
+ */
+function isFlattenedPickParameter(t) {
+  const unwrapped = unwrapOptional(t);
+  if (!isPickReferenceType(unwrapped)) {
+    return false;
+  }
+  return shouldFlattenInlineObjectParameter(getParameterObjectShapeDeclaration(t));
+}
+
+/**
+ * @param {string} value
+ */
+function stripMarkdownLinks(value) {
+  return value.replace(/\[([^\[\]]*)\]\((.*?)\)/gm, '$1');
 }
 
 /**
@@ -581,12 +680,13 @@ function clerkParametersTable(model) {
     const optional = isOptional ? '?' : '';
     row.push(`${rest}${backTicks(`${parameter.name}${optional}`)}`);
     if (parameter.type) {
-      const displayType =
+      const renderedType =
         parameter.type instanceof ReflectionType
           ? this.partials.reflectionType(parameter.type, {
               forceCollapse: true,
             })
           : this.partials.someType(parameter.type);
+      const displayType = isFlattenedPickParameter(parameter.type) ? stripMarkdownLinks(renderedType) : renderedType;
       row.push(removeLineBreaks(displayType));
     }
     if (showDefaults) {
@@ -1954,4 +2054,4 @@ function isCallablePropertyValueType(t, helpers, seenReflectionIds) {
   return false;
 }
 
-export { isCallableInterfaceProperty };
+export { getParameterObjectShapeDeclaration, getPickPropertyNames, isCallableInterfaceProperty };

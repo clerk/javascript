@@ -1,5 +1,5 @@
 // @ts-ignore ignore types
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 // @ts-ignore ignore types
 import * as uuid from 'uuid';
 

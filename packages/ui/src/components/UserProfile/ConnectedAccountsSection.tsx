@@ -109,7 +109,10 @@ const ConnectedAccount = ({ account }: { account: ExternalAccountResource }) => 
   const reauthorizationRequired = additionalScopes.length > 0 && account.approvedScopes != '';
   const shouldDisplayReconnect =
     errorCodesForReconnect.includes(account.verification?.error?.code || '') || reauthorizationRequired;
-  const strategy = (account.verification?.strategy || `oauth_${account.provider}`) as OAuthStrategy;
+  const verificationStrategy = account.verification?.strategy;
+  const strategy = (
+    verificationStrategy === 'google_one_tap' ? 'oauth_google' : verificationStrategy || `oauth_${account.provider}`
+  ) as OAuthStrategy;
 
   const createExternalAccount = useReverification((redirectUrl: string) =>
     user?.createExternalAccount({

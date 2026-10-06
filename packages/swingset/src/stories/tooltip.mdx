@@ -2,7 +2,7 @@ import * as TooltipStories from './tooltip.stories';
 
 # Tooltip
 
-A small floating label shown on hover or focus, from `@clerk/headless`. It is a **headless**
+A small floating label shown on hover or focus. It is a **headless**
 primitive: it supplies open state, hover/focus delays, portalling, floating-ui positioning,
 optional shared delay groups, and ARIA wiring, but ships **no styles** — you bring your own
 CSS by targeting the `data-*` attributes each part emits. A tooltip never receives or
@@ -22,7 +22,7 @@ delay and dismisses on blur or Escape.
 ## Usage
 
 ```tsx
-import { Tooltip } from '@clerk/headless/tooltip';
+import { Tooltip } from '@clerk/mosaic/primitives/tooltip';
 
 <Tooltip.Root>
   <Tooltip.Trigger>Hover me</Tooltip.Trigger>

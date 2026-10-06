@@ -1,0 +1,142 @@
+import type { IconFrameProps } from '@clerk/mosaic/components/icon';
+import { Icon, IconFrame } from '@clerk/mosaic/components/icon';
+import { colorVars, space } from '@clerk/mosaic/tokens.stylex';
+import * as stylex from '@stylexjs/stylex';
+
+import type { StoryMeta } from '@/lib/types';
+
+export { default as __source } from './icon-frame.stories?raw';
+
+const styles = stylex.create({
+  customSurface: {
+    backgroundColor: colorVars['--cl-color-brand'],
+    color: colorVars['--cl-color-brand-foreground'],
+  },
+});
+
+const providerIconUrl = (provider: string) => `https://img.clerk.com/static/${provider}.svg`;
+
+function ProviderLogo({ provider }: { provider: string }) {
+  return (
+    <img
+      alt=''
+      src={providerIconUrl(provider)}
+      style={{ display: 'block', height: space['5'], objectFit: 'contain', width: space['5'] }}
+    />
+  );
+}
+
+export const meta: StoryMeta = {
+  group: 'Components',
+  status: 'stable',
+  title: 'IconFrame',
+  source: 'packages/mosaic/src/components/icon/icon-frame.tsx',
+  styles: {
+    _variants: {
+      bordered: { true: {}, false: {} },
+      filled: { true: {}, false: {} },
+      size: { sm: {}, md: {}, lg: {}, xl: {} },
+    },
+    _defaultVariants: {
+      bordered: true,
+      filled: false,
+      size: 'xl',
+    },
+  },
+};
+
+function knobsAsProps(props: Record<string, unknown>) {
+  return props as unknown as IconFrameProps;
+}
+
+export function Default(props: Record<string, unknown>) {
+  return (
+    <IconFrame {...knobsAsProps(props)}>
+      <Icon name='checkmark' />
+    </IconFrame>
+  );
+}
+
+export function Sizes() {
+  return (
+    <div style={{ alignItems: 'center', display: 'flex', gap: 12 }}>
+      <IconFrame size='sm'>
+        <Icon
+          name='checkmark'
+          size='sm'
+        />
+      </IconFrame>
+      <IconFrame size='md'>
+        <Icon
+          name='checkmark'
+          size='md'
+        />
+      </IconFrame>
+      <IconFrame size='lg'>
+        <Icon
+          name='checkmark'
+          size='md'
+        />
+      </IconFrame>
+      <IconFrame size='xl'>
+        <Icon
+          name='checkmark'
+          size='lg'
+        />
+      </IconFrame>
+    </div>
+  );
+}
+
+export function Treatments() {
+  return (
+    <div style={{ alignItems: 'center', display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+      <IconFrame
+        aria-label='Unframed'
+        bordered={false}
+      >
+        <Icon name='checkmark' />
+      </IconFrame>
+      <IconFrame aria-label='Bordered'>
+        <Icon name='checkmark' />
+      </IconFrame>
+      <IconFrame
+        aria-label='Filled'
+        bordered={false}
+        filled
+      >
+        <Icon name='checkmark' />
+      </IconFrame>
+      <IconFrame
+        aria-label='Bordered and filled'
+        filled
+      >
+        <Icon name='checkmark' />
+      </IconFrame>
+    </div>
+  );
+}
+
+export function CustomSurface() {
+  return (
+    <IconFrame xstyle={styles.customSurface}>
+      <Icon
+        name='checkmark'
+        size='lg'
+      />
+    </IconFrame>
+  );
+}
+
+export function BrandIcons() {
+  return (
+    <div style={{ alignItems: 'center', display: 'flex', gap: 12 }}>
+      <IconFrame aria-label='Google'>
+        <ProviderLogo provider='google' />
+      </IconFrame>
+      <IconFrame aria-label='MetaMask'>
+        <ProviderLogo provider='metamask' />
+      </IconFrame>
+    </div>
+  );
+}

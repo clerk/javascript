@@ -58,6 +58,12 @@ const windowSender = { mainFrame, getType: () => 'window' };
 const mainFrameEvent = { sender: windowSender, senderFrame: mainFrame } as unknown as Electron.IpcMainInvokeEvent;
 const subframeEvent = { sender: windowSender, senderFrame: {} } as unknown as Electron.IpcMainInvokeEvent;
 
+function getAppListener<T extends (...args: never[]) => void>(event: string): T | undefined {
+  return (vi.mocked(app.on).mock.calls as unknown as Array<[string, T]>).find(
+    ([registered]) => registered === event,
+  )?.[1];
+}
+
 describe('createClerkBridge', () => {
   const missingStorage = {} as Parameters<typeof createClerkBridge>[0];
   const storage: TokenStorage = {
@@ -145,7 +151,6 @@ describe('createClerkBridge', () => {
         host: 'renderer',
         scheme: 'my-app',
         privileges: {
-          allowExtensions: true,
           allowServiceWorkers: true,
           bypassCSP: true,
           codeCache: true,
@@ -157,7 +162,6 @@ describe('createClerkBridge', () => {
       {
         scheme: 'my-app',
         privileges: {
-          allowExtensions: true,
           allowServiceWorkers: true,
           bypassCSP: true,
           codeCache: true,
@@ -590,12 +594,9 @@ describe('createClerkBridge', () => {
       return channel === OAUTH_TRANSPORT_CHANNELS.open;
     })?.[1];
     const openPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth');
-    const openUrlListener = vi.mocked(app.on).mock.calls.find(([event]) => event === 'open-url')?.[1] as (
-      event: Electron.Event,
-      url: string,
-    ) => void;
+    const openUrlListener = getAppListener<(event: Electron.Event, url: string) => void>('open-url');
 
-    openUrlListener({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
+    openUrlListener?.({ preventDefault: vi.fn() } as unknown as Electron.Event, 'my-app://renderer/?code=123');
 
     await expect(openPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
     expect(shell.openExternal).toHaveBeenCalledWith('https://accounts.example.com/oauth');
@@ -615,12 +616,9 @@ describe('createClerkBridge', () => {
       return channel === OAUTH_TRANSPORT_CHANNELS.open;
     })?.[1];
     const openPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth');
-    const secondInstanceListener = vi.mocked(app.on).mock.calls.find(([event]) => event === 'second-instance')?.[1] as (
-      event: Electron.Event,
-      argv: string[],
-    ) => void;
+    const secondInstanceListener = getAppListener<(event: Electron.Event, argv: string[]) => void>('second-instance');
 
-    secondInstanceListener({} as Electron.Event, [
+    secondInstanceListener?.({} as Electron.Event, [
       '/opt/MyApp/my-app',
       '--enable-features=UseOzonePlatform',
       'my-app://renderer/?code=123',
@@ -647,12 +645,9 @@ describe('createClerkBridge', () => {
       return channel === OAUTH_TRANSPORT_CHANNELS.open;
     })?.[1];
     const openPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth');
-    const secondInstanceListener = vi.mocked(app.on).mock.calls.find(([event]) => event === 'second-instance')?.[1] as (
-      event: Electron.Event,
-      argv: string[],
-    ) => void;
+    const secondInstanceListener = getAppListener<(event: Electron.Event, argv: string[]) => void>('second-instance');
 
-    secondInstanceListener({} as Electron.Event, ['/opt/MyApp/my-app', 'my-app://renderer/?code=123']);
+    secondInstanceListener?.({} as Electron.Event, ['/opt/MyApp/my-app', 'my-app://renderer/?code=123']);
 
     await expect(openPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
     expect(rendererWindow.restore).toHaveBeenCalledOnce();
@@ -676,13 +671,10 @@ describe('createClerkBridge', () => {
       return channel === OAUTH_TRANSPORT_CHANNELS.open;
     })?.[1];
     const openPromise = openHandler?.(mainFrameEvent, 'https://accounts.example.com/oauth');
-    const secondInstanceListener = vi.mocked(app.on).mock.calls.find(([event]) => event === 'second-instance')?.[1] as (
-      event: Electron.Event,
-      argv: string[],
-    ) => void;
+    const secondInstanceListener = getAppListener<(event: Electron.Event, argv: string[]) => void>('second-instance');
 
     rendererWindow.isDestroyed.mockReturnValue(true);
-    secondInstanceListener({} as Electron.Event, ['/opt/MyApp/my-app', 'my-app://renderer/?code=123']);
+    secondInstanceListener?.({} as Electron.Event, ['/opt/MyApp/my-app', 'my-app://renderer/?code=123']);
 
     await expect(openPromise).resolves.toEqual({ callbackUrl: 'my-app://renderer/?code=123' });
     expect(rendererWindow.focus).not.toHaveBeenCalled();

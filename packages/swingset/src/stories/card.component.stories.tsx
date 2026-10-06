@@ -1,8 +1,9 @@
-import { Button } from '@clerk/ui/mosaic/components/button';
-import type { CardProps } from '@clerk/ui/mosaic/components/card';
-import { Card } from '@clerk/ui/mosaic/components/card';
-import { Heading } from '@clerk/ui/mosaic/components/heading';
-import { Text } from '@clerk/ui/mosaic/components/text';
+import { Button } from '@clerk/mosaic/components/button';
+import type { CardProps } from '@clerk/mosaic/components/card';
+import { Card } from '@clerk/mosaic/components/card';
+import { Field } from '@clerk/mosaic/components/field';
+import { Input } from '@clerk/mosaic/components/input';
+import { useState } from 'react';
 
 import type { StoryMeta } from '@/lib/types';
 
@@ -12,18 +13,19 @@ export { default as __source } from './card.component.stories?raw';
 
 export const meta: StoryMeta = {
   group: 'Components',
+  status: 'stable',
   title: 'Card',
-  source: 'packages/ui/src/mosaic/components/card/card.tsx',
+  source: 'packages/mosaic/src/components/card/card.tsx',
   styles: {
     _variants: {
-      alignment: { start: {}, center: {} },
       elevation: { card: {}, flush: {}, overlay: {} },
       renderBranding: { true: {}, false: {} },
+      size: { md: {}, lg: {} },
     },
     _defaultVariants: {
-      alignment: 'start',
       elevation: 'card',
       renderBranding: true,
+      size: 'md',
     },
   },
 };
@@ -34,15 +36,17 @@ function knobsAsProps(props: Record<string, unknown>) {
 
 export function Default(props: Record<string, unknown>) {
   return (
-    <Card.Root
-      {...knobsAsProps(props)}
-      style={{ maxWidth: 400 }}
-    >
+    <Card.Root {...knobsAsProps(props)}>
       <Card.Header>
-        <Heading>Login to your account</Heading>
-        <Text>Enter your email below to login to your account</Text>
+        <Card.Title>Login to your account</Card.Title>
+        <Card.Description>Enter your email below to login to your account</Card.Description>
       </Card.Header>
-      <Card.Content>Card body content goes here.</Card.Content>
+      <Card.Content>
+        <Field.Root>
+          <Field.Label>Email address</Field.Label>
+          <Input />
+        </Field.Root>
+      </Card.Content>
       <Card.Footer>
         <Button fullWidth>Continue</Button>
       </Card.Footer>
@@ -50,19 +54,34 @@ export function Default(props: Record<string, unknown>) {
   );
 }
 
-export function Centered() {
+export function WithBanner() {
+  const [error, setError] = useState<string | undefined>();
   return (
-    <Card.Root
-      alignment='center'
-      style={{ maxWidth: 400 }}
-    >
+    <Card.Root>
       <Card.Header>
-        <Heading>Verify your email</Heading>
-        <Text>We sent a verification code to your email address</Text>
+        <Card.Title>Change password</Card.Title>
+        <Card.Description>Enter your current password and a new one.</Card.Description>
       </Card.Header>
-      <Card.Content>Enter the code below to continue.</Card.Content>
+      <Card.Banner
+        role='alert'
+        color='negative'
+      >
+        {error}
+      </Card.Banner>
+      <Card.Content>
+        <Field.Root>
+          <Field.Label>Current password</Field.Label>
+          <Input type='password' />
+        </Field.Root>
+      </Card.Content>
       <Card.Footer>
-        <Button fullWidth>Verify</Button>
+        <Button
+          variant='outline'
+          onClick={() => setError(undefined)}
+        >
+          Clear
+        </Button>
+        <Button onClick={() => setError('Incorrect password. Try again.')}>Fail</Button>
       </Card.Footer>
     </Card.Root>
   );

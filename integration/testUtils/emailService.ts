@@ -1,4 +1,4 @@
-import { runWithExponentialBackOff } from '@clerk/shared/utils';
+import { retry } from '@clerk/shared/retry';
 
 type Message = {
   _id: string;
@@ -23,7 +23,7 @@ export const createEmailService = () => {
     }
     // Retry in case the email delivery is delayed
     await new Promise(res => setTimeout(res, 1500));
-    return runWithExponentialBackOff(
+    return retry(
       async () => {
         const res = await fetcher(url);
         const json = (await res.json()) as unknown as { messages: Message[] };
@@ -34,8 +34,8 @@ export const createEmailService = () => {
         return message;
       },
       {
-        firstDelay: 750,
-        timeMultiple: 2,
+        initialDelay: 750,
+        factor: 2,
         shouldRetry: (_, iterationsCount) => iterationsCount < 5,
       },
     );

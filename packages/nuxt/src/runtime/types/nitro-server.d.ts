@@ -1,12 +1,12 @@
 import type { H3Event } from 'h3';
 
 export {
+  appendResponseHeader,
   createError,
   eventHandler,
   getRequestHeaders,
   getRequestProtocol,
   getRequestURL,
-  setResponseHeader,
   toWebRequest,
 } from 'h3';
 export type { EventHandler, H3Event } from 'h3';

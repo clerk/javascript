@@ -1,0 +1,390 @@
+import { ClerkAPIResponseError } from '@clerk/shared/error';
+import { describe, expect, it, vi } from 'vitest';
+
+import { bindCreateFixtures } from '@/test/create-fixtures';
+import { fireEvent, render, screen, waitFor } from '@/test/utils';
+
+import { ConfigureDirectorySyncWizard } from '../ConfigureDirectorySyncWizard';
+
+const { createFixtures } = bindCreateFixtures('OrganizationProfile');
+
+const withDirectorySyncFixtures = (f: Parameters<Parameters<typeof createFixtures>[0]>[0]) => {
+  f.withEnterpriseSso({ selfServeSSO: true, selfServeDirectorySync: true });
+  f.withEmailAddress();
+  f.withOrganizations();
+  f.withUser({
+    email_addresses: ['test@clerk.com'],
+    organization_memberships: [{ name: 'Org1', permissions: ['org:sys_entconns:manage'] }],
+  });
+};
+
+const oktaConnection = {
+  id: 'ent_1',
+  name: 'clerk.com',
+  provider: 'saml_okta',
+  active: true,
+  organizationId: 'Org1',
+  domains: ['clerk.com'],
+  samlConnection: {
+    idpSsoUrl: 'https://idp.example.com/sso',
+    idpEntityId: 'https://idp.example.com/entity',
+    idpCertificate: 'CERT',
+  },
+} as any;
+
+const directory = (overrides: Record<string, unknown> = {}) =>
+  ({
+    id: 'scimdir_1',
+    // The sync status hook refuses a directory from another organization, and
+    // the fixture organization's id comes from the membership name.
+    organizationId: 'Org1',
+    enterpriseConnectionId: 'ent_1',
+    endpointUrl: 'https://api.example.com/scim/v2',
+    provider: 'okta',
+    enabled: false,
+    attributeMapping: {},
+    apiKey: null,
+    update: vi.fn(),
+    delete: vi.fn(),
+    rotateToken: vi.fn(),
+    getUsers: vi.fn().mockResolvedValue({ data: [], total_count: 0 }),
+    ...overrides,
+  }) as any;
+
+const googleConnection = { ...oktaConnection, provider: 'saml_google' };
+
+const googleDirectory = (overrides: Record<string, unknown> = {}) =>
+  directory({
+    provider: 'google',
+    credentialsConfigured: false,
+    setCredentials: vi.fn(),
+    sync: vi.fn(),
+    getSyncStatus: vi.fn().mockResolvedValue({
+      lastSyncedAt: null,
+      lastSyncStatus: null,
+      lastSyncError: null,
+      lastSyncChangedUserCount: null,
+    }),
+    ...overrides,
+  });
+
+const notFound = () =>
+  new ClerkAPIResponseError('Not found', { status: 404, data: [{ code: 'resource_not_found', message: '' }] });
+
+describe('ConfigureDirectorySyncWizard configure step', () => {
+  it('creates the directory on entry and reveals the credentials', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([oktaConnection]);
+    const created = directory({ apiKey: 'tok_secret' });
+    fixtures.clerk.organization?.getDirectorySync.mockRejectedValueOnce(notFound()).mockResolvedValue(created);
+    fixtures.clerk.organization?.createDirectorySync.mockResolvedValue(created);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    expect(await screen.findByDisplayValue('https://api.example.com/scim/v2')).toBeInTheDocument();
+    expect(fixtures.clerk.organization?.createDirectorySync).toHaveBeenCalledTimes(1);
+    expect(fixtures.clerk.organization?.createDirectorySync).toHaveBeenCalledWith('ent_1', undefined);
+    expect(screen.getByDisplayValue('tok_secret')).toBeInTheDocument();
+    expect(screen.getByText('Okta Workforce')).toBeInTheDocument();
+    expect(screen.getByText('clerk.com')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled();
+
+    const toggle = screen.getByRole('button', { name: 'View instructions' });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByText(/Open the Provisioning tab/)).not.toBeInTheDocument();
+
+    await userEvent.click(toggle);
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(await screen.findByText(/Open the Provisioning tab/)).toBeInTheDocument();
+  });
+
+  it('hides the token for an existing directory until a new one is generated', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([oktaConnection]);
+    const existing = directory();
+    existing.rotateToken.mockResolvedValue(directory({ apiKey: 'tok_rotated' }));
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    expect(await screen.findByDisplayValue('https://api.example.com/scim/v2')).toBeInTheDocument();
+    expect(fixtures.clerk.organization?.createDirectorySync).not.toHaveBeenCalled();
+    expect(screen.getByPlaceholderText('Generate a new token to reveal it')).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'Generate new token' }));
+
+    expect(existing.rotateToken).toHaveBeenCalledTimes(1);
+    expect(await screen.findByDisplayValue('tok_rotated')).toBeInTheDocument();
+  });
+
+  it('collects a credential for a Google Workspace connection instead of dead-ending', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    const created = googleDirectory();
+    fixtures.clerk.organization?.getDirectorySync.mockRejectedValueOnce(notFound()).mockResolvedValue(created);
+    fixtures.clerk.organization?.createDirectorySync.mockResolvedValue(created);
+
+    render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    // Google used to render a "configure it in the Clerk Dashboard" notice here,
+    // which the organization admin has no account for.
+    expect(await screen.findByRole('button', { name: 'Upload JSON key' })).toBeInTheDocument();
+    expect(
+      screen.queryByText('Google Workspace connections are not configurable via self-serve'),
+    ).not.toBeInTheDocument();
+    // A pull directory has no endpoint or bearer token to hand out.
+    expect(screen.queryByDisplayValue('https://api.example.com/scim/v2')).not.toBeInTheDocument();
+    expect(screen.getByText('Not configured')).toBeInTheDocument();
+  });
+
+  it('sends the uploaded key and admin email, and does not keep the key afterwards', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    const existing = googleDirectory();
+    existing.setCredentials.mockResolvedValue(googleDirectory({ credentialsConfigured: true, enabled: true }));
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    // The input is hidden behind a styled button, which userEvent.upload will
+    // not interact with, so the change is dispatched directly.
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const keyFile = new File(['{"type":"service_account"}'], 'key.json', { type: 'application/json' });
+    fireEvent.change(fileInput, { target: { files: [keyFile] } });
+
+    // Reading the file is async, so the submit stays disabled until it lands.
+    expect(await screen.findByText('key.json')).toBeInTheDocument();
+
+    await userEvent.type(screen.getByPlaceholderText('admin@yourcompany.com'), 'admin@clerk.com');
+    // Continue is the submit; the form has no button of its own.
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await waitFor(() =>
+      expect(existing.setCredentials).toHaveBeenCalledWith({
+        serviceAccountJson: '{"type":"service_account"}',
+        subjectEmail: 'admin@clerk.com',
+      }),
+    );
+
+    // The key is dropped once accepted; the form must not still be holding it.
+    await waitFor(() => expect(screen.queryByText('key.json')).not.toBeInTheDocument());
+  });
+
+  it('holds Continue until both the key and the admin email are given', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(googleDirectory());
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+
+    // An email on its own is not enough to send.
+    await userEvent.type(screen.getByPlaceholderText('admin@yourcompany.com'), 'admin@clerk.com');
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(fileInput, {
+      target: { files: [new File(['{"type":"service_account"}'], 'key.json', { type: 'application/json' })] },
+    });
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled());
+  });
+
+  it('drops the staged key when a file that is not JSON replaces it', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(googleDirectory());
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    await userEvent.type(screen.getByPlaceholderText('admin@yourcompany.com'), 'admin@clerk.com');
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(fileInput, {
+      target: { files: [new File(['{"type":"service_account"}'], 'key.json', { type: 'application/json' })] },
+    });
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled());
+
+    fireEvent.change(fileInput, {
+      target: { files: [new File(['not json'], 'notes.json', { type: 'application/json' })] },
+    });
+
+    // The earlier key must not stay submittable behind the error.
+    expect(
+      await screen.findByText('That file is not valid JSON. Upload the key file downloaded from Google.'),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+  });
+
+  it('does not accept whitespace or a malformed address as the admin email', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(googleDirectory());
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(fileInput, {
+      target: { files: [new File(['{"type":"service_account"}'], 'key.json', { type: 'application/json' })] },
+    });
+    await screen.findByText('key.json');
+
+    // Continue sits outside the form, so the input's type='email' never runs
+    // native validation. These would otherwise reach the provider as-is.
+    const emailInput = screen.getByPlaceholderText('admin@yourcompany.com');
+    await userEvent.type(emailInput, '   ');
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+
+    await userEvent.clear(emailInput);
+    await userEvent.type(emailInput, 'not-an-email');
+    expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled();
+
+    await userEvent.clear(emailInput);
+    await userEvent.type(emailInput, '  admin@clerk.com  ');
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeEnabled());
+  });
+
+  it('blocks the step without an SSO connection', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([]);
+
+    render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    expect(await screen.findByText('Single Sign-On is not configured yet')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled());
+    expect(fixtures.clerk.organization?.createDirectorySync).not.toHaveBeenCalled();
+    expect(fixtures.clerk.organization?.getDirectorySync).not.toHaveBeenCalled();
+  });
+});
+
+describe('ConfigureDirectorySyncWizard test step', () => {
+  it('shows the load error instead of waiting for users when the request fails', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([oktaConnection]);
+    const existing = directory();
+    existing.getUsers.mockRejectedValue(new Error('users unavailable'));
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    expect(await screen.findByDisplayValue('https://api.example.com/scim/v2')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Attribute review')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByText('Could not load provisioned users')).toBeInTheDocument();
+    expect(screen.getByText('users unavailable')).toBeInTheDocument();
+    expect(screen.queryByText('Waiting for the first provisioned user…')).not.toBeInTheDocument();
+  });
+
+  it('stops waiting once a sync has finished without provisioning anyone', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    const existing = googleDirectory({ credentialsConfigured: true, enabled: true });
+    existing.getSyncStatus.mockResolvedValue({
+      lastSyncedAt: new Date(),
+      lastSyncStatus: 'succeeded',
+      lastSyncError: null,
+      lastSyncChangedUserCount: 0,
+    });
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Attribute review')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    // An empty directory is the sync's result, not a stage on the way to one,
+    // so the step must not keep implying users are still on their way.
+    expect(await screen.findByText('No users have been provisioned yet.')).toBeInTheDocument();
+    expect(screen.queryByText('Waiting for the first sync to finish…')).not.toBeInTheDocument();
+  });
+
+  it('keeps waiting while the list refreshed by a sync is still loading', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    const existing = googleDirectory({ credentialsConfigured: true, enabled: true });
+    let releaseUsers: ((value: unknown) => void) | null = null;
+    existing.sync.mockImplementation(async () => {
+      existing.getSyncStatus.mockResolvedValue({
+        lastSyncedAt: new Date(),
+        lastSyncStatus: 'succeeded',
+        lastSyncError: null,
+        lastSyncChangedUserCount: 3,
+      });
+      // The refreshed list is slow to arrive. Until it does, the list on screen
+      // is the one from before the sync.
+      existing.getUsers.mockImplementation(() => new Promise(resolve => (releaseUsers = resolve)));
+    });
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Attribute review')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Sync now' }));
+
+    // The sync has reported success, but the users it provisioned have not been
+    // read yet, so calling the directory empty here would be wrong.
+    expect(await screen.findByText('Succeeded')).toBeInTheDocument();
+    expect(screen.queryByText('No users have been provisioned yet.')).not.toBeInTheDocument();
+
+    releaseUsers?.({
+      data: [{ id: 'dsu_1', identifier: 'someone@clerk.com', active: true, provisionedAt: new Date() }],
+      total_count: 1,
+    });
+
+    expect(await screen.findByText('someone@clerk.com')).toBeInTheDocument();
+  });
+
+  it('keeps waiting while the users a finished sync changed are still landing', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    const existing = googleDirectory({ credentialsConfigured: true, enabled: true });
+    // The sync changed users, but they are provisioned after it finishes, so
+    // the list is legitimately empty for a moment.
+    existing.getSyncStatus.mockResolvedValue({
+      lastSyncedAt: new Date(),
+      lastSyncStatus: 'succeeded',
+      lastSyncError: null,
+      lastSyncChangedUserCount: 4,
+    });
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Attribute review')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByText('Waiting for the first sync to finish…')).toBeInTheDocument();
+    expect(screen.queryByText('No users have been provisioned yet.')).not.toBeInTheDocument();
+  });
+
+  it('keeps waiting while a pull directory has not finished a sync', async () => {
+    const { wrapper, fixtures } = await createFixtures(withDirectorySyncFixtures);
+    fixtures.clerk.organization?.getEnterpriseConnections.mockResolvedValue([googleConnection]);
+    const existing = googleDirectory({ credentialsConfigured: true, enabled: true });
+    fixtures.clerk.organization?.getDirectorySync.mockResolvedValue(existing);
+
+    const { userEvent } = render(<ConfigureDirectorySyncWizard />, { wrapper });
+
+    await screen.findByRole('button', { name: 'Upload JSON key' });
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(await screen.findByText('Attribute review')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+
+    expect(await screen.findByText('Waiting for the first sync to finish…')).toBeInTheDocument();
+  });
+});

@@ -27,4 +27,19 @@ export interface FrontendApiProxyOptions {
 export type ClerkFastifyOptions = ClerkOptions & {
   hookName?: (typeof ALLOWED_HOOKS)[number];
   frontendApiProxy?: FrontendApiProxyOptions;
+  /**
+   * Whether to enable the handshake flow for session verification.
+   *
+   * When set to `false`, the plugin strips handshake cookies (`__clerk_handshake`,
+   * `__clerk_handshake_nonce`) and query params before authenticating the request, and
+   * skips handshake redirects (except dev-browser handshakes, which development
+   * instances require). Intended for pure API backends (e.g. a SPA calling a Fastify
+   * server) where the server cannot deliver `Set-Cookie` headers back to the browser,
+   * so stale handshake nonces would otherwise be replayed and trigger repeated `404`
+   * errors from the Frontend API.
+   *
+   * @internal
+   * @default true
+   */
+  __internal_enableHandshake?: boolean;
 };
