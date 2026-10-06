@@ -42,7 +42,7 @@ export function useAccessibleDescriptionWarning(
         return;
       }
       console.warn(
-        `[clerk] <${component}.Popup> renders an alert dialog with no description. Render a \`<${descriptionPart ?? `${component}.Description`}>\` inside it — it is announced with the title, and is what says which decision is being asked for.`,
+        `[Clerk] <${component}.Popup> renders an alert dialog with no description. Render a \`<${descriptionPart ?? `${component}.Description`}>\` inside it — it is announced with the title, and is what says which decision is being asked for.`,
       );
     }, 0);
 

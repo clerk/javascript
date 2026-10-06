@@ -244,13 +244,8 @@ export function InvitationsTableTabView({
           description={m.revokeDescription}
           actionLabel={m.revoke}
           cancelLabel={m.cancel}
-          onConfirm={async invitation => {
-            try {
-              await removalFocus.remove(invitation.id);
-            } catch (error) {
-              throw error instanceof Error && error.message.trim() ? error : new Error(m.revokeError);
-            }
-          }}
+          onConfirm={invitation => removalFocus.remove(invitation.id)}
+          errorFallback={m.revokeError}
           finalFocus={removalFocus.finalFocus}
         />
       ) : null}
