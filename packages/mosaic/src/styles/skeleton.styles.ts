@@ -40,11 +40,10 @@ export const skeletonStyles = stylex.create({
     },
   },
   text: {
-    WebkitTextFillColor: 'transparent',
     overflow: 'hidden',
-    color: 'transparent',
     display: 'block',
     userSelect: 'none',
+    visibility: 'hidden',
     whiteSpace: 'nowrap',
     maxWidth: '100%',
     width: {
@@ -68,6 +67,7 @@ export const skeletonStyles = stylex.create({
       display: 'inline-block',
       marginInlineEnd: '-100%',
       verticalAlign: 'baseline',
+      visibility: 'visible',
       height: stylex.firstThatWorks('1cap', '0.7em'),
       width: '100%',
     },

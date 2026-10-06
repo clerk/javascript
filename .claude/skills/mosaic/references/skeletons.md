@@ -55,7 +55,10 @@ same fill, `--cl-color-neutral-alpha-200`.
 - **A component with its own shape** composes the pieces in
   `styles/skeleton.styles.ts` itself:
   - `SkeletonText` (`utils/skeleton-text.tsx`) around mock text: one span, one
-    line, as wide as its transparent text, drawing a bar with its `::before`.
+    line, as wide as its text, drawing a bar with its `::before`. The span is
+    `visibility: hidden` and only the bar is visible, so anything nested in the
+    mock text (a badge, a link, an icon) keeps its width but never draws. Leave
+    badges out of mock rows entirely; a skeleton doesn't draw them.
   - `skeletonStyles.bone`: fill and radius, for media and blocks.
   - `skeletonStyles.shimmer`: the moving highlight for a block, as an `::after`
     overlay. `Avatar.Fallback`, which has its own fill and circle, takes `shimmer`

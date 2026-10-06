@@ -92,6 +92,7 @@ export function UserProfileActiveDevicesSectionView({
                   <DeviceItem
                     key={device.id}
                     device={device}
+                    skeleton={skeleton}
                     triggerRef={device.id === currentDevices[0]?.id ? currentDeviceTrigger : undefined}
                     onViewDetails={device => deviceDetails.open(device)}
                   />
@@ -107,6 +108,7 @@ export function UserProfileActiveDevicesSectionView({
                 <DeviceItem
                   key={device.id}
                   device={device}
+                  skeleton={skeleton}
                   triggerRef={removalFocus.registerTrigger(device.id)}
                   onSignOut={openSignOut}
                   onViewDetails={device => deviceDetails.open(device)}
@@ -174,11 +176,13 @@ function DeviceItem({
   triggerRef,
   onViewDetails,
   onSignOut,
+  skeleton = false,
 }: {
   device: UserProfileDevice;
   triggerRef?: Ref<HTMLButtonElement>;
   onViewDetails: (device: UserProfileDevice) => void;
   onSignOut?: (device: UserProfileDevice) => void;
+  skeleton?: boolean;
 }) {
   const m = useMessages('userProfileActiveDevices');
   const actions: ActionMenuAction[] = [{ label: m.viewDetails, onClick: () => onViewDetails(device) }];
@@ -193,7 +197,7 @@ function DeviceItem({
       <Section.Content>
         <Section.Label>
           {device.name}
-          {deviceBadges(device, m).map(label => (
+          {(skeleton ? [] : deviceBadges(device, m)).map(label => (
             <Badge
               key={label}
               color='neutral'
