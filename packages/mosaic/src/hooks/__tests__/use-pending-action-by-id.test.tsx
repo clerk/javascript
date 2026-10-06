@@ -1,3 +1,4 @@
+import { createDeferredPromise } from '@clerk/shared/utils';
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -6,7 +7,7 @@ import { usePendingActionById } from '../use-pending-action-by-id';
 
 describe('usePendingActionById', () => {
   it('refuses competing actions and clears a failed action on retry', async () => {
-    const pending = Promise.withResolvers<void>();
+    const pending = createDeferredPromise();
     const execute = vi.fn(() => pending.promise);
     const competing = vi.fn(() => Promise.resolve());
     const { result } = renderHook(() => usePendingActionById('Try again.'));
