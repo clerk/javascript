@@ -32,6 +32,7 @@
     "VITE_CLERK_*"
   ],
   "globalPassThroughEnv": [
+    "E2E_KEYCLOAK_*",
     "AWS_SECRET_KEY",
     "GITHUB_TOKEN",
     "INTEGRATION_TEST_RUN_KEY",
@@ -575,6 +576,12 @@
       ],
       "outputs": ["integration/playwright-report/**"],
       "outputLogs": "new-only"
+    },
+    "//#test:integration:sso": {
+      "cache": false,
+      "env": ["CI", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS", "NODE_EXTRA_CA_CERTS"],
+      "inputs": ["integration/**", "packages/*/src/**"],
+      "outputs": []
     },
     "//#test:integration:tanstack-react-start": {
       "env": ["CLEANUP", "DEBUG", "E2E_*", "INTEGRATION_INSTANCE_KEYS", "INTEGRATION_STAGING_INSTANCE_KEYS"],

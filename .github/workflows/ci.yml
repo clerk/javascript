@@ -422,6 +422,8 @@ jobs:
           - test-name: 'mosaic'
             test-project: 'chrome'
             next-version: '16'
+          - test-name: 'sso'
+            test-project: 'chrome'
 
     steps:
       - name: Checkout Repo
@@ -595,6 +597,15 @@ jobs:
           name: playwright-traces-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.sanitize.outputs.artifact-suffix }}${{ matrix.next-version && format('-next{0}', matrix.next-version) || '' }}
           path: integration/test-results
           retention-days: 1
+
+      - name: Delete private SSO resources
+        if: ${{ always() && matrix.test-name == 'sso' && steps.integration-tests.outcome != 'skipped' }}
+        timeout-minutes: 3
+        run: pnpm test:integration:sso:cleanup
+        env:
+          CLERK_PLATFORM_API_KEY: ${{ secrets.CLERK_PLATFORM_API_KEY }}
+          INTEGRATION_INSTANCE_KEYS: ${{ secrets.INTEGRATION_INSTANCE_KEYS }}
+          NODE_EXTRA_CA_CERTS: ${{ github.workspace }}/integration/certs/rootCA.pem
 
       - name: Delete integration-test users
         if: ${{ always() && steps.integration-tests.outcome != 'skipped' }}
