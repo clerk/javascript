@@ -38,10 +38,7 @@ export interface Setup<TContext extends object, TEvent extends EventObject, TRef
       onError?: Transition<TContext, ErrorInvokeEvent, TStates, TRefs>;
     },
   ) => InvokeConfig<TContext, TEvent, TOutput, TStates, TRefs>;
-  /**
-   * Register default implementations that the config can reference by name.
-   * Mirrors XState v5's `setup(...).extend(...)`.
-   */
+  /** Register default implementations that the config can reference by name. */
   extend: <
     TGuards extends Record<string, unknown> = Record<never, never>,
     TActions extends Record<string, unknown> = Record<never, never>,
@@ -98,8 +95,6 @@ function withImplementations<TContext extends object, TEvent extends EventObject
 
     /**
      * Wraps an async function so its resolved type flows into `onDone.actions`.
-     * Mirrors XState v5's `fromPromise<TOutput>()` — a typed wrapper that carries
-     * `TOutput` to `DoneInvokeEvent<TOutput>` without needing a full actor registry.
      *
      * ```ts
      * const { createMachine, assign, fromPromise } = setup<Ctx, Event>();
