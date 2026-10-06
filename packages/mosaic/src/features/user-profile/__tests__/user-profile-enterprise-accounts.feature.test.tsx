@@ -26,7 +26,7 @@ async function renderSection(seed: FakeFapiSeed = signedIn()) {
 }
 
 describe('enterprise accounts', () => {
-  it('preserves the original cause when localizing a linking failure', async () => {
+  it('propagates a linking failure untouched', async () => {
     const feedback = vi.fn<(error: Error) => void>();
     function Connect() {
       const model = useUserProfileEnterpriseAccountsModel();
@@ -49,7 +49,7 @@ describe('enterprise accounts', () => {
     vi.spyOn(user, 'createExternalAccount').mockRejectedValue(cause);
     await userEvent.setup().click(await screen.findByRole('button', { name: 'Connect' }));
     await waitFor(() => expect(feedback).toHaveBeenCalledOnce());
-    expect(feedback.mock.calls[0]?.[0].cause).toBe(cause);
+    expect(feedback).toHaveBeenCalledWith(cause);
   });
 
   it('shows the fallback while Clerk loads', async () => {
@@ -338,7 +338,7 @@ describe('enterprise accounts', () => {
         localization={{
           locale: 'fr-FR',
           overrides: {
-            'userProfileEnterpriseAccountsSection.errors.missingVerificationUrl': 'La connexion ne peut pas démarrer.',
+            'errors.oauth_missing_verification_url': 'La connexion ne peut pas démarrer.',
           },
         }}
       >

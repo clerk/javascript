@@ -83,6 +83,11 @@ drops the fallback instead of holding the space open. Keep the two apart.
   `organizationId`), never a resource.
 - An async callback returns its promise — the controller drives pending state off
   it. Navigation callbacks stay fire-and-forget.
+- Never format an error. Let Clerk errors propagate untouched. For a failure
+  the model detects itself, throw
+  `new ClerkRuntimeError(message, { code })` and add the copy for `code` to
+  `src/localization/errors.messages.ts`. No `try`/`catch` that turns errors into
+  strings, no feature-level `toError` helpers.
 - No local UI state. What is open and what is in flight belong to the controller.
 - No React state machinery beyond the Clerk hooks themselves; the model is a
   derivation of what Clerk currently says.

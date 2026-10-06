@@ -6,7 +6,7 @@ import type { DialogHandle } from '../../components/dialog';
 import { Dialog } from '../../components/dialog';
 import { Field } from '../../components/field';
 import { Input } from '../../components/input';
-import { userProfilePasskeysMessages as m } from './user-profile-passkeys-section.messages';
+import { useMessages } from '../../localization';
 
 export interface UserProfileRenamePasskeyDialogProps {
   handle: DialogHandle;
@@ -31,6 +31,7 @@ export function UserProfileRenamePasskeyDialog({
   error,
   onSubmit,
 }: UserProfileRenamePasskeyDialogProps) {
+  const m = useMessages('userProfilePasskeys');
   const formId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   return (
