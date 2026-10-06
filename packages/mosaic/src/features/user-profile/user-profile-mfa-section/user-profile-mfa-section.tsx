@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
-import { Reverification } from '../reverification/reverification';
-import { useReverificationController } from '../reverification/reverification.controller';
-import { useReverificationModel } from '../reverification/reverification.model';
+import { Reverification } from '../../reverification/reverification';
+import { useReverificationController } from '../../reverification/reverification.controller';
+import { useReverificationModel } from '../../reverification/reverification.model';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { useUserProfileMfaController } from './user-profile-mfa-section.controller';
 import { useUserProfileMfaModel } from './user-profile-mfa-section.model';

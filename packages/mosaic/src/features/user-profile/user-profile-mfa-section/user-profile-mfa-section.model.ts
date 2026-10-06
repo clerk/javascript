@@ -2,9 +2,9 @@ import { isClerkAPIResponseError, isReverificationCancelledError } from '@clerk/
 import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { EnvironmentResource, PhoneNumberResource, UserResource } from '@clerk/shared/types';
 
-import { useMosaicEnvironment } from '../../hooks/use-mosaic-environment';
-import { useErrorText, useMessages } from '../../localization';
-import { useReverificationWithState } from '../reverification/use-reverification-with-state';
+import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
+import { useErrorText, useMessages } from '../../../localization';
+import { useReverificationWithState } from '../../reverification/use-reverification-with-state';
 import {
   MfaCancelledError,
   type MfaEnrollmentResult,

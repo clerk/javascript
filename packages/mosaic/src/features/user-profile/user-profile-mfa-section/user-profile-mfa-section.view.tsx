@@ -1,14 +1,14 @@
 import { type ReactNode, type Ref } from 'react';
 
-import { Confirmation } from '../../blocks/confirmation';
-import { Section } from '../../components/section';
-import { fill, type MosaicMessages, useMessages } from '../../localization';
+import { Confirmation } from '../../../blocks/confirmation';
+import { Section } from '../../../components/section';
+import { fill, type MosaicMessages, useMessages } from '../../../localization';
+import { UserProfileSecurityList } from '../user-profile-security-list';
 import { UserProfileAddMfaDialog } from './user-profile-add-mfa.dialog';
 import { UserProfileAddMfaView } from './user-profile-add-mfa.view';
 import { UserProfileMfaRowView } from './user-profile-mfa-row.view';
 import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.types';
 import { useUserProfileMfaSectionLeafController } from './user-profile-mfa-section-leaf.controller';
-import { UserProfileSecurityList } from './user-profile-security-list';
 
 export type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.types';
 

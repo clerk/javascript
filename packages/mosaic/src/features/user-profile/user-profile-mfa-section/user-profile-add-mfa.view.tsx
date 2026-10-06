@@ -1,8 +1,8 @@
-import { Card } from '../../components/card';
-import { useFlowAutoFocus } from '../../components/flow';
-import { Icon, IconFrame } from '../../components/icon';
-import { Item } from '../../components/item';
-import { useMessages } from '../../localization';
+import { Card } from '../../../components/card';
+import { useFlowAutoFocus } from '../../../components/flow';
+import { Icon, IconFrame } from '../../../components/icon';
+import { Item } from '../../../components/item';
+import { useMessages } from '../../../localization';
 import type { UserProfileMfaAddableMethod } from './user-profile-mfa-section.view';
 
 export interface UserProfileAddMfaViewProps {

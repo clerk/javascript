@@ -2,12 +2,12 @@ import * as stylex from '@stylexjs/stylex';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState } from 'react';
 
-import { Button } from '../../components/button';
-import { Card } from '../../components/card';
-import { CopyButton } from '../../components/copy-button';
-import { Field } from '../../components/field';
-import { InputGroup } from '../../components/input-group';
-import { useMessages } from '../../localization';
+import { Button } from '../../../components/button';
+import { Card } from '../../../components/card';
+import { CopyButton } from '../../../components/copy-button';
+import { Field } from '../../../components/field';
+import { InputGroup } from '../../../components/input-group';
+import { useMessages } from '../../../localization';
 import { styles } from './user-profile-authenticator-setup.styles';
 
 export interface UserProfileAuthenticatorSetupViewProps {

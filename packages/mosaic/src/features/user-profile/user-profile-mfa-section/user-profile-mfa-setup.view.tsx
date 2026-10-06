@@ -1,4 +1,4 @@
-import { Flow } from '../../components/flow';
+import { Flow } from '../../../components/flow';
 import type { UserProfileAddAuthenticatorViewProps } from './user-profile-add-authenticator.view';
 import { UserProfileAddAuthenticatorView } from './user-profile-add-authenticator.view';
 import type { UserProfileAddMfaViewProps } from './user-profile-add-mfa.view';

@@ -1,4 +1,4 @@
-import type { ReverificationState } from '../reverification/reverification.types';
+import type { ReverificationState } from '../../reverification/reverification.types';
 
 export interface UserProfileMfaMethod {
   id: string;

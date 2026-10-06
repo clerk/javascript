@@ -1,7 +1,7 @@
 import { serveFapi } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiEnvironment, fapiPhoneNumber, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfileMfaSection } from '../user-profile-mfa-section';
+import { UserProfileMfaSection } from '../user-profile-mfa-section/user-profile-mfa-section';
 
 export const phone = fapiPhoneNumber({ id: 'phone_1', phone_number: '+15555550101' });
 

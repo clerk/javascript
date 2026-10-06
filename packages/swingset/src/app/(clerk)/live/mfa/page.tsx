@@ -1,6 +1,6 @@
 'use client';
 
-import { UserProfileMfaSection } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section';
+import { UserProfileMfaSection } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-section';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';

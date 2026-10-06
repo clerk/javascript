@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfileMfaSection } from '../user-profile-mfa-section';
+import { UserProfileMfaSection } from '../user-profile-mfa-section/user-profile-mfa-section';
 import { mfaEnvironment, renderMfa } from './mfa-feature-setup';
 
 describe('User profile MFA interaction boundaries', () => {

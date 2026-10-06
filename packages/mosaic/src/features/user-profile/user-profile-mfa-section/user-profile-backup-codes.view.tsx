@@ -1,13 +1,13 @@
 import * as stylex from '@stylexjs/stylex';
 
-import { Button, SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
-import { useFlowAutoFocus } from '../../components/flow';
-import { Icon } from '../../components/icon';
-import { Text } from '../../components/text';
-import { useMessages } from '../../localization';
-import { mergeStyleProps, themeProps } from '../../props';
-import { reset } from '../../styles/reset.styles';
+import { Button, SubmitButton } from '../../../components/button';
+import { Card } from '../../../components/card';
+import { useFlowAutoFocus } from '../../../components/flow';
+import { Icon } from '../../../components/icon';
+import { Text } from '../../../components/text';
+import { useMessages } from '../../../localization';
+import { mergeStyleProps, themeProps } from '../../../props';
+import { reset } from '../../../styles/reset.styles';
 import { styles } from './user-profile-backup-codes.styles';
 
 export interface UserProfileBackupCodesViewProps {

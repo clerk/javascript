@@ -1,11 +1,11 @@
 import { useMergeRefs } from '@floating-ui/react';
 import { type ReactNode, type Ref, useRef } from 'react';
 
-import { Button } from '../../components/button';
-import { Card } from '../../components/card';
-import { Dialog } from '../../components/dialog';
-import { Icon } from '../../components/icon';
-import { useMessages } from '../../localization';
+import { Button } from '../../../components/button';
+import { Card } from '../../../components/card';
+import { Dialog } from '../../../components/dialog';
+import { Icon } from '../../../components/icon';
+import { useMessages } from '../../../localization';
 
 export interface UserProfileAddMfaDialogProps {
   open: boolean;

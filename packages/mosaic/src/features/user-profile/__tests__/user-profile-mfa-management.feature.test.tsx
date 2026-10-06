@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { fapiUrl, holdRequests, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiPhoneNumber, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
-import { UserProfileMfaSection, useUserProfileMfaSlot } from '../user-profile-mfa-section';
+import { UserProfileMfaSection, useUserProfileMfaSlot } from '../user-profile-mfa-section/user-profile-mfa-section';
 import { useUserProfilePasswordSlot } from '../user-profile-password-section/user-profile-password-section';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 import { mfaEnvironment, phone, renderMfa } from './mfa-feature-setup';

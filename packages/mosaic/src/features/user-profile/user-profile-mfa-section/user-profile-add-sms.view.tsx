@@ -3,13 +3,13 @@ import { useMergeRefs } from '@floating-ui/react';
 import type { Ref } from 'react';
 import { useId } from 'react';
 
-import { Button, SubmitButton } from '../../components/button';
-import { Card } from '../../components/card';
-import { Field } from '../../components/field';
-import { Flow, type FlowDirection, useFlowAutoFocus } from '../../components/flow';
-import { Select } from '../../components/select';
-import { useMessages } from '../../localization';
-import { EnterPhoneStep, VerifyPhoneStep } from './user-profile-phone.steps';
+import { Button, SubmitButton } from '../../../components/button';
+import { Card } from '../../../components/card';
+import { Field } from '../../../components/field';
+import { Flow, type FlowDirection, useFlowAutoFocus } from '../../../components/flow';
+import { Select } from '../../../components/select';
+import { useMessages } from '../../../localization';
+import { EnterPhoneStep, VerifyPhoneStep } from '../user-profile-phone.steps';
 
 export interface UserProfileAddSmsViewProps {
   step: 'select' | 'phone' | 'verify';

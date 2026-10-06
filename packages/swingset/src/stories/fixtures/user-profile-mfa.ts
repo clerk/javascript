@@ -2,8 +2,8 @@ import type {
   UserProfileMfaAddableMethod,
   UserProfileMfaMethod,
   UserProfileMfaSectionViewProps,
-} from '@clerk/mosaic/features/user-profile/user-profile-mfa-section.view';
-import type { UserProfileMfaSetupViewProps } from '@clerk/mosaic/features/user-profile/user-profile-mfa-setup.view';
+} from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-section.view';
+import type { UserProfileMfaSetupViewProps } from '@clerk/mosaic/features/user-profile/user-profile-mfa-section/user-profile-mfa-setup.view';
 import { stringToFormattedPhoneString } from '@clerk/shared/phone';
 import { useEffect, useState } from 'react';
 

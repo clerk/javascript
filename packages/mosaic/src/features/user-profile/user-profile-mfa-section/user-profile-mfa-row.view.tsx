@@ -1,12 +1,12 @@
 import type { Ref } from 'react';
 
-import type { ActionMenuAction } from '../../components/action-menu';
-import { ActionMenu } from '../../components/action-menu';
-import { Badge } from '../../components/badge';
-import { Section } from '../../components/section';
-import { fill, useMessages } from '../../localization';
+import type { ActionMenuAction } from '../../../components/action-menu';
+import { ActionMenu } from '../../../components/action-menu';
+import { Badge } from '../../../components/badge';
+import { Section } from '../../../components/section';
+import { fill, useMessages } from '../../../localization';
+import { UserProfileSecurityIcon } from '../user-profile-security-icon';
 import type { UserProfileMfaMethod, UserProfileMfaSectionViewProps } from './user-profile-mfa-section.view';
-import { UserProfileSecurityIcon } from './user-profile-security-icon';
 
 export function UserProfileMfaRowView({
   method,

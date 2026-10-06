@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { useMessages } from '../../localization';
-import { setup } from '../../machine/setup';
-import { useMachine } from '../../machine/use-machine';
+import { useMessages } from '../../../localization';
+import { setup } from '../../../machine/setup';
+import { useMachine } from '../../../machine/use-machine';
 import {
   MfaCancelledError,
   type UserProfileMfaAddableMethod,

@@ -4,9 +4,12 @@ import { Panel } from '../../components/panel';
 import { Section } from '../../components/section';
 import { themeProps } from '../../props';
 import type { UserProfileDevice } from './user-profile-active-devices-section/user-profile-active-devices-section.view';
-import type { UserProfileMfaSlot } from './user-profile-mfa-section';
-import type { UserProfileMfaAddableMethod, UserProfileMfaMethod } from './user-profile-mfa-section.view';
-import { UserProfileMfaSectionView } from './user-profile-mfa-section.view';
+import type { UserProfileMfaSlot } from './user-profile-mfa-section/user-profile-mfa-section';
+import type {
+  UserProfileMfaAddableMethod,
+  UserProfileMfaMethod,
+} from './user-profile-mfa-section/user-profile-mfa-section.view';
+import { UserProfileMfaSectionView } from './user-profile-mfa-section/user-profile-mfa-section.view';
 import type { UserProfilePasskey } from './user-profile-passkeys-section.view';
 
 export type { UserProfileDevice, UserProfileMfaAddableMethod, UserProfileMfaMethod, UserProfilePasskey };
