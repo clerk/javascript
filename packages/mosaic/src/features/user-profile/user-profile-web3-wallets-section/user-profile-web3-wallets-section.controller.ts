@@ -10,7 +10,8 @@ export function useUserProfileWeb3WalletsController({
   availableProviders,
   connect,
   setPrimary,
-}: Pick<ReadyWeb3WalletsModel, 'wallets' | 'availableProviders' | 'connect' | 'setPrimary'>) {
+  remove,
+}: Pick<ReadyWeb3WalletsModel, 'wallets' | 'availableProviders' | 'connect' | 'setPrimary' | 'remove'>) {
   const messages = useMessages('userProfileWeb3Wallets');
   const action = usePendingActionById(messages.errors.generic);
   const [picker, setPicker] = useState<UserProfileWeb3Provider | null>(null);
@@ -61,6 +62,7 @@ export function useUserProfileWeb3WalletsController({
     pendingWalletName,
     onConnect,
     onSetPrimary: (walletId: string) => action.run(walletId, () => setPrimary(walletId)),
+    onRemove: remove,
     connectSolana,
     closeSolanaPicker: () => {
       if (!action.busy()) {
