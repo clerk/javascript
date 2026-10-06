@@ -995,4 +995,7 @@ describe('connected accounts', () => {
 
   it.todo('challenges and resumes connect, reconnect, and removal when session reverification is required');
   it.todo('keeps the provider visibly pending when Try again replaces its failed account with a Connect row');
+  // TODO: Revisit sharing connected-account scope and reconnect helpers with the legacy UI.
+  // TODO: Replace the OAuth redirect timeout once routing can reliably signal when navigation completes or stops.
+  // Revisit awaiting Mosaic navigation as part of that routing work.
 });
