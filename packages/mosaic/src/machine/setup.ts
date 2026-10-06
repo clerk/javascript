@@ -80,8 +80,6 @@ function withImplementations<TContext extends object, TEvent extends EventObject
 
     /**
      * Wraps an async function so its resolved type flows into `onDone.actions`.
-     * Mirrors XState v5's `fromPromise<TOutput>()` — a typed wrapper that carries
-     * `TOutput` to `DoneInvokeEvent<TOutput>` without needing a full actor registry.
      *
      * ```ts
      * const { createMachine, assign, fromPromise } = setup<Ctx, Event>();

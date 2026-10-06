@@ -1,9 +1,8 @@
 /**
  * Shared types for the Mosaic state-machine library.
  *
- * The design mirrors XState v5's config-object shape (so a machine is statically
- * introspectable — see {@link StateMachine.states}) but is trimmed to a tiny,
- * dependency-free core: no parallel states, history, SCXML, or spawned actors.
+ * Machines are plain config objects, so they are statically introspectable
+ * (see {@link StateMachine.states}). No parallel states, history, or spawned actors.
  */
 
 /** The minimum shape every event must have. */
@@ -311,7 +310,7 @@ export interface Actor<TContext, TEvent extends EventObject, TStates extends str
   setContext: (patch: Partial<TContext>) => void;
   /**
    * Re-evaluate the current state against live data. Call this when external data
-   * a guard reads (an SWR cache, a store) has changed, so the machine can
+   * a guard reads (a cache, a store) has changed, so the machine can
    * self-correct:
    *  - if the *current* state's entry guard no longer holds, re-seat to the
    *    freshly resolved initial state (e.g. the Wizard's furthest-reachable step);
