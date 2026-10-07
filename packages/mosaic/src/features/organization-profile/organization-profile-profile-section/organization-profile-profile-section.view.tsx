@@ -34,7 +34,9 @@ export function OrganizationProfileProfileSectionView({
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>{m.sectionTitle}</Section.Title>
+          <Section.Content>
+            <Section.Title>{m.sectionTitle}</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <OrganizationProfileLogoRowView
