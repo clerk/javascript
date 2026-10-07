@@ -5,6 +5,7 @@ export { resolveSideOffset, type SideOffset } from './side-offset';
 export {
   type ComponentProps,
   type DefaultProps,
+  isRef,
   mergeProps,
   type RenderProp,
   type RenderPropOrElement,

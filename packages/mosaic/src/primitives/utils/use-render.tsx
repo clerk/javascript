@@ -124,6 +124,10 @@ export function mergeProps(a: Record<string, unknown>, b: Record<string, unknown
 // useRender
 // ---------------------------------------------------------------------------
 
+export function isRef(value: unknown): value is React.Ref<unknown> {
+  return value === null || typeof value === 'function' || (typeof value === 'object' && 'current' in value);
+}
+
 /**
  * Reads the ref off a React element passed to `render`. React 19 exposes it on
  * `props.ref`; React <=18 keeps it on the element itself.
