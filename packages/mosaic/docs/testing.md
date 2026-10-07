@@ -24,11 +24,11 @@ Rule of thumb: **test each behavior once, at the boundary that owns it.**
 
 ## Three tiers
 
-| Tier    | Files                       | Runs in                                | Covers                                                                  |
-| ------- | --------------------------- | -------------------------------------- | ----------------------------------------------------------------------- |
-| Unit    | `*.test.ts(x)`              | jsdom (`--project mosaic`)             | Pure helpers, shared primitives (`useForm`, `Dialog`, machines), timing |
-| Feature | `*.feature.test.tsx`        | Chromium via Vitest browser mode       | A feature end to end: real `Clerk`, real layers, FAPI faked with MSW    |
-| E2E     | `/integration` (Playwright) | Real apps against a real Clerk backend | Framework wiring, redirects, real sessions. Not written per Mosaic flow |
+| Tier    | Files                       | Runs in                                       | Covers                                                                  |
+| ------- | --------------------------- | --------------------------------------------- | ----------------------------------------------------------------------- |
+| Unit    | `*.test.ts(x)`              | jsdom (`pnpm test`; happy-dom for primitives) | Pure helpers, shared primitives (`useForm`, `Dialog`, machines), timing |
+| Feature | `*.feature.test.tsx`        | Chromium (`pnpm test:feature`)                | A feature end to end: real `Clerk`, real layers, FAPI faked with MSW    |
+| E2E     | `/integration` (Playwright) | Real apps against a real Clerk backend        | Framework wiring, redirects, real sessions. Not written per Mosaic flow |
 
 Visual states (loading, empty, every error, every variant) are swingset stories
 with plain props, reviewed by eye. Don't duplicate them as view tests.
@@ -101,7 +101,8 @@ it('makes the selected organization active and closes', async () => {
 is the worked example.
 
 Put a feature test next to the component it renders, and name it after that
-component. `<UserProfilePasswordSection />` is tested by
+component, as `blocks/destructive/destructive.feature.test.tsx` does.
+`<UserProfilePasswordSection />` would be tested by
 `user-profile-password-section/user-profile-password-section.feature.test.tsx`.
 Vitest finds feature tests by the `.feature.test.tsx` suffix, so a shared
 `__tests__/` folder buys nothing and makes a section's tests harder to find.
@@ -110,11 +111,9 @@ their feature next changes.
 
 ### The toolkit (`src/__tests__/feature/`)
 
-- **`fapi.ts`**: typed builders for FAPI JSON (`fapiEnvironment`, `fapiUser`,
-  `fapiSession`, `fapiClient`, `fapiOrganization`, `fapiMembership`,
-  `fapiInvitation`, `fapiSuggestion`, `fapiToken`, `fapiSessionVerification`,
-  `fapiVerification`). They return the wire shapes from `@clerk/shared/types`,
-  so a fixture can't invent a field.
+- **`fapi.ts`**: typed `fapi*` builders for FAPI JSON (`fapiUser`,
+  `fapiSession`, …; the file is the list). They return the wire shapes from
+  `@clerk/shared/types`, so a fixture can't invent a field.
   `fapiEnvironment(overrides)` shallow-merges per section, for example
   `{ organization_settings: { enabled: false } }`.
 - **`fake-fapi.ts`**:
@@ -123,9 +122,11 @@ their feature next changes.
     test can assert on it (`fapi.client.sessions`) or change it.
   - `holdRequests(method, path)` holds matching requests open. Assert the
     in-flight UI, then `release()` to let them through to `serveFapi`, or
-    `fail(code)` to answer with a 400 Clerk error.
+    `fail(code?, longMessage?, paramName?)` to answer with a 400 Clerk error.
 - **`fake-fapi/`**: fakes for larger endpoint families, kept out of
   `fake-fapi.ts` and registered by `serveFapi`.
+  Each file seeds through its own `serveFapi` key; read the file for its
+  shape. For example:
   - `verification.ts` fakes session reverification (`/verify` and its
     prepare and attempt endpoints). Seed it with
     `serveFapi({ verification: { firstFactors, secondFactors, secrets } })`:
@@ -136,13 +137,15 @@ their feature next changes.
     rejects: before start, in the wrong status, with a strategy the user
     doesn't have, and an email, phone, or passkey attempt that wasn't
     prepared. Wrong passwords and codes answer 422.
-- **`render.tsx`**: `renderWithClerk(ui)` renders inside `ClerkContextProvider`
-  and `MosaicProvider`, loads Clerk, and returns `{ clerk, navigate, ... }`.
+- **`render.tsx`**: `renderWithClerk(ui, loadOptions?)` renders inside
+  `ClerkContextProvider` and `MosaicProvider`, loads Clerk, and returns
+  `{ clerk, navigate, rerender, ... }`.
   `navigate` is the router Clerk was loaded with, called with the path.
 
 The setup file (`vitest.setup.browser.mts`) starts the worker and focuses the
 window. After each test it cleans up, resets the handlers and the shared query
-cache, and **fails the test on any FAPI request without a handler**. When a
+cache, and **fails the test on any FAPI request without a handler**, or on a
+`holdRequests` hold never released or failed. When a
 feature needs a new endpoint, add a handler to `serveFapi` that mirrors what
 FAPI returns.
 
