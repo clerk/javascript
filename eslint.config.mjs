@@ -614,6 +614,18 @@ export default tseslint.config([
     rules: {
       '@eslint-community/eslint-comments/require-description': ['error', { ignore: ['eslint-enable'] }],
       'sonarjs/cognitive-complexity': ['error', 15],
+      'sonarjs/no-collapsible-if': 'error',
+      'sonarjs/no-identical-functions': 'error',
+      'sonarjs/no-redundant-jump': 'error',
+      'sonarjs/prefer-single-boolean-return': 'error',
+      '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
+      'max-lines': ['error', { max: 1000, skipBlankLines: true, skipComments: true }],
+      'no-restricted-properties': [
+        'error',
+        { object: 'Reflect', property: 'get', message: 'Use typed property access or parse at the boundary.' },
+        { object: 'Reflect', property: 'apply', message: 'Call the function directly.' },
+      ],
       '@stylexjs/enforce-extension': 'error',
       '@stylexjs/no-legacy-contextual-styles': 'error',
       '@stylexjs/no-lookahead-selectors': 'error',
