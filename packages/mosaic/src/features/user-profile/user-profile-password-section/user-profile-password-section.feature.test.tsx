@@ -33,6 +33,18 @@ async function fillPassword() {
 }
 
 describe('Changing a password', () => {
+  it('omits a zero loading fallback in the standalone section', async () => {
+    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
+    const loading = renderWithClerk(<UserProfilePasswordSection fallback={0} />);
+    try {
+      const hasFallback = screen.queryByText('0') !== null;
+      expect(hasFallback).toBe(false);
+    } finally {
+      await loading;
+    }
+    expect(screen.getByText('Password')).toBeInTheDocument();
+  });
+
   it.each(['sign out', 'switch user', 'switch session'] as const)(
     'discards the password draft after %s',
     async change => {
@@ -254,6 +266,29 @@ describe('Changing a password', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Change password' })).toBeInTheDocument());
   });
 
+  it('hides the section when a loaded user has no active session', async () => {
+    serveFapi({
+      client: fapiClient([
+        fapiSession({
+          id: 'sess_1',
+          user: fapiUser({ ...alice, enterprise_accounts: [fapiEnterpriseAccount({ id: 'ent_1' })] }),
+        }),
+      ]),
+    });
+    const { clerk, rerender } = await renderWithClerk(<UserProfilePasswordSection />);
+    expect(screen.getByText('Managed by Company SSO')).toBeInTheDocument();
+    const resources = clerk.__internal_lastEmittedResources;
+    if (!resources?.user) {
+      throw new Error('Expected a loaded user resource');
+    }
+    clerk.__internal_lastEmittedResources = { ...resources, session: null };
+
+    rerender(<UserProfilePasswordSection />);
+
+    expect(screen.queryByText('Password')).toBeNull();
+    expect(screen.queryByText('Managed by Company SSO')).toBeNull();
+  });
+
   it('hides the section when instance passwords are disabled', async () => {
     const environment = fapiEnvironment();
     environment.user_settings.attributes.password.enabled = false;
@@ -434,6 +469,7 @@ describe('Changing a password', () => {
 });
 
 describe('Deferred password behavior', () => {
+  it.todo('shows a password section skeleton while loading without a custom fallback');
   it.todo('reverifies the session and retries the password update when Clerk requires verification');
   it.todo('omits the current password when session reverification is enabled');
 });

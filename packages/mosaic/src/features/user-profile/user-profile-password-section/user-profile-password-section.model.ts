@@ -33,11 +33,15 @@ export type UserProfilePasswordModel =
       updatePassword: (input: UserProfileEditPasswordValue) => Promise<void>;
     });
 
+type PasswordPolicyResult =
+  | { status: 'hidden' }
+  | { status: 'readonly'; mode: 'set' | 'change'; enterpriseConnectionName: string | undefined }
+  | (UserProfilePasswordPolicy & { status: 'ready'; userId: string });
+
 function getPasswordPolicy(
   user: UserResource | null | undefined,
   environment: EnvironmentResource,
-  enterpriseConnectionName: string,
-): UnavailablePasswordModel | (UserProfilePasswordPolicy & { status: 'ready'; userId: string }) {
+): PasswordPolicyResult {
   if (!user) {
     return { status: 'hidden' };
   }
@@ -56,7 +60,7 @@ function getPasswordPolicy(
     return {
       status: 'readonly',
       mode: policy.mode,
-      managedBy: { name: enterpriseAccount.enterpriseConnection?.name || enterpriseConnectionName },
+      enterpriseConnectionName: enterpriseAccount.enterpriseConnection?.name,
     };
   }
 
@@ -102,7 +106,14 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
     return { status: 'hidden' };
   }
 
-  const policy = getPasswordPolicy(user, environment, m.enterpriseConnection);
+  const policy = getPasswordPolicy(user, environment);
+  if (policy.status === 'readonly') {
+    return {
+      status: 'readonly',
+      mode: policy.mode,
+      managedBy: { name: policy.enterpriseConnectionName || m.enterpriseConnection },
+    };
+  }
   if (policy.status !== 'ready') {
     return policy;
   }

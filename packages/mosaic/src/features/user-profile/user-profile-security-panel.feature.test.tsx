@@ -28,6 +28,18 @@ describe('UserProfileSecurityPanel', () => {
     expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
   });
 
+  it.each([false, 0, ''])('omits Authentication while loading with a %s fallback', async passwordFallback => {
+    serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
+    const loading = renderWithClerk(<UserProfileSecurityPanel passwordFallback={passwordFallback} />);
+    try {
+      const hasAuthentication = screen.queryByRole('region', { name: 'Authentication' }) !== null;
+      expect(hasAuthentication).toBe(false);
+    } finally {
+      await loading;
+    }
+    expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Password');
+  });
+
   it('keeps Authentication around a visible loading fallback', async () => {
     serveFapi({ client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
     const loading = renderWithClerk(

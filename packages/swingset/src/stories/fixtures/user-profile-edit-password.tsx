@@ -3,7 +3,10 @@ import type { UserProfileFormError } from '@clerk/mosaic/features/user-profile/u
 import { UserProfileSaveError } from '@clerk/mosaic/features/user-profile/user-profile-account-section/user-profile-account-section.types';
 import { useUserProfileEditPasswordController } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-edit-password.controller';
 import { UserProfileEditPasswordDialog } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-edit-password.dialog';
-import type { UserProfileEditPasswordValue } from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.types';
+import type {
+  UserProfileEditPasswordValue,
+  UserProfilePasswordPolicy,
+} from '@clerk/mosaic/features/user-profile/user-profile-password-section/user-profile-password-section.types';
 import { useMessages } from '@clerk/mosaic/localization';
 import { useState } from 'react';
 
@@ -24,9 +27,11 @@ export function useUserProfileEditPasswordFixture({
   const m = useMessages('userProfilePasswordSection');
   const [hasPassword, setHasPassword] = useState(initialHasPassword);
   const [hasFailed, setHasFailed] = useState(false);
+  const policy: UserProfilePasswordPolicy = hasPassword
+    ? { mode: 'change', requiresCurrentPassword }
+    : { mode: 'set', requiresCurrentPassword: false };
   const controller = useUserProfileEditPasswordController({
-    policy: hasPassword ? { mode: 'change', requiresCurrentPassword } : { mode: 'set', requiresCurrentPassword: false },
-    identifier: '',
+    policy,
     onSubmit: async (_value: UserProfileEditPasswordValue) => {
       await new Promise(resolve => setTimeout(resolve, latency));
       if (failWith && !hasFailed) {
@@ -38,23 +43,22 @@ export function useUserProfileEditPasswordFixture({
   });
 
   return {
-    hasPassword: controller.hasPassword,
+    hasPassword,
     action: (
       <UserProfileEditPasswordDialog
         form={controller.form}
-        identifier={controller.identifier}
         passwordFeedback={controller.passwordFeedback}
-        hasPassword={controller.hasPassword}
+        hasPassword={hasPassword}
         open={controller.isOpen}
         onOpenChange={controller.onOpenChange}
-        requiresCurrentPassword={controller.requiresCurrentPassword}
+        requiresCurrentPassword={policy.requiresCurrentPassword}
         trigger={
           <Button
             color='neutral'
             size='sm'
             variant='outline'
           >
-            {controller.hasPassword ? m.change : m.set}
+            {hasPassword ? m.change : m.set}
           </Button>
         }
       />

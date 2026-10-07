@@ -12,7 +12,6 @@ describe('useUserProfileEditPasswordController timing', () => {
       const { result } = renderHook(() =>
         useUserProfileEditPasswordController({
           policy: { mode: 'set', requiresCurrentPassword: false },
-          identifier: '',
           onSubmit: () => Promise.resolve(),
           validatePassword: () => Promise.reject(new Error('Failed to load strength checker')),
         }),
@@ -33,7 +32,6 @@ describe('useUserProfileEditPasswordController timing', () => {
       const { result } = renderHook(() =>
         useUserProfileEditPasswordController({
           policy: { mode: 'set', requiresCurrentPassword: false },
-          identifier: '',
           onSubmit: () => Promise.resolve(),
           validatePassword,
         }),
@@ -57,7 +55,6 @@ describe('useUserProfileEditPasswordController timing', () => {
       const { result } = renderHook(() =>
         useUserProfileEditPasswordController({
           policy: { mode: 'set', requiresCurrentPassword: false },
-          identifier: '',
           onSubmit: () => Promise.resolve(),
           validatePassword,
         }),
@@ -86,7 +83,6 @@ describe('useUserProfileEditPasswordController timing', () => {
     const { result } = renderHook(() =>
       useUserProfileEditPasswordController({
         policy: { mode: 'set', requiresCurrentPassword: false },
-        identifier: '',
         onSubmit: () => Promise.resolve(),
         validatePassword,
       }),
@@ -117,7 +113,6 @@ describe('useUserProfileEditPasswordController timing', () => {
     const { result } = renderHook(() =>
       useUserProfileEditPasswordController({
         policy: { mode: 'change', requiresCurrentPassword: true },
-        identifier: '',
         onSubmit,
       }),
     );
