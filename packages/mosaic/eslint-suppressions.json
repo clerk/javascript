@@ -94,11 +94,6 @@
       "count": 2
     }
   },
-  "src/primitives/autocomplete/autocomplete-root.tsx": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    }
-  },
   "src/primitives/dialog/dialog-trigger.tsx": {
     "@typescript-eslint/consistent-type-assertions": {
       "count": 1
@@ -131,16 +126,6 @@
   },
   "src/primitives/otp/otp-input.tsx": {
     "sonarjs/cognitive-complexity": {
-      "count": 1
-    }
-  },
-  "src/primitives/select/select-root.tsx": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    }
-  },
-  "src/primitives/utils/css-vars.ts": {
-    "@typescript-eslint/consistent-type-assertions": {
       "count": 1
     }
   },
