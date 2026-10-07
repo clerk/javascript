@@ -18,13 +18,13 @@ export function UserProfileDangerSection(props: UserProfileDangerSectionProps) {
   // reverification hints or cancellation errors
   const deleteAccount = async () => {
     // Should never happen, just an extra guard
-    if (!user?.deleteSelfEnabled) {
+    if (!user?.delete || !user?.deleteSelfEnabled) {
       return undefined;
     }
 
     await user.delete();
 
-    const hasOtherSessions = client.signedInSessions.filter(s => s.user.id !== user.id).length > 0;
+    const hasOtherSessions = client.signedInSessions.filter(s => s.user?.id !== user?.id).length > 0;
     const redirectUrl = hasOtherSessions
       ? clerk.buildAfterMultiSessionSingleSignOutUrl()
       : clerk.buildAfterSignOutUrl();

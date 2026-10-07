@@ -124,7 +124,7 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
   return {
     ...policy,
     sessionId,
-    identifier: session.publicUserData.identifier,
+    identifier: session.publicUserData.identifier ?? '',
     validatePassword,
     // TODO: Add session reverification for password updates; surface API errors until then.
     updatePassword: async ({ currentPassword, newPassword, signOutOfOtherSessions }) => {

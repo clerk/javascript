@@ -27,9 +27,9 @@ export const useOrganizationListInView = ({ enabled = true }: { enabled?: boolea
         return;
       }
       if (userMemberships.hasNextPage) {
-        userMemberships.fetchNext();
+        userMemberships.fetchNext?.();
       } else if (userInvitations.hasNextPage) {
-        userInvitations.fetchNext();
+        userInvitations.fetchNext?.();
       } else {
         userSuggestions.fetchNext?.();
       }
