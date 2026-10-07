@@ -568,4 +568,24 @@ describe('Card surface', () => {
     expect(Array.from(screen.getByTestId('outer').classList)).toEqual(expect.arrayContaining(surfaceAtom()));
     expect(Array.from(screen.getByTestId('inner').classList)).not.toEqual(expect.arrayContaining(surfaceAtom()));
   });
+
+  it("treats a dialog's card as its surface when the dialog opens from inside another card", () => {
+    render(
+      <Card.Root>
+        <Card.Content>
+          <Dialog.Root defaultOpen>
+            <Dialog.Popup>
+              <Card.Root data-testid='dialog-card'>
+                <Card.Header>
+                  <Card.Title>Add email</Card.Title>
+                </Card.Header>
+              </Card.Root>
+            </Dialog.Popup>
+          </Dialog.Root>
+        </Card.Content>
+      </Card.Root>,
+    );
+
+    expect(Array.from(screen.getByTestId('dialog-card').classList)).toEqual(expect.arrayContaining(surfaceAtom()));
+  });
 });

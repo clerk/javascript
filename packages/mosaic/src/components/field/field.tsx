@@ -35,12 +35,27 @@ export interface FieldRootProps extends MosaicComponentProps<'div'> {
   /** `horizontal` places the control beside a `Field.Content` that stacks the label and supporting text. */
   orientation?: FieldOrientation;
   disabled?: boolean;
+  /**
+   * Keeps a disabled control focusable: read-only and `aria-disabled` rather than natively
+   * `disabled`, so focus stays put. For a field disabled while its form submits, where losing focus
+   * would drop a screen reader's place and close an on-screen keyboard. Text controls only.
+   */
+  focusableWhenDisabled?: boolean;
   required?: boolean;
   invalid?: boolean;
 }
 
 const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFieldRoot(
-  { render, xstyle, orientation = 'vertical', disabled = false, required = false, invalid = false, ...rest },
+  {
+    render,
+    xstyle,
+    orientation = 'vertical',
+    disabled = false,
+    focusableWhenDisabled = false,
+    required = false,
+    invalid = false,
+    ...rest
+  },
   ref,
 ) {
   const element = useRender({
@@ -65,6 +80,7 @@ const Root = React.forwardRef<HTMLDivElement, FieldRootProps>(function MosaicFie
     <FieldProvider
       orientation={orientation}
       disabled={disabled}
+      focusableWhenDisabled={focusableWhenDisabled}
       required={required}
       invalid={invalid}
     >

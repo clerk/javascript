@@ -164,7 +164,8 @@ describe('UserProfileEditNameDialog', () => {
     await user.type(firstNameField(), 'x');
     await user.click(saveButton());
 
-    expect(firstNameField()).toBeDisabled();
+    expect(firstNameField()).toHaveAttribute('aria-disabled', 'true');
+    expect(firstNameField()).toHaveAttribute('readonly');
     expect(saveButton()).toHaveAttribute('aria-busy', 'true');
     await user.click(saveButton());
     expect(props.onSubmit).toHaveBeenCalledOnce();

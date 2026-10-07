@@ -15,6 +15,8 @@ function handlesOwnDrag(element: Element): boolean {
  * - A tap on a text field focuses it without the browser's reveal pan. iOS's pan stops at the end
  *   of the locked page and leaves the field under the keyboard; the keyboard inset lifts the
  *   dialog instead.
+ * - Tapping a submit button leaves focus on the field, so the keyboard stays up while the form
+ *   submits and through to whatever field comes next.
  * - A one-finger drag is cancelled unless something under it can scroll that way or takes the drag
  *   itself. With the keyboard up, iOS would otherwise pan the visual viewport over the page; with
  *   it down, the drag would only rubber-band the scroll-locked page.
@@ -42,6 +44,14 @@ export function guardKeyboardTouch(element: HTMLElement): () => void {
   };
   const onTouchEnd = (event: TouchEvent) => {
     const target = event.target;
+    const touch = event.changedTouches[0];
+    const isTap = touch !== undefined && Math.hypot(touch.clientX - startX, touch.clientY - startY) < 10;
+    const submit = target instanceof Element ? target.closest('button[type="submit"]') : null;
+    if (isTap && submit instanceof HTMLButtonElement && opensKeyboard(document.activeElement)) {
+      event.preventDefault();
+      submit.click();
+      return;
+    }
     if (!opensKeyboard(target) || target === document.activeElement || target.matches(':disabled')) {
       return;
     }

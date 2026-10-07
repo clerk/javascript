@@ -1,7 +1,7 @@
 'use client';
 
 import { inertProps } from '@clerk/shared/inert';
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useLayoutEffect, useMemo, useRef } from 'react';
 
 import { useTransition } from '../hooks/use-transition';
 import { type ComponentProps, mergeProps, useRender } from '../utils';
@@ -75,7 +75,9 @@ export const FlowStep = React.forwardRef<HTMLDivElement, FlowStepProps>(function
     return () => unregisterExitingStep(element);
   }, [exiting, registerExitingStep, unregisterExitingStep]);
 
-  useEffect(() => {
+  // A layout effect, so focus moves in the commit that makes the leaving step inert: field to field,
+  // which iOS does without dropping the keyboard. A passive effect would leave a frame with none.
+  useLayoutEffect(() => {
     const entering = open && !wasOpenRef.current;
     wasOpenRef.current = open;
     if (!entering) {

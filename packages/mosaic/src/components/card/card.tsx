@@ -11,6 +11,7 @@ import type { BannerRootProps } from '../banner';
 import { Banner } from '../banner';
 import { Branding } from '../branding';
 import { Button } from '../button';
+import type { DialogContextValue } from '../dialog';
 import { Dialog, DialogContext, isInDialog } from '../dialog';
 import { Icon } from '../icon';
 import { cardContentMarker } from './card.markers.stylex';
@@ -22,8 +23,9 @@ export type CardSize = keyof typeof slots.sizes;
 
 const DEFAULT_ELEVATION: CardElevation = 'card';
 
-// `null` outside any card, which is how a card knows it is the outermost one.
-const CardElevationContext = React.createContext<CardElevation | null>(null);
+// The enclosing card and the dialog it was rendered in. Context crosses portals, so a card in a
+// dialog opened from inside another card is still the dialog's outermost one.
+const CardContext = React.createContext<{ elevation: CardElevation; dialog: DialogContextValue | null } | null>(null);
 
 function CardBranding() {
   return (
@@ -51,7 +53,10 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
   { elevation = DEFAULT_ELEVATION, size = 'md', renderBranding = true, render, xstyle, children, ...rest },
   ref,
 ) {
-  const isSurface = React.useContext(CardElevationContext) === null && elevation !== 'flush';
+  const dialog = React.useContext(DialogContext);
+  const enclosing = React.useContext(CardContext);
+  const isSurface = (enclosing === null || enclosing.dialog !== dialog) && elevation !== 'flush';
+  const context = React.useMemo(() => ({ elevation, dialog }), [elevation, dialog]);
   const element = useRender({
     defaultTagName: 'div',
     render,
@@ -78,7 +83,7 @@ const Root = React.forwardRef<HTMLDivElement, CardProps>(function CardRoot(
     },
   });
 
-  return <CardElevationContext.Provider value={elevation}>{element}</CardElevationContext.Provider>;
+  return <CardContext.Provider value={context}>{element}</CardContext.Provider>;
 });
 
 /**
@@ -239,7 +244,7 @@ const Footer = React.forwardRef<HTMLDivElement, MosaicComponentProps<'div'>>(fun
   { render, xstyle, ...rest },
   ref,
 ) {
-  const elevation = React.useContext(CardElevationContext) ?? DEFAULT_ELEVATION;
+  const elevation = React.useContext(CardContext)?.elevation ?? DEFAULT_ELEVATION;
   return useRender({
     defaultTagName: 'div',
     render,
