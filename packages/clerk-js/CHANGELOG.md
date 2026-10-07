@@ -1,5 +1,14 @@
 # Change Log
 
+## 6.38.1
+
+### Patch Changes
+
+- Fix `<HandleSSOCallback />` dropping the error when a Clerk Protect challenge fails on the SSO callback. The error is now available on `errors` from `useSignIn()` or `useSignUp()`, and a failed sign-up challenge calls `navigateToSignUp` instead of `navigateToSignIn`. ([#10103](https://github.com/clerk/javascript/pull/10103)) by [@wobsoriano](https://github.com/wobsoriano)
+
+- Updated dependencies [[`568c668`](https://github.com/clerk/javascript/commit/568c6689ab25972f66c44e0fb72f025c2d56a7c0)]:
+  - @clerk/shared@4.39.1
+
 ## 6.38.0
 
 ### Minor Changes

@@ -4,6 +4,7 @@ import { FloatingFocusManager, FloatingList } from '@floating-ui/react';
 import React from 'react';
 
 import { type ComponentProps, type DefaultProps, isKeyboardOpen, mergeProps, useRender } from '../utils';
+import { parsePlacement } from '../utils/side-offset';
 import { useMenuContext } from './menu-context';
 
 export type MenuPositionerProps = ComponentProps<'div'>;
@@ -25,7 +26,7 @@ export const MenuPositioner = React.forwardRef<HTMLDivElement, MenuPositionerPro
       setActiveIndex,
     } = useMenuContext();
 
-    const side = placement.split('-')[0];
+    const side = parsePlacement(placement).side;
 
     const floatingProps = getFloatingProps({
       onKeyDown(event: React.KeyboardEvent<HTMLElement>) {

@@ -160,7 +160,6 @@ export function useUserProfileFixture({ onAddEmail }: UserProfileFixtureOptions 
       passkeysSlot: <UserProfilePasskeysSectionView {...passkeys} />,
       ...mfa.security,
       devices: activeDevices.devices,
-      dangerSlot: <UserProfileDangerPreview />,
       onSignOutAllOtherDevices: activeDevices.onSignOutAllOtherDevices,
       onSignOutDevice: activeDevices.onSignOutDevice,
     },

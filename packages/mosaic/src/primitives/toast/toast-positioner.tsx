@@ -5,6 +5,7 @@ import React, { useMemo, useRef } from 'react';
 
 import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
 import { cssVars } from '../utils/css-vars';
+import { parsePlacement } from '../utils/side-offset';
 import { ToastPositionerContext, type ToastPositionerContextValue } from './toast-context';
 import type { ToastAlign, ToastObject, ToastPositionerOptions, ToastSide } from './toast-manager';
 
@@ -51,7 +52,7 @@ export const ToastPositioner = React.forwardRef<HTMLDivElement, ToastPositionerP
       whileElementsMounted: autoUpdate,
     });
 
-    const [placedSide, placedAlign = 'center'] = placement.split('-');
+    const { side: placedSide, align: placedAlign } = parsePlacement(placement);
 
     const contextValue = useMemo<ToastPositionerContextValue>(
       () => ({ floatingContext, placement, arrowRef }),

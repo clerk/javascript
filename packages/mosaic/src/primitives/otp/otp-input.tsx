@@ -197,7 +197,7 @@ export const OtpInput = React.forwardRef<HTMLInputElement, OtpInputProps>(functi
         return;
       }
       event.preventDefault();
-      const inserted = sanitize(event.clipboardData?.getData('text') ?? '', pattern, length);
+      const inserted = sanitize(event.clipboardData.getData('text'), pattern, length);
       if (inserted === '') {
         return;
       }
