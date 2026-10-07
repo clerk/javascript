@@ -54,7 +54,7 @@ function Web3Wallets({
         onRemove={controller.onRemove}
       />
       <UserProfileSolanaWalletDialog
-        wallets={solanaWallets}
+        discovery={solanaWallets}
         open={controller.solanaPickerOpen}
         pendingWalletName={controller.pendingWalletName}
         error={controller.solanaPickerError}
