@@ -39,7 +39,7 @@ type ExcludeClerkError<T> = T extends { clerk_error: any } ? never : T;
  */
 export type NeedsReverificationParameters = {
   /**
-   * Marks the reverification process as cancelled and rejects the original request.
+   * Marks the reverification process as canceled and rejects the original request.
    */
   cancel: () => void;
   /**
@@ -189,7 +189,7 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *
  * ```tsx {{ filename: 'src/components/MyButton.tsx' }}
  * import { useReverification } from '@clerk/react'
- * import { isReverificationCancelledError } from '@clerk/react/error'
+ * import { isReverificationCanceledError } from '@clerk/react/errors'
  *
  * type MyData = {
  *   balance: number
@@ -203,11 +203,11 @@ function createReverificationHandler(params: CreateReverificationHandlerParams) 
  *     try {
  *       const myData = await enhancedFetcher()
  *       //     ^ is types as `MyData`
- *     } catch (e) {
+ *     } catch (err) {
  *       // Handle error returned from the fetcher here
  *
  *       // You can also handle cancellation with the following
- *       if (isReverificationCancelledError(err)) {
+ *       if (isReverificationCanceledError(err)) {
  *         // Handle the cancellation error here
  *       }
  *     }

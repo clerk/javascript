@@ -25,6 +25,7 @@ export {
   isEmailLinkError,
   isKnownError,
   isMetamaskError,
+  isReverificationCanceledError,
   isReverificationCancelledError,
   EmailLinkErrorCode,
   EmailLinkErrorCodeStatus,

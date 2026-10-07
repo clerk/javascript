@@ -22,7 +22,7 @@ function getNativeModule(): NonNullable<typeof NativeClerkGoogleSignIn> {
 }
 
 /**
- * Check if a response indicates the user cancelled the sign-in flow.
+ * Check if a response indicates the user canceled the sign-in flow.
  */
 export function isCancelledResponse(response: OneTapResponse): response is CancelledResponse {
   return response.type === 'cancelled';

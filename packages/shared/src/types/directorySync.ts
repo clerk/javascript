@@ -25,7 +25,7 @@ export interface DirectorySyncJSON extends ClerkResourceJSON {
   credentials_configured?: boolean | null;
   /**
    * The SCIM bearer token. Only present on create and rotate responses; it
-   * cannot be retrieved again afterwards.
+   * cannot be retrieved again afterward.
    */
   api_key?: string | null;
   created_at: number;

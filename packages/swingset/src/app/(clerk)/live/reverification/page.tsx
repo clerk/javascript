@@ -9,7 +9,7 @@ import { Flow, type FlowDirection } from '@clerk/mosaic/components/flow';
 import { Reverification, useReverificationFlow } from '@clerk/mosaic/features/reverification';
 import { MosaicProvider } from '@clerk/mosaic/mosaic-provider';
 import { useUser } from '@clerk/nextjs';
-import { isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
+import { isClerkRuntimeError, isReverificationCanceledError } from '@clerk/shared/error';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 
@@ -68,7 +68,7 @@ function CardHarness() {
                   return;
                 }
                 await resetMockDelete();
-                if (isReverificationCancelledError(error)) {
+                if (isReverificationCanceledError(error)) {
                   setStatus('cancelled');
                   setMessage('Reverification cancelled.');
                   return;
@@ -140,7 +140,7 @@ function DialogHarness() {
           return;
         }
         await resetMockDelete();
-        if (isReverificationCancelledError(error)) {
+        if (isReverificationCanceledError(error)) {
           setErrorMessage(null);
           setOpen(false);
           return;

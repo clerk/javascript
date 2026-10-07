@@ -1,4 +1,4 @@
-import { ClerkRuntimeError, isClerkRuntimeError, isReverificationCancelledError } from '@clerk/shared/error';
+import { ClerkRuntimeError, isClerkRuntimeError, isReverificationCanceledError } from '@clerk/shared/error';
 import type * as SharedReact from '@clerk/shared/react';
 import type { SessionVerificationLevel } from '@clerk/shared/types';
 import { act, renderHook, waitFor } from '@testing-library/react';
@@ -169,7 +169,7 @@ describe('useReverificationWithState', () => {
     await act(async () => {
       await expect(pending).rejects.toMatchObject({ code: 'reverification_cancelled' });
     });
-    expect(isReverificationCancelledError(await pending.catch(error => error))).toBe(true);
+    expect(isReverificationCanceledError(await pending.catch(error => error))).toBe(true);
     expect(result.current[1]).toEqual({ phase: 'settled' });
     expect(fetcher).toHaveBeenCalledOnce();
     expect(challengeCancel).toHaveBeenCalledOnce();
@@ -278,7 +278,7 @@ describe('useReverificationWithState', () => {
       },
       error => error,
     );
-    expect(isReverificationCancelledError(duringVerification)).toBe(false);
+    expect(isReverificationCanceledError(duringVerification)).toBe(false);
     expect(isClerkRuntimeError(duringVerification) && duringVerification.code).toBe(IN_PROGRESS);
     expect(fetcher).toHaveBeenCalledOnce();
 

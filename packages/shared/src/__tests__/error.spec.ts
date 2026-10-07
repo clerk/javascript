@@ -8,6 +8,8 @@ import {
   is4xxError,
   is429Error,
   isClerkRuntimeError,
+  isReverificationCanceledError,
+  isReverificationCancelledError,
   isUnauthenticatedError,
 } from '../error';
 
@@ -139,6 +141,23 @@ describe('isUnauthenticatedError', () => {
     expect(isUnauthenticatedError({ status: 500 })).toBe(false);
     expect(isUnauthenticatedError({})).toBe(false);
     expect(isUnauthenticatedError(null)).toBe(false);
+  });
+});
+
+describe('isReverificationCanceledError', () => {
+  it('returns true for a canceled reverification', () => {
+    expect(isReverificationCanceledError(new ClerkRuntimeError('canceled', { code: 'reverification_cancelled' }))).toBe(
+      true,
+    );
+  });
+
+  it('returns false for other errors', () => {
+    expect(isReverificationCanceledError(new ClerkRuntimeError('other', { code: 'other_code' }))).toBe(false);
+    expect(isReverificationCanceledError(new Error('canceled'))).toBe(false);
+  });
+
+  it('is also available under the deprecated isReverificationCancelledError name', () => {
+    expect(isReverificationCancelledError).toBe(isReverificationCanceledError);
   });
 });
 

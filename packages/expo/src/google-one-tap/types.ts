@@ -165,7 +165,7 @@ export type OneTapResponse = OneTapSuccessResponse | CancelledResponse | NoSaved
 /**
  * Error codes that can be thrown by the Google Sign-In module.
  *
- * - `SIGN_IN_CANCELLED`: User cancelled the sign-in flow
+ * - `SIGN_IN_CANCELLED`: User canceled the sign-in flow
  * - `NO_SAVED_CREDENTIAL_FOUND`: No saved credentials available for One Tap
  * - `NOT_CONFIGURED`: Module not configured before use
  * - `GOOGLE_SIGN_IN_ERROR`: Generic Google Sign-In error, including Android provider failures such as an unregistered OAuth client

@@ -2,6 +2,7 @@ export {
   isClerkRuntimeError,
   isEmailLinkError,
   isKnownError,
+  isReverificationCanceledError,
   isReverificationCancelledError,
   isMetamaskError,
   EmailLinkErrorCode,
