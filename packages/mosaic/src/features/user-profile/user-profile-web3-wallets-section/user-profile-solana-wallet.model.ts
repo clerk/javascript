@@ -1,10 +1,19 @@
 import { useEffect, useState } from 'react';
 
-import { isSolanaSignInWallet } from '../../web3';
-
 export type InstalledSolanaWallet = { name: string; icon: string };
 
-export function useInstalledSolanaWallets(): readonly InstalledSolanaWallet[] {
+function isSolanaSignInWallet(wallet: {
+  chains: readonly string[];
+  features: Readonly<Record<string, unknown>>;
+}): boolean {
+  return (
+    wallet.chains.some(chain => chain.startsWith('solana:')) &&
+    'standard:connect' in wallet.features &&
+    'solana:signMessage' in wallet.features
+  );
+}
+
+export function useUserProfileSolanaWalletsModel(): readonly InstalledSolanaWallet[] {
   const [wallets, setWallets] = useState<readonly InstalledSolanaWallet[]>([]);
 
   useEffect(() => {

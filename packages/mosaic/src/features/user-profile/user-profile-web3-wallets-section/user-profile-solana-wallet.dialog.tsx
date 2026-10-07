@@ -1,18 +1,19 @@
-import { useInstalledSolanaWallets } from '@clerk/shared/react/hooks/useInstalledSolanaWallets';
-
 import { Banner } from '../../../components/banner';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
 import { useMessages } from '../../../localization';
+import type { InstalledSolanaWallet } from './user-profile-solana-wallet.model';
 
 export function UserProfileSolanaWalletDialog({
+  wallets,
   open,
   pendingWalletName,
   error,
   onOpenChange,
   onConnect,
 }: {
+  wallets: readonly InstalledSolanaWallet[];
   open: boolean;
   pendingWalletName?: string;
   error?: string;
@@ -20,7 +21,6 @@ export function UserProfileSolanaWalletDialog({
   onConnect: (walletName: string) => void;
 }) {
   const m = useMessages('userProfileWeb3Wallets');
-  const wallets = useInstalledSolanaWallets();
   const pending = pendingWalletName !== undefined;
 
   return (

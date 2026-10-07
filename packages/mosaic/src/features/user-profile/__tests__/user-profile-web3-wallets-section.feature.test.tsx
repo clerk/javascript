@@ -1,5 +1,5 @@
 import type { UserJSON } from '@clerk/shared/types';
-import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { WindowAppReadyEventAPI } from '@wallet-standard/core';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -16,6 +16,7 @@ import {
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
 import { MosaicProvider } from '../../../mosaic-provider';
+import { UserProfileSolanaWalletDialog } from '../user-profile-web3-wallets-section/user-profile-solana-wallet.dialog';
 import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section';
 
 describe('Web3 wallets', () => {
@@ -547,6 +548,32 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Manage MetaMask' })).toHaveFocus());
   });
 
+  it('renders caller-supplied Solana wallets and forwards the chosen name', async () => {
+    const props = { open: true, onOpenChange: vi.fn(), onConnect: vi.fn() };
+    const { rerender } = render(
+      <MosaicProvider>
+        <UserProfileSolanaWalletDialog
+          {...props}
+          wallets={[{ name: 'Supplied Solana', icon: '' }]}
+        />
+      </MosaicProvider>,
+    );
+
+    await userEvent.setup().click(await screen.findByRole('button', { name: 'Supplied Solana' }));
+    expect(props.onConnect).toHaveBeenCalledExactlyOnceWith('Supplied Solana');
+
+    rerender(
+      <MosaicProvider>
+        <UserProfileSolanaWalletDialog
+          {...props}
+          wallets={[]}
+        />
+      </MosaicProvider>,
+    );
+    expect(screen.queryByRole('button', { name: 'Supplied Solana' })).toBeNull();
+    expect(screen.getByText('No Solana wallets are available.')).toBeInTheDocument();
+  });
+
   it('shows only eligible Solana wallets and refreshes when wallets register or unregister', async () => {
     const wallet = {
       version: '1.0.0' as const,
@@ -750,6 +777,7 @@ describe('Web3 wallets', () => {
 
   // TODO: Add session reverification for wallet connection, primary updates, and removal;
   // surface API errors until then.
+  // TODO: Share Solana discovery and filtering only after verifying parity with the legacy UI.
   // TODO: Handle wallet registry import rejection and distinguish discovery failure from no installed wallets.
   // This is separate from wallet connection cancellation; an import catch cannot clear a pending wallet request.
   // TODO: Add recovery for abandoned MetaMask connections. In Brave, closing the locked wallet prompt

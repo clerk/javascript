@@ -4,8 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { bindCreateFixtures } from '@/test/create-fixtures';
 import { render, screen } from '@/test/utils';
-import { withCardStateProvider } from '@/ui/elements/contexts';
 
+import { withCardStateProvider } from '../contexts';
 import { Web3SolanaWalletButtons } from '../Web3SolanaWalletButtons';
 
 let installedWallets: Wallet[] = [];
