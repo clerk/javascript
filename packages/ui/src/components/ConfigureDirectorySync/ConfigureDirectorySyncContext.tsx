@@ -229,16 +229,28 @@ const useRoleMapping = (
       setDraftEnabled(null);
       return;
     }
-    if (draftMappings && !sameMappings(draftMappings, savedMappings)) {
-      await replaceGroupRoleMappings({
-        mappings: draftMappings.map(m => ({ directoryGroupId: m.groupId, role: m.roleKey })),
-      });
+    const saveMappings = async () => {
+      if (draftMappings && !sameMappings(draftMappings, savedMappings)) {
+        await replaceGroupRoleMappings({
+          mappings: draftMappings.map(m => ({ directoryGroupId: m.groupId, role: m.roleKey })),
+        });
+      }
+      setDraftMappings(null);
+    };
+    const saveEnabled = async () => {
+      if (draftEnabled !== null && draftEnabled !== savedEnabled) {
+        await updateDirectorySync({ groupRoleMappingEnabled: draftEnabled });
+      }
+      setDraftEnabled(null);
+    };
+
+    if (draftEnabled === false) {
+      await saveEnabled();
+      await saveMappings();
+    } else {
+      await saveMappings();
+      await saveEnabled();
     }
-    setDraftMappings(null);
-    if (draftEnabled !== null && draftEnabled !== savedEnabled) {
-      await updateDirectorySync({ groupRoleMappingEnabled: draftEnabled });
-    }
-    setDraftEnabled(null);
   }, [
     readOnlyReason,
     draftMappings,

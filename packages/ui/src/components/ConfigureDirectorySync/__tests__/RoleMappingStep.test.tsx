@@ -238,6 +238,37 @@ describe('RoleMappingStep', () => {
     await waitFor(() => expect(dir.update).toHaveBeenCalledWith({ groupRoleMappingEnabled: false }));
   });
 
+  it('turns role sync off before replacing the mappings when both change on Complete', async () => {
+    const { userEvent, directory: dir } = await renderRolesStep(directory({ groupRoleMappingEnabled: true }));
+    await screen.findByTestId('role-mapping-row-dirgrp_leads');
+
+    await selectRole(userEvent, 'dirgrp_contractors', 'Member');
+    await userEvent.click(screen.getByRole('switch', { name: 'Sync roles' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Disable role sync' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Complete' }));
+
+    await waitFor(() => expect(dir.replaceGroupRoleMappings).toHaveBeenCalled());
+    expect(dir.update).toHaveBeenCalledWith({ groupRoleMappingEnabled: false });
+    expect(dir.update.mock.invocationCallOrder[0]).toBeLessThan(
+      dir.replaceGroupRoleMappings.mock.invocationCallOrder[0],
+    );
+  });
+
+  it('replaces the mappings before turning role sync on when both change on Complete', async () => {
+    const { userEvent, directory: dir } = await renderRolesStep(directory({ groupRoleMappingEnabled: false }));
+    await screen.findByTestId('role-mapping-row-dirgrp_leads');
+
+    await selectRole(userEvent, 'dirgrp_contractors', 'Member');
+    await userEvent.click(screen.getByRole('switch', { name: 'Sync roles' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Enable role sync' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Complete' }));
+
+    await waitFor(() => expect(dir.update).toHaveBeenCalledWith({ groupRoleMappingEnabled: true }));
+    expect(dir.replaceGroupRoleMappings.mock.invocationCallOrder[0]).toBeLessThan(
+      dir.update.mock.invocationCallOrder[0],
+    );
+  });
+
   it('leaves role sync on when disabling is cancelled', async () => {
     const { userEvent } = await renderRolesStep(directory({ groupRoleMappingEnabled: true }));
     await screen.findByTestId('role-mapping-row-dirgrp_leads');
