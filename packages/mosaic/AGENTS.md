@@ -42,6 +42,7 @@ Most problems a feature hits already have a shared answer. Find the row for your
 | Moving focus after a list row is removed                                | `useListRemovalFocus` (`src/hooks/`)                                                                          |
 | A debounced, abortable async check as the user types                    | `useDebouncedAsync` (`src/hooks/`)                                                                            |
 | A spinner that should not flash or flicker                              | `useSpinDelay` (`src/hooks/`)                                                                                 |
+| Current time for display labels                                         | `useNow` + `MosaicProvider` ([#10098](https://github.com/clerk/javascript/pull/10098), once available)        |
 | An inline message row that animates open and closed                     | `useHeldMessage`, `useMessageHeight`, `FeedbackBody` (`src/utils/feedback.tsx`) + `styles/feedback.styles.ts` |
 | Siblings that slide when an item is added or removed                    | `useLayoutAnimation` (`src/primitives/hooks/`)                                                                |
 | An interaction with an async lifecycle or two values that move together | A machine in the controller file, via `setup()` (`src/machine/`)                                              |

@@ -98,21 +98,22 @@ drops the fallback instead of holding the space open. Keep the two apart.
 
 ## Time-dependent display data
 
-Inspect date-formatting helpers for hidden `Date.now()` or `new Date()` calls.
-Render-time derivation must receive an explicit clock value rather than read
-wall-clock time inside the helper. Check whether a shared clock or provider API
-exists and supports the required contract before adding feature-specific timers.
+Use the shared `useNow` hook and `MosaicProvider` clock support introduced in
+[#10098](https://github.com/clerk/javascript/pull/10098). These APIs must be
+available in the consuming branch before following this guidance.
 
-For server rendering, initialize from a value that can agree between server and
-client. Independent clock reads during initialization can cause hydration
-mismatches. Verify the shared API supports that initial value before claiming
-SSR support. Keep update frequency appropriate to the consuming feature;
-deduplicating all timers is an optimization to justify when needed.
+`MosaicProvider` supplies a shared initial `Date`. Read it with `useNow` from
+`src/hooks/use-now.ts` in the consuming component or controller, then pass the
+value to pure formatting helpers. For relative labels that refresh each minute,
+use `useNow({ updateInterval: 60_000 })`. Without an interval, the hook retains
+its initial value. Reuse this API instead of adding a feature-specific clock
+provider or timer.
 
-For a relative timestamp, pass a fixed clock value and assert the displayed
-label. Advance that value across a label boundary and assert the updated label.
-If the feature supports SSR, render and hydrate with the same initial clock
-value and check for hydration errors before advancing the client clock.
+In tests, supply a fixed `Date` through `MosaicNowProvider`, assert the displayed
+label, then advance fake timers across a label boundary and assert the update.
+If a feature supports SSR, also verify matching initial times during server
+rendering and hydration. Sharing time within one provider tree does not by
+itself guarantee agreement between server and client.
 
 ## Testing
 
