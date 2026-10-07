@@ -1,3 +1,4 @@
+import { useConfirmationController } from '../../../blocks/confirmation/confirmation.controller';
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { DataList } from '../../../components/data-list';
@@ -5,7 +6,6 @@ import type { DialogFocusTarget, DialogHandle } from '../../../components/dialog
 import { Dialog } from '../../../components/dialog';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
-import { useUserProfileDeviceDetailsController } from './user-profile-device-details.controller';
 
 export interface UserProfileDeviceDetailsDialogProps {
   handle: DialogHandle<UserProfileDevice>;
@@ -15,12 +15,12 @@ export interface UserProfileDeviceDetailsDialogProps {
 
 export function UserProfileDeviceDetailsDialog({ handle, finalFocus, onSignOut }: UserProfileDeviceDetailsDialogProps) {
   const m = useMessages('userProfileActiveDevices');
-  const controller = useUserProfileDeviceDetailsController({ onSignOut, fallbackError: m.detailsDialog.signOutError });
+  const controller = useConfirmationController({ errorFallback: m.detailsDialog.signOutError });
 
   return (
     <Dialog.Root
       handle={handle}
-      open={controller.open}
+      open={controller.isOpen}
       onOpenChange={controller.onOpenChange}
     >
       {({ payload: device }) =>
@@ -31,8 +31,8 @@ export function UserProfileDeviceDetailsDialog({ handle, finalFocus, onSignOut }
           >
             <DeviceDetailsCard
               device={device}
-              onSignOut={controller.onSignOut}
-              isSigningOut={controller.isSigningOut}
+              onSignOut={onSignOut ? device => controller.onConfirm(async () => onSignOut(device)) : undefined}
+              isSigningOut={controller.isConfirming}
               errorMessage={controller.errorMessage}
             />
           </Dialog.Popup>

@@ -9,6 +9,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { type ActiveDeviceRecord, fapiUrl, serveFapi, worker } from '../../../__tests__/feature/fake-fapi';
 import { fapiClient, fapiSession, fapiUser } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { MosaicNowProvider } from '../../../hooks/use-now';
 import { MosaicLocalizationProvider, resolveLocalization } from '../../../localization';
 import type { UserProfileDevice } from '../user-profile-active-devices-section/user-profile-active-devices.types';
 import { UserProfileActiveDevicesSection } from '../user-profile-active-devices-section/user-profile-active-devices-section';
@@ -487,8 +488,8 @@ describe('Active devices', () => {
     }
   });
 
-  it('localizes relative and formatted activity dates with surrounding text', async () => {
-    const now = new Date();
+  it('localizes activity dates using the provider clock', async () => {
+    const now = new Date(2025, 5, 15, 12);
     const yesterdayLate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 30);
     const todayEarly = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 30);
     const older = new Date('2024-01-05T12:00:00Z');
@@ -504,7 +505,9 @@ describe('Active devices', () => {
           messages: { userProfileActiveDevices: { lastSeen: 'Vu {date}', deviceName: '{browser} sur {device}' } },
         })}
       >
-        <UserProfileActiveDevicesSection />
+        <MosaicNowProvider value={now}>
+          <UserProfileActiveDevicesSection />
+        </MosaicNowProvider>
       </MosaicLocalizationProvider>,
     );
 

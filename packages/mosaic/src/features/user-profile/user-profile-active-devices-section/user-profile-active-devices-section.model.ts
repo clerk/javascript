@@ -3,6 +3,7 @@ import { useClerk, useSession, useUser } from '@clerk/shared/react';
 import type { SessionWithActivitiesResource } from '@clerk/shared/types';
 import { useEffect, useState } from 'react';
 
+import { useNow } from '../../../hooks/use-now';
 import { fill, useLocale, useMessages } from '../../../localization';
 import type { UserProfileDevice } from './user-profile-active-devices.types';
 
@@ -26,8 +27,8 @@ function isActiveDevice(session: SessionWithActivitiesResource): boolean {
   return session.status === 'active' || session.status === 'pending';
 }
 
-function lastActiveLabel(date: Date, locale: string): string {
-  const days = differenceInCalendarDays(new Date(), date, { absolute: false });
+function lastActiveLabel(date: Date, now: Date, locale: string): string {
+  const days = differenceInCalendarDays(now, date, { absolute: false });
   if (Math.abs(days) <= 6) {
     return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(days, 'day');
   }
@@ -38,6 +39,7 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
   const clerk = useClerk();
   const { isLoaded: isUserLoaded, user } = useUser();
   const { isLoaded: isSessionLoaded, session } = useSession();
+  const now = useNow({ updateInterval: 60_000 });
   const locale = useLocale();
   const m = useMessages('userProfileActiveDevices');
   const userId = user?.id;
@@ -78,7 +80,7 @@ export function useUserProfileActiveDevicesModel(): UserProfileActiveDevicesMode
     const model = activity.deviceType || (isMobile ? m.mobileDevice : m.desktopDevice);
     const browser = [activity.browserName, activity.browserVersion].filter(Boolean).join(' ') || m.webBrowser;
     const location = [activity.city, activity.country].filter(Boolean).join(', ');
-    const lastActive = lastActiveLabel(item.lastActiveAt, locale);
+    const lastActive = lastActiveLabel(item.lastActiveAt, now, locale);
     const description = [fill(m.lastSeen, { date: lastActive }), location].filter(Boolean).join(' · ');
 
     return {
