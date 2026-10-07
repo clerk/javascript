@@ -122,6 +122,8 @@ export function useUserProfilePasskeysModel(): UserProfilePasskeysModel {
   };
 
   function formatPasskeyDate(date: Date): string {
+    // TODO: Read relativeTo from useNow({ updateInterval: 60_000 }) once
+    // https://github.com/clerk/javascript/pull/10098 merges.
     const relative = formatRelative({ date, relativeTo: new Date() });
     if (!relative) {
       return '';
