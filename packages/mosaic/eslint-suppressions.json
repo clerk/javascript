@@ -1,7 +1,72 @@
 {
+  "src/blocks/destructive/destructive.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/components/action-bar/action-bar.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 7
+    }
+  },
+  "src/components/dialog/dialog.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/components/flow/flow.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/components/form/form.machine.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    }
+  },
+  "src/components/form/use-form.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/components/icon/icon.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/components/panel/panel.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/components/phone-input/phone-input.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/components/profile/profile.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
   "src/features/api-keys/api-keys-table.view.tsx": {
     "sonarjs/cognitive-complexity": {
       "count": 1
+    }
+  },
+  "src/features/organization-profile/organization-profile-invite-members.dialog.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/features/organization-profile/organization-profile-profile-section/organization-profile-logo-row.view.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    }
+  },
+  "src/features/organization-profile/requests-table-tab.view.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
     }
   },
   "src/features/reverification/reverification.controller.ts": {
@@ -9,12 +74,43 @@
       "count": 1
     }
   },
+  "src/features/reverification/reverification.utils.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 5
+    }
+  },
+  "src/features/reverification/use-reverification-with-state.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/features/user-button/use-organization-list-in-view.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    }
+  },
+  "src/features/user-button/user-button.model.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 4
+    }
+  },
   "src/features/user-button/user-button.view.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
     "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
+  "src/features/user-profile/user-profile-account-section/user-profile-account-section.model.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    }
+  },
   "src/features/user-profile/user-profile-account-section/user-profile-contact-row.view.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 4
+    },
     "sonarjs/cognitive-complexity": {
       "count": 1
     }
@@ -24,8 +120,38 @@
       "count": 1
     }
   },
+  "src/features/user-profile/user-profile-account-section/user-profile-picture-row.view.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    }
+  },
   "src/features/user-profile/user-profile-active-devices-section.view.tsx": {
     "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/features/user-profile/user-profile-danger-section/user-profile-danger-section.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 3
+    }
+  },
+  "src/features/user-profile/user-profile-device-details.dialog.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/features/user-profile/user-profile-enterprise-accounts-section/user-profile-enterprise-accounts-section.controller.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/features/user-profile/user-profile-password-section/user-profile-password-errors.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    }
+  },
+  "src/features/user-profile/user-profile-password-section/user-profile-password-section.model.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
       "count": 1
     }
   },
@@ -34,12 +160,106 @@
       "count": 1
     }
   },
+  "src/hooks/use-accessible-description-warning.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/hooks/use-accessible-name-warning.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/hooks/use-server-data-table.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 4
+    }
+  },
+  "src/localization/context.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
   "src/localization/messages.ts": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    },
     "sonarjs/cognitive-complexity": {
       "count": 1
     }
   },
+  "src/machine/assign.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/machine/create-actor.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 9
+    },
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 7
+    }
+  },
+  "src/machine/create-machine.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/machine/setup.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 2
+    }
+  },
+  "src/machines/first-factor-machine.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 4
+    }
+  },
+  "src/primitives/accordion/accordion-panel.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/primitives/accordion/accordion-root.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 2
+    }
+  },
+  "src/primitives/accordion/accordion-trigger.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 2
+    }
+  },
+  "src/primitives/autocomplete/autocomplete-option.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/primitives/autocomplete/autocomplete-root.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/primitives/collapsible/collapsible-panel.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/primitives/combobox/combobox-option.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/primitives/dialog/dialog-trigger.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
   "src/primitives/drawer/use-drawer-drag.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 4
+    },
     "sonarjs/cognitive-complexity": {
       "count": 1
     }
@@ -49,8 +269,81 @@
       "count": 1
     }
   },
+  "src/primitives/file-upload/file-upload-dropzone.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/primitives/flow/flow-step.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/primitives/hooks/use-data-table.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/primitives/hooks/use-focus-target.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 2
+    }
+  },
+  "src/primitives/menu/menu-trigger.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
   "src/primitives/otp/otp-input.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 2
+    },
     "sonarjs/cognitive-complexity": {
+      "count": 1
+    }
+  },
+  "src/primitives/select/select-root.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/primitives/tabs/tabs-indicator.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 4
+    }
+  },
+  "src/primitives/tabs/tabs-list.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 2
+    }
+  },
+  "src/primitives/tabs/tabs-panel.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/primitives/tabs/tabs-tab.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 2
+    }
+  },
+  "src/primitives/tag-input/tag-input-root.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/primitives/tag-input/tag-input-tag.tsx": {
+    "@typescript-eslint/no-unnecessary-condition": {
+      "count": 1
+    }
+  },
+  "src/primitives/utils/css-vars.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 1
+    }
+  },
+  "src/primitives/utils/interaction-modality.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
       "count": 1
     }
   },
@@ -60,8 +353,16 @@
     }
   },
   "src/primitives/utils/use-render.tsx": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 9
+    },
     "sonarjs/cognitive-complexity": {
       "count": 1
+    }
+  },
+  "src/utils/context.ts": {
+    "@typescript-eslint/consistent-type-assertions": {
+      "count": 2
     }
   }
 }
