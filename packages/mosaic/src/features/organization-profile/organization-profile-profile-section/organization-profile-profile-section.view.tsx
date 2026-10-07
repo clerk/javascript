@@ -7,12 +7,12 @@ import { OrganizationProfileSlugRowView } from './organization-profile-slug-row.
 
 export interface OrganizationProfileProfileSectionViewProps {
   name: string;
-  slug: string;
+  slug?: string;
   imageUrl?: string;
   hasImage?: boolean;
-  onLogoChange?: (file: File) => void;
+  onLogoChange?: (file: File) => void | Promise<void>;
   onLogoReject?: (rejections: FileRejection[]) => void;
-  onRemoveLogo?: () => void;
+  onRemoveLogo?: () => void | Promise<void>;
   onSubmitName?: (name: string) => Promise<void>;
   onSubmitSlug?: (slug: string) => Promise<void>;
 }
@@ -51,10 +51,12 @@ export function OrganizationProfileProfileSectionView({
             name={name}
             onSubmit={onSubmitName}
           />
-          <OrganizationProfileSlugRowView
-            slug={slug}
-            onSubmit={onSubmitSlug}
-          />
+          {slug !== undefined ? (
+            <OrganizationProfileSlugRowView
+              slug={slug}
+              onSubmit={onSubmitSlug}
+            />
+          ) : null}
         </Section.Body>
       </Section.Group>
     </Section.Root>

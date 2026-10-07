@@ -13,6 +13,7 @@ export interface PendingAction<TKey extends string> {
   run: (key: TKey, action: () => Promise<unknown> | void, options?: PendingActionOptions) => Promise<boolean>;
   pendingKey: TKey | undefined;
   isPending: boolean;
+  busy: () => boolean;
   error: string | undefined;
   errorKey: TKey | undefined;
   reset: () => void;
@@ -59,6 +60,7 @@ export function usePendingAction<TKey extends string = string>({
     run,
     pendingKey,
     isPending: pendingKey !== undefined,
+    busy: () => running.current,
     error: failure ? errorText(failure.error, failure.errorFallback ?? errorFallback) : undefined,
     errorKey: failure?.key,
     reset: () => setFailure(undefined),

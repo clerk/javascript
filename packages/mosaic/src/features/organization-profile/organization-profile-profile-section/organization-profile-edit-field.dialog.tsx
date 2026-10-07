@@ -1,13 +1,13 @@
-import type { FormEvent } from 'react';
-import { useId, useRef } from 'react';
+import { useMergeRefs } from '@floating-ui/react';
+import { useRef } from 'react';
 
 import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import type { DialogTriggerProps } from '../../../components/dialog';
 import { Dialog } from '../../../components/dialog';
 import { Field } from '../../../components/field';
+import type { FieldFeedback } from '../../../components/form/form-submit-error';
 import { Input } from '../../../components/input';
-import type { OrganizationProfileFormError } from '../organization-profile.types';
 
 export interface OrganizationProfileEditFieldDialogProps {
   open: boolean;
@@ -18,12 +18,16 @@ export interface OrganizationProfileEditFieldDialogProps {
   fieldLabel: string;
   cancelLabel: string;
   saveLabel: string;
+  formId: string;
+  onSubmit: (event: { preventDefault: () => void }) => void;
   value: string;
-  onValueChange: (value: string) => void;
-  canSave?: boolean;
-  isSaving?: boolean;
-  error?: OrganizationProfileFormError;
-  onSubmit: () => void;
+  onChange: (event: { target: { value: string } }) => void;
+  onBlur: () => void;
+  fieldRef: (element: HTMLElement | null) => void;
+  feedback?: FieldFeedback;
+  error?: string;
+  canSave: boolean;
+  isSaving: boolean;
 }
 
 export function OrganizationProfileEditFieldDialog({
@@ -35,22 +39,19 @@ export function OrganizationProfileEditFieldDialog({
   fieldLabel,
   cancelLabel,
   saveLabel,
-  value,
-  onValueChange,
-  canSave = true,
-  isSaving = false,
-  error,
+  formId,
   onSubmit,
+  value,
+  onChange,
+  onBlur,
+  fieldRef,
+  feedback,
+  error,
+  canSave,
+  isSaving,
 }: OrganizationProfileEditFieldDialogProps) {
-  const formId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (canSave && !isSaving) {
-      onSubmit();
-    }
-  };
+  const mergedRef = useMergeRefs([fieldRef, inputRef]);
 
   return (
     <Dialog.Root
@@ -70,32 +71,32 @@ export function OrganizationProfileEditFieldDialog({
             <Card.Title>{title}</Card.Title>
             {description ? <Card.Description>{description}</Card.Description> : null}
           </Card.Header>
-
           <Card.Banner
             role='alert'
             color='negative'
           >
-            {error?.message && !error.field ? error.message : null}
+            {error}
           </Card.Banner>
           <Card.Content
             render={
               <form
                 id={formId}
-                onSubmit={handleSubmit}
+                onSubmit={onSubmit}
               />
             }
           >
-            <Field.Root invalid={Boolean(error?.field)}>
+            <Field.Root
+              disabled={isSaving}
+              invalid={feedback?.type === 'error'}
+            >
               <Field.Label visuallyHidden>{fieldLabel}</Field.Label>
               <Input
-                ref={inputRef}
-                disabled={isSaving}
+                ref={mergedRef}
                 value={value}
-                onChange={event => onValueChange(event.target.value)}
+                onChange={onChange}
+                onBlur={onBlur}
               />
-              <Field.Message>
-                <Field.Error>{error?.field ? error.message : undefined}</Field.Error>
-              </Field.Message>
+              <Field.Feedback feedback={feedback} />
             </Field.Root>
           </Card.Content>
           <Card.Footer>
@@ -105,11 +106,11 @@ export function OrganizationProfileEditFieldDialog({
                   variant='outline'
                   color='neutral'
                   fullWidth
-                >
-                  {cancelLabel}
-                </Button>
+                />
               }
-            />
+            >
+              {cancelLabel}
+            </Dialog.Close>
             <SubmitButton
               form={formId}
               fullWidth

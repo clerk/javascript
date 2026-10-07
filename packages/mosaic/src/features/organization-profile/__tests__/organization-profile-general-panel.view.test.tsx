@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MosaicProvider } from '../../../mosaic-provider';
-import { OrganizationProfileSaveError } from '../organization-profile.types';
+import { SaveError } from '../../../utils/errors';
 import type { OrganizationProfileGeneralPanelViewProps } from '../organization-profile-general-panel.view';
 import { OrganizationProfileGeneralPanelView } from '../organization-profile-general-panel.view';
 
@@ -45,6 +45,18 @@ describe('organization profile general panel', () => {
     await waitFor(() => expect(onSubmitName).toHaveBeenCalledWith('Clerk Inc'));
   });
 
+  it('allows an optional slug to be cleared', async () => {
+    const user = userEvent.setup();
+    const onSubmitSlug = vi.fn().mockResolvedValue(undefined);
+    renderPanel({ onSubmitSlug });
+
+    await user.click(screen.getByRole('button', { name: 'Edit slug' }));
+    await user.clear(await screen.findByRole('textbox', { name: 'Slug' }));
+    await user.click(screen.getByRole('button', { name: 'Save changes' }));
+
+    await waitFor(() => expect(onSubmitSlug).toHaveBeenCalledWith(''));
+  });
+
   it('names the slug field without showing a label, and explains the change under the title', async () => {
     const user = userEvent.setup();
     renderPanel({ onSubmitSlug: vi.fn().mockResolvedValue(undefined) });
@@ -72,7 +84,9 @@ describe('organization profile general panel', () => {
 
   it('shows a rejected save under the field it names and leaves the dialog open', async () => {
     const user = userEvent.setup();
-    const onSubmitSlug = vi.fn().mockRejectedValue(new OrganizationProfileSaveError('Slug is taken', 'slug'));
+    const onSubmitSlug = vi
+      .fn()
+      .mockRejectedValue(new SaveError({ fields: { slug: { code: 'slug_taken', message: 'Slug is taken' } } }));
     renderPanel({ onSubmitSlug });
 
     await user.click(screen.getByRole('button', { name: 'Edit slug' }));
@@ -96,7 +110,9 @@ describe('organization profile general panel', () => {
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     const dialog = await screen.findByRole('dialog');
-    await waitFor(() => expect(within(dialog).getByRole('alert')).toHaveTextContent('Something went wrong.'));
+    await waitFor(() =>
+      expect(within(dialog).getByRole('alert')).toHaveTextContent('Something went wrong. Please try again.'),
+    );
     expect(within(dialog).getByRole('textbox', { name: 'Name' })).toBeValid();
   });
 });

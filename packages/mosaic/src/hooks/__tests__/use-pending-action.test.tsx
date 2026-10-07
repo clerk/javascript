@@ -16,6 +16,27 @@ function blocked() {
 }
 
 describe('usePendingAction', () => {
+  it('reports busy before React commits the pending state', async () => {
+    const pending = deferred<void>();
+    const { result } = renderHook(() => usePendingAction());
+
+    expect(result.current).toHaveProperty('busy', expect.any(Function));
+    expect(result.current.busy()).toBe(false);
+
+    let run: Promise<boolean> | undefined;
+    act(() => {
+      run = result.current.run('upload', () => pending.promise);
+      expect(result.current.isPending).toBe(false);
+      expect(result.current.busy()).toBe(true);
+    });
+
+    await act(async () => {
+      pending.resolve();
+      await run;
+    });
+    expect(result.current.busy()).toBe(false);
+  });
+
   it('reports success and leaves no error', async () => {
     const { result } = renderHook(() => usePendingAction());
 

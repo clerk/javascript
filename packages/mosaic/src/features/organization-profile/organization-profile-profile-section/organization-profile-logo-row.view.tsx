@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import type { ActionMenuAction } from '../../../components/action-menu';
 import { ActionMenu } from '../../../components/action-menu';
 import { Avatar } from '../../../components/avatar';
@@ -8,6 +6,7 @@ import { Section } from '../../../components/section';
 import { useMessages } from '../../../localization';
 import type { FileRejection } from '../../../primitives/file-upload';
 import { FileUpload } from '../../../primitives/file-upload';
+import { useOrganizationProfileLogoController } from './organization-profile-logo.controller';
 
 const LOGO_MIME_TYPES = 'image/png,image/jpeg,image/gif,image/webp';
 const LOGO_MAX_BYTES = 10 * 1000 * 1000;
@@ -17,9 +16,9 @@ export interface OrganizationProfileLogoRowViewProps {
   imageUrl?: string;
   hasImage?: boolean;
   errorMessage?: string;
-  onChange?: (file: File) => void;
+  onChange?: (file: File) => void | Promise<void>;
   onReject?: (rejections: FileRejection[]) => void;
-  onRemove?: () => void;
+  onRemove?: () => void | Promise<void>;
 }
 
 export function OrganizationProfileLogoRowView({
@@ -32,8 +31,7 @@ export function OrganizationProfileLogoRowView({
   onRemove,
 }: OrganizationProfileLogoRowViewProps) {
   const m = useMessages('organizationProfileProfileSection');
-  const [rejectionError, setRejectionError] = useState<string>();
-  const displayedError = errorMessage ?? rejectionError;
+  const logo = useOrganizationProfileLogoController({ onChange, onReject, onRemove });
   const initials = name
     .split(/\s+/)
     .map(part => part[0])
@@ -43,19 +41,15 @@ export function OrganizationProfileLogoRowView({
 
   return (
     <FileUpload.Root
+      disabled={logo.isPending || !onChange}
       accept={LOGO_MIME_TYPES}
       maxSize={LOGO_MAX_BYTES}
       render={<Section.Row />}
-      onReject={rejections => {
-        const rejection = rejections[0];
-        setRejectionError(rejection ? m.logo.errors[rejection.reason] : undefined);
-        onReject?.(rejections);
-      }}
+      onReject={logo.onReject}
       onValueChange={files => {
         const file = files[0];
         if (file) {
-          setRejectionError(undefined);
-          onChange?.(file);
+          logo.onChange(file);
         }
       }}
     >
@@ -67,7 +61,7 @@ export function OrganizationProfileLogoRowView({
           >
             <Avatar.Image
               alt={name}
-              src={imageUrl}
+              src={logo.previewUrl ?? imageUrl}
             />
             <Avatar.Fallback>{initials}</Avatar.Fallback>
           </Avatar.Root>
@@ -78,11 +72,12 @@ export function OrganizationProfileLogoRowView({
         </Section.Content>
         <LogoActions
           canChange={Boolean(onChange)}
-          hasImage={hasImage}
-          onRemove={onRemove}
+          hasImage={hasImage || Boolean(logo.previewUrl)}
+          isPending={logo.isPending}
+          onRemove={logo.onRemove}
         />
       </Section.Item>
-      <Section.Error>{displayedError}</Section.Error>
+      <Section.Error>{logo.errorMessage ?? errorMessage}</Section.Error>
     </FileUpload.Root>
   );
 }
@@ -90,10 +85,12 @@ export function OrganizationProfileLogoRowView({
 function LogoActions({
   hasImage,
   canChange,
+  isPending,
   onRemove,
 }: {
   hasImage: boolean;
   canChange: boolean;
+  isPending: boolean;
   onRemove?: () => void;
 }) {
   const m = useMessages('organizationProfileProfileSection');
@@ -114,6 +111,7 @@ function LogoActions({
         <ActionMenu
           actions={actions}
           label={m.logo.manage}
+          disabled={isPending}
         />
       </Section.Actions>
     );
