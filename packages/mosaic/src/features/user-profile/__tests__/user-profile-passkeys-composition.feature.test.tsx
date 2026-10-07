@@ -8,7 +8,8 @@ import { UserProfileView } from '../user-profile.view';
 import { UserProfilePasskeysSectionView } from '../user-profile-passkeys-section.view';
 import { passkeysSectionNode } from '../user-profile-passkeys-section/user-profile-passkeys-section';
 import { useUserProfilePasskeysModel } from '../user-profile-passkeys-section/user-profile-passkeys-section.model';
-import { useUserProfilePasswordSlot } from '../user-profile-password-section/user-profile-password-section';
+import { renderPasswordSection } from '../user-profile-password-section/user-profile-password-section';
+import { useUserProfilePasswordModel } from '../user-profile-password-section/user-profile-password-section.model';
 import { UserProfileSecurityPanelView } from '../user-profile-security-panel.view';
 
 afterEach(() => vi.restoreAllMocks());
@@ -33,7 +34,7 @@ function serveAccounts() {
 }
 
 function SecurityHost() {
-  const passwordSlot = useUserProfilePasswordSlot();
+  const passwordSlot = renderPasswordSection(useUserProfilePasswordModel(), null);
   const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
   return (
     <UserProfileSecurityPanelView
@@ -46,7 +47,7 @@ function SecurityHost() {
 }
 
 function ProfileHost() {
-  const passwordSlot = useUserProfilePasswordSlot();
+  const passwordSlot = renderPasswordSection(useUserProfilePasswordModel(), null);
   const passkeysSlot = passkeysSectionNode(useUserProfilePasskeysModel());
   return (
     <UserProfileView

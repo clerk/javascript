@@ -69,7 +69,7 @@ describe('UserProfileSecurityPanelView', () => {
   it('renders supplied password content without a separate visibility flag', () => {
     renderView({
       passwordSlot: <div>Password</div>,
-      passkeys: undefined,
+      passkeysSlot: undefined,
       mfaMethods: undefined,
     });
 
