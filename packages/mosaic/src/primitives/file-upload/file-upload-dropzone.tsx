@@ -54,7 +54,7 @@ export function FileUploadDropzone(props: FileUploadDropzoneProps) {
         return;
       }
       const { files } = event.dataTransfer;
-      if (files && files.length > 0) {
+      if (files.length > 0) {
         addFiles(files);
       }
     },

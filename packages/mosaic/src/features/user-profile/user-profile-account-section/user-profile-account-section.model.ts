@@ -113,7 +113,7 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
 
   const { attributes, usernameSettings } = environment.userSettings;
   const usernameAttribute = attributes.username;
-  const usernameImmutable = Boolean(usernameAttribute?.immutable);
+  const usernameImmutable = usernameAttribute.immutable;
   const showUsername = isAttributeAvailable(usernameAttribute) && !(usernameImmutable && !user.username);
   const nameManagedBy = toManagedBy(user.enterpriseAccounts.find(account => account.active));
   const showEmails = isAttributeAvailable(attributes.email_address);
@@ -132,7 +132,7 @@ export function useUserProfileAccountSectionModel(): UserProfileAccountSectionMo
     imageUrl: user.imageUrl,
     hasImage: user.hasImage,
     username: showUsername ? (user.username ?? '') : undefined,
-    usernameRequired: Boolean(usernameAttribute?.required),
+    usernameRequired: usernameAttribute.required,
     emails: showEmails ? toEmails(user) : undefined,
     phones: showPhones ? toPhones(user) : undefined,
     onProfilePictureChange: file => saveAsUser(current => current.setProfileImage({ file })),

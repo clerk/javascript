@@ -92,7 +92,7 @@ function DeviceDetailsCard({
             isPending={signOut.isPending}
             onClick={() =>
               void signOut.run('sign-out', async () => {
-                await onSignOut?.(device);
+                await onSignOut(device);
                 handle.close();
               })
             }

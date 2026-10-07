@@ -5,7 +5,7 @@ import type { StateMachine } from '../../machine/types';
 import { useMachine } from '../../machine/use-machine';
 import { keysOf, mapKeys } from '../../primitives/utils/object';
 import type { FieldsConfig, FormContext, FormEvent } from './form.machine';
-import { createFormMachine, fieldFeedback, firstInvalid, initialOf, isValid } from './form.machine';
+import { createFormMachine, fieldConfig, fieldFeedback, firstInvalid, initialOf, isValid } from './form.machine';
 import type { FieldFeedback } from './form-submit-error';
 
 export interface UseFormOptions<TValues extends object> {
@@ -114,7 +114,7 @@ export function useForm<TValues extends object>(options: UseFormOptions<TValues>
     <K extends keyof TValues>(name: K, value: TValues[K]) => {
       send({ type: 'CHANGE', name, value });
       const { async, fields, values: next } = actor.getSnapshot().context;
-      const validateAsync = fields?.[name]?.validateAsync;
+      const validateAsync = fieldConfig(fields, name)?.validateAsync;
       if (validateAsync === undefined || async[name]?.pending !== true || async[name].value !== value) {
         return;
       }

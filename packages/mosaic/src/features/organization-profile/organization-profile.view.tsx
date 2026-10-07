@@ -58,7 +58,7 @@ export const OrganizationProfileView = React.forwardRef<HTMLDivElement, Organiza
       customPages,
       pageOrder,
     );
-    const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : entries[0].id;
+    const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : (entries[0]?.id ?? 'general');
 
     return (
       <Profile.Root

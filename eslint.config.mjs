@@ -619,6 +619,7 @@ export default tseslint.config([
       'sonarjs/no-redundant-jump': 'error',
       'sonarjs/prefer-single-boolean-return': 'error',
       '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
+      '@typescript-eslint/no-unnecessary-condition': 'error',
       '@typescript-eslint/switch-exhaustiveness-check': 'error',
       'max-lines': ['error', { max: 1000, skipBlankLines: true, skipComments: true }],
       'no-restricted-properties': [

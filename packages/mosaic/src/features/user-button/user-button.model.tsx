@@ -209,7 +209,7 @@ export function useUserButtonModel(options?: UserButtonModelOptions, modals?: Us
   const { enabled: organizationsEnabled, forceOrganizationSelection } = organizationSettings;
   const { singleSessionMode } = authConfig;
 
-  const canInviteMembers = session.checkAuthorization({ permission: INVITE_MEMBERS_PERMISSION }) ?? false;
+  const canInviteMembers = session.checkAuthorization({ permission: INVITE_MEMBERS_PERMISSION });
   const membershipData = userMemberships.data ?? [];
   const suggestionData = userSuggestions.data ?? [];
   const invitationData = userInvitations.data ?? [];
@@ -242,13 +242,9 @@ export function useUserButtonModel(options?: UserButtonModelOptions, modals?: Us
   );
 
   // Organization requests are scoped to the active session, so another account's organizations are unknowable.
-  const additionalSessions: UserButtonSession[] = (clerk.client?.signedInSessions ?? []).flatMap(s => {
-    const sessionUser = s.user;
-    if (!sessionUser || s.id === session.id) {
-      return [];
-    }
-    return [toSession(s.id, sessionUser)];
-  });
+  const additionalSessions: UserButtonSession[] = clerk.client.signedInSessions
+    .filter(s => s.id !== session.id)
+    .map(s => toSession(s.id, s.user));
 
   const afterSelectUrl = (organizationId: string | null): string | undefined => {
     if (!organizationId) {

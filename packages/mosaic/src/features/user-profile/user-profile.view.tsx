@@ -51,7 +51,7 @@ export const UserProfileView = React.forwardRef<HTMLDivElement, UserProfileViewP
 ) {
   const m = useMessages('userProfile');
   const entries = resolveUserProfilePages(getAvailableUserProfilePages(pages), customPages, pageOrder);
-  const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : entries[0].id;
+  const resolvedPage = entries.some(entry => entry.id === activePage) ? activePage : (entries[0]?.id ?? 'account');
 
   return (
     <Profile.Root
