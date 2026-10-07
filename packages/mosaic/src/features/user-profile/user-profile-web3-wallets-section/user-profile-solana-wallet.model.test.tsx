@@ -44,28 +44,27 @@ describe('useUserProfileSolanaWalletsModel', () => {
     registry.getWallets.mockClear();
   });
 
-  it('renders an empty server snapshot without initializing the browser registry', () => {
+  it('renders a loading server snapshot without initializing the browser registry', () => {
     registry.wallets.push(wallet('Phantom'));
     function WalletNames() {
-      return createElement(
-        'div',
-        null,
-        useUserProfileSolanaWalletsModel()
-          .map(wallet => wallet.name)
-          .join(','),
-      );
+      return createElement('div', null, useUserProfileSolanaWalletsModel().status);
     }
 
-    expect(renderToString(createElement(WalletNames))).toBe('<div></div>');
+    expect(renderToString(createElement(WalletNames))).toBe('<div>loading</div>');
     expect(registry.getWallets).not.toHaveBeenCalled();
   });
 
-  it('starts empty and projects only eligible wallet names and icons after loading the registry', async () => {
+  it('starts loading and projects only eligible wallet names and icons after loading the registry', async () => {
     registry.wallets.push(wallet('Phantom'), wallet('Signer only', { 'solana:signMessage': {} }));
     const { result } = renderHook(useUserProfileSolanaWalletsModel);
 
-    expect(result.current).toEqual([]);
-    await waitFor(() => expect(result.current).toEqual([{ name: 'Phantom', icon: 'data:image/svg+xml;base64,' }]));
+    expect(result.current).toEqual({ status: 'loading' });
+    await waitFor(() =>
+      expect(result.current).toEqual({
+        status: 'ready',
+        wallets: [{ name: 'Phantom', icon: 'data:image/svg+xml;base64,' }],
+      }),
+    );
   });
 
   it.each([
@@ -81,7 +80,10 @@ describe('useUserProfileSolanaWalletsModel', () => {
       await vi.dynamicImportSettled();
     });
     expect(registry.getWallets).toHaveBeenCalled();
-    expect(result.current).toEqual(entry.eligible ? [{ name: 'Candidate', icon: 'data:image/svg+xml;base64,' }] : []);
+    expect(result.current).toEqual({
+      status: 'ready',
+      wallets: entry.eligible ? [{ name: 'Candidate', icon: 'data:image/svg+xml;base64,' }] : [],
+    });
   });
 
   it('refreshes on registration and unregistration and removes both subscriptions on unmount', async () => {
@@ -92,13 +94,16 @@ describe('useUserProfileSolanaWalletsModel', () => {
       registry.wallets.push(wallet('Backpack'));
       registry.listeners.register.forEach(listener => listener());
     });
-    expect(result.current).toEqual([{ name: 'Backpack', icon: 'data:image/svg+xml;base64,' }]);
+    expect(result.current).toEqual({
+      status: 'ready',
+      wallets: [{ name: 'Backpack', icon: 'data:image/svg+xml;base64,' }],
+    });
 
     act(() => {
       registry.wallets.splice(0);
       registry.listeners.unregister.forEach(listener => listener());
     });
-    expect(result.current).toEqual([]);
+    expect(result.current).toEqual({ status: 'ready', wallets: [] });
 
     unmount();
     expect(registry.listeners.register.size).toBe(0);

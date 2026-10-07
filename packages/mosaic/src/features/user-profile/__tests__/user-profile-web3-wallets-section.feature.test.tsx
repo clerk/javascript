@@ -548,13 +548,58 @@ describe('Web3 wallets', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Manage MetaMask' })).toHaveFocus());
   });
 
+  it('distinguishes localized discovery loading and failure from no installed wallets', async () => {
+    const props = { open: true, onOpenChange: vi.fn(), onConnect: vi.fn() };
+    const retry = vi.fn();
+    const localization = {
+      messages: {
+        userProfileWeb3Wallets: {
+          solanaDialog: {
+            loading: 'Recherche des portefeuilles…',
+            loadError: 'Chargement impossible.',
+            retry: 'Réessayer',
+          },
+        },
+      },
+    };
+    const { rerender } = render(
+      <MosaicProvider localization={localization}>
+        <UserProfileSolanaWalletDialog
+          {...props}
+          discovery={{ status: 'loading' }}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(await screen.findByRole('status')).toHaveTextContent('Recherche des portefeuilles…');
+    expect(screen.queryByText('No Solana wallets are available.')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Find a Solana wallet' })).not.toBeInTheDocument();
+
+    rerender(
+      <MosaicProvider localization={localization}>
+        <UserProfileSolanaWalletDialog
+          {...props}
+          discovery={{ status: 'error', retry }}
+        />
+      </MosaicProvider>,
+    );
+
+    expect(screen.getByRole('alert')).toHaveTextContent('Chargement impossible.');
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.queryByText('No Solana wallets are available.')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Find a Solana wallet' })).not.toBeInTheDocument();
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Réessayer' }));
+    expect(retry).toHaveBeenCalledOnce();
+    expect(props.onConnect).not.toHaveBeenCalled();
+  });
+
   it('renders caller-supplied Solana wallets and forwards the chosen name', async () => {
     const props = { open: true, onOpenChange: vi.fn(), onConnect: vi.fn() };
     const { rerender } = render(
       <MosaicProvider>
         <UserProfileSolanaWalletDialog
           {...props}
-          wallets={[{ name: 'Supplied Solana', icon: '' }]}
+          discovery={{ status: 'ready', wallets: [{ name: 'Supplied Solana', icon: '' }] }}
         />
       </MosaicProvider>,
     );
@@ -566,7 +611,7 @@ describe('Web3 wallets', () => {
       <MosaicProvider>
         <UserProfileSolanaWalletDialog
           {...props}
-          wallets={[]}
+          discovery={{ status: 'ready', wallets: [] }}
         />
       </MosaicProvider>,
     );
@@ -779,8 +824,6 @@ describe('Web3 wallets', () => {
   // surface API errors until then.
   // TODO: Share Solana discovery and filtering only after verifying parity with the legacy UI.
   // TODO: Share identification sorting only after verifying parity for legacy email, phone, and wallet sections.
-  // TODO: Handle wallet registry import rejection and distinguish discovery failure from no installed wallets.
-  // This is separate from wallet connection cancellation; an import catch cannot clear a pending wallet request.
   // TODO: Add recovery for abandoned MetaMask connections. In Brave, closing the locked wallet prompt
   // left wallet_requestPermissions pending. Refresh cleared Clerk's error, but a new connection returned -32002.
   // Clerk cancellation must release the UI and ignore late responses without claiming to cancel the wallet request.

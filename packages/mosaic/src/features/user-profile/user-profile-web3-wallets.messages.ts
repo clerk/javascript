@@ -18,6 +18,9 @@ export const userProfileWeb3WalletsMessages = {
   solanaDialog: {
     title: 'Select a Solana wallet',
     description: 'Choose an installed wallet to connect to your account.',
+    loading: 'Loading wallets…',
+    loadError: 'Wallets could not be loaded. Please try again.',
+    retry: 'Retry',
     noneAvailable: 'No Solana wallets are available.',
     findWallet: 'Find a Solana wallet',
     cancel: 'Cancel',

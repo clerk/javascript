@@ -3,17 +3,17 @@ import { Button, SubmitButton } from '../../../components/button';
 import { Card } from '../../../components/card';
 import { Dialog } from '../../../components/dialog';
 import { useMessages } from '../../../localization';
-import type { InstalledSolanaWallet } from './user-profile-solana-wallet.model';
+import type { SolanaWalletDiscovery } from './user-profile-solana-wallet.model';
 
 export function UserProfileSolanaWalletDialog({
-  wallets,
+  discovery,
   open,
   pendingWalletName,
   error,
   onOpenChange,
   onConnect,
 }: {
-  wallets: readonly InstalledSolanaWallet[];
+  discovery: SolanaWalletDiscovery;
   open: boolean;
   pendingWalletName?: string;
   error?: string;
@@ -51,7 +51,27 @@ export function UserProfileSolanaWalletDialog({
                 <Banner.Label>{error}</Banner.Label>
               </Banner.Root>
             ) : null}
-            {wallets.length === 0 ? (
+            {discovery.status === 'loading' ? <p role='status'>{m.solanaDialog.loading}</p> : null}
+            {discovery.status === 'error' ? (
+              <>
+                <Banner.Root
+                  role='alert'
+                  color='negative'
+                >
+                  <Banner.Label>{m.solanaDialog.loadError}</Banner.Label>
+                </Banner.Root>
+                <Button
+                  type='button'
+                  variant='outline'
+                  color='neutral'
+                  fullWidth
+                  onClick={discovery.retry}
+                >
+                  {m.solanaDialog.retry}
+                </Button>
+              </>
+            ) : null}
+            {discovery.status === 'ready' && discovery.wallets.length === 0 ? (
               <p>
                 {m.solanaDialog.noneAvailable}{' '}
                 <a
@@ -63,29 +83,31 @@ export function UserProfileSolanaWalletDialog({
                 </a>
               </p>
             ) : null}
-            {wallets.map(wallet => (
-              <SubmitButton
-                key={wallet.name}
-                type='button'
-                variant='outline'
-                color='neutral'
-                fullWidth
-                isPending={pendingWalletName === wallet.name}
-                disabled={pending && pendingWalletName !== wallet.name}
-                onClick={() => onConnect(wallet.name)}
-              >
-                {wallet.icon ? (
-                  <img
-                    src={wallet.icon}
-                    alt=''
-                    aria-hidden
-                    width={20}
-                    height={20}
-                  />
-                ) : null}
-                {wallet.name}
-              </SubmitButton>
-            ))}
+            {discovery.status === 'ready'
+              ? discovery.wallets.map(wallet => (
+                  <SubmitButton
+                    key={wallet.name}
+                    type='button'
+                    variant='outline'
+                    color='neutral'
+                    fullWidth
+                    isPending={pendingWalletName === wallet.name}
+                    disabled={pending && pendingWalletName !== wallet.name}
+                    onClick={() => onConnect(wallet.name)}
+                  >
+                    {wallet.icon ? (
+                      <img
+                        src={wallet.icon}
+                        alt=''
+                        aria-hidden
+                        width={20}
+                        height={20}
+                      />
+                    ) : null}
+                    {wallet.name}
+                  </SubmitButton>
+                ))
+              : null}
           </Card.Content>
           <Card.Footer>
             <Dialog.Close
