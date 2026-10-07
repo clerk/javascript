@@ -778,6 +778,7 @@ describe('Web3 wallets', () => {
   // TODO: Add session reverification for wallet connection, primary updates, and removal;
   // surface API errors until then.
   // TODO: Share Solana discovery and filtering only after verifying parity with the legacy UI.
+  // TODO: Share identification sorting only after verifying parity for legacy email, phone, and wallet sections.
   // TODO: Handle wallet registry import rejection and distinguish discovery failure from no installed wallets.
   // This is separate from wallet connection cancellation; an import catch cannot clear a pending wallet request.
   // TODO: Add recovery for abandoned MetaMask connections. In Brave, closing the locked wallet prompt

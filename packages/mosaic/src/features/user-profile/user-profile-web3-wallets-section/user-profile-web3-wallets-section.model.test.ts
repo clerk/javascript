@@ -62,27 +62,50 @@ describe('Web3 wallet projection', () => {
     }
   });
 
-  it('WEB3-04 orders primary, verified, then unverified wallets', () => {
+  it('WEB3-04 orders primary, verified, then unverified wallets without mutating the input', () => {
+    const wallets = Object.freeze([
+      {
+        ...metamask,
+        id: 'unverified_later',
+        verification: { ...metamask.verification, status: 'unverified' as const, expireAt: new Date(200) },
+      },
+      { ...metamask, id: 'verified_z' },
+      { ...metamask, id: 'verified_a' },
+      {
+        ...metamask,
+        id: 'primary',
+        verification: { ...metamask.verification, status: 'unverified' as const },
+      },
+      {
+        ...metamask,
+        id: 'unverified_earlier',
+        verification: { ...metamask.verification, status: 'unverified' as const, expireAt: new Date(100) },
+      },
+    ]);
     const result = projectWeb3Wallets({
-      wallets: [
-        {
-          ...metamask,
-          id: 'unverified',
-          verification: { ...metamask.verification, status: 'unverified', expireAt: new Date('2026-01-02') },
-        },
-        { ...metamask, id: 'verified_z' },
-        { ...metamask, id: 'verified_a' },
-        { ...metamask, id: 'primary' },
-      ],
+      wallets,
       primaryId: 'primary',
       enabledStrategies: ['web3_metamask_signature'],
       allowCreation: false,
     });
     expect(result.status).toBe('ready');
     if (result.status === 'ready') {
-      expect(result.wallets.map(wallet => wallet.id)).toEqual(['primary', 'verified_a', 'verified_z', 'unverified']);
+      expect(result.wallets.map(wallet => wallet.id)).toEqual([
+        'primary',
+        'verified_a',
+        'verified_z',
+        'unverified_earlier',
+        'unverified_later',
+      ]);
       expect(result.availableProviders).toEqual([]);
     }
+    expect(wallets.map(wallet => wallet.id)).toEqual([
+      'unverified_later',
+      'verified_z',
+      'verified_a',
+      'primary',
+      'unverified_earlier',
+    ]);
   });
 
   it('WEB3-04 keeps wallets without a verification status after expiring unverified wallets', () => {

@@ -1,5 +1,4 @@
 import { useReverification, useUser } from '@clerk/shared/react';
-import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils/sortIdentificationBasedOnVerification';
 import { Fragment, useState } from 'react';
 
 import { Card } from '@/ui/elements/Card';
@@ -15,6 +14,7 @@ import { useActionContext } from '../../elements/Action/ActionRoot';
 import { useEnabledThirdPartyProviders } from '../../hooks';
 import type { PropsOfComponent } from '../../styledSystem';
 import { RemoveWeb3WalletForm } from './RemoveResourceForm';
+import { sortIdentificationBasedOnVerification } from './utils';
 import { AddWeb3WalletActionMenu } from './Web3Form';
 
 type RemoveWeb3WalletScreenProps = { walletId: string };

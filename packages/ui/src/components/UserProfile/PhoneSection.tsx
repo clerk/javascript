@@ -1,6 +1,5 @@
 import { useReverification, useUser } from '@clerk/shared/react';
 import type { PhoneNumberResource, UserResource } from '@clerk/shared/types';
-import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils/sortIdentificationBasedOnVerification';
 import { Fragment } from 'react';
 
 import { useCardState } from '@/ui/elements/contexts';
@@ -15,6 +14,7 @@ import { useActionContext } from '../../elements/Action/ActionRoot';
 import type { PropsOfComponent } from '../../styledSystem';
 import { PhoneForm } from './PhoneForm';
 import { RemovePhoneForm } from './RemoveResourceForm';
+import { sortIdentificationBasedOnVerification } from './utils';
 
 type RemovePhoneScreenProps = { phoneId: string };
 const RemovePhoneScreen = (props: RemovePhoneScreenProps) => {
