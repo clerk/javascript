@@ -205,7 +205,7 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
                     },
                     compositeProps as Record<string, unknown>,
                   );
-                  // eslint-disable-next-line react-hooks/rules-of-hooks
+                  // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's Composite calls this render callback synchronously during its own render, so the hook keeps a stable position.
                   return useRender({
                     defaultTagName: 'div',
                     render,
@@ -264,7 +264,7 @@ const Action = React.forwardRef<HTMLButtonElement, ActionBarActionProps>(functio
             size='md'
             color={color}
             {...merged}
-            // eslint-disable-next-line react-hooks/rules-of-hooks
+            // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's CompositeItem calls this render callback synchronously during its own render, so the hook keeps a stable position.
             ref={useMergeRefs([ref, itemRef as React.Ref<HTMLButtonElement>])}
             xstyle={[color === 'negative' && styles.destructive, xstyle]}
           />
