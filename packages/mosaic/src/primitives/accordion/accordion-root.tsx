@@ -83,10 +83,7 @@ export function AccordionRoot(props: AccordionProps) {
           // useRender's merged ref would overwrite it.
           const { ref: compositeRef, ...mergedProps } = merged;
 
-          // floating-ui's Composite invokes this render callback synchronously and
-          // unconditionally during its own render (see renderJsx), so useRender runs in a
-          // stable hook position on the Composite fiber. The rule can't see that.
-          // eslint-disable-next-line react-hooks/rules-of-hooks
+          // eslint-disable-next-line react-hooks/rules-of-hooks -- floating-ui's Composite calls this render callback synchronously during its own render, so the hook keeps a stable position.
           return useRender({
             defaultTagName: 'div',
             render,
