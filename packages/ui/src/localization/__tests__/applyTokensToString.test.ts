@@ -148,6 +148,8 @@ describe('applyTokensToString', function () {
           [`{{ date | weekday(en-US, narrow) }}`, 'F'],
           [`{{ date | weekday('', 'short') }}`, 'Fri'],
           [`{{ url || link("Terms") }}`, `[Terms](https://example.com)`],
+          [`{{ url | link('Conditions d'utilisation') }}`, `[Conditions d'utilisation](https://example.com)`],
+          [`{{ date | weekday('en-US", 'short') }}`, 'Fri'],
         ];
 
         it.each(cases)('.applyTokensToString(%s, tokens) => %s', (input, expected) => {
