@@ -271,7 +271,7 @@ describe('Adding a passkey', () => {
 
   it('shows an authenticator cancellation and allows another attempt', async () => {
     servePasskeys([]);
-    fakeAuthenticator().mockRejectedValueOnce(new DOMException('Cancelled', 'NotAllowedError'));
+    fakeAuthenticator().mockRejectedValueOnce(new DOMException('Canceled', 'NotAllowedError'));
     await renderWithClerk(<UserProfilePasskeysSection />);
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Add passkey' }));

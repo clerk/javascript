@@ -10,7 +10,7 @@ import { UserProfilePasskeysSection } from '../user-profile-passkeys-section/use
 
 afterEach(() => vi.restoreAllMocks());
 
-function cancelledRegistration() {
+function canceledRegistration() {
   vi.spyOn(navigator, 'webdriver', 'get').mockReturnValue(false);
   const environment = fapiEnvironment();
   environment.user_settings.attributes.passkey.enabled = true;
@@ -18,7 +18,7 @@ function cancelledRegistration() {
     environment,
     client: fapiClient([fapiSession({ id: 'sess_1', user: fapiUser({ id: 'user_1', passkeys: [] }) })]),
   });
-  vi.spyOn(navigator.credentials, 'create').mockRejectedValue(new DOMException('Cancelled', 'NotAllowedError'));
+  vi.spyOn(navigator.credentials, 'create').mockRejectedValue(new DOMException('Canceled', 'NotAllowedError'));
   return state;
 }
 
@@ -31,7 +31,7 @@ async function pendingResourceStatus() {
 }
 
 it('removes the pending registration after cancellation, rather than merely hiding its row', async () => {
-  cancelledRegistration();
+  canceledRegistration();
   await renderWithClerk(<UserProfilePasskeysSection />);
   const cleanup = holdRequests('post', '/v1/me/passkeys/passkey_1');
   await userEvent.setup().click(screen.getByRole('button', { name: 'Add passkey' }));
@@ -43,7 +43,7 @@ it('removes the pending registration after cancellation, rather than merely hidi
 });
 
 it('retains the localized cancellation error when pending cleanup fails', async () => {
-  cancelledRegistration();
+  canceledRegistration();
   await renderWithClerk(
     <MosaicProvider
       localization={{ locale: 'fr-FR', messages: { errors: { passkey_registration_cancelled: 'Création annulée.' } } }}
