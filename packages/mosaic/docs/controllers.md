@@ -33,7 +33,7 @@ complexity calls for:
 | Is a confirm step before an action                                            | `useConfirmationController` / `useDestructiveController` with their block |
 
 Check `packages/mosaic/AGENTS.md` → "Reuse before you write" before holding any
-of this by hand. Follow its "When nothing fits" guidance for shared changes.
+of this by hand. If nothing there fits, ask the user before adding a new pattern.
 
 `usePendingAction({ errorFallback })` covers the async actions a button or a
 list row starts: set a default, sign out a device, accept or decline a request,

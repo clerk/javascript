@@ -66,19 +66,15 @@ typing. An abstraction must clarify a responsibility or hide useful complexity. 
 together and explain the tradeoff in review. Follow repository rules for any lint
 exception; this guidance does not authorize a suppression.
 
-## When nothing fits
+## When nothing fits: ask first
 
-Search the helper's implementation and callers before deciding it does not fit.
-Ask the user before introducing a new shared pattern or changing a shared helper's
-contract, unless the request already authorizes that change. Say:
+If no row fits, or a shared helper almost fits but would need a change, **stop and ask the user before writing code**. Say:
 
 1. the problem, in one sentence
 2. which shared helpers you checked and why each does not fit
 3. the shape you propose: a new shared helper, a change to an existing one, or a one-off in the feature
 
-Ordinary feature-specific logic can proceed after the reuse search. Explain why
-it belongs in the feature. Do not duplicate a shared helper locally to avoid
-asking about a shared change.
+Do not solve it locally and mention it at the end. A one-off that duplicates a shared helper is the thing this rule exists to prevent.
 
 ## Keep the docs true
 

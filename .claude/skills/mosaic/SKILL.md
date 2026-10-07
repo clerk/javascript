@@ -63,8 +63,8 @@ colocating tests (`packages/mosaic/docs/testing.md`).
 
 `packages/mosaic/AGENTS.md` loads for any work in the package. It maps common
 problems (errors, pending state, focus after removal, debouncing, confirm steps)
-to the shared helper that already solves them. It also defines when a shared
-change needs user approval. Check it before writing any of those by hand.
+to the shared helper that already solves them, and says to ask the user before
+adding a new pattern. Check it before writing any of those by hand.
 
 ## Which reference to read
 
