@@ -480,11 +480,20 @@ export const RoleMappingStep = (): JSX.Element => {
           align='center'
           sx={t => ({ flexShrink: 0, height: `calc(${t.fontSizes.$lg} * ${t.lineHeights.$medium})` })}
         >
+          <Text
+            as='label'
+            htmlFor='role-mapping-enabled'
+            variant='subtitle'
+            colorScheme='secondary'
+            localizationKey={localizationKeys('configureDirectorySync.roleMappingStep.formFieldLabel__syncRoles')}
+            sx={t => ({
+              paddingInlineEnd: t.sizes.$2,
+              cursor: roleMapping.readOnlyReason !== null ? 'not-allowed' : 'pointer',
+              userSelect: 'none',
+            })}
+          />
           <Switch
             id='role-mapping-enabled'
-            label={localizationKeys('configureDirectorySync.roleMappingStep.formFieldLabel__syncRoles')}
-            labelVariant='subtitle'
-            labelPosition='start'
             isChecked={roleMapping.enabled}
             isDisabled={roleMapping.readOnlyReason !== null}
             onChange={enabled => setPendingAction(enabled ? 'enable' : 'disable')}
