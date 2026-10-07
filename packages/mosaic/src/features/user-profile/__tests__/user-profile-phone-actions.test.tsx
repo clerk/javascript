@@ -66,7 +66,7 @@ describe('phone actions', () => {
     await waitFor(() => expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument());
   });
 
-  it('hides set primary while an update is pending', async () => {
+  it('ignores a second set primary while the first is pending', async () => {
     const user = userEvent.setup();
     let finish = () => {};
     const pending = new Promise<void>(resolve => {
@@ -77,10 +77,10 @@ describe('phone actions', () => {
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
     await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
     await user.click(screen.getByRole('button', { name: 'Manage +1 (801) 555-0100' }));
-    expect(screen.queryByRole('menuitem', { name: 'Set as primary' })).not.toBeInTheDocument();
+    await user.click(screen.getByRole('menuitem', { name: 'Set as primary' }));
+
     expect(onSetPrimaryPhone).toHaveBeenCalledOnce();
     finish();
-    await waitFor(() => expect(screen.getByRole('menuitem', { name: 'Set as primary' })).toBeInTheDocument());
   });
   it.each([
     { isDefault: true, isVerified: true },

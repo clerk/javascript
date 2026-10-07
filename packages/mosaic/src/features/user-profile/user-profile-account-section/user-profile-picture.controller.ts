@@ -1,4 +1,6 @@
-import { useForm } from '../../../components/form';
+import { useState } from 'react';
+
+import { usePendingAction } from '../../../hooks/use-pending-action';
 import { FileUpload } from '../../../primitives/file-upload';
 
 export interface UserProfilePictureControllerOptions {
@@ -18,27 +20,21 @@ export function useUserProfilePictureController({
   onChange,
   onRemove,
 }: UserProfilePictureControllerOptions): UserProfilePictureController {
-  const form = useForm<{ file: File | undefined }>({
-    initialValues: { file: undefined },
-    onSubmit: async ({ file }) => {
-      if (file) {
-        await onChange?.(file);
-      } else {
-        await onRemove?.();
-      }
-    },
-  });
-  const previewUrl = FileUpload.useObjectUrl(form.error ? undefined : form.values.file);
-  const picked = (file: File | undefined) => {
-    form.setValue('file', file);
-    form.submit();
-  };
+  const [picked, setPicked] = useState<File>();
+  const upload = usePendingAction();
+  const previewUrl = FileUpload.useObjectUrl(upload.error ? undefined : picked);
+
+  const save = (next: File | undefined, action: () => Promise<void>) =>
+    upload.run('picture', async () => {
+      setPicked(next);
+      await action();
+    });
 
   return {
-    onChange: onChange ? picked : undefined,
-    onRemove: onRemove ? () => picked(undefined) : undefined,
-    isPending: form.isSubmitting,
+    onChange: onChange ? file => void save(file, () => onChange(file)) : undefined,
+    onRemove: onRemove ? () => void save(undefined, onRemove) : undefined,
+    isPending: upload.isPending,
     previewUrl,
-    error: form.error,
+    error: upload.error,
   };
 }

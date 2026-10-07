@@ -22,7 +22,7 @@ export interface UserProfileContactListRowViewProps {
   onAdd?: () => void;
   onVerify?: (id: string) => void;
   onSetPrimary?: (id: string) => void;
-  onRemove?: (id: string) => void;
+  onRemove?: (item: UserProfileContact) => void;
   children?: ReactNode;
 }
 
@@ -97,7 +97,7 @@ export function UserProfileContactListRowView({
                 actions.push({
                   label: m[kind].remove,
                   color: 'negative',
-                  onClick: () => onRemove(item.id),
+                  onClick: () => onRemove(item),
                 });
               }
 

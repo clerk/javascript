@@ -8,11 +8,10 @@ import { Section } from '../../../components/section';
 import { useListRemovalFocus } from '../../../hooks/use-list-removal-focus';
 import { fill, useMessages } from '../../../localization';
 import type { UserProfileEmail, UserProfileEmailVerifier } from './user-profile-account-section.types';
-import { useUserProfileAddEmailController } from './user-profile-add-email.controller';
 import { UserProfileAddEmailDialog } from './user-profile-add-email.dialog';
 import { UserProfileContactListRowView } from './user-profile-contact-list-row.view';
 import { UserProfileContactRowView } from './user-profile-contact-row.view';
-import { useUserProfileSetPrimaryController } from './user-profile-set-primary.controller';
+import { useUserProfileEmailRowController } from './user-profile-email-row.controller';
 
 export interface UserProfileEmailRowViewProps {
   emails: UserProfileEmail[];
@@ -46,12 +45,17 @@ export function UserProfileEmailRowView({
     onRemove: onRemoveEmail,
     fallback: () => row.current?.querySelector<HTMLButtonElement>('button:not([disabled])') ?? row.current,
   });
-  const verification = useUserProfileAddEmailController({
+  const { verification, error, onVerify, onSetPrimary } = useUserProfileEmailRowController({
+    emails,
     username,
-    onCreate: onCreateEmail,
+    onCreateEmail,
+    getEmailVerifier,
+    onVerifyEmail,
+    onSetPrimaryEmail,
   });
   const verificationDialog = useMemo(() => Dialog.createHandle(), []);
-  const canVerify = Boolean(getEmailVerifier);
+  const removeEmailConfirmation = useMemo(() => Confirmation.createHandle<UserProfileEmail>(), []);
+  const verifyingId = useRef<string | undefined>(undefined);
   const addEmailLabel = (
     <>
       {allowMultipleAccounts ? (
@@ -65,7 +69,7 @@ export function UserProfileEmailRowView({
     </>
   );
   const addEmailAction =
-    canVerify && onCreateEmail ? (
+    verification && onCreateEmail ? (
       <Dialog.Trigger
         handle={verificationDialog}
         render={
@@ -90,28 +94,8 @@ export function UserProfileEmailRowView({
         {addEmailLabel}
       </Button>
     ) : undefined;
-  const verifyingId = useRef<string | undefined>(undefined);
-  const verifyEmail = (id: string) => {
-    const email = emails.find(email => email.id === id);
-    if (email && getEmailVerifier) {
-      verifyingId.current = id;
-      verification.onVerifyEmail(email.value, getEmailVerifier(id));
-    }
-  };
-  const removeEmailConfirmation = useMemo(() => Confirmation.createHandle<UserProfileEmail>(), []);
-  const primary = useUserProfileSetPrimaryController({
-    items: emails,
-    onSetPrimary: onSetPrimaryEmail,
-  });
 
-  const removeEmail = (id: string) => {
-    const email = emails.find(email => email.id === id);
-    if (email && onRemoveEmail) {
-      removeEmailConfirmation.open(email);
-    }
-  };
-
-  const dialog = canVerify ? (
+  const dialog = verification ? (
     <UserProfileAddEmailDialog
       {...verification}
       handle={verificationDialog}
@@ -147,11 +131,18 @@ export function UserProfileEmailRowView({
         kind='email'
         label={m.email.label}
         addAction={addEmailAction}
-        onRemove={onRemoveEmail ? removeEmail : undefined}
-        onSetPrimary={primary.onSetPrimary}
-        onVerify={canVerify ? verifyEmail : onVerifyEmail}
+        onRemove={onRemoveEmail ? email => removeEmailConfirmation.open(email) : undefined}
+        onSetPrimary={onSetPrimary}
+        onVerify={
+          onVerify
+            ? id => {
+                verifyingId.current = id;
+                onVerify(id);
+              }
+            : undefined
+        }
       >
-        <Section.Error>{primary.error}</Section.Error>
+        <Section.Error>{error}</Section.Error>
       </UserProfileContactListRowView>
       {dialog}
       {onRemoveEmail ? (

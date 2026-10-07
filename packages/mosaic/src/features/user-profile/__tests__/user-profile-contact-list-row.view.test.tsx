@@ -41,17 +41,18 @@ describe('UserProfileContactListRowView', () => {
   it('offers removal when it applies', async () => {
     const user = userEvent.setup();
     const onRemove = vi.fn();
+    const item = { id: 'contact_1', value: 'Contact', isDefault: false, isVerified: true };
     render(
       <UserProfileContactListRowView
         kind='phone'
         label='Phones'
-        items={[{ id: 'contact_1', value: 'Contact', isDefault: false, isVerified: true }]}
+        items={[item]}
         onRemove={onRemove}
       />,
     );
     await user.click(screen.getByRole('button', { name: 'Manage Contact' }));
     expect(screen.queryByRole('menuitem', { name: 'Manage', exact: true })).not.toBeInTheDocument();
     await user.click(screen.getByRole('menuitem', { name: 'Remove phone number' }));
-    expect(onRemove).toHaveBeenCalledExactlyOnceWith('contact_1');
+    expect(onRemove).toHaveBeenCalledExactlyOnceWith(item);
   });
 });
