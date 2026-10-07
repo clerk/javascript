@@ -137,10 +137,6 @@ function updateWeb3Wallet(state: FakeFapiState, wallet: Web3WalletJSON): void {
   }
 }
 
-function missing() {
-  return HttpResponse.json({ errors: [{ code: 'resource_not_found', message: 'not found' }] }, { status: 404 });
-}
-
 export function serveFapi(seed: FakeFapiSeed = {}): FakeFapiState {
   const { verification, enterpriseLinking, passkeys, ...rest } = seed;
   const state: FakeFapiState = {
