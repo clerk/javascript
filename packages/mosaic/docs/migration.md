@@ -37,10 +37,11 @@ hit is a row you must consciously place or drop later:
 | `useFetch` / `useOrganization`    | data loading, pagination, loading/empty states     |
 | `useInView`                       | infinite-scroll / intersection triggers            |
 
-Most of these already have a Mosaic home: `packages/mosaic/AGENTS.md` →
-"Reuse before you write" maps each problem to its helper (`handleError` →
-`save`, `useReverification` → `useReverificationFlow`, and so on). Use that
-table when you place a behavior in Phase 2.
+Use `packages/mosaic/AGENTS.md` → "Reuse before you write" for shared helpers
+such as `save` and `useReverificationFlow`. The table does not cover every
+legacy behavior. Place revalidation and loading rules in the model, and inspect
+existing features for pagination and derived callouts before choosing their
+implementation in Phase 2.
 
 ```bash
 rg -n 'useEffect|handleError|card\.setError|useReverification|revalidate|<Protect|checkAuthorization|useCalloutLabel|useFetch|useInView' \

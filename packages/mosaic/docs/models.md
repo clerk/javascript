@@ -109,6 +109,11 @@ mismatches. Verify the shared API supports that initial value before claiming
 SSR support. Keep update frequency appropriate to the consuming feature;
 deduplicating all timers is an optimization to justify when needed.
 
+For a relative timestamp, pass a fixed clock value and assert the displayed
+label. Advance that value across a label boundary and assert the updated label.
+If the feature supports SSR, render and hydrate with the same initial clock
+value and check for hydration errors before advancing the client clock.
+
 ## Testing
 
 The feature test covers the model by default, running it against a real Clerk

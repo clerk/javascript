@@ -5,6 +5,23 @@ Mosaic is Clerk's next-generation component library. These rules apply to everyt
 - `ARCHITECTURE.md` (this folder) is the contract: tokens, the `.cl-<slot>` + `data-<axis>` styling API, the CSS build, and the model → controller → view split.
 - `docs/` is the how-to, one file per task: StyleX authoring, motion, headless primitives, each flow layer, testing, and migration.
 
+## Task guides
+
+Read the guide for the task you are doing. Paths below are relative to this package.
+
+| Task                                      | Read                                                                              |
+| ----------------------------------------- | --------------------------------------------------------------------------------- |
+| Author a headless primitive               | [Headless primitives](docs/headless.md)                                           |
+| Style a component or change the CSS build | [StyleX](docs/stylex.md)                                                          |
+| Add or debug motion                       | [Motion](docs/motion.md)                                                          |
+| Write a model                             | [Models](docs/models.md)                                                          |
+| Write a controller                        | [Controllers](docs/controllers.md)                                                |
+| Author or debug a state machine           | [Controllers](docs/controllers.md), then [Machine runtime](src/machine/README.md) |
+| Write a view                              | [Views](docs/views.md)                                                            |
+| Test a feature                            | [Testing](docs/testing.md)                                                        |
+| Migrate legacy behavior                   | [Migration](docs/migration.md)                                                    |
+| Review migration parity                   | [Parity audit](docs/parity-audit.md)                                              |
+
 ## Layers in one paragraph
 
 A flow lives in `src/features/<feature>/`. The **model** (`*.model.ts(x)`) is the only file that reads Clerk hooks or calls Clerk resources, and answers with plain data, plain callbacks and a `status`. The **controller** (`*.controller.ts(x)`) holds local state and wraps the model's callbacks for pending, errors and closing. The **view** (`*.view.tsx`) renders plain props. No Clerk resource reaches the controller and no machine snapshot reaches the view.
@@ -49,15 +66,19 @@ typing. An abstraction must clarify a responsibility or hide useful complexity. 
 together and explain the tradeoff in review. Follow repository rules for any lint
 exception; this guidance does not authorize a suppression.
 
-## When nothing fits: ask first
+## When nothing fits
 
-If no row fits, or a shared helper almost fits but would need a change, **stop and ask the user before writing code**. Say:
+Search the helper's implementation and callers before deciding it does not fit.
+Ask the user before introducing a new shared pattern or changing a shared helper's
+contract, unless the request already authorizes that change. Say:
 
 1. the problem, in one sentence
 2. which shared helpers you checked and why each does not fit
 3. the shape you propose: a new shared helper, a change to an existing one, or a one-off in the feature
 
-Do not solve it locally and mention it at the end. A one-off that duplicates a shared helper is the thing this rule exists to prevent.
+Ordinary feature-specific logic can proceed after the reuse search. Explain why
+it belongs in the feature. Do not duplicate a shared helper locally to avoid
+asking about a shared change.
 
 ## Keep the docs true
 

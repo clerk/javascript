@@ -33,7 +33,7 @@ complexity calls for:
 | Is a confirm step before an action                                            | `useConfirmationController` / `useDestructiveController` with their block |
 
 Check `packages/mosaic/AGENTS.md` → "Reuse before you write" before holding any
-of this by hand. If nothing there fits, ask the user before adding a new pattern.
+of this by hand. Follow its "When nothing fits" guidance for shared changes.
 
 `usePendingAction({ errorFallback })` covers the async actions a button or a
 list row starts: set a default, sign out a device, accept or decline a request,
@@ -191,6 +191,13 @@ interaction does not retain an unintended error or draft, and keep reset behavio
 consistent with the pending action's lifetime. Handle rejected dynamic imports
 through an appropriate error owner rather than leaving unhandled rejections.
 
+For a dialog that clears its draft and error on close, test a failed submit,
+close it, and reopen it. Assert that the error is gone and the field has its
+initial value. If the draft is meant to survive, assert the saved draft instead.
+Hold the submit request while dismissing to verify that closing does not unlock
+a second mutation or abandon the first. When a feature uses a dynamic import,
+reject the loader and assert the error UI and recovery behavior it promises.
+
 When introducing lazy loading or Suspense, consider a boundary around dialog
 content that leaves the trigger and parent available. Choose that boundary from
 the feature's loading behavior; it does not require restructuring every dialog.
@@ -250,6 +257,10 @@ One path, so every error a user sees goes through the `errors.*` catalog:
 - In tests, reject with `clerkApiError(code, message, { paramName })` from
   `src/__tests__/clerk-errors.ts` to assert catalog copy. Reject with a plain
   `Error` (silence `console.error`) to assert the fallback.
+  For example, reject with `new Error('socket disconnected')`, assert the
+  feature's fallback is visible, and assert that `socket disconnected` is not
+  rendered. Test `clerkApiError('network_error', 'server detail')` separately
+  to verify catalog copy rather than assuming every network fault has a code.
 
 ## Testing
 
