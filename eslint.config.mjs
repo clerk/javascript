@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import pluginEslintComments from '@eslint-community/eslint-plugin-eslint-comments';
 import eslint from '@eslint/js';
 import configPrettier from 'eslint-config-prettier';
 import configTurbo from 'eslint-config-turbo/flat';
@@ -606,10 +607,12 @@ export default tseslint.config([
     // Tests assert on style values they receive; they are not authoring styles.
     ignores: ['packages/mosaic/src/__tests__/**', 'packages/mosaic/src/**/*.test.{ts,tsx}'],
     plugins: {
+      '@eslint-community/eslint-comments': pluginEslintComments,
       '@stylexjs': pluginStylex,
       sonarjs: pluginSonarjs,
     },
     rules: {
+      '@eslint-community/eslint-comments/require-description': ['error', { ignore: ['eslint-enable'] }],
       'sonarjs/cognitive-complexity': ['error', 15],
       '@stylexjs/enforce-extension': 'error',
       '@stylexjs/no-legacy-contextual-styles': 'error',

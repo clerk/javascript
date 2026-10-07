@@ -86,6 +86,7 @@
     "@commitlint/cli": "^20.5.2",
     "@commitlint/config-conventional": "^20.5.0",
     "@e2e-dev/mobile": "0.9.1",
+    "@eslint-community/eslint-plugin-eslint-comments": "4.8.1",
     "@eslint/eslintrc": "^3.3.5",
     "@eslint/js": "9.31.0",
     "@faker-js/faker": "^9.9.0",
