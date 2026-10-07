@@ -26,7 +26,6 @@ export default defineConfig(({ watch, env }) => {
       './src/*.{ts,tsx}',
       './src/react/index.ts',
       './src/utils/index.ts',
-      './src/utils/sortIdentificationBasedOnVerification.ts',
       './src/phone/index.ts',
       './src/workerTimers/index.ts',
       './src/types/index.ts',

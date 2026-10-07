@@ -2,7 +2,6 @@ import { iconImageUrl } from '@clerk/shared/constants';
 import { createWeb3 } from '@clerk/shared/internal/clerk-js/web3';
 import { useClerk, useUser } from '@clerk/shared/react';
 import type { VerificationResource, Web3WalletResource } from '@clerk/shared/types';
-import { sortIdentificationBasedOnVerification } from '@clerk/shared/utils/sortIdentificationBasedOnVerification';
 import { WEB3_PROVIDERS } from '@clerk/shared/web3';
 
 import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
@@ -47,7 +46,22 @@ export function projectWeb3Wallets({
       wallet.verification.strategy === 'admin' ||
       WEB3_PROVIDERS.some(provider => provider.strategy === wallet.verification.strategy),
   );
-  const sorted = sortIdentificationBasedOnVerification(knownWallets, primaryId);
+  const primary = knownWallets.filter(wallet => wallet.id === primaryId);
+  const remaining = knownWallets.filter(wallet => wallet.id !== primaryId);
+  const verified = remaining.filter(wallet => wallet.verification.status === 'verified');
+  const unverified = remaining.filter(
+    wallet => wallet.verification.status !== null && wallet.verification.status !== 'verified',
+  );
+  const withoutStatus = remaining.filter(wallet => wallet.verification.status === null);
+
+  verified.sort((first, second) => first.id.localeCompare(second.id));
+  unverified.sort((first, second) => {
+    const firstExpiry = first.verification.expireAt;
+    const secondExpiry = second.verification.expireAt;
+    return firstExpiry && secondExpiry ? firstExpiry.getTime() - secondExpiry.getTime() : 0;
+  });
+
+  const sorted = [...primary, ...verified, ...unverified, ...withoutStatus];
 
   const connectedStrategies = new Set(
     wallets.filter(wallet => wallet.verification.status === 'verified').map(wallet => wallet.verification.strategy),
