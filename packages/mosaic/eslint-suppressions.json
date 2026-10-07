@@ -1,9 +1,4 @@
 {
-  "src/components/action-bar/action-bar.tsx": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 2
-    }
-  },
   "src/components/dialog/dialog.tsx": {
     "@typescript-eslint/consistent-type-assertions": {
       "count": 1
@@ -99,32 +94,7 @@
       "count": 2
     }
   },
-  "src/machines/first-factor-machine.ts": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 4
-    }
-  },
-  "src/primitives/accordion/accordion-panel.tsx": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    }
-  },
-  "src/primitives/autocomplete/autocomplete-option.tsx": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    }
-  },
   "src/primitives/autocomplete/autocomplete-root.tsx": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    }
-  },
-  "src/primitives/collapsible/collapsible-panel.tsx": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 1
-    }
-  },
-  "src/primitives/combobox/combobox-option.tsx": {
     "@typescript-eslint/consistent-type-assertions": {
       "count": 1
     }
@@ -135,9 +105,6 @@
     }
   },
   "src/primitives/drawer/use-drawer-drag.ts": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 4
-    },
     "sonarjs/cognitive-complexity": {
       "count": 1
     }
@@ -189,15 +156,10 @@
   },
   "src/primitives/utils/use-render.tsx": {
     "@typescript-eslint/consistent-type-assertions": {
-      "count": 9
+      "count": 8
     },
     "sonarjs/cognitive-complexity": {
       "count": 1
-    }
-  },
-  "src/utils/context.ts": {
-    "@typescript-eslint/consistent-type-assertions": {
-      "count": 2
     }
   }
 }

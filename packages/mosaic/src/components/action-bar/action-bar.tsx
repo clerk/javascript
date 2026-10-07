@@ -17,7 +17,7 @@ import * as stylex from '@stylexjs/stylex';
 import React from 'react';
 
 import { useAnimationsFinished, useTransitionStatus } from '../../primitives/hooks';
-import { isRef, mergeProps, useRender } from '../../primitives/utils';
+import { isElement, isRef, mergeProps, useRender } from '../../primitives/utils';
 import { getComputedStyle } from '../../primitives/utils/dom';
 import type { MosaicComponentProps, XStyle } from '../../props';
 import { mergeStyleProps, themeProps } from '../../props';
@@ -113,7 +113,9 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
           shift({
             mainAxis: false,
             crossAxis: true,
-            boundary: scrollingAncestors(state.elements.reference as Element),
+            boundary: isElement(state.elements.reference)
+              ? scrollingAncestors(state.elements.reference)
+              : 'clippingAncestors',
             padding: EDGE_GAP,
             limiter: limitShift({ mainAxis: false, crossAxis: true }),
           }).fn(state),
@@ -154,7 +156,8 @@ const Root = React.forwardRef<HTMLDivElement, ActionBarRootProps>(function Actio
 
   const guardPortalledKeys = (event: React.KeyboardEvent<HTMLDivElement>) => {
     const bar = barRef.current;
-    if (!bar || !contains(bar, getTarget(event.nativeEvent) as Element)) {
+    const target = getTarget(event.nativeEvent);
+    if (!bar || !isElement(target) || !contains(bar, target)) {
       event.stopPropagation();
     }
   };

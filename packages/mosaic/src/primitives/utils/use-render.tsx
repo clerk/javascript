@@ -1,6 +1,8 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as React from 'react';
 
+import { keysOf } from './object';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -208,7 +210,7 @@ export function useRender<
 
   let dataAttrs: Record<string, string> = {};
   if (state && stateAttributesMapping) {
-    for (const key of Object.keys(stateAttributesMapping) as Array<keyof State>) {
+    for (const key of keysOf(stateAttributesMapping)) {
       const mapper = stateAttributesMapping[key];
       if (mapper) {
         const attrs = mapper(state[key]);

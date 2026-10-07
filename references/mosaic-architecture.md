@@ -499,7 +499,6 @@ The steps above cover the **styling** migration. For **flow** components — whe
 | `src/hooks/`                             | Mosaic-only hooks (`useMosaicEnvironment`, `useMosaicRouter`, …)                   |
 | `src/styles/index.ts`                    | StyleX-only barrel — the entry the CSS build walks                                 |
 | `src/machine/`                           | State-machine runtime (`createMachine`, `createActor`, `useMachine`)               |
-| `src/machines/`                          | Standalone machines written with the runtime                                       |
 | `src/<feature>/*.model.tsx`              | Clerk adapter — the only file in a feature that may import Clerk                   |
 | `src/<feature>/*.controller.tsx`         | Local state and action wrapping; holds the feature's machine                       |
 | `src/<feature>/*.view.tsx`               | Clerk-free rendering from plain props                                              |
