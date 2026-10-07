@@ -35,12 +35,6 @@ testAgainstRunningApps({ withEnv: [appConfigs.envs.withCustomRoles] })('Show com
     await app.teardown();
   });
 
-  test.afterEach(async ({ page, context }) => {
-    const u = createTestUtils({ app, page, context });
-    await u.page.signOut();
-    await u.page.context().clearCookies();
-  });
-
   test('<Show when="signed-out"> renders when not authenticated', async ({ page, context }) => {
     const u = createTestUtils({ app, page, context });
     await u.page.goToRelative('/show-component');

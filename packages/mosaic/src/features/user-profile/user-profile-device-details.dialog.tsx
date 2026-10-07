@@ -44,13 +44,7 @@ function DeviceDetailsCard({
   onSignOut: UserProfileDeviceDetailsDialogProps['onSignOut'];
 }) {
   const m = useMessages('userProfileActiveDevices');
-  const signOut = usePendingAction(
-    async () => {
-      await onSignOut?.(device);
-      handle.close();
-    },
-    { errorFallback: m.detailsDialog.signOutError },
-  );
+  const signOut = usePendingAction({ errorFallback: m.detailsDialog.signOutError });
 
   const fields: { label: string; value: string | undefined }[] = [
     { label: m.detailsDialog.model, value: device.model },
@@ -76,7 +70,7 @@ function DeviceDetailsCard({
         role='alert'
         color='negative'
       >
-        {signOut.errorMessage}
+        {signOut.error}
       </Card.Banner>
       {details.length > 0 ? (
         <Card.Content>
@@ -96,7 +90,12 @@ function DeviceDetailsCard({
             type='button'
             fullWidth
             isPending={signOut.isPending}
-            onClick={() => void signOut.run()}
+            onClick={() =>
+              void signOut.run('sign-out', async () => {
+                await onSignOut?.(device);
+                handle.close();
+              })
+            }
           >
             {m.detailsDialog.signOut}
           </SubmitButton>

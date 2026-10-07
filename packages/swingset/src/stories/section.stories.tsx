@@ -49,7 +49,9 @@ export function Default() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Profile</Section.Title>
+          <Section.Content>
+            <Section.Title>Profile</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -143,7 +145,9 @@ export function Cards() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Profile</Section.Title>
+          <Section.Content>
+            <Section.Title>Profile</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -188,7 +192,9 @@ export function Cards() {
       ].map(({ label, values }) => (
         <Section.Group key={label}>
           <Section.Header>
-            <Section.Title>{label}</Section.Title>
+            <Section.Content>
+              <Section.Title>{label}</Section.Title>
+            </Section.Content>
             <Section.Actions>
               <Button
                 aria-label={`Add ${label.toLowerCase()}`}
@@ -241,8 +247,10 @@ export function HeaderDescription() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Active devices</Section.Title>
-          <Section.Description>Devices signed in to this account.</Section.Description>
+          <Section.Content>
+            <Section.Title>Active devices</Section.Title>
+            <Section.Description>Devices signed in to this account.</Section.Description>
+          </Section.Content>
           <Section.Actions>
             <Button
               color='neutral'
@@ -286,7 +294,9 @@ export function ConnectedAccounts() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Connected accounts</Section.Title>
+          <Section.Content>
+            <Section.Title>Connected accounts</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -342,7 +352,9 @@ export function IconFrameMedia() {
     <Section.Root xstyle={styles.rootMax}>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Team</Section.Title>
+          <Section.Content>
+            <Section.Title>Team</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -372,7 +384,9 @@ export function Destructive() {
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Danger zone</Section.Title>
+          <Section.Content>
+            <Section.Title>Danger zone</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
@@ -432,7 +446,9 @@ export function Flat() {
       <Section.Root xstyle={styles.rootMax}>
         <Section.Group>
           <Section.Header>
-            <Section.Title>Profile</Section.Title>
+            <Section.Content>
+              <Section.Title>Profile</Section.Title>
+            </Section.Content>
           </Section.Header>
           <Section.Body>
             <Section.Row>
@@ -477,7 +493,9 @@ export function Flat() {
         ].map(({ label, values }) => (
           <Section.Group key={label}>
             <Section.Header>
-              <Section.Title>{label}</Section.Title>
+              <Section.Content>
+                <Section.Title>{label}</Section.Title>
+              </Section.Content>
               <Section.Actions>
                 <Button
                   aria-label={`Add ${label.toLowerCase()}`}

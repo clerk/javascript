@@ -10,7 +10,9 @@ import { Section } from '@clerk/mosaic/components/section';
 <Section.Root>
   <Section.Group>
     <Section.Header>
-      <Section.Title>Account</Section.Title>
+      <Section.Content>
+        <Section.Title>Account</Section.Title>
+      </Section.Content>
       <Section.Actions>{control}</Section.Actions>
     </Section.Header>
     <Section.Body>
@@ -32,9 +34,9 @@ import { Section } from '@clerk/mosaic/components/section';
 `Section.Root` holds one topic and stacks its cards. It has no title of its own; pass `aria-label`
 to expose it as a named region.
 
-`Section.Group` is a card. `Section.Header` holds its `Section.Title`, an optional
-`Section.Description`, and optional `Section.Actions`; the card takes its accessible name from
-the title. `Section.Body` wraps everything under the header and draws the divider between the two.
+`Section.Group` is a card. `Section.Header` holds a `Section.Content` with its `Section.Title` and
+an optional `Section.Description`, followed by optional `Section.Actions`; the card takes its
+accessible name from the title. The actions move under the content when they don't fit beside it. `Section.Body` wraps everything under the header and draws the divider between the two.
 
 Inside the body, a `Section.Row` holds one setting as a `Section.Item`. `Section.Items` renders a
 list of values, one `Section.Item` per entry, and each item becomes a list item. Items lay out
@@ -60,14 +62,14 @@ title. See [Panel](/components/panel) and [Heading](/components/heading).
 | --------------------- | ----------- | ------------------------- | --------------------------------------------------------------- |
 | `Section.Root`        | `<section>` | `.cl-section`             | Stacks cards. Unnamed unless given `aria-label`.                |
 | `Section.Group`       | `<div>`     | `.cl-section-group`       | The card, with `role='group'` named by its title.               |
-| `Section.Header`      | `<div>`     | `.cl-section-header`      | Title, optional description, optional actions.                  |
+| `Section.Header`      | `<div>`     | `.cl-section-header`      | Content and optional actions.                                   |
 | `Section.Title`       | heading     | `.cl-section-title`       | The card's heading.                                             |
 | `Section.Body`        | `<div>`     | `.cl-section-body`        | The card's content; draws the divider under the header.         |
 | `Section.Row`         | `<div>`     | `.cl-section-row`         | One setting.                                                    |
 | `Section.Items`       | `<ul>`      | `.cl-section-items`       | A list of values.                                               |
 | `Section.Item`        | `<div>`     | `.cl-section-item`        | Media, content, and actions on one line. `<li>` inside `Items`. |
 | `Section.Media`       | `<div>`     | `.cl-section-media`       | Reflects `data-size`.                                           |
-| `Section.Content`     | `<div>`     | `.cl-section-content`     | Label and description.                                          |
+| `Section.Content`     | `<div>`     | `.cl-section-content`     | Label or title, and description.                                |
 | `Section.Label`       | `<div>`     | `.cl-section-label`       |                                                                 |
 | `Section.Description` | `<div>`     | `.cl-section-description` |                                                                 |
 | `Section.Actions`     | `<div>`     | `.cl-section-actions`     |                                                                 |

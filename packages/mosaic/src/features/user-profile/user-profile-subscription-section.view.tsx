@@ -24,7 +24,9 @@ export function UserProfileSubscriptionSectionView({
     <Section.Root>
       <Section.Group>
         <Section.Header>
-          <Section.Title>Subscription</Section.Title>
+          <Section.Content>
+            <Section.Title>Subscription</Section.Title>
+          </Section.Content>
         </Section.Header>
         <Section.Body>
           <Section.Row>
