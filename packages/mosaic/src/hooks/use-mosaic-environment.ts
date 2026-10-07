@@ -1,5 +1,5 @@
 import { useClerk } from '@clerk/shared/react';
-import type { EnvironmentResource } from '@clerk/shared/types';
+import type { EnvironmentResource, LoadedClerk } from '@clerk/shared/types';
 
 /**
  * The single seam through which Mosaic reads the active Clerk environment.
@@ -20,6 +20,10 @@ import type { EnvironmentResource } from '@clerk/shared/types';
  */
 export function useMosaicEnvironment(): EnvironmentResource | undefined {
   const clerk = useClerk();
+  return getMosaicEnvironment(clerk);
+}
+
+export function getMosaicEnvironment(clerk: LoadedClerk): EnvironmentResource | undefined {
   // @ts-expect-error -- `__internal_environment` is a private Clerk surface for now.
   // SAFETY: read-only access to the loaded environment resource, mirroring
   // components/devPrompts/KeylessPrompt/use-revalidate-environment.ts.

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ToastProvider } from './components/toast/toast';
+import { MosaicNowProvider } from './hooks/use-now';
 import type { MosaicIconOverrides } from './icons/overrides';
 import { MosaicIconsProvider } from './icons/overrides';
 import type { MosaicLocalization } from './localization';
@@ -20,11 +21,14 @@ export interface MosaicProviderProps {
 export function MosaicProvider({ children, icons, localization }: MosaicProviderProps): React.ReactElement {
   const iconsValue = React.useMemo(() => icons ?? {}, [icons]);
   const localizationValue = React.useMemo(() => resolveLocalization(localization), [localization]);
+  const [now] = React.useState(() => new Date());
 
   return (
     <MosaicIconsProvider value={iconsValue}>
       <MosaicLocalizationProvider value={localizationValue}>
-        <ToastProvider>{children}</ToastProvider>
+        <MosaicNowProvider value={now}>
+          <ToastProvider>{children}</ToastProvider>
+        </MosaicNowProvider>
       </MosaicLocalizationProvider>
     </MosaicIconsProvider>
   );

@@ -11,6 +11,7 @@ import {
   fapiUser,
 } from '../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../__tests__/feature/render';
+import { UserProfilePasskeysSectionView } from './user-profile-passkeys-section.view';
 import { UserProfileSecurityPanel } from './user-profile-security-panel';
 
 const email = fapiEmailAddress({ id: 'idn_1', email_address: 'person@example.com' });
@@ -66,7 +67,7 @@ describe('UserProfileSecurityPanel', () => {
     const environment = fapiEnvironment();
     environment.user_settings.attributes.password.enabled = false;
     serveFapi({ environment, client: fapiClient([fapiSession({ id: 'sess_1', user: alice })]) });
-    await renderWithClerk(<UserProfileSecurityPanel passkeys={[]} />);
+    await renderWithClerk(<UserProfileSecurityPanel passkeysSlot={<UserProfilePasskeysSectionView passkeys={[]} />} />);
 
     expect(screen.getByRole('region', { name: 'Authentication' })).toHaveTextContent('Passkeys');
     expect(screen.queryByText('Password')).toBeNull();
