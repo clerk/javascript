@@ -18,9 +18,16 @@
 
 const PROPERTY = '--_cl-keyboard-inset';
 
+// Keyboard-sized changes only: browser toolbars collapsing and expanding stay below this.
+const KEYBOARD_THRESHOLD = 60;
+
 let listeners = 0;
 let detach: (() => void) | null = null;
 let frame = 0;
+// A fixed `100svh` box. Chrome on iOS shrinks `svh` to the keyboard before it resizes the layout
+// viewport to match, so a box that already fits the visible band means the browser is moving fixed
+// content itself, and an inset would lift the dialog twice. Safari leaves `svh` alone.
+let smallViewportProbe: HTMLElement | null = null;
 
 /**
  * The gap between the bottom of the layout viewport and the bottom of the visual viewport — which
@@ -37,6 +44,9 @@ function measure(): number {
   // A pinch-zoomed page also shrinks the visual viewport, and padding the dialog for that would be
   // actively wrong — the user zoomed in to look at something, not because a keyboard appeared.
   if (viewport.scale > 1) {
+    return 0;
+  }
+  if (smallViewportProbe && smallViewportProbe.offsetHeight - viewport.height <= KEYBOARD_THRESHOLD) {
     return 0;
   }
   return Math.max(0, Math.round(document.documentElement.clientHeight - (viewport.height + viewport.offsetTop)));
@@ -69,6 +79,10 @@ export function acquireKeyboardInset(): () => void {
   listeners++;
   if (listeners === 1) {
     const viewport = window.visualViewport;
+    smallViewportProbe = document.createElement('div');
+    smallViewportProbe.style.cssText =
+      'position:fixed;top:0;height:100svh;width:0;visibility:hidden;pointer-events:none';
+    document.body.appendChild(smallViewportProbe);
     publish();
     viewport.addEventListener('resize', schedulePublish);
     viewport.addEventListener('scroll', schedulePublish);
@@ -77,6 +91,8 @@ export function acquireKeyboardInset(): () => void {
       viewport.removeEventListener('scroll', schedulePublish);
       cancelAnimationFrame(frame);
       frame = 0;
+      smallViewportProbe?.remove();
+      smallViewportProbe = null;
       document.documentElement.style.removeProperty(PROPERTY);
     };
   }
