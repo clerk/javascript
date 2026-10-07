@@ -1,6 +1,8 @@
 import { useMergeRefs } from '@floating-ui/react';
 import * as React from 'react';
 
+import { keysOf } from './object';
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -124,6 +126,10 @@ export function mergeProps(a: Record<string, unknown>, b: Record<string, unknown
 // useRender
 // ---------------------------------------------------------------------------
 
+export function isRef(value: unknown): value is React.Ref<unknown> {
+  return value === null || typeof value === 'function' || (typeof value === 'object' && 'current' in value);
+}
+
 /**
  * Reads the ref off a React element passed to `render`. React 19 exposes it on
  * `props.ref`; React <=18 keeps it on the element itself.
@@ -204,7 +210,7 @@ export function useRender<
 
   let dataAttrs: Record<string, string> = {};
   if (state && stateAttributesMapping) {
-    for (const key of Object.keys(stateAttributesMapping) as Array<keyof State>) {
+    for (const key of keysOf(stateAttributesMapping)) {
       const mapper = stateAttributesMapping[key];
       if (mapper) {
         const attrs = mapper(state[key]);

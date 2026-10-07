@@ -11,24 +11,20 @@ import { useMosaicEnvironment } from '../../../hooks/use-mosaic-environment';
 import { useErrorText, useLocale, useMessages } from '../../../localization';
 import { passwordFormError } from './user-profile-password-errors';
 import { passwordFieldFeedback } from './user-profile-password-feedback';
-import type { UserProfileEditPasswordValue } from './user-profile-password-section.types';
-
-type EditablePasswordPolicy =
-  | { mode: 'set'; requiresCurrentPassword: false }
-  | { mode: 'change'; requiresCurrentPassword: boolean };
+import type { UserProfileEditPasswordValue, UserProfilePasswordPolicy } from './user-profile-password-section.types';
 
 type UnavailablePasswordModel =
   | { status: 'hidden' }
   | {
       status: 'readonly';
       mode: 'set' | 'change';
-      managedBy: { name?: string };
+      managedBy: { name: string };
     };
 
 export type UserProfilePasswordModel =
   | { status: 'loading' }
   | UnavailablePasswordModel
-  | (EditablePasswordPolicy & {
+  | (UserProfilePasswordPolicy & {
       status: 'ready';
       userId: string;
       sessionId: string;
@@ -37,10 +33,15 @@ export type UserProfilePasswordModel =
       updatePassword: (input: UserProfileEditPasswordValue) => Promise<void>;
     });
 
+type PasswordPolicyResult =
+  | { status: 'hidden' }
+  | { status: 'readonly'; mode: 'set' | 'change'; enterpriseConnectionName: string | undefined }
+  | (UserProfilePasswordPolicy & { status: 'ready'; userId: string });
+
 function getPasswordPolicy(
   user: UserResource | null | undefined,
   environment: EnvironmentResource,
-): UnavailablePasswordModel | (EditablePasswordPolicy & { status: 'ready'; userId: string }) {
+): PasswordPolicyResult {
   if (!user) {
     return { status: 'hidden' };
   }
@@ -50,7 +51,7 @@ function getPasswordPolicy(
   }
 
   // TODO: When session reverification is supported, require the current password only when reverification is disabled.
-  const policy: EditablePasswordPolicy = user.passwordEnabled
+  const policy: UserProfilePasswordPolicy = user.passwordEnabled
     ? { mode: 'change', requiresCurrentPassword: true }
     : { mode: 'set', requiresCurrentPassword: false };
 
@@ -59,7 +60,7 @@ function getPasswordPolicy(
     return {
       status: 'readonly',
       mode: policy.mode,
-      managedBy: { name: enterpriseAccount.enterpriseConnection?.name || undefined },
+      enterpriseConnectionName: enterpriseAccount.enterpriseConnection?.name,
     };
   }
 
@@ -106,6 +107,13 @@ export function useUserProfilePasswordModel(): UserProfilePasswordModel {
   }
 
   const policy = getPasswordPolicy(user, environment);
+  if (policy.status === 'readonly') {
+    return {
+      status: 'readonly',
+      mode: policy.mode,
+      managedBy: { name: policy.enterpriseConnectionName || m.enterpriseConnection },
+    };
+  }
   if (policy.status !== 'ready') {
     return policy;
   }

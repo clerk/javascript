@@ -38,10 +38,10 @@ export function TabsIndicator(props: TabsIndicatorProps) {
       const isTabChange = last != null && last.value !== value;
 
       const sharedVars = {
-        ['--cl-tab-left' as string]: `${newRect.x}px`,
-        ['--cl-tab-width' as string]: `${newRect.width}px`,
-        ['--cl-tab-top' as string]: `${newRect.y}px`,
-        ['--cl-tab-height' as string]: `${newRect.height}px`,
+        '--cl-tab-left': `${newRect.x}px`,
+        '--cl-tab-width': `${newRect.width}px`,
+        '--cl-tab-top': `${newRect.y}px`,
+        '--cl-tab-height': `${newRect.height}px`,
         ...(isTabChange ? {} : { transition: 'none' }),
       };
 
