@@ -3,7 +3,7 @@
 import { useListItem } from '@floating-ui/react';
 import React, { useEffect, useId } from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, isHTMLElement, mergeProps, useRender } from '../utils';
 import { useComboboxContext } from './combobox-context';
 import { ComboboxOptionContext } from './combobox-option-context';
 
@@ -57,7 +57,10 @@ export const ComboboxOption = React.forwardRef<HTMLDivElement, ComboboxOptionPro
         onClick() {
           if (!disabled) {
             handleSelect(value, index, displayLabel);
-            (refs.domReference.current as HTMLElement | null)?.focus();
+            const reference = refs.domReference.current;
+            if (isHTMLElement(reference)) {
+              reference.focus();
+            }
           }
         },
       }),

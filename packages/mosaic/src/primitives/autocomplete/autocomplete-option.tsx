@@ -3,7 +3,7 @@
 import { useListItem } from '@floating-ui/react';
 import React, { useEffect, useId } from 'react';
 
-import { type ComponentProps, type DefaultProps, mergeProps, useRender } from '../utils';
+import { type ComponentProps, type DefaultProps, isHTMLElement, mergeProps, useRender } from '../utils';
 import { useAutocompleteContext } from './autocomplete-context';
 
 export interface AutocompleteOptionProps extends ComponentProps<'div'> {
@@ -55,7 +55,10 @@ export const AutocompleteOption = React.forwardRef<HTMLDivElement, AutocompleteO
         onClick() {
           if (!disabled) {
             handleSelect(value, index, displayLabel);
-            (refs.domReference.current as HTMLElement | null)?.focus();
+            const reference = refs.domReference.current;
+            if (isHTMLElement(reference)) {
+              reference.focus();
+            }
           }
         },
       }),

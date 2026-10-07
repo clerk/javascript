@@ -47,10 +47,7 @@ export const AutocompleteInput = React.forwardRef<HTMLInputElement, Autocomplete
     return useRender({
       defaultTagName: 'input',
       render,
-      // floating-ui types `setReference` as a method signature, but at runtime it's
-      // a stable callback that doesn't use `this`, so the unbound-method check is a
-      // false positive here.
-      // eslint-disable-next-line @typescript-eslint/unbound-method
+      // eslint-disable-next-line @typescript-eslint/unbound-method -- floating-ui types `setReference` as a method, but it is a stable callback that does not use `this`.
       ref: [refs.setReference, ref],
       state,
       stateAttributesMapping: {
