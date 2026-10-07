@@ -48,7 +48,7 @@ jobs:
     name: Release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: 25
+    timeout-minutes: 40
 
     permissions:
       actions: read
@@ -307,7 +307,7 @@ jobs:
     name: Canary release
     if: ${{ github.event_name == 'push' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_NORMAL || 'ubuntu-latest' }}
-    timeout-minutes: 25
+    timeout-minutes: 40
     permissions:
       contents: read
       id-token: write
@@ -508,7 +508,7 @@ jobs:
     name: Snapshot release
     if: ${{ github.event_name == 'workflow_dispatch' && github.repository == 'clerk/javascript' }}
     runs-on: ${{ vars.RUNNER_LARGE || 'ubuntu-latest-l' }}
-    timeout-minutes: 25
+    timeout-minutes: 40
 
     permissions:
       contents: read

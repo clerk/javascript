@@ -4105,6 +4105,23 @@ describe('Clerk singleton', () => {
       expect(resolve).toHaveBeenCalledWith(sut, sut.client?.signUp);
       resolve.mockRestore();
     });
+
+    it('reports a failed gate on the resource that carries it and rejects', async () => {
+      const blocked = new Error('blocked');
+      const resolve = vi
+        .spyOn(ProtectCheckGate.prototype, 'resolve')
+        .mockResolvedValueOnce(undefined)
+        .mockRejectedValueOnce(blocked);
+      const sut = await loadWithClient({ signIn: gatedSignIn(), signUp: gatedSignIn() });
+      const emit = vi.spyOn(eventBus, 'emit');
+
+      await expect(sut.__internal_resolvePendingProtectCheck()).rejects.toBe(blocked);
+
+      expect(emit).toHaveBeenCalledTimes(1);
+      expect(emit).toHaveBeenCalledWith(events.ResourceError, { resource: sut.client?.signUp, error: blocked });
+      emit.mockRestore();
+      resolve.mockRestore();
+    });
   });
 
   describe('ui.ClerkUI option', () => {
