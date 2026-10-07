@@ -17,6 +17,7 @@ export function UserProfileWeb3WalletsSectionView({
   availableProviders = [],
   pendingId,
   onConnect,
+  onVerify,
   onSetPrimary,
   onRemove,
 }: UserProfileWeb3WalletsSectionViewProps) {
@@ -54,7 +55,9 @@ export function UserProfileWeb3WalletsSectionView({
                   key={wallet.id}
                   wallet={wallet}
                   triggerRef={removalFocus.registerTrigger(wallet.id)}
+                  isPending={pendingId === wallet.id}
                   isDisabled={isBusy}
+                  onVerify={onVerify}
                   onSetPrimary={onSetPrimary}
                   onRemove={onRemove ? wallet => removeWallet.open(wallet) : undefined}
                 />

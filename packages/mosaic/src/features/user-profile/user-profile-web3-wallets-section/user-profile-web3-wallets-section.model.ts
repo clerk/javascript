@@ -65,7 +65,7 @@ export function projectWeb3Wallets({
   const sorted = [...primary, ...verified, ...unverified, ...withoutStatus];
 
   const connectedStrategies = new Set(
-    wallets.filter(wallet => wallet.verification.status === 'verified').map(wallet => wallet.verification.strategy),
+    wallets.map(wallet => wallet.verification.strategy).filter(strategy => strategy !== null),
   );
 
   return {
@@ -76,6 +76,14 @@ export function projectWeb3Wallets({
         id: wallet.id,
         address: wallet.web3Wallet,
         provider: provider?.name,
+        providerId: provider?.strategy,
+        walletPicker: provider?.provider === 'solana' ? 'solana' : undefined,
+        canVerify:
+          Boolean(provider) &&
+          wallet.verification.status !== 'verified' &&
+          allowCreation &&
+          wallet.verification.strategy !== null &&
+          enabledStrategies.includes(wallet.verification.strategy),
         iconUrl: provider ? iconImageUrl(provider.provider) : undefined,
         isPrimary: wallet.id === primaryId,
         isVerified: wallet.verification.status === 'verified',
@@ -124,10 +132,39 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
     }
     return current;
   };
+  const attemptVerification = async ({
+    wallet,
+    provider,
+    identifier,
+    walletName,
+    web3,
+  }: {
+    wallet: Web3WalletResource;
+    provider: (typeof WEB3_PROVIDERS)[number];
+    identifier: string;
+    walletName?: string;
+    web3: ReturnType<typeof createWeb3>;
+  }) => {
+    const prepared = await wallet.prepareVerification({ strategy: provider.strategy });
+    requireCurrentUser();
+    const nonce = prepared.verification.message;
+    if (!nonce) {
+      throw new ClerkRuntimeError('The wallet verification message is unavailable.', {
+        code: 'web3_verification_message_unavailable',
+      });
+    }
+    const signature = await web3.generateWeb3Signature({ identifier, nonce, provider: provider.provider, walletName });
+    requireCurrentUser();
+    if (!signature) {
+      throw new ClerkRuntimeError('The wallet signature is unavailable.', { code: 'web3_signature_unavailable' });
+    }
+    await prepared.attemptVerification({ signature });
+  };
+
   return {
     ...projection,
     userId,
-    connect: async (strategy, walletName) => {
+    connect: async (strategy, walletName, onTarget) => {
       requireCurrentUser();
       const provider = WEB3_PROVIDERS.find(candidate => candidate.strategy === strategy);
       const available = projection.availableProviders.some(candidate => candidate.id === strategy);
@@ -159,32 +196,57 @@ export function useUserProfileWeb3WalletsModel(): UserProfileWeb3WalletsModel {
       const normalizedIdentifier = normalizedWeb3Wallet(identifier);
       const existing = current.web3Wallets.find(
         wallet =>
-          wallet.verification.status !== 'verified' && normalizedWeb3Wallet(wallet.web3Wallet) === normalizedIdentifier,
+          wallet.verification.status !== 'verified' &&
+          (wallet.verification.strategy === provider.strategy || wallet.verification.strategy === null) &&
+          normalizedWeb3Wallet(wallet.web3Wallet) === normalizedIdentifier,
       );
+      if (existing) {
+        onTarget?.({ kind: 'wallet', id: existing.id });
+      } else {
+        onTarget?.({ kind: 'address', address: normalizedIdentifier });
+      }
       const wallet = existing ?? (await current.createWeb3Wallet({ web3Wallet: identifier }));
       requireCurrentUser();
       if (!wallet) {
         throw new ClerkRuntimeError('The wallet could not be created.', { code: 'web3_wallet_creation_failed' });
       }
-      const prepared = await wallet.prepareVerification({ strategy: provider.strategy });
-      requireCurrentUser();
-      const nonce = prepared.verification.message;
-      if (!nonce) {
-        throw new ClerkRuntimeError('The wallet verification message is unavailable.', {
-          code: 'web3_verification_message_unavailable',
+      onTarget?.({ kind: 'wallet', id: wallet.id });
+      await attemptVerification({ wallet, provider, identifier, walletName, web3 });
+    },
+    verify: async (walletId, walletName) => {
+      const current = requireCurrentUser();
+      const wallet = current.web3Wallets.find(candidate => candidate.id === walletId);
+      const provider = WEB3_PROVIDERS.find(candidate => candidate.strategy === wallet?.verification.strategy);
+      const canVerify =
+        Boolean(environment.userSettings.attributes.web3_wallet?.enabled) &&
+        !environment.userSettings.attributes.web3_wallet?.immutable &&
+        allowsIdentificationCreation(current, environment.userSettings.enterpriseSSO) &&
+        environment.userSettings.web3FirstFactors.some(strategy => strategy === wallet?.verification.strategy);
+      const manager = clerk.__internal_moduleManager;
+      if (!wallet || !provider || wallet.verification.status === 'verified' || !canVerify || !manager) {
+        throw new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
+      }
+      const web3 = createWeb3(manager);
+      const identifier = await web3.getWeb3Identifier({ provider: provider.provider, walletName });
+      if (!identifier) {
+        throw new ClerkRuntimeError('A Web3 Wallet extension cannot be found.', { code: 'web3_missing_identifier' });
+      }
+      const latestUser = requireCurrentUser();
+      const latest = latestUser.web3Wallets.find(candidate => candidate.id === walletId);
+      if (
+        !latest ||
+        latest.verification.status === 'verified' ||
+        latest.verification.strategy !== provider.strategy ||
+        !allowsIdentificationCreation(latestUser, environment.userSettings.enterpriseSSO)
+      ) {
+        throw new ClerkRuntimeError('This wallet provider is unavailable.', { code: 'web3_provider_unavailable' });
+      }
+      if (normalizedWeb3Wallet(identifier) !== normalizedWeb3Wallet(latest.web3Wallet)) {
+        throw new ClerkRuntimeError('Select the wallet account that matches this address.', {
+          code: 'web3_account_mismatch',
         });
       }
-      const signature = await web3.generateWeb3Signature({
-        identifier,
-        nonce,
-        provider: provider.provider,
-        walletName,
-      });
-      requireCurrentUser();
-      if (!signature) {
-        throw new ClerkRuntimeError('The wallet signature is unavailable.', { code: 'web3_signature_unavailable' });
-      }
-      await prepared.attemptVerification({ signature });
+      await attemptVerification({ wallet: latest, provider, identifier, walletName, web3 });
     },
     setPrimary: async walletId => {
       const current = requireCurrentUser();

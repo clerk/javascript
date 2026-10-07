@@ -29,7 +29,7 @@ describe('Web3 wallet projection', () => {
     });
   });
 
-  it('WEB3-02 keeps unverified wallets and their provider available', () => {
+  it('WEB3-02 keeps unverified wallets as the only action for their provider', () => {
     const result = projectWeb3Wallets({
       wallets: [{ ...metamask, verification: { ...metamask.verification, status: 'unverified' } }],
       primaryId: null,
@@ -37,8 +37,45 @@ describe('Web3 wallet projection', () => {
       allowCreation: true,
     });
     expect(result).toMatchObject({
-      wallets: [{ id: 'wallet_metamask', provider: 'MetaMask', isVerified: false }],
-      availableProviders: [{ id: 'web3_metamask_signature' }],
+      wallets: [{ id: 'wallet_metamask', provider: 'MetaMask', isVerified: false, canVerify: true }],
+      availableProviders: [],
+    });
+  });
+
+  it('keeps every saved address when one provider has multiple unverified wallets', () => {
+    const result = projectWeb3Wallets({
+      wallets: [
+        { ...metamask, id: 'first', verification: { ...metamask.verification, status: 'unverified' } },
+        {
+          ...metamask,
+          id: 'second',
+          web3Wallet: '0xabcdef1234567890',
+          verification: { ...metamask.verification, status: 'unverified' },
+        },
+      ],
+      primaryId: null,
+      enabledStrategies: ['web3_metamask_signature'],
+      allowCreation: true,
+    });
+    expect(result).toMatchObject({
+      wallets: [
+        { id: 'first', canVerify: true },
+        { id: 'second', canVerify: true },
+      ],
+      availableProviders: [],
+    });
+  });
+
+  it('does not offer Verify when wallet changes are disabled', () => {
+    const result = projectWeb3Wallets({
+      wallets: [{ ...metamask, verification: { ...metamask.verification, status: 'unverified' } }],
+      primaryId: null,
+      enabledStrategies: ['web3_metamask_signature'],
+      allowCreation: false,
+    });
+    expect(result).toMatchObject({
+      wallets: [{ id: 'wallet_metamask', canVerify: false }],
+      availableProviders: [],
     });
   });
 

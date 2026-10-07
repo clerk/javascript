@@ -7,10 +7,6 @@ import { useState } from 'react';
 import { useChaosFixture } from '@/components/ChaosProvider';
 import { chaosText } from '@/lib/chaos';
 
-interface DemoWallet extends UserProfileWeb3Wallet {
-  providerId?: string;
-}
-
 const providers: UserProfileWeb3Provider[] = [
   { id: 'web3_metamask_signature', provider: 'MetaMask', iconUrl: 'https://img.clerk.com/static/metamask.svg' },
   {
@@ -20,7 +16,7 @@ const providers: UserProfileWeb3Provider[] = [
   },
 ];
 
-export const primaryWallet: DemoWallet = {
+export const primaryWallet: UserProfileWeb3Wallet = {
   id: 'wallet_1',
   providerId: 'web3_metamask_signature',
   provider: 'MetaMask',
@@ -30,7 +26,7 @@ export const primaryWallet: DemoWallet = {
   isVerified: true,
 };
 
-export const secondaryWallet: DemoWallet = {
+export const secondaryWallet: UserProfileWeb3Wallet = {
   id: 'wallet_2',
   providerId: 'web3_coinbase_wallet_signature',
   provider: 'Coinbase Wallet',
@@ -45,13 +41,17 @@ export function useWeb3WalletsFixture({
   primaryError = false,
   removalState,
 }: {
-  initialWallets?: DemoWallet[];
+  initialWallets?: UserProfileWeb3Wallet[];
   availableProviders?: UserProfileWeb3Provider[];
   primaryError?: boolean;
   removalState?: 'pending' | 'error';
 } = {}) {
   const seedWallets = useChaosFixture(initialWallets, items =>
-    items.map(wallet => ({ ...wallet, provider: chaosText(wallet.provider) })),
+    items.map(wallet => ({
+      ...wallet,
+      provider: chaosText(wallet.provider),
+      canVerify: !wallet.isVerified && wallet.providerId !== undefined,
+    })),
   );
   const seedProviders = useChaosFixture(availableProviders, items =>
     items.map(provider => ({ ...provider, provider: chaosText(provider.provider) })),
@@ -64,7 +64,7 @@ export function useWeb3WalletsFixture({
   return {
     wallets,
     availableProviders: connectionProviders.filter(
-      provider => !wallets.some(wallet => wallet.providerId === provider.id && wallet.isVerified),
+      provider => !wallets.some(wallet => wallet.providerId === provider.id),
     ),
     onConnect: (id: string) => {
       const provider = connectionProviders.find(item => item.id === id);
@@ -75,22 +75,25 @@ export function useWeb3WalletsFixture({
         current.map(item => (item.id === id ? { ...item, connectError: undefined } : item)),
       );
       setWallets(current => {
-        if (current.some(wallet => wallet.providerId === id && !wallet.isVerified)) {
-          return current.map(wallet => (wallet.providerId === id ? { ...wallet, isVerified: true } : wallet));
-        }
         return [
           ...current,
           {
             provider: provider.provider,
             iconUrl: provider.iconUrl,
             id: `wallet_${id}`,
-            providerId: id,
+            providerId: provider.id,
             address: '0x1234567890abcdef1234567890abcdef12345678',
             isVerified: true,
+            canVerify: false,
             isPrimary: !current.some(wallet => wallet.isPrimary),
           },
         ];
       });
+    },
+    onVerify: (id: string) => {
+      setWallets(current =>
+        current.map(wallet => (wallet.id === id ? { ...wallet, isVerified: true, canVerify: false } : wallet)),
+      );
     },
     onSetPrimary: (id: string) => {
       if (primaryError && !primaryFailed) {
