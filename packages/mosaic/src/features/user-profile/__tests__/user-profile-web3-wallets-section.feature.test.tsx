@@ -15,8 +15,9 @@ import {
   fapiWeb3Wallet,
 } from '../../../__tests__/feature/fapi';
 import { renderWithClerk } from '../../../__tests__/feature/render';
+import { Dialog } from '../../../components/dialog';
 import { MosaicProvider } from '../../../mosaic-provider';
-import { UserProfileSolanaWalletDialog } from '../user-profile-web3-wallets-section/user-profile-solana-wallet.dialog';
+import { UserProfileSolanaWalletView } from '../user-profile-web3-wallets-section/user-profile-solana-wallet.view';
 import { UserProfileWeb3WalletsSection } from '../user-profile-web3-wallets-section/user-profile-web3-wallets-section';
 
 describe('Web3 wallets', () => {
@@ -549,7 +550,7 @@ describe('Web3 wallets', () => {
   });
 
   it('distinguishes localized discovery loading and failure from no installed wallets', async () => {
-    const props = { open: true, onOpenChange: vi.fn(), onConnect: vi.fn() };
+    const props = { onConnect: vi.fn() };
     const retry = vi.fn();
     const localization = {
       messages: {
@@ -564,10 +565,14 @@ describe('Web3 wallets', () => {
     };
     const { rerender } = render(
       <MosaicProvider localization={localization}>
-        <UserProfileSolanaWalletDialog
-          {...props}
-          discovery={{ status: 'loading' }}
-        />
+        <Dialog.Root open>
+          <Dialog.Popup variant='card'>
+            <UserProfileSolanaWalletView
+              {...props}
+              discovery={{ status: 'loading' }}
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
       </MosaicProvider>,
     );
 
@@ -577,10 +582,14 @@ describe('Web3 wallets', () => {
 
     rerender(
       <MosaicProvider localization={localization}>
-        <UserProfileSolanaWalletDialog
-          {...props}
-          discovery={{ status: 'error', retry }}
-        />
+        <Dialog.Root open>
+          <Dialog.Popup variant='card'>
+            <UserProfileSolanaWalletView
+              {...props}
+              discovery={{ status: 'error', retry }}
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
       </MosaicProvider>,
     );
 
@@ -594,13 +603,17 @@ describe('Web3 wallets', () => {
   });
 
   it('renders caller-supplied Solana wallets and forwards the chosen name', async () => {
-    const props = { open: true, onOpenChange: vi.fn(), onConnect: vi.fn() };
+    const props = { onConnect: vi.fn() };
     const { rerender } = render(
       <MosaicProvider>
-        <UserProfileSolanaWalletDialog
-          {...props}
-          discovery={{ status: 'ready', wallets: [{ name: 'Supplied Solana', icon: '' }] }}
-        />
+        <Dialog.Root open>
+          <Dialog.Popup variant='card'>
+            <UserProfileSolanaWalletView
+              {...props}
+              discovery={{ status: 'ready', wallets: [{ name: 'Supplied Solana', icon: '' }] }}
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
       </MosaicProvider>,
     );
 
@@ -609,10 +622,14 @@ describe('Web3 wallets', () => {
 
     rerender(
       <MosaicProvider>
-        <UserProfileSolanaWalletDialog
-          {...props}
-          discovery={{ status: 'ready', wallets: [] }}
-        />
+        <Dialog.Root open>
+          <Dialog.Popup variant='card'>
+            <UserProfileSolanaWalletView
+              {...props}
+              discovery={{ status: 'ready', wallets: [] }}
+            />
+          </Dialog.Popup>
+        </Dialog.Root>
       </MosaicProvider>,
     );
     expect(screen.queryByRole('button', { name: 'Supplied Solana' })).toBeNull();
