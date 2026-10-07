@@ -9,7 +9,7 @@ const { createFixtures } = bindCreateFixtures('SignIn');
 
 // The wallet buttons are lazy-loaded; stub them with a button that invokes the card's
 // `web3AuthCallback` so we can assert the params the card forwards to `authenticateWithWeb3`.
-vi.mock('@/ui/components/Web3SolanaWalletButtons', () => ({
+vi.mock('@/ui/elements/Web3SolanaWalletButtons', () => ({
   Web3SolanaWalletButtons: ({ web3AuthCallback }: { web3AuthCallback: (a: { walletName: string }) => void }) => (
     <button
       type='button'

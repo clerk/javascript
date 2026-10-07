@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import { UserProfileWeb3WalletsSectionView } from '../user-profile-web3-wallets-section.view';
 import { UserProfileSolanaWalletDialog } from './user-profile-solana-wallet.dialog';
+import { useUserProfileSolanaWalletsModel } from './user-profile-solana-wallet.model';
 import { useUserProfileWeb3WalletsController } from './user-profile-web3-wallets-section.controller';
 import { useUserProfileWeb3WalletsModel } from './user-profile-web3-wallets-section.model';
 import type { ReadyWeb3WalletsModel } from './user-profile-web3-wallets-section.types';
@@ -36,6 +37,7 @@ function Web3Wallets({
   fallbackFocus?: () => HTMLElement | null;
 }) {
   const controller = useUserProfileWeb3WalletsController(model);
+  const solanaWallets = useUserProfileSolanaWalletsModel();
   return (
     <>
       <UserProfileWeb3WalletsSectionView
@@ -52,6 +54,7 @@ function Web3Wallets({
         onRemove={controller.onRemove}
       />
       <UserProfileSolanaWalletDialog
+        wallets={solanaWallets}
         open={controller.solanaPickerOpen}
         pendingWalletName={controller.pendingWalletName}
         error={controller.solanaPickerError}

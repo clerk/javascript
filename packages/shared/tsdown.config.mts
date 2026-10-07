@@ -25,7 +25,6 @@ export default defineConfig(({ watch, env }) => {
     entry: [
       './src/*.{ts,tsx}',
       './src/react/index.ts',
-      './src/react/hooks/useInstalledSolanaWallets.ts',
       './src/utils/index.ts',
       './src/utils/sortIdentificationBasedOnVerification.ts',
       './src/phone/index.ts',
@@ -62,12 +61,10 @@ export default defineConfig(({ watch, env }) => {
         const { chunkFileNames } = options;
         return {
           ...options,
-          chunkFileNames: info => {
-            const pattern =
-              typeof chunkFileNames === 'function' ? chunkFileNames(info) : (chunkFileNames ?? '[name]-[hash].js');
-            const isWalletCore = info.moduleIds.some(id => /[\\/]@wallet-standard[\\/]/.test(id));
-            return `_chunks/${isWalletCore ? 'wallet-standard-core-' : ''}${pattern}`;
-          },
+          chunkFileNames:
+            typeof chunkFileNames === 'function'
+              ? info => `_chunks/${chunkFileNames(info)}`
+              : `_chunks/${chunkFileNames ?? '[name]-[hash].js'}`,
         };
       },
     },

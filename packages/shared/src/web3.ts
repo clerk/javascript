@@ -1,16 +1,5 @@
 import type { Web3ProviderData } from './types';
 
-export function isSolanaSignInWallet(wallet: {
-  chains: readonly string[];
-  features: Readonly<Record<string, unknown>>;
-}): boolean {
-  return (
-    wallet.chains.some(chain => chain.startsWith('solana:')) &&
-    'standard:connect' in wallet.features &&
-    'solana:signMessage' in wallet.features
-  );
-}
-
 export const WEB3_PROVIDERS: Web3ProviderData[] = [
   {
     provider: 'metamask',
